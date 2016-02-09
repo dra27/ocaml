@@ -12,3 +12,16 @@ Patches are applied from the root directory with `-p1`.
 
 Alternatively, if you patch the OCaml sources using a different mechanism, touch
 `patches/name.patched` for `name` to be included in the list of applied patches.
+
+This system was introduced in OCaml 4.04.0, but may be retrospectively applied
+to OCaml 3.09.0&ndash;3.11.2 by running:
+
+```
+patch -p1 -i tools/gpr#465-3.09.0+.patch
+```
+
+or for OCaml 3.12.0&ndash;4.03.0 by running:
+
+```
+patch -p1 -i tools/gpr#465-3.12.0+.patch
+```
