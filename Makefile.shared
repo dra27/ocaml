@@ -315,3 +315,7 @@ partialclean::
 	rm -f driver/compdynlink.mlbyte
 	rm -f driver/compdynlink.mli
 	rm -f driver/compdynlink.mlopt
+
+# Do not be tempted to make this PATCHES:=, it should be evaluated on demand!
+PATCHES=$(shell find patches -regex "patches/[a-z0-9+\#/-]+\.patched" \
+                             -printf ' "%f";' | sed -e "s/\.patched//g" | sort)
