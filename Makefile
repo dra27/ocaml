@@ -1292,6 +1292,24 @@ Changes: tools/processChanges$(EXE)
 	$(CAMLRUN) -I otherlibs/$(UNIXLIB) tools/processChanges$(EXE) changes.d > $@
 	cat $@.git >> $@
 
+CHANGES_SUBMODULE_REQUIRED=changes.d/archive/.gitattributes
+$(CHANGES_SUBMODULE_REQUIRED):
+	@if [ ! -e .git/config ] ; then \
+		 echo This target can only be built from a Git clone; \
+	 else \
+	   echo This target requires the changes.d/archive submodule:; \
+	   echo \  git submodule update --init changes.d/archive; \
+	 fi
+	@false
+
+.PHONY: FullChanges
+FullChanges: $(CHANGES_SUBMODULE_REQUIRED) tools/processChanges$(EXE)
+	rm -f Changes.git
+	git update-index --no-assume-unchanged Changes
+	$(CAMLRUN) -I otherlibs/$(UNIXLIB) tools/processChanges$(EXE) \
+	  changes.d/archive > Changes
+	cat changes.d/archive/Legacy >> Changes
+
 partialclean::
 	[ -e Changes.git ] && mv -f Changes.git Changes || true
 
