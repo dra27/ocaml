@@ -1282,6 +1282,19 @@ partialclean::
 
 beforedepend:: bytecomp/opcodes.ml
 
+tools/%Changes$(EXE): tools/changesLexer.mll tools/%Changes.ml
+	cd tools && $(MAKE) $*Changes$(EXE)
+
+.PHONY: Changes
+Changes: tools/processChanges$(EXE)
+	[ ! -e $@.git ] && mv -f $@ $@.git || true
+	[ -e .git/config ] && git update-index --assume-unchanged Changes || true
+	$(CAMLRUN) -I otherlibs/$(UNIXLIB) tools/processChanges$(EXE) changes.d > $@
+	cat $@.git >> $@
+
+partialclean::
+	[ -e Changes.git ] && mv -f Changes.git Changes || true
+
 # Default rules
 
 .SUFFIXES: .ml .mli .cmo .cmi .cmx

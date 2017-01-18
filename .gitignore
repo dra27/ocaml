@@ -44,6 +44,8 @@ _ocamltest
 /package-macosx
 /ocamlnat
 
+/Changes.git
+
 # specific files and patterns in sub-directories
 
 /asmcomp/emit.ml
@@ -403,6 +405,7 @@ _ocamltest
 /tools/stripdebug.opt
 /tools/make_opcodes
 /tools/make_opcodes.ml
+/tools/changesLexer.ml
 
 /utils/config.ml
 

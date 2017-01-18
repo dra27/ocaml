@@ -372,6 +372,26 @@ install::
 	cp ocaml-instr-graph ocaml-instr-report "$(INSTALL_BINDIR)/"
 endif
 
+# Changes file processing program
+
+changesLexer.ml: changesLexer.mll
+	$(CAMLLEX) $^
+
+changesLexer.cmi changesLexer.cmo: changesLexer.ml
+	$(CAMLRUN) ../ocamlc -c -g -w +a -warn-error A -I ../stdlib \
+	  -I ../otherlibs/$(UNIXLIB) $(filter %.ml,$^)
+
+%Changes.cmo: %Changes.ml changesLexer.cmi
+	$(CAMLRUN) ../ocamlc -c -g -w +a -warn-error A -I ../stdlib \
+	  -I ../otherlibs/$(UNIXLIB) $(filter %.ml,$^)
+
+%Changes$(EXE): changesLexer.cmo %Changes.cmo
+	$(CAMLRUN) ../ocamlc -o $@ -g -I ../stdlib -I ../otherlibs/$(UNIXLIB) \
+	  unix.cma $^
+
+clean::
+	rm -f changesLexer.ml processChanges$(EXE)
+
 # Common stuff
 
 .SUFFIXES:
