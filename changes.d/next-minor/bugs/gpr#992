@@ -1,0 +1,3 @@
+GPR#992: caml-types.el: Fix missing format argument, so that it can show kind
+of call at point correctly.
+(Chunhui He)

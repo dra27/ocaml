@@ -1,0 +1,2 @@
+GPR#891: Use -fno-builtin-memcmp when building runtime with gcc.
+(Leo White)

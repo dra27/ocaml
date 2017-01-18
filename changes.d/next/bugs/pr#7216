@@ -1,0 +1,2 @@
+PR#7216, GPR#949: don't require double parens in Functor((val x))
+(Jacques Garrigue, review by Valentin Gatien-Baron)

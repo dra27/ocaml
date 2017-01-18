@@ -1,0 +1,3 @@
+PR#7357, GPR#832: Improve compilation time for toplevel
+include(struct ... end : sig ... end)
+(Alain Frisch, report by Hongbo Zhang, review by Jacques Garrigue)

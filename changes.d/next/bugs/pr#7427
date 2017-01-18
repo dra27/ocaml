@@ -1,0 +1,2 @@
+PR#7427, GPR#959: Don't delete let bodies in Cmmgen
+(Mark Shinwell)

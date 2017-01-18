@@ -1,0 +1,2 @@
+PR#7377: remove -std=gnu99 for newer gcc versions
+(Damien Doligez, report by ygrek)

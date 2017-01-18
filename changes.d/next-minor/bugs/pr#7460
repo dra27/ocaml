@@ -1,0 +1,4 @@
+PR#7460, GPR#1011: catch uncaught exception when unknown files are passed
+as argument (regression in 4.04.0)
+(Bernhard Schommer, review by Florian Angeletti and Gabriel Scherer,
+ report by Stephen Dolan)

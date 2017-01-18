@@ -1,0 +1,3 @@
+PR#6608, GPR#901: unify record types when overriding all fields
+(Tadeu Zagallo and Gabriel Scherer, report by Jeremy Yallop,
+ review by David Allsopp, Jacques Garrigue)

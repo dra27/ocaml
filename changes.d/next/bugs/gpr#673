@@ -1,0 +1,3 @@
+GPR#673, GPR#1007: distinguish initialization of block fields from mutation in
+lambda.
+(Frédéric Bour, review by Xavier Leroy, Stephen Dolan and Mark Shinwell)

@@ -1,0 +1,3 @@
+GPR#778: Arg: added option Expand that allows to expand a string
+argument to a string array of new arguments
+(Bernhard Schommer)

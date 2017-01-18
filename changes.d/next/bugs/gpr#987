@@ -1,0 +1,3 @@
+GPR#987: alloc_sockaddr: don't assume a null terminator. It is not inserted
+on macOS by system calls that fill in a struct sockaddr (e.g. getsockname).
+(Anton Bachin)

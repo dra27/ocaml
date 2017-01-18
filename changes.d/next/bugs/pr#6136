@@ -1,0 +1,3 @@
+PR#6136, GPR#967: Fix Closure so that overapplication evaluation order
+matches the bytecode compiler and Flambda.
+(Mark Shinwell, report by Jeremy Yallop, review by Frédéric Bour)

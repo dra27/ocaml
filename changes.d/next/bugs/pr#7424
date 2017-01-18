@@ -1,0 +1,2 @@
+PR#7424: Typechecker diverges on unboxed type declaration
+(Jacques Garrigue, report by Stephen Dolan)

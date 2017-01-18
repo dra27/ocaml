@@ -189,3 +189,10 @@ testsuite/tests/typing-warnings/pr7297.ml text eol=lf
 testsuite/tests/typing-warnings/pr7553.ml text eol=lf
 testsuite/tests/typing-warnings/records.ml text eol=lf
 testsuite/tests/typing-warnings/unused_types.ml text eol=lf
+
+# ocaml-changes-sequence must always begin with a colon
+# Only new items should be added here - the order of existing items should not
+# be changed. New sections must also be added to the ocaml-changelog submodule.
+# If the order of sections is to be changed, the handling of
+# ocaml-changes-sequence will need to be updated (:= don't)
+* ocaml-changes-sequence=:language:compilers:codegen:typing:runtime:stdlib:otherlibs:pruning:debugging:tools:manual:build:install:internals:bugs:features

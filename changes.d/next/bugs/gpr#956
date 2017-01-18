@@ -1,0 +1,3 @@
+GPR#956: Keep possibly-effectful expressions when optimizing multiplication
+by zero.
+(Jeremy Yallop)

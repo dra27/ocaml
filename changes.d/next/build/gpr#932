@@ -1,0 +1,3 @@
+GPR#932: install ocaml{c,lex}->ocaml{c,lex}.byte symlink correctly
+when the opt target is built but opt.opt target is not.
+(whitequark)

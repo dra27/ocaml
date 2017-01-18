@@ -1,0 +1,2 @@
+PR#7432: Linking modules compiled with -labels and -nolabels is not safe
+(Jacques Garrigue, report by Jeremy Yallop)

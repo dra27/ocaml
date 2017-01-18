@@ -1,0 +1,3 @@
+GPR#760: Add a functions List.compare_lengths and
+List.compare_length_with to avoid full list length computations
+(Fabrice Le Fessant)

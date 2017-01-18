@@ -1,0 +1,3 @@
+GPR#805, GPR#815, GPR#833: check for integer overflow in String.concat
+(Jeremy Yallop,
+ review by Damien Doligez, Alain Frisch, Daniel Bünzli, Fabrice Le Fessant)

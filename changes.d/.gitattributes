@@ -1,0 +1,19 @@
+next ocaml-changes-title=Next+version+(4.05.0)
+next-minor ocaml-changes-title=Next+minor+version+(4.04.1)
+
+*/language ocaml-changes-title=Language+features
+*/compilers ocaml-changes-title=Compiler+user-interface+and+warnings
+*/codegen ocaml-changes-title=Code+generation+and+optimizations
+*/typing ocaml-changes-title=Type+system
+*/runtime ocaml-changes-title=Runtime+system
+*/stdlib ocaml-changes-title=Standard+library
+*/otherlibs ocaml-changes-title=Other+libraries
+*/pruning ocaml-changes-title=Shedding+weight
+*/debugging ocaml-changes-title=Toplevel,+debugger+and+profiler
+*/tools ocaml-changes-title=Tools
+*/manual ocaml-changes-title=Manual+and+documentation
+*/build ocaml-changes-title=Compiler+distribution+build+system
+*/install ocaml-changes-title=Installation+procedure
+*/internals ocaml-changes-title=Internal/compiler-libs+changes
+*/bugs ocaml-changes-title=Bug+fixes
+*/features ocaml-changes-title=Feature+wishes

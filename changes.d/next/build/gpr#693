@@ -1,0 +1,3 @@
+GPR#693: fail on unexpected errors or warnings within caml_example
+environment.
+(Florian Angeletti)

@@ -1,0 +1,3 @@
+PR#5115: protect all byterun/fail.c functions against
+uninitialized caml_global_data (only changes the bytecode behavior)
+(Gabriel Scherer, review by Xavier Leroy)

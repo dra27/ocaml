@@ -1,0 +1,4 @@
+GPR#939: activate the caml_example environment in the language
+extensions section of the manual. Convert some existing code
+examples to this format.
+(Florian Angeletti)

@@ -1,0 +1,2 @@
+GPR#814: fix the Buffer.add_substring bounds check to handle overflow
+(Jeremy Yallop)

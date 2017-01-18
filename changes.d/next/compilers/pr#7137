@@ -1,0 +1,3 @@
+PR#7137, GPR#960: "-open" command line flag now accepts a module path (not a
+module name)
+(Arseniy Alekseyev and Leo White)

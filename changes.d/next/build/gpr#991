@@ -1,0 +1,3 @@
+GPR#991: On Windows, fix installation when native compiler is not
+built
+(Sébastien Hinderer, review by David Allsopp)

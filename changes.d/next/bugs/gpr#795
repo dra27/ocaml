@@ -1,0 +1,2 @@
+GPR#795: remove 256-character limitation on Sys.executable_name
+(Xavier Leroy)

@@ -1,0 +1,3 @@
+GPR#898: fix locale-dependence of primitive list order,
+detected through reproducible-builds.org.
+(Hannes Mehnert, review by Gabriel Scherer and Ximin Luo)

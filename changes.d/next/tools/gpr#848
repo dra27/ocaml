@@ -1,0 +1,3 @@
+GPR#848: ocamldoc, escape link targets in HTML output
+(Etienne Millon, review by Gabriel Scherer, Florian Angeletti and
+ Daniel Bünzli)

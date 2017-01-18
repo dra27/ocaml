@@ -1,0 +1,3 @@
+GPR#911: ocamlc/ocamlopt do not pass warnings-related options to C
+compiler when called to compile third-party C source files
+(Sébastien Hinderer)

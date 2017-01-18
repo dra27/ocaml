@@ -1,0 +1,2 @@
+GPR#887: allow -with-frame-pointers if clang is used as compiler on Linux
+(Bernhard Schommer)

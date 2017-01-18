@@ -1,0 +1,3 @@
+GPR#983: Avoid removing effectful expressions in Closure, and
+eliminate more non-effectful ones
+(Alain Frisch, review by Mark Shinwell and Gabriel Scherer)

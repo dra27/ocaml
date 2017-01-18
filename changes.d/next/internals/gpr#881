@@ -1,0 +1,3 @@
+GPR#881: change `Outcometree.out_variant` to be more general.
+`Ovar_name of out_ident * out_type list` becomes `Ovar_type of out_type`.
+(Valentin Gatien-Baron)

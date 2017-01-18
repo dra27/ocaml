@@ -1,0 +1,3 @@
+GPR#729: Make sure ocamlnat is built with a $(EXE) extension, merge
+rules between Unix and Windows Makefiles
+(Sébastien Hinderer, review by Alain Frisch)

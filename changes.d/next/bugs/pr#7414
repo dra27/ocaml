@@ -1,0 +1,2 @@
+PR#7414, GPR#929: Soundness bug with non-generalized type variable and functor
+(Jacques Garrigue, report by Leo White)

@@ -1,0 +1,3 @@
+PR#7172, GPR#970: add extra (ocamlc -config) options
+int_size, word_size, ext_exe
+(Gabriel Scherer, request by Daniel Buenzli)

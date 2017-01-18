@@ -1,0 +1,3 @@
+GPR#980: add dynlink options to ocamlbytecomp.cmxa to allow ocamlopt.opt
+to load plugins. See http://github.com/OCamlPro/ocamlc-plugins for examples.
+(Fabrice Le Fessant, review by David Allsopp)

@@ -1,0 +1,2 @@
+GPR#796: allow compiler plugins to declare their own arguments.
+(Fabrice Le Fessant)

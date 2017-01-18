@@ -1,0 +1,3 @@
+GPR#986: ocamldoc, use relative paths in error message
+to solve ocamlbuild+doc usability issue (ocaml/ocamlbuild#79)
+(Gabriel Scherer, review by Florian Angeletti, discussion with Daniel Bünzli)

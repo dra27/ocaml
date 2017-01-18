@@ -1,0 +1,2 @@
+GPR#810: check for integer overflow in Array.concat
+(Jeremy Yallop)

@@ -1,0 +1,4 @@
+PR#7201, GPR#954: Correct wrong optimisation of "0 / <expr>"
+and "0 mod <expr>" in the case when <expr> was a non-constant
+evaluating to zero
+(Mark Shinwell)

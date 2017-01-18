@@ -1,0 +1,4 @@
+GPR#875: Add missing functions to ArrayLabels, BytesLabels, ListLabels,
+MoreLabels, StringLabels so they are compatible with non-labeled
+counterparts.
+(Roma Sokolov)

@@ -1,0 +1,4 @@
+PR#7339, GPR#787: Support the '0 dimension' case for bigarrays
+(see Bigarray documentation)
+(Laurent Mazare,
+ review by Gabriel Scherer, Alain Frisch and Hezekiah M. Carty)

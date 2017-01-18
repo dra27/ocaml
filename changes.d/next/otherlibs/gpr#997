@@ -1,0 +1,3 @@
+GPR#997: Deprecate Bigarray.*.map_file and add Unix.map_file as a
+first step towards moving Bigarray to the stdlib
+(Jeremie Dimino)

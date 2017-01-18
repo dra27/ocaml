@@ -1,0 +1,3 @@
+*PR#7342, GPR#797: fix Unix.read on pipes with no data left on Windows
+it previously raised an EPIPE error, it now returns 0 like other OSes
+(Jonathan Protzenko)
