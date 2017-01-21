@@ -76,6 +76,8 @@ EOF
   [ $XARCH =  "i386" ] ||  (cd testsuite && $MAKE USE_RUNTIME="d" all)
   $MAKE install
   $MAKE manual-pregen
+  $MAKE -C tools allchanges
+  $MAKE CHANGES_CHECK_RANGE=$TRAVIS_COMMIT_RANGE CheckChanges
   # check_all_arches checks tries to compile all backends in place,
   # we would need to redo (small parts of) world.opt afterwards to
   # use the compiler again
@@ -87,9 +89,9 @@ EOF
 CheckChangesModified () {
   cat<<EOF
 ------------------------------------------------------------------------
-This test checks that the Changes file has been modified by the pull
-request. Most contributions should come with a message in the Changes
-file, as described in our contributor documentation:
+This test checks that the Changes file database has been modified by the
+pull request. Most contributions should come with a message for the
+Changes file, as described in our contributor documentation:
 
   https://github.com/ocaml/ocaml/blob/trunk/CONTRIBUTING.md#changelog
 
@@ -100,9 +102,9 @@ a commit message of the PR, or using the "no-change-entry-needed" label
 on the github pull request.
 ------------------------------------------------------------------------
 EOF
-  # check that Changes has been modified
-  git diff $TRAVIS_MERGE_BASE..$TRAVIS_PR_HEAD --name-only --exit-code Changes \
-    > /dev/null && CheckNoChangesMessage || echo pass
+  # check that a changes entry has been made
+  git diff $TRAVIS_MERGE_BASE..$TRAVIS_PR_HEAD --name-only --exit-code \
+    -- changes.d/\*/\* > /dev/null && CheckNoChangesMessage || echo pass
 }
 
 CheckNoChangesMessage () {

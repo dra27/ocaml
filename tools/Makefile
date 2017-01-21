@@ -389,6 +389,9 @@ changesLexer.cmi changesLexer.cmo: changesLexer.ml
 	$(CAMLRUN) ../ocamlc -o $@ -g -I ../stdlib -I ../otherlibs/$(UNIXLIB) \
 	  unix.cma $^
 
+.PHONY: allchanges
+allchanges: convertChanges$(EXE) processChanges$(EXE) checkChanges$(EXE)
+
 clean::
 	rm -f changesLexer.ml processChanges$(EXE)
 

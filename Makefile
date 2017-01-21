@@ -1310,6 +1310,15 @@ FullChanges: $(CHANGES_SUBMODULE_REQUIRED) tools/processChanges$(EXE)
 	  changes.d/archive > Changes
 	cat changes.d/archive/Legacy >> Changes
 
+.PHONY: CheckChanges
+CheckChanges: tools/checkChanges$(EXE)
+	@if [ -z "$(CHANGES_CHECK_RANGE)" ] ; then \
+	  echo CHANGES_CHECK_RANGE must be set to a valid git commit range ; \
+	else \
+	  $(CAMLRUN) -I otherlibs/$(UNIXLIB) tools/checkChanges$(EXE) \
+	    changes.d $(CHANGES_CHECK_RANGE) ; \
+	fi
+
 partialclean::
 	[ -e Changes.git ] && mv -f Changes.git Changes || true
 
