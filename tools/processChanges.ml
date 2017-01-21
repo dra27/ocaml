@@ -104,9 +104,10 @@ let process_version titles root {generate} old item =
                               let msg = ChangesLexer.standard_warning w in
                               Printf.eprintf "[%s:%d]: %s\n%!" file n msg
                             in
-                            let ((tag_type, index') as tag, ()) =
+                            let ((tag_type, index') as tag, (), change') =
                               ChangesLexer.validate_change_entry old warn () 1 change
                             in
+                            let change = if old then change else change' in
                             let (tag, feature', bad_subindex) =
                               if tag_type = BadTag then
                                 if subindex <> 0 then

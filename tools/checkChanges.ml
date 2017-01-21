@@ -164,7 +164,7 @@ let check_changes root range =
         in
         (w::ws, success)
       in
-      let (read_tag, ((warnings, _) as result)) =
+      let (read_tag, ((warnings, _) as result), _) =
         let acc = (warnings, success) in
         ChangesLexer.validate_change_entry false warn acc 1 change
       in

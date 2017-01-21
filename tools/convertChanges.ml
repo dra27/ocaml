@@ -67,7 +67,7 @@ let fold_tokens warnings warnings_acc g acc l =
           in
             state
       | Change (_, change) ->
-          let (tag, ws) =
+          let (tag, ws, _) =
             let warn ws n w =
               warnings ws n (ChangesLexer.standard_warning w)
             in

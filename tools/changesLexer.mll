@@ -24,10 +24,11 @@ module Types = struct
   | Corrupt of string
   | EOF
 
+  (* The order of these tags matters (BadTag > GPR > MPR) *)
   type tag_type =
-    BadTag
+    MPR
   | GPR
-  | MPR
+  | BadTag
 
   let string_of_tag_type = function
     BadTag -> "feature"
@@ -135,6 +136,26 @@ let validate_change_entry old warnings ws n change =
   let warning ws w = warnings ws n w in
   let warning_new_n ws = warning_new_n warnings old ws in
   let warning_new ws w = warning_new_n ws n w in
+  let rtrim s =
+    let rec f i =
+      if s.[i] = ' ' then
+        if i = 0 then
+          0
+        else
+          f (pred i)
+      else
+        succ i
+    in
+    let l = String.length s in
+    if l = 0 then
+      ""
+    else
+      let i = f (pred l) in
+      if i <> l then
+        String.sub s 0 i
+      else
+        s
+  in
   let check_spaces (n, a, ws) line =
     let l = String.length line in
     let (line, ws) =
@@ -146,72 +167,92 @@ let validate_change_entry old warnings ws n change =
     let ws =
       if l > 78 then
         warning_n ws n (`LongLine l)
-      else if l = 0 then
-        warning_n ws n `BlankLine
+      else ws in
+    let (a, ws) =
+      let trimmed = rtrim line in
+      if l = 0 || trimmed = "" then
+        (a, warning_n ws n `BlankLine)
       else if line.[pred l] = ' ' then
-        warning_n ws n `WhitespaceEnd
+        (trimmed::a, warning_n ws n `WhitespaceEnd)
       else
-        ws in
-   (succ n, line::a, ws)
+        (line::a, ws) in
+   (succ n, a, ws)
   in
-    let ws =
+    let (ws, change) =
       let (n', change, ws) = List.fold_left check_spaces (n, [], ws) change in
       let n' = pred n' in
-      let check_whitespace (gathering_authors, n, ws) line =
+      let check_whitespace (gathering_authors, n, ws, a) line =
         let l = String.length line in
-        let (gathering_authors, ws) =
+        let (gathering_authors, ws, line, a) =
           if gathering_authors then
             match String.index line '(' with
               i ->
-                let ws =
-                  if i <> 0 then
-                    warning_new_n ws n `ReviewersNewLine
+                if i <> 0 then
+                  let reviewer_line =
+                    String.sub line i (String.length line - i)
+                  in
+                  let line = String.sub line 0 i |> rtrim in
+                  if line = "" then
+                    let ws = warning_new_n ws n `ReviewersNewLine in
+                    (false, ws, reviewer_line, a)
                   else
-                    ws in
-                (false, ws)
+                    let ws = warning_new_n ws n `ReviewersNewLine in
+                    (false, ws, line, reviewer_line::a)
+                else
+                  (false, ws, line, a)
             | exception Not_found ->
-                let ws =
-                  if l < 2 || line.[0] <> ' ' || line.[1] = ' ' then
-                    warning_n ws n `ReviewersSpace
-                  else
-                    ws in
-                (true, ws)
+                if l < 2 || line.[0] <> ' ' || line.[1] = ' ' then
+                  let ws = warning_n ws n `ReviewersSpace in
+                  (true, ws, " " ^ String.trim line, a)
+                else
+                  (true, ws, line, a)
           else
-            (false, ws)
+            (false, ws, line, a)
         in
-        let ws =
+        let (ws, a) =
           if l > 0 && not gathering_authors && line.[0] = ' ' then
-            warning_new_n ws n `WhitespaceStart
+            (warning_new_n ws n `WhitespaceStart, line::a)
           else
-            ws in
-        (gathering_authors, pred n, ws)
+            (ws, line::a) in
+        (gathering_authors, pred n, ws, a)
       in
       match change with
         line::rest ->
           let l = String.length line in
           if l = 0 || line.[l |> pred] <> ')' then
-            let (_, _, ws) =
-              let acc = (false, n', warning_new ws `NoAuthor) in
-              List.fold_left check_whitespace acc change
-            in
-            ws
+            let (_, _, ws, change) =
+              let acc = (false, n', warning_new ws `NoAuthor, []) in
+              List.fold_left check_whitespace acc change in
+            (ws, change)
           else begin
             match String.rindex line '(' with
               i ->
-                let ws =
+                let (ws, rest, a) =
                   if i > 0 then
-                    warning_new_n ws n `ReviewersNewLine
-                  else ws in
-                let (_, _, ws) =
-                  List.fold_left check_whitespace (false, pred n', ws) rest in
-                ws
+                    let rest =
+                      let line = String.sub line 0 i |> rtrim in
+                      if line = "" then
+                        rest
+                      else
+                        line::rest
+                    in
+                    let ws = warning_new_n ws n `ReviewersNewLine in
+                    (ws, rest, [String.sub line i (String.length line - i)])
+                  else (ws, rest, [line]) in
+                let (_, _, ws, change) =
+                  let acc = (false, pred n', ws, a) in
+                  List.fold_left check_whitespace acc rest in
+                (ws, change)
             | exception Not_found ->
-                let (still_gathering, _, ws) =
-                  List.fold_left check_whitespace (true, n', ws) change in
-                if still_gathering then
-                  warning ws `ReviewersUnopened
-                else
-                  ws
+                let (still_gathering, _, ws, change) =
+                  List.fold_left check_whitespace (true, n', ws, []) change in
+                let ws =
+                  if still_gathering then
+                    warning ws `ReviewersUnopened
+                  else
+                    ws
+                in
+                (ws, change)
           end
       | [] ->
           assert false
@@ -229,39 +270,42 @@ let validate_change_entry old warnings ws n change =
                 warning_new ws `ColonSpace
               else
                 ws in
-          let check_tag ws a tag =
+          let check_tag ws a sortable tag =
             let (((tag_type, n') as tag'), pedantically_wrong) =
               parse_tag (Lexing.from_string tag) in
             if tag_type = BadTag then
-              (a, warning_new ws (`BadTag tag))
+              (a, warning_new ws (`BadTag tag), false)
             else
               let ws =
                 if pedantically_wrong then
                   let w =
                     let correct_tag =
-                      String.uppercase_ascii (string_of_tag_type tag_type)
-                        ^ "#" ^ string_of_int n'
+                      String.uppercase_ascii (string_of_tag_type tag_type) ^
+                        "#" ^ string_of_int n'
                     in
                     `TagNaming (tag, correct_tag)
                   in
                   warning ws w
                 else ws
               in
-              (tag'::a, ws) in
-          let rec find_tags n (a, ws) =
+              (tag'::a, ws, sortable) in
+          let rec find_tags n (a, ws, sortable) =
             match String.index_from tags n ',' with
               i ->
-                let (n', ws) =
+                let (n', ws, sortable) =
                   if String.length tags < i + 2 then
-                    (succ i, warning ws `CorruptTags)
+                    (succ i, warning ws `CorruptTags, false)
                   else if head.[succ i] = ' ' then
-                    (i + 2, ws)
+                    (i + 2, ws, sortable)
                   else
-                    (succ i, warning ws `CommaSpace)
+                    (succ i, warning ws `CommaSpace, sortable)
                 in
-                  String.sub tags n (i - n) |> check_tag ws a |> find_tags n'
+                  String.sub tags n (i - n)
+                    |> check_tag ws a sortable
+                    |> find_tags n'
             | exception Not_found ->
-                String.sub head n (String.length tags - n) |> check_tag ws a
+                String.sub head n (String.length tags - n)
+                  |> check_tag ws a sortable
           in
             (* Validate that the tags are in order *)
             let check_tag (gpr, idx, _, current_bet, ws) tag =
@@ -288,11 +332,38 @@ let validate_change_entry old warnings ws n change =
               | (BadTag, _) ->
                   assert false
             in
-              let (l, ws) = find_tags 0 ([], ws) in
+              let (tags, ws, sortable) = find_tags 0 ([], ws, true) in
               let (_, _, _, tag, ws) =
                 let acc = (true, max_int, (BadTag, 0), (BadTag, 0), ws) in
-                List.fold_left check_tag acc l in
-              (tag, ws)
+                List.fold_left check_tag acc tags in
+              let change =
+                if sortable then
+                  let head =
+                    String.sub head (i + 1) (String.length head - i - 1)
+                      |> String.trim
+                  in
+                  let tags =
+                    let f (tag, n) =
+                      let tag =
+                        string_of_tag_type tag |> String.uppercase_ascii
+                      in
+                      tag ^ "#" ^ string_of_int n
+                    in
+                    (List.map f (List.sort compare tags))
+                  in
+                  let head =
+                    let padding =
+                      if head = "" then
+                        ""
+                      else
+                        " "
+                    in
+                    (String.concat ", " tags ^ ":" ^ padding ^ head)
+                  in
+                  head::(List.tl change)
+                else
+                  change in
+              (tag, ws, change)
       | exception Not_found ->
-          ((BadTag, 0), warning_new ws `Untagged)
+          ((BadTag, 0), warning_new ws `Untagged, change)
 }
