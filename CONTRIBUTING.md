@@ -183,19 +183,23 @@ of the OCaml distribution.
 
 ### Changelog
 
-Any user-visible change should have a `Changes` entry:
+Any user-visible change should have a `Changes` entry created in the
+appropriate directory in `changes.d/` (usually `changes.d/next`):
 
-- in the right section (named sections if major feature, generic
-  "Bug fixes" and "Feature requests" otherwise)
+- in the right directory (named sections if major feature, generic `bugs/` and
+  `features/` otherwise). The full list of sections can be found in the root
+  `.gitattributes` file in the `ocaml-changes-sequence` attribute.
 
-- using the label "`*`" if it breaks existing programs, "`-`" otherwise
+- in the correct file. `pr#{N}` if from Mantis and `gpr#{N}` if from GitHub. If
+  the change affects multiple issues, the lowest Mantis PR number should be used
+  or the lowest GitHub PR number if there is no Mantis issue.
 
-- with the issue number `PR#{N}` if from mantis, `GPR#{N}` if from github
-  (several numbers separated by commas can be used)
+- if the change breaks existing programs, the first character of the file should
+  be an asterisk (`*`).
 
-- maintaining the order: each section lists Mantis PRs first in ascending
-  numerical order, followed by Github PRs in ascending numerical order,
-  followed by changes that are not related to a PR.
+- followed by the issue number(s) `PR#{N}` for Mantis PRs or `GPR#{N}` for
+  GitHub PRs (several numbers separated by commas can be used with Mantis PRs
+  listed before GitHub PRs then listed in ascending numerical order)
 
 - with a concise readable description of the change (possibly taken
   from a commit message, but it should make sense to end-users
@@ -208,15 +212,14 @@ Any user-visible change should have a `Changes` entry:
 
 - following the format
 
-        {label} {issue number(s)}: {readable description}
-                ({credits})
+        {issue number(s)}: {readable description}
+        ({credits})
 
-      note that the `{credits}` should be on their own line, aligned with the
-      issue number for readability
+      note that the `{credits}` should be on their own line.
       (`{readable description}` can be multiline to not overflow 80
-      columns, and should be aligned with the issue number as well.)
+      columns, but should not be further indented.)
 
-This changelog can be included in the main commit, if the merge
+The changes.d files can be included in the main commit, if the merge
 request is just one patch, or as a separate commit, if it's
 a patch series and no particular commit feels best suited to
 receive the Changelog entry.
