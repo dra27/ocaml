@@ -1,0 +1,405 @@
+From 5f725938101c1b675989f0ffa55fe4c1ba8c1951 Mon Sep 17 00:00:00 2001
+From: Damien Doligez <damien.doligez@inria.fr>
+Date: Fri, 16 Jun 2017 17:31:56 +0200
+Subject: [PATCH] Add and use caml_secure_getenv (MPR#7557)
+
+---
+ asmrun/spacetime.c    |  3 ++-
+ bytecomp/dll.ml       |  4 +++-
+ byterun/caml/osdeps.h |  5 +++++
+ byterun/debugger.c    |  3 ++-
+ byterun/dynlink.c     |  6 +++---
+ byterun/misc.c        |  3 ++-
+ byterun/startup.c     |  4 ++--
+ byterun/startup_aux.c |  5 +++--
+ byterun/sys.c         | 14 ++++++++++++--
+ byterun/unix.c        | 15 +++++++++++++++
+ byterun/win32.c       |  9 ++++++++-
+ configure             | 10 ++++++++++
+ stdlib/filename.ml    |  4 +++-
+ stdlib/hashtbl.ml     |  5 +++--
+ tools/profiling.ml    |  4 +++-
+ utils/config.mlp      |  5 +++--
+ 16 files changed, 79 insertions(+), 20 deletions(-)
+
+diff --git a/asmrun/spacetime.c b/asmrun/spacetime.c
+index b5e999f..effa522 100644
+--- a/asmrun/spacetime.c
++++ b/asmrun/spacetime.c
+@@ -38,6 +38,7 @@
+ #include "caml/minor_gc.h"
+ #include "caml/misc.h"
+ #include "caml/mlvalues.h"
++#include "caml/osdeps.h"
+ #include "caml/roots.h"
+ #include "caml/signals.h"
+ #include "caml/stack.h"
+@@ -209,7 +210,7 @@ void caml_spacetime_initialize(void)
+       int dir_ok = 1;
+ 
+       user_specified_automatic_snapshot_dir =
+-        getenv("OCAML_SPACETIME_SNAPSHOT_DIR");
++        caml_secure_getenv("OCAML_SPACETIME_SNAPSHOT_DIR");
+ 
+       if (user_specified_automatic_snapshot_dir == NULL) {
+ #ifdef HAS_GETCWD
+diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
+index c64f43c..3086fc4 100644
+--- a/bytecomp/dll.ml
++++ b/bytecomp/dll.ml
+@@ -15,6 +15,8 @@
+ 
+ (* Handling of dynamically-linked libraries *)
+ 
++external secure_getenv: string -> string = "caml_sys_secure_getenv"
++
+ type dll_handle
+ type dll_address
+ type dll_mode = For_checking | For_execution
+@@ -152,7 +154,7 @@ let ld_library_path_contents () =
+     | "Win32" -> ';'
+     | _ -> assert false in
+   try
+-    split (Sys.getenv "CAML_LD_LIBRARY_PATH") path_separator
++    split (secure_getenv "CAML_LD_LIBRARY_PATH") path_separator
+   with Not_found ->
+     []
+ 
+diff --git a/byterun/caml/osdeps.h b/byterun/caml/osdeps.h
+index 7fcf903..0fa324e 100644
+--- a/byterun/caml/osdeps.h
++++ b/byterun/caml/osdeps.h
+@@ -85,6 +85,11 @@ extern int caml_read_directory(char * dirname, struct ext_table * contents);
+    GetModuleFileName under Windows). */
+ extern int caml_executable_name(char * name, int name_len);
+ 
++/* Secure version of [getenv]: returns NULL if the process has special
++   privileges (setuid bit or capabilities).
++*/
++extern char *caml_secure_getenv(char const *var);
++
+ #endif /* CAML_INTERNALS */
+ 
+ #endif /* CAML_OSDEPS_H */
+diff --git a/byterun/debugger.c b/byterun/debugger.c
+index 2edbaa0..f400087 100644
+--- a/byterun/debugger.c
++++ b/byterun/debugger.c
+@@ -27,6 +27,7 @@
+ #include "caml/config.h"
+ #include "caml/debugger.h"
+ #include "caml/misc.h"
++#include "caml/osdeps.h"
+ 
+ int caml_debugger_in_use = 0;
+ uintnat caml_event_count;
+@@ -172,7 +173,7 @@ void caml_debugger_init(void)
+   Store_field(marshal_flags, 0, Val_int(1)); /* Marshal.Closures */
+   Store_field(marshal_flags, 1, Val_emptylist);
+ 
+-  address = getenv("CAML_DEBUG_SOCKET");
++  address = caml_secure_getenv("CAML_DEBUG_SOCKET");
+   if (address == NULL) return;
+   dbg_addr = address;
+ 
+diff --git a/byterun/dynlink.c b/byterun/dynlink.c
+index f80d1f7..ed678df 100644
+--- a/byterun/dynlink.c
++++ b/byterun/dynlink.c
+@@ -81,8 +81,8 @@ static char * parse_ld_conf(void)
+   struct stat st;
+   int ldconf, nread;
+ 
+-  stdlib = getenv("OCAMLLIB");
+-  if (stdlib == NULL) stdlib = getenv("CAMLLIB");
++  stdlib = caml_secure_getenv("OCAMLLIB");
++  if (stdlib == NULL) stdlib = caml_secure_getenv("CAMLLIB");
+   if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
+   ldconfname = caml_strconcat(3, stdlib, "/", LD_CONF_NAME);
+   if (stat(ldconfname, &st) == -1) {
+@@ -150,7 +150,7 @@ void caml_build_primitive_table(char * lib_path,
+      - directories specified in the executable
+      - directories specified in the file <stdlib>/ld.conf */
+   tofree1 = caml_decompose_path(&caml_shared_libs_path,
+-                                getenv("CAML_LD_LIBRARY_PATH"));
++                                caml_secure_getenv("CAML_LD_LIBRARY_PATH"));
+   if (lib_path != NULL)
+     for (p = lib_path; *p != 0; p += strlen(p) + 1)
+       caml_ext_table_add(&caml_shared_libs_path, p);
+diff --git a/byterun/misc.c b/byterun/misc.c
+index 447b933..49bccfc 100644
+--- a/byterun/misc.c
++++ b/byterun/misc.c
+@@ -21,6 +21,7 @@
+ #include "caml/config.h"
+ #include "caml/misc.h"
+ #include "caml/memory.h"
++#include "caml/osdeps.h"
+ #include "caml/version.h"
+ 
+ caml_timing_hook caml_major_slice_begin_hook = NULL;
+@@ -242,7 +243,7 @@ void CAML_INSTR_ATEXIT (void)
+   FILE *f = NULL;
+   char *fname;
+ 
+-  fname = getenv ("OCAML_INSTR_FILE");
++  fname = caml_secure_getenv ("OCAML_INSTR_FILE");
+   if (fname != NULL){
+     char *mode = "a";
+     char buf [1000];
+diff --git a/byterun/startup.c b/byterun/startup.c
+index ac19ee3..c4f7e26 100644
+--- a/byterun/startup.c
++++ b/byterun/startup.c
+@@ -372,7 +372,7 @@ CAMLexport void caml_main(char **argv)
+   caml_sys_init(exe_name, argv + pos);
+ #ifdef _WIN32
+   /* Start a thread to handle signals */
+-  if (getenv("CAMLSIGPIPE"))
++  if (caml_secure_getenv("CAMLSIGPIPE"))
+     _beginthread(caml_signal_thread, 4096, NULL);
+ #endif
+   /* Execute the program */
+@@ -410,7 +410,7 @@ CAMLexport void caml_startup_code(
+ #ifdef DEBUG
+   caml_verb_gc = 63;
+ #endif
+-  cds_file = getenv("CAML_DEBUG_FILE");
++  cds_file = caml_secure_getenv("CAML_DEBUG_FILE");
+   if (cds_file != NULL) {
+     caml_cds_file = caml_strdup(cds_file);
+   }
+diff --git a/byterun/startup_aux.c b/byterun/startup_aux.c
+index 109f71c..721da61 100644
+--- a/byterun/startup_aux.c
++++ b/byterun/startup_aux.c
+@@ -21,6 +21,7 @@
+ #include <stdio.h>
+ #include "caml/backtrace.h"
+ #include "caml/memory.h"
++#include "caml/osdeps.h"
+ #include "caml/startup_aux.h"
+ 
+ 
+@@ -73,10 +74,10 @@ static void scanmult (char *opt, uintnat *var)
+ 
+ void caml_parse_ocamlrunparam(void)
+ {
+-  char *opt = getenv ("OCAMLRUNPARAM");
++  char *opt = caml_secure_getenv ("OCAMLRUNPARAM");
+   uintnat p;
+ 
+-  if (opt == NULL) opt = getenv ("CAMLRUNPARAM");
++  if (opt == NULL) opt = caml_secure_getenv ("CAMLRUNPARAM");
+ 
+   if (opt != NULL){
+     while (*opt != '\0'){
+diff --git a/byterun/sys.c b/byterun/sys.c
+index 78ec5fe..e435e73 100644
+--- a/byterun/sys.c
++++ b/byterun/sys.c
+@@ -26,7 +26,7 @@
+ #include <time.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+-#if _WIN32
++#ifdef _WIN32
+ #include <io.h> /* for isatty */
+ #else
+ #include <sys/wait.h>
+@@ -324,6 +324,16 @@ CAMLprim value caml_sys_getenv(value var)
+   return caml_copy_string(res);
+ }
+ 
++CAMLprim value caml_sys_secure_getenv(value var)
++{
++  char * res;
++
++  if (! caml_string_is_c_safe(var)) caml_raise_not_found();
++  res = caml_secure_getenv(String_val(var));
++  if (res == 0) caml_raise_not_found();
++  return caml_copy_string(res);
++}
++
+ char * caml_exe_name;
+ char ** caml_main_argv;
+ 
+@@ -602,7 +612,7 @@ void caml_load_plugin(char *plugin)
+ 
+ void caml_cplugins_load(char *env_variable)
+ {
+-  char *plugins = getenv(env_variable);
++  char *plugins = caml_secure_getenv(env_variable);
+   if(plugins != NULL){
+     char* curs = plugins;
+     while(*curs != 0){
+diff --git a/byterun/unix.c b/byterun/unix.c
+index 150af2b..4431582 100644
+--- a/byterun/unix.c
++++ b/byterun/unix.c
+@@ -19,6 +19,7 @@
+ 
+ #define _GNU_SOURCE
+            /* Helps finding RTLD_DEFAULT in glibc */
++           /* also secure_getenv */
+ 
+ #include <stddef.h>
+ #include <stdlib.h>
+@@ -381,3 +382,17 @@ int caml_executable_name(char * name, int name_len)
+ }
+ 
+ #endif
++
++char *caml_secure_getenv (char const *var)
++{
++#ifdef HAS_SECURE_GETENV
++  return secure_getenv (var);
++#elif defined(HAS_ISSETUGID)
++  if (!issetugid ())
++    return CAML_SYS_GETENV (var);
++#else
++  if (geteuid () == getuid () && getegid () == getgid ())
++    return CAML_SYS_GETENV (var);
++#endif
++  return NULL;
++}
+diff --git a/byterun/win32.c b/byterun/win32.c
+index 59d1300..cea7c0a 100644
+--- a/byterun/win32.c
++++ b/byterun/win32.c
+@@ -437,7 +437,8 @@ void caml_signal_thread(void * lpParam)
+   char *endptr;
+   HANDLE h;
+   /* Get an hexa-code raw handle through the environment */
+-  h = (HANDLE) (uintptr_t) strtol(getenv("CAMLSIGPIPE"), &endptr, 16);
++  h = (HANDLE) (uintptr_t)
++    strtol(caml_secure_getenv("CAMLSIGPIPE"), &endptr, 16);
+   while (1) {
+     DWORD numread;
+     BOOL ret;
+@@ -674,3 +675,9 @@ int caml_snprintf(char * buf, size_t size, const char * format, ...)
+   return len;
+ }
+ #endif
++
++char *caml_secure_getenv (char const *var)
++{
++  /* Win32 doesn't have a notion of setuid bit, so getenv is safe. */
++  return CAML_SYS_GETENV (var);
++}
+diff --git a/configure b/configure
+index b9ae81a..3b26360 100755
+--- a/configure
++++ b/configure
+@@ -1082,6 +1082,16 @@ if sh ./hasgot times; then
+   echo "#define HAS_TIMES" >> s.h
+ fi
+ 
++if sh ./hasgot2 -D_GNU_SOURCE -i stdlib.h secure_getenv; then
++  inf "secure_getenv() found."
++  echo "#define HAS_SECURE_GETENV" >> s.h
++fi
++
++if sh ./hasgot -i unistd.h issetugid; then
++  inf "issetugid() found."
++  echo "#define HAS_ISSETUGID" >> s.h
++fi
++
+ # For the terminfo module
+ 
+ if test "$with_curses" = "yes"; then
+diff --git a/stdlib/filename.ml b/stdlib/filename.ml
+index f9b0bc6..9d6a4c9 100644
+--- a/stdlib/filename.ml
++++ b/stdlib/filename.ml
+@@ -13,6 +13,8 @@
+ (*                                                                        *)
+ (**************************************************************************)
+ 
++external secure_getenv: string -> string = "caml_sys_secure_getenv"
++
+ let generic_quote quotequote s =
+   let l = String.length s in
+   let b = Buffer.create (l + 20) in
+@@ -84,7 +86,7 @@ module Unix = struct
+     String.sub name (String.length name - String.length suff)
+                     (String.length suff) = suff
+   let temp_dir_name =
+-    try Sys.getenv "TMPDIR" with Not_found -> "/tmp"
++    try secure_getenv "TMPDIR" with Not_found -> "/tmp"
+   let quote = generic_quote "'\\''"
+   let basename = generic_basename is_dir_sep current_dir_name
+   let dirname = generic_dirname is_dir_sep current_dir_name
+diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
+index 58e558e..2d565a7 100644
+--- a/stdlib/hashtbl.ml
++++ b/stdlib/hashtbl.ml
+@@ -19,6 +19,7 @@ external seeded_hash_param :
+   int -> int -> int -> 'a -> int = "caml_hash" [@@noalloc]
+ external old_hash_param :
+   int -> int -> 'a -> int = "caml_hash_univ_param" [@@noalloc]
++external secure_getenv: string -> string = "caml_sys_secure_getenv"
+ 
+ let hash x = seeded_hash_param 10 100 0 x
+ let hash_param n1 n2 x = seeded_hash_param n1 n2 0 x
+@@ -57,8 +58,8 @@ let flip_ongoing_traversal h =
+ 
+ let randomized_default =
+   let params =
+-    try Sys.getenv "OCAMLRUNPARAM" with Not_found ->
+-    try Sys.getenv "CAMLRUNPARAM" with Not_found -> "" in
++    try secure_getenv "OCAMLRUNPARAM" with Not_found ->
++    try secure_getenv "CAMLRUNPARAM" with Not_found -> "" in
+   String.contains params 'R'
+ 
+ let randomized = ref randomized_default
+diff --git a/tools/profiling.ml b/tools/profiling.ml
+index d2eee4d..731be17 100644
+--- a/tools/profiling.ml
++++ b/tools/profiling.ml
+@@ -16,6 +16,8 @@
+ 
+ (* Run-time library for profiled programs *)
+ 
++external secure_getenv: string -> string = "caml_sys_secure_getenv"
++
+ type profiling_counters = (string * (string * int array)) list
+ 
+ let counters = ref ([] : profiling_counters);;
+@@ -25,7 +27,7 @@ exception Bad_profile
+ 
+ let dump_counters () =
+   let dumpfile =
+-    try Sys.getenv "OCAMLPROF_DUMP" with Not_found -> "ocamlprof.dump"
++    try secure_getenv "OCAMLPROF_DUMP" with Not_found -> "ocamlprof.dump"
+   in
+   begin try
+     let ic = open_in_bin dumpfile in
+diff --git a/utils/config.mlp b/utils/config.mlp
+index c16de95..0264df5 100644
+--- a/utils/config.mlp
++++ b/utils/config.mlp
+@@ -23,6 +23,7 @@
+ (**                                                                   **)
+ (***********************************************************************)
+ 
++external secure_getenv: string -> string = "caml_sys_secure_getenv"
+ 
+ (* The main OCaml version string has moved to ../VERSION *)
+ let version = Sys.ocaml_version
+@@ -31,10 +32,10 @@ let standard_library_default = "%%LIBDIR%%"
+ 
+ let standard_library =
+   try
+-    Sys.getenv "OCAMLLIB"
++    secure_getenv "OCAMLLIB"
+   with Not_found ->
+   try
+-    Sys.getenv "CAMLLIB"
++    secure_getenv "CAMLLIB"
+   with Not_found ->
+     standard_library_default
+ 
+-- 
+1.9.1
+
