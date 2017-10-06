@@ -93,8 +93,16 @@ extern char_os *caml_secure_getenv(char_os const *var);
 
 #ifdef _WIN32
 extern void caml_probe_os_version(void);
+extern int caml_channel_flags(int fd);
 #else
 #define caml_probe_os_version()
+#define caml_channel_flags(fd) 0
+#endif
+
+#if WINDOWS_UNICODE && defined(_WIN32)
+extern void caml_setup_terminal(void);
+#else
+#define caml_setup_terminal()
 #endif
 
 #ifdef _WIN32

@@ -371,6 +371,7 @@ void caml_sys_init(char_os * exe_name, char_os **argv)
   /* Initialises the caml_win32_* globals on Windows with the version of
      Windows which is running */
   caml_probe_os_version();
+  caml_setup_terminal();
 #ifdef CAML_WITH_CPLUGINS
   caml_cplugins_init(exe_name, argv);
 #endif
