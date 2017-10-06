@@ -91,11 +91,22 @@ extern char_os * caml_executable_name(void);
 */
 extern char_os *caml_secure_getenv(char_os const *var);
 
-/* Windows Unicode support */
+#ifdef _WIN32
+extern void caml_probe_os_version(void);
+#else
+#define caml_probe_os_version()
+#endif
 
 #ifdef _WIN32
 
 extern int caml_win32_rename(const wchar_t *, const wchar_t *);
+
+extern unsigned short caml_win32_major;
+extern unsigned short caml_win32_minor;
+extern unsigned short caml_win32_build;
+extern unsigned short caml_win32_revision;
+
+/* Windows Unicode support */
 
 extern int win_multi_byte_to_wide_char(const char* s, int slen, wchar_t *out, int outlen);
 extern int win_wide_char_to_multi_byte(const wchar_t* s, int slen, char *out, int outlen);
