@@ -423,6 +423,9 @@ Release branch for 4.06:
   (ygrek, Clement Franchini, Nicolas Ojeda Bar, review by Alain Frisch, David
   Allsopp, Damien Doligez)
 
+* MPR#6925, GPR#1408: full description to follow after review
+  (David Allsopp, review by ??)
+
 - GPR#1070, GPR#1295: enable gcc typechecking for caml_alloc_sprintf,
   caml_gc_message. Make caml_gc_message a variadic function. Fix many
   caml_gc_message format strings.
