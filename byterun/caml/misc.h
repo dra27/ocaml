@@ -89,7 +89,11 @@ typedef char * addr;
    was public, CAMLdata has been introduced for this purpose. */
 #define CAMLstub CAMLprim
 #define CAMLextern extern
-#define CAMLdata CAMLextern CAMLpublic
+#if !defined(IN_RUNTIME) && defined(_MSC_VER) && defined(ARCH_SIXTYFOUR)
+  #define CAMLdata __declspec(dllimport) extern
+#else
+  #define CAMLdata extern CAMLpublic
+#endif
 
 /* Weak function definitions that can be overridden by external libs */
 /* Conservatively restricted to ELF and MacOSX platforms */

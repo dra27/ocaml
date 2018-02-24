@@ -42,6 +42,8 @@ LIBRARIES += libcamlrun_pic.$(A) libcamlrun_shared.$(SO)
 endif
 endif
 
+CPPFLAGS += -DIN_RUNTIME
+
 ifdef BOOTSTRAPPING_FLEXLINK
 CFLAGS += -DBOOTSTRAPPING_FLEXLINK
 endif
