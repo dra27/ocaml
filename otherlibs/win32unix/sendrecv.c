@@ -109,7 +109,7 @@ CAMLstub value unix_send(value sock, value buff, value ofs, value len,
   return Val_int(ret);
 }
 
-CAMLprim value unix_sendto_native(value sock, value buff, value ofs, value len,
+CAMLstub value unix_sendto_native(value sock, value buff, value ofs, value len,
                                   value flags, value dest)
 {
   SOCKET s = Socket_val(sock);

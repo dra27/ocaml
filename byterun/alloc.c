@@ -157,7 +157,7 @@ value caml_alloc_array(value (*funct)(char const *), char const ** arr)
 }
 
 /* [len] is a number of floats */
-CAMLprim value caml_alloc_float_array(mlsize_t len)
+value caml_alloc_float_array(mlsize_t len)
 {
 #ifdef FLAT_FLOAT_ARRAY
   mlsize_t wosize = len * Double_wosize;
