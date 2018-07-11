@@ -54,6 +54,9 @@ Working version
   sign-extension operations
   (LemonBoy, review by Alain Frisch and Xavier Leroy)
 
+- GPR#1809: rewrite `compare x y op 0` to `x op y` when values are integers
+  (Xavier Clerc, review by Gabriel Scherer)
+
 ### Runtime system:
 
 - GPR#1793: add the -m and -M command-line options to ocamlrun

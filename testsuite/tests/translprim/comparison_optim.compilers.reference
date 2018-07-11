@@ -1,0 +1,115 @@
+
+cmm:
+(data
+ int 4864
+ global "camlComparison_optim"
+ "camlComparison_optim":
+ int 1
+ int 1
+ int 1
+ int 1)
+(data
+ global "camlComparison_optim__gc_roots"
+ "camlComparison_optim__gc_roots":
+ addr "camlComparison_optim"
+ int 0)
+(function{comparison_optim.ml:8,14-154} camlComparison_optim__optim_int_1002
+     (x: val y: val)
+ (alloc{comparison_optim.ml:9,2-118}
+   block-hdr(6144){comparison_optim.ml:9,2-118} (+ (<< (<= x y) 1) 1)
+   (+ (<< (< x y) 1) 1) (+ (<< (>= x y) 1) 1) (+ (<< (> x y) 1) 1)
+   (+ (<< (== x y) 1) 1) (+ (<< (!= x y) 1) 1)))
+
+(function{comparison_optim.ml:16,16-160} camlComparison_optim__optim_int32_1005
+     (x: val y: val)
+ (alloc{comparison_optim.ml:17,2-118}
+   block-hdr(6144){comparison_optim.ml:17,2-118}
+   (+
+     (<<
+       (<= (load_mut signed int32 (+a x 8)) (load_mut signed int32 (+a y 8)))
+       1)
+     1)
+   (+
+     (<<
+       (< (load_mut signed int32 (+a x 8)) (load_mut signed int32 (+a y 8)))
+       1)
+     1)
+   (+
+     (<<
+       (>= (load_mut signed int32 (+a x 8)) (load_mut signed int32 (+a y 8)))
+       1)
+     1)
+   (+
+     (<<
+       (> (load_mut signed int32 (+a x 8)) (load_mut signed int32 (+a y 8)))
+       1)
+     1)
+   (+
+     (<<
+       (== (load_mut signed int32 (+a x 8)) (load_mut signed int32 (+a y 8)))
+       1)
+     1)
+   (+
+     (<<
+       (!= (load_mut signed int32 (+a x 8)) (load_mut signed int32 (+a y 8)))
+       1)
+     1)))
+
+(function{comparison_optim.ml:24,16-160} camlComparison_optim__optim_int64_1008
+     (x: val y: val)
+ (alloc{comparison_optim.ml:25,2-118}
+   block-hdr(6144){comparison_optim.ml:25,2-118}
+   (+ (<< (<= (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (< (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (>= (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (> (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (== (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (!= (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)))
+
+(function{comparison_optim.ml:32,20-172} camlComparison_optim__optim_nativeint_1011
+     (x: val y: val)
+ (alloc{comparison_optim.ml:33,2-118}
+   block-hdr(6144){comparison_optim.ml:33,2-118}
+   (+ (<< (<= (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (< (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (>= (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (> (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (== (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)
+   (+ (<< (!= (load_mut int (+a x 8)) (load_mut int (+a y 8))) 1) 1)))
+
+(data
+ int 4087
+ "camlComparison_optim__1":
+ addr "caml_curry2"
+ int 5
+ addr "camlComparison_optim__optim_nativeint_1011")
+(data
+ int 4087
+ "camlComparison_optim__2":
+ addr "caml_curry2"
+ int 5
+ addr "camlComparison_optim__optim_int64_1008")
+(data
+ int 4087
+ "camlComparison_optim__3":
+ addr "caml_curry2"
+ int 5
+ addr "camlComparison_optim__optim_int32_1005")
+(data
+ int 4087
+ "camlComparison_optim__4":
+ addr "caml_curry2"
+ int 5
+ addr "camlComparison_optim__optim_int_1002")
+(function camlComparison_optim__entry ()
+ (let optim_int "camlComparison_optim__4"
+   (store val(root-init) "camlComparison_optim" optim_int))
+ (let optim_int32 "camlComparison_optim__3"
+   (store val(root-init) (+a "camlComparison_optim" 8) optim_int32))
+ (let optim_int64 "camlComparison_optim__2"
+   (store val(root-init) (+a "camlComparison_optim" 16) optim_int64))
+ (let optim_nativeint "camlComparison_optim__1"
+   (store val(root-init) (+a "camlComparison_optim" 24) optim_nativeint))
+ 1a)
+
+(data)
