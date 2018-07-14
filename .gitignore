@@ -184,6 +184,8 @@ _ocamltestd
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
+/stdlib/stdlib.ml
+/stdlib/stdlib.mli
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result

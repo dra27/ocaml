@@ -70,7 +70,7 @@ X11_LINK=
 RPATH=
 SUPPORTS_SHARED_LIBRARIES=true
 SHAREDLIB_CFLAGS=
-ASM=ml -nologo -coff -Cp -c -Fo
+ASM=ml$(BUILD_TOOL_EXT) -nologo -coff -Cp -c -Fo
 ASPP=
 ASPPPROFFLAGS=
 PROFILING=false
@@ -102,10 +102,13 @@ AFL_INSTRUMENT=false
 AWK=gawk
 CC_HAS_DEBUG_PREFIX_MAP=false
 
+# This might get changed just to be $(EXE)
+BUILD_TOOL_EXT?=.exe
+
 ########## Configuration for the bytecode compiler
 
 ### Which C compiler to use for the bytecode interpreter.
-CC=cl
+CC=cl$(BUILD_TOOL_EXT)
 OC_CFLAGS=-nologo -O2 -Gy- -MD
 OC_CPPFLAGS=-D_CRT_SECURE_NO_DEPRECATE -DCAML_NAME_SPACE -DUNICODE -D_UNICODE \
   -DWINDOWS_UNICODE=$(WINDOWS_UNICODE)
@@ -120,10 +123,10 @@ BYTECCLIBS=advapi32.lib ws2_32.lib version.lib
 NATIVECCLIBS=advapi32.lib ws2_32.lib version.lib
 
 ### How to invoke the C preprocessor
-CPP=cl -nologo -EP
+CPP=cl$(BUILD_TOOL_EXT) -nologo -EP
 
 ### Flexlink
-FLEXLINK_CMD=flexlink
+FLEXLINK_CMD=flexlink$(BUILD_TOOL_EXT)
 FLEXDLL_CHAIN=msvc
 # FLEXLINK_FLAGS must be safe to insert in an OCaml string
 #   (see ocamlmklibconfig.ml in tools/Makefile)
@@ -145,7 +148,7 @@ MKMAINDLL=$(FLEXLINK) -maindll
 
 ### Native command to build ocamlrun.exe without flexlink
 MERGEMANIFESTEXE=test ! -f $(1).manifest \
-	         || mt -nologo -outputresource:$(1) -manifest $(1).manifest \
+	         || mt$(BUILD_TOOL_EXT) -nologo -outputresource:$(1) -manifest $(1).manifest \
 	            && rm -f $(1).manifest
 MKEXE_BOOT=$(CC) $(OC_CFLAGS) $(OUTPUTEXE)$(1) $(2) \
   /link /subsystem:console $(OC_LDFLAGS) && ($(MERGEMANIFESTEXE))
@@ -154,7 +157,7 @@ MKEXE_BOOT=$(CC) $(OC_CFLAGS) $(OUTPUTEXE)$(1) $(2) \
 MKEXE_ANSI=$(FLEXLINK) -exe
 
 ### How to build a static library
-MKLIB=link -lib -nologo -out:$(1) $(2)
+MKLIB=link$(BUILD_TOOL_EXT) -lib -nologo -out:$(1) $(2)
 #ml let mklib out files opts =
 #ml   Printf.sprintf "link -lib -nologo -out:%s %s %s" out opts files;;
 MKSHAREDLIBRPATH=
@@ -186,7 +189,7 @@ OCAMLOPT_CFLAGS=-nologo -O2 -Gy- -MD
 OCAMLOPT_CPPFLAGS=-D_CRT_SECURE_NO_DEPRECATE
 
 ### Build partially-linked object file
-PACKLD=link -lib -nologo -out:# there must be no space after this '-out:'
+PACKLD=link$(BUILD_TOOL_EXT) -lib -nologo -out:# there must be no space after this '-out:'
 
 ### Set to "true" to install ".byte" executables (ocamlc.byte, etc.)
 INSTALL_BYTECODE_PROGRAMS=true
@@ -205,7 +208,7 @@ OTHERLIBRARIES=win32unix systhreads str win32graph dynlink bigarray
 #ml let topdir = "" and wintopdir = "";;
 OTOPDIR=$(WINTOPDIR)
 CTOPDIR=$(WINTOPDIR)
-CYGPATH=cygpath -m
+CYGPATH=wslpath -m
 DIFF=/usr/bin/diff -q --strip-trailing-cr
 FIND=/usr/bin/find
 SORT=/usr/bin/sort

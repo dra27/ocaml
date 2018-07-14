@@ -16,6 +16,10 @@
 TOPDIR=$(BASEDIR)/..
 include $(TOPDIR)/Makefile.tools
 
+ifeq "$(UNIX_OR_WIN32)" "win32"
+SHELL=bash
+endif
+
 codegen := $(OTOPDIR)/testsuite/tools/codegen
 
 .PHONY: defaultpromote

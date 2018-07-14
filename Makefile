@@ -41,8 +41,8 @@ else
 LN = ln -sf
 endif
 
-CAMLRUN ?= boot/ocamlrun
-CAMLYACC ?= boot/ocamlyacc
+CAMLRUN ?= boot/ocamlrun$(BUILD_TOOL_EXT)
+CAMLYACC ?= boot/ocamlyacc$(BUILD_TOOL_EXT)
 include stdlib/StdlibModules
 
 CAMLC=$(CAMLRUN) boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives
@@ -288,7 +288,7 @@ ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   BOOT_FLEXLINK_CMD =
   FLEXDLL_DIR =
 else
-  BOOT_FLEXLINK_CMD = FLEXLINK_CMD="../boot/ocamlrun ../flexdll/flexlink.exe"
+  BOOT_FLEXLINK_CMD = FLEXLINK_CMD="../boot/ocamlrun$(BUILD_TOOL_EXT) ../flexdll/flexlink.exe"
   FLEXDLL_DIR=$(if $(wildcard flexdll/flexdll_*.$(O)),+flexdll)
 endif
 else
@@ -376,7 +376,9 @@ beforedepend:: utils/config.ml
 .PHONY: coldstart
 coldstart:
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
+	rm -f boot/ocamlrun$(EXE) || mv boot/ocamlrun$(EXE) boot/ocamlrun-old$(EXE)
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+	rm -f boot/ocamlrun-old$(EXE)
 	$(MAKE) -C yacc $(BOOT_FLEXLINK_CMD) all
 	cp yacc/ocamlyacc$(EXE) boot/ocamlyacc$(EXE)
 	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) \
@@ -525,7 +527,8 @@ flexdll/Makefile:
 flexdll: flexdll/Makefile flexlink
 	$(MAKE) -C flexdll \
 	     OCAML_CONFIG_FILE=../config/Makefile \
-             MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false support
+       MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) OCAMLOPT=true NATDYNLINK=false \
+       support
 
 # Bootstrapping flexlink - leaves a bytecode image of flexlink.exe in flexdll/
 .PHONY: flexlink
@@ -536,7 +539,7 @@ flexlink: flexdll/Makefile
 	cd stdlib && cp stdlib.cma std_exit.cmo *.cmi ../boot
 	$(MAKE) -C flexdll MSVC_DETECT=0 OCAML_CONFIG_FILE=../config/Makefile \
 	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false \
-	  OCAMLOPT="../boot/ocamlrun ../boot/ocamlc -I ../boot" \
+	  OCAMLOPT="../boot/ocamlrun$(BUILD_TOOL_EXT) ../boot/ocamlc -I ../boot" \
 	  flexlink.exe
 	$(MAKE) -C runtime clean
 	$(MAKE) partialclean
@@ -1271,7 +1274,7 @@ toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 # The numeric opcodes
 
 bytecomp/opcodes.ml: runtime/caml/instruct.h tools/make_opcodes
-	runtime/ocamlrun tools/make_opcodes -opcodes < $< > $@
+	$(CAMLRUN) tools/make_opcodes -opcodes < $< > $@
 
 tools/make_opcodes: tools/make_opcodes.mll
 	$(MAKE) -C tools make_opcodes

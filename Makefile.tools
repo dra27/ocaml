@@ -21,7 +21,7 @@
 # Note that these makefile should define the $(TOPDIR) variable on their
 # own.
 
-WINTOPDIR=`cygpath -m "$(TOPDIR)"`
+WINTOPDIR=`wslpath -m "$(TOPDIR)"`
 
 # TOPDIR is the root directory of the OCaml sources, in Unix syntax.
 # WINTOPDIR is the same directory, in Windows syntax.

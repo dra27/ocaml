@@ -18,8 +18,8 @@ ROOTDIR = ..
 include $(ROOTDIR)/config/Makefile
 include $(ROOTDIR)/Makefile.common
 
-OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-OCAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc
+OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(BUILD_TOOL_EXT)
+OCAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc$(BUILD_TOOL_EXT)
 
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
 OCAMLC    = $(OCAMLRUN) $(ROOTDIR)/ocamlc $(STDLIBFLAGS)
@@ -35,7 +35,7 @@ OCAMLLEX  = $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
 # In the following line, "sh" is useful under Windows. Without it,
 # the ./remove_DEBUG command would be executed by cmd.exe which would not
 # know how to handle it.
-OCAMLPP=-pp 'sh ./remove_DEBUG'
+OCAMLPP=-pp 'C:\Windows\Sysnative\bash ./remove_DEBUG'
 
 # For installation
 ##############

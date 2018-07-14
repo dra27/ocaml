@@ -216,7 +216,7 @@ endif
 clean:
 	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO)
 	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
-	rm -f caml/version.h
+	rm -f caml/version.h ld.conf
 
 .PHONY: distclean
 distclean: clean

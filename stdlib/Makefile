@@ -16,7 +16,7 @@
 include ../config/Makefile
 include ../Makefile.common
 
-CAMLRUN ?= ../boot/ocamlrun
+CAMLRUN ?= ../boot/ocamlrun$(BUILD_TOOL_EXT)
 CAMLYACC ?= ../boot/ocamlyacc
 TARGET_BINDIR ?= $(BINDIR)
 
@@ -293,6 +293,10 @@ include .depend
 
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
+
+.PRECIOUS: stdlib.%
+stdlib.%: stdlib.%p
+	$(AWK) -f expand_module_aliases.awk $^ > $@
 
 # Note that .p.cmx targets do not depend (for compilation) upon other
 # .p.cmx files.  When the compiler imports another compilation unit,

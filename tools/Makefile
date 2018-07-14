@@ -26,8 +26,8 @@ endef
 $(foreach i,BINDIR LIBDIR STUBLIBDIR MANDIR,$(eval $(shellquote)))
 endif
 
-CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-CAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc
+CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(BUILD_TOOL_EXT)
+CAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc$(BUILD_TOOL_EXT)
 DESTDIR ?=
 # Setup GNU make variables storing per-target source and target,
 # a list of installed tools, and a function to quote a filename for
@@ -307,7 +307,7 @@ make_opcodes: make_opcodes.ml
 	$(CAMLC) make_opcodes.ml -o $@
 
 opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h make_opcodes
-	$(ROOTDIR)/runtime/ocamlrun make_opcodes -opnames < $< > $@
+	$(CAMLRUN) make_opcodes -opnames < $< > $@
 
 clean::
 	rm -f opnames.ml make_opcodes make_opcodes.ml

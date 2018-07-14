@@ -35,7 +35,7 @@ else # Windows
   ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
     FLEXLINK_ENV =
   else
-    ROOT:=$(shell cd .. && pwd| cygpath -m -f -)
+    ROOT:=$(shell wslpath -m "$$(cd .. && pwd)")
     # FLEXLINK_ENV must have a space at the end
     FLEXLINK_ENV = \
       OCAML_FLEXLINK="$(ROOT)/boot/ocamlrun $(ROOT)/flexdll/flexlink.exe" #
@@ -84,7 +84,7 @@ default:
 .PHONY: all
 all:
 	@rm -f $(TESTLOG)
-	@$(MAKE) $(NO_PRINT) legacy-without-report
+#	@$(MAKE) $(NO_PRINT) legacy-without-report
 	@$(MAKE) $(NO_PRINT) new-without-report
 	@$(MAKE) $(NO_PRINT) report
 

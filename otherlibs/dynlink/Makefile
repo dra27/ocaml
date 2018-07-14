@@ -20,8 +20,8 @@
 include ../../config/Makefile
 include ../../Makefile.common
 
-CAMLRUN ?= ../../boot/ocamlrun
-CAMLYACC ?= ../../boot/ocamlyacc
+CAMLRUN ?= ../../boot/ocamlrun$(BUILD_TOOL_EXT)
+CAMLYACC ?= ../../boot/ocamlyacc$(BUILD_TOOL_EXT)
 
 ROOTDIR   = ../..
 OCAMLC    = $(CAMLRUN) $(ROOTDIR)/ocamlc -nostdlib -I $(ROOTDIR)/stdlib

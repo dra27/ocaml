@@ -22,7 +22,7 @@ include $(ROOTDIR)/Makefile.common
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
   unix := false
-  ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)"|cygpath -w -f - \
+  ocamlsrcdir := $(shell wslpath -m "$(abspath $(shell pwd)/..)" \
     | sed 's/\\/\\\\\\\\/g')
   mkexe := $(MKEXE_ANSI) -link $(OC_LDFLAGS)
 else
@@ -156,15 +156,17 @@ flags := -g -nostdlib $(include_directories) \
   -strict-sequence -safe-string -strict-formats \
   -w +a-4-9-41-42-44-45-48 -warn-error A
 
-ocamlc := $(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlc $(flags)
+ocamlrun := $(ROOTDIR)/runtime/ocamlrun$(BUILD_TOOL_EXT)
 
-ocamlopt := $(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlopt $(flags)
+ocamlc := $(ocamlrun) $(ROOTDIR)/ocamlc $(flags)
 
-ocamldep := $(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/tools/ocamldep -slash
+ocamlopt := $(ocamlrun) $(ROOTDIR)/ocamlopt $(flags)
 
-ocamllex := $(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/lex/ocamllex
+ocamldep := $(ocamlrun) $(ROOTDIR)/tools/ocamldep -slash
 
-ocamlyacc := $(ROOTDIR)/yacc/ocamlyacc
+ocamllex := $(ocamlrun) $(ROOTDIR)/lex/ocamllex
+
+ocamlyacc := $(ROOTDIR)/yacc/ocamlyacc$(BUILD_TOOL_EXT)
 
 ocamlcdefaultflags :=
 

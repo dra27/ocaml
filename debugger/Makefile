@@ -17,8 +17,8 @@ include ../config/Makefile
 include ../Makefile.common
 
 UNIXDIR=../otherlibs/$(UNIXLIB)
-CAMLRUN ?= ../boot/ocamlrun
-CAMLYACC ?= ../boot/ocamlyacc
+CAMLRUN ?= ../boot/ocamlrun$(BUILD_TOOL_EXT)
+CAMLYACC ?= ../boot/ocamlyacc$(BUILD_TOOL_EXT)
 
 CAMLC=$(CAMLRUN) ../ocamlc -g -nostdlib -I ../stdlib
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \

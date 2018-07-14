@@ -18,8 +18,8 @@ ROOTDIR=../..
 include $(ROOTDIR)/config/Makefile
 include $(ROOTDIR)/Makefile.common
 
-CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-CAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc
+CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(BUILD_TOOL_EXT)
+CAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc$(BUILD_TOOL_EXT)
 
 LIBS = -nostdlib -I $(ROOTDIR)/stdlib -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
 
