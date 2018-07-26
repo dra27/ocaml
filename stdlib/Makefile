@@ -291,9 +291,6 @@ clean::
 
 include .depend
 
-EMPTY :=
-SPACE := $(EMPTY) $(EMPTY)
-
 .PRECIOUS: stdlib.%
 stdlib.%: stdlib.%p
 	$(AWK) -f expand_module_aliases.awk $^ > $@

@@ -23,7 +23,7 @@ val from_bindings : (Variables.t * string) list -> t
 val to_bindings : t -> (Variables.t * string) list
 val to_system_env : t -> string array
 
-val lookup : Variables.t -> t -> string option
+val lookup : ?expand_result:bool -> Variables.t -> t -> string option
 val lookup_nonempty : Variables.t -> t -> string option
 val safe_lookup : Variables.t -> t -> string
 val is_variable_defined : Variables.t -> t -> bool

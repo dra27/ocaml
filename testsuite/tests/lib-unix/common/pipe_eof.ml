@@ -33,6 +33,6 @@ let run exe args =
 ;;
 
 let _ =
-  ignore (run "cp" [||]);
+  ignore (run "C:\\Windows\\Sysnative\\bash.exe" [|"-c"; "cp"|]);
   print_endline "success"
 ;;

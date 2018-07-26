@@ -94,8 +94,15 @@ let get_test_source_directory test_dirname =
 let get_test_build_directory_prefix test_dirname =
   let ocamltestdir_variable = "OCAMLTESTDIR" in
   let root =
+    let transform_slashes =
+      if Sys.win32 then
+        function '/' -> '\\' | c -> c
+      else
+        fun c -> c
+    in
     Sys.getenv_with_default_value ocamltestdir_variable
       (Filename.concat (Sys.getcwd ()) "_ocamltest")
+    |> String.map transform_slashes
   in
   if test_dirname = "." then root
   else Filename.concat root test_dirname
@@ -134,7 +141,9 @@ let test_file test_filename =
   let test_build_directory_prefix =
     get_test_build_directory_prefix test_directory in
   if Sys.win32 then
-    ignore (Sys.command ("if exist " ^ Filename.quote (Filename.concat test_build_directory_prefix "nul") ^ " rd /s/q " ^ Filename.quote test_build_directory_prefix))
+    (* The bizarre trick with pushd is required because if exist can't handle quoting! *)
+    (* @@DRA This is highly imperfect if the directory fails to be deleted - either need to error or do something better?! *)
+    ignore (Sys.command ("pushd " ^ Filename.quote test_build_directory_prefix ^ " 2>nul && popd && rd /s /q " ^ Filename.quote test_build_directory_prefix))
   else
     ignore (Sys.command ("rm -rf " ^ test_build_directory_prefix));
   Sys.make_directory test_build_directory_prefix;

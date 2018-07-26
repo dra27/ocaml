@@ -29,6 +29,17 @@ INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
 INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
 INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
 
+# EMPTY is defined in config/Makefile
+SPACE := $(EMPTY) $(EMPTY)
+
+# WSLENV_SET adds or replaces an item in WSLENV, for example
+# $(call WSLENV_SET,OCAML_FLEXLINK CAML_LD_LIBRARY_PATH)
+DO_WSLENV_SET=$(subst $(SPACE),:,$(filter-out $(subst |,,$1),\
+              $(filter-out $(subst |,/%,$(patsubst %,%|,$1)),\
+                           $(subst :, ,$(WSLENV)))))
+DO_WSL_APPEND=$(if $1,$1:$2,$2)
+WSLENV_SET=$(call DO_WSL_APPEND,$(call DO_WSLENV_SET,$(filter-out /%,$(subst /, /,$1))),$1)
+
 ifeq "$(UNIX_OR_WIN32)" "win32"
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
@@ -36,6 +47,7 @@ ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 else
   # FLEXLINK_ENV must have a space at the end
   FLEXLINK_ENV = \
+    WSLENV=$(call WSLENV_SET,OCAML_FLEXLINK) \
     OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun $(ROOTDIR)/flexdll/flexlink.exe" #
 endif
 else

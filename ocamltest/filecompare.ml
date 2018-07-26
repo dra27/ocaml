@@ -168,10 +168,11 @@ let diff files =
   let temporary_file = Filename.temp_file "ocamltest" "diff" in
   let diff_commandline = String.concat " "
   [
+    "C:\\Windows\\Sysnative\\bash.exe -c '";
     "diff -u";
-    files.reference_filename;
-    files.output_filename;
-    "> " ^ temporary_file
+    "`wslpath " ^ (String.escaped files.reference_filename |> String.escaped) ^ "`";
+    "`wslpath " ^ (String.escaped files.output_filename |> String.escaped) ^ "`";
+    "> " ^ temporary_file; "'"
   ] in
   let result =
     if (Sys.command diff_commandline) = 2 then Pervasives.Error "diff"

@@ -124,6 +124,7 @@ let run_cmd
       environment
       (Environments.to_system_env env)
   in
+  Printf.fprintf log "progname = %s; argv = [%s]\n%!" progname (String.concat "; " quoted_lst);
   Run_command.run {
     Run_command.progname = progname;
     Run_command.argv = arguments;
@@ -136,7 +137,22 @@ let run_cmd
     Run_command.log = log
   }
 
-let run
+let wslpath file_name =
+  let response_file = Filename.temp_file "ocamltest-" ".wslpath" in
+  let result =
+    if Sys.command ("C:\\Windows\\Sysnative\\bash.exe -c 'wslpath \"" ^ (Filename.maybe_quote file_name |> String.escaped |> String.escaped) ^ "\"' > " ^ Filename.maybe_quote response_file) = 0 then
+      let ch = open_in response_file in
+      let result = input_line ch in
+      close_in ch;
+      (*Printf.eprintf "Translated %s => %s\n%!" file_name result;*)
+      result
+    else (* Log the error? *)
+      file_name
+  in
+  Sys.force_remove response_file;
+  result
+
+let run ?(script=false)
     (log_message : string)
     (redirect_output : bool)
     (can_skip : bool)
@@ -145,7 +161,8 @@ let run
     (log : out_channel)
     (env : Environments.t)
   =
-  match Environments.lookup prog_variable env with
+  let wslenv = if script then Environments.add Builtin_variables.test_build_directory (wslpath (Environments.safe_lookup Builtin_variables.test_build_directory env))(Environments.add Builtin_variables.test_source_directory (wslpath (Environments.safe_lookup Builtin_variables.test_source_directory env)) env) else env in
+  match Environments.lookup prog_variable wslenv with
   | None ->
     let msg = Printf.sprintf "%s: variable %s is undefined"
       log_message (Variables.name_of_variable prog_variable) in
@@ -153,7 +170,19 @@ let run
   | Some program ->
     let arguments = match args_variable with
       | None -> ""
-      | Some variable -> Environments.safe_lookup variable env in
+      | Some variable -> Environments.safe_lookup variable wslenv in
+    let program, arguments, cleanup =
+      if script && Filename.basename (List.hd (String.words program)) <> "ocamlrun.exe" then
+        let script_file = Filename.temp_file "ocamltest-" ".wslsh" in
+        let ch = open_out_bin script_file in
+        Printf.fprintf log "Wrote %S to wslsh\n" (program ^ " " ^ arguments);
+        Printf.fprintf log "base = %s\n" (Filename.basename program);
+        Printf.fprintf ch "%s %s" program arguments;
+        close_out ch;
+        "C:\\Windows\\Sysnative\\bash.exe", wslpath script_file, (fun () -> Sys.force_remove script_file)
+      else
+        program, arguments, (fun () -> ())
+    in
     let commandline = [program; arguments] in
     let what = log_message ^ " " ^ program ^ " " ^
     begin if arguments="" then "without any argument"
@@ -173,6 +202,7 @@ let run
       exit_status_of_variable env Builtin_variables.exit_status
     in
     let exit_status = run_cmd log env commandline in
+    cleanup ();
     if exit_status=expected_exit_status
     then (Result.pass, env)
     else begin
@@ -196,7 +226,7 @@ let run_script log env =
     response_file;
   let scriptenv = Environments.add
     Builtin_variables.ocamltest_response response_file env in
-  let (result, newenv) = run
+  let (result, newenv) = run ~script:true
     "Running script"
     true
     true
@@ -226,10 +256,11 @@ let run_hook hook_name log input_env =
     Builtin_variables.ocamltest_response response_file input_env in
   let systemenv =
     Environments.to_system_env hookenv in
+  Printf.fprintf log "Hook is being passed %s\n%!" ("\"`wslpath " ^ (Filename.maybe_quote hook_name |> String.escaped |> String.escaped) ^ "`\"");
   let open Run_command in
   let settings = {
-    progname = "sh";
-    argv = [|"sh"; Filename.maybe_quote hook_name|];
+    progname = "C:\\Windows\\Sysnative\\bash.exe";
+    argv = [|"bash"; "-c" ; "\"`wslpath " ^ (Filename.maybe_quote hook_name |> String.escaped |> String.escaped) ^ "`\""|];
     envp = systemenv;
     stdin_filename = "";
     stdout_filename = "";

@@ -268,7 +268,7 @@ LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
 TOPINCLUDES=$(addprefix -I otherlibs/,$(filter-out %threads,$(OTHERLIBRARIES)))
-RUNTOP=./runtime/ocamlrun ./ocaml \
+RUNTOP=./runtime/ocamlrun$(EXE) ./ocaml \
   -nostdlib -I stdlib \
   -noinit $(TOPFLAGS) $(TOPINCLUDES)
 NATRUNTOP=./ocamlnat$(EXE) \
@@ -548,7 +548,7 @@ flexlink: flexdll/Makefile
 flexlink.opt:
 	cd flexdll && \
 	mv flexlink.exe flexlink && \
-	($(MAKE) OCAML_FLEXLINK="../boot/ocamlrun ./flexlink" MSVC_DETECT=0 \
+	($(MAKE) WSLENV=$(call WSLENV_SET,OCAML_FLEXLINK) OCAML_FLEXLINK="../boot/ocamlrun ./flexlink" MSVC_DETECT=0 \
 	           OCAML_CONFIG_FILE=../config/Makefile \
 	           OCAMLOPT="../ocamlopt.opt -I ../stdlib" flexlink.exe || \
 	 (mv flexlink flexlink.exe && false)) && \

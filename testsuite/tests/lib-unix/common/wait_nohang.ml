@@ -5,7 +5,7 @@ include unix
 let () =
   let fd = Unix.openfile "plop" [O_CREAT; O_WRONLY] 0o666 in
   let pid =
-    Unix.create_process "echo" [|"echo"; "toto"|] Unix.stdin fd Unix.stderr
+    Unix.create_process "C:\\Windows\\Sysnative\\bash.exe" [|"bash"; "-c"; "echo toto"|] Unix.stdin fd Unix.stderr
   in
   Unix.close fd;
   while fst (Unix.waitpid [WNOHANG] pid) = 0 do

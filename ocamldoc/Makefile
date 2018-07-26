@@ -57,6 +57,7 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
   endif
 else # Windows
   OCAMLDOC_RUN = \
+    WSLENV=$(call WSLENV_SET,CAML_LD_LIBRARY_PATH) \
     CAML_LD_LIBRARY_PATH="$(ROOTDIR)/otherlibs/win32unix;$(ROOTDIR)/otherlibs/str" $(OCAMLRUN) ./$(OCAMLDOC)
 endif
 

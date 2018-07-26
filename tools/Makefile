@@ -401,9 +401,8 @@ CAMLTEX= $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 caml-tex: INCLUDES+= -I $(ROOTDIR)/otherlibs/str \
                      -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
 caml-tex: $(CAMLTEX)
-	$(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlc \
-	                              -nostdlib -I $(ROOTDIR)/stdlib \
-	                              $(LINKFLAGS) -linkall -o $@ $(CAMLTEX)
+	$(CAMLRUN) $(ROOTDIR)/ocamlc -nostdlib -I $(ROOTDIR)/stdlib \
+	                             $(LINKFLAGS) -linkall -o $@ $(CAMLTEX)
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we delay building caml-tex to the opt.opt stage

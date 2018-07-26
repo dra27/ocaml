@@ -53,8 +53,8 @@ ocamltest_program := $(or \
   $(wildcard $(ocamltest_directory)/ocamltest$(EXE)))
 
 ifneq "$(FLEXLINK_ENV)" ""
-  MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
-                                   $(FLEXLINK_FLAGS)
+  MKDLL=$(WINTOPDIR)/boot/ocamlrun$(EXE) $(WINTOPDIR)/flexdll/flexlink.exe \
+                                         $(FLEXLINK_FLAGS)
 endif
 ocamltest := $(FLEXLINK_ENV)MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
                             $(ocamltest_program)

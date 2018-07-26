@@ -6,6 +6,19 @@ include systhreads
 
 (* Test a file copy function *)
 
+let compare_files f1 f2 =
+  let ch1 = open_in_bin f1 in
+  let ch2 = open_in_bin f2 in
+  let len1 = in_channel_length ch1 in
+  let len2 = in_channel_length ch2 in
+  let buf1 = Bytes.create len1 in
+  let buf2 = Bytes.create len2 in
+  really_input ch1 buf1 0 len1;
+  really_input ch2 buf2 0 len2;
+  close_in ch1;
+  close_in ch2;
+  Bytes.compare buf1 buf2 = 0
+
 let test msg producer consumer src dst =
   print_string msg; print_newline();
   let ic = open_in_bin src in
@@ -17,7 +30,7 @@ let test msg producer consumer src dst =
   let cons = Thread.create consumer (ipipe, oc) in
   Thread.join prod;
   Thread.join cons;
-  if Unix.system ("cmp " ^ src ^ " " ^ dst) = Unix.WEXITED 0
+  if compare_files src dst
   then print_string "passed"
   else print_string "FAILED";
   print_newline()

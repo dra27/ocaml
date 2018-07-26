@@ -20,11 +20,11 @@ let ch = new_channel()
 
 let f () =
   let res = sync (swap "F" ch) in
-  print_string "f "; print_string res; print_newline()
+  print_string "f "; print_string res; print_newline(); flush stdout
 
 let g () =
   let res = sync (swap "G" ch) in
-  print_string "g "; print_string res; print_newline()
+  print_string "g "; print_string res; print_newline(); flush stdout
 
 let _ =
   let id = Thread.create f () in

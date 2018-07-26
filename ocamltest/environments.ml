@@ -49,8 +49,8 @@ let to_system_env env =
   VariableMap.iter store env;
   system_env
 
-let lookup variable env =
-  try Some (expand env (VariableMap.find variable env)) with Not_found -> None
+let lookup ?(expand_result = true) variable env =
+  try Some (let r = (VariableMap.find variable env) in if expand_result then expand env r else r) with Not_found -> None
 
 let lookup_nonempty variable env = match lookup variable env with
   | None -> None
@@ -180,6 +180,7 @@ let modifiers_of_file filename =
   let rec modifiers_of_lines acc = match input_line_opt ic with
     | None -> acc
     | Some line ->
+      Printf.eprintf "Read %s from file\n%!" line;
       modifiers_of_lines ((modifier_of_string (String.trim line)) :: acc) in
   let modifiers = modifiers_of_lines [] in
   close_in ic;

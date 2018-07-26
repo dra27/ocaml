@@ -33,7 +33,7 @@ endif
 
 ifeq "$(TOOLCHAIN)" "msvc"
 CPP := $(CPP) 2> nul
-CSC := csc
+CSC := csc.exe
 ifeq "$(HOST)" "msvc"
 CSCFLAGS := /platform:x86
 else
