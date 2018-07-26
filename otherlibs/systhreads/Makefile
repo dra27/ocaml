@@ -21,14 +21,6 @@ include $(ROOTDIR)/Makefile.common
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 CAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc
 
-ifeq "$(wildcard $(ROOTDIR)/flexdll/Makefile)" ""
-FLEXLINK_ENV =
-else
-# FLEXLINK_ENV must have a space at the end
-FLEXLINK_ENV = \
-  OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun $(ROOTDIR)/flexdll/flexlink.exe" #
-endif
-
 LIBS = -nostdlib -I $(ROOTDIR)/stdlib -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
 
 CAMLC=$(CAMLRUN) $(ROOTDIR)/ocamlc $(LIBS)
