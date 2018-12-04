@@ -15,8 +15,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 DYNLINKDIR=$(ROOTDIR)/otherlibs/dynlink
 UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
