@@ -15,8 +15,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
