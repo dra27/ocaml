@@ -1,0 +1,29 @@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*            Xavier Leroy, projet Cristal, INRIA Rocquencourt            *
+#*                                                                        *
+#*   Copyright 1999 Institut National de Recherche en Informatique et     *
+#*     en Automatique.                                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+# ALL_C_SOURCES is parsed to produce $(PRIMS), $(BYTECODE_C_SOURCES) and
+# $(NATIVE_C_SOURCES). Files prefixed : are included in $(PRIMS), the suffix
+# PLATFORM is translated to _byt for $(PRIMS) and $(BYTECODE_C_SOURCES) and to
+# _nat for $(NATIVE_C_SOURCES), the prefix B causes files to appear in
+# $(BYTECODE_C_SOURCES) only and the prefix N causes files to appear in
+# $(NATIVE_C_SOURCES) only. A : must appear before B or N.
+
+Binterp misc :Bstacks Bfix_code startup_aux startupPLATFORM freelist major_gc
+minor_gc memory :alloc rootsPLATFORM globroots failPLATFORM :signals
+signalsPLATFORM printexc :backtracePLATFORM :backtrace :compare :ints :floats
+:str :array :io :extern :intern :hash :sys :meta :parsing :gc_ctrl :md5 :obj
+:lexing :callback debugger :weak compact :finalise custom Ndynlink_nat :dynlink
+Nclambda_checks :spacetimePLATFORM Nspacetime_snapshot :afl $(UNIX_OR_WIN32)
+:bigarray main

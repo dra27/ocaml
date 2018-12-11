@@ -18,28 +18,15 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
-# Lists of source files
+# Lists of source files. See file ALL_C_SOURCES.
+include _sources
 
-PRIMS := $(addsuffix .c, \
-  alloc array compare extern floats gc_ctrl hash intern interp ints io \
-  lexing md5 meta obj parsing signals str sys callback weak finalise \
-  stacks dynlink backtrace_byt backtrace spacetime_byt afl bigarray)
-
-BYTECODE_C_SOURCES := $(addsuffix .c, \
-  interp misc stacks fix_code startup_aux startup_byt freelist major_gc \
-  minor_gc memory alloc roots_byt globroots fail_byt signals \
-  signals_byt printexc backtrace_byt backtrace compare ints \
-  floats str array io extern intern hash sys meta parsing gc_ctrl md5 obj \
-  lexing callback debugger weak compact finalise custom dynlink \
-  spacetime_byt afl $(UNIX_OR_WIN32) bigarray main)
-
-NATIVE_C_SOURCES := $(addsuffix .c, \
-  startup_aux startup_nat main fail_nat roots_nat signals \
-  signals_nat misc freelist major_gc minor_gc memory alloc compare ints \
-  floats str array io extern intern hash sys parsing gc_ctrl md5 obj \
-  lexing $(UNIX_OR_WIN32) printexc callback weak compact finalise custom \
-  globroots backtrace_nat backtrace dynlink_nat debugger meta \
-  dynlink clambda_checks spacetime_nat spacetime_snapshot afl bigarray)
+PRIMS := $(subst B,,$(subst N,,$(subst :,,$(filter :%, \
+                                          $(ALL_C_SOURCES:PLATFORM.c=_byt.c)))))
+BYTECODE_C_SOURCES := $(subst B,,$(subst :,,$(filter-out N%, \
+                                           $(ALL_C_SOURCES:PLATFORM.c=_byt.c))))
+NATIVE_C_SOURCES := $(subst N,,$(filter-out B%, \
+                                $(subst :,,$(ALL_C_SOURCES:PLATFORM.c=_nat.c))))
 
 # The other_files variable stores the list of files whose dependencies
 # should be computed by `make depend` although they do not need to be
@@ -221,7 +208,7 @@ endif
 clean:
 	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO) ld.conf
 	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
-	rm -f caml/version.h
+	rm -f caml/version.h _sources
 
 .PHONY: distclean
 distclean: clean
@@ -386,6 +373,11 @@ $(foreach object_type, $(object_types), \
 	$(ASM)$@ $(ASMFLAGS) $<
 
 # Dependencies
+
+_sources: ALL_C_SOURCES
+	@echo 'ALL_C_SOURCES := $$(addsuffix .c, \' > $@
+	@cat $^ | tr -d '\r' | sed -ne 's/^[^#].*$$/\0 \\/p' >> $@
+	@echo ')' >> $@
 
 .PHONY: depend
 ifeq "$(TOOLCHAIN)" "msvc"
