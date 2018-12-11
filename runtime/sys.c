@@ -56,7 +56,6 @@
 #include "caml/signals.h"
 #include "caml/stacks.h"
 #include "caml/sys.h"
-#include "caml/version.h"
 #include "caml/callback.h"
 #include "caml/startup_aux.h"
 
