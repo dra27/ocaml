@@ -59,7 +59,12 @@ let randomized_default =
   let params =
     try Sys.getenv "OCAMLRUNPARAM" with Not_found ->
     try Sys.getenv "CAMLRUNPARAM" with Not_found -> "" in
-  String.contains params 'R'
+  let is_R s =
+    let len = String.length s in
+    (* Ignore any parameter which has been given *)
+    len > 0 && s.[0] = 'R' && (len = 1 || s.[1] = '=')
+  in
+  List.exists is_R (String.split_on_char ',' params)
 
 let randomized = ref randomized_default
 
