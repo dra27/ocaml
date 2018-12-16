@@ -56,8 +56,11 @@ val create : ?random:bool -> int -> ('a, 'b) t
    deterministic: elements are enumerated in different orders at
    different runs of the program.
 
-   If no [~random] parameter is given, hash tables are created
-   in non-random mode by default.  This default can be changed
+   @since 4.08.0 if no [~random] parameter is given then hash tables are created
+   in random mode.
+
+   @before 4.08.0 if no [~random] parameter is given, hash tables were created
+   in non-random mode by default.  This default could be changed
    either programmatically by calling {!Hashtbl.randomize} or by
    setting the [R] flag in the [OCAMLRUNPARAM] environment variable.
 
@@ -172,19 +175,12 @@ val length : ('a, 'b) t -> int
    first argument. *)
 
 val randomize : unit -> unit
-(** After a call to [Hashtbl.randomize()], hash tables are created in
-    randomized mode by default: {!Hashtbl.create} returns randomized
-    hash tables, unless the [~random:false] optional parameter is given.
-    The same effect can be achieved by setting the [R] parameter in
-    the [OCAMLRUNPARAM] environment variable.
+(** @before 4.08.0 this function this function changed the default behavior
+    of {!Hashtbl.create} to return randomized hash tables, unless the
+    [~random:false] optional parameter was given.
 
-    It is recommended that applications or Web frameworks that need to
-    protect themselves against the denial-of-service attack described
-    in {!Hashtbl.create} call [Hashtbl.randomize()] at initialization
-    time.
-
-    Note that once [Hashtbl.randomize()] was called, there is no way
-    to revert to the non-randomized default behavior of {!Hashtbl.create}.
+    @since 4.08.0 this behaviour is now the default and there is no way to
+    revert to the non-randomized default behavior of {!Hashtbl.create}.
     This is intentional.  Non-randomized hash tables can still be
     created using [Hashtbl.create ~random:false].
 

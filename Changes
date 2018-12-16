@@ -187,8 +187,9 @@ Working version
 - GPR#2185: Add `List.filter_map`
   (Thomas Refis, review by Alain Frisch and Gabriel Scherer)
 
-- GPR#2200: harden parsing of OCAMLRUNPARAM for Hashtbl.is_randomized ()
-  (David Allsopp)
+* GPR#2200: harden parsing of OCAMLRUNPARAM for Hashtbl.is_randomized () and
+  create randomized hash tables by default.
+  (David Allsopp, review by ????)
 
 ### Other libraries:
 

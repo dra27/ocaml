@@ -53,23 +53,10 @@ let ongoing_traversal h =
 let flip_ongoing_traversal h =
   h.initial_size <- - h.initial_size
 
-(* To pick random seeds if requested *)
+(* To pick random seeds if requested. Default since 4.08 *)
 
-let randomized_default =
-  let params =
-    try Sys.getenv "OCAMLRUNPARAM" with Not_found ->
-    try Sys.getenv "CAMLRUNPARAM" with Not_found -> "" in
-  let is_R s =
-    let len = String.length s in
-    (* Ignore any parameter which has been given *)
-    len > 0 && s.[0] = 'R' && (len = 1 || s.[1] = '=')
-  in
-  List.exists is_R (String.split_on_char ',' params)
-
-let randomized = ref randomized_default
-
-let randomize () = randomized := true
-let is_randomized () = !randomized
+let randomize () = ()
+let is_randomized () = true
 
 let prng = lazy (Random.State.make_self_init())
 
@@ -80,7 +67,7 @@ let rec power_2_above x n =
   else if x * 2 > Sys.max_array_length then x
   else power_2_above (x * 2) n
 
-let create ?(random = !randomized) initial_size =
+let create ?(random = true) initial_size =
   let s = power_2_above 16 initial_size in
   let seed = if random then Random.State.bits (Lazy.force prng) else 0 in
   { initial_size = s; size = 0; seed = seed; data = Array.make s Empty }
