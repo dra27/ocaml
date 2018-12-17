@@ -91,6 +91,7 @@ EOF
     ;;
   i386)
     ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+      AS="as" ASPP="gcc -c" \
       $configure_flags
     ;;
   *)
