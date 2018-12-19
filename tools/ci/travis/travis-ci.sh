@@ -194,8 +194,8 @@ not_pruned () {
   if [ "$DIR" = "." ] ; then
     return 0
   else
-    case ",$(git check-attr ocaml-typo "$DIR" | sed -e 's/.*: //')," in
-      ,prune,)
+    case ",$(git check-attr typo.prune "$DIR" | sed -e 's/.*: //')," in
+      ,set,)
       return 1
       ;;
       *)
@@ -221,7 +221,7 @@ CheckTypoTree () {
         touch check-typo-failed
       fi
     else
-      echo "NOT checking $1: $path (ocaml-typo=prune)"
+      echo "NOT checking $1: $path (typo.prune)"
     fi
   done)
   rm -f tmp-index
