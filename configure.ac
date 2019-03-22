@@ -852,7 +852,8 @@ AS_IF([test x"$enable_shared" != "xno"],
     [arm*-*-linux*], [natdynlink=true],
     [arm*-*-freebsd*], [natdynlink=true],
     [earm*-*-netbsd*], [natdynlink=true],
-    [aarch64-*-linux*], [natdynlink=true])])
+    [aarch64-*-linux*], [natdynlink=true],
+    [aarch64-*-freebsd*], [natdynlink=true])])
 
 # Try to work around the Skylake/Kaby Lake processor bug.
 AS_CASE(["$CC,$host"],
@@ -951,6 +952,8 @@ AS_CASE([$host],
     [arch=amd64; system=mingw64],
   [aarch64-*-linux*],
     [arch=arm64; system=linux],
+  [aarch64-*-freebsd*],
+    [arch=arm64; system=freebsd],
   [x86_64-*-cygwin*],
     [arch=amd64; system=cygwin]
 )
