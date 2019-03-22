@@ -22,6 +22,12 @@ OCaml 4.08 maintenance branch:
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
 
+### Code generation and optimization
+
+- #7931, #1904: Add FreeBSD/aarch64 support
+  (Greg V, review by Sébastien Hinderer, Stephen Dolan, Damien Doligez
+   and Xavier Leroy)
+
 ### Build system:
 
 - #8650: ensure that "make" variables are defined before use;
