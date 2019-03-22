@@ -1,6 +1,12 @@
 OCaml 4.08 maintenance branch:
 ------------------------------
 
+### Code generation and optimization
+
+- #7931, #1904: Add FreeBSD/aarch64 support
+  (Greg V, review by Sébastien Hinderer, Stephen Dolan, Damien Doligez
+   and Xavier Leroy)
+
 ### Runtime system:
 
 * #10723: do not use `-flat-namespace` linking for macOS.
