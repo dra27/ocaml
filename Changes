@@ -24,6 +24,10 @@ OCaml 4.08 maintenance branch:
 
 ### Code generation and optimizations:
 
+- #7931, #1904: Add FreeBSD/aarch64 support
+  (Greg V, review by Sébastien Hinderer, Stephen Dolan, Damien Doligez
+   and Xavier Leroy)
+
 - #9549, #9557: Make -flarge-toc the default for PowerPC and introduce
   -fsmall-toc to enable the previous behaviour.
   (David Allsopp, report by Nathaniel Wesley Filardo, review by Xavier Leroy)
