@@ -1,6 +1,12 @@
 OCaml 4.08 maintenance branch:
 ------------------------------
 
+### Code generation and optimization
+
+- #7931, #1904: Add FreeBSD/aarch64 support
+  (Greg V, review by Sébastien Hinderer, Stephen Dolan, Damien Doligez
+   and Xavier Leroy)
+
 ### Bug fixes:
 
 - #8855, #8858: Links for tools not created when installing with
