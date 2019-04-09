@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+.NOTPARALLEL:
+
 BASEDIR := $(shell pwd)
 NO_PRINT=`$(MAKE) empty --no-print-directory >/dev/null 2>&1 \
 	  && echo --no-print-directory`
@@ -21,7 +23,10 @@ FIND=find
 TOPDIR := ..
 include $(TOPDIR)/Makefile.tools
 
-OCAMLTESTDIR_CYGPATH=$(shell $(CYGPATH) $(BASEDIR)/$(DIR)/_ocamltest)
+BASEDIR_HOST := $(shell $(CYGPATH) "$(BASEDIR)")
+TOPDIR_HOST := $(BASEDIR_HOST)/$(TOPDIR)
+
+OCAMLTESTDIR = $(BASEDIR_HOST)/$(DIR)/_ocamltest
 
 failstamp := failure.stamp
 
@@ -39,27 +44,53 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
   else # Non-cygwin Unix
     find := find
   endif
+  FLEXLINK_ENV =
 else # Windows
   find := /usr/bin/find
   FLEXDLL_SUBMODULE_PRESENT := $(wildcard ../flexdll/Makefile)
   ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
     FLEXLINK_ENV =
   else
-    ROOT := $(shell cd .. && pwd| cygpath -m -f -)
     FLEXLINK_ENV = \
-      OCAML_FLEXLINK="$(ROOT)/boot/ocamlrun $(ROOT)/flexdll/flexlink.exe"
+      OCAML_FLEXLINK="$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+                      $(TOPDIR_HOST)/boot/flexlink.byte$(EXE)"
   endif
 endif
 
 ifeq "$(FLEXLINK_ENV)" ""
   ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
 else
-  MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
-                                   $(FLEXLINK_FLAGS)
+  FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
+  MKDLL=$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+        $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
+        $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
 
   ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
                                $(ocamltest_program)
 endif
+
+# PROMOTE is only meant to be used internally in recursive calls;
+# users should call the 'promote' target explicitly.
+PROMOTE =
+ifeq "$(PROMOTE)" ""
+  OCAMLTEST_PROMOTE_FLAG :=
+else
+  OCAMLTEST_PROMOTE_FLAG := -promote
+endif
+
+# KEEP_TEST_DIR_ON_SUCCESS should be set by the user (to a non-empty value)
+# if they want to pass the -keep-test-dir-on-success option to ocamltest,
+# to preserve test data of succesful tests.
+KEEP_TEST_DIR_ON_SUCCESS ?=
+ifeq "$(KEEP_TEST_DIR_ON_SUCCESS)" ""
+  OCAMLTEST_KEEP_TEST_DIR_ON_SUCCESS_FLAG :=
+else
+  OCAMLTEST_KEEP_TEST_DIR_ON_SUCCESS_FLAG := -keep-test-dir-on-success
+endif
+
+OCAMLTESTFLAGS := \
+  $(OCAMLTEST_PROMOTE_FLAG) \
+  $(OCAMLTEST_KEEP_TEST_DIR_ON_SUCCESS_FLAG)
 
 .PHONY: default
 default:
@@ -116,7 +147,7 @@ new-without-report: lib tools
 	  dir=`dirname $$file`; \
 	  echo Running tests from \'$$dir\' ... ; \
 	  $(MAKE) exec-ocamltest DIR=$$dir \
-	    OCAMLTESTENV="" OCAMLTESTFLAGS=""; \
+	    OCAMLTESTENV=""; \
 	done || echo outer loop >> $(failstamp)) 2>&1 | tee -a $(TESTLOG)
 	@$(MAKE) check-failstamp
 
@@ -221,8 +252,7 @@ exec-one:
 	elif [ -f $(DIR)/ocamltests ] && [ -z $(LEGACY) ] ; then \
 	  echo "Running tests from '$$DIR' ..."; \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
-	    OCAMLTESTFLAGS=""; \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR)"; \
 	fi
 
 .PHONY: exec-ocamltest
@@ -260,15 +290,15 @@ promote:
 	fi
 	@if [ -f $(DIR)/ocamltests ]; then \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
-	    OCAMLTESTFLAGS="-promote"; \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR)" \
+	    PROMOTE="true"; \
 	else \
 	  cd $(DIR) && $(MAKE) TERM=dumb BASEDIR=$(BASEDIR) promote; \
 	fi
 
 .PHONY: lib
 lib:
-	@cd lib && $(MAKE) -s BASEDIR=$(BASEDIR)
+	@$(MAKE) -s -C lib
 
 .PHONY: tools
 tools:
@@ -276,7 +306,7 @@ tools:
 
 .PHONY: clean
 clean:
-	@cd lib && $(MAKE) BASEDIR=$(BASEDIR) clean
+	@$(MAKE) -C lib clean
 	@cd tools && $(MAKE) BASEDIR=$(BASEDIR) clean
 	@for file in `$(FIND) interactive tests -name Makefile`; do \
 	  (cd `dirname $$file` && $(MAKE) BASEDIR=$(BASEDIR) clean); \
