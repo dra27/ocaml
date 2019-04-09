@@ -3,6 +3,10 @@ OCaml 4.08 maintenance branch:
 
 ### Bug fixes:
 
+- #2267: merge generation of header programs, also fixing parallel build on
+  Cygwin.
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #8855, #8858: Links for tools not created when installing with
   --disable-installing-byecode-programs (e.g. ocamldep.opt installed, but
   ocamldep link not created)
