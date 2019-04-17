@@ -12,6 +12,9 @@ OCaml 4.09 maintenance branch
 
 ### Bug fixes:
 
+- #8622: Don't generate #! headers over 127 characters.
+  (David Allsopp, review by Xavier Leroy and Stephen Dolan)
+
 - #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
   causing a performance regression
   (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
