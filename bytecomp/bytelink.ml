@@ -322,8 +322,18 @@ let link_bytecode ?final_name tolink exec_name standalone =
        end;
        Bytesections.init_record outchan;
        (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 then begin
-         output_string outchan (make_absolute !Clflags.use_runtime);
+       if String.length !Clflags.use_runtime > 0 then
+       begin
+         let runtime = make_absolute !Clflags.use_runtime in
+         let runtime =
+           (* shebang mustn't exceed 128 including the #! and \0 *)
+           if String.length runtime > 125 then
+             "/bin/sh\n\
+              exec \"" ^ runtime ^ "\" \"$0\" \"$@\""
+           else
+             runtime
+         in
+         output_string outchan runtime;
          output_char outchan '\n';
          Bytesections.record outchan "RNTM"
        end;
