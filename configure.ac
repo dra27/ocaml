@@ -111,7 +111,7 @@ AC_SUBST([ocamlopt_cflags])
 AC_SUBST([ocamlopt_cppflags])
 AC_SUBST([flexdir])
 AC_SUBST([bootstrapping_flexdll])
-AC_SUBST([hashbangscripts])
+AC_SUBST([shebangscripts])
 AC_SUBST([AR])
 AC_SUBST([RANLIB])
 AC_SUBST([RANLIBCMD])
@@ -484,14 +484,23 @@ AS_IF([test x"$enable_str_lib" != "xno"],
 ## TODO: have two values, one for host and one for target
 AC_SYS_INTERPRETER
 
+long_shebang=false
 AS_IF(
   [test "x$interpval" = "xyes"],
     [AS_CASE([$host],
       [*-cygwin|*-*-mingw32|*-pc-windows],
-        [hashbangscripts=false],
-      [hashbangscripts=true]
+        [shebangscripts=false],
+      [shebangscripts=true
+       prev_exec_prefix="$exec_prefix"
+       AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
+       eval "expanded_bindir=\"$bindir\""
+       exec_prefix="$prev_exec_prefix"
+       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
+       # 1 char suffix and the \0 leaving 115 characters
+       AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
+      ]
     )],
-  [hashbangscripts=false]
+  [shebangscripts=false]
 )
 
 # Are we building a cross-compiler
