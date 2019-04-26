@@ -27,6 +27,10 @@
 *.png binary
 *.tfm binary
 
+# configure is a shell-script; the linguist-generated attribute suppresses
+# changes being displayed by default in pull requests.
+/configure text eol=lf -diff linguist-generated
+
 # 'union' merge driver just unions textual content in case of conflict
 #   http://krlmlr.github.io/using-gitattributes-to-avoid-merge-conflicts/
 /.mailmap                merge=union
@@ -44,6 +48,9 @@ stdlib/*.mld             typo.missing-header
 
 *.adoc                   typo.long-line=may
 
+# Github templates and scripts lack headers, have long lines
+/.github/**              typo.missing-header typo.long-line=may typo.very-long-line=may
+
 /.mailmap                typo.long-line typo.missing-header typo.non-ascii
 /.merlin                 typo.missing-header
 /Changes                 typo.utf8 typo.missing-header
@@ -55,7 +62,7 @@ stdlib/*.mld             typo.missing-header
 /tools/ci/appveyor/appveyor_build.cmd       typo.very-long-line typo.missing-header typo.non-ascii
 /tools/ci/appveyor/appveyor_build.sh        typo.non-ascii
 /tools/ci/inria/remove-sinh-primitive.patch typo.white-at-eol typo.missing-header typo.long-line
-/tools/release-checklist                    typo.missing-header
+/tools/release-checklist                    typo.missing-header typo.long-line
 
 # ignore auto-generated .depend files
 .depend                  typo.prune
@@ -139,13 +146,11 @@ menhir-bench.bash typo.missing-header typo.utf8
 
 /tools/ci/appveyor/appveyor_build.cmd text eol=crlf
 
-configure text eol=lf
 configure.ac text eol=lf
-autogen text eol=lf
 build-aux/compile text eol=lf
-build-aux/config.guess text eol=lf
-build-aux/config.sub text eol=lf
-build-aux/install text eol=lf
+build-aux/config.guess linguist-generated text eol=lf
+build-aux/config.sub linguist-generated text eol=lf
+build-aux/install-sh text eol=lf
 build-aux/missing text eol=lf
 config/auto-aux/hasgot text eol=lf
 config/auto-aux/hasgot2 text eol=lf
@@ -160,6 +165,7 @@ ocamldoc/remove_DEBUG text eol=lf
 ocamltest/getocamloptdefaultflags text eol=lf
 stdlib/Compflags text eol=lf
 stdlib/sharpbang text eol=lf
+tools/autogen text eol=lf
 tools/ci/inria/remove-sinh-primitive.patch text eol=lf
 tools/check-typo text eol=lf
 tools/ci-build text eol=lf
