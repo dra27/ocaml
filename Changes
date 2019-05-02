@@ -3,6 +3,10 @@ OCaml 4.09 maintenance branch
 
 ### Build system:
 
+- #8650: ensure that "make" variables are defined before use;
+  revise generation of config/util.ml to better quote special characters
+  (Xavier Leroy, review by David Allsopp)
+
 - #9383: Don't assume that AWKPATH includes .
   (David Allsopp, report by Ian Zimmerman)
 
