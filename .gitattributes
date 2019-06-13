@@ -55,7 +55,7 @@ stdlib/*.mld             typo.missing-header
 /tools/ci/appveyor/appveyor_build.cmd       typo.very-long-line typo.missing-header typo.non-ascii
 /tools/ci/appveyor/appveyor_build.sh        typo.non-ascii
 /tools/ci/inria/remove-sinh-primitive.patch typo.white-at-eol typo.missing-header typo.long-line
-/tools/release-checklist                    typo.missing-header
+/tools/release-checklist                    typo.missing-header typo.long-line
 
 # ignore auto-generated .depend files
 .depend                  typo.prune
