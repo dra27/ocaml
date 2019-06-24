@@ -1089,6 +1089,9 @@ parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly \
 parsing/parser.mli: boot/menhir/parser.mli
 	cat $< | sed "s/MenhirLib/CamlinternalMenhirLib/g" > $@
 
+beforedepend:: parsing/camlinternalMenhirLib.ml \
+  parsing/camlinternalMenhirLib.mli \
+	parsing/parser.ml parsing/parser.mli
 
 partialclean:: partialclean-menhir
 
