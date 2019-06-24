@@ -968,7 +968,7 @@ partialclean::
 # The lexer and parser generators
 
 .PHONY: ocamllex
-ocamllex: ocamlyacc ocamlc
+ocamllex: ocamlyacc
 	$(MAKE) -C lex all
 
 .PHONY: ocamllex.opt
@@ -1021,6 +1021,9 @@ parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly \
 parsing/parser.mli: boot/menhir/parser.mli
 	cat $< | sed "s/MenhirLib/CamlinternalMenhirLib/g" > $@
 
+beforedepend:: parsing/camlinternalMenhirLib.ml \
+  parsing/camlinternalMenhirLib.mli \
+	parsing/parser.ml parsing/parser.mli
 
 partialclean:: partialclean-menhir
 
