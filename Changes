@@ -22,6 +22,10 @@ Working version
 
 ### Other libraries:
 
+- #8796, #8797: Ensure Unix.utimes works on directories on Windows and correct
+  the use of FILE_FLAG_BACKUP_SEMANTICS in Unix.stat and Unix.readlink.
+  (David Allsopp, report by Daniil Baturin, review by Stephen Dolan)
+
 - #10192: Add support for Unix domain sockets on Windows and use them
   to emulate Unix.socketpair (only available on Windows 1803+)
   (Antonin Décimo, review by David Allsopp)
