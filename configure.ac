@@ -163,6 +163,7 @@ AC_SUBST([default_safe_string])
 AC_SUBST([flexdll_chain])
 AC_SUBST([flexlink_flags])
 AC_SUBST([PACKLD])
+AC_SUBST([stdlib_manpages])
 
 ## Generated files
 
@@ -328,6 +329,10 @@ AC_ARG_ENABLE([reserved-header-bits],
       [with_profinfo=true
       profinfo_width="$enable_reserved_header_bits"],
     [AC_MSG_ERROR([invalid argument to --enable-reserved-header-bits])])])
+
+AC_ARG_ENABLE([stdlib-manpages],
+  [AS_HELP_STRING([--disable-stdlib-manpages],
+    [do not build or install the library man pages])])
 
 AC_ARG_VAR([WINDOWS_UNICODE_MODE],
   [how to handle Unicode under Windows: ansi, compatible])
@@ -1817,6 +1822,9 @@ AS_CASE([$host],
     AC_DEFINE([HAS_STRERROR])
     AC_DEFINE([HAS_IPV6])
     AC_DEFINE([HAS_NICE])])
+
+AS_IF([test x"$enable_stdlib_manpages" != "xno"],
+  [stdlib_manpages=true],[stdlib_manpages=false])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
