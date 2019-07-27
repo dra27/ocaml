@@ -435,6 +435,9 @@ endif
 	$(MAKE) otherlibrariesopt
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
 	  ocamltest.opt
+ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
+	$(MAKE) -C ocamldoc manpages
+endif
 
 # Core bootstrapping cycle
 .PHONY: coreboot
@@ -462,6 +465,9 @@ coreboot:
 all: coreall
 	$(MAKE) ocaml
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) ocamltest
+ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
+	$(MAKE) -C ocamldoc manpages
+endif
 
 # Bootstrap and rebuild the whole system.
 # The compilation of ocaml will fail if the runtime has changed.
