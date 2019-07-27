@@ -168,9 +168,8 @@ LIBCMOFILES = $(CMOFILES)
 LIBCMXFILES = $(LIBCMOFILES:.cmo=.cmx)
 LIBCMIFILES = $(LIBCMOFILES:.cmo=.cmi)
 
-
 .PHONY: all
-all: lib exe generators manpages
+all: lib exe generators
 
 manpages: generators
 
