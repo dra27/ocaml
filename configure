@@ -692,6 +692,7 @@ build_os
 build_vendor
 build_cpu
 build
+stdlib_manpages
 PACKLD
 flexlink_flags
 flexdll_chain
@@ -849,6 +850,7 @@ enable_flambda
 enable_flambda_invariants
 with_target_bindir
 enable_reserved_header_bits
+enable_stdlib_manpages
 enable_force_safe_string
 enable_flat_float_array
 with_afl
@@ -1524,6 +1526,8 @@ Optional Features:
   --enable-reserved-header-bits=BITS
                           reserve BITS (between 0 and 31) bits in block
                           headers for profiling info
+  --disable-stdlib-manpages
+                          do not build or install the library man pages
   --enable-force-safe-string
                           force strings to be safe
   --disable-flat-float-array
@@ -2832,6 +2836,7 @@ VERSION=4.09.1
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.common"
@@ -3154,6 +3159,12 @@ if test "${enable_reserved_header_bits+set}" = set; then :
   *) :
     as_fn_error $? "invalid argument to --enable-reserved-header-bits" "$LINENO" 5 ;;
 esac
+fi
+
+
+# Check whether --enable-stdlib-manpages was given.
+if test "${enable_stdlib_manpages+set}" = set; then :
+  enableval=$enable_stdlib_manpages;
 fi
 
 
@@ -17003,6 +17014,12 @@ case $host in #(
   *) :
      ;;
 esac
+
+if test x"$enable_stdlib_manpages" != "xno"; then :
+  stdlib_manpages=true
+else
+  stdlib_manpages=false
+fi
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
