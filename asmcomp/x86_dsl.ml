@@ -103,6 +103,8 @@ module D = struct
   let text () = section [ ".text" ] None []
   let type_ name typ = directive (Type (name, typ))
   let word cst = directive (Word cst)
+  let no_keyword symbols = directive (NoKeyword symbols)
+  let macro alias symbol = directive (Macro (alias, symbol))
 end
 
 module I = struct

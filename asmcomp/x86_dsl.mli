@@ -94,6 +94,8 @@ module D : sig
   val text: unit -> unit
   val type_: string -> string -> unit
   val word: constant -> unit
+  val no_keyword : string list -> unit
+  val macro : string -> string -> unit
 end
 
 module I : sig

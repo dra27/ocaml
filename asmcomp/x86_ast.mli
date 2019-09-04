@@ -203,6 +203,8 @@ type asm_line =
   | External of string * data_type
   | Mode386
   | Model of string
+  | NoKeyword of string list
+  | Macro of string * string
 
   (* gas only (the masm emitter will fail on them) *)
   | Cfi_adjust_cfa_offset of int

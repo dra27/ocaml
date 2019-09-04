@@ -234,6 +234,8 @@ let print_line b = function
   | External (s, ptr) -> bprintf b "\tEXTRN\t%s: %s" s (string_of_datatype ptr)
   | Mode386 -> bprintf b "\t.386"
   | Model name -> bprintf b "\t.MODEL %s" name (* name = FLAT *)
+  | NoKeyword ss -> bprintf b "\tOPTION NOKEYWORD:<%s>" (String.concat " " ss)
+  | Macro (alias, s) -> bprintf b "\t%s TEXTEQU <%s>" alias s
 
   (* gas only *)
   | Cfi_adjust_cfa_offset _

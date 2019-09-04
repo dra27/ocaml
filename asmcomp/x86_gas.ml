@@ -296,6 +296,8 @@ let print_line b = function
   | External _
   | Mode386
   | Model _
+  | NoKeyword _
+  | Macro (_, _)
     -> assert false
 
 let generate_asm oc lines =

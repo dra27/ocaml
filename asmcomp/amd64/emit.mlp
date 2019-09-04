@@ -96,7 +96,25 @@ let slot_offset loc cl =
 
 let symbol_prefix = if system = S_macosx then "_" else ""
 
-let emit_symbol s = string_of_symbol symbol_prefix s
+let masm_alias_prefix = symbol_prefix ^ "__camlMASM$"
+
+(* Record external symbols encountered which need renaming in MASM *)
+let symbols_aliased = ref String.Set.empty
+
+let emit_symbol s =
+  let symbol_prefix =
+    if String.Set.mem s !symbols_aliased then
+      masm_alias_prefix
+    else
+      symbol_prefix
+  in
+    string_of_symbol symbol_prefix s
+
+let is_MASM_reserved_symbol =
+  let sensitive = String.Set.empty in
+  let insensitive = String.Set.add "test" (String.Set.add "mov" String.Set.empty) in
+  fun s ->
+    String.Set.mem s sensitive || String.Set.mem (String.lowercase_ascii s) insensitive
 
 (* Record symbols used and defined - at the end generate extern for those
    used but not defined *)
@@ -104,8 +122,13 @@ let emit_symbol s = string_of_symbol symbol_prefix s
 let symbols_defined = ref String.Set.empty
 let symbols_used = ref String.Set.empty
 
-let add_def_symbol s = symbols_defined := String.Set.add s !symbols_defined
-let add_used_symbol s = symbols_used := String.Set.add s !symbols_used
+let add_def_symbol s =
+  assert (system <> S_win64 || not (is_MASM_reserved_symbol s));
+  symbols_defined := String.Set.add s !symbols_defined
+let add_used_symbol s =
+  if system = S_win64 && is_MASM_reserved_symbol s then
+    symbols_aliased := String.Set.add s !symbols_aliased;
+  symbols_used := String.Set.add s !symbols_used
 
 let imp_table = Hashtbl.create 16
 
@@ -1125,6 +1148,15 @@ let end_assembly() =
     D.section [".note.GNU-stack"] (Some "") [ "%progbits" ];
 
   if system = S_win64 then begin
+    if not (String.Set.is_empty !symbols_aliased) then begin
+      D.comment "Reserved names used";
+      let reserved =
+        let f s = String.Set.add (String.lowercase_ascii s) in
+        String.Set.fold f !symbols_aliased String.Set.empty
+      in
+      D.no_keyword (String.Set.elements reserved);
+      String.Set.iter (fun s -> D.macro (masm_alias_prefix ^ s) s) !symbols_aliased
+    end;
     D.comment "External functions";
     String.Set.iter
       (fun s ->
