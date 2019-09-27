@@ -5498,7 +5498,6 @@ driver/main.cmo : \
     driver/main_args.cmi \
     parsing/location.cmi \
     utils/config.cmi \
-    driver/compplugin.cmi \
     driver/compmisc.cmi \
     driver/compile.cmi \
     driver/compenv.cmi \
@@ -5514,7 +5513,6 @@ driver/main.cmx : \
     driver/main_args.cmx \
     parsing/location.cmx \
     utils/config.cmx \
-    driver/compplugin.cmx \
     driver/compmisc.cmx \
     driver/compile.cmx \
     driver/compenv.cmx \
@@ -5529,6 +5527,7 @@ driver/main_args.cmo : \
     utils/profile.cmi \
     utils/misc.cmi \
     utils/config.cmi \
+    driver/compplugin.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
     driver/main_args.cmi
@@ -5537,6 +5536,7 @@ driver/main_args.cmx : \
     utils/profile.cmx \
     utils/misc.cmx \
     utils/config.cmx \
+    driver/compplugin.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
     driver/main_args.cmi
@@ -5621,7 +5621,6 @@ driver/optmain.cmo : \
     parsing/location.cmi \
     asmcomp/import_approx.cmi \
     utils/config.cmi \
-    driver/compplugin.cmi \
     driver/compmisc.cmi \
     asmcomp/compilenv.cmi \
     driver/compenv.cmi \
@@ -5642,7 +5641,6 @@ driver/optmain.cmx : \
     parsing/location.cmx \
     asmcomp/import_approx.cmx \
     utils/config.cmx \
-    driver/compplugin.cmx \
     driver/compmisc.cmx \
     asmcomp/compilenv.cmx \
     driver/compenv.cmx \

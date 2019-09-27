@@ -85,6 +85,7 @@ let wrap_expand f s =
   arr
 
 module Options = Main_args.Make_opttop_options (struct
+    include Main_args.Default.Opttopmain
     let _stdin () = file_argument ""
     let _args = wrap_expand Arg.read_arg
     let _args0 = wrap_expand Arg.read_arg0
