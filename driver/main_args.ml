@@ -853,7 +853,6 @@ module type Common_options = sig
   val _noassert : unit -> unit
   val _nolabels : unit -> unit
   val _nostdlib : unit -> unit
-  val _nopervasives : unit -> unit
   val _open : string -> unit
   val _ppx : string -> unit
   val _principal : unit -> unit
@@ -868,11 +867,19 @@ module type Common_options = sig
   val _no_strict_formats : unit -> unit
   val _unboxed_types : unit -> unit
   val _no_unboxed_types : unit -> unit
-  val _unsafe : unit -> unit
   val _unsafe_string : unit -> unit
   val _version : unit -> unit
   val _vnum : unit -> unit
   val _w : string -> unit
+
+  val anonymous : string -> unit
+end
+
+module type Core_options = sig
+  include Common_options
+
+  val _nopervasives : unit -> unit
+  val _unsafe : unit -> unit
   val _warn_error : string -> unit
   val _warn_help : unit -> unit
 
@@ -884,7 +891,6 @@ module type Common_options = sig
   val _drawlambda : unit -> unit
   val _dlambda : unit -> unit
 
-  val anonymous : string -> unit
 end
 
 module type Compiler_options = sig
@@ -941,7 +947,7 @@ end
 ;;
 
 module type Toplevel_options = sig
-  include Common_options
+  include Core_options
   val _init : string -> unit
   val _noinit : unit -> unit
   val _no_version : unit -> unit
@@ -956,7 +962,7 @@ end
 ;;
 
 module type Bytecomp_options = sig
-  include Common_options
+  include Core_options
   include Compiler_options
   val _compat_32 : unit -> unit
   val _custom : unit -> unit
@@ -1032,7 +1038,7 @@ module type Optcommon_options = sig
 end;;
 
 module type Optcomp_options = sig
-  include Common_options
+  include Core_options
   include Compiler_options
   include Optcommon_options
   val _linscan : unit -> unit
