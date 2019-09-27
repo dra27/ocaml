@@ -1715,8 +1715,6 @@ module Default = struct
         "Syntax: -inline-toplevel <n> | <round>=<n>[,...]"
         inline_toplevel_threshold
     let _inlining_report () = inlining_report := true
-    let _insn_sched = set insn_sched
-    let _no_insn_sched = clear insn_sched
     let _no_unbox_free_vars_of_closures = clear unbox_free_vars_of_closures
     let _no_unbox_specialised_args = clear unbox_specialised_args
     (* CR-someday mshinwell: should stop e.g. -O2 -classic-inlining
@@ -1779,7 +1777,7 @@ module Default = struct
     let _o s = output_name := (Some s)
     let _opaque = set opaque
     let _pack = set make_package
-    let _plugin _p = plugin := true
+    let _plugin p = Compplugin.load p
     let _pp s = preprocessor := (Some s)
     let _runtime_variant s = runtime_variant := s
     let _stop_after pass =
@@ -1795,8 +1793,6 @@ module Default = struct
     let _version () = print_version_string ()
     let _vnum () = print_version_string ()
     let _where () = print_standard_library ()
-    let _with_runtime = set with_runtime
-    let _without_runtime = clear with_runtime
   end
 
   module Toplevel = struct
@@ -1848,10 +1844,7 @@ module Default = struct
     let _output_complete_obj () =
       set output_c_object (); set output_complete_object ()
     let _output_obj = set output_c_object
-    let _p () =
-      fatal
-        "Profiling with \"gprof\" (option `-p') is only supported up to \
-         OCaml 4.08.0"
+    let _p = set gprofile
     let _shared () = shared := true; dlcode := true
     let _v () = print_version_and_library "native-code compiler"
   end
@@ -1876,17 +1869,11 @@ module Default = struct
     let _v () = Compenv.print_version_and_library "documentation generator"
     let _verbose = set Clflags.verbose
     let _version = Compenv.print_version_string
-    let _vmthread = ignore
+    let _vmthread = set Clflags.use_vmthreads
     let _vnum = Compenv.print_version_string
   end
 
   module Main = struct
-
-    let vmthread_removed_message = "\
-The -vmthread argument of ocamlc is no longer supported\n\
-since OCaml 4.09.0.  Please switch to system threads, which have the\n\
-same API. Lightweight threads with VM-level scheduling are provided by\n\
-third-party libraries such as Lwt, but with a different API."
 
     include Core
     include Compiler
@@ -1907,7 +1894,7 @@ third-party libraries such as Lwt, but with a different API."
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
     let _v () = print_version_and_library "compiler"
-    let _vmthread () = fatal vmthread_removed_message
+    let _vmthread = set use_vmthreads
   end
 
 end
