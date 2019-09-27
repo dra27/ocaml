@@ -120,9 +120,8 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
 
 $(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
 
-ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
-               warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
-               clflags.cmo main_args.cmo
+ocamlcp_cmos = $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+               $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma
 
 $(call byte_and_opt,ocamlcp,$(ocamlcp_cmos) ocamlcp.cmo,)
 $(call byte_and_opt,ocamloptp,$(ocamlcp_cmos) ocamloptp.cmo,)

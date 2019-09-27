@@ -270,3 +270,11 @@ val options_with_command_line_syntax
   : (string * Arg.spec * string) list
   -> string list ref
   -> (string * Arg.spec * string) list
+
+module Default: sig
+  module Topmain: Bytetop_options
+  module Opttopmain: Opttop_options
+  module Main: Bytecomp_options
+  module Optmain: Optcomp_options
+  module Odoc_args: Ocamldoc_options
+end
