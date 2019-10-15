@@ -17,8 +17,21 @@
 
 ROOTDIR = .
 
+# The configure and *clean targets can all be run without running ./configure
+# first.
+# If no goals were specified (i.e. `make`), add defaultentry (since it requires
+# ./configure to be run)
+CAN_BE_UNCONFIGURED := $(strip \
+  $(filter-out partialclean clean distclean configure, \
+	$(if $(MAKECMDGOALS),$(MAKECMDGOALS),defaultentry)))
+
+ifeq "$(CAN_BE_UNCONFIGURED)" ""
 -include Makefile.config
 -include Makefile.common
+else
+include Makefile.config
+include Makefile.common
+endif
 
 .PHONY: defaultentry
 ifneq "$(ARCH)" "none"
@@ -1373,7 +1386,10 @@ distclean: clean
 
 include .depend
 
-Makefile.config Makefile.common:
+ifneq "$(strip $(CAN_BE_UNCONFIGURED))" ""
+Makefile.config Makefile.common: config.status
+
+config.status:
 	@echo "Please refer to the installation instructions:"
 	@echo "- In file INSTALL for Unix systems."
 	@echo "- In file README.win32.adoc for Windows systems."
@@ -1384,3 +1400,4 @@ Makefile.config Makefile.common:
 	@echo "	make install"
 	@echo "should work."
 	@false
+endif
