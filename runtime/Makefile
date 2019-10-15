@@ -197,7 +197,9 @@ endif
 
 .PHONY: clean
 clean:
-	rm -f $(PROGRAMS) ocamlruns ocamlruns.exe *.$(O) *.$(A) *.$(SO) ld.conf
+	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
+	rm -f ocamlrun ocamlrund ocamlruni ocamlruns
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe
 	rm -f primitives primitives.new prims.c caml/opnames.h caml/jumptbl.h
 	rm -f caml/version.h
 
