@@ -167,7 +167,7 @@ partialclean:
 	rm -f extract_crc *.cm[ioaxt] *.cmti *.cmxa
 
 clean: partialclean
-	rm -f *.$(A) *.$(O) *.so *.dll dynlink.mlopt \
+	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink.mlopt \
 	      dynlink_platform_intf.mli
 
 depend:
