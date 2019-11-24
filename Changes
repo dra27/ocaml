@@ -24,6 +24,10 @@ OCaml 4.08 maintenance branch:
   (Gabriel Scherer, review by David Allsopp and Sébastien Hinderer,
    report by David Allsopp)
 
+- #9136: Don't propagate Cygwin-style prefix from configure to Makefile.config
+  on Windows ports.
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #9250: Add --disable-ocamltest to configure and disable building for
   non-development builds.
   (David Allsopp, review by Sébastien Hinderer)
