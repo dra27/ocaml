@@ -17,6 +17,7 @@ module SMap = Misc.Stdlib.String.Map
 (* Mapping from basenames to full filenames *)
 type registry = string SMap.t ref
 
+let scans : string list SMap.t ref = ref SMap.empty
 let files : registry = ref SMap.empty
 let files_uncap : registry = ref SMap.empty
 
@@ -33,13 +34,20 @@ module Dir = struct
      [Misc.find_in_path]: silently ignore directories that don't exist
      + treat [""] as the current directory. *)
   let readdir_compat dir =
-    try
-      Sys.readdir (if dir = "" then Filename.current_dir_name else dir)
-    with Sys_error _ ->
-      [||]
+    let dir = if dir = "" then Filename.current_dir_name else dir in
+    match SMap.find_opt dir !scans with
+    | Some entries -> entries
+    | None ->
+        let entries =
+          try
+            Sys.readdir dir |> Array.to_list
+          with Sys_error _ -> []
+        in
+          scans := SMap.add dir entries !scans;
+          entries
 
   let create path =
-    { path; files = Array.to_list (readdir_compat path) }
+    { path; files = readdir_compat path }
 end
 
 let dirs = ref []
@@ -60,6 +68,15 @@ let add dir =
   in
   List.iter add_file dir.Dir.files;
   dirs := dir :: !dirs
+
+let add_file file =
+  let base = Filename.basename file in
+  let dir = Filename.dirname file in
+  files := SMap.add base file !files;
+  files_uncap := SMap.add (String.uncapitalize_ascii base) file !files_uncap;
+  try
+    scans := SMap.add dir (file :: SMap.find dir !scans) !scans
+  with Not_found -> ()
 
 let remove_dir dir =
   let new_dirs = List.filter (fun d -> Dir.path d <> dir) !dirs in

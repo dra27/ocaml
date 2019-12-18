@@ -334,6 +334,7 @@ let need_send_fun n =
 (* Write the description of the current unit *)
 
 let write_unit_info info filename =
+  Load_path.add_file filename;
   let oc = open_out_bin filename in
   output_string oc cmx_magic_number;
   output_value oc info;

@@ -328,6 +328,7 @@ let save_cmi penv psig pm =
         cmi_flags = flags;
       } = cmi in
       let crc =
+        Load_path.add_file filename;
         output_to_file_via_temporary (* see MPR#7472, MPR#4991 *)
           ~mode: [Open_binary] filename
           (fun temp_filename oc -> output_cmi temp_filename oc cmi) in
