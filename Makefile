@@ -69,6 +69,7 @@ DEPFLAGS=-slash
 DEPINCLUDES=$(INCLUDES)
 
 OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
+OCAMLTEST_OPT=$(WITH_OCAMLTEST:=.opt)
 
 UTILS=utils/config.cmo utils/build_path_prefix_map.cmo utils/misc.cmo \
   utils/identifiable.cmo utils/numbers.cmo utils/arg_helper.cmo \
@@ -430,11 +431,12 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(MAKE) flexlink.opt$(EXE)
 endif
 	$(MAKE) ocamlc.opt
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) ocamltest
+	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+	  $(WITH_OCAMLTEST)
 	$(MAKE) ocamlopt.opt
 	$(MAKE) otherlibrariesopt
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
-	  ocamltest.opt
+	  $(OCAMLTEST_OPT)
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) -C ocamldoc manpages
 endif
@@ -464,7 +466,8 @@ coreboot:
 .PHONY: all
 all: coreall
 	$(MAKE) ocaml
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) ocamltest
+	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+         $(WITH_OCAMLTEST)
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) -C ocamldoc manpages
 endif
