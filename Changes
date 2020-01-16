@@ -1,6 +1,9 @@
 OCaml 4.10 maintenance branch
 -----------------------------
 
+- #9250: Add --disable-ocamltest to configure
+  (David Allsopp, review by Sébastien Hinderer)
+
 ### Bug fixes:
 
 - #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
