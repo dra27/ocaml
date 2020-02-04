@@ -44,8 +44,8 @@ Working version
 - #9230: Memprof support for native allocations.
   (Jacques-Henri Jourdan and Stephen Dolan, review by Gabriel Scherer)
 
-* #9284: harden command-line parsing in ocamlrun (ensure given parameters
-  are exactly the required string, rather than just beginning with it).
+* #9284: improve command-line parsing in ocamlrun: strictly recognise options
+  and be more informative for `ocamlrun -I`.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
