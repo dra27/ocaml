@@ -276,6 +276,10 @@ static int parse_command_line(char_os **argv)
     len = strlen_os(argv[i]);
     parsed = 1;
     if (len == 2) {
+      if (argv[i][1] == '-') {
+        i++;
+        break;
+      }
       switch(argv[i][1]) {
       case 't':
         ++ caml_trace_level; /* ignored unless DEBUG mode */
