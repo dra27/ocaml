@@ -45,8 +45,8 @@ Working version
   (Jacques-Henri Jourdan and Stephen Dolan, review by Gabriel Scherer)
 
 * #9284: improve command-line parsing in ocamlrun: strictly recognise options,
-  be more informative for `ocamlrun -I` and support `--` for terminating options
-  parsing.
+  be more informative for `ocamlrun -I`, support `--` for terminating options
+  parsing and permit gcc-style `-Ifoo` for `-I foo`.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:

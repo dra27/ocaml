@@ -320,6 +320,8 @@ static int parse_command_line(char_os **argv)
       } else if (!strcmp_os(argv[i], T("-vnum"))) {
         printf("%s\n", OCAML_VERSION_STRING);
         exit(0);
+      } else if (argv[i][1] == 'I') {
+        caml_ext_table_add(&caml_shared_libs_path, &argv[i][2]);
       } else {
         parsed = 0;
       }
