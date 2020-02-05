@@ -367,6 +367,8 @@ $(foreach object_type, $(object_types), \
 
 dynlink.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
 
+startup_byt.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG) -DHOST='"$(HOST)"'
+
 $(UNIX_OR_WIN32)_non_shared.%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
 
 $(eval $(call COMPILE_C_FILE,$(UNIX_OR_WIN32)_non_shared.%,$(UNIX_OR_WIN32)))
