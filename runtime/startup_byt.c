@@ -379,6 +379,8 @@ static void do_print_config(void)
          "windows_unicode: %s\n"
          "supports_shared_libraries: %s\n"
          "no_naked_pointers: %s\n"
+         "profinfo: %s\n"
+         "profinfo_width: %d\n"
          "exec_magic_number: %s\n",
            OCAML_VERSION_STRING,
            caml_stat_strdup_of_os(OCAML_STDLIB_DIR),
@@ -411,6 +413,11 @@ static void do_print_config(void)
            "true",
 #else
            "false",
+#endif
+#ifdef WITH_PROFINFO
+           "true", PROFINFO_WIDTH,
+#else
+           "false", 0,
 #endif
            EXEC_MAGIC);
 
