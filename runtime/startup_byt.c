@@ -378,6 +378,7 @@ static void do_print_config(void)
          "supports_afl: %s\n"
          "windows_unicode: %s\n"
          "supports_shared_libraries: %s\n"
+         "no_naked_pointers: %s\n"
          "exec_magic_number: %s\n",
            OCAML_VERSION_STRING,
            caml_stat_strdup_of_os(OCAML_STDLIB_DIR),
@@ -402,6 +403,11 @@ static void do_print_config(void)
            "false",
 #endif
 #ifdef SUPPORT_DYNAMIC_LINKING
+           "true",
+#else
+           "false",
+#endif
+#ifdef NO_NAKED_POINTERS
            "true",
 #else
            "false",
