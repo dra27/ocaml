@@ -267,6 +267,24 @@ Algorithm:
 
 */
 
+static void do_print_help(void)
+{
+  puts("Usage: ocamlrun [<options>] [--] <executable> [<command-line>]\n"
+       "Options are:\n"
+       "  -b  Set runtime parameter b (detailed exception backtraces)\n"
+       "  -config  Print configuration values and exit\n"
+       "  -I <dir>  Add <dir> to the list of DLL search directories\n"
+       "  -m  Print the magic number of <executable> and exit\n"
+       "  -M  Print the magic number expected by this runtime and exit\n"
+       "  -p  Print the names of the primitives known to this runtime\n"
+       "  -t  Increments the trace level in debug mode by 1\n"
+       "  -v  Set runtime parameter v=61 (GC event information)\n"
+       "  -version  Print version string and exit\n"
+       "  -vnum  Print short version number and exit\n"
+       "  -help  Display this list of options\n"
+       "  --help  Display this list of options");
+}
+
 /* Parse options on the command line */
 
 static int parse_command_line(char_os **argv)
@@ -323,6 +341,10 @@ static int parse_command_line(char_os **argv)
         exit(0);
       } else if (!strcmp_os(argv[i], T("-config"))) {
         print_config = 1;
+      } else if (!strcmp_os(argv[i], T("-help")) ||
+                 !strcmp_os(argv[i], T("--help"))) {
+        do_print_help();
+        exit(0);
       } else if (argv[i][1] == 'I') {
         caml_ext_table_add(&caml_shared_libs_path, &argv[i][2]);
       } else {
