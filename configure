@@ -12491,9 +12491,7 @@ case $host in #(
     internal_cflags="-Wno-unused $gcc_warnings"
     # TODO: see whether the code can be fixed to avoid -Wno-unused
     common_cflags="-O -mms-bitfields"
-    internal_cppflags='-DUNICODE -D_UNICODE'
-    internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-    internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)" ;; #(
+    internal_cppflags='-DUNICODE -D_UNICODE' ;; #(
   *) :
     case $ocaml_cv_cc_vendor in #(
   clang-*) :
@@ -12525,9 +12523,7 @@ $as_echo "$as_me: WARNING: Consider using GCC version 4.2 or above." >&2;};
   msvc-*) :
     common_cflags="-nologo -O2 -Gy- -MD"
       common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
-      internal_cppflags='-DUNICODE -D_UNICODE'
-      internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-      internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)" ;; #(
+      internal_cppflags='-DUNICODE -D_UNICODE' ;; #(
   xlc-*) :
     common_cflags="-O5 -qtune=balanced -qnoipa -qinline $CFLAGS";
       internal_cflags="$gcc_warnings" ;; #(
@@ -12535,6 +12531,9 @@ $as_echo "$as_me: WARNING: Consider using GCC version 4.2 or above." >&2;};
     common_cflags="-O" ;;
 esac ;;
 esac
+
+internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"
 
 internal_cppflags="-DCAML_NAME_SPACE $internal_cppflags"
 

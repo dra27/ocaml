@@ -552,9 +552,7 @@ AS_CASE([$host],
     [internal_cflags="-Wno-unused $gcc_warnings"
     # TODO: see whether the code can be fixed to avoid -Wno-unused
     common_cflags="-O -mms-bitfields"
-    internal_cppflags='-DUNICODE -D_UNICODE'
-    internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-    internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+    internal_cppflags='-DUNICODE -D_UNICODE'],
   [AS_CASE([$ocaml_cv_cc_vendor],
     [clang-*],
       [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
@@ -582,13 +580,14 @@ AS_CASE([$host],
     [msvc-*],
       [common_cflags="-nologo -O2 -Gy- -MD"
       common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
-      internal_cppflags='-DUNICODE -D_UNICODE'
-      internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-      internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+      internal_cppflags='-DUNICODE -D_UNICODE'],
     [xlc-*],
       [common_cflags="-O5 -qtune=balanced -qnoipa -qinline $CFLAGS";
       internal_cflags="$gcc_warnings"],
     [common_cflags="-O"])])
+
+internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"
 
 internal_cppflags="-DCAML_NAME_SPACE $internal_cppflags"
 
