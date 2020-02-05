@@ -102,7 +102,7 @@ static int read_trailer(int fd, struct exec_trailer *trail)
   magicstr[EXEC_MAGIC_LENGTH] = 0;
 
   if (print_magic) {
-    printf("%s\n", magicstr);
+    puts(magicstr);
     exit(0);
   }
   return
@@ -290,7 +290,7 @@ static int parse_command_line(char_os **argv)
         break;
       case 'p':
         for (j = 0; caml_names_of_builtin_cprim[j] != NULL; j++)
-          printf("%s\n", caml_names_of_builtin_cprim[j]);
+          puts(caml_names_of_builtin_cprim[j]);
         exit(0);
         break;
       case 'b':
@@ -308,7 +308,7 @@ static int parse_command_line(char_os **argv)
         print_magic = 1;
         break;
       case 'M':
-        printf("%s\n", EXEC_MAGIC);
+        puts(EXEC_MAGIC);
         exit(0);
         break;
       default:
@@ -316,10 +316,10 @@ static int parse_command_line(char_os **argv)
       }
     } else {
       if (!strcmp_os(argv[i], T("-version"))) {
-        printf("%s\n", "The OCaml runtime, version " OCAML_VERSION_STRING);
+        puts("The OCaml runtime, version " OCAML_VERSION_STRING);
         exit(0);
       } else if (!strcmp_os(argv[i], T("-vnum"))) {
-        printf("%s\n", OCAML_VERSION_STRING);
+        puts(OCAML_VERSION_STRING);
         exit(0);
       } else if (!strcmp_os(argv[i], T("-config"))) {
         print_config = 1;
