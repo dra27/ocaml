@@ -69,6 +69,7 @@
 
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 static int print_magic = 0;
+static int print_config = 0;
 
 /* Print the specified error message followed by an end-of-line and exit */
 static void error(char *msg, ...)
@@ -320,6 +321,8 @@ static int parse_command_line(char_os **argv)
       } else if (!strcmp_os(argv[i], T("-vnum"))) {
         printf("%s\n", OCAML_VERSION_STRING);
         exit(0);
+      } else if (!strcmp_os(argv[i], T("-config"))) {
+        print_config = 1;
       } else if (argv[i][1] == 'I') {
         caml_ext_table_add(&caml_shared_libs_path, &argv[i][2]);
       } else {
@@ -332,6 +335,71 @@ static int parse_command_line(char_os **argv)
   }
 
   return i;
+}
+
+/* Print the configuration of the runtime to stdout; memory allocated is not
+   freed, since the runtime will terminate after calling this. */
+static void do_print_config(void)
+{
+  int i;
+  char_os * dir;
+
+  /* Print the runtime configuration */
+  printf("version: %s\n"
+         "standard_library_default: %s\n"
+         "standard_library: %s\n"
+         "int_size: %d\n"
+         "word_size: %d\n"
+         "os_type: %s\n"
+         "host: %s\n"
+         "flat_float_array: %s\n"
+         "supports_afl: %s\n"
+         "windows_unicode: %s\n"
+         "supports_shared_libraries: %s\n"
+         "exec_magic_number: %s\n",
+           OCAML_VERSION_STRING,
+           caml_stat_strdup_of_os(OCAML_STDLIB_DIR),
+           caml_stat_strdup_of_os(caml_get_stdlib_location()),
+           8 * (int)sizeof(value),
+           8 * (int)sizeof(value) - 1,
+           OCAML_OS_TYPE,
+           HOST,
+#ifdef FLAT_FLOAT_ARRAY
+           "true",
+#else
+           "false",
+#endif
+#if HAS_SYS_SHM_H
+           "true",
+#else
+           "false",
+#endif
+#if WINDOWS_UNICODE
+           "true",
+#else
+           "false",
+#endif
+#ifdef SUPPORT_DYNAMIC_LINKING
+           "true",
+#else
+           "false",
+#endif
+           EXEC_MAGIC);
+
+  /* Parse ld.conf and print the effective search path */
+  puts("shared_libs_path:");
+  caml_parse_ld_conf();
+  for (i = 0; i < caml_shared_libs_path.size; i++) {
+    dir = caml_shared_libs_path.contents[i];
+    if (dir[0] == 0)
+#ifdef _WIN32
+      /* See caml_search_in_path in win32.c */
+      continue;
+#else
+      dir = ".";
+#endif
+    printf("  %s\n", caml_stat_strdup_of_os(dir));
+  }
 }
 
 extern void caml_init_ieee_floats (void);
@@ -407,6 +475,10 @@ CAMLexport void caml_main(char_os **argv)
 
   if (fd < 0) {
     pos = parse_command_line(argv);
+    if (print_config) {
+      do_print_config();
+      exit(0);
+    }
     if (argv[pos] == 0) {
       error("no bytecode file specified");
     }

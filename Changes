@@ -46,7 +46,9 @@ Working version
 
 * #9284: improve command-line parsing in ocamlrun: strictly recognise options,
   be more informative for `ocamlrun -I`, support `--` for terminating options
-  parsing and permit gcc-style `-Ifoo` for `-I foo`.
+  parsing and permit gcc-style `-Ifoo` for `-I foo`. Add -config option to dump
+  the configuration of ocamlrun to stdout, including the search path for shared
+  stub libraries.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:

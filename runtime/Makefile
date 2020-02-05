@@ -343,6 +343,8 @@ $(foreach object_type, $(object_types), \
 
 dynlink_%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
 
+startup_byt_%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG) -DHOST='"$(HOST)"'
+
 $(foreach object_type,$(subst %,,$(object_types)), \
   $(eval dynlink$(object_type).$(O): $(ROOTDIR)/Makefile.config))
 
