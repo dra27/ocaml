@@ -172,6 +172,7 @@ AC_SUBST([stdlib_manpages])
 AC_CONFIG_FILES([Makefile.common])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
+AC_CONFIG_HEADERS([runtime/caml/r.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 
 # Checks for system types

@@ -2902,6 +2902,8 @@ ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
+ac_config_headers="$ac_config_headers runtime/caml/r.h"
+
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
 
 
@@ -17841,6 +17843,7 @@ do
     "Makefile.common") CONFIG_FILES="$CONFIG_FILES Makefile.common" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
+    "runtime/caml/r.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/r.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
 

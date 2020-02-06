@@ -17,6 +17,7 @@
 #define CAML_CONFIG_H
 
 #include "m.h"
+#include "r.h"
 
 /* If supported, tell gcc that we can use 32-bit code addresses for
  * threaded code, unless we are compiled for a shared library (-fPIC option) */
