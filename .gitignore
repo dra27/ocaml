@@ -181,6 +181,7 @@ _build
 
 /runtime/caml/jumptbl.h
 /runtime/caml/m.h
+/runtime/caml/r.h
 /runtime/caml/s.h
 /runtime/primitives
 /runtime/primitives.new
