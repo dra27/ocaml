@@ -18,6 +18,7 @@
 /* Must be preprocessed by cpp */
 
 #include "caml/m.h"
+#include "caml/r.h"
 
         .syntax unified
         .text

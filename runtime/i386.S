@@ -17,6 +17,7 @@
 /* Must be preprocessed by cpp */
 
 #include "caml/m.h"
+#include "caml/r.h"
 
 /* Linux/BSD with ELF binaries and Solaris do not prefix identifiers with _.
    Linux/BSD with a.out binaries and NextStep do. */
