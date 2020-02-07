@@ -14,9 +14,14 @@
 #**************************************************************************
 
 # Remove the autom4te.cache directory to make sure we start in a clean state
-rm -rf autom4te.cache
+rm -rf autom4te.cache runtime/autom4te.cache
 
 autoconf --force --warnings=all,error
+cd runtime
+autoconf --force --warnings=all,error
+cd ..
+
+# @@DRA COMBAK Need to extend the caching support to runtime/configure
 
 # Allow pre-processing of configure arguments for Git check-outs
 # The sed call removes dra27's copyright on the whole configure script...
@@ -35,6 +40,15 @@ sed -e '/^runstatedir/d' \
     -e 's/ runstatedir//' \
     -e '1d' \
     configure >> configure.tmp
+# XXX COMBAK to function!!
+sed -e '/^runstatedir/d' \
+    -e '/-runstatedir /{N;N;N;N;N;N;N;N;d;}' \
+    -e '/--runstatedir=DIR/d' \
+    -e 's/ runstatedir//' \
+    -e '1d' \
+    runtime/configure >> runtime/configure.tmp
 
 mv -f configure.tmp configure
 chmod +x configure
+mv -f runtime/configure.tmp runtime/configure
+chmod +x runtime/configure

@@ -21,15 +21,45 @@
 
 # Since the project does not use automake, the libtool macro files
 # need to be manually included
-m4_include([build-aux/libtool.m4])
-m4_include([build-aux/ltoptions.m4])
-m4_include([build-aux/ltsugar.m4])
-m4_include([build-aux/ltversion.m4])
-m4_include([build-aux/lt~obsolete.m4])
+m4_include([../build-aux/libtool.m4])
+m4_include([../build-aux/ltoptions.m4])
+m4_include([../build-aux/ltsugar.m4])
+m4_include([../build-aux/ltversion.m4])
+m4_include([../build-aux/lt~obsolete.m4])
 
 # Macros from the autoconf macro archive
-m4_include([build-aux/ax_func_which_gethostbyname_r.m4])
-m4_include([build-aux/ax_pthread.m4])
+m4_include([../build-aux/ax_func_which_gethostbyname_r.m4])
+m4_include([../build-aux/ax_pthread.m4])
+
+# The following macro figures out which C compiler is used.
+# It does so by checking for compiler-specific predefined macros.
+# A list of such macros can be found at
+# https://sourceforge.net/p/predef/wiki/Compilers/
+AC_DEFUN([OCAML_CC_VENDOR], [
+  AC_REQUIRE([AC_PROG_CC])
+  AC_REQUIRE([AC_PROG_CPP])
+  AC_MSG_CHECKING([C compiler vendor])
+  AC_PREPROC_IFELSE(
+    [AC_LANG_SOURCE([
+#if defined(_MSC_VER)
+msvc _MSC_VER
+#elif defined(__INTEL_COMPILER)
+icc __INTEL_COMPILER
+#elif defined(__clang_major__) && defined(__clang_minor__)
+clang __clang_major__ __clang_minor__
+#elif defined(__GNUC__) && defined(__GNUC_MINOR__)
+gcc __GNUC__ __GNUC_MINOR__
+#elif defined(__xlc__) && defined(__xlC__)
+xlc __xlC__ __xlC_ver__
+#else
+unknown
+#endif]
+    )],
+    [AC_CACHE_VAL([ocaml_cv_cc_vendor],
+      [ocaml_cv_cc_vendor=`grep ['^[a-z]'] conftest.i | tr -s ' ' '-'`])],
+    [AC_MSG_FAILURE([unexpected preprocessor failure])])
+  AC_MSG_RESULT([$ocaml_cv_cc_vendor])
+])
 
 AC_DEFUN([OCAML_SIGNAL_HANDLERS_SEMANTICS], [
   AC_MSG_NOTICE([checking semantics of signal handlers])
@@ -130,57 +160,54 @@ camlPervasives__loop_1128:
 AC_DEFUN([OCAML_AS_HAS_CFI_DIRECTIVES], [
   AC_MSG_CHECKING([whether the assembler supports CFI directives])
 
-  AS_IF([test x"$enable_cfi" = "xno"],
-    [AC_MSG_RESULT([disabled])],
-    [OCAML_CC_SAVE_VARIABLES
+  OCAML_CC_SAVE_VARIABLES
 
-    # Modify C-compiler variables to use the assembler
-    CC="$ASPP"
-    CFLAGS="-o conftest.$ac_objext"
-    CPPFLAGS=""
-    ac_ext="S"
+  # Modify C-compiler variables to use the assembler
+  CC="$ASPP"
+  CFLAGS="-o conftest.$ac_objext"
+  CPPFLAGS=""
+  ac_ext="S"
+  ac_compile='$CC $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+
+  AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([
+camlPervasives__loop_1128:
+      .file   1       "pervasives.ml"
+      .loc    1       193
+      .cfi_startproc
+      .cfi_adjust_cfa_offset 8
+      .cfi_endproc
+    ])],
+    [aspp_ok=true],
+    [aspp_ok=false])
+
+  AS_IF([test "$AS" = "$ASPP"],
+    [as_ok="$aspp_ok"],
+    [CC="$AS"
     ac_compile='$CC $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-
     AC_COMPILE_IFELSE(
       [AC_LANG_SOURCE([
 camlPervasives__loop_1128:
-        .file   1       "pervasives.ml"
-        .loc    1       193
-        .cfi_startproc
-        .cfi_adjust_cfa_offset 8
-        .cfi_endproc
+      .file   1       "pervasives.ml"
+      .loc    1       193
+      .cfi_startproc
+      .cfi_adjust_cfa_offset 8
+      .cfi_endproc
       ])],
-      [aspp_ok=true],
-      [aspp_ok=false])
+      [as_ok=true],
+      [as_ok=false])])
 
-    AS_IF([test "$AS" = "$ASPP"],
-      [as_ok="$aspp_ok"],
-      [CC="$AS"
-      ac_compile='$CC $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-      AC_COMPILE_IFELSE(
-        [AC_LANG_SOURCE([
-camlPervasives__loop_1128:
-        .file   1       "pervasives.ml"
-        .loc    1       193
-        .cfi_startproc
-        .cfi_adjust_cfa_offset 8
-        .cfi_endproc
-        ])],
-        [as_ok=true],
-        [as_ok=false])])
+  OCAML_CC_RESTORE_VARIABLES
 
-    OCAML_CC_RESTORE_VARIABLES
-
-    AS_IF([$aspp_ok && $as_ok],
-      [asm_cfi_supported=true
-      AC_DEFINE([ASM_CFI_SUPPORTED])
-      AC_MSG_RESULT([yes])],
-      [AS_IF([test x"$enable_cfi" = "xyes"],
-        [AC_MSG_RESULT([requested but not available
-        AC_MSG_ERROR([exiting])])],
-        [asm_cfi_supported=false
-        AC_MSG_RESULT([no])])])
-  ])])
+  AS_IF([$aspp_ok && $as_ok],
+    [asm_cfi_supported=true
+    AC_DEFINE([ASM_CFI_SUPPORTED])
+    AC_MSG_RESULT([yes])],
+    [AS_IF([test x"$enable_cfi" = "xyes"],
+      [AC_MSG_RESULT([requested but not available
+      AC_MSG_ERROR([exiting])])],
+      [asm_cfi_supported=false
+      AC_MSG_RESULT([no])])])])
 
 AC_DEFUN([OCAML_MMAP_SUPPORTS_HUGE_PAGES], [
   AC_MSG_CHECKING([whether mmap supports huge pages])

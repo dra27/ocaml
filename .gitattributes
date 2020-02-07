@@ -32,6 +32,7 @@
 # configure is declared as binary so that it doesn't get included in diffs.
 # This also means it will have the correct Unix line-endings, even on Windows.
 /configure binary
+/runtime/configure binary
 
 # 'union' merge driver just unions textual content in case of conflict
 #   http://krlmlr.github.io/using-gitattributes-to-avoid-merge-conflicts/
@@ -81,6 +82,7 @@ build-aux                typo.prune
 
 # configure is generated so do not check it
 configure                typo.prune
+runtime/configure        typo.prune
 
 ocaml-variants.opam      typo.prune
 
@@ -142,6 +144,7 @@ menhir-bench.bash typo.missing-header typo.utf8
 /tools/ci/appveyor/appveyor_build.cmd text eol=crlf
 
 configure.ac text eol=lf
+runtime/configure.ac text eol=lf
 autogen text eol=lf
 build-aux/compile text eol=lf
 build-aux/config.guess text eol=lf

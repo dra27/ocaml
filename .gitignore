@@ -43,12 +43,17 @@ _build
 /Makefile.common
 /Makefile.config
 /autom4te.cache
+/runtime/autom4te.cache
 /ocamlc
 /config.cache
 /ocaml-*.cache
 /config.log
+/runtime/config.log
 /config.status
+/runtime/config.status
+/runtime/vars.sh
 /libtool
+/runtime/libtool
 /ocamlc.opt
 /expunge
 /ocaml

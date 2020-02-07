@@ -65,7 +65,7 @@ HASHBANGSCRIPTS:=$(SHEBANGSCRIPTS)
 LIBTOOL = $(TOP_BUILDDIR)/libtool
 
 ### Which C compiler to use
-TOOLPREF=@ac_tool_prefix@
+TOOLPREF=@TOOLPREF@
 CC=@CC@
 
 CC_HAS_DEBUG_PREFIX_MAP=@cc_has_debug_prefix_map@
@@ -185,7 +185,7 @@ EXE=@exeext@
 OUTPUTEXE=@outputexe@
 SUPPORTS_SHARED_LIBRARIES=@supports_shared_libraries@
 MKSHAREDLIBRPATH=@mksharedlibrpath@
-DYNLINKOPTS=@DLLIBS@
+DYNLINKOPTS=@dynlink_libs@
 NATDYNLINK=@natdynlink@
 NATDYNLINKOPTS=@natdynlinkopts@
 SYSLIB=@syslib@

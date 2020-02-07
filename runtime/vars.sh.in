@@ -1,0 +1,77 @@
+# @configure_input@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
+#*                                                                        *
+#*   Copyright 2020 MetaStack Solutions Ltd.                              *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+CC='@CC@'
+TOOLPREF='@ac_tool_prefix@'
+cc_has_debug_prefix_map='@cc_has_debug_prefix_map@'
+as_has_debug_prefix_map='@as_has_debug_prefix_map@'
+oc_ldflags='@oc_ldflags@'
+CPP='@CPP@'
+RANLIB='@RANLIB@'
+RANLIBCMD='@RANLIBCMD@'
+AR='@AR@'
+OBJEXT='@OBJEXT@'
+outputobj='@outputobj@'
+libext='@libext@'
+S='@S@'
+SO='@SO@'
+sharedlib_cflags='@sharedlib_cflags@'
+rpath='@rpath@'
+arch='@arch@'
+arch64='@arch64@'
+model='@model@'
+system='@system@'
+pthread_link='@pthread_link@'
+unix_or_win32='@unix_or_win32@'
+unixlib='@unixlib@'
+bfd_cppflags='@bfd_cppflags@'
+bfd_ldflags='@bfd_ldflags@'
+bfd_ldlibs='@bfd_ldlibs@'
+exeext='@exeext@'
+outputexe='@outputexe@'
+supports_shared_libraries='@supports_shared_libraries@'
+mksharedlibrpath='@mksharedlibrpath@'
+natdynlinkopts='@natdynlinkopts@'
+syslib='@syslib@'
+mklib='@mklib@'
+systhread_support='@systhread_support@'
+PACKLD='@PACKLD@'
+iflexdir='@iflexdir@'
+ccomptype='@ccomptype@'
+toolchain='@toolchain@'
+mkexe='@mkexe@'
+mksharedlib='@mksharedlib@'
+mkmaindll='@mkmaindll@'
+mkexedebugflag='@mkexedebugflag@'
+asm_cfi_supported='@asm_cfi_supported@'
+libunwind_available='@libunwind_available@'
+libunwind_include_flags='@libunwind_include_flags@'
+libunwind_link_flags='@libunwind_link_flags@'
+flexdll_chain='@flexdll_chain@'
+flexlink_flags='@flexlink_flags@'
+default_as='@default_as@'
+default_aspp='@default_aspp@'
+cclibs='@cclibs@'
+instrumented_runtime_libs='@instrumented_runtime_libs@'
+has_clock_gettime='@has_clock_gettime@'
+function_sections='@function_sections@'
+AS='@AS@'
+ASPP='@ASPP@'
+common_cflags='@common_cflags@'
+common_cppflags='@common_cppflags@'
+internal_cflags='@internal_cflags@'
+internal_cppflags='@internal_cppflags@'
+dynlink_libs='@dynlink_libs@'
+AWK='@AWK@'
