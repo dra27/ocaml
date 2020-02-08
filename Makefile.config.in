@@ -68,6 +68,9 @@ LIBTOOL = $(TOP_BUILDDIR)/libtool
 TOOLPREF=@TOOLPREF@
 CC=@CC@
 
+CROSS_COMPILED=@cross_compiling@
+CROSS_COMPILER=@cross_compiler@
+
 CC_HAS_DEBUG_PREFIX_MAP=@cc_has_debug_prefix_map@
 AS_HAS_DEBUG_PREFIX_MAP=@as_has_debug_prefix_map@
 
@@ -95,6 +98,7 @@ OUTPUTOBJ=@outputobj@
 
 ### Extension of static libraries
 A=@libext@
+host_A=@host_libext@
 EXT_LIB=.@libext@
 
 ### Extension of assembler files
@@ -176,11 +180,17 @@ BFD_LDLIBS=@bfd_ldlibs@
 INSTALL_SOURCE_ARTIFACTS=@install_source_artifacts@
 
 OC_CFLAGS=@oc_cflags@
+host_OC_CFLAGS=@host_oc_cflags@
+target_OC_CFLAGS=@oc_cflags@
 OC_CPPFLAGS=@oc_cppflags@
+target_OC_CPPFLAGS=@oc_cppflags@
+host_OC_CPPFLAGS=@host_oc_cppflags@
 OCAMLC_CFLAGS=@ocamlc_cflags@
 
 OCAMLC_CPPFLAGS=@ocamlc_cppflags@
 BYTECCLIBS=@bytecclibs@
+target_BYTECCLIBS=@bytecclibs@
+host_BYTECCLIBS=@host_bytecclibs@
 EXE=@exeext@
 OUTPUTEXE=@outputexe@
 SUPPORTS_SHARED_LIBRARIES=@supports_shared_libraries@
@@ -190,6 +200,8 @@ NATDYNLINK=@natdynlink@
 NATDYNLINKOPTS=@natdynlinkopts@
 SYSLIB=@syslib@
 MKLIB=@mklib@
+target_MKLIB=@mklib@
+host_MKLIB=@host_mklib@
 OCAMLOPT_CFLAGS=@ocamlopt_cflags@
 OCAMLOPT_CPPFLAGS=@ocamlopt_cppflags@
 NATIVECCLIBS=@nativecclibs@

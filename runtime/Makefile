@@ -46,131 +46,41 @@ else
 other_files := win32.c
 endif
 
-ifeq "$(TOOLCHAIN)" "msvc"
-ASM_EXT := asm
-ASM_SOURCES := $(ARCH)nt.$(ASM_EXT)
-else
-ASM_EXT := S
-ASM_SOURCES := $(ARCH).$(ASM_EXT)
-endif
-
 # Targets to build and install
 
-PROGRAMS := ocamlrun$(EXE)
-BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
+PROGRAMS := target/ocamlrun$(EXE)
+BYTECODE_STATIC_LIBRARIES := ld.conf target/libcamlrun.$(A)
 BYTECODE_SHARED_LIBRARIES :=
-NATIVE_STATIC_LIBRARIES := libasmrun.$(A)
+NATIVE_STATIC_LIBRARIES := target/libasmrun.$(A)
 NATIVE_SHARED_LIBRARIES :=
 
 ifeq "$(RUNTIMED)" "true"
-PROGRAMS += ocamlrund$(EXE)
-BYTECODE_STATIC_LIBRARIES += libcamlrund.$(A)
-NATIVE_STATIC_LIBRARIES += libasmrund.$(A)
+PROGRAMS += target/ocamlrund$(EXE)
+BYTECODE_STATIC_LIBRARIES += target/libcamlrund.$(A)
+NATIVE_STATIC_LIBRARIES += target/libasmrund.$(A)
 endif
 
 ifeq "$(RUNTIMEI)" "true"
-PROGRAMS += ocamlruni$(EXE)
-BYTECODE_STATIC_LIBRARIES += libcamlruni.$(A)
-NATIVE_STATIC_LIBRARIES += libasmruni.$(A)
+PROGRAMS += target/ocamlruni$(EXE)
+BYTECODE_STATIC_LIBRARIES += target/libcamlruni.$(A)
+NATIVE_STATIC_LIBRARIES += target/libasmruni.$(A)
 endif
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-BYTECODE_STATIC_LIBRARIES += libcamlrun_pic.$(A)
-BYTECODE_SHARED_LIBRARIES += libcamlrun_shared.$(SO)
-NATIVE_STATIC_LIBRARIES += libasmrun_pic.$(A)
-NATIVE_SHARED_LIBRARIES += libasmrun_shared.$(SO)
+BYTECODE_STATIC_LIBRARIES += target/libcamlrun_pic.$(A)
+BYTECODE_SHARED_LIBRARIES += target/libcamlrun_shared.$(SO)
+NATIVE_STATIC_LIBRARIES += target/libasmrun_pic.$(A)
+NATIVE_SHARED_LIBRARIES += target/libasmrun_shared.$(SO)
 endif
 endif
 
-# List of object files for each target
-
-ASM_OBJECTS := $(ASM_SOURCES:.$(ASM_EXT)=.$(O))
-
-libcamlrun_OBJECTS := $(BYTECODE_C_SOURCES:.c=_b.$(O))
-
-libcamlrund_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bd.$(O)) \
-  instrtrace_bd.$(O)
-
-libcamlruni_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bi.$(O))
-
-libcamlrunpic_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bpic.$(O))
-
-libasmrun_OBJECTS := $(NATIVE_C_SOURCES:.c=_n.$(O)) $(ASM_OBJECTS)
-
-libasmrund_OBJECTS := $(NATIVE_C_SOURCES:.c=_nd.$(O)) $(ASM_OBJECTS)
-
-libasmruni_OBJECTS := $(NATIVE_C_SOURCES:.c=_ni.$(O)) $(ASM_OBJECTS)
-
-libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=_npic.$(O)) \
-  $(ASM_OBJECTS:.$(O)=_libasmrunpic.$(O))
-
-# General (non target-specific) assembler and compiler flags
-
-ifdef BOOTSTRAPPING_FLEXLINK
-OC_CPPFLAGS += -DBOOTSTRAPPING_FLEXLINK
+ifeq "$(CROSS_COMPILING)" "true"
+PROGRAMS += build/ocamlrun$(build_EXE)
 endif
-
-# On Windows, OCAML_STDLIB_DIR needs to be defined dynamically
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-# OCAML_STDLIB_DIR needs to arrive in dynlink.c as a string which both gcc and
-# msvc are willing parse without warning. This means we can't pass UTF-8
-# directly since, as far as I can tell, cl can cope, but the pre-processor
-# can't. So the string needs to be directly translated to L"" form. To do this,
-# we take advantage of the fact that Cygwin uses GNU libiconv which includes a
-# Java pseudo-encoding which translates any UTF-8 sequences to \uXXXX (and,
-# unlike the C99 pseudo-encoding, emits two surrogate values when needed, rather
-# than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
-# pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
-OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
-else # Unix
-OCAML_STDLIB_DIR = $(LIBDIR)
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
-endif
-
-OC_CPPFLAGS += $(IFLEXDIR)
-
-ifneq "$(CCOMPTYPE)" "msvc"
-OC_CFLAGS += -g
-endif
-
-OC_NATIVE_CPPFLAGS = -DNATIVE_CODE -DTARGET_$(ARCH)
-
-ifeq "$(UNIX_OR_WIN32)" "unix"
-OC_NATIVE_CPPFLAGS += -DMODEL_$(MODEL)
-endif
-
-OC_NATIVE_CPPFLAGS += -DSYS_$(SYSTEM) $(IFLEXDIR) $(LIBUNWIND_INCLUDE_FLAGS)
-
-OC_DEBUG_CPPFLAGS=-DDEBUG
-OC_INSTR_CPPFLAGS=-DCAML_INSTR
-
-ifeq "$(TOOLCHAIN)" "msvc"
-ASMFLAGS=
-ifeq ($(WITH_SPACETIME),true)
-ASMFLAGS=/DWITH_SPACETIME
-endif
-endif
-
-ASPPFLAGS = -DSYS_$(SYSTEM) -I$(ROOTDIR)/runtime
-ifeq "$(UNIX_OR_WIN32)" "unix"
-ASPPFLAGS += -DMODEL_$(MODEL)
-endif
-
-# Commands used to build native libraries
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-LIBS = $(BYTECCLIBS) $(EXTRALIBS)
-ifdef BOOTSTRAPPING_FLEXLINK
-MAKE_OCAMLRUN=$(MKEXE_BOOT)
-else
-MAKE_OCAMLRUN = $(MKEXE) -o $(1) $(2)
-endif
-else
-LIBS = $(BYTECCLIBS)
-MAKE_OCAMLRUN = $(MKEXE) -o $(1) $(2)
+ifeq "$(CROSS_COMPILER)" "true"
+PROGRAMS += host/ocamlrun$(host_EXE)
+NATIVE_STATIC_LIBRARIES += host/libasmrun.$(host_A)
 endif
 
 # Build, install and clean targets
@@ -181,6 +91,17 @@ all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) $(PROGRAMS)
 .PHONY: allopt
 allopt: $(NATIVE_STATIC_LIBRARIES) $(NATIVE_SHARED_LIBRARIES)
 
+# XXX COMBAK This is where we introduce all the other stuff if we're cross-compiling/building a cross-compiler
+
+ifeq "$(CROSS_COMPILING)" "true"
+include build/Makefile
+endif
+ifeq "$(CROSS_COMPILER)" "true"
+include host/Makefile
+endif
+include target/Makefile
+
+# XXX COMBAK
 INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
 .PHONY: install
 install:
@@ -200,6 +121,7 @@ ifneq "$(NATIVE_SHARED_LIBRARIES)" ""
 endif
 
 .PHONY: clean
+# XXX COMBAK The files aren't being cleaned in the right places
 clean:
 	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO) ld.conf
 	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
@@ -207,6 +129,50 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+
+libcamlrund_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bd.$(O)) \
+  instrtrace_bd.$(O)
+
+libcamlruni_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bi.$(O))
+
+libcamlrunpic_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bpic.$(O))
+
+libasmrund_OBJECTS := $(NATIVE_C_SOURCES:.c=_nd.$(O)) $(ASM_OBJECTS)
+
+libasmruni_OBJECTS := $(NATIVE_C_SOURCES:.c=_ni.$(O)) $(ASM_OBJECTS)
+
+libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=_npic.$(O)) \
+  $(ASM_OBJECTS:.$(O)=_libasmrunpic.$(O))
+
+target/ocamlrund$(EXE): target/prims.$(O) target/libcamlrund.$(A)
+	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(target_LIBS)
+
+target/libcamlrund.$(A): $(addprefix target/,$(libcamlrund_OBJECTS))
+	$(call MKLIB,$@, $^)
+
+target/ocamlruni$(EXE): target/prims.$(O) target/libcamlruni.$(A)
+	$(MKEXE) -o $@ $^ $(target_LIBS)
+
+target/libcamlruni.$(A): $(addprefix target/,$(libcamlruni_OBJECTS))
+	$(call MKLIB,$@, $^)
+
+target/libcamlrun_pic.$(A): $(addprefix target/,$(libcamlrunpic_OBJECTS))
+	$(call MKLIB,$@, $^)
+
+target/libcamlrun_shared.$(SO): $(addprefix target/,$(libcamlrunpic_OBJECTS))
+	$(MKDLL) -o $@ $^ $(BYTECCLIBS)
+
+target/libasmrund.$(A): $(addprefix target/,$(libasmrund_OBJECTS))
+	$(call MKLIB,$@, $^)
+
+target/libasmruni.$(A): $(addprefix target/,$(libasmruni_OBJECTS))
+	$(call MKLIB,$@, $^)
+
+target/libasmrun_pic.$(A): $(addprefix target/,$(libasmrunpic_OBJECTS))
+	$(call MKLIB,$@, $^)
+
+target/libasmrun_shared.$(SO): $(addprefix target/,$(libasmrunpic_OBJECTS))
+	$(MKDLL) -o $@ $^ $(NATIVECCLIBS)
 
 # Generated non-object files
 
@@ -268,112 +234,26 @@ caml/jumptbl.h : caml/instruct.h
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
 
-# Libraries and programs
-
-ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
-	$(call MAKE_OCAMLRUN,$@,$^ $(LIBS))
-
-libcamlrun.$(A): $(libcamlrun_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
-	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(LIBS)
-
-libcamlrund.$(A): $(libcamlrund_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-ocamlruni$(EXE): prims.$(O) libcamlruni.$(A)
-	$(MKEXE) -o $@ $^ $(LIBS)
-
-libcamlruni.$(A): $(libcamlruni_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-libcamlrun_pic.$(A): $(libcamlrunpic_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-libcamlrun_shared.$(SO): $(libcamlrunpic_OBJECTS)
-	$(MKDLL) -o $@ $^ $(BYTECCLIBS)
-
-libasmrun.$(A): $(libasmrun_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-libasmrund.$(A): $(libasmrund_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-libasmruni.$(A): $(libasmruni_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-libasmrun_pic.$(A): $(libasmrunpic_OBJECTS)
-	$(call MKLIB,$@, $^)
-
-libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
-	$(MKDLL) -o $@ $^ $(NATIVECCLIBS)
-
-# Target-specific preprocessor and compiler flags
-
-%_bd.$(O): OC_CPPFLAGS += $(OC_DEBUG_CPPFLAGS)
-
-%_bi.$(O): OC_CPPFLAGS += $(OC_INSTR_CPPFLAGS)
-
-%_bpic.$(O): OC_CFLAGS += $(SHAREDLIB_CFLAGS)
-
-%_n.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
-
-%_nd.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(OC_DEBUG_CPPFLAGS)
-
-%_ni.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(OC_INSTR_CPPFLAGS)
-
-%_npic.$(O): OC_CFLAGS += $(SHAREDLIB_CFLAGS)
-%_npic.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
-
-# Compilation of C files
-
-# The COMPILE_C_FILE macro below receives as argument the pattern
-# that corresponds to the name of the generated object file
-# (without the extension, which is added by the macro)
-define COMPILE_C_FILE
-$(1).$(O): %.c
-	$$(CC) -c $$(OC_CFLAGS) $$(OC_CPPFLAGS) $$(OUTPUTOBJ)$$@ $$<
-endef
-
-object_types := % %_b %_bd %_bi %_bpic %_n %_nd %_ni %_np %_npic
-
-$(foreach object_type, $(object_types), \
-  $(eval $(call COMPILE_C_FILE,$(object_type))))
-
-dynlink_%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
-
-startup_byt_%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG) -DHOST='"$(HOST)"'
-
-$(foreach object_type,$(subst %,,$(object_types)), \
-  $(eval dynlink$(object_type).$(O): $(ROOTDIR)/Makefile.config))
-
-# Compilation of assembly files
-
-%.o: %.S
-	$(ASPP) $(ASPPFLAGS) -o $@ $< || \
-	{ echo "If your assembler produced syntax errors, it is probably";\
-          echo "unhappy with the preprocessor. Check your assembler, or";\
-          echo "try producing $*.o by hand.";\
-          exit 2; }
-
-%_libasmrunpic.o: %.S
-	$(ASPP) $(ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
-
 domain_state64.inc: caml/domain_state.tbl gen_domain_state64_inc.awk
 	awk -f gen_domain_state64_inc.awk $< > $@
 
 domain_state32.inc: caml/domain_state.tbl gen_domain_state32_inc.awk
 	awk -f gen_domain_state32_inc.awk $< > $@
 
-amd64nt.obj: amd64nt.asm domain_state64.inc
-	$(ASM)$@ $(ASMFLAGS) $<
+# Target-specific preprocessor and compiler flags
 
-i386nt.obj: i386nt.asm domain_state32.inc
-	$(ASM)$@ $(ASMFLAGS) $<
+target/%_bd.$(O): target_OC_CPPFLAGS += $(OC_DEBUG_CPPFLAGS)
 
-%_libasmrunpic.obj: %.asm
-	$(ASM)$@ $(ASMFLAGS) $<
+target/%_bi.$(O): target_OC_CPPFLAGS += $(OC_INSTR_CPPFLAGS)
+
+target/%_bpic.$(O): target_OC_CFLAGS += $(SHAREDLIB_CFLAGS)
+
+target/%_nd.$(O): target_OC_CPPFLAGS += $(target_OC_NATIVE_CPPFLAGS) $(OC_DEBUG_CPPFLAGS)
+
+target/%_ni.$(O): target_OC_CPPFLAGS += $(target_OC_NATIVE_CPPFLAGS) $(OC_INSTR_CPPFLAGS)
+
+target/%_npic.$(O): target_OC_CFLAGS += $(SHAREDLIB_CFLAGS)
+target/%_npic.$(O): target_OC_CPPFLAGS += $(target_OC_NATIVE_CPPFLAGS)
 
 # Dependencies
 

@@ -32,6 +32,10 @@ user_enable_shared="$enable_shared"
 
 # Configuration variables
 
+AC_ARG_VAR([CONF_PREFIX], [output prefix for variables])
+AC_SUBST([BP])
+AS_IF([test -z "$CONF_PREFIX"],[BP=target],[BP="${CONF_PREFIX%_}"])
+
 # Command to build executables
 # COMBAK This should not include the OC_ variables (and in particular Windows should communicate these rather than overriding mkexe badly)
 mkexe="\$(CC) \$(OC_CFLAGS) \$(OC_CPPFLAGS) \$(OC_LDFLAGS)"
@@ -116,8 +120,9 @@ AC_SUBST([stdlib_manpages])
 ## Generated files
 
 AC_CONFIG_FILES([vars.sh])
-AC_CONFIG_HEADERS([caml/m.h])
-AC_CONFIG_HEADERS([caml/s.h])
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_HEADERS([m.h])
+AC_CONFIG_HEADERS([s.h])
 
 # Checks for system types
 
@@ -144,12 +149,14 @@ AS_CASE([$build],
     ccomptype='msvc'
     S='asm'
     SO='dll'
+    ARCH_S='asm'
     outputexe='-Fe'
     outputobj='-Fo'
     syslib='$(1).lib'],
   [ccomptype='cc'
   S='s'
   SO='so'
+  ARCH_S='S'
   outputexe='-o $(EMPTY)'
   outputobj='-o $(EMPTY)'
   syslib='-l$(1)'])

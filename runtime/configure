@@ -738,6 +738,8 @@ instrumented_runtime_libs
 cclibs
 exeext
 ac_tool_prefix
+BP
+CONF_PREFIX
 target_alias
 host_alias
 build_alias
@@ -791,6 +793,7 @@ enable_libtool_lock
       ac_precious_vars='build_alias
 host_alias
 target_alias
+CONF_PREFIX
 CC
 CFLAGS
 LDFLAGS
@@ -1431,6 +1434,7 @@ Optional Packages:
                           compiler's sysroot if not specified).
 
 Some influential environment variables:
+  CONF_PREFIX output prefix for variables
   CC          C compiler command
   CFLAGS      C compiler flags
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
@@ -2531,6 +2535,14 @@ user_enable_shared="$enable_shared"
 
 # Configuration variables
 
+
+
+if test -z "$CONF_PREFIX"; then :
+  BP=target
+else
+  BP="${CONF_PREFIX%_}"
+fi
+
 # Command to build executables
 # COMBAK This should not include the OC_ variables (and in particular Windows should communicate these rather than overriding mkexe badly)
 mkexe="\$(CC) \$(OC_CFLAGS) \$(OC_CPPFLAGS) \$(OC_LDFLAGS)"
@@ -2644,9 +2656,11 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 ac_config_files="$ac_config_files vars.sh"
 
-ac_config_headers="$ac_config_headers caml/m.h"
+ac_config_files="$ac_config_files Makefile"
 
-ac_config_headers="$ac_config_headers caml/s.h"
+ac_config_headers="$ac_config_headers m.h"
+
+ac_config_headers="$ac_config_headers s.h"
 
 
 # Checks for system types
@@ -2781,6 +2795,7 @@ case $build in #(
     ccomptype='msvc'
     S='asm'
     SO='dll'
+    ARCH_S='asm'
     outputexe='-Fe'
     outputobj='-Fo'
     syslib='$(1).lib' ;; #(
@@ -2788,6 +2803,7 @@ case $build in #(
     ccomptype='cc'
   S='s'
   SO='so'
+  ARCH_S='S'
   outputexe='-o $(EMPTY)'
   outputobj='-o $(EMPTY)'
   syslib='-l$(1)' ;;
@@ -16545,8 +16561,9 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "vars.sh") CONFIG_FILES="$CONFIG_FILES vars.sh" ;;
-    "caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS caml/m.h" ;;
-    "caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS caml/s.h" ;;
+    "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "m.h") CONFIG_HEADERS="$CONFIG_HEADERS m.h" ;;
+    "s.h") CONFIG_HEADERS="$CONFIG_HEADERS s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

@@ -104,7 +104,14 @@ AC_SUBST([stdlib_manpages])
 AC_CONFIG_FILES([Makefile.common])
 AC_CONFIG_FILES([Makefile.config])
 # TODO Ensure all the varibles in runtime/caml/r.h.in are available
-AC_CONFIG_HEADERS([runtime/caml/r.h])
+AC_CONFIG_HEADERS([runtime/target/r.h])
+
+# COMBAK precise details for when this should be done
+cat > runtime/host/r.h <<EOF
+#define CAML_SAFE_STRING 1
+#define FLAT_FLOAT_ARRAY 1
+#define FUNCTION_SECTIONS 1
+EOF
 
 # Checks for system types
 
@@ -322,17 +329,37 @@ AS_IF([test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"],
      with_camltex=""])],
   [with_camltex="true"])
 
+AS_IF([test "$host" = "$build"],
+  [AC_MSG_NOTICE([We are NOT cross-compiling])
+  cross_compiling='false'],
+  [AC_MSG_ERROR([We are using $build to create a compiler which will run on $host])
+  cross_compiling='true'])
+AS_IF([test "$host" = "$target"],
+  [AC_MSG_NOTICE([We are making a normal compiler (for $host)])
+  cross_compiler='false'],
+  [AC_MSG_NOTICE([We are producing a cross-compiler which will target $target])
+  cross_compiler='true'])
+
+AC_SUBST([cross_compiling])
+AC_SUBST([cross_compiler])
+
 # Get the host system configuration
 cd runtime
+mkdir -p host
+cd host
 if test -n "$cache_file" ; then :
   # XXX For cross-compilation, this will then be recomputed
   # XXX The eval quoting below is also not working
-  cache_file="--cache-file \"../$cache_file\""
+  cache_file="--cache-file \"../../$cache_file\""
 fi
+# XXX Temporary - cache_file defaults to /dev/null
+cache_file=
 build_arg=
 host_arg=
+if test -n "$build_alias" ; then :
+  build_arg="--build=$build_alias"
+fi
 if test -n "$host_alias" ; then :
-  build_arg="--build=$host_alias"
   host_arg="--host=$host_alias"
 fi
 # Environment variables which are used by the runtime configure script are explicitly passed
@@ -344,11 +371,51 @@ AS_IF([test "$with_libunwind" != 'yes' && test "$with_libunwind" != 'no'],
     [LIBUNWIND_LIB_DIR="$with_libunwind/lib"])])
 # XXX CC=\"$CC\" causing trouble?
 # XXX TODO AS and ASPP should be being passed here
-eval ./configure $build_arg $host_arg $cache_file LIBUNWIND_INCLUDE_DIR=\"$LIBUNWIND_INCLUDE_DIR\" LIBUNWIND_LIB_DIR=\"$LIBUNWIND_LIB_DIR\" BFD_INCLUDE_DIR=\"$BFD_INCLUDE_DIR\" BFD_LIB_DIR=\"$BFD_LIB_DIR\" # "
+# XXX CONF_PREFIX should only be set if we are building a cross-compiler
+eval ../configure $build_arg $host_arg $cache_file CONF_PREFIX=host_ LIBUNWIND_INCLUDE_DIR=\"$LIBUNWIND_INCLUDE_DIR\" LIBUNWIND_LIB_DIR=\"$LIBUNWIND_LIB_DIR\" BFD_INCLUDE_DIR=\"$BFD_INCLUDE_DIR\" BFD_LIB_DIR=\"$BFD_LIB_DIR\" # "
+# If we're building a cross-compiler, then host ocamlrun only
+# XXX COMBAK What's really needed here it to shift logic from runtime/Makefile for what gets built to configure.ac
+#AS_IF([$cross_compiler],
+#  [cat > Makefile <<"EOF"
+#runtime: ocamlrun$(EXE)
+#
+#include ../Makefile
+#EOF
+#],[cat > Makefile <<"EOF"
+#runtime: all
+#
+#include ../Makefile
+#EOF
+#])
 cd ..
 
+AS_IF([$cross_compiler],
+[
+  # We're building a cross-compiler, so we need the build->target configuration as well
+  if test -n "$target_alias" ; then :
+    host_arg="--host=$target_alias"
+  else
+    # XXX DRA Is this impossible?
+    host_arg=''
+  fi
+  mkdir -p target
+  cd target
+  eval ../configure $build_arg $host_arg LIBUNWIND_INCLUDE_DIR=\"$LIBUNWIND_INCLUDE_DIR\" LIBUNWIND_LIB_DIR=\"$LIBUNWIND_LIB_DIR\" BFD_INCLUDE_DIR=\"$BFD_INCLUDE_DIR\" BFD_LIB_DIR=\"$BFD_LIB_DIR\" # "
+#  cat > Makefile <<"EOF"
+#runtime: all
+#include ../Makefile
+#EOF
+  cd ..
+])
+
+cd ..
+
+# XXX DRA TODO If build <> host then we also need a build ocamlrun!
+
 # Read the variables
-. runtime/vars.sh
+. runtime/host/vars.sh
+AS_IF([$cross_compiler],
+[. runtime/target/vars.sh])
 
 # Variables from the runtime configure script which we export
 AC_SUBST([CC])
@@ -360,13 +427,17 @@ AC_SUBST([RANLIB])
 AC_SUBST([RANLIBCMD])
 AC_SUBST([AR])
 AC_SUBST([OBJEXT])
+AC_SUBST([host_OBJEXT])
 AC_SUBST([outputobj])
 AC_SUBST([libext])
+AC_SUBST([host_libext])
 AC_SUBST([S])
+AC_SUBST([host_S])
 AC_SUBST([SO])
 AC_SUBST([sharedlib_cflags])
 AC_SUBST([rpath])
 AC_SUBST([arch])
+AC_SUBST([host_arch])
 AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
@@ -385,12 +456,14 @@ AC_SUBST([mksharedlibrpath])
 AC_SUBST([natdynlinkopts])
 AC_SUBST([syslib])
 AC_SUBST([mklib])
+AC_SUBST([host_mklib])
 AC_SUBST([nativecclibs])
 AC_SUBST([systhread_support])
 AC_SUBST([PACKLD])
 AC_SUBST([iflexdir])
 AC_SUBST([ccomptype])
 AC_SUBST([toolchain])
+AC_SUBST([host_toolchain])
 AC_SUBST([mkexe])
 AC_SUBST([mksharedlib])
 AC_SUBST([mkmaindll])
@@ -441,14 +514,9 @@ AS_IF(
 # Configuration for the OCaml compilers
 APPEND_FLAG([dynlink_libs], [$DLLIBS])
 bytecclibs="$cclibs $dynlink_libs $pthread_link $instrumented_runtime_libs"
+host_bytecclibs="$host_cclibs $host_dynlink_libs $host_pthread_link"
+AC_SUBST([host_bytecclibs])
 nativecclibs="$cclibs $dynlink_libs"
-
-# Are we building a cross-compiler
-
-AS_IF(
-  [test x"$host" = x"$target"],
-    [cross_compiler=false],
-    [cross_compiler=true])
 
 # Checks for programs
 
@@ -780,6 +848,10 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags -DWINDOWS_UNICODE=$windows_unicode"
+host_oc_cflags="$host_common_cflags $host_internal_cflags"
+host_oc_cppflags="$host_common_cppflags $host_internal_cppflags -DWINDOWS_UNICODE=$windows_unicode"
+AC_SUBST([host_oc_cflags])
+AC_SUBST([host_oc_cppflags])
 ocamlc_cflags="$common_cflags $sharedlib_cflags"
 ocamlc_cppflags="$common_cppflags"
 ocamlopt_cflags="$common_cflags"

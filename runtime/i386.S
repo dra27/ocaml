@@ -16,8 +16,8 @@
 /* Asm part of the runtime system, Intel 386 processor */
 /* Must be preprocessed by cpp */
 
-#include "caml/m.h"
-#include "caml/r.h"
+#include "m.h"
+#include "r.h"
 
 /* Linux/BSD with ELF binaries and Solaris do not prefix identifiers with _.
    Linux/BSD with a.out binaries and NextStep do. */

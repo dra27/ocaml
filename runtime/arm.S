@@ -17,8 +17,8 @@
 /* Asm part of the runtime system, ARM processor */
 /* Must be preprocessed by cpp */
 
-#include "caml/m.h"
-#include "caml/r.h"
+#include "m.h"
+#include "r.h"
 
         .syntax unified
         .text
