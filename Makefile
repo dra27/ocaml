@@ -206,7 +206,7 @@ opt: checknative
 opt.opt: checknative
 	$(MAKE) checkstack
 	$(MAKE) runtime
-	$(MAKE) core
+	$(MAKE) coreall
 	$(MAKE) ocaml
 	$(MAKE) opt-core
 	$(MAKE) ocamlc.opt
@@ -582,7 +582,7 @@ clean:: partialclean
 
 # The bytecode compiler
 
-ocamlc: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+ocamlc: utils/config.cmo compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
 
 partialclean::
@@ -590,7 +590,7 @@ partialclean::
 
 # The native-code compiler
 
-ocamlopt: compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
+ocamlopt: utils/config.cmo compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
           $(OPTSTART)
 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 
@@ -600,6 +600,7 @@ partialclean::
 # The toplevel
 
 ocaml_dependencies := \
+  utils/config.cmo \
   compilerlibs/ocamlcommon.cma \
   compilerlibs/ocamlbytecomp.cma \
   compilerlibs/ocamltoplevel.cma $(TOPLEVELSTART)
@@ -715,7 +716,7 @@ tools/cvt_emit: tools/cvt_emit.mll
 
 # The "expunge" utility
 
-expunge: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
+expunge: utils/config.cmo compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
          toplevel/expunge.cmo
 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 
@@ -1013,7 +1014,7 @@ toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 # The numeric opcodes
 
 bytecomp/opcodes.ml: runtime/caml/instruct.h tools/make_opcodes
-	runtime/ocamlrun tools/make_opcodes -opcodes < $< > $@
+	runtime/host/ocamlrun tools/make_opcodes -opcodes < $< > $@
 
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
 	$(CAMLC) -i $< > $@
