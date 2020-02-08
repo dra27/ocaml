@@ -729,7 +729,7 @@ runtime: stdlib/host/libcamlrun.$(A)
 
 .PHONY: makeruntime
 makeruntime:
-	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) runtime
+	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
 runtime/host/libcamlrun.$(A): makeruntime ;
 stdlib/host/libcamlrun.$(A): runtime/host/libcamlrun.$(A)
 	$(MKDIR) stdlib/host
