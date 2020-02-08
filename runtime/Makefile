@@ -123,8 +123,8 @@ endif
 .PHONY: clean
 # XXX COMBAK The files aren't being cleaned in the right places
 clean:
-	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO) ld.conf
-	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
+	rm -f $(PROGRAMS) build/*.$(O) build/*.$(A) build/*.$(SO) host/*.$(O) host/*.$(A) host/*.$(SO) target/*.$(O) target/*.$(A) target/*.$(SO) ld.conf
+	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h primitives.new
 	rm -f caml/version.h domain_state*.inc
 
 .PHONY: distclean

@@ -1064,10 +1064,13 @@ depend: beforedepend
 distclean: clean
 	rm -f boot/ocamlrun boot/ocamlrun$(EXE) boot/camlheader \
 	boot/*.cm* boot/libcamlrun.$(A) boot/ocamlc.opt
-	rm -f Makefile.config runtime/caml/m.h runtime/caml/s.h
+	rm -f Makefile.config runtime/target/r.h runtime/target/m.h runtime/target/s.h Makefile.common config.log config.status
+	rm -f runtime/target/config.log runtime/target/config.status runtime/target/Makefile runtime/target/vars.sh runtime/target/libtool
+	rm -rf runtime/host runtime/build
 	rm -f tools/*.bak
 	rm -f ocaml ocamlc
 	rm -f testsuite/_log*
+	rm -rf autom4te.cache runtime/autom4te.cache
 
 include .depend
 
