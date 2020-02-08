@@ -673,7 +673,9 @@ syslib
 natdynlinkopts
 mksharedlibrpath
 supports_shared_libraries
+host_outputexe
 outputexe
+host_exeext
 exeext
 bfd_ldlibs
 bfd_ldflags
@@ -701,9 +703,11 @@ AR
 RANLIBCMD
 RANLIB
 CPP
+host_oc_ldflags
 oc_ldflags
 cc_has_debug_prefix_map
 TOOLPREF
+host_CC
 CC
 cross_compiler
 cross_compiling
@@ -2578,6 +2582,10 @@ if $cross_compiler; then :
 fi
 
 # Variables from the runtime configure script which we export
+
+
+
+
 
 
 

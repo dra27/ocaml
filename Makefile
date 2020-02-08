@@ -919,13 +919,14 @@ else
 endif
 
 # Check that the stack limit is reasonable (Unix-only)
+# XXX COMBAK This should be being done with the *build* C compiler, not the host (the point is to be sure that ocamlopt will be able to compile itself, right?)
 .PHONY: checkstack
 checkstack:
 ifeq "$(UNIX_OR_WIN32)" "unix"
-	if $(MKEXE) $(OUTPUTEXE)tools/checkstack$(EXE) tools/checkstack.c; \
-	  then tools/checkstack$(EXE); \
+	if $(host_MKEXE) $(host_OUTPUTEXE)tools/checkstack$(host_EXE) tools/checkstack.c; \
+	  then tools/checkstack$(host_EXE); \
 	fi
-	rm -f tools/checkstack$(EXE)
+	rm -f tools/checkstack$(host_EXE)
 else
 	@
 endif

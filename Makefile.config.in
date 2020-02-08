@@ -67,6 +67,7 @@ LIBTOOL = $(TOP_BUILDDIR)/libtool
 ### Which C compiler to use
 TOOLPREF=@TOOLPREF@
 CC=@CC@
+host_CC=@host_CC@
 
 CROSS_COMPILED=@cross_compiling@
 CROSS_COMPILER=@cross_compiler@
@@ -78,6 +79,7 @@ AS_HAS_DEBUG_PREFIX_MAP=@as_has_debug_prefix_map@
 # To support dynamic loading of shared libraries (they need to look at
 # our own symbols):
 OC_LDFLAGS=@oc_ldflags@
+host_OC_LDFLAGS=@host_oc_ldflags@
 
 ### How to invoke the C preprocessor through the C compiler
 CPP=@CPP@
@@ -192,7 +194,9 @@ BYTECCLIBS=@bytecclibs@
 target_BYTECCLIBS=@bytecclibs@
 host_BYTECCLIBS=@host_bytecclibs@
 EXE=@exeext@
+host_EXE=@host_exeext@
 OUTPUTEXE=@outputexe@
+host_OUTPUTEXE=@host_outputexe@
 SUPPORTS_SHARED_LIBRARIES=@supports_shared_libraries@
 MKSHAREDLIBRPATH=@mksharedlibrpath@
 DYNLINKOPTS=@dynlink_libs@
@@ -218,6 +222,8 @@ CMXS=@cmxs@
 # or OCAML_FLEXLINK overriding will not work (see utils/config.mlp)
 
 MKEXE=@mkexe@
+# XXX COMBAK Need to eliminate things coming from autoconf which use make macros
+host_MKEXE=$(host_CC) $(host_OC_CFLAGS) $(host_OC_CPPFLAGS) $(host_OC_LDFLAGS)
 MKDLL=@mksharedlib@
 MKMAINDLL=@mkmaindll@
 
