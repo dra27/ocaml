@@ -107,6 +107,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_HEADERS([runtime/target/r.h])
 
 # COMBAK precise details for when this should be done
+mkdir -p runtime/host
 cat > runtime/host/r.h <<EOF
 #define CAML_SAFE_STRING 1
 #define FLAT_FLOAT_ARRAY 1

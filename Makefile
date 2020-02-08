@@ -137,11 +137,11 @@ beforedepend:: utils/config.ml utils/domainstate.ml utils/domainstate.mli
 .PHONY: coldstart
 coldstart:
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
-	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+	cp runtime/host/ocamlrun$(EXE) boot/ocamlrun$(EXE)
 	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) \
 	  CAMLC='$$(BOOT_OCAMLC) -use-prims ../runtime/primitives' all
 	cd stdlib; cp $(LIBFILES) ../boot
-	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+	cd boot; $(LN) ../runtime/host/libcamlrun.$(A) .
 
 # Recompile the core system using the bootstrap compiler
 .PHONY: coreall
@@ -725,17 +725,18 @@ partialclean::
 # The runtime system for the bytecode compiler
 
 .PHONY: runtime
-runtime: stdlib/libcamlrun.$(A)
+runtime: stdlib/host/libcamlrun.$(A)
 
 .PHONY: makeruntime
 makeruntime:
-	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
-runtime/libcamlrun.$(A): makeruntime ;
-stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
-	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) runtime
+runtime/host/libcamlrun.$(A): makeruntime ;
+stdlib/host/libcamlrun.$(A): runtime/host/libcamlrun.$(A)
+	$(MKDIR) stdlib/host
+	cd stdlib/host; $(LN) ../../runtime/host/libcamlrun.$(A) .
 clean::
 	$(MAKE) -C runtime clean
-	rm -f stdlib/libcamlrun.$(A)
+	rm -f stdlib/host/libcamlrun.$(A)
 
 otherlibs_all := bigarray dynlink raw_spacetime_lib \
   str systhreads unix win32unix
