@@ -5775,6 +5775,13 @@ driver/compmisc.cmx : \
 driver/compmisc.cmi : \
     typing/env.cmi \
     utils/clflags.cmi
+driver/dump_cmi.cmo : \
+    file_formats/cmi_format.cmi \
+    driver/dump_cmi.cmi
+driver/dump_cmi.cmx : \
+    file_formats/cmi_format.cmx \
+    driver/dump_cmi.cmi
+driver/dump_cmi.cmi :
 driver/errors.cmo : \
     parsing/location.cmi \
     driver/errors.cmi
@@ -5788,6 +5795,7 @@ driver/main.cmo : \
     driver/makedepend.cmi \
     driver/main_args.cmi \
     parsing/location.cmi \
+    driver/dump_cmi.cmi \
     utils/config.cmi \
     driver/compmisc.cmi \
     driver/compile.cmi \
@@ -5803,6 +5811,7 @@ driver/main.cmx : \
     driver/makedepend.cmx \
     driver/main_args.cmx \
     parsing/location.cmx \
+    driver/dump_cmi.cmx \
     utils/config.cmx \
     driver/compmisc.cmx \
     driver/compile.cmx \

@@ -31,6 +31,12 @@ let main () =
   try
     readenv ppf Before_args;
     Clflags.parse_arguments anonymous usage;
+    begin match !Clflags.dump_cmis with
+      None -> ()
+    | Some dir ->
+        Dump_cmi.dump_directory_cmis dir;
+        exit 0
+    end;
     Compmisc.read_clflags_from_env ();
     if !Clflags.plugin then
       fatal "-plugin is only supported up to OCaml 4.08.0";

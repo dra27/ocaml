@@ -836,6 +836,9 @@ let mk_dstartup f =
   "-dstartup", Arg.Unit f, " (undocumented)"
 ;;
 
+let mk_dcmis f =
+  "-dcmis", Arg.String f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -1026,6 +1029,7 @@ module type Bytecomp_options = sig
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
+  val _dcmis : string -> unit
 
   val _use_prims : string -> unit
 end;;
@@ -1237,6 +1241,7 @@ struct
     mk_dtimings F._dtimings;
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
+    mk_dcmis F._dcmis;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1965,6 +1970,7 @@ third-party libraries such as Lwt, but with a different API."
     let _custom = set custom_runtime
     let _dcamlprimc = set keep_camlprimc_file
     let _dinstr = set dump_instr
+    let _dcmis s = Clflags.dump_cmis := Some s
     let _dllib s = defer (ProcessDLLs (Misc.rev_split_words s))
     let _dllpath s = dllpaths := ((!dllpaths) @ [s])
     let _make_runtime () =
