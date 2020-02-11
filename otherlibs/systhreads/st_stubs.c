@@ -169,7 +169,7 @@ static void caml_thread_scan_roots(scanning_action action)
 
 /* Saving and restoring runtime state in curr_thread */
 
-static inline void caml_thread_save_runtime_state(void)
+Caml_inline void caml_thread_save_runtime_state(void)
 {
 #ifdef NATIVE_CODE
   curr_thread->top_of_stack = caml_top_of_stack;
@@ -198,7 +198,7 @@ static inline void caml_thread_save_runtime_state(void)
   curr_thread->backtrace_last_exn = caml_backtrace_last_exn;
 }
 
-static inline void caml_thread_restore_runtime_state(void)
+Caml_inline void caml_thread_restore_runtime_state(void)
 {
 #ifdef NATIVE_CODE
   caml_top_of_stack = curr_thread->top_of_stack;
