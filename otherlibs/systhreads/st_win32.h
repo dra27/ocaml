@@ -24,8 +24,6 @@
 
 #include <caml/osdeps.h>
 
-#define INLINE __inline
-
 #if 1
 #define TRACE(x)
 #define TRACE1(x,y)
@@ -101,7 +99,7 @@ static void st_thread_join(st_thread_id thr)
 
 /* Scheduling hints */
 
-static INLINE void st_thread_yield(void)
+Caml_inline void st_thread_yield(void)
 {
   Sleep(0);
 }
@@ -119,12 +117,12 @@ static DWORD st_tls_newkey(st_tlskey * res)
     return 0;
 }
 
-static INLINE void * st_tls_get(st_tlskey k)
+Caml_inline void * st_tls_get(st_tlskey k)
 {
   return TlsGetValue(k);
 }
 
-static INLINE void st_tls_set(st_tlskey k, void * v)
+Caml_inline void st_tls_set(st_tlskey k, void * v)
 {
   TlsSetValue(k, v);
 }
@@ -140,20 +138,20 @@ static void st_masterlock_init(st_masterlock * m)
   EnterCriticalSection(m);
 }
 
-static INLINE void st_masterlock_acquire(st_masterlock * m)
+Caml_inline void st_masterlock_acquire(st_masterlock * m)
 {
   TRACE("st_masterlock_acquire");
   EnterCriticalSection(m);
   TRACE("st_masterlock_acquire (done)");
 }
 
-static INLINE void st_masterlock_release(st_masterlock * m)
+Caml_inline void st_masterlock_release(st_masterlock * m)
 {
   LeaveCriticalSection(m);
   TRACE("st_masterlock_released");
 }
 
-static INLINE int st_masterlock_waiters(st_masterlock * m)
+Caml_inline int st_masterlock_waiters(st_masterlock * m)
 {
   return 1;                     /* info not maintained */
 }
@@ -178,7 +176,7 @@ static DWORD st_mutex_destroy(st_mutex m)
   return 0;
 }
 
-static INLINE DWORD st_mutex_lock(st_mutex m)
+Caml_inline DWORD st_mutex_lock(st_mutex m)
 {
   TRACE1("st_mutex_lock", m);
   EnterCriticalSection(m);
@@ -191,7 +189,7 @@ static INLINE DWORD st_mutex_lock(st_mutex m)
 #define PREVIOUSLY_UNLOCKED 0
 #define ALREADY_LOCKED (1<<29)
 
-static INLINE DWORD st_mutex_trylock(st_mutex m)
+Caml_inline DWORD st_mutex_trylock(st_mutex m)
 {
   TRACE1("st_mutex_trylock", m);
   if (TryEnterCriticalSection(m)) {
@@ -203,7 +201,7 @@ static INLINE DWORD st_mutex_trylock(st_mutex m)
   }
 }
 
-static INLINE DWORD st_mutex_unlock(st_mutex m)
+Caml_inline DWORD st_mutex_unlock(st_mutex m)
 {
   TRACE1("st_mutex_unlock", m);
   LeaveCriticalSection(m);

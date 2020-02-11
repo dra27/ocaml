@@ -31,9 +31,9 @@
 #endif
 
 #ifdef __GNUC__
-#define INLINE inline
+#define INLINE Caml_inline
 #else
-#define INLINE
+#define INLINE static
 #endif
 
 typedef int st_retcode;
@@ -70,7 +70,7 @@ static int st_thread_create(st_thread_id * res,
 
 /* Cleanup at thread exit */
 
-static INLINE void st_thread_cleanup(void)
+INLINE void st_thread_cleanup(void)
 {
   return;
 }
@@ -117,12 +117,12 @@ static int st_tls_newkey(st_tlskey * res)
   return pthread_key_create(res, NULL);
 }
 
-static INLINE void * st_tls_get(st_tlskey k)
+INLINE void * st_tls_get(st_tlskey k)
 {
   return pthread_getspecific(k);
 }
 
-static INLINE void st_tls_set(st_tlskey k, void * v)
+INLINE void st_tls_set(st_tlskey k, void * v)
 {
   pthread_setspecific(k, v);
 }
@@ -167,7 +167,7 @@ static void st_masterlock_release(st_masterlock * m)
   pthread_cond_signal(&m->is_free);
 }
 
-static INLINE int st_masterlock_waiters(st_masterlock * m)
+INLINE int st_masterlock_waiters(st_masterlock * m)
 {
   return m->waiters;
 }
@@ -195,7 +195,7 @@ static int st_mutex_destroy(st_mutex m)
   return rc;
 }
 
-static INLINE int st_mutex_lock(st_mutex m)
+INLINE int st_mutex_lock(st_mutex m)
 {
   return pthread_mutex_lock(m);
 }
@@ -203,12 +203,12 @@ static INLINE int st_mutex_lock(st_mutex m)
 #define PREVIOUSLY_UNLOCKED 0
 #define ALREADY_LOCKED EBUSY
 
-static INLINE int st_mutex_trylock(st_mutex m)
+INLINE int st_mutex_trylock(st_mutex m)
 {
   return pthread_mutex_trylock(m);
 }
 
-static INLINE int st_mutex_unlock(st_mutex m)
+INLINE int st_mutex_unlock(st_mutex m)
 {
   return pthread_mutex_unlock(m);
 }
@@ -236,17 +236,17 @@ static int st_condvar_destroy(st_condvar c)
   return rc;
 }
 
-static INLINE int st_condvar_signal(st_condvar c)
+INLINE int st_condvar_signal(st_condvar c)
 {
   return pthread_cond_signal(c);
 }
 
-static INLINE int st_condvar_broadcast(st_condvar c)
+INLINE int st_condvar_broadcast(st_condvar c)
 {
   return pthread_cond_broadcast(c);
 }
 
-static INLINE int st_condvar_wait(st_condvar c, st_mutex m)
+INLINE int st_condvar_wait(st_condvar c, st_mutex m)
 {
   return pthread_cond_wait(c, m);
 }
