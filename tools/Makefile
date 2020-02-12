@@ -76,10 +76,7 @@ CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
         -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt -g -nostdlib -I $(ROOTDIR)/stdlib
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
-INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
-                       middle_end middle_end/closure middle_end/flambda \
-                       middle_end/flambda/base_types driver toplevel \
-                       file_formats lambda)
+INCLUDES =
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
 LINKFLAGS = $(INCLUDES)
@@ -92,12 +89,12 @@ allopt: opt.opt
 
 CAMLDEP_OBJ=ocamldep.cmo
 CAMLDEP_IMPORTS= \
-  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma
+  ../boot/ocamlcommon.cma \
+  ../boot/ocamlbytecomp.cma
 ocamldep: LINKFLAGS += -compat-32
 $(call byte_and_opt,ocamldep,$(CAMLDEP_IMPORTS) $(CAMLDEP_OBJ),)
-ocamldep: depend.cmi
-ocamldep.opt: depend.cmi
+ocamldep: ../boot/depend.cmi
+ocamldep.opt: ../boot/depend.cmi
 
 # ocamldep is precious: sometimes we are stuck in the middle of a
 # bootstrap and we need to remake the dependencies
@@ -117,7 +114,8 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
   pprintast.cmo \
   lexer.cmo parse.cmo
 
-$(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
+# XXX Convert to compilerlibs?
+$(call byte_and_opt,ocamlprof,$(addprefix ../boot/,$(CSLPROF_IMPORTS)) profiling.cmo $(CSLPROF),)
 
 ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
@@ -125,7 +123,7 @@ ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                terminfo.cmo location.cmo load_path.cmo ccomp.cmo compenv.cmo \
                main_args.cmo
 
-$(call byte_and_opt,ocamlcp,$(ocamlcp_cmos) ocamlcp.cmo,)
+$(call byte_and_opt,ocamlcp,$(addprefix ../boot/,$(ocamlcp_cmos)) ocamlcp.cmo,)
 
 opt:: profiling.cmx
 
@@ -146,8 +144,8 @@ installopt::
 
 # To help building mixed-mode libraries (OCaml + C)
 
-$(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo config.cmo \
-	         build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo,)
+$(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo ../boot/config.cmo \
+	         ../boot/build_path_prefix_map.cmo ../boot/misc.cmo ocamlmklib.cmo,)
 
 
 ocamlmklibconfig.ml: $(ROOTDIR)/Makefile.config Makefile
@@ -170,7 +168,7 @@ OCAMLMKTOP_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo \
        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
        load_path.cmo profile.cmo ccomp.cmo
 
-$(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
+$(call byte_and_opt,ocamlmktop,$(addprefix ../boot/,$(OCAMLMKTOP_IMPORTS)) $(OCAMLMKTOP),)
 
 # Converter olabl/ocaml 2.99 to ocaml 3
 
@@ -225,8 +223,8 @@ beforedepend:: cvt_emit.ml
 # Reading cmt files
 
 READ_CMT= \
-          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+          ../boot/ocamlcommon.cma \
+          ../boot/ocamlbytecomp.cma \
           \
           cmt2annot.cmo read_cmt.cmo
 
@@ -244,8 +242,8 @@ install::
 # The bytecode disassembler
 
 DUMPOBJ= \
-          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+          ../boot/ocamlcommon.cma \
+          ../boot/ocamlbytecomp.cma \
           \
           opnames.cmo dumpobj.cmo
 
@@ -282,9 +280,9 @@ objinfo_helper.$(O): $(ROOTDIR)/runtime/caml/s.h
 objinfo_helper.$(O): \
   OC_CPPFLAGS += -I$(ROOTDIR)/runtime $(DEF_SYMBOL_PREFIX) $(BFD_CPPFLAGS)
 
-OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
-        $(ROOTDIR)/compilerlibs/ocamlmiddleend.cma \
+OBJINFO=../boot/ocamlcommon.cma \
+        ../boot/ocamlbytecomp.cma \
+        ../boot/ocamlmiddleend.cma \
         objinfo.cmo
 
 $(call byte_and_opt,ocamlobjinfo,$(OBJINFO),objinfo_helper$(EXE))
@@ -293,8 +291,8 @@ install::
 	$(INSTALL_PROG) \
 	  objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
 
-primreq=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+primreq=../boot/ocamlcommon.cma \
+        ../boot/ocamlbytecomp.cma \
         primreq.cmo
 
 # Scan object files for required primitives
@@ -319,16 +317,16 @@ clean::
 
 # Copy a bytecode executable, stripping debug info
 
-stripdebug=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+stripdebug=../boot/ocamlcommon.cma \
+           ../boot/ocamlbytecomp.cma \
            stripdebug.cmo
 
 $(call byte_and_opt,stripdebug,$(stripdebug),)
 
 # Compare two bytecode executables
 
-CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-       $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+CMPBYT=../boot/ocamlcommon.cma \
+       ../boot/ocamlbytecomp.cma \
        cmpbyt.cmo
 
 $(call byte_and_opt,cmpbyt,$(CMPBYT),)

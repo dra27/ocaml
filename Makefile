@@ -36,14 +36,10 @@ endif
 
 include stdlib/StdlibModules
 
-CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+CAMLC=$(BOOT_OCAMLC) -g -nostdlib -use-prims runtime/primitives
 CAMLOPT=$(CAMLRUN) ./ocamlopt -g -nostdlib -I stdlib -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x
-INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
-        -I lambda -I middle_end -I middle_end/closure \
-        -I middle_end/flambda -I middle_end/flambda/base_types \
-        -I asmcomp -I asmcomp/debug \
-        -I driver -I toplevel
+INCLUDES=
 
 COMPFLAGS=-strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66 \
 	  -warn-error A \
@@ -69,11 +65,11 @@ DEPINCLUDES=$(INCLUDES)
 
 OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
 
-BYTESTART=driver/main.cmo
+BYTESTART=boot/main.cmo
 
 OPTSTART=driver/optmain.cmo
 
-TOPLEVELSTART=toplevel/topstart.cmo
+TOPLEVELSTART=boot/topstart.cmo
 
 OPTTOPLEVELSTART=toplevel/opttopstart.cmo
 
@@ -138,9 +134,9 @@ beforedepend:: utils/config.ml utils/domainstate.ml utils/domainstate.mli
 coldstart:
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) \
+	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) BUILD_TO=../boot/ \
 	  CAMLC='$$(BOOT_OCAMLC) -use-prims ../runtime/primitives' all
-	cd stdlib; cp $(LIBFILES) ../boot
+#	cd stdlib; cp $(LIBFILES) ../boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
 
 # Recompile the core system using the bootstrap compiler
@@ -582,8 +578,8 @@ clean:: partialclean
 
 # The bytecode compiler
 
-ocamlc: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma $(BYTESTART)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+ocamlc: boot/ocamlcommon.cma boot/ocamlbytecomp.cma $(BYTESTART)
+	$(CAMLC) $(LINKFLAGS) -I boot -compat-32 -o $@ $^
 
 partialclean::
 	rm -rf ocamlc
@@ -600,13 +596,14 @@ partialclean::
 # The toplevel
 
 ocaml_dependencies := \
-  compilerlibs/ocamlcommon.cma \
-  compilerlibs/ocamlbytecomp.cma \
-  compilerlibs/ocamltoplevel.cma $(TOPLEVELSTART)
+  boot/ocamlcommon.cma \
+  boot/ocamlbytecomp.cma \
+  boot/ocamltoplevel.cma $(TOPLEVELSTART)
 
+$(eval $(call gen_dep,toplevel/topstart.cmo))
 .INTERMEDIATE: ocaml.tmp
 ocaml.tmp: $(ocaml_dependencies)
-	$(CAMLC) $(LINKFLAGS) -linkall -o $@ $^
+	$(CAMLC) $(LINKFLAGS) -I boot -linkall -o $@ $^
 
 ocaml: expunge ocaml.tmp
 	- $(CAMLRUN) $^ $@ $(PERVASIVES)
@@ -715,9 +712,10 @@ tools/cvt_emit: tools/cvt_emit.mll
 
 # The "expunge" utility
 
-expunge: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
-         toplevel/expunge.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+$(eval $(call gen_dep,toplevel/expunge.cmo))
+expunge: boot/ocamlcommon.cma boot/ocamlbytecomp.cma \
+         boot/expunge.cmo
+	$(CAMLC) $(LINKFLAGS) -I boot -o $@ $^
 
 partialclean::
 	rm -f expunge
@@ -771,7 +769,7 @@ clean::
 
 .PHONY: library
 library: ocamlc
-	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) all
+	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) BUILD_TO=../build/ all
 
 .PHONY: library-cross
 library-cross:
@@ -941,8 +939,14 @@ lintapidiff:
 
 # Tools
 
+build/ocamlmiddleend.cma: build/stdlib.cma build/ocamlcommon.cma build/ocamlbytecomp.cma
+
+# XXX COMBAK This should repl
+build/stdlib.cma:
+	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) BUILD_TO=../build/ all
+
 .PHONY: ocamltools
-ocamltools: ocamlc ocamllex compilerlibs/ocamlmiddleend.cma
+ocamltools: ocamlc ocamllex boot/ocamlmiddleend.cma
 	$(MAKE) -C tools all
 
 .PHONY: ocamltoolsopt
@@ -950,7 +954,7 @@ ocamltoolsopt: ocamlopt
 	$(MAKE) -C tools opt
 
 .PHONY: ocamltoolsopt.opt
-ocamltoolsopt.opt: ocamlc.opt ocamllex.opt compilerlibs/ocamlmiddleend.cmxa
+ocamltoolsopt.opt: ocamlc.opt ocamllex.opt build/ocamlmiddleend.cmxa
 	$(MAKE) -C tools opt.opt
 
 partialclean::
@@ -1013,8 +1017,9 @@ toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 bytecomp/opcodes.ml: runtime/caml/instruct.h tools/make_opcodes
 	runtime/ocamlrun tools/make_opcodes -opcodes < $< > $@
 
+.DELETE_ON_ERROR: bytecomp/opcodes.mli bytecomp/opcodes.ml
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
-	$(CAMLC) -i $< > $@
+	$(CAMLC) -I boot -i $< > $@
 
 tools/make_opcodes: tools/make_opcodes.mll
 	$(MAKE) -C tools make_opcodes
@@ -1031,15 +1036,16 @@ endif
 
 # Default rules
 
-.SUFFIXES: .ml .mli .cmo .cmi .cmx
+$(eval $(call gen_dep,driver/main.cmo))
+$(eval $(call gen_dep_cmio,driver/main.cmo))
+#boot/%.cmo: %.ml
+#	$(CAMLC) $(COMPFLAGS) -o boot/$(notdir $*).cmo -c $<
 
-.ml.cmo:
-	$(CAMLC) $(COMPFLAGS) -c $<
+#boot/%.cmi: %.mli
+#	$(CAMLC) $(COMPFLAGS) -o boot/$(notdir $*).cmi -c $<
 
-.mli.cmi:
-	$(CAMLC) $(COMPFLAGS) -c $<
 
-.ml.cmx:
+%.cmx: %.ml
 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -c $<
 
 partialclean::

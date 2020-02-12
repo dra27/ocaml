@@ -276,10 +276,41 @@ $(COMMON:.cmo=.cmx) $(BYTECOMP:.cmo=.cmx) $(OPTCOMP:.cmo=.cmx): ocamlopt
 $(OPTTOPLEVEL:.cmo=.cmx): ocamlopt
 
 
-compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
-	$(CAMLC) -a -linkall -o $@ $(COMMON)
+define gen_rule
+$1/$2: $(addprefix $1/,$(notdir $3 $4))
+	$(CAMLC) -a -linkall -o $$@ $(addprefix $1/,$(notdir $4))
+endef
+$(eval $(call gen_rule,boot,ocamlcommon.cma,$(COMMON_CMI),$(COMMON)))
+$(eval $(call gen_rule,build,ocamlcommon.cma,$(COMMON_CMI),$(COMMON)))
+#$(info $(call gen_rule,boot,ocamlcommon.cma))
 partialclean::
 	rm -f compilerlibs/ocamlcommon.cma
+
+# XXX Can the .cmo be parameters, or can parameters not appear in the replacement part?
+define gen_dep
+boot/$(notdir $1): $(1:.cmo=.ml)
+	$(CAMLC) $(COMPFLAGS) -I boot -o boot/$(notdir $1) -c $$<
+build/$(notdir $1): $(1:.cmo=.ml)
+	$(CAMLRUN) ./ocamlc $(COMPFLAGS) -I build -o build/$(notdir $1) -c $$<
+endef
+#$(info ---)
+#$(info $(call gen_dep,utils/config.cmo))
+#$(info ---)
+define gen_dep_cmio
+boot/$(notdir $(1:.cmo=.cmi)): $(1:.cmo=.mli)
+	$(CAMLC) $(COMPFLAGS) -I boot -o boot/$(notdir $(1:.cmo=.cmi)) -c $$<
+build/$(notdir $(1:.cmo=.cmi)): $(1:.cmo=.mli)
+	$(CAMLRUN) ./ocamlc $(COMPFLAGS) -I build -o build/$(notdir $(1:.cmo=.cmi)) -c $$<
+endef
+define gen_dep_cmi
+boot/$(notdir $1): $(1:.cmi=.mli)
+	$(CAMLC) $(COMPFLAGS) -I boot -o boot/$(notdir $1) -c $$<
+build/$(notdir $1): $(1:.cmi=.mli)
+	$(CAMLRUN) ./ocamlc $(COMPFLAGS) -I build -o build/$(notdir $1) -c $$<
+endef
+$(foreach cmo,$(COMMON) $(BYTECOMP) $(MIDDLE_END) $(TOPLEVEL),$(eval $(call gen_dep,$(cmo))))
+$(foreach cmo,$(COMMON) $(BYTECOMP) $(MIDDLE_END) $(TOPLEVEL),$(eval $(call gen_dep_cmio,$(cmo))))
+$(foreach cmi,$(COMMON_CMI) $(BYTECOMP_CMI) $(MIDDLE_END_CMI) $(TOPLEVEL_CMI),$(eval $(call gen_dep_cmi,$(cmi))))
 
 compilerlibs/ocamlcommon.cmxa: $(COMMON_CMI) $(COMMON:.cmo=.cmx)
 	$(CAMLOPT) -a -linkall -o $@ $(COMMON:.cmo=.cmx)
@@ -287,8 +318,8 @@ partialclean::
 	rm -f compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A)
 
 
-compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
-	$(CAMLC) -a -o $@ $(BYTECOMP)
+$(eval $(call gen_rule,boot,ocamlbytecomp.cma,$(BYTECOMP_CMI),$(BYTECOMP)))
+$(eval $(call gen_rule,build,ocamlbytecomp.cma,$(BYTECOMP_CMI),$(BYTECOMP)))
 partialclean::
 	rm -f compilerlibs/ocamlbytecomp.cma
 
@@ -298,8 +329,8 @@ partialclean::
 	rm -f compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A)
 
 
-compilerlibs/ocamlmiddleend.cma: $(MIDDLE_END_CMI) $(MIDDLE_END)
-	$(CAMLC) -a -o $@ $(MIDDLE_END)
+$(eval $(call gen_rule,boot,ocamlmiddleend.cma,$(MIDDLE_END_CMI),$(MIDDLE_END)))
+$(eval $(call gen_rule,build,ocamlmiddleend.cma,$(MIDDLE_END_CMI),$(MIDDLE_END)))
 compilerlibs/ocamlmiddleend.cmxa: $(MIDDLE_END_CMI) $(MIDDLE_END:%.cmo=%.cmx)
 	$(CAMLOPT) -a -o $@ $(MIDDLE_END:%.cmo=%.cmx)
 partialclean::
@@ -319,8 +350,7 @@ partialclean::
 	rm -f compilerlibs/ocamloptcomp.cmxa compilerlibs/ocamloptcomp.$(A)
 
 
-compilerlibs/ocamltoplevel.cma: $(TOPLEVEL_CMI) $(TOPLEVEL)
-	$(CAMLC) -a -o $@ $(TOPLEVEL)
+$(eval $(call gen_rule,boot,ocamltoplevel.cma,$(TOPLEVEL_CMI),$(TOPLEVEL)))
 partialclean::
 	rm -f compilerlibs/ocamltoplevel.cma
 

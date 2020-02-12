@@ -18,13 +18,14 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
+BUILD_TO ?= ./
 TARGET_BINDIR ?= $(BINDIR)
 
 COMPILER=$(ROOTDIR)/ocamlc
 CAMLC=$(CAMLRUN) $(COMPILER)
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
           -g -warn-error A -bin-annot -nostdlib \
-          -safe-string -strict-formats
+          -safe-string -strict-formats -I $(BUILD_TO)
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS=-O3
 else
@@ -46,20 +47,21 @@ P=stdlib__
 include StdlibModules
 
 OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
-OTHERS=$(filter-out camlinternalFormatBasics.cmo stdlib.cmo,$(OBJS))
+BUILD_OBJS=$(addprefix $(BUILD_TO),$(OBJS))
+OTHERS=$(addprefix $(BUILD_TO),$(filter-out camlinternalFormatBasics.cmo stdlib.cmo,$(OBJS)))
 
 PREFIXED_OBJS=$(filter stdlib__%.cmo,$(OBJS))
 UNPREFIXED_OBJS=$(PREFIXED_OBJS:stdlib__%.cmo=%)
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo camlheader target_camlheader camlheader_ur
+all: $(BUILD_TO)stdlib.cma $(BUILD_TO)std_exit.cmo $(BUILD_TO)camlheader $(BUILD_TO)target_camlheader $(BUILD_TO)camlheader_ur
 
 ifeq "$(RUNTIMED)" "true"
-all: camlheaderd target_camlheaderd
+all: $(BUILD_TO)camlheaderd $(BUILD_TO)target_camlheaderd
 endif
 
 ifeq "$(RUNTIMEI)" "true"
-all: camlheaderi target_camlheaderi
+all: $(BUILD_TO)camlheaderi $(BUILD_TO)target_camlheaderi
 endif
 
 .PHONY: allopt opt.opt # allopt and opt.opt are synonyms
@@ -130,7 +132,7 @@ CAMLHEADERS =\
 # The % in pattern rules must always match something, hence the slightly strange
 # patterns and $(subst ...) since `camlheader%:` wouldn't match `camlheader`
 ifeq "$(SHEBANGSCRIPTS)" "true"
-camlhead%: $(ROOTDIR)/Makefile.config Makefile
+$(BUILD_TO)camlhead%: $(ROOTDIR)/Makefile.config Makefile
 ifeq "$(LONG_SHEBANG)" "true"
 	echo '#!/bin/sh' > $@
 	echo 'exec "$(BINDIR)/ocamlrun$(subst er,,$*)" "$$0" "$$@"' >> $@
@@ -140,18 +142,18 @@ endif
 
 # TODO This does not take long shebangs into account (since TARGET_BINDIR is not
 #      yet processed by configure)
-target_%: $(ROOTDIR)/Makefile.config Makefile
+$(BUILD_TO)target_%: $(ROOTDIR)/Makefile.config Makefile
 	echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)' > $@
 
-camlheader_ur: Makefile
+$(BUILD_TO)camlheader_ur: Makefile
 	echo '#!' | tr -d '\012' > $@
 
 else # Hashbang scripts not supported
 
-$(CAMLHEADERS): $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
+$(addprefix $(BUILD_TO),$(CAMLHEADERS)): $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
-camlhead%: tmphead%.exe
+$(BUILD_TO)camlhead%: tmphead%.exe
 	rm -f $@.exe
 	mv $< $@
 
@@ -170,7 +172,7 @@ $(HEADERPROGRAM)%$(O): \
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $^
 
-camlheader_ur: camlheader
+$(BUILD_TO)camlheader_ur: $(BUILD_TO)camlheader
 	cp camlheader $@
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
@@ -193,10 +195,10 @@ endif
 
 endif # ifeq "$(SHEBANGSCRIPTS)" "true"
 
-stdlib.cma: $(OBJS)
+$(BUILD_TO)stdlib.cma: $(BUILD_OBJS)
 	$(CAMLC) -a -o $@ $^
 
-stdlib.cmxa: $(OBJS:.cmo=.cmx)
+$(BUILD_TO)stdlib.cmxa: $(BUILD_OBJS:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 
 sys.ml: $(ROOTDIR)/VERSION sys.mlp
@@ -213,16 +215,16 @@ clean::
 
 export AWK
 
-%.cmi: %.mli
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
-
-stdlib__%.cmi: %.mli
+$(BUILD_TO)%.cmi: %.mli
 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -o $@ -c $<
 
-%.cmo: %.ml
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+$(BUILD_TO)stdlib__%.cmi: %.mli
+	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -o $@ -c $<
 
-stdlib__%.cmo: %.ml
+$(BUILD_TO)%.cmo: %.ml
+	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -o $@ -c $<
+
+$(BUILD_TO)stdlib__%.cmo: %.ml
 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -o $@ -c $<
 
 %.cmx: %.ml
@@ -234,16 +236,16 @@ stdlib__%.cmx: %.ml
 
 # Dependencies on the compiler
 COMPILER_DEPS=$(filter-out -use-prims $(CAMLRUN), $(CAMLC))
-$(OBJS) std_exit.cmo: $(COMPILER_DEPS)
-$(OBJS:.cmo=.cmi) std_exit.cmi: $(COMPILER_DEPS)
-$(OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
+$(BUILD_OBJS) $(BUILD_TO)std_exit.cmo: $(COMPILER_DEPS)
+$(BUILD_OBJS:.cmo=.cmi) $(BUILD_TO)std_exit.cmi: $(COMPILER_DEPS)
+$(BUILD_OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
 
 # Dependencies on Stdlib (not tracked by ocamlc -depend)
 
-$(OTHERS) std_exit.cmo: stdlib.cmi
-$(OTHERS:.cmo=.cmi) std_exit.cmi: stdlib.cmi
-$(OBJS:.cmo=.cmx) std_exit.cmx: stdlib.cmi
-$(OTHERS:.cmo=.cmx) std_exit.cmx: stdlib.cmx
+$(OTHERS) $(BUILD_TO)std_exit.cmo: $(BUILD_TO)stdlib.cmi
+$(OTHERS:.cmo=.cmi) $(BUILD_TO)std_exit.cmi: $(BUILD_TO)stdlib.cmi
+$(BUILD_OBJS:.cmo=.cmx) $(BUILD_TO)std_exit.cmx: $(BUILD_TO)stdlib.cmi
+$(OTHERS:.cmo=.cmx) $(BUILD_TO)std_exit.cmx: $(BUILD_TO)stdlib.cmx
 
 clean::
 	rm -f *.cm* *.$(O) *.$(A) *.odoc
