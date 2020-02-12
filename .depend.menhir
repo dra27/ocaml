@@ -8,4 +8,5 @@ parsing/parser.cmx : parsing/syntaxerr.cmx parsing/parsetree.cmi \
     parsing/parser.cmi
 parsing/parser.cmi : parsing/parsetree.cmi parsing/location.cmi \
     parsing/docstrings.cmi
-parsing/parser.ml parsing/parser.mli: parsing/ast_helper.cmi parsing/asttypes.cmi utils/clflags.cmi parsing/docstrings.cmi parsing/location.cmi parsing/longident.cmi parsing/parsetree.cmi parsing/syntaxerr.cmi
+# XXX COMBAK
+parsing/parser.ml parsing/parser.mli: boot/ast_helper.cmi boot/asttypes.cmi boot/clflags.cmi boot/docstrings.cmi boot/location.cmi boot/longident.cmi boot/parsetree.cmi boot/syntaxerr.cmi
