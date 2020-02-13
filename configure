@@ -16763,11 +16763,12 @@ else
   ocamldoc=ocamldoc
 fi
 
-if test x"$enable_ocamltest" = "xno"; then :
-  ocamltest=""
-else
-  ocamltest=ocamltest
-fi
+case $enable_ocamltest,4.10.3+dev0-2020-12-08 in #(
+  yes,*|,*+dev*) :
+    ocamltest='ocamltest' ;; #(
+  *) :
+    ocamltest='' ;;
+esac
 
 if test x"$enable_flambda" = "xyes"; then :
   flambda=true
