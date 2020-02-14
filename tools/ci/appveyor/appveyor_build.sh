@@ -65,10 +65,10 @@ function set_configuration {
 
     mkdir -p "$CACHE_DIRECTORY"
     ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $build $host --prefix="$2" || ( \
+                $build $host --prefix="$2" --enable-ocamltest || ( \
       rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
       ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $build $host --prefix="$2" )
+                  $build $host --prefix="$2" --enable-ocamltest )
 
     FILE=$(pwd | cygpath -f - -m)/Makefile.config
     echo "Edit $FILE to turn C compiler warnings into errors"
