@@ -19,6 +19,10 @@ OCaml 4.09 maintenance branch
   revise generation of config/util.ml to better quote special characters
   (Xavier Leroy, review by David Allsopp)
 
+- #9250: Add --disable-ocamltest to configure and disable building for
+  non-development builds.
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #9383: Don't assume that AWKPATH includes .
   (David Allsopp, report by Ian Zimmerman)
 
