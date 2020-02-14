@@ -728,6 +728,7 @@ libbfd_include
 x_libraries
 x_includes
 pthread_link
+ocamltest
 ocamldoc
 with_camltex
 with_debugger
@@ -837,6 +838,7 @@ enable_str_lib
 enable_unix_lib
 enable_bigarray_lib
 enable_ocamldoc
+enable_ocamltest
 enable_frame_pointers
 enable_naked_pointers
 enable_spacetime
@@ -1511,6 +1513,7 @@ Optional Features:
   --disable-unix-lib      do not build the unix library
   --disable-bigarray-lib  do not build the legacy separate bigarray library
   --disable-ocamldoc      do not build the ocamldoc documentation system
+  --disable-ocamltest     do not build the ocamltest driver
   --enable-frame-pointers use frame pointers in runtime and generated code
   --disable-naked-pointers
                           do not allow naked pointers
@@ -2793,7 +2796,9 @@ VERSION=4.08.2+dev0
 
 
 
+
  # TODO: rename this variable
+
 
 
 
@@ -3059,6 +3064,12 @@ if test "${enable_ocamldoc+set}" = set; then :
   enableval=$enable_ocamldoc;
 else
   ocamldoc=auto
+fi
+
+
+# Check whether --enable-ocamltest was given.
+if test "${enable_ocamltest+set}" = set; then :
+  enableval=$enable_ocamltest;
 fi
 
 
@@ -17231,6 +17242,13 @@ if test x"$enable_ocamldoc" = "xno"; then :
 else
   ocamldoc=ocamldoc
 fi
+
+case $enable_ocamltest,4.08.2+dev0 in #(
+  yes,*|,*+dev*) :
+    ocamltest='ocamltest' ;; #(
+  *) :
+    ocamltest='' ;;
+esac
 
 if test x"$enable_flambda" = "xyes"; then :
   flambda=true
