@@ -456,7 +456,7 @@ endif
 	$(MAKE) otherlibrariesopt
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
 	  ocamltest.opt
-ifneq "$(WITH_OCAMLDOC)" ""
+ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) manpages
 endif
 
@@ -486,7 +486,7 @@ coreboot:
 all: coreall
 	$(MAKE) ocaml
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) ocamltest
-ifneq "$(WITH_OCAMLDOC)" ""
+ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) manpages
 endif
 
