@@ -12,6 +12,12 @@ OCaml 4.08 maintenance branch:
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+### Internal/compiler-libs changes:
+
+- #9414: testsuite, ocamltest: keep test artifacts only on failure.
+  Use KEEP_TEST_DIR_ON_SUCCESS=1 to keep all artifacts.
+  (Gabriel Scherer, review by Sébastien Hinderer)
+
 ### Build system:
 
 - #8650: ensure that "make" variables are defined before use;

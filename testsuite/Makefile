@@ -62,6 +62,29 @@ else
                                $(ocamltest_program)
 endif
 
+# PROMOTE is only meant to be used internally in recursive calls;
+# users should call the 'promote' target explicitly.
+PROMOTE =
+ifeq "$(PROMOTE)" ""
+  OCAMLTEST_PROMOTE_FLAG :=
+else
+  OCAMLTEST_PROMOTE_FLAG := -promote
+endif
+
+# KEEP_TEST_DIR_ON_SUCCESS should be set by the user (to a non-empty value)
+# if they want to pass the -keep-test-dir-on-success option to ocamltest,
+# to preserve test data of succesful tests.
+KEEP_TEST_DIR_ON_SUCCESS ?=
+ifeq "$(KEEP_TEST_DIR_ON_SUCCESS)" ""
+  OCAMLTEST_KEEP_TEST_DIR_ON_SUCCESS_FLAG :=
+else
+  OCAMLTEST_KEEP_TEST_DIR_ON_SUCCESS_FLAG := -keep-test-dir-on-success
+endif
+
+OCAMLTESTFLAGS := \
+  $(OCAMLTEST_PROMOTE_FLAG) \
+  $(OCAMLTEST_KEEP_TEST_DIR_ON_SUCCESS_FLAG)
+
 .PHONY: default
 default:
 	@echo "Available targets:"
@@ -117,7 +140,7 @@ new-without-report: lib tools
 	  dir=`dirname $$file`; \
 	  echo Running tests from \'$$dir\' ... ; \
 	  $(MAKE) exec-ocamltest DIR=$$dir \
-	    OCAMLTESTENV="" OCAMLTESTFLAGS=""; \
+	    OCAMLTESTENV=""; \
 	done || echo outer loop >> $(failstamp)) 2>&1 | tee -a $(TESTLOG)
 	@$(MAKE) check-failstamp
 
@@ -222,8 +245,7 @@ exec-one:
 	elif [ -f $(DIR)/ocamltests ] && [ -z $(LEGACY) ] ; then \
 	  echo "Running tests from '$$DIR' ..."; \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
-	    OCAMLTESTFLAGS=""; \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)"; \
 	fi
 
 .PHONY: exec-ocamltest
@@ -262,7 +284,7 @@ promote:
 	@if [ -f $(DIR)/ocamltests ]; then \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
 	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
-	    OCAMLTESTFLAGS="-promote"; \
+	    PROMOTE="true"; \
 	else \
 	  cd $(DIR) && $(MAKE) TERM=dumb BASEDIR=$(BASEDIR) promote; \
 	fi
