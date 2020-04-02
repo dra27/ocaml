@@ -49,6 +49,8 @@ let log_to_stderr = ref false
 
 let promote = ref false
 
+let keep_test_dir_on_success = ref false
+
 let commandline_options =
 [
   ("-e", Arg.Set log_to_stderr, "Log to stderr instead of a file.");
@@ -57,6 +59,8 @@ let commandline_options =
   ("-show-actions", Arg.Unit show_actions, "Show available actions.");
   ("-show-tests", Arg.Unit show_tests, "Show available tests.");
   ("-show-variables", Arg.Unit show_variables, "Show available variables.");
+  ("-keep-test-dir-on-success", Arg.Set keep_test_dir_on_success,
+   " Keep the test directory (with the generated test artefacts) on success.");
 ]
 
 let files_to_test = ref []
