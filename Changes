@@ -24,6 +24,10 @@ OCaml 4.09 maintenance branch
   revise generation of config/util.ml to better quote special characters
   (Xavier Leroy, review by David Allsopp)
 
+- #9068, #9437: Call the assembler through the C compiler driver on all
+  architectures on FreeBSD.
+  (Xavier Leroy, report by Hannes Mehnert, review by Sébastien Hinderer)
+
 - #9383: Don't assume that AWKPATH includes .
   (David Allsopp, report by Ian Zimmerman)
 
