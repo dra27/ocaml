@@ -3,6 +3,10 @@ OCaml 4.09 maintenance branch
 
 ### Build system:
 
+- #9068, #9437: Call the assembler through the C compiler driver on all
+  architectures on FreeBSD.
+  (Xavier Leroy, report by Hannes Mehnert, review by Sébastien Hinderer)
+
 - #9383: Don't assume that AWKPATH includes .
   (David Allsopp, report by Ian Zimmerman)
 
