@@ -15,8 +15,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 DYNLINKDIR=$(ROOTDIR)/otherlibs/dynlink
 UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
@@ -86,7 +86,7 @@ install:
 	$(INSTALL_PROG) ocamldebug$(EXE) "$(INSTALL_BINDIR)/ocamldebug$(EXE)"
 
 clean::
-	rm -f ocamldebug$(EXE)
+	rm -f ocamldebug ocamldebug.exe
 	rm -f *.cmo *.cmi
 
 .SUFFIXES:
