@@ -17,8 +17,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
@@ -51,7 +51,7 @@ ocamllex.opt: $(OBJS:.cmo=.cmx)
 
 clean::
 	rm -f ocamllex ocamllex.opt
-	rm -f *.cmo *.cmi *.cmx *.cmt *.cmti *.$(O) *~
+	rm -f *.cmo *.cmi *.cmx *.cmt *.cmti *.o *.obj *~
 
 parser.ml parser.mli: parser.mly
 	$(CAMLYACC) $(YACCFLAGS) parser.mly
