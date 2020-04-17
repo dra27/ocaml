@@ -159,13 +159,15 @@ CC_PROFILE=@cc_profile@
 
 ### Which libraries to compile and install
 # Currently available:
-#       unix            Unix system calls
-#       str             Regular expressions and high-level string processing
-#       threads         Lightweight concurrent processes
-#       systhreads      Same as threads, requires POSIX threads
-#       graph           Portable drawing primitives for X11
-#       dynlink         Dynamic linking of bytecode
-#       bigarray        Large, multidimensional numerical arrays
+#       bigarray          Large, multidimensional numerical arrays
+#                           (legacy support: this library is now part of the
+#                            Standard Library)
+#       dynlink           Dynamic linking (bytecode and native)
+#       raw_spacetime_lib Parsing of spacetime traces
+#       str               Regular expressions and high-level string processing
+#       systhreads        Same as threads, requires POSIX threads
+#       threads           Lightweight concurrent processes
+#       (win32)unix       Unix system calls
 OTHERLIBRARIES=@otherlibraries@
 
 ### Link-time options to ocamlc or ocamlopt for linking with POSIX threads

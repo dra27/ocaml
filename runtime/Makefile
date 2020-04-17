@@ -15,8 +15,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 # Lists of source files
 
@@ -217,7 +217,9 @@ endif
 
 .PHONY: clean
 clean:
-	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO) ld.conf
+	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
+	rm -f ocamlrun ocamlrund ocamlruni
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe
 	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
 	rm -f caml/version.h
 
