@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+.NOTPARALLEL:
+
 .PHONY: compile
 compile: compile-targets
 
