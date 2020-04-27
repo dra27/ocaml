@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest a new feature for OCaml.
 title: ''
-labels: ''
+labels: 'feature-wish'
 assignees: ''
 
 ---
