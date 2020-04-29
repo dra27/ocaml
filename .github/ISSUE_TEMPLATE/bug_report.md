@@ -21,7 +21,8 @@ If your error came from the OCaml package manager, opam, (messages beginning
 `[ERROR] The compilation of ...`), please start at
 https://github.com/ocaml/opam-repository/issues/new.
 
-Some libraries which used to be part of OCaml are now maintained separately.
-Please post questions about the Graphics library on Discuss or at
-https://github.com/ocaml/graphics/issues.
+Some libraries and tools which used to be part of OCaml are now maintained
+separately. Please post questions about Graphics, Num, camlp4, LablTk, CamlDBM
+or OCamlTopWin on Discuss or on their respective issue trackers (see README.adoc
+for a full list).
 -->
