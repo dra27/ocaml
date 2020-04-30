@@ -23,6 +23,6 @@ https://github.com/ocaml/opam-repository/issues/new.
 
 Some libraries and tools which used to be part of OCaml are now maintained
 separately. Please post questions about Graphics, Num, camlp4, LablTk, CamlDBM
-or OCamlTopWin on Discuss or on their respective issue trackers (see README.adoc
+or OCamlTopWin on Discuss or on their respective issue trackers (see [README.adoc](https://github.com/ocaml/ocaml/blob/trunk/README.adoc#separately-maintained-components)
 for a full list).
 -->
