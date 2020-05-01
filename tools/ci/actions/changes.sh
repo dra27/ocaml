@@ -32,6 +32,15 @@ echo "\$1 = $1"
 echo "\$2 = $2"
 TRAVIS_CUR_HEAD="$1"
 TRAVIS_PR_HEAD="$2"
+# XXX Directly lifted from travis-ci test - should be shared (or moved?!)
+     DEEPEN=50
+     while ! git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD" >& /dev/null
+     do
+       echo "Deepening $TRAVIS_BRANCH by $DEEPEN commits"
+       git fetch origin --deepen=$DEEPEN "$TRAVIS_BRANCH"
+       ((DEEPEN*=2))
+     done
+     TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD");;
 TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
 echo "\$TRAVIS_MERGE_BASE = $TRAVIS_MERGE_BASE"
 
