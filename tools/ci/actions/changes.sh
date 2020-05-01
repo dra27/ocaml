@@ -43,8 +43,6 @@ TRAVIS_PR_HEAD="$2"
 TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
 echo "\$TRAVIS_MERGE_BASE = $TRAVIS_MERGE_BASE"
 
-git log -10
-
 # XXX This goes at the start really!
 set -e
 
