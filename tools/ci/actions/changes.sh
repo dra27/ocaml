@@ -27,9 +27,14 @@
 #on the github pull request.
 #------------------------------------------------------------------------
 
+echo "\$1 = $1"
+echo "\$2 = $2"
 TRAVIS_CUR_HEAD="$1"
 TRAVIS_PR_HEAD="$2"
 TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
+echo "\$TRAVIS_MERGE_BASE = $TRAVIS_MERGE_BASE"
+
+git log -10
 
 CheckNoChangesMessage () {
   if [[ -n $(git log --grep='[Nn]o [Cc]hange.* needed' --max-count=1 \
