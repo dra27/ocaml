@@ -16,9 +16,7 @@
 # This makefile contains common definitions shared by other Makefiles
 # We assume that Makefile.config has already been included
 
-INSTALL ?= @INSTALL@
-INSTALL_DATA ?= $(INSTALL) -m u=rw,g=rw,o=r
-INSTALL_PROG ?= $(INSTALL) -m u=rwx,g=rwx,o=rx
+-include $(ROOTDIR)/Makefile.build_config
 
 # note: these are defined by lazy expansions
 # as some parts of the makefiles change BINDIR, etc.
