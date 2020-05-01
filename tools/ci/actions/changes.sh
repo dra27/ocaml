@@ -1,5 +1,4 @@
-#!/bin/sh
-# XXX Restore the -e above at the end
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
@@ -40,13 +39,13 @@ TRAVIS_PR_HEAD="$2"
        git fetch origin --deepen=$DEEPEN "$TRAVIS_BRANCH"
        ((DEEPEN*=2))
      done
-     TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD");;
+     TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
 TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
 echo "\$TRAVIS_MERGE_BASE = $TRAVIS_MERGE_BASE"
 
 git log -10
 
-# XXX This goes sat the end
+# XXX This goes at the start really!
 set -e
 
 CheckNoChangesMessage () {
