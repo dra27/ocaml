@@ -15,6 +15,8 @@
 
 # The main Makefile
 
+# Here is my crazy unedited thang
+
 ROOTDIR = .
 
 # The configure and *clean targets can all be run without running ./configure
