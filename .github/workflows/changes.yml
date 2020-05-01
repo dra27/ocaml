@@ -1,0 +1,16 @@
+name: Changes Entry
+on: [pull_request]
+
+jobs:
+  build:
+    name: Changes
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-change-entry-needed') }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: >-
+          tools/ci/actions/changes.sh
+            ${{ github.event.pull_request.base.sha }}
+            ${{ github.event.pull_request.head.sha }}
