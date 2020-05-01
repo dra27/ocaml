@@ -1,4 +1,5 @@
-#!/bin/sh -e
+#!/bin/sh
+# XXX Restore the -e above at the end
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
@@ -35,6 +36,9 @@ TRAVIS_MERGE_BASE=$(git merge-base "$TRAVIS_CUR_HEAD" "$TRAVIS_PR_HEAD")
 echo "\$TRAVIS_MERGE_BASE = $TRAVIS_MERGE_BASE"
 
 git log -10
+
+# XXX This goes sat the end
+set -e
 
 CheckNoChangesMessage () {
   if [[ -n $(git log --grep='[Nn]o [Cc]hange.* needed' --max-count=1 \

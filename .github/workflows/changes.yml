@@ -10,7 +10,4 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - run: >-
-          tools/ci/actions/changes.sh
-            ${{ github.event.pull_request.base.sha }}
-            ${{ github.event.pull_request.head.sha }}
+      - run: tools/ci/actions/changes.sh ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
