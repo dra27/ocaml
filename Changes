@@ -12,6 +12,12 @@ OCaml 4.08 maintenance branch:
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+### Code generation and optimizations:
+
+- #9549, #9557: Make -flarge-toc the default for PowerPC and introduce
+  -fsmall-toc to enable the previous behaviour.
+  (David Allsopp, report by Nathaniel Wesley Filardo, review by Xavier Leroy)
+
 ### Internal/compiler-libs changes:
 
 - #9414: testsuite, ocamltest: keep test artifacts only on failure.
