@@ -454,7 +454,8 @@ typing/cmt2annot.cmo : \
     typing/env.cmi \
     file_formats/cmt_format.cmi \
     parsing/asttypes.cmi \
-    typing/annot.cmi
+    typing/annot.cmi \
+    typing/cmt2annot.cmi
 typing/cmt2annot.cmx : \
     typing/types.cmx \
     typing/typedtree.cmx \
@@ -468,7 +469,13 @@ typing/cmt2annot.cmx : \
     typing/env.cmx \
     file_formats/cmt_format.cmx \
     parsing/asttypes.cmi \
-    typing/annot.cmi
+    typing/annot.cmi \
+    typing/cmt2annot.cmi
+typing/cmt2annot.cmi : \
+    typing/typedtree.cmi \
+    typing/tast_iterator.cmi \
+    parsing/location.cmi \
+    file_formats/cmt_format.cmi
 typing/ctype.cmo : \
     typing/types.cmi \
     typing/type_immediacy.cmi \
@@ -1479,7 +1486,7 @@ typing/typemod.cmo : \
     typing/ctype.cmi \
     utils/config.cmi \
     file_formats/cmt_format.cmi \
-    typing/cmt2annot.cmo \
+    typing/cmt2annot.cmi \
     file_formats/cmi_format.cmi \
     utils/clflags.cmi \
     parsing/builtin_attributes.cmi \
