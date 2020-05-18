@@ -1028,15 +1028,13 @@ endif
 
 # Default rules
 
-.SUFFIXES: .ml .mli .cmo .cmi .cmx
-
-.ml.cmo:
+%.cmo: %.ml
 	$(CAMLC) $(COMPFLAGS) -c $<
 
-.mli.cmi:
+%.cmi: %.mli
 	$(CAMLC) $(COMPFLAGS) -c $<
 
-.ml.cmx:
+%.cmx: %.ml
 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -c $<
 
 partialclean::
