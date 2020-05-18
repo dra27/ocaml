@@ -2213,28 +2213,23 @@ asmcomp/branch_relaxation.cmo : \
     asmcomp/mach.cmi \
     asmcomp/linear.cmi \
     asmcomp/cmm.cmi \
-    asmcomp/branch_relaxation_intf.cmo \
+    asmcomp/branch_relaxation_intf.cmi \
     asmcomp/branch_relaxation.cmi
 asmcomp/branch_relaxation.cmx : \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     asmcomp/linear.cmx \
     asmcomp/cmm.cmx \
-    asmcomp/branch_relaxation_intf.cmx \
+    asmcomp/branch_relaxation_intf.cmi \
     asmcomp/branch_relaxation.cmi
 asmcomp/branch_relaxation.cmi : \
     asmcomp/linear.cmi \
-    asmcomp/branch_relaxation_intf.cmo
-asmcomp/branch_relaxation_intf.cmo : \
+    asmcomp/branch_relaxation_intf.cmi
+asmcomp/branch_relaxation_intf.cmi : \
     asmcomp/linear.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
     asmcomp/arch.cmo
-asmcomp/branch_relaxation_intf.cmx : \
-    asmcomp/linear.cmx \
-    lambda/debuginfo.cmx \
-    asmcomp/cmm.cmx \
-    asmcomp/arch.cmx
 asmcomp/cmm.cmo : \
     utils/targetint.cmi \
     lambda/lambda.cmi \
@@ -5647,7 +5642,7 @@ asmcomp/debug/compute_ranges.cmo : \
     utils/misc.cmi \
     asmcomp/linear.cmi \
     utils/int_replace_polymorphic_compare.cmi \
-    asmcomp/debug/compute_ranges_intf.cmo \
+    asmcomp/debug/compute_ranges_intf.cmi \
     asmcomp/cmm.cmi \
     asmcomp/debug/compute_ranges.cmi
 asmcomp/debug/compute_ranges.cmx : \
@@ -5656,19 +5651,15 @@ asmcomp/debug/compute_ranges.cmx : \
     utils/misc.cmx \
     asmcomp/linear.cmx \
     utils/int_replace_polymorphic_compare.cmx \
-    asmcomp/debug/compute_ranges_intf.cmx \
+    asmcomp/debug/compute_ranges_intf.cmi \
     asmcomp/cmm.cmx \
     asmcomp/debug/compute_ranges.cmi
 asmcomp/debug/compute_ranges.cmi : \
-    asmcomp/debug/compute_ranges_intf.cmo
-asmcomp/debug/compute_ranges_intf.cmo : \
+    asmcomp/debug/compute_ranges_intf.cmi
+asmcomp/debug/compute_ranges_intf.cmi : \
     utils/numbers.cmi \
     asmcomp/linear.cmi \
     utils/identifiable.cmi
-asmcomp/debug/compute_ranges_intf.cmx : \
-    utils/numbers.cmx \
-    asmcomp/linear.cmx \
-    utils/identifiable.cmx
 asmcomp/debug/reg_availability_set.cmo : \
     asmcomp/debug/reg_with_debug_info.cmi \
     middle_end/backend_var.cmi \

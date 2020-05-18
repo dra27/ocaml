@@ -146,15 +146,16 @@ ASMCOMP=\
   asmcomp/deadcode.cmo \
   asmcomp/linear.cmo asmcomp/printlinear.cmo asmcomp/linearize.cmo \
   asmcomp/debug/available_regs.cmo \
-  asmcomp/debug/compute_ranges_intf.cmo \
   asmcomp/debug/compute_ranges.cmo \
   asmcomp/schedgen.cmo asmcomp/scheduling.cmo \
-  asmcomp/branch_relaxation_intf.cmo \
   asmcomp/branch_relaxation.cmo \
   asmcomp/emitaux.cmo asmcomp/emit.cmo asmcomp/asmgen.cmo \
   asmcomp/asmlink.cmo asmcomp/asmlibrarian.cmo asmcomp/asmpackager.cmo \
   driver/opterrors.cmo driver/optcompile.cmo
-ASMCOMP_CMI=$(ARCH_SPECIFIC_ASMCOMP_CMI)
+ASMCOMP_CMI=\
+  asmcomp/branch_relaxation_intf.cmi \
+  asmcomp/debug/compute_ranges_intf.cmi \
+  $(ARCH_SPECIFIC_ASMCOMP_CMI)
 
 # Files under middle_end/ are not to reference files under asmcomp/.
 # This ensures that the middle end can be linked (e.g. for objinfo) even when
