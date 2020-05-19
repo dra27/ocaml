@@ -172,10 +172,6 @@ OCAMLMKTOP_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo \
 
 $(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
 
-# Converter olabl/ocaml 2.99 to ocaml 3
-
-LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
-
 ifeq ($(UNIX_OR_WIN32),unix)
 LN := ln -sf
 else
