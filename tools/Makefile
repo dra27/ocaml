@@ -247,6 +247,8 @@ DUMPOBJ= \
 
 $(call byte_and_opt,dumpobj,$(DUMPOBJ),)
 
+# The "make_opcodes" utility
+
 make_opcodes: make_opcodes.ml
 	$(CAMLC) make_opcodes.ml -o $@
 
