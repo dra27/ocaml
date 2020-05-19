@@ -6200,9 +6200,12 @@ toplevel/opttopmain.cmx : \
     toplevel/opttopmain.cmi
 toplevel/opttopmain.cmi :
 toplevel/opttopstart.cmo : \
-    toplevel/opttopmain.cmi
+    toplevel/opttopmain.cmi \
+    toplevel/opttopstart.cmi
 toplevel/opttopstart.cmx : \
-    toplevel/opttopmain.cmx
+    toplevel/opttopmain.cmx \
+    toplevel/opttopstart.cmi
+toplevel/opttopstart.cmi :
 toplevel/topdirs.cmo : \
     utils/warnings.cmi \
     typing/types.cmi \
@@ -6380,9 +6383,12 @@ toplevel/topmain.cmx : \
     toplevel/topmain.cmi
 toplevel/topmain.cmi :
 toplevel/topstart.cmo : \
-    toplevel/topmain.cmi
+    toplevel/topmain.cmi \
+    toplevel/topstart.cmi
 toplevel/topstart.cmx : \
-    toplevel/topmain.cmx
+    toplevel/topmain.cmx \
+    toplevel/topstart.cmi
+toplevel/topstart.cmi :
 toplevel/trace.cmo : \
     typing/types.cmi \
     toplevel/toploop.cmi \

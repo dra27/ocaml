@@ -260,9 +260,6 @@ _build
 /tools/caml-tex
 /tools/eventlog_metadata
 
-/toplevel/opttopstart.mli
-/toplevel/topstart.mli
-
 /utils/config.ml
 /utils/domainstate.ml
 /utils/domainstate.mli

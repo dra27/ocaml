@@ -615,7 +615,7 @@ toplevel/%start.mli:
 	touch $@
 
 partialclean::
-	rm -f ocaml toplevel/topstart.mli
+	rm -f ocaml
 
 .PHONY: runtop
 runtop:
@@ -997,7 +997,7 @@ ocamlnat$(EXE): compilerlibs/ocamlcommon.cmxa compilerlibs/ocamloptcomp.cmxa \
 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -o $@ $^
 
 partialclean::
-	rm -f ocamlnat ocamlnat.exe toplevel/opttopstart.mli
+	rm -f ocamlnat ocamlnat.exe
 
 toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 
