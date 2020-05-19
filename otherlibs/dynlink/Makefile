@@ -270,11 +270,12 @@ DEPEND_DUMMY_FILES=\
   byte/dynlink.mli \
   native/dynlink.mli
 
+DEP_FLAGS=-I dynlink_compilerlibs -slash
 depend: beforedepend
 	touch $(DEPEND_DUMMY_FILES)
-	$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash \
+	$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend $(DEP_FLAGS) \
 	  -I byte -bytecode *.mli *.ml byte/dynlink.ml > .depend
-	$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash \
+	$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend $(DEP_FLAGS) \
 	  -I native -native *.ml native/dynlink.ml >> .depend
 	rm -f $(DEPEND_DUMMY_FILES)
 
