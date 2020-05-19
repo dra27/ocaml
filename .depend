@@ -6004,18 +6004,6 @@ driver/pparse.cmx : \
     driver/pparse.cmi
 driver/pparse.cmi : \
     parsing/parsetree.cmi
-toplevel/expunge.cmo : \
-    bytecomp/symtable.cmi \
-    lambda/runtimedef.cmi \
-    utils/misc.cmi \
-    typing/ident.cmi \
-    bytecomp/bytesections.cmi
-toplevel/expunge.cmx : \
-    bytecomp/symtable.cmx \
-    lambda/runtimedef.cmx \
-    utils/misc.cmx \
-    typing/ident.cmx \
-    bytecomp/bytesections.cmx
 toplevel/genprintval.cmo : \
     typing/types.cmi \
     parsing/syntaxerr.cmi \

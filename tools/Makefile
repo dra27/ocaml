@@ -262,6 +262,19 @@ clean::
 
 beforedepend:: opnames.ml
 
+# The "expunge" utility
+
+expunge: $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+         expunge.cmo
+	$(CAMLC) $(LINKFLAGS) -o $@ $^
+
+install::
+	$(INSTALL_PROG) expunge "$(INSTALL_LIBDIR)/expunge$(EXE)"
+
+clean::
+	rm -f expunge
+
 # Display info on compiled files
 
 DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'

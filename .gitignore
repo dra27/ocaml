@@ -50,7 +50,6 @@ _build
 /config.status
 /libtool
 /ocamlc.opt
-/expunge
 /ocaml
 /ocamlopt
 /ocamlopt.opt
@@ -220,6 +219,7 @@ _build
 /testsuite/tools/parsecmm.ml
 /testsuite/tools/parsecmm.mli
 
+/tools/expunge
 /tools/ocamldep
 /tools/ocamldep.opt
 /tools/ocamldep.bak
@@ -259,6 +259,9 @@ _build
 /tools/make_opcodes.ml
 /tools/caml-tex
 /tools/eventlog_metadata
+
+/toplevel/opttopstart.mli
+/toplevel/topstart.mli
 
 /utils/config.ml
 /utils/domainstate.ml

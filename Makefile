@@ -380,7 +380,6 @@ endif
 	$(INSTALL_DATA) \
 	   $(BYTESTART) $(TOPLEVELSTART) \
 	   "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_PROG) expunge "$(INSTALL_LIBDIR)/expunge$(EXE)"
 	$(INSTALL_DATA) \
 	   toplevel/topdirs.cmi \
 	   "$(INSTALL_LIBDIR)"
@@ -606,11 +605,17 @@ ocaml_dependencies := \
 ocaml.tmp: $(ocaml_dependencies)
 	$(CAMLC) $(LINKFLAGS) -linkall -o $@ $^
 
-ocaml: expunge ocaml.tmp
+ocaml: tools/expunge ocaml.tmp
 	- $(CAMLRUN) $^ $@ $(PERVASIVES)
 
+tools/expunge: tools/expunge.ml
+	$(MAKE) -C tools expunge
+
+toplevel/%start.mli:
+	touch $@
+
 partialclean::
-	rm -f ocaml
+	rm -f ocaml toplevel/topstart.mli
 
 .PHONY: runtop
 runtop:
@@ -710,15 +715,6 @@ beforedepend:: asmcomp/emit.ml
 
 tools/cvt_emit: tools/cvt_emit.mll
 	$(MAKE) -C tools cvt_emit
-
-# The "expunge" utility
-
-expunge: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
-         toplevel/expunge.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
-
-partialclean::
-	rm -f expunge
 
 # The runtime system for the bytecode compiler
 
@@ -1001,7 +997,7 @@ ocamlnat$(EXE): compilerlibs/ocamlcommon.cmxa compilerlibs/ocamloptcomp.cmxa \
 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -o $@ $^
 
 partialclean::
-	rm -f ocamlnat ocamlnat.exe
+	rm -f ocamlnat ocamlnat.exe toplevel/opttopstart.mli
 
 toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 
