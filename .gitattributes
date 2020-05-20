@@ -74,7 +74,7 @@ tools/mantis2gh_stripped.csv typo.missing-header
 # Makefiles may contain tabs
 Makefile*                typo.tab=may
 
-asmcomp/*/emit.mlp       typo.tab=may typo.long-line=may
+asmcomp/*/emit.ml       typo.tab=may typo.long-line=may
 
 # The build-aux directory contains bundled files so do not check it
 build-aux                typo.prune

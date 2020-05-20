@@ -701,17 +701,16 @@ asmcomp/$1: asmcomp/$$(ARCH)/$1 $(ARCH_COOKIE)
 	rm -f asmcomp/$(subst .ml,.cm*,$(1:.mli=.ml))
 endef
 
-$(foreach file,arch.ml proc.ml selection.ml CSE.ml reload.ml scheduling.ml, \
+$(foreach file,arch.ml proc.ml selection.ml CSE.ml \
+               reload.ml scheduling.ml emit.ml, \
                $(eval $(call LINK_ARCH_FILE,$(file))))
 
 # Preprocess the code emitters
 
-.DELETE_ON_ERROR: asmcomp/emit.ml
-asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp tools/cvt_emit $(ARCH_COOKIE)
-	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
-	$(CAMLRUN) tools/cvt_emit < $< >> $@
+asmcomp/emit.cmo: tools/cvt_emit
+asmcomp/emit.cmo: COMPFLAGS += -pp "$(CAMLRUN) tools/cvt_emit"
 
-tools/cvt_emit: tools/cvt_emit.mll
+tools/cvt_emit: tools/cvt_emit.mll runtime/primitives
 	$(MAKE) -C tools cvt_emit
 
 # The runtime system for the bytecode compiler
@@ -1054,8 +1053,11 @@ $(foreach dir,utils parsing typing bytecomp asmcomp middle_end lambda \
               middle_end/flambda/base_types asmcomp/debug driver toplevel, \
               $(eval $(call BUILD_DEP,$(dir))))
 
-asmcomp/.depend: $(ARCH_SPECIFIC) $(ARCH_COOKIE)
-	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) $(ARCH_SPECIFIC) > $@
+asmcomp/.depend: $(ARCH_SPECIFIC) $(ARCH_COOKIE) tools/cvt_emit
+	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) \
+                   $(filter-out asmcomp/emit.ml,$(ARCH_SPECIFIC)) > $@
+	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) -pp "$(CAMLRUN) tools/cvt_emit" \
+                   asmcomp/emit.ml >> $@
 
 partialclean::
 	rm -f asmcomp/.depend

@@ -80,7 +80,7 @@ and command = parse
           command lexbuf }
 
 {
-let _ = main(Lexing.from_channel stdin)
+let _ = main(Lexing.from_channel (open_in Sys.argv.(1)))
 
 let _ = exit (0)
 }
