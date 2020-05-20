@@ -703,10 +703,10 @@ asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
 
 # Preprocess the code emitters
 
+.DELETE_ON_ERROR: asmcomp/emit.ml
 asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp tools/cvt_emit
 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
-	$(CAMLRUN) tools/cvt_emit < $< >> $@ \
-	|| { rm -f $@; exit 2; }
+	$(CAMLRUN) tools/cvt_emit < $< >> $@
 
 partialclean::
 	rm -f asmcomp/emit.ml
