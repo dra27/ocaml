@@ -1,3 +1,4 @@
+# Automatically generated; run make depend to update
 utils/arg_helper.cmo : \
     utils/arg_helper.cmi
 utils/arg_helper.cmx : \

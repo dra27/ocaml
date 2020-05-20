@@ -1043,13 +1043,19 @@ partialclean::
 	done
 
 .PHONY: depend
-depend: beforedepend
-	(for d in utils parsing typing bytecomp asmcomp middle_end \
-         lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types asmcomp/debug \
-         driver toplevel; \
-         do $(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) $$d/*.mli $$d/*.ml || exit; \
-         done) > .depend
+depend:: beforedepend
+	echo '# Automatically generated; run make depend to update' > .$@
+
+define BUILD_DEP
+depend::
+	$$(CAMLDEP) $$(DEPFLAGS) $$(DEPINCLUDES) \
+                    $$(wildcard $1/*.mli) $$(wildcard $1/*.ml) >> .depend
+endef
+
+$(foreach dir,utils parsing typing bytecomp asmcomp middle_end lambda \
+              file_formats middle_end/closure middle_end/flambda \
+              middle_end/flambda/base_types asmcomp/debug driver toplevel, \
+              $(eval $(call BUILD_DEP,$(dir))))
 
 .PHONY: distclean
 distclean: clean
