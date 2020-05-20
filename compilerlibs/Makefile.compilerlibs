@@ -102,27 +102,11 @@ BYTECOMP=bytecomp/instruct.cmo bytecomp/bytegen.cmo \
   driver/errors.cmo driver/compile.cmo
 BYTECOMP_CMI=
 
-INTEL_ASM=\
+ASMCOMP=\
   asmcomp/x86_proc.cmo \
   asmcomp/x86_dsl.cmo \
   asmcomp/x86_gas.cmo \
-  asmcomp/x86_masm.cmo
-INTEL_ASM_CMI=\
-  asmcomp/x86_ast.cmi
-
-ARCH_SPECIFIC_ASMCOMP=
-ARCH_SPECIFIC_ASMCOMP_CMI=
-ifeq ($(ARCH),i386)
-ARCH_SPECIFIC_ASMCOMP=$(INTEL_ASM)
-ARCH_SPECIFIC_ASMCOMP_CMI=$(INTEL_ASM_CMI)
-endif
-ifeq ($(ARCH),amd64)
-ARCH_SPECIFIC_ASMCOMP=$(INTEL_ASM)
-ARCH_SPECIFIC_ASMCOMP_CMI=$(INTEL_ASM_CMI)
-endif
-
-ASMCOMP=\
-  $(ARCH_SPECIFIC_ASMCOMP) \
+  asmcomp/x86_masm.cmo \
   asmcomp/arch.cmo \
   asmcomp/cmm.cmo asmcomp/printcmm.cmo \
   asmcomp/reg.cmo asmcomp/debug/reg_with_debug_info.cmo \
@@ -155,7 +139,7 @@ ASMCOMP=\
 ASMCOMP_CMI=\
   asmcomp/branch_relaxation_intf.cmi \
   asmcomp/debug/compute_ranges_intf.cmi \
-  $(ARCH_SPECIFIC_ASMCOMP_CMI)
+  asmcomp/x86_ast.cmi
 
 # Files under middle_end/ are not to reference files under asmcomp/.
 # This ensures that the middle end can be linked (e.g. for objinfo) even when
