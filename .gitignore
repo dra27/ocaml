@@ -57,6 +57,9 @@ _build
 
 # specific files and patterns in sub-directories
 
+/asmcomp/.arch-configured
+/asmcomp/.arch-configured.new
+/asmcomp/.depend
 /asmcomp/emit.ml
 /asmcomp/arch.ml
 /asmcomp/proc.ml

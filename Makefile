@@ -683,35 +683,33 @@ beforedepend:: lambda/runtimedef.ml
 
 # Choose the right machine-dependent files
 
-asmcomp/arch.ml: asmcomp/$(ARCH)/arch.ml
-	cd asmcomp; $(LN) $(ARCH)/arch.ml .
+# On systems where the architecture files are symlinked, timestamps can't be
+# relied upon, so a make cookie is used to track when ARCH changes.
+ARCH_COOKIE_FILE=asmcomp/.arch-configured
 
-asmcomp/proc.ml: asmcomp/$(ARCH)/proc.ml
-	cd asmcomp; $(LN) $(ARCH)/proc.ml .
+# ARCH_COOKIE will be $(ARCH_COOKIE_FILE).new if $(ARCH) has changed and empty
+# otherwise.
+ARCH_COOKIE := \
+  $(shell mv $(ARCH_COOKIE_FILE).new $(ARCH_COOKIE_FILE) 2>/dev/null; \
+          echo '$(ARCH)' > $(ARCH_COOKIE_FILE).new; \
+          cmp -s $(ARCH_COOKIE_FILE) $(ARCH_COOKIE_FILE).new \
+              || echo $(ARCH_COOKIE_FILE).new)
 
-asmcomp/selection.ml: asmcomp/$(ARCH)/selection.ml
-	cd asmcomp; $(LN) $(ARCH)/selection.ml .
+define LINK_ARCH_FILE
+asmcomp/$1: asmcomp/$$(ARCH)/$1 $(ARCH_COOKIE)
+	cd asmcomp; $$(LN) $$(ARCH)/$1 .
+	rm -f asmcomp/$(subst .ml,.cm*,$(1:.mli=.ml))
+endef
 
-asmcomp/CSE.ml: asmcomp/$(ARCH)/CSE.ml
-	cd asmcomp; $(LN) $(ARCH)/CSE.ml .
-
-asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
-	cd asmcomp; $(LN) $(ARCH)/reload.ml .
-
-asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
-	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+$(foreach file,arch.ml proc.ml selection.ml CSE.ml reload.ml scheduling.ml, \
+               $(eval $(call LINK_ARCH_FILE,$(file))))
 
 # Preprocess the code emitters
 
 .DELETE_ON_ERROR: asmcomp/emit.ml
-asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp tools/cvt_emit
+asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp tools/cvt_emit $(ARCH_COOKIE)
 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
 	$(CAMLRUN) tools/cvt_emit < $< >> $@
-
-partialclean::
-	rm -f asmcomp/emit.ml
-
-beforedepend:: asmcomp/emit.ml
 
 tools/cvt_emit: tools/cvt_emit.mll
 	$(MAKE) -C tools cvt_emit
@@ -949,12 +947,10 @@ partialclean::
 
 ARCH_SPECIFIC =\
   asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml asmcomp/selection.ml \
-  asmcomp/scheduling.ml asmcomp/reload.ml
+  asmcomp/scheduling.ml asmcomp/reload.ml asmcomp/emit.ml
 
 partialclean::
-	rm -f $(ARCH_SPECIFIC)
-
-beforedepend:: $(ARCH_SPECIFIC)
+	rm -f $(ARCH_SPECIFIC) $(ARCH_COOKIE_FILE) $(ARCH_COOKIE_FILE).new
 
 # This rule provides a quick way to check that machine-dependent
 # files compiles fine for a foreign architecture (passed as ARCH=xxx).
@@ -962,17 +958,17 @@ beforedepend:: $(ARCH_SPECIFIC)
 .PHONY: check_arch
 check_arch:
 	@echo "========= CHECKING asmcomp/$(ARCH) =============="
-	@rm -f $(ARCH_SPECIFIC) asmcomp/emit.ml asmcomp/*.cm*
 	@$(MAKE) compilerlibs/ocamloptcomp.cma \
 	            >/dev/null
-	@rm -f $(ARCH_SPECIFIC) asmcomp/emit.ml asmcomp/*.cm*
 
+MAKE_QUIET=$(MAKE) --no-print-directory
 .PHONY: check_all_arches
 check_all_arches:
 ifeq ($(ARCH64),true)
 	@STATUS=0; \
 	 for i in $(ARCHES); do \
-	   $(MAKE) --no-print-directory check_arch ARCH=$$i || STATUS=1; \
+	   ( $(MAKE_QUIET) asmcomp/.depend ARCH=$$i > /dev/null && \
+	     $(MAKE_QUIET) check_arch ARCH=$$i ) || STATUS=1; \
 	 done; \
 	 exit $$STATUS
 else
@@ -1049,13 +1045,20 @@ depend:: beforedepend
 define BUILD_DEP
 depend::
 	$$(CAMLDEP) $$(DEPFLAGS) $$(DEPINCLUDES) \
-                    $$(wildcard $1/*.mli) $$(wildcard $1/*.ml) >> .depend
+                    $$(filter-out $$(ARCH_SPECIFIC), \
+                      $$(wildcard $1/*.mli) $$(wildcard $1/*.ml)) >> .depend
 endef
 
 $(foreach dir,utils parsing typing bytecomp asmcomp middle_end lambda \
               file_formats middle_end/closure middle_end/flambda \
               middle_end/flambda/base_types asmcomp/debug driver toplevel, \
               $(eval $(call BUILD_DEP,$(dir))))
+
+asmcomp/.depend: $(ARCH_SPECIFIC) $(ARCH_COOKIE)
+	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) $(ARCH_SPECIFIC) > $@
+
+partialclean::
+	rm -f asmcomp/.depend
 
 .PHONY: distclean
 distclean: clean
@@ -1071,6 +1074,17 @@ distclean: clean
 	rm -f testsuite/_log*
 
 include .depend
+# $(ARCH) = "" if the tree isn't yet configured;
+# $(ARCH) = "none" if the native compiler isn't selected/available
+# boot/ocamlrun$(EXE) doesn't exist until after coldstart (which is always a
+# separate invocation of make)
+ifneq "$(ARCH)" ""
+ifneq "$(ARCH)" "none"
+ifneq "$(wildcard boot/ocamlrun$(EXE))" ""
+include asmcomp/.depend
+endif
+endif
+endif
 
 Makefile.config Makefile.build_config: config.status
 config.status:
