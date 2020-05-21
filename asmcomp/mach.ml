@@ -52,15 +52,15 @@ type operation =
   | Itailcall_imm of { func : string; label_after : label; }
   | Iextcall of { func : string; alloc : bool; label_after : label; }
   | Istackoffset of int
-  | Iload of Cmm.memory_chunk * Arch.addressing_mode
-  | Istore of Cmm.memory_chunk * Arch.addressing_mode * bool
+  | Iload of Cmm.memory_chunk * Specifics.addressing_mode
+  | Istore of Cmm.memory_chunk * Specifics.addressing_mode * bool
   | Ialloc of { bytes : int; label_after_call_gc : label option;
       dbginfo : Debuginfo.alloc_dbginfo; spacetime_index : int; }
   | Iintop of integer_operation
   | Iintop_imm of integer_operation * int
   | Inegf | Iabsf | Iaddf | Isubf | Imulf | Idivf
   | Ifloatofint | Iintoffloat
-  | Ispecific of Arch.specific_operation
+  | Ispecific of Specifics.specific_operation
   | Iname_for_debugger of { ident : Backend_var.t; which_parameter : int option;
       provenance : unit option; is_assignment : bool; }
 

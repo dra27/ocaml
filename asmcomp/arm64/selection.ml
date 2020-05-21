@@ -17,7 +17,6 @@
 
 (* Instruction selection for the ARM processor *)
 
-open Arch
 open Cmm
 open Mach
 

@@ -137,6 +137,8 @@ ASMCOMP=\
   asmcomp/asmlink.cmo asmcomp/asmlibrarian.cmo asmcomp/asmpackager.cmo \
   driver/opterrors.cmo driver/optcompile.cmo
 ASMCOMP_CMI=\
+  asmcomp/archgen.cmi \
+  asmcomp/specifics.cmi \
   asmcomp/branch_relaxation_intf.cmi \
   asmcomp/debug/compute_ranges_intf.cmi \
   asmcomp/x86_ast.cmi

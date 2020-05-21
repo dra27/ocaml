@@ -14,13 +14,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Specific operations for the ARM processor *)
-
 open Format
 
-type abi = EABI | EABI_HF
-type arch = ARMv4 | ARMv5 | ARMv5TE | ARMv6 | ARMv6T2 | ARMv7 | ARMv8
-type fpu = Soft | VFPv2 | VFPv3_D16 | VFPv3
+include Specifics
 
 let abi =
   match Config.system with
@@ -100,46 +96,6 @@ let command_line_options =
     "-fno-thumb", Arg.Clear thumb,
       " Disable Thumb/Thumb-2 code generation"
       ^ (if not !thumb then " (default" else "")]
-
-(* Addressing modes *)
-
-type addressing_mode =
-    Iindexed of int                     (* reg + displ *)
-
-(* We do not support the reg + shifted reg addressing mode, because
-   what we really need is reg + shifted reg + displ,
-   and this is decomposed in two instructions (reg + shifted reg -> tmp,
-   then addressing tmp + displ). *)
-
-(* Specific operations *)
-
-type specific_operation =
-    Ishiftarith of arith_operation * shift_operation * int
-  | Ishiftcheckbound of shift_operation * int
-  | Irevsubimm of int
-  | Imulhadd      (* multiply high and add *)
-  | Imuladd       (* multiply and add *)
-  | Imulsub       (* multiply and subtract *)
-  | Inegmulf      (* floating-point negate and multiply *)
-  | Imuladdf      (* floating-point multiply and add *)
-  | Inegmuladdf   (* floating-point negate, multiply and add *)
-  | Imulsubf      (* floating-point multiply and subtract *)
-  | Inegmulsubf   (* floating-point negate, multiply and subtract *)
-  | Isqrtf        (* floating-point square root *)
-  | Ibswap of int (* endianness conversion *)
-
-and arith_operation =
-    Ishiftadd
-  | Ishiftsub
-  | Ishiftsubrev
-  | Ishiftand
-  | Ishiftor
-  | Ishiftxor
-
-and shift_operation =
-    Ishiftlogicalleft
-  | Ishiftlogicalright
-  | Ishiftarithmeticright
 
 let spacetime_node_hole_pointer_is_live_before _specific_op = false
 

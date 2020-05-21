@@ -15,7 +15,7 @@
 
 (* Instruction selection for the AMD64 *)
 
-open Arch
+open Specifics
 open Proc
 open Cmm
 open Mach

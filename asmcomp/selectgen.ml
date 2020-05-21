@@ -388,7 +388,8 @@ method virtual is_immediate : int -> bool
 (* Selection of addressing modes *)
 
 method virtual select_addressing :
-  Cmm.memory_chunk -> Cmm.expression -> Arch.addressing_mode * Cmm.expression
+  Cmm.memory_chunk -> Cmm.expression ->
+    Specifics.addressing_mode * Cmm.expression
 
 (* Default instruction selection for stores (of words) *)
 

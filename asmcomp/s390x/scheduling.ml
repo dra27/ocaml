@@ -17,7 +17,6 @@
 
 (* Instruction scheduling for the Z processor *)
 
-open Arch
 open Mach
 
 (* The z10 processor is in-order, dual-issue.  It could benefit from some

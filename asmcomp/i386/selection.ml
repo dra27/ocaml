@@ -16,6 +16,7 @@
 (* Instruction selection for the Intel x86 *)
 
 open Misc
+open Specifics
 open Arch
 open Proc
 open Cmm

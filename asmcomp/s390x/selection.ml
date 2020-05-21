@@ -18,7 +18,6 @@
 (* Instruction selection for the Z processor *)
 
 open Cmm
-open Arch
 open Mach
 
 (* Recognition of addressing modes *)

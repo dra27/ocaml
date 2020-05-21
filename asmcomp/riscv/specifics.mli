@@ -13,26 +13,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* CSE for the RISC-V *)
+(** Specific operations for the RISC-V processor *)
 
-open Mach
-open CSEgen
+(* Specific operations *)
 
-class cse = object (_self)
+type specific_operation =
+  | Imultaddf of bool        (** multiply, optionally negate, and add *)
+  | Imultsubf of bool        (** multiply, optionally negate, and subtract *)
 
-inherit cse_generic as super
+(* Addressing modes *)
 
-method! class_of_operation op =
-  match op with
-  | Ispecific(Imultaddf _ | Imultsubf _) -> Op_pure
-  | _ -> super#class_of_operation op
-
-method! is_cheap_operation op =
-  match op with
-  | Iconst_int n -> n <= 0x7FFn && n >= -0x800n
-  | _ -> false
-
-end
-
-let fundecl f =
-  (new cse)#fundecl f
+type addressing_mode =
+  | Iindexed of int                     (** reg + displ *)

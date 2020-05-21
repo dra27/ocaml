@@ -17,6 +17,7 @@
 (* Emission of PowerPC assembly code *)
 
 open Cmm
+open Specifics
 open Arch
 open Proc
 open Reg

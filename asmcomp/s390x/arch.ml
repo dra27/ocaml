@@ -19,6 +19,8 @@
 
 open Format
 
+include Specifics
+
 (* Machine-specific command-line options *)
 
 let pic_code = ref true
@@ -29,19 +31,7 @@ let command_line_options =
     "-fno-PIC", Arg.Clear pic_code,
       " Generate position-dependent machine code" ]
 
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-
 let spacetime_node_hole_pointer_is_live_before _specific_op = false
-
-(* Addressing modes *)
-
-type addressing_mode =
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2 of int                    (* reg + reg + displ *)
 
 (* Sizes, endianness *)
 

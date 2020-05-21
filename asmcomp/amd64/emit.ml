@@ -17,7 +17,7 @@
 (* Emission of Intel x86_64 assembly code *)
 
 open Cmm
-open Arch
+open Specifics
 open Proc
 open Reg
 open Mach

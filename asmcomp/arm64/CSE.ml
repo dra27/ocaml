@@ -15,7 +15,6 @@
 
 (* CSE for ARM64 *)
 
-open Arch
 open Mach
 open CSEgen
 

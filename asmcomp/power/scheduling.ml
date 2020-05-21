@@ -15,7 +15,6 @@
 
 (* Instruction scheduling for the Power PC *)
 
-open Arch
 open Mach
 
 class scheduler = object

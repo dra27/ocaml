@@ -19,6 +19,7 @@
 open Misc
 open Cmm
 open Reg
+open Specifics
 open Arch
 open Mach
 

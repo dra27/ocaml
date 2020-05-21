@@ -15,7 +15,6 @@
 
 (* CSE for the PowerPC *)
 
-open Arch
 open Mach
 open CSEgen
 

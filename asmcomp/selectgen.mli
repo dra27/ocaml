@@ -66,7 +66,8 @@ class virtual selector_generic : object
     (* Must be defined to indicate whether a constant is a suitable
        immediate operand to arithmetic instructions *)
   method virtual select_addressing :
-    Cmm.memory_chunk -> Cmm.expression -> Arch.addressing_mode * Cmm.expression
+    Cmm.memory_chunk -> Cmm.expression ->
+      Specifics.addressing_mode * Cmm.expression
     (* Must be defined to select addressing modes *)
   method is_simple_expr: Cmm.expression -> bool
   method effects_of : Cmm.expression -> Effect_and_coeffect.t
@@ -80,7 +81,7 @@ class virtual selector_generic : object
   method select_condition : Cmm.expression -> Mach.test * Cmm.expression
     (* Can be overridden to deal with special test instructions *)
   method select_store :
-    bool -> Arch.addressing_mode -> Cmm.expression ->
+    bool -> Specifics.addressing_mode -> Cmm.expression ->
                                          Mach.operation * Cmm.expression
     (* Can be overridden to deal with special store constant instructions *)
   method regs_for : Cmm.machtype -> Reg.t array

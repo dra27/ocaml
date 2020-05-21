@@ -2,9 +2,9 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*                Nicolas Ojeda Bar <n.oje.bar@gmail.com>                 *)
+(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
 (*                                                                        *)
-(*   Copyright 2016 Institut National de Recherche en Informatique et     *)
+(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
 (*                                                                        *)
 (*   All rights reserved.  This file is distributed under the terms of    *)
@@ -13,26 +13,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* CSE for the RISC-V *)
+val command_line_options: (string * Arg.spec * string) list
 
-open Mach
-open CSEgen
+val spacetime_node_hole_pointer_is_live_before:
+  Specifics.specific_operation -> bool
 
-class cse = object (_self)
+val big_endian: bool
 
-inherit cse_generic as super
+val size_addr: int
 
-method! class_of_operation op =
-  match op with
-  | Ispecific(Imultaddf _ | Imultsubf _) -> Op_pure
-  | _ -> super#class_of_operation op
+val size_int: int
 
-method! is_cheap_operation op =
-  match op with
-  | Iconst_int n -> n <= 0x7FFn && n >= -0x800n
-  | _ -> false
+val size_float: int
 
-end
+val allow_unaligned_access: bool
 
-let fundecl f =
-  (new cse)#fundecl f
+val division_crashes_on_overflow: bool
+
+val identity_addressing: Specifics.addressing_mode
+
+val offset_addressing:
+  Specifics.addressing_mode -> int -> Specifics.addressing_mode
+
+val num_args_addressing: Specifics.addressing_mode -> int
+
+val print_addressing:
+  (Format.formatter -> 'a -> unit) -> Specifics.addressing_mode ->
+  Format.formatter -> 'a array -> unit
+
+val print_specific_operation:
+  (Format.formatter -> 'a -> unit) -> Specifics.specific_operation ->
+  Format.formatter -> 'a array -> unit

@@ -2,9 +2,9 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*                Nicolas Ojeda Bar <n.oje.bar@gmail.com>                 *)
+(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
 (*                                                                        *)
-(*   Copyright 2016 Institut National de Recherche en Informatique et     *)
+(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
 (*                                                                        *)
 (*   All rights reserved.  This file is distributed under the terms of    *)
@@ -13,26 +13,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* CSE for the RISC-V *)
+(** Specific operations for the PowerPC processor *)
 
-open Mach
-open CSEgen
+(* Specific operations *)
 
-class cse = object (_self)
+type specific_operation =
+    Imultaddf                           (** multiply and add *)
+  | Imultsubf                           (** multiply and subtract *)
+  | Ialloc_far of
+      { bytes : int; label_after_call_gc : int (*Cmm.label*) option;
+        dbginfo : Debuginfo.alloc_dbginfo }
+                                        (** allocation in large functions *)
 
-inherit cse_generic as super
+(* Addressing modes *)
 
-method! class_of_operation op =
-  match op with
-  | Ispecific(Imultaddf _ | Imultsubf _) -> Op_pure
-  | _ -> super#class_of_operation op
+type addressing_mode =
+    Ibased of string * int              (** symbol + displ *)
+  | Iindexed of int                     (** reg + displ *)
+  | Iindexed2                           (** reg + reg *)
 
-method! is_cheap_operation op =
-  match op with
-  | Iconst_int n -> n <= 0x7FFn && n >= -0x800n
-  | _ -> false
-
-end
-
-let fundecl f =
-  (new cse)#fundecl f
+type abi = ELF32 | ELF64v1 | ELF64v2

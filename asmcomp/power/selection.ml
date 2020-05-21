@@ -16,7 +16,6 @@
 (* Instruction selection for the Power PC processor *)
 
 open Cmm
-open Arch
 open Mach
 
 (* Recognition of addressing modes *)

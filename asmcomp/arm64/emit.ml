@@ -20,7 +20,7 @@
 
 open Misc
 open Cmm
-open Arch
+open Specifics
 open Proc
 open Reg
 open Mach

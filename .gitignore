@@ -61,9 +61,11 @@ _build
 /asmcomp/.arch-configured.new
 /asmcomp/.depend
 /asmcomp/emit.ml
+/asmcomp/arch.mli
 /asmcomp/arch.ml
 /asmcomp/proc.ml
 /asmcomp/selection.ml
+/asmcomp/specifics.mli
 /asmcomp/reload.ml
 /asmcomp/scheduling.ml
 /asmcomp/CSE.ml

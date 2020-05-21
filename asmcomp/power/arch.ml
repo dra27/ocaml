@@ -17,13 +17,13 @@
 
 open Format
 
+include Specifics
+
 let ppc64 =
   match Config.model with
   | "ppc" -> false
   | "ppc64" | "ppc64le" -> true
   | _ -> assert false
-
-type abi = ELF32 | ELF64v1 | ELF64v2
 
 let abi =
   match Config.model with
@@ -43,28 +43,12 @@ let command_line_options = [
      " TOC (table of contents) is limited to 64 kbytes"
 ]
 
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-  | Ialloc_far of                       (* allocation in large functions *)
-      { bytes : int; label_after_call_gc : int (*Cmm.label*) option;
-        dbginfo : Debuginfo.alloc_dbginfo }
-
 (* note: we avoid introducing a dependency to Cmm since this dep
    is not detected when "make depend" is run under amd64 *)
 
 let spacetime_node_hole_pointer_is_live_before = function
   | Imultaddf | Imultsubf -> false
   | Ialloc_far _ -> true
-
-(* Addressing modes *)
-
-type addressing_mode =
-    Ibased of string * int              (* symbol + displ *)
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2                           (* reg + reg *)
 
 (* Sizes, endianness *)
 

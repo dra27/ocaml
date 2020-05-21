@@ -15,7 +15,6 @@
 
 (* Reloading for the Z Processor *)
 
-open Arch
 open Mach
 
 class reload = object (self)

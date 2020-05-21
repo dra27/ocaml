@@ -16,6 +16,7 @@
 
 (* Instruction selection for the ARM processor *)
 
+open Specifics
 open Arch
 open Proc
 open Cmm

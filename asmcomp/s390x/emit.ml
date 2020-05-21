@@ -18,6 +18,7 @@
 
 open Misc
 open Cmm
+open Specifics
 open Arch
 open Proc
 open Reg

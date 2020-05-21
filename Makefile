@@ -36,6 +36,9 @@ include stdlib/StdlibModules
 CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 CAMLOPT=$(CAMLRUN) ./ocamlopt -g -nostdlib -I stdlib -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
+ARCH_SPECIFIC := $(addprefix asmcomp/, \
+  arch.ml arch.mli proc.ml CSE.ml selection.ml scheduling.ml reload.ml emit.ml \
+  specifics.mli)
 INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
         -I lambda -I middle_end -I middle_end/closure \
         -I middle_end/flambda -I middle_end/flambda/base_types \
@@ -701,8 +704,7 @@ asmcomp/$1: asmcomp/$$(ARCH)/$1 $(ARCH_COOKIE)
 	rm -f asmcomp/$(subst .ml,.cm*,$(1:.mli=.ml))
 endef
 
-$(foreach file,arch.ml proc.ml selection.ml CSE.ml \
-               reload.ml scheduling.ml emit.ml, \
+$(foreach file,$(notdir $(ARCH_SPECIFIC)), \
                $(eval $(call LINK_ARCH_FILE,$(file))))
 
 # Preprocess the code emitters
@@ -943,10 +945,6 @@ partialclean::
 	$(MAKE) -C tools clean
 
 ## Test compilation of backend-specific parts
-
-ARCH_SPECIFIC =\
-  asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml asmcomp/selection.ml \
-  asmcomp/scheduling.ml asmcomp/reload.ml asmcomp/emit.ml
 
 partialclean::
 	rm -f $(ARCH_SPECIFIC) $(ARCH_COOKIE_FILE) $(ARCH_COOKIE_FILE).new

@@ -2,10 +2,12 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*                Nicolas Ojeda Bar <n.oje.bar@gmail.com>                 *)
+(*            Xavier Leroy, projet Gallium, INRIA Rocquencourt            *)
+(*                          Bill O'Farrell, IBM                           *)
 (*                                                                        *)
-(*   Copyright 2016 Institut National de Recherche en Informatique et     *)
+(*   Copyright 2015 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
+(*   Copyright 2015 IBM (Bill O'Farrell with help from Tristan Amini).    *)
 (*                                                                        *)
 (*   All rights reserved.  This file is distributed under the terms of    *)
 (*   the GNU Lesser General Public License version 2.1, with the          *)
@@ -13,26 +15,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* CSE for the RISC-V *)
+(** Specific operations for the Z processor *)
 
-open Mach
-open CSEgen
+(* Specific operations *)
 
-class cse = object (_self)
+type specific_operation =
+    Imultaddf                           (** multiply and add *)
+  | Imultsubf                           (** multiply and subtract *)
 
-inherit cse_generic as super
+(* Addressing modes *)
 
-method! class_of_operation op =
-  match op with
-  | Ispecific(Imultaddf _ | Imultsubf _) -> Op_pure
-  | _ -> super#class_of_operation op
-
-method! is_cheap_operation op =
-  match op with
-  | Iconst_int n -> n <= 0x7FFn && n >= -0x800n
-  | _ -> false
-
-end
-
-let fundecl f =
-  (new cse)#fundecl f
+type addressing_mode =
+  | Iindexed of int                     (** reg + displ *)
+  | Iindexed2 of int                    (** reg + reg + displ *)

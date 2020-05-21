@@ -17,7 +17,6 @@
 
 (* CSE for the Z Processor *)
 
-open Arch
 open Mach
 open CSEgen
 

@@ -15,7 +15,6 @@
 
 (* CSE for the AMD64 *)
 
-open Arch
 open Mach
 open CSEgen
 
