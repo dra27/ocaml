@@ -538,7 +538,7 @@ flexlink: flexdll/Makefile
 	$(MAKE) -C stdlib COMPILER=../boot/ocamlc stdlib.cma std_exit.cmo
 	cd stdlib && cp stdlib.cma std_exit.cmo *.cmi ../boot
 	$(MAKE) -C flexdll MSVC_DETECT=0 OCAML_CONFIG_FILE=../config/Makefile \
-	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false \
+	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false TOOLCHAIN=$(TOOLCHAIN) \
 	  OCAMLOPT="../boot/ocamlrun$(BUILD_TOOL_EXT) ../boot/ocamlc -I ../boot" \
 	  flexlink.exe
 	$(MAKE) -C runtime clean

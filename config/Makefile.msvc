@@ -208,7 +208,7 @@ OTHERLIBRARIES=win32unix systhreads str win32graph dynlink bigarray
 #ml let topdir = "" and wintopdir = "";;
 OTOPDIR=$(WINTOPDIR)
 CTOPDIR=$(WINTOPDIR)
-CYGPATH=wslpath -m
+CYGPATH=wslpath -w
 DIFF=/usr/bin/diff -q --strip-trailing-cr
 FIND=/usr/bin/find
 SORT=/usr/bin/sort
