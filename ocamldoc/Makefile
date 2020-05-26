@@ -35,7 +35,11 @@ OCAMLLEX  = $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
 # In the following line, "sh" is useful under Windows. Without it,
 # the ./remove_DEBUG command would be executed by cmd.exe which would not
 # know how to handle it.
+ifeq "$(ARCH64)" "true"
+OCAMLPP=-pp 'C:\Windows\System32\bash ./remove_DEBUG'
+else
 OCAMLPP=-pp 'C:\Windows\Sysnative\bash ./remove_DEBUG'
+endif
 
 # For installation
 ##############
