@@ -269,8 +269,24 @@ module Cygwin : SYSDEPS = struct
   let parent_dir_name = ".."
   let dir_sep = "/"
   let is_dir_sep = Win32.is_dir_sep
-  let is_relative = Win32.is_relative
-  let is_implicit = Win32.is_implicit
+  (* See https://www.cygwin.com/cygwin-ug-net/using-specialnames.html
+     and https://cygwin.com/cygwin-ug-net/using.html#pathnames-win32 *)
+  let is_relative n =
+    let open String in
+    let l = length n in
+    (l < 1 || n.[0] <> '/')
+    && (l < 1 || n.[0] <> '\\')
+    && (l < 3 || (n.[1] <> ':' || (n.[2] <> '/'
+                                  && not (contains_from n 2 '\\'))))
+  let is_implicit n =
+    let open String in
+    is_relative n
+    && (length n < 2 || (let p = sub n 0 2
+                         in p <> "./"
+                         && p <> ".\\"))
+    && (length n < 3 || (let p = sub n 0 3
+                         in p <> "../"
+                         && p <> "..\\"))
   let check_suffix = Win32.check_suffix
   let chop_suffix_opt = Win32.chop_suffix_opt
   let temp_dir_name = Unix.temp_dir_name

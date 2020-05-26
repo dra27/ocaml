@@ -1,0 +1,84 @@
+Testing "\\\\server\\share"
+  is_relative: passed
+  is_implicit: passed
+Testing "\\\\server/share"
+  is_relative: passed
+  is_implicit: passed
+Testing "\\/server\\share"
+  is_relative: passed
+  is_implicit: passed
+Testing "\\/server/share"
+  is_relative: passed
+  is_implicit: passed
+Testing "/\\server\\share"
+  is_relative: passed
+  is_implicit: passed
+Testing "/\\server/share"
+  is_relative: passed
+  is_implicit: passed
+Testing "//server\\share"
+  is_relative: passed
+  is_implicit: passed
+Testing "//server/share"
+  is_relative: passed
+  is_implicit: passed
+Testing "C:\\"
+  is_relative: passed
+  is_implicit: passed
+Testing "C:/"
+  is_relative: passed
+  is_implicit: passed
+Testing "\\"
+  is_relative: passed
+  is_implicit: passed
+Testing "/"
+  is_relative: passed
+  is_implicit: passed
+Testing "\\dir"
+  is_relative: passed
+  is_implicit: passed
+Testing "/dir"
+  is_relative: passed
+  is_implicit: passed
+Testing "C:"
+  is_relative: passed
+  is_implicit: passed
+Testing "C:file-in-cwd"
+  is_relative: passed
+  is_implicit: passed
+Testing "C:dir-in-cwd\\file"
+  is_relative: passed
+  is_implicit: passed
+Testing "C:dir-in-cwd/file"
+  is_relative: passed
+  is_implicit: passed
+Testing "."
+  is_relative: passed
+  is_implicit: passed
+Testing ".\\"
+  is_relative: passed
+  is_implicit: passed
+Testing "./"
+  is_relative: passed
+  is_implicit: passed
+Testing ".."
+  is_relative: passed
+  is_implicit: passed
+Testing "..\\"
+  is_relative: passed
+  is_implicit: passed
+Testing "../"
+  is_relative: passed
+  is_implicit: passed
+Testing ".\\file-in-cwd"
+  is_relative: passed
+  is_implicit: passed
+Testing "./file-in-cwd"
+  is_relative: passed
+  is_implicit: passed
+Testing "..\\file-in-cwd"
+  is_relative: passed
+  is_implicit: passed
+Testing "../file-in-cwd"
+  is_relative: passed
+  is_implicit: passed
