@@ -20,6 +20,8 @@ NO_PRINT=`$(MAKE) empty --no-print-directory >/dev/null 2>&1 \
 FIND=find
 TOPDIR := ..
 include $(TOPDIR)/Makefile.tools
+ROOTDIR = $(TOPDIR)
+include $(TOPDIR)/Makefile.common
 
 OCAMLTESTDIR_CYGPATH=$(shell $(CYGPATH) $(BASEDIR)/$(DIR)/_ocamltest)
 
@@ -31,16 +33,20 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
   endif
 else # Windows
   find := /usr/bin/find
-  FLEXDLL_SUBMODULE_PRESENT := $(wildcard ../flexdll/Makefile)
-  ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
-    FLEXLINK_ENV =
-  else
-    ROOT:=$(shell wslpath -m "$$(cd .. && pwd)")
+  #Makefile.common is included to get the definition of WSLENV_SET. For the
+  # testsuite, FLEXLINK_ENV is overridden to use an absolute path.
+  ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+    ROOT = $(shell wslpath -w "$$(cd .. && pwd)")
+    ROOT := $(subst \,\\,$(ROOT))
     # FLEXLINK_ENV must have a space at the end
     FLEXLINK_ENV = \
-      OCAML_FLEXLINK="$(ROOT)/boot/ocamlrun $(ROOT)/flexdll/flexlink.exe" #
+      OCAML_FLEXLINK="$(ROOT)\\boot\\ocamlrun $(ROOT)\\flexdll\\flexlink.exe" #
   endif
 endif
+
+wtf:
+	echo "$(OCAMLTESTDIR_CYGPATH)"
+	@echo "$(CYGPATH)"
 
 failstamp := failure.stamp
 
@@ -53,11 +59,10 @@ ocamltest_program := $(or \
   $(wildcard $(ocamltest_directory)/ocamltest$(EXE)))
 
 ifneq "$(FLEXLINK_ENV)" ""
-  MKDLL=$(WINTOPDIR)/boot/ocamlrun$(EXE) $(WINTOPDIR)/flexdll/flexlink.exe \
-                                         $(FLEXLINK_FLAGS)
+  MKDLL = $(ROOT)\\boot\\ocamlrun $(ROOT)\\flexdll\\flexlink.exe $(FLEXLINK_FLAGS)
 endif
-ocamltest := $(FLEXLINK_ENV)MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
-                            $(ocamltest_program)
+ocamltest = WSLENV="$(call WSLENV_SET,$(if $(FLEXLINK_ENV),OCAML_FLEXLINK) MKDLL SORT MAKE)" $(FLEXLINK_ENV)\
+            MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
 
 .PHONY: default
 default:
@@ -85,6 +90,8 @@ default:
 all:
 	@rm -f $(TESTLOG)
 #	@$(MAKE) $(NO_PRINT) legacy-without-report
+# 	@@DRA this has an error exit code which means that make report doesn't get run?!?!
+#             Test this elsewhere
 	@$(MAKE) $(NO_PRINT) new-without-report
 	@$(MAKE) $(NO_PRINT) report
 
@@ -112,7 +119,7 @@ new-without-report: lib tools
 	@rm -f $(failstamp)
 	@(for file in `$(find) tests -name ocamltests`; do \
 	  dir=`dirname $$file`; \
-	  echo Running tests from \'$$dir\' ... ; \
+	  echo Running tests from \'$$dir\' ... ; sleep 2; \
 	  $(MAKE) exec-ocamltest DIR=$$dir \
 	    OCAMLTESTENV="" OCAMLTESTFLAGS=""; \
 	done || touch $(failstamp)) 2>&1 | tee -a $(TESTLOG)
@@ -210,7 +217,7 @@ exec-one:
 	elif [ -f $(DIR)/ocamltests ] && [ -z $(LEGACY) ] ; then \
 	  echo "Running tests from '$$DIR' ..."; \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(subst \,\\\\,$(OCAMLTESTDIR_CYGPATH))" \
 	    OCAMLTESTFLAGS=""; \
 	fi
 
@@ -218,10 +225,10 @@ exec-one:
 exec-ocamltest:
 	@if [ -z "$(DIR)" ]; then exit 1; fi
 	@if [ ! -d "$(DIR)" ]; then exit 1; fi
-	@file=$(DIR)/ocamltests; \
+	file=$(DIR)/ocamltests; \
 	(IFS=$$(printf "\r\n"); while read testfile; do \
 	   TERM=dumb $(OCAMLTESTENV) \
-	     $(ocamltest) $(OCAMLTESTFLAGS) $(DIR)/$$testfile || \
+	     $(ocamltest) $(OCAMLTESTFLAGS) $(subst \,\\,$(shell wslpath -w "$(DIR)")\)$$testfile || \
 	   touch $(failstamp); \
 	done < $$file) || touch $(failstamp)
 
@@ -249,7 +256,7 @@ promote:
 	fi
 	@if [ -f $(DIR)/ocamltests ]; then \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(subst \,\\\\,$(OCAMLTESTDIR_CYGPATH))" \
 	    OCAMLTESTFLAGS="-promote"; \
 	else \
 	  cd $(DIR) && $(MAKE) TERM=dumb BASEDIR=$(BASEDIR) promote; \

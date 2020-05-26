@@ -125,17 +125,17 @@ let run_cmd
       (Environments.to_system_env env)
   in
   Printf.fprintf log "progname = %s; argv = [%s]\n%!" progname (String.concat "; " quoted_lst);
-  Run_command.run {
-    Run_command.progname = progname;
-    Run_command.argv = arguments;
-    Run_command.envp = systemenv;
-    Run_command.stdin_filename = stdin_filename;
-    Run_command.stdout_filename = stdout_filename;
-    Run_command.stderr_filename = stderr_filename;
-    Run_command.append = append;
-    Run_command.timeout = timeout;
-    Run_command.log = log
-  }
+  Run_command.(run {
+    progname;
+    argv = arguments;
+    envp = systemenv;
+    stdin_filename;
+    stdout_filename;
+    stderr_filename;
+    append;
+    timeout;
+    log
+  })
 
 let wslpath file_name =
   let response_file = Filename.temp_file "ocamltest-" ".wslpath" in

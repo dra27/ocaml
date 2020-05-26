@@ -22,7 +22,7 @@ include $(ROOTDIR)/Makefile.common
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
   unix := false
-  ocamlsrcdir := $(shell wslpath -m "$(abspath $(shell pwd)/..)" \
+  ocamlsrcdir := $(shell wslpath -w "$(abspath $(shell pwd)/..)" \
     | sed 's/\\/\\\\\\\\/g')
   mkexe := $(MKEXE_ANSI) -link $(OC_LDFLAGS)
 else

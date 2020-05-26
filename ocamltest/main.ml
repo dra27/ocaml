@@ -201,4 +201,4 @@ let main () =
   init_tests_to_skip();
   List.iter test_file !Options.files_to_test
 
-let _ = main()
+let _ = Sys.catch_break true; try main() with Sys.Break -> Printf.eprintf "Terminated on CTRL+C\n%!"; exit 123 | e -> Printf.eprintf "Terminated on %s\n%!" (Printexc.to_string e)

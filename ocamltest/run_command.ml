@@ -47,6 +47,13 @@ let settings_of_commandline ?(stdout_fname="") ?(stderr_fname="") commandline =
     log = stderr
   }
 
-external run : settings -> int = "caml_run_command"
+external run_stub : settings -> int = "caml_run_command"
+
+let run ({progname; argv; envp} as settings) =
+  if Filename.basename progname = "bash.exe" then begin
+    Printf.eprintf "Launching %s with this environment:\n%!" (String.concat " " (Array.to_list argv));
+    Array.iter (Printf.eprintf "  %s\n%!") envp
+  end;
+  run_stub settings
 
 let run_commandline commandline = run (settings_of_commandline commandline)
