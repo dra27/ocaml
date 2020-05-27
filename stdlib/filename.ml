@@ -129,16 +129,18 @@ module Unix : SYSDEPS = struct
   let dirname = generic_dirname is_dir_sep current_dir_name
 end
 
-module Win32 : SYSDEPS = struct
+module Win32 = struct
   let null = "NUL"
   let current_dir_name = "."
   let parent_dir_name = ".."
   let dir_sep = "\\"
-  let is_dir_sep s i = let c = s.[i] in c = '/' || c = '\\' || c = ':'
+  (* The generic functions later treat the ':' as a separator, but internally
+     here we use is_dir_slash which does not *)
+  let is_dir_slash s i = let c = s.[i] in c = '/' || c = '\\'
   let is_relative n =
-    (String.length n < 1 || n.[0] <> '/')
-    && (String.length n < 1 || n.[0] <> '\\')
-    && (String.length n < 2 || n.[1] <> ':')
+    let l = String.length n in
+    (l < 1 || not (is_dir_slash n 0))
+    && (l < 2 || n.[1] <> ':')
   let is_implicit n =
     is_relative n
     && (String.length n < 2 || String.sub n 0 2 <> "./")
@@ -256,11 +258,22 @@ Quoting commands for execution by cmd.exe is difficult.
     else ("", s)
   let dirname s =
     let (drive, path) = drive_and_path s in
-    let dir = generic_dirname is_dir_sep current_dir_name path in
+    (* C:foo will be split as C: and foo which would then get a dirname of .
+       unless we override it. *)
+    let current_dir_name =
+      if drive = "" then
+        current_dir_name
+      else
+        ""
+    in
+    let dir = generic_dirname is_dir_slash current_dir_name path in
     drive ^ dir
   let basename s =
     let (_drive, path) = drive_and_path s in
-    generic_basename is_dir_sep current_dir_name path
+    generic_basename is_dir_slash current_dir_name path
+  let is_dir_sep s i =
+    let c = s.[i] in
+    c = '/' || c = '\\' || (i = 1 && c = ':')
 end
 
 module Cygwin : SYSDEPS = struct
@@ -268,14 +281,13 @@ module Cygwin : SYSDEPS = struct
   let current_dir_name = "."
   let parent_dir_name = ".."
   let dir_sep = "/"
-  let is_dir_sep = Win32.is_dir_sep
+  let is_dir_sep = Win32.is_dir_slash
   (* See https://www.cygwin.com/cygwin-ug-net/using-specialnames.html
      and https://cygwin.com/cygwin-ug-net/using.html#pathnames-win32 *)
   let is_relative n =
     let open String in
     let l = length n in
-    (l < 1 || n.[0] <> '/')
-    && (l < 1 || n.[0] <> '\\')
+    (l < 1 || not (is_dir_sep n 0))
     && (l < 3 || (n.[1] <> ':' || (n.[2] <> '/'
                                   && not (contains_from n 2 '\\'))))
   let is_implicit n =
@@ -292,8 +304,17 @@ module Cygwin : SYSDEPS = struct
   let temp_dir_name = Unix.temp_dir_name
   let quote = Unix.quote
   let quote_command = Unix.quote_command
-  let basename = generic_basename is_dir_sep current_dir_name
-  let dirname = generic_dirname is_dir_sep current_dir_name
+  let drive_and_path s =
+    if Win32.has_drive s && String.length s > 2 && is_dir_sep s 2
+    then (String.sub s 0 2, String.sub s 2 (String.length s - 2))
+    else ("", s)
+  let dirname s =
+    let (drive, path) = drive_and_path s in
+    let dir = generic_dirname is_dir_sep current_dir_name path in
+    drive ^ dir
+  let basename s =
+    let (_drive, path) = drive_and_path s in
+    generic_basename is_dir_sep current_dir_name path
 end
 
 module Sysdeps =
