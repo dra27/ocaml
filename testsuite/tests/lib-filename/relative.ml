@@ -39,10 +39,10 @@ let tests = [
 
 let get_expected_outcomes result test =
   match result with
-  | `Abs -> (test, false, false)
-  | `Drv -> (test, false, false)
-  | `Rel -> (test, true, false)
-  | `Imp -> (test, true, true) (* Filename.is_implicit f => Filename.is_relative f *)
+  | `Abs -> (test, false, false, false)
+  | `Drv -> (test, true, false, false)
+  | `Rel -> (test, false, true, false)
+  | `Imp -> (test, false, true, true) (* Filename.is_implicit f => Filename.is_relative f *)
 
 let get_platform_outcome =
   if Sys.cygwin then
@@ -52,8 +52,13 @@ let get_platform_outcome =
   else
     fun (outcome, _, _, test) -> get_expected_outcomes outcome test
 
-let execute (case, is_relative, is_implicit) =
-  Printf.printf "Testing %S\n  is_relative: " case;
+let execute (case, is_drive_relative, is_relative, is_implicit) =
+  Printf.printf "Testing %S\n  is_drive_relative: " case;
+  if is_drive_relative = Filename.is_drive_relative case then
+    print_endline "passed"
+  else
+    Printf.printf "failed (expected %b)\n" is_drive_relative;
+  print_string "  is_relative: ";
   if is_relative = Filename.is_relative case then
     print_endline "passed"
   else

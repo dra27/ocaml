@@ -29,6 +29,9 @@ val concat : string -> string -> string
 (** [concat dir file] returns a file name that designates file
    [file] in directory [dir]. *)
 
+val is_drive_relative : string -> bool
+(** XXX *)
+
 val is_relative : string -> bool
 (** Return [true] if the file name is relative to the current
    directory, [false] if it is absolute (i.e. in Unix, starts

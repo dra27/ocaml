@@ -28,6 +28,20 @@ let tests = [
  );
   {|C:\|}       , {|C:\|}      , {|\|}      , Some {|C:\\|};
   {|C:/|}       , {|C:/|}      , {|/|}      , Some {|C://|};
+  (* Technically, the Win32 version generates an invalid path *)
+  {|\\|}        , {|\\|}       , {|.|}      , Some {|\\*.|};
+  {|\\srv|}     , {|\\srv|}    , {|.|}      , Some {|\\srv*.|};
+  {|\\srv\shr|} , {|\\srv\shr|}, {|.|}      , Some {|\\srv\shr*.|};
+  {|\\.\C:\|}   , {|\\.\C:\|}  , {||}       , Some {|\\.\C:\|};
+  {|\\?\C:\|}   , {|\\.\C:\|}  , {||}       , Some {|\\?\C:\|};
+  {|\\.\C:\f|}  , {|\\.\C:\|}  , {|f|}      , Some {|\\.\C:\f|};
+  {|\\?\C:\f|}  , {|\\.\C:\|}  , {|f|}      , Some {|\\?\C:\f|};
+  {|\\.\C:\d\f|}, {|\\.\C:\d|} , {|f|}      , Some {|\\.\C:\d*f|};
+  {|\\?\C:\d\f|}, {|\\.\C:\d|} , {|f|}      , Some {|\\?\C:\d\f|};
+  {|\??\C:\|}   , {|\??\|}     , {|C:|}     , Some {|\??\C:|};
+  {|/??/C:\|}   , {|/??|}      , {|C:|}     , Some {|/??*C:|};
+  {|\??\C:\f|}  , {|\??\C:|}   , {|f|}      , Some {|\??\C:\f|};
+  {|\??\C:\d\f|}, {|\??\C:\d|} , {|f|}      , Some {|\??\C:\d*f|};
 ]
 
 let check l a b =
@@ -45,6 +59,37 @@ let expand_concat (default, d, b, s) =
 
 let tests = List.map expand_concat tests
 
+let print_csharp_test (test, _, _, _) =
+  Printf.printf "      @\"%s\",\n" test
+
+let print_tests_in_csharp tests =
+  Printf.printf "using System;\n\
+                 using System.Collections.Generic;\n\
+                 class Concat {\n\
+                \  static void Main() {\n\
+                \    var tests = new List<string>{";
+  List.iter print_csharp_test tests;
+  Printf.printf "    };\n\
+                \    foreach (var test in tests) {\n\
+                \      string GetPathRoot, GetDirectoryName, GetFileName, Combine;\n\
+                \      GetPathRoot = System.IO.Path.GetPathRoot(test);\n\
+                \      GetDirectoryName = System.IO.Path.GetDirectoryName(test);\n\
+                \      GetFileName = System.IO.Path.GetFileName(test);\n\
+                \      try {\n\
+                \        Combine = System.IO.Path.Combine(GetDirectoryName, GetFileName);\n\
+                \      } catch (Exception e) {\n\
+                \        Combine = \"<exception>\";\n\
+                \      }\n\
+                \      Console.WriteLine(\"Test   : {0}\\nCombine: {1}\\nGetPathRoot: {2}\\nGetDirectoryName: {3}\\nGetFileName: {4}\\n\",\n\
+                \                        test,\n\
+                \                        Combine,\n\
+                \                        GetPathRoot,\n\
+                \                        GetDirectoryName,\n\
+                \                        GetFileName);\n\
+                \    }\n\
+                \  }\n\
+                 }"
+
 let execute (path, expected_dirname, expected_basename, expected_concat) =
   Printf.printf "Test: %s\n" path;
   let dirname = Filename.dirname path in
@@ -55,4 +100,9 @@ let execute (path, expected_dirname, expected_basename, expected_concat) =
   check "concat" concat expected_concat
 
 let () =
-  List.iter execute tests
+  if Array.length Sys.argv = 1 then
+    List.iter execute tests
+  else if Sys.argv.(1) = "--csc" then
+    print_tests_in_csharp tests
+  else
+    prerr_endline "Unrecognised command line"

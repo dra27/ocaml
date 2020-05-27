@@ -1,84 +1,112 @@
 Testing "\\\\server\\share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "\\\\server/share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "\\/server\\share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "\\/server/share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "/\\server\\share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "/\\server/share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "//server\\share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "//server/share"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "C:\\"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "C:/"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "\\"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "/"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "\\dir"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "/dir"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "C:"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "C:file-in-cwd"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "C:dir-in-cwd\\file"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "C:dir-in-cwd/file"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "."
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing ".\\"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "./"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing ".."
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "..\\"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "../"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing ".\\file-in-cwd"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "./file-in-cwd"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "..\\file-in-cwd"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed
 Testing "../file-in-cwd"
+  is_drive_relative: passed
   is_relative: passed
   is_implicit: passed

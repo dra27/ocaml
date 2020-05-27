@@ -75,6 +75,7 @@ module type SYSDEPS = sig
   val parent_dir_name : string
   val dir_sep : string
   val is_dir_sep : string -> int -> bool
+  val is_drive_relative : string -> bool
   val is_relative : string -> bool
   val is_implicit : string -> bool
   val check_suffix : string -> string -> bool
@@ -94,6 +95,7 @@ module Unix : SYSDEPS = struct
   let parent_dir_name = ".."
   let dir_sep = "/"
   let is_dir_sep s i = s.[i] = '/'
+  let is_drive_relative = Fun.const false
   let is_relative n = String.length n < 1 || n.[0] <> '/'
   let is_implicit n =
     is_relative n
@@ -137,6 +139,13 @@ module Win32 = struct
   (* The generic functions later treat the ':' as a separator, but internally
      here we use is_dir_slash which does not *)
   let is_dir_slash s i = let c = s.[i] in c = '/' || c = '\\'
+  (* See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#fully-qualified-vs-relative-paths
+     and https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
+     and https://docs.microsoft.com/en-gb/archive/blogs/jeremykuhne/path-normalization *)
+  let is_drive_relative n =
+    let l = String.length n in
+    (l >= 1 && is_dir_slash n 0 && (l = 1 || not (is_dir_slash n 1)))
+    || (l >= 2 && n.[1] = ':' && not (is_dir_slash n 2))
   let is_relative n =
     let l = String.length n in
     (l < 1 || not (is_dir_slash n 0))
@@ -252,10 +261,24 @@ Quoting commands for execution by cmd.exe is difficult.
       | _ -> false
     in
     String.length s >= 2 && is_letter s.[0] && s.[1] = ':'
+  let unc_and_path s =
+    if String.length s >= 4 && String.sub s 0 4 = "\\??\\" then
+      (* NT Object Manager Path *)
+      ("\\??", String.sub s 3 (String.length s - 3))
+ (*   else if String.length s >= 2 && is_dir_slash s 0 && is_dir_slash s 1 then
+      (* UNC / Device paths *)
+      if String.length s > 2 then
+        match Strin*)
+    else
+      ("", s)
   let drive_and_path s =
-    if has_drive s
-    then (String.sub s 0 2, String.sub s 2 (String.length s - 2))
-    else ("", s)
+    let ((unc, _) as result) = unc_and_path s in
+    if unc <> "" then
+      result
+    else if has_drive s then
+      (String.sub s 0 2, String.sub s 2 (String.length s - 2))
+    else
+      ("", s)
   let dirname s =
     let (drive, path) = drive_and_path s in
     (* C:foo will be split as C: and foo which would then get a dirname of .
@@ -284,6 +307,9 @@ module Cygwin : SYSDEPS = struct
   let is_dir_sep = Win32.is_dir_slash
   (* See https://www.cygwin.com/cygwin-ug-net/using-specialnames.html
      and https://cygwin.com/cygwin-ug-net/using.html#pathnames-win32 *)
+  let is_drive_relative n =
+    let l = String.length n in
+    (l >= 1 && n.[0] = '\\' && (l = 1 || not (is_dir_sep n 1)))
   let is_relative n =
     let open String in
     let l = length n in
@@ -305,9 +331,13 @@ module Cygwin : SYSDEPS = struct
   let quote = Unix.quote
   let quote_command = Unix.quote_command
   let drive_and_path s =
-    if Win32.has_drive s && String.length s > 2 && is_dir_sep s 2
-    then (String.sub s 0 2, String.sub s 2 (String.length s - 2))
-    else ("", s)
+    let ((unc, _) as result) = Win32.unc_and_path s in
+    if unc <> "" then
+      result
+    else if Win32.has_drive s && String.length s > 2 && is_dir_sep s 2 then
+      (String.sub s 0 2, String.sub s 2 (String.length s - 2))
+    else
+      ("", s)
   let dirname s =
     let (drive, path) = drive_and_path s in
     let dir = generic_dirname is_dir_sep current_dir_name path in
