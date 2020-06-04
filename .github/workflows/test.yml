@@ -1,0 +1,19 @@
+name: Multicore
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: build
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [windows-latest]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: dra27/setup-ocaml@multicore
+    - run: bash -lc 'cd $GITHUB_WORKSPACE; ./configure --build=x86_64-pc-cygwin --host=x86_64-w64-mingw32'
+    - run: bash -lc 'make -C $GITHUB_WORKSPACE -j flexdll'
+    - run: bash -lc 'make -C $GITHUB_WORKSPACE -j world.opt'
+    - run: bash -lc 'make -C $GITHUB_WORKSPACE/testsuite all'
