@@ -487,15 +487,21 @@ flexdll: flexdll/Makefile flexlink
              MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false support
 
 # Bootstrapping flexlink - leaves a bytecode image of flexlink.exe in flexdll/
+FLEXLINK_OCAMLOPT = \
+   ../boot/ocamlrun$(EXE) ../boot/ocamlc \
+   -use-prims ../runtime/primitives -nostdlib -I ../boot
+
 .PHONY: flexlink
 flexlink: flexdll/Makefile
 	$(MAKE) -C runtime BOOTSTRAPPING_FLEXLINK=yes ocamlrun$(EXE)
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	$(MAKE) -C stdlib COMPILER=../boot/ocamlc stdlib.cma std_exit.cmo
+	$(MAKE) -C stdlib \
+                COMPILER="../boot/ocamlc -use-prims ../runtime/primitives" \
+                stdlib.cma std_exit.cmo
 	cd stdlib && cp stdlib.cma std_exit.cmo *.cmi ../boot
 	$(MAKE) -C flexdll MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
 	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false \
-	  OCAMLOPT="../boot/ocamlrun ../boot/ocamlc -I ../boot" \
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT)" \
 	  flexlink.exe
 	$(MAKE) -C runtime clean
 	$(MAKE) partialclean
