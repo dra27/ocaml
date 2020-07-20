@@ -570,7 +570,7 @@ endif
 
 .PHONY: tests
 tests:
-	$(MAKE) -C testsuite all
+	$(MAKE) -C testsuite all-parallel
 
 # Make clean in the test suite
 

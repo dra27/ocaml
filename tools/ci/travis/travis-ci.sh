@@ -182,10 +182,11 @@ EOF
   ./tools/check-symbol-names runtime/*.a
   cd testsuite
   echo Running the testsuite with the normal runtime
-  $MAKE all
+  $MAKE all-parallel
   if [ "$MIN_BUILD" != "1" ] ; then
     echo Running the testsuite with the debug runtime
-    $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd all
+    $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd \
+          all-parallel
   fi
   cd ..
   if command -v pdflatex &>/dev/null  ; then
