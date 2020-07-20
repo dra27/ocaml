@@ -236,7 +236,7 @@ let find_test_dirs dir =
     if !contains_tests then res := dir :: !res
   in
   loop dir;
-  List.rev !res
+  List.sort String.compare !res
 
 let list_tests dir =
   let res = ref [] in
