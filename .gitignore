@@ -209,7 +209,6 @@ _build
 /testsuite/**/*.native
 /testsuite/**/program
 /testsuite/**/_log*
-/testsuite/failure.stamp
 
 /testsuite/_retries
 

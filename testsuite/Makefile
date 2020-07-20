@@ -13,8 +13,6 @@
 #*                                                                        *
 #**************************************************************************
 
-.NOTPARALLEL:
-
 BASEDIR := $(shell pwd)
 NO_PRINT=`$(MAKE) empty --no-print-directory >/dev/null 2>&1 \
 	  && echo --no-print-directory`
@@ -25,9 +23,14 @@ include $(TOPDIR)/Makefile.tools
 
 OCAMLTESTDIR_CYGPATH=$(shell $(CYGPATH) $(BASEDIR)/$(DIR)/_ocamltest)
 
-failstamp := failure.stamp
-
 TESTLOG ?= _log
+
+CPU_COUNT = \
+  $(if $(filter FreeBSD,$(shell uname -s)),\
+	    $(shell sysctl -n hw.ncpu),\
+			$(shell getconf _NPROCESSORS_ONLN))
+
+J_ARG = $(if $(filter -j,$(MAKEFLAGS)),,-j $(CPU_COUNT))
 
 ocamltest_directory := ../ocamltest
 
@@ -109,29 +112,74 @@ default:
 
 .PHONY: all
 all:
-	@rm -f $(TESTLOG)
 	@$(MAKE) $(NO_PRINT) new-without-report
 	@$(MAKE) $(NO_PRINT) report
 
-.PHONY: new-without-report
-new-without-report: lib tools
-	@rm -f $(failstamp)
-	@(IFS=$$(printf "\r\n"); \
-	$(ocamltest) -find-test-dirs tests | while read dir; do \
-	  echo Running tests from \'$$dir\' ... ; \
-	  $(MAKE) exec-ocamltest DIR=$$dir \
-	    OCAMLTESTENV=""; \
-	done || echo outer loop >> $(failstamp)) 2>&1 | tee -a $(TESTLOG)
-	@$(MAKE) check-failstamp
+.PHONY: all-parallel
+all-parallel:
+	@$(MAKE) $(NO_PRINT) $(J_ARG) all
 
-.PHONY: check-failstamp
-check-failstamp:
-	@if [ -f $(failstamp) ]; then \
-	  echo 'Unexpected error in the test infrastructure:'; \
-	  cat $(failstamp); \
-	  rm $(failstamp); \
-	  exit 1; \
-	fi
+TEST_DIR_OUTPUT = $(subst /,-,$*)
+.PHONY: %.result
+%.result:
+	@echo "Running tests from 'tests/"'$*'"' ..." > 't-$(TEST_DIR_OUTPUT)'
+	@$(MAKE) exec-ocamltest DIR=tests/$* OCAMLTESTENV="" 2>&1 \
+      >> 't-$(TEST_DIR_OUTPUT)'
+	@mv 't-$(TEST_DIR_OUTPUT)' '$(TEST_DIR_OUTPUT).result'
+	@$(MAKE) emit-log TEST='$(TEST_DIR_OUTPUT)'
+
+# emit-log is called by each test directory, running in parallel. The test
+# attempts to lock the console by atomically setting print-lock to its test
+# result filename (NB `mv -n` is not portable, hence the strange invocation with
+# `mv -i`). Only process will succeed, and it then prints all the results it
+# can, leaving the results still to be printed in test-dirs. There is a
+# potential race condition at the end of the run, hence emit-log is called at
+# the end with a dummy "flush" target to guarantee that all results have been
+# printed to the console.
+emit-log:
+	@if [ ! -e print-lock ] ; then \
+    echo '$(TEST)' > print-lock.$(TEST); \
+    echo n | LC_MESSAGES=POSIX mv -i print-lock.$(TEST) print-lock \
+       2>/dev/null; \
+    rm -f print-lock.$(TEST); \
+   fi; \
+   if [ "$$(cat print-lock 2>/dev/null)" = '$(TEST)' ]; then \
+     cat test-dirs 2>/dev/null | while IFS= read -r dir; do \
+       if [ -e printing ] ; then \
+         echo "$$dir" >> printing; \
+       else \
+         if [ -e "$$dir" ]; then \
+           cat "$$dir"; \
+         else \
+           echo "$$dir" > printing; \
+         fi; \
+       fi; \
+     done; \
+     if [ -e printing ] ; then \
+       mv printing test-dirs; \
+     else \
+       rm -f test-dirs; \
+     fi; \
+     rm -f print-lock; \
+   fi
+
+ALL_TEST_DIRS = $(shell $(ocamltest) -find-test-dirs tests)
+ALL_RESULTS = $(subst tests/,,$(addsuffix .result,$(ALL_TEST_DIRS)))
+
+# test-dirs is phony so that it is always executed
+.PHONY: test-dirs
+test-dirs:
+	@$(ocamltest) -find-test-dirs tests \
+      | sed -e 's|tests/||;s|/|-|g;s|$$|.result|' > $@
+
+.PHONY: new-without-report
+new-without-report: lib tools test-dirs
+	@rm -f *.result print-lock
+	@$(MAKE) $(ALL_RESULTS)
+	@$(MAKE) emit-log TEST='testsuite-flush-output'
+	@touch empty.result
+	@cat *.result > $(TESTLOG)
+	@rm *.result
 
 .PHONY: all-%
 all-%: lib tools
@@ -208,7 +256,6 @@ one: lib tools
 	  exit 1; \
 	fi
 	@$(MAKE) $(NO_PRINT) exec-one DIR=$(DIR)
-	@$(MAKE) check-failstamp
 
 .PHONY: exec-one
 exec-one:
@@ -233,7 +280,7 @@ exec-ocamltest:
 	   TERM=dumb $(OCAMLTESTENV) \
 	     $(ocamltest) $(OCAMLTESTFLAGS) $(DIR)/$$testfile || \
 	   echo " ... testing '$$testfile' => unexpected error"; \
-	done) || echo directory "$(DIR)" >>$(failstamp)
+	done)
 
 .PHONY: clean-one
 clean-one:
@@ -278,7 +325,6 @@ clean:
 	@$(MAKE) -C lib clean
 	@cd tools && $(MAKE) BASEDIR=$(BASEDIR) clean
 	$(FIND) . -name '*_ocamltest*' | xargs rm -rf
-	rm -f $(failstamp)
 
 .PHONY: report
 report:
