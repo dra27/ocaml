@@ -1,6 +1,12 @@
 OCaml 4.11 maintenance branch
 -----------------------------
 
+### Supported platforms:
+
+- #9699: add support for iOS and macOS on ARM 64 bits
+  (Eduardo Rafael, review by Xavier Leroy, Nicolás Ojeda Bär
+   and Anil Madhavapeddy, additional testing by Michael Schmidt)
+
 ### Runtime system:
 
 * #10723: do not use `-flat-namespace` linking for macOS.
@@ -12,6 +18,13 @@ OCaml 4.11 maintenance branch
 
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
+
+### Code generation and optimizations:
+
+- #9752: Revised handling of calling conventions for external C functions.
+   Provide a more precise description of the types of unboxed arguments,
+   so that the ARM64 iOS/macOS calling conventions can be honored.
+   (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
 
 ### Build system:
 
