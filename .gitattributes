@@ -27,6 +27,10 @@
 *.png binary
 *.tfm binary
 
+# configure is a shell-script; the linguist-generated attribute suppresses
+# changes being displayed by default in pull requests.
+/configure text eol=lf -diff linguist-generated
+
 # 'union' merge driver just unions textual content in case of conflict
 #   http://krlmlr.github.io/using-gitattributes-to-avoid-merge-conflicts/
 /.mailmap                merge=union
@@ -139,7 +143,6 @@ menhir-bench.bash typo.missing-header typo.utf8
 
 /tools/ci/appveyor/appveyor_build.cmd text eol=crlf
 
-configure text eol=lf
 configure.ac text eol=lf
 build-aux/compile text eol=lf
 build-aux/config.guess text eol=lf
