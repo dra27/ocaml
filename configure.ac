@@ -460,8 +460,9 @@ AS_CASE([$host],
     [
       libext=lib
       AR=""; RANLIB=echo; RANLIBCMD=""
-      AS_IF([test "$host_cpu" = "x86_64" ],
-        [machine="-machine:AMD64 "],
+      AS_CASE([$host_cpu],
+        [x86_64],[machine="-machine:AMD64 "],
+        [aarch64],[machine="-machine:ARM64 "],
         [machine=""])
       mklib="link -lib -nologo $machine /out:\$(1) \$(2)"
     ],
@@ -716,6 +717,7 @@ AS_CASE([$CC,$host],
     oc_ldflags='/ENTRY:wmainCRTStartup'
     AS_CASE([$host],
       [i686-pc-windows], [flexdll_chain=msvc],
+      [aarch64-pc-windows], [flexdll_chain=msvcarm64],
       [x86_64-pc-windows], [flexdll_chain=msvc64])
     AS_IF([$with_sharedlibs],
       [flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
@@ -936,6 +938,8 @@ AS_CASE([$host],
     [arch=i386; system=mingw],
   [i686-pc-windows],
     [arch=i386; system=win32],
+  [aarch64-pc-windows],
+    [arch=arm64; system=win64],
   [x86_64-pc-windows],
     [arch=amd64; system=win64],
   [[powerpc64le*-*-linux*]],
@@ -1074,6 +1078,8 @@ AS_IF([test -n "$host_alias"], [toolpref="${host_alias}-"], [toolpref=""])
 AS_CASE(["$arch,$system"],
   [i386,win32],
     [default_as="ml -nologo -coff -Cp -c -Fo"],
+  [arm64,win64],
+    [default_as="armasm64 -o"],
   [amd64,win64],
     [default_as="ml64 -nologo -Cp -c -Fo"],
   [amd64,macosx],
@@ -1903,6 +1909,9 @@ AS_CASE([$host],
   [i686-pc-windows],
     [flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216"],
+  [aarch64-pc-windows],
+    [flexdll_chain='msvcarm64'
+    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 33554432"],
   [x86_64-pc-windows],
     [flexdll_chain='msvc64'
     flexlink_flags="-x64 -merge-manifest -stack 33554432"])
@@ -1913,6 +1922,7 @@ AS_IF([test x"$prefix" = "xNONE"],
     [i686-w64-mingw32], [prefix='C:/ocamlmgw'],
     [x86_64-w64-mingw32], [prefix='C:/ocamlmgw64'],
     [i686-pc-windows], [prefix='C:/ocamlms'],
+    [aarch64-pc-windows], [prefix='C:/ocamlms64arm'],
     [x86_64-pc-windows], [prefix='C:/ocamlms64'])],
   [AS_IF([test x"$unix_or_win32" = "xwin32" \
           && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],

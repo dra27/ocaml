@@ -12468,11 +12468,14 @@ case $host in #(
 
       libext=lib
       AR=""; RANLIB=echo; RANLIBCMD=""
-      if test "$host_cpu" = "x86_64" ; then :
-  machine="-machine:AMD64 "
-else
-  machine=""
-fi
+      case $host_cpu in #(
+  x86_64) :
+    machine="-machine:AMD64 " ;; #(
+  aarch64) :
+    machine="-machine:ARM64 " ;; #(
+  *) :
+    machine="" ;;
+esac
       mklib="link -lib -nologo $machine /out:\$(1) \$(2)"
      ;; #(
   *) :
@@ -12846,6 +12849,8 @@ fi
     case $host in #(
   i686-pc-windows) :
     flexdll_chain=msvc ;; #(
+  aarch64-pc-windows) :
+    flexdll_chain=msvcarm64 ;; #(
   x86_64-pc-windows) :
     flexdll_chain=msvc64 ;; #(
   *) :
@@ -13868,6 +13873,8 @@ case $host in #(
     arch=i386; system=mingw ;; #(
   i686-pc-windows) :
     arch=i386; system=win32 ;; #(
+  aarch64-pc-windows) :
+    arch=arm64; system=win64 ;; #(
   x86_64-pc-windows) :
     arch=amd64; system=win64 ;; #(
   powerpc64le*-*-linux*) :
@@ -14136,6 +14143,8 @@ fi
 case "$arch,$system" in #(
   i386,win32) :
     default_as="ml -nologo -coff -Cp -c -Fo" ;; #(
+  arm64,win64) :
+    default_as="armasm64 -o" ;; #(
   amd64,win64) :
     default_as="ml64 -nologo -Cp -c -Fo" ;; #(
   amd64,macosx) :
@@ -17040,6 +17049,9 @@ case $host in #(
   i686-pc-windows) :
     flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216" ;; #(
+  aarch64-pc-windows) :
+    flexdll_chain='msvcarm64'
+    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 33554432" ;; #(
   x86_64-pc-windows) :
     flexdll_chain='msvc64'
     flexlink_flags="-x64 -merge-manifest -stack 33554432" ;; #(
@@ -17056,6 +17068,8 @@ if test x"$prefix" = "xNONE"; then :
     prefix='C:/ocamlmgw64' ;; #(
   i686-pc-windows) :
     prefix='C:/ocamlms' ;; #(
+  aarch64-pc-windows) :
+    prefix='C:/ocamlms64arm' ;; #(
   x86_64-pc-windows) :
     prefix='C:/ocamlms64' ;; #(
   *) :
