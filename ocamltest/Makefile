@@ -58,17 +58,25 @@ endif
 mkexe := $(MKEXE)
 
 ifeq "$(TOOLCHAIN)" "msvc"
-CPP := $(CPP) 2> nul
-CSC := csc
-ifeq "$(HOST)" "i686-pc-windows"
-CSCFLAGS := /platform:x86
+  CPP := $(CPP) 2> nul
+  CSC := csc
+  ifeq "$(HOST)" "i686-pc-windows"
+    CSCFLAGS := /platform:x86
+  else
+  ifeq "$(HOST)" "aarch64-pc-windows"
+    # Seeing an error here? Ensure you installed the Roslyn compilers!
+    # C# 5 supports arm but not arm64
+    CSCFLAGS := /platform:arm64
+    # XXX Can't find a way to target arm64 C# apps (at least yet)
+    CSC :=
+  else
+    CSCFLAGS :=
+  endif
+  endif
+  CSCFLAGS += /nologo /nowarn:1668
 else
-CSCFLAGS :=
-endif
-CSCFLAGS += /nologo /nowarn:1668
-else
-CSC :=
-CSCFLAGS :=
+  CSC :=
+  CSCFLAGS :=
 endif
 
 ifeq "$(WITH_OCAMLDOC)" "ocamldoc"
