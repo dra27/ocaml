@@ -342,13 +342,13 @@ module Make (P : Dynlink_platform_intf.S) = struct
       try
         global_state := check filename units !global_state ~priv;
         P.run_shared_startup handle;
-        List.iter
-          (fun unit_header ->
-             P.run handle ~unit_header ~priv;
-             if not priv then begin
-               global_state := set_loaded filename unit_header !global_state
-             end)
-          units;
+        let run_unit unit_header =
+          P.run handle ~unit_header ~priv;
+          if not priv then begin
+            global_state := set_loaded filename unit_header !global_state
+          end
+        in
+        List.iter run_unit units;
         P.finish handle
       with exn ->
         P.finish handle;

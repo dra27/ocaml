@@ -184,11 +184,13 @@ manual/tools/texexpand text eol=lf
 
 # Tests which include references spanning multiple lines fail with \r\n
 # endings, so use \n endings only, even on Windows.
+testsuite/tests/backtrace/names.ml text eol=lf
 testsuite/tests/basic-modules/anonymous.ml text eol=lf
 testsuite/tests/basic-more/morematch.ml text eol=lf
 testsuite/tests/basic-more/robustmatch.ml text eol=lf
 testsuite/tests/parsing/*.ml text eol=lf
 testsuite/tests/docstrings/empty.ml text eol=lf
+testsuite/tests/formatting/test_locations.ml text eol=lf
 testsuite/tests/functors/functors.ml text eol=lf
 testsuite/tests/tool-ocamlc-stop-after/stop_after_parsing_impl.ml text eol=lf
 testsuite/tests/tool-ocamlc-stop-after/stop_after_parsing_intf.mli text eol=lf

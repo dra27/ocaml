@@ -135,9 +135,9 @@ module Bytecode = struct
     let _, clos = Meta.reify_bytecode code events (Some digest) in
     try ignore ((clos ()) : Obj.t)
     with exn ->
-      Printexc.raise_with_backtrace
-        (DT.Error (Library's_module_initializers_failed exn))
-        (Printexc.get_raw_backtrace ())
+      let exn = DT.Error (Library's_module_initializers_failed exn) in
+      let bt = Printexc.get_raw_backtrace () in
+      Printexc.raise_with_backtrace exn bt
 
   let load ~filename:file_name ~priv:_ =
     let ic = open_in_bin file_name in

@@ -46,11 +46,7 @@ reference = "${test_source_directory}/test10_main.native.reference"
 let () =
   Printexc.record_backtrace true;
   try
-    if Dynlink.is_native then begin
-      Dynlink.loadfile "test10_plugin.cmxs"
-    end else begin
-      Dynlink.loadfile "test10_plugin.cmo"
-    end
+    Dynlink.loadfile (Dynlink.adapt_filename "test10_plugin.cmo")
   with
   | Dynlink.Error (Dynlink.Library's_module_initializers_failed exn) ->
       Printf.eprintf "Error: %s\n%!" (Printexc.to_string exn);

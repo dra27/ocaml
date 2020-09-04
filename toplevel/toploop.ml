@@ -209,10 +209,11 @@ let load_lambda ppf lam =
   let bytecode, closure = Meta.reify_bytecode code [| events |] None in
   match
     may_trace := true;
-    Fun.protect
-      ~finally:(fun () -> may_trace := false;
-                          if can_free then Meta.release_bytecode bytecode)
-      closure
+    let finally () =
+      may_trace := false;
+      if can_free then Meta.release_bytecode bytecode
+    in
+    Fun.protect ~finally closure
   with
   | retval -> Result retval
   | exception x ->
