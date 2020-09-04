@@ -80,7 +80,10 @@ CAMLdeprecated_typedef(addr, char *);
 
 #define CAMLexport
 #define CAMLprim
-#define CAMLextern extern
+#define CAMLextern CAMLimport extern
+#ifndef CAMLimport
+#define CAMLimport __declspec(dllimport)
+#endif
 
 /* Weak function definitions that can be overridden by external libs */
 /* Conservatively restricted to ELF and MacOSX platforms */

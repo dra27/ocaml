@@ -50,8 +50,8 @@ CAMLextern void caml_leave_blocking_section (void);
    use the runtime system (typically, a blocking I/O operation).
 */
 
-CAMLextern int caml_c_thread_register(void);
-CAMLextern int caml_c_thread_unregister(void);
+extern int caml_c_thread_register(void);
+extern int caml_c_thread_unregister(void);
 
 /* If a thread is created by C code (instead of by OCaml itself),
    it must be registered with the OCaml runtime system before
