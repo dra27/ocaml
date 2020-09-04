@@ -102,7 +102,7 @@ void SetBias(void)
   return;
 }
 
-#if !defined(_M_X64) && !defined(_M_IX86) && !defined(_M_ARM64)
+#if !defined(_M_X64) && !defined(_M_IX86) && !defined(_M_ARM64) && !defined(_M_ARM)
 #error Unsupported CPU architecture
 #endif
 
@@ -120,6 +120,8 @@ void ReplaceFunction(char* fn, char* module, void* pNew)
 #elif defined(_M_ARM64)
   SIZE_T jmpSize = 16;
   DWORD jump[4];
+#elif defined(_M_ARM)
+#error ARM32 TODO!
 #endif
   SIZE_T bytesWritten;
 
@@ -146,6 +148,8 @@ void ReplaceFunction(char* fn, char* module, void* pNew)
     jump[0] = 0x58000048;       /* ldr x8, 0x8 */
     jump[1] = 0xd61f0100;       /* br x8 */
     memcpy(jump + 2, &pNew, 8); /* imm64 */
+#elif defined(_M_ARM)
+#error ARM32 TODO!
 #endif
 
     if (WriteProcessMemory(GetCurrentProcess(), pCode, jump, jmpSize, NULL)) {
