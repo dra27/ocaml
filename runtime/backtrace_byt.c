@@ -82,6 +82,8 @@ struct ev_info {
   int ev_lnum;
   int ev_startchr;
   int ev_endchr;
+  int ev_endline_num;
+  int ev_endline_chr;
 };
 
 struct debug_info {
@@ -144,7 +146,7 @@ static struct ev_info *process_debug_events(code_t code_start,
                                             mlsize_t *num_events)
 {
   CAMLparam1(events_heap);
-  CAMLlocal3(l, ev, ev_start);
+  CAMLlocal4(l, ev, ev_start, ev_end);
   mlsize_t i, j;
   struct ev_info *events;
 
@@ -170,6 +172,7 @@ static struct ev_info *process_debug_events(code_t code_start,
                                  + Long_val(Field(ev, EV_POS)));
 
       ev_start = Field(Field(ev, EV_LOC), LOC_START);
+      ev_end = Field(Field(ev, EV_LOC), LOC_END);
 
       {
         const char *fname = String_val(Field(ev_start, POS_FNAME));
@@ -190,11 +193,12 @@ static struct ev_info *process_debug_events(code_t code_start,
 
       events[j].ev_lnum = Int_val(Field(ev_start, POS_LNUM));
       events[j].ev_startchr =
-        Int_val(Field(ev_start, POS_CNUM))
-        - Int_val(Field(ev_start, POS_BOL));
+        Int_val(Field(ev_start, POS_CNUM)) - Int_val(Field(ev_start, POS_BOL));
       events[j].ev_endchr =
-        Int_val(Field(Field(Field(ev, EV_LOC), LOC_END), POS_CNUM))
-        - Int_val(Field(ev_start, POS_BOL));
+        Int_val(Field(ev_end, POS_CNUM)) - Int_val(Field(ev_start, POS_BOL));
+      events[j].ev_endline_num = Int_val(Field(ev_end, POS_LNUM));
+      events[j].ev_endline_chr =
+        Int_val(Field(ev_end, POS_CNUM)) - Int_val(Field(ev_end, POS_BOL));
 
       j++;
     }
@@ -497,6 +501,8 @@ void caml_debuginfo_location(debuginfo dbg,
   li->loc_lnum = event->ev_lnum;
   li->loc_startchr = event->ev_startchr;
   li->loc_endchr = event->ev_endchr;
+  li->loc_endline_num = event->ev_endline_num;
+  li->loc_endline_chr = event->ev_endline_chr;
 }
 
 debuginfo caml_debuginfo_extract(backtrace_slot slot)

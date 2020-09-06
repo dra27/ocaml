@@ -238,11 +238,19 @@ struct name_info {
   char name[1];
 };
 
+struct name_and_loc_info {
+  int32_t filename_offs;
+  uint32_t cnums;
+  int32_t end_offset;
+  char name[1];
+};
+
 /* Extract location information for the given frame descriptor */
 void caml_debuginfo_location(debuginfo dbg, /*out*/ struct caml_loc_info * li)
 {
   uint32_t info1, info2;
   struct name_info * name_info;
+  struct name_and_loc_info * full_loc_info;
 
   /* If no debugging information available, print nothing.
      When everything is compiled with -g, this corresponds to
@@ -256,28 +264,46 @@ void caml_debuginfo_location(debuginfo dbg, /*out*/ struct caml_loc_info * li)
   /* Recover debugging info */
   info1 = ((uint32_t *)dbg)[0];
   info2 = ((uint32_t *)dbg)[1];
-  name_info = (struct name_info*)((char *) dbg + (info1 & 0x3FFFFFC));
-  /* Format of the two info words:
+  /*fprintf(stderr, "info1 = %lx\ninfo2 = %lx\n", info1, info2);
+  fflush(stderr);*/
+  /* Format of the two info words: XXX Update me!
+       0llllllllllllmmmaaaa aabbbbbb booooooooo ffffffffffffffffffffffff k n <- packed format
+       1lllllllllllllllllll mmmmmmmm mmmmmmmmmm ffffffffffffffffffffffff k n <- full format
        llllllllllllllllllll aaaaaaaa bbbbbbbbbb ffffffffffffffffffffffff k n
-                         44       36         26                        2 1 0
+                         44       36    |    26                        2 1 0
                        (32+12)    (32+4)
      n ( 1 bit ): 0 if this is the final debuginfo
                   1 if there's another following this one
      k ( 1 bit ): 0 if it's a call
                   1 if it's a raise
-     f (24 bits): offset (in 4-byte words) of file name relative to dbg
+     f (24 bits): offset (in 4-byte words) of defname/filename relative to dbg
      l (20 bits): line number
      a ( 8 bits): beginning of character range
      b (10 bits): end of character range */
   li->loc_valid = 1;
   li->loc_is_raise = (info1 & 2) == 2;
   li->loc_is_inlined = caml_debuginfo_next(dbg) != NULL;
-  li->loc_defname = name_info->name;
-  li->loc_filename =
-    (char *)name_info + name_info->filename_offs;
-  li->loc_lnum = info2 >> 12;
-  li->loc_startchr = (info2 >> 4) & 0xFF;
-  li->loc_endchr = ((info2 & 0xF) << 6) | (info1 >> 26);
+  if (info2 & 0x80000000) {
+    full_loc_info = (struct name_and_loc_info*)((char *) dbg + (info1 & 0x3FFFFFC));
+    li->loc_defname = full_loc_info->name;
+    li->loc_filename =
+      (char *)full_loc_info + full_loc_info->filename_offs;
+    li->loc_lnum = li->loc_endline_num = (info2 >> 12) & 0x7FFFF;
+    li->loc_endline_num += ((info2 & 0xFFF) << 6) | (info1 >> 26);
+    li->loc_startchr = full_loc_info->cnums >> 16;
+    li->loc_endline_chr = full_loc_info->cnums & 0xFFFF;
+    li->loc_endchr = full_loc_info->end_offset;
+  } else {
+    name_info = (struct name_info*)((char *) dbg + (info1 & 0x3FFFFFC));
+    li->loc_defname = name_info->name;
+    li->loc_filename =
+      (char *)name_info + name_info->filename_offs;
+    li->loc_lnum = li->loc_endline_num = info2 >> 19;
+    li->loc_endline_num += (info2 >> 16) & 0x7;
+    li->loc_startchr = (info2 >> 10) & 0x3F;
+    li->loc_endline_chr = (info2 >> 3) & 0x7F;
+    li->loc_endchr = /*li->loc_startchr +*/ li->loc_endline_chr + (((info2 & 0x7) << 6) | (info1 >> 26));
+  }
 }
 
 value caml_add_debug_info(backtrace_slot start, value size, value events)

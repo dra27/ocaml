@@ -41,6 +41,8 @@ struct caml_loc_info {
   int loc_startchr;
   int loc_endchr;
   int loc_is_inlined;
+  int loc_endline_num;
+  int loc_endline_chr;
 };
 
 /* When compiling with -g, backtrace slots have debug info associated.

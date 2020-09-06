@@ -247,17 +247,45 @@ let emit_frames a =
     a.efa_label_rel file_lbl 0l;
     a.efa_string defname
   in
-  let pack_info fd_raise d has_next =
-    let line = min 0xFFFFF d.Debuginfo.dinfo_line
-    and char_start = min 0xFF d.Debuginfo.dinfo_char_start
-    and char_end = min 0x3FF d.Debuginfo.dinfo_char_end
-    and kind = if fd_raise then 1 else 0
+  let full_locs = Queue.create () in
+  let emit_full_loc (lbl, file_lbl, char_start, char_end, char_end_offset, defname) =
+    (* stuff *)
+    a.efa_align 4;
+    a.efa_def_label lbl;
+    a.efa_label_rel file_lbl 0l;
+    a.efa_32 @@ Int32.(add (shift_left (of_int char_start) 16) (of_int char_end));
+    a.efa_32 @@ Int32.of_int char_end_offset;
+    a.efa_string defname
+  in
+      (* XXX Param is crap - have two functions *)
+  let pack_info ~full_loc_needed fd_raise d has_next =
+    let kind = if fd_raise then 1 else 0
     and has_next = if has_next then 1 else 0 in
-    Int64.(add (shift_left (of_int line) 44)
-             (add (shift_left (of_int char_start) 36)
-                (add (shift_left (of_int char_end) 26)
-                   (add (shift_left (of_int kind) 1)
-                      (of_int has_next)))))
+    if full_loc_needed then
+      let line = min 0x7FFFF d.Debuginfo.dinfo_line in
+      let end_line = min 0x3FFFF (d.Debuginfo.dinfo_end_line - d.Debuginfo.dinfo_line) in
+      Int64.(add (shift_left Int64.one 63)
+               (add (shift_left (of_int line) 44)
+                  (add (shift_left (of_int end_line) 26)
+                     (add (shift_left (of_int kind) 1)
+                        (of_int has_next)))))
+    else
+      (* Pack the location information in 37-bits *)
+      (* XXX don't need these *)
+      let line = d.Debuginfo.dinfo_line
+      (*and char_end = d.Debuginfo.dinfo_char_end in*)
+      (* XXX duplicates one below *)
+      and char_end =
+        min 0x3FFFFFFF
+            Debuginfo.(d.dinfo_char_end + d.dinfo_start_bol - d.dinfo_end_bol) in
+      Int64.(add (shift_left (of_int line) 51) (* 12 bits *)
+               (add (shift_left (of_int (d.Debuginfo.dinfo_end_line - d.Debuginfo.dinfo_line)) 48) (* 3 bits *)
+                  (add (shift_left (of_int d.Debuginfo.dinfo_char_start) 42) (* 6 bits *)
+                     (add (shift_left (of_int char_end) 35) (* 7 bits *)
+                        (add (shift_left (of_int (d.Debuginfo.dinfo_char_end (*- d.Debuginfo.dinfo_char_start*) - char_end)) 26) (* 9 bits *)
+                           (* 24 bits of offset here *)
+                           (add (shift_left (of_int kind) 1) (* 1 bit *)
+                              (of_int has_next))))))) (* 1 bit *)
   in
   let emit_debuginfo (rs, rdbg) lbl =
     (* Due to inlined functions, a single debuginfo may have multiple locations.
@@ -266,12 +294,44 @@ let emit_frames a =
     a.efa_align 4;
     a.efa_def_label lbl;
     let rec emit rs d rest =
+      (*if Debuginfo.(d.dinfo_file = "names.ml") then
+        Debuginfo.(Printf.eprintf "%s: line = %d, char_start = %d, char_end = %d, start_bol = %d, end_bol = %d, end_line = %d\n%!" d.dinfo_file d.dinfo_line d.dinfo_char_start d.dinfo_char_end d.dinfo_start_bol d.dinfo_end_bol d.dinfo_end_line);*)
       let open Debuginfo in
-      let info = pack_info rs d (rest <> []) in
+      let char_end =
+        min 0x3FFFFFFF
+            Debuginfo.(d.dinfo_char_end + d.dinfo_start_bol - d.dinfo_end_bol) in
+      (* XXX FIXME *)
+      let full_loc_needed =
+        Debuginfo.(d.dinfo_line > 0xFFF ||
+                   d.dinfo_end_line - d.dinfo_line > 0x7 ||
+                   d.dinfo_char_start > 0x3F ||
+                   char_end > 0x7F ||
+                   d.dinfo_char_end - d.dinfo_char_start - char_end > 0x1FF) in
+      let info = pack_info ~full_loc_needed rs d (rest <> []) in
       let defname = Scoped_location.string_of_scopes d.dinfo_scopes in
-      a.efa_label_rel
-        (label_defname d.dinfo_file defname)
-        (Int64.to_int32 info);
+      (*let () =
+          let char_start = min 0x3FFFFFFF d.Debuginfo.dinfo_char_start
+          and line_end = min 0x3FFFFFFF d.Debuginfo.dinfo_end_line
+          and char_end =
+            min 0x3FFFFFFF
+                Debuginfo.(d.dinfo_char_end + d.dinfo_start_bol - d.dinfo_end_bol)
+          and char_end_offset = min 0x3FFFFFFF d.Debuginfo.dinfo_char_end in
+        let overflow =
+    if (d.dinfo_line > 0x7FFFF || char_start > 0xFF ||
+               char_end_offset > 0x3FFF) then "Overflow" else "Full" in
+      Printf.eprintf "%s loc required for %s in %s at %d, %d, %d, %d, %d\n%!" overflow defname d.dinfo_file d.dinfo_line char_start line_end char_end char_end_offset
+      in*)
+      let lbl =
+        if full_loc_needed then
+          let lbl = Cmm.new_label ()
+          and char_start = min 0x3FFFFFFF d.Debuginfo.dinfo_char_start
+          and char_end_offset = min 0x3FFFFFFF d.Debuginfo.dinfo_char_end in
+          Queue.push (lbl, label_filename d.dinfo_file, char_start, char_end, char_end_offset, defname) full_locs;
+          lbl
+        else
+          label_defname d.dinfo_file defname
+      in
+      a.efa_label_rel lbl (Int64.to_int32 info);
       a.efa_32 (Int64.to_int32 (Int64.shift_right info 32));
       match rest with
       | [] -> ()
@@ -284,6 +344,7 @@ let emit_frames a =
   Label_table.iter emit_debuginfo debuginfos;
   Hashtbl.iter emit_filename filenames;
   Hashtbl.iter emit_defname defnames;
+  Queue.iter emit_full_loc full_locs;
   a.efa_align Arch.size_addr;
   frame_descriptors := []
 
