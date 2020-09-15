@@ -114,10 +114,12 @@ static void caml_sys_check_path(value name)
 
 extern void caml_terminate_signals(void);
 
-CAMLprim value caml_sys_exit(value retcode_v)
-{
-  int retcode = Int_val(retcode_v);
+CAMLnoreturn_start
+void caml_do_exit(int)
+CAMLnoreturn_end;
 
+CAMLexport void caml_do_exit(int retcode)
+{
   if ((caml_verb_gc & 0x400) != 0) {
     /* cf caml_gc_counters */
     double minwords = Caml_state->stat_minor_words
@@ -163,6 +165,11 @@ CAMLprim value caml_sys_exit(value retcode_v)
   caml_terminate_signals();
 #endif
   exit(retcode);
+}
+
+CAMLprim value caml_sys_exit(value retcode)
+{
+  caml_do_exit(Int_val(retcode));
 }
 
 #ifndef O_BINARY
