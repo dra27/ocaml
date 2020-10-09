@@ -29,9 +29,16 @@ TESTLOG ?= _log
 
 ocamltest_directory := ../ocamltest
 
+ifeq "$(NATIVE_COMPILER)" "true"
+  ocamltest_program_to_build := ocamltest.opt$(EXE)
+else
+  ocamltest_program_to_build := ocamltest$(EXE)
+endif
+
 ocamltest_program := $(or \
   $(wildcard $(ocamltest_directory)/ocamltest.opt$(EXE)),\
-  $(wildcard $(ocamltest_directory)/ocamltest$(EXE)))
+  $(wildcard $(ocamltest_directory)/ocamltest$(EXE)),\
+  $(ocamltest_directory)/$(ocamltest_program_to_build))
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
   ifeq "$(SYSTEM)" "cygwin"
@@ -52,18 +59,14 @@ else # Windows
   endif
 endif
 
-ifeq "$(ocamltest_program)" ""
-  ocamltest = $(error ocamltest not found in $(ocamltest_directory))
+ifeq "$(FLEXLINK_ENV)" ""
+  ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
 else
-  ifeq "$(FLEXLINK_ENV)" ""
-    ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
-  else
-    MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
-                                     $(FLEXLINK_FLAGS)
+  MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
+                                   $(FLEXLINK_FLAGS)
 
-    ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
-                                 $(ocamltest_program)
-  endif
+  ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
+                               $(ocamltest_program)
 endif
 
 # PROMOTE is only meant to be used internally in recursive calls;
@@ -283,8 +286,14 @@ promote:
 lib:
 	@$(MAKE) -s -C lib
 
+$(ocamltest_directory)/ocamltest$(EXE):
+	@$(MAKE) -C $(ocamltest_directory) all
+
+$(ocamltest_directory)/ocamltest.opt$(EXE):
+	@$(MAKE) -C $(ocamltest_directory) allopt
+
 .PHONY: tools
-tools:
+tools: $(ocamltest_program)
 	@cd tools && $(MAKE) -s BASEDIR=$(BASEDIR)
 
 .PHONY: clean
