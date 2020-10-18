@@ -1,6 +1,12 @@
 OCaml 4.09 maintenance branch
 -----------------------------
 
+### Code generation and optimizations:
+
+- #9969, #9981: Added mergeable flag to ELF sections containing mergeable
+  constants.  Fixes compatibility with the integrated assembler in clang 11.0.0.
+  (Jacob Young, review by Nicolás Ojeda Bär)
+
 ### Build system:
 
 - #9383: Don't assume that AWKPATH includes .
