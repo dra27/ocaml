@@ -18,6 +18,10 @@ OCaml 4.09 maintenance branch
   -fsmall-toc to enable the previous behaviour.
   (David Allsopp, report by Nathaniel Wesley Filardo, review by Xavier Leroy)
 
+- #9969, #9981: Added mergeable flag to ELF sections containing mergeable
+  constants.  Fixes compatibility with the integrated assembler in clang 11.0.0.
+  (Jacob Young, review by Nicolás Ojeda Bär)
+
 ### Internal/compiler-libs changes:
 
 - #9414: testsuite, ocamltest: keep test artifacts only on failure.
