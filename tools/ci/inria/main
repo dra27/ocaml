@@ -154,14 +154,12 @@ case "${OCAML_ARCH}" in
     host='--host=i686-w64-mingw32'
     instdir='C:/ocamlmgw'
     cleanup=true
-    check_make_alldepend=true
   ;;
   mingw64)
     build='--build=x86_64-unknown-cygwin'
     host='--host=x86_64-w64-mingw32'
     instdir='C:/ocamlmgw64'
     cleanup=true
-    check_make_alldepend=true
   ;;
   msvc)
     build='--build=i686-pc-cygwin'
