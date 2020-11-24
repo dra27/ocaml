@@ -24,29 +24,8 @@
 export OCAMLTEST_SKIP_TESTS="tests/afl-instrumentation/afltest.ml \
 tests/runtime-errors/stackoverflow.ml"
 
-# To know the slave's architecture, this script looks at the OCAML_ARCH
-# environment variable. For a given node NODE, this variable can be defined
-# in Jenkins at the following address:
-# https://ci.inria.fr/ocaml/computer/NODE/configure
-
-# Other environment variables that are honored:
-#   OCAML_JOBS                number of jobs to run in parallel (make -j)
-
-# Command-line arguments:
-# -jNN                    pass "-jNN" option to make for parallel builds
-
-error () {
-  echo "$1" >&2
-  exit 3
-}
-
-arch_error() {
-  configure_url="https://ci.inria.fr/ocaml/computer/${NODE_NAME}/configure"
-  msg="Unknown architecture. Make sure the OCAML_ARCH environment"
-  msg="$msg variable has been defined."
-  msg="$msg\nSee ${configure_url}"
-  error "$msg"
-}
+jobs=-j8
+make=make
 
 # Change a variable in Makefile.config
 # Usage: set_config_var <variable name> <new value>
@@ -59,41 +38,12 @@ set_config_var() {
 }
 
 #########################################################################
+
+# Print each command before its execution
+set -x
+
 # stop on error
 set -e
-
-# be considerate towards other potential users of the test machine
-case "${OCAML_ARCH}" in
-  bsd|macos|linux) renice 10 $$ ;;
-esac
-
-# set up variables
-
-make=make
-jobs=''
-
-case "${OCAML_ARCH}" in
-  bsd) make=gmake ;;
-  macos) ;;
-  linux) ;;
-  cygwin|cygwin64|mingw|mingw64|msvc|msvc64)
-    error "Don't run this test under Windows";;
-  *) arch_error;;
-esac
-
-case "${OCAML_JOBS}" in
-  [1-9]|[1-9][0-9]) jobs="-j${OCAML_JOBS}" ;;
-esac
-
-# parse optional command-line arguments
-
-while [ $# -gt 0 ]; do
-  case $1 in
-    -j[1-9]|-j[1-9][0-9]) jobs="$1";;
-    *) error "unknown option $1";;
-  esac
-  shift
-done
 
 # Tell gcc to use only ASCII in its diagnostic outputs.
 export LC_ALL=C
@@ -106,50 +56,23 @@ else
   run_testsuite="$make -C testsuite all"
 fi
 
-# A tool that make error backtrace nicer
-# Need to pick the one that matches clang-6.0 and is named "llvm-symbolizer"
-# (/usr/bin/llvm-symbolizer-6.0 doesn't work, that would be too easy)
-export ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-6.0/bin/llvm-symbolizer
+# A tool that makes error backtraces nicer
+# Need to pick the one that matches clang-9 and is named "llvm-symbolizer"
+# (/usr/bin/llvm-symbolizer-9 doesn't work, that would be too easy)
+export ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-9/bin/llvm-symbolizer
 export TSAN_SYMBOLIZER_PATH="$ASAN_SYMBOLIZER_PATH"
 
 #########################################################################
 
-# Ensure that the repo still passes the check-typo script
-if [ ! -x tools/check-typo ] ; then
-  error "tools/check-typo does not appear to be executable?"
-fi
-tools/check-typo
-
-#########################################################################
-
-echo "======== old school build =========="
+echo "======== clang 9, address sanitizer, UB sanitizer =========="
 
 git clean -q -f -d -x
 
-instdir="$HOME/ocaml-tmp-install-$$"
-./configure --prefix "$instdir"
-
-# Build the system without using world.opt
-make $jobs world
-make $jobs opt
-make $jobs opt.opt
-make install
-
-rm -rf "$instdir"
-
-# It's a build system test only, so we don't bother testing the compiler
-
-#########################################################################
-
-echo "======== clang 6.0, address sanitizer, UB sanitizer =========="
-
-git clean -q -f -d -x
-
-# Use clang 6.0
+# Use clang 9
 # We cannot give the sanitizer options as part of -cc because
 # then various autoconfiguration tests fail.
 # Instead, we'll fix OC_CFLAGS a posteriori.
-./configure CC=clang-6.0
+./configure CC=clang-9
 
 # These are the undefined behaviors we want to check
 # Others occur on purpose e.g. signed arithmetic overflow
@@ -179,8 +102,8 @@ set_config_var OC_CFLAGS "-O1 \
 # 2- add an exception for ocamlyacc, which doesn't free memory
 
 OCAMLRUNPARAM="c=1" \
-LSAN_OPTIONS="suppressions=$(pwd)/tools/ci/inria/lsan-suppr.txt" \
-make $jobs world.opt
+LSAN_OPTIONS="suppressions=$(pwd)/tools/ci/inria/sanitizers/lsan-suppr.txt" \
+make $jobs
 
 # Run the testsuite.
 # We deactivate leak detection for two reasons:
@@ -190,17 +113,17 @@ make $jobs world.opt
 # occurs.
 
 # We already use sigaltstack for stack overflow detection. Our use
-# interracts with ASAN's. Hence, we tell ASAN not to use it.
+# interacts with ASAN's. Hence, we tell ASAN not to use it.
 
 ASAN_OPTIONS="detect_leaks=0,use_sigaltstack=0" $run_testsuite
 
 #########################################################################
 
-echo "======== clang 6.0, thread sanitizer =========="
+echo "======== clang 9, thread sanitizer =========="
 
 git clean -q -f -d -x
 
-./configure CC=clang-6.0
+./configure CC=clang-9
 
 # Select thread sanitizer
 # Don't optimize too much to get better backtraces of errors
@@ -210,7 +133,17 @@ set_config_var OC_CFLAGS "-O1 \
 -fsanitize=thread"
 
 # Build the system
-make $jobs world.opt
+make $jobs
+
+# ThreadSanitizer has problems with processes that exit via
+# pthread_exit in the last thread.
+# It also reports errors for the error case of unlocking an
+# error-checking mutex.
+# Exclude the corresponding test
+export OCAMLTEST_SKIP_TESTS="$OCAMLTEST_SKIP_TESTS \
+tests/lib-threads/pr9971.ml \
+tests/statmemprof/thread_exit_in_callback.ml \
+tests/lib-threads/mutex_errors.ml"
 
 # Run the testsuite.
 # ThreadSanitizer complains about fork() in threaded programs,
@@ -234,7 +167,7 @@ TSAN_OPTIONS="die_after_fork=0" $run_testsuite
 # # Instead, we'll fix OC_CFLAGS a posteriori.
 # # Memory sanitizer doesn't like the static data generated by ocamlopt,
 # # hence build bytecode only
-# ./configure CC=clang-6.0 --disable-native-compiler
+# ./configure CC=clang-9 --disable-native-compiler
 
 # # Select memory sanitizer
 # # Don't optimize at all to get better backtraces of errors
@@ -243,10 +176,10 @@ TSAN_OPTIONS="die_after_fork=0" $run_testsuite
 # -Wall -Werror \
 # -fsanitize=memory"
 
-# # A tool that make error backtrace nicer
+# # A tool that makes error backtraces nicer
 # # Need to pick the one that matches clang-6.0
 # export MSAN_SYMBOLIZER_PATH=/usr/lib/llvm-6.0/bin/llvm-symbolizer
 
 # # Build the system (bytecode only) and test
-# make $jobs world
+# make $jobs
 # $run_testsuite
