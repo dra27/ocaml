@@ -810,6 +810,7 @@ ocamlc_cppflags
 ocamlc_cflags
 nativecclibs
 bytecclibs
+oc_dll_ldflags
 oc_ldflags
 oc_cppflags
 oc_cflags
@@ -2749,6 +2750,7 @@ internal_cppflags=""
 ocamlc_cflags=""
 ocamlc_cppflags=""
 oc_ldflags=""
+oc_dll_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
 iflexdir=""
@@ -2806,6 +2808,7 @@ VERSION=4.11.3+dev0-2021-02-24
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -12636,7 +12639,7 @@ fi
     if $with_sharedlibs; then :
   case $host in #(
   i686-*-*) :
-    flexdll_chain="mingw" ;; #(
+    flexdll_chain="mingw"; oc_dll_ldflags="-static-libgcc" ;; #(
   x86_64-*-*) :
     flexdll_chain="mingw64" ;; #(
   *) :
@@ -13487,6 +13490,11 @@ if test x"$enable_shared" != "xno"; then :
   *-*-mingw32) :
     mksharedlib='$(FLEXLINK)'
       mkmaindll='$(FLEXLINK) -maindll'
+      if test -n "$oc_dll_ldflags"; then :
+
+        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
+        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""
+fi
       shared_libraries_supported=$with_sharedlibs ;; #(
   *-pc-windows) :
     mksharedlib='$(FLEXLINK)'
