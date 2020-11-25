@@ -52,11 +52,7 @@ HEADERS=unixsupport.h socketaddr.h
 
 include ../Makefile.otherlibs.common
 
-ifeq "$(SYSTEM)" "mingw"
-LDOPTS=-ldopt "-link -static-libgcc" $(addprefix -ldopt ,$(WIN32_LIBS))
-else
 LDOPTS=$(addprefix -ldopt ,$(WIN32_LIBS))
-endif
 
 clean::
 	rm -f $(UNIX_FILES) $(UNIX_CAML_FILES)
