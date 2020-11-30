@@ -9,7 +9,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: configure tree
-      run: ./configure --disable-naked-pointers --disable-stdlib-manpages
+      run: ./configure --disable-naked-pointers
     - name: Build
       run: |
         make -j world.opt
@@ -26,7 +26,7 @@ jobs:
         sudo apt-get update -y && sudo apt-get install -y gcc-multilib gfortran-multilib
     - name: configure tree
       run: |
-        XARCH=i386 CONFIG_ARG='--disable-stdlib-manpages --disable-shared' bash -xe tools/ci/actions/runner.sh configure
+        XARCH=i386 CONFIG_ARG='--disable-shared' bash -xe tools/ci/actions/runner.sh configure
     - name: Build
       run: |
         bash -xe tools/ci/actions/runner.sh build
