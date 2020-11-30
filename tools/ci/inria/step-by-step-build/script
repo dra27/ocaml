@@ -20,6 +20,9 @@ set -ex
 jobs=-j8
 instdir="$HOME/ocaml-tmp-install-$$"
 
+# Make sure the repository is clean
+git clean -q -f -d -x
+
 ./configure --prefix "$instdir"
 make $jobs world
 make $jobs opt
