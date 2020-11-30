@@ -50,7 +50,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Packages
       run: |
-        sudo apt install texlive-latex-extra texlive-fonts-recommended
+        sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended
   # Ensure that make distclean can be run from an empty tree
     - name: distclean
       run: |
