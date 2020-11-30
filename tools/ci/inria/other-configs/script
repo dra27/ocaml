@@ -32,6 +32,8 @@ ${main} -conf --disable-native-compiler \
         -conf --disable-debug-runtime \
         -conf --disable-instrumented-runtime \
         -conf --disable-systhreads \
+        -conf --disable-graph-lib \
+        -conf --disable-vmthreads \
         -conf --disable-str-lib \
         -conf --disable-unix-lib \
         -conf --disable-bigarray-lib \
