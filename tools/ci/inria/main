@@ -134,7 +134,6 @@ confoptions="${OCAML_CONFIGURE_OPTIONS}"
 make_native=true
 cleanup=false
 check_make_alldepend=false
-dorebase=false
 jobs=''
 bootstrap=false
 
@@ -155,7 +154,6 @@ case "${OCAML_ARCH}" in
   cygwin64)
     cleanup=true
     check_make_alldepend=true
-    dorebase=false
     confoptions="$confoptions --disable-shared "
   ;;
   mingw)
@@ -257,13 +255,6 @@ fi
 
 if $make_native && $check_make_alldepend; then
   $make --warn-undefined-variables alldepend
-fi
-
-if $dorebase; then
-    # temporary solution to the cygwin fork problem
-    # see https://github.com/alainfrisch/flexdll/issues/50
-    rebase -b 0x7cd20000 otherlibs/unix/dllunix.so
-    rebase -b 0x7cdc0000 otherlibs/systhreads/dllthreads.so
 fi
 
 $make --warn-undefined-variables install
