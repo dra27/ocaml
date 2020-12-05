@@ -424,3 +424,8 @@ depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h
 endif
 
 include .depend
+
+# This empty target is here for AppVeyor to allow dependencies to be built
+# without doing anything else.
+.PHONY: setup-depend
+setup-depend:
