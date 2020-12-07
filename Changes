@@ -1,6 +1,13 @@
 OCaml 4.09 maintenance branch
 -----------------------------
 
+### Supported platforms:
+
+- #9699, #10026: add support for iOS and macOS on ARM 64 bits
+  Backported from OCaml 4.12.0
+  (Eduardo Rafael, review by Xavier Leroy, Nicolás Ojeda Bär
+   and Anil Madhavapeddy, additional testing by Michael Schmidt)
+
 ### Runtime system:
 
 - #10250, #10266: Dynamically allocate alternate signal stacks to
@@ -21,6 +28,14 @@ OCaml 4.09 maintenance branch
 
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
+
+### Code generation and optimization
+
+- #9752, #10026: Revised handling of calling conventions for external
+  C functions. Provide a more precise description of the types of unboxed
+  arguments, so that the ARM64 iOS/macOS calling conventions can be honored.
+  Backported from OCaml 4.12.0
+  (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
 
 ### Build system:
 
