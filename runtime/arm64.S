@@ -335,6 +335,7 @@ FUNCTION(caml_alloc3)
 
 FUNCTION(caml_allocN)
         CFI_STARTPROC
+        PROFILE
 1:      sub     ALLOC_PTR, ALLOC_PTR, ADDITIONAL_ARG
         cmp     ALLOC_PTR, ALLOC_LIMIT
         b.lo    2f
@@ -388,6 +389,7 @@ FUNCTION(caml_c_call)
 
 FUNCTION(caml_start_program)
         CFI_STARTPROC
+        PROFILE
         ADDRGLOBAL(TMP, caml_program)
 
 /* Code shared with caml_callback* */
@@ -577,6 +579,7 @@ FUNCTION(caml_callback3_exn)
 
 FUNCTION(caml_ml_array_bound_error)
         CFI_STARTPROC
+        PROFILE
     /* Load address of [caml_array_bound_error] in ADDITIONAL_ARG */
         ADDRGLOBAL(ADDITIONAL_ARG, caml_array_bound_error)
     /* Call that function */

@@ -102,8 +102,8 @@ let code_for_function_prologue ~function_name ~node_hole =
           Clet (VP.create is_new_node,
             Clet (VP.create pc, Cconst_symbol function_name,
               Cop (Cextcall ("caml_spacetime_allocate_node",
-                  typ_int, [], false, None),
-                [cconst_int (1 (* header *) + !index_within_node);
+                  [| Int |], [], false, None),
+                [Cconst_int (1 (* header *) + !index_within_node);
                 Cvar pc;
                 Cvar node_hole;
                 ],
@@ -314,8 +314,8 @@ class virtual instruction_selection = object (self)
       | M.Iop (M.Itailcall_ind { label_after; }) ->
         assert (Array.length arg = 1);
         self#instrument_indirect_call ~env ~callee:arg.(0)
-          ~is_tail:true ~label_after dbg
-      | M.Iop (M.Iextcall { func; alloc = true; label_after; _}) ->
+          ~is_tail:true ~label_after
+      | M.Iop (M.Iextcall { func; alloc = true; label_after; }) ->
         (* N.B. No need to instrument "noalloc" external calls. *)
         assert (Array.length arg = 0);
         self#instrument_direct_call ~env ~func ~is_tail:false ~label_after

@@ -739,15 +739,15 @@ method emit_expr (env:environment) exp =
               Some rd
           | Iextcall { ty_args; _} ->
               let spacetime_reg =
-                self#about_to_emit_call env (Iop new_op) [| |] dbg in
+                self#about_to_emit_call env (Iop new_op) [| |] in
               let (loc_arg, stack_ofs) =
                 self#emit_extcall_args env ty_args new_args in
-              self#maybe_emit_spacetime_move env ~spacetime_reg;
+              self#maybe_emit_spacetime_move ~spacetime_reg;
               let rd = self#regs_for ty in
               let loc_res =
-                self#insert_op_debug env new_op dbg
+                self#insert_op_debug new_op dbg
                   loc_arg (Proc.loc_external_results (Reg.typv rd)) in
-              self#insert_move_results env loc_res rd stack_ofs;
+              self#insert_move_results loc_res rd stack_ofs;
               Some rd
           | Ialloc { bytes = _; spacetime_index; label_after_call_gc; } ->
               let rd = self#regs_for typ_val in
@@ -993,19 +993,19 @@ method emit_extcall_args env ty_args args =
   let locs, stack_ofs = Proc.loc_external_arguments ty_args in
   let ty_args = Array.of_list ty_args in
   if stack_ofs <> 0 then
-    self#insert env (Iop(Istackoffset stack_ofs)) [||] [||];
+    self#insert (Iop(Istackoffset stack_ofs)) [||] [||];
   List.iteri
     (fun i arg ->
-      self#insert_move_extcall_arg env ty_args.(i) arg locs.(i))
+      self#insert_move_extcall_arg ty_args.(i) arg locs.(i))
     args;
   Array.concat (Array.to_list locs), stack_ofs
 
-method insert_move_extcall_arg env _ty_arg src dst =
+method insert_move_extcall_arg _ty_arg src dst =
   (* The default implementation is one or two ordinary moves.
      (Two in the case of an int64 argument on a 32-bit platform.)
      It can be overriden to use special move instructions,
      for example a "32-bit move" instruction for int32 arguments. *)
-  self#insert_moves env src dst
+  self#insert_moves src dst
 
 method emit_stores env data regs_addr =
   let a =
@@ -1037,8 +1037,8 @@ method private emit_return (env:environment) exp =
     None -> ()
   | Some r ->
       let loc = Proc.loc_results (Reg.typv r) in
-      self#insert_moves env r loc;
-      self#insert env Ireturn loc [||]
+      self#insert_moves r loc;
+      self#insert Ireturn loc [||]
 
 method emit_tail (env:environment) exp =
   match exp with
@@ -1175,8 +1175,8 @@ method emit_tail (env:environment) exp =
         None -> ()
       | Some r1 ->
           let loc = Proc.loc_results (Reg.typv r1) in
-          self#insert_moves env r1 loc;
-          self#insert env Ireturn loc [||]
+          self#insert_moves r1 loc;
+          self#insert Ireturn loc [||]
       end
   | _ ->
       self#emit_return env exp

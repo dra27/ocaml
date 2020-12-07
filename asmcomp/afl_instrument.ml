@@ -95,6 +95,6 @@ let instrument_initialiser c =
   with_afl_logging
     (Csequence
        (Cop (Cextcall ("caml_setup_afl", typ_int, [], false, None),
-             [Cconst_int (0, dbg ())],
-             dbg ()),
+             [Cconst_int 0],
+             Debuginfo.none),
         c))

@@ -791,6 +791,7 @@ AS_IF([test x"$enable_shared" != "xno"],
     [[i[3456]86-*-linux*]], [natdynlink=true],
     [[i[3456]86-*-gnu*]], [natdynlink=true],
     [[x86_64-*-linux*]], [natdynlink=true],
+    [[i[3456]86-*-darwin*]], [AS_IF([$arch64], [natdynlink=true])],
     [arm64-*-darwin*], [natdynlink=true],
     [aarch64-*-darwin*], [natdynlink=true],
     [x86_64-*-darwin*], [natdynlink=true],
@@ -1178,6 +1179,10 @@ AC_CHECK_FUNC([mkfifo], [AC_DEFINE([HAS_MKFIFO])])
 AC_CHECK_FUNC([getcwd], [AC_DEFINE([HAS_GETCWD])])
 
 AC_CHECK_DECL([system], [AC_DEFINE([HAS_SYSTEM])], [], [[#include <stdlib.h>]])
+
+AC_CHECK_FUNC([getpriority],
+  [AC_CHECK_FUNC([setpriority],
+    [AC_DEFINE([HAS_GETPRIORITY])])])
 
 ## utime
 ## Note: this was defined in config/s-nt.h but the autoconf macros do not

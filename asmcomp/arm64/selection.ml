@@ -254,10 +254,10 @@ method select_logical op = function
   | args ->
       (Iintop op, args)
 
-method! insert_move_extcall_arg env ty_arg src dst =
+method! insert_move_extcall_arg ty_arg src dst =
   if macosx && ty_arg = XInt32 && is_stack_slot dst
-  then self#insert env (Iop (Ispecific Imove32)) src dst
-  else self#insert_moves env src dst
+  then self#insert (Iop (Ispecific Imove32)) src dst
+  else self#insert_moves src dst
 end
 
 let fundecl f = (new selector)#emit_fundecl f

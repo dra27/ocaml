@@ -785,7 +785,7 @@ let make_alloc_generic set_fn dbg tag wordsize args =
                           fill_fields (idx + 2) el) in
     Clet(VP.create id,
          Cop(Cextcall("caml_alloc", typ_val, [], true, None),
-                 [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
+                 [Cconst_int wordsize; Cconst_int tag], dbg),
          fill_fields 1 args)
   end
 
@@ -2219,13 +2219,12 @@ and transl_prim_2 env p arg1 arg2 dbg =
   | Psetfield(n, ptr, init) ->
       begin match assignment_kind ptr init with
       | Caml_modify ->
-        return_unit dbg (Cop(Cextcall("caml_modify", typ_void, [], false, None),
+        return_unit(Cop(Cextcall("caml_modify", typ_void, [], false, None),
                         [field_address (transl env arg1) n dbg;
                          transl env arg2],
                         dbg))
       | Caml_initialize ->
-        return_unit dbg (Cop(Cextcall("caml_initialize",
-                                      typ_void, [], false, None),
+        return_unit(Cop(Cextcall("caml_initialize", typ_void, [], false, None),
                         [field_address (transl env arg1) n dbg;
                          transl env arg2],
                         dbg))
@@ -2874,8 +2873,8 @@ and transl_letrec env bindings cont =
     List.map (fun (id, exp) -> (id, exp, expr_size V.empty exp))
       bindings
   in
-  let op_alloc prim args =
-    Cop(Cextcall(prim, typ_val, [], true, None), args, dbg) in
+  let op_alloc prim sz =
+    Cop(Cextcall(prim, typ_val, [], true, None), [int_const sz], dbg) in
   let rec init_blocks = function
     | [] -> fill_nonrec bsz
     | (id, _exp, RHS_block sz) :: rem ->

@@ -114,6 +114,11 @@
 
 /* Define HAS_SYSTEM if the library provides the system() function. */
 
+#undef HAS_GETPRIORITY
+
+/* Define HAS_GETPRIORITY if the library provides getpriority() and
+   setpriority(). Otherwise, we'll use nice(). */
+
 #undef HAS_UTIME
 #undef HAS_UTIMES
 
