@@ -102,7 +102,7 @@ let code_for_function_prologue ~function_name ~node_hole =
           Clet (VP.create is_new_node,
             Clet (VP.create pc, Cconst_symbol function_name,
               Cop (Cextcall ("caml_spacetime_allocate_node",
-                  [| Int |], false, None),
+                  [| Int |], [], false, None),
                 [Cconst_int (1 (* header *) + !index_within_node);
                 Cvar pc;
                 Cvar node_hole;
@@ -138,7 +138,7 @@ let code_for_blockheader ~value's_header ~node ~dbg =
        the latter table to be used for resolving a program counter at such
        a point to a location.
     *)
-    Cop (Cextcall ("caml_spacetime_generate_profinfo", [| Int |],
+    Cop (Cextcall ("caml_spacetime_generate_profinfo", typ_int, [],
         false, Some label),
       [Cvar address_of_profinfo;
        Cconst_int (index_within_node + 1)],
@@ -253,7 +253,7 @@ let code_for_call ~node ~callee ~is_tail ~label =
         else Cconst_int 1  (* [Val_unit] *)
       in
       Cop (Cextcall ("caml_spacetime_indirect_node_hole_ptr",
-          [| Int |], false, None),
+           typ_int, [], false, None),
         [callee; Cvar place_within_node; caller_node],
         dbg))
 
