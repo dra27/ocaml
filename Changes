@@ -1,11 +1,25 @@
 OCaml 4.08 maintenance branch:
 ------------------------------
 
+### Supported platforms:
+
+- #9699, #10026: add support for iOS and macOS on ARM 64 bits
+  Backported from OCaml 4.12.0
+  (GitHub user @EduardoRFS, review by Xavier Leroy, Nicolás Ojeda Bär
+   and Anil Madhavapeddy, additional testing by Michael Schmidt)
+
 ### Code generation and optimization
 
 - #7931, #1904: Add FreeBSD/aarch64 support
   (Greg V, review by Sébastien Hinderer, Stephen Dolan, Damien Doligez
    and Xavier Leroy)
+
+ - #9752, #10026: Revised handling of calling conventions for
+   external C functions.
+   Provide a more precise description of the types of unboxed arguments,
+   so that the ARM64 iOS/macOS calling conventions can be honored.
+   Backported from OCaml 4.12.0
+   (Xavier Leroy, review by Mark Shinwell and Github user @EduardoRFS)
 
 ### Runtime system:
 
