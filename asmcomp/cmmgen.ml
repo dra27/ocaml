@@ -650,8 +650,8 @@ let rec remove_unit = function
       Clet(id, c1, remove_unit c2)
   | Cop(Capply _mty, args, dbg) ->
       Cop(Capply typ_void, args, dbg)
-  | Cop(Cextcall(proc, _mty, alloc, label_after), args, dbg) ->
-      Cop(Cextcall(proc, typ_void, alloc, label_after), args, dbg)
+  | Cop(Cextcall(proc, _ty_res, ty_args, alloc, label_after), args, dbg) ->
+      Cop(Cextcall(proc, typ_void, ty_args, alloc, label_after), args, dbg)
   | Cexit (_,_) as c -> c
   | Ctuple [] as c -> c
   | c -> Csequence(c, Ctuple [])
@@ -783,10 +783,10 @@ let float_array_ref dbg arr ofs =
   box_float dbg (unboxed_float_array_ref arr ofs dbg)
 
 let addr_array_set arr ofs newval dbg =
-  Cop(Cextcall("caml_modify", typ_void, false, None),
+  Cop(Cextcall("caml_modify", typ_void, [], false, None),
       [array_indexing log2_size_addr arr ofs dbg; newval], dbg)
 let addr_array_initialize arr ofs newval dbg =
-  Cop(Cextcall("caml_initialize", typ_void, false, None),
+  Cop(Cextcall("caml_initialize", typ_void, [], false, None),
       [array_indexing log2_size_addr arr ofs dbg; newval], dbg)
 let int_array_set arr ofs newval dbg =
   Cop(Cstore (Word_int, Assignment),
@@ -822,7 +822,7 @@ let bigstring_length ba dbg =
 
 let lookup_tag obj tag dbg =
   bind "tag" tag (fun tag ->
-    Cop(Cextcall("caml_get_public_method", typ_val, false, None),
+    Cop(Cextcall("caml_get_public_method", typ_val, [], false, None),
         [obj; tag],
         dbg))
 
@@ -852,14 +852,14 @@ let make_alloc_generic set_fn dbg tag wordsize args =
     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
                           fill_fields (idx + 2) el) in
     Clet(VP.create id,
-         Cop(Cextcall("caml_alloc", typ_val, true, None),
+         Cop(Cextcall("caml_alloc", typ_val, [], true, None),
                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
          fill_fields 1 args)
   end
 
 let make_alloc dbg tag args =
   let addr_array_init arr ofs newval dbg =
-    Cop(Cextcall("caml_initialize", typ_void, false, None),
+    Cop(Cextcall("caml_initialize", typ_void, [], false, None),
         [array_indexing log2_size_addr arr ofs dbg; newval], dbg)
   in
   make_alloc_generic addr_array_init dbg tag (List.length args) args
@@ -2333,7 +2333,7 @@ let rec transl env e =
 and transl_make_array dbg env kind args =
   match kind with
   | Pgenarray ->
-      Cop(Cextcall("caml_make_array", typ_val, true, None),
+      Cop(Cextcall("caml_make_array", typ_val, [], true, None),
           [make_alloc dbg 0 (List.map (transl env) args)], dbg)
   | Paddrarray | Pintarray ->
       make_alloc dbg 0 (List.map (transl env) args)
@@ -2344,20 +2344,32 @@ and transl_make_array dbg env kind args =
 and transl_ccall env prim args dbg =
   let transl_arg native_repr arg =
     match native_repr with
-    | Same_as_ocaml_repr -> transl env arg
-    | Unboxed_float -> transl_unbox_float dbg env arg
-    | Unboxed_integer bi -> transl_unbox_int dbg env bi arg
-    | Untagged_int -> untag_int (transl env arg) dbg
+    | Same_as_ocaml_repr ->
+        (XInt, transl env arg)
+    | Unboxed_float ->
+        (XFloat, transl_unbox_float dbg env arg)
+    | Unboxed_integer bi ->
+        let xty =
+          match bi with
+          | Pnativeint -> XInt
+          | Pint32 -> XInt32
+          | Pint64 -> XInt64 in
+        (xty, transl_unbox_int dbg env bi arg)
+    | Untagged_int ->
+        (XInt, untag_int (transl env arg) dbg)
   in
   let rec transl_args native_repr_args args =
     match native_repr_args, args with
     | [], args ->
         (* We don't require the two lists to be of the same length as
            [default_prim] always sets the arity to [0]. *)
-        List.map (transl env) args
-    | _, [] -> assert false
+        (List.map (fun _ -> XInt) args, List.map (transl env) args)
+    | _, [] ->
+        assert false
     | native_repr :: native_repr_args, arg :: args ->
-        transl_arg native_repr arg :: transl_args native_repr_args args
+        let (ty1, arg') = transl_arg native_repr arg in
+        let (tys, args') = transl_args native_repr_args args in
+        (ty1 :: tys, arg' :: args')
   in
   let typ_res, wrap_result =
     match prim.prim_native_repr_res with
@@ -2368,10 +2380,10 @@ and transl_ccall env prim args dbg =
     | Unboxed_integer bi -> (typ_int, box_int dbg bi)
     | Untagged_int -> (typ_int, (fun i -> tag_int i dbg))
   in
-  let args = transl_args prim.prim_native_repr_args args in
+  let typ_args, args = transl_args prim.prim_native_repr_args args in
   wrap_result
     (Cop(Cextcall(Primitive.native_name prim,
-                  typ_res, prim.prim_alloc, None), args, dbg))
+                  typ_res, typ_args, prim.prim_alloc, None), args, dbg))
 
 and transl_prim_1 env p arg dbg =
   match p with
@@ -2475,16 +2487,16 @@ and transl_prim_1 env p arg dbg =
         (Cop(Csubi, [Cconst_int (0, dbg); transl_unbox_int dbg env bi arg],
           dbg))
   | Pbbswap bi ->
-      let prim = match bi with
-        | Pnativeint -> "nativeint"
-        | Pint32 -> "int32"
-        | Pint64 -> "int64" in
+      let prim, tyarg = match bi with
+        | Pnativeint -> "nativeint", XInt
+        | Pint32 -> "int32", XInt32
+        | Pint64 -> "int64", XInt64 in
       box_int dbg bi (Cop(Cextcall(Printf.sprintf "caml_%s_direct_bswap" prim,
-                               typ_int, false, None),
+                               typ_int, [tyarg], false, None),
                       [transl_unbox_int dbg env bi arg],
                       dbg))
   | Pbswap16 ->
-      tag_int (Cop(Cextcall("caml_bswap16_direct", typ_int, false, None),
+      tag_int (Cop(Cextcall("caml_bswap16_direct", typ_int, [], false, None),
                    [untag_int (transl env arg) dbg],
                    dbg))
               dbg
@@ -2516,12 +2528,13 @@ and transl_prim_2 env p arg1 arg2 dbg =
   | Psetfield(n, ptr, init) ->
       begin match assignment_kind ptr init with
       | Caml_modify ->
-        return_unit dbg (Cop(Cextcall("caml_modify", typ_void, false, None),
+        return_unit dbg (Cop(Cextcall("caml_modify", typ_void, [], false, None),
                         [field_address (transl env arg1) n dbg;
                          transl env arg2],
                         dbg))
       | Caml_initialize ->
-        return_unit dbg (Cop(Cextcall("caml_initialize", typ_void, false, None),
+        return_unit dbg (Cop(Cextcall("caml_initialize",
+                                      typ_void, [], false, None),
                         [field_address (transl env arg1) n dbg;
                          transl env arg2],
                         dbg))
@@ -3201,7 +3214,7 @@ and transl_letrec env bindings cont =
       bindings
   in
   let op_alloc prim args =
-    Cop(Cextcall(prim, typ_val, true, None), args, dbg) in
+    Cop(Cextcall(prim, typ_val, [], true, None), args, dbg) in
   let rec init_blocks = function
     | [] -> fill_nonrec bsz
     | (id, _exp, RHS_block sz) :: rem ->
@@ -3227,7 +3240,7 @@ and transl_letrec env bindings cont =
     | [] -> cont
     | (id, exp, (RHS_block _ | RHS_infix _ | RHS_floatblock _)) :: rem ->
         let op =
-          Cop(Cextcall("caml_update_dummy", typ_void, false, None),
+          Cop(Cextcall("caml_update_dummy", typ_void, [], false, None),
               [Cvar (VP.var id); transl env exp], dbg) in
         Csequence(op, fill_blocks rem)
     | (_id, _exp, RHS_nonrec) :: rem ->
