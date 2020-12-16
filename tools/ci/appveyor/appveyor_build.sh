@@ -141,11 +141,6 @@ case "$1" in
   *)
     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 
-    if [[ $PORT = 'msvc64' ]] ; then
-      # Ensure that make distclean can be run from an empty tree
-      run "$MAKE distclean" $MAKE distclean
-    fi
-
     if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
       tar -xzf "$APPVEYOR_BUILD_FOLDER/flexdll.tar.gz"
       cd "flexdll-$FLEXDLL_VERSION"
