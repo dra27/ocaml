@@ -53,7 +53,6 @@ function run {
 function set_configuration {
     case "$1" in
         cygwin*)
-            dep='--disable-dependency-generation'
         ;;
         mingw32)
             build='--build=i686-pc-cygwin'
@@ -62,7 +61,6 @@ function set_configuration {
         mingw64)
             build='--build=i686-pc-cygwin'
             host='--host=x86_64-w64-mingw32'
-            dep='--disable-dependency-generation'
         ;;
         msvc32)
             build='--build=i686-pc-cygwin'
