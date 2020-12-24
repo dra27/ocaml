@@ -22,8 +22,6 @@
 #include "caml/memory.h"
 
 HDC gcMetaFile;
-int grdisplay_mode;
-int grremember_mode;
 GR_WINDOW grwindow;
 
 static void GetCurrentPosition(HDC hDC,POINT *pt)
