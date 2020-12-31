@@ -191,18 +191,15 @@ manual/tools/texexpand text eol=lf
 
 # Tests which include references spanning multiple lines fail with \r\n
 # endings, so use \n endings only, even on Windows.
-testsuite/tests/basic-modules/anonymous.ml text eol=lf
 testsuite/tests/basic-more/morematch.ml text eol=lf
 testsuite/tests/basic-more/robustmatch.ml text eol=lf
 testsuite/tests/parsing/*.ml text eol=lf
 testsuite/tests/docstrings/empty.ml text eol=lf
-testsuite/tests/functors/functors.ml text eol=lf
 testsuite/tests/tool-ocamlc-stop-after/stop_after_parsing_impl.ml text eol=lf
 testsuite/tests/tool-ocamlc-stop-after/stop_after_parsing_intf.mli text eol=lf
 testsuite/tests/tool-ocamlc-stop-after/stop_after_typing_impl.ml text eol=lf
 testsuite/tests/tool-toplevel/error_highlighting.ml text eol=lf
 testsuite/tests/tool-toplevel/error_highlighting_use4.ml text eol=lf
-testsuite/tests/translprim/module_coercion.ml text eol=lf
 testsuite/tests/typing-objects-bugs/pr3968_bad.ml text eol=lf
 testsuite/tests/typing-ocamlc-i/pr7402.ml text eol=lf
 testsuite/tests/typing-ocamlc-i/pervasives_leitmotiv.ml text eol=lf
