@@ -20,6 +20,10 @@ Working version
 
 ### Runtime system:
 
+- #10111: Increase the detail of location information for debugging events to
+  allow the end line number and character offset to be reported.
+  (David Allsopp, review by Nick Barnes, Enguerrand Decorne and Stephen Dolan)
+
 - #11919: New runtime events counters for major heap stats and minor heap
   resizing.
   (Sadiq Jaffer, review by Gabriel Scherer and David Allsopp)
