@@ -47,6 +47,10 @@ Working version
   -dtypedtree (allows tests to run with CRLF-formatted source files).
   (David Allsopp, review by ???)
 
+- #101??: Use line-relative locations in -dlambda (allows tests tun run with
+  CRLF-formatted source files).
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #9650, #9651: keep refactoring the pattern-matching compiler
