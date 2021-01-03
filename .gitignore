@@ -70,6 +70,7 @@ _build
 /boot/ocamlruns
 /boot/camlheader
 /boot/ocamlc.opt
+/boot/flexlink.byte
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
