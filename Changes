@@ -26,6 +26,10 @@ OCaml 4.09 maintenance branch
   prevent their C99-compliant snprintf conflicting with ours.
   (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
 
+- #10135: Speed-up the FlexDLL bootstrap by building a separate non-shared
+  version of the runtime and keeping shared artefacts.
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
