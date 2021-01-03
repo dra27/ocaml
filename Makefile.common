@@ -37,6 +37,8 @@ endif
 # Standard library flags
 STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
 
+BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
+
 ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   FLEXLINK_ENV =
   CAMLOPT_CMD = $(CAMLOPT)
