@@ -15,11 +15,10 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-TARGET_BINDIR ?= $(BINDIR)
 
 COMPILER=$(ROOTDIR)/ocamlc
 CAMLC=$(CAMLRUN) $(COMPILER)
@@ -153,6 +152,8 @@ HEADER_PATH =
 HEADER_TARGET_PATH =
 endif
 
+TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
+
 CAMLHEADERS =\
   camlheader target_camlheader camlheader_ur \
   camlheaderd target_camlheaderd \
@@ -197,7 +198,7 @@ camlheader_ur: camlheader
 	cp camlheader $@
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
-tmptargetcamlheader%exe: $(HEADERPROGRAM)%$(O)
+tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
 	$(call MKEXE_BOOT,$@,$^ $(EXTRALIBS))
 	strip $@
 
@@ -283,9 +284,10 @@ $(OTHERS:.cmo=.cmx) std_exit.cmx: stdlib.cmx
 $(OTHERS:.cmo=.p.cmx) std_exit.p.cmx: stdlib.cmx
 
 clean::
-	rm -f *.cm* *.$(O) *.$(A) *.odoc
+	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -f *~
 	rm -f camlheader*
+	rm -rf flexdll
 
 include .depend
 
