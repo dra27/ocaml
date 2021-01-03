@@ -21,7 +21,10 @@ FIND=find
 TOPDIR := ..
 include $(TOPDIR)/Makefile.tools
 
-OCAMLTESTDIR_CYGPATH=$(shell $(CYGPATH) $(BASEDIR)/$(DIR)/_ocamltest)
+BASEDIR_HOST := $(shell $(CYGPATH) "$(BASEDIR)")
+TOPDIR_HOST := $(BASEDIR_HOST)/$(TOPDIR)
+
+OCAMLTESTDIR = $(BASEDIR_HOST)/$(DIR)/_ocamltest
 
 failstamp := failure.stamp
 
@@ -46,17 +49,19 @@ else # Windows
   ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
     FLEXLINK_ENV =
   else
-    ROOT := $(shell cd .. && pwd| cygpath -m -f -)
     FLEXLINK_ENV = \
-      OCAML_FLEXLINK="$(ROOT)/boot/ocamlrun $(ROOT)/flexdll/flexlink.exe"
+      OCAML_FLEXLINK="$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+                      $(TOPDIR_HOST)/boot/flexlink.byte$(EXE)"
   endif
 endif
 
 ifeq "$(FLEXLINK_ENV)" ""
   ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
 else
-  MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
-                                   $(FLEXLINK_FLAGS)
+  FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
+  MKDLL=$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+        $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
+        $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
 
   ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
                                $(ocamltest_program)
@@ -190,7 +195,7 @@ exec-one:
 	@if $(ocamltest) -list-tests $(DIR) >/dev/null 2>&1; then \
 	  echo "Running tests from '$$DIR' ..."; \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR)" \
 	    OCAMLTESTFLAGS=""; \
 	else \
 	  for dir in $(DIR)/*; do \
@@ -235,7 +240,7 @@ promote:
 	fi
 	@if $(ocamltest) -list-tests $(DIR) >/dev/null 2>&1; then \
 	  $(MAKE) exec-ocamltest DIR=$(DIR) \
-	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR_CYGPATH)" \
+	    OCAMLTESTENV="OCAMLTESTDIR=$(OCAMLTESTDIR)" \
 	    OCAMLTESTFLAGS="-promote"; \
 	else \
 	  cd $(DIR) && $(MAKE) TERM=dumb BASEDIR=$(BASEDIR) promote; \
