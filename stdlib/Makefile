@@ -19,7 +19,6 @@ ROOTDIR = ..
 -include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-TARGET_BINDIR ?= $(BINDIR)
 
 COMPILER=$(ROOTDIR)/ocamlc
 CAMLC=$(CAMLRUN) $(COMPILER)
@@ -288,6 +287,7 @@ clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -f *~
 	rm -f camlheader*
+	rm -rf flexdll
 
 include .depend
 
