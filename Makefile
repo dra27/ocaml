@@ -339,7 +339,7 @@ flexlink.opt: flexdll/Makefile
 	cd flexdll && \
 	mv flexlink.exe flexlink && \
 	($(MAKE) $(FLEXLINK_BUILD_ENV) \
-             OCAML_FLEXLINK='$(value CAMLRUN) ./flexlink" \
+             OCAML_FLEXLINK='$(value CAMLRUN) ./flexlink' \
 	           OCAMLOPT="../ocamlopt.opt$(EXE) -nostdlib -I ../stdlib" \
 	           flexlink.exe || \
 	 (mv flexlink flexlink.exe && false)) && \
