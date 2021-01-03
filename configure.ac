@@ -590,7 +590,7 @@ AS_CASE([$CC,$host],
     common_cppflags="$common_cppflags -U_WIN32"
     AS_IF([$with_sharedlibs],
       [flexlink="flexlink -chain $flavor -merge-manifest -stack 16777216"
-      flexdir=`$flexlink -where | tr -d '\015'`
+      flexdir="$(flexlink -where | tr -d '\r')"
       AS_IF([test -z "$flexdir"],
         [AC_MSG_WARN(
           [flexlink not found: native shared libraries won't be available.]
@@ -611,9 +611,11 @@ AS_CASE([$CC,$host],
       [AS_CASE([$host],
         [i686-*-*], [flexdll_chain="mingw"],
         [x86_64-*-*], [flexdll_chain="mingw64"])
-      flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
-      flexdir=`$flexlink -where | tr -d '\015'`
-      AS_IF([test -z "$flexdir"], [flexdir='$(ROOTDIR)/flexdll'])
+      AS_IF([test -e 'flexdll/Makefile'],
+        [flexdir='$(ROOTDIR)/flexdll'],
+        [flexlink="flexlink -chain $flexdll_chain -merge-manifest \
+-stack 16777216"
+         flexdir="$($flexlink -where | tr -d '\r')"])
       iflexdir="-I\"$flexdir\""
       mkexedebugflag="-link -g"])
     ostype="Win32"
@@ -630,9 +632,11 @@ AS_CASE([$CC,$host],
       [i686-pc-windows], [flexdll_chain=msvc],
       [x86_64-pc-windows], [flexdll_chain=msvc64])
     AS_IF([$with_sharedlibs],
-      [flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
-      flexdir=`$flexlink -where | tr -d '\015'`
-      AS_IF([test -z "$flexdir"], [flexdir='$(ROOTDIR)/flexdll'])
+      [AS_IF([test -e 'flexdll/Makefile'],
+        [flexdir='$(ROOTDIR)/flexdll'],
+        [flexlink="flexlink -chain $flexdll_chain -merge-manifest \
+-stack 16777216"
+         flexdir="$($flexlink -where | tr -d '\r')"])
       iflexdir="-I\"$flexdir\""
       mkexedebugflag="-link -g"])],
   [*,x86_64-*-linux*],
