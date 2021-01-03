@@ -304,13 +304,11 @@ endif
 
 BOOT_FLEXLINK_CMD=
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard flexdll/Makefile)
 ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   BOOT_FLEXLINK_CMD = \
     FLEXLINK_CMD="../boot/ocamlruns$(EXE) ../boot/flexlink.byte$(EXE)"
-endif # ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
-endif # ifeq "$(UNIX_OR_WIN32)" "win32"
+endif
 
 # The configuration file
 
@@ -453,10 +451,8 @@ opt.opt: checknative
 	$(MAKE) otherlibrariesopt
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
 	  ocamltest.opt
-ifeq "$(UNIX_OR_WIN32)" "win32"
 ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 	$(MAKE) flexlink.opt$(EXE)
-endif
 endif
 ifneq "$(WITH_OCAMLDOC)" ""
 	$(MAKE) manpages
@@ -627,9 +623,8 @@ endif
 	if test -n "$(WITH_DEBUGGER)"; then \
 	  $(MAKE) -C debugger install; \
 	fi
-ifeq "$(UNIX_OR_WIN32)" "win32"
 ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
-ifneq "$(filter-out mingw,$(TOOLCHAIN))" ""
+ifeq "$(TOOLCHAIN)" "msvc"
 	$(INSTALL_DATA) flexdll/default$(filter-out _i386,_$(ARCH)).manifest \
     "$(INSTALL_BINDIR)/"
 endif
@@ -638,9 +633,8 @@ endif
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(INSTALL_PROG) \
 	  boot/flexlink.byte$(EXE) "$(INSTALL_BINDIR)/flexlink.byte$(EXE)"
-endif
-endif
-endif
+endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+endif # ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)/Makefile.config"
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	if test -f ocamlopt; then $(MAKE) installopt; else \
@@ -740,12 +734,10 @@ installoptopt:
 	   $(LN) ocamlc.opt$(EXE) ocamlc$(EXE); \
 	   $(LN) ocamlopt.opt$(EXE) ocamlopt$(EXE); \
 	   $(LN) ocamllex.opt$(EXE) ocamllex$(EXE)
-ifeq "$(UNIX_OR_WIN32)" "win32"
 ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 	$(INSTALL_PROG) flexlink.opt$(EXE) "$(INSTALL_BINDIR)"
 	cd "$(INSTALL_BINDIR)"; \
 	  $(LN) flexlink.opt$(EXE) flexlink$(EXE)
-endif
 endif
 	$(INSTALL_DATA) \
 	   utils/*.cmx parsing/*.cmx typing/*.cmx bytecomp/*.cmx \
@@ -1194,13 +1186,15 @@ endif
 
 # Check that the stack limit is reasonable (Unix-only)
 .PHONY: checkstack
-checkstack:
 ifeq "$(UNIX_OR_WIN32)" "unix"
-	if $(MKEXE) $(OUTPUTEXE)tools/checkstack$(EXE) tools/checkstack.c; \
-	  then tools/checkstack$(EXE); \
-	fi
-	rm -f tools/checkstack$(EXE)
+checkstack: tools/checkstack$(EXE)
+	$<
+
+.INTERMEDIATE: tools/checkstack$(EXE) tools/checkstack.$(O)
+tools/checkstack$(EXE): tools/checkstack.$(O)
+	$(MAKE) -C tools $(BOOT_FLEXLINK_CMD) checkstack$(EXE)
 else
+checkstack:
 	@
 endif
 
