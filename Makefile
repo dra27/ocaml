@@ -291,9 +291,7 @@ BOOT_FLEXLINK_CMD=
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard flexdll/Makefile)
-ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
-  BOOT_FLEXLINK_CMD =
-else
+ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   BOOT_FLEXLINK_CMD = \
     FLEXLINK_CMD="../boot/ocamlruns$(EXE) ../flexdll/flexlink.exe"
 endif # ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
@@ -315,13 +313,48 @@ partialclean::
 .PHONY: beforedepend
 beforedepend:: utils/config.ml
 
+USE_RUNTIME_PRIMS = -use-prims ../runtime/primitives
+USE_STDLIB = -nostdlib -I ../stdlib
+
+FLEXLINK_BUILD_ENV = \
+  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
+  CHAINS=$(FLEXDLL_CHAIN) ROOTDIR=..
+
+boot/ocamlruns$(EXE):
+	$(MAKE) -C runtime ocamlruns$(EXE)
+	cp runtime/ocamlruns$(EXE) boot/ocamlruns$(EXE)
+
 # Start up the system from the distribution compiler
+# The process depends on whether FlexDLL is also being bootstrapped.
+# Normal procedure:
+#   - Build the runtime
+#   - Build the standard library using runtime/ocamlrun
+# FlexDLL procedure:
+#   - Build ocamlruns
+#   - Build the standard library using boot/ocamlruns
+#   - Build flexlink and FlexDLL support objects
+#   - Build the runtime
+# runtime/ocamlrun is then installed to boot/ocamlrun and the stdlib artefacts
+# are copied to boot/
 .PHONY: coldstart
+ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 coldstart:
+	$(MAKE) -C runtime all
+	$(MAKE) -C stdlib \
+	  CAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
+	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+else
+coldstart: boot/ocamlruns$(EXE)
+	$(MAKE) -C stdlib CAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
+    CAMLC='$$(BOOT_OCAMLC)' all
+	$(MAKE) -C flexdll $(FLEXLINK_BUILD_ENV) \
+	  CAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
+	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
+	  flexlink.exe
+	$(MAKE) -C flexdll $(FLEXLINK_BUILD_ENV) support
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
+endif # ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) \
-	  COMPILER="../boot/ocamlc -use-prims ../runtime/primitives" all
 	cd stdlib; cp $(LIBFILES) ../boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
 
@@ -462,42 +495,23 @@ flexdll/Makefile:
 	@false
 
 .PHONY: flexdll
-flexdll: flexdll/Makefile flexlink
-	$(MAKE) -C flexdll \
-	     OCAML_CONFIG_FILE=../Makefile.config \
-             MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false support
-
-# Bootstrapping flexlink - leaves a bytecode image of flexlink.exe in flexdll/
-FLEXLINK_OCAMLOPT = \
-   ../boot/ocamlruns$(EXE) ../boot/ocamlc \
-   -use-prims ../runtime/primitives -nostdlib -I ../boot
-
-# Command to coldstart the standard library when bootstrapping flexlink
-FLEXLINK_STDLIB_CAMLC = \
-  ../boot/ocamlruns$(EXE) ../boot/ocamlc -use-prims ../runtime/primitives
-
-runtime/ocamlruns$(EXE):
-	$(MAKE) -C runtime ocamlruns$(EXE)
+flexdll: flexdll/Makefile
+	@echo WARNING! make flexdll is no longer required
+	@echo This target will be removed in a future release.
 
 .PHONY: flexlink
-flexlink: flexdll/Makefile runtime/ocamlruns$(EXE)
-	cp runtime/ocamlruns$(EXE) boot/ocamlruns$(EXE)
-	$(MAKE) -C stdlib \
-                CAMLC="$(FLEXLINK_STDLIB_CAMLC)" \
-                $(filter-out *.cmi,$(LIBFILES))
-	cd stdlib && cp $(LIBFILES) ../boot/
-	$(MAKE) -C flexdll MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
-	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false \
-	  OCAMLOPT="$(FLEXLINK_OCAMLOPT)" \
-	  flexlink.exe
+flexlink: flexdll/Makefile
+	@echo WARNING! make flexlink is no longer required
+	@echo This target will be removed in a future release.
 
 .PHONY: flexlink.opt
-flexlink.opt:
+flexlink.opt: flexdll/Makefile
 	cd flexdll && \
 	mv flexlink.exe flexlink && \
-	($(MAKE) OCAML_FLEXLINK="../boot/ocamlrun ./flexlink" MSVC_DETECT=0 \
-	           OCAML_CONFIG_FILE=../Makefile.config \
-	           OCAMLOPT="../ocamlopt.opt -I ../stdlib" flexlink.exe || \
+	($(MAKE) $(FLEXLINK_BUILD_ENV) \
+             OCAML_FLEXLINK='$(value CAMLRUN) ./flexlink' \
+	           OCAMLOPT="../ocamlopt.opt -nostdlib -I ../stdlib" \
+	           flexlink.exe || \
 	 (mv flexlink flexlink.exe && false)) && \
 	mv flexlink.exe flexlink.opt && \
 	mv flexlink flexlink.exe
