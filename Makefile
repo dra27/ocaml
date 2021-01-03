@@ -309,10 +309,10 @@ FLEXDLL_SUBMODULE_PRESENT := $(wildcard flexdll/Makefile)
 ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   BOOT_FLEXLINK_CMD =
 else
-  BOOT_FLEXLINK_CMD = FLEXLINK_CMD="../boot/ocamlrun ../flexdll/flexlink.exe"
-endif
-else
-endif
+  BOOT_FLEXLINK_CMD = \
+    FLEXLINK_CMD="../boot/ocamlruns$(EXE) ../flexdll/flexlink.exe"
+endif # ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+endif # ifeq "$(UNIX_OR_WIN32)" "win32"
 
 # The configuration file
 
@@ -496,19 +496,28 @@ flexdll: flexdll/Makefile flexlink
              MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false support
 
 # Bootstrapping flexlink - leaves a bytecode image of flexlink.exe in flexdll/
+FLEXLINK_OCAMLOPT = \
+   ../boot/ocamlruns$(EXE) ../boot/ocamlc \
+   -use-prims ../runtime/primitives -nostdlib -I ../boot
+
+# Command to coldstart the standard library when bootstrapping flexlink
+FLEXLINK_STDLIB_CAMLC = \
+  ../boot/ocamlruns$(EXE) ../boot/ocamlc -use-prims ../runtime/primitives
+
+runtime/ocamlruns$(EXE):
+	$(MAKE) -C runtime ocamlruns$(EXE)
+
 .PHONY: flexlink
-flexlink: flexdll/Makefile
-	$(MAKE) -C runtime BOOTSTRAPPING_FLEXLINK=yes ocamlrun$(EXE)
-	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	$(MAKE) -C stdlib COMPILER=../boot/ocamlc \
-	                  $(filter-out *.cmi,$(LIBFILES))
+flexlink: flexdll/Makefile runtime/ocamlruns$(EXE)
+	cp runtime/ocamlruns$(EXE) boot/ocamlruns$(EXE)
+	$(MAKE) -C stdlib \
+                CAMLC="$(FLEXLINK_STDLIB_CAMLC)" \
+                $(filter-out *.cmi,$(LIBFILES))
 	cd stdlib && cp $(LIBFILES) ../boot/
 	$(MAKE) -C flexdll MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
 	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false \
-	  OCAMLOPT="../boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot" \
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT)" \
 	  flexlink.exe
-	$(MAKE) -C runtime clean
-	$(MAKE) partialclean
 
 .PHONY: flexlink.opt
 flexlink.opt:
@@ -1324,6 +1333,7 @@ depend: beforedepend
 .PHONY: distclean
 distclean: clean
 	rm -f boot/ocamlrun boot/ocamlrun$(EXE) boot/camlheader \
+	boot/ocamlruns boot/ocamlruns.exe \
 	boot/*.cm* boot/libcamlrun.$(A) boot/ocamlc.opt
 	rm -f Makefile.config runtime/caml/m.h runtime/caml/s.h
 	rm -f tools/*.bak
