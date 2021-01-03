@@ -395,6 +395,11 @@ CAMLTEX= $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.cma \
 	caml_tex.ml
 
+# checkstack tool
+
+checkstack$(EXE): checkstack.$(O)
+	$(MKEXE) $(OUTPUTEXE)$@ $<
+
 #Scan latex files, and run ocaml code examples
 
 caml-tex: INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
