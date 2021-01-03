@@ -29,11 +29,7 @@ INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
 INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
 INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
-else
-FLEXDLL_SUBMODULE_PRESENT =
-endif
 
 # Use boot/ocamlc.opt if available
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
