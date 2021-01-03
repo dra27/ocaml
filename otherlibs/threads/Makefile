@@ -68,16 +68,16 @@ all: libvmthreads.a threads.cma stdlib.cma unix.cma
 allopt:
 
 libvmthreads.a: $(C_OBJS)
-	$(MKLIB) -o threads -oc vmthreads $(C_OBJS)
+	$(MKLIB_CMD) -o threads -oc vmthreads $(C_OBJS)
 
 threads.cma: $(CAML_OBJS)
-	$(MKLIB) -ocamlc '$(CAMLC)' -o threads -oc vmthreads $^
+	$(MKLIB_CMD) -ocamlc '$(CAMLC)' -o threads -oc vmthreads $^
 
 stdlib.cma: $(LIB_OBJS)
 	$(CAMLC) -a -o $@ $^
 
 unix.cma: $(UNIXLIB_OBJS)
-	$(MKLIB) -ocamlc '$(CAMLC)' -o unix -linkall $^
+	$(MKLIB_CMD) -ocamlc '$(CAMLC)' -o unix -linkall $^
 
 stdlib.cmo: stdlib.mli stdlib.cmi stdlib.ml
 	$(CAMLC) ${COMPFLAGS} -nopervasives \

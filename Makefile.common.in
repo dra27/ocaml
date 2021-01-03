@@ -35,11 +35,7 @@ OC_DLL_LDFLAGS=@oc_dll_ldflags@
 
 BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
-else
-FLEXDLL_SUBMODULE_PRESENT =
-endif
 
 ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
   FLEXLINK_ENV =
