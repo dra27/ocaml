@@ -42,17 +42,18 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
   else # Non-cygwin Unix
     find := find
   endif
-  FLEXLINK_ENV =
 else # Windows
   find := /usr/bin/find
-  FLEXDLL_SUBMODULE_PRESENT := $(wildcard ../flexdll/Makefile)
-  ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
-    FLEXLINK_ENV =
-  else
-    FLEXLINK_ENV = \
-      OCAML_FLEXLINK="$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
-                      $(TOPDIR_HOST)/boot/flexlink.byte$(EXE)"
-  endif
+endif
+
+ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+  # The testsuite needs an absolute path to the runtime, so override the
+  # definition in Makefile.common
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
+                    $(TOPDIR_HOST)/boot/flexlink.byte$(EXE)"
+else
+  FLEXLINK_ENV =
 endif
 
 ifeq "$(FLEXLINK_ENV)" ""
@@ -63,8 +64,8 @@ else
         $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
         $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
 
-  ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
-                               $(ocamltest_program)
+  ocamltest := $(FLEXLINK_ENV) MKEXE="$(MKEXE)" MKDLL="$(MKDLL)" \
+                               SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
 endif
 
 .PHONY: default
