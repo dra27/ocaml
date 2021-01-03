@@ -288,6 +288,7 @@ clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -f *~
 	rm -f camlheader*
+	rm -rf flexdll
 
 include .depend
 
