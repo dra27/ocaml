@@ -20,6 +20,10 @@ OCaml 4.12, maintenance version
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
   (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
+- #10135: Speed-up the FlexDLL bootstrap by building a separate non-shared
+  version of the runtime and keeping shared artefacts.
+  (David Allsopp, review by Sébastien Hinderer)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
