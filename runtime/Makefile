@@ -93,6 +93,10 @@ ASM_OBJECTS := $(ASM_SOURCES:.$(ASM_EXT)=.$(O))
 
 libcamlrun_OBJECTS := $(BYTECODE_C_SOURCES:.c=_b.$(O))
 
+libcamlrun_non_shared_OBJECTS := \
+  $(subst $(UNIX_OR_WIN32)_b.$(O),$(UNIX_OR_WIN32)_non_shared_b.$(O), \
+          $(libcamlrun_OBJECTS))
+
 libcamlrund_OBJECTS := $(BYTECODE_C_SOURCES:.c=_bd.$(O)) \
   instrtrace_bd.$(O)
 
@@ -110,10 +114,6 @@ libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=_npic.$(O)) \
   $(ASM_OBJECTS:.$(O)=_libasmrunpic.$(O))
 
 # General (non target-specific) assembler and compiler flags
-
-ifdef BOOTSTRAPPING_FLEXLINK
-OC_CPPFLAGS += -DBOOTSTRAPPING_FLEXLINK
-endif
 
 # On Windows, OCAML_STDLIB_DIR needs to be defined dynamically
 
@@ -165,16 +165,10 @@ endif
 
 # Commands used to build native libraries
 
+LIBS := $(BYTECCLIBS)
+
 ifeq "$(UNIX_OR_WIN32)" "win32"
-LIBS = $(BYTECCLIBS) $(EXTRALIBS)
-ifdef BOOTSTRAPPING_FLEXLINK
-MAKE_OCAMLRUN=$(MKEXE_BOOT)
-else
-MAKE_OCAMLRUN = $(MKEXE) -o $(1) $(2)
-endif
-else
-LIBS = $(BYTECCLIBS)
-MAKE_OCAMLRUN = $(MKEXE) -o $(1) $(2)
+LIBS += $(EXTRALIBS)
 endif
 
 # Build, install and clean targets
@@ -205,7 +199,7 @@ endif
 
 .PHONY: clean
 clean:
-	rm -f $(PROGRAMS) *.$(O) *.$(A) *.$(SO) ld.conf
+	rm -f $(PROGRAMS) ocamlruns ocamlruns.exe *.$(O) *.$(A) *.$(SO) ld.conf
 	rm -f primitives prims.c caml/opnames.h caml/jumptbl.h
 	rm -f caml/version.h
 
@@ -273,9 +267,15 @@ caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 # Libraries and programs
 
 ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
-	$(call MAKE_OCAMLRUN,$@,$^ $(LIBS))
+	$(MKEXE) -o $@ $^ $(LIBS)
+
+ocamlruns$(EXE): prims.$(O) libcamlrun_non_shared.$(A)
+	$(call MKEXE_BOOT,$@,$^ $(LIBS))
 
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(call MKLIB,$@, $^)
 
 ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
@@ -334,14 +334,18 @@ libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
 # that corresponds to the name of the generated object file
 # (without the extension, which is added by the macro)
 define COMPILE_C_FILE
-$(1).$(O): %.c
+$(1).$(O): $(2).c
 	$$(CC) -c $$(OC_CFLAGS) $$(OC_CPPFLAGS) $$(OUTPUTOBJ)$$@ $$<
 endef
 
 object_types := % %_b %_bd %_bi %_bpic %_n %_nd %_ni %_np %_npic
 
 $(foreach object_type, $(object_types), \
-  $(eval $(call COMPILE_C_FILE,$(object_type))))
+  $(eval $(call COMPILE_C_FILE,$(object_type),%)))
+
+$(UNIX_OR_WIN32)_non_shared_%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
+
+$(eval $(call COMPILE_C_FILE,$(UNIX_OR_WIN32)_non_shared_%,$(UNIX_OR_WIN32)))
 
 # Compilation of assembly files
 
