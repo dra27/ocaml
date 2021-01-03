@@ -104,6 +104,7 @@ if "%PORT%" equ "mingw32" (
   set CYGWIN_PACKAGES=%CYGWIN_PACKAGES% mingw64-i686-gcc-core mingw64-i686-runtime
   set CYGWIN_COMMANDS=%CYGWIN_COMMANDS% i686-w64-mingw32-gcc cygcheck
 )
+if "%PORT:~0,6%%BOOTSTRAP_FLEXDLL%" equ "cygwinfalse" set CYGWIN_PACKAGES=%CYGWIN_PACKAGES% flexdll
 
 set CYGWIN_INSTALL_PACKAGES=
 set CYGWIN_UPGRADE_REQUIRED=0
