@@ -290,3 +290,52 @@ AC_DEFUN([OCAML_CHECK_LIBUNWIND], [
   LDFLAGS="$SAVED_LDFLAGS"
   CFLAGS="$SAVED_CFLAGS"
 ])
+
+AC_DEFUN([OCAML_TEST_FLEXLINK], [
+  OCAML_CC_SAVE_VARIABLES
+
+  CC="$1 -exe"
+  CPPFLAGS="$2 $CPPFLAGS"
+  AC_LINK_IFELSE(
+    [AC_LANG_SOURCE([int main() { return 0; }])],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+    AC_MSG_ERROR([$1 does not work"])])
+
+  OCAML_CC_RESTORE_VARIABLES
+])
+
+AC_DEFUN([OCAML_TEST_FLEXDLL_H], [
+  OCAML_CC_SAVE_VARIABLES
+
+  AS_IF([test -n "$1"],[CPPFLAGS="-I $1 $CPPFLAGS"])
+  have_flexdll_h=no
+  AC_CHECK_HEADER([flexdll.h],[have_flexdll_h=yes],[have_flexdll_h=no])
+  AS_IF([test x"$have_flexdll_h" = 'xno'],
+    [AS_IF([test -n "$1"],
+      [AC_MSG_ERROR([$1/flexdll.h appears unusable])])])
+
+  OCAML_CC_RESTORE_VARIABLES
+])
+
+AC_DEFUN([OCAML_TEST_FLEXLINK_WHERE], [
+  OCAML_CC_SAVE_VARIABLES
+
+  AC_MSG_CHECKING([if "$1 -where" includes flexdll.h])
+  flexlink_where="$($1 -where | tr -d '\r')"
+  CPPFLAGS="$CPPFLAGS -I \"$flexlink_where\""
+  cat > conftest.c <<"EOF"
+#include <flexdll.h>
+int main (void) {return 0;}
+EOF
+  cat > conftest.Makefile <<EOF
+all:
+	$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.c $LIBS
+EOF
+  AS_IF([make -f conftest.Makefile >/dev/null 2>/dev/null],
+    [have_flexdll_h=yes
+    AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])])
+
+  OCAML_CC_RESTORE_VARIABLES
+])
