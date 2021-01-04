@@ -20,3 +20,8 @@
 # included.
 
 INSTALL ?= @INSTALL@
+
+# The location of the FlexDLL sources to use (usually provided as the flexdll
+# Git submodule)
+FLEXDLL_SOURCES=@flexdir@
+BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
