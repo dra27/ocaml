@@ -82,7 +82,7 @@ APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 # These directory names are specified here, because getting UTF-8 correctly
 # through appveyor.yml -> Command Script -> Bash is quite painful...
 OCAMLROOT=$(echo "$PROGRAMFILES/Бактріан🐫" | cygpath -f - -m)
-FLEXDLLROOT="$(echo "$OCAMLROOT" | cygpath -f -)/bin/flexdll"
+FLEXDLLROOT="$PROGRAMFILES/flexdll"
 
 # This must be kept in sync with appveyor_build.cmd
 BUILD_PREFIX=🐫реализация
