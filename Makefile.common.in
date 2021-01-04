@@ -23,6 +23,11 @@ INSTALL ?= @INSTALL@
 INSTALL_DATA ?= $(INSTALL) -m u=rw,g=rw,o=r
 INSTALL_PROG ?= $(INSTALL) -m u=rwx,g=rwx,o=rx
 
+# The location of the FlexDLL sources to use (usually provided as the flexdll
+# Git submodule)
+FLEXDLL_SOURCES=@flexdir@
+BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
+
 # note: these are defined by lazy expansions
 # as some parts of the makefiles change BINDIR, etc.
 # and expect INSTALL_BINDIR, etc. to stay in synch
@@ -45,7 +50,7 @@ else
   BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
 endif
 
-ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
   FLEXLINK_ENV =
   CAMLOPT_CMD = $(CAMLOPT)
   OCAMLOPT_CMD = $(OCAMLOPT)
@@ -61,7 +66,7 @@ else
   MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
   ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
-endif
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
