@@ -77,13 +77,11 @@ else
   CUSTOM =
 endif
 
-FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(TOPDIR)/flexdll/Makefile)
-
 OCAML=$(OCAMLRUN) $(OTOPDIR)/ocaml $(OCFLAGS) -noinit
 ifeq "$(FLEXLINK)" ""
   FLEXLINK_PREFIX=
 else
-  ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+  ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
     FLEXLINK_PREFIX=
   else
     EMPTY=
