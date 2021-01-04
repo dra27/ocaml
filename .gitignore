@@ -91,6 +91,8 @@ _build
 /emacs/ocamltags
 /emacs/*.elc
 
+/flexdll-sources
+
 /lex/parser.ml
 /lex/parser.mli
 /lex/lexer.ml
