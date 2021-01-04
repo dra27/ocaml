@@ -34,8 +34,6 @@ INSTALL_LIBDIR := $(DESTDIR)$(LIBDIR)
 INSTALL_STUBLIBDIR := $(DESTDIR)$(STUBLIBDIR)
 INSTALL_MANDIR := $(DESTDIR)$(MANDIR)
 
-FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
-
 # Use boot/ocamlc.opt if available
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 ifeq (0,$(shell \
@@ -46,7 +44,7 @@ else
   BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
 endif
 
-ifeq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+ifeq "$(FLEXDLL_SUBMODULE)" ""
   FLEXLINK_ENV =
   CAMLOPT_CMD = $(CAMLOPT)
   OCAMLOPT_CMD = $(OCAMLOPT)
