@@ -292,6 +292,8 @@ AC_DEFUN([OCAML_TEST_FLEXLINK], [
 
     CC="$1 -chain $2 -exe"
     LIBS="conftest2.$ac_objext"
+    # LT_INIT may add things to CFLAGS, so use the pristine user's copy instead
+    CFLAGS="$pristine_CFLAGS"
     CPPFLAGS="$3 $CPPFLAGS"
     AC_LINK_IFELSE(
       [AC_LANG_SOURCE([int main() { return 0; }])],

@@ -419,6 +419,8 @@ AC_CHECK_TOOLS([LD],[ld link])
 # libtool expects host_os=mingw for native Windows
 old_host_os=$host_os
 AS_IF([test x"$host_os" = "xwindows"],[host_os=mingw])
+# LT_INIT alters CFLAGS - back up the pristine copy
+pristine_CFLAGS="$CFLAGS"
 LT_INIT
 host_os=$old_host_os
 
