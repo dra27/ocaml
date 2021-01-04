@@ -35,3 +35,8 @@ OC_DLL_LDFLAGS=@oc_dll_ldflags@
 PTHREAD_CFLAGS=@PTHREAD_CFLAGS@
 
 OCAMLTEST_SYSTEM = @ocamltest_system@
+
+# The location of the FlexDLL sources to use (usually provided as the flexdll
+# Git submodule)
+FLEXDLL_SOURCES=@flexdir@
+BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
