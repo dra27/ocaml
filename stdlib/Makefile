@@ -190,9 +190,7 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 endif
 
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"' \
-	      $(OUTPUTOBJ)$@ $^
+	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $^
 
 camlheader_ur: camlheader
 	cp camlheader $@
@@ -203,9 +201,7 @@ tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
 	strip $@
 
 $(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
-	      $(OUTPUTOBJ)$@ $^
+	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $^
 
 target_%: tmptarget%.exe
 	rm -f $@.exe
