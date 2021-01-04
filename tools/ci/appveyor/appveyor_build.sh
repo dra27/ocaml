@@ -220,9 +220,7 @@ case "$1" in
         # https://github.com/appveyor/ci/issues/1824
         build="-C ../$BUILD_PREFIX-$PORT"
         script --quiet --return --command \
-          "( test "$BOOTSTRAP_FLEXDLL" = 'false' || "\
-"$MAKE -C ../$BUILD_PREFIX-$PORT flexdll ) && "\
-"if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
+          "if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed --unbuffered \
                 -e 's/\d027\[K//g' \
