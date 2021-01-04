@@ -50,12 +50,12 @@ ocamlopt_cppflags=""
 oc_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
-iflexdir=""
 SO="so"
 toolchain="cc"
 profinfo=false
 profinfo_width=0
 extralibs=
+bootstrapping_flexdll=false
 
 # Information about the package
 
@@ -107,7 +107,8 @@ AC_SUBST([ocamlc_cflags])
 AC_SUBST([ocamlc_cppflags])
 AC_SUBST([ocamlopt_cflags])
 AC_SUBST([ocamlopt_cppflags])
-AC_SUBST([iflexdir])
+AC_SUBST([flexdir])
+AC_SUBST([bootstrapping_flexdll])
 AC_SUBST([hashbangscripts])
 AC_SUBST([AR])
 AC_SUBST([RANLIB])
@@ -367,6 +368,11 @@ AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
 
+AC_ARG_WITH([flexdll],
+  [AS_HELP_STRING([--with-flexdll],
+    [bootstrap FlexDLL from the given sources])],
+  [AS_IF([test x"$withval" = 'xyes'],[with_flexdll=flexdll])])
+
 AS_IF([test x"$enable_unix_lib" = "xno"],
   [AS_IF([test x"$enable_debugger" = "xyes"],
     [AC_MSG_ERROR([replay debugger requires the unix library])],
@@ -584,7 +590,115 @@ AS_CASE([$host],
 #  [*-pc-windows],
 #    [enable_shared=yes])
 
-AS_IF([test x"$enable_shared" = "xno"],[with_sharedlibs=false])
+AS_IF([test x"$enable_shared" = "xno"],
+  [with_sharedlibs=false
+  AS_CASE([$host],
+    [*-pc-windows|*-w64-mingw32],
+    [AC_MSG_ERROR([Cannot build native Win32 with --disable-shared])])])
+
+# Define flexlink chain and flags correctly for the different Windows ports
+AS_CASE([$host],
+  [i686-*-cygwin],
+    [flexdll_chain='cygwin'
+    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 16777216"],
+  [x86_64-*-cygwin],
+    [flexdll_chain='cygwin64'
+    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 16777216"],
+  [*-*-cygwin*],
+    [AC_MSG_ERROR([unknown cygwin variant])],
+  [i686-w64-mingw32],
+    [flexdll_chain='mingw'
+    flexlink_flags="-chain $flexdll_chain -stack 16777216"],
+  [x86_64-w64-mingw32],
+    [flexdll_chain='mingw64'
+    flexlink_flags="-chain $flexdll_chain -stack 33554432"],
+  [i686-pc-windows],
+    [flexdll_chain='msvc'
+    flexlink_flags="-merge-manifest -stack 16777216"],
+  [x86_64-pc-windows],
+    [flexdll_chain='msvc64'
+    flexlink_flags="-x64 -merge-manifest -stack 33554432"])
+
+AS_IF([test x"$enable_shared" != 'xno'], [
+  AC_MSG_CHECKING([for flexdll sources])
+  AS_IF([test x"$with_flexdll" = "xno"],
+    [flexdir=''
+    AC_MSG_RESULT([disabled])],
+    [flexmsg=''
+    AS_CASE([$target],
+      [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
+      [AS_IF([test x"$with_flexdll" = 'x' -o x"$with_flexdll" = 'xflexdll'],
+        [AS_IF([test -f 'flexdll/flexdll.h'],
+          [flexdir=flexdll
+          iflexdir='$(ROOTDIR)/flexdll'
+          with_flexdll="$iflexdir"],
+          [AS_IF([test x"$with_flexdll" != 'x'],
+            [AC_MSG_RESULT([requested but not available])
+            AC_MSG_ERROR([exiting])])])],
+        [rm -rf flexdll-sources
+        AS_IF([test -f "$with_flexdll/flexdll.h"],
+          [mkdir -p flexdll-sources
+          cp -r "$with_flexdll"/* flexdll-sources/
+          flexdir='flexdll-sources'
+          iflexdir='$(ROOTDIR)/flexdll-sources'
+          flexmsg=" (from $with_flexdll)"],
+          [AC_MSG_RESULT([requested but not available])
+          AC_MSG_ERROR([exiting])])])
+      AS_IF([test x"$flexdir" = 'x'],
+        [AC_MSG_RESULT([no])],
+        [AC_MSG_RESULT([$iflexdir$flexmsg])
+        bootstrapping_flexdll=true
+        # The submodule should be searched *before* any other -I paths
+        internal_cppflags="-I $iflexdir $internal_cppflags"])],
+      [AS_IF([test x"$with_flexdll" != 'x'],
+        [AC_MSG_RESULT([requested but not supported])
+        AC_MSG_ERROR([exiting])])])])
+
+  AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
+
+  AS_IF([test -n "$flexlink" -a -z "$flexdir"],[
+    OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
+                        [$internal_cppflags], [$host])
+
+    AS_CASE([$host],
+      [*-w64-mingw32|*-pc-windows],
+      [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
+      AS_IF([test -z "$flexlink_where"],
+        [AC_MSG_ERROR([$flexlink is not executable from a native Win32 process])
+      ])])
+  ])
+
+  OCAML_TEST_FLEXDLL_H([$flexdir])
+
+  AS_IF([test -n "$flexlink" -a x"$have_flexdll_h" = 'xno'],
+    [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
+    AS_IF([test "x$have_flexdll_h" = 'xyes'],
+      [internal_cppflags="$internal_cppflags -I \"$flexlink_where\""])
+  ])
+])
+
+AS_IF([test x"$have_flexdll_h" = 'xno'],
+  [AS_CASE([$host],
+    [*-*-cygwin*],
+      [AS_IF([$with_sharedlibs],
+        [with_sharedlibs=false
+        AC_MSG_WARN([flexdll.h not found: shared library support disabled.])
+        ])],
+    [*-w64-mingw32|*-pc-windows],
+      [AC_MSG_ERROR([flexdll.h is required for native Win32])])])
+
+AS_IF([test -z "$flexdir" -o x"$have_flexdll_h" = 'xno'],
+  [AS_CASE([$host],
+    [*-*-cygwin*],
+      [AS_IF([$with_sharedlibs],
+        [AS_IF([test -z "$flexlink"],
+          [with_sharedlibs=false
+          AC_MSG_WARN(
+          [flexlink/flexdll.h not found: shared library support disabled.])
+        ])])],
+    [*-w64-mingw32|*-pc-windows],
+      [AS_IF([test -z "$flexlink"],
+        [AC_MSG_ERROR([flexlink is required for native Win32])])])])
 
 AS_CASE([$CC,$host],
   [*,*-*-darwin*],
@@ -592,44 +706,16 @@ AS_CASE([$CC,$host],
     AC_DEFINE([HAS_ARCH_CODE32], [1])],
   [*,*-*-haiku*], [mathlib=""],
   [*,*-*-cygwin*],
-    [AS_CASE([$target],
-      [i686-*], [flexdll_chain=cygwin],
-      [x86_64-*], [flexdll_chain=cygwin64],
-      [AC_MSG_ERROR([unknown cygwin variant])])
-    common_cppflags="$common_cppflags -U_WIN32"
+    [common_cppflags="$common_cppflags -U_WIN32"
     AS_IF([$with_sharedlibs],
-      [AS_IF([test -e 'flexdll/Makefile'],
-        [flexdir='$(ROOTDIR)/flexdll'],
-        [flexlink="flexlink -chain $flexdll_chain -merge-manifest \
--stack 16777216"
-        flexdir="$($flexlink -where | tr -d '\r')"
-        AS_IF([test -z "$flexdir"],
-          [AC_MSG_WARN(
-            [flexlink not found: native shared libraries won't be available.]
-          )
-          with_sharedlibs=false]
-        )]
-      )])
-    AS_IF([$with_sharedlibs],
-      [iflexdir="-I\"$flexdir\""
-      mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
+      [mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
       mkexedebugflag="-link -g"],
       [mkexe="$mkexe -Wl,--stack,16777216"
       oc_ldflags="-Wl,--stack,16777216"]
     )
     ostype="Cygwin"],
   [*,*-*-mingw32],
-    [AS_IF([$with_sharedlibs],
-      [AS_CASE([$host],
-        [i686-*-*], [flexdll_chain="mingw"],
-        [x86_64-*-*], [flexdll_chain="mingw64"])
-      AS_IF([test -e 'flexdll/Makefile'],
-        [flexdir='$(ROOTDIR)/flexdll'],
-        [flexlink="flexlink -chain $flexdll_chain -merge-manifest \
--stack 16777216"
-         flexdir="$($flexlink -where | tr -d '\r')"])
-      iflexdir="-I\"$flexdir\""
-      mkexedebugflag="-link -g"])
+    [mkexedebugflag="-link -g"
     ostype="Win32"
     toolchain="mingw"
     mkexe='$(MKEXE_ANSI) $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
@@ -640,17 +726,7 @@ AS_CASE([$CC,$host],
     ostype="Win32"
     mkexe='$(MKEXE_ANSI) $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
     oc_ldflags='/ENTRY:wmainCRTStartup'
-    AS_CASE([$host],
-      [i686-pc-windows], [flexdll_chain=msvc],
-      [x86_64-pc-windows], [flexdll_chain=msvc64])
-    AS_IF([$with_sharedlibs],
-      [AS_IF([test -e 'flexdll/Makefile'],
-        [flexdir='$(ROOTDIR)/flexdll'],
-        [flexlink="flexlink -chain $flexdll_chain -merge-manifest \
--stack 16777216"
-         flexdir="$($flexlink -where | tr -d '\r')"])
-      iflexdir="-I\"$flexdir\""
-      mkexedebugflag="-link -g"])],
+    mkexedebugflag=''],
   [*,x86_64-*-linux*],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
   [xlc*,powerpc-ibm-aix*],
@@ -1713,27 +1789,6 @@ AS_CASE([$host],
   [max_testsuite_dir_retries=0
   windows_unicode=0])
 
-# Define flexlink chain and flags correctly for the different Windows ports
-AS_CASE([$host],
-  [i686-*-cygwin],
-    [flexdll_chain='cygwin'
-    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 16777216"],
-  [x86_64-*-cygwin],
-    [flexdll_chain='cygwin64'
-    flexlink_flags="-chain $flexdll_chain -merge-manifest -stack 16777216"],
-  [i686-w64-mingw32],
-    [flexdll_chain='mingw'
-    flexlink_flags="-chain $flexdll_chain -stack 16777216"],
-  [x86_64-w64-mingw32],
-    [flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432"],
-  [i686-pc-windows],
-    [flexdll_chain='msvc'
-    flexlink_flags="-merge-manifest -stack 16777216"],
-  [x86_64-pc-windows],
-    [flexdll_chain='msvc64'
-    flexlink_flags="-x64 -merge-manifest -stack 33554432"])
-
 # Define default prefix correctly for the different Windows ports
 AS_IF([test x"$prefix" = "xNONE"],
   [AS_CASE([$host],
@@ -1751,5 +1806,8 @@ AS_CASE([$host],
     AC_DEFINE([HAS_STRERROR])
     AC_DEFINE([HAS_IPV6])
     AC_DEFINE([HAS_NICE])])
+
+# Do not permanently cache the result of flexdll.h
+unset ac_cv_header_flexdll_h
 
 AC_OUTPUT
