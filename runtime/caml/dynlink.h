@@ -41,6 +41,9 @@ extern void caml_build_primitive_table_builtin(void);
 /* Unload all the previously loaded shared libraries */
 extern void caml_free_shared_libs(void);
 
+/* Parse ld.conf and add the lines read to caml_shared_libs_path */
+extern char_os * caml_parse_ld_conf(void);
+
 #endif /* CAML_INTERNALS */
 
 #endif /* CAML_DYNLINK_H */
