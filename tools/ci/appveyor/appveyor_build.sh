@@ -89,8 +89,8 @@ function set_configuration {
 }
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
-FLEXDLLROOT="$(echo "$OCAMLROOT" | cygpath -f -)/bin/flexdll"
 OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
+FLEXDLLROOT="$(echo "$OCAMLROOT" | cygpath -f -)/bin/flexdll"
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
