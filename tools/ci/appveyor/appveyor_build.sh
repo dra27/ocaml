@@ -84,20 +84,21 @@ APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 # These directory names are specified here, because getting UTF-8 correctly
 # through appveyor.yml -> Command Script -> Bash is quite painful...
 OCAMLROOT=$(echo "$PROGRAMFILES/Бактріан🐫" | cygpath -f - -m)
+FLEXDLLROOT="$(echo "$OCAMLROOT" | cygpath -f -)/bin/flexdll"
 
 # This must be kept in sync with appveyor_build.cmd
 BUILD_PREFIX=🐫реализация
 
-PATH=$(echo "$OCAMLROOT" | cygpath -f -)/bin/flexdll:$PATH
+PATH="$FLEXDLLROOT:$PATH"
 
 case "$1" in
   install)
-    mkdir -p "$OCAMLROOT/bin/flexdll"
+    mkdir -p "$FLEXDLLROOT"
     cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
     # msvc64 objects need to be compiled with VS2015, so are copied later from
     # a source build.
     for f in flexdll.h flexlink.exe flexdll*_msvc.obj default*.manifest ; do
-      cp "$f" "$OCAMLROOT/bin/flexdll/"
+      cp "$f" "$FLEXDLLROOT/"
     done
     if [[ $PORT = 'msvc64' ]] ; then
       echo 'eval $($APPVEYOR_BUILD_FOLDER/tools/msvs-promote-path)' \
@@ -164,7 +165,7 @@ case "$1" in
       tar -xzf "$APPVEYOR_BUILD_FOLDER/flexdll.tar.gz"
       cd "flexdll-$FLEXDLL_VERSION"
       $MAKE MSVC_DETECT=0 CHAINS=msvc64 support
-      cp flexdll*_msvc64.obj "$OCAMLROOT/bin/flexdll/"
+      cp flexdll*_msvc64.obj "$FLEXDLLROOT"
       cd ..
     fi
 
