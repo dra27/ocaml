@@ -246,6 +246,9 @@ opt.opt: checknative
 	$(MAKE) coreall
 	$(MAKE) ocaml
 	$(MAKE) opt-core
+ifneq "$(FLEXDLL_SUBMODULE)" ""
+	$(MAKE) flexlink.opt
+endif
 	$(MAKE) ocamlc.opt
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
 	  $(WITH_OCAMLTEST)
@@ -253,9 +256,6 @@ opt.opt: checknative
 	$(MAKE) otherlibrariesopt
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
 	  $(OCAMLTEST_OPT)
-ifneq "$(FLEXDLL_SUBMODULE)" ""
-	$(MAKE) flexlink.opt
-endif
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) manpages
 endif
@@ -347,11 +347,17 @@ flexlink:
 	@echo ./configure --with-flexdll
 	@false
 
+ifeq "$(wildcard ocamlopt.opt$(EXE))" ""
+  FLEXLINK_OCAMLOPT=../runtime/ocamlrun$(EXE) ../ocamlopt$(EXE)
+else
+  FLEXLINK_OCAMLOPT=../ocamlopt.opt$(EXE)
+endif
+
 flexlink.opt:
 	$(MAKE) -C $(FLEXDLL_SUBMODULE) \
 	  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
 	  OCAML_FLEXLINK="../boot/ocamlrun$(EXE) ../boot/flexlink.byte$(EXE)" \
-	  OCAMLOPT="../ocamlopt.opt$(EXE) -nostdlib -I ../stdlib" \
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" \
 	  flexlink.exe
 endif # ifeq "$(FLEXDLL_SUBMODULE)" ""
 
