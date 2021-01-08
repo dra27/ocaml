@@ -285,7 +285,7 @@ $(OTHERS:.cmo=.p.cmx) std_exit.p.cmx: stdlib.cmx
 clean::
 	rm -f *.cm* *.$(O) *.$(A) *.odoc
 	rm -f *~
-	rm -f camlheader*
+	rm -rf flexdll
 
 include .depend
 
