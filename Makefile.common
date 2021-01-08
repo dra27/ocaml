@@ -63,15 +63,21 @@ ifeq "$(FLEXDLL_SUBMODULE)" ""
   ocamlc_cmd = $(ocamlc)
   ocamlopt_cmd = $(ocamlopt)
 else
+ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
   FLEXLINK_ENV = \
     OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
                     $(ROOTDIR)/boot/flexlink.byte$(EXE)"
+else
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(ROOTDIR)/$(FLEXDLL_SUBMODULE)/flexlink.exe -I \
+      $(ROOTDIR)/boot"
+endif # ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
   CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
   OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
   MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
   ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
-endif
+endif # ifeq "$(FLEXDLL_SUBMODULE)" ""
 
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
