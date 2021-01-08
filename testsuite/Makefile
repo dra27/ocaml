@@ -51,25 +51,34 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 else
   # The testsuite needs an absolute path to the runtime, so override the
   # definition in Makefile.common
+  FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
+  FLEXLINK_EXE_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
+ifeq "$(wildcard $(TOPDIR_HOST)/flexlink.opt$(EXE))" ""
   FLEXLINK_ENV = \
     OCAML_FLEXLINK="$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
                     $(TOPDIR_HOST)/boot/flexlink.byte$(EXE)"
-endif
-
-ifeq "$(FLEXLINK_ENV)" ""
-  ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
-else
-  FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
-  FLEXLINK_EXE_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
   MKDLL=$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
         $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
         $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
   MKEXE=$(TOPDIR_HOST)/boot/ocamlrun$(EXE) \
         $(TOPDIR_HOST)/boot/flexlink.byte$(EXE) \
         $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
+else
+  FLEXLINK_ENV = \
+    OCAML_FLEXLINK="$(TOPDIR_HOST)/flexlink.opt$(EXE) \
+      -I $(TOPDIR_HOST)/stdlib/flexdll"
+  MKDLL=$(TOPDIR_HOST)/flexlink.opt$(EXE) -I $(TOPDIR_HOST)/stdlib/flexdll \
+        $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
+  MKEXE=$(TOPDIR_HOST)/flexlink.opt$(EXE) -I $(TOPDIR_HOST)/stdlib/flexdll \
+        $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
+endif # ifeq "$(wildcard $(TOPDIR_HOST)/flexlink.opt$(EXE))" ""
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
-  ocamltest := $(FLEXLINK_ENV) MKEXE="$(MKEXE)" MKDLL="$(MKDLL)" \
-                               SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
+ifeq "$(FLEXLINK_ENV)" ""
+  ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
+else
+  ocamltest := $(FLEXLINK_ENV) MKEXE="$(MKEXE)" MKDLL="$(MKDLL)" SORT=$(SORT) \
+                               MAKE=$(MAKE) $(ocamltest_program)
 endif
 
 .PHONY: default
