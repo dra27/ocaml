@@ -257,6 +257,9 @@ opt.opt: checknative
 	$(MAKE) core
 	$(MAKE) ocaml
 	$(MAKE) opt-core
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+	$(MAKE) flexlink.opt$(EXE)
+endif
 	$(MAKE) ocamlc.opt
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
 	  $(WITH_OCAMLTEST)
@@ -264,9 +267,6 @@ opt.opt: checknative
 	$(MAKE) otherlibrariesopt
 	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
 	  $(OCAMLTEST_OPT)
-ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(MAKE) flexlink.opt$(EXE)
-endif
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) manpages
 endif
@@ -358,10 +358,16 @@ flexlink:
 	@echo ./configure --with-flexdll
 	@false
 
+ifeq "$(wildcard ocamlopt.opt)" ""
+  FLEXLINK_OCAMLOPT=../runtime/ocamlrun$(EXE) ../ocamlopt
+else
+  FLEXLINK_OCAMLOPT=../ocamlopt.opt
+endif
+
 flexlink.opt$(EXE):
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value CAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
-	  OCAMLOPT="../ocamlopt.opt -nostdlib -I ../stdlib" flexlink.exe
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" flexlink.exe
 	mv $(FLEXDLL_SOURCES)/flexlink.exe $@
 
 partialclean::
