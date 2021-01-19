@@ -3,6 +3,9 @@ OCaml 4.11 maintenance branch
 
 ### Bug fixes:
 
+- #10147, #10148: Fix building runtime with GCC on macOS.
+  (David Allsopp, report by John Skaller)
+
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
   (Xavier Leroy, reports by Tomasz Kłoczko and R.W.M. Jones, review by Anil
