@@ -3,11 +3,6 @@ OCaml 4.10 maintenance branch
 
 ### Runtime system:
 
-- #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
-  causing a performance regression
-  (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
-   code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
-
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
   (Xavier Leroy, reports by Tomasz Kłoczko and R.W.M. Jones, review by Anil
@@ -18,6 +13,11 @@ OCaml 4.10 maintenance branch
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
 ### Bug fixes:
+
+- #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
+  causing a performance regression
+  (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
+   code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
   (David Allsopp, report by John Skaller)
