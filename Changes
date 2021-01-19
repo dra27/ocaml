@@ -21,6 +21,9 @@ OCaml 4.11 maintenance branch
 
 ### Bug fixes:
 
+- #10147, #10148: Fix building runtime with GCC on macOS.
+  (David Allsopp, report by John Skaller)
+
 - #11358, #11378: Refactor the initialization of bytecode threading.
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
