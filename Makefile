@@ -86,6 +86,8 @@ TOPLEVELSTART=toplevel/topstart.cmo
 
 OPTTOPLEVELSTART=toplevel/opttopstart.cmo
 
+# This list is passed to expunge, which accepts both uncapitalized and
+# capitalized module names.
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
