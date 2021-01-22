@@ -20,9 +20,11 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
-OC_CPPFLAGS += -I$(ROOTDIR)/runtime
+# XXX COMBAK When we're cross-compiling, will need a build ocamlyacc for the build system and a host
+#     ocamlyacc to install. The easiest thing will be to ensure that boot/ocamlyacc is a runnable thing.
+host_OC_CPPFLAGS += -I$(ROOTDIR)/runtime -I$(ROOTDIR)/runtime/host
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
+ifeq "$(host_UNIX_OR_WIN32)" "win32"
 WSTR_OBJ = wstr
 else
 WSTR_OBJ =
@@ -32,14 +34,15 @@ ocamlyacc_SOURCES := $(addsuffix .c,\
   $(WSTR_OBJ) closure error lalr lr0 main mkpar output reader skeleton \
   symtab verbose warshall)
 
-ocamlyacc_OBJECTS := $(ocamlyacc_SOURCES:.c=.$(O))
+ocamlyacc_OBJECTS := $(ocamlyacc_SOURCES:.c=.$(host_O))
 
-generated_files := ocamlyacc$(EXE) $(ocamlyacc_OBJECTS)  version.h
+generated_files := ocamlyacc$(host_EXE) $(ocamlyacc_OBJECTS)  version.h
 
-all: ocamlyacc$(EXE)
+all: ocamlyacc$(host_EXE)
 
-ocamlyacc$(EXE): $(ocamlyacc_OBJECTS)
-	$(MKEXE) -o $@ $^ $(EXTRALIBS)
+# XXX Don't care about EXTRALIBS
+ocamlyacc$(host_EXE): $(ocamlyacc_OBJECTS)
+	$(host_MKEXE) -o $@ $^ $(EXTRALIBS)
 
 version.h : $(ROOTDIR)/VERSION
 	echo "#define OCAML_VERSION \"`sed -e 1q $< | tr -d '\r'`\"" > $@
@@ -61,3 +64,6 @@ skeleton.$(O): defs.h
 symtab.$(O): defs.h
 verbose.$(O): defs.h
 warshall.$(O): defs.h
+
+%.$(O): %.c
+	$(host_CC) -c $(host_OC_CFLAGS) $(host_OC_CPPFLAGS) $(host_OUTPUTOBJ)$@ $<

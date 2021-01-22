@@ -93,10 +93,12 @@ ARCMD=@AR@
 
 ### Extension of object files
 O=@OBJEXT@
+host_O=@host_OBJEXT@
 EXT_OBJ=.@OBJEXT@
 
 ### How to tell the C compiler to output an object file
 OUTPUTOBJ=@outputobj@
+host_OUTPUTOBJ=@host_outputobj@
 
 ### Extension of static libraries
 A=@libext@
@@ -175,6 +177,7 @@ PTHREAD_LINK=@pthread_link@
 PTHREAD_CAML_LINK=$(addprefix -cclib ,$(PTHREAD_LINK))
 
 UNIX_OR_WIN32=@unix_or_win32@
+host_UNIX_OR_WIN32=@host_unix_or_win32@
 UNIXLIB=@unixlib@
 BFD_CPPFLAGS=@bfd_cppflags@
 BFD_LDFLAGS=@bfd_ldflags@

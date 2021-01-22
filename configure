@@ -682,6 +682,7 @@ bfd_ldflags
 function_sections
 bfd_cppflags
 unixlib
+host_unix_or_win32
 unix_or_win32
 pthread_link
 system
@@ -696,6 +697,7 @@ host_S
 S
 host_libext
 libext
+host_outputobj
 outputobj
 host_OBJEXT
 OBJEXT
@@ -2582,6 +2584,8 @@ if $cross_compiler; then :
 fi
 
 # Variables from the runtime configure script which we export
+
+
 
 
 
