@@ -1,8 +1,7 @@
 (* TEST
-   include config
+   include ocamlcommon
    flags = "-w -55"
-   ocamlc_flags = "config.cmo"
-   ocamlopt_flags = "-inline 20 config.cmx"
+   ocamlopt_flags = "-inline 20"
    * native
      compare_programs = "false"
 *)

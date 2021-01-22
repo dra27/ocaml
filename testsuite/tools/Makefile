@@ -25,14 +25,12 @@ include $(TOPDIR)/Makefile.tools
 
 expect_MAIN=expect_test
 expect_PROG=$(expect_MAIN)$(EXE)
-expect_DIRS = parsing utils driver typing toplevel
-expect_OCAMLFLAGS = $(addprefix -I $(TOPDIR)/,$(expect_DIRS))
+expect_OCAMLFLAGS = -I $(TOPDIR)/compilerlibs
 expect_LIBS := $(addprefix $(COMPILERLIBSDIR)/,\
   ocamlcommon ocamlbytecomp ocamltoplevel)
 
 codegen_PROG = codegen$(EXE)
-codegen_DIRS = parsing utils typing middle_end bytecomp lambda asmcomp
-codegen_OCAMLFLAGS = $(addprefix -I $(TOPDIR)/, $(codegen_DIRS)) -w +40 -g
+codegen_OCAMLFLAGS = -I $(TOPDIR)/compilerlibs -w +40 -g
 
 codegen_LIBS = $(addprefix $(COMPILERLIBSDIR)/,\
   ocamlcommon ocamloptcomp)

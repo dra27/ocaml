@@ -35,3 +35,6 @@ let runtime ocamlsrcdir =
 
 let tools ocamlsrcdir =
   Filename.make_path [ocamlsrcdir; "tools"]
+
+let compilerlibs ocamlsrcdir =
+  Filename.make_path [ocamlsrcdir; "compilerlibs"]

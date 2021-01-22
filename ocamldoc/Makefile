@@ -98,16 +98,10 @@ endif
 #############
 
 INCLUDES_DEP=\
-  -I $(ROOTDIR)/utils \
-  -I $(ROOTDIR)/parsing \
-  -I $(ROOTDIR)/typing \
-  -I $(ROOTDIR)/driver \
-  -I $(ROOTDIR)/bytecomp \
-  -I $(ROOTDIR)/toplevel
+  -I $(ROOTDIR)/compilerlibs
 
 INCLUDES_NODEP=\
   -I $(ROOTDIR)/stdlib \
-  -I $(ROOTDIR)/compilerlibs \
   -I $(ROOTDIR)/otherlibs/str \
   -I $(ROOTDIR)/otherlibs/dynlink \
   -I $(ROOTDIR)/otherlibs/dynlink/native \

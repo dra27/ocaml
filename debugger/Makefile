@@ -33,8 +33,7 @@ CAMLDEP=$(BEST_OCAMLDEP)
 DEPFLAGS=-slash
 DEPINCLUDES=$(INCLUDES)
 
-DIRECTORIES=$(UNIXDIR) $(DYNLINKDIR) $(addprefix $(ROOTDIR)/,\
-  utils parsing typing bytecomp toplevel driver file_formats lambda)
+DIRECTORIES=$(UNIXDIR) $(DYNLINKDIR) $(ROOTDIR)/compilerlibs
 
 INCLUDES=$(addprefix -I ,$(DIRECTORIES))
 

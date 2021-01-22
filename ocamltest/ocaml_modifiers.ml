@@ -95,27 +95,14 @@ let systhreads =
   (make_library_modifier
     "threads" (compiler_subdir ["otherlibs"; "systhreads"]))
 
-let compilerlibs_subdirs =
-[
-  "asmcomp";
-  "bytecomp";
-  "compilerlibs";
-  "driver";
-  "file_formats";
-  "lambda";
-  "middle_end";
-  "parsing";
-  "toplevel";
-  "typing";
-  "utils";
-]
-
 let add_compiler_subdir subdir =
   Append (Ocaml_variables.directories, (wrap (compiler_subdir [subdir])))
 
 let compilerlibs_archive archive =
-  (Append (Ocaml_variables.libraries, wrap archive)) ::
-  (List.map add_compiler_subdir compilerlibs_subdirs)
+[
+  Append (Ocaml_variables.libraries, wrap archive);
+  Append (Ocaml_variables.directories, (wrap (compiler_subdir ["compilerlibs"])));
+]
 
 let debugger = [add_compiler_subdir "debugger"]
 

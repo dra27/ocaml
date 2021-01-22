@@ -22,10 +22,10 @@
 *.lib
 *.dll
 *.la
-*.cm[ioxat]
-*.cmx[as]
-*.cmti
-*.annot
+#*.cm[ioxat]
+#*.cmx[as]
+#*.cmti
+#*.annot
 *.exe
 *.exe.manifest
 .DS_Store
@@ -37,6 +37,43 @@ _ocamltestd
 *.odoc
 .merlin
 _build
+
+# Temporary, to detect leaks
+compilerlibs/*.cm[ioxat]
+compilerlibs/*.cmx[as]
+compilerlibs/*.cmti
+compilerlibs/*.annot
+tools/*.cm[ioxat]
+tools/*.cmx[as]
+tools/*.cmti
+tools/*.annot
+stdlib/*.cm[ioxat]
+stdlib/*.cmx[as]
+stdlib/*.cmti
+stdlib/*.annot
+otherlibs/**/*.cm[ioxat]
+otherlibs/**/*.cmx[as]
+otherlibs/**/*.cmti
+otherlibs/**/*.annot
+debugger/*.cm[ioxat]
+debugger/*.cmx[as]
+debugger/*.cmti
+debugger/*.annot
+ocamltest/*.cm[ioxat]
+ocamltest/*.cmx[as]
+ocamltest/*.cmti
+ocamltest/*.annot
+ocamldoc/**/*.cm[ioxat]
+ocamldoc/**/*.cmx[as]
+ocamldoc/**/*.cmti
+ocamldoc/**/*.annot
+lex/*.cm[ioxat]
+lex/*.cmx[as]
+lex/*.cmti
+lex/*.annot
+boot/*.cmi
+boot/std_exit.cmo
+boot/stdlib.cma
 
 # local to root directory
 
@@ -57,6 +94,7 @@ _build
 
 # specific files and patterns in sub-directories
 
+# XXX COMBAK most of these will move to
 /asmcomp/.arch-configured
 /asmcomp/.arch-configured.new
 /asmcomp/.depend
@@ -74,8 +112,12 @@ _build
 /boot/camlheader
 /boot/ocamlc.opt
 
+# XXX These should be generated directly to compilerlibs
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
+
+/compilerlibs/*.mli
+/compilerlibs/*.ml
 
 /debugger/debugger_lexer.ml
 /debugger/debugger_parser.ml
@@ -85,6 +127,7 @@ _build
 /emacs/ocamltags
 /emacs/*.elc
 
+# XXX This should be generated directly to compilerlibs
 /lambda/runtimedef.ml
 
 /lex/parser.ml
@@ -168,6 +211,7 @@ _build
 /otherlibs/win32unix/unlink.c
 /otherlibs/win32unix/fsync.c
 
+# XXX These should be generated directly in compilerlibs
 /parsing/parser.ml
 /parsing/parser.mli
 /parsing/lexer.ml
@@ -265,7 +309,7 @@ _build
 /tools/caml-tex
 /tools/eventlog_metadata
 
-/utils/config.ml
+# XXX These should be generated directly in compilerlibs
 /utils/domainstate.ml
 /utils/domainstate.mli
 

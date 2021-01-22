@@ -75,10 +75,7 @@ CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
         -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt -g -nostdlib -I $(ROOTDIR)/stdlib
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
-INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
-                       middle_end middle_end/closure middle_end/flambda \
-                       middle_end/flambda/base_types driver toplevel \
-                       file_formats lambda)
+INCLUDES = -I $(ROOTDIR)/compilerlibs
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
 LINKFLAGS = $(INCLUDES)
@@ -108,7 +105,7 @@ clean::
 # The profiler
 
 CSLPROF=ocamlprof.cmo
-CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
+CSLPROF_IMPORTS=$(ROOTDIR)/compilerlibs/ocamlcommon.cma #config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
   numbers.cmo arg_helper.cmo clflags.cmo terminfo.cmo \
   warnings.cmo location.cmo longident.cmo docstrings.cmo \
   syntaxerr.cmo ast_helper.cmo \
@@ -118,7 +115,7 @@ CSLPROF_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
 
 $(call byte_and_opt,ocamlprof,$(CSLPROF_IMPORTS) profiling.cmo $(CSLPROF),)
 
-ocamlcp_cmos = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
+ocamlcp_cmos = $(ROOTDIR)/compilerlibs/ocamlcommon.cma #config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
                warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
                clflags.cmo \
                terminfo.cmo location.cmo load_path.cmo ccomp.cmo compenv.cmo \
@@ -146,8 +143,10 @@ installopt::
 
 # To help building mixed-mode libraries (OCaml + C)
 
-$(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo config.cmo \
-	         build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo,)
+#$(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo config.cmo \
+#	         build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo,)
+$(call byte_and_opt,ocamlmklib,ocamlmklibconfig.cmo ocamlcommon.cma \
+	         ocamlmklib.cmo,)
 
 
 ocamlmklibconfig.ml: $(ROOTDIR)/Makefile.config Makefile
@@ -166,7 +165,7 @@ clean::
 # To make custom toplevels
 
 OCAMLMKTOP=ocamlmktop.cmo
-OCAMLMKTOP_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo \
+OCAMLMKTOP_IMPORTS=ocamlcommon.cma #config.cmo build_path_prefix_map.cmo misc.cmo \
        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
        load_path.cmo profile.cmo ccomp.cmo
 
@@ -385,8 +384,13 @@ clean::
 %.cmi: %.mli
 	$(CAMLC) -c $(COMPFLAGS) - $<
 
+CMX_INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
+                           middle_end middle_end/closure middle_end/flambda \
+                           middle_end/flambda/base_types driver toplevel \
+                           file_formats lambda)
+
 %.cmx: %.ml
-	$(CAMLOPT) $(COMPFLAGS) -c - $<
+	$(CAMLOPT) $(COMPFLAGS) $(CMX_INCLUDES) -c - $<
 
 clean::
 	rm -f *.cmo *.cmi *.cma *.dll *.so *.lib *.a

@@ -20,7 +20,7 @@ let stdlib ocamlsrcdir =
   "-nostdlib -I " ^ stdlib_path
 
 let include_toplevel_directory ocamlsrcdir =
-  "-I " ^ (Ocaml_directories.toplevel ocamlsrcdir)
+  "-I " ^ (Ocaml_directories.compilerlibs ocamlsrcdir)
 
 let c_includes ocamlsrcdir =
   let dir = Ocaml_directories.runtime ocamlsrcdir in
@@ -56,6 +56,6 @@ let toplevel_default_flags = "-noinit -no-version -noprompt"
 let ocamldebug_default_flags ocamlsrcdir =
   "-no-version -no-prompt -no-time -no-breakpoint-message " ^
   ("-I " ^ (Ocaml_directories.stdlib ocamlsrcdir) ^ " ") ^
-  ("-topdirs-path " ^ (Ocaml_directories.toplevel ocamlsrcdir))
+  ("-topdirs-path " ^ (Ocaml_directories.compilerlibs ocamlsrcdir))
 
 let ocamlobjinfo_default_flags = "-null-crc"

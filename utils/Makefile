@@ -50,7 +50,7 @@ OCAML_ESCAPE=$(subst ",\",$(subst \,\\,$1))
 SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 
 # SUBST_STRING does the same, for a variable that occurs between "..."
-# in config.mlp.  Thus, backslashes and double quotes must be escaped.
+# in config.ml.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
 # SUBST_QUOTE does the same, adding OCaml quotes around non-empty strings
@@ -62,7 +62,7 @@ SUBST_QUOTE=$(call SUBST_QUOTE2,$1,$($1))
 
 FLEXLINK_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
 
-config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
+../compilerlibs/config.ml: config.ml $(ROOTDIR)/Makefile.config Makefile
 	sed $(call SUBST,AFL_INSTRUMENT) \
 	    $(call SUBST,ARCH) \
 	    $(call SUBST_STRING,ARCMD) \

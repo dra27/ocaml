@@ -26,3 +26,5 @@ val toplevel : string -> string
 val runtime : string -> string
 
 val tools : string -> string
+
+val compilerlibs : string -> string

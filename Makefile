@@ -39,11 +39,12 @@ ARCHES=amd64 i386 arm arm64 power s390x riscv
 ARCH_SPECIFIC := $(addprefix asmcomp/, \
   arch.ml arch.mli proc.ml CSE.ml selection.ml scheduling.ml reload.ml emit.ml \
   specifics.mli)
-INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
-        -I lambda -I middle_end -I middle_end/closure \
-        -I middle_end/flambda -I middle_end/flambda/base_types \
-        -I asmcomp -I asmcomp/debug \
-        -I driver -I toplevel
+#INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
+#         -I lambda -I middle_end -I middle_end/closure \
+#         -I middle_end/flambda -I middle_end/flambda/base_types \
+#         -I asmcomp -I asmcomp/debug \
+#         -I driver -I toplevel
+INCLUDES=-I compilerlibs
 
 COMPFLAGS=-strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66 \
 	  -warn-error A \
@@ -65,13 +66,13 @@ DEPINCLUDES=$(INCLUDES)
 OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
 OCAMLTEST_OPT=$(WITH_OCAMLTEST:=.opt)
 
-BYTESTART=driver/main.cmo
+BYTESTART=compilerlibs/main.cmo
 
-OPTSTART=driver/optmain.cmo
+OPTSTART=compilerlibs/optmain.cmo
 
-TOPLEVELSTART=toplevel/topstart.cmo
+TOPLEVELSTART=compilerlibs/topstart.cmo
 
-OPTTOPLEVELSTART=toplevel/opttopstart.cmo
+OPTTOPLEVELSTART=compilerlibs/opttopstart.cmo
 
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
@@ -109,8 +110,8 @@ include compilerlibs/Makefile.compilerlibs
 
 # The configuration file
 
-utils/config.ml: utils/config.mlp Makefile.config utils/Makefile
-	$(MAKE) -C utils config.ml
+compilerlibs/config.ml: utils/config.ml Makefile.config utils/Makefile
+	$(MAKE) -C utils ../$@
 
 .PHONY: reconfigure
 reconfigure:
@@ -127,10 +128,10 @@ configure: configure.ac aclocal.m4 VERSION tools/autogen
 
 .PHONY: partialclean
 partialclean::
-	rm -f utils/config.ml utils/domainstate.ml utils/domainstate.mli
+	rm -f utils/domainstate.ml utils/domainstate.mli
 
 .PHONY: beforedepend
-beforedepend:: utils/config.ml utils/domainstate.ml utils/domainstate.mli
+beforedepend:: compilerlibs/config.ml utils/domainstate.ml utils/domainstate.mli
 
 # Start up the system from the distribution compiler
 .PHONY: coldstart
@@ -355,41 +356,29 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(INSTALL_PROG) lex/ocamllex "$(INSTALL_BINDIR)/ocamllex.byte$(EXE)"
 endif
 	$(INSTALL_PROG) yacc/ocamlyacc$(EXE) "$(INSTALL_BINDIR)/ocamlyacc$(EXE)"
-	$(INSTALL_DATA) \
-	   utils/*.cmi \
-	   parsing/*.cmi \
-	   typing/*.cmi \
-	   bytecomp/*.cmi \
-	   file_formats/*.cmi \
-	   lambda/*.cmi \
-	   driver/*.cmi \
-	   toplevel/*.cmi \
-	   "$(INSTALL_COMPLIBDIR)"
+	$(INSTALL_DATA) compilerlibs/*.cmi "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	   utils/*.cmt utils/*.cmti utils/*.mli \
-	   parsing/*.cmt parsing/*.cmti parsing/*.mli \
-	   typing/*.cmt typing/*.cmti typing/*.mli \
-	   file_formats/*.cmt file_formats/*.cmti file_formats/*.mli \
-	   lambda/*.cmt lambda/*.cmti lambda/*.mli \
-	   bytecomp/*.cmt bytecomp/*.cmti bytecomp/*.mli \
-	   driver/*.cmt driver/*.cmti driver/*.mli \
-	   toplevel/*.cmt toplevel/*.cmti toplevel/*.mli \
+	   compilerlibs/*.cmti \
+	   compilerlibs/*.mli \
+	   compilerlibs/*.cmt \
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 	$(INSTALL_DATA) \
 	  compilerlibs/*.cma \
 	  "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	   $(BYTESTART) $(TOPLEVELSTART) \
+	   $(BYTESTART) $(BYTESTART:.cmo=.cmi) $(BYTESTART:.cmo=.mli) $(TOPLEVELSTART) \
 	   "$(INSTALL_COMPLIBDIR)"
+# XXX Why is this done?! In which case, should it be excluded from compilerlibs
+#     Check for issues
 	$(INSTALL_DATA) \
-	   toplevel/topdirs.cmi \
+	   compilerlibs/topdirs.cmi \
 	   "$(INSTALL_LIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
-	   toplevel/topdirs.cmt toplevel/topdirs.cmti \
-           toplevel/topdirs.mli \
+	   compilerlibs/topdirs.cmt compilerlibs/topdirs.cmti \
+           compilerlibs/topdirs.mli \
 	   "$(INSTALL_LIBDIR)"
 endif
 	$(MAKE) -C tools install
@@ -434,53 +423,14 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(INSTALL_PROG) ocamlopt "$(INSTALL_BINDIR)/ocamlopt.byte$(EXE)"
 endif
 	$(MAKE) -C stdlib installopt
-	$(INSTALL_DATA) \
-	    middle_end/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    middle_end/closure/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    middle_end/flambda/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    middle_end/flambda/base_types/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    asmcomp/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    asmcomp/debug/*.cmi \
-	    "$(INSTALL_COMPLIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-	$(INSTALL_DATA) \
-	    middle_end/*.cmt middle_end/*.cmti \
-	    middle_end/*.mli \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    middle_end/closure/*.cmt middle_end/closure/*.cmti \
-	    middle_end/closure/*.mli \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    middle_end/flambda/*.cmt middle_end/flambda/*.cmti \
-	    middle_end/flambda/*.mli \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    middle_end/flambda/base_types/*.cmt \
-            middle_end/flambda/base_types/*.cmti \
-	    middle_end/flambda/base_types/*.mli \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    asmcomp/*.cmt asmcomp/*.cmti \
-	    asmcomp/*.mli \
-	    "$(INSTALL_COMPLIBDIR)"
-	$(INSTALL_DATA) \
-	    asmcomp/debug/*.cmt asmcomp/debug/*.cmti \
-	    asmcomp/debug/*.mli \
-	    "$(INSTALL_COMPLIBDIR)"
+#	$(INSTALL_DATA) \
+#	    $(OPTSTART:.cmo=.cmti) \
+#	    $(OPTSTART:.cmo=.mli) \
+#	    "$(INSTALL_COMPLIBDIR)"
 endif
 	$(INSTALL_DATA) \
-	    $(OPTSTART) \
+	    $(OPTSTART) $(OPTSTART:.cmo=.cmi) $(OPTSTART:.cmo=.mli) \
 	    "$(INSTALL_COMPLIBDIR)"
 ifneq "$(WITH_OCAMLDOC)" ""
 	$(MAKE) -C ocamldoc installopt
@@ -515,14 +465,7 @@ installoptopt:
 	   $(LN) ocamlopt.opt$(EXE) ocamlopt$(EXE); \
 	   $(LN) ocamllex.opt$(EXE) ocamllex$(EXE)
 	$(INSTALL_DATA) \
-	   utils/*.cmx parsing/*.cmx typing/*.cmx bytecomp/*.cmx \
-	   file_formats/*.cmx \
-	   lambda/*.cmx \
-	   driver/*.cmx asmcomp/*.cmx middle_end/*.cmx \
-           middle_end/closure/*.cmx \
-           middle_end/flambda/*.cmx \
-           middle_end/flambda/base_types/*.cmx \
-	   asmcomp/debug/*.cmx \
+	   compilerlibs/*.cmx \
           "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
@@ -997,12 +940,12 @@ toplevel/opttoploop.cmx: otherlibs/dynlink/dynlink.cmxa
 # The numeric opcodes
 
 bytecomp/opcodes.ml: runtime/caml/instruct.h tools/make_opcodes
-	runtime/ocamlrun tools/make_opcodes -opcodes < $< > $@
+	boot/ocamlrun tools/make_opcodes -opcodes < $< > $@
 
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
 	$(CAMLC) -i $< > $@
 
-tools/make_opcodes: tools/make_opcodes.mll
+tools/make_opcodes: tools/make_opcodes.mll runtime/primitives
 	$(MAKE) -C tools make_opcodes
 
 partialclean::
@@ -1017,13 +960,43 @@ endif
 
 # Default rules
 
-%.cmo: %.ml
+compilerlibs/%.cmo: compilerlibs/%.ml
 	$(CAMLC) $(COMPFLAGS) -c $<
 
-%.cmi: %.mli
+compilerlibs/%.cmi: compilerlibs/%.mli
 	$(CAMLC) $(COMPFLAGS) -c $<
 
-%.cmx: %.ml
+#.PRECIOUS: compilerlibs/%.cmi
+
+define COPY_SRC
+#compilerlibs/%.cmi: $1/%.cmi
+# XXX $(LN) or cp ?!
+#	cd compilerlibs ; $$(LN) ../$$< $$(notdir $$@)
+#	cd compilerlibs ; $$(LN) ../$$(<:.cmi=.cmti) $$(notdir $$(@:.cmi=.cmti))
+#	cp -f $$< $$(<:.cmi=.cmti) compilerlibs/
+#compilerlibs/%.cmo: $1/%.cmo compilerlibs/%.cmi
+#	cp -f $$< $$@
+#compilerlibs/%.cmx: $1/%.cmx
+#	cp -f $$< $$(<:.cmx=.$(O)) compilerlibs/
+# XXX COMBAK This can obviously be improved to be LN, but only if *all* files have # headers
+#            OR! if the compiler gains an option to do it manually?! Could be done with a funny -pp ?
+.PRECIOUS: compilerlibs/%.ml
+compilerlibs/%.ml: $1/%.ml
+	@echo '# 2 "$$<"' > $$@
+	cat $$< >> $$@
+.PRECIOUS: compilerlibs/%.mli
+compilerlibs/%.mli: $1/%.mli
+	@echo '# 2 "$$<"' > $$@
+	cat $$< >> $$@
+endef
+$(foreach dir,parsing utils typing file_formats lambda middle_end middle_end/flambda middle_end/flambda/base_types bytecomp driver middle_end/closure toplevel asmcomp asmcomp/debug,$(eval $(call COPY_SRC,$(dir))))
+
+#CMX_INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
+#             -I lambda -I middle_end -I middle_end/closure \
+#             -I middle_end/flambda -I middle_end/flambda/base_types \
+#             -I asmcomp -I asmcomp/debug \
+#             -I driver -I toplevel
+compilerlibs/%.cmx: compilerlibs/%.ml
 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -c $<
 
 partialclean::
@@ -1039,11 +1012,11 @@ partialclean::
 depend:: beforedepend
 	echo '# Automatically generated; run make depend to update' > .$@
 
+# XXX COMBAK Care needed from an empty directory - we need to build the compilerlibs sources completely
 define BUILD_DEP
-depend::
+depend:: $(addprefix compilerlibs/,$(notdir $(wildcard $1/*.mli))) $(addprefix compilerlibs/,$(notdir $(wildcard $1/*.ml)))
 	$$(CAMLDEP) $$(DEPFLAGS) $$(DEPINCLUDES) \
-                    $$(filter-out $$(ARCH_SPECIFIC), \
-                      $$(wildcard $1/*.mli) $$(wildcard $1/*.ml)) >> .depend
+                    $$(filter-out $$(addprefix compilerlibs/,$$(notdir $$(ARCH_SPECIFIC))), $$^) >> .depend
 endef
 
 $(foreach dir,utils parsing typing bytecomp asmcomp middle_end lambda \
@@ -1051,11 +1024,22 @@ $(foreach dir,utils parsing typing bytecomp asmcomp middle_end lambda \
               middle_end/flambda/base_types asmcomp/debug driver toplevel, \
               $(eval $(call BUILD_DEP,$(dir))))
 
-asmcomp/.depend: $(ARCH_SPECIFIC) $(ARCH_COOKIE) tools/cvt_emit
+# XXX This is the best rule, but it's invasive...
+# MIDDLE_END is a subset of OPTCOMP
+#depend:: $(OPTCOMP:.cmo=.ml) $(OPTCOMP:.cmo=.mli) $(OPTCOMP_CMI:.cmi=.mli) $(COMMON:.cmo=.ml) $(COMMON:.cmo=.mli) $(COMMON_CMI:.cmi=.mli) $(BYTECOMP:.cmo=.ml) $(BYTECOMP:.cmo=.mli) $(BYTECOMP_CMI:.cmi=.mli)
+#	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) $(filter-out $(ARCH_SPECIFIC) $^ > .$@
+
+
+# XXX COMBAK This can be improved, and made in place (simplifies the cookies too!)
+# This is filtering out opcodes.ml because we can't generate it early on in world.opt
+ARCH_COMPLIBS=$(addprefix compilerlibs/,$(notdir $(ARCH_SPECIFIC)))
+asmcomp/.depend: $(ARCH_COMPLIBS) $(ARCH_COOKIE) $(OPTCOMP:.cmo=.ml) $(OPTCOMP:.cmo=.mli) $(OPTCOMP_CMI:.cmi=.mli) $(COMMON:.cmo=.ml) $(COMMON:.cmo=.mli) $(COMMON_CMI:.cmi=.mli) tools/cvt_emit
 	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) \
-                   $(filter-out asmcomp/emit.ml,$(ARCH_SPECIFIC)) > $@
+                   $(filter-out compilerlibs/emit.ml,$(ARCH_COMPLIBS)) > $@
 	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) -pp "$(CAMLRUN) tools/cvt_emit" \
-                   asmcomp/emit.ml >> $@
+                   compilerlibs/emit.ml >> $@
+# XXX Ouch bollocks...
+	sed -i -e 's/[a-z].*\//compilerlibs\//' $@
 
 partialclean::
 	rm -f asmcomp/.depend
