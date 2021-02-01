@@ -13,6 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
+MARKER
 # Makefile for Raw_spacetime_lib
 
 LIBNAME=raw_spacetime_lib
