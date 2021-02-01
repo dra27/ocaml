@@ -21,9 +21,9 @@ ROOTDIR = .
 # first.
 # If no goals were specified (i.e. `make`), add defaultentry (since it requires
 # ./configure to be run)
+MAKECMDGOALS ?= defaultentry
 CAN_BE_UNCONFIGURED := $(strip \
-  $(filter-out partialclean clean distclean configure, \
-	$(if $(MAKECMDGOALS),$(MAKECMDGOALS),defaultentry)))
+  $(filter-out partialclean clean distclean configure, $(MAKECMDGOALS)))
 
 ifeq "$(CAN_BE_UNCONFIGURED)" ""
 -include Makefile.config
