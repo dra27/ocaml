@@ -21,7 +21,7 @@ AC_INIT([OCaml],
         m4_esyscmd([head -n1 VERSION | tr -d '\r\n']),
         [caml-list@inria.fr],
         [ocaml],
-        [http://www.ocaml.org])
+        [http://www.ocaml.org-different])
 
 AC_MSG_NOTICE([Configuring OCaml version AC_PACKAGE_VERSION])
 
