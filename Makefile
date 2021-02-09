@@ -13,7 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-# The main Makefile
+# The main Makefile - updated
 
 ROOTDIR = .
 include Makefile.common
@@ -1118,4 +1118,3 @@ config.status:
 	@echo "	make install"
 	@echo "should work."
 	@false
-
