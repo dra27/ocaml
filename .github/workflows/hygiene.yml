@@ -71,7 +71,7 @@ jobs:
 
       - name: Check that labelled/unlabelled .mli files are in sync
         run: tools/ci/actions/check-labelled-interfaces.sh
-        if: always()
+        if: false
 
         # If this step fails, it leaves behind the file compiler-failed-to-build
         # the presence of which can be felt by the last two steps, allowing them

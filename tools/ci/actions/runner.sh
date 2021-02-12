@@ -124,8 +124,7 @@ BasicCompiler () {
   # The presence of this file can be detected by later steps which
   # can choose to skip, rather than run (and presumably error).
   touch compiler-failed-to-build
-  ./configure --disable-dependency-generation \
-              --disable-debug-runtime \
+  ./configure --disable-debug-runtime \
               --disable-instrumented-runtime
 
   # Need a runtime
