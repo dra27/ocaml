@@ -1,0 +1,346 @@
+name: Windows
+
+on: [push, pull_request]
+
+env:
+  BASE_EPOCH: 14
+  FLEXDLL_VERSION: 0.39
+  BUILD_EPOCH: 16
+  CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
+  CYG_ROOT: D:\cygwin
+  CYG_CACHE: D:\cygwin\var\cache\setup
+  CACHE_ROOT: D:\caches
+  BUILD_PREFIX: 🐫реализация
+  INSTALL_DIR: Бактріан🐫
+
+jobs:
+  # XXX COMBAK don't do this as a matrix - charge both caches in the same worker. We can either see if there's a way of telling whether the Cygwin32 isn't needed (can we check the other steps?!)
+  #            or we just don't worry about the extra 80MiB cache (OR - better - we do one of the other jobs using Cygwin32)
+  caches:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86, x86_64]
+    runs-on: windows-latest
+    steps:
+    - name: Generate date-based cache key
+      run: |
+        # Put year and week number in cache-key
+        Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
+
+    - name: Base cache
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: ${{ env.CACHE_ROOT }}\base
+        key: cygwin-${{ matrix.arch }}-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+
+    - name: Download
+      run: |
+        # Download cached items
+        New-Item -Path '${{ env.CACHE_ROOT }}\base' -ItemType 'directory' | Out-Null
+        Invoke-WebRequest -Uri 'https://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2' -OutFile '${{ env.CACHE_ROOT }}\base\parallel.tar.bz2'
+        Invoke-WebRequest -Uri 'https://github.com/alainfrisch/flexdll/archive/${{ env.FLEXDLL_VERSION }}.tar.gz' -OutFile '${{ env.CACHE_ROOT }}\base\flexdll.tar.gz'
+        Invoke-WebRequest -Uri 'https://github.com/alainfrisch/flexdll/releases/download/${{ env.FLEXDLL_VERSION }}/flexdll-bin-${{ env.FLEXDLL_VERSION }}.zip' -OutFile 'flexdll.zip'
+        Expand-Archive -LiteralPath 'flexdll.zip' -DestinationPath 'flexdll'
+        Move-Item -LiteralPath 'flexdll\flexlink.exe' -Destination '${{ env.CACHE_ROOT }}\base\flexlink.exe'
+        New-Item -Path '${{ env.CYG_ROOT }}' -ItemType 'directory' | Out-Null
+        Invoke-WebRequest -Uri 'https://www.cygwin.com/setup-${{ matrix.arch }}.exe' -OutFile '${{ env.CYG_ROOT }}\setup.exe'
+        Get-Date -UFormat '%Y%m%d %T' | Out-File -FilePath '${{ env.CACHE_ROOT }}\base\stamp'
+      if: steps.cache.outputs.cache-hit != 'true'
+
+    - name: Install Cygwin
+      shell: cmd
+      run: |
+        :: Cygwin setup
+        ${{ env.CYG_ROOT }}\setup.exe --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "${{ env.CYG_ROOT }}" --site "${{ env.CYG_MIRROR }}" --local-package-dir "${{ env.CYG_CACHE }}" --packages make,diffutils,perl
+      if: steps.cache.outputs.cache-hit != 'true'
+
+    # XXX Report upstream - the cache action is failing because of a problem with Windows tar
+    #     Ideally D:\cygwin would simply be being included in the main cache
+    - name: Cache Cygwin
+      shell: cmd
+      run: |
+        :: Cache the Cygwin installation
+        "C:\Program Files\7-Zip\7z.exe" a -snl -twim ${{ env.CACHE_ROOT }}\base\base.wim ${{ env.CYG_ROOT }}
+      if: steps.cache.outputs.cache-hit != 'true'
+
+  ports:
+    needs: caches
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+            # XXX Since GHA displays the matricx values but not the keys, change these to be clearer
+            #     Possibly worth moving matrix.packages elsewhere?! Or as a matrix-specific env?!
+          - port: cygwin32
+            cygwin: x86
+            packages: gcc-core,gcc-fortran,flexdll
+          - port: cygwin64
+            cygwin: x86_64
+            packages: gcc-core,gcc-fortran,flexdll
+          - port: msvc32
+            cygwin: x86_64
+          - port: msvc64
+            cygwin: x86_64
+            packages: gcc-core
+            # XXX Don't use true here - use a symbol
+            deps: true
+          - port: mingw32
+            cygwin: x86_64
+            flexdll-bootstrap: true
+            packages: mingw64-i686-gcc-core
+          - port: mingw64
+            cygwin: x86_64
+            packages: mingw64-x86_64-gcc-core
+    runs-on: windows-latest
+    steps:
+    - name: Generate date-based cache keys
+      run: |
+        # Put year and week number in cache-key
+        Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\base-cache-key
+        Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\build-cache-key
+        # XXX COMBAK If this is done separately, it can incldue the stamp from the base cache, which will simplify
+        #     the test in the script - it can compare the two files and simply error if they're different
+        Write-Output '${{ matrix.packages }}' | Out-File -FilePath .\build-cache-key -Append
+
+    - name: Cygwin base cache
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: ${{ env.CACHE_ROOT }}\base
+        key: cygwin-${{ matrix.cygwin }}-${{ env.BASE_EPOCH }}-${{ hashFiles('base-cache-key') }}
+
+    # XXX TODO step here which triggers on the failure of the previous one for a clearer error message
+
+    - name: Build cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.CACHE_ROOT }}\build
+        key: build-${{ matrix.cygwin }}-${{ env.BASE_EPOCH }}-${{ env.BUILD_EPOCH }}-${{ hashFiles('build-cache-key') }}
+      if: steps.cache.outputs.cache-hit == 'true'
+
+    - name: Set git to use LF (temporarily)
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+      if: steps.cache.outputs.cache-hit == 'true'
+
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: ${{ matrix.flexdll-bootstrap }}
+      if: steps.cache.outputs.cache-hit == 'true'
+
+    - name: Cygwin Setup
+      shell: cmd
+      run: |
+        :: Ensure required Cygwin packages are installed
+        tools\ci\actions\build-cygwin.cmd ${{ matrix.packages }}
+      if: steps.cache.outputs.cache-hit == 'true'
+
+    - name: Temporarily get flexdll-0.39
+      run: |
+        Invoke-WebRequest -Uri 'http://mirrors.kernel.org/sourceware/cygwin/x86_64/release/flexdll/flexdll-0.39-1.tar.xz' -OutFile 'D:\cygwin\flexdll.tar.xz'
+        D:\cygwin\bin\bash -lc 'cd / ; tar -xJf flexdll.tar.xz ; rm flexdll.tar.xz'
+      if: steps.cache.outputs.cache-hit == 'true' && matrix.port == 'cygwin64'
+
+    - name: Worktree
+      run: |
+        # Set-up the git worktree for the build
+        git worktree add "..\${{ env.BUILD_PREFIX }}" -b build
+      if: steps.cache.outputs.cache-hit == 'true'
+
+    - name: Configure
+      shell: cmd
+      run: |
+        :: Perform configuration steps for the build
+        call tools\ci\actions\build-env.cmd configure ${{ matrix.port }}
+        %CYG_ROOT%\bin\bash -lc "$(cygpath '%GITHUB_WORKSPACE%\tools\ci\actions\windows-runner.sh') configure ${{ matrix.port }} '${{ matrix.deps }}'"
+
+    - name: Build
+      shell: cmd
+      run: |
+        :: Build the compiler
+        call tools\ci\actions\build-env.cmd build ${{ matrix.port }}
+        %CYG_ROOT%\bin\bash -lc "$(cygpath '%GITHUB_WORKSPACE%\tools\ci\actions\windows-runner.sh') build"
+
+    - name: Test
+      shell: cmd
+      run: |
+        :: Test the compiler
+        call tools\ci\actions\build-env.cmd test ${{ matrix.port }}
+        %CYG_ROOT%\bin\bash -lc "$(cygpath '%GITHUB_WORKSPACE%\tools\ci\actions\windows-runner.sh') test"
+
+    - name: Install
+      shell: cmd
+      run: |
+        :: Install the compiler
+        call tools\ci\actions\build-env.cmd install ${{ matrix.port }}
+        %CYG_ROOT%\bin\bash -lc "$(cygpath '%GITHUB_WORKSPACE%\tools\ci\actions\windows-runner.sh') install"
+
+    - name: Hygiene
+      shell: cmd
+      run: |
+        :: Check the clean/.gitignore targets, etc.
+        call tools\ci\actions\build-env.cmd hygiene ${{ matrix.port }}
+        %CYG_ROOT%\bin\bash -lc "$(cygpath '%GITHUB_WORKSPACE%\tools\ci\actions\windows-runner.sh') hygiene"
+
+#  cygwin64:
+#    needs: cygwin
+#    runs-on: windows-latest
+#    steps:
+#    - name: Checkout
+#      uses: actions/checkout@v2
+#
+#    - name: Generate date-based cache key
+#      run: Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
+#
+#    - name: Cygwin base cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache
+#        key: cygwin64-base-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Compiler cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache2
+#        key: cygwin64-gcc-${{ env.EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Cygwin Setup
+#      run: cmd /c tools\ci\actions\mingw64.cmd gcc-core,flexdll
+#
+#    - name: Temporarily get flexdll-0.39
+#      run: |
+#        Invoke-WebRequest -Uri 'http://mirrors.kernel.org/sourceware/cygwin/x86_64/release/flexdll/flexdll-0.39-1.tar.xz' -OutFile 'C:\cygwin64\flexdll.tar.xz'
+#        C:\cygwin64\bin\bash -lc 'cd / ; tar -xJf flexdll.tar.xz ; rm flexdll.tar.xz'
+#
+#    - name: OCaml
+#      run: cmd /c tools\ci\actions\build.cmd cygwin64
+#
+#  msvc32:
+#    needs: cygwin
+#    runs-on: windows-latest
+#    steps:
+#    - name: Set git to use LF (temporarily)
+#      run: |
+#        git config --global core.autocrlf false
+#        git config --global core.eol lf
+#
+#    - name: Checkout
+#      uses: actions/checkout@v2
+#
+#    - name: Generate date-based cache key
+#      run: Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
+#
+#    - name: Cygwin base cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache
+#        key: cygwin64-base-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Cygwin Setup
+#      shell: cmd
+#      run: |
+#        cd /d c:\ && "c:\Program Files\7-Zip\7z.exe" x -snl C:\cache\cygwin.7z
+#
+#    - name: OCaml
+#      run: cmd /c tools\ci\actions\build.cmd msvc32
+#
+#  msvc64:
+#    needs: cygwin
+#    runs-on: windows-latest
+#    steps:
+#    - name: Set git to use LF (temporarily)
+#      run: |
+#        git config --global core.autocrlf false
+#        git config --global core.eol lf
+#
+#    - name: Checkout
+#      uses: actions/checkout@v2
+#
+#    - name: Generate date-based cache key
+#      run: Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
+#
+#    - name: Cygwin base cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache
+#        key: cygwin64-base-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Cygwin Setup
+#      shell: cmd
+#      run: |
+#        cd /d c:\ && "c:\Program Files\7-Zip\7z.exe" x -snl C:\cache\cygwin.7z
+#
+#    - name: OCaml
+#      run: cmd /c tools\ci\actions\build.cmd msvc64
+#
+#  mingw32:
+#    needs: cygwin
+#    runs-on: windows-latest
+#    steps:
+#    - name: Set git to use LF (temporarily)
+#      run: |
+#        git config --global core.autocrlf false
+#        git config --global core.eol lf
+#
+#    - name: Checkout
+#      uses: actions/checkout@v2
+#      with:
+#        submodules: true
+#
+#    - name: Generate date-based cache key
+#      run: Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
+#
+#    - name: Cygwin base cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache
+#        key: cygwin64-base-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Compiler cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache2
+#        key: cygwin64-mingw32-${{ env.EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Cygwin Setup
+#      run: cmd /c tools\ci\actions\mingw64.cmd mingw64-i686-gcc-core
+#
+#    - name: OCaml
+#      run: cmd /c tools\ci\actions\build.cmd mingw32
+#
+#  mingw64:
+#    needs: cygwin
+#    runs-on: windows-latest
+#    steps:
+#    - name: Set git to use LF (temporarily)
+#      run: |
+#        git config --global core.autocrlf false
+#        git config --global core.eol lf
+#
+#    - name: Checkout
+#      uses: actions/checkout@v2
+#
+#    - name: Generate date-based cache key
+#      run: Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
+#
+#    - name: Cygwin base cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache
+#        key: cygwin64-base-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Compiler cache
+#      uses: actions/cache@v2
+#      with:
+#        path: C:\cache2
+#        key: cygwin64-mingw64-${{ env.EPOCH }}-${{ hashFiles('cache-key') }}
+#
+#    - name: Cygwin Setup
+#      run: cmd /c tools\ci\actions\mingw64.cmd mingw64-x86_64-gcc-core
+#
+#    - name: OCaml
+#      run: cmd /c tools\ci\actions\build.cmd mingw64
