@@ -169,9 +169,8 @@ CAMLexport void caml_enter_blocking_section_no_pending(void)
 
 CAMLexport void caml_leave_blocking_section(void)
 {
-  int saved_errno;
-  /* Save the value of errno (PR#5982). */
-  saved_errno = errno;
+  /* caml_leave_blocking_section_hook must not clobber errno or GetLastError
+     (PR#5982 and PR#8857). */
   caml_leave_blocking_section_hook ();
 
   /* Some other thread may have switched
@@ -190,8 +189,6 @@ CAMLexport void caml_leave_blocking_section(void)
     signals_are_pending = 1;
     caml_set_action_pending();
   }
-
-  errno = saved_errno;
 }
 
 /* Execute a signal handler immediately */
