@@ -28,6 +28,8 @@
 #include <unistd.h>
 #endif
 
+#define THREAD_LOCAL __thread
+
 typedef int st_retcode;
 
 #define SIGPREEMPTION SIGVTALRM
@@ -82,25 +84,6 @@ static void st_thread_join(st_thread_id thr)
 {
   pthread_join(thr, NULL);
   /* best effort: ignore errors */
-}
-
-/* Thread-specific state */
-
-typedef pthread_key_t st_tlskey;
-
-static int st_tls_newkey(st_tlskey * res)
-{
-  return pthread_key_create(res, NULL);
-}
-
-Caml_inline void * st_tls_get(st_tlskey k)
-{
-  return pthread_getspecific(k);
-}
-
-Caml_inline void st_tls_set(st_tlskey k, void * v)
-{
-  pthread_setspecific(k, v);
 }
 
 /* Windows-specific hook. */

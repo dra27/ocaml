@@ -113,12 +113,12 @@ static int caml_tick_thread_running = 0;
 /* The thread identifier of the "tick" thread */
 static st_thread_id caml_tick_thread_id;
 
-/* The key used for storing the thread descriptor in the specific data
-   of the corresponding system thread. */
-static st_tlskey thread_descriptor_key;
+/* The thread descriptor for this system thread (stored in TLS). */
+static THREAD_LOCAL caml_thread_t thread_descriptor = NULL;
 
-/* The key used for unlocking I/O channels on exceptions */
-static st_tlskey last_channel_locked_key;
+/* The last locked channel in this thread (used for unlocking I/O channels on
+   exceptions) */
+static THREAD_LOCAL struct channel * last_channel_locked = NULL;
 
 /* Identifier for next thread creation */
 static intnat thread_next_ident = 0;
@@ -237,7 +237,7 @@ static void caml_thread_leave_blocking_section(void)
   st_masterlock_acquire(&caml_master_lock);
   /* Update curr_thread to point to the thread descriptor corresponding
      to the thread currently executing */
-  curr_thread = st_tls_get(thread_descriptor_key);
+  curr_thread = thread_descriptor;
   /* Restore the runtime state from the curr_thread descriptor */
   caml_thread_restore_runtime_state();
 }
@@ -263,7 +263,7 @@ static void caml_io_mutex_lock(struct channel *chan)
   }
   /* PR#4351: first try to acquire mutex without releasing the master lock */
   if (st_mutex_trylock(mutex) == MUTEX_PREVIOUSLY_UNLOCKED) {
-    st_tls_set(last_channel_locked_key, (void *) chan);
+    last_channel_locked = chan;
     return;
   }
   /* If unsuccessful, block on mutex */
@@ -274,20 +274,20 @@ static void caml_io_mutex_lock(struct channel *chan)
      unlock the mutex.  The alternative (doing the setspecific
      before locking the mutex is also incorrect, since we could
      then unlock a mutex that is unlocked or locked by someone else. */
-  st_tls_set(last_channel_locked_key, (void *) chan);
+  last_channel_locked = chan;
   caml_leave_blocking_section();
 }
 
 static void caml_io_mutex_unlock(struct channel *chan)
 {
   st_mutex_unlock(chan->mutex);
-  st_tls_set(last_channel_locked_key, NULL);
+  last_channel_locked = NULL;
 }
 
 static void caml_io_mutex_unlock_exn(void)
 {
-  struct channel * chan = st_tls_get(last_channel_locked_key);
-  if (chan != NULL) caml_io_mutex_unlock(chan);
+  if (last_channel_locked != NULL)
+    caml_io_mutex_unlock(last_channel_locked);
 }
 
 /* Hook for estimating stack usage */
@@ -428,9 +428,6 @@ CAMLprim value caml_thread_initialize(value unit)   /* ML */
   st_initialize();
   /* Initialize and acquire the master lock */
   st_masterlock_init(&caml_master_lock);
-  /* Initialize the keys */
-  st_tls_newkey(&thread_descriptor_key);
-  st_tls_newkey(&last_channel_locked_key);
   /* Set up a thread info block for the current thread */
   curr_thread =
     (caml_thread_t) caml_stat_alloc(sizeof(struct caml_thread_struct));
@@ -446,7 +443,7 @@ CAMLprim value caml_thread_initialize(value unit)   /* ML */
   /* The stack-related fields will be filled in at the next
      caml_enter_blocking_section */
   /* Associate the thread descriptor with the thread */
-  st_tls_set(thread_descriptor_key, (void *) curr_thread);
+  thread_descriptor = curr_thread;
   st_thread_set_id(Ident(curr_thread->descr));
   /* Set up the hooks */
   prev_scan_roots_hook = caml_scan_roots_hook;
@@ -522,7 +519,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 #endif
 
   /* Associate the thread descriptor with the thread */
-  st_tls_set(thread_descriptor_key, (void *) th);
+  thread_descriptor = th;
   st_thread_set_id(Ident(th->descr));
   /* Acquire the global mutex */
   caml_leave_blocking_section();
@@ -585,7 +582,7 @@ CAMLexport int caml_c_thread_register(void)
   st_retcode err;
 
   /* Already registered? */
-  if (st_tls_get(thread_descriptor_key) != NULL) return 0;
+  if (thread_descriptor != NULL) return 0;
   /* Create a thread info block */
   th = caml_thread_new_info();
   if (th == NULL) return 0;
@@ -606,7 +603,7 @@ CAMLexport int caml_c_thread_register(void)
     all_threads->next = th;
   }
   /* Associate the thread descriptor with the thread */
-  st_tls_set(thread_descriptor_key, (void *) th);
+  thread_descriptor = th;
   /* Release the master lock */
   st_masterlock_release(&caml_master_lock);
   /* Now we can re-enter the run-time system and heap-allocate the descriptor */
@@ -628,13 +625,13 @@ CAMLexport int caml_c_thread_register(void)
 
 CAMLexport int caml_c_thread_unregister(void)
 {
-  caml_thread_t th = st_tls_get(thread_descriptor_key);
+  caml_thread_t th = thread_descriptor;
   /* Not registered? */
   if (th == NULL) return 0;
   /* Wait until the runtime is available */
   st_masterlock_acquire(&caml_master_lock);
   /* Forget the thread descriptor */
-  st_tls_set(thread_descriptor_key, NULL);
+  thread_descriptor = NULL;
   /* Remove thread info block from list of threads, and free it */
   caml_thread_remove_info(th);
   /* If no other OCaml thread remains, ask the tick thread to stop
@@ -719,7 +716,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
   caml_raise_if_exception(caml_process_pending_signals_exn());
   caml_thread_save_runtime_state();
   st_thread_yield(&caml_master_lock);
-  curr_thread = st_tls_get(thread_descriptor_key);
+  curr_thread = thread_descriptor;
   caml_thread_restore_runtime_state();
   caml_raise_if_exception(caml_process_pending_signals_exn());
 

@@ -34,6 +34,12 @@
                     fflush(stdout)
 #endif
 
+#ifdef _MSC_VER
+#define THREAD_LOCAL __declspec(thread)
+#else
+#define THREAD_LOCAL __thread
+#endif
+
 typedef DWORD st_retcode;
 
 #define SIGPREEMPTION SIGTERM
@@ -49,26 +55,17 @@ typedef LONG st_tid;
 #define Tid_Atomic_Compare_Exchange InterlockedCompareExchange
 #endif
 
-/* Thread-local storage associating a Win32 event to every thread. */
-static DWORD st_thread_sem_key;
+/* Win32 event associated with each every thread (used for st_condvar_wait). */
+static THREAD_LOCAL HANDLE st_thread_sem = NULL;
 
-/* Thread-local storage for the OCaml thread ID. */
-static DWORD st_thread_id_key;
+/* OCaml thread ID (in TLS, and so outside the OCaml heap). */
+static THREAD_LOCAL intnat st_ocaml_thread_id = 0;
 
 /* OS-specific initialization */
 
 static DWORD st_initialize(void)
 {
-  DWORD result = 0;
-  st_thread_sem_key = TlsAlloc();
-  if (st_thread_sem_key == TLS_OUT_OF_INDEXES)
-    return GetLastError();
-  st_thread_id_key = TlsAlloc();
-  if (st_thread_id_key == TLS_OUT_OF_INDEXES) {
-    result = GetLastError();
-    TlsFree(st_thread_sem_key);
-  }
-  return result;
+  return 0;
 }
 
 /* Thread creation.  Created in detached mode if [res] is NULL. */
@@ -94,8 +91,8 @@ static DWORD st_thread_create(st_thread_id * res,
 
 static void st_thread_cleanup(void)
 {
-  HANDLE ev = (HANDLE) TlsGetValue(st_thread_sem_key);
-  if (ev != NULL) CloseHandle(ev);
+  if (st_thread_sem != NULL)
+    CloseHandle(st_thread_sem);
 }
 
 /* Thread termination */
@@ -116,43 +113,19 @@ static void st_thread_join(st_thread_id thr)
   WaitForSingleObject(thr, INFINITE);
 }
 
-/* Thread-specific state */
-
-typedef DWORD st_tlskey;
-
-static DWORD st_tls_newkey(st_tlskey * res)
-{
-  *res = TlsAlloc();
-  if (*res == TLS_OUT_OF_INDEXES)
-    return GetLastError();
-  else
-    return 0;
-}
-
-Caml_inline void * st_tls_get(st_tlskey k)
-{
-  return TlsGetValue(k);
-}
-
-Caml_inline void st_tls_set(st_tlskey k, void * v)
-{
-  TlsSetValue(k, v);
-}
-
 /* OS-specific handling of the OCaml thread ID (must be called with the runtime
    lock). */
 Caml_inline void st_thread_set_id(intnat id)
 {
   CAMLassert(id != 0);
-  st_tls_set(st_thread_id_key, (void *)id);
+  st_ocaml_thread_id = id;
 }
 
 /* Return the identifier for the current thread. The 0 value is reserved. */
 Caml_inline intnat st_current_thread_id(void)
 {
-  intnat id = (intnat)st_tls_get(st_thread_id_key);
-  CAMLassert(id != 0);
-  return id;
+  CAMLassert(st_ocaml_thread_id != 0);
+  return st_ocaml_thread_id;
 }
 
 /* The master lock.  */
@@ -369,21 +342,18 @@ static DWORD st_condvar_broadcast(st_condvar c)
 
 static DWORD st_condvar_wait(st_condvar c, st_mutex m)
 {
-  HANDLE ev;
   struct st_wait_list wait;
   DWORD rc;
   st_tid self, prev;
 
   TRACE1("st_condvar_wait", c);
-  /* Recover (or create) the event associated with the calling thread */
-  ev = (HANDLE) TlsGetValue(st_thread_sem_key);
-  if (ev == 0) {
-    ev = CreateEvent(NULL,
-                     FALSE /*auto reset*/,
-                     FALSE /*initially unset*/,
-                     NULL);
-    if (ev == NULL) return GetLastError();
-    TlsSetValue(st_thread_sem_key, (void *) ev);
+  /* Create the event associated with the calling thread */
+  if (st_thread_sem == NULL) {
+    st_thread_sem = CreateEvent(NULL,
+                                FALSE /*auto reset*/,
+                                FALSE /*initially unset*/,
+                                NULL);
+    if (st_thread_sem == NULL) return GetLastError();
   }
   /* Get ready to release the mutex */
   self = st_current_thread_id();
@@ -395,7 +365,7 @@ static DWORD st_condvar_wait(st_condvar c, st_mutex m)
   }
   /* Insert the current thread in the waiting list (atomically) */
   EnterCriticalSection(&c->lock);
-  wait.event = ev;
+  wait.event = st_thread_sem;
   wait.next = c->waiters;
   c->waiters = &wait;
   LeaveCriticalSection(&c->lock);
@@ -405,8 +375,8 @@ static DWORD st_condvar_wait(st_condvar c, st_mutex m)
   /* Wait for our event to be signaled.  There is no risk of lost
      wakeup, since we inserted ourselves on the waiting list of c
      before releasing m */
-  TRACE1("st_condvar_wait: blocking on event", ev);
-  if (WaitForSingleObject(ev, INFINITE) == WAIT_FAILED)
+  TRACE1("st_condvar_wait: blocking on event", st_thread_sem);
+  if (WaitForSingleObject(st_thread_sem, INFINITE) == WAIT_FAILED)
     return GetLastError();
   /* Reacquire the mutex m */
   TRACE1("st_condvar_wait: restarted, acquiring mutex", c);
