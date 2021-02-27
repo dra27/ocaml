@@ -1,0 +1,45 @@
+opam-version: "2.0"
+synopsis: "OCaml 4.02 Maintenance Branch"
+maintainer: "platform@lists.ocaml.org"
+authors: ["Xavier Leroy" "Damien Doligez" "Alain Frisch" "Jacques Garrigue" "Didier Rémy" "Jérôme Vouillon"]
+homepage: "https://ocaml.org"
+bug-reports: "https://github.com/ocaml/ocaml/issues"
+dev-repo: "git+https://github.com/ocaml/ocaml.git#4.02"
+depends: [
+  "ocaml" {= "4.02.4" & post}
+  "base-unix" {post}
+  "base-bigarray" {post}
+  "base-threads" {post}
+  "base-ocamlbuild" {post}
+]
+conflict-class: "ocaml-core-compiler"
+flags: compiler
+setenv: CAML_LD_LIBRARY_PATH = "%{lib}%/stublibs"
+build: [
+  [
+    "sed"
+    "-ib"
+    "-e"
+    "s/opts=\"\"/opts=\"-Wno-implicit-function-declaration\"/"
+    "config/auto-aux/hasgot"
+  ] {os = "macos"}
+  ["./configure" "-prefix" prefix "-with-debug-runtime"]
+    {os != "openbsd" & os != "freebsd" & os != "macos"}
+  [
+    "./configure"
+    "-prefix"
+    prefix
+    "-with-debug-runtime"
+    "-cc"
+    "cc"
+    "-aspp"
+    "cc -c"
+  ] {os = "openbsd" | os = "freebsd" | os = "macos"}
+  [make "world.opt"]
+]
+install: [make "install"]
+url {
+  src: "http://caml.inria.fr/pub/distrib/ocaml-4.02/ocaml-4.02.3.tar.gz"
+  checksum: "md5=ef1a324608c97031cbd92a442d685ab7"
+}
+available: !(os = "macos" & arch = "arm64")
