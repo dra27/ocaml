@@ -82,6 +82,7 @@ build-aux                typo.prune
 # configure is generated so do not check it
 configure                typo.prune
 
+ocaml-base-compiler.opam typo.prune
 ocaml-variants.opam      typo.prune
 
 emacs/*.el               typo.long-line=may
