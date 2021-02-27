@@ -1,0 +1,42 @@
+opam-version: "2.0"
+synopsis: "OCaml 3.10 Maintenance Branch"
+maintainer: "platform@lists.ocaml.org"
+authors: ["Xavier Leroy" "Damien Doligez" "Jacques Garrigue" "Didier Rémy" "Jérôme Vouillon"]
+homepage: "https://ocaml.org"
+bug-reports: "https://github.com/ocaml/ocaml/issues"
+dev-repo: "git+https://github.com/ocaml/ocaml.git#3.10"
+depends: [
+  "ocaml" {= "3.10.3" & post}
+  "base-unix" {post}
+  "base-bigarray" {post}
+  "base-threads" {post}
+  "base-ocamlbuild" {post}
+]
+conflict-class: "ocaml-core-compiler"
+flags: compiler
+setenv: CAML_LD_LIBRARY_PATH = "%{lib}%/stublibs"
+build: [
+  [
+    "sed"
+    "-ib"
+    "-e"
+    "s/opts=\"\"/opts=\"-Wno-implicit-function-declaration\"/"
+    "config/auto-aux/hasgot"
+  ] {os = "macos"}
+  ["./configure" "-prefix" prefix]
+    {os != "openbsd" & os != "freebsd" & os != "macos"}
+  ["./configure" "-prefix" prefix "-cc" "cc" "-aspp" "cc -c"]
+    {os = "openbsd" | os = "freebsd" | os = "macos"}
+  [make "world"]
+  [make "world.opt"]
+]
+install: [
+  [make "install"]
+  ["mkdir" "-p" "%{prefix}%/lib/ocaml/compiler-libs"]
+  ["cp" "-r" "typing" "parsing" "utils" "%{prefix}%/lib/ocaml/compiler-libs/"]
+]
+url {
+  src: "http://caml.inria.fr/pub/distrib/ocaml-3.10/ocaml-3.10.2.tar.gz"
+  checksum: "md5=52c795592c90ecb15c2c4754f04eeff4"
+}
+available: !(os = "macos" & arch = "arm64")
