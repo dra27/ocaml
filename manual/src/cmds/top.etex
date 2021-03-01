@@ -206,6 +206,11 @@ will result in an ``unbound value "quit"'' error.
     Similar to "#use" but also wrap the code into a top-level module of the
     same name as capitalized file name without extensions, following
     semantics of the compiler.
+
+  \item["#sig_use \""\var{file-name}"\";;"]
+    Similar to "#use", but for .mli files. Wrap the code into a top-level
+    module type of the same name as uppercase file name without extensions,
+    following the semantics of the compiler.
   \end{options}
 
 For directives that take file names as arguments, if the given file

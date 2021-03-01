@@ -21,7 +21,7 @@ include Topeval
 
 let use_print_results = ref true
 
-let use_channel ppf ~wrap_in_module ic name filename =
+let use_channel ppf ?(wrap = fun _ -> !parse_use_file) ic name filename =
   let lb = Lexing.from_channel ic in
   Warnings.reset_fatal ();
   Location.init lb filename;
@@ -36,10 +36,7 @@ let use_channel ppf ~wrap_in_module ic name filename =
         (fun ph ->
           let ph = preprocess_phrase ppf ph in
           if not (execute_phrase !use_print_results ppf ph) then raise Exit)
-        (if wrap_in_module then
-           parse_mod_use_file name lb
-         else
-           !parse_use_file lb);
+        (wrap name lb);
       true
     with
     | Exit -> false
@@ -60,29 +57,31 @@ let use_output ppf command =
          let ic = open_in_bin fn in
          Misc.try_finally ~always:(fun () -> close_in ic)
            (fun () ->
-              use_channel ppf ~wrap_in_module:false ic "" "(command-output)")
+              use_channel ppf ic "" "(command-output)")
        | n ->
          fprintf ppf "Command exited with code %d.@." n;
          false)
 
-let use_file ppf ~wrap_in_module name =
+let use_file ppf ?wrap name =
   match name with
   | "" ->
-    use_channel ppf ~wrap_in_module stdin name "(stdin)"
+    use_channel ppf ?wrap stdin name "(stdin)"
   | _ ->
     match Load_path.find name with
     | filename ->
       let ic = open_in_bin filename in
       Misc.try_finally ~always:(fun () -> close_in ic)
-        (fun () -> use_channel ppf ~wrap_in_module ic name filename)
+        (fun () -> use_channel ppf ?wrap ic name filename)
     | exception Not_found ->
       fprintf ppf "Cannot find file %s.@." name;
       false
 
 let mod_use_file ppf name =
-  use_file ppf ~wrap_in_module:true name
-let use_file ppf name =
-  use_file ppf ~wrap_in_module:false name
+  use_file ppf ~wrap:Topcommon.parse_mod_use_file name
+let sig_use_file ppf name =
+  use_file ppf ~wrap:Topcommon.parse_sig_use_file name
+let use_file =
+  use_file ?wrap:None
 
 let use_silently ppf name =
   Misc.protect_refs

@@ -50,6 +50,20 @@ let parse_mod_use_file name lb =
        ]
    ]
 
+let parse_sig_use_file name lb =
+  let modname =
+    String.uppercase_ascii
+      (Filename.remove_extension (Filename.basename name))
+  in
+  [ Ptop_def
+      [ Str.modtype
+          (Mtd.mk
+             (Location.mknoloc modname)
+             ~typ:(Mty.signature (Parse.interface lb))
+          )
+       ]
+   ]
+
 (* Hooks for printing *)
 
 let max_printer_depth = ref 100

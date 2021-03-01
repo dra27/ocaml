@@ -86,10 +86,12 @@ val use_file : formatter -> string -> bool
 val use_output : formatter -> string -> bool
 val use_silently : formatter -> string -> bool
 val mod_use_file : formatter -> string -> bool
+val sig_use_file : formatter -> string -> bool
         (* Read and execute commands from a file.
            [use_file] prints the types and values of the results.
            [use_silently] does not print them.
-           [mod_use_file] wrap the file contents into a module. *)
+           [mod_use_file] wrap the file contents into a module.
+           [sig_use_file] wrap the file contents into a module type. *)
 val eval_module_path: Env.t -> Path.t -> Obj.t
 val eval_value_path: Env.t -> Path.t -> Obj.t
 val eval_extension_path: Env.t -> Path.t -> Obj.t

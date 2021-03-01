@@ -146,6 +146,7 @@ let load_file = Topeval.load_file false
 let dir_use ppf name = ignore(Toploop.use_file ppf name)
 let dir_use_output ppf name = ignore(Toploop.use_output ppf name)
 let dir_mod_use ppf name = ignore(Toploop.mod_use_file ppf name)
+let dir_sig_use ppf name = ignore(Toploop.sig_use_file ppf name)
 
 let _ = add_directive "use" (Directive_string (dir_use std_out))
     {
@@ -165,6 +166,13 @@ let _ = add_directive "mod_use" (Directive_string (dir_mod_use std_out))
       section = section_run;
       doc = "Usage is identical to #use but #mod_use \
              wraps the contents in a module.";
+    }
+
+let _ = add_directive "sig_use" (Directive_string (dir_sig_use std_out))
+    {
+      section = section_run;
+      doc = "Usage is identical to #use but #sig_use \
+             wraps the contents in a module type.";
     }
 
 (* Install, remove a printer *)
