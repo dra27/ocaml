@@ -89,4 +89,4 @@ jobs:
         run: |
           # Required configuration info is left-over from the previous step
           make -C manual/tests check-stdlib check-case-collision
-        if: steps.compiler.outputs.build-status == 'success' && always()
+        if: steps.compiler.outputs.build-status == 'success' && false
