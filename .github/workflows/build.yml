@@ -28,17 +28,21 @@ jobs:
       run: |
         XARCH=i386 CONFIG_ARG='--disable-stdlib-manpages --disable-shared' bash -xe tools/ci/actions/runner.sh configure
     - name: Build
+      id: build
       run: |
         bash -xe tools/ci/actions/runner.sh build
     - name: Run the testsuite
       run: |
         bash -xe tools/ci/actions/runner.sh test
+      if: steps.build.outcome == 'success' && always()
     - name: Install
       run: |
         bash -xe tools/ci/actions/runner.sh install
+      if: steps.build.outcome == 'success' && always()
     - name: Other checks
       run: |
         bash -xe tools/ci/actions/runner.sh other-checks
+      if: steps.build.outcome == 'success' && always()
   full-flambda:
     runs-on: ubuntu-latest
     steps:
@@ -55,17 +59,22 @@ jobs:
       run: |
         MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-dependency-generation' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
     - name: Build
+      id: build
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh build
     - name: Run the testsuite
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
+      if: steps.build.outcome == 'success' && always()
     - name: Build API Documentation
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh api-docs
+      if: steps.build.outcome == 'success' && always()
     - name: Install
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      if: steps.build.outcome == 'success' && always()
     - name: Other checks
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks
+      if: steps.build.outcome == 'success' && always()
