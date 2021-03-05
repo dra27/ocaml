@@ -27,6 +27,8 @@
 #include "stack.h"
 #include "roots.h"
 
+extern void caml_terminate_signals(void);
+
 /* The globals holding predefined exceptions */
 
 typedef value caml_generated_constant[1];
@@ -44,7 +46,10 @@ char * caml_exception_pointer = NULL;
 void mlraise(value v)
 {
   Unlock_exn();
-  if (caml_exception_pointer == NULL) fatal_uncaught_exception(v);
+  if (caml_exception_pointer == NULL) {
+    caml_terminate_signals();
+    fatal_uncaught_exception(v);
+  }
 
 #ifndef Stack_grows_upwards
 #define PUSHED_AFTER <

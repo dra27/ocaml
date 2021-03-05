@@ -116,10 +116,14 @@ CAMLexport void sys_error(value arg)
   }
 }
 
+extern void caml_terminate_signals(void);
+
 CAMLprim value sys_exit(value retcode)
 {
 #ifndef NATIVE_CODE
   debugger(PROGRAM_EXIT);
+#else
+  caml_terminate_signals();
 #endif
 #ifdef HAS_UI
   ui_exit(Int_val(retcode));
