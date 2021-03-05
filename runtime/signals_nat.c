@@ -182,7 +182,6 @@ DECLARE_SIGNAL_HANDLER(trap_handler)
 #ifdef HAS_STACK_OVERFLOW_DETECTION
 
 static char * system_stack_top;
-static char sig_alt_stack[SIGSTKSZ];
 
 #if defined(SYS_linux)
 /* PR#4746: recent Linux kernels with support for stack randomization
@@ -275,7 +274,15 @@ void caml_init_signals(void)
   {
     stack_t stk;
     struct sigaction act;
-    stk.ss_sp = sig_alt_stack;
+    stk.ss_sp = malloc(SIGSTKSZ);
+    /* Allocate and select an alternate stack for handling signals,
+       especially SIGSEGV signals.
+       Each thread needs its own alternate stack.
+       The alternate stack used to be statically-allocated for the main thread,
+       but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
+       may not be a compile-time constant (issue #10250). */
+    if (stk.ss_sp == NULL)
+      return;
     stk.ss_size = SIGSTKSZ;
     stk.ss_flags = 0;
     SET_SIGACT(act, segv_handler);
