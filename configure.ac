@@ -48,6 +48,7 @@ internal_cppflags=""
 ocamlc_cflags=""
 ocamlc_cppflags=""
 oc_ldflags=""
+oc_dll_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
 iflexdir=""
@@ -104,6 +105,7 @@ AC_SUBST([toolchain])
 AC_SUBST([oc_cflags])
 AC_SUBST([oc_cppflags])
 AC_SUBST([oc_ldflags])
+AC_SUBST([oc_dll_ldflags])
 AC_SUBST([bytecclibs])
 AC_SUBST([nativecclibs])
 AC_SUBST([ocamlc_cflags])
@@ -665,7 +667,7 @@ AS_CASE([$CC,$host],
   [*,*-*-mingw32],
     [AS_IF([$with_sharedlibs],
       [AS_CASE([$host],
-        [i686-*-*], [flexdll_chain="mingw"],
+        [i686-*-*], [flexdll_chain="mingw"; oc_dll_ldflags="-static-libgcc"],
         [x86_64-*-*], [flexdll_chain="mingw64"])
       flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
       flexdir=`$flexlink -where | tr -d '\015'`
@@ -807,6 +809,9 @@ AS_IF([test x"$enable_shared" != "xno"],
     [*-*-mingw32],
       [mksharedlib='$(FLEXLINK)'
       mkmaindll='$(FLEXLINK) -maindll'
+      AS_IF([test -n "$oc_dll_ldflags"],[
+        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
+        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""])
       shared_libraries_supported=$with_sharedlibs],
     [*-pc-windows],
       [mksharedlib='$(FLEXLINK)'
@@ -1901,7 +1906,11 @@ AS_CASE([$host],
     flexlink_flags="-chain $flexdll_chain -stack 16777216"],
   [x86_64-w64-mingw32],
     [flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432"],
+    # Ensure --image-base 0x10000 gets to the linker to work-around binutils
+    # 2.36+ using a random address base. See #10351 for the actual fix in
+    # 4.12+.
+    flexlink_flags="-chain $flexdll_chain -stack 33554432 \
+-link -Xlinker -link --image-base -link -Xlinker -link 0x10000"],
   [i686-pc-windows],
     [flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216"],
