@@ -48,6 +48,7 @@ internal_cppflags=""
 ocamlc_cflags=""
 ocamlc_cppflags=""
 oc_ldflags=""
+oc_dll_ldflags=""
 with_sharedlibs=true
 ostype="Unix"
 iflexdir=""
@@ -64,7 +65,7 @@ instrumented_runtime_ldlibs=""
 ## Source directory
 AC_CONFIG_SRCDIR([runtime/interp.c])
 
-## Directory containing auxiliary scripts used dugring build
+## Directory containing auxiliary scripts used during build
 AC_CONFIG_AUX_DIR([build-aux])
 
 ## Output variables
@@ -104,6 +105,7 @@ AC_SUBST([toolchain])
 AC_SUBST([oc_cflags])
 AC_SUBST([oc_cppflags])
 AC_SUBST([oc_ldflags])
+AC_SUBST([oc_dll_ldflags])
 AC_SUBST([bytecclibs])
 AC_SUBST([nativecclibs])
 AC_SUBST([ocamlc_cflags])
@@ -170,7 +172,7 @@ AC_SUBST([stdlib_manpages])
 
 ## Generated files
 
-AC_CONFIG_FILES([Makefile.common])
+AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
@@ -665,7 +667,7 @@ AS_CASE([$CC,$host],
   [*,*-*-mingw32],
     [AS_IF([$with_sharedlibs],
       [AS_CASE([$host],
-        [i686-*-*], [flexdll_chain="mingw"],
+        [i686-*-*], [flexdll_chain="mingw"; oc_dll_ldflags="-static-libgcc"],
         [x86_64-*-*], [flexdll_chain="mingw64"])
       flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
       flexdir=`$flexlink -where | tr -d '\015'`
@@ -693,6 +695,9 @@ AS_CASE([$CC,$host],
       mkexedebugflag=''])],
   [*,x86_64-*-linux*],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
+  [[*,i[3456]86-*]],
+    # Explicitly disable PIE executables on Linux and *BSD x86_32
+    [mkexe="$mkexe -no-pie "],
   [xlc*,powerpc-ibm-aix*],
     [mkexe="$mkexe "
      oc_ldflags="-brtl -bexpfull"
@@ -801,12 +806,15 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="$CC -shared -flat_namespace -undefined suppress \
-                   -Wl,-no_compact_unwind"
+      [mksharedlib="$CC -shared \
+                   -undefined dynamic_lookup -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
       [mksharedlib='$(FLEXLINK)'
       mkmaindll='$(FLEXLINK) -maindll'
+      AS_IF([test -n "$oc_dll_ldflags"],[
+        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
+        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""])
       shared_libraries_supported=$with_sharedlibs],
     [*-pc-windows],
       [mksharedlib='$(FLEXLINK)'
@@ -824,7 +832,12 @@ AS_IF([test x"$enable_shared" != "xno"],
     [[*-*-linux*|*-*-freebsd[3-9]*|*-*-freebsd[1-9][0-9]*\
     |*-*-openbsd*|*-*-netbsd*|*-*-dragonfly*|*-*-gnu*|*-*-haiku*]],
       [sharedlib_cflags="-fPIC"
-      mksharedlib="$CC -shared"
+       AS_CASE([$CC,$host],
+           [[*,i[3456]86-*]],
+           # Disable DT_TEXTREL warnings on Linux and BSD i386
+           # See https://github.com/ocaml/ocaml/issues/9800
+           [mksharedlib="$CC -shared -Wl,-z,notext"],
+           [mksharedlib="$CC -shared"])
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
@@ -845,6 +858,8 @@ AS_IF([test x"$enable_shared" != "xno"],
     [[i[3456]86-*-linux*]], [natdynlink=true],
     [[i[3456]86-*-gnu*]], [natdynlink=true],
     [[x86_64-*-linux*]], [natdynlink=true],
+    [arm64-*-darwin*], [natdynlink=true],
+    [aarch64-*-darwin*], [natdynlink=true],
     [x86_64-*-darwin*], [natdynlink=true],
     [s390x*-*-linux*], [natdynlink=true],
     [powerpc*-*-linux*], [natdynlink=true],
@@ -948,6 +963,10 @@ AS_CASE([$host],
     [arch=amd64; system=netbsd],
   [x86_64-*-openbsd*],
     [arch=amd64; system=openbsd],
+  [arm64-*-darwin*],
+    [arch=arm64; system=macosx],
+  [aarch64-*-darwin*],
+    [arch=arm64; system=macosx],
   [x86_64-*-darwin*],
     [arch=amd64; system=macosx],
   [x86_64-*-mingw32],
@@ -1282,6 +1301,8 @@ AC_CHECK_FUNC([lockf], [AC_DEFINE([HAS_LOCKF])])
 AC_CHECK_FUNC([mkfifo], [AC_DEFINE([HAS_MKFIFO])])
 
 AC_CHECK_FUNC([getcwd], [AC_DEFINE([HAS_GETCWD])])
+
+AC_CHECK_DECL([system], [AC_DEFINE([HAS_SYSTEM])], [], [[#include <stdlib.h>]])
 
 ## utime
 ## Note: this was defined in config/s-nt.h but the autoconf macros do not
@@ -1901,7 +1922,11 @@ AS_CASE([$host],
     flexlink_flags="-chain $flexdll_chain -stack 16777216"],
   [x86_64-w64-mingw32],
     [flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432"],
+    # Ensure --image-base 0x10000 gets to the linker to work-around binutils
+    # 2.36+ using a random address base. See #10351 for the actual fix in
+    # 4.12+.
+    flexlink_flags="-chain $flexdll_chain -stack 33554432 \
+-link -Xlinker -link --image-base -link -Xlinker -link 0x10000"],
   [i686-pc-windows],
     [flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216"],
