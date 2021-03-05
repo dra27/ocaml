@@ -1,0 +1,22 @@
+# @configure_input@
+
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
+#*                                                                        *
+#*   Copyright 2020 MetaStack Solutions Ltd.                              *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+# This Makefile contains configuration gleaned by configure but which should not
+# be installed in Makefile.config. The file is designed to be included in
+# Makefile.common and therefore assumes that Makefile.config has already been
+# included.
+
+INSTALL ?= @INSTALL@
