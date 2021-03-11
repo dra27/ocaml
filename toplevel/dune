@@ -20,6 +20,7 @@
  (flags (:standard -principal -nostdlib))
  (libraries stdlib ocamlcommon ocamlbytecomp)
  (modules :standard \ topstart expunge))
+)
 
 (executable
  (name topstart)
