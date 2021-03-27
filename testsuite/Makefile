@@ -46,14 +46,14 @@ else # Windows
   find := /usr/bin/find
 endif
 
-ifeq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
   FLEXLINK_ENV =
 else
   # The testsuite needs an absolute path to the runtime, so override the
   # definition in Makefile.common
   FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
   FLEXLINK_EXE_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
-ifeq "$(wildcard $(ROOTDIR_HOST)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
+ifeq "$(wildcard $(ROOTDIR_HOST)/$(FLEXDLL_SOURCES)/flexlink.exe)" ""
   FLEXLINK_ENV = \
     OCAML_FLEXLINK="$(ROOTDIR_HOST)/boot/ocamlrun$(EXE) \
                     $(ROOTDIR_HOST)/boot/flexlink.byte$(EXE)"
@@ -65,14 +65,14 @@ ifeq "$(wildcard $(ROOTDIR_HOST)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
         $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
 else
   FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR_HOST)/$(FLEXDLL_SUBMODULE)/flexlink.exe \
+    OCAML_FLEXLINK="$(ROOTDIR_HOST)/$(FLEXDLL_SOURCES)/flexlink.exe \
                       -I $(ROOTDIR_HOST)/boot"
-  MKDLL=$(ROOTDIR_HOST)/$(FLEXDLL_SUBMODULE)/flexlink.exe \
+  MKDLL=$(ROOTDIR_HOST)/$(FLEXDLL_SOURCES)/flexlink.exe \
         -I $(ROOTDIR_HOST)/boot $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
-  MKEXE=$(ROOTDIR_HOST)/$(FLEXDLL_SUBMODULE)/flexlink.exe \
+  MKEXE=$(ROOTDIR_HOST)/$(FLEXDLL_SOURCES)/flexlink.exe \
         -I $(ROOTDIR_HOST)/boot $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
-endif # ifeq "$(wildcard $(ROOTDIR_HOST)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
-endif # ifeq "$(FLEXDLL_SUBMODULE)" ""
+endif # ifeq "$(wildcard $(ROOTDIR_HOST)/$(FLEXDLL_SOURCES)/flexlink.exe)" ""
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 ifeq "$(ocamltest_program)" ""
   ocamltest = $(error ocamltest not found in $(ocamltest_directory))

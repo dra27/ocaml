@@ -89,7 +89,7 @@ EXTRAPATH = PATH="otherlibs/win32unix:$(PATH)"
 endif
 
 
-ifeq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
   COLDSTART_DEPS =
   BOOT_FLEXLINK_CMD =
 else
@@ -153,7 +153,7 @@ boot/ocamlruns$(EXE):
 # are copied to boot/
 .PHONY: coldstart
 coldstart: $(COLDSTART_DEPS)
-ifeq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	$(MAKE) -C runtime all
 	$(MAKE) -C stdlib \
 	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
@@ -161,19 +161,19 @@ ifeq "$(FLEXDLL_SUBMODULE)" ""
 else
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
     CAMLC='$$(BOOT_OCAMLC)' all
-	$(MAKE) -C $(FLEXDLL_SUBMODULE) \
+	$(MAKE) -C $(FLEXDLL_SOURCES) \
 	  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
 	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false ROOTDIR=.. \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
 	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
 	  flexlink.exe
-	mv $(FLEXDLL_SUBMODULE)/flexlink.exe boot/flexlink.byte$(EXE)
-	$(MAKE) -C $(FLEXDLL_SUBMODULE) \
+	mv $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
+	$(MAKE) -C $(FLEXDLL_SOURCES) \
 	  OCAML_CONFIG_FILE=../Makefile.config \
 	  MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false support
-	mv $(FLEXDLL_SUBMODULE)/flexdll_*.$(O) boot/
+	mv $(FLEXDLL_SOURCES)/flexdll_*.$(O) boot/
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
-endif # ifeq "$(FLEXDLL_SUBMODULE)" ""
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
 	cd boot; rm -f $(LIBFILES)
 	cd stdlib; cp $(LIBFILES) ../boot
@@ -246,7 +246,7 @@ opt.opt: checknative
 	$(MAKE) coreall
 	$(MAKE) ocaml
 	$(MAKE) opt-core
-ifneq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(MAKE) flexlink.opt
 endif
 	$(MAKE) ocamlc.opt
@@ -316,7 +316,7 @@ world.opt: checknative
 
 .PHONY: flexdll flexlink flexlink.opt
 
-ifeq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 flexdll flexlink flexlink.opt:
 	@echo It is no longer necessary to bootstrap FlexDLL with a separate
 	@echo make invocation. Simply place the sources for FlexDLL in a
@@ -354,12 +354,12 @@ else
 endif
 
 flexlink.opt:
-	$(MAKE) -C $(FLEXDLL_SUBMODULE) \
+	$(MAKE) -C $(FLEXDLL_SOURCES) \
 	  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
 	  OCAML_FLEXLINK="../boot/ocamlrun$(EXE) ../boot/flexlink.byte$(EXE)" \
 	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" \
 	  flexlink.exe
-endif # ifeq "$(FLEXDLL_SUBMODULE)" ""
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
@@ -444,9 +444,9 @@ endif
 	if test -n "$(WITH_DEBUGGER)"; then \
 	  $(MAKE) -C debugger install; \
 	fi
-ifneq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 ifeq "$(TOOLCHAIN)" "msvc"
-	$(INSTALL_DATA) $(FLEXDLL_SUBMODULE)/$(FLEXDLL_MANIFEST) \
+	$(INSTALL_DATA) $(FLEXDLL_SOURCES)/$(FLEXDLL_MANIFEST) \
     "$(INSTALL_BINDIR)/"
 endif
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
@@ -455,7 +455,7 @@ ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 endif # ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	$(MKDIR) "$(INSTALL_FLEXDLLDIR)"
 	$(INSTALL_DATA) boot/flexdll_*.$(O) "$(INSTALL_FLEXDLLDIR)"
-endif # ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
+endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_DATA) Makefile.config "$(INSTALL_LIBDIR)"
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	if test -f ocamlopt$(EXE); then $(MAKE) installopt; else \
@@ -547,9 +547,9 @@ installoptopt:
 	   $(LN) ocamlc.opt$(EXE) ocamlc$(EXE); \
 	   $(LN) ocamlopt.opt$(EXE) ocamlopt$(EXE); \
 	   $(LN) ocamllex.opt$(EXE) ocamllex$(EXE)
-ifneq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(INSTALL_PROG) \
-	  $(FLEXDLL_SUBMODULE)/flexlink.exe \
+	  $(FLEXDLL_SOURCES)/flexlink.exe \
 	  "$(INSTALL_BINDIR)/flexlink.opt$(EXE)"; \
 	cd "$(INSTALL_BINDIR)"; \
 	  $(LN)	flexlink.opt$(EXE) flexlink$(EXE)
@@ -1130,7 +1130,7 @@ distclean: clean
 	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
-	rm -rf autom4te.cache
+	rm -rf autom4te.cache flexdll-build
 	rm -f config.log config.status libtool
 	rm -f tools/eventlog_metadata
 	rm -f tools/*.bak
