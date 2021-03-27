@@ -44,29 +44,31 @@ else
   BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
 endif
 
-ifeq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(FLEXDLL_SOURCES)" ""
   FLEXLINK_ENV =
   CAMLOPT_CMD = $(CAMLOPT)
   OCAMLOPT_CMD = $(OCAMLOPT)
   MKLIB_CMD = $(MKLIB)
   ocamlc_cmd = $(ocamlc)
   ocamlopt_cmd = $(ocamlopt)
+  BOOTSTRAPPING_FLEXDLL = false
 else
-ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
+ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SOURCES)/flexlink.exe)" ""
   FLEXLINK_ENV = \
     OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
                     $(ROOTDIR)/boot/flexlink.byte$(EXE)"
 else
   FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/$(FLEXDLL_SUBMODULE)/flexlink.exe -I \
+    OCAML_FLEXLINK="$(ROOTDIR)/$(FLEXDLL_SOURCES)/flexlink.exe -I \
       $(ROOTDIR)/boot"
-endif # ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SUBMODULE)/flexlink.exe)" ""
+endif # ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SOURCES)/flexlink.exe)" ""
   CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
   OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
   MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
   ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
-endif # ifeq "$(FLEXDLL_SUBMODULE)" ""
+  BOOTSTRAPPING_FLEXDLL = true
+endif # ifeq "$(FLEXDLL_SOURCES)" ""
 
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"

@@ -708,20 +708,37 @@ AC_MSG_CHECKING([for flexdll sources])
 AS_IF([test x"$with_flexdll" = "xno"],
   [flexdir=''
   AC_MSG_RESULT([disabled])],
-  [AS_IF([test x"$with_flexdll" = 'x'],
+  [flexmsg=''
+  AS_IF([test x"$with_flexdll" = 'x'],
     [AS_IF([test -f 'flexdll/flexdll.h'],
       [AS_CASE([$target],
-        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],[flexdir=flexdll])])],
+        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
+          [flexdir=flexdll
+          iflexdir='$(ROOTDIR)/flexdll'
+          with_flexdll="$iflexdir"])])],
     [AS_IF([test -f "$with_flexdll/flexdll.h"],
-      [flexdir="$with_flexdll"],
+      [cd runtime
+      AS_IF([test -f "$with_flexdll/flexdll.h"],
+        [mkdir -p ../flexdll-build
+        cp -r "$with_flexdll/*" ../flexdll-build/
+        flexdir="flexdll-build"
+        iflexdir='$(ROOTDIR)/flexdll-build'
+        flexmsg=" (from $with_flexdll)"],
+        [flexdir="$with_flexdll"
+        AS_IF([test x"$unix_or_win32" = "xwin32" \
+               && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
+         [AS_CASE([$build],
+           [*-pc-cygwin], [with_flexdll="`cygpath "$with_flexdll"`"])])
+        iflexdir="\$(ROOTDIR)/$with_flexdll"])
+      cd ..],
       [AC_MSG_RESULT([requested but not available])
       AC_MSG_ERROR([exiting])])]
   )
   AS_IF([test x"$flexdir" = 'x'],
     [AC_MSG_RESULT([no])],
-    [AC_MSG_RESULT([\$(ROOTDIR)/$flexdir])
+    [AC_MSG_RESULT([$iflexdir$flexmsg])
     # The submodule should be searched *before* any other -I paths
-    internal_cppflags="-I \$(ROOTDIR)/$flexdir $internal_cppflags"])])
+    internal_cppflags="-I $iflexdir $internal_cppflags"])])
 
 AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
 

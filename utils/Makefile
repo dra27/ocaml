@@ -19,7 +19,7 @@ ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.common
 
-ifeq "$(FLEXDLL_SUBMODULE)" ""
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
   FLEXDLL_DIR =
 else
   FLEXDLL_DIR = +flexdll
