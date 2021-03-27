@@ -12829,18 +12829,41 @@ if test x"$with_flexdll" = "xno"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
 $as_echo "disabled" >&6; }
 else
+  flexmsg=''
   if test x"$with_flexdll" = 'x'; then :
   if test -f 'flexdll/flexdll.h'; then :
   case $target in #(
   *-*-cygwin*|*-w64-mingw32|*-pc-windows) :
-    flexdir=flexdll ;; #(
+    flexdir=flexdll
+          iflexdir='$(ROOTDIR)/flexdll'
+          with_flexdll="$iflexdir" ;; #(
   *) :
      ;;
 esac
 fi
 else
   if test -f "$with_flexdll/flexdll.h"; then :
+  cd runtime
+      if test -f "$with_flexdll/flexdll.h"; then :
+  mkdir -p ../flexdll-build
+        cp -r "$with_flexdll/*" ../flexdll-build/
+        flexdir="flexdll-build"
+        iflexdir='$(ROOTDIR)/flexdll-build'
+        flexmsg=" (from $with_flexdll)"
+else
   flexdir="$with_flexdll"
+        if test x"$unix_or_win32" = "xwin32" \
+               && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ; then :
+  case $build in #(
+  *-pc-cygwin) :
+    with_flexdll="`cygpath "$with_flexdll"`" ;; #(
+  *) :
+     ;;
+esac
+fi
+        iflexdir="\$(ROOTDIR)/$with_flexdll"
+fi
+      cd ..
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: requested but not available" >&5
 $as_echo "requested but not available" >&6; }
@@ -12852,10 +12875,10 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: \$(ROOTDIR)/$flexdir" >&5
-$as_echo "\$(ROOTDIR)/$flexdir" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $iflexdir$flexmsg" >&5
+$as_echo "$iflexdir$flexmsg" >&6; }
     # The submodule should be searched *before* any other -I paths
-    internal_cppflags="-I \$(ROOTDIR)/$flexdir $internal_cppflags"
+    internal_cppflags="-I $iflexdir $internal_cppflags"
 fi
 fi
 
