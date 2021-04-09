@@ -19,6 +19,12 @@ OCaml 4.14 maintenance version
 
 ### Build system:
 
+- #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
 ### Bug fixes:
 
 - #12070, #12075, #13209: auto-detect whether `ar` support @FILE arguments at
