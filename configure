@@ -747,6 +747,7 @@ build_os
 build_vendor
 build_cpu
 build
+target_bindir
 naked_pointers_checker
 naked_pointers
 compute_deps
@@ -1608,7 +1609,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-odoc             build documentation with odoc
-  --with-target-bindir    location of binary programs on target system
+  --with-target-bindir    location of the runtime binaries on target system
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -3267,7 +3268,9 @@ fi
 
 # Check whether --with-target-bindir was given.
 if test "${with_target_bindir+set}" = set; then :
-  withval=$with_target_bindir;
+  withval=$with_target_bindir; target_bindir=$withval
+else
+  target_bindir='$(BINDIR)'
 fi
 
 
