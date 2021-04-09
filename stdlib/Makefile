@@ -18,8 +18,6 @@ ROOTDIR = ..
 -include $(ROOTDIR)/Makefile.config
 -include $(ROOTDIR)/Makefile.common
 
-TARGET_BINDIR ?= $(BINDIR)
-
 COMPILER=$(ROOTDIR)/ocamlc
 CAMLC=$(CAMLRUN) $(COMPILER)
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
