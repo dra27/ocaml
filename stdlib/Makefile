@@ -19,7 +19,6 @@ ROOTDIR = ..
 -include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
-TARGET_BINDIR ?= $(BINDIR)
 
 # There are three ways the Standard Library is compiled in bytecode:
 # 1. During coldstart
