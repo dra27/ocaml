@@ -28,8 +28,6 @@ OCaml 5.0 maintenance version
   (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
   Sébastien Hinderer)
 
-### Build system:
-
 - #12751: --with-target-bindir configure option implemented. This option
   refers to the location of the runtime binaries on the target system for a
   cross-compiler and is embedded in executables produced by ocamlc. It does
