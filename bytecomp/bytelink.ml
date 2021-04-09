@@ -348,7 +348,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
        end;
        Bytesections.init_record outchan;
        (* The path to the bytecode interpreter (in -use-runtime mode) *)
-       if use_runtime && !Clflags.with_runtime then
+       if standalone && use_runtime && !Clflags.with_runtime then
        begin
          let runtime = make_absolute !Clflags.use_runtime in
          let runtime =
