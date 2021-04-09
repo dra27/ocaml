@@ -76,7 +76,7 @@ TOPLEVELINIT=toplevel/toploop.cmo
 # capitalized module names.
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
+LIBFILES=stdlib.cma std_exit.cmo *.cmi
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -1097,7 +1097,7 @@ depend: beforedepend
 
 .PHONY: distclean
 distclean: clean
-	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
+	rm -f boot/ocamlrun boot/ocamlrun.exe \
 	boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
