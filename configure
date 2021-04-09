@@ -778,6 +778,7 @@ build_vendor
 build_cpu
 build
 target_bindir_exp
+target_bindir
 bindir_exp
 ln
 QS
@@ -1658,7 +1659,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-odoc             build documentation with odoc
-  --with-target-bindir    location of binary programs on target system
+  --with-target-bindir    location of the runtime binaries on target system
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -3339,6 +3340,7 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3767,7 +3769,9 @@ fi
 # Check whether --with-target-bindir was given.
 if test ${with_target_bindir+y}
 then :
-  withval=$with_target_bindir;
+  withval=$with_target_bindir; target_bindir=$withval
+else $as_nop
+  target_bindir=''
 fi
 
 
@@ -19508,7 +19512,13 @@ else $as_nop
   bindir_exp="${exec_prefix}/bin"
 fi
 fi
-target_bindir_exp="$bindir_exp"
+if test x"${target_bindir}" = 'x'
+then :
+  target_bindir='$(BINDIR)'
+  target_bindir_exp="$bindir_exp"
+else $as_nop
+  target_bindir_exp="${target_bindir}"
+fi
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
