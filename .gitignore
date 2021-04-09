@@ -67,7 +67,6 @@ _build
 /asmcomp/CSE.ml
 
 /boot/ocamlrun
-/boot/camlheader
 /boot/ocamlc.opt
 
 /bytecomp/opcodes.ml
