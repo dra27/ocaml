@@ -7,6 +7,14 @@ OCaml 4.14 maintenance version
   "unexpected error".
   (Damien Doligez, review by Sébastien Hinderer)
 
+### Build system:
+
+- #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
 ### Bug fixes:
 
 - #12726: fix segmentation fault under Windows when executing a bytecode file if
