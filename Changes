@@ -19,6 +19,11 @@ OCaml 4.14.0
   (specifically, double quote characters and spaces in the path now work).
   (David Allsopp, review by ???)
 
+- #10???: Always keep within the 128 character limit for shebang lines. Previous
+  fix in #8622 handled building the compiler with a long prefix; this patch
+  extends this to the bytecode executables emitted by that compiler.
+  (David Allsopp, review by ???)
+
 OCaml 4.13.0
 -------------
 

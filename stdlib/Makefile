@@ -38,16 +38,26 @@ OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
 NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
-.PHONY: all
-all: stdlib.cma std_exit.cmo camlheader
+ifeq "$(SHEBANGSCRIPTS)" "true"
+
+  EXECUTABLE_HEADERS =
+
+else
+
+  EXECUTABLE_HEADERS := camlheader
 
 ifeq "$(RUNTIMED)" "true"
-all: camlheaderd
+  EXECUTABLE_HEADERS += camlheaderd
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-all: camlheaderi
+  EXECUTABLE_HEADERS += camlheaderi
 endif
+
+endif
+
+.PHONY: all
+all: stdlib.cma std_exit.cmo $(EXECUTABLE_HEADERS)
 
 .PHONY: allopt opt.opt # allopt and opt.opt are synonyms
 allopt: stdlib.cmxa std_exit.cmx
@@ -72,16 +82,8 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  *.cmt *.cmti *.mli *.ml \
 	  "$(INSTALL_LIBDIR)"
 endif
-	$(INSTALL_DATA) camlheader "$(INSTALL_LIBDIR)"
-
-ifeq "$(RUNTIMED)" "true"
-install::
-	$(INSTALL_DATA) camlheaderd "$(INSTALL_LIBDIR)"
-endif
-
-ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-install::
-	$(INSTALL_DATA) camlheaderi "$(INSTALL_LIBDIR)"
+ifeq "$(SHEBANGSCRIPTS)" "false"
+	$(INSTALL_DATA) $(EXECUTABLE_HEADERS) "$(INSTALL_LIBDIR)"
 endif
 
 .PHONY: installopt
@@ -116,19 +118,6 @@ endif
 # introduced with a suffix more than one character long.
 CAMLHEADERS = camlheader camlheaderd camlheaderi
 
-# The % in pattern rules must always match something, hence the slightly strange
-# patterns and $(subst ...) since `camlheader%:` wouldn't match `camlheader`
-ifeq "$(SHEBANGSCRIPTS)" "true"
-camlhead%: $(ROOTDIR)/Makefile.config Makefile
-ifeq "$(LONG_SHEBANG)" "true"
-	echo '#!/bin/sh' > $@
-	echo 'exec "$(HEADER_PATH)ocamlrun$(subst er,,$*)" "$$0" "$$@"' >> $@
-else
-	echo '#!$(HEADER_PATH)ocamlrun$(subst er,,$*)' > $@
-endif
-
-else # Hashbang scripts not supported
-
 $(CAMLHEADERS): $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
@@ -136,8 +125,8 @@ camlhead%: tmphead%.exe
 	rm -f $@.exe
 	mv $< $@
 
-# Again, pattern weirdness here means that the dot is always present so that
-# tmpheader.exe matches.
+# The % in pattern rules must always match something, hence the slightly strange
+# patterns and $(subst ...) since `tmpheader%.exe` doesn't match `tmpheader.exe`
 tmpheader%exe: $(HEADERPROGRAM)%$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^ $(EXTRALIBS))
 # FIXME This is wrong - mingw could invoke strip; MSVC equivalent?
@@ -151,8 +140,6 @@ $(HEADERPROGRAM)%$(O): \
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ $^
-
-endif # ifeq "$(SHEBANGSCRIPTS)" "true"
 
 stdlib.cma: $(OBJS)
 	$(CAMLC) -a -o $@ $^
