@@ -319,6 +319,11 @@ Working version
   application
   (Jacques Garrigue, report and review by Didier Remy)
 
+- #10???: Correct the RNTM bytecode section (-use-runtime mode) for paths
+  greater than 125 characters when *not* using shebang headers. camlheader_ur no
+  longer exists.
+  (David Allsopp, review by ???)
+
 OCaml 4.12.0 (24 February 2021)
 -------------------------------
 
