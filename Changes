@@ -84,6 +84,12 @@ OCaml 4.11 maintenance branch
   (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
   Sébastien Hinderer)
 
+- #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
