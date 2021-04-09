@@ -747,6 +747,7 @@ build_os
 build_vendor
 build_cpu
 build
+target_bindir
 naked_pointers_checker
 naked_pointers
 compute_deps
@@ -1596,7 +1597,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-target-bindir    location of binary programs on target system
+  --with-target-bindir    location of the runtime binaries on target system
   --with-afl              use the AFL fuzzer
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
@@ -2928,6 +2929,7 @@ VERSION=4.12.1
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3229,7 +3231,9 @@ fi
 
 # Check whether --with-target-bindir was given.
 if test "${with_target_bindir+set}" = set; then :
-  withval=$with_target_bindir;
+  withval=$with_target_bindir; target_bindir=$withval
+else
+  target_bindir='$(BINDIR)'
 fi
 
 
