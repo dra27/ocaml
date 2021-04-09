@@ -346,7 +346,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
            (* shebang mustn't exceed 128 including the #! and \0 *)
            if Config.use_shebang && String.length runtime > 125 then
              "/bin/sh\n\
-              exec \"" ^ runtime ^ "\" \"$0\" \"$@\""
+              exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\""
            else
              runtime
          in
