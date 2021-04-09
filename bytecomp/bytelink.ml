@@ -315,14 +315,35 @@ let link_bytecode ?final_name tolink exec_name standalone =
     open_out_gen [Open_wronly; Open_trunc; Open_creat; Open_binary]
                  outperm exec_name in
   let use_runtime = String.length !Clflags.use_runtime > 0 in
+  let runtime =
+    if standalone && use_runtime then
+      make_absolute !Clflags.use_runtime
+    else
+      let runtime_name = "ocamlrun" ^ !Clflags.runtime_variant in
+      Filename.concat Config.runtime_bindir runtime_name
+  in
   Misc.try_finally
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
        if standalone && !Clflags.with_runtime then begin
          (* Write the header *)
-         if use_runtime && Config.use_shebang then
-           output_string outchan "#!"
+         if Config.use_shebang then
+           let header =
+             (* shebang mustn't exceed 128 including the #! and \0 *)
+             if String.length runtime > 125 then
+               (* NB In -use-runtime mode, the runtime string ends up being
+                  written twice so that the RNTM section still contains its
+                  name (e.g. for tools/ocamlsize) *)
+               "#!/bin/sh\n\
+                exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\"\n"
+             else if use_runtime then
+               (* The runtime name gets recorded in RNTM *)
+               "#!"
+             else
+               "#!" ^ runtime ^ "\n"
+           in
+           output_string outchan header;
          else
            let header =
              if use_runtime then
@@ -343,15 +364,6 @@ let link_bytecode ?final_name tolink exec_name standalone =
        (* The path to the bytecode interpreter (in -use-runtime mode) *)
        if standalone && use_runtime && !Clflags.with_runtime then
        begin
-         let runtime = make_absolute !Clflags.use_runtime in
-         let runtime =
-           (* shebang mustn't exceed 128 including the #! and \0 *)
-           if Config.use_shebang && String.length runtime > 125 then
-             "/bin/sh\n\
-              exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\""
-           else
-             runtime
-         in
          output_string outchan runtime;
          output_char outchan '\n';
          Bytesections.record outchan "RNTM"

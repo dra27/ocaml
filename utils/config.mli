@@ -23,6 +23,12 @@
 val version: string
 (** The current version number of the system *)
 
+val runtime_bindir: string
+(** The directory containing the runtime binaries on the target system. Usually
+    the same as {!bindir}.
+
+    @since 4.14.0 *)
+
 val standard_library: string
 (** The directory containing the standard libraries *)
 
