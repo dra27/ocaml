@@ -171,6 +171,7 @@ AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
 AC_SUBST([bindir_exp])
+AC_SUBST([target_bindir])
 AC_SUBST([target_bindir_exp])
 
 ## Generated files
@@ -322,7 +323,9 @@ AC_ARG_ENABLE([flambda-invariants],
 
 AC_ARG_WITH([target-bindir],
   [AS_HELP_STRING([--with-target-bindir],
-    [location of binary programs on target system])])
+    [location of the runtime binaries on target system])],
+  [target_bindir=$withval],
+  [target_bindir=''])
 
 AC_ARG_ENABLE([reserved-header-bits],
   [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
@@ -1986,7 +1989,10 @@ AS_IF([test x"$bindir" = 'x${exec_prefix}/bin'],
       [bindir_exp="${ac_default_prefix}/bin"],
       [bindir_exp="${prefix}/bin"])],
     [bindir_exp="${exec_prefix}/bin"])])
-target_bindir_exp="$bindir_exp"
+AS_IF([test x"${target_bindir}" = 'x'],
+  [target_bindir='$(BINDIR)'
+  target_bindir_exp="$bindir_exp"],
+  [target_bindir_exp="${target_bindir}"])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
