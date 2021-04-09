@@ -117,6 +117,11 @@ Working version
   by leaf functions.
   (Tom Kelly and Xavier Leroy, review by Mark Shinwell)
 
+- #11???: Correct the RNTM bytecode section (-use-runtime mode) for paths
+  greater than 125 characters when *not* using shebang headers. camlheader_ur no
+  longer exists.
+  (David Allsopp, review by ???)
+
 OCaml 5.0
 ---------
 
