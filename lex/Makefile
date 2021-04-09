@@ -22,11 +22,12 @@ include $(ROOTDIR)/Makefile.common
 CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
 
 CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib \
-        -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
+        -I $(ROOTDIR)/boot
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
             -safe-string -strict-sequence -strict-formats -bin-annot
-LINKFLAGS =
+LINKFLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+            -use-runtime $(RUNTIME_NAME)
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 CAMLDEP = $(BOOT_OCAMLC) -depend
 DEPFLAGS = -slash

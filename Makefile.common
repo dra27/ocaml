@@ -62,6 +62,8 @@ else
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif
 
+RUNTIME_NAME = '$(BINDIR)/ocamlrun$(EXE)'
+
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections

@@ -42,7 +42,7 @@ $(and $(filter-out 1,$(words $1)),$(error \
 $(call PROGRAM_SYNONYM, $1)
 
 $1$(EXE): $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(LINKFLAGS) $$(BYTELINK_FLAGS) -I $$(ROOTDIR) -o $$@ $2
 
 $(call PROGRAM_SYNONYM, $1.opt)
 
@@ -68,8 +68,7 @@ $(eval $(call \
  byte_and_opt_,$(subst $$,$$$$,$1),$(subst $$,$$$$,$2),$(subst $$,$$$$,$3)))
 endef
 
-CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
-        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -g -nostdlib -I $(ROOTDIR)/stdlib
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
@@ -79,6 +78,8 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
 LINKFLAGS = $(INCLUDES)
+BYTELINK_FLAGS=-use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR) \
+               -use-runtime $(RUNTIME_NAME)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
@@ -204,7 +205,7 @@ cvt_emit := cvt_emit$(EXE)
 $(eval $(call PROGRAM_SYNONYM,cvt_emit))
 
 $(cvt_emit): cvt_emit.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $^
 
 clean::
 	rm -f cvt_emit.ml cvt_emit cvt_emit.exe
@@ -245,7 +246,7 @@ make_opcodes := make_opcodes$(EXE)
 $(eval $(call PROGRAM_SYNONYM,make_opcodes))
 
 $(make_opcodes): make_opcodes.ml
-	$(CAMLC) $< -o $@
+	$(CAMLC) $(BYTELINK_FLAGS) $< -o $@
 
 opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(make_opcodes) -opnames < $< > $@
@@ -332,7 +333,8 @@ caml_tex := caml-tex$(EXE)
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
-	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
+	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) \
+                              $(BYTELINK_FLAGS) -linkall \
 	                            -o $@ -no-alias-deps $^
 
 # we need str and unix which depend on the bytecode version of other tools
