@@ -80,6 +80,8 @@ endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
+RUNTIME_NAME = '$(BINDIR)/ocamlrun$(EXE)'
+
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
