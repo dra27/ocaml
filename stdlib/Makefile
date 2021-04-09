@@ -21,8 +21,6 @@ OCAMLDEP ?= $(BOOT_OCAMLDEP)
 
 include $(ROOTDIR)/Makefile.common
 
-TARGET_BINDIR ?= $(BINDIR)
-
 COMPILER=$(ROOTDIR)/ocamlc$(EXE)
 CAMLC=$(OCAMLRUN) $(COMPILER)
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
