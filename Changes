@@ -44,6 +44,12 @@ OCaml 4.12, maintenance version
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
   (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
+- #12751: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
