@@ -280,6 +280,12 @@ Working version
   socklen_t detection on Windows.
   (Antonin Décimo, review by David Allsopp and Sébastien Hinderer)
 
+- #10???: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 * #8857, #10220: Don't clobber GetLastError() in caml_leave_blocking_section

@@ -37,6 +37,10 @@ exec_prefix=@exec_prefix@
 ### Where to install the binaries
 BINDIR=@bindir@
 
+### Location of ocamlrun on the target system (path embedded in bytecode
+# executables)
+TARGET_BINDIR=@target_bindir@
+
 datarootdir=@datarootdir@
 
 ### Where to install the standard library
