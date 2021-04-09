@@ -23,6 +23,10 @@ INSTALL ?= @INSTALL@
 INSTALL_DATA ?= @INSTALL_DATA@
 INSTALL_PROG ?= @INSTALL_PROGRAM@
 
+# Location of ocamlrun on the target system (path embedded in bytecode
+# executables)
+TARGET_BINDIR = @target_bindir@
+
 SRCDIR_ABS = @ocamlsrcdir@
 
 ### Whether the native compiler has been enabled or not
