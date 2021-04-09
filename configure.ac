@@ -521,15 +521,7 @@ AS_IF(
     [AS_CASE([$host],
       [*-cygwin|*-*-mingw32|*-pc-windows],
         [shebangscripts=false],
-      [shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
-      ]
+      [shebangscripts=true]
     )],
   [shebangscripts=false]
 )
