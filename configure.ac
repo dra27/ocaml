@@ -175,6 +175,7 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([force_instrumented_runtime])
 AC_SUBST([QS])
+AC_SUBST([target_bindir])
 
 ## Generated files
 
@@ -378,7 +379,9 @@ AC_ARG_ENABLE([cmm-invariants],
 
 AC_ARG_WITH([target-bindir],
   [AS_HELP_STRING([--with-target-bindir],
-    [location of binary programs on target system])])
+    [location of the runtime binaries on target system])],
+  [target_bindir=$withval],
+  [target_bindir='$(BINDIR)'])
 
 AC_ARG_ENABLE([reserved-header-bits],
   [AS_HELP_STRING([--enable-reserved-header-bits=BITS],

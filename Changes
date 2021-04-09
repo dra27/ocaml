@@ -104,6 +104,12 @@ Working version
 
 ### Build system:
 
+- #11???: --with-target-bindir configure option implemented. This option
+  refers to the location of the runtime binaries on the target system for a
+  cross-compiler and is embedded in executables produced by ocamlc. It does
+  not affect the bytecode executables installed as part of the build.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #11302, #11412: `ocamlc` and `ocamlopt` should not remove generated files
