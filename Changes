@@ -23,8 +23,6 @@ OCaml 5.0 maintenance version
 - #11590: Allow installing to a destination path containing spaces.
   (Élie Brami, review by Sébastien Hinderer and David Allsopp)
 
-### Build system:
-
 - #12751: --with-target-bindir configure option implemented. This option
   refers to the location of the runtime binaries on the target system for a
   cross-compiler and is embedded in executables produced by ocamlc. It does
