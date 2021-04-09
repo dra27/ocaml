@@ -7,6 +7,10 @@ OCaml 4.14.0
   longer exists.
   (David Allsopp, review by ???)
 
+- #10???: Correctly quote -use-runtime argument when executing and linking
+  (specifically, double quote characters and spaces in the path now work).
+  (David Allsopp, review by ???)
+
 OCaml 4.13.0
 -------------
 
