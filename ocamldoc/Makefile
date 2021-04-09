@@ -21,7 +21,9 @@ include $(ROOTDIR)/Makefile.best_binaries
 OCAMLYACCFLAGS = --strict -v
 
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
-OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS) \
+                        -use-prims $(ROOTDIR)/runtime/primitives \
+                        -use-runtime '$(BINDIR)/ocamlrun$(EXE)'
 OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 OCAMLDEP = $(BEST_OCAMLDEP)
 DEPFLAGS = -slash

@@ -69,7 +69,8 @@ $(eval $(call \
 endef
 
 CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
-        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+                       -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR) \
+                       -use-runtime '$(BINDIR)/ocamlrun$(EXE)'
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -g -nostdlib -I $(ROOTDIR)/stdlib
 OCAMLLEX ?= $(BOOT_OCAMLLEX)
 INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
