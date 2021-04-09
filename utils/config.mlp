@@ -19,6 +19,8 @@ let version = Sys.ocaml_version
 
 let bindir = "%%BINDIR%%"
 
+let runtime_bindir = "%%TARGET_BINDIR%%"
+
 let standard_library_default = "%%LIBDIR%%"
 
 let standard_library =
