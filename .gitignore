@@ -69,7 +69,6 @@ _build
 
 /boot/ocamlrun
 /boot/ocamlruns
-/boot/camlheader
 /boot/ocamlc.opt
 /boot/flexlink.byte
 
