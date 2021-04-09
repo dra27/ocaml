@@ -41,14 +41,14 @@ NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo camlheader target_camlheader
+all: stdlib.cma std_exit.cmo camlheader
 
 ifeq "$(RUNTIMED)" "true"
-all: camlheaderd target_camlheaderd
+all: camlheaderd
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-all: camlheaderi target_camlheaderi
+all: camlheaderi
 endif
 
 .PHONY: allopt opt.opt # allopt and opt.opt are synonyms
@@ -74,16 +74,16 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  *.cmt *.cmti *.mli *.ml \
 	  "$(INSTALL_LIBDIR)"
 endif
-	$(INSTALL_DATA) target_camlheader "$(INSTALL_LIBDIR)/camlheader"
+	$(INSTALL_DATA) camlheader "$(INSTALL_LIBDIR)"
 
 ifeq "$(RUNTIMED)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderd "$(INSTALL_LIBDIR)/camlheaderd"
+	$(INSTALL_DATA) camlheaderd "$(INSTALL_LIBDIR)"
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
 install::
-	$(INSTALL_DATA) target_camlheaderi "$(INSTALL_LIBDIR)/camlheaderi"
+	$(INSTALL_DATA) camlheaderi "$(INSTALL_LIBDIR)"
 endif
 
 .PHONY: installopt
@@ -108,22 +108,15 @@ installopt-default::
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header
-HEADER_PATH = $(BINDIR)/
-HEADER_TARGET_PATH = $(TARGET_BINDIR)/
+HEADER_PATH = $(TARGET_BINDIR)/
 else # Windows
 HEADERPROGRAM = headernt
-HEADER_PATH = $(BINDIR)/
-HEADER_TARGET_PATH = $(TARGET_BINDIR)/
+HEADER_PATH = $(TARGET_BINDIR)/
 endif
-
-TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
 
 # The shebang test in configure.ac will need updating if any runtime is
 # introduced with a suffix more than one character long.
-CAMLHEADERS =\
-  camlheader target_camlheader \
-  camlheaderd target_camlheaderd \
-  camlheaderi target_camlheaderi
+CAMLHEADERS = camlheader camlheaderd camlheaderi
 
 # The % in pattern rules must always match something, hence the slightly strange
 # patterns and $(subst ...) since `camlheader%:` wouldn't match `camlheader`
@@ -131,15 +124,10 @@ ifeq "$(SHEBANGSCRIPTS)" "true"
 camlhead%: $(ROOTDIR)/Makefile.config Makefile
 ifeq "$(LONG_SHEBANG)" "true"
 	echo '#!/bin/sh' > $@
-	echo 'exec "$(BINDIR)/ocamlrun$(subst er,,$*)" "$$0" "$$@"' >> $@
+	echo 'exec "$(HEADER_PATH)ocamlrun$(subst er,,$*)" "$$0" "$$@"' >> $@
 else
-	echo '#!$(BINDIR)/ocamlrun$(subst er,,$*)' > $@
+	echo '#!$(HEADER_PATH)ocamlrun$(subst er,,$*)' > $@
 endif
-
-# TODO This does not take long shebangs into account (since TARGET_BINDIR is not
-#      yet processed by configure)
-target_%: $(ROOTDIR)/Makefile.config Makefile
-	echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)' > $@
 
 else # Hashbang scripts not supported
 
@@ -165,24 +153,6 @@ $(HEADERPROGRAM)%$(O): \
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ $^
-
-ifeq "$(UNIX_OR_WIN32)" "unix"
-tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
-	$(call MKEXE_USING_COMPILER,$@,$^ $(EXTRALIBS))
-	strip $@
-
-$(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
-	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
-	      $(OUTPUTOBJ)$@ $^
-
-target_%: tmptarget%.exe
-	rm -f $@.exe
-	mv $< $@
-else
-target_%: %
-	cp $< $@
-endif
 
 endif # ifeq "$(SHEBANGSCRIPTS)" "true"
 
