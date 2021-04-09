@@ -319,32 +319,39 @@ let link_bytecode ?final_name tolink exec_name standalone =
   let outchan =
     open_out_gen [Open_wronly; Open_trunc; Open_creat; Open_binary]
                  outperm exec_name in
+  let use_runtime = String.length !Clflags.use_runtime > 0 in
   Misc.try_finally
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
        if standalone && !Clflags.with_runtime then begin
-         (* Copy the header *)
-         let header =
-           if String.length !Clflags.use_runtime > 0
-           then "camlheader_ur" else "camlheader" ^ !Clflags.runtime_variant
-         in
-         try
-           let inchan = open_in_bin (Load_path.find header) in
-           copy_file inchan outchan;
-           close_in inchan
-         with
-         | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (header, msg)))
+         (* Write the header *)
+         if use_runtime && Config.use_shebang then
+           output_string outchan "#!"
+         else
+           let header =
+             if use_runtime then
+               (* Copy the standard _executable_ header *)
+               "camlheader"
+             else
+               "camlheader" ^ !Clflags.runtime_variant
+           in
+           try
+             let inchan = open_in_bin (Load_path.find header) in
+             copy_file inchan outchan;
+             close_in inchan
+           with
+           | Not_found -> raise (Error (File_not_found header))
+           | Sys_error msg -> raise (Error (Camlheader (header, msg)))
        end;
        Bytesections.init_record outchan;
-       (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 && !Clflags.with_runtime then
+       (* The path to the bytecode interpreter (in -use-runtime mode) *)
+       if use_runtime && !Clflags.with_runtime then
        begin
          let runtime = make_absolute !Clflags.use_runtime in
          let runtime =
            (* shebang mustn't exceed 128 including the #! and \0 *)
-           if String.length runtime > 125 then
+           if Config.use_shebang && String.length runtime > 125 then
              "/bin/sh\n\
               exec \"" ^ runtime ^ "\" \"$0\" \"$@\""
            else

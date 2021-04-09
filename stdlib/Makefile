@@ -41,7 +41,7 @@ NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo camlheader target_camlheader camlheader_ur
+all: stdlib.cma std_exit.cmo camlheader target_camlheader
 
 ifeq "$(RUNTIMED)" "true"
 all: camlheaderd target_camlheaderd
@@ -68,8 +68,7 @@ install::
 
 install::
 	$(INSTALL_DATA) \
-	  stdlib.cma std_exit.cmo *.cmi camlheader_ur \
-	  "$(INSTALL_LIBDIR)"
+	  stdlib.cma std_exit.cmo *.cmi "$(INSTALL_LIBDIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  *.cmt *.cmti *.mli *.ml \
@@ -120,10 +119,9 @@ endif
 TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
 
 # The shebang test in configure.ac will need updating if any runtime is
-# introduced with a suffix more than one character long (camlheader_ur doesn't
-# matter).
+# introduced with a suffix more than one character long.
 CAMLHEADERS =\
-  camlheader target_camlheader camlheader_ur \
+  camlheader target_camlheader \
   camlheaderd target_camlheaderd \
   camlheaderi target_camlheaderi
 
@@ -142,9 +140,6 @@ endif
 #      yet processed by configure)
 target_%: $(ROOTDIR)/Makefile.config Makefile
 	echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)' > $@
-
-camlheader_ur: Makefile
-	echo '#!' | tr -d '\012' > $@
 
 else # Hashbang scripts not supported
 
@@ -170,9 +165,6 @@ $(HEADERPROGRAM)%$(O): \
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ $^
-
-camlheader_ur: camlheader
-	cp camlheader $@
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
