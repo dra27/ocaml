@@ -487,7 +487,10 @@ CAMLprim value caml_sys_proc_self_exe(value unit)
     return caml_alloc_some(caml_copy_string_of_os(caml_params->proc_self_exe));
 }
 
-void caml_sys_init(char_os * proc_self_exe, char_os * exe_name, char_os **argv)
+void caml_sys_init(char_os * proc_self_exe,
+                   char_os * actual_argv0,
+                   char_os * exe_name,
+                   char_os **argv)
 {
 #ifdef _WIN32
   /* Initialises the caml_win32_* globals on Windows with the version of
@@ -497,7 +500,9 @@ void caml_sys_init(char_os * proc_self_exe, char_os * exe_name, char_os **argv)
   caml_setup_win32_terminal();
 #endif
 #endif
-  caml_init_exe_name(proc_self_exe, exe_name);
+  caml_init_exe_name(proc_self_exe,
+                     (proc_self_exe ? proc_self_exe : actual_argv0),
+                     exe_name);
   main_argv = caml_alloc_array((void *)caml_copy_string_of_os,
                                (char const **) argv);
   caml_register_generational_global_root(&main_argv);
@@ -726,6 +731,29 @@ CAMLprim value caml_sys_const_standard_library_default(value unit)
                                   : caml_runtime_standard_library_default);
 }
 #endif
+
+CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
+{
+  CAMLparam1(vstdlib_default);
+  CAMLlocal3(result, eff, root_dir);
+
+  char_os *stdlib_default = caml_stat_strdup_to_os(String_val(vstdlib_default));
+  char_os *root = NULL, *stdlib;
+
+  stdlib =
+    caml_locate_standard_library(caml_params->exe_name, stdlib_default, &root);
+
+  eff = caml_copy_string_of_os(stdlib);
+  if (root == NULL) {
+    root_dir = Val_none;
+  } else {
+    root_dir = caml_copy_string_of_os(root);
+    root_dir = caml_alloc_some(root_dir);
+  }
+  result = caml_alloc_2(0, eff, root_dir);
+
+  CAMLreturn(result);
+}
 
 CAMLprim value caml_sys_get_config(value unit)
 {
