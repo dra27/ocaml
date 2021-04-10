@@ -526,11 +526,13 @@ AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
     OCAML_CHECK_LN_ON_WINDOWS
+    default_separator='\'
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     unixlib="win32unix"
     ],
   [unix_or_win32="unix"
   ln='ln -sf'
+  default_separator='/'
   unixlib="unix"])
 
 AS_CASE([$host],
@@ -2127,10 +2129,11 @@ AC_CONFIG_COMMANDS([runtime/ld.conf],
   [rm -f runtime/ld.conf
   test x"$ocaml_additional_stublibs_dir" = 'x' || \
     echo "$ocaml_additional_stublibs_dir" > runtime/ld.conf
-  echo "$ocaml_libdir/stublibs" >> runtime/ld.conf
-  echo "$ocaml_libdir" >> runtime/ld.conf],
+  echo ".${default_separator}stublibs" >> runtime/ld.conf
+  echo "." >> runtime/ld.conf],
   [ocaml_additional_stublibs_dir=\
 '$(echo "$ocaml_additional_stublibs_dir" | sed -e "s/'/'\"'\"'/g")'
-  ocaml_libdir='$(echo "$ocaml_libdir" | sed -e "s/'/'\"'\"'/g")'])
+  ocaml_libdir='$(echo "$ocaml_libdir" | sed -e "s/'/'\"'\"'/g")'
+  default_separator='$default_separator'])
 
 AC_OUTPUT
