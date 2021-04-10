@@ -76,3 +76,5 @@ let bytecc_libs = "%%BYTECCLIBS%%"
 let nativecc_libs = "%%NATIVECCLIBS%%"
 
 let windows_unicode = %%WINDOWS_UNICODE%% != 0
+
+let has_relative_libdir = @target_libdir_is_relative@
