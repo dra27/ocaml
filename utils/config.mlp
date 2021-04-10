@@ -14,9 +14,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let bindir = "%%BINDIR%%"
+external stdlib_dirs : unit -> string * string * string option
+   = "caml_sys_get_stdlib_dirs"
 
-let standard_library_default = "%%LIBDIR%%"
+let (standard_library_default,
+     standard_library_effective,
+     relative_root_dir) = stdlib_dirs ()
+
+let bindir =
+  Option.value ~default:"%%BINDIR_REL%%" relative_root_dir
+
+let standard_library_relative = relative_root_dir <> None
 
 let ccomp_type = "%%CCOMPTYPE%%"
 let c_compiler = "%%CC%%"

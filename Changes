@@ -15,7 +15,11 @@ Working version
 
 ### Runtime system:
 
-- #11???: Only read ld.conf when there are DLLs to search for.
+- #11???: Added --enable-relative which allows the runtime and the compilers to
+  locate the Standard Library relative to where the binaries themselves,
+  removing the absolute path previously embedded in
+  caml_standard_library_default. Only read ld.conf when there are DLLs to search
+  for.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
