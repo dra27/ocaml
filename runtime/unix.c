@@ -108,9 +108,12 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
   return retcode;
 }
 
-caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
+static caml_stat_string decompose_path(struct ext_table * tbl,
+                                       char * path,
+                                       int dup)
 {
   char * p, * q;
+  char c;
   size_t n;
 
   if (path == NULL) return NULL;
@@ -118,13 +121,26 @@ caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
   q = p;
   while (1) {
     for (n = 0; q[n] != 0 && q[n] != ':'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
-    q = q + n;
-    if (*q == 0) break;
-    *q = 0;
-    q += 1;
+    c = q[n];
+    q[n] = 0;
+    if (dup)
+      caml_ext_table_add(tbl, caml_stat_strdup(q));
+    else
+      caml_ext_table_add(tbl, q);
+    if (c == 0) break;
+    q = q + n + 1;
+  }
+  if (dup) {
+    free(p);
+    p = NULL;
   }
   return p;
+}
+
+void caml_decompose_path(struct ext_table * tbl, char * path)
+{
+  decompose_path(tbl, path, 1);
+  return;
 }
 
 caml_stat_string caml_search_in_path(struct ext_table * path, const char * name)
@@ -203,7 +219,7 @@ caml_stat_string caml_search_exe_in_path(const char * name)
   caml_stat_string res;
 
   caml_ext_table_init(&path, 8);
-  tofree = caml_decompose_path(&path, getenv("PATH"));
+  tofree = decompose_path(&path, getenv("PATH"), 0);
 #ifndef __CYGWIN__
   res = caml_search_in_path(&path, name);
 #else
