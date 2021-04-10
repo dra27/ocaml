@@ -128,23 +128,25 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
   return retcode;
 }
 
-wchar_t * caml_decompose_path(struct ext_table * tbl, wchar_t * path)
+void caml_decompose_path(struct ext_table * tbl, wchar_t * path)
 {
   wchar_t * p, * q;
+  wchar_t c;
   int n;
 
-  if (path == NULL) return NULL;
+  if (path == NULL) return;
   p = caml_stat_wcsdup(path);
   q = p;
   while (1) {
     for (n = 0; q[n] != 0 && q[n] != L';'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
-    q = q + n;
-    if (*q == 0) break;
-    *q = 0;
-    q += 1;
+    c = q[n];
+    q[n] = 0;
+    caml_ext_table_add(tbl, caml_stat_wcsdup(q));
+    if (c == 0) break;
+    q = q + n + 1;
   }
-  return p;
+  caml_stat_free(p);
+  return;
 }
 
 wchar_t * caml_search_in_path(struct ext_table * path, const wchar_t * name)
