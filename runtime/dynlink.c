@@ -92,9 +92,8 @@ CAMLexport const char_os * caml_get_stdlib_location(void)
   return stdlib;
 }
 
-CAMLexport char_os * caml_parse_ld_conf(void)
+static char_os * parse_ld_conf(const char_os *location)
 {
-  const char_os * stdlib;
   char_os * ldconfname, * wconfig, * p, * q, * r;
   char * config;
 #ifdef _WIN32
@@ -106,8 +105,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
 #endif
   int ldconf, nread;
 
-  stdlib = caml_get_stdlib_location();
-  ldconfname = caml_stat_strconcat_os(3, stdlib, T("/"), LD_CONF_NAME);
+  ldconfname = caml_stat_strconcat_os(3, location, CAML_DIR_SEP, LD_CONF_NAME);
   if (stat_os(ldconfname, &st) == -1) {
     caml_stat_free(ldconfname);
     return NULL;
@@ -149,6 +147,39 @@ CAMLexport char_os * caml_parse_ld_conf(void)
 }
 #undef OPEN_FLAGS
 
+CAMLexport char_os ** caml_parse_ld_conf(void)
+{
+  char_os * env_value;
+  char_os * locations[3] = {T(""), T(""), NULL};
+  char_os ** buffer, ** tofree;
+  int i, file_count = 0;
+
+  /* Read $OCAMLLIB */
+  env_value = caml_secure_getenv(T("OCAMLLIB"));
+  if (env_value != NULL && strlen_os(env_value) > 0)
+    locations[file_count++] = caml_stat_strdup_os(env_value);
+  /* Add $CAMLLIB if set and not equal to $OCAMLLIB */
+  env_value = caml_secure_getenv(T("CAMLLIB"));
+  if (env_value != NULL && strlen_os(env_value) > 0
+      && strcmp_os(env_value, locations[0]))
+    locations[file_count++] = caml_stat_strdup_os(env_value);
+  /* Add OCAML_STDLIB_DIR if not equal to either */
+  if (strcmp_os(OCAML_STDLIB_DIR, locations[0])
+      || strcmp_os(OCAML_STDLIB_DIR, locations[1]))
+    locations[file_count++] = caml_stat_strdup_os(OCAML_STDLIB_DIR);
+
+  tofree = buffer = caml_stat_alloc((file_count + 1) * sizeof(char_os *));
+  /* Load and parse all the ld.conf files */
+  for (i = 0; i < file_count; i++) {
+    if ((*tofree = parse_ld_conf(locations[i])) != NULL)
+      tofree++;
+    caml_stat_free(locations[i]);
+  }
+  *tofree = NULL;
+
+  return buffer;
+}
+
 /* Open the given shared library and add it to shared_libs.
    Abort on error. */
 static void open_shared_lib(char_os * name)
@@ -187,6 +218,8 @@ void caml_build_primitive_table(char_os * lib_path,
      - directories specified on the command line with the -I option
      - directories specified in the CAML_LD_LIBRARY_PATH
      - directories specified in the executable
+     - directories specified in OCAMLLIB/ld.conf
+     - directories specified in CAMLLIB/ld.conf
      - directories specified in the file <stdlib>/ld.conf
 
      caml_shared_libs_path and caml_prim_name_table are not freed afterwards:
