@@ -7,6 +7,11 @@ OCaml 5.0 maintenance version
   to set up to get flexdll working changed
   (David Allsopp and Samuel Hym, light review by Xavier Leroy)
 
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
 ### Internal/compiler-libs changes:
 
 - #11763, #11759, #11861: Enable stricter C compilation warnings, use
