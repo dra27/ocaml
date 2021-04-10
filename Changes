@@ -15,6 +15,11 @@ Working version
 
 ### Runtime system:
 
+* #11???: Bytecode loads ld.conf from all of $OCAMLLIB/ld.conf, $CAMLLIB/ld.conf
+  and standard_library_default/ld.conf rather than just the first one of these
+  encountered.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #8998, #11321, #11430: change mangling of OCaml long identifiers

@@ -140,6 +140,12 @@ CAMLextern void caml_expand_command_line (int *, wchar_t ***);
 
 CAMLextern clock_t caml_win32_clock(void);
 
+#define CAML_DIR_SEP T("\\")
+
+#else
+
+#define CAML_DIR_SEP "/"
+
 #endif /* _WIN32 */
 
 /* Returns the current value of a counter that increments once per nanosecond.
