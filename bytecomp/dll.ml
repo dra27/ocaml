@@ -172,7 +172,7 @@ let ld_conf_contents () =
   let dirs = [
     Sys.getenv_opt "OCAMLLIB";
     Sys.getenv_opt "CAMLLIB";
-    Some Config.standard_library_default] in
+    Some Config.standard_library_effective] in
   let rec fold loaded = function
   | (Some dir)::dirs ->
       (* Only load if this directory hasn't been seen already *)
