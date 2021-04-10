@@ -1111,8 +1111,9 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
                                                   wchar_t **dirname)
 {
   if (Is_relative_dir(stdlib_default)) {
-    LPWSTR root = NULL, basename;
+    LPWSTR root = NULL, basename, candidate, resolved_candidate = NULL;
     DWORD l = MAX_PATH + 1, buf_len;
+    HANDLE h;
 
     do {
       buf_len = l;
@@ -1132,9 +1133,9 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
     /* Make root the dirname portion */
     *(basename - 1) = 0;
 
-    LPWSTR candidate =
+    candidate =
       caml_stat_wcsconcat(3, root, CAML_DIR_SEP, stdlib_default);
-    HANDLE h =
+    h =
       CreateFile(candidate, 0,
                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
                  OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
@@ -1143,7 +1144,7 @@ CAMLextern char_os* caml_locate_standard_library (const wchar_t *exe_name,
       return caml_stat_wcsdup(stdlib_default);
     }
 
-    LPWSTR resolved_candidate = NULL;
+    resolved_candidate = NULL;
     l = MAX_PATH + 1;
     do {
       buf_len = l;
