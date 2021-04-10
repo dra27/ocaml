@@ -109,3 +109,6 @@ val windows_unicode : bool
 val function_sections : bool
 (** Whether the compiler was configured to generate
     each function in a separate section *)
+
+val has_relative_libdir : bool
+(** Whether the compiler has been configured using --with-relative-libdir *)
