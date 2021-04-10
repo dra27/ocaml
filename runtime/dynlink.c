@@ -134,10 +134,11 @@ CAMLexport char_os * caml_parse_ld_conf(void)
 
   /* Use a temporary ext_table to hold the individually-allocated entries */
   caml_ext_table_init(&entries, 8);
-  for (int i = 0; i < sizeof(locations) / sizeof(locations[0]); i++) {
+  for (i = 0; i < sizeof(locations) / sizeof(locations[0]); i++) {
     if (locations[i] != NULL) {
+      size_t libroot_length;
       libroot = caml_stat_strdup_os(locations[i]);
-      size_t libroot_length = strlen_os(libroot);
+      libroot_length = strlen_os(libroot);
       if (libroot_length > 1 && Is_separator(libroot[libroot_length - 1]))
         libroot[libroot_length - 1] = '\0';
       ldconfname =
@@ -166,9 +167,9 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       p = wconfig;
       while (*p != '\0') {
         for (q = p; *q != '\0' && *q != '\n'; q++) /*nothing*/;
-        char_os last = *q;
+        last = *q;
         *q = '\0';
-        char_os *entry = make_relative_path_absolute(p, libroot);
+        entry = make_relative_path_absolute(p, libroot);
         length += strlen_os(entry) + 1;
         caml_ext_table_add(&entries, entry);
         p = q;
@@ -185,7 +186,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   result = caml_stat_alloc(length * sizeof(char_os));
   p = result;
   for (i = 0; i < entries.size; i++) {
-    char_os *entry = entries.contents[i];
+    entry = entries.contents[i];
     length = strlen_os(entry) + 1;
     memcpy(p, entry, length * sizeof(char_os));
     caml_ext_table_add(&caml_shared_libs_path, p);
