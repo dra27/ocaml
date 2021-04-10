@@ -121,3 +121,6 @@ val has_instrumented_runtime : bool
 
 val naked_pointers : bool
 (** Whether the runtime system supports naked pointers outside the heap *)
+
+val has_relative_libdir : bool
+(** Whether the compiler has been configured using --with-relative-libdir *)
