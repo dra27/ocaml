@@ -36,6 +36,8 @@ DIR_SEP = /
 CONVERT_PATH = $(strip $(1))
 endif
 
+QUOTE_SINGLE = '$(subst ','\'',$(1))'
+
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
 INSTALL_LIBDIR := $(DESTDIR)$(LIBDIR)
@@ -140,9 +142,14 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
-# Allow Makefile.cross to add flags to OC_COMMON_LINKFLAGS
-OC_CROSS_LINKFLAGS ?=
-OC_COMMON_LINKFLAGS += $(OC_CROSS_LINKFLAGS)
+# Allow Makefile.cross to override the Standard Library default for the compiler
+# itself.
+HOST_LIBDIR ?= $(TARGET_LIBDIR)
+
+OC_COMMON_LINKFLAGS ?=
+OC_COMMON_LINKFLAGS += \
+  -set-runtime-default \
+    $(call QUOTE_SINGLE,standard_library_default=$(HOST_LIBDIR))
 
 # The rule to compile C files
 
