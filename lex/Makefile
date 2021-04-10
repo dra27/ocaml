@@ -48,7 +48,7 @@ ocamllex$(EXE): $(OBJS)
 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
 
 ocamllex.opt$(EXE): $(OBJS:.cmo=.cmx)
-	$(CAMLOPT_CMD) -o $@ $^
+	$(CAMLOPT_CMD) $(DOTOPT_LINKFLAGS) -o $@ $^
 
 clean::
 	rm -f $(programs) $(programs:=.exe)
