@@ -2436,7 +2436,6 @@ let test_relocation prefix bindir libdir =
       "compiler-libs" / "ocamlcommon" ^ Config.ext_lib;
       "compiler-libs" / "config.cmx";
       "expunge";
-      "ld.conf";
       "libcamlrun_shared" ^ Config.ext_dll;
       "Makefile.config";
     ] in
@@ -2562,7 +2561,7 @@ let () =
   in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
   let env =
-    Environment.make ?caml_ld_library_path ?ocamllib bindir libdir
+    Environment.make ?ocamllib bindir libdir
   in
   Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests ~original:false env bindir libdir config.libraries in
