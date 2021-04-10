@@ -523,7 +523,14 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
-       begin match !Clflags.standard_library_default with
+       let standard_library_default =
+         let standard_library_default = !Clflags.standard_library_default in
+         if standard_library_default = None
+            && Config.standard_library_relative then
+           Some Config.standard_library_effective
+         else
+           standard_library_default in
+       begin match standard_library_default with
        | Some value ->
            (* Embedded runtime defaults *)
            output_string outchan value;
@@ -699,7 +706,7 @@ static char caml_sections[] = {
 
 |};
        let stdlib =
-         Option.value ~default:Config.standard_library_default
+         Option.value ~default:Config.standard_library_effective
                       !Clflags.standard_library_default
        in
        emit_global_constant outchan "caml_standard_library_default" stdlib;
@@ -858,7 +865,7 @@ extern "C" {
 |};
          Symtable.output_primitive_table poc;
          let stdlib =
-           Option.value ~default:Config.standard_library_default
+           Option.value ~default:Config.standard_library_effective
                         !Clflags.standard_library_default
          in
          emit_global_constant poc "caml_standard_library_default" stdlib;

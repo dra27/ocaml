@@ -1491,7 +1491,7 @@ let test_ld_conf ~original env bindir libdir =
        stdlib = ["ld.conf"]; outcome} :: tests in
     let outcome =
       (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-      if original then
+      if original || config.has_relative_libdir <> None then
         ["masked-stdlib"]
       else
         []
@@ -1535,7 +1535,7 @@ let test_ld_conf ~original env bindir libdir =
   let tests =
     let outcome =
       (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-      if original then
+      if original || config.has_relative_libdir <> None then
         ["libdir"]
       else
         []
