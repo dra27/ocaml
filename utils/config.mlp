@@ -21,7 +21,19 @@ let bindir = "%%OCAML_BINDIR%%"
 
 external standard_library_default : unit -> string = "%standard_library_default"
 
-let standard_library_default = standard_library_default ()
+let standard_library_default_raw = standard_library_default ()
+
+external stdlib_dirs : string -> string * string option
+   = "caml_sys_get_stdlib_dirs"
+
+let standard_library_default, relative_root_dir =
+  stdlib_dirs standard_library_default_raw
+
+let standard_library_relative =
+  if relative_root_dir = None then
+    None
+  else
+    Some standard_library_default_raw
 
 let standard_library =
   try
@@ -31,6 +43,8 @@ let standard_library =
     Sys.getenv "CAMLLIB"
   with Not_found ->
     standard_library_default
+
+let bindir = Option.value ~default:bindir relative_root_dir
 
 let ccomp_type = "%%CCOMPTYPE%%"
 let c_compiler = "%%CC%%"
@@ -167,9 +181,13 @@ let configuration_variables =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  let standard_library_relative =
+    Option.value ~default:"" standard_library_relative
+  in
 [
   p "version" version;
   p "standard_library_default" standard_library_default;
+  p "standard_library_relative" standard_library_relative;
   p "standard_library" standard_library;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
