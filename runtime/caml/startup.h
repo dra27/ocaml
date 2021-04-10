@@ -56,6 +56,8 @@ enum caml_byte_program_mode {
 
 extern enum caml_byte_program_mode caml_byte_program_mode;
 
+extern const char_os *caml_standard_library_default;
+
 #endif /* CAML_INTERNALS */
 
 #endif /* CAML_STARTUP_H */
