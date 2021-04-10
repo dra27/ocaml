@@ -146,6 +146,7 @@ SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 # itself.
 HOST_LIBDIR ?= $(TARGET_LIBDIR)
 
+OC_COMMON_LINKFLAGS ?=
 OC_COMMON_LINKFLAGS += \
   -set-runtime-default \
     $(call QUOTE_SINGLE,standard_library_default=$(HOST_LIBDIR))
