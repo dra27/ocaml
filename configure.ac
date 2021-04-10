@@ -57,6 +57,7 @@ profinfo=false
 profinfo_width=0
 extralibs=
 bootstrapping_flexdll=false
+bindir_to_libdir=''
 
 # Information about the package
 
@@ -170,6 +171,7 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([bindir_exp])
 AC_SUBST([target_bindir])
 AC_SUBST([target_bindir_exp])
+AC_SUBST([bindir_to_libdir])
 
 ## Generated files
 
@@ -392,6 +394,10 @@ AC_ARG_VAR([DEFAULT_STRING],
 AC_ARG_ENABLE([flat-float-array],
   [AS_HELP_STRING([--disable-flat-float-array],
     [do not use flat float arrays])])
+
+AC_ARG_ENABLE([relative],
+  [AS_HELP_STRING([--enable-relative],
+    [try to locate the standard library using relative paths])])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
@@ -1837,6 +1843,12 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
+
+AS_IF([test x"$enable_relative" = "xyes"],[
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
+  dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
+  dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
+])
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
