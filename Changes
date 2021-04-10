@@ -30,6 +30,12 @@ OCaml 5.3 maintenance version
   bytecode from the executable itself, rather than first trying `argv[0]`.
   (David Allsopp, review by ???)
 
+### Compiler user-interface and warnings:
+
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Internal/compiler-libs changes:
 
 - #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
