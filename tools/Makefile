@@ -47,8 +47,8 @@ $1$(EXE): $3 $2
 $(call PROGRAM_SYNONYM, $1.opt)
 
 $1.opt$(EXE): $3 $$(call byte2native,$2)
-	$$(CAMLOPT_CMD) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ \
-	                $$(call byte2native,$2)
+	$$(CAMLOPT_CMD) $$(LINKFLAGS) $$(DOTOPT_LINKFLAGS) -I $$(ROOTDIR) \
+	                -o $$@ $$(call byte2native,$2)
 
 all: $1
 
@@ -269,7 +269,8 @@ LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
 
 lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
 lintapidiff.opt$(EXE): $(LINTAPIDIFF)
-	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
+	$(CAMLOPT_CMD) $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
 clean::
 	rm -f -- lintapidiff.opt lintapidiff.opt.exe
 	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj
