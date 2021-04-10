@@ -176,6 +176,13 @@ ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
 
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-runtime-default 'standard_library_default=$(LIBDIR_REL)'
+endif # ifeq "$(LIBDIR_REL)" ""
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
@@ -346,7 +353,8 @@ $(basename $(notdir $(1)))_BYTECODE_LINKFLAGS =
 
 $(basename $(notdir $(1)))_BYTECODE_LINKCMD = \
 $(strip \
-  $$(CAMLC) $$(OC_COMMON_LINKFLAGS) $$(OC_BYTECODE_LINKFLAGS) \
+  $$(CAMLC) $$(SET_RELATIVE_STDLIB) \
+  $$(OC_COMMON_LINKFLAGS) $$(OC_BYTECODE_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_BYTECODE_LINKFLAGS))
 
@@ -379,7 +387,8 @@ $(basename $(notdir $(1)))_NATIVE_LINKFLAGS =
 
 $(basename $(notdir $(1)))_NATIVE_LINKCMD = \
 $(strip \
-  $$(CAMLOPT) $$(OC_COMMON_LINKFLAGS) $$(OC_NATIVE_LINKFLAGS) \
+  $$(CAMLOPT) $$(SET_RELATIVE_STDLIB) \
+  $$(OC_COMMON_LINKFLAGS) $$(OC_NATIVE_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_NATIVE_LINKFLAGS))
 
