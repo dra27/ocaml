@@ -494,9 +494,9 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer outchan;
     )
 
-let emit_global_constant outchan typ (name, value) =
+let emit_global_constant outchan (name, value) =
   let value = Misc.Stdlib.String.escaped_c value in
-  Printf.fprintf outchan "%s * %s = %s;\n" typ name value
+  Printf.fprintf outchan "char_os * %s = %s;\n" name value
 
 (* Output a bytecode executable as a C file *)
 
@@ -543,7 +543,7 @@ let link_bytecode_as_c tolink outfile with_main =
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
-       List.iter (emit_global_constant outchan "char_os")
+       List.iter (emit_global_constant outchan)
                  !Clflags.global_string_constants;
        if with_main then begin
          output_string outchan "\
@@ -673,6 +673,8 @@ let link objfiles output_name =
   Clflags.all_ccopts := !lib_ccopts @ !Clflags.all_ccopts;
                                                    (* put user's opts first *)
   Clflags.dllibs := !lib_dllibs @ !Clflags.dllibs; (* put user's DLLs first *)
+  if !Clflags.custom_runtime then
+    Compenv.set_caml_standard_library_default ();
   if not !Clflags.custom_runtime then begin
     assert (!Clflags.global_string_constants = []);
     link_bytecode tolink output_name true
@@ -689,7 +691,6 @@ let link objfiles output_name =
           if not !Clflags.keep_camlprimc_file then remove_file prim_name)
       (fun () ->
          link_bytecode ~final_name:output_name tolink bytecode_name false;
-         let typ = if Sys.win32 then "wchar_t" else "char" in
          let poc = open_out prim_name in
          (* note: builds will not be reproducible if the C code contains macros
             such as __FILE__. *)
@@ -699,7 +700,7 @@ let link objfiles output_name =
          #endif\n\
          #include <caml/mlvalues.h>\n";
          Symtable.output_primitive_table poc;
-         List.iter (emit_global_constant poc typ)
+         List.iter (emit_global_constant poc)
                    !Clflags.global_string_constants;
          output_string poc "\
          #ifdef __cplusplus\n\

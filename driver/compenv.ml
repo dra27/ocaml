@@ -671,4 +671,11 @@ let process_deferred_actions env =
       | _ -> false) !deferred_actions then
     fatal "Option -a cannot be used with .cmxa input files.";
   List.iter (process_action env) (List.rev !deferred_actions);
-  output_name := final_output_name;
+  output_name := final_output_name
+
+let set_caml_standard_library_default () =
+  let symbol = "caml_standard_library_default" in
+  if not (List.exists (fun (name, _) -> name = symbol)
+                      !global_string_constants) then
+    global_string_constants :=
+      (symbol, Config.standard_library_effective) :: !global_string_constants
