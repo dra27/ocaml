@@ -156,6 +156,12 @@ CAMLextern int caml_win32_isatty(int fd);
 
 CAMLextern void caml_expand_command_line (int *, wchar_t ***);
 
+#define CAML_DIR_SEP T("\\")
+
+#else
+
+#define CAML_DIR_SEP "/"
+
 #endif /* _WIN32 */
 
 #endif /* CAML_INTERNALS */
