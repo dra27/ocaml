@@ -161,6 +161,12 @@ ___________
   runtime assertions.
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and David Allsopp)
 
+- #13???: Added --enable-relative which allows the runtime and the compilers to
+  locate the Standard Library relative to where the binaries themselves,
+  removing the absolute path previously embedded in
+  caml_standard_library_default.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #13014: Enable compile-time option -function-sections on all previously
