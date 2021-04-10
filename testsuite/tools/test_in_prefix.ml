@@ -1208,7 +1208,6 @@ let load_libraries_in_toplevel env mode libraries =
     let exit_code, output =
       Environment.run_process Return
         ~runtime:(mode = Bytecode && not launcher_searches_for_ocamlrun)
-        ~stubs:(mode = Bytecode && has_c_stubs)
         ~stdlib:true ~fails:(expected_exit_code <> 0) env toplevel args
     in
     Environment.display_output output;
@@ -2372,8 +2371,7 @@ let compile_test env =
           Environment.run_process Return
             ~fails:(compilation_exit_code <> 0)
             ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
-            ~stdlib:true
-            ~stubs:(with_unix && tendered) env compiler args
+            ~stdlib:true env compiler args
         in
         Environment.display_output output;
         exit_code
@@ -3024,9 +3022,7 @@ let test_relocation env prefix =
            ~ocaml_debug:has_ocaml_debug_info,
            ~c_debug:contains_c_debug_info,
            ~s:contains_assembled_objects) =
-        if List.mem basename ["Makefile.config";
-                              "ld.conf";
-                              "runtime-launch-info"] then
+        if basename = "Makefile.config" || basename = "runtime-launch-info" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if basename = "config.cmx" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
