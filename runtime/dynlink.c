@@ -86,7 +86,7 @@ CAMLexport const char_os * caml_get_stdlib_location(void)
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_standard_library_default;
+  if (stdlib == NULL) stdlib = caml_standard_library_effective;
   return stdlib;
 }
 
