@@ -525,7 +525,21 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
-       begin match !Clflags.standard_library_default with
+       let orun =
+         if not standalone then
+           (* -custom executables don't need ORUN sections - the correct value
+              is already included in the runtime. *)
+           None
+         else if !Clflags.standard_library_default = None
+            && Config.standard_library_relative then
+           (* If -set-runtime-default hasn't been specified, and the compiler is
+              using a relative location to the standard, ensure that the image
+              we produce overrides this to an absolute value. *)
+           Some Config.standard_library_effective
+         else
+           (* -set-runtime-default *)
+           !Clflags.standard_library_default in
+       begin match orun with
        | Some value ->
            (* Embedded runtime defaults *)
            output_string outchan value;
@@ -703,7 +717,7 @@ static char caml_sections[] = {
 
 |};
        let stdlib =
-         Option.value ~default:Config.standard_library_default
+         Option.value ~default:Config.standard_library_effective
                       !Clflags.standard_library_default
        in
        emit_global_constant outchan "caml_standard_library_default" stdlib;
@@ -866,7 +880,7 @@ enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
 |};
          Symtable.output_primitive_table poc;
          let stdlib =
-           Option.value ~default:Config.standard_library_default
+           Option.value ~default:Config.standard_library_effective
                         !Clflags.standard_library_default
          in
          emit_global_constant poc "caml_standard_library_default" stdlib;
