@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <wchar.h>
 #include "caml/alloc.h"
 #include "caml/address_class.h"
 #include "caml/fail.h"
@@ -1057,4 +1058,74 @@ CAMLexport int caml_win32_isatty(int fd)
 int caml_num_rows_fd(int fd)
 {
   return -1;
+}
+
+CAMLextern void caml_locate_standard_library (const wchar_t *exe_name)
+{
+  if (Is_relative_dir(caml_standard_library_default)) {
+    LPWSTR root, basename, candidate, resolved_candidate;
+    DWORD buf_len, l;
+    HANDLE h;
+    l = GetFullPathName(exe_name, 0, NULL, NULL);
+    if (l == 0) {
+      /* Impossible thing: the path returned by GetModuleFileName can't be
+         parsed by GetFullPathName */
+      caml_standard_library = caml_standard_library_default;
+      return;
+    }
+again1:
+    CAMLassert(l != 0);
+    buf_len = l;
+    root = caml_stat_alloc(buf_len * sizeof(wchar_t));
+    l = GetFullPathName(exe_name, buf_len, root, &basename);
+    if (l > buf_len) {
+      caml_stat_free(root);
+      goto again1;
+    }
+    CAMLassert(basename != root && *(basename - 1) == '/');
+    /* Make root the dirname */
+    *(basename - 1) = 0;
+    caml_relative_root_dir = root;
+    candidate = caml_stat_strconcat_os(3, caml_relative_root_dir,
+                                          CAML_DIR_SEP,
+                                          caml_standard_library_default);
+    h = CreateFile(candidate, 0,
+                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                   NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    if (h != INVALID_HANDLE_VALUE) {
+      l = GetFinalPathNameByHandle(h, NULL, 0,
+                                   FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+again2:
+      buf_len = l;
+      resolved_candidate = caml_stat_alloc(buf_len * sizeof(wchar_t));
+      l = GetFinalPathNameByHandle(h, resolved_candidate, buf_len,
+                                   FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+      if (l > buf_len) {
+        caml_stat_free(resolved_candidate);
+        goto again2;
+      }
+      /* GetFinalPathNameByHandle always returns \\?\ which needs stripping.
+         UNC paths are returned as \\?\UNC\ - in this case, reuse the \\ from
+         \\?\. */
+      CAMLassert(l > 4 && resolved_candidate[0] == '\\'
+                       && resolved_candidate[1] == '\\'
+                       && resolved_candidate[2] == '?'
+                       && resolved_candidate[3] == '\\');
+      if (l >= 8 && resolved_candidate[4] == 'U'
+                 && resolved_candidate[5] == 'N'
+                 && resolved_candidate[6] == 'C'
+                 && resolved_candidate[7] == '\\')
+        wmemmove_s(resolved_candidate + 2, l - 1,
+                   resolved_candidate + 8, l - 7);
+      else
+        wmemmove_s(resolved_candidate, l + 1,
+                   resolved_candidate + 4, l - 3);
+      caml_stat_free(candidate);
+      caml_standard_library = resolved_candidate;
+    } else {
+      caml_standard_library = candidate;
+    }
+  } else {
+    caml_standard_library = caml_standard_library_default;
+  }
 }
