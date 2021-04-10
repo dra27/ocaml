@@ -185,8 +185,16 @@ distclean: clean
 # Generated non-object files
 
 ld.conf: $(ROOTDIR)/Makefile.config
+ifneq "$(STUBLIBDIR)" "$(LIBDIR)/stublibs"
 	echo "$(STUBLIBDIR)" > $@
-	echo "$(LIBDIR)" >> $@
+else
+ifeq "$(UNIX_OR_WIN32)" "unix"
+	echo './stublibs' > $@
+else
+	echo '.\stublibs' > $@
+endif
+endif
+	echo "." >> $@
 
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
