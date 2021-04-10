@@ -132,7 +132,8 @@ let split_dll_path path =
 let init_compile nostdlib =
   search_path :=
     ld_library_path_contents() @
-    (if nostdlib then [] else ld_conf_contents Config.standard_library_default)
+    (if nostdlib then [] else
+      ld_conf_contents Config.standard_library_effective)
 
 (* Initialization for linking in core (dynlink or toplevel) *)
 
@@ -140,7 +141,7 @@ let init_toplevel dllpath =
   search_path :=
     ld_library_path_contents() @
     split_dll_path dllpath @
-    ld_conf_contents Config.standard_library_default;
+    ld_conf_contents Config.standard_library_effective;
   opened_dlls := Array.to_list (get_current_dlls());
   names_of_opened_dlls := [];
   linking_in_core := true
