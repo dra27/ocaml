@@ -167,8 +167,8 @@ let libdir_rules config file =
        - contains objects which have been created by the assembler *)
     let (embeds_stdlib_location, has_ocaml_debug_info, has_c_debug_info,
          contains_assembled_objects) =
-      if basename = "Makefile.config" || basename = "ld.conf" then
-        (* These files all embed the Standard Library location *)
+      if basename = "Makefile.config" then
+        (* Embeds the Standard Library location *)
         (true, false, false, false)
       (* Unknown bug in 4.x flambda - the inlining information for MSVC and
          mingw-w64 appears to be corrupt. *)
