@@ -242,7 +242,7 @@ CAMLprim value caml_dynlink_parse_runtime_ld_conf(value ignored)
      is built, but this primitive is never actually called. */
   return parse_ld_conf(T(""));
 #else
-  return parse_ld_conf(caml_runtime_standard_library_default);
+  return parse_ld_conf(caml_runtime_standard_library_effective);
 #endif
 }
 

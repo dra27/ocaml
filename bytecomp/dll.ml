@@ -163,7 +163,7 @@ let init_toplevel dllpaths =
   search_path :=
     ld_library_path_contents() @
     dllpaths @
-    ld_conf_contents Config.standard_library_default;
+    ld_conf_contents Config.standard_library_effective;
   opened_dlls :=
     List.map (fun dll -> "", Execution dll)
       (Array.to_list (get_current_dlls()));
