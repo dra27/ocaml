@@ -35,7 +35,8 @@ OCaml 4.10 maintenance branch
   put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
   unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
   $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
-  first one found.
+  first one found. ld.conf files with CRLF line endings are now consistently on
+  both Windows and Unix.
   (David Allsopp, review by ???)
 
 ### Compiler user-interface and warnings:
