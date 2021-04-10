@@ -295,7 +295,8 @@ static int parse_command_line(char_os **argv)
         break;
       case 'I':
         if (argv[i + 1] != NULL) {
-          caml_ext_table_add(&caml_shared_libs_path, argv[i + 1]);
+          caml_ext_table_add(&caml_shared_libs_path,
+                             caml_stat_strdup_os(argv[i + 1]));
           i++;
         }
         break;
