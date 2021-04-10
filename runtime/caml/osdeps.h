@@ -141,10 +141,12 @@ CAMLextern void caml_expand_command_line (int *, wchar_t ***);
 CAMLextern clock_t caml_win32_clock(void);
 
 #define CAML_DIR_SEP T("\\")
+#define Is_dir_separator(c) (c == '\\' || c == '/')
 
 #else
 
 #define CAML_DIR_SEP "/"
+#define Is_dir_separator(c) (c == '/')
 
 #endif /* _WIN32 */
 
