@@ -49,6 +49,11 @@ OCaml 4.08 maintenance branch:
   compiling the primitives file before calling the linker.
   (David Allsopp, review by Vincent Laviron)
 
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
