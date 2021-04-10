@@ -8,6 +8,12 @@ OCaml 4.14.0
   as Windows.
   (David Allsopp, review by ???)
 
+* #10???: Explicit relative paths in ld.conf (".", "..", "./..." ,"../...") are
+  interpreted as being relative to the directory ld.conf was loaded from. The
+  brave may continue to put implicit paths in ld.conf. The interpretation of
+  CAML_LD_LIBRARY_PATH is unaltered.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #10???: --with-target-bindir configure option implemented. This option
