@@ -781,6 +781,7 @@ build_os
 build_vendor
 build_cpu
 build
+relative_libdir
 bindir_to_libdir
 target_bindir
 ar_supports_response_files
@@ -3303,6 +3304,7 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 bindir_to_libdir=''
+relative_libdir=false
 
 # Information about the package
 
@@ -3444,6 +3446,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L034
 
 
  # TODO: rename this variable
+
 
 
 
@@ -20415,6 +20418,7 @@ fi
 if test x"$enable_relative" = "xyes"
 then :
 
+  relative_libdir=true
 
   eval "from=\"\$bindir\""
   eval "to=\"\$libdir\""
