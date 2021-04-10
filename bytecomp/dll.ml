@@ -144,10 +144,10 @@ let synchronize_primitive num symb =
 
 (* Read the [ld.conf] file and return the corresponding list of directories *)
 
-let ld_conf_contents () =
+let ld_conf_contents dir =
   let path = ref [] in
   begin try
-    let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
+    let ic = open_in (Filename.concat dir "ld.conf") in
     begin try
       while true do
         path := input_line ic :: !path
@@ -158,6 +158,13 @@ let ld_conf_contents () =
   with Sys_error _ -> ()
   end;
   List.rev !path
+
+let ld_conf_contents () =
+  let dirs = [
+    Sys.getenv_opt "OCAMLLIB";
+    Sys.getenv_opt "CAMLLIB";
+    Some Config.standard_library_default] in
+  List.flatten (List.filter_map (Option.map ld_conf_contents) dirs)
 
 (* Split the CAML_LD_LIBRARY_PATH environment variable and return
    the corresponding list of directories.  *)

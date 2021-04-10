@@ -88,45 +88,93 @@ CAMLexport char_os * caml_get_stdlib_location(void)
 
 CAMLexport char_os * caml_parse_ld_conf(void)
 {
-  char_os * stdlib, * ldconfname, * wconfig, * p, * q;
-  char * config;
+  char_os * wconfig, * wcurrent, * p, * q;
+  char_os * ldconfs[3] = {
+    caml_secure_getenv(T("OCAMLLIB")),
+    caml_secure_getenv(T("CAMLLIB")),
+    OCAML_STDLIB_DIR };
+  int sizes[3];
+  char * config, * current;
 #ifdef _WIN32
   struct _stati64 st;
 #else
   struct stat st;
 #endif
-  int ldconf, nread;
+  int ldconf, nread, i, j;
 
-  stdlib = caml_get_stdlib_location();
-  ldconfname = caml_stat_strconcat_os(3, stdlib, T("/"), LD_CONF_NAME);
-  if (stat_os(ldconfname, &st) == -1) {
-    caml_stat_free(ldconfname);
-    return NULL;
-  }
-  ldconf = open_os(ldconfname, O_RDONLY, 0);
-  if (ldconf == -1)
-    caml_fatal_error("cannot read loader config file %s",
-                         caml_stat_strdup_of_os(ldconfname));
-  config = caml_stat_alloc(st.st_size + 1);
-  nread = read(ldconf, config, st.st_size);
-  if (nread == -1)
-    caml_fatal_error
-      ("error while reading loader config file %s",
-       caml_stat_strdup_of_os(ldconfname));
-  config[nread] = 0;
-  wconfig = caml_stat_strdup_to_os(config);
-  caml_stat_free(config);
-  q = wconfig;
-  for (p = wconfig; *p != 0; p++) {
-    if (*p == '\n') {
-      *p = 0;
-      caml_ext_table_add(&caml_shared_libs_path, q);
-      q = p + 1;
+  /* Loop through the possible ld.conf files, ignoring clearly identical files,
+     and get their sizes. */
+  nread = 0;
+  for (i = 0; i < 3; i++) {
+    if (ldconfs[i]) {
+      ldconfs[i] =
+        caml_stat_strconcat_os(3, ldconfs[i], CAML_DIR_SEP, LD_CONF_NAME);
+      if (stat_os(ldconfs[i], &st) == -1) {
+        caml_stat_free(ldconfs[i]);
+        ldconfs[i] = NULL;
+      } else {
+        j = 0;
+        for (j = 0; j < i; j++) {
+          if (ldconfs[j] && !strcmp_os(ldconfs[j], ldconfs[i]))
+            break;
+        }
+        if (j != i) {
+          /* This file's already going to be loaded */
+          caml_stat_free(ldconfs[i]);
+          ldconfs[i] = NULL;
+        } else {
+          sizes[i] = st.st_size;
+          nread += st.st_size + 1;
+        }
+      }
     }
   }
-  if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
-  close(ldconf);
-  caml_stat_free(ldconfname);
+
+  /* No ld.conf files found */
+  if (nread == 0)
+    return NULL;
+
+  /* nread is the buffer required to load the files; ldconfs entries are either
+     NULL or a file to read. Now read the files */
+  config = current = caml_stat_alloc(nread);
+  for (i = 0; i < 3; i++) {
+    if (ldconfs[i]) {
+      if ((ldconf = open_os(ldconfs[i], O_RDONLY, 0)) == -1) {
+        caml_fatal_error("cannot read loader config file %s",
+                         caml_stat_strdup_of_os(ldconfs[i]));
+      }
+      if (read(ldconf, current, sizes[i]) == -1) {
+        caml_fatal_error("error while reading loader config file %s",
+                         caml_stat_strdup_of_os(ldconfs[i]));
+      }
+      close(ldconf);
+      current[sizes[i]] = 0;
+      /* Include the null terminator */
+      sizes[i]++;
+      current += sizes[i];
+    }
+  }
+
+  wconfig = wcurrent = caml_stat_memdup_to_os(config, nread);
+  caml_stat_free(config);
+
+  /* Now process them */
+  for (i = 0; i < 3; i++) {
+    if (ldconfs[i]) {
+      /* Filename isn't needed any more */
+      caml_stat_free(ldconfs[i]);
+      for (p = q = wcurrent; *p != 0; p++) {
+        if (*p == '\n') {
+          *p = 0;
+          caml_ext_table_add(&caml_shared_libs_path, q);
+          q = p + 1;
+        }
+      }
+      if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
+      wcurrent += sizes[i];
+    }
+  }
+
   return wconfig;
 }
 
@@ -172,6 +220,8 @@ void caml_build_primitive_table(char_os * lib_path,
      - directories specified on the command line with the -I option
      - directories specified in the CAML_LD_LIBRARY_PATH
      - directories specified in the executable
+     - directories specified in OCAMLLIB/ld.conf
+     - directories specified in CAMLLIB/ld.conf
      - directories specified in the file <stdlib>/ld.conf */
   tofree1 = caml_decompose_path(&caml_shared_libs_path,
                                 caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
