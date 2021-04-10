@@ -45,7 +45,7 @@ extern void caml_free_shared_libs(void);
 extern char_os * caml_get_stdlib_location(void);
 
 /* Parse ld.conf and add the lines read to caml_shared_libs_path */
-extern char_os * caml_parse_ld_conf(void);
+extern void caml_parse_ld_conf(void);
 
 #endif /* CAML_INTERNALS */
 

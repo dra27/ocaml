@@ -86,10 +86,10 @@ CAMLexport char_os * caml_get_stdlib_location(void)
   return stdlib;
 }
 
-CAMLexport char_os * caml_parse_ld_conf(void)
+CAMLexport void caml_parse_ld_conf(void)
 {
-  char_os * stdlib, * ldconfname, * wconfig, * p, * q;
-  char * config;
+  char_os * stdlib, * ldconfname;
+  char * config, * p, * q;
 #ifdef _WIN32
   struct _stati64 st;
 #else
@@ -101,7 +101,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   ldconfname = caml_stat_strconcat_os(3, stdlib, T("/"), LD_CONF_NAME);
   if (stat_os(ldconfname, &st) == -1) {
     caml_stat_free(ldconfname);
-    return NULL;
+    return;
   }
   ldconf = open_os(ldconfname, O_RDONLY, 0);
   if (ldconf == -1)
@@ -114,20 +114,20 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       ("error while reading loader config file %s",
        caml_stat_strdup_of_os(ldconfname));
   config[nread] = 0;
-  wconfig = caml_stat_strdup_to_os(config);
-  caml_stat_free(config);
-  q = wconfig;
-  for (p = wconfig; *p != 0; p++) {
+  q = config;
+  for (p = config; *p != 0; p++) {
     if (*p == '\n') {
       *p = 0;
-      caml_ext_table_add(&caml_shared_libs_path, q);
+      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
       q = p + 1;
     }
   }
-  if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
+  if (q < p)
+    caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
   close(ldconf);
+  caml_stat_free(config);
   caml_stat_free(ldconfname);
-  return wconfig;
+  return;
 }
 
 /* Open the given shared library and add it to shared_libs.
@@ -164,7 +164,6 @@ void caml_build_primitive_table(char_os * lib_path,
                                 char_os * libs,
                                 char * req_prims)
 {
-  char_os * tofree1, * tofree2;
   char_os * p;
   char * q;
 
@@ -173,12 +172,12 @@ void caml_build_primitive_table(char_os * lib_path,
      - directories specified in the CAML_LD_LIBRARY_PATH
      - directories specified in the executable
      - directories specified in the file <stdlib>/ld.conf */
-  tofree1 = caml_decompose_path(&caml_shared_libs_path,
-                                caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
+  caml_decompose_path(&caml_shared_libs_path,
+                      caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
   if (lib_path != NULL)
     for (p = lib_path; *p != 0; p += strlen_os(p) + 1)
-      caml_ext_table_add(&caml_shared_libs_path, p);
-  tofree2 = caml_parse_ld_conf();
+      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_os(p));
+  caml_parse_ld_conf();
   /* Open the shared libraries */
   caml_ext_table_init(&shared_libs, 8);
   if (libs != NULL)
@@ -199,9 +198,7 @@ void caml_build_primitive_table(char_os * lib_path,
 #endif
   }
   /* Clean up */
-  caml_stat_free(tofree1);
-  caml_stat_free(tofree2);
-  caml_ext_table_free(&caml_shared_libs_path, 0);
+  caml_ext_table_free(&caml_shared_libs_path, 1);
 }
 
 /* Build the table of primitives as a copy of the builtin primitive table.
