@@ -763,3 +763,10 @@ let parse_arguments ?(current=ref 0) argv f program =
         Printf.sprintf "Usage: %s <options> <files>\nOptions are:" program in
       Printf.printf "%s\n%s" help_msg err_msg;
       raise (Exit_with_status 0)
+
+let set_caml_standard_library_default () =
+  let symbol = "caml_standard_library_default" in
+  if not (List.exists (fun (name, _) -> name = symbol)
+                      !global_string_constants) then
+    global_string_constants :=
+      (symbol, Config.standard_library_effective) :: !global_string_constants
