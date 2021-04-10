@@ -1,6 +1,15 @@
 OCaml 5.3 maintenance version
 -----------------------------
 
+### Runtime system:
+
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
+### Bug fixes:
+
 - #14007, #14015: Fix memory corruption when an exception is raised during
   demarshaling.
   (Benoît Vaugon, review by David Allsopp and Gabriel Scherer)
