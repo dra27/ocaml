@@ -3365,7 +3365,7 @@ fi
 if test "${with_target_bindir+set}" = set; then :
   withval=$with_target_bindir; target_bindir=$withval
 else
-  target_bindir='$(BINDIR)'
+  target_bindir=''
 fi
 
 
