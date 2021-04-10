@@ -34,8 +34,14 @@ CAMLnoret CAMLextern void caml_sys_io_error (value);
 
 CAMLextern double caml_sys_time_unboxed(value);
 CAMLextern void caml_sys_init (const char_os * exe_name, char_os ** argv);
+CAMLextern void caml_locate_standard_library (const char_os *);
 
 CAMLnoret CAMLextern void caml_do_exit (int);
+
+extern char_os * caml_standard_library_default;
+extern char_os * caml_standard_library_relative;
+extern char_os * caml_standard_library;
+extern char_os *_Atomic caml_relative_root_dir;
 
 #ifdef __cplusplus
 }
