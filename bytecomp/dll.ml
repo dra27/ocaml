@@ -121,7 +121,16 @@ let ld_conf_contents dir =
     let ic = open_in (Filename.concat dir "ld.conf") in
     begin try
       while true do
-        path := Misc.Stdlib.String.rtrim_cr (input_line ic) :: !path
+        let entry = Misc.Stdlib.String.rtrim_cr (input_line ic) in
+        let entry =
+          if entry = Filename.current_dir_name
+          || entry = Filename.parent_dir_name
+          || Filename.is_relative entry && not (Filename.is_implicit entry) then
+            Filename.concat Config.standard_library entry
+          else
+            entry
+        in
+        path := entry :: !path
       done
     with End_of_file -> ()
     end;
