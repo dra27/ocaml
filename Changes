@@ -4,7 +4,8 @@ OCaml 4.14.0
 
 - #10???: Bytecode loads ld.conf from all of $OCAMLLIB/ld.conf, $CAMLLIB/ld.conf
   and standard_library_default/ld.conf rather than just the first one of these
-  encountered.
+  encountered. CRLF-formatted ld.conf files are correctly loaded on Unix as well
+  as Windows.
   (David Allsopp, review by ???)
 
 ### Build system:
