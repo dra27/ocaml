@@ -146,7 +146,7 @@ let ld_conf_contents () =
     let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
     begin try
       while true do
-        path := input_line ic :: !path
+        path := Misc.Stdlib.String.rtrim_cr (input_line ic) :: !path
       done
     with End_of_file -> ()
     end;
