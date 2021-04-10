@@ -273,7 +273,8 @@ unix_b.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_b.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -588,7 +589,8 @@ unix_bd.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_bd.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -908,7 +910,8 @@ unix_bi.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_bi.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -1223,7 +1226,8 @@ unix_bpic.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 bigarray_bpic.$(O): bigarray.c caml/alloc.h caml/misc.h caml/config.h caml/m.h \
  caml/s.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/bigarray.h caml/custom.h caml/fail.h caml/intext.h caml/io.h \
@@ -1439,7 +1443,8 @@ unix_n.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_n.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -1752,7 +1757,8 @@ unix_nd.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_nd.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -2065,7 +2071,8 @@ unix_ni.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_ni.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \
@@ -2378,7 +2385,8 @@ unix_npic.$(O): unix.c caml/config.h caml/m.h caml/s.h caml/fail.h caml/misc.h \
  caml/config.h caml/mlvalues.h caml/domain_state.h caml/domain_state.tbl \
  caml/memory.h caml/gc.h caml/major_gc.h caml/freelist.h caml/minor_gc.h \
  caml/address_class.h caml/domain.h caml/misc.h caml/osdeps.h \
- caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h
+ caml/memory.h caml/signals.h caml/sys.h caml/io.h caml/alloc.h \
+ caml_internal_config.h
 printexc_npic.$(O): printexc.c caml/backtrace.h caml/mlvalues.h caml/config.h \
  caml/m.h caml/s.h caml/misc.h caml/domain_state.h caml/domain_state.tbl \
  caml/exec.h caml/callback.h caml/debugger.h caml/fail.h caml/misc.h \

@@ -650,10 +650,12 @@ CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
 
   eff = caml_copy_string_of_os(stdlib);
   if (root == NULL) {
-    root_dir = Val_none;
+    root_dir = Val_int(0);
   } else {
     root_dir = caml_copy_string_of_os(root);
-    root_dir = caml_alloc_some(root_dir);
+    result = caml_alloc_small(1, 0);
+    Field(result, 0) = root_dir;
+    root_dir = result;
   }
   result = caml_alloc_small(2, 0);
   Field(result, 0) = eff;
