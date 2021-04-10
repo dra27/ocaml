@@ -154,10 +154,12 @@ extern value caml_copy_string_of_utf16(const wchar_t *s);
 extern int caml_win32_isatty(int fd);
 
 #define CAML_DIR_SEP T("\\")
+#define Is_dir_separator(c) (c == '\\' || c == '/')
 
 #else
 
 #define CAML_DIR_SEP "/"
+#define Is_dir_separator(c) (c == '/')
 
 #endif /* _WIN32 */
 
