@@ -105,3 +105,6 @@ val bytecc_libs : string
 val nativecc_libs : string
 
 val windows_unicode : bool
+
+val has_relative_libdir : bool
+(** Whether the compiler has been configured using --with-relative-libdir *)
