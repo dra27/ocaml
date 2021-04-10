@@ -46,6 +46,12 @@ OCaml 5.1.2
   bytecode from the executable itself, rather than first trying `argv[0]`.
   (David Allsopp, review by ???)
 
+### Tools:
+
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Build system:
 
 * #12751: --with-target-bindir configure option implemented. This option
