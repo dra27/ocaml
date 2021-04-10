@@ -381,7 +381,7 @@ static const char_os * get_stdlib_location(void)
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_standard_library_default;
+  if (stdlib == NULL) stdlib = caml_standard_library_effective;
   return stdlib;
 }
 
@@ -433,7 +433,7 @@ static void do_print_config(void)
   puts("shared_libs_path:");
   caml_decompose_path(&caml_shared_libs_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
-  caml_parse_ld_conf(caml_standard_library_default, &caml_shared_libs_path);
+  caml_parse_ld_conf(caml_standard_library_effective, &caml_shared_libs_path);
   for (int i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
     if (dir[0] == 0)
