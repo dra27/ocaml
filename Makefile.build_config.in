@@ -68,6 +68,7 @@ DOCDIR=@docdir@
 
 ### Where to look for the standard library on target
 TARGET_LIBDIR=@TARGET_LIBDIR@
+TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
 
 # Expanded form of MKEXE_EXP and MKDLL_EXP _with host flexlink command_
