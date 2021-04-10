@@ -84,6 +84,7 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 bindir_to_libdir=''
+relocatable=no
 
 # Information about the package
 
@@ -183,6 +184,7 @@ AC_SUBST([natdynlink])
 AC_SUBST([natdynlinkopts])
 AC_SUBST([natdynlink_archive])
 AC_SUBST([bindir_to_libdir])
+AC_SUBST([relocatable])
 AC_SUBST([cmxs])
 AC_SUBST([debug_runtime])
 AC_SUBST([instrumented_runtime])
@@ -2570,6 +2572,7 @@ AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
 
 AS_IF([test x"$enable_relative" = "xyes"],[
+  relocatable=yes
   OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
   dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
   dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS

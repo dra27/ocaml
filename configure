@@ -849,6 +849,7 @@ instrumented_runtime_libs
 instrumented_runtime
 debug_runtime
 cmxs
+relocatable
 bindir_to_libdir
 natdynlink_archive
 natdynlinkopts
@@ -3303,6 +3304,7 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 bindir_to_libdir=''
+relocatable=no
 
 # Information about the package
 
@@ -3370,6 +3372,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L034
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -20416,6 +20419,7 @@ fi
 if test x"$enable_relative" = "xyes"
 then :
 
+  relocatable=yes
 
   eval "from=\"\$bindir\""
   eval "to=\"\$libdir\""
