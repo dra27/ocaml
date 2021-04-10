@@ -87,6 +87,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _rectypes = ignore
   let _no_rectypes = ignore
   let _runtime_variant = ignore
+  let _set_runtime_default = ignore
   let _with_runtime = ignore
   let _without_runtime = ignore
   let _safe_string = ignore
