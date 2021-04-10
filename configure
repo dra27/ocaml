@@ -785,6 +785,7 @@ build_os
 build_vendor
 build_cpu
 build
+bindir_to_libdir
 ar_supports_response_files
 QS
 ocaml_libdir
@@ -1019,6 +1020,7 @@ enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
+enable_relative
 with_afl
 with_flexdll
 with_winpthreads_msvc
@@ -1721,6 +1723,8 @@ Optional Features:
   --disable-function-sections
                           do not emit each function in a separate section
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
+  --enable-relative       try to locate the standard library using relative
+                          paths
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3325,6 +3329,7 @@ ocamltest_libunix=None
 ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
+bindir_to_libdir=''
 
 # Information about the package
 
@@ -3474,6 +3479,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
 
 
 
@@ -4145,6 +4151,13 @@ fi
 if test ${enable_mmap_map_stack+y}
 then :
   enableval=$enable_mmap_map_stack;
+fi
+
+
+# Check whether --enable-relative was given.
+if test ${enable_relative+y}
+then :
+  enableval=$enable_relative;
 fi
 
 
@@ -20938,6 +20951,112 @@ fi
 if test x"$mandir" = x'${datarootdir}/man'
 then :
   mandir='${prefix}/man'
+fi
+
+if test x"$enable_relative" = "xyes"
+then :
+
+
+  eval "from=\"\$bindir\""
+  eval "to=\"\$libdir\""
+
+  if test -z ""
+then :
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking relative path between \$bindir and \$libdir" >&5
+printf %s "checking relative path between \$bindir and \$libdir... " >&6; }
+
+else $as_nop
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking relative path between $from and $to" >&5
+printf %s "checking relative path between $from and $to... " >&6; }
+
+fi
+
+
+  if test "x$from" = "x$to"
+then :
+
+    result='.'
+
+else $as_nop
+
+        echo "$from" > conftest.from
+    echo "$to" > conftest.to
+    common_prefix_len="$(cmp -l conftest.from conftest.to 2>/dev/null \
+                           | head -n 1 \
+                           | sed -e 's/^ *//' \
+                           | cut -d ' ' -f 1)"
+    common_prefix="$(expr $common_prefix_len - 1)"
+    if test $common_prefix -eq 0
+then :
+
+      result=''
+      if test -z ""
+then :
+  as_fn_error $? "no common prefix" "$LINENO" 5
+fi
+
+else $as_nop
+
+      common_prefix="$(echo "$from" | cut -c -$common_prefix)"
+
+                        from_chopped="$(echo "$from" | cut -c $common_prefix_len-)"
+      to_chopped="$(echo "$to" | cut -c $common_prefix_len-)"
+      if test "x${common_prefix}" = "x${from}" && \
+             test -z "${to_chopped##/*}"
+then :
+
+        result=".$to_chopped"
+
+elif test "y${common_prefix}" = "x${to}" && \
+       test -z "${from_chopped##/*}"
+then :
+
+        echo "Here with $from_chopped and $to_chopped but confused"
+        exit 1
+
+else $as_nop
+
+                                        if test "x${common_prefix}" = "x${to}" && \
+               test -z "${from_chopped##/*}"
+then :
+
+          common_prefix=$(echo "$common_prefix/" | wc -c)
+
+else $as_nop
+
+          common_prefix=$(echo "${common_prefix%/*}/" | wc -c)
+
+fi
+                get_from="$(echo "$from" | cut -c $common_prefix-)"
+        get_to="$(echo "$to" | cut -c $common_prefix-)"
+                                result=''
+        while test "$get_from" != '.' ; do
+          result="../$result"
+          get_from="$(dirname "$get_from")"
+        done
+        if test -z "$get_to"
+then :
+
+          result="${result%/}"
+
+else $as_nop
+
+          result="$result$get_to"
+
+fi
+
+fi
+
+fi
+
+fi
+  eval "bindir_to_libdir='$result'"
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $result" >&5
+printf "%s\n" "$result" >&6; }
+
+
 fi
 
 # Define default prefix correctly for the different Windows ports
