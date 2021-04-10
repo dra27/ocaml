@@ -18,9 +18,23 @@
 (* This file is included in config_main.ml during the build rather
    than compiled on its own *)
 
-let bindir = {@QS@|@ocaml_bindir@|@QS@}
+external stdlib_dirs : unit -> string * string * string option
+   = "caml_sys_get_stdlib_dirs"
 
-let standard_library_default = {@QS@|@ocaml_libdir@|@QS@}
+let (standard_library_default,
+     standard_library_effective,
+     relative_root_dir) = stdlib_dirs ()
+
+let bindir =
+  let default =
+    if {@QS@|@bindir_to_libdir@|@QS@} = "" then
+      {@QS@|@bindir@|@QS@}
+    else
+      ""
+  in
+  Option.value ~default relative_root_dir
+
+let standard_library_relative = relative_root_dir <> None
 
 let ccomp_type = {@QS@|@ccomptype@|@QS@}
 let c_compiler = {@QS@|@CC@|@QS@}
