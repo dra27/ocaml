@@ -35,6 +35,7 @@
 #include "caml/osdeps.h"
 #include "caml/prims.h"
 #include "caml/signals.h"
+#include "caml/sys.h"
 
 #include "build_config.h"
 
@@ -82,7 +83,7 @@ CAMLexport char_os * caml_get_stdlib_location(void)
   char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
+  if (stdlib == NULL) stdlib = caml_standard_library;
   return stdlib;
 }
 

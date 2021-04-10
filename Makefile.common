@@ -110,6 +110,15 @@ ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
 
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
+
 # Escape special characters in the argument string.
 # There are four characters that need escaping:
 # - backslash and ampersand, which are special in the replacement text

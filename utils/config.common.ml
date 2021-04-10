@@ -26,7 +26,7 @@ let standard_library =
   try
     Sys.getenv "CAMLLIB"
   with Not_found ->
-    standard_library_default
+    standard_library_effective
 
 let exec_magic_number = "Caml1999X032"
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
@@ -80,7 +80,7 @@ let configuration_variables =
   let p_bool x v = (x, Bool v) in
 [
   p "version" version;
-  p "standard_library_default" standard_library_default;
+  p "standard_library_default" standard_library_effective;
   p "standard_library" standard_library;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
