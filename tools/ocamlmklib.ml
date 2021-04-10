@@ -31,10 +31,19 @@ let mklib out files opts =
   else Printf.sprintf "%s rcs %s %s %s && %s %s"
                       Config.ar out opts files Config.ranlib out
 
-(* PR#4783: under Windows, don't use absolute paths because we do
-   not know where the binary distribution will be installed. *)
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default = standard_library_default ()
+
+external stdlib_dirs : string -> string * string option
+   = "caml_sys_get_stdlib_dirs"
+
+let _, relative_root_dir = stdlib_dirs standard_library_default
+
+let bindir = Option.value ~default:bindir relative_root_dir
+
 let compiler_path name =
-  if Sys.os_type = "Win32" then name else Filename.concat bindir name
+  Filename.concat bindir name
 
 let bytecode_objs = ref []  (* .cmo,.cma,.ml,.mli files to pass to ocamlc *)
 and native_objs = ref []    (* .cmx,.ml,.mli files to pass to ocamlopt *)

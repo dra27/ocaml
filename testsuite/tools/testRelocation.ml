@@ -171,22 +171,10 @@ let libdir_rules config file =
       if basename = "Makefile.config" then
         (* Embeds the Standard Library location *)
         (Some false, false, false, false)
-      else if basename = "config.cmx"
-              || basename = "dynlink_compilerlibs.cmx" then
-        (* Unknown bug in 4.x flambda - the inlining information for MSVC and
-           mingw-w64 appears to be corrupt. Prior to the addition of
-           Config.bindir in #10204 in 4.13, flambda didn't embed the prefix. The
-           conditions under which flambda does include any of these constants in
-           the .cmx file are also heavily dependent on the code itself. For this
-           reason, in flambda mode, we make the appearance of the prefix in
-           these two files an optional expectation in flambda mode. *)
-        (Some Config.flambda, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
-        let stdlib = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "dynlink.cma"; "ocamlcommon.cma"] in
         (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
         let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
-        (not_optionally stdlib, has_ocaml_debug_info, false, false)
+        (None, has_ocaml_debug_info, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
         let stdlib = (basename = "camlheader") in
         (not_optionally stdlib, false, false, false)
@@ -226,19 +214,13 @@ let libdir_rules config file =
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
             Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
-          (* Config.standard_library is in ocamlcommon and the bytecode runtime
-             embeds the Standard Library location *)
-          let stdlib =
-            Filename.remove_extension basename = "dynlink"
-            || Filename.remove_extension basename = "ocamlcommon"
-          in
           let c_debug =
             compiled_with_debug && not is_ocaml
           in
           let is_ocaml =
             compiled_with_debug && is_ocaml
           in
-          (not_optionally stdlib, false, c_debug, is_ocaml)
+          (None, false, c_debug, is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
