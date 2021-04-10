@@ -1230,28 +1230,17 @@ let () =
       in
       if code = 0 then
         let lines =
-          (* Known issue: Sys.getenv processes blank environment variables
-             differently from _wgetenv which in the tests will cause it load
-             ld.conf files *)
-          if Sys.win32 then
-            if (test.camllib = Empty && original || test.ocamllib = Empty) then
-              let unmask s = not (String.starts_with ~prefix:"masked-" s) in
-              let lines' = List.filter unmask lines in
-              if lines = lines' then
-                "poisoned"::lines
-              else
-                lines'
-            else
-              lines
-          else
-            lines
-        in
-        let lines =
           (* Known issue: ocamlc opens ld.conf in text mode on Cygwin but
              ocamlrun opens it in binary mode (the default) *)
           match test.stdlib with
           | "\r" :: _ when Sys.cygwin && lines <> [] ->
-              "\r" :: List.map (Fun.flip (^) "\r") (List.tl lines)
+              (* This all gets a bit silly until CRLF is consistently
+                 handled! *)
+              let lines =
+                "" :: List.take 2 (List.tl lines)
+                  @ ["."; ".."] @ List.drop 5 lines
+              in
+              List.map (Fun.flip (^) "\r") lines
           | _ ->
               lines
         in
@@ -1647,6 +1636,13 @@ let test_ld_conf ~original env bindir libdir =
       in
       {base with description; caml_ld_library_path = Empty;
        stdlib = ["ld.conf"]; outcome} :: tests in
+    let outcome =
+      (* ocamlrun can't find ld.conf after the prefix has been renamed *)
+      if original then
+        ["masked-stdlib"]
+      else
+        []
+    in
     let tests =
       let description = "Embedded empty entry in CAML_LD_LIBRARY_PATH" in
       (* Embedded empty entries in CAML_LD_LIBRARY_PATH should add equivalent
@@ -1669,35 +1665,41 @@ let test_ld_conf ~original env bindir libdir =
        stdlib = ["ld.conf"]; outcome} :: tests in
     let tests =
       let description = "Empty CAMLLIB" in
-      (* An empty CAMLLIB should cause ld.conf in the Standard Library to be
-         ignored, but not CAML_LD_LIBRARY PATH *)
+      (* An empty CAMLLIB shouldn't hide ld.conf in the Standard Library *)
       {base with description;
        caml_ld_library_path = Set ["env"]; camllib = Empty;
-       stdlib = ["masked-stdlib"]; outcome = ["env"]} :: tests in
+       stdlib = ["masked-stdlib"]; outcome = "env" :: outcome} :: tests in
     let tests =
       let description = "Empty OCAMLLIB" in
-      (* An empty OCAMLLIB should cause ld.conf in both the Standard Library and
-         CAMLLIB to be ignored, but not CAML_LD_LIBRARY_PATH *)
+      (* An empty OCAMLLIB shouldn't hide ld.conf in either the Standard Library
+         or CAMLLIB\ld.conf *)
       {description; caml_ld_library_path = Set ["env"]; ocamllib = Empty;
        camllib = Set ["masked-camllib"]; stdlib = ["masked-stdlib"];
-       outcome = ["env"]} :: tests in
+       outcome = "env" :: "masked-camllib" :: outcome} :: tests in
     tests
   in
   (* Batch 3: load priority, embedded NUL characters, EOL-at-EOF, etc. *)
   let tests =
+    let outcome =
+      (* ocamlrun can't find ld.conf after the prefix has been renamed *)
+      if original then
+        ["libdir"]
+      else
+        []
+    in
     let tests =
       let description = "$OCAMLLIB/ld.conf" in
       (* OCAMLLIB should have priority over CAMLLIB and the Standard Library *)
       {description; caml_ld_library_path = Set ["env"];
        ocamllib = Set ["ocamllib\000"; "hidden"];
        camllib = Set ["camllib\000"; "hidden"]; stdlib = ["libdir"];
-       outcome = ["env"; "ocamllib"]} :: tests in
+       outcome = "env" :: "ocamllib" :: "camllib" :: outcome} :: tests in
     let tests =
       (* CAMLLIB should have priority over the Standard Library *)
       let description = "$CAMLLIB/ld.conf" in
       {base with description; caml_ld_library_path = Set ["env"];
        camllib = Set ["camllib\000"; "hidden"]; stdlib = ["libdir"];
-       outcome = ["env"; "camllib"]} :: tests in
+       outcome = "env" :: "camllib" :: outcome} :: tests in
     let tests =
       (* EOL-at-EOF should not add a blank entry to the search path *)
       let description = "EOL-at-EOF" in
