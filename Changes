@@ -56,6 +56,12 @@ OCaml 4.13 maintenance branch
   bytecode from the executable itself, rather than first trying `argv[0]`.
   (David Allsopp, review by ???)
 
+### Tools:
+
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
