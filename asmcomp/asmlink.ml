@@ -335,6 +335,7 @@ let link ~ppf_dump objfiles output_name =
     let obj_infos = List.map read_file objfiles in
     let ldeps = Linkdeps.create ~complete:true in
     let units_tolink = List.fold_right (scan_file ldeps) obj_infos [] in
+    Compenv.set_caml_standard_library_default ();
     (match Linkdeps.check ldeps with
      | None -> ()
      | Some e -> raise (Error (Link_error e)));
