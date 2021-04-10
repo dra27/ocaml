@@ -30,8 +30,12 @@ Working version
   and RISC-V.  This reduces minor GC work in the presence of deep call stacks.
   (Xavier Leroy, review by Miod Vallat, Gabriel Scherer and Olivier Nicole)
 
-- #14???: Executables linked with `ocamlc -custom` now always attempt to load
-  bytecode from the executable itself, rather than first trying `argv[0]`.
+- #14???: Added --with-relative-bindir which allows the runtime and the
+  compilers to locate the Standard Library relative to where the binaries
+  themselves are installed, removing the absolute path previously embedded in
+  caml_standard_library_default. Executables linked with `ocamlc -custom` now
+  always attempt to load bytecode from the executable itself, rather than first
+  trying `argv[0]`.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:

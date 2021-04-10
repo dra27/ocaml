@@ -176,6 +176,11 @@ ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
 
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+OC_COMMON_LINKFLAGS += \
+-set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
+endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
