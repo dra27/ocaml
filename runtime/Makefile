@@ -257,14 +257,18 @@ C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
 build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+ifneq "$(LIBDIR_REL)" ""
+	echo '#define OCAML_STDLIB_DIR_REL $(call C_LITERAL,$(LIBDIR_REL))' \
+	       >> $@
+endif
 	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
 
-ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
+ocamlrun$(EXE): prims.$(O) stdlib.$(O) libcamlrun.$(A)
 	$(MKEXE) -o $@ $^ $(LIBS)
 
-ocamlruns$(EXE): prims.$(O) libcamlrun_non_shared.$(A)
+ocamlruns$(EXE): prims.$(O) stdlib.$(O) libcamlrun_non_shared.$(A)
 	$(call MKEXE_BOOT,$@,$^ $(LIBS))
 
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
@@ -273,13 +277,13 @@ libcamlrun.$(A): $(libcamlrun_OBJECTS)
 libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
+ocamlrund$(EXE): prims.$(O) stdlib.$(O) libcamlrund.$(A)
 	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(LIBS)
 
 libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlruni$(EXE): prims.$(O) libcamlruni.$(A)
+ocamlruni$(EXE): prims.$(O) stdlib.$(O) libcamlruni.$(A)
 	$(MKEXE) -o $@ $^ $(LIBS)
 
 libcamlruni.$(A): $(libcamlruni_OBJECTS)
@@ -322,6 +326,8 @@ libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
 
 %_npic.$(O): OC_CFLAGS += $(SHAREDLIB_CFLAGS)
 %_npic.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
+
+stdlib.$(O): build_config.h
 
 # Compilation of C files
 
