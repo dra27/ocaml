@@ -785,6 +785,7 @@ build_os
 build_vendor
 build_cpu
 build
+relocatable
 bindir_to_libdir
 ar_supports_response_files
 QS
@@ -3328,6 +3329,7 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 bindir_to_libdir=''
+relocatable=no
 
 # Information about the package
 
@@ -3477,6 +3479,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
 
 
 
@@ -14975,6 +14978,17 @@ then :
 
 fi
 
+       for ac_header in unistd.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "unistd.h" "ac_cv_header_unistd_h" "$ac_includes_default"
+if test "x$ac_cv_header_unistd_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_UNISTD_H 1" >>confdefs.h
+ printf "%s\n" "#define HAS_UNISTD 1" >>confdefs.h
+
+fi
+
+done
 ac_fn_c_check_header_compile "$LINENO" "pthread_np.h" "ac_cv_header_pthread_np_h" "$ac_includes_default"
 if test "x$ac_cv_header_pthread_np_h" = xyes
 then :
@@ -20954,6 +20968,7 @@ fi
 if test x"$enable_relative" = "xyes"
 then :
 
+  relocatable=yes
 
   eval "from=\"\$bindir\""
   eval "to=\"\$libdir\""
