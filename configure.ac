@@ -65,6 +65,7 @@ profinfo_width=0
 extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
+bindir_to_libdir=''
 
 # Information about the package
 
@@ -170,6 +171,7 @@ AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
 AC_SUBST([target_bindir])
+AC_SUBST([bindir_to_libdir])
 
 ## Generated files
 
@@ -383,6 +385,10 @@ AC_ARG_ENABLE([function-sections],
     [do not emit each function in a separate section])],
   [],
   [enable_function_sections=auto])
+
+AC_ARG_ENABLE([relative],
+  [AS_HELP_STRING([--enable-relative],
+    [try to locate the standard library using relative paths])])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
@@ -1838,6 +1844,35 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
+
+AS_IF([test x"$enable_relative" = "xyes"],
+  [AC_MSG_CHECKING([relative path between \$bindir and \$libdir])
+  echo "$bindir" > conftest.bindir
+  echo "$libdir" > conftest.libdir
+  # Get the offset of the first byte which differs between the two
+  common_prefix=`cmp -l conftest.bindir conftest.libdir 2>/dev/null \
+                | head -n 1 \
+                | sed -e 's/^ *//' \
+                | cut -d ' ' -f 1`
+  common_prefix=`expr $common_prefix - 1`
+  AS_IF([test $common_prefix -eq 0],[AC_MSG_ERROR([no common prefix])])
+  # Extract the prefix
+  common_prefix=`echo "$bindir" | cut -c -$common_prefix`
+  # Ensure it's a directory component only (/foo/bar and /foo/baz have
+  # /foo/ba in common)
+  common_prefix=`echo "${common_prefix%/*}/" | wc -c`
+  # Remove the prefix from each directory
+  get_from=`echo "$bindir" | cut -c $common_prefix-`
+  get_to=`echo "$libdir" | cut -c $common_prefix-`
+  # get_from is a relative path, so recursively calling dirname will eventually
+  # get us back to ".". Each call to dirname adds ../ to the result
+  bindir_to_libdir=''
+  while test "$get_from" != '.' ; do
+    bindir_to_libdir="../$bindir_to_libdir"
+    get_from=`dirname "$get_from"`
+  done
+  bindir_to_libdir="$bindir_to_libdir$get_to"
+  AC_MSG_RESULT([$bindir_to_libdir])])
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],

@@ -746,6 +746,7 @@ build_os
 build_vendor
 build_cpu
 build
+bindir_to_libdir
 target_bindir
 naked_pointers_checker
 naked_pointers
@@ -907,6 +908,7 @@ enable_warn_error
 enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
+enable_relative
 with_afl
 enable_shared
 enable_static
@@ -1587,6 +1589,8 @@ Optional Features:
                           do not use flat float arrays
   --disable-function-sections
                           do not emit each function in a separate section
+  --enable-relative       try to locate the standard library using relative
+                          paths
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -2798,6 +2802,7 @@ profinfo_width=0
 extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
+bindir_to_libdir=''
 
 # Information about the package
 
@@ -2897,6 +2902,7 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
  # TODO: rename this variable
+
 
 
 
@@ -3315,6 +3321,12 @@ if test "${enable_function_sections+set}" = set; then :
   enableval=$enable_function_sections;
 else
   enable_function_sections=auto
+fi
+
+
+# Check whether --enable-relative was given.
+if test "${enable_relative+set}" = set; then :
+  enableval=$enable_relative;
 fi
 
 
@@ -17202,6 +17214,40 @@ fi
 
 if test x"$mandir" = x'${datarootdir}/man'; then :
   mandir='${prefix}/man'
+fi
+
+if test x"$enable_relative" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking relative path between \$bindir and \$libdir" >&5
+$as_echo_n "checking relative path between \$bindir and \$libdir... " >&6; }
+  echo "$bindir" > conftest.bindir
+  echo "$libdir" > conftest.libdir
+  # Get the offset of the first byte which differs between the two
+  common_prefix=`cmp -l conftest.bindir conftest.libdir 2>/dev/null \
+                | head -n 1 \
+                | sed -e 's/^ *//' \
+                | cut -d ' ' -f 1`
+  common_prefix=`expr $common_prefix - 1`
+  if test $common_prefix -eq 0; then :
+  as_fn_error $? "no common prefix" "$LINENO" 5
+fi
+  # Extract the prefix
+  common_prefix=`echo "$bindir" | cut -c -$common_prefix`
+  # Ensure it's a directory component only (/foo/bar and /foo/baz have
+  # /foo/ba in common)
+  common_prefix=`echo "${common_prefix%/*}/" | wc -c`
+  # Remove the prefix from each directory
+  get_from=`echo "$bindir" | cut -c $common_prefix-`
+  get_to=`echo "$libdir" | cut -c $common_prefix-`
+  # get_from is a relative path, so recursively calling dirname will eventually
+  # get us back to ".". Each call to dirname adds ../ to the result
+  bindir_to_libdir=''
+  while test "$get_from" != '.' ; do
+    bindir_to_libdir="../$bindir_to_libdir"
+    get_from=`dirname "$get_from"`
+  done
+  bindir_to_libdir="$bindir_to_libdir$get_to"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $bindir_to_libdir" >&5
+$as_echo "$bindir_to_libdir" >&6; }
 fi
 
 case $host in #(
