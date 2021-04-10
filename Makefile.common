@@ -100,6 +100,13 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+OC_COMMON_LINKFLAGS += \
+-set-runtime-default 'standard_library_default=$(TARGET_LIBDIR)'
+else
+OC_COMMON_LINKFLAGS =
+endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
