@@ -329,6 +329,8 @@ libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
 %_npic.$(O): OC_CFLAGS += $(SHAREDLIB_CFLAGS)
 %_npic.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
 
+stdlib.$(O): build_config.h
+
 # Compilation of C files
 
 # The COMPILE_C_FILE macro below receives as argument the pattern
@@ -340,9 +342,6 @@ $(1).$(O): %.c
 endef
 
 object_types := % %_b %_bd %_bi %_bpic %_n %_nd %_ni %_np %_npic
-
-# Disable the default rule from Makefile.common
-%.$(O): %.c $(REQUIRED_HEADERS)
 
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type))))

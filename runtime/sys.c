@@ -618,10 +618,11 @@ CAMLprim value caml_sys_get_stdlib_dirs(value unit)
 #endif
   def = caml_copy_string_of_os(caml_standard_library_default);
   if (caml_relative_root_dir != NULL) {
-    root_dir = caml_copy_string_of_os(caml_relative_root_dir);
-    root_dir = caml_alloc_some(root_dir);
+    result = caml_copy_string_of_os(caml_relative_root_dir);
+    root_dir = caml_alloc_small(1, 0);
+    Field(root_dir, 0) = result;
   } else {
-    root_dir = Val_none;
+    root_dir = Val_int(0);
   }
   eff = caml_copy_string_of_os(caml_standard_library);
   result = caml_alloc_small(3, 0);
