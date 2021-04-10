@@ -38,6 +38,10 @@
 
 #include "build_config.h"
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 #ifndef NATIVE_CODE
 
 /* The table of primitives */
@@ -111,8 +115,8 @@ CAMLexport char_os * caml_parse_ld_conf(void)
     caml_secure_getenv(T("OCAMLLIB")),
     caml_secure_getenv(T("CAMLLIB")),
     OCAML_STDLIB_DIR};
-  char_os * libroot, * ldconfname, * wconfig, * p, * q;
-  char_os last, * entry, * result;
+  char_os * libroot, * ldconfname, * wconfig, * p, * q, * r;
+  char_os * entry, * result;
   char * config;
 #ifdef _WIN32
   struct _stati64 st;
@@ -139,7 +143,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
         caml_stat_free(libroot);
         continue;
       }
-      ldconf = open_os(ldconfname, O_RDONLY, 0);
+      ldconf = open_os(ldconfname, O_RDONLY | O_BINARY, 0);
       if (ldconf == -1)
         caml_fatal_error("cannot read loader config file %s",
                              caml_stat_strdup_of_os(ldconfname));
@@ -158,14 +162,19 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       p = wconfig;
       while (*p != '\0') {
         for (q = p; *q != '\0' && *q != '\n'; q++) /*nothing*/;
-        last = *q;
+        r = q;
+        if (*q == '\n') {
+          r++;
+          /* Ignore any trailing CR characters, so that CR*LF is uniformly
+             treated as a single LF. */
+          while (q > p && *(q - 1) == '\r')
+            q--;
+        }
         *q = '\0';
         entry = make_relative_path_absolute(p, libroot);
         length += strlen_os(entry) + 1;
         caml_ext_table_add(&entries, entry);
-        p = q;
-        if (last == '\n')
-          p++;
+        p = r;
       }
 
       caml_stat_free(wconfig);
