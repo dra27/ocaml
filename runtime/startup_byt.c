@@ -385,7 +385,7 @@ static void do_print_config(void)
   /* Print the runtime configuration */
   printf("version: %s\n", OCAML_VERSION_STRING);
   printf("standard_library_default: %s\n",
-         caml_stat_strdup_of_os(OCAML_STDLIB_DIR));
+         caml_stat_strdup_of_os(caml_standard_library_default));
   printf("standard_library: %s\n",
          caml_stat_strdup_of_os(caml_get_stdlib_location()));
   printf("int_size: %d\n", 8 * (int)sizeof(value));
