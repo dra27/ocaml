@@ -14342,6 +14342,13 @@ then :
 fi
 
 done
+ac_fn_c_check_header_compile "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
+if test "x$ac_cv_header_libgen_h" = xyes
+then :
+  printf "%s\n" "#define HAS_LIBGEN_H 1" >>confdefs.h
+
+fi
+
 ac_fn_c_check_header_compile "$LINENO" "stdint.h" "ac_cv_header_stdint_h" "$ac_includes_default"
 if test "x$ac_cv_header_stdint_h" = xyes
 then :
