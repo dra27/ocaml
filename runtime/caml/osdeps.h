@@ -47,8 +47,8 @@ extern int caml_read_fd(int fd, int flags, void * buf, int n);
 extern int caml_write_fd(int fd, int flags, void * buf, int n);
 
 /* Decompose the given path into a list of directories, and add them
-   to the given table. */
-extern char_os * caml_decompose_path(struct ext_table * tbl, char_os * path);
+   to the given table. entries added to tbl are strdup'd. */
+extern void caml_decompose_path(struct ext_table * tbl, char_os * path);
 
 /* Search the given file in the given list of directories.
    If not found, return a copy of [name]. */
