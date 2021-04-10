@@ -161,6 +161,11 @@ ___________
   runtime assertions.
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and David Allsopp)
 
+* #13???: Bytecode loads ld.conf from all of $OCAMLLIB/ld.conf, $CAMLLIB/ld.conf
+  and standard_library_default/ld.conf rather than just the first one of these
+  encountered.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #13014: Enable compile-time option -function-sections on all previously
