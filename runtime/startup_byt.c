@@ -381,7 +381,7 @@ static void do_print_config(void)
   /* Print the runtime configuration */
   printf("version: %s\n", OCAML_VERSION_STRING);
   printf("standard_library_default: %s\n",
-         caml_stat_strdup_of_os(OCAML_STDLIB_DIR));
+         caml_stat_strdup_of_os(caml_standard_library_default));
   printf("int_size: %d\n", 8 * (int)sizeof(value));
   printf("word_size: %d\n", 8 * (int)sizeof(value) - 1);
   printf("os_type: %s\n", OCAML_OS_TYPE);
@@ -496,10 +496,13 @@ CAMLexport void caml_main(char_os **argv)
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-  if (fd < 0 && (proc_self_exe = caml_executable_name()) != NULL) {
+  proc_self_exe = caml_executable_name();
+  if (fd < 0 && proc_self_exe != NULL) {
     exe_name = proc_self_exe;
     fd = caml_attempt_open(&exe_name, &trail, 0);
   }
+
+  caml_locate_standard_library(proc_self_exe ? proc_self_exe : exe_name);
 
   if (fd < 0) {
     pos = parse_command_line(argv);
@@ -634,6 +637,7 @@ CAMLexport value caml_startup_code_exn(
   if (exe_name == NULL) exe_name = caml_search_exe_in_path(argv[0]);
   Caml_state->external_raise = NULL;
   caml_sys_init(exe_name, argv);
+  caml_locate_standard_library(exe_name);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   Caml_state->external_raise = NULL;

@@ -39,6 +39,12 @@ prefix_and_quote = $(if $(1), $(2)$(if $(word 2,$(1)),"$(1)",$(1)))
 FLEXLINK_LDFLAGS = $(call prefix_and_quote,$(OC_LDFLAGS),-link $(EMPTY))
 FLEXLINK_DLL_LDFLAGS = $(call prefix_and_quote,$(OC_DLL_LDFLAGS),-link $(EMPTY))
 
+ifeq "$(LIBDIR_REL)" ""
+  BINDIR_REL = $(BINDIR)
+else
+  BINDIR_REL =
+endif
+
 config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	sed $(call SUBST,AFL_INSTRUMENT) \
 	    $(call SUBST,ARCH) \
@@ -61,7 +67,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST_STRING,FLEXDLL_CHAIN) \
 	    $(call SUBST,HOST) \
-	    $(call SUBST_STRING,BINDIR) \
+	    $(call SUBST_STRING,BINDIR_REL) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL_EXP) \
 	    $(call SUBST_STRING,MKEXE_EXP) \
