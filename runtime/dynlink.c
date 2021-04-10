@@ -222,7 +222,7 @@ CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
   int i;
 #ifndef NATIVE_CODE
   if (stdlib_override)
-    stdlib = (char_os *)caml_runtime_standard_library_default;
+    stdlib = (char_os *)caml_runtime_standard_library_effective;
   else
 #endif
     stdlib = caml_stat_strdup_to_os(String_val(vstdlib));
