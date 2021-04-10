@@ -15,6 +15,9 @@ Working version
 
 ### Runtime system:
 
+- #11???: Only read ld.conf when there are DLLs to search for.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #8998, #11321, #11430: change mangling of OCaml long identifiers
