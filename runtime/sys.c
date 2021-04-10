@@ -689,7 +689,7 @@ CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
   char_os *root = NULL, *stdlib;
 
   stdlib =
-    caml_locate_standard_library(caml_params->exe_name, stdlib_default, &root);
+    caml_locate_standard_library(caml_exe_name, stdlib_default, &root);
 
   eff = caml_copy_string_of_os(stdlib);
   if (root == NULL) {
@@ -698,7 +698,9 @@ CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
     root_dir = caml_copy_string_of_os(root);
     root_dir = caml_alloc_some(root_dir);
   }
-  result = caml_alloc_2(0, eff, root_dir);
+  result = caml_alloc_small(2, 0);
+  Field(result, 0) = eff;
+  Field(result, 1) = root_dir;
 
   CAMLreturn(result);
 }
