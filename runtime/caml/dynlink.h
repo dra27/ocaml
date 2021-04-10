@@ -41,9 +41,6 @@ extern void caml_build_primitive_table_builtin(void);
 /* Unload all the previously loaded shared libraries */
 extern void caml_free_shared_libs(void);
 
-/* Return the effective location of the standard library */
-extern const char_os * caml_get_stdlib_location(void);
-
 /* Parse all the ld.conf files and add the lines read to caml_shared_libs_path.
    Returns a null-terminated array of pointers which requiring freeing when
    caml_shared_libs_path is finished with. */
