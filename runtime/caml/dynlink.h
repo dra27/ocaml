@@ -41,10 +41,9 @@ extern void caml_build_primitive_table_builtin(void);
 /* Unload all the previously loaded shared libraries */
 extern void caml_free_shared_libs(void);
 
-/* Parse all the ld.conf files and add the lines read to caml_shared_libs_path.
-   Returns a null-terminated array of pointers which requiring freeing when
-   caml_shared_libs_path is finished with. */
-extern char_os ** caml_parse_ld_conf(void);
+/* Parse all the ld.conf files and add the lines read to
+   caml_shared_libs_path */
+extern void caml_parse_ld_conf(void);
 
 #endif /* CAML_INTERNALS */
 
