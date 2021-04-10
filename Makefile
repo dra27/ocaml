@@ -44,7 +44,7 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -w +a-4-9-40-41-42-44-45-48-66-70 \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
-LINKFLAGS=
+LINKFLAGS=$(OC_COMMON_LINKFLAGS)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -353,7 +353,8 @@ endif
 flexlink.opt$(EXE):
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
-	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" flexlink.exe
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib \
+$(SET_RELATIVE_STDLIB)" flexlink.exe
 	mv $(FLEXDLL_SOURCES)/flexlink.exe $@
 
 partialclean::
@@ -958,15 +959,25 @@ testsuite/tools/test_in_prefix$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
     $(test_in_prefix_SOURCES))))
 	$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
-    -I otherlibs/$(UNIXLIB) -I compilerlibs \
+    -I otherlibs/$(UNIXLIB) -I compilerlibs $(TEST_IN_PREFIX_STDLIB) \
     $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
 
 testsuite/tools/test_in_prefix.opt$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
     $(test_in_prefix_SOURCES))))
 	$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
-    -I otherlibs/$(UNIXLIB) -I compilerlibs \
+    -I otherlibs/$(UNIXLIB) -I compilerlibs $(TEST_IN_PREFIX_STDLIB) \
     $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
+
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+# testsuite/tools/test_in_prefix cannot use a relative stdlib because it is run
+# from testsuite/tools, not from the installation tree (the alternative would be
+# to compile it directly with the installed compiler)
+TEST_IN_PREFIX_STDLIB = \
+  -set-runtime-default 'standard_library_default=$(LIBDIR)'
+else
+TEST_IN_PREFIX_STDLIB =
+endif
 
 partialclean::
 	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
