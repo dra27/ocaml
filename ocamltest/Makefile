@@ -203,7 +203,8 @@ ocamltest$(EXE): $(bytecode_modules)
 	$(ocamlc) -c $<
 
 ocamltest.opt$(EXE): $(native_modules)
-	$(ocamlopt_cmd) ocamlcommon.cmxa ocamlbytecomp.cmxa -o $@ $^
+	$(ocamlopt_cmd) $(DOTOPT_LINKFLAGS) \
+	                ocamlcommon.cmxa ocamlbytecomp.cmxa -o $@ $^
 
 %.cmx: %.ml
 	$(ocamlopt) -c $<

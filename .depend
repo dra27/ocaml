@@ -1675,6 +1675,7 @@ bytecomp/bytelink.cmo : \
     bytecomp/dll.cmi \
     utils/consistbl.cmi \
     utils/config.cmi \
+    driver/compenv.cmi \
     bytecomp/cmo_format.cmi \
     utils/clflags.cmi \
     utils/ccomp.cmi \
@@ -1693,6 +1694,7 @@ bytecomp/bytelink.cmx : \
     bytecomp/dll.cmx \
     utils/consistbl.cmx \
     utils/config.cmx \
+    driver/compenv.cmx \
     bytecomp/cmo_format.cmi \
     utils/clflags.cmx \
     utils/ccomp.cmx \
@@ -2455,6 +2457,7 @@ asmcomp/asmlink.cmo : \
     utils/consistbl.cmi \
     utils/config.cmi \
     asmcomp/compilenv.cmi \
+    driver/compenv.cmi \
     asmcomp/cmx_format.cmi \
     asmcomp/cmmgen.cmi \
     asmcomp/cmm.cmi \
@@ -2473,6 +2476,7 @@ asmcomp/asmlink.cmx : \
     utils/consistbl.cmx \
     utils/config.cmx \
     asmcomp/compilenv.cmx \
+    driver/compenv.cmx \
     asmcomp/cmx_format.cmi \
     asmcomp/cmmgen.cmx \
     asmcomp/cmm.cmx \
