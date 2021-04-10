@@ -266,6 +266,7 @@ AC_SUBST([ocaml_libdir])
 AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
+AC_SUBST([bindir_to_libdir])
 
 ## Generated files
 
@@ -616,6 +617,14 @@ AC_ARG_ENABLE([function-sections],
 AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
+
+AC_ARG_WITH([relative-libdir],
+  [AS_HELP_STRING([--with-relative-libdir],
+    [location of the Standard Library, specified relative to --bindir])],
+  [AS_IF([test x"$withval" = 'xno'],
+    [bindir_to_libdir=''],
+    [bindir_to_libdir="$withval"])],
+  [bindir_to_libdir=''])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
@@ -2783,7 +2792,15 @@ shlwapi.lib synchronization.lib"])
 AC_CONFIG_COMMANDS_PRE([cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"])
 
 AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
-  [libdir="$libdir"/ocaml])
+  [AS_IF([test x"$bindir_to_libdir" = 'x'],
+    [libdir="$libdir"/ocaml],
+    [AS_CASE([$bindir_to_libdir],
+      [./*|.\\*],[libdir="$bindir${bindir_to_libdir[#].}"],
+      [../*|..\\*],[libdir="$bindir$default_separator$bindir_to_libdir"],
+      [AC_MSG_ERROR([--with-relative-libdir requires a relative path])])])],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [AC_MSG_ERROR(m4_normalize([--with-relative-libdir and --libdir cannot both
+      be specified]))])])
 
 AS_IF([test x"$TARGET_LIBDIR" = x],
   [TARGET_LIBDIR="$libdir"])
