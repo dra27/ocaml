@@ -401,10 +401,9 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           let fails = (compilation_exit_code <> 0) in
           let runtime =
             mode = Bytecode && Installation.ocamlc_fails_after_rename config in
-          let stubs = with_unix && tendered in
           let stdlib = true in
           Environment.run_process Return
-            ~fails ~runtime ~stubs ~stdlib env compiler args
+            ~fails ~runtime ~stdlib env compiler args
         in
         Environment.display_output output;
         exit_code
