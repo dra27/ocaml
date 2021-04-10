@@ -1045,11 +1045,8 @@ let () =
   let expected_exit_code =
     (* Tendered OCaml bytecode executables have an increased reliance on
        caml_executable_name, and may need to be compiled with -custom under
-       certain configurations because they won't be able to find ld.conf (or
-       they can, but ld.conf will be incorrect). This never applies when the
-       prefix has been renamed, since CAML_LD_LIBRARY_PATH has to be set for
-       other reasons, and the problem is masked. *)
-    if mode = Bytecode && no_caml_executable_name && original
+       certain configurations because they won't be able to find ld.conf. *)
+    if mode = Bytecode && no_caml_executable_name
        && classify_executable test_program = Tendered then
       None
     else
@@ -2657,7 +2654,6 @@ let test_relocation env prefix bindir libdir =
       "compiler-libs" / "config.cmt";
       "compiler-libs" / "config_main.cmt";
       "expunge";
-      "ld.conf";
       "libcamlrun_shared" ^ Config.ext_dll;
       "Makefile.config";
     ] in
@@ -2779,7 +2775,7 @@ let () =
   in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
   let env =
-    let env = Shim {caml_ld_library_path; ocamllib} in
+    let env = Shim {caml_ld_library_path = None; ocamllib} in
     Environment.make ~env bindir libdir in
   Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests ~original:false env bindir libdir config.libraries in
