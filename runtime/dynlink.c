@@ -35,6 +35,7 @@
 #include "caml/osdeps.h"
 #include "caml/prims.h"
 #include "caml/signals.h"
+#include "caml/sys.h"
 
 #include "build_config.h"
 
@@ -181,10 +182,10 @@ CAMLexport void caml_parse_ld_conf(void)
   if (env_value != NULL && strlen_os(env_value) > 0
       && strcmp_os(env_value, locations[0]))
     locations[file_count++] = caml_stat_strdup_os(env_value);
-  /* Add OCAML_STDLIB_DIR if not equal to either */
-  if (strcmp_os(OCAML_STDLIB_DIR, locations[0])
-      || strcmp_os(OCAML_STDLIB_DIR, locations[1]))
-    locations[file_count++] = caml_stat_strdup_os(OCAML_STDLIB_DIR);
+  /* Add caml_standard_library if not equal to either */
+  if (strcmp_os(caml_standard_library, locations[0])
+      || strcmp_os(caml_standard_library, locations[1]))
+    locations[file_count++] = caml_stat_strdup_os(caml_standard_library);
 
   /* Load and parse all the ld.conf files */
   for (i = 0; i < file_count; i++) {
