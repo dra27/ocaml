@@ -81,12 +81,44 @@ static c_primitive lookup_primitive(const char * name)
 /* Parse the ld.conf file and add the directories
    listed there to the search path */
 
+Caml_inline char_os * filename_concat(const char_os * path1,
+                                      const char_os * path2)
+{
+  if (Is_dir_separator(path1[strlen_os(path1) - 1]))
+    return caml_stat_strconcat_os(2, path1, path2);
+  else
+    return caml_stat_strconcat_os(3, path1, CAML_DIR_SEP, path2);
+}
+
+static void add_ld_conf_entry(const char_os * root, char_os * dir)
+{
+  char_os * entry;
+  size_t len = strlen_os(dir);
+  /* Implicit paths, "." and ".." are treated relative to ld.conf */
+  if ((len == 1 && dir[0] == '.')
+      || (len == 2 && dir[0] == '.' && Is_dir_separator(dir[1]))) {
+    /* "." or "./" - add the directory containing ld.conf */
+    entry = caml_stat_strdup_os(root);
+  } else if (len >= 2 && dir[0] == '.' && dir[1] == '.'
+             && (len == 2 || Is_dir_separator(dir[2]))) {
+    /* ".." or "../<path...>" */
+    entry = filename_concat(root, dir);
+  } else if (len >= 2 && dir[0] == '.' && Is_dir_separator(dir[1])) {
+    /* "./<path...>" */
+    entry = filename_concat(root, dir + 2);
+  } else {
+    /* Absolute or implicit path */
+    entry = caml_stat_strdup_os(dir);
+  }
+  caml_ext_table_add(&caml_shared_libs_path, entry);
+}
+
 #define LD_CONF_NAME T("ld.conf")
 
 static void parse_ld_conf(const char_os *location)
 {
-  char_os * ldconfname;
-  char * config, * p, * q, * r;
+  char_os * ldconfname, * wconfig, * p, * q, * r;
+  char * config;
 #ifdef _WIN32
   #define OPEN_FLAGS _O_BINARY | _O_RDONLY
   struct _stati64 st;
@@ -112,11 +144,13 @@ static void parse_ld_conf(const char_os *location)
       ("error while reading loader config file %s",
        caml_stat_strdup_of_os(ldconfname));
   config[nread] = 0;
-  q = config;
-  for (p = config; *p != 0; p++) {
+  wconfig = caml_stat_strdup_to_os(config);
+  caml_stat_free(config);
+  q = wconfig;
+  for (p = wconfig; *p != 0; p++) {
     if (*p == '\n') {
       *p = 0;
-      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
+      add_ld_conf_entry(location, q);
       q = p + 1;
     } else if (*p == '\r') {
       r = p;
@@ -130,9 +164,9 @@ static void parse_ld_conf(const char_os *location)
     }
   }
   if (q < p)
-    caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
+    add_ld_conf_entry(location, q);
   close(ldconf);
-  caml_stat_free(config);
+  caml_stat_free(wconfig);
   caml_stat_free(ldconfname);
   return;
 }
