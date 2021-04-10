@@ -889,26 +889,14 @@ CAMLexport caml_stat_block caml_stat_calloc_noexc(asize_t num, asize_t sz)
   }
 }
 
-CAMLexport caml_stat_block caml_stat_memdup_noexc(const char *s, size_t slen)
+CAMLexport caml_stat_string caml_stat_strdup_noexc(const char *s)
 {
+  size_t slen = strlen(s);
   caml_stat_block result = caml_stat_alloc_noexc(slen + 1);
   if (result == NULL)
     return NULL;
   memcpy(result, s, slen + 1);
   return result;
-}
-
-CAMLexport caml_stat_block caml_stat_memdup(const char *s, size_t slen)
-{
-  caml_stat_block result = caml_stat_memdup_noexc(s, slen);
-  if (result == NULL)
-    caml_raise_out_of_memory();
-  return result;
-}
-
-CAMLexport caml_stat_string caml_stat_strdup_noexc(const char *s)
-{
-  return caml_stat_memdup_noexc(s, strlen(s));
 }
 
 CAMLexport caml_stat_string caml_stat_strdup(const char *s)
