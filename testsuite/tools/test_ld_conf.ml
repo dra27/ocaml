@@ -401,7 +401,7 @@ let ocamlrun_config env run_process _test =
     Harness.exe (Environment.in_test_root env "../tools/dump_load_path")
   in
   let code, lines =
-    run_process ~runtime:false ocamlrun ["-config"] in
+    run_process ~runtime:false ocamlrun [Environment.ocamlrun env] in
   if code = 0 then
     let strip s =
       let len = String.length s in
