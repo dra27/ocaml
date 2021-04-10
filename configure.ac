@@ -255,6 +255,7 @@ AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
+AC_SUBST([bindir_to_libdir])
 
 ## Generated files
 
@@ -606,6 +607,14 @@ AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
 
+AC_ARG_WITH([relative-libdir],
+  [AS_HELP_STRING([--with-relative-libdir],
+    [location of the Standard Library, specified relative to --bindir])],
+  [AS_IF([test x"$withval" = 'xno'],
+    [bindir_to_libdir=''],
+    [bindir_to_libdir="$withval"])],
+  [bindir_to_libdir=''])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -843,7 +852,7 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+  [printf '%s\n%s\000\n' "$launch_method" "$HOST_BINDIR" \
     > stdlib/runtime.info
   printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info],
@@ -854,7 +863,7 @@ dnl nefarious single quotes which may appear in any of the strings.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
-  ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
+  HOST_BINDIR='$(echo "$HOST_BINDIR" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
 # Are we building a cross-compiler
@@ -2701,6 +2710,23 @@ AS_IF([test x"$prefix" = "xNONE"],
     [AS_CASE([$build],
       [*-pc-cygwin], [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"])])])
 
+ocaml_libdir="$libdir"
+AS_IF([test x"$libdir" = x'${exec_prefix}/lib/ocaml'],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [ocaml_libdir="$bindir_to_libdir"
+    AS_CASE([$cygwin_build_env,$host],
+      [true,*-w64-mingw32*|true,*-pc-windows],
+        [build_bindir_to_libdir="$(LC_ALL=C.UTF-8 cygpath \
+                                   "$bindir_to_libdir")"],
+      [build_bindir_to_libdir="$bindir_to_libdir"])
+    AS_CASE([$build_bindir_to_libdir],
+      [./*],[libdir="$bindir${build_bindir_to_libdir[#].}"],
+      [../*],[libdir="$bindir/$build_bindir_to_libdir"],
+      [AC_MSG_ERROR([--with-relative-libdir requires a relative path])])])],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [AC_MSG_ERROR(m4_normalize([--with-relative-libdir and --libdir cannot both
+      be specified]))])])
+
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
 # (all this should be understood and fixed)
@@ -2729,9 +2755,15 @@ AC_CONFIG_COMMANDS_PRE([
   AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
   AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
   eval "exec_prefix=\"$exec_prefix\""
-  eval "ocaml_bindir=\"$bindir\""
-  eval "ocaml_libdir=\"$libdir\""
-  AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
+  eval "HOST_BINDIR=\"$bindir\""
+  AS_IF([test "x$bindir_to_libdir" = "x"],
+    [ocaml_bindir="$HOST_BINDIR"],
+    [ocaml_bindir=''])
+  AS_IF([test x"$TARGET_BINDIR" = 'x'],
+    [AS_IF([test "x$bindir_to_libdir" = "x"],
+      [TARGET_BINDIR="$HOST_BINDIR"],
+      [TARGET_BINDIR='.'])])
+  eval "ocaml_libdir=\"$ocaml_libdir\""
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"
