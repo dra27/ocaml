@@ -1890,8 +1890,9 @@ ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
 # testsuite/tools/test_in_prefix cannot use a relative stdlib because it is run
 # from testsuite/tools, not from the installation tree (the alternative would be
 # to compile it directly with the installed compiler)
-test_in_prefix_NATIVE_LINKFLAGS =
-test_in_prefix_COMMON_LINKFLAGS = \
+testsuite/tools/test_in_prefix$(EXE): OC_COMMON_LINKFLAGS += \
+  -set-runtime-default 'standard_library_default=$(LIBDIR)'
+testsuite/tools/test_in_prefix.opt$(EXE): OC_COMMON_LINKFLAGS += \
   -set-runtime-default 'standard_library_default=$(LIBDIR)'
 endif
 
