@@ -1240,7 +1240,6 @@ let run (config : Installation.t) env mode =
       Environment.run_process Return
         ~fails:(expected_exit_code <> 0)
         ~runtime:(mode = Bytecode && not config.launcher_searches_for_ocamlrun)
-        ~stubs:(mode = Bytecode && has_c_stubs)
         ~stdlib:true env toplevel args
     in
     Environment.display_output output;
@@ -2467,10 +2466,9 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           let fails = (compilation_exit_code <> 0) in
           let runtime =
             mode = Bytecode && Installation.ocamlc_fails_after_rename config in
-          let stubs = with_unix && tendered in
           let stdlib = true in
           Environment.run_process Return
-            ~fails ~runtime ~stubs ~stdlib env compiler args
+            ~fails ~runtime ~stdlib env compiler args
         in
         Environment.display_output output;
         exit_code
@@ -3137,9 +3135,7 @@ let run ~reproducible (config : Installation.t) env =
            ~ocaml_debug:has_ocaml_debug_info,
            ~c_debug:contains_c_debug_info,
            ~s:contains_assembled_objects) =
-        if List.mem basename ["Makefile.config";
-                              "ld.conf";
-                              "runtime-launch-info"] then
+        if basename = "Makefile.config" || basename = "runtime-launch-info" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if basename = "config.cmx" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
