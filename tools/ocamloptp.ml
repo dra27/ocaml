@@ -122,6 +122,7 @@ module Options = Main_args.Make_optcomp_options (struct
   let _no_rectypes = option "-no-rectypes"
   let _remove_unused_arguments = option "-remove-unused-arguments"
   let _runtime_variant s = option_with_arg "-runtime-variant" s
+  let _set_runtime_default s = option_with_arg "-set-runtime-default" s
   let _S = option "-S"
   let _safe_string = option "-safe-string"
   let _short_paths = option "-short-paths"
