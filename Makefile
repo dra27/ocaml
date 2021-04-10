@@ -421,7 +421,8 @@ endif
 flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
-	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" -B flexlink.exe
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib \
+$(SET_RELATIVE_STDLIB)" -B flexlink.exe
 	cp $(FLEXDLL_SOURCES)/flexlink.exe $@
 
 partialclean::
@@ -854,7 +855,8 @@ runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 
 C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
 
-runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
+runtime/build_config.h: $(ROOTDIR)/Makefile.config \
+                        $(ROOTDIR)/Makefile.build_config $(SAK)
 	$(V_GEN){ \
 	  echo '/* This file is generated from $(ROOTDIR)/Makefile.config */'; \
 	  printf '#define OCAML_STDLIB_DIR %s\n' \
@@ -1261,15 +1263,25 @@ testsuite/tools/test_in_prefix$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
     $(test_in_prefix_SOURCES))))
 	$(V_OCAMLC)$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
-    -I otherlibs/unix -I compilerlibs \
+    -I otherlibs/unix -I compilerlibs $(TEST_IN_PREFIX_STDLIB) \
     $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
 
 testsuite/tools/test_in_prefix.opt$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
     $(test_in_prefix_SOURCES))))
 	$(V_OCAMLOPT)$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
-    -I otherlibs/unix -I compilerlibs \
+    -I otherlibs/unix -I compilerlibs $(TEST_IN_PREFIX_STDLIB) \
     $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
+
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+# testsuite/tools/test_in_prefix cannot use a relative stdlib because it is run
+# from testsuite/tools, not from the installation tree (the alternative would be
+# to compile it directly with the installed compiler)
+TEST_IN_PREFIX_STDLIB = \
+  -set-runtime-default 'standard_library_default=$(LIBDIR)'
+else
+TEST_IN_PREFIX_STDLIB =
+endif
 
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
