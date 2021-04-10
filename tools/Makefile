@@ -42,7 +42,7 @@ DIRS = $(addprefix $(ROOTDIR)/,utils parsing typing bytecomp \
 INCLUDES = $(addprefix -I ,$(DIRS))
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
 -warn-error +A -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
-LINKFLAGS = $(INCLUDES)
+LINKFLAGS = $(INCLUDES) $(OC_COMMON_LINKFLAGS)
 VPATH := $(filter-out -I,$(INCLUDES))
 
 programs_byte := \
