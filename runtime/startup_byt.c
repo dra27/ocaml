@@ -68,6 +68,8 @@
 #define SEEK_END 2
 #endif
 
+const char_os * caml_runtime_standard_library_effective = NULL;
+
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 static int print_magic = 0;
 static int print_config = 0;
@@ -316,7 +318,7 @@ static const char_os * get_stdlib_location(void)
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_runtime_standard_library_default;
+  if (stdlib == NULL) stdlib = caml_runtime_standard_library_effective;
   return stdlib;
 }
 
@@ -380,7 +382,7 @@ static void do_print_config(void)
   puts("shared_libs_path:");
   caml_decompose_path(&caml_shared_libs_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
-  caml_parse_ld_conf(caml_runtime_standard_library_default,
+  caml_parse_ld_conf(caml_runtime_standard_library_effective,
                      &caml_shared_libs_path);
   for (i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
@@ -420,7 +422,7 @@ CAMLexport void caml_main(char_os **argv)
   value res;
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
-  char_os * exe_name, * proc_self_exe;
+  char_os * exe_name, * proc_self_exe, * argv0;
   char_os * image_standard_library_default;
 
   caml_ensure_spacetime_dot_o_is_included++;
@@ -450,7 +452,7 @@ CAMLexport void caml_main(char_os **argv)
   /* Determine position of bytecode file */
   pos = 0;
 
-  proc_self_exe = caml_executable_name();
+  argv0 = proc_self_exe = caml_executable_name();
 
   if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
     /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
@@ -468,21 +470,31 @@ CAMLexport void caml_main(char_os **argv)
     if (proc_self_exe != NULL) {
       exe_name = proc_self_exe;
       fd = caml_attempt_open(&exe_name, &trail, 0);
-    } else {
-      caml_stat_free(proc_self_exe);
     }
     if (fd < 0 && caml_byte_program_mode == APPENDED) {
       fprintf(stderr, "unable to open file '%s'",
                        caml_stat_strdup_of_os(exe_name));
       exit(127);
     }
-  } else {
-    caml_stat_free(proc_self_exe);
   }
+
+  if (argv0 == NULL) {
+    if (exe_name != proc_self_exe)
+      free(proc_self_exe);
+    argv0 = caml_search_exe_in_path(exe_name);
+  }
+
+  if (argv0 == NULL)
+    argv0 = caml_search_exe_in_path(exe_name);
 
   if (fd < 0) {
     pos = parse_command_line(argv);
     if (print_config) {
+      caml_runtime_standard_library_effective =
+        caml_locate_standard_library(argv0,
+                                     caml_runtime_standard_library_default,
+                                     NULL);
+
       do_print_config();
       exit(0);
     }
@@ -512,6 +524,22 @@ CAMLexport void caml_main(char_os **argv)
   }
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
+
+  caml_runtime_standard_library_effective =
+    caml_locate_standard_library(argv0,
+                                 caml_runtime_standard_library_default, NULL);
+  caml_stat_free(argv0);
+
+  /* Load the embedded overridden caml_standard_library_default value, if one is
+     available. Note that although -custom executables come through this
+     mechanism, they don't define OSLD sections because
+     caml_runtime_standard_library_default and caml_standard_library_default are
+     fundamentally equal and caml_runtime_standard_library_default is set when
+     the -custom executable is linked. */
+  image_standard_library_default = read_section_to_os(fd, &trail, "OSLD");
+  if (image_standard_library_default != NULL)
+    caml_standard_library_default = image_standard_library_default;
+
   /* Initialize the abstract machine */
   caml_init_gc (caml_init_minor_heap_wsz, caml_init_heap_wsz,
                 caml_init_heap_chunk_sz, caml_init_percent_free,
@@ -535,15 +563,6 @@ CAMLexport void caml_main(char_os **argv)
   req_prims = read_section(fd, &trail, "PRIM");
   if (req_prims == NULL) caml_fatal_error("no PRIM section");
   caml_build_primitive_table(shared_lib_path, shared_libs, req_prims);
-  /* Load the embedded overridden caml_standard_library_default value, if one is
-     available. Note that although -custom executables come through this
-     mechanism, they don't define OSLD sections because
-     caml_runtime_standard_library_default and caml_standard_library_default are
-     fundamentally equal and caml_runtime_standard_library_default is set when
-     the -custom executable is linked. */
-  image_standard_library_default = read_section_to_os(fd, &trail, "OSLD");
-  if (image_standard_library_default != NULL)
-    caml_standard_library_default = image_standard_library_default;
   caml_stat_free(shared_lib_path);
   caml_stat_free(shared_libs);
   caml_stat_free(req_prims);
@@ -587,7 +606,7 @@ CAMLexport value caml_startup_code_exn(
            char_os **argv)
 {
   char_os * cds_file;
-  char_os * exe_name;
+  char_os * exe_name, * proc_self_exe;
 
   /* Determine options */
 #ifdef DEBUG
@@ -612,9 +631,22 @@ CAMLexport value caml_startup_code_exn(
   if (cds_file != NULL) {
     caml_cds_file = caml_stat_strdup_os(cds_file);
   }
-  exe_name = caml_executable_name();
-  if (exe_name == NULL) exe_name = caml_search_exe_in_path(argv[0]);
+  proc_self_exe = caml_executable_name();
+  if (proc_self_exe == NULL)
+    exe_name = caml_search_exe_in_path(argv[0]);
+  else
+    exe_name = proc_self_exe;
+
+  caml_runtime_standard_library_effective =
+    caml_locate_standard_library(exe_name,
+                                 caml_runtime_standard_library_default, NULL);
+
+  caml_runtime_standard_library_effective =
+    caml_locate_standard_library(exe_name,
+                                 caml_runtime_standard_library_default, NULL);
+
   caml_external_raise = NULL;
+
   /* Initialize the abstract machine */
   caml_init_gc (caml_init_minor_heap_wsz, caml_init_heap_wsz,
                 caml_init_heap_chunk_sz, caml_init_percent_free,
