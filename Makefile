@@ -767,8 +767,16 @@ endif
 ## Generated non-object files
 
 runtime/ld.conf: $(ROOTDIR)/Makefile.config
-	$(V_GEN)echo "$(STUBLIBDIR)" > $@ && \
-	echo "$(LIBDIR)" >> $@
+ifneq "$(STUBLIBDIR)" "$(LIBDIR)/stublibs"
+	$(V_GEN)echo "$(STUBLIBDIR)" > $@
+else
+ifeq "$(UNIX_OR_WIN32)" "unix"
+	$(V_GEN)echo './stublibs' > $@
+else
+	$(V_GEN)echo '.\stublibs' > $@
+endif
+endif
+	@echo "." >> $@
 
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
