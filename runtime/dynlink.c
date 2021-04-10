@@ -37,6 +37,7 @@
 #include "caml/signals.h"
 #include "caml/intext.h"
 #include "caml/startup.h"
+#include "caml/sys.h"
 
 #include "build_config.h"
 
@@ -117,7 +118,7 @@ CAMLexport char_os * caml_parse_ld_conf(struct ext_table *table)
   const char_os * const locations[3] = {
     caml_secure_getenv(T("OCAMLLIB")),
     caml_secure_getenv(T("CAMLLIB")),
-    OCAML_STDLIB_DIR};
+    caml_standard_library};
   char_os * libroot, * ldconfname, * wconfig, * p, * q;
   char * config;
 #ifdef _WIN32
