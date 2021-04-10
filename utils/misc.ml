@@ -214,6 +214,19 @@ module Stdlib = struct
         i = len || (f t.[i] && loop (i + 1))
       in
       loop 0
+
+    let rtrim_cr s =
+      if s = "" then s
+      else
+        let len = String.length s in
+        let i = ref len in
+        while !i > 0 && s.[!i - 1] = '\r' do
+          decr i
+        done;
+        if !i <> len then
+          String.sub s 0 !i
+        else
+          s
   end
 
   external compare : 'a -> 'a -> int = "%compare"
