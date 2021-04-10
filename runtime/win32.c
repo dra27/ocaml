@@ -885,16 +885,21 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
   return v;
 }
 
-CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+CAMLexport wchar_t* caml_stat_memdup_to_utf16(const char *s, size_t n)
 {
   wchar_t * ws;
   int retcode;
 
-  retcode = win_multi_byte_to_wide_char(s, -1, NULL, 0);
+  retcode = win_multi_byte_to_wide_char(s, n, NULL, 0);
   ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
-  win_multi_byte_to_wide_char(s, -1, ws, retcode);
+  win_multi_byte_to_wide_char(s, n, ws, retcode);
 
   return ws;
+}
+
+CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+{
+  return caml_stat_memdup_to_utf16(s, -1);
 }
 
 CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
