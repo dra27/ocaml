@@ -22,6 +22,13 @@ OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
 
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS =
+else
+  BYTELINK_FLAGS = -custom -I $(ROOTDIR)/runtime $(SET_RELATIVE_STDLIB)
+endif
+
 OCAMLC    = $(OCAMLRUN) $(ROOTDIR)/ocamlc $(STDLIBFLAGS)
 OCAMLOPT  = $(OCAMLRUN) $(ROOTDIR)/ocamlopt $(STDLIBFLAGS)
 OCAMLDEP  = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc -depend
@@ -93,7 +100,6 @@ INCLUDES_DEP=\
   -I $(ROOTDIR)/toplevel
 
 INCLUDES_NODEP=\
-  -I $(ROOTDIR)/runtime \
   -I $(ROOTDIR)/stdlib \
   -I $(ROOTDIR)/compilerlibs \
   -I $(ROOTDIR)/otherlibs/str \
@@ -207,10 +213,12 @@ OCAMLDOC_BCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cma)
 OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(OCAMLDOC): $(EXECMOFILES)
-	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
+	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(BYTELINK_FLAGS) \
+	  $(OCAMLDOC_BCLIBRARIES) $^
 
 $(OCAMLDOC_OPT): $(EXECMXFILES)
-	$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_NCLIBRARIES) $^
+	$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    $(OCAMLDOC_NCLIBRARIES) $^
 
 $(OCAMLDOC_LIBCMA): $(LIBCMOFILES)
 	$(OCAMLC) -a -o $@ $(LINKFLAGS) $^

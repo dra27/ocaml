@@ -184,6 +184,17 @@ extern int caml_win32_isatty(int fd);
 
 #endif /* _WIN32 */
 
+/* True if:
+   - dir equals "."
+   - dir equals ".."
+   - dir begins "./"
+   - dir begins "../"
+   The tests for null avoid the need to call strlen_os. */
+#define Is_relative_dir(dir) \
+  (dir[0] == '.' \
+   && (dir[1] == 0 \
+       || Is_dir_separator(dir[1]) \
+       || (dir[1] == '.' && (dir[2] == 0 || Is_dir_separator(dir[2])))))
 #endif /* CAML_INTERNALS */
 
 #endif /* CAML_OSDEPS_H */
