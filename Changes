@@ -228,7 +228,9 @@ Working version
   e.g. `< foo : int; .. as $0>` when $0 is introduced by a GADT constructor
   (Stefan Muenzel, review by Jacques Garrigue and Florian Angeletti)
 
-
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
 
 ### Internal/compiler-libs changes:
 
