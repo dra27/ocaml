@@ -426,9 +426,7 @@ let run ~reproducible (config : Installation.t) env =
            ~ocaml_debug:has_ocaml_debug_info,
            ~c_debug:contains_c_debug_info,
            ~s:contains_assembled_objects) =
-        if List.mem basename ["Makefile.config";
-                              "ld.conf";
-                              "runtime-launch-info"] then
+        if basename = "Makefile.config" || basename = "runtime-launch-info" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if basename = "config.cmx" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
