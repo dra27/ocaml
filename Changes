@@ -77,6 +77,11 @@ Working version
   (Guillaume Munch-Maccagnoni, review by Gabriel Scherer, tests by
   Jan Midtgaard)
 
+* #13???: Bytecode loads ld.conf from all of $OCAMLLIB/ld.conf, $CAMLLIB/ld.conf
+  and standard_library_default/ld.conf rather than just the first one of these
+  encountered.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
