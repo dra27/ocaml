@@ -19,9 +19,9 @@ include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-  BYTELINK_FLAGS=
+  BYTELINK_FLAGS =
 else
-  BYTELINK_FLAGS=$(SET_RELATIVE_STDLIB)
+  BYTELINK_FLAGS = -custom -I $(ROOTDIR)/runtime $(SET_RELATIVE_STDLIB)
 endif
 
 OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
@@ -60,7 +60,7 @@ endif
 
 
 INCLUDE_DIRS = $(addprefix $(ROOTDIR)/,\
-  runtime utils parsing typing driver bytecomp toplevel) generators
+  utils parsing typing driver bytecomp toplevel) generators
 INCLUDES_DEP = $(addprefix -I ,$(INCLUDE_DIRS))
 INCLUDES_NODEP = $(addprefix -I $(ROOTDIR)/,\
   compilerlibs otherlibs/str otherlibs/dynlink \
