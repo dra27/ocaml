@@ -153,6 +153,12 @@ extern value caml_copy_string_of_utf16(const wchar_t *s);
 
 extern int caml_win32_isatty(int fd);
 
+#define CAML_DIR_SEP T("\\")
+
+#else
+
+#define CAML_DIR_SEP "/"
+
 #endif /* _WIN32 */
 
 #endif /* CAML_INTERNALS */
