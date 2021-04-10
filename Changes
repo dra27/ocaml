@@ -94,6 +94,12 @@ Working version
 - #13736: Fix major GC pacing bug triggered by synchronous collections.
   (Nick Barnes, review by ?)
 
+- #13???: Added --enable-relative which allows the runtime and the compilers to
+  locate the Standard Library relative to where the binaries themselves,
+  removing the absolute path previously embedded in
+  caml_standard_library_default.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
