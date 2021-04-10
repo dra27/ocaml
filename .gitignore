@@ -190,6 +190,7 @@ _build
 /runtime/ocamlrun
 /runtime/ocamlrund
 /runtime/ocamlruni
+/runtime/caml_internal_config.h
 /runtime/ld.conf
 /runtime/interp.a.lst
 /runtime/*.[sd]obj
