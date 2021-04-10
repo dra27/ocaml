@@ -785,6 +785,7 @@ build_os
 build_vendor
 build_cpu
 build
+bindir_to_libdir
 ar_supports_response_files
 QS
 ocaml_libdir
@@ -1018,6 +1019,7 @@ enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
+with_relative_libdir
 with_afl
 with_flexdll
 with_winpthreads_msvc
@@ -1735,6 +1737,8 @@ Optional Packages:
   --with-target-sh        location of Posix sh on the target system
   --with-stublibs         additional directory for searching for bytecode stub
                           libraries
+  --with-relative-libdir  location of the Standard Library, specified relative
+                          to --bindir
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-winpthreads-msvc build winpthreads (only for the MSVC port) from the
@@ -3521,6 +3525,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -4163,6 +4168,21 @@ fi
 if test ${enable_mmap_map_stack+y}
 then :
   enableval=$enable_mmap_map_stack;
+fi
+
+
+
+# Check whether --with-relative-libdir was given.
+if test ${with_relative_libdir+y}
+then :
+  withval=$with_relative_libdir; if test x"$withval" = 'xno'
+then :
+  bindir_to_libdir=''
+else $as_nop
+  bindir_to_libdir="$withval"
+fi
+else $as_nop
+  bindir_to_libdir=''
 fi
 
 
@@ -20953,7 +20973,24 @@ esac
 
 if test x"$libdir" = x'${exec_prefix}/lib'
 then :
+  if test x"$bindir_to_libdir" = 'x'
+then :
   libdir="$libdir"/ocaml
+else $as_nop
+  case $bindir_to_libdir in #(
+  ./*|.\\*) :
+    libdir="$bindir${bindir_to_libdir#.}" ;; #(
+  ../*|..\\*) :
+    libdir="$bindir$default_separator$bindir_to_libdir" ;; #(
+  *) :
+    as_fn_error $? "--with-relative-libdir requires a relative path" "$LINENO" 5 ;;
+esac
+fi
+else $as_nop
+  if test x"$bindir_to_libdir" != 'x'
+then :
+  as_fn_error $? "--with-relative-libdir and --libdir cannot both be specified" "$LINENO" 5
+fi
 fi
 
 if test x"$mandir" = x'${datarootdir}/man'
