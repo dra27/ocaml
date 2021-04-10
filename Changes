@@ -7,6 +7,12 @@ Working version
 
 ### Runtime system:
 
+- #13???: Added --with-relative-bindir which allows the runtime and the
+  compilers to locate the Standard Library relative to where the binaries
+  themselves, removing the absolute path previously embedded in
+  caml_standard_library_default.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:

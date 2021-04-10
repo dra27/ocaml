@@ -525,7 +525,21 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
-       begin match !Clflags.standard_library_default with
+       let standard_library_default =
+         if not standalone then
+           (* -custom executables don't need OSLD sections - the correct value
+              is already included in the runtime. *)
+           None
+         else if !Clflags.standard_library_default = None
+            && Config.standard_library_relative then
+           (* If -set-runtime-default hasn't been specified, and the compiler is
+              using a relative location to the standard, ensure that the image
+              we produce overrides this to an absolute value. *)
+           Some Config.standard_library_effective
+         else
+           (* -set-runtime-default *)
+           !Clflags.standard_library_default in
+       begin match standard_library_default with
        | Some value ->
            (* OCaml Standard Library Default location *)
            output_string outchan value;
@@ -644,7 +658,7 @@ let emit_standard_library_default outchan =
   let stdlib = !Clflags.standard_library_default in
   let stdlib =
     if stdlib = None then
-      Some Config.standard_library_default
+      Some Config.standard_library_effective
     else
       stdlib
   in

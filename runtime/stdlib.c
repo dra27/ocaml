@@ -15,4 +15,8 @@
 #include "caml/misc.h"
 #include "build_config.h"
 
-char_os *caml_standard_library_default = OCAML_STDLIB_DIR;
+#if defined(OCAML_STDLIB_DIR_REL)
+const char_os *caml_standard_library_default = OCAML_STDLIB_DIR_REL;
+#else
+const char_os *caml_standard_library_default = OCAML_STDLIB_DIR;
+#endif
