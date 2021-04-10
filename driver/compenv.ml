@@ -712,4 +712,11 @@ let process_deferred_actions env =
     !print_types ||
     match !stop_after with
     | None -> false
-    | Some p -> Clflags.Compiler_pass.is_compilation_pass p;
+    | Some p -> Clflags.Compiler_pass.is_compilation_pass p
+
+let set_caml_standard_library_default () =
+  let symbol = "caml_standard_library_default" in
+  if not (List.exists (fun (name, _) -> name = symbol)
+                      !global_string_constants) then
+    global_string_constants :=
+      (symbol, Config.standard_library_effective) :: !global_string_constants
