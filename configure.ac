@@ -831,6 +831,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
 
 AC_CHECK_HEADER([math.h])
 AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
+AC_CHECK_HEADER([libgen.h],[AC_DEFINE([HAS_LIBGEN_H])])
 AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])
 AC_CHECK_HEADER([sys/shm.h],[AC_DEFINE([HAS_SYS_SHM_H])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT])], [],

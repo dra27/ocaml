@@ -370,6 +370,7 @@ let link ~ppf_dump objfiles output_name =
     let units_tolink, objfiles =
       List.fold_right scan_file objfiles ([], [])
     in
+    Compenv.set_caml_standard_library_default ();
     Array.iter remove_required Runtimedef.builtin_exceptions;
     begin match extract_missing_globals() with
       [] -> ()
