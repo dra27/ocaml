@@ -11,7 +11,9 @@ conflict-class: "ocaml-core-compiler"
 flags: compiler
 setenv: CAML_LD_LIBRARY_PATH = "%{lib}%/stublibs"
 build: [
-  ["./configure" "--prefix=%{prefix}%" "--with-stublibs=%{stublibs}%"]
+  ["./configure" "--prefix=%{prefix}%"
+   "--with-stublibs=../stublibs" {os != "win32"}
+   "--with-stublibs=..\\stublibs" {os = "win32"}]
   [make "-j%{jobs}%" "world"]
   [make "-j%{jobs}%" "world.opt"]
 ]
