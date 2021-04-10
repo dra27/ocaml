@@ -13520,6 +13520,13 @@ fi
 
 done
 
+ac_fn_c_check_header_mongrel "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
+if test "x$ac_cv_header_libgen_h" = xyes; then :
+  $as_echo "#define HAS_LIBGEN_H 1" >>confdefs.h
+
+fi
+
+
 ac_fn_c_check_header_mongrel "$LINENO" "stdint.h" "ac_cv_header_stdint_h" "$ac_includes_default"
 if test "x$ac_cv_header_stdint_h" = xyes; then :
   $as_echo "#define HAS_STDINT_H 1" >>confdefs.h
