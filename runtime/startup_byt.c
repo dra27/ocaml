@@ -72,6 +72,8 @@
 #define SEEK_END 2
 #endif
 
+const char_os * caml_standard_library_effective = NULL;
+
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 
 /* Print the specified error message followed by an end-of-line and exit */
@@ -379,7 +381,7 @@ static const char_os * get_stdlib_location(void)
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_standard_library_default;
+  if (stdlib == NULL) stdlib = caml_standard_library_effective;
   return stdlib;
 }
 
@@ -431,7 +433,7 @@ static void do_print_config(void)
   puts("shared_libs_path:");
   caml_decompose_path(&caml_shared_libs_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
-  caml_parse_ld_conf(caml_standard_library_default, &caml_shared_libs_path);
+  caml_parse_ld_conf(caml_standard_library_effective, &caml_shared_libs_path);
   for (int i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
     if (dir[0] == 0)
@@ -466,7 +468,7 @@ CAMLexport void caml_main(char_os **argv)
   value res;
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
-  char_os * exe_name, * proc_self_exe;
+  char_os * exe_name, * proc_self_exe, * argv0;
 
   /* Determine options */
   caml_parse_ocamlrunparam();
@@ -487,7 +489,7 @@ CAMLexport void caml_main(char_os **argv)
   /* Determine position of bytecode file */
   pos = 0;
 
-  proc_self_exe = caml_executable_name();
+  argv0 = proc_self_exe = caml_executable_name();
 
   if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
     /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
@@ -510,9 +512,16 @@ CAMLexport void caml_main(char_os **argv)
       error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
   }
 
+  if (argv0 == NULL)
+    argv0 = caml_search_exe_in_path(exe_name);
+
   if (fd < 0) {
     pos = parse_command_line(argv);
     if (caml_params->print_config) {
+      caml_standard_library_effective =
+        caml_locate_standard_library(argv0,
+                                     caml_standard_library_default, NULL);
+
       do_print_config();
       exit(0);
     }
@@ -544,6 +553,19 @@ CAMLexport void caml_main(char_os **argv)
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
 
+  caml_standard_library_effective =
+    caml_locate_standard_library(argv0, caml_standard_library_default, NULL);
+
+  /* Load the embedded overridden caml_standard_library_default value, if one is
+     available. This value is set _after_ caml_standard_library_effective has
+     been called, because ocamlrun must use the value it was configured with.
+     For -custom executables, the value is the same - but they specify
+     caml_standard_library_default with the primitives object, rather than via
+     the ORUN section. */
+  char_os *orun = read_section_to_os(fd, &trail, "ORUN");
+  if (orun != NULL)
+    caml_standard_library_default = orun;
+
   /* Initialize the abstract machine */
   caml_init_gc ();
 
@@ -567,19 +589,6 @@ CAMLexport void caml_main(char_os **argv)
   req_prims = read_section(fd, &trail, "PRIM");
   if (req_prims == NULL) caml_fatal_error("no PRIM section");
   caml_build_primitive_table(shared_lib_path, shared_libs, req_prims);
-  /* Load the embedded overridden caml_standard_library_default value, if one is
-     available. This value is set _after_ caml_build_primitive_table has been
-     called, because ocamlrun must use the value it was configured with. Note
-     that although -custom executables come through this mechanism, they don't
-     have any DLLS to load.
-     XXX Intend to change that - -custom executables should embed their
-         standard_library_default in the same way as ocamlrun, but also set the
-         appropriate flag to disable all the DLLS section machinery, meaning
-         that they won't use this mechanism at all (at present -custom
-         executables can still have ORUN sections) */
-  char_os *orun = read_section_to_os(fd, &trail, "ORUN");
-  if (orun != NULL)
-    caml_standard_library_default = orun;
   caml_stat_free(shared_lib_path);
   caml_stat_free(shared_libs);
   caml_stat_free(req_prims);
@@ -591,7 +600,7 @@ CAMLexport void caml_main(char_os **argv)
   caml_close_channel(chan); /* this also closes fd */
   caml_stat_free(trail.section);
   /* Initialize system libraries */
-  caml_sys_init(proc_self_exe, exe_name, argv + pos);
+  caml_sys_init(proc_self_exe, argv[0], exe_name, argv + pos);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
@@ -658,6 +667,9 @@ CAMLexport value caml_startup_code_exn(
   else
     exe_name = proc_self_exe;
 
+  caml_standard_library_effective =
+    caml_locate_standard_library(exe_name, caml_standard_library_default, NULL);
+
   Caml_state->external_raise = NULL;
   /* Setup signal handling */
   caml_init_signals();
@@ -679,7 +691,7 @@ CAMLexport value caml_startup_code_exn(
   caml_modify_generational_global_root
     (&caml_global_data, caml_input_value_from_block(data, data_size));
   /* Initialize system libraries */
-  caml_sys_init(proc_self_exe, exe_name, argv);
+  caml_sys_init(proc_self_exe, argv[0], exe_name, argv);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
