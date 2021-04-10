@@ -16,6 +16,11 @@ OCaml 4.10 maintenance branch
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
 
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
 ### Compiler user-interface and warnings:
 
 - #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
