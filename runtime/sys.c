@@ -61,6 +61,10 @@
 #include "caml/callback.h"
 #include "caml/startup_aux.h"
 
+
+char_os * caml_standard_library = NULL;
+char_os * caml_relative_root_dir = NULL;
+
 static char * error_message(void)
 {
   return strerror(errno);
@@ -661,6 +665,30 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 {
   return Val_int(1); /* Bytecode backed */
 }
+
+CAMLprim value caml_sys_get_stdlib_dirs(value unit)
+{
+  CAMLparam0();
+  CAMLlocal4(result, def, eff, root_dir);
+#ifdef NATIVE_CODE
+  if (caml_standard_library == NULL)
+    caml_locate_standard_library(caml_exe_name);
+#endif
+  def = caml_copy_string_of_os(caml_standard_library_default);
+  if (caml_relative_root_dir != NULL) {
+    root_dir = caml_copy_string_of_os(caml_relative_root_dir);
+    root_dir = caml_alloc_some(root_dir);
+  } else {
+    root_dir = Val_none;
+  }
+  eff = caml_copy_string_of_os(caml_standard_library);
+  result = caml_alloc_small(3, 0);
+  Field(result, 0) = def;
+  Field(result, 1) = eff;
+  Field(result, 2) = root_dir;
+  CAMLreturn(result);
+}
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */
