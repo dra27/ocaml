@@ -55,6 +55,10 @@ Working version
   in the debugger
   (Pierre Boutillier and Gabriel Scherer, review by Florian Angeletti)
 
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Manual and documentation:
 
 * #13975: documented the `[@remove_aliases]` built-in attribute for signatures
