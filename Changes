@@ -97,7 +97,11 @@ Working version
 - #11912: Refactoring handling of scoped type variables
   (Richard Eisenberg, review by Gabriel Scherer and Florian Angeletti)
 
-- #12???: Only read ld.conf when there are DLLs to search for.
+- #12???: Added --enable-relative which allows the runtime and the compilers to
+  locate the Standard Library relative to where the binaries themselves,
+  removing the absolute path previously embedded in
+  caml_standard_library_default. Only read ld.conf when there are DLLs to search
+  for.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
