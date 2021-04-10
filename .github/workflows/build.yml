@@ -59,7 +59,7 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-codegen-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-codegen-invariants --enable-dependency-generation --enable-native-toplevel --with-relative-libdir=../lib/ocaml' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -92,6 +92,7 @@ jobs:
             name: extra (debug)
           - id: debug-s4096
             name: extra (debug-s4096)
+      fail-fast: false
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -107,18 +108,18 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y ${{ matrix.dependencies }}
       - name: Run the testsuite
-        if: matrix.id == 'normal'
+        if: ${{ matrix.id == 'normal' && !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         run: |
           MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
       - name: Run the testsuite (debug runtime)
-        if: matrix.id == 'debug'
+        if: ${{ matrix.id == 'debug' && !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         env:
           OCAMLRUNPARAM: v=0,V=1
           USE_RUNTIME: d
         run: |
           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test"
       - name: Run the testsuite (s=4096, debug runtime)
-        if: matrix.id == 'debug-s4096'
+        if: ${{ matrix.id == 'debug-s4096' && !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         env:
           OCAMLRUNPARAM: s=4096,v=0
           USE_RUNTIME: d
@@ -134,6 +135,10 @@ jobs:
         if: matrix.id == 'normal'
         run: |
          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      - name: Test in prefix
+        if: matrix.id == 'normal'
+        run: |
+         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
         run: |
@@ -155,10 +160,24 @@ jobs:
             config_arg: CFLAGS='-O0'
           - name: linux-arm64
             os: ubuntu-24.04-arm
+            config_arg: --with-target-sh=exe
+            test-in-prefix: true
           - name: macos-x86_64
             os: macos-13
+            config_arg: --with-target-sh=exe
+            test-in-prefix: true
           - name: macos-arm64
             os: macos-14
+            config_arg: --with-relative-libdir=../lib/ocaml
+            test-in-prefix: true
+          - name: static
+            os: ubuntu-latest
+            config_arg: --disable-native-toplevel --disable-shared
+            test-in-prefix: true
+          - name: minimal
+            os: ubuntu-latest
+            config_arg: --disable-native-toplevel --disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -196,11 +215,11 @@ jobs:
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
-        if: ${{ matrix.name != 'linux-O0' }}
+        if: ${{ matrix.name != 'linux-O0' && !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         run: |
           bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
       - name: Run the testsuite (linux-O0)
-        if: ${{ matrix.name == 'linux-O0' }}
+        if: ${{ matrix.name == 'linux-O0' && !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         env:
           OCAMLRUNPARAM: v=0,V=1
           USE_RUNTIME: d
@@ -208,12 +227,29 @@ jobs:
           for dir in $PARALLEL_TESTS; do \
            bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
           done
+      - name: Install
+        if: ${{ matrix.test-in-prefix }}
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      - name: Test in prefix
+        if: ${{ matrix.test-in-prefix }}
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
 
   i386:
+    name: i386 - ${{ matrix.name }}
     runs-on: ubuntu-latest
     container:
       image: debian:12
       options: --platform linux/i386 --user root
+    strategy:
+      matrix:
+        include:
+          - name: absolute
+            config_arg: --without-relative-libdir
+          - name: relative
+            config_arg: --with-relative-libdir=../lib/ocaml
+      fail-fast: false
     steps:
       - name: OS Dependencies
         run: |
@@ -226,10 +262,17 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel --with-target-sh=exe ${{ matrix.config_arg }}' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
       - name: Run the testsuite
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         run: |
           su ocaml -c "bash -xe tools/ci/actions/runner.sh test"
+      - name: Install
+        run: |
+          su ocaml -c "bash -xe tools/ci/actions/runner.sh install"
+      - name: Test in prefix
+        run: |
+          su ocaml -c "bash -xe tools/ci/actions/runner.sh test-in-prefix"
