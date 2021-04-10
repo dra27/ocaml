@@ -381,7 +381,7 @@ static const char_os * get_stdlib_location(void)
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
+  if (stdlib == NULL) stdlib = caml_standard_library;
   return stdlib;
 }
 
