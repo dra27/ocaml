@@ -165,12 +165,6 @@ CAMLextern caml_stat_string caml_stat_strdup(const char *s);
 CAMLextern wchar_t* caml_stat_wcsdup(const wchar_t *s);
 #endif
 
-/* [caml_stat_memdup(s, n)] returns a pointer to a heap-allocated buffer which
-   is a copy of the string [s] (which may include embedded NULLs). It throws an
-   OCaml exception in case the request fails, and so requires the runtime lock
-   to be held.*/
-CAMLextern caml_stat_block caml_stat_memdup(const char *s, size_t slen);
-
 /* [caml_stat_strdup_noexc] is a variant of [caml_stat_strdup] that returns NULL
    in case the request fails, and doesn't require the runtime lock.
 */

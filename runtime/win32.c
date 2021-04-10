@@ -123,9 +123,10 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
   return retcode;
 }
 
-wchar_t * caml_decompose_path(struct ext_table * tbl, wchar_t * path)
+void caml_decompose_path(struct ext_table * tbl, wchar_t * path)
 {
   wchar_t * p, * q;
+  wchar_t c;
   int n;
 
   if (path == NULL) return NULL;
@@ -133,13 +134,14 @@ wchar_t * caml_decompose_path(struct ext_table * tbl, wchar_t * path)
   q = p;
   while (1) {
     for (n = 0; q[n] != 0 && q[n] != L';'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
-    q = q + n;
-    if (*q == 0) break;
-    *q = 0;
-    q += 1;
+    c = q[n];
+    q[n] = 0;
+    caml_ext_table_add(tbl, caml_stat_wcsdup(q));
+    if (c == 0) break;
+    q = q + n + 1;
   }
-  return p;
+  caml_stat_free(p);
+  return;
 }
 
 wchar_t * caml_search_in_path(struct ext_table * path, const wchar_t * name)
@@ -880,21 +882,16 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
   return v;
 }
 
-CAMLexport wchar_t* caml_stat_memdup_to_utf16(const char *s, size_t n)
+CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
 {
   wchar_t * ws;
   int retcode;
 
-  retcode = win_multi_byte_to_wide_char(s, n, NULL, 0);
+  retcode = win_multi_byte_to_wide_char(s, -1, NULL, 0);
   ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
-  win_multi_byte_to_wide_char(s, n, ws, retcode);
+  win_multi_byte_to_wide_char(s, -1, ws, retcode);
 
   return ws;
-}
-
-CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
-{
-  return caml_stat_memdup_to_utf16(s, -1);
 }
 
 CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
