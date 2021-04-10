@@ -54,6 +54,9 @@
 #else
 #include <sys/dir.h>
 #endif
+#ifdef HAS_LIBGEN_H
+#include <libgen.h>
+#endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
@@ -540,4 +543,66 @@ void caml_plat_mem_unmap(void* mem, uintnat size)
 {
   if (munmap(mem, size) != 0)
     CAMLassert(0);
+}
+
+static char * caml_dirname (const char * path)
+{
+#ifdef HAS_LIBGEN_H
+  char *dir, *res;
+  dir = caml_stat_strdup(path);
+  res = caml_stat_strdup(dirname(dir));
+  caml_stat_free(dir);
+  return res;
+#else
+  /* See Filename.generic_dirname */
+  size_t n = strlen(path) - 1;
+  char *res;
+  if (n < 0) /* path is "" */
+    return caml_stat_strdup(".");
+  while (n >= 0 && path[n] == '/')
+    n--;
+  if (n < 0) /* path is entirely slashes */
+    return caml_stat_strdup("/");
+  while (n >= 0 && path[n] != '/')
+    n--;
+  if (n < 0) /* path is relative */
+    return caml_stat_strdup(".");
+  while (n >= 0 && path[n] == '/')
+    n--;
+  if (n < 0) /* path is a file at root */
+    return caml_stat_strdup("/");
+  /* n is the _index_ of the last character of the dirname */
+  res = caml_stat_alloc(n + 2);
+  memcpy(res, path, n + 1);
+  res[n + 1] = 0;
+  return res;
+#endif
+}
+
+CAMLextern char_os* caml_locate_standard_library (const char *exe_name,
+                                                  const char *stdlib_default,
+                                                  char **dirname)
+{
+  if (Is_relative_dir(stdlib_default)) {
+    char * root = caml_dirname(exe_name);
+    char * candidate =
+      caml_stat_strconcat(3, root, CAML_DIR_SEP, stdlib_default);
+#ifdef HAS_REALPATH
+    char * resolved_candidate = realpath(candidate, NULL);
+    /* If realpath fails, use the non-normalised path for error messages. */
+    if (resolved_candidate != NULL) {
+      caml_stat_free(candidate);
+      /* caml_realpath uses malloc */
+      candidate = caml_stat_strdup(resolved_candidate);
+      free(resolved_candidate);
+    }
+#endif
+    if (dirname == NULL)
+      caml_stat_free(root);
+    else
+      *dirname = root;
+    return candidate;
+  } else {
+    return caml_stat_strdup(stdlib_default);
+  }
 }

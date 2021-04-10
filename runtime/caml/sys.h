@@ -29,7 +29,11 @@ CAMLnoret CAMLextern void caml_sys_error (value);
 CAMLnoret CAMLextern void caml_sys_io_error (value);
 
 CAMLextern double caml_sys_time_unboxed(value);
+/* actual_argv is the actual argv[0] passed to the runtime - when the
+   interpreter directly (e.g. ocamlrun ocamlc -vnum), actual_argv0 will not be
+   the first element of the argv parameter. */
 CAMLextern void caml_sys_init (char_os * proc_self_exe,
+                               char_os * actual_argv0,
                                char_os * exe_name,
                                char_os ** argv);
 
