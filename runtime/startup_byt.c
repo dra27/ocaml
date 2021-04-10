@@ -72,6 +72,8 @@
 #define SEEK_END 2
 #endif
 
+const char_os * caml_standard_library_effective = NULL;
+
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 
 /* Print the specified error message followed by an end-of-line and exit */
@@ -459,7 +461,7 @@ CAMLexport void caml_main(char_os **argv)
   value res;
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
-  char_os * exe_name, * proc_self_exe;
+  char_os * exe_name, * proc_self_exe, * argv0;
 
   /* Determine options */
   caml_parse_ocamlrunparam();
@@ -484,7 +486,9 @@ CAMLexport void caml_main(char_os **argv)
   exe_name = argv[0];
   fd = caml_attempt_open(&exe_name, &trail, 0);
 
-  proc_self_exe = caml_executable_name();
+  argv0 = proc_self_exe = caml_executable_name();
+  if (argv0 == NULL)
+    argv0 = caml_search_exe_in_path(exe_name);
 
   /* Little grasshopper wonders why we do that at all, since
      "The current executable is ocamlrun itself, it's never a bytecode
@@ -500,6 +504,10 @@ CAMLexport void caml_main(char_os **argv)
   if (fd < 0) {
     pos = parse_command_line(argv);
     if (caml_params->print_config) {
+      caml_standard_library_effective =
+        caml_locate_standard_library(argv0,
+                                     caml_standard_library_default, NULL);
+
       do_print_config();
       exit(0);
     }
@@ -531,7 +539,12 @@ CAMLexport void caml_main(char_os **argv)
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
 
-  /* Load the embedded runtime parameters */
+  caml_standard_library_effective =
+    caml_locate_standard_library(argv0, caml_standard_library_default, NULL);
+
+  /* Load the embedded runtime parameters. This is done _after_ the runtime's
+     caml_standard_library_effective has been set, because the value of ORUN is
+     what should be being used to compute %standard_library. */
   char_os *orun = read_section_to_os(fd, &trail, "ORUN");
   if (orun != NULL)
     caml_standard_library_default = orun;
@@ -570,7 +583,7 @@ CAMLexport void caml_main(char_os **argv)
   caml_close_channel(chan); /* this also closes fd */
   caml_stat_free(trail.section);
   /* Initialize system libraries */
-  caml_sys_init(proc_self_exe, exe_name, argv + pos);
+  caml_sys_init(proc_self_exe, argv[0], exe_name, argv + pos);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
@@ -637,6 +650,9 @@ CAMLexport value caml_startup_code_exn(
   else
     exe_name = proc_self_exe;
 
+  caml_standard_library_effective =
+    caml_locate_standard_library(exe_name, caml_standard_library_default, NULL);
+
   Caml_state->external_raise = NULL;
   /* Setup signal handling */
   caml_init_signals();
@@ -658,7 +674,7 @@ CAMLexport value caml_startup_code_exn(
   caml_modify_generational_global_root
     (&caml_global_data, caml_input_value_from_block(data, data_size));
   /* Initialize system libraries */
-  caml_sys_init(proc_self_exe, exe_name, argv);
+  caml_sys_init(proc_self_exe, argv[0], exe_name, argv);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
