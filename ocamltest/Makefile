@@ -213,7 +213,7 @@ ocamltest$(EXE): $(compdeps_byte) $(bytecode_modules)
 	$(ocamlc) -c $<
 
 ocamltest.opt$(EXE): $(compdeps_opt) $(native_modules)
-	$(ocamlopt_cmd) -o $@ $^
+	$(ocamlopt_cmd) $(DOTOPT_LINKFLAGS) -o $@ $^
 
 %.cmx: %.ml $(compdeps_opt)
 	$(ocamlopt) -c $<
