@@ -30,6 +30,13 @@ struct caml_params {
      is either NULL or the path of the interpreter, rather than the file which
      contained the bytecode image. */
   const char_os* proc_self_exe;
+  /* The full filename to use as the basis for determining the Standard Library
+     location. Only relevant if the compiler is configured using
+     --with-relative-libdir (but it is always populated during startup). On
+     systems where caml_executable_name returns a non-NULL, this is the same
+     string as proc_self_exe, otherwise it will be the _actual_ argv[0] passed
+     to the process (which for bytecode may mean the interpreter). */
+  const char_os* proc_self_argv0;
   /* The string to return for caml_sys_executable_name. Never NULL. */
   const char_os* exe_name;
 
@@ -69,7 +76,9 @@ extern void caml_parse_ocamlrunparam (void);
    If [pooling] is 0, [caml_stat_*] functions will not be backed by a pool. */
 extern int caml_startup_aux (int pooling);
 
-void caml_init_exe_name(const char_os* proc_self_exe, const char_os* exe_name);
+void caml_init_exe_name(const char_os* proc_self_exe,
+                        const char_os* proc_self_argv0,
+                        const char_os* exe_name);
 void caml_init_section_table(const char* section_table,
                              asize_t section_table_size);
 
