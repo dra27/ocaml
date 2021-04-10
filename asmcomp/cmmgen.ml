@@ -3942,6 +3942,17 @@ let predef_exception i name =
   let data_items = emit_block exn_sym Global (block_header tag size) fields in
   Cdata data_items
 
+external os_bytes_of_string : string -> string = "caml_os_bytes_of_string"
+
+let emit_global_string_constant name value =
+  let value_sym = Compilenv.new_const_symbol () in
+  let value = os_bytes_of_string value in
+  Cdata[Cglobal_symbol name;
+        Cdefine_symbol name;
+        Csymbol_address value_sym;
+        Cdefine_symbol value_sym;
+        Cstring value]
+
 (* Header for a plugin *)
 
 let plugin_header units =
