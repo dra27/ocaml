@@ -1299,20 +1299,23 @@ endif
 
 
 libcamlrun_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.b.$(O)) $(winpthreads_OBJECTS)
+  $(runtime_BYTECODE_C_SOURCES:.c=.b.$(O)) $(winpthreads_OBJECTS) \
+  runtime/stdlib.$(O)
 
 libcamlrun_non_shared_OBJECTS = \
   $(subst $(UNIX_OR_WIN32).b.$(O),$(UNIX_OR_WIN32)_non_shared.b.$(O), \
           $(libcamlrun_OBJECTS))
 
 libcamlrund_OBJECTS = $(runtime_BYTECODE_C_SOURCES:.c=.bd.$(O)) \
-  $(winpthreads_OBJECTS) runtime/instrtrace.bd.$(O)
+  $(winpthreads_OBJECTS) runtime/instrtrace.bd.$(O) runtime/stdlib.$(O)
 
 libcamlruni_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.bi.$(O)) $(winpthreads_OBJECTS)
+  $(runtime_BYTECODE_C_SOURCES:.c=.bi.$(O)) $(winpthreads_OBJECTS) \
+  runtime/stdlib.$(O)
 
 libcamlrunpic_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(winpthreads_OBJECTS)
+  $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(winpthreads_OBJECTS) \
+  runtime/stdlib.$(O)
 
 libasmrun_OBJECTS = \
   $(runtime_NATIVE_C_SOURCES:.c=.n.$(O)) $(runtime_ASM_OBJECTS) \
@@ -1394,6 +1397,8 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
+
+runtime/stdlib.$(O): runtime/build_config.h
 
 ## Runtime libraries and programs
 
