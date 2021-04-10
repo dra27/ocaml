@@ -86,96 +86,78 @@ CAMLexport char_os * caml_get_stdlib_location(void)
   return stdlib;
 }
 
-CAMLexport char_os * caml_parse_ld_conf(void)
+CAMLexport void caml_parse_ld_conf(void)
 {
-  char_os * wconfig, * wcurrent, * p, * q;
   char_os * ldconfs[3] = {
     caml_secure_getenv(T("OCAMLLIB")),
     caml_secure_getenv(T("CAMLLIB")),
     OCAML_STDLIB_DIR };
-  int sizes[3];
-  char * config, * current;
+  char * config;
+  char * p, * q;
 #ifdef _WIN32
   struct _stati64 st;
 #else
   struct stat st;
 #endif
-  int ldconf, nread, i, j;
+  size_t configsize = 0;
+  int ldconf, i, j;
 
-  /* Loop through the possible ld.conf files, ignoring clearly identical files,
-     and get their sizes. */
-  nread = 0;
+  /* Loop through the possible ld.conf files, ignoring clearly identical
+     files. */
   for (i = 0; i < 3; i++) {
     if (ldconfs[i]) {
       ldconfs[i] =
         caml_stat_strconcat_os(3, ldconfs[i], CAML_DIR_SEP, LD_CONF_NAME);
-      if (stat_os(ldconfs[i], &st) == -1) {
-        caml_stat_free(ldconfs[i]);
-        ldconfs[i] = NULL;
-      } else {
-        j = 0;
+
+      if (stat_os(ldconfs[i], &st) != -1) {
+        /* Check if the file has obviously been loaded by a previous step */
         for (j = 0; j < i; j++) {
           if (ldconfs[j] && !strcmp_os(ldconfs[j], ldconfs[i]))
             break;
         }
-        if (j != i) {
-          /* This file's already going to be loaded */
-          caml_stat_free(ldconfs[i]);
-          ldconfs[i] = NULL;
-        } else {
-          sizes[i] = st.st_size;
-          nread += st.st_size + 1;
+
+        if (j == i) {
+          /* Allocate or grow the buffer, if needed */
+          if (configsize == 0) {
+            config = caml_stat_alloc(st.st_size + 1);
+          } else if (configsize < st.st_size + 1) {
+            configsize = st.st_size + 1;
+            config = caml_stat_resize(config, configsize);
+          }
+
+          if ((ldconf = open_os(ldconfs[i], O_RDONLY, 0)) == -1) {
+            caml_fatal_error("cannot read loader config file %s",
+                             caml_stat_strdup_of_os(ldconfs[i]));
+          }
+          if (read(ldconf, config, st.st_size) != st.st_size) {
+            caml_fatal_error("error while reading loader config file %s",
+                             caml_stat_strdup_of_os(ldconfs[i]));
+          }
+          close(ldconf);
+          config[st.st_size] = 0;
+
+          for (p = q = config; *p != 0; p++) {
+            if (*p == '\n') {
+              *p = 0;
+              caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
+              q = p + 1;
+            }
+          }
+          if (q < p)
+            caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
         }
       }
     }
   }
 
-  /* No ld.conf files found */
-  if (nread == 0)
-    return NULL;
+  for (i = 0; i < 3; i++)
+   if (ldconfs[i])
+     caml_stat_free(ldconfs[i]);
 
-  /* nread is the buffer required to load the files; ldconfs entries are either
-     NULL or a file to read. Now read the files */
-  config = current = caml_stat_alloc(nread);
-  for (i = 0; i < 3; i++) {
-    if (ldconfs[i]) {
-      if ((ldconf = open_os(ldconfs[i], O_RDONLY, 0)) == -1) {
-        caml_fatal_error("cannot read loader config file %s",
-                         caml_stat_strdup_of_os(ldconfs[i]));
-      }
-      if (read(ldconf, current, sizes[i]) == -1) {
-        caml_fatal_error("error while reading loader config file %s",
-                         caml_stat_strdup_of_os(ldconfs[i]));
-      }
-      close(ldconf);
-      current[sizes[i]] = 0;
-      /* Include the null terminator */
-      sizes[i]++;
-      current += sizes[i];
-    }
-  }
+  if (configsize > 0)
+    caml_stat_free(config);
 
-  wconfig = wcurrent = caml_stat_memdup_to_os(config, nread);
-  caml_stat_free(config);
-
-  /* Now process them */
-  for (i = 0; i < 3; i++) {
-    if (ldconfs[i]) {
-      /* Filename isn't needed any more */
-      caml_stat_free(ldconfs[i]);
-      for (p = q = wcurrent; *p != 0; p++) {
-        if (*p == '\n') {
-          *p = 0;
-          caml_ext_table_add(&caml_shared_libs_path, q);
-          q = p + 1;
-        }
-      }
-      if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
-      wcurrent += sizes[i];
-    }
-  }
-
-  return wconfig;
+  return;
 }
 
 /* Open the given shared library and add it to shared_libs.
@@ -212,7 +194,6 @@ void caml_build_primitive_table(char_os * lib_path,
                                 char_os * libs,
                                 char * req_prims)
 {
-  char_os * tofree1, * tofree2;
   char_os * p;
   char * q;
 
@@ -223,12 +204,12 @@ void caml_build_primitive_table(char_os * lib_path,
      - directories specified in OCAMLLIB/ld.conf
      - directories specified in CAMLLIB/ld.conf
      - directories specified in the file <stdlib>/ld.conf */
-  tofree1 = caml_decompose_path(&caml_shared_libs_path,
-                                caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
+  caml_decompose_path(&caml_shared_libs_path,
+                      caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
   if (lib_path != NULL)
     for (p = lib_path; *p != 0; p += strlen_os(p) + 1)
-      caml_ext_table_add(&caml_shared_libs_path, p);
-  tofree2 = caml_parse_ld_conf();
+      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_os(p));
+  caml_parse_ld_conf();
   /* Open the shared libraries */
   caml_ext_table_init(&shared_libs, 8);
   if (libs != NULL)
@@ -249,9 +230,7 @@ void caml_build_primitive_table(char_os * lib_path,
 #endif
   }
   /* Clean up */
-  caml_stat_free(tofree1);
-  caml_stat_free(tofree2);
-  caml_ext_table_free(&caml_shared_libs_path, 0);
+  caml_ext_table_free(&caml_shared_libs_path, 1);
 }
 
 /* Build the table of primitives as a copy of the builtin primitive table.
