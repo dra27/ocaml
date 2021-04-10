@@ -51,6 +51,7 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 
 ### Where to look for the standard library on target
 TARGET_LIBDIR=@TARGET_LIBDIR@
+TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
 
 # Platform-dependent command to create symbolic links
