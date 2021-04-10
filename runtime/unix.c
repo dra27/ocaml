@@ -53,6 +53,9 @@
 #else
 #include <sys/dir.h>
 #endif
+#ifdef HAS_LIBGEN_H
+#include <libgen.h>
+#endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
@@ -495,4 +498,71 @@ void caml_init_os_params(void)
 {
   caml_sys_pagesize = sysconf(_SC_PAGESIZE);
   return;
+}
+
+static char * caml_dirname (const char * path)
+{
+#ifdef HAS_LIBGEN_H
+  char *dir, *res;
+  dir = caml_stat_strdup(path);
+  res = caml_stat_strdup(dirname(dir));
+  caml_stat_free(dir);
+  return res;
+#else
+  /* See Filename.generic_dirname */
+  size_t n = strlen(path) - 1;
+  char *res;
+  if (n < 0) /* path is "" */
+    return caml_stat_strdup(".");
+  while (n >= 0 && path[n] == '/')
+    n--;
+  if (n < 0) /* path is entirely slashes */
+    return caml_stat_strdup("/");
+  while (n >= 0 && path[n] != '/')
+    n--;
+  if (n < 0) /* path is relative */
+    return caml_stat_strdup(".");
+  while (n >= 0 && path[n] == '/')
+    n--;
+  if (n < 0) /* path is a file at root */
+    return caml_stat_strdup("/");
+  /* n is the _index_ of the last character of the dirname */
+  res = caml_stat_alloc(n + 2);
+  memcpy(res, path, n + 1);
+  res[n + 1] = 0;
+  return res;
+#endif
+}
+
+CAMLextern void caml_locate_standard_library (const char *exe_name)
+{
+  if (Is_relative_dir(caml_standard_library_default)) {
+    char * candidate = NULL;
+    char * root = caml_dirname(exe_name);
+    /* Determine the standard library default relative to exe_name */
+    if (!atomic_compare_exchange_weak(&caml_relative_root_dir,
+                                      &candidate, root)) {
+      caml_stat_free(root);
+    } else {
+      candidate = caml_stat_strconcat_os(3, caml_relative_root_dir,
+                                            CAML_DIR_SEP,
+                                            caml_standard_library_default);
+#ifndef HAS_REALPATH
+      caml_standard_library = candidate;
+#else
+      char * resolved_candidate = realpath(candidate, NULL);
+      /* If realpath fails, use the non-normalised path for error messages. */
+      if (resolved_candidate == NULL) {
+        caml_standard_library = candidate;
+      } else {
+        caml_stat_free(candidate);
+        /* caml_realpath uses malloc */
+        caml_standard_library = caml_stat_strdup_os(resolved_candidate);
+        free(resolved_candidate);
+      }
+#endif
+    }
+  } else {
+    caml_standard_library = caml_standard_library_default;
+  }
 }
