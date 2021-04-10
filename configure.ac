@@ -63,6 +63,7 @@ profinfo_width=0
 extralibs=
 instrumented_runtime=false
 instrumented_runtime_ldlibs=""
+bindir_to_libdir=''
 
 # Information about the package
 
@@ -168,6 +169,7 @@ AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
 AC_SUBST([target_bindir])
+AC_SUBST([bindir_to_libdir])
 
 ## Generated files
 
@@ -380,6 +382,10 @@ AC_ARG_ENABLE([function-sections],
     [do not emit each function in a separate section])],
   [],
   [enable_function_sections=auto])
+
+AC_ARG_ENABLE([relative],
+  [AS_HELP_STRING([--enable-relative],
+    [try to locate the standard library using relative paths])])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
@@ -1836,6 +1842,12 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
+
+AS_IF([test x"$enable_relative" = "xyes"],[
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
+  dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
+  dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
+])
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
