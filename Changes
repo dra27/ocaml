@@ -85,6 +85,11 @@ Working version
   experimental.
   (Nicolás Ojeda Bär, review by David Allsopp)
 
+- #10???: Bytecode loads ld.conf from all of $OCAMLLIB/ld.conf, $CAMLLIB/ld.conf
+  and standard_library_default/ld.conf rather than just the first one of these
+  encountered.
+  (David Allsopp, reivew by ???)
+
 ### Code generation and optimizations:
 
 - #9876: do not cache the young_limit GC variable in a processor register.
