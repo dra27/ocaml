@@ -27,7 +27,11 @@ let standard_library =
   try
     Sys.getenv "CAMLLIB"
   with Not_found ->
-    standard_library_default
+    standard_library_effective
+
+let standard_library_relative = relative_root_dir <> None
+
+let bindir = Option.value ~default:bindir relative_root_dir
 
 let exec_magic_number = {magic|@EXEC_MAGIC_NUMBER@|magic}
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
@@ -76,9 +80,15 @@ let configuration_variables () =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  let standard_library_relative =
+    if Filename.is_relative standard_library_default then
+      standard_library_default
+    else
+      "" in
 [
   p "version" version;
-  p "standard_library_default" standard_library_default;
+  p "standard_library_default" standard_library_effective;
+  p "standard_library_relative" standard_library_relative;
   p "standard_library" standard_library;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
