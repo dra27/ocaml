@@ -3,6 +3,11 @@ OCaml 4.14 maintenance version
 
 ### Runtime system:
 
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
 ### Code generation and optimizations:
 
 ### Standard library:
@@ -14,11 +19,6 @@ OCaml 4.14 maintenance version
 ### Manual and documentation:
 
 ### Compiler user-interface and warnings:
-
-- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
-  shared_libs_path item in `ocamlrun -config` in addition to displaying the
-  entries found in ld.conf.
-  (David Allsopp, review by Stephen Dolan)
 
 ### Internal/compiler-libs changes:
 
