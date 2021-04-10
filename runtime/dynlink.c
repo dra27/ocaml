@@ -92,11 +92,13 @@ CAMLexport char_os * caml_get_stdlib_location(void)
 
 CAMLexport char_os * caml_parse_ld_conf(void)
 {
-  char_os * stdlib, * ldconfname, * wconfig, * p, * q;
+  char_os * stdlib, * ldconfname, * wconfig, * p, * q, * r;
   char * config;
 #ifdef _WIN32
+  #define OPEN_FLAGS _O_BINARY | _O_RDONLY
   struct _stati64 st;
 #else
+  #define OPEN_FLAGS O_RDONLY
   struct stat st;
 #endif
   int ldconf, nread;
@@ -107,7 +109,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
     caml_stat_free(ldconfname);
     return NULL;
   }
-  ldconf = open_os(ldconfname, O_RDONLY, 0);
+  ldconf = open_os(ldconfname, OPEN_FLAGS, 0);
   if (ldconf == -1)
     caml_fatal_error("cannot read loader config file %s",
                          caml_stat_strdup_of_os(ldconfname));
@@ -126,6 +128,15 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       *p = 0;
       caml_ext_table_add(&caml_shared_libs_path, q);
       q = p + 1;
+    } else if (*p == '\r') {
+      r = p;
+      /* Allow \r+ */
+      while (*(++r) == '\r');
+      if (*r == '\n') {
+        /* Matched \r+\n */
+        *p = 0;
+      }
+      p = r - 1;
     }
   }
   if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
@@ -133,6 +144,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   caml_stat_free(ldconfname);
   return wconfig;
 }
+#undef OPEN_FLAGS
 
 /* Open the given shared library and add it to shared_libs.
    Abort on error. */
