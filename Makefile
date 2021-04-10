@@ -1357,8 +1357,16 @@ endif
 ## Generated non-object files
 
 runtime/ld.conf: $(ROOTDIR)/Makefile.config
-	$(V_GEN)echo "$(STUBLIBDIR)" > $@ && \
-	echo "$(LIBDIR)" >> $@
+ifneq "$(STUBLIBDIR)" "$(LIBDIR)/stublibs"
+	$(V_GEN)echo "$(STUBLIBDIR)" > $@
+else
+ifeq "$(UNIX_OR_WIN32)" "unix"
+	$(V_GEN)echo './stublibs' > $@
+else
+	$(V_GEN)echo '.\stublibs' > $@
+endif
+endif
+	@echo "." >> $@
 
 runtime/primitives: runtime/gen_primitives.sh $(runtime_BYTECODE_C_SOURCES)
 	$(V_GEN)runtime/gen_primitives.sh $@ $(runtime_BYTECODE_C_SOURCES)
