@@ -1501,21 +1501,6 @@ let () =
       in
       if code = 0 then
         let lines =
-          (* Known issue: ocamlc opens ld.conf in text mode on Cygwin but
-             ocamlrun opens it in binary mode (the default) *)
-          match test.stdlib with
-          | "\r" :: _ when Sys.cygwin && lines <> [] ->
-              (* This all gets a bit silly until CRLF is consistently
-                 handled! *)
-              let lines =
-                "" :: List.take 2 (List.tl lines)
-                  @ ["."; ".."] @ List.drop 5 lines
-              in
-              List.map (Fun.flip (^) "\r") lines
-          | _ ->
-              lines
-        in
-        let lines =
           (* Known issue: Misc.split_path_contents ignores empty strings where
              caml_decompose_path does not *)
           if test.caml_ld_library_path = Set []
@@ -1759,8 +1744,8 @@ let test_ld_conf env =
         "/", "/", None;
         "//", "//", None;
         (* Current and Parent directory names *)
-        ".", libdir / "", if_not_win32 ".\r";
-        "..", libdir / "..", if_not_win32 "..\r";
+        ".", libdir / "", None;
+        "..", libdir / "..", None;
         (* Current and Parent directory names with OS-default trailing separator
            (i.e. ./ and ../ on Unix and .\ and ..\ on Windows) *)
         "." / "", libdir / "", None;
@@ -1778,15 +1763,7 @@ let test_ld_conf env =
         "/lib/ocaml", "/lib/ocaml", Some "/lib/ocaml\r";
       ] in
       let fold (main, main_outcome, main_outcome_cr) (line, outcome, cr) =
-        let cr = match cr with
-        | Some cr -> cr
-        | None ->
-            (* Windows opens ld.conf in text mode, so the \r are stripped *)
-            if Sys.win32 then
-              outcome
-            else
-              outcome ^ "\r"
-        in
+        let cr = Option.value ~default:outcome cr in
         line::main, outcome::main_outcome, cr::main_outcome_cr
       in
       List.fold_left fold ([], [], []) (List.rev data)
@@ -1875,12 +1852,12 @@ let test_ld_conf env =
     let tests =
       (* As first, but with a CR at the end of each line *)
       let outcome =
-        (* Windows opens ld.conf in text mode, so the line with just \r is
-           read as an empty string and consequently stripped *)
+        (* Known issue: Windows strips out the blank entries in the search
+           path (somewhat counterintuitively!) *)
         if Sys.win32 then
           main_outcome_cr
         else
-          "\r" :: main_outcome_cr
+          "." :: main_outcome_cr
       in
       {base with description = "Base ld.conf with CRLF endings";
                  stdlib = List.map (Fun.flip (^) "\r") ("" :: main);
