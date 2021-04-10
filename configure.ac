@@ -59,6 +59,7 @@ profinfo=false
 profinfo_width=0
 extralibs=
 bootstrapping_flexdll=false
+target_libdir_is_relative=false
 
 # Information about the package
 
@@ -176,6 +177,7 @@ AC_SUBST([naked_pointers])
 AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
+AC_SUBST([target_libdir_is_relative])
 
 ## Generated files
 
@@ -185,6 +187,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+AC_CONFIG_HEADERS([runtime/caml_internal_config.h])
 
 # Works out how many "o"s are needed in quoted strings
 AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
@@ -442,6 +445,14 @@ AC_ARG_ENABLE([flat-float-array],
   [AS_HELP_STRING([--disable-flat-float-array],
     [do not use flat float arrays])])
 
+AC_ARG_WITH([relative-libdir],
+  [AS_HELP_STRING([--with-relative-libdir],
+    [location of the Standard Library, specified relative to --bindir])],
+  [AS_IF([test x"$withval" = 'xno'],
+    [bindir_to_libdir=''],
+    [bindir_to_libdir="$withval"])],
+  [bindir_to_libdir=''])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -592,7 +603,7 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+  [printf '%s\n%s\000\n' "$launch_method" "$HOST_BINDIR" \
     > stdlib/runtime.info
   printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info],
@@ -603,7 +614,7 @@ dnl nefarious single quotes which may appear in any of the strings.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
-  ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
+  HOST_BINDIR='$(echo "$HOST_BINDIR" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
 # Are we building a cross-compiler
@@ -892,6 +903,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
 
 AC_CHECK_HEADER([math.h])
 AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
+AC_CHECK_HEADER([libgen.h],[AC_DEFINE([HAS_LIBGEN_H], [1])])
 AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])
 AC_CHECK_HEADER([sys/shm.h],[AC_DEFINE([HAS_SYS_SHM_H])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT])], [],
@@ -1413,6 +1425,8 @@ AC_CHECK_FUNC([nanosleep], [AC_DEFINE([HAS_NANOSLEEP])])
 AC_CHECK_FUNC([symlink],
   [AC_CHECK_FUNC([readlink],
     [AC_CHECK_FUNC([lstat], [AC_DEFINE([HAS_SYMLINK])])])])
+
+AC_CHECK_FUNC([realpath], [AC_DEFINE([HAS_REALPATH])])
 
 # wait
 AC_CHECK_FUNC(
@@ -1995,6 +2009,23 @@ AS_CASE([$cygwin_build_env,$host],
        [ocaml_libdir='${exec_prefix}\lib\ocaml'],
        [ocaml_libdir="$libdir"])])])
 
+AS_IF([test x"$libdir" = x'${exec_prefix}/lib/ocaml'],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [ocaml_libdir="$bindir_to_libdir"
+    target_libdir_is_relative=true
+    AS_CASE([$cygwin_build_env,$host],
+      [true,*-w64-mingw32*|true,*-pc-windows],
+        [build_bindir_to_libdir="$(LC_ALL=C.UTF-8 cygpath \
+                                   "$bindir_to_libdir")"],
+      [build_bindir_to_libdir="$bindir_to_libdir"])
+    AS_CASE([$build_bindir_to_libdir],
+      [./*],[libdir="$bindir${build_bindir_to_libdir[#].}"],
+      [../*],[libdir="$bindir/$build_bindir_to_libdir"],
+      [AC_MSG_ERROR([--with-relative-libdir requires a relative path])])])],
+  [AS_IF([test x"$bindir_to_libdir" != 'x'],
+    [AC_MSG_ERROR(m4_normalize([--with-relative-libdir and --libdir cannot both
+      be specified]))])])
+
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
 # (all this should be understood and fixed)
@@ -2019,10 +2050,30 @@ AC_CONFIG_COMMANDS_PRE([
   AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
   AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
   eval "exec_prefix=\"$exec_prefix\""
-  eval "ocaml_bindir=\"$ocaml_bindir\""
+  # Set variables necessary to create utils/config.generated.ml and the two
+  # runtime-launch-info templates in stdlib.
+  # $ocaml_bindir is used for utils/config.generated.ml and is _empty_ if the
+  #   compiler is configured with --with-relative-libdir (otherwise the path
+  #   would be embedded in config.cmo)
+  # $HOST_BINDIR and $TARGET_BINDIR are used to generate the two
+  #   runtime-launch-info files. $HOST_BINDIR is always the absolute path to the
+  #   binary directory, in host format (i.e. potentially with backslashes on
+  #   Windows). $TARGET_BINDIR can be specified by the caller when building
+  #   cross-compilers, and the value then is used unaltered. Otherwise,
+  #   $TARGET_BINDIR is set to '.' when the compiler is configured with
+  #   --with-relative-libdir or the value of $HOST_BINDIR otherwise.
+  eval "HOST_BINDIR=\"$ocaml_bindir\""
+  AS_IF([test "x$bindir_to_libdir" = 'x'],
+    [ocaml_bindir="$HOST_BINDIR"],
+    [ocaml_bindir=''])
+  AS_IF([test x"$TARGET_BINDIR" = 'x'],
+    [AS_IF([test "x$bindir_to_libdir" = 'x'],
+      [TARGET_BINDIR="$HOST_BINDIR"],
+      [TARGET_BINDIR='.'])])
   eval "ocaml_libdir=\"$ocaml_libdir\""
-  AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
-  TARGET_LIBDIR="$ocaml_libdir"
+  AS_IF([test "x$bindir_to_libdir" = 'x'],
+    [TARGET_LIBDIR="$ocaml_libdir"],
+    [TARGET_LIBDIR="$bindir_to_libdir"])
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"

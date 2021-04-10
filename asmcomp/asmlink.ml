@@ -245,7 +245,7 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
     Runtimedef.builtin_exceptions;
   if need_stdlib then begin
     let standard_library_default =
-      Option.value ~default:Config.standard_library_default
+      Option.value ~default:Config.standard_library_effective
                    !Clflags.standard_library_default in
     compile_phrase
       (Cmmgen.emit_global_string_constant
