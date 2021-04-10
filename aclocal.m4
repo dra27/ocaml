@@ -501,3 +501,115 @@ AC_DEFUN([OCAML_CHECK_LN_ON_WINDOWS], [
   )
   AC_MSG_RESULT([$ln])
 ])
+
+dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR(from, to, result[, test]) computes the
+dnl relative path between the contents of $from and $to and puts the result in
+dnl $result (i.e. from, to and result are the _names_ of variables). The fourth
+dnl parameter is used for testing and if non-empty causes result to be set to ''
+dnl instead of calling AC_MSG_ERROR.
+AC_DEFUN([OCAML_COMPUTE_BINDIR_TO_LIBDIR], [
+  eval "from=\"\$$1\""
+  eval "to=\"\$$2\""
+
+  AS_IF([test -z "$4"],[
+    dnl In live mode, display the names of the variables
+    AC_MSG_CHECKING([relative path between \$$1 and \$$2])
+  ],[
+    dnl In testing mode, display the actual values
+    AC_MSG_CHECKING([relative path between $from and $to])
+  ])
+
+  dnl Compute the relative path from $from to $to. There are five cases
+  dnl to consider:
+  dnl
+  dnl | $from  | $to     | result
+  dnl +----------+-------------+--------
+  dnl | /ocaml   | /ocaml      | .
+  dnl | /bin     | /binn       | ../binn
+  dnl | /ocaml   | /ocaml/lib  | ./lib
+  dnl | /a/b/c   | /a          | ../..
+  dnl | C:\ocaml | D:\ocamllib | Error
+  dnl
+  dnl This code goes to considerable trouble only to use POSIX options!
+  dnl $result is guaranteed to begin either ./ or ../
+
+  AS_IF([test "x$from" = "x$to"],[
+    result='.'
+  ],[
+    dnl Get the offset of the first byte which differs between the two
+    echo "$from" > conftest.from
+    echo "$to" > conftest.to
+    common_prefix_len="$(cmp -l conftest.from conftest.to 2>/dev/null \
+                           | head -n 1 \
+                           | sed -e 's/^ *//' \
+                           | cut -d ' ' -f 1)"
+    common_prefix="$(expr $common_prefix_len - 1)"
+    AS_IF([test $common_prefix -eq 0],[
+      result=''
+      AS_IF([test -z "$4"],[AC_MSG_ERROR([no common prefix])])
+    ],[
+      common_prefix="$(echo "$from" | cut -c -$common_prefix)"
+
+      dnl to might be a subdirectory of from. ${result##/*} erases a string
+      dnl which begins with / and tests that $to is of the form "$from/dir"
+      dnl (cf. $from=/ocaml and $to=/ocamllib)
+      from_chopped="$(echo "$from" | cut -c $common_prefix_len-)"
+      to_chopped="$(echo "$to" | cut -c $common_prefix_len-)"
+      AS_IF([test "x${common_prefix}" = "x${from}" && \
+             test -z "${to_chopped##/*}" ],[
+        result=".$to_chopped"
+      ],
+      [test "y${common_prefix}" = "x${to}" && \
+       test -z "${from_chopped##/*}"],[
+        echo "Here with $from_chopped and $to_chopped but confused"
+        exit 1
+      ],[
+        dnl $to is not rooted inside $from, so work out the number of ../
+        dnl components needed to get from $from to $common_prefix. Ensure it's a
+        dnl directory component only (/foo/bar and /foo/baz have /foo/ba in
+        dnl common)
+        AS_IF([test "x${common_prefix}" = "x${to}" && \
+               test -z "${from_chopped##/*}"],[
+          common_prefix=$(echo "$common_prefix/" | wc -c)
+        ],[
+          common_prefix=$(echo "${common_prefix%/*}/" | wc -c)
+        ])
+        dnl Remove the prefix from each directory
+        get_from="$(echo "$from" | cut -c $common_prefix-)"
+        get_to="$(echo "$to" | cut -c $common_prefix-)"
+        dnl get_from is a relative path, so recursively calling dirname will
+        dnl eventually get us back to ".". Each call to dirname adds ../ to the
+        dnl result
+        result=''
+        while test "$get_from" != '.' ; do
+          result="../$result"
+          get_from="$(dirname "$get_from")"
+        done
+        AS_IF([test -z "$get_to"],[
+          result="${result%/}"
+        ],[
+          result="$result$get_to"
+        ])
+      ])
+    ])
+  ])
+  eval "$3='$result'"
+  AC_MSG_RESULT([$result])
+])
+
+AC_DEFUN([OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST],[
+  a="$1"
+  b="$2"
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([a],[b],[r],[1])
+  AS_IF([test "x$r" != "x$3"],[
+    AC_MSG_ERROR([Expected "$3"])
+  ])
+])
+
+AC_DEFUN([OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS],[
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/ocaml],[/ocaml],[.])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/bin],[/binn],[../binn])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/ocaml],[/ocaml/lib],[./lib])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/a/b/c],[/a],[../..])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([C:\ocaml],[D:\ocamllib],[])
+])

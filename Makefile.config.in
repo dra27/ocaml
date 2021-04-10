@@ -52,6 +52,7 @@ datarootdir=@datarootdir@
 
 ### Where to install the standard library
 LIBDIR=@libdir@
+LIBDIR_REL=@bindir_to_libdir@
 
 ### Where to install the stub code for the standard library
 STUBLIBDIR=@libdir@/stublibs
