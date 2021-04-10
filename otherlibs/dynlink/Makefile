@@ -230,7 +230,7 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 	cp $< $@
 
 extract_crc: dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) -o $@ $(OC_COMMON_LINKFLAGS) $^
 
 install:
 	$(INSTALL_DATA) \

@@ -186,7 +186,7 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	rm -f ld.conf
+	rm -f ld.conf caml_internal_config.h
 
 # Generated non-object files
 
