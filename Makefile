@@ -1407,15 +1407,22 @@ C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
 
 runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 	$(V_GEN)echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@ && \
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@ && \
-	echo '#define HOST "$(HOST)"' >> $@
+	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+ifneq "$(LIBDIR_REL)" ""
+	@echo '#define OCAML_STDLIB_DIR_REL $(call C_LITERAL,$(LIBDIR_REL))' >> $@
+endif
+	@echo '#define HOST "$(HOST)"' >> $@
+
+runtime/stdlib.$(O): runtime/build_config.h
 
 ## Runtime libraries and programs
 
-runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
+runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                        runtime/libcamlrun.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
-runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
+runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                         runtime/libcamlrun_non_shared.$(A)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
 
 runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
@@ -1424,13 +1431,15 @@ runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
 runtime/libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 
-runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/libcamlrund.$(A)
+runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                         runtime/libcamlrund.$(A)
 	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS)
 
 runtime/libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 
-runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/libcamlruni.$(A)
+runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                         runtime/libcamlruni.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(BYTECCLIBS)
 
 runtime/libcamlruni.$(A): $(libcamlruni_OBJECTS)
@@ -2003,6 +2012,14 @@ test_in_prefix_LIBRARIES = otherlibs/unix/unix compilerlibs/ocamlcommon
 testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
 testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
+
+ifeq "$(RELATIVE_LIBDIR)" "true"
+# testsuite/tools/test_in_prefix cannot use a relative stdlib (the alternative
+# would be to compile it directly with the installed compiler)
+test_in_prefix_NATIVE_LINKFLAGS =
+test_in_prefix_COMMON_LINKFLAGS = \
+  -set-global-string 'caml_standard_library_default=$(LIBDIR)'
+endif
 
 testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
