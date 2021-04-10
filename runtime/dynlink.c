@@ -75,12 +75,44 @@ static c_primitive lookup_primitive(char * name)
 
 #define LD_CONF_NAME T("ld.conf")
 
+static inline char_os * filename_concat(char_os * path1, char_os * path2)
+{
+  if (Is_dir_separator(path1[strlen_os(path1) - 1]))
+    return caml_stat_strconcat_os(2, path1, path2);
+  else
+    return caml_stat_strconcat_os(3, path1, CAML_DIR_SEP, path2);
+}
+
+static void add_ld_conf_entry(char_os * root, char_os * dir)
+{
+  char_os * entry;
+  size_t len = strlen_os(dir);
+  /* Implicit paths, "." and ".." are treated relative to ld.conf */
+  if ((len == 1 && dir[0] == '.')
+      || (len == 2 && dir[0] == '.' && Is_dir_separator(dir[1]))) {
+    /* "." or "./" - add the directory containing ld.conf */
+    entry = caml_stat_strdup_os(root);
+  } else if (len >= 2 && dir[0] == '.' && dir[1] == '.'
+             && (len == 2 || Is_dir_separator(dir[2]))) {
+    /* ".." or "../..." */
+    entry = filename_concat(root, dir);
+  } else if (len >= 2 && dir[0] == '.' && Is_dir_separator(dir[1])) {
+    /* "./..." */
+    entry = filename_concat(root, dir + 2);
+  } else {
+    /* Absolute or implicit path */
+    entry = caml_stat_strdup_os(dir);
+  }
+  caml_ext_table_add(&caml_shared_libs_path, entry);
+}
+
 static void parse_ld_conf(void)
 {
-  char_os * ldconfs[3] = {
+  char_os * locations[3] = {
     caml_secure_getenv(T("OCAMLLIB")),
     caml_secure_getenv(T("CAMLLIB")),
     OCAML_STDLIB_DIR };
+  char_os * ldconfs[3] = {NULL, NULL, NULL};
   char * config;
   char * p, * q, * r;
 #ifdef _WIN32
@@ -96,9 +128,9 @@ static void parse_ld_conf(void)
   /* Loop through the possible ld.conf files, ignoring clearly identical
      files. */
   for (i = 0; i < 3; i++) {
-    if (ldconfs[i]) {
+    if (locations[i] && strlen_os(locations[i]) > 0) {
       ldconfs[i] =
-        caml_stat_strconcat_os(3, ldconfs[i], CAML_DIR_SEP, LD_CONF_NAME);
+        caml_stat_strconcat_os(3, locations[i], CAML_DIR_SEP, LD_CONF_NAME);
 
       if (stat_os(ldconfs[i], &st) != -1) {
         /* Check if the file has obviously been loaded by a previous step */
@@ -130,7 +162,7 @@ static void parse_ld_conf(void)
           for (p = q = config; *p != 0; p++) {
             if (*p == '\n') {
               *p = 0;
-              caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
+              add_ld_conf_entry(locations[i], q);
               q = p + 1;
             } else if (*p == '\r') {
               r = p;
@@ -144,7 +176,7 @@ static void parse_ld_conf(void)
             }
           }
           if (q < p)
-            caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
+            add_ld_conf_entry(locations[i], q);
         }
       }
     }
