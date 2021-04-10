@@ -31,6 +31,17 @@ let mklib out files opts =
   else Printf.sprintf "%s rcs %s %s %s && %s %s"
                       Config.ar out opts files Config.ranlib out
 
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default = standard_library_default ()
+
+external stdlib_dirs : string -> string * string option
+   = "caml_sys_get_stdlib_dirs"
+
+let _, relative_root_dir = stdlib_dirs standard_library_default
+
+let bindir = Option.value ~default:bindir relative_root_dir
+
 let compiler_path name =
   Filename.concat bindir name
 
