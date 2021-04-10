@@ -13866,12 +13866,14 @@ fi
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
 printf "%s\n" "$ln" >&6; }
 
+    default_separator='\'
     ocamltest_libunix="Some false"
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr" ;; #(
   *) :
     unix_or_win32="unix"
   ln='ln -sf'
+  default_separator='/'
   ocamltest_libunix="Some true"
   ocamlyacc_wstr_module="" ;;
 esac
@@ -22158,6 +22160,7 @@ fi
 ocaml_additional_stublibs_dir=\
 '$(echo "$ocaml_additional_stublibs_dir" | sed -e "s/'/'\"'\"'/g")'
   ocaml_libdir='$(echo "$ocaml_libdir" | sed -e "s/'/'\"'\"'/g")'
+  default_separator='$default_separator'
 
 _ACEOF
 
@@ -23334,8 +23337,8 @@ ltmain=$ac_aux_dir/ltmain.sh
     "runtime/ld.conf":C) rm -f runtime/ld.conf
   test x"$ocaml_additional_stublibs_dir" = 'x' || \
     echo "$ocaml_additional_stublibs_dir" > runtime/ld.conf
-  echo "$ocaml_libdir/stublibs" >> runtime/ld.conf
-  echo "$ocaml_libdir" >> runtime/ld.conf ;;
+  echo ".${default_separator}stublibs" >> runtime/ld.conf
+  echo "." >> runtime/ld.conf ;;
 
   esac
 done # for ac_tag
