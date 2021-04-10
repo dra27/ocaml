@@ -91,6 +91,12 @@ Working version
   as Windows.
   (David Allsopp, reivew by ???)
 
+* #10???: Explicit relative paths in ld.conf (".", "..", "./..." ,"../...") are
+  interpreted as being relative to the directory ld.conf was loaded from. The
+  brave may continue to put implicit paths in ld.conf. The interpretation of
+  CAML_LD_LIBRARY_PATH is unaltered.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #9876: do not cache the young_limit GC variable in a processor register.
