@@ -84,6 +84,7 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 bindir_to_libdir=''
+relative_libdir=false
 
 # Information about the package
 
@@ -251,6 +252,7 @@ AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
 AC_SUBST([target_bindir])
 AC_SUBST([bindir_to_libdir])
+AC_SUBST([relative_libdir])
 
 ## Generated files
 
@@ -2575,6 +2577,7 @@ AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
 
 AS_IF([test x"$enable_relative" = "xyes"],[
+  relative_libdir=true
   OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
   dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
   dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
