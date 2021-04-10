@@ -115,8 +115,8 @@ CAMLexport char_os * caml_parse_ld_conf(void)
     caml_secure_getenv(T("OCAMLLIB")),
     caml_secure_getenv(T("CAMLLIB")),
     OCAML_STDLIB_DIR};
-  char_os * libroot, * ldconfname, * wconfig, * p, * q;
-  char_os last, * entry, * result;
+  char_os * libroot, * ldconfname, * wconfig, * p, * q, * r;
+  char_os * entry, * result;
   char * config;
 #ifdef _WIN32
   struct _stati64 st;
@@ -162,7 +162,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       p = wconfig;
       while (*p != '\0') {
         for (q = p; *q != '\0' && *q != '\n'; q++) /*nothing*/;
-        char_os *r = q;
+        r = q;
         if (*q == '\n') {
           r++;
           /* Ignore any trailing CR characters, so that CR*LF is uniformly
