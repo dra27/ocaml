@@ -117,12 +117,18 @@ let add_ccobjs origin l =
   end
 
 let runtime_lib () =
-  let libname = "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
-  try
-    if !Clflags.nopervasives || not !Clflags.with_runtime then []
-    else [ Load_path.find libname ]
-  with Not_found ->
-    raise(Error(File_not_found libname))
+  if !Clflags.runtime_variant = "_shared" && Config.ccomp_type <> "msvc" then
+    if Config.suffixing then
+      [Misc.RuntimeID.shared_runtime Sys.Native]
+    else
+      ["-lasmrun_shared"]
+  else
+    let libname = "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
+    try
+      if !Clflags.nopervasives || not !Clflags.with_runtime then []
+      else [ Load_path.find libname ]
+    with Not_found ->
+      raise(Error(File_not_found libname))
 
 let object_file_name name =
   let file_name =
