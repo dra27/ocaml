@@ -181,6 +181,7 @@ let systhread_supported = %%SYSTHREAD_SUPPORT%%;;
 
 let flexdll_dirs = [%%FLEXDLL_DIR%%];;
 
+let suffixing = %%SUFFIXING%%
 let launch_method = "%%TARGET_LAUNCH_METHOD%%"
 
 let launch_method =
