@@ -98,6 +98,7 @@ AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 AC_SUBST([CC])
 AC_SUBST([DIFF_FLAGS])
 AC_SUBST([CSC])
@@ -219,6 +220,8 @@ AC_SUBST([bindir_exp])
 AC_SUBST([target_bindir_exp])
 AC_SUBST([target_bindir])
 AC_SUBST([bindir_to_libdir])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
 
 ## Generated files
 
@@ -252,6 +255,7 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
   AC_DEFINE([OCAML_VERSION_EXTRA], ["][OCAML__VERSION_EXTRA]["])])
 AC_DEFINE([OCAML_VERSION], [OCAML__VERSION_NUMBER])
 AC_DEFINE([OCAML_VERSION_STRING], ["][OCAML__VERSION]["])
+AC_DEFINE([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 
 # Works out how many "o"s are needed in quoted strings
 AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
@@ -2241,6 +2245,47 @@ AS_IF([test x"$bindir" = 'x${exec_prefix}/bin'],
       [bindir_exp="${prefix}/bin"])],
     [bindir_exp="${exec_prefix}/bin"])])
 target_bindir_exp="$bindir_exp"
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+m4_define([ALPHABET],
+          [0123456789abcdefghijklmnopqrstuv])
+alphabet='ALPHABET'
+
+m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
+         [m4_define([ID_VERSION], m4_eval(OCAML__RELEASE_NUMBER << 1))],
+         [m4_define([ID_VERSION], m4_eval(1 + (OCAML__RELEASE_NUMBER << 1)))])
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=m4_eval(ID_VERSION >> 5)
+# Bit 7 (int31)
+AS_IF([! $arch64], [quintet1="4 + ${quintet1}"])
+# Bit 8 (no shared libraries)
+AS_IF([! $supports_shared_libraries], [quintet1="8 + ${quintet1}"])
+# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${profinfo_width} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+AS_IF([$frame_pointers], [quintet3_native='1'], [quintet3_native='0'])
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+AS_IF([! $flat_float_array], [quintet3_byte="8 + ${quintet3_byte}"])
+# Bit 19 (WINDOWS_UNICODE=ansi)
+AS_CASE([$host,$windows_unicode],
+  [*-*-mingw32,0|*-pc-windows,0], [quintet3_byte="16 + ${quintet3_byte}"])
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}QUINTET0"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}QUINTET0"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
