@@ -2414,7 +2414,8 @@ let test_relocation prefix bindir libdir =
           LocationSet.empty in
       if Config.ccomp_type = "msvc"
            && basename <> "ocaml"
-           && (basename <> "ocamlrund" || clang_cl) then
+           && (not (List.mem "ocamlrund" (String.split_on_char '-' basename))
+                 || clang_cl) then
         prefix
       else
         LocationSet.add Build prefix
