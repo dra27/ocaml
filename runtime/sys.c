@@ -751,11 +751,7 @@ CAMLprim value caml_zinc_runtime_id(value unit)
 #else
     Val_true,
 #endif
-#ifdef HAS_ZSTD
     Val_false
-#else
-    Val_true
-#endif
   );
 
   CAMLreturn (result);

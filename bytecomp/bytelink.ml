@@ -239,7 +239,7 @@ let link_compunit accu output_fun currpos_fun inchan file_name compunit =
     if !Clflags.link_everything then
       Symtable.require_primitive name;
     ((needs_stdlib || name = "%standard_library_default"),
-     (no_compression && name <> "caml_zstd_initialize"))
+     no_compression)
   in
   List.fold_left fold_primitive accu compunit.cu_primitives
 
@@ -342,8 +342,7 @@ let find_bin_sh () =
   result
 
 (* Writes the executable header to outchan and writes the RNTM section, if
-   needed. Returns a toc_writer (i.e. Bytesections.init_record is always
-   called) *)
+   needed. Bytesections.init_record is always called. *)
 
 let update_zinc primary outchan zinc_pos (valid, invalid) =
   (* 0 is the all-supporting runtime (64-bit, shared-libraries, compression) *)
@@ -433,7 +432,8 @@ let write_header outchan =
       assert (search = Config.Absolute);
       (* Use the runtime directly *)
       Printf.fprintf outchan "#!%s\n" runtime;
-      Bytesections.init_record outchan, Fun.const ()
+      let () = Bytesections.init_record outchan in
+      Fun.const ()
   | Shebang_bin_sh bin_sh ->
       (* The full path to the runtime isn't suitable for a shebang line, so
          instead emit a small shell script to be executed with bin_sh.
@@ -583,7 +583,8 @@ let write_header outchan =
           update_zinc this_zinc outchan zinc_pos
         end
       in
-      Bytesections.init_record outchan, zinc_pos
+      let () = Bytesections.init_record outchan in
+      zinc_pos
   | Executable ->
       (* Use the executable stub launcher *)
       let header =
@@ -612,7 +613,7 @@ let write_header outchan =
       in
       Out_channel.output_string outchan data;
       (* The runtime name needs recording in RNTM *)
-      let toc_writer = Bytesections.init_record outchan in
+      let () = Bytesections.init_record outchan in
       let zinc_pos =
         (* stdlib/header.c determines which mode is needed based on whether the
            RNTM section contains an embedded NUL character. For Absolute, the
@@ -651,7 +652,7 @@ let write_header outchan =
         end
       in
       Bytesections.record outchan "RNTM";
-      toc_writer, zinc_pos
+      zinc_pos
 
 (* Create a bytecode executable file *)
 
@@ -676,12 +677,13 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
-       let toc_writer, rewrite_zinc =
+       let rewrite_zinc =
          (* Write the header and set the path to the bytecode interpreter *)
          if standalone && !Clflags.with_runtime then
            write_header outchan
          else
-           Bytesections.init_record outchan, Fun.const ()
+           let () = Bytesections.init_record outchan in
+           Fun.const ()
        in
        (* The bytecode *)
        let start_code = pos_out outchan in
@@ -788,6 +790,8 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Bytesections.write_toc_and_trailer outchan;
        (* Re-write Zinc IDs *)
        let static = (!Clflags.dllibs = []) in
+       (* TODO: Threading no_compression on pre-5.1 backport until the main
+                branch is finalised. *)
        rewrite_zinc (Misc.RuntimeID.zinc_quintets
                        ~int31 ~static ~no_compression)
     )

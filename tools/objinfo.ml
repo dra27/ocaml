@@ -267,6 +267,7 @@ let display_runtime_id search (valid, _invalid) =
       ()
   | _ ->
     let int31, static, no_compression =
+      let open Misc.RuntimeID in
       let f (int31, static, no_compression) (t : Misc.RuntimeID.t) =
         (t.int31 || int31,
          t.static || static,
