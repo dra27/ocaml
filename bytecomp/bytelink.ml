@@ -319,7 +319,10 @@ let link_bytecode ?final_name tolink exec_name standalone =
     if standalone && use_runtime then
       make_absolute !Clflags.use_runtime
     else
-      let runtime_name = "ocamlrun" ^ !Clflags.runtime_variant in
+      let runtime_name =
+        Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant
+                                       Config.bytecode_runtime_id
+      in
       Filename.concat Config.runtime_bindir runtime_name
   in
   Misc.try_finally
