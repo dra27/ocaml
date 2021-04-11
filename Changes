@@ -77,6 +77,11 @@ Working version
   (Guillaume Munch-Maccagnoni, review by Gabriel Scherer, tests by
   Jan Midtgaard)
 
+- #13???: Introduce a RuntimeID for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
