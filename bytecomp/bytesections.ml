@@ -135,26 +135,33 @@ let is_runtime_id =
   String.for_all (function '0'..'9' | 'a'..'v' -> true | _ -> false)
 
 let cut_runtime_id name =
-  let len = String.length name in
-  if len < 6 || name.[len - 5] <> '-' then
-    name, None
-  else
-    let id = String.sub name (len - 4) 4 in
+  try
+    let i = String.rindex name '-' in
+    let len = String.length name in
+    let id = String.sub name (i + 1) (len - i - 1) in
     if is_runtime_id id then
-      String.sub name 0 (len - 5), Some (Misc.RuntimeID.of_string id)
+      String.sub name 0 i, Some id
     else
-      name, None
+      raise Not_found
+  with Not_found ->
+    name, None
 
 let cut_path name =
   let basename = Filename.basename name in
   let dir = String.sub name 0 (String.length name - String.length basename) in
   let name, runtime_id = cut_runtime_id basename in
-  dir, name, runtime_id
+  dir, name, Option.map (fun id -> [Misc.RuntimeID.of_string id], []) runtime_id
 
 type search_mode =
 | Absolute of string
 | Absolute_then_search of string
 | Search
+
+let convert_ids id v s =
+ let convert_id zinc_quintet =
+    Misc.RuntimeID.of_string (Printf.sprintf "%s%c%s" id zinc_quintet v)
+  in
+  String.fold_right (fun c a -> (convert_id c)::a) s []
 
 (* Return the runtime used by this tendered/standalone image. Raise Not_found
    for an image compiled with -without-runtime. *)
@@ -185,11 +192,66 @@ let read_runtime ic =
               (* -runtime-search enable also adds a variable c containing the
                  default path to be tried. *)
               let line = input_line ic in
-              match dequote_between ~prefix:{|c=|} ~suffix:{|"$r"|} line with
-              | Some dir ->
-                  runtime, id, Absolute_then_search dir
+              match dequote_between ~prefix:{|z=|} ~suffix:{||} line with
               | None ->
-                  runtime, id, Search
+                  let id =
+                    Option.map (fun id -> [Misc.RuntimeID.of_string id], []) id
+                  in
+                  begin match dequote_between ~prefix:{|c=|}
+                                              ~suffix:{|"$r"|} line with
+                  | Some dir ->
+                      runtime, id, Absolute_then_search dir
+                  | None ->
+                      runtime, id, Search
+                  end
+              | Some zinc_quintets ->
+                  let id =
+                    match id with
+                    | None ->
+                        Printf.ksprintf failwith "Unexpected sh line: %S" line
+                    | Some id ->
+                        id
+                  in
+                  let valid, invalid = Misc.cut_at zinc_quintets '/' in
+                  let line = input_line ic in
+                  match dequote_between ~prefix:{|v=|} ~suffix:{||} line with
+                  | None ->
+                      Printf.ksprintf failwith "Unexpected sh line: %S" line
+                  | Some v ->
+                      let line = input_line ic in
+                      let c =
+                        if line = "" then
+                          None
+                        else
+                          let len = String.length line in
+                          (* XXX *)
+                          let c = String.rindex_from_opt line (len - 2) '"' in
+                          Option.bind c (fun i ->
+                              let c = String.sub line 0 i in
+                              let c =
+                                dequote_between ~prefix:{|c=|} ~suffix:{||} c
+                              in
+                              begin
+                              if c <> None then
+                                let suffix =
+                                  String.sub line (i + 1) (len - i - 1)
+                                in
+                                if not (String.starts_with ~prefix:{|${r}|}
+                                                           suffix)
+                                   || not (String.ends_with ~suffix:{|$v"|}
+                                                            suffix) then
+                                   Printf.ksprintf failwith
+                                     "Unexpected sh line: %S" suffix
+                              end;
+                              c)
+                      in
+                      let ids =
+                        convert_ids id v valid, convert_ids id v invalid
+                      in
+                      (* XXX Combinable in one?! *)
+                      match c with
+                      | Some dir -> runtime, Some ids, Absolute_then_search dir
+                      | None -> runtime, Some ids, Search
     else
       (* Direct reference to ocamlrun ("#!/usr/bin/ocamlrun", etc.) *)
       let dir, runtime, id = cut_path shebang in
@@ -200,18 +262,47 @@ let read_runtime ic =
     let rntm = read_section_string ic "RNTM" in
     let len = String.length rntm in
     if len = 0 then
-      Printf.ksprintf failwith "Corrupt RNTM: %S" rntm;
+      Printf.ksprintf failwith "Corrupt RNTM1: %S" rntm;
     try
       let dir, name = Misc.cut_at rntm '\000' in
       if name = "" then
         let dir, runtime, id = cut_path dir in
         runtime, id, Absolute dir
       else
+        let name, zinc_quintets =
+          try Misc.cut_at name '\000'
+          with Not_found -> name, "" in
         let runtime, id = cut_runtime_id name in
+        let ids =
+          if Config.suffixing then
+            let id =
+              match id with
+              | None -> Printf.ksprintf failwith "Corrupt RNTM2: %S" rntm
+              | Some id -> id
+            in
+            if String.length id <> 4
+               || zinc_quintets = ""
+               || zinc_quintets.[0] <> '\003' then
+              Printf.ksprintf failwith "Corrupt RNTM3: %S" rntm
+            else
+              let v = String.sub id 2 2 in
+              let id = String.sub id 0 1 in
+              let zinc_quintets =
+                String.sub zinc_quintets 1 (String.length zinc_quintets - 1)
+              in
+              let valid, invalid =
+                Misc.cut_at zinc_quintets '/'
+              in
+              Some (convert_ids id v valid, convert_ids id v invalid)
+          else begin
+            assert (id = None);
+            None
+          end
+        in
         if dir = "" then
-          runtime, id, Search
+          runtime, ids, Search
         else
-          runtime, id, Absolute_then_search (dir ^ Filename.dir_sep)
+          runtime, ids, Absolute_then_search (dir ^ Filename.dir_sep)
     with Not_found ->
       let dir, runtime, id = cut_path rntm in
       runtime, id, Absolute dir
