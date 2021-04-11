@@ -65,7 +65,11 @@ type search_mode =
 | Search
     (** Always search for the interpreter *)
 
-val read_runtime : in_channel -> string * Misc.RuntimeID.t option * search_mode
+val read_runtime :
+  in_channel
+  -> string *
+     (Misc.RuntimeID.t list * Misc.RuntimeID.t list) option *
+     search_mode
 (** Returns the runtime used by this tendered/standalone image
 
     @raise Not_found For an image linked using -without-runtime *)
