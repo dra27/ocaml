@@ -748,6 +748,10 @@ build_os
 build_vendor
 build_cpu
 build
+native_runtime_id
+bytecode_runtime_id
+zinc_runtime_id_hi
+zinc_runtime_id_lo
 target_libdir_is_relative
 target_bindir
 QS
@@ -2938,6 +2942,10 @@ VERSION=4.10.3+relocatable
 
 
  # TODO: rename this variable
+
+
+
+
 
 
 
@@ -17649,6 +17657,91 @@ if test x"$enable_stdlib_manpages" != "xno"; then :
 else
   stdlib_manpages=false
 fi
+
+# Determine the three Runtime IDs (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+
+
+# Bits 0-4 (dev + low 4 bits of release)
+
+
+# Bits 5-6 (high 2 bits of release)
+
+
+# Bits 7-9 (low 3 bits of reserved)
+quintet1="0 + $(expr \( $profinfo_width \* 4 \) % 32)"
+quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
+
+# Bits 10-11 (high 2 bits of reserved)
+quintet2_byte=\
+"$(echo "$alphabet" | cut -c $(expr \( $profinfo_width / 8 \) + 1))"
+
+# Bit 12 (no-flat-float-array)
+if $flat_float_array; then :
+  quintet2_zinc='0'
+else
+  quintet2_byte="4 + $quintet2_byte"
+  quintet2_zinc='4'
+fi
+# Bit 13 (fp)
+if $frame_pointers; then :
+  quintet2_native="8 + $quintet2_byte"
+else
+  quintet2_native="$quintet2_byte"
+fi
+# Bit 14 (spacetime)
+if $spacetime; then :
+  quintet2_native="16 + $quintet1_native"
+fi
+
+quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
+quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
+quintet2_native="$(echo "$alphabet" | cut -c $(expr $quintet2_native + 1))"
+
+# Bit 15 (int31)
+if $arch64; then :
+  quintet3_zinc='0'
+else
+  quintet3_zinc='1'
+fi
+# Bit 16 (static)
+if ! $supports_shared_libraries; then :
+  quintet3_zinc="2 + $quintet3_zinc"
+fi
+# Bit 17 (naked-pointers)
+if $naked_pointers; then :
+  quintet3="4 + $quintet3_zinc"
+else
+  quintet3="$quintet3_zinc"
+fi
+# Bit 18 (ansi)
+case $target,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3="8 + $quintet3" ;; #(
+  *) :
+     ;;
+esac
+# Bit 19 (mutable-string)
+if ! $force_safe_string; then :
+  quintet3="16 + $quintet3"
+fi
+
+quintet3_zinc="$(echo "$alphabet" | cut -c $(expr $quintet3_zinc + 1))"
+quintet3="$(echo "$alphabet" | cut -c $(expr $quintet3 + 1))"
+
+zinc_runtime_id_lo="m0"
+zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
+bytecode_runtime_id="m${quintet1}${quintet2_byte}${quintet3}"
+native_runtime_id="m${quintet1}${quintet2_native}${quintet3}"
+
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.mlp (this is done when tools/autogen is run, not each time
+# configure is run!)
+
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
