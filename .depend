@@ -1875,7 +1875,8 @@ bytecomp/bytesections.cmx : \
     utils/misc.cmx \
     utils/config.cmx \
     bytecomp/bytesections.cmi
-bytecomp/bytesections.cmi :
+bytecomp/bytesections.cmi : \
+    utils/misc.cmi
 bytecomp/dll.cmo : \
     utils/misc.cmi \
     utils/config.cmi \
@@ -5798,14 +5799,17 @@ testsuite/tools/expect_test.cmx : \
     parsing/asttypes.cmi \
     parsing/ast_mapper.cmx
 testsuite/tools/harness.cmo : \
+    utils/misc.cmi \
     utils/config.cmi \
     bytecomp/bytesections.cmi \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmx : \
+    utils/misc.cmx \
     utils/config.cmx \
     bytecomp/bytesections.cmx \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmi : \
+    utils/misc.cmi \
     bytecomp/bytesections.cmi
 testsuite/tools/lexcmm.cmi :
 testsuite/tools/parsecmmaux.cmo : \
@@ -5825,11 +5829,13 @@ testsuite/tools/parsecmmaux.cmi : \
     lambda/debuginfo.cmi \
     middle_end/backend_var.cmi
 testsuite/tools/testBytecodeBinaries.cmo : \
+    utils/misc.cmi \
     testsuite/tools/harness.cmi \
     testsuite/tools/environment.cmi \
     utils/config.cmi \
     testsuite/tools/testBytecodeBinaries.cmi
 testsuite/tools/testBytecodeBinaries.cmx : \
+    utils/misc.cmx \
     testsuite/tools/harness.cmx \
     testsuite/tools/environment.cmx \
     utils/config.cmx \
