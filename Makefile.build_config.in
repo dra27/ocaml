@@ -40,6 +40,7 @@ OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
 LAUNCH_METHOD = @launch_method@
 TARGET_LAUNCH_METHOD = @target_launch_method@
+SUFFIXING = @suffixing@
 
 BUILD_PATH_LOGICAL = @srcdir_abs@
 BUILD_PATH_PHYSICAL = @srcdir_abs_real@
