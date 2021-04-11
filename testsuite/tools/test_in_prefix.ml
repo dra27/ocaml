@@ -1886,8 +1886,9 @@ let compile_test ~original env bindir =
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
       | Output_complete_obj(C_ocamlopt, Shared) ->
-          (* ocamlopt doesn't correctly implement -runtime-variant _shared *)
-          let compilation_exit_code = fails_if true in
+          (* ocamlopt allows the .so to be passed to the partial linker which
+             fails with GNU ld, but not with the macOS linker *)
+          let compilation_exit_code = fails_if (Config.system <> "macosx") in
           f ~needs_ocamlopt:true ~use_shared_runtime:true
             ~compilation_exit_code ~clibs:[Config.compression_c_libraries]
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
@@ -2459,13 +2460,14 @@ let test_relocation prefix bindir libdir =
       let file =
         Filename.chop_suffix_opt ~suffix:".exe" file
         |> Option.value ~default:file in
-      let ext = Filename.extension file in
+      let basename = Filename.basename file in
+      let ext = Filename.extension basename in
       let build =
         if StringSet.mem ext libdir_exts_with_build then
           LocationSet.singleton Build
         else if ext = Config.ext_lib then
           if clang_cl then
-            if String.starts_with ~prefix:"libasmrun" (Filename.basename file)
+            if String.starts_with ~prefix:"libasmrun" basename
                || (Sys.file_exists
                      (Filename.remove_extension file ^ ".cmxa")) then
               LocationSet.singleton Build
@@ -2483,8 +2485,10 @@ let test_relocation prefix bindir libdir =
       if ext = Config.ext_lib
            && String.starts_with ~prefix:libcamlrun_prefix file
            && not (String.starts_with ~prefix:"libcamlruntime_events"
-                    (Filename.remove_extension (Filename.basename file)))
-         || StringSet.mem file libdir_files_with_prefix then
+                    (Filename.remove_extension basename))
+         || StringSet.mem file libdir_files_with_prefix
+         || ext = Config.ext_dll
+              && String.starts_with ~prefix:"libcamlrun-" basename then
         LocationSet.add Prefix build
       else
         build
