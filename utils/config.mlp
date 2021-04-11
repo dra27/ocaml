@@ -17,6 +17,11 @@
 (* The main OCaml version string has moved to ../VERSION *)
 let version = Sys.ocaml_version
 
+(* is_release and release_number are automatically updated autoconf from values
+   in ../build-aux/ocaml_version.m4 - do not edit these lines directly. *)
+let is_release = true
+let release_number = 12
+
 let bindir = "%%OCAML_BINDIR%%"
 
 external standard_library_default : unit -> string = "%standard_library_default"
@@ -138,6 +143,9 @@ let stack_safety_margin = 60
 
 let target_win32 = Sys.win32
 
+let bytecode_runtime_id = "%%BYTECODE_RUNTIME_ID%%"
+let native_runtime_id = "%%NATIVE_RUNTIME_ID%%"
+
 let architecture = "%%ARCH%%"
 let model = "%%MODEL%%"
 let system = "%%SYSTEM%%"
@@ -233,6 +241,8 @@ let configuration_variables =
   p_bool "systhread_supported" systhread_supported;
   p "host" host;
   p "target" target;
+  p "bytecode_runtime_id" bytecode_runtime_id;
+  p "native_runtime_id" native_runtime_id;
   p_bool "flambda" flambda;
   p_bool "spacetime" spacetime;
   p_bool "safe_string" safe_string;
