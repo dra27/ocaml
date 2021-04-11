@@ -347,7 +347,11 @@ let link_bytecode ?final_name tolink exec_name standalone =
            else
              let ocamlrun = Filename.concat Config.runtime_bindir "ocamlrun" in
              (* The Cygwin port also installs binaries with .exe *)
-             ocamlrun ^ !Clflags.runtime_variant ^ Config.ext_exe
+             Printf.sprintf "%s%s-%s%s"
+                            ocamlrun
+                            !Clflags.runtime_variant
+                            Config.bytecode_runtime_id
+                            Config.ext_exe
          in
          (* No modern executable format can be as small as 2 bytes, so assume
             that a header_size of 2 => "#!" was written *)
