@@ -24,7 +24,8 @@ OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-  BYTELINK_FLAGS =
+  BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                   -use-runtime $(RUNTIME_NAME)
 else
   BYTELINK_FLAGS = -custom -I $(ROOTDIR)/runtime $(SET_RELATIVE_STDLIB)
 endif

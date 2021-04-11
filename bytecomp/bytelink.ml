@@ -303,7 +303,12 @@ let write_header outchan =
     if String.length !Clflags.use_runtime > 0 then
       (true, make_absolute !Clflags.use_runtime)
     else
-      (false, "ocamlrun" ^ !Clflags.runtime_variant)
+      let ocamlrun =
+        Printf.sprintf "ocamlrun%s-%s"
+                       !Clflags.runtime_variant
+                       Config.bytecode_runtime_id
+      in
+      (false, ocamlrun)
   in
   (* Copy the header *)
   let header = "camlheader" in
