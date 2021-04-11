@@ -63,7 +63,9 @@ The bits are allocated:
   executables which have a `DLLS` section will have this bit set. Note that a
   bytecode executable which does not itself require shared library support but
   which uses `Dynlink` would be expected to check Dynlink.**this is another PR!!**
-  to determine if the runtime actually supports shared libraries.
+  to determine if the runtime actually supports shared libraries. Note that this
+  is _not_ set for native code, since the only place it would be used is in
+  `libasmrun_shared.so`!
 - 13: set if the runtime is configured with `--enable-frame-pointers`. This is
   always unset for bytecode, but affects `libasmrun_shared.so`.
 - 14: set if the runtime is configured with `--enable-naked-pointers`
