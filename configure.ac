@@ -271,6 +271,7 @@ AC_SUBST([ar_supports_response_files])
 AC_SUBST([zinc_runtime_id])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
+AC_SUBST([suffixing])
 
 ## Generated files
 
@@ -463,6 +464,12 @@ AC_ARG_ENABLE([tsan],
     [enable ThreadSanitizer support @<:@default=no@:>@])],
   [],
   [enable_tsan=no])
+
+AC_ARG_ENABLE([suffixing],
+  [AS_HELP_STRING([--disable-suffixing],
+    [disable suffixing of runtime executables and shared libraries])],
+  [AS_IF([test "x$enableval" = 'xno'], [suffixing=false], [suffixing=true])],
+  [suffixing=true])
 
 # Preprocessor and linker flags for libunwind (currently only used when TSan is
 # enabled)
