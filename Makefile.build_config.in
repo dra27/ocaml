@@ -52,5 +52,9 @@ OCAML_BINDIR = @ocaml_bindir@
 TARGET_BINDIR = @TARGET_BINDIR@
 OC_MAP_CFLAGS = @map_cflags@
 
+# Zinc Runtime ID is needed for installation only
+ZINC_RUNTIME_ID_HI = @zinc_runtime_id_hi@
+ZINC_RUNTIME_ID = @zinc_runtime_id_lo@$(ZINC_RUNTIME_ID_HI)
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
