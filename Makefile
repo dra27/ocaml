@@ -33,7 +33,7 @@ endif
 
 include stdlib/StdlibModules
 
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g -use-prims runtime/primitives
+CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -g -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
 DIRS = utils parsing typing bytecomp file_formats lambda middle_end \
@@ -45,6 +45,7 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=
+BYTELINK_FLAGS=-use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -425,7 +426,7 @@ clean:: partialclean
 
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -compat-32 -o $@ $^
 
 partialclean::
 	rm -rf ocamlc$(EXE)
@@ -434,7 +435,7 @@ partialclean::
 
 ocamlopt$(EXE): compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
           $(OPTSTART)
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $^
 
 partialclean::
 	rm -f ocamlopt$(EXE)
@@ -448,7 +449,7 @@ ocaml_dependencies := \
 
 .INTERMEDIATE: ocaml.tmp
 ocaml.tmp: $(ocaml_dependencies)
-	$(CAMLC) $(LINKFLAGS) -I toplevel/byte -linkall -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -I toplevel/byte -linkall -o $@ $^
 
 ocaml$(EXE): $(expunge) ocaml.tmp
 	- $(OCAMLRUN) $^ $@ $(PERVASIVES)
@@ -564,7 +565,7 @@ $(cvt_emit): tools/cvt_emit.mll
 
 $(expunge): compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
          toplevel/expunge.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $^
 
 partialclean::
 	rm -f $(expunge)
@@ -656,7 +657,7 @@ runtime_BUILT_HEADERS = $(addprefix runtime/, \
 
 ## Targets to build and install
 
-runtime_PROGRAMS = runtime/ocamlrun$(EXE)
+runtime_PROGRAMS = ocamlrun
 runtime_BYTECODE_STATIC_LIBRARIES = $(addprefix runtime/, \
   ld.conf libcamlrun.$(A))
 runtime_BYTECODE_SHARED_LIBRARIES =
@@ -664,13 +665,13 @@ runtime_NATIVE_STATIC_LIBRARIES = runtime/libasmrun.$(A)
 runtime_NATIVE_SHARED_LIBRARIES =
 
 ifeq "$(RUNTIMED)" "true"
-runtime_PROGRAMS += runtime/ocamlrund$(EXE)
+runtime_PROGRAMS += ocamlrund
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlrund.$(A)
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmrund.$(A)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-runtime_PROGRAMS += runtime/ocamlruni$(EXE)
+runtime_PROGRAMS += ocamlruni
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlruni.$(A)
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmruni.$(A)
 endif
@@ -722,7 +723,7 @@ ocamlruni_CPPFLAGS = -DCAML_INSTR
 .PHONY: runtime-all
 runtime-all: \
   $(runtime_BYTECODE_STATIC_LIBRARIES) $(runtime_BYTECODE_SHARED_LIBRARIES) \
-  $(runtime_PROGRAMS) $(SAK)
+  $(runtime_PROGRAMS:%=runtime/%$(EXE)) $(SAK)
 
 .PHONY: runtime-allopt
 ifneq "$(NATIVE_COMPILER)" "false"
@@ -1429,15 +1430,32 @@ distclean: clean
 	rm -f config.log config.status libtool
 
 # Installation
+
 .PHONY: install
-install:
+install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
-	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
+
+define INSTALL_RUNTIME
+install::
+	$(INSTALL_PROG) \
+    runtime/$(1)$(EXE) \
+	    "$(INSTALL_BINDIR)/$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
+	    "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
+endef
+
+$(foreach runtime, $(runtime_PROGRAMS), \
+  $(eval $(call INSTALL_RUNTIME,$(runtime))))
+
+install::
 	$(INSTALL_DATA) $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
 ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
