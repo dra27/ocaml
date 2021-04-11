@@ -777,6 +777,8 @@ build_os
 build_vendor
 build_cpu
 build
+native_runtime_id
+bytecode_runtime_id
 bindir_to_libdir
 target_bindir_exp
 target_bindir
@@ -873,6 +875,7 @@ exeext
 ac_tool_prefix
 DIFF_FLAGS
 CC
+OCAML_RELEASE_NUMBER
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
 OCAML_VERSION_PATCHLEVEL
@@ -3247,6 +3250,8 @@ OCAML_VERSION_EXTRA=
 
 OCAML_VERSION_SHORT=5.0
 
+OCAML_RELEASE_NUMBER=16
+
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -3347,6 +3352,8 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3395,6 +3402,8 @@ printf "%s\n" "#define OCAML_VERSION_ADDITIONAL \"\"" >>confdefs.h
 printf "%s\n" "#define OCAML_VERSION 50000" >>confdefs.h
 
 printf "%s\n" "#define OCAML_VERSION_STRING \"5.0.0\"" >>confdefs.h
+
+printf "%s\n" "#define OCAML_RELEASE_NUMBER 16" >>confdefs.h
 
 
 # Works out how many "o"s are needed in quoted strings
@@ -19645,6 +19654,62 @@ then :
 else $as_nop
   target_bindir_exp="${target_bindir}"
 fi
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=1
+# Bit 7 (int31)
+if ! $arch64
+then :
+  quintet1="4 + ${quintet1}"
+fi
+# Bit 8 (no shared libraries)
+if ! $supports_shared_libraries
+then :
+  quintet1="8 + ${quintet1}"
+fi
+# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${profinfo_width} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+if $frame_pointers
+then :
+  quintet3_native='1'
+else $as_nop
+  quintet3_native='0'
+fi
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+if ! $flat_float_array
+then :
+  quintet3_byte="8 + ${quintet3_byte}"
+fi
+# Bit 19 (WINDOWS_UNICODE=ansi)
+case $host,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3_byte="16 + ${quintet3_byte}" ;; #(
+  *) :
+     ;;
+esac
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}1"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}1"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
