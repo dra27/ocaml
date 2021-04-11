@@ -50,20 +50,20 @@ endif
 
 # Targets to build and install
 
-PROGRAMS := ocamlrun$(EXE)
+PROGRAMS := ocamlrun
 BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
 BYTECODE_SHARED_LIBRARIES :=
 NATIVE_STATIC_LIBRARIES := libasmrun.$(A)
 NATIVE_SHARED_LIBRARIES :=
 
 ifeq "$(RUNTIMED)" "true"
-PROGRAMS += ocamlrund$(EXE)
+PROGRAMS += ocamlrund
 BYTECODE_STATIC_LIBRARIES += libcamlrund.$(A)
 NATIVE_STATIC_LIBRARIES += libasmrund.$(A)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-PROGRAMS += ocamlruni$(EXE)
+PROGRAMS += ocamlruni
 BYTECODE_STATIC_LIBRARIES += libcamlruni.$(A)
 NATIVE_STATIC_LIBRARIES += libasmruni.$(A)
 endif
@@ -142,8 +142,8 @@ endif
 # Build, install and clean targets
 
 .PHONY: all
-all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) $(PROGRAMS) \
-     sak$(EXE)
+all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) \
+     $(PROGRAMS:%=%$(EXE)) sak$(EXE)
 
 .PHONY: allopt
 ifneq "$(NATIVE_COMPILER)" "false"
@@ -154,9 +154,23 @@ allopt:
 endif
 
 INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
+
+define INSTALL_RUNTIME
+install::
+	$(INSTALL_PROG) \
+    $(1)$(EXE) "$(INSTALL_BINDIR)/$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
+           "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
+endef
+
 .PHONY: install
-install:
-	$(INSTALL_PROG) $(PROGRAMS) "$(INSTALL_BINDIR)"
+$(foreach runtime, $(PROGRAMS), \
+  $(eval $(call INSTALL_RUNTIME,$(runtime))))
+
+install::
 	$(INSTALL_DATA) $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
 ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
