@@ -709,9 +709,9 @@ module RuntimeID : sig
     fp: bool;
       (** [true] if frame pointers are required (i.e. configured with
           {v --enable-frame-pointers v} *)
-    tsan: bool;
-      (** [true] if ThreadSanitizer (TSAN) is required (i.e. configured with
-          {v --enable-tsan v}) *)
+    spacetime: bool;
+      (** [true] if Spacetime is enable (i.e. configure with
+          {v --enable-spacetime v} *)
     int31: bool;
       (** [true] if the platform has 31-bit [int]s (i.e. 32-bit systems) *)
     static: bool;
@@ -740,7 +740,7 @@ module RuntimeID : sig
       values from {!Config} and {!Sys} as necessary) *)
 
   val make_native: ?dev:bool -> ?release:int
-    -> ?reserved:int -> ?no_flat_float_array:bool -> ?fp:bool -> ?tsan:bool
+    -> ?reserved:int -> ?no_flat_float_array:bool -> ?fp:bool -> ?spacetime:bool
     -> ?int31:bool -> ?static:bool
     -> ?naked_pointers:bool -> ?ansi:bool -> ?mutable_string:bool
     -> unit -> t
