@@ -22,12 +22,13 @@ ROOTDIR = ..
 
 CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
 
-CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib \
-        -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
+CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib -I $(ROOTDIR)/boot
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
             -safe-string -strict-sequence -strict-formats -bin-annot
 LINKFLAGS =
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                 -use-runtime $(RUNTIME_NAME)
 YACCFLAGS = -v
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 CAMLDEP = $(BOOT_OCAMLC) -depend
@@ -43,7 +44,7 @@ allopt: ocamllex.opt
 opt.opt: allopt
 
 ocamllex: $(OBJS)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o ocamllex $(OBJS)
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -compat-32 -o ocamllex $(OBJS)
 
 ocamllex.opt: $(OBJS:.cmo=.cmx)
 	$(CAMLOPT_CMD) $(DOTOPT_LINKFLAGS) -o ocamllex.opt $(OBJS:.cmo=.cmx)
