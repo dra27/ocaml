@@ -2381,12 +2381,12 @@ m4_define([QUINTET1_ZINC],
   [m4_substr(ALPHABET, m4_eval(ID_VERSION >> 5), [1])])
 
 # Bits 7-9 (low 3 bits of reserved)
-quintet1="QUINTET1_ZINC + $(expr \( $reserved_header_bits \* 4 \) % 32)"
+quintet1="QUINTET1_ZINC + $(expr \( $profinfo_width \* 4 \) % 32)"
 quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
 
 # Bits 10-11 (high 2 bits of reserved)
 quintet2_byte=\
-"$(echo "$alphabet" | cut -c $(expr \( $reserved_header_bits / 8 \) + 1))"
+"$(echo "$alphabet" | cut -c $(expr \( $profinfo_width / 8 \) + 1))"
 
 # Bit 12 (no-flat-float-array)
 AS_IF([$flat_float_array],
@@ -2410,9 +2410,7 @@ AS_IF([$arch64],
 # Bit 16 (static)
 AS_IF([! $supports_shared_libraries],
   [quintet3_zinc="2 + $quintet3_zinc"])
-# Bit 17 (no-compression)
-AS_IF([test x"$zstd_status" != 'xok'],
-  [quintet3_zinc="4 + $quintet3_zinc"])
+# Bit 17 (no-compression) cannot be set until OCaml 5.1
 # Bit 18 (ansi)
 AS_CASE([$target,$windows_unicode],
   [*-*-mingw32,0|*-pc-windows,0],

@@ -1150,13 +1150,13 @@ module RuntimeID = struct
 
   let make fn ?(dev = not Config.is_release)
               ?(release = Config.release_number)
-              ?(reserved = Config.reserved_header_bits)
+              ?(reserved = Config.profinfo_width)
               ?(no_flat_float_array = not Config.flat_float_array)
               ?(fp = Config.with_frame_pointers)
               ?(tsan = false)
               ?(int31 = (Sys.int_size = 31))
               ?(static = not Config.supports_shared_libraries)
-              ?(no_compression = (Config.compression_c_libraries = ""))
+              ?(no_compression = false)
               ?(ansi = Config.target_win32 && not Config.windows_unicode) () =
     if release < 0 || release > 63 || reserved < 0 || reserved > 31 then
       invalid_arg fn
