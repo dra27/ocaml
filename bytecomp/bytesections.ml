@@ -18,6 +18,13 @@
 module String = struct
   include String
 
+  let fold_right f a x =
+    let r = ref x in
+    for i = length a - 1 downto 0 do
+      r := f (unsafe_get a i) !r
+    done;
+    !r
+
   let for_all p s =
     let n = length s in
     let rec loop i =
