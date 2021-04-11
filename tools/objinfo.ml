@@ -213,8 +213,8 @@ let p_list title print = function
       List.iter print l
 
 let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
-                         tsan; int31; static; naked_pointers; mutable_string;
-                         ansi; reserved} as t) =
+                         spacetime; int31; static; naked_pointers;
+                         mutable_string; ansi; reserved} as t) =
   let version =
     if release > Config.release_number then
       ""
@@ -233,8 +233,8 @@ let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
     printf "\t  - Flat float array representation disabled\n";
   if fp then
     printf "\t  - Frame pointers enabled\n";
-  if tsan then
-    printf "\t  - TSAN enabled\n";
+  if spacetime then
+    printf "\t  - Spacetime profiling enabled\n";
   if int31 then
     printf "\t  - Compiled without 64-bit support\n";
   if static then
