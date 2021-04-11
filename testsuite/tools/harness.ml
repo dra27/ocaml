@@ -113,6 +113,7 @@ module Import = struct
   | Tendered of {header: launch_mode;
                  dlls: bool;
                  runtime: string;
+                 id: Misc.RuntimeID.t option;
                  search: Bytesections.search_mode}
   | Custom
   | Vanilla
@@ -130,7 +131,8 @@ module Import = struct
     target_launcher_searches_for_ocamlrun: bool;
     bytecode_shebangs_by_default: bool;
     shebangscripts: bool;
-    libraries: string list list
+    libraries: string list list;
+    zinc_bootstrapped: bool
   }
 
   module Char = Char
