@@ -383,7 +383,7 @@ let run ~reproducible (config : Installation.t) env =
         else
           (* Bytecode runtimes and ocamlyacc of which only ocamlrund is linked
              with -g *)
-          `Other, (basename = "ocamlrund")
+          `Other, (List.mem "ocamlrund" (String.split_on_char '-' basename))
       in
       (* Combine this with the properties of the platform to determine whether
          the executable will contain the build path. *)
