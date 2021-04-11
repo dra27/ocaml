@@ -285,6 +285,10 @@ FLEXLINK_FLAGS=@flexlink_flags@
 FLEXLINK_CMD=flexlink
 FLEXLINK=$(FLEXLINK_CMD) $(FLEXLINK_FLAGS)
 
+# RuntimeID values
+BYTECODE_RUNTIME_ID=@bytecode_runtime_id@
+NATIVE_RUNTIME_ID=@native_runtime_id@
+
 # Deprecated variables
 
 ## Variables renamed in OCaml 4.13
