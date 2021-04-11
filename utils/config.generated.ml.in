@@ -114,4 +114,6 @@ let flexdll_dirs = [@flexdll_dir@]
 
 let ar_supports_response_files = @ar_supports_response_files@
 
+let suffixing = @suffixing@
+
 let launch_method = {@QS@|@target_launch_method@|@QS@}

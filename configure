@@ -778,6 +778,7 @@ build_os
 build_vendor
 build_cpu
 build
+suffixing
 native_runtime_id
 bytecode_runtime_id
 zinc_runtime_id
@@ -995,6 +996,7 @@ enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
 with_relative_libdir
+enable_suffixing
 with_afl
 with_flexdll
 with_zstd
@@ -1687,6 +1689,8 @@ Optional Features:
   --disable-function-sections
                           do not emit each function in a separate section
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
+  --enable-suffixing      enable suffixing of runtime executables and shared
+                          libraries
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3435,6 +3439,7 @@ OCAML_RELEASE_NUMBER=17
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
@@ -4029,6 +4034,20 @@ else $as_nop
 fi
 else $as_nop
   bindir_to_libdir=''
+fi
+
+
+# Check whether --enable-suffixing was given.
+if test ${enable_suffixing+y}
+then :
+  enableval=$enable_suffixing; if test "x$enableval" = 'xno'
+then :
+  suffixing=false
+else $as_nop
+  suffixing=true
+fi
+else $as_nop
+  suffixing=false
 fi
 
 
