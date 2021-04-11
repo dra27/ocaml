@@ -273,6 +273,7 @@ AC_SUBST([zinc_runtime_id_lo])
 AC_SUBST([zinc_runtime_id_hi])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
+AC_SUBST([suffixing])
 
 ## Generated files
 
@@ -626,6 +627,12 @@ AC_ARG_ENABLE([function-sections],
 AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
+
+AC_ARG_ENABLE([suffixing],
+  [AS_HELP_STRING([--disable-suffixing],
+    [disable suffixing of runtime executables and shared libraries])],
+  [AS_IF([test "x$enableval" = 'xno'], [suffixing=false], [suffixing=true])],
+  [suffixing=true])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
