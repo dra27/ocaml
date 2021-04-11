@@ -228,10 +228,11 @@ let link_compunit accu output_fun currpos_fun inchan file_name compunit =
     debug_info := (currpos_fun(), debug_event_list, debug_dirs) :: !debug_info
   end;
   output_fun code_block;
-  let fold_primitive needs_stdlib name =
+  let fold_primitive (needs_stdlib, no_compression) name =
     if !Clflags.link_everything then
       Symtable.require_primitive name;
-    (needs_stdlib || name = "%standard_library_default")
+    ((needs_stdlib || name = "%standard_library_default"),
+     (no_compression && name <> "caml_zstd_initialize"))
   in
   List.fold_left fold_primitive accu compunit.cu_primitives
 
@@ -265,7 +266,7 @@ let link_file output_fun currpos_fun accu = function
       link_archive accu output_fun currpos_fun file_name units
 
 let link_files output_fun currpos_fun =
-  List.fold_left (link_file output_fun currpos_fun) false
+  List.fold_left (link_file output_fun currpos_fun) (false, true)
 
 (* Output the debugging information *)
 (* Format is:
@@ -327,6 +328,27 @@ let find_bin_sh () =
 (* Writes the executable header to outchan and writes the RNTM section, if
    needed. Returns a toc_writer (i.e. Bytesections.init_record is always
    called) *)
+
+let update_zinc primary outchan zinc_pos (valid, invalid) =
+  (* 0 is the all-supporting runtime (64-bit, shared-libraries, compression) *)
+  let valid = '0' :: valid in
+  let items =
+    (* For Absolute_then_search, we want to search for the configuration's Zinc
+       runtime ID first; for Search, this is simply set to '0' and is a no-op *)
+    (* XXX Not convinced this filtering is a good idea at all - the fast path
+           here will still not do PATH-search, and it's just a bit confusing! *)
+    (primary :: (List.filter ((<>) primary) valid)
+      @ ('/' :: (List.filter ((<>) primary) invalid)))
+  in
+  (* Sequence of quintets to try in order, with a single / separating those
+     which are known to fail. For example, an image requiring 63-bit integers
+     will use "0246/3157" - the first four quintets all specify 63-bit support
+     and will be capable of executing the image; the last four are 32-bit
+     runtimes and will display an appropriate error message. *)
+  let zinc_quintets = String.concat "" (List.map (String.make 1) items) in
+  assert (String.length zinc_quintets = 9);
+  seek_out outchan zinc_pos;
+  output_string outchan zinc_quintets
 
 let write_header outchan =
   let bindir, runtime =
@@ -399,7 +421,7 @@ let write_header outchan =
       assert (search = Config.Absolute);
       (* Use the runtime directly *)
       Printf.fprintf outchan "#!%s\n" runtime;
-      Bytesections.init_record outchan
+      Bytesections.init_record outchan, Fun.const ()
   | Shebang_bin_sh bin_sh ->
       (* The full path to the runtime isn't suitable for a shebang line, so
          instead emit a small shell script to be executed with bin_sh.
@@ -431,14 +453,15 @@ let write_header outchan =
         in
         Printf.ksprintf output fmt
       in
-      let () =
-        if search = Config.Absolute then
+      let zinc_pos =
+        if search = Config.Absolute then begin
           (* Absolute only: simply exec the runtime *)
           output_script search {|
             #!%s
             exec %s "$0" "$@"
-          |} bin_sh (Filename.quote runtime)
-        else begin
+          |} bin_sh (Filename.quote runtime);
+          Fun.const ()
+        end else if not Config.suffixing then begin
           (* Absolute_with_search / Search. The script sets up three variables:
              - $r is the name of the runtime ('ocamlrun', 'ocamlrund', etc.)
              - $d is calculated in the script as $(dirname "$0") - i.e. the
@@ -476,16 +499,79 @@ let write_header outchan =
              found. *)
           output_script search {|
             if test -z "$c"; then
-              echo 'This program requires OCaml %d.%d'>&2
-              echo "Interpreter ($r) not found either with $0 or in \$PATH">&2
+              echo 'This program requires an OCaml %d.%d interpreter'>&2
+              echo "$r not found either with $0 or in \$PATH">&2
             else
               exec "$c" "$0" "$@"
             fi
             exit 126
-          |} Sys.ocaml_release.major Sys.ocaml_release.minor
+          |} Sys.ocaml_release.major Sys.ocaml_release.minor;
+          Fun.const ()
+        end else begin
+          (* XXX TODO Merge this with the above, but first of all check it's
+                 working in all modes *)
+          (* Store the name of the runtime in $r *)
+          output_script search {|
+            #!%s
+            r=%s
+            z='01234567/'
+          |} bin_sh
+            (Filename.quote (String.sub runtime 0 (String.length runtime - 3)));
+          (* pos_out outchan at present refers to first byte after the "z=" line
+             so 11 bytes earlier is the "0" in "z='01234567/'" *)
+          let zinc_pos = pos_out outchan - 11 in
+          Printf.fprintf outchan "v='%s'\n"
+            (String.sub runtime (String.length runtime - 2) 2);
+          (* The full path passed to exec is ultimately the value of $c. For
+             Absolute_then_search, the first value to try is the absolute
+             location of the runtime. *)
+          let this_zinc =
+            if search = Config.Absolute_then_search then
+              runtime.[String.length runtime - 3]
+            else
+              '0'
+          in
+          output_script Config.Absolute_then_search {|
+            c=%s"${r}%c$v"
+            if ! test -f "$c"; then
+          |} Filename.(quote (concat bindir "")) this_zinc;
+          (* If the runtime wasn't found in the absolute location (or for Search
+             mode), next try "$(dirname "$0")/$r". If that isn't found, perform
+             a search of $PATH for $r using the command builtin. *)
+          output_script search {|
+              d="$(dirname "$0" 2>/dev/null)"
+              test -z "$d" || d="${d%%/}/"
+              for q in $(echo "${z%%/*}" | fold -b -w 1); do
+                c="$(command -v "$d$r$q$v")"
+                test -z "$c" || break
+              done
+              if test -z "$c"; then
+                for q in $(echo "${z%%/*}${z#*/}" | fold -b -w 1); do
+                  c="$(command -v "$d$r$q$v")"
+                  test -n "$c" || c="$(command -v "$r$q$v")"
+                  test -z "$c" || break
+                done
+              fi
+          |};
+          output_script Config.Absolute_then_search {|
+            fi
+          |};
+          (* If no interpreter could be found, [command -v] will have returned
+             an empty string and an error message can be displayed. Otherwise,
+             exec the runtime. *)
+          output_script search {|
+            if test -z "$c"; then
+              echo 'This program requires an OCaml %d.%d interpreter'>&2
+              echo "$r[${z%%/*}]$v not found either with $0 or in \$PATH">&2
+            else
+              exec "$c" "$0" "$@"
+            fi
+            exit 126
+          |} Sys.ocaml_release.major Sys.ocaml_release.minor;
+          update_zinc this_zinc outchan zinc_pos
         end
       in
-      Bytesections.init_record outchan
+      Bytesections.init_record outchan, zinc_pos
   | Executable ->
       (* Use the executable stub launcher *)
       let header =
@@ -515,27 +601,51 @@ let write_header outchan =
       Out_channel.output_string outchan data;
       (* The runtime name needs recording in RNTM *)
       let toc_writer = Bytesections.init_record outchan in
-      let () =
+      let zinc_pos =
         (* stdlib/header.c determines which mode is needed based on whether the
            RNTM section contains an embedded NUL character. For Absolute, the
            path is written verbatim (no extra NUL), otherwise the directory
            separator just before the basename is effectively turned into a NUL
            (for Search, there is no dirname, so the string "begins" with a NUL
            character). *)
-        if search = Absolute then
-          output_string outchan runtime
-        else begin
+        if search = Absolute then begin
+          output_string outchan runtime;
+          Fun.const ()
+        end else begin
           if search = Absolute_then_search then
             output_string outchan
               (Filename.(dirname (concat bindir current_dir_name)));
           output_char outchan '\000';
-          output_string outchan runtime
+          if not Config.suffixing then begin
+            output_string outchan runtime;
+            Fun.const ()
+          end else
+            let this_zinc =
+              let len = String.length runtime in
+              if search = Config.Absolute_then_search then begin
+                output_string outchan runtime;
+                runtime.[len - 3]
+              end else begin
+                output_substring outchan runtime 0 (len - 3);
+                output_char outchan '0';
+                output_substring outchan runtime (len - 2) 2;
+                '0'
+              end
+            in
+            output_string outchan "\000\003";
+            let zinc_pos = pos_out outchan in
+            output_string outchan "01234567/";
+            update_zinc this_zinc outchan zinc_pos
         end
       in
       Bytesections.record toc_writer RNTM;
-      toc_writer
+      toc_writer, zinc_pos
 
 (* Create a bytecode executable file *)
+
+external marshal_to_channel:
+  out_channel -> 'a -> Marshal.extern_flags list -> bool
+    = "caml_output_value_with_compat"
 
 let link_bytecode ?final_name tolink exec_name standalone =
   let final_name = Option.value final_name ~default:exec_name in
@@ -556,12 +666,12 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
-       let toc_writer =
+       let toc_writer, rewrite_zinc =
          (* Write the header and set the path to the bytecode interpreter *)
          if standalone && !Clflags.with_runtime then
            write_header outchan
          else
-           Bytesections.init_record outchan
+           Bytesections.init_record outchan, Fun.const ()
        in
        (* The bytecode *)
        let start_code = pos_out outchan in
@@ -594,7 +704,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
        let output_fun buf =
          Out_channel.output_bigarray outchan buf 0 (Bigarray.Array1.dim buf)
        and currpos_fun () = pos_out outchan - start_code in
-       let needs_stdlib =
+       let needs_stdlib, no_compression =
          link_files output_fun currpos_fun tolink
        in
        if check_dlls then Dll.close_all_dlls();
@@ -624,9 +734,16 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Symtable.output_primitive_names outchan;
        Bytesections.record toc_writer PRIM;
        (* The table of global data *)
-       Emitcode.marshal_to_channel_with_possibly_32bit_compat
-         ~filename:final_name ~kind:"bytecode executable"
-         outchan (Symtable.initial_global_table());
+       let int31 =
+         let initial_global_table = Symtable.initial_global_table () in
+         if !Clflags.bytecode_compatible_32 then begin
+           Emitcode.marshal_to_channel_with_possibly_32bit_compat
+             ~filename:final_name ~kind:"bytecode executable"
+             outchan initial_global_table;
+           true
+         end else
+           marshal_to_channel outchan initial_global_table []
+       in
        Bytesections.record toc_writer DATA;
        let standard_library_default =
          if standalone && needs_stdlib then
@@ -660,6 +777,10 @@ let link_bytecode ?final_name tolink exec_name standalone =
        end;
        (* The table of contents and the trailer *)
        Bytesections.write_toc_and_trailer toc_writer;
+       (* Re-write Zinc IDs *)
+       let static = (!Clflags.dllibs = []) in
+       rewrite_zinc (Misc.RuntimeID.zinc_quintets
+                       ~int31 ~static ~no_compression)
     )
 
 (* Output a string as a C array of unsigned ints *)

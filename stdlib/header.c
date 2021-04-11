@@ -340,8 +340,11 @@ static char * read_runtime_path(HANDLE fd, uint32_t *path_size)
 _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
                                        argv_t argv, char_os *argv0_dirname)
 {
-  const char_os *rntm_end = rntm + (rntm_bsz - 1);
+  char_os *rntm_end = rntm + (rntm_bsz - 1);
   char_os *rntm_bindir_end = rntm;
+  char_os *zinc = NULL;
+  char_os *zinc_offset = NULL;
+  char_os *current_quintet = NULL;
 
   while (*rntm_bindir_end != 0)
     rntm_bindir_end++;
@@ -361,11 +364,9 @@ _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
       exit_with_error(T("Cannot exec "), rntm, NULL);
   }
 
-  char_os *root = NULL;
+  char_os *root = (char_os *)malloc((PATH_MAX + 1) * sizeof(char_os));
   char_os *root_basename = NULL;
   if (argv0_dirname != NULL) {
-    /* Similarly - this could be a static buffer */
-    root = (char_os *)malloc((PATH_MAX + 1) * sizeof(char_os));
     safe_copy(root, argv0_dirname, PATH_MAX + 1);
     root_basename = root;
     while (*root_basename != 0)
@@ -378,23 +379,67 @@ _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
 
   rntm = rntm_bindir_end + 1;
   if (rntm < rntm_end) {
-    if (root) {
-      safe_copy(root_basename, rntm, (rntm_end - rntm + 1));
-      /* If a directory entry with the name of the runtime exists in the same
-         directory as the executable, it will be exec'd (even if that results in
-         an error) */
-      if (file_exists(root)) {
-        if (exec_file(root, argv) != 0)
-          exit_with_error(T("Cannot exec "), root, NULL);
-      }
+    zinc = rntm;
+    while (*zinc != 0)
+      zinc++;
+    if (zinc != rntm_end) {
+      rntm_end = zinc;
+      zinc++;
+      zinc_offset = rntm_end - *zinc;
+      zinc++;
     }
-    if (exec_file(rntm, argv) != ENOENT)
-      exit_with_error(T("Cannot exec "), rntm, NULL);
+
+    bool searched_all = (root_basename == NULL || zinc == rntm_end);
+    current_quintet = zinc;
+    do {
+      if (zinc_offset) {
+        if (*current_quintet == '/') {
+          if (searched_all) {
+            current_quintet++;
+          } else {
+            searched_all = true;
+            current_quintet = zinc;
+          }
+          continue;
+        }
+        *zinc_offset = *current_quintet;
+        current_quintet++;
+      }
+      /* rntm points to the name of the runtime from the RNTM section; root, if
+         non-NULL, is the directory containing the current running executable
+         (i.e. this program) */
+      if (root_basename) {
+        safe_copy(root_basename, rntm, (rntm_end - rntm + 1));
+        /* If a directory entry with the name of the runtime exists in the same
+           directory as the executable, it will be exec'd (even if that results
+           in an error) */
+        if (file_exists(root)) {
+          if (exec_file(root, argv) != 0)
+            exit_with_error(T("Cannot exec "), root, NULL);
+        }
+      }
+      if (searched_all && exec_file(rntm, argv) != ENOENT)
+        exit_with_error(T("Cannot exec "), rntm, NULL);
+    } while (*current_quintet != 0);
   }
 
-  exit_with_error(T("This program requires OCaml ") OCAML_VERSION T("\n")
-                  T("Interpreter ("), (rntm_bindir_end + 1),
-                  T(" ) not found with the program or in " PATH_NAME));
+  if (zinc != rntm_end) {
+    safe_copy(root, rntm, (zinc_offset - rntm + 1));
+    char_os *current = root + (zinc_offset - rntm);
+    *current++ = '[';
+    while (*current_quintet != '/')
+      current_quintet--;
+    *current_quintet = 0;
+    safe_copy(current, zinc, (current_quintet - zinc + 1));
+    current += (current_quintet - zinc);
+    *current++ = ']';
+    safe_copy(current, zinc_offset + 1, (zinc - zinc_offset));
+  } else {
+    root = rntm_bindir_end + 1;
+  }
+  exit_with_error(T("This program requires an OCaml ") OCAML_VERSION
+                  T(" interpreter\n"), root,
+                  T(" not found with the program or in " PATH_NAME));
 }
 
 #ifdef _WIN32
