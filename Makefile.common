@@ -27,6 +27,9 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
+# $( ) allows line breaking with $\ at the end of the line
+$(SPACE) :=
+
 
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
@@ -80,7 +83,7 @@ endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
-RUNTIME_NAME = '$(BINDIR)/ocamlrun$(EXE)'
+RUNTIME_NAME = '$(BINDIR)/ocamlrun-$(BYTECODE_RUNTIME_ID)$(EXE)'
 
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
