@@ -34,3 +34,6 @@ OC_DLL_LDFLAGS=@oc_dll_ldflags@
 
 # The rlwrap command (for the *runtop targets)
 RLWRAP=@rlwrap@
+
+# OCaml release number, relative to 3.12 (used for RuntimeID)
+OCAML_RELEASE_NUMBER=@ocaml_release_number@

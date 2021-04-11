@@ -747,6 +747,9 @@ build_os
 build_vendor
 build_cpu
 build
+native_runtime_id
+bytecode_runtime_id
+ocaml_release_number
 bindir_to_libdir
 target_bindir
 naked_pointers_checker
@@ -2780,6 +2783,7 @@ libraries_man_section=3
 mkexe="\$(CC) \$(OC_CFLAGS) \$(CFLAGS) \$(OC_LDFLAGS)"
 
 # Flags for building executable files with debugging symbols
+ocaml_release_number=14
 mkexedebugflag="-g"
 common_cflags=""
 common_cppflags=""
@@ -2898,6 +2902,9 @@ VERSION=4.12.1
 
 
  # TODO: rename this variable
+
+
+
 
 
 
@@ -17276,6 +17283,56 @@ if test x"$enable_stdlib_manpages" != "xno"; then :
 else
   stdlib_manpages=false
 fi
+
+# Determine the RuntimeID (see runtime/RuntimeID.md)
+alphabet='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-='
+
+sextet0="$(echo "$alphabet" | cut -c $(expr $ocaml_release_number + 1))"
+
+if $arch64; then
+  sextet1='1 + '
+  # XXX symlinkery too
+else
+  sextet1=''
+fi
+sextet1="$(echo "$alphabet" | cut -c $(expr $sextet1$profinfo_width '*' 2 + 1))"
+
+if $supports_shared_libraries; then
+  sextet2_byte='1 + '
+  # XXX symlinkery too
+else
+  sextet2_byte=''
+fi
+
+# frame_pointers is native only (see below)
+
+if $naked_pointers; then
+  sextet2_byte="${sextet2_byte}4 + "
+fi
+
+# Spacetime is never set
+
+if ! $force_safe_string; then
+  sextet2_byte="${sextet2_byte}16 + "
+fi
+
+if ! $flat_float_array; then
+  sextet2_byte="${sextet2_byte}32 +"
+fi
+
+if $frame_pointers; then
+  sextet2_native="${sextet2_byte}2 + "
+else
+  sextet2_native="${sextet2_byte}"
+fi
+
+sextet2_byte="$(echo "$alphabet" | cut -c $(expr $sextet2_byte + 1))"
+sextet2_native="$(echo "$alphabet" | cut -c $(expr $sextet2_native + 1))"
+
+sextet3="$(echo "$alphabet" | cut -c $(expr $windows_unicode + 1))"
+
+bytecode_runtime_id="$sextet3$sextet2_byte$sextet1$sextet0"
+native_runtime_id="$sextet3$sextet2_native$sextet1$sextet0"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

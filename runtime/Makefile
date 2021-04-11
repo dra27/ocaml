@@ -284,6 +284,7 @@ caml/jumptbl.h : caml/instruct.h
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
+	echo "#define OCAML_RELEASE_NUMBER $(OCAML_RELEASE_NUMBER)" >> $@
 
 # Libraries and programs
 

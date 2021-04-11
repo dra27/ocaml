@@ -2,3 +2,6 @@
 
 # The version string is the first line of this file.
 # It must be in the format described in stdlib/sys.mli
+
+# When the minor number is incremented, ocaml_release_number in configure.ac
+# must also be incremented.

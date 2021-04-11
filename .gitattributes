@@ -180,6 +180,7 @@ tools/markdown-add-pr-links.sh text eol=lf
 runtime/caml/m.h.in text eol=lf
 runtime/caml/s.h.in text eol=lf
 runtime/caml/compatibility.h typo.long-line=may
+runtime/RuntimeID.md typo.non-ascii
 
 # These are all Perl scripts, so may not actually require this
 manual/tools/caml-tex text eol=lf
