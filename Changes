@@ -30,6 +30,11 @@ Working version
   and RISC-V.  This reduces minor GC work in the presence of deep call stacks.
   (Xavier Leroy, review by Miod Vallat, Gabriel Scherer and Olivier Nicole)
 
+- #14???: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
