@@ -298,40 +298,64 @@ let p_list title print = function
       p_title title;
       List.iter print l
 
-let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
-                         tsan; int31; static; no_compression; ansi;
-                         reserved} as t) =
-  let version =
-    if release > Config.release_number then
-      ""
-    else
-      if release = 0 then
-        " (Objective Caml 3.12)"
-      else if release < 16 then
-        Printf.sprintf " (OCaml 4.%02d)" (release - 1)
-      else
-        Printf.sprintf " (OCaml 5.%d)" (release - 16)
-  in
-  printf "\t%s = Release %d%s%s\n"
-    (Misc.RuntimeID.to_string t)
-    release version (if dev then " - development/altered version" else "");
-  if no_flat_float_array then
-    printf "\t  - Flat float array representation disabled\n";
-  if fp then
-    printf "\t  - Frame pointers enabled\n";
-  if tsan then
-    printf "\t  - TSAN enabled\n";
-  if int31 then
-    printf "\t  - Compiled without 64-bit support\n";
-  if static then
-    printf "\t  - Compiled without support dynamic loading\n";
-  if no_compression then
-    printf "\t  - Compiled without support for marshalled compression\n";
-  if ansi then
-    printf "\t  - Windows Unicode support disabled\n";
-  if reserved > 0 then
-    printf "\t  - %d reserved header bit%s\n"
-      reserved (if reserved = 1 then "" else "s")
+let display_runtime_id search (valid, _invalid) =
+  match valid with
+  | ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
+                          tsan; int31; static; no_compression; ansi;
+                          reserved} as t) :: _ ->
+      let version =
+        if release > Config.release_number then
+          ""
+        else
+          if release = 0 then
+            " (Objective Caml 3.12)"
+          else if release < 16 then
+            Printf.sprintf " (OCaml 4.%02d)" (release - 1)
+          else
+            Printf.sprintf " (OCaml 5.%d)" (release - 16)
+      in
+      printf "\t%s = Release %d%s%s\n"
+        (Misc.RuntimeID.to_string t)
+        release version (if dev then " - development/altered version" else "");
+      if no_flat_float_array then
+        printf "\t  - Flat float array representation disabled\n";
+      if fp then
+        printf "\t  - Frame pointers enabled\n";
+      if tsan then
+        printf "\t  - TSAN enabled\n";
+      if int31 then
+        printf "\t  - Compiled without 64-bit support\n";
+      if static then
+        printf "\t  - Compiled without support dynamic loading\n";
+      if no_compression then
+        printf "\t  - Compiled without support for compressed marshalling\n";
+      if ansi then
+        printf "\t  - Windows Unicode support disabled\n";
+      if reserved > 0 then
+        printf "\t  - %d reserved header bit%s\n"
+          reserved (if reserved = 1 then "" else "s");
+      begin
+        match search with
+        | Bytesections.Absolute _ ->
+            ()
+        | _ ->
+          let int31, static, no_compression =
+            let f (int31, static, no_compression) (t : Misc.RuntimeID.t) =
+              (t.int31 || int31,
+               t.static || static,
+               t.no_compression || no_compression)
+            in
+            List.fold_left f (false, false, false) valid
+          in
+          if not int31 then
+            printf "\t  - Image uses 63-bit integers\n";
+          if not static then
+            printf "\t  - Image requires dynamic loading support\n";
+          if not no_compression then
+            printf "\t  - Image uses compressed marshalling\n"
+      end
+  | _ ->
+      ()
 
 let dump_byte ic =
   let toc = Bytesections.read_toc ic in
@@ -339,8 +363,19 @@ let dump_byte ic =
     try
       let runtime, id, search = Bytesections.read_runtime toc ic in
       let runtime =
-        let some t = "-" ^ Misc.RuntimeID.to_string t in
-        runtime ^ Option.fold ~none:"" ~some id
+        match id with
+        | Some ([id], _) ->
+            runtime ^ "-" ^ Misc.RuntimeID.to_string id
+        | Some ((id::_) as ids, _) ->
+            let primary = Misc.RuntimeID.to_string id in
+            let ids =
+              let f id = String.make 1 (Misc.RuntimeID.to_string id).[1] in
+              List.map f ids
+            in
+            let ids = String.concat "" ids in
+            Printf.sprintf "%s-%c[%s]%c%c"
+                           runtime primary.[0] ids primary.[2] primary.[3]
+        | _ -> runtime
       in
       let runtime =
         match search with
@@ -350,7 +385,7 @@ let dump_byte ic =
         | Bytesections.Absolute dir -> dir ^ runtime
       in
       printf "Runtime:\n\t%s\n" runtime;
-      Option.iter display_runtime_id id
+      Option.iter (display_runtime_id search) id
     with Not_found -> ()
   in
   let all = Bytesections.all toc in
