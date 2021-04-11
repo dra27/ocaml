@@ -250,7 +250,7 @@ caml/jumptbl.h : caml/instruct.h
 	       -e '/^}/q' > $@
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
-	$^ > $@
+	$^ $(OCAML_RELEASE_NUMBER) > $@
 
 sak$(EXE): sak.$(O)
 	$(call MKEXE_BOOT,$@,$^)
@@ -265,6 +265,7 @@ ifneq "$(LIBDIR_REL)" ""
 	       >> $@
 endif
 	echo '#define HOST "$(HOST)"' >> $@
+	echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"' >> $@
 
 # Libraries and programs
 
