@@ -100,6 +100,8 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,FLAT_FLOAT_ARRAY) \
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
+	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
+	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \
 	    $< > $@
 
 # Test for the substitution functions above
