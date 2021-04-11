@@ -38,6 +38,8 @@ OPTCOMPFLAGS=-O3
 else
 OPTCOMPFLAGS=
 endif
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                 -use-runtime $(RUNTIME_NAME)
 
 COMPFLAGS += -I byte
 OPTCOMPFLAGS += -I native
@@ -227,7 +229,7 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 	cp $< $@
 
 extract_crc: dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) $(BYTELINK_FLAGS) -o $@ $^
 
 install:
 	$(INSTALL_DATA) \
