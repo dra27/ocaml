@@ -18,6 +18,14 @@
 module String = struct
   include String
 
+  let for_all p s =
+    let n = length s in
+    let rec loop i =
+      if i = n then true
+      else if p (unsafe_get s i) then loop (succ i)
+      else false in
+    loop 0
+
   let starts_with ~prefix s =
     let len_s = length s
     and len_pre = length prefix in
@@ -154,9 +162,25 @@ let dequote_between ~prefix ~suffix s =
   else
     None
 
+let is_runtime_id =
+  String.for_all (function '0'..'9' | 'a'..'v' -> true | _ -> false)
+
+let cut_runtime_id name =
+  let len = String.length name in
+  if len < 6 || name.[len - 5] <> '-' then
+    name, None
+  else
+    let id = String.sub name (len - 4) 4 in
+    if is_runtime_id id then
+      String.sub name 0 (len - 5), Some (Misc.RuntimeID.of_string id)
+    else
+      name, None
+
 let cut_path name =
   let basename = Filename.basename name in
-  String.sub name 0 (String.length name - String.length basename), basename
+  let dir = String.sub name 0 (String.length name - String.length basename) in
+  let name, runtime_id = cut_runtime_id basename in
+  dir, name, runtime_id
 
 type search_mode =
 | Absolute of string
@@ -179,8 +203,8 @@ let read_runtime ic =
            exec '<runtime>' "$0" "$@" *)
       match dequote_between ~prefix:{|exec |} ~suffix:{| "$0" "$@"|} line with
       | Some runtime ->
-          let dir, runtime = cut_path runtime in
-          runtime, Absolute dir
+          let dir, runtime, id = cut_path runtime in
+          runtime, id, Absolute dir
       | None ->
           (* Both -runtime-search enable and -runtime-search always add a
              variable r containing the name of the runtime. *)
@@ -188,18 +212,19 @@ let read_runtime ic =
           | None ->
               Printf.ksprintf failwith "Unexpected sh line: %S" line
           | Some runtime ->
+              let runtime, id = cut_runtime_id runtime in
               (* -runtime-search enable also adds a variable c containing the
                  default path to be tried. *)
               let line = input_line ic in
               match dequote_between ~prefix:{|c=|} ~suffix:{|"$r"|} line with
               | Some dir ->
-                  runtime, Absolute_then_search dir
+                  runtime, id, Absolute_then_search dir
               | None ->
-                  runtime, Search
+                  runtime, id, Search
     else
       (* Direct reference to ocamlrun ("#!/usr/bin/ocamlrun", etc.) *)
-      let dir, runtime = cut_path shebang in
-      runtime, Absolute dir
+      let dir, runtime, id = cut_path shebang in
+      runtime, id, Absolute dir
   else
     (* ... otherwise look for an RNTM section (read_section_string will raise
        Not_found if there isn't one) *)
@@ -211,15 +236,17 @@ let read_runtime ic =
       let dir, name = Misc.cut_at rntm '\000' in
       if name = "" then
         if Sys.win32 then
-          dir, Search
+          let runtime, id = cut_runtime_id dir in
+          runtime, id, Search
         else
-          let dir, runtime = cut_path dir in
-          runtime, Absolute dir
+          let dir, runtime, id = cut_path dir in
+          runtime, id, Absolute dir
       else
+        let runtime, id = cut_runtime_id name in
         if dir = "" then
-          name, Search
+          runtime, id, Search
         else
-          name, Absolute_then_search (dir ^ Filename.dir_sep)
+          runtime, id, Absolute_then_search (dir ^ Filename.dir_sep)
     with Not_found ->
-      let dir, runtime = cut_path rntm in
-      runtime, Absolute dir
+      let dir, runtime, id = cut_path rntm in
+      runtime, id, Absolute dir
