@@ -246,6 +246,7 @@ caml/jumptbl.h : caml/instruct.h
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
+	echo "#define OCAML_RELEASE_NUMBER $(OCAML_RELEASE_NUMBER)" >> $@
 
 sak$(EXE): sak.$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^)
