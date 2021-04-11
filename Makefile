@@ -816,6 +816,7 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
 	echo '#define HOST "$(HOST)"' >> $@
+	echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"' >> $@
 
 ## Runtime libraries and programs
 
