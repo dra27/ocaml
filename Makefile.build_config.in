@@ -60,5 +60,8 @@ TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
 OC_MAP_CFLAGS = @map_cflags@
 
+# Zinc Runtime ID is needed for installation only
+ZINC_RUNTIME_ID=@zinc_runtime_id@
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
