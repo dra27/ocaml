@@ -354,6 +354,16 @@ val tsan : bool
 val shebangscripts : bool
 (** Whether the target supports shebang scripts *)
 
+val bytecode_runtime_id : string
+(** The RuntimeID for ocamlrun and libcamlrun_shared
+
+    @since 5.5 *)
+
+val native_runtime_id : string
+(** The RuntimeID for libasmrun_shared
+
+    @since 5.5 *)
+
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 
