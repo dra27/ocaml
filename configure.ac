@@ -25,6 +25,9 @@ AC_INIT([OCaml],
 
 AC_MSG_NOTICE([Configuring OCaml version AC_PACKAGE_VERSION])
 
+# OCAML__RELEASE_NUMBER must be incremented with each minor release.
+m4_define([OCAML__RELEASE_NUMBER], [11])
+
 # Configuration variables
 
 ## Command-line arguments passed to configure
