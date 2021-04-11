@@ -2225,7 +2225,10 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
 m4_define([ALPHABET], [0123456789abcdefghijklmnopqrstuv])
 alphabet='ALPHABET'
 
-m4_define([OCAML__RELEASE_NUMBER], [14])
+m4_define([OCAML__DEVELOPMENT_VERSION],
+  m4_bmatch(AC_PACKAGE_VERSION,[.*+dev.*],[true],[false]))
+m4_define([OCAML__RELEASE_NUMBER],
+  m4_eval(m4_esyscmd(head -n1 VERSION | sed -e 's/[^.]\.0*//;s/\..*//') + 1))
 m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
   [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1) + 1))],
   [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1)))])
