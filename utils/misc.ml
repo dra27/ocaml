@@ -1433,19 +1433,17 @@ module RuntimeID = struct
     let mask =
       (if int31 then 0 else 1) lor
       (if static then 0 else 2) in
-    let f i =
-      if i land mask = 0 then
-        Either.Left (char_of_int (i + 48))
-      else
-        Either.Right (char_of_int (i + 48))
-    in
     (* The order in which runtimes are tried doesn't matter - linking will
        always ensure that valid runtimes are tried first. The order given here
        always prefers runtimes which support compressed marshalling, dynamic
        loading and which are 64-bit. *)
-    List.partition_map f [2; (* static *)
-                          3; (* static and 32-bit *)
-                          1] (* 32-bit *)
+    let valid, invalid =
+      List.partition (fun i -> i land mask = 0) [2; (* static *)
+                                                 3; (* static and 32-bit *)
+                                                 1] (* 32-bit *)
+    in
+    let f i = char_of_int (i + 48) in
+    List.map f valid, List.map f invalid
 
   let shared_runtime ?runtime_id ?(host = Config.target) ?(prefix = "-l")
                      backend_type =
