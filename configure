@@ -748,6 +748,9 @@ build_os
 build_vendor
 build_cpu
 build
+native_runtime_id
+bytecode_runtime_id
+zinc_runtime_id
 target_libdir_is_relative
 target_bindir
 QS
@@ -2925,6 +2928,9 @@ VERSION=4.12.2+relocatable
 
 
  # TODO: rename this variable
+
+
+
 
 
 
@@ -17768,6 +17774,76 @@ if test x"$enable_stdlib_manpages" != "xno"; then :
 else
   stdlib_manpages=false
 fi
+
+# Determine the three Runtime IDs (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+
+
+# Bits 0-4 (dev + low 4 bits of release)
+
+
+# Bits 5-6 (high 2 bits of release)
+
+# Bit 7 (no-flat-float-array)
+if $flat_float_array; then :
+  quintet1_byte='0'
+else
+  quintet1_byte='4'
+fi
+# Bit 8 (fp)
+if $frame_pointers; then :
+  quintet1_native="8 + $quintet1_byte"
+else
+  quintet1_native="$quintet1_byte"
+fi
+# Bit 9 (tsan) cannot be set until OCaml 5.2
+
+quintet1_byte="$(echo "$alphabet" | cut -c $(expr $quintet1_byte + 1))"
+quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
+
+# Bit 10 (int31)
+if $arch64; then :
+  quintet2='0'
+else
+  quintet2='1'
+fi
+# Bit 11 (static)
+if ! $supports_shared_libraries; then :
+  quintet2="2 + $quintet2"
+fi
+# Bit 12 (naked-pointers)
+if $naked_pointers; then :
+  quintet2="4 + $quintet2"
+fi
+# Bit 13 (mutable-string)
+if ! $force_safe_string; then :
+  quintet2="8 + $quintet2"
+fi
+# Bit 14 (ansi)
+case $target,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet2="16 + $quintet2" ;; #(
+  *) :
+     ;;
+esac
+
+quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
+
+# Bits 15-19 (reserved)
+quintet3="$(echo "$alphabet" | cut -c $(expr $profinfo_width + 1))"
+
+zinc_runtime_id='000q'
+bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}q"
+native_runtime_id="${quintet3}${quintet2}${quintet1_native}q"
+
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.mlp (this is done when tools/autogen is run, not each time
+# configure is run!)
+
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
