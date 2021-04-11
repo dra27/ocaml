@@ -418,7 +418,10 @@ let write_header outchan =
     if String.length !Clflags.use_runtime > 0 then
       make_absolute !Clflags.use_runtime
     else
-      let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
+      let runtime =
+        Printf.sprintf "ocamlrun%s-%s"
+                       !Clflags.runtime_variant Config.bytecode_runtime_id
+      in
       Filename.concat runtime_info.bindir runtime
   in
   (* Determine which method will be used for launching the executable:
