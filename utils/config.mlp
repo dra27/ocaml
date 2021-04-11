@@ -92,6 +92,9 @@ let safe_string = %%FORCE_SAFE_STRING%%
 let default_safe_string = %%DEFAULT_SAFE_STRING%%
 let windows_unicode = %%WINDOWS_UNICODE%% != 0
 
+let bytecode_runtime_id = "%%BYTECODE_RUNTIME_ID%%"
+let native_runtime_id = "%%NATIVE_RUNTIME_ID%%"
+
 let flat_float_array = %%FLAT_FLOAT_ARRAY%%
 
 let function_sections = %%FUNCTION_SECTIONS%%
@@ -205,6 +208,8 @@ let configuration_variables =
   p_bool "systhread_supported" systhread_supported;
   p "host" host;
   p "target" target;
+  p "bytecode_runtime_id" bytecode_runtime_id;
+  p "native_runtime_id" native_runtime_id;
   p_bool "flambda" flambda;
   p_bool "spacetime" spacetime;
   p_bool "safe_string" safe_string;
