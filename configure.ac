@@ -80,6 +80,7 @@ AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 AC_SUBST([ocaml_cv_cc_vendor])
 AC_SUBST([CC])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -182,6 +183,9 @@ AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
 AC_SUBST([target_libdir_is_relative])
+AC_SUBST([zinc_runtime_id])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
 
 ## Generated files
 
@@ -206,6 +210,7 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
   AC_DEFINE([OCAML_VERSION_EXTRA], ["][OCAML__VERSION_EXTRA]["])])
 AC_DEFINE([OCAML_VERSION], [OCAML__VERSION_NUMBER])
 AC_DEFINE([OCAML_VERSION_STRING], ["][OCAML__VERSION]["])
+AC_DEFINE([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 
 # Works out how many "o"s are needed in quoted strings
 AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
@@ -2268,6 +2273,70 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
+
+# Determine the three Runtime IDs (see runtime/Mangling.md)
+m4_define([ALPHABET], [0123456789abcdefghijklmnopqrstuv])
+alphabet='ALPHABET'
+
+m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
+  [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1) + 1))],
+  [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1)))])
+
+# Bits 0-4 (dev + low 4 bits of release)
+m4_define([QUINTET0],
+  [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
+
+# Bits 5-6 (high 2 bits of release)
+m4_define([QUINTET1_ZINC],
+  [m4_substr(ALPHABET, m4_eval(ID_VERSION >> 5), [1])])
+# Bit 7 (no-flat-float-array)
+AS_IF([$flat_float_array],
+  [quintet1_byte='QUINTET1_ZINC'],
+  [quintet1_byte='m4_eval(4 + QUINTET1_ZINC)'])
+# Bit 8 (fp)
+AS_IF([$frame_pointers],
+  [quintet1_native="8 + $quintet1_byte"],
+  [quintet1_native="$quintet1_byte"])
+# Bit 9 (tsan) cannot be set until OCaml 5.2
+
+quintet1_byte="$(echo "$alphabet" | cut -c $(expr $quintet1_byte + 1))"
+quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
+
+# Bit 10 (int31)
+AS_IF([$arch64],
+  [quintet2='0'],
+  [quintet2='1'])
+# Bit 11 (static)
+AS_IF([! $supports_shared_libraries],
+  [quintet2="2 + $quintet2"])
+# Bit 12 (naked-pointers)
+AS_IF([$naked_pointers],
+  [quintet2="4 + $quintet2"])
+# Bit 13 (mutable-string)
+AS_IF([! $force_safe_string],
+  [quintet2="8 + $quintet2"])
+# Bit 14 (ansi)
+AS_CASE([$target,$windows_unicode],
+  [*-*-mingw32,0|*-pc-windows,0],
+    [quintet2="16 + $quintet2"])
+
+quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
+
+# Bits 15-19 (reserved)
+quintet3="$(echo "$alphabet" | cut -c $(expr $profinfo_width + 1))"
+
+zinc_runtime_id='00QUINTET1_ZINC[]QUINTET0'
+bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}QUINTET0"
+native_runtime_id="${quintet3}${quintet2}${quintet1_native}QUINTET0"
+
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.mlp (this is done when tools/autogen is run, not each time
+# configure is run!)
+m4_syscmd([sed -e '/^let is_release =/s/=.*/= ]'\
+'m4_if(OCAML__DEVELOPMENT_VERSION,true,false,true)[/' \
+    -e '/^let release_number =/s/=.*/= ]OCAML__RELEASE_NUMBER[/' \
+    utils/config.mlp > utils/config.mlp.new
+mv -f utils/config.mlp.new utils/config.mlp])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
