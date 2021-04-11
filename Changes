@@ -63,6 +63,11 @@ OCaml 4.11 maintenance branch
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Damien Doligez,
    Samuel Hym and Vincent Laviron)
 
+- #14245: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system.
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
 ### Tools:
 
 - #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
