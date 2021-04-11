@@ -26,6 +26,7 @@ module Import : sig
   | Tendered of {header: launch_mode;
                  dlls: bool;
                  runtime: string;
+                 id: Misc.RuntimeID.t option;
                  search: Byterntm.search_method}
       (** Tendered bytecode image. Executable uses the given mechanism to locate
           a suitable runtime to execute the image. [dlls] is [true] if the
@@ -76,9 +77,15 @@ module Import : sig
           header for tendered bytecode executables. *)
     shebangscripts: bool;
       (** {v $(SHEBANGSCRIPTS) v} - {v Makefile.config v} *)
-    libraries: string list list
+    filename_mangling: bool;
+      (** True if the Runtime ID is being used for filename mangling. *)
+    libraries: string list list;
       (** Sorted list of basenames of libraries to test.
           Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
+    zinc_bootstrapped: bool;
+      (** True if boot/ocamlc has been bootstrapped (temporary, to allow the
+          tests to pass on the bootstrap commit before they're updated following
+          the bootstrap) *)
   }
 
   module Bytes : sig
@@ -107,6 +114,7 @@ module Import : sig
       int -> int -> unit option
     val fold_lines : ('acc -> string -> 'acc) -> 'acc -> t -> 'acc
     val set_binary_mode : t -> bool -> unit
+    val length : t -> int64
   end
 
   module List : sig
