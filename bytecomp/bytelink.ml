@@ -588,10 +588,18 @@ let link_bytecode_as_c tolink outfile =
   if !Clflags.debug then
     output_cds_file ((Filename.chop_extension outfile) ^ ".cds")
 
+let runtime_library_name runtime_variant =
+  if runtime_variant = "_shared" then
+    Printf.sprintf "-lcamlrun-%s-%s"
+      Config.target
+      Config.bytecode_runtime_id
+  else
+    "-lcamlrun" ^ runtime_variant
+
 (* Build a custom runtime *)
 
 let build_custom_runtime prim_name exec_name =
-  let runtime_lib = "-lcamlrun" ^ !Clflags.runtime_variant in
+  let runtime_lib = runtime_library_name !Clflags.runtime_variant in
   let stable_name =
     if not !Clflags.keep_camlprimc_file then
       Some "camlprim.c"
@@ -719,7 +727,9 @@ let link objfiles output_name =
                else Ccomp.MainDll, Config.bytecomp_c_libraries
              in
              if not (
-                 let runtime_lib = "-lcamlrun" ^ !Clflags.runtime_variant in
+                 let runtime_lib =
+                   runtime_library_name !Clflags.runtime_variant
+                 in
                  Ccomp.call_linker mode output_name
                    ([obj_file] @ List.rev !Clflags.ccobjs @ [runtime_lib])
                    c_libs
