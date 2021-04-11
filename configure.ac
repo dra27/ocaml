@@ -186,6 +186,10 @@ AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
 AC_SUBST([target_libdir_is_relative])
+AC_SUBST([zinc_runtime_id_lo])
+AC_SUBST([zinc_runtime_id_hi])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
 
 ## Generated files
 
@@ -2144,6 +2148,87 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
+
+# Determine the three Runtime IDs (see runtime/Mangling.md)
+m4_define([ALPHABET], [0123456789abcdefghijklmnopqrstuv])
+alphabet='ALPHABET'
+
+m4_define([OCAML__DEVELOPMENT_VERSION],
+  m4_bmatch(AC_PACKAGE_VERSION,[.*+dev.*],[true],[false]))
+m4_define([OCAML__RELEASE_NUMBER],
+  m4_eval(m4_esyscmd(head -n1 VERSION | sed -e 's/[^.]\.0*//;s/\..*//') + 1))
+m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
+  [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1) + 1))],
+  [m4_define([ID_VERSION], m4_eval((OCAML__RELEASE_NUMBER << 1)))])
+
+# Bits 0-4 (dev + low 4 bits of release)
+m4_define([QUINTET0],
+  [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
+
+# Bits 5-6 (high 2 bits of release)
+m4_define([QUINTET1_ZINC],
+  [m4_substr(ALPHABET, m4_eval(ID_VERSION >> 5), [1])])
+
+# Bits 7-9 (low 3 bits of reserved)
+quintet1="QUINTET1_ZINC + $(expr \( $profinfo_width \* 4 \) % 32)"
+quintet1="$(echo "$alphabet" | cut -c $(expr $quintet1 + 1))"
+
+# Bits 10-11 (high 2 bits of reserved)
+quintet2_byte=\
+"$(echo "$alphabet" | cut -c $(expr \( $profinfo_width / 8 \) + 1))"
+
+# Bit 12 (no-flat-float-array)
+AS_IF([$flat_float_array],
+  [quintet2_zinc='0'],
+  [quintet2_byte="4 + $quintet2_byte"
+  quintet2_zinc='4'])
+# Bit 13 (fp)
+AS_IF([$frame_pointers],
+  [quintet2_native="8 + $quintet2_byte"],
+  [quintet2_native="$quintet2_byte"])
+# Bit 14 (spacetime)
+AS_IF([$spacetime],
+  [quintet2_native="16 + $quintet1_native"])
+
+quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
+quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
+quintet2_native="$(echo "$alphabet" | cut -c $(expr $quintet2_native + 1))"
+
+# Bit 15 (int31)
+AS_IF([$arch64],
+  [quintet3_zinc='0'],
+  [quintet3_zinc='1'])
+# Bit 16 (static)
+AS_IF([! $supports_shared_libraries],
+  [quintet3_zinc="2 + $quintet3_zinc"])
+# Bit 17 (naked-pointers)
+AS_IF([$naked_pointers],
+  [quintet3="4 + $quintet3_zinc"],
+  [quintet3="$quintet3_zinc"])
+# Bit 18 (ansi)
+AS_CASE([$target,$windows_unicode],
+  [*-*-mingw32,0|*-pc-windows,0],
+    [quintet3="8 + $quintet3"])
+# Bit 19 (mutable-string)
+AS_IF([! $force_safe_string],
+  [quintet3="16 + $quintet3"])
+
+quintet3_zinc="$(echo "$alphabet" | cut -c $(expr $quintet3_zinc + 1))"
+quintet3="$(echo "$alphabet" | cut -c $(expr $quintet3 + 1))"
+
+zinc_runtime_id_lo="QUINTET0[]QUINTET1_ZINC"
+zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
+bytecode_runtime_id="QUINTET0${quintet1}${quintet2_byte}${quintet3}"
+native_runtime_id="QUINTET0${quintet1}${quintet2_native}${quintet3}"
+
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.mlp (this is done when tools/autogen is run, not each time
+# configure is run!)
+m4_syscmd([sed -e '/^let is_release =/s/=.*/= ]'\
+'m4_if(OCAML__DEVELOPMENT_VERSION,true,false,true)[/' \
+    -e '/^let release_number =/s/=.*/= ]OCAML__RELEASE_NUMBER[/' \
+    utils/config.mlp > utils/config.mlp.new
+mv -f utils/config.mlp.new utils/config.mlp])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
