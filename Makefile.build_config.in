@@ -185,3 +185,6 @@ TSAN=@tsan@
 TSAN_NATIVE_RUNTIME_C_SOURCES = @tsan_native_runtime_c_sources@
 
 RELOCATABLE = @relocatable@
+
+# OCaml release number, relative to 3.12 (used for RuntimeID)
+OCAML_RELEASE_NUMBER = @OCAML_RELEASE_NUMBER@

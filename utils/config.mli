@@ -280,6 +280,16 @@ val ar_supports_response_files: bool
 val tsan : bool
 (** Whether ThreadSanitizer instrumentation is enabled *)
 
+val bytecode_runtime_id : string
+(** The RuntimeID for ocamlrun and libcamlrun_shared
+
+    @since 5.3 *)
+
+val native_runtime_id : string
+(** The RuntimeID for libasmrun_shared
+
+    @since 5.3 *)
+
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 
