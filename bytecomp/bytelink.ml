@@ -373,11 +373,10 @@ let read_runtime_launch_info file =
         bindir in
     let executable_offset = bindir_end + 2 in
     let kind, runtime_id =
-      (* In order to bootstrap, including the Runtime ID must be optional *)
-      if buffer.[0] <> '0' then
-        String.sub buffer 0 (bindir_start - 1), ""
+      if bindir_start < 5 then
+        raise Not_found
       else
-      String.sub buffer 4 (bindir_start - 5), String.sub buffer 0 4 in
+        String.sub buffer 4 (bindir_start - 5), String.sub buffer 0 4 in
     let launcher =
       if kind = "exe" then
         Executable
@@ -438,10 +437,6 @@ let write_header outchan =
       (true, make_absolute !Clflags.use_runtime)
     else
       let runtime =
-        (* In order to bootstrap, including the Runtime ID must be optional *)
-        if runtime_info.runtime_id = "" then
-          "ocamlrun" ^ !Clflags.runtime_variant
-        else
         Printf.sprintf "ocamlrun%s-%s"
                        !Clflags.runtime_variant runtime_info.runtime_id
       in
