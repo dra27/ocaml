@@ -951,10 +951,10 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s\n%s\000\n' "$launch_method" "$HOST_BINDIR" \
-    > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
-    > stdlib/target_runtime.info],
+  [printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$launch_method" \
+                           "$HOST_BINDIR" > stdlib/runtime.info
+  printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$target_launch_method" \
+                          "$TARGET_BINDIR" > stdlib/target_runtime.info],
 dnl These declarations are put in a here-document in configure, so the command
 dnl in '$(...)' _is_ evaluated as the content is written to config.status (by
 dnl standard interpretation of a here-document). The sed commands quote any
@@ -962,6 +962,7 @@ dnl nefarious single quotes which may appear in any of the strings.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  bytecode_runtime_id='$bytecode_runtime_id'
   HOST_BINDIR='$(echo "$HOST_BINDIR" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
