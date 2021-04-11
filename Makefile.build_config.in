@@ -59,5 +59,9 @@ TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
 TARGET_BINDIR = @TARGET_BINDIR@
 
+# Zinc Runtime ID is needed for installation only
+ZINC_RUNTIME_ID_HI = @zinc_runtime_id_hi@
+ZINC_RUNTIME_ID = @zinc_runtime_id_lo@$(ZINC_RUNTIME_ID_HI)
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
