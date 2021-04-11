@@ -940,6 +940,14 @@ module RuntimeID : sig
 
   val of_string: string -> t option
   (** Converts the 4-character representation back to a {!t} *)
+
+  val ocamlrun: ?runtime_id:t -> string -> string
+  (** [ocamlrun ?runtime_id variant] returns the name for the runtime for the
+      given Zinc Runtime ID ([runtime_id] defaults to {!make_zinc}).
+
+      e.g. [ocamlrun "d" = "ocamlrund-a100"] for a default OCaml 5.5 build on a
+           64-bit system with shared library support and compressed marshalling.
+  *)
 end
 
 (** {1 Miscellaneous type aliases} *)

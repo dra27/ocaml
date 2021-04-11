@@ -1528,4 +1528,10 @@ module RuntimeID = struct
               ansi = set 3 q3; (* bit 4 of q3 is unused *)}
       else
         None
+
+  let ocamlrun ?(runtime_id = make_zinc ()) variant =
+    if is_zinc runtime_id then
+      Printf.sprintf "ocamlrun%s-%s" variant (to_string runtime_id)
+    else
+      invalid_arg "Misc.RuntimeID.ocamlrun"
 end

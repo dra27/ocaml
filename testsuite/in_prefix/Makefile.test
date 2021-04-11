@@ -40,13 +40,19 @@ endif
 
 export PATH := $(SRCDIR_ABS)/testsuite/in_prefix/poisoned-runtime:$(PATH)
 
+ifeq "$(SUFFIXING)" "true"
+RUNTIME_NAME = ocamlrun-$(ZINC_RUNTIME_ID)$(EXE)
+else
+RUNTIME_NAME = ocamlrun$(EXE)
+endif
+
 test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O) ../tools/dummy$(EXE)
-	@$(LN) $(ROOTDIR)/runtime/ocamlrun$(EXE) ocamlrun$(EXE)
+	@$(LN) $(ROOTDIR)/runtime/ocamlrun$(EXE) $(RUNTIME_NAME)
 	@$(MKDIR) poisoned-runtime
-	@cd poisoned-runtime && $(LN) ../../tools/dummy$(EXE) ocamlrun$(EXE)
+	@cd poisoned-runtime && $(LN) ../../tools/dummy$(EXE) $(RUNTIME_NAME)
 	@$< $(DRIVER_ARGS)
 	@rm -rf poisoned-runtime
-	@rm -f ocamlrun$(EXE)
+	@rm -f ocamlrun*$(EXE)
 
 # Generates --without-$(1) if $(2) = false or --with-$(1) otherwise
 bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
