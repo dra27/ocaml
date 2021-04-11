@@ -1154,18 +1154,26 @@ module RuntimeID = struct
     else
       t
 
+  external zinc_runtime_id : unit -> bool * bool = "caml_zinc_runtime_id"
+  let default_static, default_no_compression = zinc_runtime_id ()
+  let default_int31 = (Sys.int_size = 31)
+
   let make_zinc ?(dev = not Config.is_release)
-                ?(release = Config.release_number) () =
+                ?(release = Config.release_number)
+                ?(int31 = default_int31)
+                ?(static = default_static)
+                ?(no_compression = default_no_compression) () =
     check "Misc.RuntimeID.make_zinc"
       {dev; release;
-       no_flat_float_array = false; fp = false; tsan = false; int31 = false;
-       static = false; no_compression = false; ansi = false; reserved = 0}
+       int31; static; no_compression;
+       no_flat_float_array = false; fp = false; tsan = false; ansi = false;
+       reserved = 0}
 
   let make_bytecode ?(dev = not Config.is_release)
                     ?(release = Config.release_number)
                     ?(no_flat_float_array = not Config.flat_float_array)
-                    ?(int31 = Sys.int_size = 31)
-                    ?(static = not Config.supports_shared_libraries)
+                    ?(int31 = default_int31)
+                    ?(static = default_static)
                     ?(no_compression = false)
                     ?(ansi = Config.target_win32 && not Config.windows_unicode)
                     ?(reserved = Config.profinfo_width) () =
@@ -1179,8 +1187,8 @@ module RuntimeID = struct
                   ?(no_flat_float_array = not Config.flat_float_array)
                   ?(fp = Config.with_frame_pointers)
                   ?(tsan = false)
-                  ?(int31 = Sys.int_size = 31)
-                  ?(static = not Config.supports_shared_libraries)
+                  ?(int31 = default_int31)
+                  ?(static = default_static)
                   ?(no_compression = false)
                   ?(ansi = Config.target_win32 && not Config.windows_unicode)
                   ?(reserved = Config.profinfo_width) () =
@@ -1191,7 +1199,7 @@ module RuntimeID = struct
 
   let is_zinc = function
   | {dev = _; release = _; no_flat_float_array = false; fp = false;
-     tsan = false; int31 = false; static = false; no_compression = false;
+     tsan = false; int31 = _; static = _; no_compression = _;
      ansi = false; reserved = 0} -> true
   | _ -> false
 
@@ -1252,6 +1260,29 @@ module RuntimeID = struct
       Printf.sprintf "ocamlrun%s-%s" variant (to_string runtime_id)
     else
       invalid_arg "Misc.RuntimeID.ocamlrun"
+
+  let zinc_quintets ~int31 ~static ~no_compression =
+    let mask =
+      (if int31 then 0 else 1) lor
+      (if static then 0 else 2) lor
+      (if no_compression then 0 else 4) in
+    let f i =
+      if i land mask = 0 then
+        Either.Left (char_of_int (i + 48))
+      else
+        Either.Right (char_of_int (i + 48))
+    in
+    (* The order in which runtimes are tried doesn't matter - linking will
+       always ensure that valid runtimes are tried first. The order given here
+       always prefers runtimes which support compressed marshalling, dynamic
+       loading and which are 64-bit. *)
+    List.partition_map f [2; (* static *)
+                          3; (* static and 32-bit *)
+                          1; (* 32-bit *)
+                          4; (* --without-zstd *)
+                          6; (* --without-zstd and static *)
+                          5; (* --without-zstd and 32-bit *)
+                          7] (* --without-zstd, static and 32-bit *)
 
   let shared_runtime ?runtime_id ?(host = Config.target) ?(prefix = "-l")
                      backend_type =
