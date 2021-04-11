@@ -1301,6 +1301,7 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 	  $(if $(LIBDIR_REL),printf '#define OCAML_STDLIB_DIR_REL %s\n' \
 	                            '$(call C_LITERAL,$(LIBDIR_REL))',true); \
 	  echo '#define HOST "$(HOST)"'; \
+	  echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"'; \
 	} > $@
 
 runtime/stdlib.$(O): runtime/build_config.h
