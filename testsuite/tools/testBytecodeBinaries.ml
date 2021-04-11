@@ -90,15 +90,26 @@ let run config env =
                                          program
                   else
                     "compiled with -custom"
-              | Tendered {runtime; header; search; _} ->
+              | Tendered {runtime; id; header; search} ->
+                  let expected_id =
+                    if config.filename_mangling then
+                      Some (Misc.RuntimeID.make_zinc ())
+                    else
+                      None
+                  in
+                  let expected = (runtime = "ocamlrun" && id = expected_id) in
                   let runtime, is_expected_runtime =
+                    let id =
+                      Option.map (fun t -> "-" ^ Misc.RuntimeID.to_string t) id
+                      |> Option.value ~default:""
+                    in
                     match search with
                     | Absolute dir ->
-                        dir ^ runtime, not Sys.win32 && runtime = "ocamlrun"
+                        dir ^ runtime ^ id, not Sys.win32 && expected
                     | Absolute_then_search dir ->
-                        Printf.sprintf "[%s/]%s" dir runtime, false
+                        Printf.sprintf "[%s]%s%s" dir runtime id, false
                     | Search ->
-                        runtime, Sys.win32 && runtime = "ocamlrun"
+                        runtime ^ id, Sys.win32 && expected
                   in
                   let expected_launch_mode =
                     if config.shebangscripts then
