@@ -433,7 +433,7 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
 let write_header outchan =
   let zinc_runtime_id, write_exe_launcher =
     let header =
-      let header = "runtime-launch-info" in
+      let header = "camlheader" in
       try Load_path.find header
       with Not_found -> raise (Error (File_not_found header))
     in
