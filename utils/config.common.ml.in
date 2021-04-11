@@ -110,6 +110,8 @@ let configuration_variables () =
   p_bool "systhread_supported" systhread_supported;
   p "host" host;
   p "target" target;
+  p "bytecode_runtime_id" bytecode_runtime_id;
+  p "native_runtime_id" native_runtime_id;
   p_bool "flambda" flambda;
   p_bool "safe_string" safe_string;
   p_bool "default_safe_string" default_safe_string;
