@@ -38,3 +38,6 @@ RLWRAP=@rlwrap@
 # Which document generator: odoc or ocamldoc?
 DOCUMENTATION_TOOL=@documentation_tool@
 DOCUMENTATION_TOOL_CMD=@documentation_tool_cmd@
+
+# OCaml release number, relative to 3.12 (used for RuntimeID)
+OCAML_RELEASE_NUMBER=@ocaml_release_number@
