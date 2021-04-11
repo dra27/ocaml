@@ -61,6 +61,8 @@
 #include "caml/startup.h"
 #include "caml/startup_aux.h"
 
+#include "build_config.h"
+
 static char * error_message(void)
 {
   return strerror(errno);
@@ -663,6 +665,15 @@ CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
   Field(result, 1) = root_dir;
 
   CAMLreturn(result);
+}
+
+CAMLprim value caml_zinc_runtime_id(value unit)
+{
+#ifdef SUPPORT_DYNAMIC_LINKING
+  return Val_bool(0);
+#else
+  return Val_bool(1);
+#endif
 }
 
 CAMLprim value caml_sys_get_config(value unit)
