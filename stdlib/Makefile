@@ -135,7 +135,8 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 endif
 
 $(HEADERPROGRAM)%$(O): \
-  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
+  OC_CPPFLAGS += -DRUNTIME_NAME=$\
+    '"$(HEADER_PATH)ocamlrun$(subst .,,$*)-$(BYTECODE_RUNTIME_ID)$(EXE)"'
 
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
