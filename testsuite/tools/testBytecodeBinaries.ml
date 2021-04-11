@@ -90,15 +90,26 @@ let run config env =
                                            program
                     else
                       failed, "compiled with -custom"
-                | Tendered {runtime; header; search; _} ->
+                | Tendered {runtime; id; header; search; _} ->
                     let reported_runtime =
+                      let id =
+                        Option.map
+                          (fun t -> "-" ^ Misc.RuntimeID.to_string t) id
+                        |> Option.value ~default:""
+                      in
                       match search with
                       | Absolute dir ->
-                          dir ^ runtime
+                          dir ^ runtime ^ id
                       | Absolute_then_search dir ->
-                          Printf.sprintf "[%s/]%s" dir runtime
+                          Printf.sprintf "[%s]%s%s" dir runtime id
                       | Search ->
-                          runtime
+                          runtime ^ id
+                    in
+                    let expected_id =
+                      if config.filename_mangling then
+                        Some (Misc.RuntimeID.make_zinc ())
+                      else
+                        None
                     in
                     let expected_search =
                       if Sys.win32 then
@@ -112,6 +123,12 @@ let run config env =
                         Header_shebang
                       else
                         Header_exe
+                    in
+                    let pp_runtime_id f = function
+                    | None ->
+                        Format.pp_print_string f "<NONE>"
+                    | Some id ->
+                        Format.pp_print_string f (Misc.RuntimeID.to_string id)
                     in
                     let pp_search f = function
                     | Byterntm.Absolute _ ->
@@ -137,6 +154,8 @@ let run config env =
                       failed
                       |> check expected_search search
                                "search mechanism" pp_search
+                      |> check expected_id id
+                               "runtime ID" pp_runtime_id
                       |> check "ocamlrun" runtime
                                "runtime" Format.pp_print_string
                       |> check expected_launch_mode header
