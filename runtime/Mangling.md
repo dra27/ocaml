@@ -115,6 +115,7 @@ in three different contexts where certain bits are masked out:
    (at present there aren't any).
 3. _Zinc Mask_: masks out bits which are not related to bytecode portability.
    Where the _Bytecode_ and _Native_ masks relate to _runtimes_, the _Zinc_ mask
+<<<<<<< HEAD
    relates to _bytecode images_. The Zinc ID therefore includes:
    - **release** and **dev** (a given bytecode image targets a specific version
      of OCaml)
@@ -123,6 +124,15 @@ in three different contexts where certain bits are masked out:
    - **int31**, **static**, and **no-compression** (a bytecode image using
      63-bit integers, dynamically loaded C stubs and compressed marshalling will
      be rejected by an interpreter which doesn't support any of these features)
+=======
+   relates to _bytecode images_. At present, this selects **release** and
+   **dev** (a given bytecode image targets a specific version of OCaml),
+   **int31**, **static** and **no-compression**. i.e. for a given bytecode
+   executable, setting **int31** indicates that the image can be run on a 32-bit
+   runtime, setting **static** indicates that the executable does not require
+   dynamic loading of C code and setting **no-compression** indicates that it
+   does use the compressed marshalling support of the runtime.
+>>>>>>> 31816026e1 (Enhance the portability of the Zinc ID)
 
 Note that the inclusion of a bit in a mask is determined by whether that
 property affects the ability to load and execute the code, rather than whether

@@ -20,7 +20,7 @@ module Import = struct
                  dlls: bool;
                  runtime: string;
                  id: Misc.RuntimeID.t option;
-                 search: Bytesections.search_mode}
+                 search: Config.search_method}
   | Custom
   | Vanilla
 

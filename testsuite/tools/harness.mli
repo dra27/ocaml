@@ -27,7 +27,7 @@ module Import : sig
                  dlls: bool;
                  runtime: string;
                  id: Misc.RuntimeID.t option;
-                 search: Bytesections.search_mode}
+                 search: Config.search_method}
       (** Tendered bytecode image. Executable uses the given mechanism to locate
           a suitable runtime to execute the image. [dlls] is [true] if the
           bytecode image requires additional C libraries to be loaded. [runtime]

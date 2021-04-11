@@ -1440,6 +1440,9 @@ module RuntimeID = struct
     ansi: bool;
   }
 
+  external zinc_runtime_id : unit -> bool * bool = "caml_zinc_runtime_id"
+  let default_static, default_no_compression = zinc_runtime_id ()
+
   let make fn ?(dev = not Config.is_release)
               ?(release = Config.release_number)
               ?(reserved = Config.reserved_header_bits)
@@ -1447,8 +1450,8 @@ module RuntimeID = struct
               ?(fp = Config.with_frame_pointers)
               ?(tsan = Config.tsan)
               ?(int31 = (Sys.int_size = 31))
-              ?(static = not Config.supports_shared_libraries)
-              ?(no_compression = (Config.compression_c_libraries = ""))
+              ?(static = default_static)
+              ?(no_compression = default_no_compression)
               ?(ansi = Config.target_win32 && not Config.windows_unicode) () =
     if release < 0 || release > 63 || reserved < 0 || reserved > 31 then
       invalid_arg fn
@@ -1534,6 +1537,29 @@ module RuntimeID = struct
       Printf.sprintf "ocamlrun%s-%s" variant (to_string runtime_id)
     else
       invalid_arg "Misc.RuntimeID.ocamlrun"
+
+  let zinc_quintets ~int31 ~static ~no_compression =
+    let mask =
+      (if int31 then 0 else 1) lor
+      (if static then 0 else 2) lor
+      (if no_compression then 0 else 4) in
+    let f i =
+      if i land mask = 0 then
+        Either.Left (char_of_int (i + 48))
+      else
+        Either.Right (char_of_int (i + 48))
+    in
+    (* The order in which runtimes are tried doesn't matter - linking will
+       always ensure that valid runtimes are tried first. The order given here
+       always prefers runtimes which support compressed marshalling, dynamic
+       loading and which are 64-bit. *)
+    List.partition_map f [2; (* static *)
+                          3; (* static and 32-bit *)
+                          1; (* 32-bit *)
+                          4; (* --without-zstd *)
+                          6; (* --without-zstd and static *)
+                          5; (* --without-zstd and 32-bit *)
+                          7] (* --without-zstd, static and 32-bit *)
 
   let shared_runtime ?runtime_id ?(host = Config.target) ?(prefix = "-l")
                      backend_type =

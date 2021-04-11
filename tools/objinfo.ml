@@ -294,6 +294,7 @@ let p_list title print = function
       p_title title;
       List.iter print l
 
+    (*
 let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
                          tsan; int31; static; no_compression; ansi;
                          reserved} as t) =
@@ -329,26 +330,66 @@ let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
   if ansi then
     printf "\t  - Windows Unicode support disabled\n"
 
+let _display_runtime_id search (valid, _invalid) =
+  display_runtime_id (List.hd valid);
+  match search with
+  | Byterntm.Absolute _ ->
+      ()
+  | _ ->
+    let int31, static, no_compression =
+      let f (int31, static, no_compression) (t : Misc.RuntimeID.t) =
+        (t.int31 || int31,
+         t.static || static,
+         t.no_compression || no_compression)
+      in
+      List.fold_left f (false, false, false) valid
+    in
+    if not int31 then
+      printf "\t  - Image uses 63-bit integers\n";
+    if not static then
+      printf "\t  - Image requires dynamic loading support\n";
+    if not no_compression then
+      printf "\t  - Image uses compressed marshalling\n"
+*)
+
 let dump_byte ic =
   let toc = Bytesections.read_toc ic in
+(*
   let () =
-    try
-      let runtime, id, search = Bytesections.read_runtime toc ic in
+    (* XXX Redo, obvs *)
+    Byterntm.read_runtime toc ic |> Option.iter @@ fun (runtime, bindir, alternates) ->
+      let dir =
+        match bindir with
+        | Some (dir, id) ->
+            if alternates = None then
+              dir
+        | None ->
       let runtime =
-        let some t = "-" ^ Misc.RuntimeID.to_string t in
-        runtime ^ Option.fold ~none:"" ~some id
+        match id with
+        | Some ([id], _) ->
+            runtime ^ "-" ^ Misc.RuntimeID.to_string id
+        | Some ((id::_) as ids, _) ->
+            let primary = Misc.RuntimeID.to_string id in
+            let ids =
+              let f id = String.make 1 (Misc.RuntimeID.to_string id).[1] in
+              List.map f ids
+            in
+            let ids = String.concat "" ids in
+            Printf.sprintf "%s-%c[%s]%c%c"
+                           runtime primary.[0] ids primary.[2] primary.[3]
+        | _ -> runtime
       in
       let runtime =
         match search with
-        | Bytesections.Search -> runtime
-        | Bytesections.Absolute_then_search dir ->
+        | Byterntm.Search -> runtime
+        | Byterntm.Absolute_then_search dir ->
             Printf.sprintf "[%s]%s" dir runtime
-        | Bytesections.Absolute dir -> dir ^ runtime
+        | Byterntm.Absolute dir -> dir ^ runtime
       in
       printf "Runtime:\n\t%s\n" runtime;
-      Option.iter display_runtime_id id
-    with Not_found -> ()
+      Option.iter (display_runtime_id search) id
   in
+*)
   let all = Bytesections.all toc in
   List.iter
     (fun {Bytesections.name = section; len; _} ->

@@ -344,7 +344,7 @@ ifeq "$(if $(BOOTSTRAPPED),$(filter-out false,$(SUFFIXING)))" ""
 # been bootstrapped yet or suffixing is disabled, pass the unsuffixed runtime
 # name explicitly with -use-runtime.
 BYTECODE_LAUNCHER_FLAGS += \
-  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)ocamlrun)
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)ocamlrun-$(ZINC_RUNTIME_ID))
 endif
 
 MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS = \

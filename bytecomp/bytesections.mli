@@ -87,8 +87,9 @@ val all : section_table -> section_entry list
 val pos_first_section : section_table -> int
 (** Return the position of the beginning of the first section *)
 
+(*
 (** Search methods used by a tendered bytecode image to find a runtime. *)
-type search_mode =
+type search_mode = Byterntm.search_mode =
 | Absolute of string
     (** Check fixed location only *)
 | Absolute_then_search of string
@@ -97,7 +98,11 @@ type search_mode =
     (** Always search for the interpreter *)
 
 val read_runtime :
-  section_table -> in_channel -> string * Misc.RuntimeID.t option * search_mode
+  section_table -> in_channel
+  -> string *
+     (Misc.RuntimeID.t list * Misc.RuntimeID.t list) option *
+     search_mode
 (** Returns the runtime used by this tendered/standalone image
 
     @raise Not_found For an image linked using -without-runtime *)
+*)

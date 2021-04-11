@@ -93,11 +93,13 @@ let run config env =
                       Option.map (fun t -> "-" ^ Misc.RuntimeID.to_string t) id
                       |> Option.value ~default:""
                     in
+                    (* XXX Correct? w.r.t. bootstrap *)
+                    (* XXX The idea here is that it is _displaying_ it - i.e. same format as tools/ocamlsize and tools/objinfo.ml *)
                     match search with
-                    | Absolute dir ->
-                        dir ^ runtime ^ id, expected
-                    | Absolute_then_search dir ->
-                        Printf.sprintf "[%s]%s%s" dir runtime id, false
+                    | Absolute ->
+                        (*dir*)"" ^ runtime ^ id, expected
+                    | Absolute_then_search ->
+                        Printf.sprintf "[%s]%s%s" (*dir*)"" runtime id, false
                     | Search ->
                         runtime ^ id, false
                   in

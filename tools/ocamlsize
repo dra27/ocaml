@@ -31,12 +31,23 @@ foreach $f (@ARGV) {
         # variable r with the name of the runtime (see bytecomp/bytelink.ml)
         } elsif ($path =~ s/^r='(.*)'$/$1/ > 0) {
           $path =~ s/'\\''/'/g;
-          chomp($dir = <FILE>);
-          # In -runtime-search enable, there will also be a path to the runtime
-          # defined the variable c.
-          if ($dir =~ s/^c='(.*)'"\$r"$/$1/ > 0) {
-            $dir =~ s/'\\''/'/g;
-            $path = "[$dir]$path";
+          chomp($z = <FILE>);
+          chomp($v = <FILE>);
+          if ($z =~ s/^z='(.*)\/.*'$/$1/ > 0 && $v =~ s/^v='(.*)'$/$1/ > 0) {
+            $path = "$path\[$z\]$v";
+            chomp($dir = <FILE>);
+            # In -runtime-search enable, there will also be a path to the
+            # runtime defined the variable c.
+            if ($dir =~ s/^c='(.*)'"\${r}(.)\$v"$/$1/ > 0) {
+              $dir =~ s/'\\''/'/g;
+              $path = "[$dir]$path";
+            }
+          } else {
+            $dir = $z;
+            if ($dir =~ s/^c='(.*)'"\$r"$/$1/ > 0) {
+              $dir =~ s/'\\''/'/g;
+              $path = "[$dir]$path";
+            }
           }
         } else {
           undef $path;
@@ -66,8 +77,9 @@ foreach $f (@ARGV) {
           # "/path/to\0ocamlrun" for -runtime-search enable. Transform the
           # embedded "\0" into a directory separator and display the directory
           # in square brackets (as above for the sh-case)
-          $path =~ s/^([^\/\\]*)([\\\/])([^\0]*)\0(.*)$/[$1$2$3$2]$4/
+          $path =~ s/^([^\/\\]*)([\\\/])([^\0]*)\0(.*)$/[$1$2$3$2]$4/;
         }
+        $path =~ s/(ocamlrun-0).(.*)\0(.*)\/.*$/$1\[$3\]$2/;
       } else {
         $path = '(custom runtime)';
       }

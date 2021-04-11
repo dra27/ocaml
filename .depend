@@ -2470,16 +2470,24 @@ bytecomp/bytepackager.cmi : \
     utils/format_doc.cmi \
     typing/env.cmi \
     file_formats/cmo_format.cmi
-bytecomp/bytesections.cmo : \
+bytecomp/byterntm.cmo : \
     utils/misc.cmi \
+    bytecomp/bytesections.cmi \
+    bytecomp/byterntm.cmi
+bytecomp/byterntm.cmx : \
+    utils/misc.cmx \
+    bytecomp/bytesections.cmx \
+    bytecomp/byterntm.cmi
+bytecomp/byterntm.cmi : \
+    utils/misc.cmi \
+    bytecomp/bytesections.cmi
+bytecomp/bytesections.cmo : \
     utils/config.cmi \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmx : \
-    utils/misc.cmx \
     utils/config.cmx \
     bytecomp/bytesections.cmi
-bytecomp/bytesections.cmi : \
-    utils/misc.cmi
+bytecomp/bytesections.cmi :
 bytecomp/dll.cmo : \
     utils/misc.cmi \
     utils/config.cmi \

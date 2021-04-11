@@ -67,6 +67,8 @@
 #include "caml/major_gc.h"
 #include "caml/shared_heap.h"
 
+#include "build_config.h"
+
 CAMLexport char * caml_strerror(int errnum, char * buf, size_t buflen)
 {
 #ifdef _WIN32
@@ -736,6 +738,28 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 {
   return Val_int(1); /* Bytecode backed */
 }
+
+CAMLprim value caml_zinc_runtime_id(value unit)
+{
+  CAMLparam0 ();   /* unit is unused */
+  CAMLlocal1 (result);
+
+  result = caml_alloc_2(0,
+#ifdef SUPPORT_DYNAMIC_LINKING
+    Val_false,
+#else
+    Val_true,
+#endif
+#ifdef HAS_ZSTD
+    Val_false
+#else
+    Val_true
+#endif
+  );
+
+  CAMLreturn (result);
+}
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */

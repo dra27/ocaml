@@ -296,10 +296,14 @@ static uint32_t read_size(const char *ptr)
 #define RNTM_ENCODING_LENGTH 1
 #endif
 
+/* RNTM may be a maximum of PATH_MAX - 1 encoded characters, followed by a NUL
+   up to 9 characters of alternate suffix information */
+#define MAX_RUNTIME_PATH ((PATH_MAX - 1) * RNTM_ENCODING_LENGTH + 10)
+
 static char * read_runtime_path(file_descriptor fd, uint32_t *rntm_strlen)
 {
   char buffer[TRAILER_SIZE];
-  static char runtime_path[PATH_MAX * RNTM_ENCODING_LENGTH];
+  static char runtime_path[MAX_RUNTIME_PATH];
   int num_sections;
   long ofs;
 
@@ -321,7 +325,7 @@ static char * read_runtime_path(file_descriptor fd, uint32_t *rntm_strlen)
   if (*rntm_strlen == 0) return NULL;
   /* The last character of runtime_path must be '\0', so RNTM must be strictly
      less than PATH_MAX */
-  if (*rntm_strlen > PATH_MAX * RNTM_ENCODING_LENGTH) return NULL;
+  if (*rntm_strlen > MAX_RUNTIME_PATH) return NULL;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
   if (read(fd, runtime_path, *rntm_strlen) != *rntm_strlen) return NULL;
 
@@ -331,7 +335,10 @@ static char * read_runtime_path(file_descriptor fd, uint32_t *rntm_strlen)
 /* rntm points to a buffer containing rntm_bsz characters consisting of the
    decoded content of the RNTM section (which may include NUL characters) and an
    additional NUL "terminator".
-   RNTM is either <runtime>[\0] or [<runtime-dirname>]\0<runtime-basename>
+   RNTM is one of:
+   - <runtime>[\0]
+   - [<runtime-dirname>]\0<runtime-basename>\0<valid>\0[<invalid>]
+   - \0<runtime-basename-less-one>\0<valid>\0[<invalid>]
    Decode rntm and search for a runtime (using argv0_dirname if non-NULL and
    required) and exec the first runtime found passing argv. */
 NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
@@ -373,37 +380,87 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
       exit_with_error(T("Cannot exec "), rntm, NULL);
   }
 
-  /* Shift rntm to point to <runtime-basename> */
-  rntm = rntm_bindir_end + 1;
-  if (rntm < rntm_end) {
+  char_os *runtime_basename = rntm_bindir_end + 1;
+  if (runtime_basename < rntm_end) {
+    char_os root[PATH_MAX];
+    char_os *root_basename = root;
+    char_os *root_last;
+
     /* Searching takes place first in the directory containing this executable,
        if it's known. */
     if (argv0_dirname != NULL) {
-      char_os root[PATH_MAX];
       unsafe_copy(root, argv0_dirname, PATH_MAX);
 
       /* Ensure root ends with a directory separator. root_basename points to
          the character at which to place <runtime-basename> */
-      char_os *root_basename = root;
       while (*root_basename != 0)
         root_basename++;
       if (root_basename > root && !Is_separator(*(root_basename - 1)))
         *root_basename++ = Directory_separator_character;
 
-      /* If there isn't enough space to copy rntm to root then simply skip this
-         check (e.g. an executable called b.exe in a very long directory name).
-         (root_basename - root) is strlen_os(root) and likewise
-         (rntm_end - rntm) is strlen_os(rntm). */
-      if ((rntm_end - rntm) <= PATH_MAX - (root_basename - root) - 1) {
-        unsafe_copy(root_basename, rntm, PATH_MAX - (root_basename - root));
-        if (exec_file(root, argv) != ENOENT)
-          exit_with_error(T("Cannot exec "), root, NULL);
+      /* If there isn't enough space to copy rntm to root then the check for
+         runtimes with the executable will be skipped (e.g. an executable called
+         b.exe in a very long directory name). */
+      if ((rntm_end - runtime_basename + (*rntm == 0))
+            <= PATH_MAX - (root_basename - root) - 1) {
+        /* Copy <runtime-basename> to the end of root */
+        unsafe_copy(root_basename, runtime_basename,
+                    PATH_MAX - (root_basename - root));
+      } else {
+        root_basename = root;
       }
     }
 
-    /* Otherwise, search in PATH */
-    if (exec_file(rntm, argv) != ENOENT)
-      exit_with_error(T("Cannot exec "), rntm, NULL);
+    /* If argv0_dirname is NULL or if it plus the runtime exceeds PATH_MAX, then
+       root_basename still points to root and simply copy the runtime_basename
+       to root (and ultimately only search in PATH) */
+    if (root_basename == root)
+      unsafe_copy(root, runtime_basename, PATH_MAX);
+
+    /* Set root_last to point to the NUL after <runtime-basename> */
+    root_last = root_basename;
+    while (*root_last != 0)
+      root_last++;
+
+    /* In Search mode, what was copied was <runtime-base-less-one>, so advance
+       the pointer to point to the actual last character (it doesn't matter
+       that it's not yet initialised) */
+    if (*rntm == 0) {
+      root_last[1] = '\0';
+    } else {
+      root_last--;
+    }
+
+    /* Pausing for breath, let's note that root_basename at this stage points to
+       a NUL-terminated string representing the name of the current runtime
+       being sought, and root_last points to the final character of that
+       runtime. If root != root_basename, then we're able to search for that
+       runtime in the directory containing this currently running executable. */
+
+    char_os *current_attempt = runtime_basename;
+    while (*current_attempt != 0)
+      current_attempt++;
+    /* current_attempts now points to the NUL before <valid> */
+
+    while (current_attempt++ < rntm_end) {
+      char_os *start = current_attempt;
+      char_os *runtime = root;
+
+with_feeling:
+      while (current_attempt <= rntm_end && *current_attempt != '\0') {
+        *root_last = *current_attempt;
+
+        if (exec_file(runtime, argv) != ENOENT)
+          exit_with_error(T("Cannot exec "), runtime, NULL);
+
+        current_attempt++;
+      }
+      if (runtime != root_basename) {
+        current_attempt = start;
+        runtime = root_basename;
+        goto /* once more */ with_feeling;
+      }
+    }
   }
 
   /* If we get here, we've failed... */
@@ -427,7 +484,6 @@ NORETURN void __cdecl wmainCRTStartup(void)
 
   h = CreateFile(truename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                  NULL, OPEN_EXISTING, 0, NULL);
-
 
   /* read_runtime_path returns the actual size of RNTM, but the buffer returned
      is guaranteed to have a null character following the final character of
