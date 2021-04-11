@@ -2288,7 +2288,9 @@ AS_IF([$flat_float_array],
 AS_IF([$frame_pointers],
   [quintet2_native="8 + $quintet2_byte"],
   [quintet2_native="$quintet2_byte"])
-# Bit 14 (tsan) cannot be set until OCaml 5.2
+# Bit 14 (spacetime)
+AS_IF([$spacetime],
+  [quintet2_native="16 + $quintet1_native"])
 
 quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
 quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
