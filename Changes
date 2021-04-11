@@ -50,8 +50,8 @@ Working version
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and Xavier Leroy)
 
 - #13???: Introduce a RuntimeID for use in filename mangling to allow different
-  configurations and different versions of the runtime system to coexist
-  harmoniously on a single system.
+  configurations and different versions of ocamlrun to coexist harmoniously on a
+  single system.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
