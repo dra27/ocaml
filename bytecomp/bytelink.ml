@@ -160,6 +160,13 @@ end
 module String = struct
   include Misc.Stdlib.String
 
+  let fold_left f x a =
+    let r = ref x in
+    for i = 0 to length a - 1 do
+      r := f !r (unsafe_get a i)
+    done;
+    !r
+
   let exists p s =
     let n = length s in
     let rec loop i =
@@ -505,7 +512,12 @@ let write_header outchan =
     if runtime <> "" then
       make_absolute !Clflags.use_runtime, Config.Absolute
     else
-      let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
+      let runtime =
+        if Config.suffixing then
+          Misc.RuntimeID.ocamlrun !Clflags.runtime_variant
+        else
+          "ocamlrun" ^ !Clflags.runtime_variant
+      in
       if !Clflags.search_method <> Config.Absolute then
         runtime, !Clflags.search_method
       else
