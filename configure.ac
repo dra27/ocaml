@@ -46,6 +46,7 @@ libraries_man_section=3
 mkexe="\$(CC) \$(OC_CFLAGS) \$(CFLAGS) \$(OC_LDFLAGS) \$(LDFLAGS)"
 
 # Flags for building executable files with debugging symbols
+ocaml_release_number=15
 mkexedebugflag="-g"
 common_cflags=""
 common_cppflags=""
@@ -174,6 +175,9 @@ AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
 AC_SUBST([target_bindir])
 AC_SUBST([bindir_to_libdir])
+AC_SUBST([ocaml_release_number])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
 
 ## Generated files
 
@@ -2016,5 +2020,55 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
+
+# Determine the RuntimeID (see runtime/RuntimeID.md)
+alphabet='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-='
+
+sextet0="$(echo "$alphabet" | cut -c $(expr $ocaml_release_number + 1))"
+
+if $arch64; then
+  sextet1='1 + '
+  # XXX symlinkery too
+else
+  sextet1=''
+fi
+sextet1="$(echo "$alphabet" | cut -c $(expr $sextet1$profinfo_width '*' 2 + 1))"
+
+if $supports_shared_libraries; then
+  sextet2_byte='1 + '
+  # XXX symlinkery too
+else
+  sextet2_byte=''
+fi
+
+# frame_pointers is native only (see below)
+
+if $naked_pointers; then
+  sextet2_byte="${sextet2_byte}4 + "
+fi
+
+# Spacetime is never set
+
+if ! $force_safe_string; then
+  sextet2_byte="${sextet2_byte}16 + "
+fi
+
+if ! $flat_float_array; then
+  sextet2_byte="${sextet2_byte}32 +"
+fi
+
+if $frame_pointers; then
+  sextet2_native="${sextet2_byte}2 + "
+else
+  sextet2_native="${sextet2_byte}"
+fi
+
+sextet2_byte="$(echo "$alphabet" | cut -c $(expr $sextet2_byte + 1))"
+sextet2_native="$(echo "$alphabet" | cut -c $(expr $sextet2_native + 1))"
+
+sextet3="$(echo "$alphabet" | cut -c $(expr $windows_unicode + 1))"
+
+bytecode_runtime_id="$sextet3$sextet2_byte$sextet1$sextet0"
+native_runtime_id="$sextet3$sextet2_native$sextet1$sextet0"
 
 AC_OUTPUT
