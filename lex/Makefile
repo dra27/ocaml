@@ -45,7 +45,9 @@ allopt: ocamllex.opt
 opt.opt: allopt
 
 ocamllex$(EXE): $(OBJS)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+	$(CAMLC) \
+	  $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $(LINKFLAGS)) $(LINKFLAGS) \
+	  -compat-32 -o $@ $^
 
 ocamllex.opt$(EXE): $(OBJS:.cmo=.cmx)
 	$(CAMLOPT_CMD) -o $@ $^
