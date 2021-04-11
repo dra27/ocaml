@@ -86,6 +86,11 @@ Working version
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Samuel Hym,
   Vincent Laviron and ???)
 
+- #14245: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system.
+  (David Allsopp, review by Samuel Hym and ???)
+
 - #12269, #12410, #13063: Fix unsafety, deadlocks, and/or leaks should
   rare errors happen during domain creation and thread
   creation/registration.
