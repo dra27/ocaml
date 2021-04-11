@@ -18,6 +18,14 @@
 module String = struct
   include String
 
+  let for_all p s =
+    let n = length s in
+    let rec loop i =
+      if i = n then true
+      else if p (unsafe_get s i) then loop (succ i)
+      else false in
+    loop 0
+
   let starts_with ~prefix s =
     let len_s = length s
     and len_pre = length prefix in
