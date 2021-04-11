@@ -88,8 +88,8 @@ Working version
   (Fabrice Buoro and Stephen Dolan, review by Gabriel Scherer and Sadiq Jaffer)
 
 - #11???: Introduce a RuntimeID for use in filename mangling to allow different
-  configurations and different versions of ocamlrun to coexist harmoniously on a
-  single system.
+  configurations and different versions of ocamlrun and the shared runtime
+  libraries to coexist harmoniously on a single system.
   (David Allsopp, review by ???)
 
 ### Type system:
