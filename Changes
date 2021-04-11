@@ -6,6 +6,10 @@ OCaml 5.0 maintenance version
 - #11590: Allow installing to a destination path containing spaces.
   (Élie Brami, review by Sébastien Hinderer and David Allsopp)
 
+- #12???: Use native symlinks on Windows for the OCaml installation, reducing
+  disk usage considerably.
+  (David Allsopp, review by ???)
+
 OCaml 5.0 (16 December 2022)
 ----------------------------
 
