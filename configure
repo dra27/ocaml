@@ -24760,6 +24760,7 @@ fi
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  bytecode_runtime_id='$bytecode_runtime_id'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
 
@@ -25936,10 +25937,10 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
-    "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
-    > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
-    > stdlib/target_runtime.info ;;
+    "shebang":C) printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$launch_method" \
+                           "$ocaml_bindir" > stdlib/runtime.info
+  printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$target_launch_method" \
+                          "$TARGET_BINDIR" > stdlib/target_runtime.info ;;
 
   esac
 done # for ac_tag
