@@ -2533,9 +2533,7 @@ AS_IF([$flat_float_array],
 AS_IF([$frame_pointers],
   [quintet1_native="8 + $quintet1_byte"],
   [quintet1_native="$quintet1_byte"])
-# Bit 9 (tsan)
-AS_IF([$tsan],
-  [quintet1_native="16 + $quintet1_native"])
+# Bit 9 (tsan) cannot be set until OCaml 5.2
 
 quintet1_byte="$(echo "$alphabet" | cut -c $(expr $quintet1_byte + 1))"
 quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
@@ -2566,13 +2564,13 @@ bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}QUINTET0"
 native_runtime_id="${quintet3}${quintet2}${quintet1_native}QUINTET0"
 
 # Update the values for is_release, release_number and zinc_runtime_id in
-# utils/config.common.ml.in (this is done when tools/autogen is run, not each
+# utils/config.common.ml (this is done when tools/autogen is run, not each
 # time configure is run!)
 m4_syscmd([sed -e '/^let is_release =/s/=.*/= ]'\
 'm4_if(OCAML__DEVELOPMENT_VERSION,true,false,true)[/' \
     -e '/^let release_number =/s/=.*/= ]OCAML__RELEASE_NUMBER[/' \
-    utils/config.common.ml.in > utils/config.common.ml.in.new
-mv -f utils/config.common.ml.in.new utils/config.common.ml.in])
+    utils/config.common.ml > utils/config.common.ml.new
+mv -f utils/config.common.ml.new utils/config.common.ml])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
