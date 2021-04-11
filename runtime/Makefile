@@ -269,6 +269,7 @@ build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	  printf '#define OCAML_STDLIB_DIR %s\n' \
 	         $(call QUOTE_SINGLE,$(call C_LITERAL,$(TARGET_LIBDIR))); \
 	  echo '#define HOST "$(HOST)"'; \
+	  echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"'; \
 	} > $@
 
 prims.$(O): build_config.h
