@@ -87,6 +87,9 @@ let classify_executable file =
       | runtime, id, search ->
           let header = if start = "#!" then Header_shebang else Header_exe in
           let dlls = List.exists is_DLLS sections in
+          let id =
+            Option.bind id (function (id::_, _) -> Some id | _ -> None)
+          in
           Tendered {header; dlls; runtime; id; search}
       | exception Not_found ->
           Custom)

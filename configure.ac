@@ -2189,14 +2189,15 @@ quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
 
 # Bit 10 (int31)
 AS_IF([$arch64],
-  [quintet2='0'],
-  [quintet2='1'])
+  [quintet2_zinc='0'],
+  [quintet2_zinc='1'])
 # Bit 11 (static)
 AS_IF([! $supports_shared_libraries],
-  [quintet2="2 + $quintet2"])
+  [quintet2_zinc="2 + $quintet2"])
 # Bit 12 (naked-pointers)
 AS_IF([$naked_pointers],
-  [quintet2="4 + $quintet2"])
+  [quintet2="4 + $quintet2_zinc"],
+  [quintet2="$quintet2_zinc"])
 # Bit 13 (mutable-string)
 AS_IF([! $force_safe_string],
   [quintet2="8 + $quintet2"])
@@ -2205,12 +2206,13 @@ AS_CASE([$target,$windows_unicode],
   [*-*-mingw32,0|*-pc-windows,0],
     [quintet2="16 + $quintet2"])
 
+quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
 quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
 
 # Bits 15-19 (reserved)
 quintet3="$(echo "$alphabet" | cut -c $(expr $profinfo_width + 1))"
 
-zinc_runtime_id='00QUINTET1_ZINC[]QUINTET0'
+zinc_runtime_id="0${quintet2_zinc}QUINTET1_ZINC[]QUINTET0"
 bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}QUINTET0"
 native_runtime_id="${quintet3}${quintet2}${quintet1_native}QUINTET0"
 
