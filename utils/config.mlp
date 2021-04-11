@@ -191,7 +191,7 @@ let configuration_variables =
   p "version" version;
   p "standard_library_default" standard_library_default;
   p "standard_library_relative" standard_library_relative;
-  p "standard_library" standard_library_effective;
+  p "standard_library" effective_standard_library;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
   p "ocamlc_cflags" ocamlc_cflags;
