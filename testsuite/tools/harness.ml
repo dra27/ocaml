@@ -282,6 +282,8 @@ module In_channel = struct
     | exception End_of_file -> accu
 
   let set_binary_mode = Stdlib.set_binary_mode_in
+
+  let length = Stdlib.LargeFile.in_channel_length
 end
 
 module List = struct
