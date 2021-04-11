@@ -27,7 +27,8 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
-# $( ) suppresses warning from the alignments in the V_ macros below
+# $( ) suppresses warning from the alignments in the V_ macros below and also
+# allows $\ at the end a line
 $(SPACE) :=
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
@@ -144,6 +145,8 @@ ifeq "$(filter $(REAL_ROOT_DIR)/$(BYTE_BINDIR), $(subst :, ,$(PATH)))" ""
 endif
   undefine REAL_ROOT_DIR
 endif
+
+RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun-$(BYTECODE_RUNTIME_ID)$(EXE)'
 
 # List of other libraries
 ALL_OTHERLIBS = dynlink str systhreads unix runtime_events
@@ -311,7 +314,9 @@ $(basename $(notdir $(1)))_COMMON_LINKFLAGS =
 endef # _OCAML_PROGRAM_BASE
 
 LINK_BYTECODE_PROGRAM =\
-  $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
+  $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS) \
+  $(if $(filter -custom, $(OC_BYTECODE_LINKFLAGS)),, \
+       -use-prims runtime/primitives -use-runtime $(RUNTIME_NAME))
 
 # The _OCAML_BYTECODE_PROGRAM macro defines a bytecode program but assuming
 # that _OCAML_PROGRAM_BASE has already been called. Its public counterpart
