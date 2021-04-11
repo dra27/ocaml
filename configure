@@ -17873,17 +17873,19 @@ quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
 
 # Bit 10 (int31)
 if $arch64; then :
-  quintet2='0'
+  quintet2_zinc='0'
 else
-  quintet2='1'
+  quintet2_zinc='1'
 fi
 # Bit 11 (static)
 if ! $supports_shared_libraries; then :
-  quintet2="2 + $quintet2"
+  quintet2_zinc="2 + $quintet2"
 fi
 # Bit 12 (naked-pointers)
 if $naked_pointers; then :
-  quintet2="4 + $quintet2"
+  quintet2="4 + $quintet2_zinc"
+else
+  quintet2="$quintet2_zinc"
 fi
 # Bit 13 (mutable-string)
 if ! $force_safe_string; then :
@@ -17897,12 +17899,13 @@ case $target,$windows_unicode in #(
      ;;
 esac
 
+quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
 quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
 
 # Bits 15-19 (reserved)
 quintet3="$(echo "$alphabet" | cut -c $(expr $profinfo_width + 1))"
 
-zinc_runtime_id='000o'
+zinc_runtime_id="0${quintet2_zinc}0o"
 bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}o"
 native_runtime_id="${quintet3}${quintet2}${quintet1_native}o"
 
