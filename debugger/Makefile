@@ -29,6 +29,13 @@ LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR) -I $(ROOTDIR)/runtime \
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
+ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
+LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
+else ifeq "$(SUFFIXING)" "true"
+LINKFLAGS += \
+  -use-prims $(ROOTDIR)/runtime/primitives \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
+endif
 OC_OCAMLDEPDIRS = $(DIRECTORIES)
 
 DIRECTORIES=$(UNIXDIR) $(DYNLINKDIR) $(addprefix $(ROOTDIR)/,\
