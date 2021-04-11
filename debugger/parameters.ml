@@ -23,14 +23,15 @@ let socket_name = ref ""
 let arguments = ref ""
 
 let default_load_path =
-  ref [ Filename.current_dir_name; Config.standard_library ]
+  ref [ Filename.current_dir_name; Config.effective_standard_library ]
 
 let breakpoint = ref true
 let prompt = ref true
 let time = ref true
 let version = ref true
 
-let topdirs_path = ref (Filename.concat Config.standard_library "compiler-libs")
+let topdirs_path =
+  ref (Filename.concat Config.effective_standard_library "compiler-libs")
 
 let add_path dir =
   Load_path.add_dir dir;

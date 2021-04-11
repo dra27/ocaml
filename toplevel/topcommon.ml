@@ -251,7 +251,7 @@ let set_paths () =
   (* Add whatever -I options have been specified on the command line,
      but keep the directories that user code linked in with ocamlmktop
      may have added to load_path. *)
-  let expand = Misc.expand_directory Config.standard_library in
+  let expand = Misc.expand_directory Config.effective_standard_library in
   let current_load_path = Load_path.get_paths () in
   let load_path = List.concat [
       [ "" ];

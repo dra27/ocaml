@@ -37,8 +37,22 @@ val standard_library_default: string
 
     @since 4.13.0 *)
 
+val standard_library_relative: string option
+(** Relative path from the executable to the standard library. Used by the
+    compiler when configured with --enable-relative before trying
+    {!standard_library_default}.
+
+    @since 4.13.0 *)
+
+val effective_standard_library: string
+(** The directory containing the standard libraries, taking
+    {!standard_library_relative} into account.
+
+    @since 4.13.0 *)
+
 val standard_library: string
-(** The effective directory containing the standard libraries *)
+(** The directory containing the standard libraries, computed without taking
+    {!standard_library_relative} into account. *)
 
 val ccomp_type: string
 (** The "kind" of the C compiler, assembler and linker used: one of

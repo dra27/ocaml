@@ -28,7 +28,7 @@ let print_version_and_library compiler =
   Printf.printf "The OCaml %s, version " compiler;
   print_string Config.version; print_newline();
   print_string "Standard library directory: ";
-  print_string Config.standard_library; print_newline();
+  print_string Config.effective_standard_library; print_newline();
   raise (Exit_with_status 0)
 
 let print_version_string () =
@@ -36,7 +36,7 @@ let print_version_string () =
   raise (Exit_with_status 0)
 
 let print_standard_library () =
-  print_string Config.standard_library; print_newline();
+  print_string Config.effective_standard_library; print_newline();
   raise (Exit_with_status 0)
 
 let fatal err =

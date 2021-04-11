@@ -64,6 +64,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST_STRING,BINDIR) \
 	    $(call SUBST_STRING,TARGET_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
+	    $(call SUBST_STRING,LIBDIR_REL) \
 	    $(call SUBST_STRING,MKDLL) \
 	    $(call SUBST_STRING,MKEXE) \
 	    $(call SUBST_STRING,FLEXLINK_LDFLAGS) \

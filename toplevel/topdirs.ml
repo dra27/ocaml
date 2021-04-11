@@ -67,7 +67,7 @@ let _ = add_directive "quit" (Directive_none dir_quit)
 (* To add a directory to the load path *)
 
 let dir_directory s =
-  let d = expand_directory Config.standard_library s in
+  let d = expand_directory Config.effective_standard_library s in
   Dll.add_path [d];
   let dir = Load_path.Dir.create d in
   Load_path.add dir;

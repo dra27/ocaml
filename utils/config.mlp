@@ -22,15 +22,36 @@ let bindir = "%%BINDIR%%"
 let runtime_bindir = "%%TARGET_BINDIR%%"
 
 let standard_library_default = "%%LIBDIR%%"
+let standard_library_relative =
+  if "%%LIBDIR_REL%%" = "" then
+    None
+  else
+    Some "%%LIBDIR_REL%%"
 
-let standard_library =
+let (standard_library, effective_standard_library) =
   try
-    Sys.getenv "OCAMLLIB"
+    let r = Sys.getenv "OCAMLLIB" in (r, r)
   with Not_found ->
   try
-    Sys.getenv "CAMLLIB"
+    let r = Sys.getenv "CAMLLIB" in (r, r)
   with Not_found ->
-    standard_library_default
+    match standard_library_relative with
+    | Some stdlib_rel
+      when Filename.basename Sys.executable_name <> Sys.executable_name ->
+        (* XXX realpath stuff here *)
+        let candidate =
+          Filename.(concat (dirname Sys.executable_name) stdlib_rel)
+        in
+        if Sys.file_exists candidate && Sys.is_directory candidate then
+          let cwd = Sys.getcwd () in
+          let () = Sys.chdir candidate in
+          let stdlib = Sys.getcwd () in
+          let () = Sys.chdir cwd in
+          (standard_library_default, stdlib)
+        else
+          (standard_library_default, standard_library_default)
+    | _ ->
+        (standard_library_default, standard_library_default)
 
 let ccomp_type = "%%CCOMPTYPE%%"
 let c_compiler = "%%CC%%"
@@ -163,10 +184,14 @@ let configuration_variables =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  let standard_library_relative =
+    Option.value ~default:"" standard_library_relative
+  in
 [
   p "version" version;
   p "standard_library_default" standard_library_default;
-  p "standard_library" standard_library;
+  p "standard_library_relative" standard_library_relative;
+  p "standard_library" standard_library_effective;
   p "ccomp_type" ccomp_type;
   p "c_compiler" c_compiler;
   p "ocamlc_cflags" ocamlc_cflags;

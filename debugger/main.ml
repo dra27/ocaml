@@ -149,7 +149,8 @@ let anonymous s =
   program_name := Unix_tools.make_absolute s; raise Found_program_name
 let add_include d =
   default_load_path :=
-    Misc.expand_directory Config.standard_library d :: !default_load_path
+    let stdlib = Config.effective_standard_library in
+    Misc.expand_directory stdlib d :: !default_load_path
 let set_socket s =
   socket_name := s
 let set_topdirs_path s =

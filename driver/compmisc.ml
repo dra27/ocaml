@@ -30,7 +30,7 @@ let init_path ?(dir="") () =
     !Compenv.first_include_dirs
   in
   let exp_dirs =
-    List.map (Misc.expand_directory Config.standard_library) dirs in
+    List.map (Misc.expand_directory Config.effective_standard_library) dirs in
   Load_path.init (dir :: List.rev_append exp_dirs (Clflags.std_include_dir ()));
   Env.reset_cache ()
 

@@ -172,6 +172,8 @@ let ld_conf_contents () =
   let dirs = [
     Sys.getenv_opt "OCAMLLIB";
     Sys.getenv_opt "CAMLLIB";
+    Option.map (Fun.const Config.effective_standard_library)
+                Config.standard_library_relative;
     Some Config.standard_library_default] in
   List.flatten (List.filter_map (Option.map ld_conf_contents) dirs)
 

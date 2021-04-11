@@ -150,11 +150,11 @@ let insn_sched = ref insn_sched_default (* -[no-]insn-sched *)
 
 let std_include_flag prefix =
   if !no_std_include then ""
-  else (prefix ^ (Filename.quote Config.standard_library))
+  else (prefix ^ (Filename.quote Config.effective_standard_library))
 ;;
 
 let std_include_dir () =
-  if !no_std_include then [] else [Config.standard_library]
+  if !no_std_include then [] else [Config.effective_standard_library]
 ;;
 
 let shared = ref false (* -shared *)
