@@ -289,3 +289,7 @@ FLEXLINK_CMD=flexlink
 FLEXLINK=$(FLEXLINK_CMD) $(FLEXLINK_FLAGS)
 
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
+
+# RuntimeID values
+BYTECODE_RUNTIME_ID=@bytecode_runtime_id@
+NATIVE_RUNTIME_ID=@native_runtime_id@
