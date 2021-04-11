@@ -99,6 +99,7 @@ HEADER_PATH =
 HEADER_TARGET_PATH =
 endif
 
+RID = $(BYTECODE_RUNTIME_ID)
 TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
 
 # The shebang test in configure.ac will need updating if any runtime is
@@ -115,15 +116,15 @@ ifeq "$(SHEBANGSCRIPTS)" "true"
 camlhead%: $(ROOTDIR)/Makefile.config Makefile
 ifeq "$(LONG_SHEBANG)" "true"
 	$(V_GEN)echo '#!/bin/sh' > $@ && \
-	echo 'exec "$(BINDIR)/ocamlrun$(subst er,,$*)" "$$0" "$$@"' >> $@
+	echo 'exec "$(BINDIR)/ocamlrun$(subst er,,$*)-$(RID)" "$$0" "$$@"' >> $@
 else
-	$(V_GEN)echo '#!$(BINDIR)/ocamlrun$(subst er,,$*)' > $@
+	$(V_GEN)echo '#!$(BINDIR)/ocamlrun$(subst er,,$*)-$(RID)' > $@
 endif
 
 # TODO This does not take long shebangs into account (since TARGET_BINDIR is not
 #      yet processed by configure)
 target_%: $(ROOTDIR)/Makefile.config Makefile
-	$(V_GEN)echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)' > $@
+	$(V_GEN)echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)-$(RID)' > $@
 
 camlheader_ur: Makefile
 	$(V_GEN)echo '#!' | tr -d '\012' > $@
@@ -147,7 +148,8 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 endif
 
 $(HEADERPROGRAM)%$(O): \
-  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
+  OC_CPPFLAGS += -DRUNTIME_NAME=$\
+    '"$(HEADER_PATH)ocamlrun$(subst .,,$*)-$(RID)$(EXE)"'
 
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
@@ -163,7 +165,7 @@ tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
 
 $(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
+	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)-$(RID)"' \
 	      $(OUTPUTOBJ)$@ $^
 
 target_%: tmptarget%.exe
