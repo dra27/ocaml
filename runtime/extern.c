@@ -1049,7 +1049,7 @@ CAMLprim value caml_output_value(value vchan, value v, value flags)
 
 CAMLprim value caml_output_value_with_compat(value vchan, value v, value flags)
 {
-  struct caml_extern_state* s = init_extern_state ();
+  struct caml_extern_state* s = get_extern_state ();
   caml_output_value(vchan, v, flags);
   return Val_bool(s->compat_32);
 }
