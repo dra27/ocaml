@@ -249,7 +249,7 @@ caml/jumptbl.h : caml/instruct.h
 	       -e '/^}/q' > $@
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
-	$^ > $@
+	$^ $(OCAML_RELEASE_NUMBER) > $@
 
 # These are provided as a temporary shim to allow cross-compilation systems
 # to supply a host C compiler and different flags and a linking macro.
@@ -273,6 +273,7 @@ ifneq "$(LIBDIR_REL)" ""
 	       >> $@
 endif
 	echo '#define HOST "$(HOST)"' >> $@
+	echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"' >> $@
 
 # Libraries and programs
 
