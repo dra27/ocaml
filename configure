@@ -781,6 +781,9 @@ build_os
 build_vendor
 build_cpu
 build
+native_runtime_id
+bytecode_runtime_id
+zinc_runtime_id
 target_libdir_is_relative
 target_bindir
 ar_supports_response_files
@@ -925,6 +928,7 @@ CMO_MAGIC_NUMBER
 CMI_MAGIC_NUMBER
 EXEC_MAGIC_NUMBER
 MAGIC_NUMBER_LENGTH
+OCAML_RELEASE_NUMBER
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
 OCAML_VERSION_PATCHLEVEL
@@ -3342,6 +3346,8 @@ OCAML_VERSION_EXTRA=relocatable
 
 OCAML_VERSION_SHORT=5.2
 
+OCAML_RELEASE_NUMBER=18
+
 printf "%s\n" "#define MAGIC_NUMBER_PREFIX \"Caml1999\"" >>confdefs.h
 
 printf "%s\n" "#define MAGIC_NUMBER_VERSION \"034\"" >>confdefs.h
@@ -3508,6 +3514,9 @@ LINEAR_MAGIC_NUMBER=Caml1999L034
 
 
 
+
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3559,6 +3568,8 @@ printf "%s\n" "#define OCAML_VERSION_ADDITIONAL \"relocatable\"" >>confdefs.h
 printf "%s\n" "#define OCAML_VERSION 50202" >>confdefs.h
 
 printf "%s\n" "#define OCAML_VERSION_STRING \"5.2.2+relocatable\"" >>confdefs.h
+
+printf "%s\n" "#define OCAML_RELEASE_NUMBER 18" >>confdefs.h
 
 
 # Works out how many "o"s are needed in quoted strings
@@ -20738,6 +20749,80 @@ case $host in #(
   *) :
      ;;
 esac
+
+# Determine the three Runtime IDs (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+# Bits 0-4 (dev + low 4 bits of release)
+
+
+# Bits 5-6 (high 2 bits of release)
+
+# Bit 7 (no-flat-float-array)
+if $flat_float_array
+then :
+  quintet1_byte='1'
+else $as_nop
+  quintet1_byte='5'
+fi
+# Bit 8 (fp)
+if $frame_pointers
+then :
+  quintet1_native="8 + $quintet1_byte"
+else $as_nop
+  quintet1_native="$quintet1_byte"
+fi
+# Bit 9 (tsan)
+if $tsan
+then :
+  quintet1_native="16 + $quintet1_native"
+fi
+
+quintet1_byte="$(echo "$alphabet" | cut -c $(expr $quintet1_byte + 1))"
+quintet1_native="$(echo "$alphabet" | cut -c $(expr $quintet1_native + 1))"
+
+# Bit 10 (int31)
+if $arch64
+then :
+  quintet2='0'
+else $as_nop
+  quintet2='1'
+fi
+# Bit 11 (static)
+if ! $supports_shared_libraries
+then :
+  quintet2="2 + $quintet2"
+fi
+# Bit 12 (no-compression)
+if test x"$zstd_status" != 'xok'
+then :
+  quintet2="4 + $quintet2"
+fi
+# Bit 13 (mutable-string) cannot be set since OCaml 5.0
+# Bit 14 (ansi)
+case $target,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet2="16 + $quintet2" ;; #(
+  *) :
+     ;;
+esac
+
+quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
+
+# Bits 15-19 (reserved)
+quintet3="$(echo "$alphabet" | cut -c $(expr $reserved_header_bits + 1))"
+
+zinc_runtime_id='0015'
+bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}5"
+native_runtime_id="${quintet3}${quintet2}${quintet1_native}5"
+
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.common.ml.in (this is done when tools/autogen is run, not each
+# time configure is run!)
+
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
