@@ -53,3 +53,4 @@ case "$suffix" in
 esac
 printf '#define OCAML_VERSION %d%02d%02d\n' "$major" "$minor" "$patchlvl"
 echo "#define OCAML_VERSION_STRING \"$version\""
+echo "#define OCAML_RELEASE_NUMBER $(expr $minor + 1)"
