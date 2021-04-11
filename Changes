@@ -110,6 +110,11 @@ Working version
   (Stephen Dolan, review by Nick Barnes and Josh Berdine, benchmarking by
    Nicolás Ojeda Bär)
 
+- #13???: Introduce a RuntimeID for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
