@@ -273,14 +273,14 @@ coreboot:
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
 	$(MAKE) partialclean
-	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
+	$(MAKE) ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
 	$(MAKE) library-cross
 # Promote the new compiler and the new runtime
 	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
 # Rebuild the core system
 	$(MAKE) partialclean
-	$(MAKE) IN_COREBOOT_CYCLE=true core
+	$(MAKE) core
 # Check if fixpoint reached
 	$(MAKE) compare
 
