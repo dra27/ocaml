@@ -748,6 +748,8 @@ build_os
 build_vendor
 build_cpu
 build
+native_runtime_id
+bytecode_runtime_id
 bindir_to_libdir
 target_bindir_exp
 target_bindir
@@ -842,6 +844,7 @@ exeext
 ac_tool_prefix
 DIRECT_CPP
 CC
+OCAML_RELEASE_NUMBER
 VERSION
 native_compiler
 CONFIGURE_ARGS
@@ -2769,6 +2772,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 { $as_echo "$as_me:${as_lineno-$LINENO}: Configuring OCaml version 4.12.1" >&5
 $as_echo "$as_me: Configuring OCaml version 4.12.1" >&6;}
 
+# OCAML__RELEASE_NUMBER must be incremented with each minor release.
+
+
 # Configuration variables
 
 ## Command-line arguments passed to configure
@@ -2850,6 +2856,8 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 VERSION=4.12.1
+
+OCAML_RELEASE_NUMBER=13
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -2949,21 +2957,23 @@ VERSION=4.12.1
 
 
 
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
 ac_config_files="$ac_config_files Makefile.config"
 
+ac_config_files="$ac_config_files stdlib/camlheader.shebang"
+
+ac_config_files="$ac_config_files stdlib/target_camlheader.shebang"
+
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
-
-ac_config_files="$ac_config_files stdlib/camlheader.shebang"
-
-ac_config_files="$ac_config_files stdlib/target_camlheader.shebang"
 
 
 ac_config_commands="$ac_config_commands shebang"
@@ -17619,6 +17629,58 @@ else
   target_bindir_exp="${target_bindir}"
 fi
 
+# Determine the RuntimeID (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=0
+# Bit 7 (int31)
+if ! $arch64; then :
+  quintet1="4 + ${quintet1}"
+fi
+# Bit 8 (no shared libraries)
+if ! $supports_shared_libraries; then :
+  quintet1="8 + ${quintet1}"
+fi
+# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${profinfo_width} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+if $frame_pointers; then :
+  quintet3_native='1'
+else
+  quintet3_native='0'
+fi
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+if ! $flat_float_array; then :
+  quintet3_byte="8 + ${quintet3_byte}"
+fi
+# Bit 19 (WINDOWS_UNICODE=ansi)
+case $host,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3_byte="16 + ${quintet3_byte}" ;; #(
+  *) :
+     ;;
+esac
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}r"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}r"
+
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
 
@@ -18610,11 +18672,11 @@ do
   case $ac_config_target in
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
+    "stdlib/camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.shebang" ;;
+    "stdlib/target_camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.shebang" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
-    "stdlib/camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.shebang" ;;
-    "stdlib/target_camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.shebang" ;;
     "shebang") CONFIG_COMMANDS="$CONFIG_COMMANDS shebang" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
 
