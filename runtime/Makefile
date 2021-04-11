@@ -81,9 +81,9 @@ endif
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 BYTECODE_STATIC_LIBRARIES += libcamlrun_pic.$(A)
-BYTECODE_SHARED_LIBRARIES += libcamlrun_shared.$(SO)
+BYTECODE_SHARED_LIBRARIES += camlrun
 NATIVE_STATIC_LIBRARIES += libasmrun_pic.$(A)
-NATIVE_SHARED_LIBRARIES += libasmrun_shared.$(SO)
+NATIVE_SHARED_LIBRARIES += asmrun
 endif
 endif
 
@@ -153,10 +153,13 @@ endif
 # Build, install and clean targets
 
 .PHONY: all
-all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) $(PROGRAMS)
+all: $(BYTECODE_STATIC_LIBRARIES) \
+     $(BYTECODE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL)) \
+     $(PROGRAMS:%=%$(EXE))
 
 .PHONY: allopt
-allopt: $(NATIVE_STATIC_LIBRARIES) $(NATIVE_SHARED_LIBRARIES)
+allopt: $(NATIVE_STATIC_LIBRARIES) \
+        $(NATIVE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL))
 
 INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
 
@@ -170,6 +173,19 @@ install::
     $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
            "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
 endef
+define INSTALL_RUNTIME_LIB
+ifeq "$(2)" "BYTECODE"
+install::
+else
+installopt::
+endif
+	$(INSTALL_PROG) \
+    lib$(1)_shared$(EXT_DLL) \
+      "$(INSTALL_LIBDIR)/lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)"
+	cd "$(INSTALL_LIBDIR)" && \
+    $(LN) "lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)" \
+    "lib$(1)_shared$(EXT_DLL)"
+endef
 
 .PHONY: install
 $(foreach runtime, $(PROGRAMS), \
@@ -177,18 +193,20 @@ $(foreach runtime, $(PROGRAMS), \
 
 install::
 	$(INSTALL_DATA) $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(BYTECODE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
+
+install::
 	mkdir -p "$(INSTALL_INCDIR)"
 	$(INSTALL_DATA) caml/*.h "$(INSTALL_INCDIR)"
 
 .PHONY: installopt
-installopt:
+installopt::
 	$(INSTALL_DATA) $(NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(NATIVE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(NATIVE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
 
 .PHONY: clean
 clean:
