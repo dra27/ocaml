@@ -709,19 +709,11 @@ CAMLprim value caml_sys_get_stdlib_dirs(value vstdlib_default)
 
 CAMLprim value caml_zinc_runtime_id(value unit)
 {
-  CAMLparam0 ();   /* unit is unused */
-  CAMLlocal1 (result);
-
-  result = caml_alloc_2(0,
 #ifdef SUPPORT_DYNAMIC_LINKING
-    Val_false,
+  return Val_bool(0);
 #else
-    Val_true,
+  return Val_bool(1);
 #endif
-    Val_false
-  );
-
-  CAMLreturn (result);
 }
 
 CAMLprim value caml_sys_get_config(value unit)

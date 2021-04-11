@@ -2315,14 +2315,18 @@ AS_IF([$arch64],
   [quintet2_zinc='1'])
 # Bit 11 (static)
 AS_IF([! $supports_shared_libraries],
-  [quintet2_zinc="2 + $quintet2_zinc"])
-# Bit 12 (no-compression) cannot be set until OCaml 5.1
-# Bit 13 (mutable-string) cannot be set since OCaml 5.0
+  [quintet2_zinc="2 + $quintet2"])
+# Bit 12 (naked-pointers)
+AS_IF([$naked_pointers],
+  [quintet2="4 + $quintet2_zinc"],
+  [quintet2="$quintet2_zinc"])
+# Bit 13 (mutable-string)
+AS_IF([! $force_safe_string],
+  [quintet2="8 + $quintet2"])
 # Bit 14 (ansi)
 AS_CASE([$target,$windows_unicode],
   [*-*-mingw32,0|*-pc-windows,0],
-    [quintet2="16 + $quintet2_zinc"],
-  [quintet2="$quintet2_zinc"])
+    [quintet2="16 + $quintet2"])
 
 quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
 quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"

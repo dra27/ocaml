@@ -361,6 +361,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
   char_os *zinc = NULL;
   char_os *zinc_offset = NULL;
   char_os *current_quintet = NULL;
+  char_os *current;
 
   while (*rntm_bindir_end != 0)
     rntm_bindir_end++;
@@ -394,6 +395,8 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
 
   rntm = rntm_bindir_end + 1;
   if (rntm < rntm_end) {
+    int searched_all;
+
     zinc = rntm;
     while (*zinc != 0)
       zinc++;
@@ -404,7 +407,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
       zinc++;
     }
 
-    bool searched_all = (root_basename == NULL || zinc == rntm_end);
+    searched_all = (root_basename == NULL || zinc == rntm_end);
     current_quintet = zinc;
     do {
       if (zinc_offset) {
@@ -412,7 +415,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
           if (searched_all) {
             current_quintet++;
           } else {
-            searched_all = true;
+            searched_all = 1;
             current_quintet = zinc;
           }
           continue;
@@ -440,7 +443,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
 
   if (zinc != rntm_end) {
     safe_copy(root, rntm, (zinc_offset - rntm + 1));
-    char_os *current = root + (zinc_offset - rntm);
+    current = root + (zinc_offset - rntm);
     *current++ = '[';
     while (*current_quintet != '/')
       current_quintet--;

@@ -706,7 +706,7 @@ module RuntimeID : sig
   }
 
   val make_zinc: ?dev:bool -> ?release:int
-    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
+    -> ?int31:bool -> ?static:bool
     -> unit -> t
   (** Returns the Zinc Runtime ID for the given parameters (using default values
       from {!Config} and {!Sys} as necessary) *)
@@ -751,7 +751,7 @@ module RuntimeID : sig
   *)
 
   val zinc_quintets:
-    int31:bool -> static:bool -> no_compression:bool -> char list * char list
+    int31:bool -> static:bool -> char list * char list
   (** The Zinc Runtime ID consists of the release of OCaml and, at present, 3
       other pertinent bits of information which relate to a bytecode image
       itself. These are:

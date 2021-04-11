@@ -268,21 +268,18 @@ let display_runtime_id search (valid, _invalid) =
   | Bytesections.Absolute _ ->
       ()
   | _ ->
-    let int31, static, no_compression =
-      let open Misc.RuntimeID in
-      let f (int31, static, no_compression) (t : Misc.RuntimeID.t) =
-        (t.int31 || int31,
-         t.static || static,
-         t.no_compression || no_compression)
+      let int31, static =
+        let open Misc.RuntimeID in
+        let f (int31, static) (t : Misc.RuntimeID.t) =
+          (t.int31 || int31,
+           t.static || static)
+        in
+        List.fold_left f (false, false) valid
       in
-      List.fold_left f (false, false, false) valid
-    in
-    if not int31 then
-      printf "\t  - Image uses 63-bit integers\n";
-    if not static then
-      printf "\t  - Image requires dynamic loading support\n";
-    if not no_compression then
-      printf "\t  - Image uses compressed marshalling\n"
+      if not int31 then
+        printf "\t  - Image uses 63-bit integers\n";
+      if not static then
+        printf "\t  - Image requires dynamic loading support\n"
 
 let dump_byte ic =
   Bytesections.read_toc ic;

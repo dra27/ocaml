@@ -361,7 +361,7 @@ let update_zinc primary outchan zinc_pos (valid, invalid) =
      and will be capable of executing the image; the last four are 32-bit
      runtimes and will display an appropriate error message. *)
   let zinc_quintets = String.concat "" (List.map (String.make 1) items) in
-  assert (String.length zinc_quintets = 9);
+  assert (String.length zinc_quintets = 5);
   seek_out outchan zinc_pos;
   output_string outchan zinc_quintets
 
@@ -526,12 +526,12 @@ let write_header outchan =
           output_script search {|
             #!%s
             r=%s
-            z='01234567/'
+            z='0123/'
           |} bin_sh
             (Filename.quote (String.sub runtime 0 (String.length runtime - 3)));
           (* pos_out outchan at present refers to first byte after the "z=" line
-             so 11 bytes earlier is the "0" in "z='01234567/'" *)
-          let zinc_pos = pos_out outchan - 11 in
+             so 7 bytes earlier is the "0" in "z='0123/'" *)
+          let zinc_pos = pos_out outchan - 7 in
           Printf.fprintf outchan "v='%s'\n"
             (String.sub runtime (String.length runtime - 2) 2);
           (* The full path passed to exec is ultimately the value of $c. For
@@ -647,7 +647,7 @@ let write_header outchan =
             in
             output_string outchan "\000\003";
             let zinc_pos = pos_out outchan in
-            output_string outchan "01234567/";
+            output_string outchan "0123/";
             update_zinc this_zinc outchan zinc_pos
         end
       in
@@ -715,7 +715,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
        end;
        let output_fun = output_bytes outchan
        and currpos_fun () = pos_out outchan - start_code in
-       let needs_stdlib, no_compression =
+       let needs_stdlib, _ =
          link_files output_fun currpos_fun tolink
        in
        if check_dlls then Dll.close_all_dlls();
@@ -790,10 +790,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Bytesections.write_toc_and_trailer outchan;
        (* Re-write Zinc IDs *)
        let static = (!Clflags.dllibs = []) in
-       (* TODO: Threading no_compression on pre-5.1 backport until the main
-                branch is finalised. *)
-       rewrite_zinc (Misc.RuntimeID.zinc_quintets
-                       ~int31 ~static ~no_compression)
+       rewrite_zinc (Misc.RuntimeID.zinc_quintets ~int31 ~static)
     )
 
 (* Output a string as a C array of unsigned ints *)
