@@ -211,13 +211,54 @@ let p_list title print = function
       p_title title;
       List.iter print l
 
+let display_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp;
+                         spacetime; int31; static; naked_pointers;
+                         mutable_string; ansi; reserved} as t) =
+  let version =
+    if release > Config.release_number then
+      ""
+    else
+      if release = 0 then
+        " (Objective Caml 3.12)"
+      else if release < 16 then
+        Printf.sprintf " (OCaml 4.%02d)" (release - 1)
+      else
+        Printf.sprintf " (OCaml 5.%d)" (release - 16)
+  in
+  printf "\t%s = Release %d%s%s\n"
+    (Misc.RuntimeID.to_string t)
+    release version (if dev then " - development/altered version" else "");
+  if no_flat_float_array then
+    printf "\t  - Flat float array representation disabled\n";
+  if fp then
+    printf "\t  - Frame pointers enabled\n";
+  if spacetime then
+    printf "\t  - Spacetime profiling enabled\n";
+  if int31 then
+    printf "\t  - Compiled without 64-bit support\n";
+  if static then
+    printf "\t  - Compiled without support dynamic loading\n";
+  if not naked_pointers then
+    printf "\t  - Compiled without support for naked pointers\n";
+  if not mutable_string then
+    printf "\t  - Compiled with immutable strings\n";
+  if ansi then
+    printf "\t  - Windows Unicode support disabled\n";
+  if reserved > 0 then
+    printf "\t  - %d reserved header bit%s\n"
+      reserved (if reserved = 1 then "" else "s")
+
 let dump_byte ic =
   Bytesections.read_toc ic;
   let toc = Bytesections.toc () in
   let toc = List.sort Stdlib.compare toc in
   let () =
     try
-      let runtime, search = Bytesections.read_runtime ic in
+      let runtime, id, search = Bytesections.read_runtime ic in
+      let runtime =
+        let some t = "-" ^ Misc.RuntimeID.to_string t in
+        runtime ^ Option.fold ~none:"" ~some id
+      in
       let runtime =
         match search with
         | Bytesections.Search -> runtime
@@ -225,7 +266,8 @@ let dump_byte ic =
             Printf.sprintf "[%s]%s" dir runtime
         | Bytesections.Absolute dir -> dir ^ runtime
       in
-      printf "Runtime:\n\t%s\n" runtime
+      printf "Runtime:\n\t%s\n" runtime;
+      Option.iter display_runtime_id id
     with Not_found -> ()
   in
   List.iter
