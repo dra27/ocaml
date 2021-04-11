@@ -25,6 +25,9 @@ AC_INIT([OCaml],
 
 AC_MSG_NOTICE([Configuring OCaml version AC_PACKAGE_VERSION])
 
+# OCAML__RELEASE_NUMBER must be incremented with each minor release.
+m4_define([OCAML__RELEASE_NUMBER], [11])
+
 # Configuration variables
 
 ## Command-line arguments passed to configure
@@ -74,6 +77,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_SUBST([CONFIGURE_ARGS])
 AC_SUBST([native_compiler])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
+AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 AC_SUBST([CC])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
@@ -177,15 +181,17 @@ AC_SUBST([bindir_exp])
 AC_SUBST([target_bindir])
 AC_SUBST([target_bindir_exp])
 AC_SUBST([bindir_to_libdir])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.common])
 AC_CONFIG_FILES([Makefile.config])
-AC_CONFIG_HEADERS([runtime/caml/m.h])
-AC_CONFIG_HEADERS([runtime/caml/s.h])
 AC_CONFIG_FILES([stdlib/camlheader.shebang])
 AC_CONFIG_FILES([stdlib/target_camlheader.shebang])
+AC_CONFIG_HEADERS([runtime/caml/m.h])
+AC_CONFIG_HEADERS([runtime/caml/s.h])
 
 AC_CONFIG_COMMANDS([shebang],[],[
   sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
@@ -1957,6 +1963,47 @@ AS_IF([test x"${target_bindir}" = 'x'],
   [target_bindir='$(BINDIR)'
   target_bindir_exp="$bindir_exp"],
   [target_bindir_exp="${target_bindir}"])
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+m4_define([ALPHABET],
+          [0123456789abcdefghijklmnopqrstuv])
+alphabet='ALPHABET'
+
+m4_cond(m4_bregexp(AC_PACKAGE_VERSION, [.*\(+dev\).*], [\1]), [+dev],
+         [m4_define([ID_VERSION], m4_eval(OCAML__RELEASE_NUMBER << 1))],
+         [m4_define([ID_VERSION], m4_eval(1 + (OCAML__RELEASE_NUMBER << 1)))])
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=m4_eval(ID_VERSION >> 5)
+# Bit 7 (int31)
+AS_IF([! $arch64], [quintet1="4 + ${quintet1}"])
+# Bit 8 (no shared libraries)
+AS_IF([! $supports_shared_libraries], [quintet1="8 + ${quintet1}"])
+# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${profinfo_width} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+AS_IF([$frame_pointers], [quintet3_native='1'], [quintet3_native='0'])
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+AS_IF([! $flat_float_array], [quintet3_byte="8 + ${quintet3_byte}"])
+# Bit 19 (WINDOWS_UNICODE=ansi)
+AS_CASE([$host,$windows_unicode],
+  [*-*-mingw32,0|*-pc-windows,0], [quintet3_byte="16 + ${quintet3_byte}"])
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}QUINTET0"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}QUINTET0"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
