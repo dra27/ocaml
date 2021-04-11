@@ -220,7 +220,8 @@ let p_list title print = function
       List.iter print l
 
 let p_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp; tsan;
-                   int31; static; no_compression; ansi; reserved} as t) =
+                   int31; static; naked_pointers; mutable_string; ansi;
+                   reserved} as t) =
   let version =
     if release > Config.release_number then
       ""
@@ -248,8 +249,10 @@ let p_runtime_id ({Misc.RuntimeID.dev; release; no_flat_float_array; fp; tsan;
     printf "\t  - Compiled without 64-bit support\n";
   if static then
     printf "\t  - Compiled without support dynamic loading\n";
-  if no_compression then
-    printf "\t  - Compiled without support for compressed marshalling\n";
+  if not naked_pointers then
+    printf "\t  - Compiled without support for naked pointers\n";
+  if not mutable_string then
+    printf "\t  - Compiled with immutable strings\n";
   if ansi then
     printf "\t  - Windows Unicode support disabled\n"
 
