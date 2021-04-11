@@ -712,15 +712,19 @@ let write_header outchan =
           (* If no interpreter could be found, [command -v] will have returned
              an empty string and an error message can be displayed. Otherwise,
              exec the runtime. *)
+          let version =
+            let v = Sys.ocaml_version in
+            String.sub v 0 (String.index_from v (String.index v '.' + 1) '.')
+          in
           output_script search {|
             if test -z "$c"; then
-              echo 'This program requires an OCaml %d.%d interpreter'>&2
+              echo 'This program requires an OCaml %s interpreter'>&2
               echo "$r[${z%%/*}]$v not found either with $0 or in \$PATH">&2
             else
               exec "$c" "$0" "$@"
             fi
             exit 126
-          |} Sys.ocaml_release.major Sys.ocaml_release.minor;
+          |} version;
           update_zinc this_zinc outchan zinc_pos
         end
       in
