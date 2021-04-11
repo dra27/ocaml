@@ -48,7 +48,7 @@ define byte_and_opt_
 $(and $(filter-out 1,$(words $1)),$(error \
    cannot build file with whitespace in name))
 $1: $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(LINKFLAGS) $$(BYTELINK_FLAGS) -I $$(ROOTDIR) -o $$@ $2
 
 $1.opt: $3 $$(call byte2native,$2)
 	$$(CAMLOPT_CMD) $$(LINKFLAGS) $$(DOTOPT_LINKFLAGS)  -I $$(ROOTDIR) \
@@ -72,8 +72,7 @@ $(eval $(call \
  byte_and_opt_,$(subst $$,$$$$,$1),$(subst $$,$$$$,$2),$(subst $$,$$$$,$3)))
 endef
 
-CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
-        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt -g -nostdlib -I $(ROOTDIR)/stdlib
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
@@ -83,6 +82,13 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48 -strict-sequence -warn-error A \
  -safe-string -strict-formats -bin-annot $(INCLUDES)
 LINKFLAGS = $(INCLUDES)
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR) \
+                 -use-runtime $(RUNTIME_NAME)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS_WITH_OTHERLIBS = $(BYTELINK_FLAGS)
+else
+  BYTELINK_FLAGS_WITH_OTHERLIBS = -custom -I $(ROOTDIR)
+endif
 VPATH := $(filter-out -I,$(INCLUDES))
 
 # scrapelabels addlabels
@@ -237,7 +243,7 @@ clean::
 CVT_EMIT=cvt_emit.cmo
 
 cvt_emit: $(CVT_EMIT)
-	$(CAMLC) $(LINKFLAGS) -o cvt_emit $(CVT_EMIT)
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o cvt_emit $(CVT_EMIT)
 
 # cvt_emit is precious: sometimes we are stuck in the middle of a
 # bootstrap and we need to remake the dependencies
@@ -286,7 +292,7 @@ make_opcodes.ml: make_opcodes.mll
 	$(CAMLLEX) make_opcodes.mll
 
 make_opcodes: make_opcodes.ml
-	$(CAMLC) make_opcodes.ml -o $@
+	$(CAMLC) $(BYTELINK_FLAGS) make_opcodes.ml -o $@
 
 opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h make_opcodes
 	$(ROOTDIR)/runtime/ocamlrun make_opcodes -opnames < $< > $@
@@ -390,8 +396,8 @@ caml-tex: INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
                       -I $(ROOTDIR)/runtime
 caml-tex: $(CAMLTEX)
 	$(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlc -nostdlib \
-	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
-	                            -o $@ -no-alias-deps $(CAMLTEX)
+	  -I $(ROOTDIR)/stdlib $(LINKFLAGS) $(BYTELINK_FLAGS_WITH_OTHERLIBS) \
+	  -linkall -o $@ -no-alias-deps $(CAMLTEX)
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we delay building caml-tex to the opt.opt stage
