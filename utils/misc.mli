@@ -670,3 +670,71 @@ module Magic_number : sig
 
   val all_kinds : kind list
 end
+
+module RuntimeID : sig
+  (** Manipulation of the Runtime ID values used for relocating the compiler.
+
+      @since 5.5 *)
+
+  (** Runtime IDs *)
+  type t = private {
+    dev: bool;
+      (** True if this not an unaltered released version of OCaml *)
+    release: int;
+      (** Release number. OCaml 5.5 is release 21. *)
+    no_flat_float_array: bool;
+      (** Whether the compiler was configured with
+          {v --disable-flat-float-array v} *)
+    fp: bool;
+      (** Whether the compiler was configured with
+          {v --enable-frame-pointers v} *)
+    tsan: bool;
+      (** Whether the compiler was configured with {v --enable-tsan v} *)
+    int31: bool;
+      (** True if the platform has 31bit [int]s *)
+    static: bool;
+      (** True if the runtime does not support dynamic loading of libraries *)
+    no_compression: bool;
+      (** True if the runtime does not support compressed marshalling *)
+    ansi: bool;
+      (** True on Windows if Unicode support is disabled *)
+    reserved: int;
+      (** The number of reserved bits (0-31) in the {v value v} header *)
+  }
+
+  val make_zinc: ?dev:bool -> ?release:int
+    -> unit -> t
+  (** Returns the Zinc Runtime ID for the given parameters (using default values
+      from {!Config} as necessary) *)
+
+  val make_bytecode: ?dev:bool -> ?release:int
+    -> ?no_flat_float_array:bool
+    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
+    -> ?ansi:bool -> ?reserved:int
+    -> unit -> t
+  (** Returns the Bytecode Runtime ID for the given parameters (using default
+      values from {!Config} and {!Sys} as necessary) *)
+
+  val make_native: ?dev:bool -> ?release:int
+    -> ?no_flat_float_array:bool -> ?fp:bool -> ?tsan:bool
+    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
+    -> ?ansi:bool -> ?reserved:int
+    -> unit -> t
+  (** Returns the Native Runtime ID for the given parameters (using default
+      values from {!Config} and {!Sys} as necessary) *)
+
+  val is_zinc: t -> bool
+  (** [is_zinc t] is true if [t] can be used as a Zinc Runtime ID *)
+
+  val is_bytecode: t -> bool
+  (** [is_bytecode t] is true if [t] can be used as a Bytecode Runtime ID *)
+
+  val is_native: t -> bool
+  (** [is_native t] is true if [t] can be used as a Native Runtime ID *)
+
+  val to_string: t -> string
+  (** Returns the 4-character representation of a {!t} *)
+
+  val of_string: string -> t
+  (** Converts the 4-character representation back to a {!t} *)
+end
