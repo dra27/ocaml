@@ -31,7 +31,7 @@ endif
 
 include stdlib/StdlibModules
 
-CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
 INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
@@ -45,6 +45,7 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=
+BYTELINK_FLAGS=-use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -625,7 +626,7 @@ clean:: partialclean
 
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -compat-32 -o $@ $^
 
 partialclean::
 	rm -rf ocamlc$(EXE)
@@ -634,7 +635,7 @@ partialclean::
 
 ocamlopt$(EXE): compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
           $(OPTSTART)
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $^
 
 partialclean::
 	rm -f ocamlopt$(EXE)
@@ -648,7 +649,7 @@ ocaml_dependencies := \
 
 .INTERMEDIATE: ocaml.tmp
 ocaml.tmp: $(ocaml_dependencies)
-	$(CAMLC) $(LINKFLAGS) -I toplevel/byte -linkall -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -I toplevel/byte -linkall -o $@ $^
 
 ocaml$(EXE): $(expunge) ocaml.tmp
 	- $(OCAMLRUN) $^ $@ $(PERVASIVES)
@@ -767,7 +768,7 @@ $(cvt_emit): tools/cvt_emit.mll
 
 $(expunge): compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
          toplevel/expunge.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $^
 
 partialclean::
 	rm -f $(expunge)
