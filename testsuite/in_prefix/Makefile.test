@@ -54,7 +54,7 @@ endif
 
 test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O) ../tools/dummy$(EXE)
 	@rm -f ocamlrun*
-	@$(LN) $(ROOTDIR)/runtime/ocamlrun$(EXE) test-$(RUNTIME_NAME)
+	@$(LN) $(ROOTDIR)/runtime/ocamlrun test-$(RUNTIME_NAME)
 	@$(MKDIR) poisoned-runtime
 	@cd poisoned-runtime && $(LN) ../../tools/dummy$(EXE) $(RUNTIME_NAME)
 	@$(FLEXLINK_ENV) $< $(DRIVER_ARGS)
