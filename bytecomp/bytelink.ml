@@ -352,7 +352,12 @@ let write_header outchan =
       else
         runtime, Config.Absolute
     else
-      let runtime = "ocamlrun" ^ !Clflags.runtime_variant in
+      let runtime =
+        if Config.suffixing then
+          Misc.RuntimeID.ocamlrun !Clflags.runtime_variant
+        else
+          "ocamlrun" ^ !Clflags.runtime_variant
+      in
       if !Clflags.search_method <> Config.Absolute then
         runtime, !Clflags.search_method
       else
