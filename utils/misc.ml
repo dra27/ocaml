@@ -1304,7 +1304,7 @@ module RuntimeID = struct
     reserved: int;
     no_flat_float_array: bool;
     fp: bool;
-    tsan: bool;
+    spacetime: bool;
     int31: bool;
     static: bool;
     naked_pointers: bool;
@@ -1317,7 +1317,7 @@ module RuntimeID = struct
               ?(reserved = Config.profinfo_width)
               ?(no_flat_float_array = not Config.flat_float_array)
               ?(fp = Config.with_frame_pointers)
-              ?(tsan = false)
+              ?(spacetime = false)
               ?(int31 = (Sys.int_size = 31))
               ?(static = not Config.supports_shared_libraries)
               ?(naked_pointers = Config.naked_pointers)
@@ -1326,22 +1326,22 @@ module RuntimeID = struct
     if release < 0 || release > 63 || reserved < 0 || reserved > 31 then
       invalid_arg fn
     else
-      {dev; release; reserved; no_flat_float_array; fp; tsan; int31; static;
-       naked_pointers; ansi; mutable_string}
+      {dev; release; reserved; no_flat_float_array; fp; spacetime; int31;
+       static; naked_pointers; ansi; mutable_string}
 
   let make_zinc =
     make "Misc.RuntimeID.make_zinc"
-      ~reserved:0 ~fp:false ~tsan:false ~naked_pointers:false
+      ~reserved:0 ~fp:false ~spacetime:false ~naked_pointers:false
       ~ansi:false ~mutable_string:false
 
   let make_bytecode =
-    make "Misc.RuntimeID.make_bytecode" ~fp:false ~tsan:false
+    make "Misc.RuntimeID.make_bytecode" ~fp:false ~spacetime:false
 
   let make_native = make "Misc.RuntimeID.make_native"
 
   let is_zinc = function
   | {dev = _; release = _; reserved = 0; no_flat_float_array = _; fp = false;
-     tsan = false; int31 = _; static = _; naked_pointers = false;
+     spacetime = false; int31 = _; static = _; naked_pointers = false;
      ansi = false; mutable_string = false} ->
       true
   | _ ->
@@ -1349,7 +1349,7 @@ module RuntimeID = struct
 
   let is_bytecode = function
   | {dev = _; release = _; reserved = _; no_flat_float_array = _; fp = false;
-     tsan = false; int31 = _; static = _; naked_pointers = _;
+     spacetime = false; int31 = _; static = _; naked_pointers = _;
      ansi = _; mutable_string = _} -> true
   | _ -> false
 
@@ -1370,7 +1370,7 @@ module RuntimeID = struct
       t.reserved lsr 3 lor (* 2 bits *)
       bit 2 t.no_flat_float_array lor
       bit 3 t.fp lor
-      bit 4 t.tsan
+      bit 4 t.spacetime
     in
     let q3 =
       bit 0 t.int31 lor
@@ -1399,9 +1399,10 @@ module RuntimeID = struct
       if q0 + q1 + q2 + q3 >= 0 then
         Some {dev = set 0 q0; release = ((q1 land 0b11) lsl 4) lor (q0 lsr 1);
               reserved = ((q2 land 0b11) lsl 2) lor (q1 lsr 2);
-              no_flat_float_array = set 2 q2; fp = set 3 q2; tsan = set 4 q2;
-              int31 = set 0 q3; static = set 1 q3; naked_pointers = set 2 q3;
-              ansi = set 3 q3; mutable_string = set 4 q3}
+              no_flat_float_array = set 2 q2; fp = set 3 q2;
+              spacetime = set 4 q2; int31 = set 0 q3; static = set 1 q3;
+              naked_pointers = set 2 q3; ansi = set 3 q3;
+              mutable_string = set 4 q3}
       else
         None
 end
