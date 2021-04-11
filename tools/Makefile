@@ -403,6 +403,13 @@ caml-tex: INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 caml-tex: LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
+ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
+caml-tex: LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
+else ifeq "$(SUFFIXING)" "true"
+caml-tex: LINKFLAGS += \
+  -use-prims $(ROOTDIR)/runtime/primitives \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
+endif
 caml-tex: $(CAMLTEX)
 	$(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlc -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
