@@ -468,14 +468,14 @@ coreboot:
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
 	$(MAKE) partialclean
-	$(MAKE) ocamlc ocamllex ocamltools
+	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
 	$(MAKE) library-cross
 # Promote the new compiler and the new runtime
 	$(MAKE) CAMLRUN=runtime/ocamlrun promote
 # Rebuild the core system
 	$(MAKE) partialclean
-	$(MAKE) core
+	$(MAKE) IN_COREBOOT_CYCLE=true core
 # Check if fixpoint reached
 	$(MAKE) compare
 
@@ -494,6 +494,7 @@ endif
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
 bootstrap: coreboot
+	rm -f utils/config.ml
 	$(MAKE) all
 
 # Compile everything the first time
@@ -567,8 +568,9 @@ INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 
 # Installation
+
 .PHONY: install
-install:
+install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
