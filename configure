@@ -691,6 +691,7 @@ build_os
 build_vendor
 build_cpu
 build
+suffixing
 native_runtime_id
 bytecode_runtime_id
 zinc_runtime_id
@@ -874,6 +875,7 @@ enable_stdlib_manpages
 enable_force_safe_string
 enable_flat_float_array
 with_relative_libdir
+enable_suffixing
 with_afl
 with_flexdll
 enable_shared
@@ -1558,6 +1560,8 @@ Optional Features:
                           force strings to be safe
   --disable-flat-float-array
                           do not use flat float arrays
+  --enable-suffixing      enable suffixing of runtime executables and shared
+                          libraries
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -2933,6 +2937,7 @@ VERSION=4.08.2+relocatable
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
@@ -3371,6 +3376,18 @@ else
 fi
 else
   bindir_to_libdir=''
+fi
+
+
+# Check whether --enable-suffixing was given.
+if test "${enable_suffixing+set}" = set; then :
+  enableval=$enable_suffixing; if test "x$enableval" = 'xno'; then :
+  suffixing=false
+else
+  suffixing=true
+fi
+else
+  suffixing=false
 fi
 
 

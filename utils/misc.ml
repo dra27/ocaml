@@ -1106,4 +1106,10 @@ module RuntimeID = struct
        no_flat_float_array = set 2 q1; fp = set 3 q1; spacetime = set 4 q1;
        int31 = set 0 q2; static = set 1 q2; naked_pointers = set 2 q2;
        mutable_string = set 3 q2; ansi = set 4 q2; reserved = q3}
+
+  let ocamlrun ?(runtime_id = make_zinc ()) variant =
+    if is_zinc runtime_id then
+      Printf.sprintf "ocamlrun%s-%s" variant (to_string runtime_id)
+    else
+      invalid_arg "Misc.RuntimeID.ocamlrun"
 end
