@@ -117,7 +117,7 @@ let add_ccobjs origin l =
   end
 
 let runtime_lib () =
-  if !Clflags.runtime_variant = "_shared" then
+  if !Clflags.runtime_variant = "_shared" && Config.ccomp_type <> "msvc" then
     if Config.suffixing then
       [Misc.RuntimeID.shared_runtime Sys.Native]
     else
