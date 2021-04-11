@@ -49,7 +49,9 @@ allopt: ocamllex.opt
 opt.opt: allopt
 
 ocamllex$(EXE): $(OBJS)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+	$(CAMLC) \
+	  $(call ADD_BYTECODE_RUNTIME, $(LINKFLAGS)) $(LINKFLAGS) \
+	  -compat-32 -o $@ $^
 
 ocamllex.opt$(EXE): $(OBJS:.cmo=.cmx)
 	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^
