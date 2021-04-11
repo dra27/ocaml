@@ -1303,7 +1303,7 @@ module RuntimeID = struct
     release: int;
     no_flat_float_array: bool;
     fp: bool;
-    tsan: bool;
+    spacetime: bool;
     int31: bool;
     static: bool;
     naked_pointers: bool;
@@ -1322,9 +1322,9 @@ module RuntimeID = struct
                 ?(release = Config.release_number) () =
     check "Misc.RuntimeID.make_zinc"
       {dev; release;
-       no_flat_float_array = false; fp = false; tsan = false; int31 = false;
-       static = false; naked_pointers = false; mutable_string = false;
-       ansi = false; reserved = 0}
+       no_flat_float_array = false; fp = false; spacetime = false;
+       int31 = false; static = false; naked_pointers = false;
+       mutable_string = false; ansi = false; reserved = 0}
 
   let make_bytecode ?(dev = not Config.is_release)
                     ?(release = Config.release_number)
@@ -1338,13 +1338,13 @@ module RuntimeID = struct
     check "Misc.RuntimeID.make_bytecode"
       {dev; release;
        no_flat_float_array; int31; static; naked_pointers; mutable_string; ansi;
-       reserved; fp = false; tsan = false}
+       reserved; fp = false; spacetime = false}
 
   let make_native ?(dev = not Config.is_release)
                   ?(release = Config.release_number)
                   ?(no_flat_float_array = not Config.flat_float_array)
                   ?(fp = Config.with_frame_pointers)
-                  ?(tsan = false)
+                  ?(spacetime = Config.spacetime)
                   ?(int31 = Sys.int_size = 31)
                   ?(static = not Config.supports_shared_libraries)
                   ?(naked_pointers = Config.naked_pointers)
@@ -1353,19 +1353,19 @@ module RuntimeID = struct
                   ?(reserved = Config.profinfo_width) () =
     check "Misc.RuntimeID.make_native"
       {dev; release;
-       no_flat_float_array; fp; tsan; int31; static; naked_pointers;
+       no_flat_float_array; fp; spacetime; int31; static; naked_pointers;
        mutable_string; ansi; reserved}
 
   let is_zinc = function
   | {dev = _; release = _; no_flat_float_array = false; fp = false;
-     tsan = false; int31 = false; static = false; naked_pointers = false;
+     spacetime = false; int31 = false; static = false; naked_pointers = false;
      mutable_string = false; ansi = false; reserved = 0} -> true
   | _ -> false
 
   let is_bytecode = function
-  | {dev = _; release = _; no_flat_float_array = _; fp = false; tsan = false;
-     int31 = _; static = _; naked_pointers = _; mutable_string = false;
-     ansi = _; reserved = _} -> true
+  | {dev = _; release = _; no_flat_float_array = _; fp = false;
+     spacetime = false; int31 = _; static = _; naked_pointers = _;
+     mutable_string = false; ansi = _; reserved = _} -> true
   | _ -> false
 
   let is_native _ = true
@@ -1381,7 +1381,7 @@ module RuntimeID = struct
       t.release lsr 4 lor (* 2 bits *)
       bit 2 t.no_flat_float_array lor
       bit 3 t.fp lor
-      bit 4 t.tsan
+      bit 4 t.spacetime
     in
     let q2 =
       bit 0 t.int31 lor
@@ -1411,7 +1411,7 @@ module RuntimeID = struct
       let q2 = convert s.[1] in
       let q3 = convert s.[0] in
       {dev = set 0 q0; release = ((q1 land 0b11) lsl 4) lor (q0 lsr 1);
-       no_flat_float_array = set 2 q1; fp = set 3 q1; tsan = set 4 q1;
+       no_flat_float_array = set 2 q1; fp = set 3 q1; spacetime = set 4 q1;
        int31 = set 0 q2; static = set 1 q2; naked_pointers = set 2 q2;
        mutable_string = set 3 q2; ansi = set 4 q2; reserved = q3}
 end
