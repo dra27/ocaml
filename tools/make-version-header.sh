@@ -32,8 +32,7 @@
 # be used.
 
 case $# in
-  0) version="`ocamlc -v | tr -d '\r' | sed -n -e 's/.*version //p'`";;
-  1) version="`sed -e 1q $1 | tr -d '\r'`";;
+  2) version="`sed -e 1q "$1" | tr -d '\r'`";;
   *) echo "usage: make-version-header.sh [version-file]" >&2
      exit 2;;
 esac
@@ -53,3 +52,4 @@ case "$suffix" in
 esac
 printf "#define OCAML_VERSION %d%02d%02d\n" $major $minor $patchlvl
 echo "#define OCAML_VERSION_STRING \"$version\""
+echo "#define OCAML_RELEASE_NUMBER $2"
