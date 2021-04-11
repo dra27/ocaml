@@ -558,4 +558,12 @@ module RuntimeID : sig
 
   val of_string: string -> t
   (** Converts the 4-character representation back to a {!t} *)
+
+  val ocamlrun: ?runtime_id:t -> string -> string
+  (** [ocamlrun ?runtime_id variant] returns the name for the runtime for the
+      given Zinc Runtime ID ([runtime_id] defaults to {!make_zinc}).
+
+      e.g. [ocamlrun ~runtime_id:(make_zinc ~release_number:21 is_release:true)
+                     "d" = "ocamlrund-001b"]
+  *)
 end
