@@ -31,8 +31,7 @@ define byte2native
 $(patsubst %.cmo,%.cmx,$(patsubst %.cma,%.cmxa,$1))
 endef
 
-CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
-        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot
 CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) \
   -g -nostdlib -I $(ROOTDIR)/stdlib
 INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
@@ -42,6 +41,13 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
 -warn-error +A -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
 LINKFLAGS = $(INCLUDES)
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR) \
+                 -use-runtime $(RUNTIME_NAME)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS_WITH_OTHERLIBS = $(BYTELINK_FLAGS)
+else
+  BYTELINK_FLAGS_WITH_OTHERLIBS = -custom -I $(ROOTDIR)
+endif
 VPATH := $(filter-out -I,$(INCLUDES))
 
 programs_byte := \
@@ -60,7 +66,8 @@ $(foreach program, $(programs_byte) $(programs_opt),\
   $(eval $(call PROGRAM_SYNONYM,$(program))))
 
 $(programs_byte:%=%$(EXE)):
-	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -I $(ROOTDIR) \
+    -o $@ $(filter-out %.cmi,$^)
 
 $(programs_opt:%=%$(EXE)):
 	$(CAMLOPT_CMD) $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
@@ -172,7 +179,7 @@ cvt_emit := cvt_emit$(EXE)
 $(eval $(call PROGRAM_SYNONYM,cvt_emit))
 
 $(cvt_emit): cvt_emit.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $^
 
 clean::
 	rm -f cvt_emit.ml cvt_emit cvt_emit.exe
@@ -212,7 +219,7 @@ make_opcodes := make_opcodes$(EXE)
 $(eval $(call PROGRAM_SYNONYM,make_opcodes))
 
 $(make_opcodes): make_opcodes.ml
-	$(CAMLC) $< -o $@
+	$(CAMLC) $(BYTELINK_FLAGS) $< -o $@
 
 opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
@@ -309,12 +316,14 @@ caml_tex := caml-tex$(EXE)
 # caml-tex uses str.cma and unix.cma and so must be compiled with
 # $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
 # compiler does not necessarily have the correct shared library
-# configuration.
+# configuration. caml-tex is never installed and is always invoked
+# with an explicit runtime and so does not require -use-runtime.
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
                          -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) -nostdlib -I $(ROOTDIR)/stdlib \
-	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+	  $(LINKFLAGS) $(BYTELINK_FLAGS_WITH_OTHERLIBS) -linkall \
+	  -o $@ -no-alias-deps $^
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we delay building caml-tex to the opt.opt stage
