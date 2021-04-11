@@ -1199,7 +1199,7 @@ module RuntimeID = struct
               ?(reserved = Config.reserved_header_bits)
               ?(no_flat_float_array = not Config.flat_float_array)
               ?(fp = Config.with_frame_pointers)
-              ?(tsan = Config.tsan)
+              ?(tsan = false)
               ?(int31 = (Sys.int_size = 31))
               ?(static = not Config.supports_shared_libraries)
               ?(no_compression = (Config.compression_c_libraries = ""))

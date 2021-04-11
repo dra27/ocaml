@@ -98,6 +98,7 @@ AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 AC_SUBST([ocaml_cv_cc_vendor])
 AC_SUBST([CC])
 AC_SUBST([DIFF_FLAGS])
@@ -2543,9 +2544,7 @@ AS_IF([$flat_float_array],
 AS_IF([$frame_pointers],
   [quintet2_native="8 + $quintet2_byte"],
   [quintet2_native="$quintet2_byte"])
-# Bit 14 (tsan)
-AS_IF([$tsan],
-  [quintet2_native="16 + $quintet2_native"])
+# Bit 14 (tsan) cannot be set until OCaml 5.2
 
 quintet2_zinc="$(echo "$alphabet" | cut -c $(expr $quintet2_zinc + 1))"
 quintet2_byte="$(echo "$alphabet" | cut -c $(expr $quintet2_byte + 1))"
@@ -2576,14 +2575,14 @@ zinc_runtime_id_hi="${quintet2_zinc}${quintet3_zinc}"
 bytecode_runtime_id="QUINTET0${quintet1}${quintet2_byte}${quintet3}"
 native_runtime_id="QUINTET0${quintet1}${quintet2_native}${quintet3}"
 
-# Update the values for is_release and release_number in
-# utils/config.common.ml.in (this is done when tools/autogen is run, not each
+# Update the values for is_release, release_number and zinc_runtime_id in
+# utils/config.common.ml (this is done when tools/autogen is run, not each
 # time configure is run!)
 m4_syscmd([sed -e '/^let is_release =/s/=.*/= ]'\
 'm4_if(OCAML__DEVELOPMENT_VERSION,true,false,true)[/' \
     -e '/^let release_number =/s/=.*/= ]OCAML__RELEASE_NUMBER[/' \
-    utils/config.common.ml.in > utils/config.common.ml.in.new
-mv -f utils/config.common.ml.in.new utils/config.common.ml.in])
+    utils/config.common.ml > utils/config.common.ml.new
+mv -f utils/config.common.ml.new utils/config.common.ml])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
