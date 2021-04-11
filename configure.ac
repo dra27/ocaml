@@ -2309,8 +2309,12 @@ AS_IF([$arch64],
 # Bit 11 (static)
 AS_IF([! $supports_shared_libraries],
   [quintet2="2 + $quintet2"])
-# Bit 12 (no-compression) cannot be set until OCaml 5.1
-# Bit 13 (mutable-string) cannot be set since OCaml 5.0
+# Bit 12 (naked-pointers)
+AS_IF([$naked_pointers],
+  [quintet2="4 + $quintet2"])
+# Bit 13 (mutable-string)
+AS_IF([! $force_safe_string],
+  [quintet2="8 + $quintet2"])
 # Bit 14 (ansi)
 AS_CASE([$target,$windows_unicode],
   [*-*-mingw32,0|*-pc-windows,0],
@@ -2326,13 +2330,13 @@ bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}QUINTET0"
 native_runtime_id="${quintet3}${quintet2}${quintet1_native}QUINTET0"
 
 # Update the values for is_release, release_number and zinc_runtime_id in
-# utils/config.common.ml (this is done when tools/autogen is run, not each
-# time configure is run!)
+# utils/config.mlp (this is done when tools/autogen is run, not each time
+# configure is run!)
 m4_syscmd([sed -e '/^let is_release =/s/=.*/= ]'\
 'm4_if(OCAML__DEVELOPMENT_VERSION,true,false,true)[/' \
     -e '/^let release_number =/s/=.*/= ]OCAML__RELEASE_NUMBER[/' \
-    utils/config.common.ml > utils/config.common.ml.new
-mv -f utils/config.common.ml.new utils/config.common.ml])
+    utils/config.mlp > utils/config.mlp.new
+mv -f utils/config.mlp.new utils/config.mlp])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h

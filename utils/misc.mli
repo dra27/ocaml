@@ -695,8 +695,10 @@ module RuntimeID : sig
       (** True if the platform has 31bit [int]s *)
     static: bool;
       (** True if the runtime does not support dynamic loading of libraries *)
-    no_compression: bool;
-      (** True if the runtime does not support compressed marshalling *)
+    naked_pointers: bool;
+      (** True if the runtime allows naked pointers *)
+    mutable_string: bool;
+      (** True if the runtime does not require immutable strings *)
     ansi: bool;
       (** True on Windows if Unicode support is disabled *)
     reserved: int;
@@ -710,16 +712,16 @@ module RuntimeID : sig
 
   val make_bytecode: ?dev:bool -> ?release:int
     -> ?no_flat_float_array:bool
-    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
-    -> ?ansi:bool -> ?reserved:int
+    -> ?int31:bool -> ?static:bool -> ?naked_pointers:bool
+    -> ?mutable_string:bool -> ?ansi:bool -> ?reserved:int
     -> unit -> t
   (** Returns the Bytecode Runtime ID for the given parameters (using default
       values from {!Config} and {!Sys} as necessary) *)
 
   val make_native: ?dev:bool -> ?release:int
     -> ?no_flat_float_array:bool -> ?fp:bool -> ?tsan:bool
-    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
-    -> ?ansi:bool -> ?reserved:int
+    -> ?int31:bool -> ?static:bool -> ?naked_pointers:bool
+    -> ?mutable_string:bool -> ?ansi:bool -> ?reserved:int
     -> unit -> t
   (** Returns the Native Runtime ID for the given parameters (using default
       values from {!Config} and {!Sys} as necessary) *)

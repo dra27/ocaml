@@ -1144,7 +1144,8 @@ module RuntimeID = struct
     tsan: bool;
     int31: bool;
     static: bool;
-    no_compression: bool;
+    naked_pointers: bool;
+    mutable_string: bool;
     ansi: bool;
     reserved: int;
   }
@@ -1160,20 +1161,22 @@ module RuntimeID = struct
     check "Misc.RuntimeID.make_zinc"
       {dev; release;
        no_flat_float_array = false; fp = false; tsan = false; int31 = false;
-       static = false; no_compression = false; ansi = false; reserved = 0}
+       static = false; naked_pointers = false; mutable_string = false;
+       ansi = false; reserved = 0}
 
   let make_bytecode ?(dev = not Config.is_release)
                     ?(release = Config.release_number)
                     ?(no_flat_float_array = not Config.flat_float_array)
                     ?(int31 = Sys.int_size = 31)
                     ?(static = not Config.supports_shared_libraries)
-                    ?(no_compression = false)
+                    ?(naked_pointers = Config.naked_pointers)
+                    ?(mutable_string = not Config.safe_string)
                     ?(ansi = Config.target_win32 && not Config.windows_unicode)
                     ?(reserved = Config.profinfo_width) () =
     check "Misc.RuntimeID.make_bytecode"
       {dev; release;
-       no_flat_float_array; int31; static; no_compression; ansi; reserved;
-       fp = false; tsan = false}
+       no_flat_float_array; int31; static; naked_pointers; mutable_string; ansi;
+       reserved; fp = false; tsan = false}
 
   let make_native ?(dev = not Config.is_release)
                   ?(release = Config.release_number)
@@ -1182,23 +1185,25 @@ module RuntimeID = struct
                   ?(tsan = false)
                   ?(int31 = Sys.int_size = 31)
                   ?(static = not Config.supports_shared_libraries)
-                  ?(no_compression = false)
+                  ?(naked_pointers = Config.naked_pointers)
+                  ?(mutable_string = not Config.safe_string)
                   ?(ansi = Config.target_win32 && not Config.windows_unicode)
                   ?(reserved = Config.profinfo_width) () =
     check "Misc.RuntimeID.make_native"
       {dev; release;
-       no_flat_float_array; fp; tsan; int31; static; no_compression; ansi;
-       reserved}
+       no_flat_float_array; fp; tsan; int31; static; naked_pointers;
+       mutable_string; ansi; reserved}
 
   let is_zinc = function
   | {dev = _; release = _; no_flat_float_array = false; fp = false;
-     tsan = false; int31 = false; static = false; no_compression = false;
-     ansi = false; reserved = 0} -> true
+     tsan = false; int31 = false; static = false; naked_pointers = false;
+     mutable_string = false; ansi = false; reserved = 0} -> true
   | _ -> false
 
   let is_bytecode = function
   | {dev = _; release = _; no_flat_float_array = _; fp = false; tsan = false;
-     int31 = _; static = _; no_compression = _; ansi = _; reserved = _} -> true
+     int31 = _; static = _; naked_pointers = _; mutable_string = false;
+     ansi = _; reserved = _} -> true
   | _ -> false
 
   let is_native _ = true
@@ -1219,8 +1224,8 @@ module RuntimeID = struct
     let q2 =
       bit 0 t.int31 lor
       bit 1 t.static lor
-      bit 2 t.no_compression lor
-      (* bit 3 is unused *)
+      bit 2 t.naked_pointers lor
+      bit 3 t.mutable_string lor
       bit 4 t.ansi
     in
     let q3 =
@@ -1245,6 +1250,6 @@ module RuntimeID = struct
       let q3 = convert s.[0] in
       {dev = set 0 q0; release = ((q1 land 0b11) lsl 4) lor (q0 lsr 1);
        no_flat_float_array = set 2 q1; fp = set 3 q1; tsan = set 4 q1;
-       int31 = set 0 q2; static = set 1 q2; no_compression = set 2 q2;
-       (* bit 3 of q2 is unused *) ansi = set 4 q2; reserved = q3}
+       int31 = set 0 q2; static = set 1 q2; naked_pointers = set 2 q2;
+       mutable_string = set 3 q2; ansi = set 4 q2; reserved = q3}
 end
