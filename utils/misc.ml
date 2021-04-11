@@ -1166,9 +1166,9 @@ module RuntimeID = struct
                     ?(no_flat_float_array = not Config.flat_float_array)
                     ?(int31 = Sys.int_size = 31)
                     ?(static = not Config.supports_shared_libraries)
-                    ?(no_compression = Config.compression_c_libraries = "")
+                    ?(no_compression = false)
                     ?(ansi = Config.target_win32 && not Config.windows_unicode)
-                    ?(reserved = Config.reserved_header_bits) () =
+                    ?(reserved = Config.profinfo_width) () =
     check "Misc.RuntimeID.make_bytecode"
       {dev; release;
        no_flat_float_array; int31; static; no_compression; ansi; reserved;
@@ -1181,9 +1181,9 @@ module RuntimeID = struct
                   ?(tsan = false)
                   ?(int31 = Sys.int_size = 31)
                   ?(static = not Config.supports_shared_libraries)
-                  ?(no_compression = Config.compression_c_libraries = "")
+                  ?(no_compression = false)
                   ?(ansi = Config.target_win32 && not Config.windows_unicode)
-                  ?(reserved = Config.reserved_header_bits) () =
+                  ?(reserved = Config.profinfo_width) () =
     check "Misc.RuntimeID.make_native"
       {dev; release;
        no_flat_float_array; fp; tsan; int31; static; no_compression; ansi;

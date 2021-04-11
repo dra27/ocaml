@@ -2394,9 +2394,7 @@ AS_IF([$arch64],
 # Bit 11 (static)
 AS_IF([! $supports_shared_libraries],
   [quintet2="2 + $quintet2"])
-# Bit 12 (no-compression)
-AS_IF([test x"$zstd_status" != 'xok'],
-  [quintet2="4 + $quintet2"])
+# Bit 12 (no-compression) cannot be set until OCaml 5.1
 # Bit 13 (mutable-string) cannot be set since OCaml 5.0
 # Bit 14 (ansi)
 AS_CASE([$target,$windows_unicode],
@@ -2406,7 +2404,7 @@ AS_CASE([$target,$windows_unicode],
 quintet2="$(echo "$alphabet" | cut -c $(expr $quintet2 + 1))"
 
 # Bits 15-19 (reserved)
-quintet3="$(echo "$alphabet" | cut -c $(expr $reserved_header_bits + 1))"
+quintet3="$(echo "$alphabet" | cut -c $(expr $profinfo_width + 1))"
 
 zinc_runtime_id='00QUINTET1_ZINC[]QUINTET0'
 bytecode_runtime_id="${quintet3}${quintet2}${quintet1_byte}QUINTET0"
