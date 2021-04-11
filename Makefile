@@ -613,7 +613,7 @@ OCAML_NATIVE_LIBRARIES =
 $(foreach LIBRARY, $(OCAML_NATIVE_LIBRARIES),\
   $(eval $(call OCAML_NATIVE_LIBRARY,$(LIBRARY))))
 
-USE_RUNTIME_PRIMS = -use-prims ../runtime/primitives
+USE_RUNTIME_PRIMS = -use-prims ../runtime/primitives $(BYTECODE_RUNTIME_FLAGS)
 USE_STDLIB = -nostdlib -I ../stdlib
 
 FLEXDLL_OBJECTS = \
@@ -1180,7 +1180,7 @@ runtime_BUILT_HEADERS = $(addprefix runtime/, \
 
 ## Targets to build and install
 
-runtime_PROGRAMS = runtime/ocamlrun$(EXE)
+runtime_PROGRAMS = ocamlrun
 runtime_BYTECODE_STATIC_LIBRARIES = runtime/libcamlrun.$(A)
 runtime_BYTECODE_SHARED_LIBRARIES =
 runtime_NATIVE_STATIC_LIBRARIES = \
@@ -1188,13 +1188,13 @@ runtime_NATIVE_STATIC_LIBRARIES = \
 runtime_NATIVE_SHARED_LIBRARIES =
 
 ifeq "$(RUNTIMED)" "true"
-runtime_PROGRAMS += runtime/ocamlrund$(EXE)
+runtime_PROGRAMS += ocamlrund
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlrund.$(A)
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmrund.$(A)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-runtime_PROGRAMS += runtime/ocamlruni$(EXE)
+runtime_PROGRAMS += ocamlruni
 runtime_BYTECODE_STATIC_LIBRARIES += runtime/libcamlruni.$(A)
 runtime_NATIVE_STATIC_LIBRARIES += runtime/libasmruni.$(A)
 endif
@@ -1248,7 +1248,7 @@ ocamlruni_CPPFLAGS = -DCAML_INSTR
 .PHONY: runtime-all
 runtime-all: \
   $(runtime_BYTECODE_STATIC_LIBRARIES) $(runtime_BYTECODE_SHARED_LIBRARIES) \
-  $(runtime_PROGRAMS) $(SAK)
+  $(runtime_PROGRAMS:%=runtime/%$(EXE)) $(SAK)
 
 .PHONY: runtime-allopt
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -1749,9 +1749,11 @@ ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
 else
 # Pre-bootstrap, -launch-method can't be placed by default in
 # $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
+# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc. The
+# -runtime-variant workaround is needed for Windows, which (ab)uses this flag in
+# order to specify the suffix without also specifying the path.
 ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD)
+  -launch-method $(LAUNCH_METHOD) -runtime-variant ''
 endif
 
 .PHONY: ocamldoc
@@ -2115,9 +2117,11 @@ debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
 else
 # Pre-bootstrap, -launch-method can't be placed by default in
 # $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
+# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc. The
+# -runtime-variant workaround is needed for Windows, which (ab)uses this flag in
+# order to specify the suffix without also specifying the path.
 debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD)
+  -launch-method $(LAUNCH_METHOD) -runtime-variant ''
 endif
 
 clean::
@@ -2380,9 +2384,11 @@ tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
 else
 # Pre-bootstrap, -launch-method can't be placed by default in
 # $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
+# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc. The
+# -runtime-variant workaround is needed for Windows, which (ab)uses this flag in
+# order to specify the suffix without also specifying the path.
 tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD)
+  -launch-method $(LAUNCH_METHOD) -runtime-variant ''
 endif
 
 # we need str and unix which depend on the bytecode version of other tools
@@ -2523,8 +2529,9 @@ distclean: clean
 	rm -f config.log config.status libtool
 
 # Installation
+
 .PHONY: install
-install:
+install::
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
@@ -2534,7 +2541,31 @@ endif
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
-	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
+
+ifeq "$(SUFFIXING)" "true"
+MANGLE_RUNTIME_NAME = $(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)
+else
+MANGLE_RUNTIME_NAME = $(1)$(EXE)
+endif
+
+define INSTALL_RUNTIME
+install::
+	$(INSTALL_PROG) \
+    runtime/$(1)$(EXE) \
+      "$(INSTALL_BINDIR)/$(call MANGLE_RUNTIME_NAME,$(1))"
+ifeq "$(SUFFIXING)" "true"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
+	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
+endif
+endef
+
+$(foreach runtime, $(runtime_PROGRAMS), \
+  $(eval $(call INSTALL_RUNTIME,$(runtime))))
+
+install::
 	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
 ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
