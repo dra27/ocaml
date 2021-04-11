@@ -107,9 +107,14 @@ let add_ccobjs origin l =
 
 let runtime_lib () =
   let libname =
-    if !Clflags.gprofile
-    then "libasmrunp" ^ ext_lib
-    else "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
+    if !Clflags.runtime_variant = "_shared" then
+      Printf.sprintf "-lasmrun-%s-%s"
+        Config.target
+        Config.native_runtime_id
+    else if !Clflags.gprofile then
+      "libasmrunp" ^ ext_lib
+    else
+      "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
   try
     if !Clflags.nopervasives then []
     else [ Load_path.find libname ]
