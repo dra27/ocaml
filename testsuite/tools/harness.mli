@@ -114,6 +114,7 @@ module Import : sig
       int -> int -> unit option
     val fold_lines : ('acc -> string -> 'acc) -> 'acc -> t -> 'acc
     val set_binary_mode : t -> bool -> unit
+    val length : t -> int64
   end
 
   module List : sig
