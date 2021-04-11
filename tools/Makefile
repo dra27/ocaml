@@ -61,8 +61,8 @@ $(foreach program, $(programs_byte) $(programs_opt),\
   $(eval $(call PROGRAM_SYNONYM,$(program))))
 
 $(programs_byte:%=%$(EXE)):
-	$(CAMLC) $(call ADD_BYTECODE_RUNTIME, $(LINKFLAGS)) $(LINKFLAGS) \
-	         -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+	$(CAMLC) $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $(LINKFLAGS)) \
+	         $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
 
 $(programs_opt:%=%$(EXE)):
 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
@@ -315,6 +315,13 @@ caml_tex := caml-tex$(EXE)
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 $(caml_tex): LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+ifeq "$(SUFFIXING)-$(UNIX_OR_WIN32)" "true-win32"
+$(caml_tex): LINKFLAGS += -runtime-variant -$(ZINC_RUNTIME_ID)
+else ifeq "$(SUFFIXING)" "true"
+$(caml_tex): LINKFLAGS += \
+  -use-prims $(ROOTDIR)/runtime/primitives \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID))
 endif
 
 # caml-tex uses str.cma and unix.cma and so must be compiled with
