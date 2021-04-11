@@ -107,7 +107,7 @@ let parse argv =
          has_runtime_search = None; launcher_searches_for_ocamlrun = false;
          target_launcher_searches_for_ocamlrun = false;
          bytecode_shebangs_by_default = false; shebangscripts = false;
-         libraries = []}
+         filename_mangling = false; libraries = []; zinc_bootstrapped = false}
   in
   let error fmt = Printf.ksprintf (fun s -> raise (Arg.Bad s)) fmt in
   let check_tree () =
