@@ -23,6 +23,11 @@ OCaml 5.4 maintenance version
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Samuel Hym,
   Vincent Laviron and ???)
 
+- #14245: Introduce Runtime IDs for use in filename mangling to allow different
+  configurations and different versions of the runtime system to coexist
+  harmoniously on a single system.
+  (David Allsopp, review by Samuel Hym and ???)
+
 ### Tools:
 
 - #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
