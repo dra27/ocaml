@@ -23,6 +23,16 @@
 val version: string
 (** The current version number of the system *)
 
+val release_number: int
+(** The release number for the compiler
+
+    @since 5.5 *)
+
+val is_official_release: bool
+(** True if the compiler is an unmodified official OCaml release
+
+    @since 5.5 *)
+
 val standard_library_relative: string option
 (** The explicit relative path from the compiler binaries to the standard
     libraries directory if the compiler was configured with
@@ -300,6 +310,16 @@ type search_method =
         fails *)
 | Enable
     (** Always search for the interpreter *)
+
+val bytecode_runtime_id : string
+(** The Runtime ID for this build of the bytecode runtime system
+
+    @since 5.5 *)
+
+val native_runtime_id : string
+(** The Runtime ID for this build of the native runtime system
+
+    @since 5.5 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
