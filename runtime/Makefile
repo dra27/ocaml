@@ -273,6 +273,7 @@ ifneq "$(LIBDIR_REL)" ""
 	       >> $@
 endif
 	echo '#define HOST "$(HOST)"' >> $@
+	echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"' >> $@
 
 # Libraries and programs
 
