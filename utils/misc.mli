@@ -848,6 +848,19 @@ module RuntimeID : sig
       e.g. [ocamlrun ~runtime_id:(make_zinc ~release_number:21 is_release:true)
                      "d" = "ocamlrund-001b"]
   *)
+
+  val shared_runtime: ?runtime_id:t -> ?host:string
+    -> ?prefix:string -> Sys.backend_type -> string
+  (** [shared_runtime ?runtime_id ?host ?prefix backend] returns the name of the
+      shared runtime for the given [backend]. [runtime_id] defaults to
+      {!make_bytecode} if [backend = Sys.Bytecode] and {!make_native} if
+      [backend = Sys.Native] and [host] to {!Config.target}. [prefix] defaults
+      to ["-l"] and the function does not append {!Config.ext_dll}.
+
+      e.g. [shared_runtime ~runtime_id:(make_native ~release_number:21
+                                                    ~is_release:true)
+                           ~host:"x86_64-pc-linux-gnu" Native
+                             = "-lasmrun-x86_64-pc-linux-gnu-001b"] *)
 end
 
 (** {1 Miscellaneous type aliases} *)
