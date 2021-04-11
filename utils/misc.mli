@@ -699,31 +699,33 @@ module RuntimeID : sig
       (** [true] if the platform has 31-bit [int]s (i.e. 32-bit systems) *)
     static: bool;
       (** [true] if dynamic loading of libraries is not supported *)
-    no_compression: bool;
-      (** [true] if compressed marshalling is not supported *)
+    naked_pointers: bool;
+      (** [true] if the runtime allows naked pointers *)
     ansi: bool;
       (** [true] if Unicode support on Windows is disabled *)
+    mutable_string: bool;
+      (** [true] if the runtime does not require immutable strings *)
   }
 
   val make_zinc: ?dev:bool -> ?release:int
     -> ?no_flat_float_array:bool
-    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
+    -> ?int31:bool -> ?static:bool
     -> unit -> t
   (** Returns the Zinc Runtime ID for the given parameters (using default values
       from {!Config} and {!Sys} as necessary) *)
 
   val make_bytecode: ?dev:bool -> ?release:int
     -> ?reserved:int -> ?no_flat_float_array:bool
-    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
-    -> ?ansi:bool
+    -> ?int31:bool -> ?static:bool
+    -> ?naked_pointers:bool -> ?ansi:bool -> ?mutable_string:bool
     -> unit -> t
   (** Returns the Bytecode Runtime ID for the given parameters (using default
       values from {!Config} and {!Sys} as necessary) *)
 
   val make_native: ?dev:bool -> ?release:int
     -> ?reserved:int -> ?no_flat_float_array:bool -> ?fp:bool -> ?tsan:bool
-    -> ?int31:bool -> ?static:bool -> ?no_compression:bool
-    -> ?ansi:bool
+    -> ?int31:bool -> ?static:bool
+    -> ?naked_pointers:bool -> ?ansi:bool -> ?mutable_string:bool
     -> unit -> t
   (** Returns the Native Runtime ID for the given parameters (using default
       values from {!Config} and {!Sys} as necessary) *)
