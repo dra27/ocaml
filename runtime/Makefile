@@ -155,12 +155,18 @@ endif
 
 
 .PHONY: install
+define CREATE_LINK
+install::
+	cd "$(INSTALL_BINDIR)" && $(LN) "$(1)" "$(2)"
+endef
 define INSTALL_RUNTIME
 install::
 	$(INSTALL_PROG) \
     $(1)$(EXE) "$(INSTALL_BINDIR)/$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
 	cd "$(INSTALL_BINDIR)" && \
     $(LN) "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)"
+$(foreach id, $(RUNTIME_ADDITIONAL_NAMES), $(eval \
+    $(call CREATE_LINK,$(1)-$(BYTECODE_RUNTIME_ID)$(EXE),$(1)-$(id)$(EXE))))
 endef
 
 $(foreach runtime, $(PROGRAMS), $(eval $(call INSTALL_RUNTIME,$(runtime))))

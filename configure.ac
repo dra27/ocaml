@@ -67,6 +67,8 @@ instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
 bindir_to_libdir=''
+runtime_additional_names=''
+dll_additional_names=''
 
 # Information about the package
 
@@ -178,6 +180,8 @@ AC_SUBST([bindir_to_libdir])
 AC_SUBST([ocaml_release_number])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
+AC_SUBST([runtime_additional_names])
+AC_SUBST([dll_additional_names])
 
 ## Generated files
 
@@ -2026,20 +2030,15 @@ alphabet='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-='
 
 sextet0="$(echo "$alphabet" | cut -c $(expr $ocaml_release_number + 1))"
 
+sextet1a=''
 if $arch64; then
   sextet1='1 + '
-  # XXX symlinkery too
 else
   sextet1=''
 fi
 sextet1="$(echo "$alphabet" | cut -c $(expr $sextet1$profinfo_width '*' 2 + 1))"
-
-if $supports_shared_libraries; then
-  sextet2_byte='1 + '
-  # XXX symlinkery too
-else
-  sextet2_byte=''
-fi
+sextet1a="$(echo "$alphabet" | \
+              cut -c $(expr $sextet1a$profinfo_width '*' 2 + 1))"
 
 # frame_pointers is native only (see below)
 
@@ -2063,12 +2062,36 @@ else
   sextet2_native="${sextet2_byte}"
 fi
 
+sextet2a_byte="$sextet2a_byte"
+if $supports_shared_libraries; then
+  sextet2_byte='1 + '
+else
+  sextet2_byte=''
+fi
+
 sextet2_byte="$(echo "$alphabet" | cut -c $(expr $sextet2_byte + 1))"
+sextet2a_byte="$(echo "$alphabet" | cut -c $(expr $sextet2a_byte + 1))"
 sextet2_native="$(echo "$alphabet" | cut -c $(expr $sextet2_native + 1))"
 
 sextet3="$(echo "$alphabet" | cut -c $(expr $windows_unicode + 1))"
 
 bytecode_runtime_id="$sextet3$sextet2_byte$sextet1$sextet0"
 native_runtime_id="$sextet3$sextet2_native$sextet1$sextet0"
+
+if test "x$sextet1" != "x$sextet1a"; then
+  runtime_additional_names=\
+"$runtime_additional_names $sextet3$sextet2_byte$sextet1a$sextet0"
+  if test "x$sextet2_byte" != "x$sextet2a_byte"; then
+    runtime_additional_names=\
+"$runtime_additional_names $sextet3$sextet2a_byte$sextet1$sextet0"
+    runtime_additional_names=\
+"$runtime_additional_names $sextet3$sextet2a_byte$sextet1a$sextet0"
+  fi
+else
+  if test "x$sextet2_byte" != "x$sextet2a_byte"; then
+    runtime_additional_names=\
+"$runtime_additional_names $sextet3$sextet2a_byte$sextet1$sextet0"
+  fi
+fi
 
 AC_OUTPUT
