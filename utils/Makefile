@@ -37,6 +37,10 @@ SUBST_QUOTE=$(call SUBST_QUOTE2,$1,$($1))
 FLEXLINK_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
 FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
 
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+SUFFIXING = true
+endif
+
 config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	sed $(call SUBST,AFL_INSTRUMENT) \
 	    $(call SUBST,ARCH) \
@@ -92,6 +96,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AR_SUPPORTS_RESPONSE_FILES) \
+	    $(call SUBST,SUFFIXING) \
 	    $(call SUBST_STRING,TARGET_LAUNCH_METHOD) \
 	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
 	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \

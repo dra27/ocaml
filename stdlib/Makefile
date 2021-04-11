@@ -140,11 +140,14 @@ target_camlheader%: tmpheader.exe
 
 endif
 
+MANGLING = $(filter true,$(SUFFIXING))
 target_$(HEADER_NAME): tmpheader.exe
-	@cat $^ > $@
+	@{ printf '$(if $(MANGLING),$(ZINC_RUNTIME_ID_HI),\000)'; \
+     cat $^; } > $@
 
 $(HEADER_NAME): runtime.info tmpheader.exe
-	@cat $^ > $@
+	@{ cat $^; \
+     printf '$(if $(filter true,$(SUFFIXING)),$(ZINC_RUNTIME_ID))'; } > $@
 
 # The mingw-w64 and MSVC versions of tmpheader.exe are linked with special flags
 # to reduce their size (considerably). In particular, the entry point is
