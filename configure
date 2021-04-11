@@ -2876,6 +2876,8 @@ OCAML_VERSION_EXTRA=
 
 OCAML_VERSION_SHORT=4.14
 
+OCAML_RELEASE_NUMBER=15
+
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
