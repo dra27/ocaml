@@ -26,12 +26,13 @@ include $(ROOTDIR)/Makefile.common
 
 OCAMLYACCFLAGS = -v
 
-CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib \
-        -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
+CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib -I $(ROOTDIR)/boot
 CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
             -safe-string -strict-sequence -strict-formats -bin-annot
 LINKFLAGS =
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                 -use-runtime $(RUNTIME_NAME)
 CAMLDEP = $(BOOT_OCAMLC) -depend
 DEPFLAGS = -slash
 DEPINCLUDES =
@@ -49,7 +50,7 @@ allopt: ocamllex.opt
 opt.opt: allopt
 
 ocamllex$(EXE): $(OBJS)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -compat-32 -o $@ $^
 
 ocamllex.opt$(EXE): $(OBJS:.cmo=.cmx)
 	$(CAMLOPT_CMD) $(DOTOPT_LINKFLAGS) -o $@ $^
