@@ -1296,3 +1296,122 @@ module Magic_number = struct
            | Error err -> Error (Unexpected_error err)
            | Ok () -> Ok info
 end
+
+module RuntimeID = struct
+  type t = {
+    dev: bool;
+    release: int;
+    no_flat_float_array: bool;
+    fp: bool;
+    spacetime: bool;
+    int31: bool;
+    static: bool;
+    naked_pointers: bool;
+    mutable_string: bool;
+    ansi: bool;
+    reserved: int;
+  }
+
+  let check fn ({release; reserved; _} as t) =
+    if release < 0 || release > 63 || reserved < 0 || reserved > 31 then
+      invalid_arg fn
+    else
+      t
+
+  let make_zinc ?(dev = not Config.is_release)
+                ?(release = Config.release_number) () =
+    check "Misc.RuntimeID.make_zinc"
+      {dev; release;
+       no_flat_float_array = false; fp = false; spacetime = false;
+       int31 = false; static = false; naked_pointers = false;
+       mutable_string = false; ansi = false; reserved = 0}
+
+  let make_bytecode ?(dev = not Config.is_release)
+                    ?(release = Config.release_number)
+                    ?(no_flat_float_array = not Config.flat_float_array)
+                    ?(int31 = Sys.int_size = 31)
+                    ?(static = not Config.supports_shared_libraries)
+                    ?(naked_pointers = Config.naked_pointers)
+                    ?(mutable_string = not Config.safe_string)
+                    ?(ansi = Config.target_win32 && not Config.windows_unicode)
+                    ?(reserved = Config.profinfo_width) () =
+    check "Misc.RuntimeID.make_bytecode"
+      {dev; release;
+       no_flat_float_array; int31; static; naked_pointers; mutable_string; ansi;
+       reserved; fp = false; spacetime = false}
+
+  let make_native ?(dev = not Config.is_release)
+                  ?(release = Config.release_number)
+                  ?(no_flat_float_array = not Config.flat_float_array)
+                  ?(fp = Config.with_frame_pointers)
+                  ?(spacetime = Config.spacetime)
+                  ?(int31 = Sys.int_size = 31)
+                  ?(static = not Config.supports_shared_libraries)
+                  ?(naked_pointers = Config.naked_pointers)
+                  ?(mutable_string = not Config.safe_string)
+                  ?(ansi = Config.target_win32 && not Config.windows_unicode)
+                  ?(reserved = Config.profinfo_width) () =
+    check "Misc.RuntimeID.make_native"
+      {dev; release;
+       no_flat_float_array; fp; spacetime; int31; static; naked_pointers;
+       mutable_string; ansi; reserved}
+
+  let is_zinc = function
+  | {dev = _; release = _; no_flat_float_array = false; fp = false;
+     spacetime = false; int31 = false; static = false; naked_pointers = false;
+     mutable_string = false; ansi = false; reserved = 0} -> true
+  | _ -> false
+
+  let is_bytecode = function
+  | {dev = _; release = _; no_flat_float_array = _; fp = false;
+     spacetime = false; int31 = _; static = _; naked_pointers = _;
+     mutable_string = false; ansi = _; reserved = _} -> true
+  | _ -> false
+
+  let is_native _ = true
+
+  let to_string t =
+    let alpha = "0123456789abcdefghijklmnopqrstuv" in
+    let bit bit cond = if cond then 1 lsl bit else 0 in
+    let q0 =
+      (bit 0 t.dev) lor
+      ((t.release lsl 1) land 0b11110) (* 4 bits *)
+    in
+    let q1 =
+      t.release lsr 4 lor (* 2 bits *)
+      bit 2 t.no_flat_float_array lor
+      bit 3 t.fp lor
+      bit 4 t.spacetime
+    in
+    let q2 =
+      bit 0 t.int31 lor
+      bit 1 t.static lor
+      bit 2 t.naked_pointers lor
+      bit 3 t.mutable_string lor
+      bit 4 t.ansi
+    in
+    let q3 =
+      t.reserved (* 5 bits *)
+    in
+    Printf.sprintf "%c%c%c%c" alpha.[q3] alpha.[q2] alpha.[q1] alpha.[q0]
+
+  let of_string s =
+    if String.length s <> 4 then
+      invalid_arg "Misc.RuntimeID.of_string"
+    else
+      let convert c =
+        match c with
+        | '0'..'9' -> Char.code c - Char.code '0'
+        | 'a'..'v' -> Char.code c - Char.code 'a' + 10
+        | _ -> invalid_arg "Misc.RuntimeID.of_string"
+      in
+      let set bit q = (q land (1 lsl bit) <> 0) in
+      let q0 = convert s.[3] in
+      let q1 = convert s.[2] in
+      let q2 = convert s.[1] in
+      let q3 = convert s.[0] in
+      {dev = set 0 q0; release = ((q1 land 0b11) lsl 4) lor (q0 lsr 1);
+       no_flat_float_array = set 2 q1; fp = set 3 q1; spacetime = set 4 q1;
+       int31 = set 0 q2; static = set 1 q2; naked_pointers = set 2 q2;
+       mutable_string = set 3 q2; ansi = set 4 q2; reserved = q3}
+end
