@@ -70,4 +70,5 @@ let host = "zinc-boot-ocaml"
 let target = host
 let systhread_supported = false
 let flexdll_dirs = []
+let suffixing = false
 let launch_method = "sh"
