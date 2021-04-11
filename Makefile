@@ -1413,6 +1413,7 @@ ifneq "$(LIBDIR_REL)" ""
 	@echo '#define OCAML_STDLIB_DIR_REL $(call C_LITERAL,$(LIBDIR_REL))' >> $@
 endif
 	@echo '#define HOST "$(HOST)"' >> $@
+	@echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"' >> $@
 
 runtime/stdlib.$(O): runtime/build_config.h
 
