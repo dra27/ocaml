@@ -23,7 +23,7 @@ OCAMLYACCFLAGS = -v
 
 CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib -I $(ROOTDIR)/boot \
                        -use-prims $(ROOTDIR)/runtime/primitives \
-                       -use-runtime '$(BINDIR)/ocamlrun$(EXE)'
+                       -use-runtime $(RUNTIME_NAME)
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
             -safe-string -strict-sequence -strict-formats -bin-annot

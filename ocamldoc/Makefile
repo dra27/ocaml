@@ -23,7 +23,7 @@ OCAMLYACCFLAGS = --strict -v
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
 OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS) \
                         -use-prims $(ROOTDIR)/runtime/primitives \
-                        -use-runtime '$(BINDIR)/ocamlrun$(EXE)'
+                        -use-runtime $(RUNTIME_NAME)
 OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 OCAMLDEP = $(BEST_OCAMLDEP)
 DEPFLAGS = -slash

@@ -26,7 +26,7 @@ include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLC=$(BEST_OCAMLC) -g -nostdlib -I $(ROOTDIR)/stdlib \
                       -use-prims $(ROOTDIR)/runtime/primitives \
-                      -use-runtime '$(BINDIR)/ocamlrun$(EXE)'
+                      -use-runtime $(RUNTIME_NAME)
 OCAMLOPT=$(BEST_OCAMLOPT) -g -nostdlib -I $(ROOTDIR)/stdlib
 
 # COMPFLAGS should be in sync with the toplevel Makefile's COMPFLAGS.

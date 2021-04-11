@@ -23,7 +23,7 @@ UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
 
 CAMLC=$(BEST_OCAMLC) -g -nostdlib -I $(ROOTDIR)/stdlib \
                      -use-prims $(ROOTDIR)/runtime/primitives \
-                     -use-runtime '$(BINDIR)/ocamlrun$(EXE)'
+                     -use-runtime $(RUNTIME_NAME)
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
           -safe-string -strict-sequence -strict-formats
 LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR)
