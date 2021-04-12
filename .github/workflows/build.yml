@@ -44,6 +44,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Cache the build
+      uses: actions/cache@v2
+      with:
+        path: ~/work/ocaml/ocaml
+        key: build-${{ github.run_number }}
     - name: Packages
       run: |
         sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended hevea sass
@@ -57,18 +62,60 @@ jobs:
     - name: Build
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh build
+
+  test-flambda:
+    needs: [ full-flambda ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restore the cache
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: ~/work/ocaml/ocaml
+        key: build-${{ github.run_number }}
     - name: Run the testsuite
+      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
+
+  test-flambda-debug:
+    needs: [ full-flambda ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restore the cache
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: ~/work/ocaml/ocaml
+        key: build-${{ github.run_number }}
+    - name: Run the testsuite
+      if: steps.cache.outputs.cache-hit == 'true'
+      run: |
+        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-debug
+
+  test-flambda-rest:
+    needs: [ full-flambda ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restore the cache
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: ~/work/ocaml/ocaml
+        key: build-${{ github.run_number }}
     - name: Build API Documentation
+      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh api-docs
     - name: Install
+      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
     - name: Build the manual
+      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh manual
     - name: Other checks
+      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks

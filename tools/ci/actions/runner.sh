@@ -16,6 +16,8 @@
 
 set -xe
 
+pwd
+
 PREFIX=~/local
 
 MAKE="make $MAKE_ARG"
@@ -69,12 +71,17 @@ Build () {
   ./tools/check-symbol-names runtime/*.a
 }
 
+TestDebug () {
+  cd testsuite
+  echo Running the testsuite with the debug runtime
+  $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd all
+  cd ..
+}
+
 Test () {
   cd testsuite
   echo Running the testsuite with the normal runtime
   $MAKE all
-  echo Running the testsuite with the debug runtime
-  $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd all
   cd ..
 }
 
@@ -173,6 +180,7 @@ case $1 in
 configure) Configure;;
 build) Build;;
 test) Test;;
+test-debug) TestDebug;;
 api-docs) API_Docs;;
 install) Install;;
 manual) BuildManual;;
