@@ -21,172 +21,56 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Cache the build
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: i386-build-${{ github.run_number }}
-    - name: Worktree
+    - name: Packages
       run: |
-        git worktree add ~/build
+        sudo apt-get update -y && sudo apt-get install -y gcc-multilib gfortran-multilib
     - name: configure tree
       run: |
         XARCH=i386 CONFIG_ARG='--disable-stdlib-manpages --disable-shared' bash -xe tools/ci/actions/runner.sh configure
     - name: Build
       run: |
         bash -xe tools/ci/actions/runner.sh build
-
-  test-i386:
-    needs: [ i386-static ]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Packages
-      run: |
-        sudo apt-get update -y && sudo apt-get install -y gcc-multilib gfortran-multilib
-    - name: Restore the cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
     - name: Run the testsuite
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         bash -xe tools/ci/actions/runner.sh test
-
-  test-i386-debug:
-    needs: [ i386-static ]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Packages
-      run: |
-        sudo apt-get update -y && sudo apt-get install -y gcc-multilib gfortran-multilib
-    - name: Restore the cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
-    - name: Run the testsuite
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
-      run: |
         bash -xe tools/ci/actions/runner.sh test-debug
-
-  test-i386-rest:
-    needs: [ i386-static ]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Packages
-      run: |
-        sudo apt-get update -y && sudo apt-get install -y gcc-multilib gfortran-multilib
-    - name: Restore the cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
     - name: Install
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         bash -xe tools/ci/actions/runner.sh install
     - name: Other checks
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         bash -xe tools/ci/actions/runner.sh other-checks
-
   full-flambda:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Cache the build
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
-    - name: Worktree
-      run: |
-        git worktree add ~/build
-  # Ensure that make distclean can be run from an empty tree
-    - name: distclean
-      working-directory: /home/runner/build
-      run: |
-        MAKE_ARG=-j make distclean
-    - name: configure tree
-      working-directory: /home/runner/build
-      run: |
-        MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-dependency-generation' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
-    - name: Build
-      working-directory: /home/runner/build
-      run: |
-        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh build
-
-  test-flambda:
-    needs: [ full-flambda ]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Restore the cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
-    - name: Run the testsuite
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
-      run: |
-        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
-
-  test-flambda-debug:
-    needs: [ full-flambda ]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Restore the cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
-    - name: Run the testsuite
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
-      run: |
-        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-debug
-
-  test-flambda-rest:
-    needs: [ full-flambda ]
-    runs-on: ubuntu-latest
-    steps:
     - name: Packages
       run: |
         sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended hevea sass
-    - name: Restore the cache
-      id: cache
-      uses: actions/cache@v2
-      with:
-        path: ~/build
-        key: build-${{ github.run_number }}
+  # Ensure that make distclean can be run from an empty tree
+    - name: distclean
+      run: |
+        MAKE_ARG=-j make distclean
+    - name: configure tree
+      run: |
+        MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-dependency-generation' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+    - name: Build
+      run: |
+        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh build
+    - name: Run the testsuite
+      run: |
+        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
+        MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-debug
     - name: Build API Documentation
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh api-docs
     - name: Install
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
     - name: Build the manual
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh manual
     - name: Other checks
-      working-directory: /home/runner/build
-      if: steps.cache.outputs.cache-hit == 'true'
       run: |
         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks
