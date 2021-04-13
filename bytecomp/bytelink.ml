@@ -333,6 +333,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
          (* Write the header *)
          if Config.use_shebang then
            let header =
+             (* XXX Tidy up
              (* shebang mustn't exceed 128 including the #! and \0 *)
              if String.length runtime > 125 then
                (* NB In -use-runtime mode, the runtime string ends up being
@@ -344,7 +345,24 @@ let link_bytecode ?final_name tolink exec_name standalone =
                (* The runtime name gets recorded in RNTM *)
                "#!"
              else
-               "#!" ^ runtime ^ "\n"
+               "#!" ^ runtime ^ "\n"*)
+             (* COMBAK Need to worry about the -use-runtime case in more detail *)
+             "#!/bin/sh\n\
+              i=" ^ Filename.quote runtime ^ "\n\
+              if ! test -f \"$i\" || ! test -x \"$i\"; then\n\
+                j=" ^ Filename.(quote (basename runtime)) ^ "\n\
+                i=\"$(dirname \"$0\")/$j\"\n\
+                if ! test -f \"$i\" || ! test -x \"$i\"; then\n\
+                  i=$(command -v \"$j\")\n\
+                  if test -z \"$i\"; then\n\
+                    echo \"Can't find it - you is screwed!\"\n\
+                    exit 1\n\
+                  fi\n\
+                fi\n\
+              fi\n\
+              exec \"$i\" \"$0\" \"$@\"\n\
+              echo \"We encountered an error - you is screwed!\"\n\
+              exit 1\n"
            in
            output_string outchan header;
          else
