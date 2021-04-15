@@ -110,6 +110,7 @@ Checks () {
   # check that the 'clean' target also works
   $MAKE clean
   $MAKE -C manual clean
+  $MAKE -C manual distclean
   # check that the `distclean` target definitely cleans the tree
   $MAKE distclean
   # Check the working tree is clean
@@ -130,6 +131,12 @@ EOF
   ./configure
   $MAKE check-stdlib check-case-collision -C manual/tests
 
+}
+
+BuildManual () {
+  $MAKE -C manual/src/html_processing duniverse
+  $MAKE -C manual manual
+  $MAKE -C manual web
 }
 
 # ReportBuildStatus accepts an exit code as a parameter (defaults to 1) and also
@@ -166,6 +173,7 @@ build) Build;;
 test) Test;;
 api-docs) API_Docs;;
 install) Install;;
+manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
 *) echo "Unknown CI instruction: $1"
