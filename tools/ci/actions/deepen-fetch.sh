@@ -72,8 +72,8 @@ if ! git merge-base "$UPSTREAM_HEAD" "$PR_HEAD" &> /dev/null; then
 
   while ! git merge-base "$UPSTREAM_HEAD" "$PR_HEAD" &> /dev/null
   do
-    echo " - $MSG by $DEEPEN commits"
-    git fetch origin --deepen=$DEEPEN "$UPSTREAM_BRANCH" &> /dev/null
+    echo " - $MSG by $DEEPEN commits via $GITHUB_REF"
+    git fetch origin --deepen=$DEEPEN "$GITHUB_REF" &> /dev/null
     MSG='Further deepening'
     ((DEEPEN*=2))
   done
