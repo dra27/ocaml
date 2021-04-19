@@ -35,8 +35,6 @@ else
 LN = ln -sf
 endif
 
-include stdlib/StdlibModules
-
 CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
@@ -87,6 +85,7 @@ TOPLEVELINIT=toplevel/toploop.cmo
 
 # This list is passed to expunge, which accepts both uncapitalized and
 # capitalized module names.
+-include stdlib/Makefile.stdlib_modules
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
