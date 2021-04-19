@@ -259,7 +259,6 @@ _build
 /tools/cmpbyt.opt
 /tools/stripdebug
 /tools/stripdebug.opt
-/bytecomp/make_opcodes
 /bytecomp/make_opcodes.ml
 /tools/caml-tex
 /tools/eventlog_metadata

@@ -100,7 +100,7 @@ COMMON_CMI=$(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 COMMON=$(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
 BYTECOMP=bytecomp/instruct.cmo bytecomp/bytegen.cmo \
-  bytecomp/printinstr.cmo bytecomp/emitcode.cmo \
+  bytecomp/printinstr.cmo bytecomp/emitcode.cmo bytecomp/make_opcodes.cmo \
   bytecomp/bytelink.cmo bytecomp/bytelibrarian.cmo bytecomp/bytepackager.cmo \
   driver/errors.cmo driver/compile.cmo driver/maindriver.cmo
 BYTECOMP_CMI=

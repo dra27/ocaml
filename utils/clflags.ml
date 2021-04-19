@@ -372,6 +372,9 @@ let set_dumped_pass s enabled =
 
 let dump_into_file = ref false (* -dump-into-file *)
 
+let bopcodes = ref None
+let bopnames = ref None
+
 type 'a env_reader = {
   parse : string -> 'a option;
   print : 'a -> string;
