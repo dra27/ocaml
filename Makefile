@@ -1079,7 +1079,7 @@ toplevel/native/topeval.cmx: otherlibs/dynlink/dynlink.cmxa
 
 # The numeric opcodes
 
-make_opcodes := tools/make_opcodes$(EXE)
+make_opcodes := bytecomp/make_opcodes$(EXE)
 
 bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
@@ -1087,14 +1087,16 @@ bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
 	$(CAMLC) -i $< > $@
 
-$(make_opcodes): tools/make_opcodes.mll
-	$(MAKE) -C tools make_opcodes
+$(make_opcodes): bytecomp/make_opcodes.ml
+	$(CAMLC) -o $@ $<
 
 partialclean::
-	rm -f bytecomp/opcodes.ml
-	rm -f bytecomp/opcodes.mli
+	rm -f bytecomp/opcodes.ml bytecomp/opcodes.mli
 
-beforedepend:: bytecomp/opcodes.ml bytecomp/opcodes.mli
+clean::
+	rm -f bytecomp/make_opcodes.ml
+
+beforedepend:: bytecomp/opcodes.ml bytecomp/opcodes.mli bytecomp/make_opcodes.ml
 
 ifneq "$(wildcard .git)" ""
 include Makefile.dev
