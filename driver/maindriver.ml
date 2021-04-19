@@ -103,6 +103,13 @@ let main argv ppf =
       Bytelink.link (Compenv.get_objfiles ~with_ocamlparam:true) target;
       Warnings.check_fatal ();
     end;
+    (* "Boot" options *)
+    let emit_opnames file =
+      Make_opcodes.(output_opnames stdout (parse file)) in
+    let emit_opcodes file =
+      Make_opcodes.(output_opcodes stdout (snd (parse file))) in
+    Option.iter emit_opnames !bopnames;
+    Option.iter emit_opcodes !bopcodes;
   with
   | exception (Compenv.Exit_with_status n) ->
     n

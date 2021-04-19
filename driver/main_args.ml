@@ -843,6 +843,12 @@ let mk_dstartup f =
   "-dstartup", Arg.Unit f, " (undocumented)"
 ;;
 
+let mk_bopcodes f =
+  "-bopcodes", Arg.String f, " (undocumented)"
+
+let mk_bopnames f =
+  "-bopnames", Arg.String f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -1033,6 +1039,9 @@ module type Bytecomp_options = sig
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
+
+  val _bopcodes : string -> unit
+  val _bopnames : string -> unit
 
   val _use_prims : string -> unit
 end;;
@@ -1244,6 +1253,8 @@ struct
     mk_dtimings F._dtimings;
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
+    mk_bopcodes F._bopcodes;
+    mk_bopnames F._bopnames;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1993,6 +2004,8 @@ third-party libraries such as Lwt, but with a different API."
     let _output_obj () = output_c_object := true; custom_runtime := true
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
+    let _bopcodes s = bopcodes := Some s
+    let _bopnames s = bopnames := Some s
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
   end

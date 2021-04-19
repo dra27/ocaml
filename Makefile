@@ -1159,16 +1159,11 @@ toplevel/native/topeval.cmx: otherlibs/dynlink/dynlink.cmxa
 
 # The numeric opcodes
 
-make_opcodes := bytecomp/make_opcodes$(EXE)
-
-bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
-	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
+bytecomp/opcodes.ml: runtime/caml/instruct.h
+	$(CAMLC) -bopcodes $< > $@
 
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
 	$(CAMLC) -i $< > $@
-
-$(make_opcodes): bytecomp/make_opcodes.ml
-	$(CAMLC) -o $@ $<
 
 partialclean::
 	rm -f bytecomp/opcodes.ml bytecomp/opcodes.mli

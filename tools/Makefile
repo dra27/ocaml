@@ -229,10 +229,8 @@ DUMPOBJ= \
 
 $(call byte_and_opt,dumpobj,$(DUMPOBJ),)
 
-make_opcodes := $(ROOTDIR)/bytecomp/make_opcodes$(EXE)
-
-opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
-	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h
+	$(CAMLC) -bopnames $< > $@
 
 clean::
 	rm -f opnames.ml

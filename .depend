@@ -1998,6 +1998,11 @@ bytecomp/instruct.cmi : \
     lambda/lambda.cmi \
     typing/ident.cmi \
     typing/env.cmi
+bytecomp/make_opcodes.cmo : \
+    bytecomp/make_opcodes.cmi
+bytecomp/make_opcodes.cmx : \
+    bytecomp/make_opcodes.cmi
+bytecomp/make_opcodes.cmi :
 bytecomp/meta.cmo : \
     bytecomp/instruct.cmi \
     bytecomp/meta.cmi
@@ -5870,6 +5875,7 @@ driver/maindriver.cmo : \
     utils/warnings.cmi \
     utils/profile.cmi \
     driver/makedepend.cmi \
+    bytecomp/make_opcodes.cmi \
     driver/main_args.cmi \
     parsing/location.cmi \
     utils/config.cmi \
@@ -5885,6 +5891,7 @@ driver/maindriver.cmx : \
     utils/warnings.cmx \
     utils/profile.cmx \
     driver/makedepend.cmx \
+    bytecomp/make_opcodes.cmx \
     driver/main_args.cmx \
     parsing/location.cmx \
     utils/config.cmx \

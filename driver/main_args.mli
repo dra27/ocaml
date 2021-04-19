@@ -156,6 +156,9 @@ module type Bytecomp_options = sig
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
 
+  val _bopcodes : string -> unit
+  val _bopnames : string -> unit
+
   val _use_prims : string -> unit
 end;;
 
