@@ -102,6 +102,7 @@ otherlibs/win32unix/stat.c        typo.long-line
 otherlibs/win32unix/symlink.c     typo.long-line
 
 stdlib/hashbang     typo.white-at-eol typo.missing-lf
+stdlib/StdlibModules  typo.tab
 
 testsuite/tests/**                                      typo.missing-header typo.long-line=may
 testsuite/tests/lib-bigarray-2/bigarrf.f                typo.tab

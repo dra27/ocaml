@@ -204,6 +204,7 @@ _build
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
+/stdlib/.StdlibModules
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result

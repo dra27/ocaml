@@ -1102,6 +1102,7 @@ distclean: clean
 	boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
+	rm -f stdlib/.StdlibModules
 	rm -rf autom4te.cache
 	rm -f config.log config.status libtool
 	rm -f tools/eventlog_metadata

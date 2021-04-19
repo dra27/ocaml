@@ -47,17 +47,15 @@ STDLIB_MODULE_BASENAMES=\
 STDLIB_PREFIXED_MODULES=\
   $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
 
-define add_stdlib_prefix_first
-$(shell echo $1 | cut -c1 | tr '[:lower:]' '[:upper:]')
-endef
-
-# add stdlib__ as prefix to a module except for internal modules
-# and the stdlib module itself
-define add_stdlib_prefix
-  $(or $(filter-out $(STDLIB_PREFIXED_MODULES), $1), \
-    stdlib__$(call add_stdlib_prefix_first,$1)$(shell echo $1 | cut -c2-))
-endef
+include $(ROOTDIR)/stdlib/.StdlibModules
 
 STDLIB_MODULES:=\
-  $(foreach module, $(STDLIB_MODULE_BASENAMES), \
-    $(call add_stdlib_prefix,$(module)))
+  $(filter-out $(STDLIB_PREFIXED_MODULES), $(STDLIB_MODULE_BASENAMES)) \
+  $(STDLIB_PREFIXED_MODULE_BASENAMES)
+
+# This is written as a pattern rule so that there's no chance of overriding the
+# default goal in any Makefile which uses it
+$(ROOTDIR)/stdlib/%StdlibModules: $(ROOTDIR)/stdlib/StdlibModules
+	@echo 'STDLIB_PREFIXED_MODULE_BASENAMES = \
+  $(addprefix stdlib__,$(shell echo $(STDLIB_PREFIXED_MODULES) | \
+     awk 'BEGIN {RS=" "} {print toupper(substr($$0,1,1))substr($$0,2);}'))' > $@
