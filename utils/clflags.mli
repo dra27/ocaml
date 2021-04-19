@@ -217,6 +217,7 @@ val dump_into_file : bool ref
 val bopcodes : string option ref
 val bopnames : string option ref
 val bruntimedef : string option ref
+val bstdlib : string option ref
 
 (* Support for flags that can also be set from an environment variable *)
 type 'a env_reader = {

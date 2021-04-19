@@ -34,7 +34,10 @@ DEPFLAGS=-slash
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 
-include StdlibModules
+
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+include Makefile.stdlib_modules
+endif
 
 OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
 NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
@@ -256,18 +259,29 @@ clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -rf flexdll
 
+.INTERMEDIATE: l.tmp
+Makefile.stdlib_modules: | sys.ml
+	$(MAKE) --no-print-directory -j 1 -f Makefile.link-order > l.tmp
+	$(CAMLC) -bstdlib l.tmp > $@
+	rm -f l.tmp
+
+clean::
+	rm -f Makefile.stdlib_modules
+
 include .depend
 
 STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
+.INTERMEDIATE: .depend.tmp
 .PHONY: depend
 depend:
+	cp stdlib.ml stdlib_all.tmp
 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-	  > .depend.tmp
+	  -impl stdlib_all.tmp > .depend.tmp
 	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli >> .depend.tmp
 	sed -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
 	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' \
 	  .depend.tmp > .depend
-	rm -f .depend.tmp
+	rm -f .depend.tmp stdlib_all.tmp

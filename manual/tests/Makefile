@@ -1,5 +1,5 @@
 ROOTDIR = ../..
-include $(ROOTDIR)/stdlib/StdlibModules
+include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
 include $(ROOTDIR)/api_docgen/Makefile.docfiles
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
