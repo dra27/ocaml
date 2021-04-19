@@ -18,6 +18,14 @@ open Clflags
 
 module Options = Main_args.Make_bytecomp_options (Main_args.Default.Main)
 
+let process_bootstrap boot_function =
+  let open Boot in
+  match boot_function with
+  | Runtimedef file ->
+      Symtable.init ();
+      output_builtin_exceptions stdout (parse_fail file);
+      Symtable.output_runtimedef_primitives stdout
+
 let main argv ppf =
   let program = "ocamlc" in
   Clflags.add_arguments __LOC__ Options.list;
@@ -103,6 +111,8 @@ let main argv ppf =
       Bytelink.link (Compenv.get_objfiles ~with_ocamlparam:true) target;
       Warnings.check_fatal ();
     end;
+    (* "Bootstrap" options *)
+    Option.iter process_bootstrap !bootstrap
   with
   | exception (Compenv.Exit_with_status n) ->
     n

@@ -707,12 +707,14 @@ clean:: partialclean
 
 # The bytecode compiler
 
+beforedepend:: bytecomp/boot.ml
+
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
 
 partialclean::
-	rm -rf ocamlc$(EXE)
+	rm -f ocamlc$(EXE) bytecomp/boot.ml
 
 # The native-code compiler
 

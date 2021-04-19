@@ -257,6 +257,7 @@ _build
 /tools/cmpbyt.opt
 /tools/stripdebug
 /tools/stripdebug.opt
+/bytecomp/boot.ml
 /tools/caml-tex
 /tools/eventlog_metadata
 

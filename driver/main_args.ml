@@ -843,6 +843,10 @@ let mk_dstartup f =
   "-dstartup", Arg.Unit f, " (undocumented)"
 ;;
 
+let mk_bootstrap f =
+  "-bootstrap", Arg.String f, " (undocumented)"
+;;
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -1033,6 +1037,8 @@ module type Bytecomp_options = sig
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
+
+  val _bootstrap : string -> unit
 
   val _use_prims : string -> unit
 end;;
@@ -1244,6 +1250,7 @@ struct
     mk_dtimings F._dtimings;
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
+    mk_bootstrap F._bootstrap;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1993,6 +2000,21 @@ third-party libraries such as Lwt, but with a different API."
     let _output_obj () = output_c_object := true; custom_runtime := true
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
+    let _bootstrap s =
+      let parse name file =
+        match name with
+        | "runtimedef" -> Runtimedef file
+        | _ ->
+            (* See The TeXbook p.299 *)
+            raise (Arg.Bad "Interwoven alignment preambles are not allowed")
+      in
+      match String.index s '=' with
+      | i ->
+          let len = String.length s in
+          bootstrap :=
+            Some (parse (String.sub s 0 i) (String.sub s (i + 1) (len - i - 1)))
+      | exception Not_found ->
+          raise (Arg.Bad "Interwoven alignment preambles are not allowed")
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
   end
