@@ -24,6 +24,14 @@ and opnames = parse
 | space (ident as op) space ','        { op :: opnames lexbuf }
 | space ident space '}'                { [] }
 
+and find_exceptions = parse
+| "/* \"" (ident as name) "\" */" '\r'* '\n'
+    { name :: find_exceptions lexbuf}
+| [^ '/' ]+ | '/'
+    { find_exceptions lexbuf }
+| eof
+    { [] }
+
 {
   let parse file =
     let ch = open_in_bin file in
@@ -39,4 +47,16 @@ and opnames = parse
 
   let output_opcodes ch =
     List.iteri (fun i op -> Printf.fprintf ch "let op%s = %i\n" op i)
+
+  let parse_fail file =
+    let ch = open_in_bin file in
+    let lexbuf = Lexing.from_channel ch in
+    let results = find_exceptions lexbuf in
+    close_in ch;
+    results
+
+  let output_builtin_exceptions ch names =
+    output_string ch "let builtin_exceptions = [|\n";
+    List.iter (Printf.fprintf ch "  %S;\n") names;
+    output_string ch "|]\n"
 }

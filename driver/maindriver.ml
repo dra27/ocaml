@@ -108,8 +108,13 @@ let main argv ppf =
       Make_opcodes.(output_opnames stdout (parse file)) in
     let emit_opcodes file =
       Make_opcodes.(output_opcodes stdout (snd (parse file))) in
+    let emit_runtimedef file =
+      Symtable.init ();
+      Make_opcodes.(output_builtin_exceptions stdout (parse_fail file));
+      Symtable.output_runtimedef_primitives stdout in
     Option.iter emit_opnames !bopnames;
     Option.iter emit_opcodes !bopcodes;
+    Option.iter emit_runtimedef !bruntimedef;
   with
   | exception (Compenv.Exit_with_status n) ->
     n

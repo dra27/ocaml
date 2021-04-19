@@ -158,6 +158,7 @@ module type Bytecomp_options = sig
 
   val _bopcodes : string -> unit
   val _bopnames : string -> unit
+  val _bruntimedef : string -> unit
 
   val _use_prims : string -> unit
 end;;

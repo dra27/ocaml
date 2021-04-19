@@ -849,6 +849,9 @@ let mk_bopcodes f =
 let mk_bopnames f =
   "-bopnames", Arg.String f, " (undocumented)"
 
+let mk_bruntimedef f =
+  "-bruntimedef", Arg.String f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -1042,6 +1045,7 @@ module type Bytecomp_options = sig
 
   val _bopcodes : string -> unit
   val _bopnames : string -> unit
+  val _bruntimedef : string -> unit
 
   val _use_prims : string -> unit
 end;;
@@ -1255,6 +1259,7 @@ struct
     mk_dump_into_file F._dump_into_file;
     mk_bopcodes F._bopcodes;
     mk_bopnames F._bopnames;
+    mk_bruntimedef F._bruntimedef;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -2006,6 +2011,7 @@ third-party libraries such as Lwt, but with a different API."
     let _use_runtime s = use_runtime := s
     let _bopcodes s = bopcodes := Some s
     let _bopnames s = bopnames := Some s
+    let _bruntimedef s = bruntimedef := Some s
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
   end

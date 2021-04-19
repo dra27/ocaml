@@ -21,3 +21,10 @@ val output_opnames : out_channel -> string * string list -> unit
 
 val output_opcodes : out_channel -> string list -> unit
 (* Write opcodes.ml *)
+
+val parse_fail : string -> string list
+(** [parse_fail "path/to/caml/fail.h"] parses fail.h and returns the list of
+    predefined exceptions. *)
+
+val output_builtin_exceptions : out_channel -> string list -> unit
+(** Write the builtin_exceptions part of runtimedef.ml *)

@@ -5873,6 +5873,7 @@ driver/main_args.cmx : \
 driver/main_args.cmi :
 driver/maindriver.cmo : \
     utils/warnings.cmi \
+    bytecomp/symtable.cmi \
     utils/profile.cmi \
     driver/makedepend.cmi \
     bytecomp/make_opcodes.cmi \
@@ -5889,6 +5890,7 @@ driver/maindriver.cmo : \
     driver/maindriver.cmi
 driver/maindriver.cmx : \
     utils/warnings.cmx \
+    bytecomp/symtable.cmx \
     utils/profile.cmx \
     driver/makedepend.cmx \
     bytecomp/make_opcodes.cmx \

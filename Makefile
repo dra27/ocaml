@@ -790,9 +790,8 @@ partialclean::
 runtime/primitives:
 	$(MAKE) -C runtime primitives
 
-lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
-    runtime/primitives
-	$^ > $@
+lambda/runtimedef.ml: runtime/caml/fail.h runtime/primitives
+	$(CAMLC) -use-prims runtime/primitives -bruntimedef $< > $@
 
 partialclean::
 	rm -f lambda/runtimedef.ml
