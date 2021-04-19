@@ -209,6 +209,7 @@ _build
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
+/stdlib/Makefile.stdlib_modules
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result

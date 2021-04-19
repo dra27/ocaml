@@ -28,3 +28,9 @@ val parse_fail : string -> string list
 
 val output_builtin_exceptions : out_channel -> string list -> unit
 (** Write the builtin_exceptions part of runtimedef.ml *)
+
+val read_lines : string -> string list
+(** [read_lines file] returns the lines in file, ignoring CRs *)
+
+val output_stdlib_modules : out_channel -> string list -> unit
+(** Write Makefile.stdlib_modiules *)

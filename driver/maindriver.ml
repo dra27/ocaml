@@ -112,9 +112,12 @@ let main argv ppf =
       Symtable.init ();
       Make_opcodes.(output_builtin_exceptions stdout (parse_fail file));
       Symtable.output_runtimedef_primitives stdout in
+    let emit_stdlib_modules files =
+      Make_opcodes.(output_stdlib_modules stdout (read_lines files)) in
     Option.iter emit_opnames !bopnames;
     Option.iter emit_opcodes !bopcodes;
     Option.iter emit_runtimedef !bruntimedef;
+    Option.iter emit_stdlib_modules !bstdlib;
   with
   | exception (Compenv.Exit_with_status n) ->
     n
