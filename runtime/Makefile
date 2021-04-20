@@ -192,10 +192,10 @@ endif
 .PHONY: clean
 clean:
 	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
-	rm -f ocamlrun ocamlrund ocamlruni ocamlruns
-	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe
+	rm -f ocamlrun ocamlrund ocamlruni ocamlruns sak
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe
 	rm -f primitives primitives.new prims.c $(GENERATED_FILES)
-	rm -f domain_state*.inc
+	rm -f domain_state*.inc .Makefile.primitives
 	rm -rf $(DEPDIR)
 
 .PHONY: distclean
@@ -216,33 +216,21 @@ ld.conf: $(ROOTDIR)/Makefile.config
 # end), horrible things will happen (duplicated entries in Runtimedef ->
 # double registration in Symtable -> empty entry in the PRIM table ->
 # the bytecode interpreter is confused).
-# We sort the primitive file and remove duplicates to avoid this problem.
-
-# Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
-# port, the "sort" program in the path is Microsoft's and not cygwin's
-
-# Warning: POSIX sort is locale dependent, that's why we set LC_ALL explicitly.
-# Sort is unstable for "is_directory" and "isatty"
-# see http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sort.html:
-# "using sort to process pathnames, it is recommended that LC_ALL .. set to C"
+# The primitive file is sorted and duplicates are removed to avoid this problem.
 
 # To speed up builds, we avoid changing "primitives" when files
-# containing primitives change but the primitives table does not
-primitives: $(shell ./gen_primitives.sh > primitives.new; \
-                    cmp -s primitives primitives.new || echo primitives.new)
-	cp $^ $@
+# containing primitives change but the primitives table does not. sak therefore
+# creates primitives.new and only echoes primitives.new if it differs from
+# primitives. sak automatically writes prims.c.
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+-include .Makefile.primitives
+endif
 
-prims.c : primitives
-	(echo '#define CAML_INTERNALS'; \
-         echo '#include "caml/mlvalues.h"'; \
-	 echo '#include "caml/prims.h"'; \
-	 sed -e 's/.*/extern value &();/' primitives; \
-	 echo 'c_primitive caml_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  &,/' primitives; \
-	 echo '  0 };'; \
-	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  "&",/' primitives; \
-	 echo '  0 };') > prims.c
+.Makefile.primitives: Makefile.primitives | sak$(EXE)
+	@cp $< $@
+
+# prims.c is a side-effect of producing primitives
+prims.c: primitives ;
 
 opnames.inc : caml/instruct.h
 	tr -d '\r' < $< | \
@@ -251,6 +239,9 @@ opnames.inc : caml/instruct.h
 	    -e 's/enum /static char * names_of_/' \
 	    -e 's/{$$/[] = {/' \
 	    -e 's/\([[:upper:]][[:upper:]_0-9]*\)/"\1"/g' > $@
+
+sak$(EXE): sak.$(O)
+	$(call MKEXE_USING_COMPILER,$@,$^)
 
 jumptbl.inc : caml/instruct.h
 	tr -d '\r' < $< | \
