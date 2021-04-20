@@ -197,6 +197,8 @@ _build
 /runtime/ld.conf
 /runtime/.gdb_history
 /runtime/.dep
+/runtime/.Makefile.primitives
+/runtime/sak
 /runtime/domain_state32.inc
 /runtime/domain_state64.inc
 
