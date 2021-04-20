@@ -27,10 +27,11 @@
 #include "caml/instruct.h"
 #include "caml/misc.h"
 #include "caml/mlvalues.h"
-#include "caml/opnames.h"
 #include "caml/prims.h"
 #include "caml/stacks.h"
 #include "caml/startup_aux.h"
+
+#include "opnames.inc"
 
 extern code_t caml_start_code;
 
