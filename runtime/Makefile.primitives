@@ -1,13 +1,10 @@
-#!/bin/sh
-
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*            Xavier Leroy, projet Cristal, INRIA Rocquencourt            *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
 #*                                                                        *
-#*   Copyright 1999 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2021 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -15,13 +12,7 @@
 #*                                                                        *
 #**************************************************************************
 
-# #10332: the meaning of character range a-z depends on the locale, so force C
-#         locale throughout.
-export LC_ALL=C
-echo 'let builtin_exceptions = [|'
-tr -d '\r' < "$1" | sed -n -e 's|.*/\* \("[A-Za-z_]*"\) \*/$|  \1;|p'
-echo '|]'
+# This has to be in a separate Makefile in order to ensure sak is built first
 
-echo 'let builtin_primitives = [|'
-tr -d '\r' < "$2" | sed -e 's/.*/  "&";/'
-echo '|]'
+primitives: $(shell ./sak primitives)
+	cp $^ $@
