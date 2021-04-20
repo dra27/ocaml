@@ -242,9 +242,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
 #endif
 
 #ifdef THREADED_CODE
-  static void * jumptable[] = {
-#    include "jumptbl.inc"
-  };
+#include "jumptbl.inc"
 #endif
 
   if (prog == NULL) {           /* Interpreter is initializing */
