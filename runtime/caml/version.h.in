@@ -15,6 +15,9 @@
 
 /* Macros defining the current version of OCaml */
 
+#ifndef CAML_VERSION_H
+#define CAML_VERSION_H
+
 #undef OCAML_VERSION_MAJOR
 #undef OCAML_VERSION_MINOR
 #undef OCAML_VERSION_PATCHLEVEL
@@ -22,3 +25,5 @@
 #undef OCAML_VERSION_EXTRA
 #undef OCAML_VERSION
 #undef OCAML_VERSION_STRING
+
+#endif /* CAML_VERSION_H */
