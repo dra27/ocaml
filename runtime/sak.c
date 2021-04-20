@@ -55,10 +55,13 @@
 
 void usage(void)
 {
-  printf("OCaml Build System Swiss Army Knife\n"
-         "Usage: sak command\n"
-         "Commands:\n"
-         " * primitives - generates primitives and prims.c in current dir\n");
+  printf(
+    "OCaml Build System Swiss Army Knife\n"
+    "Usage: sak command\n"
+    "Commands:\n"
+    " * primitives - generates primitives and prims.c in current dir\n"
+    " * opnames - generates opnames.inc and jumptbl.inc from caml/instruct.h\n"
+  );
 }
 
 char *read_file(char_os *path)
@@ -110,6 +113,23 @@ int qsort_strcmp(const void *l, const void *r)
   return strcmp(*(const char**)l, *(const char**)r);
 }
 
+char *scan_to_eol(char *p)
+{
+  char *q = p, *r;
+  while (*q != 0 && *q != '\n')
+    q++;
+  r = q;
+  /* If not at the end of the buffer, advance to next character */
+  if (*r != 0)
+    r++;
+  /* Backtrack over any previous CR characters */
+  while (q > p && *(q - 1) == '\r')
+    q--;
+  /* q now points to the first character of \r*\n at the end of the line */
+  *q = 0;
+  return r;
+}
+
 void harvest_primitives(void)
 {
   char_os *files[] =
@@ -153,7 +173,7 @@ void harvest_primitives(void)
           p += 19;
         }
         /* Find the end of the line */
-        while (*p != 0 && *p++ != '\n');
+        p = scan_to_eol(p);
         /* p either at the end of the file or at the character following the
            newline. */
       }
@@ -224,6 +244,73 @@ void harvest_primitives(void)
     puts("primitives.new");
 }
 
+void process_instruct(void)
+{
+  char *content, *p, *q, *space;
+  FILE *opnames, *jumptbl;
+  int state = 0;
+  if ((content = p = read_file(T("caml/instruct.h"))) == NULL)
+    die("Failed to read caml/instruct.h");
+  if ((opnames = fopen_os(T("opnames.inc"), WRITE_TEXT_FILE)) == NULL)
+    die("Failed to open opnames.inc for writing");
+  if ((jumptbl = fopen_os(T("jumptbl.inc"), WRITE_TEXT_FILE)) == NULL)
+    die("Failed to open jumptbl.inc for writing");
+  while (*p != 0) {
+    q = scan_to_eol(p);
+    /* Ignore blank lines, lines beginning # or with a comment-opening and
+       single-line characters. */
+    if (*p != 0 && *(p + 1) != 0 && *p != '#' && strncmp(p, "/*", 2)) {
+      if (state == 0 && !strncmp(p, "enum ", 5)) {
+        p += 5;
+        if ((space = strchr(p, ' ')) == NULL)
+          die("cannot parsing enum line of caml/instruct.h");
+        *space = 0;
+        fprintf(opnames, "static char * names_of_%s[] = {\n", p);
+        fputs("static void * jumptable[] = {\n", jumptbl);
+        state = 1;
+      } else if (state > 0 && *p == ' ') {
+        /* Convert enum constants to strings */
+        if (state > 1) {
+          fputs(",\n", opnames);
+          fputs(",\n", jumptbl);
+        } else {
+          state = 2;
+        }
+        while (*p != 0) {
+          while (*p != 0 && !isupper(*(unsigned char *)p)) {
+            fputc(*p, opnames);
+            fputc(*p, jumptbl);
+            p++;
+          }
+          fputc('"', opnames);
+          fputs("&&lbl_", jumptbl);
+          while (*p != 0 && *p != ',') {
+            fputc(*p, opnames);
+            fputc(*p, jumptbl);
+            p++;
+          }
+          if (*p == 0)
+            die("unexpected eol processing caml/instruct.h");
+          p++;
+          fputc('"', opnames);
+          if (*p != 0) {
+            fputc(',', opnames);
+            fputc(',', jumptbl);
+          }
+        }
+      }
+    }
+    p = q;
+  }
+  if (state != 2)
+    die("error parsing caml/instruct.h");
+  fputs("\n};\n", opnames);
+  fputs("\n};\n", jumptbl);
+  fclose(opnames);
+  fclose(jumptbl);
+  free(content);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -237,6 +324,8 @@ int main(int argc, char **argv)
 
   if (!strcmp_os(argv[1], T("primitives"))) {
     harvest_primitives();
+  } else if (!strcmp_os(argv[1], T("opnames"))) {
+    process_instruct();
   } else {
     usage();
     return 1;

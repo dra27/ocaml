@@ -232,21 +232,14 @@ endif
 # prims.c is a side-effect of producing primitives
 prims.c: primitives ;
 
-opnames.inc : caml/instruct.h
-	tr -d '\r' < $< | \
-	sed -e '/\/\*/d' \
-	    -e '/^#/d' \
-	    -e 's/enum /static char * names_of_/' \
-	    -e 's/{$$/[] = {/' \
-	    -e 's/\([[:upper:]][[:upper:]_0-9]*\)/"\1"/g' > $@
+opnames.inc: caml/instruct.h | sak$(EXE)
+	./sak$(EXE) opnames
+
+# jumptbl.inc is a side-effect of producing opnames.inc
+jumptbl.inc: opnames.inc ;
 
 sak$(EXE): sak.$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^)
-
-jumptbl.inc : caml/instruct.h
-	tr -d '\r' < $< | \
-	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
-	       -e '/^}/q' > $@
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
