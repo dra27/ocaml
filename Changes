@@ -19,6 +19,11 @@ OCaml 4.11 maintenance branch
   only needed for dllunix.dll).
   (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
 
+### Internal/compiler-libs changes:
+
+- #10045: Add libext variable to ocamltest and enable C# tests on on mingw
+  (David Allsopp, review by Gabriel Scherer)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
