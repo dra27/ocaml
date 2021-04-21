@@ -37,6 +37,8 @@ let str = @@STR@@
 
 let objext = "@@OBJEXT@@"
 
+let libext = "@@LIBEXT@@"
+
 let asmext = "@@ASMEXT@@"
 
 let system = "@@SYSTEM@@"
