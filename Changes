@@ -35,6 +35,9 @@ OCaml 4.09 maintenance branch
   Use KEEP_TEST_DIR_ON_SUCCESS=1 to keep all artifacts.
   (Gabriel Scherer, review by Sébastien Hinderer)
 
+- #10045: Add libext variable to ocamltest and enable C# tests on on mingw
+  (David Allsopp, review by Gabriel Scherer)
+
 ### Build system:
 
 - #8650: ensure that "make" variables are defined before use;
