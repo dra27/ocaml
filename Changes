@@ -12,6 +12,11 @@ OCaml 4.12, maintenance version
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+### Internal/compiler-libs changes:
+
+- #10045: Add libext variable to ocamltest and enable C# tests on on mingw
+  (David Allsopp, review by Gabriel Scherer)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
