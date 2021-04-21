@@ -37,6 +37,8 @@ let str = @@STR@@
 
 let objext = "@@OBJEXT@@"
 
+let libext = "@@LIBEXT@@"
+
 let system = "@@SYSTEM@@"
 
 let c_preprocessor = "@@CPP@@"

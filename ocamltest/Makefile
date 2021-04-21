@@ -46,24 +46,23 @@ endif
 ifeq "$(UNIX_OR_WIN32)" "win32"
   ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)"|cygpath -w -f - \
     | sed 's/\\/\\\\\\\\/g')
+  CSC := csc
+  ifeq "$(HOST:i686-%=i686)" "i686"
+    CSCFLAGS := /platform:x86
+  else
+    CSCFLAGS :=
+  endif
+  CSCFLAGS += /nologo /nowarn:1668
   mkexe := $(MKEXE_ANSI) -link $(OC_LDFLAGS)
 else
   ocamlsrcdir := $(abspath $(shell pwd)/..)
+  CSC :=
+  CSCFLAGS :=
   mkexe := $(MKEXE)
 endif
 
 ifeq "$(TOOLCHAIN)" "msvc"
 CPP := $(CPP) 2> nul
-CSC := csc
-ifeq "$(HOST)" "i686-pc-windows"
-CSCFLAGS := /platform:x86
-else
-CSCFLAGS :=
-endif
-CSCFLAGS += /nologo /nowarn:1668
-else
-CSC :=
-CSCFLAGS :=
 endif
 
 ifeq "$(WITH_OCAMLDOC)" "ocamldoc"
@@ -243,6 +242,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 	  -e 's|@@OCAMLDOC@@|$(WITH_OCAMLDOC)|' \
 	  -e 's|@@OCAMLDEBUG@@|$(WITH_OCAMLDEBUG)|' \
 	  -e 's|@@OBJEXT@@|$(O)|' \
+	  -e 's|@@LIBEXT@@|$(A)|' \
 	  -e 's|@@NATIVE_DYNLINK@@|$(NATDYNLINK)|' \
 	  -e 's|@@SHARED_LIBRARY_CFLAGS@@|$(SHAREDLIB_CFLAGS)|' \
 	  -e 's|@@SHAREDOBJEXT@@|$(SO)|' \
