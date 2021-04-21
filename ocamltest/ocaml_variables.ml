@@ -117,6 +117,9 @@ let nativecc_libs = make ("nativecc_libs",
 let objext = make ("objext",
   "Extension of object files")
 
+let libext = make ("libext",
+  "Extension of library files")
+
 let ocamlc_byte = make ("ocamlc_byte",
   "Path of the ocamlc.byte executable")
 
@@ -250,6 +253,7 @@ let _ = List.iter register_variable
     modules;
     nativecc_libs;
     objext;
+    libext;
     ocamlc_byte;
     ocamlopt_byte;
     ocamlrun;

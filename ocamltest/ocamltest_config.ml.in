@@ -37,6 +37,8 @@ let str = %%str%%
 
 let objext = "%%O%%"
 
+let libext = "%%A%%"
+
 let system = "%%SYSTEM%%"
 
 let c_preprocessor = "%%CPP%%"
