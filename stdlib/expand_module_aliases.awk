@@ -16,7 +16,7 @@
 # stdlib.ml and stdlib.mli
 BEGIN { state=0 }
 NR == 1 { printf ("# 1 \"%s\"\n", FILENAME) }
-/\(\*MODULE_ALIASES\*\)\r?/ { state=1 }
+/\[%%ocaml\.stdlib_aliases\]\r?/ { state=1 }
 { if (state==0)
     { if (FILENAME ~ /Labels/ &&
           sub(/@since [^(]* \(/, "@since ")) sub(/ in [^)]*\)/, ""); print; }
