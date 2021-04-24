@@ -843,6 +843,9 @@ let mk_dstartup f =
   "-dstartup", Arg.Unit f, " (undocumented)"
 ;;
 
+let mk_bootstrap_ppx f =
+  "-bootstrap-ppx", Arg.String f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -998,6 +1001,8 @@ module type Compiler_options = sig
   val _dprofile : unit -> unit
   val _dump_into_file : unit -> unit
 
+  val _bootstrap_ppx : string -> unit
+
   val _args: string -> string array
   val _args0: string -> string array
 end
@@ -1131,6 +1136,7 @@ module type Ocamldoc_options = sig
   val _v : unit -> unit
   val _verbose : unit -> unit
   val _vmthread : unit -> unit
+  val _bootstrap_ppx : string -> unit
 end
 
 module type Arg_list = sig
@@ -1244,6 +1250,7 @@ struct
     mk_dtimings F._dtimings;
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
+    mk_bootstrap_ppx F._bootstrap_ppx;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1464,6 +1471,7 @@ struct
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
     mk_dump_pass F._dump_pass;
+    mk_bootstrap_ppx F._bootstrap_ppx;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1613,6 +1621,7 @@ struct
     mk_vnum F._vnum;
     mk_w F._w;
     mk__ F.anonymous;
+    mk_bootstrap_ppx F._bootstrap_ppx;
   ]
 end;;
 
@@ -1693,9 +1702,11 @@ module Default = struct
     let _unsafe_string = set unsafe_string
     let _w s =
       Warnings.parse_options false s |> Option.iter Location.(prerr_alert none)
+    let _bootstrap_ppx = function
+    | "stdlib-aliases" -> bootstrap_ppx := Some Stdlib_aliases
+    | _ -> raise (Arg.Bad "Unrecognised boot ppx pass")
 
     let anonymous = Compenv.anonymous
-
   end
 
   module Core = struct
