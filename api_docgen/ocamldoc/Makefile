@@ -40,8 +40,7 @@ build/latex/ifocamldoc.tex: | build/latex
 
 OCAMLDOC_FLAGS =
 
-build/libref/stdlib.odoc: OCAMLDOC_FLAGS += -pp \
-  "$(AWK) -v ocamldoc=true -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"
+build/libref/stdlib.odoc: OCAMLDOC_FLAGS += -bootstrap-ppx stdlib-aliases
 
 build/libref/%Labels.odoc: OCAMLDOC_FLAGS += -pp \
   "$(AWK) -v ocamldoc=true -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"

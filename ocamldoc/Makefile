@@ -283,7 +283,8 @@ test:
 .PHONY: test_stdlib
 test_stdlib:
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
+	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc \
+                  -keep-code -bootstrap-ppx stdlib-aliases \
 	$(ROOTDIR)/stdlib/*.mli \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.mli \
 	$(ROOTDIR)/otherlibs/str/str.mli
@@ -291,7 +292,8 @@ test_stdlib:
 .PHONY: test_stdlib_code
 test_stdlib_code:
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
+	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc \
+                  -bootstrap-ppx stdlib-aliases -keep-code \
 	$(addprefix $(ROOTDIR)/stdlib/, $(filter-out %Labels.ml, $(addsuffix .ml, $(STDLIB_MODULE_BASENAMES)))) \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.ml \
 	$(ROOTDIR)/otherlibs/str/str.ml
@@ -299,7 +301,7 @@ test_stdlib_code:
 .PHONY: test_latex
 test_latex:
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -latex -sort -o $@/test.tex -d $@ $(INCLUDES) odoc*.ml \
+	$(OCAMLDOC_RUN) -latex -sort -o $@/test.tex -d $@ $(INCLUDES) odoc*.ml -bootstrap-ppx stdlib-aliases \
 	        odoc*.mli test2.txt $(ROOTDIR)/stdlib/*.mli $(ROOTDIR)/otherlibs/unix/unix.mli
 
 .PHONY: test_latex_simple
