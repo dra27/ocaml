@@ -41,7 +41,7 @@ build/latex/ifocamldoc.tex: | build/latex
 $(libref:%=build/libref/%.odoc): build/libref/%.odoc: %.mli | build/libref
 	$(OCAMLDOC_RUN) -nostdlib -hide Stdlib -lib Stdlib \
 	-pp \
-"$(AWK) -v ocamldoc=true -f $(ROOTDIR)/stdlib/expand_module_aliases.awk" \
+"$(AWK) -f $(ROOTDIR)/stdlib/expand_module_aliases.awk" \
 	$(DOC_STDLIB_INCLUDES) $< -dump  $@
 
 $(compilerlibref:%=build/compilerlibref/%.odoc):\
