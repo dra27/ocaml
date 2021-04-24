@@ -14,6 +14,7 @@
 (**************************************************************************)
 
 open Format
+open Ast_mapper
 
 type error =
   | CannotRun of string
@@ -109,28 +110,42 @@ let rewrite kind ppxs ast =
   read_ast kind fn
 
 let apply_rewriters_str ?(restore = true) ~tool_name ast =
-  match !Clflags.all_ppx with
-  | [] -> ast
-  | ppxs ->
-      let ast =
-        ast
-        |> Ast_mapper.add_ppx_context_str ~tool_name
-        |> rewrite Structure ppxs
-        |> Ast_mapper.drop_ppx_context_str ~restore
-      in
-      Ast_invariants.structure ast; ast
+  let ast =
+    match !Clflags.all_ppx with
+    | [] -> ast
+    | ppxs ->
+        let ast =
+          ast
+          |> Ast_mapper.add_ppx_context_str ~tool_name
+          |> rewrite Structure ppxs
+          |> Ast_mapper.drop_ppx_context_str ~restore
+        in
+        Ast_invariants.structure ast; ast
+  in
+  if !Clflags.bstdlib_aliases then
+    let mapper = Compiler_ppx.stdlib_aliases () in
+    mapper.structure mapper ast
+  else
+    ast
 
 let apply_rewriters_sig ?(restore = true) ~tool_name ast =
-  match !Clflags.all_ppx with
-  | [] -> ast
-  | ppxs ->
-      let ast =
-        ast
-        |> Ast_mapper.add_ppx_context_sig ~tool_name
-        |> rewrite Signature ppxs
-        |> Ast_mapper.drop_ppx_context_sig ~restore
-      in
-      Ast_invariants.signature ast; ast
+  let ast =
+    match !Clflags.all_ppx with
+    | [] -> ast
+    | ppxs ->
+        let ast =
+          ast
+          |> Ast_mapper.add_ppx_context_sig ~tool_name
+          |> rewrite Signature ppxs
+          |> Ast_mapper.drop_ppx_context_sig ~restore
+        in
+        Ast_invariants.signature ast; ast
+  in
+  if !Clflags.bstdlib_aliases then
+    let mapper = Compiler_ppx.stdlib_aliases () in
+    mapper.signature mapper ast
+  else
+    ast
 
 let apply_rewriters ?restore ~tool_name
     (type a) (kind : a ast_kind) (ast : a) : a =

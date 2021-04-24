@@ -851,6 +851,9 @@ let mk_bruntimedef f =
 let mk_bstdlib f =
   "-bstdlib", Arg.String f, " (undocumented)"
 
+let mk_bstdlib_aliases f =
+  "-bstdlib-aliases", Arg.Unit f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -1005,6 +1008,8 @@ module type Compiler_options = sig
   val _dtimings : unit -> unit
   val _dprofile : unit -> unit
   val _dump_into_file : unit -> unit
+
+  val _bstdlib_aliases : unit -> unit
 
   val _args: string -> string array
   val _args0: string -> string array
@@ -1260,6 +1265,7 @@ struct
     mk_bopnames F._bopnames;
     mk_bruntimedef F._bruntimedef;
     mk_bstdlib F._bstdlib;
+    mk_bstdlib_aliases F._bstdlib_aliases;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1479,6 +1485,7 @@ struct
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
     mk_dump_pass F._dump_pass;
+    mk_bstdlib_aliases F._bstdlib_aliases;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1894,6 +1901,7 @@ module Default = struct
     let _where () = Compenv.print_standard_library ()
     let _with_runtime = set with_runtime
     let _without_runtime = clear with_runtime
+    let _bstdlib_aliases = set bstdlib_aliases
   end
 
   module Toplevel = struct

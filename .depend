@@ -5800,6 +5800,22 @@ driver/compile_common.cmi : \
     typing/typedtree.cmi \
     parsing/parsetree.cmi \
     typing/env.cmi
+driver/compiler_ppx.cmo : \
+    parsing/parsetree.cmi \
+    parsing/location.cmi \
+    parsing/asttypes.cmi \
+    parsing/ast_mapper.cmi \
+    parsing/ast_helper.cmi \
+    driver/compiler_ppx.cmi
+driver/compiler_ppx.cmx : \
+    parsing/parsetree.cmi \
+    parsing/location.cmx \
+    parsing/asttypes.cmi \
+    parsing/ast_mapper.cmx \
+    parsing/ast_helper.cmx \
+    driver/compiler_ppx.cmi
+driver/compiler_ppx.cmi : \
+    parsing/ast_mapper.cmi
 driver/compmisc.cmo : \
     utils/warnings.cmi \
     typing/types.cmi \
@@ -6018,6 +6034,7 @@ driver/pparse.cmo : \
     utils/misc.cmi \
     parsing/location.cmi \
     utils/config.cmi \
+    driver/compiler_ppx.cmi \
     utils/clflags.cmi \
     utils/ccomp.cmi \
     parsing/ast_mapper.cmi \
@@ -6031,6 +6048,7 @@ driver/pparse.cmx : \
     utils/misc.cmx \
     parsing/location.cmx \
     utils/config.cmx \
+    driver/compiler_ppx.cmx \
     utils/clflags.cmx \
     utils/ccomp.cmx \
     parsing/ast_mapper.cmx \
