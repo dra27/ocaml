@@ -16,16 +16,15 @@
 # stdlib.ml and stdlib.mli
 BEGIN { state=0 }
 NR == 1 { printf ("# 1 \"%s\"\n", FILENAME) }
-/\[%%ocaml\.stdlib_aliases\]\r?/ { state=1 }
+/\[%%ocaml\.stdlib_aliases\]\r?/ { if (ocamldoc!="true") state=1 }
 { if (state==0)
     { if (FILENAME ~ /Labels/ &&
           sub(/@since [^(]* \(/, "@since ")) sub(/ in [^)]*\)/, ""); print; }
   else if (state==1)
     state=2;
   else if ($1 == "module")
-  { if (ocamldoc!="true") printf("\n(** @canonical Stdlib.%s *)", $2);
-    printf("\nmodule %s = Stdlib__%s\n", $2, $4);
-  }
+    printf("\n(** @canonical Stdlib.%s *)\nmodule %s = Stdlib__%s\n",
+           $2, $2, $4);
   else
     print
 }
