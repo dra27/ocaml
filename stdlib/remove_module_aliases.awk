@@ -17,5 +17,5 @@
 # other modules
 BEGIN { in_aliases=0 }
 NR == 1 { printf ("# 1 \"%s\"\n", FILENAME) }
-/^\(\*MODULE_ALIASES\*\)\r?$/ { in_aliases=1 }
+/^\[%%ocaml\.stdlib_aliases\]\r?$/ { in_aliases=1 }
 !in_aliases { print }

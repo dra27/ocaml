@@ -1348,7 +1348,7 @@ val do_at_exit : unit -> unit
 
 (** {1:modules Standard library modules } *)
 
-(*MODULE_ALIASES*)
+[%%ocaml.stdlib_aliases]
 module Arg          = Arg
 module Array        = Array
 module ArrayLabels  = ArrayLabels
