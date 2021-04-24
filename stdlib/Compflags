@@ -16,8 +16,7 @@
 
 case $1 in
   stdlib.cm[iox])
-      echo ' -nopervasives -no-alias-deps -w -49' \
-           ' -pp "$AWK -f ./expand_module_aliases.awk"';;
+      echo ' -nopervasives -no-alias-deps -w -49 -bstdlib-aliases';;
   # stdlib dependencies
   camlinternalFormatBasics*.cm[iox]) echo ' -nopervasives';;
   camlinternalAtomic.cm[iox]) echo ' -nopervasives';;
