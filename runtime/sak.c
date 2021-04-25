@@ -49,8 +49,14 @@
 
 #ifdef _WIN32
 #define WRITE_TEXT_FILE T("wt")
+#define printf_os wprintf
+#define strchr_os wcschr
+#define sscanf_os swscanf
 #else
 #define WRITE_TEXT_FILE T("w")
+#define printf_os printf
+#define strchr_os strchr
+#define sscanf_os sscanf
 #endif
 
 void usage(void)
@@ -58,7 +64,8 @@ void usage(void)
   printf("OCaml Build System Swiss Army Knife\n"
          "Usage: sak command\n"
          "Commands:\n"
-         " * primitives - generates primitives and prims.c in current dir\n");
+         " * primitives - generates primitives and prims.c in current dir\n"
+         " * version string - generates version.h from the given string\n");
 }
 
 char *read_file(char_os *path)
@@ -224,19 +231,54 @@ void harvest_primitives(void)
     puts("primitives.new");
 }
 
+void convert_version(char_os *content)
+{
+  char_os *p, *q;
+  int major, minor, patchlvl, read;
+
+  printf_os(T("#ifndef CAML_VERSION_H\n")
+            T("#define CAML_VERSION_H\n")
+            T("#define OCAML_VERSION_STRING \"%s\"\n"), content);
+
+  p = strchr_os(content, '+');
+  q = strchr_os(content, '~');
+  if (p == NULL || (q != NULL && q < p))
+    p = q;
+
+  /* If p isn't NULL then it points to the first + or ~ in content. Set that
+     to NULL to terminate the string passed to scanf and leave p pointing to
+     the additional info.
+     */
+  if (p != NULL && *p != 0)
+    *p++ = 0;
+  if (p != NULL && *p != 0)
+    printf_os(T("#define OCAML_VERSION_ADDITIONAL \"%s\"\n"), p);
+  else
+    printf_os(T("#undef OCAML_VERSION_ADDITIONAL\n"));
+
+  if (sscanf_os(content, T("%u.%u.%u%n"), &major, &minor, &patchlvl, &read) == 3
+      && read == strlen_os(content)) {
+    printf_os(T("#define OCAML_VERSION_MAJOR %d\n")
+              T("#define OCAML_VERSION_MINOR %d\n")
+              T("#define OCAML_VERSION_PATCHLEVEL %d\n")
+              T("#define OCAML_VERSION %d%02d%02d\n")
+              T("#endif /*CAML_VERSION_H*/\n"),
+              major, minor, patchlvl, major, minor, patchlvl);
+  } else {
+    die("unable to parse the version number");
+  }
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
 int main(int argc, char **argv)
 #endif
 {
-  if (argc != 2) {
-    usage();
-    return 1;
-  }
-
-  if (!strcmp_os(argv[1], T("primitives"))) {
+  if (argc == 2 && !strcmp_os(argv[1], T("primitives"))) {
     harvest_primitives();
+  } else if (argc == 3 && !strcmp_os(argv[1], T("version"))) {
+    convert_version(argv[2]);
   } else {
     usage();
     return 1;
