@@ -276,5 +276,4 @@ _build
 /utils/domainstate.mli
 
 /yacc/ocamlyacc
-/yacc/version.h
 /yacc/.gdb_history
