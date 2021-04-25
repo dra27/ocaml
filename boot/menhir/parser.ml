@@ -1,4 +1,3 @@
-
 (* This generated code requires the following version of MenhirLib: *)
 
 let () =
