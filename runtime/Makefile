@@ -237,8 +237,8 @@ jumptbl.inc opnames.inc : caml/instruct.h | sak$(EXE)
 sak$(EXE): sak.$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^)
 
-caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
-	$^ > $@
+caml/version.h : $(ROOTDIR)/VERSION | sak$(EXE)
+	./sak$(EXE) version '$(shell sed -ne 1p $< | tr -d '\r')' > $@
 
 # Libraries and programs
 
