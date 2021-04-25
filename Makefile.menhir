@@ -93,7 +93,7 @@ promote-menhir: parsing/parser.mly
 # rebuilds the same grammar (from the same Menhir version).
 	@ for f in $(addprefix parser.,ml mli) ; do \
 	  sed \
-	    's,^#\(.*\)"[^"]*/menhir/standard.mly",#\1"menhir/standard.mly",g' \
+	    '1d;s,^#\(.*\)"[^"]*/menhir/standard.mly",#\1"menhir/standard.mly",g' \
 	    parsing/$$f \
 	    > boot/menhir/$$f; \
 	  rm parsing/$$f; \

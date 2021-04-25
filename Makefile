@@ -1271,9 +1271,11 @@ parsing/parser.ml: $(PARSER_DEPS)
 ifeq "$(OCAML_DEVELOPMENT_VERSION)" "true"
 	@-tools/check-parser-uptodate-or-warn.sh
 endif
-	$(V_GEN)sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+	$(V_GEN)echo 'module MenhirLib = CamlinternalMenhirLib' > $@
+	@cat $< >> $@
 parsing/parser.mli: boot/menhir/parser.mli
-	$(V_GEN)sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+	$(V_GEN)echo 'module MenhirLib = CamlinternalMenhirLib' > $@
+	@cat $< >> $@
 
 beforedepend:: parsing/camlinternalMenhirLib.ml \
   parsing/camlinternalMenhirLib.mli \
