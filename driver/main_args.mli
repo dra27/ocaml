@@ -120,6 +120,7 @@ module type Compiler_options = sig
   val _dprofile : unit -> unit
   val _dump_into_file : unit -> unit
   val _bstdlib_aliases : unit -> unit
+  val _bstdlib_since : unit -> unit
 
   val _args: string -> string array
   val _args0: string -> string array

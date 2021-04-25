@@ -122,11 +122,17 @@ let apply_rewriters_str ?(restore = true) ~tool_name ast =
         in
         Ast_invariants.structure ast; ast
   in
-  if !Clflags.bstdlib_aliases then
-    let mapper = Compiler_ppx.stdlib_aliases () in
-    mapper.structure mapper ast
-  else
-    ast
+  let mapper =
+    if !Clflags.bstdlib_aliases then
+      let m = Compiler_ppx.stdlib_aliases () in
+      fun ast -> m.structure m ast
+    else if !Clflags.bstdlib_since then
+      let m = Compiler_ppx.labelled_since () in
+      fun ast -> m.structure m ast
+    else
+      Fun.id
+  in
+  mapper ast
 
 let apply_rewriters_sig ?(restore = true) ~tool_name ast =
   let ast =
@@ -141,11 +147,17 @@ let apply_rewriters_sig ?(restore = true) ~tool_name ast =
         in
         Ast_invariants.signature ast; ast
   in
-  if !Clflags.bstdlib_aliases then
-    let mapper = Compiler_ppx.stdlib_aliases () in
-    mapper.signature mapper ast
-  else
-    ast
+  let mapper =
+    if !Clflags.bstdlib_aliases then
+      let m = Compiler_ppx.stdlib_aliases () in
+      fun ast -> m.signature m ast
+    else if !Clflags.bstdlib_since then
+      let m = Compiler_ppx.labelled_since () in
+      fun ast -> m.signature m ast
+    else
+      Fun.id
+  in
+  mapper ast
 
 let apply_rewriters ?restore ~tool_name
     (type a) (kind : a ast_kind) (ast : a) : a =
