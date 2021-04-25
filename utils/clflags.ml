@@ -380,6 +380,7 @@ let bruntimedef = ref None
 let bstdlib = ref None
 let bcapitalize = ref None
 let bstdlib_aliases = ref false
+let bstdlib_since = ref false
 
 type 'a env_reader = {
   parse : string -> 'a option;

@@ -21,3 +21,5 @@
 
 val stdlib_aliases : unit -> Ast_mapper.mapper
 (** Handles the stdlib__ prefixing in stdlib.ml and stdlib.mli *)
+
+val labelled_since : unit -> Ast_mapper.mapper

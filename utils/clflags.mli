@@ -221,6 +221,7 @@ val bruntimedef : string option ref
 val bstdlib : string option ref
 val bcapitalize : string option ref
 val bstdlib_aliases : bool ref
+val bstdlib_since : bool ref
 
 (* Support for flags that can also be set from an environment variable *)
 type 'a env_reader = {
