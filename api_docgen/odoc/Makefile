@@ -38,8 +38,7 @@ endef
 
 # define the right conditional for the manual
 build/latex/ifocamldoc.tex: | build/latex
-	printf '\\newif\ifocamldoc\ocamldocfalse\n' > $@
-
+	echo '\\newif\\ifocamldoc\\ocamldocfalse' > $@
 
 # \input{} all modules in the stdlib for the latex api manual
 stdlib_INPUT= $(foreach module,\
