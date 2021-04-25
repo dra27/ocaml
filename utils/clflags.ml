@@ -379,7 +379,7 @@ type boot_function =
   | Stdlib of string
   | Capitalize of string
 let bootstrap = ref None
-type compiler_ppx_pass = Stdlib_aliases
+type compiler_ppx_pass = Stdlib_aliases | Labelled_since_annotations
 let bootstrap_ppx = ref None
 
 type 'a env_reader = {

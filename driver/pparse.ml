@@ -126,6 +126,9 @@ let apply_rewriters_str ?(restore = true) ~tool_name ast =
   | Some Stdlib_aliases ->
     let mapper = Compiler_ppx.stdlib_aliases () in
     mapper.structure mapper ast
+  | Some Labelled_since_annotations ->
+    let mapper = Compiler_ppx.labelled_since () in
+    mapper.structure mapper ast
   | None -> ast
 
 let apply_rewriters_sig ?(restore = true) ~tool_name ast =
@@ -144,6 +147,9 @@ let apply_rewriters_sig ?(restore = true) ~tool_name ast =
   match !Clflags.bootstrap_ppx with
   | Some Stdlib_aliases ->
     let mapper = Compiler_ppx.stdlib_aliases () in
+    mapper.signature mapper ast
+  | Some Labelled_since_annotations ->
+    let mapper = Compiler_ppx.labelled_since () in
     mapper.signature mapper ast
   | None -> ast
 

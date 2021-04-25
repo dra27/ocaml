@@ -454,12 +454,16 @@ odoc_lexer.cmo : \
     odoc_parser.cmi \
     odoc_messages.cmo \
     odoc_global.cmi \
-    odoc_comments_global.cmi
+    odoc_comments_global.cmi \
+    ../driver/compiler_ppx.cmi \
+    ../utils/clflags.cmi
 odoc_lexer.cmx : \
     odoc_parser.cmx \
     odoc_messages.cmx \
     odoc_global.cmx \
-    odoc_comments_global.cmx
+    odoc_comments_global.cmx \
+    ../driver/compiler_ppx.cmx \
+    ../utils/clflags.cmx
 odoc_man.cmo : \
     odoc_str.cmi \
     odoc_print.cmi \

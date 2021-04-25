@@ -222,7 +222,7 @@ type boot_function =
   | Stdlib of string
   | Capitalize of string
 val bootstrap : boot_function option ref
-type compiler_ppx_pass = Stdlib_aliases
+type compiler_ppx_pass = Stdlib_aliases | Labelled_since_annotations
 val bootstrap_ppx : compiler_ppx_pass option ref
 
 (* Support for flags that can also be set from an environment variable *)
