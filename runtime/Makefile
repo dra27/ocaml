@@ -235,8 +235,8 @@ prims.c: primitives ;
 sak$(EXE): sak.$(O)
 	$(call MKEXE_VIA_CC,$@,$^)
 
-caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
-	$^ > $@
+caml/version.h : $(ROOTDIR)/VERSION | sak$(EXE)
+	./sak$(EXE) version '$(shell sed -ne 1p $< | tr -d '\r')' > $@
 
 # Libraries and programs
 
