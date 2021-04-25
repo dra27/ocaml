@@ -1704,6 +1704,7 @@ module Default = struct
       Warnings.parse_options false s |> Option.iter Location.(prerr_alert none)
     let _bootstrap_ppx = function
     | "stdlib-aliases" -> bootstrap_ppx := Some Stdlib_aliases
+    | "stdlib-since" -> bootstrap_ppx := Some Labelled_since_annotations
     | _ -> raise (Arg.Bad "Unrecognised boot ppx pass")
 
     let anonymous = Compenv.anonymous
