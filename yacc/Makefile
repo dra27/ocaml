@@ -33,8 +33,6 @@ ocamlyacc_SOURCES := $(addsuffix .c,\
 
 ocamlyacc_OBJECTS := $(ocamlyacc_SOURCES:.c=.$(O))
 
-generated_files := ocamlyacc$(EXE) $(ocamlyacc_OBJECTS)  version.h
-
 all: ocamlyacc$(EXE)
 
 ocamlyacc$(EXE): $(ocamlyacc_OBJECTS)
