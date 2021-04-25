@@ -1,4 +1,3 @@
-
 (* The type of tokens. *)
 
 type token = 
