@@ -888,9 +888,11 @@ parsing/camlinternalMenhirLib.mli: boot/menhir/menhirLib.mli
 parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly \
   tools/check-parser-uptodate-or-warn.sh
 	@-tools/check-parser-uptodate-or-warn.sh
-	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+	echo 'module MenhirLib = CamlinternalMenhirLib' > $@
+	cat $< >> $@
 parsing/parser.mli: boot/menhir/parser.mli
-	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+	echo 'module MenhirLib = CamlinternalMenhirLib' > $@
+	cat $< >> $@
 
 beforedepend:: parsing/camlinternalMenhirLib.ml \
   parsing/camlinternalMenhirLib.mli \
