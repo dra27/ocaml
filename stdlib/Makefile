@@ -203,13 +203,7 @@ stdlib.cma: $(OBJS)
 stdlib.cmxa: $(OBJS:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 
-sys.ml: $(ROOTDIR)/VERSION sys.mlp
-	sed -e "s|%%VERSION%%|`sed -e 1q $< | tr -d '\r'`|" sys.mlp > $@
-
 .PHONY: clean
-clean::
-	rm -f sys.ml
-
 clean::
 	rm -f $(CAMLHEADERS)
 
@@ -260,7 +254,7 @@ clean::
 	rm -rf flexdll
 
 .INTERMEDIATE: l.tmp
-Makefile.stdlib_modules: | sys.ml
+Makefile.stdlib_modules:
 	$(MAKE) --no-print-directory -j 1 -f Makefile.link-order > l.tmp
 	$(CAMLC) -bstdlib l.tmp > $@
 	rm -f l.tmp

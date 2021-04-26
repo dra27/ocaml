@@ -121,7 +121,7 @@ make tests
 ## 5: build, tag and push the new release
 
 ```
-# at this point, the VERSION file contains N+devD
+# at this point, the AC_INIT macro in configure.ac contains N+devD
 # increment it into N+dev(D+1); for example,
 #   4.07.0+dev8-2018-06-19 => 4.07.0+dev9-2018-06-26
 # for production releases: check and change the Changes header
@@ -129,7 +129,7 @@ make tests
 make -B configure
 git commit -a -m "last commit before tagging $VERSION"
 
-# update VERSION with the new release; for example,
+# update AC_INIT in configure.ac with the new release; for example,
 #   4.07.0+dev9-2018-06-26 => 4.07.0+rc2
 # Update ocaml-variants.opam with new version.
 # Update \year in manual/src/macros.hva
@@ -140,13 +140,14 @@ make coreboot -j5 # must say "Fixpoint reached, bootstrap succeeded."
 git commit -m "release $VERSION" -a
 git tag -m "release $VERSION" $TAGVERSION
 
-# for production releases, change the VERSION file into (N+1)+dev0; for example,
+# for production releases, change AC_INIT in configure.ac file into (N+1)+dev0;
+# for example,
 #   4.08.0 => 4.08.1+dev0
 # for testing candidates, use N+dev(D+2) instead; for example,
 #   4.07.0+rc2 => 4.07.0+dev10-2018-06-26
 # Revert ocaml-variants.opam to its "trunk" version.
 make -B configure
-git commit -m "increment version number after tagging $VERSION" VERSION configure ocaml-variants.opam
+git commit -m "increment version number after tagging $VERSION" configure.ac configure ocaml-variants.opam
 git push
 git push --tags
 ```
@@ -155,7 +156,7 @@ git push --tags
 
 This needs to be more tested, tread with care.
 ```
-# at this point, the VERSION file contains N+devD
+# at this point, the AC_INIT in configure.ac file contains N+devD
 # increment it into N+dev(D+1); for example,
 #   4.07.0+dev0-2018-06-19 => 4.07.0+dev1-2018-06-26
 # Rename the "Working version" header in Changes
@@ -164,7 +165,7 @@ make -B configure
 git commit -a -m "last commit before branching $BRANCH"
 git branch $BRANCH
 
-# update VERSION with the new future branch,
+# update AC_INIT in configure.ac with the new future branch,
 #   4.07.0+dev1-2018-06-26 => 4.08.0+dev0-2018-06-30
 # Update ocaml-variants.opam with new version.
 make -B configure
@@ -175,7 +176,7 @@ git push
 
 # Switch to the new branch
 git checkout $BRANCH
-# increment VERSION, for instance
+# increment AC_INIT in configure.ac, for instance
 #   4.07.0+dev1-2018-06-26 => 4.07.0+dev2-2018-06-30
 make -B configure
 git commit -m "first commit on branch $BRANCH" -a
