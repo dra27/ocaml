@@ -208,7 +208,7 @@ utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
 utils/domainstate.mli: utils/domainstate.mli.c runtime/caml/domain_state.tbl
 	$(CPP) -I runtime/caml $< > $@
 
-configure: configure.ac aclocal.m4 VERSION tools/autogen
+configure: configure.ac aclocal.m4 tools/autogen
 	tools/autogen
 
 .PHONY: partialclean
@@ -975,8 +975,6 @@ parsing/camlinternalMenhirLib.mli: boot/menhir/menhirLib.mli
 
 # Copy parsing/parser.ml from boot/
 
-OCAML_VERSION=$(shell sed -ne 1p VERSION)
-
 parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly
 ifneq "$(findstring +dev, $(OCAML_VERSION))" ""
 	@-tools/check-parser-uptodate-or-warn.sh
@@ -1229,6 +1227,7 @@ distclean: clean
 	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
+	rm -f stdlib/sys.ml
 	rm -rf autom4te.cache flexdll-sources
 	rm -f config.log config.status libtool
 	rm -f tools/eventlog_metadata

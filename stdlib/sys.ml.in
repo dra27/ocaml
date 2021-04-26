@@ -1,4 +1,3 @@
-#2 "stdlib/sys.mlp"
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -14,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* WARNING: sys.ml is generated from sys.mlp.  DO NOT EDIT sys.ml or
+(* WARNING: sys.ml is generated from sys.ml.in.  DO NOT EDIT sys.ml or
    your changes will be lost.
 *)
 
@@ -126,9 +125,9 @@ external enable_runtime_warnings: bool -> unit =
 external runtime_warnings_enabled: unit -> bool =
   "caml_ml_runtime_warnings_enabled"
 
-(* The version string is found in file ../VERSION *)
-
-let ocaml_version = "%%VERSION%%"
+(* The version string is found in file ../configure.ac (AC_INIT call)
+   This source line is scanned by the manual's build system. *)
+let ocaml_version = {@id@|@PACKAGE_VERSION@|@id@}
 
 (* Optimization *)
 
