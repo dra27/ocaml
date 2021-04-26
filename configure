@@ -777,6 +777,8 @@ build_os
 build_vendor
 build_cpu
 build
+csc_flags
+csc
 ar_supports_response_files
 QS
 ocaml_libdir
@@ -3401,6 +3403,8 @@ OCAML_VERSION_SHORT=5.1
 
 
 
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3599,20 +3603,6 @@ case $host in #(
   SO=so
   outputexe='-o '
   syslib='-l$(1)' ;;
-esac
-
-case $host in #(
-  *-*-mingw32*|*-pc-windows) :
-    CSC=csc
-    CSCFLAGS="/nologo /nowarn:1668"
-    case $host_cpu in #(
-  i*86) :
-    CSCFLAGS="$CSCFLAGS /platform:x86" ;; #(
-  *) :
-     ;;
-esac ;; #(
-  *) :
-     ;;
 esac
 
 # Environment variables that are taken into account
@@ -15793,6 +15783,65 @@ printf "%s\n" "$as_me: rlwrap doesn't work with native win32 - disabling" >&6;}
   *) :
      ;;
 esac
+
+# C# compiler (for the testsuite)
+# Extract the first word of "csc", so it can be a program name with args.
+set dummy csc; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_CSC+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$CSC"; then
+  ac_cv_prog_CSC="$CSC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CSC="csc"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CSC=$ac_cv_prog_CSC
+if test -n "$CSC"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $CSC" >&5
+printf "%s\n" "$CSC" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+if test -n "$CSC"
+then :
+  case $host in #(
+  *-*-cygwin*|*-*-mingw32|*-pc-windows) :
+    CSCFLAGS='/nologo /nowarn:1668'
+    if ! $arch64
+then :
+  CSCFLAGS="$CSCFLAGS /platform:x86"
+fi ;; #(
+  *) :
+    CSC=''
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Mono is not yet supported - C sharp tests disabled" >&5
+printf "%s\n" "$as_me: WARNING: Mono is not yet supported - C sharp tests disabled" >&2;} ;;
+esac
+fi
 
 # Checks for library functions
 
