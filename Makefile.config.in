@@ -93,7 +93,7 @@ O=@OBJEXT@
 EXT_OBJ=.@OBJEXT@
 
 ### How to tell the C compiler to output an object file
-OUTPUTOBJ=@outputobj@
+OUTPUTOBJ=@outputobj@$(EMPTY)
 
 ### Extension of static libraries
 A=@libext@
@@ -183,12 +183,12 @@ OC_CFLAGS=@oc_cflags@
 CFLAGS?=@CFLAGS@
 OC_CPPFLAGS=@oc_cppflags@
 CPPFLAGS?=@CPPFLAGS@
-OCAMLC_CFLAGS=@ocamlc_cflags@
+OCAMLC_CFLAGS=@ocamlc_cflags@ $(CFLAGS)
 
-OCAMLC_CPPFLAGS=@ocamlc_cppflags@
+OCAMLC_CPPFLAGS=@ocamlc_cppflags@ $(CPPFLAGS)
 BYTECCLIBS=@bytecclibs@
 EXE=@exeext@
-OUTPUTEXE=@outputexe@
+OUTPUTEXE=@outputexe@$(EMPTY)
 SUPPORTS_SHARED_LIBRARIES=@supports_shared_libraries@
 MKSHAREDLIBRPATH=@mksharedlibrpath@
 DYNLINKOPTS=@DLLIBS@
@@ -198,11 +198,11 @@ SYSLIB=@syslib@
 MKLIB=@mklib@
 # #7678: ocamlopt uses these only to compile .c files, and the behaviour for the
 #        two drivers should be identical.
-OCAMLOPT_CFLAGS=@ocamlc_cflags@
-OCAMLOPT_CPPFLAGS=@ocamlc_cppflags@
+OCAMLOPT_CFLAGS=@ocamlc_cflags@ $(CFLAGS)
+OCAMLOPT_CPPFLAGS=@ocamlc_cppflags@ $(CPPFLAGS)
 NATIVECCLIBS=@nativecclibs@
 SYSTHREAD_SUPPORT=@systhread_support@
-PACKLD=@PACKLD@
+PACKLD=@PACKLD@$(EMPTY)
 FLEXDLL_CHAIN=@flexdll_chain@
 EXTRALIBS=@extralibs@
 CCOMPTYPE=@ccomptype@
@@ -214,8 +214,8 @@ CMXS=@cmxs@
 # or OCAML_FLEXLINK overriding will not work (see utils/config.mlp)
 
 MKEXE=@mkexe@
-MKDLL=@mksharedlib@
-MKMAINDLL=@mkmaindll@
+MKDLL=@mksharedlib@ $(LDFLAGS)
+MKMAINDLL=@mkmaindll@ $(LDFLAGS)
 
 MKEXEDEBUGFLAG=@mkexedebugflag@
 RUNTIMED=@debug_runtime@

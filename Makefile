@@ -104,9 +104,6 @@ include compilerlibs/Makefile.compilerlibs
 
 # The configuration file
 
-utils/config.ml: utils/config.mlp Makefile.config utils/Makefile
-	$(MAKE) -C utils config.ml
-
 .PHONY: reconfigure
 reconfigure:
 	ac_read_git_config=true ./configure $(CONFIGURE_ARGS)
@@ -122,10 +119,10 @@ configure: configure.ac aclocal.m4 tools/autogen
 
 .PHONY: partialclean
 partialclean::
-	rm -f utils/config.ml utils/domainstate.ml utils/domainstate.mli
+	rm -f utils/domainstate.ml utils/domainstate.mli
 
 .PHONY: beforedepend
-beforedepend:: utils/config.ml utils/domainstate.ml utils/domainstate.mli
+beforedepend:: utils/domainstate.ml utils/domainstate.mli
 
 programs := expunge ocaml ocamlc ocamlc.opt ocamlnat ocamlopt ocamlopt.opt
 
@@ -1139,7 +1136,7 @@ distclean: clean
 	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
-	rm -f stdlib/sys.ml
+	rm -f stdlib/sys.ml utils/config.ml
 	rm -rf autom4te.cache flexdll-sources
 	rm -f config.log config.status libtool
 	rm -f tools/eventlog_metadata

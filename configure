@@ -747,6 +747,9 @@ build_os
 build_vendor
 build_cpu
 build
+expanded_libdir
+expanded_bindir
+flexdll_dir
 naked_pointers_checker
 naked_pointers
 compute_deps
@@ -812,6 +815,7 @@ oc_cflags
 toolchain
 ccomptype
 mkexedebugflag
+mkexe_config
 mkexe
 fpic
 libraries_man_section
@@ -2773,15 +2777,6 @@ programs_man_section=1
 # Library section of the Unix manual
 libraries_man_section=3
 
-# Command to build executalbes
-# In general this command is supposed to use the CFLAGs- and LDFLAGS-
-# related variables (OC_CFLAGS and OC_LDFLAGS for ocaml-specific
-# flags, CFLAGS and LDFLAGS for generic flags chosen by the user), but
-# at the moment they are not taken into account on Windows, because
-# flexlink, which is used to build executables on this platform, can
-# not handle them.
-mkexe="\$(CC) \$(OC_CFLAGS) \$(CFLAGS) \$(OC_LDFLAGS) \$(LDFLAGS)"
-
 # Flags for building executable files with debugging symbols
 mkexedebugflag="-g"
 common_cflags=""
@@ -2901,7 +2896,11 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
 
+
  # TODO: rename this variable
+
+
+
 
 
 
@@ -2946,6 +2945,8 @@ ac_config_files="$ac_config_files Makefile.config"
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
 ac_config_files="$ac_config_files stdlib/sys.ml"
+
+ac_config_files="$ac_config_files utils/config.ml"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
@@ -3081,7 +3082,7 @@ If your host is 64 bits, you can try with './configure CC=\"gcc -m64\"' \
     ccomptype=cc
   S=s
   SO=so
-  outputexe='-o $(EMPTY)'
+  outputexe='-o '
   syslib='-l$(1)' ;;
 esac
 
@@ -12620,12 +12621,17 @@ if test "x$interpval" = "xyes"; then :
     shebangscripts=false ;; #(
   *) :
     shebangscripts=true
+       prev_prefix="$prefix"
        prev_exec_prefix="$exec_prefix"
+       if test "x$prefix" = "xNONE"; then :
+  prefix="$ac_default_prefix"
+fi
        if test "x$exec_prefix" = "xNONE"; then :
   exec_prefix="$prefix"
 fi
        eval "expanded_bindir=\"$bindir\""
        exec_prefix="$prev_exec_prefix"
+       prefix="$prev_prefix"
        # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
        # 1 char suffix and the \0 leaving 115 characters
        if test "${#expanded_bindir}" -gt 115; then :
@@ -12659,18 +12665,18 @@ fi
 
 case $ocaml_cv_cc_vendor in #(
   xlc-*) :
-    outputobj='-o $(EMPTY)'
+    outputobj='-o '
     warn_error_flag=''
     cc_warnings='-qflag=i:i' ;; #(
   # all warnings enabled
   sunc-*) :
-    outputobj='-o $(EMPTY)'; cc_warnings="" ;; #(
+    outputobj='-o '; cc_warnings="" ;; #(
   msvc-*) :
     outputobj='-Fo'
     warn_error_flag='-WX'
     cc_warnings='' ;; #(
   *) :
-    outputobj='-o $(EMPTY)'
+    outputobj='-o '
   warn_error_flag='-Werror'
   cc_warnings='-Wall -Wdeclaration-after-statement' ;;
 esac
@@ -12884,6 +12890,7 @@ $as_echo "no" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $iflexdir$flexmsg" >&5
 $as_echo "$iflexdir$flexmsg" >&6; }
+      flexdll_dir='+flexdll'
       bootstrapping_flexdll=true
       # The submodule should be searched *before* any other -I paths
       internal_cppflags="-I $iflexdir $internal_cppflags"
@@ -13120,7 +13127,7 @@ fi
 
 case $CC,$host in #(
   *,*-*-darwin*) :
-    mkexe="$mkexe -Wl,-no_compact_unwind";
+    oc_ldflags="-Wl,-no_compact_unwind";
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
  ;; #(
   *,*-*-haiku*) :
@@ -13159,8 +13166,7 @@ esac
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
  ;; #(
   xlc*,powerpc-ibm-aix*) :
-    mkexe="$mkexe "
-     oc_ldflags="-brtl -bexpfull"
+    oc_ldflags="-brtl -bexpfull"
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
  ;; #(
   gcc*,powerpc-*-linux*) :
@@ -13955,8 +13961,7 @@ if test x"$enable_shared" != "xno"; then :
   case $host in #(
   *-apple-darwin*) :
     mksharedlib="$CC -shared \
-                   -flat_namespace -undefined suppress -Wl,-no_compact_unwind \
-                   \$(LDFLAGS)"
+                   -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
       shared_libraries_supported=true ;; #(
   *-*-mingw32) :
     mksharedlib='$(FLEXLINK)'
@@ -13978,7 +13983,7 @@ fi
   powerpc-ibm-aix*) :
     case $ocaml_cv_cc_vendor in #(
   xlc*) :
-    mksharedlib="$CC -qmkshrobj -G \$(LDFLAGS)"
+    mksharedlib="$CC -qmkshrobj -G"
                 shared_libraries_supported=true ;; #(
   *) :
      ;;
@@ -13994,9 +13999,9 @@ esac ;; #(
     sharedlib_cflags="-fPIC"
        case $CC,$host in #(
   gcc*,powerpc-*-linux*) :
-    mksharedlib="$CC -shared -mbss-plt \$(LDFLAGS)" ;; #(
+    mksharedlib="$CC -shared -mbss-plt" ;; #(
   *) :
-    mksharedlib="$CC -shared \$(LDFLAGS)" ;;
+    mksharedlib="$CC -shared" ;;
 esac
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
@@ -14393,10 +14398,10 @@ esac
     # string.
     PACKLD="link -lib -nologo $machine -out:"
 else
-  PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o \$(EMPTY)"
+  PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o "
 fi
 else
-  PACKLD="$PARTIALLD -o \$(EMPTY)"
+  PACKLD="$PARTIALLD -o "
 fi
 
 # Disable PIE at link time when ocamlopt does not produce position-independent
@@ -17486,8 +17491,8 @@ fi
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
-ocamlc_cflags="$common_cflags $sharedlib_cflags \$(CFLAGS)"
-ocamlc_cppflags="$common_cppflags \$(CPPFLAGS)"
+ocamlc_cflags="$common_cflags $sharedlib_cflags"
+ocamlc_cppflags="$common_cppflags"
 cclibs="$cclibs $mathlib"
 
 case $host in #(
@@ -17584,6 +17589,42 @@ if test x"$enable_stdlib_manpages" != "xno"; then :
 else
   stdlib_manpages=false
 fi
+
+# Remove prefixing space from various variables
+bytecclibs="${bytecclibs## }"
+nativecclibs="${nativecclibs## }"
+ocamlc_cppflags="${ocamlc_cppflags## }"
+oc_ldflags="${oc_ldflags## }"
+oc_dll_ldflags="${oc_dll_ldflags## }"
+
+# Command to build executables
+# In general this command is supposed to use the CFLAGs- and LDFLAGS-
+# related variables (OC_CFLAGS and OC_LDFLAGS for ocaml-specific
+# flags, CFLAGS and LDFLAGS for generic flags chosen by the user), but
+# at the moment they are not taken into account on Windows, because
+# flexlink, which is used to build executables on this platform, can
+# not handle them.
+
+if test -z "$mkexe"; then :
+  mkexe="$CC \$(OC_CFLAGS) \$(CFLAGS) \$(OC_LDFLAGS) \$(LDFLAGS)"
+   mkexe_config="$CC $oc_cflags $CFLAGS $oc_ldflags $LDFLAGS"
+else
+  mkexe_config="$mkexe"
+fi
+
+# utils/config.ml needs the expanded form of these
+prev_exec_prefix="$exec_prefix"
+prev_prefix="$prefix"
+if test "x$prefix" = "xNONE"; then :
+  prefix="$ac_default_prefix"
+fi
+if test "x$exec_prefix" = "xNONE"; then :
+  exec_prefix="$prefix"
+fi
+eval "expanded_bindir=\"$bindir\""
+eval "expanded_libdir=\"$libdir\""
+exec_prefix="$prev_exec_prefix"
+prefix="$prev_prefix"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
@@ -18575,6 +18616,7 @@ do
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;
+    "utils/config.ml") CONFIG_FILES="$CONFIG_FILES utils/config.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
