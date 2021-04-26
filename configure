@@ -747,6 +747,9 @@ build_os
 build_vendor
 build_cpu
 build
+with_lib_unix
+with_lib_str
+ocamlsrcdir
 csc_flags
 csc
 expanded_libdir
@@ -784,9 +787,11 @@ ASPP
 ocamltest
 documentation_tool_cmd
 documentation_tool
-ocamldoc
+with_ocamldoc
+ocamldoc_make_target
 with_camltex
-with_debugger
+with_ocamldebug
+debugger_make_target
 as_has_debug_prefix_map
 cc_has_debug_prefix_map
 otherlibraries
@@ -2901,7 +2906,12 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
 
- # TODO: rename this variable
+
+
+
+
+
+
 
 
 
@@ -2953,6 +2963,8 @@ ac_config_files="$ac_config_files tools/eventlog_metadata"
 ac_config_files="$ac_config_files stdlib/sys.ml"
 
 ac_config_files="$ac_config_files utils/config.ml"
+
+ac_config_files="$ac_config_files ocamltest/ocamltest_config.ml"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
@@ -3175,7 +3187,7 @@ fi
 if test "${enable_ocamldoc+set}" = set; then :
   enableval=$enable_ocamldoc;
 else
-  ocamldoc=auto
+  enable_ocamldoc=auto
 fi
 
 
@@ -12584,14 +12596,20 @@ esac
 
 otherlibraries="dynlink"
 if test x"$enable_unix_lib" != "xno"; then :
+  with_lib_unix=true
   if test x"$enable_bigarray_lib" != "xno"; then :
   otherlibraries="$otherlibraries $unixlib bigarray"
 else
   otherlibraries="$otherlibraries $unixlib"
 fi
+else
+  with_lib_unix=false
 fi
 if test x"$enable_str_lib" != "xno"; then :
   otherlibraries="$otherlibraries str"
+  with_lib_str=true
+else
+  with_lib_str=false
 fi
 
 # Checks for system services
@@ -16364,16 +16382,19 @@ fi
 
 case $enable_debugger in #(
   no) :
-    with_debugger=""
+    with_ocamldebug=false
+    debugger_make_target=""
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger disabled" >&5
 $as_echo "$as_me: replay debugger disabled" >&6;} ;; #(
   *) :
     if $sockets; then :
-  with_debugger="ocamldebugger"
+  with_ocamldebug=true
+    debugger_make_target="ocamldebugger"
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger supported" >&5
 $as_echo "$as_me: replay debugger supported" >&6;}
 else
-  with_debugger=""
+  with_ocamldebug=false
+    debugger_make_target=""
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger not supported" >&5
 $as_echo "$as_me: replay debugger not supported" >&6;}
 fi
@@ -17409,9 +17430,11 @@ else
 fi
 
 if test x"$enable_ocamldoc" = "xno"; then :
-  ocamldoc=""
+  ocamldoc_make_target=""
+  with_ocamldoc=false
 else
-  ocamldoc=ocamldoc
+  ocamldoc_make_target=ocamldoc
+  with_ocamldoc=true
 fi
 
 documentation_tool_cmd=''
@@ -17578,6 +17601,14 @@ case $host in #(
 esac ;; #(
   *) :
     windows_unicode=0 ;;
+esac
+
+ocamlsrcdir="$PWD"
+case $host in #(
+  *-*-mingw32|*-pc-windows) :
+    ocamlsrcdir="$(cygpath -w "$ocamlsrcdir")" ;; #(
+  *) :
+     ;;
 esac
 
 # Define default prefix correctly for the different Windows ports
@@ -18668,6 +18699,7 @@ do
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;
     "utils/config.ml") CONFIG_FILES="$CONFIG_FILES utils/config.ml" ;;
+    "ocamltest/ocamltest_config.ml") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;

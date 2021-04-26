@@ -130,9 +130,11 @@ AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
-AC_SUBST([with_debugger]) # TODO: rename this variable
+AC_SUBST([debugger_make_target])
+AC_SUBST([with_ocamldebug])
 AC_SUBST([with_camltex])
-AC_SUBST([ocamldoc])
+AC_SUBST([ocamldoc_make_target])
+AC_SUBST([with_ocamldoc])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
 AC_SUBST([ocamltest])
@@ -170,6 +172,9 @@ AC_SUBST([expanded_bindir])
 AC_SUBST([expanded_libdir])
 AC_SUBST([csc])
 AC_SUBST([csc_flags])
+AC_SUBST([ocamlsrcdir])
+AC_SUBST([with_lib_str])
+AC_SUBST([with_lib_unix])
 
 ## Generated files
 
@@ -178,6 +183,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([utils/config.ml])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 
@@ -269,7 +275,7 @@ AC_ARG_ENABLE([ocamldoc],
   [AS_HELP_STRING([--disable-ocamldoc],
     [do not build the ocamldoc documentation system])],
   [],
-  [ocamldoc=auto])
+  [enable_ocamldoc=auto])
 
 AC_ARG_WITH([odoc],
   [AS_HELP_STRING([--with-odoc],
@@ -515,11 +521,15 @@ AS_CASE([$host],
 
 otherlibraries="dynlink"
 AS_IF([test x"$enable_unix_lib" != "xno"],
-  [AS_IF([test x"$enable_bigarray_lib" != "xno"],
+  [with_lib_unix=true
+  AS_IF([test x"$enable_bigarray_lib" != "xno"],
     [otherlibraries="$otherlibraries $unixlib bigarray"],
-    [otherlibraries="$otherlibraries $unixlib"])])
+    [otherlibraries="$otherlibraries $unixlib"])],
+  [with_lib_unix=false])
 AS_IF([test x"$enable_str_lib" != "xno"],
-  [otherlibraries="$otherlibraries str"])
+  [otherlibraries="$otherlibraries str"
+  with_lib_str=true],
+  [with_lib_str=false])
 
 # Checks for system services
 
@@ -1733,12 +1743,15 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 
 AS_CASE([$enable_debugger],
   [no],
-    [with_debugger=""
+    [with_ocamldebug=false
+    debugger_make_target=""
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
-    [with_debugger="ocamldebugger"
+    [with_ocamldebug=true
+    debugger_make_target="ocamldebugger"
     AC_MSG_NOTICE([replay debugger supported])],
-    [with_debugger=""
+    [with_ocamldebug=false
+    debugger_make_target=""
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 
@@ -1846,8 +1859,10 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""],
-  [ocamldoc=ocamldoc])
+  [ocamldoc_make_target=""
+  with_ocamldoc=false],
+  [ocamldoc_make_target=ocamldoc
+  with_ocamldoc=true])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
@@ -1957,6 +1972,11 @@ AS_CASE([$host],
         [windows_unicode=1],
       [AC_MSG_ERROR([unexpected windows unicode mode])])],
   [windows_unicode=0])
+
+ocamlsrcdir="$PWD"
+AS_CASE([$host],
+  [*-*-mingw32|*-pc-windows],
+    [ocamlsrcdir="$(cygpath -w "$ocamlsrcdir")"])
 
 # Define default prefix correctly for the different Windows ports
 AS_IF([test x"$prefix" = "xNONE"],
