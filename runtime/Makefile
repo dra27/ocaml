@@ -241,8 +241,8 @@ jumptbl.inc: opnames.inc ;
 sak$(EXE): sak.$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^)
 
-caml/version.h : $(ROOTDIR)/VERSION | sak$(EXE)
-	./sak$(EXE) version '$(shell sed -ne 1p $< | tr -d '\r')' > $@
+caml/version.h : | sak$(EXE)
+	./sak$(EXE) version '$(OCAML_VERSION)' > $@
 
 # Libraries and programs
 

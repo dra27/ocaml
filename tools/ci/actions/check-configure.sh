@@ -15,8 +15,8 @@
 
 # Hygiene Checks: ensure that configure.ac generates configure
 # This tests both branches and PRs. Any commit which updates either files which
-# affect configure (configure.ac, VERSION, aclocal.m4 and build-aux/*) and also
-# which alter this script.
+# affect configure (configure.ac, aclocal.m4 and build-aux/*) and also which
+# alter this script.
 # The behaviour is slightly different for pushes vs pull requests: in a PR, all
 # commits must be correct; in a push, it must be the case that the configure is
 # correct at the tip of the branch. This allows you to push a correcting PR to
@@ -43,7 +43,7 @@ fi
 
 CI_SCRIPT='tools/ci/actions/check-configure.sh'
 PATHS=\
-'configure\|configure\.ac\|VERSION\|aclocal\.m4\|build-aux/.*'\
+'configure\|configure\.ac\|aclocal\.m4\|build-aux/.*'\
 '\|tools/autogen\|tools/git-dev-options\.sh'
 
 # $1 - commit to checkout files from
