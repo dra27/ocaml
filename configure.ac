@@ -216,6 +216,8 @@ AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
+AC_SUBST([csc])
+AC_SUBST([csc_flags])
 
 ## Generated files
 
@@ -278,12 +280,6 @@ AS_CASE([$host],
   SO=so
   outputexe='-o '
   syslib='-l$(1)'])
-
-AS_CASE([$host],
-  [*-*-mingw32*|*-pc-windows],
-    [CSC=csc
-    CSCFLAGS="/nologo /nowarn:1668"
-    AS_CASE([$host_cpu], [i*86], [CSCFLAGS="$CSCFLAGS /platform:x86"])])
 
 # Environment variables that are taken into account
 
@@ -1411,6 +1407,15 @@ AS_CASE([$rlwrap,$system],
   [rlwrap,win*|rlwrap,mingw*],
     [AC_MSG_NOTICE([rlwrap doesn't work with native win32 - disabling])
      rlwrap=''])
+
+# C# compiler (for the testsuite)
+AC_CHECK_PROG([CSC],[csc],[csc])
+AS_IF([test -n "$CSC"],
+  [AS_CASE([$host],[*-*-cygwin*|*-*-mingw32|*-pc-windows],
+    [CSCFLAGS='/nologo /nowarn:1668'
+    AS_IF([! $arch64],[CSCFLAGS="$CSCFLAGS /platform:x86"])],
+    [CSC=''
+    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
 # Checks for library functions
 
