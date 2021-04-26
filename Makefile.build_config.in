@@ -47,3 +47,6 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 
 # Full OCaml string (historically the first line of VERSION)
 OCAML_VERSION=@PACKAGE_VERSION@
+
+CSC=@csc@
+CSC_FLAGS=@csc_flags@
