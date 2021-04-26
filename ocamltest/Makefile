@@ -20,44 +20,16 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
-ifeq "$(filter str,$(OTHERLIBRARIES))" ""
-  str := false
-else
-  str := true
-endif
-
-ifeq "$(filter systhreads,$(OTHERLIBRARIES))" ""
-  systhreads := false
-else
-  systhreads := true
-endif
-
 ifeq "$(filter $(UNIXLIB),$(OTHERLIBRARIES))" ""
   ocamltest_unix := dummy
   unix_name :=
   unix_path :=
-  unix := None
   unix_include :=
 else
   ocamltest_unix := real
   unix_name := unix
   unix_path := $(ROOTDIR)/otherlibs/$(UNIXLIB)
   unix_include := -I $(unix_path) $(EMPTY)
-  ifeq "$(UNIX_OR_WIN32)" "win32"
-    unix := Some false
-  else
-    unix := Some true
-  endif
-endif
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-  ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)" | cygpath -w -f -)
-else
-  ocamlsrcdir := $(abspath $(shell pwd)/..)
-endif
-
-ifeq "$(TOOLCHAIN)" "msvc"
-CPP := $(CPP) 2> nul
 endif
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime -DCAML_INTERNALS
@@ -82,7 +54,7 @@ endif
 
 core := \
   $(run_source) run_stubs.c \
-  ocamltest_config.mli ocamltest_config.ml.in \
+  ocamltest_config.mli ocamltest_config.ml \
   ocamltest_unix.mli ocamltest_unix.ml \
   ocamltest_stdlib.mli ocamltest_stdlib.ml \
   run_command.mli run_command.ml \
@@ -125,7 +97,7 @@ sources := $(core) $(ocaml_plugin) \
 
 ml_files := \
   $(filter %.ml, \
-    $(subst .ml.in,.ml,$(subst .mll,.ml,$(subst .mly,.ml,$(sources)))) \
+    $(subst .mll,.ml,$(subst .mly,.ml,$(sources))) \
   )
 
 cmo_files := $(ml_files:.ml=.cmo)
@@ -146,11 +118,8 @@ lexers := $(filter %.mll,$(sources))
 
 parsers := $(filter %.mly,$(sources))
 
-config_files := $(filter %.ml.in,$(sources))
-
 dependencies_generated_prereqs := \
   ocamltest_unix.ml \
-  $(config_files:.ml.in=.ml) \
   $(lexers:.mll=.ml) \
   $(parsers:.mly=.mli) $(parsers:.mly=.ml)
 
@@ -214,45 +183,6 @@ ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
 ocamltest_unix.ml: ocamltest_unix_$(ocamltest_unix).ml
 	echo '# 1 "$^"' > $@
 	cat $^ >> $@
-
-ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-	sed $(call SUBST,AFL_INSTRUMENT) \
-	    $(call SUBST,INSTRUMENTED_RUNTIME) \
-	    $(call SUBST,ARCH) \
-	    $(call SUBST,SUPPORTS_SHARED_LIBRARIES) \
-	    $(call SUBST,unix) \
-	    $(call SUBST,systhreads) \
-	    $(call SUBST,str) \
-	    $(call SUBST,SYSTEM) \
-	    $(call SUBST_STRING,CPP) \
-	    $(call SUBST_STRING,ocamlsrcdir) \
-	    $(call SUBST,FLAMBDA) \
-	    $(call SUBST,FORCE_SAFE_STRING) \
-	    $(call SUBST,FLAT_FLOAT_ARRAY) \
-	    $(call SUBST,BUILD_OCAMLDOC) \
-	    $(call SUBST,BUILD_DEBUGGER) \
-	    $(call SUBST,O) \
-	    $(call SUBST,A) \
-	    $(call SUBST,S) \
-	    $(call SUBST,NATIVE_COMPILER) \
-	    $(call SUBST,NATDYNLINK) \
-	    $(call SUBST_STRING,SHAREDLIB_CFLAGS) \
-	    $(call SUBST,SO) \
-	    $(call SUBST_STRING,CSC) \
-	    $(call SUBST_STRING,CSCFLAGS) \
-	    $(call SUBST_STRING,EXE) \
-	    $(call SUBST_STRING,MKDLL) \
-	    $(call SUBST_STRING,MKEXE) \
-	    $(call SUBST_STRING,BYTECCLIBS) \
-	    $(call SUBST_STRING,NATIVECCLIBS) \
-	    $(call SUBST_STRING,ASM) \
-	    $(call SUBST_STRING,CC) \
-	    $(call SUBST_STRING,OC_CFLAGS) \
-	    $(call SUBST,CCOMPTYPE) \
-	    $(call SUBST,WINDOWS_UNICODE) \
-	    $(call SUBST,FUNCTION_SECTIONS) \
-	    $(call SUBST,NAKED_POINTERS) \
-	    $< > $@
 
 # Manual
 
