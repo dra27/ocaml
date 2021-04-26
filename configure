@@ -747,6 +747,9 @@ build_os
 build_vendor
 build_cpu
 build
+with_lib_unix
+with_lib_str
+ocamlsrcdir
 expanded_libdir
 expanded_bindir
 flexdll_dir
@@ -2991,6 +2994,9 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
 
+
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3000,6 +3006,8 @@ ac_config_files="$ac_config_files Makefile.config"
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
 ac_config_files="$ac_config_files utils/config.ml"
+
+ac_config_files="$ac_config_files ocamltest/ocamltest_config.ml"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
@@ -12646,14 +12654,20 @@ esac
 
 otherlibraries="dynlink"
 if test x"$enable_unix_lib" != "xno"; then :
+  with_lib_unix=true
   if test x"$enable_bigarray_lib" != "xno"; then :
   otherlibraries="$otherlibraries $unixlib bigarray"
 else
   otherlibraries="$otherlibraries $unixlib"
 fi
+else
+  with_lib_unix=false
 fi
 if test x"$enable_str_lib" != "xno"; then :
   otherlibraries="$otherlibraries str"
+  with_lib_str=true
+else
+  with_lib_str=false
 fi
 
 # Checks for system services
@@ -17694,6 +17708,14 @@ esac ;; #(
     windows_unicode=0 ;;
 esac
 
+ocamlsrcdir="$PWD"
+case $host in #(
+  *-*-mingw32|*-pc-windows) :
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w "$ocamlsrcdir")" ;; #(
+  *) :
+     ;;
+esac
+
 # Define default prefix correctly for the different Windows ports
 if test x"$prefix" = "xNONE"; then :
   case $host in #(
@@ -18835,6 +18857,7 @@ do
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "utils/config.ml") CONFIG_FILES="$CONFIG_FILES utils/config.ml" ;;
+    "ocamltest/ocamltest_config.ml") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;

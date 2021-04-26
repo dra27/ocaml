@@ -240,6 +240,9 @@ AC_SUBST([id])
 AC_SUBST([flexdll_dir])
 AC_SUBST([expanded_bindir])
 AC_SUBST([expanded_libdir])
+AC_SUBST([ocamlsrcdir])
+AC_SUBST([with_lib_str])
+AC_SUBST([with_lib_unix])
 
 ## Generated files
 
@@ -247,6 +250,7 @@ AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_FILES([utils/config.ml])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 
@@ -615,11 +619,15 @@ AS_CASE([$host],
 
 otherlibraries="dynlink"
 AS_IF([test x"$enable_unix_lib" != "xno"],
-  [AS_IF([test x"$enable_bigarray_lib" != "xno"],
+  [with_lib_unix=true
+  AS_IF([test x"$enable_bigarray_lib" != "xno"],
     [otherlibraries="$otherlibraries $unixlib bigarray"],
-    [otherlibraries="$otherlibraries $unixlib"])])
+    [otherlibraries="$otherlibraries $unixlib"])],
+  [with_lib_unix=false])
 AS_IF([test x"$enable_str_lib" != "xno"],
-  [otherlibraries="$otherlibraries str"])
+  [otherlibraries="$otherlibraries str"
+  with_lib_str=true],
+  [with_lib_str=false])
 
 # Checks for system services
 
@@ -2078,6 +2086,11 @@ AS_CASE([$host],
         [windows_unicode=1],
       [AC_MSG_ERROR([unexpected windows unicode mode])])],
   [windows_unicode=0])
+
+ocamlsrcdir="$PWD"
+AS_CASE([$host],
+  [*-*-mingw32|*-pc-windows],
+    [ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w "$ocamlsrcdir")"])
 
 # Define default prefix correctly for the different Windows ports
 AS_IF([test x"$prefix" = "xNONE"],
