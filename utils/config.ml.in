@@ -1,4 +1,3 @@
-#2 "utils/config.mlp"
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -17,9 +16,9 @@
 (* The main OCaml version string has moved to ../VERSION *)
 let version = Sys.ocaml_version
 
-let bindir = "%%BINDIR%%"
+let bindir = {@id@|@expanded_bindir@|@id@}
 
-let standard_library_default = "%%LIBDIR%%"
+let standard_library_default = {@id@|@expanded_libdir@|@id@}
 
 let standard_library =
   try
@@ -30,18 +29,18 @@ let standard_library =
   with Not_found ->
     standard_library_default
 
-let ccomp_type = "%%CCOMPTYPE%%"
-let c_compiler = "%%CC%%"
-let c_output_obj = "%%OUTPUTOBJ%%"
-let c_has_debug_prefix_map = %%CC_HAS_DEBUG_PREFIX_MAP%%
-let as_has_debug_prefix_map = %%AS_HAS_DEBUG_PREFIX_MAP%%
-let ocamlc_cflags = "%%OCAMLC_CFLAGS%%"
-let ocamlc_cppflags = "%%OCAMLC_CPPFLAGS%%"
+let ccomp_type = {@id@|@ccomptype@|@id@}
+let c_compiler = {@id@|@CC@|@id@}
+let c_output_obj = {@id@|@outputobj@|@id@}
+let c_has_debug_prefix_map = @cc_has_debug_prefix_map@
+let as_has_debug_prefix_map = @as_has_debug_prefix_map@
+let ocamlc_cflags = {@id@|@ocamlc_cflags@ @CFLAGS@|@id@}
+let ocamlc_cppflags = {@id@|@ocamlc_cppflags@ @CPPFLAGS@|@id@}
 (* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
           the two drivers should be identical. *)
-let ocamlopt_cflags = "%%OCAMLC_CFLAGS%%"
-let ocamlopt_cppflags = "%%OCAMLOPT_CPPFLAGS%%"
-let bytecomp_c_libraries = "%%BYTECCLIBS%%"
+let ocamlopt_cflags = {@id@|@ocamlc_cflags@ @CFLAGS@|@id@}
+let ocamlopt_cppflags = {@id@|@ocamlc_cppflags@ @CPPFLAGS@|@id@}
+let bytecomp_c_libraries = {@id@|@bytecclibs@|@id@}
 (* bytecomp_c_compiler and native_c_compiler have been supported for a
    long time and are retained for backwards compatibility.
    For programs that don't need compatibility with older OCaml releases
@@ -52,15 +51,31 @@ let bytecomp_c_compiler =
   c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags
 let native_c_compiler =
   c_compiler ^ " " ^ ocamlopt_cflags ^ " " ^ ocamlopt_cppflags
-let native_c_libraries = "%%NATIVECCLIBS%%"
-let native_pack_linker = "%%PACKLD%%"
-let ranlib = "%%RANLIBCMD%%"
-let default_rpath = "%%RPATH%%"
-let mksharedlibrpath = "%%MKSHAREDLIBRPATH%%"
-let ar = "%%ARCMD%%"
-let supports_shared_libraries = %%SUPPORTS_SHARED_LIBRARIES%%
+let native_c_libraries = {@id@|@nativecclibs@|@id@}
+let native_pack_linker = {@id@|@PACKLD@|@id@}
+let ranlib = {@id@|@RANLIBCMD@|@id@}
+let default_rpath = {@id@|@rpath@|@id@}
+let mksharedlibrpath = {@id@|@mksharedlibrpath@|@id@}
+let ar = {@id@|@AR@|@id@}
+let supports_shared_libraries = @supports_shared_libraries@
 let mkdll, mkexe, mkmaindll =
   if Sys.win32 || Sys.cygwin && supports_shared_libraries then
+    let quote_one s =
+      if String.index_opt s ' ' = None then
+        s
+      else
+        Filename.quote s
+    in
+    let flexlink_dll_ldflags =
+      if {@id@|@oc_dll_ldflags@|@id@} <> "" then
+        " -link " ^ quote_one {@id@|@oc_dll_ldflags@|@id@}
+      else ""
+    in
+    let flexlink_ldflags =
+      if {@id@|@oc_ldflags@|@id@} <> "" then
+        " -link " ^ quote_one {@id@|@oc_ldflags@|@id@}
+      else ""
+    in
     let flexlink =
       let flexlink =
         Option.value ~default:"flexlink" (Sys.getenv_opt "OCAML_FLEXLINK")
@@ -71,24 +86,28 @@ let mkdll, mkexe, mkmaindll =
       in
       String.init (String.length flexlink) f
     in
-    let flags = " -chain %%FLEXDLL_CHAIN%% %%FLEXLINK_FLAGS%%" in
-    flexlink ^ flags ^ "%%FLEXLINK_DLL_LDFLAGS%%",
-    flexlink ^ " -exe" ^ flags ^ "%%FLEXLINK_LDFLAGS%%",
-    flexlink ^ " -maindll" ^ flags ^ "%%FLEXLINK_DLL_LDFLAGS%%"
+    let flags =
+      " -chain " ^ {@id@|@flexdll_chain@|@id@} ^ {@id@|@mkexe_extra_flags@|@id@}
+    in
+    flexlink ^ flags ^ flexlink_dll_ldflags,
+    flexlink ^ " -exe" ^ flags ^ flexlink_ldflags,
+    flexlink ^ " -maindll" ^ flags ^ flexlink_dll_ldflags
   else
-    "%%MKDLL%%", "%%MKEXE%%", "%%MKMAINDLL%%"
+    {@id@|@CC@@mksharedlib_flags@ @LDFLAGS@|@id@},
+    {@id@|@CC@ @oc_cflags@ @CFLAGS@ @oc_ldflags@ @LDFLAGS@|@id@},
+    {@id@|@CC@@mksharedlib_flags@ @LDFLAGS@|@id@}
 
-let flambda = %%FLAMBDA%%
-let with_flambda_invariants = %%WITH_FLAMBDA_INVARIANTS%%
-let with_cmm_invariants = %%WITH_CMM_INVARIANTS%%
-let safe_string = %%FORCE_SAFE_STRING%%
-let default_safe_string = %%DEFAULT_SAFE_STRING%%
-let windows_unicode = %%WINDOWS_UNICODE%% != 0
+let flambda = @flambda@
+let with_flambda_invariants = @flambda_invariants@
+let with_cmm_invariants = @cmm_invariants@
+let safe_string = @force_safe_string@
+let default_safe_string = @default_safe_string@
+let windows_unicode = @windows_unicode@ != 0
 
-let flat_float_array = %%FLAT_FLOAT_ARRAY%%
+let flat_float_array = @flat_float_array@
 
-let function_sections = %%FUNCTION_SECTIONS%%
-let afl_instrument = %%AFL_INSTRUMENT%%
+let function_sections = @function_sections@
+let afl_instrument = @afl@
 
 let exec_magic_number = "Caml1999X029"
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
@@ -123,24 +142,24 @@ let max_young_wosize = 256
 let stack_threshold = 256 (* see runtime/caml/config.h *)
 let stack_safety_margin = 60
 
-let architecture = "%%ARCH%%"
-let model = "%%MODEL%%"
-let system = "%%SYSTEM%%"
+let architecture = {@id@|@arch@|@id@}
+let model = {@id@|@model@|@id@}
+let system = {@id@|@system@|@id@}
 
-let asm = "%%ASM%%"
-let asm_cfi_supported = %%ASM_CFI_SUPPORTED%%
-let with_frame_pointers = %%WITH_FRAME_POINTERS%%
-let profinfo = %%WITH_PROFINFO%%
-let profinfo_width = %%PROFINFO_WIDTH%%
+let asm = {@id@|@AS@|@id@}
+let asm_cfi_supported = @asm_cfi_supported@
+let with_frame_pointers = @frame_pointers@
+let profinfo = @profinfo@
+let profinfo_width = @profinfo_width@
 
-let ext_exe = "%%EXE%%"
-let ext_obj = "%%EXT_OBJ%%"
-let ext_asm = "%%EXT_ASM%%"
-let ext_lib = "%%EXT_LIB%%"
-let ext_dll = "%%EXT_DLL%%"
+let ext_exe = {@id@|@exeext@|@id@}
+let ext_obj = {@id@|.@OBJEXT@|@id@}
+let ext_asm = {@id@|.@S@|@id@}
+let ext_lib = {@id@|.@libext@|@id@}
+let ext_dll = {@id@|.@SO@|@id@}
 
-let host = "%%HOST%%"
-let target = "%%TARGET%%"
+let host = {@id@|@host@|@id@}
+let target = {@id@|@target@|@id@}
 
 let default_executable_name =
   match Sys.os_type with
@@ -148,9 +167,13 @@ let default_executable_name =
   | "Win32" | "Cygwin" -> "camlprog.exe"
   | _ -> "camlprog"
 
-let systhread_supported = %%SYSTHREAD_SUPPORT%%;;
+let systhread_supported = @systhread_support@;;
 
-let flexdll_dirs = [%%FLEXDLL_DIR%%];;
+let flexdll_dirs =
+  if {@id@|@flexdll_dir@|@id@} = "" then
+    []
+  else
+    [{@id@|@flexdll_dir@|@id@}];;
 
 type configuration_value =
   | String of string
