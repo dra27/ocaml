@@ -1225,6 +1225,7 @@ distclean: clean
 	rm -f config.log config.status libtool
 	rm -f tools/eventlog_metadata
 	rm -f tools/*.bak
+	rm -f ocamltest/ocamltest_config.ml
 	rm -f testsuite/_log*
 
 include .depend
