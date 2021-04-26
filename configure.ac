@@ -59,6 +59,8 @@ instrumented_runtime=true
 force_instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+csc=""
+csc_flags=""
 
 # Information about the package
 
@@ -169,6 +171,8 @@ AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([force_instrumented_runtime])
+AC_SUBST([csc])
+AC_SUBST([csc_flags])
 
 ## Generated files
 
@@ -1254,6 +1258,15 @@ AS_CASE([$rlwrap,$system],
   [rlwrap,win*|rlwrap,mingw*],
     [AC_MSG_NOTICE([rlwrap doesn't work with native win32 - disabling])
      rlwrap=''])
+
+# C# compiler (for the testsuite)
+AC_CHECK_PROG([csc],[csc],[csc])
+AS_IF([test -n "$csc"],
+  [AS_CASE([$host],[*-*-cygwin*|*-*-mingw32|*-pc-windows],
+    [csc_flags='/nologo /nowarn:1668'
+    AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])],
+    [csc=''
+    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
 # Checks for library functions
 
