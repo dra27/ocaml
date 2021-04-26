@@ -200,13 +200,7 @@ stdlib.cma: $(OBJS)
 stdlib.cmxa: $(OBJS:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 
-sys.ml: $(ROOTDIR)/VERSION sys.mlp
-	sed -e "s|%%VERSION%%|`sed -e 1q $< | tr -d '\r'`|" sys.mlp > $@
-
 .PHONY: clean
-clean::
-	rm -f sys.ml
-
 clean::
 	rm -f $(CAMLHEADERS)
 
