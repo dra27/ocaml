@@ -747,6 +747,9 @@ build_os
 build_vendor
 build_cpu
 build
+expanded_libdir
+expanded_bindir
+flexdll_dir
 id
 csc_flags
 csc
@@ -772,6 +775,7 @@ install_source_artifacts
 install_bytecode_programs
 mksharedlibrpath
 mkmaindll
+mksharedlib_flags
 mksharedlib
 rpath
 sharedlib_cflags
@@ -823,6 +827,7 @@ mkexe_extra_flags
 mkexe_via_cc_extra_cmd
 mkexedebugflag
 mkexe_cflags
+mkexe_config
 mkexe_cmd
 fpic
 libraries_man_section
@@ -2833,7 +2838,8 @@ ocamltest_makefile_target=""
 # $mkmaindll - the full linking command for main program in DLL
 # $mkdll_ldflags - munges $(OC_DLL_LDFLAGS) and $(LDFLAGS)
 # $oc_ldflags and $oc_dll_ldflags are handled as $(OC_LDFLAGS) and
-# $(OC_DLL_LDFLAGS) and can be overidden in the build.
+# $(OC_DLL_LDFLAGS), but cannot be overidden in the build for consistency with
+# utils/config.ml.
 
 
 # Information about the package
@@ -2980,6 +2986,11 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
 
+
+
+
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -2988,12 +2999,16 @@ ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
+ac_config_files="$ac_config_files utils/config.ml"
+
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
 
 
 # Works out how many "o"s are needed in quoted strings
+
+
 
 
 # Checks for system types
@@ -12674,12 +12689,18 @@ if test "x$interpval" = "xyes"; then :
     shebangscripts=false ;; #(
   *) :
     shebangscripts=true
+       prev_prefix="$prefix"
        prev_exec_prefix="$exec_prefix"
+       if test "x$prefix" = "xNONE"; then :
+  prefix="$ac_default_prefix"
+fi
        if test "x$exec_prefix" = "xNONE"; then :
   exec_prefix="$prefix"
 fi
+       eval "exec_prefix=\"$exec_prefix\""
        eval "expanded_bindir=\"$bindir\""
        exec_prefix="$prev_exec_prefix"
+       prefix="$prev_prefix"
        # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
        # 1 char suffix and the \0 leaving 115 characters
        if test "${#expanded_bindir}" -gt 115; then :
@@ -12926,6 +12947,7 @@ $as_echo "no" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $iflexdir$flexmsg" >&5
 $as_echo "$iflexdir$flexmsg" >&6; }
+        flexdll_dir='+flexdll'
         bootstrapping_flexdll=true
         # The submodule should be searched *before* any other -I paths
         internal_cppflags="-I $iflexdir $internal_cppflags"
@@ -14029,7 +14051,8 @@ fi
 
 shared_libraries_supported=false
 sharedlib_cflags=''
-mksharedlib='shared-libs-not-available'
+mksharedlib='$(CC)'
+mksharedlib_flags=''
 rpath=''
 mksharedlibrpath=''
 natdynlinkopts=""
@@ -14037,32 +14060,35 @@ natdynlinkopts=""
 if test x"$enable_shared" != "xno"; then :
   case $host in #(
   *-apple-darwin*) :
-    mksharedlib="\$(CC) -shared \
+    mksharedlib_flags=" -shared \
                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
       shared_libraries_supported=true ;; #(
   *-*-mingw32) :
-    mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+    mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=$with_sharedlibs ;; #(
   *-pc-windows) :
-    mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+    mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=$with_sharedlibs ;; #(
   *-*-cygwin*) :
-    mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+    mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=true ;; #(
   powerpc-ibm-aix*) :
     case $ocaml_cv_cc_vendor in #(
   xlc*) :
-    mksharedlib='$(CC) -qmkshrobj -G'
+    mksharedlib_flags=' -qmkshrobj -G'
                 shared_libraries_supported=true ;; #(
   *) :
      ;;
 esac ;; #(
   *-*-solaris*) :
     sharedlib_cflags="-fPIC"
-      mksharedlib='$(CC) -shared'
+      mksharedlib_flags=' -shared'
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
       shared_libraries_supported=true ;; #(
@@ -14071,9 +14097,9 @@ esac ;; #(
     sharedlib_cflags="-fPIC"
        case $CC,$host in #(
   gcc*,powerpc-*-linux*) :
-    mksharedlib='$(CC) -shared -mbss-plt' ;; #(
+    mksharedlib_flags=' -shared -mbss-plt' ;; #(
   *) :
-    mksharedlib='$(CC) -shared' ;;
+    mksharedlib_flags=' -shared' ;;
 esac
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
@@ -14086,7 +14112,7 @@ esac
 fi
 
 if test -z "$mkmaindll"; then :
-  mkmaindll=$mksharedlib
+  mkmaindll="$mksharedlib$mksharedlib_flags"
 fi
 
 # Configure native dynlink
@@ -17904,6 +17930,29 @@ fi
   done
 
 
+  # Remove prefixing space from various variables
+  bytecclibs="${bytecclibs## }"
+  nativecclibs="${nativecclibs## }"
+  ocamlc_cppflags="${ocamlc_cppflags## }"
+  oc_ldflags="${oc_ldflags## }"
+  oc_dll_ldflags="${oc_dll_ldflags## }"
+
+  # utils/config.ml needs the expanded form of these
+  prev_exec_prefix="$exec_prefix"
+  prev_prefix="$prefix"
+  if test "x$prefix" = "xNONE"; then :
+  prefix="$ac_default_prefix"
+fi
+  if test "x$exec_prefix" = "xNONE"; then :
+  exec_prefix="$prefix"
+fi
+  eval "exec_prefix=\"$exec_prefix\""
+  eval "expanded_bindir=\"$bindir\""
+  eval "expanded_libdir=\"$libdir\""
+  exec_prefix="$prev_exec_prefix"
+  prefix="$prev_prefix"
+
+
   # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
   # decisions about it to be evaluated on each run.
   unset ac_cv_header_flexdll_h
@@ -18785,6 +18834,7 @@ do
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
+    "utils/config.ml") CONFIG_FILES="$CONFIG_FILES utils/config.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;

@@ -84,7 +84,8 @@ ocamltest_makefile_target=""
 # $mkmaindll - the full linking command for main program in DLL
 # $mkdll_ldflags - munges $(OC_DLL_LDFLAGS) and $(LDFLAGS)
 # $oc_ldflags and $oc_dll_ldflags are handled as $(OC_LDFLAGS) and
-# $(OC_DLL_LDFLAGS) and can be overidden in the build.
+# $(OC_DLL_LDFLAGS), but cannot be overidden in the build for consistency with
+# utils/config.ml.
 AC_CONFIG_COMMANDS_PRE([
   # If $mkexe_ldflags_prefix is given, apply it $oc_ldflags and $oc_dllflags and
   # ensure that LDFLAGS is passed using it. This allows LDFLAGS. This is used
@@ -158,6 +159,7 @@ AC_SUBST([programs_man_section])
 AC_SUBST([libraries_man_section])
 AC_SUBST([fpic])
 AC_SUBST([mkexe_cmd])
+AC_SUBST([mkexe_config])
 AC_SUBST([mkexe_cflags])
 AC_SUBST([mkexedebugflag])
 AC_SUBST([mkexe_via_cc_extra_cmd])
@@ -209,6 +211,7 @@ AC_SUBST([asm_cfi_supported])
 AC_SUBST([sharedlib_cflags])
 AC_SUBST([rpath])
 AC_SUBST([mksharedlib])
+AC_SUBST([mksharedlib_flags])
 AC_SUBST([mkmaindll])
 AC_SUBST([mksharedlibrpath])
 AC_SUBST([install_bytecode_programs])
@@ -234,17 +237,41 @@ AC_SUBST([naked_pointers_checker])
 AC_SUBST([csc])
 AC_SUBST([csc_flags])
 AC_SUBST([id])
+AC_SUBST([flexdll_dir])
+AC_SUBST([expanded_bindir])
+AC_SUBST([expanded_libdir])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
+AC_CONFIG_FILES([utils/config.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 
 # Works out how many "o"s are needed in quoted strings
 AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
+
+AC_CONFIG_COMMANDS_PRE([
+  # Remove prefixing space from various variables
+  bytecclibs="${bytecclibs## }"
+  nativecclibs="${nativecclibs## }"
+  ocamlc_cppflags="${ocamlc_cppflags## }"
+  oc_ldflags="${oc_ldflags## }"
+  oc_dll_ldflags="${oc_dll_ldflags## }"
+
+  # utils/config.ml needs the expanded form of these
+  prev_exec_prefix="$exec_prefix"
+  prev_prefix="$prefix"
+  AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
+  AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
+  eval "exec_prefix=\"$exec_prefix\""
+  eval "expanded_bindir=\"$bindir\""
+  eval "expanded_libdir=\"$libdir\""
+  exec_prefix="$prev_exec_prefix"
+  prefix="$prev_prefix"
+])
 
 # Checks for system types
 
@@ -607,10 +634,14 @@ AS_IF(
       [*-cygwin|*-*-mingw32|*-pc-windows],
         [shebangscripts=false],
       [shebangscripts=true
+       prev_prefix="$prefix"
        prev_exec_prefix="$exec_prefix"
+       AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
        AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
+       eval "exec_prefix=\"$exec_prefix\""
        eval "expanded_bindir=\"$bindir\""
        exec_prefix="$prev_exec_prefix"
+       prefix="$prev_prefix"
        # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
        # 1 char suffix and the \0 leaving 115 characters
        AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
@@ -811,6 +842,7 @@ AS_IF([test x"$enable_shared" != 'xno'], [
       AS_IF([test x"$flexdir" = 'x'],
         [AC_MSG_RESULT([no])],
         [AC_MSG_RESULT([$iflexdir$flexmsg])
+        flexdll_dir='+flexdll'
         bootstrapping_flexdll=true
         # The submodule should be searched *before* any other -I paths
         internal_cppflags="-I $iflexdir $internal_cppflags"])],
@@ -1006,7 +1038,8 @@ AS_IF([! $arch64],
 
 shared_libraries_supported=false
 sharedlib_cflags=''
-mksharedlib='shared-libs-not-available'
+mksharedlib='$(CC)'
+mksharedlib_flags=''
 rpath=''
 mksharedlibrpath=''
 natdynlinkopts=""
@@ -1014,29 +1047,32 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="\$(CC) -shared \
+      [mksharedlib_flags=" -shared \
                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
-      [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+      [mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=$with_sharedlibs],
     [*-pc-windows],
-      [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+      [mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=$with_sharedlibs],
     [*-*-cygwin*],
-      [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+      [mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=true],
     [powerpc-ibm-aix*],
       [AS_CASE([$ocaml_cv_cc_vendor],
                [xlc*],
-               [mksharedlib='$(CC) -qmkshrobj -G'
+               [mksharedlib_flags=' -qmkshrobj -G'
                 shared_libraries_supported=true])],
     [*-*-solaris*],
       [sharedlib_cflags="-fPIC"
-      mksharedlib='$(CC) -shared'
+      mksharedlib_flags=' -shared'
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
       shared_libraries_supported=true],
@@ -1045,15 +1081,15 @@ AS_IF([test x"$enable_shared" != "xno"],
       [sharedlib_cflags="-fPIC"
        AS_CASE([$CC,$host],
            [gcc*,powerpc-*-linux*],
-           [mksharedlib='$(CC) -shared -mbss-plt'],
-           [mksharedlib='$(CC) -shared'])
+           [mksharedlib_flags=' -shared -mbss-plt'],
+           [mksharedlib_flags=' -shared'])
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
       natdynlinkopts="-Wl,-E"
       shared_libraries_supported=true])])
 
-AS_IF([test -z "$mkmaindll"], [mkmaindll=$mksharedlib])
+AS_IF([test -z "$mkmaindll"], [mkmaindll="$mksharedlib$mksharedlib_flags"])
 
 # Configure native dynlink
 
