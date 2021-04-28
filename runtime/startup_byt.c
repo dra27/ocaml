@@ -60,6 +60,8 @@
 #include "caml/startup_aux.h"
 #include "caml/version.h"
 
+#include "build_config.h"
+
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
