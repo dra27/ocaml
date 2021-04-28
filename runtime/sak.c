@@ -57,6 +57,7 @@
 #define printf_os printf
 #define strchr_os strchr
 #define sscanf_os sscanf
+#define _printf_p printf
 #endif
 
 void usage(void)
@@ -68,6 +69,8 @@ void usage(void)
     " * primitives - generates primitives and prims.c in current dir\n"
     " * opnames - generates opnames.inc and jumptbl.inc from caml/instruct.h\n"
     " * version string - generates version.h from the given string\n"
+    " * domain_state32 - generates domain_state32.inc from domain_state.tbl\n"
+    " * domain_state64 - generates domain_state64.inc from domain_state.tbl\n"
   );
 }
 
@@ -356,6 +359,74 @@ void convert_version(char_os *content)
   }
 }
 
+void domain_state32(int count, char *name)
+{
+  _printf_p("Store_%2$s MACRO reg1, reg2\n"
+            "  mov [reg1+%1$d], reg2\n"
+            "ENDM\n"
+            "Load_%2$s MACRO reg1, reg2\n"
+            "  mov reg2, [reg1+%1$d]\n"
+             "ENDM\n"
+            "Push_%2$s MACRO reg1\n"
+            "  push [reg1+%1$d]\n"
+            "ENDM\n"
+            "Pop_%2$s MACRO reg1\n"
+            "  pop [reg1+%1$d]\n"
+            "ENDM\n"
+            "Cmp_%2$s MACRO reg1, reg2\n"
+            "  cmp reg2, [reg1+%1$d]\n"
+            "ENDM\n"
+            "Sub_%2$s MACRO reg1, reg2\n"
+            "  sub reg2, [reg1+%1$d]\n"
+            "ENDM\n", count, name);
+}
+
+void domain_state64(int count, char *name)
+{
+  _printf_p("Store_%2$s MACRO reg\n"
+            "  mov [r14+%1$d], reg\n"
+            "ENDM\n"
+            "Load_%2$s MACRO reg\n"
+            "  mov reg, [r14+%1$d]\n"
+             "ENDM\n"
+            "Push_%2$s MACRO\n"
+            "  push [r14+%1$d]\n"
+            "ENDM\n"
+            "Pop_%2$s MACRO\n"
+            "  pop [r14+%1$d]\n"
+            "ENDM\n"
+            "Cmp_%2$s MACRO reg\n"
+            "  cmp reg, [r14+%1$d]\n"
+            "ENDM\n", count, name);
+}
+
+void process_domain_state(void (*emit)(int, char *))
+{
+  char *content, *p, *q, *name;
+  int count = 0;
+
+  if ((p = content = read_file(T("caml/domain_state.tbl"))) == NULL)
+    die("unable to read caml/domain_state.tbl");
+
+  /* MSVC doesn't support the 'm' modifier in sscanf */
+  name = (char *)malloc(strlen(content));
+
+  while (*p != 0) {
+    q = scan_to_eol(p);
+
+    if (sscanf(p, "DOMAIN_STATE(%*[^,],%*[ ]%[^)])", name) == 1) {
+      emit(count, name);
+      count += 8;
+    }
+
+    /* Process next line */
+    p = q;
+  }
+
+  free(content);
+  free(name);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -368,6 +439,10 @@ int main(int argc, char **argv)
     process_instruct();
   } else if (argc == 3 && !strcmp_os(argv[1], T("version"))) {
     convert_version(argv[2]);
+  } else if (argc == 2 && !strcmp_os(argv[1], T("domain_state32"))) {
+    process_domain_state(&domain_state32);
+  } else if (argc == 2 && !strcmp_os(argv[1], T("domain_state64"))) {
+    process_domain_state(&domain_state64);
   } else {
     usage();
     return 1;
