@@ -37,7 +37,7 @@ NATIVE_C_SOURCES := $(addsuffix .c, \
   dynlink clambda_checks afl bigarray \
   memprof domain skiplist codefrag)
 
-GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h
+GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
 CONFIG_HEADERS := caml/m.h caml/s.h
 
 ifeq "$(TOOLCHAIN)" "msvc"
@@ -103,25 +103,6 @@ libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=.npic.$(O)) \
 
 ifdef BOOTSTRAPPING_FLEXLINK
 OC_CPPFLAGS += -DBOOTSTRAPPING_FLEXLINK
-endif
-
-# On Windows, OCAML_STDLIB_DIR needs to be defined dynamically
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-# OCAML_STDLIB_DIR needs to arrive in dynlink.c as a string which both gcc and
-# msvc are willing parse without warning. This means we can't pass UTF-8
-# directly since, as far as I can tell, cl can cope, but the pre-processor
-# can't. So the string needs to be directly translated to L"" form. To do this,
-# we take advantage of the fact that Cygwin uses GNU libiconv which includes a
-# Java pseudo-encoding which translates any UTF-8 sequences to \uXXXX (and,
-# unlike the C99 pseudo-encoding, emits two surrogate values when needed, rather
-# than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
-# pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
-OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
-else # Unix
-OCAML_STDLIB_DIR = $(LIBDIR)
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
 endif
 
 OC_CPPFLAGS += $(IFLEXDIR)
@@ -200,8 +181,8 @@ endif
 .PHONY: clean
 clean:
 	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
-	rm -f ocamlrun ocamlrund ocamlruni
-	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe
+	rm -f ocamlrun ocamlrund ocamlruni sak
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe sak.exe
 	rm -f primitives primitives.new prims.c $(GENERATED_HEADERS)
 	rm -f domain_state*.inc
 	rm -rf $(DEPDIR)
@@ -268,6 +249,16 @@ caml/jumptbl.h : caml/instruct.h
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
+
+sak$(EXE): sak.$(O)
+	$(call MKEXE_BOOT,$@,$^)
+
+C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
+
+build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
+	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
+	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
 
@@ -366,8 +357,6 @@ endif
 
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type))))
-
-dynlink.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
 
 $(foreach object_type,$(subst %,,$(object_types)), \
   $(eval dynlink$(object_type).$(O): $(ROOTDIR)/Makefile.config))
