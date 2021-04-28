@@ -111,25 +111,6 @@ libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=_npic.$(O)) \
 
 # General (non target-specific) assembler and compiler flags
 
-# On Windows, OCAML_STDLIB_DIR needs to be defined dynamically
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-# OCAML_STDLIB_DIR needs to arrive in dynlink.c as a string which both gcc and
-# msvc are willing parse without warning. This means we can't pass UTF-8
-# directly since, as far as I can tell, cl can cope, but the pre-processor
-# can't. So the string needs to be directly translated to L"" form. To do this,
-# we take advantage of the fact that Cygwin uses GNU libiconv which includes a
-# Java pseudo-encoding which translates any UTF-8 sequences to \uXXXX (and,
-# unlike the C99 pseudo-encoding, emits two surrogate values when needed, rather
-# than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
-# pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
-OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
-else # Unix
-OCAML_STDLIB_DIR = $(LIBDIR)
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
-endif
-
 ifneq "$(CCOMPTYPE)" "msvc"
 OC_CFLAGS += -g
 endif
@@ -194,10 +175,10 @@ endif
 .PHONY: clean
 clean:
 	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
-	rm -f ocamlrun ocamlrund ocamlruni ocamlruns
-	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe
+	rm -f ocamlrun ocamlrund ocamlruni ocamlruns sak
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe
 	rm -f primitives primitives.new prims.c caml/opnames.h caml/jumptbl.h
-	rm -f caml/version.h domain_state*.inc
+	rm -f caml/version.h domain_state*.inc build_config.h
 
 .PHONY: distclean
 distclean: clean
@@ -265,6 +246,16 @@ caml/jumptbl.h : caml/instruct.h
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
+
+sak$(EXE): sak.$(O)
+	$(call MKEXE_BOOT,$@,$^)
+
+C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
+
+build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
+	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
+	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
 
@@ -345,8 +336,6 @@ object_types := % %_b %_bd %_bi %_bpic %_n %_nd %_ni %_np %_npic
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type),%)))
 
-dynlink_%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
-
 $(UNIX_OR_WIN32)_non_shared_%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
 
 $(eval $(call COMPILE_C_FILE,$(UNIX_OR_WIN32)_non_shared_%,$(UNIX_OR_WIN32)))
@@ -393,7 +382,7 @@ NATIVE_DEP_CPPFLAGS := $(OC_CPPFLAGS) $(OC_NATIVE_CPPFLAGS)
 BYTECODE_DEP_FILES := $(BYTECODE_C_SOURCES) $(other_files) instrtrace.c
 NATIVE_DEP_FILES := $(NATIVE_C_SOURCES) $(other_files)
 
-depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h
+depend: *.c caml/opnames.h caml/jumptbl.h caml/version.h build_config.h
 	$(CC) -MM $(OC_CPPFLAGS) $(BYTECODE_DEP_FILES) | \
 	  sed -e 's/\([^.]*\)\.o/\1_b.$$(O)/' > .depend
 	$(CC) -MM $(OC_CPPFLAGS) $(OC_DEBUG_CPPFLAGS) \
