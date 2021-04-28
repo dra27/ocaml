@@ -194,6 +194,8 @@ _build
 /runtime/.gdb_history
 /runtime/*.d.c
 /runtime/*.pic.c
+/runtime/build_config.h
+/runtime/sak
 
 /stdlib/camlheader
 /stdlib/target_camlheader
