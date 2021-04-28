@@ -70,6 +70,7 @@ void usage(void)
     " * version string - generates version.h from the given string\n"
     " * domain_state32 - generates domain_state32.inc from domain_state.tbl\n"
     " * domain_state64 - generates domain_state64.inc from domain_state.tbl\n"
+    " * translate path - converts path to a C string constant\n"
   );
 }
 
@@ -451,6 +452,37 @@ void process_domain_state(void (*emit)(int, char *))
   free(name);
 }
 
+void emit_c_string(char_os *path)
+{
+  char_os c;
+
+#ifdef _WIN32
+  putchar('L');
+#endif
+  putchar('"');
+
+  while ((c = *path++) != 0) {
+    if (c == '\\') {
+      printf("\\\\");
+    } else if (c == '"') {
+      printf("\\\"");
+    } else if (c == '\n') {
+      printf("\\n");
+#ifndef _WIN32
+    } else {
+      putchar(c);
+#else
+    } else if (c < 0x80 && iswprint(c)) {
+      putwchar(c);
+    } else {
+      printf("\\x%04x", c);
+#endif
+    }
+  }
+
+  putchar('"');
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -467,6 +499,8 @@ int main(int argc, char **argv)
     process_domain_state(&domain_state32);
   } else if (argc == 2 && !strcmp_os(argv[1], T("domain_state64"))) {
     process_domain_state(&domain_state64);
+  } else if (argc == 3 && !strcmp_os(argv[1], T("translate"))) {
+    emit_c_string(argv[2]);
   } else {
     usage();
     return 1;
