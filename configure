@@ -799,6 +799,7 @@ RANLIB
 AR
 shebangscripts
 long_shebang
+bootstrapping_flexdll
 flexdir
 ocamlc_cppflags
 ocamlc_cflags
@@ -2800,6 +2801,7 @@ profinfo_width=0
 extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
+bootstrapping_flexdll=false
 
 # Information about the package
 
@@ -2847,6 +2849,7 @@ VERSION=4.13.0+dev0-2020-10-19
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -12877,6 +12880,7 @@ $as_echo "no" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $iflexdir$flexmsg" >&5
 $as_echo "$iflexdir$flexmsg" >&6; }
+    bootstrapping_flexdll=true
     # The submodule should be searched *before* any other -I paths
     internal_cppflags="-I $iflexdir $internal_cppflags"
 fi

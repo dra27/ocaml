@@ -64,6 +64,7 @@ profinfo_width=0
 extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
+bootstrapping_flexdll=false
 
 # Information about the package
 
@@ -116,6 +117,7 @@ AC_SUBST([nativecclibs])
 AC_SUBST([ocamlc_cflags])
 AC_SUBST([ocamlc_cppflags])
 AC_SUBST([flexdir])
+AC_SUBST([bootstrapping_flexdll])
 AC_SUBST([long_shebang])
 AC_SUBST([shebangscripts])
 AC_SUBST([AR])
@@ -737,6 +739,7 @@ AS_IF([test x"$with_flexdll" = "xno"],
   AS_IF([test x"$flexdir" = 'x'],
     [AC_MSG_RESULT([no])],
     [AC_MSG_RESULT([$iflexdir$flexmsg])
+    bootstrapping_flexdll=true
     # The submodule should be searched *before* any other -I paths
     internal_cppflags="-I $iflexdir $internal_cppflags"])])
 
