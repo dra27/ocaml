@@ -722,10 +722,10 @@ AS_IF([test x"$enable_shared" != 'xno'], [
       [AS_IF([test -f "$with_flexdll/flexdll.h"],
         [cd runtime
         AS_IF([test -f "$with_flexdll/flexdll.h"],
-          [mkdir -p ../flexdll-build
-          cp -r "$with_flexdll/*" ../flexdll-build/
-          flexdir="flexdll-build"
-          iflexdir='$(ROOTDIR)/flexdll-build'
+          [mkdir -p ../flexdll-sources
+          cp -r "$with_flexdll/*" ../flexdll-sources/
+          flexdir='flexdll-sources'
+          iflexdir='$(ROOTDIR)/flexdll-sources'
           flexmsg=" (from $with_flexdll)"],
           [flexdir="$with_flexdll"
           AS_IF([test x"$unix_or_win32" = "xwin32" \
