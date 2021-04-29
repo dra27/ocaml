@@ -706,65 +706,67 @@ AS_CASE([$host],
     [flexdll_chain='msvc64'
     flexlink_flags="-x64 -merge-manifest -stack 33554432"])
 
-AC_MSG_CHECKING([for flexdll sources])
-AS_IF([test x"$with_flexdll" = "xno"],
-  [flexdir=''
-  AC_MSG_RESULT([disabled])],
-  [flexmsg=''
-  AS_IF([test x"$with_flexdll" = 'x'],
-    [AS_IF([test -f 'flexdll/flexdll.h'],
-      [AS_CASE([$target],
-        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
-          [flexdir=flexdll
-          iflexdir='$(ROOTDIR)/flexdll'
-          with_flexdll="$iflexdir"])])],
-    [AS_IF([test -f "$with_flexdll/flexdll.h"],
-      [cd runtime
-      AS_IF([test -f "$with_flexdll/flexdll.h"],
-        [mkdir -p ../flexdll-build
-        cp -r "$with_flexdll/*" ../flexdll-build/
-        flexdir="flexdll-build"
-        iflexdir='$(ROOTDIR)/flexdll-build'
-        flexmsg=" (from $with_flexdll)"],
-        [flexdir="$with_flexdll"
-        AS_IF([test x"$unix_or_win32" = "xwin32" \
-               && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
-         [AS_CASE([$build],
-           [*-pc-cygwin], [with_flexdll="`cygpath "$with_flexdll"`"])])
-        iflexdir="\$(ROOTDIR)/$with_flexdll"])
-      cd ..],
-      [AC_MSG_RESULT([requested but not available])
-      AC_MSG_ERROR([exiting])])]
-  )
-  AS_IF([test x"$flexdir" = 'x'],
-    [AC_MSG_RESULT([no])],
-    [AC_MSG_RESULT([$iflexdir$flexmsg])
-    bootstrapping_flexdll=true
-    # The submodule should be searched *before* any other -I paths
-    internal_cppflags="-I $iflexdir $internal_cppflags"])])
+AS_IF([test x"$enable_shared" != 'xno'], [
+  AC_MSG_CHECKING([for flexdll sources])
+  AS_IF([test x"$with_flexdll" = "xno"],
+    [flexdir=''
+    AC_MSG_RESULT([disabled])],
+    [flexmsg=''
+    AS_IF([test x"$with_flexdll" = 'x'],
+      [AS_IF([test -f 'flexdll/flexdll.h'],
+        [AS_CASE([$target],
+          [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
+            [flexdir=flexdll
+            iflexdir='$(ROOTDIR)/flexdll'
+            with_flexdll="$iflexdir"])])],
+      [AS_IF([test -f "$with_flexdll/flexdll.h"],
+        [cd runtime
+        AS_IF([test -f "$with_flexdll/flexdll.h"],
+          [mkdir -p ../flexdll-build
+          cp -r "$with_flexdll/*" ../flexdll-build/
+          flexdir="flexdll-build"
+          iflexdir='$(ROOTDIR)/flexdll-build'
+          flexmsg=" (from $with_flexdll)"],
+          [flexdir="$with_flexdll"
+          AS_IF([test x"$unix_or_win32" = "xwin32" \
+                 && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
+           [AS_CASE([$build],
+             [*-pc-cygwin], [with_flexdll="`cygpath "$with_flexdll"`"])])
+          iflexdir="\$(ROOTDIR)/$with_flexdll"])
+        cd ..],
+        [AC_MSG_RESULT([requested but not available])
+        AC_MSG_ERROR([exiting])])]
+    )
+    AS_IF([test x"$flexdir" = 'x'],
+      [AC_MSG_RESULT([no])],
+      [AC_MSG_RESULT([$iflexdir$flexmsg])
+      bootstrapping_flexdll=true
+      # The submodule should be searched *before* any other -I paths
+      internal_cppflags="-I $iflexdir $internal_cppflags"])])
 
-AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
+  AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
 
-AS_IF([test -n "$flexlink" -a -z "$flexdir"],[
-  AC_MSG_CHECKING([whether $flexlink works])
+  AS_IF([test -n "$flexlink" -a -z "$flexdir"],[
+    AC_MSG_CHECKING([whether $flexlink works])
 
-  OCAML_TEST_FLEXLINK([$flexlink -chain $flexdll_chain],
-                      [$internal_cppflags])
+    OCAML_TEST_FLEXLINK([$flexlink -chain $flexdll_chain],
+                        [$internal_cppflags])
 
-  AS_CASE([$host],
-    [*-w64-mingw32|*-pc-windows],
-    [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
-    AS_IF([test -z "$flexlink_where"],
-      [AC_MSG_ERROR([$flexlink is not executable from a native Win32 process])
-    ])])
-])
+    AS_CASE([$host],
+      [*-w64-mingw32|*-pc-windows],
+      [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
+      AS_IF([test -z "$flexlink_where"],
+        [AC_MSG_ERROR([$flexlink is not executable from a native Win32 process])
+      ])])
+  ])
 
-OCAML_TEST_FLEXDLL_H([$flexdir])
+  OCAML_TEST_FLEXDLL_H([$flexdir])
 
-AS_IF([test -n "$flexlink" -a x"$have_flexdll_h" = 'xno'],
-  [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
-  AS_IF([test "x$have_flexdll_h" = 'xyes'],
-    [internal_cppflags="$internal_cppflags -I \"$flexlink_where\""])
+  AS_IF([test -n "$flexlink" -a x"$have_flexdll_h" = 'xno'],
+    [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
+    AS_IF([test "x$have_flexdll_h" = 'xyes'],
+      [internal_cppflags="$internal_cppflags -I \"$flexlink_where\""])
+  ])
 ])
 
 AS_IF([test x"$have_flexdll_h" = 'xno'],

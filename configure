@@ -12825,21 +12825,23 @@ case $host in #(
      ;;
 esac
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for flexdll sources" >&5
+if test x"$enable_shared" != 'xno'; then :
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for flexdll sources" >&5
 $as_echo_n "checking for flexdll sources... " >&6; }
-if test x"$with_flexdll" = "xno"; then :
+  if test x"$with_flexdll" = "xno"; then :
   flexdir=''
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
 $as_echo "disabled" >&6; }
 else
   flexmsg=''
-  if test x"$with_flexdll" = 'x'; then :
+    if test x"$with_flexdll" = 'x'; then :
   if test -f 'flexdll/flexdll.h'; then :
   case $target in #(
   *-*-cygwin*|*-w64-mingw32|*-pc-windows) :
     flexdir=flexdll
-          iflexdir='$(ROOTDIR)/flexdll'
-          with_flexdll="$iflexdir" ;; #(
+            iflexdir='$(ROOTDIR)/flexdll'
+            with_flexdll="$iflexdir" ;; #(
   *) :
      ;;
 esac
@@ -12847,16 +12849,16 @@ fi
 else
   if test -f "$with_flexdll/flexdll.h"; then :
   cd runtime
-      if test -f "$with_flexdll/flexdll.h"; then :
+        if test -f "$with_flexdll/flexdll.h"; then :
   mkdir -p ../flexdll-build
-        cp -r "$with_flexdll/*" ../flexdll-build/
-        flexdir="flexdll-build"
-        iflexdir='$(ROOTDIR)/flexdll-build'
-        flexmsg=" (from $with_flexdll)"
+          cp -r "$with_flexdll/*" ../flexdll-build/
+          flexdir="flexdll-build"
+          iflexdir='$(ROOTDIR)/flexdll-build'
+          flexmsg=" (from $with_flexdll)"
 else
   flexdir="$with_flexdll"
-        if test x"$unix_or_win32" = "xwin32" \
-               && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ; then :
+          if test x"$unix_or_win32" = "xwin32" \
+                 && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ; then :
   case $build in #(
   *-pc-cygwin) :
     with_flexdll="`cygpath "$with_flexdll"`" ;; #(
@@ -12864,29 +12866,29 @@ else
      ;;
 esac
 fi
-        iflexdir="\$(ROOTDIR)/$with_flexdll"
+          iflexdir="\$(ROOTDIR)/$with_flexdll"
 fi
-      cd ..
+        cd ..
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: requested but not available" >&5
 $as_echo "requested but not available" >&6; }
-      as_fn_error $? "exiting" "$LINENO" 5
+        as_fn_error $? "exiting" "$LINENO" 5
 fi
 
 fi
-  if test x"$flexdir" = 'x'; then :
+    if test x"$flexdir" = 'x'; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $iflexdir$flexmsg" >&5
 $as_echo "$iflexdir$flexmsg" >&6; }
-    bootstrapping_flexdll=true
-    # The submodule should be searched *before* any other -I paths
-    internal_cppflags="-I $iflexdir $internal_cppflags"
+      bootstrapping_flexdll=true
+      # The submodule should be searched *before* any other -I paths
+      internal_cppflags="-I $iflexdir $internal_cppflags"
 fi
 fi
 
-# Extract the first word of "flexlink", so it can be a program name with args.
+  # Extract the first word of "flexlink", so it can be a program name with args.
 set dummy flexlink; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -12924,9 +12926,9 @@ fi
 
 
 
-if test -n "$flexlink" -a -z "$flexdir"; then :
+  if test -n "$flexlink" -a -z "$flexdir"; then :
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $flexlink works" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $flexlink works" >&5
 $as_echo_n "checking whether $flexlink works... " >&6; }
 
 
@@ -12954,7 +12956,7 @@ $as_echo "yes" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-    as_fn_error $? "$flexlink -chain $flexdll_chain does not work\"" "$LINENO" 5
+    as_fn_error $? "$flexlink -chain $flexdll_chain does not work" "$LINENO" 5
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -12970,10 +12972,10 @@ rm -f core conftest.err conftest.$ac_objext \
 
 
 
-  case $host in #(
+    case $host in #(
   *-w64-mingw32|*-pc-windows) :
     flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
-    if test -z "$flexlink_where"; then :
+      if test -z "$flexlink_where"; then :
   as_fn_error $? "$flexlink is not executable from a native Win32 process" "$LINENO" 5
 
 fi ;; #(
@@ -13025,7 +13027,7 @@ fi
 
 
 
-if test -n "$flexlink" -a x"$have_flexdll_h" = 'xno'; then :
+  if test -n "$flexlink" -a x"$have_flexdll_h" = 'xno'; then :
 
 
   saved_CC="$CC"
@@ -13070,8 +13072,10 @@ fi
   CC="$saved_CC"
 
 
-  if test "x$have_flexdll_h" = 'xyes'; then :
+    if test "x$have_flexdll_h" = 'xyes'; then :
   internal_cppflags="$internal_cppflags -I \"$flexlink_where\""
+fi
+
 fi
 
 fi
