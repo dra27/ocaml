@@ -137,6 +137,9 @@ USE_STDLIB = -nostdlib -I ../stdlib
 
 FLEXDLL_OBJECTS = \
   flexdll_$(FLEXDLL_CHAIN).$(O) flexdll_initer_$(FLEXDLL_CHAIN).$(O)
+FLEXLINK_BUILD_ENV = \
+  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
+  CHAINS=$(FLEXDLL_CHAIN) ROOTDIR=..
 
 boot/ocamlruns$(EXE):
 	$(MAKE) -C runtime ocamlruns$(EXE)
@@ -164,16 +167,12 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 else
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
     CAMLC='$$(BOOT_OCAMLC)' all
-	$(MAKE) -C $(FLEXDLL_SOURCES) \
-	  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
-	  CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false ROOTDIR=.. \
-	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
+	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
+	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
 	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
 	  flexlink.exe
 	mv $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
-	$(MAKE) -C $(FLEXDLL_SOURCES) \
-	  OCAML_CONFIG_FILE=../Makefile.config \
-	  MSVC_DETECT=0 CHAINS=$(FLEXDLL_CHAIN) NATDYNLINK=false support
+	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) support
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
@@ -357,11 +356,9 @@ else
 endif
 
 flexlink.opt$(EXE):
-	$(MAKE) -C $(FLEXDLL_SOURCES) \
-	  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
-	  OCAML_FLEXLINK="../boot/ocamlrun$(EXE) ../boot/flexlink.byte$(EXE)" \
-	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" \
-	  flexlink.exe
+	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
+    OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
+	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" flexlink.exe
 	mv $(FLEXDLL_SOURCES)/flexlink.exe $@
 
 partialclean::
