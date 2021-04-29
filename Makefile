@@ -247,7 +247,7 @@ opt.opt: checknative
 	$(MAKE) ocaml
 	$(MAKE) opt-core
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(MAKE) flexlink.opt
+	$(MAKE) flexlink.opt$(EXE)
 endif
 	$(MAKE) ocamlc.opt
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
@@ -353,12 +353,16 @@ else
   FLEXLINK_OCAMLOPT=../ocamlopt.opt$(EXE)
 endif
 
-flexlink.opt:
+flexlink.opt$(EXE):
 	$(MAKE) -C $(FLEXDLL_SOURCES) \
 	  MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
 	  OCAML_FLEXLINK="../boot/ocamlrun$(EXE) ../boot/flexlink.byte$(EXE)" \
 	  OCAMLOPT="$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib" \
 	  flexlink.exe
+	mv $(FLEXDLL_SOURCES)/flexlink.exe $@
+
+partialclean::
+	rm -f flexlink.opt$(EXE)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
 INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
@@ -548,9 +552,7 @@ installoptopt:
 	   $(LN) ocamlopt.opt$(EXE) ocamlopt$(EXE); \
 	   $(LN) ocamllex.opt$(EXE) ocamllex$(EXE)
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(INSTALL_PROG) \
-	  $(FLEXDLL_SOURCES)/flexlink.exe \
-	  "$(INSTALL_BINDIR)/flexlink.opt$(EXE)"; \
+	$(INSTALL_PROG) flexlink.opt$(EXE) "$(INSTALL_BINDIR)";
 	cd "$(INSTALL_BINDIR)"; \
 	  $(LN)	flexlink.opt$(EXE) flexlink$(EXE)
 endif

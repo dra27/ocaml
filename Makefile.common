@@ -66,15 +66,14 @@ ifeq "$(FLEXDLL_SOURCES)" ""
   ocamlopt_cmd = $(ocamlopt)
   BOOTSTRAPPING_FLEXDLL = false
 else
-ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SOURCES)/flexlink.exe)" ""
+ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   FLEXLINK_ENV = \
     OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
                     $(ROOTDIR)/boot/flexlink.byte$(EXE)"
 else
   FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/$(FLEXDLL_SOURCES)/flexlink.exe -I \
-      $(ROOTDIR)/boot"
-endif # ifeq "$(wildcard $(ROOTDIR)/$(FLEXDLL_SOURCES)/flexlink.exe)" ""
+    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/boot"
+endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
   OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
   MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
