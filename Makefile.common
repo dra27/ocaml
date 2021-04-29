@@ -72,7 +72,7 @@ ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
                     $(ROOTDIR)/boot/flexlink.byte$(EXE)"
 else
   FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/boot"
+    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/stdlib/flexdll"
 endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
   OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
