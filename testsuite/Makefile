@@ -65,11 +65,12 @@ ifeq "$(wildcard $(ROOTDIR_HOST)/flexlink.opt$(EXE))" ""
         $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
 else
   FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR_HOST)/flexlink.opt$(EXE) -I $(ROOTDIR_HOST)/boot"
-  MKDLL=$(ROOTDIR_HOST)/flexlink.opt$(EXE) \
-        -I $(ROOTDIR_HOST)/boot $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
-  MKEXE=$(ROOTDIR_HOST)/flexlink.opt$(EXE) \
-        -I $(ROOTDIR_HOST)/boot $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
+    OCAML_FLEXLINK="$(ROOTDIR_HOST)/flexlink.opt$(EXE) \
+      -I $(ROOTDIR_HOST)/stdlib/flexdll"
+  MKDLL=$(ROOTDIR_HOST)/flexlink.opt$(EXE) -I $(ROOTDIR_HOST)/stdlib/flexdll \
+        $(FLEXLINK_FLAGS) $(FLEXLINK_DLL_LDFLAGS)
+  MKEXE=$(ROOTDIR_HOST)/flexlink.opt$(EXE) -I $(ROOTDIR_HOST)/stdlib/flexdll \
+        $(FLEXLINK_FLAGS) -exe $(FLEXLINK_EXE_LDFLAGS)
 endif # ifeq "$(wildcard $(ROOTDIR_HOST)/flexlink.opt$(EXE))" ""
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
