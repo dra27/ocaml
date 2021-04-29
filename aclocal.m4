@@ -300,7 +300,7 @@ AC_DEFUN([OCAML_TEST_FLEXLINK], [
     [AC_LANG_SOURCE([int main() { return 0; }])],
     [AC_MSG_RESULT([yes])],
     [AC_MSG_RESULT([no])
-    AC_MSG_ERROR([$1 does not work"])])
+    AC_MSG_ERROR([$1 does not work])])
 
   OCAML_CC_RESTORE_VARIABLES
 ])
