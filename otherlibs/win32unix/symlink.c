@@ -22,6 +22,7 @@
 #include <caml/alloc.h>
 #include <caml/fail.h>
 #include <caml/signals.h>
+#include <string.h>
 #include "unixsupport.h"
 
 typedef BOOLEAN (WINAPI *LPFN_CREATESYMBOLICLINK) (LPTSTR, LPTSTR, DWORD);
@@ -34,6 +35,8 @@ CAMLprim value unix_symlink(value to_dir, value source, value dest)
   CAMLparam3(to_dir, source, dest);
   DWORD flags = (Bool_val(to_dir) ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
   BOOLEAN result;
+  char * c_source;
+  char * c_dest;
 
 again:
   if (no_symlink) {
@@ -46,9 +49,22 @@ again:
     goto again;
   }
 
+  caml_unix_check_path(source, "symlink");
+  caml_unix_check_path(dest, "symlink");
+
+  c_source = caml_strdup(String_val(source));
+  c_dest = _strdup(String_val(dest));
+  if (c_dest == NULL) {
+    caml_stat_free(c_source);
+    caml_raise_out_of_memory();
+  }
+
   caml_enter_blocking_section();
-  result = pCreateSymbolicLink(String_val(dest), String_val(source), flags);
+  result = pCreateSymbolicLink(c_dest, c_source, flags);
   caml_leave_blocking_section();
+
+  caml_stat_free(c_source);
+  free(c_dest);
 
   if (!result) {
     win32_maperr(GetLastError());

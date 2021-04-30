@@ -303,3 +303,6 @@ val normalise_eol : string -> string
 (** [normalise_eol s] returns a fresh copy of [s] with any '\r' characters
    removed. Intended for pre-processing text which will subsequently be printed
    on a channel which performs EOL transformations (i.e. Windows) *)
+
+val mingw_binary_output : unit -> unit
+val slashify: string -> string

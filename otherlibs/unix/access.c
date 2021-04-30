@@ -31,6 +31,18 @@
 #   define F_OK    0/* test for presence of file */
 #  endif
 # else
+#ifdef R_OK
+#undef R_OK
+#endif
+#ifdef W_OK
+#undef W_OK
+#endif
+#ifdef X_OK
+#undef X_OK
+#endif
+#ifdef F_OK
+#undef F_OK
+#endif
 #  define R_OK    4/* test for read permission */
 #  define W_OK    2/* test for write permission */
 #  define X_OK    4/* test for execute permission - not implemented in Win32 */

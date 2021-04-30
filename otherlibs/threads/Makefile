@@ -115,6 +115,8 @@ install:
 	cp libvmthreads.a $(INSTALL_LIBDIR)/vmthreads/libvmthreads.a
 	cd $(INSTALL_LIBDIR)/vmthreads; $(RANLIB) libvmthreads.a
 	cp thread.cmi mutex.cmi condition.cmi event.cmi threadUnix.cmi \
+	   thread.cmt mutex.cmt condition.cmt event.cmt threadUnix.cmt \
+	   thread.cmti mutex.cmti condition.cmti event.cmti threadUnix.cmti \
 	   threads.cma stdlib.cma unix.cma $(INSTALL_LIBDIR)/vmthreads
 	cp thread.mli mutex.mli condition.mli event.mli threadUnix.mli \
 	   $(INSTALL_LIBDIR)/vmthreads

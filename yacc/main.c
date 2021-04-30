@@ -165,6 +165,17 @@ void usage(void)
     exit(1);
 }
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <io.h>
+#include <fcntl.h>
+static void binary_stdout(void)
+{
+    setmode(1,O_BINARY);
+}
+#else
+#define binary_stdout() do{}while(0)
+#endif
+
 void getargs(int argc, char **argv)
 {
     register int i;
@@ -189,10 +200,12 @@ void getargs(int argc, char **argv)
 
         case 'v':
             if (!strcmp (argv[i], "-version")){
+              binary_stdout();
               printf ("The OCaml parser generator, version "
                       OCAML_VERSION "\n");
               exit (0);
             }else if (!strcmp (argv[i], "-vnum")){
+              binary_stdout();
               printf (OCAML_VERSION "\n");
               exit (0);
             }else{

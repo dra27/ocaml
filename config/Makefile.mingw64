@@ -17,7 +17,7 @@
 
 ######### General configuration
 
-PREFIX=C:/ocamlmgw64
+PREFIX=@PREFIX@
 
 ### Remove this to disable compiling ocamldebug
 WITH_DEBUGGER=ocamldebugger
@@ -29,7 +29,7 @@ WITH_OCAMLDOC=ocamldoc
 BINDIR=$(PREFIX)/bin
 
 ### Where to install the standard library
-LIBDIR=$(PREFIX)/lib
+LIBDIR=$(PREFIX)/lib/ocaml
 
 ### Where to install the stub DLLs
 STUBLIBDIR=$(LIBDIR)/stublibs
@@ -67,7 +67,7 @@ X11_INCLUDES=
 X11_LINK=
 BYTECCRPATH=
 SUPPORTS_SHARED_LIBRARIES=true
-SHAREDCCCOMPOPTS=-O
+SHAREDCCCOMPOPTS=-march=x86-64 -mtune=generic -O2 -g
 MKSHAREDLIBRPATH=
 NATIVECCPROFOPTS=
 NATIVECCRPATH=
@@ -93,13 +93,16 @@ FLAMBDA=false
 BYTECC=$(TOOLPREF)gcc
 
 ### Additional compile-time options for $(BYTECC).  (For static linking.)
-BYTECCCOMPOPTS=-O -mms-bitfields -Wall -Wno-unused
+BYTECCCOMPOPTS=-march=x86-64 -mtune=generic -fcommon -O2 -g -mms-bitfields -Wall -Wno-unused
+# -fno-tree-vrp is here to try to work around the Skylake/Kaby lake bug,
+# and only works on GCC 4.2 and later
+CCCOMPOPTS_PATCH=-fno-tree-vrp -D__USE_MINGW_ANSI_STDIO=0
 
 ### Additional link-time options for $(BYTECC).  (For static linking.)
 BYTECCLINKOPTS=
 
 ### Additional compile-time options for $(BYTECC).  (For building a DLL.)
-DLLCCCOMPOPTS=-O -mms-bitfields -Wall -Wno-unused -DCAML_DLL
+DLLCCCOMPOPTS=-march=x86-64 -mtune=generic -fcommon -O2 -g -mms-bitfields -Wall -Wno-unused -DCAML_DLL
 
 ### Libraries needed
 BYTECCLIBS=-lws2_32
@@ -163,7 +166,7 @@ SYSTEM=mingw64
 NATIVECC=$(BYTECC)
 
 ### Additional compile-time options for $(NATIVECC).
-NATIVECCCOMPOPTS=-O -mms-bitfields -Wall -Wno-unused
+NATIVECCCOMPOPTS=-march=x86-64 -mtune=generic -fcommon -O2 -g -mms-bitfields -Wall -Wno-unused
 
 ### Additional link-time options for $(NATIVECC)
 NATIVECCLINKOPTS=

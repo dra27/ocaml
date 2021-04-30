@@ -22,7 +22,7 @@ endif
 # To make custom toplevels
 
 OCAMLMKTOP=ocamlmktop.cmo
-OCAMLMKTOP_IMPORTS=misc.cmo identifiable.cmo numbers.cmo config.cmo \
+OCAMLMKTOP_IMPORTS=config.cmo misc.cmo identifiable.cmo numbers.cmo \
 	           arg_helper.cmo clflags.cmo ccomp.cmo
 
 ocamlmktop: $(OCAMLMKTOP)

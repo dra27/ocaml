@@ -91,7 +91,7 @@ install:
 	cd $(INSTALL_LIBDIR); $(RANLIB) libthreads.a
 	if test -d $(INSTALL_LIBDIR)/threads; then :; \
 	  else mkdir $(INSTALL_LIBDIR)/threads; fi
-	cp $(THREAD_OBJS:.cmo=.cmi) threads.cma $(INSTALL_LIBDIR)/threads
+	cp $(THREAD_OBJS:.cmo=.cmi) $(THREAD_OBJS:.cmo=.cmt) $(THREAD_OBJS:.cmo=.cmti) threads.cma $(INSTALL_LIBDIR)/threads
 	rm -f $(INSTALL_LIBDIR)/threads/stdlib.cma
 	cp thread.mli mutex.mli condition.mli event.mli threadUnix.mli \
 	   $(INSTALL_LIBDIR)

@@ -641,3 +641,12 @@ let normalise_eol s =
       if s.[i] <> '\r' then Buffer.add_char b s.[i]
     done;
     Buffer.contents b
+
+let mingw_binary_output () =
+  match Config.system with
+  | "mingw" | "mingw64" | "win32" | "win64" ->
+      (try set_binary_mode_out stdout true with _ -> ());
+      (try set_binary_mode_out stderr true with _ -> ());
+  | _ -> ()
+
+let slashify = Config.slashify

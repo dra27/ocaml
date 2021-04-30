@@ -69,6 +69,7 @@ let intf filename =
   process_interface_file ppf filename;;
 
 let show_config () =
+  Misc.mingw_binary_output ();
   Config.print_config stdout;
   exit 0;
 ;;

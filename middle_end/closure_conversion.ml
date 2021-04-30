@@ -261,7 +261,8 @@ and close t ?debuginfo env (lam : Lambda.lambda) : Flambda.t =
       let name =
         (* The Microsoft assembler has a 247-character limit on symbol
            names, so we keep them shorter to try not to hit this. *)
-        if Sys.win32 then begin
+        if Sys.win32 && Config.system <> "mingw" && Config.system <> "mingw64"
+        then begin
           match defs with
           | (id, _)::_ -> (Ident.unique_name id) ^ "_let_rec"
           | _ -> "let_rec"

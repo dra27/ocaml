@@ -33,23 +33,29 @@ struct _LIST {
 };
 
 /* Initialize list data structure */
-void list_init (LPLIST lst);
+void caml_win32unix_list_init (LPLIST lst);
 
 /* Cleanup list data structure */
-void list_cleanup (LPLIST lst);
+void caml_win32unix_list_cleanup (LPLIST lst);
 
 /* Set next element */
-void list_next_set (LPLIST lst, LPLIST next);
+void caml_win32unix_list_next_set (LPLIST lst, LPLIST next);
 
 /* Return next element */
-LPLIST list_next (LPLIST);
+LPLIST caml_win32unix_list_next (LPLIST);
 
-#define LIST_NEXT(T, e) ((T)(list_next((LPLIST)(e))))
+#define LIST_NEXT(T, e) ((T)(caml_win32unix_list_next((LPLIST)(e))))
 
 /* Get number of element */
-int list_length (LPLIST);
+int caml_win32unix_list_length (LPLIST);
 
 /* Concat two list. */
-LPLIST list_concat (LPLIST, LPLIST);
+LPLIST caml_win32unix_list_concat (LPLIST, LPLIST);
 
+#define list_init caml_win32unix_list_init
+#define list_cleanup caml_win32unix_list_cleanup
+#define list_next_set caml_win32unix_list_next_set
+#define list_next caml_win32unix_list_next
+#define list_length caml_win32unix_list_length
+#define list_concat caml_win32unix_list_concat
 #endif /* _WINLIST_H */

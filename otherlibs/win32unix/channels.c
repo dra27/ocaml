@@ -19,9 +19,7 @@
 #include <caml/memory.h>
 #include "unixsupport.h"
 #include <fcntl.h>
-
-extern intptr_t _get_osfhandle(int);
-extern int _open_osfhandle(intptr_t, int);
+#include <io.h>
 
 int win_CRT_fd_of_filedescr(value handle)
 {

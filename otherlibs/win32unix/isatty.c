@@ -2,10 +2,9 @@
 /*                                                                        */
 /*                                 OCaml                                  */
 /*                                                                        */
-/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
+/*                 David Allsopp, OCaml Labs, Cambridge.                  */
 /*                                                                        */
-/*   Copyright 1996 Institut National de Recherche en Informatique et     */
-/*     en Automatique.                                                    */
+/*   Copyright 2017 MetaStack Solutions Ltd.                              */
 /*                                                                        */
 /*   All rights reserved.  This file is distributed under the terms of    */
 /*   the GNU Lesser General Public License version 2.1, with the          */
@@ -14,15 +13,12 @@
 /**************************************************************************/
 
 #include <caml/mlvalues.h>
-#include <caml/signals.h>
 #include "unixsupport.h"
 
-CAMLprim value unix_sleep(value t)
+CAMLprim value unix_backport_isatty(value fd)
 {
-  DWORD ct;
-  ct = Double_val(t) * 1e3;
-  enter_blocking_section();
-  Sleep(ct);
-  leave_blocking_section();
-  return Val_unit;
+  DWORD lpMode;
+  HANDLE hFile = Handle_val(fd);
+  return (Val_bool((GetFileType(hFile) == FILE_TYPE_CHAR)
+                   && GetConsoleMode(hFile, &lpMode)));
 }

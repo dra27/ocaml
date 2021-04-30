@@ -16,7 +16,15 @@
 #ifndef _WINWORKER_H
 #define _WINWORKER_H
 
-#define _WIN32_WINNT 0x0400
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#else
+#if _WIN32_WINNT < 0x0502
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#endif
+#endif
+
 #include "unixsupport.h"
 #include <windows.h>
 

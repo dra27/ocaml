@@ -49,6 +49,29 @@
 #define S_ISREG(mode) (((mode) & S_IFMT) == S_IFREG)
 #endif
 
+/* Very old Microsoft headers don't include intptr_t */
+#ifdef _MSC_VER
+
+#ifndef _UINTPTR_T_DEFINED
+#ifdef _WIN64
+typedef unsigned __int64 uintptr_t;
+#else
+typedef unsigned int uintptr_t;
+#endif
+#define _UINTPTR_T_DEFINED
+#endif
+
+#ifndef _INTPTR_T_DEFINED
+#ifdef _WIN64
+typedef __int64 intptr_t;
+#else
+typedef int intptr_t;
+#endif
+#define _INTPTR_T_DEFINED
+#endif
+
+#endif /* MSC_VER */
+
 CAMLnoreturn_start
 static void caml_win32_sys_error (int errnum)
 CAMLnoreturn_end;
@@ -338,7 +361,7 @@ static void expand_argument(char * arg)
 static void expand_pattern(char * pat)
 {
   char * prefix, * p, * name;
-  int handle;
+  intptr_t handle;
   struct _finddata_t ffblk;
   size_t i;
 
@@ -382,11 +405,7 @@ int caml_read_directory(char * dirname, struct ext_table * contents)
 {
   size_t dirnamelen;
   char * template;
-#if _MSC_VER <= 1200
-  int h;
-#else
   intptr_t h;
-#endif
   struct _finddata_t fileinfo;
 
   dirnamelen = strlen(dirname);
@@ -421,7 +440,11 @@ void caml_signal_thread(void * lpParam)
   char *endptr;
   HANDLE h;
   /* Get an hexa-code raw handle through the environment */
+#ifdef _WIN64
+  h = (HANDLE) (uintptr_t) _strtoi64(getenv("CAMLSIGPIPE"), &endptr, 16);
+#else
   h = (HANDLE) (uintptr_t) strtol(getenv("CAMLSIGPIPE"), &endptr, 16);
+#endif
   while (1) {
     DWORD numread;
     BOOL ret;
