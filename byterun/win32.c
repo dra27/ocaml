@@ -52,10 +52,27 @@
 #endif
 
 /* Very old Microsoft headers don't include intptr_t */
-#if defined(_MSC_VER) && !defined(_UINTPTR_T_DEFINED)
+#ifdef _MSC_VER
+
+#ifndef _UINTPTR_T_DEFINED
+#ifdef _WIN64
+typedef unsigned __int64 uintptr_t;
+#else
 typedef unsigned int uintptr_t;
+#endif
 #define _UINTPTR_T_DEFINED
 #endif
+
+#ifndef _INTPTR_T_DEFINED
+#ifdef _WIN64
+typedef __int64 intptr_t;
+#else
+typedef int intptr_t;
+#endif
+#define _INTPTR_T_DEFINED
+#endif
+
+#endif /* MSC_VER */
 
 unsigned short caml_win32_major = 0;
 unsigned short caml_win32_minor = 0;
@@ -294,8 +311,6 @@ static volatile sighandler ctrl_handler_action = SIG_DFL;
 
 static BOOL WINAPI ctrl_handler(DWORD event)
 {
-  int saved_mode;
-
   /* Only ctrl-C and ctrl-Break are handled */
   if (event != CTRL_C_EVENT && event != CTRL_BREAK_EVENT) return FALSE;
   /* Default behavior is to exit, which we get by not handling the event */
@@ -367,7 +382,7 @@ static void expand_argument(wchar_t * arg)
 static void expand_pattern(wchar_t * pat)
 {
   wchar_t * prefix, * p, * name;
-  int handle;
+  intptr_t handle;
   struct _wfinddata_t ffblk;
   size_t i;
 
@@ -380,7 +395,7 @@ static void expand_pattern(wchar_t * pat)
   /* We need to stop at the first directory or drive boundary, because the
    * _findata_t structure contains the filename, not the leading directory. */
   for (i = wcslen(prefix); i > 0; i--) {
-    char c = prefix[i - 1];
+    wchar_t c = prefix[i - 1];
     if (c == L'\\' || c == L'/' || c == L':') { prefix[i] = 0; break; }
   }
   /* No separator was found, it's a filename pattern without a leading directory. */
@@ -416,11 +431,7 @@ int caml_read_directory(wchar_t * dirname, struct ext_table * contents)
 {
   size_t dirnamelen;
   wchar_t * template;
-#if _MSC_VER <= 1200
-  int h;
-#else
   intptr_t h;
-#endif
   struct _wfinddata_t fileinfo;
 
   dirnamelen = wcslen(dirname);

@@ -116,7 +116,7 @@ install:
 	mkdir -p "$(INSTALL_LIBDIR)/vmthreads"
 	cp libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
 	cd "$(INSTALL_LIBDIR)/vmthreads"; $(RANLIB) libvmthreads.a
-	cp $(CMIFILES) $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmti) \
+	cp $(CMIFILES) $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmt) $(CMIFILES:.cmi=.cmti) \
 	   threads.cma stdlib.cma unix.cma "$(INSTALL_LIBDIR)/vmthreads"
 
 installopt:

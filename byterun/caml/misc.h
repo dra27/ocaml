@@ -55,7 +55,7 @@ typedef char * addr;
   #define CAMLnoreturn_start
   #define CAMLnoreturn_end __attribute__ ((noreturn))
   #define Noreturn __attribute__ ((noreturn))
-#elif _MSC_VER >= 1500
+#elif defined(_MSC_VER) && _MSC_VER >= 1500
   #define CAMLnoreturn_start __declspec(noreturn)
   #define CAMLnoreturn_end
   #define Noreturn
@@ -419,7 +419,6 @@ extern void caml_set_fields (intnat v, unsigned long, unsigned long);
 
 #if defined(_WIN32) && !defined(_UCRT)
 extern int caml_snprintf(char * buf, size_t size, const char * format, ...);
-#define snprintf caml_snprintf
 #endif
 
 #ifdef CAML_INSTR
@@ -427,6 +426,12 @@ extern int caml_snprintf(char * buf, size_t size, const char * format, ...);
 
 #include <time.h>
 #include <stdio.h>
+
+/* snprintf emulation for Win32 - do define after stdio.h, in case snprintf is defined */
+
+#if defined(_WIN32) && !defined(_UCRT)
+#define snprintf caml_snprintf
+#endif
 
 extern intnat caml_stat_minor_collections;
 extern intnat CAML_INSTR_STARTTIME, CAML_INSTR_STOPTIME;

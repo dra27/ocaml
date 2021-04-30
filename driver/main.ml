@@ -22,6 +22,7 @@ let usage = "Usage: ocamlc <options> <files>\nOptions are:"
 let ppf = Format.err_formatter
 
 let show_config () =
+  Misc.mingw_binary_output ();
   Config.print_config stdout;
   exit 0;
 ;;

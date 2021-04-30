@@ -122,7 +122,7 @@ install:
 	cp libthreads.$(A) "$(INSTALL_LIBDIR)"
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libthreads.$(A)
 	mkdir -p "$(THREADS_LIBDIR)"
-	cp $(CMIFILES) $(CMIFILES:.cmi=.cmti) threads.cma "$(THREADS_LIBDIR)"
+	cp $(CMIFILES) $(CMIFILES:.cmi=.cmt) $(CMIFILES:.cmi=.cmti) threads.cma "$(THREADS_LIBDIR)"
 	cp $(MLIFILES) "$(INSTALL_LIBDIR)"
 	cp threads.h "$(INSTALL_LIBDIR)/caml"
 
