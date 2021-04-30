@@ -224,3 +224,23 @@ let thd3 (_,_,x) = x
 let fst4 (x, _, _, _) = x
 let snd4 (_,x,_, _) = x
 let thd4 (_,_,x,_) = x
+
+let mingw_binary_output () =
+  match Sys.os_type with
+  | "Win32" ->
+    (try set_binary_mode_out stdout true with _ -> ());
+    (try set_binary_mode_out stderr true with _ -> ());
+  | _ -> ()
+
+let slashify p =
+  match Sys.os_type with
+  | "Win32" ->
+    let len = String.length p in
+    let b = String.create len in
+    for i = 0 to len - 1 do
+      String.set b i (match p.[i] with
+        | '\\' ->  '/'
+        | x -> x )
+    done;
+    b
+  | _ -> p

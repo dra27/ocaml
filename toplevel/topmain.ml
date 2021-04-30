@@ -48,11 +48,13 @@ let file_argument name =
     end
 
 let print_version () =
+  Misc.mingw_binary_output ();
   Printf.printf "The OCaml toplevel, version %s\n" Sys.ocaml_version;
   exit 0;
 ;;
 
 let print_version_num () =
+  Misc.mingw_binary_output ();
   Printf.printf "%s\n" Sys.ocaml_version;
   exit 0;
 ;;

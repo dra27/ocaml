@@ -18,7 +18,7 @@
 #include "config.h"
 #include "alloc.h"
 #include "fail.h"
-#include "io.h"
+#include "caml_io.h"
 #include "mlvalues.h"
 
 #define Uninitialised (Val_int(0))

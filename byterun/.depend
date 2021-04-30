@@ -5,7 +5,7 @@ array.o: array.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h fail.h memory.h gc.h major_gc.h freelist.h \
   minor_gc.h
 backtrace.o: backtrace.c config.h ../config/m.h ../config/s.h \
-  compatibility.h mlvalues.h misc.h alloc.h io.h instruct.h intext.h \
+  compatibility.h mlvalues.h misc.h alloc.h caml_io.h instruct.h intext.h \
   exec.h fix_code.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
   startup.h stacks.h sys.h backtrace.h
 callback.o: callback.c callback.h compatibility.h mlvalues.h config.h \
@@ -22,23 +22,23 @@ custom.o: custom.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   freelist.h minor_gc.h
 debugger.o: debugger.c alloc.h compatibility.h misc.h config.h \
   ../config/m.h ../config/s.h mlvalues.h debugger.h fail.h fix_code.h \
-  instruct.h intext.h io.h stacks.h memory.h gc.h major_gc.h freelist.h \
+  instruct.h intext.h caml_io.h stacks.h memory.h gc.h major_gc.h freelist.h \
   minor_gc.h sys.h
 dynlink.o: dynlink.c config.h ../config/m.h ../config/s.h compatibility.h \
   alloc.h misc.h mlvalues.h dynlink.h fail.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h osdeps.h prims.h
 extern.o: extern.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h custom.h fail.h gc.h intext.h io.h md5.h \
+  ../config/s.h mlvalues.h custom.h fail.h gc.h intext.h caml_io.h md5.h \
   memory.h major_gc.h freelist.h minor_gc.h reverse.h
 fail.o: fail.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h io.h gc.h memory.h major_gc.h \
+  ../config/s.h mlvalues.h fail.h caml_io.h gc.h memory.h major_gc.h \
   freelist.h minor_gc.h printexc.h signals.h stacks.h
 finalise.o: finalise.c callback.h compatibility.h mlvalues.h config.h \
   ../config/m.h ../config/s.h misc.h fail.h roots.h memory.h gc.h \
   major_gc.h freelist.h minor_gc.h signals.h
 fix_code.o: fix_code.c config.h ../config/m.h ../config/s.h \
   compatibility.h debugger.h misc.h mlvalues.h fix_code.h instruct.h \
-  intext.h io.h md5.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
+  intext.h caml_io.h md5.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
   reverse.h
 floats.o: floats.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h fail.h memory.h gc.h major_gc.h freelist.h \
@@ -58,17 +58,17 @@ hash.o: hash.c mlvalues.h compatibility.h config.h ../config/m.h \
   minor_gc.h hash.h int64_native.h
 instrtrace.o: instrtrace.c
 intern.o: intern.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h callback.h custom.h fail.h gc.h intext.h io.h \
+  ../config/s.h mlvalues.h callback.h custom.h fail.h gc.h intext.h caml_io.h \
   md5.h memory.h major_gc.h freelist.h minor_gc.h reverse.h
 interp.o: interp.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h backtrace.h callback.h debugger.h fail.h \
   fix_code.h instrtrace.h instruct.h interp.h major_gc.h freelist.h \
   memory.h gc.h minor_gc.h prims.h signals.h stacks.h jumptbl.h
 ints.o: ints.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h custom.h fail.h intext.h io.h memory.h gc.h \
+  ../config/s.h mlvalues.h custom.h fail.h intext.h caml_io.h memory.h gc.h \
   major_gc.h freelist.h minor_gc.h int64_native.h
 io.o: io.c config.h ../config/m.h ../config/s.h compatibility.h alloc.h \
-  misc.h mlvalues.h custom.h fail.h io.h memory.h gc.h major_gc.h \
+  misc.h mlvalues.h custom.h fail.h caml_io.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h signals.h sys.h
 lexing.o: lexing.c fail.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h stacks.h memory.h gc.h major_gc.h freelist.h \
@@ -79,13 +79,13 @@ major_gc.o: major_gc.c compact.h config.h ../config/m.h ../config/s.h \
   compatibility.h misc.h custom.h mlvalues.h fail.h finalise.h roots.h \
   memory.h gc.h major_gc.h freelist.h minor_gc.h gc_ctrl.h weak.h
 md5.o: md5.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h md5.h io.h memory.h gc.h major_gc.h \
+  ../config/s.h mlvalues.h fail.h md5.h caml_io.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h reverse.h
 memory.o: memory.c fail.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h freelist.h gc.h gc_ctrl.h major_gc.h memory.h \
   minor_gc.h signals.h
 meta.o: meta.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h fix_code.h interp.h intext.h io.h \
+  ../config/s.h mlvalues.h fail.h fix_code.h interp.h intext.h caml_io.h \
   major_gc.h freelist.h memory.h gc.h minor_gc.h prims.h stacks.h
 minor_gc.o: minor_gc.c config.h ../config/m.h ../config/s.h \
   compatibility.h fail.h misc.h mlvalues.h finalise.h roots.h memory.h \
@@ -119,7 +119,7 @@ stacks.o: stacks.c config.h ../config/m.h ../config/s.h compatibility.h \
 startup.o: startup.c config.h ../config/m.h ../config/s.h compatibility.h \
   alloc.h misc.h mlvalues.h backtrace.h callback.h custom.h debugger.h \
   dynlink.h exec.h fail.h fix_code.h freelist.h gc_ctrl.h instrtrace.h \
-  interp.h intext.h io.h memory.h gc.h major_gc.h minor_gc.h osdeps.h \
+  interp.h intext.h caml_io.h memory.h gc.h major_gc.h minor_gc.h osdeps.h \
   prims.h printexc.h reverse.h signals.h stacks.h sys.h startup.h \
   version.h
 str.o: str.c alloc.h compatibility.h misc.h config.h ../config/m.h \
@@ -128,7 +128,7 @@ sys.o: sys.c config.h ../config/m.h ../config/s.h compatibility.h alloc.h \
   misc.h mlvalues.h debugger.h fail.h instruct.h osdeps.h signals.h \
   stacks.h memory.h gc.h major_gc.h freelist.h minor_gc.h sys.h
 terminfo.o: terminfo.c config.h ../config/m.h ../config/s.h \
-  compatibility.h alloc.h misc.h mlvalues.h fail.h io.h
+  compatibility.h alloc.h misc.h mlvalues.h fail.h caml_io.h
 unix.o: unix.c config.h ../config/m.h ../config/s.h compatibility.h \
   memory.h gc.h mlvalues.h misc.h major_gc.h freelist.h minor_gc.h \
   osdeps.h
@@ -142,7 +142,7 @@ array.d.o: array.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h fail.h memory.h gc.h major_gc.h freelist.h \
   minor_gc.h
 backtrace.d.o: backtrace.c config.h ../config/m.h ../config/s.h \
-  compatibility.h mlvalues.h misc.h alloc.h io.h instruct.h intext.h \
+  compatibility.h mlvalues.h misc.h alloc.h caml_io.h instruct.h intext.h \
   exec.h fix_code.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
   startup.h stacks.h sys.h backtrace.h
 callback.d.o: callback.c callback.h compatibility.h mlvalues.h config.h \
@@ -159,23 +159,23 @@ custom.d.o: custom.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   freelist.h minor_gc.h
 debugger.d.o: debugger.c alloc.h compatibility.h misc.h config.h \
   ../config/m.h ../config/s.h mlvalues.h debugger.h fail.h fix_code.h \
-  instruct.h intext.h io.h stacks.h memory.h gc.h major_gc.h freelist.h \
+  instruct.h intext.h caml_io.h stacks.h memory.h gc.h major_gc.h freelist.h \
   minor_gc.h sys.h
 dynlink.d.o: dynlink.c config.h ../config/m.h ../config/s.h compatibility.h \
   alloc.h misc.h mlvalues.h dynlink.h fail.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h osdeps.h prims.h
 extern.d.o: extern.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h custom.h fail.h gc.h intext.h io.h md5.h \
+  ../config/s.h mlvalues.h custom.h fail.h gc.h intext.h caml_io.h md5.h \
   memory.h major_gc.h freelist.h minor_gc.h reverse.h
 fail.d.o: fail.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h io.h gc.h memory.h major_gc.h \
+  ../config/s.h mlvalues.h fail.h caml_io.h gc.h memory.h major_gc.h \
   freelist.h minor_gc.h printexc.h signals.h stacks.h
 finalise.d.o: finalise.c callback.h compatibility.h mlvalues.h config.h \
   ../config/m.h ../config/s.h misc.h fail.h roots.h memory.h gc.h \
   major_gc.h freelist.h minor_gc.h signals.h
 fix_code.d.o: fix_code.c config.h ../config/m.h ../config/s.h \
   compatibility.h debugger.h misc.h mlvalues.h fix_code.h instruct.h \
-  intext.h io.h md5.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
+  intext.h caml_io.h md5.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
   reverse.h
 floats.d.o: floats.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h fail.h memory.h gc.h major_gc.h freelist.h \
@@ -197,17 +197,17 @@ instrtrace.d.o: instrtrace.c instruct.h misc.h compatibility.h config.h \
   ../config/m.h ../config/s.h mlvalues.h opnames.h prims.h stacks.h \
   memory.h gc.h major_gc.h freelist.h minor_gc.h
 intern.d.o: intern.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h callback.h custom.h fail.h gc.h intext.h io.h \
+  ../config/s.h mlvalues.h callback.h custom.h fail.h gc.h intext.h caml_io.h \
   md5.h memory.h major_gc.h freelist.h minor_gc.h reverse.h
 interp.d.o: interp.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h backtrace.h callback.h debugger.h fail.h \
   fix_code.h instrtrace.h instruct.h interp.h major_gc.h freelist.h \
   memory.h gc.h minor_gc.h prims.h signals.h stacks.h
 ints.d.o: ints.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h custom.h fail.h intext.h io.h memory.h gc.h \
+  ../config/s.h mlvalues.h custom.h fail.h intext.h caml_io.h memory.h gc.h \
   major_gc.h freelist.h minor_gc.h int64_native.h
 io.d.o: io.c config.h ../config/m.h ../config/s.h compatibility.h alloc.h \
-  misc.h mlvalues.h custom.h fail.h io.h memory.h gc.h major_gc.h \
+  misc.h mlvalues.h custom.h fail.h caml_io.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h signals.h sys.h
 lexing.d.o: lexing.c fail.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h stacks.h memory.h gc.h major_gc.h freelist.h \
@@ -218,13 +218,13 @@ major_gc.d.o: major_gc.c compact.h config.h ../config/m.h ../config/s.h \
   compatibility.h misc.h custom.h mlvalues.h fail.h finalise.h roots.h \
   memory.h gc.h major_gc.h freelist.h minor_gc.h gc_ctrl.h weak.h
 md5.d.o: md5.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h md5.h io.h memory.h gc.h major_gc.h \
+  ../config/s.h mlvalues.h fail.h md5.h caml_io.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h reverse.h
 memory.d.o: memory.c fail.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h freelist.h gc.h gc_ctrl.h major_gc.h memory.h \
   minor_gc.h signals.h
 meta.d.o: meta.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h fix_code.h interp.h intext.h io.h \
+  ../config/s.h mlvalues.h fail.h fix_code.h interp.h intext.h caml_io.h \
   major_gc.h freelist.h memory.h gc.h minor_gc.h prims.h stacks.h
 minor_gc.d.o: minor_gc.c config.h ../config/m.h ../config/s.h \
   compatibility.h fail.h misc.h mlvalues.h finalise.h roots.h memory.h \
@@ -258,7 +258,7 @@ stacks.d.o: stacks.c config.h ../config/m.h ../config/s.h compatibility.h \
 startup.d.o: startup.c config.h ../config/m.h ../config/s.h compatibility.h \
   alloc.h misc.h mlvalues.h backtrace.h callback.h custom.h debugger.h \
   dynlink.h exec.h fail.h fix_code.h freelist.h gc_ctrl.h instrtrace.h \
-  interp.h intext.h io.h memory.h gc.h major_gc.h minor_gc.h osdeps.h \
+  interp.h intext.h caml_io.h memory.h gc.h major_gc.h minor_gc.h osdeps.h \
   prims.h printexc.h reverse.h signals.h stacks.h sys.h startup.h \
   version.h
 str.d.o: str.c alloc.h compatibility.h misc.h config.h ../config/m.h \
@@ -267,7 +267,7 @@ sys.d.o: sys.c config.h ../config/m.h ../config/s.h compatibility.h alloc.h \
   misc.h mlvalues.h debugger.h fail.h instruct.h osdeps.h signals.h \
   stacks.h memory.h gc.h major_gc.h freelist.h minor_gc.h sys.h
 terminfo.d.o: terminfo.c config.h ../config/m.h ../config/s.h \
-  compatibility.h alloc.h misc.h mlvalues.h fail.h io.h
+  compatibility.h alloc.h misc.h mlvalues.h fail.h caml_io.h
 unix.d.o: unix.c config.h ../config/m.h ../config/s.h compatibility.h \
   memory.h gc.h mlvalues.h misc.h major_gc.h freelist.h minor_gc.h \
   osdeps.h
@@ -281,7 +281,7 @@ array.pic.o: array.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h fail.h memory.h gc.h major_gc.h freelist.h \
   minor_gc.h
 backtrace.pic.o: backtrace.c config.h ../config/m.h ../config/s.h \
-  compatibility.h mlvalues.h misc.h alloc.h io.h instruct.h intext.h \
+  compatibility.h mlvalues.h misc.h alloc.h caml_io.h instruct.h intext.h \
   exec.h fix_code.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
   startup.h stacks.h sys.h backtrace.h
 callback.pic.o: callback.c callback.h compatibility.h mlvalues.h config.h \
@@ -298,23 +298,23 @@ custom.pic.o: custom.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   freelist.h minor_gc.h
 debugger.pic.o: debugger.c alloc.h compatibility.h misc.h config.h \
   ../config/m.h ../config/s.h mlvalues.h debugger.h fail.h fix_code.h \
-  instruct.h intext.h io.h stacks.h memory.h gc.h major_gc.h freelist.h \
+  instruct.h intext.h caml_io.h stacks.h memory.h gc.h major_gc.h freelist.h \
   minor_gc.h sys.h
 dynlink.pic.o: dynlink.c config.h ../config/m.h ../config/s.h compatibility.h \
   alloc.h misc.h mlvalues.h dynlink.h fail.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h osdeps.h prims.h
 extern.pic.o: extern.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h custom.h fail.h gc.h intext.h io.h md5.h \
+  ../config/s.h mlvalues.h custom.h fail.h gc.h intext.h caml_io.h md5.h \
   memory.h major_gc.h freelist.h minor_gc.h reverse.h
 fail.pic.o: fail.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h io.h gc.h memory.h major_gc.h \
+  ../config/s.h mlvalues.h fail.h caml_io.h gc.h memory.h major_gc.h \
   freelist.h minor_gc.h printexc.h signals.h stacks.h
 finalise.pic.o: finalise.c callback.h compatibility.h mlvalues.h config.h \
   ../config/m.h ../config/s.h misc.h fail.h roots.h memory.h gc.h \
   major_gc.h freelist.h minor_gc.h signals.h
 fix_code.pic.o: fix_code.c config.h ../config/m.h ../config/s.h \
   compatibility.h debugger.h misc.h mlvalues.h fix_code.h instruct.h \
-  intext.h io.h md5.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
+  intext.h caml_io.h md5.h memory.h gc.h major_gc.h freelist.h minor_gc.h \
   reverse.h
 floats.pic.o: floats.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h fail.h memory.h gc.h major_gc.h freelist.h \
@@ -334,17 +334,17 @@ hash.pic.o: hash.c mlvalues.h compatibility.h config.h ../config/m.h \
   minor_gc.h hash.h int64_native.h
 instrtrace.pic.o: instrtrace.c
 intern.pic.o: intern.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h callback.h custom.h fail.h gc.h intext.h io.h \
+  ../config/s.h mlvalues.h callback.h custom.h fail.h gc.h intext.h caml_io.h \
   md5.h memory.h major_gc.h freelist.h minor_gc.h reverse.h
 interp.pic.o: interp.c alloc.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h backtrace.h callback.h debugger.h fail.h \
   fix_code.h instrtrace.h instruct.h interp.h major_gc.h freelist.h \
   memory.h gc.h minor_gc.h prims.h signals.h stacks.h jumptbl.h
 ints.pic.o: ints.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h custom.h fail.h intext.h io.h memory.h gc.h \
+  ../config/s.h mlvalues.h custom.h fail.h intext.h caml_io.h memory.h gc.h \
   major_gc.h freelist.h minor_gc.h int64_native.h
 io.pic.o: io.c config.h ../config/m.h ../config/s.h compatibility.h alloc.h \
-  misc.h mlvalues.h custom.h fail.h io.h memory.h gc.h major_gc.h \
+  misc.h mlvalues.h custom.h fail.h caml_io.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h signals.h sys.h
 lexing.pic.o: lexing.c fail.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h stacks.h memory.h gc.h major_gc.h freelist.h \
@@ -355,13 +355,13 @@ major_gc.pic.o: major_gc.c compact.h config.h ../config/m.h ../config/s.h \
   compatibility.h misc.h custom.h mlvalues.h fail.h finalise.h roots.h \
   memory.h gc.h major_gc.h freelist.h minor_gc.h gc_ctrl.h weak.h
 md5.pic.o: md5.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h md5.h io.h memory.h gc.h major_gc.h \
+  ../config/s.h mlvalues.h fail.h md5.h caml_io.h memory.h gc.h major_gc.h \
   freelist.h minor_gc.h reverse.h
 memory.pic.o: memory.c fail.h compatibility.h misc.h config.h ../config/m.h \
   ../config/s.h mlvalues.h freelist.h gc.h gc_ctrl.h major_gc.h memory.h \
   minor_gc.h signals.h
 meta.pic.o: meta.c alloc.h compatibility.h misc.h config.h ../config/m.h \
-  ../config/s.h mlvalues.h fail.h fix_code.h interp.h intext.h io.h \
+  ../config/s.h mlvalues.h fail.h fix_code.h interp.h intext.h caml_io.h \
   major_gc.h freelist.h memory.h gc.h minor_gc.h prims.h stacks.h
 minor_gc.pic.o: minor_gc.c config.h ../config/m.h ../config/s.h \
   compatibility.h fail.h misc.h mlvalues.h finalise.h roots.h memory.h \
@@ -395,7 +395,7 @@ stacks.pic.o: stacks.c config.h ../config/m.h ../config/s.h compatibility.h \
 startup.pic.o: startup.c config.h ../config/m.h ../config/s.h compatibility.h \
   alloc.h misc.h mlvalues.h backtrace.h callback.h custom.h debugger.h \
   dynlink.h exec.h fail.h fix_code.h freelist.h gc_ctrl.h instrtrace.h \
-  interp.h intext.h io.h memory.h gc.h major_gc.h minor_gc.h osdeps.h \
+  interp.h intext.h caml_io.h memory.h gc.h major_gc.h minor_gc.h osdeps.h \
   prims.h printexc.h reverse.h signals.h stacks.h sys.h startup.h \
   version.h
 str.pic.o: str.c alloc.h compatibility.h misc.h config.h ../config/m.h \
@@ -404,7 +404,7 @@ sys.pic.o: sys.c config.h ../config/m.h ../config/s.h compatibility.h alloc.h \
   misc.h mlvalues.h debugger.h fail.h instruct.h osdeps.h signals.h \
   stacks.h memory.h gc.h major_gc.h freelist.h minor_gc.h sys.h
 terminfo.pic.o: terminfo.c config.h ../config/m.h ../config/s.h \
-  compatibility.h alloc.h misc.h mlvalues.h fail.h io.h
+  compatibility.h alloc.h misc.h mlvalues.h fail.h caml_io.h
 unix.pic.o: unix.c config.h ../config/m.h ../config/s.h compatibility.h \
   memory.h gc.h mlvalues.h misc.h major_gc.h freelist.h minor_gc.h \
   osdeps.h
