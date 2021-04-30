@@ -150,9 +150,10 @@ let rec string_of_command_spec_with_calls call_with_tags call_with_target resolv
   let self = string_of_command_spec_with_calls call_with_tags call_with_target resolve_virtuals in
   let b = Buffer.create 256 in
   (* The best way to prevent bash from switching to its windows-style
-   * quote-handling is to prepend an empty string before the command name. *)
+   * quote-handling is to prepend an empty string before the command name.
+   * space seems to work, too - and the ouput is nicer and compatible with cmd *)
   if Sys.os_type = "Win32" then
-    Buffer.add_string b "''";
+    Buffer.add_char b ' ';
   let first = ref true in
   let put_space () =
     if !first then

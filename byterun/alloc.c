@@ -145,7 +145,7 @@ CAMLexport int caml_convert_flag_list(value list, int *flags)
 
 CAMLprim value caml_alloc_dummy(value size)
 {
-  mlsize_t wosize = Int_val(size);
+  mlsize_t wosize = Long_val(size);
 
   if (wosize == 0) return Atom(0);
   return caml_alloc (wosize, 0);
@@ -153,7 +153,7 @@ CAMLprim value caml_alloc_dummy(value size)
 
 CAMLprim value caml_alloc_dummy_float (value size)
 {
-  mlsize_t wosize = Int_val(size) * Double_wosize;
+  mlsize_t wosize = Long_val(size) * Double_wosize;
 
   if (wosize == 0) return Atom(0);
   return caml_alloc (wosize, 0);

@@ -34,6 +34,10 @@
 #ifdef HAS_UI
 #include "ui.h"
 #endif
+#ifdef _WIN32
+#include <string.h>
+#include <windows.h>
+#endif
 
 extern int caml_parser_trace;
 CAMLexport header_t caml_atom_table[256];
@@ -155,11 +159,64 @@ extern void caml_install_invalid_parameter_handler();
 #endif
 
 
+
+#ifdef _WIN32
+static char *
+get_executable_name(void)
+{
+#define START_LENGTH  1024
+#define MAX_LENGTH    (START_LENGTH * 64)
+    DWORD result;
+    DWORD path_size = START_LENGTH;
+    char* path      = malloc(START_LENGTH);
+
+    while ( path != NULL && path_size <= MAX_LENGTH )
+    {
+        memset(path, 0, path_size);
+        result = GetModuleFileName(NULL, path, path_size - 1);
+        if (result == 0 )
+        {
+            free(path);
+            path = NULL;
+        }
+        else if (result == path_size - 1)
+        {
+            DWORD er = GetLastError();
+            free(path);
+            path=NULL;
+            if ( er == ERROR_INSUFFICIENT_BUFFER ||
+                 er == ERROR_SUCCESS )
+            {
+                path_size = path_size * 2;
+                if ( path_size <= MAX_LENGTH )
+                  path = malloc(path_size);
+            }
+        }
+        else
+        {
+            /* don't waste memory */
+            size_t len = 1 + strlen(path);
+            char * result = malloc(len);
+            if ( result )
+              result=memcpy(result, path, len);
+            free(path);
+            path=result;
+            path_size= MAX_LENGTH + 1;
+        }
+    }
+    return path;
+#undef START_LENGTH
+#undef MAX_LENGTH
+}
+#endif /*_WIN32 */
+
 void caml_main(char **argv)
 {
   char * exe_name;
 #ifdef __linux__
   static char proc_self_exe[256];
+#elif _WIN32
+  char * execut;
 #endif
   value res;
   char tos;
@@ -184,6 +241,11 @@ void caml_main(char **argv)
 #ifdef __linux__
   if (caml_executable_name(proc_self_exe, sizeof(proc_self_exe)) == 0)
     exe_name = proc_self_exe;
+  else
+    exe_name = caml_search_exe_in_path(exe_name);
+#elif _WIN32
+  if  ( ( execut = get_executable_name() ) != NULL )
+    exe_name = execut ;
   else
     exe_name = caml_search_exe_in_path(exe_name);
 #else

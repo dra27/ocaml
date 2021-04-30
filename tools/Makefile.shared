@@ -94,7 +94,7 @@ clean::
 # To help building mixed-mode libraries (OCaml + C)
 
 ocamlmklib: myocamlbuild_config.cmo ocamlmklib.cmo
-	$(CAMLC) $(LINKFLAGS) -o ocamlmklib myocamlbuild_config.cmo \
+	$(CAMLC) $(LINKFLAGS) -o ocamlmklib misc.cmo myocamlbuild_config.cmo \
 	         ocamlmklib.cmo
 
 ocamlmklib.cmo: myocamlbuild_config.cmi

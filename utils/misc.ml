@@ -334,3 +334,24 @@ let split s c =
 let cut_at s c =
   let pos = String.index s c in
   String.sub s 0 pos, String.sub s (pos+1) (String.length s - pos - 1)
+
+
+let mingw_binary_output () =
+  match Sys.os_type with
+  | "Win32" ->
+      (try set_binary_mode_out stdout true with _ -> ());
+      (try set_binary_mode_out stderr true with _ -> ());
+  | _ -> ()
+
+let slashify p =
+  match Sys.os_type with
+  | "Win32" ->
+      let len = String.length p in
+      let b = String.create len in
+      for i = 0 to len - 1 do
+        String.set b i (match p.[i] with
+          | '\\' ->  '/'
+          | x -> x )
+      done;
+      b
+  | _ -> p

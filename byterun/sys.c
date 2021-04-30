@@ -24,6 +24,9 @@
 #include <sys/stat.h>
 #if !_WIN32
 #include <sys/wait.h>
+#else
+#include <direct.h>
+#include <io.h>
 #endif
 #include "config.h"
 #ifdef HAS_UNISTD
@@ -151,14 +154,24 @@ CAMLprim value caml_sys_close(value fd)
 
 CAMLprim value caml_sys_file_exists(value name)
 {
+#if _WIN32
+  struct _stati64 st;
+  return Val_bool(_stati64(String_val(name), &st) == 0);
+#else
   struct stat st;
   return Val_bool(stat(String_val(name), &st) == 0);
+#endif
 }
 
 CAMLprim value caml_sys_is_directory(value name)
 {
+#if _WIN32
+   struct _stati64 st;
+   if (_stati64(String_val(name), &st) == -1) caml_sys_error(name);
+#else
   struct stat st;
   if (stat(String_val(name), &st) == -1) caml_sys_error(name);
+#endif
 #ifdef S_ISDIR
   return Val_bool(S_ISDIR(st.st_mode));
 #else
