@@ -12845,7 +12845,7 @@ $as_echo_n "checking for flexdll sources... " >&6; }
 $as_echo "disabled" >&6; }
 else
   flexmsg=''
-    if test x"$with_flexdll" = 'x'; then :
+    if test x"$with_flexdll" = 'x' -o x"$with_flexdll" = 'xflexdll'; then :
   if test -f 'flexdll/flexdll.h'; then :
   case $target in #(
   *-*-cygwin*|*-w64-mingw32|*-pc-windows) :

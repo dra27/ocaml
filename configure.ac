@@ -717,7 +717,7 @@ AS_IF([test x"$enable_shared" != 'xno'], [
     [flexdir=''
     AC_MSG_RESULT([disabled])],
     [flexmsg=''
-    AS_IF([test x"$with_flexdll" = 'x'],
+    AS_IF([test x"$with_flexdll" = 'x' -o x"$with_flexdll" = 'xflexdll'],
       [AS_IF([test -f 'flexdll/flexdll.h'],
         [AS_CASE([$target],
           [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
