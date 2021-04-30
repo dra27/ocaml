@@ -16,6 +16,10 @@
 /* Buffered input/output. */
 
 #include <errno.h>
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#endif
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
@@ -27,7 +31,7 @@
 #include "alloc.h"
 #include "custom.h"
 #include "fail.h"
-#include "io.h"
+#include "caml_io.h"
 #include "memory.h"
 #include "misc.h"
 #include "mlvalues.h"
@@ -437,7 +441,8 @@ static struct custom_operations channel_operations = {
   compare_channel,
   custom_hash_default,
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 CAMLexport value caml_alloc_channel(struct channel *chan)

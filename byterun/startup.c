@@ -40,7 +40,7 @@
 #include "instrtrace.h"
 #include "interp.h"
 #include "intext.h"
-#include "io.h"
+#include "caml_io.h"
 #include "memory.h"
 #include "minor_gc.h"
 #include "misc.h"

@@ -36,10 +36,10 @@ libcamlrund.$(A): $(DOBJS)
 .SUFFIXES: .$(O) .$(DBGO)
 
 .c.$(O):
-	$(CC) $(CFLAGS) $(BYTECCCOMPOPTS) -c $<
+	$(CC) $(CFLAGS) $(BYTECCCOMPOPTS) $(CCCOMPOPTS_PATCH) -c $<
 
 .c.$(DBGO):
-	$(CC) $(CFLAGS) $(BYTECCDBGCOMPOPTS) -c $<
+	$(CC) $(CFLAGS) $(BYTECCDBGCOMPOPTS) $(CCCOMPOPTS_PATCH) -c -o $@ $<
 	mv $*.$(O) $*.$(DBGO)
 
 .depend.nt: .depend

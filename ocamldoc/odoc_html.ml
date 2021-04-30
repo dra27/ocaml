@@ -1235,7 +1235,7 @@ class html =
           self#html_of_module_kind b father k2;
           self#html_of_text b [Code ")"]
       | Module_with (k, s) ->
-          (* TODO: à modifier quand Module_with sera plus détaillé *)
+          (* TODO: a modifier quand Module_with sera plus detaille *)
           self#html_of_module_type_kind b father ?modu k;
           bs b "<code class=\"type\"> ";
           bs b (self#create_fully_qualified_module_idents_links father s);
@@ -1817,7 +1817,7 @@ class html =
           self#html_of_text b [Code "end"]
 
       | Class_apply capp ->
-          (* TODO: afficher le type final à partir du typedtree *)
+          (* TODO: afficher le type final a partir du typedtree *)
           self#html_of_text b [Raw "class application not handled yet"]
 
       | Class_constr cco ->

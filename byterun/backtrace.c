@@ -24,7 +24,7 @@
 #endif
 #include "mlvalues.h"
 #include "alloc.h"
-#include "io.h"
+#include "caml_io.h"
 #include "instruct.h"
 #include "intext.h"
 #include "exec.h"

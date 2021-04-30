@@ -255,7 +255,10 @@ let default_options = [
   "-texi", Arg.Unit (fun () -> set_doc_generator !default_texi_generator), M.generate_texinfo ;
   "-man", Arg.Unit (fun () -> set_doc_generator !default_man_generator), M.generate_man ;
   "-dot", Arg.Unit (fun () -> set_doc_generator !default_dot_generator), M.generate_dot ;
-  "-customdir", Arg.Unit (fun () -> Printf.printf "%s\n" Odoc_config.custom_generators_path; exit 0),
+  "-customdir", Arg.Unit (fun () ->
+      Misc.mingw_binary_output ();
+      Printf.printf "%s\n" (Misc.slashify Odoc_config.custom_generators_path);
+      exit 0),
   M.display_custom_generators_dir ;
   "-i", Arg.String (fun s -> ()), M.add_load_dir ;
   "-g", Arg.String (fun s -> ()), M.load_file ^

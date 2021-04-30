@@ -113,7 +113,7 @@ let rec query name =
           error (Cannot_parse_query (name, s))
 
 let list () =
-  run_and_parse Lexers.blank_sep_strings "%s list | cut -d' ' -f1" ocamlfind
+  run_and_parse Lexers.blank_sep_strings "%s list | cut -d' ' -f1" (Shell.quote_filename_if_needed ocamlfind)
 
 (* The closure algorithm is easy because the dependencies are already closed
 and sorted for each package. We only have to make the union. We could also

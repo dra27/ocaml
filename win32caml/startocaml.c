@@ -136,29 +136,72 @@ Input:         None explicit
 Output:        1 means sucess, zero failure
 Errors:        Almost all system calls will be verified
 ------------------------------------------------------------------------*/
+
+static char *
+get_executable_name(void)
+{
+#define START_LENGTH  1024
+#define MAX_LENGTH    (START_LENGTH * 64)
+    DWORD result;
+    DWORD path_size = START_LENGTH;
+    char* path      = malloc(START_LENGTH);
+
+    while ( path != NULL && path_size <= MAX_LENGTH )
+    {
+        memset(path, 0, path_size);
+        result = GetModuleFileName(NULL, path, path_size - 1);
+        if (result == 0 )
+        {
+            free(path);
+            path = NULL;
+        }
+        else if (result == path_size - 1)
+        {
+            DWORD er = GetLastError();
+            free(path);
+            path=NULL;
+            if ( er == ERROR_INSUFFICIENT_BUFFER ||
+                 er == ERROR_SUCCESS )
+            {
+                path_size = path_size * 2;
+                if ( path_size <= MAX_LENGTH )
+                  path = malloc(path_size);
+            }
+        }
+        else
+        {
+            /* don't waste memory */
+            size_t len = 1 + strlen(path);
+            char * result = malloc(len);
+            if ( result )
+              result=memcpy(result, path, len);
+            free(path);
+            path=result;
+            path_size= MAX_LENGTH + 1;
+        }
+    }
+    return path;
+#undef START_LENGTH
+#undef MAX_LENGTH
+}
+
 int GetOcamlPath(void)
 {
   char path[1024], *p;
-
-  while (( !ReadRegistry(HKEY_CURRENT_USER,
-			 "Software", "Objective Caml",
-			 "InterpreterPath", path)
-	   &&
-	   !ReadRegistry(HKEY_LOCAL_MACHINE,
-			 "Software", "Objective Caml",
-			 "InterpreterPath", path))
-	 || _access(path, 0) != 0) {
-    /* Registry key doesn't exist or contains invalid path */
-    /* Ask user */
-    if (!BrowseForFile("Ocaml interpreter|ocaml.exe", path)) {
+  p = get_executable_name();
+  if ( p == NULL ){
       ShowDbgMsg("Impossible to find ocaml.exe. I quit");
       exit(0);
     }
-    WriteRegistry(HKEY_CURRENT_USER,
-		  "Software", "Objective Caml",
-		  "InterpreterPath", path);
-    /* Iterate to validate again */
+  strcpy(path,p);
+  free(p);
+  p = strrchr(path,'\\');
+  if ( p == NULL ){
+    ShowDbgMsg("Impossible to find ocaml.exe. I quit");
+    exit(0);
   }
+  *p = 0;
+  strcat(path,"\\ocaml.exe");
   strcpy(OcamlPath, path);
   p = strrchr(OcamlPath,'\\');
   if (p) {
@@ -168,7 +211,7 @@ int GetOcamlPath(void)
     p = strrchr(LibDir,'\\');
     if (p && !stricmp(p,"\\bin")) {
       *p = 0;
-      strcat(LibDir,"\\lib");
+      strcat(LibDir,"\\lib\\ocaml");
     }
   }
   return 1;

@@ -20,4 +20,4 @@ OCAMLMKTOP=ocamlmktop.cmo
 OCAMLMKTOP_IMPORTS=misc.cmo config.cmo clflags.cmo ccomp.cmo
 
 ocamlmktop: $(OCAMLMKTOP)
-	$(CAMLC) $(LINKFLAGS) -o ocamlmktop $(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP)
+	$(CAMLC) $(LINKFLAGS) -o ocamlmktop.exe $(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP)

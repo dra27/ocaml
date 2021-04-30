@@ -150,7 +150,7 @@ Command.setup_virtual_command_solver "OCAMLOPTWIN" (convert_for_windows_shell oc
 let ocamlc   = V"OCAMLC";;
 let ocamlopt = V"OCAMLOPT";;
 
-let ar = A"ar";;
+let ar = A"i686-w64-mingw32-ar";;
 
 dispatch begin function
 | Before_hygiene ->

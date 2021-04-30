@@ -22,8 +22,24 @@ let is_simple_filename s =
     | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' | '-' | '/' | '_' | ':' | '@' | '+' | ',' -> loop (pos + 1)
     | _ -> false in
   loop 0
+
+let generic_quote quotequote s =
+  let l = String.length s in
+  let b = Buffer.create (l + 20) in
+  Buffer.add_char b '\'';
+  for i = 0 to l - 1 do
+    if s.[i] = '\''
+    then Buffer.add_string b quotequote
+    else Buffer.add_char b  s.[i]
+  done;
+  Buffer.add_char b '\'';
+  Buffer.contents b
+let unix_quote = generic_quote "'\\''"
+
 let quote_filename_if_needed s =
-  if is_simple_filename s then s else Filename.quote s
+  if is_simple_filename s then s
+  else if Sys.os_type = "Win32" then unix_quote s
+  else Filename.quote s
 let chdir dir =
   reset_filesys_cache ();
   Sys.chdir dir

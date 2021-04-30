@@ -81,7 +81,7 @@ clean::
 # To help building mixed-mode libraries (Caml + C)
 
 ocamlmklib: myocamlbuild_config.cmo ocamlmklib.cmo
-	$(CAMLC) $(LINKFLAGS) -o ocamlmklib myocamlbuild_config.cmo \
+	$(CAMLC) $(LINKFLAGS) -o ocamlmklib misc.cmo myocamlbuild_config.cmo \
 	         ocamlmklib.cmo
 
 ocamlmklib.cmo: myocamlbuild_config.cmi
@@ -117,7 +117,7 @@ clean::
 # To make custom toplevels (see Makefile/Makefile.nt)
 
 install::
-	cp ocamlmktop $(BINDIR)/   # no $(EXE) here, ocamlmktop is a script
+	cp ocamlmktop$(EXE) $(BINDIR)/
 
 clean::
 	rm -f ocamlmktop

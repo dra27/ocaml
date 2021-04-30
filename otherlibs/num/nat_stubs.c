@@ -35,7 +35,8 @@ static struct custom_operations nat_operations = {
   custom_compare_default,
   custom_hash_default,
   serialize_nat,
-  deserialize_nat
+  deserialize_nat,
+  custom_compare_ext_default
 };
 
 CAMLprim value initialize_nat(value unit)

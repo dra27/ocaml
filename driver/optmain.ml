@@ -56,6 +56,7 @@ let process_file ppf name =
     raise(Arg.Bad("don't know what to do with " ^ name))
 
 let print_version_and_library () =
+  Misc.mingw_binary_output ();
   print_string "The Objective Caml native-code compiler, version ";
   print_string Config.version; print_newline();
   print_string "Standard library directory: ";
@@ -63,9 +64,11 @@ let print_version_and_library () =
   exit 0
 
 let print_version_string () =
+  Misc.mingw_binary_output ();
   print_string Config.version; print_newline(); exit 0
 
 let print_standard_library () =
+  Misc.mingw_binary_output ();
   print_string Config.standard_library; print_newline(); exit 0
 
 let fatal err =

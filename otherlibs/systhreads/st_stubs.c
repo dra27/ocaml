@@ -18,7 +18,7 @@
 #include "callback.h"
 #include "custom.h"
 #include "fail.h"
-#include "io.h"
+#include "caml_io.h"
 #include "memory.h"
 #include "misc.h"
 #include "mlvalues.h"
@@ -698,7 +698,8 @@ static struct custom_operations caml_mutex_ops = {
   caml_mutex_condition_compare,
   custom_hash_default,
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 CAMLprim value caml_mutex_new(value unit)        /* ML */
@@ -765,7 +766,8 @@ static struct custom_operations caml_condition_ops = {
   caml_mutex_condition_compare,
   custom_hash_default,
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 CAMLprim value caml_condition_new(value unit)        /* ML */
@@ -824,7 +826,8 @@ static struct custom_operations caml_threadstatus_ops = {
   custom_compare_default,
   custom_hash_default,
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 static value caml_threadstatus_new (void)

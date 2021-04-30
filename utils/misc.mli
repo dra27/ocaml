@@ -102,3 +102,6 @@ val search_substring: string -> string -> int -> int
 val rev_split_words: string -> string list
         (* [rev_split_words s] splits [s] in blank-separated words, and return
            the list of words in reverse order. *)
+
+val mingw_binary_output : unit -> unit
+val slashify: string -> string
