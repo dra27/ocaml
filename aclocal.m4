@@ -294,8 +294,22 @@ AC_DEFUN([OCAML_CHECK_LIBUNWIND], [
 AC_DEFUN([OCAML_TEST_FLEXLINK], [
   OCAML_CC_SAVE_VARIABLES
 
-  CC="$1 -exe"
-  CPPFLAGS="$2 $CPPFLAGS"
+  AC_MSG_CHECKING([whether $1 works])
+
+  # Create conftest2.$ac_objext as a symlink on Cygwin to ensure that native
+  # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
+  # flexlink can read anything).
+  $cat > conftest1.c <<"EOF"
+int answer = 42;
+EOF
+  $CC -c conftest1.c
+  AS_CASE([$4],[*-pc-cygwin],
+    [ln -s conftest1.$ac_objext conftest2.$ac_objext],
+    [cp conftest1.$ac_objext conftest2.$ac_objext])
+
+  CC="$1 -chain $2 -exe"
+  LIBS="conftest2.$ac_objext"
+  CPPFLAGS="$3 $CPPFLAGS"
   AC_LINK_IFELSE(
     [AC_LANG_SOURCE([int main() { return 0; }])],
     [AC_MSG_RESULT([yes])],

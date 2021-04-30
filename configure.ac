@@ -743,10 +743,8 @@ AS_IF([test x"$enable_shared" != 'xno'], [
   AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
 
   AS_IF([test -n "$flexlink" -a -z "$flexdir"],[
-    AC_MSG_CHECKING([whether $flexlink works])
-
-    OCAML_TEST_FLEXLINK([$flexlink -chain $flexdll_chain],
-                        [$internal_cppflags])
+    OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
+                        [$internal_cppflags], [$host])
 
     AS_CASE([$host],
       [*-w64-mingw32|*-pc-windows],

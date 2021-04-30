@@ -12922,9 +12922,6 @@ fi
 
   if test -n "$flexlink" -a -z "$flexdir"; then :
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $flexlink works" >&5
-$as_echo_n "checking whether $flexlink works... " >&6; }
-
 
 
   saved_CC="$CC"
@@ -12938,7 +12935,25 @@ $as_echo_n "checking whether $flexlink works... " >&6; }
   touch confdefs.h
 
 
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $flexlink works" >&5
+$as_echo_n "checking whether $flexlink works... " >&6; }
+
+  # Create conftest2.$ac_objext as a symlink on Cygwin to ensure that native
+  # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
+  # flexlink can read anything).
+  $cat > conftest1.c <<"EOF"
+int answer = 42;
+EOF
+  $CC -c conftest1.c
+  case $host in #(
+  *-pc-cygwin) :
+    ln -s conftest1.$ac_objext conftest2.$ac_objext ;; #(
+  *) :
+    cp conftest1.$ac_objext conftest2.$ac_objext ;;
+esac
+
   CC="$flexlink -chain $flexdll_chain -exe"
+  LIBS="conftest2.$ac_objext"
   CPPFLAGS="$internal_cppflags $CPPFLAGS"
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -12950,7 +12965,7 @@ $as_echo "yes" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-    as_fn_error $? "$flexlink -chain $flexdll_chain does not work" "$LINENO" 5
+    as_fn_error $? "$flexlink does not work" "$LINENO" 5
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
