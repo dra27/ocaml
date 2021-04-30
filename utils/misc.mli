@@ -487,3 +487,6 @@ module EnvLazy: sig
   val backtrack : log -> unit
 
 end
+
+val mingw_binary_output : unit -> unit
+val slashify: string -> string
