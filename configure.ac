@@ -717,28 +717,34 @@ AS_IF([test x"$enable_shared" != 'xno'], [
     [flexdir=''
     AC_MSG_RESULT([disabled])],
     [flexmsg=''
-    AS_IF([test x"$with_flexdll" = 'x' -o x"$with_flexdll" = 'xflexdll'],
-      [AS_IF([test -f 'flexdll/flexdll.h'],
-        [AS_CASE([$target],
-          [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
-            [flexdir=flexdll
-            iflexdir='$(ROOTDIR)/flexdll'
-            with_flexdll="$iflexdir"])])],
-      [rm -rf flexdll-sources
-      AS_IF([test -f "$with_flexdll/flexdll.h"],
-        [mkdir -p flexdll-sources
-        cp -r "$with_flexdll"/* flexdll-sources/
-        flexdir='flexdll-sources'
-        iflexdir='$(ROOTDIR)/flexdll-sources'
-        flexmsg=" (from $with_flexdll)"],
-        [AC_MSG_RESULT([requested but not available])
-        AC_MSG_ERROR([exiting])])])
-    AS_IF([test x"$flexdir" = 'x'],
-      [AC_MSG_RESULT([no])],
-      [AC_MSG_RESULT([$iflexdir$flexmsg])
-      bootstrapping_flexdll=true
-      # The submodule should be searched *before* any other -I paths
-      internal_cppflags="-I $iflexdir $internal_cppflags"])])
+    AS_CASE([$target],
+      [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
+      [AS_IF([test x"$with_flexdll" = 'x' -o x"$with_flexdll" = 'xflexdll'],
+        [AS_IF([test -f 'flexdll/flexdll.h'],
+          [flexdir=flexdll
+          iflexdir='$(ROOTDIR)/flexdll'
+          with_flexdll="$iflexdir"],
+          [AS_IF([test x"$with_flexdll" != 'x'],
+            [AC_MSG_RESULT([requested but not available])
+            AC_MSG_ERROR([exiting])])])],
+        [rm -rf flexdll-sources
+        AS_IF([test -f "$with_flexdll/flexdll.h"],
+          [mkdir -p flexdll-sources
+          cp -r "$with_flexdll"/* flexdll-sources/
+          flexdir='flexdll-sources'
+          iflexdir='$(ROOTDIR)/flexdll-sources'
+          flexmsg=" (from $with_flexdll)"],
+          [AC_MSG_RESULT([requested but not available])
+          AC_MSG_ERROR([exiting])])])
+      AS_IF([test x"$flexdir" = 'x'],
+        [AC_MSG_RESULT([no])],
+        [AC_MSG_RESULT([$iflexdir$flexmsg])
+        bootstrapping_flexdll=true
+        # The submodule should be searched *before* any other -I paths
+        internal_cppflags="-I $iflexdir $internal_cppflags"])],
+      [AS_IF([test x"$with_flexdll" != 'x'],
+        [AC_MSG_RESULT([requested but not supported])
+        AC_MSG_ERROR([exiting])])])])
 
   AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
 
