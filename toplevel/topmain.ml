@@ -46,6 +46,7 @@ let file_argument name =
     end
 
 let print_version () =
+  Misc.mingw_binary_output ();
   Printf.printf "The Objective Caml toplevel, version %s\n" Sys.ocaml_version;
   exit 0;
 ;;

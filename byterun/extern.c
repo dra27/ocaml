@@ -23,7 +23,7 @@
 #include "fail.h"
 #include "gc.h"
 #include "intext.h"
-#include "io.h"
+#include "caml_io.h"
 #include "memory.h"
 #include "misc.h"
 #include "mlvalues.h"

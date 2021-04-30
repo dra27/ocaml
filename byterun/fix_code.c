@@ -20,6 +20,10 @@
 #ifdef HAS_UNISTD
 #include <unistd.h>
 #endif
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#endif
 
 #include "debugger.h"
 #include "fix_code.h"
@@ -44,7 +48,11 @@ void caml_load_code(int fd, asize_t len)
 
   caml_code_size = len;
   caml_start_code = (code_t) caml_stat_alloc(caml_code_size);
+#ifdef _WIN32
+  if (_read(fd, (char *) caml_start_code, caml_code_size) != caml_code_size)
+#else
   if (read(fd, (char *) caml_start_code, caml_code_size) != caml_code_size)
+#endif
     caml_fatal_error("Fatal error: truncated bytecode file.\n");
   caml_MD5Init(&ctx);
   caml_MD5Update(&ctx, (unsigned char *) caml_start_code, caml_code_size);

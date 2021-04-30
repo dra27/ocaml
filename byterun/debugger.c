@@ -27,7 +27,7 @@
 #include "fix_code.h"
 #include "instruct.h"
 #include "intext.h"
-#include "io.h"
+#include "caml_io.h"
 #include "misc.h"
 #include "mlvalues.h"
 #include "stacks.h"

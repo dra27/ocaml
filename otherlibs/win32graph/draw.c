@@ -194,7 +194,8 @@ CAMLprim value caml_gr_draw_arc(value *argv, int argc)
 			     argv[4], argv[5], FALSE);
 }
 
-CAMLprim value caml_gr_draw_arc_nat(vx, vy, vrx, vry, vstart, vend)
+CAMLprim value caml_gr_draw_arc_nat(value vx, value vy, value vrx, value vry,
+                                    value vstart, value vend)
 {
   return gr_draw_or_fill_arc(vx, vy, vrx, vry, vstart, vend, FALSE);
 }
@@ -303,13 +304,14 @@ static value gr_draw_or_fill_arc(value vx, value vy, value vrx, value vry,
         return Val_unit;
 }
 
+#if 0
 CAMLprim value caml_gr_show_bitmap(value filename,int x,int y)
 {
         AfficheBitmap(filename,grwindow.gcBitmap,x,Wcvt(y));
         AfficheBitmap(filename,grwindow.gc,x,Wcvt(y));
         return Val_unit;
 }
-
+#endif
 
 
 CAMLprim value caml_gr_get_mousex(void)
@@ -421,7 +423,8 @@ CAMLprim value caml_gr_fill_arc(value *argv, int argc)
 			     argv[4], argv[5], TRUE);
 }
 
-CAMLprim value caml_gr_fill_arc_nat(vx, vy, vrx, vry, vstart, vend)
+CAMLprim value caml_gr_fill_arc_nat(value vx,value vy,value vrx,value vry,
+                                    value vstart,value vend)
 {
   return gr_draw_or_fill_arc(vx, vy, vrx, vry, vstart, vend, TRUE);
 }

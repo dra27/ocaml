@@ -159,14 +159,23 @@ value process_impl dyn_loader name =
           (new CleanAst.clean_ast)#str_item
           AstFilters.fold_implem_filters gimd;
 
+value set_output_binary () =
+  match Sys.os_type with
+  [ "Win32" ->
+    do {
+      try set_binary_mode_out stdout True with _ -> ();
+      try set_binary_mode_out stderr True with _ -> ();
+    }
+  | _ -> () ];
+
 value just_print_the_version () =
-  do { printf "%s@." Camlp4_config.version; exit 0 };
+  do { set_output_binary (); printf "%s@." Camlp4_config.version; exit 0 };
 
 value print_version () =
-  do { eprintf "Camlp4 version %s@." Camlp4_config.version; exit 0 };
+  do { set_output_binary (); eprintf "Camlp4 version %s@." Camlp4_config.version; exit 0 };
 
 value print_stdlib () =
-  do { printf "%s@." Camlp4_config.camlp4_standard_library; exit 0 };
+  do { set_output_binary (); printf "%s@." Camlp4_config.camlp4_standard_library; exit 0 };
 
 value usage ini_sl ext_sl =
   do {

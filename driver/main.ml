@@ -61,6 +61,7 @@ let process_file ppf name =
     raise(Arg.Bad("don't know what to do with " ^ name))
 
 let print_version_and_library () =
+  Misc.mingw_binary_output ();
   print_string "The Objective Caml compiler, version ";
   print_string Config.version; print_newline();
   print_string "Standard library directory: ";
@@ -68,9 +69,11 @@ let print_version_and_library () =
   exit 0
 
 let print_version_string () =
+  Misc.mingw_binary_output ();
   print_string Config.version; print_newline(); exit 0
 
 let print_standard_library () =
+  Misc.mingw_binary_output ();
   print_string Config.standard_library; print_newline(); exit 0
 
 let usage = "Usage: ocamlc <options> <files>\nOptions are:"
@@ -81,6 +84,7 @@ let impl = process_implementation_file Format.err_formatter;;
 let intf = process_interface_file Format.err_formatter;;
 
 let show_config () =
+  Misc.mingw_binary_output ();
   Config.print_config stdout;
   exit 0;
 ;;

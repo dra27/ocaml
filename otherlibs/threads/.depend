@@ -8,7 +8,7 @@ scheduler.o: scheduler.c ../../byterun/alloc.h \
   ../../byterun/callback.h ../../byterun/compatibility.h \
   ../../byterun/mlvalues.h ../../byterun/fail.h \
   ../../byterun/compatibility.h ../../byterun/misc.h \
-  ../../byterun/mlvalues.h ../../byterun/io.h ../../byterun/misc.h \
+  ../../byterun/mlvalues.h ../../byterun/caml_io.h ../../byterun/misc.h \
   ../../byterun/mlvalues.h ../../byterun/memory.h \
   ../../byterun/compatibility.h ../../byterun/config.h ../../byterun/gc.h \
   ../../byterun/mlvalues.h ../../byterun/major_gc.h \

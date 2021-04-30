@@ -123,10 +123,30 @@ let add_to' rxs x =
     ()
 let set_cmd rcmd = String (fun s -> rcmd := Sh s)
 let set_build_dir s = make_links := false; build_dir := s
+
+let slashify p =
+  match Sys.os_type with
+  | "Win32" ->
+    let len = String.length p in
+    let b = String.create len in
+    for i = 0 to len - 1 do
+      String.set b i (match p.[i] with
+          | '\\' ->  '/'
+          | x -> x )
+    done;
+    b
+  | _ -> p
+
+let sb () =
+  match Sys.os_type with
+  | "Win32" ->
+    (try set_binary_mode_out stdout true with _ -> ());
+  | _ -> ()
+
 let spec =
   Arg.align
   [
-   "-version", Unit (fun () -> print_endline version; raise Exit_OK), " Display the version";
+   "-version", Unit (fun () -> sb (); print_endline version; raise Exit_OK), " Display the version";
    "-quiet", Unit (fun () -> Log.level := 0), " Make as quiet as possible";
    "-verbose", Int (fun i -> Log.level := i + 2), "<level> Set the verbosity level";
    "-documentation", Set show_documentation, " Show rules and flags";
@@ -178,8 +198,7 @@ let spec =
    "-build-dir", String set_build_dir, "<path> Set build directory (implies no-links)";
    "-install-lib-dir", Set_string Ocamlbuild_where.libdir, "<path> Set the install library directory";
    "-install-bin-dir", Set_string Ocamlbuild_where.bindir, "<path> Set the install binary directory";
-   "-where", Unit (fun () -> print_endline !Ocamlbuild_where.libdir; raise Exit_OK), " Display the install library directory";
-
+   "-where", Unit (fun () -> sb (); print_endline (slashify !Ocamlbuild_where.libdir); raise Exit_OK), " Display the install library directory";
    "-ocamlc", set_cmd ocamlc, "<command> Set the OCaml bytecode compiler";
    "-ocamlopt", set_cmd ocamlopt, "<command> Set the OCaml native compiler";
    "-ocamldep", set_cmd ocamldep, "<command> Set the OCaml dependency tool";

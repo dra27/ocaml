@@ -158,6 +158,7 @@ let set_checkpoints n =
 let set_directory dir =
   Sys.chdir dir
 let print_version () =
+  Misc.mingw_binary_output ();
   printf "The Objective Caml debugger, version %s@." Sys.ocaml_version;
   exit 0;
 ;;

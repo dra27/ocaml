@@ -198,8 +198,8 @@ LPSELECTDATA select_data_new (LPSELECTDATA lpSelectData, SELECTTYPE EType)
   HeapUnlock(GetProcessHeap());
 
   /* Init common data */
-  list_init((LPLIST)res);
-  list_next_set((LPLIST)res, (LPLIST)lpSelectData);
+  caml_winlist_init((LPLIST)res);
+  caml_winlist_next_set((LPLIST)res, (LPLIST)lpSelectData);
   res->EType         = EType;
   res->nResultsCount = 0;
         
@@ -947,7 +947,7 @@ CAMLprim value unix_select(value readfds, value writefds, value exceptfds, value
 #ifdef DBUG
   dbug_print("Building events done array");
 #endif
-  nEventsMax   = list_length((LPLIST)lpSelectData);
+  nEventsMax   = caml_winlist_length((LPLIST)lpSelectData);
   nEventsCount = 0;
   if (!HeapLock(GetProcessHeap()))
   {

@@ -13,6 +13,9 @@
 
 /* $Id$ */
 
+#ifndef CAML_UNIXSUPPORT_H
+#define CAML_UNIXSUPPORT_H
+
 #define WIN32_LEAN_AND_MEAN
 #include <wtypes.h>
 #include <winbase.h>
@@ -21,6 +24,10 @@
 #include <process.h>
 #include <sys/types.h>
 #include <winsock.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct filedescr {
   union {
@@ -51,3 +58,9 @@ extern void uerror (char * cmdname, value arg);
 extern value unix_freeze_buffer (value);
 
 #define UNIX_BUFFER_SIZE 16384
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* CAML_UNIXSUPPORT_H */

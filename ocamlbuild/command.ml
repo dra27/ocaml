@@ -127,6 +127,8 @@ let rec string_of_command_spec_with_calls call_with_tags call_with_target resolv
   let self = string_of_command_spec_with_calls call_with_tags call_with_target resolve_virtuals in
   let b = Buffer.create 256 in
   let first = ref true in
+  if Sys.os_type = "Win32" then
+    Buffer.add_char b ' ';
   let put_space () =
     if !first then
       first := false

@@ -17,7 +17,7 @@ nat_stubs.o: nat_stubs.c ../../byterun/alloc.h \
   ../../byterun/misc.h ../../byterun/custom.h \
   ../../byterun/compatibility.h ../../byterun/mlvalues.h \
   ../../byterun/intext.h ../../byterun/compatibility.h \
-  ../../byterun/misc.h ../../byterun/mlvalues.h ../../byterun/io.h \
+  ../../byterun/misc.h ../../byterun/mlvalues.h ../../byterun/caml_io.h \
   ../../byterun/misc.h ../../byterun/mlvalues.h ../../byterun/fix_code.h \
   ../../byterun/config.h ../../byterun/misc.h ../../byterun/mlvalues.h \
   ../../byterun/fail.h ../../byterun/compatibility.h ../../byterun/misc.h \

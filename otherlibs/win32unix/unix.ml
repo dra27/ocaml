@@ -243,8 +243,7 @@ type stats =
 external stat : string -> stats = "unix_stat"
 let lstat = stat
 external fstat : file_descr -> stats = "unix_fstat"
-let isatty fd =
-  match (fstat fd).st_kind with S_CHR -> true | _ -> false
+external isatty : file_descr -> bool = "unix_backport_isatty"
 
 (* Operations on file names *)
 
@@ -759,7 +758,10 @@ external win_create_process : string -> string -> string option ->
 
 let make_cmdline args =
   let maybe_quote f =
-    if String.contains f ' ' || String.contains f '\"'
+    if String.contains f ' ' ||
+       String.contains f '\"' ||
+       String.contains f '\t' ||
+       f = ""
     then Filename.quote f
     else f in
   String.concat " " (List.map maybe_quote (Array.to_list args))

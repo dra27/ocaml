@@ -13,11 +13,13 @@
 
 /* $Id$ */
 
+#include <mlvalues.h>
+#include <signals.h>
+#include <memory.h>
+#include <alloc.h>
 #include "winworker.h"
 #include "winlist.h"
 #include "windbug.h"
-#include <mlvalues.h>
-#include <alloc.h>
 #include "unixsupport.h"
 
 typedef enum {
@@ -108,7 +110,7 @@ LPWORKER worker_new (void)
   };
   lpWorker = (LPWORKER)HeapAlloc(hWorkerHeap, 0, sizeof(WORKER));
   HeapUnlock(hWorkerHeap);
-  list_init((LPLIST)lpWorker);
+  caml_winlist_init((LPLIST)lpWorker);
   lpWorker->hJobStarted  = CreateEvent(NULL, TRUE, FALSE, NULL);
   lpWorker->hJobStop     = CreateEvent(NULL, TRUE, FALSE, NULL);
   lpWorker->hJobDone     = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -207,7 +209,7 @@ LPWORKER worker_pop (void)
   dbug_print("Workers running current/runnning max/waiting: %d/%d/%d",
       nWorkersCurrent,
       nWorkersMax,
-      list_length((LPLIST)lpWorkers));
+      caml_winlist_length((LPLIST)lpWorkers));
 #endif
   ReleaseMutex(hWorkersMutex);
 
@@ -218,7 +220,7 @@ LPWORKER worker_pop (void)
   }
 
   /* Ensure that we don't get dangling pointer to old data. */
-  list_init((LPLIST)lpWorkerFree);
+  caml_winlist_init((LPLIST)lpWorkerFree);
   lpWorkerFree->lpJobUserData = NULL;
 
   /* Reset events */
@@ -239,7 +241,7 @@ void worker_push(LPWORKER lpWorker)
 #ifdef DBUG
   dbug_print("Testing if we are under the maximum number of running workers");
 #endif
-  if (list_length((LPLIST)lpWorkers) < THREAD_WORKERS_MAX)
+  if (caml_winlist_length((LPLIST)lpWorkers) < THREAD_WORKERS_MAX)
   {
 #ifdef DBUG
     dbug_print("Saving this worker for future use");
@@ -247,7 +249,7 @@ void worker_push(LPWORKER lpWorker)
 #ifdef DBUG
     dbug_print("Next: %x", ((LPLIST)lpWorker)->lpNext);
 #endif
-    lpWorkers = (LPWORKER)list_concat((LPLIST)lpWorker, (LPLIST)lpWorkers);
+    lpWorkers = (LPWORKER)caml_winlist_concat((LPLIST)lpWorker, (LPLIST)lpWorkers);
     bFreeWorker = FALSE;
   };
   nWorkersCurrent--;
@@ -255,7 +257,7 @@ void worker_push(LPWORKER lpWorker)
   dbug_print("Workers running current/runnning max/waiting: %d/%d/%d",
       nWorkersCurrent,
       nWorkersMax,
-      list_length((LPLIST)lpWorkers));
+      caml_winlist_length((LPLIST)lpWorkers));
 #endif
   ReleaseMutex(hWorkersMutex);
 

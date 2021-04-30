@@ -183,7 +183,7 @@ ftruncate.o: ftruncate.c ../../byterun/fail.h \
   ../../byterun/../config/m.h ../../byterun/../config/s.h \
   ../../byterun/compatibility.h ../../byterun/mlvalues.h \
   ../../byterun/compatibility.h ../../byterun/config.h \
-  ../../byterun/misc.h ../../byterun/io.h ../../byterun/misc.h \
+  ../../byterun/misc.h ../../byterun/caml_io.h ../../byterun/misc.h \
   ../../byterun/mlvalues.h unixsupport.h
 getaddrinfo.o: getaddrinfo.c ../../byterun/mlvalues.h \
   ../../byterun/compatibility.h ../../byterun/config.h \
@@ -443,7 +443,7 @@ lseek.o: lseek.c ../../byterun/mlvalues.h ../../byterun/compatibility.h \
   ../../byterun/misc.h ../../byterun/compatibility.h \
   ../../byterun/config.h ../../byterun/alloc.h \
   ../../byterun/compatibility.h ../../byterun/misc.h \
-  ../../byterun/mlvalues.h ../../byterun/io.h ../../byterun/misc.h \
+  ../../byterun/mlvalues.h ../../byterun/caml_io.h ../../byterun/misc.h \
   ../../byterun/mlvalues.h unixsupport.h
 mkdir.o: mkdir.c ../../byterun/mlvalues.h ../../byterun/compatibility.h \
   ../../byterun/config.h ../../byterun/../config/m.h \
@@ -676,7 +676,7 @@ stat.o: stat.c ../../byterun/mlvalues.h ../../byterun/compatibility.h \
   ../../byterun/misc.h ../../byterun/minor_gc.h ../../byterun/misc.h \
   ../../byterun/misc.h ../../byterun/mlvalues.h ../../byterun/alloc.h \
   ../../byterun/compatibility.h ../../byterun/misc.h \
-  ../../byterun/mlvalues.h unixsupport.h cst2constr.h ../../byterun/io.h \
+  ../../byterun/mlvalues.h unixsupport.h cst2constr.h ../../byterun/caml_io.h \
   ../../byterun/misc.h ../../byterun/mlvalues.h
 strofaddr.o: strofaddr.c ../../byterun/mlvalues.h \
   ../../byterun/compatibility.h ../../byterun/config.h \
@@ -727,7 +727,7 @@ truncate.o: truncate.c ../../byterun/mlvalues.h \
   ../../byterun/compatibility.h ../../byterun/misc.h \
   ../../byterun/compatibility.h ../../byterun/config.h \
   ../../byterun/fail.h ../../byterun/compatibility.h ../../byterun/misc.h \
-  ../../byterun/mlvalues.h ../../byterun/io.h ../../byterun/misc.h \
+  ../../byterun/mlvalues.h ../../byterun/caml_io.h ../../byterun/misc.h \
   ../../byterun/mlvalues.h unixsupport.h
 umask.o: umask.c ../../byterun/mlvalues.h ../../byterun/compatibility.h \
   ../../byterun/config.h ../../byterun/../config/m.h \

@@ -17,12 +17,32 @@
  * - Nicolas Pouillard: refactoring
  *)
 
-let ocaml_standard_library = Camlp4_import.Config.standard_library;;
+let slashify p =
+  match Sys.os_type with
+  | "Win32" ->
+    let len = String.length p in
+    let b = String.create len in
+    for i = 0 to len - 1 do
+      String.set b i (match p.[i] with
+          | '\\' ->  '/'
+          | x -> x )
+    done;
+    b
+  | _ -> p
+
+let ocaml_standard_library = slashify (Camlp4_import.Config.standard_library);;
 
 let camlp4_standard_library =
-  try Sys.getenv "CAMLP4LIB"
-  with Not_found -> 
-    Filename.concat ocaml_standard_library "camlp4";;
+  slashify (
+    try
+      let d = Sys.getenv "CAMLP4LIB" in
+      if Sys.is_directory d then
+        d
+      else
+        raise Not_found
+    with _ ->
+      Filename.concat ocaml_standard_library "camlp4"
+  );;
 
 let version = Sys.ocaml_version;;
 let program_name = ref "camlp4";;

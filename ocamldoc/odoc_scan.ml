@@ -44,8 +44,8 @@ class scanner =
        @return true if the class elements must be scanned.*)
     method scan_class_pre (c : Odoc_class.t_class) = true
 
-    (** This method scan the elements of the given class. 
-       A VOIR : scan des classes héritées.*)
+    (** This method scan the elements of the given class.
+       A VOIR : scan des classes heritees.*)
     method scan_class_elements c =
       List.iter 
         (fun ele -> 
@@ -70,8 +70,8 @@ class scanner =
        @return true if the class type elements must be scanned.*)
     method scan_class_type_pre (ct : Odoc_class.t_class_type) = true
 
-    (** This method scan the elements of the given class type. 
-       A VOIR : scan des classes héritées.*)
+    (** This method scan the elements of the given class type.
+       A VOIR : scan des classes heritees.*)
     method scan_class_type_elements ct =
       List.iter 
         (fun ele -> 

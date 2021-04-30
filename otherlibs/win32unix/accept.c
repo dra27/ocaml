@@ -17,6 +17,7 @@
 #include <alloc.h>
 #include <memory.h>
 #include <signals.h>
+#include <io.h>
 #include "unixsupport.h"
 #include "socketaddr.h"
 

@@ -16,6 +16,9 @@
 #include <mlvalues.h>
 #include <alloc.h>
 #include "unixsupport.h"
+#ifdef _WIN32
+#include <io.h>
+#endif
 
 #ifdef HAS_UNISTD
 # include <unistd.h>

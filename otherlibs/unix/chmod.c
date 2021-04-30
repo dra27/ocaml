@@ -17,6 +17,9 @@
 #include <sys/stat.h>
 #include <mlvalues.h>
 #include "unixsupport.h"
+#ifdef _WIN32
+#include <io.h>
+#endif
 
 CAMLprim value unix_chmod(value path, value perm)
 {
