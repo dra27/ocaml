@@ -14,6 +14,10 @@
 /* Buffered input/output. */
 
 #include <errno.h>
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#endif
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
@@ -39,6 +43,11 @@
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
+#endif
+
+#if defined(_WIN32)
+#include <io.h>
+#define lseek _lseeki64
 #endif
 
 /* Hooks for locking channels */

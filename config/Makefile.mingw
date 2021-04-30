@@ -15,7 +15,7 @@
 
 ######### General configuration
 
-PREFIX=C:/ocamlmgw
+PREFIX=@PREFIX@
 
 ### Remove this to disable compiling ocamldebug
 WITH_DEBUGGER=ocamldebugger
@@ -30,7 +30,7 @@ WITH_OCAMLDOC=ocamldoc
 BINDIR=$(PREFIX)/bin
 
 ### Where to install the standard library
-LIBDIR=$(PREFIX)/lib
+LIBDIR=$(PREFIX)/lib/ocaml
 
 ### Where to install the stub DLLs
 STUBLIBDIR=$(LIBDIR)/stublibs
@@ -68,7 +68,7 @@ X11_INCLUDES=
 X11_LINK=
 BYTECCRPATH=
 SUPPORTS_SHARED_LIBRARIES=true
-SHAREDCCCOMPOPTS=-O
+SHAREDCCCOMPOPTS=-march=i686 -mtune=generic -O2 -g
 MKSHAREDLIBRPATH=
 NATIVECCPROFOPTS=
 NATIVECCRPATH=
@@ -93,13 +93,16 @@ GRAPHLIB=win32graph
 BYTECC=$(TOOLPREF)gcc
 
 ### Additional compile-time options for $(BYTECC).  (For static linking.)
-BYTECCCOMPOPTS=-O -mms-bitfields -Wall -Wno-unused
+BYTECCCOMPOPTS=-march=i686 -mtune=generic -fcommon -O2 -g -mms-bitfields -Wall -Wno-unused
+# -fno-tree-vrp is here to try to work around the Skylake/Kaby lake bug,
+# and only works on GCC 4.2 and later
+CCCOMPOPTS_PATCH=-fno-tree-vrp -D__USE_MINGW_ANSI_STDIO=0
 
 ### Additional link-time options for $(BYTECC).  (For static linking.)
 BYTECCLINKOPTS=
 
 ### Additional compile-time options for $(BYTECC).  (For building a DLL.)
-DLLCCCOMPOPTS=-O -mms-bitfields -Wall -Wno-unused -DCAML_DLL
+DLLCCCOMPOPTS=-march=i686 -mtune=generic -fcommon -O2 -g -mms-bitfields -Wall -Wno-unused -DCAML_DLL
 
 ### Libraries needed
 BYTECCLIBS=-lws2_32
@@ -110,7 +113,14 @@ CPP=$(BYTECC) -E
 
 ### Flexlink
 FLEXLINK=flexlink -chain mingw -stack 16777216 -link -static-libgcc
-FLEXDIR:=$(shell $(FLEXLINK) -where)
+
+FLEXDIR_OUT:=$(shell $(FLEXLINK) -where)
+ifneq ("$(wildcard $(FLEXDIR_OUT)/../lib/flexdll/flexdll_mingw.o)","")
+FLEXDIR=$(FLEXDIR_OUT)/../lib/flexdll
+else
+FLEXDIR=$(FLEXDIR_OUT)
+endif
+
 IFLEXDIR=-I"$(FLEXDIR)"
 MKDLL=$(FLEXLINK)
 MKEXE=$(FLEXLINK) -exe
@@ -146,7 +156,7 @@ SYSTEM=mingw
 NATIVECC=$(BYTECC)
 
 ### Additional compile-time options for $(NATIVECC).
-NATIVECCCOMPOPTS=-O -mms-bitfields -Wall -Wno-unused
+NATIVECCCOMPOPTS=-march=i686 -mtune=generic -fcommon -O2 -g -mms-bitfields -Wall -Wno-unused
 
 ### Additional link-time options for $(NATIVECC)
 NATIVECCLINKOPTS=

@@ -352,3 +352,24 @@ let split s c =
 let cut_at s c =
   let pos = String.index s c in
   String.sub s 0 pos, String.sub s (pos+1) (String.length s - pos - 1)
+
+
+let mingw_binary_output () =
+  match Config.system with
+  | "mingw" | "mingw64" ->
+      (try set_binary_mode_out stdout true with _ -> ());
+      (try set_binary_mode_out stderr true with _ -> ());
+  | _ -> ()
+
+let slashify p =
+  match Config.system with
+  | "mingw" | "mingw64" ->
+      let len = String.length p in
+      let b = Bytes.create len in
+      for i = 0 to len - 1 do
+        Bytes.set b i (match p.[i] with
+          | '\\' ->  '/'
+          | x -> x )
+      done;
+      Bytes.to_string b
+  | _ -> p

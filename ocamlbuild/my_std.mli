@@ -65,3 +65,6 @@ include Signatures.MISC
 
 val set_lexbuf_fname : string -> Lexing.lexbuf -> unit
 val lexbuf_of_string : ?name:string -> string -> Lexing.lexbuf
+
+val windows_shell : string array Lazy.t
+val prep_windows_cmd : string -> string

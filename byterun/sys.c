@@ -24,6 +24,9 @@
 #include <sys/stat.h>
 #if !_WIN32
 #include <sys/wait.h>
+#else
+#include <direct.h>
+#include <io.h>
 #endif
 #include "caml/config.h"
 #ifdef HAS_UNISTD

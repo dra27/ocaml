@@ -57,8 +57,8 @@ extern int win_CRT_fd_of_filedescr(value handle);
 
 extern void win32_maperr(DWORD errcode);
 extern value unix_error_of_code (int errcode);
-extern void unix_error (int errcode, char * cmdname, value arg);
-extern void uerror (char * cmdname, value arg);
+extern void unix_error (int errcode, char * cmdname, value arg) Noreturn;
+extern void uerror (char * cmdname, value arg) Noreturn;
 extern value unix_freeze_buffer (value);
 
 /* Information stored in flags_fd, describing more precisely the socket

@@ -15,7 +15,7 @@ include ../config/Makefile
 
 CC=$(NATIVECC)
 CFLAGS=-I../byterun -DNATIVE_CODE -DTARGET_$(ARCH) -DSYS_$(SYSTEM) \
-       $(NATIVECCCOMPOPTS)
+       $(NATIVECCCOMPOPTS) $(CCCOMPOPTS_PATCH)
 
 COBJS=startup.$(O) main.$(O) fail.$(O) roots.$(O) signals.$(O) signals_asm.$(O)\
   misc.$(O) freelist.$(O) major_gc.$(O) minor_gc.$(O) memory.$(O) alloc.$(O) \
@@ -66,7 +66,7 @@ $(LINKEDFILES): %.c: ../byterun/%.c
 
 # Need special compilation rule so as not to do -I../byterun
 win32.$(O): ../byterun/win32.c
-	$(CC) -c $(NATIVECCCOMPOPTS) -DNATIVE_CODE $(IFLEXDIR) ../byterun/win32.c
+	$(CC) -c $(NATIVECCCOMPOPTS) $(CCCOMPOPTS_PATCH) -DNATIVE_CODE $(IFLEXDIR) ../byterun/win32.c
 
 %.$(O): %.c
 	$(CC) $(CFLAGS) -c $<

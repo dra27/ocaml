@@ -18,6 +18,10 @@
 #ifdef HAS_UNISTD
 #include <unistd.h>
 #endif
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#endif
 
 #include "caml/debugger.h"
 #include "caml/fix_code.h"

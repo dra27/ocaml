@@ -30,7 +30,7 @@ COMPFLAGS=-w +33..39 -warn-error A -bin-annot -g -safe-string \
 OBJS=dynlinkaux.cmo dynlink.cmo
 
 COMPILEROBJS=\
-  ../../utils/misc.cmo ../../utils/config.cmo ../../utils/clflags.cmo \
+  ../../utils/config.cmo ../../utils/misc.cmo ../../utils/clflags.cmo \
   ../../utils/tbl.cmo ../../utils/consistbl.cmo \
   ../../utils/terminfo.cmo ../../utils/warnings.cmo \
   ../../parsing/asttypes.cmi \
@@ -77,7 +77,7 @@ extract_crc: dynlink.cma extract_crc.cmo
 INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
 
 install:
-	cp dynlink.cmi dynlink.cma dynlink.mli $(INSTALL_LIBDIR)
+	cp dynlink.cmi dynlink.cmt dynlink.cmti dynlink.cma dynlink.mli "$(INSTALL_LIBDIR)"
 	cp extract_crc $(INSTALL_LIBDIR)/extract_crc$(EXE)
 
 installopt:

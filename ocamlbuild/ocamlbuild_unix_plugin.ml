@@ -47,12 +47,22 @@ let at_exit_once callback =
   end
 
 let run_and_open s kont =
+  let s_orig = s in
+  let s =
+    (* Be consistent! My_unix.run_and_open uses My_std.sys_command and
+       sys_command uses bash. *)
+    if Sys.win32 = false then s else
+    let l = match Lazy.force My_std.windows_shell |> Array.to_list with
+    | hd::tl -> (Filename.quote hd)::tl
+    | _ -> assert false in
+    "\"" ^ (String.concat " " l) ^ " -ec " ^ Filename.quote (" " ^ s) ^ "\""
+  in
   let ic = Unix.open_process_in s in
   let close () =
     match Unix.close_process_in ic with
     | Unix.WEXITED 0 -> ()
     | Unix.WEXITED _ | Unix.WSIGNALED _ | Unix.WSTOPPED _ ->
-        failwith (Printf.sprintf "Error while running: %s" s) in
+        failwith (Printf.sprintf "Error while running: %s" s_orig) in
   let res = try
       kont ic
     with e -> (close (); raise e)

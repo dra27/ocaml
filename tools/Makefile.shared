@@ -37,7 +37,7 @@ opt.opt: ocamldep.opt read_cmt.opt
 # The dependency generator
 
 CAMLDEP_OBJ=depend.cmo ocamldep.cmo
-CAMLDEP_IMPORTS=misc.cmo config.cmo clflags.cmo terminfo.cmo \
+CAMLDEP_IMPORTS=config.cmo misc.cmo clflags.cmo terminfo.cmo \
   warnings.cmo location.cmo longident.cmo docstrings.cmo \
   syntaxerr.cmo ast_helper.cmo parser.cmo lexer.cmo parse.cmo \
   ccomp.cmo ast_mapper.cmo pparse.cmo compenv.cmo
@@ -67,7 +67,7 @@ install::
 # The profiler
 
 CSLPROF=ocamlprof.cmo
-CSLPROF_IMPORTS=misc.cmo config.cmo clflags.cmo terminfo.cmo \
+CSLPROF_IMPORTS=config.cmo misc.cmo clflags.cmo terminfo.cmo \
   warnings.cmo location.cmo longident.cmo docstrings.cmo \
   syntaxerr.cmo ast_helper.cmo parser.cmo lexer.cmo parse.cmo
 
@@ -98,8 +98,9 @@ clean::
 
 # To help building mixed-mode libraries (OCaml + C)
 
+MKLIB_IMPORTS=config.cmo misc.cmo
 ocamlmklib: ocamlmklibconfig.cmo ocamlmklib.cmo
-	$(CAMLC) $(LINKFLAGS) -o ocamlmklib ocamlmklibconfig.cmo ocamlmklib.cmo
+	$(CAMLC) $(LINKFLAGS) -o ocamlmklib $(MKLIB_IMPORTS) ocamlmklibconfig.cmo ocamlmklib.cmo
 
 install::
 	cp ocamlmklib $(INSTALL_BINDIR)/ocamlmklib$(EXE)
@@ -160,7 +161,7 @@ clean::
 
 # Insert labels following an interface file (upgrade 3.02 to 3.03)
 
-ADDLABELS_IMPORTS=misc.cmo config.cmo clflags.cmo terminfo.cmo \
+ADDLABELS_IMPORTS=config.cmo misc.cmo clflags.cmo terminfo.cmo \
   warnings.cmo location.cmo longident.cmo docstrings.cmo \
   syntaxerr.cmo ast_helper.cmo parser.cmo lexer.cmo parse.cmo
 
@@ -198,11 +199,11 @@ beforedepend:: cvt_emit.ml
 # Reading cmt files
 
 READ_CMT= \
+          ../utils/config.cmo \
           ../utils/misc.cmo \
           ../utils/warnings.cmo \
           ../utils/tbl.cmo \
           ../utils/consistbl.cmo \
-          ../utils/config.cmo \
           ../utils/clflags.cmo \
           ../parsing/location.cmo \
           ../parsing/longident.cmo \
@@ -253,7 +254,7 @@ DUMPOBJ=opnames.cmo dumpobj.cmo
 
 dumpobj: $(DUMPOBJ)
 	$(CAMLC) $(LINKFLAGS) -o dumpobj \
-	         misc.cmo tbl.cmo config.cmo ident.cmo \
+	         config.cmo misc.cmo tbl.cmo ident.cmo \
 	         opcodes.cmo bytesections.cmo $(DUMPOBJ)
 
 clean::

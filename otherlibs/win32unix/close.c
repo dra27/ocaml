@@ -14,8 +14,7 @@
 #include <caml/mlvalues.h>
 #include "unixsupport.h"
 #include <caml/io.h>
-
-extern int _close(int);
+#include <io.h>
 
 CAMLprim value unix_close(value fd)
 {
