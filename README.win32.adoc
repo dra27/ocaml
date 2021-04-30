@@ -63,8 +63,9 @@ Only the `make` Cygwin package is required. `diffutils` is required if you wish
 to be able to run the test suite.
 
 Unless you are also compiling the Cygwin port of OCaml, you do not need the
-`gcc-core` or `flexdll` packages. If you do, care may be required to ensure
-that a particular build is using the correct installation of `flexlink`.
+`gcc-core` or `flexdll` packages. If you do install them, care may be required
+to ensure that a particular build is using the correct installation of
+`flexlink`.
 
 [[bmflex]]
 In addition to Cygwin, FlexDLL must also be installed, which is available from
@@ -75,7 +76,7 @@ bootstrap FlexDLL, you will need to ensure that the directory to which you
 install FlexDLL is included in your `PATH` environment variable. Note: binary
 distributions of FlexDLL are compatible only with Visual Studio 2013 and
 earlier; for Visual Studio 2015 and later, you will need to compile the C
-objects from source, or configure ocaml with the the `--with-flexdll` option.
+objects from source, or configure ocaml with the `--with-flexdll` option.
 
 The base bytecode system (ocamlc, ocaml, ocamllex, ocamlyacc, ...) of all three
 ports runs without any additional tools.
@@ -307,7 +308,7 @@ done in one of three ways:
 +
   git submodule update --init
 
-OCaml is then compiled as normal for the port you require.
+OCaml is then compiled normally for the port you require.
 
   make
   make install
