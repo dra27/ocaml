@@ -35,7 +35,7 @@
 char * default_runtime_name = RUNTIME_NAME;
 
 static
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
 __forceinline
 #else
 __inline
@@ -105,7 +105,7 @@ static __inline void __declspec(noreturn) run_runtime(char * runtime,
     WriteFile(errh, runtime, strlen(runtime), &numwritten, NULL);
     WriteFile(errh, msg_and_length("\r\n"), &numwritten, NULL);
     ExitProcess(2);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
   }
@@ -129,7 +129,7 @@ static __inline void __declspec(noreturn) run_runtime(char * runtime,
     WriteFile(errh, runtime, strlen(runtime), &numwritten, NULL);
     WriteFile(errh, msg_and_length("\r\n"), &numwritten, NULL);
     ExitProcess(2);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
   }
@@ -138,7 +138,7 @@ static __inline void __declspec(noreturn) run_runtime(char * runtime,
   GetExitCodeProcess(procinfo.hProcess , &retcode);
   CloseHandle(procinfo.hProcess);
   ExitProcess(retcode);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
 }
@@ -167,13 +167,13 @@ void __declspec(noreturn) __cdecl headerentry()
                                    " executable file\r\n"),
               &numwritten, NULL);
     ExitProcess(2);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
   }
   CloseHandle(h);
   run_runtime(runtime_path , cmdline);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
 #ifdef __MINGW32__

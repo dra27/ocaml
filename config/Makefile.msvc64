@@ -17,13 +17,13 @@
 
 ######### General configuration
 
-PREFIX=C:/ocamlms64
+PREFIX=@PREFIX@
 
 ### Where to install the binaries.
 BINDIR=$(PREFIX)/bin
 
 ### Where to install the standard library
-LIBDIR=$(PREFIX)/lib
+LIBDIR=$(PREFIX)/lib/ocaml
 
 ### Where to install the stub DLLs
 STUBLIBDIR=$(LIBDIR)/stublibs
@@ -92,6 +92,7 @@ BYTECC=cl -nologo -D_CRT_SECURE_NO_DEPRECATE
 
 ### Additional compile-time options for $(BYTECC).  (For static linking.)
 BYTECCCOMPOPTS=-O2 -Gy- -MD
+CCCOMPOPTS_PATCH=
 
 ### Additional compile-time options for $(BYTECC).  (For debug version.)
 BYTECCDBGCOMPOPTS=-Zi

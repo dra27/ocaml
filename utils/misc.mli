@@ -331,3 +331,6 @@ module type HookSig = sig
 end
 
 module MakeHooks : functor (M : sig type t end) -> HookSig with type t = M.t
+
+val mingw_binary_output : unit -> unit
+val slashify: string -> string
