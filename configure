@@ -12857,34 +12857,18 @@ else
 esac
 fi
 else
-  if test -f "$with_flexdll/flexdll.h"; then :
-  cd runtime
-        if test -f "$with_flexdll/flexdll.h"; then :
-  mkdir -p ../flexdll-sources
-          cp -r "$with_flexdll/*" ../flexdll-sources/
-          flexdir='flexdll-sources'
-          iflexdir='$(ROOTDIR)/flexdll-sources'
-          flexmsg=" (from $with_flexdll)"
-else
-  flexdir="$with_flexdll"
-          if test x"$unix_or_win32" = "xwin32" \
-                 && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ; then :
-  case $build in #(
-  *-pc-cygwin) :
-    with_flexdll="`cygpath "$with_flexdll"`" ;; #(
-  *) :
-     ;;
-esac
-fi
-          iflexdir="\$(ROOTDIR)/$with_flexdll"
-fi
-        cd ..
+  rm -rf flexdll-sources
+      if test -f "$with_flexdll/flexdll.h"; then :
+  mkdir -p flexdll-sources
+        cp -r "$with_flexdll"/* flexdll-sources/
+        flexdir='flexdll-sources'
+        iflexdir='$(ROOTDIR)/flexdll-sources'
+        flexmsg=" (from $with_flexdll)"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: requested but not available" >&5
 $as_echo "requested but not available" >&6; }
         as_fn_error $? "exiting" "$LINENO" 5
 fi
-
 fi
     if test x"$flexdir" = 'x'; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5

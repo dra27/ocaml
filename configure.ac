@@ -724,24 +724,15 @@ AS_IF([test x"$enable_shared" != 'xno'], [
             [flexdir=flexdll
             iflexdir='$(ROOTDIR)/flexdll'
             with_flexdll="$iflexdir"])])],
-      [AS_IF([test -f "$with_flexdll/flexdll.h"],
-        [cd runtime
-        AS_IF([test -f "$with_flexdll/flexdll.h"],
-          [mkdir -p ../flexdll-sources
-          cp -r "$with_flexdll/*" ../flexdll-sources/
-          flexdir='flexdll-sources'
-          iflexdir='$(ROOTDIR)/flexdll-sources'
-          flexmsg=" (from $with_flexdll)"],
-          [flexdir="$with_flexdll"
-          AS_IF([test x"$unix_or_win32" = "xwin32" \
-                 && test "$host_vendor-$host_os" != "$build_vendor-$build_os" ],
-           [AS_CASE([$build],
-             [*-pc-cygwin], [with_flexdll="`cygpath "$with_flexdll"`"])])
-          iflexdir="\$(ROOTDIR)/$with_flexdll"])
-        cd ..],
+      [rm -rf flexdll-sources
+      AS_IF([test -f "$with_flexdll/flexdll.h"],
+        [mkdir -p flexdll-sources
+        cp -r "$with_flexdll"/* flexdll-sources/
+        flexdir='flexdll-sources'
+        iflexdir='$(ROOTDIR)/flexdll-sources'
+        flexmsg=" (from $with_flexdll)"],
         [AC_MSG_RESULT([requested but not available])
-        AC_MSG_ERROR([exiting])])]
-    )
+        AC_MSG_ERROR([exiting])])])
     AS_IF([test x"$flexdir" = 'x'],
       [AC_MSG_RESULT([no])],
       [AC_MSG_RESULT([$iflexdir$flexmsg])
