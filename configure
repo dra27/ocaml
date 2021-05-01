@@ -12937,6 +12937,7 @@ fi
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -12948,24 +12949,26 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $flexlink works" >&5
 $as_echo_n "checking whether $flexlink works... " >&6; }
 
-  # Create conftest2.$ac_objext as a symlink on Cygwin to ensure that native
-  # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
-  # flexlink can read anything).
-  $cat > conftest1.c <<"EOF"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 int answer = 42;
-EOF
-  $CC -c conftest1.c
-  case $host in #(
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  # Create conftest1.$ac_objext as a symlink on Cygwin to ensure that native
+    # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
+    # flexlink can read anything).
+    mv conftest.$ac_objext conftest1.$ac_objext
+    case $host in #(
   *-pc-cygwin) :
     ln -s conftest1.$ac_objext conftest2.$ac_objext ;; #(
   *) :
     cp conftest1.$ac_objext conftest2.$ac_objext ;;
 esac
 
-  CC="$flexlink -chain $flexdll_chain -exe"
-  LIBS="conftest2.$ac_objext"
-  CPPFLAGS="$internal_cppflags $CPPFLAGS"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    CC="$flexlink -chain $flexdll_chain -exe"
+    LIBS="conftest2.$ac_objext"
+    CPPFLAGS="$internal_cppflags $CPPFLAGS"
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 int main() { return 0; }
 _ACEOF
@@ -12975,10 +12978,16 @@ $as_echo "yes" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-    as_fn_error $? "$flexlink does not work" "$LINENO" 5
+      as_fn_error $? "$flexlink does not work" "$LINENO" 5
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: unexpected compile error" >&5
+$as_echo "unexpected compile error" >&6; }
+    as_fn_error $? "error calling the C compiler" "$LINENO" 5
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
   # Restore the content of confdefs.h
@@ -12988,6 +12997,7 @@ rm -f core conftest.err conftest.$ac_objext \
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
 
@@ -13009,6 +13019,7 @@ fi
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -13043,6 +13054,7 @@ fi
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
 
@@ -13052,6 +13064,7 @@ fi
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -13089,6 +13102,7 @@ fi
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
     if test "x$have_flexdll_h" = 'xyes'; then :
@@ -17082,6 +17096,7 @@ $as_echo_n "checking whether the assembler supports --debug-prefix-map... " >&6;
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -17124,6 +17139,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
 
@@ -17138,6 +17154,7 @@ else
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -17203,6 +17220,7 @@ fi
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 
 
     if $aspp_ok && $as_ok; then :

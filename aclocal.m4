@@ -130,6 +130,7 @@ AC_DEFUN([OCAML_CC_SAVE_VARIABLES], [
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -147,6 +148,7 @@ AC_DEFUN([OCAML_CC_RESTORE_VARIABLES], [
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 ])
 
 AC_DEFUN([OCAML_AS_HAS_DEBUG_PREFIX_MAP], [
@@ -296,25 +298,26 @@ AC_DEFUN([OCAML_TEST_FLEXLINK], [
 
   AC_MSG_CHECKING([whether $1 works])
 
-  # Create conftest2.$ac_objext as a symlink on Cygwin to ensure that native
-  # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
-  # flexlink can read anything).
-  $cat > conftest1.c <<"EOF"
-int answer = 42;
-EOF
-  $CC -c conftest1.c
-  AS_CASE([$4],[*-pc-cygwin],
-    [ln -s conftest1.$ac_objext conftest2.$ac_objext],
-    [cp conftest1.$ac_objext conftest2.$ac_objext])
+  AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([int answer = 42;])],
+    [# Create conftest1.$ac_objext as a symlink on Cygwin to ensure that native
+    # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
+    # flexlink can read anything).
+    mv conftest.$ac_objext conftest1.$ac_objext
+    AS_CASE([$4],[*-pc-cygwin],
+      [ln -s conftest1.$ac_objext conftest2.$ac_objext],
+      [cp conftest1.$ac_objext conftest2.$ac_objext])
 
-  CC="$1 -chain $2 -exe"
-  LIBS="conftest2.$ac_objext"
-  CPPFLAGS="$3 $CPPFLAGS"
-  AC_LINK_IFELSE(
-    [AC_LANG_SOURCE([int main() { return 0; }])],
-    [AC_MSG_RESULT([yes])],
-    [AC_MSG_RESULT([no])
-    AC_MSG_ERROR([$1 does not work])])
+    CC="$1 -chain $2 -exe"
+    LIBS="conftest2.$ac_objext"
+    CPPFLAGS="$3 $CPPFLAGS"
+    AC_LINK_IFELSE(
+      [AC_LANG_SOURCE([int main() { return 0; }])],
+      [AC_MSG_RESULT([yes])],
+      [AC_MSG_RESULT([no])
+      AC_MSG_ERROR([$1 does not work])])],
+    [AC_MSG_RESULT([unexpected compile error])
+    AC_MSG_ERROR([error calling the C compiler])])
 
   OCAML_CC_RESTORE_VARIABLES
 ])
