@@ -414,9 +414,7 @@ void process_domain_state(void (*emit)(int, char *))
   while (*p != 0) {
     q = scan_to_eol(p);
 
-   printf("Got %s\n", p);
     if (sscanf(p, "DOMAIN_STATE(%*[^,],%*[ ]%[^)])", name) == 1) {
-      printf("Processing %s\n", name);
       emit(count, name);
       count += 8;
     }
