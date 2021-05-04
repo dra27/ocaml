@@ -15,17 +15,17 @@
 
 (* The configuration module for ocamltest *)
 
-let arch = {|@arch@|}
+let arch = {@id@|@arch@|@id@}
 
 let afl_instrument = @afl@
 
-let asm = {|@AS@|}
+let asm = {@id@|@AS@|@id@}
 
-let cc = {|@CC@|}
+let cc = {@id@|@CC@|@id@}
 
-let cflags = {|@oc_cflags@|}
+let cflags = {@id@|@oc_cflags@|@id@}
 
-let ccomptype = {|@ccomptype@|}
+let ccomptype = {@id@|@ccomptype@|@id@}
 
 let shared_libraries = @supports_shared_libraries@
 
@@ -39,22 +39,22 @@ let systhreads = @systhread_support@
 
 let str = @with_lib_str@
 
-let objext = {|@OBJEXT@|}
+let objext = {@id@|@OBJEXT@|@id@}
 
-let libext = {|@libext@|}
+let libext = {@id@|@libext@|@id@}
 
-let asmext = {|@S@|}
+let asmext = {@id@|@S@|@id@}
 
-let system = {|@system@|}
+let system = {@id@|@system@|@id@}
 
 let c_preprocessor =
   if ccomptype = "cl" then
     (* Ignore stderr from cl /E (see PR#1503) *)
-    {|@CPP@ 2> nul|}
+    {@id@|@CPP@ 2> nul|@id@}
   else
-    {|@CPP@|}
+    {@id@|@CPP@|@id@}
 
-let ocamlsrcdir = {|@ocamlsrcdir@|}
+let ocamlsrcdir = {@id@|@ocamlsrcdir@|@id@}
 
 let flambda = @flambda@
 
@@ -73,22 +73,22 @@ let native_compiler = @native_compiler@
 
 let native_dynlink = @natdynlink@
 
-let shared_library_cflags = {|@sharedlib_cflags@|}
+let shared_library_cflags = {@id@|@sharedlib_cflags@|@id@}
 
-let sharedobjext = {|@SO@|}
+let sharedobjext = {@id@|@SO@|@id@}
 
-let csc = {|@csc@|}
+let csc = {@id@|@csc@|@id@}
 
-let csc_flags = {|@csc_flags@|}
+let csc_flags = {@id@|@csc_flags@|@id@}
 
-let exe = {|@exeext@|}
+let exe = {@id@|@exeext@|@id@}
 
-let mkdll = {|@mksharedlib@ @LDFLAGS@|}
-let mkexe = {|@mkexe_config@|}
+let mkdll = {@id@|@mksharedlib@ @LDFLAGS@|@id@}
+let mkexe = {@id@|@mkexe_config@|@id@}
 
-let bytecc_libs = {|@bytecclibs@|}
+let bytecc_libs = {@id@|@bytecclibs@|@id@}
 
-let nativecc_libs = {|@nativecclibs@|}
+let nativecc_libs = {@id@|@nativecclibs@|@id@}
 
 let windows_unicode = @windows_unicode@ != 0
 

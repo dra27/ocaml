@@ -747,6 +747,7 @@ build_os
 build_vendor
 build_cpu
 build
+id
 with_lib_unix
 with_lib_str
 ocamlsrcdir
@@ -2952,6 +2953,7 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -2969,6 +2971,9 @@ ac_config_files="$ac_config_files ocamltest/ocamltest_config.ml"
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
+
+
+# Works out how many "o"s are needed in quoted strings
 
 
 # Checks for system types
@@ -17694,6 +17699,7 @@ else
   mkexe_config="$mkexe"
 fi
 
+# XXX TODO use AC_CONFIG_COMMANDS_PRE
 # utils/config.ml needs the expanded form of these
 prev_exec_prefix="$exec_prefix"
 prev_prefix="$prefix"
@@ -17709,6 +17715,7 @@ exec_prefix="$prev_exec_prefix"
 prefix="$prev_prefix"
 
 # Do not permanently cache the result of flexdll.h
+# XXX TODO use AC_CONFIG_COMMANDS_PRE
 unset ac_cv_header_flexdll_h
 
 cat >confcache <<\_ACEOF
@@ -17819,6 +17826,26 @@ LIBOBJS=$ac_libobjs
 
 LTLIBOBJS=$ac_ltlibobjs
 
+
+
+  # Go through ac_subst_vars and put all the values to be substituted in
+  # $all_values.
+  id=''
+  all_values=''
+  for name in $ac_subst_vars; do
+    eval "value=\$${name}"
+    all_values="$all_values $value"
+  done
+
+  # Keep adding 'o' to $id until |$id} doens't appear in any substitution.
+  test_string=''
+  while test "x${test_string}" != "x${all_values}"; do
+    test_string="$all_values"
+    eval "test_string=\"\${test_string##*|${id}\}}\""
+    if test "x${test_string}" != "x${all_values}"; then
+      id="o${id}"
+    fi
+  done
 
 
 : "${CONFIG_STATUS=./config.status}"

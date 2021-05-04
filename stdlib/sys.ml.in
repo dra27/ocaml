@@ -127,7 +127,7 @@ external runtime_warnings_enabled: unit -> bool =
 
 (* The version string is found in file ../configure.ac (AC_INIT call)
    This source line is scanned by the manual's build system. *)
-let ocaml_version = {|@PACKAGE_VERSION@|}
+let ocaml_version = {@id@|@PACKAGE_VERSION@|@id@}
 
 (* Optimization *)
 

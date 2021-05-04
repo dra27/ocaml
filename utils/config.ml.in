@@ -15,9 +15,9 @@
 
 let version = Sys.ocaml_version
 
-let bindir = {|@expanded_bindir@|}
+let bindir = {@id@|@expanded_bindir@|@id@}
 
-let standard_library_default = {|@expanded_libdir@|}
+let standard_library_default = {@id@|@expanded_libdir@|@id@}
 
 let standard_library =
   try
@@ -28,18 +28,18 @@ let standard_library =
   with Not_found ->
     standard_library_default
 
-let ccomp_type = {|@ccomptype@|}
-let c_compiler = {|@CC@|}
-let c_output_obj = {|@outputobj@|}
+let ccomp_type = {@id@|@ccomptype@|@id@}
+let c_compiler = {@id@|@CC@|@id@}
+let c_output_obj = {@id@|@outputobj@|@id@}
 let c_has_debug_prefix_map = @cc_has_debug_prefix_map@
 let as_has_debug_prefix_map = @as_has_debug_prefix_map@
-let ocamlc_cflags = {|@ocamlc_cflags@ @CFLAGS@|}
-let ocamlc_cppflags = {|@ocamlc_cppflags@ @CPPFLAGS@|}
+let ocamlc_cflags = {@id@|@ocamlc_cflags@ @CFLAGS@|@id@}
+let ocamlc_cppflags = {@id@|@ocamlc_cppflags@ @CPPFLAGS@|@id@}
 (* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
           the two drivers should be identical. *)
-let ocamlopt_cflags = {|@ocamlc_cflags@ @CFLAGS@|}
-let ocamlopt_cppflags = {|@ocamlc_cppflags@ @CPPFLAGS@|}
-let bytecomp_c_libraries = {|@bytecclibs@|}
+let ocamlopt_cflags = {@id@|@ocamlc_cflags@ @CFLAGS@|@id@}
+let ocamlopt_cppflags = {@id@|@ocamlc_cppflags@ @CPPFLAGS@|@id@}
+let bytecomp_c_libraries = {@id@|@bytecclibs@|@id@}
 (* bytecomp_c_compiler and native_c_compiler have been supported for a
    long time and are retained for backwards compatibility.
    For programs that don't need compatibility with older OCaml releases
@@ -50,23 +50,28 @@ let bytecomp_c_compiler =
   c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags
 let native_c_compiler =
   c_compiler ^ " " ^ ocamlopt_cflags ^ " " ^ ocamlopt_cppflags
-let native_c_libraries = {|@nativecclibs@|}
-let native_pack_linker = {|@PACKLD@|}
-let ranlib = {|@RANLIBCMD@|}
-let default_rpath = {|@rpath@|}
-let mksharedlibrpath = {|@mksharedlibrpath@|}
-let ar = {|@AR@|}
+let native_c_libraries = {@id@|@nativecclibs@|@id@}
+let native_pack_linker = {@id@|@PACKLD@|@id@}
+let ranlib = {@id@|@RANLIBCMD@|@id@}
+let default_rpath = {@id@|@rpath@|@id@}
+let mksharedlibrpath = {@id@|@mksharedlibrpath@|@id@}
+let ar = {@id@|@AR@|@id@}
 let supports_shared_libraries = @supports_shared_libraries@
+let flexlink_flags = {@id@|@flexlink_flags@|@id@}
+let default_mk_commands =
+  {@id@|@mksharedlib@ @LDFLAGS@|@id@},
+  {@id@|@mkexe_config@|@id@},
+  {@id@|@mkmaindll@ @LDFLAGS@|@id@}
 let mkdll, mkexe, mkmaindll =
   if Sys.win32 || Sys.cygwin && supports_shared_libraries then
     let flexlink_dll_ldflags =
-      if {|@oc_dll_ldflags@|} <> "" then
-        " -link " ^ {|@oc_dll_ldflags@|}
+      if {@id@|@oc_dll_ldflags@|@id@} <> "" then
+        " -link " ^ {@id@|@oc_dll_ldflags@|@id@}
       else ""
     in
     let flexlink_ldflags =
-      if {|@oc_ldflags@|} <> "" then
-        " -link " ^ {|@oc_ldflags@|}
+      if {@id@|@oc_ldflags@|@id@} <> "" then
+        " -link " ^ {@id@|@oc_ldflags@|@id@}
       else ""
     in
     try
@@ -76,15 +81,15 @@ let mkdll, mkexe, mkmaindll =
           let c = flexlink.[i] in
           if c = '/' && Sys.win32 then '\\' else c
         in
-        (String.init (String.length flexlink) f) ^ " " ^ {|@flexlink_flags@|}
+        (String.init (String.length flexlink) f) ^ " " ^ flexlink_flags
       in
       flexlink ^ flexlink_dll_ldflags,
       flexlink ^ " -exe" ^ flexlink_ldflags,
       flexlink ^ " -maindll" ^ flexlink_dll_ldflags
     with Not_found ->
-      {|@mksharedlib@ @LDFLAGS@|}, {|@mkexe_config@|}, {|@mkmaindll@ @LDFLAGS@|}
+      default_mk_commands
   else
-    {|@mksharedlib@ @LDFLAGS@|}, {|@mkexe_config@|}, {|@mkmaindll@ @LDFLAGS@|}
+    default_mk_commands
 
 let flambda = @flambda@
 let with_flambda_invariants = @flambda_invariants@
@@ -130,24 +135,24 @@ let max_young_wosize = 256
 let stack_threshold = 256 (* see runtime/caml/config.h *)
 let stack_safety_margin = 60
 
-let architecture = {|@arch@|}
-let model = {|@model@|}
-let system = {|@system@|}
+let architecture = {@id@|@arch@|@id@}
+let model = {@id@|@model@|@id@}
+let system = {@id@|@system@|@id@}
 
-let asm = {|@AS@|}
+let asm = {@id@|@AS@|@id@}
 let asm_cfi_supported = @asm_cfi_supported@
 let with_frame_pointers = @frame_pointers@
 let profinfo = @profinfo@
 let profinfo_width = @profinfo_width@
 
-let ext_exe = {|@exeext@|}
-let ext_obj = {|.@OBJEXT@|}
-let ext_asm = {|.@S@|}
-let ext_lib = {|.@libext@|}
-let ext_dll = {|.@SO@|}
+let ext_exe = {@id@|@exeext@|@id@}
+let ext_obj = {@id@|.@OBJEXT@|@id@}
+let ext_asm = {@id@|.@S@|@id@}
+let ext_lib = {@id@|.@libext@|@id@}
+let ext_dll = {@id@|.@SO@|@id@}
 
-let host = {|@host@|}
-let target = {|@target@|}
+let host = {@id@|@host@|@id@}
+let target = {@id@|@target@|@id@}
 
 let default_executable_name =
   match Sys.os_type with
@@ -158,10 +163,10 @@ let default_executable_name =
 let systhread_supported = @systhread_support@;;
 
 let flexdll_dirs =
-  if {|@flexdll_dir@|} = "" then
+  if {@id@|@flexdll_dir@|@id@} = "" then
     []
   else
-    [{|@flexdll_dir@|}];;
+    [{@id@|@flexdll_dir@|@id@}];;
 
 type configuration_value =
   | String of string
