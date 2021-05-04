@@ -378,6 +378,7 @@ let bopcodes = ref None
 let bopnames = ref None
 let bruntimedef = ref None
 let bstdlib = ref None
+let bcapitalize = ref None
 
 type 'a env_reader = {
   parse : string -> 'a option;
