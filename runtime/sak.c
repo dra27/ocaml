@@ -152,9 +152,9 @@ void harvest_primitives(void)
      T("dynlink.c"), T("backtrace_byt.c"), T("backtrace.c"), T("afl.c"),
      T("bigarray.c"), T("eventlog.c"), NULL};
   char_os *current;
-  char *content, *p, *q;
+  char *content, *p, *q, prim_name[100];
   char **prims;
-  int i = 0, nb_prims = 1, sz_prims = 512, scan_int64 = 1;
+  int i = 0, len = 0, nb_prims = 1, sz_prims = 512, scan_int64 = 1;
   FILE* fp;
 #ifdef _WIN32
   struct _stati64 st;
@@ -168,36 +168,19 @@ void harvest_primitives(void)
   while ((current = files[i++]) != NULL) {
     if ((content = p = read_file(current)) != NULL) {
       while (*p != 0) {
-        if (!strncmp(p, "CAMLprim value ", 15)) {
-          /* Found start of a primitive name */
-          p += 15;
-          q = p;
-          /* Find the end of the primitive name */
-          while (*q != 0 && (isalnum(*q) || *q == '_'))
-            q++;
-          if (*q == 0)
-            die("unexpected end of \"%s\"", current);
-          *q = 0;
+        if (sscanf(p, "CAMLprim value %100[^ (]%*[ (]", prim_name) == 1) {
           /* Store the primitive name */
-          prims[nb_prims++] = strdup(p);
-          p = q + 1;
-        } else if (scan_int64 && !strncmp(p, "CAMLprim_int64_", 15)) {
-          p += 15;
-          if ((*p == '1' || *p == '2') && *++p == '(') {
-            q = ++p;
-            /* Find the end of the primitive name */
-            while (*q != 0 && (isalnum(*q) || *q == '_'))
-              q++;
-            if (*q == 0)
-              die("unexpected end of \"%s\"", current);
-            *q = 0;
-            if ((prims[nb_prims] = (char *)malloc(12 + q - p)) == NULL ||
-                (prims[nb_prims + 1] = (char *)malloc(19 + q - p)) == NULL)
-              die("out of memory");
-            sprintf(prims[nb_prims++], "caml_int64_%s", p);
-            sprintf(prims[nb_prims++], "caml_int64_%s_native", p);
-            p = q + 1;
-          }
+          prims[nb_prims++] = strdup(prim_name);
+          p += 16;
+        } else if (scan_int64 && sscanf(p, "CAMLprim_int64_%*1[12](%100[^)])",
+                                        prim_name) == 1) {
+          len = strlen(prim_name);
+          if ((prims[nb_prims] = (char *)malloc(12 + len)) == NULL ||
+              (prims[nb_prims + 1] = (char *)malloc(19 + len)) == NULL)
+            die("out of memory");
+          sprintf(prims[nb_prims++], "caml_int64_%s", prim_name);
+          sprintf(prims[nb_prims++], "caml_int64_%s_native", prim_name);
+          p += 19;
         }
         /* Find the end of the line */
         p = scan_to_eol(p);
