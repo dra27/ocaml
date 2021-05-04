@@ -26,6 +26,8 @@ OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 OCAMLDEP = $(BEST_OCAMLDEP)
 DEPFLAGS = -slash
 
+STDLIB_PPX = -ppx "$(OCAMLRUN) ppx_stdlib$(EXE)"
+
 # For installation
 ##############
 
@@ -283,25 +285,25 @@ test:
 	-load $@/ocamldoc.odoc -v
 
 .PHONY: test_stdlib
-test_stdlib:
+test_stdlib: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
+	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) $(STDLIB_PPX) -dump $@/stdlib.odoc -keep-code \
 	$(ROOTDIR)/stdlib/*.mli \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.mli \
 	$(ROOTDIR)/otherlibs/str/str.mli
 
 .PHONY: test_stdlib_code
-test_stdlib_code:
+test_stdlib_code: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
+	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) $(STDLIB_PPX) -dump $@/stdlib.odoc -keep-code \
 	`ls $(ROOTDIR)/stdlib/*.ml | grep -v Labels` \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.ml \
 	$(ROOTDIR)/otherlibs/str/str.ml
 
 .PHONY: test_latex
-test_latex:
+test_latex: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -latex -sort -o $@/test.tex -d $@ $(INCLUDES) odoc*.ml \
+	$(OCAMLDOC_RUN) -latex -sort -o $@/test.tex -d $@ $(INCLUDES) $(STDLIB_PPX) odoc*.ml \
 	        odoc*.mli test2.txt $(ROOTDIR)/stdlib/*.mli $(ROOTDIR)/otherlibs/unix/unix.mli
 
 .PHONY: test_latex_simple
