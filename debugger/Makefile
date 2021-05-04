@@ -27,7 +27,7 @@ COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
 LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR)
 CAMLDEP=$(BEST_OCAMLDEP)
 DEPFLAGS=-slash
-DEPINCLUDES=$(INCLUDES)
+DEPINCLUDES=-I '$$(UNIXDIR)' $(INCLUDES)
 
 DIRECTORIES=$(UNIXDIR) $(DYNLINKDIR) $(addprefix $(ROOTDIR)/,\
   utils parsing typing bytecomp toplevel driver file_formats lambda)
@@ -69,8 +69,10 @@ clean::
 	$(CAMLC) -c $(COMPFLAGS) $<
 
 depend: beforedepend
-	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) *.mli *.ml \
-	| sed -e 's,$(UNIXDIR)/,$$(UNIXDIR)/,' > .depend
+	mkdir -p '$$(UNIXDIR)'
+	touch '$$(UNIXDIR)/unix.ml' '$$(UNIXDIR)/unix.mli'
+	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) *.mli *.ml > .depend
+	rm -rf '$$(UNIXDIR)'
 
 clean::
 	rm -f debugger_lexer.ml
