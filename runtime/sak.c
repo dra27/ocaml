@@ -57,6 +57,7 @@
 #define printf_os printf
 #define strchr_os strchr
 #define sscanf_os sscanf
+#define _printf_p printf
 #endif
 
 void usage(void)
@@ -361,43 +362,43 @@ void convert_version(char_os *content)
 
 void domain_state32(int count, char *name)
 {
-  printf("Store_%2$s MACRO reg1, reg2\n"
-         "  mov [reg1+%1$d], reg2\n"
-         "ENDM\n"
-         "Load_%2$s MACRO reg1, reg2\n"
-         "  mov reg2, [reg1+%1$d]\n"
-          "ENDM\n"
-         "Push_%2$s MACRO reg1\n"
-         "  push [reg1+%1$d]\n"
-         "ENDM\n"
-         "Pop_%2$s MACRO reg1\n"
-         "  pop [reg1+%1$d]\n"
-         "ENDM\n"
-         "Cmp_%2$s MACRO reg1, reg2\n"
-         "  cmp reg2, [reg1+%1$d]\n"
-         "ENDM\n"
-         "Sub_%2$s MACRO reg1, reg2\n"
-         "  sub reg2, [reg1+%1$d]\n"
-         "ENDM\n", count, name);
+  _printf_p("Store_%2$s MACRO reg1, reg2\n"
+            "  mov [reg1+%1$d], reg2\n"
+            "ENDM\n"
+            "Load_%2$s MACRO reg1, reg2\n"
+            "  mov reg2, [reg1+%1$d]\n"
+             "ENDM\n"
+            "Push_%2$s MACRO reg1\n"
+            "  push [reg1+%1$d]\n"
+            "ENDM\n"
+            "Pop_%2$s MACRO reg1\n"
+            "  pop [reg1+%1$d]\n"
+            "ENDM\n"
+            "Cmp_%2$s MACRO reg1, reg2\n"
+            "  cmp reg2, [reg1+%1$d]\n"
+            "ENDM\n"
+            "Sub_%2$s MACRO reg1, reg2\n"
+            "  sub reg2, [reg1+%1$d]\n"
+            "ENDM\n", count, name);
 }
 
 void domain_state64(int count, char *name)
 {
-  printf("Store_%2$s MACRO reg\n"
-         "  mov [r14+%1$d], reg\n"
-         "ENDM\n"
-         "Load_%2$s MACRO reg\n"
-         "  mov reg, [r14+%1$d]\n"
-          "ENDM\n"
-         "Push_%2$s MACRO\n"
-         "  push [r14+%1$d]\n"
-         "ENDM\n"
-         "Pop_%2$s MACRO\n"
-         "  pop [r14+%1$d]\n"
-         "ENDM\n"
-         "Cmp_%2$s MACRO reg\n"
-         "  cmp reg, [r14+%1$d]\n"
-         "ENDM\n", count, name);
+  _printf_p("Store_%2$s MACRO reg\n"
+            "  mov [r14+%1$d], reg\n"
+            "ENDM\n"
+            "Load_%2$s MACRO reg\n"
+            "  mov reg, [r14+%1$d]\n"
+             "ENDM\n"
+            "Push_%2$s MACRO\n"
+            "  push [r14+%1$d]\n"
+            "ENDM\n"
+            "Pop_%2$s MACRO\n"
+            "  pop [r14+%1$d]\n"
+            "ENDM\n"
+            "Cmp_%2$s MACRO reg\n"
+            "  cmp reg, [r14+%1$d]\n"
+            "ENDM\n", count, name);
 }
 
 void process_domain_state(void (*emit)(int, char *))
