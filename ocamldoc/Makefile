@@ -17,6 +17,7 @@ ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
+include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
 
 OCAMLYACCFLAGS = --strict -v
 
@@ -296,7 +297,7 @@ test_stdlib: | ppx_stdlib$(EXE)
 test_stdlib_code: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
 	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) $(STDLIB_PPX) -dump $@/stdlib.odoc -keep-code \
-	`ls $(ROOTDIR)/stdlib/*.ml | grep -v Labels` \
+	$(addprefix $(ROOTDIR)/stdlib/, $(filter-out %Labels.ml, $(addsuffix .ml, $(STDLIB_MODULE_BASENAMES)))) \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.ml \
 	$(ROOTDIR)/otherlibs/str/str.ml
 
