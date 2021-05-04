@@ -248,8 +248,7 @@ GNUISH_SED = \
 depend:
 	$(V_OCAMLDEP){ \
 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
-	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli; \
+	  $(OCAMLDEP_CMD) -as-map stdlib.ml stdlib.mli; \
 	} | \
 	$(GNUISH_SED) -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
