@@ -98,6 +98,7 @@ _build
 /manual/src/cmds/warnings-help.etex
 /manual/src/warnings-help.etex
 
+/api_docgen/Makefile.compilerlibs_modules
 /api_docgen/build
 /api_docgen/odoc/build
 /api_docgen/ocamldoc/build
