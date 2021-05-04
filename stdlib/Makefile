@@ -266,14 +266,13 @@ include .depend
 
 STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
-.INTERMEDIATE: .depend.tmp
+.INTERMEDIATE: .depend.tmp stdlib_all.tmp
 .PHONY: depend
 depend:
 	cp stdlib.ml stdlib_all.tmp
 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
 	  -impl stdlib_all.tmp > .depend.tmp
-	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> .depend.tmp
+	$(CAMLDEP) $(DEPFLAGS) -as-map stdlib.ml stdlib.mli >> .depend.tmp
 	sed -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
 	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' \
