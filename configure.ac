@@ -1239,8 +1239,11 @@ AS_CASE([$rlwrap,$system],
 # C# compiler (for the testsuite)
 AC_CHECK_PROG([csc],[csc],[csc])
 AS_IF([test -n "$csc"],
-  [csc_flags='/nologo /nowarn:1668'
-   AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])])
+  [AS_CASE([$host],[*-*-cygwin*|*-*-mingw32|*-pc-windows],
+    [csc=''
+    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])],
+    [csc_flags='/nologo /nowarn:1668'
+    AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])])])
 
 # Checks for library functions
 
