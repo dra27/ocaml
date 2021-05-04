@@ -58,10 +58,6 @@ let mksharedlibrpath = {@id@|@mksharedlibrpath@|@id@}
 let ar = {@id@|@AR@|@id@}
 let supports_shared_libraries = @supports_shared_libraries@
 let flexlink_flags = {@id@|@flexlink_flags@|@id@}
-let default_mk_commands =
-  {@id@|@mksharedlib@ @LDFLAGS@|@id@},
-  {@id@|@mkexe_config@|@id@},
-  {@id@|@mkmaindll@ @LDFLAGS@|@id@}
 let mkdll, mkexe, mkmaindll =
   if Sys.win32 || Sys.cygwin && supports_shared_libraries then
     let flexlink_dll_ldflags =
@@ -74,22 +70,24 @@ let mkdll, mkexe, mkmaindll =
         " -link " ^ {@id@|@oc_ldflags@|@id@}
       else ""
     in
-    try
+    let flexlink =
       let flexlink =
-        let flexlink = Sys.getenv "OCAML_FLEXLINK" in
-        let f i =
-          let c = flexlink.[i] in
-          if c = '/' && Sys.win32 then '\\' else c
-        in
-        (String.init (String.length flexlink) f) ^ " " ^ flexlink_flags
+        try Sys.getenv "OCAML_FLEXLINK"
+        with Not_found -> "flexlink"
       in
-      flexlink ^ flexlink_dll_ldflags,
-      flexlink ^ " -exe" ^ flexlink_ldflags,
-      flexlink ^ " -maindll" ^ flexlink_dll_ldflags
-    with Not_found ->
-      default_mk_commands
+      let f i =
+        let c = flexlink.[i] in
+        if c = '/' && Sys.win32 then '\\' else c
+      in
+      (String.init (String.length flexlink) f) ^ " " ^ flexlink_flags
+    in
+    flexlink ^ flexlink_dll_ldflags,
+    flexlink ^ " -exe" ^ flexlink_ldflags,
+    flexlink ^ " -maindll" ^ flexlink_dll_ldflags
   else
-    default_mk_commands
+    {@id@|@mksharedlib@ @LDFLAGS@|@id@},
+    {@id@|@mkexe_config@|@id@},
+    {@id@|@mkmaindll@ @LDFLAGS@|@id@}
 
 let flambda = @flambda@
 let with_flambda_invariants = @flambda_invariants@

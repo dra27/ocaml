@@ -13164,11 +13164,9 @@ case $CC,$host in #(
   *,*-*-cygwin*) :
     common_cppflags="$common_cppflags -U_WIN32"
     if $with_sharedlibs; then :
-  mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
-      mkexedebugflag="-link -g"
+  mkexedebugflag="-link -g"
 else
-  mkexe="$mkexe -Wl,--stack,16777216"
-      oc_ldflags="-Wl,--stack,16777216"
+  oc_ldflags="-Wl,--stack,16777216"
 
 fi
     ostype="Cygwin" ;; #(
@@ -13182,13 +13180,11 @@ esac
     mkexedebugflag="-link -g"
     ostype="Win32"
     toolchain="mingw"
-    mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
     oc_ldflags='-municode'
     SO="dll" ;; #(
   *,*-pc-windows) :
     toolchain=msvc
     ostype="Win32"
-    mkexe='$(FLEXLINK) -exe $(if $(OC_LDFLAGS),-link "$(OC_LDFLAGS)")'
     oc_ldflags='/ENTRY:wmainCRTStartup'
     mkexedebugflag='' ;; #(
   *,x86_64-*-linux*) :
@@ -13993,22 +13989,11 @@ if test x"$enable_shared" != "xno"; then :
                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
       shared_libraries_supported=true ;; #(
   *-*-mingw32) :
-    mksharedlib='$(FLEXLINK)'
-      mkmaindll='$(FLEXLINK) -maindll'
-      if test -n "$oc_dll_ldflags"; then :
-
-        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
-        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""
-fi
-      shared_libraries_supported=$with_sharedlibs ;; #(
+    shared_libraries_supported=$with_sharedlibs ;; #(
   *-pc-windows) :
-    mksharedlib='$(FLEXLINK)'
-      mkmaindll='$(FLEXLINK) -maindll'
-      shared_libraries_supported=$with_sharedlibs ;; #(
+    shared_libraries_supported=$with_sharedlibs ;; #(
   *-*-cygwin*) :
-    mksharedlib='$(FLEXLINK)'
-      mkmaindll='$(FLEXLINK) -maindll'
-      shared_libraries_supported=true ;; #(
+    shared_libraries_supported=true ;; #(
   powerpc-ibm-aix*) :
     case $ocaml_cv_cc_vendor in #(
   xlc*) :
