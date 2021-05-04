@@ -210,7 +210,8 @@ endif
 .Makefile.primitives: Makefile.primitives | sak$(EXE)
 	@cp $< $@
 
-prims.c : primitives
+# prims.c is a side-effect of producing primitives
+prims.c: primitives ;
 
 jumptbl.inc opnames.inc : caml/instruct.h | sak$(EXE)
 	./sak$(EXE) opnames
