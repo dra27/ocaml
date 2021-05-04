@@ -115,6 +115,7 @@ _build
 /ocamldoc/odoc_text_lexer.ml
 /ocamldoc/odoc_text_parser.ml
 /ocamldoc/odoc_text_parser.mli
+/ocamldoc/ppx_stdlib
 /ocamldoc/*.output
 /ocamldoc/test_stdlib
 /ocamldoc/test_latex

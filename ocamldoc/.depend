@@ -830,6 +830,12 @@ odoc_value.cmx : \
     odoc_name.cmx \
     odoc_misc.cmx \
     ../parsing/asttypes.cmi
+ppx_stdlib.cmo : \
+    ../driver/compiler_ppx.cmi \
+    ../parsing/ast_mapper.cmi
+ppx_stdlib.cmx : \
+    ../driver/compiler_ppx.cmx \
+    ../parsing/ast_mapper.cmx
 generators/odoc_literate.cmo : \
     odoc_info.cmi \
     odoc_html.cmo \

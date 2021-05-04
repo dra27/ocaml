@@ -29,11 +29,13 @@ OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 OCAMLDEP = $(BEST_OCAMLDEP)
 DEPFLAGS = -slash
 
+STDLIB_PPX = -ppx "$(OCAMLRUN_HOST) ppx_stdlib$(EXE)"
+
 # For installation
 ##############
 
 CP=cp
-programs := ocamldoc ocamldoc.opt
+programs := ocamldoc ocamldoc.opt ppx_stdlib
 include Makefile.best_ocamldoc
 
 OCAMLDOC_LIBCMA=odoc_info.cma
@@ -148,7 +150,7 @@ LIBCMIFILES = $(LIBCMOFILES:.cmo=.cmi)
 all: lib exe generators
 
 .PHONY: exe
-exe: $(OCAMLDOC)
+exe: $(OCAMLDOC) ppx_stdlib$(EXE)
 
 .PHONY: lib
 lib: $(OCAMLDOC_LIBCMA) $(OCAMLDOC_LIBCMI) $(ODOC_TEST)
@@ -189,6 +191,9 @@ $(OCAMLDOC_LIBCMA): $(LIBCMOFILES)
 
 $(OCAMLDOC_LIBCMXA): $(LIBCMXFILES)
 	$(OCAMLOPT) -a -o $@ $(LINKFLAGS) $^
+
+ppx_stdlib$(EXE): $(ROOTDIR)/compilerlibs/ocamlcommon.cma ppx_stdlib.cmo
+	$(OCAMLC) -o $@ $^
 
 .PHONY: dot
 dot: ocamldoc.dot
@@ -283,25 +288,25 @@ test:
 	-load $@/ocamldoc.odoc -v
 
 .PHONY: test_stdlib
-test_stdlib:
+test_stdlib: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
+	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) $(STDLIB_PPX) -dump $@/stdlib.odoc -keep-code \
 	$(ROOTDIR)/stdlib/*.mli \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.mli \
 	$(ROOTDIR)/otherlibs/str/str.mli
 
 .PHONY: test_stdlib_code
-test_stdlib_code:
+test_stdlib_code: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
+	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) $(STDLIB_PPX) -dump $@/stdlib.odoc -keep-code \
 	$(addprefix $(ROOTDIR)/stdlib/, $(filter-out %Labels.ml, $(addsuffix .ml, $(STDLIB_MODULE_BASENAMES)))) \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.ml \
 	$(ROOTDIR)/otherlibs/str/str.ml
 
 .PHONY: test_latex
-test_latex:
+test_latex: | ppx_stdlib$(EXE)
 	$(MKDIR) $@
-	$(OCAMLDOC_RUN) -latex -sort -o $@/test.tex -d $@ $(INCLUDES) odoc*.ml \
+	$(OCAMLDOC_RUN) -latex -sort -o $@/test.tex -d $@ $(INCLUDES) $(STDLIB_PPX) odoc*.ml \
 	        odoc*.mli test2.txt $(ROOTDIR)/stdlib/*.mli $(ROOTDIR)/otherlibs/unix/unix.mli
 
 .PHONY: test_latex_simple
