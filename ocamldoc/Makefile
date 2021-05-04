@@ -17,7 +17,9 @@ ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
+ifneq "$(REQUIRES_CONFIGURATION)" ""
 include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
+endif
 
 OCAMLYACCFLAGS = --strict -v
 
