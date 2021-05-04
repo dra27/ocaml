@@ -16,10 +16,12 @@
 # it to give us the module link order for stdlib.cma/stdlib.cmxa. The output of
 # this is the then fed to `ocamlc -bstdlib`
 
+INTERNAL_MODULES := $(wildcard camlinternal*.ml)
+
 # stdlib_all.cmx must have an empty recipe in order to deactivate the %.cmx
 # pattern rule (or we'll include stdlib_all in the link order)
 .PHONY: stdlib_all.cmx
-stdlib_all.cmx: stdlib.cmx
+stdlib_all.cmx: stdlib.cmx $(INTERNAL_MODULES:%.ml=%.cmx)
 	@
 
 include .depend
