@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+include $(ROOTDIR)/compilerlibs/Makefile.compilerlibs
+
 # Capitalize first letter of argument
 define up
 $(shell echo $(1) | cut -c1 | tr '[:lower:]' '[:upper:]')
@@ -58,8 +60,10 @@ endif
 libref_TEXT=Ocaml_operators Format_tutorial
 libref_C=$(call capitalize,$(libref))
 
-PARSING_MLIS := $(notdir $(wildcard $(ROOTDIR)/parsing/*.mli))
-UTILS_MLIS := $(notdir $(wildcard $(ROOTDIR)/utils/*.mli))
+PARSING_MLIS := \
+  $(call sort, $(notdir $(PARSING:%.cmo=%.mli) $(PARSING_CMI:%.cmi=%.mli)))
+UTILS_MLIS := \
+  $(call sort,$(notdir $(UTILS:%.cmo=%.mli) $(UTILS_CMI:%.cmi=%.mli)))
 DRIVER_MLIS := pparse.mli
 
 compilerlibref_MLIS= \
@@ -78,8 +82,7 @@ ALL_LIBREF= \
 ALL_COMPILERLIBREF= \
   $(compilerlibref_TEXT:%=compilerlibref/%) \
   $(compilerlibref:%=compilerlibref/%)
-# Note that the output of $(wildcard ...) is sorted alphabetically.
-# The compilerlibs index will be thus be sorted first by category:
+# The compilerlibs index is sorted first by category:
 # - text documentation
 # - parsing modules
 # - utils modules
