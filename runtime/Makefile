@@ -213,8 +213,11 @@ endif
 # prims.c is a side-effect of producing primitives
 prims.c: primitives ;
 
-jumptbl.inc opnames.inc : caml/instruct.h | sak$(EXE)
+opnames.inc: caml/instruct.h | sak$(EXE)
 	./sak$(EXE) opnames
+
+# jumptbl.inc is a side-effect of producing opnames.inc
+jumptbl.inc: opnames.inc ;
 
 sak$(EXE): sak.$(O)
 	$(call MKEXE_USING_COMPILER,$@,$^)
