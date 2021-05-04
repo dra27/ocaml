@@ -114,10 +114,13 @@ let main argv ppf =
       Symtable.output_runtimedef_primitives stdout in
     let emit_stdlib_modules files =
       Make_opcodes.(output_stdlib_modules stdout (read_lines files)) in
+    let emit_capitalize file =
+      Make_opcodes.(output_capitalize stdout (read_lines file)) in
     Option.iter emit_opnames !bopnames;
     Option.iter emit_opcodes !bopcodes;
     Option.iter emit_runtimedef !bruntimedef;
     Option.iter emit_stdlib_modules !bstdlib;
+    Option.iter emit_capitalize !bcapitalize;
   with
   | exception (Compenv.Exit_with_status n) ->
     n

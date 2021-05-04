@@ -857,6 +857,9 @@ let mk_bstdlib_aliases f =
 let mk_bstdlib_since f =
   "-bstdlib-since", Arg.Unit f, " (undocumented)"
 
+let mk_bcapitalize f =
+  "-bcapitalize", Arg.String f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -1055,6 +1058,7 @@ module type Bytecomp_options = sig
   val _bopnames : string -> unit
   val _bruntimedef : string -> unit
   val _bstdlib : string -> unit
+  val _bcapitalize : string -> unit
 
   val _use_prims : string -> unit
 end;;
@@ -1271,6 +1275,7 @@ struct
     mk_bstdlib F._bstdlib;
     mk_bstdlib_aliases F._bstdlib_aliases;
     mk_bstdlib_since F._bstdlib_since;
+    mk_bcapitalize F._bcapitalize;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -2025,6 +2030,7 @@ third-party libraries such as Lwt, but with a different API."
     let _bopnames s = bopnames := Some s
     let _bruntimedef s = bruntimedef := Some s
     let _bstdlib s = bstdlib := Some s
+    let _bcapitalize s = bcapitalize := Some s
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
   end
