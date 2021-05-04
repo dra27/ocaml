@@ -50,7 +50,7 @@ EXTRACPPFLAGS=-I../unix
 HEADERS=unixsupport.h ../unix/socketaddr.h
 
 unixLabels.cmi: \
-  EXTRACAMLFLAGS += -pp "$(AWK) -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"
+  EXTRACAMLFLAGS += -bstdlib-since
 
 include ../Makefile.otherlibs.common
 
