@@ -21,20 +21,17 @@ INTERNAL_MODULES := $(wildcard camlinternal*.ml)
 # stdlib_all.cmx must have an empty recipe in order to deactivate the %.cmx
 # pattern rule (or we'll include stdlib_all in the link order)
 .PHONY: stdlib_all.cmx
-stdlib_all.cmx: stdlib.cmx $(INTERNAL_MODULES:%.ml=%.cmx)
-	@
+stdlib_all.cmx: stdlib.cmx $(INTERNAL_MODULES:%.ml=%.cmx) ;
 
 include .depend
 
 # This phony target always builds (and must have an "empty" recipe rather than
 # no recipe)
 .PHONY: must
-must:
-	@
+must: ;
 
 # By depending on must, anything in the build tree is ignored
-%.cmi: must
-	@
+%.cmi: must ;
 
 # Each module will echo its name when its dependencies have been satisfied,
 # giving the link order for the standard library.
