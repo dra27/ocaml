@@ -27,6 +27,8 @@ let process_bootstrap boot_function =
       Symtable.output_runtimedef_primitives stdout
   | Stdlib file ->
       output_stdlib_modules stdout (read_lines file)
+  | Capitalize file ->
+      output_capitalize stdout (read_lines file)
 
 let main argv ppf =
   let program = "ocamlc" in

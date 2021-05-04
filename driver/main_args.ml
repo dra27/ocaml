@@ -2005,6 +2005,7 @@ third-party libraries such as Lwt, but with a different API."
         match name with
         | "runtimedef" -> Runtimedef file
         | "stdlib" -> Stdlib file
+        | "capitalize" -> Capitalize file
         | _ ->
             (* See The TeXbook p.299 *)
             raise (Arg.Bad "Interwoven alignment preambles are not allowed")

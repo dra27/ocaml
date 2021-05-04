@@ -91,4 +91,11 @@ and read_lines = parse
                         (String.concat " \\\n  " stdlib_module_basenames)
                         (String.concat " \\\n  " stdlib_prefixed_modules)
                         (String.concat " \\\n  " modules)
+
+  let output_capitalize ch lines =
+    let basenames = List.flatten (List.map (String.split_on_char ' ') lines) in
+    let names =
+      String.concat " \\\n  " (List.map String.capitalize_ascii basenames)
+    in
+    output_string ch ("  " ^ names)
 }

@@ -377,6 +377,7 @@ let dump_into_file = ref false (* -dump-into-file *)
 type boot_function =
   | Runtimedef of string
   | Stdlib of string
+  | Capitalize of string
 let bootstrap = ref None
 
 type 'a env_reader = {
