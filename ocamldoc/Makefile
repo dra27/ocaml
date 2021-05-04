@@ -30,7 +30,7 @@ DEPFLAGS = -slash
 ##############
 
 CP=cp
-programs := ocamldoc ocamldoc.opt
+programs := ocamldoc ocamldoc.opt ppx_stdlib
 include Makefile.best_ocamldoc
 
 OCAMLDOC_LIBCMA=odoc_info.cma
@@ -145,7 +145,7 @@ LIBCMIFILES = $(LIBCMOFILES:.cmo=.cmi)
 all: lib exe generators
 
 .PHONY: exe
-exe: $(OCAMLDOC)
+exe: $(OCAMLDOC) ppx_stdlib$(EXE)
 
 .PHONY: lib
 lib: $(OCAMLDOC_LIBCMA) $(OCAMLDOC_LIBCMI) $(ODOC_TEST)
@@ -186,6 +186,9 @@ $(OCAMLDOC_LIBCMA): $(LIBCMOFILES)
 
 $(OCAMLDOC_LIBCMXA): $(LIBCMXFILES)
 	$(OCAMLOPT) -a -o $@ $(LINKFLAGS) $^
+
+ppx_stdlib$(EXE): $(ROOTDIR)/compilerlibs/ocamlcommon.cma ppx_stdlib.cmo
+	$(OCAMLC) -o $@ $^
 
 .PHONY: dot
 dot: ocamldoc.dot
