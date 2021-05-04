@@ -103,6 +103,84 @@ expunge := expunge$(EXE)
 # targets for the compilerlibs/*.{cma,cmxa} archives
 include compilerlibs/Makefile.compilerlibs
 
+$(addprefix toplevel/byte/, $(TOPLEVEL_SHARED_CMIS)):\
+toplevel/byte/%.cmi: toplevel/%.cmi
+	cp $< toplevel/$*.mli $(@D)
+
+$(addprefix toplevel/native/, $(TOPLEVEL_SHARED_CMIS)):\
+toplevel/native/%.cmi: toplevel/%.cmi
+	cp $< toplevel/$*.mli $(@D)
+
+beforedepend::
+	cd toplevel ; cp $(TOPLEVEL_SHARED_MLIS) byte/
+	cd toplevel ; cp $(TOPLEVEL_SHARED_MLIS) native/
+
+partialclean::
+	cd toplevel/byte ; rm -f $(TOPLEVEL_SHARED_ARTEFACTS)
+	cd toplevel/native ; rm -f $(TOPLEVEL_SHARED_ARTEFACTS)
+
+$(COMMON:.cmo=.cmx) $(BYTECOMP:.cmo=.cmx) $(OPTCOMP:.cmo=.cmx): ocamlopt$(EXE)
+$(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE)
+
+
+compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
+	$(CAMLC) -a -linkall -o $@ $(COMMON)
+partialclean::
+	rm -f compilerlibs/ocamlcommon.cma
+
+compilerlibs/ocamlcommon.cmxa: $(COMMON_CMI) $(COMMON:.cmo=.cmx)
+	$(CAMLOPT) -a -linkall -o $@ $(COMMON:.cmo=.cmx)
+partialclean::
+	rm -f compilerlibs/ocamlcommon.cmxa \
+	      compilerlibs/ocamlcommon.a compilerlibs/ocamlcommon.lib
+
+
+compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
+	$(CAMLC) -a -o $@ $(BYTECOMP)
+partialclean::
+	rm -f compilerlibs/ocamlbytecomp.cma
+
+compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
+	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
+partialclean::
+	rm -f compilerlibs/ocamlbytecomp.cmxa \
+	      compilerlibs/ocamlbytecomp.a compilerlibs/ocamlbytecomp.lib
+
+
+compilerlibs/ocamlmiddleend.cma: $(MIDDLE_END_CMI) $(MIDDLE_END)
+	$(CAMLC) -a -o $@ $(MIDDLE_END)
+compilerlibs/ocamlmiddleend.cmxa: $(MIDDLE_END_CMI) $(MIDDLE_END:%.cmo=%.cmx)
+	$(CAMLOPT) -a -o $@ $(MIDDLE_END:%.cmo=%.cmx)
+partialclean::
+	rm -f compilerlibs/ocamlmiddleend.cma \
+	      compilerlibs/ocamlmiddleend.cmxa \
+	      compilerlibs/ocamlmiddleend.a \
+	      compilerlibs/ocamlmiddleend.lib
+
+
+compilerlibs/ocamloptcomp.cma: $(OPTCOMP_CMI) $(OPTCOMP)
+	$(CAMLC) -a -o $@ $(OPTCOMP)
+partialclean::
+	rm -f compilerlibs/ocamloptcomp.cma
+
+compilerlibs/ocamloptcomp.cmxa: $(OPTCOMP_CMI) $(OPTCOMP:.cmo=.cmx)
+	$(CAMLOPT) -a -o $@ $(OPTCOMP:.cmo=.cmx)
+partialclean::
+	rm -f compilerlibs/ocamloptcomp.cmxa \
+	      compilerlibs/ocamloptcomp.a compilerlibs/ocamloptcomp.lib
+
+
+compilerlibs/ocamltoplevel.cma: $(TOPLEVEL_CMI) $(TOPLEVEL)
+	$(CAMLC) -a -o $@ -I toplevel/byte $(TOPLEVEL)
+partialclean::
+	rm -f compilerlibs/ocamltoplevel.cma
+
+compilerlibs/ocamltoplevel.cmxa: $(OPTTOPLEVEL_CMI) $(OPTTOPLEVEL:.cmo=.cmx)
+	$(CAMLOPT) -a -o $@ -I toplevel/native $(OPTTOPLEVEL:.cmo=.cmx)
+partialclean::
+	rm -f compilerlibs/ocamltoplevel.cmxa \
+	  compilerlibs/ocamltoplevel.a compilerlibs/ocamltoplevel.lib
+
 # The configuration file
 
 utils/config.ml: utils/config.mlp Makefile.config utils/Makefile
