@@ -132,6 +132,7 @@ char *scan_to_eol(char *p)
   /* If not at the end of the buffer, advance to next character */
   if (*r != 0)
     r++;
+  /* Backtrack over any previous CR characters */
   while (q > p && *(q - 1) == '\r')
     q--;
   /* q now points to the first character of \r*\n at the end of the line */
