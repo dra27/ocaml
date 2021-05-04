@@ -19,6 +19,21 @@ include $(ROOTDIR)/stdlib/StdlibModules
 include $(ROOTDIR)/Makefile.best_binaries
 include $(DOCGEN)/Makefile.docfiles
 
+# Capitalize first letter of argument
+define up
+$(shell echo $(1) | cut -c1 | tr '[:lower:]' '[:upper:]')
+endef
+
+define capitalize_one
+$(call up,$(1))$(shell echo $(1) | cut -c2-)
+endef
+
+define capitalize
+$(foreach m,$(1),$(call capitalize_one,$m))
+endef
+
+compilerlibref_C=$(call capitalize,$(compilerlibref))
+
 DOC_COMPILERLIBS_DIRS= $(addprefix $(ROOTDIR)/,\
   parsing utils typing bytecomp driver file_formats lambda)
 
