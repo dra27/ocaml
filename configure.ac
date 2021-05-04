@@ -175,6 +175,7 @@ AC_SUBST([expanded_libdir])
 AC_SUBST([ocamlsrcdir])
 AC_SUBST([with_lib_str])
 AC_SUBST([with_lib_unix])
+AC_SUBST([id])
 
 ## Generated files
 
@@ -185,6 +186,9 @@ AC_CONFIG_FILES([utils/config.ml])
 AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+
+# Works out how many "o"s are needed in quoted strings
+AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
 
 # Checks for system types
 
@@ -2045,6 +2049,7 @@ AS_IF([test -z "$mkexe"],
   mkexe="$mkexe\$(if \$(LDFLAGS), -link \"\$(LDFLAGS)\")"
   mkexe_config="$mkexe"])
 
+# XXX TODO use AC_CONFIG_COMMANDS_PRE
 # utils/config.ml needs the expanded form of these
 prev_exec_prefix="$exec_prefix"
 prev_prefix="$prefix"
@@ -2056,6 +2061,7 @@ exec_prefix="$prev_exec_prefix"
 prefix="$prev_prefix"
 
 # Do not permanently cache the result of flexdll.h
+# XXX TODO use AC_CONFIG_COMMANDS_PRE
 unset ac_cv_header_flexdll_h
 
 AC_OUTPUT
