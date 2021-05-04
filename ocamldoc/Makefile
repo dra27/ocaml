@@ -17,6 +17,9 @@ ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
+endif
 
 OCAMLYACCFLAGS = --strict -v
 
@@ -291,7 +294,7 @@ test_stdlib:
 test_stdlib_code:
 	$(MKDIR) $@
 	$(OCAMLDOC_RUN) -html -colorize-code -sort -d $@ $(INCLUDES) -dump $@/stdlib.odoc -keep-code \
-	`ls $(ROOTDIR)/stdlib/*.ml | grep -v Labels` \
+	$(addprefix $(ROOTDIR)/stdlib/, $(filter-out %Labels.ml, $(addsuffix .ml, $(STDLIB_MODULE_BASENAMES)))) \
 	$(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.ml \
 	$(ROOTDIR)/otherlibs/str/str.ml
 
