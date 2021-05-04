@@ -20,20 +20,7 @@ include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 include $(DOCGEN)/Makefile.docfiles
 
-# Capitalize first letter of argument
-define up
-$(shell echo $(1) | cut -c1 | tr '[:lower:]' '[:upper:]')
-endef
-
-define capitalize_one
-$(call up,$(1))$(shell echo $(1) | cut -c2-)
-endef
-
-define capitalize
-$(foreach m,$(1),$(call capitalize_one,$m))
-endef
-
-compilerlibref_C=$(call capitalize,$(compilerlibref))
+include $(DOCGEN)/Makefile.compilerlibs_modules
 
 DOC_COMPILERLIBS_DIRS= $(addprefix $(ROOTDIR)/,\
   parsing utils typing bytecomp driver file_formats lambda)
@@ -69,3 +56,13 @@ build/latex/alldoc.tex:$(DOCGEN)/alldoc.tex | build/latex
 $(compilerlibref_TEXT:%=build/%.mld) $(libref_TEXT:%=build/%.mld): \
 build/%.mld:$(DOCGEN)/%.mld
 	cp $< $@
+
+.INTERMEDIATE: l.tmp
+$(DOCGEN)/Makefile.compilerlibs_modules: \
+  $(ROOTDIR)/compilerlibs/Makefile.compilerlibs
+# It is intentional that $(compilerlibref) is not quoted to *permit* word
+# splitting (so that there's exactly one space between each item)
+	@echo $(compilerlibref) > l.tmp
+	echo 'compilerlibref_C = \' > $@
+	$(BOOT_OCAMLC) -bcapitalize l.tmp >> $@
+	rm -f l.tmp
