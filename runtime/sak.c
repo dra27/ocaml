@@ -83,36 +83,29 @@ char *read_file(char_os *path)
   if ((fd = open_os(path, flags, 0)) == -1)
     return NULL;
 
-  if ((size = lseek(fd, 0, SEEK_END)) == -1)
-    goto error;
+  /* Determine the size of the file and allocate a buffer for it */
+  if ((size = lseek(fd, 0, SEEK_END)) != -1
+      && lseek(fd, 0, SEEK_SET) != -1
+      && (result = buf = (char *)malloc(size + 1)) != NULL) {
+    result[size] = 0;
 
-  if (lseek(fd, 0, SEEK_SET) == -1)
-    goto error;
-
-  if ((result = buf = (char *)malloc(size + 1)) == NULL)
-    goto error;
-
-  result[size] = 0;
-
-  while (size > 0) {
-    if ((nbytes = read(fd, buf, size)) == -1) {
-      if (errno != EAGAIN)
-        goto abort;
-    } else {
-      size -= nbytes;
-      buf += nbytes;
+    while (size > 0) {
+      if ((nbytes = read(fd, buf, size)) == -1) {
+        if (errno != EAGAIN) {
+          free(result);
+          result = NULL;
+          size = 0;
+        }
+      } else {
+        size -= nbytes;
+        buf += nbytes;
+      }
     }
   }
 
   close(fd);
 
   return result;
-
-abort:
-  free(result);
-error:
-  close(fd);
-  return NULL;
 }
 
 void die(const char* format, ...)
