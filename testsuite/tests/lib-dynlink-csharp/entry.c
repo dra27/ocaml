@@ -37,8 +37,8 @@
 #endif /* WIN32 && !CYGWIN */
 
 _DLLAPI void _CALLPROC start_caml_engine() {
-  wchar_t * argv[2];
-  argv[0] = L"--";
+  char_os * argv[2];
+  argv[0] = "--";
   argv[1] = NULL;
   caml_startup(argv);
 }

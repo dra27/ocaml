@@ -13,13 +13,13 @@ set csharp_cmd = "${csc} ${csc_flags} /out:main.exe main.cs"
 module = "plugin.ml"
 ***** ocamlc.byte
 module = ""
-flags = "-output-obj"
-program = "main.dll"
+flags = "-output-obj -runtime-variant _pic"
+program = "main.so"
 all_modules = "dynlink.cma main.ml entry.c"
 ****** script
 script = "${csharp_cmd}"
 ******* run
-program = "./main.exe"
+program = "mono ./main.exe"
 ******** check-program-output
 reference = "${test_source_directory}/main.bytecode.reference"
 
@@ -33,12 +33,12 @@ flags = "-output-obj"
 program = "main_obj.${objext}"
 all_modules = "dynlink.cma entry.c main.ml"
 ****** script
-script = "${mkdll} -maindll -o main.dll main_obj.${objext} entry.${objext} \
-                   ${ocamlsrcdir}/runtime/libcamlrun.${libext} ${bytecc_libs}"
+script = "${mkdll} -o main.so main_obj.${objext} entry.${objext} \
+                   ${ocamlsrcdir}/runtime/libcamlrun_pic.${libext} ${bytecc_libs}"
 ******* script
 script = "${csharp_cmd}"
 ******** run
-program = "./main.exe"
+program = "mono ./main.exe"
 ********* check-program-output
 reference = "${test_source_directory}/main.bytecode.reference"
 
@@ -48,13 +48,13 @@ program = "plugin.cmxs"
 flags = "-shared"
 all_modules = "plugin.ml"
 ***** ocamlopt.byte
-flags = "-output-obj"
-program= "main.dll"
+flags = "-output-obj -runtime-variant _pic"
+program= "main.so"
 all_modules = "dynlink.cmxa entry.c main.ml"
 ****** script
 script = "${csharp_cmd}"
 ******* run
-program = "./main.exe"
+program = "mono ./main.exe"
 ******** check-program-output
 reference = "${test_source_directory}/main.native.reference"
 
@@ -69,12 +69,12 @@ flags = "-output-obj"
 program = "main_obj.${objext}"
 all_modules = "dynlink.cmxa entry.c main.ml"
 ****** script
-script = "${mkdll} -maindll -o main.dll main_obj.${objext} entry.${objext} \
-                   ${ocamlsrcdir}/runtime/libasmrun.${libext} ${nativecc_libs}"
+script = "${mkdll} -o main.so main_obj.${objext} entry.${objext} \
+                   ${ocamlsrcdir}/runtime/libasmrun_pic.${libext} ${nativecc_libs}"
 ******* script
 script = "${csharp_cmd}"
 ******** run
-program = "./main.exe"
+program = "mono ./main.exe"
 ********* check-program-output
 reference = "${test_source_directory}/main.native.reference"
 
