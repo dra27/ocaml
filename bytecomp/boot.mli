@@ -27,3 +27,6 @@ val read_lines : string -> string list
 
 val output_stdlib_modules : out_channel -> string list -> unit
 (** Write Makefile.stdlib_modiules *)
+
+val output_capitalize : out_channel -> string list -> unit
+(** Capitalize each word of the input strings and output on a separate line. *)
