@@ -229,7 +229,7 @@ C_LITERAL = $(shell ./sak$(EXE) translate '$(1)')
 
 build_config.h: | sak$(EXE)
 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' > $@
-	echo '#define HOST $(call C_LITERAL,$(HOST))' >> $@
+	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
 
