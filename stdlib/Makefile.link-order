@@ -16,6 +16,9 @@
 # it to give us the module link order for stdlib.cma/stdlib.cmxa. The output of
 # this is the then fed to `ocamlc -bstdlib`
 
+# Stable ordering of the printed dependencies
+.NOTPARALLEL:
+
 INTERNAL_MODULES := $(wildcard camlinternal*.ml)
 
 # stdlib_all.cmx must have an empty recipe in order to deactivate the %.cmx

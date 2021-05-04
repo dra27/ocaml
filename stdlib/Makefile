@@ -255,7 +255,7 @@ clean::
 
 .INTERMEDIATE: l.tmp
 Makefile.stdlib_modules:
-	$(MAKE) --no-print-directory -j 1 -f Makefile.link-order > l.tmp
+	$(MAKE) --no-print-directory -f Makefile.link-order > l.tmp
 	$(CAMLC) -bstdlib l.tmp > $@
 	rm -f l.tmp
 
