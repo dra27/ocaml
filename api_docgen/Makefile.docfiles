@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+include $(ROOTDIR)/compilerlibs/Makefile.compilerlibs
+
 # Capitalize first letter of argument
 define up
 $(shell echo $(1) | cut -c1 | tr '[:lower:]' '[:upper:]')
@@ -50,10 +52,10 @@ otherlibref= \
 libref_EXTRA=stdlib__pervasives
 libref_TEXT=Ocaml_operators Format_tutorial
 
-PARSING_MLIS := $(call sort, \
-	$(notdir $(wildcard $(ROOTDIR)/parsing/*.mli))\
-)
-UTILS_MLIS := $(call sort,$(notdir $(wildcard $(ROOTDIR)/utils/*.mli)))
+PARSING_MLIS := \
+  $(call sort, $(notdir $(PARSING:%.cmo=%.mli) $(PARSING_CMI:%.cmi=%.mli)))
+UTILS_MLIS := \
+  $(call sort,$(notdir $(UTILS:%.cmo=%.mli) $(UTILS_CMI:%.cmi=%.mli)))
 DRIVER_MLIS := pparse.mli
 
 compilerlibref_MLIS= \
