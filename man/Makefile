@@ -14,17 +14,27 @@
 #**************************************************************************
 
 ROOTDIR = ..
-include $(ROOTDIR)/Makefile.config
+include $(ROOTDIR)/Makefile.common
 
 DESTDIR ?=
 INSTALL_DIR=$(DESTDIR)$(MANDIR)/man$(PROGRAMS_MAN_SECTION)
 
-install:
-	for i in *.m; do cp \
-	  $$i $(INSTALL_DIR)/`basename $$i .m`.$(PROGRAMS_MAN_SECTION); done
-	echo '.so man$(PROGRAMS_MAN_SECTION)/ocamlc.$(PROGRAMS_MAN_SECTION)' \
-	     > $(INSTALL_DIR)/ocamlc.opt.$(PROGRAMS_MAN_SECTION)
-	echo '.so man$(PROGRAMS_MAN_SECTION)/ocamlopt.$(PROGRAMS_MAN_SECTION)' \
-	     > $(INSTALL_DIR)/ocamlopt.opt.$(PROGRAMS_MAN_SECTION)
-	echo '.so man$(PROGRAMS_MAN_SECTION)/ocamlcp.$(PROGRAMS_MAN_SECTION)' \
-	     > $(INSTALL_DIR)/ocamloptp.$(PROGRAMS_MAN_SECTION)
+MAN_PAGES := $(wildcard *.m)
+
+define install_manpage
+install::
+	$(INSTALL_DATA) $(1) $(INSTALL_DIR)/$(1:%.m=%).$(PROGRAMS_MAN_SECTION)
+endef
+
+define link_manpage
+install::
+	echo '.so man$(PROGRAMS_MAN_SECTION)/$(1).$(PROGRAMS_MAN_SECTION)' \
+    > $(INSTALL_DIR)/$(1).opt.$(PROGRAMS_MAN_SECTION)
+endef
+
+install::
+	$(MKDIR) "$(INSTALL_MANDIR)/man$(PROGRAMS_MAN_SECTION)"
+
+$(foreach page, $(wildcard *.m), $(eval $(call install_manpage,$(page))))
+
+$(foreach cmd, ocamlc ocamlopt ocamloptp, $(eval $(call link_manpage,$(cmd))))
