@@ -31,7 +31,7 @@ let shared_libraries = @supports_shared_libraries@
 
 let libunix =
   if @with_lib_unix@ then
-    Some Sys.win32
+    Some (not Sys.win32)
   else
     None
 
