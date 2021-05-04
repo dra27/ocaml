@@ -56,7 +56,6 @@ otherlibref += $(runtime_events_MLIS:%.mli=%)
 endif
 
 libref_TEXT=Ocaml_operators Format_tutorial
-libref_C=$(call capitalize,$(libref))
 
 PARSING_MLIS := $(notdir $(wildcard $(ROOTDIR)/parsing/*.mli))
 UTILS_MLIS := $(notdir $(wildcard $(ROOTDIR)/utils/*.mli))
