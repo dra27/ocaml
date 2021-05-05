@@ -41,7 +41,7 @@ build/latex/ifocamldoc.tex: | build/latex
 $(libref:%=build/libref/%.odoc): build/libref/%.odoc: %.mli \
     | build/libref $(ROOTDIR)/ocamldoc/ppx_stdlib$(EXE)
 	$(OCAMLDOC_RUN) -nostdlib -hide Stdlib -lib Stdlib \
-	-ppx "$(OCAMLRUN) $(ROOTDIR)/ocamldoc/ppx_stdlib$(EXE)" \
+	-ppx "$(OCAMLRUN_HOST) $(ROOTDIR)/ocamldoc/ppx_stdlib$(EXE)" \
 	$(DOC_STDLIB_INCLUDES) $< -dump  $@
 
 $(compilerlibref:%=build/compilerlibref/%.odoc):\

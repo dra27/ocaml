@@ -29,7 +29,7 @@ OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 OCAMLDEP = $(BEST_OCAMLDEP)
 DEPFLAGS = -slash
 
-STDLIB_PPX = -ppx "$(OCAMLRUN) ppx_stdlib$(EXE)"
+STDLIB_PPX = -ppx "$(OCAMLRUN_HOST) ppx_stdlib$(EXE)"
 
 # For installation
 ##############
