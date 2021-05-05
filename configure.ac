@@ -820,13 +820,15 @@ AS_CASE([$CC,$host],
   [*,*-*-cygwin*],
     [common_cppflags="$common_cppflags -U_WIN32"
     AS_IF([$with_sharedlibs],
-      [mkexedebugflag="-link -g"],
+      [mkexe="flexlink $flexlink_flags -exe"
+      mkexedebugflag="-link -g"],
       [oc_ldflags="-Wl,--stack,16777216"]
     )
     ostype="Cygwin"],
   [*,*-*-mingw32],
     [AS_CASE([$host],
       [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
+    mkexe="flexlink $flexlink_flags -exe"
     mkexedebugflag="-link -g"
     ostype="Win32"
     toolchain="mingw"
@@ -834,6 +836,7 @@ AS_CASE([$CC,$host],
     SO="dll"],
   [*,*-pc-windows],
     [toolchain=msvc
+    mkexe="flexlink $flexlink_flags -exe"
     ostype="Win32"
     oc_ldflags='/ENTRY:wmainCRTStartup'
     mkexedebugflag=''],
@@ -951,11 +954,24 @@ AS_IF([test x"$enable_shared" != "xno"],
                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
-      [shared_libraries_supported=$with_sharedlibs],
+      [mksharedlib="flexlink $flexlink_flags"
+      mkmaindll="flexlink $flexlink_flags -maindll"
+      # XXX COMBAK better way of doing this - is mksharedlib actually needed?
+      # It's build system only Provide a function in the Makefile to do this
+      # directly so it's always $(call decorate )?
+      AS_IF([test -n "$oc_dll_ldflags"],[
+        mksharedlib="$mksharedlib -link \"$oc_dll_ldflags\""
+        mkmaindll="$mkmaindll -link \"$oc_dll_ldflags\""])
+      shared_libraries_supported=$with_sharedlibs],
     [*-pc-windows],
-      [shared_libraries_supported=$with_sharedlibs],
+      [mksharedlib="flexlink $flexlink_flags"
+      mkmaindll="flexlink $flexlink_flags -maindll"
+      # XXX There should be support for oc_dll_ldflags here too
+      shared_libraries_supported=$with_sharedlibs],
     [*-*-cygwin*],
-      [shared_libraries_supported=true],
+      [mksharedlib="flexlink $flexlink_flags"
+      mkmaindll="flexlink $flexlink_flags -maindll"
+      shared_libraries_supported=true],
     [powerpc-ibm-aix*],
       [AS_CASE([$ocaml_cv_cc_vendor],
                [xlc*],
@@ -2023,7 +2039,13 @@ oc_dll_ldflags="${oc_dll_ldflags## }"
 AS_IF([test -z "$mkexe"],
   [mkexe="$CC \$(OC_CFLAGS) \$(CFLAGS) \$(OC_LDFLAGS) \$(LDFLAGS)"
    mkexe_config="$CC $oc_cflags $CFLAGS $oc_ldflags $LDFLAGS"],
-  [mkexe_config="$mkexe"])
+  [# XXX Flexlink-style mess - this needs tidying properly
+  # Probably we be computing the link command (i.e. $CC or $mkexe) and then the
+  # rest is in Makefile.config.in
+  # Note that flexlink isn't passed CFLAGS
+  AS_IF([test -n "$oc_ldflags"],[mkexe="$mkexe -link \"$oc_ldflags\""])
+  mkexe="$mkexe\$(if \$(LDFLAGS), -link \"\$(LDFLAGS)\")"
+  mkexe_config="$mkexe"])
 
 # XXX TODO use AC_CONFIG_COMMANDS_PRE
 # utils/config.ml needs the expanded form of these
