@@ -1,7 +1,9 @@
 ROOTDIR = ../..
-include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
 include $(ROOTDIR)/api_docgen/Makefile.docfiles
 include $(ROOTDIR)/Makefile.common
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
+endif
 include $(ROOTDIR)/Makefile.best_binaries
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
 OCAMLC ?= $(BEST_OCAMLC) $(STDLIBFLAGS)
