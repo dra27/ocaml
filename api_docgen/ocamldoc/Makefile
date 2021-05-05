@@ -36,7 +36,7 @@ ALL_MAN= $(ALL_DOC:%=build/man/%.3o)
 ALL_LATEX= $(ALL_DOC:%=build/latex/%.tex)
 
 build/latex/ifocamldoc.tex: | build/latex
-	echo '\newif\ifocamldoc\ocamldoctrue' > $@
+	echo '\\newif\\ifocamldoc\\ocamldoctrue' > $@
 
 $(libref:%=build/libref/%.odoc): build/libref/%.odoc: %.mli \
     | build/libref $(ROOTDIR)/ocamldoc/ppx_stdlib$(EXE)
