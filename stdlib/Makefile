@@ -39,6 +39,9 @@ ifneq "$(REQUIRES_CONFIGURATION)" ""
 include Makefile.stdlib_modules
 endif
 
+# Suppress undefined variables warning when Makefile.stdlib_modules hasn't yet
+# been generated.
+STDLIB_MODULES ?=
 OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
 NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
@@ -252,6 +255,10 @@ $(OTHERS:.cmo=.cmx) std_exit.cmx: stdlib.cmx
 clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -rf flexdll
+
+# Suppress the passing of command line variables to sub-make, since that can
+# trigger spurious undefined variable warnings.
+MAKEOVERRIDES=
 
 .INTERMEDIATE: l.tmp
 Makefile.stdlib_modules:
