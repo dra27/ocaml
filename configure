@@ -14602,14 +14602,14 @@ fi
 if test -n "$csc"; then :
   case $host in #(
   *-*-cygwin*|*-*-mingw32|*-pc-windows) :
-    csc=''
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Mono is not yet supported - C sharp tests disabled" >&5
-$as_echo "$as_me: WARNING: Mono is not yet supported - C sharp tests disabled" >&2;} ;; #(
-  *) :
     csc_flags='/nologo /nowarn:1668'
     if ! $arch64; then :
   csc_flags="$csc_flags /platform:x86"
-fi ;;
+fi ;; #(
+  *) :
+    csc=''
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Mono is not yet supported - C sharp tests disabled" >&5
+$as_echo "$as_me: WARNING: Mono is not yet supported - C sharp tests disabled" >&2;} ;;
 esac
 fi
 

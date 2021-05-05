@@ -1240,10 +1240,10 @@ AS_CASE([$rlwrap,$system],
 AC_CHECK_PROG([csc],[csc],[csc])
 AS_IF([test -n "$csc"],
   [AS_CASE([$host],[*-*-cygwin*|*-*-mingw32|*-pc-windows],
-    [csc=''
-    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])],
     [csc_flags='/nologo /nowarn:1668'
-    AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])])])
+    AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])],
+    [csc=''
+    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
 # Checks for library functions
 
