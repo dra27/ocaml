@@ -38,10 +38,16 @@ ALL_LATEX= $(ALL_DOC:%=build/latex/%.tex)
 build/latex/ifocamldoc.tex: | build/latex
 	echo '\\newif\\ifocamldoc\\ocamldoctrue' > $@
 
+OCAMLDOC_FLAGS =
+
+build/libref/stdlib.odoc: OCAMLDOC_FLAGS += -pp \
+  "$(AWK) -v ocamldoc=true -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"
+
+build/libref/%Labels.odoc: OCAMLDOC_FLAGS += -pp \
+  "$(AWK) -v ocamldoc=true -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"
+
 $(libref:%=build/libref/%.odoc): build/libref/%.odoc: %.mli | build/libref
-	$(OCAMLDOC_RUN) -nostdlib -hide Stdlib -lib Stdlib \
-	-pp \
-"$(AWK) -v ocamldoc=true -f $(ROOTDIR)/stdlib/expand_module_aliases.awk" \
+	$(OCAMLDOC_RUN) -nostdlib -hide Stdlib -lib Stdlib $(OCAMLDOC_FLAGS) \
 	$(DOC_STDLIB_INCLUDES) $< -dump  $@
 
 $(compilerlibref:%=build/compilerlibref/%.odoc):\
