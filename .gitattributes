@@ -1,0 +1,4 @@
+* text eol=lf
+
+boot/ocamlc binary
+boot/ocamllex binary
