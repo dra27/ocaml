@@ -173,6 +173,8 @@ opt: runtimeopt ocamlopt libraryopt otherlibrariesopt
 install: installbyt installopt
 
 installbyt:
+	mkdir -p $(BINDIR)
+	mkdir -p $(LIBDIR)
 	cd byterun & $(MAKEREC) install
 	cp ocamlc $(BINDIR)\ocamlc.exe
 	cp ocaml $(BINDIR)\ocaml.exe
@@ -186,7 +188,6 @@ installbyt:
 	cp toplevel\topdirs.cmi $(LIBDIR)\topdirs.cmi
 	cd tools & $(MAKEREC) install
 	for %i in ($(OTHERLIBRARIES)) do (cd otherlibs\%i & $(MAKEREC) install & cd ..\..)
-	cd wingui & $(MAKE) -nologo install
 	copy /a README.win32 $(DISTRIB)\Readme.txt
 	copy /a LICENSE $(DISTRIB)\License.txt
 	copy /a Changes $(DISTRIB)\Changes.txt
