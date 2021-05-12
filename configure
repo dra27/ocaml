@@ -692,6 +692,7 @@ build_os
 build_vendor
 build_cpu
 build
+QS
 naked_pointers
 stdlib_manpages
 PACKLD
@@ -2885,6 +2886,7 @@ VERSION=4.09.2+relocatable
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -2894,6 +2896,9 @@ ac_config_files="$ac_config_files Makefile.config"
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
+
+
+# Works out how many "o"s are needed in quoted strings
 
 
 # Checks for system types
@@ -17214,6 +17219,26 @@ LIBOBJS=$ac_libobjs
 
 LTLIBOBJS=$ac_ltlibobjs
 
+
+
+  # Go through ac_subst_vars and put all the values to be substituted in
+  # $all_values.
+  QS=''
+  all_values=''
+  for name in $ac_subst_vars; do
+    eval "value=\$${name}"
+    all_values="$all_values $value"
+  done
+
+  # Keep adding 'o' to $QS until |$QS} doesn't appear in any substitution.
+  test_string=''
+  while test "x${test_string}" != "x${all_values}"; do
+    test_string="$all_values"
+    eval "test_string=\"\${test_string##*\|${QS}\}}\""
+    if test "x${test_string}" != "x${all_values}"; then
+      QS="o${QS}"
+    fi
+  done
 
 
 : "${CONFIG_STATUS=./config.status}"
