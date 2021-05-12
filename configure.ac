@@ -192,8 +192,8 @@ AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
-AC_SUBST([with_debugger]) # TODO: rename this variable
-AC_SUBST([with_camltex])
+AC_SUBST([debugger])
+AC_SUBST([camltex])
 AC_SUBST([ocamldoc])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
@@ -469,8 +469,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"],
   [AS_IF([test x"$enable_ocamldoc" = "xyes"],
     [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
     [enable_ocamldoc="no"
-     with_camltex="false"])],
-  [with_camltex="true"])
+     camltex="false"])],
+  [camltex="true"])
 
 # Initialization of libtool
 # Allow the MSVC linker to be found even if ld isn't installed.
@@ -1792,12 +1792,12 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 
 AS_CASE([$enable_debugger],
   [no],
-    [with_debugger=""
+    [debugger=''
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
-    [with_debugger="ocamldebugger"
+    [debugger='ocamldebugger'
     AC_MSG_NOTICE([replay debugger supported])],
-    [with_debugger=""
+    [debugger=''
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 

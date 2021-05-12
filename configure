@@ -782,8 +782,8 @@ ocamltest
 documentation_tool_cmd
 documentation_tool
 ocamldoc
-with_camltex
-with_debugger
+camltex
+debugger
 as_has_debug_prefix_map
 cc_has_debug_prefix_map
 otherlibraries
@@ -2934,7 +2934,7 @@ VERSION=4.13.0+dev0-2020-10-19
 
 
 
- # TODO: rename this variable
+
 
 
 
@@ -3399,10 +3399,10 @@ if test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"; then :
   as_fn_error $? "ocamldoc requires the unix and str libraries" "$LINENO" 5
 else
   enable_ocamldoc="no"
-     with_camltex="false"
+     camltex="false"
 fi
 else
-  with_camltex="true"
+  camltex="true"
 fi
 
 # Initialization of libtool
@@ -16420,16 +16420,16 @@ fi
 
 case $enable_debugger in #(
   no) :
-    with_debugger=""
+    debugger=''
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger disabled" >&5
 $as_echo "$as_me: replay debugger disabled" >&6;} ;; #(
   *) :
     if $sockets; then :
-  with_debugger="ocamldebugger"
+  debugger='ocamldebugger'
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger supported" >&5
 $as_echo "$as_me: replay debugger supported" >&6;}
 else
-  with_debugger=""
+  debugger=''
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger not supported" >&5
 $as_echo "$as_me: replay debugger not supported" >&6;}
 fi
