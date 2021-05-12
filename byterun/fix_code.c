@@ -20,6 +20,10 @@
 #ifdef HAS_UNISTD
 #include <unistd.h>
 #endif
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#endif
 
 #include "debugger.h"
 #include "fix_code.h"

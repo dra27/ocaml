@@ -24,7 +24,7 @@
 #include "exec.h"
 #include "sys.h"
 #include "fail.h"
-#include "io.h"
+#include "caml_io.h"
 #include "mlvalues.h"
 #include "memory.h"
 #include "camltk.h"

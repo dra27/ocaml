@@ -16,6 +16,7 @@
 #include <mlvalues.h>
 #include <alloc.h>
 #include <io.h>
+#include "caml_io.h"
 #include <memory.h>
 #include "unixsupport.h"
 #include <fcntl.h>

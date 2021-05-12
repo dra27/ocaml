@@ -195,8 +195,8 @@ LPSELECTDATA select_data_new (LPSELECTDATA lpSelectData, SELECTTYPE EType)
   res = (LPSELECTDATA)caml_stat_alloc(sizeof(SELECTDATA));
 
   /* Init common data */
-  list_init((LPLIST)res);
-  list_next_set((LPLIST)res, (LPLIST)lpSelectData);
+  caml_winlist_init((LPLIST)res);
+  caml_winlist_next_set((LPLIST)res, (LPLIST)lpSelectData);
   res->EType         = EType;
   res->nResultsCount = 0;
 
@@ -607,7 +607,7 @@ LPSELECTDATA socket_poll_add (LPSELECTDATA lpSelectData,
 {
   LPSELECTDATA res;
   LPSELECTDATA candidate;
-  DWORD i;
+  long i;
   LPSELECTQUERY aQueries;
 
   res = lpSelectData;
@@ -1111,7 +1111,7 @@ CAMLprim value unix_select(value readfds, value writefds, value exceptfds, value
 
       /* Building the list of handle to wait for */
       DEBUG_PRINT("Building events done array");
-      nEventsMax   = list_length((LPLIST)lpSelectData);
+      nEventsMax   = caml_winlist_length((LPLIST)lpSelectData);
       nEventsCount = 0;
       lpEventsDone = (HANDLE *)caml_stat_alloc(sizeof(HANDLE) * nEventsMax);
 

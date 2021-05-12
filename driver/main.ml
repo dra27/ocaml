@@ -83,6 +83,7 @@ let impl = process_implementation_file ppf;;
 let intf = process_interface_file ppf;;
 
 let show_config () =
+  Misc.mingw_binary_output ();
   Config.print_config stdout;
   exit 0;
 ;;
