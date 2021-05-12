@@ -781,8 +781,10 @@ ASPP
 ocamltest
 documentation_tool_cmd
 documentation_tool
+ocamldoc_makefile_target
 ocamldoc
 camltex
+debugger_makefile_target
 debugger
 as_has_debug_prefix_map
 cc_has_debug_prefix_map
@@ -2817,6 +2819,8 @@ instrumented_runtime_libs=""
 bootstrapping_flexdll=false
 csc=""
 csc_flags=""
+ocamldoc_makefile_target=""
+ocamltest_makefile_target=""
 
 # Just before config.status is generated, determine the final values for MKEXE,
 # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
@@ -2877,6 +2881,8 @@ VERSION=4.13.0+dev0-2020-10-19
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
 
 
 
@@ -16422,16 +16428,17 @@ fi
 
 case $enable_debugger in #(
   no) :
-    debugger=''
+    debugger='false'
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger disabled" >&5
 $as_echo "$as_me: replay debugger disabled" >&6;} ;; #(
   *) :
     if $sockets; then :
-  debugger='ocamldebugger'
+  debugger='true'
+    debugger_makefile_target='ocamldebugger'
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger supported" >&5
 $as_echo "$as_me: replay debugger supported" >&6;}
 else
-  debugger=''
+  debugger='false'
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger not supported" >&5
 $as_echo "$as_me: replay debugger not supported" >&6;}
 fi
@@ -17474,9 +17481,11 @@ if test x"$enable_ocamldoc" = "xno"; then :
   if test x"$enable_stdlib_manpages" = "xyes"; then :
   as_fn_error $? "--enable-stdlib-manpages requires ocamldoc" "$LINENO" 5
 fi
-  ocamldoc=''
+  ocamldoc='false'
 else
-  ocamldoc='ocamldoc'
+  ocamldoc='true'
+  # Legacy, for build systems which parse Makefile.config
+  ocamldoc_makefile_target='ocamldoc'
 fi
 
 documentation_tool_cmd=''
@@ -17502,12 +17511,11 @@ if test "x$documentation_tool_cmd" = 'x'
 fi
 
 
-
 case $enable_ocamltest,4.13.0+dev0-2020-10-19 in #(
   yes,*|,*+dev*) :
-    ocamltest='ocamltest' ;; #(
+    ocamltest='true' ;; #(
   *) :
-    ocamltest='' ;;
+    ocamltest='false' ;;
 esac
 
 if test x"$enable_flambda" = "xyes"; then :

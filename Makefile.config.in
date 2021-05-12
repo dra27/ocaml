@@ -227,10 +227,6 @@ MKEXE_VIA_CC=$(CC) $(OC_CFLAGS) $(CFLAGS) \
 RUNTIMED=@debug_runtime@
 INSTRUMENTED_RUNTIME=@instrumented_runtime@
 INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
-WITH_DEBUGGER=@debugger@
-WITH_CAMLTEX=@camltex@
-WITH_OCAMLDOC=@ocamldoc@
-WITH_OCAMLTEST=@ocamltest@
 ASM_CFI_SUPPORTED=@asm_cfi_supported@
 WITH_FRAME_POINTERS=@frame_pointers@
 WITH_PROFINFO=@profinfo@
@@ -274,6 +270,8 @@ endif # ifeq "$(UNIX_OR_WIN32)" "win32"
 ## Variables renamed in OCaml 4.13
 
 RUNTIMEI=$(INSTRUMENTED_RUNTIME)
+WITH_DEBUGGER=@debugger_makefile_target@
+WITH_OCAMLDOC=@ocamldoc_makefile_target@
 
 ### pthread-related variables
 

@@ -46,3 +46,7 @@ CSCFLAGS=@csc_flags@
 
 # Internal build configuration
 BUILD_STDLIB_MANPAGES=@stdlib_manpages@
+BUILD_CAMLTEX=@camltex@
+BUILD_OCAMLTEST=@ocamltest@
+BUILD_OCAMLDOC=@ocamldoc@
+BUILD_DEBUGGER=@debugger@

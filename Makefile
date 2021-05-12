@@ -62,8 +62,20 @@ CAMLDEP=$(OCAMLRUN) boot/ocamlc -depend
 DEPFLAGS=-slash
 DEPINCLUDES=$(INCLUDES)
 
-OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
-OCAMLTEST_OPT=$(WITH_OCAMLTEST:=.opt)
+OPTIONAL_BYTECODE_COMPONENTS :=
+ifeq "$(BUILD_OCAMLDOC)" "true"
+  OPTIONAL_BYTECODE_COMPONENTS += ocamldoc
+endif
+ifeq "$(BUILD_OCAMLTEST)" "true"
+  OPTIONAL_BYTECODE_COMPONENTS += ocamltest
+endif
+ifeq "$(BUILD_DEBUGGER)" "true"
+  OPTIONAL_BYTECODE_COMPONENTS += ocamldebugger
+endif
+
+OPTIONAL_NATIVE_COMPONENTS := \
+  $(addsuffix .opt, \
+    $(filter-out ocamldebugger, $(OPTIONAL_BYTECODE_COMPONENTS)))
 
 BYTESTART=driver/main.cmo
 
@@ -329,12 +341,11 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(MAKE) flexlink.opt$(EXE)
 endif
 	$(MAKE) ocamlc.opt
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
-	  $(WITH_OCAMLTEST)
+	$(MAKE) otherlibraries $(OPTIONAL_BYTECODE_COMPONENTS)
 	$(MAKE) ocamlopt.opt
 	$(MAKE) otherlibrariesopt
-	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
-	  $(OCAMLTEST_OPT)
+	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt \
+	  $(OPTIONAL_NATIVE_COMPONENTS)
 ifeq "$(BUILD_STDLIB_MANPAGES)" "true"
 	$(MAKE) manpages
 endif
@@ -364,8 +375,7 @@ coreboot:
 .PHONY: all
 all: coreall
 	$(MAKE) ocaml
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
-         $(WITH_OCAMLTEST)
+	$(MAKE) otherlibraries $(OPTIONAL_BYTECODE_COMPONENTS)
 ifeq "$(BUILD_STDLIB_MANPAGES)" "true"
 	$(MAKE) manpages
 endif
@@ -515,15 +525,15 @@ endif
 	for i in $(OTHERLIBRARIES); do \
 	  $(MAKE) -C otherlibs/$$i install || exit $$?; \
 	done
-ifneq "$(WITH_OCAMLDOC)" ""
+ifeq "$(BUILD_OCAMLDOC)" "true"
 	$(MAKE) -C ocamldoc install
 endif
 ifeq "$(BUILD_STDLIB_MANPAGES)" "true"
 	$(MAKE) -C api_docgen install
 endif
-	if test -n "$(WITH_DEBUGGER)"; then \
-	  $(MAKE) -C debugger install; \
-	fi
+ifeq "$(BUILD_DEBUGGER)" "true"
+	$(MAKE) -C debugger install
+endif
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(INSTALL_DATA) $(FLEXDLL_SOURCES)/$(FLEXDLL_MANIFEST) \
@@ -599,7 +609,7 @@ endif
 	$(INSTALL_DATA) \
 	    $(OPTSTART) \
 	    "$(INSTALL_COMPLIBDIR)"
-ifneq "$(WITH_OCAMLDOC)" ""
+ifeq "$(BUILD_OCAMLDOC)" "true"
 	$(MAKE) -C ocamldoc installopt
 endif
 	for i in $(OTHERLIBRARIES); do \

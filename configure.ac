@@ -71,6 +71,8 @@ instrumented_runtime_libs=""
 bootstrapping_flexdll=false
 csc=""
 csc_flags=""
+ocamldoc_makefile_target=""
+ocamltest_makefile_target=""
 
 # Just before config.status is generated, determine the final values for MKEXE,
 # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
@@ -193,8 +195,10 @@ AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
 AC_SUBST([debugger])
+AC_SUBST([debugger_makefile_target])
 AC_SUBST([camltex])
 AC_SUBST([ocamldoc])
+AC_SUBST([ocamldoc_makefile_target])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
 AC_SUBST([ocamltest])
@@ -1794,12 +1798,13 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 
 AS_CASE([$enable_debugger],
   [no],
-    [debugger=''
+    [debugger='false'
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
-    [debugger='ocamldebugger'
+    [debugger='true'
+    debugger_makefile_target='ocamldebugger'
     AC_MSG_NOTICE([replay debugger supported])],
-    [debugger=''
+    [debugger='false'
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 
@@ -1909,8 +1914,10 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
 AS_IF([test x"$enable_ocamldoc" = "xno"],
   [AS_IF([test x"$enable_stdlib_manpages" = "xyes"],
     [AC_MSG_ERROR([--enable-stdlib-manpages requires ocamldoc])])
-  ocamldoc=''],
-  [ocamldoc='ocamldoc'])
+  ocamldoc='false'],
+  [ocamldoc='true'
+  # Legacy, for build systems which parse Makefile.config
+  ocamldoc_makefile_target='ocamldoc'])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
@@ -1925,10 +1932,9 @@ AS_IF([test "x$documentation_tool_cmd" = 'x']
  [documentation_tool_cmd="$documentation_tool"])
 
 
-
 AS_CASE([$enable_ocamltest,AC_PACKAGE_VERSION],
-  [yes,*|,*+dev*],[ocamltest='ocamltest'],
-  [ocamltest=''])
+  [yes,*|,*+dev*],[ocamltest='true'],
+  [ocamltest='false'])
 
 AS_IF([test x"$enable_flambda" = "xyes"],
   [flambda=true
