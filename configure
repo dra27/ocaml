@@ -3201,7 +3201,7 @@ fi
 if test "${enable_ocamldoc+set}" = set; then :
   enableval=$enable_ocamldoc;
 else
-  ocamldoc=auto
+  enable_ocamldoc='auto'
 fi
 
 
@@ -3309,6 +3309,8 @@ fi
 # Check whether --enable-stdlib-manpages was given.
 if test "${enable_stdlib_manpages+set}" = set; then :
   enableval=$enable_stdlib_manpages;
+else
+  enable_stdlib_manpages='auto'
 fi
 
 
@@ -17469,9 +17471,12 @@ else
 fi
 
 if test x"$enable_ocamldoc" = "xno"; then :
-  ocamldoc=""
+  if test x"$enable_stdlib_manpages" = "xyes"; then :
+  as_fn_error $? "--enable-stdlib-manpages requires ocamldoc" "$LINENO" 5
+fi
+  ocamldoc=''
 else
-  ocamldoc=ocamldoc
+  ocamldoc='ocamldoc'
 fi
 
 documentation_tool_cmd=''

@@ -248,7 +248,6 @@ AFL_INSTRUMENT=@afl@
 FLAT_FLOAT_ARRAY=@flat_float_array@
 FUNCTION_SECTIONS=@function_sections@
 AWK=@AWK@
-STDLIB_MANPAGES=@stdlib_manpages@
 NAKED_POINTERS=@naked_pointers@
 
 # The following variables were defined only in the Windows-specific makefiles.

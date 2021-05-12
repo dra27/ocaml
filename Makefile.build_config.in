@@ -43,3 +43,6 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 # Configuration for the C# compiler
 CSC=@csc@
 CSCFLAGS=@csc_flags@
+
+# Internal build configuration
+BUILD_STDLIB_MANPAGES=@stdlib_manpages@

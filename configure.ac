@@ -326,7 +326,7 @@ AC_ARG_ENABLE([ocamldoc],
   [AS_HELP_STRING([--disable-ocamldoc],
     [do not build the ocamldoc documentation system])],
   [],
-  [ocamldoc=auto])
+  [enable_ocamldoc='auto'])
 
 AC_ARG_WITH([odoc],
   [AS_HELP_STRING([--with-odoc],
@@ -398,7 +398,9 @@ AC_ARG_ENABLE([reserved-header-bits],
 
 AC_ARG_ENABLE([stdlib-manpages],
   [AS_HELP_STRING([--disable-stdlib-manpages],
-    [do not build or install the library man pages])])
+    [do not build or install the library man pages])],
+  [],
+  [enable_stdlib_manpages='auto'])
 
 AC_ARG_ENABLE([warn-error],
   [AS_HELP_STRING([--enable-warn-error],
@@ -1905,8 +1907,10 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""],
-  [ocamldoc=ocamldoc])
+  [AS_IF([test x"$enable_stdlib_manpages" = "xyes"],
+    [AC_MSG_ERROR([--enable-stdlib-manpages requires ocamldoc])])
+  ocamldoc=''],
+  [ocamldoc='ocamldoc'])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
