@@ -121,7 +121,7 @@ install:
 	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
 	cd "$(INSTALL_LIBDIR)/vmthreads"; $(RANLIB) libvmthreads.a
 	$(INSTALL_DATA) \
-	  $(CMIFILES) $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmti) \
+	  $(CMIFILES) $(CMIFILES:.cmi=.mli) $(CMIFILES:.cmi=.cmt) $(CMIFILES:.cmi=.cmti) \
 	  threads.cma stdlib.cma unix.cma \
 	  "$(INSTALL_LIBDIR)/vmthreads"
 

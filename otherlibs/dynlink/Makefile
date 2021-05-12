@@ -92,7 +92,7 @@ extract_crc: dynlink.cma extract_crc.cmo
 
 install:
 	$(INSTALL_DATA) \
-	  dynlink.cmi dynlink.cmti dynlink.cma dynlink.mli \
+	  dynlink.cmi dynlink.cmt dynlink.cmti dynlink.cma dynlink.mli \
 	  "$(INSTALL_LIBDIR)"
 	$(INSTALL_PROG) \
 	  extract_crc "$(INSTALL_LIBDIR)/extract_crc$(EXE)"

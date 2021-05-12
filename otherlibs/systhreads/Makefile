@@ -17,6 +17,12 @@ ROOTDIR=../..
 
 include $(ROOTDIR)/config/Makefile
 include $(ROOTDIR)/Makefile.common
+ifeq "$(SYSTEM)" "mingw"
+LDOPTS=-ldopt "-link -static-libgcc"
+else
+LDOPTS=
+endif
+
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 CAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc
@@ -68,10 +74,10 @@ all: lib$(LIBNAME).$(A) $(LIBNAME).cma $(CMIFILES)
 allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa $(CMIFILES)
 
 lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
-	$(MKLIB) -o $(LIBNAME) $(BYTECODE_C_OBJS) $(PTHREAD_LINK)
+	$(MKLIB) -o $(LIBNAME) $(BYTECODE_C_OBJS) $(PTHREAD_LINK) $(LDOPTS)
 
 lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
-	$(MKLIB) -o $(LIBNAME)nat $^
+	$(MKLIB) -o $(LIBNAME)nat $(LDOPTS) $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
 ifeq "$(UNIX_OR_WIN32)" "unix"
@@ -124,7 +130,7 @@ install:
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libthreads.$(A)
 	mkdir -p "$(INSTALL_THREADSLIBDIR)"
 	$(INSTALL_DATA) \
-	  $(CMIFILES) $(CMIFILES:.cmi=.cmti) threads.cma \
+	  $(CMIFILES) $(CMIFILES:.cmi=.cmt) $(CMIFILES:.cmi=.cmti) threads.cma \
 	  "$(INSTALL_THREADSLIBDIR)"
 	$(INSTALL_DATA) $(MLIFILES) "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) threads.h "$(INSTALL_LIBDIR)/caml"

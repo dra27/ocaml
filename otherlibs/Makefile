@@ -88,7 +88,7 @@ install::
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) lib$(CLIBNAME).$(A)
 	$(INSTALL_DATA) \
 	  $(LIBNAME).cma $(CMIFILES) $(CMIFILES:.cmi=.mli) \
-          $(CMIFILES:.cmi=.cmti) \
+          $(CMIFILES:.cmi=.cmt) $(CMIFILES:.cmi=.cmti) \
 	  "$(INSTALL_LIBDIR)/"
 	if test -n "$(HEADERS)"; then \
 	  $(INSTALL_DATA) $(HEADERS) "$(INSTALL_LIBDIR)/caml/"; \
