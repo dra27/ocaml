@@ -502,12 +502,13 @@ install-flexdll:
 	cat stdlib/camlheader flexdll/flexlink.exe > \
 	  "$(INSTALL_BINDIR)/flexlink.exe"
 ifneq "$(filter-out mingw,$(TOOLCHAIN))" ""
+	$(MKDIR) "$(INSTALL_FLEXDLLDIR)"
 	$(INSTALL_DATA) flexdll/default$(filter-out _i386,_$(ARCH)).manifest \
-    "$(INSTALL_BINDIR)/"
+    "$(INSTALL_FLEXDLLDIR)/"
 endif
 	if test -n "$(wildcard flexdll/flexdll_*.$(O))" ; then \
 	  $(MKDIR) "$(INSTALL_FLEXDLLDIR)" ; \
-	  $(INSTALL_DATA) flexdll/flexdll_*.$(O) "$(INSTALL_FLEXDLLDIR)" ; \
+	  $(INSTALL_DATA) flexdll/flexdll.h flexdll/flexdll_*.$(O) "$(INSTALL_FLEXDLLDIR)" ; \
 	fi
 
 # Installation

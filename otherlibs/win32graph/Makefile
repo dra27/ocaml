@@ -18,9 +18,14 @@ COBJS=open.$(O) draw.$(O) events.$(O)
 CAMLOBJS=graphics.cmo
 WIN32LIBS=$(call SYSLIB,kernel32) $(call SYSLIB,gdi32) $(call SYSLIB,user32)
 LINKOPTS=-cclib "\"$(WIN32LIBS)\""
-LDOPTS=-ldopt "$(WIN32LIBS)"
 
 include ../Makefile.otherlibs.common
+
+ifeq "$(SYSTEM)" "mingw"
+LDOPTS=-ldopt "-link -static-libgcc" -ldopt "$(WIN32LIBS)"
+else
+LDOPTS=-ldopt "$(WIN32LIBS)"
+endif
 
 graphics.ml: ../graph/graphics.ml
 	cp ../graph/graphics.ml graphics.ml
