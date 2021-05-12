@@ -320,7 +320,11 @@ void caml_signal_thread(void * lpParam)
   char *endptr;
   HANDLE h;
   /* Get an hexa-code raw handle through the environment */
+#ifdef _WIN64
+  h = (HANDLE) _strtoi64(getenv("CAMLSIGPIPE"), &endptr, 16);
+#else
   h = (HANDLE) strtol(getenv("CAMLSIGPIPE"), &endptr, 16);
+#endif
   while (1) {
     DWORD numread;
     BOOL ret;

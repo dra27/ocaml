@@ -15,7 +15,7 @@
 
 #ifndef CAML_IO_H
 #define CAML_IO_H
-
+#include <direct.h>
 #include "misc.h"
 #include "mlvalues.h"
 

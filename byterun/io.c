@@ -14,6 +14,10 @@
 /* Buffered input/output. */
 
 #include <errno.h>
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#endif
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
@@ -25,7 +29,7 @@
 #include "alloc.h"
 #include "custom.h"
 #include "fail.h"
-#include "io.h"
+#include "caml_io.h"
 #include "memory.h"
 #include "misc.h"
 #include "mlvalues.h"

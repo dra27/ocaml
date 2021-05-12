@@ -23,7 +23,7 @@
 #include "mlvalues.h"
 
 /* <private> */
-#include "io.h"
+#include "caml_io.h"
 
 /* Magic number */
 

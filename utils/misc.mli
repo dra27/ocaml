@@ -164,3 +164,7 @@ val cut_at : string -> char -> string * string
    Raise [Not_found] if the character does not appear in the string
    @since 4.01
 *)
+
+
+val mingw_binary_output : unit -> unit
+val slashify: string -> string

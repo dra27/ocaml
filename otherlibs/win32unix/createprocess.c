@@ -12,6 +12,7 @@
 /***********************************************************************/
 
 #include <mlvalues.h>
+#include <memory.h>
 #include "unixsupport.h"
 #include <windows.h>
 #include <osdeps.h>
@@ -25,6 +26,8 @@ value win_create_process_native(value cmd, value cmdline, value env,
   STARTUPINFO si;
   char * exefile, * envp;
   int flags;
+  BOOL cp;
+  DWORD le;
 
   exefile = search_exe_in_path(String_val(cmd));
   if (env != Val_int(0)) {
@@ -51,9 +54,14 @@ value win_create_process_native(value cmd, value cmdline, value env,
     si.wShowWindow = SW_HIDE;
   }
   /* Create the process */
-  if (! CreateProcess(exefile, String_val(cmdline), NULL, NULL,
-                      TRUE, flags, envp, NULL, &si, &pi)) {
-    win32_maperr(GetLastError());
+  cp = CreateProcess(exefile, String_val(cmdline), NULL, NULL,
+                     TRUE, flags, envp, NULL, &si, &pi);
+  if ( ! cp ){
+     le=GetLastError();
+  }
+  caml_stat_free(exefile);
+  if ( ! cp ) {
+     win32_maperr(le);
     uerror("create_process", cmd);
   }
   CloseHandle(pi.hThread);

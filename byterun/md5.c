@@ -17,7 +17,7 @@
 #include "md5.h"
 #include "memory.h"
 #include "mlvalues.h"
-#include "io.h"
+#include "caml_io.h"
 #include "reverse.h"
 
 /* MD5 message digest */

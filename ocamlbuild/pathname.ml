@@ -83,6 +83,26 @@ let rec normalize_list = function
   | x :: xs -> x :: normalize_list xs
 
 let normalize x =
+  let x =
+    if Sys.win32 = false then
+      x
+    else
+      let len = String.length x in
+      let b = String.create len in
+      for i = 0 to pred len do
+        match x.[i] with
+        | '\\' -> String.set b i '/'
+        | c -> String.set b i c
+      done;
+      if len > 1 then (
+        let c1 = String.get b 0 in
+        let c2 = String.get b 1 in
+        if c2 = ':' && c1 >= 'a' && c1 <= 'z' &&
+           ( len = 2 || String.get b 2 = '/') then
+          String.set b 0 (Char.uppercase c1)
+      );
+      b
+  in
   if Glob.eval not_normal_form_re x then
     let root, paths = split x in
     join root (normalize_list paths)

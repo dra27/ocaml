@@ -16,7 +16,7 @@
 #include <signal.h>
 #include "alloc.h"
 #include "fail.h"
-#include "io.h"
+#include "caml_io.h"
 #include "gc.h"
 #include "memory.h"
 #include "mlvalues.h"

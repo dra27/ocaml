@@ -226,11 +226,14 @@ installbyt:
 	cd tools ; $(MAKEREC) install
 	cd ocamldoc ; $(MAKEREC) install
 	mkdir -p $(STUBLIBDIR)
-	for i in $(OTHERLIBRARIES); do $(MAKEREC) -C otherlibs/$$i install; done
+	for i in $(OTHERLIBRARIES); do \
+		$(MAKEREC) -C otherlibs/$$i install  || exit $$? ; \
+	done
 	if test -f debugger/ocamldebug.exe; then (cd debugger; $(MAKEREC) install); \
 	   else :; fi
 	./build/partial-install.sh
 	cp config/Makefile $(LIBDIR)/Makefile.config
+	mkdir -p $(DISTRIB)
 	cp README $(DISTRIB)/Readme.general.txt
 	cp README.win32 $(DISTRIB)/Readme.windows.txt
 	cp LICENSE $(DISTRIB)/License.txt
@@ -244,7 +247,9 @@ installopt:
 	cp asmcomp/*.cmi driver/*.cmi $(COMPLIBDIR)
 	cp compilerlibs/ocamloptcomp.cma $(OPTSTART) $(COMPLIBDIR)
 	cd ocamldoc ; $(MAKEREC) installopt
-	for i in $(OTHERLIBRARIES); do $(MAKEREC) -C otherlibs/$$i installopt; done
+	for i in $(OTHERLIBRARIES); do \
+		$(MAKEREC) -C otherlibs/$$i installopt || exit $$? ; \
+	done
 	if test -f ocamlopt.opt ; then $(MAKEREC) installoptopt; fi
 
 installoptopt:
