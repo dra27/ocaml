@@ -469,7 +469,7 @@ AS_IF([test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"],
   [AS_IF([test x"$enable_ocamldoc" = "xyes"],
     [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
     [enable_ocamldoc="no"
-     with_camltex=""])],
+     with_camltex="false"])],
   [with_camltex="true"])
 
 # Initialization of libtool

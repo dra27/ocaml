@@ -3399,7 +3399,7 @@ if test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"; then :
   as_fn_error $? "ocamldoc requires the unix and str libraries" "$LINENO" 5
 else
   enable_ocamldoc="no"
-     with_camltex=""
+     with_camltex="false"
 fi
 else
   with_camltex="true"
