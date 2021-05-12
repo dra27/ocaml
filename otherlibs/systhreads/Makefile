@@ -17,6 +17,12 @@ ROOTDIR=../..
 
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
+ifeq "$(SYSTEM)" "mingw"
+LDOPTS=-ldopt "-link -static-libgcc"
+else
+LDOPTS=
+endif
+
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 
@@ -61,10 +67,10 @@ all: lib$(LIBNAME).$(A) $(LIBNAME).cma $(CMIFILES)
 allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa $(CMIFILES)
 
 lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
-	$(MKLIB_CMD) -o $(LIBNAME) $(BYTECODE_C_OBJS) $(PTHREAD_LINK)
+	$(MKLIB_CMD) -o $(LIBNAME) $(BYTECODE_C_OBJS) $(PTHREAD_LINK) $(LDOPTS)
 
 lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
-	$(MKLIB_CMD) -o $(LIBNAME)nat $^
+	$(MKLIB_CMD) -o $(LIBNAME)nat $(LDOPTS) $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
 ifeq "$(UNIX_OR_WIN32)" "unix"
