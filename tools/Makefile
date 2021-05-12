@@ -229,18 +229,11 @@ DUMPOBJ= \
 
 $(call byte_and_opt,dumpobj,$(DUMPOBJ),)
 
-make_opcodes := make_opcodes$(EXE)
-
-$(eval $(call PROGRAM_SYNONYM,make_opcodes))
-
-$(make_opcodes): make_opcodes.ml
-	$(CAMLC) $< -o $@
-
-opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
-	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+opnames.ml: opnames.ml.c $(ROOTDIR)/runtime/caml/instruct.tbl
+	$(CPP) -I $(ROOTDIR)/runtime/caml $< > $@
 
 clean::
-	rm -f opnames.ml make_opcodes make_opcodes.exe make_opcodes.ml
+	rm -f opnames.ml
 
 beforedepend:: opnames.ml
 

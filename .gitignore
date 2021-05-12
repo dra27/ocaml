@@ -184,13 +184,11 @@ _build
 /parsing/camlinternalMenhirLib.ml
 /parsing/camlinternalMenhirLib.mli
 
-/runtime/jumptbl.inc
 /runtime/caml/m.h
 /runtime/caml/s.h
 /runtime/primitives
 /runtime/primitives.new
 /runtime/prims.c
-/runtime/opnames.inc
 /runtime/caml/version.h
 /runtime/ocamlrun
 /runtime/ocamlrund
@@ -259,8 +257,6 @@ _build
 /tools/cmpbyt.opt
 /tools/stripdebug
 /tools/stripdebug.opt
-/tools/make_opcodes
-/tools/make_opcodes.ml
 /tools/caml-tex
 /tools/eventlog_metadata
 

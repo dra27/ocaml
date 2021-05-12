@@ -37,7 +37,7 @@ NATIVE_C_SOURCES := $(addsuffix .c, \
   dynlink clambda_checks afl bigarray \
   memprof domain skiplist codefrag)
 
-GENERATED_FILES := opnames.inc caml/version.h jumptbl.inc
+GENERATED_FILES := caml/version.h
 CONFIG_HEADERS := caml/m.h caml/s.h
 
 ifeq "$(TOOLCHAIN)" "msvc"
@@ -180,7 +180,7 @@ ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
 endif
 	mkdir -p "$(INSTALL_INCDIR)"
-	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_INCDIR)"
+	$(INSTALL_DATA) caml/*.tbl caml/*.h "$(INSTALL_INCDIR)"
 
 .PHONY: installopt
 installopt:
@@ -243,19 +243,6 @@ prims.c : primitives
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' primitives; \
 	 echo '  0 };') > prims.c
-
-opnames.inc : caml/instruct.h
-	tr -d '\r' < $< | \
-	sed -e '/\/\*/d' \
-	    -e '/^#/d' \
-	    -e 's/enum /static char * names_of_/' \
-	    -e 's/{$$/[] = {/' \
-	    -e 's/\([[:upper:]][[:upper:]_0-9]*\)/"\1"/g' > $@
-
-jumptbl.inc : caml/instruct.h
-	tr -d '\r' < $< | \
-	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
-	       -e '/^}/q' > $@
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@

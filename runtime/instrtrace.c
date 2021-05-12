@@ -31,7 +31,12 @@
 #include "caml/stacks.h"
 #include "caml/startup_aux.h"
 
-#include "opnames.inc"
+static char * names_of_instructions [] = {
+#define OPCODE(name) #name,
+#include "caml/instruct.tbl"
+#undef OPCODE
+  "FIRST_UNIMPLEMENTED_OP"
+};
 
 extern code_t caml_start_code;
 

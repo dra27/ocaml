@@ -243,7 +243,9 @@ value caml_interprete(code_t prog, asize_t prog_size)
 
 #ifdef THREADED_CODE
   static void * jumptable[] = {
-#    include "jumptbl.inc"
+#define OPCODE(name) &&lbl_ ## name,
+#include "caml/instruct.tbl"
+#undef OPCODE
   };
 #endif
 
