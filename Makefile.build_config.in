@@ -37,6 +37,8 @@ build_ocamldoc = @build_ocamldoc@
 
 build_ocamltex = @build_ocamltex@
 
+build_stdlib_manpages=@build_stdlib_manpages@
+
 lib_dynlink = @lib_dynlink@
 lib_runtime_events = @lib_runtime_events@
 lib_str = @lib_str@

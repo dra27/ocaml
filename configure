@@ -784,7 +784,7 @@ QS
 ocaml_libdir
 ocaml_bindir
 compute_deps
-stdlib_manpages
+build_stdlib_manpages
 PACKLD
 mkexe_ldflags_exp
 mkdll_ldflags_exp
@@ -3705,7 +3705,7 @@ if test ${enable_ocamldoc+y}
 then :
   enableval=$enable_ocamldoc;
 else $as_nop
-  ocamldoc=auto
+  enable_ocamldoc='auto'
 fi
 
 
@@ -3848,6 +3848,8 @@ fi
 if test ${enable_stdlib_manpages+y}
 then :
   enableval=$enable_stdlib_manpages;
+else $as_nop
+  enable_stdlib_manpages='auto'
 fi
 
 
@@ -19264,13 +19266,25 @@ fi
 
 if test x"$enable_ocamldoc" = "xno"
 then :
+  if test x"$enable_stdlib_manpages" = "xyes"
+then :
+  as_fn_error $? "--enable-stdlib-manpages requires ocamldoc" "$LINENO" 5
+fi
   ocamldoc=""
+  enable_stdlib_manpages=no
   build_ocamldoc=false
 else $as_nop
   ocamldoc=ocamldoc
   build_ocamldoc=true
   ac_config_files="$ac_config_files ocamldoc/META"
 
+fi
+
+if test x"$enable_stdlib_manpages" != "xno"
+then :
+  build_stdlib_manpages=true
+else $as_nop
+  build_stdlib_manpages=false
 fi
 
 documentation_tool_cmd=''
@@ -19702,13 +19716,6 @@ case $host in #(
   *) :
      ;;
 esac
-
-if test x"$enable_stdlib_manpages" != "xno"
-then :
-  stdlib_manpages=true
-else $as_nop
-  stdlib_manpages=false
-fi
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
