@@ -210,7 +210,7 @@ AC_SUBST([flexdll_chain])
 AC_SUBST([mkdll_ldflags_exp])
 AC_SUBST([mkexe_ldflags_exp])
 AC_SUBST([PACKLD])
-AC_SUBST([stdlib_manpages])
+AC_SUBST([build_stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
@@ -349,7 +349,7 @@ AC_ARG_ENABLE([ocamldoc],
   [AS_HELP_STRING([--disable-ocamldoc],
     [do not build the ocamldoc documentation system])],
   [],
-  [ocamldoc=auto])
+  [enable_ocamldoc='auto'])
 
 AC_ARG_WITH([odoc],
   [AS_HELP_STRING([--with-odoc],
@@ -429,7 +429,9 @@ AC_ARG_ENABLE([reserved-header-bits],
 
 AC_ARG_ENABLE([stdlib-manpages],
   [AS_HELP_STRING([--disable-stdlib-manpages],
-    [do not build or install the library man pages])])
+    [do not build or install the library man pages])],
+  [],
+  [enable_stdlib_manpages='auto'])
 
 AC_ARG_ENABLE([warn-error],
   [AS_HELP_STRING([--enable-warn-error],
@@ -2077,11 +2079,17 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""
+  [AS_IF([test x"$enable_stdlib_manpages" = "xyes"],
+    [AC_MSG_ERROR([--enable-stdlib-manpages requires ocamldoc])])
+  ocamldoc=""
+  enable_stdlib_manpages=no
   build_ocamldoc=false],
   [ocamldoc=ocamldoc
   build_ocamldoc=true
   AC_CONFIG_FILES([ocamldoc/META])])
+
+AS_IF([test x"$enable_stdlib_manpages" != "xno"],
+  [build_stdlib_manpages=true],[build_stdlib_manpages=false])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
@@ -2263,9 +2271,6 @@ AS_CASE([$host],
     # This is required as otherwise floats are printed
     # as "Infinity" and "Inf" instead of the expected "inf"
     [AC_DEFINE([HAS_BROKEN_PRINTF])])
-
-AS_IF([test x"$enable_stdlib_manpages" != "xno"],
-  [stdlib_manpages=true],[stdlib_manpages=false])
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
