@@ -501,13 +501,6 @@ value caml_int64_direct_bswap(value v)
 { return caml_swap64(v); }
 #endif
 
-/* Microsoft introduced the LL integer literal suffix in Visual C++ .NET 2003 */
-#if defined(_MSC_VER) && _MSC_VER < 1400
-#define INT64_LITERAL(s) s ## i64
-#else
-#define INT64_LITERAL(s) s ## LL
-#endif
-
 CAMLprim value caml_int64_bswap(value v)
 {
   int64_t x = Int64_val(v);
@@ -694,7 +687,7 @@ static uintnat nativeint_deserialize(void * dst)
   default:
     caml_deserialize_error("input_value: ill-formed native integer");
   }
-  return sizeof(long);
+  return sizeof(intnat);
 }
 
 CAMLexport struct custom_operations caml_nativeint_ops = {

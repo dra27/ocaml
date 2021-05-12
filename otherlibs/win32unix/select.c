@@ -193,8 +193,8 @@ LPSELECTDATA select_data_new (LPSELECTDATA lpSelectData, SELECTTYPE EType)
   res = (LPSELECTDATA)caml_stat_alloc(sizeof(SELECTDATA));
 
   /* Init common data */
-  list_init((LPLIST)res);
-  list_next_set((LPLIST)res, (LPLIST)lpSelectData);
+  caml_winlist_init((LPLIST)res);
+  caml_winlist_next_set((LPLIST)res, (LPLIST)lpSelectData);
   res->EType         = EType;
   res->nResultsCount = 0;
 
@@ -914,6 +914,8 @@ static value find_handle(LPSELECTRESULT iterResult, value readfds,
     case SELECT_MODE_EXCEPT:
       list = exceptfds;
       break;
+    case SELECT_MODE_NONE:
+      CAMLassert(0);
   };
 
   for(i=0; list != Val_unit && i < iterResult->lpOrigIdx; ++i )
@@ -1153,7 +1155,7 @@ CAMLprim value unix_select(value readfds, value writefds, value exceptfds,
 
       /* Building the list of handle to wait for */
       DEBUG_PRINT("Building events done array");
-      nEventsMax   = list_length((LPLIST)lpSelectData);
+      nEventsMax   = caml_winlist_length((LPLIST)lpSelectData);
       nEventsCount = 0;
       lpEventsDone = (HANDLE *)caml_stat_alloc(sizeof(HANDLE) * nEventsMax);
 
@@ -1278,6 +1280,8 @@ CAMLprim value unix_select(value readfds, value writefds, value exceptfds,
                       Store_field(l, 1, except_list);
                       except_list = l;
                       break;
+                    case SELECT_MODE_NONE:
+                      CAMLassert(0);
                     }
                 }
               /* We try to only process the first error, bypass other errors */

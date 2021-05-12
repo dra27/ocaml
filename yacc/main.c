@@ -21,6 +21,9 @@
 #ifdef HAS_UNISTD
 #include <unistd.h>
 #endif
+#ifdef _WIN32
+#include <io.h>
+#endif
 
 #include "version.h"
 
@@ -102,7 +105,11 @@ short **derives;
 char *nullable;
 
 #if !defined(HAS_MKSTEMP)
+#ifdef _WIN32
+#define mktemp _mktemp
+#else
 extern char *mktemp(char *);
+#endif
 #endif
 #ifndef NO_UNIX
 extern char *getenv(const char *);
@@ -166,6 +173,18 @@ void usage(void)
     exit(1);
 }
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <io.h>
+#include <fcntl.h>
+#include <stdio.h>
+static void binary_stdout(void)
+{
+  _setmode(_fileno(stdout),O_BINARY);
+}
+#else
+#define binary_stdout() do{}while(0)
+#endif
+
 void getargs(int argc, char **argv)
 {
     register int i;
@@ -194,10 +213,12 @@ void getargs(int argc, char **argv)
 
         case 'v':
             if (!strcmp (argv[i], "-version")){
+              binary_stdout();
               printf ("The OCaml parser generator, version "
                       OCAML_VERSION "\n");
               exit (0);
             }else if (!strcmp (argv[i], "-vnum")){
+              binary_stdout();
               printf (OCAML_VERSION "\n");
               exit (0);
             }else{
