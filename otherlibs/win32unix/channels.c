@@ -24,7 +24,11 @@
 #include <io.h>
 
 #if defined(_MSC_VER) && !defined(_INTPTR_T_DEFINED)
+#ifdef _WIN64
+typedef __int64 intptr_t;
+#else
 typedef int intptr_t;
+#endif
 #define _INTPTR_T_DEFINED
 #endif
 

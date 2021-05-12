@@ -60,15 +60,25 @@ CAMLextern value caml_alloc_final (mlsize_t wosize,
 
 CAMLextern int caml_convert_flag_list (value, int *);
 
+#if defined(__cplusplus) || defined(_MSC_VER) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901)
+#define CAML_INLINE inline
+#elif defined(__GNUC__)
+#define CAML_INLINE __inline__
+#else
+#define CAML_INLINE
+#endif
+
 /* Convenience functions to deal with unboxable types. */
-static inline value caml_alloc_unboxed (value arg) { return arg; }
-static inline value caml_alloc_boxed (value arg) {
+static CAML_INLINE value caml_alloc_unboxed (value arg) { return arg; }
+static CAML_INLINE value caml_alloc_boxed (value arg) {
   value result = caml_alloc_small (1, 0);
   Field (result, 0) = arg;
   return result;
 }
-static inline value caml_field_unboxed (value arg) { return arg; }
-static inline value caml_field_boxed (value arg) { return Field (arg, 0); }
+static CAML_INLINE value caml_field_unboxed (value arg) { return arg; }
+static CAML_INLINE value caml_field_boxed (value arg) { return Field (arg, 0); }
+
+#undef CAML_INLINE
 
 /* Unannotated unboxable types are boxed by default. (may change in the
    future) */
