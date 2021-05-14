@@ -254,7 +254,7 @@ AS_CASE([$host],
     ccomptype=msvc
     S=asm
     SO=dll
-    outputexe=-Fe
+    outputexe='-Fe'
     syslib='$(1).lib'],
   [i386-*-solaris*],
     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
@@ -263,7 +263,8 @@ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
   [ccomptype=cc
   S=s
   SO=so
-  outputexe='-o $(EMPTY)'
+  # The space after -o is important
+  outputexe='-o '
   syslib='-l$(1)'])
 
 # Environment variables that are taken into account
@@ -631,18 +632,19 @@ AS_IF(
 
 ## Determine which flags to use for the C compiler
 
+# The space after -o in $outputobj is important
 AS_CASE([$ocaml_cv_cc_vendor],
   [xlc-*],
-    [outputobj='-o $(EMPTY)'
+    [outputobj='-o '
     warn_error_flag=''
     cc_warnings='-qflag=i:i'], # all warnings enabled
   [sunc-*],
-    [outputobj='-o $(EMPTY)'; cc_warnings=""],
+    [outputobj='-o '; cc_warnings=""],
   [msvc-*],
     [outputobj='-Fo'
     warn_error_flag='-WX'
     cc_warnings=''],
-  [outputobj='-o $(EMPTY)'
+  [outputobj='-o '
   warn_error_flag='-Werror'
   cc_warnings='-Wall -Wdeclaration-after-statement'])
 
@@ -1206,13 +1208,13 @@ AS_IF([test -z "$PARTIALLD"],
   # The string for PACKLD must be capable of being concatenated with the
   # output filename. Don't assume that all C compilers understand GNU -ofoo
   # form, so ensure that the definition includes a space at the end (which is
-  # achieved using the $(EMPTY) expansion trick).
+  # preserved using the $(EMPTY) expansion trick in Makefile.config).
    AS_IF([test x"$CC" = "xcl"],
     # For the Microsoft C compiler there must be no space at the end of the
     # string.
     [PACKLD="link -lib -nologo $machine -out:"],
-    [PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o \$(EMPTY)"])],
-  [PACKLD="$PARTIALLD -o \$(EMPTY)"])
+    [PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o "])],
+  [PACKLD="$PARTIALLD -o "])
 
 # Disable PIE at link time when ocamlopt does not produce position-independent
 # code and the system produces PIE executables by default and demands PIC
@@ -2001,8 +2003,8 @@ AS_IF([test x"$DEFAULT_STRING" = "xunsafe"],
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
-ocamlc_cflags="$common_cflags $sharedlib_cflags \$(CFLAGS)"
-ocamlc_cppflags="$common_cppflags \$(CPPFLAGS)"
+ocamlc_cflags="$common_cflags $sharedlib_cflags"
+ocamlc_cppflags="$common_cppflags"
 cclibs="$cclibs $mathlib"
 
 AS_CASE([$host],

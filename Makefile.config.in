@@ -94,7 +94,8 @@ O=@OBJEXT@
 EXT_OBJ=.@OBJEXT@
 
 ### How to tell the C compiler to output an object file
-OUTPUTOBJ=@outputobj@
+# The $(EMPTY) preserves any space at the end of $(OUTPUTOBJ)
+OUTPUTOBJ=@outputobj@$(EMPTY)
 
 ### Extension of static libraries
 A=@libext@
@@ -184,12 +185,13 @@ OC_CFLAGS=@oc_cflags@
 CFLAGS?=@CFLAGS@
 OC_CPPFLAGS=@oc_cppflags@
 CPPFLAGS?=@CPPFLAGS@
-OCAMLC_CFLAGS=@ocamlc_cflags@
+OCAMLC_CFLAGS=@ocamlc_cflags@ $(CFLAGS)
 
-OCAMLC_CPPFLAGS=@ocamlc_cppflags@
+OCAMLC_CPPFLAGS=@ocamlc_cppflags@ $(CPPFLAGS)
 BYTECCLIBS=@bytecclibs@
 EXE=@exeext@
-OUTPUTEXE=@outputexe@
+# The $(EMPTY) preserves any space at the end of $(OUTPUTEXE)
+OUTPUTEXE=@outputexe@$(EMPTY)
 SUPPORTS_SHARED_LIBRARIES=@supports_shared_libraries@
 MKSHAREDLIBRPATH=@mksharedlibrpath@
 DYNLINKOPTS=@DLLIBS@
@@ -199,11 +201,12 @@ SYSLIB=@syslib@
 MKLIB=@mklib@
 # #7678: ocamlopt uses these only to compile .c files, and the behaviour for the
 #        two drivers should be identical.
-OCAMLOPT_CFLAGS=@ocamlc_cflags@
-OCAMLOPT_CPPFLAGS=@ocamlc_cppflags@
+OCAMLOPT_CFLAGS=@ocamlc_cflags@ $(CFLAGS)
+OCAMLOPT_CPPFLAGS=@ocamlc_cppflags@ $(CPPFLAGS)
 NATIVECCLIBS=@nativecclibs@
 SYSTHREAD_SUPPORT=@systhread_support@
-PACKLD=@PACKLD@
+# The $(EMPTY) preserves any space at the end of $(PACKLD)
+PACKLD=@PACKLD@$(EMPTY)
 EXTRALIBS=@extralibs@
 CCOMPTYPE=@ccomptype@
 TOOLCHAIN=@toolchain@
