@@ -870,6 +870,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
   ])
 ])
 
+AC_CONFIG_COMMANDS_PRE([
+  # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
+  # decisions about it to be evaluated on each run.
+  unset ac_cv_header_flexdll_h
+])
+
 AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
  [no,true,*-*-cygwin*],
    [supports_shared_libraries=false
@@ -2272,8 +2278,6 @@ AS_CASE([$host],
     # as "Infinity" and "Inf" instead of the expected "inf"
     [AC_DEFINE([HAS_BROKEN_PRINTF])])
 
-# Do not permanently cache the result of flexdll.h
-unset ac_cv_header_flexdll_h
 
 # Evaluate install directories
 # (this is needed for the OCaml configuration module)

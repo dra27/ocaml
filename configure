@@ -14132,6 +14132,8 @@ fi
 
 fi
 
+
+
 case $have_flexdll_h,$supports_shared_libraries,$host in #(
   no,true,*-*-cygwin*) :
     supports_shared_libraries=false
@@ -19717,8 +19719,6 @@ case $host in #(
      ;;
 esac
 
-# Do not permanently cache the result of flexdll.h
-unset ac_cv_header_flexdll_h
 
 # Evaluate install directories
 # (this is needed for the OCaml configuration module)
@@ -19863,6 +19863,11 @@ LTLIBOBJS=$ac_ltlibobjs
       QS="o${QS}"
     fi
   done
+
+
+  # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
+  # decisions about it to be evaluated on each run.
+  unset ac_cv_header_flexdll_h
 
 
   saved_exec_prefix="$exec_prefix"
