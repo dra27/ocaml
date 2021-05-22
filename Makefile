@@ -803,9 +803,10 @@ partialclean::
 runtime/primitives:
 	$(MAKE) -C runtime primitives
 
-lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
-    runtime/primitives
-	$^ > $@
+lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.tbl \
+    runtime/primitives lambda/runtimedef.ml.c
+	$(CPP) -I runtime/caml $@.c > $@
+	lambda/generate_runtimedef.sh runtime/primitives >> $@
 
 partialclean::
 	rm -f lambda/runtimedef.ml
