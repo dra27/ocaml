@@ -13155,6 +13155,8 @@ fi
 
 fi
 
+
+
 if test x"$have_flexdll_h" = 'xno'; then :
   case $host in #(
   *-*-cygwin*) :
@@ -17722,9 +17724,6 @@ else
   stdlib_manpages=false
 fi
 
-# Do not permanently cache the result of flexdll.h
-unset ac_cv_header_flexdll_h
-
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -17878,6 +17877,11 @@ else
   mkexe_via_cc_ldflags=\
 "$mkexe_via_cc_ldflags \$(OUTPUTEXE)\$(1) \$(2)"
 fi
+
+
+  # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
+  # decisions about it to be evaluated on each run.
+  unset ac_cv_header_flexdll_h
 
 
 : "${CONFIG_STATUS=./config.status}"

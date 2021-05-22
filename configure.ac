@@ -837,6 +837,12 @@ AS_IF([test x"$enable_shared" != 'xno'], [
   ])
 ])
 
+AC_CONFIG_COMMANDS_PRE([
+  # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
+  # decisions about it to be evaluated on each run.
+  unset ac_cv_header_flexdll_h
+])
+
 AS_IF([test x"$have_flexdll_h" = 'xno'],
   [AS_CASE([$host],
     [*-*-cygwin*],
@@ -2065,8 +2071,5 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
-
-# Do not permanently cache the result of flexdll.h
-unset ac_cv_header_flexdll_h
 
 AC_OUTPUT
