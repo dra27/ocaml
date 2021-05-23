@@ -119,6 +119,7 @@ module type Compiler_options = sig
   val _dtimings : unit -> unit
   val _dprofile : unit -> unit
   val _dump_into_file : unit -> unit
+  val _bootstrap_ppx : string -> unit
 
   val _args: string -> string array
   val _args0: string -> string array
@@ -253,6 +254,7 @@ module type Ocamldoc_options = sig
   val _v : unit -> unit
   val _verbose : unit -> unit
   val _vmthread : unit -> unit
+  val _bootstrap_ppx : string -> unit
 end
 
 module type Arg_list = sig

@@ -252,7 +252,13 @@ and special_comment_part2 = parse
              else
                remain
           in
-          Description (desc, Some remain2)
+          let remain3 =
+            match !Clflags.bootstrap_ppx with
+            | Some Clflags.Labelled_since_annotations ->
+                Compiler_ppx.transform_at_since remain2
+            | _ -> remain2
+          in
+          Description (desc, Some remain3)
         else
           (
            add_string s ;
