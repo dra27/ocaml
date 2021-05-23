@@ -37,7 +37,7 @@ NATIVE_C_SOURCES := $(addsuffix .c, \
   dynlink clambda_checks afl bigarray \
   memprof domain skiplist codefrag)
 
-GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h
+GENERATED_FILES := caml/version.h
 CONFIG_HEADERS := caml/m.h caml/s.h
 
 ifeq "$(TOOLCHAIN)" "msvc"
@@ -180,7 +180,7 @@ ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
 endif
 	mkdir -p "$(INSTALL_INCDIR)"
-	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_INCDIR)"
+	$(INSTALL_DATA) caml/*.tbl caml/*.h "$(INSTALL_INCDIR)"
 
 .PHONY: installopt
 installopt:
@@ -194,7 +194,7 @@ clean:
 	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
 	rm -f ocamlrun ocamlrund ocamlruni ocamlruns
 	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe
-	rm -f primitives primitives.new prims.c $(GENERATED_HEADERS)
+	rm -f primitives primitives.new prims.c $(GENERATED_FILES)
 	rm -f domain_state*.inc
 	rm -rf $(DEPDIR)
 
@@ -243,20 +243,6 @@ prims.c : primitives
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' primitives; \
 	 echo '  0 };') > prims.c
-
-caml/opnames.h : caml/instruct.h
-	tr -d '\r' < $< | \
-	sed -e '/\/\*/d' \
-	    -e '/^#/d' \
-	    -e 's/enum /static char * names_of_/' \
-	    -e 's/{$$/[] = {/' \
-	    -e 's/\([[:upper:]][[:upper:]_0-9]*\)/"\1"/g' > $@
-
-# caml/jumptbl.h is required only if you have GCC 2.0 or later
-caml/jumptbl.h : caml/instruct.h
-	tr -d '\r' < $< | \
-	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
-	       -e '/^}/q' > $@
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 	$^ > $@
@@ -340,18 +326,18 @@ define COMPILE_C_FILE
 ifneq "$(COMPUTE_DEPS)" "false"
 ifneq "$(1)" "%"
 # -MG would ensure that the dependencies are generated even if the files listed
-# in $$(GENERATED_HEADERS) haven't been assembled yet. However, this goes subtly
+# in $$(GENERATED_FILES) haven't been assembled yet. However, this goes subtly
 # wrong if the user has the headers installed, as gcc will pick up a dependency
 # on those instead and the local ones will not be generated. For this reason, we
-# don't use -MG and instead include $(GENERATED_HEADERS) in the order only
+# don't use -MG and instead include $(GENERATED_FILES) in the order only
 # dependencies to ensure that they exist before dependencies are computed.
-$(DEPDIR)/$(1).$(D): %.c | $(DEPDIR) $(GENERATED_HEADERS)
+$(DEPDIR)/$(1).$(D): %.c | $(DEPDIR) $(GENERATED_FILES)
 	$$(DEP_CC) $$(OC_CPPFLAGS) $$(CPPFLAGS) $$< -MT \
 	  '$$*$(subst %,,$(1)).$(O)' -MF $$@
 endif # ifneq "$(1)" "%"
 $(1).$(O): $(2).c
 else
-$(1).$(O): $(2).c $(CONFIG_HEADERS) $(GENERATED_HEADERS) $(RUNTIME_HEADERS)
+$(1).$(O): $(2).c $(CONFIG_HEADERS) $(GENERATED_FILES) $(RUNTIME_HEADERS)
 endif # ifneq "$(COMPUTE_DEPS)" "false"
 	$$(CC) -c $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
 	  $$(OUTPUTOBJ)$$@ $$<

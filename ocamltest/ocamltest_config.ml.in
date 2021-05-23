@@ -56,9 +56,9 @@ let safe_string = %%FORCE_SAFE_STRING%%
 
 let flat_float_array = %%FLAT_FLOAT_ARRAY%%
 
-let ocamldoc = %%WITH_OCAMLDOC%%
+let ocamldoc = %%BUILD_OCAMLDOC%%
 
-let ocamldebug = %%WITH_OCAMLDEBUG%%
+let ocamldebug = %%BUILD_DEBUGGER%%
 
 let native_compiler = %%NATIVE_COMPILER%%
 

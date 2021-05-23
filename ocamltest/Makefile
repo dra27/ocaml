@@ -52,34 +52,12 @@ endif
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
   ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)" | cygpath -w -f -)
-  CSC := csc
-  ifeq "$(HOST:i686-%=i686)" "i686"
-    CSCFLAGS := /platform:x86
-  else
-    CSCFLAGS :=
-  endif
-  CSCFLAGS += /nologo /nowarn:1668
 else
   ocamlsrcdir := $(abspath $(shell pwd)/..)
-  CSC :=
-  CSCFLAGS :=
 endif
-mkexe := $(MKEXE)
 
 ifeq "$(TOOLCHAIN)" "msvc"
 CPP := $(CPP) 2> nul
-endif
-
-ifeq "$(WITH_OCAMLDOC)" "ocamldoc"
-WITH_OCAMLDOC := true
-else
-WITH_OCAMLDOC := false
-endif
-
-ifeq "$(WITH_DEBUGGER)" "ocamldebugger"
-WITH_OCAMLDEBUG := true
-else
-WITH_OCAMLDEBUG := false
 endif
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime -DCAML_INTERNALS
@@ -251,8 +229,8 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 	    $(call SUBST,FLAMBDA) \
 	    $(call SUBST,FORCE_SAFE_STRING) \
 	    $(call SUBST,FLAT_FLOAT_ARRAY) \
-	    $(call SUBST,WITH_OCAMLDOC) \
-	    $(call SUBST,WITH_OCAMLDEBUG) \
+	    $(call SUBST,BUILD_OCAMLDOC) \
+	    $(call SUBST,BUILD_DEBUGGER) \
 	    $(call SUBST,O) \
 	    $(call SUBST,A) \
 	    $(call SUBST,S) \
@@ -264,7 +242,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 	    $(call SUBST_STRING,CSCFLAGS) \
 	    $(call SUBST_STRING,EXE) \
 	    $(call SUBST_STRING,MKDLL) \
-	    $(call SUBST_STRING,mkexe) \
+	    $(call SUBST_STRING,MKEXE) \
 	    $(call SUBST_STRING,BYTECCLIBS) \
 	    $(call SUBST_STRING,NATIVECCLIBS) \
 	    $(call SUBST_STRING,ASM) \

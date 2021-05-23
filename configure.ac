@@ -69,6 +69,10 @@ extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+csc=""
+csc_flags=""
+ocamldoc_makefile_target=""
+ocamltest_makefile_target=""
 
 # Just before config.status is generated, determine the final values for MKEXE,
 # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
@@ -190,9 +194,11 @@ AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
-AC_SUBST([with_debugger]) # TODO: rename this variable
-AC_SUBST([with_camltex])
+AC_SUBST([debugger])
+AC_SUBST([debugger_makefile_target])
+AC_SUBST([camltex])
 AC_SUBST([ocamldoc])
+AC_SUBST([ocamldoc_makefile_target])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
 AC_SUBST([ocamltest])
@@ -225,6 +231,9 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
+AC_SUBST([csc])
+AC_SUBST([csc_flags])
+AC_SUBST([id])
 
 ## Generated files
 
@@ -233,6 +242,9 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+
+# Works out how many "o"s are needed in quoted strings
+AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
 
 # Checks for system types
 
@@ -246,7 +258,7 @@ AS_CASE([$host],
     ccomptype=msvc
     S=asm
     SO=dll
-    outputexe=-Fe
+    outputexe='-Fe'
     syslib='$(1).lib'],
   [i386-*-solaris*],
     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
@@ -255,7 +267,8 @@ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
   [ccomptype=cc
   S=s
   SO=so
-  outputexe='-o $(EMPTY)'
+  # The space after -o is important
+  outputexe='-o '
   syslib='-l$(1)'])
 
 # Environment variables that are taken into account
@@ -322,7 +335,7 @@ AC_ARG_ENABLE([ocamldoc],
   [AS_HELP_STRING([--disable-ocamldoc],
     [do not build the ocamldoc documentation system])],
   [],
-  [ocamldoc=auto])
+  [enable_ocamldoc='auto'])
 
 AC_ARG_WITH([odoc],
   [AS_HELP_STRING([--with-odoc],
@@ -394,7 +407,9 @@ AC_ARG_ENABLE([reserved-header-bits],
 
 AC_ARG_ENABLE([stdlib-manpages],
   [AS_HELP_STRING([--disable-stdlib-manpages],
-    [do not build or install the library man pages])])
+    [do not build or install the library man pages])],
+  [],
+  [enable_stdlib_manpages='auto'])
 
 AC_ARG_ENABLE([warn-error],
   [AS_HELP_STRING([--enable-warn-error],
@@ -465,8 +480,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"],
   [AS_IF([test x"$enable_ocamldoc" = "xyes"],
     [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
     [enable_ocamldoc="no"
-     with_camltex=""])],
-  [with_camltex="true"])
+     camltex="false"])],
+  [camltex="true"])
 
 # Initialization of libtool
 # Allow the MSVC linker to be found even if ld isn't installed.
@@ -621,18 +636,19 @@ AS_IF(
 
 ## Determine which flags to use for the C compiler
 
+# The space after -o in $outputobj is important
 AS_CASE([$ocaml_cv_cc_vendor],
   [xlc-*],
-    [outputobj='-o $(EMPTY)'
+    [outputobj='-o '
     warn_error_flag=''
     cc_warnings='-qflag=i:i'], # all warnings enabled
   [sunc-*],
-    [outputobj='-o $(EMPTY)'; cc_warnings=""],
+    [outputobj='-o '; cc_warnings=""],
   [msvc-*],
     [outputobj='-Fo'
     warn_error_flag='-WX'
     cc_warnings=''],
-  [outputobj='-o $(EMPTY)'
+  [outputobj='-o '
   warn_error_flag='-Werror'
   cc_warnings='-Wall -Wdeclaration-after-statement'])
 
@@ -823,6 +839,12 @@ AS_IF([test x"$enable_shared" != 'xno'], [
     AS_IF([test "x$have_flexdll_h" = 'xyes'],
       [internal_cppflags="$internal_cppflags -I \"$flexlink_where\""])
   ])
+])
+
+AC_CONFIG_COMMANDS_PRE([
+  # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
+  # decisions about it to be evaluated on each run.
+  unset ac_cv_header_flexdll_h
 ])
 
 AS_IF([test x"$have_flexdll_h" = 'xno'],
@@ -1196,13 +1218,13 @@ AS_IF([test -z "$PARTIALLD"],
   # The string for PACKLD must be capable of being concatenated with the
   # output filename. Don't assume that all C compilers understand GNU -ofoo
   # form, so ensure that the definition includes a space at the end (which is
-  # achieved using the $(EMPTY) expansion trick).
+  # preserved using the $(EMPTY) expansion trick in Makefile.config).
    AS_IF([test x"$CC" = "xcl"],
     # For the Microsoft C compiler there must be no space at the end of the
     # string.
     [PACKLD="link -lib -nologo $machine -out:"],
-    [PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o \$(EMPTY)"])],
-  [PACKLD="$PARTIALLD -o \$(EMPTY)"])
+    [PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o "])],
+  [PACKLD="$PARTIALLD -o "])
 
 # Disable PIE at link time when ocamlopt does not produce position-independent
 # code and the system produces PIE executables by default and demands PIC
@@ -1286,6 +1308,15 @@ AS_CASE([$rlwrap,$system],
   [rlwrap,win*|rlwrap,mingw*],
     [AC_MSG_NOTICE([rlwrap doesn't work with native win32 - disabling])
      rlwrap=''])
+
+# C# compiler (for the testsuite)
+AC_CHECK_PROG([csc],[csc],[csc])
+AS_IF([test -n "$csc"],
+  [AS_CASE([$host],[*-*-cygwin*|*-*-mingw32|*-pc-windows],
+    [csc_flags='/nologo /nowarn:1668'
+    AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])],
+    [csc=''
+    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
 # Checks for library functions
 
@@ -1779,12 +1810,13 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 
 AS_CASE([$enable_debugger],
   [no],
-    [with_debugger=""
+    [debugger='false'
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
-    [with_debugger="ocamldebugger"
+    [debugger='true'
+    debugger_makefile_target='ocamldebugger'
     AC_MSG_NOTICE([replay debugger supported])],
-    [with_debugger=""
+    [debugger='false'
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 
@@ -1892,8 +1924,12 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""],
-  [ocamldoc=ocamldoc])
+  [AS_IF([test x"$enable_stdlib_manpages" = "xyes"],
+    [AC_MSG_ERROR([--enable-stdlib-manpages requires ocamldoc])])
+  ocamldoc='false'],
+  [ocamldoc='true'
+  # Legacy, for build systems which parse Makefile.config
+  ocamldoc_makefile_target='ocamldoc'])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
@@ -1908,10 +1944,9 @@ AS_IF([test "x$documentation_tool_cmd" = 'x']
  [documentation_tool_cmd="$documentation_tool"])
 
 
-
 AS_CASE([$enable_ocamltest,AC_PACKAGE_VERSION],
-  [yes,*|,*+dev*],[ocamltest='ocamltest'],
-  [ocamltest=''])
+  [yes,*|,*+dev*],[ocamltest='true'],
+  [ocamltest='false'])
 
 AS_IF([test x"$enable_flambda" = "xyes"],
   [flambda=true
@@ -1978,8 +2013,8 @@ AS_IF([test x"$DEFAULT_STRING" = "xunsafe"],
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
-ocamlc_cflags="$common_cflags $sharedlib_cflags \$(CFLAGS)"
-ocamlc_cppflags="$common_cppflags \$(CPPFLAGS)"
+ocamlc_cflags="$common_cflags $sharedlib_cflags"
+ocamlc_cppflags="$common_cppflags"
 cclibs="$cclibs $mathlib"
 
 AS_CASE([$host],
@@ -2040,8 +2075,5 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
-
-# Do not permanently cache the result of flexdll.h
-unset ac_cv_header_flexdll_h
 
 AC_OUTPUT

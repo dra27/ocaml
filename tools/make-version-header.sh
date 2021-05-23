@@ -43,6 +43,8 @@ minor="`echo "$version" | sed -n -e '1s/^[0-9]*\.0*\([0-9]*\).*/\1/p'`"
 patchlvl="`echo "$version" | sed -n -e '1s/^[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/p'`"
 suffix="`echo "$version" | sed -n -e '1s/^[^+~]*[+~]\(.*\)/\1/p'`"
 
+echo '#ifndef CAML_VERSION_H'
+echo '#define CAML_VERSION_H'
 echo "#define OCAML_VERSION_MAJOR $major"
 printf '#define OCAML_VERSION_MINOR %d\n' "$minor"
 case $patchlvl in "") patchlvl=0;; esac
@@ -53,3 +55,4 @@ case "$suffix" in
 esac
 printf '#define OCAML_VERSION %d%02d%02d\n' "$major" "$minor" "$patchlvl"
 echo "#define OCAML_VERSION_STRING \"$version\""
+echo '#endif /*CAML_VERSION_H*/'

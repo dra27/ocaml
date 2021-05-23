@@ -570,7 +570,7 @@ external naked_pointers_checked : unit -> bool
   = "caml_sys_const_naked_pointers_checked"
 let () = if naked_pointers_checked () then at_exit major
 
-(*MODULE_ALIASES*)
+[%%ocaml.stdlib_aliases]
 module Arg          = Arg
 module Array        = Array
 module ArrayLabels  = ArrayLabels
