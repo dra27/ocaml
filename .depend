@@ -1828,6 +1828,11 @@ typing/untypeast.cmi : \
     parsing/longident.cmi \
     parsing/location.cmi \
     parsing/asttypes.cmi
+bytecomp/boot.cmo : \
+    bytecomp/boot.cmi
+bytecomp/boot.cmx : \
+    bytecomp/boot.cmi
+bytecomp/boot.cmi :
 bytecomp/bytegen.cmo : \
     typing/types.cmi \
     lambda/switch.cmi \
@@ -5917,6 +5922,7 @@ driver/main_args.cmx : \
 driver/main_args.cmi :
 driver/maindriver.cmo : \
     utils/warnings.cmi \
+    bytecomp/symtable.cmi \
     utils/profile.cmi \
     driver/makedepend.cmi \
     driver/main_args.cmi \
@@ -5929,9 +5935,11 @@ driver/maindriver.cmo : \
     bytecomp/bytepackager.cmi \
     bytecomp/bytelink.cmi \
     bytecomp/bytelibrarian.cmi \
+    bytecomp/boot.cmi \
     driver/maindriver.cmi
 driver/maindriver.cmx : \
     utils/warnings.cmx \
+    bytecomp/symtable.cmx \
     utils/profile.cmx \
     driver/makedepend.cmx \
     driver/main_args.cmx \
@@ -5944,6 +5952,7 @@ driver/maindriver.cmx : \
     bytecomp/bytepackager.cmx \
     bytecomp/bytelink.cmx \
     bytecomp/bytelibrarian.cmx \
+    bytecomp/boot.cmx \
     driver/maindriver.cmi
 driver/maindriver.cmi :
 driver/makedepend.cmo : \

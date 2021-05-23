@@ -35,8 +35,6 @@ else
 LN = ln -sf
 endif
 
-include stdlib/StdlibModules
-
 CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
@@ -87,6 +85,7 @@ TOPLEVELINIT=toplevel/toploop.cmo
 
 # This list is passed to expunge, which accepts both uncapitalized and
 # capitalized module names.
+-include stdlib/Makefile.stdlib_modules
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
@@ -710,12 +709,14 @@ clean:: partialclean
 
 # The bytecode compiler
 
+beforedepend:: bytecomp/boot.ml
+
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
 
 partialclean::
-	rm -rf ocamlc$(EXE)
+	rm -f ocamlc$(EXE) bytecomp/boot.ml
 
 # The native-code compiler
 
@@ -803,9 +804,8 @@ partialclean::
 runtime/primitives:
 	$(MAKE) -C runtime primitives
 
-lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
-    runtime/primitives
-	$^ > $@
+lambda/runtimedef.ml: runtime/caml/fail.h runtime/primitives
+	$(CAMLC) -use-prims runtime/primitives -bootstrap runtimedef=$< > $@
 
 partialclean::
 	rm -f lambda/runtimedef.ml

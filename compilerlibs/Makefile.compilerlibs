@@ -165,6 +165,7 @@ BYTECOMP = \
   bytecomp/bytegen.cmo \
   bytecomp/printinstr.cmo \
   bytecomp/emitcode.cmo \
+  bytecomp/boot.cmo \
   bytecomp/bytelink.cmo \
   bytecomp/bytelibrarian.cmo \
   bytecomp/bytepackager.cmo \
