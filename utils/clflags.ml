@@ -374,6 +374,14 @@ let set_dumped_pass s enabled =
 
 let dump_into_file = ref false (* -dump-into-file *)
 
+type boot_function =
+  | Runtimedef of string
+  | Stdlib of string
+  | Capitalize of string
+let bootstrap = ref None
+type compiler_ppx_pass = Stdlib_aliases | Labelled_since_annotations
+let bootstrap_ppx = ref None
+
 type 'a env_reader = {
   parse : string -> 'a option;
   print : 'a -> string;

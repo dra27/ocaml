@@ -17,8 +17,9 @@
 
 # Require Autoconf 2.69 for repeatability in CI
 AC_PREREQ([2.69])
+# The version string must be in the format described in stdlib/sys.mli.
 AC_INIT([OCaml],
-        m4_esyscmd([head -n1 VERSION | tr -d '\r\n']),
+        [4.13.0+dev0-2020-10-19],
         [caml-list@inria.fr],
         [ocaml],
         [http://www.ocaml.org])
@@ -69,6 +70,10 @@ extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+csc=""
+csc_flags=""
+ocamldoc_makefile_target=""
+ocamltest_makefile_target=""
 
 # Just before config.status is generated, determine the final values for MKEXE,
 # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
@@ -80,7 +85,8 @@ bootstrapping_flexdll=false
 # $mkmaindll - the full linking command for main program in DLL
 # $mkdll_ldflags - munges $(OC_DLL_LDFLAGS) and $(LDFLAGS)
 # $oc_ldflags and $oc_dll_ldflags are handled as $(OC_LDFLAGS) and
-# $(OC_DLL_LDFLAGS) and can be overidden in the build.
+# $(OC_DLL_LDFLAGS), but cannot be overidden in the build for consistency with
+# utils/config.ml.
 AC_CONFIG_COMMANDS_PRE([
   # If $mkexe_ldflags_prefix is given, apply it $oc_ldflags and $oc_dllflags and
   # ensure that LDFLAGS is passed using it. This allows LDFLAGS. This is used
@@ -154,6 +160,7 @@ AC_SUBST([programs_man_section])
 AC_SUBST([libraries_man_section])
 AC_SUBST([fpic])
 AC_SUBST([mkexe_cmd])
+AC_SUBST([mkexe_config])
 AC_SUBST([mkexe_cflags])
 AC_SUBST([mkexedebugflag])
 AC_SUBST([mkexe_via_cc_extra_cmd])
@@ -190,9 +197,11 @@ AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
-AC_SUBST([with_debugger]) # TODO: rename this variable
-AC_SUBST([with_camltex])
+AC_SUBST([debugger])
+AC_SUBST([debugger_makefile_target])
+AC_SUBST([camltex])
 AC_SUBST([ocamldoc])
+AC_SUBST([ocamldoc_makefile_target])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
 AC_SUBST([ocamltest])
@@ -203,6 +212,7 @@ AC_SUBST([asm_cfi_supported])
 AC_SUBST([sharedlib_cflags])
 AC_SUBST([rpath])
 AC_SUBST([mksharedlib])
+AC_SUBST([mksharedlib_flags])
 AC_SUBST([mkmaindll])
 AC_SUBST([mksharedlibrpath])
 AC_SUBST([install_bytecode_programs])
@@ -225,14 +235,49 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
+AC_SUBST([csc])
+AC_SUBST([csc_flags])
+AC_SUBST([id])
+AC_SUBST([flexdll_dir])
+AC_SUBST([expanded_bindir])
+AC_SUBST([expanded_libdir])
+AC_SUBST([ocamlsrcdir])
+AC_SUBST([with_lib_str])
+AC_SUBST([with_lib_unix])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
+AC_CONFIG_FILES([utils/config.ml])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
+AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+
+# Works out how many "o"s are needed in quoted strings
+AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
+
+AC_CONFIG_COMMANDS_PRE([
+  # Remove prefixing space from various variables
+  bytecclibs="${bytecclibs## }"
+  nativecclibs="${nativecclibs## }"
+  ocamlc_cppflags="${ocamlc_cppflags## }"
+  oc_ldflags="${oc_ldflags## }"
+  oc_dll_ldflags="${oc_dll_ldflags## }"
+
+  # utils/config.ml needs the expanded form of these
+  prev_exec_prefix="$exec_prefix"
+  prev_prefix="$prefix"
+  AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
+  AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
+  eval "exec_prefix=\"$exec_prefix\""
+  eval "expanded_bindir=\"$bindir\""
+  eval "expanded_libdir=\"$libdir\""
+  exec_prefix="$prev_exec_prefix"
+  prefix="$prev_prefix"
+])
 
 # Checks for system types
 
@@ -246,7 +291,7 @@ AS_CASE([$host],
     ccomptype=msvc
     S=asm
     SO=dll
-    outputexe=-Fe
+    outputexe='-Fe'
     syslib='$(1).lib'],
   [i386-*-solaris*],
     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
@@ -255,7 +300,8 @@ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
   [ccomptype=cc
   S=s
   SO=so
-  outputexe='-o $(EMPTY)'
+  # The space after -o is important
+  outputexe='-o '
   syslib='-l$(1)'])
 
 # Environment variables that are taken into account
@@ -322,7 +368,7 @@ AC_ARG_ENABLE([ocamldoc],
   [AS_HELP_STRING([--disable-ocamldoc],
     [do not build the ocamldoc documentation system])],
   [],
-  [ocamldoc=auto])
+  [enable_ocamldoc='auto'])
 
 AC_ARG_WITH([odoc],
   [AS_HELP_STRING([--with-odoc],
@@ -394,7 +440,9 @@ AC_ARG_ENABLE([reserved-header-bits],
 
 AC_ARG_ENABLE([stdlib-manpages],
   [AS_HELP_STRING([--disable-stdlib-manpages],
-    [do not build or install the library man pages])])
+    [do not build or install the library man pages])],
+  [],
+  [enable_stdlib_manpages='auto'])
 
 AC_ARG_ENABLE([warn-error],
   [AS_HELP_STRING([--enable-warn-error],
@@ -465,8 +513,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" -o x"$enable_str_lib" = "xno"],
   [AS_IF([test x"$enable_ocamldoc" = "xyes"],
     [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
     [enable_ocamldoc="no"
-     with_camltex=""])],
-  [with_camltex="true"])
+     camltex="false"])],
+  [camltex="true"])
 
 # Initialization of libtool
 # Allow the MSVC linker to be found even if ld isn't installed.
@@ -573,11 +621,15 @@ AS_CASE([$host],
 
 otherlibraries="dynlink"
 AS_IF([test x"$enable_unix_lib" != "xno"],
-  [AS_IF([test x"$enable_bigarray_lib" != "xno"],
+  [with_lib_unix=true
+  AS_IF([test x"$enable_bigarray_lib" != "xno"],
     [otherlibraries="$otherlibraries $unixlib bigarray"],
-    [otherlibraries="$otherlibraries $unixlib"])])
+    [otherlibraries="$otherlibraries $unixlib"])],
+  [with_lib_unix=false])
 AS_IF([test x"$enable_str_lib" != "xno"],
-  [otherlibraries="$otherlibraries str"])
+  [otherlibraries="$otherlibraries str"
+  with_lib_str=true],
+  [with_lib_str=false])
 
 # Checks for system services
 
@@ -592,10 +644,14 @@ AS_IF(
       [*-cygwin|*-*-mingw32|*-pc-windows],
         [shebangscripts=false],
       [shebangscripts=true
+       prev_prefix="$prefix"
        prev_exec_prefix="$exec_prefix"
+       AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
        AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
+       eval "exec_prefix=\"$exec_prefix\""
        eval "expanded_bindir=\"$bindir\""
        exec_prefix="$prev_exec_prefix"
+       prefix="$prev_prefix"
        # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
        # 1 char suffix and the \0 leaving 115 characters
        AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
@@ -621,18 +677,19 @@ AS_IF(
 
 ## Determine which flags to use for the C compiler
 
+# The space after -o in $outputobj is important
 AS_CASE([$ocaml_cv_cc_vendor],
   [xlc-*],
-    [outputobj='-o $(EMPTY)'
+    [outputobj='-o '
     warn_error_flag=''
     cc_warnings='-qflag=i:i'], # all warnings enabled
   [sunc-*],
-    [outputobj='-o $(EMPTY)'; cc_warnings=""],
+    [outputobj='-o '; cc_warnings=""],
   [msvc-*],
     [outputobj='-Fo'
     warn_error_flag='-WX'
     cc_warnings=''],
-  [outputobj='-o $(EMPTY)'
+  [outputobj='-o '
   warn_error_flag='-Werror'
   cc_warnings='-Wall -Wdeclaration-after-statement'])
 
@@ -795,6 +852,7 @@ AS_IF([test x"$enable_shared" != 'xno'], [
       AS_IF([test x"$flexdir" = 'x'],
         [AC_MSG_RESULT([no])],
         [AC_MSG_RESULT([$iflexdir$flexmsg])
+        flexdll_dir='+flexdll'
         bootstrapping_flexdll=true
         # The submodule should be searched *before* any other -I paths
         internal_cppflags="-I $iflexdir $internal_cppflags"])],
@@ -823,6 +881,12 @@ AS_IF([test x"$enable_shared" != 'xno'], [
     AS_IF([test "x$have_flexdll_h" = 'xyes'],
       [internal_cppflags="$internal_cppflags -I \"$flexlink_where\""])
   ])
+])
+
+AC_CONFIG_COMMANDS_PRE([
+  # Do not permanently cache the result of flexdll.h - --with-flexdll needs the
+  # decisions about it to be evaluated on each run.
+  unset ac_cv_header_flexdll_h
 ])
 
 AS_IF([test x"$have_flexdll_h" = 'xno'],
@@ -984,7 +1048,8 @@ AS_IF([! $arch64],
 
 shared_libraries_supported=false
 sharedlib_cflags=''
-mksharedlib='shared-libs-not-available'
+mksharedlib='$(CC)'
+mksharedlib_flags=''
 rpath=''
 mksharedlibrpath=''
 natdynlinkopts=""
@@ -992,29 +1057,32 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="\$(CC) -shared \
+      [mksharedlib_flags=" -shared \
                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
-      [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+      [mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=$with_sharedlibs],
     [*-pc-windows],
-      [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+      [mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=$with_sharedlibs],
     [*-*-cygwin*],
-      [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
+      [mksharedlib='$(FLEXLINK_CMD)'
+      mksharedlib_flags=' -chain $(FLEXDLL_CHAIN)'
       mkmaindll='$(FLEXLINK_CMD) -maindll -chain $(FLEXDLL_CHAIN)'
       shared_libraries_supported=true],
     [powerpc-ibm-aix*],
       [AS_CASE([$ocaml_cv_cc_vendor],
                [xlc*],
-               [mksharedlib='$(CC) -qmkshrobj -G'
+               [mksharedlib_flags=' -qmkshrobj -G'
                 shared_libraries_supported=true])],
     [*-*-solaris*],
       [sharedlib_cflags="-fPIC"
-      mksharedlib='$(CC) -shared'
+      mksharedlib_flags=' -shared'
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
       shared_libraries_supported=true],
@@ -1023,15 +1091,15 @@ AS_IF([test x"$enable_shared" != "xno"],
       [sharedlib_cflags="-fPIC"
        AS_CASE([$CC,$host],
            [gcc*,powerpc-*-linux*],
-           [mksharedlib='$(CC) -shared -mbss-plt'],
-           [mksharedlib='$(CC) -shared'])
+           [mksharedlib_flags=' -shared -mbss-plt'],
+           [mksharedlib_flags=' -shared'])
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
       natdynlinkopts="-Wl,-E"
       shared_libraries_supported=true])])
 
-AS_IF([test -z "$mkmaindll"], [mkmaindll=$mksharedlib])
+AS_IF([test -z "$mkmaindll"], [mkmaindll="$mksharedlib$mksharedlib_flags"])
 
 # Configure native dynlink
 
@@ -1196,13 +1264,13 @@ AS_IF([test -z "$PARTIALLD"],
   # The string for PACKLD must be capable of being concatenated with the
   # output filename. Don't assume that all C compilers understand GNU -ofoo
   # form, so ensure that the definition includes a space at the end (which is
-  # achieved using the $(EMPTY) expansion trick).
+  # preserved using the $(EMPTY) expansion trick in Makefile.config).
    AS_IF([test x"$CC" = "xcl"],
     # For the Microsoft C compiler there must be no space at the end of the
     # string.
     [PACKLD="link -lib -nologo $machine -out:"],
-    [PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o \$(EMPTY)"])],
-  [PACKLD="$PARTIALLD -o \$(EMPTY)"])
+    [PACKLD="$DIRECT_LD -r$PACKLD_FLAGS -o "])],
+  [PACKLD="$PARTIALLD -o "])
 
 # Disable PIE at link time when ocamlopt does not produce position-independent
 # code and the system produces PIE executables by default and demands PIC
@@ -1286,6 +1354,15 @@ AS_CASE([$rlwrap,$system],
   [rlwrap,win*|rlwrap,mingw*],
     [AC_MSG_NOTICE([rlwrap doesn't work with native win32 - disabling])
      rlwrap=''])
+
+# C# compiler (for the testsuite)
+AC_CHECK_PROG([csc],[csc],[csc])
+AS_IF([test -n "$csc"],
+  [AS_CASE([$host],[*-*-cygwin*|*-*-mingw32|*-pc-windows],
+    [csc_flags='/nologo /nowarn:1668'
+    AS_IF([! $arch64],[csc_flags="$csc_flags /platform:x86"])],
+    [csc=''
+    AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
 # Checks for library functions
 
@@ -1779,12 +1856,13 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 
 AS_CASE([$enable_debugger],
   [no],
-    [with_debugger=""
+    [debugger='false'
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
-    [with_debugger="ocamldebugger"
+    [debugger='true'
+    debugger_makefile_target='ocamldebugger'
     AC_MSG_NOTICE([replay debugger supported])],
-    [with_debugger=""
+    [debugger='false'
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 
@@ -1892,8 +1970,12 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""],
-  [ocamldoc=ocamldoc])
+  [AS_IF([test x"$enable_stdlib_manpages" = "xyes"],
+    [AC_MSG_ERROR([--enable-stdlib-manpages requires ocamldoc])])
+  ocamldoc='false'],
+  [ocamldoc='true'
+  # Legacy, for build systems which parse Makefile.config
+  ocamldoc_makefile_target='ocamldoc'])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
@@ -1908,10 +1990,9 @@ AS_IF([test "x$documentation_tool_cmd" = 'x']
  [documentation_tool_cmd="$documentation_tool"])
 
 
-
 AS_CASE([$enable_ocamltest,AC_PACKAGE_VERSION],
-  [yes,*|,*+dev*],[ocamltest='ocamltest'],
-  [ocamltest=''])
+  [yes,*|,*+dev*],[ocamltest='true'],
+  [ocamltest='false'])
 
 AS_IF([test x"$enable_flambda" = "xyes"],
   [flambda=true
@@ -1978,8 +2059,8 @@ AS_IF([test x"$DEFAULT_STRING" = "xunsafe"],
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
-ocamlc_cflags="$common_cflags $sharedlib_cflags \$(CFLAGS)"
-ocamlc_cppflags="$common_cppflags \$(CPPFLAGS)"
+ocamlc_cflags="$common_cflags $sharedlib_cflags"
+ocamlc_cppflags="$common_cppflags"
 cclibs="$cclibs $mathlib"
 
 AS_CASE([$host],
@@ -2007,6 +2088,11 @@ AS_CASE([$host],
         [windows_unicode=1],
       [AC_MSG_ERROR([unexpected windows unicode mode])])],
   [windows_unicode=0])
+
+ocamlsrcdir="$PWD"
+AS_CASE([$host],
+  [*-*-mingw32|*-pc-windows],
+    [ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w "$ocamlsrcdir")"])
 
 # Define default prefix correctly for the different Windows ports
 AS_IF([test x"$prefix" = "xNONE"],
@@ -2040,8 +2126,5 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
-
-# Do not permanently cache the result of flexdll.h
-unset ac_cv_header_flexdll_h
 
 AC_OUTPUT

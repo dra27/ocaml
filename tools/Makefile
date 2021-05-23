@@ -229,18 +229,11 @@ DUMPOBJ= \
 
 $(call byte_and_opt,dumpobj,$(DUMPOBJ),)
 
-make_opcodes := make_opcodes$(EXE)
-
-$(eval $(call PROGRAM_SYNONYM,make_opcodes))
-
-$(make_opcodes): make_opcodes.ml
-	$(CAMLC) $< -o $@
-
-opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
-	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+opnames.ml: opnames.ml.c $(ROOTDIR)/runtime/caml/instruct.tbl
+	$(CPP) -I $(ROOTDIR)/runtime/caml $< > $@
 
 clean::
-	rm -f opnames.ml make_opcodes make_opcodes.exe make_opcodes.ml
+	rm -f opnames.ml
 
 beforedepend:: opnames.ml
 
@@ -334,7 +327,7 @@ $(caml_tex): $(caml_tex_files)
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we delay building caml-tex to the opt.opt stage
-ifneq "$(WITH_CAMLTEX)" ""
+ifeq "$(BUILD_CAMLTEX)" "true"
 opt.opt: $(caml_tex)
 endif
 clean::

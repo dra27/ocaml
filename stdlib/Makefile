@@ -34,8 +34,14 @@ DEPFLAGS=-slash
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 
-include StdlibModules
 
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+include Makefile.stdlib_modules
+endif
+
+# Suppress undefined variables warning when Makefile.stdlib_modules hasn't yet
+# been generated.
+STDLIB_MODULES ?=
 OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
 NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
@@ -200,13 +206,7 @@ stdlib.cma: $(OBJS)
 stdlib.cmxa: $(OBJS:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 
-sys.ml: $(ROOTDIR)/VERSION sys.mlp
-	sed -e "s|%%VERSION%%|`sed -e 1q $< | tr -d '\r'`|" sys.mlp > $@
-
 .PHONY: clean
-clean::
-	rm -f sys.ml
-
 clean::
 	rm -f $(CAMLHEADERS)
 
@@ -256,18 +256,34 @@ clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -rf flexdll
 
+# Suppress the passing of command line variables to sub-make, since that can
+# trigger spurious undefined variable warnings.
+MAKEOVERRIDES=
+
+.INTERMEDIATE: l.tmp
+Makefile.stdlib_modules:
+	$(MAKE) --no-print-directory -f Makefile.link-order > l.tmp
+	$(CAMLC) -bootstrap stdlib=l.tmp > $@
+	rm -f l.tmp
+
+clean::
+	rm -f Makefile.stdlib_modules
+
 include .depend
 
 STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
-.PHONY: depend
-depend:
+.INTERMEDIATE: .depend.tmp stdlib_all.tmp
+stdlib_all.tmp: stdlib.ml
+	cp $< $@
+
+.depend.tmp: stdlib_all.tmp
 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-	  > .depend.tmp
-	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> .depend.tmp
+	  -impl stdlib_all.tmp > .depend.tmp
+	$(CAMLDEP) $(DEPFLAGS) -as-map stdlib.ml stdlib.mli >> .depend.tmp
+
+.PHONY: depend
+depend: .depend.tmp
 	sed -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
-	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' \
-	  .depend.tmp > .depend
-	rm -f .depend.tmp
+	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' $< > .$@

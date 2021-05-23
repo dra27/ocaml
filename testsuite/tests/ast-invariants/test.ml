@@ -15,7 +15,7 @@
 
 let root = Sys.argv.(1)
 
-let () = assert (Sys.file_exists (Filename.concat root "VERSION"))
+let () = assert (Sys.file_exists (Filename.concat root "stdlib/sys.ml"))
 
 type _ kind =
   | Implem : Parsetree.structure kind

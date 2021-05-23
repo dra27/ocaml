@@ -843,6 +843,13 @@ let mk_dstartup f =
   "-dstartup", Arg.Unit f, " (undocumented)"
 ;;
 
+let mk_bootstrap f =
+  "-bootstrap", Arg.String f, " (undocumented)"
+;;
+
+let mk_bootstrap_ppx f =
+  "-bootstrap-ppx", Arg.String f, " (undocumented)"
+
 let mk_opaque f =
   "-opaque", Arg.Unit f,
   " Does not generate cross-module optimization information\n\
@@ -998,6 +1005,8 @@ module type Compiler_options = sig
   val _dprofile : unit -> unit
   val _dump_into_file : unit -> unit
 
+  val _bootstrap_ppx : string -> unit
+
   val _args: string -> string array
   val _args0: string -> string array
 end
@@ -1033,6 +1042,8 @@ module type Bytecomp_options = sig
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
+
+  val _bootstrap : string -> unit
 
   val _use_prims : string -> unit
 end;;
@@ -1131,6 +1142,7 @@ module type Ocamldoc_options = sig
   val _v : unit -> unit
   val _verbose : unit -> unit
   val _vmthread : unit -> unit
+  val _bootstrap_ppx : string -> unit
 end
 
 module type Arg_list = sig
@@ -1244,6 +1256,8 @@ struct
     mk_dtimings F._dtimings;
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
+    mk_bootstrap F._bootstrap;
+    mk_bootstrap_ppx F._bootstrap_ppx;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1464,6 +1478,7 @@ struct
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
     mk_dump_pass F._dump_pass;
+    mk_bootstrap_ppx F._bootstrap_ppx;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1613,6 +1628,7 @@ struct
     mk_vnum F._vnum;
     mk_w F._w;
     mk__ F.anonymous;
+    mk_bootstrap_ppx F._bootstrap_ppx;
   ]
 end;;
 
@@ -1693,9 +1709,12 @@ module Default = struct
     let _unsafe_string = set unsafe_string
     let _w s =
       Warnings.parse_options false s |> Option.iter Location.(prerr_alert none)
+    let _bootstrap_ppx = function
+    | "stdlib-aliases" -> bootstrap_ppx := Some Stdlib_aliases
+    | "stdlib-since" -> bootstrap_ppx := Some Labelled_since_annotations
+    | _ -> raise (Arg.Bad "Unrecognised boot ppx pass")
 
     let anonymous = Compenv.anonymous
-
   end
 
   module Core = struct
@@ -1993,6 +2012,23 @@ third-party libraries such as Lwt, but with a different API."
     let _output_obj () = output_c_object := true; custom_runtime := true
     let _use_prims s = use_prims := s
     let _use_runtime s = use_runtime := s
+    let _bootstrap s =
+      let parse name file =
+        match name with
+        | "runtimedef" -> Runtimedef file
+        | "stdlib" -> Stdlib file
+        | "capitalize" -> Capitalize file
+        | _ ->
+            (* See The TeXbook p.299 *)
+            raise (Arg.Bad "Interwoven alignment preambles are not allowed")
+      in
+      match String.index s '=' with
+      | i ->
+          let len = String.length s in
+          bootstrap :=
+            Some (parse (String.sub s 0 i) (String.sub s (i + 1) (len - i - 1)))
+      | exception Not_found ->
+          raise (Arg.Bad "Interwoven alignment preambles are not allowed")
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
   end

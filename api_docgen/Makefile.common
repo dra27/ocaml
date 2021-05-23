@@ -15,10 +15,14 @@
 ROOTDIR = ..
 DOCGEN= $(ROOTDIR)/api_docgen
 
--include $(ROOTDIR)/stdlib/StdlibModules
+-include $(ROOTDIR)/stdlib/Makefile.stdlib_modules
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 include $(DOCGEN)/Makefile.docfiles
+
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+include $(DOCGEN)/Makefile.compilerlibs_modules
+endif
 
 DOC_COMPILERLIBS_DIRS= $(addprefix $(ROOTDIR)/,\
   parsing utils typing bytecomp driver file_formats lambda)
@@ -54,3 +58,13 @@ build/latex/alldoc.tex:$(DOCGEN)/alldoc.tex | build/latex
 $(compilerlibref_TEXT:%=build/%.mld) $(libref_TEXT:%=build/%.mld): \
 build/%.mld:$(DOCGEN)/%.mld
 	cp $< $@
+
+.INTERMEDIATE: l.tmp
+$(DOCGEN)/Makefile.compilerlibs_modules: \
+  $(ROOTDIR)/compilerlibs/Makefile.compilerlibs
+# It is intentional that $(compilerlibref) is not quoted to *permit* word
+# splitting (so that there's exactly one space between each item)
+	@echo $(compilerlibref) > l.tmp
+	echo 'compilerlibref_C = \' > $@
+	$(BOOT_OCAMLC) -bootstrap capitalize=l.tmp >> $@
+	rm -f l.tmp

@@ -146,6 +146,11 @@ let output_primitive_table outchan =
   done;
   fprintf outchan "  (char *) 0 };\n"
 
+let output_runtimedef_primitives outchan =
+  fprintf outchan "let builtin_primitives = [|\n";
+  Array.iter (fprintf outchan "  \"%s\";\n") (all_primitives ());
+  output_string outchan "|]\n"
+
 (* Initialization for batch linking *)
 
 let init () =

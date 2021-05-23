@@ -20,6 +20,11 @@
 # $(ROOTDIR) has been defined.
 
 include $(ROOTDIR)/Makefile.config
+
+ifneq "$(BINDIR):$(LIBDIR)" "@expanded_bindir@:@expanded_libdir@"
+$(error Re-run configure to change BINDIR or LIBDIR)
+endif
+
 INSTALL ?= @INSTALL@
 INSTALL_DATA ?= @INSTALL_DATA@
 INSTALL_PROG ?= @INSTALL_PROGRAM@
@@ -27,6 +32,10 @@ INSTALL_PROG ?= @INSTALL_PROGRAM@
 # The command to generate C dependency information
 DEP_CC=@DEP_CC@ -MM
 COMPUTE_DEPS=@compute_deps@
+
+# This is munged into utils/config.ml, not overridable by other parts of
+# the build system.
+FLEXDLL_DIR=@flexdll_dir@
 
 # The rlwrap command (for the *runtop targets)
 RLWRAP=@rlwrap@
@@ -39,3 +48,13 @@ DOCUMENTATION_TOOL_CMD=@documentation_tool_cmd@
 # Git submodule)
 FLEXDLL_SOURCES=@flexdir@
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
+
+# Internal build configuration
+BUILD_STDLIB_MANPAGES=@stdlib_manpages@
+BUILD_CAMLTEX=@camltex@
+BUILD_OCAMLTEST=@ocamltest@
+BUILD_OCAMLDOC=@ocamldoc@
+BUILD_DEBUGGER=@debugger@
+
+# Full OCaml string (historically the first line of VERSION)
+OCAML_VERSION=@PACKAGE_VERSION@
