@@ -221,7 +221,7 @@ FLEXLINK_FLAGS=@mkexe_extra_flags@
 FLEXLINK_CMD=flexlink
 
 MKEXE=@mkexe_cmd@@mkexe_cflags@@mkexe_extra_flags@ @mkexe_ldflags@
-MKDLL=@mksharedlib@ @mkdll_ldflags@
+MKDLL=@mksharedlib@@mksharedlib_flags@ @mkdll_ldflags@
 MKMAINDLL=@mkmaindll@ @mkdll_ldflags@
 MKEXEDEBUGFLAG=@mkexedebugflag@
 MKEXE_VIA_CC=$(CC) $(OC_CFLAGS) $(CFLAGS) \

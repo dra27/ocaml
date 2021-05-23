@@ -15,76 +15,85 @@
 
 (* The configuration module for ocamltest *)
 
-let arch = "%%ARCH%%"
+let arch = {@id@|@arch@|@id@}
 
-let afl_instrument = %%AFL_INSTRUMENT%%
+let afl_instrument = @afl@
 
-let asm = "%%ASM%%"
+let asm = {@id@|@AS@|@id@}
 
-let cc = "%%CC%%"
+let cc = {@id@|@CC@|@id@}
 
-let cflags = "%%OC_CFLAGS%%"
+let cflags = {@id@|@oc_cflags@|@id@}
 
-let ccomptype = "%%CCOMPTYPE%%"
+let ccomptype = {@id@|@ccomptype@|@id@}
 
-let shared_libraries = %%SUPPORTS_SHARED_LIBRARIES%%
+let shared_libraries = @supports_shared_libraries@
 
-let libunix = %%unix%%
+let libunix =
+  if @with_lib_unix@ then
+    Some (not Sys.win32)
+  else
+    None
 
-let systhreads = %%systhreads%%
+let systhreads = @systhread_support@
 
-let str = %%str%%
+let str = @with_lib_str@
 
-let objext = "%%O%%"
+let objext = {@id@|@OBJEXT@|@id@}
 
-let libext = "%%A%%"
+let libext = {@id@|@libext@|@id@}
 
-let asmext = "%%S%%"
+let asmext = {@id@|@S@|@id@}
 
-let system = "%%SYSTEM%%"
+let system = {@id@|@system@|@id@}
 
-let c_preprocessor = "%%CPP%%"
+let c_preprocessor =
+  if ccomptype = "msvc" then
+    (* Ignore stderr from cl /E (see PR#1503) *)
+    {@id@|@CPP@ 2> nul|@id@}
+  else
+    {@id@|@CPP@|@id@}
 
-let ocamlsrcdir = "%%ocamlsrcdir%%"
+let ocamlsrcdir = {@id@|@ocamlsrcdir@|@id@}
 
-let flambda = %%FLAMBDA%%
+let flambda = @flambda@
 
 let ocamlc_default_flags = ""
 let ocamlopt_default_flags = ""
 
-let safe_string = %%FORCE_SAFE_STRING%%
+let safe_string = @force_safe_string@
 
-let flat_float_array = %%FLAT_FLOAT_ARRAY%%
+let flat_float_array = @flat_float_array@
 
-let ocamldoc = %%BUILD_OCAMLDOC%%
+let ocamldoc = @ocamldoc@
 
-let ocamldebug = %%BUILD_DEBUGGER%%
+let ocamldebug = @debugger@
 
-let native_compiler = %%NATIVE_COMPILER%%
+let native_compiler = @native_compiler@
 
-let native_dynlink = %%NATDYNLINK%%
+let native_dynlink = @natdynlink@
 
-let shared_library_cflags = "%%SHAREDLIB_CFLAGS%%"
+let shared_library_cflags = {@id@|@sharedlib_cflags@|@id@}
 
-let sharedobjext = "%%SO%%"
+let sharedobjext = {@id@|@SO@|@id@}
 
-let csc = "%%CSC%%"
+let csc = {@id@|@csc@|@id@}
 
-let csc_flags = "%%CSCFLAGS%%"
+let csc_flags = {@id@|@csc_flags@|@id@}
 
-let exe = "%%EXE%%"
+let exe = {@id@|@exeext@|@id@}
 
-let mkdll = "%%MKDLL%%"
-let mkexe = "%%mkexe%%"
+let mkdll = {@id@|@mksharedlib@ @LDFLAGS@|@id@}
+let mkexe = {@id@|@mkexe_config@|@id@}
 
-let bytecc_libs = "%%BYTECCLIBS%%"
+let bytecc_libs = {@id@|@bytecclibs@|@id@}
 
-let nativecc_libs = "%%NATIVECCLIBS%%"
+let nativecc_libs = {@id@|@nativecclibs@|@id@}
 
-let windows_unicode = %%WINDOWS_UNICODE%% != 0
+let windows_unicode = @windows_unicode@ != 0
 
-let function_sections = %%FUNCTION_SECTIONS%%
+let function_sections = @function_sections@
 
-let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
+let instrumented_runtime = @instrumented_runtime@
 
-let naked_pointers = %%NAKED_POINTERS%%
+let naked_pointers = @naked_pointers@
