@@ -72,6 +72,7 @@ void usage(void)
     " * domain_state64 - generates domain_state64.inc from domain_state.tbl\n"
     " * translate path - converts path to a C string constant\n"
     " * strings - emit list of lines as an OCaml string array\n"
+    " * prefix - produce module lists for the standard library\n"
   );
 }
 
@@ -416,6 +417,78 @@ void ocaml_strings_from(char_os *file)
   free(content);
 }
 
+void print_buffer(const char *name, char *buffer)
+{
+  printf("%s =", name);
+
+  while (*buffer != 0) {
+    printf(" \\\n  %s", buffer);
+    buffer += strlen(buffer) + 1;
+  }
+  putchar('\n');
+}
+
+void prefix_stdlib_modules(char_os *file)
+{
+  char *content, *p, *q;
+  char *basenames, *prefixed, *p_basenames, *p_prefixed;
+  int sz;
+
+  if ((p = content = read_file(file)) == NULL)
+    die("unable to read input file");
+
+  sz = strlen(content) + 1;
+  if ((p_basenames = basenames = (char *)malloc(sz)) == NULL
+      || (p_prefixed = prefixed = (char *)malloc(sz)) == NULL)
+    die("out of memory");
+
+  printf("STDLIB_MODULES =");
+
+  while (*p != 0) {
+    q = scan_to_eol(p);
+
+    /* Print the raw name for STDLIB_MODULES */
+    printf(" \\\n  %s", p);
+
+    /* Add the unprefixed form to STDLIB_MODULE_BASENAMES */
+    if (strncmp("stdlib__", p, 8) == 0) {
+      /* Prefixed name */
+      p += 8;
+      sz = strlen(p) + 1;
+      *p = tolower(*p);
+      strcpy(basenames, p);
+      strcpy(prefixed, p);
+      basenames += sz;
+      /* Add the unprefixed form to STDLIB_PREFIXED_MODULES */
+      prefixed += sz;
+    } else {
+      /* Un-prefixed name */
+      strcpy(basenames, p);
+      basenames += strlen(p) + 1;
+    }
+
+    p = q;
+  }
+
+  putchar('\n');
+
+  *basenames = 0;
+  *prefixed = 0;
+
+  basenames = p_basenames;
+  prefixed = p_prefixed;
+
+  /* Emit STDLIB_MODULE_BASENAMES and STDLIB_PREFIXED_MODULES */
+  print_buffer("STDLIB_MODULE_BASENAMES", basenames);
+  print_buffer("STDLIB_PREFIXED_MODULES", prefixed);
+
+  /* Stuff */
+
+  free(content);
+  free(p_basenames);
+  free(p_prefixed);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -434,6 +507,8 @@ int main(int argc, char **argv)
     emit_c_string(argv[2]);
   } else if (argc == 3 && !strcmp_os(argv[1], T("strings"))) {
     ocaml_strings_from(argv[2]);
+  } else if (argc == 3 && !strcmp_os(argv[1], T("prefix"))) {
+    prefix_stdlib_modules(argv[2]);
   } else {
     usage();
     return 1;
