@@ -38,6 +38,7 @@
 /* and NOTE section in https://man7.org/linux/man-pages/man3/toupper.3.html */
 #define toupper_os(x) toupper((unsigned char)x)
 #define printf_os printf
+#define _printf_p printf
 #endif
 
 /* Operations
@@ -55,6 +56,8 @@
 
      For example, `sak add-stdlib-prefix stdlib camlinternalAtomic Sys` returns
      ` stdlib camlinternalAtomic stdlib__Sys`
+   - namespace. Used to expand the module aliases in stdlib.ml and stdlib.mli
+     and used with the compiler's `-pp` flag.
  */
 
 void usage(void)
@@ -65,6 +68,7 @@ void usage(void)
     "Commands:\n"
     " * encode-C-literal path - encodes path as a C string literal\n"
     " * add-stdlib-prefix name1 ... - prefix standard library module names\n"
+    " * namespace - translate aliased modules in Stdlib\n"
   );
 }
 
@@ -131,12 +135,47 @@ void add_stdlib_prefix(int count, char_os **names)
   }
 }
 
+void stdlib_prefixing(char_os *file)
+{
+  char buf[256];
+  char *line;
+  char name[101], alias[101];
+  FILE *stream = fopen_os(file, T("r"));
+
+  if (stream == NULL) {
+    fputs("unable to read input file\n", stderr);
+    exit(1);
+  }
+
+  printf_os(T("# 1 \"%s\"\n"), file);
+
+  while ((line = fgets(buf, 256, stream)) != NULL
+      && strncmp(line, "[%%ocaml.stdlib_aliases]", 24) != 0)
+    fputs(line, stdout);
+
+  if (line != NULL) {
+    fputs(line + 24, stdout);
+    while ((line = fgets(buf, 256, stream)) != NULL) {
+      if (sscanf(line, "module %100s = %100s", name, alias) == 2) {
+        _printf_p("\n(** @canonical Stdlib.%1$s *)\n"
+                  "module %1$s = Stdlib__%2$s\n", name, alias);
+      } else {
+        fputs(line, stdout);
+      }
+    }
+  }
+
+  fclose(stream);
+}
+
 int main_os(int argc, char_os **argv)
 {
   if (argc == 3 && !strcmp_os(argv[1], T("encode-C-literal"))) {
     encode_C_literal(argv[2]);
   } else if (argc > 1 && !strcmp_os(argv[1], T("add-stdlib-prefix"))) {
     add_stdlib_prefix(argc - 2, &argv[2]);
+  } else if (argc == 3 && !strcmp_os(argv[1], T("namespace"))) {
+    stdlib_prefixing(argv[2]);
   } else {
     usage();
     return 1;

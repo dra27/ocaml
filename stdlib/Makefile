@@ -190,33 +190,33 @@ distclean: clean
 clean::
 	rm -f $(CAMLHEADERS)
 
-export AWK
+COMPFLAGS_CMD = SAK='$(SAK_HOST)' ./Compflags
 
 %.cmi: %.mli
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	         -o $@ -c $(filter %.mli, $^)
 
 %.cmo: %.ml
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	         -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) \
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	           -o $@ -c $(filter %.ml, $^)
 
 # Dependencies on the compiler
