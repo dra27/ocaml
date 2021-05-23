@@ -168,3 +168,8 @@ MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
   mt -nologo -outputresource:$(1) -manifest $(1).manifest)
 
 SAK = $(ROOTDIR)/runtime/sak$(EXE)
+ifeq "$(UNIX_OR_WIN32)" "win32"
+  SAK_HOST=$(subst /,\,$(SAK))
+else
+  SAK_HOST=$(SAK)
+endif

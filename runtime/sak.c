@@ -74,6 +74,7 @@ void usage(void)
     " * strings - emit list of lines as an OCaml string array\n"
     " * prefix - produce module lists for the standard library\n"
     " * capitalize - read lines from a file and capitalize the words on each\n"
+    " * namespace - translate aliased modules in Stdlib\n"
   );
 }
 
@@ -439,8 +440,11 @@ void prefix_stdlib_modules(char_os *file)
     die("unable to read input file");
 
   sz = strlen(content) + 1;
-  if ((p_basenames = basenames = (char *)malloc(sz)) == NULL
-      || (p_prefixed = prefixed = (char *)malloc(sz)) == NULL)
+  p_basenames = basenames = (char *)malloc(sz);
+  if (basenames == NULL)
+    die("out of memory");
+  p_prefixed = prefixed = (char *)malloc(sz);
+  if (prefixed == NULL)
     die("out of memory");
 
   printf("STDLIB_MODULES =");
@@ -522,6 +526,42 @@ void capitalize_words(char_os *name, char_os *file)
   free(content);
 }
 
+void stdlib_prefixing(char_os *file)
+{
+  char *content, *p, *q;
+  char name[101], alias[101];
+  int phase = 0;
+
+  if ((p = content = read_file(file)) == NULL)
+    die("unable to read input file");
+
+  printf_os(T("# 1 \"%s\"\n"), file);
+
+  while (*p != 0) {
+    q = scan_to_eol(p);
+
+    switch (phase) {
+      case 0:
+        if (strncmp(p, "[%%ocaml.stdlib_aliases]", 24) == 0) {
+          p += 24;
+          phase = 1;
+        }
+        printf("%s\n", p);
+        break;
+      case 1:
+        if (sscanf(p, "module %100s = %100s", name, alias) == 2) {
+          _printf_p("\n(** @canonical %1$s *)\n"
+                    "module %1$s = Stdlib__%2$s\n", name, alias);
+        } else {
+          printf("%s\n", p);
+        }
+    }
+    p = q;
+  }
+
+  free(content);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -544,6 +584,8 @@ int main(int argc, char **argv)
     prefix_stdlib_modules(argv[2]);
   } else if (argc == 4 && !strcmp_os(argv[1], T("capitalize"))) {
     capitalize_words(argv[2], argv[3]);
+  } else if (argc == 3 && !strcmp_os(argv[1], T("namespace"))) {
+    stdlib_prefixing(argv[2]);
   } else {
     usage();
     return 1;

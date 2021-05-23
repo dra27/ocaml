@@ -212,31 +212,33 @@ clean::
 
 export AWK
 
+COMPFLAGS_CMD = SAK='$(SAK_HOST)' ./Compflags
+
 %.cmi: %.mli
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	         -o $@ -c $(filter %.mli, $^)
 
 %.cmo: %.ml
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	         -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) \
+	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	           -o $@ -c $(filter %.ml, $^)
 
 # Dependencies on the compiler
