@@ -75,6 +75,7 @@ void usage(void)
     " * prefix - produce module lists for the standard library\n"
     " * capitalize - read lines from a file and capitalize the words on each\n"
     " * namespace - translate aliased modules in Stdlib\n"
+    " * since - translate @since markings for *Labels stdlib modules\n"
   );
 }
 
@@ -562,6 +563,32 @@ void stdlib_prefixing(char_os *file)
   free(content);
 }
 
+void stdlib_since(char_os *file)
+{
+  char *content, *p, *q;
+  char prefix[101], version[101];
+  int pos;
+
+  if ((p = content = read_file(file)) == NULL)
+    die("unable to read input file");
+
+  printf_os(T("# 1 \"%s\"\n"), file);
+
+  while (*p != 0) {
+    q = scan_to_eol(p);
+
+    if (sscanf(p, "%100[^@]@since %*s (%100s in %*[^)])%n",
+               prefix, version, &pos) == 2) {
+      printf("%s@since %s%s\n", prefix, version, (p + pos));
+    } else {
+      printf("%s\n", p);
+    }
+    p = q;
+  }
+
+  free(content);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -586,6 +613,8 @@ int main(int argc, char **argv)
     capitalize_words(argv[2], argv[3]);
   } else if (argc == 3 && !strcmp_os(argv[1], T("namespace"))) {
     stdlib_prefixing(argv[2]);
+  } else if (argc == 3 && !strcmp_os(argv[1], T("since"))) {
+    stdlib_since(argv[2]);
   } else {
     usage();
     return 1;
