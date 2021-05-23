@@ -71,6 +71,7 @@ void usage(void)
     " * domain_state32 - generates domain_state32.inc from domain_state.tbl\n"
     " * domain_state64 - generates domain_state64.inc from domain_state.tbl\n"
     " * translate path - converts path to a C string constant\n"
+    " * strings - emit list of lines as an OCaml string array\n"
   );
 }
 
@@ -106,6 +107,23 @@ char *read_file(char_os *path)
   close(fd);
 
   return result;
+}
+
+char *scan_to_eol(char *p)
+{
+  char *q = p, *r;
+  while (*q != 0 && *q != '\n')
+    q++;
+  r = q;
+  /* If not at the end of the buffer, advance to next character */
+  if (*r != 0)
+    r++;
+  /* Backtrack over any previous CR characters */
+  while (q > p && *(q - 1) == '\r')
+    q--;
+  /* q now points to the first character of \r*\n at the end of the line */
+  *q = 0;
+  return r;
 }
 
 void die(const char* format, ...)
@@ -376,6 +394,28 @@ void emit_c_string(char_os *path)
   putchar('"');
 }
 
+void ocaml_strings_from(char_os *file)
+{
+  char *content, *p, *q;
+
+  if ((p = content = read_file(file)) == NULL)
+    die("unable to read input file");
+
+  printf("let builtin_primitives = [|\n");
+
+  while (*p != 0) {
+    q = scan_to_eol(p);
+
+    printf("  \"%s\";\n", p);
+
+    p = q;
+  }
+
+  printf("|]\n");
+
+  free(content);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -392,6 +432,8 @@ int main(int argc, char **argv)
     process_domain_state(&domain_state64);
   } else if (argc == 3 && !strcmp_os(argv[1], T("translate"))) {
     emit_c_string(argv[2]);
+  } else if (argc == 3 && !strcmp_os(argv[1], T("strings"))) {
+    ocaml_strings_from(argv[2]);
   } else {
     usage();
     return 1;

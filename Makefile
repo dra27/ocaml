@@ -708,6 +708,11 @@ manual-pregen: opt.opt
 clean:: partialclean
 	rm -f $(programs) $(programs:=.exe)
 
+# The Swiss Army Knife
+# sak performs any function for which one might be tempted to use a Unix tool.
+$(SAK): runtime/sak.c
+	$(MAKE) -C runtime sak$(EXE)
+
 # The bytecode compiler
 
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
@@ -803,10 +808,10 @@ partialclean::
 runtime/primitives:
 	$(MAKE) -C runtime primitives
 
-lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.tbl \
+lambda/runtimedef.ml: $(SAK) runtime/caml/fail.tbl \
     runtime/primitives lambda/runtimedef.ml.c
 	$(CPP) -I runtime/caml $@.c > $@
-	lambda/generate_runtimedef.sh runtime/primitives >> $@
+	$(SAK) strings runtime/primitives >> $@
 
 partialclean::
 	rm -f lambda/runtimedef.ml
