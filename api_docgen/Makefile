@@ -29,3 +29,4 @@ ocamldoc-%:
 
 clean:
 	rm -rf build odoc/build ocamldoc/build
+	rm -f Makefile.compilerlibs_modules

@@ -73,6 +73,7 @@ void usage(void)
     " * translate path - converts path to a C string constant\n"
     " * strings - emit list of lines as an OCaml string array\n"
     " * prefix - produce module lists for the standard library\n"
+    " * capitalize - read lines from a file and capitalize the words on each\n"
   );
 }
 
@@ -489,6 +490,38 @@ void prefix_stdlib_modules(char_os *file)
   free(p_prefixed);
 }
 
+void capitalize_words(char_os *name, char_os *file)
+{
+  char *content, *p, *q, *space;
+
+  if ((p = content = read_file(file)) == NULL)
+    die("unable to read input file");
+
+  printf_os(T("%s ="), name);
+
+  while (*p != 0) {
+    q = scan_to_eol(p);
+
+    /* Print any space-separated words */
+    space = p;
+    *p = toupper(*p);
+    while ((space = strchr(p, ' ')) != NULL) {
+      *space = 0;
+      printf(" \\\n  %s", p);
+      p = space + 1;
+      *p = toupper(*p);
+    }
+    /* Print the last word */
+    printf(" \\\n  %s", p);
+
+    p = q;
+  }
+
+  putchar('\n');
+
+  free(content);
+}
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t **argv)
 #else
@@ -509,6 +542,8 @@ int main(int argc, char **argv)
     ocaml_strings_from(argv[2]);
   } else if (argc == 3 && !strcmp_os(argv[1], T("prefix"))) {
     prefix_stdlib_modules(argv[2]);
+  } else if (argc == 4 && !strcmp_os(argv[1], T("capitalize"))) {
+    capitalize_words(argv[2], argv[3]);
   } else {
     usage();
     return 1;
