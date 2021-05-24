@@ -23,5 +23,5 @@ tr -d '\r' < "$1" | sed -n -e 's|.*/\* \("[A-Za-z_]*"\) \*/$|  \1;|p'
 echo '|]'
 
 echo 'let builtin_primitives = [|'
-sed -e 's/.*/  "&";/' "$2"
+tr -d '\r' < "$2" | sed -e 's/.*/  "&";/'
 echo '|]'

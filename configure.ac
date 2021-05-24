@@ -17,8 +17,9 @@
 
 # Require Autoconf 2.69 for repeatability in CI
 AC_PREREQ([2.69])
+# The version string must be in the format described in stdlib/sys.mli.
 AC_INIT([OCaml],
-        m4_esyscmd([head -n1 VERSION | tr -d '\r\n']),
+        [4.13.0+dev0-2020-10-19],
         [caml-list@inria.fr],
         [ocaml],
         [http://www.ocaml.org])
@@ -240,6 +241,7 @@ AC_SUBST([id])
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([tools/eventlog_metadata])
+AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 

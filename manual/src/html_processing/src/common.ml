@@ -120,12 +120,22 @@ let add_sidebar_button body =
   |> prepend_child btn;
   prepend_child body btn
 
-(* Detect OCaml version from VERSION file *)
+(* Detect OCaml version from sys.ml *)
 let find_version () =
   let pp = Filename.parent_dir_name in
-  let version_file = pp // pp // pp // "VERSION" in
-  let major, minor = Scanf.bscanf (Scanf.Scanning.from_file version_file) "%u.%u" (fun x y -> x,y) in
-  sprintf "%u.%u" major minor
+  let version_file = pp // pp // pp // "stdlib" // "sys.ml" in
+  let ic = open_in version_file in
+  let rec loop () =
+    match input_line () with
+    | line when String.starts_with ~prefix:"let ocaml_version = " line ->
+        let major, minor =
+          Scanf.bscanf (Scanf.Scanning.from_file version_file) "let ocaml_version = {|%u.%u" (fun x y -> x,y)
+        in
+        close_in ic;
+        sprintf "%u.%u" major minor
+    | _ -> loop
+  in
+  loop ()
 
 (*
    Local Variables:

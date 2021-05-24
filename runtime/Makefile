@@ -37,7 +37,7 @@ NATIVE_C_SOURCES := $(addsuffix .c, \
   dynlink clambda_checks afl bigarray \
   memprof domain skiplist codefrag)
 
-GENERATED_FILES := caml/version.h
+GENERATED_FILES := caml/version.h build_config.h
 CONFIG_HEADERS := caml/m.h caml/s.h
 
 ifeq "$(TOOLCHAIN)" "msvc"
@@ -104,25 +104,6 @@ libasmrunpic_OBJECTS := $(NATIVE_C_SOURCES:.c=.npic.$(O)) \
   $(ASM_OBJECTS:.$(O)=_libasmrunpic.$(O))
 
 # General (non target-specific) assembler and compiler flags
-
-# On Windows, OCAML_STDLIB_DIR needs to be defined dynamically
-
-ifeq "$(UNIX_OR_WIN32)" "win32"
-# OCAML_STDLIB_DIR needs to arrive in dynlink.c as a string which both gcc and
-# msvc are willing parse without warning. This means we can't pass UTF-8
-# directly since, as far as I can tell, cl can cope, but the pre-processor
-# can't. So the string needs to be directly translated to L"" form. To do this,
-# we take advantage of the fact that Cygwin uses GNU libiconv which includes a
-# Java pseudo-encoding which translates any UTF-8 sequences to \uXXXX (and,
-# unlike the C99 pseudo-encoding, emits two surrogate values when needed, rather
-# than \UXXXXXXXX). The \u is then translated to \x in order to accommodate
-# pre-Visual Studio 2013 compilers where \x is a non-standard alias for \u.
-OCAML_STDLIB_DIR = $(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
-else # Unix
-OCAML_STDLIB_DIR = $(LIBDIR)
-STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
-endif
 
 ifneq "$(CCOMPTYPE)" "msvc"
 OC_CFLAGS += -g
@@ -192,10 +173,10 @@ endif
 .PHONY: clean
 clean:
 	rm -f *.o *.obj *.a *.lib *.so *.dll ld.conf
-	rm -f ocamlrun ocamlrund ocamlruni ocamlruns
-	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe
+	rm -f ocamlrun ocamlrund ocamlruni ocamlruns sak
+	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe
 	rm -f primitives primitives.new prims.c $(GENERATED_FILES)
-	rm -f domain_state*.inc
+	rm -f domain_state*.inc .Makefile.primitives build_config.h
 	rm -rf $(DEPDIR)
 
 .PHONY: distclean
@@ -216,36 +197,33 @@ ld.conf: $(ROOTDIR)/Makefile.config
 # end), horrible things will happen (duplicated entries in Runtimedef ->
 # double registration in Symtable -> empty entry in the PRIM table ->
 # the bytecode interpreter is confused).
-# We sort the primitive file and remove duplicates to avoid this problem.
-
-# Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
-# port, the "sort" program in the path is Microsoft's and not cygwin's
-
-# Warning: POSIX sort is locale dependent, that's why we set LC_ALL explicitly.
-# Sort is unstable for "is_directory" and "isatty"
-# see http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sort.html:
-# "using sort to process pathnames, it is recommended that LC_ALL .. set to C"
+# The primitive file is sorted and duplicates are removed to avoid this problem.
 
 # To speed up builds, we avoid changing "primitives" when files
-# containing primitives change but the primitives table does not
-primitives: $(shell ./gen_primitives.sh > primitives.new; \
-                    cmp -s primitives primitives.new || echo primitives.new)
-	cp $^ $@
+# containing primitives change but the primitives table does not. sak therefore
+# creates primitives.new and only echoes primitives.new if it differs from
+# primitives. sak automatically writes prims.c.
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+-include .Makefile.primitives
+endif
 
-prims.c : primitives
-	(echo '#define CAML_INTERNALS'; \
-         echo '#include "caml/mlvalues.h"'; \
-	 echo '#include "caml/prims.h"'; \
-	 sed -e 's/.*/extern value &();/' primitives; \
-	 echo 'c_primitive caml_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  &,/' primitives; \
-	 echo '  0 };'; \
-	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  "&",/' primitives; \
-	 echo '  0 };') > prims.c
+.Makefile.primitives: Makefile.primitives | sak$(EXE)
+	@cp $< $@
 
-caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
-	$^ > $@
+# prims.c is a side-effect of producing primitives
+prims.c: primitives ;
+
+sak$(EXE): sak.$(O)
+	$(call MKEXE_VIA_CC,$@,$^)
+
+caml/version.h : | sak$(EXE)
+	./sak$(EXE) version '$(OCAML_VERSION)' > $@
+
+C_LITERAL = $(shell ./sak$(EXE) translate '$(1)')
+
+build_config.h: | sak$(EXE)
+	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' > $@
+	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
 
@@ -351,10 +329,6 @@ endif
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type),%)))
 
-dynlink.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
-
-startup_byt.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG) -DHOST='"$(HOST)"'
-
 $(UNIX_OR_WIN32)_non_shared.%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
 
 $(eval $(call COMPILE_C_FILE,$(UNIX_OR_WIN32)_non_shared.%,$(UNIX_OR_WIN32)))
@@ -374,11 +348,8 @@ $(foreach object_type,$(subst %,,$(object_types)), \
 %_libasmrunpic.o: %.S
 	$(ASPP) $(ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
 
-domain_state64.inc: caml/domain_state.tbl gen_domain_state64_inc.awk
-	$(AWK) -f ./gen_domain_state64_inc.awk $< > $@
-
-domain_state32.inc: caml/domain_state.tbl gen_domain_state32_inc.awk
-	$(AWK) -f ./gen_domain_state32_inc.awk $< > $@
+domain_state%.inc: caml/domain_state.tbl | sak$(EXE)
+	./sak$(EXE) domain_state$* > $@
 
 amd64nt.obj: amd64nt.asm domain_state64.inc
 	$(ASM)$@ $(ASMFLAGS) $<
