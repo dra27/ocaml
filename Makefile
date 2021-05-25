@@ -35,8 +35,6 @@ else
 LN = ln -sf
 endif
 
-include stdlib/StdlibModules
-
 CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
@@ -87,6 +85,7 @@ TOPLEVELINIT=toplevel/toploop.cmo
 
 # This list is passed to expunge, which accepts both uncapitalized and
 # capitalized module names.
+-include stdlib/Makefile.stdlib_modules
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
@@ -208,7 +207,7 @@ utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
 utils/domainstate.mli: utils/domainstate.mli.c runtime/caml/domain_state.tbl
 	$(CPP) -I runtime/caml $< > $@
 
-configure: configure.ac aclocal.m4 VERSION tools/autogen
+configure: configure.ac aclocal.m4 tools/autogen
 	tools/autogen
 
 .PHONY: partialclean
@@ -708,6 +707,11 @@ manual-pregen: opt.opt
 clean:: partialclean
 	rm -f $(programs) $(programs:=.exe)
 
+# The Swiss Army Knife
+# sak performs any function for which one might be tempted to use a Unix tool.
+$(SAK): runtime/sak.c
+	$(MAKE) -C runtime sak$(EXE)
+
 # The bytecode compiler
 
 ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
@@ -803,9 +807,10 @@ partialclean::
 runtime/primitives:
 	$(MAKE) -C runtime primitives
 
-lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
-    runtime/primitives
-	$^ > $@
+lambda/runtimedef.ml: $(SAK) runtime/caml/fail.tbl \
+    runtime/primitives lambda/runtimedef.ml.c
+	$(CPP) -I runtime/caml $@.c > $@
+	$(SAK) strings runtime/primitives >> $@
 
 partialclean::
 	rm -f lambda/runtimedef.ml
@@ -973,8 +978,6 @@ parsing/camlinternalMenhirLib.mli: boot/menhir/menhirLib.mli
 	cat $< >> $@
 
 # Copy parsing/parser.ml from boot/
-
-OCAML_VERSION=$(shell sed -ne 1p VERSION)
 
 parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly
 ifneq "$(findstring +dev, $(OCAML_VERSION))" ""
@@ -1228,6 +1231,7 @@ distclean: clean
 	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
+	rm -f stdlib/sys.ml
 	rm -rf autom4te.cache flexdll-sources
 	rm -f config.log config.status libtool
 	rm -f tools/eventlog_metadata

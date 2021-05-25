@@ -34,8 +34,14 @@ DEPFLAGS=-slash
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 
-include StdlibModules
 
+ifneq "$(REQUIRES_CONFIGURATION)" ""
+include Makefile.stdlib_modules
+endif
+
+# Suppress undefined variables warning when Makefile.stdlib_modules hasn't yet
+# been generated.
+STDLIB_MODULES ?=
 OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
 NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
@@ -200,43 +206,39 @@ stdlib.cma: $(OBJS)
 stdlib.cmxa: $(OBJS:.cmo=.cmx)
 	$(CAMLOPT) -a -o $@ $^
 
-sys.ml: $(ROOTDIR)/VERSION sys.mlp
-	sed -e "s|%%VERSION%%|`sed -e 1q $< | tr -d '\r'`|" sys.mlp > $@
-
 .PHONY: clean
-clean::
-	rm -f sys.ml
-
 clean::
 	rm -f $(CAMLHEADERS)
 
 export AWK
 
+COMPFLAGS_CMD = SAK='$(SAK_HOST)' ./Compflags
+
 %.cmi: %.mli
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	         -o $@ -c $(filter %.mli, $^)
 
 %.cmo: %.ml
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
-	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+	$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	         -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) \
+	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
 	           -o $@ -c $(filter %.ml, $^)
 
 # Dependencies on the compiler
@@ -256,14 +258,30 @@ clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -rf flexdll
 
+# Suppress the passing of command line variables to sub-make, since that can
+# trigger spurious undefined variable warnings.
+MAKEOVERRIDES=
+
+.INTERMEDIATE: l.tmp
+Makefile.stdlib_modules: | sys.ml
+	$(MAKE) --no-print-directory -f Makefile.link-order > l.tmp
+	$(SAK) prefix l.tmp > $@
+	rm -f l.tmp
+
+clean::
+	rm -f Makefile.stdlib_modules
+
 include .depend
 
 STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
-.INTERMEDIATE: .depend.tmp
-.depend.tmp:
+.INTERMEDIATE: .depend.tmp stdlib_all.tmp
+stdlib_all.tmp: stdlib.ml
+	cp $< $@
+
+.depend.tmp: stdlib_all.tmp
 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-	  > .depend.tmp
+	  -impl stdlib_all.tmp > .depend.tmp
 	$(CAMLDEP) $(DEPFLAGS) -as-map stdlib.ml stdlib.mli >> .depend.tmp
 
 .PHONY: depend

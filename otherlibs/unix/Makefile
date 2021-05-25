@@ -20,7 +20,7 @@ LIBNAME=unix
 EXTRACAMLFLAGS=-nolabels
 
 unixLabels.cmi: \
-  EXTRACAMLFLAGS += -pp "$(AWK) -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"
+  EXTRACAMLFLAGS += -pp '$(SAK_HOST) since'
 
 # dllunix.so particularly requires libm for modf symbols
 LDOPTS=$(NATIVECCLIBS)
