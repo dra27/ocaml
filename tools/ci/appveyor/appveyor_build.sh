@@ -26,6 +26,8 @@ else
   MAKE=make
 fi
 
+git config --global --add safe.directory '*'
+
 function run {
     if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
     NAME=$1
@@ -55,22 +57,18 @@ function set_configuration {
             dep='--disable-dependency-generation'
         ;;
         mingw32)
-            build='--build=i686-pc-cygwin'
             host='--host=i686-w64-mingw32'
             dep='--disable-dependency-generation'
         ;;
         mingw64)
-            build='--build=i686-pc-cygwin'
             host='--host=x86_64-w64-mingw32'
             dep='--disable-dependency-generation'
         ;;
         msvc32)
-            build='--build=i686-pc-cygwin'
             host='--host=i686-pc-windows'
             dep='--disable-dependency-generation'
         ;;
         msvc64)
-            build='--build=x86_64-pc-cygwin'
             host='--host=x86_64-pc-windows'
             # Explicitly test dependency generation on msvc64
             dep='--enable-dependency-generation'
@@ -78,11 +76,25 @@ function set_configuration {
     esac
 
     mkdir -p "$CACHE_DIRECTORY"
-    ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $dep $build $host --prefix="$2" --enable-ocamltest || ( \
-      rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-      ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $dep $build $host --prefix="$2" --enable-ocamltest )
+
+    local CACHE_KEY CACHE_FILE_PREFIX CACHE_FILE
+    CACHE_KEY=$({ cat configure; uname; } | sha1sum | cut -c 1-7)
+    CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
+    CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
+
+    # Remove old configure cache if the configure script or the OS
+    # have changed
+    if [[ ! -f "$CACHE_FILE" ]] ; then
+        rm -f -- "$CACHE_FILE_PREFIX"*
+    fi
+
+    # Remove configure cache if the script has failed
+    if ! ./configure --cache-file="$CACHE_FILE" $dep $host \
+                     --prefix="$2" --enable-ocamltest ; then
+        rm -f -- "$CACHE_FILE"
+        ./configure --cache-file="$CACHE_FILE" $dep $host \
+                    --prefix="$2" --enable-ocamltest
+    fi
 
 #    FILE=$(pwd | cygpath -f - -m)/Makefile.config
 #    run "Content of $FILE" cat Makefile.config
@@ -94,14 +106,19 @@ OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
 
 if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
   case "$PORT" in
-    cygwin*) ;;
-    *) export PATH="$FLEXDLLROOT:$PATH";;
+    cygwin*)
+      install_flexdll='false';;
+    *)
+      export PATH="$FLEXDLLROOT:$PATH"
+      install_flexdll='true';;
   esac
+else
+  install_flexdll='false'
 fi
 
 case "$1" in
   install)
-    if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
+    if [[ $install_flexdll = 'true' ]] ; then
       mkdir -p "$FLEXDLLROOT"
       cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
       # The objects are always built from the sources
@@ -159,7 +176,7 @@ case "$1" in
       run "$MAKE distclean" $MAKE distclean
     fi
 
-    if [[ $BOOTSTRAP_FLEXDLL = 'false' ]] ; then
+    if [[ $install_flexdll = 'true' ]] ; then
       tar -xzf "$APPVEYOR_BUILD_FOLDER/flexdll.tar.gz"
       cd "flexdll-$FLEXDLL_VERSION"
       $MAKE MSVC_DETECT=0 CHAINS=${PORT%32} support
@@ -178,7 +195,7 @@ case "$1" in
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
         script --quiet --return --command \
-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
