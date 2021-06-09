@@ -61,7 +61,13 @@ if %ERRORLEVEL% equ 1 (
 goto :EOF
 
 :UpgradeCygwin
-if "%CYGWIN_INSTALL_PACKAGES%" neq "" "%CYG_ROOT%\setup-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages %CYGWIN_INSTALL_PACKAGES:~1% > nul
+if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
+  set CYGWIN_FLAGS=--upgrade-also
+  set CYGWIN_UPGRADE_REQUIRED=0
+) else (
+  set CYGWIN_FLAGS=
+)
+if "%CYGWIN_INSTALL_PACKAGES%" neq "" "%CYG_ROOT%\setup-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" %CYGWIN_FLAGS% --packages %CYGWIN_INSTALL_PACKAGES:~1%
 for %%P in (%CYGWIN_COMMANDS%) do "%CYG_ROOT%\bin\%%P.exe" --version 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
 "%CYG_ROOT%\bin\bash.exe" -lc "cygcheck -dc %CYGWIN_PACKAGES%"
 if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
@@ -71,14 +77,20 @@ if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
 )
 goto :EOF
 
-:install
-
+:SetDefaultSDK
 if defined SDK set SDK=call %SDK%
 if not defined SDK (
   if "%PORT%" equ "msvc64" set SDK=call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"
   if "%PORT%" equ "msvc32" set SDK=call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"
+  if "%PORT%" equ "mingw64" set SDK=call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"
+  if "%PORT%" equ "mingw32" set SDK=call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"
 )
 %SDK%
+goto :EOF
+
+:install
+
+call :SetDefaultSDK
 
 git worktree add "..\%BUILD_PREFIX%-%PORT%" -b appveyor-build-%PORT%
 
@@ -88,8 +100,8 @@ if "%BOOTSTRAP_FLEXDLL%" equ "true" (
 )
 
 cd "%APPVEYOR_BUILD_FOLDER%"
-appveyor DownloadFile "https://github.com/alainfrisch/flexdll/archive/%FLEXDLL_VERSION%.tar.gz" -FileName "flexdll.tar.gz" || exit /b 1
-appveyor DownloadFile "https://github.com/alainfrisch/flexdll/releases/download/%FLEXDLL_VERSION%/flexdll-bin-%FLEXDLL_VERSION%.zip" -FileName "flexdll.zip" || exit /b 1
+appveyor DownloadFile "https://github.com/ocaml/flexdll/archive/%FLEXDLL_VERSION%.tar.gz" -FileName "flexdll.tar.gz" || exit /b 1
+appveyor DownloadFile "https://github.com/ocaml/flexdll/releases/download/%FLEXDLL_VERSION%/flexdll-bin-%FLEXDLL_VERSION%.zip" -FileName "flexdll.zip" || exit /b 1
 rem flexdll.zip is processed here, rather than in appveyor_build.sh because the
 rem unzip command comes from MSYS2 (via Git for Windows) and it has to be
 rem invoked via cmd /c in a bash script which is weird(er).
@@ -142,7 +154,6 @@ goto :EOF
 rem No tests run in the "C" build mode
 if "%BUILD_MODE%" equ "C" goto :EOF
 rem Add a C# compiler in PATH for the testsuite for mingw
-if "%PORT%" equ "mingw64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"
-if "%PORT%" equ "mingw32" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"
+call :SetDefaultSDK
 "%CYG_ROOT%\bin\bash.exe" -lc "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/appveyor_build.sh test" || exit /b 1
 goto :EOF
