@@ -190,17 +190,11 @@ static int safe_do_stat(int do_lstat, int use_64, wchar_t* path, HANDLE fstat, _
   }
   else {
     caml_enter_blocking_section();
-    h = CreateFile(path,
-                   FILE_READ_ATTRIBUTES,
-                   FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-                   NULL,
-                   OPEN_EXISTING,
-                   FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-                   NULL);
+    h = unix_really_CreateFile(path, 0, FILE_READ_ATTRIBUTES, 0, OPEN_EXISTING,
+                               FILE_FLAG_OPEN_REPARSE_POINT);
     caml_leave_blocking_section();
   }
   if (h == INVALID_HANDLE_VALUE) {
-    errno = ENOENT;
     return 0;
   }
   else {
@@ -244,14 +238,9 @@ static int safe_do_stat(int do_lstat, int use_64, wchar_t* path, HANDLE fstat, _
       if (!is_symlink) {
         CloseHandle(h);
         caml_enter_blocking_section();
-        if ((h = CreateFile(path,
-                            FILE_READ_ATTRIBUTES,
-                            FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-                            NULL,
-                            OPEN_EXISTING,
-                            FILE_FLAG_BACKUP_SEMANTICS,
-                            NULL)) == INVALID_HANDLE_VALUE) {
-          errno = ENOENT;
+        h = unix_really_CreateFile(path, 0, FILE_READ_ATTRIBUTES, 0,
+                                   OPEN_EXISTING, 0);
+        if (h == INVALID_HANDLE_VALUE) {
           caml_leave_blocking_section();
           return 0;
         }

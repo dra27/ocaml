@@ -133,4 +133,6 @@ typedef struct _REPARSE_DATA_BUFFER
 
 #define EXECV_CAST (const char_os * const *)
 
+HANDLE unix_really_CreateFile(LPCWSTR, DWORD, DWORD, DWORD, DWORD, DWORD);
+
 #endif /* CAML_UNIXSUPPORT_H */

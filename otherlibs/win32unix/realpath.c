@@ -42,9 +42,7 @@ CAMLprim value unix_realpath (value p)
 
   caml_unix_check_path (p, "realpath");
   wp = caml_stat_strdup_to_utf16 (String_val (p));
-  h = CreateFile (wp, 0,
-                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-                  OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  h = unix_really_CreateFile (wp, 0, 0, 0, OPEN_EXISTING, 0);
   caml_stat_free (wp);
 
   if (h == INVALID_HANDLE_VALUE)

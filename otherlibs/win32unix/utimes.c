@@ -51,17 +51,11 @@ CAMLprim value unix_utimes(value path, value atime, value mtime)
   mt = Double_val(mtime);
   wpath = caml_stat_strdup_to_utf16(String_val(path));
   caml_enter_blocking_section();
-  hFile = CreateFile(wpath,
-                     FILE_WRITE_ATTRIBUTES,
-                     FILE_SHARE_READ | FILE_SHARE_WRITE,
-                     NULL,
-                     OPEN_EXISTING,
-                     FILE_FLAG_BACKUP_SEMANTICS,
-                     NULL);
+  hFile = unix_really_CreateFile(wpath, 0, FILE_WRITE_ATTRIBUTES,
+                                 FILE_SHARE_DELETE, OPEN_EXISTING, 0);
   caml_leave_blocking_section();
   caml_stat_free(wpath);
   if (hFile == INVALID_HANDLE_VALUE) {
-    win32_maperr(GetLastError());
     uerror("utimes", path);
   }
   if (at == 0.0 && mt == 0.0) {

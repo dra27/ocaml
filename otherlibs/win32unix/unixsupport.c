@@ -345,3 +345,171 @@ int win_set_inherit(HANDLE fd, BOOL inherit)
   }
   return 0;
 }
+
+/* unix_really_CreateFile wraps the Windows CreateFile function with some extra
+   functionality:
+     - errno is set on error in addition to return INVALID_HANDLE_VALUE
+     - lpFileName must include any attributes specified in requiredAttributes,
+       or errno is set EINVAL (used by readlink)
+     - dwShareMode masks the sharing bits (so 0 means read/write/delete sharing)
+ */
+HANDLE unix_really_CreateFile(LPCWSTR lpFileName,
+                              DWORD requiredAttributes,
+                              DWORD dwDesiredAccess,
+                              DWORD dwShareMode,
+                              DWORD dwCreationDisposition,
+                              DWORD dwFlagsAndAttributes)
+{
+  DWORD attributes = GetFileAttributes(lpFileName);
+  TOKEN_PRIVILEGES restore = {0};
+  HANDLE hToken;
+  HANDLE hFile;
+  BOOL result;
+  TOKEN_PRIVILEGES* privs;
+
+  if (attributes == INVALID_FILE_ATTRIBUTES) {
+    win32_maperr(GetLastError());
+    return INVALID_HANDLE_VALUE;
+  } else if ((attributes & requiredAttributes) != requiredAttributes) {
+    errno = EINVAL;
+    return INVALID_HANDLE_VALUE;
+  }
+
+  dwShareMode = (FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE)
+                  | ~dwShareMode;
+
+  if (((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)) {
+    LUID privilege_luid;
+    DWORD dwReturnLength;
+    int i = 0;
+    LUID_AND_ATTRIBUTES* privilege;
+    HANDLE h;
+
+    /* FILE_FLAG_BACKUP_SEMANTICS is required to get a handle to a directory */
+    dwFlagsAndAttributes |= FILE_FLAG_BACKUP_SEMANTICS;
+
+    /* However, we don't want to access a directory which we can only see
+       through SeBackupPrivilege, so ensure it's disabled when CreateFile is
+       called and restore it if necessary afterwards.
+
+       As always, this isn't easy...
+     */
+
+    /* Step 1: get the effective privileges for this thread */
+    result = LookupPrivilegeValue(NULL, SE_BACKUP_NAME, &privilege_luid);
+    CAMLassert(result == TRUE);
+    if (GetTokenInformation(GetCurrentThreadEffectiveToken(),
+                            TokenPrivileges, NULL, 0, &dwReturnLength)
+        || GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+      win32_maperr(GetLastError());
+      goto failed;
+    }
+
+    if (!(privs = (TOKEN_PRIVILEGES*)malloc(dwReturnLength))) {
+      errno = ENOMEM;
+      return INVALID_HANDLE_VALUE;
+    }
+
+    if (!GetTokenInformation(GetCurrentThreadEffectiveToken(),
+                             TokenPrivileges, privs,
+                             dwReturnLength, &dwReturnLength)) {
+      win32_maperr(GetLastError());
+      goto failed;
+    }
+
+    /* Search for the privilege */
+    privilege = privs->Privileges;
+    while (i < privs->PrivilegeCount
+           && (privilege->Luid.HighPart != privilege_luid.HighPart
+               || privilege->Luid.LowPart != privilege_luid.LowPart)) {
+      i++;
+      privilege++;
+    }
+
+    if (i < privs->PrivilegeCount) {
+      HANDLE hProcessToken = INVALID_HANDLE_VALUE;
+      /* NB TOKEN_PRIVILEGES is _defined_ with a single-element array for
+         Privileges, so we don't need to malloc a struct. */
+      restore.PrivilegeCount = 1;
+      restore.Privileges->Luid = privilege_luid;
+      restore.Privileges->Attributes = 0;
+
+      /* If this thread already has a token, adjust it, otherwise duplicate
+         the process's token, adjust that and impersonate it on this thread
+       */
+      if (OpenThreadToken(GetCurrentThread(),
+                          TOKEN_ADJUST_PRIVILEGES, TRUE, &hToken)) {
+        /* This thread has a token, but the privilege isn't enabled so we
+           can assume that it will remain disabled for the duration of this
+           call (or at least we can't prevent another thread mucking around)
+         */
+        if ((privilege->Attributes & SE_PRIVILEGE_ENABLED) == 0) {
+          CloseHandle(hToken);
+          restore.PrivilegeCount = 0;
+        } else {
+          /* Adjust the privileges of this thread */
+          if (AdjustTokenPrivileges(hToken, FALSE,
+                                    &restore, sizeof(TOKEN_PRIVILEGES),
+                                    NULL, NULL)) {
+            restore.Privileges->Attributes = SE_PRIVILEGE_ENABLED;
+          } else {
+            win32_maperr(GetLastError());
+            CloseHandle(hToken);
+            goto failed;
+          }
+        }
+      } else if (OpenProcessToken(GetCurrentProcess(),
+                                  TOKEN_ADJUST_PRIVILEGES | TOKEN_DUPLICATE,
+                                  &hProcessToken)
+              && DuplicateTokenEx(hProcessToken,
+                                  TOKEN_ADJUST_PRIVILEGES | TOKEN_IMPERSONATE,
+                                  NULL, SecurityImpersonation,
+                                  TokenImpersonation, &hToken)
+              && AdjustTokenPrivileges(hToken, FALSE,
+                                       &restore, sizeof(TOKEN_PRIVILEGES),
+                                       NULL, NULL)
+              && SetThreadToken(NULL, hToken)) {
+        /* Success - the token has been duplicated, adjusted and
+           impersonated, so close the handle. */
+        CloseHandle(hProcessToken);
+        CloseHandle(hToken);
+        hToken = INVALID_HANDLE_VALUE;
+      } else {
+        /* An API call, somewhere, failed! */
+        win32_maperr(GetLastError());
+        if (hProcessToken != INVALID_HANDLE_VALUE)
+          CloseHandle(hProcessToken);
+        goto failed;
+      }
+    }
+
+    free(privs);
+  }
+
+  /* Finally, open the file! */
+  hFile = CreateFile(lpFileName,
+                     dwDesiredAccess,
+                     dwShareMode,
+                     NULL,
+                     dwCreationDisposition,
+                     dwFlagsAndAttributes,
+                     NULL);
+
+  if (restore.PrivilegeCount != 0) {
+    if (hToken != INVALID_HANDLE_VALUE) {
+      result = AdjustTokenPrivileges(hToken, FALSE,
+                                     &restore, sizeof(TOKEN_PRIVILEGES),
+                                     NULL, NULL);
+      CloseHandle(hToken);
+    } else {
+      result = RevertToSelf();
+    }
+    CAMLassert(result == TRUE);
+  }
+
+  return hFile;
+
+failed:
+  free(privs);
+  return INVALID_HANDLE_VALUE;
+}
