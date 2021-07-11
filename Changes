@@ -23,7 +23,7 @@ Working version
 ### Other libraries:
 
 - #8796, #8797: Ensure Unix.utimes works on directories on Windows and correct
-  the use of FILE_FLAG_BACKUP_SEMANTICS in Unix.stat and Unix.readlink.
+  the use of FILE_FLAG_BACKUP_SEMANTICS in stat, readlink and realpath.
   (David Allsopp, report by Daniil Baturin, review by Stephen Dolan)
 
 - #10192: Add support for Unix domain sockets on Windows and use them
