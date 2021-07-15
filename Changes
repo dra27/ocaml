@@ -545,7 +545,7 @@ OCaml 4.13.0
   C string constant on Windows when building the runtime. Hardens the generation
   of the constant on Unix for paths with backslashes, double-quotes and
   newlines.
-  (David Allsopp, review by ???)
+  (David Allsopp, review by Florian Angeletti)
 
 ### Bug fixes:
 

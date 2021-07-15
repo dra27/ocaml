@@ -248,8 +248,9 @@ sak$(EXE): sak.$(O)
 
 C_LITERAL = $(shell ./sak$(EXE) translate '$(1)')
 
-build_config.h: | sak$(EXE)
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' > $@
+build_config.h: $(ROOTDIR)/Makefile.config | sak$(EXE)
+	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
+	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
 	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
