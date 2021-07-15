@@ -30,9 +30,9 @@ defaultentry: world
 endif
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
-LN = cp
+LN = mklink $(2) $(1)
 else
-LN = ln -sf
+LN = ln -sf $(1) $(2)
 endif
 
 CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
@@ -232,7 +232,7 @@ FLEXLINK_BUILD_ENV = \
 
 boot/ocamlruns$(EXE):
 	$(MAKE) -C runtime ocamlruns$(EXE)
-	cp runtime/ocamlruns$(EXE) boot/ocamlruns$(EXE)
+	$(CP) runtime\ocamlruns$(EXE) boot\ocamlruns$(EXE)
 
 # Start up the system from the distribution compiler
 # The process depends on whether FlexDLL is also being bootstrapped.
@@ -260,14 +260,14 @@ else
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
 	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
 	  flexlink.exe support
-	mv $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
-	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
+	$(MV) $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
+	$(CP) $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	cd boot; rm -f $(LIBFILES)
-	cd stdlib; cp $(LIBFILES) ../boot
-	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+	$(CP) runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+	cd boot && $(RM_F) -f $(LIBFILES)
+	cd stdlib && $(CP) $(LIBFILES) ../boot
+	cd boot && $(call LN,../runtime/libcamlrun.$(A),.)
 
 # Recompile the core system using the bootstrap compiler
 .PHONY: coreall

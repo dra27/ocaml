@@ -46,9 +46,11 @@ FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 
-TEST_BOOT_OCAMLC_OPT = $(shell \
-  test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
-  echo $$?)
+# XXX Hacked out - this is a dev option, so should be ignored for this build mode
+#TEST_BOOT_OCAMLC_OPT = $(shell \
+#  test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
+#  echo $$?)
+TEST_BOOT_OCAMLC_OPT = 1
 
 # Use boot/ocamlc.opt if available
 ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
@@ -164,10 +166,13 @@ OCAMLYACCFLAGS ?=
 # Used with the Microsoft toolchain to merge generated manifest files into
 # executables
 if_file_exists = ( test ! -f $(1) || $(2) && rm -f $(1) )
-MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
-  mt -nologo -outputresource:$(1) -manifest $(1).manifest)
+# XXX Temporarily hacked out - no .manifest files being produced. This might move to sak (or to a batch file?)
+#MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
+#  mt -nologo -outputresource:$(1) -manifest $(1).manifest)
+MERGEMANIFESTEXE =
 
-SAK = $(ROOTDIR)/runtime/sak$(EXE)
+# XXX Hacked for separators
+SAK = $(ROOTDIR)\runtime\sak$(EXE)
 ifeq "$(UNIX_OR_WIN32)" "win32"
   SAK_HOST=$(subst /,\,$(SAK))
 else

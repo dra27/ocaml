@@ -208,22 +208,22 @@ include .Makefile.primitives
 endif
 
 .Makefile.primitives: Makefile.primitives sak$(EXE)
-	@cp $< $@
+	@$(CP) $< $@
 
 # prims.c is a side-effect of producing primitives
 prims.c: primitives ;
 
-sak$(EXE): sak.$(O)
+sak$(EXE): sak.c
 	$(call MKEXE_VIA_CC,$@,$^)
 
 caml/version.h : | sak$(EXE)
-	./sak$(EXE) version '$(OCAML_VERSION)' > $@
+	$(SAK) version $(call QUOTE_ONE,$(OCAML_VERSION)) > $@
 
-C_LITERAL = $(shell ./sak$(EXE) translate '$(1)')
+C_LITERAL = $(shell $(SAK) translate '$(1)')
 
 build_config.h: | sak$(EXE)
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' > $@
-	echo '#define HOST "$(HOST)"' >> $@
+	$(call ECHO_ONE,#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))) > $@
+	$(call ECHO_ONE,#define HOST "$(HOST)") >> $@
 
 # Libraries and programs
 

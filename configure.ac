@@ -540,7 +540,8 @@ AS_CASE([$host],
   # So we let them do, at the moment
   [*-pc-windows],
     [
-      mkexe_via_cc_extra_cmd=' && $(call MERGEMANIFESTEXE,$(1))'
+      # XXX Hacked out for now (batch file?)
+      mkexe_via_cc_extra_cmd=''
       libext=lib
       AR=""; RANLIB=echo; RANLIBCMD=""
       AS_IF([test "$host_cpu" = "x86_64" ],

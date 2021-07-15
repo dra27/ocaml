@@ -53,3 +53,11 @@ BUILD_DEBUGGER=@debugger@
 
 # Full OCaml string (historically the first line of VERSION)
 OCAML_VERSION=@PACKAGE_VERSION@
+
+# XXX Hacked for now
+CP=copy
+MV=move
+RM_F=del /f
+# XXX The idea is that this is quoted on Unix and straight on Windows
+ECHO_ONE=echo $(1)
+QUOTE_ONE="$(1)"

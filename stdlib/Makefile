@@ -266,7 +266,7 @@ MAKEOVERRIDES=
 Makefile.stdlib_modules: | sys.ml
 	$(MAKE) --no-print-directory -f Makefile.link-order > l.tmp
 	$(SAK) prefix l.tmp > $@
-	rm -f l.tmp
+	$(RM_F) l.tmp
 
 clean::
 	rm -f Makefile.stdlib_modules
