@@ -87,6 +87,7 @@ echo jenkinsdir=${jenkinsdir}
 case "${OCAML_ARCH}" in
   bsd|macos|linux|solaris) ;;
   cygwin|cygwin64|mingw|mingw64)
+    wmic cpu get /format:list
     . /etc/profile
     . "$HOME/.profile"
   ;;
