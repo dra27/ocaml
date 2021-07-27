@@ -36,11 +36,11 @@ environment:
     - PORT: msvc64
       BOOTSTRAP_FLEXDLL: false
       BUILD_MODE: steps
-    - PORT: msvc32
+    - PORT: msvc64
       BOOTSTRAP_FLEXDLL: false
       BUILD_MODE: C
       SDK: |-
-        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
+        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
 
 matrix:
   fast_finish: true
