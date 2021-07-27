@@ -31,11 +31,6 @@ environment:
     FORCE_CYGWIN_UPGRADE: 0
     BUILD_MODE: world.opt
   matrix:
-    - PORT: mingw32
-      BOOTSTRAP_FLEXDLL: true
-    - PORT: msvc64
-      BOOTSTRAP_FLEXDLL: false
-      BUILD_MODE: steps
     - PORT: msvc64
       BOOTSTRAP_FLEXDLL: false
       BUILD_MODE: C
