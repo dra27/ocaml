@@ -118,7 +118,6 @@ case "$1" in
     ;;
   test)
     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
     if [[ $PORT = 'mingw32' ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
@@ -178,7 +177,7 @@ case "$1" in
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
         script --quiet --return --command \
-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
