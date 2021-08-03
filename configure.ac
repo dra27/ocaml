@@ -992,8 +992,8 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="\$(CC) -shared \
-                   -flat_namespace -undefined suppress -Wl,-no_compact_unwind"
+      [mksharedlib='$(CC) -shared '\
+'-flat_namespace -undefined suppress -Wl,-no_compact_unwind'
       shared_libraries_supported=true],
     [*-*-mingw32],
       [mksharedlib='$(FLEXLINK_CMD) -chain $(FLEXDLL_CHAIN)'
