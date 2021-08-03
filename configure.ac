@@ -82,9 +82,9 @@ bootstrapping_flexdll=false
 # $oc_ldflags and $oc_dll_ldflags are handled as $(OC_LDFLAGS) and
 # $(OC_DLL_LDFLAGS) and can be overidden in the build.
 AC_CONFIG_COMMANDS_PRE([
-  # If $mkexe_ldflags_prefix is given, apply it $oc_ldflags and $oc_dllflags and
-  # ensure that LDFLAGS is passed using it. This allows LDFLAGS. This is used
-  # for flexlink. where linker flags need to be prefixed passed with -link.
+  # If $mkexe_ldflags_prefix is given, apply it to $oc_ldflags and $oc_dllflags
+  # and ensure that LDFLAGS is passed using it. This is used for flexlink. where
+  # linker flags need to be prefixed with -link.
   AS_IF([test -n "$mkexe_ldflags_prefix"],[
     AS_IF([test -n "$mkexedebugflag"],
       [mkexedebugflag="${mkexe_ldflags_prefix}${mkexedebugflag}"])

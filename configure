@@ -17762,9 +17762,9 @@ LTLIBOBJS=$ac_ltlibobjs
 
 
 
-  # If $mkexe_ldflags_prefix is given, apply it $oc_ldflags and $oc_dllflags and
-  # ensure that LDFLAGS is passed using it. This allows LDFLAGS. This is used
-  # for flexlink. where linker flags need to be prefixed passed with -link.
+  # If $mkexe_ldflags_prefix is given, apply it to $oc_ldflags and $oc_dllflags
+  # and ensure that LDFLAGS is passed using it. This is used for flexlink. where
+  # linker flags need to be prefixed with -link.
   if test -n "$mkexe_ldflags_prefix"; then :
 
     if test -n "$mkexedebugflag"; then :
