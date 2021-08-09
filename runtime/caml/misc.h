@@ -90,8 +90,7 @@ CAMLdeprecated_typedef(addr, char *);
 #define CAMLextern CAMLDLLIMPORT extern
 
 /* Weak function definitions that can be overridden by external libs */
-/* Conservatively restricted to ELF and MacOSX platforms */
-#if defined(__GNUC__) && (defined (__ELF__) || defined(__APPLE__))
+#ifdef SUPPORT_WEAK_LINKING
 #define CAMLweakdef __attribute__((weak))
 #else
 #define CAMLweakdef
