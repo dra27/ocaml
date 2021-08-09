@@ -14235,6 +14235,32 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CFLAGS="$saved_CFLAGS"
 
 
+## Determine if __attribute__((weak)) works
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the C compiler supports __attribute__((weak))" >&5
+$as_echo_n "checking whether the C compiler supports __attribute__((weak))... " >&6; }
+  echo '__attribute__((weak)) int symbol = 0;' > conftesta.c
+  echo 'int symbol = 0;' > conftestb.c
+  saved_LIBS="$LIBS"
+  LIBS="conftesta.c conftestb.c"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+int main() { return 0; }
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  $as_echo "#define SUPPORT_WEAK_LINKING 1" >>confdefs.h
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+  LIBS="$saved_LIBS"
+
+
 # Configure the native-code compiler
 
 arch=none
