@@ -112,6 +112,20 @@ AC_DEFUN([OCAML_CC_SUPPORTS_TREE_VECTORIZE], [
   CFLAGS="$saved_CFLAGS"
 ])
 
+AC_DEFUN([OCAML_CC_SUPPORTS_WEAK_LINKING], [
+  AC_MSG_CHECKING([whether the C compiler supports __attribute__((weak))])
+  echo '__attribute__((weak)) int symbol = 0;' > conftesta.c
+  echo 'int symbol = 0;' > conftestb.c
+  saved_LIBS="$LIBS"
+  LIBS="conftesta.c conftestb.c"
+  AC_LINK_IFELSE(
+    [AC_LANG_SOURCE([int main() { return 0; }])],
+    [AC_DEFINE([SUPPORT_WEAK_LINKING])
+    AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])])
+  LIBS="$saved_LIBS"
+])
+
 AC_DEFUN([OCAML_CC_HAS_DEBUG_PREFIX_MAP], [
   AC_MSG_CHECKING([whether the C compiler supports -fdebug-prefix-map])
   saved_CFLAGS="$CFLAGS"

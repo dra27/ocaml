@@ -927,6 +927,9 @@ OCAML_CC_SUPPORTS_ALIGNED
 ## Check whether __attribute__((optimize("tree-vectorize")))) is supported
 OCAML_CC_SUPPORTS_TREE_VECTORIZE
 
+## Determine if __attribute__((weak)) works
+OCAML_CC_SUPPORTS_WEAK_LINKING
+
 # Configure the native-code compiler
 
 arch=none
