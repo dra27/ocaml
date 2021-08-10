@@ -57,7 +57,8 @@ extern int win_CRT_fd_of_filedescr(value handle);
 #define NO_CRT_FD (-1)
 #define Nothing ((value) 0)
 
-extern void win32_maperr(DWORD errcode);
+extern int caml_win32_maperr(DWORD errcode);
+#define win32_maperr caml_win32_maperr
 extern value unix_error_of_code (int errcode);
 
 CAMLnoreturn_start
