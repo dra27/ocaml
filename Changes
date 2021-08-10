@@ -58,6 +58,9 @@ OCaml 4.10 maintenance branch
 - #10147, #10148: Fix building runtime with GCC on macOS.
   (David Allsopp, report by John Skaller)
 
+- #10380: Correct handling of UTF-8 paths in configure on Windows
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #11358, #11378: Refactor the initialization of bytecode threading.
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
