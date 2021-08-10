@@ -66,7 +66,7 @@ function set_configuration {
             host='--host=i686-pc-windows'
         ;;
         msvc64)
-            build='--build=x86_64-unknown-cygwin'
+            build='--build=x86_64-pc-cygwin'
             host='--host=x86_64-pc-windows'
         ;;
     esac
