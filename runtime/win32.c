@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <wchar.h>
 #if defined(DEBUG) || defined(NATIVE_CODE)
 #include <dbghelp.h>
 #endif
@@ -1268,4 +1269,156 @@ int64_t caml_time_counter(void)
   if (!QueryPerformanceCounter(&now))
     return 0;
   return (int64_t)(now.QuadPart * clock_freq);
+}
+
+static LPWSTR do_realpath(LPCWSTR path)
+{
+  LPWSTR result = NULL;
+  HANDLE h;
+  DWORD len;
+  DWORD errcode;
+
+  h = CreateFile(path, 0,
+                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                 NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  if (h == INVALID_HANDLE_VALUE) {
+    /* On Windows this can happen on *files* to which the process doesn't have
+       access, but in a directory which the process can. POSIX realpath(3) works
+       in this case, so it's emulated. Setting errno to 0 and returning NULL
+       signals to caml_realpath to do the fallback emulation. */
+    if ((errcode = GetLastError()) == ERROR_ACCESS_DENIED)
+      errno = 0;
+    else
+      caml_win32_maperr(errcode);
+    return NULL;
+  }
+
+  len = GetFinalPathNameByHandle(h, NULL, 0,
+                                 FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+  if (len == 0) {
+    caml_win32_maperr(GetLastError());
+    goto cleanup;
+  }
+
+  result = (LPWSTR)malloc((len + 1) * sizeof(WCHAR));
+  if (result == NULL) {
+    errno = ENOMEM;
+    goto cleanup;
+  }
+
+  len = GetFinalPathNameByHandle(h, result, len + 1,
+                                 FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+  if (len == 0) {
+    caml_win32_maperr(GetLastError());
+    free(result);
+    result = NULL;
+    goto cleanup;
+  }
+
+  /* The result is returned using device format. Strip off \\?\ and ensure
+     device UNC format (\\?\UNC\) gets turned back into normal UNC form (\\) */
+  if (len >= 4 && result[0] == '\\' && result[1] == '\\'
+               && result[2] == '?' && result[3] == '\\') {
+    if (len >= 8 && result[4] == 'U' && result[5] == 'N'
+                 && result[6] == 'C' && result[7] == '\\') {
+      wmemmove_s(result + 1, len, &result[7], len - 6);
+    } else {
+      wmemmove_s(result, len + 1, &result[4], len - 3);
+    }
+  }
+
+cleanup:
+  CloseHandle(h);
+  return result;
+}
+
+CAMLexport LPWSTR caml_realpath(LPCWSTR path)
+{
+  LPWSTR result = do_realpath(path);
+
+  if (result == NULL && errno == 0) {
+    /* Split path into dirname + basename and attempt do_realpath on dirname. If
+       that succeeds, emulate realpath(3) by adding basename back on to the
+       "real" dirname. */
+    WCHAR buffer[MAX_PATH + 1];
+    LPWSTR fullpath = buffer;
+    LPWSTR basename;
+    DWORD len;
+    LPWSTR end;
+    LPWSTR path2 = wcsdup(path);
+    if (path2 == NULL) {
+      errno = ENOMEM;
+      return NULL;
+    }
+    /* GetFullPathName will set basename to NULL if path ends with \, so set it
+       to null. Strip backslashes from the end of the string as long as that
+       wouldn't convert an absolute device path (C:\) to a relative one (C:).
+       Not that we only get here if because we got ERROR_ACCESS_DENIED on path:
+       so if path ends with backslashes, we have already determined that it is
+       _actually_ a directory. i.e. if C:\Foo is a file, then C:\Foo\ will have
+       already returned ENOENT, regardless of whether the process has access to
+       read C:\Foo. */
+    end = path2 + wcslen(path2);
+    while (end > path2 && (*(end - 1) == '\\' || *(end - 1) == '/'))
+      end--;
+    /* end now points at either the null terminator for path2 or the leftmost
+       trailing slash at the end of path2. */
+    if (end > path2 && *(end - 1) != ':')
+      *end = 0;
+    /* Finally, use GetFullPathName to split path2 into a dirname and
+       basename. */
+    len = GetFullPathName(path2, MAX_PATH, fullpath, &basename);
+    if (len == 0) {
+      free(path2);
+      caml_win32_maperr(GetLastError());
+    } else {
+      /* Very long filename support. */
+      if (len > MAX_PATH) {
+        if ((fullpath = (LPWSTR)malloc(len * sizeof(WCHAR))) == NULL) {
+          errno = ENOMEM;
+          return NULL;
+        }
+        if (GetFullPathName(path2, len, fullpath, &basename) == 0) {
+          caml_win32_maperr(GetLastError());
+          free(path2);
+          free(fullpath);
+          return NULL;
+        }
+      }
+      free(path2);
+      if (basename == NULL) {
+        errno = EACCES;
+      } else {
+        LPWSTR dirname;
+        /* Block off the basename from fullpath, so that the dirname can be
+           converted with do_realpath. */
+        WCHAR first = *basename;
+        *basename = 0;
+        if ((dirname = do_realpath(fullpath)) == NULL) {
+          if (errno == 0)
+            errno = EACCES;
+        } else {
+          size_t dirname_len = wcslen(dirname);
+          size_t basename_len;
+          *basename = first;
+          basename_len = wcslen(basename);
+          result =
+            (LPWSTR)malloc((dirname_len + basename_len + 2) * sizeof(WCHAR));
+          if (result == NULL) {
+            errno = ENOMEM;
+          } else {
+            memcpy(result, dirname, dirname_len * sizeof(WCHAR));
+            result[dirname_len] = '\\';
+            memcpy(result + dirname_len + 1, basename, basename_len * sizeof(WCHAR));
+            result[dirname_len + basename_len + 1] = 0;
+          }
+          free(dirname);
+        }
+      }
+      if (len > MAX_PATH)
+        free(fullpath);
+    }
+  }
+
+  return result;
 }

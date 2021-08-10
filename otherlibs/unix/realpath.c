@@ -13,67 +13,39 @@
 /*                                                                        */
 /**************************************************************************/
 
-#define CAML_INTERNALS
-
-/*
- * Windows Vista functions enabled
- */
-#undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
-
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/fail.h>
+#define CAML_INTERNALS
 #include <caml/osdeps.h>
 #include "unixsupport.h"
 
-#include <windows.h>
-#include <stdio.h>
+#if defined(HAS_REALPATH) || defined(_WIN32)
 
 CAMLprim value caml_unix_realpath (value p)
 {
-  CAMLparam1 (p);
-  HANDLE h;
-  wchar_t *wp;
-  wchar_t *wr;
-  DWORD wr_len;
-  value rp;
+  CAMLparam1(p);
+  CAMLlocal1(res);
+  char_os *resolved;
+  char_os *path;
 
-  caml_unix_check_path (p, "realpath");
-  wp = caml_stat_strdup_to_utf16 (String_val (p));
-  h = CreateFile (wp, 0,
-                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-                  OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-  caml_stat_free (wp);
+  caml_unix_check_path(p, "realpath");
+  path = caml_stat_strdup_to_os(String_val(p));
+  resolved = caml_realpath(path);
+  caml_stat_free(path);
+  if (resolved == NULL)
+    caml_uerror("realpath", p);
+  res = caml_copy_string_of_os(resolved);
+  /* caml_realpath allocates with malloc, not caml_stat_alloc */
+  free(resolved);
 
-  if (h == INVALID_HANDLE_VALUE)
-  {
-    caml_win32_maperr (GetLastError ());
-    caml_uerror ("realpath", p);
-  }
-
-  wr_len = GetFinalPathNameByHandle (h, NULL, 0, VOLUME_NAME_DOS);
-  if (wr_len == 0)
-  {
-    caml_win32_maperr (GetLastError ());
-    CloseHandle (h);
-    caml_uerror ("realpath", p);
-  }
-
-  wr = caml_stat_alloc ((wr_len + 1) * sizeof (wchar_t));
-  wr_len = GetFinalPathNameByHandle (h, wr, wr_len, VOLUME_NAME_DOS);
-
-  if (wr_len == 0)
-  {
-    caml_win32_maperr (GetLastError ());
-    CloseHandle (h);
-    caml_stat_free (wr);
-    caml_uerror ("realpath", p);
-  }
-
-  rp = caml_copy_string_of_utf16 (wr);
-  CloseHandle (h);
-  caml_stat_free (wr);
-  CAMLreturn (rp);
+  CAMLreturn(res);
 }
+
+#else
+
+CAMLprim value caml_unix_realpath (value p)
+{ caml_invalid_argument("realpath not implemented"); }
+
+#endif

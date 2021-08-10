@@ -480,3 +480,12 @@ void caml_init_os_params(void)
   caml_sys_pagesize = sysconf(_SC_PAGESIZE);
   return;
 }
+
+CAMLexport char * caml_realpath (const char * path)
+{
+#ifdef HAS_REALPATH
+  return realpath(path, NULL);
+#else
+  return NULL;
+#endif
+}
