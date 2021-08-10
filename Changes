@@ -41,6 +41,9 @@ OCaml 4.10 maintenance branch
   (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
    code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
 
+- #10380: Correct handling of UTF-8 paths in configure on Windows
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #11358, #11378: Refactor the initialization of bytecode threading.
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
