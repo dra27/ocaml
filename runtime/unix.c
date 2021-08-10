@@ -450,3 +450,12 @@ int caml_num_rows_fd(int fd)
   return -1;
 #endif
 }
+
+CAMLexport char * caml_realpath (const char * path)
+{
+#ifdef HAS_REALPATH
+  return realpath(path, NULL);
+#else
+  return NULL;
+#endif
+}

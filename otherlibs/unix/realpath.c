@@ -17,27 +17,35 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/fail.h>
+#define CAML_INTERNALS
+#include <caml/osdeps.h>
 #include "unixsupport.h"
 
 #ifdef HAS_REALPATH
 
 CAMLprim value unix_realpath (value p)
 {
-  CAMLparam1 (p);
-  char *r;
-  value rp;
+  CAMLparam1(p);
+  CAMLlocal1(res);
+  char_os *resolved;
+  char_os *path;
 
-  caml_unix_check_path (p, "realpath");
-  r = realpath (String_val (p), NULL);
-  if (r == NULL) { uerror ("realpath", p); }
-  rp = caml_copy_string (r);
-  free (r);
-  CAMLreturn (rp);
+  caml_unix_check_path(p, "realpath");
+  path = caml_stat_strdup_to_os(String_val(p));
+  resolved = caml_realpath(path);
+  caml_stat_free(path);
+  if (resolved == NULL)
+    uerror("realpath", p);
+  res = caml_copy_string_of_os(resolved);
+  /* caml_realpath allocates with malloc, not caml_stat_alloc */
+  free(resolved);
+
+  CAMLreturn(res);
 }
 
 #else
 
 CAMLprim value unix_realpath (value p)
-{ caml_invalid_argument ("realpath not implemented"); }
+{ caml_invalid_argument("realpath not implemented"); }
 
 #endif

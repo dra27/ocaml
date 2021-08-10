@@ -23,7 +23,7 @@ WIN_FILES = accept.c bind.c channels.c close.c \
   getpeername.c getpid.c getsockname.c gettimeofday.c isatty.c \
   link.c listen.c lockf.c lseek.c nonblock.c \
   mmap.c open.c pipe.c read.c readlink.c rename.c \
-  realpath.c select.c sendrecv.c \
+  select.c sendrecv.c \
   shutdown.c sleep.c socket.c sockopt.c startup.c stat.c \
   symlink.c system.c times.c truncate.c unixsupport.c windir.c winwait.c \
   write.c winlist.c winworker.c windbug.c utimes.c
@@ -33,7 +33,7 @@ UNIX_FILES = access.c addrofstr.c chdir.c chmod.c cst2constr.c \
   cstringv.c execv.c execve.c execvp.c mkdir.c \
   exit.c getaddrinfo.c getcwd.c gethost.c gethostname.c \
   getnameinfo.c getproto.c \
-  getserv.c gmtime.c mmap_ba.c putenv.c rmdir.c \
+  getserv.c gmtime.c mmap_ba.c putenv.c realpath.c rmdir.c \
   socketaddr.c strofaddr.c time.c unlink.c fsync.c
 
 UNIX_CAML_FILES = unix.mli unixLabels.mli unixLabels.ml

@@ -759,6 +759,27 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
   return lpBuffer;
 }
 
+static void win32_maperr(DWORD errcode)
+{
+  /* Modest attempt at mapping Win32 error codes to POSIX error codes.
+     The __dosmaperr() function from the CRT does a better job but is
+     generally not accessible. */
+  switch (errcode) {
+  case ERROR_FILE_NOT_FOUND: case ERROR_PATH_NOT_FOUND:
+    errno = ENOENT; break;
+  case ERROR_ACCESS_DENIED: case ERROR_WRITE_PROTECT: case ERROR_CANNOT_MAKE:
+    errno = EACCES; break;
+  case ERROR_CURRENT_DIRECTORY: case ERROR_BUSY:
+    errno = EBUSY; break;
+  case ERROR_NOT_SAME_DEVICE:
+    errno = EXDEV; break;
+  case ERROR_ALREADY_EXISTS:
+    errno = EEXIST; break;
+  default:
+    errno = EINVAL;
+  }
+}
+
 /* The rename() implementation in MSVC's CRT is based on MoveFile()
    and therefore fails if the new name exists.  This is inconsistent
    with POSIX and a problem in practice.  Here we reimplement
@@ -779,23 +800,7 @@ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
                  MOVEFILE_COPY_ALLOWED)) {
     return 0;
   }
-  /* Modest attempt at mapping Win32 error codes to POSIX error codes.
-     The __dosmaperr() function from the CRT does a better job but is
-     generally not accessible. */
-  switch (GetLastError()) {
-  case ERROR_FILE_NOT_FOUND: case ERROR_PATH_NOT_FOUND:
-    errno = ENOENT; break;
-  case ERROR_ACCESS_DENIED: case ERROR_WRITE_PROTECT: case ERROR_CANNOT_MAKE:
-    errno = EACCES; break;
-  case ERROR_CURRENT_DIRECTORY: case ERROR_BUSY:
-    errno = EBUSY; break;
-  case ERROR_NOT_SAME_DEVICE:
-    errno = EXDEV; break;
-  case ERROR_ALREADY_EXISTS:
-    errno = EEXIST; break;
-  default:
-    errno = EINVAL;
-  }
+  win32_maperr(GetLastError());
   return -1;
 }
 
@@ -1043,4 +1048,42 @@ CAMLexport clock_t caml_win32_clock(void)
   /* total in 100-nanosecond intervals (1e7 / CLOCKS_PER_SEC) */
   clocks_per_sec = INT64_LITERAL(10000000U) / (ULONGLONG)CLOCKS_PER_SEC;
   return (clock_t)(total / clocks_per_sec);
+}
+
+CAMLexport wchar_t * caml_realpath(const wchar_t * path)
+{
+  wchar_t *result = NULL;
+  HANDLE h;
+  DWORD len;
+
+  h = CreateFile(path, 0,
+                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                 NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  if (h == INVALID_HANDLE_VALUE) {
+    win32_maperr(GetLastError());
+    return NULL;
+  }
+
+  len = GetFinalPathNameByHandle(h, NULL, 0, VOLUME_NAME_DOS);
+  if (len == 0) {
+    win32_maperr(GetLastError());
+    goto cleanup;
+  }
+
+  result = (wchar_t *)malloc((len + 1) * sizeof(wchar_t));
+  if (result == NULL) {
+    errno = ENOMEM;
+    goto cleanup;
+  }
+
+  len = GetFinalPathNameByHandle(h, result, len, VOLUME_NAME_DOS);
+  if (len == 0) {
+    win32_maperr(GetLastError());
+    free(result);
+    result = NULL;
+  }
+
+cleanup:
+  CloseHandle(h);
+  return result;
 }
