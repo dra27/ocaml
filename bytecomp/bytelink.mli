@@ -37,6 +37,7 @@ type error =
   | Camlheader of string * filepath
   | Wrong_link_order of (modname * modname) list
   | Multiple_definition of modname * filepath * filepath
+  | Needs_custom_runtime of filepath
 
 exception Error of error
 
