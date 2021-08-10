@@ -31,6 +31,7 @@ type error =
   | Required_module_unavailable of modname * modname
   | Camlheader of string * filepath
   | Wrong_link_order of (modname * modname) list
+  | Needs_custom_runtime of string
 
 exception Error of error
 
@@ -47,7 +48,7 @@ let lib_ccobjs = ref []
 let lib_ccopts = ref []
 let lib_dllibs = ref []
 
-let add_ccobjs origin l =
+let add_ccobjs obj_name origin l =
   if not !Clflags.no_auto_link then begin
     if
       String.length !Clflags.use_runtime = 0
@@ -59,7 +60,8 @@ let add_ccobjs origin l =
         Misc.replace_substring ~before:"$CAMLORIGIN" ~after:origin
       in
       lib_ccopts := List.map replace_origin l.lib_ccopts @ !lib_ccopts;
-    end;
+    end else if l.lib_custom then
+      raise(Error(Needs_custom_runtime obj_name));
     lib_dllibs := l.lib_dllibs @ !lib_dllibs
   end
 
@@ -142,7 +144,7 @@ let scan_file obj_name tolink =
       seek_in ic pos_toc;
       let toc = (input_value ic : library) in
       close_in ic;
-      add_ccobjs (Filename.dirname file_name) toc;
+      add_ccobjs obj_name (Filename.dirname file_name) toc;
       let required =
         List.fold_right
           (fun compunit reqd ->
@@ -781,6 +783,9 @@ let report_error ppf = function
       in
       fprintf ppf "@[<hov 2>Wrong link order: %a@]"
         (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf ",@ ") depends_on) l
+  | Needs_custom_runtime obj_name ->
+      fprintf ppf "%s requires a custom runtime; link with -noautolink or \
+                   without -use-prims and -use-runtime" obj_name
 
 let () =
   Location.register_error_of_exn
