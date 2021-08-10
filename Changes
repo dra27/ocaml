@@ -81,6 +81,9 @@ OCaml 4.09 maintenance branch
   (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
    code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
 
+- #10380: Correct handling of UTF-8 paths in configure on Windows
+  (David Allsopp, review by Sébastien Hinderer)
+
 - #12166, #12993: explicitly build non PIE executables on x86 32bits
   architectures
   (Florian Angeletti, review by David Allsopp)
