@@ -205,16 +205,14 @@ CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
 
 /* Exposes caml_parse_ld_conf as a primitive for the bytecode compiler, saving
    the duplication of the logic with the bytecode compiler. */
-CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
+static value parse_ld_conf(const char_os *stdlib)
 {
-  CAMLparam1(vstdlib);
+  CAMLparam0();
   CAMLlocal2(list, str);
 
-  char_os *stdlib = caml_stat_strdup_to_os(String_val(vstdlib));
   struct ext_table table;
   caml_ext_table_init(&table, 8);
   char_os *tofree = caml_parse_ld_conf(stdlib, &table);
-  caml_stat_free(stdlib);
 
   list = Val_emptylist;
   for (int i = table.size - 1; i >= 0; i--) {
@@ -226,6 +224,26 @@ CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
   caml_stat_free(tofree);
 
   CAMLreturn(list);
+}
+
+CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
+{
+  char_os *stdlib = caml_stat_strdup_to_os(String_val(vstdlib));
+  value res = parse_ld_conf(stdlib);
+  caml_stat_free(stdlib);
+
+  return res;
+}
+
+CAMLprim value caml_dynlink_parse_runtime_ld_conf(value ignored)
+{
+#ifdef NATIVE_CODE
+  /* This primitive is needed in native code because of how dynlink_compilerlibs
+     is built, but this primitive is never actually called. */
+  return parse_ld_conf(T(""));
+#else
+  return parse_ld_conf(caml_runtime_standard_library_default);
+#endif
 }
 
 #ifndef NATIVE_CODE
