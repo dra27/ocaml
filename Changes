@@ -36,6 +36,10 @@ Working version
 - #11102: Speed up register allocation by permanently spilling registers
   (Stephen Dolan, review by Xavier Leroy)
 
+- #11???: Add -set-global-string option to both compilers, allowing a C symbol
+  to be added to the binary with the given name and value.
+  (David Allsopp, review by ???)
+
 ### Standard library:
 
 - #11128: Add In_channel.isatty, Out_channel.isatty.
