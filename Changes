@@ -109,6 +109,10 @@ Working version
 
 ### Code generation and optimizations:
 
+- #14???: Add -set-runtime-default option to both compilers, allowing runtime
+  parameters to be added to the binary with the given value.
+  (David Allsopp and Antonin Décimo, review by ???)
+
 ### Standard library:
 
 - #13728: Add Sys.runtime_executable containing the full path (if available) to
