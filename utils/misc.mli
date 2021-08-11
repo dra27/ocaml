@@ -173,6 +173,7 @@ module Stdlib : sig
     val for_all : (char -> bool) -> t -> bool
 
     val rtrim_cr : string -> string
+    val escaped_c : string -> string
   end
 
   external compare : 'a -> 'a -> int = "%compare"
