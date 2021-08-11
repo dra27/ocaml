@@ -19,6 +19,7 @@ open Misc
 open Config
 open Cmo_format
 
+module String = Misc.Stdlib.String
 module Compunit = Symtable.Compunit
 
 module Dep = struct
@@ -519,6 +520,13 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
+       begin match Compenv.overridden_runtime_parameters () with
+       | Some ocamlrunparam when standalone ->
+           (* Embedded runtime defaults *)
+           output_string outchan ocamlrunparam;
+           Bytesections.record toc_writer ORUN;
+       | _ -> ()
+       end;
        (* The map of global identifiers *)
        Symtable.output_global_map outchan;
        Bytesections.record toc_writer SYMB;
@@ -590,6 +598,45 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer toc_writer;
     )
 
+(* [c_string_literal_of_string s] returns the C literal string representation of
+   [s], suitable for embedding in a C source file with type [char_os *]. The
+   result includes the quote markers. *)
+let c_string_literal_of_string s =
+  let b = Buffer.create (String.length s * 2) in
+  let utf16le = Bytes.create 4 in
+  let iter u =
+    match Uchar.to_int u with
+      (* Characters with C escape sequences *)
+    | 000 (* '\0' *) -> Buffer.add_string b "\\0"
+    | 009 (* '\t' *) -> Buffer.add_string b "\\t"
+    | 010 (* '\n' *) -> Buffer.add_string b "\\n"
+    | 013 (* '\r' *) -> Buffer.add_string b "\\r"
+    | 034 (* '\"' *) -> Buffer.add_string b "\\\""
+    | 092 (* '\\' *) -> Buffer.add_string b "\\\\"
+      (* Most C compilers will have no problem processing UTF-8 in the strings
+         with the characters above converted to their C representations. On
+         Windows, where the string is [wchar_t *], all characters for which
+         iswprint returns 0 are escaped using the extended [\x] notation. *)
+    | c when Config.target_win32 && (c < 32 (* ' ' *) || c >= 127) ->
+        (* Convert u to UTF-16LE, allowing for surrogate pairs *)
+        let len = Bytes.set_utf_16le_uchar utf16le 0 u in
+        for i = 1 to len / 2 do
+          Printf.bprintf b "\\x%04x" (Bytes.get_uint16_le utf16le ((i - 1) * 2))
+        done
+    | _ ->
+        Buffer.add_utf_8_uchar b u
+  in
+  if Config.target_win32 then
+    Buffer.add_char b 'L';
+  Buffer.add_char b '"';
+  Seq.iter iter (String.to_utf_8_seq s);
+  Buffer.add_char b '"';
+  Buffer.contents b
+
+let emit_global_constant outchan name value =
+  let value = Option.fold ~none:"NULL" ~some:c_string_literal_of_string value in
+  Printf.fprintf outchan "const char_os * %s = %s;\n" name value
+
 (* Output a bytecode executable as a C file *)
 
 let link_bytecode_as_c tolink outfile with_main =
@@ -650,6 +697,8 @@ static char caml_sections[] = {
 };
 
 |};
+       emit_global_constant outchan "caml_executable_ocamlrunparam"
+                            (Compenv.overridden_runtime_parameters ());
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
@@ -804,6 +853,8 @@ extern "C" {
 
 |};
          Symtable.output_primitive_table poc;
+         emit_global_constant poc "caml_executable_ocamlrunparam"
+                              (Compenv.overridden_runtime_parameters ());
          output_string poc {|
 #ifdef __cplusplus
 }
