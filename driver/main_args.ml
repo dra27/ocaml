@@ -131,6 +131,10 @@ let mk_I f =
   "-I", Arg.String f, "<dir>  Add <dir> to the list of include directories"
 ;;
 
+let mk_set_runtime_default f =
+  "-set-runtime-default", Arg.String f, "<param>=<value>  Set the default for \
+      runtime parameter <param> to <value>"
+
 let mk_impl f =
   "-impl", Arg.String f, "<file>  Compile <file> as a .ml file"
 ;;
@@ -943,6 +947,7 @@ module type Compiler_options = sig
   val _with_runtime : unit -> unit
   val _without_runtime : unit -> unit
   val _safe_string : unit -> unit
+  val _set_runtime_default : string -> unit
   val _short_paths : unit -> unit
   val _thread : unit -> unit
   val _v : unit -> unit
@@ -1159,6 +1164,7 @@ struct
     mk_with_runtime F._with_runtime;
     mk_without_runtime F._without_runtime;
     mk_safe_string F._safe_string;
+    mk_set_runtime_default F._set_runtime_default;
     mk_short_paths F._short_paths;
     mk_strict_sequence F._strict_sequence;
     mk_no_strict_sequence F._no_strict_sequence;
@@ -1350,6 +1356,7 @@ struct
     mk_without_runtime F._without_runtime;
     mk_S F._S;
     mk_safe_string F._safe_string;
+    mk_set_runtime_default F._set_runtime_default;
     mk_shared F._shared;
     mk_short_paths F._short_paths;
     mk_strict_sequence F._strict_sequence;
