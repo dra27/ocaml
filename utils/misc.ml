@@ -227,6 +227,8 @@ module Stdlib = struct
           String.sub s 0 !i
         else
           s
+
+    external escaped_c : string -> string = "caml_format_c_string_literal"
   end
 
   external compare : 'a -> 'a -> int = "%compare"
