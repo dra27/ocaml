@@ -3955,6 +3955,13 @@ let predef_exception i name =
   let data_items = emit_block exn_sym Global (block_header tag size) fields in
   Cdata data_items
 
+let emit_global_string_constant name value =
+  let data_items =
+    emit_block name Global (string_header (String.length value))
+      (emit_string_constant value [])
+  in
+  Cdata data_items
+
 (* Header for a plugin *)
 
 let plugin_header units =
