@@ -18,7 +18,7 @@
 open Misc
 open Config
 open Cmo_format
-
+module String = Misc.Stdlib.String
 module Compunit = Symtable.Compunit
 
 module Dep = struct
@@ -596,6 +596,53 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer toc_writer;
     )
 
+let escaped_c s =
+  let b = Buffer.create (String.length s * 2) in
+  let utf16le = Bytes.create 4 in
+  let iter u =
+    match Uchar.to_int u with
+      (* Characters with C escape sequences *)
+    | 000 (* '\0' *) -> Buffer.add_string b "\\0"
+    | 009 (* '\t' *) -> Buffer.add_string b "\\t"
+    | 010 (* '\n' *) -> Buffer.add_string b "\\n"
+    | 013 (* '\r' *) -> Buffer.add_string b "\\r"
+    | 034 (* '\"' *) -> Buffer.add_string b "\\\""
+    | 092 (* '\\' *) -> Buffer.add_string b "\\\\"
+      (* Most C compilers will have no problem processing UTF-8 in the strings
+         with the characters above converted to their C representations. On
+         Windows, where the string is [wchar_t *], all characters for which
+         iswprint returns 0 are escaped using the extended [\x] notation. *)
+    | c when Config.target_win32 && (c < 32 (* ' ' *) || c >= 127) ->
+        (* Convert u to UTF-16LE, allowing for surrogate pairs *)
+        let len = Bytes.set_utf_16le_uchar utf16le 0 u in
+        for i = 1 to len / 2 do
+          Printf.bprintf b "\\x%04x" (Bytes.get_uint16_le utf16le ((i - 1) * 2))
+        done
+    | _ ->
+        Buffer.add_utf_8_uchar b u
+  in
+  if Config.target_win32 then
+    Buffer.add_string b "L\""
+  else
+    Buffer.add_char b '"';
+  Seq.iter iter (String.to_utf_8_seq s);
+  Buffer.add_char b '"';
+  Buffer.contents b
+
+let emit_global_constant outchan name value =
+  let value = Option.fold ~none:"NULL" ~some:escaped_c value in
+  Printf.fprintf outchan "const char_os * %s = %s;\n" name value
+
+let emit_standard_library_default outchan =
+  let stdlib = !Clflags.standard_library_default in
+  let stdlib =
+    if stdlib = None then
+      Some Config.standard_library_default
+    else
+      stdlib
+  in
+  emit_global_constant outchan "caml_standard_library_default" stdlib
+
 (* Output a bytecode executable as a C file *)
 
 let link_bytecode_as_c tolink outfile with_main =
@@ -658,6 +705,7 @@ static char caml_sections[] = {
 };
 
 |};
+       emit_standard_library_default outchan;
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
@@ -816,6 +864,7 @@ enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
 
 |};
          Symtable.output_primitive_table poc;
+         emit_standard_library_default poc;
          output_string poc {|
 #ifdef __cplusplus
 }
