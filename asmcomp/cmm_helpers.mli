@@ -619,6 +619,11 @@ val code_segment_table: string list -> phrase
 (** Generate data for a predefined exception *)
 val predef_exception: int -> string -> phrase
 
+(** Generate data for a global NUL-terminated string represented using [char_os]
+    (i.e. [wchar_t] on Windows; [char] on Unix).
+    Constant must be valid UTF-8. *)
+val emit_global_string_constant: string -> string option -> phrase
+
 val plugin_header: (Cmx_format.unit_infos * Digest.t) list -> phrase
 
 (** Emit constant symbols *)

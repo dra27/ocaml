@@ -174,6 +174,10 @@ val model: string
 val system: string
 (** Name of operating system for the native-code compiler *)
 
+val target_win32: bool
+(** Alias of Sys.win32
+    Relocatable TODO: final back-port won't need this. *)
+
 val asm: string
 (** The assembler (and flags) to use for assembling
     ocamlopt-generated code. *)
