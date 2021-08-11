@@ -571,6 +571,15 @@ Enforce the separation between types
 .BR string \ and\  bytes ,
 thereby making strings read-only. This is the default.
 .TP
+.BI \-set\-runtime\-default " setting=value"
+When linking an executable, override the default value for a runtime setting.
+The only currently supported setting is:
+
+.B standard_library_default
+Specifies the default location used by the executable to locate the Standard
+Library. By default, this is the absolute path to the Standard Library the
+compiler itself was configured with.
+.TP
 .B \-shared
 Build a plugin (usually .cmxs) that can be dynamically loaded with
 the
