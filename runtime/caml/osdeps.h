@@ -110,6 +110,10 @@ extern int caml_num_rows_fd(int fd);
    string. */
 extern char_os * caml_realpath(const char_os *);
 
+/* Converts the supplied string to a C literal, returning a freshly malloc'd
+   buffer. */
+extern char * caml_emit_c_string(char_os *);
+
 #ifdef _WIN32
 
 extern int caml_win32_rename(const wchar_t *, const wchar_t *);
