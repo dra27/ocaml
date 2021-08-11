@@ -27,6 +27,7 @@ module Name : sig
     | DBUG (** debug info *)
     | DLLS (** dll names *)
     | DLPT (** dll paths *)
+    | ORUN (** embedded runtime parameters *)
     | PRIM (** primitives names *)
     | RNTM (** The path to the bytecode interpreter (use_runtime mode) *)
     | SYMB (** global identifiers *)

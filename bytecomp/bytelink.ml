@@ -525,6 +525,13 @@ let link_bytecode ?final_name tolink exec_name standalone =
          ~filename:final_name ~kind:"bytecode executable"
          outchan (Symtable.initial_global_table());
        Bytesections.record toc_writer DATA;
+       begin match !Clflags.standard_library_default with
+       | Some value ->
+           (* Embedded runtime defaults *)
+           output_string outchan value;
+           Bytesections.record toc_writer ORUN
+       | None -> ()
+       end;
        (* The map of global identifiers *)
        Symtable.output_global_map outchan;
        Bytesections.record toc_writer SYMB;
