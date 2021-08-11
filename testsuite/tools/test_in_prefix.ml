@@ -2605,7 +2605,6 @@ let test_relocation env prefix bindir libdir =
       "compiler-libs" / "config.cmt";
       "compiler-libs" / "config_main.cmt";
       "expunge";
-      "libcamlrun_shared" ^ Config.ext_dll;
       "Makefile.config";
     ] in
     StringSet.of_list (List.map (Filename.concat libdir) files) in
@@ -2624,7 +2623,6 @@ let test_relocation env prefix bindir libdir =
       else
         Config.ext_dll :: ".cmxs" :: exts in
     StringSet.of_list exts in
-  let libcamlrun_prefix = Filename.concat libdir "libcamlrun" in
   let libdir_rules file =
     if Sys.cygwin && Filename.basename (Filename.dirname file) = "flexdll" then
       LocationSet.empty
@@ -2658,11 +2656,7 @@ let test_relocation env prefix bindir libdir =
             LocationSet.empty
         else
           LocationSet.empty in
-      if ext = Config.ext_lib
-           && String.starts_with ~prefix:libcamlrun_prefix file
-           && not (String.starts_with ~prefix:"libcamlruntime_events"
-                    (Filename.remove_extension (Filename.basename file)))
-         || StringSet.mem file libdir_files_with_prefix then
+      if StringSet.mem file libdir_files_with_prefix then
         LocationSet.add Prefix build
       else
         build
