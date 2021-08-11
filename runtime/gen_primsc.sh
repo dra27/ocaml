@@ -64,7 +64,9 @@ sed -e 's/.*/  "&",/' "$primitives"
 echo '  0 };'
 
 # ocamlrun is able to use any of the mechanisms to load the bytecode
+# Generate a stub default OCAMLRUNPARAM string
 cat <<'EOF'
 
 enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
+const char_os *caml_executable_ocamlrunparam = NULL;
 EOF
