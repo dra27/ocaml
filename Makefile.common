@@ -92,6 +92,10 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
+# Allow Makefile.cross to add flags to OC_COMMON_LINKFLAGS
+OC_CROSS_LINKFLAGS ?=
+OC_COMMON_LINKFLAGS += $(OC_CROSS_LINKFLAGS)
+
 # ocamlc has several mechanisms for linking a bytecode image to the runtime
 # which executes it. The exact mechanism depends on the platform and the precise
 # location of the runtime. The boot compiler (boot/ocamlc) therefore needs this
