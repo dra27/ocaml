@@ -163,6 +163,14 @@ CAMLextern wchar_t* caml_stat_wcsdup(const wchar_t *s);
 */
 CAMLextern caml_stat_string caml_stat_strdup_noexc(const char *s);
 
+/* [caml_stat_strndup(s, n, &out_n)] returns a copy of the first n bytes of s.
+   If out_n is not NULL, then the size of the result is recorded in *out_n. This
+   function is the "dummy" Unix implementation of
+   caml_stat_strndup_{to,from}_utf16.
+*/
+CAMLextern caml_stat_string caml_stat_strndup(const char *s,
+                                              asize_t len, asize_t *out_len);
+
 /* [caml_stat_strconcat(nargs, strings)] concatenates NULL-terminated [strings]
    (an array of [char*] of size [nargs]) into a new string, dropping all NULLs,
    except for the very last one. It throws an OCaml exception in case the
