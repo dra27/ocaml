@@ -676,6 +676,7 @@ let link objfiles output_name =
     assert (!Clflags.global_string_constants = []);
     link_bytecode tolink output_name true
   end else if not !Clflags.output_c_object then begin
+    Compenv.set_caml_standard_library_default ();
     let bytecode_name = Filename.temp_file "camlcode" "" in
     let prim_name =
       if !Clflags.keep_camlprimc_file then
@@ -720,7 +721,9 @@ let link objfiles output_name =
            append_bytecode bytecode_name exec_name
       )
   end else begin
-    if not !Clflags.output_complete_executable then
+    if !Clflags.output_complete_executable then
+      Compenv.set_caml_standard_library_default ()
+    else
       assert (!Clflags.global_string_constants = []);
     let basename = Filename.remove_extension output_name in
     let c_file, stable_name =

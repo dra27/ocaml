@@ -46,6 +46,9 @@
 #else
 #include <sys/dir.h>
 #endif
+#ifdef HAS_LIBGEN_H
+#include <libgen.h>
+#endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
@@ -448,6 +451,18 @@ int caml_num_rows_fd(int fd)
     return -1;
 #else
   return -1;
+#endif
+}
+
+CAMLexport char * caml_dirname (const char * path)
+{
+#ifdef HAS_LIBGEN_H
+  char * dir = caml_stat_strdup(path);
+  char * res = caml_stat_strdup(dirname(dir));
+  caml_stat_free(dir);
+  return res;
+#else
+  return NULL;
 #endif
 }
 

@@ -35,6 +35,7 @@
 #include "caml/osdeps.h"
 #include "caml/prims.h"
 #include "caml/signals.h"
+#include "caml/sys.h"
 
 #include "build_config.h"
 
@@ -113,7 +114,7 @@ CAMLexport void caml_parse_ld_conf(void)
   char_os * locations[3] = {
     caml_secure_getenv(T("OCAMLLIB")),
     caml_secure_getenv(T("CAMLLIB")),
-    OCAML_STDLIB_DIR };
+    caml_standard_library };
   char_os * ldconfs[3] = {NULL, NULL, NULL};
   char * config;
   char * p, * q, * r;

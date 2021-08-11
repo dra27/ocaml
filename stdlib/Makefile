@@ -108,7 +108,7 @@ installopt-default::
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header
-HEADER_PATH = $(TARGET_BINDIR)/
+HEADER_PATH = $(if $(TARGET_BINDIR),$(TARGET_BINDIR),$(BINDIR))/
 else # Windows
 HEADERPROGRAM = headernt
 HEADER_PATH = $(TARGET_BINDIR)/

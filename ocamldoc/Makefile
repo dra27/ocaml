@@ -25,7 +25,7 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
   BYTELINK_FLAGS=-use-prims $(ROOTDIR)/runtime/primitives \
                  -use-runtime $(RUNTIME_NAME)
 else
-  BYTELINK_FLAGS=-custom
+  BYTELINK_FLAGS=-custom $(SET_RELATIVE_STDLIB)
 endif
 
 OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
@@ -187,7 +187,8 @@ $(OCAMLDOC): $(EXECMOFILES)
 $(eval $(call PROGRAM_SYNONYM,ocamldoc.opt))
 
 $(OCAMLDOC_OPT): $(EXECMXFILES)
-	$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_NCLIBRARIES) $^
+	$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    $(OCAMLDOC_NCLIBRARIES) $^
 
 $(OCAMLDOC_LIBCMA): $(LIBCMOFILES)
 	$(OCAMLC) -a -o $@ $(LINKFLAGS) $^

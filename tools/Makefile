@@ -65,7 +65,8 @@ $(programs_byte:%=%$(EXE)):
     -o $@ $(filter-out %.cmi,$^)
 
 $(programs_opt:%=%$(EXE)):
-	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+	$(CAMLOPT_CMD) $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
 
 clean::
 	rm -f $(programs_byte) $(programs_byte:%=%.exe)
@@ -265,7 +266,8 @@ LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
 
 lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
 lintapidiff.opt$(EXE): $(LINTAPIDIFF)
-	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
+	$(CAMLOPT_CMD) $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
 clean::
 	rm -f -- lintapidiff.opt lintapidiff.opt.exe
 	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj

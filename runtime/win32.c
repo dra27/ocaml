@@ -1118,6 +1118,12 @@ CAMLexport clock_t caml_win32_clock(void)
   return (clock_t)(total / clocks_per_sec);
 }
 
+CAMLexport wchar_t * caml_dirname(const wchar_t * path)
+{
+  /* XXX TODO via _splitpath_s */
+  /* XXX The string should _not_ include a trailing slash */
+}
+
 CAMLexport wchar_t * caml_realpath(const wchar_t * path)
 {
   wchar_t *result = NULL;
