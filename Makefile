@@ -427,6 +427,10 @@ ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
 
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamlc_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
+
 partialclean::
 	rm -rf ocamlc$(EXE)
 
@@ -1099,6 +1103,10 @@ ocamllex: ocamlyacc
 .PHONY: ocamllex.opt
 ocamllex.opt: ocamlopt
 	$(MAKE) -C lex allopt
+
+ifeq "$(IN_COREBOOT_CYCLE)" "true"
+ocamllex_BYTECODE_LINKFLAGS += -set-runtime-default standard_library_default=.
+endif
 
 partialclean::
 	$(MAKE) -C lex clean
