@@ -106,6 +106,9 @@ extern char_os *caml_secure_getenv(char_os const *var);
    cannot be determined, return -1. */
 extern int caml_num_rows_fd(int fd);
 
+/* Returns a copy of the directory name portion of a path */
+extern char_os * caml_dirname(const char_os *);
+
 /* Resolves symlinks, '.' and '..' components, returning a freshly *malloc*'d
    string. */
 extern char_os * caml_realpath(const char_os *);
@@ -173,6 +176,18 @@ CAMLextern void caml_expand_command_line (int *, wchar_t ***);
 #define Is_dir_separator(c) (c == '/')
 
 #endif /* _WIN32 */
+
+/* True if:
+   - dir equals "."
+   - dir equals ".."
+   - dir begins "./"
+   - dir begins "../"
+   The tests for null avoid the need to call strlen_os. */
+#define Is_relative_dir(dir) \
+  (dir[0] == T('.') \
+   && (dir[1] == 0 \
+       || Is_dir_separator(dir[1]) \
+       || (dir[1] == T('.') && (dir[2] == 0 || Is_dir_separator(dir[2])))))
 
 #endif /* CAML_INTERNALS */
 

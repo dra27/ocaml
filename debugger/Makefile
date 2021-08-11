@@ -32,7 +32,7 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
   LINKFLAGS+=-use-prims $(ROOTDIR)/runtime/primitives \
              -use-runtime $(RUNTIME_NAME)
 else
-  LINKFLAGS+=-custom
+  LINKFLAGS+=-custom $(SET_RELATIVE_STDLIB)
 endif
 CAMLDEP=$(BEST_OCAMLDEP)
 DEPFLAGS=-slash

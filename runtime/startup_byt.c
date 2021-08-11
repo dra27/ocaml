@@ -381,10 +381,13 @@ CAMLexport void caml_main(char_os **argv)
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-  if (fd < 0 && (proc_self_exe = caml_executable_name()) != NULL) {
+  proc_self_exe = caml_executable_name();
+  if (fd < 0 && proc_self_exe != NULL) {
     exe_name = proc_self_exe;
     fd = caml_attempt_open(&exe_name, &trail, 0);
   }
+
+  caml_locate_standard_library(proc_self_exe ? proc_self_exe : exe_name);
 
   if (fd < 0) {
     pos = parse_command_line(argv);
@@ -514,6 +517,7 @@ CAMLexport value caml_startup_code_exn(
   }
   exe_name = caml_executable_name();
   if (exe_name == NULL) exe_name = caml_search_exe_in_path(argv[0]);
+  caml_locate_standard_library(exe_name);
   /* Initialize the abstract machine */
   caml_init_gc (caml_init_minor_heap_wsz, caml_init_heap_wsz,
                 caml_init_heap_chunk_sz, caml_init_percent_free,

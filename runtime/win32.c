@@ -1127,3 +1127,9 @@ cleanup:
   CloseHandle(h);
   return result;
 }
+
+CAMLexport wchar_t * caml_dirname(const wchar_t * path)
+{
+  /* XXX TODO via _splitpath_s */
+  /* XXX The string should _not_ include a trailing slash */
+}

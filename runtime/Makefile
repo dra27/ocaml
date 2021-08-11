@@ -26,7 +26,7 @@ BYTECODE_C_SOURCES := $(addsuffix .c, \
   floats str array io extern intern hash sys meta parsing gc_ctrl md5 obj \
   lexing callback debugger weak compact finalise custom dynlink \
   afl $(UNIX_OR_WIN32) bigarray main memprof domain \
-  skiplist codefrag cstr)
+  skiplist codefrag cstr stdlib)
 
 NATIVE_C_SOURCES := $(addsuffix .c, \
   startup_aux startup_nat main fail_nat roots_nat signals \
@@ -35,7 +35,7 @@ NATIVE_C_SOURCES := $(addsuffix .c, \
   lexing $(UNIX_OR_WIN32) printexc callback weak compact finalise custom \
   globroots backtrace_nat backtrace dynlink_nat debugger meta \
   dynlink clambda_checks afl bigarray \
-  memprof domain skiplist codefrag cstr)
+  memprof domain skiplist codefrag cstr stdlib)
 
 GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h
 CONFIG_HEADERS := caml/m.h caml/s.h
@@ -122,6 +122,18 @@ STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_DIR)"'
 else # Unix
 OCAML_STDLIB_DIR = $(LIBDIR)
 STDLIB_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(OCAML_STDLIB_DIR)"'
+endif
+
+ifeq "$(LIBDIR_REL)" ""
+  STDLIB_REL_CPP_FLAG = $(STDLIB_CPP_FLAG)
+else
+ifeq "$(UNIX_OR_WIN32)" "win32"
+  OCAML_STDLIB_REL = \
+$(shell echo $(LIBDIR)| iconv -t JAVA | sed -e 's/\\u/\\x/g')
+  STDLIB_REL_CPP_FLAG = -DOCAML_STDLIB_DIR='L"$(OCAML_STDLIB_REL)"'
+else
+  STDLIB_REL_CPP_FLAG = -DOCAML_STDLIB_DIR='"$(LIBDIR_REL)"'
+endif
 endif
 
 OC_CPPFLAGS += $(IFLEXDIR)
@@ -275,19 +287,19 @@ caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
 
 # Libraries and programs
 
-ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
+ocamlrun$(EXE): prims.$(O) stdlib.$(O) libcamlrun.$(A)
 	$(call MAKE_OCAMLRUN,$@,$^ $(LIBS))
 
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
+ocamlrund$(EXE): prims.$(O) stdlib.$(O) libcamlrund.$(A)
 	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(LIBS)
 
 libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlruni$(EXE): prims.$(O) libcamlruni.$(A)
+ocamlruni$(EXE): prims.$(O) stdlib.$(O) libcamlruni.$(A)
 	$(MKEXE) -o $@ $^ $(LIBS)
 
 libcamlruni.$(A): $(libcamlruni_OBJECTS)
@@ -371,7 +383,11 @@ endif
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type))))
 
-dynlink.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
+startup_byt.%.$(O): OC_CPPFLAGS += -DHOST='"$(HOST)"'
+
+stdlib.%.$(O): OC_CPPFLAGS += $(STDLIB_CPP_FLAG)
+
+stdlib.$(O): OC_CPPFLAGS += $(STDLIB_REL_CPP_FLAG)
 
 $(foreach object_type,$(subst %,,$(object_types)), \
   $(eval dynlink$(object_type).$(O): $(ROOTDIR)/Makefile.config))

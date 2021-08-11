@@ -96,6 +96,25 @@ CAMLdeprecated_typedef(addr, char *);
 #define CAMLweakdef
 #endif
 
+/* PE doesn't support ELF's weak symbols, but the selectany attribute can be
+   used to get close to this for a global variable declared weakly in a library
+   which is overridden in an object.
+
+   The global variable in the runtime is defined with CAMLweakglobal and then
+   overriding instances (e.g. for -make-runtime or -output-complete-exe) are
+   defined with CAMLweakoverride. */
+#ifdef _WIN32
+#ifdef _MSC_VER
+  #define CAMLweakglobal __declspec(selectany)
+#else
+  #define CAMLweakglobal __attribute__((selectany))
+#endif
+  #define CAMLweakoverride CAMLweakglobal
+#else
+  #define CAMLweakglobal CAMLweakdef
+  #define CAMLweakoverride
+#endif
+
 /* Alignment is necessary for domain_state.h, since the code generated */
 /* by ocamlopt makes direct references into the domain state structure,*/
 /* which is stored in a register on many platforms. For this to work, */
