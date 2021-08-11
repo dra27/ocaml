@@ -537,6 +537,12 @@ CAMLexport void caml_main(char_os **argv)
   }
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
+
+  /* Load the embedded runtime parameters */
+  char_os *orun = read_section_to_os(fd, &trail, "ORUN");
+  if (orun != NULL)
+    caml_standard_library_default = orun;
+
   /* Initialize the abstract machine */
   caml_init_gc ();
 
