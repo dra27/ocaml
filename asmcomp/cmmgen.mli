@@ -38,3 +38,6 @@ val code_segment_table: string list -> Cmm.phrase
 val predef_exception: int -> string -> Cmm.phrase
 val plugin_header: (Cmx_format.unit_infos * Digest.t) list -> Cmm.phrase
 val black_block_header: (*tag:*)int -> (*size:*)int -> nativeint
+
+(** Generate data for a global string constant *)
+val emit_global_string_constant: string -> string -> Cmm.phrase
