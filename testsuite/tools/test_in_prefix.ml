@@ -3075,23 +3075,15 @@ let run ~reproducible (config : Installation.t) env =
             not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
           (~stdlib:false, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
         else if ext = Config.ext_lib || ext = Config.ext_dll then
-          let is_camlrun =
-            let dir = Filename.basename (Filename.dirname file) in
-            dir <> "stublibs"
-              && String.starts_with ~prefix:"libcamlrun" basename
-              && not (String.starts_with ~prefix:"libcamlruntime" basename)
-          in
           if ext = Config.ext_lib then
             let is_ocaml =
               Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
             let stdlib =
-              is_camlrun
-              || Filename.remove_extension basename = "ocamlcommon"
-            in
+              Filename.remove_extension basename = "ocamlcommon" in
             let c_debug = not is_ocaml in
             (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
           else
-            (~stdlib:is_camlrun, ~ocaml_debug:false, ~c_debug:true, ~s:false)
+            (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:false)
         else
           (~stdlib:false, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       in
