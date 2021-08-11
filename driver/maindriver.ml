@@ -65,6 +65,12 @@ let main argv ppf =
              (P.available_pass_names ~filter:(fun _ -> true) ~native:false))
       | Some (P.Scheduling | P.Emit) -> assert false (* native only *)
     end;
+    if !global_string_constants <> []
+       && (!make_archive
+          || !make_package
+          || (!output_c_object && not !output_complete_executable)) then
+      Compenv.fatal "-set-global-string cannot be used with -pack, -a or \
+                     -output-object";
     if !make_archive then begin
       Compmisc.init_path ();
 
