@@ -47,6 +47,7 @@ let cmi_file = ref None
 let compile_only = ref false            (* -c *)
 and output_name = ref (None : string option) (* -o *)
 and include_dirs = ref ([] : string list)(* -I *)
+and standard_library_default = ref None (* -set-runtime-default *)
 and no_std_include = ref false          (* -nostdlib *)
 and no_cwd = ref false                  (* -nocwd *)
 and print_types = ref false             (* -i *)
