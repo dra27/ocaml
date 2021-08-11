@@ -26,6 +26,7 @@ module Name = struct
     | DBUG (** debug info *)
     | DLLS (** dll names *)
     | DLPT (** dll paths *)
+    | ORUN (** embedded runtime parameters  *)
     | PRIM (** primitives names *)
     | RNTM (** The path to the bytecode interpreter (use_runtime mode) *)
     | SYMB (** global identifiers *)
@@ -37,6 +38,7 @@ module Name = struct
     | "DLPT" -> DLPT
     | "DLLS" -> DLLS
     | "DATA" -> DATA
+    | "ORUN" -> ORUN
     | "PRIM" -> PRIM
     | "SYMB" -> SYMB
     | "DBUG" -> DBUG
@@ -52,6 +54,7 @@ module Name = struct
     | DLPT -> "DLPT"
     | DLLS -> "DLLS"
     | DATA -> "DATA"
+    | ORUN -> "ORUN"
     | PRIM -> "PRIM"
     | SYMB -> "SYMB"
     | DBUG -> "DBUG"
