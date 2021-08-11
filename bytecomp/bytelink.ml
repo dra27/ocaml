@@ -635,6 +635,13 @@ let link_bytecode ?final_name tolink exec_name standalone =
            Bytesections.record toc_writer OSLD
        | None -> ()
        end;
+       begin match Compenv.overridden_runtime_parameters () with
+       | Some ocamlrunparam when standalone ->
+           (* Embedded runtime defaults *)
+           output_string outchan ocamlrunparam;
+           Bytesections.record toc_writer ORUN;
+       | _ -> ()
+       end;
        (* The map of global identifiers *)
        Symtable.output_global_map outchan;
        Bytesections.record toc_writer SYMB;
@@ -741,13 +748,18 @@ let c_string_literal_of_string s =
   Buffer.add_char b '"';
   Buffer.contents b
 
+let emit_global_constant outchan name value =
+  let value = Option.fold ~none:"NULL" ~some:c_string_literal_of_string value in
+  Printf.fprintf outchan "const char_os * %s = %s;\n" name value
+
 let emit_runtime_standard_library_default outchan =
   let stdlib =
-    let default = Config.standard_library_effective in
-    Option.value ~default !Clflags.standard_library_default in
-  let literal = c_string_literal_of_string stdlib in
-  Printf.fprintf outchan
-    "const char_os * caml_runtime_standard_library_default = %s;\n" literal
+    if !Clflags.standard_library_default = None then
+      Some Config.standard_library_effective
+    else
+      !Clflags.standard_library_default
+  in
+  emit_global_constant outchan "caml_runtime_standard_library_default" stdlib
 
 (* Output a bytecode executable as a C file *)
 
@@ -811,6 +823,8 @@ static char caml_sections[] = {
 };
 
 |};
+       emit_global_constant outchan "caml_executable_ocamlrunparam"
+                            (Compenv.overridden_runtime_parameters ());
        emit_runtime_standard_library_default outchan;
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
@@ -977,6 +991,8 @@ enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
 
 |};
          Symtable.output_primitive_table poc;
+         emit_global_constant poc "caml_executable_ocamlrunparam"
+                              (Compenv.overridden_runtime_parameters ());
          emit_runtime_standard_library_default poc;
          output_string poc {|
 #ifdef __cplusplus
