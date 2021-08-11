@@ -243,6 +243,8 @@ module Stdlib = struct
 
     let print ppf t =
       Format.pp_print_string ppf t
+
+    external escaped_c : string -> string = "caml_format_c_string_literal"
   end
 
   external compare : 'a -> 'a -> int = "%compare"
