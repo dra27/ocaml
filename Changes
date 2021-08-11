@@ -55,6 +55,10 @@ OCaml 4.12, maintenance version
   Makefile.config.
   (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
 
+- #14???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Internal/compiler-libs changes:
 
 - #12896: Simplify the compilation of custom bytecode runtimes by explicitly
