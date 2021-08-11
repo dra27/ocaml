@@ -747,6 +747,10 @@ OCaml 5.3.0 (8 January 2025)
   LLDB support for them.
   (Nick Barnes, review by Tim McGilchrist and Gabriel Scherer)
 
+- #13???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Toplevel:
 
 - #12891: Improved styling for initial prompt
