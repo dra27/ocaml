@@ -39,6 +39,8 @@ let fatal err =
   prerr_endline err;
   exit 2
 
+let fatalf fmt = Printf.ksprintf fatal fmt
+
 let extract_output = function
   | Some s -> s
   | None ->
@@ -671,4 +673,15 @@ let process_deferred_actions env =
       | _ -> false) !deferred_actions then
     fatal "Option -a cannot be used with .cmxa input files.";
   List.iter (process_action env) (List.rev !deferred_actions);
-  output_name := final_output_name;
+  output_name := final_output_name
+
+let parse_runtime_parameter opt =
+  let k, setting =
+    try Misc.cut_at opt '='
+    with Not_found ->
+      fatalf "-set-runtime-default: invalid runtime parameter '%s'. \
+              Expected <name>=<value>." opt in
+    if k = "standard_library_default" then
+      Clflags.standard_library_default := Some setting
+    else
+      fatalf "-set-runtime-default: unrecognized runtime parameter %s." k
