@@ -35,6 +35,7 @@
 #include "caml/osdeps.h"
 #include "caml/prims.h"
 #include "caml/signals.h"
+#include "caml/startup.h"
 
 #include "build_config.h"
 
