@@ -19,6 +19,39 @@ open Misc
 open Config
 open Cmo_format
 
+module Bytes = struct
+  include Bytes
+
+  external unsafe_set_uint16_ne : bytes -> int -> int -> unit
+                                = "%caml_bytes_set16u"
+
+  external swap16 : int -> int = "%bswap16"
+
+  let unsafe_set_uint16_le b i x =
+    if Sys.big_endian
+    then unsafe_set_uint16_ne b i (swap16 x)
+    else unsafe_set_uint16_ne b i x
+
+
+  let set_utf_16le_uchar b i u =
+    let set = unsafe_set_uint16_le in
+    let max = length b - 1 in
+    if i < 0 || i > max then invalid_arg "index out of bounds" else
+    match Uchar.to_int u with
+    | u when u < 0 -> assert false
+    | u when u <= 0xFFFF ->
+        let last = i + 1 in
+        if last > max then 0 else (set b i u; 2)
+    | u when u <= 0x10FFFF ->
+        let last = i + 3 in
+        if last > max then 0 else
+        let u' = u - 0x10000 in
+        let hi = (0xD800 lor (u' lsr 10)) in
+        let lo = (0xDC00 lor (u' land 0x3FF)) in
+        set b i hi; set b (i + 2) lo; 4
+    | _ -> assert false
+end
+
 module In_channel = struct
   let with_open openfun s f =
     let ic = openfun s in
