@@ -473,6 +473,7 @@ CAMLexport void caml_main(char_os **argv)
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
   char_os * exe_name, * proc_self_exe;
+  char_os * image_standard_library_default;
 
   /* Initialize the domain */
   caml_init_domain();
@@ -588,8 +589,7 @@ CAMLexport void caml_main(char_os **argv)
      caml_runtime_standard_library_default and caml_standard_library_default are
      fundamentally equal and caml_runtime_standard_library_default is set when
      the -custom executable is linked. */
-  char_os *image_standard_library_default =
-    read_section_to_os(fd, &trail, "OSLD");
+  image_standard_library_default = read_section_to_os(fd, &trail, "OSLD");
   if (image_standard_library_default != NULL)
     caml_standard_library_default = image_standard_library_default;
   caml_stat_free(shared_lib_path);
