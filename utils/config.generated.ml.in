@@ -20,7 +20,9 @@
 
 let bindir = {@QS@|@ocaml_bindir@|@QS@}
 
-let standard_library_default = {@QS@|@ocaml_libdir@|@QS@}
+external standard_library_default : unit -> string = "%standard_library_default"
+
+let standard_library_default = standard_library_default ()
 
 let ccomp_type = {@QS@|@ccomp_type@|@QS@}
 let c_compiler = {@QS@|@CC@|@QS@}
