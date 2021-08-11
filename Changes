@@ -34,6 +34,13 @@ OCaml 5.0 maintenance version
   bytecode from the executable itself, rather than first trying `argv[0]`.
   (David Allsopp, review by Jonah Beckford, Antonin Décimo, Samuel Hym and ???)
 
+### Compiler user-interface and warnings:
+
+- #14244: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp, Jonah Beckford, Antonin Décimo,
+  Samuel Hym and ???)
+
 ### Internal/compiler-libs changes:
 
 - #11763, #11759, #11861: Enable stricter C compilation warnings, use
