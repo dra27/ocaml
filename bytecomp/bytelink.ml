@@ -156,10 +156,9 @@ module In_channel = struct
           loop buf (nread + 1)
     end
 end
-module String = Misc.Stdlib.String
 
 module String = struct
-  include String
+  include Misc.Stdlib.String
 
   let exists p s =
     let n = length s in
