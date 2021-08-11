@@ -244,6 +244,9 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
       (Cmm_helpers.emit_global_string_constant
         "caml_standard_library_nat" standard_library_default)
   end;
+  compile_phrase (Cmm_helpers.emit_global_char_os_constant
+                    "caml_executable_ocamlrunparam"
+                    (Compenv.overridden_runtime_parameters ()));
   compile_phrase (Cmm_helpers.global_table name_list);
   let globals_map = make_globals_map units_list ~crc_interfaces in
   compile_phrase (Cmm_helpers.globals_map globals_map);
