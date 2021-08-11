@@ -448,6 +448,8 @@ extern double caml_log1p(double);
 
 #define caml_stat_strdup_to_os caml_stat_strdup_to_utf16
 #define caml_stat_strdup_of_os caml_stat_strdup_of_utf16
+#define caml_stat_char_array_to_os caml_stat_char_array_to_utf16
+#define caml_stat_char_array_of_os caml_stat_char_array_of_utf16
 #define caml_copy_string_of_os caml_copy_string_of_utf16
 
 #else /* _WIN32 */
@@ -488,6 +490,8 @@ extern double caml_log1p(double);
 
 #define caml_stat_strdup_to_os caml_stat_strdup
 #define caml_stat_strdup_of_os caml_stat_strdup
+#define caml_stat_char_array_to_os caml_stat_memdup
+#define caml_stat_char_array_of_os caml_stat_memdup
 #define caml_copy_string_of_os caml_copy_string
 
 #endif /* _WIN32 */
