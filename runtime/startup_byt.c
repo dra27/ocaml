@@ -543,6 +543,7 @@ CAMLexport void caml_main(char_os **argv)
   }
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
+
   /* Initialize the abstract machine */
   caml_init_gc ();
 
@@ -566,6 +567,20 @@ CAMLexport void caml_main(char_os **argv)
   req_prims = read_section(fd, &trail, "PRIM");
   if (req_prims == NULL) caml_fatal_error("no PRIM section");
   caml_build_primitive_table(shared_lib_path, shared_libs, req_prims);
+  /* Load the embedded overridden caml_standard_library_default value, if one is
+     available. This value is set _after_ caml_build_primitive_table has been
+     called, because ocamlrun must use the value it was configured with. Note
+     that although -custom executables come through this mechanism, they don't
+     have any DLLS to load.
+     XXX Intend to change that - -custom executables should embed their
+         standard_library_default in the same way as ocamlrun, but also set the
+         appropriate flag to disable all the DLLS section machinery, meaning
+         that they won't use this mechanism at all (at present -custom
+         executables can still have OSLD sections) */
+  char_os *image_standard_library_default =
+    read_section_to_os(fd, &trail, "OSLD");
+  if (image_standard_library_default != NULL)
+    caml_standard_library_default = image_standard_library_default;
   caml_stat_free(shared_lib_path);
   caml_stat_free(shared_libs);
   caml_stat_free(req_prims);
