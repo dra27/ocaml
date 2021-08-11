@@ -15,6 +15,10 @@ Working version
 
 ### Tools:
 
+- #13???: Add -set-runtime-default option to the compiler, allowing the default
+  value of the Standard Library location used by the runtime to be overridden.
+  (Antonin Décimo, review by David Allsopp)
+
 ### Manual and documentation:
 
 ### Compiler user-interface and warnings:
