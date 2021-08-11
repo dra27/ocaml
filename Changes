@@ -139,6 +139,10 @@ Working version
   (Nicolás Ojeda Bär, review by Stephen Dolan, Anil Madhavapeddy, and Xavier
   Leroy)
 
+- #12???: Add -set-global-string option to both compilers, allowing a C symbol
+  to be added to the binary with the given name and value.
+  (David Allsopp, review by ???)
+
 ### Standard library:
 
 * #11565: Enable -strict-formats by default. Some incorrect format
