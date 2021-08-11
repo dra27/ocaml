@@ -26,6 +26,7 @@
 #include "caml/memory.h"
 #include "caml/mlvalues.h"
 #include "caml/misc.h"
+#include "caml/osdeps.h"
 
 /* returns a number of bytes (chars) */
 CAMLexport mlsize_t caml_string_length(value s)
@@ -471,4 +472,18 @@ CAMLprim value caml_string_of_bytes(value bv)
 CAMLprim value caml_bytes_of_string(value bv)
 {
   return bv;
+}
+
+CAMLprim value caml_format_c_string_literal(value s)
+{
+  CAMLparam1(s);
+  CAMLlocal1(result);
+  char *str = caml_stat_strdup_of_os(String_val(s));
+  char *converted = caml_emit_c_string(str);
+  caml_stat_free(str);
+  if (converted == NULL)
+    caml_raise_out_of_memory();
+  result = caml_copy_string(converted);
+  free(converted);
+  CAMLreturn(result);
 }
