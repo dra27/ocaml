@@ -174,6 +174,10 @@ val model: string
 val system: string
 (** Name of operating system for the native-code compiler *)
 
+val target_win32: bool
+(** True if [target_os_type = "Win32"]
+    @since 5.4 *)
+
 val asm: string
 (** The assembler (and flags) to use for assembling
     ocamlopt-generated code. *)
