@@ -1831,7 +1831,7 @@ type outcome =
    executed in [env]. The compiler is invoked explicitly (PATH-resolution is not
    used). [~original] indicates whether the compiler is still in its original
    prefix (i.e. the prefix has not yet been renamed). *)
-let compile_test ~original env bindir =
+let compile_test ~original env bindir libdir =
   let runtime =
     (* ocamlopt is always executable after rename as it's ocamlopt.opt *)
     if original || ocamlc_executable_after_rename then
@@ -2037,6 +2037,21 @@ let compile_test ~original env bindir =
         else
           options
       in
+      let options =
+        if original then
+          let new_libdir = Filename.concat (prefix ^ ".new") libdir_suffix in
+          let stdlib_default = "standard_library_default=" ^ new_libdir in
+          let options = "-set-runtime-default" :: stdlib_default :: options in
+          match test with
+          | Default_ocamlc ->
+              (* XXX Temp - fairly sure "Temp" here refers to matching on test,
+                            not the fact we test -dllpath! *)
+              "-dllpath" :: (Filename.concat libdir "stublibs") :: options
+          | _ ->
+              options
+        else
+          options
+      in
       let args =
         "-I" :: "+compiler-libs" :: ocamlcommon ::
         "-I" :: "+unix" :: unix ::
@@ -2233,7 +2248,7 @@ let compiler_where env ?runtime compiler =
 (* This test verifies both that all compilation mechanisms are working and that
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
-let test_standard_library_location ~original env bindir =
+let test_standard_library_location ~original env bindir libdir =
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 display_path bindir;
   let ocamlc = Filename.concat bindir (exe "ocamlc") in
@@ -2254,7 +2269,7 @@ let test_standard_library_location ~original env bindir =
   in
   Format.printf "ocamlc -where: %a\nocamlopt -where: %a\n%!"
                 display_path ocamlc_where display_path ocamlopt_where;
-  let compile_test = compile_test ~original env bindir in
+  let compile_test = compile_test ~original env bindir libdir in
   let tests = [
     compile_test Default_ocamlc
       "byt_default" "with tender";
@@ -2297,7 +2312,7 @@ let test_standard_library_location ~original env bindir =
       Some (Filename.concat bindir (exe "ocamlrun"))
   in
   Printf.printf "Running programs\n%!";
-  List.filter_map (fun f -> f ?runtime env ~arg:true) programs
+  List.filter_map (fun f -> f ?runtime env ~arg:(not original)) programs
 
 let utf_16le_of_utf_8 s =
   let s = Misc.Stdlib.String.to_utf_8_seq s in
@@ -2679,7 +2694,7 @@ let run_tests ~original env bindir libdir libraries =
     load_libraries_in_prog ~original env bindir libdir Native libraries;
   test_ld_conf ~original env bindir libdir;
   test_bytecode_binaries ~original env bindir;
-  test_standard_library_location ~original env bindir
+  test_standard_library_location ~original env bindir libdir
 
 let () =
   (* Run all tests in the supplied prefix *)
@@ -2718,7 +2733,7 @@ let () =
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
   in
-  List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
+  List.iter (fun f -> assert (f ?runtime env ~arg:true = None)) programs;
   let env =
     let env = Shim {caml_ld_library_path = None; ocamllib} in
     Environment.make ~env bindir libdir in
