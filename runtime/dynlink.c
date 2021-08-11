@@ -205,6 +205,10 @@ CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
   return result;
 }
 
+#ifndef NATIVE_CODE
+static int stdlib_override = 0;
+#endif
+
 /* Exposes caml_parse_ld_conf as a primitive for the bytecode compiler, saving
    the duplication of the logic with the bytecode compiler. */
 CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
@@ -212,13 +216,25 @@ CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
   CAMLparam1(vstdlib);
   CAMLlocal3(list, str, cell);
 
-  char_os *stdlib = caml_stat_strdup_to_os(String_val(vstdlib));
+  char_os *stdlib;
   struct ext_table table;
   char_os *tofree;
   int i;
+#ifndef NATIVE_CODE
+  if (stdlib_override)
+    stdlib = (char_os *)caml_runtime_standard_library_default;
+  else
+#endif
+    stdlib = caml_stat_strdup_to_os(String_val(vstdlib));
   caml_ext_table_init(&table, 8);
   tofree = caml_parse_ld_conf(stdlib, &table);
-  caml_stat_free(stdlib);
+#ifndef NATIVE_CODE
+  if (!stdlib_override)
+#endif
+    caml_stat_free(stdlib);
+#ifndef NATIVE_CODE
+  stdlib_override = 0;
+#endif
 
   list = Val_emptylist;
   for (i = table.size - 1; i >= 0; i--) {
@@ -236,6 +252,12 @@ CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
 }
 
 #ifndef NATIVE_CODE
+
+CAMLprim value caml_dynlink_parse_runtime_ld_conf(value ignored)
+{
+  stdlib_override = 1;
+  return Val_unit;
+}
 
 /* Open the given shared library and add it to shared_libs.
    Abort on error. */
