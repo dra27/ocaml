@@ -236,6 +236,10 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Array.iteri
     (fun i name -> compile_phrase (Cmmgen.predef_exception i name))
     Runtimedef.builtin_exceptions;
+  List.iter
+    (fun (name, value) ->
+      compile_phrase (Cmmgen.emit_global_string_constant name value))
+    !Clflags.global_string_constants;
   compile_phrase (Cmmgen.global_table name_list);
   let globals_map = make_globals_map units_list ~crc_interfaces in
   compile_phrase (Cmmgen.globals_map globals_map);
