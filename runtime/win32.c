@@ -903,28 +903,57 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
   return v;
 }
 
-CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+Caml_inline wchar_t *strndup_to_utf16(const char *s,
+                                      size_t len, size_t *out_len)
 {
   wchar_t * ws;
   int retcode;
 
-  retcode = win_multi_byte_to_wide_char(s, -1, NULL, 0);
-  ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
-  win_multi_byte_to_wide_char(s, -1, ws, retcode);
+  retcode = win_multi_byte_to_wide_char(s, len, NULL, 0);
+  ws = caml_stat_alloc_noexc(retcode * sizeof(wchar_t));
+  win_multi_byte_to_wide_char(s, len, ws, retcode);
+  if (out_len != NULL)
+    *out_len = retcode;
 
   return ws;
 }
 
-CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+Caml_inline caml_stat_string strndup_of_utf16(const wchar_t *s,
+                                              size_t len, size_t *out_len)
 {
   caml_stat_string out;
   int retcode;
 
-  retcode = win_wide_char_to_multi_byte(s, -1, NULL, 0);
+  retcode = win_wide_char_to_multi_byte(s, len, NULL, 0);
   out = caml_stat_alloc(retcode);
-  win_wide_char_to_multi_byte(s, -1, out, retcode);
+  win_wide_char_to_multi_byte(s, len, out, retcode);
+  if (out_len != NULL)
+    *out_len = retcode;
 
   return out;
+}
+
+CAMLexport wchar_t *caml_stat_strndup_to_utf16(const char *s,
+                                               size_t len, size_t *out_len)
+{
+  return strndup_to_utf16(s, len, out_len);
+}
+
+CAMLexport caml_stat_string caml_stat_strndup_of_utf16(const wchar_t *s,
+                                                       size_t len,
+                                                       size_t *out_len)
+{
+  return strndup_of_utf16(s, len, out_len);
+}
+
+CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+{
+  return strndup_to_utf16(s, -1, NULL);
+}
+
+CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+{
+  return strndup_of_utf16(s, -1, NULL);
 }
 
 void caml_probe_win32_version(void)
