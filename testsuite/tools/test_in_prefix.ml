@@ -2028,7 +2028,7 @@ let run_program =
       if Environment.is_renamed env then
         stdlib_exists_when_renamed
       else
-        true in
+        false in
     let args = [string_of_bool stdlib_exists; prefix; libdir_suffix] in
     let argv0 =
       if argv0 = test_program then
@@ -2287,6 +2287,19 @@ let compile_test env =
         else
           options
       in
+      let options =
+        if Environment.is_renamed env then
+          options
+        else
+          let new_libdir = Filename.concat (prefix ^ ".new") libdir_suffix in
+          let stdlib_default = "standard_library_default=" ^ new_libdir in
+          let options = "-set-runtime-default" :: stdlib_default :: options in
+          if tendered then
+            let libdir = Environment.libdir env in
+            "-dllpath" :: (Filename.concat libdir "stublibs") :: options
+          else
+            options
+      in
       let args =
         "-o" :: output ::
         "test_install_script.ml" :: options
@@ -2340,7 +2353,7 @@ let compile_test env =
           `None
         else
           let stdlib_exists_when_renamed =
-            false in
+            not (Environment.is_renamed env) in
           (* Each test is compiled twice - in the original prefix
              (~original:true) and in the renamed prefix (~original:false).
              Additionally, the tests compiled in the original prefix are
