@@ -26,8 +26,13 @@ val version: string
 val bindir: string
 (** The directory containing the binary programs *)
 
+val standard_library_default: string
+(** The configured value for the directory containing the standard libraries
+
+    @since 5.4 *)
+
 val standard_library: string
-(** The directory containing the standard libraries *)
+(** The effective directory containing the standard libraries *)
 
 val ccomp_type: string
 (** The "kind" of the C compiler, assembler and linker used: one of
@@ -179,7 +184,21 @@ val target_os_type: string
 (** Operating system targetted by the native-code compiler. One of
 -  ["Unix"] (for all Unix versions, including Linux and macOS),
 -  ["Win32"] (for MS-Windows, OCaml compiled with MSVC++ or MinGW-w64),
--  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin). *)
+-  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin).
+
+    @since 5.4 *)
+
+val target_unix: bool
+(** True if [target_os_type = "Unix"]
+    @since 5.4 *)
+
+val target_win32: bool
+(** True if [target_os_type = "Win32"]
+    @since 5.4 *)
+
+val target_cygwin: bool
+(** True if [target_os_type = "Cygwin"]
+    @since 5.4 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling

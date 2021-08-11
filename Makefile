@@ -1301,23 +1301,20 @@ endif
 
 
 libcamlrun_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.b.$(O)) $(winpthreads_OBJECTS) \
-  runtime/stdlib.$(O)
+  $(runtime_BYTECODE_C_SOURCES:.c=.b.$(O)) $(winpthreads_OBJECTS)
 
 libcamlrun_non_shared_OBJECTS = \
   $(subst $(UNIX_OR_WIN32).b.$(O),$(UNIX_OR_WIN32)_non_shared.b.$(O), \
           $(libcamlrun_OBJECTS))
 
 libcamlrund_OBJECTS = $(runtime_BYTECODE_C_SOURCES:.c=.bd.$(O)) \
-  $(winpthreads_OBJECTS) runtime/instrtrace.bd.$(O) runtime/stdlib.$(O)
+  $(winpthreads_OBJECTS) runtime/instrtrace.bd.$(O)
 
 libcamlruni_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.bi.$(O)) $(winpthreads_OBJECTS) \
-  runtime/stdlib.$(O)
+  $(runtime_BYTECODE_C_SOURCES:.c=.bi.$(O)) $(winpthreads_OBJECTS)
 
 libcamlrunpic_OBJECTS = \
-  $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(winpthreads_OBJECTS) \
-  runtime/stdlib.$(O)
+  $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(winpthreads_OBJECTS)
 
 libasmrun_OBJECTS = \
   $(runtime_NATIVE_C_SOURCES:.c=.n.$(O)) $(runtime_ASM_OBJECTS) \
@@ -1405,10 +1402,12 @@ runtime/stdlib.$(O): runtime/build_config.h
 
 ## Runtime libraries and programs
 
-runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
+runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                        runtime/libcamlrun.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
-runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
+runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                         runtime/libcamlrun_non_shared.$(A)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
 
 runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
@@ -1417,13 +1416,15 @@ runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
 runtime/libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 
-runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/libcamlrund.$(A)
+runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                         runtime/libcamlrund.$(A)
 	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS)
 
 runtime/libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 
-runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/libcamlruni.$(A)
+runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/stdlib.$(O) \
+                         runtime/libcamlruni.$(A)
 	$(V_MKEXE)$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(BYTECCLIBS)
 
 runtime/libcamlruni.$(A): $(libcamlruni_OBJECTS)
