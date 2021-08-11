@@ -24,6 +24,13 @@ OCaml 4.11 maintenance branch
 * #10723: do not use `-flat-namespace` linking for macOS.
   (Carlo Cabrera, review by Damien Doligez)
 
+* #11449, #13497: Add caml_stat_char_array_{to,of}_os functions allowing
+  conversion of string data which may contain NUL characters. Correct
+  implementation of caml_stat_strdup_to_utf16 to raise Out_of_memory instead of
+  returning of NULL (the behaviour of caml_stat_strdup_to_os was inconsistent
+  between Unix/Windows).
+  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
+
 - #11763, #11759, #11861, #12509, #12577: Use strict prototypes on primitives.
   (Antonin Décimo, review by Xavier Leroy, David Allsopp, Sébastien
    Hinderer and Nick Barnes)
@@ -35,18 +42,6 @@ OCaml 4.11 maintenance branch
   shared_libs_path item in `ocamlrun -config` in addition to displaying the
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
-
-* #13497: Correct implementation of caml_stat_strdup_to_utf16 to raise
-  Out_of_memory instead of returning of NULL (the behaviour of
-  caml_stat_strdup_to_os was inconsistent between Unix/Windows).
-  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
-
-### Code generation and optimizations:
-
-- #9752: Revised handling of calling conventions for external C functions.
-  Provide a more precise description of the types of unboxed arguments,
-  so that the ARM64 iOS/macOS calling conventions can be honored.
-  (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
 
 ### Compiler user-interface and warnings:
 
