@@ -2667,6 +2667,13 @@ let predef_exception i name =
   in
   Cdata data_items
 
+let emit_global_string_constant name value =
+  let value_sym = Compilenv.new_const_symbol () in
+  Cdata(Cglobal_symbol name ::
+        Cdefine_symbol name ::
+        Csymbol_address value_sym ::
+        emit_string_constant (value_sym, Local) value [])
+
 (* Header for a plugin *)
 
 let plugin_header units =

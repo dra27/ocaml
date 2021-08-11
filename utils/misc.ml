@@ -238,6 +238,8 @@ module Stdlib = struct
         else
           s
 
+    external escaped_c : string -> string = "caml_format_c_string_literal"
+
     let print ppf t =
       Format.pp_print_string ppf t
   end
