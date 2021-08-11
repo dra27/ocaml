@@ -317,6 +317,11 @@ let dump_byte ic =
            | SYMB ->
                let symb = Bytesections.read_section_struct toc ic section in
                print_global_table symb
+           | ORUN ->
+               let caml_standard_library_default =
+                 Bytesections.read_section_string toc ic section in
+               printf "caml_standard_library_default: %s\n"
+                      caml_standard_library_default
            | _ -> ()
        with _ -> ()
     )
