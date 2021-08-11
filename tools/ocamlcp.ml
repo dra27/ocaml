@@ -100,6 +100,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _rectypes = option "-rectypes"
   let _no_rectypes = option "-no-rectypes"
   let _runtime_variant s = option_with_arg "-runtime-variant" s
+  let _set_runtime_default s = option_with_arg "-set-runtime-default" s
   let _safe_string = option "-safe-string"
   let _short_paths = option "-short-paths"
   let _strict_sequence = option "-strict-sequence"
