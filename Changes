@@ -126,6 +126,10 @@ Working version
   `.size` and `.type` directives and the `.note.GNU-stack` section
   (Samuel Hym, review by Miod Vallat, Antonin Décimo and Gabriel Scherer)
 
+- #13???: Add -set-global-string option to both compilers, allowing a C symbol
+  to be added to the binary with the given name and value.
+  (David Allsopp, review by ???)
+
 ### Standard library:
 
 - #13768: Add Either.get_left and Either.get_right
