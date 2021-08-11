@@ -26,6 +26,7 @@ module Name = struct
     | DBUG (** debug info *)
     | DLLS (** dll names *)
     | DLPT (** dll paths *)
+    | ORUN (** embedded runtime parameters  *)
     | PRIM (** primitives names *)
     | RNTM (** The path to the bytecode interpreter (use_runtime mode) *)
     | SYMB (** global identifiers *)
@@ -34,14 +35,15 @@ module Name = struct
   let of_string name =
     match name with
     | "CODE" -> CODE
-    | "DLPT" -> DLPT
-    | "DLLS" -> DLLS
-    | "DATA" -> DATA
-    | "PRIM" -> PRIM
-    | "SYMB" -> SYMB
-    | "DBUG" -> DBUG
     | "CRCS" -> CRCS
+    | "DATA" -> DATA
+    | "DBUG" -> DBUG
+    | "DLLS" -> DLLS
+    | "DLPT" -> DLPT
+    | "ORUN" -> ORUN
+    | "PRIM" -> PRIM
     | "RNTM" -> RNTM
+    | "SYMB" -> SYMB
     | name   ->
         if String.length name <> 4 then
           invalid_arg "Bytesections.Name.of_string: must be of size 4";
@@ -49,14 +51,15 @@ module Name = struct
 
   let to_string = function
     | CODE -> "CODE"
-    | DLPT -> "DLPT"
-    | DLLS -> "DLLS"
-    | DATA -> "DATA"
-    | PRIM -> "PRIM"
-    | SYMB -> "SYMB"
-    | DBUG -> "DBUG"
     | CRCS -> "CRCS"
+    | DATA -> "DATA"
+    | DBUG -> "DBUG"
+    | DLLS -> "DLLS"
+    | DLPT -> "DLPT"
+    | ORUN -> "ORUN"
+    | PRIM -> "PRIM"
     | RNTM -> "RNTM"
+    | SYMB -> "SYMB"
     | Other n -> n
 end
 
