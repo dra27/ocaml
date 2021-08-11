@@ -127,7 +127,7 @@ CAMLextern int win_wide_char_to_multi_byte(const wchar_t* s,
                                        char *out,
                                        int outlen);
 
-/* [caml_stat_strdup_to_utf16(s)] returns a NULL-terminated copy of [s],
+/* [caml_stat_strdup_to_utf16(s)] returns a NUL-terminated copy of [s],
    re-encoded in UTF-16.  The encoding of [s] is assumed to be UTF-8 if
    [caml_windows_unicode_runtime_enabled] is non-zero **and** [s] is valid
    UTF-8, or the current Windows code page otherwise.
@@ -135,20 +135,59 @@ CAMLextern int win_wide_char_to_multi_byte(const wchar_t* s,
    The returned string is allocated with [caml_stat_alloc], so it should be
    freed using [caml_stat_free].
 
-   If allocation fails, this raises Out_of_memory.
+   If allocation fails, this raises Out_of_memory. This function may also raise
+   [Sys_error] if [s] is not valid UTF-8.
 */
 CAMLextern wchar_t* caml_stat_strdup_to_utf16(const char *s);
 
-/* [caml_stat_strdup_of_utf16(s)] returns a NULL-terminated copy of [s],
+/* [caml_stat_strdup_of_utf16(s)] returns a NUL-terminated copy of [s],
    re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero or
    the current Windows code page otherwise.
 
    The returned string is allocated with [caml_stat_alloc], so it should be
    freed using [caml_stat_free].
 
-   If allocation fails, this raises Out_of_memory.
+   If allocation fails, this raises Out_of_memory. This function may also raise
+   [Sys_error] if [s] is not valid UTF-16.
 */
 CAMLextern char* caml_stat_strdup_of_utf16(const wchar_t *s);
+
+/* [caml_stat_char_array_to_utf16(s, size, &out_size)] returns a copy of the
+   first [size] bytes of [s] re-encoded in UTF-16. [s] does not have to be NUL-
+   terminated and may contain embedded NUL characters. The encoding of [s] is
+   assumed to be UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero
+   **and** [s] is valid UTF-8, or the current Windows code page otherwise. If
+   [out_size] is not [NULL], then the number of UTF-16 code units in the result
+   is recorded in [*out_size].
+
+   [size] must be greater than zero.
+
+   The returned buffer is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+
+   If allocation fails, this raises Out_of_memory. This function may also raise
+   [Sys_error] if [s] is not valid UTF-8.
+*/
+CAMLextern wchar_t *caml_stat_char_array_to_utf16(const char *s, size_t size,
+                                                  size_t *out_size);
+
+/* [caml_stat_char_array_of_utf16(s, size, &out_size)] returns a copy of the
+   first [size] UTF-16 code units of [s] re-encoded in UTF-8 if
+   [caml_windows_unicode_runtime_enabled] is non-zero or the current Windows
+   code page otherwise. [s] does not have to be NUL-terminated and may contain
+   embedded NUL characters. If [out_size] is not [NULL], then the size of the
+   result in bytes recorded in [*out_size].
+
+   [size] must be greater than zero.
+
+   The returned buffer is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+
+   If allocation fails, this raises Out_of_memory. This function may also raise
+   [Sys_error] if [s] is not valid UTF-16.
+*/
+CAMLextern char *caml_stat_char_array_of_utf16(const wchar_t *s, size_t size,
+                                               size_t *out_size);
 
 /* [caml_copy_string_of_utf16(s)] returns an OCaml string containing a copy of
    [s] re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero
