@@ -659,6 +659,13 @@ let link_bytecode ?final_name tolink exec_name standalone =
            Bytesections.record toc_writer OSLD
        | None -> ()
        end;
+       begin match Compenv.overridden_runtime_parameters () with
+       | Some ocamlrunparam when standalone ->
+           (* Embedded runtime defaults *)
+           output_string outchan ocamlrunparam;
+           Bytesections.record toc_writer ORUN;
+       | _ -> ()
+       end;
        (* The map of global identifiers *)
        Symtable.output_global_map outchan;
        Bytesections.record toc_writer SYMB;
@@ -840,6 +847,8 @@ static char caml_sections[] = {
 
 |};
        emit_standard_library_default outchan;
+       emit_global_constant outchan "caml_executable_ocamlrunparam"
+                            (Compenv.overridden_runtime_parameters ());
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
@@ -1008,6 +1017,8 @@ enum caml_byte_program_mode caml_byte_program_mode = APPENDED;
 |};
          Symtable.output_primitive_table poc;
          emit_standard_library_default poc;
+         emit_global_constant poc "caml_executable_ocamlrunparam"
+                              (Compenv.overridden_runtime_parameters ());
          output_string poc {|
 #ifdef __cplusplus
 }
