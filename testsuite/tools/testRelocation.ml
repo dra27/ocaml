@@ -235,8 +235,7 @@ let libdir_rules config file =
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            is_camlrun
-            || Filename.remove_extension basename = "dynlink"
+            Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
           (* Prior to #9804 (OCaml 4.12.0), only the runtime objects were
@@ -253,7 +252,7 @@ let libdir_rules config file =
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. The runtime libraries are compiled with -g, but prior to
              #9804 (OCaml 4.12.0) the stub libraries were not *)
-          (not_optionally is_camlrun, false, (dir <> "stublibs"), false)
+          (None, false, (dir <> "stublibs"), false)
       else
         (None, false, false, false)
     in
