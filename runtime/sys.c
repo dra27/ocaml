@@ -59,6 +59,7 @@
 #include "caml/sys.h"
 #include "caml/version.h"
 #include "caml/callback.h"
+#include "caml/startup.h"
 #include "caml/startup_aux.h"
 
 static char * error_message(void)
