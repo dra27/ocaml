@@ -26,7 +26,7 @@ BYTECODE_C_SOURCES := $(addsuffix .c, \
   floats str array io extern intern hash sys meta parsing gc_ctrl md5 obj \
   lexing callback debugger weak compact finalise custom dynlink \
   afl $(UNIX_OR_WIN32) bigarray main memprof domain \
-  skiplist codefrag cstr)
+  skiplist codefrag cstr stdlib)
 
 NATIVE_C_SOURCES := $(addsuffix .c, \
   startup_aux startup_nat main fail_nat roots_nat signals \
@@ -35,7 +35,7 @@ NATIVE_C_SOURCES := $(addsuffix .c, \
   lexing $(UNIX_OR_WIN32) printexc callback weak compact finalise custom \
   globroots backtrace_nat backtrace dynlink_nat debugger meta \
   dynlink clambda_checks afl bigarray \
-  memprof domain skiplist codefrag cstr)
+  memprof domain skiplist codefrag cstr stdlib)
 
 GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
 CONFIG_HEADERS := caml/m.h caml/s.h
@@ -255,11 +255,14 @@ C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
 build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+ifneq "$(LIBDIR_REL)" ""
+	echo '#define OCAML_STDLIB_DIR_REL $(call C_LITERAL,$(LIBDIR_REL))' >> $@
+endif
 	echo '#define HOST "$(HOST)"' >> $@
 
 # Libraries and programs
 
-ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
+ocamlrun$(EXE): prims.$(O) stdlib.$(O) libcamlrun.$(A)
 	$(MKEXE) -o $@ $^ $(LIBS)
 
 ocamlruns$(EXE): prims.$(O) libcamlrun_non_shared.$(A)
@@ -271,13 +274,13 @@ libcamlrun.$(A): $(libcamlrun_OBJECTS)
 libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
+ocamlrund$(EXE): prims.$(O) stdlib.$(O) libcamlrund.$(A)
 	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(LIBS)
 
 libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlruni$(EXE): prims.$(O) libcamlruni.$(A)
+ocamlruni$(EXE): prims.$(O) stdlib.$(O) libcamlruni.$(A)
 	$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(LIBS)
 
 libcamlruni.$(A): $(libcamlruni_OBJECTS)
@@ -360,6 +363,8 @@ endif
 
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type),%)))
+
+stdlib.$(O): OC_CPPFLAGS += -DFOR_OCAMLRUN
 
 $(UNIX_OR_WIN32)_non_shared.%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
 
