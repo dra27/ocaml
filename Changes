@@ -28,6 +28,12 @@ OCaml 4.12, maintenance version
   "unexpected error".
   (Damien Doligez, review by Sébastien Hinderer)
 
+### Compiler user-interface and warnings:
+
+- #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
+  Makefile.config.
+  (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
+
 ### Internal/compiler-libs changes:
 
 - #10045: Add libext variable to ocamltest and enable C# tests on on mingw
