@@ -25,6 +25,8 @@ INSTALL ?= @INSTALL@
 # the build system.
 OC_DLL_LDFLAGS=@oc_dll_ldflags@
 
+NAKED_POINTERS=@naked_pointers@
+
 # The location of the FlexDLL sources to use (usually provided as the flexdll
 # Git submodule)
 FLEXDLL_SOURCES=@flexdir@
