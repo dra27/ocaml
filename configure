@@ -691,6 +691,7 @@ build_os
 build_vendor
 build_cpu
 build
+naked_pointers
 stdlib_manpages
 PACKLD
 flexlink_flags
@@ -2848,6 +2849,7 @@ VERSION=4.08.2+relocatable
 
 
  # TODO: rename this variable
+
 
 
 
@@ -17091,8 +17093,11 @@ fi
 ## No naked pointers
 
 if test x"$enable_naked_pointers" = "xno" ; then :
+  naked_pointers=false
   $as_echo "#define NO_NAKED_POINTERS 1" >>confdefs.h
 
+else
+  naked_pointers=true
 fi
 
 ## Check for mmap support for huge pages and contiguous heap
