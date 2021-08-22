@@ -51,6 +51,10 @@ OCaml 4.11 maintenance branch
   only needed for dllunix.dll).
   (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
 
+- #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
+  Makefile.config.
+  (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
+
 ### Internal/compiler-libs changes:
 
 - #10045: Add libext variable to ocamltest and enable C# tests on on mingw
