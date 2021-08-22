@@ -31,6 +31,8 @@ PTHREAD_CFLAGS=@PTHREAD_CFLAGS@
 
 OCAMLTEST_SYSTEM = @ocamltest_system@
 
+NAKED_POINTERS=@naked_pointers@
+
 # The location of the FlexDLL sources to use (usually provided as the flexdll
 # Git submodule)
 FLEXDLL_SOURCES=@flexdir@
