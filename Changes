@@ -17,6 +17,12 @@ OCaml 4.13 maintenance branch
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
 
+### Compiler user-interface and warnings:
+
+- #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
+  Makefile.config.
+  (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
