@@ -23,6 +23,12 @@ OCaml 4.13 maintenance branch
   "unexpected error".
   (Damien Doligez, review by Sébastien Hinderer)
 
+### Compiler user-interface and warnings:
+
+- #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
+  Makefile.config.
+  (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
