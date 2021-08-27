@@ -53,10 +53,11 @@ end
 (* Fix path to use '/' as directory separator instead of '\'.
    Only under Windows. *)
 
-let fix_slash s =
-  if Sys.os_type = "Unix" then s else begin
-    String.map (function '\\' -> '/' | c -> c) s
-  end
+let fix_slash =
+  if Sys.win32 then
+    String.map (function '\\' -> '/' | c -> c)
+  else
+    Fun.id
 
 (* Since we reinitialize load_path after reading OCAMLCOMP,
   we must use a cache instead of calling Sys.readdir too often. *)
