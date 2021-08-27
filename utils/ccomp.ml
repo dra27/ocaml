@@ -50,7 +50,7 @@ let quote_files lst =
   let quoted = List.map Filename.quote lst in
   let s = String.concat " " quoted in
   if String.length s >= 65536
-  || (String.length s >= 4096 && Sys.os_type = "Win32")
+  || (String.length s >= 4096 && Sys.win32)
   then build_diversion quoted
   else s
 

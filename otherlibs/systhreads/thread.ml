@@ -78,9 +78,10 @@ let preempt signal = yield()
 (* Initialization of the scheduler *)
 
 let preempt_signal =
-  match Sys.os_type with
-  | "Win32" -> Sys.sigterm
-  | _       -> Sys.sigvtalrm
+  if Sys.win32 then
+    Sys.sigterm
+  else
+    Sys.sigvtalrm
 
 let () =
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);

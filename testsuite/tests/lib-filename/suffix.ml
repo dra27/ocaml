@@ -14,7 +14,7 @@ let () =
     | None -> assert false
     | Some base -> assert (base ^ suffix = name)
   in
-  let win32 = Sys.os_type = "Win32" || Sys.os_type = "Cygwin" in
+  let win32 = Sys.win32 || Sys.cygwin in
   full_test ~suffix:".txt" "foo.txt";
   full_test ~suffix:"txt" "foo.txt";
   full_test ~suffix:"" "foo.txt";

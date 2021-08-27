@@ -609,10 +609,10 @@ let append_bytecode bytecode_name exec_name =
    our back. *)
 
 let fix_exec_name name =
-  match Sys.os_type with
-    "Win32" | "Cygwin" ->
-      if String.contains name '.' then name else name ^ ".exe"
-  | _ -> name
+  if not Sys.win32 && not Sys.cygwin || String.contains name '.' then
+    name
+  else
+    name ^ ".exe"
 
 (* Main entry point (build a custom runtime if needed) *)
 

@@ -207,13 +207,13 @@ let main () =
   Callback.register "Debugger.function_placeholder" function_placeholder;
   try
     socket_name :=
-      (match Sys.os_type with
-        "Win32" ->
-          (Unix.string_of_inet_addr Unix.inet_addr_loopback)^
-          ":"^
-          (Int.to_string (10000 + ((Unix.getpid ()) mod 10000)))
-      | _ -> Filename.concat (Filename.get_temp_dir_name ())
-                                ("camldebug" ^ (Int.to_string (Unix.getpid ())))
+      (if Sys.win32 then
+        (Unix.string_of_inet_addr Unix.inet_addr_loopback)^
+        ":"^
+        (Int.to_string (10000 + ((Unix.getpid ()) mod 10000)))
+      else
+        Filename.concat (Filename.get_temp_dir_name ())
+                            ("camldebug" ^ (Int.to_string (Unix.getpid ())))
       );
     begin try
       Arg.parse speclist anonymous "";

@@ -144,10 +144,12 @@ let host = "%%HOST%%"
 let target = "%%TARGET%%"
 
 let default_executable_name =
-  match Sys.os_type with
-    "Unix" -> "a.out"
-  | "Win32" | "Cygwin" -> "camlprog.exe"
-  | _ -> "camlprog"
+  if Sys.unix then
+    "a.out"
+  else if Sys.win32 || Sys.cygwin then
+    "camlprog.exe"
+  else (* Customised Sys.os_type *)
+    "camlprog"
 
 let systhread_supported = %%SYSTHREAD_SUPPORT%%;;
 

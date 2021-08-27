@@ -279,10 +279,12 @@ module Cygwin : SYSDEPS = struct
 end
 
 module Sysdeps =
-  (val (match Sys.os_type with
-       | "Win32" -> (module Win32: SYSDEPS)
-       | "Cygwin" -> (module Cygwin: SYSDEPS)
-       | _ -> (module Unix: SYSDEPS)))
+  (val (if Sys.win32 then
+         (module Win32: SYSDEPS)
+       else if Sys.cygwin then
+         (module Cygwin: SYSDEPS)
+       else
+         (module Unix: SYSDEPS)))
 
 include Sysdeps
 

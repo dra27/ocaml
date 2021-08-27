@@ -78,12 +78,12 @@ let error text =
   eprintf "%s@." text;
   raise Toplevel
 
-let check_not_windows feature =
-  match Sys.os_type with
-  | "Win32" ->
+let check_not_windows =
+  if Sys.win32 then
+    fun feature ->
       error ("\'"^feature^"\' feature not supported on Windows")
-  | _ ->
-      ()
+  else
+    ignore
 
 let eol =
   end_of_line Lexer.lexeme

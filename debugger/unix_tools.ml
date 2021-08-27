@@ -37,9 +37,10 @@ let convert_address address =
                prerr_endline "The port number should be an integer";
                failwith "Can't convert address")))
   with Not_found ->
-    match Sys.os_type with
-      "Win32" -> failwith "Unix sockets not supported"
-    | _ -> (PF_UNIX, ADDR_UNIX address)
+    if Sys.win32 then
+      failwith "Unix sockets not supported"
+    else
+      (PF_UNIX, ADDR_UNIX address)
 
 (*** Report a unix error. ***)
 let report_error = function

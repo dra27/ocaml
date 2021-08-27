@@ -135,10 +135,11 @@ let rec do_go n =
 
 (* Perform a checkpoint *)
 
-let do_checkpoint () =
-  match Sys.os_type with
-    "Win32" -> failwith "do_checkpoint"
-  | _ ->
+let do_checkpoint =
+  if Sys.win32 then
+    fun () -> failwith "do_checkpoint"
+  else
+    fun () ->
       output_char !conn.io_out 'c';
       flush !conn.io_out;
       let pid = input_binary_int !conn.io_in in

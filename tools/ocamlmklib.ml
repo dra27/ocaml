@@ -32,8 +32,11 @@ let mklib out files opts =
 
 (* PR#4783: under Windows, don't use absolute paths because we do
    not know where the binary distribution will be installed. *)
-let compiler_path name =
-  if Sys.os_type = "Win32" then name else Filename.concat Config.bindir name
+let compiler_path =
+  if Sys.win32 then
+    Fun.id
+  else
+    Filename.concat Config.bindir
 
 let bytecode_objs = ref []  (* .cmo,.cma,.ml,.mli files to pass to ocamlc *)
 and native_objs = ref []    (* .cmx,.ml,.mli files to pass to ocamlopt *)
@@ -263,18 +266,19 @@ let prepostfix pre name post =
   Filename.concat dir (pre ^ base ^ post)
 ;;
 
-let transl_path s =
-  match Sys.os_type with
-    | "Win32" ->
-        let s = Bytes.of_string s in
-        let rec aux i =
-          if i = Bytes.length s || Bytes.get s i = ' ' then s
-          else begin
-            if Bytes.get s i = '/' then Bytes.set s i '\\';
-            aux (i + 1)
-          end
-        in Bytes.to_string (aux 0)
-    | _ -> s
+let transl_path =
+  if Sys.win32 then
+    fun s ->
+      let s = Bytes.of_string s in
+      let rec aux i =
+        if i = Bytes.length s || Bytes.get s i = ' ' then s
+        else begin
+          if Bytes.get s i = '/' then Bytes.set s i '\\';
+          aux (i + 1)
+        end
+      in Bytes.to_string (aux 0)
+  else
+    Fun.id
 
 let flexdll_dirs =
   let dirs =

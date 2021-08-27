@@ -291,9 +291,7 @@ let expand_directory alt s =
   else s
 
 let path_separator =
-  match Sys.os_type with
-  | "Win32" -> ';'
-  | _ -> ':'
+  if Sys.win32 then ';' else ':'
 
 let split_path_contents ?(sep = path_separator) = function
   | "" -> []

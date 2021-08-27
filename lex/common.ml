@@ -67,9 +67,10 @@ let copy_chars_win32 ic oc start stop =
   done
 
 let copy_chars =
-  match Sys.os_type with
-    "Win32" | "Cygwin" -> copy_chars_win32
-  | _       -> copy_chars_unix
+  if Sys.win32 || Sys.cygwin then
+    copy_chars_win32
+  else
+    copy_chars_unix
 
 let copy_chunk ic oc trl loc add_parens =
   if loc.start_pos < loc.end_pos || add_parens then begin

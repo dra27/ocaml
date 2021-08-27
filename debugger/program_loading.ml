@@ -112,52 +112,51 @@ let generic_exec_win cmdline = function () ->
     raise Toplevel
 
 let generic_exec =
-  match Sys.os_type with
-    "Win32" -> generic_exec_win
-  | _ -> generic_exec_unix
+  if Sys.win32 then
+    generic_exec_win
+  else
+    generic_exec_unix
 
 (* Execute the program by calling the runtime explicitly *)
 let exec_with_runtime =
   generic_exec
     (function () ->
-      match Sys.os_type with
-        "Win32" ->
-          (* This would fail on a file name with spaces
-             but quoting is even worse because Unix.create_process
-             thinks each command line parameter is a file.
-             So no good solution so far *)
-          Printf.sprintf "%sset CAML_DEBUG_SOCKET=%s& %s %s %s"
-                     (get_win32_environment ())
-                     !socket_name
-                     runtime_program
-                     !program_name
-                     !arguments
-      | _ ->
-          Printf.sprintf "%sCAML_DEBUG_SOCKET=%s %s %s %s"
-                     (get_unix_environment ())
-                     !socket_name
-                     (Filename.quote runtime_program)
-                     (Filename.quote !program_name)
-                     !arguments)
+      if Sys.win32 then
+        (* This would fail on a file name with spaces
+           but quoting is even worse because Unix.create_process
+           thinks each command line parameter is a file.
+           So no good solution so far *)
+        Printf.sprintf "%sset CAML_DEBUG_SOCKET=%s& %s %s %s"
+                   (get_win32_environment ())
+                   !socket_name
+                   runtime_program
+                   !program_name
+                   !arguments
+      else
+        Printf.sprintf "%sCAML_DEBUG_SOCKET=%s %s %s %s"
+                   (get_unix_environment ())
+                   !socket_name
+                   (Filename.quote runtime_program)
+                   (Filename.quote !program_name)
+                   !arguments)
 
 (* Execute the program directly *)
 let exec_direct =
   generic_exec
     (function () ->
-      match Sys.os_type with
-        "Win32" ->
-          (* See the comment above *)
-          Printf.sprintf "%sset CAML_DEBUG_SOCKET=%s& %s %s"
-                     (get_win32_environment ())
-                     !socket_name
-                     !program_name
-                     !arguments
-      | _ ->
-          Printf.sprintf "%sCAML_DEBUG_SOCKET=%s %s %s"
-                     (get_unix_environment ())
-                     !socket_name
-                     (Filename.quote !program_name)
-                     !arguments)
+      if Sys.win32 then
+        (* See the comment above *)
+        Printf.sprintf "%sset CAML_DEBUG_SOCKET=%s& %s %s"
+                   (get_win32_environment ())
+                   !socket_name
+                   !program_name
+                   !arguments
+      else
+        Printf.sprintf "%sCAML_DEBUG_SOCKET=%s %s %s"
+                   (get_unix_environment ())
+                   !socket_name
+                   (Filename.quote !program_name)
+                   !arguments)
 
 (* Ask the user. *)
 let exec_manual =
