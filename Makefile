@@ -13,7 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-# The main Makefile
+# The main Makefile (with a dummy change)
 
 ROOTDIR = .
 # NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
