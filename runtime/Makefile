@@ -381,6 +381,8 @@ endif
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type),%)))
 
+# XXX In --enable-relative=strict mode, this also gets applied: 
+#stdlib.%.$(O): OC_CPPFLAGS += -DFOR_OCAMLRUN
 stdlib.$(O): OC_CPPFLAGS += -DFOR_OCAMLRUN
 
 $(UNIX_OR_WIN32)_non_shared.%.$(O): OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
