@@ -27,6 +27,9 @@ let (standard_library_default,
 (* XXX Should construct these so that the absolute paths are not embedded at all
        in relative mode. *)
 let bindir =
+  (* XXX --enable-relative=strict mode, this becomes:
+  Option.get relative_root_dir
+  *)
   Option.value ~default:"%%BINDIR%%" relative_root_dir
 
 let runtime_bindir =
