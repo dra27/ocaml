@@ -53,6 +53,7 @@ CLIBNAME ?= $(LIBNAME)
 
 ifeq "$(C_SOURCES)" ""
 STUBSLIB=
+STUBSDLL=
 else
 COBJS_BYTECODE = $(C_SOURCES:.c=.b.$(O))
 COBJS_NATIVE = $(C_SOURCES:.c=.n.$(O))
@@ -61,6 +62,7 @@ COBJS = $(COBJS_BYTECODE) $(COBJS_NATIVE)
 CLIBNAME_BYTECODE=$(CLIBNAME)byt
 CLIBNAME_NATIVE=$(CLIBNAME)nat
 STUBSLIB_BYTECODE=lib$(CLIBNAME_BYTECODE).$(A)
+STUBSDLL=dll$(CLIBNAME_BYTECODE)-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
 STUBSLIB_NATIVE=lib$(CLIBNAME_NATIVE).$(A)
 endif
 
@@ -75,7 +77,7 @@ ifeq "$(COBJS)" ""
 	$(V_LINKC)$(CAMLC) -o $@ -a -linkall $(CAMLOBJS) $(LINKOPTS)
 else
 	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -oc $(CLIBNAME_BYTECODE) -ocamlc '$(CAMLC)' \
-                -linkall $(CAMLOBJS) $(LINKOPTS)
+                -linkall $(CAMLOBJS) $(LINKOPTS) -suffixed
 endif
 
 $(LIBNAME).cmxa: $(CAMLOBJS_NAT)
@@ -83,14 +85,14 @@ ifeq "$(COBJS)" ""
 	$(V_OCAMLOPT)$(CAMLOPT) -o $@ -a -linkall $(CAMLOBJS_NAT) $(LINKOPTS)
 else
 	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -oc $(CLIBNAME_NATIVE) -ocamlopt '$(CAMLOPT)' \
-                -linkall $(CAMLOBJS_NAT) $(LINKOPTS)
+                -linkall $(CAMLOBJS_NAT) $(LINKOPTS) -suffixed
 endif
 
 $(LIBNAME).cmxs: $(LIBNAME).cmxa $(STUBSLIB_NATIVE)
 	$(V_OCAMLOPT)$(CAMLOPT) -shared -o $(LIBNAME).cmxs -I . $(LIBNAME).cmxa
 
 lib$(CLIBNAME_BYTECODE).$(A): $(COBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -oc $(CLIBNAME_BYTECODE) $(COBJS_BYTECODE) $(LDOPTS)
+	$(V_OCAMLMKLIB)$(MKLIB) -oc $(CLIBNAME_BYTECODE) $(COBJS_BYTECODE) $(LDOPTS) -suffixed
 
 lib$(CLIBNAME_NATIVE).$(A): $(COBJS)
 	$(V_OCAMLMKLIB)$(MKLIB) -oc $(CLIBNAME_NATIVE) $(COBJS_NATIVE) $(LDOPTS)
@@ -98,11 +100,11 @@ lib$(CLIBNAME_NATIVE).$(A): $(COBJS)
 INSTALL_LIBDIR_LIBNAME = $(INSTALL_LIBDIR)/$(LIBNAME)
 
 install::
-	if test -f dll$(CLIBNAME_BYTECODE)$(EXT_DLL); then \
-	  $(INSTALL_PROG) \
-	    dll$(CLIBNAME_BYTECODE)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
-	fi
 ifneq "$(STUBSLIB_BYTECODE)" ""
+	if test -f $(STUBSDLL); then \
+	  $(INSTALL_PROG) \
+	    $(STUBSDLL) "$(INSTALL_STUBLIBDIR)"; \
+	fi
 	$(INSTALL_DATA) $(STUBSLIB_BYTECODE) "$(INSTALL_LIBDIR)/"
 endif
 # If installing over a previous OCaml version, ensure the library is removed
