@@ -283,11 +283,6 @@ let output_debug_info oc =
     !debug_info;
   debug_info := []
 
-(* Output a list of strings with 0-termination *)
-
-let output_stringlist oc l =
-  List.iter (fun s -> output_string oc s; output_byte oc 0) l
-
 (* Transform a file name into an absolute file name *)
 
 let make_absolute file =
@@ -394,13 +389,29 @@ let link_bytecode ?final_name tolink exec_name standalone =
        let start_code = pos_out outchan in
        Symtable.init();
        clear_crc_interfaces ();
-       let sharedobjs = List.map Dll.extract_dll_name !Clflags.dllibs in
+       let (tocheck, sharedobjs) =
+         let process_dllib ((suffixed, name) as dllib) (tocheck, sharedobjs) =
+           let resolved_name = Dll.extract_dll_name dllib in
+           let partial_name =
+             if suffixed then
+               if String.length name >= 2
+                  && name.[0] = '-' && name.[1] = 'l' then
+                 (suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
+               else
+                 dllib
+             else
+               (false, resolved_name)
+           in
+           (resolved_name::tocheck, partial_name::sharedobjs)
+         in
+         List.fold_right process_dllib !Clflags.dllibs ([], [])
+       in
        let check_dlls = standalone && Config.target = Config.host in
        if check_dlls then begin
          (* Initialize the DLL machinery *)
          Dll.init_compile !Clflags.no_std_include;
          Dll.add_path (Load_path.get_paths ());
-         try Dll.open_dlls Dll.For_checking sharedobjs
+         try Dll.open_dlls Dll.For_checking tocheck
          with Failure reason -> raise(Error(Cannot_open_dll reason))
        end;
        let output_fun = output_bytes outchan
@@ -414,11 +425,23 @@ let link_bytecode ?final_name tolink exec_name standalone =
        (* DLL stuff *)
        if standalone then begin
          (* The extra search path for DLLs *)
-         output_stringlist outchan !Clflags.dllpaths;
-         Bytesections.record outchan "DLPT";
+         if !Clflags.dllpaths <> [] then begin
+           let output_string s =
+             output_string outchan s; output_byte outchan 0
+           in
+           List.iter output_string !Clflags.dllpaths;
+           Bytesections.record outchan "DLPT"
+         end;
          (* The names of the DLLs *)
-         output_stringlist outchan sharedobjs;
-         Bytesections.record outchan "DLLS"
+         if sharedobjs <> [] then begin
+           let output_sharedobj (suffixed, name) =
+             output_char outchan (if suffixed then '-' else ':');
+             output_string outchan name;
+             output_byte outchan 0
+           in
+           List.iter output_sharedobj sharedobjs;
+           Bytesections.record outchan "DLLS"
+         end
        end;
        (* The names of all primitives *)
        Symtable.output_primitive_names outchan;
