@@ -27,6 +27,12 @@ OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 CAMLC=$(CAMLRUN) $(ROOTDIR)/ocamlc -nostdlib \
       -I $(ROOTDIR)/stdlib -I $(ROOTDIR)/otherlibs/unix
 MKLIB=$(CAMLRUN) $(ROOTDIR)/tools/ocamlmklib
+ifeq "$(SUFFIXING)" "true"
+MKLIB += -suffixed
+DLLTHREADS = dllvmthreads-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+else
+DLLTHREADS = dllvmthreads.so
+endif
 COMPFLAGS=-w +33..39 -warn-error A -bin-annot -g -safe-string
 
 C_OBJS=scheduler.o
@@ -118,8 +124,8 @@ clean: partialclean
 CMIFILES=thread.cmi mutex.cmi condition.cmi event.cmi threadUnix.cmi
 
 install:
-	if test -f dllvmthreads.so; then \
-	  $(INSTALL_PROG) dllvmthreads.so "$(INSTALL_STUBLIBDIR)"; \
+	if test -f $(DLLTHREADS); then \
+	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	mkdir -p "$(INSTALL_LIBDIR)/vmthreads"
 	$(INSTALL_DATA) libvmthreads.a "$(INSTALL_LIBDIR)/vmthreads"
