@@ -38,6 +38,9 @@ ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
 MKLIB=$(CAMLRUN) $(ROOTDIR)/tools/ocamlmklib
+ifeq "$(SUFFIXING)" "true"
+MKLIB += -suffixed
+endif
 
 # Variables that must be defined by individual libraries:
 # LIBNAME
@@ -58,6 +61,7 @@ CLIBNAME ?= $(LIBNAME)
 
 ifeq "$(COBJS)" ""
 STUBSLIB=
+STUBSDLL=
 else
 STUBSLIB=lib$(CLIBNAME).$(A)
 endif
@@ -67,6 +71,12 @@ all: $(STUBSLIB) $(LIBNAME).cma $(CMIFILES)
 
 allopt: $(STUBSLIB) $(LIBNAME).cmxa $(LIBNAME).$(CMXS) $(CMIFILES)
 opt.opt: allopt
+
+ifeq "$(SUFFIXING)" "true"
+STUBSDLL=dll$(CLIBNAME)-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+else
+STUBSDLL=dll$(CLIBNAME)$(EXT_DLL)
+endif
 
 $(LIBNAME).cma: $(CAMLOBJS)
 ifeq "$(COBJS)" ""
@@ -91,12 +101,11 @@ lib$(CLIBNAME).$(A): $(COBJS)
 	$(MKLIB_CMD) -oc $(CLIBNAME) $(COBJS) $(LDOPTS)
 
 install::
-	if $(SUPPORTS_SHARED_LIBRARIES) \
-	     && test -f dll$(CLIBNAME)$(EXT_DLL); then \
-	  $(INSTALL_PROG) \
-	    dll$(CLIBNAME)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
-	fi
 ifneq "$(STUBSLIB)" ""
+	if $(SUPPORTS_SHARED_LIBRARIES) && test -f $(STUBSDLL); then \
+	  $(INSTALL_PROG) \
+	    $(STUBSDLL) "$(INSTALL_STUBLIBDIR)"; \
+	fi
 	$(INSTALL_DATA) $(STUBSLIB) "$(INSTALL_LIBDIR)/"
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) lib$(CLIBNAME).$(A)
 endif
