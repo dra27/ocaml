@@ -40,9 +40,10 @@ end)
 
 type launch_method = Executable | Shebang of string option
 
-let objfiles = ref ([] : string list)   (* .cmo and .cma files *)
-and ccobjs = ref ([] : string list)     (* .o, .a, .so and -cclib -lxxx *)
-and dllibs = ref ([] : string list)     (* .so and -dllib -lxxx *)
+let objfiles = ref ([] : string list)         (* .cmo and .cma files *)
+and ccobjs = ref ([] : string list)           (* .o, .a, .so and -cclib -lxxx *)
+and dllibs = ref ([] : (bool * string) list)  (* .so, -dllib -lxxx and
+                                                 '-dllib-suffixed -lxxx *)
 
 let cmi_file = ref None
 
