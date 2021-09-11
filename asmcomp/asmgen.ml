@@ -278,7 +278,9 @@ let compile_implementation ?toplevel ~backend ~prefixname ~middle_end
       let clambda_with_constants =
         middle_end ~backend ~prefixname ~ppf_dump program
       in
-      end_gen_implementation ?toplevel ~ppf_dump clambda_with_constants)
+      end_gen_implementation ?toplevel ~ppf_dump clambda_with_constants);
+  if program.need_stdlib then
+    Compilenv.need_stdlib_location ()
 
 let linear_gen_implementation filename =
   let open Linear_format in

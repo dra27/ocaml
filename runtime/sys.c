@@ -679,6 +679,7 @@ CAMLprim value caml_sys_const_backend_type(value unit)
   return Val_int(1); /* Bytecode backed */
 }
 
+/* cf. Translmod.need_stdlib */
 CAMLprim value caml_sys_get_stdlib_dirs(value unit)
 {
   CAMLparam0();

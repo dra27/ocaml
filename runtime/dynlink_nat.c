@@ -56,6 +56,7 @@ CAMLprim value caml_natdynlink_getmap(value unit)
   return caml_input_value_from_block(caml_globals_map, INT_MAX);
 }
 
+/* cf. Translmod.need_stdlib */
 CAMLprim value caml_natdynlink_globals_inited(value unit)
 {
   return Val_int(caml_globals_inited);
