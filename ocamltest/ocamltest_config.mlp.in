@@ -88,3 +88,5 @@ let has_instrumented_runtime = %%RUNTIMEI%%
 let naked_pointers = %%NAKED_POINTERS%%
 
 let has_relative_libdir = @target_libdir_is_relative@
+
+let suffixing = @suffixing@
