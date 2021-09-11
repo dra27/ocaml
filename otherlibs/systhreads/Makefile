@@ -27,6 +27,12 @@ CAMLC=$(BEST_OCAMLC) $(LIBS)
 CAMLOPT=$(BEST_OCAMLOPT) $(LIBS)
 
 MKLIB=$(OCAMLRUN) $(ROOTDIR)/tools/ocamlmklib$(EXE)
+ifeq "$(SUFFIXING)" "true"
+MKLIB += -suffixed
+DLLTHREADS = dllthreads-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+else
+DLLTHREADS = dllthreads$(EXT_DLL)
+endif
 COMPFLAGS=-w +33..39 -warn-error +A -g -bin-annot
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
@@ -100,8 +106,8 @@ distclean: clean
 INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
 
 install:
-	if $(SUPPORTS_SHARED_LIBRARIES) && test -f dllthreads$(EXT_DLL); then \
-	  $(INSTALL_PROG) dllthreads$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
+	if $(SUPPORTS_SHARED_LIBRARIES) && test -f $(DLLTHREADS); then \
+	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
 	$(MKDIR) "$(INSTALL_THREADSLIBDIR)"
