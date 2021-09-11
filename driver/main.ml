@@ -44,7 +44,8 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _config_var = Misc.show_config_variable_and_exit
   let _custom = set custom_runtime
   let _no_check_prims = set no_check_prims
-  let _dllib s = defer (ProcessDLLs (Misc.rev_split_words s))
+  let _dllib s = defer (ProcessDLLs (false, Misc.rev_split_words s))
+  let _dllib_suffixed s = defer (ProcessDLLs (true, Misc.rev_split_words s))
   let _dllpath s = dllpaths := !dllpaths @ [s]
   let _for_pack s = for_package := Some s
   let _g = set debug
