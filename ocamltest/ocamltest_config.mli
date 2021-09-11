@@ -142,3 +142,7 @@ val frame_pointers : bool
 
 val tsan : bool
 (** Whether ThreadSanitizer support has been enabled at configure time *)
+
+val suffixing : bool
+(** Whether C stub library filenames are being mangled with the Bytecode
+    Runtime ID and {!Config.target}. *)

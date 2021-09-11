@@ -36,11 +36,11 @@ unixLabels.cmi: \
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
 WIN32_LIBS=$(call SYSLIB,ws2_32) $(call SYSLIB,advapi32)
-LINKOPTS=$(addprefix -cclib ,$(WIN32_LIBS))
-LDOPTS=$(addprefix -ldopt ,$(WIN32_LIBS))
+LINKOPTS+=$(addprefix -cclib ,$(WIN32_LIBS))
+LDOPTS+=$(addprefix -ldopt ,$(WIN32_LIBS))
 else # Unix
 # dllunix.so particularly requires libm for modf symbols
-LDOPTS=$(NATIVECCLIBS)
+LDOPTS+=$(NATIVECCLIBS)
 endif
 
 # C source files common to both Unix and Windows
