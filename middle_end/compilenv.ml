@@ -86,7 +86,8 @@ let current_unit =
     ui_apply_fun = [];
     ui_send_fun = [];
     ui_force_link = false;
-    ui_export_info = default_ui_export_info }
+    ui_export_info = default_ui_export_info;
+    ui_need_stdlib = false}
 
 let symbolname_for_pack pack name =
   match pack with
@@ -129,6 +130,7 @@ let reset ?packname name =
   current_unit.ui_apply_fun <- [];
   current_unit.ui_send_fun <- [];
   current_unit.ui_force_link <- !Clflags.link_everything;
+  current_unit.ui_need_stdlib <- false;
   Hashtbl.clear exported_constants;
   structured_constants := structured_constants_empty;
   current_unit.ui_export_info <- default_ui_export_info;
@@ -330,6 +332,11 @@ let need_apply_fun n =
 let need_send_fun n =
   if not (List.mem n current_unit.ui_send_fun) then
     current_unit.ui_send_fun <- n :: current_unit.ui_send_fun
+
+(* Record that caml_standard_library_default is needed *)
+
+let need_stdlib_location () =
+  current_unit.ui_need_stdlib <- true
 
 (* Write the description of the current unit *)
 

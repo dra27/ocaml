@@ -329,6 +329,7 @@ type program =
     main_module_block_size : int;
     required_globals : Ident.Set.t;    (* Modules whose initializer side effects
                                           must occur before [code]. *)
+    need_stdlib : bool;
     code : lambda }
 (* Lambda code for the middle-end.
    * In the closure case the code is a sequence of assignments to a

@@ -799,6 +799,15 @@ let required_globals ~flambda body =
   Translprim.clear_used_primitives ();
   required
 
+let need_stdlib primitive_declarations =
+  let needs_stdlib prim =
+    match Primitive.native_name prim with
+    | "caml_sys_get_stdlib_dirs"
+    | "caml_natdynlink_globals_inited" -> true
+    | _ -> false
+    in
+      List.exists needs_stdlib primitive_declarations
+
 (* Compile an implementation *)
 
 let transl_implementation_flambda module_name (str, cc) =
@@ -815,6 +824,7 @@ let transl_implementation_flambda module_name (str, cc) =
   { module_ident = module_id;
     main_module_block_size = size;
     required_globals = required_globals ~flambda:true body;
+    need_stdlib = need_stdlib !primitive_declarations;
     code = body }
 
 let transl_implementation module_name (str, cc) =
@@ -1401,6 +1411,7 @@ let transl_store_implementation module_name (str, restr) =
     (* module_ident is not used by closure, but this allow to share
        the type with the flambda version *)
     module_ident;
+    need_stdlib = need_stdlib !primitive_declarations;
     required_globals = required_globals ~flambda:true code }
 
 (* Compile a toplevel phrase *)

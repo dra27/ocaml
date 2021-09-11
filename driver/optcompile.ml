@@ -43,7 +43,7 @@ let flambda i backend typed =
       (Translmod.transl_implementation_flambda i.module_name)
   |> Profile.(record generate)
     (fun {Lambda.module_ident; main_module_block_size;
-          required_globals; code } ->
+          required_globals; need_stdlib; code } ->
     ((module_ident, main_module_block_size), code)
     |>> print_if i.ppf_dump Clflags.dump_rawlambda Printlambda.lambda
     |>> Simplif.simplify_lambda
@@ -54,6 +54,7 @@ let flambda i backend typed =
           module_ident;
           main_module_block_size;
           required_globals;
+          need_stdlib;
           code;
         }
       in
