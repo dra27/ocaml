@@ -60,6 +60,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _compat_32 = option "-compat-32"
   let _custom = option "-custom"
   let _dllib = option_with_arg "-dllib"
+  let _dllib_suffixed = option_with_arg "-dllib-suffixed"
   let _dllpath = option_with_arg "-dllpath"
   let _dtypes = option "-dtypes"
   let _for_pack = option_with_arg "-for-pack"
