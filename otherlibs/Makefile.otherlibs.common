@@ -54,8 +54,10 @@ CLIBNAME ?= $(LIBNAME)
 
 ifeq "$(COBJS)" ""
 STUBSLIB=
+STUBSDLL=
 else
 STUBSLIB=lib$(CLIBNAME).$(A)
+STUBSDLL=dll$(CLIBNAME)-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
 endif
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
@@ -69,7 +71,7 @@ ifeq "$(COBJS)" ""
 	$(CAMLC) -o $@ -a -linkall $(CAMLOBJS) $(LINKOPTS)
 else
 	$(MKLIB) -o $(LIBNAME) -oc $(CLIBNAME) -ocamlc '$(CAMLC)' -linkall \
-	         $(CAMLOBJS) $(LINKOPTS)
+	         $(CAMLOBJS) $(LINKOPTS) -suffixed
 endif
 
 $(LIBNAME).cmxa: $(CAMLOBJS_NAT)
@@ -77,22 +79,21 @@ ifeq "$(COBJS)" ""
 	$(CAMLOPT) -o $@ -a -linkall $(CAMLOBJS_NAT) $(LINKOPTS)
 else
 	$(MKLIB) -o $(LIBNAME) -oc $(CLIBNAME) -ocamlopt '$(CAMLOPT)' -linkall \
-	         $(CAMLOBJS_NAT) $(LINKOPTS)
+	         $(CAMLOBJS_NAT) $(LINKOPTS) -suffixed
 endif
 
 $(LIBNAME).cmxs: $(LIBNAME).cmxa $(STUBSLIB)
 	$(CAMLOPT_CMD) -shared -o $(LIBNAME).cmxs -I . $(LIBNAME).cmxa
 
 lib$(CLIBNAME).$(A): $(COBJS)
-	$(MKLIB_CMD) -oc $(CLIBNAME) $(COBJS) $(LDOPTS)
+	$(MKLIB_CMD) -oc $(CLIBNAME) $(COBJS) $(LDOPTS) -suffixed
 
 install::
-	if test -f dll$(CLIBNAME)$(EXT_DLL); then \
-	  $(INSTALL_PROG) \
-	    dll$(CLIBNAME)$(EXT_DLL) \
-	    "$(INSTALL_STUBLIBDIR)/"; \
-	fi
 ifneq "$(STUBSLIB)" ""
+	if test -f $(STUBSDLL); then \
+	  $(INSTALL_PROG) \
+	    $(STUBSDLL) "$(INSTALL_STUBLIBDIR)"; \
+	fi
 	$(INSTALL_DATA) $(STUBSLIB) "$(INSTALL_LIBDIR)/"
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) lib$(CLIBNAME).$(A)
 endif
