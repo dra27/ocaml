@@ -628,6 +628,7 @@ let mklib log env =
   [
     Ocaml_commands.ocamlrun_ocamlmklib;
     "-ocamlc '" ^ ocamlc_command ^ "'";
+    "-suffixed";
     "-o " ^ program
   ] @ modules env in
   let expected_exit_status = 0 in
