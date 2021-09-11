@@ -72,7 +72,7 @@ type launch_method = Executable | Shebang of string option
 
 val objfiles : string list ref
 val ccobjs : string list ref
-val dllibs : string list ref
+val dllibs : (bool * string) list ref
 val cmi_file : string option ref
 val compile_only : bool ref
 val output_name : string option ref
