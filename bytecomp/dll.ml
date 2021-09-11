@@ -59,7 +59,7 @@ let extract_dll_name (suffixed, file) =
     Filename.chop_suffix file Config.ext_dll
   else
     let file =
-      if String.starts_with ~prefix:"-l" file then
+      if String.length file >= 2 && file.[0] = '-' && file.[1] = 'l' then
       "dll" ^ String.sub file 2 (String.length file - 2)
     else
       file

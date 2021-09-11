@@ -374,7 +374,8 @@ let link_bytecode ?final_name tolink exec_name standalone =
            let resolved_name = Dll.extract_dll_name dllib in
            let partial_name =
              if suffixed then
-               if String.starts_with ~prefix:"-l" name then
+               if String.length name >= 2
+                  && name.[0] = '-' && name.[1] = 'l' then
                  (suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
                else
                  dllib
