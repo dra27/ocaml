@@ -17,8 +17,11 @@ Working version
 
 - #11???: Introduce a RuntimeID for use in filename mangling to allow different
   configurations and different versions of ocamlrun and the shared runtime
-  libraries to coexist harmoniously on a single system. A portable version is
-  used in launcher header for bytecode executables.
+  libraries to coexist harmoniously on a single system. The RuntimeID is used,
+  along with the host triplet to mangle the names of stub libraries so that
+  stub libraries compiled for a given configuration of the runtime will only be
+  sought by that runtime. A portable version of the RuntimeID containing only
+  the release number is used in the launcher header for bytecode executables.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
