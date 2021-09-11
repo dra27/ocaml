@@ -346,7 +346,15 @@ let link ~ppf_dump objfiles output_name =
       else stdlib :: (objfiles @ [stdexit]) in
     let obj_infos = List.map read_file objfiles in
     let units_tolink = List.fold_right scan_file obj_infos [] in
-    Compenv.set_caml_standard_library_default ();
+    let need_stdlib =
+      let needs_stdlib = function
+      | ({ui_need_stdlib = true; _}, _, _) -> true
+      | _ -> false
+      in
+        List.exists needs_stdlib units_tolink
+    in
+    if need_stdlib || true then
+      Compenv.set_caml_standard_library_default ();
     Array.iter remove_required Runtimedef.builtin_exceptions;
     begin match extract_missing_globals() with
       [] -> ()

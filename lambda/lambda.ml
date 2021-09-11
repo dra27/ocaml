@@ -337,6 +337,7 @@ type program =
   { module_ident : Ident.t;
     main_module_block_size : int;
     required_globals : Ident.Set.t;
+    need_stdlib : bool;
     code : lambda }
 
 let const_int n = Const_base (Const_int n)
