@@ -68,7 +68,7 @@ val use_inlining_arguments_set : ?round:int -> inlining_arguments -> unit
 
 val objfiles : string list ref
 val ccobjs : string list ref
-val dllibs : string list ref
+val dllibs : (bool * string) list ref
 val compile_only : bool ref
 val output_name : string option ref
 val include_dirs : string list ref
