@@ -89,6 +89,11 @@ let mk_dllib f =
   "-dllib", Arg.String f, "<lib>  Use the dynamically-loaded library <lib>"
 ;;
 
+let mk_dllib_suffixed f =
+  "-dllib-suffixed", Arg.String f,
+  "<lib>  Use the dynamically-loaded library <lib>, with the runtime suffix \
+          appended to the name"
+
 let mk_dllpath f =
   "-dllpath", Arg.String f,
   "<dir>  Add <dir> to the run-time search path for shared libraries"
@@ -985,6 +990,7 @@ module type Bytecomp_options = sig
   val _custom : unit -> unit
   val _no_check_prims : unit -> unit
   val _dllib : string -> unit
+  val _dllib_suffixed : string -> unit
   val _dllpath : string -> unit
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
@@ -1118,6 +1124,7 @@ struct
     mk_config_var F._config_var;
     mk_custom F._custom;
     mk_dllib F._dllib;
+    mk_dllib_suffixed F._dllib_suffixed;
     mk_dllpath F._dllpath;
     mk_dtypes F._annot;
     mk_for_pack_byt F._for_pack;
