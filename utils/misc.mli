@@ -544,4 +544,15 @@ module RuntimeID : sig
                                                     ~is_release:true)
                            ~host:"x86_64-pc-linux-gnu" Native
                              = "-lasmrun-x86_64-pc-linux-gnu-001b"] *)
+
+  val stubslib: ?runtime_id:t -> ?host:string -> string -> string
+  (** [stublibs ?runtime_id ?host dllname] returns the name for the given DLL
+      basename. [dllname] should not include {!Config.ext_dll} (and the result
+      does not include it either). [host] and [runtime_id] default to
+      {!Config.target} and {!make_bytecode} respectively.
+
+      e.g. [stubslib ~runtime_id:(make_bytecode ~release_number:21
+                                                ~is_release:true
+                     ~host:"x86_64-pc-linux-gnu" "dllunixbyt"
+                       = "dllunixbyt-x86_64-pc-linux-gnu-001b"] *)
 end
