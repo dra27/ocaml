@@ -52,6 +52,7 @@ and output_c = ref ""       (* Output name for C part of library *)
 and rpath = ref []          (* rpath options *)
 and debug = ref false       (* -g option *)
 and verbose = ref false
+and suffixed = ref false    (* -suffixed option; becomes true in 5.02 *)
 
 let starts_with s pref =
   String.length s >= String.length pref &&
@@ -166,6 +167,8 @@ let parse_arguments argv =
       c_opts := s :: !c_opts
     else if s = "-framework" then
       (let a = next_arg s in c_opts := a :: s :: !c_opts)
+    else if s = "-suffixed" then
+      suffixed := true
     else if starts_with s "-" then
       prerr_endline ("Unknown option " ^ s)
     else
@@ -212,6 +215,7 @@ Usage: ocamlmklib [options] <.cmo|.cma|.cmx|.ml|.mli|.o|.a|.obj|.lib|\
 \n  -oc <name>     Generated C library is named dll<name>.so or lib<name>.a\
 \n  -rpath <dir>   Same as -dllpath <dir>\
 \n  -R<dir>        Same as -rpath\
+\n  -suffixed      Append runtime ID to any generated shared libraries\
 \n  -verbose       Print commands before executing them\
 \n  -v             same as -verbose\
 \n  -version       Print version and exit\
@@ -286,13 +290,19 @@ let flexdll_dirs =
   List.map f dirs
 
 let build_libs () =
+  let suffix =
+    if !suffixed then
+      Printf.sprintf "-%s-%s" Config.target Config.bytecode_runtime_id
+    else
+      ""
+  in
   if !c_objs <> [] then begin
     if !dynlink then begin
       let retcode = command
           (Printf.sprintf "%s %s -o %s %s %s %s %s %s %s"
              Config.mkdll
              (if !debug then "-g" else "")
-             (prepostfix "dll" !output_c Config.ext_dll)
+             (prepostfix "dll" (!output_c ^ suffix) Config.ext_dll)
              (String.concat " " !c_objs)
              (String.concat " " !c_opts)
              (String.concat " " !ld_opts)
@@ -310,7 +320,7 @@ let build_libs () =
   end;
   if !bytecode_objs <> [] then
     scommand
-      (sprintf "%s -a %s %s %s -o %s.cma %s %s -dllib -l%s -cclib -l%s \
+      (sprintf "%s -a %s %s %s -o %s.cma %s %s -dllib%s -l%s -cclib -l%s \
                    %s %s %s %s"
                   (transl_path !ocamlc)
                   (if !debug then "-g" else "")
@@ -319,6 +329,7 @@ let build_libs () =
                   !output
                   (String.concat " " !caml_opts)
                   (String.concat " " !bytecode_objs)
+                  (if !suffixed then "-suffixed" else "")
                   (Filename.basename !output_c)
                   (Filename.basename !output_c)
                   (String.concat " " (prefix_list "-ccopt " !c_opts))
