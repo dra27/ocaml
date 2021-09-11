@@ -47,6 +47,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _compat_32 = ignore
   let _custom = ignore
   let _dllib = ignore
+  let _dllib_suffixed = ignore
   let _dllpath = ignore
   let _dtypes = ignore
   let _for_pack = ignore
