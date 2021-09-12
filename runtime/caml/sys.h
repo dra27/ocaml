@@ -18,6 +18,7 @@
 
 #ifdef CAML_INTERNALS
 
+#include "mlvalues.h"
 #include "misc.h"
 
 #ifdef __cplusplus

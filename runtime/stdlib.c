@@ -16,4 +16,4 @@
 
 /* Part of sys.c, but kept in its own compilation unit so that it doesn't get
    linked at all if symbol is overridden by a strong symbol in another unit. */
-CAMLweakglobal char_os * caml_standard_library_default = OCAML_STDLIB_DIR;
+char_os * caml_standard_library_default = OCAML_STDLIB_DIR;
