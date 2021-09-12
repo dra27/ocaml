@@ -41,7 +41,7 @@ INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
 -warn-error +A -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
 LINKFLAGS = $(INCLUDES)
-BYTELINK_FLAGS=-use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR) \
+BYTELINK_FLAGS=-use-prims $(ROOTDIR)/runtime/primitives \
                -use-runtime $(RUNTIME_NAME)
 VPATH := $(filter-out -I,$(INCLUDES))
 
@@ -61,12 +61,11 @@ $(foreach program, $(programs_byte) $(programs_opt),\
   $(eval $(call PROGRAM_SYNONYM,$(program))))
 
 $(programs_byte:%=%$(EXE)):
-	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -I $(ROOTDIR) \
-    -o $@ $(filter-out %.cmi,$^)
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -o $@ $(filter-out %.cmi,$^)
 
 $(programs_opt:%=%$(EXE)):
 	$(CAMLOPT_CMD) $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
-    -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+    -o $@ $(filter-out %.cmi,$^)
 
 clean::
 	rm -f $(programs_byte) $(programs_byte:%=%.exe)
