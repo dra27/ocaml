@@ -702,9 +702,13 @@ let link objfiles output_name =
          let poc = open_out prim_name in
          (* note: builds will not be reproducible if the C code contains macros
             such as __FILE__. *)
+         (* COMBAK There shouldn't be #ifdef's here - it's known statically! *)
          output_string poc "\
          #ifdef __cplusplus\n\
          extern \"C\" {\n\
+         #endif\n\
+         #ifdef _WIN32\n\
+         #include <wchar.h>\n\
          #endif\n\
          #ifdef _WIN64\n\
          #ifdef __MINGW32__\n\
