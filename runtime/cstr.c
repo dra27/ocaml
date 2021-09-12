@@ -20,6 +20,7 @@
 #include <string.h>
 #ifdef _WIN32
 #include <stdio.h>
+#include <ctype.h>
 #endif
 
 /* Converts the supplied path (UTF-8 on Unix and UCS-2ish on Windows) to a valid
