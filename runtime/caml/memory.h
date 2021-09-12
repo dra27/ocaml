@@ -161,6 +161,7 @@ typedef char* caml_stat_string;
 CAMLextern caml_stat_string caml_stat_strdup(const char *s);
 #ifdef _WIN32
 CAMLextern wchar_t* caml_stat_wcsdup(const wchar_t *s);
+CAMLextern wchar_t* caml_stat_wcsdup_noexc(const wchar_t *s);
 #endif
 
 /* [caml_stat_strdup_noexc] is a variant of [caml_stat_strdup] that returns NULL

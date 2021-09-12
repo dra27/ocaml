@@ -478,7 +478,7 @@ CAMLprim value caml_format_c_string_literal(value s)
 {
   CAMLparam1(s);
   CAMLlocal1(result);
-  char *str = caml_stat_strdup_of_os(String_val(s));
+  char_os *str = caml_stat_strdup_to_os(String_val(s));
   char *converted = caml_emit_c_string(str);
   caml_stat_free(str);
   if (converted == NULL)
