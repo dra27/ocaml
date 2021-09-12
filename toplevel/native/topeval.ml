@@ -149,6 +149,7 @@ let load_lambda ppf ~module_ident ~required_globals lam size =
       main_module_block_size = size;
       module_ident;
       required_globals;
+      need_stdlib = false;
     }
   in
   let middle_end =
