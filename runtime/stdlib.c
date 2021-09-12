@@ -12,7 +12,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "caml/misc.h"
+#define CAML_INTERNALS
+
+#include "caml/sys.h"
 #include "build_config.h"
 
 #if defined(OCAML_STDLIB_DIR_REL) && defined(FOR_OCAMLRUN)
@@ -23,4 +25,4 @@
 
 /* Part of sys.c, but kept in its own compilation unit so that it doesn't get
    linked at all if symbol is overridden by a strong symbol in another unit. */
-CAMLweakglobal char_os * caml_standard_library_default = DEFAULT;
+char_os * caml_standard_library_default = DEFAULT;
