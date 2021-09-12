@@ -129,7 +129,8 @@ void caml_decompose_path(struct ext_table * tbl, wchar_t * path)
   wchar_t c;
   int n;
 
-  if (path == NULL) return NULL;
+  if (path == NULL)
+    return;
   p = caml_stat_wcsdup(path);
   q = p;
   while (1) {
@@ -832,8 +833,7 @@ int caml_win32_maperr(DWORD errcode)
   for (i = 0; win_error_table[i].range >= 0; i++) {
     if (errcode >= win_error_table[i].win_code &&
         errcode <= win_error_table[i].win_code + win_error_table[i].range) {
-      errno = win_error_table[i].posix_code;
-      return;
+      return (errno = win_error_table[i].posix_code);
     }
   }
   /* Not found: save original error code, negated so that we can
@@ -1130,6 +1130,18 @@ cleanup:
 
 CAMLexport wchar_t * caml_dirname(const wchar_t * path)
 {
-  /* XXX TODO via _splitpath_s */
-  /* XXX The string should _not_ include a trailing slash */
+  wchar_t buffer[_MAX_PATH];
+  wchar_t drive[_MAX_DRIVE];
+  wchar_t dir[_MAX_DIR];
+  errno_t err;
+
+  err = _wsplitpath_s(path, drive, _MAX_DRIVE, dir, _MAX_DIR, NULL, 0, NULL, 0);
+  if (err != 0)
+    return NULL;
+
+  err = _wmakepath_s(buffer, _MAX_PATH, drive, dir, NULL, NULL);
+  if (err != 0)
+    return NULL;
+
+  return caml_stat_strdup_os_noexc(buffer);
 }

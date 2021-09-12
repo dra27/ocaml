@@ -469,7 +469,7 @@ void caml_locate_standard_library(char_os * exe_name)
     } else {
       caml_stat_free(candidate);
       /* caml_realpath uses malloc */
-      caml_standard_library = caml_stat_strdup_noexc(resolved_candidate);
+      caml_standard_library = caml_stat_strdup_os_noexc(resolved_candidate);
       free(resolved_candidate);
     }
   } else {

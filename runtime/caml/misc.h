@@ -302,6 +302,7 @@ extern double caml_log1p(double);
 #define fopen_os _wfopen
 
 #define caml_stat_strdup_os caml_stat_wcsdup
+#define caml_stat_strdup_os_noexc caml_stat_wcsdup_noexc
 #define caml_stat_strconcat_os caml_stat_wcsconcat
 
 #define caml_stat_strdup_to_os caml_stat_strdup_to_utf16
@@ -338,6 +339,7 @@ extern double caml_log1p(double);
 #define fopen_os fopen
 
 #define caml_stat_strdup_os caml_stat_strdup
+#define caml_stat_strdup_os_noexc caml_stat_strdup_noexc
 #define caml_stat_strconcat_os caml_stat_strconcat
 
 #define caml_stat_strdup_to_os caml_stat_strdup
