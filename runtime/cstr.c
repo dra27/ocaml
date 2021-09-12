@@ -18,6 +18,9 @@
 #include "caml/misc.h"
 
 #include <string.h>
+#ifdef _WIN32
+#include <stdio.h>
+#endif
 
 /* Converts the supplied path (UTF-8 on Unix and UCS-2ish on Windows) to a valid
    malloc'd C string literal. On Windows, this is always a wchar_t* (L"..."). */
@@ -60,7 +63,7 @@ char * caml_emit_c_string(const char_os *path)
     } else if (c < 0x80 && iswprint(c)) {
       *p++ = c;
     } else {
-      p += _snwprintf(p, 7, "\\x%04x", c);
+      p += _snprintf(p, 7, "\\x%04x", c);
 #endif
     }
   }

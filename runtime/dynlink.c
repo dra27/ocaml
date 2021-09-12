@@ -116,8 +116,8 @@ CAMLexport void caml_parse_ld_conf(void)
     caml_secure_getenv(T("CAMLLIB")),
     caml_standard_library };
   char_os * ldconfs[3] = {NULL, NULL, NULL};
-  char * config;
-  char * p, * q, * r;
+  char_os * config;
+  char_os * p, * q, * r;
 #ifdef _WIN32
   #define OPEN_FLAGS _O_BINARY | _O_RDONLY
   struct _stati64 st;
@@ -145,10 +145,10 @@ CAMLexport void caml_parse_ld_conf(void)
         if (j == i) {
           /* Allocate or grow the buffer, if needed */
           if (configsize == 0) {
-            config = caml_stat_alloc(st.st_size + 1);
+            config = caml_stat_alloc((st.st_size + 1) * sizeof(char_os));
           } else if (configsize < st.st_size + 1) {
             configsize = st.st_size + 1;
-            config = caml_stat_resize(config, configsize);
+            config = caml_stat_resize(config, configsize * sizeof(char_os));
           }
 
           if ((ldconf = open_os(ldconfs[i], O_RDONLY, 0)) == -1) {

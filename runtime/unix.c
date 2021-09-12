@@ -457,8 +457,10 @@ int caml_num_rows_fd(int fd)
 CAMLexport char * caml_dirname (const char * path)
 {
 #ifdef HAS_LIBGEN_H
-  char * dir = caml_stat_strdup(path);
-  char * res = caml_stat_strdup(dirname(dir));
+  char *dir, *res;
+  if ((dir = caml_stat_strdup_noexc(path)) == NULL)
+    return NULL;
+  res = caml_stat_strdup_noexc(dirname(dir));
   caml_stat_free(dir);
   return res;
 #else
