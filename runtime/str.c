@@ -487,3 +487,14 @@ CAMLprim value caml_format_c_string_literal(value s)
   free(converted);
   CAMLreturn(result);
 }
+
+CAMLprim value caml_os_bytes_of_string(value s)
+{
+  CAMLparam1(s);
+  CAMLlocal1(result);
+  char_os *str = caml_stat_strdup_to_os(String_val(s));
+  mlsize_t len = (strlen_os(str) + 1) * sizeof(char_os);
+  result = caml_alloc_initialized_string(len, (char *)str);
+  caml_stat_free(str);
+  CAMLreturn(result);
+}
