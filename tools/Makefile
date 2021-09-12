@@ -325,11 +325,16 @@ caml_tex_files := \
 
 caml_tex := caml-tex$(EXE)
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+CAMLTEX_BYTELINK_FLAGS = $(BYTELINK_FLAGS)
+else
+CAMLTEX_BYTELINK_FLAGS =
+endif
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) \
-                              $(BYTELINK_FLAGS) -linkall \
+                              $(CAMLTEX_BYTELINK_FLAGS) -linkall \
 	                            -o $@ -no-alias-deps $^
 
 # we need str and unix which depend on the bytecode version of other tools
