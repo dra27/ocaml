@@ -312,10 +312,15 @@ caml_tex := caml-tex$(EXE)
 # compiler does not necessarily have the correct shared library
 # configuration. caml-tex is never installed and is always invoked
 # with an explicit runtime and so does not require -use-runtime.
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+CAMLTEX_BYTELINK_FLAGS = $(BYTELINK_FLAGS)
+else
+CAMLTEX_BYTELINK_FLAGS =
+endif
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
 $(caml_tex): $(caml_tex_files)
 	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) -nostdlib -I $(ROOTDIR)/stdlib \
-	  $(LINKFLAGS) $(BYTELINK_FLAGS) -linkall -o $@ -no-alias-deps $^
+	  $(LINKFLAGS) $(CAMLTEX_BYTELINK_FLAGS) -linkall -o $@ -no-alias-deps $^
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we delay building caml-tex to the opt.opt stage
