@@ -21,7 +21,7 @@
 #include <caml/osdeps.h>
 #include "unixsupport.h"
 
-#ifdef HAS_REALPATH
+#if defined(HAS_REALPATH) || defined(_WIN32)
 
 CAMLprim value unix_realpath (value p)
 {
