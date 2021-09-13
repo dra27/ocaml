@@ -252,6 +252,14 @@ val should_stop_after : Compiler_pass.t -> bool
 val set_save_ir_after : Compiler_pass.t -> bool -> unit
 val should_save_ir_after : Compiler_pass.t -> bool
 
+module Header : sig
+  type t = None | Shebang | Executable
+
+  val of_string : string -> t
+  val default : t
+end
+val header : Header.t ref
+
 val arg_spec : (string * Arg.spec * string) list ref
 
 (* [add_arguments __LOC__ args] will add the arguments from [args] at
