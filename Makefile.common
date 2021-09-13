@@ -144,3 +144,9 @@ ifneq ($(EXE),)
 $(1): $(1)$(EXE)
 endif
 endef # PROGRAM_SYNONYM
+
+ifeq "$(SHEBANGSCRIPTS)" "true"
+  BYTECODE_HEADER = shebang
+else
+  BYTECODE_HEADER = executable
+endif

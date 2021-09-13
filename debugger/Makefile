@@ -30,7 +30,8 @@ LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR)
 CAMLLEX=$(BEST_OCAMLLEX)
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
   LINKFLAGS+=-use-prims $(ROOTDIR)/runtime/primitives \
-             -use-runtime $(RUNTIME_NAME)
+             -use-runtime $(RUNTIME_NAME) \
+             -header $(BYTECODE_HEADER)
 else
   LINKFLAGS+=-custom $(SET_RELATIVE_STDLIB)
 endif

@@ -40,7 +40,9 @@ COMPFLAGS=-strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66 \
 	  -warn-error A \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=
-BYTELINK_FLAGS=-use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
+BYTELINK_FLAGS=-use-prims runtime/primitives \
+               -use-runtime $(RUNTIME_NAME) \
+               -header $(BYTECODE_HEADER)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -67,6 +69,9 @@ OPTTOPLEVELSTART=toplevel/opttopstart.cmo
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi
+ifeq "$(SHEBANGSCRIPTS)" "false"
+  LIBFILES+=camlheader
+endif
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -1066,7 +1071,10 @@ depend: beforedepend
 .PHONY: distclean
 distclean: clean
 	rm -f boot/ocamlrun boot/ocamlrun.exe \
-	boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
+	      boot/ocamlruns boot/ocamlruns.exe \
+	      boot/flexlink.byte boot/flexlink.byte.exe \
+	      boot/flexdll_*.o boot/flexdll_*.obj \
+	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
 	rm -rf autom4te.cache
