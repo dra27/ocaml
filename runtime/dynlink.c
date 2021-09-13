@@ -78,7 +78,7 @@ static c_primitive lookup_primitive(char * name)
 
 #define LD_CONF_NAME T("ld.conf")
 
-static inline char_os * filename_concat(char_os * path1, char_os * path2)
+Caml_inline char_os * filename_concat(char_os * path1, char_os * path2)
 {
   if (Is_dir_separator(path1[strlen_os(path1) - 1]))
     return caml_stat_strconcat_os(2, path1, path2);
