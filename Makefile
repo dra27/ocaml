@@ -45,7 +45,9 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=
-BYTELINK_FLAGS=-use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
+BYTELINK_FLAGS=-use-prims runtime/primitives \
+               -use-runtime $(RUNTIME_NAME) \
+               -header $(BYTECODE_HEADER)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -73,6 +75,9 @@ TOPLEVELINIT=toplevel/toploop.cmo
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
 LIBFILES=stdlib.cma std_exit.cmo *.cmi
+ifeq "$(SHEBANGSCRIPTS)" "false"
+  LIBFILES+=camlheader
+endif
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -1133,7 +1138,7 @@ depend: beforedepend
 
 .PHONY: distclean
 distclean: clean
-	rm -f boot/ocamlrun boot/ocamlrun.exe \
+	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
 	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexlink.byte boot/flexlink.byte.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
