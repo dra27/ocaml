@@ -23,7 +23,8 @@ OCAMLYACCFLAGS = --strict -v
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
   BYTELINK_FLAGS=-use-prims $(ROOTDIR)/runtime/primitives \
-                 -use-runtime $(RUNTIME_NAME)
+                 -use-runtime $(RUNTIME_NAME) \
+                 -header $(BYTECODE_HEADER)
 else
   BYTELINK_FLAGS=-custom $(SET_RELATIVE_STDLIB)
 endif

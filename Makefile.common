@@ -169,6 +169,12 @@ OCAMLLEX ?= $(BEST_OCAMLLEX)
 
 OCAMLLEXFLAGS ?= -q
 
+ifeq "$(SHEBANGSCRIPTS)" "true"
+  BYTECODE_HEADER = shebang
+else
+  BYTECODE_HEADER = executable
+endif
+
 %.ml: %.mll
 	$(OCAMLLEX) $(OCAMLLEXFLAGS) $<
 

@@ -38,13 +38,7 @@ OBJS=$(addsuffix .cmo,$(STDLIB_MODULES))
 NOSTDLIB= camlinternalFormatBasics.cmo camlinternalAtomic.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
-ifeq "$(SHEBANGSCRIPTS)" "true"
-
-  EXECUTABLE_HEADERS =
-
-else
-
-  EXECUTABLE_HEADERS := camlheader
+EXECUTABLE_HEADERS := camlheader
 
 ifeq "$(RUNTIMED)" "true"
   EXECUTABLE_HEADERS += camlheaderd
@@ -52,8 +46,6 @@ endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
   EXECUTABLE_HEADERS += camlheaderi
-endif
-
 endif
 
 .PHONY: all
@@ -82,9 +74,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  *.cmt *.cmti *.mli *.ml \
 	  "$(INSTALL_LIBDIR)"
 endif
-ifeq "$(SHEBANGSCRIPTS)" "false"
 	$(INSTALL_DATA) $(EXECUTABLE_HEADERS) "$(INSTALL_LIBDIR)"
-endif
 
 .PHONY: installopt
 installopt: installopt-default
