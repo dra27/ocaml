@@ -338,55 +338,61 @@ let link_bytecode ?final_name tolink exec_name standalone =
     (fun () ->
        if standalone && !Clflags.with_runtime then begin
          (* Write the header *)
-         if Config.use_shebang then
-           let header =
-             (* XXX Tidy up
-             (* shebang mustn't exceed 128 including the #! and \0 *)
-             if String.length runtime > 125 then
-               (* NB In -use-runtime mode, the runtime string ends up being
-                  written twice so that the RNTM section still contains its
-                  name (e.g. for tools/ocamlsize) *)
-               "#!/bin/sh\n\
-                exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\"\n"
-             else if use_runtime then
-               (* The runtime name gets recorded in RNTM *)
-               "#!"
-             else
-               "#!" ^ runtime ^ "\n"*)
-             (* COMBAK Need to worry about the -use-runtime case in more detail *)
-             "#!/bin/sh\n\
-              i=" ^ Filename.quote runtime ^ "\n\
-              if ! test -f \"$i\" || ! test -x \"$i\"; then\n\
-                j=" ^ Filename.(quote (basename runtime)) ^ "\n\
-                i=\"$(dirname \"$0\")/$j\"\n\
-                if ! test -f \"$i\" || ! test -x \"$i\"; then\n\
-                  i=$(command -v \"$j\")\n\
-                  if test -z \"$i\"; then\n\
-                    echo \"Can't find it - you is screwed!\"\n\
-                    exit 1\n\
+         match !Clflags.header with
+         | Shebang ->
+             begin
+               let header =
+                 (* XXX Tidy up
+                 (* shebang mustn't exceed 128 including the #! and \0 *)
+                 if String.length runtime > 125 then
+                   (* NB In -use-runtime mode, the runtime string ends up being
+                      written twice so that the RNTM section still contains its
+                      name (e.g. for tools/ocamlsize) *)
+                   "#!/bin/sh\n\
+                    exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\"\n"
+                 else if use_runtime then
+                   (* The runtime name gets recorded in RNTM *)
+                   "#!"
+                 else
+                   "#!" ^ runtime ^ "\n"*)
+                 (* COMBAK Need to worry about the -use-runtime case in more detail *)
+                 "#!/bin/sh\n\
+                  i=" ^ Filename.quote runtime ^ "\n\
+                  if ! test -f \"$i\" || ! test -x \"$i\"; then\n\
+                    j=" ^ Filename.(quote (basename runtime)) ^ "\n\
+                    i=\"$(dirname \"$0\")/$j\"\n\
+                    if ! test -f \"$i\" || ! test -x \"$i\"; then\n\
+                      i=$(command -v \"$j\")\n\
+                      if test -z \"$i\"; then\n\
+                        echo \"Can't find it - you is screwed!\"\n\
+                        exit 1\n\
+                      fi\n\
+                    fi\n\
                   fi\n\
-                fi\n\
-              fi\n\
-              exec \"$i\" \"$0\" \"$@\"\n\
-              echo \"We encountered an error - you is screwed!\"\n\
-              exit 1\n"
-           in
-           output_string outchan header;
-         else
-           let header =
-             if use_runtime then
-               (* Copy the standard _executable_ header *)
-               "camlheader"
-             else
-               "camlheader" ^ !Clflags.runtime_variant
-           in
-           try
-             let inchan = open_in_bin (Load_path.find header) in
-             copy_file inchan outchan;
-             close_in inchan
-           with
-           | Not_found -> raise (Error (File_not_found header))
-           | Sys_error msg -> raise (Error (Camlheader (header, msg)))
+                  exec \"$i\" \"$0\" \"$@\"\n\
+                  echo \"We encountered an error - you is screwed!\"\n\
+                  exit 1\n"
+               in
+               output_string outchan header;
+             end
+         | Executable ->
+             begin
+               let header =
+                 if use_runtime then
+                   (* Copy the standard _executable_ header *)
+                   "camlheader"
+                 else
+                   "camlheader" ^ !Clflags.runtime_variant
+               in
+               try
+                 let inchan = open_in_bin (Load_path.find header) in
+                 copy_file inchan outchan;
+                 close_in inchan
+               with
+               | Not_found -> raise (Error (File_not_found header))
+               | Sys_error msg -> raise (Error (Camlheader (header, msg)))
+             end
+         | None -> ()
        end;
        Bytesections.init_record outchan;
        (* The path to the bytecode interpreter (in -use-runtime mode) *)

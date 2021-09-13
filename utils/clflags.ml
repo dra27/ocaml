@@ -546,6 +546,24 @@ let set_save_ir_after pass enabled =
   in
   save_ir_after := new_passes
 
+module Header = struct
+  type t = None | Shebang | Executable
+
+  let of_string = function
+  | "none" -> None
+  | "shebang" -> Shebang
+  | "executable" -> Executable
+  | _ -> invalid_arg "Clflags.Header.of_string"
+
+  let default =
+    if Config.use_shebang then
+      Shebang
+    else
+      Executable
+end
+
+let header = ref Header.default
+
 module String = Misc.Stdlib.String
 
 let arg_spec = ref []

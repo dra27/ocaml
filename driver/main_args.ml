@@ -898,6 +898,15 @@ let mk__ f =
   "<file>  Treat <file> as a file name (even if it starts with `-')"
 ;;
 
+let mk_header f =
+  "-header", Arg.Symbol (["none"; "shebang"; "executable"], f),
+  "  Specifies the header used for bytecode exceutables:\n\
+  \    none       no header (program must be started using ocamlrun)\n\
+  \    shebang    /bin/sh script searches for ocamlrun\n\
+  \    executable executable stub searches for ocamlrun\n\
+  \  If the option is not specified, then shebang is preferred if the \n\
+  \  platform supports it."
+
 module type Common_options = sig
   val _absname : unit -> unit
   val _alert : string -> unit
@@ -1041,6 +1050,7 @@ module type Bytecomp_options = sig
   val _dcamlprimc : unit -> unit
 
   val _use_prims : string -> unit
+  val _header : string -> unit
 end;;
 
 module type Bytetop_options = sig
@@ -1251,6 +1261,7 @@ struct
     mk_dtimings F._dtimings;
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
+    mk_header F._header;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -2009,6 +2020,8 @@ third-party libraries such as Lwt, but with a different API."
     let _use_runtime s = use_runtime := s
     let _v () = Compenv.print_version_and_library "compiler"
     let _vmthread () = Compenv.fatal vmthread_removed_message
+    let _header s =
+      Clflags.header := Clflags.Header.of_string s
   end
 
 end
