@@ -513,7 +513,7 @@ let output_cds_file outfile =
 
 let emit_global_constant outchan typ (name, value) =
   let value = Misc.Stdlib.String.escaped_c value in
-  Printf.fprintf outchan "CAMLglobal_override %s * %s = %s;\n" typ name value
+  Printf.fprintf outchan "%s * %s = %s;\n" typ name value
 
 (* Output a bytecode executable as a C file *)
 
@@ -562,9 +562,9 @@ let link_bytecode_as_c tolink outfile with_main =
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
+       List.iter (emit_global_constant outchan "char_os")
+                 !Clflags.global_string_constants;
        if with_main then begin
-         List.iter (emit_global_constant outchan "char_os")
-                   !Clflags.global_string_constants;
          output_string outchan "\
 \n#ifdef _WIN32\
 \nint wmain(int argc, wchar_t **argv)\
@@ -631,9 +631,10 @@ let link_bytecode_as_c tolink outfile with_main =
 
 let build_custom_runtime prim_name exec_name =
   let runtime_lib =
+    (* XXX COMBAK Resolve libcamlrun.a then look for libocamlc.a *)
     if not !Clflags.with_runtime
     then ""
-    else "-lcamlrun" ^ !Clflags.runtime_variant in
+    else "-locamlc" ^ !Clflags.runtime_variant in
   let debug_prefix_map =
     if Config.c_has_debug_prefix_map && not !Clflags.keep_camlprimc_file then
       let flag =
@@ -752,10 +753,7 @@ let link objfiles output_name =
            append_bytecode bytecode_name exec_name
       )
   end else begin
-    if !Clflags.output_complete_executable then
-      Compenv.set_caml_standard_library_default ()
-    else
-      assert (!Clflags.global_string_constants = []);
+    Compenv.set_caml_standard_library_default ();
     let basename = Filename.remove_extension output_name in
     let c_file, stable_name =
       if !Clflags.output_complete_object
@@ -797,7 +795,7 @@ let link objfiles output_name =
                  let runtime_lib =
                    if not !Clflags.with_runtime
                    then ""
-                   else "-lcamlrun" ^ !Clflags.runtime_variant in
+                   else "-locamlc" ^ !Clflags.runtime_variant in
                  Ccomp.call_linker mode output_name
                    ([obj_file] @ List.rev !Clflags.ccobjs @ [runtime_lib])
                    c_libs = 0

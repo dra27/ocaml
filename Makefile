@@ -178,7 +178,7 @@ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
 	cd boot; rm -f $(LIBFILES)
 	cd stdlib; cp $(LIBFILES) ../boot
-	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+	cd boot; $(LN) ../runtime/libocamlc.$(A) .
 
 # Recompile the core system using the bootstrap compiler
 .PHONY: coreall
@@ -778,7 +778,7 @@ $(SAK):
 	$(MAKE) -C runtime sak$(EXE)
 
 .PHONY: runtime
-runtime: stdlib/libcamlrun.$(A)
+runtime: stdlib/libocamlc.$(A)
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 runtime: $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS))
@@ -791,12 +791,12 @@ endif
 .PHONY: makeruntime
 makeruntime:
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
-runtime/libcamlrun.$(A): makeruntime ;
-stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
-	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+runtime/libocamlc.$(A): makeruntime ;
+stdlib/libocamlc.$(A): runtime/libocamlc.$(A)
+	cd stdlib; $(LN) ../runtime/libocamlc.$(A) .
 clean::
 	$(MAKE) -C runtime clean
-	rm -f stdlib/libcamlrun.a stdlib/libcamlrun.lib
+	rm -f stdlib/libocamlc.a stdlib/libocamlc.lib
 
 otherlibs_all := bigarray dynlink \
   str systhreads unix win32unix
@@ -812,16 +812,16 @@ alldepend: depend
 # The runtime system for the native-code compiler
 
 .PHONY: runtimeopt
-runtimeopt: stdlib/libasmrun.$(A)
+runtimeopt: stdlib/libocamlopt.$(A)
 
 .PHONY: makeruntimeopt
 makeruntimeopt:
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) allopt
-runtime/libasmrun.$(A): makeruntimeopt ;
-stdlib/libasmrun.$(A): runtime/libasmrun.$(A)
+runtime/libocamlopt.$(A): makeruntimeopt ;
+stdlib/libocamlopt.$(A): runtime/libocamlopt.$(A)
 	cp $< $@
 clean::
-	rm -f stdlib/libasmrun.a stdlib/libasmrun.lib
+	rm -f stdlib/libocamlopt.a stdlib/libocamlopt.lib
 
 # The standard library
 
@@ -1142,7 +1142,7 @@ distclean: clean
 	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexlink.byte boot/flexlink.byte.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
-	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
+	      boot/*.cm* boot/libocamlc.a boot/libocamlc.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -f runtime/caml/m.h runtime/caml/s.h
 	rm -rf autom4te.cache flexdll-sources
