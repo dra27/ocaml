@@ -90,7 +90,7 @@ CAMLdeprecated_typedef(addr, char *);
 #define CAMLextern CAMLDLLIMPORT extern
 
 /* Weak function definitions that can be overridden by external libs */
-#ifdef SUPPORT_WEAK_LINKING
+#if defined(SUPPORT_WEAK_LINKING) && !defined(__MINGW32__)
 #define CAMLweakdef __attribute__((weak))
 #else
 #define CAMLweakdef
