@@ -31,6 +31,11 @@ environment:
     FORCE_CYGWIN_UPGRADE: 0
     BUILD_MODE: world.opt
   matrix:
+    - PORT: msvc32
+      BOOTSTRAP_FLEXDLL: false
+      BUILD_MODE: C
+      SDK: |-
+        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
     - PORT: mingw32
       BOOTSTRAP_FLEXDLL: true
     - PORT: msvc64
@@ -38,12 +43,11 @@ environment:
       BUILD_MODE: steps
     - PORT: msvc32
       BOOTSTRAP_FLEXDLL: false
-      BUILD_MODE: C
-      SDK: |-
-        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
+    - PORT: mingw64
+      BOOTSTRAP_FLEXDLL: true
 
-matrix:
-  fast_finish: true
+#matrix:
+#  fast_finish: true
 
 cache:
   - C:\cygwin64\var\cache\setup
@@ -59,3 +63,6 @@ build_script:
 
 test_script:
   - call "%APPVEYOR_BUILD_FOLDER%\tools\ci\appveyor\appveyor_build.cmd" test
+
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
