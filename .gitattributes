@@ -27,6 +27,8 @@
 *.png binary
 *.tfm binary
 
+/appveyor.yml typo.very-long-line
+
 /boot/menhir/parser.ml* -diff
 
 # configure is a shell-script; the linguist-generated attribute suppresses
