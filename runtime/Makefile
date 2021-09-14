@@ -51,29 +51,29 @@ endif
 # Targets to build and install
 
 PROGRAMS := ocamlrun
-BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
+BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A) libocamlc.$(A)
 BYTECODE_SHARED_LIBRARIES :=
-NATIVE_STATIC_LIBRARIES := libasmrun.$(A)
+NATIVE_STATIC_LIBRARIES := libasmrun.$(A) libocamlopt.$(A)
 NATIVE_SHARED_LIBRARIES :=
 
 ifeq "$(RUNTIMED)" "true"
 PROGRAMS += ocamlrund
-BYTECODE_STATIC_LIBRARIES += libcamlrund.$(A)
-NATIVE_STATIC_LIBRARIES += libasmrund.$(A)
+BYTECODE_STATIC_LIBRARIES += libcamlrund.$(A) libocamlcd.$(A)
+NATIVE_STATIC_LIBRARIES += libasmrund.$(A) libocamloptd.$(A)
 endif
 
 ifeq "$(RUNTIMEI)" "true"
 PROGRAMS += ocamlruni
-BYTECODE_STATIC_LIBRARIES += libcamlruni.$(A)
-NATIVE_STATIC_LIBRARIES += libasmruni.$(A)
+BYTECODE_STATIC_LIBRARIES += libcamlruni.$(A) libocamlci.$(A)
+NATIVE_STATIC_LIBRARIES += libasmruni.$(A) libocamlopti.$(A)
 endif
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-BYTECODE_STATIC_LIBRARIES += libcamlrun_pic.$(A)
-BYTECODE_SHARED_LIBRARIES += libcamlrun_shared.$(SO)
-NATIVE_STATIC_LIBRARIES += libasmrun_pic.$(A)
-NATIVE_SHARED_LIBRARIES += libasmrun_shared.$(SO)
+BYTECODE_STATIC_LIBRARIES += libcamlrun_pic.$(A) libocamlc_pic.$(A)
+BYTECODE_SHARED_LIBRARIES += libcamlrun_shared.$(SO) libocamlc_shared.$(SO)
+NATIVE_STATIC_LIBRARIES += libasmrun_pic.$(A) libocamlopt_pic.$(A)
+NATIVE_SHARED_LIBRARIES += libasmrun_shared.$(SO) libocamlopt_shared.$(SO)
 endif
 endif
 
@@ -312,10 +312,16 @@ ocamlrun$(EXE): prims.$(O) stdlib.$(O) libcamlrun.$(A)
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
 	$(call MKLIB,$@, $^)
 
+libocamlc.$(A): $(filter-out stdlib.%, $(libcamlrun_OBJECTS))
+	$(call MKLIB,$@, $^)
+
 ocamlrund$(EXE): prims.$(O) stdlib.$(O) libcamlrund.$(A)
 	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(LIBS)
 
 libcamlrund.$(A): $(libcamlrund_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+libocamlcd.$(A): $(filter-out stdlib.%, $(libcamlrund_OBJECTS))
 	$(call MKLIB,$@, $^)
 
 ocamlruni$(EXE): prims.$(O) stdlib.$(O) libcamlruni.$(A)
@@ -324,25 +330,49 @@ ocamlruni$(EXE): prims.$(O) stdlib.$(O) libcamlruni.$(A)
 libcamlruni.$(A): $(libcamlruni_OBJECTS)
 	$(call MKLIB,$@, $^)
 
+libocamlci.$(A): $(filter-out stdlib.%, $(libcamlruni_OBJECTS))
+	$(call MKLIB,$@, $^)
+
 libcamlrun_pic.$(A): $(libcamlrunpic_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+libocamlc_pic.$(A): $(filter-out stdlib.%, $(libcamlrunpic_OBJECTS))
 	$(call MKLIB,$@, $^)
 
 libcamlrun_shared.$(SO): $(libcamlrunpic_OBJECTS)
 	$(MKDLL) -o $@ $^ $(BYTECCLIBS)
 
+libocamlc_shared.$(SO): $(filter-out stdlib.%, $(libcamlrunpic_OBJECTS))
+	$(MKDLL) -o $@ $^ $(BYTECCLIBS)
+
 libasmrun.$(A): $(libasmrun_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+libocamlopt.$(A): $(filter-out stdlib.%, $(libasmrun_OBJECTS))
 	$(call MKLIB,$@, $^)
 
 libasmrund.$(A): $(libasmrund_OBJECTS)
 	$(call MKLIB,$@, $^)
 
+libocamloptd.$(A): $(filter-out stdlib.%, $(libasmrund_OBJECTS))
+	$(call MKLIB,$@, $^)
+
 libasmruni.$(A): $(libasmruni_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+libocamlopti.$(A): $(filter-out stdlib.%, $(libasmruni_OBJECTS))
 	$(call MKLIB,$@, $^)
 
 libasmrun_pic.$(A): $(libasmrunpic_OBJECTS)
 	$(call MKLIB,$@, $^)
 
+libocamlopt_pic.$(A): $(filter-out stdlib.%, $(libasmrunpic_OBJECTS))
+	$(call MKLIB,$@, $^)
+
 libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
+	$(MKDLL) -o $@ $^ $(NATIVECCLIBS)
+
+libocamlopt_shared.$(SO): $(libasmrunpic_OBJECTS)
 	$(MKDLL) -o $@ $^ $(NATIVECCLIBS)
 
 # Target-specific preprocessor and compiler flags
