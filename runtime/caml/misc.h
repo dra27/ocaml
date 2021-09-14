@@ -103,16 +103,15 @@ CAMLdeprecated_typedef(addr, char *);
    The global variable in the runtime is defined with CAMLweakglobal and then
    overriding instances (e.g. for -make-runtime or -output-complete-exe) are
    defined with CAMLweakoverride. */
-#ifdef _WIN32
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
   #define CAMLweakglobal __declspec(selectany)
-#else
-  #define CAMLweakglobal __attribute__((selectany))
-#endif
-  #define CAMLweakoverride CAMLweakglobal
+  #define CAMLglobal_override __declspec(selectany)
+#elif defined(__MINGW32__)
+  #define CAMLweakglobal
+  #define CAMLglobal_override
 #else
   #define CAMLweakglobal CAMLweakdef
-  #define CAMLweakoverride
+  #define CAMLglobal_override
 #endif
 
 /* Alignment is necessary for domain_state.h, since the code generated */

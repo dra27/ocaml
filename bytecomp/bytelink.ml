@@ -506,7 +506,7 @@ let output_cds_file outfile =
 
 let emit_global_constant outchan typ (name, value) =
   let value = Misc.Stdlib.String.escaped_c value in
-  Printf.fprintf outchan "%s * %s = %s;\n" typ name value
+  Printf.fprintf outchan "CAMLglobal_override %s * %s = %s;\n" typ name value
 
 (* Output a bytecode executable as a C file *)
 
