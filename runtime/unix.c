@@ -469,9 +469,9 @@ CAMLexport char * caml_dirname (const char * path)
 
 CAMLexport char * caml_realpath (const char * path)
 {
-#ifdef HAS_REALPATH
+/*#ifdef HAS_REALPATH*/
   return realpath(path, NULL);
-#else
+/*#else
   return NULL;
-#endif
+#endif*/
 }
