@@ -116,6 +116,7 @@ CAMLexport void caml_parse_ld_conf(void)
     caml_secure_getenv(T("CAMLLIB")),
     caml_standard_library };
   char_os * ldconfs[3] = {NULL, NULL, NULL};
+  char * raw_config;
   char_os * config;
   char_os * p, * q, * r;
 #ifdef _WIN32
@@ -144,23 +145,25 @@ CAMLexport void caml_parse_ld_conf(void)
 
         if (j == i) {
           /* Allocate or grow the buffer, if needed */
+          /* XXX The Windows impl. reveals the already-known pointlessness of the memory over-management here! */
           if (configsize == 0) {
-            config = caml_stat_alloc((st.st_size + 1) * sizeof(char_os));
+            raw_config = caml_stat_alloc(st.st_size + 1);
           } else if (configsize < st.st_size + 1) {
             configsize = st.st_size + 1;
-            config = caml_stat_resize(config, configsize * sizeof(char_os));
+            raw_config = caml_stat_resize(raw_config, configsize);
           }
 
           if ((ldconf = open_os(ldconfs[i], O_RDONLY, 0)) == -1) {
             caml_fatal_error("cannot read loader config file %s",
                              caml_stat_strdup_of_os(ldconfs[i]));
           }
-          if (read(ldconf, config, st.st_size) != st.st_size) {
+          if (read(ldconf, raw_config, st.st_size) != st.st_size) {
             caml_fatal_error("error while reading loader config file %s",
                              caml_stat_strdup_of_os(ldconfs[i]));
           }
           close(ldconf);
-          config[st.st_size] = 0;
+          raw_config[st.st_size] = 0;
+          config = caml_stat_strdup_to_os(raw_config);
 
           for (p = q = config; *p != 0; p++) {
             if (*p == '\n') {
@@ -180,6 +183,7 @@ CAMLexport void caml_parse_ld_conf(void)
           }
           if (q < p)
             add_ld_conf_entry(locations[i], q);
+          caml_stat_free(config);
         }
       }
     }
