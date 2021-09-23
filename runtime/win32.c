@@ -1125,7 +1125,7 @@ CAMLexport wchar_t * caml_realpath(const wchar_t * path)
 
   if (len >= 4 && result[0] == L'\\' && result[1] == L'\\'
       && result[2] == L'?' && result[3] == L'\\') {
-    wmemmove(result, &result[4], len - 3);
+    wmemmove_s(result, len, &result[4], len - 3);
   }
 
 cleanup:
