@@ -3420,13 +3420,6 @@ if test "${enable_runtime_search+set}" = set; then :
   *) :
     as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
 esac
-else
-  case $host in #(
-      *-w64-mingw32*|*-pc-windows) :
-    runtime_search='always' ;; #(
-  *) :
-     ;;
-esac
 fi
 
 
@@ -3441,13 +3434,6 @@ if test "${enable_runtime_search_target+set}" = set; then :
     runtime_search_target='always' ;; #(
   *) :
     as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
-esac
-else
-  case $host in #(
-      *-w64-mingw32*|*-pc-windows) :
-    runtime_search_target='always' ;; #(
-  *) :
-     ;;
 esac
 fi
 
