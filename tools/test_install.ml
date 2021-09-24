@@ -117,7 +117,7 @@ let load_libraries_in_toplevel env ?runtime toplevel ext libraries =
   let pid =
     let executable, args =
       match runtime with
-      | Some runtime when not Sys.win32 ->
+      | Some runtime ->
           runtime, [| runtime; toplevel; "-noinit"; "-no-version"; "-noprompt";
                   "test_install_script.ml" |]
       | _ -> toplevel, [| toplevel; "-noinit"; "-no-version"; "-noprompt";
@@ -163,7 +163,7 @@ let load_libraries_in_prog env ?runtime libdir compiler native_compiler ~native
     let dynlink = if native then "dynlink.cmxa" else "dynlink.cma" in
     let executable, args =
       match runtime with
-      | Some runtime when not Sys.win32 && not native_compiler ->
+      | Some runtime when not native_compiler ->
           (* XXX All the dupl, etc. *)
           runtime, [| runtime; compiler; "-I"; "+dynlink"; dynlink; "-linkall";
                             "-o"; test_program; "test_install_script.ml" |]
@@ -265,9 +265,9 @@ let test_bytecode_binaries ~full env bindir =
                        regardless *)
                     result <> Unix.WEXITED 0
                 | `Launcher ->
-                    (* Second time around, the executable launchers should fail,
-                       except on Windows (since PATH is adjusted) *)
-                    not Sys.win32 && result <> Unix.WEXITED 2
+                    (* Second time around, the executable launchers should
+                       fail *)
+                    result <> Unix.WEXITED 2
                 | `Shebang ->
                     (* Second time around, the shebangs should all be broken so
                        Unix_error should already have been raised! *)
@@ -279,7 +279,7 @@ let test_bytecode_binaries ~full env bindir =
               exit 1
             end
           with Unix.Unix_error(_, "create_process", _) as e ->
-            if full || Sys.win32 then
+            if full then
               raise e
             else
               Printf.printf "unable to run\n%!"
@@ -467,7 +467,7 @@ let run_program env ?runtime test_program ~arg =
           (* We should get here if the program used the executable launcher, not
              a shebang *)
           let (_, result) = Unix.waitpid [] pid in
-          if not Sys.win32 && result <> Unix.WEXITED 2 then begin
+          if result <> Unix.WEXITED 2 then begin
             Printf.eprintf "%s did not terminate as expected (launcher %a)\n"
                            test_program print_process_status result;
             exit 1
@@ -542,7 +542,7 @@ let test_standard_library_location ~full env bindir libdir supports_shared
                                    ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
   let runtime =
-    if native_compiler || Sys.win32 then
+    if native_compiler then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun"))
@@ -558,6 +558,10 @@ let test_standard_library_location ~full env bindir libdir supports_shared
                 ocamlc_where ocamlopt_where;
   let unix_only = true in
   let tendered = true in
+  (* With an absolute header, in bytecode-only mode, flexlink is a bytecode
+     executable and cannot run in the second phase. *)
+  let disabled_for_bytecode_only_windows =
+    not full && Sys.win32 && not native_compiler in
   let programs = List.filter_map Fun.id [
     (* XXX Shouldn't this more be that the test is expected to fail?? *)
     compile_with_options ~tendered ~relative_libdir ~full env ocamlc ?runtime
@@ -565,6 +569,7 @@ let test_standard_library_location ~full env bindir libdir supports_shared
       [] "test_bytecode"
       "Bytecode (with tender)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
+      ~unix_only:disabled_for_bytecode_only_windows
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
     compile_with_options
@@ -579,6 +584,7 @@ let test_standard_library_location ~full env bindir libdir supports_shared
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
+      ~unix_only:disabled_for_bytecode_only_windows
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
     compile_with_options
