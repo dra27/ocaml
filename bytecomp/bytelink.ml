@@ -317,7 +317,8 @@ type runtime_launch_info = {
   buffer : string;
   bindir : string;
   launcher : launch_method;
-  executable_offset : int
+  executable_offset : int;
+  runtime_id : string
 }
 
 (* See https://www.in-ulm.de/~mascheck/various/shebang/#origin for a deep
@@ -333,8 +334,9 @@ let invalid_for_shebang_line path =
   String.length path > 125 || String.exists invalid_char path
 
 (* The runtime-launch-info file consists of two "lines" followed by binary data.
-   The file is _always_ LF-formatted, even on Windows. The sequence of bytes up
-   to the first '\n' is interpreted:
+   The file is _always_ LF-formatted, even on Windows. The first four bytes are
+   the bytecode runtime ID. The sequence of bytes following that up to the first
+   '\n' is interpreted:
      - "sh" - use a shebang-style launcher. If sh is needed, determine its
               location from [command -p -v sh]
      - "exe" - use the executable launcher contained in this runtime-launch-info
@@ -365,8 +367,13 @@ let read_runtime_launch_info file =
       else
         bindir in
     let executable_offset = bindir_end + 2 in
+    let kind, runtime_id =
+      (* In order to bootstrap, including the Runtime ID must be optional *)
+      if buffer.[0] <> '0' then
+        String.sub buffer 0 (bindir_start - 1), ""
+      else
+      String.sub buffer 4 (bindir_start - 5), String.sub buffer 0 4 in
     let launcher =
-      let kind = String.sub buffer 0 (bindir_start - 1) in
       if kind = "exe" then
         Executable
       else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
@@ -377,7 +384,7 @@ let read_runtime_launch_info file =
        || buffer.[executable_offset - 1] <> '\n' then
       raise Not_found
     else
-      {bindir; launcher; buffer; executable_offset}
+      {bindir; launcher; buffer; executable_offset; runtime_id}
   with Not_found ->
     raise (Error (Camlheader ("corrupt header", file)))
 
@@ -405,17 +412,6 @@ let find_bin_sh () =
    called) *)
 
 let write_header outchan =
-  let use_runtime, runtime =
-    if String.length !Clflags.use_runtime > 0 then
-      (* Do not use BUILD_PATH_PREFIX_MAP mapping for this. *)
-      let make_absolute file =
-        if Filename.is_relative file then Filename.concat (Sys.getcwd()) file
-        else file in
-      (true, make_absolute !Clflags.use_runtime)
-    else
-      (false, "ocamlrun" ^ !Clflags.runtime_variant)
-  in
-  (* Write the header *)
   let runtime_info =
     let header = "runtime-launch-info" in
     try read_runtime_launch_info (Load_path.find header)
@@ -431,6 +427,24 @@ let write_header outchan =
         {runtime_info with launcher = Shebang_bin_sh path}
     | None ->
         runtime_info
+  in
+  let use_runtime, runtime =
+    if String.length !Clflags.use_runtime > 0 then
+      (* Do not use BUILD_PATH_PREFIX_MAP mapping for this. *)
+      let make_absolute file =
+        if Filename.is_relative file then Filename.concat (Sys.getcwd()) file
+        else file in
+      (true, make_absolute !Clflags.use_runtime)
+    else
+      let runtime =
+        (* In order to bootstrap, including the Runtime ID must be optional *)
+        if runtime_info.runtime_id = "" then
+          "ocamlrun" ^ !Clflags.runtime_variant
+        else
+        Printf.sprintf "ocamlrun%s-%s"
+                       !Clflags.runtime_variant runtime_info.runtime_id
+      in
+      (false, runtime)
   in
   let runtime =
     (* Historically, the native Windows ports are assumed to be finding
@@ -465,6 +479,7 @@ let write_header outchan =
       else
         Shebang_runtime
   in
+  (* Write the header *)
   match launcher with
   | Shebang_runtime ->
       (* Use the runtime directly *)
