@@ -352,20 +352,6 @@ endef # _OCAML_PROGRAM_BASE
 BOOTSTRAPPED := \
   $(shell grep -Fq 'launch-method' $(ROOTDIR)/boot/ocamlc && echo Bootstrapped)
 
-ifeq "$(UNIX_OR_WIN32)$(BOOTSTRAPPED)" "win32"
-
-# Historically, the native Windows ports are assumed to be finding ocamlrun
-# using a PATH search.
-ifeq "$(SUFFIXING)" "true"
-# Pre-bootstrap, this workaround is needed for Windows which (ab)uses
-# -runtime-variant to specify the suffix without also specifying the path.
-BYTECODE_RUNTIME_FLAGS = -runtime-variant -$(ZINC_RUNTIME_ID)
-else
-BYTECODE_RUNTIME_FLAGS =
-endif
-
-else
-
 ifeq "$(SUFFIXING)" "true"
 RUNTIME_NAME = $(if $(BOOTSTRAPPED),,ocamlrun-$(ZINC_RUNTIME_ID))
 else
@@ -375,8 +361,6 @@ endif
 BYTECODE_RUNTIME_FLAGS = \
   -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
   $(if $(BOOTSTRAPPED),-launch-method $(LAUNCH_METHOD))
-
-endif
 
 ADD_BYTECODE_RUNTIME = \
   $(if $(filter -custom, $(1)),,\
