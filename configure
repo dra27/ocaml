@@ -750,6 +750,17 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search
+zinc_runtime_id
+native_runtime_id
+bytecode_runtime_id
+bindir_to_libdir
+target_bindir_exp_sh
+target_bindir_exp
+target_bindir
+bindir_exp_sh
+bindir_exp
+ln
 QS
 force_instrumented_runtime
 compute_deps
@@ -800,6 +811,7 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+bin_sh
 shebangscripts
 long_shebang
 bootstrapping_flexdll
@@ -839,6 +851,7 @@ exeext
 ac_tool_prefix
 DIFF_FLAGS
 CC
+OCAML_RELEASE_NUMBER
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
 OCAML_VERSION_PATCHLEVEL
@@ -925,6 +938,8 @@ enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
+enable_relative
+enable_runtime_search
 with_afl
 with_flexdll
 enable_shared
@@ -1609,6 +1624,9 @@ Optional Features:
   --disable-function-sections
                           do not emit each function in a separate section
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
+  --enable-relative       try to locate the standard library using relative
+                          paths
+  --enable-runtime-search allow bytecode executables to search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -1619,7 +1637,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-odoc             build documentation with odoc
-  --with-target-bindir    location of binary programs on target system
+  --with-target-bindir    location of the runtime binaries on target system
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -2817,6 +2835,8 @@ instrumented_runtime=true
 force_instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+bindir_to_libdir=''
+runtime_search=no
 
 # Information about the package
 
@@ -2874,11 +2894,14 @@ OCAML_VERSION_EXTRA=alpha1
 
 OCAML_VERSION_SHORT=5.0
 
+OCAML_RELEASE_NUMBER=16
+
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -2967,6 +2990,17 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -2974,6 +3008,14 @@ ac_config_files="$ac_config_files Makefile.build_config"
 ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_files="$ac_config_files stdlib/sys.ml"
+
+ac_config_files="$ac_config_files stdlib/camlheader.shebang"
+
+ac_config_files="$ac_config_files stdlib/camlheader.sh"
+
+ac_config_files="$ac_config_files stdlib/target_camlheader.shebang"
+
+ac_config_files="$ac_config_files stdlib/target_camlheader.sh"
 
 ac_config_files="$ac_config_files manual/src/version.tex"
 
@@ -3008,6 +3050,8 @@ $as_echo "#define OCAML_VERSION_ADDITIONAL \"alpha1\"" >>confdefs.h
 $as_echo "#define OCAML_VERSION 50000" >>confdefs.h
 
 $as_echo "#define OCAML_VERSION_STRING \"5.0.0~alpha1\"" >>confdefs.h
+
+$as_echo "#define OCAML_RELEASE_NUMBER 16" >>confdefs.h
 
 
 # Works out how many "o"s are needed in quoted strings
@@ -3355,7 +3399,9 @@ fi
 
 # Check whether --with-target-bindir was given.
 if test "${with_target_bindir+set}" = set; then :
-  withval=$with_target_bindir;
+  withval=$with_target_bindir; target_bindir=$withval
+else
+  target_bindir=''
 fi
 
 
@@ -3418,6 +3464,23 @@ fi
 # Check whether --enable-mmap-map-stack was given.
 if test "${enable_mmap_map_stack+set}" = set; then :
   enableval=$enable_mmap_map_stack;
+fi
+
+
+# Check whether --enable-relative was given.
+if test "${enable_relative+set}" = set; then :
+  enableval=$enable_relative;
+fi
+
+
+# Check whether --enable-runtime-search was given.
+if test "${enable_runtime_search+set}" = set; then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  yes|no|always) :
+     ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
 fi
 
 
@@ -12677,10 +12740,33 @@ esac
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
-    ocamlyacc_wstr_module="yacc/wstr" ;; #(
+    dir_sep="\\"
+    ocamlyacc_wstr_module="yacc/wstr"
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
+$as_echo_n "checking for a workable solution for ln -sf... " >&6; }
+  ln -sf configure conftestLink
+  if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
+  rm -f conftestLink
+    CYGWIN=winsymlinks:native ln -sf configure conftestLink
+    if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
+  ln='cp -pf'
+else
+  ln='CYGWIN=winsymlinks:native ln -sf'
+
+fi
+else
+  ln='ln -sf'
+
+fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
+$as_echo "$ln" >&6; }
+ ;; #(
   *) :
     unix_or_win32="unix"
-  ocamlyacc_wstr_module="" ;;
+  dir_sep='/'
+  ocamlyacc_wstr_module=""
+  ln='ln -sf' ;;
 esac
 case $host in #(
   *-*-cygwin*|*-*-mingw32|*-pc-windows) :
@@ -12728,6 +12814,7 @@ $as_echo "$ac_cv_sys_interpreter" >&6; }
 interpval=$ac_cv_sys_interpreter
 
 
+bin_sh=''
 long_shebang=false
 if test "x$interpval" = "xyes"; then :
   case $host in #(
@@ -12735,18 +12822,14 @@ if test "x$interpval" = "xyes"; then :
     shebangscripts=false ;; #(
   *) :
     shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
+      bin_sh="$(command -v sh 2>/dev/null)"
+      if test x"$bin_sh" = 'x' || test x"${bin_sh#* }" != x"$bin_sh" \
+             || test "${#bin_sha}" -gt 125; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: could not determine a shebang-compatible location of sh - #! scripts disabled" >&5
+$as_echo "$as_me: WARNING: could not determine a shebang-compatible location of sh - #! scripts disabled" >&2;}
+        shebangscripts=false
+        bin_sh=''
 fi
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
-
      ;;
 esac
 else
@@ -13495,6 +13578,13 @@ _ACEOF
 fi
 
 done
+
+ac_fn_c_check_header_mongrel "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
+if test "x$ac_cv_header_libgen_h" = xyes; then :
+  $as_echo "#define HAS_LIBGEN_H 1" >>confdefs.h
+
+fi
+
 
 ac_fn_c_check_header_mongrel "$LINENO" "stdint.h" "ac_cv_header_stdint_h" "$ac_includes_default"
 if test "x$ac_cv_header_stdint_h" = xyes; then :
@@ -18173,6 +18263,107 @@ if test x"$mandir" = x'${datarootdir}/man'; then :
   mandir='${prefix}/man'
 fi
 
+if test x"$enable_relative" = "xyes"; then :
+
+
+  eval "from=\"\$bindir\""
+  eval "to=\"\$libdir\""
+
+  if test -z ""; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking relative path between \$bindir and \$libdir" >&5
+$as_echo_n "checking relative path between \$bindir and \$libdir... " >&6; }
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking relative path between $from and $to" >&5
+$as_echo_n "checking relative path between $from and $to... " >&6; }
+
+fi
+
+
+  if test "x$from" = "x$to"; then :
+
+    result='.'
+
+else
+
+        echo "$from" > conftest.from
+    echo "$to" > conftest.to
+    common_prefix_len="$(cmp -l conftest.from conftest.to 2>/dev/null \
+                           | head -n 1 \
+                           | sed -e 's/^ *//' \
+                           | cut -d ' ' -f 1)"
+    common_prefix="$(expr $common_prefix_len - 1)"
+    if test $common_prefix -eq 0; then :
+
+      result=''
+      if test -z ""; then :
+  as_fn_error $? "no common prefix" "$LINENO" 5
+fi
+
+else
+
+      common_prefix="$(echo "$from" | cut -c -$common_prefix)"
+
+                        from_chopped="$(echo "$from" | cut -c $common_prefix_len-)"
+      to_chopped="$(echo "$to" | cut -c $common_prefix_len-)"
+      if test "x${common_prefix}" = "x${from}" && \
+             test -z "${to_chopped##/*}" ; then :
+
+        result=".$to_chopped"
+
+elif test "y${common_prefix}" = "x${to}" && \
+       test -z "${from_chopped##/*}"; then :
+
+        echo "Here with $from_chopped and $to_chopped but confused"
+        exit 1
+
+else
+
+                                        if test "x${common_prefix}" = "x${to}" && \
+               test -z "${from_chopped##/*}"; then :
+
+          common_prefix=$(echo "$common_prefix/" | wc -c)
+
+else
+
+          common_prefix=$(echo "${common_prefix%/*}/" | wc -c)
+
+fi
+                get_from="$(echo "$from" | cut -c $common_prefix-)"
+        get_to="$(echo "$to" | cut -c $common_prefix-)"
+                                result=''
+        while test "$get_from" != '.' ; do
+          result="../$result"
+          get_from="$(dirname "$get_from")"
+        done
+        if test -z "$get_to"; then :
+
+          result="${result%/}"
+
+else
+
+          result="$result$get_to"
+
+fi
+
+fi
+
+fi
+
+fi
+  eval "bindir_to_libdir='$result'"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $result" >&5
+$as_echo "$result" >&6; }
+
+
+fi
+
+if test x"$enable_runtime_search" != 'x'; then :
+  runtime_search="$enable_runtime_search"
+fi
+
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     case $WINDOWS_UNICODE_MODE in #(
@@ -18247,6 +18438,82 @@ if test x"$enable_stdlib_manpages" != "xno"; then :
 else
   stdlib_manpages=false
 fi
+
+if test x"$bindir" = 'x${exec_prefix}/bin'; then :
+  if test x"$exec_prefix" = 'xNONE'; then :
+  if test x"$prefix" = 'xNONE'; then :
+  bindir_exp="${ac_default_prefix}/bin"
+else
+  bindir_exp="${prefix}/bin"
+fi
+else
+  bindir_exp="${exec_prefix}/bin"
+fi
+fi
+if test x"${target_bindir}" = 'x'; then :
+  target_bindir_exp="$bindir_exp"
+else
+  target_bindir_exp="${target_bindir}"
+fi
+
+bindir_exp="${bindir_exp%$dir_sep}$dir_sep"
+bindir_exp_sh="'$(echo "${bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+target_bindir_exp="${target_bindir_exp%$dir_sep}$dir_sep"
+target_bindir_exp_sh="'$(echo "${target_bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=1
+# Bit 7 (int31)
+if ! $arch64; then :
+  quintet1="4 + ${quintet1}"
+fi
+# Bit 8 (no shared libraries)
+if ! $supports_shared_libraries; then :
+  quintet1="8 + ${quintet1}"
+fi
+# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${profinfo_width} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+if $frame_pointers; then :
+  quintet3_native='1'
+else
+  quintet3_native='0'
+fi
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+if ! $flat_float_array; then :
+  quintet3_byte="8 + ${quintet3_byte}"
+fi
+# Bit 19 (WINDOWS_UNICODE=ansi)
+case $host,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3_byte="16 + ${quintet3_byte}" ;; #(
+  *) :
+     ;;
+esac
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}1"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}1"
+zinc_runtime_id="00${quintet1}1"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
@@ -19350,6 +19617,10 @@ do
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;
+    "stdlib/camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.shebang" ;;
+    "stdlib/camlheader.sh") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.sh" ;;
+    "stdlib/target_camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.shebang" ;;
+    "stdlib/target_camlheader.sh") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.sh" ;;
     "manual/src/version.tex") CONFIG_FILES="$CONFIG_FILES manual/src/version.tex" ;;
     "manual/src/html_processing/src/common.ml") CONFIG_FILES="$CONFIG_FILES manual/src/html_processing/src/common.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;

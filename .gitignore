@@ -176,10 +176,10 @@ META
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
+/stdlib/camlheader.sh
 /stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
-/stdlib/camlheader_ur
+/stdlib/target_camlheader.sh
+/stdlib/*.shebang
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
