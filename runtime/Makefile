@@ -204,7 +204,7 @@ install::
 	$(INSTALL_PROG) \
     $(1)$(EXE) "$(INSTALL_BINDIR)/$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
 	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)"
+    $(LN) "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
 $(foreach id, $(RUNTIME_ADDITIONAL_NAMES), \
   $(call CREATE_LINK,$(1)-$(BYTECODE_RUNTIME_ID)$(EXE),$(1)-$(id)$(EXE)))
 endef
