@@ -235,12 +235,8 @@ let read_runtime ic =
     try
       let dir, name = Misc.cut_at rntm '\000' in
       if name = "" then
-        if Sys.win32 then
-          let runtime, id = cut_runtime_id dir in
-          runtime, id, Search
-        else
-          let dir, runtime, id = cut_path dir in
-          runtime, id, Absolute dir
+        let dir, runtime, id = cut_path dir in
+        runtime, id, Absolute dir
       else
         let runtime, id = cut_runtime_id name in
         if dir = "" then

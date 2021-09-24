@@ -105,11 +105,11 @@ let run config env =
                     in
                     match search with
                     | Absolute dir ->
-                        dir ^ runtime ^ id, not Sys.win32 && expected
+                        dir ^ runtime ^ id, expected
                     | Absolute_then_search dir ->
                         Printf.sprintf "[%s]%s%s" dir runtime id, false
                     | Search ->
-                        runtime ^ id, Sys.win32 && expected
+                        runtime ^ id, false
                   in
                   let expected_launch_mode =
                     if config.shebangscripts then
