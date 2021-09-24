@@ -31,12 +31,12 @@ type t = {
     (** Not implemented; always None. *)
   launcher_searches_for_ocamlrun: bool;
     (** Indicates whether bytecode executables in the compiler distribution use
-        a launcher that is capable of searching PATH to find ocamlrun. At
-        present, only native Windows has this behaviour. *)
+        a launcher that is capable of searching PATH to find ocamlrun. This used
+        to be the behaviour for native Windows. *)
   target_launcher_searches_for_ocamlrun: bool;
     (** Indicates whether the executable launcher used by ocamlc is capable of
-        searching PATH to find ocamlrun. At present, only native Windows has
-        this behaviour. *)
+        searching PATH to find ocamlrun. This used to be the behaviour for
+        native Windows. *)
   libraries: string list list
     (** Sorted list of basenames of libraries to test.
         Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
@@ -3445,8 +3445,8 @@ let () =
   let header_size =
     let {Bytelink.buffer; executable_offset; _} = runtime_launch_info in
     String.length buffer - executable_offset in
-  let launcher_searches_for_ocamlrun = Sys.win32 in
-  let target_launcher_searches_for_ocamlrun = Sys.win32 in
+  let launcher_searches_for_ocamlrun = false in
+  let target_launcher_searches_for_ocamlrun = false in
   let config =
     {config with Installation.libraries; launcher_searches_for_ocamlrun;
                  target_launcher_searches_for_ocamlrun}
