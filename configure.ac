@@ -702,11 +702,7 @@ AC_ARG_ENABLE([runtime-search],
     [yes],[runtime_search='enable'],
     [always],[runtime_search='always'],
     [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
-       --enable-runtime-search]))])],
-  [AS_CASE([$host],
-dnl Historically, the native Windows ports are assumed to be finding ocamlrun
-dnl using a PATH search. *)
-    [*-w64-mingw32*|*-pc-windows],[runtime_search='always'])])
+       --enable-runtime-search]))])])
 
 AC_ARG_ENABLE([runtime-search-target],
   [AS_HELP_STRING([--enable-runtime-search-target],
@@ -716,11 +712,7 @@ AC_ARG_ENABLE([runtime-search-target],
     [yes],[runtime_search_target='enable'],
     [always],[runtime_search_target='always'],
     [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
-       --enable-runtime-search-target]))])],
-  [AS_CASE([$host],
-dnl Historically, the native Windows ports are assumed to be finding ocamlrun
-dnl using a PATH search. *)
-    [*-w64-mingw32*|*-pc-windows],[runtime_search_target='always'])])
+       --enable-runtime-search-target]))])])
 
 AS_CASE([$suffixing,$runtime_search,$runtime_search_target],
   [true,*,*|false,,],[],
