@@ -408,17 +408,6 @@ let find_bin_sh () =
    called) *)
 
 let write_header outchan =
-  let use_runtime, runtime =
-    if String.length !Clflags.use_runtime > 0 then
-      (true, make_absolute !Clflags.use_runtime)
-    else
-      let ocamlrun =
-        Printf.sprintf "ocamlrun%s-%s"
-                       !Clflags.runtime_variant
-                       Config.zinc_runtime_id
-      in
-      (false, ocamlrun)
-  in
   (* Write the header *)
   let runtime_info =
     let header = "runtime-launch-info" in
@@ -426,11 +415,14 @@ let write_header outchan =
     with Not_found -> raise (Error (File_not_found header))
   in
   let runtime =
-    (* Historically, the native Windows ports are assumed to be finding
-       ocamlrun using a PATH search. *)
-    if use_runtime || Sys.win32 then
-      runtime
+    if String.length !Clflags.use_runtime > 0 then
+      make_absolute !Clflags.use_runtime
     else
+      let runtime =
+        Printf.sprintf "ocamlrun%s-%s"
+                       !Clflags.runtime_variant
+                       Config.zinc_runtime_id
+      in
       Filename.concat runtime_info.bindir runtime
   in
   (* Determine which method will be used for launching the executable:
