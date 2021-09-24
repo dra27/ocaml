@@ -25,6 +25,7 @@ else
   FLEXDLL_DIR = +flexdll
 endif
 
+TARGET_BINDIR ?= $(BINDIR)
 FLEXLINK_FLAGS ?=
 
 # SUBST_QUOTE does the same as SUBST_STRING, adding OCaml quotes around
@@ -62,6 +63,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_STRING,FLEXDLL_CHAIN) \
 	    $(call SUBST,HOST) \
 	    $(call SUBST_STRING,BINDIR) \
+	    $(call SUBST_STRING,TARGET_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL_EXP) \
 	    $(call SUBST_STRING,MKEXE_EXP) \
