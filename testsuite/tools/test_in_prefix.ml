@@ -119,8 +119,8 @@ let () =
     (Unix.stat (Filename.concat libdir "camlheader")).Unix.st_size in
   let bytecode_shebangs_by_default =
     Config.launch_method <> Config.Executable in
-  let launcher_searches_for_ocamlrun = Sys.win32 in
-  let target_launcher_searches_for_ocamlrun = Sys.win32 in
+  let launcher_searches_for_ocamlrun = false in
+  let target_launcher_searches_for_ocamlrun = false in
   let config =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
@@ -140,13 +140,7 @@ let () =
 
      For the compiler's files to be reproducible, the compiler needs to be both
      relocatable and also required support from the assembler and C compiler. *)
-  let relocatable =
-    (* A Windows build with a relative libdir and no native compiler (to avoid
-       the cmt/cmti absolute path embedding) ends up being reproducible because
-       the executable header doesn't include the prefix! *)
-    config.has_relative_libdir <> None
-    && not config.has_ocamlopt
-    && launcher_searches_for_ocamlrun in
+  let relocatable = false in
   let reproducible =
     relocatable
     (* At present, the compiler build doesn't actually take advantage of this
@@ -206,7 +200,10 @@ let () =
       snd (Environment.run_process env ocamlrun [boot_ocamlc; "-config"])
       |> List.exists (String.starts_with ~prefix:"zinc_runtime_id: ")
     in
-    {config with zinc_bootstrapped}
+    let launcher_searches_for_ocamlrun =
+      config.launcher_searches_for_ocamlrun && not zinc_bootstrapped
+    in
+    {config with zinc_bootstrapped; launcher_searches_for_ocamlrun}
   in
   let run_tests = run_tests ~sh config in
   (* 1. Relocation test *)
