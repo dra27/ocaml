@@ -1751,11 +1751,9 @@ ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
 else
 # Pre-bootstrap, -launch-method can't be placed by default in
 # $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc. The
-# -runtime-variant workaround is needed for Windows, which (ab)uses this flag in
-# order to specify the suffix without also specifying the path.
+# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
 ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD) -runtime-variant ''
+  -launch-method $(LAUNCH_METHOD)
 endif
 
 .PHONY: ocamldoc
@@ -2114,11 +2112,9 @@ debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
 else
 # Pre-bootstrap, -launch-method can't be placed by default in
 # $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc. The
-# -runtime-variant workaround is needed for Windows, which (ab)uses this flag in
-# order to specify the suffix without also specifying the path.
+# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
 debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD) -runtime-variant ''
+  -launch-method $(LAUNCH_METHOD)
 endif
 
 clean::
@@ -2381,11 +2377,9 @@ tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
 else
 # Pre-bootstrap, -launch-method can't be placed by default in
 # $(OC_BYTECODE_LINKFLAGS), since boot/ocamlc doesn't support it, so it has to
-# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc. The
-# -runtime-variant workaround is needed for Windows, which (ab)uses this flag in
-# order to specify the suffix without also specifying the path.
+# be added explicitly for the executables compiled with $(ROOTDIR)/ocamlc.
 tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += \
-  -launch-method $(LAUNCH_METHOD) -runtime-variant ''
+  -launch-method $(LAUNCH_METHOD)
 endif
 
 # we need str and unix which depend on the bytecode version of other tools
