@@ -582,7 +582,7 @@ let load_libraries_in_prog env ?runtime libdir compiler ~native libraries =
       "-o"; test_program; "test_install_script.ml"
     ] in
     let runtime =
-      if Sys.win32 || config.has_ocamlopt then
+      if config.has_ocamlopt then
         None
       else
         runtime in
@@ -638,9 +638,9 @@ let test_bytecode_binaries ~full env bindir =
                        regardless *)
                     result <> 0
                 | `Launcher ->
-                    (* Second time around, the executable launchers should fail,
-                       except on Windows (since PATH is adjusted) *)
-                    not Sys.win32 && result <> 2
+                    (* Second time around, the executable launchers should
+                       fail *)
+                    result <> 2
                 | `Shebang ->
                     (* Second time around, the shebangs should all be broken so
                        Unix_error should already have been raised! *)
@@ -652,7 +652,7 @@ let test_bytecode_binaries ~full env bindir =
             if result = 2 then
               print_endline "unable to run"
           with Unix.Unix_error(_, "create_process", _) as e ->
-            if full || Sys.win32 then
+            if full then
               raise e
             else
               print_endline "  Result: unable to run"
@@ -784,11 +784,11 @@ let compile_with_options ?(unix_only=false)
     None
   else
     let cont test_program ?runtime env ~arg =
-      let runtime = if tendered && not Sys.win32 then runtime else None in
+      let runtime = if tendered then runtime else None in
       run_program env ?runtime test_program ~arg;
       if full then
         Some (fun ?runtime env ~arg ->
-          let runtime = if tendered && not Sys.win32 then runtime else None in
+          let runtime = if tendered then runtime else None in
           run_program env ?runtime test_program ~arg;
           Sys.remove test_program;
           None)
@@ -826,7 +826,7 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 display_path bindir;
   let runtime =
-    if full || config.has_ocamlopt || Sys.win32 then
+    if full || config.has_ocamlopt then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun"))
@@ -843,12 +843,17 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
   let unix_only = true in
   let tendered = true in
   let needs_shared = true in
+  (* With an absolute header, in bytecode-only mode, flexlink is a bytecode
+     executable and cannot run in the second phase. *)
+  let disabled_for_bytecode_only_windows =
+    not full && Sys.win32 && not config.has_ocamlopt in
   let programs = List.filter_map Fun.id [
     (* XXX Shouldn't this more be that the test is expected to fail?? *)
     compile_with_options ~tendered ~full env ocamlc ?runtime ~native:false
       [] "test_bytecode"
       "Bytecode (with tender)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
+      ~unix_only:disabled_for_bytecode_only_windows
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
     compile_with_options
@@ -863,6 +868,7 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
+      ~unix_only:disabled_for_bytecode_only_windows
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
     compile_with_options
@@ -897,7 +903,7 @@ let run_tests ~full env bindir libdir libraries =
   let ocamlc = exe (Filename.concat bindir "ocamlc") in
   let ocamlopt = exe (Filename.concat bindir "ocamlopt") in
   let runtime =
-    if full || Sys.win32 then
+    if full then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun")) in
