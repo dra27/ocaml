@@ -398,13 +398,13 @@ let write_header outchan =
         runtime_info
   in
   let static = not Config.supports_shared_libraries in
-  let use_runtime, runtime =
+  let runtime =
     if String.length !Clflags.use_runtime > 0 then
       (* Do not use BUILD_PATH_PREFIX_MAP mapping for this. *)
       let make_absolute file =
         if Filename.is_relative file then Filename.concat (Sys.getcwd()) file
         else file in
-      (true, make_absolute !Clflags.use_runtime)
+      make_absolute !Clflags.use_runtime
     else
       let runtime_id =
         let open Config in
@@ -416,14 +416,6 @@ let write_header outchan =
       let runtime =
         Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id
       in
-      (false, runtime)
-  in
-  let runtime =
-    (* Historically, the native Windows ports are assumed to be finding
-       ocamlrun using a PATH search. *)
-    if use_runtime || Sys.win32 then
-      runtime
-    else
       Filename.concat runtime_info.bindir runtime
   in
   (* Determine which method will be used for launching the executable:
