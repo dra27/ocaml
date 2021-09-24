@@ -1143,11 +1143,11 @@ let library mode name =
 
 (* launcher_searches_for_ocamlrun describes whether ocamlc emits an RNTM with
    the name of the runtime only, expecting the launcher in stdlib/header*.c to
-   search PATH for it. Only native Windows has this behaviour at present. *)
+   search PATH for it. This used to be the behaviour for native Windows. *)
 let launcher_searches_for_ocamlrun =
-  Sys.win32
+  false
 let target_launcher_searches_for_ocamlrun =
-  Sys.win32
+  false
 
 (* linker_is_flexlink is true for Cygwin when shared library support is enabled
    and always true for native Windows. *)
