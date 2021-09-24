@@ -84,7 +84,7 @@ HEADERPROGRAM = header
 HEADER_PATH = $(if $(TARGET_BINDIR),$(TARGET_BINDIR),$(BINDIR))/
 else # Windows
 HEADERPROGRAM = headernt
-HEADER_PATH = $(TARGET_BINDIR)/
+HEADER_PATH = $(if $(TARGET_BINDIR),$(TARGET_BINDIR),$(BINDIR))/
 endif
 
 # The shebang test in configure.ac will need updating if any runtime is
@@ -107,8 +107,11 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
 
+# XXX RUNTIME_FULL should be char_os
 $(HEADERPROGRAM)%$(O): \
   OC_CPPFLAGS += -DRUNTIME_NAME=$\
+    '"ocamlrun$(subst .,,$*)-$(BYTECODE_RUNTIME_ID)$(EXE)"' \
+  -DRUNTIME_FULL=$\
     '"$(HEADER_PATH)ocamlrun$(subst .,,$*)-$(BYTECODE_RUNTIME_ID)$(EXE)"'
 
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c

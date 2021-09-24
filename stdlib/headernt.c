@@ -32,6 +32,8 @@
 #endif
 
 char * default_runtime_name = RUNTIME_NAME;
+/* FIXME Should be wchar_t* */
+char * default_runtime_full = RUNTIME_FULL;
 
 static
 #if _MSC_VER >= 1200
@@ -70,11 +72,14 @@ static __inline char * read_runtime_path(HANDLE h)
     } else if (path_size > 0)
       ofs += read_size(buffer + 4);
   }
-  if (path_size == 0) return default_runtime_name;
-  if (path_size >= MAX_PATH) return NULL;
-  if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return NULL;
-  if (! ReadFile(h, runtime_path, path_size, &nread, NULL)) return NULL;
-  if (nread != path_size) return NULL;
+  if (path_size == 0) {
+    path_size = 1;
+  } else {
+    if (path_size == 1 || path_size >= MAX_PATH) return NULL;
+    if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return NULL;
+    if (! ReadFile(h, runtime_path, path_size, &nread, NULL)) return NULL;
+    if (nread != path_size) return NULL;
+  }
   runtime_path[path_size - 1] = 0;
   return runtime_path;
 }
@@ -109,7 +114,7 @@ static void write_console(HANDLE hOut, WCHAR *wstr)
   }
 }
 
-static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
+static __inline void __declspec(noreturn) run_runtime(char * raw_runtime,
          wchar_t * const cmdline)
 {
   wchar_t path[MAX_PATH];
@@ -117,6 +122,17 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
   STARTUPINFO stinfo;
   PROCESS_INFORMATION procinfo;
   DWORD retcode;
+  wchar_t runtime[MAX_PATH];
+  if (raw_runtime[0] == 0) {
+    if (GetFileAttributesA(default_runtime_full) != INVALID_FILE_ATTRIBUTES)
+      /* XXX This will go straight to runtime */
+      raw_runtime = default_runtime_full;
+    else
+      raw_runtime = default_runtime_name;
+  }
+
+  MultiByteToWideChar(CP, 0, raw_runtime, -1, runtime,
+                      sizeof(runtime)/sizeof(wchar_t));
   if (SearchPath(NULL, runtime, L".exe", sizeof(path)/sizeof(wchar_t),
                  path, &dontcare) == 0) {
     HANDLE errh;
@@ -167,7 +183,6 @@ int wmain(void)
   wchar_t truename[MAX_PATH];
   wchar_t * cmdline = GetCommandLine();
   char * runtime_path;
-  wchar_t wruntime_path[MAX_PATH];
   HANDLE h;
 
   GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t));
@@ -185,9 +200,7 @@ int wmain(void)
 #endif
   }
   CloseHandle(h);
-  MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
-                      sizeof(wruntime_path)/sizeof(wchar_t));
-  run_runtime(wruntime_path , cmdline);
+  run_runtime(runtime_path , cmdline);
 #if _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
