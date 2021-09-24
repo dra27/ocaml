@@ -123,8 +123,8 @@ let () =
     String.length buffer - executable_offset in
   let bytecode_shebangs_by_default =
     runtime_launch_info.launcher <> Bytelink.Executable in
-  let launcher_searches_for_ocamlrun = Sys.win32 in
-  let target_launcher_searches_for_ocamlrun = Sys.win32 in
+  let launcher_searches_for_ocamlrun = false in
+  let target_launcher_searches_for_ocamlrun = false in
   let config =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
