@@ -92,6 +92,8 @@ endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
+RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun$(EXE)'
+
 # List of other libraries
 ALL_OTHERLIBS = dynlink str systhreads unix runtime_events
 
@@ -109,6 +111,15 @@ OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
+
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
 
 # Escape special characters in the argument string.
 # There are four characters that need escaping:
