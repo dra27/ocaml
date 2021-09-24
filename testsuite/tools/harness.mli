@@ -63,12 +63,12 @@ module Import : sig
       (** Not implemented; always None. *)
     launcher_searches_for_ocamlrun: bool;
       (** Indicates whether bytecode executables in the compiler distribution
-          use a launcher that is capable of searching PATH to find ocamlrun. At
-          present, only native Windows has this behaviour. *)
+          a launcher that is capable of searching PATH to find ocamlrun. This
+          used to be the behaviour for native Windows. *)
     target_launcher_searches_for_ocamlrun: bool;
       (** Indicates whether the executable launcher used by ocamlc is capable of
-          searching PATH to find ocamlrun. At present, only native Windows has
-          this behaviour. *)
+          searching PATH to find ocamlrun. This used to be the behaviour for
+          native Windows. *)
     bytecode_shebangs_by_default: bool;
       (** True if ocamlc uses a shebang-style header rather than an executable
           header for tendered bytecode executables. *)
