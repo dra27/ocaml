@@ -119,6 +119,9 @@ CAMLexport void caml_fatal_error (char *msg, ...)
     fprintf (stderr, "\n");
   }
   va_end(ap);
+#ifdef _CALL_REPORTFAULT
+  _set_abort_behavior(0, _CALL_REPORTFAULT);
+#endif
   abort();
 }
 
