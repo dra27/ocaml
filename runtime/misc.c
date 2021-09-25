@@ -121,6 +121,9 @@ CAMLexport void caml_fatal_error (const char *msg, ...)
     fprintf (stderr, "\n");
   }
   va_end(ap);
+#ifdef _CALL_REPORTFAULT
+  _set_abort_behavior(0, _CALL_REPORTFAULT);
+#endif
   /* We could use [caml_abort()] instead of [abort()], but misc.h
      documents that we call [abort()] so we kept this version
      for compatibility. */
