@@ -330,7 +330,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
         Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant
                                        Config.bytecode_runtime_id
       in
-      Filename.concat Config.runtime_bindir runtime_name
+      Filename.concat Config.runtime_bindir (runtime_name ^ Config.ext_exe)
   in
   Misc.try_finally
     ~always:(fun () -> close_out outchan)
@@ -396,7 +396,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
        end;
        Bytesections.init_record outchan;
        (* The path to the bytecode interpreter (in -use-runtime mode) *)
-       if standalone && use_runtime && !Clflags.with_runtime then
+       if standalone && (use_runtime || !Clflags.header = Clflags.Header.Executable) && !Clflags.with_runtime then
        begin
          output_string outchan runtime;
          output_char outchan '\n';

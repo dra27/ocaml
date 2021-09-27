@@ -123,7 +123,8 @@ static __inline void __declspec(noreturn) run_runtime(char * raw_runtime,
   PROCESS_INFORMATION procinfo;
   DWORD retcode;
   wchar_t runtime[MAX_PATH];
-  if (raw_runtime[0] == 0) {
+  /* Temporary hack over RNTM section - this is _not_ the final way to do it (-use-runtime should not necessarily fall back to basename search) */
+  if (raw_runtime[0] == 0 || GetFileAttributesA(raw_runtime) == INVALID_FILE_ATTRIBUTES) {
     if (GetFileAttributesA(default_runtime_full) != INVALID_FILE_ATTRIBUTES)
       /* XXX This will go straight to runtime */
       raw_runtime = default_runtime_full;
