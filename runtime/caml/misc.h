@@ -52,7 +52,14 @@
 #define CAML_MAKEWARNING1(x) CAML_STRINGIFY(GCC warning x)
 #endif
 #define CAML_MAKEWARNING2(y) CAML_MAKEWARNING1(#y)
+#ifndef _MSC_VER
 #define CAML_PREPROWARNING(x) _Pragma(CAML_MAKEWARNING2(x))
+#else
+static __inline void caml_deprecated_macro(void) {}
+#pragma warning(1 : 4995)
+#pragma deprecated(caml_deprecated)
+#define CAML_PREPROWARNING(x) caml_deprecated(); _Pragma(CAML_MAKEWARNING2(x))
+#endif
 #define CAML_DEPRECATED(name1,name2) \
   CAML_PREPROWARNING(name1 is deprecated: use name2 instead)
 
