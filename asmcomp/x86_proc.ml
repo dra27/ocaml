@@ -221,6 +221,11 @@ let string_of_rounding = function
 
 let internal_assembler = ref None
 let register_internal_assembler f = internal_assembler := Some f
+let with_internal_assembler f g =
+  let current = !internal_assembler in
+  let finally () = internal_assembler := current in
+  internal_assembler := Some f;
+  Fun.protect ~finally g
 
 (* Which asm conventions to use *)
 let masm =
