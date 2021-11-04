@@ -258,13 +258,19 @@ include .depend
 
 STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
+TEST_SED = \
+  $(if $(filter X,$(shell echo x | $(1) -E -e 's/./\u&/' 2>/dev/null)),$(1))
+GNUISH_SED = \
+  $(if $(call TEST_SED,sed),sed,$(if $(call TEST_SED,gsed),gsed,\
+  $(error GNU sed is needed for make depend)))
+
 .PHONY: depend
 depend:
 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
 	  > .depend.tmp
 	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli >> .depend.tmp
-	sed -E \
+	$(GNUISH_SED) -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
 	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' \
 	  .depend.tmp > .depend
