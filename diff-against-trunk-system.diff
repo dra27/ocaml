@@ -1,104 +1,55 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..07b8ca5d78
+index 0000000000..8a4fb0e837
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,83 @@
-+--- a	2023-09-28 18:43:15.230578276 +0100
-++++ b	2023-09-28 18:43:15.250579122 +0100
-+@@ -86,3 +86,80 @@
-+  \section{s:compat-native-bytecode}{Compatibility with the bytecode compiler}
-+  
-+  This section lists the known incompatibilities between the bytecode
-++diff --git a/runtime/caml/osdeps.h b/runtime/caml/osdeps.h
-++--- a/runtime/caml/osdeps.h
-+++++ b/runtime/caml/osdeps.h
-++@@ -108,6 +108,9 @@ extern char_os *caml_secure_getenv(char_os const *var);
-++    cannot be determined, return -1. */
-++ extern int caml_num_rows_fd(int fd);
-++ 
-+++/* Try to increase the size of the native stack */
-+++extern void caml_increase_native_stack_size(void);
-+++
-++ #ifdef _WIN32
-++ 
-++ extern int caml_win32_rename(const wchar_t *, const wchar_t *);
-++diff --git a/runtime/startup_nat.c b/runtime/startup_nat.c
-++--- a/runtime/startup_nat.c
-+++++ b/runtime/startup_nat.c
-++@@ -124,6 +124,7 @@ value caml_startup_common(char_os **argv, int pooling)
-++   if (!caml_startup_aux(pooling))
-++     return Val_unit;
-++ 
-+++  caml_increase_native_stack_size();
-++   caml_init_frame_descriptors();
-++   caml_init_locale();
-++ #if defined(_MSC_VER) && __STDC_SECURE_LIB__ >= 200411L
-++diff --git a/runtime/unix.c b/runtime/unix.c
-++--- a/runtime/unix.c
-+++++ b/runtime/unix.c
-++@@ -29,6 +29,8 @@
-++ #include <errno.h>
-++ #include <sys/ioctl.h>
-++ #include <fcntl.h>
-+++#include <sys/time.h>
-+++#include <sys/resource.h>
-++ #include "caml/config.h"
-++ #if defined(SUPPORT_DYNAMIC_LINKING) && !defined(BUILDING_LIBCAMLRUNS)
-++ #define WITH_DYNAMIC_LINKING
-++@@ -434,3 +436,29 @@ int caml_num_rows_fd(int fd)
-++   return -1;
-++ #endif
-++ }
-+++
-+++void caml_increase_native_stack_size(void)
-+++{
-+++#ifdef RLIMIT_STACK
-+++  struct rlimit lim;
-+++  rlim_t newlim;
-+++  if (getrlimit(RLIMIT_STACK, &lim) == -1) return;
-+++  newlim = lim.rlim_max;
-+++  if (newlim == RLIM_INFINITY) {
-+++#ifdef ARCH_SIXTYFOUR
-+++    newlim = 1024*1024*1024; /* 1G */
-+++#else
-+++    newlim = 16*1024*1024; /* 16M */
-+++#endif
-+++  }
-+++  if (lim.rlim_cur >= newlim) return;
-+++  lim.rlim_cur = newlim;
-+++  if (setrlimit(RLIMIT_STACK, &lim) == -1) {
-+++    caml_gc_message(0x08, "Failed to increase native stack size\n");
-+++  } else {
-+++    caml_gc_message(0x08, "Increased native stack size to "
-+++                          "%"ARCH_INT64_PRINTF_FORMAT"u\n",
-+++                    (ARCH_UINT64_TYPE) newlim);
-+++  }
-+++#endif
-+++}
-++diff --git a/runtime/win32.c b/runtime/win32.c
-++--- a/runtime/win32.c
-+++++ b/runtime/win32.c
-++@@ -1087,3 +1087,7 @@ CAMLexport clock_t caml_win32_clock(void)
-++   clocks_per_sec = INT64_LITERAL(10000000U) / (ULONGLONG)CLOCKS_PER_SEC;
-++   return (clock_t)(total / clocks_per_sec);
-++ }
-+++
-+++void caml_increase_native_stack_size(void)
-+++{
-+++}
+@@ -0,0 +1,34 @@
++--- a	2023-09-28 18:43:15.414586062 +0100
+++++ b	2023-09-28 18:43:15.418586231 +0100
++@@ -1,31 +1,3 @@
++-diff --git a/VERSION b/VERSION
++---- a/VERSION
++-+++ b/VERSION
++-@@ -1,4 +1,4 @@
++--5.0.0+dev0-2021-10-05
++-+5.00.0+dev0-2021-11-05
++- 
++- # Starting with OCaml 4.14, although the version string that appears above is
++- # still correct and this file can thus still be used to figure it out,
++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
++---- a/build-aux/ocaml_version.m4
++-+++ b/build-aux/ocaml_version.m4
++-@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
++- # including the patchlevel, are mandatory.
++- 
++- m4_define([OCAML__VERSION_MAJOR], [5])
++--m4_define([OCAML__VERSION_MINOR], [0])
++-+m4_define([OCAML__VERSION_MINOR], [00])
++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
++- # for officially-released versions of OCaml.
++--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-10-05])
++-+m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
++- 
++- # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
++- # single character:
++-diff --git a/configure b/configure
++-Binary files a/configure and b/configure differ
++ diff --git a/ocaml-variants.opam b/ocaml-variants.opam
++ --- a/ocaml-variants.opam
++ +++ b/ocaml-variants.opam
 diff --git a/VERSION b/VERSION
-index 73460e29a0..ca456ac135 100644
+index d9d76e3115..ca456ac135 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1,4 +1,4 @@
--5.0.0+dev0-2021-10-05
+-5.00.0+dev0-2021-11-05
 +4.14.0+dev1-2021-10-05
  
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-index 9fc4a0c252..21c95d87de 100644
+index 681f116bbb..21c95d87de 100644
 --- a/build-aux/ocaml_version.m4
 +++ b/build-aux/ocaml_version.m4
 @@ -31,12 +31,12 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
@@ -106,19 +57,19 @@ index 9fc4a0c252..21c95d87de 100644
  # including the patchlevel, are mandatory.
  
 -m4_define([OCAML__VERSION_MAJOR], [5])
--m4_define([OCAML__VERSION_MINOR], [0])
+-m4_define([OCAML__VERSION_MINOR], [00])
 +m4_define([OCAML__VERSION_MAJOR], [4])
 +m4_define([OCAML__VERSION_MINOR], [14])
  m4_define([OCAML__VERSION_PATCHLEVEL], [0])
  # Note that the OCAML__VERSION_EXTRA string defined below is always empty
  # for officially-released versions of OCaml.
--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-10-05])
+-m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
 +m4_define([OCAML__VERSION_EXTRA], [dev1-2021-10-05])
  
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
 diff --git a/configure b/configure
-index 98f34be35f..f3a5f38f70 100755
+index f469a8755e..f3a5f38f70 100755
 Binary files a/configure and b/configure differ
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
@@ -128,127 +79,4 @@ new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c50a82aed5
---- /dev/null
-+++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,119 @@
-+diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
-+new file mode 100644
-+index 0000000000..07b8ca5d78
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,83 @@
-++--- a	2023-09-28 18:43:15.230578276 +0100
-+++++ b	2023-09-28 18:43:15.250579122 +0100
-++@@ -86,3 +86,80 @@
-++  \section{s:compat-native-bytecode}{Compatibility with the bytecode compiler}
-++  
-++  This section lists the known incompatibilities between the bytecode
-+++diff --git a/runtime/caml/osdeps.h b/runtime/caml/osdeps.h
-+++--- a/runtime/caml/osdeps.h
-++++++ b/runtime/caml/osdeps.h
-+++@@ -108,6 +108,9 @@ extern char_os *caml_secure_getenv(char_os const *var);
-+++    cannot be determined, return -1. */
-+++ extern int caml_num_rows_fd(int fd);
-+++ 
-++++/* Try to increase the size of the native stack */
-++++extern void caml_increase_native_stack_size(void);
-++++
-+++ #ifdef _WIN32
-+++ 
-+++ extern int caml_win32_rename(const wchar_t *, const wchar_t *);
-+++diff --git a/runtime/startup_nat.c b/runtime/startup_nat.c
-+++--- a/runtime/startup_nat.c
-++++++ b/runtime/startup_nat.c
-+++@@ -124,6 +124,7 @@ value caml_startup_common(char_os **argv, int pooling)
-+++   if (!caml_startup_aux(pooling))
-+++     return Val_unit;
-+++ 
-++++  caml_increase_native_stack_size();
-+++   caml_init_frame_descriptors();
-+++   caml_init_locale();
-+++ #if defined(_MSC_VER) && __STDC_SECURE_LIB__ >= 200411L
-+++diff --git a/runtime/unix.c b/runtime/unix.c
-+++--- a/runtime/unix.c
-++++++ b/runtime/unix.c
-+++@@ -29,6 +29,8 @@
-+++ #include <errno.h>
-+++ #include <sys/ioctl.h>
-+++ #include <fcntl.h>
-++++#include <sys/time.h>
-++++#include <sys/resource.h>
-+++ #include "caml/config.h"
-+++ #if defined(SUPPORT_DYNAMIC_LINKING) && !defined(BUILDING_LIBCAMLRUNS)
-+++ #define WITH_DYNAMIC_LINKING
-+++@@ -434,3 +436,29 @@ int caml_num_rows_fd(int fd)
-+++   return -1;
-+++ #endif
-+++ }
-++++
-++++void caml_increase_native_stack_size(void)
-++++{
-++++#ifdef RLIMIT_STACK
-++++  struct rlimit lim;
-++++  rlim_t newlim;
-++++  if (getrlimit(RLIMIT_STACK, &lim) == -1) return;
-++++  newlim = lim.rlim_max;
-++++  if (newlim == RLIM_INFINITY) {
-++++#ifdef ARCH_SIXTYFOUR
-++++    newlim = 1024*1024*1024; /* 1G */
-++++#else
-++++    newlim = 16*1024*1024; /* 16M */
-++++#endif
-++++  }
-++++  if (lim.rlim_cur >= newlim) return;
-++++  lim.rlim_cur = newlim;
-++++  if (setrlimit(RLIMIT_STACK, &lim) == -1) {
-++++    caml_gc_message(0x08, "Failed to increase native stack size\n");
-++++  } else {
-++++    caml_gc_message(0x08, "Increased native stack size to "
-++++                          "%"ARCH_INT64_PRINTF_FORMAT"u\n",
-++++                    (ARCH_UINT64_TYPE) newlim);
-++++  }
-++++#endif
-++++}
-+++diff --git a/runtime/win32.c b/runtime/win32.c
-+++--- a/runtime/win32.c
-++++++ b/runtime/win32.c
-+++@@ -1087,3 +1087,7 @@ CAMLexport clock_t caml_win32_clock(void)
-+++   clocks_per_sec = INT64_LITERAL(10000000U) / (ULONGLONG)CLOCKS_PER_SEC;
-+++   return (clock_t)(total / clocks_per_sec);
-+++ }
-++++
-++++void caml_increase_native_stack_size(void)
-++++{
-++++}
-+diff --git a/VERSION b/VERSION
-+index 73460e29a0..ca456ac135 100644
-+--- a/VERSION
-++++ b/VERSION
-+@@ -1,4 +1,4 @@
-+-5.0.0+dev0-2021-10-05
-++4.14.0+dev1-2021-10-05
-+ 
-+ # Starting with OCaml 4.14, although the version string that appears above is
-+ # still correct and this file can thus still be used to figure it out,
-+diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+index 9fc4a0c252..21c95d87de 100644
-+--- a/build-aux/ocaml_version.m4
-++++ b/build-aux/ocaml_version.m4
-+@@ -31,12 +31,12 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
-+ # integers. They MUST NOT be left-padded with zeros and all of them,
-+ # including the patchlevel, are mandatory.
-+ 
-+-m4_define([OCAML__VERSION_MAJOR], [5])
-+-m4_define([OCAML__VERSION_MINOR], [0])
-++m4_define([OCAML__VERSION_MAJOR], [4])
-++m4_define([OCAML__VERSION_MINOR], [14])
-+ m4_define([OCAML__VERSION_PATCHLEVEL], [0])
-+ # Note that the OCAML__VERSION_EXTRA string defined below is always empty
-+ # for officially-released versions of OCaml.
-+-m4_define([OCAML__VERSION_EXTRA], [dev0-2021-10-05])
-++m4_define([OCAML__VERSION_EXTRA], [dev1-2021-10-05])
-+ 
-+ # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
-+ # single character
-\ No newline at end of file
+index 0000000000..e69de29bb2
