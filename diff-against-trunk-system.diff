@@ -1,6 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..90194ae8c9
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:43:15.994610604 +0100
+++++ b	2023-09-28 18:43:16.038612465 +0100
++@@ -275,10 +275,6 @@
++  ### Build system:
++  
++  - #10717: Simplify the installation of man pages
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/compilerlibs/Makefile.compilerlibs b/compilerlibs/Makefile.compilerlibs
++ --- a/compilerlibs/Makefile.compilerlibs
++ +++ b/compilerlibs/Makefile.compilerlibs
 diff --git a/VERSION b/VERSION
 index d9d76e3115..ca456ac135 100644
 --- a/VERSION
@@ -11,6 +27,12 @@ index d9d76e3115..ca456ac135 100644
  
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
+diff --git a/boot/ocamlc b/boot/ocamlc
+index ca8aa90d3c..8cdd77c041 100755
+Binary files a/boot/ocamlc and b/boot/ocamlc differ
+diff --git a/boot/ocamllex b/boot/ocamllex
+index b6efefde1b..15497b4463 100755
+Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 681f116bbb..21c95d87de 100644
 --- a/build-aux/ocaml_version.m4
