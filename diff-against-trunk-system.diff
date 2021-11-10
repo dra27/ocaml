@@ -1,22 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..90194ae8c9
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,13 @@
-+--- a	2023-09-28 18:43:15.994610604 +0100
-++++ b	2023-09-28 18:43:16.038612465 +0100
-+@@ -275,10 +275,6 @@
-+  ### Build system:
-+  
-+  - #10717: Simplify the installation of man pages
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/compilerlibs/Makefile.compilerlibs b/compilerlibs/Makefile.compilerlibs
-+ --- a/compilerlibs/Makefile.compilerlibs
-+ +++ b/compilerlibs/Makefile.compilerlibs
+index 0000000000..e69de29bb2
 diff --git a/VERSION b/VERSION
 index d9d76e3115..ca456ac135 100644
 --- a/VERSION
