@@ -286,6 +286,9 @@ clean:
 	rm -rf $(generated)
 	rm -f ocamltest.html
 
+.PHONY: distclean
+distclean: clean
+
 ifneq "$(TOOLCHAIN)" "msvc"
 .PHONY: depend
 depend: $(dependencies_generated_prereqs)
