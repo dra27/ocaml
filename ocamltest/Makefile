@@ -268,6 +268,9 @@ clean:
 	rm -rf $(cmx_files)
 	rm -rf $(generated)
 
+.PHONY: distclean
+distclean: clean
+
 ifneq "$(TOOLCHAIN)" "msvc"
 .PHONY: depend
 depend: $(dependencies_generated_prereqs)
