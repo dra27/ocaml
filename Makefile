@@ -1131,6 +1131,7 @@ depend: beforedepend
 
 .PHONY: distclean
 distclean: clean
+	$(MAKE) -C ocamltest distclean
 	rm -f boot/ocamlrun boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
 	boot/ocamlruns boot/ocamlruns.exe \
 	boot/flexlink.byte boot/flexlink.byte.exe \
