@@ -92,7 +92,7 @@ promote-menhir: parsing/parser.mly
 # This is benign but will generate pointless churn if another developer
 # rebuilds the same grammar (from the same Menhir version).
 	@ for f in $(addprefix parser.,ml mli) ; do \
-	  sed \
+	  $(SED) \
 	    's,^#\(.*\)"[^"]*/menhir/standard.mly",#\1"menhir/standard.mly",g' \
 	    parsing/$$f \
 	    > boot/menhir/$$f; \
@@ -139,7 +139,7 @@ demote-menhir:
 test-menhir: parsing/parser.mly
 	$(MENHIR) $(MENHIRFLAGS) parsing/parser.mly
 	for f in $(addprefix parsing/parser.,ml mli) ; do \
-	  cat $$f | sed "s/MenhirLib/CamlinternalMenhirLib/g" > $$f.tmp && \
+	  cat $$f | $(SED) "s/MenhirLib/CamlinternalMenhirLib/g" > $$f.tmp && \
 	  mv $$f.tmp $$f ; \
 	done
 	$(MAKE) parsing/parser.cmo
@@ -201,7 +201,7 @@ interpret-menhir:
 .PHONY: list-parse-errors
 list-parse-errors:
 	@ tmp=`mktemp -d /tmp/parser.XXXX` && \
-	  sed -e '/BEGIN AVOID/,/END AVOID/d' \
+	  $(SED) -e '/BEGIN AVOID/,/END AVOID/d' \
 	    parsing/parser.mly > $$tmp/parser.mly && \
 	  $(MENHIR) $(MENHIRBASICFLAGS) $$tmp/parser.mly \
 	    --list-errors -la 2 \
