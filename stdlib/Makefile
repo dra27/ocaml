@@ -258,11 +258,9 @@ include .depend
 
 STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
-TEST_SED = \
-  $(if $(filter X,$(shell echo x | $(1) -E -e 's/./\u&/' 2>/dev/null)),$(1))
 GNUISH_SED = \
-  $(if $(call TEST_SED,sed),sed,$(if $(call TEST_SED,gsed),gsed,\
-  $(error GNU sed is needed for make depend)))
+  $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
+       $(SED),$(error GNU sed is needed for make depend))
 
 .PHONY: depend
 depend:
