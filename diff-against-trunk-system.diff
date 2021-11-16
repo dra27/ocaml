@@ -1,44 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..780d54f43c
+index 0000000000..825400ef29
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,35 @@
-+--- a	2023-09-28 18:47:54.037414943 +0100
-++++ b	2023-09-28 18:47:54.053415519 +0100
-+@@ -1701,16 +1701,15 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1218,9 +1218,7 @@ AS_CASE([$host],
-+-   [x86_64-pc-windows],
-+-     [arch=amd64; system=win64],
-++@@ -1233,8 +1233,7 @@ AS_CASE([$host],
-+    [[powerpc64le*-*-linux*]],
-+--    [arch=power; model=ppc64le; system=elf],
-+--  [[powerpc*-*-linux*]],
-+--    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-+-+    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-++     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-++   [[powerpc*-*-linux*]],
-++-    [has_native_backend=yes; arch=power
-++-    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-+++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
-+    [[s390x*-*-linux*]],
-+-     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
-++     [arch=s390x; model=z10; system=elf],
-+    # expected to match "gnueabihf" as well as "musleabihf"
-+ diff --git a/manual/src/cmds/native.etex b/manual/src/cmds/native.etex
-+ --- a/manual/src/cmds/native.etex
-+@@ -1747,7 +1746,7 @@
-+ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-+ --- a/testsuite/tests/callback/stack_overflow.ml
-+ +++ b/testsuite/tests/callback/stack_overflow.ml
-+-@@ -23,8 +23,8 @@ open Effect.Deep
-++@@ -25,8 +25,8 @@ open Effect.Deep
-+  type _ t += E : unit t
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:47:54.585434661 +0100
+++++ b	2023-09-28 18:47:54.609435524 +0100
++@@ -32,7 +32,7 @@
++  (* Complex *)
 +  
-+  let () =
++  let box_complex dbg c_re c_im =
++-@@ -852,6 +859,7 @@ let curry_function_sym n =
+++@@ -856,6 +863,7 @@ let curry_function_sym n =
++  
++  let bigarray_elt_size : Lambda.bigarray_kind -> int = function
++      Pbigarray_unknown -> assert false
++@@ -40,7 +40,7 @@
++    | Pbigarray_float32 -> 4
++    | Pbigarray_float64 -> 8
++    | Pbigarray_sint8 -> 1
++-@@ -925,6 +933,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
+++@@ -929,6 +937,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
++  
++  let bigarray_word_kind : Lambda.bigarray_kind -> memory_chunk = function
++      Pbigarray_unknown -> assert false
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -52,10 +37,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 4a5bc24695..1195008694 100644
+index 58ab91eed8..7f151914ca 100644
 --- a/Changes
 +++ b/Changes
-@@ -1503,11 +1503,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1507,11 +1507,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -67,7 +52,7 @@ index 4a5bc24695..1195008694 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1536,6 +1531,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1540,6 +1535,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -98,7 +83,7 @@ index 4a5bc24695..1195008694 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1571,13 +1590,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1575,13 +1594,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -114,7 +99,7 @@ index 4a5bc24695..1195008694 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1684,6 +1703,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1688,6 +1707,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -124,7 +109,7 @@ index 4a5bc24695..1195008694 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1947,6 +1969,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1951,6 +1973,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -710,10 +695,10 @@ index 7021f8c3d1..a10abb9502 100644
    compile_phrase (Cmm_helpers.plugin_header units);
    compile_phrase
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index ca57632f4a..567dba44cc 100644
+index c2752503b3..9e50ffe636 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -813,7 +813,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
+@@ -820,7 +820,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
      | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
                            fill_fields (idx + 2) el) in
      Clet(VP.create id,
@@ -725,7 +710,7 @@ index ca57632f4a..567dba44cc 100644
                   [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
           fill_fields 1 args)
    end
-@@ -2113,8 +2117,13 @@ let assignment_kind
+@@ -2122,8 +2126,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -10472,51 +10457,36 @@ index 0000000000..15317da274
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..793a7fd791
+index 0000000000..a6bf440049
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10437 @@
+@@ -0,0 +1,10438 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..780d54f43c
++index 0000000000..825400ef29
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,35 @@
-++--- a	2023-09-28 18:47:54.037414943 +0100
-+++++ b	2023-09-28 18:47:54.053415519 +0100
-++@@ -1701,16 +1701,15 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1218,9 +1218,7 @@ AS_CASE([$host],
-++-   [x86_64-pc-windows],
-++-     [arch=amd64; system=win64],
-+++@@ -1233,8 +1233,7 @@ AS_CASE([$host],
-++    [[powerpc64le*-*-linux*]],
-++--    [arch=power; model=ppc64le; system=elf],
-++--  [[powerpc*-*-linux*]],
-++--    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-++-+    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-+++     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-+++   [[powerpc*-*-linux*]],
-+++-    [has_native_backend=yes; arch=power
-+++-    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-++++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
-++    [[s390x*-*-linux*]],
-++-     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
-+++     [arch=s390x; model=z10; system=elf],
-++    # expected to match "gnueabihf" as well as "musleabihf"
-++ diff --git a/manual/src/cmds/native.etex b/manual/src/cmds/native.etex
-++ --- a/manual/src/cmds/native.etex
-++@@ -1747,7 +1746,7 @@
-++ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-++ --- a/testsuite/tests/callback/stack_overflow.ml
-++ +++ b/testsuite/tests/callback/stack_overflow.ml
-++-@@ -23,8 +23,8 @@ open Effect.Deep
-+++@@ -25,8 +25,8 @@ open Effect.Deep
-++  type _ t += E : unit t
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:47:54.585434661 +0100
++++++ b	2023-09-28 18:47:54.609435524 +0100
+++@@ -32,7 +32,7 @@
+++  (* Complex *)
 ++  
-++  let () =
+++  let box_complex dbg c_re c_im =
+++-@@ -852,6 +859,7 @@ let curry_function_sym n =
++++@@ -856,6 +863,7 @@ let curry_function_sym n =
+++  
+++  let bigarray_elt_size : Lambda.bigarray_kind -> int = function
+++      Pbigarray_unknown -> assert false
+++@@ -40,7 +40,7 @@
+++    | Pbigarray_float32 -> 4
+++    | Pbigarray_float64 -> 8
+++    | Pbigarray_sint8 -> 1
+++-@@ -925,6 +933,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
++++@@ -929,6 +937,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
+++  
+++  let bigarray_word_kind : Lambda.bigarray_kind -> memory_chunk = function
+++      Pbigarray_unknown -> assert false
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10530,10 +10500,10 @@ index 0000000000..793a7fd791
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 4a5bc24695..1195008694 100644
++index 58ab91eed8..7f151914ca 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1503,11 +1503,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1507,11 +1507,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10545,7 +10515,7 @@ index 0000000000..793a7fd791
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1536,6 +1531,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1540,6 +1535,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10576,7 +10546,7 @@ index 0000000000..793a7fd791
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1571,13 +1590,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1575,13 +1594,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10592,7 +10562,7 @@ index 0000000000..793a7fd791
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1684,6 +1703,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1688,6 +1707,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10602,7 +10572,7 @@ index 0000000000..793a7fd791
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1947,6 +1969,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1951,6 +1973,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11188,10 +11158,10 @@ index 0000000000..793a7fd791
 +   compile_phrase (Cmm_helpers.plugin_header units);
 +   compile_phrase
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index ca57632f4a..567dba44cc 100644
++index c2752503b3..9e50ffe636 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -813,7 +813,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
++@@ -820,7 +820,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
 +     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
 +                           fill_fields (idx + 2) el) in
 +     Clet(VP.create id,
@@ -11203,7 +11173,7 @@ index 0000000000..793a7fd791
 +                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
 +          fill_fields 1 args)
 +   end
-+@@ -2113,8 +2117,13 @@ let assignment_kind
++@@ -2122,8 +2126,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -20912,7 +20882,23 @@ index 0000000000..793a7fd791
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
 +++      # Now reconfigure ocamltest to run in bytecode-only mode
 +++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change fr
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
