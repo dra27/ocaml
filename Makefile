@@ -726,7 +726,7 @@ runtime/primitives:
 
 lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
     runtime/primitives
-	$^ > $@
+	SED=$(SED) $^ > $@
 
 partialclean::
 	rm -f lambda/runtimedef.ml
@@ -908,9 +908,9 @@ parsing/parser.ml: $(PARSER_DEPS)
 ifeq "$(OCAML_DEVELOPMENT_VERSION)" "true"
 	@-tools/check-parser-uptodate-or-warn.sh
 endif
-	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+	$(SED) "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
 parsing/parser.mli: boot/menhir/parser.mli
-	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+	$(SED) "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
 
 beforedepend:: parsing/camlinternalMenhirLib.ml \
   parsing/camlinternalMenhirLib.mli \

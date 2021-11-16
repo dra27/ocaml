@@ -17,6 +17,8 @@
 
 # duplicated from $(ROOTDIR)/runtime/Makefile
 
+SED=${SED:-sed}
+
 # #8985: the meaning of character range a-z depends on the locale, so force C
 #        locale throughout.
 export LC_ALL=C
@@ -27,8 +29,9 @@ export LC_ALL=C
       finalise stacks dynlink backtrace_byt backtrace afl \
       bigarray eventlog
   do
-      sed -n -e 's/^CAMLprim value \([a-z0-9_][a-z0-9_]*\).*/\1/p' "$prim.c"
+      "$SED" -n -e 's/^CAMLprim value \([a-z0-9_][a-z0-9_]*\).*/\1/p' "$prim.c"
   done
-  sed -n -e 's/^CAMLprim_int64_[0-9](\([a-z0-9_][a-z0-9_]*\)).*/caml_int64_\1\
+  "$SED" \
+    -n -e 's/^CAMLprim_int64_[0-9](\([a-z0-9_][a-z0-9_]*\)).*/caml_int64_\1\
 caml_int64_\1_native/p' ints.c
 ) | sort | uniq

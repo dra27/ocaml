@@ -77,7 +77,7 @@ ocamldebug_entry.cmo: ocamldebug_entry.ml ocamldebug.cmo
 
 depend: beforedepend
 	$(CAMLDEP) $(DEPFLAGS) $(DEPINCLUDES) *.mli *.ml \
-	| sed -e 's,$(UNIXDIR)/,$$(UNIXDIR)/,' > .depend
+	| $(SED) -e 's,$(UNIXDIR)/,$$(UNIXDIR)/,' > .depend
 
 clean::
 	rm -f debugger_lexer.ml
