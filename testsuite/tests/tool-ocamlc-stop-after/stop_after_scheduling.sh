@@ -1,3 +1,3 @@
 #!/bin/sh
 
-grep "wrong argument 'scheduling'" compiler-output.raw | grep "stop-after" | sed 's/^.*: wrong argument/wrong argument/'
+sed -n -e "/wrong argument 'scheduling'/s/^.*: wrong argument/wrong argument/;/stop-after/p" compiler-output.raw
