@@ -37,8 +37,8 @@ endif
 
 include stdlib/StdlibModules
 
-CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
-CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
+CAMLC=ocamlc -g
+CAMLOPT=ocamlopt -g -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
 INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
         -I lambda -I middle_end -I middle_end/closure \
@@ -58,7 +58,7 @@ else
 OCAML_NATDYNLINKOPTS = -ccopt "$(NATDYNLINKOPTS)"
 endif
 
-CAMLDEP=$(OCAMLRUN) boot/ocamlc -depend
+CAMLDEP=ocamlc -depend
 DEPFLAGS=-slash
 DEPINCLUDES=$(INCLUDES)
 
@@ -659,7 +659,7 @@ ocaml.tmp: $(ocaml_dependencies)
 	$(CAMLC) $(LINKFLAGS) -I toplevel/byte -linkall -o $@ $^
 
 ocaml$(EXE): $(expunge) ocaml.tmp
-	- $(OCAMLRUN) $^ $@ $(PERVASIVES)
+	- ./$^ $@ $(PERVASIVES)
 
 partialclean::
 	rm -f ocaml$(EXE)
@@ -759,7 +759,7 @@ cvt_emit := tools/cvt_emit$(EXE)
 
 asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
-	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
+	$(cvt_emit) < $< >> $@ \
 	|| { rm -f $@; exit 2; }
 
 partialclean::
@@ -1093,7 +1093,7 @@ toplevel/native/topeval.cmx: otherlibs/dynlink/dynlink.cmxa
 make_opcodes := tools/make_opcodes$(EXE)
 
 bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
-	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
+	$(make_opcodes) -opcodes < $< > $@
 
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
 	$(CAMLC) -i $< > $@

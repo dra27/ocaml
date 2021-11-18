@@ -146,12 +146,12 @@ BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
 # In those directories where this needs to be overridden, the overriding
 # should take place *before* Makefile.common is included.
 
-OCAMLLEX ?= $(BEST_OCAMLLEX)
+OCAMLLEX ?= (BEST_OCAMLLEX)
 
 OCAMLLEXFLAGS ?= -q
 
 %.ml: %.mll
-	$(OCAMLLEX) $(OCAMLLEXFLAGS) $<
+	ocamllex $(OCAMLLEXFLAGS) $<
 
 # Parser generation
 

@@ -20,10 +20,10 @@ include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLYACCFLAGS = --strict -v
 
-STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
-OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
-OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
-OCAMLDEP = $(BEST_OCAMLDEP)
+STDLIBFLAGS =
+OCAMLC = ocamlc $(STDLIBFLAGS)
+OCAMLOPT = ocamlopt $(STDLIBFLAGS)
+OCAMLDEP = ocamldep
 DEPFLAGS = -slash
 
 # For installation
@@ -55,21 +55,9 @@ endif
 # Compilation
 #############
 
-INCLUDES_DEP=\
-  -I $(ROOTDIR)/utils \
-  -I $(ROOTDIR)/parsing \
-  -I $(ROOTDIR)/typing \
-  -I $(ROOTDIR)/driver \
-  -I $(ROOTDIR)/bytecomp \
-  -I $(ROOTDIR)/toplevel
+INCLUDES_DEP=-I +compiler-libs
 
-INCLUDES_NODEP=\
-  -I $(ROOTDIR)/stdlib \
-  -I $(ROOTDIR)/compilerlibs \
-  -I $(ROOTDIR)/otherlibs/str \
-  -I $(ROOTDIR)/otherlibs/dynlink \
-  -I $(ROOTDIR)/otherlibs/dynlink/native \
-  -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
+INCLUDES_NODEP=
 
 DEPINCLUDES=$(INCLUDES_DEP)
 INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
@@ -77,7 +65,7 @@ INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
   -safe-string -strict-sequence -strict-formats -bin-annot -principal
 
-LINKFLAGS=$(INCLUDES) -nostdlib
+LINKFLAGS=$(INCLUDES)
 
 CMOFILES=\
   odoc_config.cmo \

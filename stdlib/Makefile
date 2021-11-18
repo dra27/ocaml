@@ -20,7 +20,7 @@ include $(ROOTDIR)/Makefile.common
 TARGET_BINDIR ?= $(BINDIR)
 
 COMPILER=$(ROOTDIR)/ocamlc$(EXE)
-CAMLC=$(OCAMLRUN) $(COMPILER)
+CAMLC=ocamlc
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 \
           -g -warn-error +A -bin-annot -nostdlib -principal \
           -safe-string -strict-formats
@@ -28,8 +28,8 @@ ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
 OPTCOMPILER=$(ROOTDIR)/ocamlopt
-CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
-CAMLDEP=$(BOOT_OCAMLC) -depend
+CAMLOPT=ocamlopt
+CAMLDEP=ocamlc -depend
 DEPFLAGS=-slash
 
 OC_CPPFLAGS += -I$(ROOTDIR)/runtime
@@ -239,9 +239,9 @@ stdlib__%.cmx:
 
 # Dependencies on the compiler
 COMPILER_DEPS=$(filter-out -use-prims $(OCAMLRUN), $(CAMLC))
-$(OBJS) std_exit.cmo: $(COMPILER_DEPS)
-$(OBJS:.cmo=.cmi) std_exit.cmi: $(COMPILER_DEPS)
-$(OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
+#$(OBJS) std_exit.cmo: $(COMPILER_DEPS)
+#$(OBJS:.cmo=.cmi) std_exit.cmi: $(COMPILER_DEPS)
+#$(OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
 
 # Dependencies on Stdlib (not tracked by ocamlc -depend)
 

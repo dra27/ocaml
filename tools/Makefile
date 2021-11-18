@@ -31,10 +31,8 @@ define byte2native
 $(patsubst %.cmo,%.cmx,$(patsubst %.cma,%.cmxa,$1))
 endef
 
-CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
-        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
-CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) \
-  -g -nostdlib -I $(ROOTDIR)/stdlib
+CAMLC = ocamlc -g
+CAMLOPT = ocamlopt -g
 INCLUDES = $(addprefix -I $(ROOTDIR)/,utils parsing typing bytecomp \
                        middle_end middle_end/closure middle_end/flambda \
                        middle_end/flambda/base_types driver toplevel \
@@ -220,7 +218,7 @@ $(make_opcodes): make_opcodes.ml
 	$(CAMLC) $< -o $@
 
 opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
-	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+	./$(make_opcodes) -opnames < $< > $@
 
 clean::
 	rm -f opnames.ml make_opcodes make_opcodes.exe make_opcodes.ml
@@ -316,7 +314,7 @@ caml_tex := caml-tex$(EXE)
 # configuration.
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
 $(caml_tex): $(caml_tex_files)
-	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) -nostdlib -I $(ROOTDIR)/stdlib \
+	ocamlc \
 	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
 
 # we need str and unix which depend on the bytecode version of other tools

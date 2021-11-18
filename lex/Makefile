@@ -26,9 +26,8 @@ include $(ROOTDIR)/Makefile.common
 
 OCAMLYACCFLAGS = -v
 
-CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib \
-        -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
-CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
+CAMLC = ocamlc -strict-sequence
+CAMLOPT = ocamlopt
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
             -safe-string -strict-sequence -strict-formats -bin-annot
 LINKFLAGS =

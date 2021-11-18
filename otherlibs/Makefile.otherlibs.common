@@ -19,8 +19,8 @@ ROOTDIR=../..
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
-CAMLC := $(BEST_OCAMLC) -nostdlib -I $(ROOTDIR)/stdlib
-CAMLOPT := $(BEST_OCAMLOPT) -nostdlib -I $(ROOTDIR)/stdlib
+CAMLC := ocamlc
+CAMLOPT := ocamlopt
 
 ifneq "$(CCOMPTYPE)" "msvc"
 OC_CFLAGS += -g
@@ -35,7 +35,7 @@ COMPFLAGS=-absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g \
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
-MKLIB=$(OCAMLRUN) $(ROOTDIR)/tools/ocamlmklib
+MKLIB=ocamlmklib
 
 # Variables that must be defined by individual libraries:
 # LIBNAME

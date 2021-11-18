@@ -112,3 +112,9 @@ let main argv ppf =
   | () ->
     Profile.print Format.std_formatter !Clflags.profile_columns;
     0
+
+let main argv ppf =
+  if false then
+    (Printf.eprintf "ocamlc is disabled\n%!"; exit 2)
+  else
+    main argv ppf

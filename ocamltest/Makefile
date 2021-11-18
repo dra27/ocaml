@@ -41,8 +41,8 @@ ifeq "$(filter $(UNIXLIB),$(OTHERLIBRARIES))" ""
 else
   ocamltest_unix := real
   unix_name := unix
-  unix_path := $(ROOTDIR)/otherlibs/$(UNIXLIB)
-  unix_include := -I $(unix_path) $(EMPTY)
+  unix_path :=
+  unix_include :=
   ifeq "$(UNIX_OR_WIN32)" "win32"
     unix := Some false
   else
@@ -82,7 +82,7 @@ else
 WITH_OCAMLDEBUG := false
 endif
 
-OC_CPPFLAGS += -I$(ROOTDIR)/runtime -DCAML_INTERNALS
+OC_CPPFLAGS += -DCAML_INTERNALS -I $(shell ocamlc -where)
 
 ifdef UNIX_OR_WIN32
 run_source := run_$(UNIX_OR_WIN32).c
@@ -182,18 +182,17 @@ bytecode_modules := $(o_files) $(cmo_files)
 
 native_modules := $(o_files) $(cmx_files)
 
-directories := $(addprefix $(ROOTDIR)/,utils bytecomp parsing stdlib \
-                                       compilerlibs file_formats)
+directories := +compiler-libs
 
 include_directories := $(addprefix -I , $(directories))
 
-flags := -g -nostdlib $(include_directories) \
+flags := -g $(include_directories) \
   -strict-sequence -safe-string -strict-formats \
   -w +a-4-9-41-42-44-45-48 -warn-error +A
 
-ocamlc = $(BEST_OCAMLC) $(flags)
+ocamlc = ocamlc $(flags)
 
-ocamlopt = $(BEST_OCAMLOPT) $(flags)
+ocamlopt = ocamlopt $(flags)
 
 ocamldep := $(BEST_OCAMLDEP)
 depflags := -slash
@@ -208,7 +207,7 @@ opt.opt: allopt
 
 compdeps_names=ocamlcommon ocamlbytecomp
 compdeps_paths=$(addprefix $(ROOTDIR)/compilerlibs/,$(compdeps_names))
-deps_paths=$(compdeps_paths) $(addprefix $(unix_path)/,$(unix_name))
+deps_paths=+compiler-libs
 deps_byte=$(addsuffix .cma,$(deps_paths))
 deps_opt=$(addsuffix .cmxa,$(deps_paths))
 
@@ -216,21 +215,21 @@ $(eval $(call PROGRAM_SYNONYM,ocamltest))
 
 ocamltest_unix.%: flags+=$(unix_include) -opaque
 
-ocamltest$(EXE): $(deps_byte) $(bytecode_modules)
-	$(ocamlc_cmd) $(unix_include)-custom -o $@ $^
+ocamltest$(EXE): $(bytecode_modules)
+	$(ocamlc_cmd) $(unix_include)-custom -o $@ ocamlcommon.cma ocamlbytecomp.cma unix.cma $^
 
-%.cmo: %.ml $(deps_byte)
+%.cmo: %.ml
 	$(ocamlc) -c $<
 
 $(eval $(call PROGRAM_SYNONYM,ocamltest.opt))
 
-ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
-	$(ocamlopt_cmd) $(unix_include)-o $@ $^
+ocamltest.opt$(EXE): $(native_modules)
+	$(ocamlopt_cmd) $(unix_include)-o $@ ocamlcommon.cmxa ocamlbytecomp.cmxa unix.cmxa $^
 
-%.cmx: %.ml $(deps_opt)
+%.cmx: %.ml
 	$(ocamlopt) -c $<
 
-%.cmi: %.mli $(deps_byte)
+%.cmi: %.mli
 	$(ocamlc) -c $<
 
 ocamltest_unix.ml: ocamltest_unix_$(ocamltest_unix).ml

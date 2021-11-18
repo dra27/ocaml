@@ -29,12 +29,12 @@ OC_CPPFLAGS += -I$(ROOTDIR)/runtime
 NATIVE_CPPFLAGS = \
   -DNATIVE_CODE -DTARGET_$(ARCH) -DMODEL_$(MODEL) -DSYS_$(SYSTEM)
 
-LIBS = -nostdlib -I $(ROOTDIR)/stdlib -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
+LIBS =
 
-CAMLC=$(BEST_OCAMLC) $(LIBS)
-CAMLOPT=$(BEST_OCAMLOPT) $(LIBS)
+CAMLC=ocamlc $(LIBS)
+CAMLOPT=ocamlopt $(LIBS)
 
-MKLIB=$(OCAMLRUN) $(ROOTDIR)/tools/ocamlmklib$(EXE)
+MKLIB=ocamlmklib
 COMPFLAGS=-w +33..39 -warn-error +A -g -bin-annot -safe-string
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
