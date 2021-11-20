@@ -170,7 +170,6 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
-AC_SUBST([cpp_P])
 
 ## Generated files
 
@@ -506,9 +505,6 @@ AS_CASE([$host],
 ## Find vendor of the C compiler
 OCAML_CC_VENDOR
 
-## Determine if the $CPP can be passed -P
-OCAML_CPP_HAS_P
-
 ## In cross-compilation mode, can we run executables produced?
 # At the moment, it's required, but the fact is used in C99 function detection
 OCAML_HOST_IS_EXECUTABLE
@@ -526,14 +522,11 @@ OCAML_HOST_IS_EXECUTABLE
 # manually to make sure the backward compatibility is preserved
 AS_CASE([$ocaml_cv_cc_vendor],
   [xlc-*],
-    [cpp_P=''
-    CPP="$CC -E -qnoppline"], # suppress incompatible XLC line directives
+    [CPP="$CC -E -qnoppline"], # suppress incompatible XLC line directives
   [sunc-*],
-    [cpp_P=''
-    CPP="$CC -E -Qn"], # suppress generation of Sun PRO ident string
+    [CPP="$CC -E -Qn"], # suppress generation of Sun PRO ident string
   [msvc-*],
-    [cpp_P='-EP'
-    CPP="$CC -nologo -E"])
+    [CPP="$CC -nologo -EP"])
 
 # Libraries to build depending on the host
 

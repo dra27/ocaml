@@ -129,19 +129,6 @@ AC_DEFUN([OCAML_CC_HAS_DEBUG_PREFIX_MAP], [
   CFLAGS="$saved_CFLAGS"
 ])
 
-AC_DEFUN([OCAML_CPP_HAS_P], [
-  AC_MSG_CHECKING([whether the C preprocessor supports -P])
-  saved_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="-P $CPPFLAGS"
-  AC_PREPROC_IFELSE(
-    [AC_LANG_SOURCE([int main() { return 0; }])],
-    [cpp_P='-P'
-    AC_MSG_RESULT([yes])],
-    [cpp_P=''
-    AC_MSG_RESULT([no])])
-  CPPFLAGS="$saved_CPPFLAGS"
-])
-
 # Save C compiler related variables
 AC_DEFUN([OCAML_CC_SAVE_VARIABLES], [
   saved_CC="$CC"
