@@ -275,6 +275,8 @@ _build
 /toplevel/native/trace.mli
 /toplevel/native/topmain.mli
 
+/utils/config.boot.ml
+/utils/config.main.ml
 /utils/config.ml
 /utils/domainstate.ml
 /utils/domainstate.mli

@@ -406,8 +406,9 @@ partialclean::
 $(COMMON:.cmo=.cmx) $(BYTECOMP:.cmo=.cmx) $(OPTCOMP:.cmo=.cmx): ocamlopt$(EXE)
 $(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE)
 
+ALL_CONFIG_CMO = utils/config.main.cmo utils/config.boot.cmo
 
-compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
+compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(ALL_CONFIG_CMO) $(COMMON)
 	$(CAMLC) -a -linkall -o $@ $(COMMON)
 partialclean::
 	rm -f compilerlibs/ocamlcommon.cma

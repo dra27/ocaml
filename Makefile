@@ -103,8 +103,17 @@ include compilerlibs/Makefile.compilerlibs
 
 # The configuration file
 
-utils/config.ml: utils/config.mlp Makefile.config utils/Makefile
+CONFIG_MODULE_DEPENDENCIES = \
+  utils/config.common.ml Makefile.config utils/Makefile
+
+utils/config.ml: utils/config.main.ml utils/config.boot.ml
 	$(MAKE) -C utils config.ml
+
+utils/config.main.ml: utils/config.mlp $(CONFIG_MODULE_DEPENDENCIES)
+	$(MAKE) -C utils config.main.ml
+
+utils/config.boot.ml: utils/config.fixed.ml $(CONFIG_MODULE_DEPENDENCIES)
+	$(MAKE) -C utils config.boot.ml
 
 .PHONY: reconfigure
 reconfigure:
@@ -121,7 +130,8 @@ configure: configure.ac aclocal.m4 build-aux/ocaml_version.m4 tools/autogen
 
 .PHONY: partialclean
 partialclean::
-	rm -f utils/config.ml utils/domainstate.ml utils/domainstate.mli
+	rm -f utils/config.ml utils/config.boot.ml utils/config.main.ml \
+        utils/domainstate.ml utils/domainstate.mli
 
 .PHONY: beforedepend
 beforedepend:: utils/config.ml utils/domainstate.ml utils/domainstate.mli
@@ -274,15 +284,17 @@ coreboot:
 # runtime/ocamlrun
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
+# utils/config.ml will have the fixed bootstrap configuration
 	$(MAKE) partialclean
-	$(MAKE) ocamlc ocamllex ocamltools
+	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
 	$(MAKE) library-cross
 # Promote the new compiler and the new runtime
 	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
 # Rebuild the core system
+# utils/config.ml must still have the fixed bootstrap configuration
 	$(MAKE) partialclean
-	$(MAKE) core
+	$(MAKE) IN_COREBOOT_CYCLE=true core
 # Check if fixpoint reached
 	$(MAKE) compare
 else
@@ -307,6 +319,8 @@ endif
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
 bootstrap: coreboot
+# utils/config.ml must be restored to config.status's configuration
+	rm -f utils/config.ml
 	$(MAKE) all
 
 # Compile everything the first time
