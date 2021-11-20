@@ -16,7 +16,6 @@
 (* Disassembler for executable and .cmo object files *)
 
 open Asttypes
-open Config
 open Instruct
 open Lambda
 open Location
@@ -490,8 +489,8 @@ let print_reloc (info, pos) =
 (* Print a .cmo file *)
 
 let dump_obj ic =
-  let buffer = really_input_string ic (String.length cmo_magic_number) in
-  if buffer <> cmo_magic_number then begin
+  let buffer = really_input_string ic (String.length Config.cmo_magic_number) in
+  if buffer <> Config.cmo_magic_number then begin
     prerr_endline "Not an object file"; exit 2
   end;
   let cu_pos = input_binary_int ic in

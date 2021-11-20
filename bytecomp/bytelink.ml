@@ -16,7 +16,6 @@
 (* Link a set of .cmo files and produce a bytecode executable. *)
 
 open Misc
-open Config
 open Cmo_format
 
 type error =
@@ -122,8 +121,9 @@ let scan_file obj_name tolink =
       raise(Error(File_not_found obj_name)) in
   let ic = open_in_bin file_name in
   try
-    let buffer = really_input_string ic (String.length cmo_magic_number) in
-    if buffer = cmo_magic_number then begin
+    let buffer =
+      really_input_string ic (String.length Config.cmo_magic_number) in
+    if buffer = Config.cmo_magic_number then begin
       (* This is a .cmo file. It must be linked in any case.
          Read the relocation information to see which modules it
          requires. *)
@@ -135,7 +135,7 @@ let scan_file obj_name tolink =
       List.iter remove_required compunit.cu_reloc;
       Link_object(file_name, compunit) :: tolink
     end
-    else if buffer = cma_magic_number then begin
+    else if buffer = Config.cma_magic_number then begin
       (* This is an archive file. Each unit contained in it will be linked
          in only if needed. *)
       let pos_toc = input_binary_int ic in    (* Go to table of contents *)
