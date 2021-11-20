@@ -51,3 +51,6 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 datarootdir = @datarootdir@
 DOCDIR=@docdir@
+
+# Flag to suppress line numbers in the C preprocessor (empty if none available)
+CPP_P_FLAG=@cpp_P@

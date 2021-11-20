@@ -747,6 +747,7 @@ build_os
 build_vendor
 build_cpu
 build
+cpp_P
 naked_pointers_checker
 naked_pointers
 compute_deps
@@ -2924,6 +2925,7 @@ OCAML_VERSION_SHORT=5.00
 
 
  # TODO: rename this variable
+
 
 
 
@@ -12598,6 +12600,29 @@ rm -f conftest.err conftest.i conftest.$ac_ext
 $as_echo "$ocaml_cv_cc_vendor" >&6; }
 
 
+## Determine if the $CPP can be passed -P
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the C preprocessor supports -P" >&5
+$as_echo_n "checking whether the C preprocessor supports -P... " >&6; }
+  saved_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="-P $CPPFLAGS"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+int main() { return 0; }
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  cpp_P='-P'
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  cpp_P=''
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+  CPPFLAGS="$saved_CPPFLAGS"
+
+
 ## In cross-compilation mode, can we run executables produced?
 # At the moment, it's required, but the fact is used in C99 function detection
 
@@ -12643,13 +12668,16 @@ fi
 # manually to make sure the backward compatibility is preserved
 case $ocaml_cv_cc_vendor in #(
   xlc-*) :
+    cpp_P=''
     CPP="$CC -E -qnoppline" ;; #(
   # suppress incompatible XLC line directives
   sunc-*) :
+    cpp_P=''
     CPP="$CC -E -Qn" ;; #(
   # suppress generation of Sun PRO ident string
   msvc-*) :
-    CPP="$CC -nologo -EP" ;; #(
+    cpp_P='-EP'
+    CPP="$CC -nologo -E" ;; #(
   *) :
      ;;
 esac
