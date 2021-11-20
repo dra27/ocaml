@@ -1116,7 +1116,7 @@ bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
 
 bytecomp/opcodes.mli: bytecomp/opcodes.ml
-	$(CAMLC) -i $< > $@
+	$(CAMLC) -i $< | tr -d '\r' > $@
 
 $(make_opcodes): tools/make_opcodes.mll
 	$(MAKE) -C tools make_opcodes

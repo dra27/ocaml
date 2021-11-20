@@ -164,6 +164,9 @@ OCAMLYACCFLAGS ?=
 
 %.ml %.mli: %.mly
 	$(OCAMLYACC) $(OCAMLYACCFLAGS) $<
+ifeq "$(UNIX_OR_WIN32)" "win32"
+	cat $*.mli | tr -d '\r' > $*.mli.t && rm -f $*.mli && mv $*.mli.t $*.mli
+endif
 
 SAK = $(ROOTDIR)/runtime/sak$(EXE)
 
