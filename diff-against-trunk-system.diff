@@ -1,17 +1,42 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b6b836c5bd
+index 0000000000..d50b3f762c
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,8 @@
-+--- a	2023-09-28 18:43:19.126742941 +0100
-++++ b	2023-09-28 18:43:19.138743448 +0100
-+@@ -1,5 +1,3 @@
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
-+ --- a/testsuite/tests/typing-objects/Tests.ml
-+ +++ b/testsuite/tests/typing-objects/Tests.ml
+@@ -0,0 +1,19 @@
++--- a	2023-09-28 18:43:19.466757288 +0100
+++++ b	2023-09-28 18:43:19.494758470 +0100
++@@ -11,6 +11,16 @@
++  ### Compiler user-interface and warnings:
++  
++  ### Internal/compiler-libs changes:
+++@@ -217,6 +220,9 @@ OCaml 4.14.0
+++ - #10281, #10685: Add description of C compiler on macOS and Windows platforms.
+++   (Dong An, review by Xavier Leroy and David Allsopp)
+++ 
++++- #10589: Fix many typos (excess/inconsistent spaces) in the HTML manual.
++++  (Wiktor Kuchta, review by Florian Angeletti)
++++
+++ - #10605: manual, name few css classes to ease styling and maintainability.
+++   (Florian Angeletti, review by Wiktor Kuchta and Gabriel Scherer)
+++ 
++ diff --git a/manual/src/cmds/unified-options.etex b/manual/src/cmds/unified-options.etex
++ --- a/manual/src/cmds/unified-options.etex
++ +++ b/manual/src/cmds/unified-options.etex
+diff --git a/Changes b/Changes
+index 10b28b42bc..59efdcfb62 100644
+--- a/Changes
++++ b/Changes
+@@ -220,6 +220,9 @@ OCaml 4.14.0
+ - #10281, #10685: Add description of C compiler on macOS and Windows platforms.
+   (Dong An, review by Xavier Leroy and David Allsopp)
+ 
++- #10589: Fix many typos (excess/inconsistent spaces) in the HTML manual.
++  (Wiktor Kuchta, review by Florian Angeletti)
++
+ - #10605: manual, name few css classes to ease styling and maintainability.
+   (Florian Angeletti, review by Wiktor Kuchta and Gabriel Scherer)
+ 
 diff --git a/VERSION b/VERSION
 index d9d76e3115..ca456ac135 100644
 --- a/VERSION
