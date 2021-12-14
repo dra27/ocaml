@@ -1,0 +1,8 @@
+--- a	2023-09-28 18:43:19.126742941 +0100
++++ b	2023-09-28 18:43:19.138743448 +0100
+@@ -1,5 +1,3 @@
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
+ --- a/testsuite/tests/typing-objects/Tests.ml
+ +++ b/testsuite/tests/typing-objects/Tests.ml
