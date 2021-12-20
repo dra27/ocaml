@@ -67,11 +67,17 @@ let toplevel = {
     setup_ocaml_build_env;
     ocaml;
     check_ocaml_output;
-(*
+  ]
+}
+
+let nattoplevel = {
+  test_name = "toplevel.opt";
+  test_run_by_default = false;
+  test_actions =
+  [
     setup_ocamlnat_build_env;
     ocamlnat;
     check_ocamlnat_output;
-*)
   ]
 }
 
@@ -135,6 +141,7 @@ let _ =
     bytecode;
     native;
     toplevel;
+    nattoplevel;
     expect;
     ocamldoc;
     asmgen;
