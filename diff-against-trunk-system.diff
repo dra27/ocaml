@@ -1,25 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..4fb2c32c95
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,16 @@
-+--- a	2023-09-28 18:43:19.778770454 +0100
-++++ b	2023-09-28 18:43:19.806771635 +0100
-+@@ -11,13 +11,3 @@
-+  ### Compiler user-interface and warnings:
-+  
-+  ### Internal/compiler-libs changes:
-+-@@ -220,6 +217,9 @@ OCaml 4.14.0
-+- - #10281, #10685: Add description of C compiler on macOS and Windows platforms.
-+-   (Dong An, review by Xavier Leroy and David Allsopp)
-+- 
-+-+- #10589: Fix many typos (excess/inconsistent spaces) in the HTML manual.
-+-+  (Wiktor Kuchta, review by Florian Angeletti)
-+-+
-+- - #10605: manual, name few css classes to ease styling and maintainability.
-+-   (Florian Angeletti, review by Wiktor Kuchta and Gabriel Scherer)
-+- 
+index 0000000000..e69de29bb2
 diff --git a/VERSION b/VERSION
 index d9d76e3115..ca456ac135 100644
 --- a/VERSION
