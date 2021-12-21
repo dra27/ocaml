@@ -75,6 +75,7 @@ let nattoplevel = {
   test_run_by_default = false;
   test_actions =
   [
+    shared_libraries;
     setup_ocamlnat_build_env;
     ocamlnat;
     check_ocamlnat_output;
