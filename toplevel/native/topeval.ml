@@ -169,6 +169,11 @@ let execute_phrase print_outcome ppf phr =
       let sg' = Typemod.Signature_names.simplify newenv names sg in
       ignore (Includemod.signatures oldenv ~mark:Mark_positive sg sg');
       Typecore.force_delayed_checks ();
+      (* The expression is "named" after typing in order to ensure that both
+         bytecode and native toplevels always type-check _exactly_ the same
+         expression. Adding the binding at the parsetree level (before typing)
+         can create observable differences (e.g. in type variable names, see
+         tool-toplevel/pr10712.ml in the testsuite) *)
       let str, sg', rewritten =
          match str.str_items with
          | [ { str_desc = Tstr_eval (e, attrs) ; str_loc = loc } ]
