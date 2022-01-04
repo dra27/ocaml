@@ -15,13 +15,15 @@
 #*                                                                        *
 #**************************************************************************
 
+SED=${SED:-sed}
+
 # #10332: the meaning of character range a-z depends on the locale, so force C
 #         locale throughout.
 export LC_ALL=C
 echo 'let builtin_exceptions = [|'
-tr -d '\r' < "$1" | sed -n -e 's|.*/\* \("[A-Za-z_]*"\) \*/$|  \1;|p'
+tr -d '\r' < "$1" | "$SED" -n -e 's|.*/\* \("[A-Za-z_]*"\) \*/$|  \1;|p'
 echo '|]'
 
 echo 'let builtin_primitives = [|'
-sed -e 's/.*/  "&";/' "$2"
+"$SED" -e 's/.*/  "&";/' "$2"
 echo '|]'

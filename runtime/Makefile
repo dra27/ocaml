@@ -214,7 +214,7 @@ ld.conf: $(ROOTDIR)/Makefile.config
 
 # To speed up builds, we avoid changing "primitives" when files
 # containing primitives change but the primitives table does not
-primitives: $(shell ./gen_primitives.sh > primitives.new; \
+primitives: $(shell SED=$(SED) ./gen_primitives.sh > primitives.new; \
                     cmp -s primitives primitives.new || echo primitives.new)
 	cp $^ $@
 
@@ -222,17 +222,17 @@ prims.c : primitives
 	(echo '#define CAML_INTERNALS'; \
          echo '#include "caml/mlvalues.h"'; \
 	 echo '#include "caml/prims.h"'; \
-	 sed -e 's/.*/extern value &();/' primitives; \
+	 $(SED) -e 's/.*/extern value &();/' primitives; \
 	 echo 'c_primitive caml_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  &,/' primitives; \
+	 $(SED) -e 's/.*/  &,/' primitives; \
 	 echo '  0 };'; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  "&",/' primitives; \
+	 $(SED) -e 's/.*/  "&",/' primitives; \
 	 echo '  0 };') > prims.c
 
 caml/opnames.h : caml/instruct.h
 	tr -d '\r' < $< | \
-	sed -e '/\/\*/d' \
+	$(SED) -e '/\/\*/d' \
 	    -e '/^#/d' \
 	    -e 's/enum /static char * names_of_/' \
 	    -e 's/{$$/[] = {/' \
@@ -241,7 +241,7 @@ caml/opnames.h : caml/instruct.h
 # caml/jumptbl.h is required only if you have GCC 2.0 or later
 caml/jumptbl.h : caml/instruct.h
 	tr -d '\r' < $< | \
-	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
+	$(SED) -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
 	       -e '/^}/q' > $@
 # These are provided as a temporary shim to allow cross-compilation systems
 # to supply a host C compiler and different flags and a linking macro.

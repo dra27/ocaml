@@ -1,3 +1,3 @@
 #!/bin/sh
 
-grep "wrong argument 'typing'" compiler-output.raw | grep "save-ir-after" | sed 's/^.*: wrong argument/wrong argument/'
+sed -n -e "/wrong argument 'typing'/s/^.*: wrong argument/wrong argument/;/save-ir-after/p" compiler-output.raw
