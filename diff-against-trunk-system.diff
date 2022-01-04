@@ -38,7 +38,7 @@ index 681f116bbb..21c95d87de 100644
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
 diff --git a/configure b/configure
-index 6fa3a11416..f217478f20 100755
+index 6661d1bf63..c6b82f2d2d 100755
 Binary files a/configure and b/configure differ
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
