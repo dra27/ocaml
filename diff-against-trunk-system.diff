@@ -1,6 +1,35 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..7a92deb580
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:21.606847525 +0100
+++++ b	2023-09-28 18:43:21.626848368 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -428,6 +428,10 @@ OCaml 4.14.0
+++@@ -453,6 +453,10 @@ OCaml 4.14.0
++    toplevel, as in the bytecode toplevel.
++    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
++  
+diff --git a/Changes b/Changes
+index fdcca3b1e3..675ef47f6b 100644
+--- a/Changes
++++ b/Changes
+@@ -453,6 +453,10 @@ OCaml 4.14.0
+   toplevel, as in the bytecode toplevel.
+   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
+ 
++- #10853: `Obj.reachable_words` could crash if called after a marshaling
++  operation in `NO_SHARING` mode.
++  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
++
+ 
+ OCaml 4.13 maintenance branch
+ -----------------------------
 diff --git a/VERSION b/VERSION
 index d9d76e3115..ca456ac135 100644
 --- a/VERSION
