@@ -438,6 +438,10 @@ OCaml 4.14.0
 - #10763, #10764: fix miscompilation of method delegation
   (Alain Frisch, review by Vincent Laviron and Jacques Garrigue)
 
+- #10853: `Obj.reachable_words` could crash if called after a marshaling
+  operation in `NO_SHARING` mode.
+  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
+
 
 OCaml 4.13 maintenance branch
 -----------------------------
