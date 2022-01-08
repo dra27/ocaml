@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7a92deb580
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:21.606847525 +0100
-++++ b	2023-09-28 18:43:21.626848368 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -428,6 +428,10 @@ OCaml 4.14.0
-++@@ -453,6 +453,10 @@ OCaml 4.14.0
-+    toplevel, as in the bytecode toplevel.
-+    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index fdcca3b1e3..675ef47f6b 100644
 --- a/Changes
@@ -67,14 +53,32 @@ index 681f116bbb..21c95d87de 100644
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
 diff --git a/configure b/configure
-index 6661d1bf63..c6b82f2d2d 100755
+index cdd58808ae..49d907104f 100755
 Binary files a/configure and b/configure differ
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1621fa8862
+--- /dev/null
++++ b/diff-against-trunk-support.diff
+@@ -0,0 +1,15 @@
++diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
++new file mode 100644
++index 0000000000..15969eb421
++--- /dev/null
+++++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
++@@ -0,0 +1,9 @@
+++(* TEST
+++*)
+++
+++let _ =
+++  (* In 4.13 this causes Obj.reachable_words to segfault
+++     because of a missing initialization in caml_obj_reachable_words *)
+++  ignore (Marshal.(to_string 123 [No_sharing]));
+++  let n = Obj.reachable_words (Obj.repr (Array.init 10 (fun i -> i))) in
+++  assert (n = 11)
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
 index 0000000000..e69de29bb2
