@@ -57,4 +57,6 @@ extern void unix_clear_cloexec(int fd, char * cmdname, value arg);
 
 #define EXECV_CAST
 
+#define caml_process_pending_signals caml_process_pending_actions
+
 #endif /* CAML_UNIXSUPPORT_H */

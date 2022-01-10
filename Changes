@@ -1,3 +1,30 @@
+Working version
+---------------
+
+### Language features:
+
+### Runtime system:
+- #10831: Multicore OCaml
+  (The multicore team, caml-devel and more)
+
+### Code generation and optimizations:
+
+### Standard library:
+
+### Other libraries:
+
+### Tools:
+
+### Manual and documentation:
+
+### Compiler user-interface and warnings:
+
+### Internal/compiler-libs changes:
+
+### Build system:
+
+### Bug fixes:
+
 OCaml 4.14.0
 ----------------
 
@@ -427,10 +454,6 @@ OCaml 4.14.0
 - #10849: Display the result of `let _ : <type> = <expr>` in the native
   toplevel, as in the bytecode toplevel.
   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
-
-- #10853: `Obj.reachable_words` could crash if called after a marshaling
-  operation in `NO_SHARING` mode.
-  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
 
 
 OCaml 4.13 maintenance branch
