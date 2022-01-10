@@ -12899,8 +12899,6 @@ fi
 esac ;;
 esac
 
-internal_cppflags="-DCAML_NAME_SPACE $internal_cppflags"
-
 # Enable SSE2 on x86 mingw to avoid using 80-bit registers.
 case $host in #(
   i686-*-mingw32) :

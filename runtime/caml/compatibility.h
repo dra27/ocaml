@@ -22,7 +22,7 @@
 #define caml_stat_top_heap_size Bsize_wsize(caml_stat_top_heap_wsz)
 #define caml_stat_heap_size Bsize_wsize(caml_stat_heap_wsz)
 
-#ifndef CAML_NAME_SPACE
+#if 0
 
 /*
    #define --> CAMLextern  (defined with CAMLexport or CAMLprim)
