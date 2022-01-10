@@ -1,0 +1,34 @@
+--- a	2023-09-28 18:43:22.154870613 +0100
++++ b	2023-09-28 18:43:22.238874150 +0100
+@@ -1563,10 +1563,6 @@
+    | File _
+    | Indirect_symbol _
+    | Loc _
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/bytecomp/bytegen.ml b/bytecomp/bytegen.ml
+ --- a/bytecomp/bytegen.ml
+ +++ b/bytecomp/bytegen.ml
+@@ -13206,20 +13202,6 @@
+ +{
+ +  return caml_alloc_custom(&buggy_ops, 20, 0, 1);
+ +}
+-diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
+-new file mode 100644
+---- /dev/null
+-+++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
+-@@ -0,0 +1,9 @@
+-+(* TEST
+-+*)
+-+
+-+let _ =
+-+  (* In 4.13 this causes Obj.reachable_words to segfault
+-+     because of a missing initialization in caml_obj_reachable_words *)
+-+  ignore (Marshal.(to_string 123 [No_sharing]));
+-+  let n = Obj.reachable_words (Obj.repr (Array.init 10 (fun i -> i))) in
+-+  assert (n = 11)
+ diff --git a/testsuite/tests/lib-obj/reachable_words_np.ml b/testsuite/tests/lib-obj/reachable_words_np.ml
+ deleted file mode 100644
+ --- a/testsuite/tests/lib-obj/reachable_words_np.ml

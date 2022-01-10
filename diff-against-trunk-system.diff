@@ -1,11 +1,48 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..b7b564118c
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,34 @@
++--- a	2023-09-28 18:43:22.154870613 +0100
+++++ b	2023-09-28 18:43:22.238874150 +0100
++@@ -1563,10 +1563,6 @@
++    | File _
++    | Indirect_symbol _
++    | Loc _
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/bytecomp/bytegen.ml b/bytecomp/bytegen.ml
++ --- a/bytecomp/bytegen.ml
++ +++ b/bytecomp/bytegen.ml
++@@ -13206,20 +13202,6 @@
++ +{
++ +  return caml_alloc_custom(&buggy_ops, 20, 0, 1);
++ +}
++-diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
++-new file mode 100644
++---- /dev/null
++-+++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
++-@@ -0,0 +1,9 @@
++-+(* TEST
++-+*)
++-+
++-+let _ =
++-+  (* In 4.13 this causes Obj.reachable_words to segfault
++-+     because of a missing initialization in caml_obj_reachable_words *)
++-+  ignore (Marshal.(to_string 123 [No_sharing]));
++-+  let n = Obj.reachable_words (Obj.repr (Array.init 10 (fun i -> i))) in
++-+  assert (n = 11)
++ diff --git a/testsuite/tests/lib-obj/reachable_words_np.ml b/testsuite/tests/lib-obj/reachable_words_np.ml
++ deleted file mode 100644
++ --- a/testsuite/tests/lib-obj/reachable_words_np.ml
 diff --git a/Changes b/Changes
-index fdcca3b1e3..675ef47f6b 100644
+index 3542c327e5..c80b6167d5 100644
 --- a/Changes
 +++ b/Changes
-@@ -453,6 +453,10 @@ OCaml 4.14.0
+@@ -455,6 +455,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -27,10 +64,10 @@ index d9d76e3115..ca456ac135 100644
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
 diff --git a/boot/ocamlc b/boot/ocamlc
-index b65bd9a15c..6590409c5d 100755
+index d431dbd1f4..6590409c5d 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index b6efefde1b..f7298c9f3b 100755
+index b35488cadc..f7298c9f3b 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 681f116bbb..21c95d87de 100644
@@ -53,7 +90,7 @@ index 681f116bbb..21c95d87de 100644
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
 diff --git a/configure b/configure
-index cdd58808ae..49d907104f 100755
+index 35d8993e47..a30346e3ad 100755
 Binary files a/configure and b/configure differ
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
@@ -81,4 +118,118 @@ index 0000000000..1621fa8862
 ++  assert (n = 11)
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..87aeb1723c
+--- /dev/null
++++ b/diff-against-trunk-system.diff
+@@ -0,0 +1,110 @@
++diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
++new file mode 100644
++index 0000000000..b7b564118c
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,34 @@
+++--- a	2023-09-28 18:43:22.154870613 +0100
++++++ b	2023-09-28 18:43:22.238874150 +0100
+++@@ -1563,10 +1563,6 @@
+++    | File _
+++    | Indirect_symbol _
+++    | Loc _
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/bytecomp/bytegen.ml b/bytecomp/bytegen.ml
+++ --- a/bytecomp/bytegen.ml
+++ +++ b/bytecomp/bytegen.ml
+++@@ -13206,20 +13202,6 @@
+++ +{
+++ +  return caml_alloc_custom(&buggy_ops, 20, 0, 1);
+++ +}
+++-diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
+++-new file mode 100644
+++---- /dev/null
+++-+++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
+++-@@ -0,0 +1,9 @@
+++-+(* TEST
+++-+*)
+++-+
+++-+let _ =
+++-+  (* In 4.13 this causes Obj.reachable_words to segfault
+++-+     because of a missing initialization in caml_obj_reachable_words *)
+++-+  ignore (Marshal.(to_string 123 [No_sharing]));
+++-+  let n = Obj.reachable_words (Obj.repr (Array.init 10 (fun i -> i))) in
+++-+  assert (n = 11)
+++ diff --git a/testsuite/tests/lib-obj/reachable_words_np.ml b/testsuite/tests/lib-obj/reachable_words_np.ml
+++ deleted file mode 100644
+++ --- a/testsuite/tests/lib-obj/reachable_words_np.ml
++diff --git a/Changes b/Changes
++index 3542c327e5..c80b6167d5 100644
++--- a/Changes
+++++ b/Changes
++@@ -455,6 +455,10 @@ OCaml 4.14.0
++   toplevel, as in the bytecode toplevel.
++   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
++ 
+++- #10853: `Obj.reachable_words` could crash if called after a marshaling
+++  operation in `NO_SHARING` mode.
+++  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
+++
++ 
++ OCaml 4.13 maintenance branch
++ -----------------------------
++diff --git a/VERSION b/VERSION
++index d9d76e3115..ca456ac135 100644
++--- a/VERSION
+++++ b/VERSION
++@@ -1,4 +1,4 @@
++-5.00.0+dev0-2021-11-05
+++4.14.0+dev1-2021-10-05
++ 
++ # Starting with OCaml 4.14, although the version string that appears above is
++ # still correct and this file can thus still be used to figure it out,
++diff --git a/boot/ocamlc b/boot/ocamlc
++index d431dbd1f4..6590409c5d 100755
++Binary files a/boot/ocamlc and b/boot/ocamlc differ
++diff --git a/boot/ocamllex b/boot/ocamllex
++index b35488cadc..f7298c9f3b 100755
++Binary files a/boot/ocamllex and b/boot/ocamllex differ
++diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
++index 681f116bbb..21c95d87de 100644
++--- a/build-aux/ocaml_version.m4
+++++ b/build-aux/ocaml_version.m4
++@@ -31,12 +31,12 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
++ # integers. They MUST NOT be left-padded with zeros and all of them,
++ # including the patchlevel, are mandatory.
++ 
++-m4_define([OCAML__VERSION_MAJOR], [5])
++-m4_define([OCAML__VERSION_MINOR], [00])
+++m4_define([OCAML__VERSION_MAJOR], [4])
+++m4_define([OCAML__VERSION_MINOR], [14])
++ m4_define([OCAML__VERSION_PATCHLEVEL], [0])
++ # Note that the OCAML__VERSION_EXTRA string defined below is always empty
++ # for officially-released versions of OCaml.
++-m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
+++m4_define([OCAML__VERSION_EXTRA], [dev1-2021-10-05])
++ 
++ # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
++ # single character:
++diff --git a/configure b/configure
++index 35d8993e47..a30346e3ad 100755
++Binary files a/configure and b/configure differ
++diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
++new file mode 100644
++index 0000000000..e69de29bb2
++diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
++new file mode 100644
++index 0000000000..1621fa8862
++--- /dev/null
+++++ b/diff-against-trunk-support.diff
++@@ -0,0 +1,15 @@
+++diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
+++new file mode 100644
+++index 0000000000..15969eb421
+++--- /dev/null
++++++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
+++@@ -0,0 +1,9 @@
++++(* TES
+\ No newline at end of file
