@@ -1,11 +1,25 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..99f67e5593
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:23.662934095 +0100
+++++ b	2023-09-28 18:43:23.682934936 +0100
++@@ -39,7 +39,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -692,8 +692,6 @@ AS_CASE([$host],
+++@@ -701,8 +701,6 @@ AS_CASE([$host],
++        internal_cflags="$cc_warnings"],
++      [common_cflags="-O"])])
++  
 diff --git a/Changes b/Changes
-index 3542c327e5..c80b6167d5 100644
+index e35148f24d..af5bbe3e0e 100644
 --- a/Changes
 +++ b/Changes
-@@ -455,6 +455,10 @@ OCaml 4.14.0
+@@ -462,6 +462,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -330,10 +344,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 35d8993e47..15538f4f48 100755
+index 4eaf314bc8..eb31fbb79a 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 89ccd2b251..fd05ab1ec8 100644
+index b1a8b29e75..5ed9f2531e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
@@ -365,7 +379,7 @@ index 89ccd2b251..fd05ab1ec8 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-@@ -1814,7 +1823,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
+@@ -1812,7 +1821,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
      [*-*-mingw32|*-pc-windows],
        [systhread_support=true
        otherlibraries="$otherlibraries systhreads"
@@ -375,7 +389,7 @@ index 89ccd2b251..fd05ab1ec8 100644
        AC_MSG_NOTICE([the Win32 threads library is supported])],
      [AX_PTHREAD(
        [systhread_support=true
-@@ -1856,6 +1866,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1854,6 +1864,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -406,7 +420,7 @@ index 89ccd2b251..fd05ab1ec8 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1965,8 +1999,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1963,8 +1997,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -2956,18 +2970,32 @@ index 0000000000..ed59bb0842
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ff105a17e7
+index 0000000000..b53c0230c8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,2852 @@
+@@ -0,0 +1,2858 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..99f67e5593
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:23.662934095 +0100
++++++ b	2023-09-28 18:43:23.682934936 +0100
+++@@ -39,7 +39,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -692,8 +692,6 @@ AS_CASE([$host],
++++@@ -701,8 +701,6 @@ AS_CASE([$host],
+++        internal_cflags="$cc_warnings"],
+++      [common_cflags="-O"])])
+++  
 +diff --git a/Changes b/Changes
-+index 3542c327e5..c80b6167d5 100644
++index e35148f24d..af5bbe3e0e 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -455,6 +455,10 @@ OCaml 4.14.0
++@@ -462,6 +462,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
@@ -3292,10 +3320,10 @@ index 0000000000..ff105a17e7
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 35d8993e47..15538f4f48 100755
++index 4eaf314bc8..eb31fbb79a 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 89ccd2b251..fd05ab1ec8 100644
++index b1a8b29e75..5ed9f2531e 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
@@ -3327,7 +3355,7 @@ index 0000000000..ff105a17e7
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-+@@ -1814,7 +1823,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
++@@ -1812,7 +1821,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
 +     [*-*-mingw32|*-pc-windows],
 +       [systhread_support=true
 +       otherlibraries="$otherlibraries systhreads"
@@ -3337,7 +3365,7 @@ index 0000000000..ff105a17e7
 +       AC_MSG_NOTICE([the Win32 threads library is supported])],
 +     [AX_PTHREAD(
 +       [systhread_support=true
-+@@ -1856,6 +1866,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1854,6 +1864,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -3368,7 +3396,7 @@ index 0000000000..ff105a17e7
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1965,8 +1999,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1963,8 +1997,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -5803,15 +5831,7 @@ index 0000000000..ff105a17e7
 ++-*********** check-program-output
 +++******** check-ocamlc.byte-output
 +++********* ocamldebug
-+++********** check-program-output
-++ *)
-++ 
-++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++index b2d6e6e7c5..f22a4bd50f 100644
-++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags +=
++++******
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 43bccf6e2c..e404f6b040 100644

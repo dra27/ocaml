@@ -1,8 +1,8 @@
 diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
-index 74b4646679..30d068b6b8 100644
+index 93620c9bcc..4f6bf1dcab 100644
 --- a/testsuite/tests/asmcomp/polling.c
 +++ b/testsuite/tests/asmcomp/polling.c
-@@ -13,7 +13,11 @@ CAMLprim value request_minor_gc(value v) {
+@@ -12,7 +12,11 @@ CAMLprim value request_minor_gc(value v) {
      tests are only run in a single domain, so we're probably
      good.
    */
