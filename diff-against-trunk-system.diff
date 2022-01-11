@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..99f67e5593
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:23.662934095 +0100
-++++ b	2023-09-28 18:43:23.682934936 +0100
-+@@ -39,7 +39,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -692,8 +692,6 @@ AS_CASE([$host],
-++@@ -701,8 +701,6 @@ AS_CASE([$host],
-+        internal_cflags="$cc_warnings"],
-+      [common_cflags="-O"])])
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index e35148f24d..af5bbe3e0e 100644
 --- a/Changes
@@ -3546,27 +3532,13 @@ index 0000000000..b639107fc5
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4d25938d5a
+index 0000000000..1d77c91d56
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3476 @@
+@@ -0,0 +1,3472 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..99f67e5593
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:23.662934095 +0100
-+++++ b	2023-09-28 18:43:23.682934936 +0100
-++@@ -39,7 +39,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -692,8 +692,6 @@ AS_CASE([$host],
-+++@@ -701,8 +701,6 @@ AS_CASE([$host],
-++        internal_cflags="$cc_warnings"],
-++      [common_cflags="-O"])])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index e35148f24d..af5bbe3e0e 100644
 +--- a/Changes
@@ -7025,7 +6997,17 @@ index 0000000000..4d25938d5a
 ++ Line 3, characters 2-36:
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included ty
+++-Error: Illegal shadowing of included type t/289 by t/294
++++Error: Illegal shadowing of included type t/284 by t/289
+++        Line 2, characters 2-19:
+++-         Type t/289 came from this include
++++         Type t/284 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/289 is shadowed
++++         The value print has no valid type if t/284 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 43bccf6e2c..e404f6b040 100644
@@ -8154,10 +8136,10 @@ index ac8b7a8bee..2fd6aa2bf4 100644
  val force_gen : only_val:bool -> 'a lazy_t -> 'a
 +*)
 diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-index 09410192ff..f995748115 100644
+index 6a61261c8f..c86d23d854 100644
 --- a/stdlib/filename.ml
 +++ b/stdlib/filename.ml
-@@ -328,10 +328,18 @@ let remove_extension name =
+@@ -326,10 +326,18 @@ let remove_extension name =
  external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
  external close_desc: int -> unit = "caml_sys_close"
  
