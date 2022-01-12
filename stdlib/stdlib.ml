@@ -595,7 +595,7 @@ module Condition      = Condition
 module Digest         = Digest
 (* BACKPORT
 module Domain         = Domain
-module EffectHandlers = EffectHandlers
+module Effect         = Effect
 *)
 module Either         = Either
 module Ephemeron      = Ephemeron
