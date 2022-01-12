@@ -24,11 +24,29 @@ end
 Line 3, characters 2-36:
 3 |   include Comparable with type t = t
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<<<<<<< HEAD
 Error: Illegal shadowing of included type t/284 by t/289
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+Error: Illegal shadowing of included type t/289 by t/294
+=======
+Error: Illegal shadowing of included type t/287 by t/292
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
        Line 2, characters 2-19:
+<<<<<<< HEAD
          Type t/284 came from this include
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+         Type t/289 came from this include
+=======
+         Type t/287 came from this include
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
        Line 3, characters 2-23:
+<<<<<<< HEAD
          The value print has no valid type if t/284 is shadowed
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+         The value print has no valid type if t/289 is shadowed
+=======
+         The value print has no valid type if t/287 is shadowed
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
 |}]
 
 module type Sunderscore = sig

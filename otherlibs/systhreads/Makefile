@@ -50,14 +50,26 @@ LIBNAME=threads
 BYTECODE_C_OBJS=st_stubs.b.$(O)
 NATIVECODE_C_OBJS=st_stubs.n.$(O)
 
+<<<<<<< HEAD
 THREADS_SOURCES = thread.ml mutex.ml condition.ml event.ml threadUnix.ml \
   semaphore.ml
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+THREADS_SOURCES = thread.ml event.ml threadUnix.ml
+=======
+THREADS_SOURCES = thread.ml event.ml
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
 
 THREADS_BCOBJS = $(THREADS_SOURCES:.ml=.cmo)
 THREADS_NCOBJS = $(THREADS_SOURCES:.ml=.cmx)
 
+<<<<<<< HEAD
 MLIFILES=thread.mli mutex.mli condition.mli event.mli threadUnix.mli \
   semaphore.mli
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+MLIFILES=thread.mli event.mli threadUnix.mli
+=======
+MLIFILES=thread.mli event.mli
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
 
 CMIFILES=$(MLIFILES:.mli=.cmi)
 

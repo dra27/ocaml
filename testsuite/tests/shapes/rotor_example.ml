@@ -26,8 +26,16 @@ end
 {
  ("Pair", module) ->
      Abs<.9>
+<<<<<<< HEAD
         (X/279,
          Abs(Y/280, {
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+        (X/284,
+         Abs(Y/285, {
+=======
+        (X/282,
+         Abs(Y/283, {
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
                      ("t", type) -> <.5>;
                      ("to_string", value) -> <.6>;
                      }));

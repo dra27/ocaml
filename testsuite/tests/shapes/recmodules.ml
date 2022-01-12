@@ -44,10 +44,22 @@ end = B
 [%%expect{|
 {
  ("A", module) -> {<.11>
+<<<<<<< HEAD
                    ("t", type) -> A/302<.11> . "t"[type];
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+                   ("t", type) -> A/307<.11> . "t"[type];
+=======
+                   ("t", type) -> A/305<.11> . "t"[type];
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
                    };
  ("B", module) -> {<.12>
+<<<<<<< HEAD
                    ("t", type) -> B/303<.12> . "t"[type];
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+                   ("t", type) -> B/308<.12> . "t"[type];
+=======
+                   ("t", type) -> B/306<.12> . "t"[type];
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
                    };
  }
 module rec A : sig type t = Leaf of B.t end
@@ -86,13 +98,31 @@ end = Set.Make(A)
  ("ASet", module) ->
      {
       ("compare", value) ->
+<<<<<<< HEAD
           CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+          CU Stdlib . "Set"[module] . "Make"[module](A/329<.19>) .
+=======
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
           "compare"[value];
       ("elt", type) ->
+<<<<<<< HEAD
           CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+          CU Stdlib . "Set"[module] . "Make"[module](A/329<.19>) .
+=======
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
           "elt"[type];
       ("t", type) ->
+<<<<<<< HEAD
           CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) . "t"[type];
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+          CU Stdlib . "Set"[module] . "Make"[module](A/329<.19>) . "t"[type];
+=======
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) . "t"[type];
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
       };
  }
 module rec A :

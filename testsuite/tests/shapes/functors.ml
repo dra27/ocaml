@@ -17,7 +17,13 @@ module type S = sig type t val x : t end
 module Falias (X : S) = X
 [%%expect{|
 {
+<<<<<<< HEAD
  ("Falias", module) -> Abs<.4>(X/279, X/279<.3>);
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+ ("Falias", module) -> Abs<.4>(X/284, X/284<.3>);
+=======
+ ("Falias", module) -> Abs<.4>(X/282, X/282<.3>);
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
  }
 module Falias : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -29,10 +35,24 @@ end
 {
  ("Finclude", module) ->
      Abs<.6>
+<<<<<<< HEAD
         (X/283,
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+        (X/288,
+=======
+        (X/286,
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
          {
+<<<<<<< HEAD
           ("t", type) -> X/283<.5> . "t"[type];
           ("x", value) -> X/283<.5> . "x"[value];
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+          ("t", type) -> X/288<.5> . "t"[type];
+          ("x", value) -> X/288<.5> . "x"[value];
+=======
+          ("t", type) -> X/286<.5> . "t"[type];
+          ("x", value) -> X/286<.5> . "x"[value];
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
           });
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -45,7 +65,13 @@ end
 [%%expect{|
 {
  ("Fredef", module) ->
+<<<<<<< HEAD
      Abs<.10>(X/290, {
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+     Abs<.10>(X/295, {
+=======
+     Abs<.10>(X/293, {
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
                       ("t", type) -> <.8>;
                       ("x", value) -> <.9>;
                       });
@@ -225,9 +251,21 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 {
  ("Big_to_small1", module) ->
      Abs<.40>
+<<<<<<< HEAD
         (shape-var/386,
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+        (shape-var/391,
+=======
+        (shape-var/389,
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
          {<<internal>>
+<<<<<<< HEAD
           ("t", type) -> shape-var/386<<internal>> . "t"[type];
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+          ("t", type) -> shape-var/391<<internal>> . "t"[type];
+=======
+          ("t", type) -> shape-var/389<<internal>> . "t"[type];
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
           });
  }
 module Big_to_small1 : B2S
@@ -238,9 +276,21 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 {
  ("Big_to_small2", module) ->
      Abs<.42>
+<<<<<<< HEAD
         (shape-var/392,
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+        (shape-var/397,
+=======
+        (shape-var/395,
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
          {
+<<<<<<< HEAD
           ("t", type) -> (shape-var/392<<internal>> . "t"[type])<.41>;
+||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
+          ("t", type) -> (shape-var/397<<internal>> . "t"[type])<.41>;
+=======
+          ("t", type) -> (shape-var/395<<internal>> . "t"[type])<.41>;
+>>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
           });
  }
 module Big_to_small2 : B2S
