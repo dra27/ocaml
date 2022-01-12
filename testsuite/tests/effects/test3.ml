@@ -3,8 +3,8 @@
    reason = "OCaml 5 only"
  *)
 
-open EffectHandlers
-open EffectHandlers.Deep
+open Effect
+open Effect.Deep
 
 type _ eff += E : unit eff
 exception X

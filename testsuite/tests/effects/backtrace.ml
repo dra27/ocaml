@@ -5,8 +5,8 @@
    reason = "OCaml 5 only"
 *)
 
-open EffectHandlers
-open EffectHandlers.Deep
+open Effect
+open Effect.Deep
 
 let rec foo i =
   if i = 0 then ()

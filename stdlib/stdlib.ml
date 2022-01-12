@@ -588,7 +588,7 @@ module Condition      = Condition
 module Digest         = Digest
 (*
 module Domain         = Domain
-module EffectHandlers = EffectHandlers
+module Effect         = Effect
 *)
 module Either         = Either
 module Ephemeron      = Ephemeron

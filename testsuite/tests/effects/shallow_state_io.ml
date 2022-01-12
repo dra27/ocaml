@@ -3,8 +3,8 @@
    reason = "OCaml 5 only"
  *)
 
-open EffectHandlers
-open EffectHandlers.Shallow
+open Effect
+open Effect.Shallow
 
 type _ eff += Get   : int eff
             | Set   : int -> unit eff
