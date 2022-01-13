@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..67729fbf9d
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:25.619016339 +0100
-++++ b	2023-09-28 18:43:25.635017012 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -39,7 +39,7 @@ OCaml 4.14.0
-++@@ -93,7 +93,7 @@ OCaml 4.14.0
-+    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
-+     Damien Doligez)
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 49e223d13a..24cd780401 100644
 --- a/Changes
@@ -3554,27 +3540,13 @@ index 0000000000..5eb40a4a9b
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c9e4985e4f
+index 0000000000..157ddb5388
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3480 @@
+@@ -0,0 +1,3475 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..67729fbf9d
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:25.619016339 +0100
-+++++ b	2023-09-28 18:43:25.635017012 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -39,7 +39,7 @@ OCaml 4.14.0
-+++@@ -93,7 +93,7 @@ OCaml 4.14.0
-++    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
-++     Damien Doligez)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 49e223d13a..24cd780401 100644
 +--- a/Changes
@@ -7037,7 +7009,16 @@ index 0000000000..c9e4985e4f
 ++index c09643864e..4597265246 100644
 ++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
 +++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,1
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/287 by t/292
++++Error: Illegal shadowing of included type t/282 by t/287
+++        Line 2, characters 2-19:
+++-         Type t/287 came from this include
++++         Type t/282 came from this include
+++        Line 3, charact
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 43bccf6e2c..e404f6b040 100644
