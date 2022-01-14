@@ -326,10 +326,17 @@ let remove_extension name =
 external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
 external close_desc: int -> unit = "caml_sys_close"
 
+<<<<<<< HEAD
 (*
 let prng_key = Domain.DLS.new_key Random.State.make_self_init
 *)
 let prng_key = lazy(Random.State.make_self_init ())
+||||||| parent of 6839b3c856 (Merge pull request PR#10887 from gasche/multicore-random)
+let prng_key = Domain.DLS.new_key Random.State.make_self_init
+=======
+let prng_key =
+  Domain.DLS.new_key Random.State.make_self_init
+>>>>>>> 6839b3c856 (Merge pull request PR#10887 from gasche/multicore-random)
 
 let temp_file_name temp_dir prefix suffix =
   (*

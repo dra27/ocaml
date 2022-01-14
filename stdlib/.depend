@@ -204,6 +204,66 @@ stdlib__Digest.cmx : digest.ml \
     stdlib__Bytes.cmx \
     stdlib__Digest.cmi
 stdlib__Digest.cmi : digest.mli
+<<<<<<< HEAD
+||||||| parent of 6839b3c856 (Merge pull request PR#10887 from gasche/multicore-random)
+stdlib__Domain.cmo : domain.ml \
+    stdlib__Sys.cmi \
+    stdlib.cmi \
+    stdlib__Obj.cmi \
+    stdlib__Mutex.cmi \
+    stdlib__Atomic.cmi \
+    stdlib__Array.cmi \
+    stdlib__Domain.cmi
+stdlib__Domain.cmx : domain.ml \
+    stdlib__Sys.cmx \
+    stdlib.cmx \
+    stdlib__Obj.cmx \
+    stdlib__Mutex.cmx \
+    stdlib__Atomic.cmx \
+    stdlib__Array.cmx \
+    stdlib__Domain.cmi
+stdlib__Domain.cmi : domain.mli
+stdlib__Effect.cmo : effect.ml \
+    stdlib__Printexc.cmi \
+    stdlib__Obj.cmi \
+    stdlib__Effect.cmi
+stdlib__Effect.cmx : effect.ml \
+    stdlib__Printexc.cmx \
+    stdlib__Obj.cmx \
+    stdlib__Effect.cmi
+stdlib__Effect.cmi : effect.mli \
+    stdlib__Printexc.cmi
+=======
+stdlib__Domain.cmo : domain.ml \
+    stdlib__Sys.cmi \
+    stdlib.cmi \
+    stdlib__Obj.cmi \
+    stdlib__Mutex.cmi \
+    stdlib__List.cmi \
+    stdlib__Atomic.cmi \
+    stdlib__Array.cmi \
+    stdlib__Domain.cmi
+stdlib__Domain.cmx : domain.ml \
+    stdlib__Sys.cmx \
+    stdlib.cmx \
+    stdlib__Obj.cmx \
+    stdlib__Mutex.cmx \
+    stdlib__List.cmx \
+    stdlib__Atomic.cmx \
+    stdlib__Array.cmx \
+    stdlib__Domain.cmi
+stdlib__Domain.cmi : domain.mli
+stdlib__Effect.cmo : effect.ml \
+    stdlib__Printexc.cmi \
+    stdlib__Obj.cmi \
+    stdlib__Effect.cmi
+stdlib__Effect.cmx : effect.ml \
+    stdlib__Printexc.cmx \
+    stdlib__Obj.cmx \
+    stdlib__Effect.cmi
+stdlib__Effect.cmi : effect.mli \
+    stdlib__Printexc.cmi
+>>>>>>> 6839b3c856 (Merge pull request PR#10887 from gasche/multicore-random)
 stdlib__Either.cmo : either.ml \
     stdlib__Either.cmi
 stdlib__Either.cmx : either.ml \
