@@ -1,32 +1,87 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..f4448c03ae
+index 0000000000..7bca27e060
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,23 @@
-+--- a	2023-09-28 18:43:26.063034996 +0100
-++++ b	2023-09-28 18:43:26.067035164 +0100
-+@@ -12,7 +12,7 @@
-+  #ifdef POSIX_SIGNALS
+@@ -0,0 +1,78 @@
++--- a	2023-09-28 18:43:26.403049274 +0100
+++++ b	2023-09-28 18:43:26.411049610 +0100
++@@ -1,22 +1,3 @@
++-diff --git a/stdlib/.depend b/stdlib/.depend
++---- a/stdlib/.depend
++-+++ b/stdlib/.depend
++-@@ -217,6 +217,7 @@ stdlib__Domain.cmo : domain.ml \
++-     stdlib.cmi \
++-     stdlib__Obj.cmi \
++-     stdlib__Mutex.cmi \
++-+    stdlib__List.cmi \
++-     stdlib__Atomic.cmi \
++-     stdlib__Array.cmi \
++-     stdlib__Domain.cmi
++-@@ -225,6 +226,7 @@ stdlib__Domain.cmx : domain.ml \
++-     stdlib.cmx \
++-     stdlib__Obj.cmx \
++-     stdlib__Mutex.cmx \
++-+    stdlib__List.cmx \
++-     stdlib__Atomic.cmx \
++-     stdlib__Array.cmx \
++-     stdlib__Domain.cmi
++ diff --git a/stdlib/domain.ml b/stdlib/domain.ml
++ --- a/stdlib/domain.ml
++ +++ b/stdlib/domain.ml
++@@ -128,16 +109,16 @@
++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
++ --- a/stdlib/filename.ml
++ +++ b/stdlib/filename.ml
++-@@ -326,7 +326,8 @@ let remove_extension name =
++- external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
+++@@ -327,7 +327,8 @@ external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
++  external close_desc: int -> unit = "caml_sys_close"
 +  
-+  static void decode_sigset(value vset, sigset_t * set)
-+-@@ -80,11 +76,17 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
-++@@ -91,15 +87,17 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
-+  CAMLprim value unix_sigpending(value unit)
-+  {
-+    sigset_t pending;
-+@@ -21,7 +21,11 @@
-+ +  uintnat curr;
-+    if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
-+ -  for (i = 1; i < NSIG; i++)
-++-#if 0 /* BACKPORT BEGIN */
-+ -    if(atomic_load_explicit(&caml_pending_signals[i], memory_order_seq_cst))
-++-#endif
-++-    if(caml_pending_signals[i])
-++-/* BACKPORT END */
-+ -      sigaddset(&pending, i);
-+ +  for (i = 0; i < NSIG_WORDS; i++) {
-+ +    curr = atomic_load(&caml_pending_signals[i]);
+++ (* BACKPORT BEGIN
++ -let prng_key = Domain.DLS.new_key Random.State.make_self_init
++ +let prng_key =
++ +  Domain.DLS.new_key Random.State.make_self_init
++- 
++- let temp_file_name temp_dir prefix suffix =
++-   let random_state = Domain.DLS.get prng_key in
+++ *)
+++ let prng_key = lazy(Random.State.make_self_init ())
+++ (* BACKPORT END *)
++ diff --git a/stdlib/random.ml b/stdlib/random.ml
++ --- a/stdlib/random.ml
++ +++ b/stdlib/random.ml
++@@ -151,10 +132,10 @@
++  end
++  
++  (* This is the state you get with [init 27182818] and then applying
++-@@ -212,7 +215,8 @@ let mk_default () = {
++-   State.idx = 0;
+++@@ -213,7 +216,8 @@ let mk_default () = {
++  }
++  
+++ (* BACKPORT BEGIN
++ -let random_key = Domain.DLS.new_key mk_default
++ +let random_key =
++ +  Domain.DLS.new_key ~split_from_parent:State.split mk_default
++@@ -183,7 +164,7 @@
++ diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
++ --- a/testsuite/tests/gc-roots/globroots.ml
++ +++ b/testsuite/tests/gc-roots/globroots.ml
++-@@ -30,7 +30,10 @@ module Test(G: GLOBREF) () = struct
+++@@ -32,7 +32,10 @@ module Test(G: GLOBREF) () = struct
++  
++    let size = 1024
++  
++@@ -262,7 +243,7 @@
++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++-@@ -3,7 +3,10 @@
+++@@ -5,7 +5,10 @@
++  
++  let size = 1000;;
++  let num_domains = 4;;
 diff --git a/Changes b/Changes
 index 49e223d13a..24cd780401 100644
 --- a/Changes
@@ -3566,39 +3621,94 @@ index 0000000000..5eb40a4a9b
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..98656ed19d
+index 0000000000..d17180b4d3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3474 @@
+@@ -0,0 +1,3592 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..f4448c03ae
++index 0000000000..7bca27e060
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,23 @@
-++--- a	2023-09-28 18:43:26.063034996 +0100
-+++++ b	2023-09-28 18:43:26.067035164 +0100
-++@@ -12,7 +12,7 @@
-++  #ifdef POSIX_SIGNALS
++@@ -0,0 +1,78 @@
+++--- a	2023-09-28 18:43:26.403049274 +0100
++++++ b	2023-09-28 18:43:26.411049610 +0100
+++@@ -1,22 +1,3 @@
+++-diff --git a/stdlib/.depend b/stdlib/.depend
+++---- a/stdlib/.depend
+++-+++ b/stdlib/.depend
+++-@@ -217,6 +217,7 @@ stdlib__Domain.cmo : domain.ml \
+++-     stdlib.cmi \
+++-     stdlib__Obj.cmi \
+++-     stdlib__Mutex.cmi \
+++-+    stdlib__List.cmi \
+++-     stdlib__Atomic.cmi \
+++-     stdlib__Array.cmi \
+++-     stdlib__Domain.cmi
+++-@@ -225,6 +226,7 @@ stdlib__Domain.cmx : domain.ml \
+++-     stdlib.cmx \
+++-     stdlib__Obj.cmx \
+++-     stdlib__Mutex.cmx \
+++-+    stdlib__List.cmx \
+++-     stdlib__Atomic.cmx \
+++-     stdlib__Array.cmx \
+++-     stdlib__Domain.cmi
+++ diff --git a/stdlib/domain.ml b/stdlib/domain.ml
+++ --- a/stdlib/domain.ml
+++ +++ b/stdlib/domain.ml
+++@@ -128,16 +109,16 @@
+++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
+++ --- a/stdlib/filename.ml
+++ +++ b/stdlib/filename.ml
+++-@@ -326,7 +326,8 @@ let remove_extension name =
+++- external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
++++@@ -327,7 +327,8 @@ external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
+++  external close_desc: int -> unit = "caml_sys_close"
 ++  
-++  static void decode_sigset(value vset, sigset_t * set)
-++-@@ -80,11 +76,17 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
-+++@@ -91,15 +87,17 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
-++  CAMLprim value unix_sigpending(value unit)
-++  {
-++    sigset_t pending;
-++@@ -21,7 +21,11 @@
-++ +  uintnat curr;
-++    if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
-++ -  for (i = 1; i < NSIG; i++)
-+++-#if 0 /* BACKPORT BEGIN */
-++ -    if(atomic_load_explicit(&caml_pending_signals[i], memory_order_seq_cst))
-+++-#endif
-+++-    if(caml_pending_signals[i])
-+++-/* BACKPORT END */
-++ -      sigaddset(&pending, i);
-++ +  for (i = 0; i < NSIG_WORDS; i++) {
-++ +    curr = atomic_load(&caml_pending_signals[i]);
++++ (* BACKPORT BEGIN
+++ -let prng_key = Domain.DLS.new_key Random.State.make_self_init
+++ +let prng_key =
+++ +  Domain.DLS.new_key Random.State.make_self_init
+++- 
+++- let temp_file_name temp_dir prefix suffix =
+++-   let random_state = Domain.DLS.get prng_key in
++++ *)
++++ let prng_key = lazy(Random.State.make_self_init ())
++++ (* BACKPORT END *)
+++ diff --git a/stdlib/random.ml b/stdlib/random.ml
+++ --- a/stdlib/random.ml
+++ +++ b/stdlib/random.ml
+++@@ -151,10 +132,10 @@
+++  end
+++  
+++  (* This is the state you get with [init 27182818] and then applying
+++-@@ -212,7 +215,8 @@ let mk_default () = {
+++-   State.idx = 0;
++++@@ -213,7 +216,8 @@ let mk_default () = {
+++  }
+++  
++++ (* BACKPORT BEGIN
+++ -let random_key = Domain.DLS.new_key mk_default
+++ +let random_key =
+++ +  Domain.DLS.new_key ~split_from_parent:State.split mk_default
+++@@ -183,7 +164,7 @@
+++ diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
+++ --- a/testsuite/tests/gc-roots/globroots.ml
+++ +++ b/testsuite/tests/gc-roots/globroots.ml
+++-@@ -30,7 +30,10 @@ module Test(G: GLOBREF) () = struct
++++@@ -32,7 +32,10 @@ module Test(G: GLOBREF) () = struct
+++  
+++    let size = 1024
+++  
+++@@ -262,7 +243,7 @@
+++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++-@@ -3,7 +3,10 @@
++++@@ -5,7 +5,10 @@
+++  
+++  let size = 1000;;
+++  let num_domains = 4;;
 +diff --git a/Changes b/Changes
 +index 49e223d13a..24cd780401 100644
 +--- a/Changes
@@ -7043,7 +7153,70 @@ index 0000000000..98656ed19d
 ++-***** ocamlc.byte
 +++* debugger
 +++** shared-libraries
-+++*** setup-ocamlc.byte-build-
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index c09643864e..4597265246 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/287 by t/292
++++Error: Illegal shadowing of included type t/282 by t/287
+++        Line 2, characters 2-19:
+++-         Type t/287 came from this include
++++         Type t/282 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/287 is shadowed
++++         The value print has no valid type if t/282 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index b3804d00e5..827cc4affc 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index c12d2cfd6b..2035bee588 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   *
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 43bccf6e2c..e404f6b040 100644
@@ -7842,7 +8015,7 @@ index fe345466de..e9a1d2a31b 100644
 +
  #endif /* CAML_UNIXSUPPORT_H */
 diff --git a/stdlib/.depend b/stdlib/.depend
-index d6ce43f599..d53a538a7e 100644
+index 16fe55d065..d53a538a7e 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -193,14 +193,6 @@ stdlib__Complex.cmo : complex.ml \
@@ -7860,7 +8033,7 @@ index d6ce43f599..d53a538a7e 100644
  stdlib__Digest.cmo : digest.ml \
      stdlib__String.cmi \
      stdlib__Char.cmi \
-@@ -212,33 +204,6 @@ stdlib__Digest.cmx : digest.ml \
+@@ -212,35 +204,6 @@ stdlib__Digest.cmx : digest.ml \
      stdlib__Bytes.cmx \
      stdlib__Digest.cmi
  stdlib__Digest.cmi : digest.mli
@@ -7869,6 +8042,7 @@ index d6ce43f599..d53a538a7e 100644
 -    stdlib.cmi \
 -    stdlib__Obj.cmi \
 -    stdlib__Mutex.cmi \
+-    stdlib__List.cmi \
 -    stdlib__Atomic.cmi \
 -    stdlib__Array.cmi \
 -    stdlib__Domain.cmi
@@ -7877,6 +8051,7 @@ index d6ce43f599..d53a538a7e 100644
 -    stdlib.cmx \
 -    stdlib__Obj.cmx \
 -    stdlib__Mutex.cmx \
+-    stdlib__List.cmx \
 -    stdlib__Atomic.cmx \
 -    stdlib__Array.cmx \
 -    stdlib__Domain.cmi
@@ -7894,7 +8069,7 @@ index d6ce43f599..d53a538a7e 100644
  stdlib__Either.cmo : either.ml \
      stdlib__Either.cmi
  stdlib__Either.cmx : either.ml \
-@@ -275,7 +240,7 @@ stdlib__Filename.cmo : filename.ml \
+@@ -277,7 +240,7 @@ stdlib__Filename.cmo : filename.ml \
      stdlib__Random.cmi \
      stdlib__Printf.cmi \
      stdlib__List.cmi \
@@ -7903,7 +8078,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Buffer.cmi \
      stdlib__Filename.cmi
  stdlib__Filename.cmx : filename.ml \
-@@ -284,7 +249,7 @@ stdlib__Filename.cmx : filename.ml \
+@@ -286,7 +249,7 @@ stdlib__Filename.cmx : filename.ml \
      stdlib__Random.cmx \
      stdlib__Printf.cmx \
      stdlib__List.cmx \
@@ -7912,7 +8087,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Buffer.cmx \
      stdlib__Filename.cmi
  stdlib__Filename.cmi : filename.mli
-@@ -311,8 +276,8 @@ stdlib__Format.cmo : format.ml \
+@@ -313,8 +276,8 @@ stdlib__Format.cmo : format.ml \
      stdlib__Queue.cmi \
      stdlib__List.cmi \
      stdlib__Int.cmi \
@@ -7922,7 +8097,7 @@ index d6ce43f599..d53a538a7e 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -326,8 +291,8 @@ stdlib__Format.cmx : format.ml \
+@@ -328,8 +291,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -7932,7 +8107,7 @@ index d6ce43f599..d53a538a7e 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -337,7 +302,6 @@ stdlib__Format.cmi : format.mli \
+@@ -339,7 +302,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -7940,7 +8115,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -384,8 +348,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -386,8 +348,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -7950,7 +8125,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmx : hashtbl.ml \
-@@ -394,8 +358,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -396,8 +358,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -7960,7 +8135,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmi : hashtbl.mli \
-@@ -514,11 +478,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -516,11 +478,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -7972,7 +8147,7 @@ index d6ce43f599..d53a538a7e 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -627,7 +586,6 @@ stdlib__Random.cmo : random.ml \
+@@ -629,7 +586,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
      stdlib__Int.cmi \
@@ -7980,7 +8155,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Digest.cmi \
      stdlib__Char.cmi \
      stdlib__Array.cmi \
-@@ -639,7 +597,6 @@ stdlib__Random.cmx : random.ml \
+@@ -641,7 +597,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
      stdlib__Int.cmx \
@@ -7988,7 +8163,7 @@ index d6ce43f599..d53a538a7e 100644
      stdlib__Digest.cmx \
      stdlib__Char.cmx \
      stdlib__Array.cmx \
-@@ -678,15 +635,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -680,15 +635,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -8200,15 +8375,16 @@ index ac8b7a8bee..2fd6aa2bf4 100644
  val force_gen : only_val:bool -> 'a lazy_t -> 'a
 +*)
 diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-index 6a61261c8f..c86d23d854 100644
+index f7ce1e46d8..c13b0d5371 100644
 --- a/stdlib/filename.ml
 +++ b/stdlib/filename.ml
-@@ -326,10 +326,18 @@ let remove_extension name =
+@@ -326,11 +326,19 @@ let remove_extension name =
  external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
  external close_desc: int -> unit = "caml_sys_close"
  
 +(* BACKPORT BEGIN
- let prng_key = Domain.DLS.new_key Random.State.make_self_init
+ let prng_key =
+   Domain.DLS.new_key Random.State.make_self_init
 +*)
 +let prng_key = lazy(Random.State.make_self_init ())
 +(* BACKPORT END *)
@@ -8407,18 +8583,18 @@ index 8b857da52c..82f39e68b2 100644
  val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
  val [@inline always] set_double_field : t -> int -> float -> unit
 diff --git a/stdlib/random.ml b/stdlib/random.ml
-index 791ef968b9..c4d07c3d74 100644
+index d1745eb249..94d537f5d4 100644
 --- a/stdlib/random.ml
 +++ b/stdlib/random.ml
-@@ -212,6 +212,7 @@ let mk_default () = {
+@@ -215,6 +215,7 @@ let mk_default () = {
    State.idx = 0;
  }
  
 +(* BACKPORT BEGIN
- let random_key = Domain.DLS.new_key mk_default
+ let random_key =
+   Domain.DLS.new_key ~split_from_parent:State.split mk_default
  
- let bits () = State.bits (Domain.DLS.get random_key)
-@@ -228,12 +229,34 @@ let nativebits () = State.nativebits (Domain.DLS.get random_key)
+@@ -232,12 +233,34 @@ let nativebits () = State.nativebits (Domain.DLS.get random_key)
  
  let full_init seed = State.full_init (Domain.DLS.get random_key) seed
  let init seed = State.full_init (Domain.DLS.get random_key) [| seed |]

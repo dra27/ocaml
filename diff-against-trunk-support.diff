@@ -811,7 +811,7 @@ index ff1646835a..a29cd8516b 100644
  
  (* C version of ephetest.ml *)
 diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
-index b11aff1f67..2e1146adef 100644
+index 56d1586331..6bdb7fdaf3 100644
 --- a/testsuite/tests/gc-roots/globroots.ml
 +++ b/testsuite/tests/gc-roots/globroots.ml
 @@ -1,5 +1,7 @@
@@ -2514,7 +2514,7 @@ index fa2d2efc43..752a7eeabf 100644
  (* ocaml-multicore issues 528 and 468 *)
  
 diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-index dede2971e3..6028ef1f0c 100644
+index 7f80b8ab26..0791f4e53f 100644
 --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 @@ -1,4 +1,6 @@

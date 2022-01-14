@@ -327,7 +327,8 @@ external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
 external close_desc: int -> unit = "caml_sys_close"
 
 (* BACKPORT BEGIN
-let prng_key = Domain.DLS.new_key Random.State.make_self_init
+let prng_key =
+  Domain.DLS.new_key Random.State.make_self_init
 *)
 let prng_key = lazy(Random.State.make_self_init ())
 (* BACKPORT END *)
