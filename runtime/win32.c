@@ -65,15 +65,25 @@ static volatile HANDLE thread_doing_io = INVALID_HANDLE_VALUE;
 static HANDLE main_thread = INVALID_HANDLE_VALUE;
 
 static void start_io() {
+  HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD dwMode;
+  GetConsoleMode(hConsole, &dwMode);
+  /*printf("mode was %d\n", dwMode);
+  fflush(stdout);
+  dwMode &= (~1);*/
+  /*SetConsoleMode(hConsole, dwMode);*/
   if (main_thread == INVALID_HANDLE_VALUE) {
     DuplicateHandle(GetCurrentProcess(),
                     GetCurrentThread(),
                     GetCurrentProcess(),
                     &main_thread,
+                    0,
                     FALSE,
                     DUPLICATE_SAME_ACCESS);
   }
   thread_doing_io = main_thread;
+  printf("start_io: %p, %p, %p\n", INVALID_HANDLE_VALUE, main_thread, thread_doing_io);
+  fflush(stdout);
 }
 
 static void stop_io() {
@@ -107,9 +117,29 @@ int caml_read_fd(int fd, int flags, void * buf, int n)
   int retcode;
   if ((flags & CHANNEL_FLAG_FROM_SOCKET) == 0) {
     caml_enter_blocking_section();
+    /*printf("start_io\n"); fflush(stdout);
+    start_io();*/
+    /*printf("read %d\n", n);
+    fflush(stdout);*/
     SetLastError(0);
-    retcode = read(fd, buf, n);
+    HANDLE h = (HANDLE)_get_osfhandle(fd);
+    DWORD mode;
+    if (GetFileType(h) == FILE_TYPE_CHAR && GetConsoleMode(h, &mode)) {
+      if (!ReadConsole(h, buf, n, &retcode, NULL)) {
+        /*printf("failed\n");
+        fflush(stdout);*/
+        retcode = -1;
+      } else {
+        ((char*)buf)[retcode] = '\n';
+        retcode++;
+      }
+    } else {
+      retcode = read(fd, buf, n);
+    }
+    /*stop_io();*/
     if (GetLastError() == ERROR_OPERATION_ABORTED) {
+ /*     printf("we have indeed been aborted\n");*/
+
       /* retcode is not very trustworthy here:
          https://bugs.python.org/issue30237 */
       caml_leave_blocking_section();
@@ -118,6 +148,8 @@ int caml_read_fd(int fd, int flags, void * buf, int n)
     /* Large reads from console can fail with ENOMEM.  Reduce requested size
        and try again. */
     if (retcode == -1 && errno == ENOMEM && n > 16384) {
+      printf("irksome\n");
+      fflush(stdout);
       retcode = read(fd, buf, 16384);
     }
     caml_leave_blocking_section();
@@ -319,6 +351,9 @@ static volatile sighandler ctrl_handler_action = SIG_DFL;
 
 static BOOL WINAPI ctrl_handler(DWORD event)
 {
+  /*printf("in ctrl_handler\n");
+  if (event == CTRL_C_EVENT) printf("... and it is CTRL+C\n");
+  fflush(stdout);*/
   /* Only ctrl-C and ctrl-Break are handled */
   if (event != CTRL_C_EVENT && event != CTRL_BREAK_EVENT) return FALSE;
   /* Default behavior is to exit, which we get by not handling the event */
@@ -332,6 +367,8 @@ static BOOL WINAPI ctrl_handler(DWORD event)
   caml_record_signal(SIGINT);
   /* Wake up the main program if blocked */
   if (thread_doing_io != INVALID_HANDLE_VALUE) {
+    /*printf("cancelling IO");
+    fflush(stdout);*/
     CancelSynchronousIo(thread_doing_io);
   }
   /* We have handled the event */
