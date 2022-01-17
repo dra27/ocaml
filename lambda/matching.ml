@@ -1893,6 +1893,22 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force"
    Forward(val_out_of_heap).
 *)
 
+let call_force_lazy_block varg loc =
+  (* The argument is wrapped with [Popaque] to prevent the rest of the compiler
+     from making any assumptions on its contents (see comments on
+     [CamlinternalLazy.force_gen], and discussions on PRs #9998 and #10909).
+     Alternatively, [ap_inlined] could be set to [Never_inline] to achieve a
+     similar result. *)
+  let force_fun = Lazy.force code_force_lazy_block in
+  Lapply
+    { ap_tailcall = Default_tailcall;
+      ap_loc = loc;
+      ap_func = force_fun;
+      ap_args = [ Lprim (Popaque, [ varg ], loc) ];
+      ap_inlined = Default_inline;
+      ap_specialised = Default_specialise
+    }
+
 let inline_lazy_force_cond arg loc =
   let idarg = Ident.create_local "lzarg" in
   let varg = Lvar idarg in
@@ -1900,7 +1916,6 @@ let inline_lazy_force_cond arg loc =
 (* BACKPORT BEGIN *)
   let tag_var = Lvar tag in
 (* BACKPORT END *)
-  let force_fun = Lazy.force code_force_lazy_block in
 (* BACKPORT
   let test_tag t =
     Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
@@ -1944,21 +1959,13 @@ let inline_lazy_force_cond arg loc =
                   Lprim (Psequor,
                        [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
 *)
-                  Lapply
-                    { ap_tailcall = Default_tailcall;
-                      ap_loc = loc;
-                      ap_func = force_fun;
-                      ap_args = [ varg ];
-                      ap_inlined = Default_inline;
-                      ap_specialised = Default_specialise
-                    },
+                  call_force_lazy_block varg loc,
                   (* ... arg *)
                   varg ) ) ) )
 
 let inline_lazy_force_switch arg loc =
   let idarg = Ident.create_local "lzarg" in
   let varg = Lvar idarg in
-  let force_fun = Lazy.force code_force_lazy_block in
   Llet
     ( Strict,
       Pgenval,
@@ -1984,33 +1991,15 @@ let inline_lazy_force_switch arg loc =
                 sw_blocks =
                   [ (Obj.forward_tag,
                      Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
-                    ( Obj.lazy_tag,
+                    (Obj.lazy_tag, call_force_lazy_block varg loc)
 (* BACKPORT END *)
 (* BACKPORT
                 sw_consts =
                   [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
                                              [ varg ], loc));
-
-                    (Obj.lazy_tag,
-                      Lapply
-                        { ap_tailcall = Default_tailcall;
-                          ap_loc = loc;
-                          ap_func = force_fun;
-                          ap_args = [varg];
-                          ap_inlined = Default_inline;
-                          ap_specialised = Default_specialise
-                        } );
-
-                    (Obj.forcing_tag,
+                    (Obj.lazy_tag, call_force_lazy_block varg loc);
+                    (Obj.forcing_tag, call_force_lazy_block varg loc)
 *)
-                      Lapply
-                        { ap_tailcall = Default_tailcall;
-                          ap_loc = loc;
-                          ap_func = force_fun;
-                          ap_args = [ varg ];
-                          ap_inlined = Default_inline;
-                          ap_specialised = Default_specialise
-                        } )
                   ];
                 sw_failaction = Some varg
               },
