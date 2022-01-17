@@ -1,7 +1,15 @@
 (* TEST
-   flags = "-g"
-   * skip
-   reason = "OCaml 5 only"
+
+flags = "-g"
+* skip
+reason = "OCaml 5 only"
+** bytecode
+** no-flambda
+*** native
+** flambda
+reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+*** native
+
 *)
 
 open Effect
