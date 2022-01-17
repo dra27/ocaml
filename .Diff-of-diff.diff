@@ -1,0 +1,161 @@
+--- a	2023-09-28 18:43:26.999074302 +0100
++++ b	2023-09-28 18:43:27.023075309 +0100
+@@ -34,7 +34,7 @@
+ diff --git a/lambda/matching.ml b/lambda/matching.ml
+ --- a/lambda/matching.ml
+ +++ b/lambda/matching.ml
+-@@ -1889,11 +1889,26 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force_gen"
++@@ -1893,6 +1893,22 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force"
+     Forward(val_out_of_heap).
+  *)
+  
+@@ -57,15 +57,18 @@
+  let inline_lazy_force_cond arg loc =
+    let idarg = Ident.create_local "lzarg" in
+    let varg = Lvar idarg in
+-   let tag = Ident.create_local "tag" in
++@@ -1900,7 +1916,6 @@ let inline_lazy_force_cond arg loc =
++ (* BACKPORT BEGIN *)
++   let tag_var = Lvar tag in
++ (* BACKPORT END *)
+ -  let force_fun = Lazy.force code_force_lazy_block in
++ (* BACKPORT
+    let test_tag t =
+      Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
+-   in
+-@@ -1919,21 +1934,13 @@ let inline_lazy_force_cond arg loc =
+-                        else ... *)
++@@ -1944,21 +1959,13 @@ let inline_lazy_force_cond arg loc =
+                    Lprim (Psequor,
+                         [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
++ *)
+ -                  Lapply
+ -                    { ap_tailcall = Default_tailcall;
+ -                      ap_loc = loc;
+@@ -85,7 +88,14 @@
+    Llet
+      ( Strict,
+        Pgenval,
+-@@ -1951,26 +1958,8 @@ let inline_lazy_force_switch arg loc =
++@@ -1984,33 +1991,15 @@ let inline_lazy_force_switch arg loc =
++                 sw_blocks =
++                   [ (Obj.forward_tag,
++                      Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
++-                    ( Obj.lazy_tag,
+++                    (Obj.lazy_tag, call_force_lazy_block varg loc)
++ (* BACKPORT END *)
++ (* BACKPORT
+                  sw_consts =
+                    [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
+                                               [ varg ], loc));
+@@ -101,6 +111,9 @@
+ -                        } );
+ -
+ -                    (Obj.forcing_tag,
+++                    (Obj.lazy_tag, call_force_lazy_block varg loc);
+++                    (Obj.forcing_tag, call_force_lazy_block varg loc)
++ *)
+ -                      Lapply
+ -                        { ap_tailcall = Default_tailcall;
+ -                          ap_loc = loc;
+@@ -109,8 +122,6 @@
+ -                          ap_inlined = Default_inline;
+ -                          ap_specialised = Default_specialise
+ -                        } )
+-+                    (Obj.lazy_tag, call_force_lazy_block varg loc);
+-+                    (Obj.forcing_tag, call_force_lazy_block varg loc)
+                    ];
+                  sw_failaction = Some varg
+                },
+@@ -147,7 +158,7 @@
+ diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
+ --- a/stdlib/camlinternalLazy.ml
+ +++ b/stdlib/camlinternalLazy.ml
+-@@ -81,6 +81,15 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
++@@ -84,6 +84,15 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
+     declared as a primitive whose code inlines the tag tests of its
+     argument, except when afl instrumentation is turned on. *)
+  let force_gen ~only_val (lzv : 'arg lazy_t) =
+@@ -210,17 +221,17 @@
+ +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
+ @@ -5,7 +5,7 @@ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_co
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+ -Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+ +Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+  execution of module initializers in the shared library failed: Failure("SUCCESS")
+- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+-@@ -15,4 +15,4 @@ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++ Called from Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 3, characters 4-22
++@@ -19,4 +19,4 @@ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+ -Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+ +Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.flambda.reference b/testsuite/tests/backtrace/backtrace_effects_nested.flambda.reference
+@@ -235,17 +246,21 @@
+ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+ --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
+ +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+-@@ -1,5 +1,13 @@
++@@ -1,7 +1,15 @@
+  (* TEST
+ -   flags = "-g"
++-   * skip
++-   reason = "OCaml 5 only"
+ +
+ +flags = "-g"
+-+* bytecode
+-+* no-flambda
+-+** native
+-+* flambda
+++* skip
+++reason = "OCaml 5 only"
+++** bytecode
+++** no-flambda
+++*** native
+++** flambda
+ +reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+-+** native
+++*** native
+ +
+  *)
+  
+@@ -284,15 +299,16 @@
+ diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+ --- a/testsuite/tests/weak-ephe-final/finaliser2.ml
+ +++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+-@@ -1,6 +1,6 @@
+- (* TEST *)
++@@ -3,7 +3,7 @@
++    reason = "OCaml 5 only"
++ *)
+  
+ -let test1 =
+ +let[@inline never][@local never] test1 () =
+    let r' = ref 0 in
+    let rec foo () =
+      let r = ref 0 in
+-@@ -10,13 +10,13 @@ let test1 =
++@@ -13,13 +13,13 @@ let test1 =
+    Gc.minor();
+    assert (!r' = 1)
+  
+@@ -308,7 +324,7 @@
+    Gc.full_major ();
+    let rec foo () =
+      let r = ref 0 in
+-@@ -34,3 +34,8 @@ let test3 =
++@@ -37,3 +37,8 @@ let test3 =
+    print_endline "test3: joined";
+    (* Now this domain takes over the finalisers from d *)
+    Gc.full_major()

@@ -1,11 +1,175 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..0ba1492ff0
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,161 @@
++--- a	2023-09-28 18:43:26.999074302 +0100
+++++ b	2023-09-28 18:43:27.023075309 +0100
++@@ -34,7 +34,7 @@
++ diff --git a/lambda/matching.ml b/lambda/matching.ml
++ --- a/lambda/matching.ml
++ +++ b/lambda/matching.ml
++-@@ -1889,11 +1889,26 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force_gen"
+++@@ -1893,6 +1893,22 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force"
++     Forward(val_out_of_heap).
++  *)
++  
++@@ -57,15 +57,18 @@
++  let inline_lazy_force_cond arg loc =
++    let idarg = Ident.create_local "lzarg" in
++    let varg = Lvar idarg in
++-   let tag = Ident.create_local "tag" in
+++@@ -1900,7 +1916,6 @@ let inline_lazy_force_cond arg loc =
+++ (* BACKPORT BEGIN *)
+++   let tag_var = Lvar tag in
+++ (* BACKPORT END *)
++ -  let force_fun = Lazy.force code_force_lazy_block in
+++ (* BACKPORT
++    let test_tag t =
++      Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
++-   in
++-@@ -1919,21 +1934,13 @@ let inline_lazy_force_cond arg loc =
++-                        else ... *)
+++@@ -1944,21 +1959,13 @@ let inline_lazy_force_cond arg loc =
++                    Lprim (Psequor,
++                         [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
+++ *)
++ -                  Lapply
++ -                    { ap_tailcall = Default_tailcall;
++ -                      ap_loc = loc;
++@@ -85,7 +88,14 @@
++    Llet
++      ( Strict,
++        Pgenval,
++-@@ -1951,26 +1958,8 @@ let inline_lazy_force_switch arg loc =
+++@@ -1984,33 +1991,15 @@ let inline_lazy_force_switch arg loc =
+++                 sw_blocks =
+++                   [ (Obj.forward_tag,
+++                      Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
+++-                    ( Obj.lazy_tag,
++++                    (Obj.lazy_tag, call_force_lazy_block varg loc)
+++ (* BACKPORT END *)
+++ (* BACKPORT
++                  sw_consts =
++                    [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
++                                               [ varg ], loc));
++@@ -101,6 +111,9 @@
++ -                        } );
++ -
++ -                    (Obj.forcing_tag,
++++                    (Obj.lazy_tag, call_force_lazy_block varg loc);
++++                    (Obj.forcing_tag, call_force_lazy_block varg loc)
+++ *)
++ -                      Lapply
++ -                        { ap_tailcall = Default_tailcall;
++ -                          ap_loc = loc;
++@@ -109,8 +122,6 @@
++ -                          ap_inlined = Default_inline;
++ -                          ap_specialised = Default_specialise
++ -                        } )
++-+                    (Obj.lazy_tag, call_force_lazy_block varg loc);
++-+                    (Obj.forcing_tag, call_force_lazy_block varg loc)
++                    ];
++                  sw_failaction = Some varg
++                },
++@@ -147,7 +158,7 @@
++ diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
++ --- a/stdlib/camlinternalLazy.ml
++ +++ b/stdlib/camlinternalLazy.ml
++-@@ -81,6 +81,15 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
+++@@ -84,6 +84,15 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
++     declared as a primitive whose code inlines the tag tests of its
++     argument, except when afl instrumentation is turned on. *)
++  let force_gen ~only_val (lzv : 'arg lazy_t) =
++@@ -210,17 +221,17 @@
++ +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
++ @@ -5,7 +5,7 @@ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_co
++  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
++ -Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
++ +Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
++  execution of module initializers in the shared library failed: Failure("SUCCESS")
++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
++-@@ -15,4 +15,4 @@ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
+++ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++ Called from Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 3, characters 4-22
+++@@ -19,4 +19,4 @@ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
+++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
++ -Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
++ +Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
++ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.flambda.reference b/testsuite/tests/backtrace/backtrace_effects_nested.flambda.reference
++@@ -235,17 +246,21 @@
++ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
++ --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
++ +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
++-@@ -1,5 +1,13 @@
+++@@ -1,7 +1,15 @@
++  (* TEST
++ -   flags = "-g"
+++-   * skip
+++-   reason = "OCaml 5 only"
++ +
++ +flags = "-g"
++-+* bytecode
++-+* no-flambda
++-+** native
++-+* flambda
++++* skip
++++reason = "OCaml 5 only"
++++** bytecode
++++** no-flambda
++++*** native
++++** flambda
++ +reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
++-+** native
++++*** native
++ +
++  *)
++  
++@@ -284,15 +299,16 @@
++ diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
++ --- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++ +++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
++-@@ -1,6 +1,6 @@
++- (* TEST *)
+++@@ -3,7 +3,7 @@
+++    reason = "OCaml 5 only"
+++ *)
++  
++ -let test1 =
++ +let[@inline never][@local never] test1 () =
++    let r' = ref 0 in
++    let rec foo () =
++      let r = ref 0 in
++-@@ -10,13 +10,13 @@ let test1 =
+++@@ -13,13 +13,13 @@ let test1 =
++    Gc.minor();
++    assert (!r' = 1)
++  
++@@ -308,7 +324,7 @@
++    Gc.full_major ();
++    let rec foo () =
++      let r = ref 0 in
++-@@ -34,3 +34,8 @@ let test3 =
+++@@ -37,3 +37,8 @@ let test3 =
++    print_endline "test3: joined";
++    (* Now this domain takes over the finalisers from d *)
++    Gc.full_major()
 diff --git a/Changes b/Changes
-index 49e223d13a..24cd780401 100644
+index 586e9c11ff..334faf8f74 100644
 --- a/Changes
 +++ b/Changes
-@@ -93,7 +93,7 @@ OCaml 4.14.0
+@@ -97,7 +97,7 @@ OCaml 4.14.0
    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
     Damien Doligez)
  
@@ -14,7 +178,7 @@ index 49e223d13a..24cd780401 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -482,6 +482,10 @@ OCaml 4.14.0
+@@ -486,6 +486,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -3558,18 +3722,182 @@ index 0000000000..f3aa036bc2
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..312c4e9a40
+index 0000000000..8782268268
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3483 @@
+@@ -0,0 +1,3662 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..0ba1492ff0
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,161 @@
+++--- a	2023-09-28 18:43:26.999074302 +0100
++++++ b	2023-09-28 18:43:27.023075309 +0100
+++@@ -34,7 +34,7 @@
+++ diff --git a/lambda/matching.ml b/lambda/matching.ml
+++ --- a/lambda/matching.ml
+++ +++ b/lambda/matching.ml
+++-@@ -1889,11 +1889,26 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force_gen"
++++@@ -1893,6 +1893,22 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force"
+++     Forward(val_out_of_heap).
+++  *)
+++  
+++@@ -57,15 +57,18 @@
+++  let inline_lazy_force_cond arg loc =
+++    let idarg = Ident.create_local "lzarg" in
+++    let varg = Lvar idarg in
+++-   let tag = Ident.create_local "tag" in
++++@@ -1900,7 +1916,6 @@ let inline_lazy_force_cond arg loc =
++++ (* BACKPORT BEGIN *)
++++   let tag_var = Lvar tag in
++++ (* BACKPORT END *)
+++ -  let force_fun = Lazy.force code_force_lazy_block in
++++ (* BACKPORT
+++    let test_tag t =
+++      Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
+++-   in
+++-@@ -1919,21 +1934,13 @@ let inline_lazy_force_cond arg loc =
+++-                        else ... *)
++++@@ -1944,21 +1959,13 @@ let inline_lazy_force_cond arg loc =
+++                    Lprim (Psequor,
+++                         [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
++++ *)
+++ -                  Lapply
+++ -                    { ap_tailcall = Default_tailcall;
+++ -                      ap_loc = loc;
+++@@ -85,7 +88,14 @@
+++    Llet
+++      ( Strict,
+++        Pgenval,
+++-@@ -1951,26 +1958,8 @@ let inline_lazy_force_switch arg loc =
++++@@ -1984,33 +1991,15 @@ let inline_lazy_force_switch arg loc =
++++                 sw_blocks =
++++                   [ (Obj.forward_tag,
++++                      Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
++++-                    ( Obj.lazy_tag,
+++++                    (Obj.lazy_tag, call_force_lazy_block varg loc)
++++ (* BACKPORT END *)
++++ (* BACKPORT
+++                  sw_consts =
+++                    [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
+++                                               [ varg ], loc));
+++@@ -101,6 +111,9 @@
+++ -                        } );
+++ -
+++ -                    (Obj.forcing_tag,
+++++                    (Obj.lazy_tag, call_force_lazy_block varg loc);
+++++                    (Obj.forcing_tag, call_force_lazy_block varg loc)
++++ *)
+++ -                      Lapply
+++ -                        { ap_tailcall = Default_tailcall;
+++ -                          ap_loc = loc;
+++@@ -109,8 +122,6 @@
+++ -                          ap_inlined = Default_inline;
+++ -                          ap_specialised = Default_specialise
+++ -                        } )
+++-+                    (Obj.lazy_tag, call_force_lazy_block varg loc);
+++-+                    (Obj.forcing_tag, call_force_lazy_block varg loc)
+++                    ];
+++                  sw_failaction = Some varg
+++                },
+++@@ -147,7 +158,7 @@
+++ diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
+++ --- a/stdlib/camlinternalLazy.ml
+++ +++ b/stdlib/camlinternalLazy.ml
+++-@@ -81,6 +81,15 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
++++@@ -84,6 +84,15 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
+++     declared as a primitive whose code inlines the tag tests of its
+++     argument, except when afl instrumentation is turned on. *)
+++  let force_gen ~only_val (lzv : 'arg lazy_t) =
+++@@ -210,17 +221,17 @@
+++ +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
+++ @@ -5,7 +5,7 @@ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_co
+++  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+++ -Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+++ +Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+++  execution of module initializers in the shared library failed: Failure("SUCCESS")
+++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+++-@@ -15,4 +15,4 @@ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++++ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++++ Called from Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 3, characters 4-22
++++@@ -19,4 +19,4 @@ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+++ -Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+++ +Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+++ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.flambda.reference b/testsuite/tests/backtrace/backtrace_effects_nested.flambda.reference
+++@@ -235,17 +246,21 @@
+++ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+++ --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
+++ +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+++-@@ -1,5 +1,13 @@
++++@@ -1,7 +1,15 @@
+++  (* TEST
+++ -   flags = "-g"
++++-   * skip
++++-   reason = "OCaml 5 only"
+++ +
+++ +flags = "-g"
+++-+* bytecode
+++-+* no-flambda
+++-+** native
+++-+* flambda
+++++* skip
+++++reason = "OCaml 5 only"
+++++** bytecode
+++++** no-flambda
+++++*** native
+++++** flambda
+++ +reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+++-+** native
+++++*** native
+++ +
+++  *)
+++  
+++@@ -284,15 +299,16 @@
+++ diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++ --- a/testsuite/tests/weak-ephe-final/finaliser2.ml
+++ +++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++-@@ -1,6 +1,6 @@
+++- (* TEST *)
++++@@ -3,7 +3,7 @@
++++    reason = "OCaml 5 only"
++++ *)
+++  
+++ -let test1 =
+++ +let[@inline never][@local never] test1 () =
+++    let r' = ref 0 in
+++    let rec foo () =
+++      let r = ref 0 in
+++-@@ -10,13 +10,13 @@ let test1 =
++++@@ -13,13 +13,13 @@ let test1 =
+++    Gc.minor();
+++    assert (!r' = 1)
+++  
+++@@ -308,7 +324,7 @@
+++    Gc.full_major ();
+++    let rec foo () =
+++      let r = ref 0 in
+++-@@ -34,3 +34,8 @@ let test3 =
++++@@ -37,3 +37,8 @@ let test3 =
+++    print_endline "test3: joined";
+++    (* Now this domain takes over the finalisers from d *)
+++    Gc.full_major()
 +diff --git a/Changes b/Changes
-+index 49e223d13a..24cd780401 100644
++index 586e9c11ff..334faf8f74 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -93,7 +93,7 @@ OCaml 4.14.0
++@@ -97,7 +97,7 @@ OCaml 4.14.0
 +   (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
 +    Damien Doligez)
 + 
@@ -3578,7 +3906,7 @@ index 0000000000..312c4e9a40
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -482,6 +482,10 @@ OCaml 4.14.0
++@@ -486,6 +486,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
@@ -7044,10 +7372,25 @@ index 0000000000..312c4e9a40
 ++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
 ++index c09643864e..4597265246 100644
 ++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsu
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/287 by t/292
++++Error: Illegal shadowing of included type t/282 by t/287
+++        Line 2, characters 2-19:
+++-         Type t/287 came from this include
++++         Type t/282 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/287 is shadowed
++++         The value print has no valid type if t/282 is shadowed
+++ |}]
+++ 
+++ module t
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 43bccf6e2c..e404f6b040 100644
+index 65fc5e06a5..af9dd8af9b 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
@@ -7062,14 +7405,13 @@ index 43bccf6e2c..e404f6b040 100644
  
  (* inline_lazy_force inlines the beginning of the code of Lazy.force. When
     the value argument is tagged as:
-@@ -1893,10 +1897,15 @@ let inline_lazy_force_cond arg loc =
+@@ -1909,9 +1913,14 @@ let inline_lazy_force_cond arg loc =
    let idarg = Ident.create_local "lzarg" in
    let varg = Lvar idarg in
    let tag = Ident.create_local "tag" in
 +(* BACKPORT BEGIN *)
 +  let tag_var = Lvar tag in
 +(* BACKPORT END *)
-   let force_fun = Lazy.force code_force_lazy_block in
 +(* BACKPORT
    let test_tag t =
      Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
@@ -7078,7 +7420,7 @@ index 43bccf6e2c..e404f6b040 100644
  
    Llet
      ( Strict,
-@@ -1909,16 +1918,32 @@ let inline_lazy_force_cond arg loc =
+@@ -1924,16 +1933,32 @@ let inline_lazy_force_cond arg loc =
            tag,
            Lprim (Pccall prim_obj_tag, [ varg ], loc),
            Lifthenelse
@@ -7108,10 +7450,10 @@ index 43bccf6e2c..e404f6b040 100644
                    Lprim (Psequor,
                         [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
 +*)
-                   Lapply
-                     { ap_tailcall = Default_tailcall;
-                       ap_loc = loc;
-@@ -1943,11 +1968,25 @@ let inline_lazy_force_switch arg loc =
+                   call_force_lazy_block varg loc,
+                   (* ... arg *)
+                   varg ) ) ) )
+@@ -1950,16 +1975,31 @@ let inline_lazy_force_switch arg loc =
          ( Lprim (Pisint, [ varg ], loc),
            varg,
            Lswitch
@@ -7131,21 +7473,19 @@ index 43bccf6e2c..e404f6b040 100644
 +                sw_blocks =
 +                  [ (Obj.forward_tag,
 +                     Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
-+                    ( Obj.lazy_tag,
++                    (Obj.lazy_tag, call_force_lazy_block varg loc)
 +(* BACKPORT END *)
 +(* BACKPORT
                  sw_consts =
                    [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
                                               [ varg ], loc));
-@@ -1963,6 +2002,7 @@ let inline_lazy_force_switch arg loc =
-                         } );
- 
-                     (Obj.forcing_tag,
+                     (Obj.lazy_tag, call_force_lazy_block varg loc);
+                     (Obj.forcing_tag, call_force_lazy_block varg loc)
 +*)
-                       Lapply
-                         { ap_tailcall = Default_tailcall;
-                           ap_loc = loc;
-@@ -1986,7 +2026,11 @@ let inline_lazy_force arg loc =
+                   ];
+                 sw_failaction = Some varg
+               },
+@@ -1975,7 +2015,11 @@ let inline_lazy_force arg loc =
        { ap_tailcall = Default_tailcall;
          ap_loc = loc;
          ap_func = Lazy.force code_force_lazy;
@@ -8108,7 +8448,7 @@ index 7cb9554751..30f1db7e41 100644
  let incr r = ignore (fetch_and_add r 1)
  let decr r = ignore (fetch_and_add r (-1))
 diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
-index b8764064c5..1948c76412 100644
+index 07cf954054..1748dc4a87 100644
 --- a/stdlib/camlinternalLazy.ml
 +++ b/stdlib/camlinternalLazy.ml
 @@ -13,12 +13,15 @@
@@ -8127,7 +8467,7 @@ index b8764064c5..1948c76412 100644
  (* [update_to_forcing blk] tries to update a [blk] with [lazy_tag] to
     [forcing_tag] using compare-and-swap (CAS), taking care to handle concurrent
     marking of the header word by a concurrent GC thread. Returns [0] if the
-@@ -94,3 +97,56 @@ let force_gen ~only_val (lzv : 'arg lazy_t) =
+@@ -103,3 +106,56 @@ let force_gen ~only_val (lzv : 'arg lazy_t) =
    else if t = Obj.forcing_tag then raise Undefined
    else if t <> Obj.lazy_tag then (Obj.obj x : 'arg)
    else force_gen_lazy_block ~only_val lzv

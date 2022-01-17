@@ -61,7 +61,7 @@ index 9b0077d509..1680c23f7b 100644
  
  (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
-index 12390de624..5ee294030f 100644
+index 8f12a2dcbc..6992dbc04f 100644
 --- a/testsuite/tests/backtrace/backtrace_dynlink.reference
 +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
 @@ -1,18 +1,22 @@
@@ -75,7 +75,7 @@ index 12390de624..5ee294030f 100644
 -Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
 +Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
 +Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
- Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
  execution of module initializers in the shared library failed: Failure("SUCCESS")
 -Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 +Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
@@ -94,7 +94,7 @@ index 12390de624..5ee294030f 100644
 +Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
 +Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
 +Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
- Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
 index dcd4480a02..39d9880db6 100644
 --- a/testsuite/tests/backtrace/backtrace_effects.ml
@@ -109,17 +109,29 @@ index dcd4480a02..39d9880db6 100644
  
  open Effect
 diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-index b28f151fe4..10c88febc5 100644
+index 6bb1597761..b818ede59e 100644
 --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
 +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-@@ -1,5 +1,7 @@
+@@ -1,12 +1,14 @@
  (* TEST
-    flags = "-g"
-+   * skip
-+   reason = "OCaml 5 only"
+ 
+ flags = "-g"
+-* bytecode
+-* no-flambda
+-** native
+-* flambda
++* skip
++reason = "OCaml 5 only"
++** bytecode
++** no-flambda
++*** native
++** flambda
+ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+-** native
++*** native
+ 
  *)
  
- open Effect
 diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
 index c1b45f1b63..b6e95802e6 100644
 --- a/testsuite/tests/backtrace/backtrace_systhreads.reference
@@ -2506,7 +2518,7 @@ index 744c4e844d..621d7292ff 100644
  (* Due to GCs running at non-deterministic places, the output from these tests
   * are unreliable except the bad value checks and as a check for catastrophic
 diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-index c12d2cfd6b..2035bee588 100644
+index e8ab88e807..5cf871e7ac 100644
 --- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 +++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
 @@ -1,4 +1,7 @@
@@ -2516,7 +2528,7 @@ index c12d2cfd6b..2035bee588 100644
 +   reason = "OCaml 5 only"
 +*)
  
- let test1 =
+ let[@inline never][@local never] test1 () =
    let r' = ref 0 in
 diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 index fa2d2efc43..752a7eeabf 100644
