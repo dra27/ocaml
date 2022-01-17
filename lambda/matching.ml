@@ -1889,13 +1889,34 @@ let code_force_lazy = get_mod_field "CamlinternalLazy" "force_gen"
    Forward(val_out_of_heap).
 *)
 
+let call_force_lazy_block varg loc =
+  (* The argument is wrapped with [Popaque] to prevent the rest of the compiler
+     from making any assumptions on its contents (see comments on
+     [CamlinternalLazy.force_gen], and discussions on PRs #9998 and #10909).
+     Alternatively, [ap_inlined] could be set to [Never_inline] to achieve a
+     similar result. *)
+  let force_fun = Lazy.force code_force_lazy_block in
+  Lapply
+    { ap_tailcall = Default_tailcall;
+      ap_loc = loc;
+      ap_func = force_fun;
+      ap_args = [ Lprim (Popaque, [ varg ], loc) ];
+      ap_inlined = Default_inline;
+      ap_specialised = Default_specialise
+    }
+
 let inline_lazy_force_cond arg loc =
   let idarg = Ident.create_local "lzarg" in
   let varg = Lvar idarg in
   let tag = Ident.create_local "tag" in
+<<<<<<< HEAD
   let tag_var = Lvar tag in
   let force_fun = Lazy.force code_force_lazy_block in
 (*
+||||||| parent of 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
+  let force_fun = Lazy.force code_force_lazy_block in
+=======
+>>>>>>> 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
   let test_tag t =
     Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
   in
@@ -1934,6 +1955,7 @@ let inline_lazy_force_cond arg loc =
                        else ... *)
                   Lprim (Psequor,
                        [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
+<<<<<<< HEAD
 *)
                   Lapply
                     { ap_tailcall = Default_tailcall;
@@ -1943,13 +1965,24 @@ let inline_lazy_force_cond arg loc =
                       ap_inlined = Default_inline;
                       ap_specialised = Default_specialise
                     },
+||||||| parent of 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
+                  Lapply
+                    { ap_tailcall = Default_tailcall;
+                      ap_loc = loc;
+                      ap_func = force_fun;
+                      ap_args = [ varg ];
+                      ap_inlined = Default_inline;
+                      ap_specialised = Default_specialise
+                    },
+=======
+                  call_force_lazy_block varg loc,
+>>>>>>> 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
                   (* ... arg *)
                   varg ) ) ) )
 
 let inline_lazy_force_switch arg loc =
   let idarg = Ident.create_local "lzarg" in
   let varg = Lvar idarg in
-  let force_fun = Lazy.force code_force_lazy_block in
   Llet
     ( Strict,
       Pgenval,
@@ -1978,6 +2011,7 @@ let inline_lazy_force_switch arg loc =
                 sw_consts =
                   [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
                                              [ varg ], loc));
+<<<<<<< HEAD
 
                     (Obj.lazy_tag,
                       Lapply
@@ -1999,6 +2033,31 @@ let inline_lazy_force_switch arg loc =
                           ap_inlined = Default_inline;
                           ap_specialised = Default_specialise
                         } )
+||||||| parent of 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
+
+                    (Obj.lazy_tag,
+                      Lapply
+                        { ap_tailcall = Default_tailcall;
+                          ap_loc = loc;
+                          ap_func = force_fun;
+                          ap_args = [varg];
+                          ap_inlined = Default_inline;
+                          ap_specialised = Default_specialise
+                        } );
+
+                    (Obj.forcing_tag,
+                      Lapply
+                        { ap_tailcall = Default_tailcall;
+                          ap_loc = loc;
+                          ap_func = force_fun;
+                          ap_args = [ varg ];
+                          ap_inlined = Default_inline;
+                          ap_specialised = Default_specialise
+                        } )
+=======
+                    (Obj.lazy_tag, call_force_lazy_block varg loc);
+                    (Obj.forcing_tag, call_force_lazy_block varg loc)
+>>>>>>> 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
                   ];
                 sw_failaction = Some varg
               },
