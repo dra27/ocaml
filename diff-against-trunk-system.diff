@@ -7586,7 +7586,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index f88181dbfe..3fd6958fc1 100644
+index b96b8db82f..579afdba64 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -50,12 +50,12 @@ LIBNAME=threads
