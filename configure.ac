@@ -511,10 +511,24 @@ AS_CASE([$ocaml_cv_cc_vendor],
 # the vendor only as a fall-back. We could put tis part of the logic
 # in the macro itself, too
 AS_CASE([$host],
+  [x86_64-*-mingw32],
+    [internal_cflags="-Wno-unused $gcc_warnings"
+    # TODO: see whether the code can be fixed to avoid -Wno-unused
+    common_cflags="-march=x86-64 -mtune=generic -O2 -mms-bitfields -fcommon"
+    internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
+    internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+    internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+  [i686-*-mingw32],
+    [internal_cflags="-Wno-unused $gcc_warnings"
+    # TODO: see whether the code can be fixed to avoid -Wno-unused
+    common_cflags="-march=i686 -mtune=generic -O2 -mms-bitfields -fcommon"
+    internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
+    internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+    internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
   [*-*-mingw32],
     [internal_cflags="-Wno-unused $gcc_warnings"
     # TODO: see whether the code can be fixed to avoid -Wno-unused
-    common_cflags="-O -mms-bitfields"
+    common_cflags="-O2 -mms-bitfields -fcommon"
     internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
     internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
     internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
