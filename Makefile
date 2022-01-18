@@ -507,7 +507,7 @@ ifneq "$(filter-out mingw,$(TOOLCHAIN))" ""
 endif
 	if test -n "$(wildcard flexdll/flexdll_*.$(O))" ; then \
 	  $(MKDIR) "$(INSTALL_FLEXDLLDIR)" ; \
-	  $(INSTALL_DATA) flexdll/flexdll_*.$(O) "$(INSTALL_FLEXDLLDIR)" ; \
+	  $(INSTALL_DATA) flexdll/flexdll.h flexdll/flexdll_*.$(O) "$(INSTALL_FLEXDLLDIR)" ; \
 	fi
 
 # Installation
