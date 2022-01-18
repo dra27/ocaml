@@ -1071,6 +1071,7 @@ depend: beforedepend
 
 .PHONY: distclean
 distclean: clean
+	$(MAKE) -C ocamltest distclean
 	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
 	boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
