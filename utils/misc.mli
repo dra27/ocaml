@@ -454,4 +454,5 @@ val print_if :
 (** [print_if ppf flag fmt x] prints [x] with [fmt] on [ppf] if [b] is true. *)
 
 val mingw_binary_output : unit -> unit
+val slashify: string -> string
 

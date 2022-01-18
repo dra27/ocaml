@@ -322,7 +322,7 @@ let default_options = Options.list @
     M.generate_dot ;
   "-customdir", Arg.Unit (fun () ->
     Misc.mingw_binary_output ();
-    Printf.printf "%s\n" Odoc_config.custom_generators_path;
+    Odoc_config.custom_generators_path |> Misc.slashify |> Printf.printf "%s\n" ;
     exit 0),
   M.display_custom_generators_dir ;
   "-i", Arg.String (fun _ -> ()), M.add_load_dir ;
