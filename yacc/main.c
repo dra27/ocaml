@@ -21,6 +21,9 @@
 #ifdef HAS_UNISTD
 #include <unistd.h>
 #endif
+#ifdef _WIN32
+#include <io.h>
+#endif
 
 #include "version.h"
 
@@ -98,7 +101,11 @@ short **derives;
 char *nullable;
 
 #if !defined(HAS_MKSTEMP)
+#ifdef _WIN32
+#define mktemp _mktemp
+#else
 extern char *mktemp(char *);
+#endif
 #endif
 
 
