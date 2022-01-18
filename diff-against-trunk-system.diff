@@ -1,6 +1,39 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..c08b952e66
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,30 @@
++--- a	2023-09-28 18:43:28.883153339 +0100
+++++ b	2023-09-28 18:43:28.891153674 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1062,99 +1062,107 @@ model=default
+++@@ -1071,99 +1071,107 @@ model=default
++  system=unknown
++  
++  AS_CASE([$host],
++@@ -190,7 +190,7 @@
++  
++  AS_IF([! $native_compiler], [natdynlink=false])
++  
++-@@ -1799,37 +1807,35 @@ AS_CASE([$arch,$system],
+++@@ -1808,38 +1816,35 @@ AS_CASE([$arch,$system],
++      AC_MSG_RESULT([yes])],
++    [AC_MSG_RESULT([no])])
++  
++@@ -226,7 +226,8 @@
++ -    [*-*-mingw32|*-pc-windows],
++ -      [systhread_support=true
++ -      otherlibraries="$otherlibraries systhreads"
++--      PTHREAD_LIBS="-lpthread"
+++-dnl      PTHREAD_LIBS="-lpthread"
+++-      PTHREAD_LIBS=''
++ -      AC_MSG_NOTICE([the Win32 threads library is supported])],
++ -    [AX_PTHREAD(
++ -      [systhread_support=true
 diff --git a/Changes b/Changes
 index 7cc3e15464..c3eaa1aeae 100644
 --- a/Changes
@@ -338,10 +371,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 4eaf314bc8..eb31fbb79a 100755
+index 24a8604d30..d7dcfa3722 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index b1a8b29e75..5ed9f2531e 100644
+index bc1d1b493f..ff7415c829 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
@@ -373,17 +406,7 @@ index b1a8b29e75..5ed9f2531e 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-@@ -1812,7 +1821,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
-     [*-*-mingw32|*-pc-windows],
-       [systhread_support=true
-       otherlibraries="$otherlibraries systhreads"
--      PTHREAD_LIBS="-lpthread"
-+dnl      PTHREAD_LIBS="-lpthread"
-+      PTHREAD_LIBS=''
-       AC_MSG_NOTICE([the Win32 threads library is supported])],
-     [AX_PTHREAD(
-       [systhread_support=true
-@@ -1854,6 +1864,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1860,6 +1869,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -414,7 +437,7 @@ index b1a8b29e75..5ed9f2531e 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1963,8 +1997,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1969,8 +2002,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -3730,13 +3753,46 @@ index 0000000000..f4f35660eb
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0cb23daacf
+index 0000000000..7744d11c31
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3622 @@
+@@ -0,0 +1,3745 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..c08b952e66
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,30 @@
+++--- a	2023-09-28 18:43:28.883153339 +0100
++++++ b	2023-09-28 18:43:28.891153674 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1062,99 +1062,107 @@ model=default
++++@@ -1071,99 +1071,107 @@ model=default
+++  system=unknown
+++  
+++  AS_CASE([$host],
+++@@ -190,7 +190,7 @@
+++  
+++  AS_IF([! $native_compiler], [natdynlink=false])
+++  
+++-@@ -1799,37 +1807,35 @@ AS_CASE([$arch,$system],
++++@@ -1808,38 +1816,35 @@ AS_CASE([$arch,$system],
+++      AC_MSG_RESULT([yes])],
+++    [AC_MSG_RESULT([no])])
+++  
+++@@ -226,7 +226,8 @@
+++ -    [*-*-mingw32|*-pc-windows],
+++ -      [systhread_support=true
+++ -      otherlibraries="$otherlibraries systhreads"
+++--      PTHREAD_LIBS="-lpthread"
++++-dnl      PTHREAD_LIBS="-lpthread"
++++-      PTHREAD_LIBS=''
+++ -      AC_MSG_NOTICE([the Win32 threads library is supported])],
+++ -    [AX_PTHREAD(
+++ -      [systhread_support=true
 +diff --git a/Changes b/Changes
 +index 7cc3e15464..c3eaa1aeae 100644
 +--- a/Changes
@@ -4074,10 +4130,10 @@ index 0000000000..0cb23daacf
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 4eaf314bc8..eb31fbb79a 100755
++index 24a8604d30..d7dcfa3722 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index b1a8b29e75..5ed9f2531e 100644
++index bc1d1b493f..ff7415c829 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
@@ -4109,17 +4165,7 @@ index 0000000000..0cb23daacf
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-+@@ -1812,7 +1821,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
-+     [*-*-mingw32|*-pc-windows],
-+       [systhread_support=true
-+       otherlibraries="$otherlibraries systhreads"
-+-      PTHREAD_LIBS="-lpthread"
-++dnl      PTHREAD_LIBS="-lpthread"
-++      PTHREAD_LIBS=''
-+       AC_MSG_NOTICE([the Win32 threads library is supported])],
-+     [AX_PTHREAD(
-+       [systhread_support=true
-+@@ -1854,6 +1864,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1860,6 +1869,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -4150,7 +4196,7 @@ index 0000000000..0cb23daacf
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1963,8 +1997,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1969,8 +2002,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -7355,7 +7401,107 @@ index 0000000000..0cb23daacf
 ++ *)
 ++ 
 ++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool-debugger/printer/d
+++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++index b2d6e6e7c5..f22a4bd50f 100644
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index c09643864e..4597265246 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/287 by t/292
++++Error: Illegal shadowing of included type t/282 by t/287
+++        Line 2, characters 2-19:
+++-         Type t/287 came from this include
++++         Type t/282 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/287 is shadowed
++++         The value print has no valid type if t/282 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index b3804d00e5..827cc4affc 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 7f80b8ab26..0791f4e53f 100644
+++-
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644
