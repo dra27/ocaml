@@ -88,7 +88,15 @@ CAMLprim value unix_gethostbyaddr(value a)
 {
   struct in_addr adr = GET_INET_ADDR(a);
   struct hostent * hp;
-#if HAS_GETHOSTBYADDR_R == 7
+#ifndef GETHOSTBYADDR_R
+#ifdef GETHOSTBYADDR_IS_REENTRANT
+  caml_enter_blocking_section();
+#endif
+  hp = gethostbyaddr((char *) &adr, 4, AF_INET);
+#ifdef GETHOSTBYADDR_IS_REENTRANT
+  caml_leave_blocking_section();
+#endif
+#elif HAS_GETHOSTBYADDR_R == 7
   struct hostent h;
   char buffer[NETDB_BUFFER_SIZE];
   int h_errnop;
@@ -105,14 +113,6 @@ CAMLprim value unix_gethostbyaddr(value a)
                        &h, buffer, sizeof(buffer), &hp, &h_errnop);
   caml_leave_blocking_section();
   if (rc != 0) hp = NULL;
-#else
-#ifdef GETHOSTBYADDR_IS_REENTRANT
-  caml_enter_blocking_section();
-#endif
-  hp = gethostbyaddr((char *) &adr, 4, AF_INET);
-#ifdef GETHOSTBYADDR_IS_REENTRANT
-  caml_leave_blocking_section();
-#endif
 #endif
   if (hp == (struct hostent *) NULL) caml_raise_not_found();
   return alloc_host_entry(hp);
@@ -122,7 +122,7 @@ CAMLprim value unix_gethostbyname(value name)
 {
   struct hostent * hp;
   char * hostname;
-#if HAS_GETHOSTBYNAME_R
+#ifdef HAS_GETHOSTBYNAME_R
   struct hostent h;
   char buffer[NETDB_BUFFER_SIZE];
   int err;
@@ -132,7 +132,15 @@ CAMLprim value unix_gethostbyname(value name)
 
   hostname = caml_stat_strdup(String_val(name));
 
-#if HAS_GETHOSTBYNAME_R == 5
+#ifndef HAS_GETHOSTBYNAME_R
+#ifdef GETHOSTBYNAME_IS_REENTRANT
+  caml_enter_blocking_section();
+#endif
+  hp = gethostbyname(hostname);
+#ifdef GETHOSTBYNAME_IS_REENTRANT
+  caml_leave_blocking_section();
+#endif
+#elif HAS_GETHOSTBYNAME_R == 5
   {
     caml_enter_blocking_section();
     hp = gethostbyname_r(hostname, &h, buffer, sizeof(buffer), &err);
@@ -146,14 +154,6 @@ CAMLprim value unix_gethostbyname(value name)
     caml_leave_blocking_section();
     if (rc != 0) hp = NULL;
   }
-#else
-#ifdef GETHOSTBYNAME_IS_REENTRANT
-  caml_enter_blocking_section();
-#endif
-  hp = gethostbyname(hostname);
-#ifdef GETHOSTBYNAME_IS_REENTRANT
-  caml_leave_blocking_section();
-#endif
 #endif
 
   caml_stat_free(hostname);
