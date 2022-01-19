@@ -149,6 +149,10 @@ OCaml 4.14.0
   WSADuplicateSocket on sockets instead of DuplicateHandle.
   (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
 
+- #10???: Prefix all C functions in the Unix library with `unix_` except for the
+  venerable `uerror`.
+  (David Allsopp, review by ???)
+
 ### Tools:
 
 - #3959, #7202, #10476: ocaml, in script mode, directive errors

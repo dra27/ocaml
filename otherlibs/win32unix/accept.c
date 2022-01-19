@@ -41,7 +41,7 @@ CAMLprim value unix_accept(value cloexec, value sock)
   win_set_cloexec((HANDLE) snew, cloexec);
   Begin_roots2 (fd, adr)
     fd = win_alloc_socket(snew);
-    adr = alloc_sockaddr(&addr, addr_len, snew);
+    adr = unix_alloc_sockaddr(&addr, addr_len, snew);
     res = caml_alloc_small(2, 0);
     Field(res, 0) = fd;
     Field(res, 1) = adr;

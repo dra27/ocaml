@@ -25,8 +25,8 @@
 #include "socketaddr.h"
 #include <ws2tcpip.h>
 
-extern int socket_domain_table[]; /* from socket.c */
-extern int socket_type_table[]; /* from socket.c */
+extern int unix_socket_domain_table[]; /* from socket.c */
+extern int unix_socket_type_table[]; /* from socket.c */
 
 #ifdef HAS_SOCKETPAIR
 
@@ -178,8 +178,8 @@ CAMLprim value unix_socketpair(value cloexec, value domain, value type,
   int rc;
 
   caml_enter_blocking_section();
-  rc = socketpair(socket_domain_table[Int_val(domain)],
-                  socket_type_table[Int_val(type)],
+  rc = socketpair(unix_socket_domain_table[Int_val(domain)],
+                  unix_socket_type_table[Int_val(type)],
                   Int_val(protocol),
                   sv);
   caml_leave_blocking_section();

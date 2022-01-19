@@ -69,8 +69,8 @@ CAMLnoreturn_end;
 
 extern void caml_unix_check_path(value path, const char * cmdname);
 extern value unix_freeze_buffer (value);
-extern wchar_t ** cstringvect(value arg, char * cmdname);
-extern void cstringvect_free(wchar_t **);
+extern wchar_t ** unix_cstringvect(value arg, char * cmdname);
+extern void unix_cstringvect_free(wchar_t **);
 
 extern int unix_cloexec_default;
 extern int unix_cloexec_p(value cloexec);

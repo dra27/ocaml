@@ -16,11 +16,11 @@
 #include <caml/mlvalues.h>
 #include "unixsupport.h"
 
-int socket_domain_table[] = {
+int unix_socket_domain_table[] = {
   PF_UNIX, PF_INET, PF_INET6
 };
 
-int socket_type_table[] = {
+int unix_socket_type_table[] = {
   SOCK_STREAM, SOCK_DGRAM, SOCK_RAW, SOCK_SEQPACKET
 };
 
@@ -28,9 +28,9 @@ CAMLprim value unix_socket(value cloexec, value domain, value type, value proto)
 {
   SOCKET s;
 
-  s = socket(socket_domain_table[Int_val(domain)],
-                   socket_type_table[Int_val(type)],
-                   Int_val(proto));
+  s = socket(unix_socket_domain_table[Int_val(domain)],
+             unix_socket_type_table[Int_val(type)],
+             Int_val(proto));
   if (s == INVALID_SOCKET) {
     win32_maperr(WSAGetLastError());
     uerror("socket", Nothing);

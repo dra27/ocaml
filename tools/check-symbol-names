@@ -21,11 +21,15 @@ set -o pipefail
 nm -A -P "$@" | LC_ALL=C awk '
 # ignore caml_foo, camlFoo_bar, _caml_foo, _camlFoo_bar
 $2 ~ /^(_?caml[_A-Z])/ { next }
+# ignore re_foo and unix_foo
+$2 ~ /^(\.refptr\.)?(_?(re|unix)_)/ { next }
 # ignore local and undefined symbols
 $3 ~ /^[a-zU]$/ { next }
 # ignore "main", which should be externally linked
 $2 ~ /^_?main$/ { next }
 $2 ~ /^_?wmain$/ { next }
+# uerror is too widely known!
+$2 ~ /^_?uerror$/ { next }
 # Caml_state escapes the prefixing rule for now
 $2 ~ /^_?Caml_state$/ { next }
 # for x86 PIC mode
