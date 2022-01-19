@@ -24,7 +24,7 @@
 #define DEBUG_PRINT(fmt, ...) \
   do \
   { \
-    if (debug_test()) \
+    if (unix_debug_test()) \
     { \
       fprintf(stderr, "DBUG (pid:%ld, tid: %ld): ", GetCurrentProcessId(), \
               GetCurrentThreadId()); \
@@ -35,7 +35,7 @@
   } while(0)
 
 /* Test if we are in dbug mode */
-int  debug_test    (void);
+int  unix_debug_test    (void);
 
 #elif defined(_MSC_VER) && _MSC_VER < 1300
 

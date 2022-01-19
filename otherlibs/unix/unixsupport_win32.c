@@ -247,7 +247,7 @@ void win32_maperr(DWORD errcode)
 #undef EACCESS
 #define EACCESS EACCES
 
-int error_table[] = {
+static int error_table[] = {
   E2BIG, EACCESS, EAGAIN, EBADF, EBUSY, ECHILD, EDEADLK, EDOM,
   EEXIST, EFAULT, EFBIG, EINTR, EINVAL, EIO, EISDIR, EMFILE, EMLINK,
   ENAMETOOLONG, ENFILE, ENODEV, ENOENT, ENOEXEC, ENOLCK, ENOMEM, ENOSPC,
@@ -278,7 +278,7 @@ value unix_error_of_code (int errcode)
   return err;
 }
 
-int code_of_unix_error (value error)
+int unix_code_of_unix_error (value error)
 {
   if (Is_block(error)) {
     return Int_val(Field(error, 0));

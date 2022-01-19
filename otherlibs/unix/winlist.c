@@ -18,39 +18,39 @@
 #include "winlist.h"
 #include <windows.h>
 
-void list_init (LPLIST lst)
+void unix_list_init (LPLIST lst)
 {
   lst->lpNext = NULL;
 }
 
-void list_cleanup (LPLIST lst)
+void unix_list_cleanup (LPLIST lst)
 {
   lst->lpNext = NULL;
 }
 
-void list_next_set (LPLIST lst, LPLIST next)
+void unix_list_next_set (LPLIST lst, LPLIST next)
 {
   lst->lpNext = next;
 }
 
-LPLIST list_next (LPLIST lst)
+LPLIST unix_list_next (LPLIST lst)
 {
   return lst->lpNext;
 }
 
-int list_length (LPLIST lst)
+int unix_list_length (LPLIST lst)
 {
   int length = 0;
   LPLIST iter = lst;
   while (iter != NULL)
   {
     length++;
-    iter = list_next(iter);
+    iter = unix_list_next(iter);
   };
   return length;
 }
 
-LPLIST list_concat (LPLIST lsta, LPLIST lstb)
+LPLIST unix_list_concat (LPLIST lsta, LPLIST lstb)
 {
   LPLIST res = NULL;
   LPLIST iter = NULL;
@@ -71,7 +71,7 @@ LPLIST list_concat (LPLIST lsta, LPLIST lstb)
     while (iter != NULL)
     {
       iterPrev = iter;
-      iter = list_next(iter);
+      iter = unix_list_next(iter);
     };
     iterPrev->lpNext = lstb;
   };

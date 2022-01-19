@@ -16,9 +16,9 @@
 #include <caml/mlvalues.h>
 #include "unixsupport.h"
 
-extern value val_process_id;
+extern value unix_process_id;
 
 CAMLprim value unix_getpid(value unit)
 {
-  return val_process_id;
+  return unix_process_id;
 }
