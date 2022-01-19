@@ -74,7 +74,8 @@ extern SOCKET win32_socket(int domain, int type, int protocol,
 
 #define NO_CRT_FD (-1)
 
-extern void win32_maperr(DWORD errcode);
+extern void unix_win32_maperr(DWORD errcode);
+#define win32_maperr unix_win32_maperr
 #endif /* _WIN32 */
 
 #define Nothing ((value) 0)

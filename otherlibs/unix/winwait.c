@@ -64,11 +64,11 @@ CAMLprim value win_waitpid(value vflags, value vpid_req)
     if (retcode == WAIT_FAILED) err = GetLastError();
   }
   if (err) {
-    win32_maperr(err);
+    unix_win32_maperr(err);
     uerror("waitpid", Nothing);
   }
   if (! GetExitCodeProcess(pid_req, &status)) {
-    win32_maperr(GetLastError());
+    unix_win32_maperr(GetLastError());
     uerror("waitpid", Nothing);
   }
   if (status == STILL_ACTIVE)
