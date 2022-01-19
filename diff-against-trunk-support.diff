@@ -1631,7 +1631,7 @@ index 30fb9eee71..6113340ccf 100644
  
  let r = ref (Some 0)
 diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
-index b6c06be354..5af3ad1082 100644
+index f07c0e0804..dd7a94f3cf 100644
 --- a/testsuite/tests/parallel/poll.ml
 +++ b/testsuite/tests/parallel/poll.ml
 @@ -1,8 +1,10 @@
@@ -1647,7 +1647,7 @@ index b6c06be354..5af3ad1082 100644
 +*** native
  *)
  
- let rec loop () =
+ let continue = Atomic.make true
 diff --git a/testsuite/tests/parallel/prodcons_domains.ml b/testsuite/tests/parallel/prodcons_domains.ml
 index 67499d342a..e8e9d736f3 100644
 --- a/testsuite/tests/parallel/prodcons_domains.ml

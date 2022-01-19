@@ -1,0 +1,13 @@
+--- a	2023-09-28 18:43:29.963198602 +0100
++++ b	2023-09-28 18:43:29.967198770 +0100
+@@ -1,8 +1,8 @@
+ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
+ --- a/testsuite/tests/parallel/poll.ml
+ +++ b/testsuite/tests/parallel/poll.ml
+-@@ -5,10 +5,15 @@ include unix
+- ** native
++@@ -7,10 +7,15 @@ include unix
++ *** native
+  *)
+  
+ +let continue = Atomic.make true

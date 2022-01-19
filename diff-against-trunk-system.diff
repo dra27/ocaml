@@ -1,6 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..5a6d8558ee
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:43:29.963198602 +0100
+++++ b	2023-09-28 18:43:29.967198770 +0100
++@@ -1,8 +1,8 @@
++ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
++ --- a/testsuite/tests/parallel/poll.ml
++ +++ b/testsuite/tests/parallel/poll.ml
++-@@ -5,10 +5,15 @@ include unix
++- ** native
+++@@ -7,10 +7,15 @@ include unix
+++ *** native
++  *)
++  
++ +let continue = Atomic.make true
 diff --git a/Changes b/Changes
 index 7cc3e15464..c3eaa1aeae 100644
 --- a/Changes
@@ -3899,13 +3915,29 @@ index 0000000000..f4f35660eb
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e08d0b8b4f
+index 0000000000..caebf651b3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3865 @@
+@@ -0,0 +1,3868 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..5a6d8558ee
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,13 @@
+++--- a	2023-09-28 18:43:29.963198602 +0100
++++++ b	2023-09-28 18:43:29.967198770 +0100
+++@@ -1,8 +1,8 @@
+++ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
+++ --- a/testsuite/tests/parallel/poll.ml
+++ +++ b/testsuite/tests/parallel/poll.ml
+++-@@ -5,10 +5,15 @@ include unix
+++- ** native
++++@@ -7,10 +7,15 @@ include unix
++++ *** native
+++  *)
+++  
+++ +let continue = Atomic.make true
 +diff --git a/Changes b/Changes
 +index 7cc3e15464..c3eaa1aeae 100644
 +--- a/Changes
@@ -7755,19 +7787,6 @@ index 0000000000..e08d0b8b4f
 ++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
 ++index 744c4e844d..621d7292ff 100644
 ++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/tes
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644
