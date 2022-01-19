@@ -67,7 +67,7 @@ EOF
 Build () {
   script --return --command "$MAKE_WARN world.opt" build.log
   echo Ensuring that all names are prefixed in the runtime
-  ./tools/check-symbol-names runtime/*.a
+  ./tools/check-symbol-names runtime/*.a otherlibs/*/lib*.a
 }
 
 Test () {

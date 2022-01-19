@@ -122,7 +122,8 @@ case "$1" in
     if [[ $PORT =~ mingw* ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-          $FULL_BUILD_PREFIX-$PORT/runtime/*.a
+          $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+          $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
     fi
     if [[ $PORT = 'mingw64' ]] ; then
       export PATH="$PATH:/usr/x86_64-w64-mingw32/sys-root/mingw/bin"

@@ -27,7 +27,12 @@ extern "C" {
 #define Nothing ((value) 0)
 
 extern value unix_error_of_code (int errcode);
-extern int code_of_unix_error (value error);
+extern int unix_code_of_unix_error (value error);
+
+/* Compatibility definitions for the pre-5.0 names of these functions */
+#ifndef CAML_BUILDING_UNIX
+#define code_of_unix_error unix_code_of_unix_error
+#endif /* CAML_BUILDING_UNIX */
 
 CAMLnoreturn_start
 extern void unix_error (int errcode, const char * cmdname, value arg)
@@ -43,8 +48,8 @@ extern void caml_unix_check_path(value path, const char * cmdname);
 
 #define DIR_Val(v) *((DIR **) &Field(v, 0))
 
-extern char ** cstringvect(value arg, char * cmdname);
-extern void cstringvect_free(char **);
+extern char ** unix_cstringvect(value arg, char * cmdname);
+extern void unix_cstringvect_free(char **);
 
 extern int unix_cloexec_default;
 extern int unix_cloexec_p(value cloexec);
