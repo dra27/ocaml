@@ -24,11 +24,29 @@ end
 Line 3, characters 2-36:
 3 |   include Comparable with type t = t
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<<<<<<< HEAD
 Error: Illegal shadowing of included type t/282 by t/287
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+Error: Illegal shadowing of included type t/287 by t/292
+=======
+Error: Illegal shadowing of included type t/284 by t/289
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
        Line 2, characters 2-19:
+<<<<<<< HEAD
          Type t/282 came from this include
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+         Type t/287 came from this include
+=======
+         Type t/284 came from this include
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
        Line 3, characters 2-23:
+<<<<<<< HEAD
          The value print has no valid type if t/282 is shadowed
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+         The value print has no valid type if t/287 is shadowed
+=======
+         The value print has no valid type if t/284 is shadowed
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
 |}]
 
 module type Sunderscore = sig

@@ -25,7 +25,13 @@ module Mproj = Unit
 module F (X : sig type t end) = X
 [%%expect{|
 {
+<<<<<<< HEAD
  "F"[module] -> Abs<.4>(X/275, X/275<.3>);
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+ "F"[module] -> Abs<.4>(X/280, X/280<.3>);
+=======
+ "F"[module] -> Abs<.4>(X/277, X/277<.3>);
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
  }
 module F : functor (X : sig type t end) -> sig type t = X.t end
 |}]

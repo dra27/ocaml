@@ -26,7 +26,13 @@ end
 {
  "Pair"[module] ->
      Abs<.9>
+<<<<<<< HEAD
         (X/277, Abs(Y/278, {
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+        (X/282, Abs(Y/283, {
+=======
+        (X/279, Abs(Y/280, {
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));

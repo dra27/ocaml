@@ -43,8 +43,16 @@ and B : sig
 end = B
 [%%expect{|
 {
+<<<<<<< HEAD
  "A"[module] -> A/300<.11>;
  "B"[module] -> B/301<.12>;
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+ "A"[module] -> A/305<.11>;
+ "B"[module] -> B/306<.12>;
+=======
+ "A"[module] -> A/302<.11>;
+ "B"[module] -> B/303<.12>;
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -82,13 +90,31 @@ end = Set.Make(A)
  "ASet"[module] ->
      {
       "compare"[value] ->
+<<<<<<< HEAD
           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+=======
+          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
           "compare"[value];
       "elt"[type] ->
+<<<<<<< HEAD
           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+=======
+          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
           "elt"[type];
       "t"[type] ->
+<<<<<<< HEAD
           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) . "t"[type];
+||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) . "t"[type];
+=======
+          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) . "t"[type];
+>>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
       };
  }
 module rec A :
