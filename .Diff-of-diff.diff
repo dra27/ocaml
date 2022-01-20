@@ -1,13 +1,152 @@
---- a	2023-09-28 18:43:29.963198602 +0100
-+++ b	2023-09-28 18:43:29.967198770 +0100
-@@ -1,8 +1,8 @@
- diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
- --- a/testsuite/tests/parallel/poll.ml
- +++ b/testsuite/tests/parallel/poll.ml
--@@ -5,10 +5,15 @@ include unix
-- ** native
-+@@ -7,10 +7,15 @@ include unix
-+ *** native
-  *)
+--- a	2023-09-28 18:43:30.223209492 +0100
++++ b	2023-09-28 18:43:30.243210329 +0100
+@@ -37,8 +37,8 @@
+  module F (X : sig type t end) = X
+  [%%expect{|
+  {
+-- ("F", module) -> Abs<.4>(X/280, X/280<.3>);
+-+ "F"[module] -> Abs<.4>(X/280, X/280<.3>);
++- ("F", module) -> Abs<.4>(X/275, X/275<.3>);
+++ "F"[module] -> Abs<.4>(X/275, X/275<.3>);
+   }
+  module F : functor (X : sig type t end) -> sig type t = X.t end
+  |}]
+@@ -296,8 +296,8 @@
+  module Falias (X : S) = X
+  [%%expect{|
+  {
+-- ("Falias", module) -> Abs<.4>(X/282, X/282<.3>);
+-+ "Falias"[module] -> Abs<.4>(X/282, X/282<.3>);
++- ("Falias", module) -> Abs<.4>(X/277, X/277<.3>);
+++ "Falias"[module] -> Abs<.4>(X/277, X/277<.3>);
+   }
+  module Falias : functor (X : S) -> sig type t = X.t val x : t end
+  |}]
+@@ -308,12 +308,12 @@
+ - ("Finclude", module) ->
+ + "Finclude"[module] ->
+       Abs<.6>
+-         (X/286,
++         (X/281,
+           {
+--          ("t", type) -> X/286<.5> . "t"[type];
+--          ("x", value) -> X/286<.5> . "x"[value];
+-+          "t"[type] -> X/286<.5> . "t"[type];
+-+          "x"[value] -> X/286<.5> . "x"[value];
++-          ("t", type) -> X/281<.5> . "t"[type];
++-          ("x", value) -> X/281<.5> . "x"[value];
+++          "t"[type] -> X/281<.5> . "t"[type];
+++          "x"[value] -> X/281<.5> . "x"[value];
+            });
+   }
+  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
+@@ -323,7 +323,7 @@
+  {
+ - ("Fredef", module) ->
+ + "Fredef"[module] ->
+-      Abs<.10>(X/293, {
++      Abs<.10>(X/288, {
+ -                      ("t", type) -> <.8>;
+ -                      ("x", value) -> <.9>;
+ +                      "t"[type] -> <.8>;
+@@ -508,13 +508,13 @@
+  {
+ - ("Big_to_small1", module) ->
+ -     Abs<.40>
+--        (shape-var/389,
++-        (shape-var/384,
+ -         {<<internal>>
+--          ("t", type) -> shape-var/389<<internal>> . "t"[type];
++-          ("t", type) -> shape-var/384<<internal>> . "t"[type];
+ -          });
+ + "Big_to_small1"[module] ->
+-+     Abs<.40>(X/388, {<.39>
+-+                      "t"[type] -> X/388<.39> . "t"[type];
+++     Abs<.40>(X/383, {<.39>
+++                      "t"[type] -> X/383<.39> . "t"[type];
+ +                      });
+   }
+  module Big_to_small1 : B2S
+@@ -525,13 +525,13 @@
+  {
+ - ("Big_to_small2", module) ->
+ -     Abs<.42>
+--        (shape-var/395,
++-        (shape-var/390,
+ -         {
+--          ("t", type) -> (shape-var/395<<internal>> . "t"[type])<.41>;
++-          ("t", type) -> (shape-var/390<<internal>> . "t"[type])<.41>;
+ -          });
+ + "Big_to_small2"[module] ->
+-+     Abs<.42>(X/391, {
+-+                      "t"[type] -> X/391<.41> . "t"[type];
+++     Abs<.42>(X/386, {
+++                      "t"[type] -> X/386<.41> . "t"[type];
+ +                      });
+   }
+  module Big_to_small2 : B2S
+@@ -594,9 +594,9 @@
   
- +let continue = Atomic.make true
+  [%%expect{|
+  {
+-- ("Make", module) -> Abs<.3>(I/282, {
++- ("Make", module) -> Abs<.3>(I/277, {
+ -                                     });
+-+ "Make"[module] -> Abs<.3>(I/282, {
+++ "Make"[module] -> Abs<.3>(I/277, {
+ +                                   });
+   }
+  module Make : functor (I : sig end) -> sig end
+@@ -731,13 +731,13 @@
+  [%%expect{|
+  {
+ - ("A", module) -> {<.11>
+--                   ("t", type) -> A/305<.11> . "t"[type];
++-                   ("t", type) -> A/300<.11> . "t"[type];
+ -                   };
+ - ("B", module) -> {<.12>
+--                   ("t", type) -> B/306<.12> . "t"[type];
++-                   ("t", type) -> B/301<.12> . "t"[type];
+ -                   };
+-+ "A"[module] -> A/305<.11>;
+-+ "B"[module] -> B/306<.12>;
+++ "A"[module] -> A/300<.11>;
+++ "B"[module] -> B/301<.12>;
+   }
+  module rec A : sig type t = Leaf of B.t end
+  and B : sig type t = int end
+@@ -758,15 +758,15 @@
+       {
+ -      ("compare", value) ->
+ +      "compare"[value] ->
+-           CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
++           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
+            "compare"[value];
+ -      ("elt", type) ->
+ +      "elt"[type] ->
+-           CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
++           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
+            "elt"[type];
+ -      ("t", type) ->
+ +      "t"[type] ->
+-           CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) . "t"[type];
++           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) . "t"[type];
+        };
+   }
+ diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
+@@ -788,12 +788,12 @@
+ - ("Pair", module) ->
+ + "Pair"[module] ->
+       Abs<.9>
+--        (X/282,
+--         Abs(Y/283, {
++-        (X/277,
++-         Abs(Y/278, {
+ -                     ("t", type) -> <.5>;
+ -                     ("to_string", value) -> <.6>;
+ -                     }));
+-+        (X/282, Abs(Y/283, {
+++        (X/277, Abs(Y/278, {
+ +                            "t"[type] -> <.5>;
+ +                            "to_string"[value] -> <.6>;
+ +                            }));

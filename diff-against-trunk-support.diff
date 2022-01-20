@@ -1914,140 +1914,134 @@ index 0000000000..f5d4df561c
 +  exec ${program} > ${output}
 +fi
 diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-index 05eeed8ecb..5355d91a4d 100644
+index ea64f67af5..fc7802f56b 100644
 --- a/testsuite/tests/shapes/comp_units.ml
 +++ b/testsuite/tests/shapes/comp_units.ml
 @@ -25,7 +25,7 @@ module Mproj = Unit
  module F (X : sig type t end) = X
  [%%expect{|
  {
-- ("F", module) -> Abs<.4>(X/280, X/280<.3>);
-+ ("F", module) -> Abs<.4>(X/275, X/275<.3>);
+- "F"[module] -> Abs<.4>(X/280, X/280<.3>);
++ "F"[module] -> Abs<.4>(X/275, X/275<.3>);
   }
  module F : functor (X : sig type t end) -> sig type t = X.t end
  |}]
 diff --git a/testsuite/tests/shapes/functors.ml b/testsuite/tests/shapes/functors.ml
-index fc1252e23d..dbc8711009 100644
+index aa4fe0d0f0..4683db74c4 100644
 --- a/testsuite/tests/shapes/functors.ml
 +++ b/testsuite/tests/shapes/functors.ml
 @@ -17,7 +17,7 @@ module type S = sig type t val x : t end
  module Falias (X : S) = X
  [%%expect{|
  {
-- ("Falias", module) -> Abs<.4>(X/282, X/282<.3>);
-+ ("Falias", module) -> Abs<.4>(X/277, X/277<.3>);
+- "Falias"[module] -> Abs<.4>(X/282, X/282<.3>);
++ "Falias"[module] -> Abs<.4>(X/277, X/277<.3>);
   }
  module Falias : functor (X : S) -> sig type t = X.t val x : t end
  |}]
 @@ -29,10 +29,10 @@ end
  {
-  ("Finclude", module) ->
+  "Finclude"[module] ->
       Abs<.6>
 -        (X/286,
 +        (X/281,
           {
--          ("t", type) -> X/286<.5> . "t"[type];
--          ("x", value) -> X/286<.5> . "x"[value];
-+          ("t", type) -> X/281<.5> . "t"[type];
-+          ("x", value) -> X/281<.5> . "x"[value];
+-          "t"[type] -> X/286<.5> . "t"[type];
+-          "x"[value] -> X/286<.5> . "x"[value];
++          "t"[type] -> X/281<.5> . "t"[type];
++          "x"[value] -> X/281<.5> . "x"[value];
            });
   }
  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
 @@ -45,7 +45,7 @@ end
  [%%expect{|
  {
-  ("Fredef", module) ->
+  "Fredef"[module] ->
 -     Abs<.10>(X/293, {
 +     Abs<.10>(X/288, {
-                       ("t", type) -> <.8>;
-                       ("x", value) -> <.9>;
+                       "t"[type] -> <.8>;
+                       "x"[value] -> <.9>;
                        });
-@@ -225,9 +225,9 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
+@@ -223,8 +223,8 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
+ [%%expect{|
  {
-  ("Big_to_small1", module) ->
-      Abs<.40>
--        (shape-var/389,
-+        (shape-var/384,
-          {<<internal>>
--          ("t", type) -> shape-var/389<<internal>> . "t"[type];
-+          ("t", type) -> shape-var/384<<internal>> . "t"[type];
-           });
+  "Big_to_small1"[module] ->
+-     Abs<.40>(X/388, {<.39>
+-                      "t"[type] -> X/388<.39> . "t"[type];
++     Abs<.40>(X/383, {<.39>
++                      "t"[type] -> X/383<.39> . "t"[type];
+                       });
   }
  module Big_to_small1 : B2S
-@@ -238,9 +238,9 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
+@@ -234,8 +234,8 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
+ [%%expect{|
  {
-  ("Big_to_small2", module) ->
-      Abs<.42>
--        (shape-var/395,
-+        (shape-var/390,
-          {
--          ("t", type) -> (shape-var/395<<internal>> . "t"[type])<.41>;
-+          ("t", type) -> (shape-var/390<<internal>> . "t"[type])<.41>;
-           });
+  "Big_to_small2"[module] ->
+-     Abs<.42>(X/391, {
+-                      "t"[type] -> X/391<.41> . "t"[type];
++     Abs<.42>(X/386, {
++                      "t"[type] -> X/386<.41> . "t"[type];
+                       });
   }
  module Big_to_small2 : B2S
 diff --git a/testsuite/tests/shapes/open_arg.ml b/testsuite/tests/shapes/open_arg.ml
-index d606a22358..3c00161e42 100644
+index 9dd8cbe05a..e8020169be 100644
 --- a/testsuite/tests/shapes/open_arg.ml
 +++ b/testsuite/tests/shapes/open_arg.ml
 @@ -22,7 +22,7 @@ end = struct end
  
  [%%expect{|
  {
-- ("Make", module) -> Abs<.3>(I/282, {
-+ ("Make", module) -> Abs<.3>(I/277, {
-                                      });
+- "Make"[module] -> Abs<.3>(I/282, {
++ "Make"[module] -> Abs<.3>(I/277, {
+                                    });
   }
  module Make : functor (I : sig end) -> sig end
 diff --git a/testsuite/tests/shapes/recmodules.ml b/testsuite/tests/shapes/recmodules.ml
-index d76392f02e..3e04b79941 100644
+index 2f31951dc4..b40e4015d2 100644
 --- a/testsuite/tests/shapes/recmodules.ml
 +++ b/testsuite/tests/shapes/recmodules.ml
-@@ -44,10 +44,10 @@ end = B
+@@ -43,8 +43,8 @@ and B : sig
+ end = B
  [%%expect{|
  {
-  ("A", module) -> {<.11>
--                   ("t", type) -> A/305<.11> . "t"[type];
-+                   ("t", type) -> A/300<.11> . "t"[type];
-                    };
-  ("B", module) -> {<.12>
--                   ("t", type) -> B/306<.12> . "t"[type];
-+                   ("t", type) -> B/301<.12> . "t"[type];
-                    };
+- "A"[module] -> A/305<.11>;
+- "B"[module] -> B/306<.12>;
++ "A"[module] -> A/300<.11>;
++ "B"[module] -> B/301<.12>;
   }
  module rec A : sig type t = Leaf of B.t end
-@@ -86,13 +86,13 @@ end = Set.Make(A)
-  ("ASet", module) ->
+ and B : sig type t = int end
+@@ -82,13 +82,13 @@ end = Set.Make(A)
+  "ASet"[module] ->
       {
-       ("compare", value) ->
+       "compare"[value] ->
 -          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
 +          CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
            "compare"[value];
-       ("elt", type) ->
+       "elt"[type] ->
 -          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
 +          CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
            "elt"[type];
-       ("t", type) ->
+       "t"[type] ->
 -          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) . "t"[type];
 +          CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) . "t"[type];
        };
   }
  module rec A :
 diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
-index cb3b8cee71..643aaf4798 100644
+index d0d4632bb3..cf98fcb5d4 100644
 --- a/testsuite/tests/shapes/rotor_example.ml
 +++ b/testsuite/tests/shapes/rotor_example.ml
-@@ -26,8 +26,8 @@ end
+@@ -26,7 +26,7 @@ end
  {
-  ("Pair", module) ->
+  "Pair"[module] ->
       Abs<.9>
--        (X/282,
--         Abs(Y/283, {
-+        (X/277,
-+         Abs(Y/278, {
-                      ("t", type) -> <.5>;
-                      ("to_string", value) -> <.6>;
-                      }));
+-        (X/282, Abs(Y/283, {
++        (X/277, Abs(Y/278, {
+                             "t"[type] -> <.5>;
+                             "to_string"[value] -> <.6>;
+                             }));
 diff --git a/testsuite/tests/statmemprof/alloc_counts.ml b/testsuite/tests/statmemprof/alloc_counts.ml
 index de0d1e9e49..f8cbb5658d 100644
 --- a/testsuite/tests/statmemprof/alloc_counts.ml
