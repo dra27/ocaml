@@ -17,12 +17,12 @@ module rec A : sig
    = struct type t = int end
 [%%expect{|
 {
- ("A", module) -> {
-                   ("t", type) -> <.8>;
-                   };
- ("B", module) -> {
-                   ("t", type) -> <.10>;
-                   };
+ "A"[module] -> {
+                 "t"[type] -> <.8>;
+                 };
+ "B"[module] -> {
+                 "t"[type] -> <.10>;
+                 };
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -43,12 +43,24 @@ and B : sig
 end = B
 [%%expect{|
 {
+<<<<<<< HEAD
  ("A", module) -> {<.11>
                    ("t", type) -> A/300<.11> . "t"[type];
                    };
  ("B", module) -> {<.12>
                    ("t", type) -> B/301<.12> . "t"[type];
                    };
+||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+ ("A", module) -> {<.11>
+                   ("t", type) -> A/305<.11> . "t"[type];
+                   };
+ ("B", module) -> {<.12>
+                   ("t", type) -> B/306<.12> . "t"[type];
+                   };
+=======
+ "A"[module] -> A/305<.11>;
+ "B"[module] -> B/306<.12>;
+>>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -79,20 +91,44 @@ and ASet : sig
 end = Set.Make(A)
 [%%expect{|
 {
- ("A", module) -> {
-                   ("compare", value) -> <.38>;
-                   ("t", type) -> <.35>;
-                   };
- ("ASet", module) ->
+ "A"[module] -> {
+                 "compare"[value] -> <.38>;
+                 "t"[type] -> <.35>;
+                 };
+ "ASet"[module] ->
      {
+<<<<<<< HEAD
       ("compare", value) ->
           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
+||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+      ("compare", value) ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+=======
+      "compare"[value] ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+>>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
           "compare"[value];
+<<<<<<< HEAD
       ("elt", type) ->
           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) .
+||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+      ("elt", type) ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+=======
+      "elt"[type] ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) .
+>>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
           "elt"[type];
+<<<<<<< HEAD
       ("t", type) ->
           CU Stdlib . "Set"[module] . "Make"[module](A/322<.19>) . "t"[type];
+||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+      ("t", type) ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) . "t"[type];
+=======
+      "t"[type] ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/327<.19>) . "t"[type];
+>>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
       };
  }
 module rec A :
