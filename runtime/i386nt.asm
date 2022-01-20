@@ -24,7 +24,7 @@
         EXTERN  _caml_program: PROC
         EXTERN  _caml_array_bound_error: PROC
         EXTERN  _caml_stash_backtrace: PROC
-        EXTERN  _Caml_state: DWORD
+        EXTERN  _caml_state: DWORD
 
         .CODE
 
@@ -44,7 +44,7 @@ INCLUDE domain_state32.inc
 
 _caml_call_gc:
     ; Record lowest stack address and return address
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         mov     eax, [esp]
         Store_last_return_address ebx, eax
         lea     eax, [esp+4]
@@ -74,7 +74,7 @@ _caml_call_gc:
 
         ALIGN  4
 _caml_alloc1:
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         Load_young_ptr ebx, eax
         sub     eax, 8
         Store_young_ptr ebx, eax
@@ -84,7 +84,7 @@ _caml_alloc1:
 
         ALIGN  4
 _caml_alloc2:
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         Load_young_ptr ebx, eax
         sub     eax, 12
         Store_young_ptr ebx, eax
@@ -94,7 +94,7 @@ _caml_alloc2:
 
         ALIGN  4
 _caml_alloc3:
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         Load_young_ptr ebx, eax
         sub     eax, 16
         Store_young_ptr ebx, eax
@@ -104,7 +104,7 @@ _caml_alloc3:
 
         ALIGN  4
 _caml_allocN:
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         Sub_young_ptr ebx, eax ; eax = size - young_ptr
         neg     eax            ; eax = young_ptr - size
         Store_young_ptr ebx, eax
@@ -119,7 +119,7 @@ _caml_allocN:
 _caml_c_call:
     ; Record lowest stack address and return address
     ; ecx and edx are destroyed at C call. Use them as temp.
-        mov     ecx, _Caml_state
+        mov     ecx, _caml_state
         mov     edx, [esp]
         Store_last_return_address ecx, edx
         lea     edx, [esp+4]
@@ -143,7 +143,7 @@ _caml_start_program:
 ; Code shared between caml_start_program and callback*
 
 L106:
-        mov     edi, _Caml_state
+        mov     edi, _caml_state
     ; Build a callback link
         Push_gc_regs edi
         Push_last_return_address edi
@@ -155,12 +155,12 @@ L106:
     ; Call the OCaml code
         call    esi
 L107:
-        mov     edi, _Caml_state
+        mov     edi, _caml_state
     ; Pop the exception handler
         Pop_exception_pointer edi
         add     esp, 4
 L109:
-        mov     edi, _Caml_state
+        mov     edi, _caml_state
     ; Pop the callback link, restoring the global variables
     ; used by caml_c_call
         Pop_bottom_of_stack edi
@@ -184,7 +184,7 @@ L108:
         PUBLIC  _caml_raise_exn
         ALIGN   4
 _caml_raise_exn:
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         Load_backtrace_active ebx, ecx
         test    ecx, 1
         jne     L110
@@ -211,7 +211,7 @@ L110:
         PUBLIC  _caml_raise_exception
         ALIGN  4
 _caml_raise_exception:
-        mov     ebx, _Caml_state
+        mov     ebx, _caml_state
         Load_backtrace_active ebx, ecx
         test    ecx, 1
         jne     L112
