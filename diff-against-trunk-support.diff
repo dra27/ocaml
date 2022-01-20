@@ -1176,6 +1176,125 @@ index 0000000000..8a50268d20
 +
 +let () =
 +  expect_size (if native then 0 else 3) (1, 2)
+diff --git a/testsuite/tests/lib-printf/tprintf.ml b/testsuite/tests/lib-printf/tprintf.ml
+index 542c93f49a..8ee737d290 100644
+--- a/testsuite/tests/lib-printf/tprintf.ml
++++ b/testsuite/tests/lib-printf/tprintf.ml
+@@ -11,6 +11,10 @@ A test file for the Printf module.
+ open Testing;;
+ open Printf;;
+ 
++let test_roundtrip fmt of_string s =
++  test (sprintf fmt (of_string s) = s)
++;;
++
+ try
+ 
+   printf "d/i positive\n%!";
+@@ -491,9 +495,16 @@ try
+   test (sprintf "%*lX" 5 42l = "   2A");
+   (*test (sprintf "%-0+ #*lX" 5 42l = "0X2A ");*)
+     (* >> '-' is incompatible with '0' *)
++  test_roundtrip "0x%lX" Int32.of_string "0x0";
++  test_roundtrip "0x%lX" Int32.of_string "0x123";
++  test_roundtrip "0x%lX" Int32.of_string "0xABCDEF";
++  test_roundtrip "0x%lX" Int32.of_string "0x12345678";
++  test_roundtrip "0x%lX" Int32.of_string "0x7FFFFFFF";
+ 
+-  printf "\nlx negative\n%!";
++  printf "\nlX negative\n%!";
+   test (sprintf "%lX" (-42l) = "FFFFFFD6");
++  test_roundtrip "0x%lX" Int32.of_string "0x80000000";
++  test_roundtrip "0x%lX" Int32.of_string "0xFFFFFFFF";
+ 
+   printf "\nlo positive\n%!";
+   test (sprintf "%lo" 42l = "52");
+@@ -593,9 +604,16 @@ try
+   test (sprintf "%*LX" 5 42L = "   2A");
+   (*test (sprintf "%-0+ #*LX" 5 42L = "0X2A ");*)
+     (* >> '-' is incompatible with '0' *)
++  test_roundtrip "0x%LX" Int64.of_string "0x0";
++  test_roundtrip "0x%LX" Int64.of_string "0x123";
++  test_roundtrip "0x%LX" Int64.of_string "0xABCDEF";
++  test_roundtrip "0x%LX" Int64.of_string "0x1234567812345678";
++  test_roundtrip "0x%LX" Int64.of_string "0x7FFFFFFFFFFFFFFF";
+ 
+-  printf "\nLx negative\n%!";
++  printf "\nLX negative\n%!";
+   test (sprintf "%LX" (-42L) = "FFFFFFFFFFFFFFD6");
++  test_roundtrip "0x%LX" Int64.of_string "0x8000000000000000";
++  test_roundtrip "0x%LX" Int64.of_string "0xFFFFFFFFFFFFFFFF";
+ 
+   printf "\nLo positive\n%!";
+   test (sprintf "%Lo" 42L = "52");
+diff --git a/testsuite/tests/lib-printf/tprintf.reference b/testsuite/tests/lib-printf/tprintf.reference
+index e728007e0f..c637e5dc5b 100644
+--- a/testsuite/tests/lib-printf/tprintf.reference
++++ b/testsuite/tests/lib-printf/tprintf.reference
+@@ -59,43 +59,43 @@ lx positive
+ lx negative
+  239
+ lX positive
+- 240 241 242 243 244 245
+-lx negative
+- 246
++ 240 241 242 243 244 245 246 247 248 249 250
++lX negative
++ 251 252 253
+ lo positive
+- 247 248 249 250 251 252
++ 254 255 256 257 258 259
+ lo negative
+- 253
++ 260
+ Ld/Li positive
+- 254 255 256 257 258
++ 261 262 263 264 265
+ Ld/Li negative
+- 259 260 261 262 263
++ 266 267 268 269 270
+ Lu positive
+- 264 265 266 267 268
++ 271 272 273 274 275
+ Lu negative
+- 269
+-Lx positive
+- 270 271 272 273 274 275
+-Lx negative
+  276
+-LX positive
++Lx positive
+  277 278 279 280 281 282
+ Lx negative
+  283
++LX positive
++ 284 285 286 287 288 289 290 291 292 293 294
++LX negative
++ 295 296 297
+ Lo positive
+- 284 285 286 287 288 289
++ 298 299 300 301 302 303
+ Lo negative
+- 290
++ 304
+ a
+- 291
++ 305
+ t
+- 292
++ 306
+ {...%}
+- 293
++ 307
+ (...%)
+- 294
++ 308
+ ! % @ , and constants
+- 295 296 297 298 299 300 301
++ 309 310 311 312 313 314 315
+ end of tests
+ 
+ All tests succeeded.
 diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
 index e117e6eb71..929e041cfd 100644
 --- a/testsuite/tests/lib-random/parallel.ml
