@@ -1,149 +1,123 @@
---- a	2023-09-28 18:43:30.535222558 +0100
-+++ b	2023-09-28 18:43:30.551223228 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -132,6 +132,9 @@ OCaml 4.14.0
-+@@ -195,6 +195,9 @@ OCaml 4.14.0
-    OCaml.
-    (Damien Doligez, review by Stephen Dolan)
-  
-@@ -11,137 +11,6 @@
-  ### Other libraries:
-  
-  - #10192: Add support for Unix domain sockets on Windows and use them
--diff --git a/stdlib/int32.mli b/stdlib/int32.mli
----- a/stdlib/int32.mli
--+++ b/stdlib/int32.mli
--@@ -232,5 +232,6 @@ val max: t -> t -> t
-- (** {1 Deprecated functions} *)
+--- a	2023-09-28 18:43:30.815234284 +0100
++++ b	2023-09-28 18:43:30.827234787 +0100
+@@ -11,120 +11,3 @@
+    Format.get_all_formatter_output_functions,
+    Format.pp_set_all_formatter_output_functions,
+    Format.pp_get_all_formatter_output_functions, Format.pp_open_tag,
+-diff --git a/testsuite/tests/lib-printf/tprintf.ml b/testsuite/tests/lib-printf/tprintf.ml
+---- a/testsuite/tests/lib-printf/tprintf.ml
+-+++ b/testsuite/tests/lib-printf/tprintf.ml
+-@@ -11,6 +11,10 @@ A test file for the Printf module.
+- open Testing;;
+- open Printf;;
 - 
-- external format : string -> int32 -> string = "caml_int32_format"
--+[@@ocaml.deprecated "Use Printf.sprintf with a [%l...] format instead."]
-- (** Do not use this deprecated function.  Instead,
--    used {!Printf.sprintf} with a [%l...] format. *)
--diff --git a/stdlib/int64.mli b/stdlib/int64.mli
----- a/stdlib/int64.mli
--+++ b/stdlib/int64.mli
--@@ -250,5 +250,6 @@ val max: t -> t -> t
-- (** {1 Deprecated functions} *)
+-+let test_roundtrip fmt of_string s =
+-+  test (sprintf fmt (of_string s) = s)
+-+;;
+-+
+- try
 - 
-- external format : string -> int64 -> string = "caml_int64_format"
--+[@@ocaml.deprecated "Use Printf.sprintf with a [%L...] format instead."]
-- (** Do not use this deprecated function.  Instead,
--    used {!Printf.sprintf} with a [%L...] format. *)
--diff --git a/stdlib/nativeint.mli b/stdlib/nativeint.mli
----- a/stdlib/nativeint.mli
--+++ b/stdlib/nativeint.mli
--@@ -241,6 +241,7 @@ val max: t -> t -> t
-- (** {1 Deprecated functions} *)
+-   printf "d/i positive\n%!";
+-@@ -491,9 +495,16 @@ try
+-   test (sprintf "%*lX" 5 42l = "   2A");
+-   (*test (sprintf "%-0+ #*lX" 5 42l = "0X2A ");*)
+-     (* >> '-' is incompatible with '0' *)
+-+  test_roundtrip "0x%lX" Int32.of_string "0x0";
+-+  test_roundtrip "0x%lX" Int32.of_string "0x123";
+-+  test_roundtrip "0x%lX" Int32.of_string "0xABCDEF";
+-+  test_roundtrip "0x%lX" Int32.of_string "0x12345678";
+-+  test_roundtrip "0x%lX" Int32.of_string "0x7FFFFFFF";
 - 
-- external format : string -> nativeint -> string = "caml_nativeint_format"
--+[@@ocaml.deprecated "Use Printf.sprintf with a [%n...] format instead."]
-- (** [Nativeint.format fmt n] return the string representation of the
--    native integer [n] in the format specified by [fmt].
--    [fmt] is a [Printf]-style format consisting of exactly
--diff --git a/testsuite/tests/basic/boxedints.ml b/testsuite/tests/basic/boxedints.ml
----- a/testsuite/tests/basic/boxedints.ml
--+++ b/testsuite/tests/basic/boxedints.ml
--@@ -55,7 +55,6 @@ module type TESTSIG = sig
--     val minus_one: t
--     val min_int: t
--     val max_int: t
---    val format : string -> t -> string
--     val to_string: t -> string
--     val of_string: string -> t
--   end
--@@ -114,18 +113,15 @@ struct
--     test 10 (of_string "0x80000000") min_int;
--     test 11 (of_string "0xFFFFFFFF") minus_one;
+--  printf "\nlx negative\n%!";
+-+  printf "\nlX negative\n%!";
+-   test (sprintf "%lX" (-42l) = "FFFFFFD6");
+-+  test_roundtrip "0x%lX" Int32.of_string "0x80000000";
+-+  test_roundtrip "0x%lX" Int32.of_string "0xFFFFFFFF";
 - 
---    testing_function "to_string, format";
--+    testing_function "to_string";
--     List.iter (fun (n, s) -> test n (to_string (of_string s)) s)
--       [1, "0"; 2, "123"; 3, "-456"; 4, "1234567890";
--        5, "1073741824"; 6, "2147483647"; 7, "-2147483648"];
---    List.iter (fun (n, s) -> test n (format "0x%X" (of_string s)) s)
---      [8, "0x0"; 9, "0x123"; 10, "0xABCDEF"; 11, "0x12345678";
---       12, "0x7FFFFFFF"; 13, "0x80000000"; 14, "0xFFFFFFFF"];
---    test 15 (to_string max_int) "2147483647";
---    test 16 (to_string min_int) "-2147483648";
---    test 17 (to_string zero) "0";
---    test 18 (to_string one) "1";
---    test 19 (to_string minus_one) "-1";
--+    test 8 (to_string max_int) "2147483647";
--+    test 9 (to_string min_int) "-2147483648";
--+    test 10 (to_string zero) "0";
--+    test 11 (to_string one) "1";
--+    test 12 (to_string minus_one) "-1";
+-   printf "\nlo positive\n%!";
+-   test (sprintf "%lo" 42l = "52");
+-@@ -593,9 +604,16 @@ try
+-   test (sprintf "%*LX" 5 42L = "   2A");
+-   (*test (sprintf "%-0+ #*LX" 5 42L = "0X2A ");*)
+-     (* >> '-' is incompatible with '0' *)
+-+  test_roundtrip "0x%LX" Int64.of_string "0x0";
+-+  test_roundtrip "0x%LX" Int64.of_string "0x123";
+-+  test_roundtrip "0x%LX" Int64.of_string "0xABCDEF";
+-+  test_roundtrip "0x%LX" Int64.of_string "0x1234567812345678";
+-+  test_roundtrip "0x%LX" Int64.of_string "0x7FFFFFFFFFFFFFFF";
 - 
--     testing_function "neg";
--     test 1 (neg (of_int 0)) (of_int 0);
--@@ -373,21 +369,17 @@ struct
--     test 10 (of_string "0x8000000000000000") min_int;
--     test 11 (of_string "0xFFFFFFFFFFFFFFFF") minus_one;
+--  printf "\nLx negative\n%!";
+-+  printf "\nLX negative\n%!";
+-   test (sprintf "%LX" (-42L) = "FFFFFFFFFFFFFFD6");
+-+  test_roundtrip "0x%LX" Int64.of_string "0x8000000000000000";
+-+  test_roundtrip "0x%LX" Int64.of_string "0xFFFFFFFFFFFFFFFF";
 - 
---    testing_function "to_string, format";
--+    testing_function "to_string";
--     List.iter (fun (n, s) -> test n (to_string (of_string s)) s)
--       [1, "0"; 2, "123"; 3, "-456"; 4, "1234567890";
--        5, "1234567890123456789";
--        6, "9223372036854775807";
--        7, "-9223372036854775808"];
---    List.iter (fun (n, s) -> test n ("0x" ^ format "%X" (of_string s)) s)
---      [8, "0x0"; 9, "0x123"; 10, "0xABCDEF"; 11, "0x1234567812345678";
---       12, "0x7FFFFFFFFFFFFFFF"; 13, "0x8000000000000000";
---       14, "0xFFFFFFFFFFFFFFFF"];
---    test 15 (to_string max_int) "9223372036854775807";
---    test 16 (to_string min_int) "-9223372036854775808";
---    test 17 (to_string zero) "0";
---    test 18 (to_string one) "1";
---    test 19 (to_string minus_one) "-1";
--+    test 8 (to_string max_int) "9223372036854775807";
--+    test 9 (to_string min_int) "-9223372036854775808";
--+    test 10 (to_string zero) "0";
--+    test 11 (to_string one) "1";
--+    test 12 (to_string minus_one) "-1";
+-   printf "\nLo positive\n%!";
+-   test (sprintf "%Lo" 42L = "52");
+-diff --git a/testsuite/tests/lib-printf/tprintf.reference b/testsuite/tests/lib-printf/tprintf.reference
+---- a/testsuite/tests/lib-printf/tprintf.reference
+-+++ b/testsuite/tests/lib-printf/tprintf.reference
+-@@ -59,43 +59,43 @@ lx positive
+- lx negative
+-  239
+- lX positive
+-- 240 241 242 243 244 245
+--lx negative
+-- 246
+-+ 240 241 242 243 244 245 246 247 248 249 250
+-+lX negative
+-+ 251 252 253
+- lo positive
+-- 247 248 249 250 251 252
+-+ 254 255 256 257 258 259
+- lo negative
+-- 253
+-+ 260
+- Ld/Li positive
+-- 254 255 256 257 258
+-+ 261 262 263 264 265
+- Ld/Li negative
+-- 259 260 261 262 263
+-+ 266 267 268 269 270
+- Lu positive
+-- 264 265 266 267 268
+-+ 271 272 273 274 275
+- Lu negative
+-- 269
+--Lx positive
+-- 270 271 272 273 274 275
+--Lx negative
+-  276
+--LX positive
+-+Lx positive
+-  277 278 279 280 281 282
+- Lx negative
+-  283
+-+LX positive
+-+ 284 285 286 287 288 289 290 291 292 293 294
+-+LX negative
+-+ 295 296 297
+- Lo positive
+-- 284 285 286 287 288 289
+-+ 298 299 300 301 302 303
+- Lo negative
+-- 290
+-+ 304
+- a
+-- 291
+-+ 305
+- t
+-- 292
+-+ 306
+- {...%}
+-- 293
+-+ 307
+- (...%)
+-- 294
+-+ 308
+- ! % @ , and constants
+-- 295 296 297 298 299 300 301
+-+ 309 310 311 312 313 314 315
+- end of tests
 - 
--     testing_function "neg";
--     test 1 (neg (of_int 0)) (of_int 0);
--diff --git a/testsuite/tests/basic/boxedints.reference b/testsuite/tests/basic/boxedints.reference
----- a/testsuite/tests/basic/boxedints.reference
--+++ b/testsuite/tests/basic/boxedints.reference
--@@ -7,8 +7,8 @@ unsigned_to_int
--  1... 2... 3... 4... 5... 6...
-- of_string
--  1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11...
---to_string, format
--- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
--+to_string
--+ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12...
-- neg
--  1... 2... 3... 4... 5... 6...
-- add
--@@ -52,8 +52,8 @@ unsigned_to_int
--  1... 2... 3... 4... 5... 6...
-- of_string
--  1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11...
---to_string, format
--- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
--+to_string
--+ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12...
-- neg
--  1... 2... 3... 4... 5... 6...
-- add
--@@ -93,8 +93,8 @@ unsigned_to_int
--  1... 2... 3... 4... 5... 6...
-- of_string
--  1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11...
---to_string, format
--- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
--+to_string
--+ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12...
-- neg
--  1... 2... 3... 4... 5... 6...
-- add
- diff --git a/testsuite/tests/lib-printf/tprintf.ml b/testsuite/tests/lib-printf/tprintf.ml
- --- a/testsuite/tests/lib-printf/tprintf.ml
- +++ b/testsuite/tests/lib-printf/tprintf.ml
+- All tests succeeded.
