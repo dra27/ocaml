@@ -2,10 +2,10 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 71d35985f9..031fccffda 100644
+index 0d0e86ef0c..dee4f6434a 100644
 --- a/Changes
 +++ b/Changes
-@@ -118,7 +118,7 @@ OCaml 4.14.0
+@@ -121,7 +121,7 @@ OCaml 4.14.0
    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
     Damien Doligez)
  
@@ -14,7 +14,7 @@ index 71d35985f9..031fccffda 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -211,6 +211,9 @@ OCaml 4.14.0
+@@ -214,6 +214,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -24,7 +24,7 @@ index 71d35985f9..031fccffda 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -511,6 +514,10 @@ OCaml 4.14.0
+@@ -514,6 +517,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -3903,7 +3903,7 @@ index 0000000000..39658a617f
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f8a588e9d6
+index 0000000000..a1ed714eaa
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,3868 @@
@@ -3911,10 +3911,10 @@ index 0000000000..f8a588e9d6
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 71d35985f9..031fccffda 100644
++index 0d0e86ef0c..dee4f6434a 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -118,7 +118,7 @@ OCaml 4.14.0
++@@ -121,7 +121,7 @@ OCaml 4.14.0
 +   (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
 +    Damien Doligez)
 + 
@@ -3923,7 +3923,7 @@ index 0000000000..f8a588e9d6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -211,6 +211,9 @@ OCaml 4.14.0
++@@ -214,6 +214,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -3933,7 +3933,7 @@ index 0000000000..f8a588e9d6
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -511,6 +514,10 @@ OCaml 4.14.0
++@@ -514,6 +517,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
