@@ -1,8 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..f986d879ee
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:33.391342045 +0100
+++++ b	2023-09-28 18:43:33.403342547 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -252,6 +252,10 @@ OCaml 4.14.0
+++@@ -255,6 +255,10 @@ OCaml 4.14.0
++  - #10527: Show "#help;; for help" at toplevel startup
++    (Wiktor Kuchta, review by David Allsopp and Florian Angeletti)
++  
 diff --git a/Changes b/Changes
-index 0d0e86ef0c..dee4f6434a 100644
+index d5dc43635a..37719ca0e8 100644
 --- a/Changes
 +++ b/Changes
 @@ -121,7 +121,7 @@ OCaml 4.14.0
@@ -24,7 +38,7 @@ index 0d0e86ef0c..dee4f6434a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -514,6 +517,10 @@ OCaml 4.14.0
+@@ -518,6 +521,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -3917,15 +3931,29 @@ index 0000000000..39658a617f
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1cc6875fa3
+index 0000000000..8285b373bd
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3868 @@
+@@ -0,0 +1,3871 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..f986d879ee
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:33.391342045 +0100
++++++ b	2023-09-28 18:43:33.403342547 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -252,6 +252,10 @@ OCaml 4.14.0
++++@@ -255,6 +255,10 @@ OCaml 4.14.0
+++  - #10527: Show "#help;; for help" at toplevel startup
+++    (Wiktor Kuchta, review by David Allsopp and Florian Angeletti)
+++  
 +diff --git a/Changes b/Changes
-+index 0d0e86ef0c..dee4f6434a 100644
++index d5dc43635a..37719ca0e8 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -121,7 +121,7 @@ OCaml 4.14.0
@@ -3947,7 +3975,7 @@ index 0000000000..1cc6875fa3
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -514,6 +517,10 @@ OCaml 4.14.0
++@@ -518,6 +521,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
@@ -7777,18 +7805,7 @@ index 0000000000..1cc6875fa3
 +++         The value print has no valid type if t/279 is shadowed
 ++ |}]
 ++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index b3804d00e5..827cc4affc 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.m
+++ module ty
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644

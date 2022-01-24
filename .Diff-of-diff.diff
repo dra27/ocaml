@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:33.391342045 +0100
++++ b	2023-09-28 18:43:33.403342547 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -252,6 +252,10 @@ OCaml 4.14.0
++@@ -255,6 +255,10 @@ OCaml 4.14.0
+  - #10527: Show "#help;; for help" at toplevel startup
+    (Wiktor Kuchta, review by David Allsopp and Florian Angeletti)
+  
