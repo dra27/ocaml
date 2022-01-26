@@ -18,10 +18,6 @@
 type t
 
 external thread_initialize : unit -> unit = "caml_thread_initialize"
-(*
-external thread_initialize_domain : unit -> unit =
-            "caml_thread_initialize_domain"
-*)
 external thread_cleanup : unit -> unit = "caml_thread_cleanup"
 external thread_new : (unit -> unit) -> t = "caml_thread_new"
 external thread_uncaught_exception : exn -> unit =
@@ -44,18 +40,25 @@ let uncaught_exception_handler = ref default_uncaught_exception_handler
 
 let set_uncaught_exception_handler fn = uncaught_exception_handler := fn
 
+exception Exit
+
 let create fn arg =
   thread_new
     (fun () ->
       try
         fn arg;
         ignore (Sys.opaque_identity (check_memprof_cb ()))
-      with exn ->
+      with
+      | Exit ->
+        ignore (Sys.opaque_identity (check_memprof_cb ()))
+      | exn ->
         let raw_backtrace = Printexc.get_raw_backtrace () in
         flush stdout; flush stderr;
         try
           !uncaught_exception_handler exn
-        with exn' ->
+        with
+        | Exit -> ()
+        | exn' ->
           Printf.eprintf
             "Thread %d killed on uncaught exception %s\n"
             (id (self ())) (Printexc.to_string exn);
@@ -70,6 +73,11 @@ let exit () =
   ignore (Sys.opaque_identity (check_memprof_cb ()));
   exit_stub ()
 
+(* Thread.kill is currently not implemented due to problems with
+   cleanup handlers on several platforms *)
+
+let kill th = invalid_arg "Thread.kill: not implemented"
+
 (* Preemption *)
 
 let preempt signal = yield()
@@ -83,9 +91,6 @@ let preempt_signal =
 
 let () =
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-(*
-  Domain.at_startup thread_initialize_domain;
-*)
   thread_initialize ();
   Callback.register "Thread.at_shutdown" (fun () ->
     thread_cleanup();
@@ -99,6 +104,9 @@ let () =
 (* Wait functions *)
 
 let delay = Unix.sleepf
+
+let wait_read fd = ()
+let wait_write fd = ()
 
 let wait_timed_read fd d =
   match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
