@@ -1,11 +1,128 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..b5087c4712
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,114 @@
++--- a	2023-09-28 18:43:34.083370964 +0100
+++++ b	2023-09-28 18:43:34.095371465 +0100
++@@ -20,7 +20,7 @@
++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
++ --- a/otherlibs/systhreads/thread.ml
++ +++ b/otherlibs/systhreads/thread.ml
++-@@ -29,7 +29,6 @@ external yield : unit -> unit = "caml_thread_yield"
+++@@ -31,7 +31,6 @@ external yield : unit -> unit = "caml_thread_yield"
++  external self : unit -> t = "caml_thread_self" [@@noalloc]
++  external id : t -> int = "caml_thread_id" [@@noalloc]
++  external join : t -> unit = "caml_thread_join"
++@@ -28,7 +28,7 @@
++  
++  (* For new, make sure the function passed to thread_new never
++     raises an exception. *)
++-@@ -42,18 +41,25 @@ let uncaught_exception_handler = ref default_uncaught_exception_handler
+++@@ -44,18 +43,25 @@ let uncaught_exception_handler = ref default_uncaught_exception_handler
++  
++  let set_uncaught_exception_handler fn = uncaught_exception_handler := fn
++  
++@@ -56,7 +56,7 @@
++            Printf.eprintf
++              "Thread %d killed on uncaught exception %s\n"
++              (id (self ())) (Printexc.to_string exn);
++-@@ -65,8 +71,7 @@ let create fn arg =
+++@@ -67,8 +73,7 @@ let create fn arg =
++            flush stderr)
++  
++  let exit () =
++@@ -121,32 +121,32 @@
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  Thread 3 killed on uncaught exception Failure("1")
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  Thread 4 killed on uncaught exception Failure("2")
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  Thread 5 killed on uncaught exception Failure("3")
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  Thread 1 killed on uncaught exception Failure("backtrace")
++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++  Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
++  Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++ diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
++ --- a/testsuite/tests/backtrace/callstack.reference
++ +++ b/testsuite/tests/backtrace/callstack.reference
++@@ -154,8 +154,8 @@
++  Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
++  Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
++  Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++ diff --git a/testsuite/tests/lib-threads/bufchan.ml b/testsuite/tests/lib-threads/bufchan.ml
++ --- a/testsuite/tests/lib-threads/bufchan.ml
++ +++ b/testsuite/tests/lib-threads/bufchan.ml
++@@ -248,21 +248,21 @@
++ @@ -1,12 +1,15 @@
++  Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
++  Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  [thread 2] caught Uncaught_exception_handler.CallbackExn
++  Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
++  Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++  Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
++ -Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-26
++--Called from Thread.create.(fun) in file "thread.ml", line 55, characters 10-41
+++-Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
++ +Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-17
++-+Called from Thread.create.(fun) in file "thread.ml", line 59, characters 10-41
++++Called from Thread.create.(fun) in file "thread.ml", line 58, characters 10-41
++ +[thread 3] caught Uncaught_exception_handler.CallbackExn
++ +Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
 diff --git a/Changes b/Changes
-index d5dc43635a..37719ca0e8 100644
+index 5cee122e02..08170d37e9 100644
 --- a/Changes
 +++ b/Changes
-@@ -121,7 +121,7 @@ OCaml 4.14.0
+@@ -130,7 +130,7 @@ OCaml 4.14.0
    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
     Damien Doligez)
  
@@ -14,7 +131,7 @@ index d5dc43635a..37719ca0e8 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -214,6 +214,9 @@ OCaml 4.14.0
+@@ -223,6 +223,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -24,7 +141,7 @@ index d5dc43635a..37719ca0e8 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -518,6 +521,10 @@ OCaml 4.14.0
+@@ -527,6 +530,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -3917,18 +4034,135 @@ index 0000000000..39658a617f
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4b0bff23db
+index 0000000000..31ba6280bb
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3868 @@
+@@ -0,0 +1,3985 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..b5087c4712
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,114 @@
+++--- a	2023-09-28 18:43:34.083370964 +0100
++++++ b	2023-09-28 18:43:34.095371465 +0100
+++@@ -20,7 +20,7 @@
+++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+++ --- a/otherlibs/systhreads/thread.ml
+++ +++ b/otherlibs/systhreads/thread.ml
+++-@@ -29,7 +29,6 @@ external yield : unit -> unit = "caml_thread_yield"
++++@@ -31,7 +31,6 @@ external yield : unit -> unit = "caml_thread_yield"
+++  external self : unit -> t = "caml_thread_self" [@@noalloc]
+++  external id : t -> int = "caml_thread_id" [@@noalloc]
+++  external join : t -> unit = "caml_thread_join"
+++@@ -28,7 +28,7 @@
+++  
+++  (* For new, make sure the function passed to thread_new never
+++     raises an exception. *)
+++-@@ -42,18 +41,25 @@ let uncaught_exception_handler = ref default_uncaught_exception_handler
++++@@ -44,18 +43,25 @@ let uncaught_exception_handler = ref default_uncaught_exception_handler
+++  
+++  let set_uncaught_exception_handler fn = uncaught_exception_handler := fn
+++  
+++@@ -56,7 +56,7 @@
+++            Printf.eprintf
+++              "Thread %d killed on uncaught exception %s\n"
+++              (id (self ())) (Printexc.to_string exn);
+++-@@ -65,8 +71,7 @@ let create fn arg =
++++@@ -67,8 +73,7 @@ let create fn arg =
+++            flush stderr)
+++  
+++  let exit () =
+++@@ -121,32 +121,32 @@
+++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  Thread 3 killed on uncaught exception Failure("1")
+++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  Thread 4 killed on uncaught exception Failure("2")
+++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  Thread 5 killed on uncaught exception Failure("3")
+++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++  Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++  Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  Thread 1 killed on uncaught exception Failure("backtrace")
+++  Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++  Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
+++  Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++ diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
+++ --- a/testsuite/tests/backtrace/callstack.reference
+++ +++ b/testsuite/tests/backtrace/callstack.reference
+++@@ -154,8 +154,8 @@
+++  Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
+++  Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
+++  Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++ diff --git a/testsuite/tests/lib-threads/bufchan.ml b/testsuite/tests/lib-threads/bufchan.ml
+++ --- a/testsuite/tests/lib-threads/bufchan.ml
+++ +++ b/testsuite/tests/lib-threads/bufchan.ml
+++@@ -248,21 +248,21 @@
+++ @@ -1,12 +1,15 @@
+++  Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
+++  Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  [thread 2] caught Uncaught_exception_handler.CallbackExn
+++  Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
+++  Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++++-Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
+++  Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
+++ -Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-26
+++--Called from Thread.create.(fun) in file "thread.ml", line 55, characters 10-41
++++-Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
+++ +Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-17
+++-+Called from Thread.create.(fun) in file "thread.ml", line 59, characters 10-41
+++++Called from Thread.create.(fun) in file "thread.ml", line 58, characters 10-41
+++ +[thread 3] caught Uncaught_exception_handler.CallbackExn
+++ +Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++-+Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++++Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
 +diff --git a/Changes b/Changes
-+index d5dc43635a..37719ca0e8 100644
++index 5cee122e02..08170d37e9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -121,7 +121,7 @@ OCaml 4.14.0
++@@ -130,7 +130,7 @@ OCaml 4.14.0
 +   (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
 +    Damien Doligez)
 + 
@@ -3937,7 +4171,7 @@ index 0000000000..4b0bff23db
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -214,6 +214,9 @@ OCaml 4.14.0
++@@ -223,6 +223,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -3947,7 +4181,7 @@ index 0000000000..4b0bff23db
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -518,6 +521,10 @@ OCaml 4.14.0
++@@ -527,6 +530,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
@@ -7788,7 +8022,7 @@ index 0000000000..4b0bff23db
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.m
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644
@@ -8459,7 +8693,7 @@ index 0000000000..3a62747829
 +
 +end
 diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-index a2fffc4426..b5bde91c4a 100644
+index 4e751926ce..89c9d173aa 100644
 --- a/otherlibs/systhreads/thread.ml
 +++ b/otherlibs/systhreads/thread.ml
 @@ -18,8 +18,10 @@
@@ -8473,7 +8707,7 @@ index a2fffc4426..b5bde91c4a 100644
  external thread_cleanup : unit -> unit = "caml_thread_cleanup"
  external thread_new : (unit -> unit) -> t = "caml_thread_new"
  external thread_uncaught_exception : exn -> unit =
-@@ -81,7 +83,9 @@ let preempt_signal =
+@@ -86,7 +88,9 @@ let preempt_signal =
  
  let () =
    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
