@@ -1,44 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..167933005f
+index 0000000000..1456295019
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,33 @@
-+--- a	2023-09-28 18:43:35.635435765 +0100
-++++ b	2023-09-28 18:43:35.647436266 +0100
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:35.903446951 +0100
+++++ b	2023-09-28 18:43:35.915447452 +0100
 +@@ -1,7 +1,7 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -33,7 +33,7 @@ OCaml 4.14.0
-++@@ -124,7 +124,7 @@ OCaml 4.14.0
-+  - #10549: Stack overflow detection and naked pointers checking for ARM64
-+    (Xavier Leroy, review by Stephen Dolan)
++-@@ -244,6 +244,9 @@ OCaml 4.14.0
+++@@ -247,6 +247,9 @@ OCaml 4.14.0
 +  
-+@@ -10,21 +10,3 @@
-+    are used.  This will break C stub code that uses these old names and
-+    treats warnings as errors.  The workaround is to use the new names.
-+    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
-+-diff --git a/runtime/caml/compatibility.h b/runtime/caml/compatibility.h
-+---- a/runtime/caml/compatibility.h
-+-+++ b/runtime/caml/compatibility.h
-+-@@ -307,10 +307,10 @@
-+- /* ************************************************************* */
-+- 
-+- /* **** otherlibs/bigarray */
-+--#define int8 CAML_DEPRECATED("int8", "caml_ba_int8") caml_ba_int8
-+--#define uint8 CAML_DEPRECATED("uint8", "caml_ba_uint8") caml_ba_uint8
-+--#define int16 CAML_DEPRECATED("int16", "caml_ba_int16") caml_ba_int16
-+--#define uint16 CAML_DEPRECATED("uint16", "caml_ba_uint16") caml_ba_uint16
-+-+#define int8 caml_ba_int8
-+-+#define uint8 caml_ba_uint8
-+-+#define int16 caml_ba_int16
-+-+#define uint16 caml_ba_uint16
-+- #define MAX_NUM_DIMS CAML_DEPRECATED("MAX_NUM_DIMS", "CAML_BA_MAX_NUM_DIMS") CAML_BA_MAX_NUM_DIMS
-+- #define caml_bigarray_kind CAML_DEPRECATED("caml_bigarray_kind", "caml_ba_kind") caml_ba_kind
-+- #define BIGARRAY_FLOAT32 CAML_DEPRECATED("BIGARRAY_FLOAT32", "CAML_BA_FLOAT32") CAML_BA_FLOAT32
++  ### Tools:
++  
 diff --git a/Changes b/Changes
-index 2a79a4fe16..920a004d9c 100644
+index f684bada34..9f91342c72 100644
 --- a/Changes
 +++ b/Changes
 @@ -124,13 +124,13 @@ OCaml 4.14.0
@@ -67,7 +45,7 @@ index 2a79a4fe16..920a004d9c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -532,6 +535,10 @@ OCaml 4.14.0
+@@ -535,6 +538,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -3982,51 +3960,29 @@ index 0000000000..0de170ef92
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..97cecd4d81
+index 0000000000..d7cc95c4c0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3967 @@
+@@ -0,0 +1,3866 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..167933005f
++index 0000000000..1456295019
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,33 @@
-++--- a	2023-09-28 18:43:35.635435765 +0100
-+++++ b	2023-09-28 18:43:35.647436266 +0100
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:35.903446951 +0100
++++++ b	2023-09-28 18:43:35.915447452 +0100
 ++@@ -1,7 +1,7 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -33,7 +33,7 @@ OCaml 4.14.0
-+++@@ -124,7 +124,7 @@ OCaml 4.14.0
-++  - #10549: Stack overflow detection and naked pointers checking for ARM64
-++    (Xavier Leroy, review by Stephen Dolan)
+++-@@ -244,6 +244,9 @@ OCaml 4.14.0
++++@@ -247,6 +247,9 @@ OCaml 4.14.0
 ++  
-++@@ -10,21 +10,3 @@
-++    are used.  This will break C stub code that uses these old names and
-++    treats warnings as errors.  The workaround is to use the new names.
-++    (Xavier Leroy and David Allsopp, review by Sébastien Hinderer and
-++-diff --git a/runtime/caml/compatibility.h b/runtime/caml/compatibility.h
-++---- a/runtime/caml/compatibility.h
-++-+++ b/runtime/caml/compatibility.h
-++-@@ -307,10 +307,10 @@
-++- /* ************************************************************* */
-++- 
-++- /* **** otherlibs/bigarray */
-++--#define int8 CAML_DEPRECATED("int8", "caml_ba_int8") caml_ba_int8
-++--#define uint8 CAML_DEPRECATED("uint8", "caml_ba_uint8") caml_ba_uint8
-++--#define int16 CAML_DEPRECATED("int16", "caml_ba_int16") caml_ba_int16
-++--#define uint16 CAML_DEPRECATED("uint16", "caml_ba_uint16") caml_ba_uint16
-++-+#define int8 caml_ba_int8
-++-+#define uint8 caml_ba_uint8
-++-+#define int16 caml_ba_int16
-++-+#define uint16 caml_ba_uint16
-++- #define MAX_NUM_DIMS CAML_DEPRECATED("MAX_NUM_DIMS", "CAML_BA_MAX_NUM_DIMS") CAML_BA_MAX_NUM_DIMS
-++- #define caml_bigarray_kind CAML_DEPRECATED("caml_bigarray_kind", "caml_ba_kind") caml_ba_kind
-++- #define BIGARRAY_FLOAT32 CAML_DEPRECATED("BIGARRAY_FLOAT32", "CAML_BA_FLOAT32") CAML_BA_FLOAT32
+++  ### Tools:
+++  
 +diff --git a/Changes b/Changes
-+index 2a79a4fe16..920a004d9c 100644
++index f684bada34..9f91342c72 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -124,13 +124,13 @@ OCaml 4.14.0
@@ -4055,7 +4011,7 @@ index 0000000000..97cecd4d81
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -532,6 +535,10 @@ OCaml 4.14.0
++@@ -535,6 +538,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
@@ -7873,86 +7829,7 @@ index 0000000000..97cecd4d81
 ++-*** shared-libraries
 ++-**** setup-ocamlc.byte-build-env
 ++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++ 
++++* debugg
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644
