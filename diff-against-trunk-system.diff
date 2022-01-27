@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e7c7ea49a7
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:34.771399698 +0100
-++++ b	2023-09-28 18:43:34.783400199 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -237,6 +237,11 @@ OCaml 4.14.0
-++@@ -240,6 +240,11 @@ OCaml 4.14.0
-+    WSADuplicateSocket on sockets instead of DuplicateHandle.
-+    (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 2a79a4fe16..43b5da95b9 100644
 --- a/Changes
@@ -3953,27 +3939,13 @@ index 0000000000..8394ccc4db
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..70e3d4d76e
+index 0000000000..7cc93d0507
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3865 @@
+@@ -0,0 +1,3864 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e7c7ea49a7
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:34.771399698 +0100
-+++++ b	2023-09-28 18:43:34.783400199 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -237,6 +237,11 @@ OCaml 4.14.0
-+++@@ -240,6 +240,11 @@ OCaml 4.14.0
-++    WSADuplicateSocket on sockets instead of DuplicateHandle.
-++    (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 2a79a4fe16..43b5da95b9 100644
 +--- a/Changes
@@ -7821,7 +7793,20 @@ index 0000000000..70e3d4d76e
 +++**** ocamlc.byte
 ++ module = "printer.ml"
 ++-***** ocamlc.byte
-++-****
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644
