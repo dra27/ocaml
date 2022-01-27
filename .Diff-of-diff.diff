@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:43:35.215418236 +0100
++++ b	2023-09-28 18:43:35.219418403 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+ --- a/testsuite/tests/unwind/unwind_test.reference
+ +++ b/testsuite/tests/unwind/unwind_test.reference
+-@@ -4,7 +4,6 @@ Mylib.baz
++@@ -3,7 +3,6 @@ Mylib.baz
+  Driver.entry
+  caml_program
+  caml_start_program
+@@ -9,7 +9,7 @@
+  caml_main
+  main
+  ml_perform_stack_walk
+-@@ -13,6 +12,5 @@ Mylib.bob
++@@ -12,6 +11,5 @@ Mylib.bob
+  Driver.entry
+  caml_program
+  caml_start_program

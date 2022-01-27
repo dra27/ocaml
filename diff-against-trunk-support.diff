@@ -2549,7 +2549,7 @@ index 5636e9abe2..53e430713c 100644
  
  module type Sunderscore = sig
 diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-index b3804d00e5..827cc4affc 100644
+index fbcd16e8e1..56a5f30733 100644
 --- a/testsuite/tests/unwind/unwind_test.reference
 +++ b/testsuite/tests/unwind/unwind_test.reference
 @@ -1,5 +1,4 @@
