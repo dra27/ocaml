@@ -2,7 +2,7 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index f684bada34..9f91342c72 100644
+index a99d1dc670..92ba0d152f 100644
 --- a/Changes
 +++ b/Changes
 @@ -124,13 +124,13 @@ OCaml 4.14.0
@@ -3946,7 +3946,7 @@ index 0000000000..0de170ef92
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9f79e17353
+index 0000000000..342553ba40
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,3865 @@
@@ -3954,7 +3954,7 @@ index 0000000000..9f79e17353
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index f684bada34..9f91342c72 100644
++index a99d1dc670..92ba0d152f 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -124,13 +124,13 @@ OCaml 4.14.0
