@@ -1,25 +1,43 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..8f495db49a
+index 0000000000..2db0859b9b
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:37.155499168 +0100
-++++ b	2023-09-28 18:43:37.167499668 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -244,6 +244,11 @@ OCaml 4.14.0
-++@@ -247,6 +247,11 @@ OCaml 4.14.0
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:43:37.475512506 +0100
+++++ b	2023-09-28 18:43:37.515514173 +0100
++@@ -108,7 +108,7 @@
++  AC_SUBST([flexdll_chain])
++  AC_SUBST([flexlink_flags])
++  AC_SUBST([PACKLD])
++-@@ -372,37 +370,14 @@ AC_ARG_ENABLE([warn-error],
+++@@ -381,37 +379,14 @@ AC_ARG_ENABLE([warn-error],
++  AC_ARG_VAR([WINDOWS_UNICODE_MODE],
++    [how to handle Unicode under Windows: ansi, compatible])
 +  
-+  ### Tools:
++@@ -154,7 +154,7 @@
 +  
++  AC_ARG_ENABLE([flat-float-array],
++    [AS_HELP_STRING([--disable-flat-float-array],
++-@@ -1947,15 +1922,6 @@ AS_IF([test x"$with_afl" = "xyes"],
+++@@ -1981,15 +1956,6 @@ AS_IF([test x"$with_afl" = "xyes"],
++    [afl=true],
++    [afl=false])
++  
++@@ -439,7 +439,7 @@
++       in
++       match Env.open_pers_signature modname env with
++       | Error `Not_found ->
++-@@ -3442,7 +3442,7 @@ let failure_handler ~scopes loc ~failer () =
+++@@ -3490,7 +3490,7 @@ let failure_handler ~scopes loc ~failer () =
++      let sloc = Scoped_location.of_location ~scopes loc in
++      let slot =
++        transl_extension_path sloc
 diff --git a/Changes b/Changes
-index 02d2b39214..5b04728ca4 100644
+index e4457eac9b..46a19f2551 100644
 --- a/Changes
 +++ b/Changes
-@@ -124,13 +124,13 @@ OCaml 4.14.0
+@@ -129,13 +129,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -35,7 +53,7 @@ index 02d2b39214..5b04728ca4 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -223,6 +223,9 @@ OCaml 4.14.0
+@@ -228,6 +228,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -45,7 +63,7 @@ index 02d2b39214..5b04728ca4 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -540,6 +543,10 @@ OCaml 4.14.0
+@@ -545,6 +548,10 @@ OCaml 4.14.0
    toplevel, as in the bytecode toplevel.
    (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
  
@@ -57,7 +75,7 @@ index 02d2b39214..5b04728ca4 100644
  OCaml 4.13 maintenance branch
  -----------------------------
 diff --git a/Makefile.config.in b/Makefile.config.in
-index e4e22de4dd..9774884805 100644
+index 6ee1453d88..97cca9a733 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
 @@ -252,7 +252,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -369,13 +387,13 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 325eb58550..18dae84b3f 100755
+index dbeb15d7cc..7a5b1ed7ff 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 67831f74b9..0f72e5022d 100644
+index 2a7ef8637c..1775ea8435 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
+@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -384,7 +402,7 @@ index 67831f74b9..0f72e5022d 100644
  AC_SUBST([force_instrumented_runtime])
  
  ## Generated files
-@@ -301,9 +303,16 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -299,9 +301,16 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -404,7 +422,7 @@ index 67831f74b9..0f72e5022d 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-@@ -1059,93 +1068,93 @@ model=default
+@@ -1034,93 +1043,93 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -573,7 +591,7 @@ index 67831f74b9..0f72e5022d 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1808,7 +1817,8 @@ AS_CASE([$arch,$system],
+@@ -1783,7 +1792,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -583,7 +601,7 @@ index 67831f74b9..0f72e5022d 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1857,6 +1867,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1832,6 +1842,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -614,7 +632,7 @@ index 67831f74b9..0f72e5022d 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1966,8 +2000,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1932,8 +1966,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -3976,32 +3994,50 @@ index 0000000000..0de170ef92
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..936e6aa82d
+index 0000000000..1df01bce0f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3868 @@
+@@ -0,0 +1,3979 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..8f495db49a
++index 0000000000..2db0859b9b
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:37.155499168 +0100
-+++++ b	2023-09-28 18:43:37.167499668 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -244,6 +244,11 @@ OCaml 4.14.0
-+++@@ -247,6 +247,11 @@ OCaml 4.14.0
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:43:37.475512506 +0100
++++++ b	2023-09-28 18:43:37.515514173 +0100
+++@@ -108,7 +108,7 @@
+++  AC_SUBST([flexdll_chain])
+++  AC_SUBST([flexlink_flags])
+++  AC_SUBST([PACKLD])
+++-@@ -372,37 +370,14 @@ AC_ARG_ENABLE([warn-error],
++++@@ -381,37 +379,14 @@ AC_ARG_ENABLE([warn-error],
+++  AC_ARG_VAR([WINDOWS_UNICODE_MODE],
+++    [how to handle Unicode under Windows: ansi, compatible])
 ++  
-++  ### Tools:
+++@@ -154,7 +154,7 @@
 ++  
+++  AC_ARG_ENABLE([flat-float-array],
+++    [AS_HELP_STRING([--disable-flat-float-array],
+++-@@ -1947,15 +1922,6 @@ AS_IF([test x"$with_afl" = "xyes"],
++++@@ -1981,15 +1956,6 @@ AS_IF([test x"$with_afl" = "xyes"],
+++    [afl=true],
+++    [afl=false])
+++  
+++@@ -439,7 +439,7 @@
+++       in
+++       match Env.open_pers_signature modname env with
+++       | Error `Not_found ->
+++-@@ -3442,7 +3442,7 @@ let failure_handler ~scopes loc ~failer () =
++++@@ -3490,7 +3490,7 @@ let failure_handler ~scopes loc ~failer () =
+++      let sloc = Scoped_location.of_location ~scopes loc in
+++      let slot =
+++        transl_extension_path sloc
 +diff --git a/Changes b/Changes
-+index 02d2b39214..5b04728ca4 100644
++index e4457eac9b..46a19f2551 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -124,13 +124,13 @@ OCaml 4.14.0
++@@ -129,13 +129,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -4017,7 +4053,7 @@ index 0000000000..936e6aa82d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -223,6 +223,9 @@ OCaml 4.14.0
++@@ -228,6 +228,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -4027,7 +4063,7 @@ index 0000000000..936e6aa82d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -540,6 +543,10 @@ OCaml 4.14.0
++@@ -545,6 +548,10 @@ OCaml 4.14.0
 +   toplevel, as in the bytecode toplevel.
 +   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 + 
@@ -4039,7 +4075,7 @@ index 0000000000..936e6aa82d
 + OCaml 4.13 maintenance branch
 + -----------------------------
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index e4e22de4dd..9774884805 100644
++index 6ee1453d88..97cca9a733 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
 +@@ -252,7 +252,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -4351,13 +4387,13 @@ index 0000000000..936e6aa82d
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 325eb58550..18dae84b3f 100755
++index dbeb15d7cc..7a5b1ed7ff 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 67831f74b9..0f72e5022d 100644
++index 2a7ef8637c..1775ea8435 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
++@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -4366,7 +4402,7 @@ index 0000000000..936e6aa82d
 + AC_SUBST([force_instrumented_runtime])
 + 
 + ## Generated files
-+@@ -301,9 +303,16 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -299,9 +301,16 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -4386,7 +4422,7 @@ index 0000000000..936e6aa82d
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-+@@ -1059,93 +1068,93 @@ model=default
++@@ -1034,93 +1043,93 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -4555,7 +4591,7 @@ index 0000000000..936e6aa82d
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1808,7 +1817,8 @@ AS_CASE([$arch,$system],
++@@ -1783,7 +1792,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -4565,7 +4601,7 @@ index 0000000000..936e6aa82d
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1857,6 +1867,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1832,6 +1842,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -4596,7 +4632,7 @@ index 0000000000..936e6aa82d
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1966,8 +2000,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1932,8 +1966,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -7847,10 +7883,103 @@ index 0000000000..936e6aa82d
 ++ *)
 ++ 
 ++ (* This file only contains the specification of how to run the test *)
-++diff --git a/t
+++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++index b2d6e6e7c5..f22a4bd50f 100644
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   rea
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 65fc5e06a5..2da5f4b0bc 100644
+index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
@@ -9424,7 +9553,7 @@ index 7c7ee74fbf..f2878b7bb3 100644
    opEVENT, Nothing;
    opBREAK, Nothing;
 diff --git a/utils/config.mlp b/utils/config.mlp
-index 7f927f1fe6..8ea002b166 100644
+index 8deabaf112..d1746d25d8 100644
 --- a/utils/config.mlp
 +++ b/utils/config.mlp
 @@ -122,7 +122,11 @@ let max_tag = 243
