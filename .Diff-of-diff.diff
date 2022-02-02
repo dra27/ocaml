@@ -1,0 +1,29 @@
+--- a	2023-09-28 18:43:38.351549008 +0100
++++ b	2023-09-28 18:43:38.355549174 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
+ --- a/testsuite/tests/parallel/domain_id.ml
+ +++ b/testsuite/tests/parallel/domain_id.ml
+-@@ -7,8 +7,12 @@ include unix
++@@ -9,8 +9,12 @@ include unix
+  
+  open Domain
+  
+@@ -15,7 +15,7 @@
+  
+  let newdom_id () =
+    let d = Domain.spawn id in
+-@@ -16,25 +20,6 @@ let newdom_id () =
++@@ -18,25 +22,6 @@ let newdom_id () =
+    join d;
+    (n :> int)
+  
+@@ -41,7 +41,7 @@
+  let test_different_ids () =
+    let d1 = Domain.spawn id in
+    let d2 = Domain.spawn id in
+-@@ -45,6 +30,6 @@ let test_different_ids () =
++@@ -47,6 +32,6 @@ let test_different_ids () =
+  
+  
+  let () =

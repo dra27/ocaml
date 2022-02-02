@@ -1473,7 +1473,7 @@ index 6c79145ba7..279f178774 100644
  
  let _ =
 diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-index 023d425346..79a2fe48a8 100644
+index be723cbf13..ae6aab1c39 100644
 --- a/testsuite/tests/parallel/domain_id.ml
 +++ b/testsuite/tests/parallel/domain_id.ml
 @@ -1,8 +1,10 @@

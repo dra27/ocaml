@@ -1,6 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..6ac0bd212b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:43:38.351549008 +0100
+++++ b	2023-09-28 18:43:38.355549174 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
++ --- a/testsuite/tests/parallel/domain_id.ml
++ +++ b/testsuite/tests/parallel/domain_id.ml
++-@@ -7,8 +7,12 @@ include unix
+++@@ -9,8 +9,12 @@ include unix
++  
++  open Domain
++  
++@@ -15,7 +15,7 @@
++  
++  let newdom_id () =
++    let d = Domain.spawn id in
++-@@ -16,25 +20,6 @@ let newdom_id () =
+++@@ -18,25 +22,6 @@ let newdom_id () =
++    join d;
++    (n :> int)
++  
++@@ -41,7 +41,7 @@
++  let test_different_ids () =
++    let d1 = Domain.spawn id in
++    let d2 = Domain.spawn id in
++-@@ -45,6 +30,6 @@ let test_different_ids () =
+++@@ -47,6 +32,6 @@ let test_different_ids () =
++  
++  
++  let () =
 diff --git a/Changes b/Changes
 index 2ecb1a4e3f..f06dc39648 100644
 --- a/Changes
@@ -3987,13 +4019,45 @@ index 0000000000..0de170ef92
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..229d1a6351
+index 0000000000..3f7a423e5c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3983 @@
+@@ -0,0 +1,3988 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..6ac0bd212b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:43:38.351549008 +0100
++++++ b	2023-09-28 18:43:38.355549174 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
+++ --- a/testsuite/tests/parallel/domain_id.ml
+++ +++ b/testsuite/tests/parallel/domain_id.ml
+++-@@ -7,8 +7,12 @@ include unix
++++@@ -9,8 +9,12 @@ include unix
+++  
+++  open Domain
+++  
+++@@ -15,7 +15,7 @@
+++  
+++  let newdom_id () =
+++    let d = Domain.spawn id in
+++-@@ -16,25 +20,6 @@ let newdom_id () =
++++@@ -18,25 +22,6 @@ let newdom_id () =
+++    join d;
+++    (n :> int)
+++  
+++@@ -41,7 +41,7 @@
+++  let test_different_ids () =
+++    let d1 = Domain.spawn id in
+++    let d2 = Domain.spawn id in
+++-@@ -45,6 +30,6 @@ let test_different_ids () =
++++@@ -47,6 +32,6 @@ let test_different_ids () =
+++  
+++  
+++  let () =
 +diff --git a/Changes b/Changes
 +index 2ecb1a4e3f..f06dc39648 100644
 +--- a/Changes
@@ -7946,34 +8010,7 @@ index 0000000000..229d1a6351
 ++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++ 
+++-(* TEST 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
