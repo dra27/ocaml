@@ -1,38 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6ac0bd212b
+index 0000000000..e5d218d061
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:43:38.351549008 +0100
-++++ b	2023-09-28 18:43:38.355549174 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-+ --- a/testsuite/tests/parallel/domain_id.ml
-+ +++ b/testsuite/tests/parallel/domain_id.ml
-+-@@ -7,8 +7,12 @@ include unix
-++@@ -9,8 +9,12 @@ include unix
-+  
-+  open Domain
-+  
-+@@ -15,7 +15,7 @@
-+  
-+  let newdom_id () =
-+    let d = Domain.spawn id in
-+-@@ -16,25 +20,6 @@ let newdom_id () =
-++@@ -18,25 +22,6 @@ let newdom_id () =
-+    join d;
-+    (n :> int)
-+  
-+@@ -41,7 +41,7 @@
-+  let test_different_ids () =
-+    let d1 = Domain.spawn id in
-+    let d2 = Domain.spawn id in
-+-@@ -45,6 +30,6 @@ let test_different_ids () =
-++@@ -47,6 +32,6 @@ let test_different_ids () =
-+  
-+  
-+  let () =
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:38.615560004 +0100
+++++ b	2023-09-28 18:43:38.623560337 +0100
++@@ -13,7 +13,7 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -574,27 +574,27 @@ let emit_instr env fallthrough i =
+++@@ -596,27 +596,27 @@ let emit_instr env fallthrough i =
++        if n <> 0
++        then cfi_adjust_cfa_offset n;
++        env.stack_offset <- env.stack_offset + n
 diff --git a/Changes b/Changes
 index 2ecb1a4e3f..f06dc39648 100644
 --- a/Changes
@@ -112,7 +94,7 @@ index d85ccfb1a2..201f1e75c1 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index ef768b11d8..e7dec0460a 100644
+index b7208c1ff4..24864d0f67 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -63,6 +63,7 @@ let cfi_endproc () =
@@ -326,10 +308,10 @@ index 64b05a95c8..dbeaff0cbe 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index 4e0b391338..9823a80f19 100644
+index f92ec296a1..7fe7ef5c96 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -2200,8 +2200,13 @@ let assignment_kind
+@@ -2203,8 +2203,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -1403,7 +1385,7 @@ index 0000000000..73a1c0d390
 ++}
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..0de170ef92
+index 0000000000..de1762df35
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,2610 @@
@@ -2882,7 +2864,7 @@ index 0000000000..0de170ef92
 + 
 + let _ =
 +diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-+index 023d425346..79a2fe48a8 100644
++index be723cbf13..ae6aab1c39 100644
 +--- a/testsuite/tests/parallel/domain_id.ml
 ++++ b/testsuite/tests/parallel/domain_id.ml
 +@@ -1,8 +1,10 @@
@@ -4019,45 +4001,27 @@ index 0000000000..0de170ef92
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3f7a423e5c
+index 0000000000..12e1373e86
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3988 @@
+@@ -0,0 +1,3980 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6ac0bd212b
++index 0000000000..e5d218d061
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:43:38.351549008 +0100
-+++++ b	2023-09-28 18:43:38.355549174 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-++ --- a/testsuite/tests/parallel/domain_id.ml
-++ +++ b/testsuite/tests/parallel/domain_id.ml
-++-@@ -7,8 +7,12 @@ include unix
-+++@@ -9,8 +9,12 @@ include unix
-++  
-++  open Domain
-++  
-++@@ -15,7 +15,7 @@
-++  
-++  let newdom_id () =
-++    let d = Domain.spawn id in
-++-@@ -16,25 +20,6 @@ let newdom_id () =
-+++@@ -18,25 +22,6 @@ let newdom_id () =
-++    join d;
-++    (n :> int)
-++  
-++@@ -41,7 +41,7 @@
-++  let test_different_ids () =
-++    let d1 = Domain.spawn id in
-++    let d2 = Domain.spawn id in
-++-@@ -45,6 +30,6 @@ let test_different_ids () =
-+++@@ -47,6 +32,6 @@ let test_different_ids () =
-++  
-++  
-++  let () =
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:38.615560004 +0100
++++++ b	2023-09-28 18:43:38.623560337 +0100
+++@@ -13,7 +13,7 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -574,27 +574,27 @@ let emit_instr env fallthrough i =
++++@@ -596,27 +596,27 @@ let emit_instr env fallthrough i =
+++        if n <> 0
+++        then cfi_adjust_cfa_offset n;
+++        env.stack_offset <- env.stack_offset + n
 +diff --git a/Changes b/Changes
 +index 2ecb1a4e3f..f06dc39648 100644
 +--- a/Changes
@@ -4137,7 +4101,7 @@ index 0000000000..3f7a423e5c
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index ef768b11d8..e7dec0460a 100644
++index b7208c1ff4..24864d0f67 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -63,6 +63,7 @@ let cfi_endproc () =
@@ -4351,10 +4315,10 @@ index 0000000000..3f7a423e5c
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index 4e0b391338..9823a80f19 100644
++index f92ec296a1..7fe7ef5c96 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -2200,8 +2200,13 @@ let assignment_kind
++@@ -2203,8 +2203,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -5428,7 +5392,7 @@ index 0000000000..3f7a423e5c
 +++}
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..0de170ef92
++index 0000000000..de1762df35
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,2610 @@
@@ -6907,7 +6871,7 @@ index 0000000000..3f7a423e5c
 ++ 
 ++ let _ =
 ++diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-++index 023d425346..79a2fe48a8 100644
+++index be723cbf13..ae6aab1c39 100644
 ++--- a/testsuite/tests/parallel/domain_id.ml
 +++++ b/testsuite/tests/parallel/domain_id.ml
 ++@@ -1,8 +1,10 @@
@@ -8010,7 +7974,17 @@ index 0000000000..3f7a423e5c
 ++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++@@ -1,4 +1,7 @@
-++-(* TEST 
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_h
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
