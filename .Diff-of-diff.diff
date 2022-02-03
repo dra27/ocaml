@@ -1,0 +1,15 @@
+--- a	2023-09-28 18:43:39.555599141 +0100
++++ b	2023-09-28 18:43:39.583600306 +0100
+@@ -1,9 +1,9 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -545,6 +545,8 @@ OCaml 4.14.0
+-   toplevel, as in the bytecode toplevel.
+-   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
++@@ -552,6 +552,8 @@ OCaml 4.14.0
++   operation in `NO_SHARING` mode.
++   (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
+  
+ +- #10907, #10959: Wrong type inferred from existential types
+ +  (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
