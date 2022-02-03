@@ -1,26 +1,8 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e432d1e15f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,15 @@
-+--- a	2023-09-28 18:43:39.555599141 +0100
-++++ b	2023-09-28 18:43:39.583600306 +0100
-+@@ -1,9 +1,9 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -545,6 +545,8 @@ OCaml 4.14.0
-+-   toplevel, as in the bytecode toplevel.
-+-   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
-++@@ -552,6 +552,8 @@ OCaml 4.14.0
-++   operation in `NO_SHARING` mode.
-++   (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
-+  
-+ +- #10907, #10959: Wrong type inferred from existential types
-+ +  (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index f57f649f70..14fc5f60aa 100644
+index 99ebc2bc70..14fc5f60aa 100644
 --- a/Changes
 +++ b/Changes
 @@ -129,13 +129,13 @@ OCaml 4.14.0
@@ -49,17 +31,6 @@ index f57f649f70..14fc5f60aa 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -545,6 +548,10 @@ OCaml 4.14.0
-   toplevel, as in the bytecode toplevel.
-   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
- 
-+- #10853: `Obj.reachable_words` could crash if called after a marshaling
-+  operation in `NO_SHARING` mode.
-+  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
-+
- - #10907, #10959: Wrong type inferred from existential types
-   (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
- 
 diff --git a/Makefile.config.in b/Makefile.config.in
 index 6ee1453d88..97cca9a733 100644
 --- a/Makefile.config.in
@@ -4027,33 +3998,15 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..57ede91614
+index 0000000000..2ddb6ff1b6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3972 @@
+@@ -0,0 +1,3976 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e432d1e15f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,15 @@
-++--- a	2023-09-28 18:43:39.555599141 +0100
-+++++ b	2023-09-28 18:43:39.583600306 +0100
-++@@ -1,9 +1,9 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -545,6 +545,8 @@ OCaml 4.14.0
-++-   toplevel, as in the bytecode toplevel.
-++-   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
-+++@@ -552,6 +552,8 @@ OCaml 4.14.0
-+++   operation in `NO_SHARING` mode.
-+++   (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
-++  
-++ +- #10907, #10959: Wrong type inferred from existential types
-++ +  (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index f57f649f70..14fc5f60aa 100644
++index 99ebc2bc70..14fc5f60aa 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -129,13 +129,13 @@ OCaml 4.14.0
@@ -4082,17 +4035,6 @@ index 0000000000..57ede91614
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -545,6 +548,10 @@ OCaml 4.14.0
-+   toplevel, as in the bytecode toplevel.
-+   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
-+ 
-++- #10853: `Obj.reachable_words` could crash if called after a marshaling
-++  operation in `NO_SHARING` mode.
-++  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
-++
-+ - #10907, #10959: Wrong type inferred from existential types
-+   (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
-+ 
 +diff --git a/Makefile.config.in b/Makefile.config.in
 +index 6ee1453d88..97cca9a733 100644
 +--- a/Makefile.config.in
@@ -8002,7 +7944,40 @@ index 0000000000..57ede91614
 ++index fbcd16e8e1..56a5f30733 100644
 ++--- a/testsuite/tests/unwind/unwind_test.reference
 +++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
