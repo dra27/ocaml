@@ -1,8 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..2e0358119d
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:40.155624111 +0100
+++++ b	2023-09-28 18:43:40.167624610 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -541,6 +541,10 @@ OCaml 4.14.0
+++@@ -544,6 +544,10 @@ OCaml 4.14.0
++  - #10822, #10823: Bad interaction between ambivalent types and subtyping
++    coercions (Jacques Garrigue, report and review by Frédéric Bour)
++  
 diff --git a/Changes b/Changes
-index 99ebc2bc70..14fc5f60aa 100644
+index 73db3a8d1d..0f2a66877a 100644
 --- a/Changes
 +++ b/Changes
 @@ -129,13 +129,13 @@ OCaml 4.14.0
@@ -3998,15 +4012,29 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2ddb6ff1b6
+index 0000000000..453854ebb6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,3976 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..2e0358119d
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:40.155624111 +0100
++++++ b	2023-09-28 18:43:40.167624610 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -541,6 +541,10 @@ OCaml 4.14.0
++++@@ -544,6 +544,10 @@ OCaml 4.14.0
+++  - #10822, #10823: Bad interaction between ambivalent types and subtyping
+++    coercions (Jacques Garrigue, report and review by Frédéric Bour)
+++  
 +diff --git a/Changes b/Changes
-+index 99ebc2bc70..14fc5f60aa 100644
++index 73db3a8d1d..0f2a66877a 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -129,13 +129,13 @@ OCaml 4.14.0
@@ -7964,20 +7992,6 @@ index 0000000000..2ddb6ff1b6
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

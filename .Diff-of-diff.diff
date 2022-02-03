@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:40.155624111 +0100
++++ b	2023-09-28 18:43:40.167624610 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -541,6 +541,10 @@ OCaml 4.14.0
++@@ -544,6 +544,10 @@ OCaml 4.14.0
+  - #10822, #10823: Bad interaction between ambivalent types and subtyping
+    coercions (Jacques Garrigue, report and review by Frédéric Bour)
+  
