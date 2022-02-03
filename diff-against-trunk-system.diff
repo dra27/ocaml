@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e5d218d061
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:38.615560004 +0100
-++++ b	2023-09-28 18:43:38.623560337 +0100
-+@@ -13,7 +13,7 @@
-+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+ --- a/asmcomp/amd64/emit.mlp
-+ +++ b/asmcomp/amd64/emit.mlp
-+-@@ -574,27 +574,27 @@ let emit_instr env fallthrough i =
-++@@ -596,27 +596,27 @@ let emit_instr env fallthrough i =
-+        if n <> 0
-+        then cfi_adjust_cfa_offset n;
-+        env.stack_offset <- env.stack_offset + n
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 2ecb1a4e3f..f06dc39648 100644
 --- a/Changes
@@ -4001,27 +3987,13 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..12e1373e86
+index 0000000000..41ccec9a5b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3980 @@
+@@ -0,0 +1,3983 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e5d218d061
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:38.615560004 +0100
-+++++ b	2023-09-28 18:43:38.623560337 +0100
-++@@ -13,7 +13,7 @@
-++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-++ --- a/asmcomp/amd64/emit.mlp
-++ +++ b/asmcomp/amd64/emit.mlp
-++-@@ -574,27 +574,27 @@ let emit_instr env fallthrough i =
-+++@@ -596,27 +596,27 @@ let emit_instr env fallthrough i =
-++        if n <> 0
-++        then cfi_adjust_cfa_offset n;
-++        env.stack_offset <- env.stack_offset + n
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 2ecb1a4e3f..f06dc39648 100644
 +--- a/Changes
@@ -7984,7 +7956,24 @@ index 0000000000..12e1373e86
 ++   let r' = ref 0 in
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_h
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 7f80b8ab26..0791f4e53f 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,4 +1,6 @@
+++ (* TEST
++++ 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
