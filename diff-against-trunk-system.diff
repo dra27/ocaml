@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..f68aedff73
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:43:40.963657720 +0100
-++++ b	2023-09-28 18:43:40.979658386 +0100
-+@@ -53,7 +53,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -389,6 +389,10 @@ AC_ARG_ENABLE([function-sections],
-++@@ -398,6 +398,10 @@ AC_ARG_ENABLE([function-sections],
-+    [],
-+    [enable_function_sections=auto])
-+  
-+@@ -64,7 +64,7 @@
-+  AC_ARG_WITH([afl],
-+    [AS_HELP_STRING([--with-afl],
-+      [use the AFL fuzzer])])
-+-@@ -1885,6 +1889,25 @@ AS_IF([test x"$enable_flat_float_array" = "xno"],
-++@@ -1919,6 +1923,25 @@ AS_IF([test x"$enable_flat_float_array" = "xno"],
-+    [AC_DEFINE([FLAT_FLOAT_ARRAY])
-+    flat_float_array=true])
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index f16cb847ad..b3a05695d2 100644
 --- a/Changes
@@ -627,10 +604,40 @@ index 4ca2310651..c52fb86b1b 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..c0fff52807
+index 0000000000..b47fc313c5
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,772 @@
+@@ -0,0 +1,1057 @@
++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
++index 043e07031e..b7a6a9a6bb 100644
++--- a/otherlibs/systhreads/st_stubs.c
+++++ b/otherlibs/systhreads/st_stubs.c
++@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
++ {
++   caml_thread_t th = (caml_thread_t) arg;
++   value clos;
++-  void * signal_stack;
++ #ifdef NATIVE_CODE
++   struct longjmp_buffer termination_buf;
++   char tos;
++@@ -537,7 +536,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
++   /* Acquire the global mutex */
++   caml_leave_blocking_section();
++   st_thread_set_id(Ident(th->descr));
++-  signal_stack = caml_setup_stack_overflow_detection();
+++  caml_setup_stack_overflow_detection();
++ #ifdef NATIVE_CODE
++   /* Setup termination handler (for caml_thread_exit) */
++   if (sigsetjmp(termination_buf.buf, 0) == 0) {
++@@ -551,7 +550,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
++ #ifdef NATIVE_CODE
++   }
++ #endif
++-  caml_stop_stack_overflow_detection(signal_stack);
+++  caml_stop_stack_overflow_detection();
++   /* The thread now stops running */
++   return 0;
++ }
 +diff --git a/runtime/Makefile b/runtime/Makefile
 +index f5c08d8798..dee25dc02a 100644
 +--- a/runtime/Makefile
@@ -665,6 +672,19 @@ index 0000000000..c0fff52807
 + # We sort the primitive file and remove duplicates to avoid this problem.
 + 
 + # Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
++diff --git a/runtime/bigarray.c b/runtime/bigarray.c
++index ed4ff67d21..871b81ef21 100644
++--- a/runtime/bigarray.c
+++++ b/runtime/bigarray.c
++@@ -524,7 +524,7 @@ CAMLprim value caml_ba_create(value vkind, value vlayout, value vdim)
++    are within the bounds and return the offset of the corresponding
++    array element in the data part of the array. */
++ 
++-static intnat caml_ba_offset(struct caml_ba_array * b, intnat * index)
+++static long caml_ba_offset(struct caml_ba_array * b, intnat * index)
++ {
++   intnat offset;
++   int i;
 +diff --git a/runtime/caml/alloc.h b/runtime/caml/alloc.h
 +index 13f0fac2fb..816da799bb 100644
 +--- a/runtime/caml/alloc.h
@@ -1184,6 +1204,20 @@ index 0000000000..c0fff52807
 + #include "misc.h"
 + #include "mlvalues.h"
 + 
++diff --git a/runtime/caml/fix_code.h b/runtime/caml/fix_code.h
++index 2eafaa814b..83c393a17d 100644
++--- a/runtime/caml/fix_code.h
+++++ b/runtime/caml/fix_code.h
++@@ -34,7 +34,8 @@ void caml_set_instruction (code_t pos, opcode_t instr);
++ int caml_is_instruction (opcode_t instr1, opcode_t instr2);
++ 
++ #ifdef THREADED_CODE
++-void caml_init_thread_code(void ** instr_table, void * instr_base);
+++extern char ** caml_instr_table;
+++extern char * caml_instr_base;
++ void caml_thread_code (code_t code, asize_t len);
++ #endif
++ 
 +diff --git a/runtime/caml/intext.h b/runtime/caml/intext.h
 +index a2a3fb8248..b68030aad8 100644
 +--- a/runtime/caml/intext.h
@@ -1212,7 +1246,7 @@ index 0000000000..c0fff52807
 + #undef FLAT_FLOAT_ARRAY
 + 
 +diff --git a/runtime/caml/memory.h b/runtime/caml/memory.h
-+index 1e9cdf6d9b..8837d33d25 100644
++index d9e58bc2d0..8837d33d25 100644
 +--- a/runtime/caml/memory.h
 ++++ b/runtime/caml/memory.h
 +@@ -18,9 +18,6 @@
@@ -1225,8 +1259,17 @@ index 0000000000..c0fff52807
 + #include "config.h"
 + #ifdef CAML_INTERNALS
 + #include "gc.h"
++@@ -329,7 +326,7 @@ struct caml__roots_block {
++   #define CAMLunused_start __attribute__ ((unused))
++   #define CAMLunused_end
++   #define CAMLunused __attribute__ ((unused))
++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
+++#elif _MSC_VER >= 1500
++   #define CAMLunused_start  __pragma( warning (push) )           \
++     __pragma( warning (disable:4189 ) )
++   #define CAMLunused_end __pragma( warning (pop))
 +diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-+index 5915c30a7b..46bc21511b 100644
++index c605f8711e..46bc21511b 100644
 +--- a/runtime/caml/misc.h
 ++++ b/runtime/caml/misc.h
 +@@ -18,9 +18,6 @@
@@ -1239,6 +1282,58 @@ index 0000000000..c0fff52807
 + #include "config.h"
 + 
 + /* Standard definitions */
++@@ -35,7 +32,7 @@
++   /* Supported since at least GCC 3.1 */
++   #define CAMLdeprecated_typedef(name, type) \
++     typedef type name __attribute ((deprecated))
++-#elif defined(_MSC_VER) && _MSC_VER >= 1310
+++#elif _MSC_VER >= 1310
++   /* NB deprecated("message") only supported from _MSC_VER >= 1400 */
++   #define CAMLdeprecated_typedef(name, type) \
++     typedef __declspec(deprecated) type name
++@@ -43,8 +40,7 @@
++   #define CAMLdeprecated_typedef(name, type) typedef type name
++ #endif
++ 
++-#if defined(__GNUC__) && __STDC_VERSION__ >= 199901L \
++- || defined(_MSC_VER) && _MSC_VER >= 1925
+++#if defined(__GNUC__) && __STDC_VERSION__ >= 199901L || _MSC_VER >= 1925
++ 
++ #define CAML_STRINGIFY(x) #x
++ #ifdef _MSC_VER
++@@ -91,7 +87,7 @@ CAMLdeprecated_typedef(addr, char *);
++   #define CAMLnoreturn_start
++   #define CAMLnoreturn_end __attribute__ ((noreturn))
++   #define Noreturn __attribute__ ((noreturn))
++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
+++#elif _MSC_VER >= 1500
++   #define CAMLnoreturn_start __declspec(noreturn)
++   #define CAMLnoreturn_end
++   #define Noreturn
++@@ -139,12 +135,11 @@ CAMLdeprecated_typedef(addr, char *);
++ /* we need to be able to compute the exact offset of each member. */
++ #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
++ #define CAMLalign(n) _Alignas(n)
++-#elif defined(__cplusplus) \
++-   && (__cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1900)
+++#elif defined(__cplusplus) && (__cplusplus >= 201103L || _MSC_VER >= 1900)
++ #define CAMLalign(n) alignas(n)
++ #elif defined(SUPPORTS_ALIGNED_ATTRIBUTE)
++ #define CAMLalign(n) __attribute__((aligned(n)))
++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
+++#elif _MSC_VER >= 1500
++ #define CAMLalign(n) __declspec(align(n))
++ #else
++ #error "How do I align values on this platform?"
++@@ -172,7 +167,7 @@ CAMLdeprecated_typedef(addr, char *);
++   #define CAMLunused_start __attribute__ ((unused))
++   #define CAMLunused_end
++   #define CAMLunused __attribute__ ((unused))
++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
+++#elif _MSC_VER >= 1500
++   #define CAMLunused_start  __pragma( warning (push) )           \
++     __pragma( warning (disable:4189 ) )
++   #define CAMLunused_end __pragma( warning (pop))
 +diff --git a/runtime/caml/mlvalues.h b/runtime/caml/mlvalues.h
 +index 677e44e183..00143e5ea0 100644
 +--- a/runtime/caml/mlvalues.h
@@ -1266,7 +1361,7 @@ index 0000000000..c0fff52807
 + CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
 + CAMLextern int caml_string_is_c_safe (value);
 +diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
-+index c6aeebfc78..3a3b86911c 100644
++index 62b0e7fafa..3a3b86911c 100644
 +--- a/runtime/caml/signals.h
 ++++ b/runtime/caml/signals.h
 +@@ -20,9 +20,6 @@
@@ -1279,6 +1374,17 @@ index 0000000000..c0fff52807
 + #include "misc.h"
 + #include "mlvalues.h"
 + 
++@@ -87,8 +84,8 @@ value caml_do_pending_actions_exn (void);
++ value caml_process_pending_actions_with_root (value extra_root); // raises
++ value caml_process_pending_actions_with_root_exn (value extra_root);
++ int caml_set_signal_action(int signo, int action);
++-CAMLextern void * caml_setup_stack_overflow_detection(void);
++-CAMLextern int caml_stop_stack_overflow_detection(void *);
+++CAMLextern int caml_setup_stack_overflow_detection(void);
+++CAMLextern int caml_stop_stack_overflow_detection(void);
++ CAMLextern void caml_init_signals(void);
++ CAMLextern void caml_terminate_signals(void);
++ CAMLextern void (*caml_enter_blocking_section_hook)(void);
 +diff --git a/runtime/dune b/runtime/dune
 +index 78c39300ed..23eb1d1e8a 100644
 +--- a/runtime/dune
@@ -1315,6 +1421,27 @@ index 0000000000..c0fff52807
 +     caml_register_code_fragment((char *) sym, (char *) sym2,
 +                                 DIGEST_LATER, NULL);
 + 
++diff --git a/runtime/fix_code.c b/runtime/fix_code.c
++index 5584019867..aa059be5df 100644
++--- a/runtime/fix_code.c
+++++ b/runtime/fix_code.c
++@@ -82,14 +82,8 @@ void caml_fixup_endianness(code_t code, asize_t len)
++ 
++ #ifdef THREADED_CODE
++ 
++-static char ** caml_instr_table;
++-static char * caml_instr_base;
++-
++-void caml_init_thread_code(void ** instr_table, void * instr_base)
++-{
++-  caml_instr_table = (char **) instr_table;
++-  caml_instr_base = (char *) instr_base;
++-}
+++char ** caml_instr_table;
+++char * caml_instr_base;
++ 
++ static int* opcode_nargs = NULL;
++ int* caml_init_opcode_nargs(void)
 +diff --git a/runtime/gen_primitives.sh b/runtime/gen_primitives.sh
 +index a727d5c25c..e76b3300b7 100755
 +--- a/runtime/gen_primitives.sh
@@ -1328,6 +1455,32 @@ index 0000000000..c0fff52807
 +   do
 +       sed -n -e 's/^CAMLprim value \([a-z0-9_][a-z0-9_]*\).*/\1/p' "$prim.c"
 +   done
++diff --git a/runtime/interp.c b/runtime/interp.c
++index e6700994bc..a59811c87d 100644
++--- a/runtime/interp.c
+++++ b/runtime/interp.c
++@@ -50,9 +50,9 @@ sp is a local copy of the global variable Caml_state->extern_sp. */
++ #ifdef THREADED_CODE
++ #  define Instruct(name) lbl_##name
++ #  if defined(ARCH_SIXTYFOUR) && !defined(ARCH_CODE32)
++-#    define Jumptbl_base &&lbl_ACC0
+++#    define Jumptbl_base ((char *) &&lbl_ACC0)
++ #  else
++-#    define Jumptbl_base 0
+++#    define Jumptbl_base ((char *) 0)
++ #    define jumptbl_base ((char *) 0)
++ #  endif
++ #  ifdef DEBUG
++@@ -249,7 +249,8 @@ value caml_interprete(code_t prog, asize_t prog_size)
++ 
++   if (prog == NULL) {           /* Interpreter is initializing */
++ #ifdef THREADED_CODE
++-    caml_init_thread_code(jumptable, Jumptbl_base);
+++    caml_instr_table = (char **) jumptable;
+++    caml_instr_base = Jumptbl_base;
++ #endif
++     return Val_unit;
++   }
 +diff --git a/runtime/prng.c b/runtime/prng.c
 +new file mode 100644
 +index 0000000000..4357afbbfb
@@ -1403,6 +1556,115 @@ index 0000000000..c0fff52807
 ++{
 ++  return caml_copy_int64(caml_lxm_next_unboxed(v));
 ++}
++diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
++index 7cb461ac4d..439fb56404 100644
++--- a/runtime/signals_byt.c
+++++ b/runtime/signals_byt.c
++@@ -81,7 +81,7 @@ int caml_set_signal_action(int signo, int action)
++     return 0;
++ }
++ 
++-CAMLexport void * caml_setup_stack_overflow_detection(void) { return NULL; }
++-CAMLexport int caml_stop_stack_overflow_detection(void * p) { return 0; }
+++CAMLexport int caml_setup_stack_overflow_detection(void) { return 0; }
+++CAMLexport int caml_stop_stack_overflow_detection(void) { return 0; }
++ CAMLexport void caml_init_signals(void) { }
++ CAMLexport void caml_terminate_signals(void) { }
++diff --git a/runtime/signals_nat.c b/runtime/signals_nat.c
++index 1dd8289c12..443f5d53b6 100644
++--- a/runtime/signals_nat.c
+++++ b/runtime/signals_nat.c
++@@ -254,10 +254,6 @@ DECLARE_SIGNAL_HANDLER(segv_handler)
++ 
++ /* Initialization of signal stuff */
++ 
++-#ifdef HAS_STACK_OVERFLOW_DETECTION
++-static void * caml_signal_stack = NULL;
++-#endif
++-
++ void caml_init_signals(void)
++ {
++   /* Bound-check trap handling */
++@@ -282,8 +278,7 @@ void caml_init_signals(void)
++ #endif
++ 
++ #ifdef HAS_STACK_OVERFLOW_DETECTION
++-  caml_signal_stack = caml_setup_stack_overflow_detection();
++-  if (caml_signal_stack != NULL) {
+++  if (caml_setup_stack_overflow_detection() != -1) {
++     struct sigaction act;
++     SET_SIGACT(act, segv_handler);
++     act.sa_flags |= SA_ONSTACK | SA_NODEFER;
++@@ -319,8 +314,7 @@ void caml_terminate_signals(void)
++ 
++ #ifdef HAS_STACK_OVERFLOW_DETECTION
++   set_signal_default(SIGSEGV);
++-  caml_stop_stack_overflow_detection(caml_signal_stack);
++-  caml_signal_stack = NULL;
+++  caml_stop_stack_overflow_detection();
++ #endif
++ }
++ 
++@@ -329,44 +323,37 @@ void caml_terminate_signals(void)
++    Each thread needs its own alternate stack.
++    The alternate stack used to be statically-allocated for the main thread,
++    but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
++-   may not be a compile-time constant (issue #10250).
++-   Return the dynamically-allocated alternate signal stack, or NULL
++-   if an error occurred.
++-   The returned pointer must be passed to [caml_stop_stack_overflow_detection].
++-*/
+++   may not be a compile-time constant (issue #10250). */
++ 
++-CAMLexport void * caml_setup_stack_overflow_detection(void)
+++CAMLexport int caml_setup_stack_overflow_detection(void)
++ {
++ #ifdef HAS_STACK_OVERFLOW_DETECTION
++   stack_t stk;
+++  stk.ss_sp = malloc(SIGSTKSZ);
+++  if (stk.ss_sp == NULL) return -1;
++   stk.ss_size = SIGSTKSZ;
++-  stk.ss_sp = malloc(stk.ss_size);
++-  if (stk.ss_sp == NULL) return NULL;
++   stk.ss_flags = 0;
++   if (sigaltstack(&stk, NULL) == -1) {
++     free(stk.ss_sp);
++-    return NULL;
+++    return -1;
++   }
++-  return stk.ss_sp;
++-#else
++-  return NULL;
++ #endif
+++  /* Success (or stack overflow detection not available) */
+++  return 0;
++ }
++ 
++-CAMLexport int caml_stop_stack_overflow_detection(void * signal_stack)
+++CAMLexport int caml_stop_stack_overflow_detection(void)
++ {
++ #ifdef HAS_STACK_OVERFLOW_DETECTION
++   stack_t oldstk, stk;
++   stk.ss_flags = SS_DISABLE;
++-  stk.ss_sp = NULL;  /* not required but avoids a valgrind false alarm */
++-  stk.ss_size = SIGSTKSZ; /* macOS wants a valid size here */
++   if (sigaltstack(&stk, &oldstk) == -1) return -1;
++-  /* Check whether someone else installed their own signal stack */
++-  if (!(oldstk.ss_flags & SS_DISABLE) && oldstk.ss_sp != signal_stack) {
++-    /* Re-activate their signal stack. */
++-    sigaltstack(&oldstk, NULL);
++-  }
++-  free(signal_stack);
++-#endif
+++  /* If caml_setup_stack_overflow_detection failed, we are not using
+++     an alternate signal stack.  SS_DISABLE will be set in oldstk,
+++     and there is nothing to free in this case. */
+++  if (! (oldstk.ss_flags & SS_DISABLE)) free(oldstk.ss_sp);
++   return 0;
+++#else
+++  return 0;
+++#endif
++ }
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
 index 0000000000..de1762df35
@@ -4021,36 +4283,13 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..480d695de0
+index 0000000000..32bcd7eb49
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3980 @@
+@@ -0,0 +1,4184 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..f68aedff73
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:43:40.963657720 +0100
-+++++ b	2023-09-28 18:43:40.979658386 +0100
-++@@ -53,7 +53,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -389,6 +389,10 @@ AC_ARG_ENABLE([function-sections],
-+++@@ -398,6 +398,10 @@ AC_ARG_ENABLE([function-sections],
-++    [],
-++    [enable_function_sections=auto])
-++  
-++@@ -64,7 +64,7 @@
-++  AC_ARG_WITH([afl],
-++    [AS_HELP_STRING([--with-afl],
-++      [use the AFL fuzzer])])
-++-@@ -1885,6 +1889,25 @@ AS_IF([test x"$enable_flat_float_array" = "xno"],
-+++@@ -1919,6 +1923,25 @@ AS_IF([test x"$enable_flat_float_array" = "xno"],
-++    [AC_DEFINE([FLAT_FLOAT_ARRAY])
-++    flat_float_array=true])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index f16cb847ad..b3a05695d2 100644
 +--- a/Changes
@@ -4654,10 +4893,40 @@ index 0000000000..480d695de0
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..c0fff52807
++index 0000000000..b47fc313c5
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,772 @@
++@@ -0,0 +1,1057 @@
+++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
+++index 043e07031e..b7a6a9a6bb 100644
+++--- a/otherlibs/systhreads/st_stubs.c
++++++ b/otherlibs/systhreads/st_stubs.c
+++@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
+++ {
+++   caml_thread_t th = (caml_thread_t) arg;
+++   value clos;
+++-  void * signal_stack;
+++ #ifdef NATIVE_CODE
+++   struct longjmp_buffer termination_buf;
+++   char tos;
+++@@ -537,7 +536,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
+++   /* Acquire the global mutex */
+++   caml_leave_blocking_section();
+++   st_thread_set_id(Ident(th->descr));
+++-  signal_stack = caml_setup_stack_overflow_detection();
++++  caml_setup_stack_overflow_detection();
+++ #ifdef NATIVE_CODE
+++   /* Setup termination handler (for caml_thread_exit) */
+++   if (sigsetjmp(termination_buf.buf, 0) == 0) {
+++@@ -551,7 +550,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
+++ #ifdef NATIVE_CODE
+++   }
+++ #endif
+++-  caml_stop_stack_overflow_detection(signal_stack);
++++  caml_stop_stack_overflow_detection();
+++   /* The thread now stops running */
+++   return 0;
+++ }
 ++diff --git a/runtime/Makefile b/runtime/Makefile
 ++index f5c08d8798..dee25dc02a 100644
 ++--- a/runtime/Makefile
@@ -4692,6 +4961,19 @@ index 0000000000..480d695de0
 ++ # We sort the primitive file and remove duplicates to avoid this problem.
 ++ 
 ++ # Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
+++diff --git a/runtime/bigarray.c b/runtime/bigarray.c
+++index ed4ff67d21..871b81ef21 100644
+++--- a/runtime/bigarray.c
++++++ b/runtime/bigarray.c
+++@@ -524,7 +524,7 @@ CAMLprim value caml_ba_create(value vkind, value vlayout, value vdim)
+++    are within the bounds and return the offset of the corresponding
+++    array element in the data part of the array. */
+++ 
+++-static intnat caml_ba_offset(struct caml_ba_array * b, intnat * index)
++++static long caml_ba_offset(struct caml_ba_array * b, intnat * index)
+++ {
+++   intnat offset;
+++   int i;
 ++diff --git a/runtime/caml/alloc.h b/runtime/caml/alloc.h
 ++index 13f0fac2fb..816da799bb 100644
 ++--- a/runtime/caml/alloc.h
@@ -5211,6 +5493,20 @@ index 0000000000..480d695de0
 ++ #include "misc.h"
 ++ #include "mlvalues.h"
 ++ 
+++diff --git a/runtime/caml/fix_code.h b/runtime/caml/fix_code.h
+++index 2eafaa814b..83c393a17d 100644
+++--- a/runtime/caml/fix_code.h
++++++ b/runtime/caml/fix_code.h
+++@@ -34,7 +34,8 @@ void caml_set_instruction (code_t pos, opcode_t instr);
+++ int caml_is_instruction (opcode_t instr1, opcode_t instr2);
+++ 
+++ #ifdef THREADED_CODE
+++-void caml_init_thread_code(void ** instr_table, void * instr_base);
++++extern char ** caml_instr_table;
++++extern char * caml_instr_base;
+++ void caml_thread_code (code_t code, asize_t len);
+++ #endif
+++ 
 ++diff --git a/runtime/caml/intext.h b/runtime/caml/intext.h
 ++index a2a3fb8248..b68030aad8 100644
 ++--- a/runtime/caml/intext.h
@@ -5239,7 +5535,7 @@ index 0000000000..480d695de0
 ++ #undef FLAT_FLOAT_ARRAY
 ++ 
 ++diff --git a/runtime/caml/memory.h b/runtime/caml/memory.h
-++index 1e9cdf6d9b..8837d33d25 100644
+++index d9e58bc2d0..8837d33d25 100644
 ++--- a/runtime/caml/memory.h
 +++++ b/runtime/caml/memory.h
 ++@@ -18,9 +18,6 @@
@@ -5252,8 +5548,17 @@ index 0000000000..480d695de0
 ++ #include "config.h"
 ++ #ifdef CAML_INTERNALS
 ++ #include "gc.h"
+++@@ -329,7 +326,7 @@ struct caml__roots_block {
+++   #define CAMLunused_start __attribute__ ((unused))
+++   #define CAMLunused_end
+++   #define CAMLunused __attribute__ ((unused))
+++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
++++#elif _MSC_VER >= 1500
+++   #define CAMLunused_start  __pragma( warning (push) )           \
+++     __pragma( warning (disable:4189 ) )
+++   #define CAMLunused_end __pragma( warning (pop))
 ++diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-++index 5915c30a7b..46bc21511b 100644
+++index c605f8711e..46bc21511b 100644
 ++--- a/runtime/caml/misc.h
 +++++ b/runtime/caml/misc.h
 ++@@ -18,9 +18,6 @@
@@ -5266,6 +5571,58 @@ index 0000000000..480d695de0
 ++ #include "config.h"
 ++ 
 ++ /* Standard definitions */
+++@@ -35,7 +32,7 @@
+++   /* Supported since at least GCC 3.1 */
+++   #define CAMLdeprecated_typedef(name, type) \
+++     typedef type name __attribute ((deprecated))
+++-#elif defined(_MSC_VER) && _MSC_VER >= 1310
++++#elif _MSC_VER >= 1310
+++   /* NB deprecated("message") only supported from _MSC_VER >= 1400 */
+++   #define CAMLdeprecated_typedef(name, type) \
+++     typedef __declspec(deprecated) type name
+++@@ -43,8 +40,7 @@
+++   #define CAMLdeprecated_typedef(name, type) typedef type name
+++ #endif
+++ 
+++-#if defined(__GNUC__) && __STDC_VERSION__ >= 199901L \
+++- || defined(_MSC_VER) && _MSC_VER >= 1925
++++#if defined(__GNUC__) && __STDC_VERSION__ >= 199901L || _MSC_VER >= 1925
+++ 
+++ #define CAML_STRINGIFY(x) #x
+++ #ifdef _MSC_VER
+++@@ -91,7 +87,7 @@ CAMLdeprecated_typedef(addr, char *);
+++   #define CAMLnoreturn_start
+++   #define CAMLnoreturn_end __attribute__ ((noreturn))
+++   #define Noreturn __attribute__ ((noreturn))
+++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
++++#elif _MSC_VER >= 1500
+++   #define CAMLnoreturn_start __declspec(noreturn)
+++   #define CAMLnoreturn_end
+++   #define Noreturn
+++@@ -139,12 +135,11 @@ CAMLdeprecated_typedef(addr, char *);
+++ /* we need to be able to compute the exact offset of each member. */
+++ #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+++ #define CAMLalign(n) _Alignas(n)
+++-#elif defined(__cplusplus) \
+++-   && (__cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1900)
++++#elif defined(__cplusplus) && (__cplusplus >= 201103L || _MSC_VER >= 1900)
+++ #define CAMLalign(n) alignas(n)
+++ #elif defined(SUPPORTS_ALIGNED_ATTRIBUTE)
+++ #define CAMLalign(n) __attribute__((aligned(n)))
+++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
++++#elif _MSC_VER >= 1500
+++ #define CAMLalign(n) __declspec(align(n))
+++ #else
+++ #error "How do I align values on this platform?"
+++@@ -172,7 +167,7 @@ CAMLdeprecated_typedef(addr, char *);
+++   #define CAMLunused_start __attribute__ ((unused))
+++   #define CAMLunused_end
+++   #define CAMLunused __attribute__ ((unused))
+++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
++++#elif _MSC_VER >= 1500
+++   #define CAMLunused_start  __pragma( warning (push) )           \
+++     __pragma( warning (disable:4189 ) )
+++   #define CAMLunused_end __pragma( warning (pop))
 ++diff --git a/runtime/caml/mlvalues.h b/runtime/caml/mlvalues.h
 ++index 677e44e183..00143e5ea0 100644
 ++--- a/runtime/caml/mlvalues.h
@@ -5293,7 +5650,7 @@ index 0000000000..480d695de0
 ++ CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
 ++ CAMLextern int caml_string_is_c_safe (value);
 ++diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
-++index c6aeebfc78..3a3b86911c 100644
+++index 62b0e7fafa..3a3b86911c 100644
 ++--- a/runtime/caml/signals.h
 +++++ b/runtime/caml/signals.h
 ++@@ -20,9 +20,6 @@
@@ -5306,6 +5663,17 @@ index 0000000000..480d695de0
 ++ #include "misc.h"
 ++ #include "mlvalues.h"
 ++ 
+++@@ -87,8 +84,8 @@ value caml_do_pending_actions_exn (void);
+++ value caml_process_pending_actions_with_root (value extra_root); // raises
+++ value caml_process_pending_actions_with_root_exn (value extra_root);
+++ int caml_set_signal_action(int signo, int action);
+++-CAMLextern void * caml_setup_stack_overflow_detection(void);
+++-CAMLextern int caml_stop_stack_overflow_detection(void *);
++++CAMLextern int caml_setup_stack_overflow_detection(void);
++++CAMLextern int caml_stop_stack_overflow_detection(void);
+++ CAMLextern void caml_init_signals(void);
+++ CAMLextern void caml_terminate_signals(void);
+++ CAMLextern void (*caml_enter_blocking_section_hook)(void);
 ++diff --git a/runtime/dune b/runtime/dune
 ++index 78c39300ed..23eb1d1e8a 100644
 ++--- a/runtime/dune
@@ -5342,6 +5710,27 @@ index 0000000000..480d695de0
 ++     caml_register_code_fragment((char *) sym, (char *) sym2,
 ++                                 DIGEST_LATER, NULL);
 ++ 
+++diff --git a/runtime/fix_code.c b/runtime/fix_code.c
+++index 5584019867..aa059be5df 100644
+++--- a/runtime/fix_code.c
++++++ b/runtime/fix_code.c
+++@@ -82,14 +82,8 @@ void caml_fixup_endianness(code_t code, asize_t len)
+++ 
+++ #ifdef THREADED_CODE
+++ 
+++-static char ** caml_instr_table;
+++-static char * caml_instr_base;
+++-
+++-void caml_init_thread_code(void ** instr_table, void * instr_base)
+++-{
+++-  caml_instr_table = (char **) instr_table;
+++-  caml_instr_base = (char *) instr_base;
+++-}
++++char ** caml_instr_table;
++++char * caml_instr_base;
+++ 
+++ static int* opcode_nargs = NULL;
+++ int* caml_init_opcode_nargs(void)
 ++diff --git a/runtime/gen_primitives.sh b/runtime/gen_primitives.sh
 ++index a727d5c25c..e76b3300b7 100755
 ++--- a/runtime/gen_primitives.sh
@@ -5355,6 +5744,32 @@ index 0000000000..480d695de0
 ++   do
 ++       sed -n -e 's/^CAMLprim value \([a-z0-9_][a-z0-9_]*\).*/\1/p' "$prim.c"
 ++   done
+++diff --git a/runtime/interp.c b/runtime/interp.c
+++index e6700994bc..a59811c87d 100644
+++--- a/runtime/interp.c
++++++ b/runtime/interp.c
+++@@ -50,9 +50,9 @@ sp is a local copy of the global variable Caml_state->extern_sp. */
+++ #ifdef THREADED_CODE
+++ #  define Instruct(name) lbl_##name
+++ #  if defined(ARCH_SIXTYFOUR) && !defined(ARCH_CODE32)
+++-#    define Jumptbl_base &&lbl_ACC0
++++#    define Jumptbl_base ((char *) &&lbl_ACC0)
+++ #  else
+++-#    define Jumptbl_base 0
++++#    define Jumptbl_base ((char *) 0)
+++ #    define jumptbl_base ((char *) 0)
+++ #  endif
+++ #  ifdef DEBUG
+++@@ -249,7 +249,8 @@ value caml_interprete(code_t prog, asize_t prog_size)
+++ 
+++   if (prog == NULL) {           /* Interpreter is initializing */
+++ #ifdef THREADED_CODE
+++-    caml_init_thread_code(jumptable, Jumptbl_base);
++++    caml_instr_table = (char **) jumptable;
++++    caml_instr_base = Jumptbl_base;
+++ #endif
+++     return Val_unit;
+++   }
 ++diff --git a/runtime/prng.c b/runtime/prng.c
 ++new file mode 100644
 ++index 0000000000..4357afbbfb
@@ -5430,6 +5845,115 @@ index 0000000000..480d695de0
 +++{
 +++  return caml_copy_int64(caml_lxm_next_unboxed(v));
 +++}
+++diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
+++index 7cb461ac4d..439fb56404 100644
+++--- a/runtime/signals_byt.c
++++++ b/runtime/signals_byt.c
+++@@ -81,7 +81,7 @@ int caml_set_signal_action(int signo, int action)
+++     return 0;
+++ }
+++ 
+++-CAMLexport void * caml_setup_stack_overflow_detection(void) { return NULL; }
+++-CAMLexport int caml_stop_stack_overflow_detection(void * p) { return 0; }
++++CAMLexport int caml_setup_stack_overflow_detection(void) { return 0; }
++++CAMLexport int caml_stop_stack_overflow_detection(void) { return 0; }
+++ CAMLexport void caml_init_signals(void) { }
+++ CAMLexport void caml_terminate_signals(void) { }
+++diff --git a/runtime/signals_nat.c b/runtime/signals_nat.c
+++index 1dd8289c12..443f5d53b6 100644
+++--- a/runtime/signals_nat.c
++++++ b/runtime/signals_nat.c
+++@@ -254,10 +254,6 @@ DECLARE_SIGNAL_HANDLER(segv_handler)
+++ 
+++ /* Initialization of signal stuff */
+++ 
+++-#ifdef HAS_STACK_OVERFLOW_DETECTION
+++-static void * caml_signal_stack = NULL;
+++-#endif
+++-
+++ void caml_init_signals(void)
+++ {
+++   /* Bound-check trap handling */
+++@@ -282,8 +278,7 @@ void caml_init_signals(void)
+++ #endif
+++ 
+++ #ifdef HAS_STACK_OVERFLOW_DETECTION
+++-  caml_signal_stack = caml_setup_stack_overflow_detection();
+++-  if (caml_signal_stack != NULL) {
++++  if (caml_setup_stack_overflow_detection() != -1) {
+++     struct sigaction act;
+++     SET_SIGACT(act, segv_handler);
+++     act.sa_flags |= SA_ONSTACK | SA_NODEFER;
+++@@ -319,8 +314,7 @@ void caml_terminate_signals(void)
+++ 
+++ #ifdef HAS_STACK_OVERFLOW_DETECTION
+++   set_signal_default(SIGSEGV);
+++-  caml_stop_stack_overflow_detection(caml_signal_stack);
+++-  caml_signal_stack = NULL;
++++  caml_stop_stack_overflow_detection();
+++ #endif
+++ }
+++ 
+++@@ -329,44 +323,37 @@ void caml_terminate_signals(void)
+++    Each thread needs its own alternate stack.
+++    The alternate stack used to be statically-allocated for the main thread,
+++    but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
+++-   may not be a compile-time constant (issue #10250).
+++-   Return the dynamically-allocated alternate signal stack, or NULL
+++-   if an error occurred.
+++-   The returned pointer must be passed to [caml_stop_stack_overflow_detection].
+++-*/
++++   may not be a compile-time constant (issue #10250). */
+++ 
+++-CAMLexport void * caml_setup_stack_overflow_detection(void)
++++CAMLexport int caml_setup_stack_overflow_detection(void)
+++ {
+++ #ifdef HAS_STACK_OVERFLOW_DETECTION
+++   stack_t stk;
++++  stk.ss_sp = malloc(SIGSTKSZ);
++++  if (stk.ss_sp == NULL) return -1;
+++   stk.ss_size = SIGSTKSZ;
+++-  stk.ss_sp = malloc(stk.ss_size);
+++-  if (stk.ss_sp == NULL) return NULL;
+++   stk.ss_flags = 0;
+++   if (sigaltstack(&stk, NULL) == -1) {
+++     free(stk.ss_sp);
+++-    return NULL;
++++    return -1;
+++   }
+++-  return stk.ss_sp;
+++-#else
+++-  return NULL;
+++ #endif
++++  /* Success (or stack overflow detection not available) */
++++  return 0;
+++ }
+++ 
+++-CAMLexport int caml_stop_stack_overflow_detection(void * signal_stack)
++++CAMLexport int caml_stop_stack_overflow_detection(void)
+++ {
+++ #ifdef HAS_STACK_OVERFLOW_DETECTION
+++   stack_t oldstk, stk;
+++   stk.ss_flags = SS_DISABLE;
+++-  stk.ss_sp = NULL;  /* not required but avoids a valgrind false alarm */
+++-  stk.ss_size = SIGSTKSZ; /* macOS wants a valid size here */
+++   if (sigaltstack(&stk, &oldstk) == -1) return -1;
+++-  /* Check whether someone else installed their own signal stack */
+++-  if (!(oldstk.ss_flags & SS_DISABLE) && oldstk.ss_sp != signal_stack) {
+++-    /* Re-activate their signal stack. */
+++-    sigaltstack(&oldstk, NULL);
+++-  }
+++-  free(signal_stack);
+++-#endif
++++  /* If caml_setup_stack_overflow_detection failed, we are not using
++++     an alternate signal stack.  SS_DISABLE will be set in oldstk,
++++     and there is nothing to free in this case. */
++++  if (! (oldstk.ss_flags & SS_DISABLE)) free(oldstk.ss_sp);
+++   return 0;
++++#else
++++  return 0;
++++#endif
+++ }
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
 +index 0000000000..de1762df35
@@ -7946,65 +8470,7 @@ index 0000000000..480d695de0
 ++ readonly_files = "printer.ml"
 ++ include debugger
 ++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "
+++-reason = "o
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
