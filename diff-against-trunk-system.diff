@@ -1,25 +1,37 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..2e0358119d
+index 0000000000..bdcdde1984
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:40.155624111 +0100
-++++ b	2023-09-28 18:43:40.167624610 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -541,6 +541,10 @@ OCaml 4.14.0
-++@@ -544,6 +544,10 @@ OCaml 4.14.0
-+  - #10822, #10823: Bad interaction between ambivalent types and subtyping
-+    coercions (Jacques Garrigue, report and review by Frédéric Bour)
+@@ -0,0 +1,23 @@
++--- a	2023-09-28 18:43:40.451636423 +0100
+++++ b	2023-09-28 18:43:40.471637255 +0100
++@@ -17,14 +17,16 @@
++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
++ --- a/otherlibs/systhreads/thread.ml
++ +++ b/otherlibs/systhreads/thread.ml
++-@@ -85,9 +85,9 @@ let preempt_signal =
+++@@ -100,11 +100,11 @@ let preempt_signal =
++    | _       -> Sys.sigvtalrm
 +  
++  let () =
++ -  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++--  Domain.at_startup thread_initialize_domain;
++-   thread_initialize ();
++-+  Domain.at_startup thread_initialize_domain;
++++  thread_initialize ();
+++ (* BACKPORT
+++   Domain.at_startup thread_initialize_domain;
+++ *)
+++-  thread_initialize ();
++ +  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++    Callback.register "Thread.at_shutdown" (fun () ->
++      thread_cleanup();
 diff --git a/Changes b/Changes
-index 73db3a8d1d..0f2a66877a 100644
+index 7f1c79066a..06db517a43 100644
 --- a/Changes
 +++ b/Changes
-@@ -129,13 +129,13 @@ OCaml 4.14.0
+@@ -135,13 +135,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -35,7 +47,7 @@ index 73db3a8d1d..0f2a66877a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -228,6 +228,9 @@ OCaml 4.14.0
+@@ -234,6 +234,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -4012,32 +4024,44 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..453854ebb6
+index 0000000000..da3055a7c8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3976 @@
+@@ -0,0 +1,3977 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..2e0358119d
++index 0000000000..bdcdde1984
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:40.155624111 +0100
-+++++ b	2023-09-28 18:43:40.167624610 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -541,6 +541,10 @@ OCaml 4.14.0
-+++@@ -544,6 +544,10 @@ OCaml 4.14.0
-++  - #10822, #10823: Bad interaction between ambivalent types and subtyping
-++    coercions (Jacques Garrigue, report and review by Frédéric Bour)
++@@ -0,0 +1,23 @@
+++--- a	2023-09-28 18:43:40.451636423 +0100
++++++ b	2023-09-28 18:43:40.471637255 +0100
+++@@ -17,14 +17,16 @@
+++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+++ --- a/otherlibs/systhreads/thread.ml
+++ +++ b/otherlibs/systhreads/thread.ml
+++-@@ -85,9 +85,9 @@ let preempt_signal =
++++@@ -100,11 +100,11 @@ let preempt_signal =
+++    | _       -> Sys.sigvtalrm
 ++  
+++  let () =
+++ -  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++--  Domain.at_startup thread_initialize_domain;
+++-   thread_initialize ();
+++-+  Domain.at_startup thread_initialize_domain;
+++++  thread_initialize ();
++++ (* BACKPORT
++++   Domain.at_startup thread_initialize_domain;
++++ *)
++++-  thread_initialize ();
+++ +  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++    Callback.register "Thread.at_shutdown" (fun () ->
+++      thread_cleanup();
 +diff --git a/Changes b/Changes
-+index 73db3a8d1d..0f2a66877a 100644
++index 7f1c79066a..06db517a43 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -129,13 +129,13 @@ OCaml 4.14.0
++@@ -135,13 +135,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -4053,7 +4077,7 @@ index 0000000000..453854ebb6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -228,6 +228,9 @@ OCaml 4.14.0
++@@ -234,6 +234,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -7980,18 +8004,7 @@ index 0000000000..453854ebb6
 ++ caml_program
 ++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
 ++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++--- 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -8662,7 +8675,7 @@ index 0000000000..3a62747829
 +
 +end
 diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-index 4e751926ce..393751408c 100644
+index d3391e6884..08a0af2e22 100644
 --- a/otherlibs/systhreads/thread.ml
 +++ b/otherlibs/systhreads/thread.ml
 @@ -18,8 +18,10 @@
@@ -8707,11 +8720,11 @@ index 4e751926ce..393751408c 100644
 @@ -86,7 +101,9 @@ let preempt_signal =
  
  let () =
-   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+   thread_initialize ();
 +(* BACKPORT
    Domain.at_startup thread_initialize_domain;
 +*)
-   thread_initialize ();
+   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
    Callback.register "Thread.at_shutdown" (fun () ->
      thread_cleanup();
 @@ -101,6 +118,11 @@ let () =

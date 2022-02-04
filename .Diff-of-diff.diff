@@ -1,11 +1,23 @@
---- a	2023-09-28 18:43:40.155624111 +0100
-+++ b	2023-09-28 18:43:40.167624610 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -541,6 +541,10 @@ OCaml 4.14.0
-+@@ -544,6 +544,10 @@ OCaml 4.14.0
-  - #10822, #10823: Bad interaction between ambivalent types and subtyping
-    coercions (Jacques Garrigue, report and review by Frédéric Bour)
+--- a	2023-09-28 18:43:40.451636423 +0100
++++ b	2023-09-28 18:43:40.471637255 +0100
+@@ -17,14 +17,16 @@
+ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+ --- a/otherlibs/systhreads/thread.ml
+ +++ b/otherlibs/systhreads/thread.ml
+-@@ -85,9 +85,9 @@ let preempt_signal =
++@@ -100,11 +100,11 @@ let preempt_signal =
+    | _       -> Sys.sigvtalrm
   
+  let () =
+ -  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+--  Domain.at_startup thread_initialize_domain;
+-   thread_initialize ();
+-+  Domain.at_startup thread_initialize_domain;
+++  thread_initialize ();
++ (* BACKPORT
++   Domain.at_startup thread_initialize_domain;
++ *)
++-  thread_initialize ();
+ +  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+    Callback.register "Thread.at_shutdown" (fun () ->
+      thread_cleanup();
