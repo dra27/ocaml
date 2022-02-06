@@ -1307,7 +1307,7 @@ index 31b97ca50a..cd68534b54 100644
 -Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
 +Called from Thread.create.(fun) in file "thread.ml", line 55, characters 8-14
 diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-index 9549f256ea..169cf9a260 100644
+index 077a3dba66..78112d293e 100644
 --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 @@ -1,9 +1,11 @@

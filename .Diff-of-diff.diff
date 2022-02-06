@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:41.423676842 +0100
++++ b	2023-09-28 18:43:41.427677009 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+-@@ -12,11 +12,13 @@ include unix
++@@ -14,11 +14,13 @@ reason = "OCaml 5 only"
+  let expect_exn ="Unix.fork may not be called while other domains were created"
+  
+  let () =
