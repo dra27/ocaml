@@ -1,25 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..2cb21921e0
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:41.423676842 +0100
-++++ b	2023-09-28 18:43:41.427677009 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-+ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-+ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-+-@@ -12,11 +12,13 @@ include unix
-++@@ -14,11 +14,13 @@ reason = "OCaml 5 only"
-+  let expect_exn ="Unix.fork may not be called while other domains were created"
-+  
-+  let () =
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index f16cb847ad..b3a05695d2 100644
+index 9d6b622f7d..608ad183e7 100644
 --- a/Changes
 +++ b/Changes
-@@ -141,13 +141,13 @@ OCaml 4.14.0
+@@ -147,13 +147,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -35,7 +21,7 @@ index f16cb847ad..b3a05695d2 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -240,6 +240,9 @@ OCaml 4.14.0
+@@ -246,6 +246,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -1681,7 +1667,7 @@ index 0000000000..b47fc313c5
 + }
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..de1762df35
+index 0000000000..a2b11a2fb0
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,2610 @@
@@ -2994,7 +2980,7 @@ index 0000000000..de1762df35
 +-Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
 ++Called from Thread.create.(fun) in file "thread.ml", line 55, characters 8-14
 +diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-+index 9549f256ea..169cf9a260 100644
++index 077a3dba66..78112d293e 100644
 +--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 ++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 +@@ -1,9 +1,11 @@
@@ -4297,32 +4283,18 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..46d119b6eb
+index 0000000000..261de17800
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4182 @@
+@@ -0,0 +1,4184 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..2cb21921e0
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:41.423676842 +0100
-+++++ b	2023-09-28 18:43:41.427677009 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-++ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-++ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-++-@@ -12,11 +12,13 @@ include unix
-+++@@ -14,11 +14,13 @@ reason = "OCaml 5 only"
-++  let expect_exn ="Unix.fork may not be called while other domains were created"
-++  
-++  let () =
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index f16cb847ad..b3a05695d2 100644
++index 9d6b622f7d..608ad183e7 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -141,13 +141,13 @@ OCaml 4.14.0
++@@ -147,13 +147,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -4338,7 +4310,7 @@ index 0000000000..46d119b6eb
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -240,6 +240,9 @@ OCaml 4.14.0
++@@ -246,6 +246,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -5984,7 +5956,7 @@ index 0000000000..46d119b6eb
 ++ }
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..de1762df35
++index 0000000000..a2b11a2fb0
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,2610 @@
@@ -7297,7 +7269,7 @@ index 0000000000..46d119b6eb
 ++-Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
 +++Called from Thread.create.(fun) in file "thread.ml", line 55, characters 8-14
 ++diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-++index 9549f256ea..169cf9a260 100644
+++index 077a3dba66..78112d293e 100644
 ++--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 +++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 ++@@ -1,9 +1,11 @@
@@ -8482,7 +8454,23 @@ index 0000000000..46d119b6eb
 ++ program = "${test_build_directory}/noev.exe"
 ++-********* check-ocamlc.byte-output
 ++-********** ocamldebug
-++-*********** check-pro
+++-*********** check-program-output
++++******** check-ocamlc.byte-output
++++********* ocamldebug
++++********** check-program-output
+++ *)
+++ 
+++ (* This file only contains the specification of how to run the test *)
+++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++index b2d6e6e7c5..f22a4bd50f 100644
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "o
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
