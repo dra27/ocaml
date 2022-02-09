@@ -1,32 +1,8 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b33c8cfe40
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,21 @@
-+--- a	2023-09-28 18:43:41.931697959 +0100
-++++ b	2023-09-28 18:43:41.939698291 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/stdlib/Makefile b/stdlib/Makefile
-+ --- a/stdlib/Makefile
-+ +++ b/stdlib/Makefile
-+-@@ -258,13 +258,17 @@ include .depend
-++@@ -258,6 +258,10 @@ include .depend
-+  
-+  STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
-+  
-+@@ -24,7 +24,8 @@
-+ +
-+  .PHONY: depend
-+  depend:
-+- 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-++ 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
-++@@ -265,7 +269,7 @@ depend:
-+  	  > .depend.tmp
-+  	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-+  	  stdlib.ml stdlib.mli >> .depend.tmp
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 9d6b622f7d..608ad183e7 100644
+index 0fcff4f5ba..4180d580be 100644
 --- a/Changes
 +++ b/Changes
 @@ -147,13 +147,13 @@ OCaml 4.14.0
@@ -45,7 +21,7 @@ index 9d6b622f7d..608ad183e7 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -246,6 +246,9 @@ OCaml 4.14.0
+@@ -247,6 +247,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -4307,39 +4283,15 @@ index 0000000000..a2b11a2fb0
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..cf4021c631
+index 0000000000..89e3337e77
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4305 @@
+@@ -0,0 +1,4184 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b33c8cfe40
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,21 @@
-++--- a	2023-09-28 18:43:41.931697959 +0100
-+++++ b	2023-09-28 18:43:41.939698291 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/stdlib/Makefile b/stdlib/Makefile
-++ --- a/stdlib/Makefile
-++ +++ b/stdlib/Makefile
-++-@@ -258,13 +258,17 @@ include .depend
-+++@@ -258,6 +258,10 @@ include .depend
-++  
-++  STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
-++  
-++@@ -24,7 +24,8 @@
-++ +
-++  .PHONY: depend
-++  depend:
-++- 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-+++ 	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
-+++@@ -265,7 +269,7 @@ depend:
-++  	  > .depend.tmp
-++  	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-++  	  stdlib.ml stdlib.mli >> .depend.tmp
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 9d6b622f7d..608ad183e7 100644
++index 0fcff4f5ba..4180d580be 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -147,13 +147,13 @@ OCaml 4.14.0
@@ -4358,7 +4310,7 @@ index 0000000000..cf4021c631
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -246,6 +246,9 @@ OCaml 4.14.0
++@@ -247,6 +247,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -8518,104 +8470,8 @@ index 0000000000..cf4021c631
 ++ readonly_files = "printer.ml"
 ++ include debugger
 ++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-++ *)
+++-reason = "o
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
