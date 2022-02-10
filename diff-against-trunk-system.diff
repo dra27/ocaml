@@ -1,20 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..ff2326f7ce
+index 0000000000..4723789198
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:42.707730196 +0100
-++++ b	2023-09-28 18:43:42.711730362 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-+ --- a/testsuite/tests/parallel/domain_id.ml
-+ +++ b/testsuite/tests/parallel/domain_id.ml
-+-@@ -26,7 +26,8 @@ let test_different_ids () =
-++@@ -28,7 +28,8 @@ let test_different_ids () =
-+    assert (get_id d1 <> get_id d2);
-+    join d1; join d2;
-+    let d3 = Domain.spawn id in
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:43:42.963740830 +0100
+++++ b	2023-09-28 18:43:42.967740996 +0100
++@@ -12,8 +12,8 @@
++ diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
++ --- a/otherlibs/unix/signals.c
++ +++ b/otherlibs/unix/signals.c
++-@@ -68,7 +68,7 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
++-   retcode = sigprocmask(how, &set, &oldset);
+++@@ -85,7 +85,7 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+++ /* BACKPORT END */
++    caml_leave_blocking_section();
++    /* Run any handlers for just-unmasked pending signals */
++ -  caml_process_pending_signals();
 diff --git a/Changes b/Changes
 index 0fcff4f5ba..4180d580be 100644
 --- a/Changes
@@ -1681,7 +1683,7 @@ index 0000000000..b47fc313c5
 + }
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..a2b11a2fb0
+index 0000000000..22bb95ec4d
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,2610 @@
@@ -3160,7 +3162,7 @@ index 0000000000..a2b11a2fb0
 + 
 + let _ =
 +diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-+index be723cbf13..ae6aab1c39 100644
++index cc583ff508..f3baa3dde0 100644
 +--- a/testsuite/tests/parallel/domain_id.ml
 ++++ b/testsuite/tests/parallel/domain_id.ml
 +@@ -1,8 +1,10 @@
@@ -4297,27 +4299,29 @@ index 0000000000..a2b11a2fb0
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a4bbee882b
+index 0000000000..8a86504684
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4185 @@
+@@ -0,0 +1,4183 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..ff2326f7ce
++index 0000000000..4723789198
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:42.707730196 +0100
-+++++ b	2023-09-28 18:43:42.711730362 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-++ --- a/testsuite/tests/parallel/domain_id.ml
-++ +++ b/testsuite/tests/parallel/domain_id.ml
-++-@@ -26,7 +26,8 @@ let test_different_ids () =
-+++@@ -28,7 +28,8 @@ let test_different_ids () =
-++    assert (get_id d1 <> get_id d2);
-++    join d1; join d2;
-++    let d3 = Domain.spawn id in
++@@ -0,0 +1,13 @@
+++--- a	2023-09-28 18:43:42.963740830 +0100
++++++ b	2023-09-28 18:43:42.967740996 +0100
+++@@ -12,8 +12,8 @@
+++ diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
+++ --- a/otherlibs/unix/signals.c
+++ +++ b/otherlibs/unix/signals.c
+++-@@ -68,7 +68,7 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+++-   retcode = sigprocmask(how, &set, &oldset);
++++@@ -85,7 +85,7 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
++++ /* BACKPORT END */
+++    caml_leave_blocking_section();
+++    /* Run any handlers for just-unmasked pending signals */
+++ -  caml_process_pending_signals();
 +diff --git a/Changes b/Changes
 +index 0fcff4f5ba..4180d580be 100644
 +--- a/Changes
@@ -5984,7 +5988,7 @@ index 0000000000..a4bbee882b
 ++ }
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..a2b11a2fb0
++index 0000000000..22bb95ec4d
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,2610 @@
@@ -7463,7 +7467,7 @@ index 0000000000..a4bbee882b
 ++ 
 ++ let _ =
 ++diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-++index be723cbf13..ae6aab1c39 100644
+++index cc583ff508..f3baa3dde0 100644
 ++--- a/testsuite/tests/parallel/domain_id.ml
 +++++ b/testsuite/tests/parallel/domain_id.ml
 ++@@ -1,8 +1,10 @@
@@ -8481,11 +8485,7 @@ index 0000000000..a4bbee882b
 ++ all_modules = "foo.cmo b.cmo"
 ++ program = "${test_build_directory}/noev.exe"
 ++-********* check-ocamlc.byte-output
-++-********** ocamldebug
-++-*********** check-program-output
-+++******** check-ocamlc.byte-output
-+++********* ocamldebug
-+++********** check
+++-********** 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -9248,7 +9248,7 @@ index 6367f61aa8..7f2beca3af 100644
  
    CAML_EVENTLOG_DO({
 diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
-index e49c1b0e6f..83ddcbbede 100644
+index 884b54eaab..207566d2b5 100644
 --- a/otherlibs/unix/signals.c
 +++ b/otherlibs/unix/signals.c
 @@ -25,6 +25,12 @@
@@ -9292,7 +9292,7 @@ index e49c1b0e6f..83ddcbbede 100644
 +/* BACKPORT END */
    caml_leave_blocking_section();
    /* Run any handlers for just-unmasked pending signals */
-   caml_process_pending_signals();
+   caml_process_pending_actions();
 @@ -76,9 +93,15 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
  CAMLprim value unix_sigpending(value unit)
  {
