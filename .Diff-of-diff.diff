@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:42.707730196 +0100
++++ b	2023-09-28 18:43:42.711730362 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
+ --- a/testsuite/tests/parallel/domain_id.ml
+ +++ b/testsuite/tests/parallel/domain_id.ml
+-@@ -26,7 +26,8 @@ let test_different_ids () =
++@@ -28,7 +28,8 @@ let test_different_ids () =
+    assert (get_id d1 <> get_id d2);
+    join d1; join d2;
+    let d3 = Domain.spawn id in

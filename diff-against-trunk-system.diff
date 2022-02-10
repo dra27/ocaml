@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..ff2326f7ce
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:42.707730196 +0100
+++++ b	2023-09-28 18:43:42.711730362 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
++ --- a/testsuite/tests/parallel/domain_id.ml
++ +++ b/testsuite/tests/parallel/domain_id.ml
++-@@ -26,7 +26,8 @@ let test_different_ids () =
+++@@ -28,7 +28,8 @@ let test_different_ids () =
++    assert (get_id d1 <> get_id d2);
++    join d1; join d2;
++    let d3 = Domain.spawn id in
 diff --git a/Changes b/Changes
 index 0fcff4f5ba..4180d580be 100644
 --- a/Changes
@@ -4283,13 +4297,27 @@ index 0000000000..a2b11a2fb0
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..89e3337e77
+index 0000000000..a4bbee882b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4184 @@
+@@ -0,0 +1,4185 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..ff2326f7ce
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:42.707730196 +0100
++++++ b	2023-09-28 18:43:42.711730362 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
+++ --- a/testsuite/tests/parallel/domain_id.ml
+++ +++ b/testsuite/tests/parallel/domain_id.ml
+++-@@ -26,7 +26,8 @@ let test_different_ids () =
++++@@ -28,7 +28,8 @@ let test_different_ids () =
+++    assert (get_id d1 <> get_id d2);
+++    join d1; join d2;
+++    let d3 = Domain.spawn id in
 +diff --git a/Changes b/Changes
 +index 0fcff4f5ba..4180d580be 100644
 +--- a/Changes
@@ -8457,20 +8485,7 @@ index 0000000000..89e3337e77
 ++-*********** check-program-output
 +++******** check-ocamlc.byte-output
 +++********* ocamldebug
-+++********** check-program-output
-++ *)
-++ 
-++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++index b2d6e6e7c5..f22a4bd50f 100644
-++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "o
++++********** check
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
