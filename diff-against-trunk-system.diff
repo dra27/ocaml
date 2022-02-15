@@ -1,22 +1,40 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..468e593fc7
+index 0000000000..d0e843f5a1
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:43.439760591 +0100
-++++ b	2023-09-28 18:43:43.459761421 +0100
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:43:43.763774040 +0100
+++++ b	2023-09-28 18:43:43.783774871 +0100
 +@@ -1,7 +1,7 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -477,10 +477,10 @@ OCaml 4.14.0
-++@@ -480,10 +480,10 @@ OCaml 4.14.0
-+    (David Allsopp and Nathan Rebours, review by Louis Gesbert,
-+    Nicolás Ojeda Bär and Gabriel Scherer)
++-@@ -372,6 +372,9 @@ OCaml 4.14.0
+++@@ -491,6 +491,9 @@ OCaml 4.14.0
 +  
++  ### Build system:
++  
++@@ -16,7 +16,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1029,6 +1029,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+++@@ -1018,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++      [earm*-*-netbsd*], [natdynlink=true],
++      [aarch64-*-linux*], [natdynlink=true],
++      [aarch64-*-freebsd*], [natdynlink=true],
++@@ -24,7 +24,7 @@
++      [riscv*-*-linux*], [natdynlink=true])])
++  
++  AS_CASE([$enable_native_toplevel,$natdynlink],
++-@@ -1141,6 +1142,8 @@ AS_CASE([$host],
+++@@ -1130,6 +1131,8 @@ AS_CASE([$host],
++      [arch=arm64; system=linux],
++    [aarch64-*-freebsd*],
++      [arch=arm64; system=freebsd],
 diff --git a/Changes b/Changes
-index 978d706e1b..415d8c96f9 100644
+index 978d706e1b..ce99eac303 100644
 --- a/Changes
 +++ b/Changes
 @@ -147,13 +147,13 @@ OCaml 4.14.0
@@ -45,6 +63,16 @@ index 978d706e1b..415d8c96f9 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
+@@ -488,6 +491,9 @@ OCaml 4.14.0
+ 
+ ### Build system:
+ 
++- #10828 Build native-code compilers on OpenBSD/aarch64
++  (Christopher Zimmermann)
++
+ - #10717: Simplify the installation of man pages
+   (Sébastien Hinderer, review by David Allsopp)
+ 
 diff --git a/Makefile.config.in b/Makefile.config.in
 index 6ee1453d88..97cca9a733 100644
 --- a/Makefile.config.in
@@ -358,10 +386,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index e995818710..5f98b7319e 100755
+index e995818710..2ddce6bab1 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 4ca2310651..c52fb86b1b 100644
+index 4ca2310651..54dea21180 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -393,7 +421,15 @@ index 4ca2310651..c52fb86b1b 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-@@ -1038,93 +1047,93 @@ model=default
+@@ -1009,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+     [earm*-*-netbsd*], [natdynlink=true],
+     [aarch64-*-linux*], [natdynlink=true],
+     [aarch64-*-freebsd*], [natdynlink=true],
++    [aarch64-*-openbsd*], [natdynlink=true],
+     [riscv*-*-linux*], [natdynlink=true])])
+ 
+ AS_CASE([$enable_native_toplevel,$natdynlink],
+@@ -1038,93 +1048,95 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -555,6 +591,8 @@ index 4ca2310651..c52fb86b1b 100644
 +    [arch=arm64; system=linux],
 +  [aarch64-*-freebsd*],
 +    [arch=arm64; system=freebsd],
++  [aarch64-*-openbsd*],
++    [arch=arm64; system=openbsd],
 +  [x86_64-*-cygwin*],
 +    [arch=amd64; system=cygwin],
 +  [riscv64-*-linux*],
@@ -562,7 +600,7 @@ index 4ca2310651..c52fb86b1b 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1787,7 +1796,8 @@ AS_CASE([$arch,$system],
+@@ -1787,7 +1799,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -572,7 +610,7 @@ index 4ca2310651..c52fb86b1b 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1836,6 +1846,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1836,6 +1849,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -603,7 +641,7 @@ index 4ca2310651..c52fb86b1b 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1955,8 +1989,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1955,8 +1992,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -4297,29 +4335,47 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e18b869880
+index 0000000000..46ffb7d94c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4189 @@
+@@ -0,0 +1,4304 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..468e593fc7
++index 0000000000..d0e843f5a1
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:43.439760591 +0100
-+++++ b	2023-09-28 18:43:43.459761421 +0100
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:43:43.763774040 +0100
++++++ b	2023-09-28 18:43:43.783774871 +0100
 ++@@ -1,7 +1,7 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -477,10 +477,10 @@ OCaml 4.14.0
-+++@@ -480,10 +480,10 @@ OCaml 4.14.0
-++    (David Allsopp and Nathan Rebours, review by Louis Gesbert,
-++    Nicolás Ojeda Bär and Gabriel Scherer)
+++-@@ -372,6 +372,9 @@ OCaml 4.14.0
++++@@ -491,6 +491,9 @@ OCaml 4.14.0
 ++  
+++  ### Build system:
+++  
+++@@ -16,7 +16,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1029,6 +1029,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++++@@ -1018,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+++      [earm*-*-netbsd*], [natdynlink=true],
+++      [aarch64-*-linux*], [natdynlink=true],
+++      [aarch64-*-freebsd*], [natdynlink=true],
+++@@ -24,7 +24,7 @@
+++      [riscv*-*-linux*], [natdynlink=true])])
+++  
+++  AS_CASE([$enable_native_toplevel,$natdynlink],
+++-@@ -1141,6 +1142,8 @@ AS_CASE([$host],
++++@@ -1130,6 +1131,8 @@ AS_CASE([$host],
+++      [arch=arm64; system=linux],
+++    [aarch64-*-freebsd*],
+++      [arch=arm64; system=freebsd],
 +diff --git a/Changes b/Changes
-+index 978d706e1b..415d8c96f9 100644
++index 978d706e1b..ce99eac303 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -147,13 +147,13 @@ OCaml 4.14.0
@@ -4348,6 +4404,16 @@ index 0000000000..e18b869880
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
++@@ -488,6 +491,9 @@ OCaml 4.14.0
++ 
++ ### Build system:
++ 
+++- #10828 Build native-code compilers on OpenBSD/aarch64
+++  (Christopher Zimmermann)
+++
++ - #10717: Simplify the installation of man pages
++   (Sébastien Hinderer, review by David Allsopp)
++ 
 +diff --git a/Makefile.config.in b/Makefile.config.in
 +index 6ee1453d88..97cca9a733 100644
 +--- a/Makefile.config.in
@@ -4661,10 +4727,10 @@ index 0000000000..e18b869880
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index e995818710..5f98b7319e 100755
++index e995818710..2ddce6bab1 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 4ca2310651..c52fb86b1b 100644
++index 4ca2310651..54dea21180 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -4696,7 +4762,15 @@ index 0000000000..e18b869880
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-+@@ -1038,93 +1047,93 @@ model=default
++@@ -1009,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++     [earm*-*-netbsd*], [natdynlink=true],
++     [aarch64-*-linux*], [natdynlink=true],
++     [aarch64-*-freebsd*], [natdynlink=true],
+++    [aarch64-*-openbsd*], [natdynlink=true],
++     [riscv*-*-linux*], [natdynlink=true])])
++ 
++ AS_CASE([$enable_native_toplevel,$natdynlink],
++@@ -1038,93 +1048,95 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -4858,6 +4932,8 @@ index 0000000000..e18b869880
 ++    [arch=arm64; system=linux],
 ++  [aarch64-*-freebsd*],
 ++    [arch=arm64; system=freebsd],
+++  [aarch64-*-openbsd*],
+++    [arch=arm64; system=openbsd],
 ++  [x86_64-*-cygwin*],
 ++    [arch=amd64; system=cygwin],
 ++  [riscv64-*-linux*],
@@ -4865,7 +4941,7 @@ index 0000000000..e18b869880
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1787,7 +1796,8 @@ AS_CASE([$arch,$system],
++@@ -1787,7 +1799,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -4875,7 +4951,7 @@ index 0000000000..e18b869880
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1836,6 +1846,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1836,6 +1849,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -4906,7 +4982,7 @@ index 0000000000..e18b869880
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1955,8 +1989,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1955,8 +1992,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -8489,7 +8565,84 @@ index 0000000000..e18b869880
 ++ *)
 ++ 
 ++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/
+++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++index b2d6e6e7c5..f22a4bd50f 100644
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
