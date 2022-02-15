@@ -1,29 +1,11 @@
---- a	2023-09-28 18:43:43.763774040 +0100
-+++ b	2023-09-28 18:43:43.783774871 +0100
+--- a	2023-09-28 18:43:44.295796116 +0100
++++ b	2023-09-28 18:43:44.319797112 +0100
 @@ -1,7 +1,7 @@
  diff --git a/Changes b/Changes
  --- a/Changes
  +++ b/Changes
--@@ -372,6 +372,9 @@ OCaml 4.14.0
-+@@ -491,6 +491,9 @@ OCaml 4.14.0
+-@@ -179,6 +179,9 @@ OCaml 4.14.0
++@@ -182,6 +182,9 @@ OCaml 4.14.0
+  - #10681: Enforce boolean conditions for the native backend
+    (Vincent Laviron, review by Gabriel Scherer)
   
-  ### Build system:
-  
-@@ -16,7 +16,7 @@
- diff --git a/configure.ac b/configure.ac
- --- a/configure.ac
- +++ b/configure.ac
--@@ -1029,6 +1029,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-+@@ -1018,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-      [earm*-*-netbsd*], [natdynlink=true],
-      [aarch64-*-linux*], [natdynlink=true],
-      [aarch64-*-freebsd*], [natdynlink=true],
-@@ -24,7 +24,7 @@
-      [riscv*-*-linux*], [natdynlink=true])])
-  
-  AS_CASE([$enable_native_toplevel,$natdynlink],
--@@ -1141,6 +1142,8 @@ AS_CASE([$host],
-+@@ -1130,6 +1131,8 @@ AS_CASE([$host],
-      [arch=arm64; system=linux],
-    [aarch64-*-freebsd*],
-      [arch=arm64; system=freebsd],

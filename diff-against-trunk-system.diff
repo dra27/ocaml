@@ -1,40 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..d0e843f5a1
+index 0000000000..9b935f175d
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:43:43.763774040 +0100
-++++ b	2023-09-28 18:43:43.783774871 +0100
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:44.295796116 +0100
+++++ b	2023-09-28 18:43:44.319797112 +0100
 +@@ -1,7 +1,7 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -372,6 +372,9 @@ OCaml 4.14.0
-++@@ -491,6 +491,9 @@ OCaml 4.14.0
++-@@ -179,6 +179,9 @@ OCaml 4.14.0
+++@@ -182,6 +182,9 @@ OCaml 4.14.0
++  - #10681: Enforce boolean conditions for the native backend
++    (Vincent Laviron, review by Gabriel Scherer)
 +  
-+  ### Build system:
-+  
-+@@ -16,7 +16,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1029,6 +1029,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-++@@ -1018,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-+      [earm*-*-netbsd*], [natdynlink=true],
-+      [aarch64-*-linux*], [natdynlink=true],
-+      [aarch64-*-freebsd*], [natdynlink=true],
-+@@ -24,7 +24,7 @@
-+      [riscv*-*-linux*], [natdynlink=true])])
-+  
-+  AS_CASE([$enable_native_toplevel,$natdynlink],
-+-@@ -1141,6 +1142,8 @@ AS_CASE([$host],
-++@@ -1130,6 +1131,8 @@ AS_CASE([$host],
-+      [arch=arm64; system=linux],
-+    [aarch64-*-freebsd*],
-+      [arch=arm64; system=freebsd],
 diff --git a/Changes b/Changes
-index 978d706e1b..2d1582cb70 100644
+index 2439c55e61..3c970f877c 100644
 --- a/Changes
 +++ b/Changes
 @@ -110,6 +110,9 @@ Working version
@@ -63,7 +45,7 @@ index 978d706e1b..2d1582cb70 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -247,6 +250,9 @@ OCaml 4.14.0
+@@ -250,6 +253,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -73,7 +55,7 @@ index 978d706e1b..2d1582cb70 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -488,6 +494,9 @@ OCaml 4.14.0
+@@ -491,6 +497,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -4345,47 +4327,29 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..87ba026fdb
+index 0000000000..dd7ce12331
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4308 @@
+@@ -0,0 +1,4306 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..d0e843f5a1
++index 0000000000..9b935f175d
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:43:43.763774040 +0100
-+++++ b	2023-09-28 18:43:43.783774871 +0100
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:44.295796116 +0100
++++++ b	2023-09-28 18:43:44.319797112 +0100
 ++@@ -1,7 +1,7 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -372,6 +372,9 @@ OCaml 4.14.0
-+++@@ -491,6 +491,9 @@ OCaml 4.14.0
+++-@@ -179,6 +179,9 @@ OCaml 4.14.0
++++@@ -182,6 +182,9 @@ OCaml 4.14.0
+++  - #10681: Enforce boolean conditions for the native backend
+++    (Vincent Laviron, review by Gabriel Scherer)
 ++  
-++  ### Build system:
-++  
-++@@ -16,7 +16,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1029,6 +1029,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-+++@@ -1018,6 +1018,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-++      [earm*-*-netbsd*], [natdynlink=true],
-++      [aarch64-*-linux*], [natdynlink=true],
-++      [aarch64-*-freebsd*], [natdynlink=true],
-++@@ -24,7 +24,7 @@
-++      [riscv*-*-linux*], [natdynlink=true])])
-++  
-++  AS_CASE([$enable_native_toplevel,$natdynlink],
-++-@@ -1141,6 +1142,8 @@ AS_CASE([$host],
-+++@@ -1130,6 +1131,8 @@ AS_CASE([$host],
-++      [arch=arm64; system=linux],
-++    [aarch64-*-freebsd*],
-++      [arch=arm64; system=freebsd],
 +diff --git a/Changes b/Changes
-+index 978d706e1b..2d1582cb70 100644
++index 2439c55e61..3c970f877c 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -110,6 +110,9 @@ Working version
@@ -4414,7 +4378,7 @@ index 0000000000..87ba026fdb
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -247,6 +250,9 @@ OCaml 4.14.0
++@@ -250,6 +253,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -4424,7 +4388,7 @@ index 0000000000..87ba026fdb
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -488,6 +494,9 @@ OCaml 4.14.0
++@@ -491,6 +497,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -8656,7 +8620,23 @@ index 0000000000..87ba026fdb
 +++ *)
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value chec
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/t
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
