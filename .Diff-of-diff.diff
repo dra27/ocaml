@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:43.439760591 +0100
++++ b	2023-09-28 18:43:43.459761421 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -477,10 +477,10 @@ OCaml 4.14.0
++@@ -480,10 +480,10 @@ OCaml 4.14.0
+    (David Allsopp and Nathan Rebours, review by Louis Gesbert,
+    Nicolás Ojeda Bär and Gabriel Scherer)
+  
