@@ -14194,6 +14194,8 @@ if test x"$supports_shared_libraries" = 'xtrue'; then :
     natdynlink=true ;; #(
   aarch64-*-freebsd*) :
     natdynlink=true ;; #(
+  aarch64-*-openbsd*) :
+    natdynlink=true ;; #(
   riscv*-*-linux*) :
     natdynlink=true ;; #(
   *) :
