@@ -1,25 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..9b935f175d
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:44.295796116 +0100
-++++ b	2023-09-28 18:43:44.319797112 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -179,6 +179,9 @@ OCaml 4.14.0
-++@@ -182,6 +182,9 @@ OCaml 4.14.0
-+  - #10681: Enforce boolean conditions for the native backend
-+    (Vincent Laviron, review by Gabriel Scherer)
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 2439c55e61..3c970f877c 100644
+index 5d1dc8e26e..70fa3ef08b 100644
 --- a/Changes
 +++ b/Changes
-@@ -110,6 +110,9 @@ Working version
+@@ -114,6 +114,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -29,7 +15,7 @@ index 2439c55e61..3c970f877c 100644
  ### Bug fixes:
  
  OCaml 4.14.0
-@@ -147,13 +150,13 @@ OCaml 4.14.0
+@@ -151,13 +154,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -45,7 +31,7 @@ index 2439c55e61..3c970f877c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -250,6 +253,9 @@ OCaml 4.14.0
+@@ -254,6 +257,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -55,7 +41,7 @@ index 2439c55e61..3c970f877c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -491,6 +497,9 @@ OCaml 4.14.0
+@@ -495,6 +501,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -4327,32 +4313,18 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..dd7ce12331
+index 0000000000..2443849513
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4306 @@
+@@ -0,0 +1,4305 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..9b935f175d
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:44.295796116 +0100
-+++++ b	2023-09-28 18:43:44.319797112 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -179,6 +179,9 @@ OCaml 4.14.0
-+++@@ -182,6 +182,9 @@ OCaml 4.14.0
-++  - #10681: Enforce boolean conditions for the native backend
-++    (Vincent Laviron, review by Gabriel Scherer)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 2439c55e61..3c970f877c 100644
++index 5d1dc8e26e..70fa3ef08b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -110,6 +110,9 @@ Working version
++@@ -114,6 +114,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -4362,7 +4334,7 @@ index 0000000000..dd7ce12331
 + ### Bug fixes:
 + 
 + OCaml 4.14.0
-+@@ -147,13 +150,13 @@ OCaml 4.14.0
++@@ -151,13 +154,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -4378,7 +4350,7 @@ index 0000000000..dd7ce12331
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -250,6 +253,9 @@ OCaml 4.14.0
++@@ -254,6 +257,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -4388,7 +4360,7 @@ index 0000000000..dd7ce12331
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -491,6 +497,9 @@ OCaml 4.14.0
++@@ -495,6 +501,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -8636,7 +8608,20 @@ index 0000000000..dd7ce12331
 ++   let r' = ref 0 in
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++index fa2d2efc43..752a7eeabf 100644
-++--- a/t
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 7f80b8ab26..0791f4e53f 100644
+++--- 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
