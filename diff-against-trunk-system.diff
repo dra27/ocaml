@@ -2,10 +2,10 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 5d1dc8e26e..70fa3ef08b 100644
+index 5bc462a15d..c1524e34cc 100644
 --- a/Changes
 +++ b/Changes
-@@ -114,6 +114,9 @@ Working version
+@@ -118,6 +118,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -15,7 +15,7 @@ index 5d1dc8e26e..70fa3ef08b 100644
  ### Bug fixes:
  
  OCaml 4.14.0
-@@ -151,13 +154,13 @@ OCaml 4.14.0
+@@ -155,13 +158,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -31,7 +31,7 @@ index 5d1dc8e26e..70fa3ef08b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -254,6 +257,9 @@ OCaml 4.14.0
+@@ -258,6 +261,9 @@ OCaml 4.14.0
    OCaml.
    (Damien Doligez, review by Stephen Dolan)
  
@@ -41,7 +41,7 @@ index 5d1dc8e26e..70fa3ef08b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -495,6 +501,9 @@ OCaml 4.14.0
+@@ -499,6 +505,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -4313,7 +4313,7 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2443849513
+index 0000000000..9ba43e3859
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,4305 @@
@@ -4321,10 +4321,10 @@ index 0000000000..2443849513
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 5d1dc8e26e..70fa3ef08b 100644
++index 5bc462a15d..c1524e34cc 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -114,6 +114,9 @@ Working version
++@@ -118,6 +118,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -4334,7 +4334,7 @@ index 0000000000..2443849513
 + ### Bug fixes:
 + 
 + OCaml 4.14.0
-+@@ -151,13 +154,13 @@ OCaml 4.14.0
++@@ -155,13 +158,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -4350,7 +4350,7 @@ index 0000000000..2443849513
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -254,6 +257,9 @@ OCaml 4.14.0
++@@ -258,6 +261,9 @@ OCaml 4.14.0
 +   OCaml.
 +   (Damien Doligez, review by Stephen Dolan)
 + 
@@ -4360,7 +4360,7 @@ index 0000000000..2443849513
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -495,6 +501,9 @@ OCaml 4.14.0
++@@ -499,6 +505,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
