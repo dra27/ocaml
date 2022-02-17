@@ -1,16 +1,24 @@
 OCaml 4.13 maintenance branch
 -----------------------------
 
-### Bug fixes:
+### Runtime system:
 
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+### Build system:
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
+
+### Bug fixes:
+
 - #11358, #11378: Refactor the initialization of bytecode threading.
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
-
 
 OCaml 4.13.1 (01 October 2021)
 --------------------------------
