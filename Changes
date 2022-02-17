@@ -118,6 +118,9 @@ Working version
   DEFAULT_STRING=safe which are now the default unconditionally.
   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 
+- Build native-code compilers on OpenBSD/aarch64
+  (Christopher Zimmermann, review by Anil Madhavapeddy)
+
 ### Bug fixes:
 
 OCaml 4.14.0
@@ -507,6 +510,11 @@ OCaml 4.14.0
 
 - #10828 Build native-code compilers on OpenBSD/aarch64
   (Christopher Zimmermann)
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
 - #10717: Simplify the installation of man pages
   (Sébastien Hinderer, review by David Allsopp)
