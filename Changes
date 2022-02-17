@@ -13,6 +13,13 @@ OCaml 4.08 maintenance branch:
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
 
+### Build system:
+
+- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
+  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
+  in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
+  (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
+
 ### Bug fixes:
 
 - #8855, #8858: Links for tools not created when installing with
