@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e7dca6f28b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:43:46.159873406 +0100
+++++ b	2023-09-28 18:43:46.175874069 +0100
++@@ -585,7 +585,7 @@
++     trailing semicolon when it is printed vertically:
++  
++     {[
++-@@ -1028,10 +1028,12 @@ val make_formatter :
+++@@ -1029,10 +1029,12 @@ val make_formatter :
++  (** [make_formatter out flush] returns a new formatter that outputs with
++    function [out], and flushes with function [flush].
++  
++@@ -784,7 +784,7 @@
++    *)
++  
++  external field : t -> int -> t = "%obj_field"
++-@@ -132,40 +132,40 @@ module Ephemeron: sig
+++@@ -134,40 +134,40 @@ module Ephemeron: sig
++    (** return the number of keys *)
++  
++    val get_key: t -> int -> obj_t option
 diff --git a/Changes b/Changes
 index f9c85b1333..4709e66c08 100644
 --- a/Changes
@@ -4395,13 +4418,36 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3fcd39839c
+index 0000000000..3544fb6cf8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4318 @@
+@@ -0,0 +1,4315 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e7dca6f28b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:43:46.159873406 +0100
++++++ b	2023-09-28 18:43:46.175874069 +0100
+++@@ -585,7 +585,7 @@
+++     trailing semicolon when it is printed vertically:
+++  
+++     {[
+++-@@ -1028,10 +1028,12 @@ val make_formatter :
++++@@ -1029,10 +1029,12 @@ val make_formatter :
+++  (** [make_formatter out flush] returns a new formatter that outputs with
+++    function [out], and flushes with function [flush].
+++  
+++@@ -784,7 +784,7 @@
+++    *)
+++  
+++  external field : t -> int -> t = "%obj_field"
+++-@@ -132,40 +132,40 @@ module Ephemeron: sig
++++@@ -134,40 +134,40 @@ module Ephemeron: sig
+++    (** return the number of keys *)
+++  
+++    val get_key: t -> int -> obj_t option
 +diff --git a/Changes b/Changes
 +index f9c85b1333..4709e66c08 100644
 +--- a/Changes
@@ -8690,33 +8736,7 @@ index 0000000000..3fcd39839c
 ++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
 +++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
 ++@@ -3,17 +3,15 @@ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e43
+++ o
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -10010,7 +10030,7 @@ index 6ca2f8f03d..11580e7524 100644
    Domain.at_exit flush_standard_formatters)
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
-index f1921008ad..2b14973db9 100644
+index 37c6f3136a..020c9466d3 100644
 --- a/stdlib/format.mli
 +++ b/stdlib/format.mli
 @@ -959,6 +959,7 @@ val formatter_of_out_channel : out_channel -> formatter
@@ -10030,7 +10050,7 @@ index f1921008ad..2b14973db9 100644
  
  val std_formatter : formatter
  (** The initial domain's standard formatter to write to standard output.
-@@ -1035,6 +1036,7 @@ val make_formatter :
+@@ -1037,6 +1038,7 @@ val make_formatter :
    returns a formatter to the {!Stdlib.out_channel} [oc].
  *)
  
@@ -10038,7 +10058,7 @@ index f1921008ad..2b14973db9 100644
  val make_synchronized_formatter :
    (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
  (** [make_synchronized_formatter out flush] returns the key to the domain-local
-@@ -1045,6 +1047,7 @@ val make_synchronized_formatter :
+@@ -1047,6 +1049,7 @@ val make_synchronized_formatter :
      domains will be interleaved with each other at points where the formatter
      is flushed, such as with {!print_flush}.
  *)
@@ -10119,7 +10139,7 @@ index 903719d6ad..d0d581be34 100644
  external floatarray_set :
      floatarray -> int -> float -> unit = "caml_floatarray_set"
 diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-index 8b857da52c..82f39e68b2 100644
+index f043834d91..213da3f71b 100644
 --- a/stdlib/obj.mli
 +++ b/stdlib/obj.mli
 @@ -54,9 +54,11 @@ external field : t -> int -> t = "%obj_field"
@@ -10240,7 +10260,7 @@ index f81ee7848b..37b5afa040 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
-index 1ab0cff870..69e0802626 100644
+index 805fd1f1b4..c84178968a 100644
 --- a/stdlib/stdlib.mli
 +++ b/stdlib/stdlib.mli
 @@ -1382,10 +1382,14 @@ module BytesLabels    = BytesLabels
