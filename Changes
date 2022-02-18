@@ -12,6 +12,9 @@ OCaml 4.12, maintenance version
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
