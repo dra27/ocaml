@@ -1,35 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..02414b9867
+index 0000000000..5346cafb56
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,24 @@
-+--- a	2023-09-28 18:43:46.731897103 +0100
-++++ b	2023-09-28 18:43:46.755898097 +0100
-+@@ -1,9 +1,9 @@
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:47.075911352 +0100
+++++ b	2023-09-28 18:43:47.091912015 +0100
++@@ -1,7 +1,7 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -502,6 +502,11 @@ OCaml 4.14.0
-+- 
-+- ### Build system:
-++@@ -511,6 +511,11 @@ OCaml 4.14.0
-++ - #10828 Build native-code compilers on OpenBSD/aarch64
-++   (Christopher Zimmermann)
++-@@ -338,6 +338,10 @@ OCaml 4.14.0
+++@@ -344,6 +344,10 @@ OCaml 4.14.0
++  - #10281, #10685: Add description of C compiler on macOS and Windows platforms.
++    (Dong An, review by Xavier Leroy and David Allsopp)
 +  
-+ +- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
-+ +  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
-+@@ -18,7 +18,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -966,6 +966,10 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -975,6 +975,10 @@ AS_IF([test x"$enable_shared" != "xno"],
-+         AS_CASE([$cc_basename,$host],
-+             [*gcc*,powerpc-*-linux*],
-+             [mksharedlib="$CC -shared -mbss-plt \$(LDFLAGS)"],
 diff --git a/Changes b/Changes
-index 384e223d04..45098be127 100644
+index 3facb4e77b..bfc3ec7fbe 100644
 --- a/Changes
 +++ b/Changes
 @@ -118,6 +118,9 @@ Working version
@@ -68,7 +55,7 @@ index 384e223d04..45098be127 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -502,6 +508,9 @@ OCaml 4.14.0
+@@ -506,6 +512,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -4422,42 +4409,29 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1163ce4772
+index 0000000000..53ee103a9c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4313 @@
+@@ -0,0 +1,4310 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..02414b9867
++index 0000000000..5346cafb56
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,24 @@
-++--- a	2023-09-28 18:43:46.731897103 +0100
-+++++ b	2023-09-28 18:43:46.755898097 +0100
-++@@ -1,9 +1,9 @@
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:47.075911352 +0100
++++++ b	2023-09-28 18:43:47.091912015 +0100
+++@@ -1,7 +1,7 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -502,6 +502,11 @@ OCaml 4.14.0
-++- 
-++- ### Build system:
-+++@@ -511,6 +511,11 @@ OCaml 4.14.0
-+++ - #10828 Build native-code compilers on OpenBSD/aarch64
-+++   (Christopher Zimmermann)
+++-@@ -338,6 +338,10 @@ OCaml 4.14.0
++++@@ -344,6 +344,10 @@ OCaml 4.14.0
+++  - #10281, #10685: Add description of C compiler on macOS and Windows platforms.
+++    (Dong An, review by Xavier Leroy and David Allsopp)
 ++  
-++ +- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
-++ +  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
-++@@ -18,7 +18,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -966,6 +966,10 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -975,6 +975,10 @@ AS_IF([test x"$enable_shared" != "xno"],
-++         AS_CASE([$cc_basename,$host],
-++             [*gcc*,powerpc-*-linux*],
-++             [mksharedlib="$CC -shared -mbss-plt \$(LDFLAGS)"],
 +diff --git a/Changes b/Changes
-+index 384e223d04..45098be127 100644
++index 3facb4e77b..bfc3ec7fbe 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -118,6 +118,9 @@ Working version
@@ -4496,7 +4470,7 @@ index 0000000000..1163ce4772
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -502,6 +508,9 @@ OCaml 4.14.0
++@@ -506,6 +512,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -8738,7 +8712,17 @@ index 0000000000..1163ce4772
 +++********** check-program-output
 ++ *)
 ++ 
-++ (* This file
+++ (* This file only contains the specification of how to run the test *)
+++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++index b2d6e6e7c5..f22a4bd50f 100644
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is bro
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

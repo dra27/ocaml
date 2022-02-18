@@ -1,24 +1,11 @@
---- a	2023-09-28 18:43:46.731897103 +0100
-+++ b	2023-09-28 18:43:46.755898097 +0100
-@@ -1,9 +1,9 @@
+--- a	2023-09-28 18:43:47.075911352 +0100
++++ b	2023-09-28 18:43:47.091912015 +0100
+@@ -1,7 +1,7 @@
  diff --git a/Changes b/Changes
  --- a/Changes
  +++ b/Changes
--@@ -502,6 +502,11 @@ OCaml 4.14.0
-- 
-- ### Build system:
-+@@ -511,6 +511,11 @@ OCaml 4.14.0
-+ - #10828 Build native-code compilers on OpenBSD/aarch64
-+   (Christopher Zimmermann)
+-@@ -338,6 +338,10 @@ OCaml 4.14.0
++@@ -344,6 +344,10 @@ OCaml 4.14.0
+  - #10281, #10685: Add description of C compiler on macOS and Windows platforms.
+    (Dong An, review by Xavier Leroy and David Allsopp)
   
- +- #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
- +  -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
-@@ -18,7 +18,7 @@
- diff --git a/configure.ac b/configure.ac
- --- a/configure.ac
- +++ b/configure.ac
--@@ -966,6 +966,10 @@ AS_IF([test x"$enable_shared" != "xno"],
-+@@ -975,6 +975,10 @@ AS_IF([test x"$enable_shared" != "xno"],
-         AS_CASE([$cc_basename,$host],
-             [*gcc*,powerpc-*-linux*],
-             [mksharedlib="$CC -shared -mbss-plt \$(LDFLAGS)"],
