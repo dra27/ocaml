@@ -1,6 +1,11 @@
 OCaml 4.11 maintenance branch
 -----------------------------
 
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
