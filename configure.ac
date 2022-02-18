@@ -774,7 +774,7 @@ natdynlinkopts=""
 AS_IF([test x"$enable_shared" != "xno"],
   [AS_CASE([$host],
     [*-apple-darwin*],
-      [mksharedlib="$CC -shared -flat_namespace -undefined suppress \
+      [mksharedlib="$CC -shared -undefined dynamic_lookup \
                    -Wl,-no_compact_unwind"
       shared_libraries_supported=true],
     [*-*-mingw32],
