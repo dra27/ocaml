@@ -1,6 +1,11 @@
 OCaml 4.10 maintenance branch
 -----------------------------
 
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
 ### Bug fixes:
 
 - #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
