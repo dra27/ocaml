@@ -1,20 +1,11 @@
---- a	2023-09-28 18:43:48.103953910 +0100
-+++ b	2023-09-28 18:43:48.115954406 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -124,6 +124,9 @@ Working version
-+@@ -127,6 +127,9 @@ Working version
-  
-  ### Bug fixes:
-  
+--- a	2023-09-28 18:43:48.387965660 +0100
++++ b	2023-09-28 18:43:48.399966156 +0100
 @@ -16,7 +16,7 @@
  diff --git a/configure.ac b/configure.ac
  --- a/configure.ac
  +++ b/configure.ac
--@@ -1172,16 +1172,16 @@ AS_IF([test -z "$PARTIALLD"],
-+@@ -1184,16 +1184,16 @@ AS_IF([test -z "$PARTIALLD"],
-  # Disable PIE at link time when ocamlopt does not produce position-independent
-  # code and the system produces PIE executables by default and demands PIC
-  # object files to do so.
+-@@ -934,7 +934,7 @@ AS_IF([test x"$enable_shared" != "xno"],
++@@ -943,7 +943,7 @@ AS_IF([test x"$enable_shared" != "xno"],
+    [AS_CASE([$host],
+      [*-apple-darwin*],
+        [mksharedlib="$CC -shared \
