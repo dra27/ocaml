@@ -1,6 +1,11 @@
 OCaml 4.09 maintenance branch
 -----------------------------
 
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
 ### Build system:
 
 - #8650: ensure that "make" variables are defined before use;
