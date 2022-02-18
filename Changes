@@ -1,6 +1,11 @@
 OCaml 4.13 maintenance branch
 -----------------------------
 
+### Runtime system:
+
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
 ### Bug fixes:
 
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
