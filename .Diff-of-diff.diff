@@ -1,0 +1,31 @@
+--- a	2023-09-28 18:43:47.799941327 +0100
++++ b	2023-09-28 18:43:47.815941989 +0100
+@@ -1,16 +1,16 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -262,6 +262,9 @@ OCaml 4.14.0
++@@ -265,6 +265,9 @@ OCaml 4.14.0
+    OCaml.
+    (Damien Doligez, review by Stephen Dolan)
+  
+ +- #10786: The implementation of Complex.norm now uses Float.hypot.
+ +  (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+ +
+- ### Other libraries:
++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
+  
+- - #10192: Add support for Unix domain sockets on Windows and use them
+ diff --git a/stdlib/.depend b/stdlib/.depend
+ --- a/stdlib/.depend
+ +++ b/stdlib/.depend
+@@ -24,7 +24,7 @@
+ +    stdlib__Float.cmx \
+      stdlib__Complex.cmi
+  stdlib__Complex.cmi : complex.mli
+- stdlib__Condition.cmo : condition.ml \
++ stdlib__Digest.cmo : digest.ml \
+ diff --git a/stdlib/complex.ml b/stdlib/complex.ml
+ --- a/stdlib/complex.ml
+ +++ b/stdlib/complex.ml

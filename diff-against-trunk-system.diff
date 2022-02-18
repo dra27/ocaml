@@ -1,8 +1,42 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..d6c5d22aeb
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,31 @@
++--- a	2023-09-28 18:43:47.799941327 +0100
+++++ b	2023-09-28 18:43:47.815941989 +0100
++@@ -1,16 +1,16 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -262,6 +262,9 @@ OCaml 4.14.0
+++@@ -265,6 +265,9 @@ OCaml 4.14.0
++    OCaml.
++    (Damien Doligez, review by Stephen Dolan)
++  
++ +- #10786: The implementation of Complex.norm now uses Float.hypot.
++ +  (Christophe Troestler, review by David Allsopp and Xavier Leroy)
++ +
++- ### Other libraries:
+++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
+++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
++  
++- - #10192: Add support for Unix domain sockets on Windows and use them
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++@@ -24,7 +24,7 @@
++ +    stdlib__Float.cmx \
++      stdlib__Complex.cmi
++  stdlib__Complex.cmi : complex.mli
++- stdlib__Condition.cmo : condition.ml \
+++ stdlib__Digest.cmo : digest.ml \
++ diff --git a/stdlib/complex.ml b/stdlib/complex.ml
++ --- a/stdlib/complex.ml
++ +++ b/stdlib/complex.ml
 diff --git a/Changes b/Changes
-index b07255fde7..81bbad4fbc 100644
+index 0a316e0ec2..d63054b1c9 100644
 --- a/Changes
 +++ b/Changes
 @@ -122,6 +122,9 @@ Working version
@@ -31,9 +65,9 @@ index b07255fde7..81bbad4fbc 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -262,6 +265,9 @@ OCaml 4.14.0
-   OCaml.
-   (Damien Doligez, review by Stephen Dolan)
+@@ -265,6 +268,9 @@ OCaml 4.14.0
+ - #10786: The implementation of Complex.norm now uses Float.hypot.
+   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
 +* #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
 +  (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
@@ -41,7 +75,7 @@ index b07255fde7..81bbad4fbc 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -510,6 +516,9 @@ OCaml 4.14.0
+@@ -513,6 +519,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -1779,10 +1813,10 @@ index 0000000000..e761b63337
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..22bb95ec4d
+index 0000000000..30a68dd2c8
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,2610 @@
+@@ -0,0 +1,2634 @@
 +diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
 +index 93620c9bcc..4f6bf1dcab 100644
 +--- a/testsuite/tests/asmcomp/polling.c
@@ -3131,6 +3165,30 @@ index 0000000000..22bb95ec4d
 + *)
 + 
 + (* on Multicore, fork is not allowed is another domain is, and was running. *)
++diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
++index afaa814ca5..d696a26e82 100644
++--- a/testsuite/tests/memory-model/forbidden.ml
+++++ b/testsuite/tests/memory-model/forbidden.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+++  * skip
+++  reason = "OCaml 5 only"
++ *)
++ 
++ (* Memory model test:
++diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
++index 18fe866ccf..5e7e0bd565 100644
++--- a/testsuite/tests/memory-model/publish.ml
+++++ b/testsuite/tests/memory-model/publish.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+++  * skip
+++  reason = "OCaml 5 only"
++ *)
++ 
++ (* Memory model: test the _publish idiom *)
 +diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
 +index 9c1d0a3cf2..b1f5813b4a 100644
 +--- a/testsuite/tests/parallel/atomics.ml
@@ -4395,15 +4453,49 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0bb64a110d
+index 0000000000..ff35624120
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4316 @@
+@@ -0,0 +1,4428 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..d6c5d22aeb
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,31 @@
+++--- a	2023-09-28 18:43:47.799941327 +0100
++++++ b	2023-09-28 18:43:47.815941989 +0100
+++@@ -1,16 +1,16 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -262,6 +262,9 @@ OCaml 4.14.0
++++@@ -265,6 +265,9 @@ OCaml 4.14.0
+++    OCaml.
+++    (Damien Doligez, review by Stephen Dolan)
+++  
+++ +- #10786: The implementation of Complex.norm now uses Float.hypot.
+++ +  (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+++ +
+++- ### Other libraries:
++++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
++++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
+++  
+++- - #10192: Add support for Unix domain sockets on Windows and use them
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++@@ -24,7 +24,7 @@
+++ +    stdlib__Float.cmx \
+++      stdlib__Complex.cmi
+++  stdlib__Complex.cmi : complex.mli
+++- stdlib__Condition.cmo : condition.ml \
++++ stdlib__Digest.cmo : digest.ml \
+++ diff --git a/stdlib/complex.ml b/stdlib/complex.ml
+++ --- a/stdlib/complex.ml
+++ +++ b/stdlib/complex.ml
 +diff --git a/Changes b/Changes
-+index b07255fde7..81bbad4fbc 100644
++index 0a316e0ec2..d63054b1c9 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -122,6 +122,9 @@ Working version
@@ -4432,9 +4524,9 @@ index 0000000000..0bb64a110d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -262,6 +265,9 @@ OCaml 4.14.0
-+   OCaml.
-+   (Damien Doligez, review by Stephen Dolan)
++@@ -265,6 +268,9 @@ OCaml 4.14.0
++ - #10786: The implementation of Complex.norm now uses Float.hypot.
++   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
 ++* #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
 ++  (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
@@ -4442,7 +4534,7 @@ index 0000000000..0bb64a110d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -510,6 +516,9 @@ OCaml 4.14.0
++@@ -513,6 +519,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6180,10 +6272,10 @@ index 0000000000..0bb64a110d
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..22bb95ec4d
++index 0000000000..30a68dd2c8
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,2610 @@
++@@ -0,0 +1,2634 @@
 ++diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
 ++index 93620c9bcc..4f6bf1dcab 100644
 ++--- a/testsuite/tests/asmcomp/polling.c
@@ -7532,6 +7624,30 @@ index 0000000000..0bb64a110d
 ++ *)
 ++ 
 ++ (* on Multicore, fork is not allowed is another domain is, and was running. *)
+++diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
+++index afaa814ca5..d696a26e82 100644
+++--- a/testsuite/tests/memory-model/forbidden.ml
++++++ b/testsuite/tests/memory-model/forbidden.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
++++  * skip
++++  reason = "OCaml 5 only"
+++ *)
+++ 
+++ (* Memory model test:
+++diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+++index 18fe866ccf..5e7e0bd565 100644
+++--- a/testsuite/tests/memory-model/publish.ml
++++++ b/testsuite/tests/memory-model/publish.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
++++  * skip
++++  reason = "OCaml 5 only"
+++ *)
+++ 
+++ (* Memory model: test the _publish idiom *)
 ++diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
 ++index 9c1d0a3cf2..b1f5813b4a 100644
 ++--- a/testsuite/tests/parallel/atomics.ml
@@ -8714,7 +8830,61 @@ index 0000000000..0bb64a110d
 +++******* check-program-output
 ++ *)
 ++ 
-++ let f
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never]
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -9565,11 +9735,11 @@ index fe345466de..e9a1d2a31b 100644
 +
  #endif /* CAML_UNIXSUPPORT_H */
 diff --git a/stdlib/.depend b/stdlib/.depend
-index c0e1ddb92e..c37fe88100 100644
+index 424dede97b..2518c4cff6 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
-@@ -193,14 +193,6 @@ stdlib__Complex.cmo : complex.ml \
- stdlib__Complex.cmx : complex.ml \
+@@ -195,14 +195,6 @@ stdlib__Complex.cmx : complex.ml \
+     stdlib__Float.cmx \
      stdlib__Complex.cmi
  stdlib__Complex.cmi : complex.mli
 -stdlib__Condition.cmo : condition.ml \
@@ -9583,7 +9753,7 @@ index c0e1ddb92e..c37fe88100 100644
  stdlib__Digest.cmo : digest.ml \
      stdlib__String.cmi \
      stdlib__Char.cmi \
-@@ -212,35 +204,6 @@ stdlib__Digest.cmx : digest.ml \
+@@ -214,35 +206,6 @@ stdlib__Digest.cmx : digest.ml \
      stdlib__Bytes.cmx \
      stdlib__Digest.cmi
  stdlib__Digest.cmi : digest.mli
@@ -9619,7 +9789,7 @@ index c0e1ddb92e..c37fe88100 100644
  stdlib__Either.cmo : either.ml \
      stdlib__Either.cmi
  stdlib__Either.cmx : either.ml \
-@@ -277,7 +240,7 @@ stdlib__Filename.cmo : filename.ml \
+@@ -279,7 +242,7 @@ stdlib__Filename.cmo : filename.ml \
      stdlib__Random.cmi \
      stdlib__Printf.cmi \
      stdlib__List.cmi \
@@ -9628,7 +9798,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Buffer.cmi \
      stdlib__Filename.cmi
  stdlib__Filename.cmx : filename.ml \
-@@ -286,7 +249,7 @@ stdlib__Filename.cmx : filename.ml \
+@@ -288,7 +251,7 @@ stdlib__Filename.cmx : filename.ml \
      stdlib__Random.cmx \
      stdlib__Printf.cmx \
      stdlib__List.cmx \
@@ -9637,7 +9807,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Buffer.cmx \
      stdlib__Filename.cmi
  stdlib__Filename.cmi : filename.mli
-@@ -313,8 +276,8 @@ stdlib__Format.cmo : format.ml \
+@@ -315,8 +278,8 @@ stdlib__Format.cmo : format.ml \
      stdlib__Queue.cmi \
      stdlib__List.cmi \
      stdlib__Int.cmi \
@@ -9647,7 +9817,7 @@ index c0e1ddb92e..c37fe88100 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -328,8 +291,8 @@ stdlib__Format.cmx : format.ml \
+@@ -330,8 +293,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -9657,7 +9827,7 @@ index c0e1ddb92e..c37fe88100 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -339,7 +302,6 @@ stdlib__Format.cmi : format.mli \
+@@ -341,7 +304,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -9665,7 +9835,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -368,8 +330,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -370,8 +332,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -9675,7 +9845,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmx : hashtbl.ml \
-@@ -378,8 +340,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -380,8 +342,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -9685,7 +9855,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmi : hashtbl.mli \
-@@ -498,11 +460,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -500,11 +462,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -9697,7 +9867,7 @@ index c0e1ddb92e..c37fe88100 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -605,7 +562,6 @@ stdlib__Random.cmo : random.ml \
+@@ -607,7 +564,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -9705,7 +9875,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -616,7 +572,6 @@ stdlib__Random.cmx : random.ml \
+@@ -618,7 +574,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -9713,7 +9883,7 @@ index c0e1ddb92e..c37fe88100 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -656,15 +611,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -658,15 +613,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
