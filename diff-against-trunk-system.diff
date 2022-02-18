@@ -1,42 +1,31 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..d6c5d22aeb
+index 0000000000..bdfac8b2d3
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,31 @@
-+--- a	2023-09-28 18:43:47.799941327 +0100
-++++ b	2023-09-28 18:43:47.815941989 +0100
-+@@ -1,16 +1,16 @@
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:43:48.103953910 +0100
+++++ b	2023-09-28 18:43:48.115954406 +0100
++@@ -1,7 +1,7 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -262,6 +262,9 @@ OCaml 4.14.0
-++@@ -265,6 +265,9 @@ OCaml 4.14.0
-+    OCaml.
-+    (Damien Doligez, review by Stephen Dolan)
++-@@ -124,6 +124,9 @@ Working version
+++@@ -127,6 +127,9 @@ Working version
 +  
-+ +- #10786: The implementation of Complex.norm now uses Float.hypot.
-+ +  (Christophe Troestler, review by David Allsopp and Xavier Leroy)
-+ +
-+- ### Other libraries:
-++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
-++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
++  ### Bug fixes:
 +  
-+- - #10192: Add support for Unix domain sockets on Windows and use them
-+ diff --git a/stdlib/.depend b/stdlib/.depend
-+ --- a/stdlib/.depend
-+ +++ b/stdlib/.depend
-+@@ -24,7 +24,7 @@
-+ +    stdlib__Float.cmx \
-+      stdlib__Complex.cmi
-+  stdlib__Complex.cmi : complex.mli
-+- stdlib__Condition.cmo : condition.ml \
-++ stdlib__Digest.cmo : digest.ml \
-+ diff --git a/stdlib/complex.ml b/stdlib/complex.ml
-+ --- a/stdlib/complex.ml
-+ +++ b/stdlib/complex.ml
++@@ -16,7 +16,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1172,16 +1172,16 @@ AS_IF([test -z "$PARTIALLD"],
+++@@ -1184,16 +1184,16 @@ AS_IF([test -z "$PARTIALLD"],
++  # Disable PIE at link time when ocamlopt does not produce position-independent
++  # code and the system produces PIE executables by default and demands PIC
++  # object files to do so.
 diff --git a/Changes b/Changes
-index 0a316e0ec2..d63054b1c9 100644
+index ec2490bb1b..9c2d4fb716 100644
 --- a/Changes
 +++ b/Changes
 @@ -122,6 +122,9 @@ Working version
@@ -48,8 +37,8 @@ index 0a316e0ec2..d63054b1c9 100644
 +
  ### Bug fixes:
  
- OCaml 4.14.0
-@@ -159,13 +162,13 @@ OCaml 4.14.0
+ - #11025: Do not pass -no-pie to the C compiler on musl/arm64
+@@ -162,13 +165,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -65,7 +54,7 @@ index 0a316e0ec2..d63054b1c9 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -265,6 +268,9 @@ OCaml 4.14.0
+@@ -268,6 +271,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -75,7 +64,7 @@ index 0a316e0ec2..d63054b1c9 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -513,6 +519,9 @@ OCaml 4.14.0
+@@ -516,6 +522,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -398,10 +387,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index efa0bc9fb5..b3c51c0e7d 100755
+index 6dc6253a64..bd9d89aae2 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 81e8e940aa..f11189c0ff 100644
+index 3f28bc2bbb..1bc3a44bcb 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -4453,49 +4442,38 @@ index 0000000000..30a68dd2c8
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ff35624120
+index 0000000000..d94f146706
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4428 @@
+@@ -0,0 +1,4426 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..d6c5d22aeb
++index 0000000000..bdfac8b2d3
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,31 @@
-++--- a	2023-09-28 18:43:47.799941327 +0100
-+++++ b	2023-09-28 18:43:47.815941989 +0100
-++@@ -1,16 +1,16 @@
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:43:48.103953910 +0100
++++++ b	2023-09-28 18:43:48.115954406 +0100
+++@@ -1,7 +1,7 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -262,6 +262,9 @@ OCaml 4.14.0
-+++@@ -265,6 +265,9 @@ OCaml 4.14.0
-++    OCaml.
-++    (Damien Doligez, review by Stephen Dolan)
+++-@@ -124,6 +124,9 @@ Working version
++++@@ -127,6 +127,9 @@ Working version
 ++  
-++ +- #10786: The implementation of Complex.norm now uses Float.hypot.
-++ +  (Christophe Troestler, review by David Allsopp and Xavier Leroy)
-++ +
-++- ### Other libraries:
-+++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
-+++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
+++  ### Bug fixes:
 ++  
-++- - #10192: Add support for Unix domain sockets on Windows and use them
-++ diff --git a/stdlib/.depend b/stdlib/.depend
-++ --- a/stdlib/.depend
-++ +++ b/stdlib/.depend
-++@@ -24,7 +24,7 @@
-++ +    stdlib__Float.cmx \
-++      stdlib__Complex.cmi
-++  stdlib__Complex.cmi : complex.mli
-++- stdlib__Condition.cmo : condition.ml \
-+++ stdlib__Digest.cmo : digest.ml \
-++ diff --git a/stdlib/complex.ml b/stdlib/complex.ml
-++ --- a/stdlib/complex.ml
-++ +++ b/stdlib/complex.ml
+++@@ -16,7 +16,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1172,16 +1172,16 @@ AS_IF([test -z "$PARTIALLD"],
++++@@ -1184,16 +1184,16 @@ AS_IF([test -z "$PARTIALLD"],
+++  # Disable PIE at link time when ocamlopt does not produce position-independent
+++  # code and the system produces PIE executables by default and demands PIC
+++  # object files to do so.
 +diff --git a/Changes b/Changes
-+index 0a316e0ec2..d63054b1c9 100644
++index ec2490bb1b..9c2d4fb716 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -122,6 +122,9 @@ Working version
@@ -4507,8 +4485,8 @@ index 0000000000..ff35624120
 ++
 + ### Bug fixes:
 + 
-+ OCaml 4.14.0
-+@@ -159,13 +162,13 @@ OCaml 4.14.0
++ - #11025: Do not pass -no-pie to the C compiler on musl/arm64
++@@ -162,13 +165,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -4524,7 +4502,7 @@ index 0000000000..ff35624120
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -265,6 +268,9 @@ OCaml 4.14.0
++@@ -268,6 +271,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -4534,7 +4512,7 @@ index 0000000000..ff35624120
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -513,6 +519,9 @@ OCaml 4.14.0
++@@ -516,6 +522,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -4857,10 +4835,10 @@ index 0000000000..ff35624120
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index efa0bc9fb5..b3c51c0e7d 100755
++index 6dc6253a64..bd9d89aae2 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 81e8e940aa..f11189c0ff 100644
++index 3f28bc2bbb..1bc3a44bcb 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -8884,7 +8862,16 @@ index 0000000000..ff35624120
 +++   reason = "OCaml 5 only"
 +++*)
 ++ 
-++ let[@inline never][@local never]
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
