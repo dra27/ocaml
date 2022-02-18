@@ -12,6 +12,9 @@ OCaml 4.08 maintenance branch:
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+* #10723: do not use `-flat-namespace` linking for macOS.
+  (Carlo Cabrera, review by Damien Doligez)
+
 ### Code generation and optimizations:
 
 - #9549, #9557: Make -flarge-toc the default for PowerPC and introduce
