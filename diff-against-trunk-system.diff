@@ -1,20 +1,50 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..3e4f1a46cb
+index 0000000000..20dc4af1f2
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:48.387965660 +0100
-++++ b	2023-09-28 18:43:48.399966156 +0100
-+@@ -16,7 +16,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -934,7 +934,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -943,7 +943,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-+    [AS_CASE([$host],
-+      [*-apple-darwin*],
-+        [mksharedlib="$CC -shared \
+@@ -0,0 +1,41 @@
++--- a	2023-09-28 18:43:48.659976913 +0100
+++++ b	2023-09-28 18:43:48.663977079 +0100
++@@ -77,30 +77,30 @@
++ diff --git a/testsuite/tests/callback/test_signalhandler.ml b/testsuite/tests/callback/test_signalhandler.ml
++ --- a/testsuite/tests/callback/test_signalhandler.ml
++ +++ b/testsuite/tests/callback/test_signalhandler.ml
++-@@ -52,17 +52,17 @@ let sighandler signo =
++-   (* Thoroughly wipe the minor heap *)
+++@@ -53,17 +53,17 @@ let sighandler signo =
++    ignore (tak (18, 12, 6))
++  
+++ external raise_sigusr1 : unit -> unit = "raise_sigusr1" [@@noalloc]
++ -external unix_getpid : unit -> int = "unix_getpid" [@@noalloc]
++ -external unix_kill : int -> int -> unit = "unix_kill" [@@noalloc]
++-+external mykill : int -> int -> unit = "mykill" [@@noalloc]
++++(*external mykill : int -> int -> unit = "mykill" [@@noalloc]*)
++  
++  let callbacksig () =
++--  let pid = unix_getpid() in
++-+  let pid = Unix.getpid () in
+++-  let _pid = unix_getpid() in
++++  let _pid = Unix.getpid() in
++    (* Allocate a block in the minor heap *)
++    let s = String.make 5 'b' in
++    (* Send a signal to self.  We want s to remain in a register and
++ -     not be spilled on the stack, hence we declare unix_kill
++ -     [@@noalloc]. *)
++--  unix_kill pid Sys.sigusr1;
+++-  (*unix_kill pid Sys.sigusr1;*)
++ +     not be spilled on the stack, hence we use [mykill]
++ +     (which is [@@noalloc] and doesn't trigger signal handling)
++ +     instead of [Unix.kill]. *)
++-+  mykill pid Sys.sigusr1;
++++  (*mykill pid Sys.sigusr1;*)
+++   raise_sigusr1 ();
++    (* Allocate some more so that the signal will be tested *)
++    let u = (s, s) in
++-   fst u
++ diff --git a/testsuite/tests/callback/test_signalhandler.mli b/testsuite/tests/callback/test_signalhandler.mli
++ deleted file mode 100644
++ --- a/testsuite/tests/callback/test_signalhandler.mli
 diff --git a/Changes b/Changes
 index d880eb50c5..14b38f8032 100644
 --- a/Changes
@@ -4433,27 +4463,57 @@ index 0000000000..30a68dd2c8
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6ed0d0d9bf
+index 0000000000..c23cc7172a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4425 @@
+@@ -0,0 +1,4414 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..3e4f1a46cb
++index 0000000000..20dc4af1f2
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:48.387965660 +0100
-+++++ b	2023-09-28 18:43:48.399966156 +0100
-++@@ -16,7 +16,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -934,7 +934,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -943,7 +943,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-++    [AS_CASE([$host],
-++      [*-apple-darwin*],
-++        [mksharedlib="$CC -shared \
++@@ -0,0 +1,41 @@
+++--- a	2023-09-28 18:43:48.659976913 +0100
++++++ b	2023-09-28 18:43:48.663977079 +0100
+++@@ -77,30 +77,30 @@
+++ diff --git a/testsuite/tests/callback/test_signalhandler.ml b/testsuite/tests/callback/test_signalhandler.ml
+++ --- a/testsuite/tests/callback/test_signalhandler.ml
+++ +++ b/testsuite/tests/callback/test_signalhandler.ml
+++-@@ -52,17 +52,17 @@ let sighandler signo =
+++-   (* Thoroughly wipe the minor heap *)
++++@@ -53,17 +53,17 @@ let sighandler signo =
+++    ignore (tak (18, 12, 6))
+++  
++++ external raise_sigusr1 : unit -> unit = "raise_sigusr1" [@@noalloc]
+++ -external unix_getpid : unit -> int = "unix_getpid" [@@noalloc]
+++ -external unix_kill : int -> int -> unit = "unix_kill" [@@noalloc]
+++-+external mykill : int -> int -> unit = "mykill" [@@noalloc]
+++++(*external mykill : int -> int -> unit = "mykill" [@@noalloc]*)
+++  
+++  let callbacksig () =
+++--  let pid = unix_getpid() in
+++-+  let pid = Unix.getpid () in
++++-  let _pid = unix_getpid() in
+++++  let _pid = Unix.getpid() in
+++    (* Allocate a block in the minor heap *)
+++    let s = String.make 5 'b' in
+++    (* Send a signal to self.  We want s to remain in a register and
+++ -     not be spilled on the stack, hence we declare unix_kill
+++ -     [@@noalloc]. *)
+++--  unix_kill pid Sys.sigusr1;
++++-  (*unix_kill pid Sys.sigusr1;*)
+++ +     not be spilled on the stack, hence we use [mykill]
+++ +     (which is [@@noalloc] and doesn't trigger signal handling)
+++ +     instead of [Unix.kill]. *)
+++-+  mykill pid Sys.sigusr1;
+++++  (*mykill pid Sys.sigusr1;*)
++++   raise_sigusr1 ();
+++    (* Allocate some more so that the signal will be tested *)
+++    let u = (s, s) in
+++-   fst u
+++ diff --git a/testsuite/tests/callback/test_signalhandler.mli b/testsuite/tests/callback/test_signalhandler.mli
+++ deleted file mode 100644
+++ --- a/testsuite/tests/callback/test_signalhandler.mli
 +diff --git a/Changes b/Changes
 +index d880eb50c5..14b38f8032 100644
 +--- a/Changes
@@ -8820,48 +8880,7 @@ index 0000000000..6ed0d0d9bf
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tes
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

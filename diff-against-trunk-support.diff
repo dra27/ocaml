@@ -589,7 +589,7 @@ index 7f35966184..9459b6c601 100644
  
  (* Tests nested calls from C (main C) to OCaml (main OCaml) to C (caml_to_c) to
 diff --git a/testsuite/tests/callback/test_signalhandler.ml b/testsuite/tests/callback/test_signalhandler.ml
-index 9d0ecaac13..1c24a38f9d 100644
+index a2bbacee72..9250395618 100644
 --- a/testsuite/tests/callback/test_signalhandler.ml
 +++ b/testsuite/tests/callback/test_signalhandler.ml
 @@ -1,6 +1,6 @@
@@ -604,20 +604,21 @@ index 9d0ecaac13..1c24a38f9d 100644
    (* Thoroughly wipe the minor heap *)
    ignore (tak (18, 12, 6))
  
+-external mykill : int -> int -> unit = "mykill" [@@noalloc]
 +external raise_sigusr1 : unit -> unit = "raise_sigusr1" [@@noalloc]
- external unix_getpid : unit -> int = "unix_getpid" [@@noalloc]
- external unix_kill : int -> int -> unit = "unix_kill" [@@noalloc]
++(*external mykill : int -> int -> unit = "mykill" [@@noalloc]*)
  
  let callbacksig () =
--  let pid = unix_getpid() in
-+  let _pid = unix_getpid() in
+-  let pid = Unix.getpid () in
++  let _pid = Unix.getpid() in
    (* Allocate a block in the minor heap *)
    let s = String.make 5 'b' in
    (* Send a signal to self.  We want s to remain in a register and
-      not be spilled on the stack, hence we declare unix_kill
-      [@@noalloc]. *)
--  unix_kill pid Sys.sigusr1;
-+  (*unix_kill pid Sys.sigusr1;*)
+      not be spilled on the stack, hence we use [mykill]
+      (which is [@@noalloc] and doesn't trigger signal handling)
+      instead of [Unix.kill]. *)
+-  mykill pid Sys.sigusr1;
++  (*mykill pid Sys.sigusr1;*)
 +  raise_sigusr1 ();
    (* Allocate some more so that the signal will be tested *)
    let u = (s, s) in
