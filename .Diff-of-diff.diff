@@ -1,74 +1,94 @@
---- a	2023-09-28 18:43:49.864026702 +0100
-+++ b	2023-09-28 18:43:49.884027529 +0100
-@@ -36,10 +36,11 @@
- diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
- --- a/asmcomp/amd64/emit.mlp
- +++ b/asmcomp/amd64/emit.mlp
--@@ -876,29 +876,6 @@ let rec emit_all env fallthrough i =
-+@@ -925,31 +925,6 @@ let rec emit_all env fallthrough i =
+--- a	2023-09-28 18:43:50.332046043 +0100
++++ b	2023-09-28 18:43:50.344046539 +0100
+@@ -3,7 +3,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -197,6 +197,20 @@ AC_CANONICAL_BUILD
++@@ -199,6 +199,20 @@ AC_CANONICAL_BUILD
+  AC_CANONICAL_HOST
+  AC_CANONICAL_TARGET
   
-  let all_functions = ref []
+@@ -24,7 +24,7 @@
+  AS_CASE([$host],
+    [*-pc-windows],
+      [CC=cl
+-@@ -205,10 +219,6 @@ AS_CASE([$host],
++@@ -207,10 +221,6 @@ AS_CASE([$host],
+      SO=dll
+      outputexe=-Fe
+      syslib='$(1).lib'],
+@@ -35,7 +35,7 @@
+    [ccomptype=cc
+    S=s
+    SO=so
+-@@ -595,10 +605,8 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
++@@ -604,10 +614,8 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
+  # - strict no-overflow conditions on signed integer arithmetic
+  #   (the OCaml runtime assumes Java-style behavior of signed integer arith.)
+  # Concerning optimization level, -O3 is somewhat risky, so take -O2.
+@@ -48,7 +48,7 @@
   
-+-(* BACKPORT
- -type preproc_fun_result =
- -  { max_stack_size : int;
- -    contains_nontail_calls : bool }
-@@ -63,11 +64,12 @@
- -  let fs = frame_size env in
- -  let r = {max_stack_size = fs; contains_nontail_calls = false} in
- -  proc_instr r fs fun_body
-+-*)
+  # Note: the vendor macro can not recognize MinGW because it calls the
+  # C preprocessor directly so no compiler specific macro like __MING32__
+-@@ -624,32 +632,13 @@ AS_CASE([$host],
++@@ -633,32 +641,13 @@ AS_CASE([$host],
+      [clang-*],
+        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
+        internal_cflags="$cc_warnings -fno-common"],
+@@ -85,7 +85,7 @@
+      [msvc-*],
+        [common_cflags="-nologo -O2 -Gy- -MD $cc_warnings"
+        common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
+-@@ -1152,11 +1141,13 @@ AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
++@@ -1164,11 +1153,13 @@ AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
   
-  (* Emission of a function declaration *)
+  AC_CHECK_TOOL([DIRECT_LD],[ld])
+  AS_IF([test -z "$PARTIALLD"],
+@@ -366,7 +366,7 @@
+ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+-@@ -10,17 +10,22 @@ open Domain
++@@ -12,17 +12,22 @@ open Domain
+  (* This test looks to spawn domains while doing a bunch of explicit minor and major GC calls
+     from parallel domains *)
   
--@@ -920,14 +897,15 @@ let fundecl fundecl =
--   cfi_startproc ();
-+@@ -972,14 +947,15 @@ let fundecl fundecl =
-+ (* BACKPORT
-    if !Clflags.runtime_variant = "d" then
-      emit_call "caml_assert_stack_invariants";
- -  let { max_stack_size; contains_nontail_calls} =
-@@ -86,7 +88,7 @@
-      I.cmp (domain_field Domainstate.Domain_current_stack) r10;
-      I.jb (label overflow);
-      def_label ret;
--@@ -940,10 +918,10 @@ let fundecl fundecl =
-+@@ -994,10 +970,10 @@ let fundecl fundecl =
-    | None -> ()
-    | Some (overflow,ret) -> begin
-        def_label overflow;
-@@ -456,34 +458,6 @@
- +  frame_size:int ->
- +  trap_size:int ->
- +  preproc_stack_check_result
--diff --git a/configure b/configure
--Binary files a/configure and b/configure differ
--diff --git a/configure.ac b/configure.ac
----- a/configure.ac
--+++ b/configure.ac
--@@ -1113,16 +1113,16 @@ dnl   [arch=amd64; system=solaris],
--     [arch=amd64; system=openbsd],
-- dnl [x86_64-*-haiku*],
-- dnl   [arch=amd64; system=beos],
---dnl [arm64-*-darwin*],
---dnl   [arch=arm64; system=macosx],
---dnl [aarch64-*-darwin*],
---dnl   [arch=arm64; system=macosx],
--+  [arm64-*-darwin*],
--+    [arch=arm64; system=macosx],
--+  [aarch64-*-darwin*],
--+    [arch=arm64; system=macosx],
--   [x86_64-*-darwin*],
--     [arch=amd64; system=macosx],
--   [x86_64-*-mingw32],
--     [arch=amd64; system=mingw64],
---dnl [aarch64-*-linux*],
---dnl   [arch=arm64; system=linux],
--+  [aarch64-*-linux*],
--+    [arch=arm64; system=linux],
-- dnl [aarch64-*-freebsd*],
-- dnl   [arch=arm64; system=freebsd],
-- dnl [x86_64-*-cygwin*],
- diff --git a/testsuite/tests/unwind/stack_walker.c b/testsuite/tests/unwind/stack_walker.c
- --- a/testsuite/tests/unwind/stack_walker.c
- +++ b/testsuite/tests/unwind/stack_walker.c
+@@ -397,7 +397,7 @@
+ diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+ --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+ +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+-@@ -7,11 +7,18 @@ include unix
++@@ -9,11 +9,18 @@ include unix
+  
+  open Domain
+  
+@@ -417,7 +417,7 @@
+    else
+      burn (l @ l |> List.map (fun x -> x + 1))
+  
+-@@ -21,14 +28,6 @@ let test_serial_domain_spawn () =
++@@ -23,14 +30,6 @@ let test_serial_domain_spawn () =
+      join d
+    done
+  
+@@ -435,8 +435,8 @@
+ diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
+ --- a/testsuite/tests/parallel/join.ml
+ +++ b/testsuite/tests/parallel/join.ml
+-@@ -5,6 +5,13 @@ include unix
+- ** native
++@@ -7,6 +7,13 @@ include unix
++ *** native
+  *)
+  
+ +let test_size =
+@@ -449,7 +449,7 @@
+  let main_join n =
+    let a = Array.init n (fun _ -> false) in
+    Array.init n (fun i -> Domain.spawn (fun () ->
+-@@ -48,8 +55,8 @@ let join2 () =
++@@ -50,8 +57,8 @@ let join2 () =
+      assert !r
+  
+  let () =
