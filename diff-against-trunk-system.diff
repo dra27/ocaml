@@ -1,103 +1,121 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0397577527
+index 0000000000..4c6d748cc4
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,94 @@
-+--- a	2023-09-28 18:43:50.332046043 +0100
-++++ b	2023-09-28 18:43:50.344046539 +0100
-+@@ -3,7 +3,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -197,6 +197,20 @@ AC_CANONICAL_BUILD
-++@@ -199,6 +199,20 @@ AC_CANONICAL_BUILD
-+  AC_CANONICAL_HOST
-+  AC_CANONICAL_TARGET
-+  
+@@ -0,0 +1,112 @@
++--- a	2023-09-28 18:43:50.808065710 +0100
+++++ b	2023-09-28 18:43:50.816066041 +0100
 +@@ -24,7 +24,7 @@
-+  AS_CASE([$host],
-+    [*-pc-windows],
-+      [CC=cl
-+-@@ -205,10 +219,6 @@ AS_CASE([$host],
-++@@ -207,10 +221,6 @@ AS_CASE([$host],
-+      SO=dll
-+      outputexe=-Fe
-+      syslib='$(1).lib'],
-+@@ -35,7 +35,7 @@
-+    [ccomptype=cc
-+    S=s
-+    SO=so
-+-@@ -595,10 +605,8 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-++@@ -604,10 +614,8 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-+  # - strict no-overflow conditions on signed integer arithmetic
-+  #   (the OCaml runtime assumes Java-style behavior of signed integer arith.)
-+  # Concerning optimization level, -O3 is somewhat risky, so take -O2.
-+@@ -48,7 +48,7 @@
-+  
-+  # Note: the vendor macro can not recognize MinGW because it calls the
-+  # C preprocessor directly so no compiler specific macro like __MING32__
-+-@@ -624,32 +632,13 @@ AS_CASE([$host],
-++@@ -633,32 +641,13 @@ AS_CASE([$host],
-+      [clang-*],
-+        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
-+        internal_cflags="$cc_warnings -fno-common"],
-+@@ -85,7 +85,7 @@
-+      [msvc-*],
-+        [common_cflags="-nologo -O2 -Gy- -MD $cc_warnings"
-+        common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
-+-@@ -1152,11 +1141,13 @@ AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
-++@@ -1164,11 +1153,13 @@ AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
-+  
-+  AC_CHECK_TOOL([DIRECT_LD],[ld])
-+  AS_IF([test -z "$PARTIALLD"],
-+@@ -366,7 +366,7 @@
-+ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-+ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-+ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-+-@@ -10,17 +10,22 @@ open Domain
-++@@ -12,17 +12,22 @@ open Domain
-+  (* This test looks to spawn domains while doing a bunch of explicit minor and major GC calls
-+     from parallel domains *)
-+  
-+@@ -397,7 +397,7 @@
-+ diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-+ --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-+ +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-+-@@ -7,11 +7,18 @@ include unix
-++@@ -9,11 +9,18 @@ include unix
-+  
-+  open Domain
-+  
-+@@ -417,7 +417,7 @@
-+    else
-+      burn (l @ l |> List.map (fun x -> x + 1))
-+  
-+-@@ -21,14 +28,6 @@ let test_serial_domain_spawn () =
-++@@ -23,14 +30,6 @@ let test_serial_domain_spawn () =
-+      join d
-+    done
-+  
-+@@ -435,8 +435,8 @@
-+ diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
-+ --- a/testsuite/tests/parallel/join.ml
-+ +++ b/testsuite/tests/parallel/join.ml
-+-@@ -5,6 +5,13 @@ include unix
-+- ** native
-++@@ -7,6 +7,13 @@ include unix
-++ *** native
-+  *)
-+  
-+ +let test_size =
-+@@ -449,7 +449,7 @@
-+  let main_join n =
-+    let a = Array.init n (fun _ -> false) in
-+    Array.init n (fun i -> Domain.spawn (fun () ->
-+-@@ -48,8 +55,8 @@ let join2 () =
-++@@ -50,8 +57,8 @@ let join2 () =
-+      assert !r
-+  
-+  let () =
++  camlinternalFormat.cmo : \
++      stdlib__Sys.cmi \
++      stdlib__String.cmi \
++-@@ -670,12 +663,12 @@ stdlib__Semaphore.cmi : semaphore.mli
+++@@ -616,12 +609,12 @@ stdlib__Scanf.cmi : scanf.mli \
++  stdlib__Seq.cmo : seq.ml \
++      stdlib__Lazy.cmi \
++      stdlib__Either.cmi \
++@@ -39,7 +39,7 @@
++      stdlib__Seq.cmi
++  stdlib__Seq.cmi : seq.mli \
++      stdlib__Either.cmi
++-@@ -775,11 +768,9 @@ stdlib__Weak.cmi : weak.mli \
+++@@ -721,11 +714,9 @@ stdlib__Weak.cmi : weak.mli \
++      stdlib__Hashtbl.cmi
++  stdlib.cmo : \
++      camlinternalFormatBasics.cmi \
++@@ -77,7 +77,7 @@
++ diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
++ --- a/stdlib/StdlibModules
++ +++ b/stdlib/StdlibModules
++-@@ -34,13 +34,12 @@
+++@@ -34,13 +34,11 @@
++  # Basenames of the source files for the standard library (i.e. unprefixed and
++  # with lowercase first letters). These must be listed in dependency order.
++  STDLIB_MODULE_BASENAMES = \
++@@ -89,8 +89,7 @@
++    seq option result bool char uchar \
++    list int bytes string unit marshal array float int32 int64 nativeint \
++    lexing parsing set map stack queue buffer \
++--  atomic mutex condition semaphore domain \
++-+  mutex condition semaphore domain \
+++-  atomic \
++    camlinternalFormat printf arg \
++    printexc fun gc digest bigarray random hashtbl weak \
++    format scanf callback camlinternalOO oo camlinternalMod ephemeron \
++@@ -165,7 +164,7 @@
++ deleted file mode 100644
++ --- a/stdlib/camlinternalAtomic.ml
++ +++ /dev/null
++-@@ -1,32 +0,0 @@
+++@@ -1,77 +0,0 @@
++ -(**************************************************************************)
++ -(*                                                                        *)
++ -(*                                 OCaml                                  *)
++@@ -182,8 +181,11 @@
++ -(*                                                                        *)
++ -(**************************************************************************)
++ -
+++-(* BACKPORT - REVERTED to 4.14 STATE *)
+++-
++ -(* CamlinternalAtomic is a dependency of Stdlib, so it is compiled with
++ -   -nopervasives. *)
+++-(*
++ -type !'a t
++ -
++ -(* Atomic is a dependency of Stdlib, so it is compiled with
++@@ -193,9 +195,51 @@
++ -external exchange : 'a t -> 'a -> 'a = "%atomic_exchange"
++ -external compare_and_set : 'a t -> 'a -> 'a -> bool = "%atomic_cas"
++ -external fetch_and_add : int t -> int -> int = "%atomic_fetch_add"
+++-*)
+++-external ( == ) : 'a -> 'a -> bool = "%eq"
+++-external ( + ) : int -> int -> int = "%addint"
++ -external ignore : 'a -> unit = "%ignore"
++ -
+++-(* We are not reusing ('a ref) directly to make it easier to reason
+++-   about atomicity if we wish to: even in a sequential implementation,
+++-   signals and other asynchronous callbacks might break atomicity. *)
+++-type 'a t = {mutable v: 'a}
+++-
+++-let make v = {v}
+++-let get r = r.v
+++-let set r v = r.v <- v
+++-
+++-(* The following functions are set to never be inlined: Flambda is
+++-   allowed to move surrounding code inside the critical section,
+++-   including allocations. *)
+++-
+++-let[@inline never] exchange r v =
+++-  (* BEGIN ATOMIC *)
+++-  let cur = r.v in
+++-  r.v <- v;
+++-  (* END ATOMIC *)
+++-  cur
+++-
+++-let[@inline never] compare_and_set r seen v =
+++-  (* BEGIN ATOMIC *)
+++-  let cur = r.v in
+++-  if cur == seen then (
+++-    r.v <- v;
+++-    (* END ATOMIC *)
+++-    true
+++-  ) else
+++-    false
+++-
+++-let[@inline never] fetch_and_add r n =
+++-  (* BEGIN ATOMIC *)
+++-  let cur = r.v in
+++-  r.v <- (cur + n);
+++-  (* END ATOMIC *)
+++-  cur
+++-
+++-(*
++ -let set r x = ignore (exchange r x)
+++-*)
++ -let incr r = ignore (fetch_and_add r 1)
++ -let decr r = ignore (fetch_and_add r (-1))
++ diff --git a/stdlib/camlinternalAtomic.mli b/stdlib/camlinternalAtomic.mli
 diff --git a/Changes b/Changes
 index 872157e496..3357cd771f 100644
 --- a/Changes
@@ -4704,110 +4722,128 @@ index 0000000000..85d2c0ac9d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..906265000f
+index 0000000000..088b06b4de
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4647 @@
+@@ -0,0 +1,4653 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0397577527
++index 0000000000..4c6d748cc4
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,94 @@
-++--- a	2023-09-28 18:43:50.332046043 +0100
-+++++ b	2023-09-28 18:43:50.344046539 +0100
-++@@ -3,7 +3,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -197,6 +197,20 @@ AC_CANONICAL_BUILD
-+++@@ -199,6 +199,20 @@ AC_CANONICAL_BUILD
-++  AC_CANONICAL_HOST
-++  AC_CANONICAL_TARGET
-++  
++@@ -0,0 +1,112 @@
+++--- a	2023-09-28 18:43:50.808065710 +0100
++++++ b	2023-09-28 18:43:50.816066041 +0100
 ++@@ -24,7 +24,7 @@
-++  AS_CASE([$host],
-++    [*-pc-windows],
-++      [CC=cl
-++-@@ -205,10 +219,6 @@ AS_CASE([$host],
-+++@@ -207,10 +221,6 @@ AS_CASE([$host],
-++      SO=dll
-++      outputexe=-Fe
-++      syslib='$(1).lib'],
-++@@ -35,7 +35,7 @@
-++    [ccomptype=cc
-++    S=s
-++    SO=so
-++-@@ -595,10 +605,8 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-+++@@ -604,10 +614,8 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-++  # - strict no-overflow conditions on signed integer arithmetic
-++  #   (the OCaml runtime assumes Java-style behavior of signed integer arith.)
-++  # Concerning optimization level, -O3 is somewhat risky, so take -O2.
-++@@ -48,7 +48,7 @@
-++  
-++  # Note: the vendor macro can not recognize MinGW because it calls the
-++  # C preprocessor directly so no compiler specific macro like __MING32__
-++-@@ -624,32 +632,13 @@ AS_CASE([$host],
-+++@@ -633,32 +641,13 @@ AS_CASE([$host],
-++      [clang-*],
-++        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
-++        internal_cflags="$cc_warnings -fno-common"],
-++@@ -85,7 +85,7 @@
-++      [msvc-*],
-++        [common_cflags="-nologo -O2 -Gy- -MD $cc_warnings"
-++        common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
-++-@@ -1152,11 +1141,13 @@ AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
-+++@@ -1164,11 +1153,13 @@ AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
-++  
-++  AC_CHECK_TOOL([DIRECT_LD],[ld])
-++  AS_IF([test -z "$PARTIALLD"],
-++@@ -366,7 +366,7 @@
-++ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-++ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-++ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-++-@@ -10,17 +10,22 @@ open Domain
-+++@@ -12,17 +12,22 @@ open Domain
-++  (* This test looks to spawn domains while doing a bunch of explicit minor and major GC calls
-++     from parallel domains *)
-++  
-++@@ -397,7 +397,7 @@
-++ diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-++ --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-++ +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-++-@@ -7,11 +7,18 @@ include unix
-+++@@ -9,11 +9,18 @@ include unix
-++  
-++  open Domain
-++  
-++@@ -417,7 +417,7 @@
-++    else
-++      burn (l @ l |> List.map (fun x -> x + 1))
-++  
-++-@@ -21,14 +28,6 @@ let test_serial_domain_spawn () =
-+++@@ -23,14 +30,6 @@ let test_serial_domain_spawn () =
-++      join d
-++    done
-++  
-++@@ -435,8 +435,8 @@
-++ diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
-++ --- a/testsuite/tests/parallel/join.ml
-++ +++ b/testsuite/tests/parallel/join.ml
-++-@@ -5,6 +5,13 @@ include unix
-++- ** native
-+++@@ -7,6 +7,13 @@ include unix
-+++ *** native
-++  *)
-++  
-++ +let test_size =
-++@@ -449,7 +449,7 @@
-++  let main_join n =
-++    let a = Array.init n (fun _ -> false) in
-++    Array.init n (fun i -> Domain.spawn (fun () ->
-++-@@ -48,8 +55,8 @@ let join2 () =
-+++@@ -50,8 +57,8 @@ let join2 () =
-++      assert !r
-++  
-++  let () =
+++  camlinternalFormat.cmo : \
+++      stdlib__Sys.cmi \
+++      stdlib__String.cmi \
+++-@@ -670,12 +663,12 @@ stdlib__Semaphore.cmi : semaphore.mli
++++@@ -616,12 +609,12 @@ stdlib__Scanf.cmi : scanf.mli \
+++  stdlib__Seq.cmo : seq.ml \
+++      stdlib__Lazy.cmi \
+++      stdlib__Either.cmi \
+++@@ -39,7 +39,7 @@
+++      stdlib__Seq.cmi
+++  stdlib__Seq.cmi : seq.mli \
+++      stdlib__Either.cmi
+++-@@ -775,11 +768,9 @@ stdlib__Weak.cmi : weak.mli \
++++@@ -721,11 +714,9 @@ stdlib__Weak.cmi : weak.mli \
+++      stdlib__Hashtbl.cmi
+++  stdlib.cmo : \
+++      camlinternalFormatBasics.cmi \
+++@@ -77,7 +77,7 @@
+++ diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
+++ --- a/stdlib/StdlibModules
+++ +++ b/stdlib/StdlibModules
+++-@@ -34,13 +34,12 @@
++++@@ -34,13 +34,11 @@
+++  # Basenames of the source files for the standard library (i.e. unprefixed and
+++  # with lowercase first letters). These must be listed in dependency order.
+++  STDLIB_MODULE_BASENAMES = \
+++@@ -89,8 +89,7 @@
+++    seq option result bool char uchar \
+++    list int bytes string unit marshal array float int32 int64 nativeint \
+++    lexing parsing set map stack queue buffer \
+++--  atomic mutex condition semaphore domain \
+++-+  mutex condition semaphore domain \
++++-  atomic \
+++    camlinternalFormat printf arg \
+++    printexc fun gc digest bigarray random hashtbl weak \
+++    format scanf callback camlinternalOO oo camlinternalMod ephemeron \
+++@@ -165,7 +164,7 @@
+++ deleted file mode 100644
+++ --- a/stdlib/camlinternalAtomic.ml
+++ +++ /dev/null
+++-@@ -1,32 +0,0 @@
++++@@ -1,77 +0,0 @@
+++ -(**************************************************************************)
+++ -(*                                                                        *)
+++ -(*                                 OCaml                                  *)
+++@@ -182,8 +181,11 @@
+++ -(*                                                                        *)
+++ -(**************************************************************************)
+++ -
++++-(* BACKPORT - REVERTED to 4.14 STATE *)
++++-
+++ -(* CamlinternalAtomic is a dependency of Stdlib, so it is compiled with
+++ -   -nopervasives. *)
++++-(*
+++ -type !'a t
+++ -
+++ -(* Atomic is a dependency of Stdlib, so it is compiled with
+++@@ -193,9 +195,51 @@
+++ -external exchange : 'a t -> 'a -> 'a = "%atomic_exchange"
+++ -external compare_and_set : 'a t -> 'a -> 'a -> bool = "%atomic_cas"
+++ -external fetch_and_add : int t -> int -> int = "%atomic_fetch_add"
++++-*)
++++-external ( == ) : 'a -> 'a -> bool = "%eq"
++++-external ( + ) : int -> int -> int = "%addint"
+++ -external ignore : 'a -> unit = "%ignore"
+++ -
++++-(* We are not reusing ('a ref) directly to make it easier to reason
++++-   about atomicity if we wish to: even in a sequential implementation,
++++-   signals and other asynchronous callbacks might break atomicity. *)
++++-type 'a t = {mutable v: 'a}
++++-
++++-let make v = {v}
++++-let get r = r.v
++++-let set r v = r.v <- v
++++-
++++-(* The following functions are set to never be inlined: Flambda is
++++-   allowed to move surrounding code inside the critical section,
++++-   including allocations. *)
++++-
++++-let[@inline never] exchange r v =
++++-  (* BEGIN ATOMIC *)
++++-  let cur = r.v in
++++-  r.v <- v;
++++-  (* END ATOMIC *)
++++-  cur
++++-
++++-let[@inline never] compare_and_set r seen v =
++++-  (* BEGIN ATOMIC *)
++++-  let cur = r.v in
++++-  if cur == seen then (
++++-    r.v <- v;
++++-    (* END ATOMIC *)
++++-    true
++++-  ) else
++++-    false
++++-
++++-let[@inline never] fetch_and_add r n =
++++-  (* BEGIN ATOMIC *)
++++-  let cur = r.v in
++++-  r.v <- (cur + n);
++++-  (* END ATOMIC *)
++++-  cur
++++-
++++-(*
+++ -let set r x = ignore (exchange r x)
++++-*)
+++ -let incr r = ignore (fetch_and_add r 1)
+++ -let decr r = ignore (fetch_and_add r (-1))
+++ diff --git a/stdlib/camlinternalAtomic.mli b/stdlib/camlinternalAtomic.mli
 +diff --git a/Changes b/Changes
 +index 872157e496..3357cd771f 100644
 +--- a/Changes
@@ -9342,19 +9378,7 @@ index 0000000000..906265000f
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unw
++++Error: Illega
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -10205,10 +10229,10 @@ index fe345466de..e9a1d2a31b 100644
 +
  #endif /* CAML_UNIXSUPPORT_H */
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 424dede97b..2518c4cff6 100644
+index f83f96f9c9..ca0851f1ac 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
-@@ -195,14 +195,6 @@ stdlib__Complex.cmx : complex.ml \
+@@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
      stdlib__Float.cmx \
      stdlib__Complex.cmi
  stdlib__Complex.cmi : complex.mli
@@ -10223,7 +10247,7 @@ index 424dede97b..2518c4cff6 100644
  stdlib__Digest.cmo : digest.ml \
      stdlib__String.cmi \
      stdlib__Char.cmi \
-@@ -214,35 +206,6 @@ stdlib__Digest.cmx : digest.ml \
+@@ -207,35 +199,6 @@ stdlib__Digest.cmx : digest.ml \
      stdlib__Bytes.cmx \
      stdlib__Digest.cmi
  stdlib__Digest.cmi : digest.mli
@@ -10259,7 +10283,7 @@ index 424dede97b..2518c4cff6 100644
  stdlib__Either.cmo : either.ml \
      stdlib__Either.cmi
  stdlib__Either.cmx : either.ml \
-@@ -279,7 +242,7 @@ stdlib__Filename.cmo : filename.ml \
+@@ -272,7 +235,7 @@ stdlib__Filename.cmo : filename.ml \
      stdlib__Random.cmi \
      stdlib__Printf.cmi \
      stdlib__List.cmi \
@@ -10268,7 +10292,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Buffer.cmi \
      stdlib__Filename.cmi
  stdlib__Filename.cmx : filename.ml \
-@@ -288,7 +251,7 @@ stdlib__Filename.cmx : filename.ml \
+@@ -281,7 +244,7 @@ stdlib__Filename.cmx : filename.ml \
      stdlib__Random.cmx \
      stdlib__Printf.cmx \
      stdlib__List.cmx \
@@ -10277,7 +10301,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Buffer.cmx \
      stdlib__Filename.cmi
  stdlib__Filename.cmi : filename.mli
-@@ -315,8 +278,8 @@ stdlib__Format.cmo : format.ml \
+@@ -308,8 +271,8 @@ stdlib__Format.cmo : format.ml \
      stdlib__Queue.cmi \
      stdlib__List.cmi \
      stdlib__Int.cmi \
@@ -10287,7 +10311,7 @@ index 424dede97b..2518c4cff6 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -330,8 +293,8 @@ stdlib__Format.cmx : format.ml \
+@@ -323,8 +286,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -10297,7 +10321,7 @@ index 424dede97b..2518c4cff6 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -341,7 +304,6 @@ stdlib__Format.cmi : format.mli \
+@@ -334,7 +297,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -10305,7 +10329,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -370,8 +332,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -363,8 +325,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -10315,7 +10339,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmx : hashtbl.ml \
-@@ -380,8 +342,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -373,8 +335,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -10325,7 +10349,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmi : hashtbl.mli \
-@@ -500,11 +462,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -493,11 +455,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -10337,7 +10361,7 @@ index 424dede97b..2518c4cff6 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -607,7 +564,6 @@ stdlib__Random.cmo : random.ml \
+@@ -600,7 +557,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -10345,7 +10369,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -618,7 +574,6 @@ stdlib__Random.cmx : random.ml \
+@@ -611,7 +567,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -10353,7 +10377,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -658,15 +613,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -651,15 +606,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -10370,7 +10394,7 @@ index 424dede97b..2518c4cff6 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 0550580d31..d84de16336 100644
+index 9f78d23ecd..b6480b298d 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -264,7 +264,8 @@ GNUISH_SED = \
@@ -10384,15 +10408,14 @@ index 0550580d31..d84de16336 100644
  	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
  	  stdlib.ml stdlib.mli >> .depend.tmp
 diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
-index 084499581f..44b6112abf 100644
+index fc299a5ea8..0780508c00 100644
 --- a/stdlib/StdlibModules
 +++ b/stdlib/StdlibModules
-@@ -40,12 +40,12 @@ STDLIB_MODULE_BASENAMES = \
+@@ -39,12 +39,11 @@ STDLIB_MODULE_BASENAMES = \
    seq option result bool char uchar \
    list int bytes string unit marshal array float int32 int64 nativeint \
    lexing parsing set map stack queue buffer \
--  atomic mutex condition semaphore domain \
-+  atomic \
+-  mutex condition semaphore domain \
    camlinternalFormat printf arg \
    printexc fun gc digest bigarray random hashtbl weak \
    format scanf callback camlinternalOO oo camlinternalMod ephemeron \
@@ -10402,73 +10425,6 @@ index 084499581f..44b6112abf 100644
  
  STDLIB_PREFIXED_MODULES = \
    $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
-diff --git a/stdlib/camlinternalAtomic.ml b/stdlib/camlinternalAtomic.ml
-index 7cb9554751..30f1db7e41 100644
---- a/stdlib/camlinternalAtomic.ml
-+++ b/stdlib/camlinternalAtomic.ml
-@@ -14,8 +14,11 @@
- (*                                                                        *)
- (**************************************************************************)
- 
-+(* BACKPORT - REVERTED to 4.14 STATE *)
-+
- (* CamlinternalAtomic is a dependency of Stdlib, so it is compiled with
-    -nopervasives. *)
-+(*
- type !'a t
- 
- (* Atomic is a dependency of Stdlib, so it is compiled with
-@@ -25,8 +28,50 @@ external get : 'a t -> 'a = "%atomic_load"
- external exchange : 'a t -> 'a -> 'a = "%atomic_exchange"
- external compare_and_set : 'a t -> 'a -> 'a -> bool = "%atomic_cas"
- external fetch_and_add : int t -> int -> int = "%atomic_fetch_add"
-+*)
-+external ( == ) : 'a -> 'a -> bool = "%eq"
-+external ( + ) : int -> int -> int = "%addint"
- external ignore : 'a -> unit = "%ignore"
- 
-+(* We are not reusing ('a ref) directly to make it easier to reason
-+   about atomicity if we wish to: even in a sequential implementation,
-+   signals and other asynchronous callbacks might break atomicity. *)
-+type 'a t = {mutable v: 'a}
-+
-+let make v = {v}
-+let get r = r.v
-+let set r v = r.v <- v
-+
-+(* The following functions are set to never be inlined: Flambda is
-+   allowed to move surrounding code inside the critical section,
-+   including allocations. *)
-+
-+let[@inline never] exchange r v =
-+  (* BEGIN ATOMIC *)
-+  let cur = r.v in
-+  r.v <- v;
-+  (* END ATOMIC *)
-+  cur
-+
-+let[@inline never] compare_and_set r seen v =
-+  (* BEGIN ATOMIC *)
-+  let cur = r.v in
-+  if cur == seen then (
-+    r.v <- v;
-+    (* END ATOMIC *)
-+    true
-+  ) else
-+    false
-+
-+let[@inline never] fetch_and_add r n =
-+  (* BEGIN ATOMIC *)
-+  let cur = r.v in
-+  r.v <- (cur + n);
-+  (* END ATOMIC *)
-+  cur
-+
-+(*
- let set r x = ignore (exchange r x)
-+*)
- let incr r = ignore (fetch_and_add r 1)
- let decr r = ignore (fetch_and_add r (-1))
 diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
 index 07cf954054..1748dc4a87 100644
 --- a/stdlib/camlinternalLazy.ml
@@ -10825,10 +10781,10 @@ index 02112d6bbd..c91195d2ff 100644
 +let set_state s = State.assign default s
 +(* BACKPORT END *)
 diff --git a/stdlib/stdlib.ml b/stdlib/stdlib.ml
-index f81ee7848b..37b5afa040 100644
+index a6e682303d..e56b3fcbf8 100644
 --- a/stdlib/stdlib.ml
 +++ b/stdlib/stdlib.ml
-@@ -569,6 +569,13 @@ let exit retcode =
+@@ -575,6 +575,13 @@ let exit retcode =
  
  let _ = register_named_value "Pervasives.do_at_exit" do_at_exit
  
@@ -10842,7 +10798,7 @@ index f81ee7848b..37b5afa040 100644
  (*MODULE_ALIASES*)
  module Arg            = Arg
  module Array          = Array
-@@ -582,10 +589,14 @@ module BytesLabels    = BytesLabels
+@@ -588,10 +595,14 @@ module BytesLabels    = BytesLabels
  module Callback       = Callback
  module Char           = Char
  module Complex        = Complex
@@ -10857,7 +10813,7 @@ index f81ee7848b..37b5afa040 100644
  module Either         = Either
  module Ephemeron      = Ephemeron
  module Filename       = Filename
-@@ -605,7 +616,9 @@ module ListLabels     = ListLabels
+@@ -611,7 +622,9 @@ module ListLabels     = ListLabels
  module Map            = Map
  module Marshal        = Marshal
  module MoreLabels     = MoreLabels
@@ -10867,7 +10823,7 @@ index f81ee7848b..37b5afa040 100644
  module Nativeint      = Nativeint
  module Obj            = Obj
  module Oo             = Oo
-@@ -618,7 +631,9 @@ module Queue          = Queue
+@@ -624,7 +637,9 @@ module Queue          = Queue
  module Random         = Random
  module Result         = Result
  module Scanf          = Scanf
