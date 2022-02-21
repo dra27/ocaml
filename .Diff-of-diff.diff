@@ -1,0 +1,74 @@
+--- a	2023-09-28 18:43:49.864026702 +0100
++++ b	2023-09-28 18:43:49.884027529 +0100
+@@ -36,10 +36,11 @@
+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+ --- a/asmcomp/amd64/emit.mlp
+ +++ b/asmcomp/amd64/emit.mlp
+-@@ -876,29 +876,6 @@ let rec emit_all env fallthrough i =
++@@ -925,31 +925,6 @@ let rec emit_all env fallthrough i =
+  
+  let all_functions = ref []
+  
++-(* BACKPORT
+ -type preproc_fun_result =
+ -  { max_stack_size : int;
+ -    contains_nontail_calls : bool }
+@@ -63,11 +64,12 @@
+ -  let fs = frame_size env in
+ -  let r = {max_stack_size = fs; contains_nontail_calls = false} in
+ -  proc_instr r fs fun_body
++-*)
+  
+  (* Emission of a function declaration *)
+  
+-@@ -920,14 +897,15 @@ let fundecl fundecl =
+-   cfi_startproc ();
++@@ -972,14 +947,15 @@ let fundecl fundecl =
++ (* BACKPORT
+    if !Clflags.runtime_variant = "d" then
+      emit_call "caml_assert_stack_invariants";
+ -  let { max_stack_size; contains_nontail_calls} =
+@@ -86,7 +88,7 @@
+      I.cmp (domain_field Domainstate.Domain_current_stack) r10;
+      I.jb (label overflow);
+      def_label ret;
+-@@ -940,10 +918,10 @@ let fundecl fundecl =
++@@ -994,10 +970,10 @@ let fundecl fundecl =
+    | None -> ()
+    | Some (overflow,ret) -> begin
+        def_label overflow;
+@@ -456,34 +458,6 @@
+ +  frame_size:int ->
+ +  trap_size:int ->
+ +  preproc_stack_check_result
+-diff --git a/configure b/configure
+-Binary files a/configure and b/configure differ
+-diff --git a/configure.ac b/configure.ac
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -1113,16 +1113,16 @@ dnl   [arch=amd64; system=solaris],
+-     [arch=amd64; system=openbsd],
+- dnl [x86_64-*-haiku*],
+- dnl   [arch=amd64; system=beos],
+--dnl [arm64-*-darwin*],
+--dnl   [arch=arm64; system=macosx],
+--dnl [aarch64-*-darwin*],
+--dnl   [arch=arm64; system=macosx],
+-+  [arm64-*-darwin*],
+-+    [arch=arm64; system=macosx],
+-+  [aarch64-*-darwin*],
+-+    [arch=arm64; system=macosx],
+-   [x86_64-*-darwin*],
+-     [arch=amd64; system=macosx],
+-   [x86_64-*-mingw32],
+-     [arch=amd64; system=mingw64],
+--dnl [aarch64-*-linux*],
+--dnl   [arch=arm64; system=linux],
+-+  [aarch64-*-linux*],
+-+    [arch=arm64; system=linux],
+- dnl [aarch64-*-freebsd*],
+- dnl   [arch=arm64; system=freebsd],
+- dnl [x86_64-*-cygwin*],
+ diff --git a/testsuite/tests/unwind/stack_walker.c b/testsuite/tests/unwind/stack_walker.c
+ --- a/testsuite/tests/unwind/stack_walker.c
+ +++ b/testsuite/tests/unwind/stack_walker.c
