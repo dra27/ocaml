@@ -1,29 +1,76 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7655fac0c8
+index 0000000000..1313617d9e
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:43:51.732103868 +0100
-++++ b	2023-09-28 18:43:51.744104364 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -135,12 +135,6 @@ Working version
-++@@ -138,12 +138,6 @@ Working version
+@@ -0,0 +1,67 @@
++--- a	2023-09-28 18:43:51.988114438 +0100
+++++ b	2023-09-28 18:43:51.996114769 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -259,8 +259,9 @@ AC_ARG_ENABLE([instrumented-runtime],
+++@@ -261,8 +261,9 @@ AC_ARG_ENABLE([instrumented-runtime],
++    [enable_instrumented_runtime=auto])
 +  
-+  ### Bug fixes:
++  AC_ARG_ENABLE([vmthreads], [],
++@@ -15,7 +15,7 @@
++    [])
 +  
-+@@ -14,7 +14,7 @@
-+  - #11025: Do not pass -no-pie to the C compiler on musl/arm64
-+    (omni and Kate Deplaix, review by Xavier Leroy)
++  AC_ARG_ENABLE([systhreads],
++-@@ -268,9 +269,10 @@ AC_ARG_ENABLE([systhreads],
+++@@ -270,9 +271,10 @@ AC_ARG_ENABLE([systhreads],
++      [disable the Win32/POSIX threads library])])
 +  
-+-@@ -625,6 +619,12 @@ OCaml 4.14.0
-++@@ -634,6 +628,12 @@ OCaml 4.14.0
-+  - #10907, #10959: Wrong type inferred from existential types
-+    (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
++  AC_ARG_ENABLE([graph-lib], [],
++@@ -29,7 +29,7 @@
++    [])
 +  
++  AC_ARG_ENABLE([str-lib],
++-@@ -282,8 +284,9 @@ AC_ARG_ENABLE([unix-lib],
+++@@ -284,8 +286,9 @@ AC_ARG_ENABLE([unix-lib],
++      [do not build the unix library])])
++  
++  AC_ARG_ENABLE([bigarray-lib], [],
++@@ -41,20 +41,26 @@
++    [])
++  
++  AC_ARG_ENABLE([ocamldoc],
++-@@ -310,11 +313,18 @@ AC_ARG_ENABLE([frame-pointers],
+++@@ -312,8 +315,15 @@ AC_ARG_ENABLE([frame-pointers],
++      [use frame pointers in runtime and generated code])])
++  
++- AC_ARG_ENABLE([naked-pointers], [],
++--  [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
++--  [AC_DEFINE([NO_NAKED_POINTERS])])
++-+  [AS_IF([test "x$enableval" != 'xno'],
++-+    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++-+  [])
+++ dnl AC_ARG_ENABLE([naked-pointers], [],
+++-dnl   [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
+++-dnl   [AC_DEFINE([NO_NAKED_POINTERS])])
++++dnl   [AS_IF([test "x$enableval" != 'xno'],
++++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++++dnl   [])
++ +
++-+AC_ARG_ENABLE([naked-pointers-checker], [],
++-+  [AS_IF([test "x$enableval" != 'xno'],
++-+    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
++-+  [])
++++dnl AC_ARG_ENABLE([naked-pointers-checker], [],
++++dnl   [AS_IF([test "x$enableval" != 'xno'],
++++dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
++++dnl       OCaml 5.00.]))])],
++++dnl   [])
+++ AC_ARG_ENABLE([naked-pointers],
+++   [AS_HELP_STRING([--disable-naked-pointers],
+++     [do not allow naked pointers])])
+++@@ -323,7 +333,8 @@ AC_ARG_ENABLE([naked-pointers-checker],
+++     [enable the naked pointers checker])])
++  
++  AC_ARG_ENABLE([spacetime], [],
++ -  [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
 diff --git a/Changes b/Changes
 index f098e0d9b1..11bbcc5d7f 100644
 --- a/Changes
@@ -568,10 +615,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index aa3fa4047d..8082cab86e 100755
+index ce30eb22f8..3b3cb83208 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index a60f1343d0..55c5a216aa 100644
+index 0b56e97abf..de363ab346 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -598,16 +645,28 @@ index a60f1343d0..55c5a216aa 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -309,9 +311,16 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -312,15 +314,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
 -AC_ARG_ENABLE([naked-pointers], [],
--  [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
--  [AC_DEFINE([NO_NAKED_POINTERS])])
+-  [AS_IF([test "x$enableval" != 'xno'],
+-    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+-  [])
 +dnl AC_ARG_ENABLE([naked-pointers], [],
-+dnl   [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
-+dnl   [AC_DEFINE([NO_NAKED_POINTERS])])
++dnl   [AS_IF([test "x$enableval" != 'xno'],
++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++dnl   [])
+ 
+-AC_ARG_ENABLE([naked-pointers-checker], [],
+-  [AS_IF([test "x$enableval" != 'xno'],
+-    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
+-  [])
++dnl AC_ARG_ENABLE([naked-pointers-checker], [],
++dnl   [AS_IF([test "x$enableval" != 'xno'],
++dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
++dnl       OCaml 5.00.]))])],
++dnl   [])
 +AC_ARG_ENABLE([naked-pointers],
 +  [AS_HELP_STRING([--disable-naked-pointers],
 +    [do not allow naked pointers])])
@@ -617,8 +676,8 @@ index a60f1343d0..55c5a216aa 100644
 +    [enable the naked pointers checker])])
  
  AC_ARG_ENABLE([spacetime], [],
-   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-@@ -1002,6 +1011,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+   [AS_IF([test "x$enableval" != 'xno'],
+@@ -1012,6 +1022,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
      [earm*-*-netbsd*], [natdynlink=true],
      [aarch64-*-linux*], [natdynlink=true],
      [aarch64-*-freebsd*], [natdynlink=true],
@@ -626,7 +685,7 @@ index a60f1343d0..55c5a216aa 100644
      [riscv*-*-linux*], [natdynlink=true])])
  
  AS_CASE([$enable_native_toplevel,$natdynlink],
-@@ -1031,77 +1041,77 @@ model=default
+@@ -1041,77 +1052,77 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -767,7 +826,7 @@ index a60f1343d0..55c5a216aa 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1112,12 +1122,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1122,12 +1133,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -788,7 +847,7 @@ index a60f1343d0..55c5a216aa 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1782,7 +1794,8 @@ AS_CASE([$arch,$system],
+@@ -1792,7 +1805,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -798,7 +857,7 @@ index a60f1343d0..55c5a216aa 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1831,6 +1844,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1841,6 +1855,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -829,7 +888,7 @@ index a60f1343d0..55c5a216aa 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1950,8 +1987,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1960,8 +1998,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -4630,36 +4689,83 @@ index 0000000000..85d2c0ac9d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..19cbb498b0
+index 0000000000..a4092bdadc
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4533 @@
+@@ -0,0 +1,4648 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..7655fac0c8
++index 0000000000..1313617d9e
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:43:51.732103868 +0100
-+++++ b	2023-09-28 18:43:51.744104364 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -135,12 +135,6 @@ Working version
-+++@@ -138,12 +138,6 @@ Working version
++@@ -0,0 +1,67 @@
+++--- a	2023-09-28 18:43:51.988114438 +0100
++++++ b	2023-09-28 18:43:51.996114769 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -259,8 +259,9 @@ AC_ARG_ENABLE([instrumented-runtime],
++++@@ -261,8 +261,9 @@ AC_ARG_ENABLE([instrumented-runtime],
+++    [enable_instrumented_runtime=auto])
 ++  
-++  ### Bug fixes:
+++  AC_ARG_ENABLE([vmthreads], [],
+++@@ -15,7 +15,7 @@
+++    [])
 ++  
-++@@ -14,7 +14,7 @@
-++  - #11025: Do not pass -no-pie to the C compiler on musl/arm64
-++    (omni and Kate Deplaix, review by Xavier Leroy)
+++  AC_ARG_ENABLE([systhreads],
+++-@@ -268,9 +269,10 @@ AC_ARG_ENABLE([systhreads],
++++@@ -270,9 +271,10 @@ AC_ARG_ENABLE([systhreads],
+++      [disable the Win32/POSIX threads library])])
 ++  
-++-@@ -625,6 +619,12 @@ OCaml 4.14.0
-+++@@ -634,6 +628,12 @@ OCaml 4.14.0
-++  - #10907, #10959: Wrong type inferred from existential types
-++    (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
+++  AC_ARG_ENABLE([graph-lib], [],
+++@@ -29,7 +29,7 @@
+++    [])
 ++  
+++  AC_ARG_ENABLE([str-lib],
+++-@@ -282,8 +284,9 @@ AC_ARG_ENABLE([unix-lib],
++++@@ -284,8 +286,9 @@ AC_ARG_ENABLE([unix-lib],
+++      [do not build the unix library])])
+++  
+++  AC_ARG_ENABLE([bigarray-lib], [],
+++@@ -41,20 +41,26 @@
+++    [])
+++  
+++  AC_ARG_ENABLE([ocamldoc],
+++-@@ -310,11 +313,18 @@ AC_ARG_ENABLE([frame-pointers],
++++@@ -312,8 +315,15 @@ AC_ARG_ENABLE([frame-pointers],
+++      [use frame pointers in runtime and generated code])])
+++  
+++- AC_ARG_ENABLE([naked-pointers], [],
+++--  [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
+++--  [AC_DEFINE([NO_NAKED_POINTERS])])
+++-+  [AS_IF([test "x$enableval" != 'xno'],
+++-+    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+++-+  [])
++++ dnl AC_ARG_ENABLE([naked-pointers], [],
++++-dnl   [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
++++-dnl   [AC_DEFINE([NO_NAKED_POINTERS])])
+++++dnl   [AS_IF([test "x$enableval" != 'xno'],
+++++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+++++dnl   [])
+++ +
+++-+AC_ARG_ENABLE([naked-pointers-checker], [],
+++-+  [AS_IF([test "x$enableval" != 'xno'],
+++-+    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
+++-+  [])
+++++dnl AC_ARG_ENABLE([naked-pointers-checker], [],
+++++dnl   [AS_IF([test "x$enableval" != 'xno'],
+++++dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
+++++dnl       OCaml 5.00.]))])],
+++++dnl   [])
++++ AC_ARG_ENABLE([naked-pointers],
++++   [AS_HELP_STRING([--disable-naked-pointers],
++++     [do not allow naked pointers])])
++++@@ -323,7 +333,8 @@ AC_ARG_ENABLE([naked-pointers-checker],
++++     [enable the naked pointers checker])])
+++  
+++  AC_ARG_ENABLE([spacetime], [],
+++ -  [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
 +diff --git a/Changes b/Changes
 +index f098e0d9b1..11bbcc5d7f 100644
 +--- a/Changes
@@ -5204,10 +5310,10 @@ index 0000000000..19cbb498b0
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index aa3fa4047d..8082cab86e 100755
++index ce30eb22f8..3b3cb83208 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index a60f1343d0..55c5a216aa 100644
++index 0b56e97abf..de363ab346 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -5234,16 +5340,28 @@ index 0000000000..19cbb498b0
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -309,9 +311,16 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -312,15 +314,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
 +-AC_ARG_ENABLE([naked-pointers], [],
-+-  [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
-+-  [AC_DEFINE([NO_NAKED_POINTERS])])
++-  [AS_IF([test "x$enableval" != 'xno'],
++-    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++-  [])
 ++dnl AC_ARG_ENABLE([naked-pointers], [],
-++dnl   [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
-++dnl   [AC_DEFINE([NO_NAKED_POINTERS])])
+++dnl   [AS_IF([test "x$enableval" != 'xno'],
+++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+++dnl   [])
++ 
++-AC_ARG_ENABLE([naked-pointers-checker], [],
++-  [AS_IF([test "x$enableval" != 'xno'],
++-    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
++-  [])
+++dnl AC_ARG_ENABLE([naked-pointers-checker], [],
+++dnl   [AS_IF([test "x$enableval" != 'xno'],
+++dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
+++dnl       OCaml 5.00.]))])],
+++dnl   [])
 ++AC_ARG_ENABLE([naked-pointers],
 ++  [AS_HELP_STRING([--disable-naked-pointers],
 ++    [do not allow naked pointers])])
@@ -5253,8 +5371,8 @@ index 0000000000..19cbb498b0
 ++    [enable the naked pointers checker])])
 + 
 + AC_ARG_ENABLE([spacetime], [],
-+   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
-+@@ -1002,6 +1011,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++   [AS_IF([test "x$enableval" != 'xno'],
++@@ -1012,6 +1022,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
 +     [earm*-*-netbsd*], [natdynlink=true],
 +     [aarch64-*-linux*], [natdynlink=true],
 +     [aarch64-*-freebsd*], [natdynlink=true],
@@ -5262,7 +5380,7 @@ index 0000000000..19cbb498b0
 +     [riscv*-*-linux*], [natdynlink=true])])
 + 
 + AS_CASE([$enable_native_toplevel,$natdynlink],
-+@@ -1031,77 +1041,77 @@ model=default
++@@ -1041,77 +1052,77 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -5403,7 +5521,7 @@ index 0000000000..19cbb498b0
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1112,12 +1122,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1122,12 +1133,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -5424,7 +5542,7 @@ index 0000000000..19cbb498b0
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1782,7 +1794,8 @@ AS_CASE([$arch,$system],
++@@ -1792,7 +1805,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -5434,7 +5552,7 @@ index 0000000000..19cbb498b0
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1831,6 +1844,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1841,6 +1855,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -5465,7 +5583,7 @@ index 0000000000..19cbb498b0
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1950,8 +1987,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1960,8 +1998,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -9166,7 +9284,63 @@ index 0000000000..19cbb498b0
 ++-* skip
 ++-reason = "ocamldebug is broken (#34)"
 ++-** debugger
-++-*** shared-li
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++  
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -10567,10 +10741,10 @@ index 903719d6ad..d0d581be34 100644
  external floatarray_set :
      floatarray -> int -> float -> unit = "caml_floatarray_set"
 diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-index f043834d91..213da3f71b 100644
+index b4e74d3455..05676aaa86 100644
 --- a/stdlib/obj.mli
 +++ b/stdlib/obj.mli
-@@ -54,9 +54,11 @@ external field : t -> int -> t = "%obj_field"
+@@ -53,9 +53,11 @@ external field : t -> int -> t = "%obj_field"
      be propagated.
  *)
  external set_field : t -> int -> t -> unit = "%obj_set_field"
@@ -10772,7 +10946,7 @@ index 7c7ee74fbf..f2878b7bb3 100644
    opEVENT, Nothing;
    opBREAK, Nothing;
 diff --git a/utils/config.mlp b/utils/config.mlp
-index 8deabaf112..d1746d25d8 100644
+index 3e6c5b1ed3..d4e4444401 100644
 --- a/utils/config.mlp
 +++ b/utils/config.mlp
 @@ -122,7 +122,11 @@ let max_tag = 243
