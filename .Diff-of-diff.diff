@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:51.492093958 +0100
++++ b	2023-09-28 18:43:51.500094289 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -135,6 +135,12 @@ Working version
++@@ -138,6 +138,12 @@ Working version
+  
+  ### Bug fixes:
+  
