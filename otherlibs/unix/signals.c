@@ -43,9 +43,11 @@ static void decode_sigset(value vset, sigset_t * set)
 
 static value encode_sigset(sigset_t * set)
 {
-  value res = Val_int(0);
+  CAMLparam0();
+  CAMLlocal1(res);
   int i;
 
+<<<<<<< HEAD
   Begin_root(res)
     for (i = 1; i < NSIG; i++)
       if (sigismember(set, i) > 0) {
@@ -61,6 +63,27 @@ static value encode_sigset(sigset_t * set)
       }
   End_roots();
   return res;
+||||||| parent of 9a044e59d8 (Do not use `Begin_roots` / `End_roots` in runtime (PR#11002))
+  Begin_root(res)
+    for (i = 1; i < NSIG; i++)
+      if (sigismember(set, i) > 0) {
+        value newcons = caml_alloc_2(0,
+          Val_int(caml_rev_convert_signal_number(i)),
+          res);
+        res = newcons;
+      }
+  End_roots();
+  return res;
+=======
+  for (i = 1; i < NSIG; i++)
+    if (sigismember(set, i) > 0) {
+      value newcons = caml_alloc_2(0,
+        Val_int(caml_rev_convert_signal_number(i)),
+        res);
+      res = newcons;
+    }
+  CAMLreturn(res);
+>>>>>>> 9a044e59d8 (Do not use `Begin_roots` / `End_roots` in runtime (PR#11002))
 }
 
 static int sigprocmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
