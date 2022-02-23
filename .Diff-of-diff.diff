@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:43:53.020157022 +0100
++++ b	2023-09-28 18:43:53.024157187 +0100
+@@ -3,7 +3,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -604,7 +604,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -614,7 +614,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
+      cc_warnings=''],
+    [outputobj='-o $(EMPTY)'
+    warn_error_flag='-Werror'

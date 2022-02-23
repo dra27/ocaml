@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1bd092e197
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:43:53.020157022 +0100
+++++ b	2023-09-28 18:43:53.024157187 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -604,7 +604,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
+++@@ -614,7 +614,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
++      cc_warnings=''],
++    [outputobj='-o $(EMPTY)'
++    warn_error_flag='-Werror'
 diff --git a/Changes b/Changes
 index f098e0d9b1..11bbcc5d7f 100644
 --- a/Changes
@@ -545,10 +559,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index ce30eb22f8..3b3cb83208 100755
+index 837b66c866..6261dad548 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 0b56e97abf..de363ab346 100644
+index 6d051e1dda..a5fa41e2fa 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -5036,13 +5050,27 @@ index 0000000000..ff47d10956
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f6ebac5161
+index 0000000000..e7ef56a276
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4943 @@
+@@ -0,0 +1,4944 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1bd092e197
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:43:53.020157022 +0100
++++++ b	2023-09-28 18:43:53.024157187 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -604,7 +604,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
++++@@ -614,7 +614,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
+++      cc_warnings=''],
+++    [outputobj='-o $(EMPTY)'
+++    warn_error_flag='-Werror'
 +diff --git a/Changes b/Changes
 +index f098e0d9b1..11bbcc5d7f 100644
 +--- a/Changes
@@ -5587,10 +5615,10 @@ index 0000000000..f6ebac5161
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index ce30eb22f8..3b3cb83208 100755
++index 837b66c866..6261dad548 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 0b56e97abf..de363ab346 100644
++index 6d051e1dda..a5fa41e2fa 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -9969,20 +9997,8 @@ index 0000000000..f6ebac5161
 ++ (* This file only contains the specification of how to run the test *)
 ++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
 ++index b2d6e6e7c5..f22a4bd50f 100644
-++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
+++--
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
