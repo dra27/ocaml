@@ -45,26 +45,25 @@ static void decode_sigset(value vset, sigset_t * set)
 
 static value encode_sigset(sigset_t * set)
 {
-  value res = Val_int(0);
+  CAMLparam0();
+  CAMLlocal1(res);
   int i;
 
-  Begin_root(res)
-    for (i = 1; i < NSIG; i++)
-      if (sigismember(set, i) > 0) {
+  for (i = 1; i < NSIG; i++)
+    if (sigismember(set, i) > 0) {
 /* BACKPORT BEGIN */
-        value newcons = caml_alloc_small(2, 0);
-        Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
-        Field(newcons, 1) = res;
+      value newcons = caml_alloc_small(2, 0);
+      Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
+      Field(newcons, 1) = res;
 /* BACKPORT END */
 #if 0 /* BACKPORT */
-        value newcons = caml_alloc_2(0,
-          Val_int(caml_rev_convert_signal_number(i)),
-          res);
+      value newcons = caml_alloc_2(0,
+        Val_int(caml_rev_convert_signal_number(i)),
+        res);
 #endif
-        res = newcons;
-      }
-  End_roots();
-  return res;
+      res = newcons;
+    }
+  CAMLreturn(res);
 }
 
 static int sigprocmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };

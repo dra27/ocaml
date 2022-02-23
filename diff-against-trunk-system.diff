@@ -1,25 +1,59 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..1bd092e197
+index 0000000000..1f2f02a98a
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:53.020157022 +0100
-++++ b	2023-09-28 18:43:53.024157187 +0100
-+@@ -3,7 +3,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -604,7 +604,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++@@ -614,7 +614,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+      cc_warnings=''],
-+    [outputobj='-o $(EMPTY)'
-+    warn_error_flag='-Werror'
+@@ -0,0 +1,45 @@
++--- a	2023-09-28 18:43:53.268167248 +0100
+++++ b	2023-09-28 18:43:53.284167908 +0100
++@@ -539,7 +539,7 @@
++ diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
++ --- a/otherlibs/unix/signals.c
++ +++ b/otherlibs/unix/signals.c
++-@@ -39,19 +39,18 @@ static void decode_sigset(value vset, sigset_t * set)
+++@@ -45,26 +45,25 @@ static void decode_sigset(value vset, sigset_t * set)
++  
++  static value encode_sigset(sigset_t * set)
++  {
++@@ -551,18 +551,28 @@
++ -  Begin_root(res)
++ -    for (i = 1; i < NSIG; i++)
++ -      if (sigismember(set, i) > 0) {
++++  for (i = 1; i < NSIG; i++)
++++    if (sigismember(set, i) > 0) {
+++ /* BACKPORT BEGIN */
+++-        value newcons = caml_alloc_small(2, 0);
+++-        Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
+++-        Field(newcons, 1) = res;
++++      value newcons = caml_alloc_small(2, 0);
++++      Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
++++      Field(newcons, 1) = res;
+++ /* BACKPORT END */
+++ #if 0 /* BACKPORT */
++ -        value newcons = caml_alloc_2(0,
++ -          Val_int(caml_rev_convert_signal_number(i)),
++ -          res);
++++      value newcons = caml_alloc_2(0,
++++        Val_int(caml_rev_convert_signal_number(i)),
++++        res);
+++ #endif
++ -        res = newcons;
++ -      }
++ -  End_roots();
++ -  return res;
++-+  for (i = 1; i < NSIG; i++)
++-+    if (sigismember(set, i) > 0) {
++-+      value newcons = caml_alloc_2(0,
++-+        Val_int(caml_rev_convert_signal_number(i)),
++-+        res);
++ +      res = newcons;
++ +    }
++ +  CAMLreturn(res);
 diff --git a/Changes b/Changes
-index f098e0d9b1..11bbcc5d7f 100644
+index cc62b574da..8cdb2e4f39 100644
 --- a/Changes
 +++ b/Changes
-@@ -133,6 +133,9 @@ Working version
+@@ -138,6 +138,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -29,7 +63,7 @@ index f098e0d9b1..11bbcc5d7f 100644
  ### Bug fixes:
  
  - #11025: Do not pass -no-pie to the C compiler on musl/arm64
-@@ -173,13 +176,13 @@ OCaml 4.14.0
+@@ -178,13 +181,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -45,7 +79,7 @@ index f098e0d9b1..11bbcc5d7f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -279,6 +282,9 @@ OCaml 4.14.0
+@@ -284,6 +287,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -55,7 +89,7 @@ index f098e0d9b1..11bbcc5d7f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -527,6 +533,9 @@ OCaml 4.14.0
+@@ -532,6 +538,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5050,32 +5084,66 @@ index 0000000000..ff47d10956
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e7ef56a276
+index 0000000000..448f9d0d2c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4944 @@
+@@ -0,0 +1,5061 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..1bd092e197
++index 0000000000..1f2f02a98a
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:53.020157022 +0100
-+++++ b	2023-09-28 18:43:53.024157187 +0100
-++@@ -3,7 +3,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -604,7 +604,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+++@@ -614,7 +614,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++      cc_warnings=''],
-++    [outputobj='-o $(EMPTY)'
-++    warn_error_flag='-Werror'
++@@ -0,0 +1,45 @@
+++--- a	2023-09-28 18:43:53.268167248 +0100
++++++ b	2023-09-28 18:43:53.284167908 +0100
+++@@ -539,7 +539,7 @@
+++ diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
+++ --- a/otherlibs/unix/signals.c
+++ +++ b/otherlibs/unix/signals.c
+++-@@ -39,19 +39,18 @@ static void decode_sigset(value vset, sigset_t * set)
++++@@ -45,26 +45,25 @@ static void decode_sigset(value vset, sigset_t * set)
+++  
+++  static value encode_sigset(sigset_t * set)
+++  {
+++@@ -551,18 +551,28 @@
+++ -  Begin_root(res)
+++ -    for (i = 1; i < NSIG; i++)
+++ -      if (sigismember(set, i) > 0) {
+++++  for (i = 1; i < NSIG; i++)
+++++    if (sigismember(set, i) > 0) {
++++ /* BACKPORT BEGIN */
++++-        value newcons = caml_alloc_small(2, 0);
++++-        Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
++++-        Field(newcons, 1) = res;
+++++      value newcons = caml_alloc_small(2, 0);
+++++      Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
+++++      Field(newcons, 1) = res;
++++ /* BACKPORT END */
++++ #if 0 /* BACKPORT */
+++ -        value newcons = caml_alloc_2(0,
+++ -          Val_int(caml_rev_convert_signal_number(i)),
+++ -          res);
+++++      value newcons = caml_alloc_2(0,
+++++        Val_int(caml_rev_convert_signal_number(i)),
+++++        res);
++++ #endif
+++ -        res = newcons;
+++ -      }
+++ -  End_roots();
+++ -  return res;
+++-+  for (i = 1; i < NSIG; i++)
+++-+    if (sigismember(set, i) > 0) {
+++-+      value newcons = caml_alloc_2(0,
+++-+        Val_int(caml_rev_convert_signal_number(i)),
+++-+        res);
+++ +      res = newcons;
+++ +    }
+++ +  CAMLreturn(res);
 +diff --git a/Changes b/Changes
-+index f098e0d9b1..11bbcc5d7f 100644
++index cc62b574da..8cdb2e4f39 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -133,6 +133,9 @@ Working version
++@@ -138,6 +138,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5085,7 +5153,7 @@ index 0000000000..e7ef56a276
 + ### Bug fixes:
 + 
 + - #11025: Do not pass -no-pie to the C compiler on musl/arm64
-+@@ -173,13 +176,13 @@ OCaml 4.14.0
++@@ -178,13 +181,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5101,7 +5169,7 @@ index 0000000000..e7ef56a276
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -279,6 +282,9 @@ OCaml 4.14.0
++@@ -284,6 +287,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5111,7 +5179,7 @@ index 0000000000..e7ef56a276
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -527,6 +533,9 @@ OCaml 4.14.0
++@@ -532,6 +538,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -9997,7 +10065,90 @@ index 0000000000..e7ef56a276
 ++ (* This file only contains the specification of how to run the test *)
 ++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
 ++index b2d6e6e7c5..f22a4bd50f 100644
-++--
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.m
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -10760,7 +10911,7 @@ index 6367f61aa8..7f2beca3af 100644
  
    CAML_EVENTLOG_DO({
 diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
-index 884b54eaab..207566d2b5 100644
+index b644f7c83b..e5be5fa505 100644
 --- a/otherlibs/unix/signals.c
 +++ b/otherlibs/unix/signals.c
 @@ -25,6 +25,12 @@
@@ -10777,23 +10928,23 @@ index 884b54eaab..207566d2b5 100644
  
  static void decode_sigset(value vset, sigset_t * set)
 @@ -45,9 +51,16 @@ static value encode_sigset(sigset_t * set)
-   Begin_root(res)
-     for (i = 1; i < NSIG; i++)
-       if (sigismember(set, i) > 0) {
+ 
+   for (i = 1; i < NSIG; i++)
+     if (sigismember(set, i) > 0) {
 +/* BACKPORT BEGIN */
-+        value newcons = caml_alloc_small(2, 0);
-+        Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
-+        Field(newcons, 1) = res;
++      value newcons = caml_alloc_small(2, 0);
++      Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
++      Field(newcons, 1) = res;
 +/* BACKPORT END */
 +#if 0 /* BACKPORT */
-         value newcons = caml_alloc_2(0,
-           Val_int(caml_rev_convert_signal_number(i)),
-           res);
+       value newcons = caml_alloc_2(0,
+         Val_int(caml_rev_convert_signal_number(i)),
+         res);
 +#endif
-         res = newcons;
-       }
-   End_roots();
-@@ -65,7 +78,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+       res = newcons;
+     }
+   CAMLreturn(res);
+@@ -64,7 +77,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
    how = sigprocmask_cmd[Int_val(vaction)];
    decode_sigset(vset, &set);
    caml_enter_blocking_section();
@@ -10805,7 +10956,7 @@ index 884b54eaab..207566d2b5 100644
    caml_leave_blocking_section();
    /* Run any handlers for just-unmasked pending signals */
    caml_process_pending_actions();
-@@ -76,9 +93,15 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+@@ -75,9 +92,15 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
  CAMLprim value unix_sigpending(value unit)
  {
    sigset_t pending;
@@ -10821,7 +10972,7 @@ index 884b54eaab..207566d2b5 100644
    for (i = 0; i < NSIG_WORDS; i++) {
      curr = atomic_load(&caml_pending_signals[i]);
      if (curr == 0) continue;
-@@ -87,6 +110,12 @@ CAMLprim value unix_sigpending(value unit)
+@@ -86,6 +109,12 @@ CAMLprim value unix_sigpending(value unit)
        sigaddset(&pending, i * BITS_PER_WORD + j + 1);
      }
    }
