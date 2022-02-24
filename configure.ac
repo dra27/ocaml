@@ -288,7 +288,7 @@ AC_ARG_ENABLE([unix-lib],
 AC_ARG_ENABLE([bigarray-lib], [],
   [AS_IF([test "x$enableval" != 'xno'],
     [AC_MSG_ERROR(m4_normalize([The bigarray-lib option was deleted in OCaml
-      5.00, as the Bigarray module is now part of the standard library.]))])],
+      5.0, as the Bigarray module is now part of the standard library.]))])],
   [])
 
 AC_ARG_ENABLE([ocamldoc],
@@ -316,13 +316,13 @@ AC_ARG_ENABLE([frame-pointers],
 
 dnl AC_ARG_ENABLE([naked-pointers], [],
 dnl   [AS_IF([test "x$enableval" != 'xno'],
-dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
 dnl   [])
 
 dnl AC_ARG_ENABLE([naked-pointers-checker], [],
 dnl   [AS_IF([test "x$enableval" != 'xno'],
 dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
-dnl       OCaml 5.00.]))])],
+dnl       OCaml 5.0.]))])],
 dnl   [])
 AC_ARG_ENABLE([naked-pointers],
   [AS_HELP_STRING([--disable-naked-pointers],
@@ -402,12 +402,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
 
 AC_ARG_ENABLE([force-safe-string], [],
   [AS_IF([test "x$enableval" = 'xno'],
-    [AC_MSG_ERROR([Support for mutable strings was removed in OCaml 5.00.])])],
+    [AC_MSG_ERROR([Support for mutable strings was removed in OCaml 5.0.])])],
   [])
 
 AC_ARG_VAR([DEFAULT_STRING], [])
 AS_IF([test x"$DEFAULT_STRING" = "xunsafe"],
-  [AC_MSG_ERROR([Support for mutable strings was removed in OCaml 5.00.])])
+  [AC_MSG_ERROR([Support for mutable strings was removed in OCaml 5.0.])])
 
 AC_ARG_ENABLE([flat-float-array],
   [AS_HELP_STRING([--disable-flat-float-array],

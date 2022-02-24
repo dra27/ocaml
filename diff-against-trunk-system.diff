@@ -1,11 +1,106 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..989f81ffb2
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,92 @@
++--- a	2023-09-28 18:43:54.420214740 +0100
+++++ b	2023-09-28 18:43:54.436215400 +0100
++@@ -13,7 +13,7 @@
++  ### Internal/compiler-libs changes:
++  
++  - #10878, #10909: restore flambda after the Multicore merge.
++-@@ -300,7 +305,7 @@ OCaml 4.14.0
+++@@ -306,7 +311,7 @@ OCaml 4.14.0
++  
++  - #10951: Introduce the Thread.Exit exception as an alternative way to
++    terminate threads prematurely.  This alternative way will become
++@@ -22,15 +22,6 @@
++    (Xavier Leroy, review by Florian Angeletti)
++  
++  ### Tools:
++-diff --git a/VERSION b/VERSION
++---- a/VERSION
++-+++ b/VERSION
++-@@ -1,4 +1,4 @@
++--5.00.0+dev0-2021-11-05
++-+5.0.0+dev0-2021-11-05
++- 
++- # Starting with OCaml 4.14, although the version string that appears above is
++- # still correct and this file can thus still be used to figure it out,
++ diff --git a/appveyor.yml b/appveyor.yml
++ --- a/appveyor.yml
++ +++ b/appveyor.yml
++@@ -43,24 +34,12 @@
++  #    - PORT: msvc64
++  #      BOOTSTRAP_FLEXDLL: false
++  #      BUILD_MODE: steps
++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
++---- a/build-aux/ocaml_version.m4
++-+++ b/build-aux/ocaml_version.m4
++-@@ -32,7 +32,7 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
++- # including the patchlevel, are mandatory.
++- 
++- m4_define([OCAML__VERSION_MAJOR], [5])
++--m4_define([OCAML__VERSION_MINOR], [00])
++-+m4_define([OCAML__VERSION_MINOR], [0])
++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
++- # for officially-released versions of OCaml.
++ diff --git a/configure b/configure
++ Binary files a/configure and b/configure differ
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -286,7 +286,7 @@ AC_ARG_ENABLE([unix-lib],
+++@@ -288,7 +288,7 @@ AC_ARG_ENABLE([unix-lib],
++  AC_ARG_ENABLE([bigarray-lib], [],
++    [AS_IF([test "x$enableval" != 'xno'],
++      [AC_MSG_ERROR(m4_normalize([The bigarray-lib option was deleted in OCaml
++@@ -69,22 +48,23 @@
++    [])
++  
++  AC_ARG_ENABLE([ocamldoc],
++-@@ -314,12 +314,12 @@ AC_ARG_ENABLE([frame-pointers],
++- 
++- AC_ARG_ENABLE([naked-pointers], [],
++-   [AS_IF([test "x$enableval" != 'xno'],
++--    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++-+    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
++-   [])
++- 
++- AC_ARG_ENABLE([naked-pointers-checker], [],
++-   [AS_IF([test "x$enableval" != 'xno'],
++--    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
++-+    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.0.])])],
++-   [])
+++@@ -316,13 +316,13 @@ AC_ARG_ENABLE([frame-pointers],
++  
++- AC_ARG_ENABLE([spacetime], [],
++-@@ -392,12 +392,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
+++ dnl AC_ARG_ENABLE([naked-pointers], [],
+++ dnl   [AS_IF([test "x$enableval" != 'xno'],
+++-dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
+++ dnl   [])
+++ 
+++ dnl AC_ARG_ENABLE([naked-pointers-checker], [],
+++ dnl   [AS_IF([test "x$enableval" != 'xno'],
+++ dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
+++-dnl       OCaml 5.00.]))])],
++++dnl       OCaml 5.0.]))])],
+++ dnl   [])
+++ AC_ARG_ENABLE([naked-pointers],
+++   [AS_HELP_STRING([--disable-naked-pointers],
+++@@ -402,12 +402,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
++  
++  AC_ARG_ENABLE([force-safe-string], [],
++    [AS_IF([test "x$enableval" = 'xno'],
 diff --git a/Changes b/Changes
-index 5831c641ad..d3e9ff3e20 100644
+index 0c9726d894..d5cbd66023 100644
 --- a/Changes
 +++ b/Changes
-@@ -138,6 +138,9 @@ Working version
+@@ -143,6 +143,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -15,7 +110,7 @@ index 5831c641ad..d3e9ff3e20 100644
  ### Bug fixes:
  
  - #11025: Do not pass -no-pie to the C compiler on musl/arm64
-@@ -178,13 +181,13 @@ OCaml 4.14.0
+@@ -183,13 +186,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -31,7 +126,7 @@ index 5831c641ad..d3e9ff3e20 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -284,6 +287,9 @@ OCaml 4.14.0
+@@ -289,6 +292,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -41,7 +136,7 @@ index 5831c641ad..d3e9ff3e20 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -532,6 +538,9 @@ OCaml 4.14.0
+@@ -537,6 +543,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -65,11 +160,11 @@ index 6ee1453d88..97cca9a733 100644
  ### Native command to build ocamlrun.exe
  
 diff --git a/VERSION b/VERSION
-index d9d76e3115..4ef434f979 100644
+index 8dfc6cf83f..4ef434f979 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1,4 +1,4 @@
--5.00.0+dev0-2021-11-05
+-5.0.0+dev0-2021-11-05
 +5.0.0+jst-backport
  
  # Starting with OCaml 4.14, although the version string that appears above is
@@ -508,15 +603,10 @@ diff --git a/boot/ocamllex b/boot/ocamllex
 index b35488cadc..9c4fe66628 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-index 681f116bbb..0a59107ea8 100644
+index 2c66a918a3..0a59107ea8 100644
 --- a/build-aux/ocaml_version.m4
 +++ b/build-aux/ocaml_version.m4
-@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
- # including the patchlevel, are mandatory.
- 
- m4_define([OCAML__VERSION_MAJOR], [5])
--m4_define([OCAML__VERSION_MINOR], [00])
-+m4_define([OCAML__VERSION_MINOR], [0])
+@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
  m4_define([OCAML__VERSION_PATCHLEVEL], [0])
  # Note that the OCAML__VERSION_EXTRA string defined below is always empty
  # for officially-released versions of OCaml.
@@ -545,10 +635,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 837b66c866..6261dad548 100755
+index e9a2513eb0..30a5e69c92 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 6d051e1dda..a5fa41e2fa 100644
+index 6d9f4b809c..e9058e911b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -581,21 +671,21 @@ index 6d051e1dda..a5fa41e2fa 100644
  
 -AC_ARG_ENABLE([naked-pointers], [],
 -  [AS_IF([test "x$enableval" != 'xno'],
--    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+-    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
 -  [])
 +dnl AC_ARG_ENABLE([naked-pointers], [],
 +dnl   [AS_IF([test "x$enableval" != 'xno'],
-+dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
 +dnl   [])
  
 -AC_ARG_ENABLE([naked-pointers-checker], [],
 -  [AS_IF([test "x$enableval" != 'xno'],
--    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
+-    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.0.])])],
 -  [])
 +dnl AC_ARG_ENABLE([naked-pointers-checker], [],
 +dnl   [AS_IF([test "x$enableval" != 'xno'],
 +dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
-+dnl       OCaml 5.00.]))])],
++dnl       OCaml 5.0.]))])],
 +dnl   [])
 +AC_ARG_ENABLE([naked-pointers],
 +  [AS_HELP_STRING([--disable-naked-pointers],
@@ -5148,18 +5238,113 @@ index 0000000000..ff47d10956
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a7ad9b54c6
+index 0000000000..f29a33eb73
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5051 @@
+@@ -0,0 +1,5166 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..989f81ffb2
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,92 @@
+++--- a	2023-09-28 18:43:54.420214740 +0100
++++++ b	2023-09-28 18:43:54.436215400 +0100
+++@@ -13,7 +13,7 @@
+++  ### Internal/compiler-libs changes:
+++  
+++  - #10878, #10909: restore flambda after the Multicore merge.
+++-@@ -300,7 +305,7 @@ OCaml 4.14.0
++++@@ -306,7 +311,7 @@ OCaml 4.14.0
+++  
+++  - #10951: Introduce the Thread.Exit exception as an alternative way to
+++    terminate threads prematurely.  This alternative way will become
+++@@ -22,15 +22,6 @@
+++    (Xavier Leroy, review by Florian Angeletti)
+++  
+++  ### Tools:
+++-diff --git a/VERSION b/VERSION
+++---- a/VERSION
+++-+++ b/VERSION
+++-@@ -1,4 +1,4 @@
+++--5.00.0+dev0-2021-11-05
+++-+5.0.0+dev0-2021-11-05
+++- 
+++- # Starting with OCaml 4.14, although the version string that appears above is
+++- # still correct and this file can thus still be used to figure it out,
+++ diff --git a/appveyor.yml b/appveyor.yml
+++ --- a/appveyor.yml
+++ +++ b/appveyor.yml
+++@@ -43,24 +34,12 @@
+++  #    - PORT: msvc64
+++  #      BOOTSTRAP_FLEXDLL: false
+++  #      BUILD_MODE: steps
+++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
+++---- a/build-aux/ocaml_version.m4
+++-+++ b/build-aux/ocaml_version.m4
+++-@@ -32,7 +32,7 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
+++- # including the patchlevel, are mandatory.
+++- 
+++- m4_define([OCAML__VERSION_MAJOR], [5])
+++--m4_define([OCAML__VERSION_MINOR], [00])
+++-+m4_define([OCAML__VERSION_MINOR], [0])
+++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
+++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
+++- # for officially-released versions of OCaml.
+++ diff --git a/configure b/configure
+++ Binary files a/configure and b/configure differ
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -286,7 +286,7 @@ AC_ARG_ENABLE([unix-lib],
++++@@ -288,7 +288,7 @@ AC_ARG_ENABLE([unix-lib],
+++  AC_ARG_ENABLE([bigarray-lib], [],
+++    [AS_IF([test "x$enableval" != 'xno'],
+++      [AC_MSG_ERROR(m4_normalize([The bigarray-lib option was deleted in OCaml
+++@@ -69,22 +48,23 @@
+++    [])
+++  
+++  AC_ARG_ENABLE([ocamldoc],
+++-@@ -314,12 +314,12 @@ AC_ARG_ENABLE([frame-pointers],
+++- 
+++- AC_ARG_ENABLE([naked-pointers], [],
+++-   [AS_IF([test "x$enableval" != 'xno'],
+++--    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+++-+    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
+++-   [])
+++- 
+++- AC_ARG_ENABLE([naked-pointers-checker], [],
+++-   [AS_IF([test "x$enableval" != 'xno'],
+++--    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
+++-+    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.0.])])],
+++-   [])
++++@@ -316,13 +316,13 @@ AC_ARG_ENABLE([frame-pointers],
+++  
+++- AC_ARG_ENABLE([spacetime], [],
+++-@@ -392,12 +392,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
++++ dnl AC_ARG_ENABLE([naked-pointers], [],
++++ dnl   [AS_IF([test "x$enableval" != 'xno'],
++++-dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+++++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
++++ dnl   [])
++++ 
++++ dnl AC_ARG_ENABLE([naked-pointers-checker], [],
++++ dnl   [AS_IF([test "x$enableval" != 'xno'],
++++ dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
++++-dnl       OCaml 5.00.]))])],
+++++dnl       OCaml 5.0.]))])],
++++ dnl   [])
++++ AC_ARG_ENABLE([naked-pointers],
++++   [AS_HELP_STRING([--disable-naked-pointers],
++++@@ -402,12 +402,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
+++  
+++  AC_ARG_ENABLE([force-safe-string], [],
+++    [AS_IF([test "x$enableval" = 'xno'],
 +diff --git a/Changes b/Changes
-+index 5831c641ad..d3e9ff3e20 100644
++index 0c9726d894..d5cbd66023 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -138,6 +138,9 @@ Working version
++@@ -143,6 +143,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5169,7 +5354,7 @@ index 0000000000..a7ad9b54c6
 + ### Bug fixes:
 + 
 + - #11025: Do not pass -no-pie to the C compiler on musl/arm64
-+@@ -178,13 +181,13 @@ OCaml 4.14.0
++@@ -183,13 +186,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5185,7 +5370,7 @@ index 0000000000..a7ad9b54c6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -284,6 +287,9 @@ OCaml 4.14.0
++@@ -289,6 +292,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5195,7 +5380,7 @@ index 0000000000..a7ad9b54c6
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -532,6 +538,9 @@ OCaml 4.14.0
++@@ -537,6 +543,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -5219,11 +5404,11 @@ index 0000000000..a7ad9b54c6
 + ### Native command to build ocamlrun.exe
 + 
 +diff --git a/VERSION b/VERSION
-+index d9d76e3115..4ef434f979 100644
++index 8dfc6cf83f..4ef434f979 100644
 +--- a/VERSION
 ++++ b/VERSION
 +@@ -1,4 +1,4 @@
-+-5.00.0+dev0-2021-11-05
++-5.0.0+dev0-2021-11-05
 ++5.0.0+jst-backport
 + 
 + # Starting with OCaml 4.14, although the version string that appears above is
@@ -5662,15 +5847,10 @@ index 0000000000..a7ad9b54c6
 +index b35488cadc..9c4fe66628 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+index 681f116bbb..0a59107ea8 100644
++index 2c66a918a3..0a59107ea8 100644
 +--- a/build-aux/ocaml_version.m4
 ++++ b/build-aux/ocaml_version.m4
-+@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
-+ # including the patchlevel, are mandatory.
-+ 
-+ m4_define([OCAML__VERSION_MAJOR], [5])
-+-m4_define([OCAML__VERSION_MINOR], [00])
-++m4_define([OCAML__VERSION_MINOR], [0])
++@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
 + m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 + # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 + # for officially-released versions of OCaml.
@@ -5699,10 +5879,10 @@ index 0000000000..a7ad9b54c6
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 837b66c866..6261dad548 100755
++index e9a2513eb0..30a5e69c92 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 6d051e1dda..a5fa41e2fa 100644
++index 6d9f4b809c..e9058e911b 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -5735,21 +5915,21 @@ index 0000000000..a7ad9b54c6
 + 
 +-AC_ARG_ENABLE([naked-pointers], [],
 +-  [AS_IF([test "x$enableval" != 'xno'],
-+-    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
++-    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
 +-  [])
 ++dnl AC_ARG_ENABLE([naked-pointers], [],
 ++dnl   [AS_IF([test "x$enableval" != 'xno'],
-++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
+++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
 ++dnl   [])
 + 
 +-AC_ARG_ENABLE([naked-pointers-checker], [],
 +-  [AS_IF([test "x$enableval" != 'xno'],
-+-    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
++-    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.0.])])],
 +-  [])
 ++dnl AC_ARG_ENABLE([naked-pointers-checker], [],
 ++dnl   [AS_IF([test "x$enableval" != 'xno'],
 ++dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
-++dnl       OCaml 5.00.]))])],
+++dnl       OCaml 5.0.]))])],
 ++dnl   [])
 ++AC_ARG_ENABLE([naked-pointers],
 ++  [AS_HELP_STRING([--disable-naked-pointers],
@@ -10202,7 +10382,32 @@ index 0000000000..a7ad9b54c6
 ++-* skip
 ++-reason = "ocamldebug is broken (#34)"
 ++-** debugger
-++-*** shared-lib
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

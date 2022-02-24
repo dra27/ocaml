@@ -3219,7 +3219,7 @@ fi
 # Check whether --enable-bigarray-lib was given.
 if test "${enable_bigarray_lib+set}" = set; then :
   enableval=$enable_bigarray_lib; if test "x$enableval" != 'xno'; then :
-  as_fn_error $? "The bigarray-lib option was deleted in OCaml 5.00, as the Bigarray module is now part of the standard library." "$LINENO" 5
+  as_fn_error $? "The bigarray-lib option was deleted in OCaml 5.0, as the Bigarray module is now part of the standard library." "$LINENO" 5
 fi
 fi
 
@@ -3371,14 +3371,14 @@ fi
 # Check whether --enable-force-safe-string was given.
 if test "${enable_force_safe_string+set}" = set; then :
   enableval=$enable_force_safe_string; if test "x$enableval" = 'xno'; then :
-  as_fn_error $? "Support for mutable strings was removed in OCaml 5.00." "$LINENO" 5
+  as_fn_error $? "Support for mutable strings was removed in OCaml 5.0." "$LINENO" 5
 fi
 fi
 
 
 
 if test x"$DEFAULT_STRING" = "xunsafe"; then :
-  as_fn_error $? "Support for mutable strings was removed in OCaml 5.00." "$LINENO" 5
+  as_fn_error $? "Support for mutable strings was removed in OCaml 5.0." "$LINENO" 5
 fi
 
 # Check whether --enable-flat-float-array was given.
