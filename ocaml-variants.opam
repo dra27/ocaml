@@ -44,7 +44,7 @@ install: [make "install"]
 conflicts: [
   "ocaml-option-32bit"      # Not yet implemented
   "ocaml-option-nnpchecker" # Fundamentally not possible
-  "ocaml-option-default-unsafe-string" # Not supported since 5.00
+  "ocaml-option-default-unsafe-string" # Not supported since 5.0
 ]
 depopts: [
   "ocaml-option-afl"
