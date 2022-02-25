@@ -1,515 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6def9af70d
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,506 @@
-+--- a	2023-09-28 18:43:55.292250666 +0100
-++++ b	2023-09-28 18:43:55.300250996 +0100
-+@@ -130,7 +130,7 @@
-+ diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
-+ --- a/testsuite/tests/backtrace/backtrace_effects.ml
-+ +++ b/testsuite/tests/backtrace/backtrace_effects.ml
-+-@@ -7,7 +7,7 @@
-++@@ -9,7 +9,7 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -139,7 +139,7 @@
-+  
-+  let bar i =
-+    if i < 0 then begin
-+-@@ -29,7 +29,7 @@ let baz () =
-++@@ -31,7 +31,7 @@ let baz () =
-+    match_with foo 10
-+    { retc = (fun x -> ());
-+      exnc = (fun e -> raise e);
-+@@ -151,7 +151,7 @@
-+ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-+ --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
-+ +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-+-@@ -13,8 +13,8 @@ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference
-++@@ -15,8 +15,8 @@ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -162,7 +162,7 @@
-+  
-+  let blorp () =
-+    perform Inc;
-+-@@ -23,7 +23,7 @@ let blorp () =
-++@@ -25,7 +25,7 @@ let blorp () =
-+  
-+  let baz () =
-+      try_with blorp ()
-+@@ -171,7 +171,7 @@
-+          match e with
-+          | Inc -> Some (fun (k : (a, _) continuation) ->
-+              1 + continue k ())
-+-@@ -33,7 +33,7 @@ let f () =
-++@@ -35,7 +35,7 @@ let f () =
-+    match_with baz ()
-+    { retc = (fun x -> Printf.printf "%d\n" x);
-+      exnc = (fun e -> raise e);
-+@@ -183,7 +183,7 @@
-+ diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
-+ --- a/testsuite/tests/callback/nested_fiber.ml
-+ +++ b/testsuite/tests/callback/nested_fiber.ml
-+-@@ -11,7 +11,7 @@ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
-++@@ -13,7 +13,7 @@ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -192,7 +192,7 @@
-+  
-+  type 'a tree = Empty | Node of 'a tree * 'a tree
-+  
-+-@@ -34,7 +34,7 @@ let f () =
-++@@ -36,7 +36,7 @@ let f () =
-+    match_with g ()
-+    { retc = (fun () -> Printf.printf "g() returned: %d\n%!" !z);
-+      exnc = (fun e -> raise e);
-+@@ -201,7 +201,7 @@
-+            match e with
-+            | E -> Some (fun (k : (a, _) continuation) -> assert false)
-+            | _ -> None };
-+-@@ -46,7 +46,7 @@ let () =
-++@@ -48,7 +48,7 @@ let () =
-+    match_with f ()
-+    { retc = (fun () -> Printf.printf "f() returned: %d\n%!" !z);
-+      exnc = (fun e -> raise e);
-+@@ -213,7 +213,7 @@
-+ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-+ --- a/testsuite/tests/callback/stack_overflow.ml
-+ +++ b/testsuite/tests/callback/stack_overflow.ml
-+-@@ -17,7 +17,7 @@ let rec deep = function
-++@@ -19,7 +19,7 @@ let rec deep = function
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -222,7 +222,7 @@
-+  
-+  let () =
-+    Printf.printf "%d\n%d\n%!"
-+-@@ -25,7 +25,7 @@ let () =
-++@@ -27,7 +27,7 @@ let () =
-+      (match_with deep 1000
-+       { retc = (fun x -> !x);
-+         exnc = (fun e -> raise e);
-+@@ -234,7 +234,7 @@
-+ diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-+ --- a/testsuite/tests/callback/test7.ml
-+ +++ b/testsuite/tests/callback/test7.ml
-+-@@ -13,7 +13,7 @@
-++@@ -15,7 +15,7 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -243,7 +243,7 @@
-+  
-+  let printf = Printf.printf
-+  
-+-@@ -36,7 +36,7 @@ let _ =
-++@@ -38,7 +38,7 @@ let _ =
-+         perform E)
-+      end;
-+      printf "[Caml] Return from caml_to_c\n%!") ()
-+@@ -255,7 +255,7 @@
-+ diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
-+ --- a/testsuite/tests/effects/backtrace.ml
-+ +++ b/testsuite/tests/effects/backtrace.ml
-+-@@ -22,7 +22,7 @@ let rec bar i =
-++@@ -24,7 +24,7 @@ let rec bar i =
-+    end
-+    [@@inline never]
-+  
-+@@ -264,7 +264,7 @@
-+  
-+  let task1 () =
-+    try
-+-@@ -45,7 +45,7 @@ let main () =
-++@@ -47,7 +47,7 @@ let main () =
-+      exnc = (fun e ->
-+        let open Printexc in
-+        print_raw_backtrace stdout (get_raw_backtrace ()));
-+@@ -276,7 +276,7 @@
-+ diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
-+ --- a/testsuite/tests/effects/cmphash.ml
-+ +++ b/testsuite/tests/effects/cmphash.ml
-+-@@ -4,11 +4,11 @@
-++@@ -6,11 +6,11 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -293,7 +293,7 @@
-+ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-+ --- a/testsuite/tests/effects/evenodd.ml
-+ +++ b/testsuite/tests/effects/evenodd.ml
-+-@@ -4,12 +4,12 @@
-++@@ -6,12 +6,12 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -323,7 +323,7 @@
-+ diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
-+ --- a/testsuite/tests/effects/issue479.ml
-+ +++ b/testsuite/tests/effects/issue479.ml
-+-@@ -19,7 +19,7 @@ type ('a,'container) iter2gen =
-++@@ -21,7 +21,7 @@ type ('a,'container) iter2gen =
-+    -> 'container
-+    -> 'a generator;;
-+  
-+@@ -332,7 +332,7 @@
-+  
-+  let iter2gen : _ iter2gen = fun iter c ->
-+    let r = ref None in
-+-@@ -31,7 +31,7 @@ let iter2gen : _ iter2gen = fun iter c ->
-++@@ -33,7 +33,7 @@ let iter2gen : _ iter2gen = fun iter c ->
-+      match_with (iter suspending_f) c
-+      { retc = (fun _ -> fun () -> None);
-+        exnc = (fun e -> raise e);
-+@@ -344,7 +344,7 @@
-+ diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
-+ --- a/testsuite/tests/effects/overflow.ml
-+ +++ b/testsuite/tests/effects/overflow.ml
-+-@@ -4,7 +4,7 @@
-++@@ -6,7 +6,7 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -353,7 +353,7 @@
-+  
-+  let f a b c d e f g h =
-+     let bb = b + b in
-+-@@ -34,7 +34,7 @@ let () =
-++@@ -36,7 +36,7 @@ let () =
-+    match_with (fun _ -> f 1 2 3 4 5 6 7 8) ()
-+    { retc = (fun n -> Printf.printf "%d\n" n);
-+      exnc = (fun e -> raise e);
-+@@ -365,7 +365,7 @@
-+ diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
-+ --- a/testsuite/tests/effects/partial.ml
-+ +++ b/testsuite/tests/effects/partial.ml
-+-@@ -4,12 +4,12 @@
-++@@ -6,12 +6,12 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -380,7 +380,7 @@
-+        match e with
-+        | E -> Some (fun k -> assert false)
-+        | _ -> None }
-+-@@ -22,7 +22,7 @@ let () =
-++@@ -24,7 +24,7 @@ let () =
-+      exnc = (function
-+        | Done -> print_string "ok\n"
-+        | e -> raise e);
-+@@ -392,7 +392,7 @@
-+ diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
-+ --- a/testsuite/tests/effects/reperform.ml
-+ +++ b/testsuite/tests/effects/reperform.ml
-+-@@ -4,8 +4,8 @@
-++@@ -6,8 +6,8 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -403,7 +403,7 @@
-+  
-+  let rec nest = function
-+    | 0 -> perform (E 42)
-+-@@ -13,7 +13,7 @@ let rec nest = function
-++@@ -15,7 +15,7 @@ let rec nest = function
-+       match_with (fun _ -> Printf.printf "[%d\n" n; nest (n - 1)) ()
-+       { retc = (fun x -> Printf.printf " %d]\n" n; x);
-+         exnc = (fun e -> Printf.printf " !%d]\n" n; raise e);
-+@@ -412,7 +412,7 @@
-+           match e with
-+           | F -> Some (fun k -> assert false)
-+           | _ -> None }
-+-@@ -22,7 +22,7 @@ let () =
-++@@ -24,7 +24,7 @@ let () =
-+    match_with nest 5
-+    { retc = (fun x -> Printf.printf "= %d\n" x);
-+      exnc = (fun e -> raise e);
-+@@ -421,7 +421,7 @@
-+        match e with
-+        | E n -> Some (fun (k : (a, _) continuation) -> continue k (n + 100))
-+        | _ -> None }
-+-@@ -31,7 +31,7 @@ let () =
-++@@ -33,7 +33,7 @@ let () =
-+    match_with nest 5
-+    { retc = (fun x -> assert false);
-+      exnc = (fun e -> Printf.printf "%s\n" (Printexc.to_string e));
-+@@ -433,7 +433,7 @@
-+ diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
-+ --- a/testsuite/tests/effects/sched.ml
-+ +++ b/testsuite/tests/effects/sched.ml
-+-@@ -5,9 +5,9 @@ open Effect
-++@@ -7,9 +7,9 @@ open Effect
-+  open Effect.Deep
-+  
-+  exception E
-+@@ -446,7 +446,7 @@
-+  exception Pong
-+  
-+  let say = print_string
-+-@@ -27,7 +27,7 @@ let run main =
-++@@ -29,7 +29,7 @@ let run main =
-+        exnc = (function
-+          | E -> say "!"; dequeue ()
-+          | e -> raise e);
-+@@ -455,7 +455,7 @@
-+          match e with
-+          | Yield -> Some (fun (k : (a, _) continuation) ->
-+              say ","; enqueue k; dequeue ())
-+-@@ -48,7 +48,7 @@ let test () =
-++@@ -50,7 +50,7 @@ let test () =
-+          exnc = (function
-+            | Pong -> say "]"
-+            | e -> raise e);
-+@@ -467,7 +467,7 @@
-+ diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
-+ --- a/testsuite/tests/effects/shallow_state.ml
-+ +++ b/testsuite/tests/effects/shallow_state.ml
-+-@@ -15,8 +15,8 @@ let handle_state init f x =
-++@@ -17,8 +17,8 @@ let handle_state init f x =
-+    loop init (fiber f) x
-+  *)
-+  
-+@@ -478,7 +478,7 @@
-+  
-+  let handle_state init f x =
-+    let rec loop : type a r. int -> (a, r) continuation -> a -> r * int =
-+-@@ -24,7 +24,7 @@ let handle_state init f x =
-++@@ -26,7 +26,7 @@ let handle_state init f x =
-+        continue_with k x
-+        { retc = (fun result -> result, state);
-+          exnc = (fun e -> raise e);
-+@@ -490,7 +490,7 @@
-+ diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
-+ --- a/testsuite/tests/effects/shallow_state_io.ml
-+ +++ b/testsuite/tests/effects/shallow_state_io.ml
-+-@@ -4,9 +4,9 @@
-++@@ -6,9 +6,9 @@
-+  open Effect
-+  open Effect.Shallow
-+  
-+@@ -503,7 +503,7 @@
-+  
-+  let handle_state init f x =
-+    let rec loop : type a r. int -> (a, r) continuation -> a -> r * int =
-+-@@ -14,7 +14,7 @@ let handle_state init f x =
-++@@ -16,7 +16,7 @@ let handle_state init f x =
-+        continue_with k x
-+        { retc = (fun result -> result, state);
-+          exnc = (fun e -> raise e);
-+@@ -512,7 +512,7 @@
-+            match eff with
-+            | Get -> Some (fun (k : (b,r) continuation) ->
-+                loop state k state)
-+-@@ -30,7 +30,7 @@ let handle_print f =
-++@@ -32,7 +32,7 @@ let handle_print f =
-+        continue_with k ()
-+        { retc = (fun x -> x);
-+          exnc = (fun e -> raise e);
-+@@ -524,7 +524,7 @@
-+ diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
-+ --- a/testsuite/tests/effects/test1.ml
-+ +++ b/testsuite/tests/effects/test1.ml
-+-@@ -4,12 +4,12 @@
-++@@ -6,12 +6,12 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -542,7 +542,7 @@
-+ diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
-+ --- a/testsuite/tests/effects/test10.ml
-+ +++ b/testsuite/tests/effects/test10.ml
-+-@@ -4,8 +4,8 @@
-++@@ -6,8 +6,8 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -553,7 +553,7 @@
-+  
-+  let rec a i = perform Peek + Random.int i
-+  let rec b i = a i + Random.int i
-+-@@ -14,7 +14,7 @@ let rec c i = b i + Random.int i
-++@@ -16,7 +16,7 @@ let rec c i = b i + Random.int i
-+  let rec d i =
-+    Random.int i +
-+    try_with c i
-+@@ -562,7 +562,7 @@
-+        match e with
-+        | Poke -> Some (fun (k : (a,_) continuation) -> continue k ())
-+        | _ -> None }
-+-@@ -22,7 +22,7 @@ let rec d i =
-++@@ -24,7 +24,7 @@ let rec d i =
-+  let rec e i =
-+    Random.int i +
-+    try_with d i
-+@@ -574,7 +574,7 @@
-+ diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
-+ --- a/testsuite/tests/effects/test11.ml
-+ +++ b/testsuite/tests/effects/test11.ml
-+-@@ -7,11 +7,11 @@
-++@@ -9,11 +9,11 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -591,7 +591,7 @@
-+ diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-+ --- a/testsuite/tests/effects/test2.ml
-+ +++ b/testsuite/tests/effects/test2.ml
-+-@@ -5,7 +5,7 @@ open Printf
-++@@ -7,7 +7,7 @@ open Printf
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -600,7 +600,7 @@
-+  
-+  let f () =
-+    printf "perform effect (E 0)\n%!";
-+-@@ -13,7 +13,7 @@ let f () =
-++@@ -15,7 +15,7 @@ let f () =
-+    printf "perform returns %d\n%!" v;
-+    v + 1
-+  
-+@@ -612,7 +612,7 @@
-+ diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
-+ --- a/testsuite/tests/effects/test3.ml
-+ +++ b/testsuite/tests/effects/test3.ml
-+-@@ -4,7 +4,7 @@
-++@@ -6,7 +6,7 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -621,7 +621,7 @@
-+  exception X
-+  
-+  let () =
-+-@@ -16,7 +16,7 @@ let () =
-++@@ -18,7 +18,7 @@ let () =
-+        exnc = (function
-+          | X -> 10
-+          | e -> raise e);
-+@@ -633,7 +633,7 @@
-+ diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
-+ --- a/testsuite/tests/effects/test4.ml
-+ +++ b/testsuite/tests/effects/test4.ml
-+-@@ -4,15 +4,15 @@
-++@@ -6,15 +6,15 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -655,7 +655,7 @@
-+ diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
-+ --- a/testsuite/tests/effects/test5.ml
-+ +++ b/testsuite/tests/effects/test5.ml
-+-@@ -4,18 +4,18 @@
-++@@ -6,18 +6,18 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -680,7 +680,7 @@
-+ diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-+ --- a/testsuite/tests/effects/test6.ml
-+ +++ b/testsuite/tests/effects/test6.ml
-+-@@ -4,8 +4,8 @@
-++@@ -6,8 +6,8 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -691,7 +691,7 @@
-+  
-+  let () =
-+    let ok1 = ref false and ok2 = ref false in
-+-@@ -14,7 +14,7 @@ let () =
-++@@ -16,7 +16,7 @@ let () =
-+    f ok1;
-+    Printf.printf "%b\n%!" !ok1;
-+    try_with f ok2 {
-+@@ -703,7 +703,7 @@
-+ diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
-+ --- a/testsuite/tests/effects/test_lazy.ml
-+ +++ b/testsuite/tests/effects/test_lazy.ml
-+-@@ -3,7 +3,7 @@
-++@@ -6,7 +6,7 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -712,7 +712,7 @@
-+  
-+  let f count =
-+    let r = ref 0 in
-+-@@ -17,7 +17,7 @@ let _ =
-++@@ -20,7 +20,7 @@ let _ =
-+    let l = lazy (f 1_000) in
-+    let v1 =
-+      try_with Lazy.force l
-+@@ -721,7 +721,7 @@
-+          match e with
-+          | Stop -> Some (fun (k : (a, _) continuation) -> continue k ())
-+          | _ -> None }
-+-@@ -26,7 +26,7 @@ let _ =
-++@@ -29,7 +29,7 @@ let _ =
-+    let l2 = lazy (f 2_000) in
-+    let v2 =
-+      try_with Lazy.force l2
-+@@ -730,7 +730,7 @@
-+          match e with
-+          | Stop -> Some (fun (k : (a, _) continuation) ->
-+              let d = Domain.spawn(fun () -> continue k ()) in
-+-@@ -37,7 +37,7 @@ let _ =
-++@@ -40,7 +40,7 @@ let _ =
-+    let l3 = lazy (f 3_000) in
-+    let _ =
-+      try_with Lazy.force l3
-+@@ -742,7 +742,7 @@
-+ diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
-+ --- a/testsuite/tests/effects/used_cont.ml
-+ +++ b/testsuite/tests/effects/used_cont.ml
-+-@@ -4,14 +4,14 @@
-++@@ -6,14 +6,14 @@
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -762,7 +762,7 @@
-+ diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
-+ --- a/testsuite/tests/parallel/deadcont.ml
-+ +++ b/testsuite/tests/parallel/deadcont.ml
-+-@@ -14,7 +14,7 @@ include unix
-++@@ -16,7 +16,7 @@ include unix
-+  open Effect
-+  open Effect.Deep
-+  
-+@@ -771,7 +771,7 @@
-+  
-+  type result = Done | Poking of (unit -> result)
-+  
-+-@@ -32,7 +32,7 @@ let domain_handler f =
-++@@ -34,7 +34,7 @@ let domain_handler f =
-+    match_with f ()
-+    { retc = (fun () -> Done);
-+      exnc = (fun e -> raise e);
-+@@ -783,7 +783,7 @@
-+ diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
-+ --- a/testsuite/tests/parallel/mctest.ml
-+ +++ b/testsuite/tests/parallel/mctest.ml
-+-@@ -155,11 +155,11 @@ struct
-++@@ -157,11 +157,11 @@ struct
-+  
-+    type 'a cont = ('a, unit) continuation
-+  
-+@@ -800,7 +800,7 @@
-+  
-+    let suspend f = perform (Suspend f)
-+    let resume t v = perform (Resume (t, v))
-+-@@ -186,7 +186,7 @@ struct
-++@@ -188,7 +188,7 @@ struct
-+        match_with f ()
-+        { retc = (fun () -> dequeue ());
-+          exnc = (fun e -> raise e);
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index e7da66f4d9..c29133a3fd 100644
 --- a/Changes
@@ -2594,7 +2085,7 @@ index 0000000000..52a1b380eb
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ff47d10956
+index 0000000000..578c9bbcd6
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3052 @@
@@ -3151,7 +2642,7 @@ index 0000000000..ff47d10956
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
 + Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 +diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
-+index dcd4480a02..39d9880db6 100644
++index 352b32cbd7..bafd2259e8 100644
 +--- a/testsuite/tests/backtrace/backtrace_effects.ml
 ++++ b/testsuite/tests/backtrace/backtrace_effects.ml
 +@@ -2,6 +2,8 @@
@@ -3164,7 +2655,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-+index 6bb1597761..b818ede59e 100644
++index 37638a200a..2a2a630160 100644
 +--- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
 ++++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
 +@@ -1,12 +1,14 @@
@@ -3549,7 +3040,7 @@ index 0000000000..ff47d10956
 + 
 + external test : int ref -> unit = "stub"
 +diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
-+index 7d520d0915..57cbfc4a63 100644
++index 3786e455ef..77478728df 100644
 +--- a/testsuite/tests/callback/nested_fiber.ml
 ++++ b/testsuite/tests/callback/nested_fiber.ml
 +@@ -1,9 +1,11 @@
@@ -3568,7 +3059,7 @@ index 0000000000..ff47d10956
 + 
 + external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 +diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-+index e48815aede..ef8c8a3845 100644
++index 23691dcf6c..6281d76e2a 100644
 +--- a/testsuite/tests/callback/stack_overflow.ml
 ++++ b/testsuite/tests/callback/stack_overflow.ml
 +@@ -1,9 +1,11 @@
@@ -3587,7 +3078,7 @@ index 0000000000..ff47d10956
 + 
 + external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 +diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-+index 7f35966184..9459b6c601 100644
++index 9419dd5c6f..e523ba85b7 100644
 +--- a/testsuite/tests/callback/test7.ml
 ++++ b/testsuite/tests/callback/test7.ml
 +@@ -1,9 +1,11 @@
@@ -3641,7 +3132,7 @@ index 0000000000..ff47d10956
 +   let u = (s, s) in
 +   fst u
 +diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
-+index cacd27347c..0eab449113 100644
++index 6257ba75c5..df6e11ac7a 100644
 +--- a/testsuite/tests/effects/backtrace.ml
 ++++ b/testsuite/tests/effects/backtrace.ml
 +@@ -1,6 +1,8 @@
@@ -3654,7 +3145,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
-+index 20462f619d..a834ad1a71 100644
++index 78481d6404..a36d20cb8c 100644
 +--- a/testsuite/tests/effects/cmphash.ml
 ++++ b/testsuite/tests/effects/cmphash.ml
 +@@ -1,4 +1,6 @@
@@ -3665,7 +3156,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-+index 44d2a3d4ae..0b9f222b58 100644
++index 07464edb7a..e9b2d5a2fb 100644
 +--- a/testsuite/tests/effects/evenodd.ml
 ++++ b/testsuite/tests/effects/evenodd.ml
 +@@ -1,4 +1,6 @@
@@ -3676,7 +3167,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
-+index d87bf3f759..63c19a2535 100644
++index 228e098d2e..c00b55c6ff 100644
 +--- a/testsuite/tests/effects/issue479.ml
 ++++ b/testsuite/tests/effects/issue479.ml
 +@@ -1,5 +1,7 @@
@@ -3689,7 +3180,7 @@ index 0000000000..ff47d10956
 + 
 + (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
 +diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
-+index 15cd6447c2..f68acae14b 100644
++index a187e9e10d..c12503863e 100644
 +--- a/testsuite/tests/effects/overflow.ml
 ++++ b/testsuite/tests/effects/overflow.ml
 +@@ -1,4 +1,6 @@
@@ -3700,7 +3191,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
-+index 3d6e51ff6b..45efef7282 100644
++index 50e4b53cfc..010741b9fc 100644
 +--- a/testsuite/tests/effects/partial.ml
 ++++ b/testsuite/tests/effects/partial.ml
 +@@ -1,4 +1,6 @@
@@ -3711,7 +3202,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
-+index 24b2aeeac7..28f9dab5e2 100644
++index 8aefdd0587..685b48b5dd 100644
 +--- a/testsuite/tests/effects/reperform.ml
 ++++ b/testsuite/tests/effects/reperform.ml
 +@@ -1,4 +1,6 @@
@@ -3722,7 +3213,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
-+index 07e9231c53..b2bf0d2ca4 100644
++index 3dc14a2cfc..6065d21c70 100644
 +--- a/testsuite/tests/effects/sched.ml
 ++++ b/testsuite/tests/effects/sched.ml
 +@@ -1,4 +1,6 @@
@@ -3733,7 +3224,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
-+index ad7f29f3cc..99044e5eb4 100644
++index 56c61b0c3c..4d52362bc7 100644
 +--- a/testsuite/tests/effects/shallow_state.ml
 ++++ b/testsuite/tests/effects/shallow_state.ml
 +@@ -1,4 +1,6 @@
@@ -3744,7 +3235,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
-+index b5301b7b9b..4a4c457693 100644
++index 6b1fa649a7..6ca4fef8b1 100644
 +--- a/testsuite/tests/effects/shallow_state_io.ml
 ++++ b/testsuite/tests/effects/shallow_state_io.ml
 +@@ -1,4 +1,6 @@
@@ -3755,7 +3246,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
-+index bb70e9e40a..14d0ca6841 100644
++index 5d05359f8a..65da5c8b90 100644
 +--- a/testsuite/tests/effects/test1.ml
 ++++ b/testsuite/tests/effects/test1.ml
 +@@ -1,4 +1,6 @@
@@ -3766,7 +3257,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
-+index 2b3398bf61..6bdbdd7bcb 100644
++index 29c5f47f25..9b10559cfd 100644
 +--- a/testsuite/tests/effects/test10.ml
 ++++ b/testsuite/tests/effects/test10.ml
 +@@ -1,4 +1,6 @@
@@ -3777,7 +3268,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
-+index 7eede3bdaf..2a6bc7d255 100644
++index 6714473e0e..303cdd03c5 100644
 +--- a/testsuite/tests/effects/test11.ml
 ++++ b/testsuite/tests/effects/test11.ml
 +@@ -1,4 +1,6 @@
@@ -3788,7 +3279,7 @@ index 0000000000..ff47d10956
 + 
 + (* Tests RESUMETERM with extra_args != 0 in bytecode,
 +diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-+index b3cc1d61ca..33228fdb93 100644
++index d7250fa5ff..132f5966a6 100644
 +--- a/testsuite/tests/effects/test2.ml
 ++++ b/testsuite/tests/effects/test2.ml
 +@@ -1,4 +1,6 @@
@@ -3799,7 +3290,7 @@ index 0000000000..ff47d10956
 + 
 + open Printf
 +diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
-+index f42199b1c7..81ca0a093d 100644
++index d76130eaaa..2828f933a7 100644
 +--- a/testsuite/tests/effects/test3.ml
 ++++ b/testsuite/tests/effects/test3.ml
 +@@ -1,4 +1,6 @@
@@ -3810,7 +3301,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
-+index 049e95de74..dd93cfcfdf 100644
++index f5cf78cbda..77320a1ab5 100644
 +--- a/testsuite/tests/effects/test4.ml
 ++++ b/testsuite/tests/effects/test4.ml
 +@@ -1,4 +1,6 @@
@@ -3821,7 +3312,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
-+index deb3c5035e..0884710045 100644
++index 33ed2c23ca..98802a934e 100644
 +--- a/testsuite/tests/effects/test5.ml
 ++++ b/testsuite/tests/effects/test5.ml
 +@@ -1,4 +1,6 @@
@@ -3832,7 +3323,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-+index 746aad325b..45dea39102 100644
++index ddfb83a5b6..6d4842f9fa 100644
 +--- a/testsuite/tests/effects/test6.ml
 ++++ b/testsuite/tests/effects/test6.ml
 +@@ -1,4 +1,6 @@
@@ -3843,7 +3334,7 @@ index 0000000000..ff47d10956
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
-+index 347adaf25a..1ec7438849 100644
++index 24f457f0af..036c7d5038 100644
 +--- a/testsuite/tests/effects/test_lazy.ml
 ++++ b/testsuite/tests/effects/test_lazy.ml
 +@@ -1,4 +1,7 @@
@@ -3856,7 +3347,7 @@ index 0000000000..ff47d10956
 + open Effect
 + open Effect.Deep
 +diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
-+index de8bed15ca..f99a1c7031 100644
++index 71a33388ec..7972d000b7 100644
 +--- a/testsuite/tests/effects/used_cont.ml
 ++++ b/testsuite/tests/effects/used_cont.ml
 +@@ -1,4 +1,6 @@
@@ -4461,7 +3952,7 @@ index 0000000000..ff47d10956
 + 
 + (* when run with the bytecode debug runtime, this test
 +diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
-+index a5642e425c..36077b0724 100644
++index 6006323f45..bf6d7658a1 100644
 +--- a/testsuite/tests/parallel/deadcont.ml
 ++++ b/testsuite/tests/parallel/deadcont.ml
 +@@ -1,8 +1,10 @@
@@ -4623,7 +4114,7 @@ index 0000000000..ff47d10956
 + 
 + type 'a tree = Empty | Node of 'a tree * 'a tree
 +diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
-+index 505223cde4..169f871913 100644
++index c5d82d2dbd..bbebf9d4b8 100644
 +--- a/testsuite/tests/parallel/mctest.ml
 ++++ b/testsuite/tests/parallel/mctest.ml
 +@@ -1,8 +1,10 @@
@@ -5652,522 +5143,13 @@ index 0000000000..ff47d10956
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..13bd7e616d
+index 0000000000..3d52173c68
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5575 @@
+@@ -0,0 +1,5054 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6def9af70d
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,506 @@
-++--- a	2023-09-28 18:43:55.292250666 +0100
-+++++ b	2023-09-28 18:43:55.300250996 +0100
-++@@ -130,7 +130,7 @@
-++ diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
-++ --- a/testsuite/tests/backtrace/backtrace_effects.ml
-++ +++ b/testsuite/tests/backtrace/backtrace_effects.ml
-++-@@ -7,7 +7,7 @@
-+++@@ -9,7 +9,7 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -139,7 +139,7 @@
-++  
-++  let bar i =
-++    if i < 0 then begin
-++-@@ -29,7 +29,7 @@ let baz () =
-+++@@ -31,7 +31,7 @@ let baz () =
-++    match_with foo 10
-++    { retc = (fun x -> ());
-++      exnc = (fun e -> raise e);
-++@@ -151,7 +151,7 @@
-++ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-++ --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
-++ +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-++-@@ -13,8 +13,8 @@ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference
-+++@@ -15,8 +15,8 @@ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -162,7 +162,7 @@
-++  
-++  let blorp () =
-++    perform Inc;
-++-@@ -23,7 +23,7 @@ let blorp () =
-+++@@ -25,7 +25,7 @@ let blorp () =
-++  
-++  let baz () =
-++      try_with blorp ()
-++@@ -171,7 +171,7 @@
-++          match e with
-++          | Inc -> Some (fun (k : (a, _) continuation) ->
-++              1 + continue k ())
-++-@@ -33,7 +33,7 @@ let f () =
-+++@@ -35,7 +35,7 @@ let f () =
-++    match_with baz ()
-++    { retc = (fun x -> Printf.printf "%d\n" x);
-++      exnc = (fun e -> raise e);
-++@@ -183,7 +183,7 @@
-++ diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
-++ --- a/testsuite/tests/callback/nested_fiber.ml
-++ +++ b/testsuite/tests/callback/nested_fiber.ml
-++-@@ -11,7 +11,7 @@ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
-+++@@ -13,7 +13,7 @@ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -192,7 +192,7 @@
-++  
-++  type 'a tree = Empty | Node of 'a tree * 'a tree
-++  
-++-@@ -34,7 +34,7 @@ let f () =
-+++@@ -36,7 +36,7 @@ let f () =
-++    match_with g ()
-++    { retc = (fun () -> Printf.printf "g() returned: %d\n%!" !z);
-++      exnc = (fun e -> raise e);
-++@@ -201,7 +201,7 @@
-++            match e with
-++            | E -> Some (fun (k : (a, _) continuation) -> assert false)
-++            | _ -> None };
-++-@@ -46,7 +46,7 @@ let () =
-+++@@ -48,7 +48,7 @@ let () =
-++    match_with f ()
-++    { retc = (fun () -> Printf.printf "f() returned: %d\n%!" !z);
-++      exnc = (fun e -> raise e);
-++@@ -213,7 +213,7 @@
-++ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-++ --- a/testsuite/tests/callback/stack_overflow.ml
-++ +++ b/testsuite/tests/callback/stack_overflow.ml
-++-@@ -17,7 +17,7 @@ let rec deep = function
-+++@@ -19,7 +19,7 @@ let rec deep = function
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -222,7 +222,7 @@
-++  
-++  let () =
-++    Printf.printf "%d\n%d\n%!"
-++-@@ -25,7 +25,7 @@ let () =
-+++@@ -27,7 +27,7 @@ let () =
-++      (match_with deep 1000
-++       { retc = (fun x -> !x);
-++         exnc = (fun e -> raise e);
-++@@ -234,7 +234,7 @@
-++ diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-++ --- a/testsuite/tests/callback/test7.ml
-++ +++ b/testsuite/tests/callback/test7.ml
-++-@@ -13,7 +13,7 @@
-+++@@ -15,7 +15,7 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -243,7 +243,7 @@
-++  
-++  let printf = Printf.printf
-++  
-++-@@ -36,7 +36,7 @@ let _ =
-+++@@ -38,7 +38,7 @@ let _ =
-++         perform E)
-++      end;
-++      printf "[Caml] Return from caml_to_c\n%!") ()
-++@@ -255,7 +255,7 @@
-++ diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
-++ --- a/testsuite/tests/effects/backtrace.ml
-++ +++ b/testsuite/tests/effects/backtrace.ml
-++-@@ -22,7 +22,7 @@ let rec bar i =
-+++@@ -24,7 +24,7 @@ let rec bar i =
-++    end
-++    [@@inline never]
-++  
-++@@ -264,7 +264,7 @@
-++  
-++  let task1 () =
-++    try
-++-@@ -45,7 +45,7 @@ let main () =
-+++@@ -47,7 +47,7 @@ let main () =
-++      exnc = (fun e ->
-++        let open Printexc in
-++        print_raw_backtrace stdout (get_raw_backtrace ()));
-++@@ -276,7 +276,7 @@
-++ diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
-++ --- a/testsuite/tests/effects/cmphash.ml
-++ +++ b/testsuite/tests/effects/cmphash.ml
-++-@@ -4,11 +4,11 @@
-+++@@ -6,11 +6,11 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -293,7 +293,7 @@
-++ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-++ --- a/testsuite/tests/effects/evenodd.ml
-++ +++ b/testsuite/tests/effects/evenodd.ml
-++-@@ -4,12 +4,12 @@
-+++@@ -6,12 +6,12 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -323,7 +323,7 @@
-++ diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
-++ --- a/testsuite/tests/effects/issue479.ml
-++ +++ b/testsuite/tests/effects/issue479.ml
-++-@@ -19,7 +19,7 @@ type ('a,'container) iter2gen =
-+++@@ -21,7 +21,7 @@ type ('a,'container) iter2gen =
-++    -> 'container
-++    -> 'a generator;;
-++  
-++@@ -332,7 +332,7 @@
-++  
-++  let iter2gen : _ iter2gen = fun iter c ->
-++    let r = ref None in
-++-@@ -31,7 +31,7 @@ let iter2gen : _ iter2gen = fun iter c ->
-+++@@ -33,7 +33,7 @@ let iter2gen : _ iter2gen = fun iter c ->
-++      match_with (iter suspending_f) c
-++      { retc = (fun _ -> fun () -> None);
-++        exnc = (fun e -> raise e);
-++@@ -344,7 +344,7 @@
-++ diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
-++ --- a/testsuite/tests/effects/overflow.ml
-++ +++ b/testsuite/tests/effects/overflow.ml
-++-@@ -4,7 +4,7 @@
-+++@@ -6,7 +6,7 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -353,7 +353,7 @@
-++  
-++  let f a b c d e f g h =
-++     let bb = b + b in
-++-@@ -34,7 +34,7 @@ let () =
-+++@@ -36,7 +36,7 @@ let () =
-++    match_with (fun _ -> f 1 2 3 4 5 6 7 8) ()
-++    { retc = (fun n -> Printf.printf "%d\n" n);
-++      exnc = (fun e -> raise e);
-++@@ -365,7 +365,7 @@
-++ diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
-++ --- a/testsuite/tests/effects/partial.ml
-++ +++ b/testsuite/tests/effects/partial.ml
-++-@@ -4,12 +4,12 @@
-+++@@ -6,12 +6,12 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -380,7 +380,7 @@
-++        match e with
-++        | E -> Some (fun k -> assert false)
-++        | _ -> None }
-++-@@ -22,7 +22,7 @@ let () =
-+++@@ -24,7 +24,7 @@ let () =
-++      exnc = (function
-++        | Done -> print_string "ok\n"
-++        | e -> raise e);
-++@@ -392,7 +392,7 @@
-++ diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
-++ --- a/testsuite/tests/effects/reperform.ml
-++ +++ b/testsuite/tests/effects/reperform.ml
-++-@@ -4,8 +4,8 @@
-+++@@ -6,8 +6,8 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -403,7 +403,7 @@
-++  
-++  let rec nest = function
-++    | 0 -> perform (E 42)
-++-@@ -13,7 +13,7 @@ let rec nest = function
-+++@@ -15,7 +15,7 @@ let rec nest = function
-++       match_with (fun _ -> Printf.printf "[%d\n" n; nest (n - 1)) ()
-++       { retc = (fun x -> Printf.printf " %d]\n" n; x);
-++         exnc = (fun e -> Printf.printf " !%d]\n" n; raise e);
-++@@ -412,7 +412,7 @@
-++           match e with
-++           | F -> Some (fun k -> assert false)
-++           | _ -> None }
-++-@@ -22,7 +22,7 @@ let () =
-+++@@ -24,7 +24,7 @@ let () =
-++    match_with nest 5
-++    { retc = (fun x -> Printf.printf "= %d\n" x);
-++      exnc = (fun e -> raise e);
-++@@ -421,7 +421,7 @@
-++        match e with
-++        | E n -> Some (fun (k : (a, _) continuation) -> continue k (n + 100))
-++        | _ -> None }
-++-@@ -31,7 +31,7 @@ let () =
-+++@@ -33,7 +33,7 @@ let () =
-++    match_with nest 5
-++    { retc = (fun x -> assert false);
-++      exnc = (fun e -> Printf.printf "%s\n" (Printexc.to_string e));
-++@@ -433,7 +433,7 @@
-++ diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
-++ --- a/testsuite/tests/effects/sched.ml
-++ +++ b/testsuite/tests/effects/sched.ml
-++-@@ -5,9 +5,9 @@ open Effect
-+++@@ -7,9 +7,9 @@ open Effect
-++  open Effect.Deep
-++  
-++  exception E
-++@@ -446,7 +446,7 @@
-++  exception Pong
-++  
-++  let say = print_string
-++-@@ -27,7 +27,7 @@ let run main =
-+++@@ -29,7 +29,7 @@ let run main =
-++        exnc = (function
-++          | E -> say "!"; dequeue ()
-++          | e -> raise e);
-++@@ -455,7 +455,7 @@
-++          match e with
-++          | Yield -> Some (fun (k : (a, _) continuation) ->
-++              say ","; enqueue k; dequeue ())
-++-@@ -48,7 +48,7 @@ let test () =
-+++@@ -50,7 +50,7 @@ let test () =
-++          exnc = (function
-++            | Pong -> say "]"
-++            | e -> raise e);
-++@@ -467,7 +467,7 @@
-++ diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
-++ --- a/testsuite/tests/effects/shallow_state.ml
-++ +++ b/testsuite/tests/effects/shallow_state.ml
-++-@@ -15,8 +15,8 @@ let handle_state init f x =
-+++@@ -17,8 +17,8 @@ let handle_state init f x =
-++    loop init (fiber f) x
-++  *)
-++  
-++@@ -478,7 +478,7 @@
-++  
-++  let handle_state init f x =
-++    let rec loop : type a r. int -> (a, r) continuation -> a -> r * int =
-++-@@ -24,7 +24,7 @@ let handle_state init f x =
-+++@@ -26,7 +26,7 @@ let handle_state init f x =
-++        continue_with k x
-++        { retc = (fun result -> result, state);
-++          exnc = (fun e -> raise e);
-++@@ -490,7 +490,7 @@
-++ diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
-++ --- a/testsuite/tests/effects/shallow_state_io.ml
-++ +++ b/testsuite/tests/effects/shallow_state_io.ml
-++-@@ -4,9 +4,9 @@
-+++@@ -6,9 +6,9 @@
-++  open Effect
-++  open Effect.Shallow
-++  
-++@@ -503,7 +503,7 @@
-++  
-++  let handle_state init f x =
-++    let rec loop : type a r. int -> (a, r) continuation -> a -> r * int =
-++-@@ -14,7 +14,7 @@ let handle_state init f x =
-+++@@ -16,7 +16,7 @@ let handle_state init f x =
-++        continue_with k x
-++        { retc = (fun result -> result, state);
-++          exnc = (fun e -> raise e);
-++@@ -512,7 +512,7 @@
-++            match eff with
-++            | Get -> Some (fun (k : (b,r) continuation) ->
-++                loop state k state)
-++-@@ -30,7 +30,7 @@ let handle_print f =
-+++@@ -32,7 +32,7 @@ let handle_print f =
-++        continue_with k ()
-++        { retc = (fun x -> x);
-++          exnc = (fun e -> raise e);
-++@@ -524,7 +524,7 @@
-++ diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
-++ --- a/testsuite/tests/effects/test1.ml
-++ +++ b/testsuite/tests/effects/test1.ml
-++-@@ -4,12 +4,12 @@
-+++@@ -6,12 +6,12 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -542,7 +542,7 @@
-++ diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
-++ --- a/testsuite/tests/effects/test10.ml
-++ +++ b/testsuite/tests/effects/test10.ml
-++-@@ -4,8 +4,8 @@
-+++@@ -6,8 +6,8 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -553,7 +553,7 @@
-++  
-++  let rec a i = perform Peek + Random.int i
-++  let rec b i = a i + Random.int i
-++-@@ -14,7 +14,7 @@ let rec c i = b i + Random.int i
-+++@@ -16,7 +16,7 @@ let rec c i = b i + Random.int i
-++  let rec d i =
-++    Random.int i +
-++    try_with c i
-++@@ -562,7 +562,7 @@
-++        match e with
-++        | Poke -> Some (fun (k : (a,_) continuation) -> continue k ())
-++        | _ -> None }
-++-@@ -22,7 +22,7 @@ let rec d i =
-+++@@ -24,7 +24,7 @@ let rec d i =
-++  let rec e i =
-++    Random.int i +
-++    try_with d i
-++@@ -574,7 +574,7 @@
-++ diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
-++ --- a/testsuite/tests/effects/test11.ml
-++ +++ b/testsuite/tests/effects/test11.ml
-++-@@ -7,11 +7,11 @@
-+++@@ -9,11 +9,11 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -591,7 +591,7 @@
-++ diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-++ --- a/testsuite/tests/effects/test2.ml
-++ +++ b/testsuite/tests/effects/test2.ml
-++-@@ -5,7 +5,7 @@ open Printf
-+++@@ -7,7 +7,7 @@ open Printf
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -600,7 +600,7 @@
-++  
-++  let f () =
-++    printf "perform effect (E 0)\n%!";
-++-@@ -13,7 +13,7 @@ let f () =
-+++@@ -15,7 +15,7 @@ let f () =
-++    printf "perform returns %d\n%!" v;
-++    v + 1
-++  
-++@@ -612,7 +612,7 @@
-++ diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
-++ --- a/testsuite/tests/effects/test3.ml
-++ +++ b/testsuite/tests/effects/test3.ml
-++-@@ -4,7 +4,7 @@
-+++@@ -6,7 +6,7 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -621,7 +621,7 @@
-++  exception X
-++  
-++  let () =
-++-@@ -16,7 +16,7 @@ let () =
-+++@@ -18,7 +18,7 @@ let () =
-++        exnc = (function
-++          | X -> 10
-++          | e -> raise e);
-++@@ -633,7 +633,7 @@
-++ diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
-++ --- a/testsuite/tests/effects/test4.ml
-++ +++ b/testsuite/tests/effects/test4.ml
-++-@@ -4,15 +4,15 @@
-+++@@ -6,15 +6,15 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -655,7 +655,7 @@
-++ diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
-++ --- a/testsuite/tests/effects/test5.ml
-++ +++ b/testsuite/tests/effects/test5.ml
-++-@@ -4,18 +4,18 @@
-+++@@ -6,18 +6,18 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -680,7 +680,7 @@
-++ diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-++ --- a/testsuite/tests/effects/test6.ml
-++ +++ b/testsuite/tests/effects/test6.ml
-++-@@ -4,8 +4,8 @@
-+++@@ -6,8 +6,8 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -691,7 +691,7 @@
-++  
-++  let () =
-++    let ok1 = ref false and ok2 = ref false in
-++-@@ -14,7 +14,7 @@ let () =
-+++@@ -16,7 +16,7 @@ let () =
-++    f ok1;
-++    Printf.printf "%b\n%!" !ok1;
-++    try_with f ok2 {
-++@@ -703,7 +703,7 @@
-++ diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
-++ --- a/testsuite/tests/effects/test_lazy.ml
-++ +++ b/testsuite/tests/effects/test_lazy.ml
-++-@@ -3,7 +3,7 @@
-+++@@ -6,7 +6,7 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -712,7 +712,7 @@
-++  
-++  let f count =
-++    let r = ref 0 in
-++-@@ -17,7 +17,7 @@ let _ =
-+++@@ -20,7 +20,7 @@ let _ =
-++    let l = lazy (f 1_000) in
-++    let v1 =
-++      try_with Lazy.force l
-++@@ -721,7 +721,7 @@
-++          match e with
-++          | Stop -> Some (fun (k : (a, _) continuation) -> continue k ())
-++          | _ -> None }
-++-@@ -26,7 +26,7 @@ let _ =
-+++@@ -29,7 +29,7 @@ let _ =
-++    let l2 = lazy (f 2_000) in
-++    let v2 =
-++      try_with Lazy.force l2
-++@@ -730,7 +730,7 @@
-++          match e with
-++          | Stop -> Some (fun (k : (a, _) continuation) ->
-++              let d = Domain.spawn(fun () -> continue k ()) in
-++-@@ -37,7 +37,7 @@ let _ =
-+++@@ -40,7 +40,7 @@ let _ =
-++    let l3 = lazy (f 3_000) in
-++    let _ =
-++      try_with Lazy.force l3
-++@@ -742,7 +742,7 @@
-++ diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
-++ --- a/testsuite/tests/effects/used_cont.ml
-++ +++ b/testsuite/tests/effects/used_cont.ml
-++-@@ -4,14 +4,14 @@
-+++@@ -6,14 +6,14 @@
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -762,7 +762,7 @@
-++ diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
-++ --- a/testsuite/tests/parallel/deadcont.ml
-++ +++ b/testsuite/tests/parallel/deadcont.ml
-++-@@ -14,7 +14,7 @@ include unix
-+++@@ -16,7 +16,7 @@ include unix
-++  open Effect
-++  open Effect.Deep
-++  
-++@@ -771,7 +771,7 @@
-++  
-++  type result = Done | Poking of (unit -> result)
-++  
-++-@@ -32,7 +32,7 @@ let domain_handler f =
-+++@@ -34,7 +34,7 @@ let domain_handler f =
-++    match_with f ()
-++    { retc = (fun () -> Done);
-++      exnc = (fun e -> raise e);
-++@@ -783,7 +783,7 @@
-++ diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
-++ --- a/testsuite/tests/parallel/mctest.ml
-++ +++ b/testsuite/tests/parallel/mctest.ml
-++-@@ -155,11 +155,11 @@ struct
-+++@@ -157,11 +157,11 @@ struct
-++  
-++    type 'a cont = ('a, unit) continuation
-++  
-++@@ -800,7 +800,7 @@
-++  
-++    let suspend f = perform (Suspend f)
-++    let resume t v = perform (Resume (t, v))
-++-@@ -186,7 +186,7 @@ struct
-+++@@ -188,7 +188,7 @@ struct
-++        match_with f ()
-++        { retc = (fun () -> dequeue ());
-++          exnc = (fun e -> raise e);
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index e7da66f4d9..c29133a3fd 100644
 +--- a/Changes
@@ -8252,7 +7234,7 @@ index 0000000000..13bd7e616d
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ff47d10956
++index 0000000000..578c9bbcd6
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3052 @@
@@ -8809,7 +7791,7 @@ index 0000000000..13bd7e616d
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
 ++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 ++diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
-++index dcd4480a02..39d9880db6 100644
+++index 352b32cbd7..bafd2259e8 100644
 ++--- a/testsuite/tests/backtrace/backtrace_effects.ml
 +++++ b/testsuite/tests/backtrace/backtrace_effects.ml
 ++@@ -2,6 +2,8 @@
@@ -8822,7 +7804,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-++index 6bb1597761..b818ede59e 100644
+++index 37638a200a..2a2a630160 100644
 ++--- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
 +++++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
 ++@@ -1,12 +1,14 @@
@@ -9207,7 +8189,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ external test : int ref -> unit = "stub"
 ++diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
-++index 7d520d0915..57cbfc4a63 100644
+++index 3786e455ef..77478728df 100644
 ++--- a/testsuite/tests/callback/nested_fiber.ml
 +++++ b/testsuite/tests/callback/nested_fiber.ml
 ++@@ -1,9 +1,11 @@
@@ -9226,7 +8208,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 ++diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-++index e48815aede..ef8c8a3845 100644
+++index 23691dcf6c..6281d76e2a 100644
 ++--- a/testsuite/tests/callback/stack_overflow.ml
 +++++ b/testsuite/tests/callback/stack_overflow.ml
 ++@@ -1,9 +1,11 @@
@@ -9245,7 +8227,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 ++diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-++index 7f35966184..9459b6c601 100644
+++index 9419dd5c6f..e523ba85b7 100644
 ++--- a/testsuite/tests/callback/test7.ml
 +++++ b/testsuite/tests/callback/test7.ml
 ++@@ -1,9 +1,11 @@
@@ -9299,7 +8281,7 @@ index 0000000000..13bd7e616d
 ++   let u = (s, s) in
 ++   fst u
 ++diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
-++index cacd27347c..0eab449113 100644
+++index 6257ba75c5..df6e11ac7a 100644
 ++--- a/testsuite/tests/effects/backtrace.ml
 +++++ b/testsuite/tests/effects/backtrace.ml
 ++@@ -1,6 +1,8 @@
@@ -9312,7 +8294,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
-++index 20462f619d..a834ad1a71 100644
+++index 78481d6404..a36d20cb8c 100644
 ++--- a/testsuite/tests/effects/cmphash.ml
 +++++ b/testsuite/tests/effects/cmphash.ml
 ++@@ -1,4 +1,6 @@
@@ -9323,7 +8305,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-++index 44d2a3d4ae..0b9f222b58 100644
+++index 07464edb7a..e9b2d5a2fb 100644
 ++--- a/testsuite/tests/effects/evenodd.ml
 +++++ b/testsuite/tests/effects/evenodd.ml
 ++@@ -1,4 +1,6 @@
@@ -9334,7 +8316,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
-++index d87bf3f759..63c19a2535 100644
+++index 228e098d2e..c00b55c6ff 100644
 ++--- a/testsuite/tests/effects/issue479.ml
 +++++ b/testsuite/tests/effects/issue479.ml
 ++@@ -1,5 +1,7 @@
@@ -9347,7 +8329,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
 ++diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
-++index 15cd6447c2..f68acae14b 100644
+++index a187e9e10d..c12503863e 100644
 ++--- a/testsuite/tests/effects/overflow.ml
 +++++ b/testsuite/tests/effects/overflow.ml
 ++@@ -1,4 +1,6 @@
@@ -9358,7 +8340,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
-++index 3d6e51ff6b..45efef7282 100644
+++index 50e4b53cfc..010741b9fc 100644
 ++--- a/testsuite/tests/effects/partial.ml
 +++++ b/testsuite/tests/effects/partial.ml
 ++@@ -1,4 +1,6 @@
@@ -9369,7 +8351,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
-++index 24b2aeeac7..28f9dab5e2 100644
+++index 8aefdd0587..685b48b5dd 100644
 ++--- a/testsuite/tests/effects/reperform.ml
 +++++ b/testsuite/tests/effects/reperform.ml
 ++@@ -1,4 +1,6 @@
@@ -9380,7 +8362,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
-++index 07e9231c53..b2bf0d2ca4 100644
+++index 3dc14a2cfc..6065d21c70 100644
 ++--- a/testsuite/tests/effects/sched.ml
 +++++ b/testsuite/tests/effects/sched.ml
 ++@@ -1,4 +1,6 @@
@@ -9391,7 +8373,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
-++index ad7f29f3cc..99044e5eb4 100644
+++index 56c61b0c3c..4d52362bc7 100644
 ++--- a/testsuite/tests/effects/shallow_state.ml
 +++++ b/testsuite/tests/effects/shallow_state.ml
 ++@@ -1,4 +1,6 @@
@@ -9402,7 +8384,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
-++index b5301b7b9b..4a4c457693 100644
+++index 6b1fa649a7..6ca4fef8b1 100644
 ++--- a/testsuite/tests/effects/shallow_state_io.ml
 +++++ b/testsuite/tests/effects/shallow_state_io.ml
 ++@@ -1,4 +1,6 @@
@@ -9413,7 +8395,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
-++index bb70e9e40a..14d0ca6841 100644
+++index 5d05359f8a..65da5c8b90 100644
 ++--- a/testsuite/tests/effects/test1.ml
 +++++ b/testsuite/tests/effects/test1.ml
 ++@@ -1,4 +1,6 @@
@@ -9424,7 +8406,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
-++index 2b3398bf61..6bdbdd7bcb 100644
+++index 29c5f47f25..9b10559cfd 100644
 ++--- a/testsuite/tests/effects/test10.ml
 +++++ b/testsuite/tests/effects/test10.ml
 ++@@ -1,4 +1,6 @@
@@ -9435,7 +8417,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
-++index 7eede3bdaf..2a6bc7d255 100644
+++index 6714473e0e..303cdd03c5 100644
 ++--- a/testsuite/tests/effects/test11.ml
 +++++ b/testsuite/tests/effects/test11.ml
 ++@@ -1,4 +1,6 @@
@@ -9446,7 +8428,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ (* Tests RESUMETERM with extra_args != 0 in bytecode,
 ++diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-++index b3cc1d61ca..33228fdb93 100644
+++index d7250fa5ff..132f5966a6 100644
 ++--- a/testsuite/tests/effects/test2.ml
 +++++ b/testsuite/tests/effects/test2.ml
 ++@@ -1,4 +1,6 @@
@@ -9457,7 +8439,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Printf
 ++diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
-++index f42199b1c7..81ca0a093d 100644
+++index d76130eaaa..2828f933a7 100644
 ++--- a/testsuite/tests/effects/test3.ml
 +++++ b/testsuite/tests/effects/test3.ml
 ++@@ -1,4 +1,6 @@
@@ -9468,7 +8450,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
-++index 049e95de74..dd93cfcfdf 100644
+++index f5cf78cbda..77320a1ab5 100644
 ++--- a/testsuite/tests/effects/test4.ml
 +++++ b/testsuite/tests/effects/test4.ml
 ++@@ -1,4 +1,6 @@
@@ -9479,7 +8461,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
-++index deb3c5035e..0884710045 100644
+++index 33ed2c23ca..98802a934e 100644
 ++--- a/testsuite/tests/effects/test5.ml
 +++++ b/testsuite/tests/effects/test5.ml
 ++@@ -1,4 +1,6 @@
@@ -9490,7 +8472,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-++index 746aad325b..45dea39102 100644
+++index ddfb83a5b6..6d4842f9fa 100644
 ++--- a/testsuite/tests/effects/test6.ml
 +++++ b/testsuite/tests/effects/test6.ml
 ++@@ -1,4 +1,6 @@
@@ -9501,7 +8483,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
-++index 347adaf25a..1ec7438849 100644
+++index 24f457f0af..036c7d5038 100644
 ++--- a/testsuite/tests/effects/test_lazy.ml
 +++++ b/testsuite/tests/effects/test_lazy.ml
 ++@@ -1,4 +1,7 @@
@@ -9514,7 +8496,7 @@ index 0000000000..13bd7e616d
 ++ open Effect
 ++ open Effect.Deep
 ++diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
-++index de8bed15ca..f99a1c7031 100644
+++index 71a33388ec..7972d000b7 100644
 ++--- a/testsuite/tests/effects/used_cont.ml
 +++++ b/testsuite/tests/effects/used_cont.ml
 ++@@ -1,4 +1,6 @@
@@ -10119,7 +9101,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ (* when run with the bytecode debug runtime, this test
 ++diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
-++index a5642e425c..36077b0724 100644
+++index 6006323f45..bf6d7658a1 100644
 ++--- a/testsuite/tests/parallel/deadcont.ml
 +++++ b/testsuite/tests/parallel/deadcont.ml
 ++@@ -1,8 +1,10 @@
@@ -10281,7 +9263,7 @@ index 0000000000..13bd7e616d
 ++ 
 ++ type 'a tree = Empty | Node of 'a tree * 'a tree
 ++diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
-++index 505223cde4..169f871913 100644
+++index c5d82d2dbd..bbebf9d4b8 100644
 ++--- a/testsuite/tests/parallel/mctest.ml
 +++++ b/testsuite/tests/parallel/mctest.ml
 ++@@ -1,8 +1,10 @@
@@ -11218,19 +10200,7 @@ index 0000000000..13bd7e616d
 +++*** setup-ocamlc.byte-build-env
 +++**** ocamlc.byte
 ++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..5
+++-***** o
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
