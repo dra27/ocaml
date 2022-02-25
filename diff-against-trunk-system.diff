@@ -1,103 +1,31 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..989f81ffb2
+index 0000000000..d0f6761b9d
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,92 @@
-+--- a	2023-09-28 18:43:54.420214740 +0100
-++++ b	2023-09-28 18:43:54.436215400 +0100
-+@@ -13,7 +13,7 @@
-+  ### Internal/compiler-libs changes:
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:43:54.736227762 +0100
+++++ b	2023-09-28 18:43:54.748228257 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -635,6 +635,11 @@ OCaml 4.14.0
+++@@ -644,6 +644,11 @@ OCaml 4.14.0
++    Gentoo and Alpine).
++    (Alex Fan, review by Gabriel Scherer)
 +  
-+  - #10878, #10909: restore flambda after the Multicore merge.
-+-@@ -300,7 +305,7 @@ OCaml 4.14.0
-++@@ -306,7 +311,7 @@ OCaml 4.14.0
-+  
-+  - #10951: Introduce the Thread.Exit exception as an alternative way to
-+    terminate threads prematurely.  This alternative way will become
-+@@ -22,15 +22,6 @@
-+    (Xavier Leroy, review by Florian Angeletti)
-+  
-+  ### Tools:
-+-diff --git a/VERSION b/VERSION
-+---- a/VERSION
-+-+++ b/VERSION
-+-@@ -1,4 +1,4 @@
-+--5.00.0+dev0-2021-11-05
-+-+5.0.0+dev0-2021-11-05
-+- 
-+- # Starting with OCaml 4.14, although the version string that appears above is
-+- # still correct and this file can thus still be used to figure it out,
-+ diff --git a/appveyor.yml b/appveyor.yml
-+ --- a/appveyor.yml
-+ +++ b/appveyor.yml
-+@@ -43,24 +34,12 @@
-+  #    - PORT: msvc64
-+  #      BOOTSTRAP_FLEXDLL: false
-+  #      BUILD_MODE: steps
-+-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+---- a/build-aux/ocaml_version.m4
-+-+++ b/build-aux/ocaml_version.m4
-+-@@ -32,7 +32,7 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
-+- # including the patchlevel, are mandatory.
-+- 
-+- m4_define([OCAML__VERSION_MAJOR], [5])
-+--m4_define([OCAML__VERSION_MINOR], [00])
-+-+m4_define([OCAML__VERSION_MINOR], [0])
-+- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
-+- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
-+- # for officially-released versions of OCaml.
-+ diff --git a/configure b/configure
-+ Binary files a/configure and b/configure differ
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -286,7 +286,7 @@ AC_ARG_ENABLE([unix-lib],
-++@@ -288,7 +288,7 @@ AC_ARG_ENABLE([unix-lib],
-+  AC_ARG_ENABLE([bigarray-lib], [],
-+    [AS_IF([test "x$enableval" != 'xno'],
-+      [AC_MSG_ERROR(m4_normalize([The bigarray-lib option was deleted in OCaml
-+@@ -69,22 +48,23 @@
-+    [])
-+  
-+  AC_ARG_ENABLE([ocamldoc],
-+-@@ -314,12 +314,12 @@ AC_ARG_ENABLE([frame-pointers],
-+- 
-+- AC_ARG_ENABLE([naked-pointers], [],
-+-   [AS_IF([test "x$enableval" != 'xno'],
-+--    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
-+-+    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
-+-   [])
-+- 
-+- AC_ARG_ENABLE([naked-pointers-checker], [],
-+-   [AS_IF([test "x$enableval" != 'xno'],
-+--    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
-+-+    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.0.])])],
-+-   [])
-++@@ -316,13 +316,13 @@ AC_ARG_ENABLE([frame-pointers],
-+  
-+- AC_ARG_ENABLE([spacetime], [],
-+-@@ -392,12 +392,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
-++ dnl AC_ARG_ENABLE([naked-pointers], [],
-++ dnl   [AS_IF([test "x$enableval" != 'xno'],
-++-dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
-+++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
-++ dnl   [])
-++ 
-++ dnl AC_ARG_ENABLE([naked-pointers-checker], [],
-++ dnl   [AS_IF([test "x$enableval" != 'xno'],
-++ dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
-++-dnl       OCaml 5.00.]))])],
-+++dnl       OCaml 5.0.]))])],
-++ dnl   [])
-++ AC_ARG_ENABLE([naked-pointers],
-++   [AS_HELP_STRING([--disable-naked-pointers],
-++@@ -402,12 +402,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
-+  
-+  AC_ARG_ENABLE([force-safe-string], [],
-+    [AS_IF([test "x$enableval" = 'xno'],
++@@ -16,7 +16,7 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -826,7 +826,10 @@ let emit_instr env fallthrough i =
+++@@ -851,7 +851,10 @@ let emit_instr env fallthrough i =
++        done;
++        emit_named_text_section env.f.fun_name
++    | Lentertrap ->
 diff --git a/Changes b/Changes
-index 0c9726d894..d5cbd66023 100644
+index 5c2329a979..bd39ffb43b 100644
 --- a/Changes
 +++ b/Changes
 @@ -143,6 +143,9 @@ Working version
@@ -184,7 +112,7 @@ index d85ccfb1a2..201f1e75c1 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index 8128c80847..e7790961c7 100644
+index 2e03adf10d..22a45aa904 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -63,6 +63,7 @@ let cfi_endproc () =
@@ -276,7 +204,7 @@ index 8128c80847..e7790961c7 100644
    | Lreloadretaddr ->
        ()
    | Lreturn ->
-@@ -842,12 +867,24 @@ let emit_instr env fallthrough i =
+@@ -845,12 +870,24 @@ let emit_instr env fallthrough i =
        load_label_addr lbl_handler r11;
        I.push r11;
        cfi_adjust_cfa_offset 8;
@@ -301,7 +229,7 @@ index 8128c80847..e7790961c7 100644
        cfi_adjust_cfa_offset (-8);
        I.add (int 8) rsp;
        cfi_adjust_cfa_offset (-8);
-@@ -855,14 +892,26 @@ let emit_instr env fallthrough i =
+@@ -858,14 +895,26 @@ let emit_instr env fallthrough i =
    | Lraise k ->
        begin match k with
        | Lambda.Raise_regular ->
@@ -328,7 +256,7 @@ index 8128c80847..e7790961c7 100644
            I.pop r11;
            I.jmp r11
        end
-@@ -895,6 +944,7 @@ let fundecl fundecl =
+@@ -898,6 +947,7 @@ let fundecl fundecl =
    D.label (emit_symbol fundecl.fun_name);
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc ();
@@ -336,7 +264,7 @@ index 8128c80847..e7790961c7 100644
    if !Clflags.runtime_variant = "d" then
      emit_call "caml_assert_stack_invariants";
    let { max_frame_size; contains_nontail_calls} =
-@@ -911,9 +961,11 @@ let fundecl fundecl =
+@@ -914,9 +964,11 @@ let fundecl fundecl =
      def_label ret;
      handle_overflow := Some (overflow, ret)
    end;
@@ -348,7 +276,7 @@ index 8128c80847..e7790961c7 100644
    begin match !handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -928,6 +980,7 @@ let fundecl fundecl =
+@@ -931,6 +983,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -597,10 +525,10 @@ index f92ec296a1..7fe7ef5c96 100644
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
 diff --git a/boot/ocamlc b/boot/ocamlc
-index d431dbd1f4..804880e707 100755
+index 59d9190d7a..804880e707 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index b35488cadc..9c4fe66628 100755
+index be2b870da2..9c4fe66628 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 2c66a918a3..0a59107ea8 100644
@@ -5238,110 +5166,38 @@ index 0000000000..ff47d10956
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f29a33eb73
+index 0000000000..8bf55d6eac
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5166 @@
+@@ -0,0 +1,5057 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..989f81ffb2
++index 0000000000..d0f6761b9d
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,92 @@
-++--- a	2023-09-28 18:43:54.420214740 +0100
-+++++ b	2023-09-28 18:43:54.436215400 +0100
-++@@ -13,7 +13,7 @@
-++  ### Internal/compiler-libs changes:
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:43:54.736227762 +0100
++++++ b	2023-09-28 18:43:54.748228257 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -635,6 +635,11 @@ OCaml 4.14.0
++++@@ -644,6 +644,11 @@ OCaml 4.14.0
+++    Gentoo and Alpine).
+++    (Alex Fan, review by Gabriel Scherer)
 ++  
-++  - #10878, #10909: restore flambda after the Multicore merge.
-++-@@ -300,7 +305,7 @@ OCaml 4.14.0
-+++@@ -306,7 +311,7 @@ OCaml 4.14.0
-++  
-++  - #10951: Introduce the Thread.Exit exception as an alternative way to
-++    terminate threads prematurely.  This alternative way will become
-++@@ -22,15 +22,6 @@
-++    (Xavier Leroy, review by Florian Angeletti)
-++  
-++  ### Tools:
-++-diff --git a/VERSION b/VERSION
-++---- a/VERSION
-++-+++ b/VERSION
-++-@@ -1,4 +1,4 @@
-++--5.00.0+dev0-2021-11-05
-++-+5.0.0+dev0-2021-11-05
-++- 
-++- # Starting with OCaml 4.14, although the version string that appears above is
-++- # still correct and this file can thus still be used to figure it out,
-++ diff --git a/appveyor.yml b/appveyor.yml
-++ --- a/appveyor.yml
-++ +++ b/appveyor.yml
-++@@ -43,24 +34,12 @@
-++  #    - PORT: msvc64
-++  #      BOOTSTRAP_FLEXDLL: false
-++  #      BUILD_MODE: steps
-++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-++---- a/build-aux/ocaml_version.m4
-++-+++ b/build-aux/ocaml_version.m4
-++-@@ -32,7 +32,7 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
-++- # including the patchlevel, are mandatory.
-++- 
-++- m4_define([OCAML__VERSION_MAJOR], [5])
-++--m4_define([OCAML__VERSION_MINOR], [00])
-++-+m4_define([OCAML__VERSION_MINOR], [0])
-++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
-++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
-++- # for officially-released versions of OCaml.
-++ diff --git a/configure b/configure
-++ Binary files a/configure and b/configure differ
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -286,7 +286,7 @@ AC_ARG_ENABLE([unix-lib],
-+++@@ -288,7 +288,7 @@ AC_ARG_ENABLE([unix-lib],
-++  AC_ARG_ENABLE([bigarray-lib], [],
-++    [AS_IF([test "x$enableval" != 'xno'],
-++      [AC_MSG_ERROR(m4_normalize([The bigarray-lib option was deleted in OCaml
-++@@ -69,22 +48,23 @@
-++    [])
-++  
-++  AC_ARG_ENABLE([ocamldoc],
-++-@@ -314,12 +314,12 @@ AC_ARG_ENABLE([frame-pointers],
-++- 
-++- AC_ARG_ENABLE([naked-pointers], [],
-++-   [AS_IF([test "x$enableval" != 'xno'],
-++--    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
-++-+    [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
-++-   [])
-++- 
-++- AC_ARG_ENABLE([naked-pointers-checker], [],
-++-   [AS_IF([test "x$enableval" != 'xno'],
-++--    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.00.])])],
-++-+    [AC_MSG_ERROR([The naked pointers checker was removed in OCaml 5.0.])])],
-++-   [])
-+++@@ -316,13 +316,13 @@ AC_ARG_ENABLE([frame-pointers],
-++  
-++- AC_ARG_ENABLE([spacetime], [],
-++-@@ -392,12 +392,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
-+++ dnl AC_ARG_ENABLE([naked-pointers], [],
-+++ dnl   [AS_IF([test "x$enableval" != 'xno'],
-+++-dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.00.])])],
-++++dnl     [AC_MSG_ERROR([Naked pointers were prohibited in OCaml 5.0.])])],
-+++ dnl   [])
-+++ 
-+++ dnl AC_ARG_ENABLE([naked-pointers-checker], [],
-+++ dnl   [AS_IF([test "x$enableval" != 'xno'],
-+++ dnl     [AC_MSG_ERROR(m4_normalize([The naked pointers checker was removed in
-+++-dnl       OCaml 5.00.]))])],
-++++dnl       OCaml 5.0.]))])],
-+++ dnl   [])
-+++ AC_ARG_ENABLE([naked-pointers],
-+++   [AS_HELP_STRING([--disable-naked-pointers],
-+++@@ -402,12 +402,12 @@ AC_ARG_VAR([WINDOWS_UNICODE_MODE],
-++  
-++  AC_ARG_ENABLE([force-safe-string], [],
-++    [AS_IF([test "x$enableval" = 'xno'],
+++@@ -16,7 +16,7 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -826,7 +826,10 @@ let emit_instr env fallthrough i =
++++@@ -851,7 +851,10 @@ let emit_instr env fallthrough i =
+++        done;
+++        emit_named_text_section env.f.fun_name
+++    | Lentertrap ->
 +diff --git a/Changes b/Changes
-+index 0c9726d894..d5cbd66023 100644
++index 5c2329a979..bd39ffb43b 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -143,6 +143,9 @@ Working version
@@ -5428,7 +5284,7 @@ index 0000000000..f29a33eb73
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index 8128c80847..e7790961c7 100644
++index 2e03adf10d..22a45aa904 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -63,6 +63,7 @@ let cfi_endproc () =
@@ -5520,7 +5376,7 @@ index 0000000000..f29a33eb73
 +   | Lreloadretaddr ->
 +       ()
 +   | Lreturn ->
-+@@ -842,12 +867,24 @@ let emit_instr env fallthrough i =
++@@ -845,12 +870,24 @@ let emit_instr env fallthrough i =
 +       load_label_addr lbl_handler r11;
 +       I.push r11;
 +       cfi_adjust_cfa_offset 8;
@@ -5545,7 +5401,7 @@ index 0000000000..f29a33eb73
 +       cfi_adjust_cfa_offset (-8);
 +       I.add (int 8) rsp;
 +       cfi_adjust_cfa_offset (-8);
-+@@ -855,14 +892,26 @@ let emit_instr env fallthrough i =
++@@ -858,14 +895,26 @@ let emit_instr env fallthrough i =
 +   | Lraise k ->
 +       begin match k with
 +       | Lambda.Raise_regular ->
@@ -5572,7 +5428,7 @@ index 0000000000..f29a33eb73
 +           I.pop r11;
 +           I.jmp r11
 +       end
-+@@ -895,6 +944,7 @@ let fundecl fundecl =
++@@ -898,6 +947,7 @@ let fundecl fundecl =
 +   D.label (emit_symbol fundecl.fun_name);
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc ();
@@ -5580,7 +5436,7 @@ index 0000000000..f29a33eb73
 +   if !Clflags.runtime_variant = "d" then
 +     emit_call "caml_assert_stack_invariants";
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -911,9 +961,11 @@ let fundecl fundecl =
++@@ -914,9 +964,11 @@ let fundecl fundecl =
 +     def_label ret;
 +     handle_overflow := Some (overflow, ret)
 +   end;
@@ -5592,7 +5448,7 @@ index 0000000000..f29a33eb73
 +   begin match !handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -928,6 +980,7 @@ let fundecl fundecl =
++@@ -931,6 +983,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -5841,10 +5697,10 @@ index 0000000000..f29a33eb73
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index d431dbd1f4..804880e707 100755
++index 59d9190d7a..804880e707 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index b35488cadc..9c4fe66628 100755
++index be2b870da2..9c4fe66628 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 2c66a918a3..0a59107ea8 100644
@@ -10370,44 +10226,7 @@ index 0000000000..f29a33eb73
 +++********** check-program-output
 ++ *)
 ++ 
-++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++index b2d6e6e7c5..f22a4bd50f 100644
-++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   
+++ (* This file only contains the speci
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
