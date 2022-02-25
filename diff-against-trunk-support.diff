@@ -551,7 +551,7 @@ index 8f12a2dcbc..6992dbc04f 100644
 +Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
-index dcd4480a02..39d9880db6 100644
+index 352b32cbd7..bafd2259e8 100644
 --- a/testsuite/tests/backtrace/backtrace_effects.ml
 +++ b/testsuite/tests/backtrace/backtrace_effects.ml
 @@ -2,6 +2,8 @@
@@ -564,7 +564,7 @@ index dcd4480a02..39d9880db6 100644
  
  open Effect
 diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-index 6bb1597761..b818ede59e 100644
+index 37638a200a..2a2a630160 100644
 --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
 +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
 @@ -1,12 +1,14 @@
@@ -949,7 +949,7 @@ index b8c99a4b07..0ed35acf16 100644
  
  external test : int ref -> unit = "stub"
 diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
-index 7d520d0915..57cbfc4a63 100644
+index 3786e455ef..77478728df 100644
 --- a/testsuite/tests/callback/nested_fiber.ml
 +++ b/testsuite/tests/callback/nested_fiber.ml
 @@ -1,9 +1,11 @@
@@ -968,7 +968,7 @@ index 7d520d0915..57cbfc4a63 100644
  
  external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-index e48815aede..ef8c8a3845 100644
+index 23691dcf6c..6281d76e2a 100644
 --- a/testsuite/tests/callback/stack_overflow.ml
 +++ b/testsuite/tests/callback/stack_overflow.ml
 @@ -1,9 +1,11 @@
@@ -987,7 +987,7 @@ index e48815aede..ef8c8a3845 100644
  
  external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-index 7f35966184..9459b6c601 100644
+index 9419dd5c6f..e523ba85b7 100644
 --- a/testsuite/tests/callback/test7.ml
 +++ b/testsuite/tests/callback/test7.ml
 @@ -1,9 +1,11 @@
@@ -1041,7 +1041,7 @@ index a2bbacee72..9250395618 100644
    let u = (s, s) in
    fst u
 diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
-index cacd27347c..0eab449113 100644
+index 6257ba75c5..df6e11ac7a 100644
 --- a/testsuite/tests/effects/backtrace.ml
 +++ b/testsuite/tests/effects/backtrace.ml
 @@ -1,6 +1,8 @@
@@ -1054,7 +1054,7 @@ index cacd27347c..0eab449113 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
-index 20462f619d..a834ad1a71 100644
+index 78481d6404..a36d20cb8c 100644
 --- a/testsuite/tests/effects/cmphash.ml
 +++ b/testsuite/tests/effects/cmphash.ml
 @@ -1,4 +1,6 @@
@@ -1065,7 +1065,7 @@ index 20462f619d..a834ad1a71 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-index 44d2a3d4ae..0b9f222b58 100644
+index 07464edb7a..e9b2d5a2fb 100644
 --- a/testsuite/tests/effects/evenodd.ml
 +++ b/testsuite/tests/effects/evenodd.ml
 @@ -1,4 +1,6 @@
@@ -1076,7 +1076,7 @@ index 44d2a3d4ae..0b9f222b58 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
-index d87bf3f759..63c19a2535 100644
+index 228e098d2e..c00b55c6ff 100644
 --- a/testsuite/tests/effects/issue479.ml
 +++ b/testsuite/tests/effects/issue479.ml
 @@ -1,5 +1,7 @@
@@ -1089,7 +1089,7 @@ index d87bf3f759..63c19a2535 100644
  
  (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
 diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
-index 15cd6447c2..f68acae14b 100644
+index a187e9e10d..c12503863e 100644
 --- a/testsuite/tests/effects/overflow.ml
 +++ b/testsuite/tests/effects/overflow.ml
 @@ -1,4 +1,6 @@
@@ -1100,7 +1100,7 @@ index 15cd6447c2..f68acae14b 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
-index 3d6e51ff6b..45efef7282 100644
+index 50e4b53cfc..010741b9fc 100644
 --- a/testsuite/tests/effects/partial.ml
 +++ b/testsuite/tests/effects/partial.ml
 @@ -1,4 +1,6 @@
@@ -1111,7 +1111,7 @@ index 3d6e51ff6b..45efef7282 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
-index 24b2aeeac7..28f9dab5e2 100644
+index 8aefdd0587..685b48b5dd 100644
 --- a/testsuite/tests/effects/reperform.ml
 +++ b/testsuite/tests/effects/reperform.ml
 @@ -1,4 +1,6 @@
@@ -1122,7 +1122,7 @@ index 24b2aeeac7..28f9dab5e2 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
-index 07e9231c53..b2bf0d2ca4 100644
+index 3dc14a2cfc..6065d21c70 100644
 --- a/testsuite/tests/effects/sched.ml
 +++ b/testsuite/tests/effects/sched.ml
 @@ -1,4 +1,6 @@
@@ -1133,7 +1133,7 @@ index 07e9231c53..b2bf0d2ca4 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
-index ad7f29f3cc..99044e5eb4 100644
+index 56c61b0c3c..4d52362bc7 100644
 --- a/testsuite/tests/effects/shallow_state.ml
 +++ b/testsuite/tests/effects/shallow_state.ml
 @@ -1,4 +1,6 @@
@@ -1144,7 +1144,7 @@ index ad7f29f3cc..99044e5eb4 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
-index b5301b7b9b..4a4c457693 100644
+index 6b1fa649a7..6ca4fef8b1 100644
 --- a/testsuite/tests/effects/shallow_state_io.ml
 +++ b/testsuite/tests/effects/shallow_state_io.ml
 @@ -1,4 +1,6 @@
@@ -1155,7 +1155,7 @@ index b5301b7b9b..4a4c457693 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
-index bb70e9e40a..14d0ca6841 100644
+index 5d05359f8a..65da5c8b90 100644
 --- a/testsuite/tests/effects/test1.ml
 +++ b/testsuite/tests/effects/test1.ml
 @@ -1,4 +1,6 @@
@@ -1166,7 +1166,7 @@ index bb70e9e40a..14d0ca6841 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
-index 2b3398bf61..6bdbdd7bcb 100644
+index 29c5f47f25..9b10559cfd 100644
 --- a/testsuite/tests/effects/test10.ml
 +++ b/testsuite/tests/effects/test10.ml
 @@ -1,4 +1,6 @@
@@ -1177,7 +1177,7 @@ index 2b3398bf61..6bdbdd7bcb 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
-index 7eede3bdaf..2a6bc7d255 100644
+index 6714473e0e..303cdd03c5 100644
 --- a/testsuite/tests/effects/test11.ml
 +++ b/testsuite/tests/effects/test11.ml
 @@ -1,4 +1,6 @@
@@ -1188,7 +1188,7 @@ index 7eede3bdaf..2a6bc7d255 100644
  
  (* Tests RESUMETERM with extra_args != 0 in bytecode,
 diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-index b3cc1d61ca..33228fdb93 100644
+index d7250fa5ff..132f5966a6 100644
 --- a/testsuite/tests/effects/test2.ml
 +++ b/testsuite/tests/effects/test2.ml
 @@ -1,4 +1,6 @@
@@ -1199,7 +1199,7 @@ index b3cc1d61ca..33228fdb93 100644
  
  open Printf
 diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
-index f42199b1c7..81ca0a093d 100644
+index d76130eaaa..2828f933a7 100644
 --- a/testsuite/tests/effects/test3.ml
 +++ b/testsuite/tests/effects/test3.ml
 @@ -1,4 +1,6 @@
@@ -1210,7 +1210,7 @@ index f42199b1c7..81ca0a093d 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
-index 049e95de74..dd93cfcfdf 100644
+index f5cf78cbda..77320a1ab5 100644
 --- a/testsuite/tests/effects/test4.ml
 +++ b/testsuite/tests/effects/test4.ml
 @@ -1,4 +1,6 @@
@@ -1221,7 +1221,7 @@ index 049e95de74..dd93cfcfdf 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
-index deb3c5035e..0884710045 100644
+index 33ed2c23ca..98802a934e 100644
 --- a/testsuite/tests/effects/test5.ml
 +++ b/testsuite/tests/effects/test5.ml
 @@ -1,4 +1,6 @@
@@ -1232,7 +1232,7 @@ index deb3c5035e..0884710045 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-index 746aad325b..45dea39102 100644
+index ddfb83a5b6..6d4842f9fa 100644
 --- a/testsuite/tests/effects/test6.ml
 +++ b/testsuite/tests/effects/test6.ml
 @@ -1,4 +1,6 @@
@@ -1243,7 +1243,7 @@ index 746aad325b..45dea39102 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
-index 347adaf25a..1ec7438849 100644
+index 24f457f0af..036c7d5038 100644
 --- a/testsuite/tests/effects/test_lazy.ml
 +++ b/testsuite/tests/effects/test_lazy.ml
 @@ -1,4 +1,7 @@
@@ -1256,7 +1256,7 @@ index 347adaf25a..1ec7438849 100644
  open Effect
  open Effect.Deep
 diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
-index de8bed15ca..f99a1c7031 100644
+index 71a33388ec..7972d000b7 100644
 --- a/testsuite/tests/effects/used_cont.ml
 +++ b/testsuite/tests/effects/used_cont.ml
 @@ -1,4 +1,6 @@
@@ -1861,7 +1861,7 @@ index fc9fd65ff6..466c846ed1 100644
  
  (* when run with the bytecode debug runtime, this test
 diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
-index a5642e425c..36077b0724 100644
+index 6006323f45..bf6d7658a1 100644
 --- a/testsuite/tests/parallel/deadcont.ml
 +++ b/testsuite/tests/parallel/deadcont.ml
 @@ -1,8 +1,10 @@
@@ -2023,7 +2023,7 @@ index e418500774..f11190aee3 100644
  
  type 'a tree = Empty | Node of 'a tree * 'a tree
 diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
-index 505223cde4..169f871913 100644
+index c5d82d2dbd..bbebf9d4b8 100644
 --- a/testsuite/tests/parallel/mctest.ml
 +++ b/testsuite/tests/parallel/mctest.ml
 @@ -1,8 +1,10 @@
