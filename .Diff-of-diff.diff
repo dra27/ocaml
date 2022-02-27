@@ -1,21 +1,20 @@
---- a	2023-09-28 18:43:56.228289206 +0100
-+++ b	2023-09-28 18:43:56.236289535 +0100
-@@ -1,18 +1,3 @@
--diff --git a/stdlib/.depend b/stdlib/.depend
----- a/stdlib/.depend
--+++ b/stdlib/.depend
--@@ -228,11 +228,9 @@ stdlib__Domain.cmx : domain.ml \
-- stdlib__Domain.cmi : domain.mli
-- stdlib__Effect.cmo : effect.ml \
--     stdlib__Printexc.cmi \
---    stdlib__Obj.cmi \
--     stdlib__Effect.cmi
-- stdlib__Effect.cmx : effect.ml \
--     stdlib__Printexc.cmx \
---    stdlib__Obj.cmx \
--     stdlib__Effect.cmi
-- stdlib__Effect.cmi : effect.mli \
--     stdlib__Printexc.cmi
- diff --git a/stdlib/effect.ml b/stdlib/effect.ml
- --- a/stdlib/effect.ml
- +++ b/stdlib/effect.ml
+--- a	2023-09-28 18:43:56.496300235 +0100
++++ b	2023-09-28 18:43:56.520301223 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -148,8 +148,8 @@ Working version
++@@ -151,8 +151,8 @@ Working version
+  
+  ### Bug fixes:
+  
+@@ -17,7 +17,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1182,7 +1182,7 @@ AS_IF([test -z "$PARTIALLD"],
++@@ -1195,7 +1195,7 @@ AS_IF([test -z "$PARTIALLD"],
+  # e.g. Ubuntu >= 17.10 for i386, which uses the glibc dynamic loader.
+  
+  AS_CASE([$arch],
