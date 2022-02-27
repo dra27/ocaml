@@ -1,29 +1,47 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..ddb7239d23
+index 0000000000..877d429451
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:43:56.496300235 +0100
-++++ b	2023-09-28 18:43:56.520301223 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -148,8 +148,8 @@ Working version
-++@@ -151,8 +151,8 @@ Working version
-+  
-+  ### Bug fixes:
-+  
-+@@ -17,7 +17,7 @@
+@@ -0,0 +1,38 @@
++--- a	2023-09-28 18:43:56.816313404 +0100
+++++ b	2023-09-28 18:43:56.824313733 +0100
++@@ -3,7 +3,7 @@
 + diff --git a/configure.ac b/configure.ac
 + --- a/configure.ac
 + +++ b/configure.ac
-+-@@ -1182,7 +1182,7 @@ AS_IF([test -z "$PARTIALLD"],
-++@@ -1195,7 +1195,7 @@ AS_IF([test -z "$PARTIALLD"],
-+  # e.g. Ubuntu >= 17.10 for i386, which uses the glibc dynamic loader.
++-@@ -427,7 +427,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
+++@@ -437,7 +437,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
++      [AC_MSG_ERROR([replay debugger requires the unix library])],
++      [enable_debugger="no"])])
 +  
-+  AS_CASE([$arch],
++@@ -12,7 +12,7 @@
++    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
++      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
++      [enable_ocamldoc="no"
++-@@ -725,7 +725,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++@@ -735,7 +735,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++      [flexmsg=''
++      AS_CASE([$target],
++        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
++@@ -22,7 +22,7 @@
++          [AS_IF([test -f 'flexdll/flexdll.h'],
++            [flexdir=flexdll
++            iflexdir='$(ROOTDIR)/flexdll'
++-@@ -754,7 +755,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++@@ -764,7 +765,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++  
++    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
++  
++@@ -31,7 +31,7 @@
++      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
++                          [$internal_cppflags], [$host])
++  
++-@@ -768,7 +769,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++@@ -778,7 +779,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++  
++    OCAML_TEST_FLEXDLL_H([$flexdir])
++  
 diff --git a/Changes b/Changes
 index dbf7d846ad..e0ebe2f6c6 100644
 --- a/Changes
@@ -563,10 +581,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 0f4450798e..2a83af3a70 100755
+index 9014f4b624..ebdfbf6c1c 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 0c564e3cec..982c6567b9 100644
+index 0ab2e41570..d4c0876e9f 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -625,7 +643,7 @@ index 0c564e3cec..982c6567b9 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1012,6 +1022,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+@@ -1013,6 +1023,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
      [earm*-*-netbsd*], [natdynlink=true],
      [aarch64-*-linux*], [natdynlink=true],
      [aarch64-*-freebsd*], [natdynlink=true],
@@ -633,7 +651,7 @@ index 0c564e3cec..982c6567b9 100644
      [riscv*-*-linux*], [natdynlink=true])])
  
  AS_CASE([$enable_native_toplevel,$natdynlink],
-@@ -1041,77 +1052,77 @@ model=default
+@@ -1042,77 +1053,77 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -774,7 +792,7 @@ index 0c564e3cec..982c6567b9 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1122,12 +1133,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1123,12 +1134,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -795,7 +813,7 @@ index 0c564e3cec..982c6567b9 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1792,7 +1805,8 @@ AS_CASE([$arch,$system],
+@@ -1793,7 +1806,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -805,7 +823,7 @@ index 0c564e3cec..982c6567b9 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1841,6 +1855,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1842,6 +1856,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -836,7 +854,7 @@ index 0c564e3cec..982c6567b9 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1960,8 +1998,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1961,8 +1999,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -5166,36 +5184,54 @@ index 0000000000..578c9bbcd6
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..744b8a4afe
+index 0000000000..1d65d4e57c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5058 @@
+@@ -0,0 +1,5163 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..ddb7239d23
++index 0000000000..877d429451
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:43:56.496300235 +0100
-+++++ b	2023-09-28 18:43:56.520301223 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -148,8 +148,8 @@ Working version
-+++@@ -151,8 +151,8 @@ Working version
-++  
-++  ### Bug fixes:
-++  
-++@@ -17,7 +17,7 @@
++@@ -0,0 +1,38 @@
+++--- a	2023-09-28 18:43:56.816313404 +0100
++++++ b	2023-09-28 18:43:56.824313733 +0100
+++@@ -3,7 +3,7 @@
 ++ diff --git a/configure.ac b/configure.ac
 ++ --- a/configure.ac
 ++ +++ b/configure.ac
-++-@@ -1182,7 +1182,7 @@ AS_IF([test -z "$PARTIALLD"],
-+++@@ -1195,7 +1195,7 @@ AS_IF([test -z "$PARTIALLD"],
-++  # e.g. Ubuntu >= 17.10 for i386, which uses the glibc dynamic loader.
+++-@@ -427,7 +427,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
++++@@ -437,7 +437,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
+++      [AC_MSG_ERROR([replay debugger requires the unix library])],
+++      [enable_debugger="no"])])
 ++  
-++  AS_CASE([$arch],
+++@@ -12,7 +12,7 @@
+++    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
+++      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
+++      [enable_ocamldoc="no"
+++-@@ -725,7 +725,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++++@@ -735,7 +735,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++      [flexmsg=''
+++      AS_CASE([$target],
+++        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
+++@@ -22,7 +22,7 @@
+++          [AS_IF([test -f 'flexdll/flexdll.h'],
+++            [flexdir=flexdll
+++            iflexdir='$(ROOTDIR)/flexdll'
+++-@@ -754,7 +755,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++++@@ -764,7 +765,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++  
+++    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
+++  
+++@@ -31,7 +31,7 @@
+++      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
+++                          [$internal_cppflags], [$host])
+++  
+++-@@ -768,7 +769,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++++@@ -778,7 +779,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++  
+++    OCAML_TEST_FLEXDLL_H([$flexdir])
+++  
 +diff --git a/Changes b/Changes
 +index dbf7d846ad..e0ebe2f6c6 100644
 +--- a/Changes
@@ -5735,10 +5771,10 @@ index 0000000000..744b8a4afe
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 0f4450798e..2a83af3a70 100755
++index 9014f4b624..ebdfbf6c1c 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 0c564e3cec..982c6567b9 100644
++index 0ab2e41570..d4c0876e9f 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -5797,7 +5833,7 @@ index 0000000000..744b8a4afe
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1012,6 +1022,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++@@ -1013,6 +1023,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
 +     [earm*-*-netbsd*], [natdynlink=true],
 +     [aarch64-*-linux*], [natdynlink=true],
 +     [aarch64-*-freebsd*], [natdynlink=true],
@@ -5805,7 +5841,7 @@ index 0000000000..744b8a4afe
 +     [riscv*-*-linux*], [natdynlink=true])])
 + 
 + AS_CASE([$enable_native_toplevel,$natdynlink],
-+@@ -1041,77 +1052,77 @@ model=default
++@@ -1042,77 +1053,77 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -5946,7 +5982,7 @@ index 0000000000..744b8a4afe
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1122,12 +1133,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1123,12 +1134,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -5967,7 +6003,7 @@ index 0000000000..744b8a4afe
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1792,7 +1805,8 @@ AS_CASE([$arch,$system],
++@@ -1793,7 +1806,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -5977,7 +6013,7 @@ index 0000000000..744b8a4afe
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1841,6 +1855,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1842,6 +1856,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -6008,7 +6044,7 @@ index 0000000000..744b8a4afe
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1960,8 +1998,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1961,8 +1999,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -10227,7 +10263,94 @@ index 0000000000..744b8a4afe
 ++ *)
 ++ 
 ++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool
+++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++index b2d6e6e7c5..f22a4bd50f 100644
+++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

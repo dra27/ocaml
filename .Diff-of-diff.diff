@@ -1,20 +1,38 @@
---- a	2023-09-28 18:43:56.496300235 +0100
-+++ b	2023-09-28 18:43:56.520301223 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -148,8 +148,8 @@ Working version
-+@@ -151,8 +151,8 @@ Working version
-  
-  ### Bug fixes:
-  
-@@ -17,7 +17,7 @@
+--- a	2023-09-28 18:43:56.816313404 +0100
++++ b	2023-09-28 18:43:56.824313733 +0100
+@@ -3,7 +3,7 @@
  diff --git a/configure.ac b/configure.ac
  --- a/configure.ac
  +++ b/configure.ac
--@@ -1182,7 +1182,7 @@ AS_IF([test -z "$PARTIALLD"],
-+@@ -1195,7 +1195,7 @@ AS_IF([test -z "$PARTIALLD"],
-  # e.g. Ubuntu >= 17.10 for i386, which uses the glibc dynamic loader.
+-@@ -427,7 +427,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
++@@ -437,7 +437,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
+      [AC_MSG_ERROR([replay debugger requires the unix library])],
+      [enable_debugger="no"])])
   
-  AS_CASE([$arch],
+@@ -12,7 +12,7 @@
+    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
+      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
+      [enable_ocamldoc="no"
+-@@ -725,7 +725,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -735,7 +735,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+      [flexmsg=''
+      AS_CASE([$target],
+        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
+@@ -22,7 +22,7 @@
+          [AS_IF([test -f 'flexdll/flexdll.h'],
+            [flexdir=flexdll
+            iflexdir='$(ROOTDIR)/flexdll'
+-@@ -754,7 +755,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -764,7 +765,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+  
+    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
+  
+@@ -31,7 +31,7 @@
+      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
+                          [$internal_cppflags], [$host])
+  
+-@@ -768,7 +769,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -778,7 +779,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+  
+    OCAML_TEST_FLEXDLL_H([$flexdir])
+  
