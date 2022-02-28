@@ -1,52 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..877d429451
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,38 @@
-+--- a	2023-09-28 18:43:56.816313404 +0100
-++++ b	2023-09-28 18:43:56.824313733 +0100
-+@@ -3,7 +3,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -427,7 +427,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
-++@@ -437,7 +437,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
-+      [AC_MSG_ERROR([replay debugger requires the unix library])],
-+      [enable_debugger="no"])])
-+  
-+@@ -12,7 +12,7 @@
-+    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
-+      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
-+      [enable_ocamldoc="no"
-+-@@ -725,7 +725,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -735,7 +735,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+      [flexmsg=''
-+      AS_CASE([$target],
-+        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
-+@@ -22,7 +22,7 @@
-+          [AS_IF([test -f 'flexdll/flexdll.h'],
-+            [flexdir=flexdll
-+            iflexdir='$(ROOTDIR)/flexdll'
-+-@@ -754,7 +755,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -764,7 +765,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+  
-+    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
-+  
-+@@ -31,7 +31,7 @@
-+      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
-+                          [$internal_cppflags], [$host])
-+  
-+-@@ -768,7 +769,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -778,7 +779,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+  
-+    OCAML_TEST_FLEXDLL_H([$flexdir])
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index dbf7d846ad..e0ebe2f6c6 100644
+index 302dba44f9..e10494e5aa 100644
 --- a/Changes
 +++ b/Changes
-@@ -146,6 +146,9 @@ Working version
+@@ -153,6 +153,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -56,7 +15,7 @@ index dbf7d846ad..e0ebe2f6c6 100644
  ### Bug fixes:
  
  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-@@ -186,13 +189,13 @@ OCaml 4.14.0
+@@ -193,13 +196,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -72,7 +31,7 @@ index dbf7d846ad..e0ebe2f6c6 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -292,6 +295,9 @@ OCaml 4.14.0
+@@ -299,6 +302,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -82,7 +41,7 @@ index dbf7d846ad..e0ebe2f6c6 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -540,6 +546,9 @@ OCaml 4.14.0
+@@ -547,6 +553,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5184,59 +5143,18 @@ index 0000000000..578c9bbcd6
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1d65d4e57c
+index 0000000000..a9cff193f5
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5163 @@
+@@ -0,0 +1,5054 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..877d429451
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,38 @@
-++--- a	2023-09-28 18:43:56.816313404 +0100
-+++++ b	2023-09-28 18:43:56.824313733 +0100
-++@@ -3,7 +3,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -427,7 +427,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
-+++@@ -437,7 +437,7 @@ AS_IF([test x"$enable_unix_lib" = "xno"],
-++      [AC_MSG_ERROR([replay debugger requires the unix library])],
-++      [enable_debugger="no"])])
-++  
-++@@ -12,7 +12,7 @@
-++    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
-++      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
-++      [enable_ocamldoc="no"
-++-@@ -725,7 +725,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -735,7 +735,8 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++      [flexmsg=''
-++      AS_CASE([$target],
-++        [*-*-cygwin*|*-w64-mingw32|*-pc-windows],
-++@@ -22,7 +22,7 @@
-++          [AS_IF([test -f 'flexdll/flexdll.h'],
-++            [flexdir=flexdll
-++            iflexdir='$(ROOTDIR)/flexdll'
-++-@@ -754,7 +755,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -764,7 +765,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++  
-++    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
-++  
-++@@ -31,7 +31,7 @@
-++      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
-++                          [$internal_cppflags], [$host])
-++  
-++-@@ -768,7 +769,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -778,7 +779,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++  
-++    OCAML_TEST_FLEXDLL_H([$flexdir])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index dbf7d846ad..e0ebe2f6c6 100644
++index 302dba44f9..e10494e5aa 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -146,6 +146,9 @@ Working version
++@@ -153,6 +153,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5246,7 +5164,7 @@ index 0000000000..1d65d4e57c
 + ### Bug fixes:
 + 
 + - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-+@@ -186,13 +189,13 @@ OCaml 4.14.0
++@@ -193,13 +196,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5262,7 +5180,7 @@ index 0000000000..1d65d4e57c
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -292,6 +295,9 @@ OCaml 4.14.0
++@@ -299,6 +302,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5272,7 +5190,7 @@ index 0000000000..1d65d4e57c
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -540,6 +546,9 @@ OCaml 4.14.0
++@@ -547,6 +553,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -10282,75 +10200,7 @@ index 0000000000..1d65d4e57c
 +++*** setup-ocamlc.byte-build-env
 +++**** ocamlc.byte
 ++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
