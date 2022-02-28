@@ -606,6 +606,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
   warn_error_flag='-Werror'
   cc_warnings='-Wall'])
 
+OCAML_CC_HAS_COMPILE_FLAG([-Wimplicit-fallthrough], [
+  cc_warnings="$cc_warnings -Wimplicit-fallthrough"
+])
+
 AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
   [yes,*|,true],
     [cc_warnings="$cc_warnings $warn_error_flag"])
