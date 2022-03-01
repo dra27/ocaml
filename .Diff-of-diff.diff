@@ -1,11 +1,47 @@
---- a	2023-09-28 18:43:57.448339401 +0100
-+++ b	2023-09-28 18:43:57.468340224 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -158,6 +158,11 @@ Working version
-+@@ -161,6 +161,11 @@ Working version
-  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-    (omni, Kate Deplaix and Antonio Nuno Monteiro, review by Xavier Leroy)
+--- a	2023-09-28 18:43:57.828355030 +0100
++++ b	2023-09-28 18:43:57.872356839 +0100
+@@ -2611,7 +2611,7 @@
+ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
+ --- a/stdlib/obj.ml
+ +++ b/stdlib/obj.ml
+-@@ -130,7 +130,7 @@ module Ephemeron = struct
++@@ -132,7 +132,7 @@ module Ephemeron = struct
+    let additional_values = 2
+    let max_ephe_length = Sys.max_array_length - additional_values
   
+@@ -2639,7 +2639,7 @@
+  
+  let op_shapes = [
+    opACC0, Nothing;
+-@@ -404,7 +402,7 @@ let op_shapes = [
++@@ -406,7 +404,7 @@ let op_shapes = [
+    opBREAK, Nothing;
+    opRERAISE, Nothing;
+    opRAISE_NOTRACE, Nothing;
+@@ -2648,7 +2648,7 @@
+  
+  let print_event ev =
+    if !print_locations then
+-@@ -471,8 +469,7 @@ let print_instr ic =
++@@ -473,8 +471,7 @@ let print_instr ic =
+      | Nothing -> ()
+    with Not_found -> print_string " (unknown arguments)"
+    end;
+@@ -3449,7 +3449,7 @@
+ diff --git a/utils/config.mlp b/utils/config.mlp
+ --- a/utils/config.mlp
+ +++ b/utils/config.mlp
+-@@ -150,9 +150,9 @@ let default_executable_name =
++@@ -154,9 +154,9 @@ let default_executable_name =
+    | "Win32" | "Cygwin" -> "camlprog.exe"
+    | _ -> "camlprog"
+  
+@@ -3461,7 +3461,7 @@
+  
+  type configuration_value =
+    | String of string
+-@@ -232,8 +232,7 @@ let print_config oc =
++@@ -236,8 +236,7 @@ let print_config oc =
+    let print (x, v) =
+      Printf.fprintf oc "%s: %a\n" x print_config_value v in
+    List.iter print configuration_variables;

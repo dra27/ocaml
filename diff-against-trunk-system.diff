@@ -1,20 +1,56 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..a91989c691
+index 0000000000..ce21e2c115
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:43:57.448339401 +0100
-++++ b	2023-09-28 18:43:57.468340224 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -158,6 +158,11 @@ Working version
-++@@ -161,6 +161,11 @@ Working version
-+  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-+    (omni, Kate Deplaix and Antonio Nuno Monteiro, review by Xavier Leroy)
+@@ -0,0 +1,47 @@
++--- a	2023-09-28 18:43:57.828355030 +0100
+++++ b	2023-09-28 18:43:57.872356839 +0100
++@@ -2611,7 +2611,7 @@
++ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
++ --- a/stdlib/obj.ml
++ +++ b/stdlib/obj.ml
++-@@ -130,7 +130,7 @@ module Ephemeron = struct
+++@@ -132,7 +132,7 @@ module Ephemeron = struct
++    let additional_values = 2
++    let max_ephe_length = Sys.max_array_length - additional_values
 +  
++@@ -2639,7 +2639,7 @@
++  
++  let op_shapes = [
++    opACC0, Nothing;
++-@@ -404,7 +402,7 @@ let op_shapes = [
+++@@ -406,7 +404,7 @@ let op_shapes = [
++    opBREAK, Nothing;
++    opRERAISE, Nothing;
++    opRAISE_NOTRACE, Nothing;
++@@ -2648,7 +2648,7 @@
++  
++  let print_event ev =
++    if !print_locations then
++-@@ -471,8 +469,7 @@ let print_instr ic =
+++@@ -473,8 +471,7 @@ let print_instr ic =
++      | Nothing -> ()
++    with Not_found -> print_string " (unknown arguments)"
++    end;
++@@ -3449,7 +3449,7 @@
++ diff --git a/utils/config.mlp b/utils/config.mlp
++ --- a/utils/config.mlp
++ +++ b/utils/config.mlp
++-@@ -150,9 +150,9 @@ let default_executable_name =
+++@@ -154,9 +154,9 @@ let default_executable_name =
++    | "Win32" | "Cygwin" -> "camlprog.exe"
++    | _ -> "camlprog"
++  
++@@ -3461,7 +3461,7 @@
++  
++  type configuration_value =
++    | String of string
++-@@ -232,8 +232,7 @@ let print_config oc =
+++@@ -236,8 +236,7 @@ let print_config oc =
++    let print (x, v) =
++      Printf.fprintf oc "%s: %a\n" x print_config_value v in
++    List.iter print configuration_variables;
 diff --git a/Changes b/Changes
 index 3928949f60..65a5ab7c13 100644
 --- a/Changes
@@ -5157,27 +5193,63 @@ index 0000000000..578c9bbcd6
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4a31dcdbf5
+index 0000000000..a64da0f30f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5052 @@
+@@ -0,0 +1,5173 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..a91989c691
++index 0000000000..ce21e2c115
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:43:57.448339401 +0100
-+++++ b	2023-09-28 18:43:57.468340224 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -158,6 +158,11 @@ Working version
-+++@@ -161,6 +161,11 @@ Working version
-++  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-++    (omni, Kate Deplaix and Antonio Nuno Monteiro, review by Xavier Leroy)
++@@ -0,0 +1,47 @@
+++--- a	2023-09-28 18:43:57.828355030 +0100
++++++ b	2023-09-28 18:43:57.872356839 +0100
+++@@ -2611,7 +2611,7 @@
+++ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
+++ --- a/stdlib/obj.ml
+++ +++ b/stdlib/obj.ml
+++-@@ -130,7 +130,7 @@ module Ephemeron = struct
++++@@ -132,7 +132,7 @@ module Ephemeron = struct
+++    let additional_values = 2
+++    let max_ephe_length = Sys.max_array_length - additional_values
 ++  
+++@@ -2639,7 +2639,7 @@
+++  
+++  let op_shapes = [
+++    opACC0, Nothing;
+++-@@ -404,7 +402,7 @@ let op_shapes = [
++++@@ -406,7 +404,7 @@ let op_shapes = [
+++    opBREAK, Nothing;
+++    opRERAISE, Nothing;
+++    opRAISE_NOTRACE, Nothing;
+++@@ -2648,7 +2648,7 @@
+++  
+++  let print_event ev =
+++    if !print_locations then
+++-@@ -471,8 +469,7 @@ let print_instr ic =
++++@@ -473,8 +471,7 @@ let print_instr ic =
+++      | Nothing -> ()
+++    with Not_found -> print_string " (unknown arguments)"
+++    end;
+++@@ -3449,7 +3449,7 @@
+++ diff --git a/utils/config.mlp b/utils/config.mlp
+++ --- a/utils/config.mlp
+++ +++ b/utils/config.mlp
+++-@@ -150,9 +150,9 @@ let default_executable_name =
++++@@ -154,9 +154,9 @@ let default_executable_name =
+++    | "Win32" | "Cygwin" -> "camlprog.exe"
+++    | _ -> "camlprog"
+++  
+++@@ -3461,7 +3461,7 @@
+++  
+++  type configuration_value =
+++    | String of string
+++-@@ -232,8 +232,7 @@ let print_config oc =
++++@@ -236,8 +236,7 @@ let print_config oc =
+++    let print (x, v) =
+++      Printf.fprintf oc "%s: %a\n" x print_config_value v in
+++    List.iter print configuration_variables;
 +diff --git a/Changes b/Changes
 +index 3928949f60..65a5ab7c13 100644
 +--- a/Changes
@@ -10212,7 +10284,92 @@ index 0000000000..4a31dcdbf5
 ++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
 ++index b2d6e6e7c5..f22a4bd50f 100644
 ++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-+++++
++++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/tests
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -11595,7 +11752,7 @@ index ab29d404c9..8534cb3222 100644
  let from_fun (f : unit -> 'arg) =
    let x = Obj.new_block Obj.lazy_tag 1 in
 diff --git a/stdlib/obj.ml b/stdlib/obj.ml
-index 903719d6ad..d0d581be34 100644
+index 7f86887346..6fb0581747 100644
 --- a/stdlib/obj.ml
 +++ b/stdlib/obj.ml
 @@ -29,9 +29,11 @@ external size : t -> int = "%obj_size"
@@ -11799,10 +11956,10 @@ index d4f9056699..f609cfcfae 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-index 7c7ee74fbf..f2878b7bb3 100644
+index b6605d7bf2..3dc08b7994 100644
 --- a/tools/dumpobj.ml
 +++ b/tools/dumpobj.ml
-@@ -395,10 +395,12 @@ let op_shapes = [
+@@ -393,10 +393,12 @@ let op_shapes = [
    opUGEINT, Nothing;
    opBULTINT, Uint_Disp;
    opBUGEINT, Uint_Disp;
@@ -11816,7 +11973,7 @@ index 7c7ee74fbf..f2878b7bb3 100644
    opEVENT, Nothing;
    opBREAK, Nothing;
 diff --git a/utils/config.mlp b/utils/config.mlp
-index 3e6c5b1ed3..d4e4444401 100644
+index 7b43e55036..33d0f65a17 100644
 --- a/utils/config.mlp
 +++ b/utils/config.mlp
 @@ -122,7 +122,11 @@ let max_tag = 243
