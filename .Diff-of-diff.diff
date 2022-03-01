@@ -1,0 +1,26 @@
+--- a	2023-09-28 18:43:59.364418154 +0100
++++ b	2023-09-28 18:43:59.368418318 +0100
+@@ -1,17 +1,16 @@
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/utils/config.mlp b/utils/config.mlp
+ --- a/utils/config.mlp
+ +++ b/utils/config.mlp
+-@@ -122,8 +122,8 @@ let max_tag = 243
+- let lazy_tag = 246
++@@ -123,11 +123,11 @@ let lazy_tag = 246
+  
+  let max_young_wosize = 256
++ (* BACKPORT BEGIN
+ -let stack_threshold = 16 (* see runtime/caml/config.h *)
+--let stack_safety_margin = 60
+ +let stack_threshold = 32 (* see runtime/caml/config.h *)
++ *)
++ let stack_threshold = 256 (* see runtime/caml/config.h *)
++ (* BACKPORT END *)
++-let stack_safety_margin = 60
+ +let stack_safety_margin = 6
+  
+  let architecture = "%%ARCH%%"

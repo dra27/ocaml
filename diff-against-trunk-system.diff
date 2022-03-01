@@ -1,6 +1,35 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..74af025a3f
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,26 @@
++--- a	2023-09-28 18:43:59.364418154 +0100
+++++ b	2023-09-28 18:43:59.368418318 +0100
++@@ -1,17 +1,16 @@
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/utils/config.mlp b/utils/config.mlp
++ --- a/utils/config.mlp
++ +++ b/utils/config.mlp
++-@@ -122,8 +122,8 @@ let max_tag = 243
++- let lazy_tag = 246
+++@@ -123,11 +123,11 @@ let lazy_tag = 246
++  
++  let max_young_wosize = 256
+++ (* BACKPORT BEGIN
++ -let stack_threshold = 16 (* see runtime/caml/config.h *)
++--let stack_safety_margin = 60
++ +let stack_threshold = 32 (* see runtime/caml/config.h *)
+++ *)
+++ let stack_threshold = 256 (* see runtime/caml/config.h *)
+++ (* BACKPORT END *)
+++-let stack_safety_margin = 60
++ +let stack_safety_margin = 6
++  
++  let architecture = "%%ARCH%%"
 diff --git a/Changes b/Changes
 index 64852fd550..46867a8505 100644
 --- a/Changes
@@ -502,10 +531,10 @@ index f92ec296a1..7fe7ef5c96 100644
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 59d9190d7a..804880e707 100755
+index c5bcc5dba3..804880e707 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index be2b870da2..9c4fe66628 100755
+index 13c44be1f3..9c4fe66628 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 2c66a918a3..0a59107ea8 100644
@@ -5372,13 +5401,42 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9da476d492
+index 0000000000..92e7ae4ccf
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5350 @@
+@@ -0,0 +1,5352 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..74af025a3f
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,26 @@
+++--- a	2023-09-28 18:43:59.364418154 +0100
++++++ b	2023-09-28 18:43:59.368418318 +0100
+++@@ -1,17 +1,16 @@
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/utils/config.mlp b/utils/config.mlp
+++ --- a/utils/config.mlp
+++ +++ b/utils/config.mlp
+++-@@ -122,8 +122,8 @@ let max_tag = 243
+++- let lazy_tag = 246
++++@@ -123,11 +123,11 @@ let lazy_tag = 246
+++  
+++  let max_young_wosize = 256
++++ (* BACKPORT BEGIN
+++ -let stack_threshold = 16 (* see runtime/caml/config.h *)
+++--let stack_safety_margin = 60
+++ +let stack_threshold = 32 (* see runtime/caml/config.h *)
++++ *)
++++ let stack_threshold = 256 (* see runtime/caml/config.h *)
++++ (* BACKPORT END *)
++++-let stack_safety_margin = 60
+++ +let stack_safety_margin = 6
+++  
+++  let architecture = "%%ARCH%%"
 +diff --git a/Changes b/Changes
 +index 64852fd550..46867a8505 100644
 +--- a/Changes
@@ -5880,10 +5938,10 @@ index 0000000000..9da476d492
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 59d9190d7a..804880e707 100755
++index c5bcc5dba3..804880e707 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index be2b870da2..9c4fe66628 100755
++index 13c44be1f3..9c4fe66628 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 2c66a918a3..0a59107ea8 100644
@@ -10698,34 +10756,7 @@ index 0000000000..9da476d492
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeab
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12380,7 +12411,7 @@ index b6605d7bf2..3dc08b7994 100644
    opEVENT, Nothing;
    opBREAK, Nothing;
 diff --git a/utils/config.mlp b/utils/config.mlp
-index 7b43e55036..33d0f65a17 100644
+index fc92ba77ec..f86974a362 100644
 --- a/utils/config.mlp
 +++ b/utils/config.mlp
 @@ -122,7 +122,11 @@ let max_tag = 243
@@ -12388,11 +12419,11 @@ index 7b43e55036..33d0f65a17 100644
  
  let max_young_wosize = 256
 +(* BACKPORT BEGIN
- let stack_threshold = 16 (* see runtime/caml/config.h *)
+ let stack_threshold = 32 (* see runtime/caml/config.h *)
 +*)
 +let stack_threshold = 256 (* see runtime/caml/config.h *)
 +(* BACKPORT END *)
- let stack_safety_margin = 60
+ let stack_safety_margin = 6
  
  let architecture = "%%ARCH%%"
 diff --git a/utils/domainstate.ml.c b/utils/domainstate.ml.c
