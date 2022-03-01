@@ -90,7 +90,7 @@ let status =
   Sys.command
     (Printf.sprintf "ocamlopt -pp \"ocamlprof -instrument %s\" %s %s"
         (String.concat " " (List.rev !rev_profargs))
-        (if !make_archive then "" else "profiling.cmx")
+        (if !make_archive then "" else "-I +profiling profiling.cmx")
         (String.concat " " (List.rev !rev_compargs)))
 in
 exit status
