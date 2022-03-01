@@ -43,7 +43,6 @@ val section_options : string
 
 val section_undocumented : string
 
-
 type 'a printer_type_new = Format.formatter -> 'a -> unit
 type 'a printer_type_old = 'a -> unit
 
