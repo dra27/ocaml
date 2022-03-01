@@ -1,47 +1,231 @@
---- a	2023-09-28 18:43:57.828355030 +0100
-+++ b	2023-09-28 18:43:57.872356839 +0100
-@@ -2611,7 +2611,7 @@
- diff --git a/stdlib/obj.ml b/stdlib/obj.ml
- --- a/stdlib/obj.ml
- +++ b/stdlib/obj.ml
--@@ -130,7 +130,7 @@ module Ephemeron = struct
-+@@ -132,7 +132,7 @@ module Ephemeron = struct
-    let additional_values = 2
-    let max_ephe_length = Sys.max_array_length - additional_values
+--- a	2023-09-28 18:43:58.276373447 +0100
++++ b	2023-09-28 18:43:58.300374433 +0100
+@@ -127,22 +127,24 @@
+ diff --git a/otherlibs/dynlink/dynlink_common.ml b/otherlibs/dynlink/dynlink_common.ml
+ --- a/otherlibs/dynlink/dynlink_common.ml
+ +++ b/otherlibs/dynlink/dynlink_common.ml
+-@@ -20,14 +20,6 @@
++@@ -20,16 +20,6 @@
   
-@@ -2639,7 +2639,7 @@
+  open! Dynlink_compilerlibs
   
-  let op_shapes = [
-    opACC0, Nothing;
--@@ -404,7 +402,7 @@ let op_shapes = [
-+@@ -406,7 +404,7 @@ let op_shapes = [
-    opBREAK, Nothing;
-    opRERAISE, Nothing;
-    opRAISE_NOTRACE, Nothing;
-@@ -2648,7 +2648,7 @@
+ -(* Dynlink is only allowed on the main domain.
+ -   Entrypoints to public functions should check for this. *)
+ -let is_dynlink_allowed () =
++-(* BACKPORT
+ -  if not (Domain.is_main_domain ()) then
+ -    failwith "Dynlink can only be called from the main domain."
+ -  else
++-*)
+ -    ()
+ -
+  module String = struct
+    include Misc.Stdlib.String
   
-  let print_event ev =
-    if !print_locations then
--@@ -471,8 +469,7 @@ let print_instr ic =
-+@@ -473,8 +471,7 @@ let print_instr ic =
-      | Nothing -> ()
-    with Not_found -> print_string " (unknown arguments)"
-    end;
-@@ -3449,7 +3449,7 @@
- diff --git a/utils/config.mlp b/utils/config.mlp
- --- a/utils/config.mlp
- +++ b/utils/config.mlp
--@@ -150,9 +150,9 @@ let default_executable_name =
-+@@ -154,9 +154,9 @@ let default_executable_name =
-    | "Win32" | "Cygwin" -> "camlprog.exe"
-    | _ -> "camlprog"
+-@@ -80,15 +72,39 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -82,15 +72,39 @@ module Make (P : Dynlink_platform_intf.S) = struct
+      }
+    end
   
-@@ -3461,7 +3461,7 @@
+@@ -188,7 +190,7 @@
   
-  type configuration_value =
-    | String of string
--@@ -232,8 +232,7 @@ let print_config oc =
-+@@ -236,8 +236,7 @@ let print_config oc =
-    let print (x, v) =
-      Printf.fprintf oc "%s: %a\n" x print_config_value v in
-    List.iter print configuration_variables;
+    let check_symbols_disjoint ~descr syms1 syms2 =
+      let exe = Sys.executable_name in
+-@@ -104,7 +120,7 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -106,7 +120,7 @@ module Make (P : Dynlink_platform_intf.S) = struct
+        failwith msg
+      end
+  
+@@ -197,7 +199,7 @@
+      let exe = Sys.executable_name in
+      let ifaces, implems, defined_symbols =
+        P.fold_initial_units
+-@@ -143,15 +159,15 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -145,15 +159,15 @@ module Make (P : Dynlink_platform_intf.S) = struct
+          public_dynamically_loaded_units = String.Set.empty;
+        }
+      in
+@@ -219,7 +221,7 @@
+  
+    let set_loaded_implem filename ui implems =
+      String.Map.add (UH.name ui) (UH.crc ui, filename, DT.Loaded) implems
+-@@ -218,13 +234,14 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -220,13 +234,14 @@ module Make (P : Dynlink_platform_intf.S) = struct
+      end;
+      String.Map.add name (UH.crc ui, filename, DT.Not_initialized) implems
+  
+@@ -238,7 +240,7 @@
+      let new_units =
+        String.Set.of_list (List.map (fun ui -> UH.name ui) units)
+      in
+-@@ -280,57 +297,47 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -282,57 +297,47 @@ module Make (P : Dynlink_platform_intf.S) = struct
+      end
+  
+    let set_allowed_units allowed_units =
+@@ -322,7 +324,7 @@
+  
+    let dll_filename fname =
+      if Filename.is_implicit fname then Filename.concat (Sys.getcwd ()) fname
+-@@ -343,14 +350,21 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -345,14 +350,21 @@ module Make (P : Dynlink_platform_intf.S) = struct
+      | exception exn -> raise (DT.Error (Cannot_open_dynamic_library exn))
+      | handle, units ->
+        try
+@@ -350,7 +352,7 @@
+            units;
+          P.finish handle
+        with exn ->
+-@@ -360,7 +374,11 @@ module Make (P : Dynlink_platform_intf.S) = struct
++@@ -362,7 +374,11 @@ module Make (P : Dynlink_platform_intf.S) = struct
+    let loadfile filename = load false filename
+    let loadfile_private filename = load true filename
+  
+@@ -390,62 +392,65 @@
+ diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+ --- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+ +++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+-@@ -2,20 +2,19 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
++@@ -2,10 +2,10 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
+  Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+  Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 13-44
+-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 352, characters 13-44
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+--Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 348, characters 8-240
+--Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 26-45
+-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 8-240
++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 362, characters 26-45
+++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
+++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
+  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+  execution of module initializers in the shared library failed: Failure("SUCCESS")
+- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++@@ -16,10 +16,9 @@ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.m
+  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+  Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 13-44
+-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 352, characters 13-44
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+--Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 348, characters 8-240
+--Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 26-45
+--Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 358, characters 8-17
+--Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 26-45
+-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 8-240
++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 362, characters 26-45
++-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 8-17
++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 362, characters 26-45
+++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
+++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
+++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
+  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+ diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
+ --- a/testsuite/tests/backtrace/backtrace_dynlink.reference
+ +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
+-@@ -1,18 +1,18 @@
++@@ -1,10 +1,10 @@
+  Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+  Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
+-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+--Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
+-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
+++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
+  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+  execution of module initializers in the shared library failed: Failure("SUCCESS")
+- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++@@ -14,9 +14,9 @@ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.m
++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
+-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+--Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+--Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
+-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
+++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
+++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
+  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+ diff --git a/testsuite/tests/lib-dynlink-domains/Plugin_0.ml b/testsuite/tests/lib-dynlink-domains/Plugin_0.ml
+ new file mode 100644
+@@ -1838,30 +1843,30 @@
+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+ -Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 137, characters 16-25
+ -Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 139, characters 6-137
+--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
+-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
+-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
+-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 16-25
+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 6-137
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+--Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
+++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
+++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
+  Called from Test10_main in file "test10_main.ml", line 51, characters 13-69
+ diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+ --- a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+ +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+-@@ -2,9 +2,9 @@ Error: Failure("Plugin error")
+- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++@@ -6,9 +6,9 @@ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.m
++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
+-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+--Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+--Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+--Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
+-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
+++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
+++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
+  Called from Test10_main in file "test10_main.ml", line 49, characters 30-87
