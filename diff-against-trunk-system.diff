@@ -2,7 +2,7 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 4ef01fb299..124fe656c3 100644
+index 64852fd550..46867a8505 100644
 --- a/Changes
 +++ b/Changes
 @@ -157,6 +157,9 @@ Working version
@@ -5372,7 +5372,7 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..326f1d0b0d
+index 0000000000..9da476d492
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5350 @@
@@ -5380,7 +5380,7 @@ index 0000000000..326f1d0b0d
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 4ef01fb299..124fe656c3 100644
++index 64852fd550..46867a8505 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -157,6 +157,9 @@ Working version
