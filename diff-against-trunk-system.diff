@@ -1,40 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..74af025a3f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,26 @@
-+--- a	2023-09-28 18:43:59.364418154 +0100
-++++ b	2023-09-28 18:43:59.368418318 +0100
-+@@ -1,17 +1,16 @@
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/utils/config.mlp b/utils/config.mlp
-+ --- a/utils/config.mlp
-+ +++ b/utils/config.mlp
-+-@@ -122,8 +122,8 @@ let max_tag = 243
-+- let lazy_tag = 246
-++@@ -123,11 +123,11 @@ let lazy_tag = 246
-+  
-+  let max_young_wosize = 256
-++ (* BACKPORT BEGIN
-+ -let stack_threshold = 16 (* see runtime/caml/config.h *)
-+--let stack_safety_margin = 60
-+ +let stack_threshold = 32 (* see runtime/caml/config.h *)
-++ *)
-++ let stack_threshold = 256 (* see runtime/caml/config.h *)
-++ (* BACKPORT END *)
-++-let stack_safety_margin = 60
-+ +let stack_safety_margin = 6
-+  
-+  let architecture = "%%ARCH%%"
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 64852fd550..46867a8505 100644
+index 902ffffc90..9201ca56bd 100644
 --- a/Changes
 +++ b/Changes
-@@ -157,6 +157,9 @@ Working version
+@@ -160,6 +160,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -44,7 +15,7 @@ index 64852fd550..46867a8505 100644
  ### Bug fixes:
  
  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-@@ -202,13 +205,13 @@ OCaml 4.14.0
+@@ -205,13 +208,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -60,7 +31,7 @@ index 64852fd550..46867a8505 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -308,6 +311,9 @@ OCaml 4.14.0
+@@ -311,6 +314,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -70,7 +41,7 @@ index 64852fd550..46867a8505 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -556,6 +562,9 @@ OCaml 4.14.0
+@@ -559,6 +565,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5401,47 +5372,18 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..92e7ae4ccf
+index 0000000000..bae365cbbc
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5352 @@
+@@ -0,0 +1,5350 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..74af025a3f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,26 @@
-++--- a	2023-09-28 18:43:59.364418154 +0100
-+++++ b	2023-09-28 18:43:59.368418318 +0100
-++@@ -1,17 +1,16 @@
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/utils/config.mlp b/utils/config.mlp
-++ --- a/utils/config.mlp
-++ +++ b/utils/config.mlp
-++-@@ -122,8 +122,8 @@ let max_tag = 243
-++- let lazy_tag = 246
-+++@@ -123,11 +123,11 @@ let lazy_tag = 246
-++  
-++  let max_young_wosize = 256
-+++ (* BACKPORT BEGIN
-++ -let stack_threshold = 16 (* see runtime/caml/config.h *)
-++--let stack_safety_margin = 60
-++ +let stack_threshold = 32 (* see runtime/caml/config.h *)
-+++ *)
-+++ let stack_threshold = 256 (* see runtime/caml/config.h *)
-+++ (* BACKPORT END *)
-+++-let stack_safety_margin = 60
-++ +let stack_safety_margin = 6
-++  
-++  let architecture = "%%ARCH%%"
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 64852fd550..46867a8505 100644
++index 902ffffc90..9201ca56bd 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -157,6 +157,9 @@ Working version
++@@ -160,6 +160,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5451,7 +5393,7 @@ index 0000000000..92e7ae4ccf
 + ### Bug fixes:
 + 
 + - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-+@@ -202,13 +205,13 @@ OCaml 4.14.0
++@@ -205,13 +208,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5467,7 +5409,7 @@ index 0000000000..92e7ae4ccf
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -308,6 +311,9 @@ OCaml 4.14.0
++@@ -311,6 +314,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5477,7 +5419,7 @@ index 0000000000..92e7ae4ccf
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -556,6 +562,9 @@ OCaml 4.14.0
++@@ -559,6 +565,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -10756,7 +10698,34 @@ index 0000000000..92e7ae4ccf
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeab
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
