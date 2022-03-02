@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:00.336458067 +0100
++++ b	2023-09-28 18:44:00.356458888 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -170,6 +170,9 @@ Working version
++@@ -173,6 +173,9 @@ Working version
+    (David Allsopp, report by Xia Li-yao)
+  
+  
