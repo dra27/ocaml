@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..5fe7d8119c
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:44:00.620469724 +0100
-++++ b	2023-09-28 18:44:00.644470709 +0100
-+@@ -63,7 +63,7 @@
-+  let print_locations = ref true
-+  let print_reloc_info = ref false
-+  
-+-@@ -422,7 +423,7 @@ let print_instr ic =
-++@@ -424,7 +425,7 @@ let print_instr ic =
-+    else print_string names_of_instructions.(op);
-+    begin try
-+      let shape = List.assoc op op_shapes in
-+@@ -72,7 +72,7 @@
-+      match shape with
-+      | Uint -> print_int (inputu ic)
-+      | Sint -> print_int (inputs ic)
-+-@@ -547,6 +548,7 @@ let dump_exe ic =
-++@@ -549,6 +550,7 @@ let dump_exe ic =
-+    print_code ic code_size
-+  
-+  let arg_list = [
-+@@ -80,7 +80,7 @@
-+    "-noloc", Arg.Clear print_locations, " : don't print source information";
-+    "-reloc", Arg.Set print_reloc_info, " : print relocation information";
-+    "-args", Arg.Expand Arg.read_arg,
-+-@@ -566,14 +568,14 @@ let arg_fun filename =
-++@@ -568,14 +570,14 @@ let arg_fun filename =
-+    let ic = open_in_bin filename in
-+    if not !first_file then print_newline ();
-+    first_file := false;
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 324c11e542..305c0f734b 100644
 --- a/Changes
@@ -5448,45 +5416,13 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..77bd06c63d
+index 0000000000..f6ebc8a9cc
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5344 @@
+@@ -0,0 +1,5348 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..5fe7d8119c
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:44:00.620469724 +0100
-+++++ b	2023-09-28 18:44:00.644470709 +0100
-++@@ -63,7 +63,7 @@
-++  let print_locations = ref true
-++  let print_reloc_info = ref false
-++  
-++-@@ -422,7 +423,7 @@ let print_instr ic =
-+++@@ -424,7 +425,7 @@ let print_instr ic =
-++    else print_string names_of_instructions.(op);
-++    begin try
-++      let shape = List.assoc op op_shapes in
-++@@ -72,7 +72,7 @@
-++      match shape with
-++      | Uint -> print_int (inputu ic)
-++      | Sint -> print_int (inputs ic)
-++-@@ -547,6 +548,7 @@ let dump_exe ic =
-+++@@ -549,6 +550,7 @@ let dump_exe ic =
-++    print_code ic code_size
-++  
-++  let arg_list = [
-++@@ -80,7 +80,7 @@
-++    "-noloc", Arg.Clear print_locations, " : don't print source information";
-++    "-reloc", Arg.Set print_reloc_info, " : print relocation information";
-++    "-args", Arg.Expand Arg.read_arg,
-++-@@ -566,14 +568,14 @@ let arg_fun filename =
-+++@@ -568,14 +570,14 @@ let arg_fun filename =
-++    let ic = open_in_bin filename in
-++    if not !first_file then print_newline ();
-++    first_file := false;
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 324c11e542..305c0f734b 100644
 +--- a/Changes
@@ -10795,7 +10731,43 @@ index 0000000000..77bd06c63d
 ++index b2d6e6e7c5..f22a4bd50f 100644
 ++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
 +++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags += " -g 
+++@@ -3,17 +3,15 @@ flags += " -g "
+++ ocamldebug_script = "${test_source_directory}/input_script"
+++ readonly_files = "printer.ml"
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++       
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
