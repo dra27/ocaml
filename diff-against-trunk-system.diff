@@ -1,25 +1,43 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0d59e56c6f
+index 0000000000..5fe7d8119c
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:00.336458067 +0100
-++++ b	2023-09-28 18:44:00.356458888 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -170,6 +170,9 @@ Working version
-++@@ -173,6 +173,9 @@ Working version
-+    (David Allsopp, report by Xia Li-yao)
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:44:00.620469724 +0100
+++++ b	2023-09-28 18:44:00.644470709 +0100
++@@ -63,7 +63,7 @@
++  let print_locations = ref true
++  let print_reloc_info = ref false
 +  
++-@@ -422,7 +423,7 @@ let print_instr ic =
+++@@ -424,7 +425,7 @@ let print_instr ic =
++    else print_string names_of_instructions.(op);
++    begin try
++      let shape = List.assoc op op_shapes in
++@@ -72,7 +72,7 @@
++      match shape with
++      | Uint -> print_int (inputu ic)
++      | Sint -> print_int (inputs ic)
++-@@ -547,6 +548,7 @@ let dump_exe ic =
+++@@ -549,6 +550,7 @@ let dump_exe ic =
++    print_code ic code_size
 +  
++  let arg_list = [
++@@ -80,7 +80,7 @@
++    "-noloc", Arg.Clear print_locations, " : don't print source information";
++    "-reloc", Arg.Set print_reloc_info, " : print relocation information";
++    "-args", Arg.Expand Arg.read_arg,
++-@@ -566,14 +568,14 @@ let arg_fun filename =
+++@@ -568,14 +570,14 @@ let arg_fun filename =
++    let ic = open_in_bin filename in
++    if not !first_file then print_newline ();
++    first_file := false;
 diff --git a/Changes b/Changes
-index e58a166be0..c63ae82f7a 100644
+index 324c11e542..305c0f734b 100644
 --- a/Changes
 +++ b/Changes
-@@ -160,6 +160,9 @@ Working version
+@@ -163,6 +163,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -29,7 +47,7 @@ index e58a166be0..c63ae82f7a 100644
  ### Bug fixes:
  
  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-@@ -208,13 +211,13 @@ OCaml 4.14.0
+@@ -211,13 +214,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -45,7 +63,7 @@ index e58a166be0..c63ae82f7a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -314,6 +317,9 @@ OCaml 4.14.0
+@@ -317,6 +320,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -55,7 +73,7 @@ index e58a166be0..c63ae82f7a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -562,6 +568,9 @@ OCaml 4.14.0
+@@ -565,6 +571,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5430,32 +5448,50 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fcb2168c83
+index 0000000000..77bd06c63d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5354 @@
+@@ -0,0 +1,5344 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0d59e56c6f
++index 0000000000..5fe7d8119c
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:00.336458067 +0100
-+++++ b	2023-09-28 18:44:00.356458888 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -170,6 +170,9 @@ Working version
-+++@@ -173,6 +173,9 @@ Working version
-++    (David Allsopp, report by Xia Li-yao)
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:44:00.620469724 +0100
++++++ b	2023-09-28 18:44:00.644470709 +0100
+++@@ -63,7 +63,7 @@
+++  let print_locations = ref true
+++  let print_reloc_info = ref false
 ++  
+++-@@ -422,7 +423,7 @@ let print_instr ic =
++++@@ -424,7 +425,7 @@ let print_instr ic =
+++    else print_string names_of_instructions.(op);
+++    begin try
+++      let shape = List.assoc op op_shapes in
+++@@ -72,7 +72,7 @@
+++      match shape with
+++      | Uint -> print_int (inputu ic)
+++      | Sint -> print_int (inputs ic)
+++-@@ -547,6 +548,7 @@ let dump_exe ic =
++++@@ -549,6 +550,7 @@ let dump_exe ic =
+++    print_code ic code_size
 ++  
+++  let arg_list = [
+++@@ -80,7 +80,7 @@
+++    "-noloc", Arg.Clear print_locations, " : don't print source information";
+++    "-reloc", Arg.Set print_reloc_info, " : print relocation information";
+++    "-args", Arg.Expand Arg.read_arg,
+++-@@ -566,14 +568,14 @@ let arg_fun filename =
++++@@ -568,14 +570,14 @@ let arg_fun filename =
+++    let ic = open_in_bin filename in
+++    if not !first_file then print_newline ();
+++    first_file := false;
 +diff --git a/Changes b/Changes
-+index e58a166be0..c63ae82f7a 100644
++index 324c11e542..305c0f734b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -160,6 +160,9 @@ Working version
++@@ -163,6 +163,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5465,7 +5501,7 @@ index 0000000000..fcb2168c83
 + ### Bug fixes:
 + 
 + - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-+@@ -208,13 +211,13 @@ OCaml 4.14.0
++@@ -211,13 +214,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5481,7 +5517,7 @@ index 0000000000..fcb2168c83
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -314,6 +317,9 @@ OCaml 4.14.0
++@@ -317,6 +320,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5491,7 +5527,7 @@ index 0000000000..fcb2168c83
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -562,6 +568,9 @@ OCaml 4.14.0
++@@ -565,6 +571,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -10759,35 +10795,7 @@ index 0000000000..fcb2168c83
 ++index b2d6e6e7c5..f22a4bd50f 100644
 ++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
 +++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuit
+++@@ -3,17 +3,15 @@ flags += " -g 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12425,10 +12433,10 @@ index d4f9056699..f609cfcfae 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-index d78e39906c..5168dc925f 100644
+index 01722ed9ca..508dd3b226 100644
 --- a/tools/dumpobj.ml
 +++ b/tools/dumpobj.ml
-@@ -393,10 +393,12 @@ let op_shapes = [
+@@ -394,10 +394,12 @@ let op_shapes = [
    opUGEINT, Nothing;
    opBULTINT, Uint_Disp;
    opBUGEINT, Uint_Disp;
