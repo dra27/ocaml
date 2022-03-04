@@ -438,7 +438,7 @@ static value st_encode_sigset(sigset_t * set)
   for (i = 1; i < NSIG; i++)
     if (sigismember(set, i) > 0) {
 #if 0
-      res = caml_alloc_2(2, Val_int(caml_rev_convert_signal_number(i)), res);
+      res = caml_alloc_2(0, Val_int(caml_rev_convert_signal_number(i)), res);
 #endif
       value newcons = caml_alloc_small(2, 0);
       Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
