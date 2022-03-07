@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..7a912645ae
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:02.784558478 +0100
+++++ b	2023-09-28 18:44:02.792558806 +0100
++@@ -83,7 +83,7 @@
++ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
++ --- a/stdlib/obj.mli
++ +++ b/stdlib/obj.mli
++-@@ -131,40 +131,28 @@ module Ephemeron: sig
+++@@ -133,40 +133,28 @@ module Ephemeron: sig
++    (** return the number of keys *)
++  
++    val get_key: t -> int -> obj_t option
 diff --git a/Changes b/Changes
 index 6b46de797f..e22ba55556 100644
 --- a/Changes
@@ -5416,13 +5430,27 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6caf23b312
+index 0000000000..c632ede18a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5348 @@
+@@ -0,0 +1,5352 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..7a912645ae
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:02.784558478 +0100
++++++ b	2023-09-28 18:44:02.792558806 +0100
+++@@ -83,7 +83,7 @@
+++ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
+++ --- a/stdlib/obj.mli
+++ +++ b/stdlib/obj.mli
+++-@@ -131,40 +131,28 @@ module Ephemeron: sig
++++@@ -133,40 +133,28 @@ module Ephemeron: sig
+++    (** return the number of keys *)
+++  
+++    val get_key: t -> int -> obj_t option
 +diff --git a/Changes b/Changes
 +index 6b46de797f..e22ba55556 100644
 +--- a/Changes
@@ -10757,17 +10785,7 @@ index 0000000000..6caf23b312
 ++ *)
 ++ 
 ++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++       
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12216,7 +12234,7 @@ index 7f86887346..6fb0581747 100644
  external floatarray_set :
      floatarray -> int -> float -> unit = "caml_floatarray_set"
 diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-index b4e74d3455..05676aaa86 100644
+index df5fed1b8b..304596eda8 100644
 --- a/stdlib/obj.mli
 +++ b/stdlib/obj.mli
 @@ -53,9 +53,11 @@ external field : t -> int -> t = "%obj_field"

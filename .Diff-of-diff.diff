@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:02.784558478 +0100
++++ b	2023-09-28 18:44:02.792558806 +0100
+@@ -83,7 +83,7 @@
+ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
+ --- a/stdlib/obj.mli
+ +++ b/stdlib/obj.mli
+-@@ -131,40 +131,28 @@ module Ephemeron: sig
++@@ -133,40 +133,28 @@ module Ephemeron: sig
+    (** return the number of keys *)
+  
+    val get_key: t -> int -> obj_t option
