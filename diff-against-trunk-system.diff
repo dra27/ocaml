@@ -1,22 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7a912645ae
+index 0000000000..66e7c78219
 --- /dev/null
 +++ b/.Diff-of-diff.diff
 @@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:02.784558478 +0100
-++++ b	2023-09-28 18:44:02.792558806 +0100
-+@@ -83,7 +83,7 @@
-+ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-+ --- a/stdlib/obj.mli
-+ +++ b/stdlib/obj.mli
-+-@@ -131,40 +131,28 @@ module Ephemeron: sig
-++@@ -133,40 +133,28 @@ module Ephemeron: sig
-+    (** return the number of keys *)
++--- a	2023-09-28 18:44:03.092571101 +0100
+++++ b	2023-09-28 18:44:03.112571920 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -196,7 +196,7 @@ OCaml 4.14.0
+++@@ -199,7 +199,7 @@ OCaml 4.14.0
++    Allow 'object ... end # f', 'f object ... end', etc.
++    (Yan Dong, review by Nicolás Ojeda Bär, Florian Angeletti and Gabriel Scherer)
 +  
-+    val get_key: t -> int -> obj_t option
 diff --git a/Changes b/Changes
-index 6b46de797f..e22ba55556 100644
+index 91941b6913..26e0f0d368 100644
 --- a/Changes
 +++ b/Changes
 @@ -167,6 +167,9 @@ Working version
@@ -5430,29 +5430,29 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c632ede18a
+index 0000000000..8afe40c2d0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5352 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..7a912645ae
++index 0000000000..66e7c78219
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
 +@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:02.784558478 +0100
-+++++ b	2023-09-28 18:44:02.792558806 +0100
-++@@ -83,7 +83,7 @@
-++ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-++ --- a/stdlib/obj.mli
-++ +++ b/stdlib/obj.mli
-++-@@ -131,40 +131,28 @@ module Ephemeron: sig
-+++@@ -133,40 +133,28 @@ module Ephemeron: sig
-++    (** return the number of keys *)
+++--- a	2023-09-28 18:44:03.092571101 +0100
++++++ b	2023-09-28 18:44:03.112571920 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -196,7 +196,7 @@ OCaml 4.14.0
++++@@ -199,7 +199,7 @@ OCaml 4.14.0
+++    Allow 'object ... end # f', 'f object ... end', etc.
+++    (Yan Dong, review by Nicolás Ojeda Bär, Florian Angeletti and Gabriel Scherer)
 ++  
-++    val get_key: t -> int -> obj_t option
 +diff --git a/Changes b/Changes
-+index 6b46de797f..e22ba55556 100644
++index 91941b6913..26e0f0d368 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -167,6 +167,9 @@ Working version
@@ -10785,7 +10785,7 @@ index 0000000000..c632ede18a
 ++ *)
 ++ 
 ++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/tests
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
