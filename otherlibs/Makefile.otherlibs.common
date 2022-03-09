@@ -88,6 +88,8 @@ $(LIBNAME).cmxs: $(LIBNAME).cmxa $(STUBSLIB)
 lib$(CLIBNAME).$(A): $(COBJS)
 	$(MKLIB_CMD) -oc $(CLIBNAME) $(COBJS) $(LDOPTS)
 
+INSTALL_LIBDIR_LIBNAME ?= $(INSTALL_LIBDIR)/$(LIBNAME)
+
 install::
 	if test -f dll$(CLIBNAME)$(EXT_DLL); then \
 	  $(INSTALL_PROG) \
@@ -97,15 +99,15 @@ ifneq "$(STUBSLIB)" ""
 	$(INSTALL_DATA) $(STUBSLIB) "$(INSTALL_LIBDIR)/"
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) lib$(CLIBNAME).$(A)
 endif
-
+	$(MKDIR) "$(INSTALL_LIBDIR_LIBNAME)/"
 	$(INSTALL_DATA) \
 	  $(LIBNAME).cma $(CMIFILES) \
-	  "$(INSTALL_LIBDIR)/"
+	  "$(INSTALL_LIBDIR_LIBNAME)/"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	$(INSTALL_DATA) \
 	  $(CMIFILES:.cmi=.mli) \
           $(CMIFILES:.cmi=.cmti) \
-	  "$(INSTALL_LIBDIR)/"
+	  "$(INSTALL_LIBDIR_LIBNAME)/"
 endif
 	if test -n "$(HEADERS)"; then \
 	  $(INSTALL_DATA) $(HEADERS) "$(INSTALL_LIBDIR)/caml/"; \
@@ -114,10 +116,10 @@ endif
 installopt:
 	$(INSTALL_DATA) \
 	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) \
-	   "$(INSTALL_LIBDIR)/"
-	cd "$(INSTALL_LIBDIR)"; $(RANLIB) $(LIBNAME).a
+	   "$(INSTALL_LIBDIR_LIBNAME)/"
+	cd "$(INSTALL_LIBDIR_LIBNAME)"; $(RANLIB) $(LIBNAME).a
 	if test -f $(LIBNAME).cmxs; then \
-	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR)"; \
+	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR_LIBNAME)"; \
 	fi
 
 partialclean:
