@@ -14,6 +14,7 @@
 #**************************************************************************
 
 LIBNAME=bigarray
+INSTALL_LIBDIR_LIBNAME=$(INSTALL_LIBDIR)
 CAMLOBJS=bigarray.cmo
 
 include ../Makefile.otherlibs.common
