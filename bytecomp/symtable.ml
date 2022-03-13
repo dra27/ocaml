@@ -182,7 +182,8 @@ let init () =
       ~always:(fun () -> remove_file primfile)
       (fun () ->
          if Sys.command(Printf.sprintf "%s -p > %s"
-                          !Clflags.use_runtime primfile) <> 0
+                          (Filename.quote !Clflags.use_runtime)
+                          (Filename.quote primfile)) <> 0
          then raise(Error(Wrong_vm !Clflags.use_runtime));
          set_prim_table_from_file primfile
       )
