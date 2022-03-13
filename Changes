@@ -8,6 +8,9 @@ OCaml 4.14 maintenance version
 
 ### Bug fixes:
 
+- #11112: harden -use-runtime against spaces or quotes in the provided path
+  (Gabriel Scherer, report by Brahima Dibassi, review by David Allsopp)
+
 OCaml 4.14.1 (20 December 2022)
 ------------------------------
 
