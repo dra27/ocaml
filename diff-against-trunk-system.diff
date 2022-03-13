@@ -2129,10 +2129,10 @@ index 0000000000..ed4592e809
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..2e88e50921
+index 0000000000..f7de157c29
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3281 @@
+@@ -0,0 +1,3296 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7dbc7d08dc..53ebb005ca 100644
 +--- a/ocamltest/Makefile
@@ -4507,6 +4507,21 @@ index 0000000000..2e88e50921
 + *)
 + 
 + (* spins a external thread from C and register it to the OCaml runtime *)
++diff --git a/testsuite/tests/parallel/test_issue_11094.ml b/testsuite/tests/parallel/test_issue_11094.ml
++index ffc6d4bedd..8b9fb98c50 100644
++--- a/testsuite/tests/parallel/test_issue_11094.ml
+++++ b/testsuite/tests/parallel/test_issue_11094.ml
++@@ -1,6 +1,8 @@
++ (* TEST
++-* bytecode
++-* native
+++* skip
+++reason = "OCaml 5 only"
+++** bytecode
+++** native
++ *)
++ 
++ open Effect
 +diff --git a/testsuite/tests/regression/pr9326/gc_set.ml b/testsuite/tests/regression/pr9326/gc_set.ml
 +index 2570aec28e..e9d7dbcd4c 100644
 +--- a/testsuite/tests/regression/pr9326/gc_set.ml
@@ -5416,10 +5431,10 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..68def74843
+index 0000000000..cfe90866e2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5348 @@
+@@ -0,0 +1,5354 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -7551,10 +7566,10 @@ index 0000000000..68def74843
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..2e88e50921
++index 0000000000..f7de157c29
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3281 @@
++@@ -0,0 +1,3296 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7dbc7d08dc..53ebb005ca 100644
 ++--- a/ocamltest/Makefile
@@ -9929,6 +9944,21 @@ index 0000000000..68def74843
 ++ *)
 ++ 
 ++ (* spins a external thread from C and register it to the OCaml runtime *)
+++diff --git a/testsuite/tests/parallel/test_issue_11094.ml b/testsuite/tests/parallel/test_issue_11094.ml
+++index ffc6d4bedd..8b9fb98c50 100644
+++--- a/testsuite/tests/parallel/test_issue_11094.ml
++++++ b/testsuite/tests/parallel/test_issue_11094.ml
+++@@ -1,6 +1,8 @@
+++ (* TEST
+++-* bytecode
+++-* native
++++* skip
++++reason = "OCaml 5 only"
++++** bytecode
++++** native
+++ *)
+++ 
+++ open Effect
 ++diff --git a/testsuite/tests/regression/pr9326/gc_set.ml b/testsuite/tests/regression/pr9326/gc_set.ml
 ++index 2570aec28e..e9d7dbcd4c 100644
 ++--- a/testsuite/tests/regression/pr9326/gc_set.ml
@@ -10758,16 +10788,7 @@ index 0000000000..68def74843
 ++ 
 ++ let f x =
 ++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++       
+++index 5636e9abe2..53e
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
