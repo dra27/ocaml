@@ -19,7 +19,7 @@
 #include "caml/domain_state.h"
 #include "caml/memory.h"
 
-CAMLexport caml_domain_state* Caml_state;
+CAMLexport caml_domain_state* caml_state;
 
 void caml_init_domain ()
 {
