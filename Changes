@@ -15,6 +15,12 @@ OCaml 4.12, maintenance version
 * #10723: do not use `-flat-namespace` linking for macOS.
   (Carlo Cabrera, review by Damien Doligez)
 
+### Tools:
+
+- #11100: Fix ocamltest to make sure failed tests are not counted as
+  "unexpected error".
+  (Damien Doligez, review by Sébastien Hinderer)
+
 ### Internal/compiler-libs changes:
 
 - #10045: Add libext variable to ocamltest and enable C# tests on on mingw
