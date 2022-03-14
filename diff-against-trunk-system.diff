@@ -2,10 +2,10 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index c714ce7dbe..9879dd372f 100644
+index bfb2bd3fcb..93631ca4ec 100644
 --- a/Changes
 +++ b/Changes
-@@ -175,6 +175,9 @@ Working version
+@@ -179,6 +179,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -15,7 +15,7 @@ index c714ce7dbe..9879dd372f 100644
  ### Bug fixes:
  
  - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-@@ -223,13 +226,13 @@ OCaml 4.14.0
+@@ -227,13 +230,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -31,7 +31,7 @@ index c714ce7dbe..9879dd372f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -329,6 +332,9 @@ OCaml 4.14.0
+@@ -333,6 +336,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -41,7 +41,7 @@ index c714ce7dbe..9879dd372f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -577,6 +583,9 @@ OCaml 4.14.0
+@@ -581,6 +587,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -2290,10 +2290,10 @@ index 0000000000..47cf42c23a
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..f7de157c29
+index 0000000000..198bb1c7f3
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3296 @@
+@@ -0,0 +1,3309 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7dbc7d08dc..53ebb005ca 100644
 +--- a/ocamltest/Makefile
@@ -5590,9 +5590,22 @@ index 0000000000..f7de157c29
 + *)
 + 
 + let size = 1000;;
++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
++index 1d16b72d4e..956ec369ab 100644
++--- a/testsuite/tools/asmgen_i386.S
+++++ b/testsuite/tools/asmgen_i386.S
++@@ -49,7 +49,7 @@ G(call_gen_code):
++ G(caml_c_call):
++         jmp     *%eax
++ 
++-        .comm   G(Caml_state), 4
+++        .comm   G(caml_state), 4
++ 
++ /* Some tests are designed to cause registers to spill; on
++  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..23c5ba4dbc
+index 0000000000..324b66ea2e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5572 @@
@@ -5600,10 +5613,10 @@ index 0000000000..23c5ba4dbc
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index c714ce7dbe..9879dd372f 100644
++index bfb2bd3fcb..93631ca4ec 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -175,6 +175,9 @@ Working version
++@@ -179,6 +179,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5613,7 +5626,7 @@ index 0000000000..23c5ba4dbc
 + ### Bug fixes:
 + 
 + - #11025, #11036: Do not pass -no-pie to the C compiler on musl/arm64
-+@@ -223,13 +226,13 @@ OCaml 4.14.0
++@@ -227,13 +230,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5629,7 +5642,7 @@ index 0000000000..23c5ba4dbc
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -329,6 +332,9 @@ OCaml 4.14.0
++@@ -333,6 +336,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5639,7 +5652,7 @@ index 0000000000..23c5ba4dbc
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -577,6 +583,9 @@ OCaml 4.14.0
++@@ -581,6 +587,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -7888,10 +7901,10 @@ index 0000000000..23c5ba4dbc
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..f7de157c29
++index 0000000000..198bb1c7f3
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3296 @@
++@@ -0,0 +1,3309 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7dbc7d08dc..53ebb005ca 100644
 ++--- a/ocamltest/Makefile
