@@ -15,6 +15,14 @@
 
 /* POSIX thread implementation of the "st" interface */
 
+Caml_inline void st_msleep(int msec)
+{
+  struct timeval timeout = {0, msec * 1000};
+  /* select() seems to be the most efficient way to suspend the
+     thread for sub-second intervals */
+  select(0, NULL, NULL, NULL, &timeout);
+}
+
 #include "st_pthreads.h"
 
 /* Signal handling */
