@@ -1,25 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..857c3f18e3
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:04.928646288 +0100
-++++ b	2023-09-28 18:44:04.944646943 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -181,6 +181,9 @@ Working version
-++@@ -184,6 +184,9 @@ Working version
-+  
-+  ### Bug fixes:
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 9524dae79c..8439de34ce 100644
+index aa80a7ccd8..948541817a 100644
 --- a/Changes
 +++ b/Changes
-@@ -179,6 +179,9 @@ Working version
+@@ -186,6 +186,9 @@ Working version
    DEFAULT_STRING=safe which are now the default unconditionally.
    (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
  
@@ -29,7 +15,7 @@ index 9524dae79c..8439de34ce 100644
  ### Bug fixes:
  
  - #11112: harden -use-runtime against spaces or quotes in the provided path
-@@ -230,13 +233,13 @@ OCaml 4.14.0
+@@ -237,13 +240,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -45,7 +31,7 @@ index 9524dae79c..8439de34ce 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -336,6 +339,9 @@ OCaml 4.14.0
+@@ -343,6 +346,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -55,7 +41,7 @@ index 9524dae79c..8439de34ce 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -584,6 +590,9 @@ OCaml 4.14.0
+@@ -591,6 +597,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5619,32 +5605,18 @@ index 0000000000..198bb1c7f3
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..66aabb978c
+index 0000000000..8216b572e5
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5577 @@
+@@ -0,0 +1,5571 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..857c3f18e3
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:04.928646288 +0100
-+++++ b	2023-09-28 18:44:04.944646943 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -181,6 +181,9 @@ Working version
-+++@@ -184,6 +184,9 @@ Working version
-++  
-++  ### Bug fixes:
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 9524dae79c..8439de34ce 100644
++index aa80a7ccd8..948541817a 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -179,6 +179,9 @@ Working version
++@@ -186,6 +186,9 @@ Working version
 +   DEFAULT_STRING=safe which are now the default unconditionally.
 +   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 + 
@@ -5654,7 +5626,7 @@ index 0000000000..66aabb978c
 + ### Bug fixes:
 + 
 + - #11112: harden -use-runtime against spaces or quotes in the provided path
-+@@ -230,13 +233,13 @@ OCaml 4.14.0
++@@ -237,13 +240,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5670,7 +5642,7 @@ index 0000000000..66aabb978c
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -336,6 +339,9 @@ OCaml 4.14.0
++@@ -343,6 +346,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5680,7 +5652,7 @@ index 0000000000..66aabb978c
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -584,6 +590,9 @@ OCaml 4.14.0
++@@ -591,6 +597,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -11199,7 +11171,15 @@ index 0000000000..66aabb978c
 ++@@ -1,4 +1,7 @@
 ++-(* TEST *)
 +++(* TEST
-+++   * s
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handove
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
