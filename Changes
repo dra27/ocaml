@@ -8,6 +8,12 @@ OCaml 4.14 maintenance version
   relative branch offsets, reported as errors by the assembler.
   (Xavier Leroy, review by Vincent Laviron, report by Raphaël Proust)
 
+### Tools:
+
+- #11100: Fix ocamltest to make sure failed tests are not counted as
+  "unexpected error".
+  (Damien Doligez, review by Sébastien Hinderer)
+
 ### Build system:
 
 - #12372, #14572: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
