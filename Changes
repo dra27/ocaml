@@ -10,6 +10,12 @@ OCaml 4.13 maintenance branch
 * #10723: do not use `-flat-namespace` linking for macOS.
   (Carlo Cabrera, review by Damien Doligez)
 
+### Tools:
+
+- #11100: Fix ocamltest to make sure failed tests are not counted as
+  "unexpected error".
+  (Damien Doligez, review by Sébastien Hinderer)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
