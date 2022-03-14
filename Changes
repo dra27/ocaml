@@ -25,6 +25,12 @@ OCaml 4.09 maintenance branch
   constants.  Fixes compatibility with the integrated assembler in clang 11.0.0.
   (Jacob Young, review by Nicolás Ojeda Bär)
 
+### Tools:
+
+- #11100: Fix ocamltest to make sure failed tests are not counted as
+  "unexpected error".
+  (Damien Doligez, review by Sébastien Hinderer)
+
 ### Compiler user-interface and warnings:
 
 - #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
