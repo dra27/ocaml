@@ -1,9 +1,9 @@
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index 7dbc7d08dc..53ebb005ca 100644
+index 040158a60b..36fb4fcb1e 100644
 --- a/ocamltest/Makefile
 +++ b/ocamltest/Makefile
-@@ -272,6 +272,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
- 	    $(call SUBST,CCOMPTYPE) \
+@@ -274,6 +274,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+ 	    $(call SUBST,DIFF_FLAGS) \
  	    $(call SUBST,WINDOWS_UNICODE) \
  	    $(call SUBST,FUNCTION_SECTIONS) \
 +	    $(call SUBST,NAKED_POINTERS) \
@@ -36,20 +36,20 @@ index 02a437db3a..0f2974d12a 100644
      copy;
    ]
 diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-index 785235ab7e..2f03f01989 100644
+index 399d3c3cef..876d4ac79c 100644
 --- a/ocamltest/ocamltest_config.ml.in
 +++ b/ocamltest/ocamltest_config.ml.in
-@@ -84,3 +84,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
+@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
  let function_sections = %%FUNCTION_SECTIONS%%
  
  let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
 +
 +let naked_pointers = %%NAKED_POINTERS%%
 diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-index ab01b62f34..ce9e084bdf 100644
+index 564ef7644e..92cf631912 100644
 --- a/ocamltest/ocamltest_config.mli
 +++ b/ocamltest/ocamltest_config.mli
-@@ -118,3 +118,6 @@ val function_sections : bool
+@@ -124,3 +124,6 @@ val function_sections : bool
  
  val instrumented_runtime : bool
  (** Whether the instrumented runtime is available *)

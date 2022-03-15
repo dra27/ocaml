@@ -1,20 +1,29 @@
---- a	2023-09-28 18:44:05.784681310 +0100
-+++ b	2023-09-28 18:44:05.800681965 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -191,9 +191,6 @@ Working version
-+@@ -194,9 +194,6 @@ Working version
-  - #11112: harden -use-runtime against spaces or quotes in the provided path
-    (Gabriel Scherer, report by Brahima Dibassi, review by David Allsopp)
+--- a	2023-09-28 18:44:06.100694236 +0100
++++ b	2023-09-28 18:44:06.108694563 +0100
+@@ -26,7 +26,7 @@
+  # Note: This is present for the flexdll bootstrap where it exposed as the old
+  # TOOLPREF variable. It would be better if flexdll where updated to require
+  # WINDRES instead.
+-@@ -302,7 +303,7 @@ AC_ARG_WITH([odoc],
++@@ -304,7 +305,7 @@ AC_ARG_WITH([odoc],
   
-@@ -11,7 +11,7 @@
-  - #11068, #11070: Fix typo in function name given in Unix_error exception for
-    Unix.readlink on Windows.
-    (David Allsopp, report by Xia Li-yao)
--@@ -694,6 +691,13 @@ OCaml 4.14.0
-+@@ -703,6 +700,13 @@ OCaml 4.14.0
-    (Fabrice Buoro, with help from Stephen Dolan, Tom Kelly and Mark Shinwell,
-    review by Xavier Leroy)
+  AC_ARG_ENABLE([ocamltest],
+    [AS_HELP_STRING([--disable-ocamltest],
+@@ -35,7 +35,7 @@
   
+  AC_ARG_ENABLE([native-toplevel],
+    [AS_HELP_STRING([--enable-native-toplevel],
+-@@ -1878,6 +1879,22 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
++@@ -1916,6 +1917,22 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
+    [yes,*|,true],[ocamltest='ocamltest'],
+    [ocamltest=''])
+  
+@@ -85,7 +85,7 @@
+ +	    $(call SUBST,DIFF_FLAGS) \
+  	    $(call SUBST,WINDOWS_UNICODE) \
+  	    $(call SUBST,FUNCTION_SECTIONS) \
+- 	    $< > $@
++ 	    $(call SUBST,NAKED_POINTERS) \
+ diff --git a/ocamltest/filecompare.ml b/ocamltest/filecompare.ml
+ --- a/ocamltest/filecompare.ml
+ +++ b/ocamltest/filecompare.ml
