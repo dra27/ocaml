@@ -1,8 +1,31 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..acb134726d
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:44:05.784681310 +0100
+++++ b	2023-09-28 18:44:05.800681965 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -191,9 +191,6 @@ Working version
+++@@ -194,9 +194,6 @@ Working version
++  - #11112: harden -use-runtime against spaces or quotes in the provided path
++    (Gabriel Scherer, report by Brahima Dibassi, review by David Allsopp)
++  
++@@ -11,7 +11,7 @@
++  - #11068, #11070: Fix typo in function name given in Unix_error exception for
++    Unix.readlink on Windows.
++    (David Allsopp, report by Xia Li-yao)
++-@@ -694,6 +691,13 @@ OCaml 4.14.0
+++@@ -703,6 +700,13 @@ OCaml 4.14.0
++    (Fabrice Buoro, with help from Stephen Dolan, Tom Kelly and Mark Shinwell,
++    review by Xavier Leroy)
++  
 diff --git a/Changes b/Changes
-index 230f2c2d34..c48a4e0787 100644
+index 844b003809..2011e0dcfc 100644
 --- a/Changes
 +++ b/Changes
 @@ -186,6 +186,9 @@ Working version
@@ -15,7 +38,7 @@ index 230f2c2d34..c48a4e0787 100644
  ### Bug fixes:
  
  - #11112: harden -use-runtime against spaces or quotes in the provided path
-@@ -237,13 +240,13 @@ OCaml 4.14.0
+@@ -234,13 +237,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -31,7 +54,7 @@ index 230f2c2d34..c48a4e0787 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -343,6 +346,9 @@ OCaml 4.14.0
+@@ -340,6 +343,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -41,7 +64,7 @@ index 230f2c2d34..c48a4e0787 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -591,6 +597,9 @@ OCaml 4.14.0
+@@ -588,6 +594,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5605,15 +5628,38 @@ index 0000000000..198bb1c7f3
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ecf13dca2c
+index 0000000000..31b3a64409
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5571 @@
+@@ -0,0 +1,5574 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..acb134726d
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:44:05.784681310 +0100
++++++ b	2023-09-28 18:44:05.800681965 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -191,9 +191,6 @@ Working version
++++@@ -194,9 +194,6 @@ Working version
+++  - #11112: harden -use-runtime against spaces or quotes in the provided path
+++    (Gabriel Scherer, report by Brahima Dibassi, review by David Allsopp)
+++  
+++@@ -11,7 +11,7 @@
+++  - #11068, #11070: Fix typo in function name given in Unix_error exception for
+++    Unix.readlink on Windows.
+++    (David Allsopp, report by Xia Li-yao)
+++-@@ -694,6 +691,13 @@ OCaml 4.14.0
++++@@ -703,6 +700,13 @@ OCaml 4.14.0
+++    (Fabrice Buoro, with help from Stephen Dolan, Tom Kelly and Mark Shinwell,
+++    review by Xavier Leroy)
+++  
 +diff --git a/Changes b/Changes
-+index 230f2c2d34..c48a4e0787 100644
++index 844b003809..2011e0dcfc 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -186,6 +186,9 @@ Working version
@@ -5626,7 +5672,7 @@ index 0000000000..ecf13dca2c
 + ### Bug fixes:
 + 
 + - #11112: harden -use-runtime against spaces or quotes in the provided path
-+@@ -237,13 +240,13 @@ OCaml 4.14.0
++@@ -234,13 +237,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5642,7 +5688,7 @@ index 0000000000..ecf13dca2c
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -343,6 +346,9 @@ OCaml 4.14.0
++@@ -340,6 +343,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5652,7 +5698,7 @@ index 0000000000..ecf13dca2c
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -591,6 +597,9 @@ OCaml 4.14.0
++@@ -588,6 +594,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -11159,27 +11205,7 @@ index 0000000000..ecf13dca2c
 ++-(* TEST *)
 +++(* TEST
 +++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handove
++++   re
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

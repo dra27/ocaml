@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:44:05.784681310 +0100
++++ b	2023-09-28 18:44:05.800681965 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -191,9 +191,6 @@ Working version
++@@ -194,9 +194,6 @@ Working version
+  - #11112: harden -use-runtime against spaces or quotes in the provided path
+    (Gabriel Scherer, report by Brahima Dibassi, review by David Allsopp)
+  
+@@ -11,7 +11,7 @@
+  - #11068, #11070: Fix typo in function name given in Unix_error exception for
+    Unix.readlink on Windows.
+    (David Allsopp, report by Xia Li-yao)
+-@@ -694,6 +691,13 @@ OCaml 4.14.0
++@@ -703,6 +700,13 @@ OCaml 4.14.0
+    (Fabrice Buoro, with help from Stephen Dolan, Tom Kelly and Mark Shinwell,
+    review by Xavier Leroy)
+  
