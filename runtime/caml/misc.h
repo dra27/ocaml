@@ -242,8 +242,13 @@ typedef char char_os;
 CAMLnoreturn_start
 CAMLextern void caml_failed_assert (char *, char_os *, int)
 CAMLnoreturn_end;
+
+#define CAMLassert_zero(e) CAMLassert((e) == 0)
+#define CAMLassert_nonzero(e) CAMLassert((e) != 0)
 #else
 #define CAMLassert(x) ((void) 0)
+#define CAMLassert_zero(e) e
+#define CAMLassert_nonzero(e) e
 #endif
 
 #ifdef CAML_INTERNALS
