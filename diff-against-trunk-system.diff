@@ -1,52 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7e293aed66
+index 0000000000..50739b13ff
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,41 @@
-+--- a	2023-09-28 18:44:06.368705193 +0100
-++++ b	2023-09-28 18:44:06.376705520 +0100
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:06.628715823 +0100
+++++ b	2023-09-28 18:44:06.640716313 +0100
 +@@ -1,7 +1,7 @@
-+ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+ --- a/asmcomp/arm64/emit.mlp
-+ +++ b/asmcomp/arm64/emit.mlp
-+-@@ -742,12 +742,14 @@ let emit_instr env i =
-++@@ -772,12 +772,14 @@ let emit_instr env i =
-+               NB: no need to store previous x29 because OCaml frames don't
-+               maintain frame pointer *)
-+            ` mov x29, sp\n`;
-+@@ -16,9 +16,9 @@
-+ +          ` mov sp, x29\n`;
-+ +          cfi_restore_state ()
-+          end
-++ *)
-+      | Lop(Istackoffset n) ->
-+-         assert (n mod 16 = 0);
-+-@@ -1166,7 +1168,14 @@ let begin_assembly() =
-++@@ -1222,7 +1224,14 @@ let begin_assembly() =
-+    let lbl_begin = Compilenv.make_symbol (Some "code_begin") in
-+    emit_named_text_section lbl_begin;
-+    `	.globl	{emit_symbol lbl_begin}\n`;
-+@@ -67,7 +67,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -792,9 +792,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-++@@ -802,9 +802,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-+      [AC_MSG_ERROR([flexlink is required for native Win32])])
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -195,10 +195,15 @@ Working version
+++@@ -198,10 +198,15 @@ Working version
++    Unix.readlink on Windows.
++    (David Allsopp, report by Xia Li-yao)
 +  
-+  AS_CASE([$cc_basename,$host],
-+@@ -80,7 +80,7 @@
-+    [*,*-*-haiku*], [mathlib=""],
-+    [*,*-*-cygwin*],
-+      [common_cppflags="$common_cppflags -U_WIN32"
-+-@@ -933,11 +935,15 @@ natdynlinkopts=""
-++@@ -943,11 +945,15 @@ natdynlinkopts=""
-+  
-+  AS_IF([test x"$enable_shared" != "xno"],
-+    [AS_CASE([$host],
 diff --git a/Changes b/Changes
-index 844b003809..2011e0dcfc 100644
+index b57b11d927..3e82708e3c 100644
 --- a/Changes
 +++ b/Changes
 @@ -186,6 +186,9 @@ Working version
@@ -59,7 +29,7 @@ index 844b003809..2011e0dcfc 100644
  ### Bug fixes:
  
  - #11112: harden -use-runtime against spaces or quotes in the provided path
-@@ -234,13 +237,13 @@ OCaml 4.14.0
+@@ -239,13 +242,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -75,7 +45,7 @@ index 844b003809..2011e0dcfc 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -340,6 +343,9 @@ OCaml 4.14.0
+@@ -345,6 +348,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -85,7 +55,7 @@ index 844b003809..2011e0dcfc 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -588,6 +594,9 @@ OCaml 4.14.0
+@@ -593,6 +599,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5649,59 +5619,29 @@ index 0000000000..f92c3097f4
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..304a618020
+index 0000000000..523bf629d9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5572 @@
+@@ -0,0 +1,5573 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..7e293aed66
++index 0000000000..50739b13ff
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,41 @@
-++--- a	2023-09-28 18:44:06.368705193 +0100
-+++++ b	2023-09-28 18:44:06.376705520 +0100
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:06.628715823 +0100
++++++ b	2023-09-28 18:44:06.640716313 +0100
 ++@@ -1,7 +1,7 @@
-++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-++ --- a/asmcomp/arm64/emit.mlp
-++ +++ b/asmcomp/arm64/emit.mlp
-++-@@ -742,12 +742,14 @@ let emit_instr env i =
-+++@@ -772,12 +772,14 @@ let emit_instr env i =
-++               NB: no need to store previous x29 because OCaml frames don't
-++               maintain frame pointer *)
-++            ` mov x29, sp\n`;
-++@@ -16,9 +16,9 @@
-++ +          ` mov sp, x29\n`;
-++ +          cfi_restore_state ()
-++          end
-+++ *)
-++      | Lop(Istackoffset n) ->
-++-         assert (n mod 16 = 0);
-++-@@ -1166,7 +1168,14 @@ let begin_assembly() =
-+++@@ -1222,7 +1224,14 @@ let begin_assembly() =
-++    let lbl_begin = Compilenv.make_symbol (Some "code_begin") in
-++    emit_named_text_section lbl_begin;
-++    `	.globl	{emit_symbol lbl_begin}\n`;
-++@@ -67,7 +67,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -792,9 +792,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-+++@@ -802,9 +802,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-++      [AC_MSG_ERROR([flexlink is required for native Win32])])
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -195,10 +195,15 @@ Working version
++++@@ -198,10 +198,15 @@ Working version
+++    Unix.readlink on Windows.
+++    (David Allsopp, report by Xia Li-yao)
 ++  
-++  AS_CASE([$cc_basename,$host],
-++@@ -80,7 +80,7 @@
-++    [*,*-*-haiku*], [mathlib=""],
-++    [*,*-*-cygwin*],
-++      [common_cppflags="$common_cppflags -U_WIN32"
-++-@@ -933,11 +935,15 @@ natdynlinkopts=""
-+++@@ -943,11 +945,15 @@ natdynlinkopts=""
-++  
-++  AS_IF([test x"$enable_shared" != "xno"],
-++    [AS_CASE([$host],
 +diff --git a/Changes b/Changes
-+index 844b003809..2011e0dcfc 100644
++index b57b11d927..3e82708e3c 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -186,6 +186,9 @@ Working version
@@ -5714,7 +5654,7 @@ index 0000000000..304a618020
 + ### Bug fixes:
 + 
 + - #11112: harden -use-runtime against spaces or quotes in the provided path
-+@@ -234,13 +237,13 @@ OCaml 4.14.0
++@@ -239,13 +242,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5730,7 +5670,7 @@ index 0000000000..304a618020
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -340,6 +343,9 @@ OCaml 4.14.0
++@@ -345,6 +348,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5740,7 +5680,7 @@ index 0000000000..304a618020
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -588,6 +594,9 @@ OCaml 4.14.0
++@@ -593,6 +599,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -11224,7 +11164,38 @@ index 0000000000..304a618020
 ++-         Type t/284 came from this include
 +++         Type t/279 came from this include
 ++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/2
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finalise
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
