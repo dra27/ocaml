@@ -58,6 +58,10 @@ jobs:
         run: brew install parallel
       - uses: dra27/setup-ocaml@multicore
         if: ${{ matrix.os == 'windows-latest' }}
+      - name: OS Dependencies
+        if: runner.os == 'Windows'
+        run: |
+          bash -c 'tools/ci/actions/runner.sh parallel'
       - name: configure tree
         run: |
           bash -c 'CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j XARCH=x64 tools/ci/actions/runner.sh configure'

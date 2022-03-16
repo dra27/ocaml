@@ -166,6 +166,13 @@ BasicCompiler () {
   ReportBuildStatus 0
 }
 
+Parallel () {
+  PARALLEL_URL='https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel'
+  curl -Ls $PARALLEL_URL -o '/usr/bin/parallel'
+  chmod +x /usr/bin/parallel
+  parallel --version
+}
+
 if [ "$(uname -o)" = "Cygwin" ] ; then
   export PATH="/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH"
 fi
@@ -180,6 +187,7 @@ install) Install;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
+parallel) Parallel;;
 *) echo "Unknown CI instruction: $1"
    exit 1;;
 esac
