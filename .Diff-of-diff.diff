@@ -1,11 +1,11 @@
---- a	2023-09-28 18:44:06.628715823 +0100
-+++ b	2023-09-28 18:44:06.640716313 +0100
+--- a	2023-09-28 18:44:07.112735608 +0100
++++ b	2023-09-28 18:44:07.128736262 +0100
 @@ -1,7 +1,7 @@
  diff --git a/Changes b/Changes
  --- a/Changes
  +++ b/Changes
--@@ -195,10 +195,15 @@ Working version
-+@@ -198,10 +198,15 @@ Working version
-    Unix.readlink on Windows.
-    (David Allsopp, report by Xia Li-yao)
+-@@ -702,6 +702,9 @@ OCaml 4.14.0
++@@ -711,6 +711,9 @@ OCaml 4.14.0
+  - #11101, #11109: A recursive type constraint fails on 4.14
+    (Jacques Garrigue, report and review by Florian Angeletti)
   

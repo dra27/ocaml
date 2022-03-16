@@ -1,22 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..50739b13ff
+index 0000000000..4605e22c01
 --- /dev/null
 +++ b/.Diff-of-diff.diff
 @@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:06.628715823 +0100
-++++ b	2023-09-28 18:44:06.640716313 +0100
++--- a	2023-09-28 18:44:07.112735608 +0100
+++++ b	2023-09-28 18:44:07.128736262 +0100
 +@@ -1,7 +1,7 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -195,10 +195,15 @@ Working version
-++@@ -198,10 +198,15 @@ Working version
-+    Unix.readlink on Windows.
-+    (David Allsopp, report by Xia Li-yao)
++-@@ -702,6 +702,9 @@ OCaml 4.14.0
+++@@ -711,6 +711,9 @@ OCaml 4.14.0
++  - #11101, #11109: A recursive type constraint fails on 4.14
++    (Jacques Garrigue, report and review by Florian Angeletti)
 +  
 diff --git a/Changes b/Changes
-index b57b11d927..3e82708e3c 100644
+index ab1aa836ec..924084acac 100644
 --- a/Changes
 +++ b/Changes
 @@ -186,6 +186,9 @@ Working version
@@ -2304,10 +2304,10 @@ index 0000000000..47cf42c23a
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..d1ce6c17da
+index 0000000000..cf1c62f286
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3309 @@
+@@ -0,0 +1,3323 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 0aa5f92651..11782f7f9f 100644
 +--- a/ocamltest/Makefile
@@ -2366,6 +2366,20 @@ index 0000000000..d1ce6c17da
 ++
 ++val naked_pointers : bool
 ++(** Whether the runtime system supports naked pointers outside the heap *)
++diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
++index 7b576135b7..5b2298e696 100644
++--- a/ocamltest/run_unix.c
+++++ b/ocamltest/run_unix.c
++@@ -347,7 +347,9 @@ int run_command(const command_settings *settings)
++       myperror("fork");
++       return -1;
++     case 0: /* child process */
+++#if 0
++       caml_atfork_hook();
+++#endif
++       exit( run_command_child(settings) );
++     default:
++       return run_command_parent(settings, child_pid);
 +diff --git a/testsuite/tests/asmcomp/is_in_static_data.c b/testsuite/tests/asmcomp/is_in_static_data.c
 +new file mode 100644
 +index 0000000000..ccf0582c0a
@@ -5619,29 +5633,29 @@ index 0000000000..d1ce6c17da
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f41f883d11
+index 0000000000..9030535dbb
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5573 @@
+@@ -0,0 +1,5574 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..50739b13ff
++index 0000000000..4605e22c01
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
 +@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:06.628715823 +0100
-+++++ b	2023-09-28 18:44:06.640716313 +0100
+++--- a	2023-09-28 18:44:07.112735608 +0100
++++++ b	2023-09-28 18:44:07.128736262 +0100
 ++@@ -1,7 +1,7 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -195,10 +195,15 @@ Working version
-+++@@ -198,10 +198,15 @@ Working version
-++    Unix.readlink on Windows.
-++    (David Allsopp, report by Xia Li-yao)
+++-@@ -702,6 +702,9 @@ OCaml 4.14.0
++++@@ -711,6 +711,9 @@ OCaml 4.14.0
+++  - #11101, #11109: A recursive type constraint fails on 4.14
+++    (Jacques Garrigue, report and review by Florian Angeletti)
 ++  
 +diff --git a/Changes b/Changes
-+index b57b11d927..3e82708e3c 100644
++index ab1aa836ec..924084acac 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -186,6 +186,9 @@ Working version
@@ -7929,10 +7943,10 @@ index 0000000000..f41f883d11
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..d1ce6c17da
++index 0000000000..cf1c62f286
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3309 @@
++@@ -0,0 +1,3323 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 0aa5f92651..11782f7f9f 100644
 ++--- a/ocamltest/Makefile
@@ -7991,6 +8005,20 @@ index 0000000000..f41f883d11
 +++
 +++val naked_pointers : bool
 +++(** Whether the runtime system supports naked pointers outside the heap *)
+++diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
+++index 7b576135b7..5b2298e696 100644
+++--- a/ocamltest/run_unix.c
++++++ b/ocamltest/run_unix.c
+++@@ -347,7 +347,9 @@ int run_command(const command_settings *settings)
+++       myperror("fork");
+++       return -1;
+++     case 0: /* child process */
++++#if 0
+++       caml_atfork_hook();
++++#endif
+++       exit( run_command_child(settings) );
+++     default:
+++       return run_command_parent(settings, child_pid);
 ++diff --git a/testsuite/tests/asmcomp/is_in_static_data.c b/testsuite/tests/asmcomp/is_in_static_data.c
 ++new file mode 100644
 ++index 0000000000..ccf0582c0a
@@ -11182,20 +11210,7 @@ index 0000000000..f41f883d11
 ++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
 ++index 744c4e844d..621d7292ff 100644
 ++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finalise
++++++ b/testsuite/tests/weak-ephe-final/ephetes
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
