@@ -21,6 +21,7 @@
 #include <sys/time.h>
 #include "caml/platform.h"
 #include "caml/fail.h"
+#include "caml/lf_skiplist.h"
 #ifdef HAS_SYS_MMAN_H
 #include <sys/mman.h>
 #endif
@@ -144,11 +145,25 @@ uintnat caml_mem_round_up_pages(uintnat size)
 #define MAP_FAILED 0
 #endif
 
+#ifdef DEBUG
+static struct lf_skiplist mmap_blocks = {NULL};
+static caml_plat_mutex mmap_blocks_lock = CAML_PLAT_MUTEX_INITIALIZER;
+#endif
+
 void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
   uintnat alloc_sz = caml_mem_round_up_pages(size + alignment);
   void* mem;
   uintnat base, aligned_start, aligned_end;
+
+#ifdef DEBUG
+  if (mmap_blocks.head == NULL) {
+    caml_plat_lock(&mmap_blocks_lock);
+    if (mmap_blocks.head == NULL)
+      caml_lf_skiplist_init(&mmap_blocks);
+    caml_plat_unlock(&mmap_blocks_lock);
+  }
+#endif
 
   CAMLassert(Is_power_of_2(alignment));
   alignment = caml_mem_round_up_pages(alignment);
@@ -198,6 +213,9 @@ again:
   munmap((void*)base, aligned_start - base);
   munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
 #endif
+#ifdef DEBUG
+  caml_lf_skiplist_insert(&mmap_blocks, aligned_start, size);
+#endif
   return (void*)aligned_start;
 }
 
@@ -245,10 +263,18 @@ void caml_mem_decommit(void* mem, uintnat size)
 
 void caml_mem_unmap(void* mem, uintnat size)
 {
+#ifdef DEBUG
+  uintnat data;
+  CAMLassert(caml_lf_skiplist_find(&mmap_blocks, (uintnat)mem, &data) != 0);
+  CAMLassert(data == size);
+#endif
 #ifdef _WIN32
   CAMLassert_nonzero(VirtualFree(mem, 0, MEM_RELEASE));
 #else
   CAMLassert_zero(munmap(mem, size));
+#endif
+#ifdef DEBUG
+  caml_lf_skiplist_remove(&mmap_blocks, (uintnat)mem);
 #endif
 }
 
