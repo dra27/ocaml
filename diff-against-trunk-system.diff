@@ -1,38 +1,50 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..aa30ac6c2f
+index 0000000000..7e293aed66
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:44:06.100694236 +0100
-++++ b	2023-09-28 18:44:06.108694563 +0100
-+@@ -26,7 +26,7 @@
-+  # Note: This is present for the flexdll bootstrap where it exposed as the old
-+  # TOOLPREF variable. It would be better if flexdll where updated to require
-+  # WINDRES instead.
-+-@@ -302,7 +303,7 @@ AC_ARG_WITH([odoc],
-++@@ -304,7 +305,7 @@ AC_ARG_WITH([odoc],
+@@ -0,0 +1,41 @@
++--- a	2023-09-28 18:44:06.368705193 +0100
+++++ b	2023-09-28 18:44:06.376705520 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -742,12 +742,14 @@ let emit_instr env i =
+++@@ -772,12 +772,14 @@ let emit_instr env i =
++               NB: no need to store previous x29 because OCaml frames don't
++               maintain frame pointer *)
++            ` mov x29, sp\n`;
++@@ -16,9 +16,9 @@
++ +          ` mov sp, x29\n`;
++ +          cfi_restore_state ()
++          end
+++ *)
++      | Lop(Istackoffset n) ->
++-         assert (n mod 16 = 0);
++-@@ -1166,7 +1168,14 @@ let begin_assembly() =
+++@@ -1222,7 +1224,14 @@ let begin_assembly() =
++    let lbl_begin = Compilenv.make_symbol (Some "code_begin") in
++    emit_named_text_section lbl_begin;
++    `	.globl	{emit_symbol lbl_begin}\n`;
++@@ -67,7 +67,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -792,9 +792,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+++@@ -802,9 +802,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++      [AC_MSG_ERROR([flexlink is required for native Win32])])
 +  
-+  AC_ARG_ENABLE([ocamltest],
-+    [AS_HELP_STRING([--disable-ocamltest],
-+@@ -35,7 +35,7 @@
++  AS_CASE([$cc_basename,$host],
++@@ -80,7 +80,7 @@
++    [*,*-*-haiku*], [mathlib=""],
++    [*,*-*-cygwin*],
++      [common_cppflags="$common_cppflags -U_WIN32"
++-@@ -933,11 +935,15 @@ natdynlinkopts=""
+++@@ -943,11 +945,15 @@ natdynlinkopts=""
 +  
-+  AC_ARG_ENABLE([native-toplevel],
-+    [AS_HELP_STRING([--enable-native-toplevel],
-+-@@ -1878,6 +1879,22 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-++@@ -1916,6 +1917,22 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-+    [yes,*|,true],[ocamltest='ocamltest'],
-+    [ocamltest=''])
-+  
-+@@ -85,7 +85,7 @@
-+ +	    $(call SUBST,DIFF_FLAGS) \
-+  	    $(call SUBST,WINDOWS_UNICODE) \
-+  	    $(call SUBST,FUNCTION_SECTIONS) \
-+- 	    $< > $@
-++ 	    $(call SUBST,NAKED_POINTERS) \
-+ diff --git a/ocamltest/filecompare.ml b/ocamltest/filecompare.ml
-+ --- a/ocamltest/filecompare.ml
-+ +++ b/ocamltest/filecompare.ml
++  AS_IF([test x"$enable_shared" != "xno"],
++    [AS_CASE([$host],
 diff --git a/Changes b/Changes
 index 844b003809..2011e0dcfc 100644
 --- a/Changes
@@ -319,7 +331,7 @@ index 64b05a95c8..dbeaff0cbe 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index cabc353d3d..0ddb8f699e 100644
+index 3a3a9e5d0a..b338424dad 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -35,8 +35,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -415,15 +427,15 @@ index cabc353d3d..0ddb8f699e 100644
          end else begin
            (* store ocaml stack in the frame pointer register
               NB: no need to store previous x29 because OCaml frames don't
-@@ -749,6 +779,7 @@ let emit_instr env i =
-           ` mov sp, x29\n`
-           (* TODO: CFI for this *)
+@@ -751,6 +781,7 @@ let emit_instr env i =
+           ` mov sp, x29\n`;
+           cfi_restore_state ()
          end
 +*)
      | Lop(Istackoffset n) ->
          assert (n mod 16 = 0);
          emit_stack_adjustment (-n);
-@@ -789,7 +820,11 @@ let emit_instr env i =
+@@ -791,7 +822,11 @@ let emit_instr env i =
          | Double ->
              `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
          end
@@ -435,7 +447,7 @@ index cabc353d3d..0ddb8f699e 100644
          (* NB: assignments other than Word_int and Word_val do not follow the
          Multicore OCaml memory model and so do not emit a barrier *)
          let src = i.arg.(0) in
-@@ -812,7 +847,9 @@ let emit_instr env i =
+@@ -814,7 +849,9 @@ let emit_instr env i =
              `	str	s7, {emit_addressing addr base}\n`;
          | Word_int | Word_val ->
              (* memory model barrier for non-initializing store *)
@@ -445,7 +457,7 @@ index cabc353d3d..0ddb8f699e 100644
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
          | Double ->
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
-@@ -937,8 +974,13 @@ let emit_instr env i =
+@@ -939,8 +976,13 @@ let emit_instr env i =
      | Lop(Ispecific(Isignext size)) ->
          `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
      | Lop(Idls_get) ->
@@ -459,7 +471,7 @@ index cabc353d3d..0ddb8f699e 100644
      | Lreloadretaddr ->
          ()
      | Lreturn ->
-@@ -1037,10 +1079,18 @@ let emit_instr env i =
+@@ -1039,10 +1081,18 @@ let emit_instr env i =
      | Lraise k ->
          begin match k with
          | Lambda.Raise_regular ->
@@ -478,7 +490,7 @@ index cabc353d3d..0ddb8f699e 100644
            `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
          | Lambda.Raise_notrace ->
            `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-@@ -1069,6 +1119,7 @@ let fundecl fundecl =
+@@ -1071,6 +1121,7 @@ let fundecl fundecl =
      num_call_gc_and_check_bound_points env
    in
  
@@ -486,7 +498,7 @@ index cabc353d3d..0ddb8f699e 100644
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
    let { max_frame_size; contains_nontail_calls} =
-@@ -1090,9 +1141,12 @@ let fundecl fundecl =
+@@ -1092,9 +1143,12 @@ let fundecl fundecl =
      handle_overflow := Some (overflow, ret);
      stack_check_size := 5
    end;
@@ -499,7 +511,7 @@ index cabc353d3d..0ddb8f699e 100644
      max_out_of_line_code_offset ~num_call_gc
        ~num_check_bound
    in
-@@ -1105,6 +1159,7 @@ let fundecl fundecl =
+@@ -1107,6 +1161,7 @@ let fundecl fundecl =
    assert (List.length env.call_gc_sites = num_call_gc);
    assert (List.length env.bound_error_sites = num_check_bound);
  
@@ -507,7 +519,7 @@ index cabc353d3d..0ddb8f699e 100644
    begin match !handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -1119,6 +1174,7 @@ let fundecl fundecl =
+@@ -1121,6 +1176,7 @@ let fundecl fundecl =
        `  b {emit_label ret}\n`
      end
    end;
@@ -594,10 +606,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index da64a19826..dcc03948db 100755
+index 9ad0d1c085..6c3ae4bd46 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 9b5b9d9171..4419ee2b03 100644
+index 18f674bacc..929eacc690 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -656,7 +668,7 @@ index 9b5b9d9171..4419ee2b03 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1014,6 +1024,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+@@ -1020,6 +1030,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
      [earm*-*-netbsd*], [natdynlink=true],
      [aarch64-*-linux*], [natdynlink=true],
      [aarch64-*-freebsd*], [natdynlink=true],
@@ -664,7 +676,7 @@ index 9b5b9d9171..4419ee2b03 100644
      [riscv*-*-linux*], [natdynlink=true])])
  
  AS_CASE([$enable_native_toplevel,$natdynlink],
-@@ -1043,77 +1054,77 @@ model=default
+@@ -1049,77 +1060,77 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -805,7 +817,7 @@ index 9b5b9d9171..4419ee2b03 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1124,12 +1135,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1130,12 +1141,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -826,7 +838,7 @@ index 9b5b9d9171..4419ee2b03 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1794,7 +1807,8 @@ AS_CASE([$arch,$system],
+@@ -1800,7 +1813,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -836,7 +848,7 @@ index 9b5b9d9171..4419ee2b03 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1843,6 +1857,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1849,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -867,7 +879,7 @@ index 9b5b9d9171..4419ee2b03 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1978,8 +2016,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1984,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -2322,16 +2334,16 @@ index 0000000000..47cf42c23a
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..198bb1c7f3
+index 0000000000..f92c3097f4
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3309 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+index 7dbc7d08dc..53ebb005ca 100644
++index 040158a60b..36fb4fcb1e 100644
 +--- a/ocamltest/Makefile
 ++++ b/ocamltest/Makefile
-+@@ -272,6 +272,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-+ 	    $(call SUBST,CCOMPTYPE) \
++@@ -274,6 +274,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
++ 	    $(call SUBST,DIFF_FLAGS) \
 + 	    $(call SUBST,WINDOWS_UNICODE) \
 + 	    $(call SUBST,FUNCTION_SECTIONS) \
 ++	    $(call SUBST,NAKED_POINTERS) \
@@ -2364,20 +2376,20 @@ index 0000000000..198bb1c7f3
 +     copy;
 +   ]
 +diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-+index 785235ab7e..2f03f01989 100644
++index 399d3c3cef..876d4ac79c 100644
 +--- a/ocamltest/ocamltest_config.ml.in
 ++++ b/ocamltest/ocamltest_config.ml.in
-+@@ -84,3 +84,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
++@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
 + let function_sections = %%FUNCTION_SECTIONS%%
 + 
 + let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
 ++
 ++let naked_pointers = %%NAKED_POINTERS%%
 +diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-+index ab01b62f34..ce9e084bdf 100644
++index 564ef7644e..92cf631912 100644
 +--- a/ocamltest/ocamltest_config.mli
 ++++ b/ocamltest/ocamltest_config.mli
-+@@ -118,3 +118,6 @@ val function_sections : bool
++@@ -124,3 +124,6 @@ val function_sections : bool
 + 
 + val instrumented_runtime : bool
 + (** Whether the instrumented runtime is available *)
@@ -5637,45 +5649,57 @@ index 0000000000..198bb1c7f3
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..35dcec36ce
+index 0000000000..304a618020
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5572 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..aa30ac6c2f
++index 0000000000..7e293aed66
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:44:06.100694236 +0100
-+++++ b	2023-09-28 18:44:06.108694563 +0100
-++@@ -26,7 +26,7 @@
-++  # Note: This is present for the flexdll bootstrap where it exposed as the old
-++  # TOOLPREF variable. It would be better if flexdll where updated to require
-++  # WINDRES instead.
-++-@@ -302,7 +303,7 @@ AC_ARG_WITH([odoc],
-+++@@ -304,7 +305,7 @@ AC_ARG_WITH([odoc],
++@@ -0,0 +1,41 @@
+++--- a	2023-09-28 18:44:06.368705193 +0100
++++++ b	2023-09-28 18:44:06.376705520 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -742,12 +742,14 @@ let emit_instr env i =
++++@@ -772,12 +772,14 @@ let emit_instr env i =
+++               NB: no need to store previous x29 because OCaml frames don't
+++               maintain frame pointer *)
+++            ` mov x29, sp\n`;
+++@@ -16,9 +16,9 @@
+++ +          ` mov sp, x29\n`;
+++ +          cfi_restore_state ()
+++          end
++++ *)
+++      | Lop(Istackoffset n) ->
+++-         assert (n mod 16 = 0);
+++-@@ -1166,7 +1168,14 @@ let begin_assembly() =
++++@@ -1222,7 +1224,14 @@ let begin_assembly() =
+++    let lbl_begin = Compilenv.make_symbol (Some "code_begin") in
+++    emit_named_text_section lbl_begin;
+++    `	.globl	{emit_symbol lbl_begin}\n`;
+++@@ -67,7 +67,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -792,9 +792,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++++@@ -802,9 +802,11 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+++      [AC_MSG_ERROR([flexlink is required for native Win32])])
 ++  
-++  AC_ARG_ENABLE([ocamltest],
-++    [AS_HELP_STRING([--disable-ocamltest],
-++@@ -35,7 +35,7 @@
+++  AS_CASE([$cc_basename,$host],
+++@@ -80,7 +80,7 @@
+++    [*,*-*-haiku*], [mathlib=""],
+++    [*,*-*-cygwin*],
+++      [common_cppflags="$common_cppflags -U_WIN32"
+++-@@ -933,11 +935,15 @@ natdynlinkopts=""
++++@@ -943,11 +945,15 @@ natdynlinkopts=""
 ++  
-++  AC_ARG_ENABLE([native-toplevel],
-++    [AS_HELP_STRING([--enable-native-toplevel],
-++-@@ -1878,6 +1879,22 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-+++@@ -1916,6 +1917,22 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-++    [yes,*|,true],[ocamltest='ocamltest'],
-++    [ocamltest=''])
-++  
-++@@ -85,7 +85,7 @@
-++ +	    $(call SUBST,DIFF_FLAGS) \
-++  	    $(call SUBST,WINDOWS_UNICODE) \
-++  	    $(call SUBST,FUNCTION_SECTIONS) \
-++- 	    $< > $@
-+++ 	    $(call SUBST,NAKED_POINTERS) \
-++ diff --git a/ocamltest/filecompare.ml b/ocamltest/filecompare.ml
-++ --- a/ocamltest/filecompare.ml
-++ +++ b/ocamltest/filecompare.ml
+++  AS_IF([test x"$enable_shared" != "xno"],
+++    [AS_CASE([$host],
 +diff --git a/Changes b/Changes
 +index 844b003809..2011e0dcfc 100644
 +--- a/Changes
@@ -5962,7 +5986,7 @@ index 0000000000..35dcec36ce
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index cabc353d3d..0ddb8f699e 100644
++index 3a3a9e5d0a..b338424dad 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -35,8 +35,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -6058,15 +6082,15 @@ index 0000000000..35dcec36ce
 +         end else begin
 +           (* store ocaml stack in the frame pointer register
 +              NB: no need to store previous x29 because OCaml frames don't
-+@@ -749,6 +779,7 @@ let emit_instr env i =
-+           ` mov sp, x29\n`
-+           (* TODO: CFI for this *)
++@@ -751,6 +781,7 @@ let emit_instr env i =
++           ` mov sp, x29\n`;
++           cfi_restore_state ()
 +         end
 ++*)
 +     | Lop(Istackoffset n) ->
 +         assert (n mod 16 = 0);
 +         emit_stack_adjustment (-n);
-+@@ -789,7 +820,11 @@ let emit_instr env i =
++@@ -791,7 +822,11 @@ let emit_instr env i =
 +         | Double ->
 +             `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
 +         end
@@ -6078,7 +6102,7 @@ index 0000000000..35dcec36ce
 +         (* NB: assignments other than Word_int and Word_val do not follow the
 +         Multicore OCaml memory model and so do not emit a barrier *)
 +         let src = i.arg.(0) in
-+@@ -812,7 +847,9 @@ let emit_instr env i =
++@@ -814,7 +849,9 @@ let emit_instr env i =
 +             `	str	s7, {emit_addressing addr base}\n`;
 +         | Word_int | Word_val ->
 +             (* memory model barrier for non-initializing store *)
@@ -6088,7 +6112,7 @@ index 0000000000..35dcec36ce
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
 +         | Double ->
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
-+@@ -937,8 +974,13 @@ let emit_instr env i =
++@@ -939,8 +976,13 @@ let emit_instr env i =
 +     | Lop(Ispecific(Isignext size)) ->
 +         `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
 +     | Lop(Idls_get) ->
@@ -6102,7 +6126,7 @@ index 0000000000..35dcec36ce
 +     | Lreloadretaddr ->
 +         ()
 +     | Lreturn ->
-+@@ -1037,10 +1079,18 @@ let emit_instr env i =
++@@ -1039,10 +1081,18 @@ let emit_instr env i =
 +     | Lraise k ->
 +         begin match k with
 +         | Lambda.Raise_regular ->
@@ -6121,7 +6145,7 @@ index 0000000000..35dcec36ce
 +           `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
 +         | Lambda.Raise_notrace ->
 +           `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-+@@ -1069,6 +1119,7 @@ let fundecl fundecl =
++@@ -1071,6 +1121,7 @@ let fundecl fundecl =
 +     num_call_gc_and_check_bound_points env
 +   in
 + 
@@ -6129,7 +6153,7 @@ index 0000000000..35dcec36ce
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -1090,9 +1141,12 @@ let fundecl fundecl =
++@@ -1092,9 +1143,12 @@ let fundecl fundecl =
 +     handle_overflow := Some (overflow, ret);
 +     stack_check_size := 5
 +   end;
@@ -6142,7 +6166,7 @@ index 0000000000..35dcec36ce
 +     max_out_of_line_code_offset ~num_call_gc
 +       ~num_check_bound
 +   in
-+@@ -1105,6 +1159,7 @@ let fundecl fundecl =
++@@ -1107,6 +1161,7 @@ let fundecl fundecl =
 +   assert (List.length env.call_gc_sites = num_call_gc);
 +   assert (List.length env.bound_error_sites = num_check_bound);
 + 
@@ -6150,7 +6174,7 @@ index 0000000000..35dcec36ce
 +   begin match !handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -1119,6 +1174,7 @@ let fundecl fundecl =
++@@ -1121,6 +1176,7 @@ let fundecl fundecl =
 +       `  b {emit_label ret}\n`
 +     end
 +   end;
@@ -6237,10 +6261,10 @@ index 0000000000..35dcec36ce
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index da64a19826..dcc03948db 100755
++index 9ad0d1c085..6c3ae4bd46 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 9b5b9d9171..4419ee2b03 100644
++index 18f674bacc..929eacc690 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -6299,7 +6323,7 @@ index 0000000000..35dcec36ce
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1014,6 +1024,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++@@ -1020,6 +1030,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
 +     [earm*-*-netbsd*], [natdynlink=true],
 +     [aarch64-*-linux*], [natdynlink=true],
 +     [aarch64-*-freebsd*], [natdynlink=true],
@@ -6307,7 +6331,7 @@ index 0000000000..35dcec36ce
 +     [riscv*-*-linux*], [natdynlink=true])])
 + 
 + AS_CASE([$enable_native_toplevel,$natdynlink],
-+@@ -1043,77 +1054,77 @@ model=default
++@@ -1049,77 +1060,77 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -6448,7 +6472,7 @@ index 0000000000..35dcec36ce
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1124,12 +1135,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1130,12 +1141,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -6469,7 +6493,7 @@ index 0000000000..35dcec36ce
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1794,7 +1807,8 @@ AS_CASE([$arch,$system],
++@@ -1800,7 +1813,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -6479,7 +6503,7 @@ index 0000000000..35dcec36ce
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1843,6 +1857,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1849,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -6510,7 +6534,7 @@ index 0000000000..35dcec36ce
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1978,8 +2016,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1984,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -7965,16 +7989,16 @@ index 0000000000..35dcec36ce
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..198bb1c7f3
++index 0000000000..f92c3097f4
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3309 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++index 7dbc7d08dc..53ebb005ca 100644
+++index 040158a60b..36fb4fcb1e 100644
 ++--- a/ocamltest/Makefile
 +++++ b/ocamltest/Makefile
-++@@ -272,6 +272,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-++ 	    $(call SUBST,CCOMPTYPE) \
+++@@ -274,6 +274,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+++ 	    $(call SUBST,DIFF_FLAGS) \
 ++ 	    $(call SUBST,WINDOWS_UNICODE) \
 ++ 	    $(call SUBST,FUNCTION_SECTIONS) \
 +++	    $(call SUBST,NAKED_POINTERS) \
@@ -8007,20 +8031,20 @@ index 0000000000..35dcec36ce
 ++     copy;
 ++   ]
 ++diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-++index 785235ab7e..2f03f01989 100644
+++index 399d3c3cef..876d4ac79c 100644
 ++--- a/ocamltest/ocamltest_config.ml.in
 +++++ b/ocamltest/ocamltest_config.ml.in
-++@@ -84,3 +84,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
+++@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
 ++ let function_sections = %%FUNCTION_SECTIONS%%
 ++ 
 ++ let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
 +++
 +++let naked_pointers = %%NAKED_POINTERS%%
 ++diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-++index ab01b62f34..ce9e084bdf 100644
+++index 564ef7644e..92cf631912 100644
 ++--- a/ocamltest/ocamltest_config.mli
 +++++ b/ocamltest/ocamltest_config.mli
-++@@ -118,3 +118,6 @@ val function_sections : bool
+++@@ -124,3 +124,6 @@ val function_sections : bool
 ++ 
 ++ val instrumented_runtime : bool
 ++ (** Whether the instrumented runtime is available *)
@@ -11200,19 +11224,7 @@ index 0000000000..35dcec36ce
 ++-         Type t/284 came from this include
 +++         Type t/279 came from this include
 ++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.b
+++-         The value print has no valid type if t/2
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
