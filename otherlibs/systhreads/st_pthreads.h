@@ -28,8 +28,6 @@
 #include <unistd.h>
 #endif
 
-#include "../../runtime/sync_posix.h"
-
 typedef int st_retcode;
 
 /* Variables used to stop "tick" threads */

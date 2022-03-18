@@ -31,6 +31,8 @@ Caml_inline void st_msleep(int msec)
 
 /* Signal handling */
 
+#include "../../runtime/sync_posix.h"
+
 static void st_decode_sigset(value vset, sigset_t * set)
 {
   sigemptyset(set);
