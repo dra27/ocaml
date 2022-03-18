@@ -19,9 +19,16 @@
 #define _WIN32_WINNT 0x0400
 #include <windows.h>
 
-Caml_inline void st_msleep(int msec)
+typedef DWORD st_timeout;
+
+Caml_inline st_timeout st_timeout_of_ms(int msec)
 {
-  Sleep(msec);
+  return msec;
+}
+
+Caml_inline void st_msleep(st_timeout *timeout)
+{
+  Sleep(*timeout);
 }
 
 #include "st_pthreads.h"

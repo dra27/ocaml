@@ -19,13 +19,34 @@
 #include <sys/select.h>
 #endif
 
-Caml_inline void st_msleep(int msec)
+#ifdef HAS_NANOSLEEP
+typedef struct timespec st_timeout;
+
+Caml_inline st_timeout st_timeout_of_ms(int msec)
 {
-  struct timeval timeout = {0, msec * 1000};
-  /* select() seems to be the most efficient way to suspend the
-     thread for sub-second intervals */
-  select(0, NULL, NULL, NULL, &timeout);
+  return (st_timeout){0, msec * 1000000};
 }
+
+Caml_inline void st_msleep(st_timeout *timeout)
+{
+  nanosleep(timeout, NULL);
+}
+
+#else
+
+typedef int st_timeout;
+
+Caml_inline st_timeout st_timeout_of_ms(int msec)
+{
+  return msec;
+}
+
+Caml_inline void st_msleep(st_timeout *timeout)
+{
+  struct timeval t = {0, *timeout};
+  select(0, NULL, NULL, NULL, &t);
+}
+#endif
 
 #include "st_pthreads.h"
 
