@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:08.288783650 +0100
++++ b	2023-09-28 18:44:08.304784303 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -195,6 +195,12 @@ Working version
++@@ -198,6 +198,12 @@ Working version
+    Unix.readlink on Windows.
+    (David Allsopp, report by Xia Li-yao)
+  
