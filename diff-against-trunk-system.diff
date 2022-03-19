@@ -1,22 +1,8 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..76e69f68a4
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:08.288783650 +0100
-++++ b	2023-09-28 18:44:08.304784303 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -195,6 +195,12 @@ Working version
-++@@ -198,6 +198,12 @@ Working version
-+    Unix.readlink on Windows.
-+    (David Allsopp, report by Xia Li-yao)
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 382888e9eb..9386dd868a 100644
+index ac49c1dab5..f0d177dcd9 100644
 --- a/Changes
 +++ b/Changes
 @@ -186,6 +186,9 @@ Working version
@@ -5624,29 +5610,15 @@ index 0000000000..cf1c62f286
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ed1ce782bd
+index 0000000000..45d028bf6a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5577 @@
+@@ -0,0 +1,5575 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..76e69f68a4
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:08.288783650 +0100
-+++++ b	2023-09-28 18:44:08.304784303 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -195,6 +195,12 @@ Working version
-+++@@ -198,6 +198,12 @@ Working version
-++    Unix.readlink on Windows.
-++    (David Allsopp, report by Xia Li-yao)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 382888e9eb..9386dd868a 100644
++index ac49c1dab5..f0d177dcd9 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -186,6 +186,9 @@ Working version
@@ -11204,7 +11176,19 @@ index 0000000000..ed1ce782bd
 ++  * are unreliable except the bad value checks and as a check for catastrophic
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-fi
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeab
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
