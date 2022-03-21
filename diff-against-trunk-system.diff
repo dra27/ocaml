@@ -1,21 +1,52 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..0f1bafaa0d
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,38 @@
++--- a	2023-09-28 18:44:09.292824637 +0100
+++++ b	2023-09-28 18:44:09.292824637 +0100
++@@ -1,35 +0,0 @@
++-diff --git a/Changes b/Changes
++---- a/Changes
++-+++ b/Changes
++-@@ -186,6 +186,9 @@ Working version
++-   DEFAULT_STRING=safe which are now the default unconditionally.
++-   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
++- 
++-+- Build native-code compilers on OpenBSD/aarch64
++-+  (Christopher Zimmermann, review by Anil Madhavapeddy)
++-+
++- ### Bug fixes:
++- 
++- - #11112: harden -use-runtime against spaces or quotes in the provided path
++-diff --git a/configure b/configure
++-Binary files a/configure and b/configure differ
++-diff --git a/configure.ac b/configure.ac
++---- a/configure.ac
++-+++ b/configure.ac
++-@@ -1020,6 +1020,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++-     [earm*-*-netbsd*], [natdynlink=true],
++-     [aarch64-*-linux*], [natdynlink=true],
++-     [aarch64-*-freebsd*], [natdynlink=true],
++-+    [aarch64-*-openbsd*], [natdynlink=true],
++-     [riscv*-*-linux*], [natdynlink=true])])
++- 
++- AS_CASE([$enable_native_toplevel,$natdynlink],
++-@@ -1132,6 +1133,8 @@ dnl   [arch=amd64; system=beos],
++-     [arch=arm64; system=linux],
++- dnl [aarch64-*-freebsd*],
++- dnl   [arch=arm64; system=freebsd],
++-+  [aarch64-*-openbsd*],
++-+    [arch=arm64; system=openbsd],
++- dnl [x86_64-*-cygwin*],
++- dnl   [arch=amd64; system=cygwin],
++- dnl [riscv64-*-linux*],
 diff --git a/Changes b/Changes
-index ac49c1dab5..f0d177dcd9 100644
+index 049857e0f6..f0d177dcd9 100644
 --- a/Changes
 +++ b/Changes
-@@ -186,6 +186,9 @@ Working version
-   DEFAULT_STRING=safe which are now the default unconditionally.
-   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
- 
-+- Build native-code compilers on OpenBSD/aarch64
-+  (Christopher Zimmermann, review by Anil Madhavapeddy)
-+
- ### Bug fixes:
- 
- - #11112: harden -use-runtime against spaces or quotes in the provided path
-@@ -245,13 +248,13 @@ OCaml 4.14.0
+@@ -248,13 +248,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -31,7 +62,7 @@ index ac49c1dab5..f0d177dcd9 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -351,6 +354,9 @@ OCaml 4.14.0
+@@ -354,6 +354,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -41,7 +72,7 @@ index ac49c1dab5..f0d177dcd9 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -599,6 +605,9 @@ OCaml 4.14.0
+@@ -602,6 +605,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -562,10 +593,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 9ad0d1c085..6c3ae4bd46 100755
+index 68ca3fcc01..6c3ae4bd46 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 18f674bacc..929eacc690 100644
+index 834ef1083b..929eacc690 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -624,15 +655,7 @@ index 18f674bacc..929eacc690 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1020,6 +1030,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-     [earm*-*-netbsd*], [natdynlink=true],
-     [aarch64-*-linux*], [natdynlink=true],
-     [aarch64-*-freebsd*], [natdynlink=true],
-+    [aarch64-*-openbsd*], [natdynlink=true],
-     [riscv*-*-linux*], [natdynlink=true])])
- 
- AS_CASE([$enable_native_toplevel,$natdynlink],
-@@ -1049,77 +1060,77 @@ model=default
+@@ -1050,77 +1060,77 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -773,20 +796,20 @@ index 18f674bacc..929eacc690 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1130,12 +1141,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1131,14 +1141,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
 -dnl [aarch64-*-freebsd*],
 -dnl   [arch=arm64; system=freebsd],
++  [aarch64-*-freebsd*],
++    [arch=arm64; system=freebsd],
+   [aarch64-*-openbsd*],
+     [arch=arm64; system=openbsd],
 -dnl [x86_64-*-cygwin*],
 -dnl   [arch=amd64; system=cygwin],
 -dnl [riscv64-*-linux*],
 -dnl   [arch=riscv; model=riscv64; system=linux]
-+  [aarch64-*-freebsd*],
-+    [arch=arm64; system=freebsd],
-+  [aarch64-*-openbsd*],
-+    [arch=arm64; system=openbsd],
 +  [x86_64-*-cygwin*],
 +    [arch=amd64; system=cygwin],
 +  [riscv64-*-linux*],
@@ -794,7 +817,7 @@ index 18f674bacc..929eacc690 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1800,7 +1813,8 @@ AS_CASE([$arch,$system],
+@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -804,7 +827,7 @@ index 18f674bacc..929eacc690 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1849,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -835,7 +858,7 @@ index 18f674bacc..929eacc690 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1984,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1987,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -5610,28 +5633,59 @@ index 0000000000..cf1c62f286
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..45d028bf6a
+index 0000000000..5ca6178ab9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5575 @@
+@@ -0,0 +1,5579 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..0f1bafaa0d
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,38 @@
+++--- a	2023-09-28 18:44:09.292824637 +0100
++++++ b	2023-09-28 18:44:09.292824637 +0100
+++@@ -1,35 +0,0 @@
+++-diff --git a/Changes b/Changes
+++---- a/Changes
+++-+++ b/Changes
+++-@@ -186,6 +186,9 @@ Working version
+++-   DEFAULT_STRING=safe which are now the default unconditionally.
+++-   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
+++- 
+++-+- Build native-code compilers on OpenBSD/aarch64
+++-+  (Christopher Zimmermann, review by Anil Madhavapeddy)
+++-+
+++- ### Bug fixes:
+++- 
+++- - #11112: harden -use-runtime against spaces or quotes in the provided path
+++-diff --git a/configure b/configure
+++-Binary files a/configure and b/configure differ
+++-diff --git a/configure.ac b/configure.ac
+++---- a/configure.ac
+++-+++ b/configure.ac
+++-@@ -1020,6 +1020,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+++-     [earm*-*-netbsd*], [natdynlink=true],
+++-     [aarch64-*-linux*], [natdynlink=true],
+++-     [aarch64-*-freebsd*], [natdynlink=true],
+++-+    [aarch64-*-openbsd*], [natdynlink=true],
+++-     [riscv*-*-linux*], [natdynlink=true])])
+++- 
+++- AS_CASE([$enable_native_toplevel,$natdynlink],
+++-@@ -1132,6 +1133,8 @@ dnl   [arch=amd64; system=beos],
+++-     [arch=arm64; system=linux],
+++- dnl [aarch64-*-freebsd*],
+++- dnl   [arch=arm64; system=freebsd],
+++-+  [aarch64-*-openbsd*],
+++-+    [arch=arm64; system=openbsd],
+++- dnl [x86_64-*-cygwin*],
+++- dnl   [arch=amd64; system=cygwin],
+++- dnl [riscv64-*-linux*],
 +diff --git a/Changes b/Changes
-+index ac49c1dab5..f0d177dcd9 100644
++index 049857e0f6..f0d177dcd9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -186,6 +186,9 @@ Working version
-+   DEFAULT_STRING=safe which are now the default unconditionally.
-+   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
-+ 
-++- Build native-code compilers on OpenBSD/aarch64
-++  (Christopher Zimmermann, review by Anil Madhavapeddy)
-++
-+ ### Bug fixes:
-+ 
-+ - #11112: harden -use-runtime against spaces or quotes in the provided path
-+@@ -245,13 +248,13 @@ OCaml 4.14.0
++@@ -248,13 +248,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5647,7 +5701,7 @@ index 0000000000..45d028bf6a
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -351,6 +354,9 @@ OCaml 4.14.0
++@@ -354,6 +354,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5657,7 +5711,7 @@ index 0000000000..45d028bf6a
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -599,6 +605,9 @@ OCaml 4.14.0
++@@ -602,6 +605,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6178,10 +6232,10 @@ index 0000000000..45d028bf6a
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 9ad0d1c085..6c3ae4bd46 100755
++index 68ca3fcc01..6c3ae4bd46 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 18f674bacc..929eacc690 100644
++index 834ef1083b..929eacc690 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -6240,15 +6294,7 @@ index 0000000000..45d028bf6a
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1020,6 +1030,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-+     [earm*-*-netbsd*], [natdynlink=true],
-+     [aarch64-*-linux*], [natdynlink=true],
-+     [aarch64-*-freebsd*], [natdynlink=true],
-++    [aarch64-*-openbsd*], [natdynlink=true],
-+     [riscv*-*-linux*], [natdynlink=true])])
-+ 
-+ AS_CASE([$enable_native_toplevel,$natdynlink],
-+@@ -1049,77 +1060,77 @@ model=default
++@@ -1050,77 +1060,77 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -6389,20 +6435,20 @@ index 0000000000..45d028bf6a
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1130,12 +1141,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1131,14 +1141,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
 +-dnl [aarch64-*-freebsd*],
 +-dnl   [arch=arm64; system=freebsd],
+++  [aarch64-*-freebsd*],
+++    [arch=arm64; system=freebsd],
++   [aarch64-*-openbsd*],
++     [arch=arm64; system=openbsd],
 +-dnl [x86_64-*-cygwin*],
 +-dnl   [arch=amd64; system=cygwin],
 +-dnl [riscv64-*-linux*],
 +-dnl   [arch=riscv; model=riscv64; system=linux]
-++  [aarch64-*-freebsd*],
-++    [arch=arm64; system=freebsd],
-++  [aarch64-*-openbsd*],
-++    [arch=arm64; system=openbsd],
 ++  [x86_64-*-cygwin*],
 ++    [arch=amd64; system=cygwin],
 ++  [riscv64-*-linux*],
@@ -6410,7 +6456,7 @@ index 0000000000..45d028bf6a
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1800,7 +1813,8 @@ AS_CASE([$arch,$system],
++@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -6420,7 +6466,7 @@ index 0000000000..45d028bf6a
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1849,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -6451,7 +6497,7 @@ index 0000000000..45d028bf6a
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1984,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1987,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -11169,26 +11215,7 @@ index 0000000000..45d028bf6a
 ++-(* TEST *)
 +++(* TEST
 +++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeab
++++   reaso
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
