@@ -102,8 +102,15 @@ endif
 	$(MKDIR) "$(INSTALL_LIBDIR_LIBNAME)/"
 	$(INSTALL_DATA) \
 	  $(LIBNAME).cma $(CMIFILES) \
+	  "$(INSTALL_LIBDIR)/"
+	$(INSTALL_DATA) \
+	  $(LIBNAME).cma $(CMIFILES) \
 	  "$(INSTALL_LIBDIR_LIBNAME)/"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+	$(INSTALL_DATA) \
+	  $(CMIFILES:.cmi=.mli) \
+          $(CMIFILES:.cmi=.cmti) \
+	  "$(INSTALL_LIBDIR)/"
 	$(INSTALL_DATA) \
 	  $(CMIFILES:.cmi=.mli) \
           $(CMIFILES:.cmi=.cmti) \
@@ -116,9 +123,14 @@ endif
 installopt:
 	$(INSTALL_DATA) \
 	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) \
+	   "$(INSTALL_LIBDIR)/"
+	$(INSTALL_DATA) \
+	   $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) \
 	   "$(INSTALL_LIBDIR_LIBNAME)/"
+	cd "$(INSTALL_LIBDIR)"; $(RANLIB) $(LIBNAME).a
 	cd "$(INSTALL_LIBDIR_LIBNAME)"; $(RANLIB) $(LIBNAME).a
 	if test -f $(LIBNAME).cmxs; then \
+	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR)"; \
 	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR_LIBNAME)"; \
 	fi
 
