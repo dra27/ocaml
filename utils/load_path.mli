@@ -73,3 +73,5 @@ val prepend_dir : Dir.t -> unit
 
 val get : unit -> Dir.t list
 (** Same as [get_paths ()], except that it returns a [Dir.t list]. *)
+
+val set_in_toplevel : unit -> unit

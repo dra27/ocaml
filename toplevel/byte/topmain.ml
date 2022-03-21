@@ -221,6 +221,7 @@ let main () =
   Toploop.loop Format.std_formatter
 
 let main () =
+  Load_path.set_in_toplevel ();
   match main () with
   | exception Compenv.Exit_with_status n -> n
   | () -> 0

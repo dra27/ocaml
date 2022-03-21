@@ -102,11 +102,13 @@ utils/load_path.cmo : \
     utils/misc.cmi \
     utils/local_store.cmi \
     utils/config.cmi \
+    utils/clflags.cmi \
     utils/load_path.cmi
 utils/load_path.cmx : \
     utils/misc.cmx \
     utils/local_store.cmx \
     utils/config.cmx \
+    utils/clflags.cmx \
     utils/load_path.cmi
 utils/load_path.cmi :
 utils/local_store.cmo : \
@@ -6524,6 +6526,7 @@ toplevel/byte/topmain.cmo : \
     utils/misc.cmi \
     driver/main_args.cmi \
     parsing/location.cmi \
+    utils/load_path.cmi \
     typing/env.cmi \
     typing/ctype.cmi \
     driver/compmisc.cmi \
@@ -6542,6 +6545,7 @@ toplevel/byte/topmain.cmx : \
     utils/misc.cmx \
     driver/main_args.cmx \
     parsing/location.cmx \
+    utils/load_path.cmx \
     typing/env.cmx \
     typing/ctype.cmx \
     driver/compmisc.cmx \

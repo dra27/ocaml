@@ -16,6 +16,10 @@ open Local_store
 
 module STbl = Misc.Stdlib.String.Tbl
 
+let in_toplevel = ref false
+
+let set_in_toplevel () = in_toplevel := true
+
 (* Mapping from basenames to full filenames *)
 type registry = string STbl.t
 
@@ -111,14 +115,27 @@ let is_basename fn = Filename.basename fn = fn
 
 let find fn =
   assert (not Config.merlin || Local_store.is_bound ());
+  let r =
   if is_basename fn && not !Sys.interactive then
     STbl.find !files fn
   else
     Misc.find_in_path (get_paths ()) fn
+  in
+  let base = Filename.remove_extension (Filename.basename r) in
+  if !in_toplevel && Filename.extension r <> "" && List.mem base ["unix"; "dynlink"; "str"] && Filename.basename (Filename.dirname r) <> base && not !Clflags.no_std_include then
+    Misc.fatal_errorf "That's a no - you must now do -I +%s (%s -> %s)" base fn r;
+  r
 
 let find_uncap fn =
   assert (not Config.merlin || Local_store.is_bound ());
+  let r =
   if is_basename fn && not !Sys.interactive then
     STbl.find !files_uncap (String.uncapitalize_ascii fn)
   else
     Misc.find_in_path_uncap (get_paths ()) fn
+  in
+  let base = Filename.remove_extension (Filename.basename r) in
+  let base = if base = "unixLabels" then "unix" else base in
+  if !in_toplevel && Filename.extension r <> "" && List.mem base ["unix"; "dynlink"; "str"] && Filename.basename (Filename.dirname r) <> base && not !Clflags.no_std_include then
+    Misc.fatal_errorf "That's a no - you must now do -I +%s (%s -> %s)" base fn r;
+  r
