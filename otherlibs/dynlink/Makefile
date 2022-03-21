@@ -249,8 +249,14 @@ install:
 	$(MKDIR) "$(INSTALL_LIBDIR_DYNLINK)"
 	$(INSTALL_DATA) \
 	  dynlink.cmi dynlink.cma \
+	  "$(INSTALL_LIBDIR)"
+	$(INSTALL_DATA) \
+	  dynlink.cmi dynlink.cma \
 	  "$(INSTALL_LIBDIR_DYNLINK)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+	$(INSTALL_DATA) \
+	  dynlink.cmti dynlink.mli \
+	  "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) \
 	  dynlink.cmti dynlink.mli \
 	  "$(INSTALL_LIBDIR_DYNLINK)"
@@ -260,7 +266,11 @@ installopt:
 	if $(NATDYNLINK); then \
 	  $(INSTALL_DATA) \
 	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
+	    "$(INSTALL_LIBDIR)" && \
+	  $(INSTALL_DATA) \
+	    $(NATOBJS) dynlink.cmxa dynlink.$(A) \
 	    "$(INSTALL_LIBDIR_DYNLINK)" && \
+	  cd "$(INSTALL_LIBDIR)" && $(RANLIB) dynlink.$(A); \
 	  cd "$(INSTALL_LIBDIR_DYNLINK)" && $(RANLIB) dynlink.$(A); \
 	fi
 
