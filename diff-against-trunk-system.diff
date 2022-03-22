@@ -1,49 +1,8 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0f1bafaa0d
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,38 @@
-+--- a	2023-09-28 18:44:09.292824637 +0100
-++++ b	2023-09-28 18:44:09.292824637 +0100
-+@@ -1,35 +0,0 @@
-+-diff --git a/Changes b/Changes
-+---- a/Changes
-+-+++ b/Changes
-+-@@ -186,6 +186,9 @@ Working version
-+-   DEFAULT_STRING=safe which are now the default unconditionally.
-+-   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
-+- 
-+-+- Build native-code compilers on OpenBSD/aarch64
-+-+  (Christopher Zimmermann, review by Anil Madhavapeddy)
-+-+
-+- ### Bug fixes:
-+- 
-+- - #11112: harden -use-runtime against spaces or quotes in the provided path
-+-diff --git a/configure b/configure
-+-Binary files a/configure and b/configure differ
-+-diff --git a/configure.ac b/configure.ac
-+---- a/configure.ac
-+-+++ b/configure.ac
-+-@@ -1020,6 +1020,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-+-     [earm*-*-netbsd*], [natdynlink=true],
-+-     [aarch64-*-linux*], [natdynlink=true],
-+-     [aarch64-*-freebsd*], [natdynlink=true],
-+-+    [aarch64-*-openbsd*], [natdynlink=true],
-+-     [riscv*-*-linux*], [natdynlink=true])])
-+- 
-+- AS_CASE([$enable_native_toplevel,$natdynlink],
-+-@@ -1132,6 +1133,8 @@ dnl   [arch=amd64; system=beos],
-+-     [arch=arm64; system=linux],
-+- dnl [aarch64-*-freebsd*],
-+- dnl   [arch=arm64; system=freebsd],
-+-+  [aarch64-*-openbsd*],
-+-+    [arch=arm64; system=openbsd],
-+- dnl [x86_64-*-cygwin*],
-+- dnl   [arch=amd64; system=cygwin],
-+- dnl [riscv64-*-linux*],
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 049857e0f6..f0d177dcd9 100644
+index 1c25fef723..62f369eeb8 100644
 --- a/Changes
 +++ b/Changes
 @@ -248,13 +248,13 @@ OCaml 4.14.0
@@ -5633,56 +5592,15 @@ index 0000000000..cf1c62f286
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5ca6178ab9
+index 0000000000..113e2b1be8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5579 @@
+@@ -0,0 +1,5581 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0f1bafaa0d
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,38 @@
-++--- a	2023-09-28 18:44:09.292824637 +0100
-+++++ b	2023-09-28 18:44:09.292824637 +0100
-++@@ -1,35 +0,0 @@
-++-diff --git a/Changes b/Changes
-++---- a/Changes
-++-+++ b/Changes
-++-@@ -186,6 +186,9 @@ Working version
-++-   DEFAULT_STRING=safe which are now the default unconditionally.
-++-   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
-++- 
-++-+- Build native-code compilers on OpenBSD/aarch64
-++-+  (Christopher Zimmermann, review by Anil Madhavapeddy)
-++-+
-++- ### Bug fixes:
-++- 
-++- - #11112: harden -use-runtime against spaces or quotes in the provided path
-++-diff --git a/configure b/configure
-++-Binary files a/configure and b/configure differ
-++-diff --git a/configure.ac b/configure.ac
-++---- a/configure.ac
-++-+++ b/configure.ac
-++-@@ -1020,6 +1020,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-++-     [earm*-*-netbsd*], [natdynlink=true],
-++-     [aarch64-*-linux*], [natdynlink=true],
-++-     [aarch64-*-freebsd*], [natdynlink=true],
-++-+    [aarch64-*-openbsd*], [natdynlink=true],
-++-     [riscv*-*-linux*], [natdynlink=true])])
-++- 
-++- AS_CASE([$enable_native_toplevel,$natdynlink],
-++-@@ -1132,6 +1133,8 @@ dnl   [arch=amd64; system=beos],
-++-     [arch=arm64; system=linux],
-++- dnl [aarch64-*-freebsd*],
-++- dnl   [arch=arm64; system=freebsd],
-++-+  [aarch64-*-openbsd*],
-++-+    [arch=arm64; system=openbsd],
-++- dnl [x86_64-*-cygwin*],
-++- dnl   [arch=amd64; system=cygwin],
-++- dnl [riscv64-*-linux*],
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 049857e0f6..f0d177dcd9 100644
++index 1c25fef723..62f369eeb8 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -248,13 +248,13 @@ OCaml 4.14.0
@@ -11215,7 +11133,50 @@ index 0000000000..5ca6178ab9
 ++-(* TEST *)
 +++(* TEST
 +++   * skip
-+++   reaso
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 7f80b8ab26..0791f4e53f 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,4 +1,6 @@
+++ (* TEST
++++   * skip
++++   reason = "OCaml 5 only"
+++ *)
+++ 
+++ let size = 1000;;
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
