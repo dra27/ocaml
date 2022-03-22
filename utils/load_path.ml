@@ -123,7 +123,7 @@ let find fn =
   in
   let base = Filename.remove_extension (Filename.basename r) in
   if !in_toplevel && Filename.extension r <> "" && List.mem base ["unix"; "dynlink"; "str"] && Filename.basename (Filename.dirname r) <> base && not !Clflags.no_std_include then
-    Misc.fatal_errorf "That's a no - you must now do -I +%s (%s -> %s)" base fn r;
+    (*Misc.fatal_errorf*)Printf.eprintf "That's a no - you must now do -I +%s (%s -> %s)\n%!" base fn r;
   r
 
 let find_uncap fn =
@@ -137,5 +137,5 @@ let find_uncap fn =
   let base = Filename.remove_extension (Filename.basename r) in
   let base = if base = "unixLabels" then "unix" else base in
   if !in_toplevel && Filename.extension r <> "" && List.mem base ["unix"; "dynlink"; "str"] && Filename.basename (Filename.dirname r) <> base && not !Clflags.no_std_include then
-    Misc.fatal_errorf "That's a no - you must now do -I +%s (%s -> %s)" base fn r;
+    (*Misc.fatal_errorf*)Printf.eprintf "That's a no - you must now do -I +%s (%s -> %s)\n%!" base fn r;
   r
