@@ -49,7 +49,14 @@ again:
   }
 
   if (!pCreateSymbolicLink) {
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     pCreateSymbolicLink = (LPFN_CREATESYMBOLICLINK)GetProcAddress(GetModuleHandle(L"kernel32"), "CreateSymbolicLinkW");
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+  #pragma GCC diagnostic pop
+#endif
     no_symlink = !pCreateSymbolicLink;
     goto again;
   }
