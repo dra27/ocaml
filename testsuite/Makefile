@@ -55,7 +55,7 @@ ifeq "$(FLEXLINK_ENV)" ""
   ocamltest := MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) $(ocamltest_program)
 else
   MKDLL=$(WINTOPDIR)/boot/ocamlrun $(WINTOPDIR)/flexdll/flexlink.exe \
-                                   $(FLEXLINK_FLAGS)
+                                   $(FLEXLINK_FLAGS) -static-libgcc
 
   ocamltest := $(FLEXLINK_ENV) MKDLL="$(MKDLL)" SORT=$(SORT) MAKE=$(MAKE) \
                                $(ocamltest_program)

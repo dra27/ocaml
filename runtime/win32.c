@@ -959,10 +959,17 @@ static int caml_win32_is_cygwin_pty(HANDLE hFile)
   static tGetFileInformationByHandleEx pGetFileInformationByHandleEx =
     INVALID_HANDLE_VALUE;
 
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
   if (pGetFileInformationByHandleEx == INVALID_HANDLE_VALUE)
     pGetFileInformationByHandleEx =
       (tGetFileInformationByHandleEx)GetProcAddress(
         GetModuleHandle(L"KERNEL32.DLL"), "GetFileInformationByHandleEx");
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+  #pragma GCC diagnostic pop
+#endif
 
   if (pGetFileInformationByHandleEx == NULL)
     return 0;

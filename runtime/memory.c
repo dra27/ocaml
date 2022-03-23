@@ -50,7 +50,7 @@ extern uintnat caml_percent_free;                   /* major_gc.c */
 /* Page table management */
 
 #define Page(p) ((uintnat) (p) >> Page_log)
-#define Page_mask ((uintnat) -1 << Page_log)
+#define Page_mask ((~(uintnat)0) << Page_log)
 
 #ifdef ARCH_SIXTYFOUR
 
@@ -438,7 +438,7 @@ void caml_shrink_heap (char *chunk)
 
   caml_stat_heap_wsz -= Wsize_bsize (Chunk_size (chunk));
   caml_gc_message (0x04, "Shrinking heap to %"
-                   ARCH_INTNAT_PRINTF_FORMAT "uk words\n",
+                   ARCH_INTNAT_PRINTF_FORMAT "dk words\n",
                    caml_stat_heap_wsz / 1024);
 
 #ifdef DEBUG

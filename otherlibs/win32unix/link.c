@@ -41,8 +41,15 @@ CAMLprim value unix_link(value follow, value path1, value path2)
     uerror("link", path2);
   }
   hModKernel32 = GetModuleHandle(L"KERNEL32.DLL");
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
   pCreateHardLink =
     (tCreateHardLink) GetProcAddress(hModKernel32, "CreateHardLinkW");
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+  #pragma GCC diagnostic pop
+#endif
   if (pCreateHardLink == NULL)
     caml_invalid_argument("Unix.link not implemented");
   caml_unix_check_path(path1, "link");
