@@ -19,16 +19,23 @@ let version = Sys.ocaml_version
 
 let bindir = "%%BINDIR%%"
 
-let standard_library_default = "%%LIBDIR%%"
+let slashify =
+  if Sys.win32 then
+    fun s -> String.map ( fun x -> if x = '\\' then '/' else x ) s
+  else
+    fun id -> id
+
+let standard_library_default = slashify ( "%%LIBDIR%%" )
 
 let standard_library =
+  slashify (
   try
     Sys.getenv "OCAMLLIB"
   with Not_found ->
   try
     Sys.getenv "CAMLLIB"
   with Not_found ->
-    standard_library_default
+    standard_library_default )
 
 let ccomp_type = "%%CCOMPTYPE%%"
 let c_compiler = "%%CC%%"
