@@ -154,3 +154,6 @@ val libunwind_link_flags : string
 
 val safe_string: bool
         (* Whether the compiler was configured with -safe-string *)
+
+(** / *)
+val slashify : string -> string

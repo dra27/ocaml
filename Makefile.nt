@@ -206,7 +206,7 @@ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
 INSTALL_COMPLIBDIR=$(DESTDIR)$(COMPLIBDIR)
 INSTALL_STUBLIBDIR=$(DESTDIR)$(STUBLIBDIR)
 INSTALL_MANDIR=$(DESTDIR)$(MANDIR)
-INSTALL_DISTRIB=$(DESTDIR)$(PREFIX)
+INSTALL_DISTRIB=$(DESTDIR)$(PREFIX)/doc/ocaml
 INSTALL_FLEXDLL=$(INSTALL_LIBDIR)/flexdll
 
 install: installbyt installopt
@@ -250,6 +250,7 @@ installbyt:
 	  $(MAKEREC) install-flexdll; \
 	fi
 	cp config/Makefile "$(INSTALL_LIBDIR)/Makefile.config"
+	mkdir -p "$(INSTALL_DISTRIB)"
 	if test -n "$(INSTALL_DISTRIB)"; then \
 	   cp README.adoc "$(INSTALL_DISTRIB)/Readme.general.txt"; \
 	   cp README.win32.adoc "$(INSTALL_DISTRIB)/Readme.windows.txt"; \
@@ -261,8 +262,9 @@ install-flexdll:
 	cat stdlib/camlheader flexdll/flexlink.exe > \
 	  "$(INSTALL_BINDIR)/flexlink.exe"
 ifneq "$(filter-out mingw,$(TOOLCHAIN))" ""
+	mkdir -p "$(INSTALL_FLEXDLL)"
 	cp flexdll/default$(filter-out _i386,_$(ARCH)).manifest \
-    "$(INSTALL_BINDIR)/"
+        "$(INSTALL_FLEXDLL)/"
 endif
 	if test -n "$(wildcard flexdll/flexdll_*.$(O))" ; then \
 	  mkdir -p "$(INSTALL_FLEXDLL)" ; \

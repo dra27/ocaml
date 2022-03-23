@@ -15,8 +15,14 @@
 
 /* Win32 implementation of the "st" interface */
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#else
+#if _WIN32_WINNT < 0x0502
 #undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
+#define _WIN32_WINNT 0x0502
+#endif
+#endif
 #include <windows.h>
 #include <winerror.h>
 #include <stdio.h>
