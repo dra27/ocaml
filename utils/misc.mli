@@ -665,3 +665,6 @@ module Magic_number : sig
 
   val all_kinds : kind list
 end
+
+val mingw_binary_output : unit -> unit
+val slashify: string -> string
