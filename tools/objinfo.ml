@@ -241,10 +241,13 @@ let read_dyn_header filename ic =
   try
     try_finally
       (fun () ->
-        let rc = Sys.command (sprintf "%s %s > %s"
-                                (Filename.quote helper)
-                                (Filename.quote filename)
-                                tempfile) in
+        let cmd =
+          sprintf "%s %s > %s"
+            (Filename.quote helper)
+            (Filename.quote filename)
+            (Filename.quote tempfile) in
+        let cmd = if Sys.win32 then "\"" ^ cmd ^ "\"" else cmd in
+        let rc = Sys.command cmd in
         if rc <> 0 then failwith "cannot read";
         let tc = Scanf.Scanning.from_file tempfile in
         try_finally
