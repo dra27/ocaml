@@ -34,7 +34,7 @@
 char * default_runtime_name = RUNTIME_NAME;
 
 static
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
 __forceinline
 #else
 __inline
@@ -120,7 +120,7 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
     write_console(errh, runtime);
     write_console(errh, L"\r\n");
     ExitProcess(2);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
   }
@@ -143,7 +143,7 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
     write_console(errh, runtime);
     write_console(errh, L"\r\n");
     ExitProcess(2);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
   }
@@ -152,7 +152,7 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
   GetExitCodeProcess(procinfo.hProcess , &retcode);
   CloseHandle(procinfo.hProcess);
   ExitProcess(retcode);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
 }
@@ -175,14 +175,14 @@ int wmain(void)
     write_console(errh, truename);
     write_console(errh, L" not found or is not a bytecode executable file\r\n");
     ExitProcess(2);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
   }
   CloseHandle(h);
   MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path, sizeof(wruntime_path)/sizeof(wchar_t));
   run_runtime(wruntime_path , cmdline);
-#if _MSC_VER >= 1200
+#if defined(_MSC_VER) && _MSC_VER >= 1200
     __assume(0); /* Not reached */
 #endif
 #ifdef __MINGW32__
