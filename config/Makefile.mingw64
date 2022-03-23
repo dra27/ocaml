@@ -17,7 +17,7 @@
 
 ######### General configuration
 
-PREFIX=C:/ocamlmgw64
+PREFIX=@PREFIX@
 
 ### Remove this to disable compiling ocamldebug
 WITH_DEBUGGER=ocamldebugger
@@ -32,7 +32,7 @@ BINDIR=$(PREFIX)/bin
 BYTERUN=ocamlrun
 
 ### Where to install the standard library
-LIBDIR=$(PREFIX)/lib
+LIBDIR=$(PREFIX)/lib/ocaml
 
 ### Where to install the stub DLLs
 STUBLIBDIR=$(LIBDIR)/stublibs
@@ -113,11 +113,11 @@ AWK=gawk
 
 ### Which C compiler to use for the bytecode interpreter.
 CC=$(TOOLPREF)gcc
-CFLAGS=-O -mms-bitfields -Wall -Wno-unused -fno-tree-vrp
+CFLAGS=-march=x86-64 -mtune=generic -O2 -mms-bitfields -Wall -Wno-unused -fno-tree-vrp -fcommon
 # -fno-tree-vrp is here to try to work around the Skylake/Kaby lake bug,
 # and only works on GCC 4.2 and later.
-CPPFLAGS=-DCAML_NAME_SPACE -DUNICODE -D_UNICODE -DWINDOWS_UNICODE=$(WINDOWS_UNICODE)
-OCAMLC_CFLAGS=-O -mms-bitfields
+CPPFLAGS=-DCAML_NAME_SPACE -DUNICODE -D_UNICODE -DWINDOWS_UNICODE=$(WINDOWS_UNICODE) -D__USE_MINGW_ANSI_STDIO=0
+OCAMLC_CFLAGS=-march=x86-64 -mtune=generic -O2 -mms-bitfields -fcommon
 
 BYTECCDBGCOMPOPTS=-g
 
@@ -128,7 +128,7 @@ BYTECCLIBS=-lws2_32 -lversion
 NATIVECCLIBS=-lws2_32 -lversion
 
 ### How to invoke the C preprocessor
-CPP=cpp
+CPP=$(TOOLPREF)cpp
 
 ### Flexlink
 FLEXLINK_CMD=flexlink
@@ -185,7 +185,7 @@ MODEL=default
 ### Name of operating system family for the native-code compiler.
 SYSTEM=mingw64
 
-OCAMLOPT_CFLAGS=-O -mms-bitfields
+OCAMLOPT_CFLAGS=-march=x86-64 -mtune=generic -O2 -mms-bitfields -fcommon
 
 ### Build partially-linked object file
 PACKLD=$(TOOLPREF)ld -r -o # must have a space after '-o'
