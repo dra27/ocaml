@@ -694,3 +694,11 @@ module MakeHooks(M: sig
   let apply_hooks sourcefile intf =
     fold_hooks !hooks sourcefile intf
 end
+
+let mingw_binary_output () =
+  if Sys.win32 then (
+    (try set_binary_mode_out stdout true with _ -> ());
+    (try set_binary_mode_out stderr true with _ -> ());
+  )
+
+let slashify = Config.slashify

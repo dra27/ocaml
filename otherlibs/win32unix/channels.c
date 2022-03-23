@@ -21,14 +21,16 @@
 #include <caml/memory.h>
 #include "unixsupport.h"
 #include <fcntl.h>
+#include <io.h>
 
 #if defined(_MSC_VER) && !defined(_INTPTR_T_DEFINED)
+#ifdef _WIN64
+typedef __int64 intptr_t;
+#else
 typedef int intptr_t;
+#endif
 #define _INTPTR_T_DEFINED
 #endif
-
-extern intptr_t _get_osfhandle(int);
-extern int _open_osfhandle(intptr_t, int);
 
 int win_CRT_fd_of_filedescr(value handle)
 {

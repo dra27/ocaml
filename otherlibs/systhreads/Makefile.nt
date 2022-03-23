@@ -20,7 +20,7 @@ CAMLYACC ?= ../../boot/ocamlyacc
 # Compilation options
 CAMLC=$(CAMLRUN) ../../ocamlc -I ../../stdlib -I ../win32unix
 CAMLOPT=$(CAMLRUN) ../../ocamlopt -I ../../stdlib -I ../win32unix
-COMPFLAGS=-w +33 -warn-error A -g
+COMPFLAGS=-w +33 -warn-error A -g -bin-annot -safe-string 
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS=-O3
 else
@@ -92,7 +92,7 @@ install:
 	cp dllthreads.dll "$(INSTALL_STUBLIBDIR)/dllthreads.dll"
 	cp libthreads.$(A) "$(INSTALL_LIBDIR)/libthreads.$(A)"
 	mkdir -p "$(INSTALL_LIBDIR)/threads"
-	cp $(CMIFILES) threads.cma "$(INSTALL_LIBDIR)/threads"
+	cp $(CMIFILES) $(THREAD_OBJS:.cmo=.cmt) $(THREAD_OBJS:.cmo=.cmti) threads.cma "$(INSTALL_LIBDIR)/threads"
 	rm -f "$(INSTALL_LIBDIR)/threads/stdlib.cma"
 	cp threads.h "$(INSTALL_LIBDIR)/caml/threads.h"
 

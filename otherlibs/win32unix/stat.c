@@ -68,10 +68,10 @@ static value stat_aux(int use_64, __int64 st_ino, struct _stat64 *buf)
   Store_field (v, 6, Val_int (buf->st_gid));
   Store_field (v, 7, Val_int (buf->st_rdev));
   Store_field (v, 8,
-               use_64 ? copy_int64(buf->st_size) : Val_int (buf->st_size));
-  Store_field (v, 9, copy_double((double) buf->st_atime));
-  Store_field (v, 10, copy_double((double) buf->st_mtime));
-  Store_field (v, 11, copy_double((double) buf->st_ctime));
+               use_64 ? caml_copy_int64(buf->st_size) : Val_int (buf->st_size));
+  Store_field (v, 9, caml_copy_double((double) buf->st_atime / 10000000.0));
+  Store_field (v, 10, caml_copy_double((double) buf->st_mtime / 10000000.0));
+  Store_field (v, 11, caml_copy_double((double) buf->st_ctime / 10000000.0));
   CAMLreturn (v);
 }
 
@@ -117,23 +117,17 @@ static value stat_aux(int use_64, __int64 st_ino, struct _stat64 *buf)
 
 static int convert_time(FILETIME* time, __time64_t* result, __time64_t def)
 {
-  SYSTEMTIME sys;
-  FILETIME local;
+  /* Tempting though it may be, MSDN prohibits casting FILETIME directly
+   * to __int64 for alignment concerns. While this doesn't affect our supported
+   * platforms, it's easier to go with the flow...
+   */
+  ULARGE_INTEGER utime = {{time->dwLowDateTime, time->dwHighDateTime}};
 
-  if (time->dwLowDateTime || time->dwHighDateTime) {
-    if (!FileTimeToLocalFileTime(time, &local) ||
-        !FileTimeToSystemTime(&local, &sys))
-    {
-      win32_maperr(GetLastError());
-      return 0;
-    }
-    else
-    {
-      struct tm stamp = {sys.wSecond, sys.wMinute, sys.wHour,
-                         sys.wDay, sys.wMonth - 1, sys.wYear - 1900,
-                         0, 0, 0};
-      *result = _mktime64(&stamp);
-    }
+  if (utime.QuadPart) {
+    /* There are 11644473600000 seconds between 1 January 1601 (the NT Epoch)
+     * and 1 January 1970 (the Unix Epoch). FILETIME is measured in 100ns ticks.
+     */
+    *result = (utime.QuadPart - INT64_LITERAL(116444736000000000U));
   }
   else {
     *result = def;
@@ -196,15 +190,16 @@ static int safe_do_stat(int do_lstat, int use_64, char* path, mlsize_t l, HANDLE
        *      reparse point allows a POSIX-compatible value to be returned in
        *      st_size
        */
-      char buffer[16384];
+      unsigned char mem_buffer[16384];
+      REPARSE_DATA_BUFFER* buffer = (REPARSE_DATA_BUFFER *)&mem_buffer[0];
       DWORD read;
       REPARSE_DATA_BUFFER* point;
 
       caml_enter_blocking_section();
       if (DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, NULL, 0, buffer, 16384, &read, NULL)) {
-        if (((REPARSE_DATA_BUFFER*)buffer)->ReparseTag == IO_REPARSE_TAG_SYMLINK) {
+        if (buffer->ReparseTag == IO_REPARSE_TAG_SYMLINK) {
           is_symlink = do_lstat;
-          res->st_size = ((REPARSE_DATA_BUFFER*)buffer)->SymbolicLinkReparseBuffer.SubstituteNameLength / 2;
+          res->st_size = buffer->SymbolicLinkReparseBuffer.SubstituteNameLength / 2;
         }
       }
       caml_leave_blocking_section();

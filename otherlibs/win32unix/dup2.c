@@ -15,8 +15,7 @@
 
 #include <caml/mlvalues.h>
 #include "unixsupport.h"
-
-extern int _dup2(int, int);
+#include <io.h>
 
 CAMLprim value unix_dup2(value fd1, value fd2)
 {
