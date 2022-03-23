@@ -1200,7 +1200,7 @@ index 6714473e0e..303cdd03c5 100644
  
  (* Tests RESUMETERM with extra_args != 0 in bytecode,
 diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-index d7250fa5ff..132f5966a6 100644
+index e9b8289bb2..f4e805f1d0 100644
 --- a/testsuite/tests/effects/test2.ml
 +++ b/testsuite/tests/effects/test2.ml
 @@ -1,4 +1,6 @@
@@ -1838,7 +1838,7 @@ index 0000000000..8a50268d20
 +let () =
 +  expect_size (if native then 0 else 3) (1, 2)
 diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
-index e117e6eb71..929e041cfd 100644
+index 68f567abec..90a78e2250 100644
 --- a/testsuite/tests/lib-random/parallel.ml
 +++ b/testsuite/tests/lib-random/parallel.ml
 @@ -1,8 +1,10 @@
@@ -2020,7 +2020,7 @@ index afaa814ca5..d696a26e82 100644
  
  (* Memory model test:
 diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-index 18fe866ccf..5e7e0bd565 100644
+index 38fe83e57e..1c2737d8b6 100644
 --- a/testsuite/tests/memory-model/publish.ml
 +++ b/testsuite/tests/memory-model/publish.ml
 @@ -1,5 +1,7 @@

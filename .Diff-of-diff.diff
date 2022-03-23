@@ -1,0 +1,29 @@
+--- a	2023-09-28 18:44:10.488873427 +0100
++++ b	2023-09-28 18:44:10.504874079 +0100
+@@ -37,7 +37,7 @@
+ diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
+ --- a/testsuite/tests/effects/test2.ml
+ +++ b/testsuite/tests/effects/test2.ml
+-@@ -15,7 +15,7 @@ let f () =
++@@ -17,7 +17,7 @@ let f () =
+  
+  let h : type a. a t -> ((a, 'b) continuation -> 'b) option = function
+    | E v -> Some (fun k ->
+@@ -59,7 +59,7 @@
+ diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
+ --- a/testsuite/tests/lib-random/parallel.ml
+ +++ b/testsuite/tests/lib-random/parallel.ml
+-@@ -20,7 +20,7 @@ let delays =
++@@ -22,7 +22,7 @@ let delays =
+  (* Each domain will start by waiting a random amount, to ensure that
+     the Random.int functions we are testing execute in
+     non-deterministic order. The Random.int result should remain
+@@ -95,7 +95,7 @@
+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+ --- a/testsuite/tests/memory-model/publish.ml
+ +++ b/testsuite/tests/memory-model/publish.ml
+-@@ -82,7 +82,7 @@ module Publish = struct
++@@ -84,7 +84,7 @@ module Publish = struct
+  
+    (* Publication of string reference, with subsequent updates.
+     * Notice that if publication is not properly protected,
