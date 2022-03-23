@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..ff1d220e32
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:44:10.488873427 +0100
-++++ b	2023-09-28 18:44:10.504874079 +0100
-+@@ -37,7 +37,7 @@
-+ diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-+ --- a/testsuite/tests/effects/test2.ml
-+ +++ b/testsuite/tests/effects/test2.ml
-+-@@ -15,7 +15,7 @@ let f () =
-++@@ -17,7 +17,7 @@ let f () =
-+  
-+  let h : type a. a t -> ((a, 'b) continuation -> 'b) option = function
-+    | E v -> Some (fun k ->
-+@@ -59,7 +59,7 @@
-+ diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
-+ --- a/testsuite/tests/lib-random/parallel.ml
-+ +++ b/testsuite/tests/lib-random/parallel.ml
-+-@@ -20,7 +20,7 @@ let delays =
-++@@ -22,7 +22,7 @@ let delays =
-+  (* Each domain will start by waiting a random amount, to ensure that
-+     the Random.int functions we are testing execute in
-+     non-deterministic order. The Random.int result should remain
-+@@ -95,7 +95,7 @@
-+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-+ --- a/testsuite/tests/memory-model/publish.ml
-+ +++ b/testsuite/tests/memory-model/publish.ml
-+-@@ -82,7 +82,7 @@ module Publish = struct
-++@@ -84,7 +84,7 @@ module Publish = struct
-+  
-+    (* Publication of string reference, with subsequent updates.
-+     * Notice that if publication is not properly protected,
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 1c25fef723..62f369eeb8 100644
 --- a/Changes
@@ -2485,7 +2453,7 @@ index 0000000000..24125094cd
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..cf1c62f286
+index 0000000000..116f3b4e7a
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3323 @@
@@ -3691,7 +3659,7 @@ index 0000000000..cf1c62f286
 + 
 + (* Tests RESUMETERM with extra_args != 0 in bytecode,
 +diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-+index d7250fa5ff..132f5966a6 100644
++index e9b8289bb2..f4e805f1d0 100644
 +--- a/testsuite/tests/effects/test2.ml
 ++++ b/testsuite/tests/effects/test2.ml
 +@@ -1,4 +1,6 @@
@@ -4329,7 +4297,7 @@ index 0000000000..cf1c62f286
 ++let () =
 ++  expect_size (if native then 0 else 3) (1, 2)
 +diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
-+index e117e6eb71..929e041cfd 100644
++index 68f567abec..90a78e2250 100644
 +--- a/testsuite/tests/lib-random/parallel.ml
 ++++ b/testsuite/tests/lib-random/parallel.ml
 +@@ -1,8 +1,10 @@
@@ -4511,7 +4479,7 @@ index 0000000000..cf1c62f286
 + 
 + (* Memory model test:
 +diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-+index 18fe866ccf..5e7e0bd565 100644
++index 38fe83e57e..1c2737d8b6 100644
 +--- a/testsuite/tests/memory-model/publish.ml
 ++++ b/testsuite/tests/memory-model/publish.ml
 +@@ -1,5 +1,7 @@
@@ -5814,45 +5782,13 @@ index 0000000000..cf1c62f286
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0276eb5d01
+index 0000000000..c7824f6947
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5808 @@
+@@ -0,0 +1,5699 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..ff1d220e32
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:44:10.488873427 +0100
-+++++ b	2023-09-28 18:44:10.504874079 +0100
-++@@ -37,7 +37,7 @@
-++ diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-++ --- a/testsuite/tests/effects/test2.ml
-++ +++ b/testsuite/tests/effects/test2.ml
-++-@@ -15,7 +15,7 @@ let f () =
-+++@@ -17,7 +17,7 @@ let f () =
-++  
-++  let h : type a. a t -> ((a, 'b) continuation -> 'b) option = function
-++    | E v -> Some (fun k ->
-++@@ -59,7 +59,7 @@
-++ diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
-++ --- a/testsuite/tests/lib-random/parallel.ml
-++ +++ b/testsuite/tests/lib-random/parallel.ml
-++-@@ -20,7 +20,7 @@ let delays =
-+++@@ -22,7 +22,7 @@ let delays =
-++  (* Each domain will start by waiting a random amount, to ensure that
-++     the Random.int functions we are testing execute in
-++     non-deterministic order. The Random.int result should remain
-++@@ -95,7 +95,7 @@
-++ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-++ --- a/testsuite/tests/memory-model/publish.ml
-++ +++ b/testsuite/tests/memory-model/publish.ml
-++-@@ -82,7 +82,7 @@ module Publish = struct
-+++@@ -84,7 +84,7 @@ module Publish = struct
-++  
-++    (* Publication of string reference, with subsequent updates.
-++     * Notice that if publication is not properly protected,
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 1c25fef723..62f369eeb8 100644
 +--- a/Changes
@@ -8305,7 +8241,7 @@ index 0000000000..0276eb5d01
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..cf1c62f286
++index 0000000000..116f3b4e7a
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3323 @@
@@ -9511,7 +9447,7 @@ index 0000000000..0276eb5d01
 ++ 
 ++ (* Tests RESUMETERM with extra_args != 0 in bytecode,
 ++diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
-++index d7250fa5ff..132f5966a6 100644
+++index e9b8289bb2..f4e805f1d0 100644
 ++--- a/testsuite/tests/effects/test2.ml
 +++++ b/testsuite/tests/effects/test2.ml
 ++@@ -1,4 +1,6 @@
@@ -10149,7 +10085,7 @@ index 0000000000..0276eb5d01
 +++let () =
 +++  expect_size (if native then 0 else 3) (1, 2)
 ++diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
-++index e117e6eb71..929e041cfd 100644
+++index 68f567abec..90a78e2250 100644
 ++--- a/testsuite/tests/lib-random/parallel.ml
 +++++ b/testsuite/tests/lib-random/parallel.ml
 ++@@ -1,8 +1,10 @@
@@ -10331,7 +10267,7 @@ index 0000000000..0276eb5d01
 ++ 
 ++ (* Memory model test:
 ++diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-++index 18fe866ccf..5e7e0bd565 100644
+++index 38fe83e57e..1c2737d8b6 100644
 ++--- a/testsuite/tests/memory-model/publish.ml
 +++++ b/testsuite/tests/memory-model/publish.ml
 ++@@ -1,5 +1,7 @@
@@ -11548,84 +11484,7 @@ index 0000000000..0276eb5d01
 ++ Line 3, characters 2-36:
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-++ *)
-++ 
-++ let size = 1000;;
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         
+++-Error: Illegal shadowing of included type t/284 by
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
