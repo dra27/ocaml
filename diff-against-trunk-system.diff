@@ -1,11 +1,25 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..86ef7e5c03
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:11.084897729 +0100
+++++ b	2023-09-28 18:44:11.100898381 +0100
++@@ -18,7 +18,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1297,6 +1297,13 @@ AS_IF([$has_c99_float_ops],
+++@@ -1307,6 +1307,13 @@ AS_IF([$has_c99_float_ops],
++           C99 float ops unavailable, replacements enabled
++           (ancient Visual Studio)]))])])])
++  
 diff --git a/Changes b/Changes
-index 1c25fef723..62f369eeb8 100644
+index a8b35ccf67..9a41022525 100644
 --- a/Changes
 +++ b/Changes
-@@ -248,13 +248,13 @@ OCaml 4.14.0
+@@ -253,13 +253,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -21,7 +35,7 @@ index 1c25fef723..62f369eeb8 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -354,6 +354,9 @@ OCaml 4.14.0
+@@ -359,6 +359,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -31,7 +45,7 @@ index 1c25fef723..62f369eeb8 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -602,6 +605,9 @@ OCaml 4.14.0
+@@ -607,6 +610,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -552,10 +566,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 68ca3fcc01..6c3ae4bd46 100755
+index c399043b88..bcea9b6884 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 834ef1083b..929eacc690 100644
+index dd7fc9a80c..940de94b1b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -776,7 +790,7 @@ index 834ef1083b..929eacc690 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
+@@ -1810,7 +1820,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -786,7 +800,7 @@ index 834ef1083b..929eacc690 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1859,6 +1870,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -817,7 +831,7 @@ index 834ef1083b..929eacc690 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1987,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1994,8 +2029,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -5782,18 +5796,32 @@ index 0000000000..116f3b4e7a
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c7824f6947
+index 0000000000..d953d03c26
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5699 @@
+@@ -0,0 +1,5701 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..86ef7e5c03
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:11.084897729 +0100
++++++ b	2023-09-28 18:44:11.100898381 +0100
+++@@ -18,7 +18,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1297,6 +1297,13 @@ AS_IF([$has_c99_float_ops],
++++@@ -1307,6 +1307,13 @@ AS_IF([$has_c99_float_ops],
+++           C99 float ops unavailable, replacements enabled
+++           (ancient Visual Studio)]))])])])
+++  
 +diff --git a/Changes b/Changes
-+index 1c25fef723..62f369eeb8 100644
++index a8b35ccf67..9a41022525 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -248,13 +248,13 @@ OCaml 4.14.0
++@@ -253,13 +253,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5809,7 +5837,7 @@ index 0000000000..c7824f6947
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -354,6 +354,9 @@ OCaml 4.14.0
++@@ -359,6 +359,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5819,7 +5847,7 @@ index 0000000000..c7824f6947
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -602,6 +605,9 @@ OCaml 4.14.0
++@@ -607,6 +610,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6340,10 +6368,10 @@ index 0000000000..c7824f6947
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 68ca3fcc01..6c3ae4bd46 100755
++index c399043b88..bcea9b6884 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 834ef1083b..929eacc690 100644
++index dd7fc9a80c..940de94b1b 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -6564,7 +6592,7 @@ index 0000000000..c7824f6947
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
++@@ -1810,7 +1820,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -6574,7 +6602,7 @@ index 0000000000..c7824f6947
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1859,6 +1870,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -6605,7 +6633,7 @@ index 0000000000..c7824f6947
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1987,8 +2022,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1994,8 +2029,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -11472,19 +11500,7 @@ index 0000000000..c7824f6947
 +++**** ocamlc.byte
 +++***** check-ocamlc.byte-output
 +++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by
++++******* check-program
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

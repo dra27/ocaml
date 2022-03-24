@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:11.084897729 +0100
++++ b	2023-09-28 18:44:11.100898381 +0100
+@@ -18,7 +18,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1297,6 +1297,13 @@ AS_IF([$has_c99_float_ops],
++@@ -1307,6 +1307,13 @@ AS_IF([$has_c99_float_ops],
+           C99 float ops unavailable, replacements enabled
+           (ancient Visual Studio)]))])])])
+  
