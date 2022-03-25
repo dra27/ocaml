@@ -1,6 +1,31 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..61ec366935
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,22 @@
++--- a	2023-09-28 18:44:12.156941411 +0100
+++++ b	2023-09-28 18:44:12.164941737 +0100
++@@ -78,8 +78,8 @@
++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++-@@ -1,42 +1,40 @@
++- (* TEST
+++@@ -3,42 +3,40 @@
+++    reason = "OCaml 5 only"
++  *)
++  
++ -let size = 1000;;
++@@ -133,7 +133,7 @@
++  
++  (* Check the correctness condition on the data at (i,j):
++     1. if the block is present, the weak pointer must be full
++-@@ -60,44 +58,56 @@ let check_and_change data i j =
+++@@ -62,44 +60,56 @@ let check_and_change data i j =
++      | Absent n, true -> assert (gc1 <= n+2); No_change
++      | Absent _, false -> Fill
++      | Present _, true ->
 diff --git a/Changes b/Changes
 index a8b35ccf67..9a41022525 100644
 --- a/Changes
@@ -5839,13 +5864,38 @@ index 0000000000..116f3b4e7a
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d60e2c3224
+index 0000000000..981fc708e8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5827 @@
+@@ -0,0 +1,5823 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..61ec366935
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,22 @@
+++--- a	2023-09-28 18:44:12.156941411 +0100
++++++ b	2023-09-28 18:44:12.164941737 +0100
+++@@ -78,8 +78,8 @@
+++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++-@@ -1,42 +1,40 @@
+++- (* TEST
++++@@ -3,42 +3,40 @@
++++    reason = "OCaml 5 only"
+++  *)
+++  
+++ -let size = 1000;;
+++@@ -133,7 +133,7 @@
+++  
+++  (* Check the correctness condition on the data at (i,j):
+++     1. if the block is present, the weak pointer must be full
+++-@@ -60,44 +58,56 @@ let check_and_change data i j =
++++@@ -62,44 +60,56 @@ let check_and_change data i j =
+++      | Absent n, true -> assert (gc1 <= n+2); No_change
+++      | Absent _, false -> Fill
+++      | Present _, true ->
 +diff --git a/Changes b/Changes
 +index a8b35ccf67..9a41022525 100644
 +--- a/Changes
@@ -11640,36 +11690,7 @@ index 0000000000..d60e2c3224
 ++-(* TEST *)
 +++(* TEST
 +++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-++ *)
-++ 
-++ let size = 1000;;
-++diff --git a
++++   reason = "OC
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

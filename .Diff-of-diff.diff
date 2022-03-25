@@ -1,0 +1,22 @@
+--- a	2023-09-28 18:44:12.156941411 +0100
++++ b	2023-09-28 18:44:12.164941737 +0100
+@@ -78,8 +78,8 @@
+ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+-@@ -1,42 +1,40 @@
+- (* TEST
++@@ -3,42 +3,40 @@
++    reason = "OCaml 5 only"
+  *)
+  
+ -let size = 1000;;
+@@ -133,7 +133,7 @@
+  
+  (* Check the correctness condition on the data at (i,j):
+     1. if the block is present, the weak pointer must be full
+-@@ -60,44 +58,56 @@ let check_and_change data i j =
++@@ -62,44 +60,56 @@ let check_and_change data i j =
+      | Absent n, true -> assert (gc1 <= n+2); No_change
+      | Absent _, false -> Fill
+      | Present _, true ->
