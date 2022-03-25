@@ -1,31 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..61ec366935
+index 0000000000..289e3fe646
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,22 @@
-+--- a	2023-09-28 18:44:12.156941411 +0100
-++++ b	2023-09-28 18:44:12.164941737 +0100
-+@@ -78,8 +78,8 @@
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:44:12.400951348 +0100
+++++ b	2023-09-28 18:44:12.404951511 +0100
++@@ -1,8 +1,8 @@
 + diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 + --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 + +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+-@@ -1,42 +1,40 @@
++-@@ -1,6 +1,8 @@
 +- (* TEST
-++@@ -3,42 +3,40 @@
+++@@ -3,6 +3,8 @@
 ++    reason = "OCaml 5 only"
 +  *)
 +  
-+ -let size = 1000;;
-+@@ -133,7 +133,7 @@
-+  
-+  (* Check the correctness condition on the data at (i,j):
-+     1. if the block is present, the weak pointer must be full
-+-@@ -60,44 +58,56 @@ let check_and_change data i j =
-++@@ -62,44 +60,56 @@ let check_and_change data i j =
-+      | Absent n, true -> assert (gc1 <= n+2); No_change
-+      | Absent _, false -> Fill
-+      | Present _, true ->
++ +let () = Random.self_init ()
 diff --git a/Changes b/Changes
 index a8b35ccf67..9a41022525 100644
 --- a/Changes
@@ -2535,7 +2526,7 @@ index 0000000000..d9e135d7b5
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..116f3b4e7a
+index 0000000000..f355bb9ec7
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3323 @@
@@ -5839,7 +5830,7 @@ index 0000000000..116f3b4e7a
 + (* ocaml-multicore issues 528 and 468 *)
 + 
 +diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+index 7f80b8ab26..0791f4e53f 100644
++index b9c72fc66b..63816ed5a0 100644
 +--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +@@ -1,4 +1,6 @@
@@ -5848,7 +5839,7 @@ index 0000000000..116f3b4e7a
 ++   reason = "OCaml 5 only"
 + *)
 + 
-+ let size = 1000;;
++ let size, num_domains, num_gcs, num_rounds =
 +diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 +index 1d16b72d4e..956ec369ab 100644
 +--- a/testsuite/tools/asmgen_i386.S
@@ -5864,38 +5855,29 @@ index 0000000000..116f3b4e7a
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..981fc708e8
+index 0000000000..f472c89cbd
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5823 @@
+@@ -0,0 +1,5822 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..61ec366935
++index 0000000000..289e3fe646
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,22 @@
-++--- a	2023-09-28 18:44:12.156941411 +0100
-+++++ b	2023-09-28 18:44:12.164941737 +0100
-++@@ -78,8 +78,8 @@
++@@ -0,0 +1,13 @@
+++--- a	2023-09-28 18:44:12.400951348 +0100
++++++ b	2023-09-28 18:44:12.404951511 +0100
+++@@ -1,8 +1,8 @@
 ++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++-@@ -1,42 +1,40 @@
+++-@@ -1,6 +1,8 @@
 ++- (* TEST
-+++@@ -3,42 +3,40 @@
++++@@ -3,6 +3,8 @@
 +++    reason = "OCaml 5 only"
 ++  *)
 ++  
-++ -let size = 1000;;
-++@@ -133,7 +133,7 @@
-++  
-++  (* Check the correctness condition on the data at (i,j):
-++     1. if the block is present, the weak pointer must be full
-++-@@ -60,44 +58,56 @@ let check_and_change data i j =
-+++@@ -62,44 +60,56 @@ let check_and_change data i j =
-++      | Absent n, true -> assert (gc1 <= n+2); No_change
-++      | Absent _, false -> Fill
-++      | Present _, true ->
+++ +let () = Random.self_init ()
 +diff --git a/Changes b/Changes
 +index a8b35ccf67..9a41022525 100644
 +--- a/Changes
@@ -8405,7 +8387,7 @@ index 0000000000..981fc708e8
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..116f3b4e7a
++index 0000000000..f355bb9ec7
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3323 @@
@@ -11690,8 +11672,15 @@ index 0000000000..981fc708e8
 ++-(* TEST *)
 +++(* TEST
 +++   * skip
-+++   reason = "OC
-\ No newline at end of file
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
