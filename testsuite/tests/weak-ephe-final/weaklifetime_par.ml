@@ -3,6 +3,8 @@
    reason = "OCaml 5 only"
 *)
 
+let () = Random.self_init ()
+
 let size, num_domains, num_gcs, num_rounds =
   let test_size =
     try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
