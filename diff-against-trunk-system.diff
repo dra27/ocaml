@@ -1,8 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..b29b4b6636
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:13.452994180 +0100
+++++ b	2023-09-28 18:44:13.472994994 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -462,6 +462,10 @@ OCaml 4.14.0
+++@@ -465,6 +465,10 @@ OCaml 4.14.0
++  - #11107: Lifted comments in the Parsetree module into actual documentation.
++    (Paul-Elliot Anglès d'Auriac, review by Florian Angeletti)
++  
 diff --git a/Changes b/Changes
-index 2055f3ec3f..46960d7e79 100644
+index cb5f986bf3..dce4e8226e 100644
 --- a/Changes
 +++ b/Changes
 @@ -253,13 +253,13 @@ OCaml 4.14.0
@@ -31,7 +45,7 @@ index 2055f3ec3f..46960d7e79 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -610,6 +613,9 @@ OCaml 4.14.0
+@@ -614,6 +617,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -2510,10 +2524,10 @@ index 0000000000..d9e135d7b5
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..e2cfa5bb40
+index 0000000000..7b67bd7785
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3323 @@
+@@ -0,0 +1,3341 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 0aa5f92651..11782f7f9f 100644
 +--- a/ocamltest/Makefile
@@ -4709,6 +4723,24 @@ index 0000000000..e2cfa5bb40
 + *)
 + 
 + open Domain
++diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++index c03791538a..2fd0eb4b9e 100644
++--- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+++++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++@@ -1,8 +1,10 @@
++ (* TEST
++-* hasunix
+++* skip
+++reason = "OCaml 5 only"
+++** hasunix
++ include unix
++-** bytecode
++-** native
+++*** bytecode
+++*** native
++ *)
++ 
++ open Domain
 +diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 +index e853c25865..30fa17d116 100644
 +--- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
@@ -5839,15 +5871,29 @@ index 0000000000..e2cfa5bb40
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ec68508279
+index 0000000000..31b9c151f3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5827 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..b29b4b6636
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:13.452994180 +0100
++++++ b	2023-09-28 18:44:13.472994994 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -462,6 +462,10 @@ OCaml 4.14.0
++++@@ -465,6 +465,10 @@ OCaml 4.14.0
+++  - #11107: Lifted comments in the Parsetree module into actual documentation.
+++    (Paul-Elliot Anglès d'Auriac, review by Florian Angeletti)
+++  
 +diff --git a/Changes b/Changes
-+index 2055f3ec3f..46960d7e79 100644
++index cb5f986bf3..dce4e8226e 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -253,13 +253,13 @@ OCaml 4.14.0
@@ -5876,7 +5922,7 @@ index 0000000000..ec68508279
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -610,6 +613,9 @@ OCaml 4.14.0
++@@ -614,6 +617,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -8355,10 +8401,10 @@ index 0000000000..ec68508279
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..e2cfa5bb40
++index 0000000000..7b67bd7785
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3323 @@
++@@ -0,0 +1,3341 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 0aa5f92651..11782f7f9f 100644
 ++--- a/ocamltest/Makefile
@@ -10554,6 +10600,24 @@ index 0000000000..ec68508279
 ++ *)
 ++ 
 ++ open Domain
+++diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+++index c03791538a..2fd0eb4b9e 100644
+++--- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++++++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+++@@ -1,8 +1,10 @@
+++ (* TEST
+++-* hasunix
++++* skip
++++reason = "OCaml 5 only"
++++** hasunix
+++ include unix
+++-** bytecode
+++-** native
++++*** bytecode
++++*** native
+++ *)
+++ 
+++ open Domain
 ++diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 ++index e853c25865..30fa17d116 100644
 ++--- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
@@ -11637,39 +11701,7 @@ index 0000000000..ec68508279
 ++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 175f507549..340e604fde 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-++ *)
-++ 
-++ let () = Random.self_init ()
-++d
+++-(
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
