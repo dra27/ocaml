@@ -1,24 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..289e3fe646
+index 0000000000..921e097639
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,13 @@
-+--- a	2023-09-28 18:44:12.400951348 +0100
-++++ b	2023-09-28 18:44:12.404951511 +0100
-+@@ -1,8 +1,8 @@
-+ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+-@@ -1,6 +1,8 @@
-+- (* TEST
-++@@ -3,6 +3,8 @@
-++    reason = "OCaml 5 only"
-+  *)
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:12.664962099 +0100
+++++ b	2023-09-28 18:44:12.692963240 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -459,6 +459,9 @@ OCaml 4.14.0
+++@@ -462,6 +462,9 @@ OCaml 4.14.0
++    CSS for coloring bullets
++    (Wiktor Kuchta, review by Florian Angeletti)
 +  
-+ +let () = Random.self_init ()
 diff --git a/Changes b/Changes
-index a8b35ccf67..9a41022525 100644
+index 2055f3ec3f..46960d7e79 100644
 --- a/Changes
 +++ b/Changes
 @@ -253,13 +253,13 @@ OCaml 4.14.0
@@ -47,7 +45,7 @@ index a8b35ccf67..9a41022525 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -607,6 +610,9 @@ OCaml 4.14.0
+@@ -610,6 +613,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -2526,7 +2524,7 @@ index 0000000000..d9e135d7b5
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..f355bb9ec7
+index 0000000000..e2cfa5bb40
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3323 @@
@@ -5830,7 +5828,7 @@ index 0000000000..f355bb9ec7
 + (* ocaml-multicore issues 528 and 468 *)
 + 
 +diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+index b9c72fc66b..63816ed5a0 100644
++index 175f507549..340e604fde 100644
 +--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +@@ -1,4 +1,6 @@
@@ -5839,7 +5837,7 @@ index 0000000000..f355bb9ec7
 ++   reason = "OCaml 5 only"
 + *)
 + 
-+ let size, num_domains, num_gcs, num_rounds =
++ let () = Random.self_init ()
 +diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 +index 1d16b72d4e..956ec369ab 100644
 +--- a/testsuite/tools/asmgen_i386.S
@@ -5855,31 +5853,29 @@ index 0000000000..f355bb9ec7
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f472c89cbd
+index 0000000000..73b1ab9375
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5822 @@
+@@ -0,0 +1,5830 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..289e3fe646
++index 0000000000..921e097639
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,13 @@
-++--- a	2023-09-28 18:44:12.400951348 +0100
-+++++ b	2023-09-28 18:44:12.404951511 +0100
-++@@ -1,8 +1,8 @@
-++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++-@@ -1,6 +1,8 @@
-++- (* TEST
-+++@@ -3,6 +3,8 @@
-+++    reason = "OCaml 5 only"
-++  *)
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:12.664962099 +0100
++++++ b	2023-09-28 18:44:12.692963240 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -459,6 +459,9 @@ OCaml 4.14.0
++++@@ -462,6 +462,9 @@ OCaml 4.14.0
+++    CSS for coloring bullets
+++    (Wiktor Kuchta, review by Florian Angeletti)
 ++  
-++ +let () = Random.self_init ()
 +diff --git a/Changes b/Changes
-+index a8b35ccf67..9a41022525 100644
++index 2055f3ec3f..46960d7e79 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -253,13 +253,13 @@ OCaml 4.14.0
@@ -5908,7 +5904,7 @@ index 0000000000..f472c89cbd
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -607,6 +610,9 @@ OCaml 4.14.0
++@@ -610,6 +613,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -8387,7 +8383,7 @@ index 0000000000..f472c89cbd
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..f355bb9ec7
++index 0000000000..e2cfa5bb40
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3323 @@
@@ -11681,6 +11677,17 @@ index 0000000000..f472c89cbd
 ++index fa2d2efc43..752a7eeabf 100644
 ++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff 
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
