@@ -88,11 +88,18 @@ again:
   }
 
   if (!pCreateSymbolicLink) {
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     if (!(pCreateSymbolicLink = (LPFN_CREATESYMBOLICLINK)GetProcAddress(GetModuleHandle(L"kernel32"), "CreateSymbolicLinkW"))) {
       no_symlink = 1;
     } else if (IsDeveloperModeEnabled()) {
       additional_symlink_flags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
     }
+#if defined(__GNUC__) &&  __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
 
     goto again;
   }
