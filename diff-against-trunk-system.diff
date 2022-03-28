@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..921e097639
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:12.664962099 +0100
-++++ b	2023-09-28 18:44:12.692963240 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -459,6 +459,9 @@ OCaml 4.14.0
-++@@ -462,6 +462,9 @@ OCaml 4.14.0
-+    CSS for coloring bullets
-+    (Wiktor Kuchta, review by Florian Angeletti)
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 2055f3ec3f..46960d7e79 100644
 --- a/Changes
@@ -5853,27 +5839,13 @@ index 0000000000..e2cfa5bb40
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..73b1ab9375
+index 0000000000..ec68508279
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5830 @@
+@@ -0,0 +1,5827 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..921e097639
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:12.664962099 +0100
-+++++ b	2023-09-28 18:44:12.692963240 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -459,6 +459,9 @@ OCaml 4.14.0
-+++@@ -462,6 +462,9 @@ OCaml 4.14.0
-++    CSS for coloring bullets
-++    (Wiktor Kuchta, review by Florian Angeletti)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 2055f3ec3f..46960d7e79 100644
 +--- a/Changes
@@ -11686,7 +11658,18 @@ index 0000000000..73b1ab9375
 ++ 
 ++ (* ocaml-multicore issues 528 and 468 *)
 ++ 
-++diff 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 175f507549..340e604fde 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,4 +1,6 @@
+++ (* TEST
++++   * skip
++++   reason = "OCaml 5 only"
+++ *)
+++ 
+++ let () = Random.self_init ()
+++d
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
