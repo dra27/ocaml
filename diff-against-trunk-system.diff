@@ -1,28 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..3ad68b5344
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,19 @@
-+--- a	2023-09-28 18:44:13.749006227 +0100
-++++ b	2023-09-28 18:44:13.749006227 +0100
-+@@ -1,16 +0,0 @@
-+-diff --git a/configure b/configure
-+-Binary files a/configure and b/configure differ
-+-diff --git a/configure.ac b/configure.ac
-+---- a/configure.ac
-+-+++ b/configure.ac
-+-@@ -1111,8 +1111,8 @@ dnl [x86_64-*-gnu*],
-+- dnl   [arch=amd64; system=gnu],
-+- dnl [x86_64-*-dragonfly*],
-+- dnl   [arch=amd64; system=dragonfly],
-+--dnl [x86_64-*-solaris*],
-+--dnl   [arch=amd64; system=solaris],
-+-+  [x86_64-*-solaris*],
-+-+    [arch=amd64; system=solaris],
-+-   [x86_64-*-freebsd*],
-+-     [arch=amd64; system=freebsd],
-+-   [x86_64-*-netbsd*],
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index cb5f986bf3..dce4e8226e 100644
 --- a/Changes
@@ -5876,35 +5854,13 @@ index 0000000000..7b67bd7785
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..613dcfe064
+index 0000000000..f63f0ff877
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5827 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..3ad68b5344
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,19 @@
-++--- a	2023-09-28 18:44:13.749006227 +0100
-+++++ b	2023-09-28 18:44:13.749006227 +0100
-++@@ -1,16 +0,0 @@
-++-diff --git a/configure b/configure
-++-Binary files a/configure and b/configure differ
-++-diff --git a/configure.ac b/configure.ac
-++---- a/configure.ac
-++-+++ b/configure.ac
-++-@@ -1111,8 +1111,8 @@ dnl [x86_64-*-gnu*],
-++- dnl   [arch=amd64; system=gnu],
-++- dnl [x86_64-*-dragonfly*],
-++- dnl   [arch=amd64; system=dragonfly],
-++--dnl [x86_64-*-solaris*],
-++--dnl   [arch=amd64; system=solaris],
-++-+  [x86_64-*-solaris*],
-++-+    [arch=amd64; system=solaris],
-++-   [x86_64-*-freebsd*],
-++-     [arch=amd64; system=freebsd],
-++-   [x86_64-*-netbsd*],
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index cb5f986bf3..dce4e8226e 100644
 +--- a/Changes
@@ -11706,8 +11662,29 @@ index 0000000000..613dcfe064
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/test
-\ No newline at end of file
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
