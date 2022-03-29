@@ -1,20 +1,28 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b29b4b6636
+index 0000000000..3ad68b5344
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:13.452994180 +0100
-++++ b	2023-09-28 18:44:13.472994994 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -462,6 +462,10 @@ OCaml 4.14.0
-++@@ -465,6 +465,10 @@ OCaml 4.14.0
-+  - #11107: Lifted comments in the Parsetree module into actual documentation.
-+    (Paul-Elliot Anglès d'Auriac, review by Florian Angeletti)
-+  
+@@ -0,0 +1,19 @@
++--- a	2023-09-28 18:44:13.749006227 +0100
+++++ b	2023-09-28 18:44:13.749006227 +0100
++@@ -1,16 +0,0 @@
++-diff --git a/configure b/configure
++-Binary files a/configure and b/configure differ
++-diff --git a/configure.ac b/configure.ac
++---- a/configure.ac
++-+++ b/configure.ac
++-@@ -1111,8 +1111,8 @@ dnl [x86_64-*-gnu*],
++- dnl   [arch=amd64; system=gnu],
++- dnl [x86_64-*-dragonfly*],
++- dnl   [arch=amd64; system=dragonfly],
++--dnl [x86_64-*-solaris*],
++--dnl   [arch=amd64; system=solaris],
++-+  [x86_64-*-solaris*],
++-+    [arch=amd64; system=solaris],
++-   [x86_64-*-freebsd*],
++-     [arch=amd64; system=freebsd],
++-   [x86_64-*-netbsd*],
 diff --git a/Changes b/Changes
 index cb5f986bf3..dce4e8226e 100644
 --- a/Changes
@@ -566,10 +574,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index c399043b88..bcea9b6884 100755
+index 15759d4c0d..bcea9b6884 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index dd7fc9a80c..940de94b1b 100644
+index 3d2ca93790..940de94b1b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -628,7 +636,7 @@ index dd7fc9a80c..940de94b1b 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1050,77 +1060,77 @@ model=default
+@@ -1050,67 +1060,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -748,17 +756,14 @@ index dd7fc9a80c..940de94b1b 100644
 -dnl   [arch=amd64; system=gnu],
 -dnl [x86_64-*-dragonfly*],
 -dnl   [arch=amd64; system=dragonfly],
--dnl [x86_64-*-solaris*],
--dnl   [arch=amd64; system=solaris],
 +  [x86_64-*-gnu*],
 +    [arch=amd64; system=gnu],
 +  [x86_64-*-dragonfly*],
 +    [arch=amd64; system=dragonfly],
-+  [x86_64-*-solaris*],
-+    [arch=amd64; system=solaris],
+   [x86_64-*-solaris*],
+     [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-     [arch=amd64; system=freebsd],
-   [x86_64-*-netbsd*],
+@@ -1119,8 +1129,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -5871,27 +5876,35 @@ index 0000000000..7b67bd7785
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..31b9c151f3
+index 0000000000..613dcfe064
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5827 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b29b4b6636
++index 0000000000..3ad68b5344
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:13.452994180 +0100
-+++++ b	2023-09-28 18:44:13.472994994 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -462,6 +462,10 @@ OCaml 4.14.0
-+++@@ -465,6 +465,10 @@ OCaml 4.14.0
-++  - #11107: Lifted comments in the Parsetree module into actual documentation.
-++    (Paul-Elliot Anglès d'Auriac, review by Florian Angeletti)
-++  
++@@ -0,0 +1,19 @@
+++--- a	2023-09-28 18:44:13.749006227 +0100
++++++ b	2023-09-28 18:44:13.749006227 +0100
+++@@ -1,16 +0,0 @@
+++-diff --git a/configure b/configure
+++-Binary files a/configure and b/configure differ
+++-diff --git a/configure.ac b/configure.ac
+++---- a/configure.ac
+++-+++ b/configure.ac
+++-@@ -1111,8 +1111,8 @@ dnl [x86_64-*-gnu*],
+++- dnl   [arch=amd64; system=gnu],
+++- dnl [x86_64-*-dragonfly*],
+++- dnl   [arch=amd64; system=dragonfly],
+++--dnl [x86_64-*-solaris*],
+++--dnl   [arch=amd64; system=solaris],
+++-+  [x86_64-*-solaris*],
+++-+    [arch=amd64; system=solaris],
+++-   [x86_64-*-freebsd*],
+++-     [arch=amd64; system=freebsd],
+++-   [x86_64-*-netbsd*],
 +diff --git a/Changes b/Changes
 +index cb5f986bf3..dce4e8226e 100644
 +--- a/Changes
@@ -6443,10 +6456,10 @@ index 0000000000..31b9c151f3
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index c399043b88..bcea9b6884 100755
++index 15759d4c0d..bcea9b6884 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index dd7fc9a80c..940de94b1b 100644
++index 3d2ca93790..940de94b1b 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -168,6 +168,8 @@ AC_SUBST([flexlink_flags])
@@ -6505,7 +6518,7 @@ index 0000000000..31b9c151f3
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1050,77 +1060,77 @@ model=default
++@@ -1050,67 +1060,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -6625,17 +6638,14 @@ index 0000000000..31b9c151f3
 +-dnl   [arch=amd64; system=gnu],
 +-dnl [x86_64-*-dragonfly*],
 +-dnl   [arch=amd64; system=dragonfly],
-+-dnl [x86_64-*-solaris*],
-+-dnl   [arch=amd64; system=solaris],
 ++  [x86_64-*-gnu*],
 ++    [arch=amd64; system=gnu],
 ++  [x86_64-*-dragonfly*],
 ++    [arch=amd64; system=dragonfly],
-++  [x86_64-*-solaris*],
-++    [arch=amd64; system=solaris],
++   [x86_64-*-solaris*],
++     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+     [arch=amd64; system=freebsd],
-+   [x86_64-*-netbsd*],
++@@ -1119,8 +1129,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -11696,12 +11706,7 @@ index 0000000000..31b9c151f3
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/test
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
