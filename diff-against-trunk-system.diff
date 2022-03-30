@@ -1,11 +1,44 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..0ab00b8242
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,30 @@
++--- a	2023-09-28 18:44:14.561039260 +0100
+++++ b	2023-09-28 18:44:14.589040399 +0100
++@@ -287,7 +287,7 @@
++  .SECONDARY: $(lexers:.mll=.ml) $(parsers:.mly=.mli) $(parsers:.mly=.ml)
++  
++  .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
++-@@ -312,7 +308,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
+++@@ -313,7 +309,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
++  
++  .PHONY: depend
++  depend: $(dependencies_generated_prereqs)
++@@ -332,7 +332,7 @@
++  
++  OC_CPPFLAGS += -I$(ROOTDIR)/runtime
++  
++-@@ -262,14 +264,18 @@ GNUISH_SED = \
+++@@ -262,15 +264,18 @@ GNUISH_SED = \
++    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
++         $(SED),$(error GNU sed is needed for make depend))
++  
++@@ -345,7 +345,8 @@
++ +
++  .PHONY: depend
++ -depend:
++--	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
+++-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
+++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
++ -	  > .depend.tmp
++ -	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
++ -	  stdlib.ml stdlib.mli >> .depend.tmp
 diff --git a/Changes b/Changes
-index cb5f986bf3..dce4e8226e 100644
+index 6550f4ce59..7ee3ab4862 100644
 --- a/Changes
 +++ b/Changes
-@@ -253,13 +253,13 @@ OCaml 4.14.0
+@@ -258,13 +258,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -21,7 +54,7 @@ index cb5f986bf3..dce4e8226e 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -359,6 +359,9 @@ OCaml 4.14.0
+@@ -364,6 +364,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -31,7 +64,7 @@ index cb5f986bf3..dce4e8226e 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -614,6 +617,9 @@ OCaml 4.14.0
+@@ -619,6 +622,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -65,7 +98,7 @@ index 8dfc6cf83f..4ef434f979 100644
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
 diff --git a/api_docgen/Makefile.docfiles b/api_docgen/Makefile.docfiles
-index d85ccfb1a2..201f1e75c1 100644
+index c579c616e3..aba6d18670 100644
 --- a/api_docgen/Makefile.docfiles
 +++ b/api_docgen/Makefile.docfiles
 @@ -35,7 +35,8 @@ str_MLIS := str.mli
@@ -5854,18 +5887,51 @@ index 0000000000..7b67bd7785
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f63f0ff877
+index 0000000000..53d1467bc9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5827 @@
+@@ -0,0 +1,5825 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..0ab00b8242
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,30 @@
+++--- a	2023-09-28 18:44:14.561039260 +0100
++++++ b	2023-09-28 18:44:14.589040399 +0100
+++@@ -287,7 +287,7 @@
+++  .SECONDARY: $(lexers:.mll=.ml) $(parsers:.mly=.mli) $(parsers:.mly=.ml)
+++  
+++  .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
+++-@@ -312,7 +308,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
++++@@ -313,7 +309,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
+++  
+++  .PHONY: depend
+++  depend: $(dependencies_generated_prereqs)
+++@@ -332,7 +332,7 @@
+++  
+++  OC_CPPFLAGS += -I$(ROOTDIR)/runtime
+++  
+++-@@ -262,14 +264,18 @@ GNUISH_SED = \
++++@@ -262,15 +264,18 @@ GNUISH_SED = \
+++    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
+++         $(SED),$(error GNU sed is needed for make depend))
+++  
+++@@ -345,7 +345,8 @@
+++ +
+++  .PHONY: depend
+++ -depend:
+++--	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
++++-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
++++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
+++ -	  > .depend.tmp
+++ -	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+++ -	  stdlib.ml stdlib.mli >> .depend.tmp
 +diff --git a/Changes b/Changes
-+index cb5f986bf3..dce4e8226e 100644
++index 6550f4ce59..7ee3ab4862 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -253,13 +253,13 @@ OCaml 4.14.0
++@@ -258,13 +258,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5881,7 +5947,7 @@ index 0000000000..f63f0ff877
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -359,6 +359,9 @@ OCaml 4.14.0
++@@ -364,6 +364,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5891,7 +5957,7 @@ index 0000000000..f63f0ff877
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -614,6 +617,9 @@ OCaml 4.14.0
++@@ -619,6 +622,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -5925,7 +5991,7 @@ index 0000000000..f63f0ff877
 + # Starting with OCaml 4.14, although the version string that appears above is
 + # still correct and this file can thus still be used to figure it out,
 +diff --git a/api_docgen/Makefile.docfiles b/api_docgen/Makefile.docfiles
-+index d85ccfb1a2..201f1e75c1 100644
++index c579c616e3..aba6d18670 100644
 +--- a/api_docgen/Makefile.docfiles
 ++++ b/api_docgen/Makefile.docfiles
 +@@ -35,7 +35,8 @@ str_MLIS := str.mli
@@ -11650,41 +11716,7 @@ index 0000000000..f63f0ff877
 ++ Driver.entry
 ++ caml_program
 ++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
@@ -12746,20 +12778,6 @@ index da23211543..ca0851f1ac 100644
  stdlib__Seq.cmo : seq.ml \
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
-diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 9f78d23ecd..b6480b298d 100644
---- a/stdlib/Makefile
-+++ b/stdlib/Makefile
-@@ -264,7 +264,8 @@ GNUISH_SED = \
- 
- .PHONY: depend
- depend:
--	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-+	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
-+    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
- 	  > .depend.tmp
- 	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
- 	  stdlib.ml stdlib.mli >> .depend.tmp
 diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
 index fc299a5ea8..0780508c00 100644
 --- a/stdlib/StdlibModules
