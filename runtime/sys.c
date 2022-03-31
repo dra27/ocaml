@@ -692,6 +692,16 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 {
   return Val_int(1); /* Bytecode backed */
 }
+
+CAMLprim value caml_sys_const_windows_unicode(value unit)
+{
+#if WINDOWS_UNICODE
+  return Val_true;
+#else
+  return Val_false;
+#endif
+}
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */

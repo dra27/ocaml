@@ -435,6 +435,7 @@ let rec close t env (lam : Lambda.lambda) : Flambda.t =
         | Ostype_cygwin -> lambda_const_bool (String.equal Sys.os_type "Cygwin")
         | Backend_type ->
             Lambda.const_int 0 (* tag 0 is the same as Native *)
+        | Windows_unicode -> lambda_const_bool Config.windows_unicode
         end
       in
       close t env
