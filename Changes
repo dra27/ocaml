@@ -177,6 +177,10 @@ Working version
   (Sébastien Hinderer, review by David Allsopp, Florian Angeletti and
   Xavier Leroy)
 
+- #11149: Big-endian store floats in little-endian format in bytecode artefacts
+  to increase repeatability of the bytecode compiler across different platforms.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #10878, #10909: restore flambda after the Multicore merge.

@@ -29,10 +29,12 @@ exception Error of error
 
 (* marshal and possibly check 32bit compat *)
 let marshal_to_channel_with_possibly_32bit_compat ~filename ~kind outchan obj =
+  let flags =
+    Marshal.Little_float ::
+    (if !Clflags.bytecode_compatible_32
+     then [Marshal.Compat_32] else []) in
   try
-    Marshal.to_channel outchan obj
-      (if !Clflags.bytecode_compatible_32
-       then [Marshal.Compat_32] else [])
+    Marshal.to_channel outchan obj flags
   with Failure _ ->
     raise (Error (Not_compatible_32 (filename, kind)))
 

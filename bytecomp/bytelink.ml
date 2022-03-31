@@ -467,6 +467,7 @@ let output_cds_file outfile =
 
 let link_bytecode_as_c tolink outfile with_main =
   let outchan = open_out outfile in
+  let marshal_flags = [Marshal.Little_float] in
   Misc.try_finally
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file outfile)
@@ -497,7 +498,7 @@ let link_bytecode_as_c tolink outfile with_main =
        (* The table of global data *)
        output_string outchan "static char caml_data[] = {\n";
        output_data_string outchan
-         (Marshal.to_string (Symtable.initial_global_table()) []);
+         (Marshal.to_string (Symtable.initial_global_table()) marshal_flags);
        output_string outchan "\n};\n\n";
        (* The sections *)
        let sections =
@@ -506,7 +507,7 @@ let link_bytecode_as_c tolink outfile with_main =
            "CRCS", Obj.repr(extract_crc_interfaces()) ] in
        output_string outchan "static char caml_sections[] = {\n";
        output_data_string outchan
-         (Marshal.to_string sections []);
+         (Marshal.to_string sections marshal_flags);
        output_string outchan "\n};\n\n";
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
