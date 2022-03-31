@@ -1,44 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0ab00b8242
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,30 @@
-+--- a	2023-09-28 18:44:14.561039260 +0100
-++++ b	2023-09-28 18:44:14.589040399 +0100
-+@@ -287,7 +287,7 @@
-+  .SECONDARY: $(lexers:.mll=.ml) $(parsers:.mly=.mli) $(parsers:.mly=.ml)
-+  
-+  .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
-+-@@ -312,7 +308,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
-++@@ -313,7 +309,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
-+  
-+  .PHONY: depend
-+  depend: $(dependencies_generated_prereqs)
-+@@ -332,7 +332,7 @@
-+  
-+  OC_CPPFLAGS += -I$(ROOTDIR)/runtime
-+  
-+-@@ -262,14 +264,18 @@ GNUISH_SED = \
-++@@ -262,15 +264,18 @@ GNUISH_SED = \
-+    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
-+         $(SED),$(error GNU sed is needed for make depend))
-+  
-+@@ -345,7 +345,8 @@
-+ +
-+  .PHONY: depend
-+ -depend:
-+--	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-++-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
-++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
-+ -	  > .depend.tmp
-+ -	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-+ -	  stdlib.ml stdlib.mli >> .depend.tmp
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 6550f4ce59..7ee3ab4862 100644
+index fadbdc7341..5a365ab844 100644
 --- a/Changes
 +++ b/Changes
-@@ -258,13 +258,13 @@ OCaml 4.14.0
+@@ -264,13 +264,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -54,7 +21,7 @@ index 6550f4ce59..7ee3ab4862 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -364,6 +364,9 @@ OCaml 4.14.0
+@@ -370,6 +370,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -64,7 +31,7 @@ index 6550f4ce59..7ee3ab4862 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -619,6 +622,9 @@ OCaml 4.14.0
+@@ -625,6 +628,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -5887,51 +5854,18 @@ index 0000000000..b2acf00c70
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..12d0ecf242
+index 0000000000..8d4af57edc
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5825 @@
+@@ -0,0 +1,5827 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0ab00b8242
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,30 @@
-++--- a	2023-09-28 18:44:14.561039260 +0100
-+++++ b	2023-09-28 18:44:14.589040399 +0100
-++@@ -287,7 +287,7 @@
-++  .SECONDARY: $(lexers:.mll=.ml) $(parsers:.mly=.mli) $(parsers:.mly=.ml)
-++  
-++  .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
-++-@@ -312,7 +308,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
-+++@@ -313,7 +309,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
-++  
-++  .PHONY: depend
-++  depend: $(dependencies_generated_prereqs)
-++@@ -332,7 +332,7 @@
-++  
-++  OC_CPPFLAGS += -I$(ROOTDIR)/runtime
-++  
-++-@@ -262,14 +264,18 @@ GNUISH_SED = \
-+++@@ -262,15 +264,18 @@ GNUISH_SED = \
-++    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
-++         $(SED),$(error GNU sed is needed for make depend))
-++  
-++@@ -345,7 +345,8 @@
-++ +
-++  .PHONY: depend
-++ -depend:
-++--	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-+++-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
-+++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
-++ -	  > .depend.tmp
-++ -	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-++ -	  stdlib.ml stdlib.mli >> .depend.tmp
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 6550f4ce59..7ee3ab4862 100644
++index fadbdc7341..5a365ab844 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -258,13 +258,13 @@ OCaml 4.14.0
++@@ -264,13 +264,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5947,7 +5881,7 @@ index 0000000000..12d0ecf242
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -364,6 +364,9 @@ OCaml 4.14.0
++@@ -370,6 +370,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5957,7 +5891,7 @@ index 0000000000..12d0ecf242
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -619,6 +622,9 @@ OCaml 4.14.0
++@@ -625,6 +628,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -11716,7 +11650,41 @@ index 0000000000..12d0ecf242
 ++ Driver.entry
 ++ caml_program
 ++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-\ No newline at end of file
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
@@ -12003,7 +11971,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index b96b8db82f..579afdba64 100644
+index 6e7741cc25..8d3abde95c 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -50,12 +50,12 @@ LIBNAME=threads
