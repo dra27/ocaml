@@ -39,8 +39,10 @@
 enum {
   NO_SHARING = 1,               /* Flag to ignore sharing */
   CLOSURES = 2,                 /* Flag to allow marshaling code pointers */
-  COMPAT_32 = 4                 /* Flag to ensure that output can safely
+  COMPAT_32 = 4,                /* Flag to ensure that output can safely
                                    be read back on a 32-bit platform */
+  LITTLE_FLOAT = 8              /* Flag to write little-endian doubles on all
+                                   architectures */
 };
 
 /* Stack for pending values to marshal */
@@ -625,34 +627,76 @@ Caml_inline void extern_string(struct caml_extern_state *s,
 
 /* Marshaling FP numbers */
 
-Caml_inline void extern_double(struct caml_extern_state* s, value v)
+Caml_inline void extern_double_native(struct caml_extern_state* s, value v)
 {
   write(s, CODE_DOUBLE_NATIVE);
   writeblock_float8(s, (double *) v, 1);
 }
 
+#if ARCH_FLOAT_ENDIANNESS == 0x76543210
+
+Caml_inline void extern_double_little(struct caml_extern_state* s, value v)
+{
+  write(s, CODE_DOUBLE_LITTLE);
+  caml_serialize_block_float_8((double *) v, 1);
+}
+
+#else
+
+#define extern_double_little extern_double_native
+
+#endif
+
 /* Marshaling FP arrays */
 
-Caml_inline void extern_double_array(struct caml_extern_state* s,
-                                     value v, mlsize_t nfloats)
+Caml_inline void extern_write_double_array_header(struct caml_extern_state* s,
+                                                  mlsize_t nfloats,
+                                                  int code_array8,
+                                                  int code_array32,
+                                                  int code_array64)
 {
   if (nfloats < 0x100) {
-    writecode8(s, CODE_DOUBLE_ARRAY8_NATIVE, nfloats);
+    writecode8(s, code_array8, nfloats);
   } else {
 #ifdef ARCH_SIXTYFOUR
     if (nfloats > 0x1FFFFF && (s->extern_flags & COMPAT_32))
       extern_failwith(s, "output_value: float array cannot be read back on "
                       "32-bit platform");
     if (nfloats < (uintnat) 1 << 32)
-      writecode32(s, CODE_DOUBLE_ARRAY32_NATIVE, nfloats);
+      writecode32(s, code_array32, nfloats);
     else
-      writecode64(s, CODE_DOUBLE_ARRAY64_NATIVE, nfloats);
+      writecode64(s, code_array64, nfloats);
 #else
-    writecode32(s, CODE_DOUBLE_ARRAY32_NATIVE, nfloats);
+    writecode32(s, code_array32, nfloats);
 #endif
   }
+}
+
+Caml_inline void extern_double_array_native(struct caml_extern_state* s,
+                                            value v, mlsize_t nfloats)
+{
+  extern_write_double_array_header(s, nfloats, CODE_DOUBLE_ARRAY8_NATIVE,
+                                               CODE_DOUBLE_ARRAY32_NATIVE,
+                                               CODE_DOUBLE_ARRAY64_NATIVE);
   writeblock_float8(s, (double *) v, nfloats);
 }
+
+#if ARCH_FLOAT_ENDIANNESS == 0x76543210
+
+Caml_inline void extern_double_array_little(struct caml_extern_state* s,
+                                            value v, mlsize_t nfloats)
+{
+  extern_write_double_array_header(s, nfloats, CODE_DOUBLE_ARRAY8_LITTLE,
+                                               CODE_DOUBLE_ARRAY32_LITTLE,
+                                               CODE_DOUBLE_ARRAY64_LITTLE);
+  caml_serialize_block_float_8((double *) v, nfloats);
+}
+
+#else
+
+#define extern_double_array_little extern_double_array_native
+
+#endif
 
 /* Marshaling custom blocks */
 
@@ -801,7 +845,10 @@ static void extern_rec(struct caml_extern_state* s, value v)
     }
     case Double_tag: {
       CAMLassert(sizeof(double) == 8);
-      extern_double(s, v);
+      if (! (s->extern_flags & LITTLE_FLOAT))
+        extern_double_native(s, v);
+      else
+        extern_double_little(s, v);
       s->size_32 += 1 + 2;
       s->size_64 += 1 + 1;
       extern_record_location(s, v, h);
@@ -811,7 +858,10 @@ static void extern_rec(struct caml_extern_state* s, value v)
       mlsize_t nfloats;
       CAMLassert(sizeof(double) == 8);
       nfloats = Wosize_val(v) / Double_wosize;
-      extern_double_array(s, v, nfloats);
+      if (! (s->extern_flags & LITTLE_FLOAT))
+        extern_double_array_native(s, v, nfloats);
+      else
+        extern_double_array_little(s, v, nfloats);
       s->size_32 += 1 + nfloats * 2;
       s->size_64 += 1 + nfloats;
       extern_record_location(s, v, h);
@@ -885,7 +935,8 @@ static void extern_rec(struct caml_extern_state* s, value v)
   /* Never reached as function leaves with return */
 }
 
-static int extern_flag_values[] = { NO_SHARING, CLOSURES, COMPAT_32 };
+static int extern_flag_values[] =
+  { NO_SHARING, CLOSURES, COMPAT_32, LITTLE_FLOAT };
 
 static intnat extern_value(struct caml_extern_state* s, value v, value flags,
                            /*out*/ char header[32],

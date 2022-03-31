@@ -56,6 +56,7 @@ type extern_flags =
     No_sharing                          (** Don't preserve sharing *)
   | Closures                            (** Send function closures *)
   | Compat_32                           (** Ensure 32-bit compatibility *)
+  | Little_float                        (** Ensure binary float compatibility *)
 (** The flags to the [Marshal.to_*] functions below. *)
 
 val to_channel : out_channel -> 'a -> extern_flags list -> unit
@@ -97,7 +98,6 @@ val to_channel : out_channel -> 'a -> extern_flags list -> unit
    corresponding closure will create a new reference, different from
    the global one.
 
-
    If [flags] contains [Marshal.Compat_32], marshaling fails when
    it encounters an integer value outside the range [[-2{^30}, 2{^30}-1]]
    of integers that are representable on a 32-bit platform.  This
@@ -109,6 +109,15 @@ val to_channel : out_channel -> 'a -> extern_flags list -> unit
    when read back on a 32-bit platform.  The [Mashal.Compat_32] flag
    only matters when marshaling is performed on a 64-bit platform;
    it has no effect if marshaling is performed on a 32-bit platform.
+
+   By default, marshaling of floats writes big-endian doubles on big-endian
+   architectures. Unmarshaling works as expected when a big-endian double is
+   unmarshaled on a little-endian system and vice versa. If [flags] contains
+   [Marshal.Little_float], marshaling on big-endian systems will always
+   serialize little-endian double values, making the marshaled output more
+   equivalent at the binary level. There is a small performance hit if the
+   marshaled value is only to be unmarshaled on big-endian architectures.
+
    @raise Failure if [chan] is not in binary mode.
  *)
 

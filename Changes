@@ -116,6 +116,10 @@ Working version
 - #10986: Add Scanf.sscanf_opt, Scanf.bscanf_opt and Scanf.scanf_opt.
   (Nicolás Ojeda Bär, review by Florian Angeletti and Gabriel Scherer)
 
+- #11149: Add Marshal.Little_float flag to allow big-endian systems to specify
+  that float values should be physically written in little-endian format.
+  (David Allsopp, review by ???)
+
 ### Other libraries:
 
 * #9071, #9100, #10935: Reimplement `Thread.exit()` as raising the
