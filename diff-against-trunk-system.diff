@@ -2507,12 +2507,12 @@ index 0000000000..d9e135d7b5
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..b2acf00c70
+index 0000000000..8df9f2dbc4
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3341 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+index 1b45ec3e38..f2d2b1d514 100644
++index 5289eb0092..665fb67a3f 100644
 +--- a/ocamltest/Makefile
 ++++ b/ocamltest/Makefile
 +@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
@@ -5854,7 +5854,7 @@ index 0000000000..b2acf00c70
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8d4af57edc
+index 0000000000..cc5acb81a8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5827 @@
@@ -8367,12 +8367,12 @@ index 0000000000..8d4af57edc
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..b2acf00c70
++index 0000000000..8df9f2dbc4
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3341 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++index 1b45ec3e38..f2d2b1d514 100644
+++index 5289eb0092..665fb67a3f 100644
 ++--- a/ocamltest/Makefile
 +++++ b/ocamltest/Makefile
 ++@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
