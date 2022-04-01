@@ -42,9 +42,12 @@ choose_best = $(strip $(if \
     $(ROOTDIR)/$1.opt$(EXE), \
     $(OCAMLRUN) $(ROOTDIR)/$1$(EXE)))
 
+BEST_BOOT_OCAMLC := $(if $(and $(USE_BEST_BINARIES),$(wildcard $(ROOTDIR)/ocamlc.opt$(EXE))), \
+	$(ROOTDIR)/ocamlc.opt$(EXE),$(OCAMLRUN) $(ROOTDIR)/boot/ocamlc)
 BEST_OCAMLC := $(call choose_best,ocamlc)
 BEST_OCAMLOPT := $(call choose_best,ocamlopt)
 BEST_OCAMLLEX := $(call choose_best,lex/ocamllex)
+BEST_OCAMLMKLIB := $(call choose_best,tools/ocamlmklib)
 
 # We want to be able to compute dependencies even if the bytecode compiler
 # is not built yet, using the bootstrap compiler.

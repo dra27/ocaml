@@ -26,12 +26,13 @@ OCAMLDEP ?= $(BOOT_OCAMLDEP)
 OCAMLLEX ?= $(BOOT_OCAMLLEX)
 
 include $(ROOTDIR)/Makefile.common
+include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLYACCFLAGS = -v
 
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) \
+CAMLC = $(BEST_BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) \
   -use-prims $(ROOTDIR)/runtime/primitives -strict-sequence
-CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) $(STDLIBFLAGS)
+CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 COMPFLAGS = -g -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
             -safe-string -strict-sequence -strict-formats -bin-annot
 LINKFLAGS = -g

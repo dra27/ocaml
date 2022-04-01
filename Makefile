@@ -23,6 +23,7 @@ ROOTDIR = .
 OCAMLDEP ?= $(BOOT_OCAMLDEP)
 OCAMLLEX ?= $(BOOT_OCAMLLEX)
 include Makefile.common
+include Makefile.best_binaries
 
 .PHONY: defaultentry
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -39,8 +40,8 @@ endif
 
 include stdlib/StdlibModules
 
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g -use-prims runtime/primitives
-CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -g -I otherlibs/dynlink
+CAMLC = $(BEST_BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g -use-prims runtime/primitives
+CAMLOPT=$(BEST_OCAMLOPT) $(STDLIBFLAGS) -g -I otherlibs/dynlink
 ARCHES=amd64 i386 arm arm64 power s390x riscv
 DIRS = utils parsing typing bytecomp file_formats lambda middle_end \
   middle_end/closure middle_end/flambda middle_end/flambda/base_types \
@@ -849,6 +850,12 @@ library-cross:
 libraryopt:
 	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) allopt
 
+# XXX CAMLC isn't actually used here, it's just that the .cmi files depend on it
+libraryopt_boot:
+	$(MAKE) -C stdlib \
+	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
+	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' allopt
+
 partialclean::
 	$(MAKE) -C stdlib clean
 
@@ -926,11 +933,19 @@ partialclean:: partialclean-menhir
 # OCamldoc
 
 .PHONY: ocamldoc
-ocamldoc: ocamlc ocamlyacc ocamllex otherlibraries
+ocamldoc: ocamlyacc ocamllex otherlibraries
+	$(MAKE) -C ocamldoc all
+
+.PHONY: ocamldoc_boot
+ocamldoc_boot: otherlibraries_boot
 	$(MAKE) -C ocamldoc all
 
 .PHONY: ocamldoc.opt
 ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
+	$(MAKE) -C ocamldoc opt.opt
+
+.PHONY: ocamldoc.opt_boot
+ocamldoc.opt_boot:
 	$(MAKE) -C ocamldoc opt.opt
 
 # OCamltest
@@ -965,6 +980,10 @@ partialclean::
 otherlibraries: ocamltools
 	$(MAKE) -C otherlibs all
 
+.PHONY: otherlibraries_boot
+otherlibraries_boot:
+	$(MAKE) -C otherlibs all
+
 .PHONY: otherlibrariesopt
 otherlibrariesopt:
 	$(MAKE) -C otherlibs allopt
@@ -978,7 +997,11 @@ clean::
 # The replay debugger
 
 .PHONY: ocamldebugger
-ocamldebugger: ocamlc ocamlyacc ocamllex otherlibraries
+ocamldebugger: ocamlyacc ocamllex otherlibraries
+	$(MAKE) -C debugger all
+
+.PHONY: ocamldebugger_boot
+ocamldebugger_boot: otherlibraries_boot
 	$(MAKE) -C debugger all
 
 partialclean::
@@ -1034,6 +1057,10 @@ ocamltoolsopt: ocamlopt
 .PHONY: ocamltoolsopt.opt
 ocamltoolsopt.opt: ocamlc.opt ocamllex.opt compilerlibs/ocamlmiddleend.cmxa
 	$(MAKE) -C tools opt.opt
+
+.PHONY: ocamltoolsopt.opt_boot
+ocamltoolsopt.opt_boot: ocamlc.opt ocamllex.opt compilerlibs/ocamlmiddleend.cmxa
+	$(MAKE) -C tools opt.opt_boot
 
 partialclean::
 	$(MAKE) -C tools clean
@@ -1192,3 +1219,26 @@ config.status:
 	@echo "  make install"
 	@echo "should work."
 	@false
+
+.PHONY: goon
+goon:
+	$(MAKE) coldstart
+	cp runtime/libcamlrun.a stdlib/libcamlrun.a
+	$(MAKE) runtimeopt ocamlyacc
+	$(MAKE) ocamlopt
+	$(MAKE) libraryopt_boot
+	$(MAKE) ocamlopt.opt
+	$(MAKE) ocamllex.opt
+	$(MAKE) ocamlc.opt
+	$(MAKE) ocaml
+	$(MAKE) -C tools ocamlmklib.opt
+	$(MAKE) otherlibraries_boot $(if $(WITH_DEBUGGER),ocamldebugger_boot) $(if $(WITH_OCAMLDOC),ocamldoc_boot)
+	$(MAKE) otherlibrariesopt
+	$(MAKE) ocamltoolsopt.opt_boot $(if $(OCAMLDOC_OPT),ocamldoc.opt_boot) \
+	  ocamlnat
+	$(MAKE) driver/main.cmo
+	$(MAKE) -C tools profiling.cmo
+	$(MAKE) compilerlibs/ocamlmiddleend.cma
+ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
+	$(MAKE) manpages
+endif

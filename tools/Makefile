@@ -32,9 +32,9 @@ define byte2native
 $(patsubst %.cmo,%.cmx,$(patsubst %.cma,%.cmxa,$1))
 endef
 
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g \
+CAMLC = $(BEST_BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g \
         -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
-CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) $(STDLIBFLAGS) -g
+CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS) -g
 DIRS = $(addprefix $(ROOTDIR)/,utils parsing typing bytecomp \
                    middle_end middle_end/closure middle_end/flambda \
                    middle_end/flambda/base_types driver toplevel \
@@ -47,14 +47,17 @@ VPATH := $(filter-out -I,$(INCLUDES))
 
 programs_byte := \
   ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
-  ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
-  primreq stripdebug cmpbyt
+  ocamlmktop ocamlcmt ocamlobjinfo
+programs_byte_internal := \
+  dumpobj primreq stripdebug cmpbyt
 install_files += $(filter $(installed_tools), $(programs_byte))
 programs_opt := $(programs_byte:%=%.opt)
+programs_opt_internal := $(programs_byte_internal:%=%.opt)
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
-all: $(programs_byte)
-opt.opt: $(programs_opt)
+all: $(programs_byte) $(programs_byte_internal)
+opt.opt: $(programs_opt) $(programs_opt_internal)
+opt.opt_boot: $(programs_optdumpobj )
 allopt: opt.opt
 
 $(foreach program, $(programs_byte) $(programs_opt),\
@@ -317,7 +320,7 @@ caml_tex := caml-tex$(EXE)
 # configuration.
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
 $(caml_tex): $(caml_tex_files)
-	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS) \
+	$(BEST_OCAMLC) $(STDLIBFLAGS) \
 	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
 
 # we need str and unix which depend on the bytecode version of other tools
