@@ -2,10 +2,10 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index fadbdc7341..5a365ab844 100644
+index 2de3012b23..5203a8980e 100644
 --- a/Changes
 +++ b/Changes
-@@ -264,13 +264,13 @@ OCaml 4.14.0
+@@ -267,13 +267,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -21,7 +21,7 @@ index fadbdc7341..5a365ab844 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -370,6 +370,9 @@ OCaml 4.14.0
+@@ -373,6 +373,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -31,7 +31,7 @@ index fadbdc7341..5a365ab844 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -625,6 +628,9 @@ OCaml 4.14.0
+@@ -628,6 +631,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -2507,15 +2507,15 @@ index 0000000000..d9e135d7b5
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..8df9f2dbc4
+index 0000000000..d55e6a4ec9
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3341 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+index 5289eb0092..665fb67a3f 100644
++index d3e5eefb47..68b7f098c6 100644
 +--- a/ocamltest/Makefile
 ++++ b/ocamltest/Makefile
-+@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
++@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 + 	    $(call SUBST,DIFF_FLAGS) \
 + 	    $(call SUBST,WINDOWS_UNICODE) \
 + 	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -5854,7 +5854,7 @@ index 0000000000..8df9f2dbc4
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..cc5acb81a8
+index 0000000000..684dce5182
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5827 @@
@@ -5862,10 +5862,10 @@ index 0000000000..cc5acb81a8
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index fadbdc7341..5a365ab844 100644
++index 2de3012b23..5203a8980e 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -264,13 +264,13 @@ OCaml 4.14.0
++@@ -267,13 +267,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5881,7 +5881,7 @@ index 0000000000..cc5acb81a8
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -370,6 +370,9 @@ OCaml 4.14.0
++@@ -373,6 +373,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5891,7 +5891,7 @@ index 0000000000..cc5acb81a8
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -625,6 +628,9 @@ OCaml 4.14.0
++@@ -628,6 +631,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -8367,15 +8367,15 @@ index 0000000000..cc5acb81a8
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..8df9f2dbc4
++index 0000000000..d55e6a4ec9
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3341 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++index 5289eb0092..665fb67a3f 100644
+++index d3e5eefb47..68b7f098c6 100644
 ++--- a/ocamltest/Makefile
 +++++ b/ocamltest/Makefile
-++@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+++@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 ++ 	    $(call SUBST,DIFF_FLAGS) \
 ++ 	    $(call SUBST,WINDOWS_UNICODE) \
 ++ 	    $(call SUBST,FUNCTION_SECTIONS) \
