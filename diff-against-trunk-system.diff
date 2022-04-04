@@ -1,11 +1,25 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..71feeb9dad
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:17.037139885 +0100
+++++ b	2023-09-28 18:44:17.053140535 +0100
++@@ -15,7 +15,7 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -1072,7 +1072,7 @@ let end_assembly() =
+++@@ -1125,7 +1125,7 @@ let end_assembly() =
++        efa_string = (fun s -> D.bytes (s ^ "\000"))
++      };
++  
 diff --git a/Changes b/Changes
-index 2de3012b23..5203a8980e 100644
+index 6355e991b7..fb13f600f2 100644
 --- a/Changes
 +++ b/Changes
-@@ -267,13 +267,13 @@ OCaml 4.14.0
+@@ -271,13 +271,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -21,7 +35,7 @@ index 2de3012b23..5203a8980e 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -373,6 +373,9 @@ OCaml 4.14.0
+@@ -377,6 +377,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -31,7 +45,7 @@ index 2de3012b23..5203a8980e 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -628,6 +631,9 @@ OCaml 4.14.0
+@@ -632,6 +635,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -79,7 +93,7 @@ index c579c616e3..aba6d18670 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index 2e03adf10d..22a45aa904 100644
+index 545885ebc7..959a33c77c 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -63,6 +63,7 @@ let cfi_endproc () =
@@ -5854,18 +5868,32 @@ index 0000000000..d55e6a4ec9
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..684dce5182
+index 0000000000..48c4453758
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5827 @@
+@@ -0,0 +1,5828 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..71feeb9dad
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:17.037139885 +0100
++++++ b	2023-09-28 18:44:17.053140535 +0100
+++@@ -15,7 +15,7 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -1072,7 +1072,7 @@ let end_assembly() =
++++@@ -1125,7 +1125,7 @@ let end_assembly() =
+++        efa_string = (fun s -> D.bytes (s ^ "\000"))
+++      };
+++  
 +diff --git a/Changes b/Changes
-+index 2de3012b23..5203a8980e 100644
++index 6355e991b7..fb13f600f2 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -267,13 +267,13 @@ OCaml 4.14.0
++@@ -271,13 +271,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -5881,7 +5909,7 @@ index 0000000000..684dce5182
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -373,6 +373,9 @@ OCaml 4.14.0
++@@ -377,6 +377,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -5891,7 +5919,7 @@ index 0000000000..684dce5182
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -628,6 +631,9 @@ OCaml 4.14.0
++@@ -632,6 +635,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -5939,7 +5967,7 @@ index 0000000000..684dce5182
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index 2e03adf10d..22a45aa904 100644
++index 545885ebc7..959a33c77c 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -63,6 +63,7 @@ let cfi_endproc () =
@@ -11671,20 +11699,8 @@ index 0000000000..684dce5182
 +++(* TEST
 +++   * skip
 +++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
+++
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
