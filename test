@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+target=goon
+
+for branch in no-bytecode trunk; do
+  git clean -dfX &>/dev/null
+  git checkout $branch
+  echo "Configure branch $branch for building $target"
+  script -ec './configure --disable-installing-bytecode-programs --disable-stdlib-manpages' $branch-configure.log &>/dev/null
+  for cores in `seq 64 -1 1`; do
+    for run in `seq 1 5`; do
+      echo "Building $branch with -j $cores (run $run)"
+      mv config.status config.bak
+      git clean -dfX &>/dev/null
+      mv config.bak config.status
+      script -ec './config.status' $branch-$cores-$run-configure.log &>/dev/null
+      script -ec "time make -j $cores $target" $branch-$cores-$run-build.log &>/dev/null
+    done
+  done
+  target=world.opt
+done
