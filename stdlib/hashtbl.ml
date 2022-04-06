@@ -290,7 +290,7 @@ module type SeededHashedType =
   sig
     type t
     val equal: t -> t -> bool
-    val hash: int -> t -> int
+    val seeded_hash: int -> t -> int
   end
 
 module type S =
@@ -360,7 +360,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
     let copy = copy
 
     let key_index h key =
-      (H.hash h.seed key) land (Array.length h.data - 1)
+      (H.seeded_hash h.seed key) land (Array.length h.data - 1)
 
     let add h key data =
       let i = key_index h key in
@@ -487,7 +487,7 @@ module Make(H: HashedType): (S with type key = H.t) =
     include MakeSeeded(struct
         type t = H.t
         let equal = H.equal
-        let hash (_seed: int) x = H.hash x
+        let seeded_hash (_seed: int) x = H.hash x
       end)
     let create sz = create ~random:false sz
     let of_seq i =
