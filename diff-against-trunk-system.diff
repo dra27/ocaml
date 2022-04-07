@@ -1,43 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..232abae58b
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:44:18.445197031 +0100
-++++ b	2023-09-28 18:44:18.465197843 +0100
-+@@ -154,7 +154,7 @@
-+ diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
-+ --- a/stdlib/hashtbl.ml
-+ +++ b/stdlib/hashtbl.ml
-+-@@ -284,7 +284,7 @@ module type SeededHashedType =
-++@@ -292,7 +292,7 @@ module type SeededHashedType =
-+    sig
-+      type t
-+      val equal: t -> t -> bool
-+@@ -163,7 +163,7 @@
-+    end
-+  
-+  module type S =
-+-@@ -354,7 +354,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-++@@ -362,7 +362,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-+      let copy = copy
-+  
-+      let key_index h key =
-+@@ -172,7 +172,7 @@
-+  
-+      let add h key data =
-+        let i = key_index h key in
-+-@@ -481,7 +481,7 @@ module Make(H: HashedType): (S with type key = H.t) =
-++@@ -489,7 +489,7 @@ module Make(H: HashedType): (S with type key = H.t) =
-+      include MakeSeeded(struct
-+          type t = H.t
-+          let equal = H.equal
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 5ea99ca9a5..7088f1a173 100644
+index 61e37b0311..c724140473 100644
 --- a/Changes
 +++ b/Changes
-@@ -288,13 +288,13 @@ OCaml 4.14.0
+@@ -292,13 +292,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -53,7 +21,7 @@ index 5ea99ca9a5..7088f1a173 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -394,6 +394,9 @@ OCaml 4.14.0
+@@ -398,6 +398,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -63,7 +31,7 @@ index 5ea99ca9a5..7088f1a173 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -649,6 +652,9 @@ OCaml 4.14.0
+@@ -653,6 +656,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6048,50 +6016,18 @@ index 0000000000..d55e6a4ec9
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8f62f1a3ca
+index 0000000000..1f32d4a8f1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5934 @@
+@@ -0,0 +1,5936 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..232abae58b
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:44:18.445197031 +0100
-+++++ b	2023-09-28 18:44:18.465197843 +0100
-++@@ -154,7 +154,7 @@
-++ diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
-++ --- a/stdlib/hashtbl.ml
-++ +++ b/stdlib/hashtbl.ml
-++-@@ -284,7 +284,7 @@ module type SeededHashedType =
-+++@@ -292,7 +292,7 @@ module type SeededHashedType =
-++    sig
-++      type t
-++      val equal: t -> t -> bool
-++@@ -163,7 +163,7 @@
-++    end
-++  
-++  module type S =
-++-@@ -354,7 +354,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-+++@@ -362,7 +362,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-++      let copy = copy
-++  
-++      let key_index h key =
-++@@ -172,7 +172,7 @@
-++  
-++      let add h key data =
-++        let i = key_index h key in
-++-@@ -481,7 +481,7 @@ module Make(H: HashedType): (S with type key = H.t) =
-+++@@ -489,7 +489,7 @@ module Make(H: HashedType): (S with type key = H.t) =
-++      include MakeSeeded(struct
-++          type t = H.t
-++          let equal = H.equal
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 5ea99ca9a5..7088f1a173 100644
++index 61e37b0311..c724140473 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -288,13 +288,13 @@ OCaml 4.14.0
++@@ -292,13 +292,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6107,7 +6043,7 @@ index 0000000000..8f62f1a3ca
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -394,6 +394,9 @@ OCaml 4.14.0
++@@ -398,6 +398,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6117,7 +6053,7 @@ index 0000000000..8f62f1a3ca
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -649,6 +652,9 @@ OCaml 4.14.0
++@@ -653,6 +656,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -11985,7 +11921,41 @@ index 0000000000..8f62f1a3ca
 ++@@ -3,17 +3,15 @@ flags += " -g "
 ++ ocamldebug_script = "${test_source_directory}/input_script"
 ++ readonly_files = "printer.ml"
-++ include d
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12108,10 +12078,10 @@ index 6a44270f76..b61f3a3d76 100644
          ap_specialised = Default_specialise
        }
 diff --git a/manual/src/library/stdlib-blurb.etex b/manual/src/library/stdlib-blurb.etex
-index 4535ec7edf..047464d984 100644
+index 885d20158d..1e66f7e458 100644
 --- a/manual/src/library/stdlib-blurb.etex
 +++ b/manual/src/library/stdlib-blurb.etex
-@@ -128,10 +128,10 @@ be called from C \\
+@@ -129,10 +129,10 @@ be called from C \\
  \stddocitem{Callback}{registering OCaml values with the C runtime}
  \stddocitem{Char}{character operations}
  \stddocitem{Complex}{complex numbers}
@@ -12125,7 +12095,7 @@ index 4535ec7edf..047464d984 100644
  \stddocitem{Either}{either values}
  \stddocitem{Ephemeron}{Ephemerons and weak hash table}
  \stddocitem{Filename}{operations on file names}
-@@ -151,7 +151,7 @@ be called from C \\
+@@ -152,7 +152,7 @@ be called from C \\
  \stddocitem{Map}{association tables over ordered types}
  \stddocitem{Marshal}{marshaling of data structures}
  \stddocitem{MoreLabels}{include modules \texttt{Hashtbl}, \texttt{Map} and \texttt{Set} with labels}
@@ -12134,7 +12104,7 @@ index 4535ec7edf..047464d984 100644
  \stddocitem{Nativeint}{processor-native integers}
  \stddocitem{Oo}{object-oriented extension}
  \stddocitem{Option}{option values}
-@@ -165,7 +165,7 @@ be called from C \\
+@@ -166,7 +166,7 @@ be called from C \\
  \stddocitem{Scanf}{formatted input functions}
  \stddocitem{Seq}{functional iterators}
  \stddocitem{Set}{sets over ordered types}
