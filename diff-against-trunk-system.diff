@@ -2,10 +2,10 @@ diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 61e37b0311..c724140473 100644
+index e3a3d31819..85ec124d85 100644
 --- a/Changes
 +++ b/Changes
-@@ -292,13 +292,13 @@ OCaml 4.14.0
+@@ -295,13 +295,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -21,7 +21,7 @@ index 61e37b0311..c724140473 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -398,6 +398,9 @@ OCaml 4.14.0
+@@ -401,6 +401,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -31,7 +31,7 @@ index 61e37b0311..c724140473 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -653,6 +656,9 @@ OCaml 4.14.0
+@@ -656,6 +659,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6016,7 +6016,7 @@ index 0000000000..d55e6a4ec9
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1f32d4a8f1
+index 0000000000..5ecb5052c2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5936 @@
@@ -6024,10 +6024,10 @@ index 0000000000..1f32d4a8f1
 +new file mode 100644
 +index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 61e37b0311..c724140473 100644
++index e3a3d31819..85ec124d85 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -292,13 +292,13 @@ OCaml 4.14.0
++@@ -295,13 +295,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6043,7 +6043,7 @@ index 0000000000..1f32d4a8f1
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -398,6 +398,9 @@ OCaml 4.14.0
++@@ -401,6 +401,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6053,7 +6053,7 @@ index 0000000000..1f32d4a8f1
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -653,6 +656,9 @@ OCaml 4.14.0
++@@ -656,6 +659,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
