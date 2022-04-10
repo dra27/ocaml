@@ -98,7 +98,6 @@ AC_SUBST([model])
 AC_SUBST([system])
 AC_SUBST([systhread_support])
 AC_SUBST([unix_or_win32])
-AC_SUBST([unixlib])
 AC_SUBST([outputexe])
 AC_SUBST([outputobj])
 AC_SUBST([syslib])
@@ -543,11 +542,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
-    [unix_or_win32="win32"
-    unixlib="win32unix"
-    ],
-  [unix_or_win32="unix"
-  unixlib="unix"])
+    [unix_or_win32="win32"],
+  [unix_or_win32="unix"])
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
     [exeext=".exe"],
@@ -556,7 +552,7 @@ AS_CASE([$host],
 otherlibraries="dynlink"
 AS_IF([test x"$enable_unix_lib" != "xno"],
   [enable_unix_lib=yes
-   otherlibraries="$otherlibraries $unixlib"])
+   otherlibraries="$otherlibraries unix"])
 AS_IF([test x"$enable_str_lib" != "xno"],
   [otherlibraries="$otherlibraries str"])
 
