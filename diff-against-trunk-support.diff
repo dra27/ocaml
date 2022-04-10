@@ -1,5 +1,5 @@
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index d3e5eefb47..68b7f098c6 100644
+index 699dd26323..f28099869e 100644
 --- a/ocamltest/Makefile
 +++ b/ocamltest/Makefile
 @@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
@@ -11,7 +11,7 @@ index d3e5eefb47..68b7f098c6 100644
  
  # Manual
 diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-index 02a437db3a..0f2974d12a 100644
+index d2cacd6865..16b11083e4 100644
 --- a/ocamltest/builtin_actions.ml
 +++ b/ocamltest/builtin_actions.ml
 @@ -181,6 +181,12 @@ let function_sections = make
