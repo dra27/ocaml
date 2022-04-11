@@ -1,48 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..813ac7c00c
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,39 @@
-+--- a	2023-09-28 18:44:20.545282171 +0100
-++++ b	2023-09-28 18:44:20.581283630 +0100
-+@@ -178,7 +178,7 @@
-+  AC_SUBST([outputexe])
-+  AC_SUBST([outputobj])
-+  AC_SUBST([syslib])
-+-@@ -533,11 +532,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++@@ -543,11 +542,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+  
-+  AS_CASE([$host],
-+    [*-*-mingw32|*-pc-windows],
-+@@ -192,7 +192,7 @@
-+  AS_CASE([$host],
-+    [*-*-cygwin*|*-*-mingw32|*-pc-windows],
-+      [exeext=".exe"],
-+-@@ -546,7 +542,7 @@ AS_CASE([$host],
-++@@ -556,7 +552,7 @@ AS_CASE([$host],
-+  otherlibraries="dynlink"
-+  AS_IF([test x"$enable_unix_lib" != "xno"],
-+    [enable_unix_lib=yes
-+@@ -1030,7 +1030,7 @@
-+  #define Nothing ((value) 0)
-+  
-+  extern value unix_error_of_code (int errcode);
-+-@@ -43,18 +96,30 @@ extern void caml_unix_check_path(value path, const char * cmdname);
-++@@ -43,19 +96,31 @@ extern void caml_unix_check_path(value path, const char * cmdname);
-+  
-+  #define DIR_Val(v) *((DIR **) &Field(v, 0))
-+  
-+@@ -1062,7 +1062,8 @@
-+  #define EXECV_CAST
-+ +#endif
-+  
-+- #endif /* CAML_UNIXSUPPORT_H */
-++ /* BACKPORT BEGIN */
-++ #define caml_process_pending_signals caml_process_pending_actions
-+ diff --git a/otherlibs/unix/unixsupport.c b/otherlibs/unix/unixsupport_unix.c
-+ similarity index 100%
-+ rename from otherlibs/unix/unixsupport.c
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 0e76e12e3e..893bfdbd51 100644
 --- a/Changes
@@ -2731,12 +2689,12 @@ index 0000000000..7c407d1ddb
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..d55e6a4ec9
+index 0000000000..90aee5cb50
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3341 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+index d3e5eefb47..68b7f098c6 100644
++index 699dd26323..f28099869e 100644
 +--- a/ocamltest/Makefile
 ++++ b/ocamltest/Makefile
 +@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
@@ -2748,7 +2706,7 @@ index 0000000000..d55e6a4ec9
 + 
 + # Manual
 +diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-+index 02a437db3a..0f2974d12a 100644
++index d2cacd6865..16b11083e4 100644
 +--- a/ocamltest/builtin_actions.ml
 ++++ b/ocamltest/builtin_actions.ml
 +@@ -181,6 +181,12 @@ let function_sections = make
@@ -6078,55 +6036,13 @@ index 0000000000..d55e6a4ec9
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5e667e73aa
+index 0000000000..d87a922141
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6058 @@
+@@ -0,0 +1,5945 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..813ac7c00c
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,39 @@
-++--- a	2023-09-28 18:44:20.545282171 +0100
-+++++ b	2023-09-28 18:44:20.581283630 +0100
-++@@ -178,7 +178,7 @@
-++  AC_SUBST([outputexe])
-++  AC_SUBST([outputobj])
-++  AC_SUBST([syslib])
-++-@@ -533,11 +532,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+++@@ -543,11 +542,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++  
-++  AS_CASE([$host],
-++    [*-*-mingw32|*-pc-windows],
-++@@ -192,7 +192,7 @@
-++  AS_CASE([$host],
-++    [*-*-cygwin*|*-*-mingw32|*-pc-windows],
-++      [exeext=".exe"],
-++-@@ -546,7 +542,7 @@ AS_CASE([$host],
-+++@@ -556,7 +552,7 @@ AS_CASE([$host],
-++  otherlibraries="dynlink"
-++  AS_IF([test x"$enable_unix_lib" != "xno"],
-++    [enable_unix_lib=yes
-++@@ -1030,7 +1030,7 @@
-++  #define Nothing ((value) 0)
-++  
-++  extern value unix_error_of_code (int errcode);
-++-@@ -43,18 +96,30 @@ extern void caml_unix_check_path(value path, const char * cmdname);
-+++@@ -43,19 +96,31 @@ extern void caml_unix_check_path(value path, const char * cmdname);
-++  
-++  #define DIR_Val(v) *((DIR **) &Field(v, 0))
-++  
-++@@ -1062,7 +1062,8 @@
-++  #define EXECV_CAST
-++ +#endif
-++  
-++- #endif /* CAML_UNIXSUPPORT_H */
-+++ /* BACKPORT BEGIN */
-+++ #define caml_process_pending_signals caml_process_pending_actions
-++ diff --git a/otherlibs/unix/unixsupport.c b/otherlibs/unix/unixsupport_unix.c
-++ similarity index 100%
-++ rename from otherlibs/unix/unixsupport.c
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 0e76e12e3e..893bfdbd51 100644
 +--- a/Changes
@@ -8815,12 +8731,12 @@ index 0000000000..5e667e73aa
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..d55e6a4ec9
++index 0000000000..90aee5cb50
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3341 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++index d3e5eefb47..68b7f098c6 100644
+++index 699dd26323..f28099869e 100644
 ++--- a/ocamltest/Makefile
 +++++ b/ocamltest/Makefile
 ++@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
@@ -8832,7 +8748,7 @@ index 0000000000..5e667e73aa
 ++ 
 ++ # Manual
 ++diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-++index 02a437db3a..0f2974d12a 100644
+++index d2cacd6865..16b11083e4 100644
 ++--- a/ocamltest/builtin_actions.ml
 +++++ b/ocamltest/builtin_actions.ml
 ++@@ -181,6 +181,12 @@ let function_sections = make
@@ -12068,78 +11984,7 @@ index 0000000000..5e667e73aa
 ++ *)
 ++ 
 ++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 175f507549..340e604fde 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/te
+++dif
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
