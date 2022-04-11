@@ -444,6 +444,8 @@ static void intern_rec(struct caml_intern_state* s,
       if (size == 0) {
         v = Atom(tag);
       } else {
+        if (tag == 245 || tag == 248) /* Final Object_tag value */
+          tag = Object_tag; /* Current Object_tag value */
         v = intern_alloc_obj (s, d, size, tag);
         if (s->intern_obj_table != NULL)
           s->intern_obj_table[s->obj_counter++] = v;
