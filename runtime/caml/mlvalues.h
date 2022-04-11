@@ -239,7 +239,7 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
 
 /* Another special case: objects */
-#define Object_tag 248
+#define Object_tag 245
 #define Class_val(val) Field((val), 0)
 #define Oid_val(val) Long_val(Field((val), 1))
 CAMLextern value caml_get_public_method (value obj, value tag);
@@ -261,7 +261,7 @@ Caml_inline void* Ptr_val(value val)
 }
 
 /* Special case of tuples of fields: closures */
-#define Closure_tag 247
+#define Closure_tag 243
 #define Code_val(val) (((code_t *) (val)) [0])     /* Also an l-value. */
 #define Closinfo_val(val) Field((val), 1)          /* Arity and start env */
 /* In the closure info field, the top 8 bits are the arity (signed).
@@ -286,7 +286,7 @@ Caml_inline void* Ptr_val(value val)
 #define Lazy_tag 246
 
 /* Tag used for continuations (see fiber.c) */
-#define Cont_tag 245
+#define Cont_tag 248
 
 /* This tag is used (with Lazy_tag & Forward_tag) to implement lazy values.
  * See major_gc.c and stdlib/lazy.ml. */
