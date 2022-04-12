@@ -207,9 +207,8 @@ Caml_inline void DEBUG_clear(value result, mlsize_t wosize) {
     { GC }                                                                  \
     dom_st->young_ptr -= Whsize_wosize(wosize);                             \
   }                                                                         \
-  Check_tag(tag);                                                           \
   Hd_hp (dom_st->young_ptr) =                                               \
-    Make_header_with_profinfo ((wosize), (tag), 0, profinfo);\
+    Make_header_with_profinfo ((wosize), (tag), 0, profinfo);               \
   (result) = Val_hp (dom_st->young_ptr);                                    \
   DEBUG_clear ((result), (wosize));                                         \
 }while(0)

@@ -371,7 +371,6 @@ static value intern_alloc_obj(struct caml_intern_state* s, caml_domain_state* d,
 {
   void* p;
 
-  Check_tag(tag);
   if (s->intern_dest) {
     CAMLassert ((value*)s->intern_dest >= d->young_start &&
                 (value*)s->intern_dest < d->young_end);
@@ -442,7 +441,6 @@ static void intern_rec(struct caml_intern_state* s,
       tag = code & 0xF;
       size = (code >> 4) & 0x7;
     read_block:
-      Check_tag(tag);
       if (size == 0) {
         v = Atom(tag);
       } else {
