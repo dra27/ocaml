@@ -196,7 +196,7 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
 #endif
 
 /* The lowest tag for blocks containing no value. */
-#define No_scan_tag 251
+#define No_scan_tag 249
 
 
 /* 1- If tag < No_scan_tag : a tuple of fields.  */
@@ -228,7 +228,7 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
 
 /* Forward_tag: forwarding pointer that the GC may silently shortcut.
    See stdlib/lazy.ml. */
-#define Forward_tag 250
+#define Forward_tag 248
 #define Forward_val(v) Field(v, 0)
 /* FIXME: not immutable once shortcutting is implemented */
 
@@ -289,7 +289,7 @@ Caml_inline void* Ptr_val(value val)
 #define Lazy_tag 246
 
 /* Tag used for continuations (see fiber.c) */
-#define Cont_tag 248
+#define Cont_tag 250
 
 /* This tag is used (with Lazy_tag & Forward_tag) to implement lazy values.
  * See major_gc.c and stdlib/lazy.ml. */
