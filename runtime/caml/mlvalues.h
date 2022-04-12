@@ -223,8 +223,8 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
    NOTE: Update stdlib/obj.ml whenever you change the tags.
  */
 
-#define Check_tag(x) {if (x == Forward_tag) caml_fatal_error("Forward not allowed");}
-/*#define Check_tag(x)*/
+/*#define Check_tag(x) {if (x == Forward_tag) caml_fatal_error("Forward not allowed");}*/
+#define Check_tag(x)
 
 /* Forward_tag: forwarding pointer that the GC may silently shortcut.
    See stdlib/lazy.ml. */
