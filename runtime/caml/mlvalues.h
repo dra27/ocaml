@@ -234,7 +234,7 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
 /* Infix_tag must be 1 modulo 2 and infix headers can only occur in blocks
    with tag Closure_tag (see compact.c). */
 
-#define Infix_tag 249
+#define Infix_tag 247
 #define Infix_offset_hd(hd) (Bosize_hd(hd))
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
 

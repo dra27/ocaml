@@ -55,7 +55,7 @@ let cont_tag = 248
 let lazy_tag = 246
 let closure_tag = 243
 let object_tag = 245
-let infix_tag = 249
+let infix_tag = 247
 let forward_tag = 250
 
 let no_scan_tag = 251
