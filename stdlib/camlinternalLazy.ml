@@ -37,7 +37,7 @@ external reset_to_lazy : Obj.t -> unit = "caml_lazy_reset_to_lazy" [@@noalloc]
    [Obj.forcing_tag] and updates the tag to [Obj.forward_tag], taking care to
    handle concurrent marking of this object's header by a concurrent GC thread.
  *)
-external update_to_forward : Obj.t -> unit =
+external _update_to_forward : Obj.t -> unit =
   "caml_lazy_update_to_forward" [@@noalloc]
 
 (* Assumes [blk] is a block with tag forcing *)
@@ -47,8 +47,8 @@ let do_force_block blk =
   Obj.set_field b 0 (Obj.repr ()); (* Release the closure *)
   try
     let result = closure () in
-    Obj.set_field b 0 (Obj.repr result);
-    update_to_forward b;
+    Obj.set_field b 0 (Obj.repr (fun () -> result));
+    reset_to_lazy b;
     result
   with e ->
     Obj.set_field b 0 (Obj.repr (fun () -> raise e));
@@ -61,8 +61,8 @@ let do_force_val_block blk =
   let closure = (Obj.obj (Obj.field b 0) : unit -> 'arg) in
   Obj.set_field b 0 (Obj.repr ()); (* Release the closure *)
   let result = closure () in
-  Obj.set_field b 0 (Obj.repr result);
-  update_to_forward b;
+  Obj.set_field b 0 (Obj.repr (fun () -> result));
+  reset_to_lazy b;
   result
 
 (* Called by [force_gen] *)
