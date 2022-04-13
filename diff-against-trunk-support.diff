@@ -2338,7 +2338,7 @@ index 30fb9eee71..6113340ccf 100644
  
  let r = ref (Some 0)
 diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
-index f07c0e0804..dd7a94f3cf 100644
+index 4248ba10cf..98255fb08d 100644
 --- a/testsuite/tests/parallel/poll.ml
 +++ b/testsuite/tests/parallel/poll.ml
 @@ -1,8 +1,10 @@

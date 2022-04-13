@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:21.809333363 +0100
++++ b	2023-09-28 18:44:21.813333525 +0100
+@@ -24,7 +24,7 @@
+ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
+ --- a/testsuite/tests/parallel/poll.ml
+ +++ b/testsuite/tests/parallel/poll.ml
+-@@ -10,10 +10,18 @@ let continue = Atomic.make true
++@@ -12,10 +12,18 @@ let continue = Atomic.make true
+  let rec loop () =
+    if Atomic.get continue then loop ()
+  

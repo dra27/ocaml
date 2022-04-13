@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..abd06d99eb
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:21.809333363 +0100
+++++ b	2023-09-28 18:44:21.813333525 +0100
++@@ -24,7 +24,7 @@
++ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
++ --- a/testsuite/tests/parallel/poll.ml
++ +++ b/testsuite/tests/parallel/poll.ml
++-@@ -10,10 +10,18 @@ let continue = Atomic.make true
+++@@ -12,10 +12,18 @@ let continue = Atomic.make true
++  let rec loop () =
++    if Atomic.get continue then loop ()
++  
 diff --git a/Changes b/Changes
 index 1c9ae09ca4..7b0c5d8545 100644
 --- a/Changes
@@ -6036,13 +6050,27 @@ index 0000000000..90aee5cb50
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a50930683d
+index 0000000000..e131cc4f46
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5945 @@
+@@ -0,0 +1,5936 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..abd06d99eb
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:21.809333363 +0100
++++++ b	2023-09-28 18:44:21.813333525 +0100
+++@@ -24,7 +24,7 @@
+++ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
+++ --- a/testsuite/tests/parallel/poll.ml
+++ +++ b/testsuite/tests/parallel/poll.ml
+++-@@ -10,10 +10,18 @@ let continue = Atomic.make true
++++@@ -12,10 +12,18 @@ let continue = Atomic.make true
+++  let rec loop () =
+++    if Atomic.get continue then loop ()
+++  
 +diff --git a/Changes b/Changes
 +index 1c9ae09ca4..7b0c5d8545 100644
 +--- a/Changes
@@ -11961,30 +11989,7 @@ index 0000000000..a50930683d
 ++@@ -3,17 +3,15 @@ flags += " -g "
 ++ ocamldebug_script = "${test_source_directory}/input_script"
 ++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++dif
+++ incl
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
