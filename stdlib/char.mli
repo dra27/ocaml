@@ -43,13 +43,13 @@ val uppercase_ascii : char -> char
 type t = char
 (** An alias for the type of characters. *)
 
-val compare: t -> t -> int
+external compare : char -> char -> int = "%compare"
 (** The comparison function for characters, with the same specification as
     {!Stdlib.compare}.  Along with the type [t], this function [compare]
     allows the module [Char] to be passed as argument to the functors
     {!Set.Make} and {!Map.Make}. *)
 
-val equal: t -> t -> bool
+external equal : char -> char -> bool = "%equal"
 (** The equal function for chars.
     @since 4.03.0 *)
 

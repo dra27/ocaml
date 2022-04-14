@@ -304,13 +304,13 @@ val uncapitalize_ascii : bytes -> bytes
 type t = bytes
 (** An alias for the type of byte sequences. *)
 
-val compare: t -> t -> int
+external compare : t -> t -> int = "caml_bytes_compare" [@@noalloc]
 (** The comparison function for byte sequences, with the same
     specification as {!Stdlib.compare}.  Along with the type [t],
     this function [compare] allows the module [Bytes] to be passed as
     argument to the functors {!Set.Make} and {!Map.Make}. *)
 
-val equal: t -> t -> bool
+external equal : t -> t -> bool = "caml_bytes_equal" [@@noalloc]
 (** The equality function for byte sequences.
     @since 4.03.0 (4.05.0 in BytesLabels) *)
 

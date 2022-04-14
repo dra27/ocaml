@@ -89,10 +89,10 @@ val to_char : t -> char
 val unsafe_to_char : t -> char
 (**/**)
 
-val equal : t -> t -> bool
+external equal : int -> int -> bool = "%equal"
 (** [equal u u'] is [u = u']. *)
 
-val compare : t -> t -> int
+external compare : int -> int -> int = "%compare"
 (** [compare u u'] is [Stdlib.compare u u']. *)
 
 val hash : t -> int

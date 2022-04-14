@@ -80,8 +80,8 @@ let of_string_opt s =
 
 type t = int32
 
-let compare (x: t) (y: t) = Stdlib.compare x y
-let equal (x: t) (y: t) = compare x y = 0
+external compare : t -> t -> int = "%compare"
+external equal : t -> t -> bool = "%equal"
 
 let unsigned_compare n m =
   compare (sub n min_int) (sub m min_int)

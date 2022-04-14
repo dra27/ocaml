@@ -147,12 +147,12 @@ val cat : string -> string -> string
 
 (** {1:predicates Predicates and comparisons} *)
 
-val equal : t -> t -> bool
+external equal : string -> string -> bool = "caml_string_equal" [@@noalloc]
 (** [equal s0 s1] is [true] if and only if [s0] and [s1] are character-wise
     equal.
     @since 4.03.0 (4.05.0 in StringLabels) *)
 
-val compare : t -> t -> int
+external compare : t -> t -> int = "caml_string_compare" [@@noalloc]
 (** [compare s0 s1] sorts [s0] and [s1] in lexicographical order. [compare]
     behaves like {!Stdlib.compare} on strings but may be more efficient. *)
 

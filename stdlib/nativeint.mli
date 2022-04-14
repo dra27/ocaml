@@ -210,7 +210,7 @@ val to_string : nativeint -> string
 type t = nativeint
 (** An alias for the type of native integers. *)
 
-val compare: t -> t -> int
+external compare : t -> t -> int = "%compare"
 (** The comparison function for native integers, with the same specification as
     {!Stdlib.compare}.  Along with the type [t], this function [compare]
     allows the module [Nativeint] to be passed as argument to the functors
@@ -222,7 +222,7 @@ val unsigned_compare: t -> t -> int
 
     @since 4.08.0 *)
 
-val equal: t -> t -> bool
+external equal : t -> t -> bool = "%equal"
 (** The equal function for native ints.
     @since 4.03.0 *)
 

@@ -370,7 +370,7 @@ let rcontains_from s i c =
 
 type t = bytes
 
-let compare (x: t) (y: t) = Stdlib.compare x y
+external compare : t -> t -> int = "caml_bytes_compare" [@@noalloc]
 external equal : t -> t -> bool = "caml_bytes_equal" [@@noalloc]
 
 (* duplicated in string.ml *)

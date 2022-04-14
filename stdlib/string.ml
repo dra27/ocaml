@@ -239,7 +239,7 @@ let split_on_char sep s =
 
 type t = string
 
-let compare (x: t) (y: t) = Stdlib.compare x y
+external compare : t -> t -> int = "caml_string_compare" [@@noalloc]
 external equal : string -> string -> bool = "caml_string_equal" [@@noalloc]
 
 (** {1 Iterators} *)

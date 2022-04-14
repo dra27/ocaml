@@ -53,8 +53,8 @@ let to_char u =
 
 let unsafe_to_char = Char.unsafe_chr
 
-let equal : int -> int -> bool = ( = )
-let compare : int -> int -> int = Stdlib.compare
+external equal : int -> int -> bool = "%equal"
+external compare : int -> int -> int = "%compare"
 let hash = to_int
 
 (* UTF codecs tools *)

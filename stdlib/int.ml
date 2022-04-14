@@ -36,8 +36,8 @@ let lognot x = logxor x (-1)
 external shift_left : int -> int -> int = "%lslint"
 external shift_right : int -> int -> int = "%asrint"
 external shift_right_logical : int -> int -> int = "%lsrint"
-let equal : int -> int -> bool = ( = )
-let compare : int -> int -> int = Stdlib.compare
+external equal : int -> int -> bool = "%equal"
+external compare : int -> int -> int = "%compare"
 let min x y : t = if x <= y then x else y
 let max x y : t = if x >= y then x else y
 external to_float : int -> float = "%floatofint"

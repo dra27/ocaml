@@ -18,8 +18,8 @@ type t = bool = false | true
 external not : bool -> bool = "%boolnot"
 external ( && ) : bool -> bool -> bool = "%sequand"
 external ( || ) : bool -> bool -> bool = "%sequor"
-let equal : bool -> bool -> bool = ( = )
-let compare : bool -> bool -> int = Stdlib.compare
+external equal : bool -> bool -> bool = "%equal"
+external compare : bool -> bool -> int = "%compare"
 external to_int : bool -> int = "%identity"
 let to_float = function false -> 0. | true -> 1.
 

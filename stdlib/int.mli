@@ -102,10 +102,10 @@ external shift_right_logical : int -> int -> int = "%lsrint"
 
 (** {1:preds Predicates and comparisons} *)
 
-val equal : int -> int -> bool
+external equal : int -> int -> bool = "%equal"
 (** [equal x y] is [true] if and only if [x = y]. *)
 
-val compare : int -> int -> int
+external compare : int -> int -> int = "%compare"
 (** [compare x y] is {!Stdlib.compare}[ x y] but more efficient. *)
 
 val min : int -> int -> int
