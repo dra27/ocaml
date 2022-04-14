@@ -1,25 +1,34 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..abd06d99eb
+index 0000000000..2af30a5f8f
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:21.809333363 +0100
-++++ b	2023-09-28 18:44:21.813333525 +0100
-+@@ -24,7 +24,7 @@
-+ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
-+ --- a/testsuite/tests/parallel/poll.ml
-+ +++ b/testsuite/tests/parallel/poll.ml
-+-@@ -10,10 +10,18 @@ let continue = Atomic.make true
-++@@ -12,10 +12,18 @@ let continue = Atomic.make true
-+  let rec loop () =
-+    if Atomic.get continue then loop ()
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:44:22.133346479 +0100
+++++ b	2023-09-28 18:44:22.157347450 +0100
++@@ -77,7 +77,7 @@
++  AC_SUBST([mklib])
++  AC_SUBST([supports_shared_libraries])
++  AC_SUBST([natdynlink])
++-@@ -472,32 +470,24 @@ AS_CASE([$enable_dependency_generation],
+++@@ -482,32 +480,24 @@ AS_CASE([$enable_dependency_generation],
++        [compute_deps=true])],
++      [compute_deps=false])])
 +  
++@@ -256,7 +256,7 @@
++  let default_rpath = "%%RPATH%%"
++  let mksharedlibrpath = "%%MKSHAREDLIBRPATH%%"
++  let ar = "%%ARCMD%%"
++-@@ -178,7 +177,6 @@ let configuration_variables =
+++@@ -183,7 +182,6 @@ let configuration_variables =
++    p "bytecomp_c_libraries" bytecomp_c_libraries;
++    p "native_c_libraries" native_c_libraries;
++    p "native_pack_linker" native_pack_linker;
 diff --git a/Changes b/Changes
-index 1c9ae09ca4..7b0c5d8545 100644
+index 2061ddcb23..4fa2f2176c 100644
 --- a/Changes
 +++ b/Changes
-@@ -302,13 +302,13 @@ OCaml 4.14.0
+@@ -305,13 +305,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -35,7 +44,7 @@ index 1c9ae09ca4..7b0c5d8545 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -408,6 +408,9 @@ OCaml 4.14.0
+@@ -411,6 +411,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -45,7 +54,7 @@ index 1c9ae09ca4..7b0c5d8545 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -663,6 +666,9 @@ OCaml 4.14.0
+@@ -666,6 +669,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -56,10 +65,10 @@ index 1c9ae09ca4..7b0c5d8545 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile.config.in b/Makefile.config.in
-index fabec894ae..53be0922ab 100644
+index 8c1f4aeab3..6300ad93f9 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -251,7 +251,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -247,7 +247,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
@@ -566,13 +575,13 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index c735f1eae5..25a0f5a6a4 100755
+index cbec8f27b5..c41035c379 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index f15d2bac49..c54cc15275 100644
+index 2fedbc6591..68f626105e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
+@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -581,7 +590,7 @@ index f15d2bac49..c54cc15275 100644
  AC_SUBST([force_instrumented_runtime])
  
  ## Generated files
-@@ -200,10 +202,10 @@ AC_CANONICAL_TARGET
+@@ -198,10 +200,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -596,7 +605,7 @@ index f15d2bac49..c54cc15275 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -312,15 +314,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -310,15 +312,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -628,7 +637,7 @@ index f15d2bac49..c54cc15275 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1046,67 +1056,67 @@ model=default
+@@ -1036,67 +1046,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -755,7 +764,7 @@ index f15d2bac49..c54cc15275 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1115,8 +1125,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1105,8 +1115,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -766,7 +775,7 @@ index f15d2bac49..c54cc15275 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1127,14 +1137,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1117,14 +1127,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -787,7 +796,7 @@ index f15d2bac49..c54cc15275 100644
  )
  
  AS_CASE([$enable_native_compiler,$arch],
-@@ -1806,7 +1816,8 @@ AS_CASE([$arch,$system],
+@@ -1796,7 +1806,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -797,7 +806,7 @@ index f15d2bac49..c54cc15275 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1855,6 +1866,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1845,6 +1856,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -828,7 +837,7 @@ index f15d2bac49..c54cc15275 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1990,8 +2025,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1980,8 +2015,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -2703,7 +2712,7 @@ index 0000000000..7c407d1ddb
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..90aee5cb50
+index 0000000000..b9eaf6603a
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3341 @@
@@ -5047,7 +5056,7 @@ index 0000000000..90aee5cb50
 + 
 + let r = ref (Some 0)
 +diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
-+index f07c0e0804..dd7a94f3cf 100644
++index 4248ba10cf..98255fb08d 100644
 +--- a/testsuite/tests/parallel/poll.ml
 ++++ b/testsuite/tests/parallel/poll.ml
 +@@ -1,8 +1,10 @@
@@ -6050,32 +6059,41 @@ index 0000000000..90aee5cb50
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e131cc4f46
+index 0000000000..9b52503172
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5936 @@
+@@ -0,0 +1,6058 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..abd06d99eb
++index 0000000000..2af30a5f8f
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:21.809333363 +0100
-+++++ b	2023-09-28 18:44:21.813333525 +0100
-++@@ -24,7 +24,7 @@
-++ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
-++ --- a/testsuite/tests/parallel/poll.ml
-++ +++ b/testsuite/tests/parallel/poll.ml
-++-@@ -10,10 +10,18 @@ let continue = Atomic.make true
-+++@@ -12,10 +12,18 @@ let continue = Atomic.make true
-++  let rec loop () =
-++    if Atomic.get continue then loop ()
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:44:22.133346479 +0100
++++++ b	2023-09-28 18:44:22.157347450 +0100
+++@@ -77,7 +77,7 @@
+++  AC_SUBST([mklib])
+++  AC_SUBST([supports_shared_libraries])
+++  AC_SUBST([natdynlink])
+++-@@ -472,32 +470,24 @@ AS_CASE([$enable_dependency_generation],
++++@@ -482,32 +480,24 @@ AS_CASE([$enable_dependency_generation],
+++        [compute_deps=true])],
+++      [compute_deps=false])])
 ++  
+++@@ -256,7 +256,7 @@
+++  let default_rpath = "%%RPATH%%"
+++  let mksharedlibrpath = "%%MKSHAREDLIBRPATH%%"
+++  let ar = "%%ARCMD%%"
+++-@@ -178,7 +177,6 @@ let configuration_variables =
++++@@ -183,7 +182,6 @@ let configuration_variables =
+++    p "bytecomp_c_libraries" bytecomp_c_libraries;
+++    p "native_c_libraries" native_c_libraries;
+++    p "native_pack_linker" native_pack_linker;
 +diff --git a/Changes b/Changes
-+index 1c9ae09ca4..7b0c5d8545 100644
++index 2061ddcb23..4fa2f2176c 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -302,13 +302,13 @@ OCaml 4.14.0
++@@ -305,13 +305,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6091,7 +6109,7 @@ index 0000000000..e131cc4f46
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -408,6 +408,9 @@ OCaml 4.14.0
++@@ -411,6 +411,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6101,7 +6119,7 @@ index 0000000000..e131cc4f46
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -663,6 +666,9 @@ OCaml 4.14.0
++@@ -666,6 +669,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6112,10 +6130,10 @@ index 0000000000..e131cc4f46
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index fabec894ae..53be0922ab 100644
++index 8c1f4aeab3..6300ad93f9 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -251,7 +251,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -247,7 +247,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
@@ -6622,13 +6640,13 @@ index 0000000000..e131cc4f46
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index c735f1eae5..25a0f5a6a4 100755
++index cbec8f27b5..c41035c379 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index f15d2bac49..c54cc15275 100644
++index 2fedbc6591..68f626105e 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
++@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -6637,7 +6655,7 @@ index 0000000000..e131cc4f46
 + AC_SUBST([force_instrumented_runtime])
 + 
 + ## Generated files
-+@@ -200,10 +202,10 @@ AC_CANONICAL_TARGET
++@@ -198,10 +200,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -6652,7 +6670,7 @@ index 0000000000..e131cc4f46
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -312,15 +314,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -310,15 +312,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -6684,7 +6702,7 @@ index 0000000000..e131cc4f46
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1046,67 +1056,67 @@ model=default
++@@ -1036,67 +1046,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -6811,7 +6829,7 @@ index 0000000000..e131cc4f46
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1115,8 +1125,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1105,8 +1115,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -6822,7 +6840,7 @@ index 0000000000..e131cc4f46
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1127,14 +1137,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1117,14 +1127,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -6843,7 +6861,7 @@ index 0000000000..e131cc4f46
 + )
 + 
 + AS_CASE([$enable_native_compiler,$arch],
-+@@ -1806,7 +1816,8 @@ AS_CASE([$arch,$system],
++@@ -1796,7 +1806,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -6853,7 +6871,7 @@ index 0000000000..e131cc4f46
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1855,6 +1866,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1845,6 +1856,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -6884,7 +6902,7 @@ index 0000000000..e131cc4f46
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1990,8 +2025,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1980,8 +2015,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -8759,7 +8777,7 @@ index 0000000000..e131cc4f46
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..90aee5cb50
++index 0000000000..b9eaf6603a
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3341 @@
@@ -11103,7 +11121,7 @@ index 0000000000..e131cc4f46
 ++ 
 ++ let r = ref (Some 0)
 ++diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
-++index f07c0e0804..dd7a94f3cf 100644
+++index 4248ba10cf..98255fb08d 100644
 ++--- a/testsuite/tests/parallel/poll.ml
 +++++ b/testsuite/tests/parallel/poll.ml
 ++@@ -1,8 +1,10 @@
@@ -11989,7 +12007,120 @@ index 0000000000..e131cc4f46
 ++@@ -3,17 +3,15 @@ flags += " -g "
 ++ ocamldebug_script = "${test_source_directory}/input_script"
 ++ readonly_files = "printer.ml"
-++ incl
+++ include debugger
+++-* skip
+++-reason = "ocamldebug is broken (#34)"
+++-** debugger
+++-*** shared-libraries
+++-**** setup-ocamlc.byte-build-env
+++-***** ocamlc.byte
++++* debugger
++++** shared-libraries
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 175f507549..340e604fde 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,4 +1,6 @@
+++ (* TEST
++++   * skip
++++   reason = "OCaml 5 only"
+++ *)
+++ 
+++ let () = Random.self_init ()
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause r
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12486,7 +12617,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index 08f106d2ce..f8279e90ec 100644
+index b082a0c36e..01221cb0a4 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -50,12 +50,12 @@ LIBNAME=threads
@@ -13262,10 +13393,10 @@ index da23211543..ca0851f1ac 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 4a52e3b159..9707f1f559 100644
+index de64f747b7..1e87a39a5e 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
-@@ -267,7 +267,8 @@ GNUISH_SED = \
+@@ -266,7 +266,8 @@ GNUISH_SED = \
  .INTERMEDIATE: .depend.tmp
  
  .depend.tmp:
@@ -13852,10 +13983,10 @@ index 01722ed9ca..508dd3b226 100644
    opEVENT, Nothing;
    opBREAK, Nothing;
 diff --git a/utils/config.mlp b/utils/config.mlp
-index fc92ba77ec..75087e4b2f 100644
+index 4aa205266e..3e4461a9c7 100644
 --- a/utils/config.mlp
 +++ b/utils/config.mlp
-@@ -122,8 +122,13 @@ let max_tag = 243
+@@ -121,8 +121,13 @@ let max_tag = 243
  let lazy_tag = 246
  
  let max_young_wosize = 256
