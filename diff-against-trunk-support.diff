@@ -2032,20 +2032,13 @@ index 38fe83e57e..1c2737d8b6 100644
  
  (* Memory model: test the _publish idiom *)
 diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
-index 9c1d0a3cf2..b1f5813b4a 100644
+index 823fb32dc2..de7aa2a5b4 100644
 --- a/testsuite/tests/parallel/atomics.ml
 +++ b/testsuite/tests/parallel/atomics.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  type u = U of unit
@@ -2086,128 +2079,79 @@ index 41fd101c1f..d0c5bb6e35 100644
  
  
 diff --git a/testsuite/tests/parallel/constpromote.ml b/testsuite/tests/parallel/constpromote.ml
-index fc9fd65ff6..466c846ed1 100644
+index 9bf7ede7a3..89e2f9aef4 100644
 --- a/testsuite/tests/parallel/constpromote.ml
 +++ b/testsuite/tests/parallel/constpromote.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  (* when run with the bytecode debug runtime, this test
 diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
-index 6006323f45..bf6d7658a1 100644
+index fcdfbec210..d162cd1993 100644
 --- a/testsuite/tests/parallel/deadcont.ml
 +++ b/testsuite/tests/parallel/deadcont.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  (*
 diff --git a/testsuite/tests/parallel/domain_dls.ml b/testsuite/tests/parallel/domain_dls.ml
-index db4ebe0c56..82d8f55e5a 100644
+index 72f4ddf0bd..3d313a288a 100644
 --- a/testsuite/tests/parallel/domain_dls.ml
 +++ b/testsuite/tests/parallel/domain_dls.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  let check_dls () =
 diff --git a/testsuite/tests/parallel/domain_dls2.ml b/testsuite/tests/parallel/domain_dls2.ml
-index 6c79145ba7..279f178774 100644
+index ae301bda36..fe19776342 100644
 --- a/testsuite/tests/parallel/domain_dls2.ml
 +++ b/testsuite/tests/parallel/domain_dls2.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  let _ =
 diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
-index cc583ff508..f3baa3dde0 100644
+index 540ca905fd..a38477147b 100644
 --- a/testsuite/tests/parallel/domain_id.ml
 +++ b/testsuite/tests/parallel/domain_id.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  open Domain
 diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-index 8a8a115141..20fd12d705 100644
+index 0cf33a8c9c..11bad7b4bd 100644
 --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  open Domain
 diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
-index c03791538a..2fd0eb4b9e 100644
+index 2776f14e10..93cb3623da 100644
 --- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
 +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  open Domain
@@ -2248,20 +2192,13 @@ index f6005729b7..3ab3dde90d 100644
  
  
 diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
-index d270cca9bc..5a5c5b2464 100644
+index 8da8fb0234..29f525913e 100644
 --- a/testsuite/tests/parallel/join.ml
 +++ b/testsuite/tests/parallel/join.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  let test_size =
@@ -2320,20 +2257,13 @@ index 2f0fcf20b0..5ce5ea86ea 100644
  
  
 diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
-index 30fb9eee71..6113340ccf 100644
+index 1f29cb6b8b..70b7ed6f69 100644
 --- a/testsuite/tests/parallel/pingpong.ml
 +++ b/testsuite/tests/parallel/pingpong.ml
-@@ -1,8 +1,10 @@
+@@ -1,4 +1,6 @@
  (* TEST
--* hasunix
 +* skip
 +reason = "OCaml 5 only"
-+** hasunix
- include unix
--** bytecode
--** native
-+*** bytecode
-+*** native
  *)
  
  let r = ref (Some 0)
@@ -2356,24 +2286,16 @@ index 4248ba10cf..98255fb08d 100644
  
  let continue = Atomic.make true
 diff --git a/testsuite/tests/parallel/prodcons_domains.ml b/testsuite/tests/parallel/prodcons_domains.ml
-index 67499d342a..e8e9d736f3 100644
+index 2e2c09756c..2b86809df1 100644
 --- a/testsuite/tests/parallel/prodcons_domains.ml
 +++ b/testsuite/tests/parallel/prodcons_domains.ml
-@@ -1,9 +1,11 @@
+@@ -1,4 +1,6 @@
  (* TEST
- 
--* hassysthreads
 +* skip
 +reason = "OCaml 5 only"
-+** hassysthreads
- include systhreads
--** bytecode
--** native
-+*** bytecode
-+*** native
- 
  *)
  
+ (* Classic producer-consumer *)
 diff --git a/testsuite/tests/parallel/tak.ml b/testsuite/tests/parallel/tak.ml
 index a9b6874c4f..bdc4173266 100644
 --- a/testsuite/tests/parallel/tak.ml

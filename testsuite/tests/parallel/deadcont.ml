@@ -1,10 +1,6 @@
 (* TEST
 * skip
 reason = "OCaml 5 only"
-** hasunix
-include unix
-*** bytecode
-*** native
 *)
 
 (*
