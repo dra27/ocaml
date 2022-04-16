@@ -1,12 +1,6 @@
 (* TEST
-
 * skip
 reason = "OCaml 5 only"
-** hassysthreads
-include systhreads
-*** bytecode
-*** native
-
 *)
 
 (* Classic producer-consumer *)
