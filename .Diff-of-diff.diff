@@ -1,0 +1,23 @@
+--- a	2023-09-28 18:44:23.413398263 +0100
++++ b	2023-09-28 18:44:23.417398425 +0100
+@@ -1,8 +1,9 @@
+ diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+ --- a/testsuite/tests/weak-ephe-final/finaliser2.ml
+ +++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+-@@ -1,5 +1,9 @@
+- (* TEST *)
++@@ -3,6 +3,10 @@
++    reason = "OCaml 5 only"
++ *)
+  
+ +let () = Out_channel.set_buffered stdout false
+ +
+@@ -11,7 +12,7 @@
+  let[@inline never][@local never] test1 () =
+    let r' = ref 0 in
+    let rec foo () =
+-@@ -10,30 +14,36 @@ let[@inline never][@local never] test1 () =
++@@ -13,30 +17,36 @@ let[@inline never][@local never] test1 () =
+    Gc.minor();
+    assert (!r' = 1)
+  

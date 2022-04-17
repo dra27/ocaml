@@ -3212,7 +3212,7 @@ index 744c4e844d..621d7292ff 100644
  (* Due to GCs running at non-deterministic places, the output from these tests
   * are unreliable except the bad value checks and as a check for catastrophic
 diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-index e8ab88e807..5cf871e7ac 100644
+index 666a55efeb..5a36157e0e 100644
 --- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 +++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
 @@ -1,4 +1,7 @@
@@ -3222,8 +3222,8 @@ index e8ab88e807..5cf871e7ac 100644
 +   reason = "OCaml 5 only"
 +*)
  
- let[@inline never][@local never] test1 () =
-   let r' = ref 0 in
+ let () = Out_channel.set_buffered stdout false
+ 
 diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 index fa2d2efc43..752a7eeabf 100644
 --- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
