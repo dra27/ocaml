@@ -2192,7 +2192,7 @@ index f6005729b7..3ab3dde90d 100644
  
  
 diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
-index 8da8fb0234..29f525913e 100644
+index ee85838527..f98dbcef64 100644
 --- a/testsuite/tests/parallel/join.ml
 +++ b/testsuite/tests/parallel/join.ml
 @@ -1,4 +1,6 @@
