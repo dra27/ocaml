@@ -14,6 +14,8 @@ jobs:
 # subsequent jobs.
   build:
     runs-on: 'ubuntu-latest'
+    outputs:
+      manual-changed: ${{ steps.manual.outputs.changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,6 +25,21 @@ jobs:
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
+      - name: Check for manual changes
+        id: manual
+        run: >-
+         tools/ci/actions/check-manual-modified.sh
+         '${{ github.ref }}'
+         '${{ github.event_name }}'
+         '${{ github.event.pull_request.base.ref }}'
+         '${{ github.event.pull_request.base.sha }}'
+         '${{ github.event.pull_request.head.ref }}'
+         '${{ github.event.pull_request.head.sha }}'
+         '${{ github.event.ref }}'
+         '${{ github.event.before }}'
+         '${{ github.event.ref }}'
+         '${{ github.event.after }}'
+         '${{ github.event.repository.full_name }}'
       - name: Prepare Artifact
         run: |
           tar --zstd -cf /tmp/sources.tar.zstd .
@@ -57,26 +74,11 @@ jobs:
       - name: Install
         run: |
          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
-      - name: Check for manual changes
-        id: manual
-        run: >-
-         tools/ci/actions/check-manual-modified.sh
-         '${{ github.ref }}'
-         '${{ github.event_name }}'
-         '${{ github.event.pull_request.base.ref }}'
-         '${{ github.event.pull_request.base.sha }}'
-         '${{ github.event.pull_request.head.ref }}'
-         '${{ github.event.pull_request.head.sha }}'
-         '${{ github.event.ref }}'
-         '${{ github.event.before }}'
-         '${{ github.event.ref }}'
-         '${{ github.event.after }}'
-         '${{ github.event.repository.full_name }}'
       - name: Build the manual
         run: |
           MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh manual
        # Temporarily disabled 23-Apr-2021 while Dune isn't building
-        if: steps.manual.outputs.changed == 'disabled'
+        if: needs.build.outputs.manual-changed == 'disabled'
       - name: Other checks
         run: |
           MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks
