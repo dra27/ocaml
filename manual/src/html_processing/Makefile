@@ -88,14 +88,15 @@ distclean::
 	rm -rf .sass-cache
 
 # We need Dune and Lambda Soup; Markup.ml and Uutf are dependencies
-DUNE_TAG = 2.6.2
-LAMBDASOUP_TAG = 0.7.1
-MARKUP_TAG = 0.8.2
-UUTF_TAG = v1.0.2
-RE_TAG = 1.9.0
+DUNE_TAG = 2.9.3
+LAMBDASOUP_TAG = 0.7.3
+MARKUP_TAG = 1.0.3
+UUTF_TAG = v1.0.3
+RE_TAG = 1.10.3
+CAMLP_STREAMS_TAG = v5.0
 
 # Duniverse rules - set-up dune and the dependencies in-tree for CI
-duniverse: dune/dune.exe re markup.ml uutf lambdasoup
+duniverse: dune/dune.exe re markup.ml uutf lambdasoup camlp-streams
 
 dune/dune.exe: dune
 	cd dune; ocaml bootstrap.ml
@@ -141,5 +142,12 @@ uutf:
 
 distclean::
 	rm -rf uutf
+
+camlp-streams:
+	git clone https://github.com/ocaml/camlp-streams.git -n -o upstream
+	cd camlp-streams; $(GIT_CHECKOUT) $(CAMLP_STREAMS_TAG)
+
+distclean::
+	rm -rf camlp-streams
 
 .PHONY: css js img duniverse
