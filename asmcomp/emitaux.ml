@@ -82,8 +82,9 @@ let emit_string_directive directive s =
     done
   end
 
-let emit_bytes_directive directive s =
+let emit_bytes_directive s =
    let pos = ref 0 in
+   let directive = "\t.byte\t" in
    for i = 0 to String.length s - 1 do
      if !pos = 0
      then emit_string directive
