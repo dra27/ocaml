@@ -89,19 +89,19 @@ let emit_label lbl =
 (* Section switching *)
 
 let code_space =
-  "	.section \".text\"\n"
+  "\t.section \".text\"\n"
 
 let function_descr_space =
   match abi with
   | ELF32 -> code_space
-  | ELF64v1 -> "	.section \".opd\",\"aw\"\n"
+  | ELF64v1 -> "\t.section \".opd\",\"aw\"\n"
   | ELF64v2 -> code_space
 
 let data_space =
-  "	.section \".data\"\n"
+  "\t.section \".data\"\n"
 
 let rodata_space =
-  "	.section \".rodata\"\n"
+  "\t.section \".rodata\"\n"
 
 let toc_space =
   " .section \".toc\",\"aw\"\n"

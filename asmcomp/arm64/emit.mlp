@@ -1146,7 +1146,7 @@ let emit_item = function
   | Csingle f -> emit_float32_directive ".long" (Int32.bits_of_float f)
   | Cdouble f -> emit_float64_directive ".quad" (Int64.bits_of_float f)
   | Csymbol_address s -> `	.quad	{emit_symbol s}\n`
-  | Cstring s -> emit_string_directive "	.ascii  " s
+  | Cstring s -> emit_string_directive "\t.ascii  " s
   | Cskip n -> if n > 0 then `	.space	{emit_int n}\n`
   | Calign n -> `	.align	{emit_int(Misc.log2 n)}\n`
 
@@ -1206,7 +1206,7 @@ let end_assembly () =
       efa_label_rel = (fun lbl ofs ->
                            `	.long	{emit_label lbl} - . + {emit_int32 ofs}\n`);
       efa_def_label = (fun lbl -> `{emit_label lbl}:\n`);
-      efa_string = (fun s -> emit_string_directive "	.asciz	" s) };
+      efa_string = (fun s -> emit_string_directive "\t.asciz\t" s) };
   emit_symbol_type emit_symbol lbl "object";
   emit_symbol_size lbl;
   begin match Config.system with

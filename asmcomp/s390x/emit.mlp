@@ -65,11 +65,11 @@ let emit_label lbl =
 
 (* Section switching *)
 
-let data_space = "	.section \".data\"\n"
+let data_space = "\t.section \".data\"\n"
 
-let code_space = "	.section \".text\"\n"
+let code_space = "\t.section \".text\"\n"
 
-let rodata_space = "	.section \".rodata\"\n"
+let rodata_space = "\t.section \".rodata\"\n"
 
 (* Output a pseudo-register *)
 
