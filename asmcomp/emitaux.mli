@@ -25,7 +25,7 @@ val emit_printf: ('a, out_channel, unit) format -> 'a
 val emit_char: char -> unit
 val emit_string_literal: string -> unit
 val emit_string_directive: string -> string -> unit
-val emit_bytes_directive: string -> unit
+val emit_bytes_directive: string -> string -> unit
 val emit_float64_directive: string -> int64 -> unit
 val emit_float64_split_directive: string -> int64 -> unit
 val emit_float32_directive: string -> int32 -> unit

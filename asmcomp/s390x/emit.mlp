@@ -712,7 +712,7 @@ let emit_item = function
   | Csymbol_address s ->
       `	.quad	{emit_symbol s}\n`
   | Cstring s ->
-      emit_bytes_directive s
+      emit_bytes_directive "	.byte	" s
   | Cskip n ->
       if n > 0 then `	.space	{emit_int n}\n`
   | Calign n ->
@@ -771,7 +771,7 @@ let end_assembly() =
       efa_label_rel = (fun lbl ofs ->
                            `	.long	({emit_label lbl} - .) + {emit_int32 ofs}\n`);
       efa_def_label = (fun l -> `{emit_label l}:\n`);
-      efa_string = (fun s -> emit_bytes_directive (s ^ "\000"))
+      efa_string = (fun s -> emit_bytes_directive "	.byte	" (s ^ "\000"))
      };
    (* Mark stack as non-executable *)
    `	.section .note.GNU-stack,\"\",%progbits\n`
