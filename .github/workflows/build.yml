@@ -45,18 +45,6 @@ jobs:
       - name: Unpack Artifact
         run: |
           tar --zstd -xf sources.tar.zstd
-      - name: Packages
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended hevea sass
-      - name: Run the testsuite
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
-      - name: Build API Documentation
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh api-docs
-      - name: Install
-        run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
       - name: Check for manual changes
         id: manual
         run: >-
@@ -72,6 +60,18 @@ jobs:
          '${{ github.event.ref }}'
          '${{ github.event.after }}'
          '${{ github.event.repository.full_name }}'
+      - name: Packages
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended hevea sass
+      - name: Run the testsuite
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
+      - name: Build API Documentation
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh api-docs
+      - name: Install
+        run: |
+         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
       - name: Build the manual
         run: |
           MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh manual

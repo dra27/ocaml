@@ -13,7 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-set -e
+set -ex
 
 # Test whether the manual/ has been touched by this PR.
 

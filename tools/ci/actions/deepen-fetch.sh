@@ -63,19 +63,21 @@ if [[ -z ${UPSTREAM_HEAD//0/} ]]; then
   NEW=1
 elif ! git log -1 "$UPSTREAM_HEAD" &> /dev/null ; then
   echo "$UPSTREAM_BRANCH has been force-pushed"
-  git fetch origin "$UPSTREAM_HEAD" &> /dev/null
+  git remote -v
+  ls -la
+  git fetch origin "$UPSTREAM_HEAD"
 fi
 
-if ! git merge-base "$UPSTREAM_HEAD" "$PR_HEAD" &> /dev/null; then
+if ! git merge-base "$UPSTREAM_HEAD" "$PR_HEAD" ; then
   echo "Determining merge-base of $UPSTREAM_HEAD..$PR_HEAD for $PR_BRANCH"
 
   DEEPEN=50
   MSG='Deepening'
 
-  while ! git merge-base "$UPSTREAM_HEAD" "$PR_HEAD" &> /dev/null
+  while ! git merge-base "$UPSTREAM_HEAD" "$PR_HEAD"
   do
     echo " - $MSG by $DEEPEN commits from $FETCH_REF"
-    git fetch origin --deepen=$DEEPEN "$FETCH_REF" &> /dev/null
+    git fetch origin --deepen=$DEEPEN "$FETCH_REF"
     MSG='Further deepening'
     ((DEEPEN*=2))
   done
