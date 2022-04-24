@@ -15,7 +15,7 @@
 
 {
 let first_item = ref false
-let command_beginning = ref 0
+let lexeme_beginning = ref 0
 
 let add_semicolon () =
   if !first_item
@@ -36,7 +36,7 @@ let print_unescaped_string s =
 }
 
 rule main = parse
-    "`" { command_beginning := Lexing.lexeme_start lexbuf;
+    "`" { lexeme_beginning := Lexing.lexeme_start lexbuf;
           first_item := true;
           print_char '(';
           command lexbuf;
@@ -44,13 +44,23 @@ rule main = parse
           main lexbuf }
   | "\\`"
         { print_string "`"; main lexbuf }
+  | '\t' { prerr_char '[';
+           prerr_int lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum;
+           prerr_endline "]: Tabs not allowed outside `...` blocks";
+           exit 2 }
+  | '"' { lexeme_beginning := Lexing.lexeme_start lexbuf;
+          print_char '"';
+          string lexbuf }
   | eof { () }
-  | _   { print_char(Lexing.lexeme_char lexbuf 0); main lexbuf }
+  | _   { let c = Lexing.lexeme_char lexbuf 0 in
+          if c = '\n' then
+            Lexing.new_line lexbuf;
+          print_char c; main lexbuf }
 
 and command = parse
     "`" { () }
   | eof { prerr_string "Unterminated `...` at character ";
-          prerr_int !command_beginning;
+          prerr_int !lexeme_beginning;
           prerr_newline();
           exit 2 }
   | "{" [^ '}'] * "}"
@@ -58,10 +68,15 @@ and command = parse
           add_semicolon();
           print_string (String.sub s 1 (String.length s - 2));
           command lexbuf }
+  | '\\' ('\n' | "\r\n")
+        { Lexing.new_line lexbuf;
+          add_semicolon();
+          print_string "emit_string \"\\\n\"";
+          command lexbuf
+          }
   | ( [^ '`' '{' '\\'] |
       '\\' ['\\' '"' 'n' 't' 'b' 'r' '`' '{' ] |
-      '\\' ['0'-'9'] ['0'-'9'] ['0'-'9'] |
-      '\\' ('\n' | "\r\n")) +
+      '\\' ['0'-'9'] ['0'-'9'] ['0'-'9'] ) +
         { let s = Lexing.lexeme lexbuf in
           add_semicolon();
           (* Optimise one-character strings *)
@@ -79,8 +94,27 @@ and command = parse
           end;
           command lexbuf }
 
+and string = parse
+  | '"' { print_char '"';
+          main lexbuf }
+  | '\\' ('\n' | "\r\n")
+        { Lexing.new_line lexbuf;
+          print_string "\\\n";
+          string lexbuf }
+  | '\\' _ | [^ '\\' '"' ]+
+        { print_string (Lexing.lexeme lexbuf);
+          string lexbuf }
+  | eof { prerr_string "Unterminated \"...\" at character ";
+          prerr_int !lexeme_beginning;
+          prerr_newline();
+          exit 2 }
+
 {
-let _ = main(Lexing.from_channel stdin)
+let _ =
+  let open Lexing in
+  let lexbuf = from_channel stdin in
+  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_lnum = 1};
+  main lexbuf
 
 let _ = exit (0)
 }
