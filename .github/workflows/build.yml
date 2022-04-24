@@ -45,6 +45,7 @@ jobs:
       - name: Unpack Artifact
         run: |
           tar --zstd -xf sources.tar.zstd
+          git config --local --unset http.https://github.com/.extraheader
       - name: Check for manual changes
         id: manual
         run: >-
