@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..c106a0a5a9
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:24.997462293 +0100
+++++ b	2023-09-28 18:44:25.001462455 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -1085,7 +1085,7 @@ let fundecl fundecl =
+++@@ -1136,7 +1136,7 @@ let fundecl fundecl =
++      let f = max_frame_size + threshold_offset in
++      let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
++      `  ldr {emit_reg reg_tmp1}, [{emit_reg reg_domain_state_ptr}, #{emit_int offset}]\n`;
 diff --git a/Changes b/Changes
 index a245317a26..abc1cdb80c 100644
 --- a/Changes
@@ -277,7 +291,7 @@ index 64b05a95c8..dbeaff0cbe 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index 3a3a9e5d0a..b338424dad 100644
+index a881de8bf3..5e0de6647b 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -35,8 +35,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -5958,13 +5972,27 @@ index 0000000000..17ac6b2e5e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..19f8c4bfaf
+index 0000000000..de2e8260a3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5889 @@
+@@ -0,0 +1,5890 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..c106a0a5a9
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:24.997462293 +0100
++++++ b	2023-09-28 18:44:25.001462455 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -1085,7 +1085,7 @@ let fundecl fundecl =
++++@@ -1136,7 +1136,7 @@ let fundecl fundecl =
+++      let f = max_frame_size + threshold_offset in
+++      let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
+++      `  ldr {emit_reg reg_tmp1}, [{emit_reg reg_domain_state_ptr}, #{emit_int offset}]\n`;
 +diff --git a/Changes b/Changes
 +index a245317a26..abc1cdb80c 100644
 +--- a/Changes
@@ -6241,7 +6269,7 @@ index 0000000000..19f8c4bfaf
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index 3a3a9e5d0a..b338424dad 100644
++index a881de8bf3..5e0de6647b 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -35,8 +35,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -11837,20 +11865,7 @@ index 0000000000..19f8c4bfaf
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsui
++++E
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
