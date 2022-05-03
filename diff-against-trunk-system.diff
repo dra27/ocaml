@@ -492,7 +492,7 @@ index f92ec296a1..7fe7ef5c96 100644
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
 diff --git a/asmcomp/i386/emit.mlp b/asmcomp/i386/emit.mlp
-index a38cf19be6..327440ebd7 100644
+index fe6a84cd24..71605eeb35 100644
 --- a/asmcomp/i386/emit.mlp
 +++ b/asmcomp/i386/emit.mlp
 @@ -136,7 +136,7 @@ let domain_field f r =
@@ -504,7 +504,7 @@ index a38cf19be6..327440ebd7 100644
  
  let x86_data_type_for_stack_slot = function
    | Float -> REAL8
-@@ -961,7 +961,7 @@ let begin_assembly() =
+@@ -964,7 +964,7 @@ let begin_assembly() =
      D.extrn "_caml_alloc3" PROC;
      D.extrn "_caml_ml_array_bound_error" PROC;
      D.extrn "_caml_raise_exn" PROC;
@@ -5958,7 +5958,7 @@ index 0000000000..17ac6b2e5e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..442fc38d81
+index 0000000000..71e0eb30c9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5889 @@
@@ -6456,7 +6456,7 @@ index 0000000000..442fc38d81
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
 +diff --git a/asmcomp/i386/emit.mlp b/asmcomp/i386/emit.mlp
-+index a38cf19be6..327440ebd7 100644
++index fe6a84cd24..71605eeb35 100644
 +--- a/asmcomp/i386/emit.mlp
 ++++ b/asmcomp/i386/emit.mlp
 +@@ -136,7 +136,7 @@ let domain_field f r =
@@ -6468,7 +6468,7 @@ index 0000000000..442fc38d81
 + 
 + let x86_data_type_for_stack_slot = function
 +   | Float -> REAL8
-+@@ -961,7 +961,7 @@ let begin_assembly() =
++@@ -964,7 +964,7 @@ let begin_assembly() =
 +     D.extrn "_caml_alloc3" PROC;
 +     D.extrn "_caml_ml_array_bound_error" PROC;
 +     D.extrn "_caml_raise_exn" PROC;
