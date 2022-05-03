@@ -1,0 +1,52 @@
+--- a	2023-09-28 18:44:26.629528190 +0100
++++ b	2023-09-28 18:44:26.633528352 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
+ --- a/stdlib/filename.ml
+ +++ b/stdlib/filename.ml
+-@@ -334,12 +334,13 @@ let temp_file_name temp_dir prefix suffix =
++@@ -342,12 +342,13 @@ let temp_file_name temp_dir prefix suffix =
+    let rnd = (Random.State.bits random_state) land 0xFFFFFF in
+    concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
+  
+@@ -19,7 +19,7 @@
+    let rec try_name counter =
+      let name = temp_file_name temp_dir prefix suffix in
+      try
+-@@ -350,7 +351,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
++@@ -358,7 +359,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
+    in try_name 0
+  
+  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
+@@ -56,9 +56,9 @@
+ +let randomize () = Atomic.set randomized true
+ +let is_randomized () = Atomic.get randomized
+  
++ (* BACKPORT BEGIN
+  let prng_key = Domain.DLS.new_key Random.State.make_self_init
+- 
+-@@ -70,7 +70,7 @@ let rec power_2_above x n =
++@@ -74,7 +74,7 @@ let rec power_2_above x n =
+    else if x * 2 > Sys.max_array_length then x
+    else power_2_above (x * 2) n
+  
+@@ -66,8 +66,8 @@
+ +let create ?(random = Atomic.get randomized) initial_size =
+    let s = power_2_above 16 initial_size in
+    let seed =
+-     if random then Random.State.bits (Domain.DLS.get prng_key) else 0
+-@@ -616,7 +616,7 @@ let of_seq i =
++ (* BACKPORT BEGIN
++@@ -624,7 +624,7 @@ let of_seq i =
+    replace_seq tbl i;
+    tbl
+  
+@@ -75,7 +75,7 @@
+ +let rebuild ?(random = Atomic.get randomized) h =
+    let s = power_2_above 16 (Array.length h.data) in
+    let seed =
+-     if random then Random.State.bits (Domain.DLS.get prng_key)
++ (* BACKPORT BEGIN
+ diff --git a/stdlib/hashtbl.mli b/stdlib/hashtbl.mli
+ --- a/stdlib/hashtbl.mli
+ +++ b/stdlib/hashtbl.mli

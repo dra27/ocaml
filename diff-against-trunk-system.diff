@@ -1,6 +1,61 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..5a9506e94a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,52 @@
++--- a	2023-09-28 18:44:26.629528190 +0100
+++++ b	2023-09-28 18:44:26.633528352 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
++ --- a/stdlib/filename.ml
++ +++ b/stdlib/filename.ml
++-@@ -334,12 +334,13 @@ let temp_file_name temp_dir prefix suffix =
+++@@ -342,12 +342,13 @@ let temp_file_name temp_dir prefix suffix =
++    let rnd = (Random.State.bits random_state) land 0xFFFFFF in
++    concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
++  
++@@ -19,7 +19,7 @@
++    let rec try_name counter =
++      let name = temp_file_name temp_dir prefix suffix in
++      try
++-@@ -350,7 +351,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
+++@@ -358,7 +359,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
++    in try_name 0
++  
++  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
++@@ -56,9 +56,9 @@
++ +let randomize () = Atomic.set randomized true
++ +let is_randomized () = Atomic.get randomized
++  
+++ (* BACKPORT BEGIN
++  let prng_key = Domain.DLS.new_key Random.State.make_self_init
++- 
++-@@ -70,7 +70,7 @@ let rec power_2_above x n =
+++@@ -74,7 +74,7 @@ let rec power_2_above x n =
++    else if x * 2 > Sys.max_array_length then x
++    else power_2_above (x * 2) n
++  
++@@ -66,8 +66,8 @@
++ +let create ?(random = Atomic.get randomized) initial_size =
++    let s = power_2_above 16 initial_size in
++    let seed =
++-     if random then Random.State.bits (Domain.DLS.get prng_key) else 0
++-@@ -616,7 +616,7 @@ let of_seq i =
+++ (* BACKPORT BEGIN
+++@@ -624,7 +624,7 @@ let of_seq i =
++    replace_seq tbl i;
++    tbl
++  
++@@ -75,7 +75,7 @@
++ +let rebuild ?(random = Atomic.get randomized) h =
++    let s = power_2_above 16 (Array.length h.data) in
++    let seed =
++-     if random then Random.State.bits (Domain.DLS.get prng_key)
+++ (* BACKPORT BEGIN
++ diff --git a/stdlib/hashtbl.mli b/stdlib/hashtbl.mli
++ --- a/stdlib/hashtbl.mli
++ +++ b/stdlib/hashtbl.mli
 diff --git a/Changes b/Changes
 index a245317a26..abc1cdb80c 100644
 --- a/Changes
@@ -5987,13 +6042,68 @@ index 0000000000..17ac6b2e5e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9925c423e9
+index 0000000000..7808acc5a1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5882 @@
+@@ -0,0 +1,5993 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..5a9506e94a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,52 @@
+++--- a	2023-09-28 18:44:26.629528190 +0100
++++++ b	2023-09-28 18:44:26.633528352 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
+++ --- a/stdlib/filename.ml
+++ +++ b/stdlib/filename.ml
+++-@@ -334,12 +334,13 @@ let temp_file_name temp_dir prefix suffix =
++++@@ -342,12 +342,13 @@ let temp_file_name temp_dir prefix suffix =
+++    let rnd = (Random.State.bits random_state) land 0xFFFFFF in
+++    concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
+++  
+++@@ -19,7 +19,7 @@
+++    let rec try_name counter =
+++      let name = temp_file_name temp_dir prefix suffix in
+++      try
+++-@@ -350,7 +351,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
++++@@ -358,7 +359,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
+++    in try_name 0
+++  
+++  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
+++@@ -56,9 +56,9 @@
+++ +let randomize () = Atomic.set randomized true
+++ +let is_randomized () = Atomic.get randomized
+++  
++++ (* BACKPORT BEGIN
+++  let prng_key = Domain.DLS.new_key Random.State.make_self_init
+++- 
+++-@@ -70,7 +70,7 @@ let rec power_2_above x n =
++++@@ -74,7 +74,7 @@ let rec power_2_above x n =
+++    else if x * 2 > Sys.max_array_length then x
+++    else power_2_above (x * 2) n
+++  
+++@@ -66,8 +66,8 @@
+++ +let create ?(random = Atomic.get randomized) initial_size =
+++    let s = power_2_above 16 initial_size in
+++    let seed =
+++-     if random then Random.State.bits (Domain.DLS.get prng_key) else 0
+++-@@ -616,7 +616,7 @@ let of_seq i =
++++ (* BACKPORT BEGIN
++++@@ -624,7 +624,7 @@ let of_seq i =
+++    replace_seq tbl i;
+++    tbl
+++  
+++@@ -75,7 +75,7 @@
+++ +let rebuild ?(random = Atomic.get randomized) h =
+++    let s = power_2_above 16 (Array.length h.data) in
+++    let seed =
+++-     if random then Random.State.bits (Domain.DLS.get prng_key)
++++ (* BACKPORT BEGIN
+++ diff --git a/stdlib/hashtbl.mli b/stdlib/hashtbl.mli
+++ --- a/stdlib/hashtbl.mli
+++ +++ b/stdlib/hashtbl.mli
 +diff --git a/Changes b/Changes
 +index a245317a26..abc1cdb80c 100644
 +--- a/Changes
@@ -11872,7 +11982,63 @@ index 0000000000..9925c423e9
 ++-***** ocamlc.byte
 +++* debugger
 +++** shared-libraries
-+++*
++++*** setup-ocamlc.byte-build-env
++++**** ocamlc.byte
+++ module = "printer.ml"
+++-***** ocamlc.byte
+++-****** check-ocamlc.byte-output
+++-******* ocamldebug
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -13340,7 +13506,7 @@ index ac8b7a8bee..2fd6aa2bf4 100644
  val force_gen : only_val:bool -> 'a lazy_t -> 'a
 +*)
 diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-index f7ce1e46d8..c13b0d5371 100644
+index 6b3aeade39..2984f96073 100644
 --- a/stdlib/filename.ml
 +++ b/stdlib/filename.ml
 @@ -326,11 +326,19 @@ let remove_extension name =
@@ -13460,12 +13626,12 @@ index 37c6f3136a..020c9466d3 100644
  val formatter_of_out_functions :
    formatter_out_functions -> formatter
 diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
-index aac9416b62..02ddb31f38 100644
+index d1f4ca0bce..67bb7b7389 100644
 --- a/stdlib/hashtbl.ml
 +++ b/stdlib/hashtbl.ml
-@@ -57,7 +57,11 @@ let randomized = ref randomized_default
- let randomize () = randomized := true
- let is_randomized () = !randomized
+@@ -57,7 +57,11 @@ let randomized = Atomic.make randomized_default
+ let randomize () = Atomic.set randomized true
+ let is_randomized () = Atomic.get randomized
  
 +(* BACKPORT BEGIN
  let prng_key = Domain.DLS.new_key Random.State.make_self_init
@@ -13476,7 +13642,7 @@ index aac9416b62..02ddb31f38 100644
  (* Functions which appear before the functorial interface must either be
     independent of the hash function or take it as a parameter (see #2202 and
 @@ -73,7 +77,11 @@ let rec power_2_above x n =
- let create ?(random = !randomized) initial_size =
+ let create ?(random = Atomic.get randomized) initial_size =
    let s = power_2_above 16 initial_size in
    let seed =
 +(* BACKPORT BEGIN
@@ -13488,7 +13654,7 @@ index aac9416b62..02ddb31f38 100644
    { initial_size = s; size = 0; seed = seed; data = Array.make s Empty }
  
 @@ -619,7 +627,11 @@ let of_seq i =
- let rebuild ?(random = !randomized) h =
+ let rebuild ?(random = Atomic.get randomized) h =
    let s = power_2_above 16 (Array.length h.data) in
    let seed =
 +(* BACKPORT BEGIN
