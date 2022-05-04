@@ -1,66 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..5a9506e94a
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,52 @@
-+--- a	2023-09-28 18:44:26.629528190 +0100
-++++ b	2023-09-28 18:44:26.633528352 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-+ --- a/stdlib/filename.ml
-+ +++ b/stdlib/filename.ml
-+-@@ -334,12 +334,13 @@ let temp_file_name temp_dir prefix suffix =
-++@@ -342,12 +342,13 @@ let temp_file_name temp_dir prefix suffix =
-+    let rnd = (Random.State.bits random_state) land 0xFFFFFF in
-+    concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
-+  
-+@@ -19,7 +19,7 @@
-+    let rec try_name counter =
-+      let name = temp_file_name temp_dir prefix suffix in
-+      try
-+-@@ -350,7 +351,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
-++@@ -358,7 +359,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
-+    in try_name 0
-+  
-+  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-+@@ -56,9 +56,9 @@
-+ +let randomize () = Atomic.set randomized true
-+ +let is_randomized () = Atomic.get randomized
-+  
-++ (* BACKPORT BEGIN
-+  let prng_key = Domain.DLS.new_key Random.State.make_self_init
-+- 
-+-@@ -70,7 +70,7 @@ let rec power_2_above x n =
-++@@ -74,7 +74,7 @@ let rec power_2_above x n =
-+    else if x * 2 > Sys.max_array_length then x
-+    else power_2_above (x * 2) n
-+  
-+@@ -66,8 +66,8 @@
-+ +let create ?(random = Atomic.get randomized) initial_size =
-+    let s = power_2_above 16 initial_size in
-+    let seed =
-+-     if random then Random.State.bits (Domain.DLS.get prng_key) else 0
-+-@@ -616,7 +616,7 @@ let of_seq i =
-++ (* BACKPORT BEGIN
-++@@ -624,7 +624,7 @@ let of_seq i =
-+    replace_seq tbl i;
-+    tbl
-+  
-+@@ -75,7 +75,7 @@
-+ +let rebuild ?(random = Atomic.get randomized) h =
-+    let s = power_2_above 16 (Array.length h.data) in
-+    let seed =
-+-     if random then Random.State.bits (Domain.DLS.get prng_key)
-++ (* BACKPORT BEGIN
-+ diff --git a/stdlib/hashtbl.mli b/stdlib/hashtbl.mli
-+ --- a/stdlib/hashtbl.mli
-+ +++ b/stdlib/hashtbl.mli
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index a245317a26..abc1cdb80c 100644
+index 8ed41f3336..ef89b1af86 100644
 --- a/Changes
 +++ b/Changes
-@@ -314,13 +314,13 @@ OCaml 4.14.0
+@@ -317,13 +317,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +21,7 @@ index a245317a26..abc1cdb80c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -420,6 +420,9 @@ OCaml 4.14.0
+@@ -423,6 +423,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -86,7 +31,7 @@ index a245317a26..abc1cdb80c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -675,6 +678,9 @@ OCaml 4.14.0
+@@ -678,6 +681,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6042,73 +5987,18 @@ index 0000000000..17ac6b2e5e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7808acc5a1
+index 0000000000..5ae8ba6633
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5993 @@
+@@ -0,0 +1,5882 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..5a9506e94a
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,52 @@
-++--- a	2023-09-28 18:44:26.629528190 +0100
-+++++ b	2023-09-28 18:44:26.633528352 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-++ --- a/stdlib/filename.ml
-++ +++ b/stdlib/filename.ml
-++-@@ -334,12 +334,13 @@ let temp_file_name temp_dir prefix suffix =
-+++@@ -342,12 +342,13 @@ let temp_file_name temp_dir prefix suffix =
-++    let rnd = (Random.State.bits random_state) land 0xFFFFFF in
-++    concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
-++  
-++@@ -19,7 +19,7 @@
-++    let rec try_name counter =
-++      let name = temp_file_name temp_dir prefix suffix in
-++      try
-++-@@ -350,7 +351,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
-+++@@ -358,7 +359,8 @@ let temp_file ?(temp_dir = !current_temp_dir_name) prefix suffix =
-++    in try_name 0
-++  
-++  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-++@@ -56,9 +56,9 @@
-++ +let randomize () = Atomic.set randomized true
-++ +let is_randomized () = Atomic.get randomized
-++  
-+++ (* BACKPORT BEGIN
-++  let prng_key = Domain.DLS.new_key Random.State.make_self_init
-++- 
-++-@@ -70,7 +70,7 @@ let rec power_2_above x n =
-+++@@ -74,7 +74,7 @@ let rec power_2_above x n =
-++    else if x * 2 > Sys.max_array_length then x
-++    else power_2_above (x * 2) n
-++  
-++@@ -66,8 +66,8 @@
-++ +let create ?(random = Atomic.get randomized) initial_size =
-++    let s = power_2_above 16 initial_size in
-++    let seed =
-++-     if random then Random.State.bits (Domain.DLS.get prng_key) else 0
-++-@@ -616,7 +616,7 @@ let of_seq i =
-+++ (* BACKPORT BEGIN
-+++@@ -624,7 +624,7 @@ let of_seq i =
-++    replace_seq tbl i;
-++    tbl
-++  
-++@@ -75,7 +75,7 @@
-++ +let rebuild ?(random = Atomic.get randomized) h =
-++    let s = power_2_above 16 (Array.length h.data) in
-++    let seed =
-++-     if random then Random.State.bits (Domain.DLS.get prng_key)
-+++ (* BACKPORT BEGIN
-++ diff --git a/stdlib/hashtbl.mli b/stdlib/hashtbl.mli
-++ --- a/stdlib/hashtbl.mli
-++ +++ b/stdlib/hashtbl.mli
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index a245317a26..abc1cdb80c 100644
++index 8ed41f3336..ef89b1af86 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -314,13 +314,13 @@ OCaml 4.14.0
++@@ -317,13 +317,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6124,7 +6014,7 @@ index 0000000000..7808acc5a1
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -420,6 +420,9 @@ OCaml 4.14.0
++@@ -423,6 +423,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6134,7 +6024,7 @@ index 0000000000..7808acc5a1
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -675,6 +678,9 @@ OCaml 4.14.0
++@@ -678,6 +681,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -11982,63 +11872,7 @@ index 0000000000..7808acc5a1
 ++-***** ocamlc.byte
 +++* debugger
 +++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2
++++*
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
