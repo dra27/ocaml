@@ -1,8 +1,8 @@
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index 699dd26323..f28099869e 100644
+index 6dcc5b73e5..0217685fcd 100644
 --- a/ocamltest/Makefile
 +++ b/ocamltest/Makefile
-@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
  	    $(call SUBST,DIFF_FLAGS) \
  	    $(call SUBST,WINDOWS_UNICODE) \
  	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -57,10 +57,10 @@ index 564ef7644e..92cf631912 100644
 +val naked_pointers : bool
 +(** Whether the runtime system supports naked pointers outside the heap *)
 diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
-index 7b576135b7..5b2298e696 100644
+index 80eac2d727..f8f264f471 100644
 --- a/ocamltest/run_unix.c
 +++ b/ocamltest/run_unix.c
-@@ -347,7 +347,9 @@ int run_command(const command_settings *settings)
+@@ -349,7 +349,9 @@ int run_command(const command_settings *settings)
        myperror("fork");
        return -1;
      case 0: /* child process */

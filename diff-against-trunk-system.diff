@@ -1,28 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..bb37184da2
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,19 @@
-+--- a	2023-09-28 18:44:27.909579830 +0100
-++++ b	2023-09-28 18:44:27.917580153 +0100
-+@@ -1,10 +1,13 @@
-+ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+-@@ -1,4 +1,5 @@
-+--(* TEST
-++@@ -2,6 +2,9 @@
-++    * skip
-++    reason = "OCaml 5 only"
-++ *)
-+ +(* This test is currently disabled, 
-+ +   until the random failures have been investigated.
-+- *)
-+++*)
-+  
-+  let () = Random.self_init ()
-++ 
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 8ed41f3336..ef89b1af86 100644
 --- a/Changes
@@ -64,7 +42,7 @@ index 8ed41f3336..ef89b1af86 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile.config.in b/Makefile.config.in
-index 8c1f4aeab3..6300ad93f9 100644
+index 05535bb9c3..e81bb6e7c4 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
 @@ -247,7 +247,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -2740,10 +2718,10 @@ index 0000000000..7c407d1ddb
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..17ac6b2e5e
+index 0000000000..ce012cd8e6
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3263 @@
+@@ -0,0 +1,3264 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 699dd26323..f28099869e 100644
 +--- a/ocamltest/Makefile
@@ -5984,16 +5962,17 @@ index 0000000000..17ac6b2e5e
 + (* ocaml-multicore issues 528 and 468 *)
 + 
 +diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+index 175f507549..340e604fde 100644
++index 11c24faa78..b52649e12c 100644
 +--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+@@ -1,4 +1,6 @@
-+ (* TEST
++@@ -1,3 +1,7 @@
+++(* TEST
 ++   * skip
 ++   reason = "OCaml 5 only"
+++*)
++ (* This test is currently disabled, 
++    until the random failures have been investigated.
 + *)
-+ 
-+ let () = Random.self_init ()
 +diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 +index 1d16b72d4e..956ec369ab 100644
 +--- a/testsuite/tools/asmgen_i386.S
@@ -6009,35 +5988,13 @@ index 0000000000..17ac6b2e5e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9df3ca4a22
+index 0000000000..616bd0dda8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6005 @@
+@@ -0,0 +1,5882 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..bb37184da2
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,19 @@
-++--- a	2023-09-28 18:44:27.909579830 +0100
-+++++ b	2023-09-28 18:44:27.917580153 +0100
-++@@ -1,10 +1,13 @@
-++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++-@@ -1,4 +1,5 @@
-++--(* TEST
-+++@@ -2,6 +2,9 @@
-+++    * skip
-+++    reason = "OCaml 5 only"
-+++ *)
-++ +(* This test is currently disabled, 
-++ +   until the random failures have been investigated.
-++- *)
-++++*)
-++  
-++  let () = Random.self_init ()
-+++ 
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 8ed41f3336..ef89b1af86 100644
 +--- a/Changes
@@ -6079,7 +6036,7 @@ index 0000000000..9df3ca4a22
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index 8c1f4aeab3..6300ad93f9 100644
++index 05535bb9c3..e81bb6e7c4 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
 +@@ -247,7 +247,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -8755,10 +8712,10 @@ index 0000000000..9df3ca4a22
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..17ac6b2e5e
++index 0000000000..ce012cd8e6
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3263 @@
++@@ -0,0 +1,3264 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 699dd26323..f28099869e 100644
 ++--- a/ocamltest/Makefile
@@ -11916,108 +11873,7 @@ index 0000000000..9df3ca4a22
 ++-***** ocamlc.byte
 +++* debugger
 +++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 175f507549..340e604fde 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-++ *)
-++ 
-++ let () = Random.self_init ()
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++
++++*
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12514,10 +12370,10 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index b082a0c36e..01221cb0a4 100644
+index d1bb02aea2..3aa7cdaf0e 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
-@@ -50,12 +50,12 @@ LIBNAME=threads
+@@ -48,12 +48,12 @@ LIBNAME=threads
  BYTECODE_C_OBJS=st_stubs.b.$(O)
  NATIVECODE_C_OBJS=st_stubs.n.$(O)
  
@@ -13292,10 +13148,10 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index de64f747b7..1e87a39a5e 100644
+index 490940f983..ac69a48c3a 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
-@@ -266,7 +266,8 @@ GNUISH_SED = \
+@@ -264,7 +264,8 @@ GNUISH_SED = \
  .INTERMEDIATE: .depend.tmp
  
  .depend.tmp:
