@@ -3238,16 +3238,17 @@ index fa2d2efc43..752a7eeabf 100644
  (* ocaml-multicore issues 528 and 468 *)
  
 diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-index 175f507549..340e604fde 100644
+index 11c24faa78..b52649e12c 100644
 --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-@@ -1,4 +1,6 @@
- (* TEST
+@@ -1,3 +1,7 @@
++(* TEST
 +   * skip
 +   reason = "OCaml 5 only"
++*)
+ (* This test is currently disabled, 
+    until the random failures have been investigated.
  *)
- 
- let () = Random.self_init ()
 diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 index 1d16b72d4e..956ec369ab 100644
 --- a/testsuite/tools/asmgen_i386.S
