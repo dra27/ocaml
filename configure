@@ -816,7 +816,6 @@ ccomptype
 mkexedebugflag
 mkexe
 fpic
-extralibs
 syslib
 outputobj
 outputexe
@@ -827,6 +826,7 @@ model
 arch64
 arch
 SO
+runtime_asm_objects
 S
 libext
 OBJEXT
@@ -2810,7 +2810,6 @@ SO="so"
 toolchain="cc"
 profinfo=false
 profinfo_width=0
-extralibs=
 instrumented_runtime=true
 force_instrumented_runtime=false
 instrumented_runtime_libs=""
@@ -14392,6 +14391,13 @@ fi; system=elf ;; #(
      ;;
 esac
 
+case $ccomptype in #(
+  msvc) :
+    runtime_asm_objects=${arch}nt.${OBJEXT} ;; #(
+  *) :
+    runtime_asm_objects=${arch}.${OBJEXT} ;;
+esac
+
 case $enable_native_compiler,$arch in #(
   no,*) :
     native_compiler=false
@@ -18010,6 +18016,13 @@ if test x"$with_afl" = "xyes"; then :
   afl=true
 else
   afl=false
+fi
+
+# Enable debugging support
+# TODO: add a --disable-debug-info configure option that disables debugging
+# info for both C and OCaml
+if test "$ccomptype" != "msvc"; then :
+  internal_cflags="-g $internal_cflags"
 fi
 
 oc_cflags="$common_cflags $internal_cflags"
