@@ -1,36 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..85be58e745
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,22 @@
-+--- a	2023-09-28 18:44:28.877618853 +0100
-++++ b	2023-09-28 18:44:28.885619176 +0100
-+@@ -68,8 +68,8 @@
-+  AC_SUBST([fpic])
-+  AC_SUBST([mkexe])
-+  AC_SUBST([mkexedebugflag])
-+-@@ -1127,6 +1126,11 @@ dnl [riscv64-*-linux*],
-+- dnl   [arch=riscv; model=riscv64; system=linux]
-++@@ -1137,6 +1136,11 @@ AS_CASE([$host],
-++     [arch=riscv; model=riscv64; system=linux]
-+  )
-+  
-+ +AS_CASE([$ccomptype],
-+@@ -80,7 +80,7 @@
-+  AS_CASE([$enable_native_compiler,$arch],
-+    [no,*],
-+      [native_compiler=false
-+-@@ -1970,6 +1974,12 @@ AS_IF([test x"$with_afl" = "xyes"],
-++@@ -2005,6 +2009,12 @@ AS_IF([test x"$with_afl" = "xyes"],
-+    [afl=true],
-+    [afl=false])
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 8ed41f3336..ef89b1af86 100644
+index 80e4cb0c12..fb6c416e84 100644
 --- a/Changes
 +++ b/Changes
-@@ -317,13 +317,13 @@ OCaml 4.14.0
+@@ -321,13 +321,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -46,7 +21,7 @@ index 8ed41f3336..ef89b1af86 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -423,6 +423,9 @@ OCaml 4.14.0
+@@ -427,6 +427,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -56,7 +31,7 @@ index 8ed41f3336..ef89b1af86 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -678,6 +681,9 @@ OCaml 4.14.0
+@@ -682,6 +685,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6180,43 +6155,18 @@ index 0000000000..696ed27c43
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..40d30d7bc8
+index 0000000000..f36e4cb713
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6144 @@
+@@ -0,0 +1,6143 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..85be58e745
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,22 @@
-++--- a	2023-09-28 18:44:28.877618853 +0100
-+++++ b	2023-09-28 18:44:28.885619176 +0100
-++@@ -68,8 +68,8 @@
-++  AC_SUBST([fpic])
-++  AC_SUBST([mkexe])
-++  AC_SUBST([mkexedebugflag])
-++-@@ -1127,6 +1126,11 @@ dnl [riscv64-*-linux*],
-++- dnl   [arch=riscv; model=riscv64; system=linux]
-+++@@ -1137,6 +1136,11 @@ AS_CASE([$host],
-+++     [arch=riscv; model=riscv64; system=linux]
-++  )
-++  
-++ +AS_CASE([$ccomptype],
-++@@ -80,7 +80,7 @@
-++  AS_CASE([$enable_native_compiler,$arch],
-++    [no,*],
-++      [native_compiler=false
-++-@@ -1970,6 +1974,12 @@ AS_IF([test x"$with_afl" = "xyes"],
-+++@@ -2005,6 +2009,12 @@ AS_IF([test x"$with_afl" = "xyes"],
-++    [afl=true],
-++    [afl=false])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 8ed41f3336..ef89b1af86 100644
++index 80e4cb0c12..fb6c416e84 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -317,13 +317,13 @@ OCaml 4.14.0
++@@ -321,13 +321,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6232,7 +6182,7 @@ index 0000000000..40d30d7bc8
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -423,6 +423,9 @@ OCaml 4.14.0
++@@ -427,6 +427,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6242,7 +6192,7 @@ index 0000000000..40d30d7bc8
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -678,6 +681,9 @@ OCaml 4.14.0
++@@ -682,6 +685,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -12327,7 +12277,31 @@ index 0000000000..40d30d7bc8
 ++ let () = Out_channel.set_buffered stdout false
 ++ 
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eea
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index 11c24faa78..b52649e12c 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled, 
+++    until the random failures have been investigated.
+++ *)
+++diff --gi
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
