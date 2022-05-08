@@ -2,7 +2,7 @@
    * skip
    reason = "OCaml 5 only"
 *)
-(* This test is currently disabled, 
+(* This test is currently disabled,
    until the random failures have been investigated.
 *)
 
