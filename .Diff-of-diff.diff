@@ -1,0 +1,14 @@
+--- a	2023-09-28 18:44:29.661650440 +0100
++++ b	2023-09-28 18:44:29.669650763 +0100
+@@ -1,7 +1,10 @@
+ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+-@@ -1,4 +1,4 @@
++@@ -2,7 +2,7 @@
++    * skip
++    reason = "OCaml 5 only"
++ *)
+ -(* This test is currently disabled, 
+ +(* This test is currently disabled,
+     until the random failures have been investigated.
