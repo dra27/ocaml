@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:30.957702626 +0100
++++ b	2023-09-28 18:44:30.965702948 +0100
+@@ -96,7 +96,7 @@
+  AC_SUBST([outputexe])
+  AC_SUBST([outputobj])
+  AC_SUBST([syslib])
+-@@ -521,8 +522,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -531,8 +532,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
+  
+  AS_CASE([$host],
+    [*-*-mingw32|*-pc-windows],

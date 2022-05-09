@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..04dfbc9ee4
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:30.957702626 +0100
+++++ b	2023-09-28 18:44:30.965702948 +0100
++@@ -96,7 +96,7 @@
++  AC_SUBST([outputexe])
++  AC_SUBST([outputobj])
++  AC_SUBST([syslib])
++-@@ -521,8 +522,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
+++@@ -531,8 +532,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
++  
++  AS_CASE([$host],
++    [*-*-mingw32|*-pc-windows],
 diff --git a/Changes b/Changes
 index 1b5ecbdca1..1cc5f33bf1 100644
 --- a/Changes
@@ -581,13 +595,13 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 7df26b8fb5..14edd04ad2 100755
+index 621f078ea9..262c34ad78 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 8abcba0e36..222d1ef40b 100644
+index b6d33fb2e4..277a4a81e8 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -164,6 +164,8 @@ AC_SUBST([flexlink_flags])
+@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -596,7 +610,7 @@ index 8abcba0e36..222d1ef40b 100644
  AC_SUBST([force_instrumented_runtime])
  
  ## Generated files
-@@ -197,10 +199,10 @@ AC_CANONICAL_TARGET
+@@ -198,10 +200,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -611,7 +625,7 @@ index 8abcba0e36..222d1ef40b 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -309,15 +311,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -310,15 +312,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -643,7 +657,7 @@ index 8abcba0e36..222d1ef40b 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1035,67 +1045,67 @@ model=default
+@@ -1038,67 +1048,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -770,7 +784,7 @@ index 8abcba0e36..222d1ef40b 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1104,8 +1114,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1107,8 +1117,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -781,7 +795,7 @@ index 8abcba0e36..222d1ef40b 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1116,14 +1126,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1119,14 +1129,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -802,7 +816,7 @@ index 8abcba0e36..222d1ef40b 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1800,7 +1810,8 @@ AS_CASE([$arch,$system],
+@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -812,7 +826,7 @@ index 8abcba0e36..222d1ef40b 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1849,6 +1860,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -843,7 +857,7 @@ index 8abcba0e36..222d1ef40b 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1990,8 +2025,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1993,8 +2028,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6155,13 +6169,27 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..08b7ea8125
+index 0000000000..df11af063b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6143 @@
+@@ -0,0 +1,6145 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..04dfbc9ee4
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:30.957702626 +0100
++++++ b	2023-09-28 18:44:30.965702948 +0100
+++@@ -96,7 +96,7 @@
+++  AC_SUBST([outputexe])
+++  AC_SUBST([outputobj])
+++  AC_SUBST([syslib])
+++-@@ -521,8 +522,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
++++@@ -531,8 +532,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
+++  
+++  AS_CASE([$host],
+++    [*-*-mingw32|*-pc-windows],
 +diff --git a/Changes b/Changes
 +index 1b5ecbdca1..1cc5f33bf1 100644
 +--- a/Changes
@@ -6742,13 +6770,13 @@ index 0000000000..08b7ea8125
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 7df26b8fb5..14edd04ad2 100755
++index 621f078ea9..262c34ad78 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 8abcba0e36..222d1ef40b 100644
++index b6d33fb2e4..277a4a81e8 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -164,6 +164,8 @@ AC_SUBST([flexlink_flags])
++@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -6757,7 +6785,7 @@ index 0000000000..08b7ea8125
 + AC_SUBST([force_instrumented_runtime])
 + 
 + ## Generated files
-+@@ -197,10 +199,10 @@ AC_CANONICAL_TARGET
++@@ -198,10 +200,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -6772,7 +6800,7 @@ index 0000000000..08b7ea8125
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -309,15 +311,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -310,15 +312,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -6804,7 +6832,7 @@ index 0000000000..08b7ea8125
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1035,67 +1045,67 @@ model=default
++@@ -1038,67 +1048,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -6931,7 +6959,7 @@ index 0000000000..08b7ea8125
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1104,8 +1114,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1107,8 +1117,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -6942,7 +6970,7 @@ index 0000000000..08b7ea8125
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1116,14 +1126,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1119,14 +1129,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -6963,7 +6991,7 @@ index 0000000000..08b7ea8125
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1800,7 +1810,8 @@ AS_CASE([$arch,$system],
++@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -6973,7 +7001,7 @@ index 0000000000..08b7ea8125
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1849,6 +1860,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7004,7 +7032,7 @@ index 0000000000..08b7ea8125
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1990,8 +2025,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1993,8 +2028,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -12289,19 +12317,7 @@ index 0000000000..08b7ea8125
 ++ 
 ++ (* ocaml-multicore issues 528 and 468 *)
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
