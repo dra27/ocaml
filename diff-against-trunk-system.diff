@@ -1,28 +1,79 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..98c9824a60
+index 0000000000..a4ee1ed08f
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,14 @@
-+--- a	2023-09-28 18:44:29.661650440 +0100
-++++ b	2023-09-28 18:44:29.669650763 +0100
-+@@ -1,7 +1,10 @@
-+ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+-@@ -1,4 +1,4 @@
-++@@ -2,7 +2,7 @@
-++    * skip
-++    reason = "OCaml 5 only"
-++ *)
-+ -(* This test is currently disabled, 
-+ +(* This test is currently disabled,
-+     until the random failures have been investigated.
+@@ -0,0 +1,65 @@
++--- a	2023-09-28 18:44:29.993663815 +0100
+++++ b	2023-09-28 18:44:30.021664943 +0100
++@@ -169,10 +169,6 @@
++  # Variables used to represent the OCaml runtime system
++  # Most of the time, boot/ocamlrun and runtime/ocamlrun are the same.
++  # However, under some circumstances it is important to be able to
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/compilerlibs/Makefile.compilerlibs b/compilerlibs/Makefile.compilerlibs
++ --- a/compilerlibs/Makefile.compilerlibs
++ +++ b/compilerlibs/Makefile.compilerlibs
++@@ -239,7 +235,7 @@
++ new file mode 100644
++ --- /dev/null
++ +++ b/utils/config.common.ml
++-@@ -0,0 +1,162 @@
+++@@ -0,0 +1,167 @@
++ +#2 "utils/config.common.ml"
++ +(**************************************************************************)
++ +(*                                                                        *)
++@@ -304,8 +300,13 @@
++ +let lazy_tag = 246
++ +
++ +let max_young_wosize = 256
++++(* BACKPORT BEGIN
++ +let stack_threshold = 32 (* see runtime/caml/config.h *)
++ +let stack_safety_margin = 6
++++*)
++++let stack_threshold = 256 (* see runtime/caml/config.h *)
++++let stack_safety_margin = 60
++++(* BACKPORT END *)
++ +let default_executable_name =
++ +  match Sys.os_type with
++ +    "Unix" -> "a.out"
++@@ -514,7 +515,7 @@
++  let force_instrumented_runtime = %%FORCE_INSTRUMENTED_RUNTIME%%
++  
++  let flat_float_array = %%FLAT_FLOAT_ARRAY%%
++-@@ -91,39 +76,6 @@ let flat_float_array = %%FLAT_FLOAT_ARRAY%%
+++@@ -91,44 +76,6 @@ let flat_float_array = %%FLAT_FLOAT_ARRAY%%
++  let function_sections = %%FUNCTION_SECTIONS%%
++  let afl_instrument = %%AFL_INSTRUMENT%%
++  
++@@ -548,13 +549,18 @@
++ -let lazy_tag = 246
++ -
++ -let max_young_wosize = 256
+++-(* BACKPORT BEGIN
++ -let stack_threshold = 32 (* see runtime/caml/config.h *)
++ -let stack_safety_margin = 6
+++-*)
+++-let stack_threshold = 256 (* see runtime/caml/config.h *)
+++-let stack_safety_margin = 60
+++-(* BACKPORT END *)
++ -
++  let architecture = "%%ARCH%%"
++  let model = "%%MODEL%%"
++  let system = "%%SYSTEM%%"
++-@@ -143,104 +95,6 @@ let ext_dll = "%%EXT_DLL%%"
+++@@ -148,104 +95,6 @@ let ext_dll = "%%EXT_DLL%%"
++  let host = "%%HOST%%"
++  let target = "%%TARGET%%"
++  
 diff --git a/Changes b/Changes
-index 80e4cb0c12..fb6c416e84 100644
+index 21626379da..dce1efcefe 100644
 --- a/Changes
 +++ b/Changes
-@@ -321,13 +321,13 @@ OCaml 4.14.0
+@@ -327,13 +327,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -38,7 +89,7 @@ index 80e4cb0c12..fb6c416e84 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -427,6 +427,9 @@ OCaml 4.14.0
+@@ -433,6 +433,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -48,7 +99,7 @@ index 80e4cb0c12..fb6c416e84 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -682,6 +685,9 @@ OCaml 4.14.0
+@@ -688,6 +691,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -560,10 +611,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index c5bcc5dba3..804880e707 100755
+index 3085d4d863..804880e707 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 13c44be1f3..9c4fe66628 100755
+index ff3bce2d1f..9c4fe66628 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 2c66a918a3..0a59107ea8 100644
@@ -2902,7 +2953,7 @@ index 0000000000..1b5a5e436e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..696ed27c43
+index 0000000000..b163a4df3c
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3264 @@
@@ -6146,7 +6197,7 @@ index 0000000000..696ed27c43
 + (* ocaml-multicore issues 528 and 468 *)
 + 
 +diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+index 11c24faa78..b52649e12c 100644
++index b42d399907..656e318473 100644
 +--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +@@ -1,3 +1,7 @@
@@ -6154,7 +6205,7 @@ index 0000000000..696ed27c43
 ++   * skip
 ++   reason = "OCaml 5 only"
 ++*)
-+ (* This test is currently disabled, 
++ (* This test is currently disabled,
 +    until the random failures have been investigated.
 + *)
 +diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
@@ -6172,35 +6223,86 @@ index 0000000000..696ed27c43
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..46a9893a49
+index 0000000000..6cafbc92d9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6138 @@
+@@ -0,0 +1,6142 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..98c9824a60
++index 0000000000..a4ee1ed08f
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,14 @@
-++--- a	2023-09-28 18:44:29.661650440 +0100
-+++++ b	2023-09-28 18:44:29.669650763 +0100
-++@@ -1,7 +1,10 @@
-++ diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++ --- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++ +++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++-@@ -1,4 +1,4 @@
-+++@@ -2,7 +2,7 @@
-+++    * skip
-+++    reason = "OCaml 5 only"
-+++ *)
-++ -(* This test is currently disabled, 
-++ +(* This test is currently disabled,
-++     until the random failures have been investigated.
++@@ -0,0 +1,65 @@
+++--- a	2023-09-28 18:44:29.993663815 +0100
++++++ b	2023-09-28 18:44:30.021664943 +0100
+++@@ -169,10 +169,6 @@
+++  # Variables used to represent the OCaml runtime system
+++  # Most of the time, boot/ocamlrun and runtime/ocamlrun are the same.
+++  # However, under some circumstances it is important to be able to
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/compilerlibs/Makefile.compilerlibs b/compilerlibs/Makefile.compilerlibs
+++ --- a/compilerlibs/Makefile.compilerlibs
+++ +++ b/compilerlibs/Makefile.compilerlibs
+++@@ -239,7 +235,7 @@
+++ new file mode 100644
+++ --- /dev/null
+++ +++ b/utils/config.common.ml
+++-@@ -0,0 +1,162 @@
++++@@ -0,0 +1,167 @@
+++ +#2 "utils/config.common.ml"
+++ +(**************************************************************************)
+++ +(*                                                                        *)
+++@@ -304,8 +300,13 @@
+++ +let lazy_tag = 246
+++ +
+++ +let max_young_wosize = 256
+++++(* BACKPORT BEGIN
+++ +let stack_threshold = 32 (* see runtime/caml/config.h *)
+++ +let stack_safety_margin = 6
+++++*)
+++++let stack_threshold = 256 (* see runtime/caml/config.h *)
+++++let stack_safety_margin = 60
+++++(* BACKPORT END *)
+++ +let default_executable_name =
+++ +  match Sys.os_type with
+++ +    "Unix" -> "a.out"
+++@@ -514,7 +515,7 @@
+++  let force_instrumented_runtime = %%FORCE_INSTRUMENTED_RUNTIME%%
+++  
+++  let flat_float_array = %%FLAT_FLOAT_ARRAY%%
+++-@@ -91,39 +76,6 @@ let flat_float_array = %%FLAT_FLOAT_ARRAY%%
++++@@ -91,44 +76,6 @@ let flat_float_array = %%FLAT_FLOAT_ARRAY%%
+++  let function_sections = %%FUNCTION_SECTIONS%%
+++  let afl_instrument = %%AFL_INSTRUMENT%%
+++  
+++@@ -548,13 +549,18 @@
+++ -let lazy_tag = 246
+++ -
+++ -let max_young_wosize = 256
++++-(* BACKPORT BEGIN
+++ -let stack_threshold = 32 (* see runtime/caml/config.h *)
+++ -let stack_safety_margin = 6
++++-*)
++++-let stack_threshold = 256 (* see runtime/caml/config.h *)
++++-let stack_safety_margin = 60
++++-(* BACKPORT END *)
+++ -
+++  let architecture = "%%ARCH%%"
+++  let model = "%%MODEL%%"
+++  let system = "%%SYSTEM%%"
+++-@@ -143,104 +95,6 @@ let ext_dll = "%%EXT_DLL%%"
++++@@ -148,104 +95,6 @@ let ext_dll = "%%EXT_DLL%%"
+++  let host = "%%HOST%%"
+++  let target = "%%TARGET%%"
+++  
 +diff --git a/Changes b/Changes
-+index 80e4cb0c12..fb6c416e84 100644
++index 21626379da..dce1efcefe 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -321,13 +321,13 @@ OCaml 4.14.0
++@@ -327,13 +327,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6216,7 +6318,7 @@ index 0000000000..46a9893a49
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -427,6 +427,9 @@ OCaml 4.14.0
++@@ -433,6 +433,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6226,7 +6328,7 @@ index 0000000000..46a9893a49
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -682,6 +685,9 @@ OCaml 4.14.0
++@@ -688,6 +691,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6738,10 +6840,10 @@ index 0000000000..46a9893a49
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index c5bcc5dba3..804880e707 100755
++index 3085d4d863..804880e707 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 13c44be1f3..9c4fe66628 100755
++index ff3bce2d1f..9c4fe66628 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 2c66a918a3..0a59107ea8 100644
@@ -9080,7 +9182,7 @@ index 0000000000..46a9893a49
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..696ed27c43
++index 0000000000..b163a4df3c
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3264 @@
@@ -12266,54 +12368,7 @@ index 0000000000..46a9893a49
 ++-Error: Illegal shadowing of included type t/284 by t/289
 +++Error: Illegal shadowing of included type t/279 by t/284
 ++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe
+++-         Type t/284 came from thi
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14192,11 +14247,11 @@ index 01722ed9ca..508dd3b226 100644
    opSTOP, Nothing;
    opEVENT, Nothing;
    opBREAK, Nothing;
-diff --git a/utils/config.mlp b/utils/config.mlp
-index 4aa205266e..3e4461a9c7 100644
---- a/utils/config.mlp
-+++ b/utils/config.mlp
-@@ -121,8 +121,13 @@ let max_tag = 243
+diff --git a/utils/config.common.ml b/utils/config.common.ml
+index 13eb6392b8..d9d88cc19b 100644
+--- a/utils/config.common.ml
++++ b/utils/config.common.ml
+@@ -62,8 +62,13 @@ let max_tag = 243
  let lazy_tag = 246
  
  let max_young_wosize = 256
@@ -14207,9 +14262,9 @@ index 4aa205266e..3e4461a9c7 100644
 +let stack_threshold = 256 (* see runtime/caml/config.h *)
 +let stack_safety_margin = 60
 +(* BACKPORT END *)
- 
- let architecture = "%%ARCH%%"
- let model = "%%MODEL%%"
+ let default_executable_name =
+   match Sys.os_type with
+     "Unix" -> "a.out"
 diff --git a/utils/domainstate.ml.c b/utils/domainstate.ml.c
 index 6dbae1d07a..1eee2142ad 100644
 --- a/utils/domainstate.ml.c
