@@ -1,20 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..04dfbc9ee4
+index 0000000000..251c10d6a6
 --- /dev/null
 +++ b/.Diff-of-diff.diff
 @@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:30.957702626 +0100
-++++ b	2023-09-28 18:44:30.965702948 +0100
-+@@ -96,7 +96,7 @@
-+  AC_SUBST([outputexe])
-+  AC_SUBST([outputobj])
-+  AC_SUBST([syslib])
-+-@@ -521,8 +522,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++@@ -531,8 +532,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
++--- a	2023-09-28 18:44:31.433721778 +0100
+++++ b	2023-09-28 18:44:31.441722100 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1673,6 +1673,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
+++@@ -1683,6 +1683,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
 +  
-+  AS_CASE([$host],
-+    [*-*-mingw32|*-pc-windows],
++  ## Does stat support nanosecond precision
++  
 diff --git a/Changes b/Changes
 index 1b5ecbdca1..1cc5f33bf1 100644
 --- a/Changes
@@ -607,10 +607,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 621f078ea9..262c34ad78 100755
+index 8a3b0450b1..57b3254908 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index b6d33fb2e4..277a4a81e8 100644
+index 46ca5d75fb..dadda4e3bd 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
@@ -828,7 +828,7 @@ index b6d33fb2e4..277a4a81e8 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
+@@ -1805,7 +1815,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -838,7 +838,7 @@ index b6d33fb2e4..277a4a81e8 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1854,6 +1865,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -869,7 +869,7 @@ index b6d33fb2e4..277a4a81e8 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1993,8 +2028,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -1995,8 +2030,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6181,27 +6181,27 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a3675ab6cf
+index 0000000000..066d57fe27
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6145 @@
+@@ -0,0 +1,6144 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..04dfbc9ee4
++index 0000000000..251c10d6a6
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
 +@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:30.957702626 +0100
-+++++ b	2023-09-28 18:44:30.965702948 +0100
-++@@ -96,7 +96,7 @@
-++  AC_SUBST([outputexe])
-++  AC_SUBST([outputobj])
-++  AC_SUBST([syslib])
-++-@@ -521,8 +522,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+++@@ -531,8 +532,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
+++--- a	2023-09-28 18:44:31.433721778 +0100
++++++ b	2023-09-28 18:44:31.441722100 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1673,6 +1673,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
++++@@ -1683,6 +1683,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
 ++  
-++  AS_CASE([$host],
-++    [*-*-mingw32|*-pc-windows],
+++  ## Does stat support nanosecond precision
+++  
 +diff --git a/Changes b/Changes
 +index 1b5ecbdca1..1cc5f33bf1 100644
 +--- a/Changes
@@ -6794,10 +6794,10 @@ index 0000000000..a3675ab6cf
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 621f078ea9..262c34ad78 100755
++index 8a3b0450b1..57b3254908 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index b6d33fb2e4..277a4a81e8 100644
++index 46ca5d75fb..dadda4e3bd 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
@@ -7015,7 +7015,7 @@ index 0000000000..a3675ab6cf
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1803,7 +1813,8 @@ AS_CASE([$arch,$system],
++@@ -1805,7 +1815,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7025,7 +7025,7 @@ index 0000000000..a3675ab6cf
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1852,6 +1863,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1854,6 +1865,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7056,7 +7056,7 @@ index 0000000000..a3675ab6cf
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1993,8 +2028,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -1995,8 +2030,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -12328,8 +12328,7 @@ index 0000000000..a3675ab6cf
 ++ 
 ++ let () = Out_channel.set_buffered stdout false
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finalis
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
