@@ -89,7 +89,7 @@ AC_CONFIG_COMMANDS_PRE([
     AS_IF([test -n "$mkexedebugflag"],
       [mkexedebugflag="${mkexe_ldflags_prefix}${mkexedebugflag}"])
     mkdll_ldflags="\$(if \$(LDFLAGS), \
-$mkexe_ldflags_prefix\$(if \$(word 2,\$(LDFLAGS)),\"\$(LDFLAGS)\",\$(LDFLAGS)))"
+\$(addprefix ${mkexe_ldflags_prefix},\$(LDFLAGS)))"
     mkexe_ldflags=\
 "\$(addprefix ${mkexe_ldflags_prefix},\$(OC_LDFLAGS))${mkdll_ldflags}"
     mkdll_ldflags="\$(addprefix ${mkexe_ldflags_prefix},\$(OC_DLL_LDFLAGS)) \
@@ -102,9 +102,7 @@ ${mkdll_ldflags}"
   # the msvc ports.
   AS_IF([test -n "$mkexe_via_cc_ldflags_prefix"],[
     mkexe_via_cc_ldflags=\
-"\$(addprefix ${mkexe_via_cc_ldflags_prefix},\$(OC_LDFLAGS))\
-\$(if \$(LDFLAGS),$mkexe_via_cc_ldflags_prefix\
-\$(if \$(word 2,\$(LDFLAGS)),\"\$(LDFLAGS)\",\$(LDFLAGS)))"
+"\$(addprefix ${mkexe_via_cc_ldflags_prefix},\$(OC_LDFLAGS) \$(LDFLAGS))"
   ],[
     mkexe_via_cc_ldflags='$(OC_LDFLAGS) $(LDFLAGS)'
   ])
