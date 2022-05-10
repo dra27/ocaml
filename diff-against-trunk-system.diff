@@ -1,25 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..251c10d6a6
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:31.433721778 +0100
-++++ b	2023-09-28 18:44:31.441722100 +0100
-+@@ -3,7 +3,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1673,6 +1673,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
-++@@ -1683,6 +1683,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
-+  
-+  ## Does stat support nanosecond precision
-+  
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 1b5ecbdca1..1cc5f33bf1 100644
+index eeb6c71108..f47aa4008e 100644
 --- a/Changes
 +++ b/Changes
-@@ -331,13 +331,13 @@ OCaml 4.14.0
+@@ -334,13 +334,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -35,7 +21,7 @@ index 1b5ecbdca1..1cc5f33bf1 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -437,6 +437,9 @@ OCaml 4.14.0
+@@ -440,6 +440,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -45,7 +31,7 @@ index 1b5ecbdca1..1cc5f33bf1 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -692,6 +695,9 @@ OCaml 4.14.0
+@@ -695,6 +698,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6181,32 +6167,18 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..066d57fe27
+index 0000000000..e12f7e2277
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6144 @@
+@@ -0,0 +1,6143 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..251c10d6a6
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:31.433721778 +0100
-+++++ b	2023-09-28 18:44:31.441722100 +0100
-++@@ -3,7 +3,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1673,6 +1673,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
-+++@@ -1683,6 +1683,8 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
-++  
-++  ## Does stat support nanosecond precision
-++  
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 1b5ecbdca1..1cc5f33bf1 100644
++index eeb6c71108..f47aa4008e 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -331,13 +331,13 @@ OCaml 4.14.0
++@@ -334,13 +334,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6222,7 +6194,7 @@ index 0000000000..066d57fe27
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -437,6 +437,9 @@ OCaml 4.14.0
++@@ -440,6 +440,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6232,7 +6204,7 @@ index 0000000000..066d57fe27
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -692,6 +695,9 @@ OCaml 4.14.0
++@@ -695,6 +698,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -12328,7 +12300,20 @@ index 0000000000..066d57fe27
 ++ 
 ++ let () = Out_channel.set_buffered stdout false
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finalis
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifeti
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
