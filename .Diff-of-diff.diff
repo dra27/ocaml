@@ -1,0 +1,31 @@
+--- a	2023-09-28 18:44:32.049746562 +0100
++++ b	2023-09-28 18:44:32.057746883 +0100
+@@ -833,8 +833,8 @@
+  
+  ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+  
+-@@ -903,7 +1110,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+- clean::
++@@ -904,7 +1111,7 @@ clean::
++ 	rm -f yacc/wstr.o yacc/wstr.obj
+  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
+  
+ -$(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
+@@ -842,7 +842,7 @@
+  
+  # The Menhir-generated parser
+  
+-@@ -1197,7 +1404,7 @@ distclean: clean
++@@ -1198,7 +1405,7 @@ distclean: clean
+  	$(MAKE) -C ocamldoc distclean
+  	$(MAKE) -C ocamltest distclean
+  	$(MAKE) -C otherlibs distclean
+@@ -851,7 +851,7 @@
+  	$(MAKE) -C stdlib distclean
+  	$(MAKE) -C testsuite distclean
+  	$(MAKE) -C tools distclean
+-@@ -1211,6 +1418,240 @@ distclean: clean
++@@ -1212,6 +1419,240 @@ distclean: clean
+  	rm -rf autom4te.cache flexdll-sources
+  	rm -f config.log config.status libtool
+  

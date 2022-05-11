@@ -1,6 +1,40 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..ed66a622e6
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,31 @@
++--- a	2023-09-28 18:44:32.049746562 +0100
+++++ b	2023-09-28 18:44:32.057746883 +0100
++@@ -833,8 +833,8 @@
++  
++  ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
++  
++-@@ -903,7 +1110,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++- clean::
+++@@ -904,7 +1111,7 @@ clean::
+++ 	rm -f yacc/wstr.o yacc/wstr.obj
++  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
++  
++ -$(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
++@@ -842,7 +842,7 @@
++  
++  # The Menhir-generated parser
++  
++-@@ -1197,7 +1404,7 @@ distclean: clean
+++@@ -1198,7 +1405,7 @@ distclean: clean
++  	$(MAKE) -C ocamldoc distclean
++  	$(MAKE) -C ocamltest distclean
++  	$(MAKE) -C otherlibs distclean
++@@ -851,7 +851,7 @@
++  	$(MAKE) -C stdlib distclean
++  	$(MAKE) -C testsuite distclean
++  	$(MAKE) -C tools distclean
++-@@ -1211,6 +1418,240 @@ distclean: clean
+++@@ -1212,6 +1419,240 @@ distclean: clean
++  	rm -rf autom4te.cache flexdll-sources
++  	rm -f config.log config.status libtool
++  
 diff --git a/Changes b/Changes
 index eeb6c71108..f47aa4008e 100644
 --- a/Changes
@@ -42,17 +76,17 @@ index eeb6c71108..f47aa4008e 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 5af888fdc3..cd8f54b04e 100644
+index 9510d68c23..d6aacd47c7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -901,6 +901,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1108,6 +1108,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
 +	rm -f yacc/wstr.o yacc/wstr.obj
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
- $(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
+ $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 diff --git a/Makefile.config.in b/Makefile.config.in
 index ebe398e0e0..f8522da946 100644
 --- a/Makefile.config.in
@@ -6167,13 +6201,47 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e12f7e2277
+index 0000000000..7e77d759dd
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6143 @@
+@@ -0,0 +1,6149 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..ed66a622e6
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,31 @@
+++--- a	2023-09-28 18:44:32.049746562 +0100
++++++ b	2023-09-28 18:44:32.057746883 +0100
+++@@ -833,8 +833,8 @@
+++  
+++  ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+++  
+++-@@ -903,7 +1110,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+++- clean::
++++@@ -904,7 +1111,7 @@ clean::
++++ 	rm -f yacc/wstr.o yacc/wstr.obj
+++  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
+++  
+++ -$(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
+++@@ -842,7 +842,7 @@
+++  
+++  # The Menhir-generated parser
+++  
+++-@@ -1197,7 +1404,7 @@ distclean: clean
++++@@ -1198,7 +1405,7 @@ distclean: clean
+++  	$(MAKE) -C ocamldoc distclean
+++  	$(MAKE) -C ocamltest distclean
+++  	$(MAKE) -C otherlibs distclean
+++@@ -851,7 +851,7 @@
+++  	$(MAKE) -C stdlib distclean
+++  	$(MAKE) -C testsuite distclean
+++  	$(MAKE) -C tools distclean
+++-@@ -1211,6 +1418,240 @@ distclean: clean
++++@@ -1212,6 +1419,240 @@ distclean: clean
+++  	rm -rf autom4te.cache flexdll-sources
+++  	rm -f config.log config.status libtool
+++  
 +diff --git a/Changes b/Changes
 +index eeb6c71108..f47aa4008e 100644
 +--- a/Changes
@@ -6215,17 +6283,17 @@ index 0000000000..e12f7e2277
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 5af888fdc3..cd8f54b04e 100644
++index 9510d68c23..d6aacd47c7 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -901,6 +901,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1108,6 +1108,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
 ++	rm -f yacc/wstr.o yacc/wstr.obj
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
-+ $(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
++ $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 +diff --git a/Makefile.config.in b/Makefile.config.in
 +index ebe398e0e0..f8522da946 100644
 +--- a/Makefile.config.in
@@ -12285,35 +12353,7 @@ index 0000000000..e12f7e2277
 +++   reason = "OCaml 5 only"
 +++ *)
 ++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifeti
+++ (* Due to GCs running a
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -12810,7 +12850,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index 1be0533b96..689dad303d 100644
+index f7efed57bc..0483b1b17d 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
