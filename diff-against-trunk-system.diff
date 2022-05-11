@@ -1,39 +1,100 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..ed66a622e6
+index 0000000000..dc9b99e270
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,31 @@
-+--- a	2023-09-28 18:44:32.049746562 +0100
-++++ b	2023-09-28 18:44:32.057746883 +0100
-+@@ -833,8 +833,8 @@
+@@ -0,0 +1,92 @@
++--- a	2023-09-28 18:44:32.489764254 +0100
+++++ b	2023-09-28 18:44:32.501764736 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -804,7 +804,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
+++@@ -801,7 +801,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
++  # to supply a host C compiler and different flags and a linking macro.
++  SAK_CC ?= $(CC)
++  SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
++@@ -10,7 +10,7 @@
 +  
-+  ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
++  $(SAK): runtime/sak.$(O)
++  	$(call SAK_LINK,$@,$^)
++-@@ -825,7 +825,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
+++@@ -822,7 +822,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
++  	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 +  
-+-@@ -903,7 +1110,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
-+- clean::
-++@@ -904,7 +1111,7 @@ clean::
-++ 	rm -f yacc/wstr.o yacc/wstr.obj
-+  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
++  runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
++@@ -92,7 +92,7 @@
++  INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
++ @@ -248,23 +252,6 @@ AWK=@AWK@
++  STDLIB_MANPAGES=@stdlib_manpages@
++- NAKED_POINTERS=false
+++ NAKED_POINTERS=@naked_pointers@
 +  
-+ -$(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
-+@@ -842,7 +842,7 @@
++ -### Native command to build ocamlrun.exe
++ -
++@@ -170,7 +170,7 @@
++  AC_SUBST([PACKLD])
++  AC_SUBST([stdlib_manpages])
++  AC_SUBST([compute_deps])
++-@@ -479,6 +482,7 @@ AS_CASE([$host],
+++@@ -489,6 +492,7 @@ AS_CASE([$host],
++    # So we let them do, at the moment
++    [*-pc-windows],
++      [
++@@ -178,7 +178,7 @@
++        libext=lib
++        AR=""
++        AS_IF([test "$host_cpu" = "x86_64" ],
++-@@ -687,24 +691,25 @@ AS_IF([test x"$enable_shared" = "xno"],
+++@@ -697,24 +701,25 @@ AS_IF([test x"$enable_shared" = "xno"],
++  AS_CASE([$host],
++    [i686-*-cygwin],
++      [flexdll_chain='cygwin'
++@@ -210,7 +210,7 @@
 +  
-+  # The Menhir-generated parser
++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++    AC_MSG_CHECKING([for flexdll sources])
++-@@ -781,7 +786,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+++@@ -791,7 +796,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
 +  
-+-@@ -1197,7 +1404,7 @@ distclean: clean
-++@@ -1198,7 +1405,7 @@ distclean: clean
-+  	$(MAKE) -C ocamldoc distclean
-+  	$(MAKE) -C ocamltest distclean
-+  	$(MAKE) -C otherlibs distclean
-+@@ -851,7 +851,7 @@
-+  	$(MAKE) -C stdlib distclean
-+  	$(MAKE) -C testsuite distclean
-+  	$(MAKE) -C tools distclean
-+-@@ -1211,6 +1418,240 @@ distclean: clean
-++@@ -1212,6 +1419,240 @@ distclean: clean
-+  	rm -rf autom4te.cache flexdll-sources
-+  	rm -f config.log config.status libtool
++  AS_CASE([$cc_basename,$host],
++    [*,x86_64-*-darwin*],
++@@ -219,7 +219,7 @@
++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
++    [*,aarch64-*-darwin*|arm64-*-darwin*],
++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
++-@@ -789,32 +794,36 @@ AS_CASE([$cc_basename,$host],
+++@@ -799,32 +804,36 @@ AS_CASE([$cc_basename,$host],
++    [*,*-*-cygwin*],
++      [common_cppflags="$common_cppflags -U_WIN32"
++      AS_IF([$supports_shared_libraries],
++@@ -265,7 +265,7 @@
++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
++    [gcc*,powerpc-*-linux*],
++      [oc_ldflags="-mbss-plt"],
++-@@ -924,34 +933,32 @@ natdynlinkopts=""
+++@@ -934,34 +943,32 @@ natdynlinkopts=""
++  AS_IF([test x"$enable_shared" != "xno"],
++    [AS_CASE([$host],
++      [x86_64-apple-darwin*],
++@@ -311,7 +311,7 @@
++        rpath="-Wl,-rpath,"
++        mksharedlibrpath="-Wl,-rpath,"
++        supports_shared_libraries=true],
++-@@ -960,12 +967,12 @@ AS_IF([test x"$enable_shared" != "xno"],
+++@@ -970,12 +977,12 @@ AS_IF([test x"$enable_shared" != "xno"],
++        [sharedlib_cflags="-fPIC"
++         AS_CASE([$cc_basename,$host],
++             [*gcc*,powerpc-*-linux*],
++@@ -327,7 +327,7 @@
++        oc_ldflags="$oc_ldflags -Wl,-E"
++        rpath="-Wl,-rpath,"
++        mksharedlibrpath="-Wl,-rpath,"
++-@@ -2055,4 +2062,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
+++@@ -2092,4 +2099,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
++  # Do not permanently cache the result of flexdll.h
++  unset ac_cv_header_flexdll_h
 +  
 diff --git a/Changes b/Changes
 index eeb6c71108..f47aa4008e 100644
@@ -76,7 +137,7 @@ index eeb6c71108..f47aa4008e 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 9510d68c23..ac30b0cd63 100644
+index 052d4ea54b..2d43453122 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -582,7 +582,6 @@ partialclean::
@@ -160,17 +221,17 @@ index 9510d68c23..ac30b0cd63 100644
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 diff --git a/Makefile.config.in b/Makefile.config.in
-index ebe398e0e0..f8522da946 100644
+index 0134f81443..dc4cef03b6 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -246,7 +246,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -250,7 +250,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
 -NAKED_POINTERS=false
 +NAKED_POINTERS=@naked_pointers@
  
- ### Native command to build ocamlrun.exe
+ # Deprecated variables
  
 diff --git a/VERSION b/VERSION
 index 8dfc6cf83f..4ef434f979 100644
@@ -699,13 +760,13 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 8a3b0450b1..57b3254908 100755
+index b10c10c38c..d3b7a787c5 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 46ca5d75fb..dadda4e3bd 100644
+index 9c8a506b3f..f3222266a7 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
+@@ -168,6 +168,8 @@ AC_SUBST([flexdll_chain])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -714,7 +775,7 @@ index 46ca5d75fb..dadda4e3bd 100644
  AC_SUBST([force_instrumented_runtime])
  
  ## Generated files
-@@ -198,10 +200,10 @@ AC_CANONICAL_TARGET
+@@ -201,10 +203,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -729,7 +790,7 @@ index 46ca5d75fb..dadda4e3bd 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -310,15 +312,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -313,15 +315,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -761,7 +822,7 @@ index 46ca5d75fb..dadda4e3bd 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1038,67 +1048,67 @@ model=default
+@@ -1045,67 +1055,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -888,7 +949,7 @@ index 46ca5d75fb..dadda4e3bd 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1107,8 +1117,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1114,8 +1124,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -899,7 +960,7 @@ index 46ca5d75fb..dadda4e3bd 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1119,14 +1129,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1126,14 +1136,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -920,7 +981,7 @@ index 46ca5d75fb..dadda4e3bd 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1805,7 +1815,8 @@ AS_CASE([$arch,$system],
+@@ -1812,7 +1822,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -930,7 +991,7 @@ index 46ca5d75fb..dadda4e3bd 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1854,6 +1865,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1861,6 +1872,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -961,7 +1022,7 @@ index 46ca5d75fb..dadda4e3bd 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -1995,8 +2030,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2002,8 +2037,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6505,46 +6566,107 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..51d2f8318d
+index 0000000000..9d65da8e78
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6413 @@
+@@ -0,0 +1,6516 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..ed66a622e6
++index 0000000000..dc9b99e270
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,31 @@
-++--- a	2023-09-28 18:44:32.049746562 +0100
-+++++ b	2023-09-28 18:44:32.057746883 +0100
-++@@ -833,8 +833,8 @@
++@@ -0,0 +1,92 @@
+++--- a	2023-09-28 18:44:32.489764254 +0100
++++++ b	2023-09-28 18:44:32.501764736 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -804,7 +804,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
++++@@ -801,7 +801,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
+++  # to supply a host C compiler and different flags and a linking macro.
+++  SAK_CC ?= $(CC)
+++  SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
+++@@ -10,7 +10,7 @@
 ++  
-++  ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+++  $(SAK): runtime/sak.$(O)
+++  	$(call SAK_LINK,$@,$^)
+++-@@ -825,7 +825,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
++++@@ -822,7 +822,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
+++  	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 ++  
-++-@@ -903,7 +1110,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
-++- clean::
-+++@@ -904,7 +1111,7 @@ clean::
-+++ 	rm -f yacc/wstr.o yacc/wstr.obj
-++  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
+++  runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
+++@@ -92,7 +92,7 @@
+++  INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
+++ @@ -248,23 +252,6 @@ AWK=@AWK@
+++  STDLIB_MANPAGES=@stdlib_manpages@
+++- NAKED_POINTERS=false
++++ NAKED_POINTERS=@naked_pointers@
 ++  
-++ -$(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
-++@@ -842,7 +842,7 @@
+++ -### Native command to build ocamlrun.exe
+++ -
+++@@ -170,7 +170,7 @@
+++  AC_SUBST([PACKLD])
+++  AC_SUBST([stdlib_manpages])
+++  AC_SUBST([compute_deps])
+++-@@ -479,6 +482,7 @@ AS_CASE([$host],
++++@@ -489,6 +492,7 @@ AS_CASE([$host],
+++    # So we let them do, at the moment
+++    [*-pc-windows],
+++      [
+++@@ -178,7 +178,7 @@
+++        libext=lib
+++        AR=""
+++        AS_IF([test "$host_cpu" = "x86_64" ],
+++-@@ -687,24 +691,25 @@ AS_IF([test x"$enable_shared" = "xno"],
++++@@ -697,24 +701,25 @@ AS_IF([test x"$enable_shared" = "xno"],
+++  AS_CASE([$host],
+++    [i686-*-cygwin],
+++      [flexdll_chain='cygwin'
+++@@ -210,7 +210,7 @@
 ++  
-++  # The Menhir-generated parser
+++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++    AC_MSG_CHECKING([for flexdll sources])
+++-@@ -781,7 +786,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++++@@ -791,7 +796,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
 ++  
-++-@@ -1197,7 +1404,7 @@ distclean: clean
-+++@@ -1198,7 +1405,7 @@ distclean: clean
-++  	$(MAKE) -C ocamldoc distclean
-++  	$(MAKE) -C ocamltest distclean
-++  	$(MAKE) -C otherlibs distclean
-++@@ -851,7 +851,7 @@
-++  	$(MAKE) -C stdlib distclean
-++  	$(MAKE) -C testsuite distclean
-++  	$(MAKE) -C tools distclean
-++-@@ -1211,6 +1418,240 @@ distclean: clean
-+++@@ -1212,6 +1419,240 @@ distclean: clean
-++  	rm -rf autom4te.cache flexdll-sources
-++  	rm -f config.log config.status libtool
+++  AS_CASE([$cc_basename,$host],
+++    [*,x86_64-*-darwin*],
+++@@ -219,7 +219,7 @@
+++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
+++    [*,aarch64-*-darwin*|arm64-*-darwin*],
+++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
+++-@@ -789,32 +794,36 @@ AS_CASE([$cc_basename,$host],
++++@@ -799,32 +804,36 @@ AS_CASE([$cc_basename,$host],
+++    [*,*-*-cygwin*],
+++      [common_cppflags="$common_cppflags -U_WIN32"
+++      AS_IF([$supports_shared_libraries],
+++@@ -265,7 +265,7 @@
+++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
+++    [gcc*,powerpc-*-linux*],
+++      [oc_ldflags="-mbss-plt"],
+++-@@ -924,34 +933,32 @@ natdynlinkopts=""
++++@@ -934,34 +943,32 @@ natdynlinkopts=""
+++  AS_IF([test x"$enable_shared" != "xno"],
+++    [AS_CASE([$host],
+++      [x86_64-apple-darwin*],
+++@@ -311,7 +311,7 @@
+++        rpath="-Wl,-rpath,"
+++        mksharedlibrpath="-Wl,-rpath,"
+++        supports_shared_libraries=true],
+++-@@ -960,12 +967,12 @@ AS_IF([test x"$enable_shared" != "xno"],
++++@@ -970,12 +977,12 @@ AS_IF([test x"$enable_shared" != "xno"],
+++        [sharedlib_cflags="-fPIC"
+++         AS_CASE([$cc_basename,$host],
+++             [*gcc*,powerpc-*-linux*],
+++@@ -327,7 +327,7 @@
+++        oc_ldflags="$oc_ldflags -Wl,-E"
+++        rpath="-Wl,-rpath,"
+++        mksharedlibrpath="-Wl,-rpath,"
+++-@@ -2055,4 +2062,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
++++@@ -2092,4 +2099,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
+++  # Do not permanently cache the result of flexdll.h
+++  unset ac_cv_header_flexdll_h
 ++  
 +diff --git a/Changes b/Changes
 +index eeb6c71108..f47aa4008e 100644
@@ -6587,7 +6709,7 @@ index 0000000000..51d2f8318d
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 9510d68c23..ac30b0cd63 100644
++index 052d4ea54b..2d43453122 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -582,7 +582,6 @@ partialclean::
@@ -6671,17 +6793,17 @@ index 0000000000..51d2f8318d
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index ebe398e0e0..f8522da946 100644
++index 0134f81443..dc4cef03b6 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -246,7 +246,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -250,7 +250,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
 +-NAKED_POINTERS=false
 ++NAKED_POINTERS=@naked_pointers@
 + 
-+ ### Native command to build ocamlrun.exe
++ # Deprecated variables
 + 
 +diff --git a/VERSION b/VERSION
 +index 8dfc6cf83f..4ef434f979 100644
@@ -7210,13 +7332,13 @@ index 0000000000..51d2f8318d
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 8a3b0450b1..57b3254908 100755
++index b10c10c38c..d3b7a787c5 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 46ca5d75fb..dadda4e3bd 100644
++index 9c8a506b3f..f3222266a7 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -165,6 +165,8 @@ AC_SUBST([flexlink_flags])
++@@ -168,6 +168,8 @@ AC_SUBST([flexdll_chain])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -7225,7 +7347,7 @@ index 0000000000..51d2f8318d
 + AC_SUBST([force_instrumented_runtime])
 + 
 + ## Generated files
-+@@ -198,10 +200,10 @@ AC_CANONICAL_TARGET
++@@ -201,10 +203,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -7240,7 +7362,7 @@ index 0000000000..51d2f8318d
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -310,15 +312,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -313,15 +315,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -7272,7 +7394,7 @@ index 0000000000..51d2f8318d
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1038,67 +1048,67 @@ model=default
++@@ -1045,67 +1055,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -7399,7 +7521,7 @@ index 0000000000..51d2f8318d
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1107,8 +1117,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1114,8 +1124,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -7410,7 +7532,7 @@ index 0000000000..51d2f8318d
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1119,14 +1129,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1126,14 +1136,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -7431,7 +7553,7 @@ index 0000000000..51d2f8318d
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1805,7 +1815,8 @@ AS_CASE([$arch,$system],
++@@ -1812,7 +1822,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7441,7 +7563,7 @@ index 0000000000..51d2f8318d
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1854,6 +1865,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1861,6 +1872,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7472,7 +7594,7 @@ index 0000000000..51d2f8318d
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -1995,8 +2030,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2002,8 +2037,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -12921,7 +13043,49 @@ index 0000000000..51d2f8318d
 ++ *)
 ++ 
 ++ let f x =
-++diff --git a/testsuite/tests/typin
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --g
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14196,7 +14360,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index b8b379b1a8..357d0f59d6 100644
+index 60fe85e24b..f2654a9d8f 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -264,7 +264,8 @@ GNUISH_SED = \

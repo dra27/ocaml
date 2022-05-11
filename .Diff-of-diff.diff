@@ -1,31 +1,92 @@
---- a	2023-09-28 18:44:32.049746562 +0100
-+++ b	2023-09-28 18:44:32.057746883 +0100
-@@ -833,8 +833,8 @@
+--- a	2023-09-28 18:44:32.489764254 +0100
++++ b	2023-09-28 18:44:32.501764736 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -804,7 +804,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
++@@ -801,7 +801,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
+  # to supply a host C compiler and different flags and a linking macro.
+  SAK_CC ?= $(CC)
+  SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
+@@ -10,7 +10,7 @@
   
-  ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+  $(SAK): runtime/sak.$(O)
+  	$(call SAK_LINK,$@,$^)
+-@@ -825,7 +825,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
++@@ -822,7 +822,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
+  	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
   
--@@ -903,7 +1110,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
-- clean::
-+@@ -904,7 +1111,7 @@ clean::
-+ 	rm -f yacc/wstr.o yacc/wstr.obj
-  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
+  runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
+@@ -92,7 +92,7 @@
+  INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
+ @@ -248,23 +252,6 @@ AWK=@AWK@
+  STDLIB_MANPAGES=@stdlib_manpages@
+- NAKED_POINTERS=false
++ NAKED_POINTERS=@naked_pointers@
   
- -$(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
-@@ -842,7 +842,7 @@
+ -### Native command to build ocamlrun.exe
+ -
+@@ -170,7 +170,7 @@
+  AC_SUBST([PACKLD])
+  AC_SUBST([stdlib_manpages])
+  AC_SUBST([compute_deps])
+-@@ -479,6 +482,7 @@ AS_CASE([$host],
++@@ -489,6 +492,7 @@ AS_CASE([$host],
+    # So we let them do, at the moment
+    [*-pc-windows],
+      [
+@@ -178,7 +178,7 @@
+        libext=lib
+        AR=""
+        AS_IF([test "$host_cpu" = "x86_64" ],
+-@@ -687,24 +691,25 @@ AS_IF([test x"$enable_shared" = "xno"],
++@@ -697,24 +701,25 @@ AS_IF([test x"$enable_shared" = "xno"],
+  AS_CASE([$host],
+    [i686-*-cygwin],
+      [flexdll_chain='cygwin'
+@@ -210,7 +210,7 @@
   
-  # The Menhir-generated parser
+  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+    AC_MSG_CHECKING([for flexdll sources])
+-@@ -781,7 +786,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++@@ -791,7 +796,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
   
--@@ -1197,7 +1404,7 @@ distclean: clean
-+@@ -1198,7 +1405,7 @@ distclean: clean
-  	$(MAKE) -C ocamldoc distclean
-  	$(MAKE) -C ocamltest distclean
-  	$(MAKE) -C otherlibs distclean
-@@ -851,7 +851,7 @@
-  	$(MAKE) -C stdlib distclean
-  	$(MAKE) -C testsuite distclean
-  	$(MAKE) -C tools distclean
--@@ -1211,6 +1418,240 @@ distclean: clean
-+@@ -1212,6 +1419,240 @@ distclean: clean
-  	rm -rf autom4te.cache flexdll-sources
-  	rm -f config.log config.status libtool
+  AS_CASE([$cc_basename,$host],
+    [*,x86_64-*-darwin*],
+@@ -219,7 +219,7 @@
+      AC_DEFINE([HAS_ARCH_CODE32], [1])],
+    [*,aarch64-*-darwin*|arm64-*-darwin*],
+      AC_DEFINE([HAS_ARCH_CODE32], [1]),
+-@@ -789,32 +794,36 @@ AS_CASE([$cc_basename,$host],
++@@ -799,32 +804,36 @@ AS_CASE([$cc_basename,$host],
+    [*,*-*-cygwin*],
+      [common_cppflags="$common_cppflags -U_WIN32"
+      AS_IF([$supports_shared_libraries],
+@@ -265,7 +265,7 @@
+      AC_DEFINE([HAS_ARCH_CODE32], [1])],
+    [gcc*,powerpc-*-linux*],
+      [oc_ldflags="-mbss-plt"],
+-@@ -924,34 +933,32 @@ natdynlinkopts=""
++@@ -934,34 +943,32 @@ natdynlinkopts=""
+  AS_IF([test x"$enable_shared" != "xno"],
+    [AS_CASE([$host],
+      [x86_64-apple-darwin*],
+@@ -311,7 +311,7 @@
+        rpath="-Wl,-rpath,"
+        mksharedlibrpath="-Wl,-rpath,"
+        supports_shared_libraries=true],
+-@@ -960,12 +967,12 @@ AS_IF([test x"$enable_shared" != "xno"],
++@@ -970,12 +977,12 @@ AS_IF([test x"$enable_shared" != "xno"],
+        [sharedlib_cflags="-fPIC"
+         AS_CASE([$cc_basename,$host],
+             [*gcc*,powerpc-*-linux*],
+@@ -327,7 +327,7 @@
+        oc_ldflags="$oc_ldflags -Wl,-E"
+        rpath="-Wl,-rpath,"
+        mksharedlibrpath="-Wl,-rpath,"
+-@@ -2055,4 +2062,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
++@@ -2092,4 +2099,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
+  # Do not permanently cache the result of flexdll.h
+  unset ac_cv_header_flexdll_h
   
