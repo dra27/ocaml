@@ -793,6 +793,8 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
 
 mkexe_cmd_exp="$CC"
 
+boot_flexlink_cmd='$(ROOTDIR)/boot/ocamlruns.exe $(ROOTDIR)/boot/flexlink.byte.exe'
+
 AS_CASE([$cc_basename,$host],
   [*,x86_64-*-darwin*],
     [oc_ldflags='-Wl,-no_compact_unwind';
@@ -803,8 +805,10 @@ AS_CASE([$cc_basename,$host],
   [*,*-*-cygwin*],
     [common_cppflags="$common_cppflags -U_WIN32"
     AS_IF([$supports_shared_libraries],
-      [mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain}"
-      mkexe_cmd_exp="${mkexe_cmd}"
+      [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+      AS_IF([$bootstrapping_flexlink],
+        [mkexe_cmd="$boot_flexlink_cmd -exe -chain ${flexdll_chain}"],
+        [mkexe_cmd="$mkexe_cmd_exp"])
       mkexe_cflags=''
       mkexe_ldflags_prefix='-link ']
       [mkexe_extra_flags=''
@@ -816,8 +820,10 @@ AS_CASE([$cc_basename,$host],
       [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
     ostype="Win32"
     toolchain="mingw"
-    mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain}"
-    mkexe_cmd_exp="${mkexe_cmd}"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+    AS_IF([$bootstrapping_flexlink],
+      [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
+      [mkexe_cmd="$mkexe_cmd_exp"])
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     oc_ldflags='-municode'
@@ -825,8 +831,10 @@ AS_CASE([$cc_basename,$host],
   [*,*-pc-windows],
     [toolchain=msvc
     ostype="Win32"
-    mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain}"
-    mkexe_cmd_exp="${mkexe_cmd}"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+    AS_IF([$bootstrapping_flexlink],
+      [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
+      [mkexe_cmd="$mkexe_cmd_exp"])
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     mkexe_via_cc_ldflags_prefix='/link '
@@ -960,7 +968,6 @@ AS_IF([test x"$enable_shared" != "xno"],
     [*-pc-windows],
       [mkdll_ld="${flexlink_cmd} -chain ${flexdll_chain}"
       mkdll_flags=''
-      mkdll_exp="${mkdll}"
       mkmaindll="${flexlink_cmd} -maindll -chain ${flexdll_chain}"],
     [*-*-cygwin*],
       [mkdll_ld="${flexlink_cmd} -chain ${flexdll_chain}"
@@ -993,10 +1000,10 @@ AS_IF([test x"$enable_shared" != "xno"],
       mksharedlibrpath="-Wl,-rpath,"
       natdynlinkopts="-Wl,-E"
       supports_shared_libraries=true])
-  AS_IF([supports_shared_libraries && test -n "$mkdll_ld"],[
-    mkdll="$mkdll_ld $mkdll_flags"
-    mkdll_exp="$mkdll"],[
-    mkdll="\$(CC) $mkdll_flags"
+  AS_IF([$supports_shared_libraries && test -n "$mkdll_ld"],
+    [mkdll="$mkdll_ld $mkdll_flags"
+    mkdll_exp="$mkdll"],
+    [mkdll="\$(CC) $mkdll_flags"
     mkdll_exp="$CC $mkdll_flags"])])
 
 AS_IF([test -z "$mkmaindll"], [mkmaindll=$mkdll_exp])

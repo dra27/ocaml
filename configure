@@ -13233,6 +13233,8 @@ esac
 
 mkexe_cmd_exp="$CC"
 
+boot_flexlink_cmd='$(ROOTDIR)/boot/ocamlruns.exe $(ROOTDIR)/boot/flexlink.byte.exe'
+
 case $cc_basename,$host in #(
   *,x86_64-*-darwin*) :
     oc_ldflags='-Wl,-no_compact_unwind';
@@ -13246,8 +13248,12 @@ case $cc_basename,$host in #(
   *,*-*-cygwin*) :
     common_cppflags="$common_cppflags -U_WIN32"
     if $supports_shared_libraries; then :
-  mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain}"
-      mkexe_cmd_exp="${mkexe_cmd}"
+  mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+      if $bootstrapping_flexlink; then :
+  mkexe_cmd="$boot_flexlink_cmd -exe -chain ${flexdll_chain}"
+else
+  mkexe_cmd="$mkexe_cmd_exp"
+fi
       mkexe_cflags=''
       mkexe_ldflags_prefix='-link '
       mkexe_extra_flags=''
@@ -13264,8 +13270,12 @@ fi
 esac
     ostype="Win32"
     toolchain="mingw"
-    mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain}"
-    mkexe_cmd_exp="${mkexe_cmd}"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+    if $bootstrapping_flexlink; then :
+  mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"
+else
+  mkexe_cmd="$mkexe_cmd_exp"
+fi
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     oc_ldflags='-municode'
@@ -13273,8 +13283,12 @@ esac
   *,*-pc-windows) :
     toolchain=msvc
     ostype="Win32"
-    mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain}"
-    mkexe_cmd_exp="${mkexe_cmd}"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+    if $bootstrapping_flexlink; then :
+  mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"
+else
+  mkexe_cmd="$mkexe_cmd_exp"
+fi
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     mkexe_via_cc_ldflags_prefix='/link '
@@ -14113,7 +14127,6 @@ fi ;; #(
   *-pc-windows) :
     mkdll_ld="${flexlink_cmd} -chain ${flexdll_chain}"
       mkdll_flags=''
-      mkdll_exp="${mkdll}"
       mkmaindll="${flexlink_cmd} -maindll -chain ${flexdll_chain}" ;; #(
   *-*-cygwin*) :
     mkdll_ld="${flexlink_cmd} -chain ${flexdll_chain}"
@@ -14154,13 +14167,11 @@ esac
   *) :
      ;;
 esac
-  if supports_shared_libraries && test -n "$mkdll_ld"; then :
-
-    mkdll="$mkdll_ld $mkdll_flags"
+  if $supports_shared_libraries && test -n "$mkdll_ld"; then :
+  mkdll="$mkdll_ld $mkdll_flags"
     mkdll_exp="$mkdll"
 else
-
-    mkdll="\$(CC) $mkdll_flags"
+  mkdll="\$(CC) $mkdll_flags"
     mkdll_exp="$CC $mkdll_flags"
 fi
 fi
