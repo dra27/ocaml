@@ -1,19 +1,30 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b3b0188eb6
+index 0000000000..85480e9951
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:33.029785966 +0100
-++++ b	2023-09-28 18:44:33.037786287 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -934,8 +934,8 @@ $(foreach runtime_OBJECT_TYPE, $(runtime_OBJECT_TYPES), \
-++@@ -931,8 +931,8 @@ $(foreach runtime_OBJECT_TYPE, $(runtime_OBJECT_TYPES), \
-+  runtime/$(UNIX_OR_WIN32)_non_shared.%.$(O): \
-+    OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
+@@ -0,0 +1,22 @@
++--- a	2023-09-28 18:44:33.281796092 +0100
+++++ b	2023-09-28 18:44:33.289796414 +0100
++@@ -34,15 +34,15 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -169,6 +169,7 @@ AC_SUBST([PACKLD])
++- AC_SUBST([stdlib_manpages])
++- AC_SUBST([compute_deps])
+++@@ -171,6 +171,7 @@ AC_SUBST([compute_deps])
+++ AC_SUBST([naked_pointers])
+++ AC_SUBST([naked_pointers_checker])
++  AC_SUBST([force_instrumented_runtime])
++ +AC_SUBST([QS])
++  
++  ## Generated files
++  
++-@@ -192,6 +193,9 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
+++@@ -194,6 +195,9 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
++  AC_DEFINE([OCAML_VERSION], [OCAML__VERSION_NUMBER])
++  AC_DEFINE([OCAML_VERSION_STRING], ["][OCAML__VERSION]["])
 +  
 diff --git a/Changes b/Changes
 index eeb6c71108..f47aa4008e 100644
@@ -679,10 +690,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index b10c10c38c..d3b7a787c5 100755
+index 61033a8c15..da71f6ab71 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 9c8a506b3f..f3222266a7 100644
+index b3a5df487b..dd8d6cf746 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -168,6 +168,8 @@ AC_SUBST([flexdll_chain])
@@ -692,9 +703,9 @@ index 9c8a506b3f..f3222266a7 100644
 +AC_SUBST([naked_pointers])
 +AC_SUBST([naked_pointers_checker])
  AC_SUBST([force_instrumented_runtime])
+ AC_SUBST([QS])
  
- ## Generated files
-@@ -201,10 +203,10 @@ AC_CANONICAL_TARGET
+@@ -205,10 +207,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -709,7 +720,7 @@ index 9c8a506b3f..f3222266a7 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -313,15 +315,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -317,15 +319,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -741,7 +752,7 @@ index 9c8a506b3f..f3222266a7 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1045,67 +1055,67 @@ model=default
+@@ -1049,67 +1059,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -868,7 +879,7 @@ index 9c8a506b3f..f3222266a7 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1114,8 +1124,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1118,8 +1128,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -879,7 +890,7 @@ index 9c8a506b3f..f3222266a7 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1126,14 +1136,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1130,14 +1140,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -900,7 +911,7 @@ index 9c8a506b3f..f3222266a7 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1812,7 +1822,8 @@ AS_CASE([$arch,$system],
+@@ -1816,7 +1826,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -910,7 +921,7 @@ index 9c8a506b3f..f3222266a7 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1861,6 +1872,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1865,6 +1876,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -941,7 +952,7 @@ index 9c8a506b3f..f3222266a7 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2002,8 +2037,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2006,8 +2041,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -3215,15 +3226,15 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..7a54fd1b61
+index 0000000000..798529b696
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3264 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+index 1f8abec508..40579e0f6f 100644
++index 081e146338..23504fb0e8 100644
 +--- a/ocamltest/Makefile
 ++++ b/ocamltest/Makefile
-+@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
++@@ -270,6 +270,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 + 	    $(call SUBST,DIFF_FLAGS) \
 + 	    $(call SUBST,WINDOWS_UNICODE) \
 + 	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -6485,26 +6496,37 @@ index 0000000000..7a54fd1b61
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fb2db59947
+index 0000000000..f6112e008a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6406 @@
+@@ -0,0 +1,6410 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b3b0188eb6
++index 0000000000..85480e9951
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:33.029785966 +0100
-+++++ b	2023-09-28 18:44:33.037786287 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -934,8 +934,8 @@ $(foreach runtime_OBJECT_TYPE, $(runtime_OBJECT_TYPES), \
-+++@@ -931,8 +931,8 @@ $(foreach runtime_OBJECT_TYPE, $(runtime_OBJECT_TYPES), \
-++  runtime/$(UNIX_OR_WIN32)_non_shared.%.$(O): \
-++    OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
++@@ -0,0 +1,22 @@
+++--- a	2023-09-28 18:44:33.281796092 +0100
++++++ b	2023-09-28 18:44:33.289796414 +0100
+++@@ -34,15 +34,15 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -169,6 +169,7 @@ AC_SUBST([PACKLD])
+++- AC_SUBST([stdlib_manpages])
+++- AC_SUBST([compute_deps])
++++@@ -171,6 +171,7 @@ AC_SUBST([compute_deps])
++++ AC_SUBST([naked_pointers])
++++ AC_SUBST([naked_pointers_checker])
+++  AC_SUBST([force_instrumented_runtime])
+++ +AC_SUBST([QS])
+++  
+++  ## Generated files
+++  
+++-@@ -192,6 +193,9 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
++++@@ -194,6 +195,9 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
+++  AC_DEFINE([OCAML_VERSION], [OCAML__VERSION_NUMBER])
+++  AC_DEFINE([OCAML_VERSION_STRING], ["][OCAML__VERSION]["])
 ++  
 +diff --git a/Changes b/Changes
 +index eeb6c71108..f47aa4008e 100644
@@ -7170,10 +7192,10 @@ index 0000000000..fb2db59947
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index b10c10c38c..d3b7a787c5 100755
++index 61033a8c15..da71f6ab71 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 9c8a506b3f..f3222266a7 100644
++index b3a5df487b..dd8d6cf746 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -168,6 +168,8 @@ AC_SUBST([flexdll_chain])
@@ -7183,9 +7205,9 @@ index 0000000000..fb2db59947
 ++AC_SUBST([naked_pointers])
 ++AC_SUBST([naked_pointers_checker])
 + AC_SUBST([force_instrumented_runtime])
++ AC_SUBST([QS])
 + 
-+ ## Generated files
-+@@ -201,10 +203,10 @@ AC_CANONICAL_TARGET
++@@ -205,10 +207,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -7200,7 +7222,7 @@ index 0000000000..fb2db59947
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -313,15 +315,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -317,15 +319,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -7232,7 +7254,7 @@ index 0000000000..fb2db59947
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1045,67 +1055,67 @@ model=default
++@@ -1049,67 +1059,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -7359,7 +7381,7 @@ index 0000000000..fb2db59947
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1114,8 +1124,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1118,8 +1128,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -7370,7 +7392,7 @@ index 0000000000..fb2db59947
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1126,14 +1136,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1130,14 +1140,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -7391,7 +7413,7 @@ index 0000000000..fb2db59947
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1812,7 +1822,8 @@ AS_CASE([$arch,$system],
++@@ -1816,7 +1826,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7401,7 +7423,7 @@ index 0000000000..fb2db59947
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1861,6 +1872,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1865,6 +1876,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7432,7 +7454,7 @@ index 0000000000..fb2db59947
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2002,8 +2037,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2006,8 +2041,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -9706,15 +9728,15 @@ index 0000000000..fb2db59947
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..7a54fd1b61
++index 0000000000..798529b696
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3264 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++index 1f8abec508..40579e0f6f 100644
+++index 081e146338..23504fb0e8 100644
 ++--- a/ocamltest/Makefile
 +++++ b/ocamltest/Makefile
-++@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+++@@ -270,6 +270,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 ++ 	    $(call SUBST,DIFF_FLAGS) \
 ++ 	    $(call SUBST,WINDOWS_UNICODE) \
 ++ 	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -12887,14 +12909,7 @@ index 0000000000..fb2db59947
 +++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
 ++@@ -24,11 +24,11 @@ end
 ++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++    
+++ 3 |   include Comparable wit
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
