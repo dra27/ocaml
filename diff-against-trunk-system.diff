@@ -1,101 +1,56 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..dc9b99e270
+index 0000000000..7dbf1b02ff
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,92 @@
-+--- a	2023-09-28 18:44:32.489764254 +0100
-++++ b	2023-09-28 18:44:32.501764736 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -804,7 +804,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
-++@@ -801,7 +801,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
-+  # to supply a host C compiler and different flags and a linking macro.
-+  SAK_CC ?= $(CC)
-+  SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
-+@@ -10,7 +10,7 @@
+@@ -0,0 +1,47 @@
++--- a	2023-09-28 18:44:32.757775030 +0100
+++++ b	2023-09-28 18:44:32.765775351 +0100
++@@ -23,7 +23,7 @@
++  endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
++  	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
++  	cd boot; rm -f $(LIBFILES)
++-@@ -1021,8 +1017,7 @@ stdlib/flexdll:
+++@@ -1018,8 +1014,7 @@ stdlib/flexdll:
++  endif
 +  
-+  $(SAK): runtime/sak.$(O)
-+  	$(call SAK_LINK,$@,$^)
-+-@@ -825,7 +825,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
-++@@ -822,7 +822,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
-+  	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
++  .PHONY: makeruntime
++@@ -33,7 +33,7 @@
++  stdlib/libcamlrun.$(A): runtime-all
++  	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
++  clean::
++-@@ -1040,8 +1035,7 @@ clean::
+++@@ -1037,8 +1032,7 @@ clean::
++  runtimeopt: stdlib/libasmrun.$(A)
 +  
-+  runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
-+@@ -92,7 +92,7 @@
-+  INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
-+ @@ -248,23 +252,6 @@ AWK=@AWK@
-+  STDLIB_MANPAGES=@stdlib_manpages@
-+- NAKED_POINTERS=false
-++ NAKED_POINTERS=@naked_pointers@
++  .PHONY: makeruntimeopt
++@@ -43,7 +43,7 @@
++  stdlib/libasmrun.$(A): runtime-allopt
++  	cd stdlib; $(LN) ../runtime/libasmrun.$(A) .
 +  
-+ -### Native command to build ocamlrun.exe
-+ -
-+@@ -170,7 +170,7 @@
-+  AC_SUBST([PACKLD])
-+  AC_SUBST([stdlib_manpages])
-+  AC_SUBST([compute_deps])
-+-@@ -479,6 +482,7 @@ AS_CASE([$host],
-++@@ -489,6 +492,7 @@ AS_CASE([$host],
-+    # So we let them do, at the moment
-+    [*-pc-windows],
-+      [
-+@@ -178,7 +178,7 @@
-+        libext=lib
-+        AR=""
-+        AS_IF([test "$host_cpu" = "x86_64" ],
-+-@@ -687,24 +691,25 @@ AS_IF([test x"$enable_shared" = "xno"],
-++@@ -697,24 +701,25 @@ AS_IF([test x"$enable_shared" = "xno"],
-+  AS_CASE([$host],
-+    [i686-*-cygwin],
-+      [flexdll_chain='cygwin'
-+@@ -210,7 +210,7 @@
++-@@ -1063,16 +1057,15 @@ alldepend: depend
+++@@ -1060,16 +1054,15 @@ alldepend: depend
 +  
-+  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+    AC_MSG_CHECKING([for flexdll sources])
-+-@@ -781,7 +786,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-++@@ -791,7 +796,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++  .PHONY: library
++  library: ocamlc
++@@ -63,7 +63,7 @@
 +  
-+  AS_CASE([$cc_basename,$host],
-+    [*,x86_64-*-darwin*],
-+@@ -219,7 +219,7 @@
-+      AC_DEFINE([HAS_ARCH_CODE32], [1])],
-+    [*,aarch64-*-darwin*|arm64-*-darwin*],
-+      AC_DEFINE([HAS_ARCH_CODE32], [1]),
-+-@@ -789,32 +794,36 @@ AS_CASE([$cc_basename,$host],
-++@@ -799,32 +804,36 @@ AS_CASE([$cc_basename,$host],
-+    [*,*-*-cygwin*],
-+      [common_cppflags="$common_cppflags -U_WIN32"
-+      AS_IF([$supports_shared_libraries],
-+@@ -265,7 +265,7 @@
-+      AC_DEFINE([HAS_ARCH_CODE32], [1])],
-+    [gcc*,powerpc-*-linux*],
-+      [oc_ldflags="-mbss-plt"],
-+-@@ -924,34 +933,32 @@ natdynlinkopts=""
-++@@ -934,34 +943,32 @@ natdynlinkopts=""
-+  AS_IF([test x"$enable_shared" != "xno"],
-+    [AS_CASE([$host],
-+      [x86_64-apple-darwin*],
-+@@ -311,7 +311,7 @@
-+        rpath="-Wl,-rpath,"
-+        mksharedlibrpath="-Wl,-rpath,"
-+        supports_shared_libraries=true],
-+-@@ -960,12 +967,12 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -970,12 +977,12 @@ AS_IF([test x"$enable_shared" != "xno"],
-+        [sharedlib_cflags="-fPIC"
-+         AS_CASE([$cc_basename,$host],
-+             [*gcc*,powerpc-*-linux*],
-+@@ -327,7 +327,7 @@
-+        oc_ldflags="$oc_ldflags -Wl,-E"
-+        rpath="-Wl,-rpath,"
-+        mksharedlibrpath="-Wl,-rpath,"
-+-@@ -2055,4 +2062,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
-++@@ -2092,4 +2099,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
-+  # Do not permanently cache the result of flexdll.h
-+  unset ac_cv_header_flexdll_h
++  partialclean::
++  	$(MAKE) -C stdlib clean
++-@@ -1101,8 +1094,7 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+++@@ -1098,8 +1091,7 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
++  ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
 +  
++  .PHONY: ocamlyacc
++@@ -73,7 +73,7 @@
++  
++  $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++  	$(MKEXE) -o $@ $^
++-@@ -1245,7 +1237,7 @@ checkstack: tools/checkstack$(EXE)
+++@@ -1243,7 +1235,7 @@ checkstack: tools/checkstack$(EXE)
++  
++  .INTERMEDIATE: tools/checkstack$(EXE) tools/checkstack.$(O)
++  tools/checkstack$(EXE): tools/checkstack.$(O)
 diff --git a/Changes b/Changes
 index eeb6c71108..f47aa4008e 100644
 --- a/Changes
@@ -137,10 +92,10 @@ index eeb6c71108..f47aa4008e 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 052d4ea54b..2d43453122 100644
+index d472231727..2c1bc87d6f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -582,7 +582,6 @@ partialclean::
+@@ -578,7 +578,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -148,7 +103,7 @@ index 052d4ea54b..2d43453122 100644
    afl \
    alloc \
    array \
-@@ -590,6 +589,7 @@ runtime_COMMON_C_SOURCES = \
+@@ -586,6 +585,7 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -156,7 +111,7 @@ index 052d4ea54b..2d43453122 100644
    compare \
    custom \
    debugger \
-@@ -597,18 +597,16 @@ runtime_COMMON_C_SOURCES = \
+@@ -593,18 +593,16 @@ runtime_COMMON_C_SOURCES = \
    dynlink \
    eventlog \
    extern \
@@ -176,7 +131,7 @@ index 052d4ea54b..2d43453122 100644
    main \
    major_gc \
    md5 \
-@@ -619,16 +617,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -615,16 +613,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -193,7 +148,7 @@ index 052d4ea54b..2d43453122 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -638,6 +632,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -634,6 +628,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -203,7 +158,7 @@ index 052d4ea54b..2d43453122 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -648,7 +645,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -644,7 +641,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -212,7 +167,7 @@ index 052d4ea54b..2d43453122 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1108,6 +1105,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1100,6 +1097,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
@@ -6566,108 +6521,63 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9d65da8e78
+index 0000000000..78c2cbbf05
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6516 @@
+@@ -0,0 +1,6408 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..dc9b99e270
++index 0000000000..7dbf1b02ff
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,92 @@
-++--- a	2023-09-28 18:44:32.489764254 +0100
-+++++ b	2023-09-28 18:44:32.501764736 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -804,7 +804,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
-+++@@ -801,7 +801,7 @@ runtime/caml/jumptbl.h : runtime/caml/instruct.h
-++  # to supply a host C compiler and different flags and a linking macro.
-++  SAK_CC ?= $(CC)
-++  SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
-++@@ -10,7 +10,7 @@
++@@ -0,0 +1,47 @@
+++--- a	2023-09-28 18:44:32.757775030 +0100
++++++ b	2023-09-28 18:44:32.765775351 +0100
+++@@ -23,7 +23,7 @@
+++  endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+++  	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+++  	cd boot; rm -f $(LIBFILES)
+++-@@ -1021,8 +1017,7 @@ stdlib/flexdll:
++++@@ -1018,8 +1014,7 @@ stdlib/flexdll:
+++  endif
 ++  
-++  $(SAK): runtime/sak.$(O)
-++  	$(call SAK_LINK,$@,$^)
-++-@@ -825,7 +825,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
-+++@@ -822,7 +822,7 @@ runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
-++  	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+++  .PHONY: makeruntime
+++@@ -33,7 +33,7 @@
+++  stdlib/libcamlrun.$(A): runtime-all
+++  	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+++  clean::
+++-@@ -1040,8 +1035,7 @@ clean::
++++@@ -1037,8 +1032,7 @@ clean::
+++  runtimeopt: stdlib/libasmrun.$(A)
 ++  
-++  runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
-++@@ -92,7 +92,7 @@
-++  INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
-++ @@ -248,23 +252,6 @@ AWK=@AWK@
-++  STDLIB_MANPAGES=@stdlib_manpages@
-++- NAKED_POINTERS=false
-+++ NAKED_POINTERS=@naked_pointers@
+++  .PHONY: makeruntimeopt
+++@@ -43,7 +43,7 @@
+++  stdlib/libasmrun.$(A): runtime-allopt
+++  	cd stdlib; $(LN) ../runtime/libasmrun.$(A) .
 ++  
-++ -### Native command to build ocamlrun.exe
-++ -
-++@@ -170,7 +170,7 @@
-++  AC_SUBST([PACKLD])
-++  AC_SUBST([stdlib_manpages])
-++  AC_SUBST([compute_deps])
-++-@@ -479,6 +482,7 @@ AS_CASE([$host],
-+++@@ -489,6 +492,7 @@ AS_CASE([$host],
-++    # So we let them do, at the moment
-++    [*-pc-windows],
-++      [
-++@@ -178,7 +178,7 @@
-++        libext=lib
-++        AR=""
-++        AS_IF([test "$host_cpu" = "x86_64" ],
-++-@@ -687,24 +691,25 @@ AS_IF([test x"$enable_shared" = "xno"],
-+++@@ -697,24 +701,25 @@ AS_IF([test x"$enable_shared" = "xno"],
-++  AS_CASE([$host],
-++    [i686-*-cygwin],
-++      [flexdll_chain='cygwin'
-++@@ -210,7 +210,7 @@
+++-@@ -1063,16 +1057,15 @@ alldepend: depend
++++@@ -1060,16 +1054,15 @@ alldepend: depend
 ++  
-++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++    AC_MSG_CHECKING([for flexdll sources])
-++-@@ -781,7 +786,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-+++@@ -791,7 +796,7 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+++  .PHONY: library
+++  library: ocamlc
+++@@ -63,7 +63,7 @@
 ++  
-++  AS_CASE([$cc_basename,$host],
-++    [*,x86_64-*-darwin*],
-++@@ -219,7 +219,7 @@
-++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
-++    [*,aarch64-*-darwin*|arm64-*-darwin*],
-++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
-++-@@ -789,32 +794,36 @@ AS_CASE([$cc_basename,$host],
-+++@@ -799,32 +804,36 @@ AS_CASE([$cc_basename,$host],
-++    [*,*-*-cygwin*],
-++      [common_cppflags="$common_cppflags -U_WIN32"
-++      AS_IF([$supports_shared_libraries],
-++@@ -265,7 +265,7 @@
-++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
-++    [gcc*,powerpc-*-linux*],
-++      [oc_ldflags="-mbss-plt"],
-++-@@ -924,34 +933,32 @@ natdynlinkopts=""
-+++@@ -934,34 +943,32 @@ natdynlinkopts=""
-++  AS_IF([test x"$enable_shared" != "xno"],
-++    [AS_CASE([$host],
-++      [x86_64-apple-darwin*],
-++@@ -311,7 +311,7 @@
-++        rpath="-Wl,-rpath,"
-++        mksharedlibrpath="-Wl,-rpath,"
-++        supports_shared_libraries=true],
-++-@@ -960,12 +967,12 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -970,12 +977,12 @@ AS_IF([test x"$enable_shared" != "xno"],
-++        [sharedlib_cflags="-fPIC"
-++         AS_CASE([$cc_basename,$host],
-++             [*gcc*,powerpc-*-linux*],
-++@@ -327,7 +327,7 @@
-++        oc_ldflags="$oc_ldflags -Wl,-E"
-++        rpath="-Wl,-rpath,"
-++        mksharedlibrpath="-Wl,-rpath,"
-++-@@ -2055,4 +2062,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
-+++@@ -2092,4 +2099,54 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
-++  # Do not permanently cache the result of flexdll.h
-++  unset ac_cv_header_flexdll_h
+++  partialclean::
+++  	$(MAKE) -C stdlib clean
+++-@@ -1101,8 +1094,7 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
++++@@ -1098,8 +1091,7 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+++  ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
 ++  
+++  .PHONY: ocamlyacc
+++@@ -73,7 +73,7 @@
+++  
+++  $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+++  	$(MKEXE) -o $@ $^
+++-@@ -1245,7 +1237,7 @@ checkstack: tools/checkstack$(EXE)
++++@@ -1243,7 +1235,7 @@ checkstack: tools/checkstack$(EXE)
+++  
+++  .INTERMEDIATE: tools/checkstack$(EXE) tools/checkstack.$(O)
+++  tools/checkstack$(EXE): tools/checkstack.$(O)
 +diff --git a/Changes b/Changes
 +index eeb6c71108..f47aa4008e 100644
 +--- a/Changes
@@ -6709,10 +6619,10 @@ index 0000000000..9d65da8e78
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 052d4ea54b..2d43453122 100644
++index d472231727..2c1bc87d6f 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -582,7 +582,6 @@ partialclean::
++@@ -578,7 +578,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -6720,7 +6630,7 @@ index 0000000000..9d65da8e78
 +   afl \
 +   alloc \
 +   array \
-+@@ -590,6 +589,7 @@ runtime_COMMON_C_SOURCES = \
++@@ -586,6 +585,7 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -6728,7 +6638,7 @@ index 0000000000..9d65da8e78
 +   compare \
 +   custom \
 +   debugger \
-+@@ -597,18 +597,16 @@ runtime_COMMON_C_SOURCES = \
++@@ -593,18 +593,16 @@ runtime_COMMON_C_SOURCES = \
 +   dynlink \
 +   eventlog \
 +   extern \
@@ -6748,7 +6658,7 @@ index 0000000000..9d65da8e78
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -619,16 +617,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -615,16 +613,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -6765,7 +6675,7 @@ index 0000000000..9d65da8e78
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -638,6 +632,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -634,6 +628,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -6775,7 +6685,7 @@ index 0000000000..9d65da8e78
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -648,7 +645,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -644,7 +641,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -6784,7 +6694,7 @@ index 0000000000..9d65da8e78
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1108,6 +1105,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1100,6 +1097,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -13022,70 +12932,7 @@ index 0000000000..9d65da8e78
 ++ readonly_files = "printer.ml"
 ++ include debugger
 ++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --g
+++-reason = "ocam
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

@@ -1,8 +1,8 @@
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index 6dcc5b73e5..0217685fcd 100644
+index 1f8abec508..40579e0f6f 100644
 --- a/ocamltest/Makefile
 +++ b/ocamltest/Makefile
-@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
  	    $(call SUBST,DIFF_FLAGS) \
  	    $(call SUBST,WINDOWS_UNICODE) \
  	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -36,7 +36,7 @@ index d2cacd6865..16b11083e4 100644
      copy;
    ]
 diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-index 399d3c3cef..876d4ac79c 100644
+index 8dc96c88d3..cc7a2ef255 100644
 --- a/ocamltest/ocamltest_config.ml.in
 +++ b/ocamltest/ocamltest_config.ml.in
 @@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
