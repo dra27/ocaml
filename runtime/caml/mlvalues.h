@@ -204,6 +204,8 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
 #define Op_val(x) ((value *) (x))
 /* Fields are numbered from 0. */
 #define Field(x, i) (((volatile value *)(x)) [i]) /* Also an l-value. */
+#define Load_field(x, i) \
+  (atomic_load_explicit(Op_atomic_val(x) + i, memory_order_acquire))
 
 typedef int32_t opcode_t;
 typedef opcode_t * code_t;
