@@ -21,7 +21,7 @@
 #include "misc.h"
 #include "memory.h"
 
-typedef void (*scanning_action) (value, value *);
+typedef void (*scanning_action) (value, volatile value *);
 
 void caml_oldify_local_roots (void);
 void caml_darken_all_roots_start (void);

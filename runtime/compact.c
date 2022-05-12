@@ -94,7 +94,7 @@ static void invert_pointer_at (word *p)
   }
 }
 
-void caml_invert_root (value v, value *p)
+void caml_invert_root (value v, volatile value *p)
 {
 #ifdef NO_NAKED_POINTERS
   /* Note: this assertion will become tautological and should be removed when
@@ -217,7 +217,7 @@ static void do_compaction (intnat new_allocation_policy)
           }
         }
         invert_pointer_at ((word *) pp);
-        pp = &Field (p, 0);
+        pp = (value*)&Field (p, 0);
       }
     }
   }

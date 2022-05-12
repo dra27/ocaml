@@ -307,6 +307,7 @@ void caml_free_for_heap (char *mem)
    The caller must update [caml_allocated_words] if applicable.
    Return value: 0 if no error; -1 in case of error.
 
+<<<<<<< HEAD
    See also: caml_compact_heap, which duplicates most of this function.
 */
 int caml_add_to_heap (char *m)
@@ -594,7 +595,7 @@ CAMLexport void caml_adjust_gc_speed (mlsize_t res, mlsize_t max)
 /* [caml_initialize] never calls the GC, so you may call it while a block is
    unfinished (i.e. just after a call to [caml_alloc_shr].) */
 /* PR#6084 workaround: define it as a weak symbol */
-CAMLexport CAMLweakdef void caml_initialize (value *fp, value val)
+CAMLexport CAMLweakdef void caml_initialize (volatile value *fp, value val)
 {
   CAMLassert(Is_in_heap_or_young(fp));
   *fp = val;
@@ -614,7 +615,7 @@ CAMLexport CAMLweakdef void caml_initialize (value *fp, value val)
    block being changed is in the minor heap or the major heap. */
 /* PR#6084 workaround: define it as a weak symbol */
 
-CAMLexport CAMLweakdef void caml_modify (value *fp, value val)
+CAMLexport CAMLweakdef void caml_modify (volatile value *fp, value val)
 {
   /* The write barrier implemented by [caml_modify] checks for the
      following two conditions and takes appropriate action:

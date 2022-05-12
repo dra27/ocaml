@@ -203,7 +203,7 @@ bits  63        (64-P) (63-P)        10 9     8 7   0
 /* Pointer to the first field. */
 #define Op_val(x) ((value *) (x))
 /* Fields are numbered from 0. */
-#define Field(x, i) (((value *)(x)) [i])           /* Also an l-value. */
+#define Field(x, i) (((volatile value *)(x)) [i]) /* Also an l-value. */
 
 typedef int32_t opcode_t;
 typedef opcode_t * code_t;

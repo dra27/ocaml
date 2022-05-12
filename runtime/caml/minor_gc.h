@@ -70,7 +70,7 @@ extern void caml_set_minor_heap_size (asize_t); /* size in bytes */
 extern void caml_empty_minor_heap (void);
 extern void caml_gc_dispatch (void);
 extern void caml_garbage_collection (void); /* runtime/signals_nat.c */
-extern void caml_oldify_one (value, value *);
+extern void caml_oldify_one (value, volatile value *);
 extern void caml_oldify_mopup (void);
 
 extern void caml_realloc_ref_table (struct caml_ref_table *);
@@ -96,13 +96,14 @@ void caml_alloc_minor_tables (void);
     } \
   }while(0)
 
-Caml_inline void add_to_ref_table (struct caml_ref_table *tbl, value *p)
+Caml_inline void add_to_ref_table (struct caml_ref_table *tbl,
+                                   volatile value *p)
 {
   if (tbl->ptr >= tbl->limit){
     CAMLassert (tbl->ptr == tbl->limit);
     caml_realloc_ref_table (tbl);
   }
-  *tbl->ptr++ = p;
+  *tbl->ptr++ = (value*)p;
 }
 
 Caml_inline void add_to_ephe_ref_table (struct caml_ephe_ref_table *tbl,

@@ -112,8 +112,8 @@ int caml_gc_subphase;     /* Subphase_{mark_roots,mark_main,mark_final} */
 int caml_ephe_list_pure;
 /** The ephemerons is pure if since the start of its iteration
     no value have been darkened. */
-static value *ephes_checked_if_pure;
-static value *ephes_to_check;
+static volatile value *ephes_checked_if_pure;
+static volatile value *ephes_to_check;
 
 int caml_major_window = 1;
 double caml_major_ring[Max_major_window] = { 0. };
@@ -275,7 +275,7 @@ Caml_inline void mark_stack_push(struct mark_stack* stk, value block,
 static void is_naked_pointer_safe (value v, value *p);
 #endif
 
-void caml_darken (value v, value *p)
+void caml_darken (value v, volatile value *p)
 {
 #ifdef NO_NAKED_POINTERS
   if (Is_block(v) && !Is_young (v)) {
@@ -608,7 +608,7 @@ Caml_inline void prefetch_block(value v)
      depending on alignment, word size, and cache line size), which is
      cheap enough to make this worthwhile. */
   caml_prefetch(Hp_val(v));
-  caml_prefetch(&Field(v, 3));
+  caml_prefetch((value*)&Field(v, 3));
 }
 
 Caml_inline uintnat rotate1(uintnat x)

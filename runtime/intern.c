@@ -312,7 +312,7 @@ static struct intern_item * intern_resize_stack(struct intern_item * sp)
     if (_n > 0) {                                                       \
       PushItem();                                                       \
       sp->op = OReadItems;                                              \
-      sp->dest = _dest;                                                 \
+      sp->dest = (value*)_dest;                                         \
       sp->arg = _n;                                                     \
     }                                                                   \
   } while(0)

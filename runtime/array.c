@@ -327,7 +327,7 @@ CAMLprim value caml_floatarray_blit(value a1, value ofs1, value a2, value ofs2,
 CAMLprim value caml_array_blit(value a1, value ofs1, value a2, value ofs2,
                                value n)
 {
-  value * src, * dst;
+  volatile value * src, * dst;
   intnat count;
 
 #ifdef FLAT_FLOAT_ARRAY
@@ -340,8 +340,8 @@ CAMLprim value caml_array_blit(value a1, value ofs1, value a2, value ofs2,
        Here too we can do a direct copy since this cannot create
        old-to-young pointers, nor mess up with the incremental major GC.
        Again, memmove takes care of overlap. */
-    memmove(&Field(a2, Long_val(ofs2)),
-            &Field(a1, Long_val(ofs1)),
+    memmove((value*)&Field(a2, Long_val(ofs2)),
+            (value*)&Field(a1, Long_val(ofs1)),
             Long_val(n) * sizeof(value));
     return Val_unit;
   }
@@ -384,7 +384,7 @@ static value caml_array_gather(intnat num_arrays,
   mlsize_t wsize;
 #endif
   mlsize_t i, size, count, pos;
-  value * src;
+  volatile value * src;
 
   /* Determine total size and whether result array is an array of floats */
   size = 0;
@@ -419,8 +419,8 @@ static value caml_array_gather(intnat num_arrays,
        We can use memcpy directly. */
     res = caml_alloc_small(size, 0);
     for (i = 0, pos = 0; i < num_arrays; i++) {
-      memcpy(&Field(res, pos),
-             &Field(arrays[i], offsets[i]),
+      memcpy((value*)&Field(res, pos),
+             (value*)&Field(arrays[i], offsets[i]),
              lengths[i] * sizeof(value));
       pos += lengths[i];
     }
@@ -520,7 +520,7 @@ CAMLprim value caml_array_fill(value array,
 {
   intnat ofs = Long_val(v_ofs);
   intnat len = Long_val(v_len);
-  value* fp;
+  volatile value* fp;
 
   /* This duplicates the logic of caml_modify.  Please refer to the
      implementation of that function for a description of GC
@@ -549,7 +549,7 @@ CAMLprim value caml_array_fill(value array,
         if (caml_gc_phase == Phase_mark) caml_darken(old, NULL);
       }
       if (is_val_young_block)
-        add_to_ref_table (Caml_state->ref_table, fp);
+        add_to_ref_table (Caml_state->ref_table, (value*)fp);
     }
     if (is_val_young_block) caml_check_urgent_gc (Val_unit);
   }

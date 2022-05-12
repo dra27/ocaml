@@ -1289,7 +1289,7 @@ static void bf_insert_remnant_small (value v)
     Next_small (v) = bf_small_fl[wosz].free;
     bf_small_fl[wosz].free = v;
     if (bf_small_fl[wosz].merge == &bf_small_fl[wosz].free){
-      bf_small_fl[wosz].merge = &Next_small (v);
+      bf_small_fl[wosz].merge = (value*)&Next_small (v);
     }
     set_map (wosz);
   }
@@ -1331,11 +1331,11 @@ static void bf_insert_sweep (value v)
         break;
       }
       if (Bp_val (next) >= Bp_val (v)) break;
-      bf_small_fl[wosz].merge = &Next_small (next);
+      bf_small_fl[wosz].merge = (value*)&Next_small (next);
     }
     Next_small (v) = *bf_small_fl[wosz].merge;
     *bf_small_fl[wosz].merge = v;
-    bf_small_fl[wosz].merge = &Next_small (v);
+    bf_small_fl[wosz].merge = (value*)&Next_small (v);
   }else{
     bf_insert_block ((large_free_block *) v);
   }
@@ -1350,7 +1350,7 @@ static void bf_remove (value v)
   if (wosz <= BF_NUM_SMALL){
     while (*bf_small_fl[wosz].merge != v){
       CAMLassert (Bp_val (*bf_small_fl[wosz].merge) < Bp_val (v));
-      bf_small_fl[wosz].merge = &Next_small (*bf_small_fl[wosz].merge);
+      bf_small_fl[wosz].merge = (value*)&Next_small (*bf_small_fl[wosz].merge);
     }
     *bf_small_fl[wosz].merge = Next_small (v);
     if (bf_small_fl[wosz].free == Val_NULL) unset_map (wosz);

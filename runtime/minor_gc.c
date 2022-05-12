@@ -186,7 +186,7 @@ static value oldify_todo_list = 0;
 /* Note that the tests on the tag depend on the fact that Infix_tag,
    Forward_tag, and No_scan_tag are contiguous. */
 
-void caml_oldify_one (value v, value *p)
+void caml_oldify_one (value v, volatile value *p)
 {
   value result;
   header_t hd;
@@ -329,7 +329,7 @@ void caml_oldify_mopup (void)
        re < Caml_state->ephe_ref_table->ptr; re++){
     /* look only at ephemeron with data in the minor heap */
     if (re->offset == 1){
-      value *data = &Field(re->ephe,1), v = *data;
+      value *data = (value*)&Field(re->ephe,1), v = *data;
       if (v != caml_ephe_none && Is_block (v) && Is_young (v)){
         mlsize_t offs = Tag_val(v) == Infix_tag ? Infix_offset_val(v) : 0;
         v -= offs;
@@ -381,7 +381,7 @@ void caml_empty_minor_heap (void)
          re < Caml_state->ephe_ref_table->ptr; re++){
       if(re->offset < Wosize_val(re->ephe)){
         /* If it is not the case, the ephemeron has been truncated */
-        value *key = &Field(re->ephe,re->offset), v = *key;
+        volatile value *key = &Field(re->ephe,re->offset), v = *key;
         if (v != caml_ephe_none && Is_block (v) && Is_young (v)){
           mlsize_t offs = Tag_val (v) == Infix_tag ? Infix_offset_val (v) : 0;
           v -= offs;
