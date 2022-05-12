@@ -1,47 +1,11 @@
---- a	2023-09-28 18:44:32.757775030 +0100
-+++ b	2023-09-28 18:44:32.765775351 +0100
-@@ -23,7 +23,7 @@
-  endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-  	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-  	cd boot; rm -f $(LIBFILES)
--@@ -1021,8 +1017,7 @@ stdlib/flexdll:
-+@@ -1018,8 +1014,7 @@ stdlib/flexdll:
-  endif
+--- a	2023-09-28 18:44:33.029785966 +0100
++++ b	2023-09-28 18:44:33.037786287 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -934,8 +934,8 @@ $(foreach runtime_OBJECT_TYPE, $(runtime_OBJECT_TYPES), \
++@@ -931,8 +931,8 @@ $(foreach runtime_OBJECT_TYPE, $(runtime_OBJECT_TYPES), \
+  runtime/$(UNIX_OR_WIN32)_non_shared.%.$(O): \
+    OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
   
-  .PHONY: makeruntime
-@@ -33,7 +33,7 @@
-  stdlib/libcamlrun.$(A): runtime-all
-  	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
-  clean::
--@@ -1040,8 +1035,7 @@ clean::
-+@@ -1037,8 +1032,7 @@ clean::
-  runtimeopt: stdlib/libasmrun.$(A)
-  
-  .PHONY: makeruntimeopt
-@@ -43,7 +43,7 @@
-  stdlib/libasmrun.$(A): runtime-allopt
-  	cd stdlib; $(LN) ../runtime/libasmrun.$(A) .
-  
--@@ -1063,16 +1057,15 @@ alldepend: depend
-+@@ -1060,16 +1054,15 @@ alldepend: depend
-  
-  .PHONY: library
-  library: ocamlc
-@@ -63,7 +63,7 @@
-  
-  partialclean::
-  	$(MAKE) -C stdlib clean
--@@ -1101,8 +1094,7 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
-+@@ -1098,8 +1091,7 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
-  ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
-  
-  .PHONY: ocamlyacc
-@@ -73,7 +73,7 @@
-  
-  $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
-  	$(MKEXE) -o $@ $^
--@@ -1245,7 +1237,7 @@ checkstack: tools/checkstack$(EXE)
-+@@ -1243,7 +1235,7 @@ checkstack: tools/checkstack$(EXE)
-  
-  .INTERMEDIATE: tools/checkstack$(EXE) tools/checkstack.$(O)
-  tools/checkstack$(EXE): tools/checkstack.$(O)

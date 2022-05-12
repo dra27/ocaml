@@ -1,8 +1,8 @@
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index 1f8abec508..40579e0f6f 100644
+index 081e146338..23504fb0e8 100644
 --- a/ocamltest/Makefile
 +++ b/ocamltest/Makefile
-@@ -275,6 +275,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+@@ -270,6 +270,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
  	    $(call SUBST,DIFF_FLAGS) \
  	    $(call SUBST,WINDOWS_UNICODE) \
  	    $(call SUBST,FUNCTION_SECTIONS) \
