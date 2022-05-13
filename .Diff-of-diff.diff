@@ -1,0 +1,29 @@
+--- a	2023-09-28 18:44:34.141830647 +0100
++++ b	2023-09-28 18:44:34.145830807 +0100
+@@ -3,7 +3,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -811,7 +811,7 @@ AS_CASE([$cc_basename,$host],
++@@ -821,7 +821,7 @@ AS_CASE([$cc_basename,$host],
+      [common_cppflags="$common_cppflags -U_WIN32"
+      AS_IF([$supports_shared_libraries],
+        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+@@ -12,7 +12,7 @@
+          [mkexe_cmd="$boot_flexlink_cmd -exe -chain ${flexdll_chain}"],
+          [mkexe_cmd="$mkexe_cmd_exp"])
+        mkexe_cflags=''
+-@@ -826,7 +826,7 @@ AS_CASE([$cc_basename,$host],
++@@ -836,7 +836,7 @@ AS_CASE([$cc_basename,$host],
+      ostype="Win32"
+      toolchain="mingw"
+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+@@ -21,7 +21,7 @@
+        [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
+        [mkexe_cmd="$mkexe_cmd_exp"])
+      mkexe_cflags=''
+-@@ -837,7 +837,7 @@ AS_CASE([$cc_basename,$host],
++@@ -847,7 +847,7 @@ AS_CASE([$cc_basename,$host],
+      [toolchain=msvc
+      ostype="Win32"
+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"

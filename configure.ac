@@ -821,7 +821,7 @@ AS_CASE([$cc_basename,$host],
     [common_cppflags="$common_cppflags -U_WIN32"
     AS_IF([$supports_shared_libraries],
       [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-      AS_IF([$bootstrapping_flexlink],
+      AS_IF([$bootstrapping_flexdll],
         [mkexe_cmd="$boot_flexlink_cmd -exe -chain ${flexdll_chain}"],
         [mkexe_cmd="$mkexe_cmd_exp"])
       mkexe_cflags=''
@@ -836,7 +836,7 @@ AS_CASE([$cc_basename,$host],
     ostype="Win32"
     toolchain="mingw"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-    AS_IF([$bootstrapping_flexlink],
+    AS_IF([$bootstrapping_flexdll],
       [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
       [mkexe_cmd="$mkexe_cmd_exp"])
     mkexe_cflags=''
@@ -847,7 +847,7 @@ AS_CASE([$cc_basename,$host],
     [toolchain=msvc
     ostype="Win32"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-    AS_IF([$bootstrapping_flexlink],
+    AS_IF([$bootstrapping_flexdll],
       [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
       [mkexe_cmd="$mkexe_cmd_exp"])
     mkexe_cflags=''
