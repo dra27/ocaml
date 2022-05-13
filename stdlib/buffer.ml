@@ -21,12 +21,15 @@ type t =
   mutable length : int;
   initial_buffer : bytes}
 (* Invariants: all parts of the code preserve the invariants that:
-   - [0 <= b.position <= b.length]
-   - [b.length = Bytes.length b.buffer]
+   - [0 <= b.position]
+   - [b.length <= Bytes.length b.buffer]
 
    Note in particular that [b.position = b.length] is legal,
    it means that the buffer is full and will have to be extended
-   before any further addition. *)
+   before any further addition. [b.position > b.length] is also legal,
+   but is indicative of invalid parallel access to the buffer. Functions
+   which return the content of the buffer need to take this case into
+   account. *)
 
 let create n =
  let n = if n < 1 then 1 else n in
@@ -34,37 +37,47 @@ let create n =
  let s = Bytes.create n in
  {buffer = s; position = 0; length = n; initial_buffer = s}
 
-let contents b = Bytes.sub_string b.buffer 0 b.position
-let to_bytes b = Bytes.sub b.buffer 0 b.position
+let contents b =
+  let buffer = b.buffer in
+  Bytes.sub_string buffer 0 (min b.position (Bytes.length buffer))
+let to_bytes b =
+  let buffer = b.buffer in
+  Bytes.sub buffer 0 (min b.position (Bytes.length buffer))
 
 let sub b ofs len =
-  if ofs < 0 || len < 0 || ofs > b.position - len
+  let buffer = b.buffer in
+  if ofs < 0 || len < 0 || ofs > (min b.position (Bytes.length buffer)) - len
   then invalid_arg "Buffer.sub"
   else Bytes.sub_string b.buffer ofs len
 
 
-let blit src srcoff dst dstoff len =
-  if len < 0 || srcoff < 0 || srcoff > src.position - len
+let blit b srcoff dst dstoff len =
+  let src = b.buffer in
+  let pos = min b.position (Bytes.length src) in
+  if len < 0 || srcoff < 0 || srcoff > pos - len
              || dstoff < 0 || dstoff > (Bytes.length dst) - len
   then invalid_arg "Buffer.blit"
   else
-    Bytes.unsafe_blit src.buffer srcoff dst dstoff len
+    Bytes.unsafe_blit src srcoff dst dstoff len
 
 
 let nth b ofs =
-  if ofs < 0 || ofs >= b.position then
+  let buffer = b.buffer in
+  if ofs < 0 || ofs >= (min b.position (Bytes.length buffer)) then
    invalid_arg "Buffer.nth"
-  else Bytes.unsafe_get b.buffer ofs
+  else Bytes.unsafe_get buffer ofs
 
 
-let length b = b.position
+let length b = (min b.position (Bytes.length b.buffer))
 
 let clear b = b.position <- 0
 
 let reset b =
   b.position <- 0;
-  b.buffer <- b.initial_buffer;
-  b.length <- Bytes.length b.buffer
+  (* Reset b.length before b.buffer to enforce
+     [b.length <= Bytes.length buffer] *)
+  b.length <- Bytes.length b.initial_buffer;
+  b.buffer <- b.initial_buffer
 
 (* [resize b more] ensures that [b.position + more <= b.length] holds
    by dynamically extending [b.buffer] if necessary -- and thus
@@ -88,6 +101,8 @@ let resize b more =
   (* PR#6148: let's keep using [blit] rather than [unsafe_blit] in
      this tricky function that is slow anyway. *)
   Bytes.blit b.buffer 0 new_buffer 0 b.position;
+  (* Set b.buffer first (cf. reset) in order to enforce
+     [b.length <= Bytes.length b.buffer] *)
   b.buffer <- new_buffer;
   b.length <- !new_len;
   assert (b.position + more <= b.length);
@@ -172,12 +187,20 @@ let add_substring b s offset len =
 let add_subbytes b s offset len =
   add_substring b (Bytes.unsafe_to_string s) offset len
 
-let add_string b s =
-  let len = String.length s in
-  let new_position = b.position + len in
-  if new_position > b.length then resize b len;
-  Bytes.unsafe_blit_string s 0 b.buffer b.position len;
-  b.position <- new_position
+let rec add_string b s =
+  let s_len = String.length s in
+  let buffer = b.buffer in
+  let length = b.length in
+  let position = b.position in
+  if position <= length then
+    let new_position = position + s_len in
+    if new_position > length then begin
+      resize b s_len;
+      add_string b s
+    end else begin
+      Bytes.unsafe_blit_string s 0 buffer position s_len;
+      b.position <- new_position
+    end
 
 let add_bytes b s = add_string b (Bytes.unsafe_to_string s)
 
