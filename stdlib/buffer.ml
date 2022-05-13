@@ -88,8 +88,9 @@ let reset b =
    (unsafe_{get,set}) may be used for performance.
 *)
 let resize b more =
-  let old_pos = b.position in
+  let buffer = b.buffer in
   let old_len = b.length in
+  let old_pos = b.position in
   let new_len = ref old_len in
   while old_pos + more > !new_len do new_len := 2 * !new_len done;
   if !new_len > Sys.max_string_length then begin
@@ -100,13 +101,13 @@ let resize b more =
   let new_buffer = Bytes.create !new_len in
   (* PR#6148: let's keep using [blit] rather than [unsafe_blit] in
      this tricky function that is slow anyway. *)
-  Bytes.blit b.buffer 0 new_buffer 0 b.position;
+  Bytes.blit buffer 0 new_buffer 0 old_pos;
   (* Set b.buffer first (cf. reset) in order to enforce
      [b.length <= Bytes.length b.buffer] *)
   b.buffer <- new_buffer;
   b.length <- !new_len;
-  assert (b.position + more <= b.length);
-  assert (old_pos + more <= b.length);
+  (*assert (b.position + more <= b.length);
+  assert (old_pos + more <= b.length);*)
   ()
   (* Note: there are various situations (preemptive threads, signals and
      gc finalizers) where OCaml code may be run asynchronously; in
