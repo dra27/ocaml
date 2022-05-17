@@ -1,43 +1,11 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0945059c48
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:44:34.141830647 +0100
-++++ b	2023-09-28 18:44:34.145830807 +0100
-+@@ -3,7 +3,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -811,7 +811,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -821,7 +821,7 @@ AS_CASE([$cc_basename,$host],
-+      [common_cppflags="$common_cppflags -U_WIN32"
-+      AS_IF([$supports_shared_libraries],
-+        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-+@@ -12,7 +12,7 @@
-+          [mkexe_cmd="$boot_flexlink_cmd -exe -chain ${flexdll_chain}"],
-+          [mkexe_cmd="$mkexe_cmd_exp"])
-+        mkexe_cflags=''
-+-@@ -826,7 +826,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -836,7 +836,7 @@ AS_CASE([$cc_basename,$host],
-+      ostype="Win32"
-+      toolchain="mingw"
-+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-+@@ -21,7 +21,7 @@
-+        [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
-+        [mkexe_cmd="$mkexe_cmd_exp"])
-+      mkexe_cflags=''
-+-@@ -837,7 +837,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -847,7 +847,7 @@ AS_CASE([$cc_basename,$host],
-+      [toolchain=msvc
-+      ostype="Win32"
-+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
-index 9ca92e7317..be6e118506 100644
+index 41b137d1fd..69e660cd4d 100644
 --- a/Changes
 +++ b/Changes
-@@ -338,13 +338,13 @@ OCaml 4.14.0
+@@ -342,13 +342,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -53,7 +21,7 @@ index 9ca92e7317..be6e118506 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -444,6 +444,9 @@ OCaml 4.14.0
+@@ -448,6 +448,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -63,7 +31,7 @@ index 9ca92e7317..be6e118506 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -699,6 +702,9 @@ OCaml 4.14.0
+@@ -703,6 +706,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6503,50 +6471,18 @@ index 0000000000..86357ac645
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b3c9c7114f
+index 0000000000..aef329e002
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,6403 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0945059c48
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:44:34.141830647 +0100
-+++++ b	2023-09-28 18:44:34.145830807 +0100
-++@@ -3,7 +3,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -811,7 +811,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -821,7 +821,7 @@ AS_CASE([$cc_basename,$host],
-++      [common_cppflags="$common_cppflags -U_WIN32"
-++      AS_IF([$supports_shared_libraries],
-++        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-++@@ -12,7 +12,7 @@
-++          [mkexe_cmd="$boot_flexlink_cmd -exe -chain ${flexdll_chain}"],
-++          [mkexe_cmd="$mkexe_cmd_exp"])
-++        mkexe_cflags=''
-++-@@ -826,7 +826,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -836,7 +836,7 @@ AS_CASE([$cc_basename,$host],
-++      ostype="Win32"
-++      toolchain="mingw"
-++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
-++@@ -21,7 +21,7 @@
-++        [mkexe_cmd="${boot_flexlink_cmd} -exe -chain ${flexdll_chain}"],
-++        [mkexe_cmd="$mkexe_cmd_exp"])
-++      mkexe_cflags=''
-++-@@ -837,7 +837,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -847,7 +847,7 @@ AS_CASE([$cc_basename,$host],
-++      [toolchain=msvc
-++      ostype="Win32"
-++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain}"
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
-+index 9ca92e7317..be6e118506 100644
++index 41b137d1fd..69e660cd4d 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -338,13 +338,13 @@ OCaml 4.14.0
++@@ -342,13 +342,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6562,7 +6498,7 @@ index 0000000000..b3c9c7114f
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -444,6 +444,9 @@ OCaml 4.14.0
++@@ -448,6 +448,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6572,7 +6508,7 @@ index 0000000000..b3c9c7114f
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -699,6 +702,9 @@ OCaml 4.14.0
++@@ -703,6 +706,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -12909,7 +12845,39 @@ index 0000000000..b3c9c7114f
 ++-***** ocamlc.byte
 ++-****** check-ocamlc.byte-output
 ++-******* ocamldebug
-++-******** check-program-out
+++-******** check-program-output
++++**** ocamlc.byte
++++***** check-ocamlc.byte-output
++++****** ocamldebug
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_wal
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
