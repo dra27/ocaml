@@ -3201,10 +3201,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..86357ac645
+index 0000000000..ea6425c907
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3264 @@
+@@ -0,0 +1,3277 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 60b92e6c36..cdbf9e55f6 100644
 +--- a/ocamltest/Makefile
@@ -4708,6 +4708,19 @@ index 0000000000..86357ac645
 + *)
 + 
 + external init_skiplist : unit -> unit = "init_skiplist"
++diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
++index bc0b8dfe66..deaba0a3ee 100644
++--- a/testsuite/tests/lib-channels/refcounting.ml
+++++ b/testsuite/tests/lib-channels/refcounting.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++-   * expect
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** expect
++ *)
++ 
++ (* Test the behavior of channel refcounting. *)
 +diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
 +index 1feeb3918a..781d82300a 100644
 +--- a/testsuite/tests/lib-dynlink-domains/main.ml
@@ -6471,10 +6484,10 @@ index 0000000000..86357ac645
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..aef329e002
+index 0000000000..68613e3f66
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6403 @@
+@@ -0,0 +1,6406 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -9678,10 +9691,10 @@ index 0000000000..aef329e002
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..86357ac645
++index 0000000000..ea6425c907
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3264 @@
++@@ -0,0 +1,3277 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 60b92e6c36..cdbf9e55f6 100644
 ++--- a/ocamltest/Makefile
@@ -11185,6 +11198,19 @@ index 0000000000..aef329e002
 ++ *)
 ++ 
 ++ external init_skiplist : unit -> unit = "init_skiplist"
+++diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
+++index bc0b8dfe66..deaba0a3ee 100644
+++--- a/testsuite/tests/lib-channels/refcounting.ml
++++++ b/testsuite/tests/lib-channels/refcounting.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++-   * expect
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** expect
+++ *)
+++ 
+++ (* Test the behavior of channel refcounting. *)
 ++diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
 ++index 1feeb3918a..781d82300a 100644
 ++--- a/testsuite/tests/lib-dynlink-domains/main.ml
@@ -12867,17 +12893,7 @@ index 0000000000..aef329e002
 ++-         Type t/284 came from this include
 +++         Type t/279 came from this include
 ++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_wal
+++-         The value print has no valid type if t/284 is shad
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
