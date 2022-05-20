@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..7d9c5b1491
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:35.657891511 +0100
+++++ b	2023-09-28 18:44:35.665891832 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -1400,7 +1400,6 @@ distclean: clean
+++@@ -1398,7 +1398,6 @@ distclean: clean
++  	$(MAKE) -C stdlib distclean
++  	$(MAKE) -C testsuite distclean
++  	$(MAKE) -C tools distclean
 diff --git a/Changes b/Changes
 index 41b137d1fd..69e660cd4d 100644
 --- a/Changes
@@ -42,7 +56,7 @@ index 41b137d1fd..69e660cd4d 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index ec0fb0b2a1..66f7c75ff8 100644
+index 64241c2a70..4a4a9149a8 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -578,7 +578,6 @@ partialclean::
@@ -6484,13 +6498,27 @@ index 0000000000..ea6425c907
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..68613e3f66
+index 0000000000..6cee0cb926
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6406 @@
+@@ -0,0 +1,6412 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..7d9c5b1491
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:35.657891511 +0100
++++++ b	2023-09-28 18:44:35.665891832 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -1400,7 +1400,6 @@ distclean: clean
++++@@ -1398,7 +1398,6 @@ distclean: clean
+++  	$(MAKE) -C stdlib distclean
+++  	$(MAKE) -C testsuite distclean
+++  	$(MAKE) -C tools distclean
 +diff --git a/Changes b/Changes
 +index 41b137d1fd..69e660cd4d 100644
 +--- a/Changes
@@ -6532,7 +6560,7 @@ index 0000000000..68613e3f66
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index ec0fb0b2a1..66f7c75ff8 100644
++index 64241c2a70..4a4a9149a8 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -578,7 +578,6 @@ partialclean::
@@ -12885,15 +12913,7 @@ index 0000000000..68613e3f66
 +++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
 ++@@ -24,11 +24,11 @@ end
 ++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shad
+++ 3 |   include
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:35.657891511 +0100
++++ b	2023-09-28 18:44:35.665891832 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -1400,7 +1400,6 @@ distclean: clean
++@@ -1398,7 +1398,6 @@ distclean: clean
+  	$(MAKE) -C stdlib distclean
+  	$(MAKE) -C testsuite distclean
+  	$(MAKE) -C tools distclean
