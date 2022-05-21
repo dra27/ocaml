@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..21f432c17a
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:35.901901303 +0100
-++++ b	2023-09-28 18:44:35.905901464 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -1028,7 +1028,7 @@ clean::
-++@@ -1025,7 +1025,7 @@ clean::
-+  	rm -f runtime/primitives runtime/primitives.new runtime/prims.c \
-+  	  $(runtime_BUILT_HEADERS)
-+  	rm -f runtime/domain_state*.inc
+index 0000000000..e69de29bb2
 diff --git a/Changes b/Changes
 index 41b137d1fd..69e660cd4d 100644
 --- a/Changes
@@ -6498,27 +6484,13 @@ index 0000000000..ea6425c907
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7b2e2a9030
+index 0000000000..1644d855bb
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6411 @@
+@@ -0,0 +1,6406 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..21f432c17a
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:35.901901303 +0100
-+++++ b	2023-09-28 18:44:35.905901464 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -1028,7 +1028,7 @@ clean::
-+++@@ -1025,7 +1025,7 @@ clean::
-++  	rm -f runtime/primitives runtime/primitives.new runtime/prims.c \
-++  	  $(runtime_BUILT_HEADERS)
-++  	rm -f runtime/domain_state*.inc
++index 0000000000..e69de29bb2
 +diff --git a/Changes b/Changes
 +index 41b137d1fd..69e660cd4d 100644
 +--- a/Changes
@@ -12912,7 +12884,16 @@ index 0000000000..7b2e2a9030
 ++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
 +++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
 ++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shad
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
