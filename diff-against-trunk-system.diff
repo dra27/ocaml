@@ -1,114 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..38d75e6f31
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,105 @@
-+--- a	2023-09-28 18:44:36.733934676 +0100
-++++ b	2023-09-28 18:44:36.761935799 +0100
-+@@ -34,16 +34,16 @@
-+    dynlink \
-+ -  eventlog \
-+    extern \
-+-   fiber \
-+    finalise \
-+-@@ -619,6 +618,7 @@ runtime_COMMON_C_SOURCES = \
-++   floats \
-++@@ -615,6 +614,7 @@ runtime_COMMON_C_SOURCES = \
-++   parsing \
-+    printexc \
-+    prng \
-+-   roots \
-+ +  runtime_events \
-+-   shared_heap \
-+    signals \
-+    skiplist \
-++   startup_aux \
-+ diff --git a/Makefile.common b/Makefile.common
-+ --- a/Makefile.common
-+ +++ b/Makefile.common
-+@@ -56,16 +56,12 @@
-+  
-+  # The following variable defines flags to be passed to the C preprocessor
-+  # when compiling C files for the native runtime.
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/configure b/configure
-+ Binary files a/configure and b/configure differ
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -181,7 +181,6 @@ AC_CONFIG_FILES([Makefile.config])
-++@@ -183,7 +183,6 @@ AC_CONFIG_FILES([Makefile.config])
-+  AC_CONFIG_FILES([stdlib/sys.ml])
-+  AC_CONFIG_FILES([manual/src/version.tex])
-+  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-+@@ -73,7 +69,7 @@
-+  AC_CONFIG_HEADERS([runtime/caml/m.h])
-+  AC_CONFIG_HEADERS([runtime/caml/s.h])
-+  AC_CONFIG_HEADERS([runtime/caml/version.h])
-+-@@ -542,7 +541,7 @@ AS_CASE([$host],
-++@@ -552,7 +551,7 @@ AS_CASE([$host],
-+      [exeext=".exe"],
-+    [exeext=''])
-+  
-+@@ -1507,15 +1503,16 @@
-+  CAMLprim value unix_fork(value unit)
-+  {
-+    int ret;
-+-@@ -30,16 +41,17 @@ CAMLprim value unix_fork(value unit)
-+-       ("Unix.fork may not be called while other domains were created");
-++@@ -32,18 +43,19 @@ CAMLprim value unix_fork(value unit)
-+    }
-++ #endif
-+  
-+ -  CAML_EV_FLUSH();
-+ -
-+    ret = fork();
-+--  if (ret == 0) caml_atfork_hook();
-+-+
-++ #if 0 /* BACKPORT */
-++   if (ret == 0) caml_atfork_hook();
-++ #endif
-+    if (ret == -1) uerror("fork", Nothing);
-+  
-+ -  CAML_EVENTLOG_DO({
-+@@ -1535,7 +1532,7 @@
-+ diff --git a/stdlib/.depend b/stdlib/.depend
-+ --- a/stdlib/.depend
-+ +++ b/stdlib/.depend
-+-@@ -266,6 +266,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
-++@@ -229,6 +229,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
-+  stdlib__Ephemeron.cmi : ephemeron.mli \
-+      stdlib__Seq.cmi \
-+      stdlib__Hashtbl.cmi
-+@@ -1602,24 +1599,6 @@
-+  
-+  (** [Memprof] is a sampling engine for allocated memory words. Every
-+     allocated word has a probability of being sampled equal to a
-+-diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-+-deleted file mode 100644
-+---- a/testsuite/tests/instrumented-runtime/main.ml
-+-+++ /dev/null
-+-@@ -1,13 +0,0 @@
-+--(* TEST
-+--  * instrumented-runtime
-+--  * skip
-+--  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
-+--  ** native
-+--    flags = "-runtime-variant=i"
-+--*)
-+--
-+--(* Test if the instrumented runtime is in working condition *)
-+--
-+--let _ =
-+--  Gc.eventlog_pause ();
-+--  Gc.eventlog_resume()
-+ diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
-+ deleted file mode 100644
-+ --- a/testsuite/tests/instrumented-runtime/main.run
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -122,10 +14,10 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 35b005351e..6e9f5903c9 100644
+index 79a4330f44..7125624ce9 100644
 --- a/Changes
 +++ b/Changes
-@@ -350,13 +350,13 @@ OCaml 4.14.0
+@@ -356,13 +356,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -141,7 +33,7 @@ index 35b005351e..6e9f5903c9 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -456,6 +456,9 @@ OCaml 4.14.0
+@@ -462,6 +462,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -151,7 +43,7 @@ index 35b005351e..6e9f5903c9 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -711,6 +714,9 @@ OCaml 4.14.0
+@@ -717,6 +720,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -3351,10 +3243,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ccd22a4399
+index 0000000000..3270d34f9e
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3282 @@
+@@ -0,0 +1,3412 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 60b92e6c36..cdbf9e55f6 100644
 +--- a/ocamltest/Makefile
@@ -4738,23 +4630,6 @@ index 0000000000..ccd22a4399
 + |}]
 + 
 + (* It was decided to not allow this anymore. *)
-+diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-+new file mode 100644
-+index 0000000000..94200ec67f
-+--- /dev/null
-++++ b/testsuite/tests/instrumented-runtime/main.ml
-+@@ -0,0 +1,11 @@
-++(* TEST
-++  * instrumented-runtime
-++  ** native
-++    flags = "-runtime-variant=i"
-++*)
-++
-++(* Test if the instrumented runtime is in working condition *)
-++
-++let _ =
-++  Gc.eventlog_pause ();
-++  Gc.eventlog_resume()
 +diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 +index cccbd96d71..35dd7fd85b 100644
 +--- a/testsuite/tests/lazy/lazy2.ml
@@ -5230,6 +5105,153 @@ index 0000000000..ccd22a4399
 +  *)
 + 
 + let () = Random.init 42
++diff --git a/testsuite/tests/lib-runtime-events/test.ml b/testsuite/tests/lib-runtime-events/test.ml
++index db08937089..8ccaccdf25 100644
++--- a/testsuite/tests/lib-runtime-events/test.ml
+++++ b/testsuite/tests/lib-runtime-events/test.ml
++@@ -1,6 +1,8 @@
++ (* TEST
++ modules = "stubs.c"
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ 
++ external start_runtime_events : unit -> unit = "start_runtime_events"
++diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
++index 02398467b7..88fb80b9cf 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_caml_exception.ml b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
++index e1df5aee0b..6738603ddd 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++index 3cd4752282..dbcdf76434 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
++index d69042e354..724466a63b 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
++index 34b034a8e8..8656ca2e59 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
++index 35ddd983a1..d63066e646 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_env_start.ml b/testsuite/tests/lib-runtime-events/test_env_start.ml
++index 6b6bca5b09..cbdf114e57 100644
++--- a/testsuite/tests/lib-runtime-events/test_env_start.ml
+++++ b/testsuite/tests/lib-runtime-events/test_env_start.ml
++@@ -1,6 +1,8 @@
++ (* TEST
++ include runtime_events
++ set OCAML_RUNTIME_EVENTS_START = "1"
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ 
++ (* In this test the runtime_events should already be started by the environment
++diff --git a/testsuite/tests/lib-runtime-events/test_external.ml b/testsuite/tests/lib-runtime-events/test_external.ml
++index b7269b7501..375564764f 100644
++--- a/testsuite/tests/lib-runtime-events/test_external.ml
+++++ b/testsuite/tests/lib-runtime-events/test_external.ml
++@@ -1,8 +1,10 @@
++ (* TEST
++    include runtime_events
++-   * libunix
++-   ** bytecode
++-   ** native *)
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** libunix
+++   *** bytecode
+++   *** native *)
++ 
++ let got_major = ref false
++ let got_minor = ref false
++diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
++index c3add88370..32d2367e26 100644
++--- a/testsuite/tests/lib-runtime-events/test_fork.ml
+++++ b/testsuite/tests/lib-runtime-events/test_fork.ml
++@@ -1,8 +1,10 @@
++ (* TEST
++    include runtime_events
++-   * libunix
++-   ** bytecode
++-   ** native *)
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** libunix
+++   *** bytecode
+++   *** native *)
++ 
++ let got_start = ref false
++ let got_fork_child = ref false
++diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
++index 7a41c49b2a..63aded8114 100644
++--- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
+++++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++-  * native
+++  * skip
+++  reason = "OCaml 5 only"
+++  ** native
++     include runtime_events
++     flags = "-runtime-variant=i"
++ *)
 +diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 +index 23f2a5f7de..08055698e7 100644
 +--- a/testsuite/tests/lib-str/parallel.ml
@@ -6639,121 +6661,13 @@ index 0000000000..ccd22a4399
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..52f63ff918
+index 0000000000..9b99709a19
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6543 @@
+@@ -0,0 +1,6652 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..38d75e6f31
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,105 @@
-++--- a	2023-09-28 18:44:36.733934676 +0100
-+++++ b	2023-09-28 18:44:36.761935799 +0100
-++@@ -34,16 +34,16 @@
-++    dynlink \
-++ -  eventlog \
-++    extern \
-++-   fiber \
-++    finalise \
-++-@@ -619,6 +618,7 @@ runtime_COMMON_C_SOURCES = \
-+++   floats \
-+++@@ -615,6 +614,7 @@ runtime_COMMON_C_SOURCES = \
-+++   parsing \
-++    printexc \
-++    prng \
-++-   roots \
-++ +  runtime_events \
-++-   shared_heap \
-++    signals \
-++    skiplist \
-+++   startup_aux \
-++ diff --git a/Makefile.common b/Makefile.common
-++ --- a/Makefile.common
-++ +++ b/Makefile.common
-++@@ -56,16 +56,12 @@
-++  
-++  # The following variable defines flags to be passed to the C preprocessor
-++  # when compiling C files for the native runtime.
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/configure b/configure
-++ Binary files a/configure and b/configure differ
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -181,7 +181,6 @@ AC_CONFIG_FILES([Makefile.config])
-+++@@ -183,7 +183,6 @@ AC_CONFIG_FILES([Makefile.config])
-++  AC_CONFIG_FILES([stdlib/sys.ml])
-++  AC_CONFIG_FILES([manual/src/version.tex])
-++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-++@@ -73,7 +69,7 @@
-++  AC_CONFIG_HEADERS([runtime/caml/m.h])
-++  AC_CONFIG_HEADERS([runtime/caml/s.h])
-++  AC_CONFIG_HEADERS([runtime/caml/version.h])
-++-@@ -542,7 +541,7 @@ AS_CASE([$host],
-+++@@ -552,7 +551,7 @@ AS_CASE([$host],
-++      [exeext=".exe"],
-++    [exeext=''])
-++  
-++@@ -1507,15 +1503,16 @@
-++  CAMLprim value unix_fork(value unit)
-++  {
-++    int ret;
-++-@@ -30,16 +41,17 @@ CAMLprim value unix_fork(value unit)
-++-       ("Unix.fork may not be called while other domains were created");
-+++@@ -32,18 +43,19 @@ CAMLprim value unix_fork(value unit)
-++    }
-+++ #endif
-++  
-++ -  CAML_EV_FLUSH();
-++ -
-++    ret = fork();
-++--  if (ret == 0) caml_atfork_hook();
-++-+
-+++ #if 0 /* BACKPORT */
-+++   if (ret == 0) caml_atfork_hook();
-+++ #endif
-++    if (ret == -1) uerror("fork", Nothing);
-++  
-++ -  CAML_EVENTLOG_DO({
-++@@ -1535,7 +1532,7 @@
-++ diff --git a/stdlib/.depend b/stdlib/.depend
-++ --- a/stdlib/.depend
-++ +++ b/stdlib/.depend
-++-@@ -266,6 +266,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
-+++@@ -229,6 +229,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
-++  stdlib__Ephemeron.cmi : ephemeron.mli \
-++      stdlib__Seq.cmi \
-++      stdlib__Hashtbl.cmi
-++@@ -1602,24 +1599,6 @@
-++  
-++  (** [Memprof] is a sampling engine for allocated memory words. Every
-++     allocated word has a probability of being sampled equal to a
-++-diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-++-deleted file mode 100644
-++---- a/testsuite/tests/instrumented-runtime/main.ml
-++-+++ /dev/null
-++-@@ -1,13 +0,0 @@
-++--(* TEST
-++--  * instrumented-runtime
-++--  * skip
-++--  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
-++--  ** native
-++--    flags = "-runtime-variant=i"
-++--*)
-++--
-++--(* Test if the instrumented runtime is in working condition *)
-++--
-++--let _ =
-++--  Gc.eventlog_pause ();
-++--  Gc.eventlog_resume()
-++ diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
-++ deleted file mode 100644
-++ --- a/testsuite/tests/instrumented-runtime/main.run
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -6767,10 +6681,10 @@ index 0000000000..52f63ff918
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 35b005351e..6e9f5903c9 100644
++index 79a4330f44..7125624ce9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -350,13 +350,13 @@ OCaml 4.14.0
++@@ -356,13 +356,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6786,7 +6700,7 @@ index 0000000000..52f63ff918
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -456,6 +456,9 @@ OCaml 4.14.0
++@@ -462,6 +462,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6796,7 +6710,7 @@ index 0000000000..52f63ff918
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -711,6 +714,9 @@ OCaml 4.14.0
++@@ -717,6 +720,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -9996,10 +9910,10 @@ index 0000000000..52f63ff918
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ccd22a4399
++index 0000000000..3270d34f9e
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3282 @@
++@@ -0,0 +1,3412 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 60b92e6c36..cdbf9e55f6 100644
 ++--- a/ocamltest/Makefile
@@ -11383,23 +11297,6 @@ index 0000000000..52f63ff918
 ++ |}]
 ++ 
 ++ (* It was decided to not allow this anymore. *)
-++diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-++new file mode 100644
-++index 0000000000..94200ec67f
-++--- /dev/null
-+++++ b/testsuite/tests/instrumented-runtime/main.ml
-++@@ -0,0 +1,11 @@
-+++(* TEST
-+++  * instrumented-runtime
-+++  ** native
-+++    flags = "-runtime-variant=i"
-+++*)
-+++
-+++(* Test if the instrumented runtime is in working condition *)
-+++
-+++let _ =
-+++  Gc.eventlog_pause ();
-+++  Gc.eventlog_resume()
 ++diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 ++index cccbd96d71..35dd7fd85b 100644
 ++--- a/testsuite/tests/lazy/lazy2.ml
@@ -11875,6 +11772,153 @@ index 0000000000..52f63ff918
 ++  *)
 ++ 
 ++ let () = Random.init 42
+++diff --git a/testsuite/tests/lib-runtime-events/test.ml b/testsuite/tests/lib-runtime-events/test.ml
+++index db08937089..8ccaccdf25 100644
+++--- a/testsuite/tests/lib-runtime-events/test.ml
++++++ b/testsuite/tests/lib-runtime-events/test.ml
+++@@ -1,6 +1,8 @@
+++ (* TEST
+++ modules = "stubs.c"
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ 
+++ external start_runtime_events : unit -> unit = "start_runtime_events"
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
+++index 02398467b7..88fb80b9cf 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml_exception.ml b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+++index e1df5aee0b..6738603ddd 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml_exception.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+++index 3cd4752282..dbcdf76434 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+++index d69042e354..724466a63b 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+++index 34b034a8e8..8656ca2e59 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+++index 35ddd983a1..d63066e646 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_env_start.ml b/testsuite/tests/lib-runtime-events/test_env_start.ml
+++index 6b6bca5b09..cbdf114e57 100644
+++--- a/testsuite/tests/lib-runtime-events/test_env_start.ml
++++++ b/testsuite/tests/lib-runtime-events/test_env_start.ml
+++@@ -1,6 +1,8 @@
+++ (* TEST
+++ include runtime_events
+++ set OCAML_RUNTIME_EVENTS_START = "1"
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ 
+++ (* In this test the runtime_events should already be started by the environment
+++diff --git a/testsuite/tests/lib-runtime-events/test_external.ml b/testsuite/tests/lib-runtime-events/test_external.ml
+++index b7269b7501..375564764f 100644
+++--- a/testsuite/tests/lib-runtime-events/test_external.ml
++++++ b/testsuite/tests/lib-runtime-events/test_external.ml
+++@@ -1,8 +1,10 @@
+++ (* TEST
+++    include runtime_events
+++-   * libunix
+++-   ** bytecode
+++-   ** native *)
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** libunix
++++   *** bytecode
++++   *** native *)
+++ 
+++ let got_major = ref false
+++ let got_minor = ref false
+++diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
+++index c3add88370..32d2367e26 100644
+++--- a/testsuite/tests/lib-runtime-events/test_fork.ml
++++++ b/testsuite/tests/lib-runtime-events/test_fork.ml
+++@@ -1,8 +1,10 @@
+++ (* TEST
+++    include runtime_events
+++-   * libunix
+++-   ** bytecode
+++-   ** native *)
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** libunix
++++   *** bytecode
++++   *** native *)
+++ 
+++ let got_start = ref false
+++ let got_fork_child = ref false
+++diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+++index 7a41c49b2a..63aded8114 100644
+++--- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
++++++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++-  * native
++++  * skip
++++  reason = "OCaml 5 only"
++++  ** native
+++     include runtime_events
+++     flags = "-runtime-variant=i"
+++ *)
 ++diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 ++index 23f2a5f7de..08055698e7 100644
 ++--- a/testsuite/tests/lib-str/parallel.ml
@@ -13185,7 +13229,94 @@ index 0000000000..52f63ff918
 +++**** ocamlc.byte
 +++***** check-ocamlc.byte-output
 +++****** ocamldebug
-+++******* check-prog
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -15109,7 +15240,7 @@ index 8775eadb88..0c2b22634f 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/Makefile b/tools/Makefile
-index 66ce89f9cd..fffcfe6cbe 100644
+index afbae6fae3..19e4d178f6 100644
 --- a/tools/Makefile
 +++ b/tools/Makefile
 @@ -275,6 +275,13 @@ clean::
