@@ -591,7 +591,6 @@ runtime_COMMON_C_SOURCES = \
   debugger \
   domain \
   dynlink \
-  eventlog \
   extern \
   finalise \
   floats \
@@ -615,6 +614,15 @@ runtime_COMMON_C_SOURCES = \
   parsing \
   printexc \
   prng \
+<<<<<<< HEAD
+||||||| parent of 9f696b86d2 (Merge pull request PR#10964 from sadiqj/eventring-pr)
+  roots \
+  shared_heap \
+=======
+  roots \
+  runtime_events \
+  shared_heap \
+>>>>>>> 9f696b86d2 (Merge pull request PR#10964 from sadiqj/eventring-pr)
   signals \
   skiplist \
   startup_aux \
