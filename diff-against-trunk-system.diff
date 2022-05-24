@@ -1,11 +1,119 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..38d75e6f31
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,105 @@
++--- a	2023-09-28 18:44:36.733934676 +0100
+++++ b	2023-09-28 18:44:36.761935799 +0100
++@@ -34,16 +34,16 @@
++    dynlink \
++ -  eventlog \
++    extern \
++-   fiber \
++    finalise \
++-@@ -619,6 +618,7 @@ runtime_COMMON_C_SOURCES = \
+++   floats \
+++@@ -615,6 +614,7 @@ runtime_COMMON_C_SOURCES = \
+++   parsing \
++    printexc \
++    prng \
++-   roots \
++ +  runtime_events \
++-   shared_heap \
++    signals \
++    skiplist \
+++   startup_aux \
++ diff --git a/Makefile.common b/Makefile.common
++ --- a/Makefile.common
++ +++ b/Makefile.common
++@@ -56,16 +56,12 @@
++  
++  # The following variable defines flags to be passed to the C preprocessor
++  # when compiling C files for the native runtime.
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/configure b/configure
++ Binary files a/configure and b/configure differ
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -181,7 +181,6 @@ AC_CONFIG_FILES([Makefile.config])
+++@@ -183,7 +183,6 @@ AC_CONFIG_FILES([Makefile.config])
++  AC_CONFIG_FILES([stdlib/sys.ml])
++  AC_CONFIG_FILES([manual/src/version.tex])
++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
++@@ -73,7 +69,7 @@
++  AC_CONFIG_HEADERS([runtime/caml/m.h])
++  AC_CONFIG_HEADERS([runtime/caml/s.h])
++  AC_CONFIG_HEADERS([runtime/caml/version.h])
++-@@ -542,7 +541,7 @@ AS_CASE([$host],
+++@@ -552,7 +551,7 @@ AS_CASE([$host],
++      [exeext=".exe"],
++    [exeext=''])
++  
++@@ -1507,15 +1503,16 @@
++  CAMLprim value unix_fork(value unit)
++  {
++    int ret;
++-@@ -30,16 +41,17 @@ CAMLprim value unix_fork(value unit)
++-       ("Unix.fork may not be called while other domains were created");
+++@@ -32,18 +43,19 @@ CAMLprim value unix_fork(value unit)
++    }
+++ #endif
++  
++ -  CAML_EV_FLUSH();
++ -
++    ret = fork();
++--  if (ret == 0) caml_atfork_hook();
++-+
+++ #if 0 /* BACKPORT */
+++   if (ret == 0) caml_atfork_hook();
+++ #endif
++    if (ret == -1) uerror("fork", Nothing);
++  
++ -  CAML_EVENTLOG_DO({
++@@ -1535,7 +1532,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -266,6 +266,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
+++@@ -229,6 +229,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
++  stdlib__Ephemeron.cmi : ephemeron.mli \
++      stdlib__Seq.cmi \
++      stdlib__Hashtbl.cmi
++@@ -1602,24 +1599,6 @@
++  
++  (** [Memprof] is a sampling engine for allocated memory words. Every
++     allocated word has a probability of being sampled equal to a
++-diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
++-deleted file mode 100644
++---- a/testsuite/tests/instrumented-runtime/main.ml
++-+++ /dev/null
++-@@ -1,13 +0,0 @@
++--(* TEST
++--  * instrumented-runtime
++--  * skip
++--  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
++--  ** native
++--    flags = "-runtime-variant=i"
++--*)
++--
++--(* Test if the instrumented runtime is in working condition *)
++--
++--let _ =
++--  Gc.eventlog_pause ();
++--  Gc.eventlog_resume()
++ diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
++ deleted file mode 100644
++ --- a/testsuite/tests/instrumented-runtime/main.run
 diff --git a/Changes b/Changes
-index c03e8db7b6..40c15e097c 100644
+index 35b005351e..6e9f5903c9 100644
 --- a/Changes
 +++ b/Changes
-@@ -344,13 +344,13 @@ OCaml 4.14.0
+@@ -350,13 +350,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -21,7 +129,7 @@ index c03e8db7b6..40c15e097c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -450,6 +450,9 @@ OCaml 4.14.0
+@@ -456,6 +456,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -31,7 +139,7 @@ index c03e8db7b6..40c15e097c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -705,6 +708,9 @@ OCaml 4.14.0
+@@ -711,6 +714,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -42,7 +150,7 @@ index c03e8db7b6..40c15e097c 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index a535f88529..874db36f16 100644
+index 5181edd869..13ca0d7a3a 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -578,7 +578,6 @@ partialclean::
@@ -53,7 +161,7 @@ index a535f88529..874db36f16 100644
    afl \
    alloc \
    array \
-@@ -586,6 +585,7 @@ runtime_COMMON_C_SOURCES = \
+@@ -586,24 +585,23 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -61,9 +169,8 @@ index a535f88529..874db36f16 100644
    compare \
    custom \
    debugger \
-@@ -593,18 +593,16 @@ runtime_COMMON_C_SOURCES = \
+   domain \
    dynlink \
-   eventlog \
    extern \
 -  fiber \
    finalise \
@@ -81,7 +188,7 @@ index a535f88529..874db36f16 100644
    main \
    major_gc \
    md5 \
-@@ -615,16 +613,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -614,17 +612,13 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -89,6 +196,7 @@ index a535f88529..874db36f16 100644
    printexc \
    prng \
 -  roots \
+   runtime_events \
 -  shared_heap \
    signals \
    skiplist \
@@ -627,10 +735,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 3085d4d863..3634dfd1f5 100755
+index 5387e78dc6..3634dfd1f5 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index ff3bce2d1f..89ef04e943 100755
+index 8d8bc63306..89ef04e943 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 2c66a918a3..0a59107ea8 100644
@@ -665,10 +773,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index fe4ce42991..d901d1a2f5 100755
+index 1bff929e3c..cbaf8a3457 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index f30d8fffd7..01556a2aaf 100644
+index 74b6a4cd40..e559b5560d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -680,7 +788,7 @@ index f30d8fffd7..01556a2aaf 100644
  AC_SUBST([force_instrumented_runtime])
  AC_SUBST([QS])
  
-@@ -208,10 +210,10 @@ AC_CANONICAL_TARGET
+@@ -207,10 +209,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -695,7 +803,7 @@ index f30d8fffd7..01556a2aaf 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -320,15 +322,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -319,15 +321,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -727,7 +835,7 @@ index f30d8fffd7..01556a2aaf 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1077,67 +1087,67 @@ model=default
+@@ -1076,67 +1086,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -854,7 +962,7 @@ index f30d8fffd7..01556a2aaf 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1146,8 +1156,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1145,8 +1155,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -865,7 +973,7 @@ index f30d8fffd7..01556a2aaf 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1158,14 +1168,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1157,14 +1167,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -886,7 +994,7 @@ index f30d8fffd7..01556a2aaf 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1844,7 +1854,8 @@ AS_CASE([$arch,$system],
+@@ -1843,7 +1853,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -896,7 +1004,7 @@ index f30d8fffd7..01556a2aaf 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1893,6 +1904,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1892,6 +1903,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -927,7 +1035,7 @@ index f30d8fffd7..01556a2aaf 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2034,8 +2069,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2033,8 +2068,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6484,18 +6592,126 @@ index 0000000000..ea6425c907
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f24e3efd11
+index 0000000000..b7c9b63731
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6406 @@
+@@ -0,0 +1,6532 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..38d75e6f31
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,105 @@
+++--- a	2023-09-28 18:44:36.733934676 +0100
++++++ b	2023-09-28 18:44:36.761935799 +0100
+++@@ -34,16 +34,16 @@
+++    dynlink \
+++ -  eventlog \
+++    extern \
+++-   fiber \
+++    finalise \
+++-@@ -619,6 +618,7 @@ runtime_COMMON_C_SOURCES = \
++++   floats \
++++@@ -615,6 +614,7 @@ runtime_COMMON_C_SOURCES = \
++++   parsing \
+++    printexc \
+++    prng \
+++-   roots \
+++ +  runtime_events \
+++-   shared_heap \
+++    signals \
+++    skiplist \
++++   startup_aux \
+++ diff --git a/Makefile.common b/Makefile.common
+++ --- a/Makefile.common
+++ +++ b/Makefile.common
+++@@ -56,16 +56,12 @@
+++  
+++  # The following variable defines flags to be passed to the C preprocessor
+++  # when compiling C files for the native runtime.
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/configure b/configure
+++ Binary files a/configure and b/configure differ
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -181,7 +181,6 @@ AC_CONFIG_FILES([Makefile.config])
++++@@ -183,7 +183,6 @@ AC_CONFIG_FILES([Makefile.config])
+++  AC_CONFIG_FILES([stdlib/sys.ml])
+++  AC_CONFIG_FILES([manual/src/version.tex])
+++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+++@@ -73,7 +69,7 @@
+++  AC_CONFIG_HEADERS([runtime/caml/m.h])
+++  AC_CONFIG_HEADERS([runtime/caml/s.h])
+++  AC_CONFIG_HEADERS([runtime/caml/version.h])
+++-@@ -542,7 +541,7 @@ AS_CASE([$host],
++++@@ -552,7 +551,7 @@ AS_CASE([$host],
+++      [exeext=".exe"],
+++    [exeext=''])
+++  
+++@@ -1507,15 +1503,16 @@
+++  CAMLprim value unix_fork(value unit)
+++  {
+++    int ret;
+++-@@ -30,16 +41,17 @@ CAMLprim value unix_fork(value unit)
+++-       ("Unix.fork may not be called while other domains were created");
++++@@ -32,18 +43,19 @@ CAMLprim value unix_fork(value unit)
+++    }
++++ #endif
+++  
+++ -  CAML_EV_FLUSH();
+++ -
+++    ret = fork();
+++--  if (ret == 0) caml_atfork_hook();
+++-+
++++ #if 0 /* BACKPORT */
++++   if (ret == 0) caml_atfork_hook();
++++ #endif
+++    if (ret == -1) uerror("fork", Nothing);
+++  
+++ -  CAML_EVENTLOG_DO({
+++@@ -1535,7 +1532,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -266,6 +266,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
++++@@ -229,6 +229,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
+++  stdlib__Ephemeron.cmi : ephemeron.mli \
+++      stdlib__Seq.cmi \
+++      stdlib__Hashtbl.cmi
+++@@ -1602,24 +1599,6 @@
+++  
+++  (** [Memprof] is a sampling engine for allocated memory words. Every
+++     allocated word has a probability of being sampled equal to a
+++-diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
+++-deleted file mode 100644
+++---- a/testsuite/tests/instrumented-runtime/main.ml
+++-+++ /dev/null
+++-@@ -1,13 +0,0 @@
+++--(* TEST
+++--  * instrumented-runtime
+++--  * skip
+++--  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
+++--  ** native
+++--    flags = "-runtime-variant=i"
+++--*)
+++--
+++--(* Test if the instrumented runtime is in working condition *)
+++--
+++--let _ =
+++--  Gc.eventlog_pause ();
+++--  Gc.eventlog_resume()
+++ diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
+++ deleted file mode 100644
+++ --- a/testsuite/tests/instrumented-runtime/main.run
 +diff --git a/Changes b/Changes
-+index c03e8db7b6..40c15e097c 100644
++index 35b005351e..6e9f5903c9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -344,13 +344,13 @@ OCaml 4.14.0
++@@ -350,13 +350,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6511,7 +6727,7 @@ index 0000000000..f24e3efd11
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -450,6 +450,9 @@ OCaml 4.14.0
++@@ -456,6 +456,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6521,7 +6737,7 @@ index 0000000000..f24e3efd11
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -705,6 +708,9 @@ OCaml 4.14.0
++@@ -711,6 +714,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6532,7 +6748,7 @@ index 0000000000..f24e3efd11
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index a535f88529..874db36f16 100644
++index 5181edd869..13ca0d7a3a 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -578,7 +578,6 @@ partialclean::
@@ -6543,7 +6759,7 @@ index 0000000000..f24e3efd11
 +   afl \
 +   alloc \
 +   array \
-+@@ -586,6 +585,7 @@ runtime_COMMON_C_SOURCES = \
++@@ -586,24 +585,23 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -6551,9 +6767,8 @@ index 0000000000..f24e3efd11
 +   compare \
 +   custom \
 +   debugger \
-+@@ -593,18 +593,16 @@ runtime_COMMON_C_SOURCES = \
++   domain \
 +   dynlink \
-+   eventlog \
 +   extern \
 +-  fiber \
 +   finalise \
@@ -6571,7 +6786,7 @@ index 0000000000..f24e3efd11
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -615,16 +613,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -614,17 +612,13 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -6579,6 +6794,7 @@ index 0000000000..f24e3efd11
 +   printexc \
 +   prng \
 +-  roots \
++   runtime_events \
 +-  shared_heap \
 +   signals \
 +   skiplist \
@@ -7117,10 +7333,10 @@ index 0000000000..f24e3efd11
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 3085d4d863..3634dfd1f5 100755
++index 5387e78dc6..3634dfd1f5 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index ff3bce2d1f..89ef04e943 100755
++index 8d8bc63306..89ef04e943 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 2c66a918a3..0a59107ea8 100644
@@ -7155,10 +7371,10 @@ index 0000000000..f24e3efd11
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index fe4ce42991..d901d1a2f5 100755
++index 1bff929e3c..cbaf8a3457 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index f30d8fffd7..01556a2aaf 100644
++index 74b6a4cd40..e559b5560d 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -7170,7 +7386,7 @@ index 0000000000..f24e3efd11
 + AC_SUBST([force_instrumented_runtime])
 + AC_SUBST([QS])
 + 
-+@@ -208,10 +210,10 @@ AC_CANONICAL_TARGET
++@@ -207,10 +209,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -7185,7 +7401,7 @@ index 0000000000..f24e3efd11
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -320,15 +322,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -319,15 +321,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -7217,7 +7433,7 @@ index 0000000000..f24e3efd11
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1077,67 +1087,67 @@ model=default
++@@ -1076,67 +1086,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -7344,7 +7560,7 @@ index 0000000000..f24e3efd11
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1146,8 +1156,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1145,8 +1155,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -7355,7 +7571,7 @@ index 0000000000..f24e3efd11
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1158,14 +1168,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1157,14 +1167,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -7376,7 +7592,7 @@ index 0000000000..f24e3efd11
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1844,7 +1854,8 @@ AS_CASE([$arch,$system],
++@@ -1843,7 +1853,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7386,7 +7602,7 @@ index 0000000000..f24e3efd11
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1893,6 +1904,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1892,6 +1903,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7417,7 +7633,7 @@ index 0000000000..f24e3efd11
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2034,8 +2069,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2033,8 +2068,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -12893,7 +13109,25 @@ index 0000000000..f24e3efd11
 ++-         Type t/284 came from this include
 +++         Type t/279 came from this include
 ++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shad
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-e
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -13016,10 +13250,10 @@ index 6a44270f76..b61f3a3d76 100644
          ap_specialised = Default_specialise
        }
 diff --git a/manual/src/library/stdlib-blurb.etex b/manual/src/library/stdlib-blurb.etex
-index 885d20158d..1e66f7e458 100644
+index 9e64269fff..db44fa9311 100644
 --- a/manual/src/library/stdlib-blurb.etex
 +++ b/manual/src/library/stdlib-blurb.etex
-@@ -129,10 +129,10 @@ be called from C \\
+@@ -133,10 +133,10 @@ be called from C \\
  \stddocitem{Callback}{registering OCaml values with the C runtime}
  \stddocitem{Char}{character operations}
  \stddocitem{Complex}{complex numbers}
@@ -13033,7 +13267,7 @@ index 885d20158d..1e66f7e458 100644
  \stddocitem{Either}{either values}
  \stddocitem{Ephemeron}{Ephemerons and weak hash table}
  \stddocitem{Filename}{operations on file names}
-@@ -152,7 +152,7 @@ be called from C \\
+@@ -156,7 +156,7 @@ be called from C \\
  \stddocitem{Map}{association tables over ordered types}
  \stddocitem{Marshal}{marshaling of data structures}
  \stddocitem{MoreLabels}{include modules \texttt{Hashtbl}, \texttt{Map} and \texttt{Set} with labels}
@@ -13042,7 +13276,7 @@ index 885d20158d..1e66f7e458 100644
  \stddocitem{Nativeint}{processor-native integers}
  \stddocitem{Oo}{object-oriented extension}
  \stddocitem{Option}{option values}
-@@ -166,7 +166,7 @@ be called from C \\
+@@ -171,7 +171,7 @@ be called from C \\
  \stddocitem{Scanf}{formatted input functions}
  \stddocitem{Seq}{functional iterators}
  \stddocitem{Set}{sets over ordered types}
@@ -13892,10 +14126,10 @@ index d3391e6884..d6fcaa8d91 100644
    match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
  let wait_timed_write fd d =
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
-index 6367f61aa8..7f2beca3af 100644
+index 38650426e4..ced3aa04f7 100644
 --- a/otherlibs/unix/fork.c
 +++ b/otherlibs/unix/fork.c
-@@ -25,15 +25,19 @@
+@@ -36,13 +36,17 @@ void caml_atfork_child() {
  CAMLprim value unix_fork(value unit)
  {
    int ret;
@@ -13906,15 +14140,14 @@ index 6367f61aa8..7f2beca3af 100644
    }
 +#endif
  
-   CAML_EV_FLUSH();
- 
    ret = fork();
+-
 +#if 0 /* BACKPORT */
-   if (ret == 0) caml_atfork_hook();
++  if (ret == 0) caml_atfork_hook();
 +#endif
    if (ret == -1) uerror("fork", Nothing);
  
-   CAML_EVENTLOG_DO({
+   if (ret == 0) {
 diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
 index 3d03d5cff3..24e7218699 100644
 --- a/otherlibs/unix/signals.c
@@ -14003,7 +14236,7 @@ index 114c45ec0e..0773e964c8 100644
 +
  #endif /* CAML_UNIXSUPPORT_H */
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 71cd7ef72b..ca0851f1ac 100644
+index 497ac2d1bd..96ec1fc218 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -14057,7 +14290,7 @@ index 71cd7ef72b..ca0851f1ac 100644
  stdlib__Either.cmo : either.ml \
      stdlib__Either.cmi
  stdlib__Either.cmx : either.ml \
-@@ -272,7 +235,7 @@ stdlib__Filename.cmo : filename.ml \
+@@ -280,7 +243,7 @@ stdlib__Filename.cmo : filename.ml \
      stdlib__Random.cmi \
      stdlib__Printf.cmi \
      stdlib__List.cmi \
@@ -14066,7 +14299,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Buffer.cmi \
      stdlib__Filename.cmi
  stdlib__Filename.cmx : filename.ml \
-@@ -281,7 +244,7 @@ stdlib__Filename.cmx : filename.ml \
+@@ -289,7 +252,7 @@ stdlib__Filename.cmx : filename.ml \
      stdlib__Random.cmx \
      stdlib__Printf.cmx \
      stdlib__List.cmx \
@@ -14075,7 +14308,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Buffer.cmx \
      stdlib__Filename.cmi
  stdlib__Filename.cmi : filename.mli
-@@ -308,8 +271,8 @@ stdlib__Format.cmo : format.ml \
+@@ -316,8 +279,8 @@ stdlib__Format.cmo : format.ml \
      stdlib__Queue.cmi \
      stdlib__List.cmi \
      stdlib__Int.cmi \
@@ -14085,7 +14318,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -323,8 +286,8 @@ stdlib__Format.cmx : format.ml \
+@@ -331,8 +294,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -14095,7 +14328,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -334,7 +297,6 @@ stdlib__Format.cmi : format.mli \
+@@ -342,7 +305,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -14103,7 +14336,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -363,8 +325,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -371,8 +333,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -14113,7 +14346,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmx : hashtbl.ml \
-@@ -373,8 +335,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -381,8 +343,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -14123,7 +14356,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
  stdlib__Hashtbl.cmi : hashtbl.mli \
-@@ -493,11 +455,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -501,11 +463,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -14135,7 +14368,7 @@ index 71cd7ef72b..ca0851f1ac 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -600,7 +557,6 @@ stdlib__Random.cmo : random.ml \
+@@ -608,7 +565,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -14143,7 +14376,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -611,7 +567,6 @@ stdlib__Random.cmx : random.ml \
+@@ -619,7 +575,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -14151,7 +14384,7 @@ index 71cd7ef72b..ca0851f1ac 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -651,15 +606,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -659,15 +614,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi

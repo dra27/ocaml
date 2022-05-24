@@ -1382,17 +1382,22 @@ index bd72ed302f..6d21977529 100644
  
  (* It was decided to not allow this anymore. *)
 diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-index 084ceb03ca..94200ec67f 100644
---- a/testsuite/tests/instrumented-runtime/main.ml
+new file mode 100644
+index 0000000000..94200ec67f
+--- /dev/null
 +++ b/testsuite/tests/instrumented-runtime/main.ml
-@@ -1,7 +1,5 @@
- (* TEST
-   * instrumented-runtime
--  * skip
--  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
-   ** native
-     flags = "-runtime-variant=i"
- *)
+@@ -0,0 +1,11 @@
++(* TEST
++  * instrumented-runtime
++  ** native
++    flags = "-runtime-variant=i"
++*)
++
++(* Test if the instrumented runtime is in working condition *)
++
++let _ =
++  Gc.eventlog_pause ();
++  Gc.eventlog_resume()
 diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 index cccbd96d71..35dd7fd85b 100644
 --- a/testsuite/tests/lazy/lazy2.ml

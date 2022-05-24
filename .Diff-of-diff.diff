@@ -1,0 +1,105 @@
+--- a	2023-09-28 18:44:36.733934676 +0100
++++ b	2023-09-28 18:44:36.761935799 +0100
+@@ -34,16 +34,16 @@
+    dynlink \
+ -  eventlog \
+    extern \
+-   fiber \
+    finalise \
+-@@ -619,6 +618,7 @@ runtime_COMMON_C_SOURCES = \
++   floats \
++@@ -615,6 +614,7 @@ runtime_COMMON_C_SOURCES = \
++   parsing \
+    printexc \
+    prng \
+-   roots \
+ +  runtime_events \
+-   shared_heap \
+    signals \
+    skiplist \
++   startup_aux \
+ diff --git a/Makefile.common b/Makefile.common
+ --- a/Makefile.common
+ +++ b/Makefile.common
+@@ -56,16 +56,12 @@
+  
+  # The following variable defines flags to be passed to the C preprocessor
+  # when compiling C files for the native runtime.
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/configure b/configure
+ Binary files a/configure and b/configure differ
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -181,7 +181,6 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -183,7 +183,6 @@ AC_CONFIG_FILES([Makefile.config])
+  AC_CONFIG_FILES([stdlib/sys.ml])
+  AC_CONFIG_FILES([manual/src/version.tex])
+  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+@@ -73,7 +69,7 @@
+  AC_CONFIG_HEADERS([runtime/caml/m.h])
+  AC_CONFIG_HEADERS([runtime/caml/s.h])
+  AC_CONFIG_HEADERS([runtime/caml/version.h])
+-@@ -542,7 +541,7 @@ AS_CASE([$host],
++@@ -552,7 +551,7 @@ AS_CASE([$host],
+      [exeext=".exe"],
+    [exeext=''])
+  
+@@ -1507,15 +1503,16 @@
+  CAMLprim value unix_fork(value unit)
+  {
+    int ret;
+-@@ -30,16 +41,17 @@ CAMLprim value unix_fork(value unit)
+-       ("Unix.fork may not be called while other domains were created");
++@@ -32,18 +43,19 @@ CAMLprim value unix_fork(value unit)
+    }
++ #endif
+  
+ -  CAML_EV_FLUSH();
+ -
+    ret = fork();
+--  if (ret == 0) caml_atfork_hook();
+-+
++ #if 0 /* BACKPORT */
++   if (ret == 0) caml_atfork_hook();
++ #endif
+    if (ret == -1) uerror("fork", Nothing);
+  
+ -  CAML_EVENTLOG_DO({
+@@ -1535,7 +1532,7 @@
+ diff --git a/stdlib/.depend b/stdlib/.depend
+ --- a/stdlib/.depend
+ +++ b/stdlib/.depend
+-@@ -266,6 +266,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
++@@ -229,6 +229,14 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
+  stdlib__Ephemeron.cmi : ephemeron.mli \
+      stdlib__Seq.cmi \
+      stdlib__Hashtbl.cmi
+@@ -1602,24 +1599,6 @@
+  
+  (** [Memprof] is a sampling engine for allocated memory words. Every
+     allocated word has a probability of being sampled equal to a
+-diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
+-deleted file mode 100644
+---- a/testsuite/tests/instrumented-runtime/main.ml
+-+++ /dev/null
+-@@ -1,13 +0,0 @@
+--(* TEST
+--  * instrumented-runtime
+--  * skip
+--  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
+--  ** native
+--    flags = "-runtime-variant=i"
+--*)
+--
+--(* Test if the instrumented runtime is in working condition *)
+--
+--let _ =
+--  Gc.eventlog_pause ();
+--  Gc.eventlog_resume()
+ diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
+ deleted file mode 100644
+ --- a/testsuite/tests/instrumented-runtime/main.run

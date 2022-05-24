@@ -591,7 +591,6 @@ runtime_COMMON_C_SOURCES = \
   debugger \
   domain \
   dynlink \
-  eventlog \
   extern \
   finalise \
   floats \
@@ -615,6 +614,7 @@ runtime_COMMON_C_SOURCES = \
   parsing \
   printexc \
   prng \
+  runtime_events \
   signals \
   skiplist \
   startup_aux \
