@@ -18,8 +18,8 @@
 #include <caml/alloc.h>
 #include "unixsupport.h"
 
-CAMLprim value unix_error_message(value err)
+CAMLprim value caml_unix_error_message(value err)
 {
-  int errnum = unix_code_of_unix_error(err);
+  int errnum = caml_unix_code_of_unix_error(err);
   return caml_copy_string(strerror(errnum));
 }

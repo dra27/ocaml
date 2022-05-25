@@ -26,25 +26,27 @@ extern "C" {
 
 #define Nothing ((value) 0)
 
-extern value unix_error_of_code (int errcode);
-extern int unix_code_of_unix_error (value error);
+extern value caml_unix_error_of_code (int errcode);
+extern int caml_unix_code_of_unix_error (value error);
 
 /* Compatibility definitions for the pre-5.0 names of these functions */
 #ifndef CAML_BUILDING_UNIX
-#define code_of_unix_error unix_code_of_unix_error
+#define unix_error_of_code caml_unix_error_of_code
+#define code_of_unix_error caml_unix_code_of_unix_error
 #endif /* CAML_BUILDING_UNIX */
 
 CAMLnoreturn_start
-extern void unix_error (int errcode, const char * cmdname, value arg)
+extern void caml_unix_error (int errcode, const char * cmdname, value arg)
 CAMLnoreturn_end;
 
 CAMLnoreturn_start
 extern void caml_uerror (const char * cmdname, value arg)
 CAMLnoreturn_end;
 
-/* Compatibility definitions for the pre-5.0 name of this function */
+/* Compatibility definitions for the pre-5.0 names of these functions */
 #ifndef CAML_BUILDING_UNIX
 #define uerror caml_uerror
+#define unix_error caml_unix_error
 #endif /* CAML_BUILDING_UNIX */
 
 extern void caml_unix_check_path(value path, const char * cmdname);
@@ -53,13 +55,13 @@ extern void caml_unix_check_path(value path, const char * cmdname);
 
 #define DIR_Val(v) *((DIR **) &Field(v, 0))
 
-extern char ** unix_cstringvect(value arg, char * cmdname);
-extern void unix_cstringvect_free(char **);
+extern char ** caml_unix_cstringvect(value arg, char * cmdname);
+extern void caml_unix_cstringvect_free(char **);
 
-extern int unix_cloexec_default;
-extern int unix_cloexec_p(value cloexec);
-extern void unix_set_cloexec(int fd, char * cmdname, value arg);
-extern void unix_clear_cloexec(int fd, char * cmdname, value arg);
+extern int caml_unix_cloexec_default;
+extern int caml_unix_cloexec_p(value cloexec);
+extern void caml_unix_set_cloexec(int fd, char * cmdname, value arg);
+extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
 
 #ifdef __cplusplus
 }

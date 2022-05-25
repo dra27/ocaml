@@ -20,7 +20,7 @@
 #include <caml/eventlog.h>
 #include "unixsupport.h"
 
-CAMLprim value unix_fork(value unit)
+CAMLprim value caml_unix_fork(value unit)
 {
   int ret;
 

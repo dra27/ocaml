@@ -19,10 +19,10 @@ open Unix
 
 (*** Process handling *)
 
-external execv : string -> string array -> unit = "unix_execv"
+external execv : string -> string array -> unit = "caml_unix_execv"
 external execve : string -> string array -> string array -> unit
-           = "unix_execve"
-external execvp : string -> string array -> unit = "unix_execvp"
+           = "caml_unix_execve"
+external execvp : string -> string array -> unit = "caml_unix_execvp"
 let wait = Unix.wait
 let waitpid = Unix.waitpid
 let system = Unix.system
@@ -50,11 +50,11 @@ let open_process_in = Unix.open_process_in
 let open_process_out = Unix.open_process_out
 let open_process = Unix.open_process
 
-external sleep : int -> unit = "unix_sleep"
+external sleep : int -> unit = "caml_unix_sleep"
 
 let socket = Unix.socket
 let accept = Unix.accept
-external connect : file_descr -> sockaddr -> unit = "unix_connect"
+external connect : file_descr -> sockaddr -> unit = "caml_unix_connect"
 let recv = Unix.recv
 let recvfrom = Unix.recvfrom
 let send = Unix.send
