@@ -14,7 +14,7 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 79a4330f44..7125624ce9 100644
+index 3a80375f6f..c80dc5c1ad 100644
 --- a/Changes
 +++ b/Changes
 @@ -356,13 +356,13 @@ OCaml 4.14.0
@@ -6661,7 +6661,7 @@ index 0000000000..3270d34f9e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9b99709a19
+index 0000000000..c73cc7bd6b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,6652 @@
@@ -6681,7 +6681,7 @@ index 0000000000..9b99709a19
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 79a4330f44..7125624ce9 100644
++index 3a80375f6f..c80dc5c1ad 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -356,13 +356,13 @@ OCaml 4.14.0
