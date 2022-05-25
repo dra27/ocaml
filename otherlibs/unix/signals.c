@@ -81,7 +81,7 @@ CAMLprim value unix_sigpending(value unit)
 {
   sigset_t pending;
   int i;
-  if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
+  if (sigpending(&pending) == -1) caml_uerror("sigpending", Nothing);
   for (i = 1; i < NSIG; i++)
     if(caml_pending_signals[i])
       sigaddset(&pending, i);
@@ -96,7 +96,7 @@ CAMLprim value unix_sigsuspend(value vset)
   caml_enter_blocking_section();
   retcode = sigsuspend(&set);
   caml_leave_blocking_section();
-  if (retcode == -1 && errno != EINTR) uerror("sigsuspend", Nothing);
+  if (retcode == -1 && errno != EINTR) caml_uerror("sigsuspend", Nothing);
   return Val_unit;
 }
 

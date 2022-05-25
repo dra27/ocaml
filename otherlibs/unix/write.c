@@ -45,7 +45,7 @@ CAMLprim value unix_write(value fd, value buf, value vofs, value vlen)
       caml_leave_blocking_section();
       if (ret == -1) {
         if ((errno == EAGAIN || errno == EWOULDBLOCK) && written > 0) break;
-        uerror("write", Nothing);
+        caml_uerror("write", Nothing);
       }
       written += ret;
       ofs += ret;
@@ -79,7 +79,7 @@ CAMLprim value unix_single_write(value fd, value buf, value vofs, value vlen)
       caml_enter_blocking_section();
       ret = write(Int_val(fd), iobuf, numbytes);
       caml_leave_blocking_section();
-      if (ret == -1) uerror("single_write", Nothing);
+      if (ret == -1) caml_uerror("single_write", Nothing);
     }
   End_roots();
   return Val_int(ret);

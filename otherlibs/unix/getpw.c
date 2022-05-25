@@ -57,7 +57,7 @@ CAMLprim value unix_getpwnam(value name)
   entry = getpwnam(String_val(name));
   if (entry == (struct passwd *) NULL) {
     if (errno == EINTR) {
-      uerror("getpwnam", Nothing);
+      caml_uerror("getpwnam", Nothing);
     } else {
       caml_raise_not_found();
     }
@@ -72,7 +72,7 @@ CAMLprim value unix_getpwuid(value uid)
   entry = getpwuid(Int_val(uid));
   if (entry == (struct passwd *) NULL) {
     if (errno == EINTR) {
-      uerror("getpwuid", Nothing);
+      caml_uerror("getpwuid", Nothing);
     } else {
       caml_raise_not_found();
     }

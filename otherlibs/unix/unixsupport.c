@@ -310,7 +310,7 @@ void unix_error(int errcode, const char *cmdname, value cmdarg)
   caml_raise(res);
 }
 
-void uerror(const char *cmdname, value cmdarg)
+void caml_uerror(const char *cmdname, value cmdarg)
 {
   unix_error(errno, cmdname, cmdarg);
 }
@@ -335,7 +335,7 @@ void unix_set_cloexec(int fd, char *cmdname, value cmdarg)
   int flags = fcntl(fd, F_GETFD, 0);
   if (flags == -1 ||
       fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
-    uerror(cmdname, cmdarg);
+    caml_uerror(cmdname, cmdarg);
 }
 
 void unix_clear_cloexec(int fd, char *cmdname, value cmdarg)
@@ -343,5 +343,5 @@ void unix_clear_cloexec(int fd, char *cmdname, value cmdarg)
   int flags = fcntl(fd, F_GETFD, 0);
   if (flags == -1 ||
       fcntl(fd, F_SETFD, flags & ~FD_CLOEXEC) == -1)
-    uerror(cmdname, cmdarg);
+    caml_uerror(cmdname, cmdarg);
 }
