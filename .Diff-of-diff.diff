@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:39.662051987 +0100
++++ b	2023-09-28 18:44:39.666052147 +0100
+@@ -3,7 +3,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -944,6 +944,12 @@ AS_IF([! $arch64],
++@@ -956,6 +956,12 @@ AS_IF([! $arch64],
+        [AC_DEFINE([ARCH_ALIGN_INT64], [1])])])
+      ])])
+  
