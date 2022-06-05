@@ -1,0 +1,25 @@
+--- a	2023-09-28 18:44:40.442083202 +0100
++++ b	2023-09-28 18:44:40.446083362 +0100
+@@ -5,9 +5,9 @@
+  (* TEST
+     include runtime_events
+ +   include unix
+-    * libunix
+-    ** bytecode
+-    ** native *)
++    * skip
++    reason = "OCaml 5 only"
++    ** libunix
+ diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
+ --- a/testsuite/tests/lib-runtime-events/test_fork.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_fork.ml
+@@ -15,6 +15,6 @@
+  (* TEST
+     include runtime_events
+ +   include unix
+-    * libunix
+-    ** bytecode
+-    ** native *)
++    * skip
++    reason = "OCaml 5 only"
++    ** libunix

@@ -1,5 +1,6 @@
 (* TEST
    include runtime_events
+   include unix
    * skip
    reason = "OCaml 5 only"
    ** libunix

@@ -1955,12 +1955,13 @@ index 6b6bca5b09..cbdf114e57 100644
  
  (* In this test the runtime_events should already be started by the environment
 diff --git a/testsuite/tests/lib-runtime-events/test_external.ml b/testsuite/tests/lib-runtime-events/test_external.ml
-index b7269b7501..375564764f 100644
+index ecea4b7e13..4f363941f4 100644
 --- a/testsuite/tests/lib-runtime-events/test_external.ml
 +++ b/testsuite/tests/lib-runtime-events/test_external.ml
-@@ -1,8 +1,10 @@
+@@ -1,9 +1,11 @@
  (* TEST
     include runtime_events
+    include unix
 -   * libunix
 -   ** bytecode
 -   ** native *)
@@ -1973,12 +1974,13 @@ index b7269b7501..375564764f 100644
  let got_major = ref false
  let got_minor = ref false
 diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
-index c3add88370..32d2367e26 100644
+index 87f556a659..097905b626 100644
 --- a/testsuite/tests/lib-runtime-events/test_fork.ml
 +++ b/testsuite/tests/lib-runtime-events/test_fork.ml
-@@ -1,8 +1,10 @@
+@@ -1,9 +1,11 @@
  (* TEST
     include runtime_events
+    include unix
 -   * libunix
 -   ** bytecode
 -   ** native *)
