@@ -90,6 +90,14 @@ let preempt_signal =
   | _       -> Sys.sigvtalrm
 
 let () =
+<<<<<<< HEAD
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+  thread_initialize ();
+  Domain.at_startup thread_initialize_domain;
+=======
+  thread_initialize ();
+  Domain.at_each_spawn thread_initialize_domain;
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
   thread_initialize ();
   Callback.register "Thread.at_shutdown" (fun () ->

@@ -24,11 +24,29 @@ end
 Line 3, characters 2-36:
 3 |   include Comparable with type t = t
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<<<<<<< HEAD
 Error: Illegal shadowing of included type t/279 by t/284
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+Error: Illegal shadowing of included type t/284 by t/289
+=======
+Error: Illegal shadowing of included type t/285 by t/290
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
        Line 2, characters 2-19:
+<<<<<<< HEAD
          Type t/279 came from this include
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+         Type t/284 came from this include
+=======
+         Type t/285 came from this include
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
        Line 3, characters 2-23:
+<<<<<<< HEAD
          The value print has no valid type if t/279 is shadowed
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+         The value print has no valid type if t/284 is shadowed
+=======
+         The value print has no valid type if t/285 is shadowed
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
 |}]
 
 module type Sunderscore = sig

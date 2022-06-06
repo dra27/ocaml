@@ -17,7 +17,13 @@ module type S = sig type t val x : t end
 module Falias (X : S) = X
 [%%expect{|
 {
+<<<<<<< HEAD
  "Falias"[module] -> Abs<.4>(X/274, X/274<.3>);
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+ "Falias"[module] -> Abs<.4>(X/279, X/279<.3>);
+=======
+ "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
  }
 module Falias : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -29,10 +35,24 @@ end
 {
  "Finclude"[module] ->
      Abs<.6>
+<<<<<<< HEAD
         (X/278,
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+        (X/283,
+=======
+        (X/284,
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
          {
+<<<<<<< HEAD
           "t"[type] -> X/278<.5> . "t"[type];
           "x"[value] -> X/278<.5> . "x"[value];
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+          "t"[type] -> X/283<.5> . "t"[type];
+          "x"[value] -> X/283<.5> . "x"[value];
+=======
+          "t"[type] -> X/284<.5> . "t"[type];
+          "x"[value] -> X/284<.5> . "x"[value];
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
           });
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -45,7 +65,13 @@ end
 [%%expect{|
 {
  "Fredef"[module] ->
+<<<<<<< HEAD
      Abs<.10>(X/285, {
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+     Abs<.10>(X/290, {
+=======
+     Abs<.10>(X/291, {
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
                       "t"[type] -> <.8>;
                       "x"[value] -> <.9>;
                       });
@@ -223,8 +249,16 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 [%%expect{|
 {
  "Big_to_small1"[module] ->
+<<<<<<< HEAD
      Abs<.40>(X/380, {<.39>
                       "t"[type] -> X/380<.39> . "t"[type];
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+     Abs<.40>(X/385, {<.39>
+                      "t"[type] -> X/385<.39> . "t"[type];
+=======
+     Abs<.40>(X/386, {<.39>
+                      "t"[type] -> X/386<.39> . "t"[type];
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
                       });
  }
 module Big_to_small1 : B2S
@@ -234,8 +268,16 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 [%%expect{|
 {
  "Big_to_small2"[module] ->
+<<<<<<< HEAD
      Abs<.42>(X/383, {
                       "t"[type] -> X/383<.41> . "t"[type];
+||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+     Abs<.42>(X/388, {
+                      "t"[type] -> X/388<.41> . "t"[type];
+=======
+     Abs<.42>(X/389, {
+                      "t"[type] -> X/389<.41> . "t"[type];
+>>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
                       });
  }
 module Big_to_small2 : B2S
