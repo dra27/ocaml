@@ -14,6 +14,7 @@ list_next
 list_next_set
 socket_domain_table
 socket_type_table
+uerror
 val_process_id
 win32_maperr
 win32_socket
