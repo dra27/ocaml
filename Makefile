@@ -1418,6 +1418,7 @@ install:
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(MKDIR) "$(INSTALL_DOCDIR)"
 	$(MKDIR) "$(INSTALL_INCDIR)"
+	sed -e 's/.*/ & /' renamed_C_API > "$(INSTALL_LIBDIR)/renamed_C_API"
 	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
 	$(INSTALL_DATA) $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
