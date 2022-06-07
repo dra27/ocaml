@@ -2306,7 +2306,7 @@ index 2776f14e10..93cb3623da 100644
  
  open Domain
 diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-index e853c25865..30fa17d116 100644
+index aeac4f71f7..ea63910f2f 100644
 --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 @@ -1,8 +1,10 @@

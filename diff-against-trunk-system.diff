@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..424b4f3f2b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:41.614130076 +0100
+++++ b	2023-09-28 18:44:41.622130396 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
++ --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
++ +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
++-@@ -11,12 +11,17 @@ let test_size =
+++@@ -13,12 +13,17 @@ let test_size =
++    try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
++    with Not_found | Failure _ -> 0
++  
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -6676,13 +6690,27 @@ index 0000000000..0509b79243
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f7f08af5f4
+index 0000000000..ce146a64c6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6655 @@
+@@ -0,0 +1,6653 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..424b4f3f2b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:41.614130076 +0100
++++++ b	2023-09-28 18:44:41.622130396 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+++ --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+++ +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+++-@@ -11,12 +11,17 @@ let test_size =
++++@@ -13,12 +13,17 @@ let test_size =
+++    try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
+++    with Not_found | Failure _ -> 0
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -13318,23 +13346,7 @@ index 0000000000..f7f08af5f4
 ++ 
 ++ let () = Out_channel.set_buffered stdout false
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weakl
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/f
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
