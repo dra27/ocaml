@@ -962,6 +962,12 @@ dnl AS_IF([! $arch64],
 dnl  [AS_CASE([$ocaml_cv_cc_vendor],
 dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
 
+# Support for C11 atomic types
+
+OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
+AS_IF([! $cc_supports_atomic],
+  [AC_MSG_FAILURE([C11 atomic support is required, use another C compiler])])
+
 # Shared library support
 
 sharedlib_cflags=''
