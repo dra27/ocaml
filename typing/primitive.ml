@@ -81,6 +81,25 @@ let make ~name ~alloc ~native_name ~native_repr_args ~native_repr_res =
    prim_native_repr_args = native_repr_args;
    prim_native_repr_res = native_repr_res}
 
+let blocked_primitives = [
+  "win_startup";
+  "win_cleanup";
+  "win_waitpid";
+  "win_handle_fd";
+  "win_inchannel_of_filedescr";
+  "win_outchannel_of_filedescr";
+  "win_filedescr_of_channel";
+  "win_set_close_on_exec";
+  "win_clear_close_on_exec";
+  "win_findfirst";
+  "win_findnext";
+  "win_findclose";
+  "win_terminate_process";
+  "win_create_process";
+  "win_create_process_native";
+  "win_system";
+]
+
 let parse_declaration valdecl ~native_repr_args ~native_repr_res =
   let arity = List.length native_repr_args in
   let name, native_name, old_style_noalloc, old_style_float =
@@ -94,6 +113,10 @@ let parse_declaration valdecl ~native_repr_args ~native_repr_res =
     | [] ->
         fatal_error "Primitive.parse_declaration"
   in
+  if List.mem name blocked_primitives then
+    Misc.fatal_errorf "Illegal byte primitive detected: %s\n" name;
+  if List.mem native_name blocked_primitives then
+    Misc.fatal_errorf "Illegal native primitive detected: %s\n" name;
   let noalloc_attribute =
     Attr_helper.has_no_payload_attribute ["noalloc"; "ocaml.noalloc"]
       valdecl.pval_attributes

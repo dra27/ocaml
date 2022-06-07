@@ -43,6 +43,7 @@
 #/Changes                 merge=union
 
 # No header for text files (would be too obtrusive).
+renamed_C_API            typo.missing-header
 *.md                     typo.missing-header
 README*                  typo.missing-header
 VERSION                  typo.missing-header

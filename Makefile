@@ -382,6 +382,7 @@ install:
 	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(MKDIR) "$(INSTALL_DOCDIR)"
+	sed -e 's/.*/ & /' renamed_C_API > "$(INSTALL_LIBDIR)/renamed_C_API"
 	$(MAKE) -C runtime install
 	$(INSTALL_PROG) ocaml$(EXE) "$(INSTALL_BINDIR)"
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
