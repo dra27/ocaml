@@ -1,6 +1,24 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..86a2c9b9d5
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,15 @@
++--- a	2023-09-28 18:44:42.214154061 +0100
+++++ b	2023-09-28 18:44:42.234154860 +0100
++@@ -48,9 +48,9 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -950,6 +950,12 @@ AS_IF([! $arch64],
++-   [AS_CASE([$ocaml_cv_cc_vendor],
++-     [gcc-*], [cclibs="$cclibs -latomic"])])
+++@@ -962,6 +962,12 @@ dnl AS_IF([! $arch64],
+++ dnl  [AS_CASE([$ocaml_cv_cc_vendor],
+++ dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
++  
++ +# Support for C11 atomic types
++ +
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -14,10 +32,10 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 5ed28085d1..5a64397438 100644
+index 8ba85e1d86..f7a5066d4f 100644
 --- a/Changes
 +++ b/Changes
-@@ -372,13 +372,13 @@ OCaml 4.14.0
+@@ -376,13 +376,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -33,7 +51,7 @@ index 5ed28085d1..5a64397438 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -478,6 +478,9 @@ OCaml 4.14.0
+@@ -482,6 +482,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -43,7 +61,7 @@ index 5ed28085d1..5a64397438 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -733,6 +736,9 @@ OCaml 4.14.0
+@@ -737,6 +740,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -689,10 +707,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index a45f9841af..ec2a26f914 100755
+index 4d47591ca6..fbe1580e88 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 311f4c1554..04bf1d8fd9 100644
+index 7c5def33b9..28b48e9c37 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -780,9 +798,9 @@ index 311f4c1554..04bf1d8fd9 100644
 +dnl  [AS_CASE([$ocaml_cv_cc_vendor],
 +dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
  
- # Shared library support
+ # Support for C11 atomic types
  
-@@ -1082,67 +1094,67 @@ model=default
+@@ -1088,67 +1100,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -909,7 +927,7 @@ index 311f4c1554..04bf1d8fd9 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1151,8 +1163,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1157,8 +1169,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -920,7 +938,7 @@ index 311f4c1554..04bf1d8fd9 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1163,14 +1175,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1169,14 +1181,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -941,7 +959,7 @@ index 311f4c1554..04bf1d8fd9 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1849,7 +1861,8 @@ AS_CASE([$arch,$system],
+@@ -1855,7 +1867,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -951,7 +969,7 @@ index 311f4c1554..04bf1d8fd9 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1898,6 +1911,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1904,6 +1917,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -982,7 +1000,7 @@ index 311f4c1554..04bf1d8fd9 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2039,8 +2076,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2045,8 +2082,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6676,13 +6694,31 @@ index 0000000000..97f5a32db6
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..224944fecd
+index 0000000000..f7307c880c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6655 @@
+@@ -0,0 +1,6657 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..86a2c9b9d5
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,15 @@
+++--- a	2023-09-28 18:44:42.214154061 +0100
++++++ b	2023-09-28 18:44:42.234154860 +0100
+++@@ -48,9 +48,9 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -950,6 +950,12 @@ AS_IF([! $arch64],
+++-   [AS_CASE([$ocaml_cv_cc_vendor],
+++-     [gcc-*], [cclibs="$cclibs -latomic"])])
++++@@ -962,6 +962,12 @@ dnl AS_IF([! $arch64],
++++ dnl  [AS_CASE([$ocaml_cv_cc_vendor],
++++ dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
+++  
+++ +# Support for C11 atomic types
+++ +
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -6696,10 +6732,10 @@ index 0000000000..224944fecd
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 5ed28085d1..5a64397438 100644
++index 8ba85e1d86..f7a5066d4f 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -372,13 +372,13 @@ OCaml 4.14.0
++@@ -376,13 +376,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6715,7 +6751,7 @@ index 0000000000..224944fecd
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -478,6 +478,9 @@ OCaml 4.14.0
++@@ -482,6 +482,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6725,7 +6761,7 @@ index 0000000000..224944fecd
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -733,6 +736,9 @@ OCaml 4.14.0
++@@ -737,6 +740,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -7371,10 +7407,10 @@ index 0000000000..224944fecd
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index a45f9841af..ec2a26f914 100755
++index 4d47591ca6..fbe1580e88 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 311f4c1554..04bf1d8fd9 100644
++index 7c5def33b9..28b48e9c37 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -7462,9 +7498,9 @@ index 0000000000..224944fecd
 ++dnl  [AS_CASE([$ocaml_cv_cc_vendor],
 ++dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
 + 
-+ # Shared library support
++ # Support for C11 atomic types
 + 
-+@@ -1082,67 +1094,67 @@ model=default
++@@ -1088,67 +1100,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -7591,7 +7627,7 @@ index 0000000000..224944fecd
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1151,8 +1163,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1157,8 +1169,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -7602,7 +7638,7 @@ index 0000000000..224944fecd
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1163,14 +1175,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1169,14 +1181,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -7623,7 +7659,7 @@ index 0000000000..224944fecd
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1849,7 +1861,8 @@ AS_CASE([$arch,$system],
++@@ -1855,7 +1867,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7633,7 +7669,7 @@ index 0000000000..224944fecd
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1898,6 +1911,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1904,6 +1917,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7664,7 +7700,7 @@ index 0000000000..224944fecd
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2039,8 +2076,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2045,8 +2082,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -13318,23 +13354,7 @@ index 0000000000..224944fecd
 ++ 
 ++ let () = Out_channel.set_buffered stdout false
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weakl
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.m
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
