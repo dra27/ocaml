@@ -9,9 +9,7 @@ cst_to_constr
 debug_test
 get_sockaddr
 list_cleanup
-list_concat
 list_init
-list_length
 list_next
 list_next_set
 socket_domain_table
