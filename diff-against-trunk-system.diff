@@ -1,6 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..8067318567
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:44:42.854179634 +0100
+++++ b	2023-09-28 18:44:42.862179954 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
++ --- a/testsuite/tests/lib-runtime-events/test_caml.ml
++ +++ b/testsuite/tests/lib-runtime-events/test_caml.ml
++-@@ -25,7 +25,7 @@ let lifecycle domain_id ts lifecycle_event data =
+++@@ -27,7 +27,7 @@ let lifecycle domain_id ts lifecycle_event data =
++  
++  let runtime_begin domain_id ts phase =
++      match phase with
++@@ -10,7 +10,7 @@
++          begin
++              assert(!major == 0);
++              major := 1
++-@@ -39,7 +39,7 @@ let runtime_begin domain_id ts phase =
+++@@ -41,7 +41,7 @@ let runtime_begin domain_id ts phase =
++  
++  let runtime_end domain_id ts phase =
++      match phase with
++@@ -19,7 +19,7 @@
++          begin
++              assert(!major == 1);
++              major := 0;
++-@@ -76,4 +76,4 @@ let () =
+++@@ -78,4 +78,4 @@ let () =
++          ignore(read_poll cursor callbacks None)
++      done;
++      assert(!got_start);
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -6676,13 +6708,45 @@ index 0000000000..97f5a32db6
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c39e8164cc
+index 0000000000..02753328f0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6655 @@
+@@ -0,0 +1,6657 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..8067318567
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:44:42.854179634 +0100
++++++ b	2023-09-28 18:44:42.862179954 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
+++ --- a/testsuite/tests/lib-runtime-events/test_caml.ml
+++ +++ b/testsuite/tests/lib-runtime-events/test_caml.ml
+++-@@ -25,7 +25,7 @@ let lifecycle domain_id ts lifecycle_event data =
++++@@ -27,7 +27,7 @@ let lifecycle domain_id ts lifecycle_event data =
+++  
+++  let runtime_begin domain_id ts phase =
+++      match phase with
+++@@ -10,7 +10,7 @@
+++          begin
+++              assert(!major == 0);
+++              major := 1
+++-@@ -39,7 +39,7 @@ let runtime_begin domain_id ts phase =
++++@@ -41,7 +41,7 @@ let runtime_begin domain_id ts phase =
+++  
+++  let runtime_end domain_id ts phase =
+++      match phase with
+++@@ -19,7 +19,7 @@
+++          begin
+++              assert(!major == 1);
+++              major := 0;
+++-@@ -76,4 +76,4 @@ let () =
++++@@ -78,4 +78,4 @@ let () =
+++          ignore(read_poll cursor callbacks None)
+++      done;
+++      assert(!got_start);
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -13304,37 +13368,7 @@ index 0000000000..c39e8164cc
 +++ *)
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final
+++  * are unreliabl
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

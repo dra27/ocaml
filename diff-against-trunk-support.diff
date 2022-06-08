@@ -1870,7 +1870,7 @@ index db08937089..8ccaccdf25 100644
  
  external start_runtime_events : unit -> unit = "start_runtime_events"
 diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
-index 02398467b7..88fb80b9cf 100644
+index 1e96998149..6cc9474f2e 100644
 --- a/testsuite/tests/lib-runtime-events/test_caml.ml
 +++ b/testsuite/tests/lib-runtime-events/test_caml.ml
 @@ -1,5 +1,7 @@
