@@ -1,19 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6fe012ad38
+index 0000000000..e96abce7b1
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,10 @@
-+--- a	2023-09-28 18:44:43.770216217 +0100
-++++ b	2023-09-28 18:44:43.774216376 +0100
-+@@ -1,7 +1,3 @@
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/utils/config.common.ml b/utils/config.common.ml
-+ --- a/utils/config.common.ml
-+ +++ b/utils/config.common.ml
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:44:44.282236656 +0100
+++++ b	2023-09-28 18:44:44.298237294 +0100
++@@ -9,26 +9,3 @@
++  
++  ### Language features:
++  
++-diff --git a/VERSION b/VERSION
++---- a/VERSION
++-+++ b/VERSION
++-@@ -1,4 +1,4 @@
++--5.0.0+dev0-2021-11-05
++-+5.0.0+dev1-2021-06-09
++- 
++- # Starting with OCaml 4.14, although the version string that appears above is
++- # still correct and this file can thus still be used to figure it out,
++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
++---- a/build-aux/ocaml_version.m4
++-+++ b/build-aux/ocaml_version.m4
++-@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
++- # for officially-released versions of OCaml.
++--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
++-+m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
++- 
++- # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
++- # single character:
++-diff --git a/configure b/configure
++-Binary files a/configure and b/configure differ
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -27,7 +46,7 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index af89628aaf..9f52987291 100644
+index cef880214f..cb10cde12e 100644
 --- a/Changes
 +++ b/Changes
 @@ -381,13 +381,13 @@ OCaml 4.14.0
@@ -176,11 +195,11 @@ index f011288595..922eb9cfdd 100644
  # Deprecated variables
  
 diff --git a/VERSION b/VERSION
-index 8dfc6cf83f..4ef434f979 100644
+index fb28d0be34..4ef434f979 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1,4 +1,4 @@
--5.0.0+dev0-2021-11-05
+-5.0.0+dev1-2021-06-09
 +5.0.0+jst-backport
  
  # Starting with OCaml 4.14, although the version string that appears above is
@@ -670,14 +689,14 @@ diff --git a/boot/ocamllex b/boot/ocamllex
 index 162bbf47a7..89ef04e943 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-index 2c66a918a3..0a59107ea8 100644
+index d6bcef552a..0a59107ea8 100644
 --- a/build-aux/ocaml_version.m4
 +++ b/build-aux/ocaml_version.m4
 @@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
  m4_define([OCAML__VERSION_PATCHLEVEL], [0])
  # Note that the OCAML__VERSION_EXTRA string defined below is always empty
  # for officially-released versions of OCaml.
--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
+-m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
 +m4_define([OCAML__VERSION_EXTRA], [jst-backport])
  
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
@@ -702,7 +721,7 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 4d47591ca6..fbe1580e88 100755
+index 79659c3ad7..fbe1580e88 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
 index 7c5def33b9..28b48e9c37 100644
@@ -6689,26 +6708,45 @@ index 0000000000..6326e5a2bf
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5e9c00f71b
+index 0000000000..add377eb00
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6654 @@
+@@ -0,0 +1,6656 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6fe012ad38
++index 0000000000..e96abce7b1
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,10 @@
-++--- a	2023-09-28 18:44:43.770216217 +0100
-+++++ b	2023-09-28 18:44:43.774216376 +0100
-++@@ -1,7 +1,3 @@
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/utils/config.common.ml b/utils/config.common.ml
-++ --- a/utils/config.common.ml
-++ +++ b/utils/config.common.ml
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:44:44.282236656 +0100
++++++ b	2023-09-28 18:44:44.298237294 +0100
+++@@ -9,26 +9,3 @@
+++  
+++  ### Language features:
+++  
+++-diff --git a/VERSION b/VERSION
+++---- a/VERSION
+++-+++ b/VERSION
+++-@@ -1,4 +1,4 @@
+++--5.0.0+dev0-2021-11-05
+++-+5.0.0+dev1-2021-06-09
+++- 
+++- # Starting with OCaml 4.14, although the version string that appears above is
+++- # still correct and this file can thus still be used to figure it out,
+++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
+++---- a/build-aux/ocaml_version.m4
+++-+++ b/build-aux/ocaml_version.m4
+++-@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
+++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
+++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
+++- # for officially-released versions of OCaml.
+++--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
+++-+m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
+++- 
+++- # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
+++- # single character:
+++-diff --git a/configure b/configure
+++-Binary files a/configure and b/configure differ
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -6722,7 +6760,7 @@ index 0000000000..5e9c00f71b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index af89628aaf..9f52987291 100644
++index cef880214f..cb10cde12e 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -381,13 +381,13 @@ OCaml 4.14.0
@@ -6871,11 +6909,11 @@ index 0000000000..5e9c00f71b
 + # Deprecated variables
 + 
 +diff --git a/VERSION b/VERSION
-+index 8dfc6cf83f..4ef434f979 100644
++index fb28d0be34..4ef434f979 100644
 +--- a/VERSION
 ++++ b/VERSION
 +@@ -1,4 +1,4 @@
-+-5.0.0+dev0-2021-11-05
++-5.0.0+dev1-2021-06-09
 ++5.0.0+jst-backport
 + 
 + # Starting with OCaml 4.14, although the version string that appears above is
@@ -7365,14 +7403,14 @@ index 0000000000..5e9c00f71b
 +index 162bbf47a7..89ef04e943 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+index 2c66a918a3..0a59107ea8 100644
++index d6bcef552a..0a59107ea8 100644
 +--- a/build-aux/ocaml_version.m4
 ++++ b/build-aux/ocaml_version.m4
 +@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
 + m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 + # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 + # for officially-released versions of OCaml.
-+-m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
++-m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
 ++m4_define([OCAML__VERSION_EXTRA], [jst-backport])
 + 
 + # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
@@ -7397,7 +7435,7 @@ index 0000000000..5e9c00f71b
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 4d47591ca6..fbe1580e88 100755
++index 79659c3ad7..fbe1580e88 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
 +index 7c5def33b9..28b48e9c37 100644
@@ -13329,24 +13367,7 @@ index 0000000000..5e9c00f71b
 +++   reason = "OCaml 5 only"
 +++ *)
 ++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-e
+++ (* Due to GCs running at non-deterministic places, the output from the
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
