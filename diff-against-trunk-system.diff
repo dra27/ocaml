@@ -1,33 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e96abce7b1
+index 0000000000..b466f344a4
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:44:44.282236656 +0100
-++++ b	2023-09-28 18:44:44.298237294 +0100
-+@@ -9,26 +9,3 @@
-+  
-+  ### Language features:
+@@ -0,0 +1,34 @@
++--- a	2023-09-28 18:44:44.598249267 +0100
+++++ b	2023-09-28 18:44:44.614249905 +0100
++@@ -30,31 +30,3 @@
++  OCaml 5.0
++  ---------
 +  
 +-diff --git a/VERSION b/VERSION
 +---- a/VERSION
 +-+++ b/VERSION
 +-@@ -1,4 +1,4 @@
-+--5.0.0+dev0-2021-11-05
-+-+5.0.0+dev1-2021-06-09
++--5.0.0+dev1-2021-06-09
++-+5.1.0+dev1-2020-06-09
 +- 
 +- # Starting with OCaml 4.14, although the version string that appears above is
 +- # still correct and this file can thus still be used to figure it out,
 +-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +---- a/build-aux/ocaml_version.m4
 +-+++ b/build-aux/ocaml_version.m4
-+-@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
++-@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
++- # including the patchlevel, are mandatory.
++- 
++- m4_define([OCAML__VERSION_MAJOR], [5])
++--m4_define([OCAML__VERSION_MINOR], [0])
++-+m4_define([OCAML__VERSION_MINOR], [1])
 +- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 +- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 +- # for officially-released versions of OCaml.
-+--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
-+-+m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
++--m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
++-+m4_define([OCAML__VERSION_EXTRA], [dev1-2020-06-09])
 +- 
 +- # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
 +- # single character:
@@ -46,10 +51,10 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index cef880214f..cb10cde12e 100644
+index 31dc2b6756..5ad6a007f0 100644
 --- a/Changes
 +++ b/Changes
-@@ -381,13 +381,13 @@ OCaml 4.14.0
+@@ -406,13 +406,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -65,7 +70,7 @@ index cef880214f..cb10cde12e 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -487,6 +487,9 @@ OCaml 4.14.0
+@@ -512,6 +512,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -75,7 +80,7 @@ index cef880214f..cb10cde12e 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -742,6 +745,9 @@ OCaml 4.14.0
+@@ -767,6 +770,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -195,11 +200,11 @@ index f011288595..922eb9cfdd 100644
  # Deprecated variables
  
 diff --git a/VERSION b/VERSION
-index fb28d0be34..4ef434f979 100644
+index 7e65c2d531..4ef434f979 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1,4 +1,4 @@
--5.0.0+dev1-2021-06-09
+-5.1.0+dev1-2020-06-09
 +5.0.0+jst-backport
  
  # Starting with OCaml 4.14, although the version string that appears above is
@@ -689,14 +694,19 @@ diff --git a/boot/ocamllex b/boot/ocamllex
 index 162bbf47a7..89ef04e943 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-index d6bcef552a..0a59107ea8 100644
+index 84a9706355..0a59107ea8 100644
 --- a/build-aux/ocaml_version.m4
 +++ b/build-aux/ocaml_version.m4
-@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
+@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
+ # including the patchlevel, are mandatory.
+ 
+ m4_define([OCAML__VERSION_MAJOR], [5])
+-m4_define([OCAML__VERSION_MINOR], [1])
++m4_define([OCAML__VERSION_MINOR], [0])
  m4_define([OCAML__VERSION_PATCHLEVEL], [0])
  # Note that the OCAML__VERSION_EXTRA string defined below is always empty
  # for officially-released versions of OCaml.
--m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
+-m4_define([OCAML__VERSION_EXTRA], [dev1-2020-06-09])
 +m4_define([OCAML__VERSION_EXTRA], [jst-backport])
  
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
@@ -721,7 +731,7 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 79659c3ad7..fbe1580e88 100755
+index 5100a8ca39..fbe1580e88 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
 index 7c5def33b9..28b48e9c37 100644
@@ -6708,40 +6718,45 @@ index 0000000000..6326e5a2bf
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..add377eb00
+index 0000000000..b61500d952
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6656 @@
+@@ -0,0 +1,6655 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e96abce7b1
++index 0000000000..b466f344a4
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:44:44.282236656 +0100
-+++++ b	2023-09-28 18:44:44.298237294 +0100
-++@@ -9,26 +9,3 @@
-++  
-++  ### Language features:
++@@ -0,0 +1,34 @@
+++--- a	2023-09-28 18:44:44.598249267 +0100
++++++ b	2023-09-28 18:44:44.614249905 +0100
+++@@ -30,31 +30,3 @@
+++  OCaml 5.0
+++  ---------
 ++  
 ++-diff --git a/VERSION b/VERSION
 ++---- a/VERSION
 ++-+++ b/VERSION
 ++-@@ -1,4 +1,4 @@
-++--5.0.0+dev0-2021-11-05
-++-+5.0.0+dev1-2021-06-09
+++--5.0.0+dev1-2021-06-09
+++-+5.1.0+dev1-2020-06-09
 ++- 
 ++- # Starting with OCaml 4.14, although the version string that appears above is
 ++- # still correct and this file can thus still be used to figure it out,
 ++-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 ++---- a/build-aux/ocaml_version.m4
 ++-+++ b/build-aux/ocaml_version.m4
-++-@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
+++-@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
+++- # including the patchlevel, are mandatory.
+++- 
+++- m4_define([OCAML__VERSION_MAJOR], [5])
+++--m4_define([OCAML__VERSION_MINOR], [0])
+++-+m4_define([OCAML__VERSION_MINOR], [1])
 ++- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 ++- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 ++- # for officially-released versions of OCaml.
-++--m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
-++-+m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
+++--m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
+++-+m4_define([OCAML__VERSION_EXTRA], [dev1-2020-06-09])
 ++- 
 ++- # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
 ++- # single character:
@@ -6760,10 +6775,10 @@ index 0000000000..add377eb00
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index cef880214f..cb10cde12e 100644
++index 31dc2b6756..5ad6a007f0 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -381,13 +381,13 @@ OCaml 4.14.0
++@@ -406,13 +406,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6779,7 +6794,7 @@ index 0000000000..add377eb00
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -487,6 +487,9 @@ OCaml 4.14.0
++@@ -512,6 +512,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6789,7 +6804,7 @@ index 0000000000..add377eb00
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -742,6 +745,9 @@ OCaml 4.14.0
++@@ -767,6 +770,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6909,11 +6924,11 @@ index 0000000000..add377eb00
 + # Deprecated variables
 + 
 +diff --git a/VERSION b/VERSION
-+index fb28d0be34..4ef434f979 100644
++index 7e65c2d531..4ef434f979 100644
 +--- a/VERSION
 ++++ b/VERSION
 +@@ -1,4 +1,4 @@
-+-5.0.0+dev1-2021-06-09
++-5.1.0+dev1-2020-06-09
 ++5.0.0+jst-backport
 + 
 + # Starting with OCaml 4.14, although the version string that appears above is
@@ -7403,14 +7418,19 @@ index 0000000000..add377eb00
 +index 162bbf47a7..89ef04e943 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+index d6bcef552a..0a59107ea8 100644
++index 84a9706355..0a59107ea8 100644
 +--- a/build-aux/ocaml_version.m4
 ++++ b/build-aux/ocaml_version.m4
-+@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
++@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
++ # including the patchlevel, are mandatory.
++ 
++ m4_define([OCAML__VERSION_MAJOR], [5])
++-m4_define([OCAML__VERSION_MINOR], [1])
+++m4_define([OCAML__VERSION_MINOR], [0])
 + m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 + # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 + # for officially-released versions of OCaml.
-+-m4_define([OCAML__VERSION_EXTRA], [dev1-2021-06-09])
++-m4_define([OCAML__VERSION_EXTRA], [dev1-2020-06-09])
 ++m4_define([OCAML__VERSION_EXTRA], [jst-backport])
 + 
 + # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
@@ -7435,7 +7455,7 @@ index 0000000000..add377eb00
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 79659c3ad7..fbe1580e88 100755
++index 5100a8ca39..fbe1580e88 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
 +index 7c5def33b9..28b48e9c37 100644
@@ -13356,18 +13376,7 @@ index 0000000000..add377eb00
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from the
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
