@@ -1,6 +1,19 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..6fe012ad38
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,10 @@
++--- a	2023-09-28 18:44:43.770216217 +0100
+++++ b	2023-09-28 18:44:43.774216376 +0100
++@@ -1,7 +1,3 @@
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/utils/config.common.ml b/utils/config.common.ml
++ --- a/utils/config.common.ml
++ +++ b/utils/config.common.ml
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -651,10 +664,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 690899c87b..3634dfd1f5 100755
+index 83f81630e6..3634dfd1f5 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 66008fe9e2..89ef04e943 100755
+index 162bbf47a7..89ef04e943 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 2c66a918a3..0a59107ea8 100644
@@ -6676,13 +6689,26 @@ index 0000000000..6326e5a2bf
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ab2c8b282b
+index 0000000000..5e9c00f71b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6655 @@
+@@ -0,0 +1,6654 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..6fe012ad38
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,10 @@
+++--- a	2023-09-28 18:44:43.770216217 +0100
++++++ b	2023-09-28 18:44:43.774216376 +0100
+++@@ -1,7 +1,3 @@
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/utils/config.common.ml b/utils/config.common.ml
+++ --- a/utils/config.common.ml
+++ +++ b/utils/config.common.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -7333,10 +7359,10 @@ index 0000000000..ab2c8b282b
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 690899c87b..3634dfd1f5 100755
++index 83f81630e6..3634dfd1f5 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 66008fe9e2..89ef04e943 100755
++index 162bbf47a7..89ef04e943 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 2c66a918a3..0a59107ea8 100644
@@ -13320,21 +13346,7 @@ index 0000000000..ab2c8b282b
 ++ 
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final
+++--- a/testsuite/tests/weak-e
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -15555,7 +15567,7 @@ index 0000000000..00d51897e0
 +     };
 +};
 diff --git a/utils/config.common.ml b/utils/config.common.ml
-index 13eb6392b8..d9d88cc19b 100644
+index b54bf1941b..0c866c93d4 100644
 --- a/utils/config.common.ml
 +++ b/utils/config.common.ml
 @@ -62,8 +62,13 @@ let max_tag = 243
