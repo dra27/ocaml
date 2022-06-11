@@ -253,7 +253,8 @@ static int error_table[] = {
   EHOSTUNREACH, ELOOP, EOVERFLOW /*, EUNKNOWNERR */
 };
 
-static const value * unix_error_exn = NULL;
+/* This doesn't need to be prefixed, but it's easier */
+static const value * caml_unix_error_exn = NULL;
 
 value caml_unix_error_of_code (int errcode)
 {
@@ -295,14 +296,14 @@ void caml_unix_error(int errcode, const char *cmdname, value cmdarg)
     arg = cmdarg == Nothing ? caml_copy_string("") : cmdarg;
     name = caml_copy_string(cmdname);
     err = caml_unix_error_of_code (errcode);
-    if (unix_error_exn == NULL) {
-      unix_error_exn = caml_named_value("Unix.Unix_error");
-      if (unix_error_exn == NULL)
+    if (caml_unix_error_exn == NULL) {
+      caml_unix_error_exn = caml_named_value("Unix.Unix_error");
+      if (caml_unix_error_exn == NULL)
         caml_invalid_argument("Exception Unix.Unix_error not initialized,"
                          " please link unix.cma");
     }
     res = caml_alloc_small(4, 0);
-    Field(res, 0) = *unix_error_exn;
+    Field(res, 0) = *caml_unix_error_exn;
     Field(res, 1) = err;
     Field(res, 2) = name;
     Field(res, 3) = arg;
