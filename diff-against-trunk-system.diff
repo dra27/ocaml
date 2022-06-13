@@ -1,6 +1,100 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..5dc42900b9
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,91 @@
++--- a	2023-09-28 18:44:46.226314202 +0100
+++++ b	2023-09-28 18:44:46.266315797 +0100
++@@ -12,7 +12,7 @@
++  ### Code generation and optimizations:
++  
++  - #10578: Increase the number of integer registers used for
++-@@ -535,6 +539,10 @@ OCaml 4.14.0
+++@@ -538,6 +542,10 @@ OCaml 4.14.0
++    WSADuplicateSocket on sockets instead of DuplicateHandle.
++    (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
++  
++@@ -1309,24 +1309,24 @@
++ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
++ --- a/otherlibs/unix/fork.c
++ +++ b/otherlibs/unix/fork.c
++-@@ -33,7 +33,7 @@ void caml_atfork_child() {
++-   CAML_EV_LIFECYCLE(EV_FORK_CHILD, 0);
+++@@ -39,7 +39,7 @@ void caml_atfork_child() {
++  }
+++ #endif
++  
++ -CAMLprim value unix_fork(value unit)
++ +CAMLprim value caml_unix_fork(value unit)
++  {
++    int ret;
++-   if (caml_domain_is_multicore()) {
++-@@ -43,7 +43,7 @@ CAMLprim value unix_fork(value unit)
++- 
++-   ret = fork();
++- 
+++ #if 0 /* BACKPORT */
+++@@ -57,7 +57,7 @@ CAMLprim value unix_fork(value unit)
+++ #if 0 /* BACKPORT */
+++   if (ret == 0) caml_atfork_hook();
+++ #endif
++ -  if (ret == -1) uerror("fork", Nothing);
++ +  if (ret == -1) caml_uerror("fork", Nothing);
++  
+++ #if 0 /* BACKPORT BEGIN */
++    if (ret == 0) {
++-     caml_atfork_child();
++ diff --git a/otherlibs/unix/fsync.c b/otherlibs/unix/fsync.c
++ --- a/otherlibs/unix/fsync.c
++ +++ b/otherlibs/unix/fsync.c
++@@ -3843,7 +3843,7 @@
++ diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
++ --- a/otherlibs/unix/signals.c
++ +++ b/otherlibs/unix/signals.c
++-@@ -54,7 +54,7 @@ static value encode_sigset(sigset_t * set)
+++@@ -66,7 +66,7 @@ static value encode_sigset(sigset_t * set)
++  
++  static int sigprocmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
++  
++@@ -3852,7 +3852,7 @@
++  {
++    int how;
++    sigset_t set, oldset;
++-@@ -67,16 +67,16 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+++@@ -83,11 +83,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
++    caml_leave_blocking_section();
++    /* Run any handlers for just-unmasked pending signals */
++    caml_process_pending_actions();
++@@ -3865,14 +3865,17 @@
++ +CAMLprim value caml_unix_sigpending(value unit)
++  {
++    sigset_t pending;
+++ /* BACKPORT BEGIN */
+++@@ -97,7 +97,7 @@ CAMLprim value unix_sigpending(value unit)
++    int i, j;
++    uintnat curr;
+++ #endif
++ -  if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
++ +  if (sigpending(&pending) == -1) caml_uerror("sigpending", Nothing);
+++ #if 0 /* BACKPORT */
++    for (i = 0; i < NSIG_WORDS; i++) {
++      curr = atomic_load(&caml_pending_signals[i]);
++-     if (curr == 0) continue;
++-@@ -88,7 +88,7 @@ CAMLprim value unix_sigpending(value unit)
+++@@ -116,7 +116,7 @@ CAMLprim value unix_sigpending(value unit)
++    return encode_sigset(&pending);
++  }
++  
++@@ -3881,7 +3884,7 @@
++  {
++    sigset_t set;
++    int retcode;
++-@@ -96,19 +96,19 @@ CAMLprim value unix_sigsuspend(value vset)
+++@@ -124,19 +124,19 @@ CAMLprim value unix_sigsuspend(value vset)
++    caml_enter_blocking_section();
++    retcode = sigsuspend(&set);
++    caml_leave_blocking_section();
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -14,7 +108,7 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 76f0ae8b5a..a25120d904 100644
+index ca7087eb74..493c0b6268 100644
 --- a/Changes
 +++ b/Changes
 @@ -415,13 +415,13 @@ OCaml 4.14.0
@@ -33,7 +127,7 @@ index 76f0ae8b5a..a25120d904 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -521,6 +521,9 @@ OCaml 4.14.0
+@@ -525,6 +525,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -43,7 +137,7 @@ index 76f0ae8b5a..a25120d904 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -776,6 +779,9 @@ OCaml 4.14.0
+@@ -784,6 +787,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6700,13 +6794,107 @@ index 0000000000..17c10814dd
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..260dcdc2b1
+index 0000000000..be14763312
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6654 @@
+@@ -0,0 +1,6778 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..5dc42900b9
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,91 @@
+++--- a	2023-09-28 18:44:46.226314202 +0100
++++++ b	2023-09-28 18:44:46.266315797 +0100
+++@@ -12,7 +12,7 @@
+++  ### Code generation and optimizations:
+++  
+++  - #10578: Increase the number of integer registers used for
+++-@@ -535,6 +539,10 @@ OCaml 4.14.0
++++@@ -538,6 +542,10 @@ OCaml 4.14.0
+++    WSADuplicateSocket on sockets instead of DuplicateHandle.
+++    (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
+++  
+++@@ -1309,24 +1309,24 @@
+++ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
+++ --- a/otherlibs/unix/fork.c
+++ +++ b/otherlibs/unix/fork.c
+++-@@ -33,7 +33,7 @@ void caml_atfork_child() {
+++-   CAML_EV_LIFECYCLE(EV_FORK_CHILD, 0);
++++@@ -39,7 +39,7 @@ void caml_atfork_child() {
+++  }
++++ #endif
+++  
+++ -CAMLprim value unix_fork(value unit)
+++ +CAMLprim value caml_unix_fork(value unit)
+++  {
+++    int ret;
+++-   if (caml_domain_is_multicore()) {
+++-@@ -43,7 +43,7 @@ CAMLprim value unix_fork(value unit)
+++- 
+++-   ret = fork();
+++- 
++++ #if 0 /* BACKPORT */
++++@@ -57,7 +57,7 @@ CAMLprim value unix_fork(value unit)
++++ #if 0 /* BACKPORT */
++++   if (ret == 0) caml_atfork_hook();
++++ #endif
+++ -  if (ret == -1) uerror("fork", Nothing);
+++ +  if (ret == -1) caml_uerror("fork", Nothing);
+++  
++++ #if 0 /* BACKPORT BEGIN */
+++    if (ret == 0) {
+++-     caml_atfork_child();
+++ diff --git a/otherlibs/unix/fsync.c b/otherlibs/unix/fsync.c
+++ --- a/otherlibs/unix/fsync.c
+++ +++ b/otherlibs/unix/fsync.c
+++@@ -3843,7 +3843,7 @@
+++ diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
+++ --- a/otherlibs/unix/signals.c
+++ +++ b/otherlibs/unix/signals.c
+++-@@ -54,7 +54,7 @@ static value encode_sigset(sigset_t * set)
++++@@ -66,7 +66,7 @@ static value encode_sigset(sigset_t * set)
+++  
+++  static int sigprocmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
+++  
+++@@ -3852,7 +3852,7 @@
+++  {
+++    int how;
+++    sigset_t set, oldset;
+++-@@ -67,16 +67,16 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
++++@@ -83,11 +83,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+++    caml_leave_blocking_section();
+++    /* Run any handlers for just-unmasked pending signals */
+++    caml_process_pending_actions();
+++@@ -3865,14 +3865,17 @@
+++ +CAMLprim value caml_unix_sigpending(value unit)
+++  {
+++    sigset_t pending;
++++ /* BACKPORT BEGIN */
++++@@ -97,7 +97,7 @@ CAMLprim value unix_sigpending(value unit)
+++    int i, j;
+++    uintnat curr;
++++ #endif
+++ -  if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
+++ +  if (sigpending(&pending) == -1) caml_uerror("sigpending", Nothing);
++++ #if 0 /* BACKPORT */
+++    for (i = 0; i < NSIG_WORDS; i++) {
+++      curr = atomic_load(&caml_pending_signals[i]);
+++-     if (curr == 0) continue;
+++-@@ -88,7 +88,7 @@ CAMLprim value unix_sigpending(value unit)
++++@@ -116,7 +116,7 @@ CAMLprim value unix_sigpending(value unit)
+++    return encode_sigset(&pending);
+++  }
+++  
+++@@ -3881,7 +3884,7 @@
+++  {
+++    sigset_t set;
+++    int retcode;
+++-@@ -96,19 +96,19 @@ CAMLprim value unix_sigsuspend(value vset)
++++@@ -124,19 +124,19 @@ CAMLprim value unix_sigsuspend(value vset)
+++    caml_enter_blocking_section();
+++    retcode = sigsuspend(&set);
+++    caml_leave_blocking_section();
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -6720,7 +6908,7 @@ index 0000000000..260dcdc2b1
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 76f0ae8b5a..a25120d904 100644
++index ca7087eb74..493c0b6268 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -415,13 +415,13 @@ OCaml 4.14.0
@@ -6739,7 +6927,7 @@ index 0000000000..260dcdc2b1
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -521,6 +521,9 @@ OCaml 4.14.0
++@@ -525,6 +525,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6749,7 +6937,7 @@ index 0000000000..260dcdc2b1
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -776,6 +779,9 @@ OCaml 4.14.0
++@@ -784,6 +787,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -13357,7 +13545,37 @@ index 0000000000..260dcdc2b1
 ++index 666a55efeb..5a36157e0e 100644
 ++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14356,7 +14574,7 @@ index fa77d41b14..8c67db8ba3 100644
    match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
  let wait_timed_write fd d =
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
-index 38650426e4..f8ecea8c9f 100644
+index 55206323de..c12e4db68f 100644
 --- a/otherlibs/unix/fork.c
 +++ b/otherlibs/unix/fork.c
 @@ -17,11 +17,16 @@
@@ -14382,7 +14600,7 @@ index 38650426e4..f8ecea8c9f 100644
  }
 +#endif
  
- CAMLprim value unix_fork(value unit)
+ CAMLprim value caml_unix_fork(value unit)
  {
    int ret;
 +#if 0 /* BACKPORT */
@@ -14401,13 +14619,13 @@ index 38650426e4..f8ecea8c9f 100644
 +#if 0 /* BACKPORT */
 +  if (ret == 0) caml_atfork_hook();
 +#endif
-   if (ret == -1) uerror("fork", Nothing);
+   if (ret == -1) caml_uerror("fork", Nothing);
  
 +#if 0 /* BACKPORT BEGIN */
    if (ret == 0) {
      caml_atfork_child();
      /* the following hook can be redefined in other places */
-@@ -52,6 +67,12 @@ CAMLprim value unix_fork(value unit)
+@@ -52,6 +67,12 @@ CAMLprim value caml_unix_fork(value unit)
    } else {
      caml_atfork_parent(ret);
    }
@@ -14421,7 +14639,7 @@ index 38650426e4..f8ecea8c9f 100644
    if (caml_debugger_in_use)
      if ((caml_debugger_fork_mode && ret == 0) ||
 diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
-index 3d03d5cff3..24e7218699 100644
+index b9cc32040e..7f83d8b537 100644
 --- a/otherlibs/unix/signals.c
 +++ b/otherlibs/unix/signals.c
 @@ -25,6 +25,12 @@
@@ -14453,7 +14671,7 @@ index 3d03d5cff3..24e7218699 100644
        res = newcons;
      }
    CAMLreturn(res);
-@@ -63,7 +75,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+@@ -63,7 +75,11 @@ CAMLprim value caml_unix_sigprocmask(value vaction, value vset)
    how = sigprocmask_cmd[Int_val(vaction)];
    decode_sigset(vset, &set);
    caml_enter_blocking_section();
@@ -14465,8 +14683,8 @@ index 3d03d5cff3..24e7218699 100644
    caml_leave_blocking_section();
    /* Run any handlers for just-unmasked pending signals */
    caml_process_pending_actions();
-@@ -74,9 +90,15 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
- CAMLprim value unix_sigpending(value unit)
+@@ -74,9 +90,15 @@ CAMLprim value caml_unix_sigprocmask(value vaction, value vset)
+ CAMLprim value caml_unix_sigpending(value unit)
  {
    sigset_t pending;
 +/* BACKPORT BEGIN */
@@ -14476,12 +14694,12 @@ index 3d03d5cff3..24e7218699 100644
    int i, j;
    uintnat curr;
 +#endif
-   if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
+   if (sigpending(&pending) == -1) caml_uerror("sigpending", Nothing);
 +#if 0 /* BACKPORT */
    for (i = 0; i < NSIG_WORDS; i++) {
      curr = atomic_load(&caml_pending_signals[i]);
      if (curr == 0) continue;
-@@ -85,6 +107,12 @@ CAMLprim value unix_sigpending(value unit)
+@@ -85,6 +107,12 @@ CAMLprim value caml_unix_sigpending(value unit)
        sigaddset(&pending, i * BITS_PER_WORD + j + 1);
      }
    }
@@ -14495,10 +14713,10 @@ index 3d03d5cff3..24e7218699 100644
  }
  
 diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
-index 114c45ec0e..0773e964c8 100644
+index ead9aca9d8..5f09fe0843 100644
 --- a/otherlibs/unix/unixsupport.h
 +++ b/otherlibs/unix/unixsupport.h
-@@ -122,4 +122,8 @@ extern void unix_clear_cloexec(int fd, char * cmdname, value arg);
+@@ -135,4 +135,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
  #define EXECV_CAST
  #endif
  
