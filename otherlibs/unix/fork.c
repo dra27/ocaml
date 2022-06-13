@@ -35,7 +35,7 @@ void caml_atfork_child() {
 }
 #endif
 
-CAMLprim value unix_fork(value unit)
+CAMLprim value caml_unix_fork(value unit)
 {
   int ret;
 #if 0
@@ -48,10 +48,18 @@ CAMLprim value unix_fork(value unit)
   CAML_EV_FLUSH();
 
   ret = fork();
+<<<<<<< HEAD
 #if 0
   if (ret == 0) caml_atfork_hook();
 #endif
   if (ret == -1) uerror("fork", Nothing);
+||||||| parent of 6887832153 (Merge pull request PR#10926 from dra27/check-symbols)
+
+  if (ret == -1) uerror("fork", Nothing);
+=======
+
+  if (ret == -1) caml_uerror("fork", Nothing);
+>>>>>>> 6887832153 (Merge pull request PR#10926 from dra27/check-symbols)
 
 #if 0
   if (ret == 0) {
