@@ -39,7 +39,7 @@ void caml_atfork_child() {
 }
 #endif
 
-CAMLprim value unix_fork(value unit)
+CAMLprim value caml_unix_fork(value unit)
 {
   int ret;
 #if 0 /* BACKPORT */
@@ -57,7 +57,7 @@ CAMLprim value unix_fork(value unit)
 #if 0 /* BACKPORT */
   if (ret == 0) caml_atfork_hook();
 #endif
-  if (ret == -1) uerror("fork", Nothing);
+  if (ret == -1) caml_uerror("fork", Nothing);
 
 #if 0 /* BACKPORT BEGIN */
   if (ret == 0) {
