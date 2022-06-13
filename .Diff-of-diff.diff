@@ -1,91 +1,11 @@
---- a	2023-09-28 18:44:46.226314202 +0100
-+++ b	2023-09-28 18:44:46.266315797 +0100
-@@ -12,7 +12,7 @@
-  ### Code generation and optimizations:
-  
-  - #10578: Increase the number of integer registers used for
--@@ -535,6 +539,10 @@ OCaml 4.14.0
-+@@ -538,6 +542,10 @@ OCaml 4.14.0
+--- a	2023-09-28 18:44:46.882340350 +0100
++++ b	2023-09-28 18:44:46.902341147 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -539,9 +539,8 @@ OCaml 4.14.0
++@@ -542,9 +542,8 @@ OCaml 4.14.0
     WSADuplicateSocket on sockets instead of DuplicateHandle.
     (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
   
-@@ -1309,24 +1309,24 @@
- diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
- --- a/otherlibs/unix/fork.c
- +++ b/otherlibs/unix/fork.c
--@@ -33,7 +33,7 @@ void caml_atfork_child() {
--   CAML_EV_LIFECYCLE(EV_FORK_CHILD, 0);
-+@@ -39,7 +39,7 @@ void caml_atfork_child() {
-  }
-+ #endif
-  
- -CAMLprim value unix_fork(value unit)
- +CAMLprim value caml_unix_fork(value unit)
-  {
-    int ret;
--   if (caml_domain_is_multicore()) {
--@@ -43,7 +43,7 @@ CAMLprim value unix_fork(value unit)
-- 
--   ret = fork();
-- 
-+ #if 0 /* BACKPORT */
-+@@ -57,7 +57,7 @@ CAMLprim value unix_fork(value unit)
-+ #if 0 /* BACKPORT */
-+   if (ret == 0) caml_atfork_hook();
-+ #endif
- -  if (ret == -1) uerror("fork", Nothing);
- +  if (ret == -1) caml_uerror("fork", Nothing);
-  
-+ #if 0 /* BACKPORT BEGIN */
-    if (ret == 0) {
--     caml_atfork_child();
- diff --git a/otherlibs/unix/fsync.c b/otherlibs/unix/fsync.c
- --- a/otherlibs/unix/fsync.c
- +++ b/otherlibs/unix/fsync.c
-@@ -3843,7 +3843,7 @@
- diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
- --- a/otherlibs/unix/signals.c
- +++ b/otherlibs/unix/signals.c
--@@ -54,7 +54,7 @@ static value encode_sigset(sigset_t * set)
-+@@ -66,7 +66,7 @@ static value encode_sigset(sigset_t * set)
-  
-  static int sigprocmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
-  
-@@ -3852,7 +3852,7 @@
-  {
-    int how;
-    sigset_t set, oldset;
--@@ -67,16 +67,16 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
-+@@ -83,11 +83,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
-    caml_leave_blocking_section();
-    /* Run any handlers for just-unmasked pending signals */
-    caml_process_pending_actions();
-@@ -3865,14 +3865,17 @@
- +CAMLprim value caml_unix_sigpending(value unit)
-  {
-    sigset_t pending;
-+ /* BACKPORT BEGIN */
-+@@ -97,7 +97,7 @@ CAMLprim value unix_sigpending(value unit)
-    int i, j;
-    uintnat curr;
-+ #endif
- -  if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
- +  if (sigpending(&pending) == -1) caml_uerror("sigpending", Nothing);
-+ #if 0 /* BACKPORT */
-    for (i = 0; i < NSIG_WORDS; i++) {
-      curr = atomic_load(&caml_pending_signals[i]);
--     if (curr == 0) continue;
--@@ -88,7 +88,7 @@ CAMLprim value unix_sigpending(value unit)
-+@@ -116,7 +116,7 @@ CAMLprim value unix_sigpending(value unit)
-    return encode_sigset(&pending);
-  }
-  
-@@ -3881,7 +3884,7 @@
-  {
-    sigset_t set;
-    int retcode;
--@@ -96,19 +96,19 @@ CAMLprim value unix_sigsuspend(value vset)
-+@@ -124,19 +124,19 @@ CAMLprim value unix_sigsuspend(value vset)
-    caml_enter_blocking_section();
-    retcode = sigsuspend(&set);
-    caml_leave_blocking_section();
