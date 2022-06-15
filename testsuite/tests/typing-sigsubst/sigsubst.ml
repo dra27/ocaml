@@ -24,11 +24,29 @@ end
 Line 3, characters 2-36:
 3 |   include Comparable with type t = t
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<<<<<<< HEAD
 Error: Illegal shadowing of included type t/280 by t/285
+||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+Error: Illegal shadowing of included type t/285 by t/290
+=======
+Error: Illegal shadowing of included type t/304 by t/309
+>>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
        Line 2, characters 2-19:
+<<<<<<< HEAD
          Type t/280 came from this include
+||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+         Type t/285 came from this include
+=======
+         Type t/304 came from this include
+>>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
        Line 3, characters 2-23:
+<<<<<<< HEAD
          The value print has no valid type if t/280 is shadowed
+||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+         The value print has no valid type if t/285 is shadowed
+=======
+         The value print has no valid type if t/304 is shadowed
+>>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
 |}]
 
 module type Sunderscore = sig

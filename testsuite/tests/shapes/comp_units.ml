@@ -25,7 +25,13 @@ module Mproj = Unit
 module F (X : sig type t end) = X
 [%%expect{|
 {
+<<<<<<< HEAD
  "F"[module] -> Abs<.4>(X/273, X/273<.3>);
+||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+ "F"[module] -> Abs<.4>(X/278, X/278<.3>);
+=======
+ "F"[module] -> Abs<.4>(X/297, X/297<.3>);
+>>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
  }
 module F : functor (X : sig type t end) -> sig type t = X.t end
 |}]
