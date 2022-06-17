@@ -54,10 +54,10 @@ index b1a5ab6550..d29834d8fd 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 5181edd869..23865a628b 100644
+index 30ab16f83e..f9ca398a37 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -578,7 +578,6 @@ partialclean::
+@@ -580,7 +580,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -65,7 +65,7 @@ index 5181edd869..23865a628b 100644
    afl \
    alloc \
    array \
-@@ -586,24 +585,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -588,24 +587,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -93,7 +93,7 @@ index 5181edd869..23865a628b 100644
    main \
    major_gc \
    md5 \
-@@ -614,17 +613,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -616,17 +615,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -111,7 +111,7 @@ index 5181edd869..23865a628b 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -634,6 +628,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -636,6 +630,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -121,7 +121,7 @@ index 5181edd869..23865a628b 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -644,7 +641,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -646,7 +643,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -130,7 +130,7 @@ index 5181edd869..23865a628b 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1044,7 +1041,9 @@ clean::
+@@ -1046,7 +1043,9 @@ clean::
  
  # Dependencies
  
@@ -141,7 +141,7 @@ index 5181edd869..23865a628b 100644
    debugger lex ocamldoc ocamltest tools
  
  .PHONY: alldepend
-@@ -1100,6 +1099,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1102,6 +1101,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
@@ -6700,7 +6700,7 @@ index 0000000000..d77f466729
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..164427db2f
+index 0000000000..29a9b9de16
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,6654 @@
@@ -6760,10 +6760,10 @@ index 0000000000..164427db2f
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 5181edd869..23865a628b 100644
++index 30ab16f83e..f9ca398a37 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -578,7 +578,6 @@ partialclean::
++@@ -580,7 +580,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -6771,7 +6771,7 @@ index 0000000000..164427db2f
 +   afl \
 +   alloc \
 +   array \
-+@@ -586,24 +585,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -588,24 +587,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -6799,7 +6799,7 @@ index 0000000000..164427db2f
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -614,17 +613,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -616,17 +615,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -6817,7 +6817,7 @@ index 0000000000..164427db2f
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -634,6 +628,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -636,6 +630,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -6827,7 +6827,7 @@ index 0000000000..164427db2f
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -644,7 +641,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -646,7 +643,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -6836,7 +6836,7 @@ index 0000000000..164427db2f
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1044,7 +1041,9 @@ clean::
++@@ -1046,7 +1043,9 @@ clean::
 + 
 + # Dependencies
 + 
@@ -6847,7 +6847,7 @@ index 0000000000..164427db2f
 +   debugger lex ocamldoc ocamltest tools
 + 
 + .PHONY: alldepend
-+@@ -1100,6 +1099,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1102,6 +1101,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
