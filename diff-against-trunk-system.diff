@@ -1,40 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..66e970e165
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,31 @@
-+--- a	2023-09-28 18:44:47.714373495 +0100
-++++ b	2023-09-28 18:44:47.742374611 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -807,6 +807,9 @@ OCaml 4.14.0
-++@@ -813,6 +813,9 @@ OCaml 4.14.0
-+    (Xavier Leroy, report by Rehan Malak, review by Gabriel Scherer and
-+     Vincent Laviron)
-+  
-+@@ -11,7 +11,7 @@
-+  - #10473: Add CFI directives to RISC-V runtime and asmcomp.
-+    This allows stacktraces to work in gdb through C and OCaml calls.
-+    (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
-+-@@ -1443,8 +1446,8 @@ OCaml 4.13.0 (24 September 2021)
-++@@ -1449,8 +1452,8 @@ OCaml 4.13.0 (24 September 2021)
-+    when the systhreads library is loaded.
-+    (David Allsopp, report by Anton Bachin, review by Xavier Leroy)
-+  
-+@@ -22,10 +22,6 @@
-+    (Jacques Garrigue, report and review by Thomas Refis)
-+  
-+  - #8917, #8929, #9889, #10219: fix printing of nested recursive definitions
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/testsuite/tests/typing-gadts/ambivalent_apply.ml b/testsuite/tests/typing-gadts/ambivalent_apply.ml
-+ --- a/testsuite/tests/typing-gadts/ambivalent_apply.ml
-+ +++ b/testsuite/tests/typing-gadts/ambivalent_apply.ml
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 7bb4730a7f..c6003a4193 100644
 --- a/.gitattributes
@@ -48,10 +14,10 @@ index 7bb4730a7f..c6003a4193 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 767d556422..3667489330 100644
+index b1a5ab6550..d29834d8fd 100644
 --- a/Changes
 +++ b/Changes
-@@ -415,13 +415,13 @@ OCaml 4.14.0
+@@ -420,13 +420,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -67,7 +33,7 @@ index 767d556422..3667489330 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -525,6 +525,9 @@ OCaml 4.14.0
+@@ -530,6 +530,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -77,7 +43,7 @@ index 767d556422..3667489330 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -783,6 +786,9 @@ OCaml 4.14.0
+@@ -788,6 +791,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -6734,47 +6700,13 @@ index 0000000000..d77f466729
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..918fbbb54a
+index 0000000000..164427db2f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6652 @@
+@@ -0,0 +1,6654 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..66e970e165
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,31 @@
-++--- a	2023-09-28 18:44:47.714373495 +0100
-+++++ b	2023-09-28 18:44:47.742374611 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -807,6 +807,9 @@ OCaml 4.14.0
-+++@@ -813,6 +813,9 @@ OCaml 4.14.0
-++    (Xavier Leroy, report by Rehan Malak, review by Gabriel Scherer and
-++     Vincent Laviron)
-++  
-++@@ -11,7 +11,7 @@
-++  - #10473: Add CFI directives to RISC-V runtime and asmcomp.
-++    This allows stacktraces to work in gdb through C and OCaml calls.
-++    (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
-++-@@ -1443,8 +1446,8 @@ OCaml 4.13.0 (24 September 2021)
-+++@@ -1449,8 +1452,8 @@ OCaml 4.13.0 (24 September 2021)
-++    when the systhreads library is loaded.
-++    (David Allsopp, report by Anton Bachin, review by Xavier Leroy)
-++  
-++@@ -22,10 +22,6 @@
-++    (Jacques Garrigue, report and review by Thomas Refis)
-++  
-++  - #8917, #8929, #9889, #10219: fix printing of nested recursive definitions
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/testsuite/tests/typing-gadts/ambivalent_apply.ml b/testsuite/tests/typing-gadts/ambivalent_apply.ml
-++ --- a/testsuite/tests/typing-gadts/ambivalent_apply.ml
-++ +++ b/testsuite/tests/typing-gadts/ambivalent_apply.ml
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 7bb4730a7f..c6003a4193 100644
 +--- a/.gitattributes
@@ -6788,10 +6720,10 @@ index 0000000000..918fbbb54a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 767d556422..3667489330 100644
++index b1a5ab6550..d29834d8fd 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -415,13 +415,13 @@ OCaml 4.14.0
++@@ -420,13 +420,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6807,7 +6739,7 @@ index 0000000000..918fbbb54a
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -525,6 +525,9 @@ OCaml 4.14.0
++@@ -530,6 +530,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6817,7 +6749,7 @@ index 0000000000..918fbbb54a
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -783,6 +786,9 @@ OCaml 4.14.0
++@@ -788,6 +791,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -13389,7 +13321,43 @@ index 0000000000..918fbbb54a
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ++-Error: Illegal shadowing of included type t/304 by t/309
 +++Error: Illegal shadowing of included type t/299 by t/304
-++    
+++        Line 2, characters 2-19:
+++-         Type t/304 came from this include
++++         Type t/299 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/304 is shadowed
++++         The value print has no valid type if t/299 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
