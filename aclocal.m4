@@ -557,3 +557,100 @@ AC_DEFUN([OCAML_CC_SUPPORTS_ATOMIC], [
    AC_MSG_RESULT([no])])
   LIBS="$saved_LIBS"
 ])
+
+AC_DEFUN([OCAML_GENERATE_META], [
+  m4_define([__OCAML_PLUGIN],[])
+  m4_if([$3],[],[
+    m4_define([__OCAML_NATIVE],[$native_compiler])
+  ],[
+    m4_define([__OCAML_NATIVE],[$3])
+    m4_undefine([__OCAML_PLUGIN])
+  ])
+  AC_CONFIG_FILES([$1],
+    [echo 'archive(byte) = "$2.cma"' >> $ac_file
+    AS_IF(__OCAML_NATIVE,[
+      echo 'archive(native) = "$2.cmxa"' >> $ac_file
+    ])]
+    m4_ifdef([__OCAML_PLUGIN],[
+      echo 'plugin(byte) = "$2.cma"' >> $ac_file
+      AS_IF($natdynlink, [
+        echo 'plugin(native) = "$2.cmxs"' >> $ac_file
+      ])
+    ])
+  )
+])
+
+AC_DEFUN([OCAML_GENERATE_COMPILER_LIBS_META], [
+  AC_CONFIG_FILES([$1], [
+    # compiler-libs.common
+    cat <<EOF >> $ac_file
+
+package "common" (
+  version = "$ocaml_version"
+  description = "Common compiler routines"
+  requires = "compiler-libs"
+  archive(byte) = "ocamlcommon.cma"
+EOF
+    AS_IF([$native_compiler], [
+      echo '  archive(native) = "ocamlcommon.cmxa"' >> $ac_file
+    ])
+    echo ')' >> $ac_file
+
+    # compiler-libs.bytecomp
+    cat <<EOF >> $ac_file
+
+package "bytecomp" (
+  version = "$ocaml_version"
+  description = "Bytecode compiler"
+  requires = "compiler-libs.common"
+  archive(byte) = "ocamlbytecomp.cma"
+EOF
+    AS_IF([$native_compiler], [
+      echo '  archive(native) = "ocamlbytecomp.cmxa"' >> $ac_file
+    ])
+    echo ')' >> $ac_file
+
+    # compiler-libs.optcomp
+    AS_IF([$native_compiler], [
+      cat <<EOF >> $ac_file
+
+package "optcomp" (
+  version = "$ocaml_version"
+  description = "Native-code compiler"
+  requires = "compiler-libs.common"
+  archive(byte) = "ocamloptcomp.cma"
+  archive(native) = "ocamloptcomp.cmxa"
+)
+EOF
+    ])
+
+    # compiler-libs.toplevel
+    cat <<EOF >> $ac_file
+
+package "toplevel" (
+  version = "$ocaml_version"
+  description = "Toplevel interactions"
+  requires = "compiler-libs.bytecomp"
+  archive(byte) = "ocamltoplevel.cma"
+)
+EOF
+    AS_IF([$natdynlink], [
+      cat <<EOF >> $ac_file
+
+package "native-toplevel" (
+  version = "$ocaml_version"
+  description = "Toplevel interactions"
+  requires = "compiler-libs.optcomp dynlink"
+  archive(native) = "ocamltoplevel.cmxa"
+)
+EOF
+    ])
+  ])
+])
+
+dnl These three variables are needed in config.status for META file generation
+AC_CONFIG_COMMANDS([setup],[],[
+  native_compiler=$native_compiler
+  natdynlink=$natdynlink
+  ocaml_version='OCAML__VERSION'
+])

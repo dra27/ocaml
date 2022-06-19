@@ -109,6 +109,8 @@ otherlibs/unix/readlink_win32.c    typo.long-line
 otherlibs/unix/stat_win32.c        typo.long-line
 otherlibs/unix/symlink_win32.c     typo.long-line
 
+otherlibs/systhreads/META.in       typo.white-at-eof
+
 runtime/sak.c            typo.non-ascii
 
 stdlib/hashbang     typo.white-at-eol typo.missing-lf

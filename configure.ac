@@ -130,7 +130,6 @@ AC_SUBST([mklib])
 AC_SUBST([supports_shared_libraries])
 AC_SUBST([natdynlink])
 AC_SUBST([natdynlinkopts])
-AC_SUBST([natdynlink_archive])
 AC_SUBST([cmxs])
 AC_SUBST([debug_runtime])
 AC_SUBST([instrumented_runtime])
@@ -186,9 +185,9 @@ AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 AC_CONFIG_HEADERS([runtime/caml/version.h])
-AC_CONFIG_FILES([compilerlibs/META])
-AC_CONFIG_FILES([otherlibs/dynlink/META])
-AC_CONFIG_FILES([otherlibs/runtime_events/META])
+OCAML_GENERATE_COMPILER_LIBS_META([compilerlibs/META])
+OCAML_GENERATE_META([otherlibs/dynlink/META], [dynlink], [$natdynlink])
+OCAML_GENERATE_META([otherlibs/runtime_events/META], [runtime_events])
 AC_CONFIG_FILES([stdlib/META])
 
 # Definitions related to the version of OCaml
@@ -550,11 +549,11 @@ AS_CASE([$host],
 otherlibraries="dynlink runtime_events"
 AS_IF([test x"$enable_unix_lib" != "xno"],
   [enable_unix_lib=yes
-  AC_CONFIG_FILES([otherlibs/unix/META])
+  OCAML_GENERATE_META([otherlibs/unix/META], [unix])
   otherlibraries="$otherlibraries unix"])
 AS_IF([test x"$enable_str_lib" != "xno"],
   [otherlibraries="$otherlibraries str"
-  AC_CONFIG_FILES([otherlibs/str/META])])
+  OCAML_GENERATE_META([otherlibs/str/META], [str])])
 
 # Checks for system services
 
@@ -1212,9 +1211,6 @@ AS_IF([$native_compiler],
 AS_IF([! $native_compiler], [natdynlink=false])
 
 AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
-AS_IF([$natdynlink],
-  [natdynlink_archive="dynlink.cmxa"],
-  [natdynlink_archive=""])
 
 AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
 
@@ -1905,7 +1901,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
     [systhread_support=false
     AC_MSG_NOTICE([the threads library is disabled])],
   [systhread_support=true
-  AC_CONFIG_FILES([otherlibs/systhreads/META])
+  OCAML_GENERATE_META([otherlibs/systhreads/META],[threads],[$native_compiler])
   otherlibraries="$otherlibraries systhreads"
   AC_MSG_NOTICE([the threads library is supported])])
 
