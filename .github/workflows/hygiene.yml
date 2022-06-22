@@ -53,6 +53,14 @@ jobs:
           '${{ github.event.after }}'
         if: ${{ always() }}
 
+      - name: Check no ignored files committed
+        run: |
+          if git ls-tree HEAD --name-only -r | git check-ignore --stdin --no-index; then
+            echo These files are matched by .gitignore and should not be committed
+            exit 1
+          fi
+        if: ${{ always() }}
+
       - name: check-typo revered
         run: >-
           tools/ci/actions/check-typo.sh
