@@ -15272,10 +15272,10 @@ index f9767c95be..172fe48b72 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
-index 12e753b0e5..c659ccc3f7 100644
+index 0a4b87634b..f71de8360b 100644
 --- a/stdlib/stdlib.mli
 +++ b/stdlib/stdlib.mli
-@@ -1386,10 +1386,14 @@ module BytesLabels    = BytesLabels
+@@ -1395,10 +1395,14 @@ module BytesLabels    = BytesLabels
  module Callback       = Callback
  module Char           = Char
  module Complex        = Complex
@@ -15290,7 +15290,7 @@ index 12e753b0e5..c659ccc3f7 100644
  module Either         = Either
  module Ephemeron      = Ephemeron
  module Filename       = Filename
-@@ -1409,7 +1413,9 @@ module ListLabels     = ListLabels
+@@ -1418,7 +1422,9 @@ module ListLabels     = ListLabels
  module Map            = Map
  module Marshal        = Marshal
  module MoreLabels     = MoreLabels
@@ -15300,7 +15300,7 @@ index 12e753b0e5..c659ccc3f7 100644
  module Nativeint      = Nativeint
  module Obj            = Obj
  module Oo             = Oo
-@@ -1422,7 +1428,9 @@ module Queue          = Queue
+@@ -1431,7 +1437,9 @@ module Queue          = Queue
  module Random         = Random
  module Result         = Result
  module Scanf          = Scanf
