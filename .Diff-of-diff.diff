@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:44:52.382559151 +0100
++++ b	2023-09-28 18:44:52.390559469 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+-@@ -21,7 +21,8 @@ let rec burn l =
++@@ -23,7 +23,8 @@ let rec burn l =
+  let test_parallel_spawn () =
+    for i = 1 to 20 do
+      Array.init num_domains (fun _ -> Domain.spawn (fun () -> burn [0]))
+@@ -11,7 +11,7 @@
+    done
+  
+  let () =
+-@@ -39,6 +40,8 @@ let () =
++@@ -41,6 +42,8 @@ let () =
+  
+    running := false;
+    join domain_minor_gc;

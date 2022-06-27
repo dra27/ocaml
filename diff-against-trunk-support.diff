@@ -2303,7 +2303,7 @@ index 540ca905fd..a38477147b 100644
  
  open Domain
 diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-index 0cf33a8c9c..11bad7b4bd 100644
+index 11a1d108c8..724d7882d9 100644
 --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 @@ -1,4 +1,6 @@
