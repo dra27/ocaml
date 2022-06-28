@@ -26,6 +26,7 @@ double unix_gettimeofday_unboxed(value unit)
 {
   FILETIME ft;
   double tm;
+  ULARGE_INTEGER utime;
   GetSystemTimeAsFileTime(&ft);
 #if defined(_MSC_VER) && _MSC_VER < 1300
   /* This compiler can't cast uint64_t to double! Fortunately, this doesn't
@@ -34,7 +35,9 @@ double unix_gettimeofday_unboxed(value unit)
    */
   tm = *(int64_t *)&ft - epoch_ft; /* shift to Epoch-relative time */
 #else
-  tm = *(uint64_t *)&ft - epoch_ft; /* shift to Epoch-relative time */
+  utime.LowPart = ft.dwLowDateTime;
+  utime.HighPart = ft.dwHighDateTime;
+  tm = utime.QuadPart - epoch_ft; /* shift to Epoch-relative time */
 #endif
   return (tm * 1e-7);  /* tm is in 100ns */
 }
