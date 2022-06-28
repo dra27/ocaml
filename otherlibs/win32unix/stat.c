@@ -163,10 +163,7 @@ static void convert_time(FILETIME* time, __time64_t* result, __time64_t def)
   ULARGE_INTEGER utime = {{time->dwLowDateTime, time->dwHighDateTime}};
 
   if (utime.QuadPart) {
-    /* There are 11644473600 seconds between 1 January 1601 (the NT Epoch) and 1
-     * January 1970 (the Unix Epoch). FILETIME is measured in 100ns ticks.
-     */
-    *result = (utime.QuadPart - INT64_LITERAL(116444736000000000U));
+    *result = (utime.QuadPart - CAML_NT_EPOCH_100ns_TICKS);
   }
   else {
     *result = def;

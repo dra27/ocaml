@@ -59,6 +59,12 @@ extern void win32_maperr(DWORD errcode);
 extern value unix_error_of_code (int errcode);
 extern int code_of_unix_error (value error);
 
+
+/* There are 11644473600 seconds between 1 January 1601 (the NT Epoch) and 1
+ * January 1970 (the Unix Epoch). FILETIME is measured in 100ns ticks.
+ */
+#define CAML_NT_EPOCH_100ns_TICKS 116444736000000000ULL
+
 CAMLnoreturn_start
 extern void unix_error (int errcode, const char * cmdname, value arg)
 CAMLnoreturn_end;
