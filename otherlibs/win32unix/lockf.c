@@ -30,24 +30,6 @@
 /* Sets handle h to a position based on gohere */
 /* output, if set, is changed to the new location */
 
-static void set_file_pointer(HANDLE h, LARGE_INTEGER gohere,
-                             PLARGE_INTEGER output, DWORD method)
-{
-  LONG high = gohere.HighPart;
-  DWORD ret = SetFilePointer(h, gohere.LowPart, &high, method);
-  if(ret == INVALID_SET_FILE_POINTER) {
-    DWORD err = GetLastError();
-    if(err != NO_ERROR) {
-      win32_maperr(err);
-      uerror("lockf", Nothing);
-    }
-  }
-  if(output != NULL) {
-    output->LowPart = ret;
-    output->HighPart = high;
-  }
-}
-
 CAMLprim value unix_lockf(value fd, value cmd, value span)
 {
   CAMLparam3(fd, cmd, span);
@@ -57,7 +39,7 @@ CAMLprim value unix_lockf(value fd, value cmd, value span)
   LARGE_INTEGER cur_position;
   LARGE_INTEGER beg_position;
   LARGE_INTEGER lock_len;
-  LARGE_INTEGER zero;
+  LARGE_INTEGER zero = {{0, 0}};
   DWORD err = NO_ERROR;
 
   h = Handle_val(fd);
@@ -65,8 +47,10 @@ CAMLprim value unix_lockf(value fd, value cmd, value span)
   l_len = Long_val(span);
 
   /* No matter what, we need the current position in the file */
-  zero.HighPart = zero.LowPart = 0;
-  set_file_pointer(h, zero, &cur_position, FILE_CURRENT);
+  if (!SetFilePointerEx(h, zero, &cur_position, FILE_CURRENT)) {
+    win32_maperr(GetLastError());
+    uerror("lockf", Nothing);
+  }
 
   /* All unused fields must be set to zero */
   memset(&overlap, 0, sizeof(overlap));
