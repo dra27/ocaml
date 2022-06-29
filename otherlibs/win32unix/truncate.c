@@ -28,8 +28,7 @@
 
 static int win_truncate_handle(HANDLE fh, __int64 len)
 {
-  LARGE_INTEGER fp;
-  fp.QuadPart = len;
+  LARGE_INTEGER fp = {{len}};
   if (SetFilePointerEx(fh, fp, NULL, FILE_BEGIN) == 0 ||
       SetEndOfFile(fh) == 0) {
     win32_maperr(GetLastError());

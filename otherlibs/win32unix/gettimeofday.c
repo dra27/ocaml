@@ -21,10 +21,9 @@
 
 double unix_gettimeofday_unboxed(value unit)
 {
-  FILETIME ft;
+  ULONGLONG utime;
   double tm;
-  ULARGE_INTEGER utime;
-  GetSystemTimeAsFileTime(&ft);
+  GetSystemTimeAsFileTime((LPFILETIME)&utime);
 #if defined(_MSC_VER) && _MSC_VER < 1300
   /* This compiler can't cast uint64_t to double! Fortunately, this doesn't
      matter since SYSTEMTIME is only ever 63-bit (maximum value 31-Dec-30827
@@ -32,9 +31,7 @@ double unix_gettimeofday_unboxed(value unit)
    */
   tm = *(int64_t *)&ft - epoch_ft; /* shift to Epoch-relative time */
 #else
-  utime.LowPart = ft.dwLowDateTime;
-  utime.HighPart = ft.dwHighDateTime;
-  tm = utime.QuadPart - CAML_NT_EPOCH_100ns_TICKS;
+  tm = utime - CAML_NT_EPOCH_100ns_TICKS;
 #endif
   return (tm * 1e-7);  /* tm is in 100ns */
 }

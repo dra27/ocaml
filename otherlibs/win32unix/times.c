@@ -18,37 +18,20 @@
 #include "unixsupport.h"
 #include <windows.h>
 
-
-double to_sec(FILETIME ft) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-  /* See gettimeofday.c - it is not possible for these values to be 64-bit, so
-     there's no worry about using a signed struct in order to work around the
-     lack of support for casting int64_t to double.
-   */
-  LARGE_INTEGER tmp;
-#else
-  ULARGE_INTEGER tmp = {{ft.dwLowDateTime, ft.dwHighDateTime}};
-#endif
-
-  /* convert to seconds:
-     GetProcessTimes returns number of 100-nanosecond intervals */
-  return tmp.QuadPart / 1e7;
-}
-
-
 value unix_times(value unit) {
   value res;
-  FILETIME creation, exit, stime, utime;
+  FILETIME _creation, _exit;
+  ULONGLONG stime, utime;
 
-  if (!(GetProcessTimes(GetCurrentProcess(), &creation, &exit, &stime,
-                        &utime))) {
+  if (!(GetProcessTimes(GetCurrentProcess(), &_creation, &_exit,
+                        (LPFILETIME)&stime, (LPFILETIME)&utime))) {
     win32_maperr(GetLastError());
     uerror("times", Nothing);
   }
 
   res = caml_alloc_small(4 * Double_wosize, Double_array_tag);
-  Store_double_field(res, 0, to_sec(utime));
-  Store_double_field(res, 1, to_sec(stime));
+  Store_double_field(res, 0, (double)(utime / 1e7));
+  Store_double_field(res, 1, (double)(stime / 1e7));
   Store_double_field(res, 2, 0);
   Store_double_field(res, 3, 0);
   return res;

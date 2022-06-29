@@ -24,21 +24,12 @@
 
 #include <windows.h>
 
-static void convert_time(double unixTime, FILETIME* ft)
-{
-  ULARGE_INTEGER u;
-  u.QuadPart =
-    (ULONGLONG)(unixTime * 10000000.0) + CAML_NT_EPOCH_100ns_TICKS;
-  ft->dwLowDateTime = u.LowPart;
-  ft->dwHighDateTime = u.HighPart;
-}
-
 CAMLprim value unix_utimes(value path, value atime, value mtime)
 {
   CAMLparam3(path, atime, mtime);
   WCHAR *wpath;
   HANDLE hFile;
-  FILETIME lastAccessTime, lastModificationTime;
+  ULONGLONG lastAccessTime, lastModificationTime;
   SYSTEMTIME systemTime;
   double at, mt;
   BOOL res;
@@ -63,14 +54,17 @@ CAMLprim value unix_utimes(value path, value atime, value mtime)
   }
   if (at == 0.0 && mt == 0.0) {
     GetSystemTime(&systemTime);
-    SystemTimeToFileTime(&systemTime, &lastAccessTime);
-    memcpy(&lastModificationTime, &lastAccessTime, sizeof(FILETIME));
+    SystemTimeToFileTime(&systemTime, (LPFILETIME)&lastAccessTime);
+    lastModificationTime = lastAccessTime;
   } else {
-    convert_time(at, &lastAccessTime);
-    convert_time(mt, &lastModificationTime);
+    lastAccessTime =
+      (ULONGLONG)(at * 10000000.0) + CAML_NT_EPOCH_100ns_TICKS;
+    lastModificationTime =
+      (ULONGLONG)(mt * 10000000.0) + CAML_NT_EPOCH_100ns_TICKS;
   }
   caml_enter_blocking_section();
-  res = SetFileTime(hFile, NULL, &lastAccessTime, &lastModificationTime);
+  res = SetFileTime(hFile, NULL, (LPFILETIME)&lastAccessTime,
+                                 (LPFILETIME)&lastModificationTime);
   caml_leave_blocking_section();
   if (res == 0) {
     win32_maperr(GetLastError());
