@@ -15,6 +15,7 @@
 
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
+#include <caml/signals.h>
 #include "unixsupport.h"
 
 #ifdef HAS_UNISTD
@@ -33,38 +34,44 @@ static DWORD seek_command_table[] = {
 #define INVALID_SET_FILE_POINTER (-1)
 #endif
 
-static __int64 caml_set_file_pointer(HANDLE h, __int64 dist, DWORD mode)
-{
-  LARGE_INTEGER i;
-  DWORD err;
-
-  i.QuadPart = dist;
-  i.LowPart = SetFilePointer(h, i.LowPart, &i.HighPart, mode);
-  if (i.LowPart == INVALID_SET_FILE_POINTER) {
-    err = GetLastError();
-    if (err != NO_ERROR) { win32_maperr(err); uerror("lseek", Nothing); }
-  }
-  return i.QuadPart;
-}
-
 CAMLprim value unix_lseek(value fd, value ofs, value cmd)
 {
-  __int64 ret;
+  LARGE_INTEGER i;
+  HANDLE h = Handle_val(fd);
+  BOOL success;
 
-  ret = caml_set_file_pointer(Handle_val(fd), Long_val(ofs),
-                              seek_command_table[Int_val(cmd)]);
-  if (ret > Max_long) {
+  i.QuadPart = Long_val(ofs);
+
+  caml_enter_blocking_section();
+  success = SetFilePointerEx(h, i, &i, seek_command_table[Int_val(cmd)]);
+  caml_leave_blocking_section();
+
+  if (!success) {
+    win32_maperr(GetLastError());
+    uerror("lseek", Nothing);
+  }
+  if (i.QuadPart > Max_long) {
     win32_maperr(ERROR_ARITHMETIC_OVERFLOW);
     uerror("lseek", Nothing);
   }
-  return Val_long(ret);
+  return Val_long(i.QuadPart);
 }
 
 CAMLprim value unix_lseek_64(value fd, value ofs, value cmd)
 {
-  __int64 ret;
+  LARGE_INTEGER i;
+  HANDLE h = Handle_val(fd);
+  BOOL success;
 
-  ret = caml_set_file_pointer(Handle_val(fd), Int64_val(ofs),
-                              seek_command_table[Int_val(cmd)]);
-  return caml_copy_int64(ret);
+  i.QuadPart = Long_val(ofs);
+
+  caml_enter_blocking_section();
+  success = SetFilePointerEx(h, i, &i, seek_command_table[Int_val(cmd)]);
+  caml_leave_blocking_section();
+
+  if (!success) {
+    win32_maperr(GetLastError());
+    uerror("lseek", Nothing);
+  }
+  return caml_copy_int64(i.QuadPart);
 }
