@@ -573,9 +573,9 @@ let emit_instr env fallthrough i =
 (* BACKPORT END *)
       end else begin
 (* BACKPORT
-        I.mov rsp rbp;
+        I.mov rsp rbx;
         cfi_remember_state ();
-        cfi_def_cfa_register "rbp";
+        cfi_def_cfa_register "rbx";
         (* NB: gdb has asserts on contiguous stacks that mean it
            will not unwind through this unless we were to tag this
            calling frame with cfi_signal_frame in it's definition. *)
@@ -583,7 +583,7 @@ let emit_instr env fallthrough i =
 *)
         emit_call func;
 (* BACKPORT
-        I.mov rbp rsp;
+        I.mov rbx rsp;
         cfi_restore_state ();
 *)
       end
@@ -976,9 +976,11 @@ let fundecl fundecl =
         argument-passing registers may be in use.
         Also serves to align the stack properly before the call *)
       I.push (int (Config.stack_threshold + max_frame_size / 8));
+      cfi_adjust_cfa_offset 8;
         (* measured in words *)
       emit_call "caml_call_realloc_stack";
       I.pop r10; (* ignored *)
+      cfi_adjust_cfa_offset (-8);
       I.jmp (label ret)
     end
   end;

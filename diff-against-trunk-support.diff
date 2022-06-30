@@ -1,5 +1,5 @@
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index 60b92e6c36..cdbf9e55f6 100644
+index 7f2433adc9..68329c5bc1 100644
 --- a/ocamltest/Makefile
 +++ b/ocamltest/Makefile
 @@ -267,6 +267,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
@@ -7,11 +7,11 @@ index 60b92e6c36..cdbf9e55f6 100644
  	    $(call SUBST,WINDOWS_UNICODE) \
  	    $(call SUBST,FUNCTION_SECTIONS) \
 +	    $(call SUBST,NAKED_POINTERS) \
+ 	    $(call SUBST,WITH_FRAME_POINTERS) \
  	    $< > $@
  
- # Manual
 diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-index d2cacd6865..16b11083e4 100644
+index c4c11c1905..17eb07492b 100644
 --- a/ocamltest/builtin_actions.ml
 +++ b/ocamltest/builtin_actions.ml
 @@ -181,6 +181,12 @@ let function_sections = make
@@ -24,38 +24,41 @@ index d2cacd6865..16b11083e4 100644
 +     "Runtime system supports naked pointers"
 +     "Runtime system does not support naked pointers")
 +
- let has_symlink = make
-   "has_symlink"
-   (Actions_helpers.pass_or_skip (Unix.has_symlink () )
-@@ -302,6 +308,7 @@ let _ =
+ let frame_pointers = make
+   "frame_pointers"
+   (Actions_helpers.pass_or_skip (Ocamltest_config.frame_pointers)
+@@ -308,6 +314,7 @@ let _ =
      arch_i386;
      arch_power;
      function_sections;
 +    naked_pointers;
+     frame_pointers;
      file_exists;
      copy;
-   ]
 diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-index d1a86cfc80..48f296095e 100644
+index bd3452f4b7..53c86b8866 100644
 --- a/ocamltest/ocamltest_config.ml.in
 +++ b/ocamltest/ocamltest_config.ml.in
-@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
- let function_sections = %%FUNCTION_SECTIONS%%
+@@ -88,4 +88,6 @@ let function_sections = %%FUNCTION_SECTIONS%%
  
  let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
-+
+ 
 +let naked_pointers = %%NAKED_POINTERS%%
++
+ let frame_pointers = %%WITH_FRAME_POINTERS%%
 diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-index 564ef7644e..92cf631912 100644
+index 4c8cb07d2e..e0185f5d1e 100644
 --- a/ocamltest/ocamltest_config.mli
 +++ b/ocamltest/ocamltest_config.mli
-@@ -124,3 +124,6 @@ val function_sections : bool
- 
+@@ -125,5 +125,8 @@ val function_sections : bool
  val instrumented_runtime : bool
  (** Whether the instrumented runtime is available *)
-+
+ 
 +val naked_pointers : bool
 +(** Whether the runtime system supports naked pointers outside the heap *)
++
+ val frame_pointers : bool
+ (** Whether frame-pointers have been enabled at configure time *)
 diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
 index 80eac2d727..f8f264f471 100644
 --- a/ocamltest/run_unix.c

@@ -1,6 +1,132 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e3d55c7b7e
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,123 @@
++--- a	2023-09-28 18:44:54.046625206 +0100
+++++ b	2023-09-28 18:44:54.066625999 +0100
++@@ -14,10 +14,10 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -553,16 +553,16 @@ let emit_instr env fallthrough i =
++-         emit_call "caml_c_call";
++-         record_frame env i.live (Dbg_other i.dbg);
+++@@ -573,9 +573,9 @@ let emit_instr env fallthrough i =
+++ (* BACKPORT END *)
++        end else begin
+++ (* BACKPORT
++ -        I.mov rsp rbp;
++ +        I.mov rsp rbx;
++          cfi_remember_state ();
++@@ -26,15 +26,16 @@
++          (* NB: gdb has asserts on contiguous stacks that mean it
++             will not unwind through this unless we were to tag this
++             calling frame with cfi_signal_frame in it's definition. *)
++-         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
++- 
+++@@ -583,7 +583,7 @@ let emit_instr env fallthrough i =
+++ *)
++          emit_call func;
+++ (* BACKPORT
++ -        I.mov rbp rsp;
++ +        I.mov rbx rsp;
++          cfi_restore_state ();
+++ *)
++        end
++-   | Lop(Istackoffset n) ->
++-@@ -924,9 +924,11 @@ let fundecl fundecl =
+++@@ -976,9 +976,11 @@ let fundecl fundecl =
++          argument-passing registers may be in use.
++          Also serves to align the stack properly before the call *)
++        I.push (int (Config.stack_threshold + max_frame_size / 8));
++@@ -58,15 +59,15 @@
++       by the code sequence used for C calls in emit.mlp, so it
++       is marked as destroyed. *)
++    if win64 then
++-@@ -302,7 +302,7 @@ let destroyed_at_c_call =
++-   else
+++@@ -307,7 +307,7 @@ let destroyed_at_c_call =
++      (* Unix: rbx, r12-r15 preserved *)
++      Array.of_list(List.map phys_reg
+++ (* BACKPORT BEGIN
++ -      [0;2;3;4;5;6;7;10;11;12;
++ +      [0;1;2;3;4;5;6;7;10;11;
++-        100;101;102;103;104;105;106;107;
++-        108;109;110;111;112;113;114;115])
++- 
+++ *)
+++       [0;2;3;4;5;6;7;10;11;
+++ (* BACKPORT END *)
++ diff --git a/asmcomp/x86_dsl.ml b/asmcomp/x86_dsl.ml
++ --- a/asmcomp/x86_dsl.ml
++ +++ b/asmcomp/x86_dsl.ml
++@@ -92,10 +93,10 @@
++ diff --git a/ocamltest/Makefile b/ocamltest/Makefile
++ --- a/ocamltest/Makefile
++ +++ b/ocamltest/Makefile
++-@@ -267,6 +267,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
++- 	    $(call SUBST,DIFF_FLAGS) \
+++@@ -268,6 +268,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
++  	    $(call SUBST,WINDOWS_UNICODE) \
++  	    $(call SUBST,FUNCTION_SECTIONS) \
+++ 	    $(call SUBST,NAKED_POINTERS) \
++ +	    $(call SUBST,WITH_FRAME_POINTERS) \
++  	    $< > $@
++  
++@@ -103,9 +104,9 @@
++ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
++ --- a/ocamltest/builtin_actions.ml
++ +++ b/ocamltest/builtin_actions.ml
++-@@ -181,6 +181,12 @@ let function_sections = make
++-      "Target supports function sections"
++-      "Target does not support function sections")
+++@@ -187,6 +187,12 @@ let naked_pointers = make
+++      "Runtime system supports naked pointers"
+++      "Runtime system does not support naked pointers")
++  
++ +let frame_pointers = make
++ +  "frame_pointers"
++@@ -116,10 +117,10 @@
++  let has_symlink = make
++    "has_symlink"
++    (Actions_helpers.pass_or_skip (Unix.has_symlink () )
++-@@ -302,6 +308,7 @@ let _ =
++-     arch_i386;
+++@@ -309,6 +315,7 @@ let _ =
++      arch_power;
++      function_sections;
+++     naked_pointers;
++ +    frame_pointers;
++      file_exists;
++      copy;
++@@ -127,19 +128,19 @@
++ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
++ --- a/ocamltest/ocamltest_config.ml.in
++ +++ b/ocamltest/ocamltest_config.ml.in
++-@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
++- let function_sections = %%FUNCTION_SECTIONS%%
++- 
+++@@ -89,3 +89,5 @@ let function_sections = %%FUNCTION_SECTIONS%%
++  let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
+++ 
+++ let naked_pointers = %%NAKED_POINTERS%%
++ +
++ +let frame_pointers = %%WITH_FRAME_POINTERS%%
++ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
++ --- a/ocamltest/ocamltest_config.mli
++ +++ b/ocamltest/ocamltest_config.mli
++-@@ -124,3 +124,6 @@ val function_sections : bool
+++@@ -127,3 +127,6 @@ val instrumented_runtime : bool
++  
++- val instrumented_runtime : bool
++- (** Whether the instrumented runtime is available *)
+++ val naked_pointers : bool
+++ (** Whether the runtime system supports naked pointers outside the heap *)
++ +
++ +val frame_pointers : bool
++ +(** Whether frame-pointers have been enabled at configure time *)
 diff --git a/.gitattributes b/.gitattributes
 index 260cdd1514..64e8daa4c7 100644
 --- a/.gitattributes
@@ -14,10 +140,10 @@ index 260cdd1514..64e8daa4c7 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index bc22f8773a..b4d7f21374 100644
+index f2170e8631..605247c87c 100644
 --- a/Changes
 +++ b/Changes
-@@ -448,13 +448,13 @@ OCaml 4.14.0
+@@ -451,13 +451,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -33,7 +159,7 @@ index bc22f8773a..b4d7f21374 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -558,6 +558,9 @@ OCaml 4.14.0
+@@ -561,6 +561,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -43,7 +169,7 @@ index bc22f8773a..b4d7f21374 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -816,6 +819,9 @@ OCaml 4.14.0
+@@ -819,6 +822,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -187,7 +313,7 @@ index 0c2412b192..deb1ab6aa9 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index fbff9963bc..a78edbce4e 100644
+index 4e986c25e4..0cf7fa8089 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -251,9 +377,9 @@ index fbff9963bc..a78edbce4e 100644
 +(* BACKPORT END *)
        end else begin
 +(* BACKPORT
-         I.mov rsp rbp;
+         I.mov rsp rbx;
          cfi_remember_state ();
-         cfi_def_cfa_register "rbp";
+         cfi_def_cfa_register "rbx";
 @@ -560,10 +580,12 @@ let emit_instr env fallthrough i =
             will not unwind through this unless we were to tag this
             calling frame with cfi_signal_frame in it's definition. *)
@@ -262,7 +388,7 @@ index fbff9963bc..a78edbce4e 100644
 +*)
          emit_call func;
 +(* BACKPORT
-         I.mov rbp rsp;
+         I.mov rbx rsp;
          cfi_restore_state ();
 +*)
        end
@@ -351,7 +477,7 @@ index fbff9963bc..a78edbce4e 100644
    begin match !handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -930,6 +982,7 @@ let fundecl fundecl =
+@@ -932,6 +984,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -360,7 +486,7 @@ index fbff9963bc..a78edbce4e 100644
      let n = (frame_size env) - 8 - (if fp then 8 else 0) in
      if n <> 0
 diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-index 64b05a95c8..dbeaff0cbe 100644
+index 70ee85fd44..8a46f7ea27 100644
 --- a/asmcomp/amd64/proc.ml
 +++ b/asmcomp/amd64/proc.ml
 @@ -297,12 +297,20 @@ let destroyed_at_c_call =
@@ -377,7 +503,7 @@ index 64b05a95c8..dbeaff0cbe 100644
      (* Unix: rbx, r12-r15 preserved *)
      Array.of_list(List.map phys_reg
 +(* BACKPORT BEGIN
-       [0;2;3;4;5;6;7;10;11;12;
+       [0;1;2;3;4;5;6;7;10;11;
 +*)
 +      [0;2;3;4;5;6;7;10;11;
 +(* BACKPORT END *)
@@ -3261,10 +3387,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..bc5b721ba3
+index 0000000000..d85332c8a9
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3433 @@
+@@ -0,0 +1,3452 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 60b92e6c36..cdbf9e55f6 100644
 +--- a/ocamltest/Makefile
@@ -5443,6 +5569,25 @@ index 0000000000..bc5b721ba3
 + *)
 + 
 + (* on Multicore, fork is not allowed is another domain is, and was running. *)
++diff --git a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
++index 01ae4df1c3..fb17641f40 100644
++--- a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+++++ b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
++@@ -1,9 +1,11 @@
++ (* TEST
++ modules = "fd_of_channel.c"
++-* libwin32unix
+++reason = "OCaml 5 only"
+++* skip
+++** libwin32unix
++ include unix
++-** bytecode
++-** native
+++*** bytecode
+++*** native
++ *)
++ 
++ external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
 +diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
 +index afaa814ca5..d696a26e82 100644
 +--- a/testsuite/tests/memory-model/forbidden.ml
@@ -6700,13 +6845,139 @@ index 0000000000..bc5b721ba3
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0904a27140
+index 0000000000..be445b3a0e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6654 @@
+@@ -0,0 +1,6771 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e3d55c7b7e
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,123 @@
+++--- a	2023-09-28 18:44:54.046625206 +0100
++++++ b	2023-09-28 18:44:54.066625999 +0100
+++@@ -14,10 +14,10 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -553,16 +553,16 @@ let emit_instr env fallthrough i =
+++-         emit_call "caml_c_call";
+++-         record_frame env i.live (Dbg_other i.dbg);
++++@@ -573,9 +573,9 @@ let emit_instr env fallthrough i =
++++ (* BACKPORT END *)
+++        end else begin
++++ (* BACKPORT
+++ -        I.mov rsp rbp;
+++ +        I.mov rsp rbx;
+++          cfi_remember_state ();
+++@@ -26,15 +26,16 @@
+++          (* NB: gdb has asserts on contiguous stacks that mean it
+++             will not unwind through this unless we were to tag this
+++             calling frame with cfi_signal_frame in it's definition. *)
+++-         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
+++- 
++++@@ -583,7 +583,7 @@ let emit_instr env fallthrough i =
++++ *)
+++          emit_call func;
++++ (* BACKPORT
+++ -        I.mov rbp rsp;
+++ +        I.mov rbx rsp;
+++          cfi_restore_state ();
++++ *)
+++        end
+++-   | Lop(Istackoffset n) ->
+++-@@ -924,9 +924,11 @@ let fundecl fundecl =
++++@@ -976,9 +976,11 @@ let fundecl fundecl =
+++          argument-passing registers may be in use.
+++          Also serves to align the stack properly before the call *)
+++        I.push (int (Config.stack_threshold + max_frame_size / 8));
+++@@ -58,15 +59,15 @@
+++       by the code sequence used for C calls in emit.mlp, so it
+++       is marked as destroyed. *)
+++    if win64 then
+++-@@ -302,7 +302,7 @@ let destroyed_at_c_call =
+++-   else
++++@@ -307,7 +307,7 @@ let destroyed_at_c_call =
+++      (* Unix: rbx, r12-r15 preserved *)
+++      Array.of_list(List.map phys_reg
++++ (* BACKPORT BEGIN
+++ -      [0;2;3;4;5;6;7;10;11;12;
+++ +      [0;1;2;3;4;5;6;7;10;11;
+++-        100;101;102;103;104;105;106;107;
+++-        108;109;110;111;112;113;114;115])
+++- 
++++ *)
++++       [0;2;3;4;5;6;7;10;11;
++++ (* BACKPORT END *)
+++ diff --git a/asmcomp/x86_dsl.ml b/asmcomp/x86_dsl.ml
+++ --- a/asmcomp/x86_dsl.ml
+++ +++ b/asmcomp/x86_dsl.ml
+++@@ -92,10 +93,10 @@
+++ diff --git a/ocamltest/Makefile b/ocamltest/Makefile
+++ --- a/ocamltest/Makefile
+++ +++ b/ocamltest/Makefile
+++-@@ -267,6 +267,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+++- 	    $(call SUBST,DIFF_FLAGS) \
++++@@ -268,6 +268,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+++  	    $(call SUBST,WINDOWS_UNICODE) \
+++  	    $(call SUBST,FUNCTION_SECTIONS) \
++++ 	    $(call SUBST,NAKED_POINTERS) \
+++ +	    $(call SUBST,WITH_FRAME_POINTERS) \
+++  	    $< > $@
+++  
+++@@ -103,9 +104,9 @@
+++ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
+++ --- a/ocamltest/builtin_actions.ml
+++ +++ b/ocamltest/builtin_actions.ml
+++-@@ -181,6 +181,12 @@ let function_sections = make
+++-      "Target supports function sections"
+++-      "Target does not support function sections")
++++@@ -187,6 +187,12 @@ let naked_pointers = make
++++      "Runtime system supports naked pointers"
++++      "Runtime system does not support naked pointers")
+++  
+++ +let frame_pointers = make
+++ +  "frame_pointers"
+++@@ -116,10 +117,10 @@
+++  let has_symlink = make
+++    "has_symlink"
+++    (Actions_helpers.pass_or_skip (Unix.has_symlink () )
+++-@@ -302,6 +308,7 @@ let _ =
+++-     arch_i386;
++++@@ -309,6 +315,7 @@ let _ =
+++      arch_power;
+++      function_sections;
++++     naked_pointers;
+++ +    frame_pointers;
+++      file_exists;
+++      copy;
+++@@ -127,19 +128,19 @@
+++ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
+++ --- a/ocamltest/ocamltest_config.ml.in
+++ +++ b/ocamltest/ocamltest_config.ml.in
+++-@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
+++- let function_sections = %%FUNCTION_SECTIONS%%
+++- 
++++@@ -89,3 +89,5 @@ let function_sections = %%FUNCTION_SECTIONS%%
+++  let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
++++ 
++++ let naked_pointers = %%NAKED_POINTERS%%
+++ +
+++ +let frame_pointers = %%WITH_FRAME_POINTERS%%
+++ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
+++ --- a/ocamltest/ocamltest_config.mli
+++ +++ b/ocamltest/ocamltest_config.mli
+++-@@ -124,3 +124,6 @@ val function_sections : bool
++++@@ -127,3 +127,6 @@ val instrumented_runtime : bool
+++  
+++- val instrumented_runtime : bool
+++- (** Whether the instrumented runtime is available *)
++++ val naked_pointers : bool
++++ (** Whether the runtime system supports naked pointers outside the heap *)
+++ +
+++ +val frame_pointers : bool
+++ +(** Whether frame-pointers have been enabled at configure time *)
 +diff --git a/.gitattributes b/.gitattributes
 +index 260cdd1514..64e8daa4c7 100644
 +--- a/.gitattributes
@@ -6720,10 +6991,10 @@ index 0000000000..0904a27140
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index bc22f8773a..b4d7f21374 100644
++index f2170e8631..605247c87c 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -448,13 +448,13 @@ OCaml 4.14.0
++@@ -451,13 +451,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6739,7 +7010,7 @@ index 0000000000..0904a27140
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -558,6 +558,9 @@ OCaml 4.14.0
++@@ -561,6 +561,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6749,7 +7020,7 @@ index 0000000000..0904a27140
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -816,6 +819,9 @@ OCaml 4.14.0
++@@ -819,6 +822,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6893,7 +7164,7 @@ index 0000000000..0904a27140
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index fbff9963bc..a78edbce4e 100644
++index 4e986c25e4..0cf7fa8089 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -6957,9 +7228,9 @@ index 0000000000..0904a27140
 ++(* BACKPORT END *)
 +       end else begin
 ++(* BACKPORT
-+         I.mov rsp rbp;
++         I.mov rsp rbx;
 +         cfi_remember_state ();
-+         cfi_def_cfa_register "rbp";
++         cfi_def_cfa_register "rbx";
 +@@ -560,10 +580,12 @@ let emit_instr env fallthrough i =
 +            will not unwind through this unless we were to tag this
 +            calling frame with cfi_signal_frame in it's definition. *)
@@ -6968,7 +7239,7 @@ index 0000000000..0904a27140
 ++*)
 +         emit_call func;
 ++(* BACKPORT
-+         I.mov rbp rsp;
++         I.mov rbx rsp;
 +         cfi_restore_state ();
 ++*)
 +       end
@@ -7057,7 +7328,7 @@ index 0000000000..0904a27140
 +   begin match !handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -930,6 +982,7 @@ let fundecl fundecl =
++@@ -932,6 +984,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -7066,7 +7337,7 @@ index 0000000000..0904a27140
 +     let n = (frame_size env) - 8 - (if fp then 8 else 0) in
 +     if n <> 0
 +diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-+index 64b05a95c8..dbeaff0cbe 100644
++index 70ee85fd44..8a46f7ea27 100644
 +--- a/asmcomp/amd64/proc.ml
 ++++ b/asmcomp/amd64/proc.ml
 +@@ -297,12 +297,20 @@ let destroyed_at_c_call =
@@ -7083,7 +7354,7 @@ index 0000000000..0904a27140
 +     (* Unix: rbx, r12-r15 preserved *)
 +     Array.of_list(List.map phys_reg
 ++(* BACKPORT BEGIN
-+       [0;2;3;4;5;6;7;10;11;12;
++       [0;1;2;3;4;5;6;7;10;11;
 ++*)
 ++      [0;2;3;4;5;6;7;10;11;
 ++(* BACKPORT END *)
@@ -9967,10 +10238,10 @@ index 0000000000..0904a27140
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..bc5b721ba3
++index 0000000000..d85332c8a9
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3433 @@
++@@ -0,0 +1,3452 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 60b92e6c36..cdbf9e55f6 100644
 ++--- a/ocamltest/Makefile
@@ -12149,6 +12420,25 @@ index 0000000000..0904a27140
 ++ *)
 ++ 
 ++ (* on Multicore, fork is not allowed is another domain is, and was running. *)
+++diff --git a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+++index 01ae4df1c3..fb17641f40 100644
+++--- a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
++++++ b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+++@@ -1,9 +1,11 @@
+++ (* TEST
+++ modules = "fd_of_channel.c"
+++-* libwin32unix
++++reason = "OCaml 5 only"
++++* skip
++++** libwin32unix
+++ include unix
+++-** bytecode
+++-** native
++++*** bytecode
++++*** native
+++ *)
+++ 
+++ external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
 ++diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
 ++index afaa814ca5..d696a26e82 100644
 ++--- a/testsuite/tests/memory-model/forbidden.ml
@@ -13329,35 +13619,7 @@ index 0000000000..0904a27140
 +++         The value print has no valid type if t/299 is shadowed
 ++ |}]
 ++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -
+++ module type Sund
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
