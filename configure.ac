@@ -257,8 +257,6 @@ AC_CANONICAL_TARGET
 AS_CASE([$host],
   [*-pc-windows],
     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
-  [*-*-cygwin*],
-    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
   [i386-*-solaris*],
     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
@@ -1281,8 +1279,8 @@ dnl   [arch=amd64; system=beos],
     [arch=arm64; system=openbsd],
   [aarch64-*-netbsd*],
     [arch=arm64; system=netbsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
+  [x86_64-*-cygwin*],
+    [arch=amd64; system=cygwin],
 dnl [riscv64-*-linux*],
 dnl   [arch=riscv; model=riscv64; system=linux]
 )
