@@ -1,132 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e3d55c7b7e
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,123 @@
-+--- a	2023-09-28 18:44:54.046625206 +0100
-++++ b	2023-09-28 18:44:54.066625999 +0100
-+@@ -14,10 +14,10 @@
-+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+ --- a/asmcomp/amd64/emit.mlp
-+ +++ b/asmcomp/amd64/emit.mlp
-+-@@ -553,16 +553,16 @@ let emit_instr env fallthrough i =
-+-         emit_call "caml_c_call";
-+-         record_frame env i.live (Dbg_other i.dbg);
-++@@ -573,9 +573,9 @@ let emit_instr env fallthrough i =
-++ (* BACKPORT END *)
-+        end else begin
-++ (* BACKPORT
-+ -        I.mov rsp rbp;
-+ +        I.mov rsp rbx;
-+          cfi_remember_state ();
-+@@ -26,15 +26,16 @@
-+          (* NB: gdb has asserts on contiguous stacks that mean it
-+             will not unwind through this unless we were to tag this
-+             calling frame with cfi_signal_frame in it's definition. *)
-+-         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
-+- 
-++@@ -583,7 +583,7 @@ let emit_instr env fallthrough i =
-++ *)
-+          emit_call func;
-++ (* BACKPORT
-+ -        I.mov rbp rsp;
-+ +        I.mov rbx rsp;
-+          cfi_restore_state ();
-++ *)
-+        end
-+-   | Lop(Istackoffset n) ->
-+-@@ -924,9 +924,11 @@ let fundecl fundecl =
-++@@ -976,9 +976,11 @@ let fundecl fundecl =
-+          argument-passing registers may be in use.
-+          Also serves to align the stack properly before the call *)
-+        I.push (int (Config.stack_threshold + max_frame_size / 8));
-+@@ -58,15 +59,15 @@
-+       by the code sequence used for C calls in emit.mlp, so it
-+       is marked as destroyed. *)
-+    if win64 then
-+-@@ -302,7 +302,7 @@ let destroyed_at_c_call =
-+-   else
-++@@ -307,7 +307,7 @@ let destroyed_at_c_call =
-+      (* Unix: rbx, r12-r15 preserved *)
-+      Array.of_list(List.map phys_reg
-++ (* BACKPORT BEGIN
-+ -      [0;2;3;4;5;6;7;10;11;12;
-+ +      [0;1;2;3;4;5;6;7;10;11;
-+-        100;101;102;103;104;105;106;107;
-+-        108;109;110;111;112;113;114;115])
-+- 
-++ *)
-++       [0;2;3;4;5;6;7;10;11;
-++ (* BACKPORT END *)
-+ diff --git a/asmcomp/x86_dsl.ml b/asmcomp/x86_dsl.ml
-+ --- a/asmcomp/x86_dsl.ml
-+ +++ b/asmcomp/x86_dsl.ml
-+@@ -92,10 +93,10 @@
-+ diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+ --- a/ocamltest/Makefile
-+ +++ b/ocamltest/Makefile
-+-@@ -267,6 +267,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-+- 	    $(call SUBST,DIFF_FLAGS) \
-++@@ -268,6 +268,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-+  	    $(call SUBST,WINDOWS_UNICODE) \
-+  	    $(call SUBST,FUNCTION_SECTIONS) \
-++ 	    $(call SUBST,NAKED_POINTERS) \
-+ +	    $(call SUBST,WITH_FRAME_POINTERS) \
-+  	    $< > $@
-+  
-+@@ -103,9 +104,9 @@
-+ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-+ --- a/ocamltest/builtin_actions.ml
-+ +++ b/ocamltest/builtin_actions.ml
-+-@@ -181,6 +181,12 @@ let function_sections = make
-+-      "Target supports function sections"
-+-      "Target does not support function sections")
-++@@ -187,6 +187,12 @@ let naked_pointers = make
-++      "Runtime system supports naked pointers"
-++      "Runtime system does not support naked pointers")
-+  
-+ +let frame_pointers = make
-+ +  "frame_pointers"
-+@@ -116,10 +117,10 @@
-+  let has_symlink = make
-+    "has_symlink"
-+    (Actions_helpers.pass_or_skip (Unix.has_symlink () )
-+-@@ -302,6 +308,7 @@ let _ =
-+-     arch_i386;
-++@@ -309,6 +315,7 @@ let _ =
-+      arch_power;
-+      function_sections;
-++     naked_pointers;
-+ +    frame_pointers;
-+      file_exists;
-+      copy;
-+@@ -127,19 +128,19 @@
-+ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-+ --- a/ocamltest/ocamltest_config.ml.in
-+ +++ b/ocamltest/ocamltest_config.ml.in
-+-@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
-+- let function_sections = %%FUNCTION_SECTIONS%%
-+- 
-++@@ -89,3 +89,5 @@ let function_sections = %%FUNCTION_SECTIONS%%
-+  let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
-++ 
-++ let naked_pointers = %%NAKED_POINTERS%%
-+ +
-+ +let frame_pointers = %%WITH_FRAME_POINTERS%%
-+ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-+ --- a/ocamltest/ocamltest_config.mli
-+ +++ b/ocamltest/ocamltest_config.mli
-+-@@ -124,3 +124,6 @@ val function_sections : bool
-++@@ -127,3 +127,6 @@ val instrumented_runtime : bool
-+  
-+- val instrumented_runtime : bool
-+- (** Whether the instrumented runtime is available *)
-++ val naked_pointers : bool
-++ (** Whether the runtime system supports naked pointers outside the heap *)
-+ +
-+ +val frame_pointers : bool
-+ +(** Whether frame-pointers have been enabled at configure time *)
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 260cdd1514..64e8daa4c7 100644
 --- a/.gitattributes
@@ -3387,10 +3261,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..93ad3dc5c3
+index 0000000000..4265571c05
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3455 @@
+@@ -0,0 +1,3551 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7f2433adc9..68329c5bc1 100644
 +--- a/ocamltest/Makefile
@@ -4686,6 +4560,102 @@ index 0000000000..93ad3dc5c3
 + *)
 + 
 + (* C version of ephetest.ml *)
++diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
++index 3f0a02e4a1..3c5b1b621b 100644
++--- a/testsuite/tests/frame-pointers/c_call.ml
+++++ b/testsuite/tests/frame-pointers/c_call.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++ 
++-* frame_pointers
++-** native
+++* skip
+++reason = "OCaml 5 only"
+++** frame_pointers
+++*** native
++ readonly_files = "fp_backtrace.c c_call_.c"
++ all_modules = "${readonly_files} c_call.ml"
++ 
++diff --git a/testsuite/tests/frame-pointers/effects.ml b/testsuite/tests/frame-pointers/effects.ml
++index e14633a374..03068242a4 100644
++--- a/testsuite/tests/frame-pointers/effects.ml
+++++ b/testsuite/tests/frame-pointers/effects.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++ 
++-* frame_pointers
++-** native
+++* skip
+++reason - "OCaml 5 only"
+++** frame_pointers
+++*** native
++ readonly_files = "fp_backtrace.c"
++ all_modules = "${readonly_files} effects.ml"
++ 
++diff --git a/testsuite/tests/frame-pointers/exception_handler.ml b/testsuite/tests/frame-pointers/exception_handler.ml
++index 575f7329bf..56676119b7 100644
++--- a/testsuite/tests/frame-pointers/exception_handler.ml
+++++ b/testsuite/tests/frame-pointers/exception_handler.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++ 
++-* frame_pointers
++-** native
+++* skip
+++reason = "OCaml 5 only"
+++** frame_pointers
+++*** native
++ readonly_files = "fp_backtrace.c"
++ all_modules = "${readonly_files} exception_handler.ml"
++ 
++diff --git a/testsuite/tests/frame-pointers/reperform.ml b/testsuite/tests/frame-pointers/reperform.ml
++index 1af8452e5f..5e7a76f0e3 100644
++--- a/testsuite/tests/frame-pointers/reperform.ml
+++++ b/testsuite/tests/frame-pointers/reperform.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++ 
++-* frame_pointers
++-** native
+++* skip
+++reason - "OCaml 5 only"
+++** frame_pointers
+++*** native
++ 
++ readonly_files = "fp_backtrace.c"
++ all_modules = "${readonly_files} reperform.ml"
++diff --git a/testsuite/tests/frame-pointers/stack_realloc.ml b/testsuite/tests/frame-pointers/stack_realloc.ml
++index 79e70c2add..b36bcd3a70 100644
++--- a/testsuite/tests/frame-pointers/stack_realloc.ml
+++++ b/testsuite/tests/frame-pointers/stack_realloc.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++ 
++-* frame_pointers
++-** native
+++* skip
+++reason - "OCaml 5 only"
+++** frame_pointers
+++*** native
++ 
++ readonly_files = "fp_backtrace.c stack_realloc_.c"
++ all_modules = "${readonly_files} stack_realloc.ml"
++diff --git a/testsuite/tests/frame-pointers/stack_realloc2.ml b/testsuite/tests/frame-pointers/stack_realloc2.ml
++index a3d21bf2bf..df4a074443 100644
++--- a/testsuite/tests/frame-pointers/stack_realloc2.ml
+++++ b/testsuite/tests/frame-pointers/stack_realloc2.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++ 
++-* frame_pointers
++-** native
+++* skip
+++reason - "OCaml 5 only"
+++** frame_pointers
+++*** native
++ 
++ readonly_files = "fp_backtrace.c stack_realloc_.c"
++ all_modules = "${readonly_files} stack_realloc2.ml"
 +diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
 +index 56d1586331..6bdb7fdaf3 100644
 +--- a/testsuite/tests/gc-roots/globroots.ml
@@ -6848,139 +6818,13 @@ index 0000000000..93ad3dc5c3
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..663c7aa430
+index 0000000000..011915b3bf
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6769 @@
+@@ -0,0 +1,6789 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e3d55c7b7e
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,123 @@
-++--- a	2023-09-28 18:44:54.046625206 +0100
-+++++ b	2023-09-28 18:44:54.066625999 +0100
-++@@ -14,10 +14,10 @@
-++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-++ --- a/asmcomp/amd64/emit.mlp
-++ +++ b/asmcomp/amd64/emit.mlp
-++-@@ -553,16 +553,16 @@ let emit_instr env fallthrough i =
-++-         emit_call "caml_c_call";
-++-         record_frame env i.live (Dbg_other i.dbg);
-+++@@ -573,9 +573,9 @@ let emit_instr env fallthrough i =
-+++ (* BACKPORT END *)
-++        end else begin
-+++ (* BACKPORT
-++ -        I.mov rsp rbp;
-++ +        I.mov rsp rbx;
-++          cfi_remember_state ();
-++@@ -26,15 +26,16 @@
-++          (* NB: gdb has asserts on contiguous stacks that mean it
-++             will not unwind through this unless we were to tag this
-++             calling frame with cfi_signal_frame in it's definition. *)
-++-         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
-++- 
-+++@@ -583,7 +583,7 @@ let emit_instr env fallthrough i =
-+++ *)
-++          emit_call func;
-+++ (* BACKPORT
-++ -        I.mov rbp rsp;
-++ +        I.mov rbx rsp;
-++          cfi_restore_state ();
-+++ *)
-++        end
-++-   | Lop(Istackoffset n) ->
-++-@@ -924,9 +924,11 @@ let fundecl fundecl =
-+++@@ -976,9 +976,11 @@ let fundecl fundecl =
-++          argument-passing registers may be in use.
-++          Also serves to align the stack properly before the call *)
-++        I.push (int (Config.stack_threshold + max_frame_size / 8));
-++@@ -58,15 +59,15 @@
-++       by the code sequence used for C calls in emit.mlp, so it
-++       is marked as destroyed. *)
-++    if win64 then
-++-@@ -302,7 +302,7 @@ let destroyed_at_c_call =
-++-   else
-+++@@ -307,7 +307,7 @@ let destroyed_at_c_call =
-++      (* Unix: rbx, r12-r15 preserved *)
-++      Array.of_list(List.map phys_reg
-+++ (* BACKPORT BEGIN
-++ -      [0;2;3;4;5;6;7;10;11;12;
-++ +      [0;1;2;3;4;5;6;7;10;11;
-++-        100;101;102;103;104;105;106;107;
-++-        108;109;110;111;112;113;114;115])
-++- 
-+++ *)
-+++       [0;2;3;4;5;6;7;10;11;
-+++ (* BACKPORT END *)
-++ diff --git a/asmcomp/x86_dsl.ml b/asmcomp/x86_dsl.ml
-++ --- a/asmcomp/x86_dsl.ml
-++ +++ b/asmcomp/x86_dsl.ml
-++@@ -92,10 +93,10 @@
-++ diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++ --- a/ocamltest/Makefile
-++ +++ b/ocamltest/Makefile
-++-@@ -267,6 +267,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-++- 	    $(call SUBST,DIFF_FLAGS) \
-+++@@ -268,6 +268,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-++  	    $(call SUBST,WINDOWS_UNICODE) \
-++  	    $(call SUBST,FUNCTION_SECTIONS) \
-+++ 	    $(call SUBST,NAKED_POINTERS) \
-++ +	    $(call SUBST,WITH_FRAME_POINTERS) \
-++  	    $< > $@
-++  
-++@@ -103,9 +104,9 @@
-++ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-++ --- a/ocamltest/builtin_actions.ml
-++ +++ b/ocamltest/builtin_actions.ml
-++-@@ -181,6 +181,12 @@ let function_sections = make
-++-      "Target supports function sections"
-++-      "Target does not support function sections")
-+++@@ -187,6 +187,12 @@ let naked_pointers = make
-+++      "Runtime system supports naked pointers"
-+++      "Runtime system does not support naked pointers")
-++  
-++ +let frame_pointers = make
-++ +  "frame_pointers"
-++@@ -116,10 +117,10 @@
-++  let has_symlink = make
-++    "has_symlink"
-++    (Actions_helpers.pass_or_skip (Unix.has_symlink () )
-++-@@ -302,6 +308,7 @@ let _ =
-++-     arch_i386;
-+++@@ -309,6 +315,7 @@ let _ =
-++      arch_power;
-++      function_sections;
-+++     naked_pointers;
-++ +    frame_pointers;
-++      file_exists;
-++      copy;
-++@@ -127,19 +128,19 @@
-++ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-++ --- a/ocamltest/ocamltest_config.ml.in
-++ +++ b/ocamltest/ocamltest_config.ml.in
-++-@@ -87,3 +87,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
-++- let function_sections = %%FUNCTION_SECTIONS%%
-++- 
-+++@@ -89,3 +89,5 @@ let function_sections = %%FUNCTION_SECTIONS%%
-++  let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
-+++ 
-+++ let naked_pointers = %%NAKED_POINTERS%%
-++ +
-++ +let frame_pointers = %%WITH_FRAME_POINTERS%%
-++ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-++ --- a/ocamltest/ocamltest_config.mli
-++ +++ b/ocamltest/ocamltest_config.mli
-++-@@ -124,3 +124,6 @@ val function_sections : bool
-+++@@ -127,3 +127,6 @@ val instrumented_runtime : bool
-++  
-++- val instrumented_runtime : bool
-++- (** Whether the instrumented runtime is available *)
-+++ val naked_pointers : bool
-+++ (** Whether the runtime system supports naked pointers outside the heap *)
-++ +
-++ +val frame_pointers : bool
-++ +(** Whether frame-pointers have been enabled at configure time *)
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 260cdd1514..64e8daa4c7 100644
 +--- a/.gitattributes
@@ -10241,10 +10085,10 @@ index 0000000000..663c7aa430
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..93ad3dc5c3
++index 0000000000..4265571c05
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3455 @@
++@@ -0,0 +1,3551 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7f2433adc9..68329c5bc1 100644
 ++--- a/ocamltest/Makefile
@@ -11540,6 +11384,102 @@ index 0000000000..663c7aa430
 ++ *)
 ++ 
 ++ (* C version of ephetest.ml *)
+++diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
+++index 3f0a02e4a1..3c5b1b621b 100644
+++--- a/testsuite/tests/frame-pointers/c_call.ml
++++++ b/testsuite/tests/frame-pointers/c_call.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++ 
+++-* frame_pointers
+++-** native
++++* skip
++++reason = "OCaml 5 only"
++++** frame_pointers
++++*** native
+++ readonly_files = "fp_backtrace.c c_call_.c"
+++ all_modules = "${readonly_files} c_call.ml"
+++ 
+++diff --git a/testsuite/tests/frame-pointers/effects.ml b/testsuite/tests/frame-pointers/effects.ml
+++index e14633a374..03068242a4 100644
+++--- a/testsuite/tests/frame-pointers/effects.ml
++++++ b/testsuite/tests/frame-pointers/effects.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++ 
+++-* frame_pointers
+++-** native
++++* skip
++++reason - "OCaml 5 only"
++++** frame_pointers
++++*** native
+++ readonly_files = "fp_backtrace.c"
+++ all_modules = "${readonly_files} effects.ml"
+++ 
+++diff --git a/testsuite/tests/frame-pointers/exception_handler.ml b/testsuite/tests/frame-pointers/exception_handler.ml
+++index 575f7329bf..56676119b7 100644
+++--- a/testsuite/tests/frame-pointers/exception_handler.ml
++++++ b/testsuite/tests/frame-pointers/exception_handler.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++ 
+++-* frame_pointers
+++-** native
++++* skip
++++reason = "OCaml 5 only"
++++** frame_pointers
++++*** native
+++ readonly_files = "fp_backtrace.c"
+++ all_modules = "${readonly_files} exception_handler.ml"
+++ 
+++diff --git a/testsuite/tests/frame-pointers/reperform.ml b/testsuite/tests/frame-pointers/reperform.ml
+++index 1af8452e5f..5e7a76f0e3 100644
+++--- a/testsuite/tests/frame-pointers/reperform.ml
++++++ b/testsuite/tests/frame-pointers/reperform.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++ 
+++-* frame_pointers
+++-** native
++++* skip
++++reason - "OCaml 5 only"
++++** frame_pointers
++++*** native
+++ 
+++ readonly_files = "fp_backtrace.c"
+++ all_modules = "${readonly_files} reperform.ml"
+++diff --git a/testsuite/tests/frame-pointers/stack_realloc.ml b/testsuite/tests/frame-pointers/stack_realloc.ml
+++index 79e70c2add..b36bcd3a70 100644
+++--- a/testsuite/tests/frame-pointers/stack_realloc.ml
++++++ b/testsuite/tests/frame-pointers/stack_realloc.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++ 
+++-* frame_pointers
+++-** native
++++* skip
++++reason - "OCaml 5 only"
++++** frame_pointers
++++*** native
+++ 
+++ readonly_files = "fp_backtrace.c stack_realloc_.c"
+++ all_modules = "${readonly_files} stack_realloc.ml"
+++diff --git a/testsuite/tests/frame-pointers/stack_realloc2.ml b/testsuite/tests/frame-pointers/stack_realloc2.ml
+++index a3d21bf2bf..df4a074443 100644
+++--- a/testsuite/tests/frame-pointers/stack_realloc2.ml
++++++ b/testsuite/tests/frame-pointers/stack_realloc2.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++ 
+++-* frame_pointers
+++-** native
++++* skip
++++reason - "OCaml 5 only"
++++** frame_pointers
++++*** native
+++ 
+++ readonly_files = "fp_backtrace.c stack_realloc_.c"
+++ all_modules = "${readonly_files} stack_realloc2.ml"
 ++diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
 ++index 56d1586331..6bdb7fdaf3 100644
 ++--- a/testsuite/tests/gc-roots/globroots.ml
@@ -13620,7 +13560,57 @@ index 0000000000..663c7aa430
 ++        Line 2, characters 2-19:
 ++-         Type t/304 came from this include
 +++         Type t/299 came from this include
-++        Line 3, characters 2-2
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/304 is shadowed
++++         The value print has no valid type if t/299 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   r
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
