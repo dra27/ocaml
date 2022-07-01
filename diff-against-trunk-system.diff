@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6007806560
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:44:56.618727167 +0100
-++++ b	2023-09-28 18:44:56.626727484 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-+ --- a/testsuite/tests/effects/evenodd.ml
-+ +++ b/testsuite/tests/effects/evenodd.ml
-+-@@ -18,5 +18,5 @@ and odd n =
-++@@ -20,5 +20,5 @@ and odd n =
-+    else even (n-1)
-+  
-+  let _ =
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -3547,7 +3533,7 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..b63f8d86ff
+index 0000000000..0afac16edc
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3336 @@
@@ -4633,7 +4619,7 @@ index 0000000000..b63f8d86ff
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-+index 07464edb7a..e9b2d5a2fb 100644
++index 035308b58f..85f178310b 100644
 +--- a/testsuite/tests/effects/evenodd.ml
 ++++ b/testsuite/tests/effects/evenodd.ml
 +@@ -1,4 +1,6 @@
@@ -6889,27 +6875,13 @@ index 0000000000..b63f8d86ff
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7f9403563a
+index 0000000000..65d024c43c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6805 @@
+@@ -0,0 +1,6801 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6007806560
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:44:56.618727167 +0100
-+++++ b	2023-09-28 18:44:56.626727484 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-++ --- a/testsuite/tests/effects/evenodd.ml
-++ +++ b/testsuite/tests/effects/evenodd.ml
-++-@@ -18,5 +18,5 @@ and odd n =
-+++@@ -20,5 +20,5 @@ and odd n =
-++    else even (n-1)
-++  
-++  let _ =
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -10442,7 +10414,7 @@ index 0000000000..7f9403563a
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..b63f8d86ff
++index 0000000000..0afac16edc
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3336 @@
@@ -11528,7 +11500,7 @@ index 0000000000..7f9403563a
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-++index 07464edb7a..e9b2d5a2fb 100644
+++index 035308b58f..85f178310b 100644
 ++--- a/testsuite/tests/effects/evenodd.ml
 +++++ b/testsuite/tests/effects/evenodd.ml
 ++@@ -1,4 +1,6 @@
@@ -13697,7 +13669,17 @@ index 0000000000..7f9403563a
 ++ Line 3, characters 2-36:
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal
+++-Error: Illegal shadowing of included type t/304 by t/309
++++Error: Illegal shadowing of included type t/299 by t/304
+++        Line 2, characters 2-19:
+++-         Type t/304 came from this include
++++         Type t/299 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/304 is shadowed
++++         The value print has no valid type if t/299 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
