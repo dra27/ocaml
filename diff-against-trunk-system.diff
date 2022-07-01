@@ -1,6 +1,87 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..7308a65294
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,78 @@
++--- a	2023-09-28 18:44:54.894658841 +0100
+++++ b	2023-09-28 18:44:54.918659793 +0100
++@@ -6457,7 +6457,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -266,20 +266,13 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
+++@@ -229,14 +229,6 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
++  stdlib__Ephemeron.cmi : ephemeron.mli \
++      stdlib__Seq.cmi \
++      stdlib__Hashtbl.cmi
++@@ -6472,22 +6472,23 @@
++  stdlib__Filename.cmo : filename.ml \
++      stdlib__Sys.cmi \
++      stdlib__String.cmi \
++-     stdlib__Random.cmi \
+++@@ -244,6 +236,7 @@ stdlib__Filename.cmo : filename.ml \
++      stdlib__Printf.cmi \
++      stdlib__List.cmi \
+++     stdlib__Lazy.cmi \
++ +    stdlib__Fun.cmi \
++-     stdlib__Domain.cmi \
++      stdlib__Buffer.cmi \
++      stdlib__Filename.cmi
++-@@ -289,6 +282,7 @@ stdlib__Filename.cmx : filename.ml \
++-     stdlib__Random.cmx \
+++ stdlib__Filename.cmx : filename.ml \
+++@@ -253,6 +246,7 @@ stdlib__Filename.cmx : filename.ml \
++      stdlib__Printf.cmx \
++      stdlib__List.cmx \
+++     stdlib__Lazy.cmx \
++ +    stdlib__Fun.cmx \
++-     stdlib__Domain.cmx \
++      stdlib__Buffer.cmx \
++      stdlib__Filename.cmi
++-@@ -356,12 +350,14 @@ stdlib__Gc.cmo : gc.ml \
+++ stdlib__Filename.cmi : filename.mli
+++@@ -318,12 +312,14 @@ stdlib__Gc.cmo : gc.ml \
++      stdlib__String.cmi \
++      stdlib__Printf.cmi \
++      stdlib__Printexc.cmi \
++@@ -6502,23 +6503,23 @@
++      stdlib__Gc.cmi
++  stdlib__Gc.cmi : gc.mli \
++      stdlib__Printexc.cmi
++-@@ -373,6 +369,7 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+++@@ -335,6 +331,7 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
++      stdlib__Obj.cmi \
+++     stdlib__Lazy.cmi \
++      stdlib__Int.cmi \
++-     stdlib__Domain.cmi \
++ +    stdlib__Atomic.cmi \
++      stdlib__Array.cmi \
++      stdlib__Hashtbl.cmi
++  stdlib__Hashtbl.cmx : hashtbl.ml \
++-@@ -383,6 +380,7 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+++@@ -345,6 +342,7 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
++      stdlib__Obj.cmx \
+++     stdlib__Lazy.cmx \
++      stdlib__Int.cmx \
++-     stdlib__Domain.cmx \
++ +    stdlib__Atomic.cmx \
++      stdlib__Array.cmx \
++      stdlib__Hashtbl.cmi
++  stdlib__Hashtbl.cmi : hashtbl.mli \
++-@@ -717,8 +715,11 @@ stdlib__StdLabels.cmi : stdLabels.mli \
+++@@ -663,8 +661,10 @@ stdlib__StdLabels.cmi : stdLabels.mli \
++      stdlib__ListLabels.cmi \
++      stdlib__BytesLabels.cmi \
++      stdlib__ArrayLabels.cmi
++@@ -6528,7 +6529,6 @@
++ +    std_exit.cmi
++ +std_exit.cmx : \
++ +    std_exit.cmi
++-+std_exit.cmi :
++  stdlib__String.cmo : string.ml \
++      stdlib.cmi \
++      stdlib__Bytes.cmi \
 diff --git a/.gitattributes b/.gitattributes
 index 260cdd1514..64e8daa4c7 100644
 --- a/.gitattributes
@@ -54,10 +135,10 @@ index f2170e8631..605247c87c 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index dbc70334ff..97d9c1b03a 100644
+index 078f469385..20f00cdc03 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -576,7 +576,6 @@ partialclean::
+@@ -579,7 +579,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -65,7 +146,7 @@ index dbc70334ff..97d9c1b03a 100644
    afl \
    alloc \
    array \
-@@ -584,24 +583,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -587,24 +586,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -93,7 +174,7 @@ index dbc70334ff..97d9c1b03a 100644
    main \
    major_gc \
    md5 \
-@@ -612,17 +611,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -615,17 +614,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -111,7 +192,7 @@ index dbc70334ff..97d9c1b03a 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -632,6 +626,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -635,6 +629,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -121,7 +202,7 @@ index dbc70334ff..97d9c1b03a 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -642,7 +639,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -645,7 +642,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -130,7 +211,7 @@ index dbc70334ff..97d9c1b03a 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1042,7 +1039,9 @@ clean::
+@@ -1045,7 +1042,9 @@ clean::
  
  # Dependencies
  
@@ -141,7 +222,7 @@ index dbc70334ff..97d9c1b03a 100644
    debugger lex ocamldoc ocamltest tools
  
  .PHONY: alldepend
-@@ -1098,6 +1097,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1101,6 +1100,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
@@ -6818,13 +6899,94 @@ index 0000000000..4265571c05
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..011915b3bf
+index 0000000000..99f958617f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6789 @@
+@@ -0,0 +1,6795 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..7308a65294
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,78 @@
+++--- a	2023-09-28 18:44:54.894658841 +0100
++++++ b	2023-09-28 18:44:54.918659793 +0100
+++@@ -6457,7 +6457,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -266,20 +266,13 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
++++@@ -229,14 +229,6 @@ stdlib__Ephemeron.cmx : ephemeron.ml \
+++  stdlib__Ephemeron.cmi : ephemeron.mli \
+++      stdlib__Seq.cmi \
+++      stdlib__Hashtbl.cmi
+++@@ -6472,22 +6472,23 @@
+++  stdlib__Filename.cmo : filename.ml \
+++      stdlib__Sys.cmi \
+++      stdlib__String.cmi \
+++-     stdlib__Random.cmi \
++++@@ -244,6 +236,7 @@ stdlib__Filename.cmo : filename.ml \
+++      stdlib__Printf.cmi \
+++      stdlib__List.cmi \
++++     stdlib__Lazy.cmi \
+++ +    stdlib__Fun.cmi \
+++-     stdlib__Domain.cmi \
+++      stdlib__Buffer.cmi \
+++      stdlib__Filename.cmi
+++-@@ -289,6 +282,7 @@ stdlib__Filename.cmx : filename.ml \
+++-     stdlib__Random.cmx \
++++ stdlib__Filename.cmx : filename.ml \
++++@@ -253,6 +246,7 @@ stdlib__Filename.cmx : filename.ml \
+++      stdlib__Printf.cmx \
+++      stdlib__List.cmx \
++++     stdlib__Lazy.cmx \
+++ +    stdlib__Fun.cmx \
+++-     stdlib__Domain.cmx \
+++      stdlib__Buffer.cmx \
+++      stdlib__Filename.cmi
+++-@@ -356,12 +350,14 @@ stdlib__Gc.cmo : gc.ml \
++++ stdlib__Filename.cmi : filename.mli
++++@@ -318,12 +312,14 @@ stdlib__Gc.cmo : gc.ml \
+++      stdlib__String.cmi \
+++      stdlib__Printf.cmi \
+++      stdlib__Printexc.cmi \
+++@@ -6502,23 +6503,23 @@
+++      stdlib__Gc.cmi
+++  stdlib__Gc.cmi : gc.mli \
+++      stdlib__Printexc.cmi
+++-@@ -373,6 +369,7 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
++++@@ -335,6 +331,7 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+++      stdlib__Obj.cmi \
++++     stdlib__Lazy.cmi \
+++      stdlib__Int.cmi \
+++-     stdlib__Domain.cmi \
+++ +    stdlib__Atomic.cmi \
+++      stdlib__Array.cmi \
+++      stdlib__Hashtbl.cmi
+++  stdlib__Hashtbl.cmx : hashtbl.ml \
+++-@@ -383,6 +380,7 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
++++@@ -345,6 +342,7 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+++      stdlib__Obj.cmx \
++++     stdlib__Lazy.cmx \
+++      stdlib__Int.cmx \
+++-     stdlib__Domain.cmx \
+++ +    stdlib__Atomic.cmx \
+++      stdlib__Array.cmx \
+++      stdlib__Hashtbl.cmi
+++  stdlib__Hashtbl.cmi : hashtbl.mli \
+++-@@ -717,8 +715,11 @@ stdlib__StdLabels.cmi : stdLabels.mli \
++++@@ -663,8 +661,10 @@ stdlib__StdLabels.cmi : stdLabels.mli \
+++      stdlib__ListLabels.cmi \
+++      stdlib__BytesLabels.cmi \
+++      stdlib__ArrayLabels.cmi
+++@@ -6528,7 +6529,6 @@
+++ +    std_exit.cmi
+++ +std_exit.cmx : \
+++ +    std_exit.cmi
+++-+std_exit.cmi :
+++  stdlib__String.cmo : string.ml \
+++      stdlib.cmi \
+++      stdlib__Bytes.cmi \
 +diff --git a/.gitattributes b/.gitattributes
 +index 260cdd1514..64e8daa4c7 100644
 +--- a/.gitattributes
@@ -6878,10 +7040,10 @@ index 0000000000..011915b3bf
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index dbc70334ff..97d9c1b03a 100644
++index 078f469385..20f00cdc03 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -576,7 +576,6 @@ partialclean::
++@@ -579,7 +579,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -6889,7 +7051,7 @@ index 0000000000..011915b3bf
 +   afl \
 +   alloc \
 +   array \
-+@@ -584,24 +583,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -587,24 +586,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -6917,7 +7079,7 @@ index 0000000000..011915b3bf
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -612,17 +611,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -615,17 +614,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -6935,7 +7097,7 @@ index 0000000000..011915b3bf
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -632,6 +626,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -635,6 +629,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -6945,7 +7107,7 @@ index 0000000000..011915b3bf
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -642,7 +639,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -645,7 +642,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -6954,7 +7116,7 @@ index 0000000000..011915b3bf
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1042,7 +1039,9 @@ clean::
++@@ -1045,7 +1042,9 @@ clean::
 + 
 + # Dependencies
 + 
@@ -6965,7 +7127,7 @@ index 0000000000..011915b3bf
 +   debugger lex ocamldoc ocamltest tools
 + 
 + .PHONY: alldepend
-+@@ -1098,6 +1097,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1101,6 +1100,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -13535,82 +13697,7 @@ index 0000000000..011915b3bf
 +++** shared-libraries
 +++*** setup-ocamlc.byte-build-env
 +++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 1e35152097..d0cc6c5a5a 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/304 by t/309
-+++Error: Illegal shadowing of included type t/299 by t/304
-++        Line 2, characters 2-19:
-++-         Type t/304 came from this include
-+++         Type t/299 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/304 is shadowed
-+++         The value print has no valid type if t/299 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   r
+++ module = "pr
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14921,7 +15008,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 497ac2d1bd..96ec1fc218 100644
+index a0a1132ff8..0f2d95219e 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -14975,25 +15062,27 @@ index 497ac2d1bd..96ec1fc218 100644
  stdlib__Either.cmo : either.ml \
      stdlib__Either.cmi
  stdlib__Either.cmx : either.ml \
-@@ -280,7 +243,7 @@ stdlib__Filename.cmo : filename.ml \
+@@ -272,8 +235,8 @@ stdlib__Filename.cmo : filename.ml \
      stdlib__Random.cmi \
      stdlib__Printf.cmi \
      stdlib__List.cmi \
--    stdlib__Domain.cmi \
 +    stdlib__Lazy.cmi \
+     stdlib__Fun.cmi \
+-    stdlib__Domain.cmi \
      stdlib__Buffer.cmi \
      stdlib__Filename.cmi
  stdlib__Filename.cmx : filename.ml \
-@@ -289,7 +252,7 @@ stdlib__Filename.cmx : filename.ml \
+@@ -282,8 +245,8 @@ stdlib__Filename.cmx : filename.ml \
      stdlib__Random.cmx \
      stdlib__Printf.cmx \
      stdlib__List.cmx \
--    stdlib__Domain.cmx \
 +    stdlib__Lazy.cmx \
+     stdlib__Fun.cmx \
+-    stdlib__Domain.cmx \
      stdlib__Buffer.cmx \
      stdlib__Filename.cmi
  stdlib__Filename.cmi : filename.mli
-@@ -316,8 +279,8 @@ stdlib__Format.cmo : format.ml \
+@@ -310,8 +273,8 @@ stdlib__Format.cmo : format.ml \
      stdlib__Queue.cmi \
      stdlib__List.cmi \
      stdlib__Int.cmi \
@@ -15003,7 +15092,7 @@ index 497ac2d1bd..96ec1fc218 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -331,8 +294,8 @@ stdlib__Format.cmx : format.ml \
+@@ -325,8 +288,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -15013,7 +15102,7 @@ index 497ac2d1bd..96ec1fc218 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -342,7 +305,6 @@ stdlib__Format.cmi : format.mli \
+@@ -336,7 +299,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -15021,27 +15110,27 @@ index 497ac2d1bd..96ec1fc218 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -371,8 +333,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -367,8 +329,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
 +    stdlib__Lazy.cmi \
      stdlib__Int.cmi \
 -    stdlib__Domain.cmi \
+     stdlib__Atomic.cmi \
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
- stdlib__Hashtbl.cmx : hashtbl.ml \
-@@ -381,8 +343,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -378,8 +340,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
 +    stdlib__Lazy.cmx \
      stdlib__Int.cmx \
 -    stdlib__Domain.cmx \
+     stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
- stdlib__Hashtbl.cmi : hashtbl.mli \
-@@ -501,11 +463,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -499,11 +461,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -15053,7 +15142,7 @@ index 497ac2d1bd..96ec1fc218 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -608,7 +565,6 @@ stdlib__Random.cmo : random.ml \
+@@ -606,7 +563,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -15061,7 +15150,7 @@ index 497ac2d1bd..96ec1fc218 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -619,7 +575,6 @@ stdlib__Random.cmx : random.ml \
+@@ -617,7 +573,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -15069,7 +15158,7 @@ index 497ac2d1bd..96ec1fc218 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -659,15 +614,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -657,15 +612,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -15085,11 +15174,19 @@ index 497ac2d1bd..96ec1fc218 100644
  stdlib__Seq.cmo : seq.ml \
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
+@@ -719,7 +665,6 @@ std_exit.cmo : \
+     std_exit.cmi
+ std_exit.cmx : \
+     std_exit.cmi
+-std_exit.cmi :
+ stdlib__String.cmo : string.ml \
+     stdlib.cmi \
+     stdlib__Bytes.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 60fe85e24b..f2654a9d8f 100644
+index 306dfc9604..1a8a47c161 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
-@@ -264,7 +264,8 @@ GNUISH_SED = \
+@@ -263,7 +263,8 @@ GNUISH_SED = \
  .INTERMEDIATE: .depend.tmp
  
  .depend.tmp:
