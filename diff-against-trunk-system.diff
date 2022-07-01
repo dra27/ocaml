@@ -1,30 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..576fd65a3a
+index 0000000000..6007806560
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,21 @@
-+--- a	2023-09-28 18:44:56.302714648 +0100
-++++ b	2023-09-28 18:44:56.322715441 +0100
-+@@ -109,15 +109,15 @@
-+  AC_SUBST([cmxs])
-+  AC_SUBST([debug_runtime])
-+  AC_SUBST([instrumented_runtime])
-+-@@ -180,6 +181,7 @@ AC_SUBST([QS])
-++@@ -182,6 +183,7 @@ AC_SUBST([QS])
-+  AC_CONFIG_FILES([Makefile.build_config])
-+  AC_CONFIG_FILES([Makefile.config])
-+  AC_CONFIG_FILES([stdlib/sys.ml])
-+ +AC_CONFIG_FILES([otherlibs/dynlink/META])
-+  AC_CONFIG_FILES([manual/src/version.tex])
-+  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-+- AC_CONFIG_HEADERS([runtime/caml/m.h])
-+-@@ -1204,6 +1206,9 @@ AS_IF([$native_compiler],
-++ AC_CONFIG_FILES([tools/eventlog_metadata])
-++@@ -1216,6 +1218,9 @@ AS_IF([$native_compiler],
-+  AS_IF([! $native_compiler], [natdynlink=false])
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:56.618727167 +0100
+++++ b	2023-09-28 18:44:56.626727484 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
++ --- a/testsuite/tests/effects/evenodd.ml
++ +++ b/testsuite/tests/effects/evenodd.ml
++-@@ -18,5 +18,5 @@ and odd n =
+++@@ -20,5 +20,5 @@ and odd n =
++    else even (n-1)
 +  
-+  AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
++  let _ =
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -6899,37 +6889,27 @@ index 0000000000..b63f8d86ff
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6d3f2a6477
+index 0000000000..7f9403563a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6806 @@
+@@ -0,0 +1,6805 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..576fd65a3a
++index 0000000000..6007806560
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,21 @@
-++--- a	2023-09-28 18:44:56.302714648 +0100
-+++++ b	2023-09-28 18:44:56.322715441 +0100
-++@@ -109,15 +109,15 @@
-++  AC_SUBST([cmxs])
-++  AC_SUBST([debug_runtime])
-++  AC_SUBST([instrumented_runtime])
-++-@@ -180,6 +181,7 @@ AC_SUBST([QS])
-+++@@ -182,6 +183,7 @@ AC_SUBST([QS])
-++  AC_CONFIG_FILES([Makefile.build_config])
-++  AC_CONFIG_FILES([Makefile.config])
-++  AC_CONFIG_FILES([stdlib/sys.ml])
-++ +AC_CONFIG_FILES([otherlibs/dynlink/META])
-++  AC_CONFIG_FILES([manual/src/version.tex])
-++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-++- AC_CONFIG_HEADERS([runtime/caml/m.h])
-++-@@ -1204,6 +1206,9 @@ AS_IF([$native_compiler],
-+++ AC_CONFIG_FILES([tools/eventlog_metadata])
-+++@@ -1216,6 +1218,9 @@ AS_IF([$native_compiler],
-++  AS_IF([! $native_compiler], [natdynlink=false])
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:56.618727167 +0100
++++++ b	2023-09-28 18:44:56.626727484 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
+++ --- a/testsuite/tests/effects/evenodd.ml
+++ +++ b/testsuite/tests/effects/evenodd.ml
+++-@@ -18,5 +18,5 @@ and odd n =
++++@@ -20,5 +20,5 @@ and odd n =
+++    else even (n-1)
 ++  
-++  AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
+++  let _ =
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -13708,7 +13688,16 @@ index 0000000000..6d3f2a6477
 +++
 ++ let _ =
 ++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
-++     { null_
+++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 1e35152097..d0cc6c5a5a 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

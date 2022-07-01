@@ -1080,7 +1080,7 @@ index 78481d6404..a36d20cb8c 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
-index 07464edb7a..e9b2d5a2fb 100644
+index 035308b58f..85f178310b 100644
 --- a/testsuite/tests/effects/evenodd.ml
 +++ b/testsuite/tests/effects/evenodd.ml
 @@ -1,4 +1,6 @@
