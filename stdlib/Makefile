@@ -25,9 +25,8 @@ TARGET_BINDIR ?= $(BINDIR)
 
 COMPILER=$(ROOTDIR)/ocamlc$(EXE)
 CAMLC=$(OCAMLRUN) $(COMPILER)
-COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 \
-          -g -warn-error +A -bin-annot -nostdlib -principal \
-          -safe-string -strict-formats
+COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
+          -g -warn-error +A -bin-annot -nostdlib -principal
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
@@ -264,7 +263,7 @@ GNUISH_SED = \
 .INTERMEDIATE: .depend.tmp
 
 .depend.tmp:
-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml \
+	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
     $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
 	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli >> $@
