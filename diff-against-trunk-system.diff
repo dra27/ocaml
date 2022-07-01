@@ -1,11 +1,35 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..576fd65a3a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,21 @@
++--- a	2023-09-28 18:44:56.302714648 +0100
+++++ b	2023-09-28 18:44:56.322715441 +0100
++@@ -109,15 +109,15 @@
++  AC_SUBST([cmxs])
++  AC_SUBST([debug_runtime])
++  AC_SUBST([instrumented_runtime])
++-@@ -180,6 +181,7 @@ AC_SUBST([QS])
+++@@ -182,6 +183,7 @@ AC_SUBST([QS])
++  AC_CONFIG_FILES([Makefile.build_config])
++  AC_CONFIG_FILES([Makefile.config])
++  AC_CONFIG_FILES([stdlib/sys.ml])
++ +AC_CONFIG_FILES([otherlibs/dynlink/META])
++  AC_CONFIG_FILES([manual/src/version.tex])
++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
++- AC_CONFIG_HEADERS([runtime/caml/m.h])
++-@@ -1204,6 +1206,9 @@ AS_IF([$native_compiler],
+++ AC_CONFIG_FILES([tools/eventlog_metadata])
+++@@ -1216,6 +1218,9 @@ AS_IF([$native_compiler],
++  AS_IF([! $native_compiler], [natdynlink=false])
++  
++  AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
 diff --git a/.gitattributes b/.gitattributes
-index 260cdd1514..64e8daa4c7 100644
+index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
 +++ b/.gitattributes
-@@ -139,6 +139,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
+@@ -140,6 +140,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
  testsuite/tests/tool-ocamltest/norm*.reference binary
  
  tools/magic                       typo.missing-header
@@ -14,10 +38,10 @@ index 260cdd1514..64e8daa4c7 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 033a5bf589..3e618b56a5 100644
+index 56aea818f9..f6747fda4a 100644
 --- a/Changes
 +++ b/Changes
-@@ -457,13 +457,13 @@ OCaml 4.14.0
+@@ -463,13 +463,13 @@ OCaml 4.14.0
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -33,7 +57,7 @@ index 033a5bf589..3e618b56a5 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -567,6 +567,9 @@ OCaml 4.14.0
+@@ -573,6 +573,9 @@ OCaml 4.14.0
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -43,7 +67,7 @@ index 033a5bf589..3e618b56a5 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -825,6 +828,9 @@ OCaml 4.14.0
+@@ -831,6 +834,9 @@ OCaml 4.14.0
  
  ### Build system:
  
@@ -54,7 +78,7 @@ index 033a5bf589..3e618b56a5 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 078f469385..a3f71e309f 100644
+index 19dea3d86f..c57a7565e2 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -579,7 +579,6 @@ partialclean::
@@ -700,13 +724,13 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 2c70a7f455..860e097da7 100755
+index 608301711a..51814089e0 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 59aabefb2f..0135950af7 100644
+index d988aa342a..6bcea94d5d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -172,6 +172,8 @@ AC_SUBST([flexdll_chain])
+@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -715,15 +739,15 @@ index 59aabefb2f..0135950af7 100644
  AC_SUBST([force_instrumented_runtime])
  AC_SUBST([QS])
  
-@@ -182,6 +184,7 @@ AC_CONFIG_FILES([Makefile.config])
- AC_CONFIG_FILES([stdlib/sys.ml])
+@@ -184,6 +186,7 @@ AC_CONFIG_FILES([stdlib/sys.ml])
+ AC_CONFIG_FILES([otherlibs/dynlink/META])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
 +AC_CONFIG_FILES([tools/eventlog_metadata])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
  AC_CONFIG_HEADERS([runtime/caml/s.h])
  AC_CONFIG_HEADERS([runtime/caml/version.h])
-@@ -208,10 +211,10 @@ AC_CANONICAL_TARGET
+@@ -210,10 +213,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -738,7 +762,7 @@ index 59aabefb2f..0135950af7 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -320,15 +323,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -322,15 +325,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -770,7 +794,7 @@ index 59aabefb2f..0135950af7 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -542,7 +553,8 @@ AS_CASE([$host],
+@@ -544,7 +555,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -780,7 +804,7 @@ index 59aabefb2f..0135950af7 100644
  AS_IF([test x"$enable_unix_lib" != "xno"],
    [enable_unix_lib=yes
     otherlibraries="$otherlibraries unix"])
-@@ -947,9 +959,9 @@ AS_IF([! $arch64],
+@@ -949,9 +961,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -793,7 +817,7 @@ index 59aabefb2f..0135950af7 100644
  
  # Support for C11 atomic types
  
-@@ -1089,67 +1101,67 @@ model=default
+@@ -1091,67 +1103,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -920,7 +944,7 @@ index 59aabefb2f..0135950af7 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1158,8 +1170,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1160,8 +1172,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -931,7 +955,7 @@ index 59aabefb2f..0135950af7 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1170,14 +1182,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1172,14 +1184,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -952,7 +976,7 @@ index 59aabefb2f..0135950af7 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1859,7 +1871,8 @@ AS_CASE([$arch,$system],
+@@ -1864,7 +1876,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -962,7 +986,7 @@ index 59aabefb2f..0135950af7 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1908,6 +1921,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1913,6 +1926,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -993,7 +1017,7 @@ index 59aabefb2f..0135950af7 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2049,8 +2086,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2054,8 +2091,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6875,18 +6899,42 @@ index 0000000000..b63f8d86ff
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1a5f29d707
+index 0000000000..6d3f2a6477
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6802 @@
+@@ -0,0 +1,6806 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..576fd65a3a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,21 @@
+++--- a	2023-09-28 18:44:56.302714648 +0100
++++++ b	2023-09-28 18:44:56.322715441 +0100
+++@@ -109,15 +109,15 @@
+++  AC_SUBST([cmxs])
+++  AC_SUBST([debug_runtime])
+++  AC_SUBST([instrumented_runtime])
+++-@@ -180,6 +181,7 @@ AC_SUBST([QS])
++++@@ -182,6 +183,7 @@ AC_SUBST([QS])
+++  AC_CONFIG_FILES([Makefile.build_config])
+++  AC_CONFIG_FILES([Makefile.config])
+++  AC_CONFIG_FILES([stdlib/sys.ml])
+++ +AC_CONFIG_FILES([otherlibs/dynlink/META])
+++  AC_CONFIG_FILES([manual/src/version.tex])
+++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+++- AC_CONFIG_HEADERS([runtime/caml/m.h])
+++-@@ -1204,6 +1206,9 @@ AS_IF([$native_compiler],
++++ AC_CONFIG_FILES([tools/eventlog_metadata])
++++@@ -1216,6 +1218,9 @@ AS_IF([$native_compiler],
+++  AS_IF([! $native_compiler], [natdynlink=false])
+++  
+++  AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
 +diff --git a/.gitattributes b/.gitattributes
-+index 260cdd1514..64e8daa4c7 100644
++index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
 ++++ b/.gitattributes
-+@@ -139,6 +139,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
++@@ -140,6 +140,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
 + testsuite/tests/tool-ocamltest/norm*.reference binary
 + 
 + tools/magic                       typo.missing-header
@@ -6895,10 +6943,10 @@ index 0000000000..1a5f29d707
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 033a5bf589..3e618b56a5 100644
++index 56aea818f9..f6747fda4a 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -457,13 +457,13 @@ OCaml 4.14.0
++@@ -463,13 +463,13 @@ OCaml 4.14.0
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6914,7 +6962,7 @@ index 0000000000..1a5f29d707
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -567,6 +567,9 @@ OCaml 4.14.0
++@@ -573,6 +573,9 @@ OCaml 4.14.0
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6924,7 +6972,7 @@ index 0000000000..1a5f29d707
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -825,6 +828,9 @@ OCaml 4.14.0
++@@ -831,6 +834,9 @@ OCaml 4.14.0
 + 
 + ### Build system:
 + 
@@ -6935,7 +6983,7 @@ index 0000000000..1a5f29d707
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 078f469385..a3f71e309f 100644
++index 19dea3d86f..c57a7565e2 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -579,7 +579,6 @@ partialclean::
@@ -7581,13 +7629,13 @@ index 0000000000..1a5f29d707
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 2c70a7f455..860e097da7 100755
++index 608301711a..51814089e0 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 59aabefb2f..0135950af7 100644
++index d988aa342a..6bcea94d5d 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -172,6 +172,8 @@ AC_SUBST([flexdll_chain])
++@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -7596,15 +7644,15 @@ index 0000000000..1a5f29d707
 + AC_SUBST([force_instrumented_runtime])
 + AC_SUBST([QS])
 + 
-+@@ -182,6 +184,7 @@ AC_CONFIG_FILES([Makefile.config])
-+ AC_CONFIG_FILES([stdlib/sys.ml])
++@@ -184,6 +186,7 @@ AC_CONFIG_FILES([stdlib/sys.ml])
++ AC_CONFIG_FILES([otherlibs/dynlink/META])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
 ++AC_CONFIG_FILES([tools/eventlog_metadata])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
 + AC_CONFIG_HEADERS([runtime/caml/s.h])
 + AC_CONFIG_HEADERS([runtime/caml/version.h])
-+@@ -208,10 +211,10 @@ AC_CANONICAL_TARGET
++@@ -210,10 +213,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -7619,7 +7667,7 @@ index 0000000000..1a5f29d707
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -320,15 +323,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -322,15 +325,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -7651,7 +7699,7 @@ index 0000000000..1a5f29d707
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -542,7 +553,8 @@ AS_CASE([$host],
++@@ -544,7 +555,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -7661,7 +7709,7 @@ index 0000000000..1a5f29d707
 + AS_IF([test x"$enable_unix_lib" != "xno"],
 +   [enable_unix_lib=yes
 +    otherlibraries="$otherlibraries unix"])
-+@@ -947,9 +959,9 @@ AS_IF([! $arch64],
++@@ -949,9 +961,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -7674,7 +7722,7 @@ index 0000000000..1a5f29d707
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1089,67 +1101,67 @@ model=default
++@@ -1091,67 +1103,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -7801,7 +7849,7 @@ index 0000000000..1a5f29d707
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1158,8 +1170,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1160,8 +1172,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -7812,7 +7860,7 @@ index 0000000000..1a5f29d707
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1170,14 +1182,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1172,14 +1184,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -7833,7 +7881,7 @@ index 0000000000..1a5f29d707
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1859,7 +1871,8 @@ AS_CASE([$arch,$system],
++@@ -1864,7 +1876,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7843,7 +7891,7 @@ index 0000000000..1a5f29d707
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1908,6 +1921,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1913,6 +1926,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7874,7 +7922,7 @@ index 0000000000..1a5f29d707
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2049,8 +2086,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2054,8 +2091,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -13660,27 +13708,7 @@ index 0000000000..1a5f29d707
 +++
 ++ let _ =
 ++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
-++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 1e35152097..d0cc6c5a5a 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/304 by t/309
-+++Error: Illegal shadowing of included type t/299 by t/304
-++        Line 2, characters 2-19:
-++-         Type t/304 came from this include
-+++         Type t/299 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/304 is shadowed
-+++         The value print has no valid type if t/299 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff 
+++     { null_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14177,7 +14205,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index f7efed57bc..0483b1b17d 100644
+index 8f1f4f212c..2c3c398c4f 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
@@ -15158,10 +15186,10 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 240ba9f8e5..2ef5abf793 100644
+index ebc20a2ac4..b7947804cc 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
-@@ -263,7 +263,8 @@ GNUISH_SED = \
+@@ -267,7 +267,8 @@ GNUISH_SED = \
  .INTERMEDIATE: .depend.tmp
  
  .depend.tmp:
