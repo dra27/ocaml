@@ -1,6 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..726988cb0e
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:44:57.162748713 +0100
+++++ b	2023-09-28 18:44:57.166748872 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
++ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
++ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
++-@@ -10,6 +10,11 @@ let test_size =
+++@@ -12,6 +12,11 @@ let test_size =
++    try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
++    with Not_found | Failure _ -> 0
++  
++@@ -13,7 +13,7 @@
++  let (list_size, num_domains) =
++    if test_size >= 2 then (14, 25) else (13, 12)
++  
++-@@ -21,8 +26,7 @@ let rec burn l =
+++@@ -23,8 +28,7 @@ let rec burn l =
++  let test_parallel_spawn () =
++    for i = 1 to 20 do
++      Array.init num_domains (fun _ -> Domain.spawn (fun () -> burn [0]))
++@@ -23,7 +23,7 @@
++    done
++  
++  let () =
++-@@ -40,8 +44,6 @@ let () =
+++@@ -42,8 +46,6 @@ let () =
++  
++    running := false;
++    join domain_minor_gc;
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -6875,13 +6907,45 @@ index 0000000000..0afac16edc
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..65d024c43c
+index 0000000000..358953d2ce
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6801 @@
+@@ -0,0 +1,6807 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..726988cb0e
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:44:57.162748713 +0100
++++++ b	2023-09-28 18:44:57.166748872 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+++ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+++ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+++-@@ -10,6 +10,11 @@ let test_size =
++++@@ -12,6 +12,11 @@ let test_size =
+++    try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
+++    with Not_found | Failure _ -> 0
+++  
+++@@ -13,7 +13,7 @@
+++  let (list_size, num_domains) =
+++    if test_size >= 2 then (14, 25) else (13, 12)
+++  
+++-@@ -21,8 +26,7 @@ let rec burn l =
++++@@ -23,8 +28,7 @@ let rec burn l =
+++  let test_parallel_spawn () =
+++    for i = 1 to 20 do
+++      Array.init num_domains (fun _ -> Domain.spawn (fun () -> burn [0]))
+++@@ -23,7 +23,7 @@
+++    done
+++  
+++  let () =
+++-@@ -40,8 +44,6 @@ let () =
++++@@ -42,8 +46,6 @@ let () =
+++  
+++    running := false;
+++    join domain_minor_gc;
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -13653,33 +13717,7 @@ index 0000000000..65d024c43c
 ++   let t = Thread.create (fun () ->
 ++       ignore (Sys.opaque_identity (ref 1));
 ++@@ -21,6 +19,8 @@ let _ =
-++   Thread.join t;
-++   Gc.Memprof.stop ()
 ++ 
-+++[@@@ocaml.alert "-deprecated"]
-+++
-++ let _ =
-++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
-++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 1e35152097..d0cc6c5a5a 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/304 by t/309
-+++Error: Illegal shadowing of included type t/299 by t/304
-++        Line 2, characters 2-19:
-++-         Type t/304 came from this include
-+++         Type t/299 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/304 is shadowed
-+++         The value print has no valid type if t/299 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
