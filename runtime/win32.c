@@ -1090,7 +1090,8 @@ CAMLexport clock_t caml_win32_clock(void)
   return (clock_t)(total / clocks_per_sec);
 }
 
-static double clock_freq = 0;
+static LONGLONG clock_period_int64 = 0LL;
+static double clock_period_double = 0.0;
 
 void caml_init_os_params(void)
 {
@@ -1103,7 +1104,16 @@ void caml_init_os_params(void)
 
   /* Get the number of nanoseconds for each tick in QueryPerformanceCounter */
   QueryPerformanceFrequency(&frequency);
-  clock_freq = (1000000000.0 / frequency.QuadPart);
+
+  if (1000000000LL % frequency.QuadPart)
+    /* Older Windows system - leave clock_period_int64 as 0 and use
+       clock_period_double. */
+    clock_period_double = 1000000000.0 / frequency.QuadPart;
+  else
+  /* Since Windows 10 1809 / Windows Server 2019, QueryPerformanceFrequency is
+     fixed at 10MHz. Capitalise on this to use integer arithmetic where
+     possible. */
+    clock_period_int64 = 1000000000LL / frequency.QuadPart;
 }
 
 int64_t caml_time_counter(void)
@@ -1111,5 +1121,12 @@ int64_t caml_time_counter(void)
   LARGE_INTEGER now;
 
   QueryPerformanceCounter(&now);
-  return (int64_t)(now.QuadPart * clock_freq);
+
+  /* clock_period_int64 and clock_period_double are initialised by
+     caml_init_os_params */
+
+  if (clock_period_int64)
+    return (now.QuadPart * clock_period_int64);
+  else
+    return (int64_t)(now.QuadPart * clock_period_double);
 }
