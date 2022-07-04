@@ -182,6 +182,9 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
 again:
   mem = VirtualAlloc(NULL, alloc_sz, MEM_RESERVE, PAGE_NOACCESS);
 #else
+#ifdef __CYGWIN__
+again:
+#endif
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
@@ -220,6 +223,24 @@ again:
   }
   caml_gc_message(0x1000, "mmap %lld bytes at %p for heaps\n", alloc_sz, mem);
   CAMLassert(mem == (void*)aligned_start);
+#elif defined(__CYGWIN__)
+  /* Cygwin's mmap functions are ultimately backed by the Windows functions, but
+     we can't use those directly as Cygwin's memory accounting would then be
+     unaware of the OCaml heaps (and vfork will fail) */
+  munmap(mem, alloc_sz);
+  mem = mmap((void*)aligned_start,
+             aligned_end - aligned_start,
+             reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
+             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+  if (mem == MAP_FAILED) {
+    if (errno == EINVAL) {
+      /* Raced - try again. */
+      goto again;
+    } else {
+      return 0;
+    }
+  }
+  CAMLassert(mem == (void*)aligned_start);
 #else
   caml_gc_message(0x1000, "munmap %" ARCH_INT64_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n",
@@ -237,9 +258,12 @@ again:
 #ifndef _WIN32
 static void* map_fixed(void* mem, uintnat size, int prot)
 {
-  if (mmap((void*)mem, size, prot,
-           MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
+#ifdef __CYGWIN__
+  if (mprotect(mem, size, prot) != 0) {
+#else
+  if (mmap(mem, size, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
            -1, 0) == MAP_FAILED) {
+#endif
     return 0;
   } else {
     return mem;
