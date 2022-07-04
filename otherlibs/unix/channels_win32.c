@@ -115,6 +115,8 @@ CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
 {
   CAMLparam1(handle);
   CAMLlocal1(vchan);
+  int flags = 0;
+  int fd;
   struct channel * chan;
   DWORD err;
 
@@ -123,12 +125,10 @@ CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
     caml_win32_maperr(err);
     caml_uerror("in_channel_of_descr", Nothing);
   }
-  chan = caml_open_descriptor_in(caml_win32_CRT_fd_of_filedescr(handle));
-  chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC;
-                 /* as in caml_ml_open_descriptor_in() */
+  fd = caml_win32_CRT_fd_of_filedescr(handle);
   if (Descr_kind_val(handle) == KIND_SOCKET)
-    chan->flags |= CHANNEL_FLAG_FROM_SOCKET;
-  vchan = caml_alloc_channel(chan);
+    flags |= CHANNEL_FLAG_FROM_SOCKET;
+  vchan = caml_ml_open_descriptor_in_with_flags(fd, flags);
   CAMLreturn(vchan);
 }
 
@@ -137,6 +137,7 @@ CAMLprim value caml_unix_outchannel_of_filedescr(value handle)
   CAMLparam1(handle);
   CAMLlocal1(vchan);
   int fd;
+  int flags = 0;
   struct channel * chan;
   DWORD err;
 
@@ -145,12 +146,10 @@ CAMLprim value caml_unix_outchannel_of_filedescr(value handle)
     caml_win32_maperr(err);
     caml_uerror("out_channel_of_descr", Nothing);
   }
-  chan = caml_open_descriptor_out(caml_win32_CRT_fd_of_filedescr(handle));
-  chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC;
-                 /* as in caml_ml_open_descriptor_out() */
+  fd = caml_win32_CRT_fd_of_filedescr(handle);
   if (Descr_kind_val(handle) == KIND_SOCKET)
-    chan->flags |= CHANNEL_FLAG_FROM_SOCKET;
-  vchan = caml_alloc_channel(chan);
+    flags |= CHANNEL_FLAG_FROM_SOCKET;
+  vchan = caml_ml_open_descriptor_out_with_flags(fd, flags);
   CAMLreturn(vchan);
 }
 
