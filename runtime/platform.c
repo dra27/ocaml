@@ -156,7 +156,10 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
   uintnat alloc_sz = caml_mem_round_up_pages(size + alignment);
   void* mem;
-  uintnat base, aligned_start, aligned_end;
+  uintnat base, aligned_start;
+#ifndef __CYGWIN__
+  uintnat aligned_end;
+#endif
 
 #ifdef DEBUG
   if (mmap_blocks.head == NULL) {
@@ -177,6 +180,9 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
 again:
   mem = VirtualAlloc(NULL, alloc_sz, MEM_RESERVE, PAGE_NOACCESS);
 #else
+#ifdef __CYGWIN__
+again:
+#endif
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
@@ -187,14 +193,13 @@ again:
   /* trim to an aligned region */
   base = (uintnat)mem;
   aligned_start = round_up(base, alignment);
-  aligned_end = aligned_start + caml_mem_round_up_pages(size);
 #ifdef _WIN32
   /* VirtualFree can be used to decommit portions of memory, but it can only
      release the entire block of memory. For Windows, repeat the call but this
      time specify the address. */
   VirtualFree(mem, 0, MEM_RELEASE);
   mem = VirtualAlloc((void*)aligned_start,
-                     aligned_end - aligned_start + 1,
+                     alloc_sz,
                      MEM_RESERVE | (reserve_only ? 0 : MEM_COMMIT),
                      reserve_only ? PAGE_NOACCESS : PAGE_READWRITE);
   if (mem == NULL) {
@@ -211,7 +216,28 @@ again:
     }
   }
   CAMLassert(mem == (void*)aligned_start);
+#elif defined(__CYGWIN__)
+  /* Cygwin's mmap functions are ultimately backed by the Windows functions, but
+     we can't use those directly as Cygwin's memory accounting would then be
+     unaware of the OCaml heaps (and vfork will fail) */
+  if ((uintnat)mem != aligned_start) {
+    munmap(mem, alloc_sz);
+    mem = mmap((void*)aligned_start,
+               alloc_sz,
+               reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
+               MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+    if (mem == MAP_FAILED) {
+      if (errno == EINVAL) {
+        /* Raced - try again. */
+        goto again;
+      } else {
+        return 0;
+      }
+    }
+    CAMLassert((intnat)mem == aligned_start);
+  }
 #else
+  aligned_end = aligned_start + caml_mem_round_up_pages(size);
   munmap((void*)base, aligned_start - base);
   munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
 #endif
@@ -224,9 +250,12 @@ again:
 #ifndef _WIN32
 static void* map_fixed(void* mem, uintnat size, int prot)
 {
-  if (mmap((void*)mem, size, prot,
-           MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
+#ifdef __CYGWIN__
+  if (mprotect(mem, size, prot) != 0) {
+#else
+  if (mmap(mem, size, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
            -1, 0) == MAP_FAILED) {
+#endif
     return 0;
   } else {
     return mem;
