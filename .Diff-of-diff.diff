@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:44:58.118786560 +0100
++++ b	2023-09-28 18:44:58.126786876 +0100
+@@ -3,7 +3,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1849,17 +1849,6 @@ AS_CASE([$enable_debug_runtime],
++@@ -1861,17 +1861,6 @@ AS_CASE([$enable_debug_runtime],
+    [no], [debug_runtime=false],
+    [debug_runtime=true])
+  

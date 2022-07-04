@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..57bf6f16ac
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:44:58.118786560 +0100
+++++ b	2023-09-28 18:44:58.126786876 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1849,17 +1849,6 @@ AS_CASE([$enable_debug_runtime],
+++@@ -1861,17 +1861,6 @@ AS_CASE([$enable_debug_runtime],
++    [no], [debug_runtime=false],
++    [debug_runtime=true])
++  
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -700,10 +714,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 608301711a..51814089e0 100755
+index 3e3e6d44bc..5d5954f7db 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index d988aa342a..6bcea94d5d 100644
+index e42682d8f7..8ac40817d5 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -952,7 +966,7 @@ index d988aa342a..6bcea94d5d 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1864,7 +1876,8 @@ AS_CASE([$arch,$system],
+@@ -1853,7 +1865,8 @@ AS_CASE([$enable_debug_runtime],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -962,7 +976,7 @@ index d988aa342a..6bcea94d5d 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1913,6 +1926,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1902,6 +1915,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -993,7 +1007,7 @@ index d988aa342a..6bcea94d5d 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2054,8 +2091,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2043,8 +2080,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6875,13 +6889,27 @@ index 0000000000..340077091b
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..90ee4eac36
+index 0000000000..21d364d858
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6801 @@
+@@ -0,0 +1,6805 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..57bf6f16ac
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:44:58.118786560 +0100
++++++ b	2023-09-28 18:44:58.126786876 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1849,17 +1849,6 @@ AS_CASE([$enable_debug_runtime],
++++@@ -1861,17 +1861,6 @@ AS_CASE([$enable_debug_runtime],
+++    [no], [debug_runtime=false],
+++    [debug_runtime=true])
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7581,10 +7609,10 @@ index 0000000000..90ee4eac36
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 608301711a..51814089e0 100755
++index 3e3e6d44bc..5d5954f7db 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index d988aa342a..6bcea94d5d 100644
++index e42682d8f7..8ac40817d5 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -7833,7 +7861,7 @@ index 0000000000..90ee4eac36
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1864,7 +1876,8 @@ AS_CASE([$arch,$system],
++@@ -1853,7 +1865,8 @@ AS_CASE([$enable_debug_runtime],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7843,7 +7871,7 @@ index 0000000000..90ee4eac36
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1913,6 +1926,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1902,6 +1915,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7874,7 +7902,7 @@ index 0000000000..90ee4eac36
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2054,8 +2091,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2043,8 +2080,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -13669,17 +13697,7 @@ index 0000000000..90ee4eac36
 ++ Line 3, characters 2-36:
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/304 by t/309
-+++Error: Illegal shadowing of included type t/299 by t/304
-++        Line 2, characters 2-19:
-++-         Type t/304 came from this include
-+++         Type t/299 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/304 is shadowed
-+++         The value print has no valid type if t/299 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
+++-Error: Illega
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
