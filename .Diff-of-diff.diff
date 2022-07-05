@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:45:00.958898859 +0100
++++ b	2023-09-28 18:45:00.974899492 +0100
+@@ -17,7 +17,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1831,6 +1831,29 @@ AC_CHECK_HEADER([spawn.h],
++@@ -1843,6 +1843,29 @@ AC_CHECK_HEADER([spawn.h],
+  AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
+  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
+  

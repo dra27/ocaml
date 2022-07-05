@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..4bd7ebb31f
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:00.958898859 +0100
+++++ b	2023-09-28 18:45:00.974899492 +0100
++@@ -17,7 +17,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1831,6 +1831,29 @@ AC_CHECK_HEADER([spawn.h],
+++@@ -1843,6 +1843,29 @@ AC_CHECK_HEADER([spawn.h],
++  AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
++  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
++  
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index aea0de9738..926653c8b6 100644
+index a06a9c9111..2363d9b656 100644
 --- a/Changes
 +++ b/Changes
-@@ -477,13 +477,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -481,13 +481,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -33,7 +47,7 @@ index aea0de9738..926653c8b6 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -587,6 +587,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -591,6 +591,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -43,7 +57,7 @@ index aea0de9738..926653c8b6 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -846,6 +849,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -850,6 +853,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -700,10 +714,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 3e3e6d44bc..51814089e0 100755
+index 89760d617a..c49e055046 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index e42682d8f7..6bcea94d5d 100644
+index 12f359f381..be29e2b3b3 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -952,7 +966,7 @@ index e42682d8f7..6bcea94d5d 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1849,11 +1861,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1872,11 +1884,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -977,7 +991,7 @@ index e42682d8f7..6bcea94d5d 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1902,6 +1926,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1925,6 +1949,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -1008,7 +1022,7 @@ index e42682d8f7..6bcea94d5d 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2043,8 +2091,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2066,8 +2114,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -6890,13 +6904,27 @@ index 0000000000..340077091b
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..91150b77f4
+index 0000000000..b728ccd3c6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6804 @@
+@@ -0,0 +1,6807 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..4bd7ebb31f
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:00.958898859 +0100
++++++ b	2023-09-28 18:45:00.974899492 +0100
+++@@ -17,7 +17,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1831,6 +1831,29 @@ AC_CHECK_HEADER([spawn.h],
++++@@ -1843,6 +1843,29 @@ AC_CHECK_HEADER([spawn.h],
+++  AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
+++  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -6910,10 +6938,10 @@ index 0000000000..91150b77f4
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index aea0de9738..926653c8b6 100644
++index a06a9c9111..2363d9b656 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -477,13 +477,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -481,13 +481,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -6929,7 +6957,7 @@ index 0000000000..91150b77f4
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -587,6 +587,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -591,6 +591,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -6939,7 +6967,7 @@ index 0000000000..91150b77f4
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -846,6 +849,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -850,6 +853,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -7596,10 +7624,10 @@ index 0000000000..91150b77f4
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 3e3e6d44bc..51814089e0 100755
++index 89760d617a..c49e055046 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index e42682d8f7..6bcea94d5d 100644
++index 12f359f381..be29e2b3b3 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -7848,7 +7876,7 @@ index 0000000000..91150b77f4
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1849,11 +1861,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1872,11 +1884,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -7873,7 +7901,7 @@ index 0000000000..91150b77f4
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1902,6 +1926,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1925,6 +1949,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7904,7 +7932,7 @@ index 0000000000..91150b77f4
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2043,8 +2091,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2066,8 +2114,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -13686,18 +13714,7 @@ index 0000000000..91150b77f4
 ++   Thread.join t;
 ++   Gc.Memprof.stop ()
 ++ 
-+++[@@@ocaml.alert "-deprecated"]
-+++
-++ let _ =
-++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
-++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 1e35152097..d0cc6c5a5a 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 
++++[@@
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
