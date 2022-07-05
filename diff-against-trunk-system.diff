@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..4bd7ebb31f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:00.958898859 +0100
-++++ b	2023-09-28 18:45:00.974899492 +0100
-+@@ -17,7 +17,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1831,6 +1831,29 @@ AC_CHECK_HEADER([spawn.h],
-++@@ -1843,6 +1843,29 @@ AC_CHECK_HEADER([spawn.h],
-+  AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
-+  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -3562,10 +3548,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..340077091b
+index 0000000000..f4762be748
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3336 @@
+@@ -0,0 +1,3366 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7f2433adc9..68329c5bc1 100644
 +--- a/ocamltest/Makefile
@@ -6151,6 +6137,36 @@ index 0000000000..340077091b
 + *)
 + 
 + (* Classic producer-consumer *)
++diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
++index a0c5eab744..f31f507819 100644
++--- a/testsuite/tests/parallel/recommended_domain_count.ml
+++++ b/testsuite/tests/parallel/recommended_domain_count.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ modules = "recommended_domain_count_cstubs.c"
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ 
++ external get_max_domains : unit -> int = "caml_get_max_domains"
++diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
++index 64cf056ad8..8662a37fbd 100644
++--- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
+++++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
++@@ -1,8 +1,10 @@
++ (* TEST
++-* hasunix
+++* skip
+++reason = "OCaml 5 only"
+++** hasunix
++ include unix
++-** bytecode
++-** native
+++*** bytecode
+++*** native
++ *)
++ 
++ let try_ext cmd =
 +diff --git a/testsuite/tests/parallel/tak.ml b/testsuite/tests/parallel/tak.ml
 +index a9b6874c4f..bdc4173266 100644
 +--- a/testsuite/tests/parallel/tak.ml
@@ -6904,27 +6920,13 @@ index 0000000000..340077091b
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b728ccd3c6
+index 0000000000..e01d77ac12
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6807 @@
+@@ -0,0 +1,6810 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..4bd7ebb31f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:00.958898859 +0100
-+++++ b	2023-09-28 18:45:00.974899492 +0100
-++@@ -17,7 +17,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1831,6 +1831,29 @@ AC_CHECK_HEADER([spawn.h],
-+++@@ -1843,6 +1843,29 @@ AC_CHECK_HEADER([spawn.h],
-++  AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
-++  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -10472,10 +10474,10 @@ index 0000000000..b728ccd3c6
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..340077091b
++index 0000000000..f4762be748
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3336 @@
++@@ -0,0 +1,3366 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7f2433adc9..68329c5bc1 100644
 ++--- a/ocamltest/Makefile
@@ -13061,6 +13063,36 @@ index 0000000000..b728ccd3c6
 ++ *)
 ++ 
 ++ (* Classic producer-consumer *)
+++diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
+++index a0c5eab744..f31f507819 100644
+++--- a/testsuite/tests/parallel/recommended_domain_count.ml
++++++ b/testsuite/tests/parallel/recommended_domain_count.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ modules = "recommended_domain_count_cstubs.c"
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ 
+++ external get_max_domains : unit -> int = "caml_get_max_domains"
+++diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
+++index 64cf056ad8..8662a37fbd 100644
+++--- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
++++++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
+++@@ -1,8 +1,10 @@
+++ (* TEST
+++-* hasunix
++++* skip
++++reason = "OCaml 5 only"
++++** hasunix
+++ include unix
+++-** bytecode
+++-** native
++++*** bytecode
++++*** native
+++ *)
+++ 
+++ let try_ext cmd =
 ++diff --git a/testsuite/tests/parallel/tak.ml b/testsuite/tests/parallel/tak.ml
 ++index a9b6874c4f..bdc4173266 100644
 ++--- a/testsuite/tests/parallel/tak.ml
@@ -13702,20 +13734,6 @@ index 0000000000..b728ccd3c6
 ++ ** native
 ++ *)
 ++@@ -12,7 +10,7 @@ let _ =
-++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
-++                 { null_tracker with alloc_minor = fun _ ->
-++                       if Thread.id (Thread.self ()) <> main_thread then
-++-                        Thread.exit ();
-+++                        raise Thread.Exit;
-++                       None });
-++   let t = Thread.create (fun () ->
-++       ignore (Sys.opaque_identity (ref 1));
-++@@ -21,6 +19,8 @@ let _ =
-++   Thread.join t;
-++   Gc.Memprof.stop ()
-++ 
-+++[@@
-\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
