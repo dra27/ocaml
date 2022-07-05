@@ -1,56 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e82f2b3d65
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,47 @@
-+--- a	2023-09-28 18:45:00.366875464 +0100
-++++ b	2023-09-28 18:45:00.382876097 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -598,7 +598,8 @@ OCaml 4.14.0 (28 March 2022)
-++@@ -601,7 +601,8 @@ OCaml 4.14.0 (28 March 2022)
-+    WSADuplicateSocket on sockets instead of DuplicateHandle.
-+    (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
-+  
-+@@ -26,7 +26,7 @@
-+ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
-+ --- a/otherlibs/unix/unixsupport.h
-+ +++ b/otherlibs/unix/unixsupport.h
-+-@@ -87,7 +87,6 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
-++@@ -96,7 +96,6 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
-+                                  BOOL inherit);
-+  
-+  extern void caml_win32_maperr(DWORD errcode);
-+@@ -34,7 +34,7 @@
-+  #endif /* _WIN32 */
-+  
-+  #define Nothing ((value) 0)
-+-@@ -95,12 +94,6 @@ extern void caml_win32_maperr(DWORD errcode);
-++@@ -104,12 +103,6 @@ extern void caml_win32_maperr(DWORD errcode);
-+  extern value caml_unix_error_of_code (int errcode);
-+  extern int caml_unix_code_of_unix_error (value error);
-+  
-+@@ -47,7 +47,7 @@
-+  CAMLnoreturn_start
-+  extern void caml_unix_error (int errcode, const char * cmdname, value arg)
-+  CAMLnoreturn_end;
-+-@@ -109,12 +102,6 @@ CAMLnoreturn_start
-++@@ -118,12 +111,6 @@ CAMLnoreturn_start
-+  extern void caml_uerror (const char * cmdname, value arg)
-+  CAMLnoreturn_end;
-+  
-+@@ -60,7 +60,7 @@
-+  extern void caml_unix_check_path(value path, const char * cmdname);
-+  
-+  #define UNIX_BUFFER_SIZE 65536
-+-@@ -135,7 +122,37 @@ extern int caml_win32_set_inherit(HANDLE fd, BOOL inherit);
-++@@ -144,7 +131,37 @@ extern int caml_win32_set_inherit(HANDLE fd, BOOL inherit);
-+  #else
-+  extern void caml_unix_set_cloexec(int fd, char * cmdname, value arg);
-+  extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -64,10 +14,10 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 160a8fdf86..6a282b8ee0 100644
+index aea0de9738..926653c8b6 100644
 --- a/Changes
 +++ b/Changes
-@@ -474,13 +474,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -477,13 +477,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -83,7 +33,7 @@ index 160a8fdf86..6a282b8ee0 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -584,6 +584,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -587,6 +587,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -93,7 +43,7 @@ index 160a8fdf86..6a282b8ee0 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -843,6 +846,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -846,6 +849,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6940,63 +6890,13 @@ index 0000000000..340077091b
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..361a8641e3
+index 0000000000..91150b77f4
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6909 @@
+@@ -0,0 +1,6804 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e82f2b3d65
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,47 @@
-++--- a	2023-09-28 18:45:00.366875464 +0100
-+++++ b	2023-09-28 18:45:00.382876097 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -598,7 +598,8 @@ OCaml 4.14.0 (28 March 2022)
-+++@@ -601,7 +601,8 @@ OCaml 4.14.0 (28 March 2022)
-++    WSADuplicateSocket on sockets instead of DuplicateHandle.
-++    (Antonin Décimo, review by Xavier Leroy and Nicolás Ojeda Bär)
-++  
-++@@ -26,7 +26,7 @@
-++ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
-++ --- a/otherlibs/unix/unixsupport.h
-++ +++ b/otherlibs/unix/unixsupport.h
-++-@@ -87,7 +87,6 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
-+++@@ -96,7 +96,6 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
-++                                  BOOL inherit);
-++  
-++  extern void caml_win32_maperr(DWORD errcode);
-++@@ -34,7 +34,7 @@
-++  #endif /* _WIN32 */
-++  
-++  #define Nothing ((value) 0)
-++-@@ -95,12 +94,6 @@ extern void caml_win32_maperr(DWORD errcode);
-+++@@ -104,12 +103,6 @@ extern void caml_win32_maperr(DWORD errcode);
-++  extern value caml_unix_error_of_code (int errcode);
-++  extern int caml_unix_code_of_unix_error (value error);
-++  
-++@@ -47,7 +47,7 @@
-++  CAMLnoreturn_start
-++  extern void caml_unix_error (int errcode, const char * cmdname, value arg)
-++  CAMLnoreturn_end;
-++-@@ -109,12 +102,6 @@ CAMLnoreturn_start
-+++@@ -118,12 +111,6 @@ CAMLnoreturn_start
-++  extern void caml_uerror (const char * cmdname, value arg)
-++  CAMLnoreturn_end;
-++  
-++@@ -60,7 +60,7 @@
-++  extern void caml_unix_check_path(value path, const char * cmdname);
-++  
-++  #define UNIX_BUFFER_SIZE 65536
-++-@@ -135,7 +122,37 @@ extern int caml_win32_set_inherit(HANDLE fd, BOOL inherit);
-+++@@ -144,7 +131,37 @@ extern int caml_win32_set_inherit(HANDLE fd, BOOL inherit);
-++  #else
-++  extern void caml_unix_set_cloexec(int fd, char * cmdname, value arg);
-++  extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7010,10 +6910,10 @@ index 0000000000..361a8641e3
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 160a8fdf86..6a282b8ee0 100644
++index aea0de9738..926653c8b6 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -474,13 +474,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -477,13 +477,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7029,7 +6929,7 @@ index 0000000000..361a8641e3
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -584,6 +584,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -587,6 +587,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7039,7 +6939,7 @@ index 0000000000..361a8641e3
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -843,6 +846,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -846,6 +849,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13797,62 +13697,7 @@ index 0000000000..361a8641e3
 +++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
 ++@@ -24,11 +24,11 @@ end
 ++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/304 by t/309
-+++Error: Illegal shadowing of included type t/299 by t/304
-++        Line 2, characters 2-19:
-++-         Type t/304 came from this include
-+++         Type t/299 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/304 is shadowed
-+++         The value print has no valid type if t/299 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(*
+++ 3 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
