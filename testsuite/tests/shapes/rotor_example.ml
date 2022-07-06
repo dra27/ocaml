@@ -26,7 +26,7 @@ end
 {
  "Pair"[module] ->
      Abs<.9>
-        (X/294, Abs(Y/295, {
+        (X/275, Abs(Y/276, {
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));
