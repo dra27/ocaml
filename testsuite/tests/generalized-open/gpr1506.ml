@@ -103,9 +103,21 @@ include struct open struct type t = T end let x = T end
 Line 1, characters 15-41:
 1 | include struct open struct type t = T end let x = T end
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+<<<<<<< HEAD
 Error: The type t/352 introduced by this open appears in the signature
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+Error: The type t/357 introduced by this open appears in the signature
+=======
+Error: The type t/338 introduced by this open appears in the signature
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
        Line 1, characters 46-47:
+<<<<<<< HEAD
          The value x has no valid type if t/352 is hidden
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+         The value x has no valid type if t/357 is hidden
+=======
+         The value x has no valid type if t/338 is hidden
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
 |}];;
 
 module A = struct
@@ -123,9 +135,21 @@ Lines 3-6, characters 4-7:
 4 |       type t = T
 5 |       let x = T
 6 |     end
+<<<<<<< HEAD
 Error: The type t/357 introduced by this open appears in the signature
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+Error: The type t/362 introduced by this open appears in the signature
+=======
+Error: The type t/343 introduced by this open appears in the signature
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
        Line 7, characters 8-9:
+<<<<<<< HEAD
          The value y has no valid type if t/357 is hidden
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+         The value y has no valid type if t/362 is hidden
+=======
+         The value y has no valid type if t/343 is hidden
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
 |}];;
 
 module A = struct
@@ -142,9 +166,21 @@ Lines 3-5, characters 4-7:
 3 | ....open struct
 4 |       type t = T
 5 |     end
+<<<<<<< HEAD
 Error: The type t/362 introduced by this open appears in the signature
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+Error: The type t/367 introduced by this open appears in the signature
+=======
+Error: The type t/348 introduced by this open appears in the signature
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
        Line 6, characters 8-9:
+<<<<<<< HEAD
          The value y has no valid type if t/362 is hidden
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+         The value y has no valid type if t/367 is hidden
+=======
+         The value y has no valid type if t/348 is hidden
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
 |}]
 
 (* It was decided to not allow this anymore. *)

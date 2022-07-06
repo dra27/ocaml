@@ -17,7 +17,13 @@ module type S = sig type t val x : t end
 module Falias (X : S) = X
 [%%expect{|
 {
+<<<<<<< HEAD
  "Falias"[module] -> Abs<.4>(X/294, X/294<.3>);
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+ "Falias"[module] -> Abs<.4>(X/299, X/299<.3>);
+=======
+ "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
  }
 module Falias : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -29,10 +35,24 @@ end
 {
  "Finclude"[module] ->
      Abs<.6>
+<<<<<<< HEAD
         (X/298,
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+        (X/303,
+=======
+        (X/284,
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
          {
+<<<<<<< HEAD
           "t"[type] -> X/298<.5> . "t"[type];
           "x"[value] -> X/298<.5> . "x"[value];
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+          "t"[type] -> X/303<.5> . "t"[type];
+          "x"[value] -> X/303<.5> . "x"[value];
+=======
+          "t"[type] -> X/284<.5> . "t"[type];
+          "x"[value] -> X/284<.5> . "x"[value];
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
           });
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -45,7 +65,13 @@ end
 [%%expect{|
 {
  "Fredef"[module] ->
+<<<<<<< HEAD
      Abs<.10>(X/305, {
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+     Abs<.10>(X/310, {
+=======
+     Abs<.10>(X/291, {
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
                       "t"[type] -> <.8>;
                       "x"[value] -> <.9>;
                       });
@@ -223,8 +249,16 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 [%%expect{|
 {
  "Big_to_small1"[module] ->
+<<<<<<< HEAD
      Abs<.40>(X/400, {<.39>
                       "t"[type] -> X/400<.39> . "t"[type];
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+     Abs<.40>(X/405, {<.39>
+                      "t"[type] -> X/405<.39> . "t"[type];
+=======
+     Abs<.40>(X/386, {<.39>
+                      "t"[type] -> X/386<.39> . "t"[type];
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
                       });
  }
 module Big_to_small1 : B2S
@@ -234,8 +268,16 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 [%%expect{|
 {
  "Big_to_small2"[module] ->
+<<<<<<< HEAD
      Abs<.42>(X/403, {
                       "t"[type] -> X/403<.41> . "t"[type];
+||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+     Abs<.42>(X/408, {
+                      "t"[type] -> X/408<.41> . "t"[type];
+=======
+     Abs<.42>(X/389, {
+                      "t"[type] -> X/389<.41> . "t"[type];
+>>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
                       });
  }
 module Big_to_small2 : B2S
