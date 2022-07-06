@@ -1,6 +1,47 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..66222d5df5
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,38 @@
++--- a	2023-09-28 18:45:02.890975143 +0100
+++++ b	2023-09-28 18:45:02.894975301 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/gc-roots/globroots_parallel.ml b/testsuite/tests/gc-roots/globroots_parallel.ml
++ --- a/testsuite/tests/gc-roots/globroots_parallel.ml
++ +++ b/testsuite/tests/gc-roots/globroots_parallel.ml
++-@@ -5,7 +5,16 @@
+++@@ -7,7 +7,16 @@
++  
++  open Globroots
++  
++@@ -22,7 +22,7 @@
++ diff --git a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
++ --- a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
++ +++ b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
++-@@ -8,6 +8,13 @@ open Globroots
+++@@ -10,6 +10,13 @@ open Globroots
++  module TestClassic = Test(Classic)
++  module TestGenerational = Test(Generational)
++  
++@@ -39,7 +39,7 @@
++ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++-@@ -22,6 +22,11 @@ let test_size =
+++@@ -24,6 +24,11 @@ let test_size =
++  let (list_size, num_domains, niters) =
++    if test_size >= 2 then (14, 8, 20) else (13, 4, 5)
++  
++@@ -54,7 +54,7 @@
++ diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
++ --- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++ +++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
++-@@ -149,6 +149,13 @@ let run () =
+++@@ -152,6 +152,13 @@ let run () =
++    ()
++  end
++  
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -7144,13 +7185,54 @@ index 0000000000..077717566b
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..832b97289a
+index 0000000000..f7dfadcd38
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7047 @@
+@@ -0,0 +1,7149 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..66222d5df5
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,38 @@
+++--- a	2023-09-28 18:45:02.890975143 +0100
++++++ b	2023-09-28 18:45:02.894975301 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/gc-roots/globroots_parallel.ml b/testsuite/tests/gc-roots/globroots_parallel.ml
+++ --- a/testsuite/tests/gc-roots/globroots_parallel.ml
+++ +++ b/testsuite/tests/gc-roots/globroots_parallel.ml
+++-@@ -5,7 +5,16 @@
++++@@ -7,7 +7,16 @@
+++  
+++  open Globroots
+++  
+++@@ -22,7 +22,7 @@
+++ diff --git a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+++ --- a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+++ +++ b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+++-@@ -8,6 +8,13 @@ open Globroots
++++@@ -10,6 +10,13 @@ open Globroots
+++  module TestClassic = Test(Classic)
+++  module TestGenerational = Test(Generational)
+++  
+++@@ -39,7 +39,7 @@
+++ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+++ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+++ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+++-@@ -22,6 +22,11 @@ let test_size =
++++@@ -24,6 +24,11 @@ let test_size =
+++  let (list_size, num_domains, niters) =
+++    if test_size >= 2 then (14, 8, 20) else (13, 4, 5)
+++  
+++@@ -54,7 +54,7 @@
+++ diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++ --- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++ +++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++-@@ -149,6 +149,13 @@ let run () =
++++@@ -152,6 +152,13 @@ let run () =
+++    ()
+++  end
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -14194,7 +14276,68 @@ index 0000000000..832b97289a
 ++   Thread.join t;
 ++   Gc.Memprof.stop ()
 ++ 
-+++[
++++[@@@ocaml.alert "-deprecated"]
++++
+++ let _ =
+++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
+++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 1e35152097..d0cc6c5a5a 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/304 by t/309
++++Error: Illegal shadowing of included type t/299 by t/304
+++        Line 2, characters 2-19:
+++-         Type t/304 came from this include
++++         Type t/299 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/304 is shadowed
++++         The value print has no valid type if t/299 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..75
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

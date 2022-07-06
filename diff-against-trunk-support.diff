@@ -1407,7 +1407,7 @@ index 56d1586331..6bdb7fdaf3 100644
  
  module type GLOBREF = sig
 diff --git a/testsuite/tests/gc-roots/globroots_parallel.ml b/testsuite/tests/gc-roots/globroots_parallel.ml
-index 4c3e36d140..fabbaa8ec6 100644
+index 9ef88575b2..4858ecc49b 100644
 --- a/testsuite/tests/gc-roots/globroots_parallel.ml
 +++ b/testsuite/tests/gc-roots/globroots_parallel.ml
 @@ -1,6 +1,8 @@
@@ -1420,7 +1420,7 @@ index 4c3e36d140..fabbaa8ec6 100644
  
  open Globroots
 diff --git a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
-index bf392c13b0..cf932d9491 100644
+index c8b36098ac..d548d6e540 100644
 --- a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
 +++ b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
 @@ -1,6 +1,8 @@
@@ -2437,7 +2437,7 @@ index ecc9d0b78f..2b6369bc3b 100644
  
  open Domain
 diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
-index 2776f14e10..93cb3623da 100644
+index 883ab1a5ab..245b0b73fb 100644
 --- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
 +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
 @@ -1,4 +1,6 @@
@@ -3525,7 +3525,7 @@ index fbcd16e8e1..56a5f30733 100644
  Driver.entry
  caml_program
 diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-index 744c4e844d..621d7292ff 100644
+index e3cab0e83e..26b5878c7a 100644
 --- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
 +++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
 @@ -1,4 +1,7 @@

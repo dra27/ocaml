@@ -1,0 +1,38 @@
+--- a	2023-09-28 18:45:02.890975143 +0100
++++ b	2023-09-28 18:45:02.894975301 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/gc-roots/globroots_parallel.ml b/testsuite/tests/gc-roots/globroots_parallel.ml
+ --- a/testsuite/tests/gc-roots/globroots_parallel.ml
+ +++ b/testsuite/tests/gc-roots/globroots_parallel.ml
+-@@ -5,7 +5,16 @@
++@@ -7,7 +7,16 @@
+  
+  open Globroots
+  
+@@ -22,7 +22,7 @@
+ diff --git a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+ --- a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+ +++ b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+-@@ -8,6 +8,13 @@ open Globroots
++@@ -10,6 +10,13 @@ open Globroots
+  module TestClassic = Test(Classic)
+  module TestGenerational = Test(Generational)
+  
+@@ -39,7 +39,7 @@
+ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+-@@ -22,6 +22,11 @@ let test_size =
++@@ -24,6 +24,11 @@ let test_size =
+  let (list_size, num_domains, niters) =
+    if test_size >= 2 then (14, 8, 20) else (13, 4, 5)
+  
+@@ -54,7 +54,7 @@
+ diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+ --- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
+ +++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+-@@ -149,6 +149,13 @@ let run () =
++@@ -152,6 +152,13 @@ let run () =
+    ()
+  end
+  
