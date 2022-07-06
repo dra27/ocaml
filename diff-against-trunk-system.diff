@@ -1,670 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c3c3831978
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,661 @@
-+--- a	2023-09-28 18:45:03.314991872 +0100
-++++ b	2023-09-28 18:45:03.330992503 +0100
-+@@ -20,20 +20,20 @@
-+  | _ -> false
-+  ;;
-+  [%%expect{|
-+--(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-+-+(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-++-(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
-+++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
-+    (catch
-+      (catch
-+--      (catch (if (!= *match*/295 3) (exit 3) (exit 1)) with (3)
-+--        (if (!= *match*/294 1) (exit 2) (exit 1)))
-+-+      (catch (if (!= *match*/276 3) (exit 3) (exit 1)) with (3)
-+-+        (if (!= *match*/275 1) (exit 2) (exit 1)))
-++-      (catch (if (!= *match*/290 3) (exit 3) (exit 1)) with (3)
-++-        (if (!= *match*/289 1) (exit 2) (exit 1)))
-+++      (catch (if (!= *match*/271 3) (exit 3) (exit 1)) with (3)
-+++        (if (!= *match*/270 1) (exit 2) (exit 1)))
-+       with (2) 0)
-+     with (1) 1))
-+--(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-+--  (catch (if (!= *match*/295 3) (if (!= *match*/294 1) 0 (exit 1)) (exit 1))
-+-+(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-+-+  (catch (if (!= *match*/276 3) (if (!= *match*/275 1) 0 (exit 1)) (exit 1))
-++-(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
-++-  (catch (if (!= *match*/290 3) (if (!= *match*/289 1) 0 (exit 1)) (exit 1))
-+++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
-+++  (catch (if (!= *match*/271 3) (if (!= *match*/270 1) 0 (exit 1)) (exit 1))
-+     with (1) 1))
-+  - : bool = false
-+  |}];;
-+@@ -41,40 +41,40 @@
-+  | _ -> false
-+  ;;
-+  [%%expect{|
-+--(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-+-+(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
-++-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-+++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-+    (catch
-+      (catch
-+        (catch
-+--        (if (!= *match*/300 3) (exit 6)
-+--          (let (x/303 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-+--            (exit 4 x/303)))
-+-+        (if (!= *match*/281 3) (exit 6)
-+-+          (let (x/284 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
-+-+            (exit 4 x/284)))
-++-        (if (!= *match*/295 3) (exit 6)
-++-          (let (x/298 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-++-            (exit 4 x/298)))
-+++        (if (!= *match*/276 3) (exit 6)
-+++          (let (x/279 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
-+++            (exit 4 x/279)))
-+         with (6)
-+--        (if (!= *match*/299 1) (exit 5)
-+--          (let (x/302 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-+--            (exit 4 x/302))))
-+-+        (if (!= *match*/280 1) (exit 5)
-+-+          (let (x/283 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
-+-+            (exit 4 x/283))))
-++-        (if (!= *match*/294 1) (exit 5)
-++-          (let (x/297 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-++-            (exit 4 x/297))))
-+++        (if (!= *match*/275 1) (exit 5)
-+++          (let (x/278 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
-+++            (exit 4 x/278))))
-+       with (5) 0)
-+--   with (4 x/297) (seq (ignore x/297) 1)))
-+--(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-+-+   with (4 x/278) (seq (ignore x/278) 1)))
-+-+(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
-++-   with (4 x/292) (seq (ignore x/292) 1)))
-++-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-+++   with (4 x/273) (seq (ignore x/273) 1)))
-+++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-+    (catch
-+--    (if (!= *match*/300 3)
-+--      (if (!= *match*/299 1) 0
-+--        (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-+--      (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-+--   with (4 x/297) (seq (ignore x/297) 1)))
-+-+    (if (!= *match*/281 3)
-+-+      (if (!= *match*/280 1) 0
-+-+        (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
-+-+      (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
-+-+   with (4 x/278) (seq (ignore x/278) 1)))
-++-    (if (!= *match*/295 3)
-++-      (if (!= *match*/294 1) 0
-++-        (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-++-      (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-++-   with (4 x/292) (seq (ignore x/292) 1)))
-+++    (if (!= *match*/276 3)
-+++      (if (!= *match*/275 1) 0
-+++        (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
-+++      (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
-+++   with (4 x/273) (seq (ignore x/273) 1)))
-+  - : bool = false
-+  |}];;
-+  
-+@@ -82,10 +82,10 @@
-+    | ((true, _) as _g)
-+    | ((false, _) as _g) -> ()
-+  [%%expect{|
-+--(function a/304[int] b/305 : int 0)
-+--(function a/304[int] b/305 : int 0)
-+-+(function a/285[int] b/286 : int 0)
-+-+(function a/285[int] b/286 : int 0)
-++-(function a/299[int] b/300 : int 0)
-++-(function a/299[int] b/300 : int 0)
-+++(function a/280[int] b/281 : int 0)
-+++(function a/280[int] b/281 : int 0)
-+  - : bool -> 'a -> unit = <fun>
-+  |}];;
-+  
-+@@ -93,10 +93,10 @@
-+  | (false, _) as p -> p
-+  (* outside, trivial *)
-+  [%%expect {|
-+--(function a/308[int] b/309 (let (p/310 =a (makeblock 0 a/308 b/309)) p/310))
-+--(function a/308[int] b/309 (makeblock 0 a/308 b/309))
-+-+(function a/289[int] b/290 (let (p/291 =a (makeblock 0 a/289 b/290)) p/291))
-+-+(function a/289[int] b/290 (makeblock 0 a/289 b/290))
-++-(function a/303[int] b/304 (let (p/305 =a (makeblock 0 a/303 b/304)) p/305))
-++-(function a/303[int] b/304 (makeblock 0 a/303 b/304))
-+++(function a/284[int] b/285 (let (p/286 =a (makeblock 0 a/284 b/285)) p/286))
-+++(function a/284[int] b/285 (makeblock 0 a/284 b/285))
-+  - : bool -> 'a -> bool * 'a = <fun>
-+  |}]
-+  
-+@@ -104,10 +104,10 @@
-+  | ((false, _) as p) -> p
-+  (* inside, trivial *)
-+  [%%expect{|
-+--(function a/312[int] b/313 (let (p/314 =a (makeblock 0 a/312 b/313)) p/314))
-+--(function a/312[int] b/313 (makeblock 0 a/312 b/313))
-+-+(function a/293[int] b/294 (let (p/295 =a (makeblock 0 a/293 b/294)) p/295))
-+-+(function a/293[int] b/294 (makeblock 0 a/293 b/294))
-++-(function a/307[int] b/308 (let (p/309 =a (makeblock 0 a/307 b/308)) p/309))
-++-(function a/307[int] b/308 (makeblock 0 a/307 b/308))
-+++(function a/288[int] b/289 (let (p/290 =a (makeblock 0 a/288 b/289)) p/290))
-+++(function a/288[int] b/289 (makeblock 0 a/288 b/289))
-+  - : bool -> 'a -> bool * 'a = <fun>
-+  |}];;
-+  
-+@@ -115,16 +115,16 @@
-+  | (false as x, _) as p -> x, p
-+  (* outside, simple *)
-+  [%%expect {|
-+--(function a/318[int] b/319
-+--  (let (x/320 =a[int] a/318 p/321 =a (makeblock 0 a/318 b/319))
-+--    (makeblock 0 (int,*) x/320 p/321)))
-+--(function a/318[int] b/319
-+--  (makeblock 0 (int,*) a/318 (makeblock 0 a/318 b/319)))
-+-+(function a/299[int] b/300
-+-+  (let (x/301 =a[int] a/299 p/302 =a (makeblock 0 a/299 b/300))
-+-+    (makeblock 0 (int,*) x/301 p/302)))
-+-+(function a/299[int] b/300
-+-+  (makeblock 0 (int,*) a/299 (makeblock 0 a/299 b/300)))
-++-(function a/313[int] b/314
-++-  (let (x/315 =a[int] a/313 p/316 =a (makeblock 0 a/313 b/314))
-++-    (makeblock 0 (int,*) x/315 p/316)))
-++-(function a/313[int] b/314
-++-  (makeblock 0 (int,*) a/313 (makeblock 0 a/313 b/314)))
-+++(function a/294[int] b/295
-+++  (let (x/296 =a[int] a/294 p/297 =a (makeblock 0 a/294 b/295))
-+++    (makeblock 0 (int,*) x/296 p/297)))
-+++(function a/294[int] b/295
-+++  (makeblock 0 (int,*) a/294 (makeblock 0 a/294 b/295)))
-+  - : bool -> 'a -> bool * (bool * 'a) = <fun>
-+  |}]
-+  
-+@@ -132,16 +132,16 @@
-+  | ((false as x, _) as p) -> x, p
-+  (* inside, simple *)
-+  [%%expect {|
-+--(function a/324[int] b/325
-+--  (let (x/326 =a[int] a/324 p/327 =a (makeblock 0 a/324 b/325))
-+--    (makeblock 0 (int,*) x/326 p/327)))
-+--(function a/324[int] b/325
-+--  (makeblock 0 (int,*) a/324 (makeblock 0 a/324 b/325)))
-+-+(function a/305[int] b/306
-+-+  (let (x/307 =a[int] a/305 p/308 =a (makeblock 0 a/305 b/306))
-+-+    (makeblock 0 (int,*) x/307 p/308)))
-+-+(function a/305[int] b/306
-+-+  (makeblock 0 (int,*) a/305 (makeblock 0 a/305 b/306)))
-++-(function a/319[int] b/320
-++-  (let (x/321 =a[int] a/319 p/322 =a (makeblock 0 a/319 b/320))
-++-    (makeblock 0 (int,*) x/321 p/322)))
-++-(function a/319[int] b/320
-++-  (makeblock 0 (int,*) a/319 (makeblock 0 a/319 b/320)))
-+++(function a/300[int] b/301
-+++  (let (x/302 =a[int] a/300 p/303 =a (makeblock 0 a/300 b/301))
-+++    (makeblock 0 (int,*) x/302 p/303)))
-+++(function a/300[int] b/301
-+++  (makeblock 0 (int,*) a/300 (makeblock 0 a/300 b/301)))
-+  - : bool -> 'a -> bool * (bool * 'a) = <fun>
-+  |}]
-+  
-+@@ -149,24 +149,24 @@
-+  | (false, x) as p -> x, p
-+  (* outside, complex *)
-+  [%%expect{|
-+--(function a/334[int] b/335[int]
-+--  (if a/334
-+--    (let (x/336 =a[int] a/334 p/337 =a (makeblock 0 a/334 b/335))
-+--      (makeblock 0 (int,*) x/336 p/337))
-+--    (let (x/338 =a b/335 p/339 =a (makeblock 0 a/334 b/335))
-+--      (makeblock 0 (int,*) x/338 p/339))))
-+--(function a/334[int] b/335[int]
-+--  (if a/334 (makeblock 0 (int,*) a/334 (makeblock 0 a/334 b/335))
-+--    (makeblock 0 (int,*) b/335 (makeblock 0 a/334 b/335))))
-+-+(function a/315[int] b/316[int]
-+-+  (if a/315
-+-+    (let (x/317 =a[int] a/315 p/318 =a (makeblock 0 a/315 b/316))
-+-+      (makeblock 0 (int,*) x/317 p/318))
-+-+    (let (x/319 =a b/316 p/320 =a (makeblock 0 a/315 b/316))
-+-+      (makeblock 0 (int,*) x/319 p/320))))
-+-+(function a/315[int] b/316[int]
-+-+  (if a/315 (makeblock 0 (int,*) a/315 (makeblock 0 a/315 b/316))
-+-+    (makeblock 0 (int,*) b/316 (makeblock 0 a/315 b/316))))
-++-(function a/329[int] b/330[int]
-++-  (if a/329
-++-    (let (x/331 =a[int] a/329 p/332 =a (makeblock 0 a/329 b/330))
-++-      (makeblock 0 (int,*) x/331 p/332))
-++-    (let (x/333 =a b/330 p/334 =a (makeblock 0 a/329 b/330))
-++-      (makeblock 0 (int,*) x/333 p/334))))
-++-(function a/329[int] b/330[int]
-++-  (if a/329 (makeblock 0 (int,*) a/329 (makeblock 0 a/329 b/330))
-++-    (makeblock 0 (int,*) b/330 (makeblock 0 a/329 b/330))))
-+++(function a/310[int] b/311[int]
-+++  (if a/310
-+++    (let (x/312 =a[int] a/310 p/313 =a (makeblock 0 a/310 b/311))
-+++      (makeblock 0 (int,*) x/312 p/313))
-+++    (let (x/314 =a b/311 p/315 =a (makeblock 0 a/310 b/311))
-+++      (makeblock 0 (int,*) x/314 p/315))))
-+++(function a/310[int] b/311[int]
-+++  (if a/310 (makeblock 0 (int,*) a/310 (makeblock 0 a/310 b/311))
-+++    (makeblock 0 (int,*) b/311 (makeblock 0 a/310 b/311))))
-+  - : bool -> bool -> bool * (bool * bool) = <fun>
-+  |}]
-+  
-+@@ -174,30 +174,30 @@
-+    -> x, p
-+  (* inside, complex *)
-+  [%%expect{|
-+--(function a/340[int] b/341[int]
-+-+(function a/321[int] b/322[int]
-++-(function a/335[int] b/336[int]
-+++(function a/316[int] b/317[int]
-+    (catch
-+--    (if a/340
-+--      (let (x/348 =a[int] a/340 p/349 =a (makeblock 0 a/340 b/341))
-+--        (exit 10 x/348 p/349))
-+--      (let (x/346 =a b/341 p/347 =a (makeblock 0 a/340 b/341))
-+--        (exit 10 x/346 p/347)))
-+--   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-+--(function a/340[int] b/341[int]
-+-+    (if a/321
-+-+      (let (x/329 =a[int] a/321 p/330 =a (makeblock 0 a/321 b/322))
-+-+        (exit 10 x/329 p/330))
-+-+      (let (x/327 =a b/322 p/328 =a (makeblock 0 a/321 b/322))
-+-+        (exit 10 x/327 p/328)))
-+-+   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
-+-+(function a/321[int] b/322[int]
-++-    (if a/335
-++-      (let (x/343 =a[int] a/335 p/344 =a (makeblock 0 a/335 b/336))
-++-        (exit 10 x/343 p/344))
-++-      (let (x/341 =a b/336 p/342 =a (makeblock 0 a/335 b/336))
-++-        (exit 10 x/341 p/342)))
-++-   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
-++-(function a/335[int] b/336[int]
-+++    (if a/316
-+++      (let (x/324 =a[int] a/316 p/325 =a (makeblock 0 a/316 b/317))
-+++        (exit 10 x/324 p/325))
-+++      (let (x/322 =a b/317 p/323 =a (makeblock 0 a/316 b/317))
-+++        (exit 10 x/322 p/323)))
-+++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
-+++(function a/316[int] b/317[int]
-+    (catch
-+--    (if a/340 (exit 10 a/340 (makeblock 0 a/340 b/341))
-+--      (exit 10 b/341 (makeblock 0 a/340 b/341)))
-+--   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-+-+    (if a/321 (exit 10 a/321 (makeblock 0 a/321 b/322))
-+-+      (exit 10 b/322 (makeblock 0 a/321 b/322)))
-+-+   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
-++-    (if a/335 (exit 10 a/335 (makeblock 0 a/335 b/336))
-++-      (exit 10 b/336 (makeblock 0 a/335 b/336)))
-++-   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
-+++    (if a/316 (exit 10 a/316 (makeblock 0 a/316 b/317))
-+++      (exit 10 b/317 (makeblock 0 a/316 b/317)))
-+++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
-+  - : bool -> bool -> bool * (bool * bool) = <fun>
-+  |}]
-+  
-+@@ -205,24 +205,24 @@
-+  | (false as x, _) as p -> x, p
-+  (* outside, onecase *)
-+  [%%expect {|
-+--(function a/350[int] b/351[int]
-+--  (if a/350
-+--    (let (x/352 =a[int] a/350 _p/353 =a (makeblock 0 a/350 b/351))
-+--      (makeblock 0 (int,*) x/352 [0: 1 1]))
-+--    (let (x/354 =a[int] a/350 p/355 =a (makeblock 0 a/350 b/351))
-+--      (makeblock 0 (int,*) x/354 p/355))))
-+--(function a/350[int] b/351[int]
-+--  (if a/350 (makeblock 0 (int,*) a/350 [0: 1 1])
-+--    (makeblock 0 (int,*) a/350 (makeblock 0 a/350 b/351))))
-+-+(function a/331[int] b/332[int]
-+-+  (if a/331
-+-+    (let (x/333 =a[int] a/331 _p/334 =a (makeblock 0 a/331 b/332))
-+-+      (makeblock 0 (int,*) x/333 [0: 1 1]))
-+-+    (let (x/335 =a[int] a/331 p/336 =a (makeblock 0 a/331 b/332))
-+-+      (makeblock 0 (int,*) x/335 p/336))))
-+-+(function a/331[int] b/332[int]
-+-+  (if a/331 (makeblock 0 (int,*) a/331 [0: 1 1])
-+-+    (makeblock 0 (int,*) a/331 (makeblock 0 a/331 b/332))))
-++-(function a/345[int] b/346[int]
-++-  (if a/345
-++-    (let (x/347 =a[int] a/345 _p/348 =a (makeblock 0 a/345 b/346))
-++-      (makeblock 0 (int,*) x/347 [0: 1 1]))
-++-    (let (x/349 =a[int] a/345 p/350 =a (makeblock 0 a/345 b/346))
-++-      (makeblock 0 (int,*) x/349 p/350))))
-++-(function a/345[int] b/346[int]
-++-  (if a/345 (makeblock 0 (int,*) a/345 [0: 1 1])
-++-    (makeblock 0 (int,*) a/345 (makeblock 0 a/345 b/346))))
-+++(function a/326[int] b/327[int]
-+++  (if a/326
-+++    (let (x/328 =a[int] a/326 _p/329 =a (makeblock 0 a/326 b/327))
-+++      (makeblock 0 (int,*) x/328 [0: 1 1]))
-+++    (let (x/330 =a[int] a/326 p/331 =a (makeblock 0 a/326 b/327))
-+++      (makeblock 0 (int,*) x/330 p/331))))
-+++(function a/326[int] b/327[int]
-+++  (if a/326 (makeblock 0 (int,*) a/326 [0: 1 1])
-+++    (makeblock 0 (int,*) a/326 (makeblock 0 a/326 b/327))))
-+  - : bool -> bool -> bool * (bool * bool) = <fun>
-+  |}]
-+  
-+@@ -230,16 +230,16 @@
-+  | ((false as x, _) as p) -> x, p
-+  (* inside, onecase *)
-+  [%%expect{|
-+--(function a/356[int] b/357
-+--  (let (x/358 =a[int] a/356 p/359 =a (makeblock 0 a/356 b/357))
-+--    (makeblock 0 (int,*) x/358 p/359)))
-+--(function a/356[int] b/357
-+--  (makeblock 0 (int,*) a/356 (makeblock 0 a/356 b/357)))
-+-+(function a/337[int] b/338
-+-+  (let (x/339 =a[int] a/337 p/340 =a (makeblock 0 a/337 b/338))
-+-+    (makeblock 0 (int,*) x/339 p/340)))
-+-+(function a/337[int] b/338
-+-+  (makeblock 0 (int,*) a/337 (makeblock 0 a/337 b/338)))
-++-(function a/351[int] b/352
-++-  (let (x/353 =a[int] a/351 p/354 =a (makeblock 0 a/351 b/352))
-++-    (makeblock 0 (int,*) x/353 p/354)))
-++-(function a/351[int] b/352
-++-  (makeblock 0 (int,*) a/351 (makeblock 0 a/351 b/352)))
-+++(function a/332[int] b/333
-+++  (let (x/334 =a[int] a/332 p/335 =a (makeblock 0 a/332 b/333))
-+++    (makeblock 0 (int,*) x/334 p/335)))
-+++(function a/332[int] b/333
-+++  (makeblock 0 (int,*) a/332 (makeblock 0 a/332 b/333)))
-+  - : bool -> 'a -> bool * (bool * 'a) = <fun>
-+  |}]
-+  
-+@@ -247,20 +247,20 @@
-+  | (_, _) as p -> p
-+  (* outside, tuplist *)
-+  [%%expect {|
-+--(function a/369[int] b/370
-+-+(function a/350[int] b/351
-++-(function a/364[int] b/365
-+++(function a/345[int] b/346
-+    (catch
-+--    (if a/369 (if b/370 (let (p/371 =a (field_imm 0 b/370)) p/371) (exit 12))
-+-+    (if a/350 (if b/351 (let (p/352 =a (field_imm 0 b/351)) p/352) (exit 12))
-++-    (if a/364 (if b/365 (let (p/366 =a (field_imm 0 b/365)) p/366) (exit 12))
-+++    (if a/345 (if b/346 (let (p/347 =a (field_imm 0 b/346)) p/347) (exit 12))
-+        (exit 12))
-+--   with (12) (let (p/372 =a (makeblock 0 a/369 b/370)) p/372)))
-+--(function a/369[int] b/370
-+--  (catch (if a/369 (if b/370 (field_imm 0 b/370) (exit 12)) (exit 12))
-+--   with (12) (makeblock 0 a/369 b/370)))
-+-+   with (12) (let (p/353 =a (makeblock 0 a/350 b/351)) p/353)))
-+-+(function a/350[int] b/351
-+-+  (catch (if a/350 (if b/351 (field_imm 0 b/351) (exit 12)) (exit 12))
-+-+   with (12) (makeblock 0 a/350 b/351)))
-++-   with (12) (let (p/367 =a (makeblock 0 a/364 b/365)) p/367)))
-++-(function a/364[int] b/365
-++-  (catch (if a/364 (if b/365 (field_imm 0 b/365) (exit 12)) (exit 12))
-++-   with (12) (makeblock 0 a/364 b/365)))
-+++   with (12) (let (p/348 =a (makeblock 0 a/345 b/346)) p/348)))
-+++(function a/345[int] b/346
-+++  (catch (if a/345 (if b/346 (field_imm 0 b/346) (exit 12)) (exit 12))
-+++   with (12) (makeblock 0 a/345 b/346)))
-+  - : bool -> bool tuplist -> bool * bool tuplist = <fun>
-+  |}]
-+  
-+@@ -268,30 +268,30 @@
-+  | ((_, _) as p) -> p
-+  (* inside, tuplist *)
-+  [%%expect{|
-+--(function a/373[int] b/374
-+-+(function a/354[int] b/355
-++-(function a/368[int] b/369
-+++(function a/349[int] b/350
-+    (catch
-+      (catch
-+--      (if a/373
-+--        (if b/374 (let (p/378 =a (field_imm 0 b/374)) (exit 13 p/378))
-+-+      (if a/354
-+-+        (if b/355 (let (p/359 =a (field_imm 0 b/355)) (exit 13 p/359))
-++-      (if a/368
-++-        (if b/369 (let (p/373 =a (field_imm 0 b/369)) (exit 13 p/373))
-+++      (if a/349
-+++        (if b/350 (let (p/354 =a (field_imm 0 b/350)) (exit 13 p/354))
-+            (exit 14))
-+          (exit 14))
-+--     with (14) (let (p/377 =a (makeblock 0 a/373 b/374)) (exit 13 p/377)))
-+--   with (13 p/375) p/375))
-+--(function a/373[int] b/374
-+-+     with (14) (let (p/358 =a (makeblock 0 a/354 b/355)) (exit 13 p/358)))
-+-+   with (13 p/356) p/356))
-+-+(function a/354[int] b/355
-++-     with (14) (let (p/372 =a (makeblock 0 a/368 b/369)) (exit 13 p/372)))
-++-   with (13 p/370) p/370))
-++-(function a/368[int] b/369
-+++     with (14) (let (p/353 =a (makeblock 0 a/349 b/350)) (exit 13 p/353)))
-+++   with (13 p/351) p/351))
-+++(function a/349[int] b/350
-+    (catch
-+      (catch
-+--      (if a/373 (if b/374 (exit 13 (field_imm 0 b/374)) (exit 14)) (exit 14))
-+--     with (14) (exit 13 (makeblock 0 a/373 b/374)))
-+--   with (13 p/375) p/375))
-+-+      (if a/354 (if b/355 (exit 13 (field_imm 0 b/355)) (exit 14)) (exit 14))
-+-+     with (14) (exit 13 (makeblock 0 a/354 b/355)))
-+-+   with (13 p/356) p/356))
-++-      (if a/368 (if b/369 (exit 13 (field_imm 0 b/369)) (exit 14)) (exit 14))
-++-     with (14) (exit 13 (makeblock 0 a/368 b/369)))
-++-   with (13 p/370) p/370))
-+++      (if a/349 (if b/350 (exit 13 (field_imm 0 b/350)) (exit 14)) (exit 14))
-+++     with (14) (exit 13 (makeblock 0 a/349 b/350)))
-+++   with (13 p/351) p/351))
-+  - : bool -> bool tuplist -> bool * bool tuplist = <fun>
-+  |}]
-+ diff --git a/testsuite/tests/basic/patmatch_split_no_or.ml b/testsuite/tests/basic/patmatch_split_no_or.ml
-+@@ -394,11 +394,11 @@
-+  Line 1, characters 15-41:
-+  1 | include struct open struct type t = T end let x = T end
-+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--Error: The type t/357 introduced by this open appears in the signature
-+-+Error: The type t/338 introduced by this open appears in the signature
-++-Error: The type t/352 introduced by this open appears in the signature
-+++Error: The type t/333 introduced by this open appears in the signature
-+         Line 1, characters 46-47:
-+--         The value x has no valid type if t/357 is hidden
-+-+         The value x has no valid type if t/338 is hidden
-++-         The value x has no valid type if t/352 is hidden
-+++         The value x has no valid type if t/333 is hidden
-+  |}];;
-+  
-+  module A = struct
-+@@ -406,11 +406,11 @@
-+  4 |       type t = T
-+  5 |       let x = T
-+  6 |     end
-+--Error: The type t/362 introduced by this open appears in the signature
-+-+Error: The type t/343 introduced by this open appears in the signature
-++-Error: The type t/357 introduced by this open appears in the signature
-+++Error: The type t/338 introduced by this open appears in the signature
-+         Line 7, characters 8-9:
-+--         The value y has no valid type if t/362 is hidden
-+-+         The value y has no valid type if t/343 is hidden
-++-         The value y has no valid type if t/357 is hidden
-+++         The value y has no valid type if t/338 is hidden
-+  |}];;
-+  
-+  module A = struct
-+@@ -418,11 +418,11 @@
-+  3 | ....open struct
-+  4 |       type t = T
-+  5 |     end
-+--Error: The type t/367 introduced by this open appears in the signature
-+-+Error: The type t/348 introduced by this open appears in the signature
-++-Error: The type t/362 introduced by this open appears in the signature
-+++Error: The type t/343 introduced by this open appears in the signature
-+         Line 6, characters 8-9:
-+--         The value y has no valid type if t/367 is hidden
-+-+         The value y has no valid type if t/348 is hidden
-++-         The value y has no valid type if t/362 is hidden
-+++         The value y has no valid type if t/343 is hidden
-+  |}]
-+  
-+  (* It was decided to not allow this anymore. *)
-+@@ -496,8 +496,8 @@
-+  module F (X : sig type t end) = X
-+  [%%expect{|
-+  {
-+-- "F"[module] -> Abs<.4>(X/297, X/297<.3>);
-+-+ "F"[module] -> Abs<.4>(X/278, X/278<.3>);
-++- "F"[module] -> Abs<.4>(X/292, X/292<.3>);
-+++ "F"[module] -> Abs<.4>(X/273, X/273<.3>);
-+   }
-+  module F : functor (X : sig type t end) -> sig type t = X.t end
-+  |}]
-+@@ -508,8 +508,8 @@
-+  module Falias (X : S) = X
-+  [%%expect{|
-+  {
-+-- "Falias"[module] -> Abs<.4>(X/299, X/299<.3>);
-+-+ "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
-++- "Falias"[module] -> Abs<.4>(X/294, X/294<.3>);
-+++ "Falias"[module] -> Abs<.4>(X/275, X/275<.3>);
-+   }
-+  module Falias : functor (X : S) -> sig type t = X.t val x : t end
-+  |}]
-+@@ -517,13 +517,13 @@
-+  {
-+   "Finclude"[module] ->
-+       Abs<.6>
-+--        (X/303,
-+-+        (X/284,
-++-        (X/298,
-+++        (X/279,
-+           {
-+--          "t"[type] -> X/303<.5> . "t"[type];
-+--          "x"[value] -> X/303<.5> . "x"[value];
-+-+          "t"[type] -> X/284<.5> . "t"[type];
-+-+          "x"[value] -> X/284<.5> . "x"[value];
-++-          "t"[type] -> X/298<.5> . "t"[type];
-++-          "x"[value] -> X/298<.5> . "x"[value];
-+++          "t"[type] -> X/279<.5> . "t"[type];
-+++          "x"[value] -> X/279<.5> . "x"[value];
-+            });
-+   }
-+  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
-+@@ -531,8 +531,8 @@
-+  [%%expect{|
-+  {
-+   "Fredef"[module] ->
-+--     Abs<.10>(X/310, {
-+-+     Abs<.10>(X/291, {
-++-     Abs<.10>(X/305, {
-+++     Abs<.10>(X/286, {
-+                        "t"[type] -> <.8>;
-+                        "x"[value] -> <.9>;
-+                        });
-+@@ -540,10 +540,10 @@
-+  [%%expect{|
-+  {
-+   "Big_to_small1"[module] ->
-+--     Abs<.40>(X/405, {<.39>
-+--                      "t"[type] -> X/405<.39> . "t"[type];
-+-+     Abs<.40>(X/386, {<.39>
-+-+                      "t"[type] -> X/386<.39> . "t"[type];
-++-     Abs<.40>(X/400, {<.39>
-++-                      "t"[type] -> X/400<.39> . "t"[type];
-+++     Abs<.40>(X/381, {<.39>
-+++                      "t"[type] -> X/381<.39> . "t"[type];
-+                        });
-+   }
-+  module Big_to_small1 : B2S
-+@@ -551,10 +551,10 @@
-+  [%%expect{|
-+  {
-+   "Big_to_small2"[module] ->
-+--     Abs<.42>(X/408, {
-+--                      "t"[type] -> X/408<.41> . "t"[type];
-+-+     Abs<.42>(X/389, {
-+-+                      "t"[type] -> X/389<.41> . "t"[type];
-++-     Abs<.42>(X/403, {
-++-                      "t"[type] -> X/403<.41> . "t"[type];
-+++     Abs<.42>(X/384, {
-+++                      "t"[type] -> X/384<.41> . "t"[type];
-+                        });
-+   }
-+  module Big_to_small2 : B2S
-+@@ -565,8 +565,8 @@
-+  
-+  [%%expect{|
-+  {
-+-- "Make"[module] -> Abs<.3>(I/299, {
-+-+ "Make"[module] -> Abs<.3>(I/280, {
-++- "Make"[module] -> Abs<.3>(I/294, {
-+++ "Make"[module] -> Abs<.3>(I/275, {
-+                                     });
-+   }
-+  module Make : functor (I : sig end) -> sig end
-+@@ -577,10 +577,10 @@
-+  end = B
-+  [%%expect{|
-+  {
-+-- "A"[module] -> A/322<.11>;
-+-- "B"[module] -> B/323<.12>;
-+-+ "A"[module] -> A/303<.11>;
-+-+ "B"[module] -> B/304<.12>;
-++- "A"[module] -> A/317<.11>;
-++- "B"[module] -> B/318<.12>;
-+++ "A"[module] -> A/298<.11>;
-+++ "B"[module] -> B/299<.12>;
-+   }
-+  module rec A : sig type t = Leaf of B.t end
-+  and B : sig type t = int end
-+@@ -588,16 +588,16 @@
-+   "ASet"[module] ->
-+       {
-+        "compare"[value] ->
-+--          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-+-+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+            "compare"[value];
-+        "elt"[type] ->
-+--          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-+-+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+            "elt"[type];
-+        "t"[type] ->
-+--          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) . "t"[type];
-+-+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) . "t"[type];
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-+        };
-+   }
-+  module rec A :
-+@@ -608,8 +608,8 @@
-+  {
-+   "Pair"[module] ->
-+       Abs<.9>
-+--        (X/299, Abs(Y/300, {
-+-+        (X/280, Abs(Y/281, {
-++-        (X/294, Abs(Y/295, {
-+++        (X/275, Abs(Y/276, {
-+                              "t"[type] -> <.5>;
-+                              "to_string"[value] -> <.6>;
-+                              }));
-+@@ -620,14 +620,14 @@
-+  Line 3, characters 2-36:
-+  3 |   include Comparable with type t = t
-+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--Error: Illegal shadowing of included type t/304 by t/309
-+-+Error: Illegal shadowing of included type t/285 by t/290
-++-Error: Illegal shadowing of included type t/299 by t/304
-+++Error: Illegal shadowing of included type t/280 by t/285
-+         Line 2, characters 2-19:
-+--         Type t/304 came from this include
-+-+         Type t/285 came from this include
-++-         Type t/299 came from this include
-+++         Type t/280 came from this include
-+         Line 3, characters 2-23:
-+--         The value print has no valid type if t/304 is shadowed
-+-+         The value print has no valid type if t/285 is shadowed
-++-         The value print has no valid type if t/299 is shadowed
-+++         The value print has no valid type if t/280 is shadowed
-+  |}]
-+  
-+  module type Sunderscore = sig
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -4212,10 +3548,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..6be734834e
+index 0000000000..1f67d5436c
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3590 @@
+@@ -0,0 +1,3585 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7f2433adc9..68329c5bc1 100644
 +--- a/ocamltest/Makefile
@@ -4713,21 +4049,18 @@ index 0000000000..6be734834e
 + 
 + (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 +diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+index b7907c99bd..f4b5531cb8 100644
++index 4fb34a7071..f4b5531cb8 100644
 +--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
 ++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+@@ -1,20 +1,24 @@
-+ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
++@@ -2,19 +2,23 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
 + Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 + Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 +-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 +-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 +-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 ++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
 + Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
@@ -4739,16 +4072,14 @@ index 0000000000..6be734834e
 ++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 ++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 + Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 + Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 +-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 +-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 +-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 +-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 ++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 ++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
@@ -4893,27 +4224,27 @@ index 0000000000..6be734834e
 + Called from Lazy.test2 in file "lazy.ml", line 15, characters 6-15
 + Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
 +diff --git a/testsuite/tests/basic/patmatch_for_multiple.ml b/testsuite/tests/basic/patmatch_for_multiple.ml
-+index dccb4ccabd..46fcb1e936 100644
++index 22c967370f..f2201b62d5 100644
 +--- a/testsuite/tests/basic/patmatch_for_multiple.ml
 ++++ b/testsuite/tests/basic/patmatch_for_multiple.ml
 +@@ -26,15 +26,15 @@ match (3, 2, 1) with
 + | _ -> false
 + ;;
 + [%%expect{|
-+-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-++(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
++-(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
+++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
 +   (catch
 +     (catch
-+-      (catch (if (!= *match*/295 3) (exit 3) (exit 1)) with (3)
-+-        (if (!= *match*/294 1) (exit 2) (exit 1)))
-++      (catch (if (!= *match*/290 3) (exit 3) (exit 1)) with (3)
-++        (if (!= *match*/289 1) (exit 2) (exit 1)))
++-      (catch (if (!= *match*/276 3) (exit 3) (exit 1)) with (3)
++-        (if (!= *match*/275 1) (exit 2) (exit 1)))
+++      (catch (if (!= *match*/271 3) (exit 3) (exit 1)) with (3)
+++        (if (!= *match*/270 1) (exit 2) (exit 1)))
 +      with (2) 0)
 +    with (1) 1))
-+-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-+-  (catch (if (!= *match*/295 3) (if (!= *match*/294 1) 0 (exit 1)) (exit 1))
-++(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
-++  (catch (if (!= *match*/290 3) (if (!= *match*/289 1) 0 (exit 1)) (exit 1))
++-(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
++-  (catch (if (!= *match*/276 3) (if (!= *match*/275 1) 0 (exit 1)) (exit 1))
+++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
+++  (catch (if (!= *match*/271 3) (if (!= *match*/270 1) 0 (exit 1)) (exit 1))
 +    with (1) 1))
 + - : bool = false
 + |}];;
@@ -4921,40 +4252,40 @@ index 0000000000..6be734834e
 + | _ -> false
 + ;;
 + [%%expect{|
-+-(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-++(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
++-(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
+++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
 +   (catch
 +     (catch
 +       (catch
-+-        (if (!= *match*/300 3) (exit 6)
-+-          (let (x/303 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-+-            (exit 4 x/303)))
-++        (if (!= *match*/295 3) (exit 6)
-++          (let (x/298 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-++            (exit 4 x/298)))
++-        (if (!= *match*/281 3) (exit 6)
++-          (let (x/284 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
++-            (exit 4 x/284)))
+++        (if (!= *match*/276 3) (exit 6)
+++          (let (x/279 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
+++            (exit 4 x/279)))
 +        with (6)
-+-        (if (!= *match*/299 1) (exit 5)
-+-          (let (x/302 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-+-            (exit 4 x/302))))
-++        (if (!= *match*/294 1) (exit 5)
-++          (let (x/297 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-++            (exit 4 x/297))))
++-        (if (!= *match*/280 1) (exit 5)
++-          (let (x/283 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
++-            (exit 4 x/283))))
+++        (if (!= *match*/275 1) (exit 5)
+++          (let (x/278 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
+++            (exit 4 x/278))))
 +      with (5) 0)
-+-   with (4 x/297) (seq (ignore x/297) 1)))
-+-(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-++   with (4 x/292) (seq (ignore x/292) 1)))
-++(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
++-   with (4 x/278) (seq (ignore x/278) 1)))
++-(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
+++   with (4 x/273) (seq (ignore x/273) 1)))
+++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
 +   (catch
-+-    (if (!= *match*/300 3)
-+-      (if (!= *match*/299 1) 0
-+-        (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-+-      (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-+-   with (4 x/297) (seq (ignore x/297) 1)))
-++    (if (!= *match*/295 3)
-++      (if (!= *match*/294 1) 0
-++        (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-++      (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-++   with (4 x/292) (seq (ignore x/292) 1)))
++-    (if (!= *match*/281 3)
++-      (if (!= *match*/280 1) 0
++-        (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
++-      (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
++-   with (4 x/278) (seq (ignore x/278) 1)))
+++    (if (!= *match*/276 3)
+++      (if (!= *match*/275 1) 0
+++        (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
+++      (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
+++   with (4 x/273) (seq (ignore x/273) 1)))
 + - : bool = false
 + |}];;
 + 
@@ -4962,10 +4293,10 @@ index 0000000000..6be734834e
 +   | ((true, _) as _g)
 +   | ((false, _) as _g) -> ()
 + [%%expect{|
-+-(function a/304[int] b/305 : int 0)
-+-(function a/304[int] b/305 : int 0)
-++(function a/299[int] b/300 : int 0)
-++(function a/299[int] b/300 : int 0)
++-(function a/285[int] b/286 : int 0)
++-(function a/285[int] b/286 : int 0)
+++(function a/280[int] b/281 : int 0)
+++(function a/280[int] b/281 : int 0)
 + - : bool -> 'a -> unit = <fun>
 + |}];;
 + 
@@ -4973,10 +4304,10 @@ index 0000000000..6be734834e
 + | (false, _) as p -> p
 + (* outside, trivial *)
 + [%%expect {|
-+-(function a/308[int] b/309 (let (p/310 =a (makeblock 0 a/308 b/309)) p/310))
-+-(function a/308[int] b/309 (makeblock 0 a/308 b/309))
-++(function a/303[int] b/304 (let (p/305 =a (makeblock 0 a/303 b/304)) p/305))
-++(function a/303[int] b/304 (makeblock 0 a/303 b/304))
++-(function a/289[int] b/290 (let (p/291 =a (makeblock 0 a/289 b/290)) p/291))
++-(function a/289[int] b/290 (makeblock 0 a/289 b/290))
+++(function a/284[int] b/285 (let (p/286 =a (makeblock 0 a/284 b/285)) p/286))
+++(function a/284[int] b/285 (makeblock 0 a/284 b/285))
 + - : bool -> 'a -> bool * 'a = <fun>
 + |}]
 + 
@@ -4984,10 +4315,10 @@ index 0000000000..6be734834e
 + | ((false, _) as p) -> p
 + (* inside, trivial *)
 + [%%expect{|
-+-(function a/312[int] b/313 (let (p/314 =a (makeblock 0 a/312 b/313)) p/314))
-+-(function a/312[int] b/313 (makeblock 0 a/312 b/313))
-++(function a/307[int] b/308 (let (p/309 =a (makeblock 0 a/307 b/308)) p/309))
-++(function a/307[int] b/308 (makeblock 0 a/307 b/308))
++-(function a/293[int] b/294 (let (p/295 =a (makeblock 0 a/293 b/294)) p/295))
++-(function a/293[int] b/294 (makeblock 0 a/293 b/294))
+++(function a/288[int] b/289 (let (p/290 =a (makeblock 0 a/288 b/289)) p/290))
+++(function a/288[int] b/289 (makeblock 0 a/288 b/289))
 + - : bool -> 'a -> bool * 'a = <fun>
 + |}];;
 + 
@@ -4995,16 +4326,16 @@ index 0000000000..6be734834e
 + | (false as x, _) as p -> x, p
 + (* outside, simple *)
 + [%%expect {|
-+-(function a/318[int] b/319
-+-  (let (x/320 =a[int] a/318 p/321 =a (makeblock 0 a/318 b/319))
-+-    (makeblock 0 (int,*) x/320 p/321)))
-+-(function a/318[int] b/319
-+-  (makeblock 0 (int,*) a/318 (makeblock 0 a/318 b/319)))
-++(function a/313[int] b/314
-++  (let (x/315 =a[int] a/313 p/316 =a (makeblock 0 a/313 b/314))
-++    (makeblock 0 (int,*) x/315 p/316)))
-++(function a/313[int] b/314
-++  (makeblock 0 (int,*) a/313 (makeblock 0 a/313 b/314)))
++-(function a/299[int] b/300
++-  (let (x/301 =a[int] a/299 p/302 =a (makeblock 0 a/299 b/300))
++-    (makeblock 0 (int,*) x/301 p/302)))
++-(function a/299[int] b/300
++-  (makeblock 0 (int,*) a/299 (makeblock 0 a/299 b/300)))
+++(function a/294[int] b/295
+++  (let (x/296 =a[int] a/294 p/297 =a (makeblock 0 a/294 b/295))
+++    (makeblock 0 (int,*) x/296 p/297)))
+++(function a/294[int] b/295
+++  (makeblock 0 (int,*) a/294 (makeblock 0 a/294 b/295)))
 + - : bool -> 'a -> bool * (bool * 'a) = <fun>
 + |}]
 + 
@@ -5012,16 +4343,16 @@ index 0000000000..6be734834e
 + | ((false as x, _) as p) -> x, p
 + (* inside, simple *)
 + [%%expect {|
-+-(function a/324[int] b/325
-+-  (let (x/326 =a[int] a/324 p/327 =a (makeblock 0 a/324 b/325))
-+-    (makeblock 0 (int,*) x/326 p/327)))
-+-(function a/324[int] b/325
-+-  (makeblock 0 (int,*) a/324 (makeblock 0 a/324 b/325)))
-++(function a/319[int] b/320
-++  (let (x/321 =a[int] a/319 p/322 =a (makeblock 0 a/319 b/320))
-++    (makeblock 0 (int,*) x/321 p/322)))
-++(function a/319[int] b/320
-++  (makeblock 0 (int,*) a/319 (makeblock 0 a/319 b/320)))
++-(function a/305[int] b/306
++-  (let (x/307 =a[int] a/305 p/308 =a (makeblock 0 a/305 b/306))
++-    (makeblock 0 (int,*) x/307 p/308)))
++-(function a/305[int] b/306
++-  (makeblock 0 (int,*) a/305 (makeblock 0 a/305 b/306)))
+++(function a/300[int] b/301
+++  (let (x/302 =a[int] a/300 p/303 =a (makeblock 0 a/300 b/301))
+++    (makeblock 0 (int,*) x/302 p/303)))
+++(function a/300[int] b/301
+++  (makeblock 0 (int,*) a/300 (makeblock 0 a/300 b/301)))
 + - : bool -> 'a -> bool * (bool * 'a) = <fun>
 + |}]
 + 
@@ -5029,24 +4360,24 @@ index 0000000000..6be734834e
 + | (false, x) as p -> x, p
 + (* outside, complex *)
 + [%%expect{|
-+-(function a/334[int] b/335[int]
-+-  (if a/334
-+-    (let (x/336 =a[int] a/334 p/337 =a (makeblock 0 a/334 b/335))
-+-      (makeblock 0 (int,*) x/336 p/337))
-+-    (let (x/338 =a b/335 p/339 =a (makeblock 0 a/334 b/335))
-+-      (makeblock 0 (int,*) x/338 p/339))))
-+-(function a/334[int] b/335[int]
-+-  (if a/334 (makeblock 0 (int,*) a/334 (makeblock 0 a/334 b/335))
-+-    (makeblock 0 (int,*) b/335 (makeblock 0 a/334 b/335))))
-++(function a/329[int] b/330[int]
-++  (if a/329
-++    (let (x/331 =a[int] a/329 p/332 =a (makeblock 0 a/329 b/330))
-++      (makeblock 0 (int,*) x/331 p/332))
-++    (let (x/333 =a b/330 p/334 =a (makeblock 0 a/329 b/330))
-++      (makeblock 0 (int,*) x/333 p/334))))
-++(function a/329[int] b/330[int]
-++  (if a/329 (makeblock 0 (int,*) a/329 (makeblock 0 a/329 b/330))
-++    (makeblock 0 (int,*) b/330 (makeblock 0 a/329 b/330))))
++-(function a/315[int] b/316[int]
++-  (if a/315
++-    (let (x/317 =a[int] a/315 p/318 =a (makeblock 0 a/315 b/316))
++-      (makeblock 0 (int,*) x/317 p/318))
++-    (let (x/319 =a b/316 p/320 =a (makeblock 0 a/315 b/316))
++-      (makeblock 0 (int,*) x/319 p/320))))
++-(function a/315[int] b/316[int]
++-  (if a/315 (makeblock 0 (int,*) a/315 (makeblock 0 a/315 b/316))
++-    (makeblock 0 (int,*) b/316 (makeblock 0 a/315 b/316))))
+++(function a/310[int] b/311[int]
+++  (if a/310
+++    (let (x/312 =a[int] a/310 p/313 =a (makeblock 0 a/310 b/311))
+++      (makeblock 0 (int,*) x/312 p/313))
+++    (let (x/314 =a b/311 p/315 =a (makeblock 0 a/310 b/311))
+++      (makeblock 0 (int,*) x/314 p/315))))
+++(function a/310[int] b/311[int]
+++  (if a/310 (makeblock 0 (int,*) a/310 (makeblock 0 a/310 b/311))
+++    (makeblock 0 (int,*) b/311 (makeblock 0 a/310 b/311))))
 + - : bool -> bool -> bool * (bool * bool) = <fun>
 + |}]
 + 
@@ -5054,30 +4385,30 @@ index 0000000000..6be734834e
 +   -> x, p
 + (* inside, complex *)
 + [%%expect{|
-+-(function a/340[int] b/341[int]
-++(function a/335[int] b/336[int]
++-(function a/321[int] b/322[int]
+++(function a/316[int] b/317[int]
 +   (catch
-+-    (if a/340
-+-      (let (x/348 =a[int] a/340 p/349 =a (makeblock 0 a/340 b/341))
-+-        (exit 10 x/348 p/349))
-+-      (let (x/346 =a b/341 p/347 =a (makeblock 0 a/340 b/341))
-+-        (exit 10 x/346 p/347)))
-+-   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-+-(function a/340[int] b/341[int]
-++    (if a/335
-++      (let (x/343 =a[int] a/335 p/344 =a (makeblock 0 a/335 b/336))
-++        (exit 10 x/343 p/344))
-++      (let (x/341 =a b/336 p/342 =a (makeblock 0 a/335 b/336))
-++        (exit 10 x/341 p/342)))
-++   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
-++(function a/335[int] b/336[int]
++-    (if a/321
++-      (let (x/329 =a[int] a/321 p/330 =a (makeblock 0 a/321 b/322))
++-        (exit 10 x/329 p/330))
++-      (let (x/327 =a b/322 p/328 =a (makeblock 0 a/321 b/322))
++-        (exit 10 x/327 p/328)))
++-   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
++-(function a/321[int] b/322[int]
+++    (if a/316
+++      (let (x/324 =a[int] a/316 p/325 =a (makeblock 0 a/316 b/317))
+++        (exit 10 x/324 p/325))
+++      (let (x/322 =a b/317 p/323 =a (makeblock 0 a/316 b/317))
+++        (exit 10 x/322 p/323)))
+++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
+++(function a/316[int] b/317[int]
 +   (catch
-+-    (if a/340 (exit 10 a/340 (makeblock 0 a/340 b/341))
-+-      (exit 10 b/341 (makeblock 0 a/340 b/341)))
-+-   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-++    (if a/335 (exit 10 a/335 (makeblock 0 a/335 b/336))
-++      (exit 10 b/336 (makeblock 0 a/335 b/336)))
-++   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
++-    (if a/321 (exit 10 a/321 (makeblock 0 a/321 b/322))
++-      (exit 10 b/322 (makeblock 0 a/321 b/322)))
++-   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
+++    (if a/316 (exit 10 a/316 (makeblock 0 a/316 b/317))
+++      (exit 10 b/317 (makeblock 0 a/316 b/317)))
+++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
 + - : bool -> bool -> bool * (bool * bool) = <fun>
 + |}]
 + 
@@ -5085,24 +4416,24 @@ index 0000000000..6be734834e
 + | (false as x, _) as p -> x, p
 + (* outside, onecase *)
 + [%%expect {|
-+-(function a/350[int] b/351[int]
-+-  (if a/350
-+-    (let (x/352 =a[int] a/350 _p/353 =a (makeblock 0 a/350 b/351))
-+-      (makeblock 0 (int,*) x/352 [0: 1 1]))
-+-    (let (x/354 =a[int] a/350 p/355 =a (makeblock 0 a/350 b/351))
-+-      (makeblock 0 (int,*) x/354 p/355))))
-+-(function a/350[int] b/351[int]
-+-  (if a/350 (makeblock 0 (int,*) a/350 [0: 1 1])
-+-    (makeblock 0 (int,*) a/350 (makeblock 0 a/350 b/351))))
-++(function a/345[int] b/346[int]
-++  (if a/345
-++    (let (x/347 =a[int] a/345 _p/348 =a (makeblock 0 a/345 b/346))
-++      (makeblock 0 (int,*) x/347 [0: 1 1]))
-++    (let (x/349 =a[int] a/345 p/350 =a (makeblock 0 a/345 b/346))
-++      (makeblock 0 (int,*) x/349 p/350))))
-++(function a/345[int] b/346[int]
-++  (if a/345 (makeblock 0 (int,*) a/345 [0: 1 1])
-++    (makeblock 0 (int,*) a/345 (makeblock 0 a/345 b/346))))
++-(function a/331[int] b/332[int]
++-  (if a/331
++-    (let (x/333 =a[int] a/331 _p/334 =a (makeblock 0 a/331 b/332))
++-      (makeblock 0 (int,*) x/333 [0: 1 1]))
++-    (let (x/335 =a[int] a/331 p/336 =a (makeblock 0 a/331 b/332))
++-      (makeblock 0 (int,*) x/335 p/336))))
++-(function a/331[int] b/332[int]
++-  (if a/331 (makeblock 0 (int,*) a/331 [0: 1 1])
++-    (makeblock 0 (int,*) a/331 (makeblock 0 a/331 b/332))))
+++(function a/326[int] b/327[int]
+++  (if a/326
+++    (let (x/328 =a[int] a/326 _p/329 =a (makeblock 0 a/326 b/327))
+++      (makeblock 0 (int,*) x/328 [0: 1 1]))
+++    (let (x/330 =a[int] a/326 p/331 =a (makeblock 0 a/326 b/327))
+++      (makeblock 0 (int,*) x/330 p/331))))
+++(function a/326[int] b/327[int]
+++  (if a/326 (makeblock 0 (int,*) a/326 [0: 1 1])
+++    (makeblock 0 (int,*) a/326 (makeblock 0 a/326 b/327))))
 + - : bool -> bool -> bool * (bool * bool) = <fun>
 + |}]
 + 
@@ -5110,16 +4441,16 @@ index 0000000000..6be734834e
 + | ((false as x, _) as p) -> x, p
 + (* inside, onecase *)
 + [%%expect{|
-+-(function a/356[int] b/357
-+-  (let (x/358 =a[int] a/356 p/359 =a (makeblock 0 a/356 b/357))
-+-    (makeblock 0 (int,*) x/358 p/359)))
-+-(function a/356[int] b/357
-+-  (makeblock 0 (int,*) a/356 (makeblock 0 a/356 b/357)))
-++(function a/351[int] b/352
-++  (let (x/353 =a[int] a/351 p/354 =a (makeblock 0 a/351 b/352))
-++    (makeblock 0 (int,*) x/353 p/354)))
-++(function a/351[int] b/352
-++  (makeblock 0 (int,*) a/351 (makeblock 0 a/351 b/352)))
++-(function a/337[int] b/338
++-  (let (x/339 =a[int] a/337 p/340 =a (makeblock 0 a/337 b/338))
++-    (makeblock 0 (int,*) x/339 p/340)))
++-(function a/337[int] b/338
++-  (makeblock 0 (int,*) a/337 (makeblock 0 a/337 b/338)))
+++(function a/332[int] b/333
+++  (let (x/334 =a[int] a/332 p/335 =a (makeblock 0 a/332 b/333))
+++    (makeblock 0 (int,*) x/334 p/335)))
+++(function a/332[int] b/333
+++  (makeblock 0 (int,*) a/332 (makeblock 0 a/332 b/333)))
 + - : bool -> 'a -> bool * (bool * 'a) = <fun>
 + |}]
 + 
@@ -5127,20 +4458,20 @@ index 0000000000..6be734834e
 + | (_, _) as p -> p
 + (* outside, tuplist *)
 + [%%expect {|
-+-(function a/369[int] b/370
-++(function a/364[int] b/365
++-(function a/350[int] b/351
+++(function a/345[int] b/346
 +   (catch
-+-    (if a/369 (if b/370 (let (p/371 =a (field_imm 0 b/370)) p/371) (exit 12))
-++    (if a/364 (if b/365 (let (p/366 =a (field_imm 0 b/365)) p/366) (exit 12))
++-    (if a/350 (if b/351 (let (p/352 =a (field_imm 0 b/351)) p/352) (exit 12))
+++    (if a/345 (if b/346 (let (p/347 =a (field_imm 0 b/346)) p/347) (exit 12))
 +       (exit 12))
-+-   with (12) (let (p/372 =a (makeblock 0 a/369 b/370)) p/372)))
-+-(function a/369[int] b/370
-+-  (catch (if a/369 (if b/370 (field_imm 0 b/370) (exit 12)) (exit 12))
-+-   with (12) (makeblock 0 a/369 b/370)))
-++   with (12) (let (p/367 =a (makeblock 0 a/364 b/365)) p/367)))
-++(function a/364[int] b/365
-++  (catch (if a/364 (if b/365 (field_imm 0 b/365) (exit 12)) (exit 12))
-++   with (12) (makeblock 0 a/364 b/365)))
++-   with (12) (let (p/353 =a (makeblock 0 a/350 b/351)) p/353)))
++-(function a/350[int] b/351
++-  (catch (if a/350 (if b/351 (field_imm 0 b/351) (exit 12)) (exit 12))
++-   with (12) (makeblock 0 a/350 b/351)))
+++   with (12) (let (p/348 =a (makeblock 0 a/345 b/346)) p/348)))
+++(function a/345[int] b/346
+++  (catch (if a/345 (if b/346 (field_imm 0 b/346) (exit 12)) (exit 12))
+++   with (12) (makeblock 0 a/345 b/346)))
 + - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 + |}]
 + 
@@ -5148,30 +4479,30 @@ index 0000000000..6be734834e
 + | ((_, _) as p) -> p
 + (* inside, tuplist *)
 + [%%expect{|
-+-(function a/373[int] b/374
-++(function a/368[int] b/369
++-(function a/354[int] b/355
+++(function a/349[int] b/350
 +   (catch
 +     (catch
-+-      (if a/373
-+-        (if b/374 (let (p/378 =a (field_imm 0 b/374)) (exit 13 p/378))
-++      (if a/368
-++        (if b/369 (let (p/373 =a (field_imm 0 b/369)) (exit 13 p/373))
++-      (if a/354
++-        (if b/355 (let (p/359 =a (field_imm 0 b/355)) (exit 13 p/359))
+++      (if a/349
+++        (if b/350 (let (p/354 =a (field_imm 0 b/350)) (exit 13 p/354))
 +           (exit 14))
 +         (exit 14))
-+-     with (14) (let (p/377 =a (makeblock 0 a/373 b/374)) (exit 13 p/377)))
-+-   with (13 p/375) p/375))
-+-(function a/373[int] b/374
-++     with (14) (let (p/372 =a (makeblock 0 a/368 b/369)) (exit 13 p/372)))
-++   with (13 p/370) p/370))
-++(function a/368[int] b/369
++-     with (14) (let (p/358 =a (makeblock 0 a/354 b/355)) (exit 13 p/358)))
++-   with (13 p/356) p/356))
++-(function a/354[int] b/355
+++     with (14) (let (p/353 =a (makeblock 0 a/349 b/350)) (exit 13 p/353)))
+++   with (13 p/351) p/351))
+++(function a/349[int] b/350
 +   (catch
 +     (catch
-+-      (if a/373 (if b/374 (exit 13 (field_imm 0 b/374)) (exit 14)) (exit 14))
-+-     with (14) (exit 13 (makeblock 0 a/373 b/374)))
-+-   with (13 p/375) p/375))
-++      (if a/368 (if b/369 (exit 13 (field_imm 0 b/369)) (exit 14)) (exit 14))
-++     with (14) (exit 13 (makeblock 0 a/368 b/369)))
-++   with (13 p/370) p/370))
++-      (if a/354 (if b/355 (exit 13 (field_imm 0 b/355)) (exit 14)) (exit 14))
++-     with (14) (exit 13 (makeblock 0 a/354 b/355)))
++-   with (13 p/356) p/356))
+++      (if a/349 (if b/350 (exit 13 (field_imm 0 b/350)) (exit 14)) (exit 14))
+++     with (14) (exit 13 (makeblock 0 a/349 b/350)))
+++   with (13 p/351) p/351))
 + - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 + |}]
 +diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
@@ -5664,18 +4995,18 @@ index 0000000000..6be734834e
 + open Globroots
 + 
 +diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
-+index 8afb2d9bde..470a3aa829 100644
++index f6919c78f4..e17b287aaf 100644
 +--- a/testsuite/tests/generalized-open/gpr1506.ml
 ++++ b/testsuite/tests/generalized-open/gpr1506.ml
 +@@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
 + Line 1, characters 15-41:
 + 1 | include struct open struct type t = T end let x = T end
 +                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-Error: The type t/357 introduced by this open appears in the signature
-++Error: The type t/352 introduced by this open appears in the signature
++-Error: The type t/338 introduced by this open appears in the signature
+++Error: The type t/333 introduced by this open appears in the signature
 +        Line 1, characters 46-47:
-+-         The value x has no valid type if t/357 is hidden
-++         The value x has no valid type if t/352 is hidden
++-         The value x has no valid type if t/338 is hidden
+++         The value x has no valid type if t/333 is hidden
 + |}];;
 + 
 + module A = struct
@@ -5683,11 +5014,11 @@ index 0000000000..6be734834e
 + 4 |       type t = T
 + 5 |       let x = T
 + 6 |     end
-+-Error: The type t/362 introduced by this open appears in the signature
-++Error: The type t/357 introduced by this open appears in the signature
++-Error: The type t/343 introduced by this open appears in the signature
+++Error: The type t/338 introduced by this open appears in the signature
 +        Line 7, characters 8-9:
-+-         The value y has no valid type if t/362 is hidden
-++         The value y has no valid type if t/357 is hidden
++-         The value y has no valid type if t/343 is hidden
+++         The value y has no valid type if t/338 is hidden
 + |}];;
 + 
 + module A = struct
@@ -5695,11 +5026,11 @@ index 0000000000..6be734834e
 + 3 | ....open struct
 + 4 |       type t = T
 + 5 |     end
-+-Error: The type t/367 introduced by this open appears in the signature
-++Error: The type t/362 introduced by this open appears in the signature
++-Error: The type t/348 introduced by this open appears in the signature
+++Error: The type t/343 introduced by this open appears in the signature
 +        Line 6, characters 8-9:
-+-         The value y has no valid type if t/367 is hidden
-++         The value y has no valid type if t/362 is hidden
++-         The value y has no valid type if t/348 is hidden
+++         The value y has no valid type if t/343 is hidden
 + |}]
 + 
 + (* It was decided to not allow this anymore. *)
@@ -7098,28 +6429,28 @@ index 0000000000..6be734834e
 ++  exec ${program} > ${output}
 ++fi
 +diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-+index 1289fba83c..eb198e3d31 100644
++index 3c9d10366f..92cea33495 100644
 +--- a/testsuite/tests/shapes/comp_units.ml
 ++++ b/testsuite/tests/shapes/comp_units.ml
 +@@ -25,7 +25,7 @@ module Mproj = Unit
 + module F (X : sig type t end) = X
 + [%%expect{|
 + {
-+- "F"[module] -> Abs<.4>(X/297, X/297<.3>);
-++ "F"[module] -> Abs<.4>(X/292, X/292<.3>);
++- "F"[module] -> Abs<.4>(X/278, X/278<.3>);
+++ "F"[module] -> Abs<.4>(X/273, X/273<.3>);
 +  }
 + module F : functor (X : sig type t end) -> sig type t = X.t end
 + |}]
 +diff --git a/testsuite/tests/shapes/functors.ml b/testsuite/tests/shapes/functors.ml
-+index b6225a13d5..1ec4c07f25 100644
++index f55021180a..b2d24fdc96 100644
 +--- a/testsuite/tests/shapes/functors.ml
 ++++ b/testsuite/tests/shapes/functors.ml
 +@@ -17,7 +17,7 @@ module type S = sig type t val x : t end
 + module Falias (X : S) = X
 + [%%expect{|
 + {
-+- "Falias"[module] -> Abs<.4>(X/299, X/299<.3>);
-++ "Falias"[module] -> Abs<.4>(X/294, X/294<.3>);
++- "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
+++ "Falias"[module] -> Abs<.4>(X/275, X/275<.3>);
 +  }
 + module Falias : functor (X : S) -> sig type t = X.t val x : t end
 + |}]
@@ -7127,13 +6458,13 @@ index 0000000000..6be734834e
 + {
 +  "Finclude"[module] ->
 +      Abs<.6>
-+-        (X/303,
-++        (X/298,
++-        (X/284,
+++        (X/279,
 +          {
-+-          "t"[type] -> X/303<.5> . "t"[type];
-+-          "x"[value] -> X/303<.5> . "x"[value];
-++          "t"[type] -> X/298<.5> . "t"[type];
-++          "x"[value] -> X/298<.5> . "x"[value];
++-          "t"[type] -> X/284<.5> . "t"[type];
++-          "x"[value] -> X/284<.5> . "x"[value];
+++          "t"[type] -> X/279<.5> . "t"[type];
+++          "x"[value] -> X/279<.5> . "x"[value];
 +           });
 +  }
 + module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -7141,8 +6472,8 @@ index 0000000000..6be734834e
 + [%%expect{|
 + {
 +  "Fredef"[module] ->
-+-     Abs<.10>(X/310, {
-++     Abs<.10>(X/305, {
++-     Abs<.10>(X/291, {
+++     Abs<.10>(X/286, {
 +                       "t"[type] -> <.8>;
 +                       "x"[value] -> <.9>;
 +                       });
@@ -7150,10 +6481,10 @@ index 0000000000..6be734834e
 + [%%expect{|
 + {
 +  "Big_to_small1"[module] ->
-+-     Abs<.40>(X/405, {<.39>
-+-                      "t"[type] -> X/405<.39> . "t"[type];
-++     Abs<.40>(X/400, {<.39>
-++                      "t"[type] -> X/400<.39> . "t"[type];
++-     Abs<.40>(X/386, {<.39>
++-                      "t"[type] -> X/386<.39> . "t"[type];
+++     Abs<.40>(X/381, {<.39>
+++                      "t"[type] -> X/381<.39> . "t"[type];
 +                       });
 +  }
 + module Big_to_small1 : B2S
@@ -7161,38 +6492,38 @@ index 0000000000..6be734834e
 + [%%expect{|
 + {
 +  "Big_to_small2"[module] ->
-+-     Abs<.42>(X/408, {
-+-                      "t"[type] -> X/408<.41> . "t"[type];
-++     Abs<.42>(X/403, {
-++                      "t"[type] -> X/403<.41> . "t"[type];
++-     Abs<.42>(X/389, {
++-                      "t"[type] -> X/389<.41> . "t"[type];
+++     Abs<.42>(X/384, {
+++                      "t"[type] -> X/384<.41> . "t"[type];
 +                       });
 +  }
 + module Big_to_small2 : B2S
 +diff --git a/testsuite/tests/shapes/open_arg.ml b/testsuite/tests/shapes/open_arg.ml
-+index c7f9a67712..b0bea13f61 100644
++index 81b19af3f7..d86820c0f5 100644
 +--- a/testsuite/tests/shapes/open_arg.ml
 ++++ b/testsuite/tests/shapes/open_arg.ml
 +@@ -22,7 +22,7 @@ end = struct end
 + 
 + [%%expect{|
 + {
-+- "Make"[module] -> Abs<.3>(I/299, {
-++ "Make"[module] -> Abs<.3>(I/294, {
++- "Make"[module] -> Abs<.3>(I/280, {
+++ "Make"[module] -> Abs<.3>(I/275, {
 +                                    });
 +  }
 + module Make : functor (I : sig end) -> sig end
 +diff --git a/testsuite/tests/shapes/recmodules.ml b/testsuite/tests/shapes/recmodules.ml
-+index d895182cf9..0fb00d1132 100644
++index 93fef6012c..126c792ea2 100644
 +--- a/testsuite/tests/shapes/recmodules.ml
 ++++ b/testsuite/tests/shapes/recmodules.ml
 +@@ -43,8 +43,8 @@ and B : sig
 + end = B
 + [%%expect{|
 + {
-+- "A"[module] -> A/322<.11>;
-+- "B"[module] -> B/323<.12>;
-++ "A"[module] -> A/317<.11>;
-++ "B"[module] -> B/318<.12>;
++- "A"[module] -> A/303<.11>;
++- "B"[module] -> B/304<.12>;
+++ "A"[module] -> A/298<.11>;
+++ "B"[module] -> B/299<.12>;
 +  }
 + module rec A : sig type t = Leaf of B.t end
 + and B : sig type t = int end
@@ -7200,29 +6531,29 @@ index 0000000000..6be734834e
 +  "ASet"[module] ->
 +      {
 +       "compare"[value] ->
-+-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-++          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
 +           "compare"[value];
 +       "elt"[type] ->
-+-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-++          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
 +           "elt"[type];
 +       "t"[type] ->
-+-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) . "t"[type];
-++          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) . "t"[type];
++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
 +       };
 +  }
 + module rec A :
 +diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
-+index ba74bc3e28..122401918e 100644
++index 521d86d019..e5dc4732b5 100644
 +--- a/testsuite/tests/shapes/rotor_example.ml
 ++++ b/testsuite/tests/shapes/rotor_example.ml
 +@@ -26,7 +26,7 @@ end
 + {
 +  "Pair"[module] ->
 +      Abs<.9>
-+-        (X/299, Abs(Y/300, {
-++        (X/294, Abs(Y/295, {
++-        (X/280, Abs(Y/281, {
+++        (X/275, Abs(Y/276, {
 +                             "t"[type] -> <.5>;
 +                             "to_string"[value] -> <.6>;
 +                             }));
@@ -7714,21 +7045,21 @@ index 0000000000..6be734834e
 +   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 +     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
 +diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-+index 1e35152097..d0cc6c5a5a 100644
++index 4948e3e7e8..6a922581a0 100644
 +--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
 ++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
 +@@ -24,11 +24,11 @@ end
 + Line 3, characters 2-36:
 + 3 |   include Comparable with type t = t
 +       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-Error: Illegal shadowing of included type t/304 by t/309
-++Error: Illegal shadowing of included type t/299 by t/304
++-Error: Illegal shadowing of included type t/285 by t/290
+++Error: Illegal shadowing of included type t/280 by t/285
 +        Line 2, characters 2-19:
-+-         Type t/304 came from this include
-++         Type t/299 came from this include
++-         Type t/285 came from this include
+++         Type t/280 came from this include
 +        Line 3, characters 2-23:
-+-         The value print has no valid type if t/304 is shadowed
-++         The value print has no valid type if t/299 is shadowed
++-         The value print has no valid type if t/285 is shadowed
+++         The value print has no valid type if t/280 is shadowed
 + |}]
 + 
 + module type Sunderscore = sig
@@ -7808,677 +7139,13 @@ index 0000000000..6be734834e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5a7c2e87fc
+index 0000000000..f891853267
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7745 @@
+@@ -0,0 +1,7050 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c3c3831978
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,661 @@
-++--- a	2023-09-28 18:45:03.314991872 +0100
-+++++ b	2023-09-28 18:45:03.330992503 +0100
-++@@ -20,20 +20,20 @@
-++  | _ -> false
-++  ;;
-++  [%%expect{|
-++--(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-++-+(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-+++-(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
-++++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
-++    (catch
-++      (catch
-++--      (catch (if (!= *match*/295 3) (exit 3) (exit 1)) with (3)
-++--        (if (!= *match*/294 1) (exit 2) (exit 1)))
-++-+      (catch (if (!= *match*/276 3) (exit 3) (exit 1)) with (3)
-++-+        (if (!= *match*/275 1) (exit 2) (exit 1)))
-+++-      (catch (if (!= *match*/290 3) (exit 3) (exit 1)) with (3)
-+++-        (if (!= *match*/289 1) (exit 2) (exit 1)))
-++++      (catch (if (!= *match*/271 3) (exit 3) (exit 1)) with (3)
-++++        (if (!= *match*/270 1) (exit 2) (exit 1)))
-++       with (2) 0)
-++     with (1) 1))
-++--(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-++--  (catch (if (!= *match*/295 3) (if (!= *match*/294 1) 0 (exit 1)) (exit 1))
-++-+(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-++-+  (catch (if (!= *match*/276 3) (if (!= *match*/275 1) 0 (exit 1)) (exit 1))
-+++-(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
-+++-  (catch (if (!= *match*/290 3) (if (!= *match*/289 1) 0 (exit 1)) (exit 1))
-++++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
-++++  (catch (if (!= *match*/271 3) (if (!= *match*/270 1) 0 (exit 1)) (exit 1))
-++     with (1) 1))
-++  - : bool = false
-++  |}];;
-++@@ -41,40 +41,40 @@
-++  | _ -> false
-++  ;;
-++  [%%expect{|
-++--(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-++-+(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
-+++-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-++++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-++    (catch
-++      (catch
-++        (catch
-++--        (if (!= *match*/300 3) (exit 6)
-++--          (let (x/303 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-++--            (exit 4 x/303)))
-++-+        (if (!= *match*/281 3) (exit 6)
-++-+          (let (x/284 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
-++-+            (exit 4 x/284)))
-+++-        (if (!= *match*/295 3) (exit 6)
-+++-          (let (x/298 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-+++-            (exit 4 x/298)))
-++++        (if (!= *match*/276 3) (exit 6)
-++++          (let (x/279 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
-++++            (exit 4 x/279)))
-++         with (6)
-++--        (if (!= *match*/299 1) (exit 5)
-++--          (let (x/302 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-++--            (exit 4 x/302))))
-++-+        (if (!= *match*/280 1) (exit 5)
-++-+          (let (x/283 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
-++-+            (exit 4 x/283))))
-+++-        (if (!= *match*/294 1) (exit 5)
-+++-          (let (x/297 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-+++-            (exit 4 x/297))))
-++++        (if (!= *match*/275 1) (exit 5)
-++++          (let (x/278 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
-++++            (exit 4 x/278))))
-++       with (5) 0)
-++--   with (4 x/297) (seq (ignore x/297) 1)))
-++--(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-++-+   with (4 x/278) (seq (ignore x/278) 1)))
-++-+(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
-+++-   with (4 x/292) (seq (ignore x/292) 1)))
-+++-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-++++   with (4 x/273) (seq (ignore x/273) 1)))
-++++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
-++    (catch
-++--    (if (!= *match*/300 3)
-++--      (if (!= *match*/299 1) 0
-++--        (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-++--      (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-++--   with (4 x/297) (seq (ignore x/297) 1)))
-++-+    (if (!= *match*/281 3)
-++-+      (if (!= *match*/280 1) 0
-++-+        (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
-++-+      (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
-++-+   with (4 x/278) (seq (ignore x/278) 1)))
-+++-    (if (!= *match*/295 3)
-+++-      (if (!= *match*/294 1) 0
-+++-        (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-+++-      (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-+++-   with (4 x/292) (seq (ignore x/292) 1)))
-++++    (if (!= *match*/276 3)
-++++      (if (!= *match*/275 1) 0
-++++        (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
-++++      (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
-++++   with (4 x/273) (seq (ignore x/273) 1)))
-++  - : bool = false
-++  |}];;
-++  
-++@@ -82,10 +82,10 @@
-++    | ((true, _) as _g)
-++    | ((false, _) as _g) -> ()
-++  [%%expect{|
-++--(function a/304[int] b/305 : int 0)
-++--(function a/304[int] b/305 : int 0)
-++-+(function a/285[int] b/286 : int 0)
-++-+(function a/285[int] b/286 : int 0)
-+++-(function a/299[int] b/300 : int 0)
-+++-(function a/299[int] b/300 : int 0)
-++++(function a/280[int] b/281 : int 0)
-++++(function a/280[int] b/281 : int 0)
-++  - : bool -> 'a -> unit = <fun>
-++  |}];;
-++  
-++@@ -93,10 +93,10 @@
-++  | (false, _) as p -> p
-++  (* outside, trivial *)
-++  [%%expect {|
-++--(function a/308[int] b/309 (let (p/310 =a (makeblock 0 a/308 b/309)) p/310))
-++--(function a/308[int] b/309 (makeblock 0 a/308 b/309))
-++-+(function a/289[int] b/290 (let (p/291 =a (makeblock 0 a/289 b/290)) p/291))
-++-+(function a/289[int] b/290 (makeblock 0 a/289 b/290))
-+++-(function a/303[int] b/304 (let (p/305 =a (makeblock 0 a/303 b/304)) p/305))
-+++-(function a/303[int] b/304 (makeblock 0 a/303 b/304))
-++++(function a/284[int] b/285 (let (p/286 =a (makeblock 0 a/284 b/285)) p/286))
-++++(function a/284[int] b/285 (makeblock 0 a/284 b/285))
-++  - : bool -> 'a -> bool * 'a = <fun>
-++  |}]
-++  
-++@@ -104,10 +104,10 @@
-++  | ((false, _) as p) -> p
-++  (* inside, trivial *)
-++  [%%expect{|
-++--(function a/312[int] b/313 (let (p/314 =a (makeblock 0 a/312 b/313)) p/314))
-++--(function a/312[int] b/313 (makeblock 0 a/312 b/313))
-++-+(function a/293[int] b/294 (let (p/295 =a (makeblock 0 a/293 b/294)) p/295))
-++-+(function a/293[int] b/294 (makeblock 0 a/293 b/294))
-+++-(function a/307[int] b/308 (let (p/309 =a (makeblock 0 a/307 b/308)) p/309))
-+++-(function a/307[int] b/308 (makeblock 0 a/307 b/308))
-++++(function a/288[int] b/289 (let (p/290 =a (makeblock 0 a/288 b/289)) p/290))
-++++(function a/288[int] b/289 (makeblock 0 a/288 b/289))
-++  - : bool -> 'a -> bool * 'a = <fun>
-++  |}];;
-++  
-++@@ -115,16 +115,16 @@
-++  | (false as x, _) as p -> x, p
-++  (* outside, simple *)
-++  [%%expect {|
-++--(function a/318[int] b/319
-++--  (let (x/320 =a[int] a/318 p/321 =a (makeblock 0 a/318 b/319))
-++--    (makeblock 0 (int,*) x/320 p/321)))
-++--(function a/318[int] b/319
-++--  (makeblock 0 (int,*) a/318 (makeblock 0 a/318 b/319)))
-++-+(function a/299[int] b/300
-++-+  (let (x/301 =a[int] a/299 p/302 =a (makeblock 0 a/299 b/300))
-++-+    (makeblock 0 (int,*) x/301 p/302)))
-++-+(function a/299[int] b/300
-++-+  (makeblock 0 (int,*) a/299 (makeblock 0 a/299 b/300)))
-+++-(function a/313[int] b/314
-+++-  (let (x/315 =a[int] a/313 p/316 =a (makeblock 0 a/313 b/314))
-+++-    (makeblock 0 (int,*) x/315 p/316)))
-+++-(function a/313[int] b/314
-+++-  (makeblock 0 (int,*) a/313 (makeblock 0 a/313 b/314)))
-++++(function a/294[int] b/295
-++++  (let (x/296 =a[int] a/294 p/297 =a (makeblock 0 a/294 b/295))
-++++    (makeblock 0 (int,*) x/296 p/297)))
-++++(function a/294[int] b/295
-++++  (makeblock 0 (int,*) a/294 (makeblock 0 a/294 b/295)))
-++  - : bool -> 'a -> bool * (bool * 'a) = <fun>
-++  |}]
-++  
-++@@ -132,16 +132,16 @@
-++  | ((false as x, _) as p) -> x, p
-++  (* inside, simple *)
-++  [%%expect {|
-++--(function a/324[int] b/325
-++--  (let (x/326 =a[int] a/324 p/327 =a (makeblock 0 a/324 b/325))
-++--    (makeblock 0 (int,*) x/326 p/327)))
-++--(function a/324[int] b/325
-++--  (makeblock 0 (int,*) a/324 (makeblock 0 a/324 b/325)))
-++-+(function a/305[int] b/306
-++-+  (let (x/307 =a[int] a/305 p/308 =a (makeblock 0 a/305 b/306))
-++-+    (makeblock 0 (int,*) x/307 p/308)))
-++-+(function a/305[int] b/306
-++-+  (makeblock 0 (int,*) a/305 (makeblock 0 a/305 b/306)))
-+++-(function a/319[int] b/320
-+++-  (let (x/321 =a[int] a/319 p/322 =a (makeblock 0 a/319 b/320))
-+++-    (makeblock 0 (int,*) x/321 p/322)))
-+++-(function a/319[int] b/320
-+++-  (makeblock 0 (int,*) a/319 (makeblock 0 a/319 b/320)))
-++++(function a/300[int] b/301
-++++  (let (x/302 =a[int] a/300 p/303 =a (makeblock 0 a/300 b/301))
-++++    (makeblock 0 (int,*) x/302 p/303)))
-++++(function a/300[int] b/301
-++++  (makeblock 0 (int,*) a/300 (makeblock 0 a/300 b/301)))
-++  - : bool -> 'a -> bool * (bool * 'a) = <fun>
-++  |}]
-++  
-++@@ -149,24 +149,24 @@
-++  | (false, x) as p -> x, p
-++  (* outside, complex *)
-++  [%%expect{|
-++--(function a/334[int] b/335[int]
-++--  (if a/334
-++--    (let (x/336 =a[int] a/334 p/337 =a (makeblock 0 a/334 b/335))
-++--      (makeblock 0 (int,*) x/336 p/337))
-++--    (let (x/338 =a b/335 p/339 =a (makeblock 0 a/334 b/335))
-++--      (makeblock 0 (int,*) x/338 p/339))))
-++--(function a/334[int] b/335[int]
-++--  (if a/334 (makeblock 0 (int,*) a/334 (makeblock 0 a/334 b/335))
-++--    (makeblock 0 (int,*) b/335 (makeblock 0 a/334 b/335))))
-++-+(function a/315[int] b/316[int]
-++-+  (if a/315
-++-+    (let (x/317 =a[int] a/315 p/318 =a (makeblock 0 a/315 b/316))
-++-+      (makeblock 0 (int,*) x/317 p/318))
-++-+    (let (x/319 =a b/316 p/320 =a (makeblock 0 a/315 b/316))
-++-+      (makeblock 0 (int,*) x/319 p/320))))
-++-+(function a/315[int] b/316[int]
-++-+  (if a/315 (makeblock 0 (int,*) a/315 (makeblock 0 a/315 b/316))
-++-+    (makeblock 0 (int,*) b/316 (makeblock 0 a/315 b/316))))
-+++-(function a/329[int] b/330[int]
-+++-  (if a/329
-+++-    (let (x/331 =a[int] a/329 p/332 =a (makeblock 0 a/329 b/330))
-+++-      (makeblock 0 (int,*) x/331 p/332))
-+++-    (let (x/333 =a b/330 p/334 =a (makeblock 0 a/329 b/330))
-+++-      (makeblock 0 (int,*) x/333 p/334))))
-+++-(function a/329[int] b/330[int]
-+++-  (if a/329 (makeblock 0 (int,*) a/329 (makeblock 0 a/329 b/330))
-+++-    (makeblock 0 (int,*) b/330 (makeblock 0 a/329 b/330))))
-++++(function a/310[int] b/311[int]
-++++  (if a/310
-++++    (let (x/312 =a[int] a/310 p/313 =a (makeblock 0 a/310 b/311))
-++++      (makeblock 0 (int,*) x/312 p/313))
-++++    (let (x/314 =a b/311 p/315 =a (makeblock 0 a/310 b/311))
-++++      (makeblock 0 (int,*) x/314 p/315))))
-++++(function a/310[int] b/311[int]
-++++  (if a/310 (makeblock 0 (int,*) a/310 (makeblock 0 a/310 b/311))
-++++    (makeblock 0 (int,*) b/311 (makeblock 0 a/310 b/311))))
-++  - : bool -> bool -> bool * (bool * bool) = <fun>
-++  |}]
-++  
-++@@ -174,30 +174,30 @@
-++    -> x, p
-++  (* inside, complex *)
-++  [%%expect{|
-++--(function a/340[int] b/341[int]
-++-+(function a/321[int] b/322[int]
-+++-(function a/335[int] b/336[int]
-++++(function a/316[int] b/317[int]
-++    (catch
-++--    (if a/340
-++--      (let (x/348 =a[int] a/340 p/349 =a (makeblock 0 a/340 b/341))
-++--        (exit 10 x/348 p/349))
-++--      (let (x/346 =a b/341 p/347 =a (makeblock 0 a/340 b/341))
-++--        (exit 10 x/346 p/347)))
-++--   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-++--(function a/340[int] b/341[int]
-++-+    (if a/321
-++-+      (let (x/329 =a[int] a/321 p/330 =a (makeblock 0 a/321 b/322))
-++-+        (exit 10 x/329 p/330))
-++-+      (let (x/327 =a b/322 p/328 =a (makeblock 0 a/321 b/322))
-++-+        (exit 10 x/327 p/328)))
-++-+   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
-++-+(function a/321[int] b/322[int]
-+++-    (if a/335
-+++-      (let (x/343 =a[int] a/335 p/344 =a (makeblock 0 a/335 b/336))
-+++-        (exit 10 x/343 p/344))
-+++-      (let (x/341 =a b/336 p/342 =a (makeblock 0 a/335 b/336))
-+++-        (exit 10 x/341 p/342)))
-+++-   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
-+++-(function a/335[int] b/336[int]
-++++    (if a/316
-++++      (let (x/324 =a[int] a/316 p/325 =a (makeblock 0 a/316 b/317))
-++++        (exit 10 x/324 p/325))
-++++      (let (x/322 =a b/317 p/323 =a (makeblock 0 a/316 b/317))
-++++        (exit 10 x/322 p/323)))
-++++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
-++++(function a/316[int] b/317[int]
-++    (catch
-++--    (if a/340 (exit 10 a/340 (makeblock 0 a/340 b/341))
-++--      (exit 10 b/341 (makeblock 0 a/340 b/341)))
-++--   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-++-+    (if a/321 (exit 10 a/321 (makeblock 0 a/321 b/322))
-++-+      (exit 10 b/322 (makeblock 0 a/321 b/322)))
-++-+   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
-+++-    (if a/335 (exit 10 a/335 (makeblock 0 a/335 b/336))
-+++-      (exit 10 b/336 (makeblock 0 a/335 b/336)))
-+++-   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
-++++    (if a/316 (exit 10 a/316 (makeblock 0 a/316 b/317))
-++++      (exit 10 b/317 (makeblock 0 a/316 b/317)))
-++++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
-++  - : bool -> bool -> bool * (bool * bool) = <fun>
-++  |}]
-++  
-++@@ -205,24 +205,24 @@
-++  | (false as x, _) as p -> x, p
-++  (* outside, onecase *)
-++  [%%expect {|
-++--(function a/350[int] b/351[int]
-++--  (if a/350
-++--    (let (x/352 =a[int] a/350 _p/353 =a (makeblock 0 a/350 b/351))
-++--      (makeblock 0 (int,*) x/352 [0: 1 1]))
-++--    (let (x/354 =a[int] a/350 p/355 =a (makeblock 0 a/350 b/351))
-++--      (makeblock 0 (int,*) x/354 p/355))))
-++--(function a/350[int] b/351[int]
-++--  (if a/350 (makeblock 0 (int,*) a/350 [0: 1 1])
-++--    (makeblock 0 (int,*) a/350 (makeblock 0 a/350 b/351))))
-++-+(function a/331[int] b/332[int]
-++-+  (if a/331
-++-+    (let (x/333 =a[int] a/331 _p/334 =a (makeblock 0 a/331 b/332))
-++-+      (makeblock 0 (int,*) x/333 [0: 1 1]))
-++-+    (let (x/335 =a[int] a/331 p/336 =a (makeblock 0 a/331 b/332))
-++-+      (makeblock 0 (int,*) x/335 p/336))))
-++-+(function a/331[int] b/332[int]
-++-+  (if a/331 (makeblock 0 (int,*) a/331 [0: 1 1])
-++-+    (makeblock 0 (int,*) a/331 (makeblock 0 a/331 b/332))))
-+++-(function a/345[int] b/346[int]
-+++-  (if a/345
-+++-    (let (x/347 =a[int] a/345 _p/348 =a (makeblock 0 a/345 b/346))
-+++-      (makeblock 0 (int,*) x/347 [0: 1 1]))
-+++-    (let (x/349 =a[int] a/345 p/350 =a (makeblock 0 a/345 b/346))
-+++-      (makeblock 0 (int,*) x/349 p/350))))
-+++-(function a/345[int] b/346[int]
-+++-  (if a/345 (makeblock 0 (int,*) a/345 [0: 1 1])
-+++-    (makeblock 0 (int,*) a/345 (makeblock 0 a/345 b/346))))
-++++(function a/326[int] b/327[int]
-++++  (if a/326
-++++    (let (x/328 =a[int] a/326 _p/329 =a (makeblock 0 a/326 b/327))
-++++      (makeblock 0 (int,*) x/328 [0: 1 1]))
-++++    (let (x/330 =a[int] a/326 p/331 =a (makeblock 0 a/326 b/327))
-++++      (makeblock 0 (int,*) x/330 p/331))))
-++++(function a/326[int] b/327[int]
-++++  (if a/326 (makeblock 0 (int,*) a/326 [0: 1 1])
-++++    (makeblock 0 (int,*) a/326 (makeblock 0 a/326 b/327))))
-++  - : bool -> bool -> bool * (bool * bool) = <fun>
-++  |}]
-++  
-++@@ -230,16 +230,16 @@
-++  | ((false as x, _) as p) -> x, p
-++  (* inside, onecase *)
-++  [%%expect{|
-++--(function a/356[int] b/357
-++--  (let (x/358 =a[int] a/356 p/359 =a (makeblock 0 a/356 b/357))
-++--    (makeblock 0 (int,*) x/358 p/359)))
-++--(function a/356[int] b/357
-++--  (makeblock 0 (int,*) a/356 (makeblock 0 a/356 b/357)))
-++-+(function a/337[int] b/338
-++-+  (let (x/339 =a[int] a/337 p/340 =a (makeblock 0 a/337 b/338))
-++-+    (makeblock 0 (int,*) x/339 p/340)))
-++-+(function a/337[int] b/338
-++-+  (makeblock 0 (int,*) a/337 (makeblock 0 a/337 b/338)))
-+++-(function a/351[int] b/352
-+++-  (let (x/353 =a[int] a/351 p/354 =a (makeblock 0 a/351 b/352))
-+++-    (makeblock 0 (int,*) x/353 p/354)))
-+++-(function a/351[int] b/352
-+++-  (makeblock 0 (int,*) a/351 (makeblock 0 a/351 b/352)))
-++++(function a/332[int] b/333
-++++  (let (x/334 =a[int] a/332 p/335 =a (makeblock 0 a/332 b/333))
-++++    (makeblock 0 (int,*) x/334 p/335)))
-++++(function a/332[int] b/333
-++++  (makeblock 0 (int,*) a/332 (makeblock 0 a/332 b/333)))
-++  - : bool -> 'a -> bool * (bool * 'a) = <fun>
-++  |}]
-++  
-++@@ -247,20 +247,20 @@
-++  | (_, _) as p -> p
-++  (* outside, tuplist *)
-++  [%%expect {|
-++--(function a/369[int] b/370
-++-+(function a/350[int] b/351
-+++-(function a/364[int] b/365
-++++(function a/345[int] b/346
-++    (catch
-++--    (if a/369 (if b/370 (let (p/371 =a (field_imm 0 b/370)) p/371) (exit 12))
-++-+    (if a/350 (if b/351 (let (p/352 =a (field_imm 0 b/351)) p/352) (exit 12))
-+++-    (if a/364 (if b/365 (let (p/366 =a (field_imm 0 b/365)) p/366) (exit 12))
-++++    (if a/345 (if b/346 (let (p/347 =a (field_imm 0 b/346)) p/347) (exit 12))
-++        (exit 12))
-++--   with (12) (let (p/372 =a (makeblock 0 a/369 b/370)) p/372)))
-++--(function a/369[int] b/370
-++--  (catch (if a/369 (if b/370 (field_imm 0 b/370) (exit 12)) (exit 12))
-++--   with (12) (makeblock 0 a/369 b/370)))
-++-+   with (12) (let (p/353 =a (makeblock 0 a/350 b/351)) p/353)))
-++-+(function a/350[int] b/351
-++-+  (catch (if a/350 (if b/351 (field_imm 0 b/351) (exit 12)) (exit 12))
-++-+   with (12) (makeblock 0 a/350 b/351)))
-+++-   with (12) (let (p/367 =a (makeblock 0 a/364 b/365)) p/367)))
-+++-(function a/364[int] b/365
-+++-  (catch (if a/364 (if b/365 (field_imm 0 b/365) (exit 12)) (exit 12))
-+++-   with (12) (makeblock 0 a/364 b/365)))
-++++   with (12) (let (p/348 =a (makeblock 0 a/345 b/346)) p/348)))
-++++(function a/345[int] b/346
-++++  (catch (if a/345 (if b/346 (field_imm 0 b/346) (exit 12)) (exit 12))
-++++   with (12) (makeblock 0 a/345 b/346)))
-++  - : bool -> bool tuplist -> bool * bool tuplist = <fun>
-++  |}]
-++  
-++@@ -268,30 +268,30 @@
-++  | ((_, _) as p) -> p
-++  (* inside, tuplist *)
-++  [%%expect{|
-++--(function a/373[int] b/374
-++-+(function a/354[int] b/355
-+++-(function a/368[int] b/369
-++++(function a/349[int] b/350
-++    (catch
-++      (catch
-++--      (if a/373
-++--        (if b/374 (let (p/378 =a (field_imm 0 b/374)) (exit 13 p/378))
-++-+      (if a/354
-++-+        (if b/355 (let (p/359 =a (field_imm 0 b/355)) (exit 13 p/359))
-+++-      (if a/368
-+++-        (if b/369 (let (p/373 =a (field_imm 0 b/369)) (exit 13 p/373))
-++++      (if a/349
-++++        (if b/350 (let (p/354 =a (field_imm 0 b/350)) (exit 13 p/354))
-++            (exit 14))
-++          (exit 14))
-++--     with (14) (let (p/377 =a (makeblock 0 a/373 b/374)) (exit 13 p/377)))
-++--   with (13 p/375) p/375))
-++--(function a/373[int] b/374
-++-+     with (14) (let (p/358 =a (makeblock 0 a/354 b/355)) (exit 13 p/358)))
-++-+   with (13 p/356) p/356))
-++-+(function a/354[int] b/355
-+++-     with (14) (let (p/372 =a (makeblock 0 a/368 b/369)) (exit 13 p/372)))
-+++-   with (13 p/370) p/370))
-+++-(function a/368[int] b/369
-++++     with (14) (let (p/353 =a (makeblock 0 a/349 b/350)) (exit 13 p/353)))
-++++   with (13 p/351) p/351))
-++++(function a/349[int] b/350
-++    (catch
-++      (catch
-++--      (if a/373 (if b/374 (exit 13 (field_imm 0 b/374)) (exit 14)) (exit 14))
-++--     with (14) (exit 13 (makeblock 0 a/373 b/374)))
-++--   with (13 p/375) p/375))
-++-+      (if a/354 (if b/355 (exit 13 (field_imm 0 b/355)) (exit 14)) (exit 14))
-++-+     with (14) (exit 13 (makeblock 0 a/354 b/355)))
-++-+   with (13 p/356) p/356))
-+++-      (if a/368 (if b/369 (exit 13 (field_imm 0 b/369)) (exit 14)) (exit 14))
-+++-     with (14) (exit 13 (makeblock 0 a/368 b/369)))
-+++-   with (13 p/370) p/370))
-++++      (if a/349 (if b/350 (exit 13 (field_imm 0 b/350)) (exit 14)) (exit 14))
-++++     with (14) (exit 13 (makeblock 0 a/349 b/350)))
-++++   with (13 p/351) p/351))
-++  - : bool -> bool tuplist -> bool * bool tuplist = <fun>
-++  |}]
-++ diff --git a/testsuite/tests/basic/patmatch_split_no_or.ml b/testsuite/tests/basic/patmatch_split_no_or.ml
-++@@ -394,11 +394,11 @@
-++  Line 1, characters 15-41:
-++  1 | include struct open struct type t = T end let x = T end
-++                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-++--Error: The type t/357 introduced by this open appears in the signature
-++-+Error: The type t/338 introduced by this open appears in the signature
-+++-Error: The type t/352 introduced by this open appears in the signature
-++++Error: The type t/333 introduced by this open appears in the signature
-++         Line 1, characters 46-47:
-++--         The value x has no valid type if t/357 is hidden
-++-+         The value x has no valid type if t/338 is hidden
-+++-         The value x has no valid type if t/352 is hidden
-++++         The value x has no valid type if t/333 is hidden
-++  |}];;
-++  
-++  module A = struct
-++@@ -406,11 +406,11 @@
-++  4 |       type t = T
-++  5 |       let x = T
-++  6 |     end
-++--Error: The type t/362 introduced by this open appears in the signature
-++-+Error: The type t/343 introduced by this open appears in the signature
-+++-Error: The type t/357 introduced by this open appears in the signature
-++++Error: The type t/338 introduced by this open appears in the signature
-++         Line 7, characters 8-9:
-++--         The value y has no valid type if t/362 is hidden
-++-+         The value y has no valid type if t/343 is hidden
-+++-         The value y has no valid type if t/357 is hidden
-++++         The value y has no valid type if t/338 is hidden
-++  |}];;
-++  
-++  module A = struct
-++@@ -418,11 +418,11 @@
-++  3 | ....open struct
-++  4 |       type t = T
-++  5 |     end
-++--Error: The type t/367 introduced by this open appears in the signature
-++-+Error: The type t/348 introduced by this open appears in the signature
-+++-Error: The type t/362 introduced by this open appears in the signature
-++++Error: The type t/343 introduced by this open appears in the signature
-++         Line 6, characters 8-9:
-++--         The value y has no valid type if t/367 is hidden
-++-+         The value y has no valid type if t/348 is hidden
-+++-         The value y has no valid type if t/362 is hidden
-++++         The value y has no valid type if t/343 is hidden
-++  |}]
-++  
-++  (* It was decided to not allow this anymore. *)
-++@@ -496,8 +496,8 @@
-++  module F (X : sig type t end) = X
-++  [%%expect{|
-++  {
-++-- "F"[module] -> Abs<.4>(X/297, X/297<.3>);
-++-+ "F"[module] -> Abs<.4>(X/278, X/278<.3>);
-+++- "F"[module] -> Abs<.4>(X/292, X/292<.3>);
-++++ "F"[module] -> Abs<.4>(X/273, X/273<.3>);
-++   }
-++  module F : functor (X : sig type t end) -> sig type t = X.t end
-++  |}]
-++@@ -508,8 +508,8 @@
-++  module Falias (X : S) = X
-++  [%%expect{|
-++  {
-++-- "Falias"[module] -> Abs<.4>(X/299, X/299<.3>);
-++-+ "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
-+++- "Falias"[module] -> Abs<.4>(X/294, X/294<.3>);
-++++ "Falias"[module] -> Abs<.4>(X/275, X/275<.3>);
-++   }
-++  module Falias : functor (X : S) -> sig type t = X.t val x : t end
-++  |}]
-++@@ -517,13 +517,13 @@
-++  {
-++   "Finclude"[module] ->
-++       Abs<.6>
-++--        (X/303,
-++-+        (X/284,
-+++-        (X/298,
-++++        (X/279,
-++           {
-++--          "t"[type] -> X/303<.5> . "t"[type];
-++--          "x"[value] -> X/303<.5> . "x"[value];
-++-+          "t"[type] -> X/284<.5> . "t"[type];
-++-+          "x"[value] -> X/284<.5> . "x"[value];
-+++-          "t"[type] -> X/298<.5> . "t"[type];
-+++-          "x"[value] -> X/298<.5> . "x"[value];
-++++          "t"[type] -> X/279<.5> . "t"[type];
-++++          "x"[value] -> X/279<.5> . "x"[value];
-++            });
-++   }
-++  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
-++@@ -531,8 +531,8 @@
-++  [%%expect{|
-++  {
-++   "Fredef"[module] ->
-++--     Abs<.10>(X/310, {
-++-+     Abs<.10>(X/291, {
-+++-     Abs<.10>(X/305, {
-++++     Abs<.10>(X/286, {
-++                        "t"[type] -> <.8>;
-++                        "x"[value] -> <.9>;
-++                        });
-++@@ -540,10 +540,10 @@
-++  [%%expect{|
-++  {
-++   "Big_to_small1"[module] ->
-++--     Abs<.40>(X/405, {<.39>
-++--                      "t"[type] -> X/405<.39> . "t"[type];
-++-+     Abs<.40>(X/386, {<.39>
-++-+                      "t"[type] -> X/386<.39> . "t"[type];
-+++-     Abs<.40>(X/400, {<.39>
-+++-                      "t"[type] -> X/400<.39> . "t"[type];
-++++     Abs<.40>(X/381, {<.39>
-++++                      "t"[type] -> X/381<.39> . "t"[type];
-++                        });
-++   }
-++  module Big_to_small1 : B2S
-++@@ -551,10 +551,10 @@
-++  [%%expect{|
-++  {
-++   "Big_to_small2"[module] ->
-++--     Abs<.42>(X/408, {
-++--                      "t"[type] -> X/408<.41> . "t"[type];
-++-+     Abs<.42>(X/389, {
-++-+                      "t"[type] -> X/389<.41> . "t"[type];
-+++-     Abs<.42>(X/403, {
-+++-                      "t"[type] -> X/403<.41> . "t"[type];
-++++     Abs<.42>(X/384, {
-++++                      "t"[type] -> X/384<.41> . "t"[type];
-++                        });
-++   }
-++  module Big_to_small2 : B2S
-++@@ -565,8 +565,8 @@
-++  
-++  [%%expect{|
-++  {
-++-- "Make"[module] -> Abs<.3>(I/299, {
-++-+ "Make"[module] -> Abs<.3>(I/280, {
-+++- "Make"[module] -> Abs<.3>(I/294, {
-++++ "Make"[module] -> Abs<.3>(I/275, {
-++                                     });
-++   }
-++  module Make : functor (I : sig end) -> sig end
-++@@ -577,10 +577,10 @@
-++  end = B
-++  [%%expect{|
-++  {
-++-- "A"[module] -> A/322<.11>;
-++-- "B"[module] -> B/323<.12>;
-++-+ "A"[module] -> A/303<.11>;
-++-+ "B"[module] -> B/304<.12>;
-+++- "A"[module] -> A/317<.11>;
-+++- "B"[module] -> B/318<.12>;
-++++ "A"[module] -> A/298<.11>;
-++++ "B"[module] -> B/299<.12>;
-++   }
-++  module rec A : sig type t = Leaf of B.t end
-++  and B : sig type t = int end
-++@@ -588,16 +588,16 @@
-++   "ASet"[module] ->
-++       {
-++        "compare"[value] ->
-++--          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-++-+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
-++++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++            "compare"[value];
-++        "elt"[type] ->
-++--          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-++-+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
-++++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++            "elt"[type];
-++        "t"[type] ->
-++--          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) . "t"[type];
-++-+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-+++-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) . "t"[type];
-++++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-++        };
-++   }
-++  module rec A :
-++@@ -608,8 +608,8 @@
-++  {
-++   "Pair"[module] ->
-++       Abs<.9>
-++--        (X/299, Abs(Y/300, {
-++-+        (X/280, Abs(Y/281, {
-+++-        (X/294, Abs(Y/295, {
-++++        (X/275, Abs(Y/276, {
-++                              "t"[type] -> <.5>;
-++                              "to_string"[value] -> <.6>;
-++                              }));
-++@@ -620,14 +620,14 @@
-++  Line 3, characters 2-36:
-++  3 |   include Comparable with type t = t
-++        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++--Error: Illegal shadowing of included type t/304 by t/309
-++-+Error: Illegal shadowing of included type t/285 by t/290
-+++-Error: Illegal shadowing of included type t/299 by t/304
-++++Error: Illegal shadowing of included type t/280 by t/285
-++         Line 2, characters 2-19:
-++--         Type t/304 came from this include
-++-+         Type t/285 came from this include
-+++-         Type t/299 came from this include
-++++         Type t/280 came from this include
-++         Line 3, characters 2-23:
-++--         The value print has no valid type if t/304 is shadowed
-++-+         The value print has no valid type if t/285 is shadowed
-+++-         The value print has no valid type if t/299 is shadowed
-++++         The value print has no valid type if t/280 is shadowed
-++  |}]
-++  
-++  module type Sunderscore = sig
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -12026,10 +10693,10 @@ index 0000000000..5a7c2e87fc
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..6be734834e
++index 0000000000..1f67d5436c
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3590 @@
++@@ -0,0 +1,3585 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7f2433adc9..68329c5bc1 100644
 ++--- a/ocamltest/Makefile
@@ -12527,21 +11194,18 @@ index 0000000000..5a7c2e87fc
 ++ 
 ++ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 ++diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++index b7907c99bd..f4b5531cb8 100644
+++index 4fb34a7071..f4b5531cb8 100644
 ++--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
 +++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++@@ -1,20 +1,24 @@
-++ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+++@@ -2,19 +2,23 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
 ++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 ++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 ++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
++++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 ++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 ++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 +++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
 ++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
@@ -12553,16 +11217,14 @@ index 0000000000..5a7c2e87fc
 +++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 +++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 ++ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 ++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 ++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
++++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 ++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 ++-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 ++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
 +++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 +++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
@@ -12707,27 +11369,27 @@ index 0000000000..5a7c2e87fc
 ++ Called from Lazy.test2 in file "lazy.ml", line 15, characters 6-15
 ++ Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
 ++diff --git a/testsuite/tests/basic/patmatch_for_multiple.ml b/testsuite/tests/basic/patmatch_for_multiple.ml
-++index dccb4ccabd..46fcb1e936 100644
+++index 22c967370f..f2201b62d5 100644
 ++--- a/testsuite/tests/basic/patmatch_for_multiple.ml
 +++++ b/testsuite/tests/basic/patmatch_for_multiple.ml
 ++@@ -26,15 +26,15 @@ match (3, 2, 1) with
 ++ | _ -> false
 ++ ;;
 ++ [%%expect{|
-++-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-+++(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
+++-(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
++++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
 ++   (catch
 ++     (catch
-++-      (catch (if (!= *match*/295 3) (exit 3) (exit 1)) with (3)
-++-        (if (!= *match*/294 1) (exit 2) (exit 1)))
-+++      (catch (if (!= *match*/290 3) (exit 3) (exit 1)) with (3)
-+++        (if (!= *match*/289 1) (exit 2) (exit 1)))
+++-      (catch (if (!= *match*/276 3) (exit 3) (exit 1)) with (3)
+++-        (if (!= *match*/275 1) (exit 2) (exit 1)))
++++      (catch (if (!= *match*/271 3) (exit 3) (exit 1)) with (3)
++++        (if (!= *match*/270 1) (exit 2) (exit 1)))
 ++      with (2) 0)
 ++    with (1) 1))
-++-(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
-++-  (catch (if (!= *match*/295 3) (if (!= *match*/294 1) 0 (exit 1)) (exit 1))
-+++(let (*match*/289 = 3 *match*/290 = 2 *match*/291 = 1)
-+++  (catch (if (!= *match*/290 3) (if (!= *match*/289 1) 0 (exit 1)) (exit 1))
+++-(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
+++-  (catch (if (!= *match*/276 3) (if (!= *match*/275 1) 0 (exit 1)) (exit 1))
++++(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
++++  (catch (if (!= *match*/271 3) (if (!= *match*/270 1) 0 (exit 1)) (exit 1))
 ++    with (1) 1))
 ++ - : bool = false
 ++ |}];;
@@ -12735,40 +11397,40 @@ index 0000000000..5a7c2e87fc
 ++ | _ -> false
 ++ ;;
 ++ [%%expect{|
-++-(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-+++(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
+++-(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
++++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
 ++   (catch
 ++     (catch
 ++       (catch
-++-        (if (!= *match*/300 3) (exit 6)
-++-          (let (x/303 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-++-            (exit 4 x/303)))
-+++        (if (!= *match*/295 3) (exit 6)
-+++          (let (x/298 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-+++            (exit 4 x/298)))
+++-        (if (!= *match*/281 3) (exit 6)
+++-          (let (x/284 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
+++-            (exit 4 x/284)))
++++        (if (!= *match*/276 3) (exit 6)
++++          (let (x/279 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
++++            (exit 4 x/279)))
 ++        with (6)
-++-        (if (!= *match*/299 1) (exit 5)
-++-          (let (x/302 =a (makeblock 0 *match*/299 *match*/300 *match*/301))
-++-            (exit 4 x/302))))
-+++        (if (!= *match*/294 1) (exit 5)
-+++          (let (x/297 =a (makeblock 0 *match*/294 *match*/295 *match*/296))
-+++            (exit 4 x/297))))
+++-        (if (!= *match*/280 1) (exit 5)
+++-          (let (x/283 =a (makeblock 0 *match*/280 *match*/281 *match*/282))
+++-            (exit 4 x/283))))
++++        (if (!= *match*/275 1) (exit 5)
++++          (let (x/278 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
++++            (exit 4 x/278))))
 ++      with (5) 0)
-++-   with (4 x/297) (seq (ignore x/297) 1)))
-++-(let (*match*/299 = 3 *match*/300 = 2 *match*/301 = 1)
-+++   with (4 x/292) (seq (ignore x/292) 1)))
-+++(let (*match*/294 = 3 *match*/295 = 2 *match*/296 = 1)
+++-   with (4 x/278) (seq (ignore x/278) 1)))
+++-(let (*match*/280 = 3 *match*/281 = 2 *match*/282 = 1)
++++   with (4 x/273) (seq (ignore x/273) 1)))
++++(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
 ++   (catch
-++-    (if (!= *match*/300 3)
-++-      (if (!= *match*/299 1) 0
-++-        (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-++-      (exit 4 (makeblock 0 *match*/299 *match*/300 *match*/301)))
-++-   with (4 x/297) (seq (ignore x/297) 1)))
-+++    (if (!= *match*/295 3)
-+++      (if (!= *match*/294 1) 0
-+++        (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-+++      (exit 4 (makeblock 0 *match*/294 *match*/295 *match*/296)))
-+++   with (4 x/292) (seq (ignore x/292) 1)))
+++-    (if (!= *match*/281 3)
+++-      (if (!= *match*/280 1) 0
+++-        (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
+++-      (exit 4 (makeblock 0 *match*/280 *match*/281 *match*/282)))
+++-   with (4 x/278) (seq (ignore x/278) 1)))
++++    (if (!= *match*/276 3)
++++      (if (!= *match*/275 1) 0
++++        (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
++++      (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
++++   with (4 x/273) (seq (ignore x/273) 1)))
 ++ - : bool = false
 ++ |}];;
 ++ 
@@ -12776,10 +11438,10 @@ index 0000000000..5a7c2e87fc
 ++   | ((true, _) as _g)
 ++   | ((false, _) as _g) -> ()
 ++ [%%expect{|
-++-(function a/304[int] b/305 : int 0)
-++-(function a/304[int] b/305 : int 0)
-+++(function a/299[int] b/300 : int 0)
-+++(function a/299[int] b/300 : int 0)
+++-(function a/285[int] b/286 : int 0)
+++-(function a/285[int] b/286 : int 0)
++++(function a/280[int] b/281 : int 0)
++++(function a/280[int] b/281 : int 0)
 ++ - : bool -> 'a -> unit = <fun>
 ++ |}];;
 ++ 
@@ -12787,10 +11449,10 @@ index 0000000000..5a7c2e87fc
 ++ | (false, _) as p -> p
 ++ (* outside, trivial *)
 ++ [%%expect {|
-++-(function a/308[int] b/309 (let (p/310 =a (makeblock 0 a/308 b/309)) p/310))
-++-(function a/308[int] b/309 (makeblock 0 a/308 b/309))
-+++(function a/303[int] b/304 (let (p/305 =a (makeblock 0 a/303 b/304)) p/305))
-+++(function a/303[int] b/304 (makeblock 0 a/303 b/304))
+++-(function a/289[int] b/290 (let (p/291 =a (makeblock 0 a/289 b/290)) p/291))
+++-(function a/289[int] b/290 (makeblock 0 a/289 b/290))
++++(function a/284[int] b/285 (let (p/286 =a (makeblock 0 a/284 b/285)) p/286))
++++(function a/284[int] b/285 (makeblock 0 a/284 b/285))
 ++ - : bool -> 'a -> bool * 'a = <fun>
 ++ |}]
 ++ 
@@ -12798,10 +11460,10 @@ index 0000000000..5a7c2e87fc
 ++ | ((false, _) as p) -> p
 ++ (* inside, trivial *)
 ++ [%%expect{|
-++-(function a/312[int] b/313 (let (p/314 =a (makeblock 0 a/312 b/313)) p/314))
-++-(function a/312[int] b/313 (makeblock 0 a/312 b/313))
-+++(function a/307[int] b/308 (let (p/309 =a (makeblock 0 a/307 b/308)) p/309))
-+++(function a/307[int] b/308 (makeblock 0 a/307 b/308))
+++-(function a/293[int] b/294 (let (p/295 =a (makeblock 0 a/293 b/294)) p/295))
+++-(function a/293[int] b/294 (makeblock 0 a/293 b/294))
++++(function a/288[int] b/289 (let (p/290 =a (makeblock 0 a/288 b/289)) p/290))
++++(function a/288[int] b/289 (makeblock 0 a/288 b/289))
 ++ - : bool -> 'a -> bool * 'a = <fun>
 ++ |}];;
 ++ 
@@ -12809,16 +11471,16 @@ index 0000000000..5a7c2e87fc
 ++ | (false as x, _) as p -> x, p
 ++ (* outside, simple *)
 ++ [%%expect {|
-++-(function a/318[int] b/319
-++-  (let (x/320 =a[int] a/318 p/321 =a (makeblock 0 a/318 b/319))
-++-    (makeblock 0 (int,*) x/320 p/321)))
-++-(function a/318[int] b/319
-++-  (makeblock 0 (int,*) a/318 (makeblock 0 a/318 b/319)))
-+++(function a/313[int] b/314
-+++  (let (x/315 =a[int] a/313 p/316 =a (makeblock 0 a/313 b/314))
-+++    (makeblock 0 (int,*) x/315 p/316)))
-+++(function a/313[int] b/314
-+++  (makeblock 0 (int,*) a/313 (makeblock 0 a/313 b/314)))
+++-(function a/299[int] b/300
+++-  (let (x/301 =a[int] a/299 p/302 =a (makeblock 0 a/299 b/300))
+++-    (makeblock 0 (int,*) x/301 p/302)))
+++-(function a/299[int] b/300
+++-  (makeblock 0 (int,*) a/299 (makeblock 0 a/299 b/300)))
++++(function a/294[int] b/295
++++  (let (x/296 =a[int] a/294 p/297 =a (makeblock 0 a/294 b/295))
++++    (makeblock 0 (int,*) x/296 p/297)))
++++(function a/294[int] b/295
++++  (makeblock 0 (int,*) a/294 (makeblock 0 a/294 b/295)))
 ++ - : bool -> 'a -> bool * (bool * 'a) = <fun>
 ++ |}]
 ++ 
@@ -12826,16 +11488,16 @@ index 0000000000..5a7c2e87fc
 ++ | ((false as x, _) as p) -> x, p
 ++ (* inside, simple *)
 ++ [%%expect {|
-++-(function a/324[int] b/325
-++-  (let (x/326 =a[int] a/324 p/327 =a (makeblock 0 a/324 b/325))
-++-    (makeblock 0 (int,*) x/326 p/327)))
-++-(function a/324[int] b/325
-++-  (makeblock 0 (int,*) a/324 (makeblock 0 a/324 b/325)))
-+++(function a/319[int] b/320
-+++  (let (x/321 =a[int] a/319 p/322 =a (makeblock 0 a/319 b/320))
-+++    (makeblock 0 (int,*) x/321 p/322)))
-+++(function a/319[int] b/320
-+++  (makeblock 0 (int,*) a/319 (makeblock 0 a/319 b/320)))
+++-(function a/305[int] b/306
+++-  (let (x/307 =a[int] a/305 p/308 =a (makeblock 0 a/305 b/306))
+++-    (makeblock 0 (int,*) x/307 p/308)))
+++-(function a/305[int] b/306
+++-  (makeblock 0 (int,*) a/305 (makeblock 0 a/305 b/306)))
++++(function a/300[int] b/301
++++  (let (x/302 =a[int] a/300 p/303 =a (makeblock 0 a/300 b/301))
++++    (makeblock 0 (int,*) x/302 p/303)))
++++(function a/300[int] b/301
++++  (makeblock 0 (int,*) a/300 (makeblock 0 a/300 b/301)))
 ++ - : bool -> 'a -> bool * (bool * 'a) = <fun>
 ++ |}]
 ++ 
@@ -12843,24 +11505,24 @@ index 0000000000..5a7c2e87fc
 ++ | (false, x) as p -> x, p
 ++ (* outside, complex *)
 ++ [%%expect{|
-++-(function a/334[int] b/335[int]
-++-  (if a/334
-++-    (let (x/336 =a[int] a/334 p/337 =a (makeblock 0 a/334 b/335))
-++-      (makeblock 0 (int,*) x/336 p/337))
-++-    (let (x/338 =a b/335 p/339 =a (makeblock 0 a/334 b/335))
-++-      (makeblock 0 (int,*) x/338 p/339))))
-++-(function a/334[int] b/335[int]
-++-  (if a/334 (makeblock 0 (int,*) a/334 (makeblock 0 a/334 b/335))
-++-    (makeblock 0 (int,*) b/335 (makeblock 0 a/334 b/335))))
-+++(function a/329[int] b/330[int]
-+++  (if a/329
-+++    (let (x/331 =a[int] a/329 p/332 =a (makeblock 0 a/329 b/330))
-+++      (makeblock 0 (int,*) x/331 p/332))
-+++    (let (x/333 =a b/330 p/334 =a (makeblock 0 a/329 b/330))
-+++      (makeblock 0 (int,*) x/333 p/334))))
-+++(function a/329[int] b/330[int]
-+++  (if a/329 (makeblock 0 (int,*) a/329 (makeblock 0 a/329 b/330))
-+++    (makeblock 0 (int,*) b/330 (makeblock 0 a/329 b/330))))
+++-(function a/315[int] b/316[int]
+++-  (if a/315
+++-    (let (x/317 =a[int] a/315 p/318 =a (makeblock 0 a/315 b/316))
+++-      (makeblock 0 (int,*) x/317 p/318))
+++-    (let (x/319 =a b/316 p/320 =a (makeblock 0 a/315 b/316))
+++-      (makeblock 0 (int,*) x/319 p/320))))
+++-(function a/315[int] b/316[int]
+++-  (if a/315 (makeblock 0 (int,*) a/315 (makeblock 0 a/315 b/316))
+++-    (makeblock 0 (int,*) b/316 (makeblock 0 a/315 b/316))))
++++(function a/310[int] b/311[int]
++++  (if a/310
++++    (let (x/312 =a[int] a/310 p/313 =a (makeblock 0 a/310 b/311))
++++      (makeblock 0 (int,*) x/312 p/313))
++++    (let (x/314 =a b/311 p/315 =a (makeblock 0 a/310 b/311))
++++      (makeblock 0 (int,*) x/314 p/315))))
++++(function a/310[int] b/311[int]
++++  (if a/310 (makeblock 0 (int,*) a/310 (makeblock 0 a/310 b/311))
++++    (makeblock 0 (int,*) b/311 (makeblock 0 a/310 b/311))))
 ++ - : bool -> bool -> bool * (bool * bool) = <fun>
 ++ |}]
 ++ 
@@ -12868,30 +11530,30 @@ index 0000000000..5a7c2e87fc
 ++   -> x, p
 ++ (* inside, complex *)
 ++ [%%expect{|
-++-(function a/340[int] b/341[int]
-+++(function a/335[int] b/336[int]
+++-(function a/321[int] b/322[int]
++++(function a/316[int] b/317[int]
 ++   (catch
-++-    (if a/340
-++-      (let (x/348 =a[int] a/340 p/349 =a (makeblock 0 a/340 b/341))
-++-        (exit 10 x/348 p/349))
-++-      (let (x/346 =a b/341 p/347 =a (makeblock 0 a/340 b/341))
-++-        (exit 10 x/346 p/347)))
-++-   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-++-(function a/340[int] b/341[int]
-+++    (if a/335
-+++      (let (x/343 =a[int] a/335 p/344 =a (makeblock 0 a/335 b/336))
-+++        (exit 10 x/343 p/344))
-+++      (let (x/341 =a b/336 p/342 =a (makeblock 0 a/335 b/336))
-+++        (exit 10 x/341 p/342)))
-+++   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
-+++(function a/335[int] b/336[int]
+++-    (if a/321
+++-      (let (x/329 =a[int] a/321 p/330 =a (makeblock 0 a/321 b/322))
+++-        (exit 10 x/329 p/330))
+++-      (let (x/327 =a b/322 p/328 =a (makeblock 0 a/321 b/322))
+++-        (exit 10 x/327 p/328)))
+++-   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
+++-(function a/321[int] b/322[int]
++++    (if a/316
++++      (let (x/324 =a[int] a/316 p/325 =a (makeblock 0 a/316 b/317))
++++        (exit 10 x/324 p/325))
++++      (let (x/322 =a b/317 p/323 =a (makeblock 0 a/316 b/317))
++++        (exit 10 x/322 p/323)))
++++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
++++(function a/316[int] b/317[int]
 ++   (catch
-++-    (if a/340 (exit 10 a/340 (makeblock 0 a/340 b/341))
-++-      (exit 10 b/341 (makeblock 0 a/340 b/341)))
-++-   with (10 x/342[int] p/343) (makeblock 0 (int,*) x/342 p/343)))
-+++    (if a/335 (exit 10 a/335 (makeblock 0 a/335 b/336))
-+++      (exit 10 b/336 (makeblock 0 a/335 b/336)))
-+++   with (10 x/337[int] p/338) (makeblock 0 (int,*) x/337 p/338)))
+++-    (if a/321 (exit 10 a/321 (makeblock 0 a/321 b/322))
+++-      (exit 10 b/322 (makeblock 0 a/321 b/322)))
+++-   with (10 x/323[int] p/324) (makeblock 0 (int,*) x/323 p/324)))
++++    (if a/316 (exit 10 a/316 (makeblock 0 a/316 b/317))
++++      (exit 10 b/317 (makeblock 0 a/316 b/317)))
++++   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
 ++ - : bool -> bool -> bool * (bool * bool) = <fun>
 ++ |}]
 ++ 
@@ -12899,24 +11561,24 @@ index 0000000000..5a7c2e87fc
 ++ | (false as x, _) as p -> x, p
 ++ (* outside, onecase *)
 ++ [%%expect {|
-++-(function a/350[int] b/351[int]
-++-  (if a/350
-++-    (let (x/352 =a[int] a/350 _p/353 =a (makeblock 0 a/350 b/351))
-++-      (makeblock 0 (int,*) x/352 [0: 1 1]))
-++-    (let (x/354 =a[int] a/350 p/355 =a (makeblock 0 a/350 b/351))
-++-      (makeblock 0 (int,*) x/354 p/355))))
-++-(function a/350[int] b/351[int]
-++-  (if a/350 (makeblock 0 (int,*) a/350 [0: 1 1])
-++-    (makeblock 0 (int,*) a/350 (makeblock 0 a/350 b/351))))
-+++(function a/345[int] b/346[int]
-+++  (if a/345
-+++    (let (x/347 =a[int] a/345 _p/348 =a (makeblock 0 a/345 b/346))
-+++      (makeblock 0 (int,*) x/347 [0: 1 1]))
-+++    (let (x/349 =a[int] a/345 p/350 =a (makeblock 0 a/345 b/346))
-+++      (makeblock 0 (int,*) x/349 p/350))))
-+++(function a/345[int] b/346[int]
-+++  (if a/345 (makeblock 0 (int,*) a/345 [0: 1 1])
-+++    (makeblock 0 (int,*) a/345 (makeblock 0 a/345 b/346))))
+++-(function a/331[int] b/332[int]
+++-  (if a/331
+++-    (let (x/333 =a[int] a/331 _p/334 =a (makeblock 0 a/331 b/332))
+++-      (makeblock 0 (int,*) x/333 [0: 1 1]))
+++-    (let (x/335 =a[int] a/331 p/336 =a (makeblock 0 a/331 b/332))
+++-      (makeblock 0 (int,*) x/335 p/336))))
+++-(function a/331[int] b/332[int]
+++-  (if a/331 (makeblock 0 (int,*) a/331 [0: 1 1])
+++-    (makeblock 0 (int,*) a/331 (makeblock 0 a/331 b/332))))
++++(function a/326[int] b/327[int]
++++  (if a/326
++++    (let (x/328 =a[int] a/326 _p/329 =a (makeblock 0 a/326 b/327))
++++      (makeblock 0 (int,*) x/328 [0: 1 1]))
++++    (let (x/330 =a[int] a/326 p/331 =a (makeblock 0 a/326 b/327))
++++      (makeblock 0 (int,*) x/330 p/331))))
++++(function a/326[int] b/327[int]
++++  (if a/326 (makeblock 0 (int,*) a/326 [0: 1 1])
++++    (makeblock 0 (int,*) a/326 (makeblock 0 a/326 b/327))))
 ++ - : bool -> bool -> bool * (bool * bool) = <fun>
 ++ |}]
 ++ 
@@ -12924,16 +11586,16 @@ index 0000000000..5a7c2e87fc
 ++ | ((false as x, _) as p) -> x, p
 ++ (* inside, onecase *)
 ++ [%%expect{|
-++-(function a/356[int] b/357
-++-  (let (x/358 =a[int] a/356 p/359 =a (makeblock 0 a/356 b/357))
-++-    (makeblock 0 (int,*) x/358 p/359)))
-++-(function a/356[int] b/357
-++-  (makeblock 0 (int,*) a/356 (makeblock 0 a/356 b/357)))
-+++(function a/351[int] b/352
-+++  (let (x/353 =a[int] a/351 p/354 =a (makeblock 0 a/351 b/352))
-+++    (makeblock 0 (int,*) x/353 p/354)))
-+++(function a/351[int] b/352
-+++  (makeblock 0 (int,*) a/351 (makeblock 0 a/351 b/352)))
+++-(function a/337[int] b/338
+++-  (let (x/339 =a[int] a/337 p/340 =a (makeblock 0 a/337 b/338))
+++-    (makeblock 0 (int,*) x/339 p/340)))
+++-(function a/337[int] b/338
+++-  (makeblock 0 (int,*) a/337 (makeblock 0 a/337 b/338)))
++++(function a/332[int] b/333
++++  (let (x/334 =a[int] a/332 p/335 =a (makeblock 0 a/332 b/333))
++++    (makeblock 0 (int,*) x/334 p/335)))
++++(function a/332[int] b/333
++++  (makeblock 0 (int,*) a/332 (makeblock 0 a/332 b/333)))
 ++ - : bool -> 'a -> bool * (bool * 'a) = <fun>
 ++ |}]
 ++ 
@@ -12941,20 +11603,20 @@ index 0000000000..5a7c2e87fc
 ++ | (_, _) as p -> p
 ++ (* outside, tuplist *)
 ++ [%%expect {|
-++-(function a/369[int] b/370
-+++(function a/364[int] b/365
+++-(function a/350[int] b/351
++++(function a/345[int] b/346
 ++   (catch
-++-    (if a/369 (if b/370 (let (p/371 =a (field_imm 0 b/370)) p/371) (exit 12))
-+++    (if a/364 (if b/365 (let (p/366 =a (field_imm 0 b/365)) p/366) (exit 12))
+++-    (if a/350 (if b/351 (let (p/352 =a (field_imm 0 b/351)) p/352) (exit 12))
++++    (if a/345 (if b/346 (let (p/347 =a (field_imm 0 b/346)) p/347) (exit 12))
 ++       (exit 12))
-++-   with (12) (let (p/372 =a (makeblock 0 a/369 b/370)) p/372)))
-++-(function a/369[int] b/370
-++-  (catch (if a/369 (if b/370 (field_imm 0 b/370) (exit 12)) (exit 12))
-++-   with (12) (makeblock 0 a/369 b/370)))
-+++   with (12) (let (p/367 =a (makeblock 0 a/364 b/365)) p/367)))
-+++(function a/364[int] b/365
-+++  (catch (if a/364 (if b/365 (field_imm 0 b/365) (exit 12)) (exit 12))
-+++   with (12) (makeblock 0 a/364 b/365)))
+++-   with (12) (let (p/353 =a (makeblock 0 a/350 b/351)) p/353)))
+++-(function a/350[int] b/351
+++-  (catch (if a/350 (if b/351 (field_imm 0 b/351) (exit 12)) (exit 12))
+++-   with (12) (makeblock 0 a/350 b/351)))
++++   with (12) (let (p/348 =a (makeblock 0 a/345 b/346)) p/348)))
++++(function a/345[int] b/346
++++  (catch (if a/345 (if b/346 (field_imm 0 b/346) (exit 12)) (exit 12))
++++   with (12) (makeblock 0 a/345 b/346)))
 ++ - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 ++ |}]
 ++ 
@@ -12962,30 +11624,30 @@ index 0000000000..5a7c2e87fc
 ++ | ((_, _) as p) -> p
 ++ (* inside, tuplist *)
 ++ [%%expect{|
-++-(function a/373[int] b/374
-+++(function a/368[int] b/369
+++-(function a/354[int] b/355
++++(function a/349[int] b/350
 ++   (catch
 ++     (catch
-++-      (if a/373
-++-        (if b/374 (let (p/378 =a (field_imm 0 b/374)) (exit 13 p/378))
-+++      (if a/368
-+++        (if b/369 (let (p/373 =a (field_imm 0 b/369)) (exit 13 p/373))
+++-      (if a/354
+++-        (if b/355 (let (p/359 =a (field_imm 0 b/355)) (exit 13 p/359))
++++      (if a/349
++++        (if b/350 (let (p/354 =a (field_imm 0 b/350)) (exit 13 p/354))
 ++           (exit 14))
 ++         (exit 14))
-++-     with (14) (let (p/377 =a (makeblock 0 a/373 b/374)) (exit 13 p/377)))
-++-   with (13 p/375) p/375))
-++-(function a/373[int] b/374
-+++     with (14) (let (p/372 =a (makeblock 0 a/368 b/369)) (exit 13 p/372)))
-+++   with (13 p/370) p/370))
-+++(function a/368[int] b/369
+++-     with (14) (let (p/358 =a (makeblock 0 a/354 b/355)) (exit 13 p/358)))
+++-   with (13 p/356) p/356))
+++-(function a/354[int] b/355
++++     with (14) (let (p/353 =a (makeblock 0 a/349 b/350)) (exit 13 p/353)))
++++   with (13 p/351) p/351))
++++(function a/349[int] b/350
 ++   (catch
 ++     (catch
-++-      (if a/373 (if b/374 (exit 13 (field_imm 0 b/374)) (exit 14)) (exit 14))
-++-     with (14) (exit 13 (makeblock 0 a/373 b/374)))
-++-   with (13 p/375) p/375))
-+++      (if a/368 (if b/369 (exit 13 (field_imm 0 b/369)) (exit 14)) (exit 14))
-+++     with (14) (exit 13 (makeblock 0 a/368 b/369)))
-+++   with (13 p/370) p/370))
+++-      (if a/354 (if b/355 (exit 13 (field_imm 0 b/355)) (exit 14)) (exit 14))
+++-     with (14) (exit 13 (makeblock 0 a/354 b/355)))
+++-   with (13 p/356) p/356))
++++      (if a/349 (if b/350 (exit 13 (field_imm 0 b/350)) (exit 14)) (exit 14))
++++     with (14) (exit 13 (makeblock 0 a/349 b/350)))
++++   with (13 p/351) p/351))
 ++ - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 ++ |}]
 ++diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
@@ -13478,18 +12140,18 @@ index 0000000000..5a7c2e87fc
 ++ open Globroots
 ++ 
 ++diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
-++index 8afb2d9bde..470a3aa829 100644
+++index f6919c78f4..e17b287aaf 100644
 ++--- a/testsuite/tests/generalized-open/gpr1506.ml
 +++++ b/testsuite/tests/generalized-open/gpr1506.ml
 ++@@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
 ++ Line 1, characters 15-41:
 ++ 1 | include struct open struct type t = T end let x = T end
 ++                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: The type t/357 introduced by this open appears in the signature
-+++Error: The type t/352 introduced by this open appears in the signature
+++-Error: The type t/338 introduced by this open appears in the signature
++++Error: The type t/333 introduced by this open appears in the signature
 ++        Line 1, characters 46-47:
-++-         The value x has no valid type if t/357 is hidden
-+++         The value x has no valid type if t/352 is hidden
+++-         The value x has no valid type if t/338 is hidden
++++         The value x has no valid type if t/333 is hidden
 ++ |}];;
 ++ 
 ++ module A = struct
@@ -13497,11 +12159,11 @@ index 0000000000..5a7c2e87fc
 ++ 4 |       type t = T
 ++ 5 |       let x = T
 ++ 6 |     end
-++-Error: The type t/362 introduced by this open appears in the signature
-+++Error: The type t/357 introduced by this open appears in the signature
+++-Error: The type t/343 introduced by this open appears in the signature
++++Error: The type t/338 introduced by this open appears in the signature
 ++        Line 7, characters 8-9:
-++-         The value y has no valid type if t/362 is hidden
-+++         The value y has no valid type if t/357 is hidden
+++-         The value y has no valid type if t/343 is hidden
++++         The value y has no valid type if t/338 is hidden
 ++ |}];;
 ++ 
 ++ module A = struct
@@ -13509,11 +12171,11 @@ index 0000000000..5a7c2e87fc
 ++ 3 | ....open struct
 ++ 4 |       type t = T
 ++ 5 |     end
-++-Error: The type t/367 introduced by this open appears in the signature
-+++Error: The type t/362 introduced by this open appears in the signature
+++-Error: The type t/348 introduced by this open appears in the signature
++++Error: The type t/343 introduced by this open appears in the signature
 ++        Line 6, characters 8-9:
-++-         The value y has no valid type if t/367 is hidden
-+++         The value y has no valid type if t/362 is hidden
+++-         The value y has no valid type if t/348 is hidden
++++         The value y has no valid type if t/343 is hidden
 ++ |}]
 ++ 
 ++ (* It was decided to not allow this anymore. *)
@@ -14912,28 +13574,28 @@ index 0000000000..5a7c2e87fc
 +++  exec ${program} > ${output}
 +++fi
 ++diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-++index 1289fba83c..eb198e3d31 100644
+++index 3c9d10366f..92cea33495 100644
 ++--- a/testsuite/tests/shapes/comp_units.ml
 +++++ b/testsuite/tests/shapes/comp_units.ml
 ++@@ -25,7 +25,7 @@ module Mproj = Unit
 ++ module F (X : sig type t end) = X
 ++ [%%expect{|
 ++ {
-++- "F"[module] -> Abs<.4>(X/297, X/297<.3>);
-+++ "F"[module] -> Abs<.4>(X/292, X/292<.3>);
+++- "F"[module] -> Abs<.4>(X/278, X/278<.3>);
++++ "F"[module] -> Abs<.4>(X/273, X/273<.3>);
 ++  }
 ++ module F : functor (X : sig type t end) -> sig type t = X.t end
 ++ |}]
 ++diff --git a/testsuite/tests/shapes/functors.ml b/testsuite/tests/shapes/functors.ml
-++index b6225a13d5..1ec4c07f25 100644
+++index f55021180a..b2d24fdc96 100644
 ++--- a/testsuite/tests/shapes/functors.ml
 +++++ b/testsuite/tests/shapes/functors.ml
 ++@@ -17,7 +17,7 @@ module type S = sig type t val x : t end
 ++ module Falias (X : S) = X
 ++ [%%expect{|
 ++ {
-++- "Falias"[module] -> Abs<.4>(X/299, X/299<.3>);
-+++ "Falias"[module] -> Abs<.4>(X/294, X/294<.3>);
+++- "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
++++ "Falias"[module] -> Abs<.4>(X/275, X/275<.3>);
 ++  }
 ++ module Falias : functor (X : S) -> sig type t = X.t val x : t end
 ++ |}]
@@ -14941,13 +13603,13 @@ index 0000000000..5a7c2e87fc
 ++ {
 ++  "Finclude"[module] ->
 ++      Abs<.6>
-++-        (X/303,
-+++        (X/298,
+++-        (X/284,
++++        (X/279,
 ++          {
-++-          "t"[type] -> X/303<.5> . "t"[type];
-++-          "x"[value] -> X/303<.5> . "x"[value];
-+++          "t"[type] -> X/298<.5> . "t"[type];
-+++          "x"[value] -> X/298<.5> . "x"[value];
+++-          "t"[type] -> X/284<.5> . "t"[type];
+++-          "x"[value] -> X/284<.5> . "x"[value];
++++          "t"[type] -> X/279<.5> . "t"[type];
++++          "x"[value] -> X/279<.5> . "x"[value];
 ++           });
 ++  }
 ++ module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -14955,8 +13617,8 @@ index 0000000000..5a7c2e87fc
 ++ [%%expect{|
 ++ {
 ++  "Fredef"[module] ->
-++-     Abs<.10>(X/310, {
-+++     Abs<.10>(X/305, {
+++-     Abs<.10>(X/291, {
++++     Abs<.10>(X/286, {
 ++                       "t"[type] -> <.8>;
 ++                       "x"[value] -> <.9>;
 ++                       });
@@ -14964,10 +13626,10 @@ index 0000000000..5a7c2e87fc
 ++ [%%expect{|
 ++ {
 ++  "Big_to_small1"[module] ->
-++-     Abs<.40>(X/405, {<.39>
-++-                      "t"[type] -> X/405<.39> . "t"[type];
-+++     Abs<.40>(X/400, {<.39>
-+++                      "t"[type] -> X/400<.39> . "t"[type];
+++-     Abs<.40>(X/386, {<.39>
+++-                      "t"[type] -> X/386<.39> . "t"[type];
++++     Abs<.40>(X/381, {<.39>
++++                      "t"[type] -> X/381<.39> . "t"[type];
 ++                       });
 ++  }
 ++ module Big_to_small1 : B2S
@@ -14975,38 +13637,38 @@ index 0000000000..5a7c2e87fc
 ++ [%%expect{|
 ++ {
 ++  "Big_to_small2"[module] ->
-++-     Abs<.42>(X/408, {
-++-                      "t"[type] -> X/408<.41> . "t"[type];
-+++     Abs<.42>(X/403, {
-+++                      "t"[type] -> X/403<.41> . "t"[type];
+++-     Abs<.42>(X/389, {
+++-                      "t"[type] -> X/389<.41> . "t"[type];
++++     Abs<.42>(X/384, {
++++                      "t"[type] -> X/384<.41> . "t"[type];
 ++                       });
 ++  }
 ++ module Big_to_small2 : B2S
 ++diff --git a/testsuite/tests/shapes/open_arg.ml b/testsuite/tests/shapes/open_arg.ml
-++index c7f9a67712..b0bea13f61 100644
+++index 81b19af3f7..d86820c0f5 100644
 ++--- a/testsuite/tests/shapes/open_arg.ml
 +++++ b/testsuite/tests/shapes/open_arg.ml
 ++@@ -22,7 +22,7 @@ end = struct end
 ++ 
 ++ [%%expect{|
 ++ {
-++- "Make"[module] -> Abs<.3>(I/299, {
-+++ "Make"[module] -> Abs<.3>(I/294, {
+++- "Make"[module] -> Abs<.3>(I/280, {
++++ "Make"[module] -> Abs<.3>(I/275, {
 ++                                    });
 ++  }
 ++ module Make : functor (I : sig end) -> sig end
 ++diff --git a/testsuite/tests/shapes/recmodules.ml b/testsuite/tests/shapes/recmodules.ml
-++index d895182cf9..0fb00d1132 100644
+++index 93fef6012c..126c792ea2 100644
 ++--- a/testsuite/tests/shapes/recmodules.ml
 +++++ b/testsuite/tests/shapes/recmodules.ml
 ++@@ -43,8 +43,8 @@ and B : sig
 ++ end = B
 ++ [%%expect{|
 ++ {
-++- "A"[module] -> A/322<.11>;
-++- "B"[module] -> B/323<.12>;
-+++ "A"[module] -> A/317<.11>;
-+++ "B"[module] -> B/318<.12>;
+++- "A"[module] -> A/303<.11>;
+++- "B"[module] -> B/304<.12>;
++++ "A"[module] -> A/298<.11>;
++++ "B"[module] -> B/299<.12>;
 ++  }
 ++ module rec A : sig type t = Leaf of B.t end
 ++ and B : sig type t = int end
@@ -15014,29 +13676,29 @@ index 0000000000..5a7c2e87fc
 ++  "ASet"[module] ->
 ++      {
 ++       "compare"[value] ->
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
+++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
++++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
 ++           "compare"[value];
 ++       "elt"[type] ->
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
+++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
++++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
 ++           "elt"[type];
 ++       "t"[type] ->
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) . "t"[type];
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) . "t"[type];
+++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
++++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
 ++       };
 ++  }
 ++ module rec A :
 ++diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
-++index ba74bc3e28..122401918e 100644
+++index 521d86d019..e5dc4732b5 100644
 ++--- a/testsuite/tests/shapes/rotor_example.ml
 +++++ b/testsuite/tests/shapes/rotor_example.ml
 ++@@ -26,7 +26,7 @@ end
 ++ {
 ++  "Pair"[module] ->
 ++      Abs<.9>
-++-        (X/299, Abs(Y/300, {
-+++        (X/294, Abs(Y/295, {
+++-        (X/280, Abs(Y/281, {
++++        (X/275, Abs(Y/276, {
 ++                             "t"[type] -> <.5>;
 ++                             "to_string"[value] -> <.6>;
 ++                             }));
@@ -15528,35 +14190,9 @@ index 0000000000..5a7c2e87fc
 ++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 ++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
 ++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 1e35152097..d0cc6c5a5a 100644
+++index 4948e3e7e8..6a922581a0 100644
 ++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/304 by t/309
-+++Error: Illegal shadowing of included type t/299 by t/304
-++        Line 2, characters 2-19:
-++-         Type t/304 came from this include
-+++         Type t/299 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/304 is shadowed
-+++         The value print has no valid type if t/299 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff -
++++++ b/testsuite/tests/typi
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
