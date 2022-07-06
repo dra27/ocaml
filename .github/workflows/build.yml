@@ -8,6 +8,9 @@ on:
       - 'trunk'
   pull_request:
 
+permissions:
+  contents: none
+
 jobs:
 
   build:
