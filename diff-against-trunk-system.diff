@@ -1,20 +1,35 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..665428e5fd
+index 0000000000..c291799c63
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:04.115023427 +0100
-++++ b	2023-09-28 18:45:04.119023584 +0100
-+@@ -53,7 +53,7 @@
-+  INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
-+  install::
-+  	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
-+-@@ -328,9 +328,9 @@ $(caml_tex): $(caml_tex_files)
-++@@ -335,9 +335,9 @@ $(caml_tex): $(caml_tex_files)
-+  	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+@@ -0,0 +1,26 @@
++--- a	2023-09-28 18:45:04.379033834 +0100
+++++ b	2023-09-28 18:45:04.403034780 +0100
++@@ -1,10 +1,13 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -25,6 +25,13 @@ OCaml 4.14 maintenance branch
+++@@ -455,6 +455,16 @@ OCaml 5.0
++  - #11392, #11392: assertion failure with -rectypes and external definitions
++    (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
 +  
-+  # we need str and unix which depend on the bytecode version of other tools
++++OCaml 4.14 maintenance branch
++++-----------------------------
++++
++ +### Manual and documentation:
++ +
++ +- #11045, #11409: document that the array argument to `caml_callbackN`
++@@ -18,7 +21,7 @@
++ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
++ --- a/manual/src/cmds/intf-c.etex
++ +++ b/manual/src/cmds/intf-c.etex
++-@@ -1449,6 +1449,10 @@ the value \var{a} and returns the value returned by~\var{f}.
+++@@ -1434,6 +1434,10 @@ the value \var{a} and returns the value returned by~\var{f}.
++  (a curried OCaml function with three arguments) to \var{a}, \var{b} and \var{c}.
++  \item "caml_callbackN("\var{f, n, args}")" applies the functional value \var{f}
++  to the \var{n} arguments contained in the C array of values \var{args}.
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -28,10 +43,27 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index e82626de9d..d8639848d1 100644
+index e82626de9d..722795bffb 100644
 --- a/Changes
 +++ b/Changes
-@@ -490,13 +490,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -455,6 +455,16 @@ OCaml 5.0
+ - #11392, #11392: assertion failure with -rectypes and external definitions
+   (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
+ 
++OCaml 4.14 maintenance branch
++-----------------------------
++
++### Manual and documentation:
++
++- #11045, #11409: document that the array argument to `caml_callbackN`
++  must not have been declared by `CAMLlocalN`.
++  (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
++
++
+ OCaml 4.14.0 (28 March 2022)
+ ----------------------------
+ 
+@@ -490,13 +500,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -47,7 +79,7 @@ index e82626de9d..d8639848d1 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -600,6 +600,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -600,6 +610,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -57,7 +89,7 @@ index e82626de9d..d8639848d1 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -859,6 +862,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -859,6 +872,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -7153,27 +7185,42 @@ index 0000000000..1f67d5436c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..cdda9bf2cf
+index 0000000000..51e57dadb4
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7050 @@
+@@ -0,0 +1,7161 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..665428e5fd
++index 0000000000..c291799c63
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:04.115023427 +0100
-+++++ b	2023-09-28 18:45:04.119023584 +0100
-++@@ -53,7 +53,7 @@
-++  INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
-++  install::
-++  	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
-++-@@ -328,9 +328,9 @@ $(caml_tex): $(caml_tex_files)
-+++@@ -335,9 +335,9 @@ $(caml_tex): $(caml_tex_files)
-++  	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
++@@ -0,0 +1,26 @@
+++--- a	2023-09-28 18:45:04.379033834 +0100
++++++ b	2023-09-28 18:45:04.403034780 +0100
+++@@ -1,10 +1,13 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -25,6 +25,13 @@ OCaml 4.14 maintenance branch
++++@@ -455,6 +455,16 @@ OCaml 5.0
+++  - #11392, #11392: assertion failure with -rectypes and external definitions
+++    (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
 ++  
-++  # we need str and unix which depend on the bytecode version of other tools
+++++OCaml 4.14 maintenance branch
+++++-----------------------------
+++++
+++ +### Manual and documentation:
+++ +
+++ +- #11045, #11409: document that the array argument to `caml_callbackN`
+++@@ -18,7 +21,7 @@
+++ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
+++ --- a/manual/src/cmds/intf-c.etex
+++ +++ b/manual/src/cmds/intf-c.etex
+++-@@ -1449,6 +1449,10 @@ the value \var{a} and returns the value returned by~\var{f}.
++++@@ -1434,6 +1434,10 @@ the value \var{a} and returns the value returned by~\var{f}.
+++  (a curried OCaml function with three arguments) to \var{a}, \var{b} and \var{c}.
+++  \item "caml_callbackN("\var{f, n, args}")" applies the functional value \var{f}
+++  to the \var{n} arguments contained in the C array of values \var{args}.
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7187,10 +7234,27 @@ index 0000000000..cdda9bf2cf
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index e82626de9d..d8639848d1 100644
++index e82626de9d..722795bffb 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -490,13 +490,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -455,6 +455,16 @@ OCaml 5.0
++ - #11392, #11392: assertion failure with -rectypes and external definitions
++   (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
++ 
+++OCaml 4.14 maintenance branch
+++-----------------------------
+++
+++### Manual and documentation:
+++
+++- #11045, #11409: document that the array argument to `caml_callbackN`
+++  must not have been declared by `CAMLlocalN`.
+++  (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
+++
+++
++ OCaml 4.14.0 (28 March 2022)
++ ----------------------------
++ 
++@@ -490,13 +500,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7206,7 +7270,7 @@ index 0000000000..cdda9bf2cf
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -600,6 +600,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -600,6 +610,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7216,7 +7280,7 @@ index 0000000000..cdda9bf2cf
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -859,6 +862,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -859,6 +872,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -14206,7 +14270,86 @@ index 0000000000..cdda9bf2cf
 ++-                        Thread.exit ();
 +++                        raise Thread.Exit;
 ++                       None });
-++   let t = Thread.create (fun () -
+++   let t = Thread.create (fun () ->
+++       ignore (Sys.opaque_identity (ref 1));
+++@@ -21,6 +19,8 @@ let _ =
+++   Thread.join t;
+++   Gc.Memprof.stop ()
+++ 
++++[@@@ocaml.alert "-deprecated"]
++++
+++ let _ =
+++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
+++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 4948e3e7e8..6a922581a0 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/285 by t/290
++++Error: Illegal shadowing of included type t/280 by t/285
+++        Line 2, characters 2-19:
+++-         Type t/285 came from this include
++++         Type t/280 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/285 is shadowed
++++         The value print has no valid type if t/280 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index e3cab0e83e..26b5878c7a 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/wea
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14328,6 +14471,21 @@ index 6a44270f76..b61f3a3d76 100644
          ap_inlined = Default_inline;
          ap_specialised = Default_specialise
        }
+diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
+index 7fedd22631..50d9709364 100644
+--- a/manual/src/cmds/intf-c.etex
++++ b/manual/src/cmds/intf-c.etex
+@@ -1434,6 +1434,10 @@ the value \var{a} and returns the value returned by~\var{f}.
+ (a curried OCaml function with three arguments) to \var{a}, \var{b} and \var{c}.
+ \item "caml_callbackN("\var{f, n, args}")" applies the functional value \var{f}
+ to the \var{n} arguments contained in the C array of values \var{args}.
++The array \var{args} must \emph{not} be declared with "CAMLlocalN".
++It should be declared as "value "\var{args}"["\var{n}"];".
++Alternatively, a C99 compound literal can be used:
++"caml_callbackN("\var{f, n, }"(value[]){"\nth{arg}{1}, \ldots, \nth{arg}{n}"})".
+ \end{itemize}
+ If the function \var{f} does not return, but raises an exception that
+ escapes the scope of the application, then this exception is
 diff --git a/manual/src/library/stdlib-blurb.etex b/manual/src/library/stdlib-blurb.etex
 index 9e64269fff..db44fa9311 100644
 --- a/manual/src/library/stdlib-blurb.etex

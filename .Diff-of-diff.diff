@@ -1,11 +1,26 @@
---- a	2023-09-28 18:45:04.115023427 +0100
-+++ b	2023-09-28 18:45:04.119023584 +0100
-@@ -53,7 +53,7 @@
-  INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
-  install::
-  	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
--@@ -328,9 +328,9 @@ $(caml_tex): $(caml_tex_files)
-+@@ -335,9 +335,9 @@ $(caml_tex): $(caml_tex_files)
-  	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+--- a	2023-09-28 18:45:04.379033834 +0100
++++ b	2023-09-28 18:45:04.403034780 +0100
+@@ -1,10 +1,13 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -25,6 +25,13 @@ OCaml 4.14 maintenance branch
++@@ -455,6 +455,16 @@ OCaml 5.0
+  - #11392, #11392: assertion failure with -rectypes and external definitions
+    (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
   
-  # we need str and unix which depend on the bytecode version of other tools
+++OCaml 4.14 maintenance branch
+++-----------------------------
+++
+ +### Manual and documentation:
+ +
+ +- #11045, #11409: document that the array argument to `caml_callbackN`
+@@ -18,7 +21,7 @@
+ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
+ --- a/manual/src/cmds/intf-c.etex
+ +++ b/manual/src/cmds/intf-c.etex
+-@@ -1449,6 +1449,10 @@ the value \var{a} and returns the value returned by~\var{f}.
++@@ -1434,6 +1434,10 @@ the value \var{a} and returns the value returned by~\var{f}.
+  (a curried OCaml function with three arguments) to \var{a}, \var{b} and \var{c}.
+  \item "caml_callbackN("\var{f, n, args}")" applies the functional value \var{f}
+  to the \var{n} arguments contained in the C array of values \var{args}.
