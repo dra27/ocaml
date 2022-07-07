@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..665428e5fd
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:04.115023427 +0100
+++++ b	2023-09-28 18:45:04.119023584 +0100
++@@ -53,7 +53,7 @@
++  INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
++  install::
++  	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
++-@@ -328,9 +328,9 @@ $(caml_tex): $(caml_tex_files)
+++@@ -335,9 +335,9 @@ $(caml_tex): $(caml_tex_files)
++  	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
++  
++  # we need str and unix which depend on the bytecode version of other tools
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -54,10 +68,10 @@ index e82626de9d..d8639848d1 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 19dea3d86f..c57a7565e2 100644
+index 6daba8eafb..a5474edd7d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -579,7 +579,6 @@ partialclean::
+@@ -580,7 +580,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -65,7 +79,7 @@ index 19dea3d86f..c57a7565e2 100644
    afl \
    alloc \
    array \
-@@ -587,24 +586,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -588,24 +587,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -93,7 +107,7 @@ index 19dea3d86f..c57a7565e2 100644
    main \
    major_gc \
    md5 \
-@@ -615,17 +614,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -616,17 +615,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -111,7 +125,7 @@ index 19dea3d86f..c57a7565e2 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -635,6 +629,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -636,6 +630,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -121,7 +135,7 @@ index 19dea3d86f..c57a7565e2 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -645,7 +642,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -646,7 +643,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -130,7 +144,7 @@ index 19dea3d86f..c57a7565e2 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1045,12 +1042,14 @@ clean::
+@@ -1046,12 +1043,14 @@ clean::
  
  # Dependencies
  
@@ -147,7 +161,7 @@ index 19dea3d86f..c57a7565e2 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1101,6 +1100,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1102,6 +1101,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
@@ -7139,13 +7153,27 @@ index 0000000000..1f67d5436c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f891853267
+index 0000000000..cdda9bf2cf
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,7050 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..665428e5fd
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:04.115023427 +0100
++++++ b	2023-09-28 18:45:04.119023584 +0100
+++@@ -53,7 +53,7 @@
+++  INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
+++  install::
+++  	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
+++-@@ -328,9 +328,9 @@ $(caml_tex): $(caml_tex_files)
++++@@ -335,9 +335,9 @@ $(caml_tex): $(caml_tex_files)
+++  	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+++  
+++  # we need str and unix which depend on the bytecode version of other tools
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7199,10 +7227,10 @@ index 0000000000..f891853267
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 19dea3d86f..c57a7565e2 100644
++index 6daba8eafb..a5474edd7d 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -579,7 +579,6 @@ partialclean::
++@@ -580,7 +580,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -7210,7 +7238,7 @@ index 0000000000..f891853267
 +   afl \
 +   alloc \
 +   array \
-+@@ -587,24 +586,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -588,24 +587,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -7238,7 +7266,7 @@ index 0000000000..f891853267
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -615,17 +614,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -616,17 +615,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -7256,7 +7284,7 @@ index 0000000000..f891853267
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -635,6 +629,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -636,6 +630,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -7266,7 +7294,7 @@ index 0000000000..f891853267
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -645,7 +642,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -646,7 +643,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -7275,7 +7303,7 @@ index 0000000000..f891853267
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1045,12 +1042,14 @@ clean::
++@@ -1046,12 +1043,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -7292,7 +7320,7 @@ index 0000000000..f891853267
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1101,6 +1100,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1102,6 +1101,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -14178,21 +14206,7 @@ index 0000000000..f891853267
 ++-                        Thread.exit ();
 +++                        raise Thread.Exit;
 ++                       None });
-++   let t = Thread.create (fun () ->
-++       ignore (Sys.opaque_identity (ref 1));
-++@@ -21,6 +19,8 @@ let _ =
-++   Thread.join t;
-++   Gc.Memprof.stop ()
-++ 
-+++[@@@ocaml.alert "-deprecated"]
-+++
-++ let _ =
-++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
-++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 4948e3e7e8..6a922581a0 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typi
+++   let t = Thread.create (fun () -
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -16339,7 +16353,7 @@ index 0a4b87634b..f71de8360b 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/Makefile b/tools/Makefile
-index 73ed62a62b..83e4826643 100644
+index 8325e26dc2..b03bd3b0af 100644
 --- a/tools/Makefile
 +++ b/tools/Makefile
 @@ -283,6 +283,13 @@ clean::

@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:45:04.115023427 +0100
++++ b	2023-09-28 18:45:04.119023584 +0100
+@@ -53,7 +53,7 @@
+  INSTALL_LIBDIR_OCAMLMKTOP = $(INSTALL_LIBDIR)/ocamlmktop
+  install::
+  	$(MKDIR) "$(INSTALL_LIBDIR_OCAMLMKTOP)"
+-@@ -328,9 +328,9 @@ $(caml_tex): $(caml_tex_files)
++@@ -335,9 +335,9 @@ $(caml_tex): $(caml_tex_files)
+  	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+  
+  # we need str and unix which depend on the bytecode version of other tools
