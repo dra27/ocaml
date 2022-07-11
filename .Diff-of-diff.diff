@@ -1,39 +1,11 @@
---- a	2023-09-28 18:45:05.715086487 +0100
-+++ b	2023-09-28 18:45:05.723086802 +0100
-@@ -1,24 +1,26 @@
- diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
- --- a/testsuite/tests/memory-model/forbidden.ml
- +++ b/testsuite/tests/memory-model/forbidden.ml
--@@ -1,5 +1,8 @@
-- (* TEST
-+@@ -2,6 +2,9 @@
-    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
--+  * not-bsd
--+  ** bytecode
--+  ** native
-+   * skip
-+   reason = "OCaml 5 only"
-++  ** not-bsd
-++  *** bytecode
-++  *** native
-  *)
-  
-  (* Memory model test:
- diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
- --- a/testsuite/tests/memory-model/publish.ml
- +++ b/testsuite/tests/memory-model/publish.ml
--@@ -1,5 +1,8 @@
-- (* TEST
-+@@ -2,6 +2,9 @@
-    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
--+  * not-bsd
--+  ** bytecode
--+  ** native
-+   * skip
-+   reason = "OCaml 5 only"
-++  ** not-bsd
-++  *** bytecode
-++  *** native
-  *)
-  
-  (* Memory model: test the _publish idiom *)
+--- a	2023-09-28 18:45:06.043099409 +0100
++++ b	2023-09-28 18:45:06.059100039 +0100
+@@ -19,7 +19,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -870,6 +870,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
++@@ -882,6 +882,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
+  AC_CHECK_HEADER([math.h])
+  AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
+  AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])

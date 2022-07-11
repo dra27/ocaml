@@ -1,48 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..eb3e3aa854
+index 0000000000..077caad531
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,39 @@
-+--- a	2023-09-28 18:45:05.715086487 +0100
-++++ b	2023-09-28 18:45:05.723086802 +0100
-+@@ -1,24 +1,26 @@
-+ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
-+ --- a/testsuite/tests/memory-model/forbidden.ml
-+ +++ b/testsuite/tests/memory-model/forbidden.ml
-+-@@ -1,5 +1,8 @@
-+- (* TEST
-++@@ -2,6 +2,9 @@
-+    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-+-+  * not-bsd
-+-+  ** bytecode
-+-+  ** native
-++   * skip
-++   reason = "OCaml 5 only"
-+++  ** not-bsd
-+++  *** bytecode
-+++  *** native
-+  *)
-+  
-+  (* Memory model test:
-+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-+ --- a/testsuite/tests/memory-model/publish.ml
-+ +++ b/testsuite/tests/memory-model/publish.ml
-+-@@ -1,5 +1,8 @@
-+- (* TEST
-++@@ -2,6 +2,9 @@
-+    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-+-+  * not-bsd
-+-+  ** bytecode
-+-+  ** native
-++   * skip
-++   reason = "OCaml 5 only"
-+++  ** not-bsd
-+++  *** bytecode
-+++  *** native
-+  *)
-+  
-+  (* Memory model: test the _publish idiom *)
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:06.043099409 +0100
+++++ b	2023-09-28 18:45:06.059100039 +0100
++@@ -19,7 +19,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -870,6 +870,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
+++@@ -882,6 +882,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
++  AC_CHECK_HEADER([math.h])
++  AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
++  AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -56,7 +28,7 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index ee8b3b924c..9c4b59bae0 100644
+index b3e38bb86c..bccfa72ae7 100644
 --- a/Changes
 +++ b/Changes
 @@ -467,6 +467,16 @@ OCaml 5.0
@@ -759,10 +731,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 89760d617a..c49e055046 100755
+index 30f8534ae9..345de8d92d 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 12f359f381..be29e2b3b3 100644
+index f4479e99a9..e4a55176ac 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -839,7 +811,7 @@ index 12f359f381..be29e2b3b3 100644
  AS_IF([test x"$enable_unix_lib" != "xno"],
    [enable_unix_lib=yes
     otherlibraries="$otherlibraries unix"])
-@@ -949,9 +961,9 @@ AS_IF([! $arch64],
+@@ -950,9 +962,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -852,7 +824,7 @@ index 12f359f381..be29e2b3b3 100644
  
  # Support for C11 atomic types
  
-@@ -1091,67 +1103,67 @@ model=default
+@@ -1092,67 +1104,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -979,7 +951,7 @@ index 12f359f381..be29e2b3b3 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1160,8 +1172,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1161,8 +1173,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -990,7 +962,7 @@ index 12f359f381..be29e2b3b3 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1172,14 +1184,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1173,14 +1185,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -1011,7 +983,7 @@ index 12f359f381..be29e2b3b3 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1872,11 +1884,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1873,11 +1885,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -1036,7 +1008,7 @@ index 12f359f381..be29e2b3b3 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1925,6 +1949,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1926,6 +1950,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -1067,7 +1039,7 @@ index 12f359f381..be29e2b3b3 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2066,8 +2114,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2067,8 +2115,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -3607,10 +3579,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..1f67d5436c
+index 0000000000..b3cd4f7fb6
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3585 @@
+@@ -0,0 +1,3597 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7f2433adc9..68329c5bc1 100644
 +--- a/ocamltest/Makefile
@@ -5908,26 +5880,38 @@ index 0000000000..1f67d5436c
 + 
 + external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
 +diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
-+index afaa814ca5..d696a26e82 100644
++index 5504d94f04..32a8d9fa8c 100644
 +--- a/testsuite/tests/memory-model/forbidden.ml
 ++++ b/testsuite/tests/memory-model/forbidden.ml
-+@@ -1,5 +1,7 @@
++@@ -1,8 +1,10 @@
 + (* TEST
 +   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
++-  * not-bsd
++-  ** bytecode
++-  ** native
 ++  * skip
 ++  reason = "OCaml 5 only"
+++  ** not-bsd
+++  *** bytecode
+++  *** native
 + *)
 + 
 + (* Memory model test:
 +diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-+index 38fe83e57e..1c2737d8b6 100644
++index fbfaa2870b..2a72134da2 100644
 +--- a/testsuite/tests/memory-model/publish.ml
 ++++ b/testsuite/tests/memory-model/publish.ml
-+@@ -1,5 +1,7 @@
++@@ -1,8 +1,10 @@
 + (* TEST
 +   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
++-  * not-bsd
++-  ** bytecode
++-  ** native
 ++  * skip
 ++  reason = "OCaml 5 only"
+++  ** not-bsd
+++  *** bytecode
+++  *** native
 + *)
 + 
 + (* Memory model: test the _publish idiom *)
@@ -7198,55 +7182,27 @@ index 0000000000..1f67d5436c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1cbaeeb978
+index 0000000000..f477a2721c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7175 @@
+@@ -0,0 +1,7170 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..eb3e3aa854
++index 0000000000..077caad531
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,39 @@
-++--- a	2023-09-28 18:45:05.715086487 +0100
-+++++ b	2023-09-28 18:45:05.723086802 +0100
-++@@ -1,24 +1,26 @@
-++ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
-++ --- a/testsuite/tests/memory-model/forbidden.ml
-++ +++ b/testsuite/tests/memory-model/forbidden.ml
-++-@@ -1,5 +1,8 @@
-++- (* TEST
-+++@@ -2,6 +2,9 @@
-++    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-++-+  * not-bsd
-++-+  ** bytecode
-++-+  ** native
-+++   * skip
-+++   reason = "OCaml 5 only"
-++++  ** not-bsd
-++++  *** bytecode
-++++  *** native
-++  *)
-++  
-++  (* Memory model test:
-++ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-++ --- a/testsuite/tests/memory-model/publish.ml
-++ +++ b/testsuite/tests/memory-model/publish.ml
-++-@@ -1,5 +1,8 @@
-++- (* TEST
-+++@@ -2,6 +2,9 @@
-++    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-++-+  * not-bsd
-++-+  ** bytecode
-++-+  ** native
-+++   * skip
-+++   reason = "OCaml 5 only"
-++++  ** not-bsd
-++++  *** bytecode
-++++  *** native
-++  *)
-++  
-++  (* Memory model: test the _publish idiom *)
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:06.043099409 +0100
++++++ b	2023-09-28 18:45:06.059100039 +0100
+++@@ -19,7 +19,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -870,6 +870,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
++++@@ -882,6 +882,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
+++  AC_CHECK_HEADER([math.h])
+++  AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
+++  AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7260,7 +7216,7 @@ index 0000000000..1cbaeeb978
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index ee8b3b924c..9c4b59bae0 100644
++index b3e38bb86c..bccfa72ae7 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -467,6 +467,16 @@ OCaml 5.0
@@ -7963,10 +7919,10 @@ index 0000000000..1cbaeeb978
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 89760d617a..c49e055046 100755
++index 30f8534ae9..345de8d92d 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 12f359f381..be29e2b3b3 100644
++index f4479e99a9..e4a55176ac 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -8043,7 +7999,7 @@ index 0000000000..1cbaeeb978
 + AS_IF([test x"$enable_unix_lib" != "xno"],
 +   [enable_unix_lib=yes
 +    otherlibraries="$otherlibraries unix"])
-+@@ -949,9 +961,9 @@ AS_IF([! $arch64],
++@@ -950,9 +962,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -8056,7 +8012,7 @@ index 0000000000..1cbaeeb978
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1091,67 +1103,67 @@ model=default
++@@ -1092,67 +1104,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -8183,7 +8139,7 @@ index 0000000000..1cbaeeb978
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1160,8 +1172,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1161,8 +1173,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -8194,7 +8150,7 @@ index 0000000000..1cbaeeb978
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1172,14 +1184,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1173,14 +1185,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -8215,7 +8171,7 @@ index 0000000000..1cbaeeb978
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1872,11 +1884,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1873,11 +1885,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -8240,7 +8196,7 @@ index 0000000000..1cbaeeb978
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1925,6 +1949,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1926,6 +1950,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -8271,7 +8227,7 @@ index 0000000000..1cbaeeb978
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2066,8 +2114,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2067,8 +2115,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -10811,10 +10767,10 @@ index 0000000000..1cbaeeb978
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..1f67d5436c
++index 0000000000..b3cd4f7fb6
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3585 @@
++@@ -0,0 +1,3597 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7f2433adc9..68329c5bc1 100644
 ++--- a/ocamltest/Makefile
@@ -13112,26 +13068,38 @@ index 0000000000..1cbaeeb978
 ++ 
 ++ external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
 ++diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
-++index afaa814ca5..d696a26e82 100644
+++index 5504d94f04..32a8d9fa8c 100644
 ++--- a/testsuite/tests/memory-model/forbidden.ml
 +++++ b/testsuite/tests/memory-model/forbidden.ml
-++@@ -1,5 +1,7 @@
+++@@ -1,8 +1,10 @@
 ++ (* TEST
 ++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+++-  * not-bsd
+++-  ** bytecode
+++-  ** native
 +++  * skip
 +++  reason = "OCaml 5 only"
++++  ** not-bsd
++++  *** bytecode
++++  *** native
 ++ *)
 ++ 
 ++ (* Memory model test:
 ++diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-++index 38fe83e57e..1c2737d8b6 100644
+++index fbfaa2870b..2a72134da2 100644
 ++--- a/testsuite/tests/memory-model/publish.ml
 +++++ b/testsuite/tests/memory-model/publish.ml
-++@@ -1,5 +1,7 @@
+++@@ -1,8 +1,10 @@
 ++ (* TEST
 ++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+++-  * not-bsd
+++-  ** bytecode
+++-  ** native
 +++  * skip
 +++  reason = "OCaml 5 only"
++++  ** not-bsd
++++  *** bytecode
++++  *** native
 ++ *)
 ++ 
 ++ (* Memory model: test the _publish idiom *)
@@ -14376,7 +14344,18 @@ index 0000000000..1cbaeeb978
 ++ (* ocaml-multicore issues 528 and 468 *)
 ++ 
 ++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++inde
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
