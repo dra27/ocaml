@@ -1,0 +1,39 @@
+--- a	2023-09-28 18:45:05.715086487 +0100
++++ b	2023-09-28 18:45:05.723086802 +0100
+@@ -1,24 +1,26 @@
+ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
+ --- a/testsuite/tests/memory-model/forbidden.ml
+ +++ b/testsuite/tests/memory-model/forbidden.ml
+-@@ -1,5 +1,8 @@
+- (* TEST
++@@ -2,6 +2,9 @@
+    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+-+  * not-bsd
+-+  ** bytecode
+-+  ** native
++   * skip
++   reason = "OCaml 5 only"
+++  ** not-bsd
+++  *** bytecode
+++  *** native
+  *)
+  
+  (* Memory model test:
+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+ --- a/testsuite/tests/memory-model/publish.ml
+ +++ b/testsuite/tests/memory-model/publish.ml
+-@@ -1,5 +1,8 @@
+- (* TEST
++@@ -2,6 +2,9 @@
+    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+-+  * not-bsd
+-+  ** bytecode
+-+  ** native
++   * skip
++   reason = "OCaml 5 only"
+++  ** not-bsd
+++  *** bytecode
+++  *** native
+  *)
+  
+  (* Memory model: test the _publish idiom *)

@@ -2295,26 +2295,38 @@ index 01ae4df1c3..fb17641f40 100644
  
  external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
 diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
-index afaa814ca5..d696a26e82 100644
+index 5504d94f04..32a8d9fa8c 100644
 --- a/testsuite/tests/memory-model/forbidden.ml
 +++ b/testsuite/tests/memory-model/forbidden.ml
-@@ -1,5 +1,7 @@
+@@ -1,8 +1,10 @@
  (* TEST
    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+-  * not-bsd
+-  ** bytecode
+-  ** native
 +  * skip
 +  reason = "OCaml 5 only"
++  ** not-bsd
++  *** bytecode
++  *** native
  *)
  
  (* Memory model test:
 diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-index 38fe83e57e..1c2737d8b6 100644
+index fbfaa2870b..2a72134da2 100644
 --- a/testsuite/tests/memory-model/publish.ml
 +++ b/testsuite/tests/memory-model/publish.ml
-@@ -1,5 +1,7 @@
+@@ -1,8 +1,10 @@
  (* TEST
    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+-  * not-bsd
+-  ** bytecode
+-  ** native
 +  * skip
 +  reason = "OCaml 5 only"
++  ** not-bsd
++  *** bytecode
++  *** native
  *)
  
  (* Memory model: test the _publish idiom *)
