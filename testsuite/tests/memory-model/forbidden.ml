@@ -1,7 +1,14 @@
 (* TEST
   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+<<<<<<< HEAD
   * skip
   reason = "OCaml 5 only"
+||||||| parent of b3b51a7864 (tests/memory-model: disable entirely on BSD systems)
+=======
+  * not-bsd
+  ** bytecode
+  ** native
+>>>>>>> b3b51a7864 (tests/memory-model: disable entirely on BSD systems)
 *)
 
 (* Memory model test:
