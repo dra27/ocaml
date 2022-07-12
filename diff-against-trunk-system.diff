@@ -15979,7 +15979,7 @@ index ac8b7a8bee..2fd6aa2bf4 100644
  val force_gen : only_val:bool -> 'a lazy_t -> 'a
 +*)
 diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-index 6b3aeade39..b781bf7daf 100644
+index 1406d1d4bf..920a3b91b5 100644
 --- a/stdlib/filename.ml
 +++ b/stdlib/filename.ml
 @@ -326,14 +326,34 @@ let remove_extension name =
