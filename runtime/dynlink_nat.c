@@ -43,7 +43,7 @@ static value Val_handle(void* handle) {
 }
 
 static void *getsym(void *handle, const char *module, const char *name){
-  char *fullname = caml_stat_strconcat(3, "caml", module, name);
+  char *fullname = caml_stat_strconcat(4, "caml", module, ".", name);
   void *sym;
   sym = caml_dlsym (handle, fullname);
   /*  printf("%s => %lx\n", fullname, (uintnat) sym); */
@@ -105,26 +105,26 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
 
   unit = String_val(symbol);
 
-  sym = optsym("__frametable");
+  sym = optsym("frametable");
   if (NULL != sym) caml_register_frametable(sym);
 
-  sym = optsym("__gc_roots");
+  sym = optsym("gc_roots");
   if (NULL != sym) caml_register_dyn_global(sym);
 
-  sym = optsym("__data_begin");
-  sym2 = optsym("__data_end");
+  sym = optsym("data_begin");
+  sym2 = optsym("data_end");
   if (NULL != sym && NULL != sym2)
     caml_page_table_add(In_static_data, sym, sym2);
 
-  sym = optsym("__code_begin");
-  sym2 = optsym("__code_end");
+  sym = optsym("code_begin");
+  sym2 = optsym("code_end");
   if (NULL != sym && NULL != sym2)
     caml_register_code_fragment((char *) sym, (char *) sym2,
                                 DIGEST_LATER, NULL);
 
   if( caml_natdynlink_hook != NULL ) caml_natdynlink_hook(handle,unit);
 
-  entrypoint = optsym("__entry");
+  entrypoint = optsym("entry");
   if (NULL != entrypoint) result = caml_callback((value)(&entrypoint), 0);
   else result = Val_unit;
 
