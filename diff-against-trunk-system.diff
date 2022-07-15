@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..d5aca4bea0
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:08.503196226 +0100
-++++ b	2023-09-28 18:45:08.523197012 +0100
-+@@ -32,7 +32,7 @@
-+ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+ --- a/asmcomp/arm64/emit.mlp
-+ +++ b/asmcomp/arm64/emit.mlp
-+-@@ -49,7 +49,7 @@ let emit_label lbl =
-++@@ -51,7 +51,7 @@ let emit_label lbl =
-+  
-+  let emit_symbol s =
-+    if macosx then emit_string "_";
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -3886,10 +3872,37 @@ index 0000000000..68c246234e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..b3cd4f7fb6
+index 0000000000..f967bde12a
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3597 @@
+@@ -0,0 +1,3657 @@
++diff --git a/appveyor.yml b/appveyor.yml
++index 150b3e8048..6d97b5350f 100644
++--- a/appveyor.yml
+++++ b/appveyor.yml
++@@ -31,9 +31,10 @@ environment:
++     FORCE_CYGWIN_UPGRADE: 0
++     BUILD_MODE: world.opt
++   matrix:
+++    - PORT: mingw32
+++      BOOTSTRAP_FLEXDLL: true
++     - PORT: mingw64
++       BOOTSTRAP_FLEXDLL: true
++-# OCaml 5.0 does not yet support MSVC
++ #    - PORT: msvc64
++ #      BOOTSTRAP_FLEXDLL: false
++ #      BUILD_MODE: steps
++@@ -43,8 +44,8 @@ environment:
++ #      SDK: |-
++ #        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
++ 
++-matrix:
++-  fast_finish: true
+++#matrix:
+++#  fast_finish: true
++ 
++ cache:
++   - C:\cygwin64\var\cache\setup
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7f2433adc9..68329c5bc1 100644
 +--- a/ocamltest/Makefile
@@ -7487,29 +7500,48 @@ index 0000000000..b3cd4f7fb6
 + 
 + /* Some tests are designed to cause registers to spill; on
 +  * x86 we require the caml_extra_params symbol from the RTS. */
++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
++index ebee82eb6f..8936f1e9dd 100644
++--- a/tools/ci/appveyor/appveyor_build.sh
+++++ b/tools/ci/appveyor/appveyor_build.sh
++@@ -64,8 +64,8 @@ function set_configuration {
++         mingw64)
++             build='--build=i686-pc-cygwin'
++             host='--host=x86_64-w64-mingw32'
++-            dep='--disable-dependency-generation'
++-            man='--disable-stdlib-manpages'
+++            # Explicitly test dependency generation on msvc64
+++            dep='--enable-dependency-generation'
++         ;;
++         msvc32)
++             build='--build=i686-pc-cygwin'
++@@ -153,7 +153,7 @@ case "$1" in
++     #run "test $PORT" \
++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
++-    if [[ $PORT = 'msvc64' ]] ; then
+++    if [[ $PORT = 'mingw64' ]] ; then
++       run "$MAKE check_all_arches" \
++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
++       cd "$FULL_BUILD_PREFIX-$PORT"
++@@ -176,7 +176,7 @@ case "$1" in
++   *)
++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
++ 
++-    if [[ $PORT = 'msvc64' ]] ; then
+++    if [[ $PORT = 'mingw64' ]] ; then
++       # Ensure that make distclean can be run from an empty tree
++       run "$MAKE distclean" $MAKE distclean
++     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fbe063449c
+index 0000000000..a62888e086
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7427 @@
+@@ -0,0 +1,7432 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..d5aca4bea0
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:08.503196226 +0100
-+++++ b	2023-09-28 18:45:08.523197012 +0100
-++@@ -32,7 +32,7 @@
-++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-++ --- a/asmcomp/arm64/emit.mlp
-++ +++ b/asmcomp/arm64/emit.mlp
-++-@@ -49,7 +49,7 @@ let emit_label lbl =
-+++@@ -51,7 +51,7 @@ let emit_label lbl =
-++  
-++  let emit_symbol s =
-++    if macosx then emit_string "_";
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -11381,10 +11413,37 @@ index 0000000000..fbe063449c
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..b3cd4f7fb6
++index 0000000000..f967bde12a
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3597 @@
++@@ -0,0 +1,3657 @@
+++diff --git a/appveyor.yml b/appveyor.yml
+++index 150b3e8048..6d97b5350f 100644
+++--- a/appveyor.yml
++++++ b/appveyor.yml
+++@@ -31,9 +31,10 @@ environment:
+++     FORCE_CYGWIN_UPGRADE: 0
+++     BUILD_MODE: world.opt
+++   matrix:
++++    - PORT: mingw32
++++      BOOTSTRAP_FLEXDLL: true
+++     - PORT: mingw64
+++       BOOTSTRAP_FLEXDLL: true
+++-# OCaml 5.0 does not yet support MSVC
+++ #    - PORT: msvc64
+++ #      BOOTSTRAP_FLEXDLL: false
+++ #      BUILD_MODE: steps
+++@@ -43,8 +44,8 @@ environment:
+++ #      SDK: |-
+++ #        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
+++ 
+++-matrix:
+++-  fast_finish: true
++++#matrix:
++++#  fast_finish: true
+++ 
+++ cache:
+++   - C:\cygwin64\var\cache\setup
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7f2433adc9..68329c5bc1 100644
 ++--- a/ocamltest/Makefile
@@ -14911,15 +14970,7 @@ index 0000000000..fbe063449c
 ++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 ++index fbcd16e8e1..56a5f30733 100644
 ++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index e3cab0e83e..26b5878c7a 100644
++++++ b/testsuite/tests/unwind/unwi
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

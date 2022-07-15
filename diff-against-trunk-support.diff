@@ -1615,6 +1615,19 @@ index ac02717889..c882a8dac7 100644
  *)
  
  external init_skiplist : unit -> unit = "init_skiplist"
+diff --git a/testsuite/tests/lib-bigarray-2/has-gfortran.sh b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
+index 051122113a..7eef1e662e 100644
+--- a/testsuite/tests/lib-bigarray-2/has-gfortran.sh
++++ b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
+@@ -5,7 +5,7 @@ if ! which gfortran > /dev/null 2>&1; then
+ elif ! grep -q '^CC=gcc' ${ocamlsrcdir}/Makefile.config; then
+   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
+   test_result=${TEST_SKIP}
+-elif gcc --version 2>&1 | grep 'Apple clang version'; then
++elif gcc --version 2>&1 | grep -q 'Apple clang version'; then
+   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
+   test_result=${TEST_SKIP}
+ else
 diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
 index bc0b8dfe66..deaba0a3ee 100644
 --- a/testsuite/tests/lib-channels/refcounting.ml
