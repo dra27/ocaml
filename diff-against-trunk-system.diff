@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..d5aca4bea0
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:08.503196226 +0100
+++++ b	2023-09-28 18:45:08.523197012 +0100
++@@ -32,7 +32,7 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -49,7 +49,7 @@ let emit_label lbl =
+++@@ -51,7 +51,7 @@ let emit_label lbl =
++  
++  let emit_symbol s =
++    if macosx then emit_string "_";
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 05d2814f6d..9cf9b8d804 100644
+index a24efae4d9..f9dcb7f2bb 100644
 --- a/Changes
 +++ b/Changes
-@@ -477,6 +477,16 @@ OCaml 5.0
+@@ -483,6 +483,16 @@ OCaml 5.0
  - #11392, #11392: assertion failure with -rectypes and external definitions
    (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
  
@@ -34,7 +48,7 @@ index 05d2814f6d..9cf9b8d804 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -512,13 +522,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -518,13 +528,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +64,7 @@ index 05d2814f6d..9cf9b8d804 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -622,6 +632,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -628,6 +638,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +74,7 @@ index 05d2814f6d..9cf9b8d804 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -881,6 +894,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -887,6 +900,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -408,7 +422,7 @@ index 70ee85fd44..8a46f7ea27 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index ce1f456eec..b7aaad2add 100644
+index 12ad260b2e..6666e1a210 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -7238,13 +7252,27 @@ index 0000000000..b3cd4f7fb6
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..606c1b3ee6
+index 0000000000..560ac7ad62
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7188 @@
+@@ -0,0 +1,7189 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..d5aca4bea0
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:08.503196226 +0100
++++++ b	2023-09-28 18:45:08.523197012 +0100
+++@@ -32,7 +32,7 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -49,7 +49,7 @@ let emit_label lbl =
++++@@ -51,7 +51,7 @@ let emit_label lbl =
+++  
+++  let emit_symbol s =
+++    if macosx then emit_string "_";
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7258,10 +7286,10 @@ index 0000000000..606c1b3ee6
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 05d2814f6d..9cf9b8d804 100644
++index a24efae4d9..f9dcb7f2bb 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -477,6 +477,16 @@ OCaml 5.0
++@@ -483,6 +483,16 @@ OCaml 5.0
 + - #11392, #11392: assertion failure with -rectypes and external definitions
 +   (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
 + 
@@ -7278,7 +7306,7 @@ index 0000000000..606c1b3ee6
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -512,13 +522,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -518,13 +528,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7294,7 +7322,7 @@ index 0000000000..606c1b3ee6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -622,6 +632,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -628,6 +638,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7304,7 +7332,7 @@ index 0000000000..606c1b3ee6
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -881,6 +894,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -887,6 +900,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -7652,7 +7680,7 @@ index 0000000000..606c1b3ee6
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index ce1f456eec..b7aaad2add 100644
++index 12ad260b2e..6666e1a210 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -14416,20 +14444,7 @@ index 0000000000..606c1b3ee6
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index e3cab0e83e..26b5878c7a 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_pa
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
