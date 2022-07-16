@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e831a0c84a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:09.331228782 +0100
+++++ b	2023-09-28 18:45:09.351229568 +0100
++@@ -18,7 +18,7 @@
++ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
++ --- a/manual/src/cmds/intf-c.etex
++ +++ b/manual/src/cmds/intf-c.etex
++-@@ -2500,6 +2500,10 @@ CAMLprim stub_gethostbyname(value vname)
+++@@ -2504,6 +2504,10 @@ CAMLprim stub_gethostbyname(value vname)
++  }
++  \end{verbatim}
++  
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index a24efae4d9..f9dcb7f2bb 100644
+index ca69346f34..e2e0c1692b 100644
 --- a/Changes
 +++ b/Changes
-@@ -483,6 +483,16 @@ OCaml 5.0
+@@ -490,6 +490,16 @@ OCaml 5.0
  - #11392, #11392: assertion failure with -rectypes and external definitions
    (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
  
@@ -34,7 +48,7 @@ index a24efae4d9..f9dcb7f2bb 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -518,13 +528,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -525,13 +535,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +64,7 @@ index a24efae4d9..f9dcb7f2bb 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -628,6 +638,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -635,6 +645,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +74,7 @@ index a24efae4d9..f9dcb7f2bb 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -887,6 +900,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -894,6 +907,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3872,10 +3886,10 @@ index 0000000000..68c246234e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..f967bde12a
+index 0000000000..ab150e64cb
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3657 @@
+@@ -0,0 +1,3670 @@
 +diff --git a/appveyor.yml b/appveyor.yml
 +index 150b3e8048..6d97b5350f 100644
 +--- a/appveyor.yml
@@ -5493,6 +5507,19 @@ index 0000000000..f967bde12a
 + *)
 + 
 + external init_skiplist : unit -> unit = "init_skiplist"
++diff --git a/testsuite/tests/lib-bigarray-2/has-gfortran.sh b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
++index 051122113a..7eef1e662e 100644
++--- a/testsuite/tests/lib-bigarray-2/has-gfortran.sh
+++++ b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
++@@ -5,7 +5,7 @@ if ! which gfortran > /dev/null 2>&1; then
++ elif ! grep -q '^CC=gcc' ${ocamlsrcdir}/Makefile.config; then
++   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
++   test_result=${TEST_SKIP}
++-elif gcc --version 2>&1 | grep 'Apple clang version'; then
+++elif gcc --version 2>&1 | grep -q 'Apple clang version'; then
++   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
++   test_result=${TEST_SKIP}
++ else
 +diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
 +index bc0b8dfe66..deaba0a3ee 100644
 +--- a/testsuite/tests/lib-channels/refcounting.ml
@@ -7535,13 +7562,27 @@ index 0000000000..f967bde12a
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a62888e086
+index 0000000000..7ae5c6b8dd
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7432 @@
+@@ -0,0 +1,7541 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e831a0c84a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:09.331228782 +0100
++++++ b	2023-09-28 18:45:09.351229568 +0100
+++@@ -18,7 +18,7 @@
+++ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
+++ --- a/manual/src/cmds/intf-c.etex
+++ +++ b/manual/src/cmds/intf-c.etex
+++-@@ -2500,6 +2500,10 @@ CAMLprim stub_gethostbyname(value vname)
++++@@ -2504,6 +2504,10 @@ CAMLprim stub_gethostbyname(value vname)
+++  }
+++  \end{verbatim}
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7555,10 +7596,10 @@ index 0000000000..a62888e086
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index a24efae4d9..f9dcb7f2bb 100644
++index ca69346f34..e2e0c1692b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -483,6 +483,16 @@ OCaml 5.0
++@@ -490,6 +490,16 @@ OCaml 5.0
 + - #11392, #11392: assertion failure with -rectypes and external definitions
 +   (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
 + 
@@ -7575,7 +7616,7 @@ index 0000000000..a62888e086
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -518,13 +528,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -525,13 +535,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7591,7 +7632,7 @@ index 0000000000..a62888e086
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -628,6 +638,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -635,6 +645,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7601,7 +7642,7 @@ index 0000000000..a62888e086
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -887,6 +900,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -894,6 +907,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11413,10 +11454,10 @@ index 0000000000..a62888e086
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..f967bde12a
++index 0000000000..ab150e64cb
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3657 @@
++@@ -0,0 +1,3670 @@
 ++diff --git a/appveyor.yml b/appveyor.yml
 ++index 150b3e8048..6d97b5350f 100644
 ++--- a/appveyor.yml
@@ -13034,6 +13075,19 @@ index 0000000000..a62888e086
 ++ *)
 ++ 
 ++ external init_skiplist : unit -> unit = "init_skiplist"
+++diff --git a/testsuite/tests/lib-bigarray-2/has-gfortran.sh b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
+++index 051122113a..7eef1e662e 100644
+++--- a/testsuite/tests/lib-bigarray-2/has-gfortran.sh
++++++ b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
+++@@ -5,7 +5,7 @@ if ! which gfortran > /dev/null 2>&1; then
+++ elif ! grep -q '^CC=gcc' ${ocamlsrcdir}/Makefile.config; then
+++   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
+++   test_result=${TEST_SKIP}
+++-elif gcc --version 2>&1 | grep 'Apple clang version'; then
++++elif gcc --version 2>&1 | grep -q 'Apple clang version'; then
+++   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
+++   test_result=${TEST_SKIP}
+++ else
 ++diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
 ++index bc0b8dfe66..deaba0a3ee 100644
 ++--- a/testsuite/tests/lib-channels/refcounting.ml
@@ -14970,7 +15024,89 @@ index 0000000000..a62888e086
 ++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 ++index fbcd16e8e1..56a5f30733 100644
 ++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwi
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index e3cab0e83e..26b5878c7a 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index ebee82eb6f..8936f1e9dd 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generat
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -15093,7 +15229,7 @@ index 6a44270f76..b61f3a3d76 100644
          ap_specialised = Default_specialise
        }
 diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
-index 7fedd22631..50d9709364 100644
+index 52207fbf96..2baad7efaf 100644
 --- a/manual/src/cmds/intf-c.etex
 +++ b/manual/src/cmds/intf-c.etex
 @@ -1434,6 +1434,10 @@ the value \var{a} and returns the value returned by~\var{f}.
