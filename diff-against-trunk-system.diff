@@ -1,24 +1,58 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..78dfd4c8b9
+index 0000000000..637db5450f
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,13 @@
-+--- a	2023-09-28 18:45:09.947252994 +0100
-++++ b	2023-09-28 18:45:09.967253780 +0100
-+@@ -8,8 +8,8 @@
-+ +- #11417: Fix regression allowing virtual methods in non-virtual classes.
-+ +  (Leo White, review by Florian Angeletti)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
+@@ -0,0 +1,47 @@
++--- a	2023-09-28 18:45:10.287266351 +0100
+++++ b	2023-09-28 18:45:10.307267136 +0100
++@@ -126,13 +126,14 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -181,12 +181,15 @@ AC_SUBST([QS])
+++@@ -183,13 +183,16 @@ AC_SUBST([QS])
++  AC_CONFIG_FILES([Makefile.build_config])
++  AC_CONFIG_FILES([Makefile.config])
++  AC_CONFIG_FILES([stdlib/sys.ml])
++ -AC_CONFIG_FILES([otherlibs/dynlink/META])
++  AC_CONFIG_FILES([manual/src/version.tex])
++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+++ AC_CONFIG_FILES([tools/eventlog_metadata])
++  AC_CONFIG_HEADERS([runtime/caml/m.h])
++  AC_CONFIG_HEADERS([runtime/caml/s.h])
++  AC_CONFIG_HEADERS([runtime/caml/version.h])
++@@ -143,8 +144,8 @@
 +  
-+ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
-+ --- a/testsuite/tests/typing-objects/Tests.ml
++  # Definitions related to the version of OCaml
++  AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
++-@@ -547,9 +550,11 @@ AS_CASE([$host],
++- otherlibraries="dynlink runtime_events"
+++@@ -559,9 +562,11 @@ dnl otherlibraries="dynlink runtime_events"
+++ otherlibraries="dynlink"
++  AS_IF([test x"$enable_unix_lib" != "xno"],
++    [enable_unix_lib=yes
++ -   otherlibraries="$otherlibraries unix"])
++@@ -157,7 +158,7 @@
++  
++  # Checks for system services
++  
++-@@ -1900,6 +1905,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
+++@@ -1924,6 +1929,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
++      [systhread_support=false
++      AC_MSG_NOTICE([the threads library is disabled])],
++    [systhread_support=true
++@@ -165,7 +166,7 @@
++    otherlibraries="$otherlibraries systhreads"
++    AC_MSG_NOTICE([the threads library is supported])])
++  
++-@@ -1942,7 +1948,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
+++@@ -1990,7 +1996,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
++  
++  AS_IF([test x"$enable_ocamldoc" = "xno"],
++    [ocamldoc=""],
 diff --git a/.gitattributes b/.gitattributes
-index ddb7a1af55..a7365347db 100644
+index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
 +++ b/.gitattributes
 @@ -140,6 +140,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
@@ -30,7 +64,7 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 58e80fe0d4..ff2cc3ea11 100644
+index 1fa91d6422..6aec713a52 100644
 --- a/Changes
 +++ b/Changes
 @@ -493,6 +493,16 @@ OCaml 5.0
@@ -87,7 +121,7 @@ index 58e80fe0d4..ff2cc3ea11 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 6daba8eafb..a5474edd7d 100644
+index 6a2a7d98a9..332e59278b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -580,7 +580,6 @@ partialclean::
@@ -733,10 +767,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 30f8534ae9..cf8a53325f 100755
+index da032aa067..f553736d53 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index f4479e99a9..3c4d97d0e9 100644
+index e3a1f5b77a..03691bcf79 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -748,15 +782,15 @@ index f4479e99a9..3c4d97d0e9 100644
  AC_SUBST([force_instrumented_runtime])
  AC_SUBST([QS])
  
-@@ -184,6 +186,7 @@ AC_CONFIG_FILES([stdlib/sys.ml])
- AC_CONFIG_FILES([otherlibs/dynlink/META])
+@@ -183,6 +185,7 @@ AC_CONFIG_FILES([Makefile.config])
+ AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
 +AC_CONFIG_FILES([tools/eventlog_metadata])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
  AC_CONFIG_HEADERS([runtime/caml/s.h])
  AC_CONFIG_HEADERS([runtime/caml/version.h])
-@@ -212,8 +215,8 @@ AC_CANONICAL_TARGET
+@@ -215,8 +218,8 @@ AC_CANONICAL_TARGET
  AS_CASE([$host],
    [*-pc-windows],
      [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
@@ -767,7 +801,7 @@ index f4479e99a9..3c4d97d0e9 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -322,15 +325,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -325,15 +328,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -799,7 +833,7 @@ index f4479e99a9..3c4d97d0e9 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -544,7 +555,8 @@ AS_CASE([$host],
+@@ -547,7 +558,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -808,8 +842,8 @@ index f4479e99a9..3c4d97d0e9 100644
 +otherlibraries="dynlink"
  AS_IF([test x"$enable_unix_lib" != "xno"],
    [enable_unix_lib=yes
-    otherlibraries="$otherlibraries unix"])
-@@ -950,9 +962,9 @@ AS_IF([! $arch64],
+   AC_CONFIG_FILES([otherlibs/unix/META])
+@@ -955,9 +967,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -822,7 +856,7 @@ index f4479e99a9..3c4d97d0e9 100644
  
  # Support for C11 atomic types
  
-@@ -1092,67 +1104,67 @@ model=default
+@@ -1097,67 +1109,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -949,7 +983,7 @@ index f4479e99a9..3c4d97d0e9 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1161,8 +1173,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1166,8 +1178,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -960,7 +994,7 @@ index f4479e99a9..3c4d97d0e9 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1173,14 +1185,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1178,14 +1190,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -981,7 +1015,7 @@ index f4479e99a9..3c4d97d0e9 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1873,11 +1885,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1878,11 +1890,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -1006,7 +1040,7 @@ index f4479e99a9..3c4d97d0e9 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1926,6 +1950,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1932,6 +1956,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -1037,7 +1071,7 @@ index f4479e99a9..3c4d97d0e9 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2067,8 +2115,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2074,8 +2122,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -7599,31 +7633,65 @@ index 0000000000..788fc8601a
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a047752e19
+index 0000000000..47b4ba4cd1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7548 @@
+@@ -0,0 +1,7545 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..78dfd4c8b9
++index 0000000000..637db5450f
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,13 @@
-++--- a	2023-09-28 18:45:09.947252994 +0100
-+++++ b	2023-09-28 18:45:09.967253780 +0100
-++@@ -8,8 +8,8 @@
-++ +- #11417: Fix regression allowing virtual methods in non-virtual classes.
-++ +  (Leo White, review by Florian Angeletti)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
++@@ -0,0 +1,47 @@
+++--- a	2023-09-28 18:45:10.287266351 +0100
++++++ b	2023-09-28 18:45:10.307267136 +0100
+++@@ -126,13 +126,14 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -181,12 +181,15 @@ AC_SUBST([QS])
++++@@ -183,13 +183,16 @@ AC_SUBST([QS])
+++  AC_CONFIG_FILES([Makefile.build_config])
+++  AC_CONFIG_FILES([Makefile.config])
+++  AC_CONFIG_FILES([stdlib/sys.ml])
+++ -AC_CONFIG_FILES([otherlibs/dynlink/META])
+++  AC_CONFIG_FILES([manual/src/version.tex])
+++  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
++++ AC_CONFIG_FILES([tools/eventlog_metadata])
+++  AC_CONFIG_HEADERS([runtime/caml/m.h])
+++  AC_CONFIG_HEADERS([runtime/caml/s.h])
+++  AC_CONFIG_HEADERS([runtime/caml/version.h])
+++@@ -143,8 +144,8 @@
 ++  
-++ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
-++ --- a/testsuite/tests/typing-objects/Tests.ml
+++  # Definitions related to the version of OCaml
+++  AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
+++-@@ -547,9 +550,11 @@ AS_CASE([$host],
+++- otherlibraries="dynlink runtime_events"
++++@@ -559,9 +562,11 @@ dnl otherlibraries="dynlink runtime_events"
++++ otherlibraries="dynlink"
+++  AS_IF([test x"$enable_unix_lib" != "xno"],
+++    [enable_unix_lib=yes
+++ -   otherlibraries="$otherlibraries unix"])
+++@@ -157,7 +158,7 @@
+++  
+++  # Checks for system services
+++  
+++-@@ -1900,6 +1905,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
++++@@ -1924,6 +1929,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
+++      [systhread_support=false
+++      AC_MSG_NOTICE([the threads library is disabled])],
+++    [systhread_support=true
+++@@ -165,7 +166,7 @@
+++    otherlibraries="$otherlibraries systhreads"
+++    AC_MSG_NOTICE([the threads library is supported])])
+++  
+++-@@ -1942,7 +1948,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
++++@@ -1990,7 +1996,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
+++  
+++  AS_IF([test x"$enable_ocamldoc" = "xno"],
+++    [ocamldoc=""],
 +diff --git a/.gitattributes b/.gitattributes
-+index ddb7a1af55..a7365347db 100644
++index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
 ++++ b/.gitattributes
 +@@ -140,6 +140,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
@@ -7635,7 +7703,7 @@ index 0000000000..a047752e19
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 58e80fe0d4..ff2cc3ea11 100644
++index 1fa91d6422..6aec713a52 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -493,6 +493,16 @@ OCaml 5.0
@@ -7692,7 +7760,7 @@ index 0000000000..a047752e19
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 6daba8eafb..a5474edd7d 100644
++index 6a2a7d98a9..332e59278b 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -580,7 +580,6 @@ partialclean::
@@ -8338,10 +8406,10 @@ index 0000000000..a047752e19
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 30f8534ae9..cf8a53325f 100755
++index da032aa067..f553736d53 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index f4479e99a9..3c4d97d0e9 100644
++index e3a1f5b77a..03691bcf79 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -8353,15 +8421,15 @@ index 0000000000..a047752e19
 + AC_SUBST([force_instrumented_runtime])
 + AC_SUBST([QS])
 + 
-+@@ -184,6 +186,7 @@ AC_CONFIG_FILES([stdlib/sys.ml])
-+ AC_CONFIG_FILES([otherlibs/dynlink/META])
++@@ -183,6 +185,7 @@ AC_CONFIG_FILES([Makefile.config])
++ AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
 ++AC_CONFIG_FILES([tools/eventlog_metadata])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
 + AC_CONFIG_HEADERS([runtime/caml/s.h])
 + AC_CONFIG_HEADERS([runtime/caml/version.h])
-+@@ -212,8 +215,8 @@ AC_CANONICAL_TARGET
++@@ -215,8 +218,8 @@ AC_CANONICAL_TARGET
 + AS_CASE([$host],
 +   [*-pc-windows],
 +     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
@@ -8372,7 +8440,7 @@ index 0000000000..a047752e19
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -322,15 +325,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -325,15 +328,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -8404,7 +8472,7 @@ index 0000000000..a047752e19
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -544,7 +555,8 @@ AS_CASE([$host],
++@@ -547,7 +558,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -8413,8 +8481,8 @@ index 0000000000..a047752e19
 ++otherlibraries="dynlink"
 + AS_IF([test x"$enable_unix_lib" != "xno"],
 +   [enable_unix_lib=yes
-+    otherlibraries="$otherlibraries unix"])
-+@@ -950,9 +962,9 @@ AS_IF([! $arch64],
++   AC_CONFIG_FILES([otherlibs/unix/META])
++@@ -955,9 +967,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -8427,7 +8495,7 @@ index 0000000000..a047752e19
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1092,67 +1104,67 @@ model=default
++@@ -1097,67 +1109,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -8554,7 +8622,7 @@ index 0000000000..a047752e19
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1161,8 +1173,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1166,8 +1178,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -8565,7 +8633,7 @@ index 0000000000..a047752e19
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1173,14 +1185,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1178,14 +1190,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -8586,7 +8654,7 @@ index 0000000000..a047752e19
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1873,11 +1885,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1878,11 +1890,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -8611,7 +8679,7 @@ index 0000000000..a047752e19
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1926,6 +1950,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1932,6 +1956,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -8642,7 +8710,7 @@ index 0000000000..a047752e19
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2067,8 +2115,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2074,8 +2122,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -15113,44 +15181,8 @@ index 0000000000..a047752e19
 ++-(* TEST *)
 +++(* TEST
 +++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
+++
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
@@ -15646,7 +15678,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index 8f1f4f212c..2c3c398c4f 100644
+index 8e08db4745..d51b23c9b4 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
@@ -16688,7 +16720,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index ebc20a2ac4..b7947804cc 100644
+index ac469c7de8..6d39cd543a 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -267,7 +267,8 @@ GNUISH_SED = \

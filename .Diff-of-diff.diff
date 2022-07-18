@@ -1,13 +1,47 @@
---- a	2023-09-28 18:45:09.947252994 +0100
-+++ b	2023-09-28 18:45:09.967253780 +0100
-@@ -8,8 +8,8 @@
- +- #11417: Fix regression allowing virtual methods in non-virtual classes.
- +  (Leo White, review by Florian Angeletti)
- +
-- OCaml 4.14.0 (28 March 2022)
-- ----------------------------
-+ OCaml 4.14 maintenance branch
-+ -----------------------------
+--- a	2023-09-28 18:45:10.287266351 +0100
++++ b	2023-09-28 18:45:10.307267136 +0100
+@@ -126,13 +126,14 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -181,12 +181,15 @@ AC_SUBST([QS])
++@@ -183,13 +183,16 @@ AC_SUBST([QS])
+  AC_CONFIG_FILES([Makefile.build_config])
+  AC_CONFIG_FILES([Makefile.config])
+  AC_CONFIG_FILES([stdlib/sys.ml])
+ -AC_CONFIG_FILES([otherlibs/dynlink/META])
+  AC_CONFIG_FILES([manual/src/version.tex])
+  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
++ AC_CONFIG_FILES([tools/eventlog_metadata])
+  AC_CONFIG_HEADERS([runtime/caml/m.h])
+  AC_CONFIG_HEADERS([runtime/caml/s.h])
+  AC_CONFIG_HEADERS([runtime/caml/version.h])
+@@ -143,8 +144,8 @@
   
- diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
- --- a/testsuite/tests/typing-objects/Tests.ml
+  # Definitions related to the version of OCaml
+  AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
+-@@ -547,9 +550,11 @@ AS_CASE([$host],
+- otherlibraries="dynlink runtime_events"
++@@ -559,9 +562,11 @@ dnl otherlibraries="dynlink runtime_events"
++ otherlibraries="dynlink"
+  AS_IF([test x"$enable_unix_lib" != "xno"],
+    [enable_unix_lib=yes
+ -   otherlibraries="$otherlibraries unix"])
+@@ -157,7 +158,7 @@
+  
+  # Checks for system services
+  
+-@@ -1900,6 +1905,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
++@@ -1924,6 +1929,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
+      [systhread_support=false
+      AC_MSG_NOTICE([the threads library is disabled])],
+    [systhread_support=true
+@@ -165,7 +166,7 @@
+    otherlibraries="$otherlibraries systhreads"
+    AC_MSG_NOTICE([the threads library is supported])])
+  
+-@@ -1942,7 +1948,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
++@@ -1990,7 +1996,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
+  
+  AS_IF([test x"$enable_ocamldoc" = "xno"],
+    [ocamldoc=""],
