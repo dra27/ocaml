@@ -1,20 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e831a0c84a
+index 0000000000..78dfd4c8b9
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:09.331228782 +0100
-++++ b	2023-09-28 18:45:09.351229568 +0100
-+@@ -18,7 +18,7 @@
-+ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
-+ --- a/manual/src/cmds/intf-c.etex
-+ +++ b/manual/src/cmds/intf-c.etex
-+-@@ -2500,6 +2500,10 @@ CAMLprim stub_gethostbyname(value vname)
-++@@ -2504,6 +2504,10 @@ CAMLprim stub_gethostbyname(value vname)
-+  }
-+  \end{verbatim}
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:45:09.947252994 +0100
+++++ b	2023-09-28 18:45:09.967253780 +0100
++@@ -8,8 +8,8 @@
++ +- #11417: Fix regression allowing virtual methods in non-virtual classes.
++ +  (Leo White, review by Florian Angeletti)
++ +
++- OCaml 4.14.0 (28 March 2022)
++- ----------------------------
+++ OCaml 4.14 maintenance branch
+++ -----------------------------
 +  
++ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
++ --- a/testsuite/tests/typing-objects/Tests.ml
 diff --git a/.gitattributes b/.gitattributes
 index ddb7a1af55..a7365347db 100644
 --- a/.gitattributes
@@ -28,12 +30,12 @@ index ddb7a1af55..a7365347db 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index ca69346f34..e2e0c1692b 100644
+index 58e80fe0d4..ff2cc3ea11 100644
 --- a/Changes
 +++ b/Changes
-@@ -490,6 +490,16 @@ OCaml 5.0
- - #11392, #11392: assertion failure with -rectypes and external definitions
-   (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
+@@ -493,6 +493,16 @@ OCaml 5.0
+ - #11417: Fix regression allowing virtual methods in non-virtual classes.
+   (Leo White, review by Florian Angeletti)
  
 +OCaml 4.14 maintenance branch
 +-----------------------------
@@ -48,7 +50,7 @@ index ca69346f34..e2e0c1692b 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -525,13 +535,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -528,13 +538,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -64,7 +66,7 @@ index ca69346f34..e2e0c1692b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -635,6 +645,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -638,6 +648,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -74,7 +76,7 @@ index ca69346f34..e2e0c1692b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -894,6 +907,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -897,6 +910,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3886,10 +3888,10 @@ index 0000000000..68c246234e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ab150e64cb
+index 0000000000..788fc8601a
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3670 @@
+@@ -0,0 +1,3705 @@
 +diff --git a/appveyor.yml b/appveyor.yml
 +index 150b3e8048..6d97b5350f 100644
 +--- a/appveyor.yml
@@ -4882,6 +4884,41 @@ index 0000000000..ab150e64cb
 + *)
 + 
 + external test : int ref -> unit = "stub"
++diff --git a/testsuite/tests/c-api/test_c_thread_has_lock.ml b/testsuite/tests/c-api/test_c_thread_has_lock.ml
++index e826001559..f3e4a20be8 100644
++--- a/testsuite/tests/c-api/test_c_thread_has_lock.ml
+++++ b/testsuite/tests/c-api/test_c_thread_has_lock.ml
++@@ -1,7 +1,9 @@
++ (* TEST
++    modules = "test_c_thread_has_lock_cstubs.c"
++-   * bytecode
++-   * native
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** bytecode
+++   ** native
++ *)
++ 
++ external test_with_lock : unit -> bool = "with_lock"
++diff --git a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
++index 65327be652..036068739a 100644
++--- a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+++++ b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
++@@ -1,9 +1,11 @@
++ (* TEST
++    modules = "test_c_thread_has_lock_cstubs.c"
++-   * hassysthreads
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** hassysthreads
++    include systhreads
++-   ** bytecode
++-   ** native
+++   *** bytecode
+++   *** native
++ *)
++ 
++ external test_with_lock : unit -> bool = "with_lock"
 +diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
 +index 3786e455ef..77478728df 100644
 +--- a/testsuite/tests/callback/nested_fiber.ml
@@ -7562,27 +7599,29 @@ index 0000000000..ab150e64cb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7ae5c6b8dd
+index 0000000000..a047752e19
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7541 @@
+@@ -0,0 +1,7548 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e831a0c84a
++index 0000000000..78dfd4c8b9
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:09.331228782 +0100
-+++++ b	2023-09-28 18:45:09.351229568 +0100
-++@@ -18,7 +18,7 @@
-++ diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
-++ --- a/manual/src/cmds/intf-c.etex
-++ +++ b/manual/src/cmds/intf-c.etex
-++-@@ -2500,6 +2500,10 @@ CAMLprim stub_gethostbyname(value vname)
-+++@@ -2504,6 +2504,10 @@ CAMLprim stub_gethostbyname(value vname)
-++  }
-++  \end{verbatim}
++@@ -0,0 +1,13 @@
+++--- a	2023-09-28 18:45:09.947252994 +0100
++++++ b	2023-09-28 18:45:09.967253780 +0100
+++@@ -8,8 +8,8 @@
+++ +- #11417: Fix regression allowing virtual methods in non-virtual classes.
+++ +  (Leo White, review by Florian Angeletti)
+++ +
+++- OCaml 4.14.0 (28 March 2022)
+++- ----------------------------
++++ OCaml 4.14 maintenance branch
++++ -----------------------------
 ++  
+++ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
+++ --- a/testsuite/tests/typing-objects/Tests.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index ddb7a1af55..a7365347db 100644
 +--- a/.gitattributes
@@ -7596,12 +7635,12 @@ index 0000000000..7ae5c6b8dd
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index ca69346f34..e2e0c1692b 100644
++index 58e80fe0d4..ff2cc3ea11 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -490,6 +490,16 @@ OCaml 5.0
-+ - #11392, #11392: assertion failure with -rectypes and external definitions
-+   (Gabriel Scherer, review by Florian Angeletti, report by Dmitrii Kosarev)
++@@ -493,6 +493,16 @@ OCaml 5.0
++ - #11417: Fix regression allowing virtual methods in non-virtual classes.
++   (Leo White, review by Florian Angeletti)
 + 
 ++OCaml 4.14 maintenance branch
 ++-----------------------------
@@ -7616,7 +7655,7 @@ index 0000000000..7ae5c6b8dd
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -525,13 +535,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -528,13 +538,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7632,7 +7671,7 @@ index 0000000000..7ae5c6b8dd
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -635,6 +645,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -638,6 +648,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7642,7 +7681,7 @@ index 0000000000..7ae5c6b8dd
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -894,6 +907,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -897,6 +910,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11454,10 +11493,10 @@ index 0000000000..7ae5c6b8dd
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ab150e64cb
++index 0000000000..788fc8601a
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3670 @@
++@@ -0,0 +1,3705 @@
 ++diff --git a/appveyor.yml b/appveyor.yml
 ++index 150b3e8048..6d97b5350f 100644
 ++--- a/appveyor.yml
@@ -12450,6 +12489,41 @@ index 0000000000..7ae5c6b8dd
 ++ *)
 ++ 
 ++ external test : int ref -> unit = "stub"
+++diff --git a/testsuite/tests/c-api/test_c_thread_has_lock.ml b/testsuite/tests/c-api/test_c_thread_has_lock.ml
+++index e826001559..f3e4a20be8 100644
+++--- a/testsuite/tests/c-api/test_c_thread_has_lock.ml
++++++ b/testsuite/tests/c-api/test_c_thread_has_lock.ml
+++@@ -1,7 +1,9 @@
+++ (* TEST
+++    modules = "test_c_thread_has_lock_cstubs.c"
+++-   * bytecode
+++-   * native
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** bytecode
++++   ** native
+++ *)
+++ 
+++ external test_with_lock : unit -> bool = "with_lock"
+++diff --git a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+++index 65327be652..036068739a 100644
+++--- a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
++++++ b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+++@@ -1,9 +1,11 @@
+++ (* TEST
+++    modules = "test_c_thread_has_lock_cstubs.c"
+++-   * hassysthreads
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** hassysthreads
+++    include systhreads
+++-   ** bytecode
+++-   ** native
++++   *** bytecode
++++   *** native
+++ *)
+++ 
+++ external test_with_lock : unit -> bool = "with_lock"
 ++diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
 ++index 3786e455ef..77478728df 100644
 ++--- a/testsuite/tests/callback/nested_fiber.ml
@@ -15077,37 +15151,6 @@ index 0000000000..7ae5c6b8dd
 ++@@ -1,3 +1,7 @@
 +++(* TEST
 +++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index ebee82eb6f..8936f1e9dd 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generat
-\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml

@@ -1,11 +1,13 @@
---- a	2023-09-28 18:45:09.331228782 +0100
-+++ b	2023-09-28 18:45:09.351229568 +0100
-@@ -18,7 +18,7 @@
- diff --git a/manual/src/cmds/intf-c.etex b/manual/src/cmds/intf-c.etex
- --- a/manual/src/cmds/intf-c.etex
- +++ b/manual/src/cmds/intf-c.etex
--@@ -2500,6 +2500,10 @@ CAMLprim stub_gethostbyname(value vname)
-+@@ -2504,6 +2504,10 @@ CAMLprim stub_gethostbyname(value vname)
-  }
-  \end{verbatim}
+--- a	2023-09-28 18:45:09.947252994 +0100
++++ b	2023-09-28 18:45:09.967253780 +0100
+@@ -8,8 +8,8 @@
+ +- #11417: Fix regression allowing virtual methods in non-virtual classes.
+ +  (Leo White, review by Florian Angeletti)
+ +
+- OCaml 4.14.0 (28 March 2022)
+- ----------------------------
++ OCaml 4.14 maintenance branch
++ -----------------------------
   
+ diff --git a/testsuite/tests/typing-objects/Tests.ml b/testsuite/tests/typing-objects/Tests.ml
+ --- a/testsuite/tests/typing-objects/Tests.ml
