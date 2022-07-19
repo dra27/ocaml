@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:45:10.987293848 +0100
++++ b	2023-09-28 18:45:11.011294790 +0100
+@@ -91,7 +91,7 @@
+ diff --git a/lambda/matching.ml b/lambda/matching.ml
+ --- a/lambda/matching.ml
+ +++ b/lambda/matching.ml
+-@@ -3472,13 +3472,13 @@ let check_total ~scopes loc ~failer total lambda i =
++@@ -3520,13 +3520,13 @@ let check_total ~scopes loc ~failer total lambda i =
+  
+  let toplevel_handler ~scopes loc ~failer partial args cases compile_fun =
+    match partial with

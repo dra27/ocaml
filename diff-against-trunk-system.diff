@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..a9c4400815
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:10.987293848 +0100
+++++ b	2023-09-28 18:45:11.011294790 +0100
++@@ -91,7 +91,7 @@
++ diff --git a/lambda/matching.ml b/lambda/matching.ml
++ --- a/lambda/matching.ml
++ +++ b/lambda/matching.ml
++-@@ -3472,13 +3472,13 @@ let check_total ~scopes loc ~failer total lambda i =
+++@@ -3520,13 +3520,13 @@ let check_total ~scopes loc ~failer total lambda i =
++  
++  let toplevel_handler ~scopes loc ~failer partial args cases compile_fun =
++    match partial with
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index f067d30833..1a34666d77 100644
+index 4c04ffb2f1..0de9ac5d77 100644
 --- a/Changes
 +++ b/Changes
-@@ -497,6 +497,16 @@ OCaml 5.0
+@@ -504,6 +504,16 @@ OCaml 5.0
  - #11417: Fix regression allowing virtual methods in non-virtual classes.
    (Leo White, review by Florian Angeletti)
  
@@ -34,7 +48,7 @@ index f067d30833..1a34666d77 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -532,13 +542,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -539,13 +549,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +64,7 @@ index f067d30833..1a34666d77 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -642,6 +652,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -649,6 +659,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +74,7 @@ index f067d30833..1a34666d77 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -901,6 +914,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -908,6 +921,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -7583,13 +7597,27 @@ index 0000000000..788fc8601a
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..15136c5252
+index 0000000000..4c31b75695
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7550 @@
+@@ -0,0 +1,7549 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..a9c4400815
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:10.987293848 +0100
++++++ b	2023-09-28 18:45:11.011294790 +0100
+++@@ -91,7 +91,7 @@
+++ diff --git a/lambda/matching.ml b/lambda/matching.ml
+++ --- a/lambda/matching.ml
+++ +++ b/lambda/matching.ml
+++-@@ -3472,13 +3472,13 @@ let check_total ~scopes loc ~failer total lambda i =
++++@@ -3520,13 +3520,13 @@ let check_total ~scopes loc ~failer total lambda i =
+++  
+++  let toplevel_handler ~scopes loc ~failer partial args cases compile_fun =
+++    match partial with
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -7603,10 +7631,10 @@ index 0000000000..15136c5252
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index f067d30833..1a34666d77 100644
++index 4c04ffb2f1..0de9ac5d77 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -497,6 +497,16 @@ OCaml 5.0
++@@ -504,6 +504,16 @@ OCaml 5.0
 + - #11417: Fix regression allowing virtual methods in non-virtual classes.
 +   (Leo White, review by Florian Angeletti)
 + 
@@ -7623,7 +7651,7 @@ index 0000000000..15136c5252
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -532,13 +542,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -539,13 +549,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7639,7 +7667,7 @@ index 0000000000..15136c5252
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -642,6 +652,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -649,6 +659,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7649,7 +7677,7 @@ index 0000000000..15136c5252
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -901,6 +914,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -908,6 +921,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -15121,25 +15149,10 @@ index 0000000000..15136c5252
 +++   * skip
 +++   reason = "OCaml 5 only"
 +++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_para
+++ (* Th
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 6a44270f76..b61f3a3d76 100644
+index 63f45da588..b81b324926 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
