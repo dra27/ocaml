@@ -3872,10 +3872,10 @@ index 0000000000..68c246234e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..788fc8601a
+index 0000000000..79c81123af
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3705 @@
+@@ -0,0 +1,3718 @@
 +diff --git a/appveyor.yml b/appveyor.yml
 +index 150b3e8048..6d97b5350f 100644
 +--- a/appveyor.yml
@@ -5969,6 +5969,19 @@ index 0000000000..788fc8601a
 + *)
 + open Runtime_events
 + 
++diff --git a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
++index a574e7d341..4dc607eed3 100644
++--- a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+++++ b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
++@@ -1,6 +1,8 @@
++ (* TEST
++ include runtime_events
++ ocamlrunparam += ",e=4"
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ 
++ (* We set the ring buffer size smaller and witness that we do indeed
 +diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
 +index 34b034a8e8..8656ca2e59 100644
 +--- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
@@ -7583,10 +7596,10 @@ index 0000000000..788fc8601a
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..aa4d14d47f
+index 0000000000..31d21a9b33
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7550 @@
+@@ -0,0 +1,7549 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -11461,10 +11474,10 @@ index 0000000000..aa4d14d47f
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..788fc8601a
++index 0000000000..79c81123af
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3705 @@
++@@ -0,0 +1,3718 @@
 ++diff --git a/appveyor.yml b/appveyor.yml
 ++index 150b3e8048..6d97b5350f 100644
 ++--- a/appveyor.yml
@@ -13558,6 +13571,19 @@ index 0000000000..aa4d14d47f
 ++ *)
 ++ open Runtime_events
 ++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+++index a574e7d341..4dc607eed3 100644
+++--- a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
++++++ b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+++@@ -1,6 +1,8 @@
+++ (* TEST
+++ include runtime_events
+++ ocamlrunparam += ",e=4"
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ 
+++ (* We set the ring buffer size smaller and witness that we do indeed
 ++diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
 ++index 34b034a8e8..8656ca2e59 100644
 ++--- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
@@ -15122,21 +15148,7 @@ index 0000000000..aa4d14d47f
 +++   reason = "OCaml 5 only"
 +++*)
 ++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_para
+++    until 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
