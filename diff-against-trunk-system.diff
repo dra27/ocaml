@@ -1,6 +1,334 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e9b1e48fe5
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,325 @@
++--- a	2023-09-28 18:45:15.239460610 +0100
+++++ b	2023-09-28 18:45:15.259461393 +0100
++@@ -121,55 +121,300 @@
++ +      | Seq.Nil -> [x1]
++ +      | Seq.Cons (x2, seq) -> x1 :: x2 :: of_seq seq
++ +      end
+++diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+++--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+++@@ -1,9 +1,9 @@
+++ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
+++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+++@@ -14,10 +14,10 @@ Re-raised at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", lin
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
++ diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
++ --- a/testsuite/tests/backtrace/backtrace_dynlink.reference
++ +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
++-@@ -1,17 +1,17 @@
+++@@ -1,8 +1,8 @@
++  Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
++  Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
++  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
++- execution of module initializers in the shared library failed: Failure("SUCCESS")
++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++@@ -13,9 +13,9 @@ Re-raised at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", lin
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
++ diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
++ --- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
++ +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
++ @@ -6,7 +6,7 @@ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
++- Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
++- Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
+++ Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
+++ Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++  Called from Test10_main in file "test10_main.ml", line 51, characters 13-69
++ diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
++ --- a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
++ +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
++-@@ -1,9 +1,9 @@
++- Error: Failure("Plugin error")
++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++@@ -5,9 +5,9 @@ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
+++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
+++diff --git a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
+++--- a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
++++++ b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
+++@@ -1,74 +1,74 @@
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_list_literal in file "callstacks.ml", line 18, characters 30-53
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_pair in file "callstacks.ml", line 21, characters 30-76
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_record in file "callstacks.ml", line 26, characters 12-66
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_some in file "callstacks.ml", line 29, characters 30-60
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_array_literal in file "callstacks.ml", line 32, characters 30-55
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_float_array_literal in file "callstacks.ml", line 36, characters 12-62
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.do_alloc_unknown_array_literal in file "callstacks.ml", line 39, characters 22-27
+++ Called from Callstacks.alloc_unknown_array_literal in file "callstacks.ml", line 41, characters 30-65
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_small_array in file "callstacks.ml", line 44, characters 30-69
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_large_array in file "callstacks.ml", line 47, characters 30-73
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_closure.(fun) in file "callstacks.ml", line 51, characters 30-43
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.get0 in file "callstacks.ml", line 54, characters 28-33
+++ Called from Callstacks.getfloatfield in file "callstacks.ml", line 56, characters 30-47
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 61, characters 9-35
+++ Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 62, characters 12-87
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.alloc_ref in file "callstacks.ml", line 65, characters 30-59
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++ -----------
+++ Raised by primitive operation at Callstacks.prod_floats in file "callstacks.ml", line 68, characters 37-43
+++ Called from Callstacks.alloc_boxedfloat in file "callstacks.ml", line 70, characters 30-49
+++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++diff --git a/testsuite/tests/statmemprof/comballoc.byte.reference b/testsuite/tests/statmemprof/comballoc.byte.reference
+++--- a/testsuite/tests/statmemprof/comballoc.byte.reference
++++++ b/testsuite/tests/statmemprof/comballoc.byte.reference
+++@@ -1,49 +1,49 @@
+++ 2: 0.42 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 3: 0.42 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 4: 0.42 true
+++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
+++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 2: 0.01 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 3: 0.01 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 4: 0.01 true
+++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
+++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 2: 0.83 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 3: 0.83 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 4: 0.83 true
+++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
+++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ OK
+++diff --git a/testsuite/tests/statmemprof/comballoc.opt.reference b/testsuite/tests/statmemprof/comballoc.opt.reference
+++--- a/testsuite/tests/statmemprof/comballoc.opt.reference
++++++ b/testsuite/tests/statmemprof/comballoc.opt.reference
+++@@ -1,49 +1,49 @@
+++ 2: 0.42 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 3: 0.42 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 4: 0.42 true
+++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
+++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 2: 0.01 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 3: 0.01 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 4: 0.01 true
+++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
+++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 2: 0.83 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 3: 0.83 false
+++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ 4: 0.83 true
+++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
+++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
+++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
+++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++ OK
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,10 +342,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 70d11ee309..81829b6d86 100644
+index 0455416a73..13886f7704 100644
 --- a/Changes
 +++ b/Changes
-@@ -527,6 +527,16 @@ OCaml 5.0
+@@ -532,6 +532,16 @@ OCaml 5.0
  - #11417: Fix regression allowing virtual methods in non-virtual classes.
    (Leo White, review by Florian Angeletti)
  
@@ -34,7 +362,7 @@ index 70d11ee309..81829b6d86 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -562,13 +572,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -567,13 +577,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +378,7 @@ index 70d11ee309..81829b6d86 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -672,6 +682,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -677,6 +687,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +388,7 @@ index 70d11ee309..81829b6d86 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -931,6 +944,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -936,6 +949,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -7608,13 +7936,341 @@ index 0000000000..9d8f847b96
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fb8e142163
+index 0000000000..ef57a0f692
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7549 @@
+@@ -0,0 +1,7829 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e9b1e48fe5
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,325 @@
+++--- a	2023-09-28 18:45:15.239460610 +0100
++++++ b	2023-09-28 18:45:15.259461393 +0100
+++@@ -121,55 +121,300 @@
+++ +      | Seq.Nil -> [x1]
+++ +      | Seq.Cons (x2, seq) -> x1 :: x2 :: of_seq seq
+++ +      end
++++diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++++--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+++++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++++@@ -1,9 +1,9 @@
++++ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
++++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
++++@@ -14,10 +14,10 @@ Re-raised at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", lin
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
++++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
+++ diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
+++ --- a/testsuite/tests/backtrace/backtrace_dynlink.reference
+++ +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
+++-@@ -1,17 +1,17 @@
++++@@ -1,8 +1,8 @@
+++  Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+++  Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
+++  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+++- execution of module initializers in the shared library failed: Failure("SUCCESS")
+++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++@@ -13,9 +13,9 @@ Re-raised at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", lin
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
+++ diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
+++ --- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
+++ +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
+++ @@ -6,7 +6,7 @@ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+++- Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
+++- Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
+++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++++ Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
++++ Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
+++  Called from Test10_main in file "test10_main.ml", line 51, characters 13-69
+++ diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+++ --- a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+++ +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+++-@@ -1,9 +1,9 @@
+++- Error: Failure("Plugin error")
+++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++@@ -5,9 +5,9 @@ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+++  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++++ Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++++ Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
++++diff --git a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
++++--- a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
+++++++ b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
++++@@ -1,74 +1,74 @@
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_list_literal in file "callstacks.ml", line 18, characters 30-53
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_pair in file "callstacks.ml", line 21, characters 30-76
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_record in file "callstacks.ml", line 26, characters 12-66
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_some in file "callstacks.ml", line 29, characters 30-60
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_array_literal in file "callstacks.ml", line 32, characters 30-55
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_float_array_literal in file "callstacks.ml", line 36, characters 12-62
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.do_alloc_unknown_array_literal in file "callstacks.ml", line 39, characters 22-27
++++ Called from Callstacks.alloc_unknown_array_literal in file "callstacks.ml", line 41, characters 30-65
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_small_array in file "callstacks.ml", line 44, characters 30-69
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_large_array in file "callstacks.ml", line 47, characters 30-73
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_closure.(fun) in file "callstacks.ml", line 51, characters 30-43
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.get0 in file "callstacks.ml", line 54, characters 28-33
++++ Called from Callstacks.getfloatfield in file "callstacks.ml", line 56, characters 30-47
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 61, characters 9-35
++++ Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 62, characters 12-87
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.alloc_ref in file "callstacks.ml", line 65, characters 30-59
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++ -----------
++++ Raised by primitive operation at Callstacks.prod_floats in file "callstacks.ml", line 68, characters 37-43
++++ Called from Callstacks.alloc_boxedfloat in file "callstacks.ml", line 70, characters 30-49
++++ Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
++++diff --git a/testsuite/tests/statmemprof/comballoc.byte.reference b/testsuite/tests/statmemprof/comballoc.byte.reference
++++--- a/testsuite/tests/statmemprof/comballoc.byte.reference
+++++++ b/testsuite/tests/statmemprof/comballoc.byte.reference
++++@@ -1,49 +1,49 @@
++++ 2: 0.42 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 3: 0.42 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 4: 0.42 true
++++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
++++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 2: 0.01 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 3: 0.01 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 4: 0.01 true
++++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
++++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 2: 0.83 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 3: 0.83 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 4: 0.83 true
++++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
++++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ OK
++++diff --git a/testsuite/tests/statmemprof/comballoc.opt.reference b/testsuite/tests/statmemprof/comballoc.opt.reference
++++--- a/testsuite/tests/statmemprof/comballoc.opt.reference
+++++++ b/testsuite/tests/statmemprof/comballoc.opt.reference
++++@@ -1,49 +1,49 @@
++++ 2: 0.42 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 3: 0.42 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 4: 0.42 true
++++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
++++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 2: 0.01 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 3: 0.01 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 4: 0.01 true
++++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
++++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 2: 0.83 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 3: 0.83 false
++++ Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
++++-Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ 4: 0.83 true
++++ Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
++++ Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++++ Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++ -Called from Stdlib__List.iter in file "list.ml", line 122, characters 12-15
+++ +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++++ Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
++++ OK
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -7628,10 +8284,10 @@ index 0000000000..fb8e142163
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 70d11ee309..81829b6d86 100644
++index 0455416a73..13886f7704 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -527,6 +527,16 @@ OCaml 5.0
++@@ -532,6 +532,16 @@ OCaml 5.0
 + - #11417: Fix regression allowing virtual methods in non-virtual classes.
 +   (Leo White, review by Florian Angeletti)
 + 
@@ -7648,7 +8304,7 @@ index 0000000000..fb8e142163
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -562,13 +572,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -567,13 +577,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7664,7 +8320,7 @@ index 0000000000..fb8e142163
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -672,6 +682,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -677,6 +687,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7674,7 +8330,7 @@ index 0000000000..fb8e142163
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -931,6 +944,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -936,6 +949,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -15112,55 +15768,7 @@ index 0000000000..fb8e142163
 +++         The value print has no valid type if t/280 is shadowed
 ++ |}]
 ++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index e3cab0e83e..26b5878c7a 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
