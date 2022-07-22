@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..a4d5234c5a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:45:16.063492880 +0100
+++++ b	2023-09-28 18:45:16.079493506 +0100
++@@ -14,7 +14,7 @@
++ diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
++ --- a/stdlib/hashtbl.ml
++ +++ b/stdlib/hashtbl.ml
++-@@ -421,7 +421,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
+++@@ -429,7 +429,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
++                    if H.equal key k3 then Some d3 else find_rec_opt key next3
++  
++      let find_all h key =
++@@ -23,7 +23,7 @@
++        | Empty ->
++            []
++        | Cons{key=k; data=d; next} ->
++-@@ -571,7 +571,7 @@ let find_opt h key =
+++@@ -579,7 +579,7 @@ let find_opt h key =
++                if compare key k3 = 0 then Some d3 else find_rec_opt key next3
++  
++  let find_all h key =
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,10 +37,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index d38b605f02..2ed5e67e7a 100644
+index b775dbbbb1..1ca3876384 100644
 --- a/Changes
 +++ b/Changes
-@@ -532,6 +532,16 @@ OCaml 5.0
+@@ -535,6 +535,16 @@ OCaml 5.0
  - #11417: Fix regression allowing virtual methods in non-virtual classes.
    (Leo White, review by Florian Angeletti)
  
@@ -34,7 +57,7 @@ index d38b605f02..2ed5e67e7a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -567,13 +577,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -570,13 +580,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +73,7 @@ index d38b605f02..2ed5e67e7a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -677,6 +687,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -680,6 +690,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +83,7 @@ index d38b605f02..2ed5e67e7a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -936,6 +949,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -939,6 +952,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -7613,13 +7636,36 @@ index 0000000000..82add79818
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d57f9b59f4
+index 0000000000..4bf43ec714
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7543 @@
+@@ -0,0 +1,7540 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..a4d5234c5a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:45:16.063492880 +0100
++++++ b	2023-09-28 18:45:16.079493506 +0100
+++@@ -14,7 +14,7 @@
+++ diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
+++ --- a/stdlib/hashtbl.ml
+++ +++ b/stdlib/hashtbl.ml
+++-@@ -421,7 +421,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
++++@@ -429,7 +429,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
+++                    if H.equal key k3 then Some d3 else find_rec_opt key next3
+++  
+++      let find_all h key =
+++@@ -23,7 +23,7 @@
+++        | Empty ->
+++            []
+++        | Cons{key=k; data=d; next} ->
+++-@@ -571,7 +571,7 @@ let find_opt h key =
++++@@ -579,7 +579,7 @@ let find_opt h key =
+++                if compare key k3 = 0 then Some d3 else find_rec_opt key next3
+++  
+++  let find_all h key =
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -7633,10 +7679,10 @@ index 0000000000..d57f9b59f4
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index d38b605f02..2ed5e67e7a 100644
++index b775dbbbb1..1ca3876384 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -532,6 +532,16 @@ OCaml 5.0
++@@ -535,6 +535,16 @@ OCaml 5.0
 + - #11417: Fix regression allowing virtual methods in non-virtual classes.
 +   (Leo White, review by Florian Angeletti)
 + 
@@ -7653,7 +7699,7 @@ index 0000000000..d57f9b59f4
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -567,13 +577,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -570,13 +580,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7669,7 +7715,7 @@ index 0000000000..d57f9b59f4
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -677,6 +687,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -680,6 +690,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7679,7 +7725,7 @@ index 0000000000..d57f9b59f4
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -936,6 +949,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -939,6 +952,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -15133,33 +15179,7 @@ index 0000000000..d57f9b59f4
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index e3cab0e83e..26b5878c7a 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
@@ -17046,7 +17066,7 @@ index 832cfedb4d..84611ad812 100644
  open Printf
  
 diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
-index d1f4ca0bce..67bb7b7389 100644
+index ae2cc25b9f..3170801580 100644
 --- a/stdlib/hashtbl.ml
 +++ b/stdlib/hashtbl.ml
 @@ -57,7 +57,11 @@ let randomized = Atomic.make randomized_default
