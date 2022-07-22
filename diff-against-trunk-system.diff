@@ -1,45 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..13bbd1d34a
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,36 @@
-+--- a	2023-09-28 18:45:16.335503526 +0100
-++++ b	2023-09-28 18:45:16.343503839 +0100
-+@@ -267,33 +267,6 @@
-+  
-+  .PHONY: distclean
-+  distclean: clean
-+-diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+---- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+-+++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+-@@ -1,19 +1,19 @@
-+- Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
-+- Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-+- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
-+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
-+- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+- Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
-+- execution of module initializers in the shared library failed: Failure("SUCCESS")
-+- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-+- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
-+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-+- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
-+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
-+- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
-+- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+ diff --git a/testsuite/tests/misc/pr7168.ml b/testsuite/tests/misc/pr7168.ml
-+ --- a/testsuite/tests/misc/pr7168.ml
-+ +++ b/testsuite/tests/misc/pr7168.ml
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -53,10 +14,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index b775dbbbb1..1ca3876384 100644
+index 75e1b8d8a2..b17a900bf1 100644
 --- a/Changes
 +++ b/Changes
-@@ -535,6 +535,16 @@ OCaml 5.0
+@@ -539,6 +539,16 @@ OCaml 5.0
  - #11417: Fix regression allowing virtual methods in non-virtual classes.
    (Leo White, review by Florian Angeletti)
  
@@ -73,7 +34,7 @@ index b775dbbbb1..1ca3876384 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -570,13 +580,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -574,13 +584,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -89,7 +50,7 @@ index b775dbbbb1..1ca3876384 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -680,6 +690,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -684,6 +694,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -99,7 +60,7 @@ index b775dbbbb1..1ca3876384 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -939,6 +952,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -943,6 +956,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3911,10 +3872,10 @@ index 0000000000..68c246234e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..82add79818
+index 0000000000..2de217ced9
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3735 @@
+@@ -0,0 +1,3730 @@
 +diff --git a/appveyor.yml b/appveyor.yml
 +index 150b3e8048..6d97b5350f 100644
 +--- a/appveyor.yml
@@ -4439,21 +4400,18 @@ index 0000000000..82add79818
 + 
 + (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 +diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+index 4fb34a7071..5df45f8e80 100644
++index bd96e81b23..5df45f8e80 100644
 +--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
 ++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-+@@ -1,20 +1,24 @@
-+ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
++@@ -2,19 +2,23 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
 + Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 + Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 +-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 +-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 +-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 ++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
 + Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
@@ -4465,16 +4423,14 @@ index 0000000000..82add79818
 ++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 ++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 + Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 + Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 +-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 +-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 +-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 +-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 ++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 ++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
@@ -7652,52 +7608,13 @@ index 0000000000..82add79818
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2a54f88bab
+index 0000000000..750f594380
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7609 @@
+@@ -0,0 +1,7549 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..13bbd1d34a
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,36 @@
-++--- a	2023-09-28 18:45:16.335503526 +0100
-+++++ b	2023-09-28 18:45:16.343503839 +0100
-++@@ -267,33 +267,6 @@
-++  
-++  .PHONY: distclean
-++  distclean: clean
-++-diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++---- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++-+++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++-@@ -1,19 +1,19 @@
-++- Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
-++- Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-++--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-++-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-++- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
-++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-++--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-++-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
-++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-++- Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
-++- execution of module initializers in the shared library failed: Failure("SUCCESS")
-++- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-++- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
-++--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-++-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-++- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
-++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-++--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-++-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
-++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
-++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
-++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-++ diff --git a/testsuite/tests/misc/pr7168.ml b/testsuite/tests/misc/pr7168.ml
-++ --- a/testsuite/tests/misc/pr7168.ml
-++ +++ b/testsuite/tests/misc/pr7168.ml
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -7711,10 +7628,10 @@ index 0000000000..2a54f88bab
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index b775dbbbb1..1ca3876384 100644
++index 75e1b8d8a2..b17a900bf1 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -535,6 +535,16 @@ OCaml 5.0
++@@ -539,6 +539,16 @@ OCaml 5.0
 + - #11417: Fix regression allowing virtual methods in non-virtual classes.
 +   (Leo White, review by Florian Angeletti)
 + 
@@ -7731,7 +7648,7 @@ index 0000000000..2a54f88bab
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -570,13 +580,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -574,13 +584,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7747,7 +7664,7 @@ index 0000000000..2a54f88bab
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -680,6 +690,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -684,6 +694,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7757,7 +7674,7 @@ index 0000000000..2a54f88bab
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -939,6 +952,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -943,6 +956,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11569,10 +11486,10 @@ index 0000000000..2a54f88bab
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..82add79818
++index 0000000000..2de217ced9
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3735 @@
++@@ -0,0 +1,3730 @@
 ++diff --git a/appveyor.yml b/appveyor.yml
 ++index 150b3e8048..6d97b5350f 100644
 ++--- a/appveyor.yml
@@ -12097,21 +12014,18 @@ index 0000000000..2a54f88bab
 ++ 
 ++ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 ++diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++index 4fb34a7071..5df45f8e80 100644
+++index bd96e81b23..5df45f8e80 100644
 ++--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
 +++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-++@@ -1,20 +1,24 @@
-++ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+++@@ -2,19 +2,23 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
 ++ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 ++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 ++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 ++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 ++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 +++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
 ++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
@@ -12123,16 +12037,14 @@ index 0000000000..2a54f88bab
 +++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 +++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 ++ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 ++ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 ++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-++-Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
++++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+++ Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 ++-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 ++-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 ++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-+++Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
 +++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
 +++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
@@ -15248,23 +15160,7 @@ index 0000000000..2a54f88bab
 +++   reason = "OCaml 5 only"
 +++*)
 ++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsui
+++ (* ocaml-multicore issues 528
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
@@ -17291,7 +17187,7 @@ index 02112d6bbd..c91195d2ff 100644
 +let set_state s = State.assign default s
 +(* BACKPORT END *)
 diff --git a/stdlib/stdlib.ml b/stdlib/stdlib.ml
-index f9767c95be..172fe48b72 100644
+index 00fd264de9..5086907b0f 100644
 --- a/stdlib/stdlib.ml
 +++ b/stdlib/stdlib.ml
 @@ -548,11 +548,27 @@ let ( ^^ ) (Format (fmt1, str1)) (Format (fmt2, str2)) =
@@ -17372,10 +17268,10 @@ index f9767c95be..172fe48b72 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
-index 0a4b87634b..f71de8360b 100644
+index 288bc0b8ff..7bbcf3c380 100644
 --- a/stdlib/stdlib.mli
 +++ b/stdlib/stdlib.mli
-@@ -1395,10 +1395,14 @@ module BytesLabels    = BytesLabels
+@@ -1398,10 +1398,14 @@ module BytesLabels    = BytesLabels
  module Callback       = Callback
  module Char           = Char
  module Complex        = Complex
@@ -17390,7 +17286,7 @@ index 0a4b87634b..f71de8360b 100644
  module Either         = Either
  module Ephemeron      = Ephemeron
  module Filename       = Filename
-@@ -1418,7 +1422,9 @@ module ListLabels     = ListLabels
+@@ -1421,7 +1425,9 @@ module ListLabels     = ListLabels
  module Map            = Map
  module Marshal        = Marshal
  module MoreLabels     = MoreLabels
@@ -17400,7 +17296,7 @@ index 0a4b87634b..f71de8360b 100644
  module Nativeint      = Nativeint
  module Obj            = Obj
  module Oo             = Oo
-@@ -1431,7 +1437,9 @@ module Queue          = Queue
+@@ -1434,7 +1440,9 @@ module Queue          = Queue
  module Random         = Random
  module Result         = Result
  module Scanf          = Scanf
