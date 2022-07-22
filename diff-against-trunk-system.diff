@@ -16931,7 +16931,7 @@ index 1406d1d4bf..920a3b91b5 100644
    Domain.DLS.new_key ~split_from_parent:Fun.id (fun () -> temp_dir_name)
  
 diff --git a/stdlib/format.ml b/stdlib/format.ml
-index 2e1cfb89c7..3bb1afe25b 100644
+index 79bed35407..efb21b7f12 100644
 --- a/stdlib/format.ml
 +++ b/stdlib/format.ml
 @@ -1020,6 +1020,7 @@ and err_formatter = formatter_of_out_channel Stdlib.stderr
