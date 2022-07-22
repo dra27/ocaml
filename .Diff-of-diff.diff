@@ -1,20 +1,36 @@
---- a	2023-09-28 18:45:16.063492880 +0100
-+++ b	2023-09-28 18:45:16.079493506 +0100
-@@ -14,7 +14,7 @@
- diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
- --- a/stdlib/hashtbl.ml
- +++ b/stdlib/hashtbl.ml
--@@ -421,7 +421,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-+@@ -429,7 +429,7 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-                    if H.equal key k3 then Some d3 else find_rec_opt key next3
+--- a	2023-09-28 18:45:16.335503526 +0100
++++ b	2023-09-28 18:45:16.343503839 +0100
+@@ -267,33 +267,6 @@
   
-      let find_all h key =
-@@ -23,7 +23,7 @@
-        | Empty ->
-            []
-        | Cons{key=k; data=d; next} ->
--@@ -571,7 +571,7 @@ let find_opt h key =
-+@@ -579,7 +579,7 @@ let find_opt h key =
-                if compare key k3 = 0 then Some d3 else find_rec_opt key next3
-  
-  let find_all h key =
+  .PHONY: distclean
+  distclean: clean
+-diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+---- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+-+++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+-@@ -1,19 +1,19 @@
+- Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+- Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
+- Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+- execution of module initializers in the shared library failed: Failure("SUCCESS")
+- Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
+--Called from Stdlib__List.iter in file "list.ml" (inlined), line 122, characters 12-15
+-+Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
+ diff --git a/testsuite/tests/misc/pr7168.ml b/testsuite/tests/misc/pr7168.ml
+ --- a/testsuite/tests/misc/pr7168.ml
+ +++ b/testsuite/tests/misc/pr7168.ml
