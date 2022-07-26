@@ -1,6 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..5ecdd89547
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:45:18.307580675 +0100
+++++ b	2023-09-28 18:45:18.331581613 +0100
++@@ -12,10 +12,6 @@
++  - #11364: Allow `make -C testsuite promote` to take `TEST` and `LIST` variables
++    (Antal Spector-Zabusky, review by Gabriel Scherer and David Allsopp)
++  
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/testsuite/tests/typing-misc/variance.ml b/testsuite/tests/typing-misc/variance.ml
++ --- a/testsuite/tests/typing-misc/variance.ml
++ +++ b/testsuite/tests/typing-misc/variance.ml
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,10 +30,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index c699cff845..f669e48dc1 100644
+index 5d165def98..39b71c8ed3 100644
 --- a/Changes
 +++ b/Changes
-@@ -546,6 +546,16 @@ OCaml 5.0
+@@ -550,6 +550,16 @@ OCaml 5.0
  - #11417: Fix regression allowing virtual methods in non-virtual classes.
    (Leo White, review by Florian Angeletti)
  
@@ -34,7 +50,7 @@ index c699cff845..f669e48dc1 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -581,13 +591,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -585,13 +595,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +66,7 @@ index c699cff845..f669e48dc1 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -691,6 +701,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -695,6 +705,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +76,7 @@ index c699cff845..f669e48dc1 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -950,6 +963,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -954,6 +967,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -674,10 +690,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 141fc5b08a..3923a4144a 100755
+index 612ff353fa..3923a4144a 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 682a87e119..a894307e35 100755
+index 8349975dbe..a894307e35 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 41776d2578..0a59107ea8 100644
@@ -7608,13 +7624,29 @@ index 0000000000..2de217ced9
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8f245fa971
+index 0000000000..ec3ac3e361
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7549 @@
+@@ -0,0 +1,7541 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..5ecdd89547
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,13 @@
+++--- a	2023-09-28 18:45:18.307580675 +0100
++++++ b	2023-09-28 18:45:18.331581613 +0100
+++@@ -12,10 +12,6 @@
+++  - #11364: Allow `make -C testsuite promote` to take `TEST` and `LIST` variables
+++    (Antal Spector-Zabusky, review by Gabriel Scherer and David Allsopp)
+++  
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/testsuite/tests/typing-misc/variance.ml b/testsuite/tests/typing-misc/variance.ml
+++ --- a/testsuite/tests/typing-misc/variance.ml
+++ +++ b/testsuite/tests/typing-misc/variance.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -7628,10 +7660,10 @@ index 0000000000..8f245fa971
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index c699cff845..f669e48dc1 100644
++index 5d165def98..39b71c8ed3 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -546,6 +546,16 @@ OCaml 5.0
++@@ -550,6 +550,16 @@ OCaml 5.0
 + - #11417: Fix regression allowing virtual methods in non-virtual classes.
 +   (Leo White, review by Florian Angeletti)
 + 
@@ -7648,7 +7680,7 @@ index 0000000000..8f245fa971
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -581,13 +591,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -585,13 +595,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7664,7 +7696,7 @@ index 0000000000..8f245fa971
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -691,6 +701,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -695,6 +705,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7674,7 +7706,7 @@ index 0000000000..8f245fa971
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -950,6 +963,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -954,6 +967,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -8288,10 +8320,10 @@ index 0000000000..8f245fa971
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 141fc5b08a..3923a4144a 100755
++index 612ff353fa..3923a4144a 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 682a87e119..a894307e35 100755
++index 8349975dbe..a894307e35 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 41776d2578..0a59107ea8 100644
@@ -15136,31 +15168,7 @@ index 0000000000..8f245fa971
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/wea
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
