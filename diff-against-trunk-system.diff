@@ -14,10 +14,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index d868b5800f..46ddfc3edc 100644
+index 0dcbdc686a..80690c065b 100644
 --- a/Changes
 +++ b/Changes
-@@ -555,6 +555,16 @@ OCaml 5.0
+@@ -558,6 +558,16 @@ OCaml 5.0
  - #11417: Fix regression allowing virtual methods in non-virtual classes.
    (Leo White, review by Florian Angeletti)
  
@@ -34,7 +34,7 @@ index d868b5800f..46ddfc3edc 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -590,13 +600,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -593,13 +603,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +50,7 @@ index d868b5800f..46ddfc3edc 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -700,6 +710,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -703,6 +713,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +60,7 @@ index d868b5800f..46ddfc3edc 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -959,6 +972,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -962,6 +975,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -717,10 +717,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index da032aa067..f553736d53 100755
+index a7f330f876..f553736d53 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index e3a1f5b77a..03691bcf79 100644
+index 5e576e9143..03691bcf79 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -944,14 +944,8 @@ index e3a1f5b77a..03691bcf79 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1178,14 +1190,14 @@ dnl   [arch=amd64; system=beos],
-     [arch=amd64; system=mingw64],
-   [aarch64-*-linux*],
-     [arch=arm64; system=linux],
--dnl [aarch64-*-freebsd*],
--dnl   [arch=arm64; system=freebsd],
-+  [aarch64-*-freebsd*],
-+    [arch=arm64; system=freebsd],
+@@ -1182,10 +1194,10 @@ dnl   [arch=amd64; system=beos],
+     [arch=arm64; system=freebsd],
    [aarch64-*-openbsd*],
      [arch=arm64; system=openbsd],
 -dnl [x86_64-*-cygwin*],
@@ -7608,10 +7602,10 @@ index 0000000000..2de217ced9
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9d2718dbc5
+index 0000000000..01e7cef66e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7549 @@
+@@ -0,0 +1,7547 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -7628,10 +7622,10 @@ index 0000000000..9d2718dbc5
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index d868b5800f..46ddfc3edc 100644
++index 0dcbdc686a..80690c065b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -555,6 +555,16 @@ OCaml 5.0
++@@ -558,6 +558,16 @@ OCaml 5.0
 + - #11417: Fix regression allowing virtual methods in non-virtual classes.
 +   (Leo White, review by Florian Angeletti)
 + 
@@ -7648,7 +7642,7 @@ index 0000000000..9d2718dbc5
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -590,13 +600,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -593,13 +603,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -7664,7 +7658,7 @@ index 0000000000..9d2718dbc5
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -700,6 +710,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -703,6 +713,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -7674,7 +7668,7 @@ index 0000000000..9d2718dbc5
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -959,6 +972,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -962,6 +975,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -8331,10 +8325,10 @@ index 0000000000..9d2718dbc5
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index da032aa067..f553736d53 100755
++index a7f330f876..f553736d53 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index e3a1f5b77a..03691bcf79 100644
++index 5e576e9143..03691bcf79 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -8558,14 +8552,8 @@ index 0000000000..9d2718dbc5
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1178,14 +1190,14 @@ dnl   [arch=amd64; system=beos],
-+     [arch=amd64; system=mingw64],
-+   [aarch64-*-linux*],
-+     [arch=arm64; system=linux],
-+-dnl [aarch64-*-freebsd*],
-+-dnl   [arch=arm64; system=freebsd],
-++  [aarch64-*-freebsd*],
-++    [arch=arm64; system=freebsd],
++@@ -1182,10 +1194,10 @@ dnl   [arch=amd64; system=beos],
++     [arch=arm64; system=freebsd],
 +   [aarch64-*-openbsd*],
 +     [arch=arm64; system=openbsd],
 +-dnl [x86_64-*-cygwin*],
@@ -15160,7 +15148,11 @@ index 0000000000..9d2718dbc5
 +++   reason = "OCaml 5 only"
 +++*)
 ++ 
-++ (* ocaml-multicore issues 528
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/t
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
