@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e7853ec4da
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:23.719791941 +0100
+++++ b	2023-09-28 18:45:23.723792097 +0100
++@@ -27,7 +27,7 @@
++ +         '${{ github.event.repository.full_name }}'
++        - name: Configure tree
++          run: |
++-           MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+++           MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
++ @@ -65,25 +82,10 @@ jobs:
++        - name: Install
++          run: |
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -10033,13 +10047,27 @@ index 0000000000..9d01e725b4
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..90cfb23512
+index 0000000000..27a23c4157
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10012 @@
+@@ -0,0 +1,10003 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e7853ec4da
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:23.719791941 +0100
++++++ b	2023-09-28 18:45:23.723792097 +0100
+++@@ -27,7 +27,7 @@
+++ +         '${{ github.event.repository.full_name }}'
+++        - name: Configure tree
+++          run: |
+++-           MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
++++           MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+++ @@ -65,25 +82,10 @@ jobs:
+++        - name: Install
+++          run: |
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -20025,30 +20053,7 @@ index 0000000000..90cfb23512
 ++-    ./configure $configure_flags
 ++-    ;;
 ++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index ebee82eb6f..8936f1e9dd 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:45:23.719791941 +0100
++++ b	2023-09-28 18:45:23.723792097 +0100
+@@ -27,7 +27,7 @@
+ +         '${{ github.event.repository.full_name }}'
+        - name: Configure tree
+          run: |
+-           MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
++           MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+ @@ -65,25 +82,10 @@ jobs:
+        - name: Install
+          run: |
