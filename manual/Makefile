@@ -1,5 +1,6 @@
 all: tools manual tests
 
+# Dummy change
 
 # The tools and the tests are rebuilt each time in order to avoid issues with
 # different compiler versions
