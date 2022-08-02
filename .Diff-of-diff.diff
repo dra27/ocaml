@@ -1,11 +1,21 @@
---- a	2023-09-28 18:45:23.719791941 +0100
-+++ b	2023-09-28 18:45:23.723792097 +0100
-@@ -27,7 +27,7 @@
- +         '${{ github.event.repository.full_name }}'
-        - name: Configure tree
-          run: |
--           MAKE_ARG=-j XARCH=x64 CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
-+           MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
- @@ -65,25 +82,10 @@ jobs:
-        - name: Install
-          run: |
+--- a	2023-09-28 18:45:24.083806128 +0100
++++ b	2023-09-28 18:45:24.107807063 +0100
+@@ -9,15 +9,15 @@
+ +  mingw-w64 i686 port.
+ +  (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
+ +
+- OCaml 4.14.0 (28 March 2022)
+- ----------------------------
++ OCaml 4.14 maintenance branch
++ -----------------------------
+  
+ diff --git a/configure b/configure
+ Binary files a/configure and b/configure differ
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -2117,6 +2117,7 @@ AS_CASE([$host],
++@@ -2167,6 +2167,7 @@ AS_CASE([$host],
+    [*-*-mingw32],
+      [AC_DEFINE([HAS_BROKEN_PRINTF])
+      AC_DEFINE([HAS_STRERROR])
