@@ -1,30 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c04de7e5b3
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,21 @@
-+--- a	2023-09-28 18:45:24.083806128 +0100
-++++ b	2023-09-28 18:45:24.107807063 +0100
-+@@ -9,15 +9,15 @@
-+ +  mingw-w64 i686 port.
-+ +  (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
-+  
-+ diff --git a/configure b/configure
-+ Binary files a/configure and b/configure differ
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -2117,6 +2117,7 @@ AS_CASE([$host],
-++@@ -2167,6 +2167,7 @@ AS_CASE([$host],
-+    [*-*-mingw32],
-+      [AC_DEFINE([HAS_BROKEN_PRINTF])
-+      AC_DEFINE([HAS_STRERROR])
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -38,10 +14,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 0b9bc39498..93af96eb77 100644
+index 58948e5d3d..a785c8f6c7 100644
 --- a/Changes
 +++ b/Changes
-@@ -575,6 +575,16 @@ OCaml 5.0
+@@ -578,6 +578,16 @@ OCaml 5.0
    mingw-w64 i686 port.
    (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
  
@@ -58,7 +34,7 @@ index 0b9bc39498..93af96eb77 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -610,13 +620,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -613,13 +623,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -74,7 +50,7 @@ index 0b9bc39498..93af96eb77 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -720,6 +730,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -723,6 +733,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -84,7 +60,7 @@ index 0b9bc39498..93af96eb77 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -979,6 +992,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -982,6 +995,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10057,37 +10033,13 @@ index 0000000000..1a1a1bedaf
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..73da4282f1
+index 0000000000..35cb2f8be2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10013 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c04de7e5b3
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,21 @@
-++--- a	2023-09-28 18:45:24.083806128 +0100
-+++++ b	2023-09-28 18:45:24.107807063 +0100
-++@@ -9,15 +9,15 @@
-++ +  mingw-w64 i686 port.
-++ +  (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
-++  
-++ diff --git a/configure b/configure
-++ Binary files a/configure and b/configure differ
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -2117,6 +2117,7 @@ AS_CASE([$host],
-+++@@ -2167,6 +2167,7 @@ AS_CASE([$host],
-++    [*-*-mingw32],
-++      [AC_DEFINE([HAS_BROKEN_PRINTF])
-++      AC_DEFINE([HAS_STRERROR])
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -10101,10 +10053,10 @@ index 0000000000..73da4282f1
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 0b9bc39498..93af96eb77 100644
++index 58948e5d3d..a785c8f6c7 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -575,6 +575,16 @@ OCaml 5.0
++@@ -578,6 +578,16 @@ OCaml 5.0
 +   mingw-w64 i686 port.
 +   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 + 
@@ -10121,7 +10073,7 @@ index 0000000000..73da4282f1
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -610,13 +620,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -613,13 +623,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10137,7 +10089,7 @@ index 0000000000..73da4282f1
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -720,6 +730,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -723,6 +733,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10147,7 +10099,7 @@ index 0000000000..73da4282f1
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -979,6 +992,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -982,6 +995,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20074,6 +20026,31 @@ index 0000000000..73da4282f1
 ++-    ;;
 ++-  i386)
 ++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index ebee82eb6f..8936f1e9dd 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++       
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
 --- a/lambda/matching.ml
