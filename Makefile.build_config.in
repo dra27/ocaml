@@ -38,6 +38,7 @@ BUILD_MAP_CFLAGS = $(foreach flag, $(BUILD_MAP_FLAGS), \
 
 LAUNCH_METHOD = @launch_method@
 LAUNCH_METHOD_TARGET = @launch_method_target@
+RUNTIME_SEARCH_TARGET = @runtime_search_target@
 SUFFIXING = @suffixing@
 
 # This is munged into utils/config.ml, not overridable by other parts of
@@ -63,3 +64,5 @@ ZINC_RUNTIME_ID = @zinc_runtime_id_lo@$(ZINC_RUNTIME_ID_HI)
 
 # Platform-dependent command to create symbolic links
 LN = @ln@
+
+RUNTIME_SEARCH = @runtime_search@
