@@ -45,7 +45,7 @@ COMPFLAGS=-strict-sequence -principal -absname \
           -warn-error +a \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=
-BYTELINK_FLAGS=-use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
+BYTELINK_FLAGS=-use-prims runtime/primitives
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -1421,6 +1421,7 @@ distclean: clean
 	$(MAKE) -C stdlib distclean
 	$(MAKE) -C testsuite distclean
 	$(MAKE) -C tools distclean
+	rm -f utils/config.common.ml
 	rm -f compilerlibs/META
 	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
 	      boot/ocamlruns boot/ocamlruns.exe \
