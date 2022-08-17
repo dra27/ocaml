@@ -81,3 +81,9 @@ SHEBANG_BIN_SH = @bin_sh@
 # OCaml release number, relative to 3.12 (used for RuntimeID)
 OCAML_RELEASE_NUMBER = @OCAML_RELEASE_NUMBER@
 ZINC_RUNTIME_ID = @zinc_runtime_id@
+
+# Location of sh (to use in a shebang line)
+SHEBANG_BIN_SH = @bin_sh@
+
+# Can bytecode executable headers search for the runtime
+RUNTIME_HEADER_SEARCH = @runtime_search@
