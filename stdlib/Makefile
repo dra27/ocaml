@@ -210,6 +210,9 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
 
+$(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
+	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $^
+
 $(HEADERPROGRAM)%$(O): \
   OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
 
