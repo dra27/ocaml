@@ -455,3 +455,11 @@ val debug_prefix_map_flags: unit -> string list
 val print_if :
   Format.formatter -> bool ref -> (Format.formatter -> 'a -> unit) -> 'a -> 'a
 (** [print_if ppf flag fmt x] prints [x] with [fmt] on [ppf] if [b] is true. *)
+
+module RuntimeID : sig
+  (** Manipulation of the Runtime ID values used for relocating the compiler *)
+
+  val make_zinc : static:bool -> int31:bool -> int -> is_release:bool -> string
+  (** [make_zinc static int31 release_number is_release] returns the Zinc
+      RuntimeID for the given parameters *)
+end
