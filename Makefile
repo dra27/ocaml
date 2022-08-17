@@ -83,7 +83,7 @@ OPTTOPLEVELSTART=toplevel/opttopstart.cmo
 
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-LIBFILES=stdlib.cma std_exit.cmo *.cmi
+LIBFILES=stdlib.cma std_exit.cmo *.cmi $(HEADER_NAME)
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -184,8 +184,8 @@ else
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	cd boot; rm -f $(LIBFILES) $(HEADER_NAME)
-	cd stdlib; cp $(LIBFILES) ../boot; cp bootheader ../boot/$(HEADER_NAME)
+	cd boot; rm -f $(LIBFILES)
+	cd stdlib; cp $(LIBFILES) ../boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
 
 # Recompile the core system using the bootstrap compiler
