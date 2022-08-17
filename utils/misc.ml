@@ -310,10 +310,10 @@ let create_hashtable size init =
 
 let copy_file ic oc =
   let buff = Bytes.create 0x1000 in
-  let rec copy () =
+  let rec copy copied =
     let n = input ic buff 0 0x1000 in
-    if n = 0 then () else (output oc buff 0 n; copy())
-  in copy()
+    if n = 0 then copied else (output oc buff 0 n; copy (copied + n))
+  in copy 0
 
 let copy_file_chunk ic oc len =
   let buff = Bytes.create 0x1000 in

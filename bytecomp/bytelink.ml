@@ -333,7 +333,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
          in
          try
            let inchan = open_in_bin (Load_path.find header) in
-           copy_file inchan outchan;
+           ignore (copy_file inchan outchan);
            close_in inchan
          with
          | Not_found -> raise (Error (File_not_found header))
@@ -600,7 +600,7 @@ let build_custom_runtime prim_name exec_name =
 let append_bytecode bytecode_name exec_name =
   let oc = open_out_gen [Open_wronly; Open_append; Open_binary] 0 exec_name in
   let ic = open_in_bin bytecode_name in
-  copy_file ic oc;
+  ignore (copy_file ic oc);
   close_in ic;
   close_out oc
 
