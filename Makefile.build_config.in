@@ -124,3 +124,6 @@ runtime_ASM_OBJECTS = $(addprefix runtime/,@runtime_asm_objects@)
 
 # Platform-dependent module for ocamlyacc
 ocamlyacc_WSTR_MODULE = @ocamlyacc_wstr_module@
+
+# Location of sh (to use in a shebang line)
+SHEBANG_BIN_SH = @bin_sh@
