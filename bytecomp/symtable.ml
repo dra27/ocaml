@@ -249,6 +249,7 @@ let rec transl_const = function
 let int63_mask = lnot (0x3fffffff lor (1 lsl 30))
 
 let rec const_needs_int63 = function
+  | Const_pointer i
   | Const_base(Const_int i) ->
       (i land int63_mask) <> 0
   | Const_block(_, fields) ->
