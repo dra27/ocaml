@@ -750,6 +750,8 @@ build_os
 build_vendor
 build_cpu
 build
+target_bindir_exp
+bindir_exp
 ln
 QS
 force_instrumented_runtime
@@ -801,6 +803,7 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+bin_sh
 shebangscripts
 long_shebang
 bootstrapping_flexdll
@@ -2931,7 +2934,10 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
  # TODO: rename this variable
+
+
 
 
 
@@ -2977,6 +2983,10 @@ ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_files="$ac_config_files stdlib/sys.ml"
 
+ac_config_files="$ac_config_files stdlib/camlheader.shebang"
+
+ac_config_files="$ac_config_files stdlib/target_camlheader.shebang"
+
 ac_config_files="$ac_config_files manual/src/version.tex"
 
 ac_config_files="$ac_config_files manual/src/html_processing/src/common.ml"
@@ -2994,6 +3004,9 @@ ac_config_files="$ac_config_files otherlibs/dynlink/META"
 ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
+
+
+ac_config_commands="$ac_config_commands shebang"
 
 
 # Definitions related to the version of OCaml
@@ -12751,6 +12764,7 @@ $as_echo "$ac_cv_sys_interpreter" >&6; }
 interpval=$ac_cv_sys_interpreter
 
 
+bin_sh=''
 long_shebang=false
 if test "x$interpval" = "xyes"; then :
   case $host in #(
@@ -12758,18 +12772,14 @@ if test "x$interpval" = "xyes"; then :
     shebangscripts=false ;; #(
   *) :
     shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
+      bin_sh="$(command -v sh 2>/dev/null)"
+      if test x"$bin_sh" = 'x' || test x"${bin_sh#* }" != x"$bin_sh" \
+             || test "${#bin_sha}" -gt 125; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: could not determine a shebang-compatible location of sh - #! scripts disabled" >&5
+$as_echo "$as_me: WARNING: could not determine a shebang-compatible location of sh - #! scripts disabled" >&2;}
+        shebangscripts=false
+        bin_sh=''
 fi
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
-
      ;;
 esac
 else
@@ -18271,6 +18281,19 @@ else
   stdlib_manpages=false
 fi
 
+if test x"$bindir" = 'x${exec_prefix}/bin'; then :
+  if test x"$exec_prefix" = 'xNONE'; then :
+  if test x"$prefix" = 'xNONE'; then :
+  bindir_exp="${ac_default_prefix}/bin"
+else
+  bindir_exp="${prefix}/bin"
+fi
+else
+  bindir_exp="${exec_prefix}/bin"
+fi
+fi
+target_bindir_exp="$bindir_exp"
+
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
 
@@ -19079,6 +19102,9 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 # INIT-COMMANDS
 #
 
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
+    > stdlib/target_camlheader.shebang.in
+
 
 # The HP-UX ksh and POSIX shell print the target directory to stdout
 # if CDPATH is set.
@@ -19373,6 +19399,8 @@ do
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;
+    "stdlib/camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.shebang" ;;
+    "stdlib/target_camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.shebang" ;;
     "manual/src/version.tex") CONFIG_FILES="$CONFIG_FILES manual/src/version.tex" ;;
     "manual/src/html_processing/src/common.ml") CONFIG_FILES="$CONFIG_FILES manual/src/html_processing/src/common.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
@@ -19382,6 +19410,7 @@ do
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
+    "shebang") CONFIG_COMMANDS="$CONFIG_COMMANDS shebang" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "otherlibs/unix/META") CONFIG_FILES="$CONFIG_FILES otherlibs/unix/META" ;;
     "otherlibs/str/META") CONFIG_FILES="$CONFIG_FILES otherlibs/str/META" ;;
