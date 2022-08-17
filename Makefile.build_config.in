@@ -24,10 +24,6 @@ INSTALL ?= @INSTALL@
 INSTALL_DATA ?= @INSTALL_DATA@
 INSTALL_PROG ?= @INSTALL_PROGRAM@
 
-# Location of ocamlrun on the target system (path embedded in bytecode
-# executables)
-TARGET_BINDIR = @target_bindir@
-
 # The command to generate C dependency information
 DEP_CC=@DEP_CC@ -MM
 COMPUTE_DEPS=@compute_deps@
