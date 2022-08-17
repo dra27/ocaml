@@ -26,10 +26,11 @@ OCaml 4.13 maintenance branch
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
   (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
-- #12751: --with-target-bindir configure option implemented. This option
+* #12751: --with-target-bindir configure option implemented. This option
   refers to the location of the runtime binaries on the target system for a
   cross-compiler and is embedded in executables produced by ocamlc. It does
-  not affect the bytecode executables installed as part of the build.
+  not affect the bytecode executables installed as part of the build. The old
+  mechanism `make TARGET_BINDIR=..` no longer works.
   (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
 ### Bug fixes:
@@ -50,6 +51,11 @@ OCaml 4.13 maintenance branch
   the runtime (`ocamlrun.exe`) cannot be found.
   (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
   David Allsopp)
+
+* #12751: Always keep within the 128 character limit for shebang lines. Previous
+  fix in #8622 handled building the compiler with a long prefix; this patch
+  extends this to the bytecode executables emitted by that compiler.
+  (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
 
 OCaml 4.13.1 (01 October 2021)
