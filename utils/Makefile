@@ -25,7 +25,6 @@ else
   FLEXDLL_DIR = +flexdll
 endif
 
-TARGET_BINDIR ?= $(BINDIR)
 FLEXLINK_FLAGS ?=
 
 # SUBST_QUOTE does the same as SUBST_STRING, adding OCaml quotes around
