@@ -31,8 +31,6 @@
 #endif
 #endif
 
-char * default_runtime_name = RUNTIME_NAME;
-
 static
 #ifdef _MSC_VER
 __forceinline
@@ -70,12 +68,11 @@ static __inline char * read_runtime_path(HANDLE h)
     } else if (path_size > 0)
       ofs += read_size(buffer + 4);
   }
-  if (path_size == 0) return default_runtime_name;
+  if (path_size == 0) return NULL;
   if (path_size >= MAX_PATH) return NULL;
   if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return NULL;
   if (! ReadFile(h, runtime_path, path_size, &nread, NULL)) return NULL;
   if (nread != path_size) return NULL;
-  runtime_path[path_size - 1] = 0;
   return runtime_path;
 }
 
