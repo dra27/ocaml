@@ -35,8 +35,7 @@ COMPFLAGS=-strict-sequence -principal -absname \
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
-BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
-                 -use-runtime $(RUNTIME_NAME)
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 
 COMPFLAGS += -I byte
 OPTCOMPFLAGS += -I native
