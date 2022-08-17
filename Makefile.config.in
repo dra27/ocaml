@@ -230,7 +230,7 @@ NAKED_POINTERS=false
 
 SHEBANGSCRIPTS=@shebangscripts@
 HASHBANGSCRIPTS=$(SHEBANGSCRIPTS)
-LONG_SHEBANG=@long_shebang@
+LONG_SHEBANG=false
 
 ## Variables deprecated since OCaml 5.0
 
