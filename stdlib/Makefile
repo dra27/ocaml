@@ -21,8 +21,6 @@ OCAMLDEP ?= $(BOOT_OCAMLDEP)
 
 include $(ROOTDIR)/Makefile.common
 
-TARGET_BINDIR ?= $(BINDIR)
-
 COMPILER=$(ROOTDIR)/ocamlc$(EXE)
 CAMLC=$(OCAMLRUN) $(COMPILER)
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
@@ -40,15 +38,7 @@ NOSTDLIB= camlinternalFormatBasics.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo camlheader target_camlheader camlheader_ur
-
-ifeq "$(RUNTIMED)" "true"
-all: camlheaderd target_camlheaderd
-endif
-
-ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-all: camlheaderi target_camlheaderi
-endif
+all: stdlib.cma std_exit.cmo camlheader target_camlheader
 
 .PHONY: allopt opt.opt # allopt and opt.opt are synonyms
 allopt: stdlib.cmxa std_exit.cmx
@@ -59,8 +49,7 @@ INSTALL_STDLIB_META_DIR=$(DESTDIR)$(LIBDIR)/stdlib
 .PHONY: install
 install::
 	$(INSTALL_DATA) \
-	  stdlib.cma std_exit.cmo *.cmi camlheader_ur \
-	  "$(INSTALL_LIBDIR)"
+	  stdlib.cma std_exit.cmo *.cmi "$(INSTALL_LIBDIR)"
 	$(MKDIR) "$(INSTALL_STDLIB_META_DIR)"
 	$(INSTALL_DATA) META "$(INSTALL_STDLIB_META_DIR)"
 ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
@@ -69,16 +58,6 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  "$(INSTALL_LIBDIR)"
 endif
 	$(INSTALL_DATA) target_camlheader "$(INSTALL_LIBDIR)/camlheader"
-
-ifeq "$(RUNTIMED)" "true"
-install::
-	$(INSTALL_DATA) target_camlheaderd "$(INSTALL_LIBDIR)/camlheaderd"
-endif
-
-ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-install::
-	$(INSTALL_DATA) target_camlheaderi "$(INSTALL_LIBDIR)/camlheaderi"
-endif
 
 .PHONY: installopt
 installopt: installopt-default
@@ -91,88 +70,36 @@ installopt-default:
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header
-HEADER_PATH = $(BINDIR)/
-HEADER_TARGET_PATH = $(TARGET_BINDIR)/
 else # Windows
 HEADERPROGRAM = headernt
-HEADER_PATH = $(BINDIR)/
-HEADER_TARGET_PATH = $(TARGET_BINDIR)/
 endif
 
-TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
-
-# The shebang test in configure.ac will need updating if any runtime is
-# introduced with a suffix more than one character long (camlheader_ur doesn't
-# matter).
-CAMLHEADERS =\
-  camlheader target_camlheader camlheader_ur \
-  camlheaderd target_camlheaderd \
-  camlheaderi target_camlheaderi
-
-# The % in pattern rules must always match something, hence the slightly strange
-# patterns and $(subst ...) since `camlheader%:` wouldn't match `camlheader`
 ifeq "$(SHEBANGSCRIPTS)" "true"
-camlhead%: $(ROOTDIR)/Makefile.config Makefile
-ifeq "$(LONG_SHEBANG)" "true"
-	$(V_GEN)echo '#!/bin/sh' > $@ && \
-	echo 'exec "$(BINDIR)/ocamlrun$(subst er,,$*)" "$$0" "$$@"' >> $@
-else
-	$(V_GEN)echo '#!$(BINDIR)/ocamlrun$(subst er,,$*)' > $@
-endif
 
-# TODO This does not take long shebangs into account (since TARGET_BINDIR is not
-#      yet processed by configure)
-target_%: $(ROOTDIR)/Makefile.config Makefile
-	$(V_GEN)echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)' > $@
+%header: %header.shebang
+	$(V_GEN)sed -e 's/^ *//;/^#[^!]/d;/^$$/d' $< > $@
 
-camlheader_ur: Makefile
-	$(V_GEN)echo '#!' | tr -d '\012' > $@
+else # Shebang scripts not supported
 
-else # Hashbang scripts not supported
-
-$(CAMLHEADERS): $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
+%header: $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
-camlhead%: tmphead%.exe
-	$(V_GEN)rm -f $@.exe && \
-	mv $< $@
+%header: %header.shebang tmpheader.exe
+	@rm -f $@.exe
+	$(V_GEN)sed -ne '/^\#!/s/^\#!/!\#/p' $< > $@
+	@cat tmpheader.exe >> $@
 
-# Again, pattern weirdness here means that the dot is always present so that
-# tmpheader.exe matches.
-tmpheader%exe: $(HEADERPROGRAM)%$(O)
-	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
+.INTERMEDIATE: tmpheader.exe
+tmpheader.exe: $(HEADERPROGRAM).$(O)
+	$(call MKEXE_VIA_CC,$@,$^)
 # FIXME This is wrong - mingw could invoke strip; MSVC equivalent?
 ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
 
-$(HEADERPROGRAM)%$(O): \
-  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
-
-$(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
+$(HEADERPROGRAM).$(O): $(HEADERPROGRAM).c
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ $^
-
-camlheader_ur: camlheader
-	$(V_GEN)cp camlheader $@
-
-ifeq "$(UNIX_OR_WIN32)" "unix"
-tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
-	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
-	strip $@
-
-$(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
-	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
-	      $(OUTPUTOBJ)$@ $^
-
-target_%: tmptarget%.exe
-	$(V_GEN)rm -f $@.exe && \
-	mv $< $@
-else
-target_%: %
-	$(V_GEN)cp $< $@
-endif
 
 endif # ifeq "$(SHEBANGSCRIPTS)" "true"
 
@@ -184,11 +111,11 @@ stdlib.cmxa: $(OBJS:.cmo=.cmx)
 
 .PHONY: distclean
 distclean: clean
-	rm -f sys.ml META
+	rm -f sys.ml META *.shebang target_camlheader.shebang.in
 
 .PHONY: clean
 clean::
-	rm -f $(CAMLHEADERS)
+	rm -f camlheader target_camlheader
 
 export AWK
 

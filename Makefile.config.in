@@ -64,7 +64,6 @@ LIBRARIES_MAN_DIR=$(MANDIR)/man3
 ### the string "#!$(BINDIR)/ocamlrun" is less than 32 characters long.
 ### In doubt, set HASHBANGSCRIPTS to false.
 SHEBANGSCRIPTS=@shebangscripts@
-LONG_SHEBANG=@long_shebang@
 # For compatibility
 HASHBANGSCRIPTS:=$(SHEBANGSCRIPTS)
 
