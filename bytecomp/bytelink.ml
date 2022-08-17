@@ -302,10 +302,15 @@ let write_header outchan =
     if String.length !Clflags.use_runtime > 0 then
       (true, make_absolute !Clflags.use_runtime)
     else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:false ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
       let ocamlrun =
         Printf.sprintf "ocamlrun%s-%s"
                        !Clflags.runtime_variant
-                       Config.zinc_runtime_id
+                       runtime_id
       in
       (false, ocamlrun)
   in
@@ -313,7 +318,7 @@ let write_header outchan =
   let header = "camlheader" in
   try
     let inchan = open_in_bin (Load_path.find header) in
-    let shebang, runtime =
+    let cher_header, runtime_dir =
       let header_line =
         try input_line inchan
         with End_of_file ->
@@ -322,43 +327,110 @@ let write_header outchan =
       let header_length = String.length header_line in
       if header_length < 2 then
         raise (Error (Camlheader ("corrupt header", header)));
-      let runtime =
-        if use_runtime then
-          runtime
-        else
-          Filename.concat (String.sub header_line 2 (header_length - 2))
-                          runtime
-      in
-      (String.sub header_line 0 2 = "#!", runtime)
+      (String.sub header_line 0 2,
+       String.sub header_line 2 (header_length - 2))
     in
-    if shebang then begin
-      (* Write the shebang header, then start recording *)
-      let bin_sh =
-        try input_line inchan
-        with End_of_file ->
-          raise (Error (Camlheader ("corrupt header", header)))
+    let additional_runtimes = [
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:true ~int31:(Sys.int_size < 63) release_number ~is_release
       in
-      if String.length runtime > 125 || String.contains runtime ' ' then
-        (* shebang mustn't exceed 128 including the #! and \0 and can't
-           contain spaces. Use exec in a small shell script instead. *)
-        Printf.fprintf outchan "\
-          #!%s\n\
-          exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
-      else begin
-        output_string outchan "#!";
-        output_string outchan runtime;
-        output_char outchan '\n'
-      end;
-      Bytesections.init_record outchan
-    end else begin
-      copy_file inchan outchan;
-      (* The header is finished - the runtime name needs recording in RNTM,
-         so start recording now *)
-      Bytesections.init_record outchan;
-      output_string outchan runtime;
-      output_char outchan '\000';
-      Bytesections.record outchan "RNTM"
-    end;
+      Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id]
+    in
+    let () =
+      if cher_header = "#!" then begin
+        let is_absolute_header =
+          let l = String.length runtime_dir in
+          l > 0 && runtime_dir.[l - 1] = Filename.dir_sep.[0]
+        in
+        (* Write the shebang header, then start recording *)
+        if use_runtime || is_absolute_header then begin
+          let runtime =
+            if use_runtime then
+              runtime
+            else
+              runtime_dir ^ runtime
+          in
+          let bin_sh =
+            if is_absolute_header then
+              try input_line inchan
+              with End_of_file ->
+                raise (Error (Camlheader ("corrupt header", header)))
+            else
+              (* The header is a relative search header, so the "runtime_dir"
+                 read is in fact the path to /bin/sh *)
+              runtime_dir
+          in
+          if String.length runtime > 125 || String.contains runtime ' ' then
+            (* shebang mustn't exceed 128 including the #! and \0 and can't
+               contain spaces. Use exec in a small shell script instead. *)
+            Printf.fprintf outchan "\
+              #!%s\n\
+              exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
+          else begin
+            output_string outchan "#!";
+            output_string outchan runtime;
+            output_char outchan '\n'
+          end
+        end else begin
+          (* Write the shebang header from the script *)
+          output_string outchan "#!";
+          output_string outchan runtime_dir;
+          output_char outchan '\n';
+          let runtime = Filename.quote runtime in
+          let additional_runtimes =
+            if additional_runtimes = [] then ""
+            else
+              " " ^ String.concat " "
+                                  (List.map Filename.quote additional_runtimes)
+          in
+          let buff = Bytes.create 0x1000 in
+          let rec loop () =
+            let read = input inchan buff 0 0x1000 in
+            if read = 0 then () else
+              let substitute = ref false in
+              for i = 0 to read do
+                let c = Bytes.unsafe_get buff i in
+                if !substitute then begin
+                  substitute := false;
+                  match c with
+                  | 'r' -> output_string outchan runtime
+                  | 'a' -> output_string outchan additional_runtimes
+                  | _ ->
+                      raise (Error (Camlheader ("corrupt header", header)))
+                end else
+                  if c = ':' then
+                    substitute := true
+                  else
+                    output_char outchan c
+              done;
+              if !substitute then
+                raise (Error (Camlheader ("corrupt header", header)));
+              loop ()
+          in
+          loop ()
+        end;
+        Bytesections.init_record outchan
+      end else
+        let rntm =
+          let runtimes = runtime :: additional_runtimes in
+          if use_runtime then
+            runtime
+          else if cher_header = "!#" then
+            runtime_dir ^ runtime
+          else if cher_header = "!!" then
+            runtime_dir ^ "\000" ^ String.concat "\000" runtimes ^ "\000"
+          else
+            raise (Error (Camlheader ("corrupt header", header)))
+        in
+        copy_file inchan outchan;
+        (* The header is finished - the runtime name needs recording in RNTM,
+           so start recording now *)
+        Bytesections.init_record outchan;
+        output_string outchan rntm;
+        Bytesections.record outchan "RNTM"
+    in
     close_in inchan;
   with
   | Not_found -> raise (Error (File_not_found header))
