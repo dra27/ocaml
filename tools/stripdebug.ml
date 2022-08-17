@@ -26,6 +26,7 @@ let remove_CRCS = ref false
 let remove_section = function
   | "DBUG" -> !remove_DBUG
   | "CRCS" -> !remove_CRCS
+  | "RNTM" -> !remove_header
   | _ -> false
 
 let stripdebug infile outfile =
