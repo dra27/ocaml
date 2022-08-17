@@ -298,9 +298,15 @@ type launch_method =
 | Shebang_runtime
 | Executable
 
+type search_method =
+| Absolute
+| Absolute_then_search
+| Search
+
 type runtime_launch_info = {
   buffer : string;
   bindir : string;
+  search : search_method;
   launcher : launch_method;
   executable_offset : int
 }
@@ -318,8 +324,15 @@ let invalid_for_shebang_line path =
   String.length path > 125 || String.exists invalid_char path
 
 (* The runtime-launch-info file consists of two "lines" followed by binary data.
-   The file is _always_ LF-formatted, even on Windows. The sequence of bytes up
-   to the first '\n' is interpreted:
+   The file is _always_ LF-formatted, even on Windows. The first character
+   indicates the search mode for the header and is either '1', '2', or '3' for:
+     - "1" - use an absolute path to the runtime only (--runtime-search=no)
+     - "2" - use an absolute path, but fallback to searching the directory
+             containing the image and then PATH if that runtime is not found
+             (--runtime-search=yes)
+     - "3" - always search the directory containing the image and then PATH for
+             the runtime (--runtime-search=always)
+   The remaining bytes up to the first '\n' are interpreted:
      - "sh" - use a shebang-style launcher. If sh is needed, determine its
               location from [command -p -v sh]
      - "exe" - use the executable launcher contained in this runtime-launch-info
@@ -345,8 +358,17 @@ let read_runtime_launch_info file =
     let bindir_end = String.index_from buffer bindir_start '\000' in
     let bindir = String.sub buffer bindir_start (bindir_end - bindir_start) in
     let executable_offset = bindir_end + 2 in
+    let search =
+      (* buffer <> "" since we have the index of the first \n *)
+      match buffer.[0] with
+      | '1' -> Absolute
+      | '2' -> Absolute_then_search
+      | '3' -> Search
+      | _ -> raise Not_found
+    in
     let launcher =
-      let kind = String.sub buffer 0 (bindir_start - 1) in
+      (* buffer has at least one character before the first \n *)
+      let kind = String.sub buffer 1 (bindir_start - 2) in
       if kind = "exe" then
         Executable
       else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
@@ -357,7 +379,7 @@ let read_runtime_launch_info file =
        || buffer.[executable_offset - 1] <> '\n' then
       raise Not_found
     else
-      {bindir; launcher; buffer; executable_offset}
+      {bindir; search; launcher; buffer; executable_offset}
   with Not_found ->
     raise (Error (Camlheader ("corrupt header", file)))
 
@@ -391,16 +413,27 @@ let write_header outchan =
     try read_runtime_launch_info (Load_path.find header)
     with Not_found -> raise (Error (File_not_found header))
   in
-  let runtime =
+  let runtime, search =
     if String.length !Clflags.use_runtime > 0 then
-      make_absolute !Clflags.use_runtime
+      make_absolute !Clflags.use_runtime, Absolute
     else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:false ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
       let runtime =
         Printf.sprintf "ocamlrun%s-%s"
                        !Clflags.runtime_variant
-                       Config.zinc_runtime_id
+                       runtime_id
       in
-      Filename.concat runtime_info.bindir runtime
+      let runtime =
+        if runtime_info.search = Absolute then
+          Filename.concat runtime_info.bindir runtime
+        else
+          runtime
+      in
+      runtime, runtime_info.search
   in
   (* Determine which method will be used for launching the executable:
      Executable: concatenate the bytecode image to the executable stub
@@ -410,7 +443,7 @@ let write_header outchan =
     if runtime_info.launcher = Executable then
       Executable
     else
-      if invalid_for_shebang_line runtime then
+      if search <> Absolute || invalid_for_shebang_line runtime then
         match runtime_info.launcher with
         | Shebang_bin_sh sh ->
             let sh =
@@ -427,16 +460,67 @@ let write_header outchan =
       else
         Shebang_runtime
   in
+  let additional_runtimes =
+    if search = Absolute then
+      []
+    else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:true ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
+      [Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id]
+  in
   match launcher with
   | Shebang_runtime ->
+      assert (search = Absolute);
       (* Use the runtime directly *)
       Printf.fprintf outchan "#!%s\n" runtime;
       Bytesections.init_record outchan
   | Shebang_bin_sh bin_sh ->
-      (* exec the runtime using sh *)
-      Printf.fprintf outchan "\
-        #!%s\n\
-        exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime);
+      let () =
+        if search = Absolute then
+          (* exec the runtime using sh *)
+          Printf.fprintf outchan "\
+            #!%s\n\
+            exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
+        else
+          let absolute_then_search =
+            if search = Absolute_then_search then
+              let runtime =
+                Filename.quote (Filename.concat runtime_info.bindir runtime) in
+              Printf.sprintf "\nc=%s\nif ! test -f \"$c\"; then" runtime
+            else "" in
+          let absolute_then_search_fi =
+            if search = Absolute_then_search then "\nfi" else "" in
+          let additional_runtimes =
+            if additional_runtimes = [] then
+              ""
+            else
+              let additional_runtimes =
+                String.concat " " (List.map Filename.quote additional_runtimes)
+              in
+              " " ^ additional_runtimes
+          in
+          Printf.fprintf outchan {|#!%s
+r=%s%s
+d="$(dirname "$0" 2>/dev/null)"
+test -z "$d" || d="${d%%/}/"
+for r in "$r"%s; do
+c="$(command -v "$d$r")"
+test -n "$c" || c="$(command -v "$r")"
+test -z "$c" || break
+done%s
+if test -z "$c"; then
+echo 'This program requires OCaml %d.%d'>&2
+echo "The interpreter ($r) was not found either with $0 or in \$PATH">&2
+else
+exec "$c" "$0" "$@"
+fi
+exit 126
+|} bin_sh runtime absolute_then_search additional_runtimes
+   absolute_then_search_fi Sys.ocaml_release.major Sys.ocaml_release.minor
+      in
       Bytesections.init_record outchan
   | Executable ->
       (* Use the executable stub launcher *)
@@ -445,7 +529,21 @@ let write_header outchan =
       Out_channel.output_substring outchan runtime_info.buffer pos len;
       (* The runtime name needs recording in RNTM *)
       let toc_writer = Bytesections.init_record outchan in
-      Printf.fprintf outchan "%s\000" runtime;
+      let () =
+        match search with
+        | Absolute ->
+            output_string outchan runtime
+        | Absolute_then_search ->
+            (* TODO Executable header should add the separator? *)
+            (* TODO No need to null-terminate the runtime itself *)
+            Printf.fprintf outchan "%s\000%s\000"
+              (Filename.concat runtime_info.bindir "")
+              (String.concat "\000" (runtime::additional_runtimes))
+        | Search ->
+            (* TODO No need to null-terminate the runtime itself *)
+            Printf.fprintf outchan "\000%s\000"
+              (String.concat "\000" (runtime::additional_runtimes))
+      in
       Bytesections.record toc_writer RNTM;
       toc_writer
 
