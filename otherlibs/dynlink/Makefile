@@ -38,8 +38,7 @@ OPTCOMPFLAGS=-O3
 else
 OPTCOMPFLAGS=
 endif
-BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
-                 -use-runtime $(RUNTIME_NAME)
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 
 COMPFLAGS += -I byte
 OPTCOMPFLAGS += -I native
