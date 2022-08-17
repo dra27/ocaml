@@ -777,6 +777,7 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search
 zinc_runtime_id
 native_runtime_id
 bytecode_runtime_id
@@ -987,6 +988,7 @@ enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
 enable_relative
+enable_runtime_search
 with_afl
 with_flexdll
 enable_shared
@@ -1680,6 +1682,7 @@ Optional Features:
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
   --enable-relative       try to locate the standard library using relative
                           paths
+  --enable-runtime-search allow bytecode executables to search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3259,6 +3262,7 @@ ocamltest_unix_name=""
 ocamltest_unix_path=""
 ocamltest_unix_include=""
 bindir_to_libdir=''
+runtime_search=no
 
 # Information about the package
 
@@ -3416,6 +3420,7 @@ OCAML_RELEASE_NUMBER=17
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3426,7 +3431,11 @@ ac_config_files="$ac_config_files stdlib/sys.ml"
 
 ac_config_files="$ac_config_files stdlib/camlheader.shebang"
 
+ac_config_files="$ac_config_files stdlib/camlheader.sh"
+
 ac_config_files="$ac_config_files stdlib/target_camlheader.shebang"
+
+ac_config_files="$ac_config_files stdlib/target_camlheader.sh"
 
 ac_config_files="$ac_config_files manual/src/version.tex"
 
@@ -3441,6 +3450,8 @@ ac_config_headers="$ac_config_headers runtime/caml/m.h"
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/version.h"
+
+ac_config_files="$ac_config_files utils/config.common.ml"
 
 ac_config_files="$ac_config_files compilerlibs/META"
 
@@ -3939,6 +3950,18 @@ fi
 if test ${enable_relative+y}
 then :
   enableval=$enable_relative;
+fi
+
+
+# Check whether --enable-runtime-search was given.
+if test ${enable_runtime_search+y}
+then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  yes|no|always) :
+     ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
 fi
 
 
@@ -13556,6 +13579,7 @@ ocamlsrcdir=${ocamlsrcdir%X}
 case $host in #(
   *-*-mingw32*|*-pc-windows) :
     unix_or_win32="win32"
+    dir_sep="\\"
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
 printf %s "checking for a workable solution for ln -sf... " >&6; }
@@ -13583,6 +13607,7 @@ printf "%s\n" "$ln" >&6; }
     ocamlyacc_wstr_module="yacc/wstr" ;; #(
   *) :
     unix_or_win32="unix"
+  dir_sep='/'
   ln='ln -sf'
   ocamltest_libunix="Some true"
   ocamlyacc_wstr_module="" ;;
@@ -19627,6 +19652,11 @@ printf "%s\n" "$result" >&6; }
 
 fi
 
+if test x"$enable_runtime_search" != 'x'
+then :
+  runtime_search="$enable_runtime_search"
+fi
+
 case $host in #(
   *-*-mingw32*|*-pc-windows) :
     case $WINDOWS_UNICODE_MODE in #(
@@ -19720,8 +19750,16 @@ fi
 else $as_nop
   bindir_exp="${exec_prefix}/bin"
 fi
+else $as_nop
+  bindir_exp="$bindir"
 fi
-target_bindir_exp="$bindir_exp"
+target_bindir_exp="$bindir"
+
+bindir_exp="${bindir_exp%$dir_sep}$dir_sep"
+bindir_exp_sh="'$(echo "${bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+target_bindir_exp="${target_bindir_exp%$dir_sep}$dir_sep"
+target_bindir_exp_sh="'$(echo "${target_bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
 
 # Determine the RuntimeID (see runtime/Mangling.md)
 
@@ -20623,6 +20661,8 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 
   sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
     > stdlib/target_camlheader.shebang.in
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.sh.in \
+    > stdlib/target_camlheader.sh.in
 
 
 # The HP-UX ksh and POSIX shell print the target directory to stdout
@@ -20919,7 +20959,9 @@ do
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;
     "stdlib/camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.shebang" ;;
+    "stdlib/camlheader.sh") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.sh" ;;
     "stdlib/target_camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.shebang" ;;
+    "stdlib/target_camlheader.sh") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.sh" ;;
     "manual/src/version.tex") CONFIG_FILES="$CONFIG_FILES manual/src/version.tex" ;;
     "manual/src/html_processing/src/common.ml") CONFIG_FILES="$CONFIG_FILES manual/src/html_processing/src/common.ml" ;;
     "ocamltest/ocamltest_config.ml") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.ml" ;;
@@ -20927,6 +20969,7 @@ do
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "runtime/caml/version.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/version.h" ;;
+    "utils/config.common.ml") CONFIG_FILES="$CONFIG_FILES utils/config.common.ml" ;;
     "compilerlibs/META") CONFIG_FILES="$CONFIG_FILES compilerlibs/META" ;;
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;

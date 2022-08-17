@@ -76,26 +76,48 @@ endif
 
 ifeq "$(SHEBANGSCRIPTS)" "true"
 
+ifeq "$(RUNTIME_HEADER_SEARCH)" "no"
 %header: %header.shebang
-	$(V_GEN)sed -e 's/^ *//;/^#[^!]/d;/^$$/d' $< > $@
+else
+%header: %header.sh
+endif
+ifeq "$(RUNTIME_HEADER_SEARCH)" "yes"
+	$(V_GEN)sed -e 's/^>* *//;/^\#[^!]/d;/^$$/d' $< > $@
+else
+	$(V_GEN)sed -e 's/^ *//;/^\#[^!]/d;/^>/d;/^$$/d' $< > $@
+endif
 
 else # Shebang scripts not supported
 
 %header: $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
+ifeq "$(RUNTIME_HEADER_SEARCH)" "no"
+  CHER_HEADER='/^\#!/s/^\#!/!\#/p'
+else
+ifeq "$(RUNTIME_HEADER_SEARCH)" "yes"
+  CHER_HEADER='/^\#!/s/^\#/!/p'
+else
+  CHER_HEADER='1s/.*/!!/p'
+endif
+endif
+
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
 %header: %header.shebang tmpheader.exe
 	@rm -f $@.exe
-	$(V_GEN)sed -ne '/^\#!/s/^\#!/!\#/p' $< > $@
+	$(V_GEN)sed -ne $(CHER_HEADER) $< > $@
 	@cat tmpheader.exe >> $@
 
 .INTERMEDIATE: tmpheader.exe
 tmpheader.exe: $(HEADERPROGRAM).$(O)
-	$(call MKEXE_VIA_CC,$@,$^)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
 # FIXME This is wrong - mingw could invoke strip; MSVC equivalent?
 ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
+
+$(HEADERPROGRAM).$(O): OC_CPPFLAGS += \
+  -DOCAML_VERSION_MAJOR=$(OCAML_VERSION_MAJOR) \
+  -DOCAML_VERSION_MINOR=$(OCAML_VERSION_MINOR)
 
 $(HEADERPROGRAM).$(O): $(HEADERPROGRAM).c
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
@@ -111,7 +133,8 @@ stdlib.cmxa: $(OBJS:.cmo=.cmx)
 
 .PHONY: distclean
 distclean: clean
-	rm -f sys.ml META *.shebang target_camlheader.shebang.in
+	rm -f sys.ml META *camlheader.sh *.shebang \
+	  target_camlheader.sh.in target_camlheader.shebang.in
 
 .PHONY: clean
 clean::
