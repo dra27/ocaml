@@ -80,8 +80,7 @@ PREFIXED_OBJS=$(filter stdlib__%.cmo,$(OBJS))
 UNPREFIXED_OBJS=$(PREFIXED_OBJS:stdlib__%.cmo=%)
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo bootheader $(HEADER_NAME) target_$(HEADER_NAME) \
-     camlheader_ur
+all: stdlib.cma std_exit.cmo $(HEADER_NAME) target_$(HEADER_NAME) camlheader_ur
 
 ifeq "$(RUNTIMED)" "true"
 all: target_camlheaderd
@@ -161,15 +160,11 @@ installopt-prof:
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header
-HEADER_PATH = $(BINDIR)/
 else # Windows
 HEADERPROGRAM = headernt
-HEADER_PATH =
 endif
 
 ifeq "$(HASHBANGSCRIPTS)" "true"
-bootheader: $(ROOTDIR)/Makefile.config Makefile
-	echo '#!$(BINDIR)/ocamlrun' > $@
 
 camlheader_ur: Makefile
 	echo '#!' | tr -d '\012' > $@
@@ -178,13 +173,6 @@ target_camlheader%: Makefile
 	echo '#!/usr/bin/false' > $@
 
 else # Hashbang scripts not supported
-
-bootheader: $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
-
-# $@.exe is deleted to ensure no Cygwin .exe mangling takes place
-bootheader: tmpheader.exe
-	rm -f $@.exe
-	cp $< $@
 
 camlheader_ur: tmpheader.exe
 	rm -f $@.exe
@@ -238,7 +226,7 @@ distclean: clean
 
 .PHONY: clean
 clean::
-	rm -f bootheader $(HEADER_NAME) target_$(HEADER_NAME)* camlheader_ur
+	rm -f $(HEADER_NAME) target_$(HEADER_NAME)* camlheader_ur
 
 .SUFFIXES: .mli .ml .cmi .cmo .cmx .p.cmx
 
