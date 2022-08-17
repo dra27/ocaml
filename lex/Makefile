@@ -31,8 +31,7 @@ CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
             -safe-string -strict-sequence -strict-formats -bin-annot
 LINKFLAGS =
-BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
-                 -use-runtime $(RUNTIME_NAME)
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 CAMLDEP = $(BOOT_OCAMLC) -depend
 DEPFLAGS = -slash
 DEPINCLUDES =
