@@ -747,12 +747,15 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search
 zinc_runtime_id
 native_runtime_id
 bytecode_runtime_id
 bindir_to_libdir
+target_bindir_exp_sh
 target_bindir_exp
 target_bindir
+bindir_exp_sh
 bindir_exp
 naked_pointers_checker
 naked_pointers
@@ -845,7 +848,10 @@ exeext
 ac_tool_prefix
 DIRECT_CPP
 CC
+OCAML_DEVELOPMENT_VERSION
 OCAML_RELEASE_NUMBER
+OCAML_VERSION_MINOR
+OCAML_VERSION_MAJOR
 VERSION
 native_compiler
 CONFIGURE_ARGS
@@ -923,6 +929,7 @@ enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
 enable_relative
+enable_runtime_search
 with_afl
 with_flexdll
 enable_shared
@@ -1611,6 +1618,7 @@ Optional Features:
                           do not emit each function in a separate section
   --enable-relative       try to locate the standard library using relative
                           paths
+  --enable-runtime-search allow bytecode executables to search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -2827,6 +2835,7 @@ instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
 bindir_to_libdir=''
+runtime_search=no
 
 # Information about the package
 
@@ -2868,9 +2877,20 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
+
+
+
+
+
 VERSION=4.13.1
 
+OCAML_VERSION_MAJOR=4
+
+OCAML_VERSION_MINOR=13
+
 OCAML_RELEASE_NUMBER=14
+
+OCAML_DEVELOPMENT_VERSION=false
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -2974,6 +2994,9 @@ OCAML_RELEASE_NUMBER=14
 
 
 
+
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -2982,13 +3005,19 @@ ac_config_files="$ac_config_files Makefile.config"
 
 ac_config_files="$ac_config_files stdlib/camlheader.shebang"
 
+ac_config_files="$ac_config_files stdlib/camlheader.sh"
+
 ac_config_files="$ac_config_files stdlib/target_camlheader.shebang"
+
+ac_config_files="$ac_config_files stdlib/target_camlheader.sh"
 
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/s.h"
+
+ac_config_files="$ac_config_files utils/config.mlp"
 
 
 ac_config_commands="$ac_config_commands shebang"
@@ -3387,6 +3416,17 @@ fi
 # Check whether --enable-relative was given.
 if test "${enable_relative+set}" = set; then :
   enableval=$enable_relative;
+fi
+
+
+# Check whether --enable-runtime-search was given.
+if test "${enable_runtime_search+set}" = set; then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  yes|no|always) :
+     ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
 fi
 
 
@@ -12657,6 +12697,7 @@ esac
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
+    dir_sep="\\"
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
 $as_echo_n "checking for a workable solution for ln -sf... " >&6; }
@@ -12681,6 +12722,7 @@ $as_echo "$ln" >&6; }
      ;; #(
   *) :
     unix_or_win32="unix"
+  dir_sep='/'
   ln='ln -sf'
   unixlib="unix" ;;
 esac
@@ -17901,6 +17943,10 @@ $as_echo "$result" >&6; }
 
 fi
 
+if test x"$enable_runtime_search" != 'x'; then :
+  runtime_search="$enable_runtime_search"
+fi
+
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     case $WINDOWS_UNICODE_MODE in #(
@@ -17988,11 +18034,16 @@ else
 fi
 fi
 if test x"${target_bindir}" = 'x'; then :
-  target_bindir='$(BINDIR)'
   target_bindir_exp="$bindir_exp"
 else
   target_bindir_exp="${target_bindir}"
 fi
+
+bindir_exp="${bindir_exp%$dir_sep}$dir_sep"
+bindir_exp_sh="'$(echo "${bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+target_bindir_exp="${target_bindir_exp%$dir_sep}$dir_sep"
+target_bindir_exp_sh="'$(echo "${target_bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
 
 # Determine the RuntimeID (see runtime/Mangling.md)
 
@@ -18744,6 +18795,8 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 
   sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
     > stdlib/target_camlheader.shebang.in
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.sh.in \
+    > stdlib/target_camlheader.sh.in
 
 
 # The HP-UX ksh and POSIX shell print the target directory to stdout
@@ -19039,10 +19092,13 @@ do
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.shebang" ;;
+    "stdlib/camlheader.sh") CONFIG_FILES="$CONFIG_FILES stdlib/camlheader.sh" ;;
     "stdlib/target_camlheader.shebang") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.shebang" ;;
+    "stdlib/target_camlheader.sh") CONFIG_FILES="$CONFIG_FILES stdlib/target_camlheader.sh" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
+    "utils/config.mlp") CONFIG_FILES="$CONFIG_FILES utils/config.mlp" ;;
     "shebang") CONFIG_COMMANDS="$CONFIG_COMMANDS shebang" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
 
