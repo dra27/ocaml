@@ -23,10 +23,6 @@ INSTALL ?= @INSTALL@
 INSTALL_DATA ?= @INSTALL_DATA@
 INSTALL_PROG ?= @INSTALL_PROGRAM@
 
-# Location of ocamlrun on the target system (path embedded in bytecode
-# executables)
-TARGET_BINDIR = @target_bindir@
-
 # This is munged into utils/config.ml, not overridable by other parts of
 # the build system.
 OC_DLL_LDFLAGS=@oc_dll_ldflags@
