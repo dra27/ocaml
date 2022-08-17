@@ -74,7 +74,6 @@ META
 /boot/ocamlrun
 /boot/ocamlruns
 /boot/camlheader
-/boot/camlheader_ur
 /boot/ocamlc.opt
 /boot/flexlink.byte
 

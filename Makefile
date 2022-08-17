@@ -181,9 +181,8 @@ else
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	rm -f boot/ocamlrun$(EXE)
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	cd boot; rm -f $(LIBFILES) camlheader_ur
+	cd boot; rm -f $(LIBFILES)
 	cd stdlib; cp $(LIBFILES) ../boot
-	cp boot/camlheader boot/camlheader_ur
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
 
 # Recompile the core system using the bootstrap compiler
@@ -1410,8 +1409,7 @@ distclean: clean
 	$(MAKE) -C testsuite distclean
 	$(MAKE) -C tools distclean
 	rm -f compilerlibs/META
-	rm -f boot/ocamlrun boot/ocamlrun.exe \
-	      boot/camlheader boot/camlheader_ur \
+	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
 	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexlink.byte boot/flexlink.byte.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
