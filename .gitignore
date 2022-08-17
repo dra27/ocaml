@@ -199,7 +199,6 @@ _build
 /runtime/build_config.h
 /runtime/sak
 
-/stdlib/bootheader
 /stdlib/camlheader
 /stdlib/target_camlheader*
 /stdlib/camlheader_ur
