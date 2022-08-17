@@ -480,20 +480,7 @@ let read_runtime_launch_info file =
     else
       {bindir; launcher; buffer; executable_offset}
   with Not_found ->
-    let prefix =
-      if String.length buffer >= 2 then
-        String.sub buffer 0 2
-      else
-        ""
-    in
-    if prefix = "#!" then
-      let runtime = String.sub buffer 2 (String.index buffer '\n' - 2) in
-      {bindir = Filename.dirname runtime; launcher = Shebang_bin_sh "sh";
-       buffer; executable_offset = 0}
-    else if prefix = "MZ" then
-      {bindir = ""; launcher = Executable; buffer; executable_offset = 0}
-    else
-      raise (Error (Camlheader ("corrupt header", file)))
+    raise (Error (Camlheader ("corrupt header", file)))
 
 let find_bin_sh () =
   let output_file = Filename.temp_file "caml_bin_sh" "" in
