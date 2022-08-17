@@ -46,3 +46,6 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 
 # Commandline for creating symlinks
 LN = @ln@
+
+# Location of sh (to use in a shebang line)
+SHEBANG_BIN_SH = @bin_sh@
