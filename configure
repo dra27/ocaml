@@ -12412,7 +12412,8 @@ if test "x$interpval" = "xyes"; then :
      ;; #(
   *) :
     hashbangscripts=true
-    launch_method='sh' ;;
+    launch_method='sh'
+   ;;
 esac
 
 fi
