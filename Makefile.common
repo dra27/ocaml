@@ -146,8 +146,6 @@ endif
   undefine REAL_ROOT_DIR
 endif
 
-RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun-$(ZINC_RUNTIME_ID)$(EXE)'
-
 # List of other libraries
 ALL_OTHERLIBS = dynlink str systhreads unix runtime_events
 
@@ -316,7 +314,7 @@ endef # _OCAML_PROGRAM_BASE
 LINK_BYTECODE_PROGRAM =\
   $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS) \
   $(if $(filter -custom, $(OC_BYTECODE_LINKFLAGS)),, \
-       -use-prims runtime/primitives -use-runtime $(RUNTIME_NAME))
+       -use-prims runtime/primitives)
 
 # The _OCAML_BYTECODE_PROGRAM macro defines a bytecode program but assuming
 # that _OCAML_PROGRAM_BASE has already been called. Its public counterpart

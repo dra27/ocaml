@@ -785,6 +785,8 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search_target
+runtime_search
 zinc_runtime_id
 native_runtime_id
 bytecode_runtime_id
@@ -1024,6 +1026,8 @@ enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
 enable_relative
+enable_runtime_search
+enable_runtime_search_target
 with_afl
 with_flexdll
 with_winpthreads_msvc
@@ -1728,6 +1732,11 @@ Optional Features:
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
   --enable-relative       try to locate the standard library using relative
                           paths
+  --enable-runtime-search allow the distribution's bytecode executables to
+                          search for ocamlrun
+  --enable-runtime-search-target
+                          allow bytecode executables produced by ocamlc to
+                          search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3334,6 +3343,8 @@ unix_library=""
 unix_directory=""
 bindir_to_libdir=''
 relocatable=no
+runtime_search=no
+runtime_search_target=no
 
 # Information about the package
 
@@ -3485,6 +3496,8 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
+
 
 
 
@@ -4168,6 +4181,42 @@ fi
 if test ${enable_relative+y}
 then :
   enableval=$enable_relative;
+fi
+
+
+# Check whether --enable-runtime-search was given.
+if test ${enable_runtime_search+y}
+then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  no) :
+    search_method='1' ;; #(
+  yes) :
+    search_method='2' ;; #(
+  always) :
+    search_method='3' ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
+else $as_nop
+  search_method='1'
+fi
+
+
+# Check whether --enable-runtime-search-target was given.
+if test ${enable_runtime_search_target+y}
+then :
+  enableval=$enable_runtime_search_target; case $enableval in #(
+  no) :
+    target_search_method='1' ;; #(
+  yes) :
+    target_search_method='2' ;; #(
+  always) :
+    target_search_method='3' ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
+esac
+else $as_nop
+  target_search_method='1'
 fi
 
 
@@ -13986,6 +14035,13 @@ fi
 ac_config_commands="$ac_config_commands shebang"
 
 
+case $search_method$target_search_method in #(
+  1*|*1) :
+    relocatable=no ;; #(
+  *) :
+    relocatable=yes ;;
+esac
+
 # Are we building a cross-compiler
 
 if test x"$host" = x"$target"
@@ -22321,6 +22377,8 @@ fi
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  search_method='$search_method'
+  target_search_method='$target_search_method'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   target_bindir='$(echo "$target_bindir" | sed -e "s/'/'\"'\"'/g")'
 
@@ -23491,10 +23549,10 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
-    "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+    "shebang":C) printf '%s%s\n%s\000\n' "$search_method" "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$target_bindir" \
-    > stdlib/target_runtime.info ;;
+  printf '%s%s\n%s\000\n' "$target_search_method" "$target_launch_method" \
+    "$target_bindir" > stdlib/target_runtime.info ;;
 
   esac
 done # for ac_tag
