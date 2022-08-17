@@ -300,7 +300,7 @@ OPTTOPLEVELSTART=toplevel/opttopstart.cmo
 
 PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-LIBFILES=stdlib.cma std_exit.cmo *.cmi camlheader
+LIBFILES=stdlib.cma std_exit.cmo *.cmi
 
 COMPLIBDIR=$(LIBDIR)/compiler-libs
 
@@ -392,7 +392,8 @@ else
 	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	cd stdlib; cp $(LIBFILES) ../boot
+	cd boot; rm -f $(LIBFILES) $(HEADER_NAME)
+	cd stdlib; cp $(LIBFILES) ../boot; cp bootheader ../boot/$(HEADER_NAME)
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
 
 # Recompile the core system using the bootstrap compiler
@@ -1390,7 +1391,9 @@ depend: beforedepend
 .PHONY: distclean
 distclean: clean
 	$(MAKE) -C ocamltest distclean
-	rm -f boot/ocamlrun boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
+	$(MAKE) -C stdlib distclean
+	rm -f boot/ocamlrun boot/ocamlrun boot/ocamlrun.exe \
+	boot/$(HEADER_NAME) \
 	boot/ocamlruns boot/ocamlruns.exe \
 	boot/flexlink.byte boot/flexlink.byte.exe \
 	boot/flexdll_*.o boot/flexdll_*.obj \

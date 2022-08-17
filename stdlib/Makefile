@@ -62,14 +62,15 @@ PREFIXED_OBJS=$(filter stdlib__%.cmo,$(OBJS))
 UNPREFIXED_OBJS=$(PREFIXED_OBJS:stdlib__%.cmo=%)
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo camlheader target_camlheader camlheader_ur
+all: stdlib.cma std_exit.cmo bootheader $(HEADER_NAME) target_$(HEADER_NAME) \
+     camlheader_ur
 
 ifeq "$(RUNTIMED)" "true"
-all: camlheaderd target_camlheaderd
+all: target_camlheaderd
 endif
 
 ifeq "$(RUNTIMEI)" "true"
-all: camlheaderi target_camlheaderi
+all: target_camlheaderi
 endif
 
 .PHONY: allopt opt.opt # allopt and opt.opt are synonyms
@@ -95,7 +96,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  *.cmt *.cmti *.mli *.ml \
 	  "$(INSTALL_LIBDIR)"
 endif
-	$(INSTALL_DATA) target_camlheader "$(INSTALL_LIBDIR)/camlheader"
+	$(INSTALL_DATA) target_$(HEADER_NAME) "$(INSTALL_LIBDIR)/$(HEADER_NAME)"
 
 ifeq "$(RUNTIMED)" "true"
 install::
@@ -120,77 +121,56 @@ installopt-default:
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header
 HEADER_PATH = $(BINDIR)/
-HEADER_TARGET_PATH = $(TARGET_BINDIR)/
 else # Windows
 HEADERPROGRAM = headernt
 HEADER_PATH =
-HEADER_TARGET_PATH =
 endif
 
-TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
-
-CAMLHEADERS =\
-  camlheader target_camlheader camlheader_ur \
-  camlheaderd target_camlheaderd \
-  camlheaderi target_camlheaderi
-
-# The % in pattern rules must always match something, hence the slightly strange
-# patterns and $(subst ...) since `camlheader%:` wouldn't match `camlheader`
 ifeq "$(HASHBANGSCRIPTS)" "true"
-camlhead%: $(ROOTDIR)/Makefile.config Makefile
-	echo '#!$(BINDIR)/ocamlrun$(subst er,,$*)' > $@
-
-target_%: $(ROOTDIR)/Makefile.config Makefile
-	echo '#!$(TARGET_BINDIR)/ocamlrun$(subst camlheader,,$*)' > $@
+bootheader: $(ROOTDIR)/Makefile.config Makefile
+	echo '#!$(BINDIR)/ocamlrun' > $@
 
 camlheader_ur: Makefile
 	echo '#!' | tr -d '\012' > $@
 
+target_camlheader%: Makefile
+	echo '#!/usr/bin/false' > $@
+
 else # Hashbang scripts not supported
 
-$(CAMLHEADERS): $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
+bootheader: $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
-camlhead%: tmphead%.exe
+bootheader: tmpheader.exe
 	rm -f $@.exe
-	mv $< $@
+	cp $< $@
 
-# Again, pattern weirdness here means that the dot is always present so that
-# tmpheader.exe matches.
-tmpheader%exe: $(HEADERPROGRAM)%$(O)
-	$(call MKEXE_BOOT,$@,$^ $(EXTRALIBS))
+camlheader_ur: tmpheader.exe
+	rm -f $@.exe
+	cp $< $@
+
+target_camlheader%: tmpheader.exe
+	rm -f $@.exe
+	cp $< $@
+
+endif
+
+target_$(HEADER_NAME): target_runtime.info tmpheader.exe
+	@cat $^ > $@
+
+$(HEADER_NAME): runtime.info tmpheader.exe
+	@cat $^ > $@
+
+.INTERMEDIATE: tmpheader.exe
+tmpheader.exe: $(HEADERPROGRAM).$(O)
+	$(call MKEXE_BOOT,$@,$^)
 # FIXME This is wrong - mingw could invoke strip; MSVC equivalent?
 ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
 
-$(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"' \
-	      $(OUTPUTOBJ)$@ $^
-
-camlheader_ur: camlheader
-	cp camlheader $@
-
-ifeq "$(UNIX_OR_WIN32)" "unix"
-tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
-	$(call MKEXE_BOOT,$@,$^ $(EXTRALIBS))
-	strip $@
-
-$(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
-	      $(OUTPUTOBJ)$@ $^
-
-target_%: tmptarget%.exe
-	rm -f $@.exe
-	mv $< $@
-else
-target_%: %
-	cp $< $@
-endif
-
-endif # ifeq "$(HASHBANGSCRIPTS)" "true"
+$(HEADERPROGRAM)%$(O): \
+  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
 
 stdlib.cma: $(OBJS)
 	$(CAMLC) -a -o $@ $^
@@ -205,8 +185,13 @@ sys.ml: $(ROOTDIR)/VERSION sys.mlp
 clean::
 	rm -f sys.ml
 
+.PHONY: distclean
+distclean: clean
+	rm -f sys.ml runtime.info target_runtime.info
+
+.PHONY: clean
 clean::
-	rm -f $(CAMLHEADERS)
+	rm -f bootheader $(HEADER_NAME) target_$(HEADER_NAME)* camlheader_ur
 
 .SUFFIXES: .mli .ml .cmi .cmo .cmx
 
