@@ -250,14 +250,15 @@ META
 /runtime/domain_state32.inc
 /runtime/domain_state64.inc
 
+/stdlib/bootheader
 /stdlib/camlheader
-/stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
+/stdlib/target_camlheader*
 /stdlib/camlheader_ur
+/stdlib/runtime.info
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
+/stdlib/target_runtime.info
 
 /testsuite/**/*.result
 /testsuite/**/*.opt_result
