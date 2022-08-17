@@ -295,6 +295,71 @@ let make_absolute file =
   else Location.rewrite_absolute_path
          (Filename.concat (Sys.getcwd()) file)
 
+(* Writes the executable header to outchan and writes the RNTM section, if
+   needed. Bytesections.init_record is always called. *)
+
+let write_header outchan =
+  let use_runtime, runtime =
+    if String.length !Clflags.use_runtime > 0 then
+      (true, make_absolute !Clflags.use_runtime)
+    else
+      (false, "ocamlrun" ^ !Clflags.runtime_variant)
+  in
+  (* Copy the header *)
+  let header = "camlheader" in
+  try
+    let inchan = open_in_bin (Load_path.find header) in
+    let shebang, runtime =
+      let header_line =
+        try input_line inchan
+        with End_of_file ->
+          raise (Error (Camlheader ("corrupt header", header)))
+      in
+      let header_length = String.length header_line in
+      if header_length < 2 then
+        raise (Error (Camlheader ("corrupt header", header)));
+      let runtime =
+        if use_runtime then
+          runtime
+        else
+          Filename.concat (String.sub header_line 2 (header_length - 2))
+                          runtime
+      in
+      (String.sub header_line 0 2 = "#!", runtime)
+    in
+    if shebang then begin
+      (* Write the shebang header, then start recording *)
+      let bin_sh =
+        try input_line inchan
+        with End_of_file ->
+          raise (Error (Camlheader ("corrupt header", header)))
+      in
+      if String.length runtime > 125 || String.contains runtime ' ' then
+        (* shebang mustn't exceed 128 including the #! and \0 and can't
+           contain spaces. Use exec in a small shell script instead. *)
+        Printf.fprintf outchan "\
+          #!%s\n\
+          exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
+      else begin
+        output_string outchan "#!";
+        output_string outchan runtime;
+        output_char outchan '\n'
+      end;
+      Bytesections.init_record outchan
+    end else begin
+      copy_file inchan outchan;
+      (* The header is finished - the runtime name needs recording in RNTM,
+         so start recording now *)
+      Bytesections.init_record outchan;
+      output_string outchan runtime;
+      output_char outchan '\000';
+      Bytesections.record outchan "RNTM"
+    end;
+    close_in inchan;
+  with
+  | Not_found -> raise (Error (File_not_found header))
+  | Sys_error msg -> raise (Error (Camlheader (msg, header)))
+
 (* Create a bytecode executable file *)
 
 let link_bytecode ?final_name tolink exec_name standalone =
@@ -314,37 +379,12 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
-       if standalone && !Clflags.with_runtime then begin
-         (* Copy the header *)
-         let header =
-           if String.length !Clflags.use_runtime > 0
-           then "camlheader_ur" else "camlheader" ^ !Clflags.runtime_variant
-         in
-         try
-           let inchan = open_in_bin (Load_path.find header) in
-           copy_file inchan outchan;
-           close_in inchan
-         with
-         | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (msg, header)))
-       end;
-       Bytesections.init_record outchan;
-       (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 && !Clflags.with_runtime then
-       begin
-         let runtime = make_absolute !Clflags.use_runtime in
-         let runtime =
-           (* shebang mustn't exceed 128 including the #! and \0 *)
-           if String.length runtime > 125 || String.contains runtime ' ' then
-             "/bin/sh\n\
-              exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\""
-           else
-             runtime
-         in
-         output_string outchan runtime;
-         output_char outchan '\n';
-         Bytesections.record outchan "RNTM"
-       end;
+       (* Copy the header and set the path to the bytecode interpreter *)
+       if standalone && !Clflags.with_runtime then
+         (* write_header calls Bytesections.init_record *)
+         write_header outchan
+       else
+         Bytesections.init_record outchan;
        (* The bytecode *)
        let start_code = pos_out outchan in
        Symtable.init();
