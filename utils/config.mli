@@ -393,6 +393,11 @@ type search_method =
                            if that fails *)
 | Search               (** Always search for the interpreter *)
 
+val search_method : search_method
+(** Default search mechanism for bytecode executables
+
+    @since 5.5 *)
+
 val shebangscripts : bool
 (** Whether the target supports shebang scripts
 
