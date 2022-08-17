@@ -77,17 +77,35 @@ endif
 
 ifeq "$(SHEBANGSCRIPTS)" "true"
 
+ifeq "$(RUNTIME_HEADER_SEARCH)" "no"
 %header: %header.shebang
-	sed -e 's/^ *//;/^\(#[^!]\|$$\)/d' $< > $@
+else
+%header: %header.sh
+endif
+ifeq "$(RUNTIME_HEADER_SEARCH)" "yes"
+	sed -e 's/^\(>\| *\)//;/^\(#[^!]\|$$\)/d' $< > $@
+else
+	sed -e 's/^ *//;/^#[^!]/d;/^\(>\|$$\)/d' $< > $@
+endif
 
 else # Shebang scripts not supported
 
 %header: $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
+ifeq "$(RUNTIME_HEADER_SEARCH)" "no"
+  CHER_HEADER='/^\#!/s/^\#!/!\#/p'
+else
+ifeq "$(RUNTIME_HEADER_SEARCH)" "yes"
+  CHER_HEADER='/^\#!/s/^\#/!/p'
+else
+  CHER_HEADER='1s/.*/!!/p'
+endif
+endif
+
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
 %header: %header.shebang tmpheader.exe
 	rm -f $@.exe
-	sed -ne '/^\#!/s/^\#!/!\#/p' $< > $@
+	sed -ne $(CHER_HEADER) $< > $@
 	cat tmpheader.exe >> $@
 	rm -f tmpheader.exe
 
@@ -97,6 +115,10 @@ tmpheader.exe: $(HEADERPROGRAM).$(O)
 ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
+
+$(HEADERPROGRAM).$(O): OC_CPPFLAGS += \
+  -DOCAML_VERSION_MAJOR=$(OCAML_VERSION_MAJOR) \
+  -DOCAML_VERSION_MINOR=$(OCAML_VERSION_MINOR)
 
 $(HEADERPROGRAM).$(O): $(HEADERPROGRAM).c
 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
@@ -119,7 +141,7 @@ clean::
 
 .PHONY: distclean
 distclean: clean
-	rm -f *.shebang
+	rm -f *camlheader.sh *.shebang
 
 clean::
 	rm -f camlheader target_camlheader
