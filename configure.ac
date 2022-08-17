@@ -120,7 +120,6 @@ AC_SUBST([ocamlc_cflags])
 AC_SUBST([ocamlc_cppflags])
 AC_SUBST([flexdir])
 AC_SUBST([bootstrapping_flexdll])
-AC_SUBST([long_shebang])
 AC_SUBST([shebangscripts])
 AC_SUBST([AR])
 AC_SUBST([RANLIB])
@@ -578,19 +577,11 @@ AC_SYS_INTERPRETER
 
 shebangscripts=false
 launch_method='exe'
-long_shebang=false
 AS_IF([test "x$interpval" = "xyes"],
   [AS_CASE([$host],
     [*-cygwin|*-*-mingw32*|*-pc-windows], [],
     [shebangscripts=true
-    launch_method='sh'
-    prev_exec_prefix="$exec_prefix"
-    AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
-    eval "expanded_bindir=\"$bindir\""
-    exec_prefix="$prev_exec_prefix"
-    # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-    # 1 char suffix and the \0 leaving 115 characters
-    AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])]
+    launch_method='sh']
   )]
 )
 
