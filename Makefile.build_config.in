@@ -188,5 +188,8 @@ TSAN_NATIVE_RUNTIME_C_SOURCES = @tsan_native_runtime_c_sources@
 OCAML_RELEASE_NUMBER = @OCAML_RELEASE_NUMBER@
 
 ZINC_RUNTIME_ID = @zinc_runtime_id@
+ADDITIONAL_ZINC_RUNTIME_IDs = @zinc_runtime_additional@
 
 RELATIVE_LIBDIR = @relative_libdir@
+RUNTIME_SEARCH = @runtime_search@
+RUNTIME_SEARCH_TARGET = @runtime_search_target@
