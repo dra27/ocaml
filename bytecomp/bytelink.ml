@@ -19,6 +19,123 @@ open Misc
 open Config
 open Cmo_format
 
+module In_channel = struct
+  let with_open openfun s f =
+    let ic = openfun s in
+    Fun.protect ~finally:(fun () -> close_in_noerr ic)
+      (fun () -> f ic)
+
+  let with_open_bin s f =
+    with_open open_in_bin s f
+
+  let with_open_text s f =
+    with_open open_in s f
+
+  (* Read up to [len] bytes into [buf], starting at [ofs]. Return total bytes
+     read. *)
+  let read_upto ic buf ofs len =
+    let rec loop ofs len =
+      if len = 0 then ofs
+      else begin
+        let r = input ic buf ofs len in
+        if r = 0 then
+          ofs
+        else
+          loop (ofs + r) (len - r)
+      end
+    in
+    loop ofs len - ofs
+
+  (* Best effort attempt to return a buffer with >= (ofs + n) bytes of storage,
+     and such that it coincides with [buf] at indices < [ofs].
+
+     The returned buffer is equal to [buf] itself if it already has sufficient
+     free space.
+
+     The returned buffer may have *fewer* than [ofs + n] bytes of storage if
+     this number is > [Sys.max_string_length]. However the returned buffer will
+     *always* have > [ofs] bytes of storage. In the limiting case when [ofs =
+     len = Sys.max_string_length] (so that it is not possible to resize the
+     buffer at all), an exception is raised. *)
+
+  let ensure buf ofs n =
+    let len = Bytes.length buf in
+    if len >= ofs + n then buf
+    else begin
+      let new_len = ref len in
+      while !new_len < ofs + n do
+        new_len := 2 * !new_len + 1
+      done;
+      let new_len = !new_len in
+      let new_len =
+        if new_len <= Sys.max_string_length then
+          new_len
+        else if ofs < Sys.max_string_length then
+          Sys.max_string_length
+        else
+          failwith "In_channel.input_all: channel content \
+                    is larger than maximum string length"
+      in
+      let new_buf = Bytes.create new_len in
+      Bytes.blit buf 0 new_buf 0 ofs;
+      buf
+    end
+
+  let input_all ic =
+    let chunk_size = 65536 in (* IO_BUFFER_SIZE *)
+    let initial_size =
+      try
+        in_channel_length ic - pos_in ic
+      with Sys_error _ ->
+        -1
+    in
+    let initial_size = if initial_size < 0 then chunk_size else initial_size in
+    let initial_size =
+      if initial_size <= Sys.max_string_length then
+        initial_size
+      else
+        Sys.max_string_length
+    in
+    let buf = Bytes.create initial_size in
+    let nread = read_upto ic buf 0 initial_size in
+    if nread < initial_size then (* EOF reached, buffer partially filled *)
+      Bytes.sub_string buf 0 nread
+    else begin (* nread = initial_size, maybe EOF reached *)
+      match input_char ic with
+      | exception End_of_file ->
+          (* EOF reached, buffer is completely filled *)
+          Bytes.unsafe_to_string buf
+      | c ->
+          (* EOF not reached *)
+          let rec loop buf ofs =
+            let buf = ensure buf ofs chunk_size in
+            let rem = Bytes.length buf - ofs in
+            (* [rem] can be < [chunk_size] if buffer size close to
+               [Sys.max_string_length] *)
+            let r = read_upto ic buf ofs rem in
+            if r < rem then (* EOF reached *)
+              Bytes.sub_string buf 0 (ofs + r)
+            else (* r = rem *)
+              loop buf (ofs + rem)
+          in
+          let buf = ensure buf nread (chunk_size + 1) in
+          Bytes.set buf nread c;
+          loop buf (nread + 1)
+    end
+end
+
+module String = struct
+  include String
+
+  let exists p s =
+    let n = length s in
+    let rec loop i =
+      if i = n then false
+      else if p (unsafe_get s i) then true
+      else loop (succ i) in
+    loop 0
+end
+
 type error =
     File_not_found of string
   | Not_an_object_file of string
@@ -291,6 +408,176 @@ let make_absolute file =
   else Location.rewrite_absolute_path
          (Filename.concat (Sys.getcwd()) file)
 
+type launch_method =
+| Shebang_bin_sh of string
+| Shebang_runtime
+| Executable
+
+type runtime_launch_info = {
+  buffer : string;
+  bindir : string;
+  launcher : launch_method;
+  executable_offset : int
+}
+
+(* See https://www.in-ulm.de/~mascheck/various/shebang/#origin for a deep
+   dive into shebangs.
+   - Whitespace (space or horizontal tab) delimits the interpreter from an
+     optional argument
+   - The path clearly must not contain a linefeed
+   - A maximum length of 125 (128 less the #! and the newline) is picked as a
+     portable maximum (it's actually Linux's prior to kernel v5.1), rather than
+     actually probing the maximum length in configure *)
+let invalid_for_shebang_line path =
+  let invalid_char = function ' ' | '\t' | '\n' -> true | _ -> false in
+  String.length path > 125 || String.exists invalid_char path
+
+(* The runtime-launch-info file consists of two "lines" followed by binary data.
+   The file is _always_ LF-formatted, even on Windows. The sequence of bytes up
+   to the first '\n' is interpreted:
+     - "sh" - use a shebang-style launcher. If sh is needed, determine its
+              location from [command -p -v sh]
+     - "exe" - use the executable launcher contained in this runtime-launch-info
+               file.
+     - "/" ^ path - use a shebang-style launcher. If sh is needed, path is the
+                    absolute location of sh. path must be valid for a shebang
+                    line.
+   The second "line" is interpreted as the next "\000\n"-terminated sequence and
+   is the directory containing the default runtimes (ocamlrun, ocamlrund, etc.).
+   The null terminator is used since '\n' is valid in a nefarious installation
+   prefix but Posix forbids filenames including the nul character.
+   The remainder of the file is then the executable launcher for bytecode
+   programs (see stdlib/header{,nt}.c). *)
+
+let read_runtime_launch_info file =
+  let buffer =
+    try
+      In_channel.with_open_bin file In_channel.input_all
+    with Sys_error msg -> raise (Error (Camlheader (msg, file)))
+  in
+  try
+    let bindir_start = String.index buffer '\n' + 1 in
+    let bindir_end = String.index_from buffer bindir_start '\000' in
+    let bindir = String.sub buffer bindir_start (bindir_end - bindir_start) in
+    let executable_offset = bindir_end + 2 in
+    let launcher =
+      let kind = String.sub buffer 0 (bindir_start - 1) in
+      if kind = "exe" then
+        Executable
+      else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
+        Shebang_bin_sh kind
+      else
+        raise Not_found in
+    if String.length buffer < executable_offset
+       || buffer.[executable_offset - 1] <> '\n' then
+      raise Not_found
+    else
+      {bindir; launcher; buffer; executable_offset}
+  with Not_found ->
+    let prefix =
+      if String.length buffer >= 2 then
+        String.sub buffer 0 2
+      else
+        ""
+    in
+    if prefix = "#!" then
+      let runtime = String.sub buffer 2 (String.index buffer '\n' - 2) in
+      {bindir = Filename.dirname runtime; launcher = Shebang_bin_sh "sh";
+       buffer; executable_offset = 0}
+    else if prefix = "MZ" then
+      {bindir = ""; launcher = Executable; buffer; executable_offset = 0}
+    else
+      raise (Error (Camlheader ("corrupt header", file)))
+
+let find_bin_sh () =
+  let output_file = Filename.temp_file "caml_bin_sh" "" in
+  let result =
+  try
+    let cmd = "command -p -v sh > " ^ Filename.quote output_file in
+    if !Clflags.verbose then
+      Printf.eprintf "+ %s\n" cmd;
+    if Sys.command cmd = 0 then
+      In_channel.with_open_text output_file input_line
+    else
+      ""
+  with Sys_error _
+     | End_of_file -> ""
+  in
+  remove_file output_file;
+  result
+
+(* Writes the executable header to outchan and writes the RNTM section, if
+   needed. Returns a toc_writer (i.e. Bytesections.init_record is always
+   called) *)
+
+let write_header outchan =
+  let use_runtime, runtime =
+    if String.length !Clflags.use_runtime > 0 then
+      (true, make_absolute !Clflags.use_runtime)
+    else
+      (false, "ocamlrun" ^ !Clflags.runtime_variant)
+  in
+  (* Write the header *)
+  let runtime_info =
+    let header = "camlheader" in
+    try read_runtime_launch_info (Load_path.find header)
+    with Not_found -> raise (Error (File_not_found header))
+  in
+  let runtime =
+    (* Historically, the native Windows ports are assumed to be finding
+       ocamlrun using a PATH search. *)
+    if use_runtime || Sys.win32 then
+      runtime
+    else
+      Filename.concat runtime_info.bindir runtime
+  in
+  (* Determine which method will be used for launching the executable:
+     Executable: concatenate the bytecode image to the executable stub
+     Shebang_runtime: #! line with the required runtime
+     Shebang_bin_sh: #! for a shell script calling exec *)
+  let launcher =
+    if runtime_info.launcher = Executable then
+      Executable
+    else
+      if invalid_for_shebang_line runtime then
+        match runtime_info.launcher with
+        | Shebang_bin_sh sh ->
+            let sh =
+              if sh = "sh" then
+                find_bin_sh ()
+              else
+                sh in
+            if sh = "" || invalid_for_shebang_line sh then
+              Executable
+            else
+              Shebang_bin_sh sh
+        | _ ->
+            Executable
+      else
+        Shebang_runtime
+  in
+  match launcher with
+  | Shebang_runtime ->
+      (* Use the runtime directly *)
+      Printf.fprintf outchan "#!%s\n" runtime;
+      Bytesections.init_record outchan
+  | Shebang_bin_sh bin_sh ->
+      (* exec the runtime using sh *)
+      Printf.fprintf outchan "\
+        #!%s\n\
+        exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime);
+      Bytesections.init_record outchan
+  | Executable ->
+      (* Use the executable stub launcher *)
+      let pos = runtime_info.executable_offset in
+      let len = String.length runtime_info.buffer - pos in
+      output_substring outchan runtime_info.buffer pos len;
+      (* The runtime name needs recording in RNTM *)
+      let toc_writer = Bytesections.init_record outchan in
+      Printf.fprintf outchan "%s\000" runtime;
+      Bytesections.record outchan "RNTM";
+      toc_writer
+
 (* Create a bytecode executable file *)
 
 let link_bytecode ?final_name tolink exec_name standalone =
@@ -309,27 +596,11 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
-       if standalone then begin
-         (* Copy the header *)
-         let header =
-           if String.length !Clflags.use_runtime > 0
-           then "camlheader_ur" else "camlheader" ^ !Clflags.runtime_variant
-         in
-         try
-           let inchan = open_in_bin (Load_path.find header) in
-           copy_file inchan outchan;
-           close_in inchan
-         with
-         | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (header, msg)))
-       end;
-       Bytesections.init_record outchan;
-       (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 then begin
-         output_string outchan (make_absolute !Clflags.use_runtime);
-         output_char outchan '\n';
-         Bytesections.record outchan "RNTM"
-       end;
+       (* Write the header and set the path to the bytecode interpreter *)
+       if standalone then
+         write_header outchan
+       else
+         Bytesections.init_record outchan;
        (* The bytecode *)
        let start_code = pos_out outchan in
        Symtable.init();
