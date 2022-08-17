@@ -29,10 +29,7 @@ defaultentry: $(DEFAULT_BUILD_TARGET)
 
 include stdlib/StdlibModules
 
-RUNTIME_NAME = $(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID)$(EXE)
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) \
-        -use-prims runtime/primitives \
-        -use-runtime '$(subst ','\'',$(RUNTIME_NAME))'
+CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -I otherlibs/dynlink
 ARCHES=amd64 arm64 power s390x riscv
 VPATH = utils parsing typing bytecomp file_formats lambda middle_end \
@@ -616,10 +613,8 @@ $(foreach LIBRARY, $(OCAML_NATIVE_LIBRARIES),\
 
 USE_RUNTIME_PRIMS = \
   -use-prims ../runtime/primitives
-USE_RUNTIME = \
-  -use-runtime '\''$(subst ','\\\'\\\',$(RUNTIME_NAME))'\''
 USE_STDLIB = -nostdlib -I ../stdlib
-FLEXLINK_BOOT_OCAMLC_FLAGS = $(USE_RUNTIME_PRIMS) $(USE_RUNTIME) $(USE_STDLIB)
+FLEXLINK_BOOT_OCAMLC_FLAGS = $(USE_RUNTIME_PRIMS) $(USE_STDLIB)
 
 FLEXDLL_OBJECTS = \
   flexdll_$(FLEXDLL_CHAIN).$(O) flexdll_initer_$(FLEXDLL_CHAIN).$(O)
@@ -2502,6 +2497,12 @@ install::
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
 
+define LINK_ZINC
+install::
+	cd "$(INSTALL_BINDIR)" && $(LN) "$(1)$(EXE)" "$(2)$(EXE)"
+
+endef
+
 define INSTALL_RUNTIME
 install::
 	$(INSTALL_PROG) \
@@ -2509,9 +2510,9 @@ install::
 	    "$(INSTALL_BINDIR)/$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
 	cd "$(INSTALL_BINDIR)" && \
     $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
-	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
-	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
+
+$(foreach id, $(ZINC_RUNTIME_ID) $(ADDITIONAL_ZINC_RUNTIME_IDs), \
+  $(call LINK_ZINC,$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID),$(1)-$(id)))
 endef
 define INSTALL_RUNTIME_LIB
 ifeq "$(2)" "BYTECODE"

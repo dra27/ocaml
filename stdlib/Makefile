@@ -90,8 +90,12 @@ else # Windows
 HEADERPROGRAM = headernt
 endif
 
+$(HEADERPROGRAM).$(O): OC_CPPFLAGS += \
+  -DOCAML_VERSION_MAJOR=$(OCAML_VERSION_MAJOR) \
+  -DOCAML_VERSION_MINOR=$(OCAML_VERSION_MINOR)
+
 %-launch-info: %.info tmpheader.exe
-	@cat $^ >> $@
+	@cat $^ > $@
 
 .INTERMEDIATE: tmpheader.exe
 tmpheader.exe: $(HEADERPROGRAM).$(O)
