@@ -53,6 +53,7 @@ BUILD_MAP_CFLAGS = $(foreach flag, $(BUILD_MAP_FLAGS), \
 
 LAUNCH_METHOD = @launch_method@
 TARGET_LAUNCH_METHOD = @target_launch_method@
+TARGET_SEARCH_METHOD = @runtime_search_target@
 SUFFIXING = @suffixing@
 
 # Which tool to use to display differences between files
@@ -105,3 +106,5 @@ runtime_ASM_OBJECTS = $(addprefix runtime/,@runtime_asm_objects@)
 
 # Platform-dependent module for ocamlyacc
 ocamlyacc_WSTR_MODULE = @ocamlyacc_wstr_module@
+
+RUNTIME_SEARCH = @runtime_search@
