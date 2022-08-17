@@ -61,6 +61,7 @@ profinfo_width=0
 extralibs=
 bootstrapping_flexdll=false
 bindir_to_libdir=''
+runtime_search=no
 
 # Information about the package
 
@@ -72,9 +73,21 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 ## Output variables
 
+m4_cond(m4_bregexp(AC_PACKAGE_VERSION, [.*\(+dev\).*], [\1]), [+dev],
+  [m4_define([OCAML__DEVELOPMENT_VERSION], [true])],
+  [m4_define([OCAML__DEVELOPMENT_VERSION], [false])])
+
+m4_define([OCAML__VERSION_MAJOR],
+          m4_bregexp(AC_PACKAGE_VERSION, [^\([^.]*\).*], [\1]))
+m4_define([OCAML__VERSION_MINOR],
+          m4_bregexp(AC_PACKAGE_VERSION, [^[^.]*\.\([^.]*\).*], [\1]))
+
 AC_SUBST([CONFIGURE_ARGS])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
+AC_SUBST([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
+AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
+AC_SUBST([OCAML_DEVELOPMENT_VERSION], [OCAML__DEVELOPMENT_VERSION])
 AC_SUBST([CC])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
@@ -173,25 +186,33 @@ AC_SUBST([flexlink_flags])
 AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([bindir_exp])
+AC_SUBST([bindir_exp_sh])
 AC_SUBST([target_bindir])
 AC_SUBST([target_bindir_exp])
+AC_SUBST([target_bindir_exp_sh])
 AC_SUBST([bindir_to_libdir])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
 AC_SUBST([zinc_runtime_id])
+AC_SUBST([runtime_search])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.common])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/camlheader.shebang])
+AC_CONFIG_FILES([stdlib/camlheader.sh])
 AC_CONFIG_FILES([stdlib/target_camlheader.shebang])
+AC_CONFIG_FILES([stdlib/target_camlheader.sh])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+AC_CONFIG_FILES([utils/config.mlp])
 
 AC_CONFIG_COMMANDS([shebang],[],[
   sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
-    > stdlib/target_camlheader.shebang.in])
+    > stdlib/target_camlheader.shebang.in
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.sh.in \
+    > stdlib/target_camlheader.sh.in])
 
 # Checks for system types
 
@@ -406,6 +427,13 @@ AC_ARG_ENABLE([relative],
   [AS_HELP_STRING([--enable-relative],
     [try to locate the standard library using relative paths])])
 
+AC_ARG_ENABLE([runtime-search],
+  [AS_HELP_STRING([--enable-runtime-search],
+    [allow bytecode executables to search for ocamlrun])],
+  [AS_CASE([$enableval],[yes|no|always],[],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search]))])])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -487,10 +515,12 @@ AS_CASE([$host],
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    dir_sep="\\"
     OCAML_CHECK_LN_ON_WINDOWS
     unixlib="win32unix"
     ],
   [unix_or_win32="unix"
+  dir_sep='/'
   ln='ln -sf'
   unixlib="unix"])
 AS_CASE([$host],
@@ -1858,6 +1888,9 @@ AS_IF([test x"$enable_relative" = "xyes"],[
   dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
 ])
 
+AS_IF([test x"$enable_runtime_search" != 'x'],
+  [runtime_search="$enable_runtime_search"])
+
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [max_testsuite_dir_retries=1
@@ -1898,18 +1931,23 @@ AS_IF([test x"$bindir" = 'x${exec_prefix}/bin'],
       [bindir_exp="${prefix}/bin"])],
     [bindir_exp="${exec_prefix}/bin"])])
 AS_IF([test x"${target_bindir}" = 'x'],
-  [target_bindir='$(BINDIR)'
-  target_bindir_exp="$bindir_exp"],
+  [target_bindir_exp="$bindir_exp"],
   [target_bindir_exp="${target_bindir}"])
+
+bindir_exp="${bindir_exp%$dir_sep}$dir_sep"
+bindir_exp_sh="'$(echo "${bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+target_bindir_exp="${target_bindir_exp%$dir_sep}$dir_sep"
+target_bindir_exp_sh="'$(echo "${target_bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
 
 # Determine the RuntimeID (see runtime/Mangling.md)
 m4_define([ALPHABET],
           [0123456789abcdefghijklmnopqrstuv])
 alphabet='ALPHABET'
 
-m4_cond(m4_bregexp(AC_PACKAGE_VERSION, [.*\(+dev\).*], [\1]), [+dev],
-         [m4_define([ID_VERSION], m4_eval(OCAML__RELEASE_NUMBER << 1))],
-         [m4_define([ID_VERSION], m4_eval(1 + (OCAML__RELEASE_NUMBER << 1)))])
+m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
+  [m4_define([ID_VERSION], m4_eval(OCAML__RELEASE_NUMBER << 1))],
+  [m4_define([ID_VERSION], m4_eval(1 + (OCAML__RELEASE_NUMBER << 1)))])
 
 # Bits 0-4 (release bit + low 4 bits of release number)
 m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
