@@ -807,7 +807,6 @@ RANLIBCMD
 RANLIB
 AR
 shebangscripts
-long_shebang
 bootstrapping_flexdll
 flexdir
 ocamlc_cppflags
@@ -2865,7 +2864,6 @@ VERSION=4.11.3+relocatable
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
-
 
 
 
@@ -12538,7 +12536,6 @@ interpval=$ac_cv_sys_interpreter
 
 shebangscripts=false
 launch_method='exe'
-long_shebang=false
 if test "x$interpval" = "xyes"; then :
   case $host in #(
   *-cygwin|*-*-mingw32*|*-pc-windows) :
@@ -12546,17 +12543,6 @@ if test "x$interpval" = "xyes"; then :
   *) :
     shebangscripts=true
     launch_method='sh'
-    prev_exec_prefix="$exec_prefix"
-    if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
-fi
-    eval "expanded_bindir=\"$bindir\""
-    exec_prefix="$prev_exec_prefix"
-    # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-    # 1 char suffix and the \0 leaving 115 characters
-    if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
    ;;
 esac
 
