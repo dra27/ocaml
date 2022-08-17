@@ -954,3 +954,18 @@ module EnvLazy = struct
     loop !log
 
 end
+
+module RuntimeID = struct
+  let make_zinc ~static ~int31 release_number ~is_release =
+    if release_number > 63 then
+      invalid_arg "Invalid release_number";
+    let alphabet = "0123456789abcdefghijklmnopqrstuv" in
+    let zinc_id =
+      (if static then 0x100 else 0) lor
+      (if int31 then 0x80 else 0) lor
+      (release_number lsl 1) lor
+      (if is_release then 1 else 0)
+    in
+    Printf.sprintf
+      "00%c%c" alphabet.[zinc_id lsr 5] alphabet.[zinc_id land 0x1f]
+end
