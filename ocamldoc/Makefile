@@ -25,8 +25,7 @@ else
 endif
 
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
-  BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
-                   -use-runtime $(RUNTIME_NAME)
+  BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 else
   BYTELINK_FLAGS = -custom
 endif
