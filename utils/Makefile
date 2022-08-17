@@ -94,6 +94,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,SUFFIXING) \
 	    $(call SUBST_STRING,LAUNCH_METHOD_TARGET) \
+	    $(call SUBST_STRING,RUNTIME_SEARCH_TARGET) \
 	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
 	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \
 	    $< > $@
