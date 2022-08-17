@@ -85,6 +85,8 @@ unix_library=""
 unix_directory=""
 bindir_to_libdir=''
 relative_libdir=false
+runtime_search=false
+runtime_search_target=false
 
 # Information about the package
 
@@ -263,6 +265,9 @@ AC_SUBST([relative_libdir])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
 AC_SUBST([zinc_runtime_id])
+AC_SUBST([zinc_runtime_additional])
+AC_SUBST([runtime_search])
+AC_SUBST([runtime_search_target])
 
 ## Generated files
 
@@ -576,6 +581,28 @@ AC_ARG_ENABLE([relative],
   [AS_HELP_STRING([--enable-relative],
     [try to locate the standard library using relative paths])])
 
+AC_ARG_ENABLE([runtime-search],
+  [AS_HELP_STRING([--enable-runtime-search],
+    [allow the distribution's bytecode executables to search for ocamlrun])],
+  [AS_CASE([$enableval],
+    [no],[search_method='1'],
+    [yes],[search_method='2';runtime_search=true],
+    [always],[search_method='3';runtime_search=true],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search]))])],
+  [search_method='1'])
+
+AC_ARG_ENABLE([runtime-search-target],
+  [AS_HELP_STRING([--enable-runtime-search-target],
+    [allow bytecode executables produced by ocamlc to search for ocamlrun])],
+  [AS_CASE([$enableval],
+    [no],[target_search_method='1'],
+    [yes],[target_search_method='2';runtime_search_target=true],
+    [always],[target_search_method='3';runtime_search_target=true],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search-target]))])],
+  [target_search_method='1'])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -811,17 +838,21 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+  [printf '%s%s\n%s\000\n' "$search_method" "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$target_bindir" \
-    > stdlib/target_runtime.info],
+  printf '%s%s\n%s\000\n' "$target_search_method" "$target_launch_method" \
+    "$target_bindir" > stdlib/target_runtime.info],
 dnl These declarations are put in a here-document in configure, so the command
 dnl in '$(...)' _is_ evaluated as the content is written to config.status (by
 dnl standard interpretation of a here-document). The sed commands quote any
 dnl nefarious single quotes which may appear in any of the strings.
+dnl Since $search_method/$target_search_method are only ever 1, 2 or 3, no
+dnl escaping is done.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  search_method='$search_method'
+  target_search_method='$target_search_method'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   target_bindir='$(echo "$target_bindir" | sed -e "s/'/'\"'\"'/g")'])
 
@@ -2707,12 +2738,36 @@ m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
 
 # Bits 5-6 (high 2 bits of release number)
 quintet1=m4_eval(ID_VERSION >> 5)
-# Bit 7 (int31)
-AS_IF([! $arch64], [quintet1="4 + ${quintet1}"])
-# Bit 8 (no shared libraries)
-AS_IF([! $supports_shared_libraries], [quintet1="8 + ${quintet1}"])
-# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1a=''
+quintet1b=''
+quintet1c=''
+# Bits 7 & 8 (int31 + no shared libraries)
+AS_CASE([$arch64,$supports_shared_libraries],
+  [false,false],
+    dnl no int63 support; no support for shared libraries
+    [quintet1="8 + 4 + ${quintet1}"],
+  [false,true],
+    dnl no int63 support;
+    [quintet1a="8 + 4 + ${quintet1}"
+    quintet1="4 + ${quintet1}"],
+  [true,false],
+    dnl no shared library support
+    [quintet1a="8 + 4 + ${quintet1}"
+    quintet1="8 + ${quintet1}"],
+  [true,true],
+    [quintet1a="4 + ${quintet1}"
+    quintet1b="8 + ${quintet1}"
+    quintet1c="8 + 4 + ${quintet1}"])
 quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+AS_IF([test -n "${quintet1a}"],
+  [zinc_runtime_additional="00$(echo "${alphabet}" | \
+     cut -c $(expr ${quintet1a} + 1))QUINTET0"])
+AS_IF([test -n "${quintet1b}"],
+  [zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1b} + 1))QUINTET0"])
+AS_IF([test -n "${quintet1c}"],
+  [zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1c} + 1))QUINTET0"])
 
 # Bits 10-14 (number of reserved header bits)
 quintet2="$(echo "${alphabet}" | cut -c $(expr ${reserved_header_bits} + 1))"
