@@ -23,6 +23,16 @@
 val version: string
 (** The current version number of the system *)
 
+val release_number: int
+(** The release number for the compiler (Bits 1-6 of RuntimeID)
+
+    @since 5.1 *)
+
+val is_release: bool
+(** True if the release is an official OCaml release (Bit 0 of RuntimeID)
+
+    @since 5.1 *)
+
 val bindir: string
 (** The directory containing the binary programs. If the compiler was configured
     with [--enable-relative] then this will be the directory containing the
@@ -273,12 +283,6 @@ val afl_instrument : bool
 
 val bytecode_runtime_id : string
 (** The RuntimeID for ocamlrun and libcamlrun_shared
-
-    @since 5.1 *)
-
-val zinc_runtime_id : string
-(** {!bytecode_runtime_id} with the Zinc Mask (used in headers to refer portably
-    to ocamlrun)
 
     @since 5.1 *)
 
