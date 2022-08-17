@@ -54,8 +54,7 @@ NOSTDLIB= camlinternalFormatBasics.cmo stdlib.cmo
 OTHERS=$(filter-out $(NOSTDLIB),$(OBJS))
 
 .PHONY: all
-all: stdlib.cma std_exit.cmo bootheader $(HEADER_NAME) target_$(HEADER_NAME) \
-     camlheader_ur
+all: stdlib.cma std_exit.cmo $(HEADER_NAME) target_$(HEADER_NAME) camlheader_ur
 
 ifeq "$(RUNTIMED)" "true"
 all: target_camlheaderd
@@ -106,20 +105,11 @@ installopt-default:
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 HEADERPROGRAM = header
-HEADER_PATH = $(BINDIR)/
 else # Windows
 HEADERPROGRAM = headernt
-HEADER_PATH =
 endif
 
 ifeq "$(SHEBANGSCRIPTS)" "true"
-bootheader: $(ROOTDIR)/Makefile.config Makefile
-ifeq "$(LONG_SHEBANG)" "true"
-	$(V_GEN)echo '#!/bin/sh' > $@ && \
-	echo 'exec "$(BINDIR)/ocamlrun" "$$0" "$$@"' >> $@
-else
-	$(V_GEN)echo '#!$(BINDIR)/ocamlrun' > $@
-endif
 
 camlheader_ur: Makefile
 	$(V_GEN)echo '#!' | tr -d '\012' > $@
@@ -128,13 +118,6 @@ target_camlheader%: Makefile
 	$(V_GEN)echo '#!/usr/bin/false' > $@
 
 else # Hashbang scripts not supported
-
-bootheader: $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
-
-# $@.exe is deleted to ensure no Cygwin .exe mangling takes place
-bootheader: tmpheader.exe
-	$(V_GEN)rm -f $@.exe && \
-	cp $< $@
 
 camlheader_ur: tmpheader.exe
 	$(V_GEN)rm -f $@.exe && \
@@ -160,9 +143,6 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 	strip $@
 endif
 
-$(HEADERPROGRAM)%$(O): \
-  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
-
 stdlib.cma: $(OBJS)
 	$(V_LINKC)$(CAMLC) -a -o $@ $^
 
@@ -175,7 +155,7 @@ distclean: clean
 
 .PHONY: clean
 clean::
-	rm -f bootheader $(HEADER_NAME) target_$(HEADER_NAME)* camlheader_ur
+	rm -f $(HEADER_NAME) target_$(HEADER_NAME)* camlheader_ur
 
 export AWK
 
