@@ -24,6 +24,10 @@ INSTALL_PROG ?= $(INSTALL) -m u=rwx,g=rwx,o=rx
 # Git submodule)
 FLEXDLL_SOURCES=@flexdir@
 
+# Backported OCaml version macros
+OCAML_VERSION_MAJOR = @OCAML_VERSION_MAJOR@
+OCAML_VERSION_MINOR = @OCAML_VERSION_MINOR@
+
 # OCaml release number, relative to 3.12 (used for RuntimeID)
 OCAML_RELEASE_NUMBER = @OCAML_RELEASE_NUMBER@
 
@@ -78,8 +82,6 @@ endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
-RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun-$(ZINC_RUNTIME_ID)$(EXE)'
-
 ifeq "$(LIBDIR_REL)" ""
   SET_RELATIVE_STDLIB =
 else
@@ -90,6 +92,12 @@ endif
 DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
 
 ZINC_RUNTIME_ID = @zinc_runtime_id@
+
+# Location of sh (to use in a shebang line)
+SHEBANG_BIN_SH = @bin_sh@
+
+# Can bytecode executable headers search for the runtime
+RUNTIME_HEADER_SEARCH = @runtime_search@
 
 # Escape special characters in the argument string.
 # There are four characters that need escaping:
