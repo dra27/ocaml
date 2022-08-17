@@ -12737,18 +12737,6 @@ if test "x$interpval" = "xyes"; then :
     shebangscripts=false ;; #(
   *) :
     shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
-fi
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
-
      ;;
 esac
 else

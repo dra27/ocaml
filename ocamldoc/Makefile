@@ -20,6 +20,13 @@ include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLYACCFLAGS = --strict -v
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                   -use-runtime $(RUNTIME_NAME)
+else
+  BYTELINK_FLAGS = -custom
+endif
+
 OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
@@ -164,7 +171,8 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
 $(OCAMLDOC): $(EXECMOFILES)
-	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
+	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(BYTELINK_FLAGS) \
+    $(OCAMLDOC_BCLIBRARIES) $^
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc.opt))
 

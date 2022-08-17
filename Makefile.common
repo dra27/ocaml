@@ -92,6 +92,8 @@ endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
+RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun$(EXE)'
+
 # List of other libraries
 ALL_OTHERLIBS = dynlink str systhreads unix runtime_events
 

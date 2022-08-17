@@ -325,37 +325,54 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
+       (* Copy the header and set the path to the bytecode interpreter *)
        if standalone && !Clflags.with_runtime then begin
-         (* Copy the header *)
-         let header =
-           if String.length !Clflags.use_runtime > 0
-           then "camlheader_ur" else "camlheader" ^ !Clflags.runtime_variant
+         let header_size =
+           (* Copy the header *)
+           let header = "camlheader" in
+           try
+             let inchan = open_in_bin (Load_path.find header) in
+             let size = copy_file inchan outchan in
+             close_in inchan;
+             size
+           with
+           | Not_found -> raise (Error (File_not_found header))
+           | Sys_error msg -> raise (Error (Camlheader (header, msg)))
          in
-         try
-           let inchan = open_in_bin (Load_path.find header) in
-           ignore (copy_file inchan outchan);
-           close_in inchan
-         with
-         | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (header, msg)))
-       end;
-       Bytesections.init_record outchan;
-       (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 && !Clflags.with_runtime then
-       begin
-         let runtime = make_absolute !Clflags.use_runtime in
          let runtime =
-           (* shebang mustn't exceed 128 including the #! and \0 *)
-           if String.length runtime > 125 || String.contains runtime ' ' then
-             "/bin/sh\n\
-              exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\""
+           if String.length !Clflags.use_runtime > 0 then
+             make_absolute !Clflags.use_runtime
            else
-             runtime
+             let ocamlrun = Filename.concat Config.runtime_bindir "ocamlrun" in
+             (* The Cygwin port also installs binaries with .exe *)
+             ocamlrun ^ !Clflags.runtime_variant ^ Config.ext_exe
          in
-         output_string outchan runtime;
-         output_char outchan '\n';
-         Bytesections.record outchan "RNTM"
-       end;
+         (* No modern executable format can be as small as 2 bytes, so assume
+            that a header_size of 2 => "#!" was written *)
+         if header_size = 2 then begin
+           (* Finish the shebang header, then start recording *)
+           if String.length runtime > 125 || String.contains runtime ' ' then
+              (* shebang mustn't exceed 128 including the #! and \0 and can't
+                 contain spaces. Use exec in a small shell script instead. *)
+              Printf.fprintf outchan "\
+                /bin/sh\n\
+                exec %s \"$0\" \"$@\"" (Filename.quote runtime)
+           else
+             output_string outchan runtime;
+           output_char outchan '\n';
+           Bytesections.init_record outchan;
+         end else begin
+           (* The header is finished - the runtime name needs recording in RNTM,
+              so start recording now *)
+           Bytesections.init_record outchan;
+           output_string outchan runtime;
+           (* The RNTM section is read by the C executable header, so null
+              terminate it. *)
+           output_char outchan '\000';
+           Bytesections.record outchan "RNTM"
+         end
+       end else
+         Bytesections.init_record outchan;
        (* The bytecode *)
        let start_code = pos_out outchan in
        Symtable.init();

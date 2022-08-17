@@ -74,6 +74,7 @@ META
 /boot/ocamlrun
 /boot/ocamlruns
 /boot/camlheader
+/boot/camlheader_ur
 /boot/ocamlc.opt
 /boot/flexlink.byte
 
@@ -177,10 +178,6 @@ META
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
-/stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
-/stdlib/camlheader_ur
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml

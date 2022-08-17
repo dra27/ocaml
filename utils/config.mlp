@@ -15,6 +15,7 @@
 (**************************************************************************)
 
 let bindir = "%%BINDIR%%"
+let runtime_bindir = "%%TARGET_BINDIR%%"
 
 let standard_library_default = "%%LIBDIR%%"
 
