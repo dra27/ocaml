@@ -198,8 +198,11 @@ _build
 /runtime/sak
 
 /stdlib/camlheader
+/stdlib/camlheader.sh
 /stdlib/target_camlheader
 /stdlib/target_camlheader.shebang.in
+/stdlib/target_camlheader.sh
+/stdlib/target_camlheader.sh.in
 /stdlib/*.shebang
 /stdlib/labelled-*
 /stdlib/caml
@@ -267,6 +270,7 @@ _build
 /tools/caml-tex
 
 /utils/config.ml
+/utils/config.mlp
 
 /yacc/ocamlyacc
 /yacc/version.h
