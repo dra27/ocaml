@@ -113,6 +113,8 @@ otherlibs/unix/symlink_win32.c     typo.long-line
 
 runtime/sak.c            typo.non-ascii
 
+stdlib/camlheader.sh.in  typo.long-line
+
 testsuite/tests/**                                      typo.missing-header typo.long-line=may
 testsuite/tests/lib-bigarray-2/bigarrf.f                typo.tab
 testsuite/tests/lib-unix/win-stat/fakeclock.c           typo.missing-header=false
