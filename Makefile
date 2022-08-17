@@ -29,8 +29,7 @@ defaultentry: $(DEFAULT_BUILD_TARGET)
 
 include stdlib/StdlibModules
 
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) \
-        -use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
+CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -I otherlibs/dynlink
 ARCHES=amd64 arm64 power s390x riscv
 VPATH = utils parsing typing bytecomp file_formats lambda middle_end \
@@ -612,12 +611,8 @@ OCAML_NATIVE_LIBRARIES =
 $(foreach LIBRARY, $(OCAML_NATIVE_LIBRARIES),\
   $(eval $(call OCAML_NATIVE_LIBRARY,$(LIBRARY))))
 
-USE_RUNTIME_PRIMS = \
-  -use-prims ../runtime/primitives
-USE_RUNTIME = \
-  -use-runtime '\''$(subst ','\\\'\\\',$(RUNTIME_NAME))'\''
+USE_RUNTIME_PRIMS = -use-prims ../runtime/primitives
 USE_STDLIB = -nostdlib -I ../stdlib
-FLEXLINK_BOOT_OCAMLC_FLAGS = $(USE_RUNTIME_PRIMS) $(USE_RUNTIME) $(USE_STDLIB)
 
 FLEXDLL_OBJECTS = \
   flexdll_$(FLEXDLL_CHAIN).$(O) flexdll_initer_$(FLEXDLL_CHAIN).$(O)
@@ -636,7 +631,7 @@ flexlink.byte$(EXE): $(FLEXDLL_SOURCES)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlrun$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT='$(value BOOT_OCAMLC) $(FLEXLINK_BOOT_OCAMLC_FLAGS)' \
+	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
 	  flexlink.exe support
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe $@
 
