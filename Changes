@@ -2293,6 +2293,11 @@ Some of those changes will benefit all OCaml packages.
   with ZSTD support.
   (David Allsopp, review by Sébastien Hinderer)
 
+- #13???: New --enable-runtime-search extends the bytecode executeable header
+  to be able to search for the runtime interpreter in the directory containing
+  the executable and in PATH rather than relying on a single hard-coded path.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #8813, #12029: In the toplevel, let the user type several phrases in one line
