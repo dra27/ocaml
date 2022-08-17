@@ -205,9 +205,8 @@ _build
 
 /stdlib/camlheader
 /stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
-/stdlib/camlheader_ur
+/stdlib/target_camlheader.shebang.in
+/stdlib/*.shebang
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
