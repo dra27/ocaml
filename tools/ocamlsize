@@ -17,6 +17,19 @@
 
 foreach $f (@ARGV) {
     open(FILE, $f) || die("Cannot open $f");
+    read(FILE, $header, 2);
+    if ($header eq '#!') {
+      $path = <FILE>;
+      if ($path = '/bin/sh') {
+        # exec form of the shebang header
+        $path = <FILE>;
+        if ($path =~ s/^exec '(.*)' "\$0" "\$@\"$/$1/ > 0) {
+          $path =~ s/'\\''/'/g;
+        } else {
+          undef $path;
+        }
+      }
+    };
     seek(FILE, -16, 2);
     $num_sections = &read_int();
     read(FILE, $magic, 12);
@@ -31,14 +44,25 @@ foreach $f (@ARGV) {
         $length{$sec} = $seclength[$i];
     }
     print $f, ":\n" if ($#ARGV > 0);
-    $path =
-        $length{'RNTM'} > 0 ?
-            &read_section('RNTM') :
-            "(default runtime)\n";
+    if (not defined $path) {
+      if ($length{'RNTM'} > 0) {
+        # In --enable-runtime-search=always, use the first runtime (RNTM is
+        # 0<runtime1>0<runtime<2>0 etc.)
+        $path = &read_section('RNTM');
+        if ($path !~ s/^\0([^\0]+)\0.*/$1/) {
+          # Matches either the null-terminated full runtime path ($2 = '') or
+          # matches the directory portion in $1 and the name of the first
+          # runtime in $2
+          $path =~ s/^([^\0]+)\0?([^\0]*).*$/$1$2/;
+        }
+      } else {
+        $path = '(custom runtime)';
+      }
+    };
     printf ("\tcode: %-7d data: %-7d symbols: %-7d debug: %-7d\n",
             $length{'CODE'}, $length{'DATA'},
             $length{'SYMB'}, $length{'DBUG'});
-    printf ("\tmagic number: %s  runtime system: %s",
+    printf ("\tmagic number: %s  runtime system: %s\n",
             $magic, $path);
     close(FILE);
 }

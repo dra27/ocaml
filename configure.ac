@@ -61,6 +61,7 @@ instrumented_runtime=true
 force_instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+runtime_search=no
 
 # Information about the package
 
@@ -125,6 +126,7 @@ AC_SUBST([flexdir])
 AC_SUBST([bootstrapping_flexdll])
 AC_SUBST([long_shebang])
 AC_SUBST([shebangscripts])
+AC_SUBST([bin_sh])
 AC_SUBST([AR])
 AC_SUBST([mklib])
 AC_SUBST([supports_shared_libraries])
@@ -175,12 +177,21 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([force_instrumented_runtime])
 AC_SUBST([QS])
+AC_SUBST([runtime_search])
+AC_SUBST([bindir_exp])
+AC_SUBST([bindir_exp_sh])
+AC_SUBST([target_bindir_exp])
+AC_SUBST([target_bindir_exp_sh])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
+AC_CONFIG_FILES([stdlib/camlheader.sh])
+AC_CONFIG_FILES([stdlib/camlheader.shebang])
+AC_CONFIG_FILES([stdlib/target_camlheader.sh])
+AC_CONFIG_FILES([stdlib/target_camlheader.shebang])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
@@ -190,6 +201,12 @@ AC_CONFIG_FILES([compilerlibs/META])
 AC_CONFIG_FILES([otherlibs/dynlink/META])
 AC_CONFIG_FILES([otherlibs/runtime_events/META])
 AC_CONFIG_FILES([stdlib/META])
+
+AC_CONFIG_COMMANDS([shebang],[],[
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
+    > stdlib/target_camlheader.shebang.in
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.sh.in \
+    > stdlib/target_camlheader.sh.in])
 
 # Definitions related to the version of OCaml
 AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
@@ -426,6 +443,13 @@ AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
 
+AC_ARG_ENABLE([runtime-search],
+  [AS_HELP_STRING([--enable-runtime-search],
+    [allow bytecode executables to search for ocamlrun])],
+  [AS_CASE([$enableval],[yes|no|always],[],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search]))])])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -539,8 +563,10 @@ AS_CASE([$ocaml_cv_cc_vendor],
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    dir_sep="\\"
     ocamlyacc_wstr_module="yacc/wstr"],
   [unix_or_win32="unix"
+  dir_sep='/'
   ocamlyacc_wstr_module=""])
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
@@ -562,6 +588,7 @@ AS_IF([test x"$enable_str_lib" != "xno"],
 ## TODO: have two values, one for host and one for target
 AC_SYS_INTERPRETER
 
+bin_sh=''
 long_shebang=false
 AS_IF(
   [test "x$interpval" = "xyes"],
@@ -569,14 +596,13 @@ AS_IF(
       [*-cygwin|*-*-mingw32|*-pc-windows],
         [shebangscripts=false],
       [shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
-      ]
+      bin_sh="$(command -v sh 2>/dev/null)"
+      AS_IF([test x"$bin_sh" = 'x' || test x"${bin_sh#* }" != x"$bin_sh" \
+             || test "${#bin_sha}" -gt 125],
+        [AC_MSG_WARN([m4_normalize([could not determine a shebang-compatible
+                                   location of sh - #! scripts disabled])])
+        shebangscripts=false
+        bin_sh=''])]
     )],
   [shebangscripts=false]
 )
@@ -2088,6 +2114,9 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
 
+AS_IF([test x"$enable_runtime_search" != 'x'],
+  [runtime_search="$enable_runtime_search"])
+
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [AS_CASE([$WINDOWS_UNICODE_MODE],
@@ -2131,6 +2160,21 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
+
+AS_IF([test x"$bindir" = 'x${exec_prefix}/bin'],
+  [AS_IF([test x"$exec_prefix" = 'xNONE'],
+    [AS_IF([test x"$prefix" = 'xNONE'],
+      [bindir_exp="${ac_default_prefix}/bin"],
+      [bindir_exp="${prefix}/bin"])],
+    [bindir_exp="${exec_prefix}/bin"])],
+  [bindir_exp="$bindir"])
+target_bindir_exp="$bindir"
+
+bindir_exp="${bindir_exp%$dir_sep}$dir_sep"
+bindir_exp_sh="'$(echo "${bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+target_bindir_exp="${target_bindir_exp%$dir_sep}$dir_sep"
+target_bindir_exp_sh="'$(echo "${target_bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h

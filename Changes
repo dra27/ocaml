@@ -104,6 +104,11 @@ Working version
 
 ### Build system:
 
+- #11???: New --enable-runtime-search extends the bytecode executeable header
+  to be able to search for the runtime interpreter in the directory containing
+  the executable and in PATH rather than relying on a single hard-coded path.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #11302, #11412: `ocamlc` and `ocamlopt` should not remove generated files
