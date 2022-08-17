@@ -176,8 +176,11 @@ META
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
+/stdlib/camlheader.sh
 /stdlib/target_camlheader
 /stdlib/target_camlheader.shebang.in
+/stdlib/target_camlheader.sh
+/stdlib/target_camlheader.sh.in
 /stdlib/*.shebang
 /stdlib/labelled-*
 /stdlib/caml
@@ -246,6 +249,7 @@ META
 
 /utils/config_*.ml*
 /utils/config.ml
+/utils/config.common.ml
 /utils/domainstate.ml
 /utils/domainstate.mli
 
