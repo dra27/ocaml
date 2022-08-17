@@ -243,6 +243,28 @@ let rec transl_const = function
 
 (* Build the initial table of globals *)
 
+(* int63_mask is 0x7fffffff80000000 on a 64-bit system and 0 on a 32-bit
+   system *)
+let int63_mask = lnot (0x3fffffff lor (1 lsl 30))
+
+let rec const_needs_int63 = function
+  | Const_pointer i
+  | Const_base(Const_int i) ->
+      (i land int63_mask) <> 0
+  | Const_block(_, fields) ->
+      List.exists const_needs_int63 fields
+  | Const_base(Const_char _)
+  | Const_base(Const_string(_, _))
+  | Const_base(Const_float _)
+  | Const_base(Const_int32 _)
+  | Const_base(Const_int64 _)
+  | Const_base(Const_nativeint _)
+  | Const_float_array _
+  | Const_immstring _ -> false
+
+let initial_global_table_is_compat_32 () =
+  List.exists (fun (_, cst) -> const_needs_int63 cst) !literal_table
+
 let initial_global_table () =
   let glob = Array.make !global_table.cnt (Obj.repr 0) in
   List.iter
