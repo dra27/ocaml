@@ -105,6 +105,9 @@ otherlibs/win32unix/symlink.c     typo.long-line
 runtime/sak.c            typo.non-ascii
 runtime/caml/compatibility.h    typo.very-long-line
 
+stdlib/camlheader.sh.in         typo.long-line
+stdlib/target_camlheader.sh.in  typo.long-line
+
 testsuite/tests/**                                      typo.missing-header typo.long-line=may
 testsuite/tests/lib-bigarray-2/bigarrf.f                typo.tab
 testsuite/tests/lib-unix/win-stat/fakeclock.c           typo.missing-header=false
