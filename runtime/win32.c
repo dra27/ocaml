@@ -765,6 +765,27 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
   return lpBuffer;
 }
 
+static void win32_maperr(DWORD errcode)
+{
+  /* Modest attempt at mapping Win32 error codes to POSIX error codes.
+     The __dosmaperr() function from the CRT does a better job but is
+     generally not accessible. */
+  switch (errcode) {
+  case ERROR_FILE_NOT_FOUND: case ERROR_PATH_NOT_FOUND:
+    errno = ENOENT; break;
+  case ERROR_ACCESS_DENIED: case ERROR_WRITE_PROTECT: case ERROR_CANNOT_MAKE:
+    errno = EACCES; break;
+  case ERROR_CURRENT_DIRECTORY: case ERROR_BUSY:
+    errno = EBUSY; break;
+  case ERROR_NOT_SAME_DEVICE:
+    errno = EXDEV; break;
+  case ERROR_ALREADY_EXISTS:
+    errno = EEXIST; break;
+  default:
+    errno = EINVAL;
+  }
+}
+
 /* The rename() implementation in MSVC's CRT is based on MoveFile()
    and therefore fails if the new name exists.  This is inconsistent
    with POSIX and a problem in practice.  Here we reimplement
@@ -785,23 +806,7 @@ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
                  MOVEFILE_COPY_ALLOWED)) {
     return 0;
   }
-  /* Modest attempt at mapping Win32 error codes to POSIX error codes.
-     The __dosmaperr() function from the CRT does a better job but is
-     generally not accessible. */
-  switch (GetLastError()) {
-  case ERROR_FILE_NOT_FOUND: case ERROR_PATH_NOT_FOUND:
-    errno = ENOENT; break;
-  case ERROR_ACCESS_DENIED: case ERROR_WRITE_PROTECT: case ERROR_CANNOT_MAKE:
-    errno = EACCES; break;
-  case ERROR_CURRENT_DIRECTORY: case ERROR_BUSY:
-    errno = EBUSY; break;
-  case ERROR_NOT_SAME_DEVICE:
-    errno = EXDEV; break;
-  case ERROR_ALREADY_EXISTS:
-    errno = EEXIST; break;
-  default:
-    errno = EINVAL;
-  }
+  win32_maperr(GetLastError());
   return -1;
 }
 
