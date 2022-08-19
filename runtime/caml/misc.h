@@ -394,6 +394,15 @@ extern double caml_log1p(double);
 #define caml_stat_strdup_of_os caml_stat_strdup_of_utf16
 #define caml_copy_string_of_os caml_copy_string_of_utf16
 
+/* [caml_win32_maperr(errcode)] sets errno to an appropriate errno.h constant
+   for the Windows System Error Code errcode. If errcode is not recognised,
+   errno is set to -errcode.
+
+   (See https://pubs.opengroup.org/onlinepubs/9699919799/ and
+    https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes)
+*/
+CAMLextern int caml_win32_maperr(unsigned long);
+
 #else /* _WIN32 */
 
 #ifdef CAML_INTERNALS

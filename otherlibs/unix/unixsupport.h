@@ -85,8 +85,6 @@ extern int caml_win32_get_CRT_fd(value handle);
 extern SOCKET caml_win32_socket(int domain, int type, int protocol,
                                 LPWSAPROTOCOL_INFO info,
                                 BOOL inherit);
-
-extern void caml_win32_maperr(DWORD errcode);
 #endif /* _WIN32 */
 
 #define Nothing ((value) 0)
