@@ -770,6 +770,7 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
 struct error_entry { DWORD win_code; int range; int posix_code; };
 
 static struct error_entry win_error_table[] = {
+  /* UCRT mappings from misc/errno.cpp */
   { ERROR_INVALID_FUNCTION, 0, EINVAL },
   { ERROR_FILE_NOT_FOUND, 0, ENOENT },
   { ERROR_PATH_NOT_FOUND, 0, ENOENT },
@@ -823,6 +824,8 @@ static struct error_entry win_error_table[] = {
     ERROR_SHARING_BUFFER_EXCEEDED - ERROR_WRITE_PROTECT,
     EACCES },
   { ERROR_PRIVILEGE_NOT_HELD, 0, EPERM },
+  /* Limited mapping for Winsock. The Unix library uses a different trick
+     for the socket-specific error constants. */
   { WSAEINVAL, 0, EINVAL },
   { WSAEACCES, 0, EACCES },
   { WSAEBADF, 0, EBADF },
