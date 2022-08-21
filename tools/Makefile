@@ -314,7 +314,8 @@ checkstack$(EXE): checkstack.$(O)
 
 caml_tex := caml-tex$(EXE)
 
-$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+$(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
+                         -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
 	$(ROOTDIR)/runtime/ocamlrun$(EXE) $(ROOTDIR)/ocamlc$(EXE) -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
