@@ -18,6 +18,7 @@ ROOTDIR = ..
 -include $(ROOTDIR)/Makefile.config
 -include $(ROOTDIR)/Makefile.common
 
+RUNTIMEDIR=$(ROOTDIR)/runtime
 UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
@@ -25,7 +26,7 @@ CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
 CAMLC=$(CAMLRUN) $(ROOTDIR)/ocamlc -g -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
           -safe-string -strict-sequence -strict-formats
-LINKFLAGS=-linkall -I $(UNIXDIR)
+LINKFLAGS=-linkall -I $(UNIXDIR) -I $(RUNTIMEDIR)
 YACCFLAGS=
 CAMLLEX=$(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 CAMLDEP=$(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend
