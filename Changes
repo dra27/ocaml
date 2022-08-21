@@ -39,6 +39,10 @@ OCaml 4.12, maintenance version
 - #10045: Add libext variable to ocamltest and enable C# tests on on mingw
   (David Allsopp, review by Gabriel Scherer)
 
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 - #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
