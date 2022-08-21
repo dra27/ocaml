@@ -51,6 +51,12 @@ OCaml 4.09 maintenance branch
   Makefile.config.
   (Damien Doligez, review by Mark Shinwell and Gabriel Scherer)
 
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 - #8650: ensure that "make" variables are defined before use;
