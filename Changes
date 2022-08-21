@@ -18,6 +18,10 @@ OCaml 5.0 maintenance version
   bytecode executable (`ocamlc -custom`).
   (Antonin Décimo, review by Xavier Leroy)
 
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 - #11590: Allow installing to a destination path containing spaces.
