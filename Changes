@@ -13,6 +13,10 @@ OCaml 4.12, maintenance version
 - #11764: Add prototypes to old-style C function definitions.
   (Antonin Décimo, review by Xavier Leroy)
 
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 - #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
