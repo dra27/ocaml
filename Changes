@@ -43,6 +43,12 @@ OCaml 4.08 maintenance branch:
    Backported from OCaml 4.12.0
    (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
 
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 - #10835 Disable DT_TEXTREL warnings on x86 32 bit architecture by passing
