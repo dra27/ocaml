@@ -336,7 +336,8 @@ checkstack$(EXE): checkstack.$(O)
 
 #Scan latex files, and run ocaml code examples
 
-caml-tex: INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+caml-tex: INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
+                      -I $(ROOTDIR)/runtime
 caml-tex: $(CAMLTEX)
 	$(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlc -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
