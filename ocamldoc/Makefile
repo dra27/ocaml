@@ -54,7 +54,7 @@ endif
 
 
 INCLUDE_DIRS = $(addprefix $(ROOTDIR)/,\
-  utils parsing typing driver bytecomp toplevel) generators
+  runtime utils parsing typing driver bytecomp toplevel) generators
 INCLUDES_DEP = $(addprefix -I ,$(INCLUDE_DIRS))
 INCLUDES_NODEP = $(addprefix -I $(ROOTDIR)/,\
   compilerlibs otherlibs/str otherlibs/dynlink \
