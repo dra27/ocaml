@@ -1459,7 +1459,7 @@ ocamltex_MODULES = tools/ocamltex
 # of ocamltex.
 $(ocamltex): CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
 $(ocamltex): OC_COMMON_LDFLAGS += -linkall
-$(ocamltex): VPATH += $(addprefix otherlibs/,str unix)
+$(ocamltex): VPATH += $(addprefix otherlibs/,str unix) runtime
 
 tools/ocamltex.cmo: OC_COMMON_CFLAGS += -no-alias-deps
 
