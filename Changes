@@ -17,6 +17,10 @@ OCaml 4.14 maintenance version
 
 ### Internal/compiler-libs changes:
 
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 * #12751: --with-target-bindir configure option implemented. This option
