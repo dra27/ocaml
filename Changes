@@ -1,6 +1,14 @@
 OCaml 5.2 maintenance version
 -----------------------------
 
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
+### Bug fixes:
+
 - #13790: Fix bytecode-only build of Cygwin when flexlink is being bootstrapped
   with the compiler.
   (David Allsopp, review by Antonin Décimo and Miod Vallat)
