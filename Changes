@@ -458,6 +458,10 @@ Working version
   in preparation for quadratic-time fix
   (Gabriel Scherer, review by Enguerrand Decorne)
 
+- #12???: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #11590: Allow installing to a destination path containing spaces.
