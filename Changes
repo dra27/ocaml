@@ -23,6 +23,12 @@ OCaml 4.10 maintenance branch
   only needed for dllunix.dll).
   (David Allsopp, report by Andreas Hauptmann, review by Xavier Leroy)
 
+### Internal/compiler-libs changes:
+
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
+
 ### Build system:
 
 - #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
