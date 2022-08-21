@@ -108,6 +108,7 @@ INCLUDES_DEP=\
   -I $(ROOTDIR)/toplevel
 
 INCLUDES_NODEP=\
+  -I $(ROOTDIR)/runtime \
   -I $(ROOTDIR)/stdlib \
   -I $(ROOTDIR)/compilerlibs \
   -I $(ROOTDIR)/otherlibs/str \
