@@ -1,7 +1,9 @@
 OCaml 5.2 maintenance version
 -----------------------------
 
-
+- #12896: Simplify the compilation of custom bytecode runtimes by explicitly
+  compiling the primitives file before calling the linker.
+  (David Allsopp, review by Vincent Laviron)
 
 OCaml 5.2.1 (18 November 2024)
 ------------------------------
