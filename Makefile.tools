@@ -72,7 +72,7 @@ OCFLAGS=-nostdlib -I $(OTOPDIR)/stdlib $(COMPFLAGS)
 OCOPTFLAGS=
 
 ifeq ($(SUPPORTS_SHARED_LIBRARIES),false)
-  CUSTOM = -custom
+  CUSTOM = -I $(TOPDIR)/runtime
 else
   CUSTOM =
 endif
