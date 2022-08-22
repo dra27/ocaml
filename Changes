@@ -593,6 +593,11 @@ OCaml 4.14 maintenance branch
   must not have been declared by `CAMLlocalN`.
   (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
 
+### Bug fixes:
+
+- #11489, #11496: More prudent deallocation of alternate signal stack
+  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
+
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------

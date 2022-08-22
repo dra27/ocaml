@@ -517,6 +517,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 {
   caml_thread_t th = (caml_thread_t) arg;
   value clos;
+  void * signal_stack;
 #ifdef NATIVE_CODE
   struct longjmp_buffer termination_buf;
   char tos;
@@ -529,7 +530,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
   /* Acquire the global mutex */
   caml_leave_blocking_section();
   st_thread_set_id(Ident(th->descr));
-  caml_setup_stack_overflow_detection();
+  signal_stack = caml_setup_stack_overflow_detection();
 #ifdef NATIVE_CODE
   /* Setup termination handler (for caml_thread_exit) */
   if (sigsetjmp(termination_buf.buf, 0) == 0) {
@@ -543,7 +544,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 #ifdef NATIVE_CODE
   }
 #endif
-  caml_stop_stack_overflow_detection();
+  caml_stop_stack_overflow_detection(signal_stack);
   /* The thread now stops running */
   return 0;
 }
