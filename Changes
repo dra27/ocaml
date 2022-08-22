@@ -584,6 +584,9 @@ OCaml 5.0
   mingw-w64 i686 port.
   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 
+- #11489, #11496: More prudent deallocation of alternate signal stack
+  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
+
 ### Manual and documentation:
 
 - #11045, #11409: document that the array argument to `caml_callbackN`
