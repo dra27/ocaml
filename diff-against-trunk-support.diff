@@ -516,15 +516,15 @@ index 0000000000..56ea9e1793
 +   hence the value of Simple_float_const_opaque.f cannot be known
 +   preventing the static allocation of d *)
 diff --git a/testsuite/tests/backtrace/backtrace2.reference b/testsuite/tests/backtrace/backtrace2.reference
-index 20ef708fe0..54c5ab7570 100644
+index 62ae0cb77b..816405ff78 100644
 --- a/testsuite/tests/backtrace/backtrace2.reference
 +++ b/testsuite/tests/backtrace/backtrace2.reference
 @@ -35,7 +35,7 @@ Uncaught exception Invalid_argument("index out of bounds")
  Raised by primitive operation at Backtrace2.run in file "backtrace2.ml", line 62, characters 14-22
  test_Not_found
  Uncaught exception Not_found
--Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-+Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
+-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
  Called from Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 9-42
  Re-raised at Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 61-70
  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
@@ -538,8 +538,8 @@ index 20ef708fe0..54c5ab7570 100644
 +Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
  Uncaught exception Not_found
--Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-+Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
+-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
  Called from Backtrace2.test_lazy.exception_raised_internally in file "backtrace2.ml", line 50, characters 8-41
 -Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
 -Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
