@@ -1,6 +1,44 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1211985695
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,35 @@
++--- a	2023-09-28 18:45:27.047921523 +0100
+++++ b	2023-09-28 18:45:27.063922145 +0100
++@@ -1,17 +1,18 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -41,6 +41,10 @@ OCaml 4.14 maintenance branch
++-   mingw-w64 i686 port.
++-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
+++@@ -593,6 +593,11 @@ OCaml 4.14 maintenance branch
+++   must not have been declared by `CAMLlocalN`.
+++   (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
++  
++++### Bug fixes:
++++
++ +- #11489, #11496: More prudent deallocation of alternate signal stack
++ +  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
++ +
++-+
+++ 
++  OCaml 4.14.0 (28 March 2022)
++  ----------------------------
++- 
++ diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
++ --- a/otherlibs/systhreads/st_stubs.c
++ +++ b/otherlibs/systhreads/st_stubs.c
++@@ -44,7 +45,7 @@
++ diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
++ --- a/runtime/caml/signals.h
++ +++ b/runtime/caml/signals.h
++-@@ -87,8 +87,8 @@ value caml_do_pending_actions_exn (void);
+++@@ -84,8 +84,8 @@ value caml_do_pending_actions_exn (void);
++  value caml_process_pending_actions_with_root (value extra_root); // raises
++  value caml_process_pending_actions_with_root_exn (value extra_root);
++  int caml_set_signal_action(int signo, int action);
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,10 +52,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 839720bb70..4d6f19a725 100644
+index 839720bb70..2ff7371f33 100644
 --- a/Changes
 +++ b/Changes
-@@ -584,6 +584,16 @@ OCaml 5.0
+@@ -584,6 +584,21 @@ OCaml 5.0
    mingw-w64 i686 port.
    (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
  
@@ -30,11 +68,16 @@ index 839720bb70..4d6f19a725 100644
 +  must not have been declared by `CAMLlocalN`.
 +  (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
 +
++### Bug fixes:
++
++- #11489, #11496: More prudent deallocation of alternate signal stack
++  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
++
 +
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -619,13 +629,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -619,13 +634,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -50,7 +93,7 @@ index 839720bb70..4d6f19a725 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -729,6 +739,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -729,6 +744,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -60,7 +103,7 @@ index 839720bb70..4d6f19a725 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -988,6 +1001,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -988,6 +1006,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3643,10 +3686,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..68c246234e
+index 0000000000..c6cd8e9031
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2564 @@
+@@ -0,0 +1,2421 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -3670,7 +3713,7 @@ index 0000000000..68c246234e
 + #ifdef HAS_SIGWAIT
 +   sigset_t set;
 +diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
-+index 043e07031e..c1d8358e93 100644
++index 043e07031e..9dc38727a5 100644
 +--- a/otherlibs/systhreads/st_stubs.c
 ++++ b/otherlibs/systhreads/st_stubs.c
 +@@ -430,7 +430,7 @@ static void caml_thread_reinitialize(void)
@@ -3691,30 +3734,7 @@ index 0000000000..68c246234e
 + {
 +   if (caml_tick_thread_running){
 +     caml_tick_thread_stop = 1;
-+@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-+ {
-+   caml_thread_t th = (caml_thread_t) arg;
-+   value clos;
-+-  void * signal_stack;
-+ #ifdef NATIVE_CODE
-+   struct longjmp_buffer termination_buf;
-+   char tos;
-+@@ -537,7 +536,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-+   /* Acquire the global mutex */
-+   caml_leave_blocking_section();
-+   st_thread_set_id(Ident(th->descr));
-+-  signal_stack = caml_setup_stack_overflow_detection();
-++  caml_setup_stack_overflow_detection();
-+ #ifdef NATIVE_CODE
-+   /* Setup termination handler (for caml_thread_exit) */
-+   if (sigsetjmp(termination_buf.buf, 0) == 0) {
-+@@ -551,12 +550,12 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-+ #ifdef NATIVE_CODE
-+   }
-+ #endif
-+-  caml_stop_stack_overflow_detection(signal_stack);
-++  caml_stop_stack_overflow_detection();
-+   /* The thread now stops running */
++@@ -556,7 +556,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 +   return 0;
 + }
 + 
@@ -3723,7 +3743,7 @@ index 0000000000..68c246234e
 + {
 +   caml_thread_t th;
 +   st_retcode err;
-+@@ -663,7 +662,7 @@ CAMLexport int caml_c_thread_unregister(void)
++@@ -663,7 +663,7 @@ CAMLexport int caml_c_thread_unregister(void)
 + 
 + /* Return the current thread */
 + 
@@ -3732,7 +3752,7 @@ index 0000000000..68c246234e
 + {
 +   if (curr_thread == NULL)
 +     caml_invalid_argument("Thread.self: not initialized");
-+@@ -672,14 +671,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
++@@ -672,14 +672,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
 + 
 + /* Return the identifier of a thread */
 + 
@@ -3749,7 +3769,7 @@ index 0000000000..68c246234e
 + {
 +   char * msg = caml_format_exception(exn);
 +   fprintf(stderr, "Thread %d killed on uncaught exception %s\n",
-+@@ -692,7 +691,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
++@@ -692,7 +692,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
 + 
 + /* Terminate current thread */
 + 
@@ -3758,7 +3778,7 @@ index 0000000000..68c246234e
 + {
 +   struct longjmp_buffer * exit_buf = NULL;
 + 
-+@@ -723,7 +722,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
++@@ -723,7 +723,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
 + 
 + /* Allow re-scheduling */
 + 
@@ -3767,7 +3787,7 @@ index 0000000000..68c246234e
 + {
 +   if (st_masterlock_waiters(&caml_master_lock) == 0) return Val_unit;
 + 
-+@@ -744,7 +743,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
++@@ -744,7 +744,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
 + 
 + /* Suspend the current thread until another thread terminates */
 + 
@@ -3776,7 +3796,7 @@ index 0000000000..68c246234e
 + {
 +   st_retcode rc = caml_threadstatus_wait(Terminated(th));
 +   st_check_error(rc, "Thread.join");
-+@@ -783,7 +782,7 @@ static struct custom_operations caml_mutex_ops = {
++@@ -783,7 +783,7 @@ static struct custom_operations caml_mutex_ops = {
 +   custom_fixed_length_default
 + };
 + 
@@ -3785,7 +3805,7 @@ index 0000000000..68c246234e
 + {
 +   st_mutex mut = NULL;          /* suppress warning */
 +   value wrapper;
-+@@ -794,7 +793,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
++@@ -794,7 +794,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
 +   return wrapper;
 + }
 + 
@@ -3794,7 +3814,7 @@ index 0000000000..68c246234e
 + {
 +   st_mutex mut = Mutex_val(wrapper);
 +   st_retcode retcode;
-+@@ -811,7 +810,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
++@@ -811,7 +811,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
 +   return Val_unit;
 + }
 + 
@@ -3803,7 +3823,7 @@ index 0000000000..68c246234e
 + {
 +   st_mutex mut = Mutex_val(wrapper);
 +   st_retcode retcode;
-+@@ -821,7 +820,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
++@@ -821,7 +821,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
 +   return Val_unit;
 + }
 + 
@@ -3812,7 +3832,7 @@ index 0000000000..68c246234e
 + {
 +   st_mutex mut = Mutex_val(wrapper);
 +   st_retcode retcode;
-+@@ -863,7 +862,7 @@ static struct custom_operations caml_condition_ops = {
++@@ -863,7 +863,7 @@ static struct custom_operations caml_condition_ops = {
 +   custom_fixed_length_default
 + };
 + 
@@ -3821,7 +3841,7 @@ index 0000000000..68c246234e
 + {
 +   st_condvar cond = NULL;       /* suppress warning */
 +   value wrapper;
-+@@ -874,7 +873,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
++@@ -874,7 +874,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
 +   return wrapper;
 + }
 + 
@@ -3830,7 +3850,7 @@ index 0000000000..68c246234e
 + {
 +   st_condvar cond = Condition_val(wcond);
 +   st_mutex mut = Mutex_val(wmut);
-+@@ -889,14 +888,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
++@@ -889,14 +889,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
 +   return Val_unit;
 + }
 + 
@@ -5424,7 +5444,7 @@ index 0000000000..68c246234e
 + 
 + #undef HAS_SOCKETS
 +diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
-+index 62b0e7fafa..3a3b86911c 100644
++index 62b0e7fafa..0b8cc50064 100644
 +--- a/runtime/caml/signals.h
 ++++ b/runtime/caml/signals.h
 +@@ -20,9 +20,6 @@
@@ -5437,17 +5457,6 @@ index 0000000000..68c246234e
 + #include "misc.h"
 + #include "mlvalues.h"
 + 
-+@@ -87,8 +84,8 @@ value caml_do_pending_actions_exn (void);
-+ value caml_process_pending_actions_with_root (value extra_root); // raises
-+ value caml_process_pending_actions_with_root_exn (value extra_root);
-+ int caml_set_signal_action(int signo, int action);
-+-CAMLextern void * caml_setup_stack_overflow_detection(void);
-+-CAMLextern int caml_stop_stack_overflow_detection(void *);
-++CAMLextern int caml_setup_stack_overflow_detection(void);
-++CAMLextern int caml_stop_stack_overflow_detection(void);
-+ CAMLextern void caml_init_signals(void);
-+ CAMLextern void caml_terminate_signals(void);
-+ CAMLextern void (*caml_enter_blocking_section_hook)(void);
 +diff --git a/runtime/caml/sys.h b/runtime/caml/sys.h
 +index 75b97818c1..3b2d537ac4 100644
 +--- a/runtime/caml/sys.h
@@ -5944,115 +5953,6 @@ index 0000000000..68c246234e
 +         .quad   1               /* one descriptor */
 +         .quad   .L105           /* return address into callback */
 +         .short  -1              /* negative size count => use callback link */
-+diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
-+index 7cb461ac4d..439fb56404 100644
-+--- a/runtime/signals_byt.c
-++++ b/runtime/signals_byt.c
-+@@ -81,7 +81,7 @@ int caml_set_signal_action(int signo, int action)
-+     return 0;
-+ }
-+ 
-+-CAMLexport void * caml_setup_stack_overflow_detection(void) { return NULL; }
-+-CAMLexport int caml_stop_stack_overflow_detection(void * p) { return 0; }
-++CAMLexport int caml_setup_stack_overflow_detection(void) { return 0; }
-++CAMLexport int caml_stop_stack_overflow_detection(void) { return 0; }
-+ CAMLexport void caml_init_signals(void) { }
-+ CAMLexport void caml_terminate_signals(void) { }
-+diff --git a/runtime/signals_nat.c b/runtime/signals_nat.c
-+index 1dd8289c12..443f5d53b6 100644
-+--- a/runtime/signals_nat.c
-++++ b/runtime/signals_nat.c
-+@@ -254,10 +254,6 @@ DECLARE_SIGNAL_HANDLER(segv_handler)
-+ 
-+ /* Initialization of signal stuff */
-+ 
-+-#ifdef HAS_STACK_OVERFLOW_DETECTION
-+-static void * caml_signal_stack = NULL;
-+-#endif
-+-
-+ void caml_init_signals(void)
-+ {
-+   /* Bound-check trap handling */
-+@@ -282,8 +278,7 @@ void caml_init_signals(void)
-+ #endif
-+ 
-+ #ifdef HAS_STACK_OVERFLOW_DETECTION
-+-  caml_signal_stack = caml_setup_stack_overflow_detection();
-+-  if (caml_signal_stack != NULL) {
-++  if (caml_setup_stack_overflow_detection() != -1) {
-+     struct sigaction act;
-+     SET_SIGACT(act, segv_handler);
-+     act.sa_flags |= SA_ONSTACK | SA_NODEFER;
-+@@ -319,8 +314,7 @@ void caml_terminate_signals(void)
-+ 
-+ #ifdef HAS_STACK_OVERFLOW_DETECTION
-+   set_signal_default(SIGSEGV);
-+-  caml_stop_stack_overflow_detection(caml_signal_stack);
-+-  caml_signal_stack = NULL;
-++  caml_stop_stack_overflow_detection();
-+ #endif
-+ }
-+ 
-+@@ -329,44 +323,37 @@ void caml_terminate_signals(void)
-+    Each thread needs its own alternate stack.
-+    The alternate stack used to be statically-allocated for the main thread,
-+    but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
-+-   may not be a compile-time constant (issue #10250).
-+-   Return the dynamically-allocated alternate signal stack, or NULL
-+-   if an error occurred.
-+-   The returned pointer must be passed to [caml_stop_stack_overflow_detection].
-+-*/
-++   may not be a compile-time constant (issue #10250). */
-+ 
-+-CAMLexport void * caml_setup_stack_overflow_detection(void)
-++CAMLexport int caml_setup_stack_overflow_detection(void)
-+ {
-+ #ifdef HAS_STACK_OVERFLOW_DETECTION
-+   stack_t stk;
-++  stk.ss_sp = malloc(SIGSTKSZ);
-++  if (stk.ss_sp == NULL) return -1;
-+   stk.ss_size = SIGSTKSZ;
-+-  stk.ss_sp = malloc(stk.ss_size);
-+-  if (stk.ss_sp == NULL) return NULL;
-+   stk.ss_flags = 0;
-+   if (sigaltstack(&stk, NULL) == -1) {
-+     free(stk.ss_sp);
-+-    return NULL;
-++    return -1;
-+   }
-+-  return stk.ss_sp;
-+-#else
-+-  return NULL;
-+ #endif
-++  /* Success (or stack overflow detection not available) */
-++  return 0;
-+ }
-+ 
-+-CAMLexport int caml_stop_stack_overflow_detection(void * signal_stack)
-++CAMLexport int caml_stop_stack_overflow_detection(void)
-+ {
-+ #ifdef HAS_STACK_OVERFLOW_DETECTION
-+   stack_t oldstk, stk;
-+   stk.ss_flags = SS_DISABLE;
-+-  stk.ss_sp = NULL;  /* not required but avoids a valgrind false alarm */
-+-  stk.ss_size = SIGSTKSZ; /* macOS wants a valid size here */
-+   if (sigaltstack(&stk, &oldstk) == -1) return -1;
-+-  /* Check whether someone else installed their own signal stack */
-+-  if (!(oldstk.ss_flags & SS_DISABLE) && oldstk.ss_sp != signal_stack) {
-+-    /* Re-activate their signal stack. */
-+-    sigaltstack(&oldstk, NULL);
-+-  }
-+-  free(signal_stack);
-+-#endif
-++  /* If caml_setup_stack_overflow_detection failed, we are not using
-++     an alternate signal stack.  SS_DISABLE will be set in oldstk,
-++     and there is nothing to free in this case. */
-++  if (! (oldstk.ss_flags & SS_DISABLE)) free(oldstk.ss_sp);
-+   return 0;
-++#else
-++  return 0;
-++#endif
-+ }
 +diff --git a/runtime/sys.c b/runtime/sys.c
 +index a77fd9d1cf..9508d3f903 100644
 +--- a/runtime/sys.c
@@ -10033,13 +9933,51 @@ index 0000000000..9a704fdceb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2876ef0b0a
+index 0000000000..1994f0c438
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10013 @@
+@@ -0,0 +1,9906 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1211985695
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,35 @@
+++--- a	2023-09-28 18:45:27.047921523 +0100
++++++ b	2023-09-28 18:45:27.063922145 +0100
+++@@ -1,17 +1,18 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -41,6 +41,10 @@ OCaml 4.14 maintenance branch
+++-   mingw-w64 i686 port.
+++-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
++++@@ -593,6 +593,11 @@ OCaml 4.14 maintenance branch
++++   must not have been declared by `CAMLlocalN`.
++++   (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
+++  
+++++### Bug fixes:
+++++
+++ +- #11489, #11496: More prudent deallocation of alternate signal stack
+++ +  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
+++ +
+++-+
++++ 
+++  OCaml 4.14.0 (28 March 2022)
+++  ----------------------------
+++- 
+++ diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
+++ --- a/otherlibs/systhreads/st_stubs.c
+++ +++ b/otherlibs/systhreads/st_stubs.c
+++@@ -44,7 +45,7 @@
+++ diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
+++ --- a/runtime/caml/signals.h
+++ +++ b/runtime/caml/signals.h
+++-@@ -87,8 +87,8 @@ value caml_do_pending_actions_exn (void);
++++@@ -84,8 +84,8 @@ value caml_do_pending_actions_exn (void);
+++  value caml_process_pending_actions_with_root (value extra_root); // raises
+++  value caml_process_pending_actions_with_root_exn (value extra_root);
+++  int caml_set_signal_action(int signo, int action);
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -10053,10 +9991,10 @@ index 0000000000..2876ef0b0a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 839720bb70..4d6f19a725 100644
++index 839720bb70..2ff7371f33 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -584,6 +584,16 @@ OCaml 5.0
++@@ -584,6 +584,21 @@ OCaml 5.0
 +   mingw-w64 i686 port.
 +   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 + 
@@ -10069,11 +10007,16 @@ index 0000000000..2876ef0b0a
 ++  must not have been declared by `CAMLlocalN`.
 ++  (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
 ++
+++### Bug fixes:
+++
+++- #11489, #11496: More prudent deallocation of alternate signal stack
+++  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
+++
 ++
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -619,13 +629,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -619,13 +634,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10089,7 +10032,7 @@ index 0000000000..2876ef0b0a
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -729,6 +739,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -729,6 +744,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10099,7 +10042,7 @@ index 0000000000..2876ef0b0a
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -988,6 +1001,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -988,6 +1006,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13682,10 +13625,10 @@ index 0000000000..2876ef0b0a
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..68c246234e
++index 0000000000..c6cd8e9031
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2564 @@
++@@ -0,0 +1,2421 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -13709,7 +13652,7 @@ index 0000000000..2876ef0b0a
 ++ #ifdef HAS_SIGWAIT
 ++   sigset_t set;
 ++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
-++index 043e07031e..c1d8358e93 100644
+++index 043e07031e..9dc38727a5 100644
 ++--- a/otherlibs/systhreads/st_stubs.c
 +++++ b/otherlibs/systhreads/st_stubs.c
 ++@@ -430,7 +430,7 @@ static void caml_thread_reinitialize(void)
@@ -13730,30 +13673,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   if (caml_tick_thread_running){
 ++     caml_tick_thread_stop = 1;
-++@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-++ {
-++   caml_thread_t th = (caml_thread_t) arg;
-++   value clos;
-++-  void * signal_stack;
-++ #ifdef NATIVE_CODE
-++   struct longjmp_buffer termination_buf;
-++   char tos;
-++@@ -537,7 +536,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-++   /* Acquire the global mutex */
-++   caml_leave_blocking_section();
-++   st_thread_set_id(Ident(th->descr));
-++-  signal_stack = caml_setup_stack_overflow_detection();
-+++  caml_setup_stack_overflow_detection();
-++ #ifdef NATIVE_CODE
-++   /* Setup termination handler (for caml_thread_exit) */
-++   if (sigsetjmp(termination_buf.buf, 0) == 0) {
-++@@ -551,12 +550,12 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-++ #ifdef NATIVE_CODE
-++   }
-++ #endif
-++-  caml_stop_stack_overflow_detection(signal_stack);
-+++  caml_stop_stack_overflow_detection();
-++   /* The thread now stops running */
+++@@ -556,7 +556,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 ++   return 0;
 ++ }
 ++ 
@@ -13762,7 +13682,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   caml_thread_t th;
 ++   st_retcode err;
-++@@ -663,7 +662,7 @@ CAMLexport int caml_c_thread_unregister(void)
+++@@ -663,7 +663,7 @@ CAMLexport int caml_c_thread_unregister(void)
 ++ 
 ++ /* Return the current thread */
 ++ 
@@ -13771,7 +13691,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   if (curr_thread == NULL)
 ++     caml_invalid_argument("Thread.self: not initialized");
-++@@ -672,14 +671,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
+++@@ -672,14 +672,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
 ++ 
 ++ /* Return the identifier of a thread */
 ++ 
@@ -13788,7 +13708,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   char * msg = caml_format_exception(exn);
 ++   fprintf(stderr, "Thread %d killed on uncaught exception %s\n",
-++@@ -692,7 +691,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
+++@@ -692,7 +692,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
 ++ 
 ++ /* Terminate current thread */
 ++ 
@@ -13797,7 +13717,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   struct longjmp_buffer * exit_buf = NULL;
 ++ 
-++@@ -723,7 +722,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
+++@@ -723,7 +723,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
 ++ 
 ++ /* Allow re-scheduling */
 ++ 
@@ -13806,7 +13726,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   if (st_masterlock_waiters(&caml_master_lock) == 0) return Val_unit;
 ++ 
-++@@ -744,7 +743,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
+++@@ -744,7 +744,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
 ++ 
 ++ /* Suspend the current thread until another thread terminates */
 ++ 
@@ -13815,7 +13735,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_retcode rc = caml_threadstatus_wait(Terminated(th));
 ++   st_check_error(rc, "Thread.join");
-++@@ -783,7 +782,7 @@ static struct custom_operations caml_mutex_ops = {
+++@@ -783,7 +783,7 @@ static struct custom_operations caml_mutex_ops = {
 ++   custom_fixed_length_default
 ++ };
 ++ 
@@ -13824,7 +13744,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_mutex mut = NULL;          /* suppress warning */
 ++   value wrapper;
-++@@ -794,7 +793,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
+++@@ -794,7 +794,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
 ++   return wrapper;
 ++ }
 ++ 
@@ -13833,7 +13753,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_mutex mut = Mutex_val(wrapper);
 ++   st_retcode retcode;
-++@@ -811,7 +810,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
+++@@ -811,7 +811,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
 ++   return Val_unit;
 ++ }
 ++ 
@@ -13842,7 +13762,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_mutex mut = Mutex_val(wrapper);
 ++   st_retcode retcode;
-++@@ -821,7 +820,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
+++@@ -821,7 +821,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
 ++   return Val_unit;
 ++ }
 ++ 
@@ -13851,7 +13771,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_mutex mut = Mutex_val(wrapper);
 ++   st_retcode retcode;
-++@@ -863,7 +862,7 @@ static struct custom_operations caml_condition_ops = {
+++@@ -863,7 +863,7 @@ static struct custom_operations caml_condition_ops = {
 ++   custom_fixed_length_default
 ++ };
 ++ 
@@ -13860,7 +13780,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_condvar cond = NULL;       /* suppress warning */
 ++   value wrapper;
-++@@ -874,7 +873,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
+++@@ -874,7 +874,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
 ++   return wrapper;
 ++ }
 ++ 
@@ -13869,7 +13789,7 @@ index 0000000000..2876ef0b0a
 ++ {
 ++   st_condvar cond = Condition_val(wcond);
 ++   st_mutex mut = Mutex_val(wmut);
-++@@ -889,14 +888,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
+++@@ -889,14 +889,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
 ++   return Val_unit;
 ++ }
 ++ 
@@ -15463,7 +15383,7 @@ index 0000000000..2876ef0b0a
 ++ 
 ++ #undef HAS_SOCKETS
 ++diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
-++index 62b0e7fafa..3a3b86911c 100644
+++index 62b0e7fafa..0b8cc50064 100644
 ++--- a/runtime/caml/signals.h
 +++++ b/runtime/caml/signals.h
 ++@@ -20,9 +20,6 @@
@@ -15476,17 +15396,6 @@ index 0000000000..2876ef0b0a
 ++ #include "misc.h"
 ++ #include "mlvalues.h"
 ++ 
-++@@ -87,8 +84,8 @@ value caml_do_pending_actions_exn (void);
-++ value caml_process_pending_actions_with_root (value extra_root); // raises
-++ value caml_process_pending_actions_with_root_exn (value extra_root);
-++ int caml_set_signal_action(int signo, int action);
-++-CAMLextern void * caml_setup_stack_overflow_detection(void);
-++-CAMLextern int caml_stop_stack_overflow_detection(void *);
-+++CAMLextern int caml_setup_stack_overflow_detection(void);
-+++CAMLextern int caml_stop_stack_overflow_detection(void);
-++ CAMLextern void caml_init_signals(void);
-++ CAMLextern void caml_terminate_signals(void);
-++ CAMLextern void (*caml_enter_blocking_section_hook)(void);
 ++diff --git a/runtime/caml/sys.h b/runtime/caml/sys.h
 ++index 75b97818c1..3b2d537ac4 100644
 ++--- a/runtime/caml/sys.h
@@ -15983,115 +15892,6 @@ index 0000000000..2876ef0b0a
 ++         .quad   1               /* one descriptor */
 ++         .quad   .L105           /* return address into callback */
 ++         .short  -1              /* negative size count => use callback link */
-++diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
-++index 7cb461ac4d..439fb56404 100644
-++--- a/runtime/signals_byt.c
-+++++ b/runtime/signals_byt.c
-++@@ -81,7 +81,7 @@ int caml_set_signal_action(int signo, int action)
-++     return 0;
-++ }
-++ 
-++-CAMLexport void * caml_setup_stack_overflow_detection(void) { return NULL; }
-++-CAMLexport int caml_stop_stack_overflow_detection(void * p) { return 0; }
-+++CAMLexport int caml_setup_stack_overflow_detection(void) { return 0; }
-+++CAMLexport int caml_stop_stack_overflow_detection(void) { return 0; }
-++ CAMLexport void caml_init_signals(void) { }
-++ CAMLexport void caml_terminate_signals(void) { }
-++diff --git a/runtime/signals_nat.c b/runtime/signals_nat.c
-++index 1dd8289c12..443f5d53b6 100644
-++--- a/runtime/signals_nat.c
-+++++ b/runtime/signals_nat.c
-++@@ -254,10 +254,6 @@ DECLARE_SIGNAL_HANDLER(segv_handler)
-++ 
-++ /* Initialization of signal stuff */
-++ 
-++-#ifdef HAS_STACK_OVERFLOW_DETECTION
-++-static void * caml_signal_stack = NULL;
-++-#endif
-++-
-++ void caml_init_signals(void)
-++ {
-++   /* Bound-check trap handling */
-++@@ -282,8 +278,7 @@ void caml_init_signals(void)
-++ #endif
-++ 
-++ #ifdef HAS_STACK_OVERFLOW_DETECTION
-++-  caml_signal_stack = caml_setup_stack_overflow_detection();
-++-  if (caml_signal_stack != NULL) {
-+++  if (caml_setup_stack_overflow_detection() != -1) {
-++     struct sigaction act;
-++     SET_SIGACT(act, segv_handler);
-++     act.sa_flags |= SA_ONSTACK | SA_NODEFER;
-++@@ -319,8 +314,7 @@ void caml_terminate_signals(void)
-++ 
-++ #ifdef HAS_STACK_OVERFLOW_DETECTION
-++   set_signal_default(SIGSEGV);
-++-  caml_stop_stack_overflow_detection(caml_signal_stack);
-++-  caml_signal_stack = NULL;
-+++  caml_stop_stack_overflow_detection();
-++ #endif
-++ }
-++ 
-++@@ -329,44 +323,37 @@ void caml_terminate_signals(void)
-++    Each thread needs its own alternate stack.
-++    The alternate stack used to be statically-allocated for the main thread,
-++    but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
-++-   may not be a compile-time constant (issue #10250).
-++-   Return the dynamically-allocated alternate signal stack, or NULL
-++-   if an error occurred.
-++-   The returned pointer must be passed to [caml_stop_stack_overflow_detection].
-++-*/
-+++   may not be a compile-time constant (issue #10250). */
-++ 
-++-CAMLexport void * caml_setup_stack_overflow_detection(void)
-+++CAMLexport int caml_setup_stack_overflow_detection(void)
-++ {
-++ #ifdef HAS_STACK_OVERFLOW_DETECTION
-++   stack_t stk;
-+++  stk.ss_sp = malloc(SIGSTKSZ);
-+++  if (stk.ss_sp == NULL) return -1;
-++   stk.ss_size = SIGSTKSZ;
-++-  stk.ss_sp = malloc(stk.ss_size);
-++-  if (stk.ss_sp == NULL) return NULL;
-++   stk.ss_flags = 0;
-++   if (sigaltstack(&stk, NULL) == -1) {
-++     free(stk.ss_sp);
-++-    return NULL;
-+++    return -1;
-++   }
-++-  return stk.ss_sp;
-++-#else
-++-  return NULL;
-++ #endif
-+++  /* Success (or stack overflow detection not available) */
-+++  return 0;
-++ }
-++ 
-++-CAMLexport int caml_stop_stack_overflow_detection(void * signal_stack)
-+++CAMLexport int caml_stop_stack_overflow_detection(void)
-++ {
-++ #ifdef HAS_STACK_OVERFLOW_DETECTION
-++   stack_t oldstk, stk;
-++   stk.ss_flags = SS_DISABLE;
-++-  stk.ss_sp = NULL;  /* not required but avoids a valgrind false alarm */
-++-  stk.ss_size = SIGSTKSZ; /* macOS wants a valid size here */
-++   if (sigaltstack(&stk, &oldstk) == -1) return -1;
-++-  /* Check whether someone else installed their own signal stack */
-++-  if (!(oldstk.ss_flags & SS_DISABLE) && oldstk.ss_sp != signal_stack) {
-++-    /* Re-activate their signal stack. */
-++-    sigaltstack(&oldstk, NULL);
-++-  }
-++-  free(signal_stack);
-++-#endif
-+++  /* If caml_setup_stack_overflow_detection failed, we are not using
-+++     an alternate signal stack.  SS_DISABLE will be set in oldstk,
-+++     and there is nothing to free in this case. */
-+++  if (! (oldstk.ss_flags & SS_DISABLE)) free(oldstk.ss_sp);
-++   return 0;
-+++#else
-+++  return 0;
-+++#endif
-++ }
 ++diff --git a/runtime/sys.c b/runtime/sys.c
 ++index a77fd9d1cf..9508d3f903 100644
 ++--- a/runtime/sys.c
@@ -20042,14 +19842,7 @@ index 0000000000..2876ef0b0a
 ++--- a/tools/ci/appveyor/appveyor_build.sh
 +++++ b/tools/ci/appveyor/appveyor_build.sh
 ++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++      
+++         mingw6
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

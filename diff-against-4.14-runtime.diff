@@ -21,7 +21,7 @@ index 957f4717b6..09b243f6a5 100644
  #ifdef HAS_SIGWAIT
    sigset_t set;
 diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
-index 043e07031e..c1d8358e93 100644
+index 043e07031e..9dc38727a5 100644
 --- a/otherlibs/systhreads/st_stubs.c
 +++ b/otherlibs/systhreads/st_stubs.c
 @@ -430,7 +430,7 @@ static void caml_thread_reinitialize(void)
@@ -42,30 +42,7 @@ index 043e07031e..c1d8358e93 100644
  {
    if (caml_tick_thread_running){
      caml_tick_thread_stop = 1;
-@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
- {
-   caml_thread_t th = (caml_thread_t) arg;
-   value clos;
--  void * signal_stack;
- #ifdef NATIVE_CODE
-   struct longjmp_buffer termination_buf;
-   char tos;
-@@ -537,7 +536,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
-   /* Acquire the global mutex */
-   caml_leave_blocking_section();
-   st_thread_set_id(Ident(th->descr));
--  signal_stack = caml_setup_stack_overflow_detection();
-+  caml_setup_stack_overflow_detection();
- #ifdef NATIVE_CODE
-   /* Setup termination handler (for caml_thread_exit) */
-   if (sigsetjmp(termination_buf.buf, 0) == 0) {
-@@ -551,12 +550,12 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
- #ifdef NATIVE_CODE
-   }
- #endif
--  caml_stop_stack_overflow_detection(signal_stack);
-+  caml_stop_stack_overflow_detection();
-   /* The thread now stops running */
+@@ -556,7 +556,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
    return 0;
  }
  
@@ -74,7 +51,7 @@ index 043e07031e..c1d8358e93 100644
  {
    caml_thread_t th;
    st_retcode err;
-@@ -663,7 +662,7 @@ CAMLexport int caml_c_thread_unregister(void)
+@@ -663,7 +663,7 @@ CAMLexport int caml_c_thread_unregister(void)
  
  /* Return the current thread */
  
@@ -83,7 +60,7 @@ index 043e07031e..c1d8358e93 100644
  {
    if (curr_thread == NULL)
      caml_invalid_argument("Thread.self: not initialized");
-@@ -672,14 +671,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
+@@ -672,14 +672,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
  
  /* Return the identifier of a thread */
  
@@ -100,7 +77,7 @@ index 043e07031e..c1d8358e93 100644
  {
    char * msg = caml_format_exception(exn);
    fprintf(stderr, "Thread %d killed on uncaught exception %s\n",
-@@ -692,7 +691,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
+@@ -692,7 +692,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
  
  /* Terminate current thread */
  
@@ -109,7 +86,7 @@ index 043e07031e..c1d8358e93 100644
  {
    struct longjmp_buffer * exit_buf = NULL;
  
-@@ -723,7 +722,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
+@@ -723,7 +723,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
  
  /* Allow re-scheduling */
  
@@ -118,7 +95,7 @@ index 043e07031e..c1d8358e93 100644
  {
    if (st_masterlock_waiters(&caml_master_lock) == 0) return Val_unit;
  
-@@ -744,7 +743,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
+@@ -744,7 +744,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
  
  /* Suspend the current thread until another thread terminates */
  
@@ -127,7 +104,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_retcode rc = caml_threadstatus_wait(Terminated(th));
    st_check_error(rc, "Thread.join");
-@@ -783,7 +782,7 @@ static struct custom_operations caml_mutex_ops = {
+@@ -783,7 +783,7 @@ static struct custom_operations caml_mutex_ops = {
    custom_fixed_length_default
  };
  
@@ -136,7 +113,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_mutex mut = NULL;          /* suppress warning */
    value wrapper;
-@@ -794,7 +793,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
+@@ -794,7 +794,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
    return wrapper;
  }
  
@@ -145,7 +122,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_mutex mut = Mutex_val(wrapper);
    st_retcode retcode;
-@@ -811,7 +810,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
+@@ -811,7 +811,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
    return Val_unit;
  }
  
@@ -154,7 +131,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_mutex mut = Mutex_val(wrapper);
    st_retcode retcode;
-@@ -821,7 +820,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
+@@ -821,7 +821,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
    return Val_unit;
  }
  
@@ -163,7 +140,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_mutex mut = Mutex_val(wrapper);
    st_retcode retcode;
-@@ -863,7 +862,7 @@ static struct custom_operations caml_condition_ops = {
+@@ -863,7 +863,7 @@ static struct custom_operations caml_condition_ops = {
    custom_fixed_length_default
  };
  
@@ -172,7 +149,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_condvar cond = NULL;       /* suppress warning */
    value wrapper;
-@@ -874,7 +873,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
+@@ -874,7 +874,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
    return wrapper;
  }
  
@@ -181,7 +158,7 @@ index 043e07031e..c1d8358e93 100644
  {
    st_condvar cond = Condition_val(wcond);
    st_mutex mut = Mutex_val(wmut);
-@@ -889,14 +888,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
+@@ -889,14 +889,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
    return Val_unit;
  }
  
@@ -1775,7 +1752,7 @@ index 8e4efdcc72..9a5d9f4a91 100644
  
  #undef HAS_SOCKETS
 diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
-index 62b0e7fafa..3a3b86911c 100644
+index 62b0e7fafa..0b8cc50064 100644
 --- a/runtime/caml/signals.h
 +++ b/runtime/caml/signals.h
 @@ -20,9 +20,6 @@
@@ -1788,17 +1765,6 @@ index 62b0e7fafa..3a3b86911c 100644
  #include "misc.h"
  #include "mlvalues.h"
  
-@@ -87,8 +84,8 @@ value caml_do_pending_actions_exn (void);
- value caml_process_pending_actions_with_root (value extra_root); // raises
- value caml_process_pending_actions_with_root_exn (value extra_root);
- int caml_set_signal_action(int signo, int action);
--CAMLextern void * caml_setup_stack_overflow_detection(void);
--CAMLextern int caml_stop_stack_overflow_detection(void *);
-+CAMLextern int caml_setup_stack_overflow_detection(void);
-+CAMLextern int caml_stop_stack_overflow_detection(void);
- CAMLextern void caml_init_signals(void);
- CAMLextern void caml_terminate_signals(void);
- CAMLextern void (*caml_enter_blocking_section_hook)(void);
 diff --git a/runtime/caml/sys.h b/runtime/caml/sys.h
 index 75b97818c1..3b2d537ac4 100644
 --- a/runtime/caml/sys.h
@@ -2295,115 +2261,6 @@ index aab63e9b24..a05f721836 100644
          .quad   1               /* one descriptor */
          .quad   .L105           /* return address into callback */
          .short  -1              /* negative size count => use callback link */
-diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
-index 7cb461ac4d..439fb56404 100644
---- a/runtime/signals_byt.c
-+++ b/runtime/signals_byt.c
-@@ -81,7 +81,7 @@ int caml_set_signal_action(int signo, int action)
-     return 0;
- }
- 
--CAMLexport void * caml_setup_stack_overflow_detection(void) { return NULL; }
--CAMLexport int caml_stop_stack_overflow_detection(void * p) { return 0; }
-+CAMLexport int caml_setup_stack_overflow_detection(void) { return 0; }
-+CAMLexport int caml_stop_stack_overflow_detection(void) { return 0; }
- CAMLexport void caml_init_signals(void) { }
- CAMLexport void caml_terminate_signals(void) { }
-diff --git a/runtime/signals_nat.c b/runtime/signals_nat.c
-index 1dd8289c12..443f5d53b6 100644
---- a/runtime/signals_nat.c
-+++ b/runtime/signals_nat.c
-@@ -254,10 +254,6 @@ DECLARE_SIGNAL_HANDLER(segv_handler)
- 
- /* Initialization of signal stuff */
- 
--#ifdef HAS_STACK_OVERFLOW_DETECTION
--static void * caml_signal_stack = NULL;
--#endif
--
- void caml_init_signals(void)
- {
-   /* Bound-check trap handling */
-@@ -282,8 +278,7 @@ void caml_init_signals(void)
- #endif
- 
- #ifdef HAS_STACK_OVERFLOW_DETECTION
--  caml_signal_stack = caml_setup_stack_overflow_detection();
--  if (caml_signal_stack != NULL) {
-+  if (caml_setup_stack_overflow_detection() != -1) {
-     struct sigaction act;
-     SET_SIGACT(act, segv_handler);
-     act.sa_flags |= SA_ONSTACK | SA_NODEFER;
-@@ -319,8 +314,7 @@ void caml_terminate_signals(void)
- 
- #ifdef HAS_STACK_OVERFLOW_DETECTION
-   set_signal_default(SIGSEGV);
--  caml_stop_stack_overflow_detection(caml_signal_stack);
--  caml_signal_stack = NULL;
-+  caml_stop_stack_overflow_detection();
- #endif
- }
- 
-@@ -329,44 +323,37 @@ void caml_terminate_signals(void)
-    Each thread needs its own alternate stack.
-    The alternate stack used to be statically-allocated for the main thread,
-    but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
--   may not be a compile-time constant (issue #10250).
--   Return the dynamically-allocated alternate signal stack, or NULL
--   if an error occurred.
--   The returned pointer must be passed to [caml_stop_stack_overflow_detection].
--*/
-+   may not be a compile-time constant (issue #10250). */
- 
--CAMLexport void * caml_setup_stack_overflow_detection(void)
-+CAMLexport int caml_setup_stack_overflow_detection(void)
- {
- #ifdef HAS_STACK_OVERFLOW_DETECTION
-   stack_t stk;
-+  stk.ss_sp = malloc(SIGSTKSZ);
-+  if (stk.ss_sp == NULL) return -1;
-   stk.ss_size = SIGSTKSZ;
--  stk.ss_sp = malloc(stk.ss_size);
--  if (stk.ss_sp == NULL) return NULL;
-   stk.ss_flags = 0;
-   if (sigaltstack(&stk, NULL) == -1) {
-     free(stk.ss_sp);
--    return NULL;
-+    return -1;
-   }
--  return stk.ss_sp;
--#else
--  return NULL;
- #endif
-+  /* Success (or stack overflow detection not available) */
-+  return 0;
- }
- 
--CAMLexport int caml_stop_stack_overflow_detection(void * signal_stack)
-+CAMLexport int caml_stop_stack_overflow_detection(void)
- {
- #ifdef HAS_STACK_OVERFLOW_DETECTION
-   stack_t oldstk, stk;
-   stk.ss_flags = SS_DISABLE;
--  stk.ss_sp = NULL;  /* not required but avoids a valgrind false alarm */
--  stk.ss_size = SIGSTKSZ; /* macOS wants a valid size here */
-   if (sigaltstack(&stk, &oldstk) == -1) return -1;
--  /* Check whether someone else installed their own signal stack */
--  if (!(oldstk.ss_flags & SS_DISABLE) && oldstk.ss_sp != signal_stack) {
--    /* Re-activate their signal stack. */
--    sigaltstack(&oldstk, NULL);
--  }
--  free(signal_stack);
--#endif
-+  /* If caml_setup_stack_overflow_detection failed, we are not using
-+     an alternate signal stack.  SS_DISABLE will be set in oldstk,
-+     and there is nothing to free in this case. */
-+  if (! (oldstk.ss_flags & SS_DISABLE)) free(oldstk.ss_sp);
-   return 0;
-+#else
-+  return 0;
-+#endif
- }
 diff --git a/runtime/sys.c b/runtime/sys.c
 index a77fd9d1cf..9508d3f903 100644
 --- a/runtime/sys.c

@@ -1,0 +1,35 @@
+--- a	2023-09-28 18:45:27.047921523 +0100
++++ b	2023-09-28 18:45:27.063922145 +0100
+@@ -1,17 +1,18 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -41,6 +41,10 @@ OCaml 4.14 maintenance branch
+-   mingw-w64 i686 port.
+-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
++@@ -593,6 +593,11 @@ OCaml 4.14 maintenance branch
++   must not have been declared by `CAMLlocalN`.
++   (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
+  
+++### Bug fixes:
+++
+ +- #11489, #11496: More prudent deallocation of alternate signal stack
+ +  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
+ +
+-+
++ 
+  OCaml 4.14.0 (28 March 2022)
+  ----------------------------
+- 
+ diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
+ --- a/otherlibs/systhreads/st_stubs.c
+ +++ b/otherlibs/systhreads/st_stubs.c
+@@ -44,7 +45,7 @@
+ diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
+ --- a/runtime/caml/signals.h
+ +++ b/runtime/caml/signals.h
+-@@ -87,8 +87,8 @@ value caml_do_pending_actions_exn (void);
++@@ -84,8 +84,8 @@ value caml_do_pending_actions_exn (void);
+  value caml_process_pending_actions_with_root (value extra_root); // raises
+  value caml_process_pending_actions_with_root_exn (value extra_root);
+  int caml_set_signal_action(int signo, int action);
