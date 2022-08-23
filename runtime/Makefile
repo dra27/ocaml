@@ -206,7 +206,7 @@ clean:
 	rm -f ocamlrun ocamlrund ocamlruni
 	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe
 	rm -f primitives primitives.new prims.c caml/opnames.h caml/jumptbl.h
-	rm -f caml/version.h domain_state*.inc
+	rm -f caml/version.h domain_state*.inc build_config.h
 
 .PHONY: distclean
 distclean: clean
