@@ -1,55 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..8989cce6d6
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,46 @@
-+--- a	2023-09-28 18:45:25.907877164 +0100
-++++ b	2023-09-28 18:45:25.927877942 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
-+ --- a/stdlib/hashtbl.ml
-+ +++ b/stdlib/hashtbl.ml
-+-@@ -447,13 +447,14 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-++@@ -455,13 +455,14 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-+          if h.size > Array.length h.data lsl 1 then resize key_index h
-+        end
-+  
-+@@ -33,7 +33,7 @@
-+  
-+      let add_seq tbl i =
-+        Seq.iter (fun (k,v) -> add tbl k v) i
-+-@@ -597,13 +598,14 @@ let replace h key data =
-++@@ -605,13 +606,14 @@ let replace h key data =
-+      if h.size > Array.length h.data lsl 1 then resize key_index h
-+    end
-+  
-+@@ -59,17 +59,17 @@
-+  Raised by primitive operation at Backtrace2.run in file "backtrace2.ml", line 62, characters 14-22
-+  test_Not_found
-+  Uncaught exception Not_found
-+--Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-+-+Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
-++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
-+++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
-+  Called from Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 9-42
-+  Re-raised at Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 61-70
-+  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
-+-@@ -50,7 +50,7 @@ Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line
-+- Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
-++@@ -50,7 +50,7 @@ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", lin
-++ Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
-+  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
-+  Uncaught exception Not_found
-+--Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-+-+Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
-++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
-+++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
-+  Called from Backtrace2.test_lazy.exception_raised_internally in file "backtrace2.ml", line 50, characters 8-41
-+- Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
-+- Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
-++ Re-raised at CamlinternalLazy.force_lazy_block.(fun) in file "camlinternalLazy.ml", line 123, characters 56-63
-++ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -6262,7 +6213,7 @@ index 0000000000..68c246234e
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..1a1a1bedaf
+index 0000000000..9a704fdceb
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3814 @@
@@ -6784,15 +6735,15 @@ index 0000000000..1a1a1bedaf
 ++   hence the value of Simple_float_const_opaque.f cannot be known
 ++   preventing the static allocation of d *)
 +diff --git a/testsuite/tests/backtrace/backtrace2.reference b/testsuite/tests/backtrace/backtrace2.reference
-+index 20ef708fe0..54c5ab7570 100644
++index 62ae0cb77b..816405ff78 100644
 +--- a/testsuite/tests/backtrace/backtrace2.reference
 ++++ b/testsuite/tests/backtrace/backtrace2.reference
 +@@ -35,7 +35,7 @@ Uncaught exception Invalid_argument("index out of bounds")
 + Raised by primitive operation at Backtrace2.run in file "backtrace2.ml", line 62, characters 14-22
 + test_Not_found
 + Uncaught exception Not_found
-+-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
+++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
 + Called from Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 9-42
 + Re-raised at Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 61-70
 + Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
@@ -6806,8 +6757,8 @@ index 0000000000..1a1a1bedaf
 ++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
 + Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
 + Uncaught exception Not_found
-+-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
+++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
 + Called from Backtrace2.test_lazy.exception_raised_internally in file "backtrace2.ml", line 50, characters 8-41
 +-Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
 +-Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
@@ -10082,62 +10033,13 @@ index 0000000000..1a1a1bedaf
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b971fc8376
+index 0000000000..d9de48973e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9972 @@
+@@ -0,0 +1,10013 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..8989cce6d6
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,46 @@
-++--- a	2023-09-28 18:45:25.907877164 +0100
-+++++ b	2023-09-28 18:45:25.927877942 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
-++ --- a/stdlib/hashtbl.ml
-++ +++ b/stdlib/hashtbl.ml
-++-@@ -447,13 +447,14 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-+++@@ -455,13 +455,14 @@ module MakeSeeded(H: SeededHashedType): (SeededS with type key = H.t) =
-++          if h.size > Array.length h.data lsl 1 then resize key_index h
-++        end
-++  
-++@@ -33,7 +33,7 @@
-++  
-++      let add_seq tbl i =
-++        Seq.iter (fun (k,v) -> add tbl k v) i
-++-@@ -597,13 +598,14 @@ let replace h key data =
-+++@@ -605,13 +606,14 @@ let replace h key data =
-++      if h.size > Array.length h.data lsl 1 then resize key_index h
-++    end
-++  
-++@@ -59,17 +59,17 @@
-++  Raised by primitive operation at Backtrace2.run in file "backtrace2.ml", line 62, characters 14-22
-++  test_Not_found
-++  Uncaught exception Not_found
-++--Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-++-+Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
-+++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
-++++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
-++  Called from Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 9-42
-++  Re-raised at Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 61-70
-++  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
-++-@@ -50,7 +50,7 @@ Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line
-++- Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
-+++@@ -50,7 +50,7 @@ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", lin
-+++ Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
-++  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
-++  Uncaught exception Not_found
-++--Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-++-+Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
-+++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
-++++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
-++  Called from Backtrace2.test_lazy.exception_raised_internally in file "backtrace2.ml", line 50, characters 8-41
-++- Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
-++- Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
-+++ Re-raised at CamlinternalLazy.force_lazy_block.(fun) in file "camlinternalLazy.ml", line 123, characters 56-63
-+++ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -16350,7 +16252,7 @@ index 0000000000..b971fc8376
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..1a1a1bedaf
++index 0000000000..9a704fdceb
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3814 @@
@@ -16872,15 +16774,15 @@ index 0000000000..b971fc8376
 +++   hence the value of Simple_float_const_opaque.f cannot be known
 +++   preventing the static allocation of d *)
 ++diff --git a/testsuite/tests/backtrace/backtrace2.reference b/testsuite/tests/backtrace/backtrace2.reference
-++index 20ef708fe0..54c5ab7570 100644
+++index 62ae0cb77b..816405ff78 100644
 ++--- a/testsuite/tests/backtrace/backtrace2.reference
 +++++ b/testsuite/tests/backtrace/backtrace2.reference
 ++@@ -35,7 +35,7 @@ Uncaught exception Invalid_argument("index out of bounds")
 ++ Raised by primitive operation at Backtrace2.run in file "backtrace2.ml", line 62, characters 14-22
 ++ test_Not_found
 ++ Uncaught exception Not_found
-++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-+++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
+++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
++++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
 ++ Called from Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 9-42
 ++ Re-raised at Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 61-70
 ++ Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
@@ -16894,8 +16796,8 @@ index 0000000000..b971fc8376
 +++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
 ++ Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
 ++ Uncaught exception Not_found
-++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
-+++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
+++-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 542, characters 13-28
++++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 550, characters 13-28
 ++ Called from Backtrace2.test_lazy.exception_raised_internally in file "backtrace2.ml", line 50, characters 8-41
 ++-Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
 ++-Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
@@ -20057,7 +19959,97 @@ index 0000000000..b971fc8376
 +++   reason = "OCaml 5 only"
 +++ *)
 ++ 
-++ (* Due to GCs running at non
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index ebee82eb6f..8936f1e9dd 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++      
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
