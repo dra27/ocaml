@@ -88,6 +88,7 @@ AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
 AC_SUBST([systhread_support])
+AC_SUBST([ocamlsrcdir])
 AC_SUBST([unix_or_win32])
 AC_SUBST([unixlib])
 AC_SUBST([outputexe])
@@ -173,6 +174,7 @@ AC_SUBST([QS])
 
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 
@@ -456,15 +458,32 @@ AS_CASE([$host],
   [*-pc-windows],
     [CPP="$CC -nologo -EP"])
 
+# Absolute path to the toplevel source directory
+
+# A sentinel character (X) is added at the end of the directory name
+# and then removed, in case the directory name finishes with an odd character.
+# (The $(...) construct strips trailing \n characters.)
+# Also, it is important to use `printf` rather than `echo` because the
+# behaviour of `echo` is indeterminate and uncontrollable if the
+# absolute path contains backslashes, which will definitely be the case
+# on Windows
+# See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
+# for the detailed explanation.
+
+ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+ocamlsrcdir=${ocamlsrcdir%X}
+
 # Libraries to build depending on the host
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     unixlib="win32unix"
     ],
   [unix_or_win32="unix"
   unixlib="unix"])
+
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
     [exeext=".exe"],
