@@ -44,10 +44,8 @@ else
 endif
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
-  ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)" | cygpath -w -f -)
   mkexe := $(MKEXE_ANSI) -link $(OC_LDFLAGS)
 else
-  ocamlsrcdir := $(abspath $(shell pwd)/..)
   mkexe := $(MKEXE)
 endif
 
@@ -91,7 +89,7 @@ core := \
   $(run).c \
   run_stubs.c \
   ocamltest_stdlib_stubs.c \
-  ocamltest_config.mli ocamltest_config.ml.in \
+  ocamltest_config.mli ocamltest_config.mlp \
   ocamltest_stdlib.mli ocamltest_stdlib.ml \
   run_command.mli run_command.ml \
   filecompare.mli filecompare.ml \
@@ -133,7 +131,7 @@ sources := $(core) $(ocaml_plugin) \
 
 ml_files := \
   $(filter %.ml, \
-    $(subst .ml.in,.ml,$(subst .mll,.ml,$(subst .mly,.ml,$(sources)))) \
+    $(subst .mlp,.ml,$(subst .mll,.ml,$(subst .mly,.ml,$(sources)))) \
   )
 
 cmo_files := $(ml_files:.ml=.cmo)
@@ -156,10 +154,10 @@ lexers := $(filter %.mll,$(sources))
 
 parsers := $(filter %.mly,$(sources))
 
-config_files := $(filter %.ml.in,$(sources))
+config_files := $(filter %.mlp,$(sources))
 
 dependencies_generated_prereqs := \
-  $(config_files:.ml.in=.ml) \
+  $(config_files:.mlp=.ml) \
   $(lexers:.mll=.ml) \
   $(parsers:.mly=.mli) $(parsers:.mly=.ml)
 
@@ -227,7 +225,7 @@ ocamltest.opt$(EXE): $(compdeps_opt) $(native_modules)
 %.ml: %.mll
 	$(ocamllex) $(OCAMLLEX_FLAGS) $<
 
-ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+ocamltest_config.ml: ocamltest_config.mlp Makefile ../Makefile.config
 	sed $(call SUBST,AFL_INSTRUMENT) \
 	    $(call SUBST,RUNTIMEI) \
 	    $(call SUBST,ARCH) \
@@ -239,7 +237,6 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 	    $(call SUBST_STRING,CPP) \
 	    $(call SUBST_STRING,ocamlcdefaultflags) \
 	    $(call SUBST_STRING,ocamloptdefaultflags) \
-	    $(call SUBST_STRING,ocamlsrcdir) \
 	    $(call SUBST,FLAMBDA) \
 	    $(call SUBST,WITH_SPACETIME) \
 	    $(call SUBST,FORCE_SAFE_STRING) \
@@ -288,6 +285,7 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	rm -f ocamltest_config.mlp
 
 ifneq "$(TOOLCHAIN)" "msvc"
 .PHONY: depend
