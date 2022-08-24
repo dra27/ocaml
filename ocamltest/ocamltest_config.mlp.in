@@ -41,7 +41,7 @@ let system = "%%SYSTEM%%"
 
 let c_preprocessor = "%%CPP%%"
 
-let ocamlsrcdir = "%%ocamlsrcdir%%"
+let ocamlsrcdir = {@QS@|@ocamlsrcdir@|@QS@}
 
 let flambda = %%FLAMBDA%%
 
