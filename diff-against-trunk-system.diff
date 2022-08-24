@@ -71,7 +71,7 @@ index 839720bb70..4d6f19a725 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 6a2a7d98a9..332e59278b 100644
+index 1b7a03144a..b42c2bfdc8 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -580,7 +580,6 @@ partialclean::
@@ -10033,7 +10033,7 @@ index 0000000000..9a704fdceb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d9de48973e
+index 0000000000..2876ef0b0a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10013 @@
@@ -10110,7 +10110,7 @@ index 0000000000..d9de48973e
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 6a2a7d98a9..332e59278b 100644
++index 1b7a03144a..b42c2bfdc8 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -580,7 +580,6 @@ partialclean::
