@@ -772,6 +772,7 @@ outputobj
 outputexe
 unixlib
 unix_or_win32
+ocamlsrcdir
 systhread_support
 system
 model
@@ -2845,6 +2846,7 @@ VERSION=4.09.2+relocatable
 
 
 
+
  # TODO: rename this variable
 
 
@@ -2892,6 +2894,8 @@ VERSION=4.09.2+relocatable
 ac_config_files="$ac_config_files Makefile.build_config"
 
 ac_config_files="$ac_config_files Makefile.config"
+
+ac_config_files="$ac_config_files ocamltest/ocamltest_config.mlp"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
@@ -12307,17 +12311,34 @@ case $host in #(
      ;;
 esac
 
+# Absolute path to the toplevel source directory
+
+# A sentinel character (X) is added at the end of the directory name
+# and then removed, in case the directory name finishes with an odd character.
+# (The $(...) construct strips trailing \n characters.)
+# Also, it is important to use `printf` rather than `echo` because the
+# behaviour of `echo` is indeterminate and uncontrollable if the
+# absolute path contains backslashes, which will definitely be the case
+# on Windows
+# See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
+# for the detailed explanation.
+
+ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+ocamlsrcdir=${ocamlsrcdir%X}
+
 # Libraries to build depending on the host
 
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     unixlib="win32unix"
      ;; #(
   *) :
     unix_or_win32="unix"
   unixlib="unix" ;;
 esac
+
 case $host in #(
   *-*-cygwin*|*-*-mingw32|*-pc-windows) :
     exeext=".exe" ;; #(
@@ -18116,6 +18137,7 @@ do
   case $ac_config_target in
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
+    "ocamltest/ocamltest_config.mlp") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.mlp" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
