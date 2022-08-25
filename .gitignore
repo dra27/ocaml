@@ -206,10 +206,10 @@ _build
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
+/stdlib/camlheader.sh
 /stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
-/stdlib/camlheader_ur
+/stdlib/target_camlheader.sh
+/stdlib/*.shebang
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
@@ -276,6 +276,7 @@ _build
 /toplevel/native/topmain.mli
 
 /utils/config.ml
+/utils/config.common.ml
 /utils/domainstate.ml
 /utils/domainstate.mli
 
