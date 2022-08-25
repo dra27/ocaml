@@ -747,6 +747,8 @@ build_os
 build_vendor
 build_cpu
 build
+bindir_to_libdir
+target_bindir
 naked_pointers_checker
 naked_pointers
 compute_deps
@@ -756,6 +758,7 @@ flexlink_flags
 flexdll_chain
 default_safe_string
 force_safe_string
+ln
 afl
 function_sections
 flat_float_array
@@ -919,6 +922,7 @@ enable_warn_error
 enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
+enable_relative
 with_afl
 with_flexdll
 enable_shared
@@ -1607,6 +1611,8 @@ Optional Features:
                           do not use flat float arrays
   --disable-function-sections
                           do not emit each function in a separate section
+  --enable-relative       try to locate the standard library using relative
+                          paths
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -1617,7 +1623,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-odoc             build documentation with odoc
-  --with-target-bindir    location of binary programs on target system
+  --with-target-bindir    location of the runtime binaries on target system
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -2812,6 +2818,7 @@ extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+bindir_to_libdir=''
 
 # Information about the package
 
@@ -2924,6 +2931,9 @@ OCAML_VERSION_SHORT=4.14
 
 
  # TODO: rename this variable
+
+
+
 
 
 
@@ -3312,7 +3322,9 @@ fi
 
 # Check whether --with-target-bindir was given.
 if test "${with_target_bindir+set}" = set; then :
-  withval=$with_target_bindir;
+  withval=$with_target_bindir; target_bindir=$withval
+else
+  target_bindir=''
 fi
 
 
@@ -3389,6 +3401,12 @@ if test "${enable_function_sections+set}" = set; then :
   enableval=$enable_function_sections;
 else
   enable_function_sections=auto
+fi
+
+
+# Check whether --enable-relative was given.
+if test "${enable_relative+set}" = set; then :
+  enableval=$enable_relative;
 fi
 
 
@@ -12659,10 +12677,31 @@ esac
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
+$as_echo_n "checking for a workable solution for ln -sf... " >&6; }
+  ln -sf configure conftestLink
+  if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
+  rm -f conftestLink
+    CYGWIN=winsymlinks:native ln -sf configure conftestLink
+    if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
+  ln='cp -pf'
+else
+  ln='CYGWIN=winsymlinks:native ln -sf'
+
+fi
+else
+  ln='ln -sf'
+
+fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
+$as_echo "$ln" >&6; }
+
     unixlib="win32unix"
      ;; #(
   *) :
     unix_or_win32="unix"
+  ln='ln -sf'
   unixlib="unix" ;;
 esac
 case $host in #(
@@ -12718,18 +12757,6 @@ if test "x$interpval" = "xyes"; then :
     shebangscripts=false ;; #(
   *) :
     shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
-fi
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
-
      ;;
 esac
 else
@@ -12770,7 +12797,7 @@ case $ocaml_cv_cc_vendor in #(
   *) :
     outputobj='-o $(EMPTY)'
   warn_error_flag='-Werror'
-  cc_warnings='-Wall -Wdeclaration-after-statement' ;;
+  cc_warnings='-Wall' ;;
 esac
 
 case $enable_warn_error,false in #(
@@ -13473,6 +13500,13 @@ _ACEOF
 fi
 
 done
+
+ac_fn_c_check_header_mongrel "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
+if test "x$ac_cv_header_libgen_h" = xyes; then :
+  $as_echo "#define HAS_LIBGEN_H 1" >>confdefs.h
+
+fi
+
 
 ac_fn_c_check_header_mongrel "$LINENO" "stdint.h" "ac_cv_header_stdint_h" "$ac_includes_default"
 if test "x$ac_cv_header_stdint_h" = xyes; then :
@@ -17839,6 +17873,103 @@ fi
 
 if test x"$mandir" = x'${datarootdir}/man'; then :
   mandir='${prefix}/man'
+fi
+
+if test x"$enable_relative" = "xyes"; then :
+
+
+  eval "from=\"\$bindir\""
+  eval "to=\"\$libdir\""
+
+  if test -z ""; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking relative path between \$bindir and \$libdir" >&5
+$as_echo_n "checking relative path between \$bindir and \$libdir... " >&6; }
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking relative path between $from and $to" >&5
+$as_echo_n "checking relative path between $from and $to... " >&6; }
+
+fi
+
+
+  if test "x$from" = "x$to"; then :
+
+    result='.'
+
+else
+
+        echo "$from" > conftest.from
+    echo "$to" > conftest.to
+    common_prefix_len="$(cmp -l conftest.from conftest.to 2>/dev/null \
+                           | head -n 1 \
+                           | sed -e 's/^ *//' \
+                           | cut -d ' ' -f 1)"
+    common_prefix="$(expr $common_prefix_len - 1)"
+    if test $common_prefix -eq 0; then :
+
+      result=''
+      if test -z ""; then :
+  as_fn_error $? "no common prefix" "$LINENO" 5
+fi
+
+else
+
+      common_prefix="$(echo "$from" | cut -c -$common_prefix)"
+
+                        from_chopped="$(echo "$from" | cut -c $common_prefix_len-)"
+      to_chopped="$(echo "$to" | cut -c $common_prefix_len-)"
+      if test "x${common_prefix}" = "x${from}" && \
+             test -z "${to_chopped##/*}" ; then :
+
+        result=".$to_chopped"
+
+elif test "y${common_prefix}" = "x${to}" && \
+       test -z "${from_chopped##/*}"; then :
+
+        echo "Here with $from_chopped and $to_chopped but confused"
+        exit 1
+
+else
+
+                                        if test "x${common_prefix}" = "x${to}" && \
+               test -z "${from_chopped##/*}"; then :
+
+          common_prefix=$(echo "$common_prefix/" | wc -c)
+
+else
+
+          common_prefix=$(echo "${common_prefix%/*}/" | wc -c)
+
+fi
+                get_from="$(echo "$from" | cut -c $common_prefix-)"
+        get_to="$(echo "$to" | cut -c $common_prefix-)"
+                                result=''
+        while test "$get_from" != '.' ; do
+          result="../$result"
+          get_from="$(dirname "$get_from")"
+        done
+        if test -z "$get_to"; then :
+
+          result="${result%/}"
+
+else
+
+          result="$result$get_to"
+
+fi
+
+fi
+
+fi
+
+fi
+  eval "bindir_to_libdir='$result'"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $result" >&5
+$as_echo "$result" >&6; }
+
+
 fi
 
 case $host in #(
