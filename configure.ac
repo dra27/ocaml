@@ -540,7 +540,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
   [msvc-*],
     [outputobj=-Fo; gcc_warnings=""],
   [outputobj='-o $(EMPTY)'
-  gcc_warnings='-Wall -Wdeclaration-after-statement'
+  gcc_warnings='-Wall'
   AS_CASE([AC_PACKAGE_VERSION],
     [*+dev*],
       [gcc_warnings="$gcc_warnings -Werror"])
