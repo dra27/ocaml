@@ -16658,7 +16658,11 @@ case $host in #(
     flexlink_flags="-chain $flexdll_chain -stack 16777216" ;; #(
   x86_64-w64-mingw32) :
     flexdll_chain='mingw64'
-    flexlink_flags="-chain $flexdll_chain -stack 33554432" ;; #(
+    # Ensure --image-base 0x10000 gets to the linker to work-around binutils
+    # 2.36+ using a random address base. See #10351 for the actual fix in
+    # 4.12+.
+    flexlink_flags="-chain $flexdll_chain -stack 33554432 \
+-link -Xlinker -link --image-base -link -Xlinker -link 0x10000" ;; #(
   i686-pc-windows) :
     flexdll_chain='msvc'
     flexlink_flags="-merge-manifest -stack 16777216" ;; #(
