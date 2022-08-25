@@ -153,7 +153,12 @@ case "$1" in
     # Now reconfigure ocamltest to run in bytecode-only mode
     sed -i '/native_/s/true/false/' \
            "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest.opt.exe" ]] ; then
+      TARGETS='all allopt'
+    else
+      TARGETS='all'
+    fi
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j $TARGETS
     # And run the entire testsuite, skipping all the native-code tests
     run "test $PORT" \
         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
@@ -205,7 +210,7 @@ case "$1" in
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
         script --quiet --return --command \
-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
