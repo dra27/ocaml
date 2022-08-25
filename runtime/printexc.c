@@ -150,7 +150,7 @@ void caml_fatal_uncaught_exception(value exn)
     default_fatal_uncaught_exception(exn);
   /* Terminate the process */
   if (caml_abort_on_uncaught_exn) {
-#ifdef _CALL_REPORTFAULT
+#if defined(_CALL_REPORTFAULT) && !defined(__MINGW32__)
     _set_abort_behavior(0, _CALL_REPORTFAULT);
 #endif
     abort();
