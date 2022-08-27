@@ -590,6 +590,11 @@ OCaml 5.0
 - #11489, #11496: More prudent deallocation of alternate signal stack
   (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
 
+- #11508, #11509: make Bytes.escaped domain-safe
+  (Christiano Haesbaert and Gabriel Scherer,
+   review by Xavier Leroy,
+   report by Jan Midtgaard and Tom Kelly)
+
 ### Manual and documentation:
 
 - #11045, #11409: document that the array argument to `caml_callbackN`
