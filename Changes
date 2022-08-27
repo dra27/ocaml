@@ -590,6 +590,11 @@ OCaml 5.0
 OCaml 4.14 maintenance branch
 -----------------------------
 
+- #11508, #11509: make Bytes.escaped domain-safe
+  (Christiano Haesbaert and Gabriel Scherer,
+   review by Xavier Leroy,
+   report by Jan Midtgaard and Tom Kelly)
+
 ### Manual and documentation:
 
 - #11045, #11409: document that the array argument to `caml_callbackN`

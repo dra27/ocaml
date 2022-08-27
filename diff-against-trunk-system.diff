@@ -1,29 +1,35 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..1efff39aa0
+index 0000000000..a5f7aa5ca8
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:45:28.287969738 +0100
-++++ b	2023-09-28 18:45:28.291969893 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-+ --- a/testsuite/tests/unwind/unwind_test.reference
-+ +++ b/testsuite/tests/unwind/unwind_test.reference
-+-@@ -4,6 +4,7 @@ Mylib.baz
-++@@ -3,6 +3,7 @@ Mylib.baz
-+  Driver.entry
-+  caml_program
-+  caml_start_program
-+@@ -9,7 +9,7 @@
-+  caml_main
-+  main
-+  ml_perform_stack_walk
-+-@@ -12,5 +13,6 @@ Mylib.bob
-++@@ -11,5 +12,6 @@ Mylib.bob
-+  Driver.entry
-+  caml_program
-+  caml_start_program
+@@ -0,0 +1,26 @@
++--- a	2023-09-28 18:45:28.567980620 +0100
+++++ b	2023-09-28 18:45:28.587981397 +0100
++@@ -1,18 +1,18 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -587,6 +587,11 @@ OCaml 5.0
++-   mingw-w64 i686 port.
++-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
+++@@ -590,6 +590,11 @@ OCaml 5.0
+++ OCaml 4.14 maintenance branch
+++ -----------------------------
++  
++ +- #11508, #11509: make Bytes.escaped domain-safe
++ +  (Christiano Haesbaert and Gabriel Scherer,
++ +   review by Xavier Leroy,
++ +   report by Jan Midtgaard and Tom Kelly)
++ +
++- OCaml 4.14.0 (28 March 2022)
++- ----------------------------
+++ ### Manual and documentation:
++  
+++ - #11045, #11409: document that the array argument to `caml_callbackN`
++ diff --git a/stdlib/bytes.ml b/stdlib/bytes.ml
++ --- a/stdlib/bytes.ml
++ +++ b/stdlib/bytes.ml
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -37,16 +43,21 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 4e9daee519..f33df09ec0 100644
+index a1c2b8d0ca..f873e30c80 100644
 --- a/Changes
 +++ b/Changes
-@@ -587,6 +587,21 @@ OCaml 5.0
+@@ -587,11 +587,26 @@ OCaml 5.0
    mingw-w64 i686 port.
    (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
  
 +OCaml 4.14 maintenance branch
 +-----------------------------
 +
+ - #11508, #11509: make Bytes.escaped domain-safe
+   (Christiano Haesbaert and Gabriel Scherer,
+    review by Xavier Leroy,
+    report by Jan Midtgaard and Tom Kelly)
+ 
 +### Manual and documentation:
 +
 +- #11045, #11409: document that the array argument to `caml_callbackN`
@@ -62,7 +73,7 @@ index 4e9daee519..f33df09ec0 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -622,13 +637,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -627,13 +642,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -78,7 +89,7 @@ index 4e9daee519..f33df09ec0 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -732,6 +747,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -737,6 +752,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -88,7 +99,7 @@ index 4e9daee519..f33df09ec0 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -991,6 +1009,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -996,6 +1014,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6098,7 +6109,7 @@ index 0000000000..c6cd8e9031
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..9a704fdceb
+index 0000000000..bd8cbb2a05
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3814 @@
@@ -9785,7 +9796,7 @@ index 0000000000..9a704fdceb
 + 
 + module type Sunderscore = sig
 +diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-+index fbcd16e8e1..56a5f30733 100644
++index b3804d00e5..827cc4affc 100644
 +--- a/testsuite/tests/unwind/unwind_test.reference
 ++++ b/testsuite/tests/unwind/unwind_test.reference
 +@@ -1,5 +1,4 @@
@@ -9918,36 +9929,42 @@ index 0000000000..9a704fdceb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b3ffea437c
+index 0000000000..5d28afa088
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9908 @@
+@@ -0,0 +1,9911 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..1efff39aa0
++index 0000000000..a5f7aa5ca8
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:45:28.287969738 +0100
-+++++ b	2023-09-28 18:45:28.291969893 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++ --- a/testsuite/tests/unwind/unwind_test.reference
-++ +++ b/testsuite/tests/unwind/unwind_test.reference
-++-@@ -4,6 +4,7 @@ Mylib.baz
-+++@@ -3,6 +3,7 @@ Mylib.baz
-++  Driver.entry
-++  caml_program
-++  caml_start_program
-++@@ -9,7 +9,7 @@
-++  caml_main
-++  main
-++  ml_perform_stack_walk
-++-@@ -12,5 +13,6 @@ Mylib.bob
-+++@@ -11,5 +12,6 @@ Mylib.bob
-++  Driver.entry
-++  caml_program
-++  caml_start_program
++@@ -0,0 +1,26 @@
+++--- a	2023-09-28 18:45:28.567980620 +0100
++++++ b	2023-09-28 18:45:28.587981397 +0100
+++@@ -1,18 +1,18 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -587,6 +587,11 @@ OCaml 5.0
+++-   mingw-w64 i686 port.
+++-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
++++@@ -590,6 +590,11 @@ OCaml 5.0
++++ OCaml 4.14 maintenance branch
++++ -----------------------------
+++  
+++ +- #11508, #11509: make Bytes.escaped domain-safe
+++ +  (Christiano Haesbaert and Gabriel Scherer,
+++ +   review by Xavier Leroy,
+++ +   report by Jan Midtgaard and Tom Kelly)
+++ +
+++- OCaml 4.14.0 (28 March 2022)
+++- ----------------------------
++++ ### Manual and documentation:
+++  
++++ - #11045, #11409: document that the array argument to `caml_callbackN`
+++ diff --git a/stdlib/bytes.ml b/stdlib/bytes.ml
+++ --- a/stdlib/bytes.ml
+++ +++ b/stdlib/bytes.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -9961,16 +9978,21 @@ index 0000000000..b3ffea437c
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 4e9daee519..f33df09ec0 100644
++index a1c2b8d0ca..f873e30c80 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -587,6 +587,21 @@ OCaml 5.0
++@@ -587,11 +587,26 @@ OCaml 5.0
 +   mingw-w64 i686 port.
 +   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 + 
 ++OCaml 4.14 maintenance branch
 ++-----------------------------
 ++
++ - #11508, #11509: make Bytes.escaped domain-safe
++   (Christiano Haesbaert and Gabriel Scherer,
++    review by Xavier Leroy,
++    report by Jan Midtgaard and Tom Kelly)
++ 
 ++### Manual and documentation:
 ++
 ++- #11045, #11409: document that the array argument to `caml_callbackN`
@@ -9986,7 +10008,7 @@ index 0000000000..b3ffea437c
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -622,13 +637,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -627,13 +642,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10002,7 +10024,7 @@ index 0000000000..b3ffea437c
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -732,6 +747,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -737,6 +752,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10012,7 +10034,7 @@ index 0000000000..b3ffea437c
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -991,6 +1009,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -996,6 +1014,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16022,7 +16044,7 @@ index 0000000000..b3ffea437c
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..9a704fdceb
++index 0000000000..bd8cbb2a05
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3814 @@
@@ -19709,7 +19731,7 @@ index 0000000000..b3ffea437c
 ++ 
 ++ module type Sunderscore = sig
 ++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
+++index b3804d00e5..827cc4affc 100644
 ++--- a/testsuite/tests/unwind/unwind_test.reference
 +++++ b/testsuite/tests/unwind/unwind_test.reference
 ++@@ -1,5 +1,4 @@
@@ -19821,15 +19843,7 @@ index 0000000000..b3ffea437c
 +++            dep='--enable-dependency-generation'
 ++         ;;
 ++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -153,7 +153,7 @@ case "$1" in
-++     #run "test $PORT" \
-++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all
+++            
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
