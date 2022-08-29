@@ -785,6 +785,7 @@ build_os
 build_vendor
 build_cpu
 build
+zinc_runtime_id
 native_runtime_id
 bytecode_runtime_id
 relative_libdir
@@ -3484,6 +3485,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
 
 
 
@@ -21190,6 +21192,7 @@ quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
 
 bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}7"
 native_runtime_id="${quintet3_native}${quintet2}${quintet1}7"
+zinc_runtime_id="00${quintet1}7"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
