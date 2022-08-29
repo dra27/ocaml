@@ -350,7 +350,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
              Printf.sprintf "%s%s-%s%s"
                             ocamlrun
                             !Clflags.runtime_variant
-                            Config.bytecode_runtime_id
+                            Config.zinc_runtime_id
                             Config.ext_exe
          in
          (* No modern executable format can be as small as 2 bytes, so assume
