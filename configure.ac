@@ -159,6 +159,7 @@ AC_SUBST([max_testsuite_dir_retries])
 AC_SUBST([windows_unicode])
 AC_SUBST([flat_float_array])
 AC_SUBST([afl])
+AC_SUBST([ln])
 AC_SUBST([force_safe_string])
 AC_SUBST([default_safe_string])
 AC_SUBST([flexdll_chain])
@@ -461,9 +462,11 @@ AS_CASE([$host],
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    OCAML_CHECK_LN_ON_WINDOWS
     unixlib="win32unix"
     ],
   [unix_or_win32="unix"
+  ln='ln -sf'
   unixlib="unix"])
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
