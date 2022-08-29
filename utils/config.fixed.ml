@@ -58,6 +58,7 @@ let align_int64 = true
 let function_sections = false
 let afl_instrument = false
 let bytecode_runtime_id = ""
+let zinc_runtime_id = ""
 let native_runtime_id = ""
 let native_compiler = false
 let tsan = false
