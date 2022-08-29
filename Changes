@@ -48,6 +48,10 @@ OCaml 4.13 maintenance branch
   mechanism `make TARGET_BINDIR=..` no longer works.
   (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
+- #13494: Use native symlinks on Windows for the OCaml installation, reducing
+  disk usage considerably.
+  (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
+
 ### Bug fixes:
 
 - #11358, #11378: Refactor the initialization of bytecode threading.
