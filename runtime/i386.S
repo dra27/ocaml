@@ -431,6 +431,8 @@ G(caml_system__frametable):
         .value  -1              /* negative frame size => use callback link */
         .value  0               /* no roots here */
 #endif
+        .type   G(caml_system__frametable), @object
+        .size   G(caml_system__frametable), .-G(caml_system__frametable)
 
         .globl  G(caml_extra_params)
 G(caml_extra_params):

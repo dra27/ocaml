@@ -703,6 +703,8 @@ G(caml_system__frametable):
         .quad   LBL(107)    /* return address into callback */
         .value  -1          /* negative frame size => use callback link */
         .value  0           /* no roots here */
+        .type   G(caml_system__frametable), @object
+        .size   G(caml_system__frametable), .-G(caml_system__frametable)
         .align  EIGHT_ALIGN
         .quad   16
         .quad   0
