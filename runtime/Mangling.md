@@ -49,7 +49,7 @@ OCaml 5.x series.
 ## Masks
 
 A particular configuration of the compiler has one RuntimeID, but this is used
-in two different contexts where certain bits are masked out:
+in three different contexts where certain bits are masked out:
 
 1. Bytecode Mask (0xe7fff) is used by `libcamlrun` and masks out the frame
    pointers and spacetime bits since these affect neither the runtime nor code
@@ -57,6 +57,8 @@ in two different contexts where certain bits are masked out:
 2. Native Mask (0xfffff) is used by `libasmrun`. Note that in native code, the
    only place where name mangling is used is natdynlink, and bit 8 is therefore
    _never_ set.
+3. Zinc Mask (0x001ff) is used by `ocamlc` for bytecode executables which do not
+   contain their own runtime.
 
 ## File Name Mangling
 
@@ -73,10 +75,33 @@ Mangling is applied to the name of any file which will be loaded at runtime:
 
 - `ocamlrun` (and variants) are triplet-prefixed and Bytecode-suffixed. A
   symbolic is created both for `ocamlrun` and for `ocamlrun` Byte-suffixed but
-  not triplet-prefixed.
+  not triplet-prefixed. See below for additional symbolic links which are
+  created.
 - C stub libraries loaded by both the bytecode runtime and bytecode `Dynlink`.
   These are triplet-prefixed and Bytecode-suffixed. The effect is that any
   runtime attempts to load stub libraries compiled for exactly the same runtime.
 - Shared versions of the bytecode and native runtimes (`libcamlrun_shared.so`
   and `libasmrun_shared.so`). These are triplet-prefixed and
   Bytecode/Native-suffixed respectively.
+
+Bytecode executables compiled without their runtime pose an additional challenge
+as these are portable. When a bytecode image is produced, the Zinc runtime ID is
+used to mangle the name of the runtime with Bit 7 set if the bytecode image does
+not require 63 bit `int` support (i.e. if the image compiles without error with
+`ocamlc -compat-32` then Bit 7 will be set in the RuntimeID, even with a 64-bit
+`ocamlc`) and Bit 8 unset. The runtime variant is then Zinc-suffixed to create
+the runtime name for the executable's header. For example, if OCaml 5.1 is
+configured with `--disable-flat-float-array --disable-shared` (Runtime suffix
+`8093`) then an executable not requiring 63-bit `int`s will use `ocamlrun-0053`
+as the runtime name. The "Zinc" RuntimeID here creates a portable and
+reproducible runtime name. In order to facilitate this, the following additional
+symbolic names are created, for each variant `<ocamlrun>`, with no
+triplet-prefix:
+
+- Zinc-suffixed
+- For runtimes supporting 63-bit `int` values, Zinc-suffixed but with Bit 7 set
+  (i.e. a 64-bit OCaml runtime also advertises that it works for 32-bit)
+
+Additionally, the header for the bytecode executable will initially search for a
+runtime with Bit 8 un-set (i.e. with a preference for runtimes supporting shared
+libraries) and fallback to searching for one with Bit 8 set otherwise.
