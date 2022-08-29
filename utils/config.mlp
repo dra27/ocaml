@@ -75,6 +75,7 @@ let function_sections = %%FUNCTION_SECTIONS%%
 let afl_instrument = %%AFL_INSTRUMENT%%
 
 let bytecode_runtime_id = "%%BYTECODE_RUNTIME_ID%%"
+let zinc_runtime_id = "%%ZINC_RUNTIME_ID%%"
 let native_runtime_id = "%%NATIVE_RUNTIME_ID%%"
 
 let architecture = "%%ARCH%%"
