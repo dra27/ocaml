@@ -64,8 +64,12 @@
 #define ENDFUNCTION(name) \
         .type name,@function; \
         .size name, . - name
+#define ENDOBJECT(name) \
+        .type name,@object; \
+        .size name, . - name
 #else
 #define ENDFUNCTION(name)
+#define ENDOBJECT(name)
 #endif
 
 #ifdef ASM_CFI_SUPPORTED
@@ -431,6 +435,7 @@ G(caml_system__frametable):
         .value  -1              /* negative frame size => use callback link */
         .value  0               /* no roots here */
 #endif
+        ENDOBJECT(caml_system__frametable)
 
         .globl  G(caml_extra_params)
 G(caml_extra_params):
