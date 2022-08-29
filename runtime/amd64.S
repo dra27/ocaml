@@ -33,6 +33,7 @@
         .globl name; \
         .align FUNCTION_ALIGN; \
         name:
+#define ENDOBJECT(name)
 
 #elif defined(SYS_mingw64) || defined(SYS_cygwin)
 
@@ -47,6 +48,7 @@
         .globl name; \
         .align FUNCTION_ALIGN; \
         name:
+#define ENDOBJECT(name)
 
 #else
 
@@ -62,7 +64,9 @@
         .type name,@function; \
         .align FUNCTION_ALIGN; \
         name:
-
+#define ENDOBJECT(name) \
+        .type name, @object; \
+        .size name, . - name;
 #endif
 
 #ifdef ASM_CFI_SUPPORTED
@@ -701,6 +705,7 @@ G(caml_system__frametable):
         .quad   LBL(107)    /* return address into callback */
         .value  -1          /* negative frame size => use callback link */
         .value  0           /* no roots here */
+        ENDOBJECT(G(caml_system__frametable))
         .align  EIGHT_ALIGN
         .quad   16
         .quad   0
