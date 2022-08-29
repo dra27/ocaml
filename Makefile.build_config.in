@@ -39,3 +39,6 @@ RLWRAP=@rlwrap@
 # Git submodule)
 FLEXDLL_SOURCES=@flexdir@
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
+
+# Commandline for creating symlinks
+LN = @ln@
