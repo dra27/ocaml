@@ -397,7 +397,7 @@ let write_header outchan =
     else
       let runtime =
         Printf.sprintf "ocamlrun%s-%s"
-                       !Clflags.runtime_variant Config.bytecode_runtime_id
+                       !Clflags.runtime_variant Config.zinc_runtime_id
       in
       Filename.concat runtime_info.bindir runtime
   in
