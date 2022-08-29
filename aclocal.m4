@@ -486,3 +486,18 @@ int main (void) {
       [AC_MSG_RESULT([cross-compiling; assume yes])
       AC_DEFINE([HAS_WORKING_FMA])])])
 ])
+
+AC_DEFUN([OCAML_CHECK_LN_ON_WINDOWS], [
+  AC_MSG_CHECKING([for a workable solution for ln -sf])
+  ln -sf configure conftestLink
+  AS_IF([test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"],
+    [rm -f conftestLink
+    CYGWIN=winsymlinks:native ln -sf configure conftestLink
+    AS_IF([test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"],
+      [ln='cp -pf'],
+      [ln='CYGWIN=winsymlinks:native ln -sf']
+    )],
+    [ln='ln -sf']
+  )
+  AC_MSG_RESULT([$ln])
+])
