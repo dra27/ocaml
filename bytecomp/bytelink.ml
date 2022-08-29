@@ -306,7 +306,7 @@ let write_header outchan =
       let ocamlrun =
         Printf.sprintf "ocamlrun%s-%s"
                        !Clflags.runtime_variant
-                       Config.bytecode_runtime_id
+                       Config.zinc_runtime_id
       in
       (false, ocamlrun)
   in
