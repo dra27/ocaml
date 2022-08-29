@@ -93,6 +93,7 @@ let default_safe_string = %%DEFAULT_SAFE_STRING%%
 let windows_unicode = %%WINDOWS_UNICODE%% != 0
 
 let bytecode_runtime_id = "%%BYTECODE_RUNTIME_ID%%"
+let zinc_runtime_id = "%%ZINC_RUNTIME_ID%%"
 let native_runtime_id = "%%NATIVE_RUNTIME_ID%%"
 
 let flat_float_array = %%FLAT_FLOAT_ARRAY%%
