@@ -795,6 +795,7 @@ build_os
 build_vendor
 build_cpu
 build
+zinc_runtime_id
 native_runtime_id
 bytecode_runtime_id
 ar_supports_response_files
@@ -3514,6 +3515,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
 
 
 
@@ -23625,6 +23627,7 @@ quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
 
 bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}8"
 native_runtime_id="${quintet3_native}${quintet2}${quintet1}8"
+zinc_runtime_id="00${quintet1}8"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
@@ -24754,7 +24757,7 @@ fi
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
-  bytecode_runtime_id='$bytecode_runtime_id'
+  zinc_runtime_id='$zinc_runtime_id'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
 
@@ -25931,9 +25934,9 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
-    "shebang":C) printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$launch_method" \
+    "shebang":C) printf '%s%s\n%s\000\n' "$zinc_runtime_id" "$launch_method" \
                            "$ocaml_bindir" > stdlib/runtime.info
-  printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$target_launch_method" \
+  printf '%s%s\n%s\000\n' "$zinc_runtime_id" "$target_launch_method" \
                           "$TARGET_BINDIR" > stdlib/target_runtime.info ;;
 
   esac
