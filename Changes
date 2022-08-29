@@ -1,13 +1,21 @@
 OCaml 5.3 maintenance version
 -----------------------------
 
-- #14007, #14015: Fix memory corruption when an exception is raised during
-  demarshaling.
-  (Benoît Vaugon, review by David Allsopp and Gabriel Scherer)
+### Build system:
+
+- #13494: Use native symlinks on Windows for the OCaml installation, reducing
+  disk usage considerably.
+  (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
+
+### Bug fixes:
 
 - #13790: Fix bytecode-only build of Cygwin when flexlink is being bootstrapped
   with the compiler.
   (David Allsopp, review by Antonin Décimo and Miod Vallat)
+
+- #14007, #14015: Fix memory corruption when an exception is raised during
+  demarshaling.
+  (Benoît Vaugon, review by David Allsopp and Gabriel Scherer)
 
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
