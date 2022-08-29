@@ -12548,10 +12548,31 @@ esac
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
+$as_echo_n "checking for a workable solution for ln -sf... " >&6; }
+  ln -sf configure conftestLink
+  if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
+  rm -f conftestLink
+    CYGWIN=winsymlinks:native ln -sf configure conftestLink
+    if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
+  ln='cp -pf'
+else
+  ln='CYGWIN=winsymlinks:native ln -sf'
+
+fi
+else
+  ln='ln -sf'
+
+fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
+$as_echo "$ln" >&6; }
+
     unixlib="win32unix"
      ;; #(
   *) :
     unix_or_win32="unix"
+  ln='ln -sf'
   unixlib="unix" ;;
 esac
 case $host in #(
