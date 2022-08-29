@@ -33,11 +33,8 @@ INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
 INSTALL_STUBLIBDIR = $(DESTDIR)$(STUBLIBDIR)
 INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
 
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
+# Commandline for creating symlinks
+LN = @ln@
 
 # This is munged into utils/config.ml, not overridable by other parts of
 # the build system.
