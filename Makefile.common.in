@@ -83,7 +83,7 @@ endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
   ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 
-RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun-$(BYTECODE_RUNTIME_ID)$(EXE)'
+RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun-$(ZINC_RUNTIME_ID)$(EXE)'
 
 OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
@@ -100,6 +100,8 @@ else
 endif
 
 DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
+
+ZINC_RUNTIME_ID = @zinc_runtime_id@
 
 # Escape special characters in the argument string.
 # There are four characters that need escaping:
