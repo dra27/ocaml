@@ -535,9 +535,11 @@ AS_CASE([$ocaml_cv_cc_vendor],
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
-    ocamlyacc_wstr_module="yacc/wstr"],
+    ocamlyacc_wstr_module="yacc/wstr"
+    OCAML_CHECK_LN_ON_WINDOWS],
   [unix_or_win32="unix"
-  ocamlyacc_wstr_module=""])
+  ocamlyacc_wstr_module=""
+  ln='ln -sf'])
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
     [exeext=".exe"],
