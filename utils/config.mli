@@ -272,6 +272,12 @@ val bytecode_runtime_id : string
 
     @since 5.1.0 *)
 
+val zinc_runtime_id : string
+(** {!bytecode_runtime_id} with the Zinc Mask (used in headers to refer portably
+    to ocamlrun)
+
+    @since 5.1.0 *)
+
 val native_runtime_id : string
 (** The RuntimeID for libasmrun_shared
 
