@@ -218,6 +218,11 @@ ___________
   runtime assertions.
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and David Allsopp)
 
+- #13496: Add missing .type and .size directives to main frametable to silence
+  warnings from the linker when using libasmrun_shared on amd64 and power. The
+  other backends already carried these directives.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #13014: Enable compile-time option -function-sections on all previously
