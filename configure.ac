@@ -269,6 +269,7 @@ AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
+AC_SUBST([zinc_runtime_id])
 
 ## Generated files
 
@@ -883,9 +884,9 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$launch_method" \
+  [printf '%s%s\n%s\000\n' "$zinc_runtime_id" "$launch_method" \
                            "$ocaml_bindir" > stdlib/runtime.info
-  printf '%s%s\n%s\000\n' "$bytecode_runtime_id" "$target_launch_method" \
+  printf '%s%s\n%s\000\n' "$zinc_runtime_id" "$target_launch_method" \
                           "$TARGET_BINDIR" > stdlib/target_runtime.info],
 dnl These declarations are put in a here-document in configure, so the command
 dnl in '$(...)' _is_ evaluated as the content is written to config.status (by
@@ -894,7 +895,7 @@ dnl nefarious single quotes which may appear in any of the strings.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
-  bytecode_runtime_id='$bytecode_runtime_id'
+  zinc_runtime_id='$zinc_runtime_id'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'])
 
@@ -2850,6 +2851,7 @@ quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
 
 bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}QUINTET0"
 native_runtime_id="${quintet3_native}${quintet2}${quintet1}QUINTET0"
+zinc_runtime_id="00${quintet1}QUINTET0"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
