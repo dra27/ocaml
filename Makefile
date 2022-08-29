@@ -29,7 +29,7 @@ defaultentry: $(DEFAULT_BUILD_TARGET)
 
 include stdlib/StdlibModules
 
-RUNTIME_NAME = $(BINDIR)/ocamlrun-$(BYTECODE_RUNTIME_ID)$(EXE)
+RUNTIME_NAME = $(BINDIR)/ocamlrun-$(ZINC_RUNTIME_ID)$(EXE)
 CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) \
         -use-prims runtime/primitives \
         -use-runtime '$(subst ','\'',$(RUNTIME_NAME))'
@@ -2724,7 +2724,7 @@ install::
     $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
 	cd "$(INSTALL_BINDIR)" && \
     $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
-	    "$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
+	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
 endef
 define INSTALL_RUNTIME_LIB
 ifeq "$(2)" "BYTECODE"
