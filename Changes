@@ -15,6 +15,11 @@ Working version
 
 ### Runtime system:
 
+- #11???: Add missing .type and .size directives to main frametable to silence
+  warnings from the linker when using libasmrun_shared on i386, amd64 and power.
+  The other backends already carried these directives.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #8998, #11321, #11430: change mangling of OCaml long identifiers

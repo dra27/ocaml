@@ -652,6 +652,7 @@ caml_system.frametable:
         datag   .L105 + 4       /* return address into callback */
         .short  -1              /* negative size count => use callback link */
         .short  0               /* no roots here */
+        .size   caml_system.frametable, .-caml_system.frametable
 
 /* TOC entries */
 
