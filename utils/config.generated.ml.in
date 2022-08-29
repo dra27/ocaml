@@ -83,6 +83,7 @@ let function_sections = @function_sections@
 let afl_instrument = @afl@
 
 let bytecode_runtime_id = {@QS@|@bytecode_runtime_id@|@QS@}
+let zinc_runtime_id = {@QS@|@zinc_runtime_id@|@QS@}
 let native_runtime_id = {@QS@|@native_runtime_id@|@QS@}
 
 let native_compiler = @native_compiler@
