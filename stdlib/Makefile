@@ -99,7 +99,7 @@ HEADER_PATH =
 HEADER_TARGET_PATH =
 endif
 
-RID = $(BYTECODE_RUNTIME_ID)
+RID = $(ZINC_RUNTIME_ID)
 TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
 
 # The shebang test in configure.ac will need updating if any runtime is
