@@ -1,35 +1,37 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..a5f7aa5ca8
+index 0000000000..79eff450e1
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,26 @@
-+--- a	2023-09-28 18:45:28.567980620 +0100
-++++ b	2023-09-28 18:45:28.587981397 +0100
-+@@ -1,18 +1,18 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -587,6 +587,11 @@ OCaml 5.0
-+-   mingw-w64 i686 port.
-+-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
-++@@ -590,6 +590,11 @@ OCaml 5.0
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
+@@ -0,0 +1,28 @@
++--- a	2023-09-28 18:45:28.935994923 +0100
+++++ b	2023-09-28 18:45:28.955995700 +0100
++@@ -16,7 +16,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1068,6 +1068,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+++@@ -1080,6 +1080,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++      [aarch64-*-linux*], [natdynlink=true],
++      [aarch64-*-freebsd*], [natdynlink=true],
++      [aarch64-*-openbsd*], [natdynlink=true],
++@@ -24,12 +24,12 @@
++      [riscv*-*-linux*], [natdynlink=true])])
 +  
-+ +- #11508, #11509: make Bytes.escaped domain-safe
-+ +  (Christiano Haesbaert and Gabriel Scherer,
-+ +   review by Xavier Leroy,
-+ +   report by Jan Midtgaard and Tom Kelly)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ ### Manual and documentation:
-+  
-++ - #11045, #11409: document that the array argument to `caml_callbackN`
-+ diff --git a/stdlib/bytes.ml b/stdlib/bytes.ml
-+ --- a/stdlib/bytes.ml
-+ +++ b/stdlib/bytes.ml
++  AS_CASE([$enable_native_toplevel,$natdynlink],
++-@@ -1182,6 +1183,8 @@ dnl   [arch=amd64; system=beos],
+++@@ -1194,6 +1195,8 @@ AS_CASE([$host],
++      [arch=arm64; system=freebsd],
++    [aarch64-*-openbsd*],
++      [arch=arm64; system=openbsd],
++ +  [aarch64-*-netbsd*],
++ +    [arch=arm64; system=netbsd],
++- dnl [x86_64-*-cygwin*],
++- dnl   [arch=amd64; system=cygwin],
++- dnl [riscv64-*-linux*],
+++   [x86_64-*-cygwin*],
+++     [arch=amd64; system=cygwin],
+++   [riscv64-*-linux*],
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -43,10 +45,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index a1c2b8d0ca..f873e30c80 100644
+index 357aa509a4..ae7f105670 100644
 --- a/Changes
 +++ b/Changes
-@@ -587,11 +587,26 @@ OCaml 5.0
+@@ -590,11 +590,26 @@ OCaml 5.0
    mingw-w64 i686 port.
    (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
  
@@ -73,7 +75,7 @@ index a1c2b8d0ca..f873e30c80 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -627,13 +642,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -630,13 +645,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -89,7 +91,7 @@ index a1c2b8d0ca..f873e30c80 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -737,6 +752,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -740,6 +755,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -99,7 +101,7 @@ index a1c2b8d0ca..f873e30c80 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -996,6 +1014,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -999,6 +1017,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3103,10 +3105,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index ad37f55502..2bda7b5c3c 100755
+index 96ff8296c9..ce1eeaa380 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index fbdc38060f..5a84b04276 100644
+index d2e71871fb..2a70450961 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -3192,7 +3194,7 @@ index fbdc38060f..5a84b04276 100644
  
  # Support for C11 atomic types
  
-@@ -1097,67 +1109,67 @@ model=default
+@@ -1098,67 +1110,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -3319,7 +3321,7 @@ index fbdc38060f..5a84b04276 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1166,8 +1178,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1167,8 +1179,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -3330,10 +3332,10 @@ index fbdc38060f..5a84b04276 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1182,10 +1194,10 @@ dnl   [arch=amd64; system=beos],
-     [arch=arm64; system=freebsd],
-   [aarch64-*-openbsd*],
+@@ -1185,10 +1197,10 @@ dnl   [arch=amd64; system=beos],
      [arch=arm64; system=openbsd],
+   [aarch64-*-netbsd*],
+     [arch=arm64; system=netbsd],
 -dnl [x86_64-*-cygwin*],
 -dnl   [arch=amd64; system=cygwin],
 -dnl [riscv64-*-linux*],
@@ -3345,7 +3347,7 @@ index fbdc38060f..5a84b04276 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1878,11 +1890,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1881,11 +1893,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3370,7 +3372,7 @@ index fbdc38060f..5a84b04276 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1932,6 +1956,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1935,6 +1959,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3401,7 +3403,7 @@ index fbdc38060f..5a84b04276 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2074,8 +2122,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2077,8 +2125,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -9929,42 +9931,44 @@ index 0000000000..bd8cbb2a05
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5d28afa088
+index 0000000000..09cf2c70a2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9911 @@
+@@ -0,0 +1,9908 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..a5f7aa5ca8
++index 0000000000..79eff450e1
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,26 @@
-++--- a	2023-09-28 18:45:28.567980620 +0100
-+++++ b	2023-09-28 18:45:28.587981397 +0100
-++@@ -1,18 +1,18 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -587,6 +587,11 @@ OCaml 5.0
-++-   mingw-w64 i686 port.
-++-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
-+++@@ -590,6 +590,11 @@ OCaml 5.0
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
++@@ -0,0 +1,28 @@
+++--- a	2023-09-28 18:45:28.935994923 +0100
++++++ b	2023-09-28 18:45:28.955995700 +0100
+++@@ -16,7 +16,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1068,6 +1068,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++++@@ -1080,6 +1080,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+++      [aarch64-*-linux*], [natdynlink=true],
+++      [aarch64-*-freebsd*], [natdynlink=true],
+++      [aarch64-*-openbsd*], [natdynlink=true],
+++@@ -24,12 +24,12 @@
+++      [riscv*-*-linux*], [natdynlink=true])])
 ++  
-++ +- #11508, #11509: make Bytes.escaped domain-safe
-++ +  (Christiano Haesbaert and Gabriel Scherer,
-++ +   review by Xavier Leroy,
-++ +   report by Jan Midtgaard and Tom Kelly)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ ### Manual and documentation:
-++  
-+++ - #11045, #11409: document that the array argument to `caml_callbackN`
-++ diff --git a/stdlib/bytes.ml b/stdlib/bytes.ml
-++ --- a/stdlib/bytes.ml
-++ +++ b/stdlib/bytes.ml
+++  AS_CASE([$enable_native_toplevel,$natdynlink],
+++-@@ -1182,6 +1183,8 @@ dnl   [arch=amd64; system=beos],
++++@@ -1194,6 +1195,8 @@ AS_CASE([$host],
+++      [arch=arm64; system=freebsd],
+++    [aarch64-*-openbsd*],
+++      [arch=arm64; system=openbsd],
+++ +  [aarch64-*-netbsd*],
+++ +    [arch=arm64; system=netbsd],
+++- dnl [x86_64-*-cygwin*],
+++- dnl   [arch=amd64; system=cygwin],
+++- dnl [riscv64-*-linux*],
++++   [x86_64-*-cygwin*],
++++     [arch=amd64; system=cygwin],
++++   [riscv64-*-linux*],
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -9978,10 +9982,10 @@ index 0000000000..5d28afa088
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index a1c2b8d0ca..f873e30c80 100644
++index 357aa509a4..ae7f105670 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -587,11 +587,26 @@ OCaml 5.0
++@@ -590,11 +590,26 @@ OCaml 5.0
 +   mingw-w64 i686 port.
 +   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 + 
@@ -10008,7 +10012,7 @@ index 0000000000..5d28afa088
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -627,13 +642,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -630,13 +645,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10024,7 +10028,7 @@ index 0000000000..5d28afa088
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -737,6 +752,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -740,6 +755,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10034,7 +10038,7 @@ index 0000000000..5d28afa088
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -996,6 +1014,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -999,6 +1017,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13038,10 +13042,10 @@ index 0000000000..5d28afa088
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index ad37f55502..2bda7b5c3c 100755
++index 96ff8296c9..ce1eeaa380 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index fbdc38060f..5a84b04276 100644
++index d2e71871fb..2a70450961 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -13127,7 +13131,7 @@ index 0000000000..5d28afa088
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1097,67 +1109,67 @@ model=default
++@@ -1098,67 +1110,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -13254,7 +13258,7 @@ index 0000000000..5d28afa088
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1166,8 +1178,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1167,8 +1179,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -13265,10 +13269,10 @@ index 0000000000..5d28afa088
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1182,10 +1194,10 @@ dnl   [arch=amd64; system=beos],
-+     [arch=arm64; system=freebsd],
-+   [aarch64-*-openbsd*],
++@@ -1185,10 +1197,10 @@ dnl   [arch=amd64; system=beos],
 +     [arch=arm64; system=openbsd],
++   [aarch64-*-netbsd*],
++     [arch=arm64; system=netbsd],
 +-dnl [x86_64-*-cygwin*],
 +-dnl   [arch=amd64; system=cygwin],
 +-dnl [riscv64-*-linux*],
@@ -13280,7 +13284,7 @@ index 0000000000..5d28afa088
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1878,11 +1890,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1881,11 +1893,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13305,7 +13309,7 @@ index 0000000000..5d28afa088
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1932,6 +1956,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1935,6 +1959,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13336,7 +13340,7 @@ index 0000000000..5d28afa088
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2074,8 +2122,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2077,8 +2125,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -19838,12 +19842,7 @@ index 0000000000..5d28afa088
 ++             build='--build=i686-pc-cygwin'
 ++             host='--host=x86_64-w64-mingw32'
 ++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++            
+++-        
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

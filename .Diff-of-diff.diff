@@ -1,26 +1,28 @@
---- a	2023-09-28 18:45:28.567980620 +0100
-+++ b	2023-09-28 18:45:28.587981397 +0100
-@@ -1,18 +1,18 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -587,6 +587,11 @@ OCaml 5.0
--   mingw-w64 i686 port.
--   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
-+@@ -590,6 +590,11 @@ OCaml 5.0
-+ OCaml 4.14 maintenance branch
-+ -----------------------------
+--- a	2023-09-28 18:45:28.935994923 +0100
++++ b	2023-09-28 18:45:28.955995700 +0100
+@@ -16,7 +16,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1068,6 +1068,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
++@@ -1080,6 +1080,7 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
+      [aarch64-*-linux*], [natdynlink=true],
+      [aarch64-*-freebsd*], [natdynlink=true],
+      [aarch64-*-openbsd*], [natdynlink=true],
+@@ -24,12 +24,12 @@
+      [riscv*-*-linux*], [natdynlink=true])])
   
- +- #11508, #11509: make Bytes.escaped domain-safe
- +  (Christiano Haesbaert and Gabriel Scherer,
- +   review by Xavier Leroy,
- +   report by Jan Midtgaard and Tom Kelly)
- +
-- OCaml 4.14.0 (28 March 2022)
-- ----------------------------
-+ ### Manual and documentation:
-  
-+ - #11045, #11409: document that the array argument to `caml_callbackN`
- diff --git a/stdlib/bytes.ml b/stdlib/bytes.ml
- --- a/stdlib/bytes.ml
- +++ b/stdlib/bytes.ml
+  AS_CASE([$enable_native_toplevel,$natdynlink],
+-@@ -1182,6 +1183,8 @@ dnl   [arch=amd64; system=beos],
++@@ -1194,6 +1195,8 @@ AS_CASE([$host],
+      [arch=arm64; system=freebsd],
+    [aarch64-*-openbsd*],
+      [arch=arm64; system=openbsd],
+ +  [aarch64-*-netbsd*],
+ +    [arch=arm64; system=netbsd],
+- dnl [x86_64-*-cygwin*],
+- dnl   [arch=amd64; system=cygwin],
+- dnl [riscv64-*-linux*],
++   [x86_64-*-cygwin*],
++     [arch=amd64; system=cygwin],
++   [riscv64-*-linux*],
