@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [0])
 m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 
 # OCAML__RELEASE_NUMBER must be incremented with each minor release.
-m4_define([OCAML__RELEASE_NUMBER], [17])
+m4_define([OCAML__RELEASE_NUMBER], [16])
 
 # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 # for officially-released versions of OCaml.
