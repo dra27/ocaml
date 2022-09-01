@@ -35,7 +35,7 @@ CAMLextern void caml_sys_io_error (value)
 CAMLnoreturn_end;
 
 CAMLextern double caml_sys_time_unboxed(value);
-CAMLextern void caml_sys_init (char_os * exe_name, char_os ** argv);
+CAMLextern void caml_sys_init (char_os *, char_os *, char_os ** argv);
 CAMLextern void caml_locate_standard_library (const char_os *);
 
 CAMLnoreturn_start
@@ -45,6 +45,7 @@ CAMLnoreturn_end;
 CAMLextern value caml_sys_get_argv(value unit);
 
 extern char_os * caml_exe_name;
+extern char_os * caml_proc_exe_name;
 
 extern char_os * caml_standard_library_default;
 extern char_os * caml_standard_library_relative;
