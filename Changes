@@ -63,6 +63,10 @@ Working version
   with js_of_ocaml
   (Hugo Heuzard, review by Gabriel Scherer)
 
+- #13???: Add Sys.interpreter containing the full path (if available) to the
+  currently executing runtime.
+  (David Allsopp, review by ???)
+
 ### Other libraries:
 
 - #13429: add `Unix.sigwait`, a binding to the `sigwait` system call;
