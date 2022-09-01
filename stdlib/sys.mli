@@ -32,6 +32,15 @@ val executable_name : string
     on the platform and whether the program was compiled to bytecode or a native
     executable. *)
 
+val interpreter : string
+(** The name of the file containing the interpreter currently running. For
+    native code, this is just {!executable_name}. This name may be absolute or
+    relative to the current directory, depending on the platform (Linux, Windows
+    and macOS should all return absolute paths).
+
+    @since 5.1.0
+*)
+
 external file_exists : string -> bool = "caml_sys_file_exists"
 (** Test if a file with the given name exists. *)
 
