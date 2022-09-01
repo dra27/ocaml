@@ -264,6 +264,10 @@ Working version
   (Boris Yakobowski, review by Daniel Bünzli, Gabriel Scherer and Nicolás Ojeda
   Bär)
 
+- #12???: Add Sys.interpreter containing the full path (if available) to the
+  currently executing runtime.
+  (David Allsopp, review by ???)
+
 ### Other libraries:
 
 - #11374: Remove pointer cast to a type with stricter alignment requirements
