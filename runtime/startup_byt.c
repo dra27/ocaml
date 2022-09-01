@@ -569,7 +569,7 @@ CAMLexport void caml_main(char_os **argv)
   caml_close_channel(chan); /* this also closes fd */
   caml_stat_free(trail.section);
   /* Initialize system libraries */
-  caml_sys_init(exe_name, argv + pos);
+  caml_sys_init(proc_self_exe, exe_name, argv + pos);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
@@ -636,7 +636,7 @@ CAMLexport value caml_startup_code_exn(
   exe_name = caml_executable_name();
   if (exe_name == NULL) exe_name = caml_search_exe_in_path(argv[0]);
   Caml_state->external_raise = NULL;
-  caml_sys_init(exe_name, argv);
+  caml_sys_init(exe_name, exe_name, argv);
   caml_locate_standard_library(exe_name);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
@@ -662,7 +662,7 @@ CAMLexport value caml_startup_code_exn(
   /* Record the sections (for caml_get_section_table in meta.c) */
   caml_init_section_table(section_table, section_table_size);
   /* Initialize system libraries */
-  caml_sys_init(exe_name, argv);
+  caml_sys_init(exe_name, exe_name, argv);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* Execute the program */
