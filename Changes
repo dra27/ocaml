@@ -602,6 +602,9 @@ OCaml 5.0
   mingw-w64 i686 port.
   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 
+- #11516, #11524: Fix the `deprecated_mutable` attribute.
+  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
+
 OCaml 4.14 maintenance branch
 -----------------------------
 
