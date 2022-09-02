@@ -610,12 +610,8 @@ OCaml 5.0
    review by Xavier Leroy,
    report by Jan Midtgaard and Tom Kelly)
 
-### Manual and documentation:
-
-- #11045, #11409: document that the array argument to `caml_callbackN`
-  must not have been declared by `CAMLlocalN`.
-  (Xavier Leroy, report by Stephen Dolan, review by Gabriel Scherer.)
-
+- #11516, #11524: Fix the `deprecated_mutable` attribute.
+  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------
