@@ -1,6 +1,32 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..81f59f42db
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,23 @@
++--- a	2023-09-28 18:45:31.464093075 +0100
+++++ b	2023-09-28 18:45:31.484093851 +0100
++@@ -1,15 +1,15 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -607,6 +607,9 @@ OCaml 5.0
++-    review by Xavier Leroy,
++-    report by Jan Midtgaard and Tom Kelly)
+++@@ -602,6 +602,9 @@ OCaml 5.0
+++   mingw-w64 i686 port.
+++   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
++  
++ +- #11516, #11524: Fix the `deprecated_mutable` attribute.
++ +  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
++ +
++- OCaml 4.14.0 (28 March 2022)
++- ----------------------------
+++ OCaml 4.14 maintenance branch
+++ -----------------------------
++  
++ diff --git a/testsuite/tests/warnings/deprecated_mutable.compilers.reference b/testsuite/tests/warnings/deprecated_mutable.compilers.reference
++ new file mode 100644
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,13 +40,16 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 1a41046169..953283d545 100644
+index 2425dba26c..ad20339d51 100644
 --- a/Changes
 +++ b/Changes
-@@ -602,11 +602,26 @@ OCaml 5.0
+@@ -602,13 +602,28 @@ OCaml 5.0
    mingw-w64 i686 port.
    (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
  
++- #11516, #11524: Fix the `deprecated_mutable` attribute.
++  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
++
 +OCaml 4.14 maintenance branch
 +-----------------------------
 +
@@ -29,6 +58,8 @@ index 1a41046169..953283d545 100644
     review by Xavier Leroy,
     report by Jan Midtgaard and Tom Kelly)
  
+-- #11516, #11524: Fix the `deprecated_mutable` attribute.
+-  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 +### Manual and documentation:
 +
 +- #11045, #11409: document that the array argument to `caml_callbackN`
@@ -40,11 +71,10 @@ index 1a41046169..953283d545 100644
 +- #11489, #11496: More prudent deallocation of alternate signal stack
 +  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
 +
-+
+ 
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
- 
-@@ -642,13 +657,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -645,13 +660,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -60,7 +90,7 @@ index 1a41046169..953283d545 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -752,6 +767,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -755,6 +770,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -70,7 +100,7 @@ index 1a41046169..953283d545 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1011,6 +1029,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1014,6 +1032,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9915,13 +9945,39 @@ index 0000000000..bd8cbb2a05
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..39f4c8b19d
+index 0000000000..f8b4aaf75c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9906 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..81f59f42db
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,23 @@
+++--- a	2023-09-28 18:45:31.464093075 +0100
++++++ b	2023-09-28 18:45:31.484093851 +0100
+++@@ -1,15 +1,15 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -607,6 +607,9 @@ OCaml 5.0
+++-    review by Xavier Leroy,
+++-    report by Jan Midtgaard and Tom Kelly)
++++@@ -602,6 +602,9 @@ OCaml 5.0
++++   mingw-w64 i686 port.
++++   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
+++  
+++ +- #11516, #11524: Fix the `deprecated_mutable` attribute.
+++ +  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
+++ +
+++- OCaml 4.14.0 (28 March 2022)
+++- ----------------------------
++++ OCaml 4.14 maintenance branch
++++ -----------------------------
+++  
+++ diff --git a/testsuite/tests/warnings/deprecated_mutable.compilers.reference b/testsuite/tests/warnings/deprecated_mutable.compilers.reference
+++ new file mode 100644
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -9935,13 +9991,16 @@ index 0000000000..39f4c8b19d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 1a41046169..953283d545 100644
++index 2425dba26c..ad20339d51 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -602,11 +602,26 @@ OCaml 5.0
++@@ -602,13 +602,28 @@ OCaml 5.0
 +   mingw-w64 i686 port.
 +   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 + 
+++- #11516, #11524: Fix the `deprecated_mutable` attribute.
+++  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
+++
 ++OCaml 4.14 maintenance branch
 ++-----------------------------
 ++
@@ -9950,6 +10009,8 @@ index 0000000000..39f4c8b19d
 +    review by Xavier Leroy,
 +    report by Jan Midtgaard and Tom Kelly)
 + 
++-- #11516, #11524: Fix the `deprecated_mutable` attribute.
++-  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 ++### Manual and documentation:
 ++
 ++- #11045, #11409: document that the array argument to `caml_callbackN`
@@ -9961,11 +10022,10 @@ index 0000000000..39f4c8b19d
 ++- #11489, #11496: More prudent deallocation of alternate signal stack
 ++  (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
 ++
-++
++ 
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
-+ 
-+@@ -642,13 +657,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -645,13 +660,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9981,7 +10041,7 @@ index 0000000000..39f4c8b19d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -752,6 +767,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -755,6 +770,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -9991,7 +10051,7 @@ index 0000000000..39f4c8b19d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1011,6 +1029,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1014,6 +1032,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -19792,39 +19852,7 @@ index 0000000000..39f4c8b19d
 ++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
 ++-      $configure_flags
 ++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index ebee82eb6f..8936f1e9dd 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -153,7 +153,7 @@ case "$1" in
-++     #run "test $PORT" \
-++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
