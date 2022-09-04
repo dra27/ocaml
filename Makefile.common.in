@@ -73,6 +73,8 @@ endif
 # By default, request ocamllex to be quiet
 OCAMLLEX_FLAGS ?= -q
 
+ZINC_RUNTIME_ID = @zinc_runtime_id@
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
