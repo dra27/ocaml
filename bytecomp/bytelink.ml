@@ -417,10 +417,15 @@ let write_header outchan =
     if String.length !Clflags.use_runtime > 0 then
       make_absolute !Clflags.use_runtime, Absolute
     else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:false ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
       let runtime =
         Printf.sprintf "ocamlrun%s-%s"
                        !Clflags.runtime_variant
-                       Config.zinc_runtime_id
+                       runtime_id
       in
       let runtime =
         if runtime_info.search = Absolute then
@@ -455,6 +460,17 @@ let write_header outchan =
       else
         Shebang_runtime
   in
+  let additional_runtimes =
+    if search = Absolute then
+      []
+    else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:true ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
+      [Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id]
+  in
   match launcher with
   | Shebang_runtime ->
       assert (search = Absolute);
@@ -477,12 +493,24 @@ let write_header outchan =
             else "" in
           let absolute_then_search_fi =
             if search = Absolute_then_search then "\nfi" else "" in
+          let additional_runtimes =
+            if additional_runtimes = [] then
+              ""
+            else
+              let additional_runtimes =
+                String.concat " " (List.map Filename.quote additional_runtimes)
+              in
+              " " ^ additional_runtimes
+          in
           Printf.fprintf outchan {|#!%s
 r=%s%s
 d="$(dirname "$0" 2>/dev/null)"
 test -z "$d" || d="${d%%/}/"
+for r in "$r"%s; do
 c="$(command -v "$d$r")"
-test -n "$c" || c="$(command -v "$r")"%s
+test -n "$c" || c="$(command -v "$r")"
+test -z "$c" || break
+done%s
 if test -z "$c"; then
 echo 'This program requires OCaml %d.%d'>&2
 echo "The interpreter ($r) was not found either with $0 or in \$PATH">&2
@@ -490,8 +518,8 @@ else
 exec "$c" "$0" "$@"
 fi
 exit 126
-|} bin_sh runtime absolute_then_search absolute_then_search_fi
-   Sys.ocaml_release.major Sys.ocaml_release.minor
+|} bin_sh runtime absolute_then_search additional_runtimes
+   absolute_then_search_fi Sys.ocaml_release.major Sys.ocaml_release.minor
       in
       Bytesections.init_record outchan
   | Executable ->
@@ -510,10 +538,11 @@ exit 126
             (* TODO No need to null-terminate the runtime itself *)
             Printf.fprintf outchan "%s\000%s\000"
               (Filename.concat runtime_info.bindir "")
-              runtime
+              (String.concat "\000" (runtime::additional_runtimes))
         | Search ->
             (* TODO No need to null-terminate the runtime itself *)
-            Printf.fprintf outchan "\000%s\000" runtime
+            Printf.fprintf outchan "\000%s\000"
+              (String.concat "\000" (runtime::additional_runtimes))
       in
       Bytesections.record toc_writer RNTM;
       toc_writer
