@@ -267,6 +267,7 @@ AC_SUBST([relative_libdir])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
 AC_SUBST([zinc_runtime_id])
+AC_SUBST([zinc_runtime_additional])
 AC_SUBST([runtime_search])
 AC_SUBST([runtime_search_target])
 
@@ -2739,12 +2740,36 @@ m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
 
 # Bits 5-6 (high 2 bits of release number)
 quintet1=m4_eval(ID_VERSION >> 5)
-# Bit 7 (int31)
-AS_IF([! $arch64], [quintet1="4 + ${quintet1}"])
-# Bit 8 (no shared libraries)
-AS_IF([! $supports_shared_libraries], [quintet1="8 + ${quintet1}"])
-# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1a=''
+quintet1b=''
+quintet1c=''
+# Bits 7 & 8 (int31 + no shared libraries)
+AS_CASE([$arch64,$supports_shared_libraries],
+  [false,false],
+    dnl no int63 support; no support for shared libraries
+    [quintet1="8 + 4 + ${quintet1}"],
+  [false,true],
+    dnl no int63 support;
+    [quintet1a="8 + 4 + ${quintet1}"
+    quintet1="4 + ${quintet1}"],
+  [true,false],
+    dnl no shared library support
+    [quintet1a="8 + 4 + ${quintet1}"
+    quintet1="8 + ${quintet1}"],
+  [true,true],
+    [quintet1a="4 + ${quintet1}"
+    quintet1b="8 + ${quintet1}"
+    quintet1c="8 + 4 + ${quintet1}"])
 quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+AS_IF([test -n "${quintet1a}"],
+  [zinc_runtime_additional="00$(echo "${alphabet}" | \
+     cut -c $(expr ${quintet1a} + 1))QUINTET0"])
+AS_IF([test -n "${quintet1b}"],
+  [zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1b} + 1))QUINTET0"])
+AS_IF([test -n "${quintet1c}"],
+  [zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1c} + 1))QUINTET0"])
 
 # Bits 10-14 (number of reserved header bits)
 quintet2="$(echo "${alphabet}" | cut -c $(expr ${reserved_header_bits} + 1))"
