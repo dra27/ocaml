@@ -2687,6 +2687,12 @@ install::
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
 
+define LINK_ZINC
+install::
+	cd "$(INSTALL_BINDIR)" && $(LN) "$(1)$(EXE)" "$(2)$(EXE)"
+
+endef
+
 define INSTALL_RUNTIME
 install::
 	$(INSTALL_PROG) \
@@ -2694,9 +2700,9 @@ install::
 	    "$(INSTALL_BINDIR)/$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
 	cd "$(INSTALL_BINDIR)" && \
     $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
-	cd "$(INSTALL_BINDIR)" && \
-    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
-	    "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
+
+$(foreach id, $(ZINC_RUNTIME_ID) $(ADDITIONAL_ZINC_RUNTIME_IDs), \
+  $(call LINK_ZINC,$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID),$(1)-$(id)))
 endef
 define INSTALL_RUNTIME_LIB
 ifeq "$(2)" "BYTECODE"
