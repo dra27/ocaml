@@ -347,7 +347,7 @@ _Noreturn void search_and_exec_runtime(char_os * rntm, uint32_t rntm_size,
   }
 
   rntm = rntm_bindir_end + 1;
-  if (rntm < rntm_end) {
+  while (rntm < rntm_end) {
     if (root) {
       safe_copy(root_basename, rntm, (rntm_end - rntm + 1));
       /* XXX Double-check, but if the file is _readable_ then we should proceed
@@ -361,6 +361,8 @@ _Noreturn void search_and_exec_runtime(char_os * rntm, uint32_t rntm_size,
     }
     if (exec_file(rntm, argv) != ENOENT)
       exit_with_error(T("Cannot exec "), rntm, NULL);
+    while (rntm != 0)
+      rntm++;
   }
 
   exit_with_error(T("This program requires OCaml ")
