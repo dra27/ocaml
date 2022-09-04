@@ -103,8 +103,6 @@ otherlibs/win32unix/symlink.c     typo.long-line
 
 runtime/sak.c            typo.non-ascii
 
-stdlib/hashbang     typo.white-at-eol typo.missing-lf
-
 testsuite/tests/**                                      typo.missing-header typo.long-line=may
 testsuite/tests/lib-bigarray-2/bigarrf.f                typo.tab
 testsuite/tests/lib-unix/win-stat/fakeclock.c           typo.missing-header=false
