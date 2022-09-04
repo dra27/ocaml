@@ -29,9 +29,7 @@ defaultentry: $(DEFAULT_BUILD_TARGET)
 
 include stdlib/StdlibModules
 
-RUNTIME_NAME = '$(subst ','\'',$(BINDIR))/ocamlrun-$(BYTECODE_RUNTIME_ID)$(EXE)'
-CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) \
-        -use-prims runtime/primitives -use-runtime $(RUNTIME_NAME)
+CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -I otherlibs/dynlink
 ARCHES=amd64 arm64 power s390x riscv
 VPATH = utils parsing typing bytecomp file_formats lambda middle_end \
