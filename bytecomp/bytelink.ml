@@ -341,7 +341,8 @@ let write_header outchan =
     let () =
       if cher_header = "#!" then begin
         let is_absolute_header =
-          String.ends_with ~suffix:Filename.dir_sep runtime_dir
+          let l = String.length runtime_dir in
+          l > 0 && runtime_dir.[l - 1] = Filename.dir_sep.[0]
         in
         (* Write the shebang header, then start recording *)
         if use_runtime || is_absolute_header then begin
