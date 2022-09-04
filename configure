@@ -796,6 +796,7 @@ build_os
 build_vendor
 build_cpu
 build
+zinc_runtime_additional
 zinc_runtime_id
 native_runtime_id
 bytecode_runtime_id
@@ -3510,6 +3511,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
 
 
 
@@ -23589,18 +23591,42 @@ alphabet='0123456789abcdefghijklmnopqrstuv'
 
 # Bits 5-6 (high 2 bits of release number)
 quintet1=1
-# Bit 7 (int31)
-if ! $arch64
-then :
-  quintet1="4 + ${quintet1}"
-fi
-# Bit 8 (no shared libraries)
-if ! $supports_shared_libraries
-then :
-  quintet1="8 + ${quintet1}"
-fi
-# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1a=''
+quintet1b=''
+quintet1c=''
+# Bits 7 & 8 (int31 + no shared libraries)
+case $arch64,$supports_shared_libraries in #(
+  false,false) :
+        quintet1="8 + 4 + ${quintet1}" ;; #(
+  false,true) :
+        quintet1a="8 + 4 + ${quintet1}"
+    quintet1="4 + ${quintet1}" ;; #(
+  true,false) :
+        quintet1a="8 + 4 + ${quintet1}"
+    quintet1="8 + ${quintet1}" ;; #(
+  true,true) :
+    quintet1a="4 + ${quintet1}"
+    quintet1b="8 + ${quintet1}"
+    quintet1c="8 + 4 + ${quintet1}" ;; #(
+  *) :
+     ;;
+esac
 quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+if test -n "${quintet1a}"
+then :
+  zinc_runtime_additional="00$(echo "${alphabet}" | \
+     cut -c $(expr ${quintet1a} + 1))8"
+fi
+if test -n "${quintet1b}"
+then :
+  zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1b} + 1))8"
+fi
+if test -n "${quintet1c}"
+then :
+  zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1c} + 1))8"
+fi
 
 # Bits 10-14 (number of reserved header bits)
 quintet2="$(echo "${alphabet}" | cut -c $(expr ${reserved_header_bits} + 1))"
