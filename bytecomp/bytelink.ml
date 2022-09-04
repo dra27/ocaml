@@ -309,10 +309,15 @@ let write_header outchan =
     if String.length !Clflags.use_runtime > 0 then
       (true, make_absolute !Clflags.use_runtime)
     else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:false ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
       let ocamlrun =
         Printf.sprintf "ocamlrun%s-%s"
                        !Clflags.runtime_variant
-                       Config.zinc_runtime_id
+                       runtime_id
       in
       (false, ocamlrun)
   in
@@ -332,7 +337,14 @@ let write_header outchan =
       (String.sub header_line 0 2,
        String.sub header_line 2 (header_length - 2))
     in
-    let additional_runtimes = [] in
+    let additional_runtimes = [
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          ~static:true ~int31:(Sys.int_size < 63) release_number ~is_release
+      in
+      Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id]
+    in
     let () =
       if cher_header = "#!" then begin
         let is_absolute_header =

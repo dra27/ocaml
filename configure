@@ -3027,6 +3027,8 @@ ac_config_headers="$ac_config_headers runtime/caml/s.h"
 
 ac_config_headers="$ac_config_headers runtime/caml/version.h"
 
+ac_config_files="$ac_config_files utils/config.common.ml"
+
 ac_config_files="$ac_config_files compilerlibs/META"
 
 ac_config_files="$ac_config_files otherlibs/dynlink/META"
@@ -19626,6 +19628,7 @@ do
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "runtime/caml/version.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/version.h" ;;
+    "utils/config.common.ml") CONFIG_FILES="$CONFIG_FILES utils/config.common.ml" ;;
     "compilerlibs/META") CONFIG_FILES="$CONFIG_FILES compilerlibs/META" ;;
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;

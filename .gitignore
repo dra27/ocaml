@@ -247,6 +247,7 @@ META
 
 /utils/config_*.ml*
 /utils/config.ml
+/utils/config.common.ml
 /utils/domainstate.ml
 /utils/domainstate.mli
 
