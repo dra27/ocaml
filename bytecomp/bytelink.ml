@@ -299,7 +299,7 @@ type launch_method =
 | Shebang_runtime
 | Executable
 
-type runtime_launch_info = {
+type[@ocaml.warning "-69"] runtime_launch_info = {
   buffer : string;
   bindir : string;
   launcher : launch_method;
@@ -348,12 +348,12 @@ let read_runtime_launch_info file =
     let bindir_end = String.index_from buffer bindir_start '\000' in
     let bindir = String.sub buffer bindir_start (bindir_end - bindir_start) in
     let executable_offset = bindir_end + 2 in
-    let kind, runtime_id =
-      if bindir_start < 5 then
-        raise Not_found
-      else
-        String.sub buffer 4 (bindir_start - 5), String.sub buffer 0 4 in
     let launcher =
+      let kind =
+        if buffer.[0] = '0' then
+          String.sub buffer 4 (bindir_start - 5)
+        else
+          String.sub buffer 0 (bindir_start - 1) in
       if kind = "exe" then
         Executable
       else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
@@ -364,7 +364,7 @@ let read_runtime_launch_info file =
        || buffer.[executable_offset - 1] <> '\n' then
       raise Not_found
     else
-      {bindir; launcher; buffer; executable_offset; runtime_id}
+      {bindir; launcher; buffer; executable_offset; runtime_id = ""}
   with Not_found ->
     raise (Error (Camlheader ("corrupt header", file)))
 
@@ -397,13 +397,20 @@ let write_header outchan =
     try read_runtime_launch_info (Load_path.find header)
     with Not_found -> raise (Error (File_not_found header))
   in
+  let static = not Config.supports_shared_libraries in
   let use_runtime, runtime =
     if String.length !Clflags.use_runtime > 0 then
       (true, make_absolute !Clflags.use_runtime)
     else
+      let runtime_id =
+        let open Config in
+        Misc.RuntimeID.make_zinc
+          (* XXX int31 = false is the _boot_ value; neither static nor int31
+             are properly implemented yet *)
+          ~static ~int31:true release_number ~is_release
+      in
       let runtime =
-        Printf.sprintf "ocamlrun%s-%s"
-                       !Clflags.runtime_variant runtime_info.runtime_id
+        Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id
       in
       (false, runtime)
   in
