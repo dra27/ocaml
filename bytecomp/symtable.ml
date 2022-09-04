@@ -254,7 +254,7 @@ let rec const_needs_int63 = function
   | Const_block(_, fields) ->
       List.exists const_needs_int63 fields
   | Const_base(Const_char _)
-  | Const_base(Const_string(_, _, _))
+  | Const_base(Const_string(_, _))
   | Const_base(Const_float _)
   | Const_base(Const_int32 _)
   | Const_base(Const_int64 _)
