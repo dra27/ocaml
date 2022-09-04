@@ -367,8 +367,8 @@ _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_size,
        pointing to the location at which to place filenames */
   }
 
-  rntm = rntm_bindir_end + 1;
-  if (rntm < rntm_end) {
+  rntm = rntm_bindir_end;
+  while (++rntm < rntm_end) {
     if (root) {
       safe_copy(root_basename, rntm, (rntm_end - rntm + 1));
       /* If a directory entry with the name of the runtime exists in the same
@@ -381,6 +381,8 @@ _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_size,
     }
     if (exec_file(rntm, argv) != ENOENT)
       exit_with_error(T("Cannot exec "), rntm, NULL);
+    while (*rntm != 0)
+      rntm++;
   }
 
   exit_with_error(T("This program requires OCaml ") OCAML_VERSION T("\n")
