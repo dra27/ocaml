@@ -309,6 +309,24 @@ let patch_object buff patchlist =
 
 (* Build the initial table of globals *)
 
+(* int63_mask is 0x7fffffff80000000 on a 64-bit system and 0 on a 32-bit
+   system *)
+let int63_mask = lnot (0x3fffffff lor (1 lsl 30))
+
+let rec exists_in_block f obj i =
+  f (Obj.field obj i) || i > 0 && exists_in_block f obj (pred i)
+
+let exists_in_block f obj = exists_in_block f obj (Obj.size obj - 1)
+
+let rec const_needs_int63 obj =
+  if Obj.is_block obj then
+    Obj.tag obj < Obj.no_scan_tag && exists_in_block const_needs_int63 obj
+  else
+    ((Obj.obj obj : int) land int63_mask) <> 0
+
+let initial_global_table_is_compat_32 () =
+  List.exists (fun (_, cst) -> const_needs_int63 cst) !literal_table
+
 let initial_global_table () =
   let glob = Array.make !global_table.cnt (Obj.repr 0) in
   List.iter
