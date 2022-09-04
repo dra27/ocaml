@@ -334,7 +334,7 @@ let link_bytecode ?final_name tolink exec_name standalone =
            close_in inchan
          with
          | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (header, msg)))
+         | Sys_error msg -> raise (Error (Camlheader (msg, header)))
        end;
        Bytesections.init_record outchan;
        (* The path to the bytecode interpreter (in use_runtime mode) *)
