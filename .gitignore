@@ -276,7 +276,7 @@ _build
 /toplevel/native/topmain.mli
 
 /utils/config.ml
-/utils/config.common.ml
+/utils/config.mlp
 /utils/domainstate.ml
 /utils/domainstate.mli
 
