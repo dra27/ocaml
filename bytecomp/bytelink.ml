@@ -39,6 +39,7 @@ type error =
   | Cannot_open_dll of filepath
   | Camlheader of string * filepath
   | Link_error of Linkdeps.error
+  | Needs_custom_runtime of string
 
 exception Error of error
 
@@ -55,7 +56,7 @@ let lib_ccobjs = ref []
 let lib_ccopts = ref []
 let lib_dllibs = ref []
 
-let add_ccobjs origin l =
+let add_ccobjs obj_name origin l =
   if not !Clflags.no_auto_link then begin
     if
       String.length !Clflags.use_runtime = 0
@@ -67,7 +68,8 @@ let add_ccobjs origin l =
         Misc.replace_substring ~before:"$CAMLORIGIN" ~after:origin
       in
       lib_ccopts := List.map replace_origin l.lib_ccopts @ !lib_ccopts;
-    end;
+    end else if l.lib_custom then
+      raise(Error(Needs_custom_runtime obj_name));
     lib_dllibs := l.lib_dllibs @ !lib_dllibs
   end
 
@@ -139,7 +141,7 @@ let scan_file ldeps obj_name tolink =
       seek_in ic pos_toc;
       let toc = (input_value ic : library) in
       close_in ic;
-      add_ccobjs (Filename.dirname file_name) toc;
+      add_ccobjs obj_name (Filename.dirname file_name) toc;
       let required =
         List.fold_right
           (fun compunit reqd ->
@@ -588,6 +590,10 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer toc_writer;
     )
 
+let emit_global_constant outchan (name, value) =
+  let value = Misc.Stdlib.String.escaped_c value in
+  Printf.fprintf outchan "char_os * %s = %s;\n" name value
+
 (* Output a bytecode executable as a C file *)
 
 let link_bytecode_as_c tolink outfile with_main =
@@ -651,6 +657,8 @@ static char caml_sections[] = {
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
+       List.iter (emit_global_constant outchan)
+                 !Clflags.global_string_constants;
        if with_main then begin
          output_string outchan {|
 int main_os(int argc, char_os **argv)
@@ -774,9 +782,12 @@ let link objfiles output_name =
   Clflags.all_ccopts := !lib_ccopts @ !Clflags.all_ccopts;
                                                    (* put user's opts first *)
   Clflags.dllibs := !lib_dllibs @ !Clflags.dllibs; (* put user's DLLs first *)
-  if not !Clflags.custom_runtime then
+  if !Clflags.custom_runtime then
+    Compenv.set_caml_standard_library_default ();
+  if not !Clflags.custom_runtime then begin
+    assert (!Clflags.global_string_constants = []);
     link_bytecode tolink output_name true
-  else if not !Clflags.output_c_object then begin
+  end else if not !Clflags.output_c_object then begin
     let bytecode_name = Filename.temp_file "camlcode" "" in
     let prim_name =
       if !Clflags.keep_camlprimc_file then
@@ -802,6 +813,8 @@ extern "C" {
 
 |};
          Symtable.output_primitive_table poc;
+         List.iter (emit_global_constant poc)
+                   !Clflags.global_string_constants;
          output_string poc {|
 #ifdef __cplusplus
 }
@@ -836,12 +849,11 @@ extern "C" {
       ~always:(fun () -> List.iter remove_file !temps)
       (fun () ->
          link_bytecode_as_c tolink c_file !Clflags.output_complete_executable;
+         temps := c_file :: !temps;
          if !Clflags.output_complete_executable then begin
-           temps := c_file :: !temps;
            if not (build_custom_runtime c_file output_name) then
              raise(Error Custom_runtime)
          end else if not (Filename.check_suffix output_name ".c") then begin
-           temps := c_file :: !temps;
            if Ccomp.compile_file ~output:obj_file ?stable_name c_file <> 0 then
              raise(Error Custom_runtime);
            if not (Filename.check_suffix output_name Config.ext_obj) ||
@@ -907,6 +919,9 @@ let report_error_doc ppf = function
         Style.inline_code msg
   | Link_error e ->
       Linkdeps.report_error_doc ~print_filename:Location.Doc.filename ppf e
+  | Needs_custom_runtime obj_name ->
+      fprintf ppf "%s requires a custom runtime; link with -noautolink or \
+                   without -use-prims and -use-runtime" obj_name
 
 let () =
   Location.register_error_of_exn
