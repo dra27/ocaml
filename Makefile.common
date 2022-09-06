@@ -27,7 +27,8 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
-# $( ) suppresses warning from the alignments in the V_ macros below
+# $( ) suppresses warning from the alignments in the V_ macros below and also
+# allows $\ at the end a line
 $(SPACE) :=
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
@@ -155,6 +156,15 @@ OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
+
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
 
 # The rule to compile C files
 
@@ -360,6 +370,7 @@ $(basename $(notdir $(1)))_NATIVE_LINKFLAGS =
 $(basename $(notdir $(1)))_NATIVE_LINKCMD = \
 $(strip \
   $$(CAMLOPT) $$(OC_COMMON_LINKFLAGS) $$(OC_NATIVE_LINKFLAGS) \
+  $(DOTOPT_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_NATIVE_LINKFLAGS))
 
