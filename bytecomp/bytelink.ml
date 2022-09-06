@@ -32,6 +32,7 @@ type error =
   | Camlheader of string * filepath
   | Wrong_link_order of (modname * modname) list
   | Multiple_definition of modname * filepath * filepath
+  | Needs_custom_runtime of string
 
 exception Error of error
 
@@ -48,7 +49,7 @@ let lib_ccobjs = ref []
 let lib_ccopts = ref []
 let lib_dllibs = ref []
 
-let add_ccobjs origin l =
+let add_ccobjs obj_name origin l =
   if not !Clflags.no_auto_link then begin
     if
       String.length !Clflags.use_runtime = 0
@@ -60,7 +61,8 @@ let add_ccobjs origin l =
         Misc.replace_substring ~before:"$CAMLORIGIN" ~after:origin
       in
       lib_ccopts := List.map replace_origin l.lib_ccopts @ !lib_ccopts;
-    end;
+    end else if l.lib_custom then
+      raise(Error(Needs_custom_runtime obj_name));
     lib_dllibs := l.lib_dllibs @ !lib_dllibs
   end
 
@@ -143,7 +145,7 @@ let scan_file obj_name tolink =
       seek_in ic pos_toc;
       let toc = (input_value ic : library) in
       close_in ic;
-      add_ccobjs (Filename.dirname file_name) toc;
+      add_ccobjs obj_name (Filename.dirname file_name) toc;
       let required =
         List.fold_right
           (fun compunit reqd ->
@@ -299,6 +301,71 @@ let make_absolute file =
   else Location.rewrite_absolute_path
          (Filename.concat (Sys.getcwd()) file)
 
+(* Writes the executable header to outchan and writes the RNTM section, if
+   needed. Bytesections.init_record is always called. *)
+
+let write_header outchan =
+  let use_runtime, runtime =
+    if String.length !Clflags.use_runtime > 0 then
+      (true, make_absolute !Clflags.use_runtime)
+    else
+      (false, "ocamlrun" ^ !Clflags.runtime_variant)
+  in
+  (* Copy the header *)
+  let header = "camlheader" in
+  try
+    let inchan = open_in_bin (Load_path.find header) in
+    let shebang, runtime =
+      let header_line =
+        try input_line inchan
+        with End_of_file ->
+          raise (Error (Camlheader ("corrupt header", header)))
+      in
+      let header_length = String.length header_line in
+      if header_length < 2 then
+        raise (Error (Camlheader ("corrupt header", header)));
+      let runtime =
+        if use_runtime then
+          runtime
+        else
+          Filename.concat (String.sub header_line 2 (header_length - 2))
+                          runtime
+      in
+      (String.sub header_line 0 2 = "#!", runtime)
+    in
+    if shebang then begin
+      (* Write the shebang header, then start recording *)
+      let bin_sh =
+        try input_line inchan
+        with End_of_file ->
+          raise (Error (Camlheader ("corrupt header", header)))
+      in
+      if String.length runtime > 125 || String.contains runtime ' ' then
+        (* shebang mustn't exceed 128 including the #! and \0 and can't
+           contain spaces. Use exec in a small shell script instead. *)
+        Printf.fprintf outchan "\
+          #!%s\n\
+          exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
+      else begin
+        output_string outchan "#!";
+        output_string outchan runtime;
+        output_char outchan '\n'
+      end;
+      Bytesections.init_record outchan
+    end else begin
+      copy_file inchan outchan;
+      (* The header is finished - the runtime name needs recording in RNTM,
+         so start recording now *)
+      Bytesections.init_record outchan;
+      output_string outchan runtime;
+      output_char outchan '\000';
+      Bytesections.record outchan "RNTM"
+    end;
+    close_in inchan;
+  with
+  | Not_found -> raise (Error (File_not_found header))
+  | Sys_error msg -> raise (Error (Camlheader (msg, header)))
+
 (* Create a bytecode executable file *)
 
 let link_bytecode ?final_name tolink exec_name standalone =
@@ -320,37 +387,12 @@ let link_bytecode ?final_name tolink exec_name standalone =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file exec_name)
     (fun () ->
-       if standalone && !Clflags.with_runtime then begin
-         (* Copy the header *)
-         let header =
-           if String.length !Clflags.use_runtime > 0
-           then "camlheader_ur" else "camlheader" ^ !Clflags.runtime_variant
-         in
-         try
-           let inchan = open_in_bin (Load_path.find header) in
-           copy_file inchan outchan;
-           close_in inchan
-         with
-         | Not_found -> raise (Error (File_not_found header))
-         | Sys_error msg -> raise (Error (Camlheader (header, msg)))
-       end;
-       Bytesections.init_record outchan;
-       (* The path to the bytecode interpreter (in use_runtime mode) *)
-       if String.length !Clflags.use_runtime > 0 && !Clflags.with_runtime then
-       begin
-         let runtime = make_absolute !Clflags.use_runtime in
-         let runtime =
-           (* shebang mustn't exceed 128 including the #! and \0 *)
-           if String.length runtime > 125 || String.contains runtime ' ' then
-             "/bin/sh\n\
-              exec " ^ Filename.quote runtime ^ " \"$0\" \"$@\""
-           else
-             runtime
-         in
-         output_string outchan runtime;
-         output_char outchan '\n';
-         Bytesections.record outchan "RNTM"
-       end;
+       (* Copy the header and set the path to the bytecode interpreter *)
+       if standalone && !Clflags.with_runtime then
+         (* write_header calls Bytesections.init_record *)
+         write_header outchan
+       else
+         Bytesections.init_record outchan;
        (* The bytecode *)
        let start_code = pos_out outchan in
        Symtable.init();
@@ -460,6 +502,10 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer outchan;
     )
 
+let emit_global_constant outchan (name, value) =
+  let value = Misc.Stdlib.String.escaped_c value in
+  Printf.fprintf outchan "char_os * %s = %s;\n" name value
+
 (* Output a bytecode executable as a C file *)
 
 let link_bytecode_as_c tolink outfile with_main =
@@ -508,6 +554,8 @@ let link_bytecode_as_c tolink outfile with_main =
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
+       List.iter (emit_global_constant outchan)
+                 !Clflags.global_string_constants;
        if with_main then begin
          output_string outchan "\
 \nint main_os(int argc, char_os **argv)\
@@ -574,23 +622,21 @@ let build_custom_runtime prim_name exec_name =
     if not !Clflags.with_runtime
     then ""
     else "-lcamlrun" ^ !Clflags.runtime_variant in
-  let debug_prefix_map =
-    if Config.c_has_debug_prefix_map && not !Clflags.keep_camlprimc_file then
-      let flag =
-        [Printf.sprintf "-fdebug-prefix-map=%s=camlprim.c" prim_name]
-      in
-        if Ccomp.linker_is_flexlink then
-          "-link" :: flag
-        else
-          flag
+  let stable_name =
+    if not !Clflags.keep_camlprimc_file then
+      Some "camlprim.c"
     else
-      [] in
-  let exitcode =
-    (Clflags.std_include_flag "-I" ^ " " ^ Config.bytecomp_c_libraries)
+      None
   in
-  Ccomp.call_linker Ccomp.Exe exec_name
-    (debug_prefix_map @ [prim_name] @ List.rev !Clflags.ccobjs @ [runtime_lib])
-    exitcode = 0
+  let prims_obj = Filename.temp_file "camlprim" Config.ext_obj in
+  let result =
+    Ccomp.compile_file ~output:prims_obj ?stable_name prim_name = 0
+    && Ccomp.call_linker Ccomp.Exe exec_name
+        ([prims_obj] @ List.rev !Clflags.ccobjs @ [runtime_lib])
+        (Clflags.std_include_flag "-I" ^ " " ^ Config.bytecomp_c_libraries) = 0
+  in
+  remove_file prims_obj;
+  result
 
 let append_bytecode bytecode_name exec_name =
   let oc = open_out_gen [Open_wronly; Open_append; Open_binary] 0 exec_name in
@@ -639,9 +685,12 @@ let link objfiles output_name =
   Clflags.all_ccopts := !lib_ccopts @ !Clflags.all_ccopts;
                                                    (* put user's opts first *)
   Clflags.dllibs := !lib_dllibs @ !Clflags.dllibs; (* put user's DLLs first *)
-  if not !Clflags.custom_runtime then
+  if !Clflags.custom_runtime then
+    Compenv.set_caml_standard_library_default ();
+  if not !Clflags.custom_runtime then begin
+    assert (!Clflags.global_string_constants = []);
     link_bytecode tolink output_name true
-  else if not !Clflags.output_c_object then begin
+  end else if not !Clflags.output_c_object then begin
     let bytecode_name = Filename.temp_file "camlcode" "" in
     let prim_name =
       if !Clflags.keep_camlprimc_file then
@@ -661,16 +710,10 @@ let link objfiles output_name =
          #ifdef __cplusplus\n\
          extern \"C\" {\n\
          #endif\n\
-         #ifdef _WIN64\n\
-         #ifdef __MINGW32__\n\
-         typedef long long value;\n\
-         #else\n\
-         typedef __int64 value;\n\
-         #endif\n\
-         #else\n\
-         typedef long value;\n\
-         #endif\n";
+         #include <caml/mlvalues.h>\n";
          Symtable.output_primitive_table poc;
+         List.iter (emit_global_constant poc)
+                   !Clflags.global_string_constants;
          output_string poc "\
          #ifdef __cplusplus\n\
          }\n\
@@ -704,12 +747,11 @@ let link objfiles output_name =
       ~always:(fun () -> List.iter remove_file !temps)
       (fun () ->
          link_bytecode_as_c tolink c_file !Clflags.output_complete_executable;
+         temps := c_file :: !temps;
          if !Clflags.output_complete_executable then begin
-           temps := c_file :: !temps;
            if not (build_custom_runtime c_file output_name) then
              raise(Error Custom_runtime)
          end else if not (Filename.check_suffix output_name ".c") then begin
-           temps := c_file :: !temps;
            if Ccomp.compile_file ~output:obj_file ?stable_name c_file <> 0 then
              raise(Error Custom_runtime);
            if not (Filename.check_suffix output_name Config.ext_obj) ||
@@ -781,7 +823,9 @@ let report_error ppf = function
         Location.print_filename file1
         Location.print_filename file2
         modname
-
+  | Needs_custom_runtime obj_name ->
+      fprintf ppf "%s requires a custom runtime; link with -noautolink or \
+                   without -use-prims and -use-runtime" obj_name
 
 let () =
   Location.register_error_of_exn

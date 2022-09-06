@@ -155,6 +155,15 @@ ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
 
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
@@ -262,7 +271,7 @@ $(1)$(EXE): \
 endef # OCAML_BYTECODE_PROGRAM
 
 LINK_NATIVE_PROGRAM =\
-  $(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) $(OC_NATIVE_LDFLAGS)
+  $(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) $(DOTOPT_LINKFLAGS) $(OC_NATIVE_LDFLAGS)
 
 define OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))

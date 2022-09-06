@@ -18,13 +18,17 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
+RUNTIMEDIR=$(ROOTDIR)/runtime
 DYNLINKDIR=$(ROOTDIR)/otherlibs/dynlink
 UNIXDIR=$(ROOTDIR)/otherlibs/unix
 
 CAMLC=$(BEST_OCAMLC) $(STDLIBFLAGS)
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
           -strict-sequence -strict-formats
-LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR)
+LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR) -I $(RUNTIMEDIR)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+  LINKFLAGS += $(SET_RELATIVE_STDLIB)
+endif
 OC_OCAMLDEPDIRS = $(DIRECTORIES)
 
 DIRECTORIES=$(UNIXDIR) $(DYNLINKDIR) $(addprefix $(ROOTDIR)/,\
