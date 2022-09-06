@@ -27,7 +27,8 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
-# $( ) suppresses warning from the alignments in the V_ macros below
+# $( ) suppresses warning from the alignments in the V_ macros below and also
+# allows $\ at the end a line
 $(SPACE) :=
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
@@ -155,6 +156,15 @@ OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
+
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
 
 # The rule to compile C files
 
@@ -360,6 +370,7 @@ $(basename $(notdir $(1)))_NATIVE_LINKFLAGS =
 $(basename $(notdir $(1)))_NATIVE_LINKCMD = \
 $(strip \
   $$(CAMLOPT) $$(OC_COMMON_LINKFLAGS) $$(OC_NATIVE_LINKFLAGS) \
+  $(DOTOPT_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_NATIVE_LINKFLAGS))
 
@@ -467,3 +478,12 @@ endef # INSTALL_STRIPPED_BYTE_PROG
 # boot/ as part of coldstart. See read_runtime_launch_info in
 # bytecomp/bytelink.ml for further details.
 HEADER_NAME = runtime-launch-info
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif
