@@ -2,10 +2,9 @@
 /*                                                                        */
 /*                                 OCaml                                  */
 /*                                                                        */
-/*             Sebastien Hinderer, projet Cambium, INRIA Paris            */
+/*                 David Allsopp, OCaml Labs, Cambridge.                  */
 /*                                                                        */
-/*   Copyright 2021 Institut National de Recherche en Informatique et     */
-/*     en Automatique.                                                    */
+/*   Copyright 2021 David Allsopp Ltd.                                    */
 /*                                                                        */
 /*   All rights reserved.  This file is distributed under the terms of    */
 /*   the GNU Lesser General Public License version 2.1, with the          */
@@ -13,13 +12,11 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Macros defining the current version of OCaml */
+#include "caml/misc.h"
+#include "build_config.h"
 
-#undef OCAML_VERSION_MAJOR
-#undef OCAML_VERSION_MINOR
-#undef OCAML_VERSION_PATCHLEVEL
-#undef OCAML_VERSION_ADDITIONAL
-#undef OCAML_VERSION_EXTRA
-#undef OCAML_VERSION
-#undef OCAML_VERSION_STRING
-#undef OCAML_RELEASE_NUMBER
+#if defined(OCAML_STDLIB_DIR_REL)
+char_os * caml_standard_library_default = OCAML_STDLIB_DIR_REL;
+#else
+char_os * caml_standard_library_default = OCAML_STDLIB_DIR;
+#endif

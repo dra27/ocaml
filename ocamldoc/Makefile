@@ -18,6 +18,19 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS =
+else
+  BYTELINK_FLAGS = -custom -I $(ROOTDIR)/runtime $(SET_RELATIVE_STDLIB)
+endif
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                   -use-runtime $(RUNTIME_NAME)
+else
+  BYTELINK_FLAGS = -custom
+endif
+
 OCAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 OCAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
@@ -162,12 +175,14 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
 $(OCAMLDOC): $(EXECMOFILES)
-	$(V_LINKC)$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
+	$(V_LINKC)$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(BYTELINK_FLAGS) \
+    $(OCAMLDOC_BCLIBRARIES) $^
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc.opt))
 
 $(OCAMLDOC_OPT): $(EXECMXFILES)
-	$(V_LINKOPT)$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_NCLIBRARIES) $^
+	$(V_LINKOPT)$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    $(OCAMLDOC_NCLIBRARIES) $^
 
 $(OCAMLDOC_LIBCMA): $(LIBCMOFILES)
 	$(V_LINKC)$(OCAMLC) -a -o $@ $(LINKFLAGS) $^

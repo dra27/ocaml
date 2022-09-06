@@ -61,7 +61,7 @@ type deferred_action =
   | ProcessCFile of string
   | ProcessOtherFile of string
   | ProcessObjects of string list
-  | ProcessDLLs of string list
+  | ProcessDLLs of bool * string list
 
 val c_object_of_filename : string -> string
 
@@ -85,3 +85,7 @@ val process_deferred_actions :
 *)
 val parse_arguments : ?current:(int ref)
       -> string array ref -> Arg.anon_fun -> string -> unit
+
+(** Adds caml_standard_library_default to {!Clflags.global_string_constants}
+    if it isn't already present. *)
+val set_caml_standard_library_default: unit -> unit

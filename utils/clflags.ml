@@ -38,15 +38,18 @@ module Float_arg_helper = Arg_helper.Make (struct
   end
 end)
 
-let objfiles = ref ([] : string list)   (* .cmo and .cma files *)
-and ccobjs = ref ([] : string list)     (* .o, .a, .so and -cclib -lxxx *)
-and dllibs = ref ([] : string list)     (* .so and -dllib -lxxx *)
+let objfiles = ref ([] : string list)         (* .cmo and .cma files *)
+and ccobjs = ref ([] : string list)           (* .o, .a, .so and -cclib -lxxx *)
+and dllibs = ref ([] : (bool * string) list)  (* .so, -dllib -lxxx and
+                                                 '-dllib-suffixed -lxxx *)
 
 let cmi_file = ref None
 
 let compile_only = ref false            (* -c *)
 and output_name = ref (None : string option) (* -o *)
 and include_dirs = ref ([] : string list)(* -I *)
+and global_string_constants = ref ([] : (string * string) list)
+                                        (* -set-global-string *)
 and no_std_include = ref false          (* -nostdlib *)
 and no_cwd = ref false                  (* -nocwd *)
 and print_types = ref false             (* -i *)

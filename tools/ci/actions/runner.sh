@@ -38,6 +38,7 @@ EOF
   configure_flags="\
     --prefix=$PREFIX \
     --enable-debug-runtime \
+    --enable-ocamltest \
     $CONFIG_ARG"
 
   case $XARCH in
