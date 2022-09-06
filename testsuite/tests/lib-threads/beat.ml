@@ -1,9 +1,11 @@
 (* TEST
 
-* hassysthreads
+* skip
+reason = "This test is unreliable on macOS in GHA"
+** hassysthreads
 include systhreads
-** bytecode
-** native
+*** bytecode
+*** native
 
 *)
 
