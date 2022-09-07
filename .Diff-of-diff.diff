@@ -1,0 +1,42 @@
+--- a	2023-09-28 18:45:32.124118678 +0100
++++ b	2023-09-28 18:45:32.140119298 +0100
+@@ -245,16 +245,16 @@
+  
+  partialclean::
+  	rm -f $(expunge)
+-@@ -1047,7 +1045,7 @@ clean::
+- # Dependencies
+- 
+- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
++@@ -1046,7 +1044,7 @@ clean::
++ subdirs = \
++   stdlib $(addprefix otherlibs/, \
++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
+ -  debugger lex ocamldoc ocamltest tools
+ +  debugger ocamldoc ocamltest tools
+  
+  .PHONY: alldepend
+  alldepend: depend
+-@@ -1072,18 +1070,39 @@ libraryopt:
++@@ -1071,18 +1069,39 @@ libraryopt:
+  partialclean::
+  	$(MAKE) -C stdlib clean
+  
+@@ -421,7 +421,7 @@
+  AC_SUBST([afl])
+  AC_SUBST([flexlink_cmd])
+  AC_SUBST([flexdll_chain])
+-@@ -2024,6 +2025,8 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
++@@ -2072,6 +2073,8 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
+       [with_mmap_map_stack=false])
+    ])
+  
+@@ -430,7 +430,7 @@
+  AS_IF([test x"$enable_function_sections" = "xno"],
+    [function_sections=false],
+    [AS_CASE([$arch],
+-@@ -2044,6 +2047,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
++@@ -2092,6 +2095,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
+                in Clang prior to version 3.5.])],
+              [gcc-*|clang-*],
+                [function_sections=true;
