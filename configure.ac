@@ -916,7 +916,7 @@ AS_CASE([$cc_basename,$host],
       [mkexe_cmd="$mkexe_cmd_exp"])
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
-    oc_ldflags='-municode'
+    mkexe_extra_flags='-link -municode'
     SO="dll"],
   [*,*-pc-windows],
     [toolchain=msvc
@@ -928,7 +928,7 @@ AS_CASE([$cc_basename,$host],
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     mkexe_via_cc_ldflags_prefix='/link '
-    oc_ldflags='/ENTRY:wmainCRTStartup'
+    mkexe_extra_flags='-link /ENTRY:wmainCRTStartup'
     mkexedebugflag=''],
   [*,x86_64-*-linux*],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
