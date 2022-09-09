@@ -1,42 +1,196 @@
---- a	2023-09-28 18:45:32.124118678 +0100
-+++ b	2023-09-28 18:45:32.140119298 +0100
-@@ -245,16 +245,16 @@
-  
-  partialclean::
-  	rm -f $(expunge)
--@@ -1047,7 +1045,7 @@ clean::
-- # Dependencies
-- 
-- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-+@@ -1046,7 +1044,7 @@ clean::
-+ subdirs = \
-+   stdlib $(addprefix otherlibs/, \
-+     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
- -  debugger lex ocamldoc ocamltest tools
- +  debugger ocamldoc ocamltest tools
-  
-  .PHONY: alldepend
-  alldepend: depend
--@@ -1072,18 +1070,39 @@ libraryopt:
-+@@ -1071,18 +1069,39 @@ libraryopt:
-  partialclean::
-  	$(MAKE) -C stdlib clean
-  
-@@ -421,7 +421,7 @@
+--- a	2023-09-28 18:45:32.464131862 +0100
++++ b	2023-09-28 18:45:32.480132482 +0100
+@@ -254,7 +254,7 @@
+  AC_SUBST([documentation_tool])
+  AC_SUBST([documentation_tool_cmd])
+  AC_SUBST([ocamltest])
+-@@ -171,10 +202,14 @@ AC_SUBST([oc_native_cflags])
++@@ -171,12 +202,16 @@ AC_SUBST([oc_native_cflags])
   AC_SUBST([afl])
   AC_SUBST([flexlink_cmd])
   AC_SUBST([flexdll_chain])
--@@ -2024,6 +2025,8 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
-+@@ -2072,6 +2073,8 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
-       [with_mmap_map_stack=false])
+@@ -263,22 +263,24 @@
+  AC_SUBST([PACKLD])
+  AC_SUBST([stdlib_manpages])
+  AC_SUBST([compute_deps])
++ AC_SUBST([naked_pointers])
++ AC_SUBST([naked_pointers_checker])
+  AC_SUBST([force_instrumented_runtime])
+ +AC_SUBST([ocaml_bindir])
+ +AC_SUBST([ocaml_libdir])
+  AC_SUBST([QS])
+  
+  ## Generated files
+-@@ -184,6 +219,8 @@ AC_CONFIG_FILES([Makefile.config])
+- AC_CONFIG_FILES([stdlib/sys.ml])
++@@ -187,6 +222,8 @@ AC_CONFIG_FILES([stdlib/sys.ml])
+  AC_CONFIG_FILES([manual/src/version.tex])
+  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
++ AC_CONFIG_FILES([tools/eventlog_metadata])
+ +AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
+ +AC_CONFIG_FILES([utils/config.generated.ml])
+  AC_CONFIG_HEADERS([runtime/caml/m.h])
+  AC_CONFIG_HEADERS([runtime/caml/s.h])
+  AC_CONFIG_HEADERS([runtime/caml/version.h])
+-@@ -236,9 +273,15 @@ AS_CASE([$host],
++@@ -239,9 +276,15 @@ AS_CASE([$host],
+    [ccomptype=cc
+    S=s
+    SO=so
+@@ -295,7 +297,7 @@
+  # Environment variables that are taken into account
+  
+  AC_ARG_VAR([AS], [which assembler to use])
+-@@ -527,34 +570,65 @@ OCAML_HOST_IS_EXECUTABLE
++@@ -538,22 +581,45 @@ OCAML_HOST_IS_EXECUTABLE
+  # manually to make sure the backward compatibility is preserved
+  AS_CASE([$ocaml_cv_cc_vendor],
+    [xlc-*],
+@@ -345,9 +347,10 @@
+  AS_CASE([$host],
+    [*-*-cygwin*|*-*-mingw32|*-pc-windows],
+      [exeext=".exe"],
+-   [exeext=''])
++@@ -561,12 +627,20 @@ AS_CASE([$host],
+  
+- otherlibraries="dynlink runtime_events"
++ dnl otherlibraries="dynlink runtime_events"
++ otherlibraries="dynlink"
+ +lib_dynlink=true
+  AS_IF([test x"$enable_unix_lib" != "xno"],
+    [enable_unix_lib=yes
+@@ -366,7 +369,7 @@
+    AC_CONFIG_FILES([otherlibs/str/META])])
+  
+  # Checks for system services
+-@@ -601,16 +675,16 @@ AS_IF(
++@@ -613,16 +687,16 @@ AS_IF(
+  
+  AS_CASE([$ocaml_cv_cc_vendor],
+    [xlc-*],
+@@ -386,7 +389,7 @@
+    warn_error_flag='-Werror'
+    cc_warnings='-Wall'])
+  
+-@@ -760,6 +834,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -772,6 +846,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+          [AC_MSG_RESULT([no])],
+          [AC_MSG_RESULT([$iflexdir$flexmsg])
+          bootstrapping_flexdll=true
+@@ -394,7 +397,7 @@
+          # The submodule should be searched *before* any other -I paths
+          internal_cppflags="-I $iflexdir $internal_cppflags"])],
+        [AS_IF([test x"$with_flexdll" != 'x'],
+-@@ -1235,13 +1310,13 @@ AS_IF([test -z "$PARTIALLD"],
++@@ -1247,13 +1322,13 @@ AS_IF([test -z "$PARTIALLD"],
+    # The string for PACKLD must be capable of being concatenated with the
+    # output filename. Don't assume that all C compilers understand GNU -ofoo
+    # form, so ensure that the definition includes a space at the end (which is
+@@ -412,7 +415,7 @@
+  
+  # Disable PIE at link time when ocamlopt does not produce position-independent
+  # code and the system produces PIE executables by default and demands PIC
+-@@ -1869,11 +1944,14 @@ AC_COMPILE_IFELSE(
++@@ -1881,11 +1956,14 @@ AC_COMPILE_IFELSE(
+  AS_CASE([$enable_debugger],
+    [no],
+      [with_debugger=""
+@@ -427,7 +430,7 @@
+      AC_MSG_NOTICE([replay debugger not supported])])
     ])
   
-@@ -430,7 +430,7 @@
-  AS_IF([test x"$enable_function_sections" = "xno"],
-    [function_sections=false],
-    [AS_CASE([$arch],
--@@ -2044,6 +2047,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
-+@@ -2092,6 +2095,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
-                in Clang prior to version 3.5.])],
-              [gcc-*|clang-*],
-                [function_sections=true;
+-@@ -1911,6 +1989,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
++@@ -1935,6 +2013,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
+    [systhread_support=true
+    AC_CONFIG_FILES([otherlibs/systhreads/META])
+    otherlibraries="$otherlibraries systhreads"
+@@ -435,7 +438,7 @@
+    AC_MSG_NOTICE([the threads library is supported])])
+  
+  ## Does the assembler support debug prefix map and CFI directives
+-@@ -1951,8 +2030,10 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
++@@ -1999,8 +2078,10 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
+    [install_source_artifacts=true])
+  
+  AS_IF([test x"$enable_ocamldoc" = "xno"],
+@@ -447,7 +450,7 @@
+    AC_CONFIG_FILES([ocamldoc/META])])
+  
+  documentation_tool_cmd=''
+-@@ -2073,8 +2154,8 @@ AS_IF([test "$ccomptype" != "msvc"],
++@@ -2121,8 +2202,8 @@ AS_IF([test "$ccomptype" != "msvc"],
+  
+  oc_cflags="$common_cflags $internal_cflags"
+  oc_cppflags="$common_cppflags $internal_cppflags"
+@@ -458,7 +461,7 @@
+  cclibs="$cclibs $mathlib"
+  
+  AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+-@@ -2142,6 +2223,19 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
++@@ -2192,6 +2273,19 @@ AS_IF([test x"$enable_stdlib_manpages" != "xno"],
+  # Do not permanently cache the result of flexdll.h
+  unset ac_cv_header_flexdll_h
+  
+@@ -478,7 +481,7 @@
+  # Just before config.status is generated, determine the final values for MKEXE,
+  # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
+  # $mkexe - the linking commmand and munged CFLAGS + any extra flexlink flags
+-@@ -2171,31 +2265,37 @@ AC_CONFIG_COMMANDS_PRE([
++@@ -2221,31 +2315,37 @@ AC_CONFIG_COMMANDS_PRE([
+      AS_IF([test -n "${LDFLAGS}"],
+        [for flag in ${LDFLAGS}; do
+          mkdll_ldflags="${mkdll_ldflags} ${mkexe_ldflags_prefix}${flag}"
+@@ -661,7 +664,7 @@
+  
+  %.cmx: %.ml $(deps_opt)
+  	$(ocamlopt) -c $<
+-@@ -226,49 +151,9 @@ ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
++@@ -226,50 +151,9 @@ ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
+  %.cmi: %.mli $(deps_byte)
+  	$(ocamlc) -c $<
+  
+@@ -706,6 +709,7 @@
+ -	    $(call SUBST,DIFF_FLAGS) \
+ -	    $(call SUBST,WINDOWS_UNICODE) \
+ -	    $(call SUBST,FUNCTION_SECTIONS) \
++-	    $(call SUBST,NAKED_POINTERS) \
+ -	    $(call SUBST,WITH_FRAME_POINTERS) \
+ -	    $< > $@
+ +ocamltest_unix.ml: ocamltest_unix_$(ocamltest_unix_impl).ml
+@@ -714,7 +718,7 @@
+  
+  # Manual
+  
+-@@ -282,11 +167,7 @@ ocamltest.html: ocamltest.org
++@@ -283,11 +167,7 @@ ocamltest.html: ocamltest.org
+  .PHONY: clean
+  clean:
+  	rm -rf ocamltest ocamltest.exe ocamltest.opt ocamltest.opt.exe
+@@ -727,7 +731,7 @@
+  	rm -rf $(generated)
+  	rm -f ocamltest.html
+  	rm -rf $(DEPDIR)
+-@@ -297,6 +178,7 @@ endif
++@@ -298,6 +178,7 @@ endif
+  
+  .PHONY: distclean
+  distclean: clean
+@@ -744,7 +748,7 @@
+  (**************************************************************************)
+  (*                                                                        *)
+  (*                                 OCaml                                  *)
+-@@ -15,77 +17,77 @@
++@@ -15,79 +17,79 @@
+  
+  (* The configuration module for ocamltest *)
+  
+@@ -857,6 +861,9 @@
+ -let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
+ +let instrumented_runtime = @instrumented_runtime@
+  
++-let naked_pointers = %%NAKED_POINTERS%%
+++let naked_pointers = @naked_pointers@
++ 
+ -let frame_pointers = %%WITH_FRAME_POINTERS%%
+ +let frame_pointers = @frame_pointers@
+ diff --git a/utils/Makefile b/utils/Makefile

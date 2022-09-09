@@ -65,18 +65,6 @@ index 150b3e8048..6d97b5350f 100644
  
  cache:
    - C:\cygwin64\var\cache\setup
-diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-index 7f2433adc9..68329c5bc1 100644
---- a/ocamltest/Makefile
-+++ b/ocamltest/Makefile
-@@ -267,6 +267,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
- 	    $(call SUBST,DIFF_FLAGS) \
- 	    $(call SUBST,WINDOWS_UNICODE) \
- 	    $(call SUBST,FUNCTION_SECTIONS) \
-+	    $(call SUBST,NAKED_POINTERS) \
- 	    $(call SUBST,WITH_FRAME_POINTERS) \
- 	    $< > $@
- 
 diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
 index c4c11c1905..17eb07492b 100644
 --- a/ocamltest/builtin_actions.ml
@@ -103,16 +91,16 @@ index c4c11c1905..17eb07492b 100644
      file_exists;
      copy;
 diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-index bd3452f4b7..53c86b8866 100644
+index 62b3ae2722..c0e5666224 100644
 --- a/ocamltest/ocamltest_config.ml.in
 +++ b/ocamltest/ocamltest_config.ml.in
-@@ -88,4 +88,6 @@ let function_sections = %%FUNCTION_SECTIONS%%
+@@ -90,4 +90,6 @@ let function_sections = @function_sections@
  
- let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
+ let instrumented_runtime = @instrumented_runtime@
  
-+let naked_pointers = %%NAKED_POINTERS%%
++let naked_pointers = @naked_pointers@
 +
- let frame_pointers = %%WITH_FRAME_POINTERS%%
+ let frame_pointers = @frame_pointers@
 diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
 index 4c8cb07d2e..e0185f5d1e 100644
 --- a/ocamltest/ocamltest_config.mli
