@@ -1,56 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..82d3fc8db5
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,47 @@
-+--- a	2023-09-28 18:45:32.816145510 +0100
-++++ b	2023-09-28 18:45:32.828145976 +0100
-+@@ -55,7 +55,7 @@
-+  AC_SUBST([long_shebang])
-+  AC_SUBST([shebangscripts])
-+  AC_SUBST([AR])
-+-@@ -779,29 +782,30 @@ AS_IF([test x"$enable_shared" = "xno"],
-++@@ -791,29 +794,30 @@ AS_IF([test x"$enable_shared" = "xno"],
-+  # The flexlink command
-+  
-+  flexlink_cmd=flexlink
-+@@ -92,7 +92,7 @@
-+    [flexdll_chain=''])
-+  
-+  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+-@@ -893,12 +897,13 @@ AS_CASE([$cc_basename,$host],
-++@@ -905,12 +909,13 @@ AS_CASE([$cc_basename,$host],
-+    [*,*-*-cygwin*],
-+      [common_cppflags="$common_cppflags -U_WIN32"
-+      AS_IF([$supports_shared_libraries],
-+@@ -109,7 +109,7 @@
-+        [mkexe_extra_flags=''
-+        oc_ldflags='-Wl,--stack,16777216']
-+      )
-+-@@ -908,25 +913,29 @@ AS_CASE([$cc_basename,$host],
-++@@ -920,25 +925,29 @@ AS_CASE([$cc_basename,$host],
-+        [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
-+      ostype="Win32"
-+      toolchain="mingw"
-+@@ -145,7 +145,7 @@
-+      mkexedebugflag=''],
-+    [*,x86_64-*-linux*],
-+      AC_DEFINE([HAS_ARCH_CODE32], [1]),
-+-@@ -1060,20 +1069,19 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -1072,20 +1081,19 @@ AS_IF([test x"$enable_shared" != "xno"],
-+        [mkdll_flags='-shared -undefined dynamic_lookup'
-+        supports_shared_libraries=true],
-+      [*-*-mingw32],
-+@@ -175,7 +175,7 @@
-+      [powerpc-ibm-aix*],
-+        [AS_CASE([$ocaml_cv_cc_vendor],
-+                 [xlc*],
-+-@@ -2243,7 +2251,7 @@ AC_CONFIG_COMMANDS_PRE([
-++@@ -2293,7 +2301,7 @@ AC_CONFIG_COMMANDS_PRE([
-+  # $mkdll - the full linking command for DLLs
-+  # $mkdll_exp: same as above but expanded
-+  # $mkmaindll - the full linking command for main program in DLL
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -9957,63 +9907,13 @@ index 0000000000..a1d1ed3506
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9ed38accac
+index 0000000000..9dd1fcf32d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9899 @@
+@@ -0,0 +1,9903 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..82d3fc8db5
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,47 @@
-++--- a	2023-09-28 18:45:32.816145510 +0100
-+++++ b	2023-09-28 18:45:32.828145976 +0100
-++@@ -55,7 +55,7 @@
-++  AC_SUBST([long_shebang])
-++  AC_SUBST([shebangscripts])
-++  AC_SUBST([AR])
-++-@@ -779,29 +782,30 @@ AS_IF([test x"$enable_shared" = "xno"],
-+++@@ -791,29 +794,30 @@ AS_IF([test x"$enable_shared" = "xno"],
-++  # The flexlink command
-++  
-++  flexlink_cmd=flexlink
-++@@ -92,7 +92,7 @@
-++    [flexdll_chain=''])
-++  
-++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++-@@ -893,12 +897,13 @@ AS_CASE([$cc_basename,$host],
-+++@@ -905,12 +909,13 @@ AS_CASE([$cc_basename,$host],
-++    [*,*-*-cygwin*],
-++      [common_cppflags="$common_cppflags -U_WIN32"
-++      AS_IF([$supports_shared_libraries],
-++@@ -109,7 +109,7 @@
-++        [mkexe_extra_flags=''
-++        oc_ldflags='-Wl,--stack,16777216']
-++      )
-++-@@ -908,25 +913,29 @@ AS_CASE([$cc_basename,$host],
-+++@@ -920,25 +925,29 @@ AS_CASE([$cc_basename,$host],
-++        [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
-++      ostype="Win32"
-++      toolchain="mingw"
-++@@ -145,7 +145,7 @@
-++      mkexedebugflag=''],
-++    [*,x86_64-*-linux*],
-++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
-++-@@ -1060,20 +1069,19 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -1072,20 +1081,19 @@ AS_IF([test x"$enable_shared" != "xno"],
-++        [mkdll_flags='-shared -undefined dynamic_lookup'
-++        supports_shared_libraries=true],
-++      [*-*-mingw32],
-++@@ -175,7 +175,7 @@
-++      [powerpc-ibm-aix*],
-++        [AS_CASE([$ocaml_cv_cc_vendor],
-++                 [xlc*],
-++-@@ -2243,7 +2251,7 @@ AC_CONFIG_COMMANDS_PRE([
-+++@@ -2293,7 +2301,7 @@ AC_CONFIG_COMMANDS_PRE([
-++  # $mkdll - the full linking command for DLLs
-++  # $mkdll_exp: same as above but expanded
-++  # $mkmaindll - the full linking command for main program in DLL
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -19859,8 +19759,61 @@ index 0000000000..9ed38accac
 +++        .comm   G(caml_state), 4
 ++ 
 ++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_param
-\ No newline at end of file
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index ebee82eb6f..8936f1e9dd 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -153,7 +153,7 @@ case "$1" in
+++     #run "test $PORT" \
+++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
+++@@ -176,7 +176,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
 --- a/lambda/matching.ml
@@ -20356,7 +20309,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index 8e08db4745..d51b23c9b4 100644
+index 95a33f115d..3ace0e40f1 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
@@ -22006,7 +21959,7 @@ index 288bc0b8ff..7bbcf3c380 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/Makefile b/tools/Makefile
-index 8325e26dc2..b03bd3b0af 100644
+index 85f9348b11..54f1884110 100644
 --- a/tools/Makefile
 +++ b/tools/Makefile
 @@ -283,6 +283,13 @@ clean::
