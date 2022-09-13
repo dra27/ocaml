@@ -147,8 +147,11 @@ installopt:
 %.$(O): %.c
 	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
+.PHONY: beforedepend
+beforedepend: stdlib.mli unix.mli
+
 .PHONY: depend
-depend:
+depend: beforedepend
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(error Dependencies cannot be regenerated using the MSVC ports)
 else
