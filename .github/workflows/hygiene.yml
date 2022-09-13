@@ -81,9 +81,3 @@ jobs:
       - name: Check that dependency info is up-to-date
         run: tools/ci/actions/check-alldepend.sh
         if: hashFiles('compiler-failed-to-build') == '' && always()
-
-      - name: Check global structure of the reference manual
-        run: |
-          # Required configuration info is left-over from the previous step
-          make -C manual/tests check-stdlib check-case-collision
-        if: hashFiles('compiler-failed-to-build') == '' && always()
