@@ -18,7 +18,7 @@ BASEDIR = ..
 
 ROOTDIR = ../..
 
-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.config
 expect_MAIN=expect_test
 expect_PROG=$(expect_MAIN)$(EXE)
 expect_COMPFLAGS=-I $(OTOPDIR)/parsing -I $(OTOPDIR)/utils \
