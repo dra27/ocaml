@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..603f737bed
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:33.812184112 +0100
+++++ b	2023-09-28 18:45:33.832184887 +0100
++@@ -156,7 +156,7 @@
++  
++     If multiple domains write to the same output channel using the
++     predefined formatters (as obtained by {!get_std_formatter} or
++-@@ -1405,3 +1407,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
+++@@ -1408,3 +1410,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
++  
++    @since 4.03
++  *)
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 6d2d7c85d2..035e5696bc 100644
+index 92843952ea..53ce416df9 100644
 --- a/Changes
 +++ b/Changes
-@@ -606,13 +606,28 @@ OCaml 5.0
+@@ -610,13 +610,28 @@ OCaml 5.0
    mingw-w64 i686 port.
    (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
  
@@ -48,7 +62,7 @@ index 6d2d7c85d2..035e5696bc 100644
  
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
-@@ -649,13 +664,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -653,13 +668,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -64,7 +78,7 @@ index 6d2d7c85d2..035e5696bc 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -759,6 +774,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -763,6 +778,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -74,7 +88,7 @@ index 6d2d7c85d2..035e5696bc 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1018,6 +1036,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1022,6 +1040,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9907,13 +9921,27 @@ index 0000000000..a1d1ed3506
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0f47ed860b
+index 0000000000..246135084b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9903 @@
+@@ -0,0 +1,9905 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..603f737bed
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:33.812184112 +0100
++++++ b	2023-09-28 18:45:33.832184887 +0100
+++@@ -156,7 +156,7 @@
+++  
+++     If multiple domains write to the same output channel using the
+++     predefined formatters (as obtained by {!get_std_formatter} or
+++-@@ -1405,3 +1407,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
++++@@ -1408,3 +1410,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
+++  
+++    @since 4.03
+++  *)
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -9927,10 +9955,10 @@ index 0000000000..0f47ed860b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 6d2d7c85d2..035e5696bc 100644
++index 92843952ea..53ce416df9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -606,13 +606,28 @@ OCaml 5.0
++@@ -610,13 +610,28 @@ OCaml 5.0
 +   mingw-w64 i686 port.
 +   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
 + 
@@ -9961,7 +9989,7 @@ index 0000000000..0f47ed860b
 + 
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
-+@@ -649,13 +664,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -653,13 +668,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9977,7 +10005,7 @@ index 0000000000..0f47ed860b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -759,6 +774,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -763,6 +778,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -9987,7 +10015,7 @@ index 0000000000..0f47ed860b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1018,6 +1036,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1022,6 +1040,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -19801,19 +19829,8 @@ index 0000000000..0f47ed860b
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
 ++@@ -153,7 +153,7 @@ case "$1" in
-++     #run "test $PORT" \
-++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-++@@ -176,7 +176,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
+++     #r
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
 --- a/lambda/matching.ml
@@ -21642,10 +21659,10 @@ index 79bed35407..efb21b7f12 100644
    Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
-index 37c6f3136a..020c9466d3 100644
+index 32e0850f6a..712e4e3493 100644
 --- a/stdlib/format.mli
 +++ b/stdlib/format.mli
-@@ -959,6 +959,7 @@ val formatter_of_out_channel : out_channel -> formatter
+@@ -961,6 +961,7 @@ val formatter_of_out_channel : out_channel -> formatter
      to the corresponding output channel [oc].
  *)
  
@@ -21653,7 +21670,7 @@ index 37c6f3136a..020c9466d3 100644
  val synchronized_formatter_of_out_channel :
    out_channel -> formatter Domain.DLS.key
  (** [synchronized_formatter_of_out_channel oc] returns the key to the
-@@ -969,7 +970,7 @@ val synchronized_formatter_of_out_channel :
+@@ -971,7 +972,7 @@ val synchronized_formatter_of_out_channel :
      domains will be interleaved with each other at points where the formatter
      is flushed, such as with {!print_flush}.
  *)
@@ -21662,7 +21679,7 @@ index 37c6f3136a..020c9466d3 100644
  
  val std_formatter : formatter
  (** The initial domain's standard formatter to write to standard output.
-@@ -1037,6 +1038,7 @@ val make_formatter :
+@@ -1039,6 +1040,7 @@ val make_formatter :
    returns a formatter to the {!Stdlib.out_channel} [oc].
  *)
  
@@ -21670,7 +21687,7 @@ index 37c6f3136a..020c9466d3 100644
  val make_synchronized_formatter :
    (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
  (** [make_synchronized_formatter out flush] returns the key to the domain-local
-@@ -1047,6 +1049,7 @@ val make_synchronized_formatter :
+@@ -1049,6 +1051,7 @@ val make_synchronized_formatter :
      domains will be interleaved with each other at points where the formatter
      is flushed, such as with {!print_flush}.
  *)
