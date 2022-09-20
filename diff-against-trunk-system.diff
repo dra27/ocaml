@@ -1,20 +1,24 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..603f737bed
+index 0000000000..d178dfb227
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:33.812184112 +0100
-++++ b	2023-09-28 18:45:33.832184887 +0100
-+@@ -156,7 +156,7 @@
-+  
-+     If multiple domains write to the same output channel using the
-+     predefined formatters (as obtained by {!get_std_formatter} or
-+-@@ -1405,3 +1407,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
-++@@ -1408,3 +1410,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
-+  
-+    @since 4.03
-+  *)
+@@ -0,0 +1,15 @@
++--- a	2023-09-28 18:45:34.164197749 +0100
+++++ b	2023-09-28 18:45:34.180198369 +0100
++@@ -17,9 +17,9 @@
++ +  (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
++ +   Xavier Leroy)
++ +
++- - #11508, #11509: make Bytes.escaped domain-safe
++-   (Christiano Haesbaert and Gabriel Scherer,
++-    review by Xavier Leroy,
+++ - #11516, #11524: Fix the `deprecated_mutable` attribute.
+++   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
+++ 
++ diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
++ --- a/asmcomp/cmm_helpers.ml
++ +++ b/asmcomp/cmm_helpers.ml
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -28,12 +32,12 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 92843952ea..53ce416df9 100644
+index 8a08aeb02d..ebb87b0761 100644
 --- a/Changes
 +++ b/Changes
-@@ -610,13 +610,28 @@ OCaml 5.0
-   mingw-w64 i686 port.
-   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
+@@ -615,13 +615,28 @@ OCaml 5.0
+   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
+    Xavier Leroy)
  
 +- #11516, #11524: Fix the `deprecated_mutable` attribute.
 +  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
@@ -62,7 +66,7 @@ index 92843952ea..53ce416df9 100644
  
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
-@@ -653,13 +668,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -658,13 +673,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -78,7 +82,7 @@ index 92843952ea..53ce416df9 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -763,6 +778,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -768,6 +783,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -88,7 +92,7 @@ index 92843952ea..53ce416df9 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1022,6 +1040,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1027,6 +1045,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -633,7 +637,7 @@ index 12ad260b2e..6666e1a210 100644
    cfi_endproc();
    emit_symbol_type emit_symbol fundecl.fun_name "function";
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index f92ec296a1..7fe7ef5c96 100644
+index a0f8e6ade2..06d5feb02d 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
 @@ -2203,8 +2203,13 @@ let assignment_kind
@@ -9921,27 +9925,31 @@ index 0000000000..a1d1ed3506
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..246135084b
+index 0000000000..5fc393216d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9905 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..603f737bed
++index 0000000000..d178dfb227
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:33.812184112 +0100
-+++++ b	2023-09-28 18:45:33.832184887 +0100
-++@@ -156,7 +156,7 @@
-++  
-++     If multiple domains write to the same output channel using the
-++     predefined formatters (as obtained by {!get_std_formatter} or
-++-@@ -1405,3 +1407,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
-+++@@ -1408,3 +1410,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
-++  
-++    @since 4.03
-++  *)
++@@ -0,0 +1,15 @@
+++--- a	2023-09-28 18:45:34.164197749 +0100
++++++ b	2023-09-28 18:45:34.180198369 +0100
+++@@ -17,9 +17,9 @@
+++ +  (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
+++ +   Xavier Leroy)
+++ +
+++- - #11508, #11509: make Bytes.escaped domain-safe
+++-   (Christiano Haesbaert and Gabriel Scherer,
+++-    review by Xavier Leroy,
++++ - #11516, #11524: Fix the `deprecated_mutable` attribute.
++++   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
++++ 
+++ diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
+++ --- a/asmcomp/cmm_helpers.ml
+++ +++ b/asmcomp/cmm_helpers.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -9955,12 +9963,12 @@ index 0000000000..246135084b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 92843952ea..53ce416df9 100644
++index 8a08aeb02d..ebb87b0761 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -610,13 +610,28 @@ OCaml 5.0
-+   mingw-w64 i686 port.
-+   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
++@@ -615,13 +615,28 @@ OCaml 5.0
++   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
++    Xavier Leroy)
 + 
 ++- #11516, #11524: Fix the `deprecated_mutable` attribute.
 ++  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
@@ -9989,7 +9997,7 @@ index 0000000000..246135084b
 + 
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
-+@@ -653,13 +668,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -658,13 +673,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10005,7 +10013,7 @@ index 0000000000..246135084b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -763,6 +778,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -768,6 +783,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10015,7 +10023,7 @@ index 0000000000..246135084b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1022,6 +1040,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1027,6 +1045,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10560,7 +10568,7 @@ index 0000000000..246135084b
 +   cfi_endproc();
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index f92ec296a1..7fe7ef5c96 100644
++index a0f8e6ade2..06d5feb02d 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
 +@@ -2203,8 +2203,13 @@ let assignment_kind
@@ -19824,12 +19832,7 @@ index 0000000000..246135084b
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
 +++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -153,7 +153,7 @@ case "$1" in
-++     #r
++++            dep='--enable-depen
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

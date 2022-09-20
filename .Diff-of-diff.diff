@@ -1,11 +1,15 @@
---- a	2023-09-28 18:45:33.812184112 +0100
-+++ b	2023-09-28 18:45:33.832184887 +0100
-@@ -156,7 +156,7 @@
-  
-     If multiple domains write to the same output channel using the
-     predefined formatters (as obtained by {!get_std_formatter} or
--@@ -1405,3 +1407,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
-+@@ -1408,3 +1410,142 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
-  
-    @since 4.03
-  *)
+--- a	2023-09-28 18:45:34.164197749 +0100
++++ b	2023-09-28 18:45:34.180198369 +0100
+@@ -17,9 +17,9 @@
+ +  (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
+ +   Xavier Leroy)
+ +
+- - #11508, #11509: make Bytes.escaped domain-safe
+-   (Christiano Haesbaert and Gabriel Scherer,
+-    review by Xavier Leroy,
++ - #11516, #11524: Fix the `deprecated_mutable` attribute.
++   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
++ 
+ diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
+ --- a/asmcomp/cmm_helpers.ml
+ +++ b/asmcomp/cmm_helpers.ml
