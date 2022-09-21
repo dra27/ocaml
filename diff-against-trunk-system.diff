@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c8d0b148e5
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:45:35.356243907 +0100
-++++ b	2023-09-28 18:45:35.376244681 +0100
-+@@ -34,7 +34,7 @@
-+ diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
-+ --- a/testsuite/tests/parallel/recommended_domain_count.ml
-+ +++ b/testsuite/tests/parallel/recommended_domain_count.ml
-+-@@ -5,6 +5,6 @@ modules = "recommended_domain_count_cstubs.c"
-++@@ -7,6 +7,6 @@ reason = "OCaml 5 only"
-+  external get_max_domains : unit -> int = "caml_get_max_domains"
-+  
-+  let _ =
-+@@ -46,7 +46,7 @@
-+ diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-+ --- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
-+ +++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-+-@@ -19,10 +19,12 @@ let _ =
-++@@ -21,10 +21,12 @@ let _ =
-+        match try_ext cmd with
-+        | None -> ()
-+        | Some n ->
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -37,10 +14,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index aa338187e9..2239cc3ae0 100644
+index 27ccb84139..427c065c70 100644
 --- a/Changes
 +++ b/Changes
-@@ -615,13 +615,28 @@ OCaml 5.0
+@@ -618,13 +618,28 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -71,7 +48,7 @@ index aa338187e9..2239cc3ae0 100644
  
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
-@@ -658,13 +673,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -661,13 +676,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +64,7 @@ index aa338187e9..2239cc3ae0 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -768,6 +783,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -771,6 +786,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -97,7 +74,7 @@ index aa338187e9..2239cc3ae0 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1027,6 +1045,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1030,6 +1048,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6122,7 +6099,7 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..a1d1ed3506
+index 0000000000..caec05d055
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3802 @@
@@ -8871,7 +8848,7 @@ index 0000000000..a1d1ed3506
 + 
 + (* Classic producer-consumer *)
 +diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
-+index a0c5eab744..f31f507819 100644
++index 8aedeba202..cb2c93cbf6 100644
 +--- a/testsuite/tests/parallel/recommended_domain_count.ml
 ++++ b/testsuite/tests/parallel/recommended_domain_count.ml
 +@@ -1,5 +1,7 @@
@@ -8883,7 +8860,7 @@ index 0000000000..a1d1ed3506
 + 
 + external get_max_domains : unit -> int = "caml_get_max_domains"
 +diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-+index 64cf056ad8..8662a37fbd 100644
++index f26038a765..9bab6ccab9 100644
 +--- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
 ++++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
 +@@ -1,8 +1,10 @@
@@ -9930,36 +9907,13 @@ index 0000000000..a1d1ed3506
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4933fdc9d7
+index 0000000000..1f5f4edb67
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9902 @@
+@@ -0,0 +1,9903 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c8d0b148e5
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:45:35.356243907 +0100
-+++++ b	2023-09-28 18:45:35.376244681 +0100
-++@@ -34,7 +34,7 @@
-++ diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
-++ --- a/testsuite/tests/parallel/recommended_domain_count.ml
-++ +++ b/testsuite/tests/parallel/recommended_domain_count.ml
-++-@@ -5,6 +5,6 @@ modules = "recommended_domain_count_cstubs.c"
-+++@@ -7,6 +7,6 @@ reason = "OCaml 5 only"
-++  external get_max_domains : unit -> int = "caml_get_max_domains"
-++  
-++  let _ =
-++@@ -46,7 +46,7 @@
-++ diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-++ --- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
-++ +++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-++-@@ -19,10 +19,12 @@ let _ =
-+++@@ -21,10 +21,12 @@ let _ =
-++        match try_ext cmd with
-++        | None -> ()
-++        | Some n ->
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -9973,10 +9927,10 @@ index 0000000000..4933fdc9d7
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index aa338187e9..2239cc3ae0 100644
++index 27ccb84139..427c065c70 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -615,13 +615,28 @@ OCaml 5.0
++@@ -618,13 +618,28 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10007,7 +9961,7 @@ index 0000000000..4933fdc9d7
 + 
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
-+@@ -658,13 +673,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -661,13 +676,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10023,7 +9977,7 @@ index 0000000000..4933fdc9d7
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -768,6 +783,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -771,6 +786,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10033,7 +9987,7 @@ index 0000000000..4933fdc9d7
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1027,6 +1045,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1030,6 +1048,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16058,7 +16012,7 @@ index 0000000000..4933fdc9d7
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..a1d1ed3506
++index 0000000000..caec05d055
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3802 @@
@@ -18807,7 +18761,7 @@ index 0000000000..4933fdc9d7
 ++ 
 ++ (* Classic producer-consumer *)
 ++diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
-++index a0c5eab744..f31f507819 100644
+++index 8aedeba202..cb2c93cbf6 100644
 ++--- a/testsuite/tests/parallel/recommended_domain_count.ml
 +++++ b/testsuite/tests/parallel/recommended_domain_count.ml
 ++@@ -1,5 +1,7 @@
@@ -18819,7 +18773,7 @@ index 0000000000..4933fdc9d7
 ++ 
 ++ external get_max_domains : unit -> int = "caml_get_max_domains"
 ++diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-++index 64cf056ad8..8662a37fbd 100644
+++index f26038a765..9bab6ccab9 100644
 ++--- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
 +++++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
 ++@@ -1,8 +1,10 @@
@@ -19835,7 +19789,31 @@ index 0000000000..4933fdc9d7
 ++index ebee82eb6f..8936f1e9dd 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
 +++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -153,7 +153,7 @@ case "$1" in
+++     #run "test $PORT" \
+++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
+++@@ -176,7 +176,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
