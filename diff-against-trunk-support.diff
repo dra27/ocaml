@@ -2743,7 +2743,7 @@ index 2e2c09756c..2b86809df1 100644
  
  (* Classic producer-consumer *)
 diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
-index a0c5eab744..f31f507819 100644
+index 8aedeba202..cb2c93cbf6 100644
 --- a/testsuite/tests/parallel/recommended_domain_count.ml
 +++ b/testsuite/tests/parallel/recommended_domain_count.ml
 @@ -1,5 +1,7 @@
@@ -2755,7 +2755,7 @@ index a0c5eab744..f31f507819 100644
  
  external get_max_domains : unit -> int = "caml_get_max_domains"
 diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
-index 64cf056ad8..8662a37fbd 100644
+index f26038a765..9bab6ccab9 100644
 --- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
 +++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
 @@ -1,8 +1,10 @@
