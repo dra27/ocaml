@@ -1,6 +1,112 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..099f664a53
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,103 @@
++--- a	2023-09-28 18:45:37.448324841 +0100
+++++ b	2023-09-28 18:45:37.456325150 +0100
++@@ -1,7 +1,3 @@
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/manual/src/refman/extensions/effects.etex b/manual/src/refman/extensions/effects.etex
++ --- a/manual/src/refman/extensions/effects.etex
++ +++ b/manual/src/refman/extensions/effects.etex
++@@ -17,7 +13,7 @@
++ +handle the effect "F". Hence, we will get an "Effect.Unhandled F" exception
++ +when we run "bar".
++  
++- \begin{caml_example}{verbatim}
+++ \begin{caml_example}{verbatim}[error]
++ -try bar () with Unhandled -> "Saw unhandled exception"
++ +try bar () with Effect.Unhandled F -> "Saw Effect.Unhandled exception"
++  \end{caml_example}
++@@ -30,29 +26,25 @@
++ -"Continuation_already_taken" exception. For example:
++ +"Continuation_already_resumed" exception. For example:
++  
++- \begin{caml_example}{verbatim}
+++ \begin{caml_example}{verbatim}[error]
++  try_with perform (Xchg 0)
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -229,10 +229,16 @@ stdlib__Domain.cmx : domain.ml \
++-     stdlib__Domain.cmi
++- stdlib__Domain.cmi : domain.mli
++- stdlib__Effect.cmo : effect.ml \
++-+    stdlib__Printf.cmi \
++-     stdlib__Printexc.cmi \
++-+    stdlib__Obj.cmi \
++-+    stdlib__Callback.cmi \
++-     stdlib__Effect.cmi
++- stdlib__Effect.cmx : effect.ml \
++-+    stdlib__Printf.cmx \
++-     stdlib__Printexc.cmx \
++-+    stdlib__Obj.cmx \
++-+    stdlib__Callback.cmx \
++-     stdlib__Effect.cmi
++- stdlib__Effect.cmi : effect.mli \
++-     stdlib__Printexc.cmi
++-@@ -580,7 +586,8 @@ stdlib__Printexc.cmx : printexc.ml \
+++@@ -410,12 +410,10 @@ stdlib__Lexing.cmx : lexing.ml \
+++     stdlib__Lexing.cmi
+++ stdlib__Lexing.cmi : lexing.mli
+++ stdlib__List.cmo : list.ml \
+++-    stdlib__Sys.cmi \
+++     stdlib__Seq.cmi \
+++     stdlib__Either.cmi \
+++     stdlib__List.cmi
+++ stdlib__List.cmx : list.ml \
+++-    stdlib__Sys.cmx \
+++     stdlib__Seq.cmx \
+++     stdlib__Either.cmx \
+++     stdlib__List.cmi
+++@@ -537,7 +535,8 @@ stdlib__Printexc.cmx : printexc.ml \
++      stdlib__Atomic.cmx \
++      stdlib__Array.cmx \
++      stdlib__Printexc.cmi
++@@ -62,20 +54,6 @@
++  stdlib__Printf.cmo : printf.ml \
++      camlinternalFormatBasics.cmi \
++      camlinternalFormat.cmi \
++-diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
++---- a/stdlib/StdlibModules
++-+++ b/stdlib/StdlibModules
++-@@ -40,8 +40,8 @@ STDLIB_MODULE_BASENAMES = \
++-   list int bytes string unit marshal array float int32 int64 nativeint \
++-   lexing parsing set map stack queue buffer \
++-   mutex condition semaphore domain \
++--  camlinternalFormat printf arg \
++--  printexc fun gc digest bigarray random hashtbl weak \
++-+  camlinternalFormat printf arg printexc \
++-+  fun gc digest bigarray random hashtbl weak \
++-   format scanf callback camlinternalOO oo camlinternalMod ephemeron \
++-   filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
++-   stdLabels in_channel out_channel effect
++ diff --git a/stdlib/effect.ml b/stdlib/effect.ml
++ --- a/stdlib/effect.ml
++ +++ b/stdlib/effect.ml
++@@ -254,7 +232,7 @@
++ diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
++ --- a/testsuite/tests/callback/test7.ml
++ +++ b/testsuite/tests/callback/test7.ml
++-@@ -31,8 +31,8 @@ let _ =
+++@@ -33,8 +33,8 @@ let _ =
++      printf "[Caml] Call caml_to_c\n%!";
++      begin try
++        caml_to_c ()
++@@ -307,7 +285,7 @@
++ diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
++ --- a/testsuite/tests/effects/test6.ml
++ +++ b/testsuite/tests/effects/test6.ml
++-@@ -8,15 +8,23 @@ type _ t += E : unit t
+++@@ -10,15 +10,23 @@ type _ t += E : unit t
++            | F : unit t
++  
++  let () =
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -688,10 +794,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 612ff353fa..4bf121515f 100755
+index c524f7052d..4bf121515f 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 8349975dbe..f8d315e9ac 100755
+index fe5f665a7a..f8d315e9ac 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -9907,13 +10013,119 @@ index 0000000000..caec05d055
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f17533e6bc
+index 0000000000..d265912f8a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9903 @@
+@@ -0,0 +1,10012 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..099f664a53
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,103 @@
+++--- a	2023-09-28 18:45:37.448324841 +0100
++++++ b	2023-09-28 18:45:37.456325150 +0100
+++@@ -1,7 +1,3 @@
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/manual/src/refman/extensions/effects.etex b/manual/src/refman/extensions/effects.etex
+++ --- a/manual/src/refman/extensions/effects.etex
+++ +++ b/manual/src/refman/extensions/effects.etex
+++@@ -17,7 +13,7 @@
+++ +handle the effect "F". Hence, we will get an "Effect.Unhandled F" exception
+++ +when we run "bar".
+++  
+++- \begin{caml_example}{verbatim}
++++ \begin{caml_example}{verbatim}[error]
+++ -try bar () with Unhandled -> "Saw unhandled exception"
+++ +try bar () with Effect.Unhandled F -> "Saw Effect.Unhandled exception"
+++  \end{caml_example}
+++@@ -30,29 +26,25 @@
+++ -"Continuation_already_taken" exception. For example:
+++ +"Continuation_already_resumed" exception. For example:
+++  
+++- \begin{caml_example}{verbatim}
++++ \begin{caml_example}{verbatim}[error]
+++  try_with perform (Xchg 0)
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -229,10 +229,16 @@ stdlib__Domain.cmx : domain.ml \
+++-     stdlib__Domain.cmi
+++- stdlib__Domain.cmi : domain.mli
+++- stdlib__Effect.cmo : effect.ml \
+++-+    stdlib__Printf.cmi \
+++-     stdlib__Printexc.cmi \
+++-+    stdlib__Obj.cmi \
+++-+    stdlib__Callback.cmi \
+++-     stdlib__Effect.cmi
+++- stdlib__Effect.cmx : effect.ml \
+++-+    stdlib__Printf.cmx \
+++-     stdlib__Printexc.cmx \
+++-+    stdlib__Obj.cmx \
+++-+    stdlib__Callback.cmx \
+++-     stdlib__Effect.cmi
+++- stdlib__Effect.cmi : effect.mli \
+++-     stdlib__Printexc.cmi
+++-@@ -580,7 +586,8 @@ stdlib__Printexc.cmx : printexc.ml \
++++@@ -410,12 +410,10 @@ stdlib__Lexing.cmx : lexing.ml \
++++     stdlib__Lexing.cmi
++++ stdlib__Lexing.cmi : lexing.mli
++++ stdlib__List.cmo : list.ml \
++++-    stdlib__Sys.cmi \
++++     stdlib__Seq.cmi \
++++     stdlib__Either.cmi \
++++     stdlib__List.cmi
++++ stdlib__List.cmx : list.ml \
++++-    stdlib__Sys.cmx \
++++     stdlib__Seq.cmx \
++++     stdlib__Either.cmx \
++++     stdlib__List.cmi
++++@@ -537,7 +535,8 @@ stdlib__Printexc.cmx : printexc.ml \
+++      stdlib__Atomic.cmx \
+++      stdlib__Array.cmx \
+++      stdlib__Printexc.cmi
+++@@ -62,20 +54,6 @@
+++  stdlib__Printf.cmo : printf.ml \
+++      camlinternalFormatBasics.cmi \
+++      camlinternalFormat.cmi \
+++-diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
+++---- a/stdlib/StdlibModules
+++-+++ b/stdlib/StdlibModules
+++-@@ -40,8 +40,8 @@ STDLIB_MODULE_BASENAMES = \
+++-   list int bytes string unit marshal array float int32 int64 nativeint \
+++-   lexing parsing set map stack queue buffer \
+++-   mutex condition semaphore domain \
+++--  camlinternalFormat printf arg \
+++--  printexc fun gc digest bigarray random hashtbl weak \
+++-+  camlinternalFormat printf arg printexc \
+++-+  fun gc digest bigarray random hashtbl weak \
+++-   format scanf callback camlinternalOO oo camlinternalMod ephemeron \
+++-   filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
+++-   stdLabels in_channel out_channel effect
+++ diff --git a/stdlib/effect.ml b/stdlib/effect.ml
+++ --- a/stdlib/effect.ml
+++ +++ b/stdlib/effect.ml
+++@@ -254,7 +232,7 @@
+++ diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
+++ --- a/testsuite/tests/callback/test7.ml
+++ +++ b/testsuite/tests/callback/test7.ml
+++-@@ -31,8 +31,8 @@ let _ =
++++@@ -33,8 +33,8 @@ let _ =
+++      printf "[Caml] Call caml_to_c\n%!";
+++      begin try
+++        caml_to_c ()
+++@@ -307,7 +285,7 @@
+++ diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
+++ --- a/testsuite/tests/effects/test6.ml
+++ +++ b/testsuite/tests/effects/test6.ml
+++-@@ -8,15 +8,23 @@ type _ t += E : unit t
++++@@ -10,15 +10,23 @@ type _ t += E : unit t
+++            | F : unit t
+++  
+++  let () =
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -10601,10 +10813,10 @@ index 0000000000..f17533e6bc
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 612ff353fa..4bf121515f 100755
++index c524f7052d..4bf121515f 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 8349975dbe..f8d315e9ac 100755
++index fe5f665a7a..f8d315e9ac 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -19813,7 +20025,10 @@ index 0000000000..f17533e6bc
 ++   *)
 ++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 ++ 
-++-    if [[ $PORT = 'msvc64' ]] ; 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE dis
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
@@ -19972,7 +20187,7 @@ index 9e64269fff..db44fa9311 100644
  \stddocitem{StdLabels}{include modules \texttt{Array}, \texttt{List} and \texttt{String} with labels}
  \stddocitem{String}{string operations}
 diff --git a/manual/src/refman/extensions/effects.etex b/manual/src/refman/extensions/effects.etex
-index 9d768a317f..eb5bebcea2 100644
+index 19f712c108..71c54af549 100644
 --- a/manual/src/refman/extensions/effects.etex
 +++ b/manual/src/refman/extensions/effects.etex
 @@ -24,7 +24,7 @@ To understand the basics, let us define an effect (that is, an operation) that
@@ -20127,17 +20342,17 @@ index 9d768a317f..eb5bebcea2 100644
  \end{caml_example}
  
 @@ -606,7 +606,7 @@ corresponding "perform". For example, in the previous example, "bar" does not
- handle the effect "F". Hence, we will get an "Unhandled" exception when we run
- "bar".
+ handle the effect "F". Hence, we will get an "Effect.Unhandled F" exception
+ when we run "bar".
  
 -\begin{caml_example}{verbatim}
 +\begin{caml_example}{verbatim}[error]
- try bar () with Unhandled -> "Saw unhandled exception"
+ try bar () with Effect.Unhandled F -> "Saw Effect.Unhandled exception"
  \end{caml_example}
  
 @@ -618,7 +618,7 @@ must be resumed either with a "continue" or "discontinue" exactly once}}.
  Attempting to use a continuation more than once raises a
- "Continuation_already_taken" exception. For example:
+ "Continuation_already_resumed" exception. For example:
  
 -\begin{caml_example}{verbatim}
 +\begin{caml_example}{verbatim}[error]
@@ -21185,7 +21400,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index a0a1132ff8..a741b83cc5 100644
+index b70e25ca23..203af2c274 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21203,7 +21418,7 @@ index a0a1132ff8..a741b83cc5 100644
  stdlib__Digest.cmo : digest.ml \
      stdlib__String.cmi \
      stdlib__Char.cmi \
-@@ -207,35 +199,6 @@ stdlib__Digest.cmx : digest.ml \
+@@ -207,41 +199,6 @@ stdlib__Digest.cmx : digest.ml \
      stdlib__Bytes.cmx \
      stdlib__Digest.cmi
  stdlib__Digest.cmi : digest.mli
@@ -21229,17 +21444,23 @@ index a0a1132ff8..a741b83cc5 100644
 -    stdlib__Domain.cmi
 -stdlib__Domain.cmi : domain.mli
 -stdlib__Effect.cmo : effect.ml \
+-    stdlib__Printf.cmi \
 -    stdlib__Printexc.cmi \
+-    stdlib__Obj.cmi \
+-    stdlib__Callback.cmi \
 -    stdlib__Effect.cmi
 -stdlib__Effect.cmx : effect.ml \
+-    stdlib__Printf.cmx \
 -    stdlib__Printexc.cmx \
+-    stdlib__Obj.cmx \
+-    stdlib__Callback.cmx \
 -    stdlib__Effect.cmi
 -stdlib__Effect.cmi : effect.mli \
 -    stdlib__Printexc.cmi
  stdlib__Either.cmo : either.ml \
      stdlib__Either.cmi
  stdlib__Either.cmx : either.ml \
-@@ -272,8 +235,8 @@ stdlib__Filename.cmo : filename.ml \
+@@ -278,8 +235,8 @@ stdlib__Filename.cmo : filename.ml \
      stdlib__Random.cmi \
      stdlib__Printf.cmi \
      stdlib__List.cmi \
@@ -21249,7 +21470,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Buffer.cmi \
      stdlib__Filename.cmi
  stdlib__Filename.cmx : filename.ml \
-@@ -282,8 +245,8 @@ stdlib__Filename.cmx : filename.ml \
+@@ -288,8 +245,8 @@ stdlib__Filename.cmx : filename.ml \
      stdlib__Random.cmx \
      stdlib__Printf.cmx \
      stdlib__List.cmx \
@@ -21259,7 +21480,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Buffer.cmx \
      stdlib__Filename.cmi
  stdlib__Filename.cmi : filename.mli
-@@ -310,8 +273,8 @@ stdlib__Format.cmo : format.ml \
+@@ -316,8 +273,8 @@ stdlib__Format.cmo : format.ml \
      stdlib__Queue.cmi \
      stdlib__List.cmi \
      stdlib__Int.cmi \
@@ -21269,7 +21490,7 @@ index a0a1132ff8..a741b83cc5 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -325,8 +288,8 @@ stdlib__Format.cmx : format.ml \
+@@ -331,8 +288,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -21279,7 +21500,7 @@ index a0a1132ff8..a741b83cc5 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -336,7 +299,6 @@ stdlib__Format.cmi : format.mli \
+@@ -342,7 +299,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -21287,7 +21508,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -367,8 +329,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -373,8 +329,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -21297,7 +21518,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Atomic.cmi \
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
-@@ -378,8 +340,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -384,8 +340,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -21307,7 +21528,20 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
-@@ -499,11 +461,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -454,12 +410,10 @@ stdlib__Lexing.cmx : lexing.ml \
+     stdlib__Lexing.cmi
+ stdlib__Lexing.cmi : lexing.mli
+ stdlib__List.cmo : list.ml \
+-    stdlib__Sys.cmi \
+     stdlib__Seq.cmi \
+     stdlib__Either.cmi \
+     stdlib__List.cmi
+ stdlib__List.cmx : list.ml \
+-    stdlib__Sys.cmx \
+     stdlib__Seq.cmx \
+     stdlib__Either.cmx \
+     stdlib__List.cmi
+@@ -505,11 +459,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -21319,7 +21553,7 @@ index a0a1132ff8..a741b83cc5 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -606,7 +563,6 @@ stdlib__Random.cmo : random.ml \
+@@ -613,7 +562,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -21327,7 +21561,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -617,7 +573,6 @@ stdlib__Random.cmx : random.ml \
+@@ -624,7 +572,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -21335,7 +21569,7 @@ index a0a1132ff8..a741b83cc5 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -657,15 +612,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -664,15 +611,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -21366,7 +21600,7 @@ index ac469c7de8..6d39cd543a 100644
  	  stdlib.ml stdlib.mli >> $@
  
 diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
-index fc299a5ea8..0780508c00 100644
+index 7302579817..0780508c00 100644
 --- a/stdlib/StdlibModules
 +++ b/stdlib/StdlibModules
 @@ -39,12 +39,11 @@ STDLIB_MODULE_BASENAMES = \
@@ -21374,8 +21608,10 @@ index fc299a5ea8..0780508c00 100644
    list int bytes string unit marshal array float int32 int64 nativeint \
    lexing parsing set map stack queue buffer \
 -  mutex condition semaphore domain \
-   camlinternalFormat printf arg \
-   printexc fun gc digest bigarray random hashtbl weak \
+-  camlinternalFormat printf arg printexc \
+-  fun gc digest bigarray random hashtbl weak \
++  camlinternalFormat printf arg \
++  printexc fun gc digest bigarray random hashtbl weak \
    format scanf callback camlinternalOO oo camlinternalMod ephemeron \
    filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
 -  stdLabels in_channel out_channel effect

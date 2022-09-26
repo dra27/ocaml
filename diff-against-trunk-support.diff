@@ -1092,7 +1092,7 @@ index 23691dcf6c..6281d76e2a 100644
  
  external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-index 9419dd5c6f..e523ba85b7 100644
+index 8883a55f69..800c60e6de 100644
 --- a/testsuite/tests/callback/test7.ml
 +++ b/testsuite/tests/callback/test7.ml
 @@ -1,9 +1,11 @@
@@ -1337,7 +1337,7 @@ index 33ed2c23ca..98802a934e 100644
  
  open Effect
 diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-index ddfb83a5b6..6d4842f9fa 100644
+index 40574561bf..451e9704bc 100644
 --- a/testsuite/tests/effects/test6.ml
 +++ b/testsuite/tests/effects/test6.ml
 @@ -1,4 +1,6 @@
