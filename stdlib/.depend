@@ -410,12 +410,10 @@ stdlib__Lexing.cmx : lexing.ml \
     stdlib__Lexing.cmi
 stdlib__Lexing.cmi : lexing.mli
 stdlib__List.cmo : list.ml \
-    stdlib__Sys.cmi \
     stdlib__Seq.cmi \
     stdlib__Either.cmi \
     stdlib__List.cmi
 stdlib__List.cmx : list.ml \
-    stdlib__Sys.cmx \
     stdlib__Seq.cmx \
     stdlib__Either.cmx \
     stdlib__List.cmi
@@ -537,7 +535,8 @@ stdlib__Printexc.cmx : printexc.ml \
     stdlib__Atomic.cmx \
     stdlib__Array.cmx \
     stdlib__Printexc.cmi
-stdlib__Printexc.cmi : printexc.mli
+stdlib__Printexc.cmi : printexc.mli \
+    stdlib__Obj.cmi
 stdlib__Printf.cmo : printf.ml \
     camlinternalFormatBasics.cmi \
     camlinternalFormat.cmi \
