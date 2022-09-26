@@ -14,10 +14,10 @@ index 772bd2a7ea..2b345c854c 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 569ab37098..401df77164 100644
+index 5dc2f3d766..e0f3825c1c 100644
 --- a/Changes
 +++ b/Changes
-@@ -622,13 +622,28 @@ OCaml 5.0
+@@ -625,13 +625,28 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -48,7 +48,7 @@ index 569ab37098..401df77164 100644
  
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
-@@ -665,13 +680,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -668,13 +683,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -64,7 +64,7 @@ index 569ab37098..401df77164 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -775,6 +790,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -778,6 +793,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -74,7 +74,7 @@ index 569ab37098..401df77164 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1034,6 +1052,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1037,6 +1055,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9907,7 +9907,7 @@ index 0000000000..caec05d055
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1a1cad1530
+index 0000000000..f17533e6bc
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,9903 @@
@@ -9927,10 +9927,10 @@ index 0000000000..1a1cad1530
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 569ab37098..401df77164 100644
++index 5dc2f3d766..e0f3825c1c 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -622,13 +622,28 @@ OCaml 5.0
++@@ -625,13 +625,28 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -9961,7 +9961,7 @@ index 0000000000..1a1cad1530
 + 
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
-+@@ -665,13 +680,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -668,13 +683,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9977,7 +9977,7 @@ index 0000000000..1a1cad1530
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -775,6 +790,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -778,6 +793,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -9987,7 +9987,7 @@ index 0000000000..1a1cad1530
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1034,6 +1052,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1037,6 +1055,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
