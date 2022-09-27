@@ -298,13 +298,13 @@ CAMLprim value caml_dynlink_get_current_libs(value unit)
 
 #else
 
-value caml_dynlink_add_primitive(value handle)
+CAMLprim value caml_dynlink_add_primitive(value handle)
 {
   caml_invalid_argument("dynlink_add_primitive");
   return Val_unit; /* not reached */
 }
 
-value caml_dynlink_get_current_libs(value unit)
+CAMLprim value caml_dynlink_get_current_libs(value unit)
 {
   caml_invalid_argument("dynlink_get_current_libs");
   return Val_unit; /* not reached */

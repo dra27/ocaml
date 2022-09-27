@@ -134,11 +134,6 @@ OCAMLTESTFLAGS := \
 USE_RUNTIME ?=
 
 ifneq ($(USE_RUNTIME),)
-# Check USE_RUNTIME value
-ifeq ($(findstring $(USE_RUNTIME),d i),)
-$(error If set, USE_RUNTIME must be equal to "d" (debug runtime) \
-        or "i" (instrumented runtime))
-endif
 # When using the debug or instrumented runtime,
 # set the runtime's verbosity to 0 by default
 export OCAMLRUNPARAM?=v=0

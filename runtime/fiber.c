@@ -197,7 +197,7 @@ caml_alloc_stack_noexc(mlsize_t wosize, value hval, value hexn, value heff,
 
 #ifdef NATIVE_CODE
 
-value caml_alloc_stack (value hval, value hexn, value heff) {
+CAMLprim value caml_alloc_stack (value hval, value hexn, value heff) {
   const int64_t id = atomic_fetch_add(&fiber_id, 1);
   struct stack_info* stack =
     alloc_size_class_stack_noexc(caml_fiber_wsz, 0 /* first bucket */,

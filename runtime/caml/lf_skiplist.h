@@ -56,13 +56,13 @@ struct lf_skipcell {
 };
 
 /* Initialize a skip list */
-extern void caml_lf_skiplist_init(struct lf_skiplist *sk);
+__attribute__ ((visibility ("default"))) void caml_lf_skiplist_init(struct lf_skiplist *sk);
 
 /* Search a skip list.
    If [key] is found, store associated data in [*data] and return 1.
    If [key] is not found, return 0 and leave [*data] unchanged. */
-extern int caml_lf_skiplist_find(struct lf_skiplist *sk, uintnat key,
-                                 /*out*/ uintnat *data);
+__attribute__ ((visibility ("default"))) int caml_lf_skiplist_find(struct lf_skiplist *sk, uintnat key,
+                                     /*out*/ uintnat *data);
 
 /* Search the entry of the skip list that has the largest key less than
    or equal to [k].
@@ -70,23 +70,23 @@ extern int caml_lf_skiplist_find(struct lf_skiplist *sk, uintnat key,
    [*data], and return 1.
    If no such entry exists (all keys in the skip list are strictly greater
    than [k]), return 0 and leave [*key] and [*data] unchanged. */
-extern int caml_lf_skiplist_find_below(struct lf_skiplist *sk, uintnat k,
-                                       /*out*/ uintnat *key,
-                                       /*out*/ uintnat *data);
+__attribute__ ((visibility ("default"))) int caml_lf_skiplist_find_below(struct lf_skiplist *sk, uintnat k,
+                                           /*out*/ uintnat *key,
+                                           /*out*/ uintnat *data);
 /* Insertion in a skip list. [key] must be between 1 and UINTNAT_MAX-1.
    If [key] was already there, change the associated data and return 1.
    If [key] was not there, insert new [key, data] binding and return 0. */
-extern int caml_lf_skiplist_insert(struct lf_skiplist *sk, uintnat key,
-                                   uintnat data);
+__attribute__ ((visibility ("default"))) int caml_lf_skiplist_insert(struct lf_skiplist *sk, uintnat key,
+                                       uintnat data);
 
 /* Deletion in a skip list.
    If [key] was there, remove it and return 1.
    If [key] was not there, leave the skip list unchanged and return 0. */
-extern int caml_lf_skiplist_remove(struct lf_skiplist *sk, uintnat key);
+__attribute__ ((visibility ("default"))) int caml_lf_skiplist_remove(struct lf_skiplist *sk, uintnat key);
 
 /* This must only be called by a single domain during a stop-the world
     protected by global barriers. */
-extern void caml_lf_skiplist_free_garbage(struct lf_skiplist *sk);
+__attribute__ ((visibility ("default"))) void caml_lf_skiplist_free_garbage(struct lf_skiplist *sk);
 
 /* Macros used for marking pointers and that are unfortunately necessary
   in the header for FOREACH_LF_SKIPLIST_ELEMENT to work */

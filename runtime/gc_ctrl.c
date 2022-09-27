@@ -88,7 +88,7 @@ CAMLprim value caml_gc_quick_stat(value v)
   CAMLreturn (res);
 }
 
-double caml_gc_minor_words_unboxed (void)
+CAMLprim double caml_gc_minor_words_unboxed (void)
 {
   return (Caml_state->stat_minor_words
           + ((double) ((uintnat)Caml_state->young_end -

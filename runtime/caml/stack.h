@@ -77,7 +77,7 @@
 
 /* Declaration of variables used in the asm code */
 extern value * caml_globals[];
-extern intnat caml_globals_inited;
+CAMLextern intnat caml_globals_inited;
 
 #endif /* CAML_INTERNALS */
 

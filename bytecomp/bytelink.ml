@@ -484,6 +484,7 @@ let link_bytecode_as_c tolink outfile with_main =
 \n#include <caml/mlvalues.h>\
 \n#include <caml/startup.h>\
 \n#include <caml/sys.h>\
+\n#include <caml/prims.h>\
 \n#include <caml/misc.h>\n";
        output_string outchan "static int caml_code[] = {\n";
        Symtable.init();
@@ -674,7 +675,10 @@ let link objfiles output_name =
          #endif\n\
          #else\n\
          typedef long value;\n\
-         #endif\n";
+         #endif\n\
+         extern __attribute__ ((visibility (\"default\"))) const char * caml_names_of_builtin_cprim[];\n\
+         typedef value (*int_primitive)();\n\
+         extern __attribute__ ((visibility (\"default\"))) int_primitive caml_builtin_cprim[];\n";
          Symtable.output_primitive_table poc;
          output_string poc "\
          #ifdef __cplusplus\n\

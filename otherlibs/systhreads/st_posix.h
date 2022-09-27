@@ -60,7 +60,7 @@ static value st_encode_sigset(sigset_t * set)
 
 static int sigmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
 
-value caml_thread_sigmask(value cmd, value sigs)
+CAMLprim value caml_thread_sigmask(value cmd, value sigs)
 {
   int how;
   sigset_t set, oldset;
@@ -77,7 +77,7 @@ value caml_thread_sigmask(value cmd, value sigs)
   return st_encode_sigset(&oldset);
 }
 
-value caml_wait_signal(value sigs)
+CAMLprim value caml_wait_signal(value sigs)
 {
 #ifdef HAS_SIGWAIT
   sigset_t set;

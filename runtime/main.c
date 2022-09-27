@@ -27,7 +27,7 @@
 #include <windows.h>
 #endif
 
-int main_os(int argc, char_os **argv)
+__attribute__ ((visibility ("default"))) int main_os(int argc, char_os **argv)
 {
 #ifdef _WIN32
   /* Expand wildcards and diversions in command line */

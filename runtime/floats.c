@@ -464,7 +464,7 @@ CAMLprim value caml_exp_float(value f)
   return caml_copy_double(exp(Double_val(f)));
 }
 
-double caml_exp2(double x)
+CAMLprim double caml_exp2(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return exp2(x);
@@ -478,7 +478,7 @@ CAMLprim value caml_exp2_float(value f)
   return caml_copy_double(caml_exp2(Double_val(f)));
 }
 
-double caml_trunc(double x)
+CAMLprim double caml_trunc(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return trunc(x);
@@ -492,7 +492,7 @@ CAMLprim value caml_trunc_float(value f)
   return caml_copy_double(caml_trunc(Double_val(f)));
 }
 
-double caml_round(double f)
+CAMLprim double caml_round(double f)
 {
 #ifdef HAS_WORKING_ROUND
   return round(f);
@@ -527,7 +527,7 @@ CAMLprim value caml_floor_float(value f)
   return caml_copy_double(floor(Double_val(f)));
 }
 
-double caml_nextafter(double x, double y)
+CAMLprim double caml_nextafter(double x, double y)
 {
   return nextafter(x, y);
 }
@@ -552,7 +552,7 @@ union double_as_int64 { double d; uint64_t i; };
 #define FLM1074 (pow(2,-1074)) //0x1p-1074
 #endif
 
-double caml_fma(double x, double y, double z)
+CAMLprim double caml_fma(double x, double y, double z)
 {
 #ifdef HAS_WORKING_FMA
   return fma(x, y, z);
@@ -774,7 +774,7 @@ CAMLprim value caml_frexp_float(value f)
 }
 
 // Seems dumb but intnat could not correspond to int type.
-double caml_ldexp_float_unboxed(double f, intnat i)
+CAMLprim double caml_ldexp_float_unboxed(double f, intnat i)
 {
   return ldexp(f, (int) i);
 }
@@ -795,7 +795,7 @@ CAMLprim value caml_log10_float(value f)
   return caml_copy_double(log10(Double_val(f)));
 }
 
-double caml_log2(double x)
+CAMLprim double caml_log2(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return log2(x);
@@ -829,7 +829,7 @@ CAMLprim value caml_sqrt_float(value f)
   return caml_copy_double(sqrt(Double_val(f)));
 }
 
-double caml_cbrt(double x)
+CAMLprim double caml_cbrt(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return cbrt(x);
@@ -885,7 +885,7 @@ CAMLprim value caml_asin_float(value f)
   return caml_copy_double(asin(Double_val(f)));
 }
 
-double caml_asinh(double x)
+CAMLprim double caml_asinh(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return asinh(x);
@@ -904,7 +904,7 @@ CAMLprim value caml_acos_float(value f)
   return caml_copy_double(acos(Double_val(f)));
 }
 
-double caml_acosh(double x)
+CAMLprim double caml_acosh(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return acosh(x);
@@ -923,7 +923,7 @@ CAMLprim value caml_atan_float(value f)
   return caml_copy_double(atan(Double_val(f)));
 }
 
-double caml_atanh(double x)
+CAMLprim double caml_atanh(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return atanh(x);
@@ -947,7 +947,7 @@ CAMLprim value caml_ceil_float(value f)
   return caml_copy_double(ceil(Double_val(f)));
 }
 
-double caml_hypot(double x, double y)
+CAMLprim double caml_hypot(double x, double y)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return hypot(x, y);
@@ -972,7 +972,7 @@ CAMLprim value caml_hypot_float(value f, value g)
 
 /* These emulations of expm1() and log1p() are due to William Kahan.
    See http://www.plunk.org/~hatch/rightway.php */
-double caml_expm1(double x)
+CAMLprim double caml_expm1(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return expm1(x);
@@ -986,7 +986,7 @@ double caml_expm1(double x)
 #endif
 }
 
-double caml_log1p(double x)
+CAMLprim double caml_log1p(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return log1p(x);
@@ -1028,7 +1028,7 @@ Caml_inline double simple_erf(double x)
 }
 #endif
 
-double caml_erf(double x)
+CAMLprim double caml_erf(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return erf(x);
@@ -1042,7 +1042,7 @@ CAMLprim value caml_erf_float(value f)
   return caml_copy_double(caml_erf(Double_val(f)));
 }
 
-double caml_erfc(double x)
+CAMLprim double caml_erfc(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return erfc(x);
@@ -1065,7 +1065,7 @@ union double_as_two_int32 {
 #endif
 };
 
-double caml_copysign(double x, double y)
+CAMLprim double caml_copysign(double x, double y)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return copysign(x, y);
@@ -1110,7 +1110,7 @@ CAMLprim value caml_neq_float(value f, value g)
   return Val_bool(Double_val(f) op Double_val(g)); \
 }
 
-intnat caml_float_compare_unboxed(double f, double g)
+CAMLprim intnat caml_float_compare_unboxed(double f, double g)
 {
   /* If one or both of f and g is NaN, order according to the convention
      NaN = NaN and NaN < x for all other floats x. */
@@ -1137,7 +1137,7 @@ CAMLprim value caml_float_compare(value vf, value vg)
 
 enum { FP_normal, FP_subnormal, FP_zero, FP_infinite, FP_nan };
 
-value caml_classify_float_unboxed(double vd)
+CAMLprim value caml_classify_float_unboxed(double vd)
 {
 #ifdef ARCH_SIXTYFOUR
   union { double d; uint64_t i; } u;

@@ -120,8 +120,8 @@ CAMLdeprecated_typedef(addr, char *);
 #endif
 
 #define CAMLexport
-#define CAMLprim
-#define CAMLextern CAMLDLLIMPORT extern
+#define CAMLprim __attribute__ ((visibility ("default")))
+#define CAMLextern CAMLDLLIMPORT extern __attribute ((visibility ("default")))
 
 /* Weak function definitions that can be overridden by external libs */
 /* Conservatively restricted to ELF and MacOSX platforms */

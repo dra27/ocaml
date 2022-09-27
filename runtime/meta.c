@@ -229,37 +229,37 @@ CAMLprim value caml_invoke_traced_function(value codeptr, value env, value arg)
 
 /* Dummy definitions to support compilation of ocamlc.opt */
 
-value caml_get_global_data(value unit)
+CAMLprim value caml_get_global_data(value unit)
 {
   caml_invalid_argument("Meta.get_global_data");
   return Val_unit; /* not reached */
 }
 
-value caml_get_section_table(value unit)
+CAMLprim value caml_get_section_table(value unit)
 {
   caml_invalid_argument("Meta.get_section_table");
   return Val_unit; /* not reached */
 }
 
-value caml_realloc_global(value size)
+CAMLprim value caml_realloc_global(value size)
 {
   caml_invalid_argument("Meta.realloc_global");
   return Val_unit; /* not reached */
 }
 
-value caml_invoke_traced_function(value codeptr, value env, value arg)
+CAMLprim value caml_invoke_traced_function(value codeptr, value env, value arg)
 {
   caml_invalid_argument("Meta.invoke_traced_function");
   return Val_unit; /* not reached */
 }
 
-value caml_reify_bytecode(value prog, value len)
+CAMLprim value caml_reify_bytecode(value prog, value len)
 {
   caml_invalid_argument("Meta.reify_bytecode");
   return Val_unit; /* not reached */
 }
 
-value caml_static_release_bytecode(value prog, value len)
+CAMLprim value caml_static_release_bytecode(value prog, value len)
 {
   caml_invalid_argument("Meta.static_release_bytecode");
   return Val_unit; /* not reached */

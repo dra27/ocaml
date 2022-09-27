@@ -27,7 +27,7 @@ let c_includes =
   "-ccopt -I" ^ dir
 
 let runtime_variant_flags () = match Ocaml_files.runtime_variant() with
-  | Ocaml_files.Normal -> ""
+  | Ocaml_files.Normal -> "-runtime-variant _shared"
   | Ocaml_files.Debug -> " -runtime-variant d"
   | Ocaml_files.Instrumented -> " -runtime-variant i"
 
