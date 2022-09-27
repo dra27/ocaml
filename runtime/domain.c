@@ -207,7 +207,7 @@ static caml_plat_cond all_domains_cond =
 static atomic_uintnat /* dom_internal* */ stw_leader = 0;
 static struct dom_internal all_domains[Max_domains];
 
-CAMLexport atomic_uintnat caml_num_domains_running;
+atomic_uintnat caml_num_domains_running;
 
 
 
@@ -228,8 +228,8 @@ uintnat caml_minor_heap_max_wsz;
   See [stw_resize_minor_heap_reservation].
 */
 
-CAMLexport uintnat caml_minor_heaps_start;
-CAMLexport uintnat caml_minor_heaps_end;
+uintnat caml_minor_heaps_start;
+uintnat caml_minor_heaps_end;
 static __thread dom_internal* domain_self;
 
 /*
@@ -285,7 +285,7 @@ static dom_internal* next_free_domain() {
 #ifdef __APPLE__
 /* OSX has issues with dynamic loading + exported TLS.
    This is slower but works */
-CAMLexport pthread_key_t caml_domain_state_key;
+pthread_key_t caml_domain_state_key;
 static pthread_once_t key_once = PTHREAD_ONCE_INIT;
 
 static void caml_make_domain_state_key (void)
@@ -299,7 +299,7 @@ void caml_init_domain_state_key (void)
 }
 
 #else
-CAMLexport __thread caml_domain_state* caml_state;
+__thread caml_domain_state* caml_state;
 #endif
 
 Caml_inline void interrupt_domain(struct interruptor* s)
@@ -711,7 +711,7 @@ domain_init_complete:
   caml_plat_unlock(&all_domains_lock);
 }
 
-CAMLexport void caml_reset_domain_lock(void)
+void caml_reset_domain_lock(void)
 {
   dom_internal* self = domain_self;
   // This is only used to reset the domain_lock state on fork.
@@ -1040,13 +1040,13 @@ static void caml_domain_external_interrupt_hook_default(void)
   return;
 }
 
-CAMLexport void (*caml_domain_stop_hook)(void) =
+void (*caml_domain_stop_hook)(void) =
    caml_domain_stop_default;
 
-CAMLexport void (*caml_domain_external_interrupt_hook)(void) =
+void (*caml_domain_external_interrupt_hook)(void) =
    caml_domain_external_interrupt_hook_default;
 
-CAMLexport _Atomic caml_timing_hook caml_domain_terminated_hook =
+_Atomic caml_timing_hook caml_domain_terminated_hook =
   (caml_timing_hook)NULL;
 
 static void domain_terminate();
@@ -1547,31 +1547,31 @@ void caml_handle_gc_interrupt(void)
   caml_poll_gc_work();
 }
 
-CAMLexport int caml_bt_is_in_blocking_section(void)
+int caml_bt_is_in_blocking_section(void)
 {
   uintnat status = atomic_load_acq(&domain_self->backup_thread_msg);
   return status == BT_IN_BLOCKING_SECTION;
 }
 
-CAMLexport int caml_bt_is_self(void)
+int caml_bt_is_self(void)
 {
   return pthread_equal(domain_self->backup_thread, pthread_self());
 }
 
-CAMLexport intnat caml_domain_is_multicore (void)
+intnat caml_domain_is_multicore (void)
 {
   dom_internal *self = domain_self;
   return (!caml_domain_alone() || self->backup_thread_running);
 }
 
-CAMLexport void caml_acquire_domain_lock(void)
+void caml_acquire_domain_lock(void)
 {
   dom_internal* self = domain_self;
   caml_plat_lock(&self->domain_lock);
   SET_Caml_state(self->state);
 }
 
-CAMLexport void caml_bt_enter_ocaml(void)
+void caml_bt_enter_ocaml(void)
 {
   dom_internal* self = domain_self;
 
@@ -1582,14 +1582,14 @@ CAMLexport void caml_bt_enter_ocaml(void)
   }
 }
 
-CAMLexport void caml_release_domain_lock(void)
+void caml_release_domain_lock(void)
 {
   dom_internal* self = domain_self;
   SET_Caml_state(NULL);
   caml_plat_unlock(&self->domain_lock);
 }
 
-CAMLexport void caml_bt_exit_ocaml(void)
+void caml_bt_exit_ocaml(void)
 {
   dom_internal* self = domain_self;
 
@@ -1608,7 +1608,7 @@ static void caml_atfork_default(void) {
   caml_acquire_domain_lock();
 }
 
-CAMLexport void (*caml_atfork_hook)(void) = caml_atfork_default;
+void (*caml_atfork_hook)(void) = caml_atfork_default;
 
 static void handover_ephemerons(caml_domain_state* domain_state)
 {

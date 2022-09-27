@@ -172,7 +172,7 @@ union option_value {
   struct timeval tv;
 };
 
-CAMLexport value caml_unix_getsockopt_aux(char * name,
+value caml_unix_getsockopt_aux(char * name,
                                      enum option_type ty, int level, int option,
                                      value socket)
 {
@@ -230,7 +230,7 @@ CAMLexport value caml_unix_getsockopt_aux(char * name,
   CAMLreturn(res);
 }
 
-CAMLexport value caml_unix_setsockopt_aux(char * name,
+value caml_unix_setsockopt_aux(char * name,
                                      enum option_type ty, int level, int option,
                                      value socket, value val)
 {

@@ -30,7 +30,7 @@ CAMLprim value caml_reset_afl_instrumentation(value full)
   return Val_unit;
 }
 
-CAMLexport value caml_setup_afl(value unit)
+value caml_setup_afl(value unit)
 {
   /* AFL is not supported */
   return Val_unit;
@@ -75,7 +75,7 @@ static uint32_t afl_read()
   return msg;
 }
 
-CAMLexport value caml_setup_afl(value unit)
+value caml_setup_afl(value unit)
 {
   char* shm_id_str;
   char* shm_id_end;

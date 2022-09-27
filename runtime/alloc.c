@@ -30,7 +30,7 @@
 #include "caml/fiber.h"
 #include "caml/domain.h"
 
-CAMLexport value caml_alloc (mlsize_t wosize, tag_t tag)
+value caml_alloc (mlsize_t wosize, tag_t tag)
 {
   value result;
   mlsize_t i;
@@ -58,7 +58,7 @@ CAMLexport value caml_alloc (mlsize_t wosize, tag_t tag)
 }
 
 /* This is used by the native compiler for large block allocations. */
-CAMLexport value caml_alloc_shr_check_gc (mlsize_t wosize, tag_t tag)
+value caml_alloc_shr_check_gc (mlsize_t wosize, tag_t tag)
 {
   caml_check_urgent_gc (Val_unit);
   return caml_alloc_shr (wosize, tag);
@@ -90,66 +90,66 @@ Caml_inline value do_alloc_small(mlsize_t wosize, tag_t tag, value* vals)
   return v;
 }
 
-CAMLexport value caml_alloc_1 (tag_t tag, value a)
+value caml_alloc_1 (tag_t tag, value a)
 {
   value v[1] = {a};
   return do_alloc_small(1, tag, v);
 }
 
-CAMLexport value caml_alloc_2 (tag_t tag, value a, value b)
+value caml_alloc_2 (tag_t tag, value a, value b)
 {
   value v[2] = {a, b};
   return do_alloc_small(2, tag, v);
 }
 
-CAMLexport value caml_alloc_3 (tag_t tag, value a, value b, value c)
+value caml_alloc_3 (tag_t tag, value a, value b, value c)
 {
   value v[3] = {a, b, c};
   return do_alloc_small(3, tag, v);
 }
 
-CAMLexport value caml_alloc_4 (tag_t tag, value a, value b, value c, value d)
+value caml_alloc_4 (tag_t tag, value a, value b, value c, value d)
 {
   value v[4] = {a, b, c, d};
   return do_alloc_small(4, tag, v);
 }
 
-CAMLexport value caml_alloc_5 (tag_t tag, value a, value b, value c, value d,
+value caml_alloc_5 (tag_t tag, value a, value b, value c, value d,
                                value e)
 {
   value v[5] = {a, b, c, d, e};
   return do_alloc_small(5, tag, v);
 }
 
-CAMLexport value caml_alloc_6 (tag_t tag, value a, value b, value c, value d,
+value caml_alloc_6 (tag_t tag, value a, value b, value c, value d,
                                value e, value f)
 {
   value v[6] = {a, b, c, d, e, f};
   return do_alloc_small(6, tag, v);
 }
 
-CAMLexport value caml_alloc_7 (tag_t tag, value a, value b, value c, value d,
+value caml_alloc_7 (tag_t tag, value a, value b, value c, value d,
                                value e, value f, value g)
 {
   value v[7] = {a, b, c, d, e, f, g};
   return do_alloc_small(7, tag, v);
 }
 
-CAMLexport value caml_alloc_8 (tag_t tag, value a, value b, value c, value d,
+value caml_alloc_8 (tag_t tag, value a, value b, value c, value d,
                                value e, value f, value g, value h)
 {
   value v[8] = {a, b, c, d, e, f, g, h};
   return do_alloc_small(8, tag, v);
 }
 
-CAMLexport value caml_alloc_9 (tag_t tag, value a, value b, value c, value d,
+value caml_alloc_9 (tag_t tag, value a, value b, value c, value d,
                                value e, value f, value g, value h, value i)
 {
   value v[9] = {a, b, c, d, e, f, g, h, i};
   return do_alloc_small(9, tag, v);
 }
 
-CAMLexport value caml_alloc_N (mlsize_t wosize, tag_t tag, ...)
+value caml_alloc_N (mlsize_t wosize, tag_t tag, ...)
 {
   va_list args;
   mlsize_t i;
@@ -164,7 +164,7 @@ CAMLexport value caml_alloc_N (mlsize_t wosize, tag_t tag, ...)
 }
 
 
-CAMLexport value caml_alloc_small (mlsize_t wosize, tag_t tag)
+value caml_alloc_small (mlsize_t wosize, tag_t tag)
 {
   value result;
 
@@ -177,13 +177,13 @@ CAMLexport value caml_alloc_small (mlsize_t wosize, tag_t tag)
 }
 
 /* [n] is a number of words (fields) */
-CAMLexport value caml_alloc_tuple(mlsize_t n)
+value caml_alloc_tuple(mlsize_t n)
 {
   return caml_alloc(n, 0);
 }
 
 /* [len] is a number of bytes (chars) */
-CAMLexport value caml_alloc_string (mlsize_t len)
+value caml_alloc_string (mlsize_t len)
 {
   value result;
   mlsize_t offset_index;
@@ -203,7 +203,7 @@ CAMLexport value caml_alloc_string (mlsize_t len)
 }
 
 /* [len] is a number of bytes (chars) */
-CAMLexport value caml_alloc_initialized_string (mlsize_t len, const char *p)
+value caml_alloc_initialized_string (mlsize_t len, const char *p)
 {
   value result = caml_alloc_string (len);
   memcpy((char *)String_val(result), p, len);
@@ -213,14 +213,14 @@ CAMLexport value caml_alloc_initialized_string (mlsize_t len, const char *p)
 /* [len] is a number of words.
    [mem] and [max] are relative (without unit).
 */
-CAMLexport value caml_alloc_final (mlsize_t len, final_fun fun,
+value caml_alloc_final (mlsize_t len, final_fun fun,
                                    mlsize_t mem, mlsize_t max)
 {
   return caml_alloc_custom(caml_final_custom_operations(fun),
                            len * sizeof(value), mem, max);
 }
 
-CAMLexport value caml_copy_string(char const *s)
+value caml_copy_string(char const *s)
 {
   mlsize_t len;
   value res;
@@ -230,7 +230,7 @@ CAMLexport value caml_copy_string(char const *s)
   return res;
 }
 
-CAMLexport value caml_alloc_array(value (*funct)(char const *),
+value caml_alloc_array(value (*funct)(char const *),
                                   char const * const* arr)
 {
   CAMLparam0 ();
@@ -276,12 +276,12 @@ value caml_alloc_float_array(mlsize_t len)
 }
 
 
-CAMLexport value caml_copy_string_array(char const * const * arr)
+value caml_copy_string_array(char const * const * arr)
 {
   return caml_alloc_array(caml_copy_string, arr);
 }
 
-CAMLexport int caml_convert_flag_list(value list, const int *flags)
+int caml_convert_flag_list(value list, const int *flags)
 {
   int res = 0;
   for (/*nothing*/; list != Val_emptylist; list = Field(list, 1))
@@ -374,7 +374,7 @@ CAMLprim value caml_update_dummy(value dummy, value newval)
   return Val_unit;
 }
 
-CAMLexport value caml_alloc_some(value v)
+value caml_alloc_some(value v)
 {
   CAMLparam1(v);
   value some = caml_alloc_small(1, Tag_some);

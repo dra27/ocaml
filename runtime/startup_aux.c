@@ -150,7 +150,7 @@ static void call_registered_value(char* name)
     caml_callback_exn(*f, Val_unit);
 }
 
-CAMLexport void caml_shutdown(void)
+void caml_shutdown(void)
 {
   Caml_check_caml_state();
   if (startup_count <= 0)

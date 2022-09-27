@@ -38,7 +38,7 @@
    (This is checked when we install a signal handler.)
    Signal 1 is the least significant bit of caml_pending_signals[0]. */
 
-CAMLexport atomic_uintnat caml_pending_signals[NSIG_WORDS];
+atomic_uintnat caml_pending_signals[NSIG_WORDS];
 
 static caml_plat_mutex signal_install_mutex = CAML_PLAT_MUTEX_INITIALIZER;
 
@@ -54,7 +54,7 @@ int caml_check_pending_signals(void)
 
 /* Execute all pending signals */
 
-CAMLexport value caml_process_pending_signals_exn(void)
+value caml_process_pending_signals_exn(void)
 {
   int i, j, signo;
   uintnat curr, mask ;
@@ -109,7 +109,7 @@ CAMLexport value caml_process_pending_signals_exn(void)
    - by playing with the allocation limit, processed in
      caml_alloc_small_dispatch.
 */
-CAMLexport void caml_record_signal(int signal_number)
+void caml_record_signal(int signal_number)
 {
   unsigned int i;
   if (signal_number <= 0 || signal_number >= NSIG) return;
@@ -134,12 +134,12 @@ static void caml_leave_blocking_section_default(void)
   caml_acquire_domain_lock();
 }
 
-CAMLexport void (*caml_enter_blocking_section_hook)(void) =
+void (*caml_enter_blocking_section_hook)(void) =
    caml_enter_blocking_section_default;
-CAMLexport void (*caml_leave_blocking_section_hook)(void) =
+void (*caml_leave_blocking_section_hook)(void) =
    caml_leave_blocking_section_default;
 
-CAMLexport void caml_enter_blocking_section(void)
+void caml_enter_blocking_section(void)
 {
   while (1){
     /* Process all pending signals now */
@@ -155,12 +155,12 @@ CAMLexport void caml_enter_blocking_section(void)
   }
 }
 
-CAMLexport void caml_enter_blocking_section_no_pending(void)
+void caml_enter_blocking_section_no_pending(void)
 {
   caml_enter_blocking_section_hook ();
 }
 
-CAMLexport void caml_leave_blocking_section(void)
+void caml_leave_blocking_section(void)
 {
   int saved_errno;
   /* Save the value of errno (PR#5982). */
@@ -285,7 +285,7 @@ void caml_set_action_pending(caml_domain_state * dom_st)
   atomic_store_rel(&dom_st->young_limit, (uintnat)-1);
 }
 
-CAMLexport int caml_check_pending_actions(void)
+int caml_check_pending_actions(void)
 {
   Caml_check_caml_state();
   return Caml_check_gc_interrupt(Caml_state) || Caml_state->action_pending;
@@ -345,12 +345,12 @@ value caml_process_pending_actions_with_root(value root)
     caml_process_pending_actions_with_root_exn(root));
 }
 
-CAMLexport value caml_process_pending_actions_exn(void)
+value caml_process_pending_actions_exn(void)
 {
   return caml_process_pending_actions_with_root_exn(Val_unit);
 }
 
-CAMLexport void caml_process_pending_actions(void)
+void caml_process_pending_actions(void)
 {
   caml_process_pending_actions_with_root(Val_unit);
 }
@@ -449,7 +449,7 @@ static int posix_signals[] = {
   SIGPOLL, SIGSYS, SIGTRAP, SIGURG, SIGXCPU, SIGXFSZ
 };
 
-CAMLexport int caml_convert_signal_number(int signo)
+int caml_convert_signal_number(int signo)
 {
   if (signo < 0 && signo >= -(sizeof(posix_signals) / sizeof(int)))
     return posix_signals[-signo-1];
@@ -457,7 +457,7 @@ CAMLexport int caml_convert_signal_number(int signo)
     return signo;
 }
 
-CAMLexport int caml_rev_convert_signal_number(int signo)
+int caml_rev_convert_signal_number(int signo)
 {
   int i;
   for (i = 0; i < sizeof(posix_signals) / sizeof(int); i++)

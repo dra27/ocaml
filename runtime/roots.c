@@ -29,7 +29,7 @@
 #include "caml/shared_heap.h"
 #include "caml/fiber.h"
 
-CAMLexport _Atomic scan_roots_hook caml_scan_roots_hook =
+_Atomic scan_roots_hook caml_scan_roots_hook =
   (scan_roots_hook)NULL;
 
 void caml_do_roots (
@@ -46,7 +46,7 @@ void caml_do_roots (
 
 }
 
-CAMLexport void caml_do_local_roots (
+void caml_do_local_roots (
   scanning_action f, scanning_action_flags fflags, void* fdata,
   struct caml__roots_block *local_roots,
   struct stack_info *current_stack,

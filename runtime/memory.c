@@ -146,7 +146,7 @@ Caml_inline void write_barrier(
    }
 }
 
-CAMLexport CAMLweakdef void caml_modify (volatile value *fp, value val)
+CAMLweakdef void caml_modify (volatile value *fp, value val)
 {
   write_barrier((value)fp, 0, *fp, val);
 
@@ -165,13 +165,13 @@ CAMLexport CAMLweakdef void caml_modify (volatile value *fp, value val)
    free it.  In both cases, you pass as argument the size (in bytes)
    of the block being allocated or freed.
 */
-CAMLexport void caml_alloc_dependent_memory (mlsize_t nbytes)
+void caml_alloc_dependent_memory (mlsize_t nbytes)
 {
   Caml_state->dependent_size += nbytes / sizeof (value);
   Caml_state->dependent_allocated += nbytes / sizeof (value);
 }
 
-CAMLexport void caml_free_dependent_memory (mlsize_t nbytes)
+void caml_free_dependent_memory (mlsize_t nbytes)
 {
   if (Caml_state->dependent_size < nbytes / sizeof (value)){
     Caml_state->dependent_size = 0;
@@ -188,7 +188,7 @@ CAMLexport void caml_free_dependent_memory (mlsize_t nbytes)
    Note that only [res/max] is relevant.  The units (and kind of
    resource) can change between calls to [caml_adjust_gc_speed].
 */
-CAMLexport void caml_adjust_gc_speed (mlsize_t res, mlsize_t max)
+void caml_adjust_gc_speed (mlsize_t res, mlsize_t max)
 {
   if (max == 0) max = 1;
   if (res > max) res = max;
@@ -206,7 +206,7 @@ CAMLexport void caml_adjust_gc_speed (mlsize_t res, mlsize_t max)
 
    [caml_initialize] never calls the GC, so you may call it while a block is
    unfinished (i.e. just after a call to [caml_alloc_shr].) */
-CAMLexport CAMLweakdef void caml_initialize (volatile value *fp, value val)
+CAMLweakdef void caml_initialize (volatile value *fp, value val)
 {
 #ifdef DEBUG
   /* Previous value should not be a pointer.
@@ -219,7 +219,7 @@ CAMLexport CAMLweakdef void caml_initialize (volatile value *fp, value val)
     Ref_table_add(&Caml_state->minor_tables->major_ref, fp);
 }
 
-CAMLexport int caml_atomic_cas_field (
+int caml_atomic_cas_field (
   value obj, intnat field, value oldval, value newval)
 {
   if (caml_domain_alone()) {
@@ -318,7 +318,7 @@ CAMLprim value caml_atomic_fetch_add (value ref, value incr)
   return ret;
 }
 
-CAMLexport void caml_set_fields (value obj, value v)
+void caml_set_fields (value obj, value v)
 {
   int i;
   CAMLassert (Is_block(obj));
@@ -356,12 +356,12 @@ Caml_inline value alloc_shr(mlsize_t wosize, tag_t tag, int noexc)
   return Val_hp(v);
 }
 
-CAMLexport value caml_alloc_shr(mlsize_t wosize, tag_t tag)
+value caml_alloc_shr(mlsize_t wosize, tag_t tag)
 {
   return alloc_shr(wosize, tag, 0);
 }
 
-CAMLexport value caml_alloc_shr_noexc(mlsize_t wosize, tag_t tag) {
+value caml_alloc_shr_noexc(mlsize_t wosize, tag_t tag) {
   return alloc_shr(wosize, tag, 1);
 }
 
@@ -453,7 +453,7 @@ static void unlink_pool_block(struct pool_block *pb)
     caml_plat_unlock(&pool_mutex);
 }
 
-CAMLexport void caml_stat_create_pool(void)
+void caml_stat_create_pool(void)
 {
   if (pool == NULL) {
     pool = malloc(SIZEOF_POOL_BLOCK);
@@ -467,7 +467,7 @@ CAMLexport void caml_stat_create_pool(void)
   }
 }
 
-CAMLexport void caml_stat_destroy_pool(void)
+void caml_stat_destroy_pool(void)
 {
   caml_plat_lock(&pool_mutex);
   if (pool != NULL) {
@@ -483,7 +483,7 @@ CAMLexport void caml_stat_destroy_pool(void)
 }
 
 /* [sz] is a number of bytes */
-CAMLexport caml_stat_block caml_stat_alloc_noexc(asize_t sz)
+caml_stat_block caml_stat_alloc_noexc(asize_t sz)
 {
   /* Backward compatibility mode */
   if (pool == NULL)
@@ -501,7 +501,7 @@ CAMLexport caml_stat_block caml_stat_alloc_noexc(asize_t sz)
 }
 
 /* [sz] and [modulo] are numbers of bytes */
-CAMLexport void* caml_stat_alloc_aligned_noexc(asize_t sz, int modulo,
+void* caml_stat_alloc_aligned_noexc(asize_t sz, int modulo,
                                                caml_stat_block *b)
 {
   char *raw_mem;
@@ -528,7 +528,7 @@ CAMLexport void* caml_stat_alloc_aligned_noexc(asize_t sz, int modulo,
 }
 
 /* [sz] and [modulo] are numbers of bytes */
-CAMLexport void* caml_stat_alloc_aligned(asize_t sz, int modulo,
+void* caml_stat_alloc_aligned(asize_t sz, int modulo,
                                          caml_stat_block *b)
 {
   void *result = caml_stat_alloc_aligned_noexc(sz, modulo, b);
@@ -539,7 +539,7 @@ CAMLexport void* caml_stat_alloc_aligned(asize_t sz, int modulo,
 }
 
 /* [sz] is a number of bytes */
-CAMLexport caml_stat_block caml_stat_alloc(asize_t sz)
+caml_stat_block caml_stat_alloc(asize_t sz)
 {
   void *result = caml_stat_alloc_noexc(sz);
   /* malloc() may return NULL if size is 0 */
@@ -548,7 +548,7 @@ CAMLexport caml_stat_block caml_stat_alloc(asize_t sz)
   return result;
 }
 
-CAMLexport void caml_stat_free(caml_stat_block b)
+void caml_stat_free(caml_stat_block b)
 {
   /* Backward compatibility mode */
   if (pool == NULL)
@@ -562,7 +562,7 @@ CAMLexport void caml_stat_free(caml_stat_block b)
 }
 
 /* [sz] is a number of bytes */
-CAMLexport caml_stat_block caml_stat_resize_noexc(caml_stat_block b, asize_t sz)
+caml_stat_block caml_stat_resize_noexc(caml_stat_block b, asize_t sz)
 {
   if(b == NULL)
     return caml_stat_alloc_noexc(sz);
@@ -589,7 +589,7 @@ CAMLexport caml_stat_block caml_stat_resize_noexc(caml_stat_block b, asize_t sz)
 }
 
 /* [sz] is a number of bytes */
-CAMLexport caml_stat_block caml_stat_resize(caml_stat_block b, asize_t sz)
+caml_stat_block caml_stat_resize(caml_stat_block b, asize_t sz)
 {
   void *result = caml_stat_resize_noexc(b, sz);
   if (result == NULL)
@@ -598,7 +598,7 @@ CAMLexport caml_stat_block caml_stat_resize(caml_stat_block b, asize_t sz)
 }
 
 /* [sz] is a number of bytes */
-CAMLexport caml_stat_block caml_stat_calloc_noexc(asize_t num, asize_t sz)
+caml_stat_block caml_stat_calloc_noexc(asize_t num, asize_t sz)
 {
   uintnat total;
   if (caml_umul_overflow(sz, num, &total))
@@ -611,7 +611,7 @@ CAMLexport caml_stat_block caml_stat_calloc_noexc(asize_t num, asize_t sz)
   }
 }
 
-CAMLexport caml_stat_string caml_stat_strdup_noexc(const char *s)
+caml_stat_string caml_stat_strdup_noexc(const char *s)
 {
   size_t slen = strlen(s);
   caml_stat_block result = caml_stat_alloc_noexc(slen + 1);
@@ -621,7 +621,7 @@ CAMLexport caml_stat_string caml_stat_strdup_noexc(const char *s)
   return result;
 }
 
-CAMLexport caml_stat_string caml_stat_strdup(const char *s)
+caml_stat_string caml_stat_strdup(const char *s)
 {
   caml_stat_string result = caml_stat_strdup_noexc(s);
   if (result == NULL)
@@ -631,7 +631,7 @@ CAMLexport caml_stat_string caml_stat_strdup(const char *s)
 
 #ifdef _WIN32
 
-CAMLexport wchar_t * caml_stat_wcsdup(const wchar_t *s)
+wchar_t * caml_stat_wcsdup(const wchar_t *s)
 {
   int slen = wcslen(s);
   wchar_t* result = caml_stat_alloc((slen + 1)*sizeof(wchar_t));
@@ -643,7 +643,7 @@ CAMLexport wchar_t * caml_stat_wcsdup(const wchar_t *s)
 
 #endif
 
-CAMLexport caml_stat_string caml_stat_strconcat(int n, ...)
+caml_stat_string caml_stat_strconcat(int n, ...)
 {
   va_list args;
   char *result, *p;
@@ -675,7 +675,7 @@ CAMLexport caml_stat_string caml_stat_strconcat(int n, ...)
 
 #ifdef _WIN32
 
-CAMLexport wchar_t* caml_stat_wcsconcat(int n, ...)
+wchar_t* caml_stat_wcsconcat(int n, ...)
 {
   va_list args;
   wchar_t *result, *p;

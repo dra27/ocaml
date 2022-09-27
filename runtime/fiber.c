@@ -688,7 +688,7 @@ static const value * cache_named_exception(const value * _Atomic * cache,
   return exn;
 }
 
-CAMLexport void caml_raise_continuation_already_resumed(void)
+void caml_raise_continuation_already_resumed(void)
 {
   const value * exn =
     cache_named_exception(&caml_continuation_already_resumed_exn,
@@ -708,7 +708,7 @@ value caml_make_unhandled_effect_exn (value effect)
   CAMLreturn(res);
 }
 
-CAMLexport void caml_raise_unhandled_effect (value effect)
+void caml_raise_unhandled_effect (value effect)
 {
   caml_raise(caml_make_unhandled_effect_exn(effect));
 }

@@ -30,7 +30,7 @@
 #include "caml/startup.h"
 
 /* Start or stop the backtrace machinery */
-CAMLexport void caml_record_backtraces(int flag)
+void caml_record_backtraces(int flag)
 {
   if (flag != Caml_state->backtrace_active) {
     Caml_state->backtrace_active = flag;
@@ -96,7 +96,7 @@ static void print_location(struct caml_loc_info * li, int index)
 }
 
 /* Print a backtrace */
-CAMLexport void caml_print_exception_backtrace(void)
+void caml_print_exception_backtrace(void)
 {
   int i;
   struct caml_loc_info li;

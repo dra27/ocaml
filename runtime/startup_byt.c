@@ -450,7 +450,7 @@ extern void caml_install_invalid_parameter_handler(void);
 
 /* Main entry point when loading code from a file */
 
-CAMLexport void caml_main(char_os **argv)
+void caml_main(char_os **argv)
 {
   int fd, pos;
   struct exec_trailer trail;
@@ -594,7 +594,7 @@ CAMLexport void caml_main(char_os **argv)
 
 /* Main entry point when code is linked in as initialized data */
 
-CAMLexport value caml_startup_code_exn(
+value caml_startup_code_exn(
            code_t code, asize_t code_size,
            char *data, asize_t data_size,
            char *section_table, asize_t section_table_size,
@@ -671,7 +671,7 @@ CAMLexport value caml_startup_code_exn(
   return res;
 }
 
-CAMLexport void caml_startup_code(
+void caml_startup_code(
            code_t code, asize_t code_size,
            char *data, asize_t data_size,
            char *section_table, asize_t section_table_size,

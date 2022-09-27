@@ -617,7 +617,7 @@ CAMLprim value caml_thread_new(value clos)
 #define Dom_c_threads 0
 
 /* the thread lock is not held when entering */
-CAMLexport int caml_c_thread_register(void)
+int caml_c_thread_register(void)
 {
   /* Already registered? */
   if (st_tls_get(caml_thread_key) != NULL) return 0;
@@ -665,7 +665,7 @@ CAMLexport int caml_c_thread_register(void)
    the function above */
 
 /* the thread lock is not held when entering */
-CAMLexport int caml_c_thread_unregister(void)
+int caml_c_thread_unregister(void)
 {
   caml_thread_t th = st_tls_get(caml_thread_key);
 

@@ -806,7 +806,7 @@ CAMLprim value caml_input_value_to_outside_heap(value vchan)
   return caml_input_value(vchan);
 }
 
-CAMLexport value caml_input_val_from_bytes(value str, intnat ofs)
+value caml_input_val_from_bytes(value str, intnat ofs)
 {
   CAMLparam1 (str);
   CAMLlocal1 (obj);
@@ -842,7 +842,7 @@ static value input_val_from_block(struct caml_intern_state* s,
   return (intern_end(s, obj));
 }
 
-CAMLexport value caml_input_value_from_malloc(char * data, intnat ofs)
+value caml_input_value_from_malloc(char * data, intnat ofs)
 {
   struct marshal_header h;
   struct caml_intern_state* s = get_intern_state ();
@@ -855,7 +855,7 @@ CAMLexport value caml_input_value_from_malloc(char * data, intnat ofs)
 }
 
 /* [len] is a number of bytes */
-CAMLexport value caml_input_value_from_block(const char * data, intnat len)
+value caml_input_value_from_block(const char * data, intnat len)
 {
   struct marshal_header h;
   struct caml_intern_state* s = get_intern_state ();
@@ -933,78 +933,78 @@ static void intern_bad_code_pointer(unsigned char digest[16])
 
 /* Functions for writing user-defined marshallers */
 
-CAMLexport int caml_deserialize_uint_1(void)
+int caml_deserialize_uint_1(void)
 {
   struct caml_intern_state* s = get_intern_state ();
   return read8u(s);
 }
 
-CAMLexport int caml_deserialize_sint_1(void)
+int caml_deserialize_sint_1(void)
 {
   struct caml_intern_state* s = get_intern_state ();
   return read8s(s);
 }
 
-CAMLexport int caml_deserialize_uint_2(void)
+int caml_deserialize_uint_2(void)
 {
   struct caml_intern_state* s = get_intern_state ();
   return read16u(s);
 }
 
-CAMLexport int caml_deserialize_sint_2(void)
+int caml_deserialize_sint_2(void)
 {
   struct caml_intern_state* s = get_intern_state ();
   return read16s(s);
 }
 
-CAMLexport uint32_t caml_deserialize_uint_4(void)
+uint32_t caml_deserialize_uint_4(void)
 {
   struct caml_intern_state* s = get_intern_state ();
   return read32u(s);
 }
 
-CAMLexport int32_t caml_deserialize_sint_4(void)
+int32_t caml_deserialize_sint_4(void)
 {
   struct caml_intern_state* s = get_intern_state ();
   return read32s(s);
 }
 
-CAMLexport uint64_t caml_deserialize_uint_8(void)
+uint64_t caml_deserialize_uint_8(void)
 {
   uint64_t i;
   caml_deserialize_block_8(&i, 1);
   return i;
 }
 
-CAMLexport int64_t caml_deserialize_sint_8(void)
+int64_t caml_deserialize_sint_8(void)
 {
   int64_t i;
   caml_deserialize_block_8(&i, 1);
   return i;
 }
 
-CAMLexport float caml_deserialize_float_4(void)
+float caml_deserialize_float_4(void)
 {
   float f;
   caml_deserialize_block_4(&f, 1);
   return f;
 }
 
-CAMLexport double caml_deserialize_float_8(void)
+double caml_deserialize_float_8(void)
 {
   double f;
   caml_deserialize_block_float_8(&f, 1);
   return f;
 }
 
-CAMLexport void caml_deserialize_block_1(void * data, intnat len)
+void caml_deserialize_block_1(void * data, intnat len)
 {
   struct caml_intern_state* s = get_intern_state ();
   memcpy(data, s->intern_src, len);
   s->intern_src += len;
 }
 
-CAMLexport void caml_deserialize_block_2(void * data, intnat len)
+void caml_deserialize_block_2(void * data, intnat len)
 {
   struct caml_intern_state* s = get_intern_state ();
 #ifndef ARCH_BIG_ENDIAN
@@ -1018,7 +1018,7 @@ CAMLexport void caml_deserialize_block_2(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_deserialize_block_4(void * data, intnat len)
+void caml_deserialize_block_4(void * data, intnat len)
 {
   struct caml_intern_state* s = get_intern_state ();
 #ifndef ARCH_BIG_ENDIAN
@@ -1032,7 +1032,7 @@ CAMLexport void caml_deserialize_block_4(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_deserialize_block_8(void * data, intnat len)
+void caml_deserialize_block_8(void * data, intnat len)
 {
   struct caml_intern_state* s = get_intern_state ();
 #ifndef ARCH_BIG_ENDIAN
@@ -1046,7 +1046,7 @@ CAMLexport void caml_deserialize_block_8(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_deserialize_block_float_8(void * data, intnat len)
+void caml_deserialize_block_float_8(void * data, intnat len)
 {
   struct caml_intern_state* s = get_intern_state ();
 #if ARCH_FLOAT_ENDIANNESS == 0x01234567
@@ -1065,7 +1065,7 @@ CAMLexport void caml_deserialize_block_float_8(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_deserialize_error(char * msg)
+void caml_deserialize_error(char * msg)
 {
   struct caml_intern_state* s = get_intern_state ();
   intern_cleanup(s);

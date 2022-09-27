@@ -64,7 +64,7 @@ Caml_inline void caml_delete_global_root(struct skiplist * list, value * r)
 
 /* Register a global C root of the mutable kind */
 
-CAMLexport void caml_register_global_root(value *r)
+void caml_register_global_root(value *r)
 {
   CAMLassert (((intnat) r & 3) == 0);  /* compact.c demands this (for now) */
   caml_insert_global_root(&caml_global_roots, r);
@@ -72,7 +72,7 @@ CAMLexport void caml_register_global_root(value *r)
 
 /* Un-register a global C root of the mutable kind */
 
-CAMLexport void caml_remove_global_root(value *r)
+void caml_remove_global_root(value *r)
 {
   caml_delete_global_root(&caml_global_roots, r);
 }
@@ -92,7 +92,7 @@ static enum gc_root_class classify_gc_root(value v)
 
 /* Register a global C root of the generational kind */
 
-CAMLexport void caml_register_generational_global_root(value *r)
+void caml_register_generational_global_root(value *r)
 {
   Caml_check_caml_state();
   CAMLassert (((intnat) r & 3) == 0);  /* compact.c demands this (for now) */
@@ -110,7 +110,7 @@ CAMLexport void caml_register_generational_global_root(value *r)
 
 /* Un-register a global C root of the generational kind */
 
-CAMLexport void caml_remove_generational_global_root(value *r)
+void caml_remove_generational_global_root(value *r)
 {
   switch(classify_gc_root(*r)) {
     case OLD:
@@ -126,7 +126,7 @@ CAMLexport void caml_remove_generational_global_root(value *r)
 
 /* Modify the value of a global C root of the generational kind */
 
-CAMLexport void caml_modify_generational_global_root(value *r, value newval)
+void caml_modify_generational_global_root(value *r, value newval)
 {
   enum gc_root_class c;
   /* See PRs #4704, #607 and #8656 */

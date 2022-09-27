@@ -680,7 +680,7 @@ A(254),A(255)
 #undef A
 };
 
-CAMLexport value caml_atom(tag_t tag) {
+value caml_atom(tag_t tag) {
   return Val_hp(&atoms[tag]);
 }
 

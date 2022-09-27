@@ -1111,10 +1111,10 @@ static void th_ctx_iter_default(th_ctx_action f, void* data) {
   f(local, data);
 }
 
-CAMLexport void (*caml_memprof_th_ctx_iter_hook)(th_ctx_action, void*)
+void (*caml_memprof_th_ctx_iter_hook)(th_ctx_action, void*)
   = th_ctx_iter_default;
 
-CAMLexport struct caml_memprof_th_ctx* caml_memprof_new_th_ctx()
+struct caml_memprof_th_ctx* caml_memprof_new_th_ctx()
 {
   struct caml_memprof_th_ctx* ctx =
     caml_stat_alloc(sizeof(struct caml_memprof_th_ctx));
@@ -1127,7 +1127,7 @@ CAMLexport struct caml_memprof_th_ctx* caml_memprof_new_th_ctx()
   return ctx;
 }
 
-CAMLexport void caml_memprof_delete_th_ctx(struct caml_memprof_th_ctx* ctx)
+void caml_memprof_delete_th_ctx(struct caml_memprof_th_ctx* ctx)
 {
   if (ctx->callback_status >= 0)
     /* A callback is running in this thread from the global entries
@@ -1138,12 +1138,12 @@ CAMLexport void caml_memprof_delete_th_ctx(struct caml_memprof_th_ctx* ctx)
   if (ctx != &caml_memprof_main_ctx) caml_stat_free(ctx);
 }
 
-CAMLexport void caml_memprof_leave_thread(void)
+void caml_memprof_leave_thread(void)
 {
   local = NULL;
 }
 
-CAMLexport void caml_memprof_enter_thread(struct caml_memprof_th_ctx* ctx)
+void caml_memprof_enter_thread(struct caml_memprof_th_ctx* ctx)
 {
   CAMLassert(local == NULL);
   local = ctx;

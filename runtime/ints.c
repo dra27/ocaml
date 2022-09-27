@@ -214,7 +214,7 @@ static uintnat int32_deserialize(void * dst)
 
 static const struct custom_fixed_length int32_length = { 4, 4 };
 
-CAMLexport const struct custom_operations caml_int32_ops = {
+const struct custom_operations caml_int32_ops = {
   "_i",
   custom_finalize_default,
   int32_cmp,
@@ -225,7 +225,7 @@ CAMLexport const struct custom_operations caml_int32_ops = {
   &int32_length
 };
 
-CAMLexport value caml_copy_int32(int32_t i)
+value caml_copy_int32(int32_t i)
 {
   value res = caml_alloc_custom(&caml_int32_ops, 4, 0, 1);
   Int32_val(res) = i;
@@ -367,7 +367,7 @@ CAMLprim value caml_int32_float_of_bits(value vi)
 
 #ifdef ARCH_ALIGN_INT64
 
-CAMLexport int64_t caml_Int64_val(value v)
+int64_t caml_Int64_val(value v)
 {
   union { int32_t i[2]; int64_t j; } buffer;
   buffer.i[0] = ((int32_t *) Data_custom_val(v))[0];
@@ -413,7 +413,7 @@ static uintnat int64_deserialize(void * dst)
 
 static const struct custom_fixed_length int64_length = { 8, 8 };
 
-CAMLexport const struct custom_operations caml_int64_ops = {
+const struct custom_operations caml_int64_ops = {
   "_j",
   custom_finalize_default,
   int64_cmp,
@@ -424,7 +424,7 @@ CAMLexport const struct custom_operations caml_int64_ops = {
   &int64_length
 };
 
-CAMLexport value caml_copy_int64(int64_t i)
+value caml_copy_int64(int64_t i)
 {
   value res = caml_alloc_custom(&caml_int64_ops, 8, 0, 1);
 #ifndef ARCH_ALIGN_INT64
@@ -710,7 +710,7 @@ static uintnat nativeint_deserialize(void * dst)
 }
 
 static const struct custom_fixed_length nativeint_length = { 4, 8 };
-CAMLexport const struct custom_operations caml_nativeint_ops = {
+const struct custom_operations caml_nativeint_ops = {
   "_n",
   custom_finalize_default,
   nativeint_cmp,
@@ -721,7 +721,7 @@ CAMLexport const struct custom_operations caml_nativeint_ops = {
   &nativeint_length
 };
 
-CAMLexport value caml_copy_nativeint(intnat i)
+value caml_copy_nativeint(intnat i)
 {
   value res = caml_alloc_custom(&caml_nativeint_ops, sizeof(intnat), 0, 1);
   Nativeint_val(res) = i;

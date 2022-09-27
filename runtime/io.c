@@ -90,20 +90,20 @@ static void channel_mutex_unlock_exn_default(void)
     caml_channel_mutex_unlock(chan);
 }
 
-CAMLexport void (*caml_channel_mutex_free) (struct channel *)
+void (*caml_channel_mutex_free) (struct channel *)
   = channel_mutex_free_default;
-CAMLexport void (*caml_channel_mutex_lock) (struct channel *)
+void (*caml_channel_mutex_lock) (struct channel *)
   = channel_mutex_lock_default;
-CAMLexport void (*caml_channel_mutex_unlock) (struct channel *)
+void (*caml_channel_mutex_unlock) (struct channel *)
   = channel_mutex_unlock_default;
-CAMLexport void (*caml_channel_mutex_unlock_exn) (void)
+void (*caml_channel_mutex_unlock_exn) (void)
   = channel_mutex_unlock_exn_default;
 
 /* List of channels opened from the OCaml side and managed by the GC */
-CAMLexport struct channel * caml_all_opened_channels = NULL;
+struct channel * caml_all_opened_channels = NULL;
 
 /* The mutex protecting the list above */
-CAMLexport caml_plat_mutex
+caml_plat_mutex
   caml_all_opened_channels_mutex = CAML_PLAT_MUTEX_INITIALIZER;
 
 /* Basic functions over type struct channel *.
@@ -161,7 +161,7 @@ static void unlink_channel(struct channel *channel)
   channel->prev = NULL;
 }
 
-CAMLexport struct channel * caml_open_descriptor_in(int fd)
+struct channel * caml_open_descriptor_in(int fd)
 {
   struct channel * channel;
 
@@ -181,7 +181,7 @@ CAMLexport struct channel * caml_open_descriptor_in(int fd)
   return channel;
 }
 
-CAMLexport struct channel * caml_open_descriptor_out(int fd)
+struct channel * caml_open_descriptor_out(int fd)
 {
   struct channel * channel;
 
@@ -190,7 +190,7 @@ CAMLexport struct channel * caml_open_descriptor_out(int fd)
   return channel;
 }
 
-CAMLexport void caml_close_channel(struct channel *channel)
+void caml_close_channel(struct channel *channel)
 {
   CAMLassert((channel->flags & CHANNEL_FLAG_MANAGED_BY_GC) == 0);
   close(channel->fd);
@@ -199,7 +199,7 @@ CAMLexport void caml_close_channel(struct channel *channel)
   caml_stat_free(channel);
 }
 
-CAMLexport file_offset caml_channel_size(struct channel *channel)
+file_offset caml_channel_size(struct channel *channel)
 {
   file_offset here, end;
   int fd;
@@ -224,7 +224,7 @@ CAMLexport file_offset caml_channel_size(struct channel *channel)
   caml_sys_error(NO_ARG);
 }
 
-CAMLexport int caml_channel_binary_mode(struct channel *channel)
+int caml_channel_binary_mode(struct channel *channel)
 {
   return channel->flags & CHANNEL_TEXT_MODE ? 0 : 1;
 }
@@ -236,7 +236,7 @@ CAMLexport int caml_channel_binary_mode(struct channel *channel)
    end of the flush, or false if some data remains in the buffer.
  */
 
-CAMLexport int caml_flush_partial(struct channel *channel)
+int caml_flush_partial(struct channel *channel)
 {
   int towrite, written;
  again:
@@ -258,7 +258,7 @@ CAMLexport int caml_flush_partial(struct channel *channel)
 
 /* Flush completely the buffer. */
 
-CAMLexport void caml_flush(struct channel *channel)
+void caml_flush(struct channel *channel)
 {
   while (! caml_flush_partial(channel)) /*nothing*/;
 }
@@ -270,12 +270,12 @@ CAMLexport void caml_flush(struct channel *channel)
   *((channel)->curr)++ = (ch);                                            \
 }while(0)
 
-CAMLexport void caml_putch(struct channel *channel, int ch)
+void caml_putch(struct channel *channel, int ch)
 {
   Putch(channel, ch);
 }
 
-CAMLexport void caml_putword(struct channel *channel, uint32_t w)
+void caml_putword(struct channel *channel, uint32_t w)
 {
   if (! caml_channel_binary_mode(channel))
     caml_failwith("output_binary_int: not a binary channel");
@@ -285,7 +285,7 @@ CAMLexport void caml_putword(struct channel *channel, uint32_t w)
   caml_putch(channel, w);
 }
 
-CAMLexport int caml_putblock(struct channel *channel, char *p, intnat len)
+int caml_putblock(struct channel *channel, char *p, intnat len)
 {
   int n, free;
 
@@ -306,7 +306,7 @@ CAMLexport int caml_putblock(struct channel *channel, char *p, intnat len)
   }
 }
 
-CAMLexport void caml_really_putblock(struct channel *channel,
+void caml_really_putblock(struct channel *channel,
                                      char *p, intnat len)
 {
   int written;
@@ -317,7 +317,7 @@ CAMLexport void caml_really_putblock(struct channel *channel,
   }
 }
 
-CAMLexport void caml_seek_out(struct channel *channel, file_offset dest)
+void caml_seek_out(struct channel *channel, file_offset dest)
 {
   caml_flush(channel);
   caml_enter_blocking_section_no_pending();
@@ -329,7 +329,7 @@ CAMLexport void caml_seek_out(struct channel *channel, file_offset dest)
   channel->offset = dest;
 }
 
-CAMLexport file_offset caml_pos_out(struct channel *channel)
+file_offset caml_pos_out(struct channel *channel)
 {
   return channel->offset + (file_offset)(channel->curr - channel->buff);
 }
@@ -345,7 +345,7 @@ int caml_do_read(int fd, char *p, unsigned int n)
   return r;
 }
 
-CAMLexport unsigned char caml_refill(struct channel *channel)
+unsigned char caml_refill(struct channel *channel)
 {
   int n;
  again:
@@ -365,12 +365,12 @@ CAMLexport unsigned char caml_refill(struct channel *channel)
    ? caml_refill(channel)                                                   \
    : (unsigned char) *((channel)->curr)++)
 
-CAMLexport unsigned char caml_getch(struct channel *channel)
+unsigned char caml_getch(struct channel *channel)
 {
   return Getch(channel);
 }
 
-CAMLexport uint32_t caml_getword(struct channel *channel)
+uint32_t caml_getword(struct channel *channel)
 {
   int i;
   uint32_t res;
@@ -384,7 +384,7 @@ CAMLexport uint32_t caml_getword(struct channel *channel)
   return res;
 }
 
-CAMLexport int caml_getblock(struct channel *channel, char *p, intnat len)
+int caml_getblock(struct channel *channel, char *p, intnat len)
 {
   int n, avail, nread;
  again:
@@ -413,7 +413,7 @@ CAMLexport int caml_getblock(struct channel *channel, char *p, intnat len)
 }
 
 /* Returns the number of bytes read. */
-CAMLexport intnat caml_really_getblock(struct channel *chan, char *p, intnat n)
+intnat caml_really_getblock(struct channel *chan, char *p, intnat n)
 {
   intnat k = n;
   int r;
@@ -426,7 +426,7 @@ CAMLexport intnat caml_really_getblock(struct channel *chan, char *p, intnat n)
   return n - k;
 }
 
-CAMLexport void caml_seek_in(struct channel *channel, file_offset dest)
+void caml_seek_in(struct channel *channel, file_offset dest)
 {
   if (dest >= channel->offset - (channel->max - channel->buff)
       && dest <= channel->offset
@@ -444,7 +444,7 @@ CAMLexport void caml_seek_in(struct channel *channel, file_offset dest)
   }
 }
 
-CAMLexport file_offset caml_pos_in(struct channel *channel)
+file_offset caml_pos_in(struct channel *channel)
 {
   return channel->offset - (file_offset)(channel->max - channel->curr);
 }
@@ -562,7 +562,7 @@ static struct custom_operations channel_operations = {
   custom_fixed_length_default
 };
 
-CAMLexport value caml_alloc_channel(struct channel *chan)
+value caml_alloc_channel(struct channel *chan)
 {
   value res;
   res = caml_alloc_custom_mem(&channel_operations, sizeof(struct channel *),

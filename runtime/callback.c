@@ -75,7 +75,7 @@ static void init_callback_code(void)
   callback_code_inited = 1;
 }
 
-CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
+value caml_callbackN_exn(value closure, int narg, value args[])
 {
   CAMLparam1(closure);
   CAMLxparamN(args, narg);
@@ -111,14 +111,14 @@ CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
   CAMLreturn (res);
 }
 
-CAMLexport value caml_callback_exn(value closure, value arg1)
+value caml_callback_exn(value closure, value arg1)
 {
   value arg[1];
   arg[0] = arg1;
   return caml_callbackN_exn(closure, 1, arg);
 }
 
-CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
+value caml_callback2_exn(value closure, value arg1, value arg2)
 {
   value arg[2];
   arg[0] = arg1;
@@ -126,7 +126,7 @@ CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
   return caml_callbackN_exn(closure, 2, arg);
 }
 
-CAMLexport value caml_callback3_exn(value closure,
+value caml_callback3_exn(value closure,
                                value arg1, value arg2, value arg3)
 {
   value arg[3];
@@ -150,7 +150,7 @@ typedef value (callback_stub)(caml_domain_state* state,
 
 callback_stub caml_callback_asm, caml_callback2_asm, caml_callback3_asm;
 
-CAMLexport value caml_callback_exn(value closure, value arg)
+value caml_callback_exn(value closure, value arg)
 {
   Caml_check_caml_state();
   caml_domain_state* domain_state = Caml_state;
@@ -171,7 +171,7 @@ CAMLexport value caml_callback_exn(value closure, value arg)
   }
 }
 
-CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
+value caml_callback2_exn(value closure, value arg1, value arg2)
 {
   Caml_check_caml_state();
   value args[] = {arg1, arg2};
@@ -193,7 +193,7 @@ CAMLexport value caml_callback2_exn(value closure, value arg1, value arg2)
   }
 }
 
-CAMLexport value caml_callback3_exn(value closure,
+value caml_callback3_exn(value closure,
                                     value arg1, value arg2, value arg3)
 {
   Caml_check_caml_state();
@@ -216,7 +216,7 @@ CAMLexport value caml_callback3_exn(value closure,
   }
 }
 
-CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
+value caml_callbackN_exn(value closure, int narg, value args[])
 {
   CAMLparam1 (closure);
   CAMLxparamN (args, narg);
@@ -251,23 +251,23 @@ CAMLexport value caml_callbackN_exn(value closure, int narg, value args[])
 
 /* Exception-propagating variants of the above */
 
-CAMLexport value caml_callback (value closure, value arg)
+value caml_callback (value closure, value arg)
 {
   return caml_raise_if_exception(caml_callback_exn(closure, arg));
 }
 
-CAMLexport value caml_callback2 (value closure, value arg1, value arg2)
+value caml_callback2 (value closure, value arg1, value arg2)
 {
   return caml_raise_if_exception(caml_callback2_exn(closure, arg1, arg2));
 }
 
-CAMLexport value caml_callback3 (value closure, value arg1, value arg2,
+value caml_callback3 (value closure, value arg1, value arg2,
                                  value arg3)
 {
   return caml_raise_if_exception(caml_callback3_exn(closure, arg1, arg2, arg3));
 }
 
-CAMLexport value caml_callbackN (value closure, int narg, value args[])
+value caml_callbackN (value closure, int narg, value args[])
 {
   return caml_raise_if_exception(caml_callbackN_exn(closure, narg, args));
 }
@@ -327,7 +327,7 @@ CAMLprim value caml_register_named_value(value vname, value val)
   return Val_unit;
 }
 
-CAMLexport const value* caml_named_value(char const *name)
+const value* caml_named_value(char const *name)
 {
   struct named_value * nv;
   caml_plat_lock(&named_value_lock);
@@ -343,7 +343,7 @@ CAMLexport const value* caml_named_value(char const *name)
   return NULL;
 }
 
-CAMLexport void caml_iterate_named_values(caml_named_action f)
+void caml_iterate_named_values(caml_named_action f)
 {
   int i;
   caml_plat_lock(&named_value_lock);

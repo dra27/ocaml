@@ -59,12 +59,12 @@ static const struct custom_operations caml_mutex_ops = {
   custom_fixed_length_default
 };
 
-CAMLexport int caml_mutex_lock(sync_mutex mut)
+int caml_mutex_lock(sync_mutex mut)
 {
   return sync_mutex_lock(mut);
 }
 
-CAMLexport int caml_mutex_unlock(sync_mutex mut)
+int caml_mutex_unlock(sync_mutex mut)
 {
   return sync_mutex_unlock(mut);
 }

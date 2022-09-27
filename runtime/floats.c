@@ -81,7 +81,7 @@
 
 #ifdef ARCH_ALIGN_DOUBLE
 
-CAMLexport double caml_Double_val(value val)
+double caml_Double_val(value val)
 {
   union { value v[2]; double d; } buffer;
 
@@ -91,7 +91,7 @@ CAMLexport double caml_Double_val(value val)
   return buffer.d;
 }
 
-CAMLexport void caml_Store_double_val(value val, double dbl)
+void caml_Store_double_val(value val, double dbl)
 {
   union { value v[2]; double d; } buffer;
 
@@ -149,7 +149,7 @@ void caml_free_locale(void)
 #endif
 }
 
-CAMLexport value caml_copy_double(double d)
+value caml_copy_double(double d)
 {
   Caml_check_caml_state();
   value res;
@@ -160,7 +160,7 @@ CAMLexport value caml_copy_double(double d)
 }
 
 #ifndef FLAT_FLOAT_ARRAY
-CAMLexport void caml_Store_double_array_field(value val, mlsize_t i, double dbl)
+void caml_Store_double_array_field(value val, mlsize_t i, double dbl)
 {
   CAMLparam1 (val);
   value d = caml_copy_double (dbl);
@@ -464,7 +464,7 @@ CAMLprim value caml_exp_float(value f)
   return caml_copy_double(exp(Double_val(f)));
 }
 
-CAMLexport double caml_exp2(double x)
+double caml_exp2(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return exp2(x);
@@ -478,7 +478,7 @@ CAMLprim value caml_exp2_float(value f)
   return caml_copy_double(caml_exp2(Double_val(f)));
 }
 
-CAMLexport double caml_trunc(double x)
+double caml_trunc(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return trunc(x);
@@ -492,7 +492,7 @@ CAMLprim value caml_trunc_float(value f)
   return caml_copy_double(caml_trunc(Double_val(f)));
 }
 
-CAMLexport double caml_round(double f)
+double caml_round(double f)
 {
 #ifdef HAS_WORKING_ROUND
   return round(f);
@@ -527,7 +527,7 @@ CAMLprim value caml_floor_float(value f)
   return caml_copy_double(floor(Double_val(f)));
 }
 
-CAMLexport double caml_nextafter(double x, double y)
+double caml_nextafter(double x, double y)
 {
   return nextafter(x, y);
 }
@@ -552,7 +552,7 @@ union double_as_int64 { double d; uint64_t i; };
 #define FLM1074 (pow(2,-1074)) //0x1p-1074
 #endif
 
-CAMLexport double caml_fma(double x, double y, double z)
+double caml_fma(double x, double y, double z)
 {
 #ifdef HAS_WORKING_FMA
   return fma(x, y, z);
@@ -795,7 +795,7 @@ CAMLprim value caml_log10_float(value f)
   return caml_copy_double(log10(Double_val(f)));
 }
 
-CAMLexport double caml_log2(double x)
+double caml_log2(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return log2(x);
@@ -829,7 +829,7 @@ CAMLprim value caml_sqrt_float(value f)
   return caml_copy_double(sqrt(Double_val(f)));
 }
 
-CAMLexport double caml_cbrt(double x)
+double caml_cbrt(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return cbrt(x);
@@ -885,7 +885,7 @@ CAMLprim value caml_asin_float(value f)
   return caml_copy_double(asin(Double_val(f)));
 }
 
-CAMLexport double caml_asinh(double x)
+double caml_asinh(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return asinh(x);
@@ -904,7 +904,7 @@ CAMLprim value caml_acos_float(value f)
   return caml_copy_double(acos(Double_val(f)));
 }
 
-CAMLexport double caml_acosh(double x)
+double caml_acosh(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return acosh(x);
@@ -923,7 +923,7 @@ CAMLprim value caml_atan_float(value f)
   return caml_copy_double(atan(Double_val(f)));
 }
 
-CAMLexport double caml_atanh(double x)
+double caml_atanh(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return atanh(x);
@@ -947,7 +947,7 @@ CAMLprim value caml_ceil_float(value f)
   return caml_copy_double(ceil(Double_val(f)));
 }
 
-CAMLexport double caml_hypot(double x, double y)
+double caml_hypot(double x, double y)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return hypot(x, y);
@@ -972,7 +972,7 @@ CAMLprim value caml_hypot_float(value f, value g)
 
 /* These emulations of expm1() and log1p() are due to William Kahan.
    See http://www.plunk.org/~hatch/rightway.php */
-CAMLexport double caml_expm1(double x)
+double caml_expm1(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return expm1(x);
@@ -986,7 +986,7 @@ CAMLexport double caml_expm1(double x)
 #endif
 }
 
-CAMLexport double caml_log1p(double x)
+double caml_log1p(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return log1p(x);
@@ -1028,7 +1028,7 @@ Caml_inline double simple_erf(double x)
 }
 #endif
 
-CAMLexport double caml_erf(double x)
+double caml_erf(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return erf(x);
@@ -1042,7 +1042,7 @@ CAMLprim value caml_erf_float(value f)
   return caml_copy_double(caml_erf(Double_val(f)));
 }
 
-CAMLexport double caml_erfc(double x)
+double caml_erfc(double x)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return erfc(x);
@@ -1065,7 +1065,7 @@ union double_as_two_int32 {
 #endif
 };
 
-CAMLexport double caml_copysign(double x, double y)
+double caml_copysign(double x, double y)
 {
 #ifdef HAS_C99_FLOAT_OPS
   return copysign(x, y);

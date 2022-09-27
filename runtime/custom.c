@@ -78,7 +78,7 @@ static value alloc_custom_gen (const struct custom_operations * ops,
   CAMLreturn(result);
 }
 
-CAMLexport value caml_alloc_custom(const struct custom_operations * ops,
+value caml_alloc_custom(const struct custom_operations * ops,
                                    uintnat bsz,
                                    mlsize_t mem,
                                    mlsize_t max)
@@ -86,7 +86,7 @@ CAMLexport value caml_alloc_custom(const struct custom_operations * ops,
   return alloc_custom_gen (ops, bsz, mem, max, mem, max);
 }
 
-CAMLexport value caml_alloc_custom_mem(const struct custom_operations * ops,
+value caml_alloc_custom_mem(const struct custom_operations * ops,
                                        uintnat bsz,
                                        mlsize_t mem)
 {
@@ -117,7 +117,7 @@ struct custom_operations_list {
 
 static struct custom_operations_list * custom_ops_table = NULL;
 
-CAMLexport void
+void
 caml_register_custom_operations(const struct custom_operations * ops)
 {
   struct custom_operations_list * l =

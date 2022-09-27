@@ -1004,7 +1004,7 @@ CAMLprim value caml_output_value_to_string(value v, value flags)
   return caml_output_value_to_bytes(v,flags);
 }
 
-CAMLexport intnat caml_output_value_to_block(value v, value flags,
+intnat caml_output_value_to_block(value v, value flags,
                                              char * buf, intnat len)
 {
   char header[32];
@@ -1038,7 +1038,7 @@ CAMLprim value caml_output_value_to_buffer(value buf, value ofs, value len,
   return Val_long(l);
 }
 
-CAMLexport void caml_output_value_to_malloc(value v, value flags,
+void caml_output_value_to_malloc(value v, value flags,
                                             /*out*/ char ** buf,
                                             /*out*/ intnat * len)
 {
@@ -1068,7 +1068,7 @@ CAMLexport void caml_output_value_to_malloc(value v, value flags,
 
 /* Functions for writing user-defined marshallers */
 
-CAMLexport void caml_serialize_int_1(int i)
+void caml_serialize_int_1(int i)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 1 > s->extern_limit) grow_extern_output(s, 1);
@@ -1076,7 +1076,7 @@ CAMLexport void caml_serialize_int_1(int i)
   s->extern_ptr += 1;
 }
 
-CAMLexport void caml_serialize_int_2(int i)
+void caml_serialize_int_2(int i)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 2 > s->extern_limit) grow_extern_output(s, 2);
@@ -1084,7 +1084,7 @@ CAMLexport void caml_serialize_int_2(int i)
   s->extern_ptr += 2;
 }
 
-CAMLexport void caml_serialize_int_4(int32_t i)
+void caml_serialize_int_4(int32_t i)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 4 > s->extern_limit) grow_extern_output(s, 4);
@@ -1092,7 +1092,7 @@ CAMLexport void caml_serialize_int_4(int32_t i)
   s->extern_ptr += 4;
 }
 
-CAMLexport void caml_serialize_int_8(int64_t i)
+void caml_serialize_int_8(int64_t i)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 8 > s->extern_limit) grow_extern_output(s, 8);
@@ -1100,17 +1100,17 @@ CAMLexport void caml_serialize_int_8(int64_t i)
   s->extern_ptr += 8;
 }
 
-CAMLexport void caml_serialize_float_4(float f)
+void caml_serialize_float_4(float f)
 {
   caml_serialize_block_4(&f, 1);
 }
 
-CAMLexport void caml_serialize_float_8(double f)
+void caml_serialize_float_8(double f)
 {
   caml_serialize_block_float_8(&f, 1);
 }
 
-CAMLexport void caml_serialize_block_1(void * data, intnat len)
+void caml_serialize_block_1(void * data, intnat len)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + len > s->extern_limit) grow_extern_output(s, len);
@@ -1118,7 +1118,7 @@ CAMLexport void caml_serialize_block_1(void * data, intnat len)
   s->extern_ptr += len;
 }
 
-CAMLexport void caml_serialize_block_2(void * data, intnat len)
+void caml_serialize_block_2(void * data, intnat len)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 2 * len > s->extern_limit)
@@ -1137,7 +1137,7 @@ CAMLexport void caml_serialize_block_2(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_serialize_block_4(void * data, intnat len)
+void caml_serialize_block_4(void * data, intnat len)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 4 * len > s->extern_limit)
@@ -1156,7 +1156,7 @@ CAMLexport void caml_serialize_block_4(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_serialize_block_8(void * data, intnat len)
+void caml_serialize_block_8(void * data, intnat len)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 8 * len > s->extern_limit)
@@ -1175,7 +1175,7 @@ CAMLexport void caml_serialize_block_8(void * data, intnat len)
 #endif
 }
 
-CAMLexport void caml_serialize_block_float_8(void * data, intnat len)
+void caml_serialize_block_float_8(void * data, intnat len)
 {
   struct caml_extern_state* s = get_extern_state ();
   if (s->extern_ptr + 8 * len > s->extern_limit) grow_extern_output(s, 8 * len);

@@ -101,7 +101,7 @@ void caml_gc_message (int level, char *msg, ...)
 
 _Atomic fatal_error_hook caml_fatal_error_hook = (fatal_error_hook)NULL;
 
-CAMLexport void caml_fatal_error (char *msg, ...)
+void caml_fatal_error (char *msg, ...)
 {
   va_list ap;
   fatal_error_hook hook;
@@ -118,13 +118,13 @@ CAMLexport void caml_fatal_error (char *msg, ...)
   abort();
 }
 
-CAMLexport void caml_fatal_error_arg (const char *fmt, const char *arg)
+void caml_fatal_error_arg (const char *fmt, const char *arg)
 {
   fprintf (stderr, fmt, arg);
   exit(2);
 }
 
-CAMLexport void caml_fatal_error_arg2 (const char *fmt1, const char *arg1,
+void caml_fatal_error_arg2 (const char *fmt1, const char *arg1,
                                        const char *fmt2, const char *arg2)
 {
   fprintf (stderr, fmt1, arg1);
@@ -184,7 +184,7 @@ void caml_ext_table_free(struct ext_table * tbl, int free_entries)
 /* Integer arithmetic with overflow detection */
 
 #if ! (__GNUC__ >= 5 || Caml_has_builtin(__builtin_mul_overflow))
-CAMLexport int caml_umul_overflow(uintnat a, uintnat b, uintnat * res)
+int caml_umul_overflow(uintnat a, uintnat b, uintnat * res)
 {
 #define HALF_SIZE (sizeof(uintnat) * 4)
 #define HALF_MASK (((uintnat)1 << HALF_SIZE) - 1)

@@ -185,7 +185,7 @@ wchar_t * caml_search_in_path(struct ext_table * path, const wchar_t * name)
   return caml_stat_wcsdup(name);
 }
 
-CAMLexport wchar_t * caml_search_exe_in_path(const wchar_t * name)
+wchar_t * caml_search_exe_in_path(const wchar_t * name)
 {
   wchar_t * fullname, * filepart;
   char * u8;
@@ -398,7 +398,7 @@ static void expand_pattern(wchar_t * pat)
 }
 
 
-CAMLexport void caml_expand_command_line(int * argcp, wchar_t *** argvp)
+void caml_expand_command_line(int * argcp, wchar_t *** argvp)
 {
   int i;
   argc = 0;
@@ -415,7 +415,7 @@ CAMLexport void caml_expand_command_line(int * argcp, wchar_t *** argvp)
    the directory named [dirname].  No entries are added for [.] and [..].
    Return 0 on success, -1 on error; set errno in the case of error. */
 
-CAMLexport int caml_read_directory(wchar_t * dirname,
+int caml_read_directory(wchar_t * dirname,
                                    struct ext_table * contents)
 {
   size_t dirnamelen;
@@ -729,7 +729,7 @@ wchar_t *caml_secure_getenv (wchar_t const *var)
    In contrast, the OCaml runtime system still calls _wgetenv from the C runtime
    system, via caml_secure_getenv. The result is statically allocated and needs
    no deallocation. */
-CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
+wchar_t *caml_win32_getenv(wchar_t const *lpName)
 {
   wchar_t * lpBuffer;
   DWORD nSize = 256, res;
@@ -864,7 +864,7 @@ static uintnat windows_unicode_strict = 1;
    the argument string is encoded in the local codepage. */
 static uintnat windows_unicode_fallback = 1;
 
-CAMLexport int caml_win32_multi_byte_to_wide_char(const char *s, int slen,
+int caml_win32_multi_byte_to_wide_char(const char *s, int slen,
                                                   wchar_t *out, int outlen)
 {
   int retcode;
@@ -896,7 +896,7 @@ CAMLexport int caml_win32_multi_byte_to_wide_char(const char *s, int slen,
 #define WC_ERR_INVALID_CHARS 0
 #endif
 
-CAMLexport int caml_win32_wide_char_to_multi_byte(const wchar_t *s, int slen,
+int caml_win32_wide_char_to_multi_byte(const wchar_t *s, int slen,
                                                   char *out, int outlen)
 {
   int retcode;
@@ -921,7 +921,7 @@ CAMLexport int caml_win32_wide_char_to_multi_byte(const wchar_t *s, int slen,
   return retcode;
 }
 
-CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
+value caml_copy_string_of_utf16(const wchar_t *s)
 {
   int retcode, slen;
   value v;
@@ -935,7 +935,7 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
   return v;
 }
 
-CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+wchar_t* caml_stat_strdup_to_utf16(const char *s)
 {
   wchar_t * ws;
   int retcode;
@@ -947,7 +947,7 @@ CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
   return ws;
 }
 
-CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
 {
   caml_stat_string out;
   int retcode;
@@ -1041,7 +1041,7 @@ static int caml_win32_is_cygwin_pty(HANDLE hFile)
   return 0;
 }
 
-CAMLexport int caml_win32_isatty(int fd)
+int caml_win32_isatty(int fd)
 {
   DWORD lpMode;
   HANDLE hFile = (HANDLE)_get_osfhandle(fd);
@@ -1071,7 +1071,7 @@ int caml_num_rows_fd(int fd)
 }
 
 /* UCRT clock function returns wall-clock time */
-CAMLexport clock_t caml_win32_clock(void)
+clock_t caml_win32_clock(void)
 {
   FILETIME c, e, stime, utime;
   ULARGE_INTEGER tmp;

@@ -66,7 +66,7 @@
 #include "caml/major_gc.h"
 #include "caml/shared_heap.h"
 
-CAMLexport char * caml_strerror(int errnum, char * buf, size_t buflen)
+char * caml_strerror(int errnum, char * buf, size_t buflen)
 {
 #ifdef _WIN32
   /* Windows has a thread-safe strerror */
@@ -90,7 +90,7 @@ CAMLexport char * caml_strerror(int errnum, char * buf, size_t buflen)
 #define EWOULDBLOCK (-1)
 #endif
 
-CAMLexport void caml_sys_error(value arg)
+void caml_sys_error(value arg)
 {
   CAMLparam1 (arg);
   char * err;
@@ -112,7 +112,7 @@ CAMLexport void caml_sys_error(value arg)
   CAMLnoreturn;
 }
 
-CAMLexport void caml_sys_io_error(value arg)
+void caml_sys_io_error(value arg)
 {
   if (errno == EAGAIN || errno == EWOULDBLOCK) {
     caml_raise_sys_blocked_io();
@@ -131,7 +131,7 @@ static void caml_sys_check_path(value name)
   }
 }
 
-CAMLexport void caml_do_exit(int retcode)
+void caml_do_exit(int retcode)
 {
   caml_domain_state* domain_state = Caml_state;
   struct gc_stats s;
