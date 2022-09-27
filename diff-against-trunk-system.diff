@@ -1,130 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e35d278ced
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,121 @@
-+--- a	2023-09-28 18:45:38.892380650 +0100
-++++ b	2023-09-28 18:45:38.908381268 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/.gitattributes b/.gitattributes
-+ --- a/.gitattributes
-+ +++ b/.gitattributes
-+-@@ -192,14 +192,6 @@ tools/pre-commit-githook text eol=lf
-++@@ -193,14 +193,6 @@ tools/pre-commit-githook text eol=lf
-+  tools/markdown-add-pr-links.sh text eol=lf
-+  runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
-+  
-+@@ -31,7 +31,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -729,7 +729,7 @@ runtime-all: \
-++@@ -726,7 +726,7 @@ runtime-all: \
-+    $(runtime_PROGRAMS) $(SAK)
-+  
-+  .PHONY: runtime-allopt
-+@@ -40,7 +40,7 @@
-+  runtime-allopt: \
-+    $(runtime_NATIVE_STATIC_LIBRARIES) $(runtime_NATIVE_SHARED_LIBRARIES)
-+  else
-+-@@ -897,7 +897,7 @@ $(DEPDIR)/runtime/%.npic.$(D): \
-++@@ -894,7 +894,7 @@ $(DEPDIR)/runtime/%.npic.$(D): \
-+  # that corresponds to the name of the generated object file
-+  # (without the extension, which is added by the macro)
-+  define COMPILE_C_FILE
-+@@ -49,7 +49,7 @@
-+  ifneq "$(1)" "%"
-+  # -MG would ensure that the dependencies are generated even if the files listed
-+  # in $$(runtime_BUILT_HEADERS) haven't been assembled yet. However,
-+-@@ -915,7 +915,7 @@ else
-++@@ -912,7 +912,7 @@ else
-+  $(1).$(O): $(2).c \
-+    $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
-+    $(RUNTIME_HEADERS)
-+@@ -58,7 +58,7 @@
-+  	$$(CC) -c $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
-+  	  $$(OUTPUTOBJ)$$@ $$<
-+  endef
-+-@@ -924,7 +924,7 @@ $(DEPDIR)/runtime:
-++@@ -921,7 +921,7 @@ $(DEPDIR)/runtime:
-+  	$(MKDIR) $@
-+  
-+  runtime_OBJECT_TYPES = % %.b %.bd %.bi %.bpic
-+@@ -67,7 +67,7 @@
-+  runtime_OBJECT_TYPES += %.n %.nd %.ni %.np %.npic
-+  endif
-+  
-+-@@ -993,7 +993,7 @@ runtime/%_libasmrunpic.obj: runtime/%.asm
-++@@ -990,7 +990,7 @@ runtime/%_libasmrunpic.obj: runtime/%.asm
-+  
-+  runtime_DEP_FILES := $(addsuffix .b, \
-+    $(basename $(runtime_BYTECODE_C_SOURCES) runtime/instrtrace))
-+@@ -153,7 +153,7 @@
-+ diff --git a/api_docgen/Makefile.docfiles b/api_docgen/Makefile.docfiles
-+ --- a/api_docgen/Makefile.docfiles
-+ +++ b/api_docgen/Makefile.docfiles
-+-@@ -43,19 +43,19 @@ stdlib_UNPREFIXED=$(STDLIB_MODULE_BASENAMES)
-++@@ -44,19 +44,19 @@ stdlib_UNPREFIXED=$(STDLIB_MODULE_BASENAMES)
-+  
-+  otherlibref := $(dynlink_MLIS:%.mli=%)
-+  
-+@@ -204,7 +204,7 @@
-+  AC_SUBST([documentation_tool])
-+  AC_SUBST([documentation_tool_cmd])
-+  AC_SUBST([ocamltest])
-+-@@ -491,8 +492,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" || test x"$enable_str_lib" = "xno"],
-++@@ -502,8 +503,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" || test x"$enable_str_lib" = "xno"],
-+    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
-+      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
-+      [enable_ocamldoc="no"
-+@@ -215,15 +215,15 @@
-+  
-+  # Initialization of libtool
-+  # Allow the MSVC linker to be found even if ld isn't installed.
-+-@@ -619,6 +620,7 @@ AS_CASE([$host],
-+- 
-+- otherlibraries="dynlink runtime_events"
-++@@ -631,6 +632,7 @@ AS_CASE([$host],
-++ dnl otherlibraries="dynlink runtime_events"
-++ otherlibraries="dynlink"
-+  lib_dynlink=true
-+ +lib_runtime_events=true
-+  AS_IF([test x"$enable_unix_lib" != "xno"],
-+    [enable_unix_lib=yes
-+    AC_CONFIG_FILES([otherlibs/unix/META])
-+-@@ -1954,14 +1956,14 @@ AC_COMPILE_IFELSE(
-++@@ -1966,14 +1968,14 @@ AC_COMPILE_IFELSE(
-+  AS_CASE([$enable_debugger],
-+    [no],
-+      [with_debugger=""
-+@@ -241,7 +241,7 @@
-+      AC_MSG_NOTICE([replay debugger not supported])])
-+    ])
-+  
-+-@@ -2041,9 +2043,9 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
-++@@ -2089,9 +2091,9 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
-+  
-+  AS_IF([test x"$enable_ocamldoc" = "xno"],
-+    [ocamldoc=""
-+@@ -456,7 +456,7 @@
-+ diff --git a/tools/Makefile b/tools/Makefile
-+ --- a/tools/Makefile
-+ +++ b/tools/Makefile
-+-@@ -301,13 +301,13 @@ CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-++@@ -308,13 +308,13 @@ CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-+  cmpbyt$(EXE): $(CMPBYT)
-+  cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
-+  
-+@@ -472,7 +472,7 @@
-+  
-+  # checkstack tool
-+  
-+-@@ -316,24 +316,24 @@ checkstack$(EXE): checkstack.$(O)
-++@@ -323,24 +323,24 @@ checkstack$(EXE): checkstack.$(O)
-+  
-+  #Scan latex files, and run ocaml code examples
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -138,10 +14,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 5dc2f3d766..e0f3825c1c 100644
+index d31d6a9fcd..8939e6743d 100644
 --- a/Changes
 +++ b/Changes
-@@ -625,13 +625,28 @@ OCaml 5.0
+@@ -629,13 +629,28 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -172,7 +48,7 @@ index 5dc2f3d766..e0f3825c1c 100644
  
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
-@@ -668,13 +683,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -672,13 +687,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -188,7 +64,7 @@ index 5dc2f3d766..e0f3825c1c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -778,6 +793,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -782,6 +797,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -198,7 +74,7 @@ index 5dc2f3d766..e0f3825c1c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1037,6 +1055,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1041,6 +1059,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6235,7 +6111,7 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..5b1d6d1387
+index 0000000000..ff747f3b06
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3814 @@
@@ -6332,7 +6208,7 @@ index 0000000000..5b1d6d1387
 +     file_exists;
 +     copy;
 +diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-+index 62b3ae2722..c0e5666224 100644
++index 282090b4c3..dfda7b1f87 100644
 +--- a/ocamltest/ocamltest_config.ml.in
 ++++ b/ocamltest/ocamltest_config.ml.in
 +@@ -90,4 +90,6 @@ let function_sections = @function_sections@
@@ -10055,137 +9931,13 @@ index 0000000000..5b1d6d1387
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4bf0edb447
+index 0000000000..f376edfb44
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10023 @@
+@@ -0,0 +1,9906 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e35d278ced
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,121 @@
-++--- a	2023-09-28 18:45:38.892380650 +0100
-+++++ b	2023-09-28 18:45:38.908381268 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/.gitattributes b/.gitattributes
-++ --- a/.gitattributes
-++ +++ b/.gitattributes
-++-@@ -192,14 +192,6 @@ tools/pre-commit-githook text eol=lf
-+++@@ -193,14 +193,6 @@ tools/pre-commit-githook text eol=lf
-++  tools/markdown-add-pr-links.sh text eol=lf
-++  runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
-++  
-++@@ -31,7 +31,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -729,7 +729,7 @@ runtime-all: \
-+++@@ -726,7 +726,7 @@ runtime-all: \
-++    $(runtime_PROGRAMS) $(SAK)
-++  
-++  .PHONY: runtime-allopt
-++@@ -40,7 +40,7 @@
-++  runtime-allopt: \
-++    $(runtime_NATIVE_STATIC_LIBRARIES) $(runtime_NATIVE_SHARED_LIBRARIES)
-++  else
-++-@@ -897,7 +897,7 @@ $(DEPDIR)/runtime/%.npic.$(D): \
-+++@@ -894,7 +894,7 @@ $(DEPDIR)/runtime/%.npic.$(D): \
-++  # that corresponds to the name of the generated object file
-++  # (without the extension, which is added by the macro)
-++  define COMPILE_C_FILE
-++@@ -49,7 +49,7 @@
-++  ifneq "$(1)" "%"
-++  # -MG would ensure that the dependencies are generated even if the files listed
-++  # in $$(runtime_BUILT_HEADERS) haven't been assembled yet. However,
-++-@@ -915,7 +915,7 @@ else
-+++@@ -912,7 +912,7 @@ else
-++  $(1).$(O): $(2).c \
-++    $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
-++    $(RUNTIME_HEADERS)
-++@@ -58,7 +58,7 @@
-++  	$$(CC) -c $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
-++  	  $$(OUTPUTOBJ)$$@ $$<
-++  endef
-++-@@ -924,7 +924,7 @@ $(DEPDIR)/runtime:
-+++@@ -921,7 +921,7 @@ $(DEPDIR)/runtime:
-++  	$(MKDIR) $@
-++  
-++  runtime_OBJECT_TYPES = % %.b %.bd %.bi %.bpic
-++@@ -67,7 +67,7 @@
-++  runtime_OBJECT_TYPES += %.n %.nd %.ni %.np %.npic
-++  endif
-++  
-++-@@ -993,7 +993,7 @@ runtime/%_libasmrunpic.obj: runtime/%.asm
-+++@@ -990,7 +990,7 @@ runtime/%_libasmrunpic.obj: runtime/%.asm
-++  
-++  runtime_DEP_FILES := $(addsuffix .b, \
-++    $(basename $(runtime_BYTECODE_C_SOURCES) runtime/instrtrace))
-++@@ -153,7 +153,7 @@
-++ diff --git a/api_docgen/Makefile.docfiles b/api_docgen/Makefile.docfiles
-++ --- a/api_docgen/Makefile.docfiles
-++ +++ b/api_docgen/Makefile.docfiles
-++-@@ -43,19 +43,19 @@ stdlib_UNPREFIXED=$(STDLIB_MODULE_BASENAMES)
-+++@@ -44,19 +44,19 @@ stdlib_UNPREFIXED=$(STDLIB_MODULE_BASENAMES)
-++  
-++  otherlibref := $(dynlink_MLIS:%.mli=%)
-++  
-++@@ -204,7 +204,7 @@
-++  AC_SUBST([documentation_tool])
-++  AC_SUBST([documentation_tool_cmd])
-++  AC_SUBST([ocamltest])
-++-@@ -491,8 +492,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" || test x"$enable_str_lib" = "xno"],
-+++@@ -502,8 +503,8 @@ AS_IF([test x"$enable_unix_lib" = "xno" || test x"$enable_str_lib" = "xno"],
-++    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
-++      [AC_MSG_ERROR([ocamldoc requires the unix and str libraries])],
-++      [enable_ocamldoc="no"
-++@@ -215,15 +215,15 @@
-++  
-++  # Initialization of libtool
-++  # Allow the MSVC linker to be found even if ld isn't installed.
-++-@@ -619,6 +620,7 @@ AS_CASE([$host],
-++- 
-++- otherlibraries="dynlink runtime_events"
-+++@@ -631,6 +632,7 @@ AS_CASE([$host],
-+++ dnl otherlibraries="dynlink runtime_events"
-+++ otherlibraries="dynlink"
-++  lib_dynlink=true
-++ +lib_runtime_events=true
-++  AS_IF([test x"$enable_unix_lib" != "xno"],
-++    [enable_unix_lib=yes
-++    AC_CONFIG_FILES([otherlibs/unix/META])
-++-@@ -1954,14 +1956,14 @@ AC_COMPILE_IFELSE(
-+++@@ -1966,14 +1968,14 @@ AC_COMPILE_IFELSE(
-++  AS_CASE([$enable_debugger],
-++    [no],
-++      [with_debugger=""
-++@@ -241,7 +241,7 @@
-++      AC_MSG_NOTICE([replay debugger not supported])])
-++    ])
-++  
-++-@@ -2041,9 +2043,9 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
-+++@@ -2089,9 +2091,9 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
-++  
-++  AS_IF([test x"$enable_ocamldoc" = "xno"],
-++    [ocamldoc=""
-++@@ -456,7 +456,7 @@
-++ diff --git a/tools/Makefile b/tools/Makefile
-++ --- a/tools/Makefile
-++ +++ b/tools/Makefile
-++-@@ -301,13 +301,13 @@ CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-+++@@ -308,13 +308,13 @@ CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-++  cmpbyt$(EXE): $(CMPBYT)
-++  cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
-++  
-++@@ -472,7 +472,7 @@
-++  
-++  # checkstack tool
-++  
-++-@@ -316,24 +316,24 @@ checkstack$(EXE): checkstack.$(O)
-+++@@ -323,24 +323,24 @@ checkstack$(EXE): checkstack.$(O)
-++  
-++  #Scan latex files, and run ocaml code examples
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10199,10 +9951,10 @@ index 0000000000..4bf0edb447
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 5dc2f3d766..e0f3825c1c 100644
++index d31d6a9fcd..8939e6743d 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -625,13 +625,28 @@ OCaml 5.0
++@@ -629,13 +629,28 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10233,7 +9985,7 @@ index 0000000000..4bf0edb447
 + 
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
-+@@ -668,13 +683,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -672,13 +687,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10249,7 +10001,7 @@ index 0000000000..4bf0edb447
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -778,6 +793,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -782,6 +797,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10259,7 +10011,7 @@ index 0000000000..4bf0edb447
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1037,6 +1055,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1041,6 +1059,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16296,7 +16048,7 @@ index 0000000000..4bf0edb447
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..5b1d6d1387
++index 0000000000..ff747f3b06
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3814 @@
@@ -16393,7 +16145,7 @@ index 0000000000..4bf0edb447
 ++     file_exists;
 ++     copy;
 ++diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-++index 62b3ae2722..c0e5666224 100644
+++index 282090b4c3..dfda7b1f87 100644
 ++--- a/ocamltest/ocamltest_config.ml.in
 +++++ b/ocamltest/ocamltest_config.ml.in
 ++@@ -90,4 +90,6 @@ let function_sections = @function_sections@
@@ -20081,7 +19833,14 @@ index 0000000000..4bf0edb447
 ++ }
 ++ 
 ++ Build () {
-++diff --git a/tools/ci/appvey
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index ebee82eb6f..8936f1e9dd 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host=
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
