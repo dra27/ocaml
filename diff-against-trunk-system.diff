@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..635331f528
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:38.588368903 +0100
+++++ b	2023-09-28 18:45:38.596369212 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1064,10 +1064,11 @@ mkdll_ld=''
+++@@ -1076,10 +1076,11 @@ mkdll_ld=''
++  AS_IF([test x"$enable_shared" != "xno"],
++    [AS_CASE([$host],
++      [x86_64-apple-darwin*],
 diff --git a/.gitattributes b/.gitattributes
 index 772bd2a7ea..2b345c854c 100644
 --- a/.gitattributes
@@ -3090,10 +3104,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index e04cd45a99..6301cc5e8c 100755
+index 88842b3cab..7cc4997b5e 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 029582a417..2ac3c05f36 100644
+index 234760060c..43baeb474e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3179,7 +3193,7 @@ index 029582a417..2ac3c05f36 100644
  
  # Support for C11 atomic types
  
-@@ -1183,67 +1195,67 @@ model=default
+@@ -1184,67 +1196,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -3306,7 +3320,7 @@ index 029582a417..2ac3c05f36 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1252,8 +1264,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1253,8 +1265,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -3317,7 +3331,7 @@ index 029582a417..2ac3c05f36 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1270,10 +1282,10 @@ dnl   [arch=amd64; system=beos],
+@@ -1271,10 +1283,10 @@ dnl   [arch=amd64; system=beos],
      [arch=arm64; system=openbsd],
    [aarch64-*-netbsd*],
      [arch=arm64; system=netbsd],
@@ -3332,7 +3346,7 @@ index 029582a417..2ac3c05f36 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1969,11 +1981,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1970,11 +1982,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3357,7 +3371,7 @@ index 029582a417..2ac3c05f36 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2024,6 +2048,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2025,6 +2049,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3388,7 +3402,7 @@ index 029582a417..2ac3c05f36 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2171,8 +2219,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2172,8 +2220,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -9931,13 +9945,27 @@ index 0000000000..5b1d6d1387
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ace0dac4a1
+index 0000000000..34936ca14d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,9906 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..635331f528
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:38.588368903 +0100
++++++ b	2023-09-28 18:45:38.596369212 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1064,10 +1064,11 @@ mkdll_ld=''
++++@@ -1076,10 +1076,11 @@ mkdll_ld=''
+++  AS_IF([test x"$enable_shared" != "xno"],
+++    [AS_CASE([$host],
+++      [x86_64-apple-darwin*],
 +diff --git a/.gitattributes b/.gitattributes
 +index 772bd2a7ea..2b345c854c 100644
 +--- a/.gitattributes
@@ -13027,10 +13055,10 @@ index 0000000000..ace0dac4a1
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index e04cd45a99..6301cc5e8c 100755
++index 88842b3cab..7cc4997b5e 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 029582a417..2ac3c05f36 100644
++index 234760060c..43baeb474e 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13116,7 +13144,7 @@ index 0000000000..ace0dac4a1
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1183,67 +1195,67 @@ model=default
++@@ -1184,67 +1196,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -13243,7 +13271,7 @@ index 0000000000..ace0dac4a1
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1252,8 +1264,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1253,8 +1265,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -13254,7 +13282,7 @@ index 0000000000..ace0dac4a1
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1270,10 +1282,10 @@ dnl   [arch=amd64; system=beos],
++@@ -1271,10 +1283,10 @@ dnl   [arch=amd64; system=beos],
 +     [arch=arm64; system=openbsd],
 +   [aarch64-*-netbsd*],
 +     [arch=arm64; system=netbsd],
@@ -13269,7 +13297,7 @@ index 0000000000..ace0dac4a1
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1969,11 +1981,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1970,11 +1982,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13294,7 +13322,7 @@ index 0000000000..ace0dac4a1
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2024,6 +2048,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2025,6 +2049,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13325,7 +13353,7 @@ index 0000000000..ace0dac4a1
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2171,8 +2219,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2172,8 +2220,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -19826,21 +19854,7 @@ index 0000000000..ace0dac4a1
 ++-    ;;
 ++-  *)
 ++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index ebee82eb6f..8936f1e9dd 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='
+++-    exi
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

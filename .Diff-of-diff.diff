@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:45:38.588368903 +0100
++++ b	2023-09-28 18:45:38.596369212 +0100
+@@ -3,7 +3,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1064,10 +1064,11 @@ mkdll_ld=''
++@@ -1076,10 +1076,11 @@ mkdll_ld=''
+  AS_IF([test x"$enable_shared" != "xno"],
+    [AS_CASE([$host],
+      [x86_64-apple-darwin*],
