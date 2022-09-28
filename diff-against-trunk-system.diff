@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6f7d91355f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:45:41.248471604 +0100
-++++ b	2023-09-28 18:45:41.260472067 +0100
-+@@ -13,7 +13,7 @@
-+  ### Other libraries:
-+  
-+  - #11475: Make Unix terminal interface bindings domain-safe
-+-@@ -642,6 +637,11 @@ OCaml 5.0
-++@@ -637,6 +632,11 @@ OCaml 5.0
-+  - #11516, #11524: Fix the `deprecated_mutable` attribute.
-+    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
-+  
-+@@ -22,6 +22,6 @@
-+ +  (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
-+ +  Yallop and Florian Angeletti)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -37,10 +14,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 67eaae9e5d..60fa9b2eee 100644
+index f64c7b3a43..17df1d8575 100644
 --- a/Changes
 +++ b/Changes
-@@ -629,11 +629,6 @@ OCaml 5.0
+@@ -632,11 +632,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -52,7 +29,7 @@ index 67eaae9e5d..60fa9b2eee 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -642,6 +637,26 @@ OCaml 5.0
+@@ -645,6 +640,26 @@ OCaml 5.0
    (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
    Yallop and Florian Angeletti)
  
@@ -79,7 +56,7 @@ index 67eaae9e5d..60fa9b2eee 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -677,13 +692,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -680,13 +695,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -95,7 +72,7 @@ index 67eaae9e5d..60fa9b2eee 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -787,6 +802,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -790,6 +805,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -105,7 +82,7 @@ index 67eaae9e5d..60fa9b2eee 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1046,6 +1064,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1049,6 +1067,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3121,10 +3098,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 46f9e97e96..ce52824107 100755
+index 4224239dfe..808331248a 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 213e6604e5..823354b54a 100644
+index d32653b388..759ecafaa1 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -9968,36 +9945,13 @@ index 0000000000..866caf3795
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..42f7b4f524
+index 0000000000..52c0ad85ea
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9904 @@
+@@ -0,0 +1,9909 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6f7d91355f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:45:41.248471604 +0100
-+++++ b	2023-09-28 18:45:41.260472067 +0100
-++@@ -13,7 +13,7 @@
-++  ### Other libraries:
-++  
-++  - #11475: Make Unix terminal interface bindings domain-safe
-++-@@ -642,6 +637,11 @@ OCaml 5.0
-+++@@ -637,6 +632,11 @@ OCaml 5.0
-++  - #11516, #11524: Fix the `deprecated_mutable` attribute.
-++    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
-++  
-++@@ -22,6 +22,6 @@
-++ +  (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
-++ +  Yallop and Florian Angeletti)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10011,10 +9965,10 @@ index 0000000000..42f7b4f524
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 67eaae9e5d..60fa9b2eee 100644
++index f64c7b3a43..17df1d8575 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -629,11 +629,6 @@ OCaml 5.0
++@@ -632,11 +632,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10026,7 +9980,7 @@ index 0000000000..42f7b4f524
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -642,6 +637,26 @@ OCaml 5.0
++@@ -645,6 +640,26 @@ OCaml 5.0
 +   (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
 +   Yallop and Florian Angeletti)
 + 
@@ -10053,7 +10007,7 @@ index 0000000000..42f7b4f524
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -677,13 +692,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -680,13 +695,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10069,7 +10023,7 @@ index 0000000000..42f7b4f524
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -787,6 +802,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -790,6 +805,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10079,7 +10033,7 @@ index 0000000000..42f7b4f524
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1046,6 +1064,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1049,6 +1067,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13095,10 +13049,10 @@ index 0000000000..42f7b4f524
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 46f9e97e96..ce52824107 100755
++index 4224239dfe..808331248a 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 213e6604e5..823354b54a 100644
++index d32653b388..759ecafaa1 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -19875,7 +19829,35 @@ index 0000000000..42f7b4f524
 +++        .comm   G(caml_state), 4
 ++ 
 ++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_param
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 58e081081f..66b315bb9d 100644
+++--- a/tools/ci/appveyor/appvey
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
