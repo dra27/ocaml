@@ -31,12 +31,6 @@ else
 defaultentry: world
 endif
 
-ifeq "$(UNIX_OR_WIN32)" "win32"
-LN = cp
-else
-LN = ln -sf
-endif
-
 include stdlib/StdlibModules
 
 CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g -use-prims runtime/primitives
@@ -741,8 +735,16 @@ endif
 ## Generated non-object files
 
 runtime/ld.conf: $(ROOTDIR)/Makefile.config
+ifneq "$(STUBLIBDIR)" "$(LIBDIR)/stublibs"
 	echo "$(STUBLIBDIR)" > $@
-	echo "$(LIBDIR)" >> $@
+else
+ifeq "$(UNIX_OR_WIN32)" "unix"
+	echo './stublibs' > $@
+else
+	echo '.\stublibs' > $@
+endif
+endif
+	echo "." >> $@
 
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
