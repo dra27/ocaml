@@ -1,18 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..4671930069
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,9 @@
-+--- a	2023-09-28 18:45:40.168429926 +0100
-++++ b	2023-09-28 18:45:40.172430080 +0100
-+@@ -80,5 +80,5 @@
-+ +    run "test $PORT" \
-+ +        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-+      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-+-     if [[ $PORT = 'msvc64' ]] ; then
-++     if [[ $PORT = 'mingw64' ]] ; then
-+        run "$MAKE check_all_arches" \
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -6123,10 +6111,10 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..2facd2c1d3
+index 0000000000..866caf3795
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3814 @@
+@@ -0,0 +1,3820 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index a42b0dab97..ed1137f668 100644
 +--- a/.github/workflows/build.yml
@@ -9909,7 +9897,7 @@ index 0000000000..2facd2c1d3
 + 
 + Build () {
 +diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-+index 58e081081f..a5d887d284 100644
++index 58e081081f..66b315bb9d 100644
 +--- a/tools/ci/appveyor/appveyor_build.sh
 ++++ b/tools/ci/appveyor/appveyor_build.sh
 +@@ -64,8 +64,8 @@ function set_configuration {
@@ -9923,7 +9911,7 @@ index 0000000000..2facd2c1d3
 +         ;;
 +         msvc32)
 +             build='--build=i686-pc-cygwin'
-+@@ -161,7 +161,7 @@ case "$1" in
++@@ -161,10 +161,13 @@ case "$1" in
 +     run "test $PORT" \
 +         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 +     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
@@ -9932,7 +9920,13 @@ index 0000000000..2facd2c1d3
 +       run "$MAKE check_all_arches" \
 +            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
 +       cd "$FULL_BUILD_PREFIX-$PORT"
-+@@ -184,7 +184,7 @@ case "$1" in
+++
+++      git config --global safe.directory '*'
+++
++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
++       # or altered files exist. We revert the change from the bootstrap (that
++       # would have failed the build earlier if necessary)
++@@ -184,7 +187,7 @@ case "$1" in
 +   *)
 +     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 + 
@@ -9943,25 +9937,13 @@ index 0000000000..2facd2c1d3
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4853c07b3a
+index 0000000000..92ba08881c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9902 @@
+@@ -0,0 +1,9906 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..4671930069
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,9 @@
-++--- a	2023-09-28 18:45:40.168429926 +0100
-+++++ b	2023-09-28 18:45:40.172430080 +0100
-++@@ -80,5 +80,5 @@
-++ +    run "test $PORT" \
-++ +        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-     if [[ $PORT = 'msvc64' ]] ; then
-+++     if [[ $PORT = 'mingw64' ]] ; then
-++        run "$MAKE check_all_arches" \
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -16072,10 +16054,10 @@ index 0000000000..4853c07b3a
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..2facd2c1d3
++index 0000000000..866caf3795
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3814 @@
++@@ -0,0 +1,3820 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index a42b0dab97..ed1137f668 100644
 ++--- a/.github/workflows/build.yml
@@ -19848,7 +19830,23 @@ index 0000000000..4853c07b3a
 ++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
 ++-      $configure_flags
 ++-    ;;
-++-  
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 58e081081f..66b315bb9d 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host=
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

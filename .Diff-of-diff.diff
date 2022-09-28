@@ -1,9 +1,0 @@
---- a	2023-09-28 18:45:40.168429926 +0100
-+++ b	2023-09-28 18:45:40.172430080 +0100
-@@ -80,5 +80,5 @@
- +    run "test $PORT" \
- +        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
--     if [[ $PORT = 'msvc64' ]] ; then
-+     if [[ $PORT = 'mingw64' ]] ; then
-        run "$MAKE check_all_arches" \
