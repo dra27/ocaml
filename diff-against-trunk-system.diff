@@ -1,29 +1,18 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..5b3eebd924
+index 0000000000..4671930069
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:45:39.860418035 +0100
-++++ b	2023-09-28 18:45:39.868418344 +0100
-+@@ -105,7 +105,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -715,7 +715,7 @@ AS_CASE([$host],
-++@@ -727,7 +727,7 @@ AS_CASE([$host],
-+    [*-*-mingw32],
-+      [AS_CASE([$ocaml_cv_cc_vendor],
-+        [gcc-[[01234]]-*],
-+@@ -114,7 +114,7 @@
-+            Please use GCC version 5 or above.]))],
-+        [gcc-*],
-+          [internal_cflags="-Wno-unused $cc_warnings \
-+-@@ -725,7 +725,7 @@ AS_CASE([$host],
-++@@ -737,7 +737,7 @@ AS_CASE([$host],
-+          internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
-+          internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-+          internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+@@ -0,0 +1,9 @@
++--- a	2023-09-28 18:45:40.168429926 +0100
+++++ b	2023-09-28 18:45:40.172430080 +0100
++@@ -80,5 +80,5 @@
++ +    run "test $PORT" \
++ +        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
++      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
++-     if [[ $PORT = 'msvc64' ]] ; then
+++     if [[ $PORT = 'mingw64' ]] ; then
++        run "$MAKE check_all_arches" \
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -9954,36 +9943,25 @@ index 0000000000..ff747f3b06
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fcbff82629
+index 0000000000..36992e81ad
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9897 @@
+@@ -0,0 +1,9902 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..5b3eebd924
++index 0000000000..4671930069
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:45:39.860418035 +0100
-+++++ b	2023-09-28 18:45:39.868418344 +0100
-++@@ -105,7 +105,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -715,7 +715,7 @@ AS_CASE([$host],
-+++@@ -727,7 +727,7 @@ AS_CASE([$host],
-++    [*-*-mingw32],
-++      [AS_CASE([$ocaml_cv_cc_vendor],
-++        [gcc-[[01234]]-*],
-++@@ -114,7 +114,7 @@
-++            Please use GCC version 5 or above.]))],
-++        [gcc-*],
-++          [internal_cflags="-Wno-unused $cc_warnings \
-++-@@ -725,7 +725,7 @@ AS_CASE([$host],
-+++@@ -737,7 +737,7 @@ AS_CASE([$host],
-++          internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
-++          internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-++          internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
++@@ -0,0 +1,9 @@
+++--- a	2023-09-28 18:45:40.168429926 +0100
++++++ b	2023-09-28 18:45:40.172430080 +0100
+++@@ -80,5 +80,5 @@
+++ +    run "test $PORT" \
+++ +        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-     if [[ $PORT = 'msvc64' ]] ; then
++++     if [[ $PORT = 'mingw64' ]] ; then
+++        run "$MAKE check_all_arches" \
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -19854,7 +19832,23 @@ index 0000000000..fcbff82629
 ++ 
 ++ /* Some tests are designed to cause registers to spill; on
 ++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

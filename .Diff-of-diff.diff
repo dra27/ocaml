@@ -1,20 +1,9 @@
---- a	2023-09-28 18:45:39.860418035 +0100
-+++ b	2023-09-28 18:45:39.868418344 +0100
-@@ -105,7 +105,7 @@
- diff --git a/configure.ac b/configure.ac
- --- a/configure.ac
- +++ b/configure.ac
--@@ -715,7 +715,7 @@ AS_CASE([$host],
-+@@ -727,7 +727,7 @@ AS_CASE([$host],
-    [*-*-mingw32],
-      [AS_CASE([$ocaml_cv_cc_vendor],
-        [gcc-[[01234]]-*],
-@@ -114,7 +114,7 @@
-            Please use GCC version 5 or above.]))],
-        [gcc-*],
-          [internal_cflags="-Wno-unused $cc_warnings \
--@@ -725,7 +725,7 @@ AS_CASE([$host],
-+@@ -737,7 +737,7 @@ AS_CASE([$host],
-          internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
-          internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
-          internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+--- a	2023-09-28 18:45:40.168429926 +0100
++++ b	2023-09-28 18:45:40.172430080 +0100
+@@ -80,5 +80,5 @@
+ +    run "test $PORT" \
+ +        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+-     if [[ $PORT = 'msvc64' ]] ; then
++     if [[ $PORT = 'mingw64' ]] ; then
+        run "$MAKE check_all_arches" \
