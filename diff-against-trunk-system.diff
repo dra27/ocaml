@@ -14,7 +14,7 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 0508fe631a..7eb3e8b760 100644
+index d37d168670..910cd80319 100644
 --- a/Changes
 +++ b/Changes
 @@ -635,11 +635,6 @@ OCaml 5.0
@@ -6119,10 +6119,10 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..866caf3795
+index 0000000000..f4e3cd25ae
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3820 @@
+@@ -0,0 +1,3837 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index a42b0dab97..ed1137f668 100644
 +--- a/.github/workflows/build.yml
@@ -8578,6 +8578,23 @@ index 0000000000..866caf3795
 + *)
 + 
 + external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
++diff --git a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
++index d27e7db02d..651e071303 100644
++--- a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+++++ b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
++@@ -2,8 +2,10 @@
++ * libwin32unix
++ include unix
++ ** has_symlink
++-*** bytecode
++-*** native
+++*** skip
+++reason = "OCaml 5 only"
+++**** bytecode
+++**** native
++ *)
++ 
++ let create_symlink barrier src dst () =
 +diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
 +index 5504d94f04..32a8d9fa8c 100644
 +--- a/testsuite/tests/memory-model/forbidden.ml
@@ -9945,10 +9962,10 @@ index 0000000000..866caf3795
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..37a49f09de
+index 0000000000..53ccc72e0e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9909 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -9965,7 +9982,7 @@ index 0000000000..37a49f09de
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 0508fe631a..7eb3e8b760 100644
++index d37d168670..910cd80319 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -635,11 +635,6 @@ OCaml 5.0
@@ -16070,10 +16087,10 @@ index 0000000000..37a49f09de
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..866caf3795
++index 0000000000..f4e3cd25ae
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3820 @@
++@@ -0,0 +1,3837 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index a42b0dab97..ed1137f668 100644
 ++--- a/.github/workflows/build.yml
@@ -18529,6 +18546,23 @@ index 0000000000..37a49f09de
 ++ *)
 ++ 
 ++ external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
+++diff --git a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+++index d27e7db02d..651e071303 100644
+++--- a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
++++++ b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+++@@ -2,8 +2,10 @@
+++ * libwin32unix
+++ include unix
+++ ** has_symlink
+++-*** bytecode
+++-*** native
++++*** skip
++++reason = "OCaml 5 only"
++++**** bytecode
++++**** native
+++ *)
+++ 
+++ let create_symlink barrier src dst () =
 ++diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
 ++index 5504d94f04..32a8d9fa8c 100644
 ++--- a/testsuite/tests/memory-model/forbidden.ml
@@ -19835,29 +19869,7 @@ index 0000000000..37a49f09de
 ++--- a/tools/ci/actions/runner.sh
 +++++ b/tools/ci/actions/runner.sh
 ++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 58e081081f..66b315bb9d 100644
-++--- a/tools/ci/appveyor/appvey
+++     
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
