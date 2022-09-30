@@ -1,0 +1,24 @@
+--- a	2023-09-28 18:45:43.624563206 +0100
++++ b	2023-09-28 18:45:43.644563976 +0100
+@@ -14,20 +14,7 @@
+ diff --git a/stdlib/.depend b/stdlib/.depend
+ --- a/stdlib/.depend
+ +++ b/stdlib/.depend
+-@@ -454,12 +454,10 @@ stdlib__Lexing.cmx : lexing.ml \
+-     stdlib__Lexing.cmi
+- stdlib__Lexing.cmi : lexing.mli
+- stdlib__List.cmo : list.ml \
+--    stdlib__Sys.cmi \
+-     stdlib__Seq.cmi \
+-     stdlib__Either.cmi \
+-     stdlib__List.cmi
+- stdlib__List.cmx : list.ml \
+--    stdlib__Sys.cmx \
+-     stdlib__Seq.cmx \
+-     stdlib__Either.cmx \
+-     stdlib__List.cmi
+-@@ -477,9 +475,11 @@ stdlib__ListLabels.cmi : listLabels.mli \
++@@ -431,9 +431,11 @@ stdlib__ListLabels.cmi : listLabels.mli \
+      stdlib__Either.cmi
+  stdlib__Map.cmo : map.ml \
+      stdlib__Seq.cmi \

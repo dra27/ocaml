@@ -1,6 +1,33 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1afc217b60
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,24 @@
++--- a	2023-09-28 18:45:43.624563206 +0100
+++++ b	2023-09-28 18:45:43.644563976 +0100
++@@ -14,20 +14,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -454,12 +454,10 @@ stdlib__Lexing.cmx : lexing.ml \
++-     stdlib__Lexing.cmi
++- stdlib__Lexing.cmi : lexing.mli
++- stdlib__List.cmo : list.ml \
++--    stdlib__Sys.cmi \
++-     stdlib__Seq.cmi \
++-     stdlib__Either.cmi \
++-     stdlib__List.cmi
++- stdlib__List.cmx : list.ml \
++--    stdlib__Sys.cmx \
++-     stdlib__Seq.cmx \
++-     stdlib__Either.cmx \
++-     stdlib__List.cmi
++-@@ -477,9 +475,11 @@ stdlib__ListLabels.cmi : listLabels.mli \
+++@@ -431,9 +431,11 @@ stdlib__ListLabels.cmi : listLabels.mli \
++      stdlib__Either.cmi
++  stdlib__Map.cmo : map.ml \
++      stdlib__Seq.cmi \
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -14,10 +41,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index d37d168670..910cd80319 100644
+index c61618d2de..37e4dbcd1e 100644
 --- a/Changes
 +++ b/Changes
-@@ -635,11 +635,6 @@ OCaml 5.0
+@@ -638,11 +638,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +56,7 @@ index d37d168670..910cd80319 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -648,6 +643,26 @@ OCaml 5.0
+@@ -651,6 +646,26 @@ OCaml 5.0
    (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
    Yallop and Florian Angeletti)
  
@@ -56,7 +83,7 @@ index d37d168670..910cd80319 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -683,13 +698,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -686,13 +701,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -72,7 +99,7 @@ index d37d168670..910cd80319 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -793,6 +808,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -796,6 +811,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -82,7 +109,7 @@ index d37d168670..910cd80319 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1052,6 +1070,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1055,6 +1073,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9962,13 +9989,40 @@ index 0000000000..f4e3cd25ae
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..53ccc72e0e
+index 0000000000..08bef4695e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1afc217b60
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,24 @@
+++--- a	2023-09-28 18:45:43.624563206 +0100
++++++ b	2023-09-28 18:45:43.644563976 +0100
+++@@ -14,20 +14,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -454,12 +454,10 @@ stdlib__Lexing.cmx : lexing.ml \
+++-     stdlib__Lexing.cmi
+++- stdlib__Lexing.cmi : lexing.mli
+++- stdlib__List.cmo : list.ml \
+++--    stdlib__Sys.cmi \
+++-     stdlib__Seq.cmi \
+++-     stdlib__Either.cmi \
+++-     stdlib__List.cmi
+++- stdlib__List.cmx : list.ml \
+++--    stdlib__Sys.cmx \
+++-     stdlib__Seq.cmx \
+++-     stdlib__Either.cmx \
+++-     stdlib__List.cmi
+++-@@ -477,9 +475,11 @@ stdlib__ListLabels.cmi : listLabels.mli \
++++@@ -431,9 +431,11 @@ stdlib__ListLabels.cmi : listLabels.mli \
+++      stdlib__Either.cmi
+++  stdlib__Map.cmo : map.ml \
+++      stdlib__Seq.cmi \
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -9982,10 +10036,10 @@ index 0000000000..53ccc72e0e
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index d37d168670..910cd80319 100644
++index c61618d2de..37e4dbcd1e 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -635,11 +635,6 @@ OCaml 5.0
++@@ -638,11 +638,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -9997,7 +10051,7 @@ index 0000000000..53ccc72e0e
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -648,6 +643,26 @@ OCaml 5.0
++@@ -651,6 +646,26 @@ OCaml 5.0
 +   (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
 +   Yallop and Florian Angeletti)
 + 
@@ -10024,7 +10078,7 @@ index 0000000000..53ccc72e0e
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -683,13 +698,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -686,13 +701,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10040,7 +10094,7 @@ index 0000000000..53ccc72e0e
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -793,6 +808,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -796,6 +811,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10050,7 +10104,7 @@ index 0000000000..53ccc72e0e
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1052,6 +1070,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1055,6 +1073,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -19842,34 +19896,7 @@ index 0000000000..53ccc72e0e
 ++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++index b42d399907..656e318473 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
@@ -21241,7 +21268,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index b70e25ca23..203af2c274 100644
+index 41f14fb66a..999f76d0dc 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21369,20 +21396,7 @@ index b70e25ca23..203af2c274 100644
      stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
-@@ -454,12 +410,10 @@ stdlib__Lexing.cmx : lexing.ml \
-     stdlib__Lexing.cmi
- stdlib__Lexing.cmi : lexing.mli
- stdlib__List.cmo : list.ml \
--    stdlib__Sys.cmi \
-     stdlib__Seq.cmi \
-     stdlib__Either.cmi \
-     stdlib__List.cmi
- stdlib__List.cmx : list.ml \
--    stdlib__Sys.cmx \
-     stdlib__Seq.cmx \
-     stdlib__Either.cmx \
-     stdlib__List.cmi
-@@ -505,11 +459,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -505,11 +461,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -21394,7 +21408,7 @@ index b70e25ca23..203af2c274 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -613,7 +562,6 @@ stdlib__Random.cmo : random.ml \
+@@ -613,7 +564,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -21402,7 +21416,7 @@ index b70e25ca23..203af2c274 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -624,7 +572,6 @@ stdlib__Random.cmx : random.ml \
+@@ -624,7 +574,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -21410,7 +21424,7 @@ index b70e25ca23..203af2c274 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -664,15 +611,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -664,15 +613,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi

@@ -3063,7 +3063,7 @@ index 0000000000..f5d4df561c
 +  exec ${program} > ${output}
 +fi
 diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-index 3c9d10366f..92cea33495 100644
+index 6f88995df3..b302e7c37d 100644
 --- a/testsuite/tests/shapes/comp_units.ml
 +++ b/testsuite/tests/shapes/comp_units.ml
 @@ -25,7 +25,7 @@ module Mproj = Unit
