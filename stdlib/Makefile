@@ -57,13 +57,10 @@ opt.opt: allopt
 .PHONY: install
 # Ensure any pre-4.13 lowercased artefacts are removed on macOS and Windows
 install::
-	stale="$(filter-out $(notdir $(wildcard stdlib__*.cmi)), \
-         $(notdir $(wildcard $(INSTALL_LIBDIR)/stdlib__*.cmi)))"; \
-  if test -n "$$stale" ; then \
-    echo "$(INSTALL_LIBDIR) contains stale stdlib artefacts"; \
-    echo "Please rm $(INSTALL_LIBDIR)/stdlib__*.cm* and re-run make install"; \
-    exit 1; \
-  fi
+	@$(MAKE) -C '$(INSTALL_LIBDIR)' -f '$(realpath Makefile.check-stale)' \
+	         EXT=.cmi \
+	         'ARTEFACTS=$(wildcard stdlib__*.cmi)' \
+	         'INSTALL_LIBDIR=$(INSTALL_LIBDIR)'
 
 INSTALL_STDLIB_META_DIR=$(DESTDIR)$(LIBDIR)/stdlib
 
@@ -96,13 +93,10 @@ installopt: installopt-default
 .PHONY: installopt-default
 # Ensure any pre-4.13 lowercased artefacts are removed on macOS and Windows
 installopt-default::
-	stale="$(filter-out $(notdir $(wildcard stdlib__*.cmx)), \
-         $(notdir $(wildcard $(INSTALL_LIBDIR)/stdlib__*.cmx)))"; \
-  if test -n "$$stale" ; then \
-    echo "$(INSTALL_LIBDIR) contains stale stdlib artefacts"; \
-    echo "Please rm $(INSTALL_LIBDIR)/stdlib__*.cmx and re-run make install"; \
-    exit 1; \
-  fi
+	@$(MAKE) -C '$(INSTALL_LIBDIR)' -f '$(realpath Makefile.check-stale)' \
+	         EXT=.cmx \
+	         'ARTEFACTS=$(wildcard stdlib__*.cmx)' \
+	         'INSTALL_LIBDIR=$(INSTALL_LIBDIR)'
 
 installopt-default::
 	$(INSTALL_DATA) \
