@@ -1,15 +1,11 @@
---- a	2023-09-28 18:45:44.896612196 +0100
-+++ b	2023-09-28 18:45:44.904612504 +0100
-@@ -1,10 +1,10 @@
- diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
- --- a/otherlibs/systhreads/thread.ml
- +++ b/otherlibs/systhreads/thread.ml
--@@ -88,6 +88,7 @@ let () =
--   thread_initialize ();
-+@@ -106,6 +106,7 @@ let () =
-    Domain.at_each_spawn thread_initialize_domain;
-    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-+ *)
- +  (* Callback in [caml_shutdown], when the last domain exits. *)
-    Callback.register "Thread.at_shutdown" (fun () ->
-      thread_cleanup();
+--- a	2023-09-28 18:45:45.220624667 +0100
++++ b	2023-09-28 18:45:45.240625437 +0100
+@@ -14,7 +14,7 @@
+ diff --git a/lambda/matching.ml b/lambda/matching.ml
+ --- a/lambda/matching.ml
+ +++ b/lambda/matching.ml
+-@@ -2946,9 +2946,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
++@@ -2994,9 +2994,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
+          match (consts, nonconsts) with
+          | [ (_, act1) ], [ (_, act2) ] when fail = None ->
+              test_int_or_block arg act1 act2

@@ -1,24 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c2e9db533b
+index 0000000000..8f195f9e6b
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,15 @@
-+--- a	2023-09-28 18:45:44.896612196 +0100
-++++ b	2023-09-28 18:45:44.904612504 +0100
-+@@ -1,10 +1,10 @@
-+ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-+ --- a/otherlibs/systhreads/thread.ml
-+ +++ b/otherlibs/systhreads/thread.ml
-+-@@ -88,6 +88,7 @@ let () =
-+-   thread_initialize ();
-++@@ -106,6 +106,7 @@ let () =
-+    Domain.at_each_spawn thread_initialize_domain;
-+    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-++ *)
-+ +  (* Callback in [caml_shutdown], when the last domain exits. *)
-+    Callback.register "Thread.at_shutdown" (fun () ->
-+      thread_cleanup();
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:45.220624667 +0100
+++++ b	2023-09-28 18:45:45.240625437 +0100
++@@ -14,7 +14,7 @@
++ diff --git a/lambda/matching.ml b/lambda/matching.ml
++ --- a/lambda/matching.ml
++ +++ b/lambda/matching.ml
++-@@ -2946,9 +2946,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
+++@@ -2994,9 +2994,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
++          match (consts, nonconsts) with
++          | [ (_, act1) ], [ (_, act2) ] when fail = None ->
++              test_int_or_block arg act1 act2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -32,10 +28,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 9a539983e4..7c217eba2b 100644
+index 7f1f81349e..b285627901 100644
 --- a/Changes
 +++ b/Changes
-@@ -643,11 +643,6 @@ OCaml 5.0
+@@ -646,11 +646,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -47,7 +43,7 @@ index 9a539983e4..7c217eba2b 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -656,6 +651,26 @@ OCaml 5.0
+@@ -659,6 +654,26 @@ OCaml 5.0
    (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
    Yallop and Florian Angeletti)
  
@@ -74,7 +70,7 @@ index 9a539983e4..7c217eba2b 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -691,13 +706,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -694,13 +709,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -90,7 +86,7 @@ index 9a539983e4..7c217eba2b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -801,6 +816,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -804,6 +819,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -100,7 +96,7 @@ index 9a539983e4..7c217eba2b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1060,6 +1078,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1063,6 +1081,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9980,31 +9976,27 @@ index 0000000000..a2ecea6324
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bc0fba2695
+index 0000000000..6c04bf8824
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9903 @@
+@@ -0,0 +1,9900 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c2e9db533b
++index 0000000000..8f195f9e6b
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,15 @@
-++--- a	2023-09-28 18:45:44.896612196 +0100
-+++++ b	2023-09-28 18:45:44.904612504 +0100
-++@@ -1,10 +1,10 @@
-++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-++ --- a/otherlibs/systhreads/thread.ml
-++ +++ b/otherlibs/systhreads/thread.ml
-++-@@ -88,6 +88,7 @@ let () =
-++-   thread_initialize ();
-+++@@ -106,6 +106,7 @@ let () =
-++    Domain.at_each_spawn thread_initialize_domain;
-++    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-+++ *)
-++ +  (* Callback in [caml_shutdown], when the last domain exits. *)
-++    Callback.register "Thread.at_shutdown" (fun () ->
-++      thread_cleanup();
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:45.220624667 +0100
++++++ b	2023-09-28 18:45:45.240625437 +0100
+++@@ -14,7 +14,7 @@
+++ diff --git a/lambda/matching.ml b/lambda/matching.ml
+++ --- a/lambda/matching.ml
+++ +++ b/lambda/matching.ml
+++-@@ -2946,9 +2946,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
++++@@ -2994,9 +2994,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
+++          match (consts, nonconsts) with
+++          | [ (_, act1) ], [ (_, act2) ] when fail = None ->
+++              test_int_or_block arg act1 act2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10018,10 +10010,10 @@ index 0000000000..bc0fba2695
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 9a539983e4..7c217eba2b 100644
++index 7f1f81349e..b285627901 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -643,11 +643,6 @@ OCaml 5.0
++@@ -646,11 +646,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10033,7 +10025,7 @@ index 0000000000..bc0fba2695
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -656,6 +651,26 @@ OCaml 5.0
++@@ -659,6 +654,26 @@ OCaml 5.0
 +   (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
 +   Yallop and Florian Angeletti)
 + 
@@ -10060,7 +10052,7 @@ index 0000000000..bc0fba2695
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -691,13 +706,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -694,13 +709,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10076,7 +10068,7 @@ index 0000000000..bc0fba2695
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -801,6 +816,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -804,6 +819,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10086,7 +10078,7 @@ index 0000000000..bc0fba2695
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1060,6 +1078,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1063,6 +1081,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -19887,9 +19879,10 @@ index 0000000000..bc0fba2695
 ++ (* This test is currently disabled,
 ++    until the random failures have been investigated.
 ++ *)
+++diff --git a/testsuite/tools/asmgen_i386
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 63f45da588..b81b324926 100644
+index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
