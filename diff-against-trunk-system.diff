@@ -1,6 +1,24 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..c2e9db533b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,15 @@
++--- a	2023-09-28 18:45:44.896612196 +0100
+++++ b	2023-09-28 18:45:44.904612504 +0100
++@@ -1,10 +1,10 @@
++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
++ --- a/otherlibs/systhreads/thread.ml
++ +++ b/otherlibs/systhreads/thread.ml
++-@@ -88,6 +88,7 @@ let () =
++-   thread_initialize ();
+++@@ -106,6 +106,7 @@ let () =
++    Domain.at_each_spawn thread_initialize_domain;
++    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++ *)
++ +  (* Callback in [caml_shutdown], when the last domain exits. *)
++    Callback.register "Thread.at_shutdown" (fun () ->
++      thread_cleanup();
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -9962,13 +9980,31 @@ index 0000000000..a2ecea6324
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ec0e8fe3c6
+index 0000000000..bc0fba2695
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9904 @@
+@@ -0,0 +1,9903 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..c2e9db533b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,15 @@
+++--- a	2023-09-28 18:45:44.896612196 +0100
++++++ b	2023-09-28 18:45:44.904612504 +0100
+++@@ -1,10 +1,10 @@
+++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+++ --- a/otherlibs/systhreads/thread.ml
+++ +++ b/otherlibs/systhreads/thread.ml
+++-@@ -88,6 +88,7 @@ let () =
+++-   thread_initialize ();
++++@@ -106,6 +106,7 @@ let () =
+++    Domain.at_each_spawn thread_initialize_domain;
+++    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++++ *)
+++ +  (* Callback in [caml_shutdown], when the last domain exits. *)
+++    Callback.register "Thread.at_shutdown" (fun () ->
+++      thread_cleanup();
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -19851,25 +19887,6 @@ index 0000000000..ec0e8fe3c6
 ++ (* This test is currently disabled,
 ++    until the random failures have been investigated.
 ++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
@@ -20916,7 +20933,7 @@ index 0000000000..3a62747829
 +
 +end
 diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-index fa77d41b14..8c67db8ba3 100644
+index f9ac70c550..740a0d6233 100644
 --- a/otherlibs/systhreads/thread.ml
 +++ b/otherlibs/systhreads/thread.ml
 @@ -18,8 +18,10 @@
@@ -20968,10 +20985,10 @@ index fa77d41b14..8c67db8ba3 100644
    Domain.at_each_spawn thread_initialize_domain;
    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
 +*)
+   (* Callback in [caml_shutdown], when the last domain exits. *)
    Callback.register "Thread.at_shutdown" (fun () ->
      thread_cleanup();
-     (* In case of DLL-embedded OCaml the preempt_signal handler
-@@ -101,6 +119,11 @@ let () =
+@@ -102,6 +120,11 @@ let () =
  
  let delay = Unix.sleepf
  
