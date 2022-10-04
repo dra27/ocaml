@@ -91,10 +91,15 @@ let preempt_signal =
 
 let () =
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+<<<<<<< HEAD
   thread_initialize ();
 (*
   Domain.at_each_spawn thread_initialize_domain;
 *)
+||||||| parent of c397f30ea2 (Merge pull request PR#11385 from gadmm/systhread_simpl_and_fixes2)
+=======
+  (* Callback in [caml_shutdown], when the last domain exits. *)
+>>>>>>> c397f30ea2 (Merge pull request PR#11385 from gadmm/systhread_simpl_and_fixes2)
   Callback.register "Thread.at_shutdown" (fun () ->
     thread_cleanup();
     (* In case of DLL-embedded OCaml the preempt_signal handler
