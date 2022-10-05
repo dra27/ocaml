@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..8f195f9e6b
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:45.220624667 +0100
-++++ b	2023-09-28 18:45:45.240625437 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/lambda/matching.ml b/lambda/matching.ml
-+ --- a/lambda/matching.ml
-+ +++ b/lambda/matching.ml
-+-@@ -2946,9 +2946,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
-++@@ -2994,9 +2994,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
-+          match (consts, nonconsts) with
-+          | [ (_, act1) ], [ (_, act2) ] when fail = None ->
-+              test_int_or_block arg act1 act2
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -9976,27 +9962,13 @@ index 0000000000..a2ecea6324
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6c04bf8824
+index 0000000000..ed49a56aeb
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9900 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..8f195f9e6b
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:45.220624667 +0100
-+++++ b	2023-09-28 18:45:45.240625437 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/lambda/matching.ml b/lambda/matching.ml
-++ --- a/lambda/matching.ml
-++ +++ b/lambda/matching.ml
-++-@@ -2946,9 +2946,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
-+++@@ -2994,9 +2994,14 @@ let combine_variant loc row arg partial ctx def (tag_lambda_list, total1, _pats)
-++          match (consts, nonconsts) with
-++          | [ (_, act1) ], [ (_, act2) ] when fail = None ->
-++              test_int_or_block arg act1 act2
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -19879,7 +19851,25 @@ index 0000000000..6c04bf8824
 ++ (* This test is currently disabled,
 ++    until the random failures have been investigated.
 ++ *)
-++diff --git a/testsuite/tools/asmgen_i386
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
