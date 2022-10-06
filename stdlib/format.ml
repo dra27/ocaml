@@ -1052,6 +1052,7 @@ let std_formatter_key = DLS.new_key (fun () ->
   ppf.pp_out_newline <- display_newline ppf;
   ppf.pp_out_spaces <- display_blanks ppf;
   ppf.pp_out_indent <- display_indent ppf;
+  Domain.at_exit (pp_print_flush ppf);
   ppf)
 let _ = DLS.set std_formatter_key std_formatter
 
@@ -1063,6 +1064,7 @@ let err_formatter_key = DLS.new_key (fun () ->
   ppf.pp_out_newline <- display_newline ppf;
   ppf.pp_out_spaces <- display_blanks ppf;
   ppf.pp_out_indent <- display_indent ppf;
+  Domain.at_exit (pp_print_flush ppf);
   ppf)
 let _ = DLS.set err_formatter_key err_formatter
 *)
@@ -1491,7 +1493,6 @@ let () = at_exit flush_standard_formatters
 (* BACKPORT
 let () = Domain.before_first_spawn (fun () ->
   flush_standard_formatters ();
-
   let fs = pp_get_formatter_out_functions std_formatter () in
   pp_set_formatter_out_functions std_formatter
     {fs with out_string = buffered_out_string std_buf_key;
@@ -1501,6 +1502,5 @@ let () = Domain.before_first_spawn (fun () ->
   pp_set_formatter_out_functions err_formatter
     {fs with out_string = buffered_out_string err_buf_key;
              out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
-
-  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
+)
 *)
