@@ -90,6 +90,13 @@ let preempt_signal =
   | _       -> Sys.sigvtalrm
 
 let () =
+<<<<<<< HEAD
+||||||| parent of c9187a9bea (Merge pull request PR#11595 from Octachron/remove_at_each_spawn)
+  thread_initialize ();
+  Domain.at_each_spawn thread_initialize_domain;
+=======
+  thread_initialize ();
+>>>>>>> c9187a9bea (Merge pull request PR#11595 from Octachron/remove_at_each_spawn)
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
   thread_initialize ();
 (*
