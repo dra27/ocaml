@@ -1,140 +1,47 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e214bc9d57
+index 0000000000..0c3b4a1864
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,131 @@
-+--- a	2023-09-28 18:45:47.016693765 +0100
-++++ b	2023-09-28 18:45:47.024694073 +0100
-+@@ -1,91 +1,91 @@
-+ diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
-+ --- a/testsuite/tests/lib-dynlink-domains/main.ml
-+ +++ b/testsuite/tests/lib-dynlink-domains/main.ml
-+-@@ -4,57 +4,58 @@ include dynlink
-+- libraries = ""
-+- readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml"
-++@@ -6,57 +6,58 @@ readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plu
+@@ -0,0 +1,38 @@
++--- a	2023-09-28 18:45:47.336706066 +0100
+++++ b	2023-09-28 18:45:47.352706682 +0100
++@@ -14,7 +14,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -322,6 +322,7 @@ stdlib__Format.cmo : format.ml \
+++@@ -279,6 +279,7 @@ stdlib__Format.cmo : format.ml \
++      camlinternalFormat.cmi \
++      stdlib__Bytes.cmi \
++      stdlib__Buffer.cmi \
++@@ -22,7 +22,7 @@
++      stdlib__Format.cmi
++  stdlib__Format.cmx : format.ml \
++      stdlib__String.cmx \
++-@@ -337,6 +338,7 @@ stdlib__Format.cmx : format.ml \
+++@@ -294,6 +295,7 @@ stdlib__Format.cmx : format.ml \
++      camlinternalFormat.cmx \
++      stdlib__Bytes.cmx \
++      stdlib__Buffer.cmx \
++@@ -33,7 +33,7 @@
++ diff --git a/stdlib/format.ml b/stdlib/format.ml
++ --- a/stdlib/format.ml
++ +++ b/stdlib/format.ml
++-@@ -1250,30 +1250,25 @@ and set_tags v =
+++@@ -1264,30 +1264,25 @@ and set_tags v =
 +  
-+--*01 shared-libraries
-+--*02 setup-ocamlc.byte-build-env
-+--*03 ocamlc.byte
-++ * skip
-++ reason = "OCaml 5 only"
-++-**01 shared-libraries
-++-**02 setup-ocamlc.byte-build-env
-++-**03 ocamlc.byte
-+ -module = "store.ml"
-+-+*01 not-windows
-+-+*02 shared-libraries
-+-+*03 setup-ocamlc.byte-build-env
-+- *04 ocamlc.byte
-+++**01 not-windows
-+++**02 shared-libraries
-+++**03 setup-ocamlc.byte-build-env
-++ **04 ocamlc.byte
-+ -module = "Plugin_0.ml"
-+ +module = "store.ml"
-+- *05 ocamlc.byte
-++ **05 ocamlc.byte
-+ -module = "Plugin_0_0.ml"
-+ +module = "Plugin_0.ml"
-+- *06 ocamlc.byte
-++ **06 ocamlc.byte
-+ -module = "Plugin_0_0_0.ml"
-+ +module = "Plugin_0_0.ml"
-+- *07 ocamlc.byte
-++ **07 ocamlc.byte
-+ -module = "Plugin_0_0_0_0.ml"
-+ +module = "Plugin_0_0_0.ml"
-+- *08 ocamlc.byte
-++ **08 ocamlc.byte
-+ -module = "Plugin_0_0_0_1.ml"
-+ +module = "Plugin_0_0_0_0.ml"
-+- *09 ocamlc.byte
-++ **09 ocamlc.byte
-+ -module = "Plugin_0_0_0_2.ml"
-+ +module = "Plugin_0_0_0_1.ml"
-+- *10 ocamlc.byte
-++ **10 ocamlc.byte
-+ -module = "Plugin_1.ml"
-+ +module = "Plugin_0_0_0_2.ml"
-+- *11 ocamlc.byte
-++ **11 ocamlc.byte
-+ -module = "Plugin_1_0.ml"
-+ +module = "Plugin_1.ml"
-+- *12 ocamlc.byte
-++ **12 ocamlc.byte
-+ -module = "Plugin_1_0_0.ml"
-+ +module = "Plugin_1_0.ml"
-+- *13 ocamlc.byte
-++ **13 ocamlc.byte
-+ -module = "Plugin_1_0_0_0.ml"
-+ +module = "Plugin_1_0_0.ml"
-+- *14 ocamlc.byte
-++ **14 ocamlc.byte
-+ -module = "Plugin_1_1.ml"
-+ +module = "Plugin_1_0_0_0.ml"
-+- *15 ocamlc.byte
-++ **15 ocamlc.byte
-+ -module = "Plugin_1_2.ml"
-+ +module = "Plugin_1_1.ml"
-+- *16 ocamlc.byte
-++ **16 ocamlc.byte
-+ -module = "Plugin_1_2_0.ml"
-+ +module = "Plugin_1_2.ml"
-+- *17 ocamlc.byte
-++ **17 ocamlc.byte
-+ -module = "Plugin_1_2_0_0.ml"
-+ +module = "Plugin_1_2_0.ml"
-+- *18 ocamlc.byte
-++ **18 ocamlc.byte
-+ -module = "Plugin_1_2_1.ml"
-+ +module = "Plugin_1_2_0_0.ml"
-+- *19 ocamlc.byte
-++ **19 ocamlc.byte
-+ -module = "Plugin_1_2_2.ml"
-+ +module = "Plugin_1_2_1.ml"
-+- *20 ocamlc.byte
-++ **20 ocamlc.byte
-+ -module = "Plugin_1_2_2_0.ml"
-+ +module = "Plugin_1_2_2.ml"
-+- *21 ocamlc.byte
-++ **21 ocamlc.byte
-+ -module = "Plugin_1_2_3.ml"
-+ +module = "Plugin_1_2_2_0.ml"
-+- *22 ocamlc.byte
-++ **22 ocamlc.byte
-+ -module = "Plugin_1_2_3_0.ml"
-+ +module = "Plugin_1_2_3.ml"
-+- *23 ocamlc.byte
-++ **23 ocamlc.byte
-+ -module = "main.ml"
-+ +module = "Plugin_1_2_3_0.ml"
-+- *24 ocamlc.byte
-++ **24 ocamlc.byte
-+ +module = "main.ml"
-+-+*25 ocamlc.byte
-+++**25 ocamlc.byte
-+  program = "./main.byte.exe"
-+  libraries= "dynlink"
-+  all_modules = "store.cmo main.cmo"
-+  module = ""
-+--*25 run
-+--*26 check-program-output
-+-+*26 run
-+-+*27 check-program-output
-++-**25 run
-++-**26 check-program-output
-+++**26 run
-+++**27 check-program-output
++  (* Convenience functions *)
 +  
-+- *02 native-dynlink
-+- *03 setup-ocamlopt.byte-build-env
-++ **02 native-dynlink
-++ **03 setup-ocamlopt.byte-build-env
-+ diff --git a/testsuite/tests/lib-dynlink-domains/test_generator.ml b/testsuite/tests/lib-dynlink-domains/test_generator.ml
-+ --- a/testsuite/tests/lib-dynlink-domains/test_generator.ml
-+ +++ b/testsuite/tests/lib-dynlink-domains/test_generator.ml
++@@ -82,7 +82,7 @@
++ diff --git a/stdlib/format.mli b/stdlib/format.mli
++ --- a/stdlib/format.mli
++ +++ b/stdlib/format.mli
++-@@ -1152,17 +1152,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
+++@@ -1155,17 +1155,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
++  
++  (** {1 Convenience formatting functions.} *)
++  
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -148,10 +55,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index b13ddbb6a4..dec3caa7b1 100644
+index 2ff000d6aa..56324c9857 100644
 --- a/Changes
 +++ b/Changes
-@@ -643,11 +643,6 @@ OCaml 5.0
+@@ -646,11 +646,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -163,7 +70,7 @@ index b13ddbb6a4..dec3caa7b1 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -659,6 +654,26 @@ OCaml 5.0
+@@ -662,6 +657,26 @@ OCaml 5.0
  - #11587: Prevent integer comparison from being used on pointers
    (Vincent Laviron, review by Gabriel Scherer)
  
@@ -190,7 +97,7 @@ index b13ddbb6a4..dec3caa7b1 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -694,13 +709,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -697,13 +712,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -206,7 +113,7 @@ index b13ddbb6a4..dec3caa7b1 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -804,6 +819,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -807,6 +822,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -216,7 +123,7 @@ index b13ddbb6a4..dec3caa7b1 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1063,6 +1081,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1066,6 +1084,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6253,10 +6160,10 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..7bd6e1fa06
+index 0000000000..2d986ac807
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3850 @@
+@@ -0,0 +1,3852 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index a42b0dab97..ed1137f668 100644
 +--- a/.github/workflows/build.yml
@@ -7976,92 +7883,94 @@ index 0000000000..7bd6e1fa06
 + 
 + (* Test the behavior of channel refcounting. *)
 +diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
-+index 1feeb3918a..781d82300a 100644
++index d87ddc24e4..a10828c80e 100644
 +--- a/testsuite/tests/lib-dynlink-domains/main.ml
 ++++ b/testsuite/tests/lib-dynlink-domains/main.ml
-+@@ -4,168 +4,170 @@ include dynlink
++@@ -4,169 +4,171 @@ include dynlink
 + libraries = ""
 + readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml"
 + 
-+-*01 shared-libraries
-+-*02 setup-ocamlc.byte-build-env
-+-*03 ocamlc.byte
++-*01 not-windows
++-*02 shared-libraries
++-*03 setup-ocamlc.byte-build-env
++-*04 ocamlc.byte
 ++* skip
 ++reason = "OCaml 5 only"
-++**01 shared-libraries
-++**02 setup-ocamlc.byte-build-env
-++**03 ocamlc.byte
-+ module = "store.ml"
-+-*04 ocamlc.byte
+++**01 not-windows
+++**02 shared-libraries
+++**03 setup-ocamlc.byte-build-env
 ++**04 ocamlc.byte
-+ module = "Plugin_0.ml"
++ module = "store.ml"
 +-*05 ocamlc.byte
 ++**05 ocamlc.byte
-+ module = "Plugin_0_0.ml"
++ module = "Plugin_0.ml"
 +-*06 ocamlc.byte
 ++**06 ocamlc.byte
-+ module = "Plugin_0_0_0.ml"
++ module = "Plugin_0_0.ml"
 +-*07 ocamlc.byte
 ++**07 ocamlc.byte
-+ module = "Plugin_0_0_0_0.ml"
++ module = "Plugin_0_0_0.ml"
 +-*08 ocamlc.byte
 ++**08 ocamlc.byte
-+ module = "Plugin_0_0_0_1.ml"
++ module = "Plugin_0_0_0_0.ml"
 +-*09 ocamlc.byte
 ++**09 ocamlc.byte
-+ module = "Plugin_0_0_0_2.ml"
++ module = "Plugin_0_0_0_1.ml"
 +-*10 ocamlc.byte
 ++**10 ocamlc.byte
-+ module = "Plugin_1.ml"
++ module = "Plugin_0_0_0_2.ml"
 +-*11 ocamlc.byte
 ++**11 ocamlc.byte
-+ module = "Plugin_1_0.ml"
++ module = "Plugin_1.ml"
 +-*12 ocamlc.byte
 ++**12 ocamlc.byte
-+ module = "Plugin_1_0_0.ml"
++ module = "Plugin_1_0.ml"
 +-*13 ocamlc.byte
 ++**13 ocamlc.byte
-+ module = "Plugin_1_0_0_0.ml"
++ module = "Plugin_1_0_0.ml"
 +-*14 ocamlc.byte
 ++**14 ocamlc.byte
-+ module = "Plugin_1_1.ml"
++ module = "Plugin_1_0_0_0.ml"
 +-*15 ocamlc.byte
 ++**15 ocamlc.byte
-+ module = "Plugin_1_2.ml"
++ module = "Plugin_1_1.ml"
 +-*16 ocamlc.byte
 ++**16 ocamlc.byte
-+ module = "Plugin_1_2_0.ml"
++ module = "Plugin_1_2.ml"
 +-*17 ocamlc.byte
 ++**17 ocamlc.byte
-+ module = "Plugin_1_2_0_0.ml"
++ module = "Plugin_1_2_0.ml"
 +-*18 ocamlc.byte
 ++**18 ocamlc.byte
-+ module = "Plugin_1_2_1.ml"
++ module = "Plugin_1_2_0_0.ml"
 +-*19 ocamlc.byte
 ++**19 ocamlc.byte
-+ module = "Plugin_1_2_2.ml"
++ module = "Plugin_1_2_1.ml"
 +-*20 ocamlc.byte
 ++**20 ocamlc.byte
-+ module = "Plugin_1_2_2_0.ml"
++ module = "Plugin_1_2_2.ml"
 +-*21 ocamlc.byte
 ++**21 ocamlc.byte
-+ module = "Plugin_1_2_3.ml"
++ module = "Plugin_1_2_2_0.ml"
 +-*22 ocamlc.byte
 ++**22 ocamlc.byte
-+ module = "Plugin_1_2_3_0.ml"
++ module = "Plugin_1_2_3.ml"
 +-*23 ocamlc.byte
 ++**23 ocamlc.byte
-+ module = "main.ml"
++ module = "Plugin_1_2_3_0.ml"
 +-*24 ocamlc.byte
 ++**24 ocamlc.byte
++ module = "main.ml"
++-*25 ocamlc.byte
+++**25 ocamlc.byte
 + program = "./main.byte.exe"
 + libraries= "dynlink"
 + all_modules = "store.cmo main.cmo"
 + module = ""
-+-*25 run
-+-*26 check-program-output
-++**25 run
-++**26 check-program-output
++-*26 run
++-*27 check-program-output
+++**26 run
+++**27 check-program-output
 + 
 +-*02 native-dynlink
 +-*03 setup-ocamlopt.byte-build-env
@@ -10109,147 +10018,54 @@ index 0000000000..7bd6e1fa06
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7b3c09c0a7
+index 0000000000..68daff2fa0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10045 @@
+@@ -0,0 +1,9905 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e214bc9d57
++index 0000000000..0c3b4a1864
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,131 @@
-++--- a	2023-09-28 18:45:47.016693765 +0100
-+++++ b	2023-09-28 18:45:47.024694073 +0100
-++@@ -1,91 +1,91 @@
-++ diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
-++ --- a/testsuite/tests/lib-dynlink-domains/main.ml
-++ +++ b/testsuite/tests/lib-dynlink-domains/main.ml
-++-@@ -4,57 +4,58 @@ include dynlink
-++- libraries = ""
-++- readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml"
-+++@@ -6,57 +6,58 @@ readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plu
++@@ -0,0 +1,38 @@
+++--- a	2023-09-28 18:45:47.336706066 +0100
++++++ b	2023-09-28 18:45:47.352706682 +0100
+++@@ -14,7 +14,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -322,6 +322,7 @@ stdlib__Format.cmo : format.ml \
++++@@ -279,6 +279,7 @@ stdlib__Format.cmo : format.ml \
+++      camlinternalFormat.cmi \
+++      stdlib__Bytes.cmi \
+++      stdlib__Buffer.cmi \
+++@@ -22,7 +22,7 @@
+++      stdlib__Format.cmi
+++  stdlib__Format.cmx : format.ml \
+++      stdlib__String.cmx \
+++-@@ -337,6 +338,7 @@ stdlib__Format.cmx : format.ml \
++++@@ -294,6 +295,7 @@ stdlib__Format.cmx : format.ml \
+++      camlinternalFormat.cmx \
+++      stdlib__Bytes.cmx \
+++      stdlib__Buffer.cmx \
+++@@ -33,7 +33,7 @@
+++ diff --git a/stdlib/format.ml b/stdlib/format.ml
+++ --- a/stdlib/format.ml
+++ +++ b/stdlib/format.ml
+++-@@ -1250,30 +1250,25 @@ and set_tags v =
++++@@ -1264,30 +1264,25 @@ and set_tags v =
 ++  
-++--*01 shared-libraries
-++--*02 setup-ocamlc.byte-build-env
-++--*03 ocamlc.byte
-+++ * skip
-+++ reason = "OCaml 5 only"
-+++-**01 shared-libraries
-+++-**02 setup-ocamlc.byte-build-env
-+++-**03 ocamlc.byte
-++ -module = "store.ml"
-++-+*01 not-windows
-++-+*02 shared-libraries
-++-+*03 setup-ocamlc.byte-build-env
-++- *04 ocamlc.byte
-++++**01 not-windows
-++++**02 shared-libraries
-++++**03 setup-ocamlc.byte-build-env
-+++ **04 ocamlc.byte
-++ -module = "Plugin_0.ml"
-++ +module = "store.ml"
-++- *05 ocamlc.byte
-+++ **05 ocamlc.byte
-++ -module = "Plugin_0_0.ml"
-++ +module = "Plugin_0.ml"
-++- *06 ocamlc.byte
-+++ **06 ocamlc.byte
-++ -module = "Plugin_0_0_0.ml"
-++ +module = "Plugin_0_0.ml"
-++- *07 ocamlc.byte
-+++ **07 ocamlc.byte
-++ -module = "Plugin_0_0_0_0.ml"
-++ +module = "Plugin_0_0_0.ml"
-++- *08 ocamlc.byte
-+++ **08 ocamlc.byte
-++ -module = "Plugin_0_0_0_1.ml"
-++ +module = "Plugin_0_0_0_0.ml"
-++- *09 ocamlc.byte
-+++ **09 ocamlc.byte
-++ -module = "Plugin_0_0_0_2.ml"
-++ +module = "Plugin_0_0_0_1.ml"
-++- *10 ocamlc.byte
-+++ **10 ocamlc.byte
-++ -module = "Plugin_1.ml"
-++ +module = "Plugin_0_0_0_2.ml"
-++- *11 ocamlc.byte
-+++ **11 ocamlc.byte
-++ -module = "Plugin_1_0.ml"
-++ +module = "Plugin_1.ml"
-++- *12 ocamlc.byte
-+++ **12 ocamlc.byte
-++ -module = "Plugin_1_0_0.ml"
-++ +module = "Plugin_1_0.ml"
-++- *13 ocamlc.byte
-+++ **13 ocamlc.byte
-++ -module = "Plugin_1_0_0_0.ml"
-++ +module = "Plugin_1_0_0.ml"
-++- *14 ocamlc.byte
-+++ **14 ocamlc.byte
-++ -module = "Plugin_1_1.ml"
-++ +module = "Plugin_1_0_0_0.ml"
-++- *15 ocamlc.byte
-+++ **15 ocamlc.byte
-++ -module = "Plugin_1_2.ml"
-++ +module = "Plugin_1_1.ml"
-++- *16 ocamlc.byte
-+++ **16 ocamlc.byte
-++ -module = "Plugin_1_2_0.ml"
-++ +module = "Plugin_1_2.ml"
-++- *17 ocamlc.byte
-+++ **17 ocamlc.byte
-++ -module = "Plugin_1_2_0_0.ml"
-++ +module = "Plugin_1_2_0.ml"
-++- *18 ocamlc.byte
-+++ **18 ocamlc.byte
-++ -module = "Plugin_1_2_1.ml"
-++ +module = "Plugin_1_2_0_0.ml"
-++- *19 ocamlc.byte
-+++ **19 ocamlc.byte
-++ -module = "Plugin_1_2_2.ml"
-++ +module = "Plugin_1_2_1.ml"
-++- *20 ocamlc.byte
-+++ **20 ocamlc.byte
-++ -module = "Plugin_1_2_2_0.ml"
-++ +module = "Plugin_1_2_2.ml"
-++- *21 ocamlc.byte
-+++ **21 ocamlc.byte
-++ -module = "Plugin_1_2_3.ml"
-++ +module = "Plugin_1_2_2_0.ml"
-++- *22 ocamlc.byte
-+++ **22 ocamlc.byte
-++ -module = "Plugin_1_2_3_0.ml"
-++ +module = "Plugin_1_2_3.ml"
-++- *23 ocamlc.byte
-+++ **23 ocamlc.byte
-++ -module = "main.ml"
-++ +module = "Plugin_1_2_3_0.ml"
-++- *24 ocamlc.byte
-+++ **24 ocamlc.byte
-++ +module = "main.ml"
-++-+*25 ocamlc.byte
-++++**25 ocamlc.byte
-++  program = "./main.byte.exe"
-++  libraries= "dynlink"
-++  all_modules = "store.cmo main.cmo"
-++  module = ""
-++--*25 run
-++--*26 check-program-output
-++-+*26 run
-++-+*27 check-program-output
-+++-**25 run
-+++-**26 check-program-output
-++++**26 run
-++++**27 check-program-output
+++  (* Convenience functions *)
 ++  
-++- *02 native-dynlink
-++- *03 setup-ocamlopt.byte-build-env
-+++ **02 native-dynlink
-+++ **03 setup-ocamlopt.byte-build-env
-++ diff --git a/testsuite/tests/lib-dynlink-domains/test_generator.ml b/testsuite/tests/lib-dynlink-domains/test_generator.ml
-++ --- a/testsuite/tests/lib-dynlink-domains/test_generator.ml
-++ +++ b/testsuite/tests/lib-dynlink-domains/test_generator.ml
+++@@ -82,7 +82,7 @@
+++ diff --git a/stdlib/format.mli b/stdlib/format.mli
+++ --- a/stdlib/format.mli
+++ +++ b/stdlib/format.mli
+++-@@ -1152,17 +1152,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
++++@@ -1155,17 +1155,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
+++  
+++  (** {1 Convenience formatting functions.} *)
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10263,10 +10079,10 @@ index 0000000000..7b3c09c0a7
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index b13ddbb6a4..dec3caa7b1 100644
++index 2ff000d6aa..56324c9857 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -643,11 +643,6 @@ OCaml 5.0
++@@ -646,11 +646,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10278,7 +10094,7 @@ index 0000000000..7b3c09c0a7
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -659,6 +654,26 @@ OCaml 5.0
++@@ -662,6 +657,26 @@ OCaml 5.0
 + - #11587: Prevent integer comparison from being used on pointers
 +   (Vincent Laviron, review by Gabriel Scherer)
 + 
@@ -10305,7 +10121,7 @@ index 0000000000..7b3c09c0a7
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -694,13 +709,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -697,13 +712,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10321,7 +10137,7 @@ index 0000000000..7b3c09c0a7
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -804,6 +819,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -807,6 +822,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10331,7 +10147,7 @@ index 0000000000..7b3c09c0a7
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1063,6 +1081,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1066,6 +1084,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16368,10 +16184,10 @@ index 0000000000..7b3c09c0a7
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..7bd6e1fa06
++index 0000000000..2d986ac807
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3850 @@
++@@ -0,0 +1,3852 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index a42b0dab97..ed1137f668 100644
 ++--- a/.github/workflows/build.yml
@@ -18091,92 +17907,94 @@ index 0000000000..7b3c09c0a7
 ++ 
 ++ (* Test the behavior of channel refcounting. *)
 ++diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
-++index 1feeb3918a..781d82300a 100644
+++index d87ddc24e4..a10828c80e 100644
 ++--- a/testsuite/tests/lib-dynlink-domains/main.ml
 +++++ b/testsuite/tests/lib-dynlink-domains/main.ml
-++@@ -4,168 +4,170 @@ include dynlink
+++@@ -4,169 +4,171 @@ include dynlink
 ++ libraries = ""
 ++ readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml"
 ++ 
-++-*01 shared-libraries
-++-*02 setup-ocamlc.byte-build-env
-++-*03 ocamlc.byte
+++-*01 not-windows
+++-*02 shared-libraries
+++-*03 setup-ocamlc.byte-build-env
+++-*04 ocamlc.byte
 +++* skip
 +++reason = "OCaml 5 only"
-+++**01 shared-libraries
-+++**02 setup-ocamlc.byte-build-env
-+++**03 ocamlc.byte
-++ module = "store.ml"
-++-*04 ocamlc.byte
++++**01 not-windows
++++**02 shared-libraries
++++**03 setup-ocamlc.byte-build-env
 +++**04 ocamlc.byte
-++ module = "Plugin_0.ml"
+++ module = "store.ml"
 ++-*05 ocamlc.byte
 +++**05 ocamlc.byte
-++ module = "Plugin_0_0.ml"
+++ module = "Plugin_0.ml"
 ++-*06 ocamlc.byte
 +++**06 ocamlc.byte
-++ module = "Plugin_0_0_0.ml"
+++ module = "Plugin_0_0.ml"
 ++-*07 ocamlc.byte
 +++**07 ocamlc.byte
-++ module = "Plugin_0_0_0_0.ml"
+++ module = "Plugin_0_0_0.ml"
 ++-*08 ocamlc.byte
 +++**08 ocamlc.byte
-++ module = "Plugin_0_0_0_1.ml"
+++ module = "Plugin_0_0_0_0.ml"
 ++-*09 ocamlc.byte
 +++**09 ocamlc.byte
-++ module = "Plugin_0_0_0_2.ml"
+++ module = "Plugin_0_0_0_1.ml"
 ++-*10 ocamlc.byte
 +++**10 ocamlc.byte
-++ module = "Plugin_1.ml"
+++ module = "Plugin_0_0_0_2.ml"
 ++-*11 ocamlc.byte
 +++**11 ocamlc.byte
-++ module = "Plugin_1_0.ml"
+++ module = "Plugin_1.ml"
 ++-*12 ocamlc.byte
 +++**12 ocamlc.byte
-++ module = "Plugin_1_0_0.ml"
+++ module = "Plugin_1_0.ml"
 ++-*13 ocamlc.byte
 +++**13 ocamlc.byte
-++ module = "Plugin_1_0_0_0.ml"
+++ module = "Plugin_1_0_0.ml"
 ++-*14 ocamlc.byte
 +++**14 ocamlc.byte
-++ module = "Plugin_1_1.ml"
+++ module = "Plugin_1_0_0_0.ml"
 ++-*15 ocamlc.byte
 +++**15 ocamlc.byte
-++ module = "Plugin_1_2.ml"
+++ module = "Plugin_1_1.ml"
 ++-*16 ocamlc.byte
 +++**16 ocamlc.byte
-++ module = "Plugin_1_2_0.ml"
+++ module = "Plugin_1_2.ml"
 ++-*17 ocamlc.byte
 +++**17 ocamlc.byte
-++ module = "Plugin_1_2_0_0.ml"
+++ module = "Plugin_1_2_0.ml"
 ++-*18 ocamlc.byte
 +++**18 ocamlc.byte
-++ module = "Plugin_1_2_1.ml"
+++ module = "Plugin_1_2_0_0.ml"
 ++-*19 ocamlc.byte
 +++**19 ocamlc.byte
-++ module = "Plugin_1_2_2.ml"
+++ module = "Plugin_1_2_1.ml"
 ++-*20 ocamlc.byte
 +++**20 ocamlc.byte
-++ module = "Plugin_1_2_2_0.ml"
+++ module = "Plugin_1_2_2.ml"
 ++-*21 ocamlc.byte
 +++**21 ocamlc.byte
-++ module = "Plugin_1_2_3.ml"
+++ module = "Plugin_1_2_2_0.ml"
 ++-*22 ocamlc.byte
 +++**22 ocamlc.byte
-++ module = "Plugin_1_2_3_0.ml"
+++ module = "Plugin_1_2_3.ml"
 ++-*23 ocamlc.byte
 +++**23 ocamlc.byte
-++ module = "main.ml"
+++ module = "Plugin_1_2_3_0.ml"
 ++-*24 ocamlc.byte
 +++**24 ocamlc.byte
+++ module = "main.ml"
+++-*25 ocamlc.byte
++++**25 ocamlc.byte
 ++ program = "./main.byte.exe"
 ++ libraries= "dynlink"
 ++ all_modules = "store.cmo main.cmo"
 ++ module = ""
-++-*25 run
-++-*26 check-program-output
-+++**25 run
-+++**26 check-program-output
+++-*26 run
+++-*27 check-program-output
++++**26 run
++++**27 check-program-output
 ++ 
 ++-*02 native-dynlink
 ++-*03 setup-ocamlopt.byte-build-env
@@ -20108,56 +19926,7 @@ index 0000000000..7b3c09c0a7
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params 
+++index 666a55efeb..5a
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21644,7 +21413,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 41f14fb66a..999f76d0dc 100644
+index b13de05fd6..504233667c 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21734,7 +21503,7 @@ index 41f14fb66a..999f76d0dc 100644
      camlinternalFormatBasics.cmi \
      camlinternalFormat.cmi \
      stdlib__Bytes.cmi \
-@@ -331,8 +288,8 @@ stdlib__Format.cmx : format.ml \
+@@ -332,8 +289,8 @@ stdlib__Format.cmx : format.ml \
      stdlib__Queue.cmx \
      stdlib__List.cmx \
      stdlib__Int.cmx \
@@ -21744,7 +21513,7 @@ index 41f14fb66a..999f76d0dc 100644
      camlinternalFormatBasics.cmx \
      camlinternalFormat.cmx \
      stdlib__Bytes.cmx \
-@@ -342,7 +299,6 @@ stdlib__Format.cmi : format.mli \
+@@ -344,7 +301,6 @@ stdlib__Format.cmi : format.mli \
      stdlib.cmi \
      stdlib__Seq.cmi \
      stdlib__Either.cmi \
@@ -21752,7 +21521,7 @@ index 41f14fb66a..999f76d0dc 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -373,8 +329,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -375,8 +331,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -21762,7 +21531,7 @@ index 41f14fb66a..999f76d0dc 100644
      stdlib__Atomic.cmi \
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
-@@ -384,8 +340,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -386,8 +342,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -21772,7 +21541,7 @@ index 41f14fb66a..999f76d0dc 100644
      stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
-@@ -505,11 +461,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -507,11 +463,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -21784,7 +21553,7 @@ index 41f14fb66a..999f76d0dc 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -613,7 +564,6 @@ stdlib__Random.cmo : random.ml \
+@@ -615,7 +566,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -21792,7 +21561,7 @@ index 41f14fb66a..999f76d0dc 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -624,7 +574,6 @@ stdlib__Random.cmx : random.ml \
+@@ -626,7 +576,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -21800,7 +21569,7 @@ index 41f14fb66a..999f76d0dc 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -664,15 +613,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -666,15 +615,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -22051,7 +21820,7 @@ index 1406d1d4bf..920a3b91b5 100644
    Domain.DLS.new_key ~split_from_parent:Fun.id (fun () -> temp_dir_name)
  
 diff --git a/stdlib/format.ml b/stdlib/format.ml
-index d8f7a934f1..99a97e5ad3 100644
+index 669494be53..8b92d36cb9 100644
 --- a/stdlib/format.ml
 +++ b/stdlib/format.ml
 @@ -1020,6 +1020,7 @@ and err_formatter = formatter_of_out_channel Stdlib.stderr
@@ -22096,7 +21865,7 @@ index d8f7a934f1..99a97e5ad3 100644
  
  (*
    Symbolic pretty-printing
-@@ -1476,6 +1490,7 @@ let flush_standard_formatters () =
+@@ -1471,6 +1485,7 @@ let flush_standard_formatters () =
  
  let () = at_exit flush_standard_formatters
  
@@ -22104,13 +21873,13 @@ index d8f7a934f1..99a97e5ad3 100644
  let () = Domain.before_first_spawn (fun () ->
    flush_standard_formatters ();
    let fs = pp_get_formatter_out_functions std_formatter () in
-@@ -1488,3 +1503,4 @@ let () = Domain.before_first_spawn (fun () ->
+@@ -1483,3 +1498,4 @@ let () = Domain.before_first_spawn (fun () ->
      {fs with out_string = buffered_out_string err_buf_key;
               out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
  )
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
-index 32e0850f6a..712e4e3493 100644
+index 40748ff801..a194be304c 100644
 --- a/stdlib/format.mli
 +++ b/stdlib/format.mli
 @@ -961,6 +961,7 @@ val formatter_of_out_channel : out_channel -> formatter
