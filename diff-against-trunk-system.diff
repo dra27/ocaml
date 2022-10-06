@@ -1,6 +1,154 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..387a321ffa
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,145 @@
++--- a	2023-09-28 18:45:46.156660687 +0100
+++++ b	2023-09-28 18:45:46.160660840 +0100
++@@ -1,23 +1,14 @@
++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
++ --- a/otherlibs/systhreads/thread.ml
++ +++ b/otherlibs/systhreads/thread.ml
++-@@ -18,8 +18,6 @@
++- type t
++- 
++- external thread_initialize : unit -> unit = "caml_thread_initialize"
++--external thread_initialize_domain : unit -> unit =
++--            "caml_thread_initialize_domain"
++- external thread_cleanup : unit -> unit = "caml_thread_cleanup"
++- external thread_new : (unit -> unit) -> t = "caml_thread_new"
++- external thread_uncaught_exception : exn -> unit =
++-@@ -86,7 +84,6 @@ let preempt_signal =
++- 
++- let () =
+++@@ -103,7 +103,6 @@ let () =
+++   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++    thread_initialize ();
+++ (* BACKPORT
++ -  Domain.at_each_spawn thread_initialize_domain;
++    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++ *)
++    (* Callback in [caml_shutdown], when the last domain exits. *)
++-   Callback.register "Thread.at_shutdown" (fun () ->
++ diff --git a/stdlib/domain.ml b/stdlib/domain.ml
++ --- a/stdlib/domain.ml
++ +++ b/stdlib/domain.ml
++@@ -80,7 +71,7 @@
++ diff --git a/stdlib/format.ml b/stdlib/format.ml
++ --- a/stdlib/format.ml
++ +++ b/stdlib/format.ml
++-@@ -1051,6 +1051,7 @@ let std_formatter_key = DLS.new_key (fun () ->
+++@@ -1052,6 +1052,7 @@ let std_formatter_key = DLS.new_key (fun () ->
++    ppf.pp_out_newline <- display_newline ppf;
++    ppf.pp_out_spaces <- display_blanks ppf;
++    ppf.pp_out_indent <- display_indent ppf;
++@@ -88,71 +79,30 @@
++    ppf)
++  let _ = DLS.set std_formatter_key std_formatter
++  
++-@@ -1062,6 +1063,7 @@ let err_formatter_key = DLS.new_key (fun () ->
+++@@ -1063,6 +1064,7 @@ let err_formatter_key = DLS.new_key (fun () ->
++    ppf.pp_out_newline <- display_newline ppf;
++    ppf.pp_out_spaces <- display_blanks ppf;
++    ppf.pp_out_indent <- display_indent ppf;
++ +  Domain.at_exit (pp_print_flush ppf);
++    ppf)
++  let _ = DLS.set err_formatter_key err_formatter
++- 
++-@@ -1476,7 +1478,6 @@ let () = at_exit flush_standard_formatters
++- 
+++ *)
+++@@ -1491,7 +1493,6 @@ let () = at_exit flush_standard_formatters
+++ (* BACKPORT
++  let () = Domain.before_first_spawn (fun () ->
++    flush_standard_formatters ();
++ -
++    let fs = pp_get_formatter_out_functions std_formatter () in
++    pp_set_formatter_out_functions std_formatter
++      {fs with out_string = buffered_out_string std_buf_key;
++-@@ -1486,5 +1487,4 @@ let () = Domain.before_first_spawn (fun () ->
+++@@ -1501,6 +1502,5 @@ let () = Domain.before_first_spawn (fun () ->
++    pp_set_formatter_out_functions err_formatter
++      {fs with out_string = buffered_out_string err_buf_key;
++               out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
++ -
++ -  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
++ +)
++-diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
++---- a/testsuite/tests/backtrace/backtrace_systhreads.reference
++-+++ b/testsuite/tests/backtrace/backtrace_systhreads.reference
++-@@ -2,24 +2,24 @@ Thread 2 killed on uncaught exception Failure("0")
++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- Thread 3 killed on uncaught exception Failure("1")
++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- Thread 4 killed on uncaught exception Failure("2")
++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- Thread 5 killed on uncaught exception Failure("3")
++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- Thread 1 killed on uncaught exception Failure("backtrace")
++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++- Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
++- Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++-diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
++---- a/testsuite/tests/backtrace/callstack.reference
++-+++ b/testsuite/tests/backtrace/callstack.reference
++-@@ -12,4 +12,4 @@ Raised by primitive operation at Callstack.f0 in file "callstack.ml", line 11, c
++- Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
++- Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
++- Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++ *)
++ diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
++ new file mode 100644
++ --- /dev/null
++@@ -187,27 +137,3 @@
++ +++ b/testsuite/tests/lib-format/domains.reference
++ @@ -0,0 +1 @@
++ +0123
++-diff --git a/testsuite/tests/lib-threads/uncaught_exception_handler.reference b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
++---- a/testsuite/tests/lib-threads/uncaught_exception_handler.reference
++-+++ b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
++-@@ -1,15 +1,15 @@
++- Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- [thread 2] caught Uncaught_exception_handler.CallbackExn
++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++- Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
++- Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-17
++--Called from Thread.create.(fun) in file "thread.ml", line 59, characters 10-41
++-+Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
++- [thread 3] caught Uncaught_exception_handler.CallbackExn
++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -9962,13 +10110,161 @@ index 0000000000..a2ecea6324
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ed49a56aeb
+index 0000000000..2de81b7493
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9904 @@
+@@ -0,0 +1,10034 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..387a321ffa
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,145 @@
+++--- a	2023-09-28 18:45:46.156660687 +0100
++++++ b	2023-09-28 18:45:46.160660840 +0100
+++@@ -1,23 +1,14 @@
+++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+++ --- a/otherlibs/systhreads/thread.ml
+++ +++ b/otherlibs/systhreads/thread.ml
+++-@@ -18,8 +18,6 @@
+++- type t
+++- 
+++- external thread_initialize : unit -> unit = "caml_thread_initialize"
+++--external thread_initialize_domain : unit -> unit =
+++--            "caml_thread_initialize_domain"
+++- external thread_cleanup : unit -> unit = "caml_thread_cleanup"
+++- external thread_new : (unit -> unit) -> t = "caml_thread_new"
+++- external thread_uncaught_exception : exn -> unit =
+++-@@ -86,7 +84,6 @@ let preempt_signal =
+++- 
+++- let () =
++++@@ -103,7 +103,6 @@ let () =
++++   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++    thread_initialize ();
++++ (* BACKPORT
+++ -  Domain.at_each_spawn thread_initialize_domain;
+++    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++++ *)
+++    (* Callback in [caml_shutdown], when the last domain exits. *)
+++-   Callback.register "Thread.at_shutdown" (fun () ->
+++ diff --git a/stdlib/domain.ml b/stdlib/domain.ml
+++ --- a/stdlib/domain.ml
+++ +++ b/stdlib/domain.ml
+++@@ -80,7 +71,7 @@
+++ diff --git a/stdlib/format.ml b/stdlib/format.ml
+++ --- a/stdlib/format.ml
+++ +++ b/stdlib/format.ml
+++-@@ -1051,6 +1051,7 @@ let std_formatter_key = DLS.new_key (fun () ->
++++@@ -1052,6 +1052,7 @@ let std_formatter_key = DLS.new_key (fun () ->
+++    ppf.pp_out_newline <- display_newline ppf;
+++    ppf.pp_out_spaces <- display_blanks ppf;
+++    ppf.pp_out_indent <- display_indent ppf;
+++@@ -88,71 +79,30 @@
+++    ppf)
+++  let _ = DLS.set std_formatter_key std_formatter
+++  
+++-@@ -1062,6 +1063,7 @@ let err_formatter_key = DLS.new_key (fun () ->
++++@@ -1063,6 +1064,7 @@ let err_formatter_key = DLS.new_key (fun () ->
+++    ppf.pp_out_newline <- display_newline ppf;
+++    ppf.pp_out_spaces <- display_blanks ppf;
+++    ppf.pp_out_indent <- display_indent ppf;
+++ +  Domain.at_exit (pp_print_flush ppf);
+++    ppf)
+++  let _ = DLS.set err_formatter_key err_formatter
+++- 
+++-@@ -1476,7 +1478,6 @@ let () = at_exit flush_standard_formatters
+++- 
++++ *)
++++@@ -1491,7 +1493,6 @@ let () = at_exit flush_standard_formatters
++++ (* BACKPORT
+++  let () = Domain.before_first_spawn (fun () ->
+++    flush_standard_formatters ();
+++ -
+++    let fs = pp_get_formatter_out_functions std_formatter () in
+++    pp_set_formatter_out_functions std_formatter
+++      {fs with out_string = buffered_out_string std_buf_key;
+++-@@ -1486,5 +1487,4 @@ let () = Domain.before_first_spawn (fun () ->
++++@@ -1501,6 +1502,5 @@ let () = Domain.before_first_spawn (fun () ->
+++    pp_set_formatter_out_functions err_formatter
+++      {fs with out_string = buffered_out_string err_buf_key;
+++               out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
+++ -
+++ -  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
+++ +)
+++-diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
+++---- a/testsuite/tests/backtrace/backtrace_systhreads.reference
+++-+++ b/testsuite/tests/backtrace/backtrace_systhreads.reference
+++-@@ -2,24 +2,24 @@ Thread 2 killed on uncaught exception Failure("0")
+++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- Thread 3 killed on uncaught exception Failure("1")
+++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- Thread 4 killed on uncaught exception Failure("2")
+++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- Thread 5 killed on uncaught exception Failure("3")
+++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- Thread 1 killed on uncaught exception Failure("backtrace")
+++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+++- Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
+++- Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++-diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
+++---- a/testsuite/tests/backtrace/callstack.reference
+++-+++ b/testsuite/tests/backtrace/callstack.reference
+++-@@ -12,4 +12,4 @@ Raised by primitive operation at Callstack.f0 in file "callstack.ml", line 11, c
+++- Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
+++- Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
+++- Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++++ *)
+++ diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
+++ new file mode 100644
+++ --- /dev/null
+++@@ -187,27 +137,3 @@
+++ +++ b/testsuite/tests/lib-format/domains.reference
+++ @@ -0,0 +1 @@
+++ +0123
+++-diff --git a/testsuite/tests/lib-threads/uncaught_exception_handler.reference b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
+++---- a/testsuite/tests/lib-threads/uncaught_exception_handler.reference
+++-+++ b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
+++-@@ -1,15 +1,15 @@
+++- Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
+++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- [thread 2] caught Uncaught_exception_handler.CallbackExn
+++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
+++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++- Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
+++- Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-17
+++--Called from Thread.create.(fun) in file "thread.ml", line 59, characters 10-41
+++-+Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
+++- [thread 3] caught Uncaught_exception_handler.CallbackExn
+++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
+++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -19851,25 +20147,7 @@ index 0000000000..ed49a56aeb
 ++ (* This test is currently disabled,
 ++    until the random failures have been investigated.
 ++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsu
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -20916,21 +21194,21 @@ index 0000000000..3a62747829
 +
 +end
 diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-index f9ac70c550..740a0d6233 100644
+index 83cbb80ca8..0324c2c617 100644
 --- a/otherlibs/systhreads/thread.ml
 +++ b/otherlibs/systhreads/thread.ml
-@@ -18,8 +18,10 @@
+@@ -18,6 +18,10 @@
  type t
  
  external thread_initialize : unit -> unit = "caml_thread_initialize"
 +(* BACKPORT
- external thread_initialize_domain : unit -> unit =
-             "caml_thread_initialize_domain"
++external thread_initialize_domain : unit -> unit =
++            "caml_thread_initialize_domain"
 +*)
  external thread_cleanup : unit -> unit = "caml_thread_cleanup"
  external thread_new : (unit -> unit) -> t = "caml_thread_new"
  external thread_uncaught_exception : exn -> unit =
-@@ -29,6 +31,9 @@ external yield : unit -> unit = "caml_thread_yield"
+@@ -27,6 +31,9 @@ external yield : unit -> unit = "caml_thread_yield"
  external self : unit -> t = "caml_thread_self" [@@noalloc]
  external id : t -> int = "caml_thread_id" [@@noalloc]
  external join : t -> unit = "caml_thread_join"
@@ -20940,7 +21218,7 @@ index f9ac70c550..740a0d6233 100644
  
  (* For new, make sure the function passed to thread_new never
     raises an exception. *)
-@@ -71,7 +76,17 @@ let create fn arg =
+@@ -69,7 +76,17 @@ let create fn arg =
            flush stderr)
  
  let exit () =
@@ -20958,20 +21236,19 @@ index f9ac70c550..740a0d6233 100644
  
  (* Preemption *)
  
-@@ -85,9 +100,12 @@ let preempt_signal =
+@@ -83,8 +100,11 @@ let preempt_signal =
    | _       -> Sys.sigvtalrm
  
  let () =
 +  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
    thread_initialize ();
 +(* BACKPORT
-   Domain.at_each_spawn thread_initialize_domain;
    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
 +*)
    (* Callback in [caml_shutdown], when the last domain exits. *)
    Callback.register "Thread.at_shutdown" (fun () ->
      thread_cleanup();
-@@ -102,6 +120,11 @@ let () =
+@@ -99,6 +119,11 @@ let () =
  
  let delay = Unix.sleepf
  
@@ -21764,7 +22041,7 @@ index 1406d1d4bf..920a3b91b5 100644
    Domain.DLS.new_key ~split_from_parent:Fun.id (fun () -> temp_dir_name)
  
 diff --git a/stdlib/format.ml b/stdlib/format.ml
-index 79bed35407..efb21b7f12 100644
+index d8f7a934f1..99a97e5ad3 100644
 --- a/stdlib/format.ml
 +++ b/stdlib/format.ml
 @@ -1020,6 +1020,7 @@ and err_formatter = formatter_of_out_channel Stdlib.stderr
@@ -21775,8 +22052,8 @@ index 79bed35407..efb21b7f12 100644
  module DLS = Domain.DLS
  
  let stdbuf_key = DLS.new_key pp_make_buffer
-@@ -1064,6 +1065,17 @@ let err_formatter_key = DLS.new_key (fun () ->
-   ppf.pp_out_indent <- display_indent ppf;
+@@ -1066,6 +1067,17 @@ let err_formatter_key = DLS.new_key (fun () ->
+   Domain.at_exit (pp_print_flush ppf);
    ppf)
  let _ = DLS.set err_formatter_key err_formatter
 +*)
@@ -21793,7 +22070,7 @@ index 79bed35407..efb21b7f12 100644
  
  let get_std_formatter () = DLS.get std_formatter_key
  let get_err_formatter () = DLS.get err_formatter_key
-@@ -1086,6 +1098,7 @@ let flush_str_formatter () =
+@@ -1088,6 +1100,7 @@ let flush_str_formatter () =
    let str_formatter = DLS.get str_formatter_key in
    flush_buffer_formatter stdbuf str_formatter
  
@@ -21801,7 +22078,7 @@ index 79bed35407..efb21b7f12 100644
  let make_synchronized_formatter output flush =
    DLS.new_key (fun () ->
      let buf = Buffer.create pp_buffer_size in
-@@ -1099,6 +1112,7 @@ let make_synchronized_formatter output flush =
+@@ -1101,6 +1114,7 @@ let make_synchronized_formatter output flush =
  
  let synchronized_formatter_of_out_channel oc =
    make_synchronized_formatter (output_substring oc) (fun () -> flush oc)
@@ -21809,18 +22086,18 @@ index 79bed35407..efb21b7f12 100644
  
  (*
    Symbolic pretty-printing
-@@ -1474,6 +1488,7 @@ let flush_standard_formatters () =
+@@ -1476,6 +1490,7 @@ let flush_standard_formatters () =
  
  let () = at_exit flush_standard_formatters
  
 +(* BACKPORT
  let () = Domain.before_first_spawn (fun () ->
    flush_standard_formatters ();
- 
+   let fs = pp_get_formatter_out_functions std_formatter () in
 @@ -1488,3 +1503,4 @@ let () = Domain.before_first_spawn (fun () ->
+     {fs with out_string = buffered_out_string err_buf_key;
               out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
- 
-   Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
+ )
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
 index 32e0850f6a..712e4e3493 100644

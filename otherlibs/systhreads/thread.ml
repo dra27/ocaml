@@ -103,7 +103,6 @@ let () =
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
   thread_initialize ();
 (* BACKPORT
-  Domain.at_each_spawn thread_initialize_domain;
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
 *)
   (* Callback in [caml_shutdown], when the last domain exits. *)
