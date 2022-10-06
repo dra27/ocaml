@@ -1,154 +1,28 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..387a321ffa
+index 0000000000..bf25b9cefe
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,145 @@
-+--- a	2023-09-28 18:45:46.156660687 +0100
-++++ b	2023-09-28 18:45:46.160660840 +0100
-+@@ -1,23 +1,14 @@
-+ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-+ --- a/otherlibs/systhreads/thread.ml
-+ +++ b/otherlibs/systhreads/thread.ml
-+-@@ -18,8 +18,6 @@
-+- type t
-+- 
-+- external thread_initialize : unit -> unit = "caml_thread_initialize"
-+--external thread_initialize_domain : unit -> unit =
-+--            "caml_thread_initialize_domain"
-+- external thread_cleanup : unit -> unit = "caml_thread_cleanup"
-+- external thread_new : (unit -> unit) -> t = "caml_thread_new"
-+- external thread_uncaught_exception : exn -> unit =
-+-@@ -86,7 +84,6 @@ let preempt_signal =
-+- 
-+- let () =
-++@@ -103,7 +103,6 @@ let () =
-++   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-+    thread_initialize ();
-++ (* BACKPORT
-+ -  Domain.at_each_spawn thread_initialize_domain;
-+    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-++ *)
-+    (* Callback in [caml_shutdown], when the last domain exits. *)
-+-   Callback.register "Thread.at_shutdown" (fun () ->
-+ diff --git a/stdlib/domain.ml b/stdlib/domain.ml
-+ --- a/stdlib/domain.ml
-+ +++ b/stdlib/domain.ml
-+@@ -80,7 +71,7 @@
-+ diff --git a/stdlib/format.ml b/stdlib/format.ml
-+ --- a/stdlib/format.ml
-+ +++ b/stdlib/format.ml
-+-@@ -1051,6 +1051,7 @@ let std_formatter_key = DLS.new_key (fun () ->
-++@@ -1052,6 +1052,7 @@ let std_formatter_key = DLS.new_key (fun () ->
-+    ppf.pp_out_newline <- display_newline ppf;
-+    ppf.pp_out_spaces <- display_blanks ppf;
-+    ppf.pp_out_indent <- display_indent ppf;
-+@@ -88,71 +79,30 @@
-+    ppf)
-+  let _ = DLS.set std_formatter_key std_formatter
+@@ -0,0 +1,19 @@
++--- a	2023-09-28 18:45:46.692681303 +0100
+++++ b	2023-09-28 18:45:46.704681765 +0100
++@@ -11,13 +11,13 @@
++  OCaml 5.0
++  ---------
 +  
-+-@@ -1062,6 +1063,7 @@ let err_formatter_key = DLS.new_key (fun () ->
-++@@ -1063,6 +1064,7 @@ let err_formatter_key = DLS.new_key (fun () ->
-+    ppf.pp_out_newline <- display_newline ppf;
-+    ppf.pp_out_spaces <- display_blanks ppf;
-+    ppf.pp_out_indent <- display_indent ppf;
-+ +  Domain.at_exit (pp_print_flush ppf);
-+    ppf)
-+  let _ = DLS.set err_formatter_key err_formatter
-+- 
-+-@@ -1476,7 +1478,6 @@ let () = at_exit flush_standard_formatters
-+- 
-++ *)
-++@@ -1491,7 +1493,6 @@ let () = at_exit flush_standard_formatters
-++ (* BACKPORT
-+  let () = Domain.before_first_spawn (fun () ->
-+    flush_standard_formatters ();
-+ -
-+    let fs = pp_get_formatter_out_functions std_formatter () in
-+    pp_set_formatter_out_functions std_formatter
-+      {fs with out_string = buffered_out_string std_buf_key;
-+-@@ -1486,5 +1487,4 @@ let () = Domain.before_first_spawn (fun () ->
-++@@ -1501,6 +1502,5 @@ let () = Domain.before_first_spawn (fun () ->
-+    pp_set_formatter_out_functions err_formatter
-+      {fs with out_string = buffered_out_string err_buf_key;
-+               out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
-+ -
-+ -  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
-+ +)
-+-diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
-+---- a/testsuite/tests/backtrace/backtrace_systhreads.reference
-+-+++ b/testsuite/tests/backtrace/backtrace_systhreads.reference
-+-@@ -2,24 +2,24 @@ Thread 2 killed on uncaught exception Failure("0")
-+- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-+- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-+- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- Thread 3 killed on uncaught exception Failure("1")
-+- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-+- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-+- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- Thread 4 killed on uncaught exception Failure("2")
-+- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-+- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-+- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- Thread 5 killed on uncaught exception Failure("3")
-+- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-+- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-+- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- Thread 1 killed on uncaught exception Failure("backtrace")
-+- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-+- Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
-+- Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+-diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
-+---- a/testsuite/tests/backtrace/callstack.reference
-+-+++ b/testsuite/tests/backtrace/callstack.reference
-+-@@ -12,4 +12,4 @@ Raised by primitive operation at Callstack.f0 in file "callstack.ml", line 11, c
-+- Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
-+- Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
-+- Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++ *)
-+ diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
-+ new file mode 100644
-+ --- /dev/null
-+@@ -187,27 +137,3 @@
-+ +++ b/testsuite/tests/lib-format/domains.reference
-+ @@ -0,0 +1 @@
-+ +0123
-+-diff --git a/testsuite/tests/lib-threads/uncaught_exception_handler.reference b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
-+---- a/testsuite/tests/lib-threads/uncaught_exception_handler.reference
-+-+++ b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
-+-@@ -1,15 +1,15 @@
-+- Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
-+- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- [thread 2] caught Uncaught_exception_handler.CallbackExn
-+- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
-+- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+- Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
-+- Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-17
-+--Called from Thread.create.(fun) in file "thread.ml", line 59, characters 10-41
-+-+Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
-+- [thread 3] caught Uncaught_exception_handler.CallbackExn
-+- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-+--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-+-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
++-@@ -659,6 +656,9 @@ OCaml 5.0
+++@@ -654,6 +651,9 @@ OCaml 5.0
++    (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
++    Yallop and Florian Angeletti)
++  
++ +- #11587: Prevent integer comparison from being used on pointers
++ +  (Vincent Laviron, review by Gabriel Scherer)
++ +
++- OCaml 4.14.0 (28 March 2022)
++- ----------------------------
+++ OCaml 4.14 maintenance branch
+++ -----------------------------
++  
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -162,10 +36,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 7f1f81349e..b285627901 100644
+index b13ddbb6a4..dec3caa7b1 100644
 --- a/Changes
 +++ b/Changes
-@@ -646,11 +646,6 @@ OCaml 5.0
+@@ -643,11 +643,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -178,8 +52,8 @@ index 7f1f81349e..b285627901 100644
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
 @@ -659,6 +654,26 @@ OCaml 5.0
-   (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
-   Yallop and Florian Angeletti)
+ - #11587: Prevent integer comparison from being used on pointers
+   (Vincent Laviron, review by Gabriel Scherer)
  
 +OCaml 4.14 maintenance branch
 +-----------------------------
@@ -6267,10 +6141,10 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..02eb4d0fb2
+index 0000000000..7bd6e1fa06
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3837 @@
+@@ -0,0 +1,3850 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index a42b0dab97..ed1137f668 100644
 +--- a/.github/workflows/build.yml
@@ -8260,6 +8134,19 @@ index 0000000000..02eb4d0fb2
 ++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
 + Called from Test10_main in file "test10_main.ml", line 49, characters 30-87
++diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
++index 941aa681cf..0daaad5171 100644
++--- a/testsuite/tests/lib-format/domains.ml
+++++ b/testsuite/tests/lib-format/domains.ml
++@@ -1,4 +1,7 @@
++-(* TEST *)
+++(* TEST
+++* skip
+++reason = "OCaml 5 only"
+++*)
++ 
++ (** Test that domains stdout and stderr are flushed at domain exit *)
++ 
 +diff --git a/testsuite/tests/lib-format/mc_pr586_par.ml b/testsuite/tests/lib-format/mc_pr586_par.ml
 +index 456a306ce7..da5c148416 100644
 +--- a/testsuite/tests/lib-format/mc_pr586_par.ml
@@ -10110,161 +9997,35 @@ index 0000000000..02eb4d0fb2
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..266d5bbde4
+index 0000000000..a064580304
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10034 @@
+@@ -0,0 +1,9909 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..387a321ffa
++index 0000000000..bf25b9cefe
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,145 @@
-++--- a	2023-09-28 18:45:46.156660687 +0100
-+++++ b	2023-09-28 18:45:46.160660840 +0100
-++@@ -1,23 +1,14 @@
-++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-++ --- a/otherlibs/systhreads/thread.ml
-++ +++ b/otherlibs/systhreads/thread.ml
-++-@@ -18,8 +18,6 @@
-++- type t
-++- 
-++- external thread_initialize : unit -> unit = "caml_thread_initialize"
-++--external thread_initialize_domain : unit -> unit =
-++--            "caml_thread_initialize_domain"
-++- external thread_cleanup : unit -> unit = "caml_thread_cleanup"
-++- external thread_new : (unit -> unit) -> t = "caml_thread_new"
-++- external thread_uncaught_exception : exn -> unit =
-++-@@ -86,7 +84,6 @@ let preempt_signal =
-++- 
-++- let () =
-+++@@ -103,7 +103,6 @@ let () =
-+++   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-++    thread_initialize ();
-+++ (* BACKPORT
-++ -  Domain.at_each_spawn thread_initialize_domain;
-++    Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-+++ *)
-++    (* Callback in [caml_shutdown], when the last domain exits. *)
-++-   Callback.register "Thread.at_shutdown" (fun () ->
-++ diff --git a/stdlib/domain.ml b/stdlib/domain.ml
-++ --- a/stdlib/domain.ml
-++ +++ b/stdlib/domain.ml
-++@@ -80,7 +71,7 @@
-++ diff --git a/stdlib/format.ml b/stdlib/format.ml
-++ --- a/stdlib/format.ml
-++ +++ b/stdlib/format.ml
-++-@@ -1051,6 +1051,7 @@ let std_formatter_key = DLS.new_key (fun () ->
-+++@@ -1052,6 +1052,7 @@ let std_formatter_key = DLS.new_key (fun () ->
-++    ppf.pp_out_newline <- display_newline ppf;
-++    ppf.pp_out_spaces <- display_blanks ppf;
-++    ppf.pp_out_indent <- display_indent ppf;
-++@@ -88,71 +79,30 @@
-++    ppf)
-++  let _ = DLS.set std_formatter_key std_formatter
++@@ -0,0 +1,19 @@
+++--- a	2023-09-28 18:45:46.692681303 +0100
++++++ b	2023-09-28 18:45:46.704681765 +0100
+++@@ -11,13 +11,13 @@
+++  OCaml 5.0
+++  ---------
 ++  
-++-@@ -1062,6 +1063,7 @@ let err_formatter_key = DLS.new_key (fun () ->
-+++@@ -1063,6 +1064,7 @@ let err_formatter_key = DLS.new_key (fun () ->
-++    ppf.pp_out_newline <- display_newline ppf;
-++    ppf.pp_out_spaces <- display_blanks ppf;
-++    ppf.pp_out_indent <- display_indent ppf;
-++ +  Domain.at_exit (pp_print_flush ppf);
-++    ppf)
-++  let _ = DLS.set err_formatter_key err_formatter
-++- 
-++-@@ -1476,7 +1478,6 @@ let () = at_exit flush_standard_formatters
-++- 
-+++ *)
-+++@@ -1491,7 +1493,6 @@ let () = at_exit flush_standard_formatters
-+++ (* BACKPORT
-++  let () = Domain.before_first_spawn (fun () ->
-++    flush_standard_formatters ();
-++ -
-++    let fs = pp_get_formatter_out_functions std_formatter () in
-++    pp_set_formatter_out_functions std_formatter
-++      {fs with out_string = buffered_out_string std_buf_key;
-++-@@ -1486,5 +1487,4 @@ let () = Domain.before_first_spawn (fun () ->
-+++@@ -1501,6 +1502,5 @@ let () = Domain.before_first_spawn (fun () ->
-++    pp_set_formatter_out_functions err_formatter
-++      {fs with out_string = buffered_out_string err_buf_key;
-++               out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
-++ -
-++ -  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
-++ +)
-++-diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
-++---- a/testsuite/tests/backtrace/backtrace_systhreads.reference
-++-+++ b/testsuite/tests/backtrace/backtrace_systhreads.reference
-++-@@ -2,24 +2,24 @@ Thread 2 killed on uncaught exception Failure("0")
-++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- Thread 3 killed on uncaught exception Failure("1")
-++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- Thread 4 killed on uncaught exception Failure("2")
-++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- Thread 5 killed on uncaught exception Failure("3")
-++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-++- Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
-++- Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- Thread 1 killed on uncaught exception Failure("backtrace")
-++- Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
-++- Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
-++- Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++-diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
-++---- a/testsuite/tests/backtrace/callstack.reference
-++-+++ b/testsuite/tests/backtrace/callstack.reference
-++-@@ -12,4 +12,4 @@ Raised by primitive operation at Callstack.f0 in file "callstack.ml", line 11, c
-++- Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
-++- Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
-++- Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-+++ *)
-++ diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
-++ new file mode 100644
-++ --- /dev/null
-++@@ -187,27 +137,3 @@
-++ +++ b/testsuite/tests/lib-format/domains.reference
-++ @@ -0,0 +1 @@
-++ +0123
-++-diff --git a/testsuite/tests/lib-threads/uncaught_exception_handler.reference b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
-++---- a/testsuite/tests/lib-threads/uncaught_exception_handler.reference
-++-+++ b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
-++-@@ -1,15 +1,15 @@
-++- Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
-++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- [thread 2] caught Uncaught_exception_handler.CallbackExn
-++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
-++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
-++- Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
-++- Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-17
-++--Called from Thread.create.(fun) in file "thread.ml", line 59, characters 10-41
-++-+Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
-++- [thread 3] caught Uncaught_exception_handler.CallbackExn
-++- Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
-++--Called from Thread.create.(fun) in file "thread.ml", line 50, characters 8-14
-++-+Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
+++-@@ -659,6 +656,9 @@ OCaml 5.0
++++@@ -654,6 +651,9 @@ OCaml 5.0
+++    (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
+++    Yallop and Florian Angeletti)
+++  
+++ +- #11587: Prevent integer comparison from being used on pointers
+++ +  (Vincent Laviron, review by Gabriel Scherer)
+++ +
+++- OCaml 4.14.0 (28 March 2022)
+++- ----------------------------
++++ OCaml 4.14 maintenance branch
++++ -----------------------------
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10278,10 +10039,10 @@ index 0000000000..266d5bbde4
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 7f1f81349e..b285627901 100644
++index b13ddbb6a4..dec3caa7b1 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -646,11 +646,6 @@ OCaml 5.0
++@@ -643,11 +643,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10294,8 +10055,8 @@ index 0000000000..266d5bbde4
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
 +@@ -659,6 +654,26 @@ OCaml 5.0
-+   (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
-+   Yallop and Florian Angeletti)
++ - #11587: Prevent integer comparison from being used on pointers
++   (Vincent Laviron, review by Gabriel Scherer)
 + 
 ++OCaml 4.14 maintenance branch
 ++-----------------------------
@@ -16383,10 +16144,10 @@ index 0000000000..266d5bbde4
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..02eb4d0fb2
++index 0000000000..7bd6e1fa06
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3837 @@
++@@ -0,0 +1,3850 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index a42b0dab97..ed1137f668 100644
 ++--- a/.github/workflows/build.yml
@@ -18376,6 +18137,19 @@ index 0000000000..266d5bbde4
 +++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
 ++ Called from Test10_main in file "test10_main.ml", line 49, characters 30-87
+++diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
+++index 941aa681cf..0daaad5171 100644
+++--- a/testsuite/tests/lib-format/domains.ml
++++++ b/testsuite/tests/lib-format/domains.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (** Test that domains stdout and stderr are flushed at domain exit *)
+++ 
 ++diff --git a/testsuite/tests/lib-format/mc_pr586_par.ml b/testsuite/tests/lib-format/mc_pr586_par.ml
 ++index 456a306ce7..da5c148416 100644
 ++--- a/testsuite/tests/lib-format/mc_pr586_par.ml
@@ -20135,19 +19909,7 @@ index 0000000000..266d5bbde4
 ++ 
 ++ (* ocaml-multicore issues 528 and 468 *)
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsu
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklife
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
