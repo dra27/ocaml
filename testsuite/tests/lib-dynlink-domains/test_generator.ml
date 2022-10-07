@@ -1,3 +1,19 @@
+let c = open_out "trace"
+module Random = struct
+  let wrap f s fmt x =
+    let v = Printf.sprintf fmt x in
+    let r = f x in
+    let vr = Printf.sprintf fmt r in
+    Printf.fprintf c "Random.%s %s = %s\n" s v vr;
+    r
+
+  let int = wrap Random.int "int" "%d"
+  let float = wrap Random.float "float" "%f"
+  let init x =
+    Printf.fprintf c "Random.init %d" x;
+    Random.init x
+end
+
 type path = int list
 type topdown_path = Topdown of int list
 let rev p = Topdown (List.rev p)
@@ -64,7 +80,7 @@ end
 
 module Rand = struct
   let shuffle_in_place a =
-    for i = Array.length a - 1 downto 1 do
+   for i = Array.length a - 1 downto 1 do
       let pos = Random.int i in
       let tmp = a.(i) in
       a.(i) <- a.(pos);
