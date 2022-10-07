@@ -1,47 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0c3b4a1864
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,38 @@
-+--- a	2023-09-28 18:45:47.336706066 +0100
-++++ b	2023-09-28 18:45:47.352706682 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/stdlib/.depend b/stdlib/.depend
-+ --- a/stdlib/.depend
-+ +++ b/stdlib/.depend
-+-@@ -322,6 +322,7 @@ stdlib__Format.cmo : format.ml \
-++@@ -279,6 +279,7 @@ stdlib__Format.cmo : format.ml \
-+      camlinternalFormat.cmi \
-+      stdlib__Bytes.cmi \
-+      stdlib__Buffer.cmi \
-+@@ -22,7 +22,7 @@
-+      stdlib__Format.cmi
-+  stdlib__Format.cmx : format.ml \
-+      stdlib__String.cmx \
-+-@@ -337,6 +338,7 @@ stdlib__Format.cmx : format.ml \
-++@@ -294,6 +295,7 @@ stdlib__Format.cmx : format.ml \
-+      camlinternalFormat.cmx \
-+      stdlib__Bytes.cmx \
-+      stdlib__Buffer.cmx \
-+@@ -33,7 +33,7 @@
-+ diff --git a/stdlib/format.ml b/stdlib/format.ml
-+ --- a/stdlib/format.ml
-+ +++ b/stdlib/format.ml
-+-@@ -1250,30 +1250,25 @@ and set_tags v =
-++@@ -1264,30 +1264,25 @@ and set_tags v =
-+  
-+  (* Convenience functions *)
-+  
-+@@ -82,7 +82,7 @@
-+ diff --git a/stdlib/format.mli b/stdlib/format.mli
-+ --- a/stdlib/format.mli
-+ +++ b/stdlib/format.mli
-+-@@ -1152,17 +1152,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
-++@@ -1155,17 +1155,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
-+  
-+  (** {1 Convenience formatting functions.} *)
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -10018,54 +9977,13 @@ index 0000000000..2d986ac807
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..68daff2fa0
+index 0000000000..b09411ebbf
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9905 @@
+@@ -0,0 +1,9907 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0c3b4a1864
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,38 @@
-++--- a	2023-09-28 18:45:47.336706066 +0100
-+++++ b	2023-09-28 18:45:47.352706682 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/stdlib/.depend b/stdlib/.depend
-++ --- a/stdlib/.depend
-++ +++ b/stdlib/.depend
-++-@@ -322,6 +322,7 @@ stdlib__Format.cmo : format.ml \
-+++@@ -279,6 +279,7 @@ stdlib__Format.cmo : format.ml \
-++      camlinternalFormat.cmi \
-++      stdlib__Bytes.cmi \
-++      stdlib__Buffer.cmi \
-++@@ -22,7 +22,7 @@
-++      stdlib__Format.cmi
-++  stdlib__Format.cmx : format.ml \
-++      stdlib__String.cmx \
-++-@@ -337,6 +338,7 @@ stdlib__Format.cmx : format.ml \
-+++@@ -294,6 +295,7 @@ stdlib__Format.cmx : format.ml \
-++      camlinternalFormat.cmx \
-++      stdlib__Bytes.cmx \
-++      stdlib__Buffer.cmx \
-++@@ -33,7 +33,7 @@
-++ diff --git a/stdlib/format.ml b/stdlib/format.ml
-++ --- a/stdlib/format.ml
-++ +++ b/stdlib/format.ml
-++-@@ -1250,30 +1250,25 @@ and set_tags v =
-+++@@ -1264,30 +1264,25 @@ and set_tags v =
-++  
-++  (* Convenience functions *)
-++  
-++@@ -82,7 +82,7 @@
-++ diff --git a/stdlib/format.mli b/stdlib/format.mli
-++ --- a/stdlib/format.mli
-++ +++ b/stdlib/format.mli
-++-@@ -1152,17 +1152,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
-+++@@ -1155,17 +1155,43 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
-++  
-++  (** {1 Convenience formatting functions.} *)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -19926,7 +19844,50 @@ index 0000000000..68daff2fa0
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%e
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
