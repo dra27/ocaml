@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:45:47.968730362 +0100
++++ b	2023-09-28 18:45:47.976730669 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -717,7 +717,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
++@@ -714,7 +714,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
+  
+  ## General (non target-specific) assembler and compiler flags
+  
+@@ -15,7 +15,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1053,6 +1053,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
++@@ -1065,6 +1065,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
+  AS_IF([! $cc_supports_atomic],
+    [AC_MSG_FAILURE([C11 atomic support is required, use another C compiler])])
+  

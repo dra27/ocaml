@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..d1eb8e0af0
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:45:47.968730362 +0100
+++++ b	2023-09-28 18:45:47.976730669 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -717,7 +717,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
+++@@ -714,7 +714,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
++  
++  ## General (non target-specific) assembler and compiler flags
++  
++@@ -15,7 +15,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1053,6 +1053,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
+++@@ -1065,6 +1065,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
++  AS_IF([! $cc_supports_atomic],
++    [AC_MSG_FAILURE([C11 atomic support is required, use another C compiler])])
++  
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -93,7 +116,7 @@ index 2ff000d6aa..56324c9857 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index b1b56a4c36..96f41ac248 100644
+index 0ad7597d70..e0b017af40 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -578,7 +578,6 @@ partialclean::
@@ -3098,10 +3121,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 4224239dfe..808331248a 100755
+index 76a82debf1..1d2c16b7c4 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index d32653b388..759ecafaa1 100644
+index 81d2c20950..8693d4f526 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3187,7 +3210,7 @@ index d32653b388..759ecafaa1 100644
  
  # Support for C11 atomic types
  
-@@ -1186,67 +1198,67 @@ model=default
+@@ -1194,67 +1206,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -3314,7 +3337,7 @@ index d32653b388..759ecafaa1 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1255,8 +1267,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1263,8 +1275,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -3325,7 +3348,7 @@ index d32653b388..759ecafaa1 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1273,10 +1285,10 @@ dnl   [arch=amd64; system=beos],
+@@ -1281,10 +1293,10 @@ dnl   [arch=amd64; system=beos],
      [arch=arm64; system=openbsd],
    [aarch64-*-netbsd*],
      [arch=arm64; system=netbsd],
@@ -3340,7 +3363,7 @@ index d32653b388..759ecafaa1 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1972,11 +1984,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1980,11 +1992,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3365,7 +3388,7 @@ index d32653b388..759ecafaa1 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2027,6 +2051,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2035,6 +2059,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3396,7 +3419,7 @@ index d32653b388..759ecafaa1 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2174,8 +2222,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2182,8 +2230,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -9977,13 +10000,36 @@ index 0000000000..2d986ac807
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b09411ebbf
+index 0000000000..e6ea0eebc2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9907 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..d1eb8e0af0
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:45:47.968730362 +0100
++++++ b	2023-09-28 18:45:47.976730669 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -717,7 +717,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
++++@@ -714,7 +714,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
+++  
+++  ## General (non target-specific) assembler and compiler flags
+++  
+++@@ -15,7 +15,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1053,6 +1053,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
++++@@ -1065,6 +1065,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
+++  AS_IF([! $cc_supports_atomic],
+++    [AC_MSG_FAILURE([C11 atomic support is required, use another C compiler])])
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10076,7 +10122,7 @@ index 0000000000..b09411ebbf
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index b1b56a4c36..96f41ac248 100644
++index 0ad7597d70..e0b017af40 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -578,7 +578,6 @@ partialclean::
@@ -13081,10 +13127,10 @@ index 0000000000..b09411ebbf
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 4224239dfe..808331248a 100755
++index 76a82debf1..1d2c16b7c4 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index d32653b388..759ecafaa1 100644
++index 81d2c20950..8693d4f526 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13170,7 +13216,7 @@ index 0000000000..b09411ebbf
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1186,67 +1198,67 @@ model=default
++@@ -1194,67 +1206,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -13297,7 +13343,7 @@ index 0000000000..b09411ebbf
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1255,8 +1267,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1263,8 +1275,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -13308,7 +13354,7 @@ index 0000000000..b09411ebbf
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1273,10 +1285,10 @@ dnl   [arch=amd64; system=beos],
++@@ -1281,10 +1293,10 @@ dnl   [arch=amd64; system=beos],
 +     [arch=arm64; system=openbsd],
 +   [aarch64-*-netbsd*],
 +     [arch=arm64; system=netbsd],
@@ -13323,7 +13369,7 @@ index 0000000000..b09411ebbf
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1972,11 +1984,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1980,11 +1992,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13348,7 +13394,7 @@ index 0000000000..b09411ebbf
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2027,6 +2051,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2035,6 +2059,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13379,7 +13425,7 @@ index 0000000000..b09411ebbf
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2174,8 +2222,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2182,8 +2230,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -19861,33 +19907,7 @@ index 0000000000..b09411ebbf
 ++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%e
+++-(
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
