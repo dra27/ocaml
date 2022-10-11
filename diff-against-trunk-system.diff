@@ -1,29 +1,54 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..d1eb8e0af0
+index 0000000000..823b1c37ba
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:45:47.968730362 +0100
-++++ b	2023-09-28 18:45:47.976730669 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -717,7 +717,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
-++@@ -714,7 +714,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
-+  
-+  ## General (non target-specific) assembler and compiler flags
-+  
-+@@ -15,7 +15,7 @@
+@@ -0,0 +1,45 @@
++--- a	2023-09-28 18:45:48.252741274 +0100
+++++ b	2023-09-28 18:45:48.260741581 +0100
++@@ -28,31 +28,29 @@
++ -### 4.12 and 4.13. Indeed, for OCaml 4.12 most of the time the variable
++ -### contained -lpthread. From 4.13 onward it will most of the time be
++ -### empty since we have -pthread in CFLAGS which implies -lpthread.
++-diff --git a/configure b/configure
++-Binary files a/configure and b/configure differ
 + diff --git a/configure.ac b/configure.ac
 + --- a/configure.ac
 + +++ b/configure.ac
-+-@@ -1053,6 +1053,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
-++@@ -1065,6 +1065,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
-+  AS_IF([! $cc_supports_atomic],
-+    [AC_MSG_FAILURE([C11 atomic support is required, use another C compiler])])
++-@@ -1984,7 +1984,7 @@ AS_CASE([$enable_debug_runtime],
+++@@ -2007,7 +2007,7 @@ AS_CASE([$arch,$system],
 +  
++  AS_CASE([$host],
++    [*-*-mingw32|*-pc-windows],
++--    [PTHREAD_LIBS="-lpthread"],
++-+    [PTHREAD_LIBS="-l:libpthread.a"],
+++-dnl    [PTHREAD_LIBS="-lpthread"],
++++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
+++     [PTHREAD_LIBS=''],
++    [AX_PTHREAD(
++      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
++-     saved_CFLAGS="$CFLAGS"
++-@@ -2182,8 +2182,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+++@@ -2230,8 +2230,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++  
++  AS_CASE([$host],
++    [*-*-mingw32],
++--    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
++--    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
++-+    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
++-+    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
+++-dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
+++-dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
++++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
++++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
+++     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
+++     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
++    [*-pc-windows],
++-     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
++-     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
++ diff --git a/otherlibs/str/Makefile b/otherlibs/str/Makefile
++ --- a/otherlibs/str/Makefile
++ +++ b/otherlibs/str/Makefile
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -218,10 +243,10 @@ index 0ad7597d70..e0b017af40 100644
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 diff --git a/Makefile.config.in b/Makefile.config.in
-index 81399b27c1..11e05748ad 100644
+index c0559552db..7a8fee64c5 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -251,7 +251,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -245,7 +245,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
@@ -3121,10 +3146,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 76a82debf1..1d2c16b7c4 100755
+index 1f909da0a4..1d2c16b7c4 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 81d2c20950..8693d4f526 100644
+index 1c4df95651..0d6d3fed54 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3382,8 +3407,8 @@ index 81d2c20950..8693d4f526 100644
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
--    [PTHREAD_LIBS="-lpthread"],
-+dnl    [PTHREAD_LIBS="-lpthread"],
+-    [PTHREAD_LIBS="-l:libpthread.a"],
++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
 +    [PTHREAD_LIBS=''],
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
@@ -3423,10 +3448,10 @@ index 81d2c20950..8693d4f526 100644
  
  AS_CASE([$host],
    [*-*-mingw32],
--    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
--    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
-+dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-+dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
+-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
 +    [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
 +    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
    [*-pc-windows],
@@ -10000,36 +10025,61 @@ index 0000000000..2d986ac807
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e6ea0eebc2
+index 0000000000..d04ef55270
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9904 @@
+@@ -0,0 +1,10010 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..d1eb8e0af0
++index 0000000000..823b1c37ba
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:45:47.968730362 +0100
-+++++ b	2023-09-28 18:45:47.976730669 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -717,7 +717,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
-+++@@ -714,7 +714,7 @@ libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
-++  
-++  ## General (non target-specific) assembler and compiler flags
-++  
-++@@ -15,7 +15,7 @@
++@@ -0,0 +1,45 @@
+++--- a	2023-09-28 18:45:48.252741274 +0100
++++++ b	2023-09-28 18:45:48.260741581 +0100
+++@@ -28,31 +28,29 @@
+++ -### 4.12 and 4.13. Indeed, for OCaml 4.12 most of the time the variable
+++ -### contained -lpthread. From 4.13 onward it will most of the time be
+++ -### empty since we have -pthread in CFLAGS which implies -lpthread.
+++-diff --git a/configure b/configure
+++-Binary files a/configure and b/configure differ
 ++ diff --git a/configure.ac b/configure.ac
 ++ --- a/configure.ac
 ++ +++ b/configure.ac
-++-@@ -1053,6 +1053,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
-+++@@ -1065,6 +1065,14 @@ OCAML_CC_SUPPORTS_ATOMIC([$cclibs])
-++  AS_IF([! $cc_supports_atomic],
-++    [AC_MSG_FAILURE([C11 atomic support is required, use another C compiler])])
+++-@@ -1984,7 +1984,7 @@ AS_CASE([$enable_debug_runtime],
++++@@ -2007,7 +2007,7 @@ AS_CASE([$arch,$system],
 ++  
+++  AS_CASE([$host],
+++    [*-*-mingw32|*-pc-windows],
+++--    [PTHREAD_LIBS="-lpthread"],
+++-+    [PTHREAD_LIBS="-l:libpthread.a"],
++++-dnl    [PTHREAD_LIBS="-lpthread"],
+++++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
++++     [PTHREAD_LIBS=''],
+++    [AX_PTHREAD(
+++      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
+++-     saved_CFLAGS="$CFLAGS"
+++-@@ -2182,8 +2182,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++++@@ -2230,8 +2230,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+++  
+++  AS_CASE([$host],
+++    [*-*-mingw32],
+++--    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
+++--    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+++-+    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
+++-+    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
++++-dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
++++-dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+++++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
+++++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
++++     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
++++     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
+++    [*-pc-windows],
+++-     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
+++-     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
+++ diff --git a/otherlibs/str/Makefile b/otherlibs/str/Makefile
+++ --- a/otherlibs/str/Makefile
+++ +++ b/otherlibs/str/Makefile
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10224,10 +10274,10 @@ index 0000000000..e6ea0eebc2
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index 81399b27c1..11e05748ad 100644
++index c0559552db..7a8fee64c5 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -251,7 +251,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -245,7 +245,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
@@ -13127,10 +13177,10 @@ index 0000000000..e6ea0eebc2
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 76a82debf1..1d2c16b7c4 100755
++index 1f909da0a4..1d2c16b7c4 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 81d2c20950..8693d4f526 100644
++index 1c4df95651..0d6d3fed54 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13388,8 +13438,8 @@ index 0000000000..e6ea0eebc2
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
-+-    [PTHREAD_LIBS="-lpthread"],
-++dnl    [PTHREAD_LIBS="-lpthread"],
++-    [PTHREAD_LIBS="-l:libpthread.a"],
+++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
 ++    [PTHREAD_LIBS=''],
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
@@ -13429,10 +13479,10 @@ index 0000000000..e6ea0eebc2
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
-+-    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-+-    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
-++dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-++dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
++-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
++-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
+++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
+++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
 ++    [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
 ++    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
 +   [*-pc-windows],
@@ -19907,8 +19957,88 @@ index 0000000000..e6ea0eebc2
 ++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++@@ -1,4 +1,7 @@
-++-(
-\ No newline at end of file
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 58e081081f..66b315bb9d 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -161,10 +161,13 @@ case "$1" in
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
@@ -20520,7 +20650,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index fcc4bce8c7..fa3fd4696d 100644
+index 1428ef1284..d68c63cb2a 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
