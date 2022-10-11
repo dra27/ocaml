@@ -1997,8 +1997,14 @@ AS_CASE([$arch,$system],
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
+<<<<<<< HEAD
 dnl    [PTHREAD_LIBS="-lpthread"],
     [PTHREAD_LIBS=''],
+||||||| parent of 207ff080ab (Merge pull request PR#11586 from dra27/static-winpthreads)
+    [PTHREAD_LIBS="-lpthread"],
+=======
+    [PTHREAD_LIBS="-l:libpthread.a"],
+>>>>>>> 207ff080ab (Merge pull request PR#11586 from dra27/static-winpthreads)
   [AX_PTHREAD(
     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
     saved_CFLAGS="$CFLAGS"
@@ -2196,10 +2202,18 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 
 AS_CASE([$host],
   [*-*-mingw32],
+<<<<<<< HEAD
 dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
 dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
+||||||| parent of 207ff080ab (Merge pull request PR#11586 from dra27/static-winpthreads)
+    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
+    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+=======
+    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
+    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
+>>>>>>> 207ff080ab (Merge pull request PR#11586 from dra27/static-winpthreads)
   [*-pc-windows],
     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
