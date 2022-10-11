@@ -1,54 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..823b1c37ba
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,45 @@
-+--- a	2023-09-28 18:45:48.252741274 +0100
-++++ b	2023-09-28 18:45:48.260741581 +0100
-+@@ -28,31 +28,29 @@
-+ -### 4.12 and 4.13. Indeed, for OCaml 4.12 most of the time the variable
-+ -### contained -lpthread. From 4.13 onward it will most of the time be
-+ -### empty since we have -pthread in CFLAGS which implies -lpthread.
-+-diff --git a/configure b/configure
-+-Binary files a/configure and b/configure differ
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1984,7 +1984,7 @@ AS_CASE([$enable_debug_runtime],
-++@@ -2007,7 +2007,7 @@ AS_CASE([$arch,$system],
-+  
-+  AS_CASE([$host],
-+    [*-*-mingw32|*-pc-windows],
-+--    [PTHREAD_LIBS="-lpthread"],
-+-+    [PTHREAD_LIBS="-l:libpthread.a"],
-++-dnl    [PTHREAD_LIBS="-lpthread"],
-+++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-++     [PTHREAD_LIBS=''],
-+    [AX_PTHREAD(
-+      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
-+-     saved_CFLAGS="$CFLAGS"
-+-@@ -2182,8 +2182,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-++@@ -2230,8 +2230,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-+  
-+  AS_CASE([$host],
-+    [*-*-mingw32],
-+--    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-+--    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
-+-+    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
-+-+    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
-++-dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-++-dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
-+++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
-+++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
-++     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
-++     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
-+    [*-pc-windows],
-+-     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
-+-     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
-+ diff --git a/otherlibs/str/Makefile b/otherlibs/str/Makefile
-+ --- a/otherlibs/str/Makefile
-+ +++ b/otherlibs/str/Makefile
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -6167,7 +6119,7 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..2d986ac807
+index 0000000000..464eb345bc
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3852 @@
@@ -9985,7 +9937,7 @@ index 0000000000..2d986ac807
 + 
 + Build () {
 +diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-+index 58e081081f..66b315bb9d 100644
++index cdeaf1b674..832812925d 100644
 +--- a/tools/ci/appveyor/appveyor_build.sh
 ++++ b/tools/ci/appveyor/appveyor_build.sh
 +@@ -64,8 +64,8 @@ function set_configuration {
@@ -9999,7 +9951,7 @@ index 0000000000..2d986ac807
 +         ;;
 +         msvc32)
 +             build='--build=i686-pc-cygwin'
-+@@ -161,10 +161,13 @@ case "$1" in
++@@ -152,10 +152,13 @@ case "$1" in
 +     run "test $PORT" \
 +         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 +     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
@@ -10014,7 +9966,7 @@ index 0000000000..2d986ac807
 +       # Ensure that .gitignore is up-to-date - this will fail if any untracked
 +       # or altered files exist. We revert the change from the bootstrap (that
 +       # would have failed the build earlier if necessary)
-+@@ -184,7 +187,7 @@ case "$1" in
++@@ -175,7 +178,7 @@ case "$1" in
 +   *)
 +     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 + 
@@ -10025,61 +9977,13 @@ index 0000000000..2d986ac807
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d04ef55270
+index 0000000000..649204effa
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10010 @@
+@@ -0,0 +1,9906 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..823b1c37ba
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,45 @@
-++--- a	2023-09-28 18:45:48.252741274 +0100
-+++++ b	2023-09-28 18:45:48.260741581 +0100
-++@@ -28,31 +28,29 @@
-++ -### 4.12 and 4.13. Indeed, for OCaml 4.12 most of the time the variable
-++ -### contained -lpthread. From 4.13 onward it will most of the time be
-++ -### empty since we have -pthread in CFLAGS which implies -lpthread.
-++-diff --git a/configure b/configure
-++-Binary files a/configure and b/configure differ
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1984,7 +1984,7 @@ AS_CASE([$enable_debug_runtime],
-+++@@ -2007,7 +2007,7 @@ AS_CASE([$arch,$system],
-++  
-++  AS_CASE([$host],
-++    [*-*-mingw32|*-pc-windows],
-++--    [PTHREAD_LIBS="-lpthread"],
-++-+    [PTHREAD_LIBS="-l:libpthread.a"],
-+++-dnl    [PTHREAD_LIBS="-lpthread"],
-++++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-+++     [PTHREAD_LIBS=''],
-++    [AX_PTHREAD(
-++      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
-++-     saved_CFLAGS="$CFLAGS"
-++-@@ -2182,8 +2182,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-+++@@ -2230,8 +2230,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-++  
-++  AS_CASE([$host],
-++    [*-*-mingw32],
-++--    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-++--    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
-++-+    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
-++-+    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
-+++-dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-+++-dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
-++++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
-++++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
-+++     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
-+++     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
-++    [*-pc-windows],
-++-     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
-++-     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
-++ diff --git a/otherlibs/str/Makefile b/otherlibs/str/Makefile
-++ --- a/otherlibs/str/Makefile
-++ +++ b/otherlibs/str/Makefile
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -16198,7 +16102,7 @@ index 0000000000..d04ef55270
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..2d986ac807
++index 0000000000..464eb345bc
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3852 @@
@@ -19982,63 +19886,8 @@ index 0000000000..d04ef55270
 ++--- a/testsuite/tools/asmgen_i386.S
 +++++ b/testsuite/tools/asmgen_i386.S
 ++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 58e081081f..66b315bb9d 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -161,10 +161,13 @@ case "$1" in
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
+++ G
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
