@@ -2007,7 +2007,7 @@ AS_CASE([$arch,$system],
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
-dnl    [PTHREAD_LIBS="-lpthread"],
+dnl    [PTHREAD_LIBS="-l:libpthread.a"],
     [PTHREAD_LIBS=''],
   [AX_PTHREAD(
     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
@@ -2230,8 +2230,8 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 
 AS_CASE([$host],
   [*-*-mingw32],
-dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
+dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
   [*-pc-windows],
