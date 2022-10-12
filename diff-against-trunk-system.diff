@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..957119dc72
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:45:49.584792436 +0100
-++++ b	2023-09-28 18:45:49.588792590 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/stdlib/format.mli b/stdlib/format.mli
-+ --- a/stdlib/format.mli
-+ +++ b/stdlib/format.mli
-+-@@ -1285,7 +1285,7 @@ val fprintf : formatter -> ('a, formatter, unit) format -> 'a
-++@@ -1288,7 +1288,7 @@ val fprintf : formatter -> ('a, formatter, unit) format -> 'a
-+      optionally specified with the following syntax:
-+      the [<] character, followed by an integer [nspaces] value,
-+      then an integer [offset], and a closing [>] character.
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -9991,27 +9977,13 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..60579258bc
+index 0000000000..5dc88183ee
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9903 @@
+@@ -0,0 +1,9906 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..957119dc72
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:45:49.584792436 +0100
-+++++ b	2023-09-28 18:45:49.588792590 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/stdlib/format.mli b/stdlib/format.mli
-++ --- a/stdlib/format.mli
-++ +++ b/stdlib/format.mli
-++-@@ -1285,7 +1285,7 @@ val fprintf : formatter -> ('a, formatter, unit) format -> 'a
-+++@@ -1288,7 +1288,7 @@ val fprintf : formatter -> ('a, formatter, unit) format -> 'a
-++      optionally specified with the following syntax:
-++      the [<] character, followed by an integer [nspaces] value,
-++      then an integer [offset], and a closing [>] character.
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -19897,7 +19869,24 @@ index 0000000000..60579258bc
 ++ 
 ++ (* ocaml-multicore issues 528 and 468 *)
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklife
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21850,7 +21839,7 @@ index 669494be53..8b92d36cb9 100644
  )
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
-index cbd9cac25b..ca6804909d 100644
+index cc5435136c..c78a271731 100644
 --- a/stdlib/format.mli
 +++ b/stdlib/format.mli
 @@ -961,6 +961,7 @@ val formatter_of_out_channel : out_channel -> formatter
