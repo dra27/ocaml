@@ -43,8 +43,12 @@ LOCAL_SRC=dynlink_compilerlibs
 OBJS=byte/dynlink_compilerlibs.cmo dynlink_types.cmo \
   dynlink_platform_intf.cmo dynlink_common.cmo byte/dynlink.cmo
 
+ifeq "$(NATDYNLINK)" "true"
 NATOBJS=native/dynlink_compilerlibs.cmx dynlink_types.cmx \
   dynlink_platform_intf.cmx dynlink_common.cmx native/dynlink.cmx
+else
+NATOBJS=dynlink_types.cmx nonatdynlink/dynlink.cmx
+endif
 
 # We need/desire access to compilerlibs for various reasons:
 # - The bytecode dynamic linker is in compilerlibs and has many dependencies
@@ -204,6 +208,7 @@ native/dynlink_compilerlibs.cmx: $(COMPILERLIBS_CMX)
 # intermediate (which ensures it gets recopied after make depend)
 byte/dynlink.mli: dynlink.mli
 native/dynlink.mli: dynlink.mli
+nonatdynlink/dynlink.mli: dynlink.mli
 
 %/dynlink.cmi: dynlink.cmi %/dynlink.mli
 	cp $(^F) $*/
@@ -232,7 +237,7 @@ dynlink.cmxa: $(NATOBJS)
 # with a -opaque warning. Note that installopt refers to $(NATOBJS) so doesn't
 # require this file to exist, hence its inclusion in the recipe for dynlink.cmxa
 # rather than as a dependency elsewhere.
-	cp native/dynlink.cmx dynlink.cmx
+	cp $(filter %/dynlink.cmx, $(NATOBJS)) dynlink.cmx
 
 # Since there is no .mli for [Dynlink_platform_intf], we need to be
 # careful that compilation of the .cmx file does not write the .cmi file again,
@@ -265,16 +270,16 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 endif
 
 installopt:
-ifeq "$(strip $(NATDYNLINK))" "true"
 	$(INSTALL_DATA) \
 	  $(NATOBJS) dynlink.cmxa dynlink.$(A) \
 	  "$(INSTALL_LIBDIR_DYNLINK)"
-endif
 
 partialclean:
 	rm -f $(extract_crc) *.cm[ioaxt] *.cmti *.cmxa \
 	      byte/*.cm[iot] byte/*.cmti \
 	      native/*.cm[ixt] native/*.cmti native/*.o native/*.obj \
+	      nonatdynlink/*.cm[ixt] nonatdynlink/*.cmti \
+	      nonatdynlink/*.o nonatdynlink/*.obj \
 	      $(LOCAL_SRC)/*.cm[ioaxt] $(LOCAL_SRC)/*.cmti \
         $(LOCAL_SRC)/*.o $(LOCAL_SRC)/*.obj
 
@@ -282,7 +287,8 @@ clean: partialclean
 	rm -f extract_crc extract_crc.exe
 	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink_platform_intf.mli \
 	      $(LOCAL_SRC)/*.ml $(LOCAL_SRC)/*.mli $(LOCAL_SRC)/Makefile \
-	      $(LOCAL_SRC)/.depend byte/dynlink.mli native/dynlink.mli
+	      $(LOCAL_SRC)/.depend byte/dynlink.mli native/dynlink.mli \
+	      nonatdynlink/dynlink.mli
 
 .PHONY: distclean
 distclean: clean
@@ -296,7 +302,8 @@ DEPEND_DUMMY_FILES=\
   native/dynlink_compilerlibs.ml \
   byte/dynlink_compilerlibs.mli \
   byte/dynlink.mli \
-  native/dynlink.mli
+  native/dynlink.mli \
+  nonatdynlink/dynlink.mli
 
 depend: beforedepend
 	touch $(DEPEND_DUMMY_FILES)
@@ -304,6 +311,8 @@ depend: beforedepend
 	  -I byte -bytecode *.mli *.ml byte/dynlink.ml > .depend
 	$(OCAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash \
 	  -I native -native *.ml native/dynlink.ml >> .depend
+	$(OCAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash \
+	  -I nonatdynlink -native *.ml nonatdynlink/dynlink.ml >> .depend
 	rm -f $(DEPEND_DUMMY_FILES)
 
 include .depend

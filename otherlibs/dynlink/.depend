@@ -41,3 +41,17 @@ native/dynlink.cmx : \
     native/dynlink_compilerlibs.cmx \
     dynlink_common.cmx \
     native/dynlink.cmi
+dynlink_common.cmx : \
+    dynlink_types.cmx \
+    dynlink_platform_intf.cmx \
+    dynlink_common.cmi
+dynlink_platform_intf.cmx : \
+    dynlink_types.cmx \
+    dynlink_platform_intf.cmi
+dynlink_types.cmx : \
+    dynlink_types.cmi
+extract_crc.cmx : \
+    extract_crc.cmi
+nonatdynlink/dynlink.cmx : \
+    dynlink_types.cmx \
+    nonatdynlink/dynlink.cmi

@@ -141,6 +141,7 @@ META
 /otherlibs/dynlink/dynlink_platform_intf.mli
 /otherlibs/dynlink/byte/dynlink.mli
 /otherlibs/dynlink/native/dynlink.mli
+/otherlibs/dynlink/nonatdynlink/dynlink.mli
 /otherlibs/dynlink/dynlink_compilerlibs/Makefile
 /otherlibs/dynlink/dynlink_compilerlibs/*.ml
 /otherlibs/dynlink/dynlink_compilerlibs/*.mli
