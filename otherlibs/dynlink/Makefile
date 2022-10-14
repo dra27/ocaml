@@ -200,8 +200,13 @@ byt%/dynlink_compilerlibs.cmo byt%/dynlink_compilerlibs.cmi: $(COMPILERLIBS_CMO)
 native/dynlink_compilerlibs.cmx: $(COMPILERLIBS_CMX)
 	$(OCAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -pack -o $@ $(COMPILERLIBS_CMX)
 
-%/dynlink.cmi: dynlink.cmi dynlink.mli
-	cp $^ $*/
+# List %/dynlink.mli explicitly, to avoid GNU make regarding the target as
+# intermediate (which ensures it gets recopied after make depend)
+byte/dynlink.mli: dynlink.mli
+native/dynlink.mli: dynlink.mli
+
+%/dynlink.cmi: dynlink.cmi %/dynlink.mli
+	cp $(^F) $*/
 
 # Rules for building the interface of the [Dynlink_compilerlibs] packs.
 # To avoid falling foul of the problem described below, the .cmo and .cmx
