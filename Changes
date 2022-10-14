@@ -13,6 +13,9 @@ Working version
 - #11457: Remove old polymorphic variant syntax.
   (Stefan Muenzel, review by Gabriel Scherer and Jacques Garrigue)
 
+* #11565: Enable -strict-formats by default.
+  (Nicolás Ojeda Bär, review by David Allsopp)
+
 ### Runtime system:
 
 ### Code generation and optimizations:
@@ -35,8 +38,14 @@ Working version
 
 ### Standard library:
 
+- #11410: Add Set.to_list, Map.to_list, Map.of_list, Map.add_to_list,
+  (Daniel Bünzli, review by Nicolás Ojeda Bär and Gabriel Scherer)
+
 - #11128: Add In_channel.isatty, Out_channel.isatty.
   (Nicolás Ojeda Bär, review by Gabriel Scherer and Florian Angeletti)
+
+- #10859: Add `Format.pp_print_iter` and `Format.pp_print_array`.
+  (Léo Andrès and Daniel Bünzli, review by David Allsopp and Hugo Heuzard)
 
 - #10789: Add `Stack.drop`
   (Léo Andrès, review by Gabriel Scherer)
@@ -47,6 +56,9 @@ Working version
 
 - #11354: Hashtbl.find_all is now tail-recursive.
   (Fermín Reig, review by Gabriel Scherer)
+
+- #11500: Make Hashtbl.mem non-allocating.
+  (Simmo Saan, review by Nicolás Ojeda Bär)
 
 - #11362: Rewrite List.map, List.mapi and List.map2 using TRMC, making them
   faster as well as tail-recursive.
@@ -60,6 +72,15 @@ Working version
   halving memory usage while remaining tail-recursive.
   (Nicolás Ojeda Bär, review by Xavier Leroy and Gabriel Scherer)
 
+- #11476: Add examples in documentation of Hashtbl, Queue, Atomic, Format
+  (Simon Cruanes, review by Yotam Barnoy, Gabriel Scherer, Daniel Bünzli,
+   Ulugbek Abdullaev, and Nicolás Ojeda Bär)
+
+- #11488: Add Mutex.protect for resource-safe critical sections protected by
+  a mutex.
+  (Simon Cruanes, review by Gabriel Scherer, Xavier Leroy,
+   Guillaume Munch-Maccagnoni)
+
 ### Other libraries:
 
 - #11475: Make Unix terminal interface bindings domain-safe
@@ -71,6 +92,10 @@ Working version
   This allows to see optimized bytecode with -dlambda.
   (Jacques Garrigue, review by Gabriel Scherer)
 
+- #11166: ocamllex: the union of two character sets "cset1 | cset2" can now be
+  used in any context where a character set is expected.
+  (Nicolás Ojeda Bär, Martin Jambon, review by Sébastien Hinderer)
+
 ### Manual and documentation:
 
 - #9430, #11291: Document the general desugaring rules for binding operators.
@@ -81,6 +106,9 @@ Working version
 
 ### Compiler user-interface and warnings:
 
+- #11530: Include kinds in kind mismatch error message.
+  (Leonhard Markert, review by Gabriel Scherer and Florian Angeletti)
+
 - #10818: Preserve integer literal formatting in type hint.
   (Leonhard Markert, review by Gabriel Scherer and Florian Angeletti)
 
@@ -90,7 +118,14 @@ Working version
 - #10911: Improve the location reported by parenthesized assert expressions
   (Fabian Hemmer, review by Gabriel Scherer)
 
+- #1391, #7645, #3922: Add an early error when compiling different
+  modules with mismatching -for-pack
+  (Pierre Chambart and Vincent Laviron, review by Mark Shinwell)
+
 ### Internal/compiler-libs changes:
+- #11027: Separate typing counter-examples from type_pat into retype_pat;
+  type_pat is no longer in CPS.
+  (Jacques Garrigue and Takafumi Saikawa, review by Gabriel Scherer)
 
 - #11018: Clean up Types.Variance, adding a description of the lattice used,
   and defining explicitly composition.
@@ -110,6 +145,7 @@ Working version
   when they are not regular files.
   (Xavier Leroy, report by Thierry Martinez, review by
    Anil Madhavapeddy, Nicolás Ojeda Bär, David Allsopp)
+
 - #10348: Expand GADT equations lazily during unification to avoid ambiguity
   (Jacques Garrigue, review by Leo White)
 
@@ -255,12 +291,25 @@ OCaml 5.0
   Guillaume Munch-Maccagnoni, additional discussions with Stephen
   Dolan and Luc Maranget)
 
-- #5299, #4787, #11138, #11272: `Caml_state` is `NULL` when the domain lock is
-  not held. This allows to test if the current thread holds the lock of its
-  domain, and it makes it simpler to debug when one forgets to acquire
-  the lock.
-  (Guillaume Munch-Maccagnoni, review by Sadiq Jaffer, Xavier Leroy and
-  Gabriel Scherer)
+- #5299, #4787, #11138, #11272, #11506: To help debugging, `Caml_state`
+  now dynamically checks that the domain lock is held, and fails
+  otherwise (with a fatal error at most entry points of the C API, or
+  systematically in debug mode). A new variable `Caml_state_opt` is
+  introduced, and is `NULL` when the domain lock is not held. This
+  allows to test from C code if the current thread holds the lock of
+  its domain.
+  (Guillaume Munch-Maccagnoni, review by Florian Angeletti, Damien
+  Doligez, Sadiq Jaffer, Xavier Leroy, and Gabriel Scherer)
+
+- #11223: The serialization format of custom blocks changed in 4.08,
+  but the deserializer would still support the pre-4.08 format.  OCaml
+  5.x removed support for this old format; provide a clear error message
+  in this case.
+  (Hugo Heuzard, review by Gabriel Scherer)
+
+- #11504, #11522: Use static allocation in `caml_make_float_vect` in
+  no-flat-float-array mode, it's more efficient and avoids a a race condition
+  (Xavier Leroy, report by Guillaume Munch-Maccagnoni, review by David Allsopp)
 
 ### Code generation and optimizations:
 
@@ -347,13 +396,16 @@ OCaml 5.0
   Unix module.
   (Nicolás Ojeda Bär, review by Anil Madhavapeddy)
 
-- #11309, #11424, #11427: Add Domain.recommended_domain_count.
+- #11309, #11424, #11427, #11545: Add Domain.recommended_domain_count.
   (Christiano Haesbaert, Konstantin Belousov, review by David Allsopp,
   KC Sivaramakrishnan, Gabriel Scherer, Nicolas Ojeda Bar)
 
 - #11461, #11466: Fix gethostbyaddr for IPv6 arguments and make it domain-safe
   (Olivier Nicole, Nicolás Ojeda Bär, David Allsopp and Xavier Leroy,
    review by the same)
+
+- #11479: Make Unix.symlink domain-safe on Windows
+  (Olivier Nicole, review by Xavier Leroy and David Allsopp)
 
 ### Tools:
 
@@ -397,6 +449,11 @@ OCaml 5.0
 
 - #11192: Better documentation for condition variables.
   (François Pottier, review by Luc Maranget, Xavier Leroy, and Wiktor Kuchta)
+
+- #11093: Add tutorials on parallelism features and the relaxed memory model
+  (KC Sivaramakrishnan, review by Damien Doligez, Anil Madhavapeddy, Gabriel
+  Scherer, Thomas Leonard, Tom Ridge, Xavier Leroy, Luc Maranget, Fabrice
+  Buoro, Olivier Nicole, Guillaume Munch-Maccagnoni, Jacques-Henri Jourdan)
 
 ### Compiler user-interface and warnings:
 
@@ -492,9 +549,18 @@ OCaml 5.0
   removing it from the default namespace.
   (David Allsopp, review by Sébastien Hinderer)
 
+- #11294: Switch minimum required autoconf to 2.71.
+  (David Allsopp, review by Xavier Leroy)
+
 - #11370, #11373: Don't pass CFLAGS to flexlink during configure.
   (David Allsopp, report by William Hu, review by Xavier Leroy and
    Sébastien Hinderer)
+
+- #11487: Thwart FMA test optimization during configure
+  (William Hu, review by David Allsopp and Sébastien Hinderer)
+
+- #11097: Build native-code compilers on NetBSD/aarch64
+  (Kate Deplaix, review by Anil Madhavapeddy)
 
 ### Bug fixes:
 
@@ -554,7 +620,7 @@ OCaml 5.0
   it to ensure that the headers can always be used in code which turns on
   -Wundef (or equivalent).
   (David Allsopp and Nicolás Ojeda Bär, review by Nicolás Ojeda Bär and
-   Sebastien Hinderer)
+   Sébastien Hinderer)
 
 - #11289, #11405: fix some leaks on systhread termination
   (Fabrice Buoro, Enguerrand Decorne, Gabriel Scherer,
@@ -580,6 +646,26 @@ OCaml 5.0
 - #11468: Fix regression from #10186 (OCaml 4.13) detecting IPv6 on Windows for
   mingw-w64 i686 port.
   (David Allsopp, review by Xavier Leroy and Sébastien Hinderer)
+
+- #11482, #11542: Fix random crash in large closure allocation
+  (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
+   Xavier Leroy)
+
+- #11508, #11509: make Bytes.escaped domain-safe
+  (Christiano Haesbaert and Gabriel Scherer,
+   review by Xavier Leroy,
+   report by Jan Midtgaard and Tom Kelly)
+
+- #11516, #11524: Fix the `deprecated_mutable` attribute.
+  (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
+
+- #11576: Fix bug in Bigarray.Genarray.init in the the case of zero-dimensional
+  arrays.
+  (Nicolás Ojeda Bär, Jeremy Yallop, report by Masayuki Takeda, review by Jeremy
+  Yallop and Florian Angeletti)
+
+- #11587: Prevent integer comparison from being used on pointers
+  (Vincent Laviron, review by Gabriel Scherer)
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------

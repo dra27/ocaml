@@ -464,7 +464,7 @@ int main (void) {
      broken implementations of Cygwin64, mingw-w64 (x86_64) and VS2013-2017.
      The static volatile variables aim to thwart GCC's constant folding. */
   static volatile double x, y, z;
-  double t264, t265, t266;
+  volatile double t264, t265, t266;
   x = 0x3.bd5b7dde5fddap-496;
   y = 0x3.bd5b7dde5fddap-496;
   z = -0xd.fc352bc352bap-992;
@@ -558,3 +558,31 @@ AC_DEFUN([OCAML_CC_SUPPORTS_ATOMIC], [
    AC_MSG_RESULT([no])])
   LIBS="$saved_LIBS"
 ])
+
+AC_DEFUN([OCAML_POSIX_SUPPORT], [
+  AC_MSG_CHECKING([for POSIX 1003.1-2008 support])
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#if _POSIX_VERSION < 200809L
+#error POSIX 1003.1-2008 not supported
+#endif
+  ]])],
+  [AC_MSG_RESULT([yes])
+   posix_2008_supported=yes],
+  [AC_MSG_RESULT([no])
+   posix_2008_supported=no])])
+
+AC_DEFUN([OCAML_POSIX_SUPPORT2], [
+  AC_MSG_CHECKING([for POSIX 1003.1-2001 support])
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#define _POSIX_C_SOURCE 200112L
+#include <unistd.h>
+#if _POSIX_VERSION < 200112L
+#error POSIX 1003.1-2001 not supported
+#endif
+  ]])],
+  [AC_MSG_RESULT([yes])
+   posix_2001_supported=yes],
+  [AC_MSG_RESULT([no])
+   posix_2001_supported=no])])
