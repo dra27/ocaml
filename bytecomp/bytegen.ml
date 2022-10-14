@@ -466,7 +466,8 @@ let comp_primitive p sz args =
        | Ostype_unix -> "ostype_unix"
        | Ostype_win32 -> "ostype_win32"
        | Ostype_cygwin -> "ostype_cygwin"
-       | Backend_type -> "backend_type" in
+       | Backend_type -> "backend_type"
+       | Dynamic_linking -> "dynamic_linking"in
      Kccall(Printf.sprintf "caml_sys_const_%s" const_name, 1)
   | Pisint -> Kisint
   | Pisout -> Kisout

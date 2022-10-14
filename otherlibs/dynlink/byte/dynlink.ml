@@ -68,7 +68,14 @@ module Bytecode = struct
     default_crcs := Symtable.init_toplevel ();
     default_global_map := Symtable.current_state ()
 
+  external runtime_has_dynamic_linking : unit -> bool = "%dynamic_linking"
+
   let is_native = false
+  let support =
+    if runtime_has_dynamic_linking () then
+      Full
+    else
+      Pure
   let adapt_filename f = f
 
   let num_globals_inited () =

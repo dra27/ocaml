@@ -318,7 +318,7 @@ depend: beforedepend
 include .depend
 
 %.cmi: %.mli
-	$(OCAMLC) -c $(COMPFLAGS) $<
+	$(OCAMLC) -c $(COMPFLAGS) -opaque $<
 
 %.cmo: %.ml
 	$(OCAMLC) -c $(COMPFLAGS) $<

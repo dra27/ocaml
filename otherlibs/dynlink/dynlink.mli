@@ -23,6 +23,24 @@ val is_native : bool
 (** [true] if the program is native,
     [false] if the program is bytecode. *)
 
+(** Levels of support for dynlink
+    
+    @since 5.1.0 *)
+type support_level = private
+  | Unsupported
+      (** Native-only; {!loadfile} and {!loadfile_private} will fail. *)
+  | Pure
+      (** Bytecode-only; units requiring C libraries will fail. *)
+  | Full 
+      (** Full support in both bytecode and native code. *)
+
+val support : support_level
+(** Indicates the level of dynamic loading which is available to the program.
+    For bytecode, this depends on the runtime executing the program; in native
+    code this is fixed by the compiler which built the program.
+
+    @since 5.1.0 *)
+
 (** {1 Dynamic loading of compiled files} *)
 
 val loadfile : string -> unit

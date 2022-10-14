@@ -239,6 +239,11 @@ val supports_shared_libraries: bool
 
     @since 4.08.0 *)
 
+val natdynlink: bool
+(** Whether native dynlink is supported
+
+    @since 5.1.0 *)
+
 val force_instrumented_runtime: bool
 (** Force runtime-variant to be "i" at configure time
     when ocamlc or ocamlopt link executables. *)

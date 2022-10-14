@@ -57,6 +57,8 @@ module Native = struct
   let init () = ()
 
   let is_native = true
+  let support = Full
+
   let adapt_filename f = Filename.chop_extension f ^ ".cmxs"
 
   let num_globals_inited () = ndl_globals_inited ()

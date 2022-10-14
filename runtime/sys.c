@@ -698,8 +698,18 @@ CAMLprim value caml_sys_const_ostype_cygwin(value unit)
 
 CAMLprim value caml_sys_const_backend_type(value unit)
 {
-  return Val_int(1); /* Bytecode backed */
+  return Val_int(1); /* Bytecode backend */
 }
+
+CAMLprim value caml_sys_const_dynamic_linking(value unit)
+{
+#ifdef SUPPORT_DYNAMIC_LINKING
+  return Val_int(1);
+#else
+  return Val_int(0);
+#endif
+}
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */
