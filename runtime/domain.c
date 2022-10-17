@@ -750,7 +750,9 @@ static void reserve_minor_heaps() {
 }
 
 static void unreserve_minor_heaps() {
+#ifndef __CYGWIN__
   uintnat size;
+#endif
 
   caml_gc_log("unreserve_minor_heaps");
 
@@ -775,9 +777,13 @@ static void unreserve_minor_heaps() {
     dom->minor_heap_area_start = dom->minor_heap_area_end = 0;
   }
 
+  /* Temporarily leave the address space reservation in place on Cygwin to avoid
+     crash in malloc */
+#ifndef __CYGWIN__
   size = caml_minor_heaps_end - caml_minor_heaps_start;
   CAMLassert (Bsize_wsize(caml_minor_heap_max_wsz) * Max_domains == size);
   caml_mem_unmap((void *) caml_minor_heaps_start, size);
+#endif
 }
 
 static void stw_resize_minor_heap_reservation(caml_domain_state* domain,
