@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:45:51.156852770 +0100
++++ b	2023-09-28 18:45:51.168853230 +0100
+@@ -75,7 +75,7 @@
+  
+  (* Emission of one instruction *)
+  
+-@@ -394,6 +403,7 @@ let rec emit = function
++@@ -398,6 +407,7 @@ let rec emit = function
+  
+  let to_file outchan unit_name objfile ~required_globals code =
+    init();
+@@ -83,7 +83,7 @@
+    output_string outchan cmo_magic_number;
+    let pos_depl = pos_out outchan in
+    output_binary_int outchan 0;
+-@@ -423,41 +433,37 @@ let to_file outchan unit_name objfile ~required_globals code =
++@@ -427,41 +437,37 @@ let to_file outchan unit_name objfile ~required_globals code =
+        cu_force_link = !Clflags.link_everything;
+        cu_debug = pos_debug;
+        cu_debugsize = size_debug } in
