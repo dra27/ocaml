@@ -51,3 +51,6 @@ BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 datarootdir = @datarootdir@
 DOCDIR=@docdir@
+
+# Platform-dependent command to create symbolic links
+LN = @ln@
