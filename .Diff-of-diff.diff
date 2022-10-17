@@ -1,0 +1,22 @@
+--- a	2023-09-28 18:45:52.060887441 +0100
++++ b	2023-09-28 18:45:52.076888054 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -682,6 +682,10 @@ OCaml 5.0
++@@ -677,6 +677,10 @@ OCaml 5.0
+  - #11587: Prevent integer comparison from being used on pointers
+    (Vincent Laviron, review by Gabriel Scherer)
+  
+@@ -9,8 +9,8 @@
+ +  mismatch error involving recursive types.
+ +  (Florian Angeletti, review by Gabriel Scherer)
+ +
+- OCaml 4.14.0 (28 March 2022)
+- ----------------------------
++ OCaml 4.14 maintenance branch
++ -----------------------------
+  
+ diff --git a/testsuite/tests/typing-modules/inclusion_errors.ml b/testsuite/tests/typing-modules/inclusion_errors.ml
+ --- a/testsuite/tests/typing-modules/inclusion_errors.ml
