@@ -29,3 +29,6 @@ OC_DLL_LDFLAGS=@oc_dll_ldflags@
 # Git submodule)
 FLEXDLL_SOURCES=@flexdir@
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
+
+# Platform-dependent command to create symbolic links
+LN = @ln@
