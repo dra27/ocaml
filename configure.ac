@@ -101,6 +101,7 @@ AC_SUBST([system])
 AC_SUBST([systhread_support])
 AC_SUBST([ocamlsrcdir])
 AC_SUBST([unix_or_win32])
+AC_SUBST([ln])
 AC_SUBST([ocamlyacc_wstr_module])
 AC_SUBST([outputexe])
 AC_SUBST([outputobj])
@@ -552,9 +553,11 @@ ocamlsrcdir=${ocamlsrcdir%X}
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    ln='cp -pf'
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr"],
   [unix_or_win32="unix"
+  ln='ln -sf'
   ocamlyacc_wstr_module=""])
 
 AS_CASE([$host],
