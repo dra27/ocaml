@@ -1,6 +1,193 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..93250feb8b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,184 @@
++--- a	2023-09-28 18:45:52.708912281 +0100
+++++ b	2023-09-28 18:45:52.716912587 +0100
++@@ -3,133 +3,24 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1193,98 +1193,99 @@ arch=none
+++@@ -1205,6 +1205,7 @@ arch=none
++  model=default
++  system=unknown
++  
++ +has_native_backend=no
++  AS_CASE([$host],
++--dnl [[i[3456]86-*-linux*]],
++--dnl   [arch=i386; system=linux_elf],
++--dnl [[i[3456]86-*-*bsd*]],
++--dnl   [arch=i386; system=bsd_elf],
++--dnl [[i[3456]86-*-haiku*]],
++--dnl   [arch=i386; system=beos],
++--dnl [[i[3456]86-*-cygwin]],
++--dnl   [arch=i386; system=cygwin],
++--dnl [[i[3456]86-*-gnu*]],
++--dnl   [arch=i386; system=gnu],
++--dnl [[i[3456]86-*-mingw32]],
++--dnl   [arch=i386; system=mingw],
++--dnl [i686-pc-windows],
++--dnl   [arch=i386; system=win32],
++--dnl [x86_64-pc-windows],
++--dnl   [arch=amd64; system=win64],
++--dnl [[powerpc64le*-*-linux*]],
++--dnl   [arch=power; model=ppc64le; system=elf],
++--dnl [[powerpc*-*-linux*]],
++--dnl   [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++--dnl [[s390x*-*-linux*]],
++--dnl   [arch=s390x; model=z10; system=elf],
++--dnl # expected to match "gnueabihf" as well as "musleabihf"
++--dnl [armv6*-*-linux-*eabihf],
++--dnl   [arch=arm; model=armv6; system=linux_eabihf],
++--dnl [armv7*-*-linux-*eabihf],
++--dnl   [arch=arm; model=armv7; system=linux_eabihf],
++--dnl [armv8*-*-linux-*eabihf],
++--dnl   [arch=arm; model=armv8; system=linux_eabihf],
++--dnl [armv8*-*-linux-*eabi],
++--dnl   [arch=arm; model=armv8; system=linux_eabi],
++--dnl [armv7*-*-linux-*eabi],
++--dnl   [arch=arm; model=armv7; system=linux_eabi],
++--dnl [armv6t2*-*-linux-*eabi],
++--dnl   [arch=arm; model=armv6t2; system=linux_eabi],
++--dnl [armv6*-*-linux-*eabi],
++--dnl   [arch=arm; model=armv6; system=linux_eabi],
++--dnl [armv6*-*-freebsd*],
++--dnl   [arch=arm; model=armv6; system=freebsd],
++--dnl [earmv6*-*-netbsd*],
++--dnl   [arch=arm; model=armv6; system=netbsd],
++--dnl [earmv7*-*-netbsd*],
++--dnl   [arch=arm; model=armv7; system=netbsd],
++--dnl [armv5te*-*-linux-*eabi],
++--dnl   [arch=arm; model=armv5te; system=linux_eabi],
++--dnl [armv5*-*-linux-*eabi],
++--dnl   [arch=arm; model=armv5; system=linux_eabi],
++--dnl [arm*-*-linux-*eabihf],
++--dnl   [arch=arm; system=linux_eabihf],
++--dnl [arm*-*-linux-*eabi],
++--dnl   [arch=arm; system=linux_eabi],
++--dnl [arm*-*-openbsd*],
++--dnl   [arch=arm; system=bsd],
++--dnl [zaurus*-*-openbsd*],
++--dnl   [arch=arm; system=bsd],
++-+  [[i[3456]86-*-linux*]],
++-+    [arch=i386; system=linux_elf],
++-+  [[i[3456]86-*-*bsd*]],
++-+    [arch=i386; system=bsd_elf],
++-+  [[i[3456]86-*-haiku*]],
++-+    [arch=i386; system=beos],
++-+  [[i[3456]86-*-cygwin]],
++-+    [arch=i386; system=cygwin],
++-+  [[i[3456]86-*-gnu*]],
++-+    [arch=i386; system=gnu],
++-+  [[i[3456]86-*-mingw32]],
++-+    [arch=i386; system=mingw],
++-+  [i686-pc-windows],
++-+    [arch=i386; system=win32],
++-+  [x86_64-pc-windows],
++-+    [arch=amd64; system=win64],
++-+  [[powerpc64le*-*-linux*]],
++-+    [arch=power; model=ppc64le; system=elf],
++-+  [[powerpc*-*-linux*]],
++-+    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++-+  [[s390x*-*-linux*]],
++-+    [arch=s390x; model=z10; system=elf],
++-+  # expected to match "gnueabihf" as well as "musleabihf"
++-+  [armv6*-*-linux-*eabihf],
++-+    [arch=arm; model=armv6; system=linux_eabihf],
++-+  [armv7*-*-linux-*eabihf],
++-+    [arch=arm; model=armv7; system=linux_eabihf],
++-+  [armv8*-*-linux-*eabihf],
++-+    [arch=arm; model=armv8; system=linux_eabihf],
++-+  [armv8*-*-linux-*eabi],
++-+    [arch=arm; model=armv8; system=linux_eabi],
++-+  [armv7*-*-linux-*eabi],
++-+    [arch=arm; model=armv7; system=linux_eabi],
++-+  [armv6t2*-*-linux-*eabi],
++-+    [arch=arm; model=armv6t2; system=linux_eabi],
++-+  [armv6*-*-linux-*eabi],
++-+    [arch=arm; model=armv6; system=linux_eabi],
++-+  [armv6*-*-freebsd*],
++-+    [arch=arm; model=armv6; system=freebsd],
++-+  [earmv6*-*-netbsd*],
++-+    [arch=arm; model=armv6; system=netbsd],
++-+  [earmv7*-*-netbsd*],
++-+    [arch=arm; model=armv7; system=netbsd],
++-+  [armv5te*-*-linux-*eabi],
++-+    [arch=arm; model=armv5te; system=linux_eabi],
++-+  [armv5*-*-linux-*eabi],
++-+    [arch=arm; model=armv5; system=linux_eabi],
++-+  [arm*-*-linux-*eabihf],
++-+    [arch=arm; system=linux_eabihf],
++-+  [arm*-*-linux-*eabi],
++-+    [arch=arm; system=linux_eabi],
++-+  [arm*-*-openbsd*],
++-+    [arch=arm; system=bsd],
++-+  [zaurus*-*-openbsd*],
++-+    [arch=arm; system=bsd],
+++   [[i[3456]86-*-linux*]],
+++     [arch=i386; system=linux_elf],
+++@@ -1262,37 +1263,37 @@ AS_CASE([$host],
+++   [zaurus*-*-openbsd*],
+++     [arch=arm; system=bsd],
++    [x86_64-*-linux*],
++ -    [arch=amd64; system=linux],
++--dnl [x86_64-*-gnu*],
++--dnl   [arch=amd64; system=gnu],
++--dnl [x86_64-*-dragonfly*],
++--dnl   [arch=amd64; system=dragonfly],
++ +    [has_native_backend=yes; arch=amd64; system=linux],
++-+  [x86_64-*-gnu*],
++-+    [arch=amd64; system=gnu],
++-+  [x86_64-*-dragonfly*],
++-+    [arch=amd64; system=dragonfly],
+++   [x86_64-*-gnu*],
+++     [arch=amd64; system=gnu],
+++   [x86_64-*-dragonfly*],
+++     [arch=amd64; system=dragonfly],
++    [x86_64-*-solaris*],
++ -    [arch=amd64; system=solaris],
++ +    [has_native_backend=yes; arch=amd64; system=solaris],
++@@ -141,11 +32,9 @@
++ +    [has_native_backend=yes; arch=amd64; system=netbsd],
++    [x86_64-*-openbsd*],
++ -    [arch=amd64; system=openbsd],
++--dnl [x86_64-*-haiku*],
++--dnl   [arch=amd64; system=beos],
++ +    [has_native_backend=yes; arch=amd64; system=openbsd],
++-+  [x86_64-*-haiku*],
++-+    [arch=amd64; system=beos],
+++   [x86_64-*-haiku*],
+++     [arch=amd64; system=beos],
++    [arm64-*-darwin*],
++ -    [arch=arm64; system=macosx],
++ +    [has_native_backend=yes; arch=arm64; system=macosx],
++@@ -169,19 +58,11 @@
++ +    [has_native_backend=yes; arch=arm64; system=openbsd],
++    [aarch64-*-netbsd*],
++ -    [arch=arm64; system=netbsd],
++--dnl [x86_64-*-cygwin*],
++--dnl   [arch=amd64; system=cygwin],
++--dnl [riscv64-*-linux*],
++--dnl   [arch=riscv; model=riscv64; system=linux]
++ +    [has_native_backend=yes; arch=arm64; system=netbsd],
++-+  [x86_64-*-cygwin*],
++-+    [arch=amd64; system=cygwin],
++-+  [riscv64-*-linux*],
++-+    [arch=riscv; model=riscv64; system=linux]
++- )
++- 
++- AS_CASE([$ccomptype],
++-@@ -1292,13 +1293,13 @@ AS_CASE([$ccomptype],
+++   [x86_64-*-cygwin*],
+++     [arch=amd64; system=cygwin],
+++   [riscv64-*-linux*],
+++@@ -1304,13 +1305,13 @@ AS_CASE([$ccomptype],
++      [runtime_asm_objects=${arch}nt.${OBJEXT}],
++    [runtime_asm_objects=${arch}.${OBJEXT}])
++  
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -3126,10 +3313,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 1f909da0a4..1d2c16b7c4 100755
+index 84269da187..ad6cafcc0e 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 1c4df95651..0d6d3fed54 100644
+index 62838e07e6..963603e1f7 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3215,160 +3402,7 @@ index 1c4df95651..0d6d3fed54 100644
  
  # Support for C11 atomic types
  
-@@ -1194,67 +1206,67 @@ model=default
- system=unknown
- 
- AS_CASE([$host],
--dnl [[i[3456]86-*-linux*]],
--dnl   [arch=i386; system=linux_elf],
--dnl [[i[3456]86-*-*bsd*]],
--dnl   [arch=i386; system=bsd_elf],
--dnl [[i[3456]86-*-haiku*]],
--dnl   [arch=i386; system=beos],
--dnl [[i[3456]86-*-cygwin]],
--dnl   [arch=i386; system=cygwin],
--dnl [[i[3456]86-*-gnu*]],
--dnl   [arch=i386; system=gnu],
--dnl [[i[3456]86-*-mingw32]],
--dnl   [arch=i386; system=mingw],
--dnl [i686-pc-windows],
--dnl   [arch=i386; system=win32],
--dnl [x86_64-pc-windows],
--dnl   [arch=amd64; system=win64],
--dnl [[powerpc64le*-*-linux*]],
--dnl   [arch=power; model=ppc64le; system=elf],
--dnl [[powerpc*-*-linux*]],
--dnl   [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
--dnl [[s390x*-*-linux*]],
--dnl   [arch=s390x; model=z10; system=elf],
--dnl # expected to match "gnueabihf" as well as "musleabihf"
--dnl [armv6*-*-linux-*eabihf],
--dnl   [arch=arm; model=armv6; system=linux_eabihf],
--dnl [armv7*-*-linux-*eabihf],
--dnl   [arch=arm; model=armv7; system=linux_eabihf],
--dnl [armv8*-*-linux-*eabihf],
--dnl   [arch=arm; model=armv8; system=linux_eabihf],
--dnl [armv8*-*-linux-*eabi],
--dnl   [arch=arm; model=armv8; system=linux_eabi],
--dnl [armv7*-*-linux-*eabi],
--dnl   [arch=arm; model=armv7; system=linux_eabi],
--dnl [armv6t2*-*-linux-*eabi],
--dnl   [arch=arm; model=armv6t2; system=linux_eabi],
--dnl [armv6*-*-linux-*eabi],
--dnl   [arch=arm; model=armv6; system=linux_eabi],
--dnl [armv6*-*-freebsd*],
--dnl   [arch=arm; model=armv6; system=freebsd],
--dnl [earmv6*-*-netbsd*],
--dnl   [arch=arm; model=armv6; system=netbsd],
--dnl [earmv7*-*-netbsd*],
--dnl   [arch=arm; model=armv7; system=netbsd],
--dnl [armv5te*-*-linux-*eabi],
--dnl   [arch=arm; model=armv5te; system=linux_eabi],
--dnl [armv5*-*-linux-*eabi],
--dnl   [arch=arm; model=armv5; system=linux_eabi],
--dnl [arm*-*-linux-*eabihf],
--dnl   [arch=arm; system=linux_eabihf],
--dnl [arm*-*-linux-*eabi],
--dnl   [arch=arm; system=linux_eabi],
--dnl [arm*-*-openbsd*],
--dnl   [arch=arm; system=bsd],
--dnl [zaurus*-*-openbsd*],
--dnl   [arch=arm; system=bsd],
-+  [[i[3456]86-*-linux*]],
-+    [arch=i386; system=linux_elf],
-+  [[i[3456]86-*-*bsd*]],
-+    [arch=i386; system=bsd_elf],
-+  [[i[3456]86-*-haiku*]],
-+    [arch=i386; system=beos],
-+  [[i[3456]86-*-cygwin]],
-+    [arch=i386; system=cygwin],
-+  [[i[3456]86-*-gnu*]],
-+    [arch=i386; system=gnu],
-+  [[i[3456]86-*-mingw32]],
-+    [arch=i386; system=mingw],
-+  [i686-pc-windows],
-+    [arch=i386; system=win32],
-+  [x86_64-pc-windows],
-+    [arch=amd64; system=win64],
-+  [[powerpc64le*-*-linux*]],
-+    [arch=power; model=ppc64le; system=elf],
-+  [[powerpc*-*-linux*]],
-+    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-+  [[s390x*-*-linux*]],
-+    [arch=s390x; model=z10; system=elf],
-+  # expected to match "gnueabihf" as well as "musleabihf"
-+  [armv6*-*-linux-*eabihf],
-+    [arch=arm; model=armv6; system=linux_eabihf],
-+  [armv7*-*-linux-*eabihf],
-+    [arch=arm; model=armv7; system=linux_eabihf],
-+  [armv8*-*-linux-*eabihf],
-+    [arch=arm; model=armv8; system=linux_eabihf],
-+  [armv8*-*-linux-*eabi],
-+    [arch=arm; model=armv8; system=linux_eabi],
-+  [armv7*-*-linux-*eabi],
-+    [arch=arm; model=armv7; system=linux_eabi],
-+  [armv6t2*-*-linux-*eabi],
-+    [arch=arm; model=armv6t2; system=linux_eabi],
-+  [armv6*-*-linux-*eabi],
-+    [arch=arm; model=armv6; system=linux_eabi],
-+  [armv6*-*-freebsd*],
-+    [arch=arm; model=armv6; system=freebsd],
-+  [earmv6*-*-netbsd*],
-+    [arch=arm; model=armv6; system=netbsd],
-+  [earmv7*-*-netbsd*],
-+    [arch=arm; model=armv7; system=netbsd],
-+  [armv5te*-*-linux-*eabi],
-+    [arch=arm; model=armv5te; system=linux_eabi],
-+  [armv5*-*-linux-*eabi],
-+    [arch=arm; model=armv5; system=linux_eabi],
-+  [arm*-*-linux-*eabihf],
-+    [arch=arm; system=linux_eabihf],
-+  [arm*-*-linux-*eabi],
-+    [arch=arm; system=linux_eabi],
-+  [arm*-*-openbsd*],
-+    [arch=arm; system=bsd],
-+  [zaurus*-*-openbsd*],
-+    [arch=arm; system=bsd],
-   [x86_64-*-linux*],
-     [arch=amd64; system=linux],
--dnl [x86_64-*-gnu*],
--dnl   [arch=amd64; system=gnu],
--dnl [x86_64-*-dragonfly*],
--dnl   [arch=amd64; system=dragonfly],
-+  [x86_64-*-gnu*],
-+    [arch=amd64; system=gnu],
-+  [x86_64-*-dragonfly*],
-+    [arch=amd64; system=dragonfly],
-   [x86_64-*-solaris*],
-     [arch=amd64; system=solaris],
-   [x86_64-*-freebsd*],
-@@ -1263,8 +1275,8 @@ dnl   [arch=amd64; system=dragonfly],
-     [arch=amd64; system=netbsd],
-   [x86_64-*-openbsd*],
-     [arch=amd64; system=openbsd],
--dnl [x86_64-*-haiku*],
--dnl   [arch=amd64; system=beos],
-+  [x86_64-*-haiku*],
-+    [arch=amd64; system=beos],
-   [arm64-*-darwin*],
-     [arch=arm64; system=macosx],
-   [aarch64-*-darwin*],
-@@ -1281,10 +1293,10 @@ dnl   [arch=amd64; system=beos],
-     [arch=arm64; system=openbsd],
-   [aarch64-*-netbsd*],
-     [arch=arm64; system=netbsd],
--dnl [x86_64-*-cygwin*],
--dnl   [arch=amd64; system=cygwin],
--dnl [riscv64-*-linux*],
--dnl   [arch=riscv; model=riscv64; system=linux]
-+  [x86_64-*-cygwin*],
-+    [arch=amd64; system=cygwin],
-+  [riscv64-*-linux*],
-+    [arch=riscv; model=riscv64; system=linux]
- )
- 
- AS_CASE([$ccomptype],
-@@ -1980,11 +1992,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1981,11 +1993,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3393,7 +3427,7 @@ index 1c4df95651..0d6d3fed54 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2035,6 +2059,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2036,6 +2060,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3424,7 +3458,7 @@ index 1c4df95651..0d6d3fed54 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2182,8 +2230,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2183,8 +2231,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -10018,13 +10052,200 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..767417df45
+index 0000000000..e9b94261ea
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9904 @@
+@@ -0,0 +1,10022 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..93250feb8b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,184 @@
+++--- a	2023-09-28 18:45:52.708912281 +0100
++++++ b	2023-09-28 18:45:52.716912587 +0100
+++@@ -3,133 +3,24 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1193,98 +1193,99 @@ arch=none
++++@@ -1205,6 +1205,7 @@ arch=none
+++  model=default
+++  system=unknown
+++  
+++ +has_native_backend=no
+++  AS_CASE([$host],
+++--dnl [[i[3456]86-*-linux*]],
+++--dnl   [arch=i386; system=linux_elf],
+++--dnl [[i[3456]86-*-*bsd*]],
+++--dnl   [arch=i386; system=bsd_elf],
+++--dnl [[i[3456]86-*-haiku*]],
+++--dnl   [arch=i386; system=beos],
+++--dnl [[i[3456]86-*-cygwin]],
+++--dnl   [arch=i386; system=cygwin],
+++--dnl [[i[3456]86-*-gnu*]],
+++--dnl   [arch=i386; system=gnu],
+++--dnl [[i[3456]86-*-mingw32]],
+++--dnl   [arch=i386; system=mingw],
+++--dnl [i686-pc-windows],
+++--dnl   [arch=i386; system=win32],
+++--dnl [x86_64-pc-windows],
+++--dnl   [arch=amd64; system=win64],
+++--dnl [[powerpc64le*-*-linux*]],
+++--dnl   [arch=power; model=ppc64le; system=elf],
+++--dnl [[powerpc*-*-linux*]],
+++--dnl   [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+++--dnl [[s390x*-*-linux*]],
+++--dnl   [arch=s390x; model=z10; system=elf],
+++--dnl # expected to match "gnueabihf" as well as "musleabihf"
+++--dnl [armv6*-*-linux-*eabihf],
+++--dnl   [arch=arm; model=armv6; system=linux_eabihf],
+++--dnl [armv7*-*-linux-*eabihf],
+++--dnl   [arch=arm; model=armv7; system=linux_eabihf],
+++--dnl [armv8*-*-linux-*eabihf],
+++--dnl   [arch=arm; model=armv8; system=linux_eabihf],
+++--dnl [armv8*-*-linux-*eabi],
+++--dnl   [arch=arm; model=armv8; system=linux_eabi],
+++--dnl [armv7*-*-linux-*eabi],
+++--dnl   [arch=arm; model=armv7; system=linux_eabi],
+++--dnl [armv6t2*-*-linux-*eabi],
+++--dnl   [arch=arm; model=armv6t2; system=linux_eabi],
+++--dnl [armv6*-*-linux-*eabi],
+++--dnl   [arch=arm; model=armv6; system=linux_eabi],
+++--dnl [armv6*-*-freebsd*],
+++--dnl   [arch=arm; model=armv6; system=freebsd],
+++--dnl [earmv6*-*-netbsd*],
+++--dnl   [arch=arm; model=armv6; system=netbsd],
+++--dnl [earmv7*-*-netbsd*],
+++--dnl   [arch=arm; model=armv7; system=netbsd],
+++--dnl [armv5te*-*-linux-*eabi],
+++--dnl   [arch=arm; model=armv5te; system=linux_eabi],
+++--dnl [armv5*-*-linux-*eabi],
+++--dnl   [arch=arm; model=armv5; system=linux_eabi],
+++--dnl [arm*-*-linux-*eabihf],
+++--dnl   [arch=arm; system=linux_eabihf],
+++--dnl [arm*-*-linux-*eabi],
+++--dnl   [arch=arm; system=linux_eabi],
+++--dnl [arm*-*-openbsd*],
+++--dnl   [arch=arm; system=bsd],
+++--dnl [zaurus*-*-openbsd*],
+++--dnl   [arch=arm; system=bsd],
+++-+  [[i[3456]86-*-linux*]],
+++-+    [arch=i386; system=linux_elf],
+++-+  [[i[3456]86-*-*bsd*]],
+++-+    [arch=i386; system=bsd_elf],
+++-+  [[i[3456]86-*-haiku*]],
+++-+    [arch=i386; system=beos],
+++-+  [[i[3456]86-*-cygwin]],
+++-+    [arch=i386; system=cygwin],
+++-+  [[i[3456]86-*-gnu*]],
+++-+    [arch=i386; system=gnu],
+++-+  [[i[3456]86-*-mingw32]],
+++-+    [arch=i386; system=mingw],
+++-+  [i686-pc-windows],
+++-+    [arch=i386; system=win32],
+++-+  [x86_64-pc-windows],
+++-+    [arch=amd64; system=win64],
+++-+  [[powerpc64le*-*-linux*]],
+++-+    [arch=power; model=ppc64le; system=elf],
+++-+  [[powerpc*-*-linux*]],
+++-+    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+++-+  [[s390x*-*-linux*]],
+++-+    [arch=s390x; model=z10; system=elf],
+++-+  # expected to match "gnueabihf" as well as "musleabihf"
+++-+  [armv6*-*-linux-*eabihf],
+++-+    [arch=arm; model=armv6; system=linux_eabihf],
+++-+  [armv7*-*-linux-*eabihf],
+++-+    [arch=arm; model=armv7; system=linux_eabihf],
+++-+  [armv8*-*-linux-*eabihf],
+++-+    [arch=arm; model=armv8; system=linux_eabihf],
+++-+  [armv8*-*-linux-*eabi],
+++-+    [arch=arm; model=armv8; system=linux_eabi],
+++-+  [armv7*-*-linux-*eabi],
+++-+    [arch=arm; model=armv7; system=linux_eabi],
+++-+  [armv6t2*-*-linux-*eabi],
+++-+    [arch=arm; model=armv6t2; system=linux_eabi],
+++-+  [armv6*-*-linux-*eabi],
+++-+    [arch=arm; model=armv6; system=linux_eabi],
+++-+  [armv6*-*-freebsd*],
+++-+    [arch=arm; model=armv6; system=freebsd],
+++-+  [earmv6*-*-netbsd*],
+++-+    [arch=arm; model=armv6; system=netbsd],
+++-+  [earmv7*-*-netbsd*],
+++-+    [arch=arm; model=armv7; system=netbsd],
+++-+  [armv5te*-*-linux-*eabi],
+++-+    [arch=arm; model=armv5te; system=linux_eabi],
+++-+  [armv5*-*-linux-*eabi],
+++-+    [arch=arm; model=armv5; system=linux_eabi],
+++-+  [arm*-*-linux-*eabihf],
+++-+    [arch=arm; system=linux_eabihf],
+++-+  [arm*-*-linux-*eabi],
+++-+    [arch=arm; system=linux_eabi],
+++-+  [arm*-*-openbsd*],
+++-+    [arch=arm; system=bsd],
+++-+  [zaurus*-*-openbsd*],
+++-+    [arch=arm; system=bsd],
++++   [[i[3456]86-*-linux*]],
++++     [arch=i386; system=linux_elf],
++++@@ -1262,37 +1263,37 @@ AS_CASE([$host],
++++   [zaurus*-*-openbsd*],
++++     [arch=arm; system=bsd],
+++    [x86_64-*-linux*],
+++ -    [arch=amd64; system=linux],
+++--dnl [x86_64-*-gnu*],
+++--dnl   [arch=amd64; system=gnu],
+++--dnl [x86_64-*-dragonfly*],
+++--dnl   [arch=amd64; system=dragonfly],
+++ +    [has_native_backend=yes; arch=amd64; system=linux],
+++-+  [x86_64-*-gnu*],
+++-+    [arch=amd64; system=gnu],
+++-+  [x86_64-*-dragonfly*],
+++-+    [arch=amd64; system=dragonfly],
++++   [x86_64-*-gnu*],
++++     [arch=amd64; system=gnu],
++++   [x86_64-*-dragonfly*],
++++     [arch=amd64; system=dragonfly],
+++    [x86_64-*-solaris*],
+++ -    [arch=amd64; system=solaris],
+++ +    [has_native_backend=yes; arch=amd64; system=solaris],
+++@@ -141,11 +32,9 @@
+++ +    [has_native_backend=yes; arch=amd64; system=netbsd],
+++    [x86_64-*-openbsd*],
+++ -    [arch=amd64; system=openbsd],
+++--dnl [x86_64-*-haiku*],
+++--dnl   [arch=amd64; system=beos],
+++ +    [has_native_backend=yes; arch=amd64; system=openbsd],
+++-+  [x86_64-*-haiku*],
+++-+    [arch=amd64; system=beos],
++++   [x86_64-*-haiku*],
++++     [arch=amd64; system=beos],
+++    [arm64-*-darwin*],
+++ -    [arch=arm64; system=macosx],
+++ +    [has_native_backend=yes; arch=arm64; system=macosx],
+++@@ -169,19 +58,11 @@
+++ +    [has_native_backend=yes; arch=arm64; system=openbsd],
+++    [aarch64-*-netbsd*],
+++ -    [arch=arm64; system=netbsd],
+++--dnl [x86_64-*-cygwin*],
+++--dnl   [arch=amd64; system=cygwin],
+++--dnl [riscv64-*-linux*],
+++--dnl   [arch=riscv; model=riscv64; system=linux]
+++ +    [has_native_backend=yes; arch=arm64; system=netbsd],
+++-+  [x86_64-*-cygwin*],
+++-+    [arch=amd64; system=cygwin],
+++-+  [riscv64-*-linux*],
+++-+    [arch=riscv; model=riscv64; system=linux]
+++- )
+++- 
+++- AS_CASE([$ccomptype],
+++-@@ -1292,13 +1293,13 @@ AS_CASE([$ccomptype],
++++   [x86_64-*-cygwin*],
++++     [arch=amd64; system=cygwin],
++++   [riscv64-*-linux*],
++++@@ -1304,13 +1305,13 @@ AS_CASE([$ccomptype],
+++      [runtime_asm_objects=${arch}nt.${OBJEXT}],
+++    [runtime_asm_objects=${arch}.${OBJEXT}])
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -13150,10 +13371,10 @@ index 0000000000..767417df45
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 1f909da0a4..1d2c16b7c4 100755
++index 84269da187..ad6cafcc0e 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 1c4df95651..0d6d3fed54 100644
++index 62838e07e6..963603e1f7 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13239,160 +13460,7 @@ index 0000000000..767417df45
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1194,67 +1206,67 @@ model=default
-+ system=unknown
-+ 
-+ AS_CASE([$host],
-+-dnl [[i[3456]86-*-linux*]],
-+-dnl   [arch=i386; system=linux_elf],
-+-dnl [[i[3456]86-*-*bsd*]],
-+-dnl   [arch=i386; system=bsd_elf],
-+-dnl [[i[3456]86-*-haiku*]],
-+-dnl   [arch=i386; system=beos],
-+-dnl [[i[3456]86-*-cygwin]],
-+-dnl   [arch=i386; system=cygwin],
-+-dnl [[i[3456]86-*-gnu*]],
-+-dnl   [arch=i386; system=gnu],
-+-dnl [[i[3456]86-*-mingw32]],
-+-dnl   [arch=i386; system=mingw],
-+-dnl [i686-pc-windows],
-+-dnl   [arch=i386; system=win32],
-+-dnl [x86_64-pc-windows],
-+-dnl   [arch=amd64; system=win64],
-+-dnl [[powerpc64le*-*-linux*]],
-+-dnl   [arch=power; model=ppc64le; system=elf],
-+-dnl [[powerpc*-*-linux*]],
-+-dnl   [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-+-dnl [[s390x*-*-linux*]],
-+-dnl   [arch=s390x; model=z10; system=elf],
-+-dnl # expected to match "gnueabihf" as well as "musleabihf"
-+-dnl [armv6*-*-linux-*eabihf],
-+-dnl   [arch=arm; model=armv6; system=linux_eabihf],
-+-dnl [armv7*-*-linux-*eabihf],
-+-dnl   [arch=arm; model=armv7; system=linux_eabihf],
-+-dnl [armv8*-*-linux-*eabihf],
-+-dnl   [arch=arm; model=armv8; system=linux_eabihf],
-+-dnl [armv8*-*-linux-*eabi],
-+-dnl   [arch=arm; model=armv8; system=linux_eabi],
-+-dnl [armv7*-*-linux-*eabi],
-+-dnl   [arch=arm; model=armv7; system=linux_eabi],
-+-dnl [armv6t2*-*-linux-*eabi],
-+-dnl   [arch=arm; model=armv6t2; system=linux_eabi],
-+-dnl [armv6*-*-linux-*eabi],
-+-dnl   [arch=arm; model=armv6; system=linux_eabi],
-+-dnl [armv6*-*-freebsd*],
-+-dnl   [arch=arm; model=armv6; system=freebsd],
-+-dnl [earmv6*-*-netbsd*],
-+-dnl   [arch=arm; model=armv6; system=netbsd],
-+-dnl [earmv7*-*-netbsd*],
-+-dnl   [arch=arm; model=armv7; system=netbsd],
-+-dnl [armv5te*-*-linux-*eabi],
-+-dnl   [arch=arm; model=armv5te; system=linux_eabi],
-+-dnl [armv5*-*-linux-*eabi],
-+-dnl   [arch=arm; model=armv5; system=linux_eabi],
-+-dnl [arm*-*-linux-*eabihf],
-+-dnl   [arch=arm; system=linux_eabihf],
-+-dnl [arm*-*-linux-*eabi],
-+-dnl   [arch=arm; system=linux_eabi],
-+-dnl [arm*-*-openbsd*],
-+-dnl   [arch=arm; system=bsd],
-+-dnl [zaurus*-*-openbsd*],
-+-dnl   [arch=arm; system=bsd],
-++  [[i[3456]86-*-linux*]],
-++    [arch=i386; system=linux_elf],
-++  [[i[3456]86-*-*bsd*]],
-++    [arch=i386; system=bsd_elf],
-++  [[i[3456]86-*-haiku*]],
-++    [arch=i386; system=beos],
-++  [[i[3456]86-*-cygwin]],
-++    [arch=i386; system=cygwin],
-++  [[i[3456]86-*-gnu*]],
-++    [arch=i386; system=gnu],
-++  [[i[3456]86-*-mingw32]],
-++    [arch=i386; system=mingw],
-++  [i686-pc-windows],
-++    [arch=i386; system=win32],
-++  [x86_64-pc-windows],
-++    [arch=amd64; system=win64],
-++  [[powerpc64le*-*-linux*]],
-++    [arch=power; model=ppc64le; system=elf],
-++  [[powerpc*-*-linux*]],
-++    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-++  [[s390x*-*-linux*]],
-++    [arch=s390x; model=z10; system=elf],
-++  # expected to match "gnueabihf" as well as "musleabihf"
-++  [armv6*-*-linux-*eabihf],
-++    [arch=arm; model=armv6; system=linux_eabihf],
-++  [armv7*-*-linux-*eabihf],
-++    [arch=arm; model=armv7; system=linux_eabihf],
-++  [armv8*-*-linux-*eabihf],
-++    [arch=arm; model=armv8; system=linux_eabihf],
-++  [armv8*-*-linux-*eabi],
-++    [arch=arm; model=armv8; system=linux_eabi],
-++  [armv7*-*-linux-*eabi],
-++    [arch=arm; model=armv7; system=linux_eabi],
-++  [armv6t2*-*-linux-*eabi],
-++    [arch=arm; model=armv6t2; system=linux_eabi],
-++  [armv6*-*-linux-*eabi],
-++    [arch=arm; model=armv6; system=linux_eabi],
-++  [armv6*-*-freebsd*],
-++    [arch=arm; model=armv6; system=freebsd],
-++  [earmv6*-*-netbsd*],
-++    [arch=arm; model=armv6; system=netbsd],
-++  [earmv7*-*-netbsd*],
-++    [arch=arm; model=armv7; system=netbsd],
-++  [armv5te*-*-linux-*eabi],
-++    [arch=arm; model=armv5te; system=linux_eabi],
-++  [armv5*-*-linux-*eabi],
-++    [arch=arm; model=armv5; system=linux_eabi],
-++  [arm*-*-linux-*eabihf],
-++    [arch=arm; system=linux_eabihf],
-++  [arm*-*-linux-*eabi],
-++    [arch=arm; system=linux_eabi],
-++  [arm*-*-openbsd*],
-++    [arch=arm; system=bsd],
-++  [zaurus*-*-openbsd*],
-++    [arch=arm; system=bsd],
-+   [x86_64-*-linux*],
-+     [arch=amd64; system=linux],
-+-dnl [x86_64-*-gnu*],
-+-dnl   [arch=amd64; system=gnu],
-+-dnl [x86_64-*-dragonfly*],
-+-dnl   [arch=amd64; system=dragonfly],
-++  [x86_64-*-gnu*],
-++    [arch=amd64; system=gnu],
-++  [x86_64-*-dragonfly*],
-++    [arch=amd64; system=dragonfly],
-+   [x86_64-*-solaris*],
-+     [arch=amd64; system=solaris],
-+   [x86_64-*-freebsd*],
-+@@ -1263,8 +1275,8 @@ dnl   [arch=amd64; system=dragonfly],
-+     [arch=amd64; system=netbsd],
-+   [x86_64-*-openbsd*],
-+     [arch=amd64; system=openbsd],
-+-dnl [x86_64-*-haiku*],
-+-dnl   [arch=amd64; system=beos],
-++  [x86_64-*-haiku*],
-++    [arch=amd64; system=beos],
-+   [arm64-*-darwin*],
-+     [arch=arm64; system=macosx],
-+   [aarch64-*-darwin*],
-+@@ -1281,10 +1293,10 @@ dnl   [arch=amd64; system=beos],
-+     [arch=arm64; system=openbsd],
-+   [aarch64-*-netbsd*],
-+     [arch=arm64; system=netbsd],
-+-dnl [x86_64-*-cygwin*],
-+-dnl   [arch=amd64; system=cygwin],
-+-dnl [riscv64-*-linux*],
-+-dnl   [arch=riscv; model=riscv64; system=linux]
-++  [x86_64-*-cygwin*],
-++    [arch=amd64; system=cygwin],
-++  [riscv64-*-linux*],
-++    [arch=riscv; model=riscv64; system=linux]
-+ )
-+ 
-+ AS_CASE([$ccomptype],
-+@@ -1980,11 +1992,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1981,11 +1993,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13417,7 +13485,7 @@ index 0000000000..767417df45
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2035,6 +2059,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2036,6 +2060,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13448,7 +13516,7 @@ index 0000000000..767417df45
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2182,8 +2230,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2183,8 +2231,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -19925,7 +19993,91 @@ index 0000000000..767417df45
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/t
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index cdeaf1b674..832812925d 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-gen
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
