@@ -185,6 +185,7 @@ again:
 #endif
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  caml_gc_message(0x1000, "mmap %ld bytes at %p for heaps\n", alloc_sz, mem);
 #endif
   if (mem == MAP_FAILED) {
     return 0;
@@ -221,11 +222,13 @@ again:
      we can't use those directly as Cygwin's memory accounting would then be
      unaware of the OCaml heaps (and vfork will fail) */
   if ((uintnat)mem != aligned_start) {
+    caml_gc_message(0x1000, "munmap %ld bytes at %p for heaps\n", alloc_sz, mem);
     munmap(mem, alloc_sz);
     mem = mmap((void*)aligned_start,
                alloc_sz,
                reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
                MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+    caml_gc_message(0x1000, "mmap %ld bytes at %p for heaps\n", alloc_sz, mem);
     if (mem == MAP_FAILED) {
       if (errno == EINVAL) {
         /* Raced - try again. */
@@ -238,7 +241,11 @@ again:
   }
 #else
   aligned_end = aligned_start + caml_mem_round_up_pages(size);
+  caml_gc_message(0x1000, "munmap %ld bytes at %p for heaps\n",
+                          aligned_start - base, (void*)base);
   munmap((void*)base, aligned_start - base);
+  caml_gc_message(0x1000, "munmap %ld bytes at %p for heaps\n",
+                          (base + alloc_sz) - aligned_end, (void*)aligned_end);
   munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
 #endif
 #ifdef DEBUG
@@ -251,8 +258,12 @@ again:
 static void* map_fixed(void* mem, uintnat size, int prot)
 {
 #ifdef __CYGWIN__
+  caml_gc_message(0x1000, "mprotect set to %d for %ld bytes at %p for heaps\n",
+                          prot, size, mem);
   if (mprotect(mem, size, prot) != 0) {
 #else
+  caml_gc_message(0x1000, "mmap set to %d for %ld bytes at %p for heaps\n",
+                          prot, size, mem);
   if (mmap(mem, size, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
            -1, 0) == MAP_FAILED) {
 #endif
@@ -303,6 +314,7 @@ void caml_mem_unmap(void* mem, uintnat size)
   if (!VirtualFree(mem, 0, MEM_RELEASE))
     CAMLassert(0);
 #else
+  caml_gc_message(0x1000, "munmap %ld bytes at %p for heaps\n", size, mem);
   if (munmap(mem, size) != 0)
     CAMLassert(0);
 #endif
