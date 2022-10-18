@@ -1,0 +1,74 @@
+--- a	2023-09-28 18:45:54.240970975 +0100
++++ b	2023-09-28 18:45:54.248971281 +0100
+@@ -11,7 +11,7 @@
+  AC_SUBST([mksharedlibrpath])
+  AC_SUBST([install_bytecode_programs])
+  AC_SUBST([install_source_artifacts])
+-@@ -782,12 +783,8 @@ AS_IF([test x"$enable_shared" = "xno"],
++@@ -794,12 +795,8 @@ AS_IF([test x"$enable_shared" = "xno"],
+      [AC_MSG_ERROR([Cannot build native Win32 with --disable-shared])])],
+    [supports_shared_libraries=true])
+  
+@@ -25,7 +25,7 @@
+  AS_CASE([$host],
+    [i686-*-cygwin],
+      [flexdll_chain='cygwin'
+-@@ -887,8 +884,10 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++@@ -899,8 +896,10 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+  
+  mkexe_cmd_exp="$CC"
+  
+@@ -38,7 +38,7 @@
+  
+  AS_CASE([$cc_basename,$host],
+    [*,x86_64-*-darwin*],
+-@@ -901,10 +900,7 @@ AS_CASE([$cc_basename,$host],
++@@ -913,10 +912,7 @@ AS_CASE([$cc_basename,$host],
+      [common_cppflags="$common_cppflags -U_WIN32"
+      AS_IF([$supports_shared_libraries],
+        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+@@ -50,7 +50,7 @@
+        mkexe_cflags=''
+        mkexe_ldflags_prefix='-link '],
+        [mkexe_extra_flags=''
+-@@ -917,10 +913,7 @@ AS_CASE([$cc_basename,$host],
++@@ -929,10 +925,7 @@ AS_CASE([$cc_basename,$host],
+      ostype="Win32"
+      toolchain="mingw"
+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+@@ -62,7 +62,7 @@
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '
+      oc_exe_ldflags='-municode'
+-@@ -930,10 +923,7 @@ AS_CASE([$cc_basename,$host],
++@@ -942,10 +935,7 @@ AS_CASE([$cc_basename,$host],
+      [toolchain=msvc
+      ostype="Win32"
+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+@@ -74,7 +74,7 @@
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '
+      mkexe_via_cc_ldflags_prefix='/link '
+-@@ -1070,9 +1060,9 @@ rpath=''
++@@ -1082,9 +1072,9 @@ rpath=''
+  mksharedlibrpath=''
+  natdynlinkopts=""
+  
+@@ -86,7 +86,7 @@
+      [x86_64-apple-darwin*],
+        [mkdll_flags=\
+  '-shared -undefined dynamic_lookup -Wl,-no_compact_unwind -Wl,-w'
+-@@ -1080,20 +1070,12 @@ AS_IF([test x"$enable_shared" != "xno"],
++@@ -1092,20 +1082,12 @@ AS_IF([test x"$enable_shared" != "xno"],
+      [aarch64-apple-darwin*|arm64-apple-darwin*],
+        [mkdll_flags='-shared -undefined dynamic_lookup -Wl,-w'
+        supports_shared_libraries=true],
+@@ -113,7 +113,7 @@
+      [powerpc-ibm-aix*],
+        [AS_CASE([$ocaml_cv_cc_vendor],
+                 [xlc*],
+-@@ -1120,14 +1102,15 @@ AS_IF([test x"$enable_shared" != "xno"],
++@@ -1132,14 +1114,15 @@ AS_IF([test x"$enable_shared" != "xno"],
+        rpath="-Wl,-rpath,"
+        mksharedlibrpath="-Wl,-rpath,"
+        natdynlinkopts="-Wl,-E"
