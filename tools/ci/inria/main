@@ -250,6 +250,8 @@ fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
+grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
+
 if $bootstrap; then
   $make $jobs --warn-undefined-variables core
   $make $jobs --warn-undefined-variables coreboot
