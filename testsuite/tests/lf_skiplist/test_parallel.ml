@@ -23,7 +23,7 @@ let () =
   clean_skiplist 0;
   init_skiplist ();
   assert (cardinal_skiplist() = 0) ;
-  let nturns = 128 and npar = 4 and nseq = 4 in
+  let nturns = 128 and npar = 2 and nseq = 4 in
   assert (nturns < 1024); (* See calc_key in stubs.c *)
   (* Fill skip list and then empty it *)
   for k = 1 to nseq do
