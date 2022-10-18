@@ -256,7 +256,7 @@ fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
-grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
+grep -q '^ARCH=none' Makefile.config && make_native=false
 
 if $init_submodule; then
   $make $jobs --warn-undefined-variables flexdll
