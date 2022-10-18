@@ -1,31 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c04ae329a4
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,22 @@
-+--- a	2023-09-28 18:45:52.060887441 +0100
-++++ b	2023-09-28 18:45:52.076888054 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -682,6 +682,10 @@ OCaml 5.0
-++@@ -677,6 +677,10 @@ OCaml 5.0
-+  - #11587: Prevent integer comparison from being used on pointers
-+    (Vincent Laviron, review by Gabriel Scherer)
-+  
-+@@ -9,8 +9,8 @@
-+ +  mismatch error involving recursive types.
-+ +  (Florian Angeletti, review by Gabriel Scherer)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
-+  
-+ diff --git a/testsuite/tests/typing-modules/inclusion_errors.ml b/testsuite/tests/typing-modules/inclusion_errors.ml
-+ --- a/testsuite/tests/typing-modules/inclusion_errors.ml
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -39,10 +14,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 1e945b4057..e667db4d97 100644
+index d10d26afb0..226cabc9e3 100644
 --- a/Changes
 +++ b/Changes
-@@ -666,11 +666,6 @@ OCaml 5.0
+@@ -668,11 +668,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -54,7 +29,7 @@ index 1e945b4057..e667db4d97 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -686,6 +681,26 @@ OCaml 5.0
+@@ -688,6 +683,26 @@ OCaml 5.0
    mismatch error involving recursive types.
    (Florian Angeletti, review by Gabriel Scherer)
  
@@ -81,7 +56,7 @@ index 1e945b4057..e667db4d97 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -721,13 +736,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -723,13 +738,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -97,7 +72,7 @@ index 1e945b4057..e667db4d97 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -831,6 +846,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -833,6 +848,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -107,7 +82,7 @@ index 1e945b4057..e667db4d97 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1090,6 +1108,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1092,6 +1110,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3730,10 +3705,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..b3412f8bb4
+index 0000000000..c43abc17a9
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2436 @@
+@@ -0,0 +1,2449 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -6011,6 +5986,19 @@ index 0000000000..b3412f8bb4
 ++#define toupper_os(x) toupper((unsigned char)x)
 + #define printf_os printf
 + #endif
++ 
++diff --git a/runtime/stacks.c b/runtime/stacks.c
++index 611b05018e..a1409b2abd 100644
++--- a/runtime/stacks.c
+++++ b/runtime/stacks.c
++@@ -24,7 +24,7 @@
++ #include "caml/mlvalues.h"
++ #include "caml/stacks.h"
++ 
++-value caml_global_data = Val_unit; /* must be a valid value (#11768) */
+++value caml_global_data = 0;
++ 
++ uintnat caml_max_stack_size;            /* also used in gc_ctrl.c */
 + 
 +diff --git a/runtime/sys.c b/runtime/sys.c
 +index a77fd9d1cf..9508d3f903 100644
@@ -10030,38 +10018,13 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..61362f2b7c
+index 0000000000..767417df45
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10024 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c04ae329a4
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,22 @@
-++--- a	2023-09-28 18:45:52.060887441 +0100
-+++++ b	2023-09-28 18:45:52.076888054 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -682,6 +682,10 @@ OCaml 5.0
-+++@@ -677,6 +677,10 @@ OCaml 5.0
-++  - #11587: Prevent integer comparison from being used on pointers
-++    (Vincent Laviron, review by Gabriel Scherer)
-++  
-++@@ -9,8 +9,8 @@
-++ +  mismatch error involving recursive types.
-++ +  (Florian Angeletti, review by Gabriel Scherer)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
-++  
-++ diff --git a/testsuite/tests/typing-modules/inclusion_errors.ml b/testsuite/tests/typing-modules/inclusion_errors.ml
-++ --- a/testsuite/tests/typing-modules/inclusion_errors.ml
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10075,10 +10038,10 @@ index 0000000000..61362f2b7c
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 1e945b4057..e667db4d97 100644
++index d10d26afb0..226cabc9e3 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -666,11 +666,6 @@ OCaml 5.0
++@@ -668,11 +668,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10090,7 +10053,7 @@ index 0000000000..61362f2b7c
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -686,6 +681,26 @@ OCaml 5.0
++@@ -688,6 +683,26 @@ OCaml 5.0
 +   mismatch error involving recursive types.
 +   (Florian Angeletti, review by Gabriel Scherer)
 + 
@@ -10117,7 +10080,7 @@ index 0000000000..61362f2b7c
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -721,13 +736,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -723,13 +738,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10133,7 +10096,7 @@ index 0000000000..61362f2b7c
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -831,6 +846,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -833,6 +848,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10143,7 +10106,7 @@ index 0000000000..61362f2b7c
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1090,6 +1108,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1092,6 +1110,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13766,10 +13729,10 @@ index 0000000000..61362f2b7c
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..b3412f8bb4
++index 0000000000..c43abc17a9
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2436 @@
++@@ -0,0 +1,2449 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -16047,6 +16010,19 @@ index 0000000000..61362f2b7c
 +++#define toupper_os(x) toupper((unsigned char)x)
 ++ #define printf_os printf
 ++ #endif
+++ 
+++diff --git a/runtime/stacks.c b/runtime/stacks.c
+++index 611b05018e..a1409b2abd 100644
+++--- a/runtime/stacks.c
++++++ b/runtime/stacks.c
+++@@ -24,7 +24,7 @@
+++ #include "caml/mlvalues.h"
+++ #include "caml/stacks.h"
+++ 
+++-value caml_global_data = Val_unit; /* must be a valid value (#11768) */
++++value caml_global_data = 0;
+++ 
+++ uintnat caml_max_stack_size;            /* also used in gc_ctrl.c */
 ++ 
 ++diff --git a/runtime/sys.c b/runtime/sys.c
 ++index a77fd9d1cf..9508d3f903 100644
@@ -19949,115 +19925,7 @@ index 0000000000..61362f2b7c
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index cdeaf1b674..832812925d 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -152,10 +152,13 @@ case "$1" in
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -175,7 +178,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/t
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21717,10 +21585,10 @@ index b13de05fd6..504233667c 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index ac469c7de8..6d39cd543a 100644
+index d6e9b7f52c..6c8cf55871 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
-@@ -267,7 +267,8 @@ GNUISH_SED = \
+@@ -247,7 +247,8 @@ GNUISH_SED = \
  .INTERMEDIATE: .depend.tmp
  
  .depend.tmp:
