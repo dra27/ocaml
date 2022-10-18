@@ -1195,6 +1195,7 @@ arch=none
 model=default
 system=unknown
 
+has_native_backend=no
 AS_CASE([$host],
   [[i[3456]86-*-linux*]],
     [arch=i386; system=linux_elf],
@@ -1252,37 +1253,65 @@ AS_CASE([$host],
   [zaurus*-*-openbsd*],
     [arch=arm; system=bsd],
   [x86_64-*-linux*],
+<<<<<<< HEAD
     [arch=amd64; system=linux],
+||||||| parent of 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
+    [arch=amd64; system=linux],
+dnl [x86_64-*-gnu*],
+dnl   [arch=amd64; system=gnu],
+dnl [x86_64-*-dragonfly*],
+dnl   [arch=amd64; system=dragonfly],
+=======
+    [has_native_backend=yes; arch=amd64; system=linux],
+>>>>>>> 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
   [x86_64-*-gnu*],
     [arch=amd64; system=gnu],
   [x86_64-*-dragonfly*],
     [arch=amd64; system=dragonfly],
   [x86_64-*-solaris*],
-    [arch=amd64; system=solaris],
+    [has_native_backend=yes; arch=amd64; system=solaris],
   [x86_64-*-freebsd*],
-    [arch=amd64; system=freebsd],
+    [has_native_backend=yes; arch=amd64; system=freebsd],
   [x86_64-*-netbsd*],
-    [arch=amd64; system=netbsd],
+    [has_native_backend=yes; arch=amd64; system=netbsd],
   [x86_64-*-openbsd*],
+<<<<<<< HEAD
     [arch=amd64; system=openbsd],
+||||||| parent of 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
+    [arch=amd64; system=openbsd],
+dnl [x86_64-*-haiku*],
+dnl   [arch=amd64; system=beos],
+=======
+    [has_native_backend=yes; arch=amd64; system=openbsd],
+>>>>>>> 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
   [x86_64-*-haiku*],
     [arch=amd64; system=beos],
   [arm64-*-darwin*],
-    [arch=arm64; system=macosx],
+    [has_native_backend=yes; arch=arm64; system=macosx],
   [aarch64-*-darwin*],
-    [arch=arm64; system=macosx],
+    [has_native_backend=yes; arch=arm64; system=macosx],
   [x86_64-*-darwin*],
-    [arch=amd64; system=macosx],
+    [has_native_backend=yes; arch=amd64; system=macosx],
   [x86_64-*-mingw32],
-    [arch=amd64; system=mingw64],
+    [has_native_backend=yes; arch=amd64; system=mingw64],
   [aarch64-*-linux*],
-    [arch=arm64; system=linux],
+    [has_native_backend=yes; arch=arm64; system=linux],
   [aarch64-*-freebsd*],
-    [arch=arm64; system=freebsd],
+    [has_native_backend=yes; arch=arm64; system=freebsd],
   [aarch64-*-openbsd*],
-    [arch=arm64; system=openbsd],
+    [has_native_backend=yes; arch=arm64; system=openbsd],
   [aarch64-*-netbsd*],
+<<<<<<< HEAD
     [arch=arm64; system=netbsd],
+||||||| parent of 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
+    [arch=arm64; system=netbsd],
+dnl [x86_64-*-cygwin*],
+dnl   [arch=amd64; system=cygwin],
+dnl [riscv64-*-linux*],
+dnl   [arch=riscv; model=riscv64; system=linux]
+=======
+    [has_native_backend=yes; arch=arm64; system=netbsd],
+>>>>>>> 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
   [x86_64-*-cygwin*],
     [arch=amd64; system=cygwin],
   [riscv64-*-linux*],
@@ -1294,13 +1323,13 @@ AS_CASE([$ccomptype],
     [runtime_asm_objects=${arch}nt.${OBJEXT}],
   [runtime_asm_objects=${arch}.${OBJEXT}])
 
-AS_CASE([$enable_native_compiler,$arch],
+AS_CASE([$enable_native_compiler,$has_native_backend],
   [no,*],
     [native_compiler=false
     AC_MSG_NOTICE([the native compiler is disabled])],
-  [yes,none],
+  [yes,no],
     [AC_MSG_ERROR([the native compiler is not supported on this platform], 69)],
-  [*,none],
+  [*,no],
     [native_compiler=false
     AC_MSG_NOTICE([the native compiler is not supported on this platform])],
   [*,*],
