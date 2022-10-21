@@ -3126,10 +3126,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 452e9995ed..f2165db02d 100755
+index da143e16c8..d95ca411ee 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 2f7a17063a..991b858a6a 100644
+index c9306afb80..96da3f6966 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -9977,7 +9977,7 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6e36714e29
+index 0000000000..1f8c5f9a69
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,9876 @@
@@ -13109,10 +13109,10 @@ index 0000000000..6e36714e29
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 452e9995ed..f2165db02d 100755
++index da143e16c8..d95ca411ee 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 2f7a17063a..991b858a6a 100644
++index c9306afb80..96da3f6966 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
