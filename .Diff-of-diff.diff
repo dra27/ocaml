@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:45:57.949112827 +0100
++++ b	2023-09-28 18:45:57.969113592 +0100
+@@ -441,7 +441,7 @@
+ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
+ --- a/otherlibs/unix/unixsupport.h
+ +++ b/otherlibs/unix/unixsupport.h
+-@@ -87,6 +87,12 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
++@@ -96,6 +96,12 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
+                                  BOOL inherit);
+  
+  extern void caml_win32_maperr(DWORD errcode);

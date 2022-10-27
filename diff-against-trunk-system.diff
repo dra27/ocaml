@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..09306495ae
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:45:57.949112827 +0100
+++++ b	2023-09-28 18:45:57.969113592 +0100
++@@ -441,7 +441,7 @@
++ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
++ --- a/otherlibs/unix/unixsupport.h
++ +++ b/otherlibs/unix/unixsupport.h
++-@@ -87,6 +87,12 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
+++@@ -96,6 +96,12 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
++                                  BOOL inherit);
++  
++  extern void caml_win32_maperr(DWORD errcode);
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index b12bd67890..bed25f1a08 100644
+index 3f7cacc36e..2b6a0c1479 100644
 --- a/Changes
 +++ b/Changes
-@@ -681,11 +681,6 @@ OCaml 5.0
+@@ -689,11 +689,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +43,7 @@ index b12bd67890..bed25f1a08 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -701,6 +696,26 @@ OCaml 5.0
+@@ -709,6 +704,26 @@ OCaml 5.0
    mismatch error involving recursive types.
    (Florian Angeletti, review by Gabriel Scherer)
  
@@ -56,7 +70,7 @@ index b12bd67890..bed25f1a08 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -736,13 +751,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -744,13 +759,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -72,7 +86,7 @@ index b12bd67890..bed25f1a08 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -846,6 +861,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -854,6 +869,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10786: The implementation of Complex.norm now uses Float.hypot.
    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
@@ -82,7 +96,7 @@ index b12bd67890..bed25f1a08 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1105,6 +1123,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1113,6 +1131,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9977,13 +9991,27 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..34ce58ab11
+index 0000000000..9b0fbe27ae
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9878 @@
+@@ -0,0 +1,9876 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..09306495ae
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:45:57.949112827 +0100
++++++ b	2023-09-28 18:45:57.969113592 +0100
+++@@ -441,7 +441,7 @@
+++ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
+++ --- a/otherlibs/unix/unixsupport.h
+++ +++ b/otherlibs/unix/unixsupport.h
+++-@@ -87,6 +87,12 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
++++@@ -96,6 +96,12 @@ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
+++                                  BOOL inherit);
+++  
+++  extern void caml_win32_maperr(DWORD errcode);
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -9997,10 +10025,10 @@ index 0000000000..34ce58ab11
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index b12bd67890..bed25f1a08 100644
++index 3f7cacc36e..2b6a0c1479 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -681,11 +681,6 @@ OCaml 5.0
++@@ -689,11 +689,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10012,7 +10040,7 @@ index 0000000000..34ce58ab11
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -701,6 +696,26 @@ OCaml 5.0
++@@ -709,6 +704,26 @@ OCaml 5.0
 +   mismatch error involving recursive types.
 +   (Florian Angeletti, review by Gabriel Scherer)
 + 
@@ -10039,7 +10067,7 @@ index 0000000000..34ce58ab11
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -736,13 +751,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -744,13 +759,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10055,7 +10083,7 @@ index 0000000000..34ce58ab11
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -846,6 +861,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -854,6 +869,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10786: The implementation of Complex.norm now uses Float.hypot.
 +   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
@@ -10065,7 +10093,7 @@ index 0000000000..34ce58ab11
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1105,6 +1123,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1113,6 +1131,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -19842,23 +19870,7 @@ index 0000000000..34ce58ab11
 +++ *)
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite
+++  * are unreliable except the bad value checks and as a
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21272,7 +21284,7 @@ index b9cc32040e..7f83d8b537 100644
  }
  
 diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
-index 7c5e051cd7..d432197cce 100644
+index 2d9f95d8a3..77054318ba 100644
 --- a/otherlibs/unix/unixsupport.h
 +++ b/otherlibs/unix/unixsupport.h
 @@ -46,7 +46,11 @@ struct filedescr {
@@ -21307,7 +21319,7 @@ index 7c5e051cd7..d432197cce 100644
  
  extern SOCKET caml_win32_socket(int domain, int type, int protocol,
                                  LPWSAPROTOCOL_INFO info,
-@@ -164,4 +173,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
+@@ -170,4 +179,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
  #define EXECV_CAST
  #endif
  
