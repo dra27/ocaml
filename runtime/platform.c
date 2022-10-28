@@ -137,7 +137,7 @@ static uintnat round_up(uintnat size, uintnat align) {
   return (size + align - 1) & ~(align - 1);
 }
 
-long caml_sys_pagesize = 0;
+intnat caml_sys_pagesize = 0;
 
 uintnat caml_mem_round_up_pages(uintnat size)
 {
@@ -188,7 +188,7 @@ again:
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
-  caml_gc_message(0x1000, "mmap %" ARCH_INT64_PRINTF_FORMAT "d"
+  caml_gc_message(0x1000, "mmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n", alloc_sz, mem);
   if (mem == MAP_FAILED) {
     return 0;
@@ -242,10 +242,13 @@ again:
   }
   CAMLassert(mem == (void*)aligned_start);
 #else
-  caml_gc_message(0x1000, "munmap %" ARCH_INT64_PRINTF_FORMAT "d"
+  caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n",
                           aligned_start - base, (void*)base);
   munmap((void*)base, aligned_start - base);
+  caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
+                          " bytes at %p for heaps\n",
+                          (base + alloc_sz) - aligned_end, (void*)aligned_end);
   munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
 #endif
 #ifdef DEBUG
@@ -274,7 +277,7 @@ static void* map_fixed(void* mem, uintnat size, int prot)
 void* caml_mem_commit(void* mem, uintnat size)
 {
   CAML_ASSERT_SIZE_IS_PAGE_ALIGNED(size);
-  caml_gc_message(0x1000, "commit %" ARCH_INT64_PRINTF_FORMAT "d"
+  caml_gc_message(0x1000, "commit %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n", size, mem);
 #ifdef _WIN32
   return VirtualAlloc(mem, size, MEM_COMMIT, PAGE_READWRITE);
@@ -294,7 +297,7 @@ void* caml_mem_commit(void* mem, uintnat size)
 
 void caml_mem_decommit(void* mem, uintnat size)
 {
-  caml_gc_message(0x1000, "decommit %" ARCH_INT64_PRINTF_FORMAT "d"
+  caml_gc_message(0x1000, "decommit %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n", size, mem);
 #ifdef _WIN32
   /* VirtualFree can't decommit zero bytes */
@@ -312,7 +315,7 @@ void caml_mem_unmap(void* mem, uintnat size)
   CAMLassert(caml_lf_skiplist_find(&mmap_blocks, (uintnat)mem, &data) != 0);
   CAMLassert(data == size);
 #endif
-  caml_gc_message(0x1000, "munmap %" ARCH_INT64_PRINTF_FORMAT "d"
+  caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n", size, mem);
 #ifdef _WIN32
   if (!VirtualFree(mem, 0, MEM_RELEASE))
