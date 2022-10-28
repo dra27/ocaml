@@ -144,8 +144,7 @@ uintnat caml_mem_round_up_pages(uintnat size)
   return round_up(size, caml_sys_pagesize);
 }
 
-#define CAML_ASSERT_SIZE_IS_PAGE_ALIGNED(size) \
-  CAMLassert((size & (caml_sys_pagesize - 1)) == 0)
+#define Is_page_aligned(size) ((size & (caml_sys_pagesize - 1)) == 0)
 
 #ifdef _WIN32
 #define MAP_FAILED 0
@@ -158,13 +157,12 @@ static struct lf_skiplist mmap_blocks = {NULL};
 void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
   CAMLassert(Is_power_of_2(alignment));
+  CAMLassert(Is_page_aligned(size));
   alignment = caml_mem_round_up_pages(alignment);
 
   uintnat alloc_sz = size + alignment;
   void* mem;
   uintnat base, aligned_start, aligned_end;
-
-  CAML_ASSERT_SIZE_IS_PAGE_ALIGNED(size);
 
 #ifdef DEBUG
   if (mmap_blocks.head == NULL) {
@@ -276,7 +274,7 @@ static void* map_fixed(void* mem, uintnat size, int prot)
 
 void* caml_mem_commit(void* mem, uintnat size)
 {
-  CAML_ASSERT_SIZE_IS_PAGE_ALIGNED(size);
+  CAMLassert(Is_page_aligned(size));
   caml_gc_message(0x1000, "commit %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n", size, mem);
 #ifdef _WIN32
