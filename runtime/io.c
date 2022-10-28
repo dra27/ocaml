@@ -56,7 +56,7 @@
 
 /* Hooks for locking channels */
 
-static __thread struct channel* last_channel_locked = NULL;
+static __declspec(thread) struct channel* last_channel_locked = NULL;
 
 static void channel_mutex_free_default(struct channel *chan)
 {
