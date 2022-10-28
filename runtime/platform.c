@@ -160,9 +160,13 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
   CAMLassert(Is_page_aligned(size));
   alignment = caml_mem_round_up_pages(alignment);
 
+#ifdef MMAP_ALIGNS_TO_PAGESIZE
+  uintnat alloc_sz = size;
+#else
   uintnat alloc_sz = size + alignment;
-  void* mem;
   uintnat base, aligned_start, aligned_end;
+#endif
+  void* mem;
 
 #ifdef DEBUG
   if (mmap_blocks.head == NULL) {
@@ -173,16 +177,14 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
   }
 #endif
 
-  CAMLassert (alloc_sz > size);
 #ifdef _WIN32
-  /* Memory is only reserved at this point. It'll be committed after the
-     trim. */
-again:
-  mem = VirtualAlloc(NULL, alloc_sz, MEM_RESERVE, PAGE_NOACCESS);
+  /* caml_sys_pagesize has been engineered to be the granularity of
+     VirtualAlloc, so trimming will be unnecessary. */
+  mem =
+    VirtualAlloc(NULL, alloc_sz,
+                 MEM_RESERVE | (reserve_only ? 0 : MEM_COMMIT),
+                 reserve_only ? PAGE_NOACCESS : PAGE_READWRITE);
 #else
-#ifdef __CYGWIN__
-again:
-#endif
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
@@ -192,68 +194,27 @@ again:
     return 0;
   }
 
+#ifndef MMAP_ALIGNS_TO_PAGESIZE
   /* trim to an aligned region */
   base = (uintnat)mem;
   aligned_start = round_up(base, alignment);
   aligned_end = aligned_start + size;
-#ifdef _WIN32
-  /* VirtualFree can be used to decommit portions of memory, but it can only
-     release the entire block of memory. For Windows, repeat the call but this
-     time specify the address. */
-  VirtualFree(mem, 0, MEM_RELEASE);
-  caml_gc_message(0x1000, "munmap %lld bytes at %p for heaps\n", alloc_sz, mem);
-  mem = VirtualAlloc((void*)aligned_start,
-                     aligned_end - aligned_start,
-                     MEM_RESERVE | (reserve_only ? 0 : MEM_COMMIT),
-                     reserve_only ? PAGE_NOACCESS : PAGE_READWRITE);
-  if (mem == NULL) {
-    /* VirtualAlloc can return the following three interesting errors:
-         - ERROR_INVALID_ADDRESS - pages are already reserved (race)
-         - ERROR_NOT_ENOUGH_MEMORY - address space exhausted
-         - ERROR_COMMITMENT_LIMIT - memory exhausted */
-    if (GetLastError() == ERROR_INVALID_ADDRESS) {
-      SetLastError(0);
-      /* Raced - try again. */
-      goto again;
-    } else {
-      return 0;
-    }
-  }
-  caml_gc_message(0x1000, "mmap %lld bytes at %p for heaps\n", alloc_sz, mem);
-  CAMLassert(mem == (void*)aligned_start);
-#elif defined(__CYGWIN__)
-  /* Cygwin's mmap functions are ultimately backed by the Windows functions, but
-     we can't use those directly as Cygwin's memory accounting would then be
-     unaware of the OCaml heaps (and vfork will fail) */
-  munmap(mem, alloc_sz);
-  mem = mmap((void*)aligned_start,
-             aligned_end - aligned_start,
-             reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
-             MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-  if (mem == MAP_FAILED) {
-    if (errno == EINVAL) {
-      /* Raced - try again. */
-      goto again;
-    } else {
-      return 0;
-    }
-  }
-  CAMLassert(mem == (void*)aligned_start);
-#else
   caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n",
                           aligned_start - base, (void*)base);
-  munmap((void*)base, aligned_start - base);
+  munmap(mem, aligned_start - base);
   caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
                           " bytes at %p for heaps\n",
                           (base + alloc_sz) - aligned_end, (void*)aligned_end);
   munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
+  mem = (void*)aligned_start;
 #endif
+
 #ifdef DEBUG
-  caml_lf_skiplist_insert(&mmap_blocks,
-                          aligned_start, aligned_end - aligned_start);
+  caml_lf_skiplist_insert(&mmap_blocks, (uintnat)mem, size);
 #endif
-  return (void*)aligned_start;
+
+  return mem;
 }
 
 #ifndef _WIN32
