@@ -188,11 +188,13 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
-  caml_gc_message(0x1000, "mmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
-                          " bytes at %p for heaps\n", alloc_sz, mem);
   if (mem == MAP_FAILED) {
+    caml_gc_message(0x1000, "mmap %" ARCH_INTNAT_PRINTF_FORMAT "d bytes failed",
+                            alloc_sz);
     return 0;
   }
+  caml_gc_message(0x1000, "mmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
+                          " bytes at %p for heaps\n", alloc_sz, mem);
 
 #ifndef MMAP_ALIGNS_TO_PAGESIZE
   /* trim to an aligned region */
