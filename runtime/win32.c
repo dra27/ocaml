@@ -1113,3 +1113,32 @@ int64_t caml_time_counter(void)
   QueryPerformanceCounter(&now);
   return (int64_t)(now.QuadPart * clock_period);
 }
+
+void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
+{
+  /* caml_sys_pagesize has been engineered to be the granularity of
+     VirtualAlloc, so trimming will be unnecessary. VirtualAlloc
+     returns 0 on error. */
+  return
+    VirtualAlloc(NULL, size,
+                 MEM_RESERVE | (reserve_only ? 0 : MEM_COMMIT),
+                 reserve_only ? PAGE_NOACCESS : PAGE_READWRITE);
+}
+
+void* caml_plat_mem_commit(void* mem, uintnat size)
+{
+  return VirtualAlloc(mem, size, MEM_COMMIT, PAGE_READWRITE);
+}
+
+void caml_plat_mem_decommit(void* mem, uintnat size)
+{
+  /* VirtualFree can't decommit zero bytes */
+  if (size)
+    VirtualFree(mem, size, MEM_DECOMMIT);
+}
+
+void caml_plat_mem_unmap(void* mem, uintnat size)
+{
+  if (!VirtualFree(mem, 0, MEM_RELEASE))
+    CAMLassert(0);
+}

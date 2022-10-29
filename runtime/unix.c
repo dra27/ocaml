@@ -56,6 +56,9 @@
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
+#ifdef HAS_SYS_MMAN_H
+#include <sys/mman.h>
+#endif
 #include "caml/fail.h"
 #include "caml/memory.h"
 #include "caml/misc.h"
@@ -477,4 +480,77 @@ void caml_init_os_params(void)
 {
   caml_sys_pagesize = sysconf(_SC_PAGESIZE);
   return;
+}
+
+void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
+{
+#ifdef __CYGWIN__
+  uintnat alloc_sz = size;
+#else
+  uintnat alloc_sz = size + alignment;
+  uintnat base, aligned_start, aligned_end;
+#endif
+  void* mem;
+
+  mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
+             MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (mem == MAP_FAILED)
+    return 0;
+
+#ifndef __CYGWIN__
+  /* trim to an aligned region */
+  base = (uintnat)mem;
+  aligned_start = (base + alignment - 1) & ~(alignment - 1);
+  aligned_end = aligned_start + size;
+  caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
+                          " bytes at %p for heaps\n",
+                          aligned_start - base, (void*)base);
+  munmap(mem, aligned_start - base);
+  caml_gc_message(0x1000, "munmap %" ARCH_INTNAT_PRINTF_FORMAT "d"
+                          " bytes at %p for heaps\n",
+                          (base + alloc_sz) - aligned_end, (void*)aligned_end);
+  munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
+  mem = (void*)aligned_start;
+#endif
+
+  return mem;
+}
+
+static void* map_fixed(void* mem, uintnat size, int prot)
+{
+#ifdef __CYGWIN__
+  if (mprotect(mem, size, prot) != 0) {
+#else
+  if (mmap(mem, size, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
+           -1, 0) == MAP_FAILED) {
+#endif
+    return 0;
+  } else {
+    return mem;
+  }
+}
+
+void* caml_plat_mem_commit(void* mem, uintnat size)
+{
+  void* p = map_fixed(mem, size, PROT_READ | PROT_WRITE);
+  /*
+    FIXME: On Linux, with overcommit, you stand a better
+    chance of getting good error messages in OOM conditions
+    by forcing the kernel to allocate actual memory by touching
+    all the pages. Not sure whether this is a good idea, though.
+
+      if (p) memset(p, 0, size);
+  */
+  return p;
+}
+
+void caml_plat_mem_decommit(void* mem, uintnat size)
+{
+  map_fixed(mem, size, PROT_NONE);
+}
+
+void caml_plat_mem_unmap(void* mem, uintnat size)
+{
+  if (munmap(mem, size) != 0)
+    CAMLassert(0);
 }
