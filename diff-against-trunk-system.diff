@@ -1,6 +1,31 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1bac4ddf77
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,22 @@
++--- a	2023-09-28 18:45:59.113157295 +0100
+++++ b	2023-09-28 18:45:59.133158059 +0100
++@@ -1,16 +1,16 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -858,6 +858,9 @@ OCaml 4.14.0 (28 March 2022)
+++@@ -873,6 +873,9 @@ OCaml 4.14.0 (28 March 2022)
++  - #10786: The implementation of Complex.norm now uses Float.hypot.
++    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
++  
++ +- #10464: Add List.is_empty.
++ +  (Craig Ferguson, review by David Allsopp)
++ +
++- ### Other libraries:
+++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
+++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
++  
++- - #10192: Add support for Unix domain sockets on Windows and use them
++ diff --git a/stdlib/list.ml b/stdlib/list.ml
++ --- a/stdlib/list.ml
++ +++ b/stdlib/list.ml
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -14,7 +39,7 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 24fc60f544..6e1e32d70f 100644
+index 05cdc7991b..162937e777 100644
 --- a/Changes
 +++ b/Changes
 @@ -693,11 +693,6 @@ OCaml 5.0
@@ -72,9 +97,9 @@ index 24fc60f544..6e1e32d70f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -858,6 +873,9 @@ OCaml 4.14.0 (28 March 2022)
- - #10786: The implementation of Complex.norm now uses Float.hypot.
-   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+@@ -861,6 +876,9 @@ OCaml 4.14.0 (28 March 2022)
+ - #10464: Add List.is_empty.
+   (Craig Ferguson, review by David Allsopp)
  
 +* #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
 +  (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
@@ -82,7 +107,7 @@ index 24fc60f544..6e1e32d70f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1117,6 +1135,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1120,6 +1138,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -9993,13 +10018,38 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..17d2f3dc31
+index 0000000000..4e7347e775
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9881 @@
+@@ -0,0 +1,10005 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1bac4ddf77
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,22 @@
+++--- a	2023-09-28 18:45:59.113157295 +0100
++++++ b	2023-09-28 18:45:59.133158059 +0100
+++@@ -1,16 +1,16 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -858,6 +858,9 @@ OCaml 4.14.0 (28 March 2022)
++++@@ -873,6 +873,9 @@ OCaml 4.14.0 (28 March 2022)
+++  - #10786: The implementation of Complex.norm now uses Float.hypot.
+++    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+++  
+++ +- #10464: Add List.is_empty.
+++ +  (Craig Ferguson, review by David Allsopp)
+++ +
+++- ### Other libraries:
++++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
++++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
+++  
+++- - #10192: Add support for Unix domain sockets on Windows and use them
+++ diff --git a/stdlib/list.ml b/stdlib/list.ml
+++ --- a/stdlib/list.ml
+++ +++ b/stdlib/list.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10013,7 +10063,7 @@ index 0000000000..17d2f3dc31
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 24fc60f544..6e1e32d70f 100644
++index 05cdc7991b..162937e777 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -693,11 +693,6 @@ OCaml 5.0
@@ -10071,9 +10121,9 @@ index 0000000000..17d2f3dc31
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -858,6 +873,9 @@ OCaml 4.14.0 (28 March 2022)
-+ - #10786: The implementation of Complex.norm now uses Float.hypot.
-+   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
++@@ -861,6 +876,9 @@ OCaml 4.14.0 (28 March 2022)
++ - #10464: Add List.is_empty.
++   (Craig Ferguson, review by David Allsopp)
 + 
 ++* #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
 ++  (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
@@ -10081,7 +10131,7 @@ index 0000000000..17d2f3dc31
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1117,6 +1135,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1120,6 +1138,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -19877,7 +19927,106 @@ index 0000000000..17d2f3dc31
 ++  * are unreliable except the bad value checks and as a check for catastrophic
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++index 666a55efeb..5a36157e0e 100644
-++--- a/
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index cdeaf1b674..832812925d 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -152,10 +152,13 @@ case "$1" in
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
