@@ -1,22 +1,128 @@
---- a	2023-09-28 18:45:59.113157295 +0100
-+++ b	2023-09-28 18:45:59.133158059 +0100
-@@ -1,16 +1,16 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -858,6 +858,9 @@ OCaml 4.14.0 (28 March 2022)
-+@@ -873,6 +873,9 @@ OCaml 4.14.0 (28 March 2022)
-  - #10786: The implementation of Complex.norm now uses Float.hypot.
-    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+--- a	2023-09-28 18:45:59.477171194 +0100
++++ b	2023-09-28 18:45:59.501172110 +0100
+@@ -1685,7 +1685,7 @@
   
- +- #10464: Add List.is_empty.
- +  (Craig Ferguson, review by David Allsopp)
- +
-- ### Other libraries:
-+ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
-+   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
+  (** {1:formatter Defining formatters}
   
-- - #10192: Add support for Unix domain sockets on Windows and use them
- diff --git a/stdlib/list.ml b/stdlib/list.ml
- --- a/stdlib/list.ml
- +++ b/stdlib/list.ml
+-@@ -1058,7 +1058,7 @@ val formatter_of_out_functions :
++@@ -1061,7 +1061,7 @@ val formatter_of_out_functions :
+    See definition of type {!formatter_out_functions} for the meaning of argument
+    [out_funs].
+  
+@@ -1694,7 +1694,7 @@
+  *)
+  
+  
+-@@ -1095,34 +1095,34 @@ type symbolic_output_item =
++@@ -1098,34 +1098,34 @@ type symbolic_output_item =
+    | Output_indent of int
+    (** [Output_indent i]: symbolic indentation of size [i] *)
+  (** Items produced by symbolic pretty-printers
+@@ -1734,7 +1734,7 @@
+  *)
+  
+  val flush_symbolic_output_buffer :
+-@@ -1133,21 +1133,21 @@ val flush_symbolic_output_buffer :
++@@ -1136,21 +1136,21 @@ val flush_symbolic_output_buffer :
+    [let items = get_symbolic_output_buffer sob in
+     clear_symbolic_output_buffer sob; items]
+  
+@@ -1759,7 +1759,7 @@
+  *)
+  
+  (** {1 Convenience formatting functions.} *)
+-@@ -1160,7 +1160,7 @@ val pp_print_iter :
++@@ -1163,7 +1163,7 @@ val pp_print_iter :
+    [iter] over a collection [v] of values using [pp_v]. Iterations are
+    separated by [pp_sep] (defaults to {!pp_print_cut}).
+  
+@@ -1768,7 +1768,7 @@
+  *)
+  
+  val pp_print_list:
+-@@ -1171,7 +1171,7 @@ val pp_print_list:
++@@ -1174,7 +1174,7 @@ val pp_print_list:
+    between items ([pp_sep] defaults to {!pp_print_cut}).
+    Does nothing on empty lists.
+  
+@@ -1777,7 +1777,7 @@
+  *)
+  
+  val pp_print_array:
+-@@ -1186,7 +1186,7 @@ val pp_print_array:
++@@ -1189,7 +1189,7 @@ val pp_print_array:
+    may not be what is expected because [Format] can delay the printing.
+    This can be avoided by flushing [ppf].
+  
+@@ -1786,7 +1786,7 @@
+  *)
+  
+  val pp_print_seq:
+-@@ -1206,7 +1206,7 @@ val pp_print_text : formatter -> string -> unit
++@@ -1209,7 +1209,7 @@ val pp_print_text : formatter -> string -> unit
+  (** [pp_print_text ppf s] prints [s] with spaces and newlines respectively
+    printed using {!pp_print_space} and {!pp_force_newline}.
+  
+@@ -1795,7 +1795,7 @@
+  *)
+  
+  val pp_print_option :
+-@@ -1364,7 +1364,7 @@ val asprintf : ('a, formatter, unit, string) format4 -> 'a
++@@ -1367,7 +1367,7 @@ val asprintf : ('a, formatter, unit, string) format4 -> 'a
+    The type of [asprintf] is general enough to interact nicely with [%a]
+    conversions.
+  
+@@ -1804,7 +1804,7 @@
+  *)
+  
+  val dprintf :
+-@@ -1386,7 +1386,7 @@ val dprintf :
++@@ -1389,7 +1389,7 @@ val dprintf :
+    Format.printf "@[<v>%t@]" t
+  ]}
+  
+@@ -1813,7 +1813,7 @@
+  *)
+  
+  
+-@@ -1394,7 +1394,7 @@ val ifprintf : formatter -> ('a, formatter, unit) format -> 'a
++@@ -1397,7 +1397,7 @@ val ifprintf : formatter -> ('a, formatter, unit) format -> 'a
+  (** Same as [fprintf] above, but does not print anything.
+    Useful to ignore some material when conditionally printing.
+  
+@@ -1822,7 +1822,7 @@
+  *)
+  
+  (** Formatted Pretty-Printing with continuations. *)
+-@@ -1411,7 +1411,7 @@ val kdprintf :
++@@ -1414,7 +1414,7 @@ val kdprintf :
+  (** Same as {!dprintf} above, but instead of returning immediately,
+    passes the suspended printer to its first argument at the end of printing.
+  
+@@ -1831,7 +1831,7 @@
+  *)
+  
+  val ikfprintf :
+-@@ -1420,7 +1420,7 @@ val ikfprintf :
++@@ -1423,7 +1423,7 @@ val ikfprintf :
+  (** Same as [kfprintf] above, but does not print anything.
+    Useful to ignore some material when conditionally printing.
+  
+@@ -3202,7 +3202,7 @@
+ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
+ --- a/stdlib/obj.mli
+ +++ b/stdlib/obj.mli
+-@@ -70,9 +70,9 @@ external set_raw_field : t -> int -> raw_data -> unit
++@@ -72,9 +72,9 @@ external set_raw_field : t -> int -> raw_data -> unit
+  external new_block : int -> int -> t = "caml_obj_block"
+  external dup : t -> t = "caml_obj_dup"
+  external add_offset : t -> Int32.t -> t = "caml_obj_add_offset"
+@@ -3214,7 +3214,7 @@
+  
+  val first_non_constant_constructor_tag : int
+  val last_non_constant_constructor_tag : int
+-@@ -93,7 +93,7 @@ val custom_tag : int
++@@ -95,7 +95,7 @@ val custom_tag : int
+  
+  val int_tag : int
+  val out_of_heap_tag : int
