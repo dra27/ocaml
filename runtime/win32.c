@@ -1118,7 +1118,9 @@ void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
   /* VirtualAlloc returns an address aligned to caml_plat_mmap_granularity, so
      trimming will not be required. VirtualAlloc returns 0 on error. */
-  CAMLassert(alignment <= caml_plat_mmap_granularity);
+  if (alignment > caml_plat_mmap_granularity)
+    caml_fatal_error("Cannot align memory to %" ARCH_INTNAT_PRINTF_FORMAT "x"
+                     " on this platform", alignment);
   return
     VirtualAlloc(NULL, size,
                  MEM_RESERVE | (reserve_only ? 0 : MEM_COMMIT),

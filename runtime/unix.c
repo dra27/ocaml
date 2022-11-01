@@ -538,7 +538,8 @@ void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
   uintnat alloc_sz = size;
   void* mem;
 
-  CAMLassert(alignment <= caml_plat_mmap_granularity);
+  if (alignment > caml_plat_mmap_granularity)
+    caml_fatal_error("Cannot align memory to %lx on this platform", alignment);
 
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
