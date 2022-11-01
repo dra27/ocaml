@@ -478,7 +478,7 @@ int caml_num_rows_fd(int fd)
 
 void caml_init_os_params(void)
 {
-  caml_sys_pagesize = sysconf(_SC_PAGESIZE);
+  caml_plat_mmap_granularity = sysconf(_SC_PAGESIZE);
   return;
 }
 

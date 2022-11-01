@@ -1099,7 +1099,7 @@ void caml_init_os_params(void)
      page size and granularity. This simplifies caml_mem_map, since we can
      guarantee that trimming will not be required. */
   CAMLassert(si.dwAllocationGranularity >= si.dwPageSize);
-  caml_sys_pagesize = si.dwAllocationGranularity;
+  caml_plat_mmap_granularity = si.dwAllocationGranularity;
 
   /* Get the number of nanoseconds for each tick in QueryPerformanceCounter */
   QueryPerformanceFrequency(&frequency);
@@ -1116,9 +1116,8 @@ int64_t caml_time_counter(void)
 
 void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
-  /* caml_sys_pagesize has been engineered to be the granularity of
-     VirtualAlloc, so trimming will be unnecessary. VirtualAlloc
-     returns 0 on error. */
+  /* VirtualAlloc returns an address aligned to caml_plat_mmap_granularity, so
+     trimming will not be required. VirtualAlloc returns 0 on error. */
   return
     VirtualAlloc(NULL, size,
                  MEM_RESERVE | (reserve_only ? 0 : MEM_COMMIT),
