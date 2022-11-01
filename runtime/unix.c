@@ -482,14 +482,15 @@ void caml_init_os_params(void)
   return;
 }
 
+#ifndef __CYGWIN__
+
+/* Standard Unix implementation: reserve with mmap (and trim to alignment) with
+   commit done using mmap as well. */
+
 void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
-#ifdef __CYGWIN__
-  uintnat alloc_sz = size;
-#else
   uintnat alloc_sz = size + alignment;
   uintnat base, aligned_start, aligned_end;
-#endif
   void* mem;
 
   mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
@@ -497,7 +498,6 @@ void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
   if (mem == MAP_FAILED)
     return 0;
 
-#ifndef __CYGWIN__
   /* trim to an aligned region */
   base = (uintnat)mem;
   aligned_start = (base + alignment - 1) & ~(alignment - 1);
@@ -511,24 +511,51 @@ void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
                           (base + alloc_sz) - aligned_end, (void*)aligned_end);
   munmap((void*)aligned_end, (base + alloc_sz) - aligned_end);
   mem = (void*)aligned_start;
-#endif
 
   return mem;
 }
 
 static void* map_fixed(void* mem, uintnat size, int prot)
 {
-#ifdef __CYGWIN__
-  if (mprotect(mem, size, prot) != 0) {
-#else
   if (mmap(mem, size, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
            -1, 0) == MAP_FAILED) {
-#endif
     return 0;
   } else {
     return mem;
   }
 }
+
+#else
+
+/* Cygwin implementation: memory reserved using mmap, but relying on the large
+   allocation granularity of the underlying Windows VirtualAlloc call to ensure
+   alignment (since on Windows it is not possible to trim the region). Commit
+   done using mprotect, since Cygwin's mmap doesn't implement the required
+   functions for committing using mmap. */
+
+void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
+{
+  uintnat alloc_sz = size;
+  void* mem;
+
+  mem = mmap(0, alloc_sz, reserve_only ? PROT_NONE : (PROT_READ | PROT_WRITE),
+             MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (mem == MAP_FAILED)
+    return 0;
+
+  return mem;
+}
+
+static void* map_fixed(void* mem, uintnat size, int prot)
+{
+  if (mprotect(mem, size, prot) != 0) {
+    return 0;
+  } else {
+    return mem;
+  }
+}
+
+#endif /* !__CYGWIN__ */
 
 void* caml_plat_mem_commit(void* mem, uintnat size)
 {
