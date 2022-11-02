@@ -138,15 +138,15 @@ static uintnat round_up(uintnat size, uintnat align) {
   return (size + align - 1) & ~(align - 1);
 }
 
-intnat caml_sys_pagesize = 0;
-intnat caml_sys_mmap_alignment = 0;
+intnat caml_plat_pagesize = 0;
+intnat caml_plat_mmap_alignment = 0;
 
 uintnat caml_mem_round_up_pages(uintnat size)
 {
-  return round_up(size, caml_sys_pagesize);
+  return round_up(size, caml_plat_pagesize);
 }
 
-#define Is_page_aligned(size) ((size & (caml_sys_pagesize - 1)) == 0)
+#define Is_page_aligned(size) ((size & (caml_plat_pagesize - 1)) == 0)
 
 #ifdef DEBUG
 static struct lf_skiplist mmap_blocks = {NULL};
@@ -156,7 +156,7 @@ void* caml_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
   CAMLassert(Is_power_of_2(alignment));
   CAMLassert(Is_page_aligned(size));
-  alignment = round_up(alignment, caml_sys_mmap_alignment);
+  alignment = round_up(alignment, caml_plat_mmap_alignment);
 
 #ifdef DEBUG
   if (mmap_blocks.head == NULL) {

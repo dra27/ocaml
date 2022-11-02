@@ -1094,8 +1094,8 @@ void caml_init_os_params(void)
   /* Get the system page size and allocation granularity. */
   GetSystemInfo(&si);
   CAMLassert(si.dwAllocationGranularity >= si.dwPageSize);
-  caml_sys_pagesize = si.dwPageSize;
-  caml_sys_mmap_alignment = si.dwAllocationGranularity;
+  caml_plat_pagesize = si.dwPageSize;
+  caml_plat_mmap_alignment = si.dwAllocationGranularity;
 
   /* Get the number of nanoseconds for each tick in QueryPerformanceCounter */
   QueryPerformanceFrequency(&frequency);
@@ -1112,9 +1112,9 @@ int64_t caml_time_counter(void)
 
 void *caml_plat_mem_map(uintnat size, uintnat alignment, int reserve_only)
 {
-  /* VirtualAlloc returns an address aligned to caml_sys_mmap_alignment, so
+  /* VirtualAlloc returns an address aligned to caml_plat_mmap_alignment, so
      trimming will not be required. VirtualAlloc returns 0 on error. */
-  if (alignment > caml_sys_mmap_alignment)
+  if (alignment > caml_plat_mmap_alignment)
     caml_fatal_error("Cannot align memory to %" ARCH_INTNAT_PRINTF_FORMAT "x"
                      " on this platform", alignment);
   return
