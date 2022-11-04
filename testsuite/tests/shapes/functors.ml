@@ -28,12 +28,28 @@ end
 [%%expect{|
 {
  "Finclude"[module] ->
+<<<<<<< HEAD
      Abs<.6>
         (X/279,
          {
           "t"[type] -> X/279<.5> . "t"[type];
           "x"[value] -> X/279<.5> . "x"[value];
           });
+||||||| parent of 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
+     Abs<.6>
+        (X/284,
+         {
+          "t"[type] -> X/284<.5> . "t"[type];
+          "x"[value] -> X/284<.5> . "x"[value];
+          });
+=======
+   Abs<.6>
+      (X/284,
+       {
+        "t"[type] -> X/284<.5> . "t"[type];
+        "x"[value] -> X/284<.5> . "x"[value];
+        });
+>>>>>>> 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -45,10 +61,22 @@ end
 [%%expect{|
 {
  "Fredef"[module] ->
+<<<<<<< HEAD
      Abs<.10>(X/286, {
                       "t"[type] -> <.8>;
                       "x"[value] -> <.9>;
                       });
+||||||| parent of 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
+     Abs<.10>(X/291, {
+                      "t"[type] -> <.8>;
+                      "x"[value] -> <.9>;
+                      });
+=======
+   Abs<.10>(X/291, {
+                    "t"[type] -> <.8>;
+                    "x"[value] -> <.9>;
+                    });
+>>>>>>> 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
  }
 module Fredef : functor (X : S) -> sig type t = X.t val x : X.t end
 |}]
@@ -60,10 +88,10 @@ end
 [%%expect{|
 {
  "Fignore"[module] ->
-     Abs<.14>(()/1, {
-                     "t"[type] -> <.11>;
-                     "x"[value] -> <.13>;
-                     });
+   Abs<.14>(()/1, {
+                   "t"[type] -> <.11>;
+                   "x"[value] -> <.13>;
+                   });
  }
 module Fignore : S -> sig type t = Fresh val x : t end
 |}]
@@ -223,9 +251,19 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 [%%expect{|
 {
  "Big_to_small1"[module] ->
+<<<<<<< HEAD
      Abs<.40>(X/381, {<.39>
                       "t"[type] -> X/381<.39> . "t"[type];
                       });
+||||||| parent of 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
+     Abs<.40>(X/386, {<.39>
+                      "t"[type] -> X/386<.39> . "t"[type];
+                      });
+=======
+   Abs<.40>(X/386, {<.39>
+                    "t"[type] -> X/386<.39> . "t"[type];
+                    });
+>>>>>>> 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
  }
 module Big_to_small1 : B2S
 |}]
@@ -234,9 +272,19 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 [%%expect{|
 {
  "Big_to_small2"[module] ->
+<<<<<<< HEAD
      Abs<.42>(X/384, {
                       "t"[type] -> X/384<.41> . "t"[type];
                       });
+||||||| parent of 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
+     Abs<.42>(X/389, {
+                      "t"[type] -> X/389<.41> . "t"[type];
+                      });
+=======
+   Abs<.42>(X/389, {
+                    "t"[type] -> X/389<.41> . "t"[type];
+                    });
+>>>>>>> 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
  }
 module Big_to_small2 : B2S
 |}]

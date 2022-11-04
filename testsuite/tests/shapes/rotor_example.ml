@@ -25,11 +25,24 @@ end
 [%%expect{|
 {
  "Pair"[module] ->
+<<<<<<< HEAD
      Abs<.9>
         (X/275, Abs(Y/276, {
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));
+||||||| parent of 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
+     Abs<.9>
+        (X/280, Abs(Y/281, {
+                            "t"[type] -> <.5>;
+                            "to_string"[value] -> <.6>;
+                            }));
+=======
+   Abs<.9>(X/280, Y/281, {
+                          "t"[type] -> <.5>;
+                          "to_string"[value] -> <.6>;
+                          });
+>>>>>>> 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
  }
 module Pair :
   functor (X : Stringable) (Y : Stringable) ->

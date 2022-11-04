@@ -80,6 +80,7 @@ end = Set.Make(A)
                  "t"[type] -> <.35>;
                  };
  "ASet"[module] ->
+<<<<<<< HEAD
      {
       "compare"[value] ->
           CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
@@ -90,6 +91,28 @@ end = Set.Make(A)
       "t"[type] ->
           CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
       };
+||||||| parent of 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
+     {
+      "compare"[value] ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+          "compare"[value];
+      "elt"[type] ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+          "elt"[type];
+      "t"[type] ->
+          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+      };
+=======
+   {
+    "compare"[value] ->
+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+      "compare"[value];
+    "elt"[type] ->
+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
+    "t"[type] ->
+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+    };
+>>>>>>> 10d1045244 (Merge pull request PR#11697 from gasche/shape-pprint)
  }
 module rec A :
   sig
