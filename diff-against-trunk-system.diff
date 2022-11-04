@@ -1,6 +1,123 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..8e492c0bd4
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,114 @@
++--- a	2023-09-28 18:46:01.985266892 +0100
+++++ b	2023-09-28 18:46:01.993267197 +0100
++@@ -59,16 +59,16 @@
++  {
++   "Finclude"[module] ->
++ -     Abs<.6>
++--        (X/284,
+++-        (X/279,
++ -         {
++--          "t"[type] -> X/284<.5> . "t"[type];
++--          "x"[value] -> X/284<.5> . "x"[value];
+++-          "t"[type] -> X/279<.5> . "t"[type];
+++-          "x"[value] -> X/279<.5> . "x"[value];
++ -          });
++ +   Abs<.6>
++-+      (X/284,
++++      (X/279,
++ +       {
++-+        "t"[type] -> X/284<.5> . "t"[type];
++-+        "x"[value] -> X/284<.5> . "x"[value];
++++        "t"[type] -> X/279<.5> . "t"[type];
++++        "x"[value] -> X/279<.5> . "x"[value];
++ +        });
++   }
++  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
++@@ -77,11 +77,11 @@
++  [%%expect{|
++  {
++   "Fredef"[module] ->
++--     Abs<.10>(X/291, {
+++-     Abs<.10>(X/286, {
++ -                      "t"[type] -> <.8>;
++ -                      "x"[value] -> <.9>;
++ -                      });
++-+   Abs<.10>(X/291, {
++++   Abs<.10>(X/286, {
++ +                    "t"[type] -> <.8>;
++ +                    "x"[value] -> <.9>;
++ +                    });
++@@ -107,11 +107,11 @@
++  [%%expect{|
++  {
++   "Big_to_small1"[module] ->
++--     Abs<.40>(X/386, {<.39>
++--                      "t"[type] -> X/386<.39> . "t"[type];
+++-     Abs<.40>(X/381, {<.39>
+++-                      "t"[type] -> X/381<.39> . "t"[type];
++ -                      });
++-+   Abs<.40>(X/386, {<.39>
++-+                    "t"[type] -> X/386<.39> . "t"[type];
++++   Abs<.40>(X/381, {<.39>
++++                    "t"[type] -> X/381<.39> . "t"[type];
++ +                    });
++   }
++  module Big_to_small1 : B2S
++@@ -120,11 +120,11 @@
++  [%%expect{|
++  {
++   "Big_to_small2"[module] ->
++--     Abs<.42>(X/389, {
++--                      "t"[type] -> X/389<.41> . "t"[type];
+++-     Abs<.42>(X/384, {
+++-                      "t"[type] -> X/384<.41> . "t"[type];
++ -                      });
++-+   Abs<.42>(X/389, {
++-+                    "t"[type] -> X/389<.41> . "t"[type];
++++   Abs<.42>(X/384, {
++++                    "t"[type] -> X/384<.41> . "t"[type];
++ +                    });
++   }
++  module Big_to_small2 : B2S
++@@ -138,22 +138,22 @@
++   "ASet"[module] ->
++ -     {
++ -      "compare"[value] ->
++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
++ -          "compare"[value];
++ -      "elt"[type] ->
++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
++ -          "elt"[type];
++ -      "t"[type] ->
++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
++ -      };
++ +   {
++ +    "compare"[value] ->
++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
++ +      "compare"[value];
++ +    "elt"[type] ->
++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
++ +    "t"[type] ->
++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
++ +    };
++   }
++  module rec A :
++@@ -166,11 +166,11 @@
++  {
++   "Pair"[module] ->
++ -     Abs<.9>
++--        (X/280, Abs(Y/281, {
+++-        (X/275, Abs(Y/276, {
++ -                            "t"[type] -> <.5>;
++ -                            "to_string"[value] -> <.6>;
++ -                            }));
++-+   Abs<.9>(X/280, Y/281, {
++++   Abs<.9>(X/275, Y/276, {
++ +                          "t"[type] -> <.5>;
++ +                          "to_string"[value] -> <.6>;
++ +                          });
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -10059,13 +10176,130 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..adcaf46321
+index 0000000000..9f902db247
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10002 @@
+@@ -0,0 +1,10126 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..8e492c0bd4
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,114 @@
+++--- a	2023-09-28 18:46:01.985266892 +0100
++++++ b	2023-09-28 18:46:01.993267197 +0100
+++@@ -59,16 +59,16 @@
+++  {
+++   "Finclude"[module] ->
+++ -     Abs<.6>
+++--        (X/284,
++++-        (X/279,
+++ -         {
+++--          "t"[type] -> X/284<.5> . "t"[type];
+++--          "x"[value] -> X/284<.5> . "x"[value];
++++-          "t"[type] -> X/279<.5> . "t"[type];
++++-          "x"[value] -> X/279<.5> . "x"[value];
+++ -          });
+++ +   Abs<.6>
+++-+      (X/284,
+++++      (X/279,
+++ +       {
+++-+        "t"[type] -> X/284<.5> . "t"[type];
+++-+        "x"[value] -> X/284<.5> . "x"[value];
+++++        "t"[type] -> X/279<.5> . "t"[type];
+++++        "x"[value] -> X/279<.5> . "x"[value];
+++ +        });
+++   }
+++  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
+++@@ -77,11 +77,11 @@
+++  [%%expect{|
+++  {
+++   "Fredef"[module] ->
+++--     Abs<.10>(X/291, {
++++-     Abs<.10>(X/286, {
+++ -                      "t"[type] -> <.8>;
+++ -                      "x"[value] -> <.9>;
+++ -                      });
+++-+   Abs<.10>(X/291, {
+++++   Abs<.10>(X/286, {
+++ +                    "t"[type] -> <.8>;
+++ +                    "x"[value] -> <.9>;
+++ +                    });
+++@@ -107,11 +107,11 @@
+++  [%%expect{|
+++  {
+++   "Big_to_small1"[module] ->
+++--     Abs<.40>(X/386, {<.39>
+++--                      "t"[type] -> X/386<.39> . "t"[type];
++++-     Abs<.40>(X/381, {<.39>
++++-                      "t"[type] -> X/381<.39> . "t"[type];
+++ -                      });
+++-+   Abs<.40>(X/386, {<.39>
+++-+                    "t"[type] -> X/386<.39> . "t"[type];
+++++   Abs<.40>(X/381, {<.39>
+++++                    "t"[type] -> X/381<.39> . "t"[type];
+++ +                    });
+++   }
+++  module Big_to_small1 : B2S
+++@@ -120,11 +120,11 @@
+++  [%%expect{|
+++  {
+++   "Big_to_small2"[module] ->
+++--     Abs<.42>(X/389, {
+++--                      "t"[type] -> X/389<.41> . "t"[type];
++++-     Abs<.42>(X/384, {
++++-                      "t"[type] -> X/384<.41> . "t"[type];
+++ -                      });
+++-+   Abs<.42>(X/389, {
+++-+                    "t"[type] -> X/389<.41> . "t"[type];
+++++   Abs<.42>(X/384, {
+++++                    "t"[type] -> X/384<.41> . "t"[type];
+++ +                    });
+++   }
+++  module Big_to_small2 : B2S
+++@@ -138,22 +138,22 @@
+++   "ASet"[module] ->
+++ -     {
+++ -      "compare"[value] ->
+++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
++++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
+++ -          "compare"[value];
+++ -      "elt"[type] ->
+++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
++++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
+++ -          "elt"[type];
+++ -      "t"[type] ->
+++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
++++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
+++ -      };
+++ +   {
+++ +    "compare"[value] ->
+++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
+++ +      "compare"[value];
+++ +    "elt"[type] ->
+++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
+++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
+++ +    "t"[type] ->
+++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
+++ +    };
+++   }
+++  module rec A :
+++@@ -166,11 +166,11 @@
+++  {
+++   "Pair"[module] ->
+++ -     Abs<.9>
+++--        (X/280, Abs(Y/281, {
++++-        (X/275, Abs(Y/276, {
+++ -                            "t"[type] -> <.5>;
+++ -                            "to_string"[value] -> <.6>;
+++ -                            }));
+++-+   Abs<.9>(X/280, Y/281, {
+++++   Abs<.9>(X/275, Y/276, {
+++ +                          "t"[type] -> <.5>;
+++ +                          "to_string"[value] -> <.6>;
+++ +                          });
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -20065,6 +20299,13 @@ index 0000000000..adcaf46321
 ++@@ -40,19 +40,7 @@ EOF
 ++     --enable-debug-runtime \
 ++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i3
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
