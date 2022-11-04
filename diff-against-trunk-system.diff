@@ -1,123 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..8e492c0bd4
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,114 @@
-+--- a	2023-09-28 18:46:01.985266892 +0100
-++++ b	2023-09-28 18:46:01.993267197 +0100
-+@@ -59,16 +59,16 @@
-+  {
-+   "Finclude"[module] ->
-+ -     Abs<.6>
-+--        (X/284,
-++-        (X/279,
-+ -         {
-+--          "t"[type] -> X/284<.5> . "t"[type];
-+--          "x"[value] -> X/284<.5> . "x"[value];
-++-          "t"[type] -> X/279<.5> . "t"[type];
-++-          "x"[value] -> X/279<.5> . "x"[value];
-+ -          });
-+ +   Abs<.6>
-+-+      (X/284,
-+++      (X/279,
-+ +       {
-+-+        "t"[type] -> X/284<.5> . "t"[type];
-+-+        "x"[value] -> X/284<.5> . "x"[value];
-+++        "t"[type] -> X/279<.5> . "t"[type];
-+++        "x"[value] -> X/279<.5> . "x"[value];
-+ +        });
-+   }
-+  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
-+@@ -77,11 +77,11 @@
-+  [%%expect{|
-+  {
-+   "Fredef"[module] ->
-+--     Abs<.10>(X/291, {
-++-     Abs<.10>(X/286, {
-+ -                      "t"[type] -> <.8>;
-+ -                      "x"[value] -> <.9>;
-+ -                      });
-+-+   Abs<.10>(X/291, {
-+++   Abs<.10>(X/286, {
-+ +                    "t"[type] -> <.8>;
-+ +                    "x"[value] -> <.9>;
-+ +                    });
-+@@ -107,11 +107,11 @@
-+  [%%expect{|
-+  {
-+   "Big_to_small1"[module] ->
-+--     Abs<.40>(X/386, {<.39>
-+--                      "t"[type] -> X/386<.39> . "t"[type];
-++-     Abs<.40>(X/381, {<.39>
-++-                      "t"[type] -> X/381<.39> . "t"[type];
-+ -                      });
-+-+   Abs<.40>(X/386, {<.39>
-+-+                    "t"[type] -> X/386<.39> . "t"[type];
-+++   Abs<.40>(X/381, {<.39>
-+++                    "t"[type] -> X/381<.39> . "t"[type];
-+ +                    });
-+   }
-+  module Big_to_small1 : B2S
-+@@ -120,11 +120,11 @@
-+  [%%expect{|
-+  {
-+   "Big_to_small2"[module] ->
-+--     Abs<.42>(X/389, {
-+--                      "t"[type] -> X/389<.41> . "t"[type];
-++-     Abs<.42>(X/384, {
-++-                      "t"[type] -> X/384<.41> . "t"[type];
-+ -                      });
-+-+   Abs<.42>(X/389, {
-+-+                    "t"[type] -> X/389<.41> . "t"[type];
-+++   Abs<.42>(X/384, {
-+++                    "t"[type] -> X/384<.41> . "t"[type];
-+ +                    });
-+   }
-+  module Big_to_small2 : B2S
-+@@ -138,22 +138,22 @@
-+   "ASet"[module] ->
-+ -     {
-+ -      "compare"[value] ->
-+--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+ -          "compare"[value];
-+ -      "elt"[type] ->
-+--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+ -          "elt"[type];
-+ -      "t"[type] ->
-+--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-+ -      };
-+ +   {
-+ +    "compare"[value] ->
-+-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+ +      "compare"[value];
-+ +    "elt"[type] ->
-+-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
-+++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
-+ +    "t"[type] ->
-+-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-+++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-+ +    };
-+   }
-+  module rec A :
-+@@ -166,11 +166,11 @@
-+  {
-+   "Pair"[module] ->
-+ -     Abs<.9>
-+--        (X/280, Abs(Y/281, {
-++-        (X/275, Abs(Y/276, {
-+ -                            "t"[type] -> <.5>;
-+ -                            "to_string"[value] -> <.6>;
-+ -                            }));
-+-+   Abs<.9>(X/280, Y/281, {
-+++   Abs<.9>(X/275, Y/276, {
-+ +                          "t"[type] -> <.5>;
-+ +                          "to_string"[value] -> <.6>;
-+ +                          });
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -131,10 +14,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 284ed988e4..006880828a 100644
+index 3c97de8318..1df1b16071 100644
 --- a/Changes
 +++ b/Changes
-@@ -704,11 +704,6 @@ OCaml 5.0
+@@ -708,11 +708,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -146,7 +29,7 @@ index 284ed988e4..006880828a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -724,6 +719,26 @@ OCaml 5.0
+@@ -728,6 +723,26 @@ OCaml 5.0
    mismatch error involving recursive types.
    (Florian Angeletti, review by Gabriel Scherer)
  
@@ -173,7 +56,7 @@ index 284ed988e4..006880828a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -759,13 +774,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -763,13 +778,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -189,7 +72,7 @@ index 284ed988e4..006880828a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -872,6 +887,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -876,6 +891,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -199,7 +82,7 @@ index 284ed988e4..006880828a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1131,6 +1149,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1135,6 +1153,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6318,10 +6201,10 @@ index 0000000000..5f898b6b8d
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..464eb345bc
+index 0000000000..3e2c67fbe4
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3852 @@
+@@ -0,0 +1,3851 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index a42b0dab97..ed1137f668 100644
 +--- a/.github/workflows/build.yml
@@ -9402,7 +9285,7 @@ index 0000000000..464eb345bc
 ++  exec ${program} > ${output}
 ++fi
 +diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-+index 6f88995df3..b302e7c37d 100644
++index 32d7f72b5c..b043beafc6 100644
 +--- a/testsuite/tests/shapes/comp_units.ml
 ++++ b/testsuite/tests/shapes/comp_units.ml
 +@@ -25,7 +25,7 @@ module Mproj = Unit
@@ -9415,7 +9298,7 @@ index 0000000000..464eb345bc
 + module F : functor (X : sig type t end) -> sig type t = X.t end
 + |}]
 +diff --git a/testsuite/tests/shapes/functors.ml b/testsuite/tests/shapes/functors.ml
-+index f55021180a..b2d24fdc96 100644
++index a3d7bfd659..77ead1d555 100644
 +--- a/testsuite/tests/shapes/functors.ml
 ++++ b/testsuite/tests/shapes/functors.ml
 +@@ -17,7 +17,7 @@ module type S = sig type t val x : t end
@@ -9430,46 +9313,46 @@ index 0000000000..464eb345bc
 +@@ -29,10 +29,10 @@ end
 + {
 +  "Finclude"[module] ->
-+      Abs<.6>
-+-        (X/284,
-++        (X/279,
-+          {
-+-          "t"[type] -> X/284<.5> . "t"[type];
-+-          "x"[value] -> X/284<.5> . "x"[value];
-++          "t"[type] -> X/279<.5> . "t"[type];
-++          "x"[value] -> X/279<.5> . "x"[value];
-+           });
++    Abs<.6>
++-      (X/284,
+++      (X/279,
++        {
++-        "t"[type] -> X/284<.5> . "t"[type];
++-        "x"[value] -> X/284<.5> . "x"[value];
+++        "t"[type] -> X/279<.5> . "t"[type];
+++        "x"[value] -> X/279<.5> . "x"[value];
++         });
 +  }
 + module Finclude : functor (X : S) -> sig type t = X.t val x : t end
 +@@ -45,7 +45,7 @@ end
 + [%%expect{|
 + {
 +  "Fredef"[module] ->
-+-     Abs<.10>(X/291, {
-++     Abs<.10>(X/286, {
-+                       "t"[type] -> <.8>;
-+                       "x"[value] -> <.9>;
-+                       });
++-   Abs<.10>(X/291, {
+++   Abs<.10>(X/286, {
++                     "t"[type] -> <.8>;
++                     "x"[value] -> <.9>;
++                     });
 +@@ -223,8 +223,8 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 + [%%expect{|
 + {
 +  "Big_to_small1"[module] ->
-+-     Abs<.40>(X/386, {<.39>
-+-                      "t"[type] -> X/386<.39> . "t"[type];
-++     Abs<.40>(X/381, {<.39>
-++                      "t"[type] -> X/381<.39> . "t"[type];
-+                       });
++-   Abs<.40>(X/386, {<.39>
++-                    "t"[type] -> X/386<.39> . "t"[type];
+++   Abs<.40>(X/381, {<.39>
+++                    "t"[type] -> X/381<.39> . "t"[type];
++                     });
 +  }
 + module Big_to_small1 : B2S
 +@@ -234,8 +234,8 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 + [%%expect{|
 + {
 +  "Big_to_small2"[module] ->
-+-     Abs<.42>(X/389, {
-+-                      "t"[type] -> X/389<.41> . "t"[type];
-++     Abs<.42>(X/384, {
-++                      "t"[type] -> X/384<.41> . "t"[type];
-+                       });
++-   Abs<.42>(X/389, {
++-                    "t"[type] -> X/389<.41> . "t"[type];
+++   Abs<.42>(X/384, {
+++                    "t"[type] -> X/384<.41> . "t"[type];
++                     });
 +  }
 + module Big_to_small2 : B2S
 +diff --git a/testsuite/tests/shapes/open_arg.ml b/testsuite/tests/shapes/open_arg.ml
@@ -9486,7 +9369,7 @@ index 0000000000..464eb345bc
 +  }
 + module Make : functor (I : sig end) -> sig end
 +diff --git a/testsuite/tests/shapes/recmodules.ml b/testsuite/tests/shapes/recmodules.ml
-+index 93fef6012c..126c792ea2 100644
++index 6d9d86fc9a..c2c58ba194 100644
 +--- a/testsuite/tests/shapes/recmodules.ml
 ++++ b/testsuite/tests/shapes/recmodules.ml
 +@@ -43,8 +43,8 @@ and B : sig
@@ -9500,36 +9383,35 @@ index 0000000000..464eb345bc
 +  }
 + module rec A : sig type t = Leaf of B.t end
 + and B : sig type t = int end
-+@@ -82,13 +82,13 @@ end = Set.Make(A)
++@@ -82,12 +82,12 @@ end = Set.Make(A)
 +  "ASet"[module] ->
-+      {
-+       "compare"[value] ->
-+-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+           "compare"[value];
-+       "elt"[type] ->
-+-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-+           "elt"[type];
-+       "t"[type] ->
-+-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-+       };
++    {
++     "compare"[value] ->
++-      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
++       "compare"[value];
++     "elt"[type] ->
++-      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
+++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
++     "t"[type] ->
++-      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
++     };
 +  }
 + module rec A :
 +diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
-+index 521d86d019..e5dc4732b5 100644
++index 182a0a9bc2..53b1fb806a 100644
 +--- a/testsuite/tests/shapes/rotor_example.ml
 ++++ b/testsuite/tests/shapes/rotor_example.ml
-+@@ -26,7 +26,7 @@ end
++@@ -25,7 +25,7 @@ end
++ [%%expect{|
 + {
 +  "Pair"[module] ->
-+      Abs<.9>
-+-        (X/280, Abs(Y/281, {
-++        (X/275, Abs(Y/276, {
-+                             "t"[type] -> <.5>;
-+                             "to_string"[value] -> <.6>;
-+                             }));
++-   Abs<.9>(X/280, Y/281, {
+++   Abs<.9>(X/275, Y/276, {
++                           "t"[type] -> <.5>;
++                           "to_string"[value] -> <.6>;
++                           });
 +diff --git a/testsuite/tests/statmemprof/alloc_counts.ml b/testsuite/tests/statmemprof/alloc_counts.ml
 +index de0d1e9e49..f8cbb5658d 100644
 +--- a/testsuite/tests/statmemprof/alloc_counts.ml
@@ -10176,130 +10058,13 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9f902db247
+index 0000000000..36f9a19894
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10126 @@
+@@ -0,0 +1,10008 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..8e492c0bd4
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,114 @@
-++--- a	2023-09-28 18:46:01.985266892 +0100
-+++++ b	2023-09-28 18:46:01.993267197 +0100
-++@@ -59,16 +59,16 @@
-++  {
-++   "Finclude"[module] ->
-++ -     Abs<.6>
-++--        (X/284,
-+++-        (X/279,
-++ -         {
-++--          "t"[type] -> X/284<.5> . "t"[type];
-++--          "x"[value] -> X/284<.5> . "x"[value];
-+++-          "t"[type] -> X/279<.5> . "t"[type];
-+++-          "x"[value] -> X/279<.5> . "x"[value];
-++ -          });
-++ +   Abs<.6>
-++-+      (X/284,
-++++      (X/279,
-++ +       {
-++-+        "t"[type] -> X/284<.5> . "t"[type];
-++-+        "x"[value] -> X/284<.5> . "x"[value];
-++++        "t"[type] -> X/279<.5> . "t"[type];
-++++        "x"[value] -> X/279<.5> . "x"[value];
-++ +        });
-++   }
-++  module Finclude : functor (X : S) -> sig type t = X.t val x : t end
-++@@ -77,11 +77,11 @@
-++  [%%expect{|
-++  {
-++   "Fredef"[module] ->
-++--     Abs<.10>(X/291, {
-+++-     Abs<.10>(X/286, {
-++ -                      "t"[type] -> <.8>;
-++ -                      "x"[value] -> <.9>;
-++ -                      });
-++-+   Abs<.10>(X/291, {
-++++   Abs<.10>(X/286, {
-++ +                    "t"[type] -> <.8>;
-++ +                    "x"[value] -> <.9>;
-++ +                    });
-++@@ -107,11 +107,11 @@
-++  [%%expect{|
-++  {
-++   "Big_to_small1"[module] ->
-++--     Abs<.40>(X/386, {<.39>
-++--                      "t"[type] -> X/386<.39> . "t"[type];
-+++-     Abs<.40>(X/381, {<.39>
-+++-                      "t"[type] -> X/381<.39> . "t"[type];
-++ -                      });
-++-+   Abs<.40>(X/386, {<.39>
-++-+                    "t"[type] -> X/386<.39> . "t"[type];
-++++   Abs<.40>(X/381, {<.39>
-++++                    "t"[type] -> X/381<.39> . "t"[type];
-++ +                    });
-++   }
-++  module Big_to_small1 : B2S
-++@@ -120,11 +120,11 @@
-++  [%%expect{|
-++  {
-++   "Big_to_small2"[module] ->
-++--     Abs<.42>(X/389, {
-++--                      "t"[type] -> X/389<.41> . "t"[type];
-+++-     Abs<.42>(X/384, {
-+++-                      "t"[type] -> X/384<.41> . "t"[type];
-++ -                      });
-++-+   Abs<.42>(X/389, {
-++-+                    "t"[type] -> X/389<.41> . "t"[type];
-++++   Abs<.42>(X/384, {
-++++                    "t"[type] -> X/384<.41> . "t"[type];
-++ +                    });
-++   }
-++  module Big_to_small2 : B2S
-++@@ -138,22 +138,22 @@
-++   "ASet"[module] ->
-++ -     {
-++ -      "compare"[value] ->
-++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++ -          "compare"[value];
-++ -      "elt"[type] ->
-++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++ -          "elt"[type];
-++ -      "t"[type] ->
-++--          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-+++-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-++ -      };
-++ +   {
-++ +    "compare"[value] ->
-++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++ +      "compare"[value];
-++ +    "elt"[type] ->
-++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
-++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
-++ +    "t"[type] ->
-++-+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-++ +    };
-++   }
-++  module rec A :
-++@@ -166,11 +166,11 @@
-++  {
-++   "Pair"[module] ->
-++ -     Abs<.9>
-++--        (X/280, Abs(Y/281, {
-+++-        (X/275, Abs(Y/276, {
-++ -                            "t"[type] -> <.5>;
-++ -                            "to_string"[value] -> <.6>;
-++ -                            }));
-++-+   Abs<.9>(X/280, Y/281, {
-++++   Abs<.9>(X/275, Y/276, {
-++ +                          "t"[type] -> <.5>;
-++ +                          "to_string"[value] -> <.6>;
-++ +                          });
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10313,10 +10078,10 @@ index 0000000000..9f902db247
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 284ed988e4..006880828a 100644
++index 3c97de8318..1df1b16071 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -704,11 +704,6 @@ OCaml 5.0
++@@ -708,11 +708,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10328,7 +10093,7 @@ index 0000000000..9f902db247
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -724,6 +719,26 @@ OCaml 5.0
++@@ -728,6 +723,26 @@ OCaml 5.0
 +   mismatch error involving recursive types.
 +   (Florian Angeletti, review by Gabriel Scherer)
 + 
@@ -10355,7 +10120,7 @@ index 0000000000..9f902db247
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -759,13 +774,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -763,13 +778,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10371,7 +10136,7 @@ index 0000000000..9f902db247
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -872,6 +887,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -876,6 +891,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10381,7 +10146,7 @@ index 0000000000..9f902db247
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1131,6 +1149,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1135,6 +1153,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16500,10 +16265,10 @@ index 0000000000..9f902db247
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..464eb345bc
++index 0000000000..3e2c67fbe4
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3852 @@
++@@ -0,0 +1,3851 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index a42b0dab97..ed1137f668 100644
 ++--- a/.github/workflows/build.yml
@@ -19584,7 +19349,7 @@ index 0000000000..9f902db247
 +++  exec ${program} > ${output}
 +++fi
 ++diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-++index 6f88995df3..b302e7c37d 100644
+++index 32d7f72b5c..b043beafc6 100644
 ++--- a/testsuite/tests/shapes/comp_units.ml
 +++++ b/testsuite/tests/shapes/comp_units.ml
 ++@@ -25,7 +25,7 @@ module Mproj = Unit
@@ -19597,7 +19362,7 @@ index 0000000000..9f902db247
 ++ module F : functor (X : sig type t end) -> sig type t = X.t end
 ++ |}]
 ++diff --git a/testsuite/tests/shapes/functors.ml b/testsuite/tests/shapes/functors.ml
-++index f55021180a..b2d24fdc96 100644
+++index a3d7bfd659..77ead1d555 100644
 ++--- a/testsuite/tests/shapes/functors.ml
 +++++ b/testsuite/tests/shapes/functors.ml
 ++@@ -17,7 +17,7 @@ module type S = sig type t val x : t end
@@ -19612,46 +19377,46 @@ index 0000000000..9f902db247
 ++@@ -29,10 +29,10 @@ end
 ++ {
 ++  "Finclude"[module] ->
-++      Abs<.6>
-++-        (X/284,
-+++        (X/279,
-++          {
-++-          "t"[type] -> X/284<.5> . "t"[type];
-++-          "x"[value] -> X/284<.5> . "x"[value];
-+++          "t"[type] -> X/279<.5> . "t"[type];
-+++          "x"[value] -> X/279<.5> . "x"[value];
-++           });
+++    Abs<.6>
+++-      (X/284,
++++      (X/279,
+++        {
+++-        "t"[type] -> X/284<.5> . "t"[type];
+++-        "x"[value] -> X/284<.5> . "x"[value];
++++        "t"[type] -> X/279<.5> . "t"[type];
++++        "x"[value] -> X/279<.5> . "x"[value];
+++         });
 ++  }
 ++ module Finclude : functor (X : S) -> sig type t = X.t val x : t end
 ++@@ -45,7 +45,7 @@ end
 ++ [%%expect{|
 ++ {
 ++  "Fredef"[module] ->
-++-     Abs<.10>(X/291, {
-+++     Abs<.10>(X/286, {
-++                       "t"[type] -> <.8>;
-++                       "x"[value] -> <.9>;
-++                       });
+++-   Abs<.10>(X/291, {
++++   Abs<.10>(X/286, {
+++                     "t"[type] -> <.8>;
+++                     "x"[value] -> <.9>;
+++                     });
 ++@@ -223,8 +223,8 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 ++ [%%expect{|
 ++ {
 ++  "Big_to_small1"[module] ->
-++-     Abs<.40>(X/386, {<.39>
-++-                      "t"[type] -> X/386<.39> . "t"[type];
-+++     Abs<.40>(X/381, {<.39>
-+++                      "t"[type] -> X/381<.39> . "t"[type];
-++                       });
+++-   Abs<.40>(X/386, {<.39>
+++-                    "t"[type] -> X/386<.39> . "t"[type];
++++   Abs<.40>(X/381, {<.39>
++++                    "t"[type] -> X/381<.39> . "t"[type];
+++                     });
 ++  }
 ++ module Big_to_small1 : B2S
 ++@@ -234,8 +234,8 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 ++ [%%expect{|
 ++ {
 ++  "Big_to_small2"[module] ->
-++-     Abs<.42>(X/389, {
-++-                      "t"[type] -> X/389<.41> . "t"[type];
-+++     Abs<.42>(X/384, {
-+++                      "t"[type] -> X/384<.41> . "t"[type];
-++                       });
+++-   Abs<.42>(X/389, {
+++-                    "t"[type] -> X/389<.41> . "t"[type];
++++   Abs<.42>(X/384, {
++++                    "t"[type] -> X/384<.41> . "t"[type];
+++                     });
 ++  }
 ++ module Big_to_small2 : B2S
 ++diff --git a/testsuite/tests/shapes/open_arg.ml b/testsuite/tests/shapes/open_arg.ml
@@ -19668,7 +19433,7 @@ index 0000000000..9f902db247
 ++  }
 ++ module Make : functor (I : sig end) -> sig end
 ++diff --git a/testsuite/tests/shapes/recmodules.ml b/testsuite/tests/shapes/recmodules.ml
-++index 93fef6012c..126c792ea2 100644
+++index 6d9d86fc9a..c2c58ba194 100644
 ++--- a/testsuite/tests/shapes/recmodules.ml
 +++++ b/testsuite/tests/shapes/recmodules.ml
 ++@@ -43,8 +43,8 @@ and B : sig
@@ -19682,36 +19447,35 @@ index 0000000000..9f902db247
 ++  }
 ++ module rec A : sig type t = Leaf of B.t end
 ++ and B : sig type t = int end
-++@@ -82,13 +82,13 @@ end = Set.Make(A)
+++@@ -82,12 +82,12 @@ end = Set.Make(A)
 ++  "ASet"[module] ->
-++      {
-++       "compare"[value] ->
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++           "compare"[value];
-++       "elt"[type] ->
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-++           "elt"[type];
-++       "t"[type] ->
-++-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-+++          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-++       };
+++    {
+++     "compare"[value] ->
+++-      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
+++       "compare"[value];
+++     "elt"[type] ->
+++-      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
+++     "t"[type] ->
+++-      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
++++      CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
+++     };
 ++  }
 ++ module rec A :
 ++diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
-++index 521d86d019..e5dc4732b5 100644
+++index 182a0a9bc2..53b1fb806a 100644
 ++--- a/testsuite/tests/shapes/rotor_example.ml
 +++++ b/testsuite/tests/shapes/rotor_example.ml
-++@@ -26,7 +26,7 @@ end
+++@@ -25,7 +25,7 @@ end
+++ [%%expect{|
 ++ {
 ++  "Pair"[module] ->
-++      Abs<.9>
-++-        (X/280, Abs(Y/281, {
-+++        (X/275, Abs(Y/276, {
-++                             "t"[type] -> <.5>;
-++                             "to_string"[value] -> <.6>;
-++                             }));
+++-   Abs<.9>(X/280, Y/281, {
++++   Abs<.9>(X/275, Y/276, {
+++                           "t"[type] -> <.5>;
+++                           "to_string"[value] -> <.6>;
+++                           });
 ++diff --git a/testsuite/tests/statmemprof/alloc_counts.ml b/testsuite/tests/statmemprof/alloc_counts.ml
 ++index de0d1e9e49..f8cbb5658d 100644
 ++--- a/testsuite/tests/statmemprof/alloc_counts.ml
@@ -20305,7 +20069,7 @@ index 0000000000..9f902db247
 ++-    ./configure $configure_flags
 ++-    ;;
 ++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i3
+++-    ./con
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
