@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..2bcd7982c3
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:03.241314764 +0100
+++++ b	2023-09-28 18:46:03.249315069 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -2255,7 +2255,7 @@ AC_CONFIG_COMMANDS_PRE([
+++@@ -2305,7 +2305,7 @@ AC_CONFIG_COMMANDS_PRE([
++    mkexe_exp="$mkexe_cmd_exp"
++    AS_IF([test -n "$mkexe_cflags"],
++      [mkexe="$mkexe $mkexe_cflags"
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -3192,10 +3206,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index fe382fd868..275f4b1ac3 100755
+index 352b5e9118..4122646d9f 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index aae7ba2bf4..abc9ef971e 100644
+index e0e4fc8a8c..63dfcbfdab 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -10058,13 +10072,27 @@ index 0000000000..3e2c67fbe4
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..36f9a19894
+index 0000000000..9ed68a81fe
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10008 @@
+@@ -0,0 +1,10007 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..2bcd7982c3
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:03.241314764 +0100
++++++ b	2023-09-28 18:46:03.249315069 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -2255,7 +2255,7 @@ AC_CONFIG_COMMANDS_PRE([
++++@@ -2305,7 +2305,7 @@ AC_CONFIG_COMMANDS_PRE([
+++    mkexe_exp="$mkexe_cmd_exp"
+++    AS_IF([test -n "$mkexe_cflags"],
+++      [mkexe="$mkexe $mkexe_cflags"
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -13256,10 +13284,10 @@ index 0000000000..36f9a19894
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index fe382fd868..275f4b1ac3 100755
++index 352b5e9118..4122646d9f 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index aae7ba2bf4..abc9ef971e 100644
++index e0e4fc8a8c..63dfcbfdab 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -20054,22 +20082,7 @@ index 0000000000..36f9a19894
 ++-        .comm   G(Caml_state), 4
 +++        .comm   G(caml_state), 4
 ++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./con
+++ /* Some tests are des
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
