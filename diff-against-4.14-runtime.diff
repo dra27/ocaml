@@ -197,7 +197,7 @@ index 3f598a715d..21eb674fc5 100644
    return Val_int(0);            /* not reached */
 diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
 new file mode 100644
-index 0000000000..0ee84a6a5c
+index 0000000000..bf18b5a7d1
 --- /dev/null
 +++ b/runtime/HACKING.adoc
 @@ -0,0 +1,156 @@
@@ -356,7 +356,7 @@ index 0000000000..0ee84a6a5c
 +(For the brave there are some scripts in
 +link:../tools/ci/inria/sanitizers/script[], but you probably don't
 +want to run them directly, in particular they will `git clean -xfd`,
-+destroying changed/uncommited files in your development repository!)
++destroying changed/uncommitted files in your development repository!)
 diff --git a/runtime/Makefile b/runtime/Makefile
 deleted file mode 100644
 index f5c08d8798..0000000000

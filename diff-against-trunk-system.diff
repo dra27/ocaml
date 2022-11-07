@@ -1,6 +1,50 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..0fa9cb914f
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,41 @@
++--- a	2023-09-28 18:46:03.957342041 +0100
+++++ b	2023-09-28 18:46:03.985343108 +0100
++@@ -35,7 +35,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -2242,13 +2242,13 @@ AC_CONFIG_COMMANDS_PRE([
+++@@ -2292,13 +2292,13 @@ AC_CONFIG_COMMANDS_PRE([
++  
++  # Just before config.status is generated, determine the final values for MKEXE,
++  # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
++@@ -183,10 +183,19 @@
++  - A quoted extension syntax for ppxs.
++  - Many quality of life improvements
++  - Many bug fixes.
+++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
+++--- a/runtime/HACKING.adoc
++++++ b/runtime/HACKING.adoc
+++@@ -153,4 +153,4 @@ TODO: I would be curious to know!
+++ (For the brave there are some scripts in
+++ link:../tools/ci/inria/sanitizers/script[], but you probably don't
+++ want to run them directly, in particular they will `git clean -xfd`,
+++-destroying changed/uncommited files in your development repository!)
++++destroying changed/uncommitted files in your development repository!)
++ diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
++ --- a/stdlib/camlinternalLazy.ml
++ +++ b/stdlib/camlinternalLazy.ml
++-@@ -83,7 +83,7 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
+++@@ -86,7 +86,7 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
++  let force_gen ~only_val (lzv : 'arg lazy_t) =
++    (* Using [Sys.opaque_identity] prevents two potential problems:
++       - If the value is known to have Forward_tag, then it could have been
++@@ -222,7 +231,7 @@
++ diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
++ --- a/testsuite/tests/frame-pointers/c_call.ml
++ +++ b/testsuite/tests/frame-pointers/c_call.ml
++-@@ -17,9 +17,9 @@ let[@inline never] f () =
+++@@ -19,9 +19,9 @@ let[@inline never] f () =
++    (* Check backtrace through caml_c_call_stack_args *)
++    fp_backtrace_many_args 1 2 3 4 5 6 7 8 9 10 11;
++    (* Check backtrace through caml_c_call.
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -14,7 +58,7 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 86c5efed31..9f8579e739 100644
+index f83d9a42de..a8d10db4d2 100644
 --- a/Changes
 +++ b/Changes
 @@ -713,11 +713,6 @@ OCaml 5.0
@@ -3192,10 +3236,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 352b5e9118..4122646d9f 100755
+index 9ad382d8f0..1ce97e375b 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index e0e4fc8a8c..63dfcbfdab 100644
+index 1f36f37fa0..6e6bedca20 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3730,7 +3774,7 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..5f898b6b8d
+index 0000000000..0c06d677da
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
 @@ -0,0 +1,2465 @@
@@ -3933,7 +3977,7 @@ index 0000000000..5f898b6b8d
 +   return Val_int(0);            /* not reached */
 +diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
 +new file mode 100644
-+index 0000000000..0ee84a6a5c
++index 0000000000..bf18b5a7d1
 +--- /dev/null
 ++++ b/runtime/HACKING.adoc
 +@@ -0,0 +1,156 @@
@@ -4092,7 +4136,7 @@ index 0000000000..5f898b6b8d
 ++(For the brave there are some scripts in
 ++link:../tools/ci/inria/sanitizers/script[], but you probably don't
 ++want to run them directly, in particular they will `git clean -xfd`,
-++destroying changed/uncommited files in your development repository!)
+++destroying changed/uncommitted files in your development repository!)
 +diff --git a/runtime/Makefile b/runtime/Makefile
 +deleted file mode 100644
 +index f5c08d8798..0000000000
@@ -10058,13 +10102,57 @@ index 0000000000..3e2c67fbe4
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3b784deb78
+index 0000000000..c30a1d436d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10008 @@
+@@ -0,0 +1,9987 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..0fa9cb914f
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,41 @@
+++--- a	2023-09-28 18:46:03.957342041 +0100
++++++ b	2023-09-28 18:46:03.985343108 +0100
+++@@ -35,7 +35,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -2242,13 +2242,13 @@ AC_CONFIG_COMMANDS_PRE([
++++@@ -2292,13 +2292,13 @@ AC_CONFIG_COMMANDS_PRE([
+++  
+++  # Just before config.status is generated, determine the final values for MKEXE,
+++  # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
+++@@ -183,10 +183,19 @@
+++  - A quoted extension syntax for ppxs.
+++  - Many quality of life improvements
+++  - Many bug fixes.
++++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
++++--- a/runtime/HACKING.adoc
+++++++ b/runtime/HACKING.adoc
++++@@ -153,4 +153,4 @@ TODO: I would be curious to know!
++++ (For the brave there are some scripts in
++++ link:../tools/ci/inria/sanitizers/script[], but you probably don't
++++ want to run them directly, in particular they will `git clean -xfd`,
++++-destroying changed/uncommited files in your development repository!)
+++++destroying changed/uncommitted files in your development repository!)
+++ diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
+++ --- a/stdlib/camlinternalLazy.ml
+++ +++ b/stdlib/camlinternalLazy.ml
+++-@@ -83,7 +83,7 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
++++@@ -86,7 +86,7 @@ let force_lazy_block blk = force_gen_lazy_block ~only_val:false blk
+++  let force_gen ~only_val (lzv : 'arg lazy_t) =
+++    (* Using [Sys.opaque_identity] prevents two potential problems:
+++       - If the value is known to have Forward_tag, then it could have been
+++@@ -222,7 +231,7 @@
+++ diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
+++ --- a/testsuite/tests/frame-pointers/c_call.ml
+++ +++ b/testsuite/tests/frame-pointers/c_call.ml
+++-@@ -17,9 +17,9 @@ let[@inline never] f () =
++++@@ -19,9 +19,9 @@ let[@inline never] f () =
+++    (* Check backtrace through caml_c_call_stack_args *)
+++    fp_backtrace_many_args 1 2 3 4 5 6 7 8 9 10 11;
+++    (* Check backtrace through caml_c_call.
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10078,7 +10166,7 @@ index 0000000000..3b784deb78
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 86c5efed31..9f8579e739 100644
++index f83d9a42de..a8d10db4d2 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -713,11 +713,6 @@ OCaml 5.0
@@ -13256,10 +13344,10 @@ index 0000000000..3b784deb78
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 352b5e9118..4122646d9f 100755
++index 9ad382d8f0..1ce97e375b 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index e0e4fc8a8c..63dfcbfdab 100644
++index 1f36f37fa0..6e6bedca20 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13794,7 +13882,7 @@ index 0000000000..3b784deb78
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..5f898b6b8d
++index 0000000000..0c06d677da
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
 +@@ -0,0 +1,2465 @@
@@ -13997,7 +14085,7 @@ index 0000000000..3b784deb78
 ++   return Val_int(0);            /* not reached */
 ++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
 ++new file mode 100644
-++index 0000000000..0ee84a6a5c
+++index 0000000000..bf18b5a7d1
 ++--- /dev/null
 +++++ b/runtime/HACKING.adoc
 ++@@ -0,0 +1,156 @@
@@ -14156,7 +14244,7 @@ index 0000000000..3b784deb78
 +++(For the brave there are some scripts in
 +++link:../tools/ci/inria/sanitizers/script[], but you probably don't
 +++want to run them directly, in particular they will `git clean -xfd`,
-+++destroying changed/uncommited files in your development repository!)
++++destroying changed/uncommitted files in your development repository!)
 ++diff --git a/runtime/Makefile b/runtime/Makefile
 ++deleted file mode 100644
 ++index f5c08d8798..0000000000
@@ -20004,72 +20092,7 @@ index 0000000000..3b784deb78
 +++ *)
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index 666a55efeb..5a36157e0e 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./con
+++  * are unreliable excep
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21829,7 +21852,7 @@ index d5d6e99e1d..aa057e3985 100644
  let incr r = ignore (fetch_and_add r 1)
  let decr r = ignore (fetch_and_add r (-1))
 diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
-index 07cf954054..1748dc4a87 100644
+index 6035541601..247bfcfb58 100644
 --- a/stdlib/camlinternalLazy.ml
 +++ b/stdlib/camlinternalLazy.ml
 @@ -13,12 +13,15 @@
@@ -22300,7 +22323,7 @@ index 00fd264de9..5086907b0f 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
-index 3e5092a18d..832ec0d49f 100644
+index 1404b7b406..920e9442be 100644
 --- a/stdlib/stdlib.mli
 +++ b/stdlib/stdlib.mli
 @@ -1398,10 +1398,14 @@ module BytesLabels    = BytesLabels

@@ -1396,7 +1396,7 @@ index ff1646835a..a29cd8516b 100644
  
  (* C version of ephetest.ml *)
 diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
-index 3f0a02e4a1..3c5b1b621b 100644
+index c2493b3a99..e156e23d11 100644
 --- a/testsuite/tests/frame-pointers/c_call.ml
 +++ b/testsuite/tests/frame-pointers/c_call.ml
 @@ -1,7 +1,9 @@
