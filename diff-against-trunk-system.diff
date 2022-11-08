@@ -1,6 +1,23 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..4354dcfff3
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,14 @@
++--- a	2023-09-28 18:46:05.973418783 +0100
+++++ b	2023-09-28 18:46:05.989419392 +0100
++@@ -15,9 +15,9 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1268,7 +1268,7 @@ AS_CASE([$host],
+++@@ -1280,7 +1280,7 @@ AS_CASE([$host],
++    [x86_64-*-cygwin*],
++-     [arch=amd64; system=cygwin],
+++     [has_native_backend=yes; arch=amd64; system=cygwin],
++    [riscv64-*-linux*],
++ -    [arch=riscv; model=riscv64; system=linux]
++ +    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -14,7 +31,7 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 03f535a8ef..5fd9e40e1b 100644
+index 7278758d21..71262e4fc5 100644
 --- a/Changes
 +++ b/Changes
 @@ -719,11 +719,6 @@ OCaml 5.0
@@ -3192,10 +3209,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 9ad382d8f0..1ce97e375b 100755
+index 7afd85dc68..733869fdcc 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 1f36f37fa0..6e6bedca20 100644
+index c4fd1bc0be..ab4a9b3a69 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3391,7 +3408,7 @@ index 1f36f37fa0..6e6bedca20 100644
 -    [arch=amd64; system=cygwin],
 +    [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
-     [arch=riscv; model=riscv64; system=linux]
+     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
  )
 @@ -1964,11 +1976,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
@@ -10058,13 +10075,30 @@ index 0000000000..753a097933
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..03a7067cc7
+index 0000000000..ae6cdfa566
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10005 @@
+@@ -0,0 +1,10002 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..4354dcfff3
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,14 @@
+++--- a	2023-09-28 18:46:05.973418783 +0100
++++++ b	2023-09-28 18:46:05.989419392 +0100
+++@@ -15,9 +15,9 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1268,7 +1268,7 @@ AS_CASE([$host],
++++@@ -1280,7 +1280,7 @@ AS_CASE([$host],
+++    [x86_64-*-cygwin*],
+++-     [arch=amd64; system=cygwin],
++++     [has_native_backend=yes; arch=amd64; system=cygwin],
+++    [riscv64-*-linux*],
+++ -    [arch=riscv; model=riscv64; system=linux]
+++ +    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10078,7 +10112,7 @@ index 0000000000..03a7067cc7
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 03f535a8ef..5fd9e40e1b 100644
++index 7278758d21..71262e4fc5 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -719,11 +719,6 @@ OCaml 5.0
@@ -13256,10 +13290,10 @@ index 0000000000..03a7067cc7
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 9ad382d8f0..1ce97e375b 100755
++index 7afd85dc68..733869fdcc 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 1f36f37fa0..6e6bedca20 100644
++index c4fd1bc0be..ab4a9b3a69 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13455,7 +13489,7 @@ index 0000000000..03a7067cc7
 +-    [arch=amd64; system=cygwin],
 ++    [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
-+     [arch=riscv; model=riscv64; system=linux]
++     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
 + )
 +@@ -1964,11 +1976,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
@@ -20046,27 +20080,7 @@ index 0000000000..03a7067cc7
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 ++index 1d16b72d4e..956ec369ab 100644
 ++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $confi
+++++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
