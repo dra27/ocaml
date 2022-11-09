@@ -1,14 +1,27 @@
---- a	2023-09-28 18:46:05.973418783 +0100
-+++ b	2023-09-28 18:46:05.989419392 +0100
-@@ -15,9 +15,9 @@
- diff --git a/configure.ac b/configure.ac
- --- a/configure.ac
- +++ b/configure.ac
--@@ -1268,7 +1268,7 @@ AS_CASE([$host],
-+@@ -1280,7 +1280,7 @@ AS_CASE([$host],
-    [x86_64-*-cygwin*],
--     [arch=amd64; system=cygwin],
-+     [has_native_backend=yes; arch=amd64; system=cygwin],
-    [riscv64-*-linux*],
- -    [arch=riscv; model=riscv64; system=linux]
- +    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+--- a	2023-09-28 18:46:06.485438257 +0100
++++ b	2023-09-28 18:46:06.489438409 +0100
+@@ -1,16 +1,20 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+ --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+-@@ -1,7 +1,9 @@
++@@ -1,9 +1,11 @@
+  (* TEST
+--  * native
++-  * skip
++-  reason = "OCaml 5 only"
++-  ** native
+ -    include runtime_events
+ -    flags = "-runtime-variant=i"
+ +   include runtime_events
+ +   flags = "-runtime-variant=i"
+ +
+-+   * instrumented-runtime
+-+   ** native
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** instrumented-runtime
+++   *** native
+  *)
+  
+  open Runtime_events

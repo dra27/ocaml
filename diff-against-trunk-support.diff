@@ -2266,18 +2266,22 @@ index 87f556a659..097905b626 100644
  let got_start = ref false
  let got_fork_child = ref false
 diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-index 7a41c49b2a..63aded8114 100644
+index 94727d13fd..e353268013 100644
 --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
 +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-@@ -1,5 +1,7 @@
- (* TEST
--  * native
-+  * skip
-+  reason = "OCaml 5 only"
-+  ** native
-     include runtime_events
-     flags = "-runtime-variant=i"
+@@ -2,8 +2,10 @@
+    include runtime_events
+    flags = "-runtime-variant=i"
+ 
+-   * instrumented-runtime
+-   ** native
++   * skip
++   reason = "OCaml 5 only"
++   ** instrumented-runtime
++   *** native
  *)
+ 
+ open Runtime_events
 diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 index 23f2a5f7de..08055698e7 100644
 --- a/testsuite/tests/lib-str/parallel.ml

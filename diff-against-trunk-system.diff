@@ -1,23 +1,36 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..4354dcfff3
+index 0000000000..30f36b27e9
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,14 @@
-+--- a	2023-09-28 18:46:05.973418783 +0100
-++++ b	2023-09-28 18:46:05.989419392 +0100
-+@@ -15,9 +15,9 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1268,7 +1268,7 @@ AS_CASE([$host],
-++@@ -1280,7 +1280,7 @@ AS_CASE([$host],
-+    [x86_64-*-cygwin*],
-+-     [arch=amd64; system=cygwin],
-++     [has_native_backend=yes; arch=amd64; system=cygwin],
-+    [riscv64-*-linux*],
-+ -    [arch=riscv; model=riscv64; system=linux]
-+ +    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+@@ -0,0 +1,27 @@
++--- a	2023-09-28 18:46:06.485438257 +0100
+++++ b	2023-09-28 18:46:06.489438409 +0100
++@@ -1,16 +1,20 @@
++ diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
++ --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
++ +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
++-@@ -1,7 +1,9 @@
+++@@ -1,9 +1,11 @@
++  (* TEST
++--  * native
+++-  * skip
+++-  reason = "OCaml 5 only"
+++-  ** native
++ -    include runtime_events
++ -    flags = "-runtime-variant=i"
++ +   include runtime_events
++ +   flags = "-runtime-variant=i"
++ +
++-+   * instrumented-runtime
++-+   ** native
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** instrumented-runtime
++++   *** native
++  *)
++  
++  open Runtime_events
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -10078,30 +10091,43 @@ index 0000000000..753a097933
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e13c0cc4f4
+index 0000000000..20b6042468
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10003 @@
+@@ -0,0 +1,10007 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..4354dcfff3
++index 0000000000..30f36b27e9
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,14 @@
-++--- a	2023-09-28 18:46:05.973418783 +0100
-+++++ b	2023-09-28 18:46:05.989419392 +0100
-++@@ -15,9 +15,9 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1268,7 +1268,7 @@ AS_CASE([$host],
-+++@@ -1280,7 +1280,7 @@ AS_CASE([$host],
-++    [x86_64-*-cygwin*],
-++-     [arch=amd64; system=cygwin],
-+++     [has_native_backend=yes; arch=amd64; system=cygwin],
-++    [riscv64-*-linux*],
-++ -    [arch=riscv; model=riscv64; system=linux]
-++ +    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
++@@ -0,0 +1,27 @@
+++--- a	2023-09-28 18:46:06.485438257 +0100
++++++ b	2023-09-28 18:46:06.489438409 +0100
+++@@ -1,16 +1,20 @@
+++ diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+++ --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
+++ +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+++-@@ -1,7 +1,9 @@
++++@@ -1,9 +1,11 @@
+++  (* TEST
+++--  * native
++++-  * skip
++++-  reason = "OCaml 5 only"
++++-  ** native
+++ -    include runtime_events
+++ -    flags = "-runtime-variant=i"
+++ +   include runtime_events
+++ +   flags = "-runtime-variant=i"
+++ +
+++-+   * instrumented-runtime
+++-+   ** native
+++++   * skip
+++++   reason = "OCaml 5 only"
+++++   ** instrumented-runtime
+++++   *** native
+++  *)
+++  
+++  open Runtime_events
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -20075,16 +20101,7 @@ index 0000000000..e13c0cc4f4
 ++index b42d399907..656e318473 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++inde
+++@@ -1,3 +
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
