@@ -1,36 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..30f36b27e9
+index 0000000000..a23e86d2df
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,27 @@
-+--- a	2023-09-28 18:46:06.485438257 +0100
-++++ b	2023-09-28 18:46:06.489438409 +0100
-+@@ -1,16 +1,20 @@
-+ diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-+ --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
-+ +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-+-@@ -1,7 +1,9 @@
-++@@ -1,9 +1,11 @@
-+  (* TEST
-+--  * native
-++-  * skip
-++-  reason = "OCaml 5 only"
-++-  ** native
-+ -    include runtime_events
-+ -    flags = "-runtime-variant=i"
-+ +   include runtime_events
-+ +   flags = "-runtime-variant=i"
-+ +
-+-+   * instrumented-runtime
-+-+   ** native
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++   ** instrumented-runtime
-+++   *** native
-+  *)
-+  
-+  open Runtime_events
+@@ -0,0 +1,13 @@
++--- a	2023-09-28 18:46:06.809450580 +0100
+++++ b	2023-09-28 18:46:06.837451645 +0100
++@@ -11,10 +11,6 @@
++  ### Build system:
++  - #11590: Allow installing to a destination path containing spaces.
++     (Élie Brami, review by Sébastien Hinderer and David Allsopp)
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/testsuite/tests/shadow_include/shadow_all.ml b/testsuite/tests/shadow_include/shadow_all.ml
++ --- a/testsuite/tests/shadow_include/shadow_all.ml
++ +++ b/testsuite/tests/shadow_include/shadow_all.ml
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -44,10 +30,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 7278758d21..71262e4fc5 100644
+index 32d4d5a012..00d7d26b6f 100644
 --- a/Changes
 +++ b/Changes
-@@ -719,11 +719,6 @@ OCaml 5.0
+@@ -722,11 +722,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -59,7 +45,7 @@ index 7278758d21..71262e4fc5 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -743,6 +738,26 @@ OCaml 5.0
+@@ -746,6 +741,26 @@ OCaml 5.0
    the bug was only present in development version of OCaml 5.
    (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
  
@@ -86,7 +72,7 @@ index 7278758d21..71262e4fc5 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -778,13 +793,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -781,13 +796,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -102,7 +88,7 @@ index 7278758d21..71262e4fc5 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -891,6 +906,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -894,6 +909,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -112,7 +98,7 @@ index 7278758d21..71262e4fc5 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1150,6 +1168,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1153,6 +1171,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -804,10 +790,10 @@ index 2d8b5f168f..b982a6247e 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
-index c524f7052d..ebad0d2bba 100755
+index 11ca18dfc5..ebad0d2bba 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index fe5f665a7a..5393f87ab3 100755
+index d109f64080..5393f87ab3 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -6234,10 +6220,10 @@ index 0000000000..0c06d677da
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..753a097933
+index 0000000000..113c234ed3
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3851 @@
+@@ -0,0 +1,3855 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index a42b0dab97..ed1137f668 100644
 +--- a/.github/workflows/build.yml
@@ -8506,18 +8492,22 @@ index 0000000000..753a097933
 + let got_start = ref false
 + let got_fork_child = ref false
 +diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-+index 7a41c49b2a..63aded8114 100644
++index 94727d13fd..e353268013 100644
 +--- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
 ++++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-+@@ -1,5 +1,7 @@
-+ (* TEST
-+-  * native
-++  * skip
-++  reason = "OCaml 5 only"
-++  ** native
-+     include runtime_events
-+     flags = "-runtime-variant=i"
++@@ -2,8 +2,10 @@
++    include runtime_events
++    flags = "-runtime-variant=i"
++ 
++-   * instrumented-runtime
++-   ** native
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** instrumented-runtime
+++   *** native
 + *)
++ 
++ open Runtime_events
 +diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 +index 23f2a5f7de..08055698e7 100644
 +--- a/testsuite/tests/lib-str/parallel.ml
@@ -10091,43 +10081,29 @@ index 0000000000..753a097933
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..20b6042468
+index 0000000000..21b34ccba3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10007 @@
+@@ -0,0 +1,9999 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..30f36b27e9
++index 0000000000..a23e86d2df
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,27 @@
-++--- a	2023-09-28 18:46:06.485438257 +0100
-+++++ b	2023-09-28 18:46:06.489438409 +0100
-++@@ -1,16 +1,20 @@
-++ diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-++ --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
-++ +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-++-@@ -1,7 +1,9 @@
-+++@@ -1,9 +1,11 @@
-++  (* TEST
-++--  * native
-+++-  * skip
-+++-  reason = "OCaml 5 only"
-+++-  ** native
-++ -    include runtime_events
-++ -    flags = "-runtime-variant=i"
-++ +   include runtime_events
-++ +   flags = "-runtime-variant=i"
-++ +
-++-+   * instrumented-runtime
-++-+   ** native
-++++   * skip
-++++   reason = "OCaml 5 only"
-++++   ** instrumented-runtime
-++++   *** native
-++  *)
-++  
-++  open Runtime_events
++@@ -0,0 +1,13 @@
+++--- a	2023-09-28 18:46:06.809450580 +0100
++++++ b	2023-09-28 18:46:06.837451645 +0100
+++@@ -11,10 +11,6 @@
+++  ### Build system:
+++  - #11590: Allow installing to a destination path containing spaces.
+++     (Élie Brami, review by Sébastien Hinderer and David Allsopp)
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/testsuite/tests/shadow_include/shadow_all.ml b/testsuite/tests/shadow_include/shadow_all.ml
+++ --- a/testsuite/tests/shadow_include/shadow_all.ml
+++ +++ b/testsuite/tests/shadow_include/shadow_all.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10141,10 +10117,10 @@ index 0000000000..20b6042468
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 7278758d21..71262e4fc5 100644
++index 32d4d5a012..00d7d26b6f 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -719,11 +719,6 @@ OCaml 5.0
++@@ -722,11 +722,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10156,7 +10132,7 @@ index 0000000000..20b6042468
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -743,6 +738,26 @@ OCaml 5.0
++@@ -746,6 +741,26 @@ OCaml 5.0
 +   the bug was only present in development version of OCaml 5.
 +   (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
 + 
@@ -10183,7 +10159,7 @@ index 0000000000..20b6042468
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -778,13 +793,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -781,13 +796,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10199,7 +10175,7 @@ index 0000000000..20b6042468
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -891,6 +906,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -894,6 +909,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10209,7 +10185,7 @@ index 0000000000..20b6042468
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1150,6 +1168,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1153,6 +1171,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10901,10 +10877,10 @@ index 0000000000..20b6042468
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index c524f7052d..ebad0d2bba 100755
++index 11ca18dfc5..ebad0d2bba 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index fe5f665a7a..5393f87ab3 100755
++index d109f64080..5393f87ab3 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -16331,10 +16307,10 @@ index 0000000000..20b6042468
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..753a097933
++index 0000000000..113c234ed3
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3851 @@
++@@ -0,0 +1,3855 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index a42b0dab97..ed1137f668 100644
 ++--- a/.github/workflows/build.yml
@@ -18603,18 +18579,22 @@ index 0000000000..20b6042468
 ++ let got_start = ref false
 ++ let got_fork_child = ref false
 ++diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-++index 7a41c49b2a..63aded8114 100644
+++index 94727d13fd..e353268013 100644
 ++--- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
 +++++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
-++@@ -1,5 +1,7 @@
-++ (* TEST
-++-  * native
-+++  * skip
-+++  reason = "OCaml 5 only"
-+++  ** native
-++     include runtime_events
-++     flags = "-runtime-variant=i"
+++@@ -2,8 +2,10 @@
+++    include runtime_events
+++    flags = "-runtime-variant=i"
+++ 
+++-   * instrumented-runtime
+++-   ** native
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** instrumented-runtime
++++   *** native
 ++ *)
+++ 
+++ open Runtime_events
 ++diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 ++index 23f2a5f7de..08055698e7 100644
 ++--- a/testsuite/tests/lib-str/parallel.ml
@@ -20101,7 +20081,9 @@ index 0000000000..20b6042468
 ++index b42d399907..656e318473 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644

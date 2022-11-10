@@ -1,27 +1,13 @@
---- a	2023-09-28 18:46:06.485438257 +0100
-+++ b	2023-09-28 18:46:06.489438409 +0100
-@@ -1,16 +1,20 @@
- diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
- --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
- +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
--@@ -1,7 +1,9 @@
-+@@ -1,9 +1,11 @@
-  (* TEST
---  * native
-+-  * skip
-+-  reason = "OCaml 5 only"
-+-  ** native
- -    include runtime_events
- -    flags = "-runtime-variant=i"
- +   include runtime_events
- +   flags = "-runtime-variant=i"
- +
--+   * instrumented-runtime
--+   ** native
-++   * skip
-++   reason = "OCaml 5 only"
-++   ** instrumented-runtime
-++   *** native
-  *)
-  
-  open Runtime_events
+--- a	2023-09-28 18:46:06.809450580 +0100
++++ b	2023-09-28 18:46:06.837451645 +0100
+@@ -11,10 +11,6 @@
+  ### Build system:
+  - #11590: Allow installing to a destination path containing spaces.
+     (Élie Brami, review by Sébastien Hinderer and David Allsopp)
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/testsuite/tests/shadow_include/shadow_all.ml b/testsuite/tests/shadow_include/shadow_all.ml
+ --- a/testsuite/tests/shadow_include/shadow_all.ml
+ +++ b/testsuite/tests/shadow_include/shadow_all.ml
