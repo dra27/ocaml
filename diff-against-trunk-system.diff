@@ -1,22 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..a23e86d2df
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,13 @@
-+--- a	2023-09-28 18:46:06.809450580 +0100
-++++ b	2023-09-28 18:46:06.837451645 +0100
-+@@ -11,10 +11,6 @@
-+  ### Build system:
-+  - #11590: Allow installing to a destination path containing spaces.
-+     (Élie Brami, review by Sébastien Hinderer and David Allsopp)
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/testsuite/tests/shadow_include/shadow_all.ml b/testsuite/tests/shadow_include/shadow_all.ml
-+ --- a/testsuite/tests/shadow_include/shadow_all.ml
-+ +++ b/testsuite/tests/shadow_include/shadow_all.ml
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -30,10 +14,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 32d4d5a012..00d7d26b6f 100644
+index b00159e657..daf77e8be7 100644
 --- a/Changes
 +++ b/Changes
-@@ -722,11 +722,6 @@ OCaml 5.0
+@@ -725,11 +725,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -45,7 +29,7 @@ index 32d4d5a012..00d7d26b6f 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -746,6 +741,26 @@ OCaml 5.0
+@@ -749,6 +744,26 @@ OCaml 5.0
    the bug was only present in development version of OCaml 5.
    (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
  
@@ -72,7 +56,7 @@ index 32d4d5a012..00d7d26b6f 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -781,13 +796,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -784,13 +799,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -88,7 +72,7 @@ index 32d4d5a012..00d7d26b6f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -894,6 +909,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -897,6 +912,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -98,7 +82,7 @@ index 32d4d5a012..00d7d26b6f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1153,6 +1171,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1156,6 +1174,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10081,29 +10065,13 @@ index 0000000000..113c234ed3
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3e325d3132
+index 0000000000..8a3e14bf21
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9999 @@
+@@ -0,0 +1,10004 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..a23e86d2df
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,13 @@
-++--- a	2023-09-28 18:46:06.809450580 +0100
-+++++ b	2023-09-28 18:46:06.837451645 +0100
-++@@ -11,10 +11,6 @@
-++  ### Build system:
-++  - #11590: Allow installing to a destination path containing spaces.
-++     (Élie Brami, review by Sébastien Hinderer and David Allsopp)
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/testsuite/tests/shadow_include/shadow_all.ml b/testsuite/tests/shadow_include/shadow_all.ml
-++ --- a/testsuite/tests/shadow_include/shadow_all.ml
-++ +++ b/testsuite/tests/shadow_include/shadow_all.ml
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10117,10 +10085,10 @@ index 0000000000..3e325d3132
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 32d4d5a012..00d7d26b6f 100644
++index b00159e657..daf77e8be7 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -722,11 +722,6 @@ OCaml 5.0
++@@ -725,11 +725,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10132,7 +10100,7 @@ index 0000000000..3e325d3132
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -746,6 +741,26 @@ OCaml 5.0
++@@ -749,6 +744,26 @@ OCaml 5.0
 +   the bug was only present in development version of OCaml 5.
 +   (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
 + 
@@ -10159,7 +10127,7 @@ index 0000000000..3e325d3132
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -781,13 +796,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -784,13 +799,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10175,7 +10143,7 @@ index 0000000000..3e325d3132
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -894,6 +909,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -897,6 +912,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10185,7 +10153,7 @@ index 0000000000..3e325d3132
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1153,6 +1171,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1156,6 +1174,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20083,7 +20051,28 @@ index 0000000000..3e325d3132
 +++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++@@ -1,3 +1,7 @@
 +++(* TEST
-+++   * 
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actio
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
