@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:46:08.777525377 +0100
++++ b	2023-09-28 18:46:08.785525680 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -1114,6 +1114,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
++@@ -1113,6 +1113,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
+  
+  ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
+  
