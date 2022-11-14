@@ -1111,6 +1111,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
 
 ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
 
+# Do not compile assertions in ocamlyacc
+ocamlyacc_CPPFLAGS = -DNDEBUG
+
 .PHONY: ocamlyacc
 ocamlyacc: $(ocamlyacc_PROGRAM)$(EXE)
 
@@ -1122,6 +1125,8 @@ clean::
 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 
 $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
+
+$(ocamlyacc_OTHER_MODULES:=.$(O)): OC_CPPFLAGS += $(ocamlyacc_CPPFLAGS)
 
 # The Menhir-generated parser
 
