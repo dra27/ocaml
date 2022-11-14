@@ -1,8 +1,8 @@
 diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
-index a42b0dab97..ed1137f668 100644
+index 845ae1086b..1fb1ba30e6 100644
 --- a/.github/workflows/build.yml
 +++ b/.github/workflows/build.yml
-@@ -42,7 +42,7 @@ jobs:
+@@ -47,7 +47,7 @@ jobs:
           '${{ github.event.repository.full_name }}'
        - name: Configure tree
          run: |
@@ -11,7 +11,7 @@ index a42b0dab97..ed1137f668 100644
        - name: Build
          run: |
            MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
-@@ -110,7 +110,7 @@ jobs:
+@@ -115,7 +115,7 @@ jobs:
          run: brew install parallel
        - name: configure tree
          run: |
@@ -20,7 +20,7 @@ index a42b0dab97..ed1137f668 100644
        - name: Build
          run: |
            MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
-@@ -131,7 +131,7 @@ jobs:
+@@ -136,7 +136,7 @@ jobs:
    i386:
      runs-on: ubuntu-latest
      container:
@@ -29,7 +29,7 @@ index a42b0dab97..ed1137f668 100644
        options: --platform linux/i386 --user root
      steps:
        - name: OS Dependencies
-@@ -143,7 +143,7 @@ jobs:
+@@ -148,7 +148,7 @@ jobs:
          uses: actions/checkout@v1
        - name: configure tree
          run: |
