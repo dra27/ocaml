@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c6d59da404
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:08.777525377 +0100
-++++ b	2023-09-28 18:46:08.785525680 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -1114,6 +1114,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
-++@@ -1113,6 +1113,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
-+  
-+  ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -28,10 +14,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index db4347ff00..963cdcc17f 100644
+index 18c56118ac..3564b717e2 100644
 --- a/Changes
 +++ b/Changes
-@@ -729,11 +729,6 @@ OCaml 5.0
+@@ -733,11 +733,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -43,7 +29,7 @@ index db4347ff00..963cdcc17f 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -753,6 +748,26 @@ OCaml 5.0
+@@ -757,6 +752,26 @@ OCaml 5.0
    the bug was only present in development version of OCaml 5.
    (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
  
@@ -70,7 +56,7 @@ index db4347ff00..963cdcc17f 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -788,13 +803,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -792,13 +807,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -86,7 +72,7 @@ index db4347ff00..963cdcc17f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -901,6 +916,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -905,6 +920,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -96,7 +82,7 @@ index db4347ff00..963cdcc17f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1160,6 +1178,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1164,6 +1182,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10079,27 +10065,13 @@ index 0000000000..a99c76a132
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..519b4468c5
+index 0000000000..568dbf3307
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10005 @@
+@@ -0,0 +1,10004 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c6d59da404
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:08.777525377 +0100
-+++++ b	2023-09-28 18:46:08.785525680 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -1114,6 +1114,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
-+++@@ -1113,6 +1113,9 @@ ocamlyacc_MODULES = $(ocamlyacc_WSTR_MODULE) $(ocamlyacc_OTHER_MODULES)
-++  
-++  ocamlyacc_OBJECTS = $(ocamlyacc_MODULES:=.$(O))
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10113,10 +10085,10 @@ index 0000000000..519b4468c5
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index db4347ff00..963cdcc17f 100644
++index 18c56118ac..3564b717e2 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -729,11 +729,6 @@ OCaml 5.0
++@@ -733,11 +733,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10128,7 +10100,7 @@ index 0000000000..519b4468c5
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -753,6 +748,26 @@ OCaml 5.0
++@@ -757,6 +752,26 @@ OCaml 5.0
 +   the bug was only present in development version of OCaml 5.
 +   (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
 + 
@@ -10155,7 +10127,7 @@ index 0000000000..519b4468c5
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -788,13 +803,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -792,13 +807,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10171,7 +10143,7 @@ index 0000000000..519b4468c5
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -901,6 +916,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -905,6 +920,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10181,7 +10153,7 @@ index 0000000000..519b4468c5
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1160,6 +1178,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1164,6 +1182,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20087,7 +20059,20 @@ index 0000000000..519b4468c5
 ++ *)
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 ++index 1d16b72d4e..956ec369ab 100644
-++--- 
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actio
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
