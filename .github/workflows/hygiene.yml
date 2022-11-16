@@ -1,10 +1,6 @@
 name: Hygiene
 on:
   push:
-    branches:
-      - '4.**'
-      - '5.**'
-      - 'trunk'
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
@@ -22,7 +18,9 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         # Comment out the line below to enable (debugging) display of the github
         # context variable.
-        if: failure()
+        # if: failure()
+      - name: Proposal
+        run: echo ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'pull_request' || github.sha }}
 
       - uses: actions/checkout@v2
         with:
