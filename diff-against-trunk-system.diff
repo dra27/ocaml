@@ -1,6 +1,40 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..5103034ffd
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,31 @@
++--- a	2023-09-28 18:46:10.589594172 +0100
+++++ b	2023-09-28 18:46:10.597594475 +0100
++@@ -22,15 +22,15 @@
++  instrumented_runtime_libs=""
++  bootstrapping_flexdll=false
++  flexdll_dir=
++-@@ -212,7 +211,6 @@ AC_SUBST([mkexe_ldflags_exp])
++- AC_SUBST([PACKLD])
++- AC_SUBST([stdlib_manpages])
+++@@ -214,7 +213,6 @@ AC_SUBST([stdlib_manpages])
++  AC_SUBST([compute_deps])
+++ AC_SUBST([naked_pointers])
+++ AC_SUBST([naked_pointers_checker])
++ -AC_SUBST([force_instrumented_runtime])
++  AC_SUBST([ocaml_bindir])
++  AC_SUBST([ocaml_libdir])
++  AC_SUBST([QS])
++-@@ -417,10 +415,6 @@ AC_ARG_ENABLE([flambda-invariants],
+++@@ -428,10 +426,6 @@ AC_ARG_ENABLE([flambda-invariants],
++    [AS_HELP_STRING([--enable-flambda-invariants],
++      [enable invariants checks in flambda])])
++  
++@@ -41,7 +41,7 @@
++  AC_ARG_ENABLE([cmm-invariants],
++    [AS_HELP_STRING([--enable-cmm-invariants],
++      [enable invariants checks in Cmm])])
++-@@ -1503,10 +1497,6 @@ AS_CASE([$host],
+++@@ -1515,10 +1509,6 @@ AS_CASE([$host],
++    ]
++  )
++  
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -195,10 +229,10 @@ index 8dd7ccd3d6..2d8fbcb16e 100644
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 diff --git a/Makefile.config.in b/Makefile.config.in
-index c0559552db..7a8fee64c5 100644
+index 0b83f398b5..0b289c8c8f 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -245,7 +245,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -244,7 +244,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
@@ -3192,22 +3226,22 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 7afd85dc68..1ce97e375b 100755
+index 443a7af066..e235c05353 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index c4fd1bc0be..6e6bedca20 100644
+index 071e42a6bf..68b4418671 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
 +AC_SUBST([naked_pointers])
 +AC_SUBST([naked_pointers_checker])
- AC_SUBST([force_instrumented_runtime])
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
-@@ -224,6 +226,7 @@ AC_CONFIG_FILES([Makefile.config])
+ AC_SUBST([QS])
+@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -3215,7 +3249,7 @@ index c4fd1bc0be..6e6bedca20 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -258,8 +261,8 @@ AC_CANONICAL_TARGET
+@@ -256,8 +259,8 @@ AC_CANONICAL_TARGET
  AS_CASE([$host],
    [*-pc-windows],
      [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
@@ -3226,7 +3260,7 @@ index c4fd1bc0be..6e6bedca20 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -374,15 +377,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -372,15 +375,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3258,7 +3292,7 @@ index c4fd1bc0be..6e6bedca20 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -619,7 +630,8 @@ AS_CASE([$host],
+@@ -613,7 +624,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3268,7 +3302,7 @@ index c4fd1bc0be..6e6bedca20 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -1033,9 +1045,9 @@ AS_IF([! $arch64],
+@@ -1027,9 +1039,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3281,7 +3315,7 @@ index c4fd1bc0be..6e6bedca20 100644
  
  # Support for C11 atomic types
  
-@@ -1179,66 +1191,66 @@ system=unknown
+@@ -1173,66 +1185,66 @@ system=unknown
  has_native_backend=no
  AS_CASE([$host],
    [[i[3456]86-*-linux*]],
@@ -3375,7 +3409,7 @@ index c4fd1bc0be..6e6bedca20 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1248,7 +1260,7 @@ AS_CASE([$host],
+@@ -1242,7 +1254,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3384,7 +3418,7 @@ index c4fd1bc0be..6e6bedca20 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1266,9 +1278,9 @@ AS_CASE([$host],
+@@ -1260,9 +1272,9 @@ AS_CASE([$host],
    [aarch64-*-netbsd*],
      [has_native_backend=yes; arch=arm64; system=netbsd],
    [x86_64-*-cygwin*],
@@ -3396,7 +3430,7 @@ index c4fd1bc0be..6e6bedca20 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1964,11 +1976,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1954,11 +1966,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3421,7 +3455,7 @@ index c4fd1bc0be..6e6bedca20 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2019,6 +2043,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2009,6 +2033,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3452,7 +3486,7 @@ index c4fd1bc0be..6e6bedca20 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2166,8 +2214,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2156,8 +2204,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -10065,13 +10099,47 @@ index 0000000000..9f3136a531
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..77bc9b67d7
+index 0000000000..4eafce30d6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10004 @@
+@@ -0,0 +1,10009 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..5103034ffd
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,31 @@
+++--- a	2023-09-28 18:46:10.589594172 +0100
++++++ b	2023-09-28 18:46:10.597594475 +0100
+++@@ -22,15 +22,15 @@
+++  instrumented_runtime_libs=""
+++  bootstrapping_flexdll=false
+++  flexdll_dir=
+++-@@ -212,7 +211,6 @@ AC_SUBST([mkexe_ldflags_exp])
+++- AC_SUBST([PACKLD])
+++- AC_SUBST([stdlib_manpages])
++++@@ -214,7 +213,6 @@ AC_SUBST([stdlib_manpages])
+++  AC_SUBST([compute_deps])
++++ AC_SUBST([naked_pointers])
++++ AC_SUBST([naked_pointers_checker])
+++ -AC_SUBST([force_instrumented_runtime])
+++  AC_SUBST([ocaml_bindir])
+++  AC_SUBST([ocaml_libdir])
+++  AC_SUBST([QS])
+++-@@ -417,10 +415,6 @@ AC_ARG_ENABLE([flambda-invariants],
++++@@ -428,10 +426,6 @@ AC_ARG_ENABLE([flambda-invariants],
+++    [AS_HELP_STRING([--enable-flambda-invariants],
+++      [enable invariants checks in flambda])])
+++  
+++@@ -41,7 +41,7 @@
+++  AC_ARG_ENABLE([cmm-invariants],
+++    [AS_HELP_STRING([--enable-cmm-invariants],
+++      [enable invariants checks in Cmm])])
+++-@@ -1503,10 +1497,6 @@ AS_CASE([$host],
++++@@ -1515,10 +1509,6 @@ AS_CASE([$host],
+++    ]
+++  )
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10266,10 +10334,10 @@ index 0000000000..77bc9b67d7
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index c0559552db..7a8fee64c5 100644
++index 0b83f398b5..0b289c8c8f 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -245,7 +245,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -244,7 +244,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
@@ -13263,22 +13331,22 @@ index 0000000000..77bc9b67d7
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 7afd85dc68..1ce97e375b 100755
++index 443a7af066..e235c05353 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index c4fd1bc0be..6e6bedca20 100644
++index 071e42a6bf..68b4418671 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
 ++AC_SUBST([naked_pointers])
 ++AC_SUBST([naked_pointers_checker])
-+ AC_SUBST([force_instrumented_runtime])
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
-+@@ -224,6 +226,7 @@ AC_CONFIG_FILES([Makefile.config])
++ AC_SUBST([QS])
++@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -13286,7 +13354,7 @@ index 0000000000..77bc9b67d7
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -258,8 +261,8 @@ AC_CANONICAL_TARGET
++@@ -256,8 +259,8 @@ AC_CANONICAL_TARGET
 + AS_CASE([$host],
 +   [*-pc-windows],
 +     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
@@ -13297,7 +13365,7 @@ index 0000000000..77bc9b67d7
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -374,15 +377,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -372,15 +375,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -13329,7 +13397,7 @@ index 0000000000..77bc9b67d7
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -619,7 +630,8 @@ AS_CASE([$host],
++@@ -613,7 +624,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13339,7 +13407,7 @@ index 0000000000..77bc9b67d7
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -1033,9 +1045,9 @@ AS_IF([! $arch64],
++@@ -1027,9 +1039,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -13352,7 +13420,7 @@ index 0000000000..77bc9b67d7
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1179,66 +1191,66 @@ system=unknown
++@@ -1173,66 +1185,66 @@ system=unknown
 + has_native_backend=no
 + AS_CASE([$host],
 +   [[i[3456]86-*-linux*]],
@@ -13446,7 +13514,7 @@ index 0000000000..77bc9b67d7
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1248,7 +1260,7 @@ AS_CASE([$host],
++@@ -1242,7 +1254,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13455,7 +13523,7 @@ index 0000000000..77bc9b67d7
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1266,9 +1278,9 @@ AS_CASE([$host],
++@@ -1260,9 +1272,9 @@ AS_CASE([$host],
 +   [aarch64-*-netbsd*],
 +     [has_native_backend=yes; arch=arm64; system=netbsd],
 +   [x86_64-*-cygwin*],
@@ -13467,7 +13535,7 @@ index 0000000000..77bc9b67d7
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1964,11 +1976,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1954,11 +1966,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13492,7 +13560,7 @@ index 0000000000..77bc9b67d7
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2019,6 +2043,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2009,6 +2033,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13523,7 +13591,7 @@ index 0000000000..77bc9b67d7
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2166,8 +2214,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2156,8 +2204,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -20043,36 +20111,7 @@ index 0000000000..77bc9b67d7
 +++   reason = "OCaml 5 only"
 +++*)
 ++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actio
+++ (* ocaml-multicore issues 528 and 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
