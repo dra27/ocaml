@@ -1,0 +1,46 @@
+--- a	2023-09-28 18:46:11.265619820 +0100
++++ b	2023-09-28 18:46:11.277620276 +0100
+@@ -29,16 +29,16 @@
+ diff --git a/stdlib/format.mli b/stdlib/format.mli
+ --- a/stdlib/format.mli
+ +++ b/stdlib/format.mli
+-@@ -963,6 +963,7 @@ val formatter_of_out_channel : out_channel -> formatter
+- 
++@@ -964,6 +964,7 @@ val formatter_of_out_channel : out_channel -> formatter
++ (* BACKPORT
+  val synchronized_formatter_of_out_channel :
+    out_channel -> formatter Domain.DLS.key
+ +[@@alert unstable][@@alert "-unstable"]
+  (** [synchronized_formatter_of_out_channel oc] returns the key to the
+      domain-local state that holds the domain-local formatter for writing to the
+      corresponding output channel [oc].
+-@@ -1041,6 +1042,7 @@ val make_formatter :
+- 
++@@ -1043,6 +1044,7 @@ val make_formatter :
++ (* BACKPORT
+  val make_synchronized_formatter :
+    (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
+ +[@@alert unstable][@@alert "-unstable"]
+@@ -48,9 +48,9 @@
+ diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
+ --- a/stdlib/stdlib.mli
+ +++ b/stdlib/stdlib.mli
+-@@ -1401,7 +1401,15 @@ module Complex        = Complex
+- module Condition      = Condition
++@@ -1404,7 +1404,15 @@ module Condition      = Condition
+  module Digest         = Digest
++ (* BACKPORT
+  module Domain         = Domain
+ +[@@alert "-unstable"]
+ +[@@alert unstable
+@@ -61,9 +61,9 @@
+ +[@@alert unstable
+ +    "The Effect interface may change in incompatible ways in the future."
+ +]
++ *)
+  module Either         = Either
+  module Ephemeron      = Ephemeron
+- module Filename       = Filename
+ diff --git a/utils/warnings.ml b/utils/warnings.ml
+ --- a/utils/warnings.ml
+ +++ b/utils/warnings.ml
