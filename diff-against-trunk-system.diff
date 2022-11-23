@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..448344c6b5
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:46:12.269657895 +0100
-++++ b	2023-09-28 18:46:12.289658654 +0100
-+@@ -12,7 +12,7 @@
-+  OCaml 5.0
-+  ---------
-+  
-+-@@ -772,6 +768,10 @@ OCaml 5.0
-++@@ -767,6 +763,10 @@ OCaml 5.0
-+    the bug was only present in development version of OCaml 5.
-+    (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
-+  
-+@@ -20,6 +20,6 @@
-+ +  multiple threads.
-+ +  (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -10088,36 +10065,13 @@ index 0000000000..9f3136a531
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..242c63e141
+index 0000000000..6bc6489465
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10010 @@
+@@ -0,0 +1,10006 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..448344c6b5
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:46:12.269657895 +0100
-+++++ b	2023-09-28 18:46:12.289658654 +0100
-++@@ -12,7 +12,7 @@
-++  OCaml 5.0
-++  ---------
-++  
-++-@@ -772,6 +768,10 @@ OCaml 5.0
-+++@@ -767,6 +763,10 @@ OCaml 5.0
-++    the bug was only present in development version of OCaml 5.
-++    (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
-++  
-++@@ -20,6 +20,6 @@
-++ +  multiple threads.
-++ +  (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -20101,7 +20055,26 @@ index 0000000000..242c63e141
 +++   reason = "OCaml 5 only"
 +++*)
 ++ (* This test is currently disabled,
-++    until the random failures have been invest
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
