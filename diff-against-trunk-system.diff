@@ -6204,10 +6204,10 @@ index 0000000000..0c06d677da
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..9f3136a531
+index 0000000000..ab993447c2
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3855 @@
+@@ -0,0 +1,3868 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -9986,6 +9986,19 @@ index 0000000000..9f3136a531
 + (* This test is currently disabled,
 +    until the random failures have been investigated.
 + *)
++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++index f5e0711b79..8beb1f6433 100644
++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++@@ -1,4 +1,7 @@
++-(* TEST *)
+++(* TEST
+++* skip
+++reason = "OCaml 5 only"
+++*)
++ 
++ (* Testing unsynchronized, parallel Weak usage *)
++ 
 +diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 +index 1d16b72d4e..956ec369ab 100644
 +--- a/testsuite/tools/asmgen_i386.S
@@ -10065,10 +10078,10 @@ index 0000000000..9f3136a531
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6bc6489465
+index 0000000000..e1f5eb8d33
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10006 @@
+@@ -0,0 +1,10007 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -16275,10 +16288,10 @@ index 0000000000..6bc6489465
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..9f3136a531
++index 0000000000..ab993447c2
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3855 @@
++@@ -0,0 +1,3868 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -20057,24 +20070,25 @@ index 0000000000..6bc6489465
 ++ (* This test is currently disabled,
 ++    until the random failures have been investigated.
 ++ *)
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (* Testing unsynchronized, parallel Weak usage *)
+++ 
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 ++index 1d16b72d4e..956ec369ab 100644
 ++--- a/testsuite/tools/asmgen_i386.S
 +++++ b/testsuite/tools/asmgen_i386.S
 ++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,
+++ G(caml_c_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
