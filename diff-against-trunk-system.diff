@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..404bd3061e
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:15.541781834 +0100
+++++ b	2023-09-28 18:46:15.561782591 +0100
++@@ -40,7 +40,7 @@
++ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
++ --- a/otherlibs/unix/fork.c
++ +++ b/otherlibs/unix/fork.c
++-@@ -28,7 +28,7 @@ void caml_atfork_parent(pid_t child_pid) {
+++@@ -33,7 +33,7 @@ void caml_atfork_parent(pid_t child_pid) {
++  }
++  
++  /* Post-fork tasks to be carried out in the child */
 diff --git a/.gitattributes b/.gitattributes
 index cf76412e2b..c21c8f2bf4 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index cf76412e2b..c21c8f2bf4 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index de11e8b349..4ef0f23935 100644
+index 91aa330095..65f9b9d6fa 100644
 --- a/Changes
 +++ b/Changes
-@@ -750,11 +750,6 @@ OCaml 5.0
+@@ -753,11 +753,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +43,7 @@ index de11e8b349..4ef0f23935 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -778,6 +773,26 @@ OCaml 5.0
+@@ -781,6 +776,26 @@ OCaml 5.0
    multiple threads.
    (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
  
@@ -56,7 +70,7 @@ index de11e8b349..4ef0f23935 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -813,13 +828,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -816,13 +831,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -72,7 +86,7 @@ index de11e8b349..4ef0f23935 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -926,6 +941,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -929,6 +944,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -82,7 +96,7 @@ index de11e8b349..4ef0f23935 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1185,6 +1203,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1188,6 +1206,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10078,13 +10092,27 @@ index 0000000000..ab993447c2
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0081494372
+index 0000000000..2e19153c86
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10007 @@
+@@ -0,0 +1,10005 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..404bd3061e
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:15.541781834 +0100
++++++ b	2023-09-28 18:46:15.561782591 +0100
+++@@ -40,7 +40,7 @@
+++ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
+++ --- a/otherlibs/unix/fork.c
+++ +++ b/otherlibs/unix/fork.c
+++-@@ -28,7 +28,7 @@ void caml_atfork_parent(pid_t child_pid) {
++++@@ -33,7 +33,7 @@ void caml_atfork_parent(pid_t child_pid) {
+++  }
+++  
+++  /* Post-fork tasks to be carried out in the child */
 +diff --git a/.gitattributes b/.gitattributes
 +index cf76412e2b..c21c8f2bf4 100644
 +--- a/.gitattributes
@@ -10098,10 +10126,10 @@ index 0000000000..0081494372
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index de11e8b349..4ef0f23935 100644
++index 91aa330095..65f9b9d6fa 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -750,11 +750,6 @@ OCaml 5.0
++@@ -753,11 +753,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10113,7 +10141,7 @@ index 0000000000..0081494372
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -778,6 +773,26 @@ OCaml 5.0
++@@ -781,6 +776,26 @@ OCaml 5.0
 +   multiple threads.
 +   (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
 + 
@@ -10140,7 +10168,7 @@ index 0000000000..0081494372
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -813,13 +828,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -816,13 +831,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10156,7 +10184,7 @@ index 0000000000..0081494372
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -926,6 +941,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -929,6 +944,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10166,7 +10194,7 @@ index 0000000000..0081494372
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1185,6 +1203,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1188,6 +1206,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20072,23 +20100,7 @@ index 0000000000..0081494372
 ++ *)
 ++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
 ++index f5e0711b79..8beb1f6433 100644
-++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++* skip
-+++reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* Testing unsynchronized, parallel Weak usage *)
-++ 
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_
+++--- a/testsuite/tes
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21348,7 +21360,7 @@ index d2e677a0bf..dd96b7f0b1 100644
            caml_win32_CRT_fd_of_filedescr(fd2));
    CAMLreturn(Val_unit);
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
-index 55206323de..c12e4db68f 100644
+index 653034ac4b..5bd650d14b 100644
 --- a/otherlibs/unix/fork.c
 +++ b/otherlibs/unix/fork.c
 @@ -17,11 +17,16 @@
@@ -21368,7 +21380,7 @@ index 55206323de..c12e4db68f 100644
  /* Post-fork tasks to be carried out in the parent */
  void caml_atfork_parent(pid_t child_pid) {
    CAML_EV_LIFECYCLE(EV_FORK_PARENT, child_pid);
-@@ -32,19 +37,29 @@ void caml_atfork_child() {
+@@ -32,19 +37,29 @@ void caml_atfork_child(void) {
    caml_runtime_events_post_fork();
    CAML_EV_LIFECYCLE(EV_FORK_CHILD, 0);
  }

@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:46:15.541781834 +0100
++++ b	2023-09-28 18:46:15.561782591 +0100
+@@ -40,7 +40,7 @@
+ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
+ --- a/otherlibs/unix/fork.c
+ +++ b/otherlibs/unix/fork.c
+-@@ -28,7 +28,7 @@ void caml_atfork_parent(pid_t child_pid) {
++@@ -33,7 +33,7 @@ void caml_atfork_parent(pid_t child_pid) {
+  }
+  
+  /* Post-fork tasks to be carried out in the child */
