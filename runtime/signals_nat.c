@@ -46,7 +46,7 @@ typedef void (*signal_handler)(int signo);
 #ifdef _WIN32
 extern signal_handler caml_win32_signal(int sig, signal_handler action);
 #define signal(sig,act) caml_win32_signal(sig,act)
-extern void caml_win32_overflow_detection();
+extern void caml_win32_overflow_detection(void);
 #endif
 
 /* This routine is the common entry point for garbage collection
