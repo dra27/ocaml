@@ -1,52 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c051dc87c1
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,43 @@
-+--- a	2023-09-28 18:46:18.621898299 +0100
-++++ b	2023-09-28 18:46:18.625898450 +0100
-+@@ -1,33 +1,37 @@
-+ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
-+ --- a/stdlib/obj.ml
-+ +++ b/stdlib/obj.ml
-+-@@ -29,9 +29,6 @@ external size : t -> int = "%obj_size"
-++@@ -29,11 +29,6 @@ external size : t -> int = "%obj_size"
-+  external reachable_words : t -> int = "caml_obj_reachable_words"
-+  external field : t -> int -> t = "%obj_field"
-+  external set_field : t -> int -> t -> unit = "%obj_set_field"
-++-(* BACKPORT
-+ -external compare_and_swap_field : t -> int -> t -> t -> bool
-+ -  = "caml_obj_compare_and_swap"
-+ -external is_shared : t -> bool = "caml_obj_is_shared"
-++-*)
-+  external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
-+  external floatarray_set :
-+      floatarray -> int -> float -> unit = "caml_floatarray_set"
-+ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-+ --- a/stdlib/obj.mli
-+ +++ b/stdlib/obj.mli
-+-@@ -53,9 +53,6 @@ external field : t -> int -> t = "%obj_field"
-++@@ -53,11 +53,6 @@ external field : t -> int -> t = "%obj_field"
-+      be propagated.
-+  *)
-+  external set_field : t -> int -> t -> unit = "%obj_set_field"
-++-(* BACKPORT
-+ -external compare_and_swap_field : t -> int -> t -> t -> bool
-+ -  = "caml_obj_compare_and_swap"
-+ -external is_shared : t -> bool = "caml_obj_is_shared"
-++-*)
-+  
-+  val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
-+  val [@inline always] set_double_field : t -> int -> float -> unit
-+ diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
-+ --- a/testsuite/tests/lazy/minor_major_force.ml
-+ +++ b/testsuite/tests/lazy/minor_major_force.ml
-+-@@ -15,7 +15,8 @@ type test_record = {
-++@@ -17,7 +17,8 @@ type test_record = {
-+    mutable lzy_int: int Lazy.t;
-+  }
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -60,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index d086d71206..657296b722 100644
+index 727b53ba24..8a65c94628 100644
 --- a/Changes
 +++ b/Changes
-@@ -771,11 +771,6 @@ OCaml 5.0
+@@ -777,11 +777,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -75,7 +29,7 @@ index d086d71206..657296b722 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -803,6 +798,26 @@ OCaml 5.0
+@@ -809,6 +804,26 @@ OCaml 5.0
    (this had stopped working in 4.14.0)
    (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
  
@@ -102,7 +56,7 @@ index d086d71206..657296b722 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -838,13 +853,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -844,13 +859,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -118,7 +72,7 @@ index d086d71206..657296b722 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -951,6 +966,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -957,6 +972,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -128,7 +82,7 @@ index d086d71206..657296b722 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1210,6 +1228,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1216,6 +1234,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6250,7 +6204,7 @@ index 0000000000..0c06d677da
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ab993447c2
+index 0000000000..1253d31774
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3868 @@
@@ -7911,7 +7865,7 @@ index 0000000000..ab993447c2
 + 
 + exception E
 +diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
-+index b18fe44a9b..d7497f986d 100644
++index 37f367a9c7..3b2c33af87 100644
 +--- a/testsuite/tests/lazy/minor_major_force.ml
 ++++ b/testsuite/tests/lazy/minor_major_force.ml
 +@@ -1,5 +1,7 @@
@@ -10124,59 +10078,13 @@ index 0000000000..ab993447c2
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..066b116992
+index 0000000000..d2c76315a6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10118 @@
+@@ -0,0 +1,10007 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c051dc87c1
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,43 @@
-++--- a	2023-09-28 18:46:18.621898299 +0100
-+++++ b	2023-09-28 18:46:18.625898450 +0100
-++@@ -1,33 +1,37 @@
-++ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
-++ --- a/stdlib/obj.ml
-++ +++ b/stdlib/obj.ml
-++-@@ -29,9 +29,6 @@ external size : t -> int = "%obj_size"
-+++@@ -29,11 +29,6 @@ external size : t -> int = "%obj_size"
-++  external reachable_words : t -> int = "caml_obj_reachable_words"
-++  external field : t -> int -> t = "%obj_field"
-++  external set_field : t -> int -> t -> unit = "%obj_set_field"
-+++-(* BACKPORT
-++ -external compare_and_swap_field : t -> int -> t -> t -> bool
-++ -  = "caml_obj_compare_and_swap"
-++ -external is_shared : t -> bool = "caml_obj_is_shared"
-+++-*)
-++  external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
-++  external floatarray_set :
-++      floatarray -> int -> float -> unit = "caml_floatarray_set"
-++ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-++ --- a/stdlib/obj.mli
-++ +++ b/stdlib/obj.mli
-++-@@ -53,9 +53,6 @@ external field : t -> int -> t = "%obj_field"
-+++@@ -53,11 +53,6 @@ external field : t -> int -> t = "%obj_field"
-++      be propagated.
-++  *)
-++  external set_field : t -> int -> t -> unit = "%obj_set_field"
-+++-(* BACKPORT
-++ -external compare_and_swap_field : t -> int -> t -> t -> bool
-++ -  = "caml_obj_compare_and_swap"
-++ -external is_shared : t -> bool = "caml_obj_is_shared"
-+++-*)
-++  
-++  val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
-++  val [@inline always] set_double_field : t -> int -> float -> unit
-++ diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
-++ --- a/testsuite/tests/lazy/minor_major_force.ml
-++ +++ b/testsuite/tests/lazy/minor_major_force.ml
-++-@@ -15,7 +15,8 @@ type test_record = {
-+++@@ -17,7 +17,8 @@ type test_record = {
-++    mutable lzy_int: int Lazy.t;
-++  }
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10190,10 +10098,10 @@ index 0000000000..066b116992
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index d086d71206..657296b722 100644
++index 727b53ba24..8a65c94628 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -771,11 +771,6 @@ OCaml 5.0
++@@ -777,11 +777,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10205,7 +10113,7 @@ index 0000000000..066b116992
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -803,6 +798,26 @@ OCaml 5.0
++@@ -809,6 +804,26 @@ OCaml 5.0
 +   (this had stopped working in 4.14.0)
 +   (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
 + 
@@ -10232,7 +10140,7 @@ index 0000000000..066b116992
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -838,13 +853,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -844,13 +859,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10248,7 +10156,7 @@ index 0000000000..066b116992
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -951,6 +966,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -957,6 +972,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10258,7 +10166,7 @@ index 0000000000..066b116992
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1210,6 +1228,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1216,6 +1234,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16380,7 +16288,7 @@ index 0000000000..066b116992
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ab993447c2
++index 0000000000..1253d31774
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3868 @@
@@ -18041,7 +17949,7 @@ index 0000000000..066b116992
 ++ 
 ++ exception E
 ++diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
-++index b18fe44a9b..d7497f986d 100644
+++index 37f367a9c7..3b2c33af87 100644
 ++--- a/testsuite/tests/lazy/minor_major_force.ml
 +++++ b/testsuite/tests/lazy/minor_major_force.ml
 ++@@ -1,5 +1,7 @@
@@ -20180,72 +20088,7 @@ index 0000000000..066b116992
 ++--- a/testsuite/tools/asmgen_i386.S
 +++++ b/testsuite/tools/asmgen_i386.S
 ++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
 ++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index cdeaf1b674..832812925d 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -152,10 +152,13 @@ case "$1" in
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -175,7 +178,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
