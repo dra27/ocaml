@@ -1655,7 +1655,7 @@ index c9b5781617..ddadf48a1b 100644
  
  exception E
 diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
-index b18fe44a9b..d7497f986d 100644
+index 37f367a9c7..3b2c33af87 100644
 --- a/testsuite/tests/lazy/minor_major_force.ml
 +++ b/testsuite/tests/lazy/minor_major_force.ml
 @@ -1,5 +1,7 @@

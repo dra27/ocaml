@@ -1,31 +1,52 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..f71bc99895
+index 0000000000..c051dc87c1
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,22 @@
-+--- a	2023-09-28 18:46:18.305886359 +0100
-++++ b	2023-09-28 18:46:18.325887115 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -799,6 +799,10 @@ OCaml 5.0
-++@@ -794,6 +794,10 @@ OCaml 5.0
-+    multiple threads.
-+    (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
+@@ -0,0 +1,43 @@
++--- a	2023-09-28 18:46:18.621898299 +0100
+++++ b	2023-09-28 18:46:18.625898450 +0100
++@@ -1,33 +1,37 @@
++ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
++ --- a/stdlib/obj.ml
++ +++ b/stdlib/obj.ml
++-@@ -29,9 +29,6 @@ external size : t -> int = "%obj_size"
+++@@ -29,11 +29,6 @@ external size : t -> int = "%obj_size"
++  external reachable_words : t -> int = "caml_obj_reachable_words"
++  external field : t -> int -> t = "%obj_field"
++  external set_field : t -> int -> t -> unit = "%obj_set_field"
+++-(* BACKPORT
++ -external compare_and_swap_field : t -> int -> t -> t -> bool
++ -  = "caml_obj_compare_and_swap"
++ -external is_shared : t -> bool = "caml_obj_is_shared"
+++-*)
++  external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
++  external floatarray_set :
++      floatarray -> int -> float -> unit = "caml_floatarray_set"
++ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
++ --- a/stdlib/obj.mli
++ +++ b/stdlib/obj.mli
++-@@ -53,9 +53,6 @@ external field : t -> int -> t = "%obj_field"
+++@@ -53,11 +53,6 @@ external field : t -> int -> t = "%obj_field"
++      be propagated.
++  *)
++  external set_field : t -> int -> t -> unit = "%obj_set_field"
+++-(* BACKPORT
++ -external compare_and_swap_field : t -> int -> t -> t -> bool
++ -  = "caml_obj_compare_and_swap"
++ -external is_shared : t -> bool = "caml_obj_is_shared"
+++-*)
 +  
-+@@ -9,8 +9,8 @@
-+ +  (this had stopped working in 4.14.0)
-+ +  (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
-+ +
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
++  val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
++  val [@inline always] set_double_field : t -> int -> float -> unit
++ diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
++ --- a/testsuite/tests/lazy/minor_major_force.ml
++ +++ b/testsuite/tests/lazy/minor_major_force.ml
++-@@ -15,7 +15,8 @@ type test_record = {
+++@@ -17,7 +17,8 @@ type test_record = {
++    mutable lzy_int: int Lazy.t;
++  }
 +  
-+ diff --git a/testsuite/tests/tool-toplevel/show.ml b/testsuite/tests/tool-toplevel/show.ml
-+ --- a/testsuite/tests/tool-toplevel/show.ml
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10103,38 +10124,59 @@ index 0000000000..ab993447c2
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6dbecd5bdf
+index 0000000000..066b116992
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10006 @@
+@@ -0,0 +1,10118 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..f71bc99895
++index 0000000000..c051dc87c1
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,22 @@
-++--- a	2023-09-28 18:46:18.305886359 +0100
-+++++ b	2023-09-28 18:46:18.325887115 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -799,6 +799,10 @@ OCaml 5.0
-+++@@ -794,6 +794,10 @@ OCaml 5.0
-++    multiple threads.
-++    (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
++@@ -0,0 +1,43 @@
+++--- a	2023-09-28 18:46:18.621898299 +0100
++++++ b	2023-09-28 18:46:18.625898450 +0100
+++@@ -1,33 +1,37 @@
+++ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
+++ --- a/stdlib/obj.ml
+++ +++ b/stdlib/obj.ml
+++-@@ -29,9 +29,6 @@ external size : t -> int = "%obj_size"
++++@@ -29,11 +29,6 @@ external size : t -> int = "%obj_size"
+++  external reachable_words : t -> int = "caml_obj_reachable_words"
+++  external field : t -> int -> t = "%obj_field"
+++  external set_field : t -> int -> t -> unit = "%obj_set_field"
++++-(* BACKPORT
+++ -external compare_and_swap_field : t -> int -> t -> t -> bool
+++ -  = "caml_obj_compare_and_swap"
+++ -external is_shared : t -> bool = "caml_obj_is_shared"
++++-*)
+++  external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
+++  external floatarray_set :
+++      floatarray -> int -> float -> unit = "caml_floatarray_set"
+++ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
+++ --- a/stdlib/obj.mli
+++ +++ b/stdlib/obj.mli
+++-@@ -53,9 +53,6 @@ external field : t -> int -> t = "%obj_field"
++++@@ -53,11 +53,6 @@ external field : t -> int -> t = "%obj_field"
+++      be propagated.
+++  *)
+++  external set_field : t -> int -> t -> unit = "%obj_set_field"
++++-(* BACKPORT
+++ -external compare_and_swap_field : t -> int -> t -> t -> bool
+++ -  = "caml_obj_compare_and_swap"
+++ -external is_shared : t -> bool = "caml_obj_is_shared"
++++-*)
 ++  
-++@@ -9,8 +9,8 @@
-++ +  (this had stopped working in 4.14.0)
-++ +  (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
-++ +
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
+++  val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
+++  val [@inline always] set_double_field : t -> int -> float -> unit
+++ diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
+++ --- a/testsuite/tests/lazy/minor_major_force.ml
+++ +++ b/testsuite/tests/lazy/minor_major_force.ml
+++-@@ -15,7 +15,8 @@ type test_record = {
++++@@ -17,7 +17,8 @@ type test_record = {
+++    mutable lzy_int: int Lazy.t;
+++  }
 ++  
-++ diff --git a/testsuite/tests/tool-toplevel/show.ml b/testsuite/tests/tool-toplevel/show.ml
-++ --- a/testsuite/tests/tool-toplevel/show.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20112,7 +20154,98 @@ index 0000000000..6dbecd5bdf
 ++index b42d399907..656e318473 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (* Testing unsynchronized, parallel Weak usage *)
+++ 
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index cdeaf1b674..832812925d 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -152,10 +152,13 @@ case "$1" in
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -175,7 +178,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -22177,38 +22310,6 @@ index ab29d404c9..8534cb3222 100644
  
  let from_fun (f : unit -> 'arg) =
    let x = Obj.new_block Obj.lazy_tag 1 in
-diff --git a/stdlib/obj.ml b/stdlib/obj.ml
-index 7f86887346..6fb0581747 100644
---- a/stdlib/obj.ml
-+++ b/stdlib/obj.ml
-@@ -29,9 +29,11 @@ external size : t -> int = "%obj_size"
- external reachable_words : t -> int = "caml_obj_reachable_words"
- external field : t -> int -> t = "%obj_field"
- external set_field : t -> int -> t -> unit = "%obj_set_field"
-+(* BACKPORT
- external compare_and_swap_field : t -> int -> t -> t -> bool
-   = "caml_obj_compare_and_swap"
- external is_shared : t -> bool = "caml_obj_is_shared"
-+*)
- external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
- external floatarray_set :
-     floatarray -> int -> float -> unit = "caml_floatarray_set"
-diff --git a/stdlib/obj.mli b/stdlib/obj.mli
-index bfc096b4b8..3de53dd15d 100644
---- a/stdlib/obj.mli
-+++ b/stdlib/obj.mli
-@@ -53,9 +53,11 @@ external field : t -> int -> t = "%obj_field"
-     be propagated.
- *)
- external set_field : t -> int -> t -> unit = "%obj_set_field"
-+(* BACKPORT
- external compare_and_swap_field : t -> int -> t -> t -> bool
-   = "caml_obj_compare_and_swap"
- external is_shared : t -> bool = "caml_obj_is_shared"
-+*)
- 
- val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
- val [@inline always] set_double_field : t -> int -> float -> unit
 diff --git a/stdlib/random.ml b/stdlib/random.ml
 index 02112d6bbd..c91195d2ff 100644
 --- a/stdlib/random.ml

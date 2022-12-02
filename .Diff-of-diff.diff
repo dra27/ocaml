@@ -1,22 +1,43 @@
---- a	2023-09-28 18:46:18.305886359 +0100
-+++ b	2023-09-28 18:46:18.325887115 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Changes b/Changes
- --- a/Changes
- +++ b/Changes
--@@ -799,6 +799,10 @@ OCaml 5.0
-+@@ -794,6 +794,10 @@ OCaml 5.0
-    multiple threads.
-    (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
+--- a	2023-09-28 18:46:18.621898299 +0100
++++ b	2023-09-28 18:46:18.625898450 +0100
+@@ -1,33 +1,37 @@
+ diff --git a/stdlib/obj.ml b/stdlib/obj.ml
+ --- a/stdlib/obj.ml
+ +++ b/stdlib/obj.ml
+-@@ -29,9 +29,6 @@ external size : t -> int = "%obj_size"
++@@ -29,11 +29,6 @@ external size : t -> int = "%obj_size"
+  external reachable_words : t -> int = "caml_obj_reachable_words"
+  external field : t -> int -> t = "%obj_field"
+  external set_field : t -> int -> t -> unit = "%obj_set_field"
++-(* BACKPORT
+ -external compare_and_swap_field : t -> int -> t -> t -> bool
+ -  = "caml_obj_compare_and_swap"
+ -external is_shared : t -> bool = "caml_obj_is_shared"
++-*)
+  external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
+  external floatarray_set :
+      floatarray -> int -> float -> unit = "caml_floatarray_set"
+ diff --git a/stdlib/obj.mli b/stdlib/obj.mli
+ --- a/stdlib/obj.mli
+ +++ b/stdlib/obj.mli
+-@@ -53,9 +53,6 @@ external field : t -> int -> t = "%obj_field"
++@@ -53,11 +53,6 @@ external field : t -> int -> t = "%obj_field"
+      be propagated.
+  *)
+  external set_field : t -> int -> t -> unit = "%obj_set_field"
++-(* BACKPORT
+ -external compare_and_swap_field : t -> int -> t -> t -> bool
+ -  = "caml_obj_compare_and_swap"
+ -external is_shared : t -> bool = "caml_obj_is_shared"
++-*)
   
-@@ -9,8 +9,8 @@
- +  (this had stopped working in 4.14.0)
- +  (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
- +
-- OCaml 4.14.0 (28 March 2022)
-- ----------------------------
-+ OCaml 4.14 maintenance branch
-+ -----------------------------
+  val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
+  val [@inline always] set_double_field : t -> int -> float -> unit
+ diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
+ --- a/testsuite/tests/lazy/minor_major_force.ml
+ +++ b/testsuite/tests/lazy/minor_major_force.ml
+-@@ -15,7 +15,8 @@ type test_record = {
++@@ -17,7 +17,8 @@ type test_record = {
+    mutable lzy_int: int Lazy.t;
+  }
   
- diff --git a/testsuite/tests/tool-toplevel/show.ml b/testsuite/tests/tool-toplevel/show.ml
- --- a/testsuite/tests/tool-toplevel/show.ml
