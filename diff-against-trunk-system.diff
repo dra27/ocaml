@@ -1,28 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..34b389f24f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,19 @@
-+--- a	2023-09-28 18:46:19.265922626 +0100
-++++ b	2023-09-28 18:46:19.281923230 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -807,7 +807,8 @@ OCaml 5.0
-++@@ -802,7 +802,8 @@ OCaml 5.0
-+  
-+  - #11533, #11534: follow synonyms again in #show_module_type
-+    (this had stopped working in 4.14.0)
-+@@ -9,5 +9,5 @@
-+ +  (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
-+ +   report by Yaron Minsky)
-+  
-+- OCaml 4.14.0 (28 March 2022)
-+- ----------------------------
-++ OCaml 4.14 maintenance branch
-++ -----------------------------
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10100,35 +10078,13 @@ index 0000000000..1253d31774
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1d3e8bdd8a
+index 0000000000..133fef0f10
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10011 @@
+@@ -0,0 +1,10007 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..34b389f24f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,19 @@
-++--- a	2023-09-28 18:46:19.265922626 +0100
-+++++ b	2023-09-28 18:46:19.281923230 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -807,7 +807,8 @@ OCaml 5.0
-+++@@ -802,7 +802,8 @@ OCaml 5.0
-++  
-++  - #11533, #11534: follow synonyms again in #show_module_type
-++    (this had stopped working in 4.14.0)
-++@@ -9,5 +9,5 @@
-++ +  (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
-++ +   report by Yaron Minsky)
-++  
-++- OCaml 4.14.0 (28 March 2022)
-++- ----------------------------
-+++ OCaml 4.14 maintenance branch
-+++ -----------------------------
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20114,7 +20070,25 @@ index 0000000000..1d3e8bdd8a
 ++ (* This test is currently disabled,
 ++    until the random failures have been investigated.
 ++ *)
-++diff
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (* Testing unsynchronized, parallel Weak usage *)
+++ 
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call)
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
