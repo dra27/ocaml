@@ -2292,19 +2292,6 @@ index b7e5c721c2..7499dbf46f 100644
  #define printf_os printf
  #endif
  
-diff --git a/runtime/stacks.c b/runtime/stacks.c
-index 611b05018e..a1409b2abd 100644
---- a/runtime/stacks.c
-+++ b/runtime/stacks.c
-@@ -24,7 +24,7 @@
- #include "caml/mlvalues.h"
- #include "caml/stacks.h"
- 
--value caml_global_data = Val_unit; /* must be a valid value (#11768) */
-+value caml_global_data = 0;
- 
- uintnat caml_max_stack_size;            /* also used in gc_ctrl.c */
- 
 diff --git a/runtime/sys.c b/runtime/sys.c
 index a77fd9d1cf..9508d3f903 100644
 --- a/runtime/sys.c

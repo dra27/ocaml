@@ -1,0 +1,25 @@
+--- a	2023-09-28 18:46:20.209958270 +0100
++++ b	2023-09-28 18:46:20.229959025 +0100
+@@ -1,18 +1,17 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -82,6 +82,11 @@ OCaml 4.14 maintenance branch
+-   (this had stopped working in 4.14.0)
+-   (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
++@@ -824,6 +824,10 @@ OCaml 4.14 maintenance branch
++ - #11489, #11496: More prudent deallocation of alternate signal stack
++   (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
+  
+ +- #11768, #11788: Fix crash at start-up of bytecode programs in
+ +  no-naked-pointers mode caused by wrong initialization of caml_global_data
+ +  (Xavier Leroy, report by Etienne Millon, review by Gabriel Scherer)
+ +
+-+
++ 
+  OCaml 4.14.0 (28 March 2022)
+  ----------------------------
+- 
+ diff --git a/runtime/stacks.c b/runtime/stacks.c
+ --- a/runtime/stacks.c
+ +++ b/runtime/stacks.c
