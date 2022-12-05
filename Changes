@@ -824,6 +824,10 @@ OCaml 4.14 maintenance branch
 - #11489, #11496: More prudent deallocation of alternate signal stack
   (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
 
+- #11768, #11788: Fix crash at start-up of bytecode programs in
+  no-naked-pointers mode caused by wrong initialization of caml_global_data
+  (Xavier Leroy, report by Etienne Millon, review by Gabriel Scherer)
+
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------
