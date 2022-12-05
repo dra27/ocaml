@@ -24,7 +24,13 @@
 #include "caml/mlvalues.h"
 #include "caml/stacks.h"
 
+<<<<<<< HEAD
 value caml_global_data = Val_unit;
+||||||| parent of 87b5765a68 (Statically initialize `caml_global_data` with a valid value (PR#11788))
+value caml_global_data = 0;
+=======
+value caml_global_data = Val_unit; /* must be a valid value (#11768) */
+>>>>>>> 87b5765a68 (Statically initialize `caml_global_data` with a valid value (PR#11788))
 
 uintnat caml_max_stack_size;            /* also used in gc_ctrl.c */
 
