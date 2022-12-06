@@ -1,34 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b35108d750
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,25 @@
-+--- a	2023-09-28 18:46:20.209958270 +0100
-++++ b	2023-09-28 18:46:20.229959025 +0100
-+@@ -1,18 +1,17 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -82,6 +82,11 @@ OCaml 4.14 maintenance branch
-+-   (this had stopped working in 4.14.0)
-+-   (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
-++@@ -824,6 +824,10 @@ OCaml 4.14 maintenance branch
-++ - #11489, #11496: More prudent deallocation of alternate signal stack
-++   (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
-+  
-+ +- #11768, #11788: Fix crash at start-up of bytecode programs in
-+ +  no-naked-pointers mode caused by wrong initialization of caml_global_data
-+ +  (Xavier Leroy, report by Etienne Millon, review by Gabriel Scherer)
-+ +
-+-+
-++ 
-+  OCaml 4.14.0 (28 March 2022)
-+  ----------------------------
-+- 
-+ diff --git a/runtime/stacks.c b/runtime/stacks.c
-+ --- a/runtime/stacks.c
-+ +++ b/runtime/stacks.c
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10097,41 +10069,13 @@ index 0000000000..1253d31774
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..879ba8babc
+index 0000000000..6b483cdf50
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10000 @@
+@@ -0,0 +1,10005 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b35108d750
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,25 @@
-++--- a	2023-09-28 18:46:20.209958270 +0100
-+++++ b	2023-09-28 18:46:20.229959025 +0100
-++@@ -1,18 +1,17 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -82,6 +82,11 @@ OCaml 4.14 maintenance branch
-++-   (this had stopped working in 4.14.0)
-++-   (Gabriel Scherer, review by Jacques Garrigue, report by Yaron Minsky)
-+++@@ -824,6 +824,10 @@ OCaml 4.14 maintenance branch
-+++ - #11489, #11496: More prudent deallocation of alternate signal stack
-+++   (Xavier Leroy, report by @rajdakin, review by Florian Angeletti)
-++  
-++ +- #11768, #11788: Fix crash at start-up of bytecode programs in
-++ +  no-naked-pointers mode caused by wrong initialization of caml_global_data
-++ +  (Xavier Leroy, report by Etienne Millon, review by Gabriel Scherer)
-++ +
-++-+
-+++ 
-++  OCaml 4.14.0 (28 March 2022)
-++  ----------------------------
-++- 
-++ diff --git a/runtime/stacks.c b/runtime/stacks.c
-++ --- a/runtime/stacks.c
-++ +++ b/runtime/stacks.c
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20100,7 +20044,40 @@ index 0000000000..879ba8babc
 ++index b42d399907..656e318473 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (* Testing unsynchronized, parallel Weak usage *)
+++ 
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we requ
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
