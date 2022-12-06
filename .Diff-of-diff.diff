@@ -1,0 +1,39 @@
+--- a	2023-09-28 18:46:20.853982576 +0100
++++ b	2023-09-28 18:46:20.873983331 +0100
+@@ -18,24 +18,15 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -256,8 +256,6 @@ AC_CANONICAL_TARGET
++@@ -259,8 +259,6 @@ AC_CANONICAL_TARGET
+  AS_CASE([$host],
+    [*-pc-windows],
+      [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
+--  [*-*-cygwin*],
+--    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
++-dnl   [*-*-cygwin*],
++-dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
+    [i386-*-solaris*],
+      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
+  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
+-@@ -1260,7 +1258,7 @@ AS_CASE([$host],
+-   [aarch64-*-netbsd*],
+-     [has_native_backend=yes; arch=arm64; system=netbsd],
+-   [x86_64-*-cygwin*],
+--    [arch=amd64; system=cygwin],
+-+    [has_native_backend=yes; arch=amd64; system=cygwin],
+-   [riscv64-*-linux*],
+-     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+- )
+ diff --git a/man/ocamlrun.1 b/man/ocamlrun.1
+ --- a/man/ocamlrun.1
+ +++ b/man/ocamlrun.1
+@@ -94,7 +85,7 @@
+        mkdir -p "$FLEXDLLROOT"
+        cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
+        # The objects are always built from the sources
+-@@ -180,7 +186,7 @@ case "$1" in
++@@ -183,7 +189,7 @@ case "$1" in
+        run "$MAKE distclean" $MAKE distclean
+      fi
+  

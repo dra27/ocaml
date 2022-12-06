@@ -1,6 +1,48 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..80e6439ad5
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,39 @@
++--- a	2023-09-28 18:46:20.853982576 +0100
+++++ b	2023-09-28 18:46:20.873983331 +0100
++@@ -18,24 +18,15 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -256,8 +256,6 @@ AC_CANONICAL_TARGET
+++@@ -259,8 +259,6 @@ AC_CANONICAL_TARGET
++  AS_CASE([$host],
++    [*-pc-windows],
++      [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
++--  [*-*-cygwin*],
++--    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
+++-dnl   [*-*-cygwin*],
+++-dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
++    [i386-*-solaris*],
++      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
++  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
++-@@ -1260,7 +1258,7 @@ AS_CASE([$host],
++-   [aarch64-*-netbsd*],
++-     [has_native_backend=yes; arch=arm64; system=netbsd],
++-   [x86_64-*-cygwin*],
++--    [arch=amd64; system=cygwin],
++-+    [has_native_backend=yes; arch=amd64; system=cygwin],
++-   [riscv64-*-linux*],
++-     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
++- )
++ diff --git a/man/ocamlrun.1 b/man/ocamlrun.1
++ --- a/man/ocamlrun.1
++ +++ b/man/ocamlrun.1
++@@ -94,7 +85,7 @@
++        mkdir -p "$FLEXDLLROOT"
++        cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
++        # The objects are always built from the sources
++-@@ -180,7 +186,7 @@ case "$1" in
+++@@ -183,7 +189,7 @@ case "$1" in
++        run "$MAKE distclean" $MAKE distclean
++      fi
++  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +56,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index fcf7a28cb5..7846e85399 100644
+index 3b0dac8297..7200b0433c 100644
 --- a/Changes
 +++ b/Changes
-@@ -777,11 +777,6 @@ OCaml 5.0
+@@ -782,11 +782,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +71,7 @@ index fcf7a28cb5..7846e85399 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -810,6 +805,30 @@ OCaml 5.0
+@@ -815,6 +810,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +102,7 @@ index fcf7a28cb5..7846e85399 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -845,13 +864,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -850,13 +869,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +118,7 @@ index fcf7a28cb5..7846e85399 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -958,6 +977,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -963,6 +982,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +128,7 @@ index fcf7a28cb5..7846e85399 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1217,6 +1239,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1222,6 +1244,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3196,10 +3238,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 443a7af066..e235c05353 100755
+index f7ae8db0a0..92438b257d 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 071e42a6bf..68b4418671 100644
+index 572e9d958f..36d9474fb9 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3219,18 +3261,7 @@ index 071e42a6bf..68b4418671 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -256,8 +259,8 @@ AC_CANONICAL_TARGET
- AS_CASE([$host],
-   [*-pc-windows],
-     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
--  [*-*-cygwin*],
--    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
-+dnl   [*-*-cygwin*],
-+dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
-   [i386-*-solaris*],
-     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
- If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -372,15 +375,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -370,15 +373,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3262,7 +3293,7 @@ index 071e42a6bf..68b4418671 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -613,7 +624,8 @@ AS_CASE([$host],
+@@ -611,7 +622,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3272,7 +3303,7 @@ index 071e42a6bf..68b4418671 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -1027,9 +1039,9 @@ AS_IF([! $arch64],
+@@ -1025,9 +1037,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3285,7 +3316,7 @@ index 071e42a6bf..68b4418671 100644
  
  # Support for C11 atomic types
  
-@@ -1173,66 +1185,66 @@ system=unknown
+@@ -1171,66 +1183,66 @@ system=unknown
  has_native_backend=no
  AS_CASE([$host],
    [[i[3456]86-*-linux*]],
@@ -3379,7 +3410,7 @@ index 071e42a6bf..68b4418671 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1242,7 +1254,7 @@ AS_CASE([$host],
+@@ -1240,7 +1252,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3388,19 +3419,16 @@ index 071e42a6bf..68b4418671 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1260,9 +1272,9 @@ AS_CASE([$host],
-   [aarch64-*-netbsd*],
-     [has_native_backend=yes; arch=arm64; system=netbsd],
+@@ -1260,7 +1272,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
--    [arch=amd64; system=cygwin],
-+    [has_native_backend=yes; arch=amd64; system=cygwin],
+     [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
 -    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
 +    [arch=riscv; model=riscv64; system=linux]
  )
  
  AS_CASE([$ccomptype],
-@@ -1954,11 +1966,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1952,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3425,7 +3453,7 @@ index 071e42a6bf..68b4418671 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2009,6 +2033,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2007,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3456,7 +3484,7 @@ index 071e42a6bf..68b4418671 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2156,8 +2204,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2154,8 +2202,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -10069,13 +10097,55 @@ index 0000000000..1253d31774
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6b483cdf50
+index 0000000000..e5e5e22714
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10005 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..80e6439ad5
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,39 @@
+++--- a	2023-09-28 18:46:20.853982576 +0100
++++++ b	2023-09-28 18:46:20.873983331 +0100
+++@@ -18,24 +18,15 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -256,8 +256,6 @@ AC_CANONICAL_TARGET
++++@@ -259,8 +259,6 @@ AC_CANONICAL_TARGET
+++  AS_CASE([$host],
+++    [*-pc-windows],
+++      [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
+++--  [*-*-cygwin*],
+++--    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
++++-dnl   [*-*-cygwin*],
++++-dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
+++    [i386-*-solaris*],
+++      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
+++  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
+++-@@ -1260,7 +1258,7 @@ AS_CASE([$host],
+++-   [aarch64-*-netbsd*],
+++-     [has_native_backend=yes; arch=arm64; system=netbsd],
+++-   [x86_64-*-cygwin*],
+++--    [arch=amd64; system=cygwin],
+++-+    [has_native_backend=yes; arch=amd64; system=cygwin],
+++-   [riscv64-*-linux*],
+++-     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+++- )
+++ diff --git a/man/ocamlrun.1 b/man/ocamlrun.1
+++ --- a/man/ocamlrun.1
+++ +++ b/man/ocamlrun.1
+++@@ -94,7 +85,7 @@
+++        mkdir -p "$FLEXDLLROOT"
+++        cd "$APPVEYOR_BUILD_FOLDER/../flexdll"
+++        # The objects are always built from the sources
+++-@@ -180,7 +186,7 @@ case "$1" in
++++@@ -183,7 +189,7 @@ case "$1" in
+++        run "$MAKE distclean" $MAKE distclean
+++      fi
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10089,10 +10159,10 @@ index 0000000000..6b483cdf50
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index fcf7a28cb5..7846e85399 100644
++index 3b0dac8297..7200b0433c 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -777,11 +777,6 @@ OCaml 5.0
++@@ -782,11 +782,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10104,7 +10174,7 @@ index 0000000000..6b483cdf50
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -810,6 +805,30 @@ OCaml 5.0
++@@ -815,6 +810,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10135,7 +10205,7 @@ index 0000000000..6b483cdf50
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -845,13 +864,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -850,13 +869,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10151,7 +10221,7 @@ index 0000000000..6b483cdf50
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -958,6 +977,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -963,6 +982,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10161,7 +10231,7 @@ index 0000000000..6b483cdf50
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1217,6 +1239,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1222,6 +1244,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13271,10 +13341,10 @@ index 0000000000..6b483cdf50
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 443a7af066..e235c05353 100755
++index f7ae8db0a0..92438b257d 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 071e42a6bf..68b4418671 100644
++index 572e9d958f..36d9474fb9 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13294,18 +13364,7 @@ index 0000000000..6b483cdf50
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -256,8 +259,8 @@ AC_CANONICAL_TARGET
-+ AS_CASE([$host],
-+   [*-pc-windows],
-+     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
-+-  [*-*-cygwin*],
-+-    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
-++dnl   [*-*-cygwin*],
-++dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
-+   [i386-*-solaris*],
-+     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
-+ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -372,15 +375,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -370,15 +373,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -13337,7 +13396,7 @@ index 0000000000..6b483cdf50
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -613,7 +624,8 @@ AS_CASE([$host],
++@@ -611,7 +622,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13347,7 +13406,7 @@ index 0000000000..6b483cdf50
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -1027,9 +1039,9 @@ AS_IF([! $arch64],
++@@ -1025,9 +1037,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -13360,7 +13419,7 @@ index 0000000000..6b483cdf50
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1173,66 +1185,66 @@ system=unknown
++@@ -1171,66 +1183,66 @@ system=unknown
 + has_native_backend=no
 + AS_CASE([$host],
 +   [[i[3456]86-*-linux*]],
@@ -13454,7 +13513,7 @@ index 0000000000..6b483cdf50
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1242,7 +1254,7 @@ AS_CASE([$host],
++@@ -1240,7 +1252,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13463,19 +13522,16 @@ index 0000000000..6b483cdf50
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1260,9 +1272,9 @@ AS_CASE([$host],
-+   [aarch64-*-netbsd*],
-+     [has_native_backend=yes; arch=arm64; system=netbsd],
++@@ -1260,7 +1272,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
-+-    [arch=amd64; system=cygwin],
-++    [has_native_backend=yes; arch=amd64; system=cygwin],
++     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
 +-    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
 ++    [arch=riscv; model=riscv64; system=linux]
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1954,11 +1966,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1952,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13500,7 +13556,7 @@ index 0000000000..6b483cdf50
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2009,6 +2033,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2007,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13531,7 +13587,7 @@ index 0000000000..6b483cdf50
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2156,8 +2204,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2154,8 +2202,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -20049,35 +20105,7 @@ index 0000000000..6b483cdf50
 +++   * skip
 +++   reason = "OCaml 5 only"
 +++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++index f5e0711b79..8beb1f6433 100644
-++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++* skip
-+++reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* Testing unsynchronized, parallel Weak usage *)
-++ 
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we requ
+++ (* T
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644

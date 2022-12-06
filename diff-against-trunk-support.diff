@@ -3828,7 +3828,7 @@ index de10bd1fd3..5f9e31bc66 100755
  
  Build () {
 diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-index cdeaf1b674..832812925d 100644
+index 3292ad9c31..24fd58adef 100644
 --- a/tools/ci/appveyor/appveyor_build.sh
 +++ b/tools/ci/appveyor/appveyor_build.sh
 @@ -64,8 +64,8 @@ function set_configuration {
@@ -3842,7 +3842,7 @@ index cdeaf1b674..832812925d 100644
          ;;
          msvc32)
              build='--build=i686-pc-cygwin'
-@@ -152,10 +152,13 @@ case "$1" in
+@@ -158,10 +158,13 @@ case "$1" in
      run "test $PORT" \
          make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
@@ -3857,7 +3857,7 @@ index cdeaf1b674..832812925d 100644
        # Ensure that .gitignore is up-to-date - this will fail if any untracked
        # or altered files exist. We revert the change from the bootstrap (that
        # would have failed the build earlier if necessary)
-@@ -175,7 +178,7 @@ case "$1" in
+@@ -181,7 +184,7 @@ case "$1" in
    *)
      cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
  
