@@ -1,6 +1,95 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e864fabbc2
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,86 @@
++--- a	2023-09-28 18:46:22.274036139 +0100
+++++ b	2023-09-28 18:46:22.278036290 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -903,20 +903,21 @@ let fundecl fundecl =
+++@@ -953,22 +953,23 @@ let fundecl fundecl =
++      preproc_stack_check
++        ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
++    in
++@@ -26,9 +26,11 @@
++ +      Some (overflow, ret)
++ +    end else None
++ +  in
+++ *)
++    emit_all env true fundecl.fun_body;
++    List.iter emit_call_gc env.call_gc_sites;
++    emit_call_bound_errors env;
+++ (* BACKPORT
++ -  begin match !handle_overflow with
++ +  begin match handle_overflow with
++    | None -> ()
++@@ -37,7 +39,7 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -1076,24 +1076,23 @@ let fundecl fundecl =
+++@@ -1127,26 +1127,25 @@ let fundecl fundecl =
++      preproc_stack_check
++        ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
++    in
++@@ -70,17 +72,19 @@
++ +      Some (overflow, ret), 5
++ +    end else None, 0
++ +  in
+++ *)
++  
++    let max_out_of_line_code_offset =
+++ (* BACKPORT
++ -    !stack_check_size +
++ +    stack_check_size +
+++ *)
++      max_out_of_line_code_offset ~num_call_gc
++        ~num_check_bound
++-   in
++-@@ -1106,7 +1105,7 @@ let fundecl fundecl =
++-   assert (List.length env.call_gc_sites = num_call_gc);
+++@@ -1161,7 +1160,7 @@ let fundecl fundecl =
++    assert (List.length env.bound_error_sites = num_check_bound);
++  
+++ (* BACKPORT
++ -  begin match !handle_overflow with
++ +  begin match handle_overflow with
++    | None -> ()
++@@ -89,13 +93,14 @@
++ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
++ --- a/asmcomp/riscv/emit.mlp
++ +++ b/asmcomp/riscv/emit.mlp
++-@@ -617,24 +617,25 @@ let fundecl fundecl =
+++@@ -624,19 +624,19 @@ let fundecl fundecl =
++      preproc_stack_check
++        ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
++    in
++ -  let handle_overflow = ref None in
++ -  if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
++ -    let overflow = new_label () and ret = new_label () in
+++-
++ -    let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
++ -    let f = max_frame_size + threshold_offset in
++ -    let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
++@@ -118,11 +123,13 @@
++ +      Some (overflow, ret)
++ +    end else None
++ +  in
+++ *)
++  
++    emit_all env fundecl.fun_body;
++-   List.iter emit_call_gc env.call_gc_sites;
+++@@ -644,7 +644,7 @@ let fundecl fundecl =
++    List.iter emit_call_bound_error env.bound_error_sites;
++  
+++ (* BACKPORT
++ -  begin match !handle_overflow with
++ +  begin match handle_overflow with
++    | None -> ()
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -236,7 +325,7 @@ index 2d77fe6984..f723706001 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index 4e986c25e4..0cf7fa8089 100644
+index 841f67c507..978e10bbd3 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -388,19 +477,19 @@ index 4e986c25e4..0cf7fa8089 100644
    if !Clflags.runtime_variant = "d" then
      emit_call "caml_assert_stack_invariants";
    let { max_frame_size; contains_nontail_calls} =
-@@ -913,9 +963,11 @@ let fundecl fundecl =
-     def_label ret;
-     handle_overflow := Some (overflow, ret)
-   end;
+@@ -914,9 +964,11 @@ let fundecl fundecl =
+       Some (overflow, ret)
+     end else None
+   in
 +*)
    emit_all env true fundecl.fun_body;
    List.iter emit_call_gc env.call_gc_sites;
    emit_call_bound_errors env;
 +(* BACKPORT
-   begin match !handle_overflow with
+   begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -932,6 +984,7 @@ let fundecl fundecl =
+@@ -933,6 +985,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -434,7 +523,7 @@ index 70ee85fd44..8a46f7ea27 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index 12ad260b2e..6666e1a210 100644
+index 9890043c85..6acba55a5c 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -601,28 +690,28 @@ index 12ad260b2e..6666e1a210 100644
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
    let { max_frame_size; contains_nontail_calls} =
-@@ -1091,9 +1142,12 @@ let fundecl fundecl =
-     handle_overflow := Some (overflow, ret);
-     stack_check_size := 5
-   end;
+@@ -1090,9 +1141,12 @@ let fundecl fundecl =
+       Some (overflow, ret), 5
+     end else None, 0
+   in
 +*)
  
    let max_out_of_line_code_offset =
 +(* BACKPORT
-     !stack_check_size +
+     stack_check_size +
 +*)
      max_out_of_line_code_offset ~num_call_gc
        ~num_check_bound
    in
-@@ -1106,6 +1160,7 @@ let fundecl fundecl =
+@@ -1105,6 +1159,7 @@ let fundecl fundecl =
    assert (List.length env.call_gc_sites = num_call_gc);
    assert (List.length env.bound_error_sites = num_check_bound);
  
 +(* BACKPORT
-   begin match !handle_overflow with
+   begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -1120,6 +1175,7 @@ let fundecl fundecl =
+@@ -1119,6 +1174,7 @@ let fundecl fundecl =
        `  b {emit_label ret}\n`
      end
    end;
@@ -712,7 +801,7 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-index 2d8b5f168f..b982a6247e 100644
+index 859e52c463..f52a46d438 100644
 --- a/asmcomp/riscv/emit.mlp
 +++ b/asmcomp/riscv/emit.mlp
 @@ -328,8 +328,10 @@ let emit_instr env i =
@@ -747,18 +836,10 @@ index 2d8b5f168f..b982a6247e 100644
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
    let { max_frame_size; contains_nontail_calls } =
-@@ -620,6 +627,7 @@ let fundecl fundecl =
-   let handle_overflow = ref None in
-   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
-     let overflow = new_label () and ret = new_label () in
-+
-     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
-     let f = max_frame_size + threshold_offset in
-     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
-@@ -629,11 +637,13 @@ let fundecl fundecl =
-     `{emit_label ret}:\n`;
-     handle_overflow := Some (overflow, ret)
-   end;
+@@ -630,11 +637,13 @@ let fundecl fundecl =
+       Some (overflow, ret)
+     end else None
+   in
 +*)
  
    emit_all env fundecl.fun_body;
@@ -766,10 +847,10 @@ index 2d8b5f168f..b982a6247e 100644
    List.iter emit_call_bound_error env.bound_error_sites;
  
 +(* BACKPORT
-   begin match !handle_overflow with
+   begin match handle_overflow with
    | None -> ()
    | Some (overflow, ret) ->
-@@ -650,6 +660,7 @@ let fundecl fundecl =
+@@ -651,6 +660,7 @@ let fundecl fundecl =
        `	addi	sp, sp, 16\n`;
        `	j	{emit_label ret}\n`
    end;
@@ -10055,13 +10136,102 @@ index 0000000000..29c099ab76
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e61d208889
+index 0000000000..f6240a938b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10016 @@
+@@ -0,0 +1,10136 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e864fabbc2
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,86 @@
+++--- a	2023-09-28 18:46:22.274036139 +0100
++++++ b	2023-09-28 18:46:22.278036290 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -903,20 +903,21 @@ let fundecl fundecl =
++++@@ -953,22 +953,23 @@ let fundecl fundecl =
+++      preproc_stack_check
+++        ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
+++    in
+++@@ -26,9 +26,11 @@
+++ +      Some (overflow, ret)
+++ +    end else None
+++ +  in
++++ *)
+++    emit_all env true fundecl.fun_body;
+++    List.iter emit_call_gc env.call_gc_sites;
+++    emit_call_bound_errors env;
++++ (* BACKPORT
+++ -  begin match !handle_overflow with
+++ +  begin match handle_overflow with
+++    | None -> ()
+++@@ -37,7 +39,7 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -1076,24 +1076,23 @@ let fundecl fundecl =
++++@@ -1127,26 +1127,25 @@ let fundecl fundecl =
+++      preproc_stack_check
+++        ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
+++    in
+++@@ -70,17 +72,19 @@
+++ +      Some (overflow, ret), 5
+++ +    end else None, 0
+++ +  in
++++ *)
+++  
+++    let max_out_of_line_code_offset =
++++ (* BACKPORT
+++ -    !stack_check_size +
+++ +    stack_check_size +
++++ *)
+++      max_out_of_line_code_offset ~num_call_gc
+++        ~num_check_bound
+++-   in
+++-@@ -1106,7 +1105,7 @@ let fundecl fundecl =
+++-   assert (List.length env.call_gc_sites = num_call_gc);
++++@@ -1161,7 +1160,7 @@ let fundecl fundecl =
+++    assert (List.length env.bound_error_sites = num_check_bound);
+++  
++++ (* BACKPORT
+++ -  begin match !handle_overflow with
+++ +  begin match handle_overflow with
+++    | None -> ()
+++@@ -89,13 +93,14 @@
+++ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
+++ --- a/asmcomp/riscv/emit.mlp
+++ +++ b/asmcomp/riscv/emit.mlp
+++-@@ -617,24 +617,25 @@ let fundecl fundecl =
++++@@ -624,19 +624,19 @@ let fundecl fundecl =
+++      preproc_stack_check
+++        ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
+++    in
+++ -  let handle_overflow = ref None in
+++ -  if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
+++ -    let overflow = new_label () and ret = new_label () in
++++-
+++ -    let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+++ -    let f = max_frame_size + threshold_offset in
+++ -    let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
+++@@ -118,11 +123,13 @@
+++ +      Some (overflow, ret)
+++ +    end else None
+++ +  in
++++ *)
+++  
+++    emit_all env fundecl.fun_body;
+++-   List.iter emit_call_gc env.call_gc_sites;
++++@@ -644,7 +644,7 @@ let fundecl fundecl =
+++    List.iter emit_call_bound_error env.bound_error_sites;
+++  
++++ (* BACKPORT
+++ -  begin match !handle_overflow with
+++ +  begin match handle_overflow with
+++    | None -> ()
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10297,7 +10467,7 @@ index 0000000000..e61d208889
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index 4e986c25e4..0cf7fa8089 100644
++index 841f67c507..978e10bbd3 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -10449,19 +10619,19 @@ index 0000000000..e61d208889
 +   if !Clflags.runtime_variant = "d" then
 +     emit_call "caml_assert_stack_invariants";
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -913,9 +963,11 @@ let fundecl fundecl =
-+     def_label ret;
-+     handle_overflow := Some (overflow, ret)
-+   end;
++@@ -914,9 +964,11 @@ let fundecl fundecl =
++       Some (overflow, ret)
++     end else None
++   in
 ++*)
 +   emit_all env true fundecl.fun_body;
 +   List.iter emit_call_gc env.call_gc_sites;
 +   emit_call_bound_errors env;
 ++(* BACKPORT
-+   begin match !handle_overflow with
++   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -932,6 +984,7 @@ let fundecl fundecl =
++@@ -933,6 +985,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -10495,7 +10665,7 @@ index 0000000000..e61d208889
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index 12ad260b2e..6666e1a210 100644
++index 9890043c85..6acba55a5c 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -10662,28 +10832,28 @@ index 0000000000..e61d208889
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -1091,9 +1142,12 @@ let fundecl fundecl =
-+     handle_overflow := Some (overflow, ret);
-+     stack_check_size := 5
-+   end;
++@@ -1090,9 +1141,12 @@ let fundecl fundecl =
++       Some (overflow, ret), 5
++     end else None, 0
++   in
 ++*)
 + 
 +   let max_out_of_line_code_offset =
 ++(* BACKPORT
-+     !stack_check_size +
++     stack_check_size +
 ++*)
 +     max_out_of_line_code_offset ~num_call_gc
 +       ~num_check_bound
 +   in
-+@@ -1106,6 +1160,7 @@ let fundecl fundecl =
++@@ -1105,6 +1159,7 @@ let fundecl fundecl =
 +   assert (List.length env.call_gc_sites = num_call_gc);
 +   assert (List.length env.bound_error_sites = num_check_bound);
 + 
 ++(* BACKPORT
-+   begin match !handle_overflow with
++   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -1120,6 +1175,7 @@ let fundecl fundecl =
++@@ -1119,6 +1174,7 @@ let fundecl fundecl =
 +       `  b {emit_label ret}\n`
 +     end
 +   end;
@@ -10773,7 +10943,7 @@ index 0000000000..e61d208889
 + 
 +   D.data ();
 +diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-+index 2d8b5f168f..b982a6247e 100644
++index 859e52c463..f52a46d438 100644
 +--- a/asmcomp/riscv/emit.mlp
 ++++ b/asmcomp/riscv/emit.mlp
 +@@ -328,8 +328,10 @@ let emit_instr env i =
@@ -10808,18 +10978,10 @@ index 0000000000..e61d208889
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
 +   let { max_frame_size; contains_nontail_calls } =
-+@@ -620,6 +627,7 @@ let fundecl fundecl =
-+   let handle_overflow = ref None in
-+   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
-+     let overflow = new_label () and ret = new_label () in
-++
-+     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
-+     let f = max_frame_size + threshold_offset in
-+     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
-+@@ -629,11 +637,13 @@ let fundecl fundecl =
-+     `{emit_label ret}:\n`;
-+     handle_overflow := Some (overflow, ret)
-+   end;
++@@ -630,11 +637,13 @@ let fundecl fundecl =
++       Some (overflow, ret)
++     end else None
++   in
 ++*)
 + 
 +   emit_all env fundecl.fun_body;
@@ -10827,10 +10989,10 @@ index 0000000000..e61d208889
 +   List.iter emit_call_bound_error env.bound_error_sites;
 + 
 ++(* BACKPORT
-+   begin match !handle_overflow with
++   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow, ret) ->
-+@@ -650,6 +660,7 @@ let fundecl fundecl =
++@@ -651,6 +660,7 @@ let fundecl fundecl =
 +       `	addi	sp, sp, 16\n`;
 +       `	j	{emit_label ret}\n`
 +   end;
@@ -20074,7 +20236,46 @@ index 0000000000..e61d208889
 +++  ./configure $configure_flags
 ++ }
 ++ 
-++ B
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..24fd58adef 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -158,10 +158,13 @@ case "$1" in
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +184,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     f
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
