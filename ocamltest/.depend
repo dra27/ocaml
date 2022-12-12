@@ -365,11 +365,13 @@ ocamltest_unix.cmi :
 options.cmo : \
     variables.cmi \
     tests.cmi \
+    ocamltest_config.cmi \
     actions.cmi \
     options.cmi
 options.cmx : \
     variables.cmx \
     tests.cmx \
+    ocamltest_config.cmx \
     actions.cmx \
     options.cmi
 options.cmi :
