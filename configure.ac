@@ -711,11 +711,11 @@ AS_CASE([$host],
         [AC_MSG_ERROR(m4_normalize([This version of MinGW-w64 GCC is too old.
           Please use GCC version 5 or above.]))],
       [gcc-*],
-        [internal_cflags="-Wno-unused $cc_warnings \
+        [internal_cflags="-Wno-unused -Wimplicit-fallthrough $cc_warnings \
 -fexcess-precision=standard"
         # TODO: see whether the code can be fixed to avoid -Wno-unused
         common_cflags="-O2 -fno-strict-aliasing -fwrapv -mms-bitfields"
-        internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
+        internal_cppflags='-CC -D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
         internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
         internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
       [AC_MSG_ERROR([Unsupported C compiler for a MinGW-w64 build])])],
@@ -729,6 +729,8 @@ AS_CASE([$host],
         Please use GCC version 4.9 or above.]), 69)],
     [gcc-*],
       [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
+      cc_warnings="-Wimplicit-fallthrough $cc_warnings"
+      internal_cppflags="$internal_cppflags -CC"
       internal_cflags="$cc_warnings -fno-common -fexcess-precision=standard"],
     [msvc-*],
       [common_cflags="-nologo -O2 -Gy- -MD $cc_warnings"

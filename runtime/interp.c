@@ -1015,7 +1015,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
         }
         sp = domain_state->current_stack->sp;
       }
-      /* Fall through CHECK_SIGNALS */
+      /* Fall through */ /* CHECK_SIGNALS */
 
 /* Signal handling */
 
