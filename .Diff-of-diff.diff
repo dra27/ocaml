@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:46:22.758054387 +0100
++++ b	2023-09-28 18:46:22.762054538 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+-@@ -28,42 +28,47 @@ type phase_record = { mutable major: int; mutable minor: int }
++@@ -30,42 +30,47 @@ type phase_record = { mutable major: int; mutable minor: int }
+  
+  let domain_tbl : (int, phase_record) Hashtbl.t = Hashtbl.create 5
+  
+@@ -71,7 +71,7 @@
+  let num_domains = 3
+  let num_minors = 30
+  
+-@@ -86,7 +91,5 @@ let () =
++@@ -88,7 +93,5 @@ let () =
+                                          ~lost_events () in
+      ignore(read_poll cursor callbacks None);
+      assert(!got_start);

@@ -2135,7 +2135,7 @@ index e1df5aee0b..6738603ddd 100644
  open Runtime_events
  
 diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-index 3cd4752282..dbcdf76434 100644
+index 76cad340d8..391186d007 100644
 --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
 +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
 @@ -1,5 +1,7 @@

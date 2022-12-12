@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..13de4e334b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:46:22.758054387 +0100
+++++ b	2023-09-28 18:46:22.762054538 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++ --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++ +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++-@@ -28,42 +28,47 @@ type phase_record = { mutable major: int; mutable minor: int }
+++@@ -30,42 +30,47 @@ type phase_record = { mutable major: int; mutable minor: int }
++  
++  let domain_tbl : (int, phase_record) Hashtbl.t = Hashtbl.create 5
++  
++@@ -71,7 +71,7 @@
++  let num_domains = 3
++  let num_minors = 30
++  
++-@@ -86,7 +91,5 @@ let () =
+++@@ -88,7 +93,5 @@ let () =
++                                          ~lost_events () in
++      ignore(read_poll cursor callbacks None);
++      assert(!got_start);
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10047,13 +10070,36 @@ index 0000000000..29c099ab76
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..342bea5ead
+index 0000000000..65de34a230
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10019 @@
+@@ -0,0 +1,10009 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..13de4e334b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:46:22.758054387 +0100
++++++ b	2023-09-28 18:46:22.762054538 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+++ --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+++ +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+++-@@ -28,42 +28,47 @@ type phase_record = { mutable major: int; mutable minor: int }
++++@@ -30,42 +30,47 @@ type phase_record = { mutable major: int; mutable minor: int }
+++  
+++  let domain_tbl : (int, phase_record) Hashtbl.t = Hashtbl.create 5
+++  
+++@@ -71,7 +71,7 @@
+++  let num_domains = 3
+++  let num_minors = 30
+++  
+++-@@ -86,7 +91,5 @@ let () =
++++@@ -88,7 +93,5 @@ let () =
+++                                          ~lost_events () in
+++      ignore(read_poll cursor callbacks None);
+++      assert(!got_start);
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20036,40 +20082,7 @@ index 0000000000..342bea5ead
 ++  * x86 we require the caml_extra_params symbol from the RTS. */
 ++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
 ++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..24fd58adef 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly 
+++--- a/tools/
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
