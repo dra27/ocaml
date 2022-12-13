@@ -23,6 +23,9 @@ OCaml 5.0 maintenance version
 - #11590: Allow installing to a destination path containing spaces.
   (Élie Brami, review by Sébastien Hinderer and David Allsopp)
 
+- #11675: Stop installing ocamloptp when the native compiler is not built.
+  (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
+
 ### Bug fixes:
 
 - #13019: Remove linking instructions for the Unix library from threads.cma
