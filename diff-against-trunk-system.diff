@@ -1,20 +1,425 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..5cffcf5ec1
+index 0000000000..872309532e
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:23.314075343 +0100
-++++ b	2023-09-28 18:46:23.334076096 +0100
-+@@ -434,7 +434,7 @@
-+ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-+ --- a/bytecomp/emitcode.ml
-+ +++ b/bytecomp/emitcode.ml
-+-@@ -465,5 +465,8 @@ let to_packed_file outchan code =
-++@@ -469,5 +469,8 @@ let to_packed_file outchan code =
-+    Fun.protect ~finally:clear (fun () ->
-+    emit code;
-+    LongString.output outchan !out_buffer 0 !out_position;
+@@ -0,0 +1,416 @@
++--- a	2023-09-28 18:46:23.694089662 +0100
+++++ b	2023-09-28 18:46:23.726090867 +0100
++@@ -554,16 +554,16 @@
++  
++  # The runtime system
++  
++-@@ -1045,7 +1070,7 @@ clean::
++- # Dependencies
++- 
++- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
+++@@ -1044,7 +1069,7 @@ clean::
+++ subdirs = \
+++   stdlib $(addprefix otherlibs/, \
+++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
++ -  debugger ocamldoc ocamltest tools
++ +  debugger ocamldoc ocamltest
++  
++  .PHONY: alldepend
++  alldepend: depend
++-@@ -1072,6 +1097,8 @@ partialclean::
+++@@ -1071,6 +1096,8 @@ partialclean::
++  
++  # The lexer generator
++  
++@@ -572,7 +572,7 @@
++  ocamllex_MODULES = $(addprefix lex/,\
++    cset syntax parser lexer table lexgen compact  common output outputbis main)
++  
++-@@ -1089,11 +1116,7 @@ ocamllex: ocamlyacc
+++@@ -1088,11 +1115,7 @@ ocamllex: ocamlyacc
++  ocamllex.opt: ocamlopt
++  	$(MAKE) lex-allopt
++  
++@@ -1059,7 +1059,7 @@
++  AC_SUBST([ocamlyacc_wstr_module])
++  AC_SUBST([outputexe])
++  AC_SUBST([outputobj])
++-@@ -599,10 +600,12 @@ ocamlsrcdir=${ocamlsrcdir%X}
+++@@ -610,10 +611,12 @@ ocamlsrcdir=${ocamlsrcdir%X}
++  AS_CASE([$host],
++    [*-*-mingw32|*-pc-windows],
++      [unix_or_win32="win32"
++@@ -1290,364 +1290,6 @@
++ -stripdebug.cmx : \
++ -    ../utils/misc.cmx \
++ -    ../bytecomp/bytesections.cmx
++-diff --git a/tools/Makefile b/tools/Makefile
++-deleted file mode 100644
++---- a/tools/Makefile
++-+++ /dev/null
++-@@ -1,353 +0,0 @@
++--#**************************************************************************
++--#*                                                                        *
++--#*                                 OCaml                                  *
++--#*                                                                        *
++--#*            Xavier Leroy, projet Cristal, INRIA Rocquencourt            *
++--#*                                                                        *
++--#*   Copyright 1999 Institut National de Recherche en Informatique et     *
++--#*     en Automatique.                                                    *
++--#*                                                                        *
++--#*   All rights reserved.  This file is distributed under the terms of    *
++--#*   the GNU Lesser General Public License version 2.1, with the          *
++--#*   special exception on linking described in the file LICENSE.          *
++--#*                                                                        *
++--#**************************************************************************
++--
++--ROOTDIR = ..
++--# NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
++--# gets included, so that its definition here takes precedence
++--# over the one there.
++--OCAMLLEX ?= $(BOOT_OCAMLLEX)
++--include $(ROOTDIR)/Makefile.common
++--include $(ROOTDIR)/Makefile.best_binaries
++--
++--# Setup GNU make variables storing per-target source and target,
++--# a list of installed tools, and a function to quote a filename for
++--# the shell.
++--installed_tools := ocamldep ocamlprof ocamlcp ocamloptp \
++--                   ocamlmktop ocamlmklib ocamlobjinfo
++--
++--install_files :=
++--define byte2native
++--$(patsubst %.cmo,%.cmx,$(patsubst %.cma,%.cmxa,$1))
++--endef
++--
++--CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g \
++--        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
++--CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) $(STDLIBFLAGS) -g
++--DIRS = $(addprefix $(ROOTDIR)/,utils parsing typing bytecomp \
++--                   middle_end middle_end/closure middle_end/flambda \
++--                   middle_end/flambda/base_types driver toplevel \
++--                   file_formats lambda)
++--INCLUDES = $(addprefix -I ,$(DIRS))
++--COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
++---warn-error +A -principal -strict-formats -bin-annot $(INCLUDES)
++--LINKFLAGS = $(INCLUDES)
++--VPATH := $(filter-out -I,$(INCLUDES))
++--
++--programs_byte := \
++--  ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
++--  ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
++--  primreq stripdebug cmpbyt
++--install_files += $(filter $(installed_tools), $(programs_byte))
++--programs_opt := $(programs_byte:%=%.opt)
++--
++--.PHONY: all allopt opt.opt othertools # allopt and opt.opt are synonyms
++--all: $(programs_byte)
++--opt.opt: $(programs_opt)
++--allopt: opt.opt
++--
++--$(foreach program, $(programs_byte) $(programs_opt),\
++--  $(eval $(call PROGRAM_SYNONYM,$(program))))
++--
++--$(programs_byte:%=%$(EXE)):
++--	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
++--
++--$(programs_opt:%=%$(EXE)):
++--	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
++--
++--clean::
++--	rm -f $(programs_byte) $(programs_byte:%=%.exe)
++--	rm -f $(programs_opt) $(programs_opt:%=%.exe)
++--
++--# The dependency generator
++--
++--ocamldep_objects = \
++--  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--  ocamldep.cmo depend.cmi
++--
++--ocamldep$(EXE): LINKFLAGS += -compat-32
++--ocamldep$(EXE): $(ocamldep_objects)
++--ocamldep.opt$(EXE): $(call byte2native, $(ocamldep_objects))
++--
++--# The profiler
++--
++--OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
++--  numbers.cmo arg_helper.cmo local_store.cmo load_path.cmo clflags.cmo \
++--  terminfo.cmo warnings.cmo location.cmo longident.cmo docstrings.cmo \
++--  syntaxerr.cmo ast_helper.cmo \
++--  camlinternalMenhirLib.cmo parser.cmo \
++--  pprintast.cmo \
++--  lexer.cmo parse.cmo ocamlprof.cmo
++--
++--ocamlprof$(EXE): $(OCAMLPROF)
++--ocamlprof.opt$(EXE): $(call byte2native, $(OCAMLPROF))
++--all: profiling.cmo
++--opt.opt: profiling.cmx
++--
++--OCAMLCP = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
++--          warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
++--          local_store.cmo load_path.cmo clflags.cmo \
++--          terminfo.cmo location.cmo ccomp.cmo compenv.cmo \
++--          main_args.cmo ocamlcp_common.cmo
++--
++--ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
++--ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
++--ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
++--ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
++--
++--opt:: profiling.cmx
++--
++--INSTALL_LIBDIR_PROFILING = $(INSTALL_LIBDIR)/profiling
++--
++--install::
++--# If installing over a previous OCaml version, ensure the module is removed
++--# from the previous installation.
++--	rm -f "$(INSTALL_LIBDIR)"/profiling.cm* "$(INSTALL_LIBDIR)/profiling.$(O)"
++--	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
++--	$(INSTALL_DATA) \
++--	  profiling.cmi profiling.cmo \
++--	  "$(INSTALL_LIBDIR_PROFILING)"
++--ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
++--	$(INSTALL_DATA) \
++--	  profiling.cmt profiling.cmti \
++--	  "$(INSTALL_LIBDIR_PROFILING)"
++--endif
++--
++--installopt::
++--	$(INSTALL_DATA) \
++--          profiling.cmx profiling.$(O) \
++--	  "$(INSTALL_LIBDIR_PROFILING)"
++--
++--# To help building mixed-mode libraries (OCaml + C)
++--OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
++--
++--ocamlmklib$(EXE): $(OCAMLMKLIB)
++--ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
++--
++--# To make custom toplevels
++--
++--OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
++--       identifiable.cmo numbers.cmo arg_helper.cmo local_store.cmo \
++--       load_path.cmo clflags.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
++--
++--ocamlmktop$(EXE): $(OCAMLMKTOP)
++--ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
++--
++--# Converter olabl/ocaml 2.99 to ocaml 3
++--
++--LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
++--
++--ifeq ($(UNIX_OR_WIN32),unix)
++--LN := ln -sf
++--else
++--LN := cp -pf
++--endif
++--
++--install::
++--ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
++--	for i in $(install_files); \
++--	do \
++--	  $(INSTALL_PROG) "$$i$(EXE)" "$(INSTALL_BINDIR)/$$i.byte$(EXE)"; \
++--	  if test -f "$$i".opt$(EXE); then \
++--	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)" && \
++--	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
++--	  else \
++--	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.byte$(EXE)" "$$i$(EXE)"); \
++--	  fi; \
++--	done
++--else
++--	for i in $(install_files); \
++--	do \
++--	  if test -f "$$i".opt$(EXE); then \
++--	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)"; \
++--	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
++--	  fi; \
++--	done
++--endif
++--
++--# The preprocessor for asm generators
++--
++--cvt_emit := cvt_emit$(EXE)
++--
++--$(eval $(call PROGRAM_SYNONYM,cvt_emit))
++--
++--$(cvt_emit): cvt_emit.cmo
++--	$(CAMLC) $(LINKFLAGS) -o $@ $^
++--
++--clean::
++--	rm -f cvt_emit.ml cvt_emit cvt_emit.exe
++--
++--beforedepend:: cvt_emit.ml
++--
++--# Reading cmt files
++--
++--OCAMLCMT = \
++--          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--          ocamlcmt.cmo
++--
++--ocamlcmt$(EXE): $(OCAMLCMT)
++--ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
++--
++--install::
++--	if test -f ocamlcmt.opt$(EXE); then \
++--	  $(INSTALL_PROG)\
++--	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
++--	else \
++--	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
++--	fi
++--
++--# The bytecode disassembler
++--
++--DUMPOBJ= \
++--          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--          opnames.cmo dumpobj.cmo
++--
++--dumpobj$(EXE): $(DUMPOBJ)
++--dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
++--
++--make_opcodes := make_opcodes$(EXE)
++--
++--$(eval $(call PROGRAM_SYNONYM,make_opcodes))
++--
++--$(make_opcodes): make_opcodes.ml
++--	$(CAMLC) $< -o $@
++--
++--opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
++--	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
++--
++--clean::
++--	rm -f opnames.ml make_opcodes make_opcodes.exe make_opcodes.ml
++--
++--beforedepend:: opnames.ml
++--
++--# Display info on compiled files
++--
++--DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'
++--
++--ifeq "$(SYSTEM)" "macosx"
++--DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
++--endif
++--
++--ifeq "$(SYSTEM)" "cygwin"
++--DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
++--endif
++--
++--OCAMLOBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--             $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--             $(ROOTDIR)/compilerlibs/ocamlmiddleend.cma \
++--             objinfo.cmo
++--
++--ocamlobjinfo$(EXE): $(OCAMLOBJINFO)
++--ocamlobjinfo.opt$(EXE): $(call byte2native, $(OCAMLOBJINFO))
++--
++--PRIMREQ=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--        primreq.cmo
++--
++--# Scan object files for required primitives
++--primreq$(EXE): $(PRIMREQ)
++--primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
++--
++--LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
++--        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cmxa \
++--        $(ROOTDIR)/compilerlibs/ocamlmiddleend.cmxa \
++--        $(ROOTDIR)/otherlibs/str/str.cmxa \
++--        lintapidiff.cmx
++--
++--lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
++--lintapidiff.opt$(EXE): $(LINTAPIDIFF)
++--	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
++--clean::
++--	rm -f -- lintapidiff.opt lintapidiff.opt.exe
++--	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj
++--
++--# Copy a bytecode executable, stripping debug info
++--
++--STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--           stripdebug.cmo
++--
++--stripdebug$(EXE): $(STRIPDEBUG)
++--stripdebug.opt$(EXE): $(call byte2native, $(STRIPDEBUG))
++--
++--# Compare two bytecode executables
++--
++--CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--       $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--       cmpbyt.cmo
++--
++--cmpbyt$(EXE): $(CMPBYT)
++--cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
++--
++--ocamltex_files := \
++--  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++--  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++--  $(ROOTDIR)/compilerlibs/ocamltoplevel.cma \
++--  $(ROOTDIR)/otherlibs/str/str.cma \
++--  $(ROOTDIR)/otherlibs/unix/unix.cma \
++--  ocamltex.ml
++--
++--# checkstack tool
++--
++--checkstack$(EXE): checkstack.$(O)
++--	$(MKEXE) $(OUTPUTEXE)$@ $<
++--
++--#Scan latex files, and run ocaml code examples
++--
++--ocamltex := ocamltex$(EXE)
++--
++--# ocamltex uses str.cma and unix.cma and so must be compiled with
++--# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
++--# compiler does not necessarily have the correct shared library
++--# configuration.
++--$(ocamltex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str unix)
++--$(ocamltex): $(ocamltex_files)
++--	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS) \
++--	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
++--
++--# we need str and unix which depend on the bytecode version of other tools
++--# thus we use the othertools target
++--ifeq "$(build_ocamltex)" "true"
++--othertools: $(ocamltex)
++--endif
++--clean::
++--	rm -f -- ocamltex ocamltex.exe ocamltex.cm?
++--
++--# Common stuff
++--
++--%.cmo: %.ml
++--	$(CAMLC) -c $(COMPFLAGS) - $<
++--
++--%.cmi: %.mli
++--	$(CAMLC) -c $(COMPFLAGS) - $<
++--
++--%.cmx: %.ml
++--	$(CAMLOPT) $(COMPFLAGS) -c - $<
++--
++--clean::
++--	rm -f *.cmo *.cmi *.cma *.dll *.so *.lib *.a
++--
++--OC_OCAMLDEPDIRS = $(DIRS)
++--depend: beforedepend
++--	$(OCAMLDEP_CMD) *.mli *.ml > .depend
++--
++--.PHONY: clean distclean install beforedepend depend
++--
++--distclean: clean
++--	rm -f eventlog_metadata *.bak
++--
++--include .depend
++ diff --git a/tools/cmpbyt.ml b/tools/cmpbyt.ml
++ --- a/tools/cmpbyt.ml
++ +++ b/tools/cmpbyt.ml
++@@ -1761,7 +1403,7 @@
++ diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
++ --- a/tools/dumpobj.ml
++ +++ b/tools/dumpobj.ml
++-@@ -577,7 +577,7 @@ let arg_fun filename =
+++@@ -579,7 +579,7 @@ let arg_fun filename =
++    close_in ic;
++    if !print_banners then printf "## end of ocaml dump of %S\n%!" filename
++  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,10 +433,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index be2158111c..2519c1db85 100644
+index 9d3ab25a2f..58cb2e4a44 100644
 --- a/Changes
 +++ b/Changes
-@@ -799,11 +799,6 @@ OCaml 5.0
+@@ -804,11 +804,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -43,7 +448,7 @@ index be2158111c..2519c1db85 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -832,6 +827,30 @@ OCaml 5.0
+@@ -837,6 +832,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -74,7 +479,7 @@ index be2158111c..2519c1db85 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -867,13 +886,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -872,13 +891,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -90,7 +495,7 @@ index be2158111c..2519c1db85 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -980,6 +999,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -985,6 +1004,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -100,7 +505,7 @@ index be2158111c..2519c1db85 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1239,6 +1261,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1244,6 +1266,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -111,10 +516,10 @@ index be2158111c..2519c1db85 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 6f4dc0c98f..fb79d6a079 100644
+index 36e11b0171..b5a065eecb 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -578,7 +578,6 @@ partialclean::
+@@ -603,7 +603,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -122,7 +527,7 @@ index 6f4dc0c98f..fb79d6a079 100644
    afl \
    alloc \
    array \
-@@ -586,24 +585,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -611,24 +610,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -150,7 +555,7 @@ index 6f4dc0c98f..fb79d6a079 100644
    main \
    major_gc \
    md5 \
-@@ -614,17 +613,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -639,17 +638,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -168,7 +573,7 @@ index 6f4dc0c98f..fb79d6a079 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -634,6 +628,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -659,6 +653,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -178,7 +583,7 @@ index 6f4dc0c98f..fb79d6a079 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -644,7 +641,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -669,7 +666,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -187,7 +592,7 @@ index 6f4dc0c98f..fb79d6a079 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1044,12 +1041,14 @@ clean::
+@@ -1069,12 +1066,14 @@ clean::
  
  # Dependencies
  
@@ -195,7 +600,7 @@ index 6f4dc0c98f..fb79d6a079 100644
 +subdirs = \
 +  stdlib $(addprefix otherlibs/, \
 +    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-   debugger ocamldoc ocamltest tools
+   debugger ocamldoc ocamltest
  
  .PHONY: alldepend
  alldepend: depend
@@ -204,7 +609,7 @@ index 6f4dc0c98f..fb79d6a079 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1124,6 +1123,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1147,6 +1146,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
@@ -3202,13 +3607,13 @@ index 8e600d7fa0..a71d53aecc 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index f7ae8db0a0..92438b257d 100755
+index 487f66a95e..42fad7050a 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 572e9d958f..36d9474fb9 100644
+index e7956cb6c8..230f60b7e2 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -3217,7 +3622,7 @@ index 572e9d958f..36d9474fb9 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -3225,7 +3630,7 @@ index 572e9d958f..36d9474fb9 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -370,15 +373,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -371,15 +374,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3257,7 +3662,7 @@ index 572e9d958f..36d9474fb9 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -611,7 +622,8 @@ AS_CASE([$host],
+@@ -614,7 +625,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3267,7 +3672,7 @@ index 572e9d958f..36d9474fb9 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -1025,9 +1037,9 @@ AS_IF([! $arch64],
+@@ -1028,9 +1040,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3280,7 +3685,7 @@ index 572e9d958f..36d9474fb9 100644
  
  # Support for C11 atomic types
  
-@@ -1171,66 +1183,66 @@ system=unknown
+@@ -1174,66 +1186,66 @@ system=unknown
  has_native_backend=no
  AS_CASE([$host],
    [[i[3456]86-*-linux*]],
@@ -3374,7 +3779,7 @@ index 572e9d958f..36d9474fb9 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1240,7 +1252,7 @@ AS_CASE([$host],
+@@ -1243,7 +1255,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3383,7 +3788,7 @@ index 572e9d958f..36d9474fb9 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1260,7 +1272,7 @@ AS_CASE([$host],
+@@ -1263,7 +1275,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3392,7 +3797,7 @@ index 572e9d958f..36d9474fb9 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1952,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1955,11 +1967,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3417,7 +3822,7 @@ index 572e9d958f..36d9474fb9 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2007,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2010,6 +2034,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3448,7 +3853,7 @@ index 572e9d958f..36d9474fb9 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2154,8 +2202,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2157,8 +2205,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -10061,27 +10466,432 @@ index 0000000000..e20e984b9f
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..15f8711bc8
+index 0000000000..d90bd7792e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10020 @@
+@@ -0,0 +1,10380 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..5cffcf5ec1
++index 0000000000..872309532e
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:23.314075343 +0100
-+++++ b	2023-09-28 18:46:23.334076096 +0100
-++@@ -434,7 +434,7 @@
-++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-++ --- a/bytecomp/emitcode.ml
-++ +++ b/bytecomp/emitcode.ml
-++-@@ -465,5 +465,8 @@ let to_packed_file outchan code =
-+++@@ -469,5 +469,8 @@ let to_packed_file outchan code =
-++    Fun.protect ~finally:clear (fun () ->
-++    emit code;
-++    LongString.output outchan !out_buffer 0 !out_position;
++@@ -0,0 +1,416 @@
+++--- a	2023-09-28 18:46:23.694089662 +0100
++++++ b	2023-09-28 18:46:23.726090867 +0100
+++@@ -554,16 +554,16 @@
+++  
+++  # The runtime system
+++  
+++-@@ -1045,7 +1070,7 @@ clean::
+++- # Dependencies
+++- 
+++- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
++++@@ -1044,7 +1069,7 @@ clean::
++++ subdirs = \
++++   stdlib $(addprefix otherlibs/, \
++++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
+++ -  debugger ocamldoc ocamltest tools
+++ +  debugger ocamldoc ocamltest
+++  
+++  .PHONY: alldepend
+++  alldepend: depend
+++-@@ -1072,6 +1097,8 @@ partialclean::
++++@@ -1071,6 +1096,8 @@ partialclean::
+++  
+++  # The lexer generator
+++  
+++@@ -572,7 +572,7 @@
+++  ocamllex_MODULES = $(addprefix lex/,\
+++    cset syntax parser lexer table lexgen compact  common output outputbis main)
+++  
+++-@@ -1089,11 +1116,7 @@ ocamllex: ocamlyacc
++++@@ -1088,11 +1115,7 @@ ocamllex: ocamlyacc
+++  ocamllex.opt: ocamlopt
+++  	$(MAKE) lex-allopt
+++  
+++@@ -1059,7 +1059,7 @@
+++  AC_SUBST([ocamlyacc_wstr_module])
+++  AC_SUBST([outputexe])
+++  AC_SUBST([outputobj])
+++-@@ -599,10 +600,12 @@ ocamlsrcdir=${ocamlsrcdir%X}
++++@@ -610,10 +611,12 @@ ocamlsrcdir=${ocamlsrcdir%X}
+++  AS_CASE([$host],
+++    [*-*-mingw32|*-pc-windows],
+++      [unix_or_win32="win32"
+++@@ -1290,364 +1290,6 @@
+++ -stripdebug.cmx : \
+++ -    ../utils/misc.cmx \
+++ -    ../bytecomp/bytesections.cmx
+++-diff --git a/tools/Makefile b/tools/Makefile
+++-deleted file mode 100644
+++---- a/tools/Makefile
+++-+++ /dev/null
+++-@@ -1,353 +0,0 @@
+++--#**************************************************************************
+++--#*                                                                        *
+++--#*                                 OCaml                                  *
+++--#*                                                                        *
+++--#*            Xavier Leroy, projet Cristal, INRIA Rocquencourt            *
+++--#*                                                                        *
+++--#*   Copyright 1999 Institut National de Recherche en Informatique et     *
+++--#*     en Automatique.                                                    *
+++--#*                                                                        *
+++--#*   All rights reserved.  This file is distributed under the terms of    *
+++--#*   the GNU Lesser General Public License version 2.1, with the          *
+++--#*   special exception on linking described in the file LICENSE.          *
+++--#*                                                                        *
+++--#**************************************************************************
+++--
+++--ROOTDIR = ..
+++--# NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
+++--# gets included, so that its definition here takes precedence
+++--# over the one there.
+++--OCAMLLEX ?= $(BOOT_OCAMLLEX)
+++--include $(ROOTDIR)/Makefile.common
+++--include $(ROOTDIR)/Makefile.best_binaries
+++--
+++--# Setup GNU make variables storing per-target source and target,
+++--# a list of installed tools, and a function to quote a filename for
+++--# the shell.
+++--installed_tools := ocamldep ocamlprof ocamlcp ocamloptp \
+++--                   ocamlmktop ocamlmklib ocamlobjinfo
+++--
+++--install_files :=
+++--define byte2native
+++--$(patsubst %.cmo,%.cmx,$(patsubst %.cma,%.cmxa,$1))
+++--endef
+++--
+++--CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g \
+++--        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+++--CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) $(STDLIBFLAGS) -g
+++--DIRS = $(addprefix $(ROOTDIR)/,utils parsing typing bytecomp \
+++--                   middle_end middle_end/closure middle_end/flambda \
+++--                   middle_end/flambda/base_types driver toplevel \
+++--                   file_formats lambda)
+++--INCLUDES = $(addprefix -I ,$(DIRS))
+++--COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
+++---warn-error +A -principal -strict-formats -bin-annot $(INCLUDES)
+++--LINKFLAGS = $(INCLUDES)
+++--VPATH := $(filter-out -I,$(INCLUDES))
+++--
+++--programs_byte := \
+++--  ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
+++--  ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
+++--  primreq stripdebug cmpbyt
+++--install_files += $(filter $(installed_tools), $(programs_byte))
+++--programs_opt := $(programs_byte:%=%.opt)
+++--
+++--.PHONY: all allopt opt.opt othertools # allopt and opt.opt are synonyms
+++--all: $(programs_byte)
+++--opt.opt: $(programs_opt)
+++--allopt: opt.opt
+++--
+++--$(foreach program, $(programs_byte) $(programs_opt),\
+++--  $(eval $(call PROGRAM_SYNONYM,$(program))))
+++--
+++--$(programs_byte:%=%$(EXE)):
+++--	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+++--
+++--$(programs_opt:%=%$(EXE)):
+++--	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+++--
+++--clean::
+++--	rm -f $(programs_byte) $(programs_byte:%=%.exe)
+++--	rm -f $(programs_opt) $(programs_opt:%=%.exe)
+++--
+++--# The dependency generator
+++--
+++--ocamldep_objects = \
+++--  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--  ocamldep.cmo depend.cmi
+++--
+++--ocamldep$(EXE): LINKFLAGS += -compat-32
+++--ocamldep$(EXE): $(ocamldep_objects)
+++--ocamldep.opt$(EXE): $(call byte2native, $(ocamldep_objects))
+++--
+++--# The profiler
+++--
+++--OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
+++--  numbers.cmo arg_helper.cmo local_store.cmo load_path.cmo clflags.cmo \
+++--  terminfo.cmo warnings.cmo location.cmo longident.cmo docstrings.cmo \
+++--  syntaxerr.cmo ast_helper.cmo \
+++--  camlinternalMenhirLib.cmo parser.cmo \
+++--  pprintast.cmo \
+++--  lexer.cmo parse.cmo ocamlprof.cmo
+++--
+++--ocamlprof$(EXE): $(OCAMLPROF)
+++--ocamlprof.opt$(EXE): $(call byte2native, $(OCAMLPROF))
+++--all: profiling.cmo
+++--opt.opt: profiling.cmx
+++--
+++--OCAMLCP = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
+++--          warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
+++--          local_store.cmo load_path.cmo clflags.cmo \
+++--          terminfo.cmo location.cmo ccomp.cmo compenv.cmo \
+++--          main_args.cmo ocamlcp_common.cmo
+++--
+++--ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
+++--ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
+++--ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
+++--ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
+++--
+++--opt:: profiling.cmx
+++--
+++--INSTALL_LIBDIR_PROFILING = $(INSTALL_LIBDIR)/profiling
+++--
+++--install::
+++--# If installing over a previous OCaml version, ensure the module is removed
+++--# from the previous installation.
+++--	rm -f "$(INSTALL_LIBDIR)"/profiling.cm* "$(INSTALL_LIBDIR)/profiling.$(O)"
+++--	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
+++--	$(INSTALL_DATA) \
+++--	  profiling.cmi profiling.cmo \
+++--	  "$(INSTALL_LIBDIR_PROFILING)"
+++--ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+++--	$(INSTALL_DATA) \
+++--	  profiling.cmt profiling.cmti \
+++--	  "$(INSTALL_LIBDIR_PROFILING)"
+++--endif
+++--
+++--installopt::
+++--	$(INSTALL_DATA) \
+++--          profiling.cmx profiling.$(O) \
+++--	  "$(INSTALL_LIBDIR_PROFILING)"
+++--
+++--# To help building mixed-mode libraries (OCaml + C)
+++--OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
+++--
+++--ocamlmklib$(EXE): $(OCAMLMKLIB)
+++--ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
+++--
+++--# To make custom toplevels
+++--
+++--OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
+++--       identifiable.cmo numbers.cmo arg_helper.cmo local_store.cmo \
+++--       load_path.cmo clflags.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
+++--
+++--ocamlmktop$(EXE): $(OCAMLMKTOP)
+++--ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
+++--
+++--# Converter olabl/ocaml 2.99 to ocaml 3
+++--
+++--LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
+++--
+++--ifeq ($(UNIX_OR_WIN32),unix)
+++--LN := ln -sf
+++--else
+++--LN := cp -pf
+++--endif
+++--
+++--install::
+++--ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+++--	for i in $(install_files); \
+++--	do \
+++--	  $(INSTALL_PROG) "$$i$(EXE)" "$(INSTALL_BINDIR)/$$i.byte$(EXE)"; \
+++--	  if test -f "$$i".opt$(EXE); then \
+++--	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)" && \
+++--	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
+++--	  else \
+++--	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.byte$(EXE)" "$$i$(EXE)"); \
+++--	  fi; \
+++--	done
+++--else
+++--	for i in $(install_files); \
+++--	do \
+++--	  if test -f "$$i".opt$(EXE); then \
+++--	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)"; \
+++--	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
+++--	  fi; \
+++--	done
+++--endif
+++--
+++--# The preprocessor for asm generators
+++--
+++--cvt_emit := cvt_emit$(EXE)
+++--
+++--$(eval $(call PROGRAM_SYNONYM,cvt_emit))
+++--
+++--$(cvt_emit): cvt_emit.cmo
+++--	$(CAMLC) $(LINKFLAGS) -o $@ $^
+++--
+++--clean::
+++--	rm -f cvt_emit.ml cvt_emit cvt_emit.exe
+++--
+++--beforedepend:: cvt_emit.ml
+++--
+++--# Reading cmt files
+++--
+++--OCAMLCMT = \
+++--          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--          ocamlcmt.cmo
+++--
+++--ocamlcmt$(EXE): $(OCAMLCMT)
+++--ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
+++--
+++--install::
+++--	if test -f ocamlcmt.opt$(EXE); then \
+++--	  $(INSTALL_PROG)\
+++--	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
+++--	else \
+++--	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
+++--	fi
+++--
+++--# The bytecode disassembler
+++--
+++--DUMPOBJ= \
+++--          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--          opnames.cmo dumpobj.cmo
+++--
+++--dumpobj$(EXE): $(DUMPOBJ)
+++--dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
+++--
+++--make_opcodes := make_opcodes$(EXE)
+++--
+++--$(eval $(call PROGRAM_SYNONYM,make_opcodes))
+++--
+++--$(make_opcodes): make_opcodes.ml
+++--	$(CAMLC) $< -o $@
+++--
+++--opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
+++--	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+++--
+++--clean::
+++--	rm -f opnames.ml make_opcodes make_opcodes.exe make_opcodes.ml
+++--
+++--beforedepend:: opnames.ml
+++--
+++--# Display info on compiled files
+++--
+++--DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'
+++--
+++--ifeq "$(SYSTEM)" "macosx"
+++--DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
+++--endif
+++--
+++--ifeq "$(SYSTEM)" "cygwin"
+++--DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
+++--endif
+++--
+++--OCAMLOBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--             $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--             $(ROOTDIR)/compilerlibs/ocamlmiddleend.cma \
+++--             objinfo.cmo
+++--
+++--ocamlobjinfo$(EXE): $(OCAMLOBJINFO)
+++--ocamlobjinfo.opt$(EXE): $(call byte2native, $(OCAMLOBJINFO))
+++--
+++--PRIMREQ=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--        primreq.cmo
+++--
+++--# Scan object files for required primitives
+++--primreq$(EXE): $(PRIMREQ)
+++--primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
+++--
+++--LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
+++--        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cmxa \
+++--        $(ROOTDIR)/compilerlibs/ocamlmiddleend.cmxa \
+++--        $(ROOTDIR)/otherlibs/str/str.cmxa \
+++--        lintapidiff.cmx
+++--
+++--lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
+++--lintapidiff.opt$(EXE): $(LINTAPIDIFF)
+++--	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
+++--clean::
+++--	rm -f -- lintapidiff.opt lintapidiff.opt.exe
+++--	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj
+++--
+++--# Copy a bytecode executable, stripping debug info
+++--
+++--STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--           stripdebug.cmo
+++--
+++--stripdebug$(EXE): $(STRIPDEBUG)
+++--stripdebug.opt$(EXE): $(call byte2native, $(STRIPDEBUG))
+++--
+++--# Compare two bytecode executables
+++--
+++--CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--       $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--       cmpbyt.cmo
+++--
+++--cmpbyt$(EXE): $(CMPBYT)
+++--cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
+++--
+++--ocamltex_files := \
+++--  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+++--  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+++--  $(ROOTDIR)/compilerlibs/ocamltoplevel.cma \
+++--  $(ROOTDIR)/otherlibs/str/str.cma \
+++--  $(ROOTDIR)/otherlibs/unix/unix.cma \
+++--  ocamltex.ml
+++--
+++--# checkstack tool
+++--
+++--checkstack$(EXE): checkstack.$(O)
+++--	$(MKEXE) $(OUTPUTEXE)$@ $<
+++--
+++--#Scan latex files, and run ocaml code examples
+++--
+++--ocamltex := ocamltex$(EXE)
+++--
+++--# ocamltex uses str.cma and unix.cma and so must be compiled with
+++--# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
+++--# compiler does not necessarily have the correct shared library
+++--# configuration.
+++--$(ocamltex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str unix)
+++--$(ocamltex): $(ocamltex_files)
+++--	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS) \
+++--	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+++--
+++--# we need str and unix which depend on the bytecode version of other tools
+++--# thus we use the othertools target
+++--ifeq "$(build_ocamltex)" "true"
+++--othertools: $(ocamltex)
+++--endif
+++--clean::
+++--	rm -f -- ocamltex ocamltex.exe ocamltex.cm?
+++--
+++--# Common stuff
+++--
+++--%.cmo: %.ml
+++--	$(CAMLC) -c $(COMPFLAGS) - $<
+++--
+++--%.cmi: %.mli
+++--	$(CAMLC) -c $(COMPFLAGS) - $<
+++--
+++--%.cmx: %.ml
+++--	$(CAMLOPT) $(COMPFLAGS) -c - $<
+++--
+++--clean::
+++--	rm -f *.cmo *.cmi *.cma *.dll *.so *.lib *.a
+++--
+++--OC_OCAMLDEPDIRS = $(DIRS)
+++--depend: beforedepend
+++--	$(OCAMLDEP_CMD) *.mli *.ml > .depend
+++--
+++--.PHONY: clean distclean install beforedepend depend
+++--
+++--distclean: clean
+++--	rm -f eventlog_metadata *.bak
+++--
+++--include .depend
+++ diff --git a/tools/cmpbyt.ml b/tools/cmpbyt.ml
+++ --- a/tools/cmpbyt.ml
+++ +++ b/tools/cmpbyt.ml
+++@@ -1761,7 +1403,7 @@
+++ diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
+++ --- a/tools/dumpobj.ml
+++ +++ b/tools/dumpobj.ml
+++-@@ -577,7 +577,7 @@ let arg_fun filename =
++++@@ -579,7 +579,7 @@ let arg_fun filename =
+++    close_in ic;
+++    if !print_banners then printf "## end of ocaml dump of %S\n%!" filename
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10095,10 +10905,10 @@ index 0000000000..15f8711bc8
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index be2158111c..2519c1db85 100644
++index 9d3ab25a2f..58cb2e4a44 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -799,11 +799,6 @@ OCaml 5.0
++@@ -804,11 +804,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10110,7 +10920,7 @@ index 0000000000..15f8711bc8
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -832,6 +827,30 @@ OCaml 5.0
++@@ -837,6 +832,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10141,7 +10951,7 @@ index 0000000000..15f8711bc8
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -867,13 +886,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -872,13 +891,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10157,7 +10967,7 @@ index 0000000000..15f8711bc8
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -980,6 +999,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -985,6 +1004,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10167,7 +10977,7 @@ index 0000000000..15f8711bc8
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1239,6 +1261,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1244,6 +1266,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10178,10 +10988,10 @@ index 0000000000..15f8711bc8
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 6f4dc0c98f..fb79d6a079 100644
++index 36e11b0171..b5a065eecb 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -578,7 +578,6 @@ partialclean::
++@@ -603,7 +603,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -10189,7 +10999,7 @@ index 0000000000..15f8711bc8
 +   afl \
 +   alloc \
 +   array \
-+@@ -586,24 +585,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -611,24 +610,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -10217,7 +11027,7 @@ index 0000000000..15f8711bc8
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -614,17 +613,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -639,17 +638,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -10235,7 +11045,7 @@ index 0000000000..15f8711bc8
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -634,6 +628,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -659,6 +653,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10245,7 +11055,7 @@ index 0000000000..15f8711bc8
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -644,7 +641,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -669,7 +666,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10254,7 +11064,7 @@ index 0000000000..15f8711bc8
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1044,12 +1041,14 @@ clean::
++@@ -1069,12 +1066,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10262,7 +11072,7 @@ index 0000000000..15f8711bc8
 ++subdirs = \
 ++  stdlib $(addprefix otherlibs/, \
 ++    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-+   debugger ocamldoc ocamltest tools
++   debugger ocamldoc ocamltest
 + 
 + .PHONY: alldepend
 + alldepend: depend
@@ -10271,7 +11081,7 @@ index 0000000000..15f8711bc8
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1124,6 +1123,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1147,6 +1146,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -13269,13 +14079,13 @@ index 0000000000..15f8711bc8
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index f7ae8db0a0..92438b257d 100755
++index 487f66a95e..42fad7050a 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 572e9d958f..36d9474fb9 100644
++index e7956cb6c8..230f60b7e2 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -13284,7 +14094,7 @@ index 0000000000..15f8711bc8
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -13292,7 +14102,7 @@ index 0000000000..15f8711bc8
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -370,15 +373,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -371,15 +374,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -13324,7 +14134,7 @@ index 0000000000..15f8711bc8
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -611,7 +622,8 @@ AS_CASE([$host],
++@@ -614,7 +625,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13334,7 +14144,7 @@ index 0000000000..15f8711bc8
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -1025,9 +1037,9 @@ AS_IF([! $arch64],
++@@ -1028,9 +1040,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -13347,7 +14157,7 @@ index 0000000000..15f8711bc8
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1171,66 +1183,66 @@ system=unknown
++@@ -1174,66 +1186,66 @@ system=unknown
 + has_native_backend=no
 + AS_CASE([$host],
 +   [[i[3456]86-*-linux*]],
@@ -13441,7 +14251,7 @@ index 0000000000..15f8711bc8
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1240,7 +1252,7 @@ AS_CASE([$host],
++@@ -1243,7 +1255,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13450,7 +14260,7 @@ index 0000000000..15f8711bc8
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1260,7 +1272,7 @@ AS_CASE([$host],
++@@ -1263,7 +1275,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -13459,7 +14269,7 @@ index 0000000000..15f8711bc8
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1952,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1955,11 +1967,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13484,7 +14294,7 @@ index 0000000000..15f8711bc8
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2007,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2010,6 +2034,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13515,7 +14325,7 @@ index 0000000000..15f8711bc8
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2154,8 +2202,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2157,8 +2205,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -20039,52 +20849,8 @@ index 0000000000..15f8711bc8
 ++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
 ++index f5e0711b79..8beb1f6433 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++* skip
-+++reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* Testing unsynchronized, parallel Weak usage *)
-++ 
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/ci/actions/runner.sh
-+++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
-++     --enable-debug-runtime \
-++     $CONFIG_ARG"
-++ 
-++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
++++++ b/testsuite/tests/weak-e
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
@@ -22326,13 +23092,288 @@ index a70f2b17c4..a8b9a43bd7 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/Makefile b/tools/Makefile
-index 12f3a2af6a..ec5c00b33e 100644
---- a/tools/Makefile
+new file mode 100644
+index 0000000000..ec5c00b33e
+--- /dev/null
 +++ b/tools/Makefile
-@@ -275,6 +275,13 @@ clean::
- 	rm -f -- lintapidiff.opt lintapidiff.opt.exe
- 	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj
- 
+@@ -0,0 +1,360 @@
++#**************************************************************************
++#*                                                                        *
++#*                                 OCaml                                  *
++#*                                                                        *
++#*            Xavier Leroy, projet Cristal, INRIA Rocquencourt            *
++#*                                                                        *
++#*   Copyright 1999 Institut National de Recherche en Informatique et     *
++#*     en Automatique.                                                    *
++#*                                                                        *
++#*   All rights reserved.  This file is distributed under the terms of    *
++#*   the GNU Lesser General Public License version 2.1, with the          *
++#*   special exception on linking described in the file LICENSE.          *
++#*                                                                        *
++#**************************************************************************
++
++ROOTDIR = ..
++# NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
++# gets included, so that its definition here takes precedence
++# over the one there.
++OCAMLLEX ?= $(BOOT_OCAMLLEX)
++include $(ROOTDIR)/Makefile.common
++include $(ROOTDIR)/Makefile.best_binaries
++
++# Setup GNU make variables storing per-target source and target,
++# a list of installed tools, and a function to quote a filename for
++# the shell.
++installed_tools := ocamldep ocamlprof ocamlcp ocamloptp \
++                   ocamlmktop ocamlmklib ocamlobjinfo
++
++install_files :=
++define byte2native
++$(patsubst %.cmo,%.cmx,$(patsubst %.cma,%.cmxa,$1))
++endef
++
++CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g \
++        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
++CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) $(STDLIBFLAGS) -g
++DIRS = $(addprefix $(ROOTDIR)/,utils parsing typing bytecomp \
++                   middle_end middle_end/closure middle_end/flambda \
++                   middle_end/flambda/base_types driver toplevel \
++                   file_formats lambda)
++INCLUDES = $(addprefix -I ,$(DIRS))
++COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
++-warn-error +A -principal -strict-formats -bin-annot $(INCLUDES)
++LINKFLAGS = $(INCLUDES)
++VPATH := $(filter-out -I,$(INCLUDES))
++
++programs_byte := \
++  ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
++  ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
++  primreq stripdebug cmpbyt
++install_files += $(filter $(installed_tools), $(programs_byte))
++programs_opt := $(programs_byte:%=%.opt)
++
++.PHONY: all allopt opt.opt othertools # allopt and opt.opt are synonyms
++all: $(programs_byte)
++opt.opt: $(programs_opt)
++allopt: opt.opt
++
++$(foreach program, $(programs_byte) $(programs_opt),\
++  $(eval $(call PROGRAM_SYNONYM,$(program))))
++
++$(programs_byte:%=%$(EXE)):
++	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
++
++$(programs_opt:%=%$(EXE)):
++	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
++
++clean::
++	rm -f $(programs_byte) $(programs_byte:%=%.exe)
++	rm -f $(programs_opt) $(programs_opt:%=%.exe)
++
++# The dependency generator
++
++ocamldep_objects = \
++  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++  ocamldep.cmo depend.cmi
++
++ocamldep$(EXE): LINKFLAGS += -compat-32
++ocamldep$(EXE): $(ocamldep_objects)
++ocamldep.opt$(EXE): $(call byte2native, $(ocamldep_objects))
++
++# The profiler
++
++OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
++  numbers.cmo arg_helper.cmo local_store.cmo load_path.cmo clflags.cmo \
++  terminfo.cmo warnings.cmo location.cmo longident.cmo docstrings.cmo \
++  syntaxerr.cmo ast_helper.cmo \
++  camlinternalMenhirLib.cmo parser.cmo \
++  pprintast.cmo \
++  lexer.cmo parse.cmo ocamlprof.cmo
++
++ocamlprof$(EXE): $(OCAMLPROF)
++ocamlprof.opt$(EXE): $(call byte2native, $(OCAMLPROF))
++all: profiling.cmo
++opt.opt: profiling.cmx
++
++OCAMLCP = config.cmo build_path_prefix_map.cmo misc.cmo profile.cmo \
++          warnings.cmo identifiable.cmo numbers.cmo arg_helper.cmo \
++          local_store.cmo load_path.cmo clflags.cmo \
++          terminfo.cmo location.cmo ccomp.cmo compenv.cmo \
++          main_args.cmo ocamlcp_common.cmo
++
++ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
++ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
++ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
++ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
++
++opt:: profiling.cmx
++
++INSTALL_LIBDIR_PROFILING = $(INSTALL_LIBDIR)/profiling
++
++install::
++# If installing over a previous OCaml version, ensure the module is removed
++# from the previous installation.
++	rm -f "$(INSTALL_LIBDIR)"/profiling.cm* "$(INSTALL_LIBDIR)/profiling.$(O)"
++	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
++	$(INSTALL_DATA) \
++	  profiling.cmi profiling.cmo \
++	  "$(INSTALL_LIBDIR_PROFILING)"
++ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
++	$(INSTALL_DATA) \
++	  profiling.cmt profiling.cmti \
++	  "$(INSTALL_LIBDIR_PROFILING)"
++endif
++
++installopt::
++	$(INSTALL_DATA) \
++          profiling.cmx profiling.$(O) \
++	  "$(INSTALL_LIBDIR_PROFILING)"
++
++# To help building mixed-mode libraries (OCaml + C)
++OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
++
++ocamlmklib$(EXE): $(OCAMLMKLIB)
++ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
++
++# To make custom toplevels
++
++OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
++       identifiable.cmo numbers.cmo arg_helper.cmo local_store.cmo \
++       load_path.cmo clflags.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
++
++ocamlmktop$(EXE): $(OCAMLMKTOP)
++ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
++
++# Converter olabl/ocaml 2.99 to ocaml 3
++
++LIBRARY3=config.cmo build_path_prefix_map.cmo misc.cmo warnings.cmo location.cmo
++
++ifeq ($(UNIX_OR_WIN32),unix)
++LN := ln -sf
++else
++LN := cp -pf
++endif
++
++install::
++ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
++	for i in $(install_files); \
++	do \
++	  $(INSTALL_PROG) "$$i$(EXE)" "$(INSTALL_BINDIR)/$$i.byte$(EXE)"; \
++	  if test -f "$$i".opt$(EXE); then \
++	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)" && \
++	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
++	  else \
++	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.byte$(EXE)" "$$i$(EXE)"); \
++	  fi; \
++	done
++else
++	for i in $(install_files); \
++	do \
++	  if test -f "$$i".opt$(EXE); then \
++	    $(INSTALL_PROG) "$$i.opt$(EXE)" "$(INSTALL_BINDIR)"; \
++	    (cd "$(INSTALL_BINDIR)" && $(LN) "$$i.opt$(EXE)" "$$i$(EXE)"); \
++	  fi; \
++	done
++endif
++
++# The preprocessor for asm generators
++
++cvt_emit := cvt_emit$(EXE)
++
++$(eval $(call PROGRAM_SYNONYM,cvt_emit))
++
++$(cvt_emit): cvt_emit.cmo
++	$(CAMLC) $(LINKFLAGS) -o $@ $^
++
++clean::
++	rm -f cvt_emit.ml cvt_emit cvt_emit.exe
++
++beforedepend:: cvt_emit.ml
++
++# Reading cmt files
++
++OCAMLCMT = \
++          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++          ocamlcmt.cmo
++
++ocamlcmt$(EXE): $(OCAMLCMT)
++ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
++
++install::
++	if test -f ocamlcmt.opt$(EXE); then \
++	  $(INSTALL_PROG)\
++	    ocamlcmt.opt$(EXE) "$(INSTALL_BINDIR)/ocamlcmt$(EXE)"; \
++	else \
++	  $(INSTALL_PROG) ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
++	fi
++
++# The bytecode disassembler
++
++DUMPOBJ= \
++          $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++          $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++          opnames.cmo dumpobj.cmo
++
++dumpobj$(EXE): $(DUMPOBJ)
++dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
++
++make_opcodes := make_opcodes$(EXE)
++
++$(eval $(call PROGRAM_SYNONYM,make_opcodes))
++
++$(make_opcodes): make_opcodes.ml
++	$(CAMLC) $< -o $@
++
++opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
++	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
++
++clean::
++	rm -f opnames.ml make_opcodes make_opcodes.exe make_opcodes.ml
++
++beforedepend:: opnames.ml
++
++# Display info on compiled files
++
++DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'
++
++ifeq "$(SYSTEM)" "macosx"
++DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
++endif
++
++ifeq "$(SYSTEM)" "cygwin"
++DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
++endif
++
++OCAMLOBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++             $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++             $(ROOTDIR)/compilerlibs/ocamlmiddleend.cma \
++             objinfo.cmo
++
++ocamlobjinfo$(EXE): $(OCAMLOBJINFO)
++ocamlobjinfo.opt$(EXE): $(call byte2native, $(OCAMLOBJINFO))
++
++PRIMREQ=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++        primreq.cmo
++
++# Scan object files for required primitives
++primreq$(EXE): $(PRIMREQ)
++primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
++
++LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
++        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cmxa \
++        $(ROOTDIR)/compilerlibs/ocamlmiddleend.cmxa \
++        $(ROOTDIR)/otherlibs/str/str.cmxa \
++        lintapidiff.cmx
++
++lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
++lintapidiff.opt$(EXE): $(LINTAPIDIFF)
++	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
++clean::
++	rm -f -- lintapidiff.opt lintapidiff.opt.exe
++	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj
++
 +# Eventlog metadata file
 +
 +install::
@@ -22340,9 +23381,82 @@ index 12f3a2af6a..ec5c00b33e 100644
 +	  eventlog_metadata \
 +	  "$(INSTALL_LIBDIR)"
 +
- # Copy a bytecode executable, stripping debug info
- 
- STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++# Copy a bytecode executable, stripping debug info
++
++STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++           stripdebug.cmo
++
++stripdebug$(EXE): $(STRIPDEBUG)
++stripdebug.opt$(EXE): $(call byte2native, $(STRIPDEBUG))
++
++# Compare two bytecode executables
++
++CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++       $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++       cmpbyt.cmo
++
++cmpbyt$(EXE): $(CMPBYT)
++cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
++
++ocamltex_files := \
++  $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
++  $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
++  $(ROOTDIR)/compilerlibs/ocamltoplevel.cma \
++  $(ROOTDIR)/otherlibs/str/str.cma \
++  $(ROOTDIR)/otherlibs/unix/unix.cma \
++  ocamltex.ml
++
++# checkstack tool
++
++checkstack$(EXE): checkstack.$(O)
++	$(MKEXE) $(OUTPUTEXE)$@ $<
++
++#Scan latex files, and run ocaml code examples
++
++ocamltex := ocamltex$(EXE)
++
++# ocamltex uses str.cma and unix.cma and so must be compiled with
++# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
++# compiler does not necessarily have the correct shared library
++# configuration.
++$(ocamltex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str unix)
++$(ocamltex): $(ocamltex_files)
++	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS) \
++	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
++
++# we need str and unix which depend on the bytecode version of other tools
++# thus we use the othertools target
++ifeq "$(build_ocamltex)" "true"
++othertools: $(ocamltex)
++endif
++clean::
++	rm -f -- ocamltex ocamltex.exe ocamltex.cm?
++
++# Common stuff
++
++%.cmo: %.ml
++	$(CAMLC) -c $(COMPFLAGS) - $<
++
++%.cmi: %.mli
++	$(CAMLC) -c $(COMPFLAGS) - $<
++
++%.cmx: %.ml
++	$(CAMLOPT) $(COMPFLAGS) -c - $<
++
++clean::
++	rm -f *.cmo *.cmi *.cma *.dll *.so *.lib *.a
++
++OC_OCAMLDEPDIRS = $(DIRS)
++depend: beforedepend
++	$(OCAMLDEP_CMD) *.mli *.ml > .depend
++
++.PHONY: clean distclean install beforedepend depend
++
++distclean: clean
++	rm -f eventlog_metadata *.bak
++
++include .depend
 diff --git a/tools/check-symbol-names b/tools/check-symbol-names
 index 0e1c829de4..8a88cfa1f3 100755
 --- a/tools/check-symbol-names
@@ -22358,7 +23472,7 @@ index 0e1c829de4..8a88cfa1f3 100755
  { found=1; print $1 " " $2 " " $3 }
  # fail if there were any results
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-index 01722ed9ca..508dd3b226 100644
+index 621cac264f..02d619d3de 100644
 --- a/tools/dumpobj.ml
 +++ b/tools/dumpobj.ml
 @@ -394,10 +394,12 @@ let op_shapes = [
