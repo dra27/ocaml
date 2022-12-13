@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:46:23.314075343 +0100
++++ b	2023-09-28 18:46:23.334076096 +0100
+@@ -434,7 +434,7 @@
+ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
+ --- a/bytecomp/emitcode.ml
+ +++ b/bytecomp/emitcode.ml
+-@@ -465,5 +465,8 @@ let to_packed_file outchan code =
++@@ -469,5 +469,8 @@ let to_packed_file outchan code =
+    Fun.protect ~finally:clear (fun () ->
+    emit code;
+    LongString.output outchan !out_buffer 0 !out_position;

@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..5cffcf5ec1
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:23.314075343 +0100
+++++ b	2023-09-28 18:46:23.334076096 +0100
++@@ -434,7 +434,7 @@
++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
++ --- a/bytecomp/emitcode.ml
++ +++ b/bytecomp/emitcode.ml
++-@@ -465,5 +465,8 @@ let to_packed_file outchan code =
+++@@ -469,5 +469,8 @@ let to_packed_file outchan code =
++    Fun.protect ~finally:clear (fun () ->
++    emit code;
++    LongString.output outchan !out_buffer 0 !out_position;
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 8039cd5dc9..71d24b68da 100644
+index be2158111c..2519c1db85 100644
 --- a/Changes
 +++ b/Changes
-@@ -797,11 +797,6 @@ OCaml 5.0
+@@ -799,11 +799,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +43,7 @@ index 8039cd5dc9..71d24b68da 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -830,6 +825,30 @@ OCaml 5.0
+@@ -832,6 +827,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +74,7 @@ index 8039cd5dc9..71d24b68da 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -865,13 +884,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -867,13 +886,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +90,7 @@ index 8039cd5dc9..71d24b68da 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -978,6 +997,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -980,6 +999,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +100,7 @@ index 8039cd5dc9..71d24b68da 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1237,6 +1259,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1239,6 +1261,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3169,7 +3183,7 @@ index 1675a6ca21..75809c8285 100644
            let opened = match current with
              | None -> List.remove_assoc fullname !opened_dlls
 diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-index 0bb661f74b..c5ad0d8698 100644
+index 8e600d7fa0..a71d53aecc 100644
 --- a/bytecomp/emitcode.ml
 +++ b/bytecomp/emitcode.ml
 @@ -309,10 +309,14 @@ let emit_instr = function
@@ -10047,13 +10061,27 @@ index 0000000000..e20e984b9f
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..53bbd8ad5b
+index 0000000000..15f8711bc8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10019 @@
+@@ -0,0 +1,10020 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..5cffcf5ec1
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:23.314075343 +0100
++++++ b	2023-09-28 18:46:23.334076096 +0100
+++@@ -434,7 +434,7 @@
+++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
+++ --- a/bytecomp/emitcode.ml
+++ +++ b/bytecomp/emitcode.ml
+++-@@ -465,5 +465,8 @@ let to_packed_file outchan code =
++++@@ -469,5 +469,8 @@ let to_packed_file outchan code =
+++    Fun.protect ~finally:clear (fun () ->
+++    emit code;
+++    LongString.output outchan !out_buffer 0 !out_position;
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10067,10 +10095,10 @@ index 0000000000..53bbd8ad5b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 8039cd5dc9..71d24b68da 100644
++index be2158111c..2519c1db85 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -797,11 +797,6 @@ OCaml 5.0
++@@ -799,11 +799,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10082,7 +10110,7 @@ index 0000000000..53bbd8ad5b
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -830,6 +825,30 @@ OCaml 5.0
++@@ -832,6 +827,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10113,7 +10141,7 @@ index 0000000000..53bbd8ad5b
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -865,13 +884,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -867,13 +886,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10129,7 +10157,7 @@ index 0000000000..53bbd8ad5b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -978,6 +997,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -980,6 +999,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10139,7 +10167,7 @@ index 0000000000..53bbd8ad5b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1237,6 +1259,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1239,6 +1261,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13222,7 +13250,7 @@ index 0000000000..53bbd8ad5b
 +           let opened = match current with
 +             | None -> List.remove_assoc fullname !opened_dlls
 +diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-+index 0bb661f74b..c5ad0d8698 100644
++index 8e600d7fa0..a71d53aecc 100644
 +--- a/bytecomp/emitcode.ml
 ++++ b/bytecomp/emitcode.ml
 +@@ -309,10 +309,14 @@ let emit_instr = function
@@ -20057,20 +20085,6 @@ index 0000000000..53bbd8ad5b
 ++-  esac
 +++  ./configure $configure_flags
 ++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..24fd58adef 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly 
-\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
