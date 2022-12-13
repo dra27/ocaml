@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..13de4e334b
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:46:22.758054387 +0100
-++++ b	2023-09-28 18:46:22.762054538 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-+ --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-+ +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-+-@@ -28,42 +28,47 @@ type phase_record = { mutable major: int; mutable minor: int }
-++@@ -30,42 +30,47 @@ type phase_record = { mutable major: int; mutable minor: int }
-+  
-+  let domain_tbl : (int, phase_record) Hashtbl.t = Hashtbl.create 5
-+  
-+@@ -71,7 +71,7 @@
-+  let num_domains = 3
-+  let num_minors = 30
-+  
-+-@@ -86,7 +91,5 @@ let () =
-++@@ -88,7 +93,5 @@ let () =
-+                                          ~lost_events () in
-+      ignore(read_poll cursor callbacks None);
-+      assert(!got_start);
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -37,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 80e0d9731c..9a8d0e640d 100644
+index 8039cd5dc9..71d24b68da 100644
 --- a/Changes
 +++ b/Changes
-@@ -794,11 +794,6 @@ OCaml 5.0
+@@ -797,11 +797,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -52,7 +29,7 @@ index 80e0d9731c..9a8d0e640d 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -827,6 +822,30 @@ OCaml 5.0
+@@ -830,6 +825,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -83,7 +60,7 @@ index 80e0d9731c..9a8d0e640d 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -862,13 +881,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -865,13 +884,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -99,7 +76,7 @@ index 80e0d9731c..9a8d0e640d 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -975,6 +994,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -978,6 +997,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -109,7 +86,7 @@ index 80e0d9731c..9a8d0e640d 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1234,6 +1256,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1237,6 +1259,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6196,7 +6173,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..29c099ab76
+index 0000000000..e20e984b9f
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3868 @@
@@ -8337,7 +8314,7 @@ index 0000000000..29c099ab76
 + open Runtime_events
 + 
 +diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-+index 3cd4752282..dbcdf76434 100644
++index 76cad340d8..391186d007 100644
 +--- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
 ++++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
 +@@ -1,5 +1,7 @@
@@ -10070,36 +10047,13 @@ index 0000000000..29c099ab76
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..65de34a230
+index 0000000000..53bbd8ad5b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10009 @@
+@@ -0,0 +1,10019 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..13de4e334b
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:46:22.758054387 +0100
-+++++ b	2023-09-28 18:46:22.762054538 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-++ --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-++ +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-++-@@ -28,42 +28,47 @@ type phase_record = { mutable major: int; mutable minor: int }
-+++@@ -30,42 +30,47 @@ type phase_record = { mutable major: int; mutable minor: int }
-++  
-++  let domain_tbl : (int, phase_record) Hashtbl.t = Hashtbl.create 5
-++  
-++@@ -71,7 +71,7 @@
-++  let num_domains = 3
-++  let num_minors = 30
-++  
-++-@@ -86,7 +91,5 @@ let () =
-+++@@ -88,7 +93,5 @@ let () =
-++                                          ~lost_events () in
-++      ignore(read_poll cursor callbacks None);
-++      assert(!got_start);
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10113,10 +10067,10 @@ index 0000000000..65de34a230
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 80e0d9731c..9a8d0e640d 100644
++index 8039cd5dc9..71d24b68da 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -794,11 +794,6 @@ OCaml 5.0
++@@ -797,11 +797,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10128,7 +10082,7 @@ index 0000000000..65de34a230
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -827,6 +822,30 @@ OCaml 5.0
++@@ -830,6 +825,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10159,7 +10113,7 @@ index 0000000000..65de34a230
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -862,13 +881,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -865,13 +884,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10175,7 +10129,7 @@ index 0000000000..65de34a230
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -975,6 +994,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -978,6 +997,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10185,7 +10139,7 @@ index 0000000000..65de34a230
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1234,6 +1256,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1237,6 +1259,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16272,7 +16226,7 @@ index 0000000000..65de34a230
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..29c099ab76
++index 0000000000..e20e984b9f
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3868 @@
@@ -18413,7 +18367,7 @@ index 0000000000..65de34a230
 ++ open Runtime_events
 ++ 
 ++diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
-++index 3cd4752282..dbcdf76434 100644
+++index 76cad340d8..391186d007 100644
 ++--- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
 +++++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
 ++@@ -1,5 +1,7 @@
@@ -20082,7 +20036,40 @@ index 0000000000..65de34a230
 ++  * x86 we require the caml_extra_params symbol from the RTS. */
 ++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
 ++index de10bd1fd3..5f9e31bc66 100755
-++--- a/tools/
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..24fd58adef 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
