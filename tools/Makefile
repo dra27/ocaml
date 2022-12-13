@@ -31,8 +31,11 @@ DESTDIR ?=
 # Setup GNU make variables storing per-target source and target,
 # a list of installed tools, and a function to quote a filename for
 # the shell.
-override installed_tools := ocamldep ocamlprof ocamlcp ocamloptp \
+override installed_tools := ocamldep ocamlprof ocamlcp \
                    ocamlmktop ocamlmklib ocamlobjinfo
+ifneq "$(ARCH)" "none"
+installed_tools += ocamloptp
+endif
 
 install_files :=
 define byte2native
