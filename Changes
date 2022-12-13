@@ -9,6 +9,9 @@ OCaml 4.14 maintenance version
 
 ### Build system:
 
+- #11675: Stop installing ocamloptp when the native compiler is not built.
+  (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
+
 - #12372, #14572: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
   so that code sections remain readable, as needed for closure marshaling.
   Originally backported in 4.14.2, but the flag was accidentally not passed when
