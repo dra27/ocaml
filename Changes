@@ -33,6 +33,9 @@ OCaml 4.12, maintenance version
   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
   (Hannes Mehnert with Kate Deplaix and Stéphane Glondu, review by Xavier Leroy)
 
+- #11675: Stop installing ocamloptp when the native compiler is not built.
+  (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
