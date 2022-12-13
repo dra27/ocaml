@@ -32,9 +32,6 @@ DESTDIR ?=
 # the shell.
 override installed_tools := ocamldep ocamlprof ocamlcp \
                    ocamlmktop ocamlmklib ocamlobjinfo
-ifeq "$(NATIVE_COMPILER)" "true"
-installed_tools += ocamloptp
-endif
 
 install_files :=
 define byte2native
