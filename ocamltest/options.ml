@@ -99,4 +99,4 @@ let default_timeout = !default_timeout
 let find_test_dirs = !find_test_dirs
 let list_tests = !list_tests
 let keep_test_dir_on_success = !keep_test_dir_on_success
-let show_timings = Ocamltest_config.libunix <> None && !show_timings
+let show_timings = !show_timings
