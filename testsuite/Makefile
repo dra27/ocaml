@@ -122,7 +122,8 @@ SHOW_TIMINGS ?=
 ifeq "$(SHOW_TIMINGS)" ""
   OCAMLTEST_SHOW_TIMINGS_FLAG :=
 else
-  OCAMLTEST_SHOW_TIMINGS_FLAG := -show-timings
+  OCAMLTEST_SHOW_TIMINGS_FLAG := \
+    $(if $(filter-out dummy,$(ocamltest_unix_impl)),-show-timings)
 endif
 
 OCAMLTESTFLAGS := \
