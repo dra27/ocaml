@@ -1,64 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..209d9e8b60
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,55 @@
-+--- a	2023-09-28 18:46:24.314113018 +0100
-++++ b	2023-09-28 18:46:24.330113620 +0100
-+@@ -27,7 +27,7 @@
-+  
-+  val pp_set_geometry : formatter -> max_indent:int -> margin:int -> unit
-+  val set_geometry : max_indent:int -> margin:int -> unit
-+-@@ -983,6 +985,7 @@ val std_formatter : formatter
-++@@ -984,6 +986,7 @@ val std_formatter : formatter
-+  val get_std_formatter : unit -> formatter
-+  (** [get_std_formatter ()] returns the current domain's standard formatter used
-+      to write to standard output.
-+@@ -35,7 +35,7 @@
-+  *)
-+  
-+  val err_formatter : formatter
-+-@@ -992,8 +995,9 @@ val err_formatter : formatter
-++@@ -993,8 +996,9 @@ val err_formatter : formatter
-+  *)
-+  
-+  val get_err_formatter : unit -> formatter
-+@@ -46,7 +46,7 @@
-+  *)
-+  
-+  val formatter_of_buffer : Buffer.t -> formatter
-+-@@ -1008,7 +1012,8 @@ val stdbuf : Buffer.t
-++@@ -1009,7 +1013,8 @@ val stdbuf : Buffer.t
-+  
-+  val get_stdbuf : unit -> Buffer.t
-+  (** [get_stdbuf ()] returns the current domain's string buffer in which the
-+@@ -56,7 +56,7 @@
-+  
-+  val str_formatter : formatter
-+  (** The initial domain's formatter to output to the {!stdbuf} string buffer.
-+-@@ -1019,6 +1024,7 @@ val str_formatter : formatter
-++@@ -1020,6 +1025,7 @@ val str_formatter : formatter
-+  val get_str_formatter : unit -> formatter
-+  (** The current domain's formatter to output to the current domains string
-+      buffer.
-+@@ -64,14 +64,14 @@
-+  *)
-+  
-+  val flush_str_formatter : unit -> string
-+-@@ -1050,6 +1056,7 @@ val make_synchronized_formatter :
-++@@ -1052,6 +1058,7 @@ val make_synchronized_formatter :
-+      When the formatter is used with multiple domains, the output from the
-+      domains will be interleaved with each other at points where the formatter
-+      is flushed, such as with {!print_flush}.
-+ +    @since 5.0
-+  *)
-++ *)
-+  
-+- val formatter_of_out_functions :
-+ diff --git a/stdlib/sys.mli b/stdlib/sys.mli
-+ --- a/stdlib/sys.mli
-+ +++ b/stdlib/sys.mli
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -72,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 4948852a57..162233ea4f 100644
+index 19303ca0bf..8e5acad477 100644
 --- a/Changes
 +++ b/Changes
-@@ -807,11 +807,6 @@ OCaml 5.0
+@@ -812,11 +812,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -87,7 +29,7 @@ index 4948852a57..162233ea4f 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -840,6 +835,30 @@ OCaml 5.0
+@@ -845,6 +840,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -118,7 +60,7 @@ index 4948852a57..162233ea4f 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -875,13 +894,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -880,13 +899,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -134,7 +76,7 @@ index 4948852a57..162233ea4f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -988,6 +1007,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -993,6 +1012,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -144,7 +86,7 @@ index 4948852a57..162233ea4f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1247,6 +1269,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1252,6 +1274,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10115,71 +10057,13 @@ index 0000000000..e20e984b9f
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..09b55b3dfc
+index 0000000000..9d6a34dc27
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10015 @@
+@@ -0,0 +1,10024 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..209d9e8b60
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,55 @@
-++--- a	2023-09-28 18:46:24.314113018 +0100
-+++++ b	2023-09-28 18:46:24.330113620 +0100
-++@@ -27,7 +27,7 @@
-++  
-++  val pp_set_geometry : formatter -> max_indent:int -> margin:int -> unit
-++  val set_geometry : max_indent:int -> margin:int -> unit
-++-@@ -983,6 +985,7 @@ val std_formatter : formatter
-+++@@ -984,6 +986,7 @@ val std_formatter : formatter
-++  val get_std_formatter : unit -> formatter
-++  (** [get_std_formatter ()] returns the current domain's standard formatter used
-++      to write to standard output.
-++@@ -35,7 +35,7 @@
-++  *)
-++  
-++  val err_formatter : formatter
-++-@@ -992,8 +995,9 @@ val err_formatter : formatter
-+++@@ -993,8 +996,9 @@ val err_formatter : formatter
-++  *)
-++  
-++  val get_err_formatter : unit -> formatter
-++@@ -46,7 +46,7 @@
-++  *)
-++  
-++  val formatter_of_buffer : Buffer.t -> formatter
-++-@@ -1008,7 +1012,8 @@ val stdbuf : Buffer.t
-+++@@ -1009,7 +1013,8 @@ val stdbuf : Buffer.t
-++  
-++  val get_stdbuf : unit -> Buffer.t
-++  (** [get_stdbuf ()] returns the current domain's string buffer in which the
-++@@ -56,7 +56,7 @@
-++  
-++  val str_formatter : formatter
-++  (** The initial domain's formatter to output to the {!stdbuf} string buffer.
-++-@@ -1019,6 +1024,7 @@ val str_formatter : formatter
-+++@@ -1020,6 +1025,7 @@ val str_formatter : formatter
-++  val get_str_formatter : unit -> formatter
-++  (** The current domain's formatter to output to the current domains string
-++      buffer.
-++@@ -64,14 +64,14 @@
-++  *)
-++  
-++  val flush_str_formatter : unit -> string
-++-@@ -1050,6 +1056,7 @@ val make_synchronized_formatter :
-+++@@ -1052,6 +1058,7 @@ val make_synchronized_formatter :
-++      When the formatter is used with multiple domains, the output from the
-++      domains will be interleaved with each other at points where the formatter
-++      is flushed, such as with {!print_flush}.
-++ +    @since 5.0
-++  *)
-+++ *)
-++  
-++- val formatter_of_out_functions :
-++ diff --git a/stdlib/sys.mli b/stdlib/sys.mli
-++ --- a/stdlib/sys.mli
-++ +++ b/stdlib/sys.mli
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10193,10 +10077,10 @@ index 0000000000..09b55b3dfc
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 4948852a57..162233ea4f 100644
++index 19303ca0bf..8e5acad477 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -807,11 +807,6 @@ OCaml 5.0
++@@ -812,11 +812,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10208,7 +10092,7 @@ index 0000000000..09b55b3dfc
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -840,6 +835,30 @@ OCaml 5.0
++@@ -845,6 +840,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10239,7 +10123,7 @@ index 0000000000..09b55b3dfc
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -875,13 +894,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -880,13 +899,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10255,7 +10139,7 @@ index 0000000000..09b55b3dfc
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -988,6 +1007,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -993,6 +1012,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10265,7 +10149,7 @@ index 0000000000..09b55b3dfc
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1247,6 +1269,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1252,6 +1274,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20133,7 +20017,74 @@ index 0000000000..09b55b3dfc
 ++ (* ocaml-multicore issues 528 and 468 *)
 ++ 
 ++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (* Testing unsynchronized, parallel Weak usage *)
+++ 
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..24fd58adef 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
