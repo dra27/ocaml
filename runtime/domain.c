@@ -21,7 +21,9 @@
 #define _GNU_SOURCE  /* For sched.h CPU_ZERO(3) and CPU_COUNT(3) */
 #include "caml/config.h"
 #include <stdio.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include <pthread.h>
 #include <string.h>
 #ifdef HAS_GNU_GETAFFINITY_NP
