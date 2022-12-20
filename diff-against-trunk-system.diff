@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..04b17e3493
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:27.206221860 +0100
+++++ b	2023-09-28 18:46:27.214222160 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
++ --- a/asmcomp/riscv/emit.mlp
++ +++ b/asmcomp/riscv/emit.mlp
++-@@ -364,8 +364,8 @@ let emit_instr env i =
+++@@ -366,8 +366,8 @@ let emit_instr env i =
++        (* ft0 is marked as destroyed for this operation *)
++        `	fcvt.s.d	ft0, {emit_reg i.arg.(0)}\n`;
++        `	fsw	ft0, {emit_int ofs}({emit_reg i.arg.(1)})\n`
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -722,7 +736,7 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-index 859e52c463..f52a46d438 100644
+index 6bb703b29d..6285c3a96d 100644
 --- a/asmcomp/riscv/emit.mlp
 +++ b/asmcomp/riscv/emit.mlp
 @@ -328,8 +328,10 @@ let emit_instr env i =
@@ -10057,13 +10071,27 @@ index 0000000000..378a7fd915
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d7400e4769
+index 0000000000..da5efb5791
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10023 @@
+@@ -0,0 +1,10016 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..04b17e3493
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:27.206221860 +0100
++++++ b	2023-09-28 18:46:27.214222160 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
+++ --- a/asmcomp/riscv/emit.mlp
+++ +++ b/asmcomp/riscv/emit.mlp
+++-@@ -364,8 +364,8 @@ let emit_instr env i =
++++@@ -366,8 +366,8 @@ let emit_instr env i =
+++        (* ft0 is marked as destroyed for this operation *)
+++        `	fcvt.s.d	ft0, {emit_reg i.arg.(0)}\n`;
+++        `	fsw	ft0, {emit_int ofs}({emit_reg i.arg.(1)})\n`
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10785,7 +10813,7 @@ index 0000000000..d7400e4769
 + 
 +   D.data ();
 +diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-+index 859e52c463..f52a46d438 100644
++index 6bb703b29d..6285c3a96d 100644
 +--- a/asmcomp/riscv/emit.mlp
 ++++ b/asmcomp/riscv/emit.mlp
 +@@ -328,8 +328,10 @@ let emit_instr env i =
@@ -20063,27 +20091,7 @@ index 0000000000..d7400e4769
 ++     $CONFIG_ARG"
 ++ 
 ++-  case $XARCH in
-++-  x64)
-++-    ./configure $configure_flags
-++-    ;;
-++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..24fd58adef 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml

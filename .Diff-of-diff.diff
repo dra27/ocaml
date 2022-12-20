@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:46:27.206221860 +0100
++++ b	2023-09-28 18:46:27.214222160 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
+ --- a/asmcomp/riscv/emit.mlp
+ +++ b/asmcomp/riscv/emit.mlp
+-@@ -364,8 +364,8 @@ let emit_instr env i =
++@@ -366,8 +366,8 @@ let emit_instr env i =
+        (* ft0 is marked as destroyed for this operation *)
+        `	fcvt.s.d	ft0, {emit_reg i.arg.(0)}\n`;
+        `	fsw	ft0, {emit_int ofs}({emit_reg i.arg.(1)})\n`
