@@ -43,8 +43,16 @@ and B : sig
 end = B
 [%%expect{|
 {
+<<<<<<< HEAD
  "A"[module] -> A/298<.11>;
  "B"[module] -> B/299<.12>;
+||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+ "A"[module] -> A/303<.11>;
+ "B"[module] -> B/304<.12>;
+=======
+ "A"[module] -> A/304<.11>;
+ "B"[module] -> B/305<.12>;
+>>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -82,12 +90,30 @@ end = Set.Make(A)
  "ASet"[module] ->
    {
     "compare"[value] ->
+<<<<<<< HEAD
       CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
+||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
+=======
+      CU Stdlib . "Set"[module] . "Make"[module](A/326<.19>) .
+>>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
       "compare"[value];
     "elt"[type] ->
+<<<<<<< HEAD
       CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "elt"[type];
+||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "elt"[type];
+=======
+      CU Stdlib . "Set"[module] . "Make"[module](A/326<.19>) . "elt"[type];
+>>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
     "t"[type] ->
+<<<<<<< HEAD
       CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
+||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+      CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
+=======
+      CU Stdlib . "Set"[module] . "Make"[module](A/326<.19>) . "t"[type];
+>>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
     };
  }
 module rec A :

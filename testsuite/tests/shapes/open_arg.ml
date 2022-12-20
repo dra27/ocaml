@@ -22,7 +22,13 @@ end = struct end
 
 [%%expect{|
 {
+<<<<<<< HEAD
  "Make"[module] -> Abs<.3>(I/275, {
+||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+ "Make"[module] -> Abs<.3>(I/280, {
+=======
+ "Make"[module] -> Abs<.3>(I/281, {
+>>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
                                    });
  }
 module Make : functor (I : sig end) -> sig end
