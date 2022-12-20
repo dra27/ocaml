@@ -26,15 +26,15 @@ match (3, 2, 1) with
 | _ -> false
 ;;
 [%%expect{|
-(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
+(let (*match*/271 = 3 *match*/272 = 2 *match*/273 = 1)
   (catch
     (catch
-      (catch (if (!= *match*/271 3) (exit 3) (exit 1)) with (3)
-        (if (!= *match*/270 1) (exit 2) (exit 1)))
+      (catch (if (!= *match*/272 3) (exit 3) (exit 1)) with (3)
+        (if (!= *match*/271 1) (exit 2) (exit 1)))
      with (2) 0)
    with (1) 1))
-(let (*match*/270 = 3 *match*/271 = 2 *match*/272 = 1)
-  (catch (if (!= *match*/271 3) (if (!= *match*/270 1) 0 (exit 1)) (exit 1))
+(let (*match*/271 = 3 *match*/272 = 2 *match*/273 = 1)
+  (catch (if (!= *match*/272 3) (if (!= *match*/271 1) 0 (exit 1)) (exit 1))
    with (1) 1))
 - : bool = false
 |}];;
@@ -47,26 +47,26 @@ match (3, 2, 1) with
 | _ -> false
 ;;
 [%%expect{|
-(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
+(let (*match*/276 = 3 *match*/277 = 2 *match*/278 = 1)
   (catch
     (catch
       (catch
-        (if (!= *match*/276 3) (exit 6)
-          (let (x/279 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
-            (exit 4 x/279)))
+        (if (!= *match*/277 3) (exit 6)
+          (let (x/280 =a (makeblock 0 *match*/276 *match*/277 *match*/278))
+            (exit 4 x/280)))
        with (6)
-        (if (!= *match*/275 1) (exit 5)
-          (let (x/278 =a (makeblock 0 *match*/275 *match*/276 *match*/277))
-            (exit 4 x/278))))
+        (if (!= *match*/276 1) (exit 5)
+          (let (x/279 =a (makeblock 0 *match*/276 *match*/277 *match*/278))
+            (exit 4 x/279))))
      with (5) 0)
-   with (4 x/273) (seq (ignore x/273) 1)))
-(let (*match*/275 = 3 *match*/276 = 2 *match*/277 = 1)
+   with (4 x/274) (seq (ignore x/274) 1)))
+(let (*match*/276 = 3 *match*/277 = 2 *match*/278 = 1)
   (catch
-    (if (!= *match*/276 3)
-      (if (!= *match*/275 1) 0
-        (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
-      (exit 4 (makeblock 0 *match*/275 *match*/276 *match*/277)))
-   with (4 x/273) (seq (ignore x/273) 1)))
+    (if (!= *match*/277 3)
+      (if (!= *match*/276 1) 0
+        (exit 4 (makeblock 0 *match*/276 *match*/277 *match*/278)))
+      (exit 4 (makeblock 0 *match*/276 *match*/277 *match*/278)))
+   with (4 x/274) (seq (ignore x/274) 1)))
 - : bool = false
 |}];;
 
@@ -76,8 +76,8 @@ let _ = fun a b ->
   | ((true, _) as _g)
   | ((false, _) as _g) -> ()
 [%%expect{|
-(function a/280[int] b/281 : int 0)
-(function a/280[int] b/281 : int 0)
+(function a/281[int] b/282 : int 0)
+(function a/281[int] b/282 : int 0)
 - : bool -> 'a -> unit = <fun>
 |}];;
 
@@ -96,8 +96,8 @@ let _ = fun a b -> match a, b with
 | (false, _) as p -> p
 (* outside, trivial *)
 [%%expect {|
-(function a/284[int] b/285 (let (p/286 =a (makeblock 0 a/284 b/285)) p/286))
-(function a/284[int] b/285 (makeblock 0 a/284 b/285))
+(function a/285[int] b/286 (let (p/287 =a (makeblock 0 a/285 b/286)) p/287))
+(function a/285[int] b/286 (makeblock 0 a/285 b/286))
 - : bool -> 'a -> bool * 'a = <fun>
 |}]
 
@@ -106,8 +106,8 @@ let _ = fun a b -> match a, b with
 | ((false, _) as p) -> p
 (* inside, trivial *)
 [%%expect{|
-(function a/288[int] b/289 (let (p/290 =a (makeblock 0 a/288 b/289)) p/290))
-(function a/288[int] b/289 (makeblock 0 a/288 b/289))
+(function a/289[int] b/290 (let (p/291 =a (makeblock 0 a/289 b/290)) p/291))
+(function a/289[int] b/290 (makeblock 0 a/289 b/290))
 - : bool -> 'a -> bool * 'a = <fun>
 |}];;
 
@@ -116,11 +116,11 @@ let _ = fun a b -> match a, b with
 | (false as x, _) as p -> x, p
 (* outside, simple *)
 [%%expect {|
-(function a/294[int] b/295
-  (let (x/296 =a[int] a/294 p/297 =a (makeblock 0 a/294 b/295))
-    (makeblock 0 (int,*) x/296 p/297)))
-(function a/294[int] b/295
-  (makeblock 0 (int,*) a/294 (makeblock 0 a/294 b/295)))
+(function a/295[int] b/296
+  (let (x/297 =a[int] a/295 p/298 =a (makeblock 0 a/295 b/296))
+    (makeblock 0 (int,*) x/297 p/298)))
+(function a/295[int] b/296
+  (makeblock 0 (int,*) a/295 (makeblock 0 a/295 b/296)))
 - : bool -> 'a -> bool * (bool * 'a) = <fun>
 |}]
 
@@ -129,11 +129,11 @@ let _ = fun a b -> match a, b with
 | ((false as x, _) as p) -> x, p
 (* inside, simple *)
 [%%expect {|
-(function a/300[int] b/301
-  (let (x/302 =a[int] a/300 p/303 =a (makeblock 0 a/300 b/301))
-    (makeblock 0 (int,*) x/302 p/303)))
-(function a/300[int] b/301
-  (makeblock 0 (int,*) a/300 (makeblock 0 a/300 b/301)))
+(function a/301[int] b/302
+  (let (x/303 =a[int] a/301 p/304 =a (makeblock 0 a/301 b/302))
+    (makeblock 0 (int,*) x/303 p/304)))
+(function a/301[int] b/302
+  (makeblock 0 (int,*) a/301 (makeblock 0 a/301 b/302)))
 - : bool -> 'a -> bool * (bool * 'a) = <fun>
 |}]
 
@@ -142,15 +142,15 @@ let _ = fun a b -> match a, b with
 | (false, x) as p -> x, p
 (* outside, complex *)
 [%%expect{|
-(function a/310[int] b/311[int]
-  (if a/310
-    (let (x/312 =a[int] a/310 p/313 =a (makeblock 0 a/310 b/311))
-      (makeblock 0 (int,*) x/312 p/313))
-    (let (x/314 =a b/311 p/315 =a (makeblock 0 a/310 b/311))
-      (makeblock 0 (int,*) x/314 p/315))))
-(function a/310[int] b/311[int]
-  (if a/310 (makeblock 0 (int,*) a/310 (makeblock 0 a/310 b/311))
-    (makeblock 0 (int,*) b/311 (makeblock 0 a/310 b/311))))
+(function a/311[int] b/312[int]
+  (if a/311
+    (let (x/313 =a[int] a/311 p/314 =a (makeblock 0 a/311 b/312))
+      (makeblock 0 (int,*) x/313 p/314))
+    (let (x/315 =a b/312 p/316 =a (makeblock 0 a/311 b/312))
+      (makeblock 0 (int,*) x/315 p/316))))
+(function a/311[int] b/312[int]
+  (if a/311 (makeblock 0 (int,*) a/311 (makeblock 0 a/311 b/312))
+    (makeblock 0 (int,*) b/312 (makeblock 0 a/311 b/312))))
 - : bool -> bool -> bool * (bool * bool) = <fun>
 |}]
 
@@ -160,19 +160,19 @@ let _ = fun a b -> match a, b with
   -> x, p
 (* inside, complex *)
 [%%expect{|
-(function a/316[int] b/317[int]
+(function a/317[int] b/318[int]
   (catch
-    (if a/316
-      (let (x/324 =a[int] a/316 p/325 =a (makeblock 0 a/316 b/317))
-        (exit 10 x/324 p/325))
-      (let (x/322 =a b/317 p/323 =a (makeblock 0 a/316 b/317))
-        (exit 10 x/322 p/323)))
-   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
-(function a/316[int] b/317[int]
+    (if a/317
+      (let (x/325 =a[int] a/317 p/326 =a (makeblock 0 a/317 b/318))
+        (exit 10 x/325 p/326))
+      (let (x/323 =a b/318 p/324 =a (makeblock 0 a/317 b/318))
+        (exit 10 x/323 p/324)))
+   with (10 x/319[int] p/320) (makeblock 0 (int,*) x/319 p/320)))
+(function a/317[int] b/318[int]
   (catch
-    (if a/316 (exit 10 a/316 (makeblock 0 a/316 b/317))
-      (exit 10 b/317 (makeblock 0 a/316 b/317)))
-   with (10 x/318[int] p/319) (makeblock 0 (int,*) x/318 p/319)))
+    (if a/317 (exit 10 a/317 (makeblock 0 a/317 b/318))
+      (exit 10 b/318 (makeblock 0 a/317 b/318)))
+   with (10 x/319[int] p/320) (makeblock 0 (int,*) x/319 p/320)))
 - : bool -> bool -> bool * (bool * bool) = <fun>
 |}]
 
@@ -185,15 +185,15 @@ let _ = fun a b -> match a, b with
 | (false as x, _) as p -> x, p
 (* outside, onecase *)
 [%%expect {|
-(function a/326[int] b/327[int]
-  (if a/326
-    (let (x/328 =a[int] a/326 _p/329 =a (makeblock 0 a/326 b/327))
-      (makeblock 0 (int,*) x/328 [0: 1 1]))
-    (let (x/330 =a[int] a/326 p/331 =a (makeblock 0 a/326 b/327))
-      (makeblock 0 (int,*) x/330 p/331))))
-(function a/326[int] b/327[int]
-  (if a/326 (makeblock 0 (int,*) a/326 [0: 1 1])
-    (makeblock 0 (int,*) a/326 (makeblock 0 a/326 b/327))))
+(function a/327[int] b/328[int]
+  (if a/327
+    (let (x/329 =a[int] a/327 _p/330 =a (makeblock 0 a/327 b/328))
+      (makeblock 0 (int,*) x/329 [0: 1 1]))
+    (let (x/331 =a[int] a/327 p/332 =a (makeblock 0 a/327 b/328))
+      (makeblock 0 (int,*) x/331 p/332))))
+(function a/327[int] b/328[int]
+  (if a/327 (makeblock 0 (int,*) a/327 [0: 1 1])
+    (makeblock 0 (int,*) a/327 (makeblock 0 a/327 b/328))))
 - : bool -> bool -> bool * (bool * bool) = <fun>
 |}]
 
@@ -202,11 +202,11 @@ let _ = fun a b -> match a, b with
 | ((false as x, _) as p) -> x, p
 (* inside, onecase *)
 [%%expect{|
-(function a/332[int] b/333
-  (let (x/334 =a[int] a/332 p/335 =a (makeblock 0 a/332 b/333))
-    (makeblock 0 (int,*) x/334 p/335)))
-(function a/332[int] b/333
-  (makeblock 0 (int,*) a/332 (makeblock 0 a/332 b/333)))
+(function a/333[int] b/334
+  (let (x/335 =a[int] a/333 p/336 =a (makeblock 0 a/333 b/334))
+    (makeblock 0 (int,*) x/335 p/336)))
+(function a/333[int] b/334
+  (makeblock 0 (int,*) a/333 (makeblock 0 a/333 b/334)))
 - : bool -> 'a -> bool * (bool * 'a) = <fun>
 |}]
 
@@ -223,14 +223,14 @@ let _ =fun a b -> match a, b with
 | (_, _) as p -> p
 (* outside, tuplist *)
 [%%expect {|
-(function a/345[int] b/346
+(function a/346[int] b/347
   (catch
-    (if a/345 (if b/346 (let (p/347 =a (field_imm 0 b/346)) p/347) (exit 12))
+    (if a/346 (if b/347 (let (p/348 =a (field_imm 0 b/347)) p/348) (exit 12))
       (exit 12))
-   with (12) (let (p/348 =a (makeblock 0 a/345 b/346)) p/348)))
-(function a/345[int] b/346
-  (catch (if a/345 (if b/346 (field_imm 0 b/346) (exit 12)) (exit 12))
-   with (12) (makeblock 0 a/345 b/346)))
+   with (12) (let (p/349 =a (makeblock 0 a/346 b/347)) p/349)))
+(function a/346[int] b/347
+  (catch (if a/346 (if b/347 (field_imm 0 b/347) (exit 12)) (exit 12))
+   with (12) (makeblock 0 a/346 b/347)))
 - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 |}]
 
@@ -239,20 +239,20 @@ let _ = fun a b -> match a, b with
 | ((_, _) as p) -> p
 (* inside, tuplist *)
 [%%expect{|
-(function a/349[int] b/350
+(function a/350[int] b/351
   (catch
     (catch
-      (if a/349
-        (if b/350 (let (p/354 =a (field_imm 0 b/350)) (exit 13 p/354))
+      (if a/350
+        (if b/351 (let (p/355 =a (field_imm 0 b/351)) (exit 13 p/355))
           (exit 14))
         (exit 14))
-     with (14) (let (p/353 =a (makeblock 0 a/349 b/350)) (exit 13 p/353)))
-   with (13 p/351) p/351))
-(function a/349[int] b/350
+     with (14) (let (p/354 =a (makeblock 0 a/350 b/351)) (exit 13 p/354)))
+   with (13 p/352) p/352))
+(function a/350[int] b/351
   (catch
     (catch
-      (if a/349 (if b/350 (exit 13 (field_imm 0 b/350)) (exit 14)) (exit 14))
-     with (14) (exit 13 (makeblock 0 a/349 b/350)))
-   with (13 p/351) p/351))
+      (if a/350 (if b/351 (exit 13 (field_imm 0 b/351)) (exit 14)) (exit 14))
+     with (14) (exit 13 (makeblock 0 a/350 b/351)))
+   with (13 p/352) p/352))
 - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 |}]
