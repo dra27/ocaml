@@ -535,7 +535,7 @@ let emit_instr env fallthrough i =
           end
         end
       end
-  | Lop(Iextcall { func; alloc; stack_ofs }) ->
+  | Lop(Iextcall { func; alloc = _alloc; stack_ofs }) ->
       add_used_symbol func;
       let base_stack_size =
         if Arch.win64 then
@@ -548,7 +548,7 @@ let emit_instr env fallthrough i =
         load_symbol_addr func rax;
         emit_call "caml_c_call_stack_args";
         record_frame env i.live (Dbg_other i.dbg);
-      end else if alloc then begin
+      end else if (*alloc*) true then begin
         load_symbol_addr func rax;
         emit_call "caml_c_call";
         record_frame env i.live (Dbg_other i.dbg);
