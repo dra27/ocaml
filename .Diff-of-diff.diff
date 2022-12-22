@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:46:28.522271331 +0100
++++ b	2023-09-28 18:46:28.538271932 +0100
+@@ -15,7 +15,7 @@
+ diff --git a/utils/config.common.ml b/utils/config.common.ml
+ --- a/utils/config.common.ml
+ +++ b/utils/config.common.ml
+-@@ -93,6 +93,7 @@ let configuration_variables =
++@@ -98,6 +98,7 @@ let configuration_variables =
+    p "bytecomp_c_libraries" bytecomp_c_libraries;
+    p "native_c_libraries" native_c_libraries;
+    p "native_pack_linker" native_pack_linker;
+@@ -23,7 +23,7 @@
+    p "architecture" architecture;
+    p "model" model;
+    p_int "int_size" Sys.int_size;
+-@@ -119,6 +120,7 @@ let configuration_variables =
++@@ -124,6 +125,7 @@ let configuration_variables =
+    p_bool "afl_instrument" afl_instrument;
+    p_bool "windows_unicode" windows_unicode;
+    p_bool "supports_shared_libraries" supports_shared_libraries;
