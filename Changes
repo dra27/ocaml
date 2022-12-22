@@ -37,6 +37,9 @@ Working version
   the hashing work.
   (Gabriel Scherer, review by Xavier Leroy, report by Olivier Nicole)
 
+- #11835: Restore MSVC port.
+  (David Allsopp, review by ???)
+
 ### Type system:
 
 - #6941, #11187: prohibit using classes through recursive modules
