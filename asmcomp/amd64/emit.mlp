@@ -561,7 +561,15 @@ let emit_instr env fallthrough i =
            calling frame with cfi_signal_frame in it's definition. *)
         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
 
+        (* XXX If the function call needed C stack for arguments, we wouldn't be here,
+               so it should just be the 32 bytes of parameter/shadow stack required.
+               However, the calculations in selectgen have also reserved this on the
+               OCaml stack! *)
+        assert (stack_ofs = 32);
+        I.sub (int 32) rsp;
         emit_call func;
+        (* We're about to restore the OCaml stack, so there's no need to recover the shadow
+           stack *)
         I.mov rbx rsp;
         cfi_restore_state ();
       end
@@ -995,6 +1003,10 @@ let begin_assembly() =
     D.extrn "caml_alloc3" NEAR;
     D.extrn "caml_ml_array_bound_error" NEAR;
     D.extrn "caml_raise_exn" NEAR;
+    D.extrn "caml_call_realloc_stack" NEAR;
+    D.extrn "caml_reraise_exn" NEAR;
+    D.extrn "caml_c_call_stack_args" NEAR;
+    D.extrn "caml_assert_stack_invariants" NEAR;
   end;
 
 
