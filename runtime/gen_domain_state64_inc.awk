@@ -15,7 +15,7 @@
 BEGIN{FS="[,)] *";count=0};
 /DOMAIN_STATE/{
   print "Store_" $2 " MACRO reg";
-  print "  mov [r14+" count "], reg";
+  print "  mov QWORD PTR [r14+" count "], reg";
   print "ENDM";
   print "Load_" $2 " MACRO reg";
   print "  mov reg, [r14+" count "]";
