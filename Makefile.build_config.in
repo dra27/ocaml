@@ -112,7 +112,7 @@ OC_COMMON_LDFLAGS = -g $(INCLUDES)
 
 OC_BYTECODE_LDFLAGS =
 
-OC_NATIVE_CFLAGS = @oc_native_cflags@
+OC_NATIVE_CFLAGS = -S @oc_native_cflags@
 
 OC_NATIVE_LDFLAGS =
 
