@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..950ca8a034
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:46:28.522271331 +0100
-++++ b	2023-09-28 18:46:28.538271932 +0100
-+@@ -15,7 +15,7 @@
-+ diff --git a/utils/config.common.ml b/utils/config.common.ml
-+ --- a/utils/config.common.ml
-+ +++ b/utils/config.common.ml
-+-@@ -93,6 +93,7 @@ let configuration_variables =
-++@@ -98,6 +98,7 @@ let configuration_variables =
-+    p "bytecomp_c_libraries" bytecomp_c_libraries;
-+    p "native_c_libraries" native_c_libraries;
-+    p "native_pack_linker" native_pack_linker;
-+@@ -23,7 +23,7 @@
-+    p "architecture" architecture;
-+    p "model" model;
-+    p_int "int_size" Sys.int_size;
-+-@@ -119,6 +120,7 @@ let configuration_variables =
-++@@ -124,6 +125,7 @@ let configuration_variables =
-+    p_bool "afl_instrument" afl_instrument;
-+    p_bool "windows_unicode" windows_unicode;
-+    p_bool "supports_shared_libraries" supports_shared_libraries;
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10080,36 +10057,13 @@ index 0000000000..378a7fd915
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..39a614a04d
+index 0000000000..0dc1d3ed4c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10015 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..950ca8a034
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:46:28.522271331 +0100
-+++++ b	2023-09-28 18:46:28.538271932 +0100
-++@@ -15,7 +15,7 @@
-++ diff --git a/utils/config.common.ml b/utils/config.common.ml
-++ --- a/utils/config.common.ml
-++ +++ b/utils/config.common.ml
-++-@@ -93,6 +93,7 @@ let configuration_variables =
-+++@@ -98,6 +98,7 @@ let configuration_variables =
-++    p "bytecomp_c_libraries" bytecomp_c_libraries;
-++    p "native_c_libraries" native_c_libraries;
-++    p "native_pack_linker" native_pack_linker;
-++@@ -23,7 +23,7 @@
-++    p "architecture" architecture;
-++    p "model" model;
-++    p_int "int_size" Sys.int_size;
-++-@@ -119,6 +120,7 @@ let configuration_variables =
-+++@@ -124,6 +125,7 @@ let configuration_variables =
-++    p_bool "afl_instrument" afl_instrument;
-++    p_bool "windows_unicode" windows_unicode;
-++    p_bool "supports_shared_libraries" supports_shared_libraries;
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20098,8 +20052,38 @@ index 0000000000..39a614a04d
 ++-        .comm   G(Caml_state), 4
 +++        .comm   G(caml_state), 4
 ++ 
-++ /* Some tests are designed to 
-\ No newline at end of file
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..24fd58adef 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
