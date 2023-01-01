@@ -71,7 +71,7 @@ struct caml_thread_struct {
   struct caml_thread_struct * prev;
   int domain_id;      /* The id of the domain to which this thread belongs */
   struct stack_info* current_stack;      /* saved Caml_state->current_stack */
-  struct c_stack_link* c_stack;          /* saved Caml_state->c_stack */
+  void* c_stack;                         /* saved Caml_state->c_stack */
   /* Note: we do not save Caml_state->stack_cache, because it can
      safely be shared between all threads on the same domain. */
   struct caml__roots_block *local_roots; /* saved value of local_roots */

@@ -41,9 +41,9 @@ DOMAIN_STATE(int, action_pending)
 /* Whether we are due to start the processing of delayable pending
    actions. See runtime/signal.c. */
 
-DOMAIN_STATE(struct c_stack_link*, c_stack)
+DOMAIN_STATE(void*, c_stack)
 /* The C stack associated with this domain.
- * Used by this domain to perform external calls. */
+ * Used by this domain in native code only to perform external calls. */
 
 DOMAIN_STATE(struct stack_info**, stack_cache)
 /* This is a list of freelist buckets of stacks */

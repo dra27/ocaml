@@ -20,6 +20,8 @@
 
 #ifdef CAML_INTERNALS
 
+#include "fiber.h"
+
 /* Macros to access the stack frame */
 
 #ifdef TARGET_power
@@ -52,6 +54,13 @@
 #else
 #define Pop_frame_pointer(sp)
 #endif
+/* Size of the shadow store which must be reserved on the C stack. See the
+   definition of SIZEOF_SHADOW_STORE in amd64.S */
+#if defined(SYS_mingw64) || defined (SYS_cygwin)
+#define First_c_stack \
+        (Caml_state->c_stack ? \
+          (struct c_stack_link *)((uintptr_t)Caml_state->c_stack + 32) : NULL)
+#endif
 #endif
 
 #ifdef TARGET_arm64
@@ -72,6 +81,11 @@
    is an extra word of padding after it that needs to be skipped when
    walking the stack. */
 #define Pop_frame_pointer(sp) sp += sizeof(value)
+#endif
+
+#ifndef First_c_stack
+/* Caml_state->c_stack points to the c_stack_link struct (no shadow store) */
+#define First_c_stack ((struct c_stack_link *)Caml_state->c_stack)
 #endif
 
 /* Declaration of variables used in the asm code */

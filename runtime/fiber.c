@@ -526,14 +526,13 @@ int caml_try_realloc_stack(asize_t required_space)
 #ifdef WITH_FRAME_POINTERS
   rewrite_frame_pointers(old_stack, new_stack);
 #endif
-#endif
 
   /* Update stack pointers in Caml_state->c_stack. It is possible to have
    * multiple c_stack_links to point to the same stack since callbacks are run
    * on existing stacks. */
   {
     struct c_stack_link* link;
-    for (link = Caml_state->c_stack; link; link = link->prev) {
+    for (link = First_c_stack; link; link = link->prev) {
       if (link->stack == old_stack) {
         link->stack = new_stack;
         link->sp = (void*)((char*)Stack_high(new_stack) -
@@ -541,6 +540,7 @@ int caml_try_realloc_stack(asize_t required_space)
       }
     }
   }
+#endif
 
   caml_free_stack(old_stack);
   Caml_state->current_stack = new_stack;
