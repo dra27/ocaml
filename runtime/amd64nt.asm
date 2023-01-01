@@ -137,20 +137,14 @@ SWITCH_OCAML_TO_C MACRO
         mov    qword ptr [r10], rsp
     ; Fill in Caml_state->c_stack
         mov     r11, Caml_state(c_stack)
-        mov    qword ptr [r11 + 8], rsp
-        mov    qword ptr [r11], r10
+        mov    qword ptr [r11 + 40], rsp
+        mov    qword ptr [r11 + 32], r10
     ; Switch to C stack
         mov     rsp, r11
 ENDM
 
-C_call MACRO function
-        sub rsp, 32      ; PR#5008: bottom 32 bytes are reserved for callee
-        call function
-        add rsp, 32      ; PR#5008
-ENDM
-
 SWITCH_C_TO_OCAML MACRO
-        mov     rsp,qword ptr [rsp+8]
+        mov     rsp,qword ptr [rsp+40]
 ENDM
 
 ; Callee-save regs are rbx, rbp, rsi, rdi, r12-r15, xmm6-xmm15
@@ -230,7 +224,7 @@ caml_call_realloc_stack:
         SAVE_ALL_REGS
         mov     rcx,qword ptr [rsp+8]
         SWITCH_OCAML_TO_C
-        C_call  caml_try_realloc_stack
+        call    caml_try_realloc_stack
         SWITCH_C_TO_OCAML
         cmp     rax, 0
         jz      L104
@@ -249,7 +243,7 @@ caml_call_gc:
         mov     Caml_state(gc_regs), r15
     ; Call the garbage collector
         SWITCH_OCAML_TO_C
-        C_call caml_garbage_collection
+        call    caml_garbage_collection
         SWITCH_C_TO_OCAML
         mov     r15, Caml_state(gc_regs)
         RESTORE_ALL_REGS
@@ -299,11 +293,7 @@ caml_c_call:
     ; Make the alloc ptr available to the C code
         mov     Caml_state(young_ptr), r15
     ; Call the function (address in rax)
-        ; TODO It's correct that we do C_call here, because it must be
-        ;      done on the C stack, but the emitter is not properly respecting
-        ;      this meaning that we're reserving more space on the OCaml stack
-        ;      as well (also affecting Cygwin64 and mingw-w64)
-        C_call    rax
+        call    rax
     ; Prepare for return to OCaml
         mov     r15, Caml_state(young_ptr)
     ; Load OCaml stack and restore global variables
@@ -325,15 +315,17 @@ caml_c_call_stack_args:
     ; Make the alloc ptr available to the C code
         mov     Caml_state(young_ptr), r15
     ; Copy arguments from OCaml to C stack
+        add     rsp, 32
 L105:
         sub     r12, 8
         cmp     r12,r13
         jb      L210
-        push   qword ptr [r12]
+        push    qword ptr [r12]
         jmp     L105
 L210:
+        sub     rsp, 32
     ; Call the function (address in %rax)
-        C_call  rax
+        call    rax
     ; Pop arguments back off the stack
         mov     rsp, Caml_state(c_stack)
     ; Prepare for return to OCaml
@@ -359,11 +351,11 @@ L106:
     ; Load young_ptr into %r15
         mov     r15, Caml_state(young_ptr)
     ; Build struct c_stack_link on the C stack
-        sub     rsp, 24 ; sizeof struct c_stack_link
-        mov     qword ptr [rsp], 0
-        mov     qword ptr [rsp + 8], 0
+        sub     rsp, 56 ; sizeof struct c_stack_link
+        mov     qword ptr [rsp + 32], 0
+        mov     qword ptr [rsp + 40], 0
         mov     r10, Caml_state(c_stack)
-        mov     qword ptr [rsp + 16], r10
+        mov     qword ptr [rsp + 48], r10
         mov     Caml_state(c_stack), rsp
     ; Load the OCaml stack.
         mov     r11, Caml_state(current_stack)
@@ -402,9 +394,9 @@ L109:
         mov     qword ptr [r11], r10
         mov     rsp, Caml_state(c_stack)
     ; Pop the struct c_stack_link
-        mov     r10, qword ptr [rsp+16]
+        mov     r10, qword ptr [rsp+48]
         mov     Caml_state(c_stack), r10
-        add     rsp, 24
+        add     rsp, 56
     ; Restore callee-save registers.
         POP_CALLEE_SAVE_REGS
     ; Return to caller
@@ -436,7 +428,7 @@ L117:
         mov     rdx, qword ptr [r10] ; Arg 2: PC of raise
         lea     r8, [r10+8]          ; Arg 3: SP of raise
         mov     r9, Caml_state(exn_handler) ; Arg 4: SP of handler
-        C_call  caml_stash_backtrace
+        call    caml_stash_backtrace
         mov     rax, r12             ; Recover exception bucket
         RESTORE_EXN_HANDLER_OCAML
         ret
@@ -615,7 +607,7 @@ L610:
         mov     r13, qword ptr [r10]    ; saved across C call
         mov     r12, rax ; save %rax across C call
         mov     rsp, Caml_state(c_stack)
-        C_call  caml_free_stack
+        call  caml_free_stack
     ; switch directly to parent stack with correct return
         mov     rsp, r13
         mov     rax, r12

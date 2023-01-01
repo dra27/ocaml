@@ -98,6 +98,8 @@ CAML_STATIC_ASSERT(sizeof(struct stack_info) ==
  * stack is reallocated, this linked list is walked to update the OCaml stack
  * pointers. It is also used for DWARF backtraces. */
 struct c_stack_link {
+  /* Win64 ABI stack slots */
+  void* shadow_stack[4];
   /* The reference to the OCaml stack */
   struct stack_info* stack;
   /* OCaml return address */
