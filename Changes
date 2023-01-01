@@ -620,7 +620,11 @@ Working version
    Hugo Heuzard)
 
 - #11846: Mark rbx as destroyed at C call for Win64 (mingw-w64 and Cygwin64).
-  (David Allsopp, review by KC Sivaramakrishnan)
+  Fix two bugs in the allocation of the shadow store, ensuring that it is only
+  reserved on the C stack (and not the OCaml stack as well) and also ensure it
+  is reserved when calling noalloc functions.
+  (David Allsopp, report by Vesa Karvonen, review by Xavier Leroy and
+   KC Sivaramakrishnan)
 
 - #11850: When stopping before the `emit` phase (using `-stop-after`), an empty
   temporary assembly file is no longer left in the file system.
