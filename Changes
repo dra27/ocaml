@@ -620,7 +620,13 @@ Working version
    Hugo Heuzard)
 
 - #11846: Mark rbx as destroyed at C call for Win64 (mingw-w64 and Cygwin64).
-  (David Allsopp, review by KC Sivaramakrishnan)
+  Ensure the shadow shadow store for the ABI is always reserved on the C stack,
+  rather than bracketing C calls with stack pointer manipulations. This
+  simultaneously reduces the number of stack pointer manipulations and also
+  fixes a bug when calling noalloc functions where the shadow store was not
+  being reserved.
+  (David Allsopp, report by Vesa Karvonen, review by Xavier Leroy and
+   KC Sivaramakrishnan)
 
 - #11850: When stopping before the `emit` phase (using `-stop-after`), an empty
   temporary assembly file is no longer left in the file system.

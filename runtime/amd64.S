@@ -144,6 +144,16 @@
 #define Handler_parent          24
 
 /* struct c_stack_link */
+#if defined(SYS_mingw64) || defined (SYS_cygwin)
+#define SIZEOF_SHADOW_STORE     32
+#define RESTORE_C_STACK_POINTER            \
+        movq    Caml_state(c_stack), %rsp; \
+        subq    $32, %rsp
+#else
+#define SIZEOF_SHADOW_STORE      0
+#define RESTORE_C_STACK_POINTER           \
+        movq    Caml_state(c_stack), %rsp
+#endif
 #define Cstack_stack             0
 #define Cstack_sp                8
 #define Cstack_prev             16
@@ -214,12 +224,12 @@
 
 /* Switch from OCaml to C stack. Clobbers %r10, %r11. */
 #ifdef ASM_CFI_SUPPORTED
-#define SWITCH_OCAML_TO_C_CFI                                   \
-        CFI_REMEMBER_STATE;                                     \
-          /* %rsp points to the c_stack_link. */                \
-        .cfi_escape DW_CFA_def_cfa_expression, 5,               \
-           DW_OP_breg + DW_REG_rsp, Cstack_sp, DW_OP_deref,     \
-           DW_OP_plus_uconst, RETADDR_ENTRY_SIZE
+#define SWITCH_OCAML_TO_C_CFI                                          \
+        CFI_REMEMBER_STATE;                                            \
+          /* %rsp + SIZEOF_SHADOW_STORE points to the c_stack_link. */ \
+        .cfi_escape DW_CFA_def_cfa_expression, 5,                      \
+           DW_OP_breg + DW_REG_rsp, SIZEOF_SHADOW_STORE + Cstack_sp,   \
+           DW_OP_deref, DW_OP_plus_uconst, RETADDR_ENTRY_SIZE
 #else
 #define SWITCH_OCAML_TO_C_CFI
 #endif
@@ -232,18 +242,19 @@
         movq    %rsp, Cstack_sp(%r11);                     \
         movq    %r10, Cstack_stack(%r11);                  \
     /* Switch to C stack */                                \
-        movq    %r11, %rsp;                                \
+        leaq    -SIZEOF_SHADOW_STORE(%r11), %rsp;          \
         SWITCH_OCAML_TO_C_CFI
 
 /* Switch from C to OCaml stack.  Clobbers %r11. */
-#define SWITCH_C_TO_OCAML                                           \
-    /* Assert that %rsp == Caml_state->c_stack &&
-        Caml_state->c_stack->sp == Caml_state->current_stack->sp */ \
-        IF_DEBUG(cmpq %rsp, Caml_state(c_stack); je 8f; int3; 8:    \
-                 movq Caml_state(current_stack), %r11;              \
-                 movq Stack_sp(%r11), %r11;                         \
-                 cmpq %r11, Cstack_sp(%rsp); je 8f; int3; 8:)       \
-        movq    Cstack_sp(%rsp), %rsp;                              \
+#define SWITCH_C_TO_OCAML                                               \
+    /* Assert that %rsp + SIZEOF_SHADOW_STORE == Caml_state->c_stack &&
+        Caml_state->c_stack->sp == Caml_state->current_stack->sp */     \
+        IF_DEBUG(leaq SIZEOF_SHADOW_STORE(%rsp), %r11;                  \
+                 cmpq %r11, Caml_state(c_stack); je 8f; int3; 8:        \
+                 movq Caml_state(current_stack), %r11;                  \
+                 movq Stack_sp(%r11), %r11;                             \
+                 cmpq %r11, Cstack_sp(%rsp); je 8f; int3; 8:)           \
+        movq    (SIZEOF_SHADOW_STORE + Cstack_sp)(%rsp), %rsp;          \
         CFI_RESTORE_STATE
 
 /* Load Caml_state->exn_handler into %rsp and restores prior exn_handler.
@@ -369,20 +380,7 @@
 
 #endif
 
-#if defined(SYS_mingw64) || defined (SYS_cygwin)
-   /* Calls from OCaml to C must reserve 32 bytes of extra stack space */
-#  define PREPARE_FOR_C_CALL subq $32, %rsp; CFI_ADJUST(32)
-#  define CLEANUP_AFTER_C_CALL addq $32, %rsp; CFI_ADJUST(-32)
-   /* Stack probing mustn't be larger than the page size */
-#  define STACK_PROBE_SIZE 4096
-#else
-#  define PREPARE_FOR_C_CALL
-#  define CLEANUP_AFTER_C_CALL
-#  define STACK_PROBE_SIZE 4096
-#endif
-
-#define C_call(target) \
-  PREPARE_FOR_C_CALL; CHECK_STACK_ALIGNMENT; call target; CLEANUP_AFTER_C_CALL
+#define C_call(target) CHECK_STACK_ALIGNMENT; call target
 
 /******************************************************************************/
 /* Registers holding arguments of C functions. */
@@ -627,14 +625,17 @@ CFI_STARTPROC
     /* we use %rbx (otherwise unused) to enable backtraces */
         movq    %rsp, %rbx
 #ifdef ASM_CFI_SUPPORTED
-        .cfi_escape DW_CFA_def_cfa_expression, 5,           \
-          /* %rbp points to the c_stack_link structure */   \
-          DW_OP_breg + DW_REG_rbx, Cstack_sp, DW_OP_deref,  \
-          DW_OP_plus_uconst, RETADDR_ENTRY_SIZE
+        .cfi_escape DW_CFA_def_cfa_expression, 5,                      \
+          /* %rbx + SIZEOF_SHADOW_STORE points to the c_stack_link. */ \
+          DW_OP_breg + DW_REG_rbx, SIZEOF_SHADOW_STORE + Cstack_sp,    \
+          DW_OP_deref, DW_OP_plus_uconst, RETADDR_ENTRY_SIZE
 #endif
     /* Make the alloc ptr available to the C code */
         movq    %r15, Caml_state(young_ptr)
     /* Copy arguments from OCaml to C stack */
+#if SIZEOF_SHADOW_STORE
+        addq    $SIZEOF_SHADOW_STORE, %rsp
+#endif
 LBL(105):
         subq    $8, %r12
         cmpq    %r13,%r12
@@ -642,10 +643,13 @@ LBL(105):
         push    (%r12); CFI_ADJUST(8)
         jmp     LBL(105)
 LBL(106):
+#if SIZEOF_SHADOW_STORE
+        subq    $SIZEOF_SHADOW_STORE, %rsp
+#endif
     /* Call the function (address in %rax) */
         C_call  (*%rax)
     /* Pop arguments back off the stack */
-        movq    Caml_state(c_stack), %rsp
+        RESTORE_C_STACK_POINTER
     /* Prepare for return to OCaml */
         movq    Caml_state(young_ptr), %r15
     /* Load ocaml stack and restore global variables */
@@ -686,6 +690,9 @@ LBL(caml_start_program):
         movq    Caml_state(c_stack), %r10
         movq    %r10, Cstack_prev(%rsp)
         movq    %rsp, Caml_state(c_stack)
+#if SIZEOF_SHADOW_STORE
+        subq    $SIZEOF_SHADOW_STORE, %rsp
+#endif
         CHECK_STACK_ALIGNMENT
     /* Load the OCaml stack. */
         movq    Caml_state(current_stack), %r11
@@ -732,12 +739,13 @@ LBL(108):
     /* Return to C stack. */
         movq    Caml_state(current_stack), %r11
         movq    %r10, Stack_sp(%r11)
-        movq    Caml_state(c_stack), %rsp
+        RESTORE_C_STACK_POINTER
         CFI_RESTORE_STATE
     /* Pop the struct c_stack_link */
-        movq    Cstack_prev(%rsp), %r10
+        movq    (SIZEOF_SHADOW_STORE + Cstack_prev)(%rsp), %r10
         movq    %r10, Caml_state(c_stack)
-        addq    $24, %rsp; CFI_ADJUST(-24)
+        addq    $(SIZEOF_SHADOW_STORE + 24), %rsp;
+                CFI_ADJUST(-SIZEOF_SHADOW_STORE - 24)
     /* Restore callee-save registers. */
         POP_CALLEE_SAVE_REGS
     /* Return to caller. */
@@ -771,7 +779,7 @@ LBL(116):
 LBL(117):
         movq    %rsp, %r10        /* Save OCaml stack pointer */
         movq    %rax, %r12        /* Save exception bucket */
-        movq    Caml_state(c_stack), %rsp
+        RESTORE_C_STACK_POINTER
         movq    %rax, C_ARG_1     /* arg 1: exception bucket */
 #ifdef WITH_FRAME_POINTERS
         movq    8(%r10), C_ARG_2   /* arg 2: pc of raise */
@@ -1007,7 +1015,7 @@ LBL(frame_runstack):
         CFI_REMEMBER_STATE
         CFI_DEF_CFA_REGISTER(DW_REG_r13)
         movq    %rax, %r12 /* save %rax across C call */
-        movq    Caml_state(c_stack), %rsp
+        RESTORE_C_STACK_POINTER
         C_call  (GCALL(caml_free_stack))
     /* switch directly to parent stack with correct return */
         movq    %r13, %rsp
