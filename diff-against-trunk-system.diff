@@ -1,6 +1,118 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..208bed7c3a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,109 @@
++--- a	2023-09-28 18:46:32.970438287 +0100
+++++ b	2023-09-28 18:46:32.974438437 +0100
++@@ -1,9 +1,9 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -727,27 +727,27 @@ let emit_instr env i =
++-           output_epilogue env (fun () -> `	b	{emit_symbol func}\n`)
++-     | Lop(Iextcall {func; alloc; stack_ofs}) ->
+++@@ -748,10 +748,10 @@ let emit_instr env i =
+++     | Lop(Iextcall {func; alloc; stack_ofs = _}) ->
+++ (* BACKPORT BEGIN
++          if stack_ofs > 0 then begin
++ -          ` mov {emit_reg reg_stack_arg_begin}, sp\n`;
++ -          ` add {emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
++@@ -14,11 +14,17 @@
++ +          `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
++            `{record_frame env i.live (Dbg_other i.dbg)}\n`
++          end else if alloc then begin
+++ *)
+++@@ -760,7 +760,7 @@ let emit_instr env i =
+++         else begin
+++ (* BACKPORT END *)
++            emit_load_symbol_addr reg_x8 func;
++ -          ` bl  {emit_symbol "caml_c_call"}\n`;
++ +          `	bl	{emit_symbol "caml_c_call"}\n`;
++            `{record_frame env i.live (Dbg_other i.dbg)}\n`
++-         end else begin
+++ (* BACKPORT BEGIN *)
+++         end
+++@@ -770,14 +770,14 @@ let emit_instr env i =
++            (* store ocaml stack in the frame pointer register
++               NB: no need to store previous x29 because OCaml frames don't
++               maintain frame pointer *)
++@@ -37,8 +43,8 @@
++ +          `	mov	sp, x29\n`;
++            cfi_restore_state ()
++          end
++-     | Lop(Istackoffset n) ->
++-@@ -783,7 +783,7 @@ let emit_instr env i =
+++ *)
+++@@ -814,7 +814,7 @@ let emit_instr env i =
++          | Word_int | Word_val ->
++              if is_atomic then begin
++                assert (addressing_mode = Iindexed 0);
++@@ -47,25 +53,24 @@
++                `	ldar	{emit_reg dst}, [{emit_reg i.arg.(0)}]\n`
++              end else
++                `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
++-@@ -813,7 +813,7 @@ let emit_instr env i =
++-             `	str	s7, {emit_addressing addr base}\n`;
++-         | Word_int | Word_val ->
+++@@ -850,6 +850,7 @@ let emit_instr env i =
++              (* memory model barrier for non-initializing store *)
++--            if assignment then ` dmb ishld\n`;
+++ (* BACKPORT
+++             if assignment then ` dmb ishld\n`;
++ +            if assignment then `	dmb	ishld\n`;
+++ *)
++              `	str	{emit_reg src}, {emit_addressing addr base}\n`
++          | Double ->
++-             `	str	{emit_reg src}, {emit_addressing addr base}\n`
++-@@ -939,7 +939,7 @@ let emit_instr env i =
++-         `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
++-     | Lop(Idls_get) ->
+++@@ -980,7 +981,7 @@ let emit_instr env i =
+++ (* BACKPORT END *)
+++ (* BACKPORT
++          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++ -        ` ldr {emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
++ +        `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
+++ *)
++      | Lreloadretaddr ->
++          ()
++-     | Lreturn ->
++-@@ -1082,10 +1082,10 @@ let fundecl fundecl =
+++@@ -1133,10 +1134,10 @@ let fundecl fundecl =
++        let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
++        let f = max_frame_size + threshold_offset in
++        let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
++@@ -79,7 +84,7 @@
++        `{emit_label ret}:\n`;
++        Some (overflow, ret), 5
++      end else None, 0
++-@@ -1112,11 +1112,11 @@ let fundecl fundecl =
+++@@ -1167,11 +1168,11 @@ let fundecl fundecl =
++        (* Pass the desired frame size on the stack, since all of the
++          argument-passing registers may be in use. *)
++        let s = (Config.stack_threshold + max_frame_size / 8) in
++@@ -95,8 +100,8 @@
++ +      `	b	{emit_label ret}\n`
++      end
++    end;
++- 
++-@@ -1151,7 +1151,7 @@ let emit_item = function
+++ *)
+++@@ -1207,7 +1208,7 @@ let emit_item = function
++  
++  let data l =
++    `	.data\n`;
++@@ -105,7 +110,7 @@
++    List.iter emit_item l
++  
++  (* Beginning / end of an assembly file *)
++-@@ -1172,7 +1172,10 @@ let begin_assembly() =
+++@@ -1228,7 +1229,10 @@ let begin_assembly() =
++       Alignment is needed to avoid linker warnings for
++       shared_startup__code_{begin,end} (e.g. tests/lib-dynlink-pr4839).
++     *)
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -444,7 +556,7 @@ index 70ee85fd44..8a46f7ea27 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index 9890043c85..6acba55a5c 100644
+index 9a40379e14..56d05d07a2 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -519,10 +631,10 @@ index 9890043c85..6acba55a5c 100644
 +    | Lop(Iextcall {func; alloc; stack_ofs = _}) ->
 +(* BACKPORT BEGIN
          if stack_ofs > 0 then begin
-           ` mov {emit_reg reg_stack_arg_begin}, sp\n`;
-           ` add {emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
+           `	mov	{emit_reg reg_stack_arg_begin}, sp\n`;
+           `	add	{emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
 @@ -733,9 +754,18 @@ let emit_instr env i =
-           ` bl  {emit_symbol "caml_c_call_stack_args"}\n`;
+           `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
            `{record_frame env i.live (Dbg_other i.dbg)}\n`
          end else if alloc then begin
 +*)
@@ -531,7 +643,7 @@ index 9890043c85..6acba55a5c 100644
 +        else begin
 +(* BACKPORT END *)
            emit_load_symbol_addr reg_x8 func;
-           ` bl  {emit_symbol "caml_c_call"}\n`;
+           `	bl	{emit_symbol "caml_c_call"}\n`;
            `{record_frame env i.live (Dbg_other i.dbg)}\n`
 +(* BACKPORT BEGIN *)
 +        end
@@ -541,7 +653,7 @@ index 9890043c85..6acba55a5c 100644
            (* store ocaml stack in the frame pointer register
               NB: no need to store previous x29 because OCaml frames don't
 @@ -750,6 +780,7 @@ let emit_instr env i =
-           ` mov sp, x29\n`;
+           `	mov	sp, x29\n`;
            cfi_restore_state ()
          end
 +*)
@@ -560,17 +672,18 @@ index 9890043c85..6acba55a5c 100644
          (* NB: assignments other than Word_int and Word_val do not follow the
          Multicore OCaml memory model and so do not emit a barrier *)
          let src = i.arg.(0) in
-@@ -813,7 +848,9 @@ let emit_instr env i =
+@@ -813,7 +848,10 @@ let emit_instr env i =
              `	str	s7, {emit_addressing addr base}\n`;
          | Word_int | Word_val ->
              (* memory model barrier for non-initializing store *)
 +(* BACKPORT
-             if assignment then ` dmb ishld\n`;
++            if assignment then ` dmb ishld\n`;
+             if assignment then `	dmb	ishld\n`;
 +*)
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
          | Double ->
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
-@@ -938,8 +975,13 @@ let emit_instr env i =
+@@ -938,8 +976,13 @@ let emit_instr env i =
      | Lop(Ispecific(Isignext size)) ->
          `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
      | Lop(Idls_get) ->
@@ -579,12 +692,12 @@ index 9890043c85..6acba55a5c 100644
 +(* BACKPORT END *)
 +(* BACKPORT
          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
-         ` ldr {emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
+         `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
 +*)
      | Lreloadretaddr ->
          ()
      | Lreturn ->
-@@ -1038,10 +1080,18 @@ let emit_instr env i =
+@@ -1038,10 +1081,18 @@ let emit_instr env i =
      | Lraise k ->
          begin match k with
          | Lambda.Raise_regular ->
@@ -603,7 +716,7 @@ index 9890043c85..6acba55a5c 100644
            `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
          | Lambda.Raise_notrace ->
            `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-@@ -1070,6 +1120,7 @@ let fundecl fundecl =
+@@ -1070,6 +1121,7 @@ let fundecl fundecl =
      num_call_gc_and_check_bound_points env
    in
  
@@ -611,7 +724,7 @@ index 9890043c85..6acba55a5c 100644
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
    let { max_frame_size; contains_nontail_calls} =
-@@ -1090,9 +1141,12 @@ let fundecl fundecl =
+@@ -1090,9 +1142,12 @@ let fundecl fundecl =
        Some (overflow, ret), 5
      end else None, 0
    in
@@ -624,7 +737,7 @@ index 9890043c85..6acba55a5c 100644
      max_out_of_line_code_offset ~num_call_gc
        ~num_check_bound
    in
-@@ -1105,6 +1159,7 @@ let fundecl fundecl =
+@@ -1105,6 +1160,7 @@ let fundecl fundecl =
    assert (List.length env.call_gc_sites = num_call_gc);
    assert (List.length env.bound_error_sites = num_check_bound);
  
@@ -632,8 +745,8 @@ index 9890043c85..6acba55a5c 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -1119,6 +1174,7 @@ let fundecl fundecl =
-       `  b {emit_label ret}\n`
+@@ -1119,6 +1175,7 @@ let fundecl fundecl =
+       `	b	{emit_label ret}\n`
      end
    end;
 +*)
@@ -10057,13 +10170,125 @@ index 0000000000..378a7fd915
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..cc31b857fa
+index 0000000000..6d804a1944
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10023 @@
+@@ -0,0 +1,10120 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..208bed7c3a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,109 @@
+++--- a	2023-09-28 18:46:32.970438287 +0100
++++++ b	2023-09-28 18:46:32.974438437 +0100
+++@@ -1,9 +1,9 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -727,27 +727,27 @@ let emit_instr env i =
+++-           output_epilogue env (fun () -> `	b	{emit_symbol func}\n`)
+++-     | Lop(Iextcall {func; alloc; stack_ofs}) ->
++++@@ -748,10 +748,10 @@ let emit_instr env i =
++++     | Lop(Iextcall {func; alloc; stack_ofs = _}) ->
++++ (* BACKPORT BEGIN
+++          if stack_ofs > 0 then begin
+++ -          ` mov {emit_reg reg_stack_arg_begin}, sp\n`;
+++ -          ` add {emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
+++@@ -14,11 +14,17 @@
+++ +          `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
+++            `{record_frame env i.live (Dbg_other i.dbg)}\n`
+++          end else if alloc then begin
++++ *)
++++@@ -760,7 +760,7 @@ let emit_instr env i =
++++         else begin
++++ (* BACKPORT END *)
+++            emit_load_symbol_addr reg_x8 func;
+++ -          ` bl  {emit_symbol "caml_c_call"}\n`;
+++ +          `	bl	{emit_symbol "caml_c_call"}\n`;
+++            `{record_frame env i.live (Dbg_other i.dbg)}\n`
+++-         end else begin
++++ (* BACKPORT BEGIN *)
++++         end
++++@@ -770,14 +770,14 @@ let emit_instr env i =
+++            (* store ocaml stack in the frame pointer register
+++               NB: no need to store previous x29 because OCaml frames don't
+++               maintain frame pointer *)
+++@@ -37,8 +43,8 @@
+++ +          `	mov	sp, x29\n`;
+++            cfi_restore_state ()
+++          end
+++-     | Lop(Istackoffset n) ->
+++-@@ -783,7 +783,7 @@ let emit_instr env i =
++++ *)
++++@@ -814,7 +814,7 @@ let emit_instr env i =
+++          | Word_int | Word_val ->
+++              if is_atomic then begin
+++                assert (addressing_mode = Iindexed 0);
+++@@ -47,25 +53,24 @@
+++                `	ldar	{emit_reg dst}, [{emit_reg i.arg.(0)}]\n`
+++              end else
+++                `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
+++-@@ -813,7 +813,7 @@ let emit_instr env i =
+++-             `	str	s7, {emit_addressing addr base}\n`;
+++-         | Word_int | Word_val ->
++++@@ -850,6 +850,7 @@ let emit_instr env i =
+++              (* memory model barrier for non-initializing store *)
+++--            if assignment then ` dmb ishld\n`;
++++ (* BACKPORT
++++             if assignment then ` dmb ishld\n`;
+++ +            if assignment then `	dmb	ishld\n`;
++++ *)
+++              `	str	{emit_reg src}, {emit_addressing addr base}\n`
+++          | Double ->
+++-             `	str	{emit_reg src}, {emit_addressing addr base}\n`
+++-@@ -939,7 +939,7 @@ let emit_instr env i =
+++-         `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
+++-     | Lop(Idls_get) ->
++++@@ -980,7 +981,7 @@ let emit_instr env i =
++++ (* BACKPORT END *)
++++ (* BACKPORT
+++          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+++ -        ` ldr {emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
+++ +        `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
++++ *)
+++      | Lreloadretaddr ->
+++          ()
+++-     | Lreturn ->
+++-@@ -1082,10 +1082,10 @@ let fundecl fundecl =
++++@@ -1133,10 +1134,10 @@ let fundecl fundecl =
+++        let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+++        let f = max_frame_size + threshold_offset in
+++        let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
+++@@ -79,7 +84,7 @@
+++        `{emit_label ret}:\n`;
+++        Some (overflow, ret), 5
+++      end else None, 0
+++-@@ -1112,11 +1112,11 @@ let fundecl fundecl =
++++@@ -1167,11 +1168,11 @@ let fundecl fundecl =
+++        (* Pass the desired frame size on the stack, since all of the
+++          argument-passing registers may be in use. *)
+++        let s = (Config.stack_threshold + max_frame_size / 8) in
+++@@ -95,8 +100,8 @@
+++ +      `	b	{emit_label ret}\n`
+++      end
+++    end;
+++- 
+++-@@ -1151,7 +1151,7 @@ let emit_item = function
++++ *)
++++@@ -1207,7 +1208,7 @@ let emit_item = function
+++  
+++  let data l =
+++    `	.data\n`;
+++@@ -105,7 +110,7 @@
+++    List.iter emit_item l
+++  
+++  (* Beginning / end of an assembly file *)
+++-@@ -1172,7 +1172,10 @@ let begin_assembly() =
++++@@ -1228,7 +1229,10 @@ let begin_assembly() =
+++       Alignment is needed to avoid linker warnings for
+++       shared_startup__code_{begin,end} (e.g. tests/lib-dynlink-pr4839).
+++     *)
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10507,7 +10732,7 @@ index 0000000000..cc31b857fa
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index 9890043c85..6acba55a5c 100644
++index 9a40379e14..56d05d07a2 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -10582,10 +10807,10 @@ index 0000000000..cc31b857fa
 ++    | Lop(Iextcall {func; alloc; stack_ofs = _}) ->
 ++(* BACKPORT BEGIN
 +         if stack_ofs > 0 then begin
-+           ` mov {emit_reg reg_stack_arg_begin}, sp\n`;
-+           ` add {emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
++           `	mov	{emit_reg reg_stack_arg_begin}, sp\n`;
++           `	add	{emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
 +@@ -733,9 +754,18 @@ let emit_instr env i =
-+           ` bl  {emit_symbol "caml_c_call_stack_args"}\n`;
++           `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
 +           `{record_frame env i.live (Dbg_other i.dbg)}\n`
 +         end else if alloc then begin
 ++*)
@@ -10594,7 +10819,7 @@ index 0000000000..cc31b857fa
 ++        else begin
 ++(* BACKPORT END *)
 +           emit_load_symbol_addr reg_x8 func;
-+           ` bl  {emit_symbol "caml_c_call"}\n`;
++           `	bl	{emit_symbol "caml_c_call"}\n`;
 +           `{record_frame env i.live (Dbg_other i.dbg)}\n`
 ++(* BACKPORT BEGIN *)
 ++        end
@@ -10604,7 +10829,7 @@ index 0000000000..cc31b857fa
 +           (* store ocaml stack in the frame pointer register
 +              NB: no need to store previous x29 because OCaml frames don't
 +@@ -750,6 +780,7 @@ let emit_instr env i =
-+           ` mov sp, x29\n`;
++           `	mov	sp, x29\n`;
 +           cfi_restore_state ()
 +         end
 ++*)
@@ -10623,17 +10848,18 @@ index 0000000000..cc31b857fa
 +         (* NB: assignments other than Word_int and Word_val do not follow the
 +         Multicore OCaml memory model and so do not emit a barrier *)
 +         let src = i.arg.(0) in
-+@@ -813,7 +848,9 @@ let emit_instr env i =
++@@ -813,7 +848,10 @@ let emit_instr env i =
 +             `	str	s7, {emit_addressing addr base}\n`;
 +         | Word_int | Word_val ->
 +             (* memory model barrier for non-initializing store *)
 ++(* BACKPORT
-+             if assignment then ` dmb ishld\n`;
+++            if assignment then ` dmb ishld\n`;
++             if assignment then `	dmb	ishld\n`;
 ++*)
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
 +         | Double ->
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
-+@@ -938,8 +975,13 @@ let emit_instr env i =
++@@ -938,8 +976,13 @@ let emit_instr env i =
 +     | Lop(Ispecific(Isignext size)) ->
 +         `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
 +     | Lop(Idls_get) ->
@@ -10642,12 +10868,12 @@ index 0000000000..cc31b857fa
 ++(* BACKPORT END *)
 ++(* BACKPORT
 +         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
-+         ` ldr {emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
++         `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
 ++*)
 +     | Lreloadretaddr ->
 +         ()
 +     | Lreturn ->
-+@@ -1038,10 +1080,18 @@ let emit_instr env i =
++@@ -1038,10 +1081,18 @@ let emit_instr env i =
 +     | Lraise k ->
 +         begin match k with
 +         | Lambda.Raise_regular ->
@@ -10666,7 +10892,7 @@ index 0000000000..cc31b857fa
 +           `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
 +         | Lambda.Raise_notrace ->
 +           `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-+@@ -1070,6 +1120,7 @@ let fundecl fundecl =
++@@ -1070,6 +1121,7 @@ let fundecl fundecl =
 +     num_call_gc_and_check_bound_points env
 +   in
 + 
@@ -10674,7 +10900,7 @@ index 0000000000..cc31b857fa
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -1090,9 +1141,12 @@ let fundecl fundecl =
++@@ -1090,9 +1142,12 @@ let fundecl fundecl =
 +       Some (overflow, ret), 5
 +     end else None, 0
 +   in
@@ -10687,7 +10913,7 @@ index 0000000000..cc31b857fa
 +     max_out_of_line_code_offset ~num_call_gc
 +       ~num_check_bound
 +   in
-+@@ -1105,6 +1159,7 @@ let fundecl fundecl =
++@@ -1105,6 +1160,7 @@ let fundecl fundecl =
 +   assert (List.length env.call_gc_sites = num_call_gc);
 +   assert (List.length env.bound_error_sites = num_check_bound);
 + 
@@ -10695,8 +10921,8 @@ index 0000000000..cc31b857fa
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -1119,6 +1174,7 @@ let fundecl fundecl =
-+       `  b {emit_label ret}\n`
++@@ -1119,6 +1175,7 @@ let fundecl fundecl =
++       `	b	{emit_label ret}\n`
 +     end
 +   end;
 ++*)
@@ -20067,23 +20293,8 @@ index 0000000000..cc31b857fa
 ++-    ./configure $configure_flags
 ++-    ;;
 ++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..24fd58adef 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
+++-   
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
