@@ -1554,7 +1554,7 @@ index 6bf995bf96..dc732ce6a3 100644
  open Globroots
  
 diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
-index 631ffe1b24..2027f87095 100644
+index 0041d91889..cf0eb4eed3 100644
 --- a/testsuite/tests/generalized-open/gpr1506.ml
 +++ b/testsuite/tests/generalized-open/gpr1506.ml
 @@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
