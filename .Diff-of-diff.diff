@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:46:35.046516073 +0100
++++ b	2023-09-28 18:46:35.050516223 +0100
+@@ -12,7 +12,7 @@
+  runtime_events_MLIS := runtime_events.mli
+  str_MLIS := str.mli
+  unix_MLIS := unix.mli unixLabels.mli
+-@@ -62,10 +58,8 @@ endif
++@@ -63,10 +59,8 @@ endif
+  libref_TEXT=Ocaml_operators Format_tutorial
+  libref_C=$(call capitalize,$(libref))
+  
+@@ -25,7 +25,7 @@
+  DRIVER_MLIS := pparse.mli
+  
+  compilerlibref_MLIS= \
+-@@ -76,8 +70,20 @@ compilerlibref=$(compilerlibref_MLIS:%.mli=%)
++@@ -77,8 +71,20 @@ compilerlibref=$(compilerlibref_MLIS:%.mli=%)
+  compilerlibref_TEXT=Compiler_libs
+  compilerlibref_C=$(call capitalize,$(compilerlibref))
+  
