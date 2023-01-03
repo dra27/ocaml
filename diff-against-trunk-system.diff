@@ -14,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 8c84ce9e00..469614f49b 100644
+index 5009072f96..12c0b9cce2 100644
 --- a/Changes
 +++ b/Changes
-@@ -861,11 +861,6 @@ OCaml 5.0
+@@ -866,11 +866,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +29,7 @@ index 8c84ce9e00..469614f49b 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -894,6 +889,30 @@ OCaml 5.0
+@@ -899,6 +894,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +60,7 @@ index 8c84ce9e00..469614f49b 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -929,13 +948,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -934,13 +953,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +76,7 @@ index 8c84ce9e00..469614f49b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1042,6 +1061,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1047,6 +1066,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +86,7 @@ index 8c84ce9e00..469614f49b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1301,6 +1323,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1306,6 +1328,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6184,7 +6184,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ec2f885795
+index 0000000000..3f2b664b18
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3879 @@
@@ -9283,7 +9283,7 @@ index 0000000000..ec2f885795
 ++  exec ${program} > ${output}
 ++fi
 +diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-+index 354583fc13..433fa15a0b 100644
++index 3a1b9494a1..e706bd4c8e 100644
 +--- a/testsuite/tests/shapes/comp_units.ml
 ++++ b/testsuite/tests/shapes/comp_units.ml
 +@@ -25,7 +25,7 @@ module Mproj = Unit
@@ -10069,7 +10069,7 @@ index 0000000000..ec2f885795
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7fb432aec3
+index 0000000000..1eba421814
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10024 @@
@@ -10089,10 +10089,10 @@ index 0000000000..7fb432aec3
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 8c84ce9e00..469614f49b 100644
++index 5009072f96..12c0b9cce2 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -861,11 +861,6 @@ OCaml 5.0
++@@ -866,11 +866,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10104,7 +10104,7 @@ index 0000000000..7fb432aec3
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -894,6 +889,30 @@ OCaml 5.0
++@@ -899,6 +894,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10135,7 +10135,7 @@ index 0000000000..7fb432aec3
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -929,13 +948,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -934,13 +953,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10151,7 +10151,7 @@ index 0000000000..7fb432aec3
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1042,6 +1061,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1047,6 +1066,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10161,7 +10161,7 @@ index 0000000000..7fb432aec3
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1301,6 +1323,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1306,6 +1328,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16259,7 +16259,7 @@ index 0000000000..7fb432aec3
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ec2f885795
++index 0000000000..3f2b664b18
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3879 @@
@@ -19358,7 +19358,7 @@ index 0000000000..7fb432aec3
 +++  exec ${program} > ${output}
 +++fi
 ++diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
-++index 354583fc13..433fa15a0b 100644
+++index 3a1b9494a1..e706bd4c8e 100644
 ++--- a/testsuite/tests/shapes/comp_units.ml
 +++++ b/testsuite/tests/shapes/comp_units.ml
 ++@@ -25,7 +25,7 @@ module Mproj = Unit
