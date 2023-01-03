@@ -14,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 5b5930d0c1..a0214aac98 100644
+index 8c84ce9e00..469614f49b 100644
 --- a/Changes
 +++ b/Changes
-@@ -857,11 +857,6 @@ OCaml 5.0
+@@ -861,11 +861,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +29,7 @@ index 5b5930d0c1..a0214aac98 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -890,6 +885,30 @@ OCaml 5.0
+@@ -894,6 +889,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +60,7 @@ index 5b5930d0c1..a0214aac98 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -925,13 +944,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -929,13 +948,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +76,7 @@ index 5b5930d0c1..a0214aac98 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1038,6 +1057,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1042,6 +1061,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +86,7 @@ index 5b5930d0c1..a0214aac98 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1297,6 +1319,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1301,6 +1323,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6184,10 +6184,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..378a7fd915
+index 0000000000..ec2f885795
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3868 @@
+@@ -0,0 +1,3879 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -7383,6 +7383,17 @@ index 0000000000..378a7fd915
 + *)
 + 
 + (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
++diff --git a/testsuite/tests/effects/marshal.ml b/testsuite/tests/effects/marshal.ml
++index 89eee89457..02b9d4e4af 100644
++--- a/testsuite/tests/effects/marshal.ml
+++++ b/testsuite/tests/effects/marshal.ml
++@@ -1,4 +1,6 @@
++ (* TEST
+++* skip
+++reason = "OCaml 5 only"
++  *)
++ 
++ open Effect
 +diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
 +index a187e9e10d..c12503863e 100644
 +--- a/testsuite/tests/effects/overflow.ml
@@ -10058,7 +10069,7 @@ index 0000000000..378a7fd915
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a98e85bd56
+index 0000000000..7fb432aec3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10024 @@
@@ -10078,10 +10089,10 @@ index 0000000000..a98e85bd56
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 5b5930d0c1..a0214aac98 100644
++index 8c84ce9e00..469614f49b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -857,11 +857,6 @@ OCaml 5.0
++@@ -861,11 +861,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10093,7 +10104,7 @@ index 0000000000..a98e85bd56
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -890,6 +885,30 @@ OCaml 5.0
++@@ -894,6 +889,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10124,7 +10135,7 @@ index 0000000000..a98e85bd56
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -925,13 +944,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -929,13 +948,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10140,7 +10151,7 @@ index 0000000000..a98e85bd56
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1038,6 +1057,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1042,6 +1061,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10150,7 +10161,7 @@ index 0000000000..a98e85bd56
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1297,6 +1319,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1301,6 +1323,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16248,10 +16259,10 @@ index 0000000000..a98e85bd56
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..378a7fd915
++index 0000000000..ec2f885795
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3868 @@
++@@ -0,0 +1,3879 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -17447,6 +17458,17 @@ index 0000000000..a98e85bd56
 ++ *)
 ++ 
 ++ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
+++diff --git a/testsuite/tests/effects/marshal.ml b/testsuite/tests/effects/marshal.ml
+++index 89eee89457..02b9d4e4af 100644
+++--- a/testsuite/tests/effects/marshal.ml
++++++ b/testsuite/tests/effects/marshal.ml
+++@@ -1,4 +1,6 @@
+++ (* TEST
++++* skip
++++reason = "OCaml 5 only"
+++  *)
+++ 
+++ open Effect
 ++diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
 ++index a187e9e10d..c12503863e 100644
 ++--- a/testsuite/tests/effects/overflow.ml
@@ -20074,18 +20096,7 @@ index 0000000000..a98e85bd56
 ++-    ;;
 ++-  *)
 ++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..24fd58adef 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@
+++-   
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
