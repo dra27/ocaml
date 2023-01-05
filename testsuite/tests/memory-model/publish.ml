@@ -1,10 +1,21 @@
 (* TEST
   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+<<<<<<< HEAD
   * skip
   reason = "OCaml 5 only"
   ** not-bsd
   *** bytecode
   *** native
+||||||| parent of b9c3cc9b30 (Merge pull request PR#11854 from dra27/publish-memory-model)
+  * not-bsd
+  ** bytecode
+  ** native
+=======
+  * not-bsd
+  ** not-windows
+  *** bytecode
+  ** native
+>>>>>>> b9c3cc9b30 (Merge pull request PR#11854 from dra27/publish-memory-model)
 *)
 
 (* Memory model: test the _publish idiom *)
