@@ -3,8 +3,9 @@
   * skip
   reason = "OCaml 5 only"
   ** not-bsd
-  *** bytecode
-  *** native
+  *** not-windows
+  **** bytecode
+  **** native
 *)
 
 (* Memory model: test the _publish idiom *)
