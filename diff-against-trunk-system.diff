@@ -14,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 14537bd00b..d21803413b 100644
+index 09ffa058d7..991ff4456c 100644
 --- a/Changes
 +++ b/Changes
-@@ -879,11 +879,6 @@ OCaml 5.0
+@@ -882,11 +882,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +29,7 @@ index 14537bd00b..d21803413b 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -912,6 +907,30 @@ OCaml 5.0
+@@ -915,6 +910,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +60,7 @@ index 14537bd00b..d21803413b 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -947,13 +966,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -950,13 +969,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +76,7 @@ index 14537bd00b..d21803413b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1060,6 +1079,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1063,6 +1082,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +86,7 @@ index 14537bd00b..d21803413b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1319,6 +1341,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1322,6 +1344,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10069,7 +10069,7 @@ index 0000000000..74636ef52d
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e191e506dc
+index 0000000000..007b9ad6ec
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10024 @@
@@ -10089,10 +10089,10 @@ index 0000000000..e191e506dc
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 14537bd00b..d21803413b 100644
++index 09ffa058d7..991ff4456c 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -879,11 +879,6 @@ OCaml 5.0
++@@ -882,11 +882,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10104,7 +10104,7 @@ index 0000000000..e191e506dc
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -912,6 +907,30 @@ OCaml 5.0
++@@ -915,6 +910,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10135,7 +10135,7 @@ index 0000000000..e191e506dc
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -947,13 +966,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -950,13 +969,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10151,7 +10151,7 @@ index 0000000000..e191e506dc
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1060,6 +1079,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1063,6 +1082,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10161,7 +10161,7 @@ index 0000000000..e191e506dc
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1319,6 +1341,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1322,6 +1344,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -22219,10 +22219,10 @@ index 02112d6bbd..c91195d2ff 100644
 +let set_state s = State.assign default s
 +(* BACKPORT END *)
 diff --git a/stdlib/stdlib.ml b/stdlib/stdlib.ml
-index 803bf3d7ed..beb0ab7daa 100644
+index e24e5a2820..7fcc68dd56 100644
 --- a/stdlib/stdlib.ml
 +++ b/stdlib/stdlib.ml
-@@ -548,11 +548,27 @@ let ( ^^ ) (Format (fmt1, str1)) (Format (fmt2, str2)) =
+@@ -550,11 +550,27 @@ let ( ^^ ) (Format (fmt1, str1)) (Format (fmt2, str2)) =
  external sys_exit : int -> 'a = "caml_sys_exit"
  
  (* for at_exit *)
@@ -22250,7 +22250,7 @@ index 803bf3d7ed..beb0ab7daa 100644
  
  let exit_function = atomic_make flush_all
  
-@@ -579,6 +595,13 @@ let exit retcode =
+@@ -581,6 +597,13 @@ let exit retcode =
  
  let _ = register_named_value "Pervasives.do_at_exit" do_at_exit
  
@@ -22264,7 +22264,7 @@ index 803bf3d7ed..beb0ab7daa 100644
  (*MODULE_ALIASES*)
  module Arg            = Arg
  module Array          = Array
-@@ -592,10 +615,14 @@ module BytesLabels    = BytesLabels
+@@ -594,10 +617,14 @@ module BytesLabels    = BytesLabels
  module Callback       = Callback
  module Char           = Char
  module Complex        = Complex
@@ -22279,7 +22279,7 @@ index 803bf3d7ed..beb0ab7daa 100644
  module Either         = Either
  module Ephemeron      = Ephemeron
  module Filename       = Filename
-@@ -615,7 +642,9 @@ module ListLabels     = ListLabels
+@@ -617,7 +644,9 @@ module ListLabels     = ListLabels
  module Map            = Map
  module Marshal        = Marshal
  module MoreLabels     = MoreLabels
@@ -22289,7 +22289,7 @@ index 803bf3d7ed..beb0ab7daa 100644
  module Nativeint      = Nativeint
  module Obj            = Obj
  module Oo             = Oo
-@@ -628,7 +657,9 @@ module Queue          = Queue
+@@ -630,7 +659,9 @@ module Queue          = Queue
  module Random         = Random
  module Result         = Result
  module Scanf          = Scanf
@@ -22300,10 +22300,10 @@ index 803bf3d7ed..beb0ab7daa 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
-index 3c88b622f8..79077d0f9c 100644
+index 3d2ffe10e8..d590e714dd 100644
 --- a/stdlib/stdlib.mli
 +++ b/stdlib/stdlib.mli
-@@ -1398,8 +1398,11 @@ module BytesLabels    = BytesLabels
+@@ -1399,8 +1399,11 @@ module BytesLabels    = BytesLabels
  module Callback       = Callback
  module Char           = Char
  module Complex        = Complex
@@ -22315,7 +22315,7 @@ index 3c88b622f8..79077d0f9c 100644
  module Domain         = Domain
  [@@alert "-unstable"]
  [@@alert unstable
-@@ -1410,6 +1413,7 @@ module Effect         = Effect
+@@ -1411,6 +1414,7 @@ module Effect         = Effect
  [@@alert unstable
      "The Effect interface may change in incompatible ways in the future."
  ]
@@ -22323,7 +22323,7 @@ index 3c88b622f8..79077d0f9c 100644
  module Either         = Either
  module Ephemeron      = Ephemeron
  module Filename       = Filename
-@@ -1429,7 +1433,9 @@ module ListLabels     = ListLabels
+@@ -1430,7 +1434,9 @@ module ListLabels     = ListLabels
  module Map            = Map
  module Marshal        = Marshal
  module MoreLabels     = MoreLabels
@@ -22333,7 +22333,7 @@ index 3c88b622f8..79077d0f9c 100644
  module Nativeint      = Nativeint
  module Obj            = Obj
  module Oo             = Oo
-@@ -1442,7 +1448,9 @@ module Queue          = Queue
+@@ -1443,7 +1449,9 @@ module Queue          = Queue
  module Random         = Random
  module Result         = Result
  module Scanf          = Scanf
