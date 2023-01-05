@@ -2519,20 +2519,22 @@ index 5504d94f04..32a8d9fa8c 100644
  
  (* Memory model test:
 diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-index fbfaa2870b..2a72134da2 100644
+index 7f778307a1..94e08074d4 100644
 --- a/testsuite/tests/memory-model/publish.ml
 +++ b/testsuite/tests/memory-model/publish.ml
-@@ -1,8 +1,10 @@
+@@ -1,9 +1,11 @@
  (* TEST
    modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
 -  * not-bsd
--  ** bytecode
+-  ** not-windows
+-  *** bytecode
 -  ** native
 +  * skip
 +  reason = "OCaml 5 only"
 +  ** not-bsd
-+  *** bytecode
-+  *** native
++  *** not-windows
++  **** bytecode
++  **** native
  *)
  
  (* Memory model: test the _publish idiom *)
