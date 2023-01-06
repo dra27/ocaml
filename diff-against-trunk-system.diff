@@ -1,35 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..a96dad1095
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,26 @@
-+--- a	2023-09-28 18:46:37.142594521 +0100
-++++ b	2023-09-28 18:46:37.146594670 +0100
-+@@ -1,13 +1,15 @@
-+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-+ --- a/testsuite/tests/memory-model/publish.ml
-+ +++ b/testsuite/tests/memory-model/publish.ml
-+-@@ -1,7 +1,8 @@
-+- (* TEST
-+-   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-+-   * not-bsd
-+--  ** bytecode
-+-+  ** not-windows
-+-+  *** bytecode
-+-   ** native
-++@@ -3,8 +3,9 @@
-++   * skip
-++   reason = "OCaml 5 only"
-++   ** not-bsd
-++-  *** bytecode
-++-  *** native
-+++  *** not-windows
-+++  **** bytecode
-+++  **** native
-+  *)
-+  
-++ (* Memory model: test the _publish idiom *)
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -6224,10 +6195,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..74636ef52d
+index 0000000000..44e12356ad
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3879 @@
+@@ -0,0 +1,3881 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -8749,20 +8720,22 @@ index 0000000000..74636ef52d
 + 
 + (* Memory model test:
 +diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-+index fbfaa2870b..2a72134da2 100644
++index 7f778307a1..94e08074d4 100644
 +--- a/testsuite/tests/memory-model/publish.ml
 ++++ b/testsuite/tests/memory-model/publish.ml
-+@@ -1,8 +1,10 @@
++@@ -1,9 +1,11 @@
 + (* TEST
 +   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
 +-  * not-bsd
-+-  ** bytecode
++-  ** not-windows
++-  *** bytecode
 +-  ** native
 ++  * skip
 ++  reason = "OCaml 5 only"
 ++  ** not-bsd
-++  *** bytecode
-++  *** native
+++  *** not-windows
+++  **** bytecode
+++  **** native
 + *)
 + 
 + (* Memory model: test the _publish idiom *)
@@ -10109,42 +10082,13 @@ index 0000000000..74636ef52d
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..82d67287f5
+index 0000000000..2775701e34
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10023 @@
+@@ -0,0 +1,10019 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..a96dad1095
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,26 @@
-++--- a	2023-09-28 18:46:37.142594521 +0100
-+++++ b	2023-09-28 18:46:37.146594670 +0100
-++@@ -1,13 +1,15 @@
-++ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-++ --- a/testsuite/tests/memory-model/publish.ml
-++ +++ b/testsuite/tests/memory-model/publish.ml
-++-@@ -1,7 +1,8 @@
-++- (* TEST
-++-   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-++-   * not-bsd
-++--  ** bytecode
-++-+  ** not-windows
-++-+  *** bytecode
-++-   ** native
-+++@@ -3,8 +3,9 @@
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++   ** not-bsd
-+++-  *** bytecode
-+++-  *** native
-++++  *** not-windows
-++++  **** bytecode
-++++  **** native
-++  *)
-++  
-+++ (* Memory model: test the _publish idiom *)
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -16339,10 +16283,10 @@ index 0000000000..82d67287f5
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..74636ef52d
++index 0000000000..44e12356ad
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3879 @@
++@@ -0,0 +1,3881 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -18864,20 +18808,22 @@ index 0000000000..82d67287f5
 ++ 
 ++ (* Memory model test:
 ++diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-++index fbfaa2870b..2a72134da2 100644
+++index 7f778307a1..94e08074d4 100644
 ++--- a/testsuite/tests/memory-model/publish.ml
 +++++ b/testsuite/tests/memory-model/publish.ml
-++@@ -1,8 +1,10 @@
+++@@ -1,9 +1,11 @@
 ++ (* TEST
 ++   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
 ++-  * not-bsd
-++-  ** bytecode
+++-  ** not-windows
+++-  *** bytecode
 ++-  ** native
 +++  * skip
 +++  reason = "OCaml 5 only"
 +++  ** not-bsd
-+++  *** bytecode
-+++  *** native
++++  *** not-windows
++++  **** bytecode
++++  **** native
 ++ *)
 ++ 
 ++ (* Memory model: test the _publish idiom *)
@@ -20135,7 +20081,30 @@ index 0000000000..82d67287f5
 ++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
 ++index f5e0711b79..8beb1f6433 100644
 ++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++*)
+++ 
+++ (* Testing unsynchronized, parallel Weak usage *)
+++ 
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actio
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
