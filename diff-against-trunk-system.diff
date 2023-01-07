@@ -14,7 +14,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index ff2357b799..c70ea34bb4 100644
+index 76ae69e346..cb044daa75 100644
 --- a/Changes
 +++ b/Changes
 @@ -363,6 +363,10 @@ Working version
@@ -10082,7 +10082,7 @@ index 0000000000..44e12356ad
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2775701e34
+index 0000000000..df65eaa4a9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10019 @@
@@ -10102,7 +10102,7 @@ index 0000000000..2775701e34
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index ff2357b799..c70ea34bb4 100644
++index 76ae69e346..cb044daa75 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -363,6 +363,10 @@ Working version
