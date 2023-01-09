@@ -792,10 +792,10 @@ index 6bb703b29d..6285c3a96d 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
-index ab9221f97e..74a8af934a 100755
+index 8936fc3ac9..74a8af934a 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index d64e1c90a0..9598dd70e2 100755
+index c5217d98fd..9598dd70e2 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -10082,7 +10082,7 @@ index 0000000000..44e12356ad
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..23d92d89c9
+index 0000000000..e9191f7639
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10019 @@
@@ -10880,10 +10880,10 @@ index 0000000000..23d92d89c9
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index ab9221f97e..74a8af934a 100755
++index 8936fc3ac9..74a8af934a 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index d64e1c90a0..9598dd70e2 100755
++index c5217d98fd..9598dd70e2 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -20227,10 +20227,10 @@ index a155076b11..c4b0f00cc5 100644
          ap_specialised = Default_specialise
        }
 diff --git a/manual/src/library/stdlib-blurb.etex b/manual/src/library/stdlib-blurb.etex
-index b10c944cc9..8c66943bcd 100644
+index 7c90119eb4..39518d86cb 100644
 --- a/manual/src/library/stdlib-blurb.etex
 +++ b/manual/src/library/stdlib-blurb.etex
-@@ -134,10 +134,10 @@ be called from C \\
+@@ -130,10 +130,10 @@ be called from C \\
  \stddocitem{Callback}{registering OCaml values with the C runtime}
  \stddocitem{Char}{character operations}
  \stddocitem{Complex}{complex numbers}
@@ -20244,7 +20244,7 @@ index b10c944cc9..8c66943bcd 100644
  \stddocitem{Either}{either values}
  \stddocitem{Ephemeron}{Ephemerons and weak hash table}
  \stddocitem{Filename}{operations on file names}
-@@ -157,7 +157,7 @@ be called from C \\
+@@ -153,7 +153,7 @@ be called from C \\
  \stddocitem{Map}{association tables over ordered types}
  \stddocitem{Marshal}{marshaling of data structures}
  \stddocitem{MoreLabels}{include modules \texttt{Hashtbl}, \texttt{Map} and \texttt{Set} with labels}
@@ -20253,7 +20253,7 @@ index b10c944cc9..8c66943bcd 100644
  \stddocitem{Nativeint}{processor-native integers}
  \stddocitem{Oo}{object-oriented extension}
  \stddocitem{Option}{option values}
-@@ -172,7 +172,7 @@ be called from C \\
+@@ -167,7 +167,7 @@ be called from C \\
  \stddocitem{Scanf}{formatted input functions}
  \stddocitem{Seq}{functional iterators}
  \stddocitem{Set}{sets over ordered types}
