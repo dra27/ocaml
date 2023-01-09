@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..ef98b0af97
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:38.646650757 +0100
+++++ b	2023-09-28 18:46:38.666651505 +0100
++@@ -15,7 +15,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -755,8 +755,10 @@ stdlib__Sys.cmx : sys.ml \
+++@@ -695,8 +695,10 @@ stdlib__Sys.cmx : sys.ml \
++      stdlib__Sys.cmi
++  stdlib__Sys.cmi : sys.mli
++  stdlib__Type.cmo : type.ml \
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 76ae69e346..cb044daa75 100644
+index 0fcb0bdae5..78a7e766d6 100644
 --- a/Changes
 +++ b/Changes
-@@ -363,6 +363,10 @@ Working version
+@@ -367,6 +367,10 @@ Working version
    temporary assembly file is no longer left in the file system.
    (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
  
@@ -28,7 +42,7 @@ index 76ae69e346..cb044daa75 100644
  OCaml 5.0
  ---------
  
-@@ -890,11 +894,6 @@ OCaml 5.0
+@@ -894,11 +898,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index 76ae69e346..cb044daa75 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -923,6 +922,30 @@ OCaml 5.0
+@@ -927,6 +926,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index 76ae69e346..cb044daa75 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -958,13 +981,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -962,13 +985,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index 76ae69e346..cb044daa75 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1071,6 +1094,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1075,6 +1098,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index 76ae69e346..cb044daa75 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1330,6 +1356,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1334,6 +1360,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10082,13 +10096,27 @@ index 0000000000..44e12356ad
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e9191f7639
+index 0000000000..62f5e9ec10
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10019 @@
+@@ -0,0 +1,10021 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..ef98b0af97
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:38.646650757 +0100
++++++ b	2023-09-28 18:46:38.666651505 +0100
+++@@ -15,7 +15,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -755,8 +755,10 @@ stdlib__Sys.cmx : sys.ml \
++++@@ -695,8 +695,10 @@ stdlib__Sys.cmx : sys.ml \
+++      stdlib__Sys.cmi
+++  stdlib__Sys.cmi : sys.mli
+++  stdlib__Type.cmo : type.ml \
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10102,10 +10130,10 @@ index 0000000000..e9191f7639
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 76ae69e346..cb044daa75 100644
++index 0fcb0bdae5..78a7e766d6 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -363,6 +363,10 @@ Working version
++@@ -367,6 +367,10 @@ Working version
 +   temporary assembly file is no longer left in the file system.
 +   (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
 + 
@@ -10116,7 +10144,7 @@ index 0000000000..e9191f7639
 + OCaml 5.0
 + ---------
 + 
-+@@ -890,11 +894,6 @@ OCaml 5.0
++@@ -894,11 +898,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10128,7 +10156,7 @@ index 0000000000..e9191f7639
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -923,6 +922,30 @@ OCaml 5.0
++@@ -927,6 +926,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10159,7 +10187,7 @@ index 0000000000..e9191f7639
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -958,13 +981,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -962,13 +985,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10175,7 +10203,7 @@ index 0000000000..e9191f7639
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1071,6 +1094,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1075,6 +1098,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10185,7 +10213,7 @@ index 0000000000..e9191f7639
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1330,6 +1356,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1334,6 +1360,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20092,19 +20120,7 @@ index 0000000000..e9191f7639
 ++ (* Testing unsynchronized, parallel Weak usage *)
 ++ 
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actio
+++index 1d16b
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21591,7 +21607,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 079dd9546d..4349d6e51a 100644
+index da86e8bbe0..cc1842fbb2 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21778,7 +21794,7 @@ index d6e9b7f52c..6c8cf55871 100644
  	  stdlib.ml stdlib.mli >> $@
  
 diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
-index cdd858aab8..720b6a5d5b 100644
+index 963a25f4f1..4235aa89fa 100644
 --- a/stdlib/StdlibModules
 +++ b/stdlib/StdlibModules
 @@ -67,10 +67,6 @@ STDLIB_MODULE_BASENAMES = \
