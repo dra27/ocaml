@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..98b5e53c8f
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:39.330676318 +0100
+++++ b	2023-09-28 18:46:39.346676916 +0100
++@@ -24,7 +24,7 @@
++  
++  CAMLprim value request_minor_gc(value v) {
++    Caml_state->requested_minor_gc = 1;
++-@@ -18,5 +20,5 @@ CAMLprim value request_minor_gc(value v) {
+++@@ -22,5 +24,5 @@ CAMLprim value request_minor_gc(value v) {
++  }
++  
++  CAMLprim value minor_gcs(value v) {
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 012dffb7cf..b7de421c6d 100644
+index 5c7060f82c..f05d98698e 100644
 --- a/Changes
 +++ b/Changes
-@@ -371,6 +371,10 @@ Working version
+@@ -375,6 +375,10 @@ Working version
    temporary assembly file is no longer left in the file system.
    (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
  
@@ -28,7 +42,7 @@ index 012dffb7cf..b7de421c6d 100644
  OCaml 5.0
  ---------
  
-@@ -898,11 +902,6 @@ OCaml 5.0
+@@ -902,11 +906,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index 012dffb7cf..b7de421c6d 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -931,6 +930,30 @@ OCaml 5.0
+@@ -935,6 +934,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index 012dffb7cf..b7de421c6d 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -966,13 +989,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -970,13 +993,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index 012dffb7cf..b7de421c6d 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1079,6 +1102,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1083,6 +1106,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index 012dffb7cf..b7de421c6d 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1338,6 +1364,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1342,6 +1368,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10082,13 +10096,27 @@ index 0000000000..44e12356ad
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c854ff46b5
+index 0000000000..8664086fac
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10019 @@
+@@ -0,0 +1,10021 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..98b5e53c8f
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:39.330676318 +0100
++++++ b	2023-09-28 18:46:39.346676916 +0100
+++@@ -24,7 +24,7 @@
+++  
+++  CAMLprim value request_minor_gc(value v) {
+++    Caml_state->requested_minor_gc = 1;
+++-@@ -18,5 +20,5 @@ CAMLprim value request_minor_gc(value v) {
++++@@ -22,5 +24,5 @@ CAMLprim value request_minor_gc(value v) {
+++  }
+++  
+++  CAMLprim value minor_gcs(value v) {
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10102,10 +10130,10 @@ index 0000000000..c854ff46b5
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 012dffb7cf..b7de421c6d 100644
++index 5c7060f82c..f05d98698e 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -371,6 +371,10 @@ Working version
++@@ -375,6 +375,10 @@ Working version
 +   temporary assembly file is no longer left in the file system.
 +   (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
 + 
@@ -10116,7 +10144,7 @@ index 0000000000..c854ff46b5
 + OCaml 5.0
 + ---------
 + 
-+@@ -898,11 +902,6 @@ OCaml 5.0
++@@ -902,11 +906,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10128,7 +10156,7 @@ index 0000000000..c854ff46b5
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -931,6 +930,30 @@ OCaml 5.0
++@@ -935,6 +934,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10159,7 +10187,7 @@ index 0000000000..c854ff46b5
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -966,13 +989,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -970,13 +993,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10175,7 +10203,7 @@ index 0000000000..c854ff46b5
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1079,6 +1102,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1083,6 +1106,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10185,7 +10213,7 @@ index 0000000000..c854ff46b5
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1338,6 +1364,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1342,6 +1368,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20092,19 +20120,7 @@ index 0000000000..c854ff46b5
 ++ (* Testing unsynchronized, parallel Weak usage *)
 ++ 
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G(caml_c_call):
-++         jmp     *%eax
-++ 
-++-        .comm   G(Caml_state), 4
-+++        .comm   G(caml_state), 4
-++ 
-++ /* Some tests are designed to cause registers to spill; on
-++  * x86 we require the caml_extra_params symbol from the RTS. */
-++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actio
+++index 1d16b72d4e..956ec
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
