@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..98b5e53c8f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:39.330676318 +0100
-++++ b	2023-09-28 18:46:39.346676916 +0100
-+@@ -24,7 +24,7 @@
-+  
-+  CAMLprim value request_minor_gc(value v) {
-+    Caml_state->requested_minor_gc = 1;
-+-@@ -18,5 +20,5 @@ CAMLprim value request_minor_gc(value v) {
-++@@ -22,5 +24,5 @@ CAMLprim value request_minor_gc(value v) {
-+  }
-+  
-+  CAMLprim value minor_gcs(value v) {
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -6209,10 +6195,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..d36b5872e9
+index 0000000000..839446eb08
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3881 @@
+@@ -0,0 +1,3888 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -6621,10 +6607,10 @@ index 0000000000..d36b5872e9
 +@@ -0,0 +1 @@
 ++let pair = 1, 12
 +diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
-+index b10b9fa4ea..5ca29acc3c 100644
++index b10b9fa4ea..b4680dcd04 100644
 +--- a/testsuite/tests/asmcomp/polling.c
 ++++ b/testsuite/tests/asmcomp/polling.c
-+@@ -14,7 +14,11 @@ CAMLprim value request_minor_gc(value v) {
++@@ -14,11 +14,18 @@ CAMLprim value request_minor_gc(value v) {
 +     tests are only run in a single domain, so we're probably
 +     good.
 +   */
@@ -6635,6 +6621,13 @@ index 0000000000..d36b5872e9
 ++  Caml_state->young_limit = Caml_state->young_alloc_end;
 + 
 +   return Val_unit;
++ }
++ 
++ CAMLprim value minor_gcs(value v) {
+++#if 0
++   return Val_long(atomic_load(&caml_minor_collections_count));
+++#endif
+++  return Val_long(Caml_state->stat_minor_collections);
 + }
 +diff --git a/testsuite/tests/asmcomp/simple_float_const.ml b/testsuite/tests/asmcomp/simple_float_const.ml
 +new file mode 100644
@@ -10096,27 +10089,13 @@ index 0000000000..d36b5872e9
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f3ba7d52ac
+index 0000000000..c0bf671305
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10021 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..98b5e53c8f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:39.330676318 +0100
-+++++ b	2023-09-28 18:46:39.346676916 +0100
-++@@ -24,7 +24,7 @@
-++  
-++  CAMLprim value request_minor_gc(value v) {
-++    Caml_state->requested_minor_gc = 1;
-++-@@ -18,5 +20,5 @@ CAMLprim value request_minor_gc(value v) {
-+++@@ -22,5 +24,5 @@ CAMLprim value request_minor_gc(value v) {
-++  }
-++  
-++  CAMLprim value minor_gcs(value v) {
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -16311,10 +16290,10 @@ index 0000000000..f3ba7d52ac
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..d36b5872e9
++index 0000000000..839446eb08
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3881 @@
++@@ -0,0 +1,3888 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -16723,10 +16702,10 @@ index 0000000000..f3ba7d52ac
 ++@@ -0,0 +1 @@
 +++let pair = 1, 12
 ++diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
-++index b10b9fa4ea..5ca29acc3c 100644
+++index b10b9fa4ea..b4680dcd04 100644
 ++--- a/testsuite/tests/asmcomp/polling.c
 +++++ b/testsuite/tests/asmcomp/polling.c
-++@@ -14,7 +14,11 @@ CAMLprim value request_minor_gc(value v) {
+++@@ -14,11 +14,18 @@ CAMLprim value request_minor_gc(value v) {
 ++     tests are only run in a single domain, so we're probably
 ++     good.
 ++   */
@@ -16737,6 +16716,13 @@ index 0000000000..f3ba7d52ac
 +++  Caml_state->young_limit = Caml_state->young_alloc_end;
 ++ 
 ++   return Val_unit;
+++ }
+++ 
+++ CAMLprim value minor_gcs(value v) {
++++#if 0
+++   return Val_long(atomic_load(&caml_minor_collections_count));
++++#endif
++++  return Val_long(Caml_state->stat_minor_collections);
 ++ }
 ++diff --git a/testsuite/tests/asmcomp/simple_float_const.ml b/testsuite/tests/asmcomp/simple_float_const.ml
 ++new file mode 100644
@@ -20120,7 +20106,16 @@ index 0000000000..f3ba7d52ac
 ++ (* Testing unsynchronized, parallel Weak usage *)
 ++ 
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
