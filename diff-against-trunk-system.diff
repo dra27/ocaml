@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..24bdf41331
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:42.802805926 +0100
+++++ b	2023-09-28 18:46:42.818806523 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -588,6 +588,9 @@ OCaml 5.0
+++@@ -592,6 +592,9 @@ OCaml 5.0
++    (emitted for Linux in #8805)
++    (Hannes Mehnert, review by Nicolás Ojeda Bär)
++  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,7 +28,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index a58c8e8088..d525c57c3c 100644
+index 2dac3949ae..a65990e874 100644
 --- a/Changes
 +++ b/Changes
 @@ -403,6 +403,10 @@ Working version
@@ -28,7 +42,7 @@ index a58c8e8088..d525c57c3c 100644
  OCaml 5.0
  ---------
  
-@@ -930,11 +934,6 @@ OCaml 5.0
+@@ -933,11 +937,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index a58c8e8088..d525c57c3c 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -963,6 +962,30 @@ OCaml 5.0
+@@ -966,6 +965,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index a58c8e8088..d525c57c3c 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -998,13 +1021,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1001,13 +1024,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index a58c8e8088..d525c57c3c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1111,6 +1134,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1114,6 +1137,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index a58c8e8088..d525c57c3c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1370,6 +1396,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1373,6 +1399,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10101,13 +10115,27 @@ index 0000000000..839446eb08
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9b5e9b1731
+index 0000000000..e34c1a7ab8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10020 @@
+@@ -0,0 +1,10024 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..24bdf41331
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:42.802805926 +0100
++++++ b	2023-09-28 18:46:42.818806523 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -588,6 +588,9 @@ OCaml 5.0
++++@@ -592,6 +592,9 @@ OCaml 5.0
+++    (emitted for Linux in #8805)
+++    (Hannes Mehnert, review by Nicolás Ojeda Bär)
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10121,7 +10149,7 @@ index 0000000000..9b5e9b1731
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index a58c8e8088..d525c57c3c 100644
++index 2dac3949ae..a65990e874 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -403,6 +403,10 @@ Working version
@@ -10135,7 +10163,7 @@ index 0000000000..9b5e9b1731
 + OCaml 5.0
 + ---------
 + 
-+@@ -930,11 +934,6 @@ OCaml 5.0
++@@ -933,11 +937,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10147,7 +10175,7 @@ index 0000000000..9b5e9b1731
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -963,6 +962,30 @@ OCaml 5.0
++@@ -966,6 +965,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10178,7 +10206,7 @@ index 0000000000..9b5e9b1731
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -998,13 +1021,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1001,13 +1024,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10194,7 +10222,7 @@ index 0000000000..9b5e9b1731
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1111,6 +1134,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1114,6 +1137,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10204,7 +10232,7 @@ index 0000000000..9b5e9b1731
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1370,6 +1396,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1373,6 +1399,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20114,17 +20142,7 @@ index 0000000000..9b5e9b1731
 +++   reason = "OCaml 5 only"
 +++*)
 ++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++index f5e0711b79..8beb1f6433 100644
-++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++* skip
-+++reason = "OCaml 5 o
+++    until the random failure
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
