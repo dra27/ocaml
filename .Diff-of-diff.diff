@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:46:41.850770412 +0100
++++ b	2023-09-28 18:46:41.866771010 +0100
+@@ -16,7 +16,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -796,13 +796,17 @@ runtime/primitives: \
++@@ -793,13 +793,17 @@ runtime/primitives: \
+  	cp $^ $@
+  
+  runtime/prims.c : runtime/primitives
+@@ -43,7 +43,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -688,7 +688,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -700,7 +700,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
+      cc_warnings=''],
+    [outputobj='-o '
+    warn_error_flag='-Werror'
