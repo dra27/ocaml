@@ -244,19 +244,15 @@ GNUISH_SED = \
   $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
        $(SED),$(error GNU sed is needed for make depend))
 
-.INTERMEDIATE: .depend.tmp
-
-.depend.tmp:
-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
-	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> $@
-
 .PHONY: depend
-depend: .depend
-
-.depend: .depend.tmp
+depend:
+	{ \
+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
+      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
+	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+	  stdlib.ml stdlib.mli; \
+	} | \
 	$(GNUISH_SED) -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
 	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' \
-	$< > $@
+	> .$@
