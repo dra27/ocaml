@@ -1,39 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0c2ed12712
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,30 @@
-+--- a	2023-09-28 18:46:44.622873770 +0100
-++++ b	2023-09-28 18:46:44.630874068 +0100
-+@@ -1,14 +1,15 @@
-+ diff --git a/stdlib/Makefile b/stdlib/Makefile
-+ --- a/stdlib/Makefile
-+ +++ b/stdlib/Makefile
-+-@@ -244,18 +244,14 @@ GNUISH_SED = \
-++@@ -244,19 +244,15 @@ GNUISH_SED = \
-+    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
-+         $(SED),$(error GNU sed is needed for make depend))
-+  
-+ -.INTERMEDIATE: .depend.tmp
-+ -
-+ -.depend.tmp:
-+--	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
-++-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
-+ -	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-+ -	  stdlib.ml stdlib.mli >> $@
-+ -
-+@@ -18,7 +19,8 @@
-+ -.depend: .depend.tmp
-+ +depend:
-+ +	{ \
-+-+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
-+++	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-+++      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
-+ +	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-+ +	  stdlib.ml stdlib.mli; \
-+ +	} | \
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -47,7 +14,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index e05df6ae2b..3540ef33b2 100644
+index c5e39c3927..d88a08ba31 100644
 --- a/Changes
 +++ b/Changes
 @@ -422,6 +422,10 @@ Working version
@@ -10134,46 +10101,13 @@ index 0000000000..839446eb08
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..14cd2f1db0
+index 0000000000..241193a87b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10018 @@
+@@ -0,0 +1,10020 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0c2ed12712
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,30 @@
-++--- a	2023-09-28 18:46:44.622873770 +0100
-+++++ b	2023-09-28 18:46:44.630874068 +0100
-++@@ -1,14 +1,15 @@
-++ diff --git a/stdlib/Makefile b/stdlib/Makefile
-++ --- a/stdlib/Makefile
-++ +++ b/stdlib/Makefile
-++-@@ -244,18 +244,14 @@ GNUISH_SED = \
-+++@@ -244,19 +244,15 @@ GNUISH_SED = \
-++    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
-++         $(SED),$(error GNU sed is needed for make depend))
-++  
-++ -.INTERMEDIATE: .depend.tmp
-++ -
-++ -.depend.tmp:
-++--	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
-+++-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-+++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
-++ -	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-++ -	  stdlib.ml stdlib.mli >> $@
-++ -
-++@@ -18,7 +19,8 @@
-++ -.depend: .depend.tmp
-++ +depend:
-++ +	{ \
-++-+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
-++++	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-++++      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
-++ +	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-++ +	  stdlib.ml stdlib.mli; \
-++ +	} | \
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10187,7 +10121,7 @@ index 0000000000..14cd2f1db0
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index e05df6ae2b..3540ef33b2 100644
++index c5e39c3927..d88a08ba31 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -422,6 +422,10 @@ Working version
@@ -20155,7 +20089,42 @@ index 0000000000..14cd2f1db0
 +++   reason = "OCaml 5 only"
 +++*)
 ++ 
-++ let () = Out_channel.s
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
