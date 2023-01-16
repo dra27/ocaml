@@ -1,0 +1,30 @@
+--- a	2023-09-28 18:46:44.622873770 +0100
++++ b	2023-09-28 18:46:44.630874068 +0100
+@@ -1,14 +1,15 @@
+ diff --git a/stdlib/Makefile b/stdlib/Makefile
+ --- a/stdlib/Makefile
+ +++ b/stdlib/Makefile
+-@@ -244,18 +244,14 @@ GNUISH_SED = \
++@@ -244,19 +244,15 @@ GNUISH_SED = \
+    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
+         $(SED),$(error GNU sed is needed for make depend))
+  
+ -.INTERMEDIATE: .depend.tmp
+ -
+ -.depend.tmp:
+--	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
++-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
+ -	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+ -	  stdlib.ml stdlib.mli >> $@
+ -
+@@ -18,7 +19,8 @@
+ -.depend: .depend.tmp
+ +depend:
+ +	{ \
+-+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
+++	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
+++      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
+ +	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+ +	  stdlib.ml stdlib.mli; \
+ +	} | \

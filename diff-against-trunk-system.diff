@@ -1,6 +1,39 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..0c2ed12712
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,30 @@
++--- a	2023-09-28 18:46:44.622873770 +0100
+++++ b	2023-09-28 18:46:44.630874068 +0100
++@@ -1,14 +1,15 @@
++ diff --git a/stdlib/Makefile b/stdlib/Makefile
++ --- a/stdlib/Makefile
++ +++ b/stdlib/Makefile
++-@@ -244,18 +244,14 @@ GNUISH_SED = \
+++@@ -244,19 +244,15 @@ GNUISH_SED = \
++    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
++         $(SED),$(error GNU sed is needed for make depend))
++  
++ -.INTERMEDIATE: .depend.tmp
++ -
++ -.depend.tmp:
++--	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
+++-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
+++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
++ -	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
++ -	  stdlib.ml stdlib.mli >> $@
++ -
++@@ -18,7 +19,8 @@
++ -.depend: .depend.tmp
++ +depend:
++ +	{ \
++-+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
++++	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
++++      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
++ +	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
++ +	  stdlib.ml stdlib.mli; \
++ +	} | \
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10101,13 +10134,46 @@ index 0000000000..839446eb08
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8f6c481e3d
+index 0000000000..14cd2f1db0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10020 @@
+@@ -0,0 +1,10018 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..0c2ed12712
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,30 @@
+++--- a	2023-09-28 18:46:44.622873770 +0100
++++++ b	2023-09-28 18:46:44.630874068 +0100
+++@@ -1,14 +1,15 @@
+++ diff --git a/stdlib/Makefile b/stdlib/Makefile
+++ --- a/stdlib/Makefile
+++ +++ b/stdlib/Makefile
+++-@@ -244,18 +244,14 @@ GNUISH_SED = \
++++@@ -244,19 +244,15 @@ GNUISH_SED = \
+++    $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
+++         $(SED),$(error GNU sed is needed for make depend))
+++  
+++ -.INTERMEDIATE: .depend.tmp
+++ -
+++ -.depend.tmp:
+++--	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
++++-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
++++-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
+++ -	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+++ -	  stdlib.ml stdlib.mli >> $@
+++ -
+++@@ -18,7 +19,8 @@
+++ -.depend: .depend.tmp
+++ +depend:
+++ +	{ \
+++-+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
+++++	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
+++++      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
+++ +	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+++ +	  stdlib.ml stdlib.mli; \
+++ +	} | \
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20089,42 +20155,7 @@ index 0000000000..8f6c481e3d
 +++   reason = "OCaml 5 only"
 +++*)
 ++ 
-++ let () = Out_channel.set_buffered stdout false
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++index f5e0711b79..8beb1f6433 100644
-++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++* skip
-+++reason = "OCaml 5 
+++ let () = Out_channel.s
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -21784,19 +21815,19 @@ index da86e8bbe0..cc1842fbb2 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index d6e9b7f52c..6c8cf55871 100644
+index 3c40ad943f..506f511362 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -247,7 +247,8 @@ GNUISH_SED = \
- .INTERMEDIATE: .depend.tmp
- 
- .depend.tmp:
--	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
-+	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-+    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
- 	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
- 	  stdlib.ml stdlib.mli >> $@
- 
+ .PHONY: depend
+ depend:
+ 	{ \
+-	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
++	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
++      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
+ 	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+ 	  stdlib.ml stdlib.mli; \
+ 	} | \
 diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
 index 963a25f4f1..4235aa89fa 100644
 --- a/stdlib/StdlibModules
