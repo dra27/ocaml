@@ -1,31 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..832e664743
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,22 @@
-+--- a	2023-09-28 18:46:45.366901485 +0100
-++++ b	2023-09-28 18:46:45.386902230 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -904,6 +904,9 @@ OCaml 5.0
-++@@ -908,6 +908,9 @@ OCaml 5.0
-+    socket and deadlock the parent.
-+    (Antonin Décimo, review by Xavier Leroy)
-+  
-+@@ -11,10 +11,6 @@
-+  - #11186, #11188: Fix composition of coercions with aliases
-+    (Vincent Laviron, report and review by Leo White)
-+  
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/testsuite/tests/typing-misc/constraints.ml b/testsuite/tests/typing-misc/constraints.ml
-+ --- a/testsuite/tests/typing-misc/constraints.ml
-+ +++ b/testsuite/tests/typing-misc/constraints.ml
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -245,7 +220,7 @@ index 4c9707bac5..687cdc2b7f 100644
  	   utils/*.cmi \
  	   parsing/*.cmi \
 diff --git a/Makefile.config.in b/Makefile.config.in
-index 0b83f398b5..0b289c8c8f 100644
+index acfa023b4d..26804870b7 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
 @@ -244,7 +244,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -10126,38 +10101,13 @@ index 0000000000..839446eb08
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..649f1aef0b
+index 0000000000..f9f93853f8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10016 @@
+@@ -0,0 +1,10020 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..832e664743
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,22 @@
-++--- a	2023-09-28 18:46:45.366901485 +0100
-+++++ b	2023-09-28 18:46:45.386902230 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -904,6 +904,9 @@ OCaml 5.0
-+++@@ -908,6 +908,9 @@ OCaml 5.0
-++    socket and deadlock the parent.
-++    (Antonin Décimo, review by Xavier Leroy)
-++  
-++@@ -11,10 +11,6 @@
-++  - #11186, #11188: Fix composition of coercions with aliases
-++    (Vincent Laviron, report and review by Leo White)
-++  
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/testsuite/tests/typing-misc/constraints.ml b/testsuite/tests/typing-misc/constraints.ml
-++ --- a/testsuite/tests/typing-misc/constraints.ml
-++ +++ b/testsuite/tests/typing-misc/constraints.ml
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10377,7 +10327,7 @@ index 0000000000..649f1aef0b
 + 	   utils/*.cmi \
 + 	   parsing/*.cmi \
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index 0b83f398b5..0b289c8c8f 100644
++index acfa023b4d..26804870b7 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
 +@@ -244,7 +244,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -20145,7 +20095,36 @@ index 0000000000..649f1aef0b
 ++index fa2d2efc43..752a7eeabf 100644
 ++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 +++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++index f5e0711b79..8beb1f6433 100644
+++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
