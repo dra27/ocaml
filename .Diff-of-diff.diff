@@ -1,0 +1,22 @@
+--- a	2023-09-28 18:46:45.366901485 +0100
++++ b	2023-09-28 18:46:45.386902230 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -904,6 +904,9 @@ OCaml 5.0
++@@ -908,6 +908,9 @@ OCaml 5.0
+    socket and deadlock the parent.
+    (Antonin Décimo, review by Xavier Leroy)
+  
+@@ -11,10 +11,6 @@
+  - #11186, #11188: Fix composition of coercions with aliases
+    (Vincent Laviron, report and review by Leo White)
+  
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/testsuite/tests/typing-misc/constraints.ml b/testsuite/tests/typing-misc/constraints.ml
+ --- a/testsuite/tests/typing-misc/constraints.ml
+ +++ b/testsuite/tests/typing-misc/constraints.ml
