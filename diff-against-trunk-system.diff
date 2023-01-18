@@ -14,7 +14,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index cc8c7a501f..33147ea654 100644
+index 3c28320420..d5d8ce71e3 100644
 --- a/Changes
 +++ b/Changes
 @@ -425,6 +425,10 @@ Working version
@@ -6207,10 +6207,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..839446eb08
+index 0000000000..d618ab8beb
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3888 @@
+@@ -0,0 +1,3919 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -8513,6 +8513,37 @@ index 0000000000..839446eb08
 + *)
 + 
 + open Runtime_events
++diff --git a/testsuite/tests/lib-runtime-events/test_user_event.ml b/testsuite/tests/lib-runtime-events/test_user_event.ml
++index a4cb09175b..51566e99ed 100644
++--- a/testsuite/tests/lib-runtime-events/test_user_event.ml
+++++ b/testsuite/tests/lib-runtime-events/test_user_event.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++ include runtime_events
+++* skip
+++reason = "OCaml 5 only"
++ *)
++ open Runtime_events
++ 
++diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++index c45c1d85da..3137ba09f1 100644
++--- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+++++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++@@ -2,9 +2,11 @@
++    include runtime_events
++    include unix
++    set OCAML_RUNTIME_EVENTS_PRESERVE = "1"
++-   * libunix
++-   ** bytecode
++-   ** native
+++   * skip
+++   reason = "OCaml 5 only"
+++   ** libunix
+++   *** bytecode
+++   *** native
++ *)
++ open Runtime_events
++ 
 +diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 +index 23f2a5f7de..08055698e7 100644
 +--- a/testsuite/tests/lib-str/parallel.ml
@@ -10101,7 +10132,7 @@ index 0000000000..839446eb08
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..92164552fb
+index 0000000000..bb27bf66ea
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10020 @@
@@ -10121,7 +10152,7 @@ index 0000000000..92164552fb
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index cc8c7a501f..33147ea654 100644
++index 3c28320420..d5d8ce71e3 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -425,6 +425,10 @@ Working version
@@ -16314,10 +16345,10 @@ index 0000000000..92164552fb
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..839446eb08
++index 0000000000..d618ab8beb
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3888 @@
++@@ -0,0 +1,3919 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -18620,6 +18651,37 @@ index 0000000000..92164552fb
 ++ *)
 ++ 
 ++ open Runtime_events
+++diff --git a/testsuite/tests/lib-runtime-events/test_user_event.ml b/testsuite/tests/lib-runtime-events/test_user_event.ml
+++index a4cb09175b..51566e99ed 100644
+++--- a/testsuite/tests/lib-runtime-events/test_user_event.ml
++++++ b/testsuite/tests/lib-runtime-events/test_user_event.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++ include runtime_events
++++* skip
++++reason = "OCaml 5 only"
+++ *)
+++ open Runtime_events
+++ 
+++diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+++index c45c1d85da..3137ba09f1 100644
+++--- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++++++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+++@@ -2,9 +2,11 @@
+++    include runtime_events
+++    include unix
+++    set OCAML_RUNTIME_EVENTS_PRESERVE = "1"
+++-   * libunix
+++-   ** bytecode
+++-   ** native
++++   * skip
++++   reason = "OCaml 5 only"
++++   ** libunix
++++   *** bytecode
++++   *** native
+++ *)
+++ open Runtime_events
+++ 
 ++diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 ++index 23f2a5f7de..08055698e7 100644
 ++--- a/testsuite/tests/lib-str/parallel.ml
@@ -20093,38 +20155,7 @@ index 0000000000..92164552fb
 ++ 
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++index f5e0711b79..8beb1f6433 100644
-++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++* skip
-+++reason = "OCaml 5 
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.m
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
