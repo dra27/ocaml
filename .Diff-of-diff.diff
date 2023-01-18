@@ -1,101 +1,12 @@
---- a	2023-09-28 18:46:47.222970579 +0100
-+++ b	2023-09-28 18:46:47.246971472 +0100
-@@ -84,7 +84,7 @@
-  	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
-  	|| { rm -f $@; exit 2; }
-  
--@@ -765,7 +765,7 @@ endif
-+@@ -762,7 +762,7 @@ endif
-  ## Generated non-object files
-  
-  runtime/ld.conf: $(ROOTDIR)/Makefile.config
-@@ -93,7 +93,7 @@
-  	echo "$(LIBDIR)" >> $@
-  
-  # If primitives contain duplicated lines (e.g. because the code is defined
--@@ -793,10 +793,10 @@ runtime/primitives: \
-+@@ -790,10 +790,10 @@ runtime/primitives: \
-    $(shell runtime/gen_primitives.sh > runtime/primitives.new; \
-                      cmp -s runtime/primitives runtime/primitives.new || \
-                      echo runtime/primitives.new)
-@@ -106,7 +106,7 @@
-  	(echo '#include "caml/config.h"'; \
-  	 echo 'typedef intnat value;'; \
-  	 echo 'typedef value (*c_primitive)(void);'; \
--@@ -812,7 +812,7 @@ runtime/prims.c : runtime/primitives
-+@@ -809,7 +809,7 @@ runtime/prims.c : runtime/primitives
-  	 echo '  0 };') > $@
-  
-  runtime/caml/opnames.h : runtime/caml/instruct.h
-@@ -115,7 +115,7 @@
-  	sed -e '/\/\*/d' \
-  	    -e '/^#/d' \
-  	    -e 's/enum /static char * names_of_/' \
--@@ -821,7 +821,7 @@ runtime/caml/opnames.h : runtime/caml/instruct.h
-+@@ -818,7 +818,7 @@ runtime/caml/opnames.h : runtime/caml/instruct.h
-  
-  # runtime/caml/jumptbl.h is required only if you have GCC 2.0 or later
-  runtime/caml/jumptbl.h : runtime/caml/instruct.h
-@@ -124,7 +124,7 @@
-  	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
-  	       -e '/^}/q' > $@
-  
--@@ -832,64 +832,64 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
-+@@ -829,64 +829,64 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
-  SAK_LINK ?= $(MKEXE_VIA_CC)
-  
-  $(SAK): runtime/sak.$(O)
-@@ -208,7 +208,7 @@
-  
-  ## Runtime target-specific preprocessor and compiler flags
-  
--@@ -936,7 +936,7 @@ ifneq "$(1)" "%"
-+@@ -933,7 +933,7 @@ ifneq "$(1)" "%"
-  # instead include $(runtime_BUILT_HEADERS) in the order only dependencies
-  # to ensure that they exist before dependencies are computed.
-  $(DEPDIR)/$(1).$(D): runtime/%.c | $(DEPDIR)/runtime $(runtime_BUILT_HEADERS)
-@@ -217,7 +217,7 @@
-  	  'runtime/$$*$(subst runtime/%,,$(1)).$(O)' -MF $$@
-  endif # ifneq "$(1)" "%"
-  $(1).$(O): $(2).c
--@@ -945,7 +945,7 @@ $(1).$(O): $(2).c \
-+@@ -942,7 +942,7 @@ $(1).$(O): $(2).c \
-    $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
-    $(RUNTIME_HEADERS)
-  endif # ifeq "$(COMPUTE_DEPS)" "true"
-@@ -226,7 +226,7 @@
-  	  $$(OUTPUTOBJ)$$@ $$<
-  endef
-  
--@@ -978,45 +978,45 @@ ASPP_ERROR = \
-+@@ -975,45 +975,45 @@ ASPP_ERROR = \
-            echo "try producing $*.o by hand.";\
-            exit 2; }
-  runtime/%.o: runtime/%.S
-@@ -285,7 +285,7 @@
-  
-  ## Runtime dependencies
-  
--@@ -1148,7 +1148,7 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
-+@@ -1147,7 +1147,7 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
-  ocamlyacc: $(ocamlyacc_PROGRAM)$(EXE)
-  
-  $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
-@@ -293,7 +293,7 @@
- +	$(V_MKEXE)$(MKEXE) -o $@ $^
-  
-  clean::
-- 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
-+ 	rm -f yacc/wstr.o yacc/wstr.obj
- @@ -1180,9 +1180,9 @@ include Makefile.menhir
-  # generated parser.ml.
-  
-@@ -1255,6 +1255,6 @@
-  depend:
- -	{ \
- +	$(V_OCAMLDEP){ \
-- 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
-+ 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-+       $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
-  	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-- 	  stdlib.ml stdlib.mli; \
+--- a	2023-09-28 18:46:47.594984418 +0100
++++ b	2023-09-28 18:46:47.614985162 +0100
+@@ -9,6 +9,6 @@
+ +  (Andrei Paskevich and Charlène Gros, review by David Allsopp and
+ +   Nicolás Ojeda Bär)
+ +
+- OCaml 5.0
+- ---------
+- 
++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
++   that causes very slow compaction.
++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
