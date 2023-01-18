@@ -1,6 +1,110 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..f9111f994c
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,101 @@
++--- a	2023-09-28 18:46:47.222970579 +0100
+++++ b	2023-09-28 18:46:47.246971472 +0100
++@@ -84,7 +84,7 @@
++  	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
++  	|| { rm -f $@; exit 2; }
++  
++-@@ -765,7 +765,7 @@ endif
+++@@ -762,7 +762,7 @@ endif
++  ## Generated non-object files
++  
++  runtime/ld.conf: $(ROOTDIR)/Makefile.config
++@@ -93,7 +93,7 @@
++  	echo "$(LIBDIR)" >> $@
++  
++  # If primitives contain duplicated lines (e.g. because the code is defined
++-@@ -793,10 +793,10 @@ runtime/primitives: \
+++@@ -790,10 +790,10 @@ runtime/primitives: \
++    $(shell runtime/gen_primitives.sh > runtime/primitives.new; \
++                      cmp -s runtime/primitives runtime/primitives.new || \
++                      echo runtime/primitives.new)
++@@ -106,7 +106,7 @@
++  	(echo '#include "caml/config.h"'; \
++  	 echo 'typedef intnat value;'; \
++  	 echo 'typedef value (*c_primitive)(void);'; \
++-@@ -812,7 +812,7 @@ runtime/prims.c : runtime/primitives
+++@@ -809,7 +809,7 @@ runtime/prims.c : runtime/primitives
++  	 echo '  0 };') > $@
++  
++  runtime/caml/opnames.h : runtime/caml/instruct.h
++@@ -115,7 +115,7 @@
++  	sed -e '/\/\*/d' \
++  	    -e '/^#/d' \
++  	    -e 's/enum /static char * names_of_/' \
++-@@ -821,7 +821,7 @@ runtime/caml/opnames.h : runtime/caml/instruct.h
+++@@ -818,7 +818,7 @@ runtime/caml/opnames.h : runtime/caml/instruct.h
++  
++  # runtime/caml/jumptbl.h is required only if you have GCC 2.0 or later
++  runtime/caml/jumptbl.h : runtime/caml/instruct.h
++@@ -124,7 +124,7 @@
++  	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
++  	       -e '/^}/q' > $@
++  
++-@@ -832,64 +832,64 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
+++@@ -829,64 +829,64 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
++  SAK_LINK ?= $(MKEXE_VIA_CC)
++  
++  $(SAK): runtime/sak.$(O)
++@@ -208,7 +208,7 @@
++  
++  ## Runtime target-specific preprocessor and compiler flags
++  
++-@@ -936,7 +936,7 @@ ifneq "$(1)" "%"
+++@@ -933,7 +933,7 @@ ifneq "$(1)" "%"
++  # instead include $(runtime_BUILT_HEADERS) in the order only dependencies
++  # to ensure that they exist before dependencies are computed.
++  $(DEPDIR)/$(1).$(D): runtime/%.c | $(DEPDIR)/runtime $(runtime_BUILT_HEADERS)
++@@ -217,7 +217,7 @@
++  	  'runtime/$$*$(subst runtime/%,,$(1)).$(O)' -MF $$@
++  endif # ifneq "$(1)" "%"
++  $(1).$(O): $(2).c
++-@@ -945,7 +945,7 @@ $(1).$(O): $(2).c \
+++@@ -942,7 +942,7 @@ $(1).$(O): $(2).c \
++    $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
++    $(RUNTIME_HEADERS)
++  endif # ifeq "$(COMPUTE_DEPS)" "true"
++@@ -226,7 +226,7 @@
++  	  $$(OUTPUTOBJ)$$@ $$<
++  endef
++  
++-@@ -978,45 +978,45 @@ ASPP_ERROR = \
+++@@ -975,45 +975,45 @@ ASPP_ERROR = \
++            echo "try producing $*.o by hand.";\
++            exit 2; }
++  runtime/%.o: runtime/%.S
++@@ -285,7 +285,7 @@
++  
++  ## Runtime dependencies
++  
++-@@ -1148,7 +1148,7 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
+++@@ -1147,7 +1147,7 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
++  ocamlyacc: $(ocamlyacc_PROGRAM)$(EXE)
++  
++  $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -293,7 +293,7 @@
++ +	$(V_MKEXE)$(MKEXE) -o $@ $^
++  
++  clean::
++- 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
+++ 	rm -f yacc/wstr.o yacc/wstr.obj
++ @@ -1180,9 +1180,9 @@ include Makefile.menhir
++  # generated parser.ml.
++  
++@@ -1255,6 +1255,6 @@
++  depend:
++ -	{ \
++ +	$(V_OCAMLDEP){ \
++- 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
+++ 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
+++       $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
++  	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
++- 	  stdlib.ml stdlib.mli; \
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +118,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 3c28320420..d5d8ce71e3 100644
+index eaa95f054a..c9aed43f72 100644
 --- a/Changes
 +++ b/Changes
-@@ -425,6 +425,10 @@ Working version
+@@ -431,6 +431,10 @@ Working version
    temporary assembly file is no longer left in the file system.
    (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
  
@@ -28,7 +132,7 @@ index 3c28320420..d5d8ce71e3 100644
  OCaml 5.0
  ---------
  
-@@ -958,11 +962,6 @@ OCaml 5.0
+@@ -964,11 +968,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +144,7 @@ index 3c28320420..d5d8ce71e3 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -991,6 +990,30 @@ OCaml 5.0
+@@ -997,6 +996,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +175,7 @@ index 3c28320420..d5d8ce71e3 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1026,13 +1049,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1032,13 +1055,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +191,7 @@ index 3c28320420..d5d8ce71e3 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1139,6 +1162,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1145,6 +1168,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +201,7 @@ index 3c28320420..d5d8ce71e3 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1398,6 +1424,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1404,6 +1430,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -108,7 +212,7 @@ index 3c28320420..d5d8ce71e3 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 4c9707bac5..687cdc2b7f 100644
+index bb5186b758..4bb8b9e6a5 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -603,7 +603,6 @@ partialclean::
@@ -202,7 +306,7 @@ index 4c9707bac5..687cdc2b7f 100644
  	done
  
 @@ -1151,6 +1150,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
- 	$(MKEXE) -o $@ $^
+ 	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
 +	rm -f yacc/wstr.o yacc/wstr.obj
@@ -10132,13 +10236,117 @@ index 0000000000..d618ab8beb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bb27bf66ea
+index 0000000000..2e380f79d7
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10020 @@
+@@ -0,0 +1,10137 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..f9111f994c
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,101 @@
+++--- a	2023-09-28 18:46:47.222970579 +0100
++++++ b	2023-09-28 18:46:47.246971472 +0100
+++@@ -84,7 +84,7 @@
+++  	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
+++  	|| { rm -f $@; exit 2; }
+++  
+++-@@ -765,7 +765,7 @@ endif
++++@@ -762,7 +762,7 @@ endif
+++  ## Generated non-object files
+++  
+++  runtime/ld.conf: $(ROOTDIR)/Makefile.config
+++@@ -93,7 +93,7 @@
+++  	echo "$(LIBDIR)" >> $@
+++  
+++  # If primitives contain duplicated lines (e.g. because the code is defined
+++-@@ -793,10 +793,10 @@ runtime/primitives: \
++++@@ -790,10 +790,10 @@ runtime/primitives: \
+++    $(shell runtime/gen_primitives.sh > runtime/primitives.new; \
+++                      cmp -s runtime/primitives runtime/primitives.new || \
+++                      echo runtime/primitives.new)
+++@@ -106,7 +106,7 @@
+++  	(echo '#include "caml/config.h"'; \
+++  	 echo 'typedef intnat value;'; \
+++  	 echo 'typedef value (*c_primitive)(void);'; \
+++-@@ -812,7 +812,7 @@ runtime/prims.c : runtime/primitives
++++@@ -809,7 +809,7 @@ runtime/prims.c : runtime/primitives
+++  	 echo '  0 };') > $@
+++  
+++  runtime/caml/opnames.h : runtime/caml/instruct.h
+++@@ -115,7 +115,7 @@
+++  	sed -e '/\/\*/d' \
+++  	    -e '/^#/d' \
+++  	    -e 's/enum /static char * names_of_/' \
+++-@@ -821,7 +821,7 @@ runtime/caml/opnames.h : runtime/caml/instruct.h
++++@@ -818,7 +818,7 @@ runtime/caml/opnames.h : runtime/caml/instruct.h
+++  
+++  # runtime/caml/jumptbl.h is required only if you have GCC 2.0 or later
+++  runtime/caml/jumptbl.h : runtime/caml/instruct.h
+++@@ -124,7 +124,7 @@
+++  	sed -n -e '/^  /s/ \([A-Z]\)/ \&\&lbl_\1/gp' \
+++  	       -e '/^}/q' > $@
+++  
+++-@@ -832,64 +832,64 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
++++@@ -829,64 +829,64 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
+++  SAK_LINK ?= $(MKEXE_VIA_CC)
+++  
+++  $(SAK): runtime/sak.$(O)
+++@@ -208,7 +208,7 @@
+++  
+++  ## Runtime target-specific preprocessor and compiler flags
+++  
+++-@@ -936,7 +936,7 @@ ifneq "$(1)" "%"
++++@@ -933,7 +933,7 @@ ifneq "$(1)" "%"
+++  # instead include $(runtime_BUILT_HEADERS) in the order only dependencies
+++  # to ensure that they exist before dependencies are computed.
+++  $(DEPDIR)/$(1).$(D): runtime/%.c | $(DEPDIR)/runtime $(runtime_BUILT_HEADERS)
+++@@ -217,7 +217,7 @@
+++  	  'runtime/$$*$(subst runtime/%,,$(1)).$(O)' -MF $$@
+++  endif # ifneq "$(1)" "%"
+++  $(1).$(O): $(2).c
+++-@@ -945,7 +945,7 @@ $(1).$(O): $(2).c \
++++@@ -942,7 +942,7 @@ $(1).$(O): $(2).c \
+++    $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
+++    $(RUNTIME_HEADERS)
+++  endif # ifeq "$(COMPUTE_DEPS)" "true"
+++@@ -226,7 +226,7 @@
+++  	  $$(OUTPUTOBJ)$$@ $$<
+++  endef
+++  
+++-@@ -978,45 +978,45 @@ ASPP_ERROR = \
++++@@ -975,45 +975,45 @@ ASPP_ERROR = \
+++            echo "try producing $*.o by hand.";\
+++            exit 2; }
+++  runtime/%.o: runtime/%.S
+++@@ -285,7 +285,7 @@
+++  
+++  ## Runtime dependencies
+++  
+++-@@ -1148,7 +1148,7 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
++++@@ -1147,7 +1147,7 @@ ocamlyacc_CPPFLAGS = -DNDEBUG
+++  ocamlyacc: $(ocamlyacc_PROGRAM)$(EXE)
+++  
+++  $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+++@@ -293,7 +293,7 @@
+++ +	$(V_MKEXE)$(MKEXE) -o $@ $^
+++  
+++  clean::
+++- 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
++++ 	rm -f yacc/wstr.o yacc/wstr.obj
+++ @@ -1180,9 +1180,9 @@ include Makefile.menhir
+++  # generated parser.ml.
+++  
+++@@ -1255,6 +1255,6 @@
+++  depend:
+++ -	{ \
+++ +	$(V_OCAMLDEP){ \
+++- 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
++++ 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
++++       $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
+++  	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+++- 	  stdlib.ml stdlib.mli; \
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10152,10 +10360,10 @@ index 0000000000..bb27bf66ea
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 3c28320420..d5d8ce71e3 100644
++index eaa95f054a..c9aed43f72 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -425,6 +425,10 @@ Working version
++@@ -431,6 +431,10 @@ Working version
 +   temporary assembly file is no longer left in the file system.
 +   (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
 + 
@@ -10166,7 +10374,7 @@ index 0000000000..bb27bf66ea
 + OCaml 5.0
 + ---------
 + 
-+@@ -958,11 +962,6 @@ OCaml 5.0
++@@ -964,11 +968,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10178,7 +10386,7 @@ index 0000000000..bb27bf66ea
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -991,6 +990,30 @@ OCaml 5.0
++@@ -997,6 +996,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10209,7 +10417,7 @@ index 0000000000..bb27bf66ea
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1026,13 +1049,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1032,13 +1055,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10225,7 +10433,7 @@ index 0000000000..bb27bf66ea
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1139,6 +1162,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1145,6 +1168,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10235,7 +10443,7 @@ index 0000000000..bb27bf66ea
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1398,6 +1424,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1404,6 +1430,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10246,7 +10454,7 @@ index 0000000000..bb27bf66ea
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 4c9707bac5..687cdc2b7f 100644
++index bb5186b758..4bb8b9e6a5 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -603,7 +603,6 @@ partialclean::
@@ -10340,7 +10548,7 @@ index 0000000000..bb27bf66ea
 + 	done
 + 
 +@@ -1151,6 +1150,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
-+ 	$(MKEXE) -o $@ $^
++ 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
 ++	rm -f yacc/wstr.o yacc/wstr.obj
@@ -20155,7 +20363,20 @@ index 0000000000..bb27bf66ea
 ++ 
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.m
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/t
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
@@ -20768,7 +20989,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index 5ea72d7303..d1d6fc97c9 100644
+index 51cffb0492..dc25a56475 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
@@ -21815,13 +22036,13 @@ index da86e8bbe0..cc1842fbb2 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 3c40ad943f..506f511362 100644
+index ffd472eaef..04a7812d9c 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -247,7 +247,8 @@ GNUISH_SED = \
  .PHONY: depend
  depend:
- 	{ \
+ 	$(V_OCAMLDEP){ \
 -	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
 +	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
 +      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
