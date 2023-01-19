@@ -1,21 +1,56 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..3a80cc3c92
+index 0000000000..66b9dc8604
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,12 @@
-+--- a	2023-09-28 18:46:47.594984418 +0100
-++++ b	2023-09-28 18:46:47.614985162 +0100
-+@@ -9,6 +9,6 @@
-+ +  (Andrei Paskevich and Charlène Gros, review by David Allsopp and
-+ +   Nicolás Ojeda Bär)
-+ +
-+- OCaml 5.0
-+- ---------
-+- 
-++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-++   that causes very slow compaction.
-++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+@@ -0,0 +1,47 @@
++--- a	2023-09-28 18:46:47.942997365 +0100
+++++ b	2023-09-28 18:46:47.962998109 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -738,6 +738,9 @@ OCaml 5.0
+++@@ -742,6 +742,9 @@ OCaml 5.0
++    toplevel printers.
++    (Florian Angeletti, review by Gabriel Scherer and David Allsopp)
++  
++@@ -190,7 +190,7 @@
++    (Actions_helpers.pass_or_skip (not (is_bsd_system Ocamltest_config.system))
++      "not on a BSD system"
++      "on a BSD system")
++-@@ -128,89 +142,106 @@ let not_bsd = make
+++@@ -128,55 +142,64 @@ let not_bsd = make
++  let macos_system = "macosx"
++  
++  let macos = make
++@@ -264,6 +264,8 @@
++    (Actions_helpers.pass_or_skip (Ocamltest_config.function_sections)
++       "Target supports function sections"
++       "Target does not support function sections")
+++@@ -188,35 +211,43 @@ let naked_pointers = make
+++      "Runtime system does not support naked pointers")
++  
++  let frame_pointers = make
++ -  "frame_pointers"
++@@ -313,7 +315,7 @@
++    (Actions_helpers.check_output "program"
++      Builtin_variables.output
++      Builtin_variables.reference)
++-@@ -236,7 +267,11 @@ let file_exists_action _log env =
+++@@ -242,7 +273,11 @@ let file_exists_action _log env =
++          let result = Result.fail_with_reason reason in
++          (result, env)
++        end
++@@ -326,7 +328,7 @@
++  
++  let copy_action log env =
++    let do_copy src dst =
++-@@ -264,7 +299,7 @@ let copy_action log env =
+++@@ -270,7 +305,7 @@ let copy_action log env =
++        List.iter f (String.words src);
++        (Result.pass, env)
++  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -29,7 +64,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 8357076e8d..2bedd12948 100644
+index c56713b139..517b09a50a 100644
 --- a/Changes
 +++ b/Changes
 @@ -435,6 +435,10 @@ Working version
@@ -43,7 +78,7 @@ index 8357076e8d..2bedd12948 100644
  OCaml 5.0
  ---------
  
-@@ -968,11 +972,6 @@ OCaml 5.0
+@@ -971,11 +975,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -55,7 +90,7 @@ index 8357076e8d..2bedd12948 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1001,6 +1000,30 @@ OCaml 5.0
+@@ -1004,6 +1003,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -86,7 +121,7 @@ index 8357076e8d..2bedd12948 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1036,13 +1059,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1039,13 +1062,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -102,7 +137,7 @@ index 8357076e8d..2bedd12948 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1149,6 +1172,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1152,6 +1175,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -112,7 +147,7 @@ index 8357076e8d..2bedd12948 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1408,6 +1434,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1411,6 +1437,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10147,28 +10182,63 @@ index 0000000000..d618ab8beb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..eaf232eba0
+index 0000000000..38d1fa6471
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10145 @@
+@@ -0,0 +1,10152 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..3a80cc3c92
++index 0000000000..66b9dc8604
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,12 @@
-++--- a	2023-09-28 18:46:47.594984418 +0100
-+++++ b	2023-09-28 18:46:47.614985162 +0100
-++@@ -9,6 +9,6 @@
-++ +  (Andrei Paskevich and Charlène Gros, review by David Allsopp and
-++ +   Nicolás Ojeda Bär)
-++ +
-++- OCaml 5.0
-++- ---------
-++- 
-+++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-+++   that causes very slow compaction.
-+++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
++@@ -0,0 +1,47 @@
+++--- a	2023-09-28 18:46:47.942997365 +0100
++++++ b	2023-09-28 18:46:47.962998109 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -738,6 +738,9 @@ OCaml 5.0
++++@@ -742,6 +742,9 @@ OCaml 5.0
+++    toplevel printers.
+++    (Florian Angeletti, review by Gabriel Scherer and David Allsopp)
+++  
+++@@ -190,7 +190,7 @@
+++    (Actions_helpers.pass_or_skip (not (is_bsd_system Ocamltest_config.system))
+++      "not on a BSD system"
+++      "on a BSD system")
+++-@@ -128,89 +142,106 @@ let not_bsd = make
++++@@ -128,55 +142,64 @@ let not_bsd = make
+++  let macos_system = "macosx"
+++  
+++  let macos = make
+++@@ -264,6 +264,8 @@
+++    (Actions_helpers.pass_or_skip (Ocamltest_config.function_sections)
+++       "Target supports function sections"
+++       "Target does not support function sections")
++++@@ -188,35 +211,43 @@ let naked_pointers = make
++++      "Runtime system does not support naked pointers")
+++  
+++  let frame_pointers = make
+++ -  "frame_pointers"
+++@@ -313,7 +315,7 @@
+++    (Actions_helpers.check_output "program"
+++      Builtin_variables.output
+++      Builtin_variables.reference)
+++-@@ -236,7 +267,11 @@ let file_exists_action _log env =
++++@@ -242,7 +273,11 @@ let file_exists_action _log env =
+++          let result = Result.fail_with_reason reason in
+++          (result, env)
+++        end
+++@@ -326,7 +328,7 @@
+++  
+++  let copy_action log env =
+++    let do_copy src dst =
+++-@@ -264,7 +299,7 @@ let copy_action log env =
++++@@ -270,7 +305,7 @@ let copy_action log env =
+++        List.iter f (String.words src);
+++        (Result.pass, env)
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10182,7 +10252,7 @@ index 0000000000..eaf232eba0
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 8357076e8d..2bedd12948 100644
++index c56713b139..517b09a50a 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -435,6 +435,10 @@ Working version
@@ -10196,7 +10266,7 @@ index 0000000000..eaf232eba0
 + OCaml 5.0
 + ---------
 + 
-+@@ -968,11 +972,6 @@ OCaml 5.0
++@@ -971,11 +975,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10208,7 +10278,7 @@ index 0000000000..eaf232eba0
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1001,6 +1000,30 @@ OCaml 5.0
++@@ -1004,6 +1003,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10239,7 +10309,7 @@ index 0000000000..eaf232eba0
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1036,13 +1059,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1039,13 +1062,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10255,7 +10325,7 @@ index 0000000000..eaf232eba0
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1149,6 +1172,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1152,6 +1175,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10265,7 +10335,7 @@ index 0000000000..eaf232eba0
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1408,6 +1434,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1411,6 +1437,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20267,35 +20337,7 @@ index 0000000000..eaf232eba0
 ++         mingw64)
 ++             build='--build=i686-pc-cygwin'
 ++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -158,10 +158,13 @@ case "$1" in
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +184,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that 
+++-            dep='--disable-depende
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644

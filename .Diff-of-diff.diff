@@ -1,12 +1,47 @@
---- a	2023-09-28 18:46:47.594984418 +0100
-+++ b	2023-09-28 18:46:47.614985162 +0100
-@@ -9,6 +9,6 @@
- +  (Andrei Paskevich and Charlène Gros, review by David Allsopp and
- +   Nicolás Ojeda Bär)
- +
-- OCaml 5.0
-- ---------
-- 
-+ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-+   that causes very slow compaction.
-+   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+--- a	2023-09-28 18:46:47.942997365 +0100
++++ b	2023-09-28 18:46:47.962998109 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -738,6 +738,9 @@ OCaml 5.0
++@@ -742,6 +742,9 @@ OCaml 5.0
+    toplevel printers.
+    (Florian Angeletti, review by Gabriel Scherer and David Allsopp)
+  
+@@ -190,7 +190,7 @@
+    (Actions_helpers.pass_or_skip (not (is_bsd_system Ocamltest_config.system))
+      "not on a BSD system"
+      "on a BSD system")
+-@@ -128,89 +142,106 @@ let not_bsd = make
++@@ -128,55 +142,64 @@ let not_bsd = make
+  let macos_system = "macosx"
+  
+  let macos = make
+@@ -264,6 +264,8 @@
+    (Actions_helpers.pass_or_skip (Ocamltest_config.function_sections)
+       "Target supports function sections"
+       "Target does not support function sections")
++@@ -188,35 +211,43 @@ let naked_pointers = make
++      "Runtime system does not support naked pointers")
+  
+  let frame_pointers = make
+ -  "frame_pointers"
+@@ -313,7 +315,7 @@
+    (Actions_helpers.check_output "program"
+      Builtin_variables.output
+      Builtin_variables.reference)
+-@@ -236,7 +267,11 @@ let file_exists_action _log env =
++@@ -242,7 +273,11 @@ let file_exists_action _log env =
+          let result = Result.fail_with_reason reason in
+          (result, env)
+        end
+@@ -326,7 +328,7 @@
+  
+  let copy_action log env =
+    let do_copy src dst =
+-@@ -264,7 +299,7 @@ let copy_action log env =
++@@ -270,7 +305,7 @@ let copy_action log env =
+        List.iter f (String.words src);
+        (Result.pass, env)
+  

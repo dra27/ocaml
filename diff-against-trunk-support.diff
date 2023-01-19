@@ -66,10 +66,10 @@ index 333bcad1af..94ee1cfe3d 100644
  cache:
    - C:\cygwin64\var\cache\setup
 diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-index c4c11c1905..17eb07492b 100644
+index 0bc17bc281..0bb0042339 100644
 --- a/ocamltest/builtin_actions.ml
 +++ b/ocamltest/builtin_actions.ml
-@@ -181,6 +181,12 @@ let function_sections = make
+@@ -204,6 +204,12 @@ let function_sections = make
       "Target supports function sections"
       "Target does not support function sections")
  
@@ -80,9 +80,9 @@ index c4c11c1905..17eb07492b 100644
 +     "Runtime system does not support naked pointers")
 +
  let frame_pointers = make
-   "frame_pointers"
-   (Actions_helpers.pass_or_skip (Ocamltest_config.frame_pointers)
-@@ -308,6 +314,7 @@ let _ =
+   ~name:"frame_pointers"
+   ~description:"Pass if frame pointers are available"
+@@ -343,6 +349,7 @@ let _ =
      arch_i386;
      arch_power;
      function_sections;
@@ -102,7 +102,7 @@ index 282090b4c3..dfda7b1f87 100644
 +
  let frame_pointers = @frame_pointers@
 diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-index 4c8cb07d2e..e0185f5d1e 100644
+index cbe1432466..d20ec18ff3 100644
 --- a/ocamltest/ocamltest_config.mli
 +++ b/ocamltest/ocamltest_config.mli
 @@ -125,5 +125,8 @@ val function_sections : bool
