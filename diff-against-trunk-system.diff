@@ -1,56 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..66b9dc8604
+index 0000000000..26a94efd02
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,47 @@
-+--- a	2023-09-28 18:46:47.942997365 +0100
-++++ b	2023-09-28 18:46:47.962998109 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -738,6 +738,9 @@ OCaml 5.0
-++@@ -742,6 +742,9 @@ OCaml 5.0
-+    toplevel printers.
-+    (Florian Angeletti, review by Gabriel Scherer and David Allsopp)
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:46:48.295010455 +0100
+++++ b	2023-09-28 18:46:48.311011050 +0100
++@@ -15,7 +15,7 @@
++ diff --git a/lambda/matching.ml b/lambda/matching.ml
++ --- a/lambda/matching.ml
++ +++ b/lambda/matching.ml
++-@@ -2376,11 +2376,29 @@ module SArg = struct
+++@@ -2424,11 +2424,29 @@ module SArg = struct
++    let make_if cond ifso ifnot = Lifthenelse (cond, ifso, ifnot)
 +  
-+@@ -190,7 +190,7 @@
-+    (Actions_helpers.pass_or_skip (not (is_bsd_system Ocamltest_config.system))
-+      "not on a BSD system"
-+      "on a BSD system")
-+-@@ -128,89 +142,106 @@ let not_bsd = make
-++@@ -128,55 +142,64 @@ let not_bsd = make
-+  let macos_system = "macosx"
-+  
-+  let macos = make
-+@@ -264,6 +264,8 @@
-+    (Actions_helpers.pass_or_skip (Ocamltest_config.function_sections)
-+       "Target supports function sections"
-+       "Target does not support function sections")
-++@@ -188,35 +211,43 @@ let naked_pointers = make
-++      "Runtime system does not support naked pointers")
-+  
-+  let frame_pointers = make
-+ -  "frame_pointers"
-+@@ -313,7 +315,7 @@
-+    (Actions_helpers.check_output "program"
-+      Builtin_variables.output
-+      Builtin_variables.reference)
-+-@@ -236,7 +267,11 @@ let file_exists_action _log env =
-++@@ -242,7 +273,11 @@ let file_exists_action _log env =
-+          let result = Result.fail_with_reason reason in
-+          (result, env)
-+        end
-+@@ -326,7 +328,7 @@
-+  
-+  let copy_action log env =
-+    let do_copy src dst =
-+-@@ -264,7 +299,7 @@ let copy_action log env =
-++@@ -270,7 +305,7 @@ let copy_action log env =
-+        List.iter f (String.words src);
-+        (Result.pass, env)
-+  
++    let make_switch loc arg cases acts =
++@@ -46,7 +46,7 @@
++        ( arg,
++          { sw_numconsts = Array.length cases;
++            sw_consts = !l;
++-@@ -2388,7 +2406,7 @@ module SArg = struct
+++@@ -2436,7 +2454,7 @@ module SArg = struct
++            sw_blocks = [];
++            sw_failaction = None
++          },
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -64,10 +37,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index c56713b139..517b09a50a 100644
+index 7b9e7664f3..fc40a8100b 100644
 --- a/Changes
 +++ b/Changes
-@@ -435,6 +435,10 @@ Working version
+@@ -439,6 +439,10 @@ Working version
    (Andrei Paskevich and Charlène Gros, review by David Allsopp and
     Nicolás Ojeda Bär)
  
@@ -78,7 +51,7 @@ index c56713b139..517b09a50a 100644
  OCaml 5.0
  ---------
  
-@@ -971,11 +975,6 @@ OCaml 5.0
+@@ -975,11 +979,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -90,7 +63,7 @@ index c56713b139..517b09a50a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1004,6 +1003,30 @@ OCaml 5.0
+@@ -1008,6 +1007,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -121,7 +94,7 @@ index c56713b139..517b09a50a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1039,13 +1062,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1043,13 +1066,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -137,7 +110,7 @@ index c56713b139..517b09a50a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1152,6 +1175,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1156,6 +1179,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -147,7 +120,7 @@ index c56713b139..517b09a50a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1411,6 +1437,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1415,6 +1441,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6257,7 +6230,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..d618ab8beb
+index 0000000000..b2713d870c
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3919 @@
@@ -6329,10 +6302,10 @@ index 0000000000..d618ab8beb
 + cache:
 +   - C:\cygwin64\var\cache\setup
 +diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-+index c4c11c1905..17eb07492b 100644
++index 0bc17bc281..0bb0042339 100644
 +--- a/ocamltest/builtin_actions.ml
 ++++ b/ocamltest/builtin_actions.ml
-+@@ -181,6 +181,12 @@ let function_sections = make
++@@ -204,6 +204,12 @@ let function_sections = make
 +      "Target supports function sections"
 +      "Target does not support function sections")
 + 
@@ -6343,9 +6316,9 @@ index 0000000000..d618ab8beb
 ++     "Runtime system does not support naked pointers")
 ++
 + let frame_pointers = make
-+   "frame_pointers"
-+   (Actions_helpers.pass_or_skip (Ocamltest_config.frame_pointers)
-+@@ -308,6 +314,7 @@ let _ =
++   ~name:"frame_pointers"
++   ~description:"Pass if frame pointers are available"
++@@ -343,6 +349,7 @@ let _ =
 +     arch_i386;
 +     arch_power;
 +     function_sections;
@@ -6365,7 +6338,7 @@ index 0000000000..d618ab8beb
 ++
 + let frame_pointers = @frame_pointers@
 +diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-+index 4c8cb07d2e..e0185f5d1e 100644
++index cbe1432466..d20ec18ff3 100644
 +--- a/ocamltest/ocamltest_config.mli
 ++++ b/ocamltest/ocamltest_config.mli
 +@@ -125,5 +125,8 @@ val function_sections : bool
@@ -10182,63 +10155,36 @@ index 0000000000..d618ab8beb
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..38d1fa6471
+index 0000000000..8106966bb7
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10152 @@
+@@ -0,0 +1,10145 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..66b9dc8604
++index 0000000000..26a94efd02
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,47 @@
-++--- a	2023-09-28 18:46:47.942997365 +0100
-+++++ b	2023-09-28 18:46:47.962998109 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -738,6 +738,9 @@ OCaml 5.0
-+++@@ -742,6 +742,9 @@ OCaml 5.0
-++    toplevel printers.
-++    (Florian Angeletti, review by Gabriel Scherer and David Allsopp)
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:46:48.295010455 +0100
++++++ b	2023-09-28 18:46:48.311011050 +0100
+++@@ -15,7 +15,7 @@
+++ diff --git a/lambda/matching.ml b/lambda/matching.ml
+++ --- a/lambda/matching.ml
+++ +++ b/lambda/matching.ml
+++-@@ -2376,11 +2376,29 @@ module SArg = struct
++++@@ -2424,11 +2424,29 @@ module SArg = struct
+++    let make_if cond ifso ifnot = Lifthenelse (cond, ifso, ifnot)
 ++  
-++@@ -190,7 +190,7 @@
-++    (Actions_helpers.pass_or_skip (not (is_bsd_system Ocamltest_config.system))
-++      "not on a BSD system"
-++      "on a BSD system")
-++-@@ -128,89 +142,106 @@ let not_bsd = make
-+++@@ -128,55 +142,64 @@ let not_bsd = make
-++  let macos_system = "macosx"
-++  
-++  let macos = make
-++@@ -264,6 +264,8 @@
-++    (Actions_helpers.pass_or_skip (Ocamltest_config.function_sections)
-++       "Target supports function sections"
-++       "Target does not support function sections")
-+++@@ -188,35 +211,43 @@ let naked_pointers = make
-+++      "Runtime system does not support naked pointers")
-++  
-++  let frame_pointers = make
-++ -  "frame_pointers"
-++@@ -313,7 +315,7 @@
-++    (Actions_helpers.check_output "program"
-++      Builtin_variables.output
-++      Builtin_variables.reference)
-++-@@ -236,7 +267,11 @@ let file_exists_action _log env =
-+++@@ -242,7 +273,11 @@ let file_exists_action _log env =
-++          let result = Result.fail_with_reason reason in
-++          (result, env)
-++        end
-++@@ -326,7 +328,7 @@
-++  
-++  let copy_action log env =
-++    let do_copy src dst =
-++-@@ -264,7 +299,7 @@ let copy_action log env =
-+++@@ -270,7 +305,7 @@ let copy_action log env =
-++        List.iter f (String.words src);
-++        (Result.pass, env)
-++  
+++    let make_switch loc arg cases acts =
+++@@ -46,7 +46,7 @@
+++        ( arg,
+++          { sw_numconsts = Array.length cases;
+++            sw_consts = !l;
+++-@@ -2388,7 +2406,7 @@ module SArg = struct
++++@@ -2436,7 +2454,7 @@ module SArg = struct
+++            sw_blocks = [];
+++            sw_failaction = None
+++          },
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10252,10 +10198,10 @@ index 0000000000..38d1fa6471
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index c56713b139..517b09a50a 100644
++index 7b9e7664f3..fc40a8100b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -435,6 +435,10 @@ Working version
++@@ -439,6 +439,10 @@ Working version
 +   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
 +    Nicolás Ojeda Bär)
 + 
@@ -10266,7 +10212,7 @@ index 0000000000..38d1fa6471
 + OCaml 5.0
 + ---------
 + 
-+@@ -971,11 +975,6 @@ OCaml 5.0
++@@ -975,11 +979,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10278,7 +10224,7 @@ index 0000000000..38d1fa6471
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1004,6 +1003,30 @@ OCaml 5.0
++@@ -1008,6 +1007,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10309,7 +10255,7 @@ index 0000000000..38d1fa6471
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1039,13 +1062,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1043,13 +1066,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10325,7 +10271,7 @@ index 0000000000..38d1fa6471
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1152,6 +1175,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1156,6 +1179,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10335,7 +10281,7 @@ index 0000000000..38d1fa6471
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1411,6 +1437,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1415,6 +1441,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16445,7 +16391,7 @@ index 0000000000..38d1fa6471
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..d618ab8beb
++index 0000000000..b2713d870c
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3919 @@
@@ -16517,10 +16463,10 @@ index 0000000000..38d1fa6471
 ++ cache:
 ++   - C:\cygwin64\var\cache\setup
 ++diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-++index c4c11c1905..17eb07492b 100644
+++index 0bc17bc281..0bb0042339 100644
 ++--- a/ocamltest/builtin_actions.ml
 +++++ b/ocamltest/builtin_actions.ml
-++@@ -181,6 +181,12 @@ let function_sections = make
+++@@ -204,6 +204,12 @@ let function_sections = make
 ++      "Target supports function sections"
 ++      "Target does not support function sections")
 ++ 
@@ -16531,9 +16477,9 @@ index 0000000000..38d1fa6471
 +++     "Runtime system does not support naked pointers")
 +++
 ++ let frame_pointers = make
-++   "frame_pointers"
-++   (Actions_helpers.pass_or_skip (Ocamltest_config.frame_pointers)
-++@@ -308,6 +314,7 @@ let _ =
+++   ~name:"frame_pointers"
+++   ~description:"Pass if frame pointers are available"
+++@@ -343,6 +349,7 @@ let _ =
 ++     arch_i386;
 ++     arch_power;
 ++     function_sections;
@@ -16553,7 +16499,7 @@ index 0000000000..38d1fa6471
 +++
 ++ let frame_pointers = @frame_pointers@
 ++diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-++index 4c8cb07d2e..e0185f5d1e 100644
+++index cbe1432466..d20ec18ff3 100644
 ++--- a/ocamltest/ocamltest_config.mli
 +++++ b/ocamltest/ocamltest_config.mli
 ++@@ -125,5 +125,8 @@ val function_sections : bool
@@ -20337,10 +20283,30 @@ index 0000000000..38d1fa6471
 ++         mingw64)
 ++             build='--build=i686-pc-cygwin'
 ++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-depende
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -158,10 +158,13 @@ case "$1" in
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the boot
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index a155076b11..c4b0f00cc5 100644
+index e2d1b08fab..d80b0d7c24 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
