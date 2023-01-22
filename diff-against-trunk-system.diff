@@ -1,1264 +1,110 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c6d32355e3
+index 0000000000..8441dbde64
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,1255 @@
-+--- a	2023-09-28 18:46:49.667061458 +0100
-++++ b	2023-09-28 18:46:49.695062499 +0100
-+@@ -83,7 +83,7 @@
+@@ -0,0 +1,101 @@
++--- a	2023-09-28 18:46:50.575095192 +0100
+++++ b	2023-09-28 18:46:50.591095786 +0100
++@@ -62,7 +62,7 @@
 +  
-+  DOC_FILES=\
-+    Changes \
-+-@@ -1000,21 +1000,12 @@ runtime/domain_state32.inc: \
-++@@ -997,21 +997,12 @@ runtime/domain_state32.inc: \
-+  runtime/amd64nt.obj: runtime/amd64nt.asm runtime/domain_state64.inc
-+  	$(V_ASM)$(ASM)$@ $<
++  (* Array indexing *)
 +  
-+@@ -2561,7 +2561,7 @@
-+      && not (is_different_from (-1) c2)
-+      then
-+        Cifthenelse(Cop(Ccmpi Cne, [c2; Cconst_int (-1, dbg)], dbg),
-+-@@ -980,12 +980,11 @@ let bigarray_set unsafe elt_kind layout b args newval dbg =
-++@@ -984,12 +984,11 @@ let bigarray_set unsafe elt_kind layout b args newval dbg =
-+              [bigarray_indexing unsafe elt_kind layout b args dbg; newval],
-+              dbg))
++-@@ -2063,7 +2059,7 @@ let offsetref n arg dbg =
+++@@ -2067,7 +2063,7 @@ let offsetref n arg dbg =
++               dbg)))
 +  
-+@@ -2576,7 +2576,7 @@
-+      (* Ignore sign and zero extensions, which do not affect the low bits *)
-+    | Cop(Casr, [Cop(Clsl, [x; Cconst_int (32, _)], _);
-+                 Cconst_int (32, _)], _)
-+-@@ -995,18 +994,14 @@ let rec low_32 dbg = function
-++@@ -999,18 +998,14 @@ let rec low_32 dbg = function
-+      Clet(id, e, low_32 dbg body)
-+    | x -> x
++  let arraylength kind arg dbg =
++@@ -71,7 +71,7 @@
++    match (kind : Lambda.array_kind) with
++      Pgenarray ->
++        let len =
++-@@ -2263,7 +2259,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++@@ -2272,7 +2268,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++    | Pgenarray ->
++        bind "index" arg2 (fun idx ->
++        bind "arr" arg1 (fun arr ->
++@@ -80,7 +80,7 @@
++          if wordsize_shift = numfloat_shift then
++            Csequence(
++              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
++-@@ -2290,7 +2286,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++@@ -2299,7 +2295,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++              Csequence(
++                make_checkbound dbg [
++                  addr_array_length_shifted
++@@ -89,7 +89,7 @@
++                addr_array_ref arr idx dbg)))
++        | Pintarray ->
++            bind "index" arg2 (fun idx ->
++-@@ -2298,7 +2294,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++              Csequence(
++                make_checkbound dbg [
++                  addr_array_length_shifted
++@@ -98,7 +98,7 @@
++                int_array_ref arr idx dbg)))
++        | Pfloatarray ->
++            box_float dbg (
++-@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++@@ -2316,7 +2312,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++                Csequence(
++                  make_checkbound dbg [
++                    float_array_length_shifted
++@@ -107,7 +107,7 @@
++                    idx],
++                  unboxed_float_array_ref arr idx dbg))))
 +  
-+@@ -2600,7 +2600,7 @@
++-@@ -2366,7 +2362,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++@@ -2375,7 +2371,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++        bind "newval" arg3 (fun newval ->
++        bind "index" arg2 (fun idx ->
++        bind "arr" arg1 (fun arr ->
++@@ -116,7 +116,7 @@
++          if wordsize_shift = numfloat_shift then
++            Csequence(
++              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
++-@@ -2398,7 +2394,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++@@ -2407,7 +2403,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++          Csequence(
++            make_checkbound dbg [
++              addr_array_length_shifted
++@@ -125,7 +125,7 @@
++              idx],
++            addr_array_set arr idx newval dbg))))
++    | Pintarray ->
++-@@ -2408,7 +2404,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++@@ -2417,7 +2413,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++          Csequence(
++            make_checkbound dbg [
++              addr_array_length_shifted
++@@ -134,7 +134,7 @@
++              idx],
++            int_array_set arr idx newval dbg))))
++    | Pfloatarray ->
++-@@ -2418,7 +2414,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++@@ -2427,7 +2423,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++          Csequence(
++            make_checkbound dbg [
++              float_array_length_shifted
++@@ -193,7 +193,7 @@
++  AC_SUBST([frame_pointers])
++  AC_SUBST([flambda])
++  AC_SUBST([flambda_invariants])
++-@@ -424,15 +422,11 @@ AC_ARG_WITH([target-bindir],
+++@@ -435,15 +433,11 @@ AC_ARG_WITH([target-bindir],
 +  
-+  (* Boxed integers *)
++  AC_ARG_ENABLE([reserved-header-bits],
++    [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
++@@ -213,7 +213,7 @@
 +  
-+-@@ -1024,7 +1019,7 @@ let alloc_header_boxed_int (bi : Primitive.boxed_integer) =
-++@@ -1028,7 +1023,7 @@ let alloc_header_boxed_int (bi : Primitive.boxed_integer) =
++  AC_ARG_ENABLE([stdlib-manpages],
++    [AS_HELP_STRING([--disable-stdlib-manpages],
++-@@ -2014,8 +2008,7 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+++@@ -2064,8 +2058,7 @@ AS_IF([test x"$enable_naked_pointers_checker" = "xyes" ],
++  ## Check for mmap support for huge pages and contiguous heap
++  OCAML_MMAP_SUPPORTS_HUGE_PAGES
 +  
-+  let box_int_gen dbg (bi : Primitive.boxed_integer) arg =
-+    let arg' =
-+@@ -2609,7 +2609,7 @@
-+        if big_endian
-+        then Cop(Clsl, [arg; Cconst_int (32, dbg)], dbg)
-+        else sign_extend_32 dbg arg
-+-@@ -1034,13 +1029,6 @@ let box_int_gen dbg (bi : Primitive.boxed_integer) arg =
-++@@ -1038,13 +1033,6 @@ let box_int_gen dbg (bi : Primitive.boxed_integer) arg =
-+                 Cconst_symbol(operations_boxed_int bi, dbg);
-+                 arg'], dbg)
-+  
-+@@ -2623,7 +2623,7 @@
-+  let alloc_matches_boxed_int bi ~hdr ~ops =
-+    match (bi : Primitive.boxed_integer), hdr, ops with
-+    | Pnativeint, Cconst_natint (hdr, _dbg), Cconst_symbol (sym, _) ->
-+-@@ -1056,28 +1044,25 @@ let alloc_matches_boxed_int bi ~hdr ~ops =
-++@@ -1060,28 +1048,25 @@ let alloc_matches_boxed_int bi ~hdr ~ops =
-+  
-+  let unbox_int dbg bi =
-+    let default arg =
-+@@ -2659,7 +2659,7 @@
-+               && alloc_matches_boxed_int bi ~hdr ~ops ->
-+            (* Force sign-extension of low 32 bits *)
-+            sign_extend_32 dbg contents
-+-@@ -1091,19 +1076,7 @@ let unbox_int dbg bi =
-++@@ -1095,19 +1080,7 @@ let unbox_int dbg bi =
-+            | Some (Uconst_int32 n), Primitive.Pint32 ->
-+                natint_const_untagged dbg (Nativeint.of_int32 n)
-+            | Some (Uconst_int64 n), Primitive.Pint64 ->
-+@@ -2680,7 +2680,7 @@
-+            | _ ->
-+                default cmm
-+            end
-+-@@ -1112,7 +1085,7 @@ let unbox_int dbg bi =
-++@@ -1116,7 +1089,7 @@ let unbox_int dbg bi =
-+      )
-+  
-+  let make_unsigned_int bi arg dbg =
-+@@ -2689,7 +2689,7 @@
-+    then zero_extend_32 dbg arg
-+    else arg
-+  
-+-@@ -1207,7 +1180,6 @@ let unaligned_set_32 ptr idx newval dbg =
-++@@ -1211,7 +1184,6 @@ let unaligned_set_32 ptr idx newval dbg =
-+                  dbg)))
-+  
-+  let unaligned_load_64 ptr idx dbg =
-+@@ -2697,7 +2697,7 @@
-+    if Arch.allow_unaligned_access
-+    then Cop(mk_load_mut Word_int, [add_int ptr idx dbg], dbg)
-+    else
-+-@@ -1246,7 +1218,6 @@ let unaligned_load_64 ptr idx dbg =
-++@@ -1250,7 +1222,6 @@ let unaligned_load_64 ptr idx dbg =
-+               dbg)], dbg)
-+  
-+  let unaligned_set_64 ptr idx newval dbg =
-+@@ -2705,7 +2705,7 @@
-+    if Arch.allow_unaligned_access
-+    then Cop(Cstore (Word_int, Assignment), [add_int ptr idx dbg; newval], dbg)
-+    else
-+-@@ -1370,65 +1341,6 @@ let box_sized size dbg exp =
-++@@ -1374,65 +1345,6 @@ let box_sized size dbg exp =
-+  let default_prim name =
-+    Primitive.simple ~name ~arity:0(*ignored*) ~alloc:true
-+  
-+@@ -2771,7 +2771,7 @@
-+  let simplif_primitive p : Clambda_primitives.primitive =
-+    match (p : Clambda_primitives.primitive) with
-+    | Pduprecord _ ->
-+-@@ -1442,7 +1354,7 @@ let simplif_primitive p : Clambda_primitives.primitive =
-++@@ -1446,7 +1358,7 @@ let simplif_primitive p : Clambda_primitives.primitive =
-+    | Pbigarrayset(_unsafe, n, _kind, Pbigarray_unknown_layout) ->
-+        Pccall (default_prim ("caml_ba_set_" ^ string_of_int n))
-+    | p ->
-+@@ -2780,7 +2780,7 @@
-+  
-+  (* Build switchers both for constants and blocks *)
-+  
-+-@@ -2549,22 +2461,11 @@ let emit_string_constant_fields s cont =
-++@@ -2558,22 +2470,11 @@ let emit_string_constant_fields s cont =
-+  
-+  let emit_boxed_int32_constant_fields n cont =
-+    let n = Nativeint.of_int32 n in
-+@@ -3272,1044 +3272,6 @@
-+ -(* Specific operations that can raise *)
-+ -
-+ -val operation_can_raise : specific_operation -> bool
-+-diff --git a/asmcomp/i386/emit.mlp b/asmcomp/i386/emit.mlp
-+-deleted file mode 100644
-+---- a/asmcomp/i386/emit.mlp
-+-+++ /dev/null
-+-@@ -1,1033 +0,0 @@
-+--(**************************************************************************)
-+--(*                                                                        *)
-+--(*                                 OCaml                                  *)
-+--(*                                                                        *)
-+--(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
-+--(*                                                                        *)
-+--(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
-+--(*     en Automatique.                                                    *)
-+--(*                                                                        *)
-+--(*   All rights reserved.  This file is distributed under the terms of    *)
-+--(*   the GNU Lesser General Public License version 2.1, with the          *)
-+--(*   special exception on linking described in the file LICENSE.          *)
-+--(*                                                                        *)
-+--(**************************************************************************)
-+--
-+--(* Emission of Intel 386 assembly code *)
-+--
-+--open Misc
-+--open Cmm
-+--open Arch
-+--open Proc
-+--open Reg
-+--open Mach
-+--open Linear
-+--open Emitaux
-+--open Emitenv
-+--module String = Misc.Stdlib.String
-+--
-+--open X86_ast
-+--open X86_proc
-+--open X86_dsl
-+--
-+--let _label s = D.label ~typ:DWORD s
-+--
-+--let mem_sym typ ?(ofs = 0) sym =
-+--  mem32 typ ~scale:0 ?base:None ~sym ofs RAX (*ignored since scale=0*)
-+--
-+--(* CFI directives *)
-+--
-+--let cfi_startproc () =
-+--  if Config.asm_cfi_supported then D.cfi_startproc ()
-+--
-+--let cfi_endproc () =
-+--  if Config.asm_cfi_supported then D.cfi_endproc ()
-+--
-+--let cfi_adjust_cfa_offset n =
-+--  if Config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
-+--
-+--let emit_debug_info dbg =
-+--  emit_debug_info_gen dbg D.file D.loc
-+--
-+--let frame_size env =                     (* includes return address *)
-+--  let sz =
-+--    env.stack_offset
-+--    + 4 * env.f.fun_num_stack_slots.(0)
-+--    + 8 * env.f.fun_num_stack_slots.(1) + 4
-+--  in Misc.align sz stack_alignment
-+--
-+--let slot_offset env loc cl =
-+--  match loc with
-+--  | Incoming n ->
-+--      assert (n >= 0);
-+--      frame_size env + n
-+--  | Local n ->
-+--      if cl = 0
-+--      then env.stack_offset + n * 4
-+--      else env.stack_offset + env.f.fun_num_stack_slots.(0) * 4 + n * 8
-+--  | Outgoing n ->
-+--      assert (n >= 0);
-+--      n
-+--  | Domainstate _ -> assert false  (* not a stack slot *)
-+--
-+--(* Record symbols used and defined - at the end generate extern for those
-+--   used but not defined *)
-+--
-+--let symbols_defined = ref String.Set.empty
-+--let symbols_used = ref String.Set.empty
-+--
-+--let add_def_symbol s = symbols_defined := String.Set.add s !symbols_defined
-+--let add_used_symbol s = symbols_used := String.Set.add s !symbols_used
-+--
-+--let trap_frame_size = Misc.align 8 stack_alignment
-+--
-+--(* Prefixing of symbols with "_" *)
-+--
-+--let symbol_prefix =
-+--  match system with
-+--  | S_linux_elf -> ""
-+--  | S_bsd_elf -> ""
-+--  | S_solaris -> ""
-+--  | S_beos -> ""
-+--  | S_gnu -> ""
-+--  | _ -> "_" (* win32 & others *)
-+--
-+--let emit_symbol s = string_of_symbol symbol_prefix s
-+--
-+--let immsym s = sym (emit_symbol s)
-+--
-+--let emit_call s = I.call (immsym s)
-+--
-+--(* Output a label *)
-+--
-+--let label_prefix =
-+--  match system with
-+--  | S_linux_elf -> ".L"
-+--  | S_bsd_elf -> ".L"
-+--  | S_solaris -> ".L"
-+--  | S_beos -> ".L"
-+--  | S_gnu -> ".L"
-+--  | _ -> "L"
-+--
-+--let emit_label lbl =
-+--  Printf.sprintf "%s%d" label_prefix lbl
-+--
-+--let label s = sym (emit_label s)
-+--
-+--let def_label s = D.label (emit_label s)
-+--
-+--let emit_Llabel env fallthrough lbl =
-+--  if not fallthrough && env.f.fun_fast then D.align 16 ;
-+--  def_label lbl
-+--
-+--(* Output a pseudo-register *)
-+--
-+--let int_reg_name =  [| RAX; RBX; RCX; RDX; RSI; RDI; RBP  |]
-+--
-+--let float_reg_name = [| TOS |]
-+--
-+--let register_name r =
-+--  if r < 100 then Reg32 (int_reg_name.(r))
-+--  else Regf (float_reg_name.(r - 100))
-+--
-+--let sym32 ?ofs s = mem_sym ?ofs DWORD (emit_symbol s)
-+--
-+--let domain_field f r =
-+--  mem32 DWORD (Domainstate.idx_of_field f * 8) r
-+--
-+--let load_domain_state r =
-+--  I.mov (sym32 "Caml_state") r
-+--
-+--let x86_data_type_for_stack_slot = function
-+--  | Float -> REAL8
-+--  | _ -> DWORD
-+--
-+--(* The Domainstate locations are mapped to a global array "caml_extra_params"
-+--   defined in runtime/i386*.  We cannot access the domain state here
-+--   because in the i386 port there is no register that always point to the
-+--   domain state.  A global array works because i386 does not
-+--   support multiple domains. *)
-+--
-+--let reg env = function
-+--  | { loc = Reg r } -> register_name r
-+--  | { loc = Stack(Domainstate n); typ = ty } ->
-+--      mem_sym (x86_data_type_for_stack_slot ty)
-+--              (emit_symbol "caml_extra_params") ~ofs:n
-+--  | { loc = Stack s; typ = ty } as r ->
-+--      let ofs = slot_offset env s (register_class r) in
-+--      mem32 (x86_data_type_for_stack_slot ty) ofs RSP
-+--  | { loc = Unknown } ->
-+--      fatal_error "Emit_i386.reg"
-+--
-+--(* Output a reference to the lower 8 bits or lower 16 bits of a register *)
-+--
-+--let reg_low_8_name  = Array.map (fun r -> Reg8L r) int_reg_name
-+--let reg_low_16_name = Array.map (fun r -> Reg16 r) int_reg_name
-+--
-+--let reg8 r =
-+--  match r.loc with
-+--  | Reg r when r < 4 -> reg_low_8_name.(r)
-+--  | _ -> fatal_error "Emit_i386.reg8"
-+--
-+--let reg16 r =
-+--  match r.loc with
-+--  | Reg r when r < 7 -> reg_low_16_name.(r)
-+--  | _ -> fatal_error "Emit_i386.reg16"
-+--
-+--let reg32 = function
-+--  | { loc = Reg.Reg r } -> int_reg_name.(r)
-+--  | _ -> assert false
-+--
-+--let arg32 i n = reg32 i.arg.(n)
-+--
-+--(* Output an addressing mode *)
-+--
-+--let addressing addr typ i n =
-+--  match addr with
-+--  | Ibased(s, ofs) ->
-+--      add_used_symbol s;
-+--      mem_sym typ (emit_symbol s) ~ofs
-+--  | Iindexed d ->
-+--      mem32 typ d (arg32 i n)
-+--  | Iindexed2 d ->
-+--      mem32 typ ~base:(arg32 i n) d (arg32 i (n+1))
-+--  | Iscaled(2, d) ->
-+--      mem32 typ ~base:(arg32 i n) d (arg32 i n)
-+--  | Iscaled(scale, d) ->
-+--      mem32 typ ~scale d (arg32 i n)
-+--  | Iindexed2scaled(scale, d) ->
-+--      mem32 typ ~scale ~base:(arg32 i n) d (arg32 i (n+1))
-+--
-+--(* Record live pointers at call points *)
-+--
-+--let record_frame_label env live dbg =
-+--  let lbl = new_label () in
-+--  let live_offset = ref [] in
-+--  Reg.Set.iter
-+--    (function
-+--      | {typ = Val; loc = Reg r} ->
-+--          live_offset := ((r lsl 1) + 1) :: !live_offset
-+--      | {typ = Val; loc = Stack s} as reg ->
-+--          live_offset := slot_offset env s (register_class reg) :: !live_offset
-+--      | {typ = Addr} as r ->
-+--          Misc.fatal_error ("bad GC root " ^ Reg.name r)
-+--      | _ -> ())
-+--    live;
-+--  record_frame_descr ~label:lbl ~frame_size:(frame_size env)
-+--    ~live_offset:!live_offset dbg;
-+--  lbl
-+--
-+--let record_frame env live dbg =
-+--  let lbl = record_frame_label env live dbg in
-+--  def_label lbl
-+--
-+--let emit_call_gc gc =
-+--  def_label gc.gc_lbl;
-+--  emit_call "caml_call_gc";
-+--  def_label gc.gc_frame_lbl;
-+--  I.jmp (label gc.gc_return_lbl)
-+--
-+--let bound_error_label env dbg =
-+--  if !Clflags.debug then begin
-+--    let lbl_bound_error = new_label() in
-+--    let lbl_frame = record_frame_label env Reg.Set.empty (Dbg_other dbg) in
-+--    env.bound_error_sites <-
-+--      { bd_lbl = lbl_bound_error; bd_frame = lbl_frame; }
-+--      :: env.bound_error_sites;
-+--    lbl_bound_error
-+--  end else begin
-+--    match env.bound_error_call with
-+--    | None->
-+--      let lbl = new_label () in
-+--      env.bound_error_call <- Some lbl;
-+--      lbl
-+--    | Some lbl -> lbl
-+--  end
-+--
-+--let emit_call_bound_error bd =
-+--  def_label bd.bd_lbl;
-+--  emit_call "caml_ml_array_bound_error";
-+--  def_label bd.bd_frame
-+--
-+--let emit_call_bound_errors env =
-+--  List.iter emit_call_bound_error env.bound_error_sites;
-+--  match env.bound_error_call with
-+--  | Some lbl ->
-+--    def_label lbl;
-+--    emit_call "caml_ml_array_bound_error"
-+--  | None -> ()
-+--
-+--(* Names for instructions *)
-+--
-+--let instr_for_intop = function
-+--  | Iadd -> I.add
-+--  | Isub -> I.sub
-+--  | Imul -> (fun arg1 arg2 ->  I.imul arg1 (Some arg2))
-+--  | Iand -> I.and_
-+--  | Ior -> I.or_
-+--  | Ixor -> I.xor
-+--  | Ilsl -> I.sal
-+--  | Ilsr -> I.shr
-+--  | Iasr -> I.sar
-+--  | _ -> fatal_error "Emit_i386: instr_for_intop"
-+--
-+--let unary_instr_for_floatop = function
-+--  | Inegf -> I.fchs ()
-+--  | Iabsf -> I.fabs ()
-+--  | _ -> fatal_error "Emit_i386: unary_instr_for_floatop"
-+--
-+--let instr_for_floatop = function
-+--  | Iaddf -> I.fadd
-+--  | Isubf -> I.fsub
-+--  | Imulf -> I.fmul
-+--  | Idivf -> I.fdiv
-+--  | Ispecific Isubfrev -> I.fsubr
-+--  | Ispecific Idivfrev -> I.fdivr
-+--  | _ -> fatal_error "Emit_i386: instr_for_floatop"
-+--
-+--let instr_for_floatop_reversed = function
-+--  | Iaddf -> I.fadd
-+--  | Isubf -> I.fsubr
-+--  | Imulf -> I.fmul
-+--  | Idivf -> I.fdivr
-+--  | Ispecific Isubfrev -> I.fsub
-+--  | Ispecific Idivfrev -> I.fdiv
-+--  | _ -> fatal_error "Emit_i386: instr_for_floatop_reversed"
-+--
-+--
-+--let instr_for_floatop_reversed_pop = function
-+--  | Iaddf -> I.faddp
-+--  | Isubf -> I.fsubrp
-+--  | Imulf -> I.fmulp
-+--  | Idivf -> I.fdivrp
-+--  | Ispecific Isubfrev -> I.fsubp
-+--  | Ispecific Idivfrev -> I.fdivp
-+--  | _ -> fatal_error "Emit_i386: instr_for_floatop_reversed_pop"
-+--
-+--let instr_for_floatarithmem = function
-+--  | Ifloatadd -> I.fadd
-+--  | Ifloatsub -> I.fsub
-+--  | Ifloatsubrev -> I.fsubr
-+--  | Ifloatmul -> I.fmul
-+--  | Ifloatdiv -> I.fdiv
-+--  | Ifloatdivrev -> I.fdivr
-+--
-+--let cond = function
-+--  | Isigned Ceq   -> E   | Isigned Cne   -> NE
-+--  | Isigned Cle   -> LE  | Isigned Cgt   -> G
-+--  | Isigned Clt   -> L   | Isigned Cge   -> GE
-+--  | Iunsigned Ceq -> E   | Iunsigned Cne -> NE
-+--  | Iunsigned Cle -> BE  | Iunsigned Cgt -> A
-+--  | Iunsigned Clt -> B   | Iunsigned Cge -> AE
-+--
-+--(* Output an = 0 or <> 0 test. *)
-+--
-+--let output_test_zero env arg =
-+--  match arg.loc with
-+--  | Reg.Reg _ -> I.test (reg env arg) (reg env arg)
-+--  | _  -> I.cmp (int 0) (reg env arg)
-+--
-+--(* Deallocate the stack frame before a return or tail call *)
-+--
-+--let output_epilogue env f =
-+--  let n = frame_size env - 4 in
-+--  if n > 0 then
-+--    begin
-+--      I.add (int n) esp;
-+--      cfi_adjust_cfa_offset (-n);
-+--      f ();
-+--      (* reset CFA back cause function body may continue *)
-+--      cfi_adjust_cfa_offset n
-+--    end
-+--  else
-+--    f ()
-+--
-+--(* Determine if the given register is the top of the floating-point stack *)
-+--
-+--let is_tos = function { loc = Reg _; typ = Float } -> true | _ -> false
-+--
-+--(* Emit the code for a floating-point comparison *)
-+--
-+--let emit_float_test env cmp arg lbl =
-+--  let actual_cmp =
-+--    match (is_tos arg.(0), is_tos arg.(1)) with
-+--    | (true, true) ->
-+--        (* both args on top of FP stack *)
-+--        I.fcompp ();
-+--        cmp
-+--    | (true, false) ->
-+--        (* first arg on top of FP stack *)
-+--        I.fcomp (reg env arg.(1));
-+--        cmp
-+--    | (false, true) ->
-+--        (* second arg on top of FP stack *)
-+--        I.fcomp (reg env arg.(0));
-+--        Cmm.swap_float_comparison cmp
-+--    | (false, false) ->
-+--        I.fld     (reg env arg.(0));
-+--        I.fcomp   (reg env arg.(1));
-+--        cmp
-+--  in
-+--  I.fnstsw ax;
-+--  match actual_cmp with
-+--  | CFeq ->
-+--      I.and_ (int 69) ah;
-+--      I.cmp (int 64) ah;
-+--      I.je lbl
-+--  | CFneq ->
-+--      I.and_ (int 68) ah;
-+--      I.xor (int 64) ah;
-+--      I.jne lbl
-+--  | CFle ->
-+--      I.and_ (int 69) ah;
-+--      I.dec ah;
-+--      I.cmp (int 64) ah;
-+--      I.jb lbl
-+--  | CFnle ->
-+--      I.and_ (int 69) ah;
-+--      I.dec ah;
-+--      I.cmp (int 64) ah;
-+--      I.jae lbl
-+--  | CFge ->
-+--      I.and_ (int 5) ah;
-+--      I.je lbl
-+--  | CFnge ->
-+--      I.and_ (int 5) ah;
-+--      I.jne lbl
-+--  | CFlt ->
-+--      I.and_ (int 69) ah;
-+--      I.cmp (int 1) ah;
-+--      I.je lbl
-+--  | CFnlt ->
-+--      I.and_ (int 69) ah;
-+--      I.cmp (int 1) ah;
-+--      I.jne lbl
-+--  | CFgt ->
-+--      I.and_ (int 69) ah;
-+--      I.je lbl
-+--  | CFngt ->
-+--      I.and_ (int 69) ah;
-+--      I.jne lbl
-+--
-+--(* Emit a Ifloatspecial instruction *)
-+--
-+--let emit_floatspecial = function
-+--  | "atan"  -> I.fld1 (); I.fpatan ()
-+--  | "atan2" -> I.fpatan ()
-+--  | "cos"   -> I.fcos ()
-+--  | "log"   -> I.fldln2 (); I.fxch st1; I.fyl2x ()
-+--  | "log10" -> I.fldlg2 (); I.fxch st1; I.fyl2x ()
-+--  | "sin"   -> I.fsin ()
-+--  | "sqrt"  -> I.fsqrt ()
-+--  | "tan"   -> I.fptan (); I.fstp st0
-+--  | _ -> assert false
-+--
-+--(* Floating-point constants *)
-+--
-+--let float_constants = ref ([] : (int64 * int) list)
-+--
-+--let add_float_constant cst =
-+--  try
-+--    List.assoc cst !float_constants
-+--  with
-+--    Not_found ->
-+--      let lbl = new_label() in
-+--      float_constants := (cst, lbl) :: !float_constants;
-+--      lbl
-+--
-+--let emit_float64_split_directive x =
-+--  let lo = Int64.logand x 0xFFFF_FFFFL
-+--  and hi = Int64.shift_right_logical x 32 in
-+--  D.long (Const (if Arch.big_endian then hi else lo));
-+--  D.long (Const (if Arch.big_endian then lo else hi))
-+--
-+--let emit_float_constant cst lbl =
-+--  _label (emit_label lbl);
-+--  emit_float64_split_directive cst
-+--
-+--let emit_global_label s =
-+--  let lbl = Compilenv.make_symbol (Some s) in
-+--  add_def_symbol lbl;
-+--  let lbl = emit_symbol lbl in
-+--  D.global lbl;
-+--  _label lbl
-+--
-+--(* Output .text section directive, or named .text.caml.<name> if enabled. *)
-+--
-+--let emit_named_text_section func_name =
-+--  if !Clflags.function_sections then
-+--    begin match system with
-+--    | S_macosx | S_mingw | S_cygwin | S_win32 -> D.text ()
-+--    | _ -> D.section [ ".text.caml."^(emit_symbol func_name) ]
-+--             (Some "ax") ["@progbits"]
-+--    end
-+--  else D.text ()
-+--
-+--(* Output the assembly code for an instruction *)
-+--let emit_instr env fallthrough i =
-+--  let reg = reg env in
-+--  emit_debug_info i.dbg;
-+--  match i.desc with
-+--  | Lend -> ()
-+--  | Lprologue ->
-+--    assert (env.f.fun_prologue_required);
-+--    let n = frame_size env - 4 in
-+--    if n > 0 then  begin
-+--      I.sub (int n) esp;
-+--      cfi_adjust_cfa_offset n;
-+--    end;
-+--  | Lop(Imove | Ispill | Ireload) ->
-+--      let src = i.arg.(0) and dst = i.res.(0) in
-+--      if src.loc <> dst.loc then begin
-+--        if src.typ = Float then
-+--          if is_tos src then
-+--            I.fstp (reg dst)
-+--          else if is_tos dst then
-+--            I.fld (reg src)
-+--          else begin
-+--            I.fld (reg src);
-+--            I.fstp (reg dst)
-+--          end
-+--        else
-+--          I.mov (reg src) (reg dst)
-+--      end
-+--  | Lop(Iconst_int n) ->
-+--      if n = 0n then begin
-+--        match i.res.(0).loc with
-+--        | Reg _ -> I.xor (reg i.res.(0)) (reg i.res.(0))
-+--        | _     -> I.mov (int 0) (reg i.res.(0))
-+--      end else
-+--        I.mov (nat n) (reg i.res.(0))
-+--  | Lop(Iconst_float f) ->
-+--      begin match f with
-+--      | 0x0000_0000_0000_0000L ->       (* +0.0 *)
-+--          I.fldz ()
-+--      | 0x8000_0000_0000_0000L ->       (* -0.0 *)
-+--          I.fldz (); I.fchs ()
-+--      | 0x3FF0_0000_0000_0000L ->       (*  1.0 *)
-+--          I.fld1 ()
-+--      | 0xBFF0_0000_0000_0000L ->       (* -1.0 *)
-+--          I.fld1 (); I.fchs ()
-+--      | _ ->
-+--          let lbl = add_float_constant f in
-+--          I.fld (mem_sym REAL8 (emit_label lbl))
-+--      end
-+--  | Lop(Iconst_symbol s) ->
-+--      add_used_symbol s;
-+--      I.mov (immsym s) (reg i.res.(0))
-+--  | Lop(Icall_ind) ->
-+--      I.call (reg i.arg.(0));
-+--      record_frame env i.live (Dbg_other i.dbg)
-+--  | Lop(Icall_imm { func; }) ->
-+--      add_used_symbol func;
-+--      emit_call func;
-+--      record_frame env i.live (Dbg_other i.dbg)
-+--  | Lop(Itailcall_ind) ->
-+--      output_epilogue env (fun () -> I.jmp (reg i.arg.(0)))
-+--  | Lop(Itailcall_imm { func; }) ->
-+--      if func = env.f.fun_name then
-+--        I.jmp (label env.f.fun_tailrec_entry_point_label)
-+--      else begin
-+--        output_epilogue env begin fun () ->
-+--          add_used_symbol func;
-+--          I.jmp (immsym func)
-+--        end
-+--      end
-+--  | Lop(Iextcall { func; alloc; }) ->
-+--      add_used_symbol func;
-+--      if alloc then begin
-+--        I.mov (immsym func) eax;
-+--        emit_call "caml_c_call";
-+--        record_frame env i.live (Dbg_other i.dbg)
-+--      end else begin
-+--        emit_call func
-+--      end
-+--  | Lop(Istackoffset n) ->
-+--      if n < 0
-+--      then I.add (int (-n)) esp
-+--      else I.sub (int n) esp;
-+--      cfi_adjust_cfa_offset n;
-+--      env.stack_offset <- env.stack_offset + n
-+--  | Lop(Iload { memory_chunk; addressing_mode; _ }) ->
-+--      let dest = i.res.(0) in
-+--      begin match memory_chunk with
-+--      | Word_int | Word_val | Thirtytwo_signed | Thirtytwo_unsigned ->
-+--          I.mov (addressing addressing_mode DWORD i 0) (reg dest)
-+--      | Byte_unsigned ->
-+--          I.movzx (addressing addressing_mode BYTE i 0) (reg dest)
-+--      | Byte_signed ->
-+--          I.movsx (addressing addressing_mode BYTE i 0) (reg dest)
-+--      | Sixteen_unsigned ->
-+--          I.movzx (addressing addressing_mode WORD i 0) (reg dest)
-+--      | Sixteen_signed ->
-+--          I.movsx (addressing addressing_mode WORD i 0) (reg dest)
-+--      | Single ->
-+--          I.fld (addressing addressing_mode REAL4 i 0)
-+--      | Double ->
-+--          I.fld (addressing addressing_mode REAL8 i 0)
-+--      end
-+--  | Lop(Istore(chunk, addr, _)) ->
-+--      begin match chunk with
-+--      | Word_int | Word_val | Thirtytwo_signed | Thirtytwo_unsigned ->
-+--          I.mov (reg i.arg.(0)) (addressing addr DWORD i 1)
-+--      | Byte_unsigned | Byte_signed ->
-+--          I.mov (reg8 i.arg.(0)) (addressing addr BYTE i 1)
-+--      | Sixteen_unsigned | Sixteen_signed ->
-+--          I.mov (reg16 i.arg.(0)) (addressing addr WORD i 1)
-+--      | Single ->
-+--          if is_tos i.arg.(0) then
-+--            I.fstp (addressing addr REAL4 i 1)
-+--          else begin
-+--            I.fld (reg i.arg.(0));
-+--            I.fstp (addressing addr REAL4 i 1)
-+--          end
-+--      | Double ->
-+--          if is_tos i.arg.(0) then
-+--            I.fstp (addressing addr REAL8 i 1)
-+--          else begin
-+--            I.fld (reg i.arg.(0));
-+--            I.fstp (addressing addr REAL8 i 1)
-+--          end
-+--      end
-+--  | Lop(Ipoll { return_label }) ->
-+--    begin match return_label with
-+--      None -> ()
-+--    | Some lbl -> I.jmp (label lbl)
-+--    end
-+--  | Lop(Ialloc { bytes = n; dbginfo }) ->
-+--      if env.f.fun_fast then begin
-+--        load_domain_state ebx;
-+--        I.mov (domain_field Domain_young_ptr RBX) eax;
-+--        I.sub (int n) eax;
-+--        I.mov eax (domain_field Domain_young_ptr RBX);
-+--        I.cmp (domain_field Domain_young_limit RBX) eax;
-+--        let lbl_call_gc = new_label() in
-+--        let lbl_frame =
-+--          record_frame_label env i.live (Dbg_alloc dbginfo) in
-+--        I.jb (label lbl_call_gc);
-+--        let lbl_after_alloc = new_label() in
-+--        def_label lbl_after_alloc;
-+--        I.lea (mem32 NONE 4 RAX) (reg i.res.(0));
-+--        env.call_gc_sites <-
-+--          { gc_lbl = lbl_call_gc;
-+--            gc_return_lbl = lbl_after_alloc;
-+--            gc_frame_lbl = lbl_frame; } :: env.call_gc_sites
-+--      end else begin
-+--        begin match n with
-+--          8  -> emit_call "caml_alloc1"
-+--        | 12 -> emit_call "caml_alloc2"
-+--        | 16 -> emit_call "caml_alloc3"
-+--        | _  ->
-+--            I.mov (int n) eax;
-+--            emit_call "caml_allocN"
-+--        end;
-+--        let label = record_frame_label env i.live (Dbg_alloc dbginfo) in
-+--        def_label label;
-+--        I.lea (mem32 NONE 4 RAX) (reg i.res.(0))
-+--      end
-+--  | Lop(Iintop(Icomp cmp)) ->
-+--      I.cmp (reg i.arg.(1)) (reg i.arg.(0));
-+--      I.set (cond cmp) al;
-+--      I.movzx al (reg i.res.(0));
-+--  | Lop(Iintop_imm(Icomp cmp, n)) ->
-+--      I.cmp (int n) (reg i.arg.(0));
-+--      I.set (cond cmp) al;
-+--      I.movzx al (reg i.res.(0))
-+--  | Lop(Iintop (Icheckbound)) ->
-+--      let lbl = bound_error_label env i.dbg in
-+--      I.cmp (reg i.arg.(1)) (reg i.arg.(0));
-+--      I.jbe (label lbl)
-+--  | Lop(Iintop_imm(Icheckbound, n)) ->
-+--      let lbl = bound_error_label env i.dbg in
-+--      I.cmp (int n) (reg i.arg.(0));
-+--      I.jbe (label lbl)
-+--  | Lop(Iintop(Idiv | Imod)) ->
-+--      I.cdq ();
-+--      I.idiv (reg i.arg.(1))
-+--  | Lop(Iintop(Ilsl | Ilsr | Iasr as op)) ->
-+--      (* We have i.arg.(0) = i.res.(0) and i.arg.(1) = %ecx *)
-+--      instr_for_intop op cl (reg i.res.(0))
-+--  | Lop(Iintop Imulh) ->
-+--      I.imul (reg i.arg.(1)) None
-+--  | Lop(Iintop op) ->
-+--      (* We have i.arg.(0) = i.res.(0) *)
-+--      instr_for_intop op (reg i.arg.(1)) (reg i.res.(0))
-+--  | Lop(Iintop_imm(Iadd, n)) when i.arg.(0).loc <> i.res.(0).loc ->
-+--      I.lea (mem32 NONE n (reg32 i.arg.(0))) (reg i.res.(0))
-+--  | Lop(Iintop_imm(Iadd, 1) | Iintop_imm(Isub, -1)) ->
-+--      I.inc (reg i.res.(0))
-+--  | Lop(Iintop_imm(Iadd, -1) | Iintop_imm(Isub, 1)) ->
-+--      I.dec (reg i.res.(0))
-+--  | Lop(Iintop_imm(op, n)) ->
-+--      (* We have i.arg.(0) = i.res.(0) *)
-+--      instr_for_intop op (int n) (reg i.res.(0))
-+--  | Lop(Inegf | Iabsf as floatop) ->
-+--      if not (is_tos i.arg.(0)) then
-+--        I.fld (reg i.arg.(0));
-+--      unary_instr_for_floatop floatop
-+--  | Lop(Iaddf | Isubf | Imulf | Idivf | Ispecific(Isubfrev | Idivfrev)
-+--        as floatop) ->
-+--      begin match (is_tos i.arg.(0), is_tos i.arg.(1)) with
-+--        (true, true) ->
-+--          (* both operands on top of FP stack *)
-+--          instr_for_floatop_reversed_pop floatop st0 st1
-+--      | (true, false) ->
-+--          (* first operand on stack *)
-+--          instr_for_floatop floatop (reg i.arg.(1))
-+--      | (false, true) ->
-+--          (* second operand on stack *)
-+--          instr_for_floatop_reversed floatop (reg i.arg.(0))
-+--      | (false, false) ->
-+--          (* both operands in memory *)
-+--          I.fld (reg i.arg.(0));
-+--          instr_for_floatop floatop (reg i.arg.(1))
-+--      end
-+--  | Lop(Ifloatofint) ->
-+--      begin match i.arg.(0).loc with
-+--      | Stack _ ->
-+--          I.fild (reg i.arg.(0))
-+--      | _ ->
-+--          I.push (reg i.arg.(0));
-+--          I.fild (mem32 DWORD 0 RSP);
-+--          I.add (int 4) esp
-+--      end
-+--  | Lop(Iintoffloat) ->
-+--      if not (is_tos i.arg.(0)) then
-+--        I.fld (reg i.arg.(0));
-+--      env.stack_offset <- env.stack_offset - 8;
-+--      I.sub (int 8) esp;
-+--      cfi_adjust_cfa_offset 8;
-+--      I.fnstcw (mem32 NONE 4 RSP);
-+--      I.mov (mem32 WORD 4 RSP) ax;
-+--      I.mov (int 12) ah;
-+--      I.mov ax (mem32 WORD 0 RSP);
-+--      I.fldcw (mem32 NONE 0 RSP);
-+--      begin match i.res.(0).loc with
-+--      | Stack _ ->
-+--          I.fistp (reg i.res.(0))
-+--      | _ ->
-+--          I.fistp (mem32 DWORD 0 RSP);
-+--          I.mov (mem32 DWORD 0 RSP) (reg i.res.(0))
-+--      end;
-+--      I.fldcw (mem32 NONE 4 RSP);
-+--      I.add (int 8) esp;
-+--      cfi_adjust_cfa_offset (-8);
-+--      env.stack_offset <- env.stack_offset + 8
-+--  | Lop(Iopaque) ->
-+--      assert (i.arg.(0).loc = i.res.(0).loc)
-+--  | Lop(Ispecific(Ilea addr)) ->
-+--      I.lea (addressing addr DWORD i 0) (reg i.res.(0))
-+--  | Lop(Ispecific(Istore_int(n, addr, _))) ->
-+--      I.mov (nat n) (addressing addr DWORD i 0)
-+--  | Lop(Ispecific(Istore_symbol(s, addr, _))) ->
-+--      add_used_symbol s;
-+--      I.mov (immsym s) (addressing addr DWORD i 0)
-+--  | Lop(Ispecific(Ioffset_loc(n, addr))) ->
-+--      I.add (int n) (addressing addr DWORD i 0)
-+--  | Lop(Ispecific(Ipush)) ->
-+--      (* Push arguments in reverse order *)
-+--      for n = Array.length i.arg - 1 downto 0 do
-+--        let r = i.arg.(n) in
-+--        match r with
-+--          {loc = Reg _; typ = Float} ->
-+--            I.sub (int 8) esp;
-+--            cfi_adjust_cfa_offset 8;
-+--            I.fstp (mem32 REAL8 0 RSP);
-+--            env.stack_offset <- env.stack_offset + 8
-+--        | {loc = Stack sl; typ = Float} ->
-+--            let ofs = slot_offset env sl 1 in
-+--            (* Use x87 stack to move from stack to stack,
-+--               instead of two 32-bit push instructions,
-+--               which could kill performance on modern CPUs (see #6979).
-+--            *)
-+--            I.fld (mem32 REAL8 ofs RSP);
-+--            I.sub (int 8) esp;
-+--            cfi_adjust_cfa_offset 8;
-+--            I.fstp (mem32 REAL8 0 RSP);
-+--            env.stack_offset <- env.stack_offset + 8
-+--        | _ ->
-+--            I.push (reg r);
-+--            cfi_adjust_cfa_offset 4;
-+--            env.stack_offset <- env.stack_offset + 4
-+--      done
-+--  | Lop(Ispecific(Ipush_int n)) ->
-+--      I.push (nat n);
-+--      cfi_adjust_cfa_offset 4;
-+--      env.stack_offset <- env.stack_offset + 4
-+--  | Lop(Ispecific(Ipush_symbol s)) ->
-+--      add_used_symbol s;
-+--      I.push (immsym s);
-+--      cfi_adjust_cfa_offset 4;
-+--      env.stack_offset <- env.stack_offset + 4
-+--  | Lop(Ispecific(Ipush_load addr)) ->
-+--      I.push (addressing addr DWORD i 0);
-+--      cfi_adjust_cfa_offset 4;
-+--      env.stack_offset <- env.stack_offset + 4
-+--  | Lop(Ispecific(Ipush_load_float addr)) ->
-+--      I.push (addressing (offset_addressing addr 4) DWORD i 0);
-+--      I.push (addressing addr DWORD i 0);
-+--      cfi_adjust_cfa_offset 8;
-+--      env.stack_offset <- env.stack_offset + 8
-+--  | Lop(Ispecific(Ifloatarithmem(double, op, addr))) ->
-+--      if not (is_tos i.arg.(0)) then
-+--        I.fld (reg i.arg.(0));
-+--      instr_for_floatarithmem op
-+--          (addressing addr
-+--             (if double then REAL8 else REAL4) i 1)
-+--  | Lop(Ispecific(Ifloatspecial s)) ->
-+--      (* Push args on float stack if necessary *)
-+--      for k = 0 to Array.length i.arg - 1 do
-+--        if not (is_tos i.arg.(k)) then I.fld (reg i.arg.(k))
-+--      done;
-+--      (* Fix-up for binary instrs whose args were swapped *)
-+--      if Array.length i.arg = 2 && is_tos i.arg.(1) then
-+--        I.fxch st1;
-+--      emit_floatspecial s
-+--  | Lop (Idls_get) ->
-+--      (* Here to maintain build *)
-+--      assert false
-+--  | Lreloadretaddr ->
-+--      ()
-+--  | Lreturn ->
-+--      output_epilogue env begin fun () ->
-+--        I.ret ()
-+--      end
-+--  | Llabel lbl ->
-+--      emit_Llabel env fallthrough lbl
-+--  | Lbranch lbl ->
-+--      I.jmp (label lbl)
-+--  | Lcondbranch(tst, lbl) ->
-+--      let lbl = label lbl in
-+--      begin match tst with
-+--      | Itruetest ->
-+--          output_test_zero env i.arg.(0);
-+--          I.jne lbl;
-+--      | Ifalsetest ->
-+--          output_test_zero env i.arg.(0);
-+--          I.je lbl
-+--      | Iinttest cmp ->
-+--          I.cmp (reg i.arg.(1)) (reg i.arg.(0));
-+--          I.j (cond cmp) lbl
-+--      | Iinttest_imm((Isigned Ceq | Isigned Cne |
-+--                      Iunsigned Ceq | Iunsigned Cne) as cmp, 0) ->
-+--          output_test_zero env i.arg.(0);
-+--          I.j (cond cmp) lbl
-+--      | Iinttest_imm(cmp, n) ->
-+--          I.cmp (int n) (reg i.arg.(0));
-+--          I.j (cond cmp) lbl
-+--      | Ifloattest cmp ->
-+--          emit_float_test env cmp i.arg lbl
-+--      | Ioddtest ->
-+--          I.test (int 1) (reg i.arg.(0));
-+--          I.jne lbl
-+--      | Ieventest ->
-+--          I.test (int 1) (reg i.arg.(0));
-+--          I.je lbl
-+--      end
-+--  | Lcondbranch3(lbl0, lbl1, lbl2) ->
-+--      I.cmp (int 1) (reg i.arg.(0));
-+--      begin match lbl0 with
-+--        None -> ()
-+--      | Some lbl -> I.jb (label lbl)
-+--      end;
-+--      begin match lbl1 with
-+--        None -> ()
-+--      | Some lbl -> I.je (label lbl)
-+--      end;
-+--      begin match lbl2 with
-+--        None -> ()
-+--      | Some lbl -> I.ja (label lbl)
-+--      end
-+--  | Lswitch jumptbl ->
-+--      let lbl = new_label() in
-+--      I.jmp (mem32 NONE 0 (reg32 i.arg.(0)) ~scale:4 ~sym:(emit_label lbl));
-+--      D.data ();
-+--      _label (emit_label lbl);
-+--      for i = 0 to Array.length jumptbl - 1 do
-+--        D.long (ConstLabel (emit_label jumptbl.(i)))
-+--      done;
-+--      emit_named_text_section env.f.fun_name
-+--  | Lentertrap ->
-+--      ()
-+--  | Ladjust_trap_depth { delta_traps } ->
-+--      let delta = trap_frame_size * delta_traps in
-+--      cfi_adjust_cfa_offset delta;
-+--      env.stack_offset <- env.stack_offset + delta
-+--  | Lpushtrap { lbl_handler; } ->
-+--      I.push (label lbl_handler);
-+--      if trap_frame_size > 8 then
-+--        I.sub (int (trap_frame_size - 8)) esp;
-+--      load_domain_state edx;
-+--      I.push (domain_field Domain_exn_handler RDX);
-+--      cfi_adjust_cfa_offset trap_frame_size;
-+--      I.mov esp (domain_field Domain_exn_handler RDX);
-+--      env.stack_offset <- env.stack_offset + trap_frame_size
-+--  | Lpoptrap ->
-+--      I.mov edx (mem32 DWORD 4 RSP);
-+--      load_domain_state edx;
-+--      I.pop (domain_field Domain_exn_handler RDX);
-+--      I.pop edx;
-+--      if trap_frame_size > 8 then
-+--        I.add (int (trap_frame_size - 8)) esp;
-+--      cfi_adjust_cfa_offset (-trap_frame_size);
-+--      env.stack_offset <- env.stack_offset - trap_frame_size
-+--  | Lraise k  ->
-+--      begin match k with
-+--      | Lambda.Raise_regular ->
-+--          load_domain_state ebx;
-+--          I.mov (int 0) (domain_field Domain_backtrace_pos RBX);
-+--          emit_call "caml_raise_exn";
-+--          record_frame env Reg.Set.empty (Dbg_raise i.dbg)
-+--      | Lambda.Raise_reraise ->
-+--          emit_call "caml_raise_exn";
-+--          record_frame env Reg.Set.empty (Dbg_raise i.dbg)
-+--      | Lambda.Raise_notrace ->
-+--          load_domain_state ebx;
-+--          I.mov (domain_field Domain_exn_handler RBX) esp;
-+--          I.pop (domain_field Domain_exn_handler RBX);
-+--          if trap_frame_size > 8 then
-+--            I.add (int (trap_frame_size - 8)) esp;
-+--          I.pop ebx;
-+--          I.jmp ebx
-+--      end
-+--
-+--let rec emit_all env fallthrough i =
-+--  match i.desc with
-+--  |  Lend -> ()
-+--  | _ ->
-+--      emit_instr env fallthrough i;
-+--      emit_all env
-+--        (system = S_win32 || Linear.has_fallthrough i.desc)
-+--        i.next
-+--
-+--(* Emission of a function declaration *)
-+--
-+--let fundecl fundecl =
-+--  let env = mk_env fundecl in
-+--  emit_named_text_section fundecl.fun_name;
-+--  add_def_symbol fundecl.fun_name;
-+--  D.align (if system = S_win32 then 4 else 16);
-+--  D.global (emit_symbol fundecl.fun_name);
-+--  D.label (emit_symbol fundecl.fun_name);
-+--  emit_debug_info fundecl.fun_dbg;
-+--  cfi_startproc ();
-+--  emit_all env true fundecl.fun_body;
-+--  List.iter emit_call_gc env.call_gc_sites;
-+--  emit_call_bound_errors env;
-+--  cfi_endproc ();
-+--  begin match system with
-+--  | S_linux_elf | S_bsd_elf | S_gnu ->
-+--      D.type_ (emit_symbol fundecl.fun_name) "@function";
-+--      D.size (emit_symbol fundecl.fun_name)
-+--        (ConstSub (
-+--            ConstThis,
-+--            ConstLabel (emit_symbol fundecl.fun_name)))
-+--  | _ -> ()
-+--  end
-+--
-+--
-+--(* Emission of data *)
-+--
-+--let emit_item = function
-+--  | Cglobal_symbol s -> D.global (emit_symbol s)
-+--  | Cdefine_symbol s -> add_def_symbol s; _label (emit_symbol s)
-+--  | Cint8 n -> D.byte (const n)
-+--  | Cint16 n -> D.word (const n)
-+--  | Cint32 n -> D.long (const_nat n)
-+--  | Cint n -> D.long (const_nat n)
-+--  | Csingle f -> D.long (Const (Int64.of_int32 (Int32.bits_of_float f)))
-+--  | Cdouble f -> emit_float64_split_directive (Int64.bits_of_float f)
-+--  | Csymbol_address s -> add_used_symbol s; D.long (ConstLabel (emit_symbol s))
-+--  | Cstring s -> D.bytes s
-+--  | Cskip n -> if n > 0 then D.space n
-+--  | Calign n -> D.align n
-+--
-+--let data l =
-+--  D.data ();
-+--  List.iter emit_item l
-+--
-+--(* Beginning / end of an assembly file *)
-+--
-+--let begin_assembly() =
-+--  X86_proc.reset_asm_code ();
-+--  reset_debug_info();                   (* PR#5603 *)
-+--  float_constants := [];
-+--  if system = S_win32 then begin
-+--    D.mode386 ();
-+--    D.model "FLAT";
-+--    D.extrn "_caml_extra_params" DWORD;
-+--    D.extrn "_caml_call_gc" PROC;
-+--    D.extrn "_caml_c_call" PROC;
-+--    D.extrn "_caml_allocN" PROC;
-+--    D.extrn "_caml_alloc1" PROC;
-+--    D.extrn "_caml_alloc2" PROC;
-+--    D.extrn "_caml_alloc3" PROC;
-+--    D.extrn "_caml_ml_array_bound_error" PROC;
-+--    D.extrn "_caml_raise_exn" PROC;
-+--    D.extrn "_Caml_state" DWORD;
-+--  end;
-+--
-+--  D.data ();
-+--  emit_global_label "data_begin";
-+--  emit_named_text_section (Compilenv.make_symbol (Some "code_begin"));
-+--  emit_global_label "code_begin"
-+--
-+--let end_assembly() =
-+--  if !float_constants <> [] then begin
-+--    D.data ();
-+--    List.iter (fun (cst,lbl) -> emit_float_constant cst lbl) !float_constants
-+--  end;
-+--
-+--  emit_named_text_section (Compilenv.make_symbol (Some "code_end"));
-+--  emit_global_label "code_end";
-+--
-+--  D.data ();
-+--  D.long (const 0);  (* PR#6329 *)
-+--  emit_global_label "data_end";
-+--  D.long (const 0);
-+--
-+--  emit_global_label "frametable";
-+--
-+--  emit_frames
-+--    { efa_code_label = (fun l -> D.long (ConstLabel (emit_label l)));
-+--      efa_data_label = (fun l -> D.long (ConstLabel (emit_label l)));
-+--      efa_8 = (fun n -> D.byte (const n));
-+--      efa_16 = (fun n -> D.word (const n));
-+--      efa_32 = (fun n -> D.long (const_32 n));
-+--      efa_word = (fun n -> D.long (const n));
-+--      efa_align = D.align;
-+--      efa_label_rel = (fun lbl ofs ->
-+--          D.long (ConstAdd (
-+--              ConstSub(ConstLabel(emit_label lbl),
-+--                       ConstThis),
-+--              const_32 ofs)));
-+--      efa_def_label = (fun l -> _label (emit_label l));
-+--      efa_string = (fun s -> D.bytes (s ^ "\000"))
-+--    };
-+--
-+--  if system = S_linux_elf then
-+--    (* Mark stack as non-executable, PR#4564 *)
-+--    D.section [".note.GNU-stack"] (Some "") ["%progbits"];
-+--
-+--  if system = S_win32 then begin
-+--    D.comment "External functions";
-+--    String.Set.iter
-+--      (fun s ->
-+--         if not (String.Set.mem s !symbols_defined) then
-+--           D.extrn (emit_symbol s) PROC)
-+--      !symbols_used;
-+--    symbols_used := String.Set.empty;
-+--    symbols_defined := String.Set.empty;
-+--  end;
-+--
-+--  let asm =
-+--    if !Emitaux.create_asm_file then
-+--      Some
-+--        (
-+--         (if X86_proc.masm then X86_masm.generate_asm
-+--          else X86_gas.generate_asm) !Emitaux.output_channel
-+--        )
-+--    else
-+--      None
-+--  in
-+--  X86_proc.generate_code asm
-+ diff --git a/asmcomp/i386/proc.ml b/asmcomp/i386/proc.ml
-+ deleted file mode 100644
-+ --- a/asmcomp/i386/proc.ml
-+@@ -5102,7 +4064,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -2107,7 +2107,7 @@ oc_native_cflags=''
-++@@ -2156,7 +2156,7 @@ oc_native_cflags=''
-+  AS_IF([test x"$enable_function_sections" = "xno"],
-+    [function_sections=false],
-+    [AS_CASE([$arch],
-+@@ -5125,81 +4087,6 @@
-+  %.cmi: %.mli
-+  	$(OCAMLC) $(COMPFLAGS) -c $<
-+  
-+-diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-+-deleted file mode 100644
-+---- a/testsuite/tools/asmgen_i386.S
-+-+++ /dev/null
-+-@@ -1,70 +0,0 @@
-+--/**************************************************************************/
-+--/*                                                                        */
-+--/*                                OCaml                                   */
-+--/*                                                                        */
-+--/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
-+--/*                                                                        */
-+--/*   Copyright 1996 Institut National de Recherche en Informatique et     */
-+--/*     en Automatique.                                                    */
-+--/*                                                                        */
-+--/*   All rights reserved.  This file is distributed under the terms of    */
-+--/*   the GNU Lesser General Public License version 2.1, with the          */
-+--/*   special exception on linking described in the file LICENSE.          */
-+--/*                                                                        */
-+--/**************************************************************************/
-+--
-+--/* Linux with ELF binaries does not prefix identifiers with _.
-+--   Linux with a.out binaries, FreeBSD, and NextStep do. */
-+--
-+--#if defined(SYS_linux_elf) || defined(SYS_bsd_elf) \
-+-- || defined(SYS_solaris) || defined(SYS_beos) || defined(SYS_gnu)
-+--#define G(x) x
-+--#define FUNCTION_ALIGN 16
-+--#else
-+--#define G(x) _##x
-+--#define FUNCTION_ALIGN 4
-+--#endif
-+--
-+--        .globl  G(call_gen_code)
-+--        .align  FUNCTION_ALIGN
-+--G(call_gen_code):
-+--        pushl %ebp
-+--        movl %esp,%ebp
-+--        pushl %ebx
-+--        pushl %esi
-+--        pushl %edi
-+--        movl 12(%ebp),%eax
-+--        movl 16(%ebp),%ebx
-+--        movl 20(%ebp),%ecx
-+--        movl 24(%ebp),%edx
-+--        call *8(%ebp)
-+--        popl %edi
-+--        popl %esi
-+--        popl %ebx
-+--        popl %ebp
-+--        ret
-+--
-+--        .globl  G(caml_c_call)
-+--        .align  FUNCTION_ALIGN
-+--G(caml_c_call):
-+--        jmp     *%eax
-+--
-+--        .comm   G(Caml_state), 4
-+--
-+--/* Some tests are designed to cause registers to spill; on
-+-- * x86 we require the caml_extra_params symbol from the RTS. */
-+--        .data
-+--        .globl  G(caml_extra_params)
-+--G(caml_extra_params):
-+--#ifndef SYS_solaris
-+--        .space  64
-+--#else
-+--        .zero   64
-+--#endif
-+--
-+--
-+--
-+--#if defined(SYS_linux_elf)
-+--    /* Mark stack as non-executable */
-+--        .section .note.GNU-stack,"",%progbits
-+--#endif
-+ diff --git a/testsuite/tools/asmgen_i386nt.asm b/testsuite/tools/asmgen_i386nt.asm
-+ deleted file mode 100644
-+ --- a/testsuite/tools/asmgen_i386nt.asm
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -1272,10 +118,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index bfe3494c7c..e6237d6a4c 100644
+index a60c88a612..440e3d3f53 100644
 --- a/Changes
 +++ b/Changes
-@@ -451,6 +451,10 @@ Working version
+@@ -455,6 +455,10 @@ Working version
    (Andrei Paskevich and Charlène Gros, review by David Allsopp and
     Nicolás Ojeda Bär)
  
@@ -1286,7 +132,7 @@ index bfe3494c7c..e6237d6a4c 100644
  OCaml 5.0
  ---------
  
-@@ -987,11 +991,6 @@ OCaml 5.0
+@@ -991,11 +995,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -1298,7 +144,7 @@ index bfe3494c7c..e6237d6a4c 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1020,6 +1019,30 @@ OCaml 5.0
+@@ -1024,6 +1023,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -1329,7 +175,7 @@ index bfe3494c7c..e6237d6a4c 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1055,13 +1078,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1059,13 +1082,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -1345,7 +191,7 @@ index bfe3494c7c..e6237d6a4c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1168,6 +1191,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1172,6 +1195,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -1355,7 +201,7 @@ index bfe3494c7c..e6237d6a4c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1427,6 +1453,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1431,6 +1457,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -1478,10 +324,10 @@ index b29ec55724..96cbed8c52 100644
  	   utils/*.cmi \
  	   parsing/*.cmi \
 diff --git a/Makefile.config.in b/Makefile.config.in
-index acfa023b4d..26804870b7 100644
+index c8d6966c40..6a1cbd16a0 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -244,7 +244,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -243,7 +243,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
@@ -1911,10 +757,10 @@ index 9a40379e14..56d05d07a2 100644
    cfi_endproc();
    emit_symbol_type emit_symbol fundecl.fun_name "function";
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index e7dc40430a..d64f28d2d3 100644
+index 40ff3fccdd..773655f1f9 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
+@@ -812,7 +812,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
      | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
                            fill_fields (idx + 2) el) in
      Clet(VP.create id,
@@ -1926,7 +772,7 @@ index e7dc40430a..d64f28d2d3 100644
                   [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
           fill_fields 1 args)
    end
-@@ -2115,8 +2119,13 @@ let assignment_kind
+@@ -2111,8 +2115,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -4417,13 +3263,13 @@ index 8e600d7fa0..a71d53aecc 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index d67d3991a0..d3e59fdd66 100755
+index 10c226ad83..eeecac1107 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 6f143c3f46..2aa34aa349 100644
+index a4d3a064c0..3d67ca996a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -4432,7 +3278,7 @@ index 6f143c3f46..2aa34aa349 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -221,6 +223,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -4440,7 +3286,7 @@ index 6f143c3f46..2aa34aa349 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -371,15 +374,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -369,15 +372,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -4472,7 +3318,7 @@ index 6f143c3f46..2aa34aa349 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -614,7 +625,8 @@ AS_CASE([$host],
+@@ -608,7 +619,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -4482,7 +3328,7 @@ index 6f143c3f46..2aa34aa349 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -688,8 +700,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -682,8 +694,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -4494,7 +3340,7 @@ index 6f143c3f46..2aa34aa349 100644
  
  AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
    [yes,*|,true],
-@@ -1029,9 +1042,9 @@ AS_IF([! $arch64],
+@@ -1023,9 +1036,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -4507,7 +3353,7 @@ index 6f143c3f46..2aa34aa349 100644
  
  # Support for C11 atomic types
  
-@@ -1189,13 +1202,14 @@ AS_CASE([$host],
+@@ -1183,13 +1196,14 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -4526,7 +3372,7 @@ index 6f143c3f46..2aa34aa349 100644
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux_eabihf],
-@@ -1232,9 +1246,9 @@ AS_CASE([$host],
+@@ -1226,9 +1240,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -4538,7 +3384,7 @@ index 6f143c3f46..2aa34aa349 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1244,7 +1258,7 @@ AS_CASE([$host],
+@@ -1238,7 +1252,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -4547,7 +3393,7 @@ index 6f143c3f46..2aa34aa349 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1264,7 +1278,7 @@ AS_CASE([$host],
+@@ -1258,7 +1272,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -4556,7 +3402,7 @@ index 6f143c3f46..2aa34aa349 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1956,11 +1970,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1950,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -4581,7 +3427,7 @@ index 6f143c3f46..2aa34aa349 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2011,6 +2037,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2005,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -4612,7 +3458,7 @@ index 6f143c3f46..2aa34aa349 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2158,8 +2208,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2151,8 +2201,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -7351,10 +6197,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..be26a84e20
+index 0000000000..a455c16e94
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3952 @@
+@@ -0,0 +1,3953 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -7423,15 +6269,16 @@ index 0000000000..be26a84e20
 + cache:
 +   - C:\cygwin64\var\cache\setup
 +diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-+index 0bc17bc281..0bb0042339 100644
++index 0bc17bc281..faae83cf0e 100644
 +--- a/ocamltest/builtin_actions.ml
 ++++ b/ocamltest/builtin_actions.ml
-+@@ -204,6 +204,12 @@ let function_sections = make
++@@ -204,6 +204,13 @@ let function_sections = make
 +      "Target supports function sections"
 +      "Target does not support function sections")
 + 
 ++let naked_pointers = make
-++  "naked_pointers"
+++  ~name:"naked_pointers"
+++  ~description:"Pass if target supports naked pointers"
 ++  (Actions_helpers.pass_or_skip (Ocamltest_config.naked_pointers)
 ++     "Runtime system supports naked pointers"
 ++     "Runtime system does not support naked pointers")
@@ -7439,7 +6286,7 @@ index 0000000000..be26a84e20
 + let frame_pointers = make
 +   ~name:"frame_pointers"
 +   ~description:"Pass if frame pointers are available"
-+@@ -343,6 +349,7 @@ let _ =
++@@ -343,6 +350,7 @@ let _ =
 +     arch_i386;
 +     arch_power;
 +     function_sections;
@@ -11309,1271 +10156,117 @@ index 0000000000..be26a84e20
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..75e5bb5e84
+index 0000000000..a2215e0cab
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11244 @@
+@@ -0,0 +1,10138 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c6d32355e3
++index 0000000000..8441dbde64
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,1255 @@
-++--- a	2023-09-28 18:46:49.667061458 +0100
-+++++ b	2023-09-28 18:46:49.695062499 +0100
-++@@ -83,7 +83,7 @@
++@@ -0,0 +1,101 @@
+++--- a	2023-09-28 18:46:50.575095192 +0100
++++++ b	2023-09-28 18:46:50.591095786 +0100
+++@@ -62,7 +62,7 @@
 ++  
-++  DOC_FILES=\
-++    Changes \
-++-@@ -1000,21 +1000,12 @@ runtime/domain_state32.inc: \
-+++@@ -997,21 +997,12 @@ runtime/domain_state32.inc: \
-++  runtime/amd64nt.obj: runtime/amd64nt.asm runtime/domain_state64.inc
-++  	$(V_ASM)$(ASM)$@ $<
+++  (* Array indexing *)
 ++  
-++@@ -2561,7 +2561,7 @@
-++      && not (is_different_from (-1) c2)
-++      then
-++        Cifthenelse(Cop(Ccmpi Cne, [c2; Cconst_int (-1, dbg)], dbg),
-++-@@ -980,12 +980,11 @@ let bigarray_set unsafe elt_kind layout b args newval dbg =
-+++@@ -984,12 +984,11 @@ let bigarray_set unsafe elt_kind layout b args newval dbg =
-++              [bigarray_indexing unsafe elt_kind layout b args dbg; newval],
-++              dbg))
+++-@@ -2063,7 +2059,7 @@ let offsetref n arg dbg =
++++@@ -2067,7 +2063,7 @@ let offsetref n arg dbg =
+++               dbg)))
 ++  
-++@@ -2576,7 +2576,7 @@
-++      (* Ignore sign and zero extensions, which do not affect the low bits *)
-++    | Cop(Casr, [Cop(Clsl, [x; Cconst_int (32, _)], _);
-++                 Cconst_int (32, _)], _)
-++-@@ -995,18 +994,14 @@ let rec low_32 dbg = function
-+++@@ -999,18 +998,14 @@ let rec low_32 dbg = function
-++      Clet(id, e, low_32 dbg body)
-++    | x -> x
+++  let arraylength kind arg dbg =
+++@@ -71,7 +71,7 @@
+++    match (kind : Lambda.array_kind) with
+++      Pgenarray ->
+++        let len =
+++-@@ -2263,7 +2259,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++++@@ -2272,7 +2268,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++    | Pgenarray ->
+++        bind "index" arg2 (fun idx ->
+++        bind "arr" arg1 (fun arr ->
+++@@ -80,7 +80,7 @@
+++          if wordsize_shift = numfloat_shift then
+++            Csequence(
+++              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
+++-@@ -2290,7 +2286,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++++@@ -2299,7 +2295,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++              Csequence(
+++                make_checkbound dbg [
+++                  addr_array_length_shifted
+++@@ -89,7 +89,7 @@
+++                addr_array_ref arr idx dbg)))
+++        | Pintarray ->
+++            bind "index" arg2 (fun idx ->
+++-@@ -2298,7 +2294,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++++@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++              Csequence(
+++                make_checkbound dbg [
+++                  addr_array_length_shifted
+++@@ -98,7 +98,7 @@
+++                int_array_ref arr idx dbg)))
+++        | Pfloatarray ->
+++            box_float dbg (
+++-@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
++++@@ -2316,7 +2312,7 @@ let arrayref_safe kind arg1 arg2 dbg =
+++                Csequence(
+++                  make_checkbound dbg [
+++                    float_array_length_shifted
+++@@ -107,7 +107,7 @@
+++                    idx],
+++                  unboxed_float_array_ref arr idx dbg))))
 ++  
-++@@ -2600,7 +2600,7 @@
+++-@@ -2366,7 +2362,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++++@@ -2375,7 +2371,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++        bind "newval" arg3 (fun newval ->
+++        bind "index" arg2 (fun idx ->
+++        bind "arr" arg1 (fun arr ->
+++@@ -116,7 +116,7 @@
+++          if wordsize_shift = numfloat_shift then
+++            Csequence(
+++              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
+++-@@ -2398,7 +2394,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++++@@ -2407,7 +2403,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++          Csequence(
+++            make_checkbound dbg [
+++              addr_array_length_shifted
+++@@ -125,7 +125,7 @@
+++              idx],
+++            addr_array_set arr idx newval dbg))))
+++    | Pintarray ->
+++-@@ -2408,7 +2404,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++++@@ -2417,7 +2413,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++          Csequence(
+++            make_checkbound dbg [
+++              addr_array_length_shifted
+++@@ -134,7 +134,7 @@
+++              idx],
+++            int_array_set arr idx newval dbg))))
+++    | Pfloatarray ->
+++-@@ -2418,7 +2414,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
++++@@ -2427,7 +2423,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
+++          Csequence(
+++            make_checkbound dbg [
+++              float_array_length_shifted
+++@@ -193,7 +193,7 @@
+++  AC_SUBST([frame_pointers])
+++  AC_SUBST([flambda])
+++  AC_SUBST([flambda_invariants])
+++-@@ -424,15 +422,11 @@ AC_ARG_WITH([target-bindir],
++++@@ -435,15 +433,11 @@ AC_ARG_WITH([target-bindir],
 ++  
-++  (* Boxed integers *)
+++  AC_ARG_ENABLE([reserved-header-bits],
+++    [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
+++@@ -213,7 +213,7 @@
 ++  
-++-@@ -1024,7 +1019,7 @@ let alloc_header_boxed_int (bi : Primitive.boxed_integer) =
-+++@@ -1028,7 +1023,7 @@ let alloc_header_boxed_int (bi : Primitive.boxed_integer) =
+++  AC_ARG_ENABLE([stdlib-manpages],
+++    [AS_HELP_STRING([--disable-stdlib-manpages],
+++-@@ -2014,8 +2008,7 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++++@@ -2064,8 +2058,7 @@ AS_IF([test x"$enable_naked_pointers_checker" = "xyes" ],
+++  ## Check for mmap support for huge pages and contiguous heap
+++  OCAML_MMAP_SUPPORTS_HUGE_PAGES
 ++  
-++  let box_int_gen dbg (bi : Primitive.boxed_integer) arg =
-++    let arg' =
-++@@ -2609,7 +2609,7 @@
-++        if big_endian
-++        then Cop(Clsl, [arg; Cconst_int (32, dbg)], dbg)
-++        else sign_extend_32 dbg arg
-++-@@ -1034,13 +1029,6 @@ let box_int_gen dbg (bi : Primitive.boxed_integer) arg =
-+++@@ -1038,13 +1033,6 @@ let box_int_gen dbg (bi : Primitive.boxed_integer) arg =
-++                 Cconst_symbol(operations_boxed_int bi, dbg);
-++                 arg'], dbg)
-++  
-++@@ -2623,7 +2623,7 @@
-++  let alloc_matches_boxed_int bi ~hdr ~ops =
-++    match (bi : Primitive.boxed_integer), hdr, ops with
-++    | Pnativeint, Cconst_natint (hdr, _dbg), Cconst_symbol (sym, _) ->
-++-@@ -1056,28 +1044,25 @@ let alloc_matches_boxed_int bi ~hdr ~ops =
-+++@@ -1060,28 +1048,25 @@ let alloc_matches_boxed_int bi ~hdr ~ops =
-++  
-++  let unbox_int dbg bi =
-++    let default arg =
-++@@ -2659,7 +2659,7 @@
-++               && alloc_matches_boxed_int bi ~hdr ~ops ->
-++            (* Force sign-extension of low 32 bits *)
-++            sign_extend_32 dbg contents
-++-@@ -1091,19 +1076,7 @@ let unbox_int dbg bi =
-+++@@ -1095,19 +1080,7 @@ let unbox_int dbg bi =
-++            | Some (Uconst_int32 n), Primitive.Pint32 ->
-++                natint_const_untagged dbg (Nativeint.of_int32 n)
-++            | Some (Uconst_int64 n), Primitive.Pint64 ->
-++@@ -2680,7 +2680,7 @@
-++            | _ ->
-++                default cmm
-++            end
-++-@@ -1112,7 +1085,7 @@ let unbox_int dbg bi =
-+++@@ -1116,7 +1089,7 @@ let unbox_int dbg bi =
-++      )
-++  
-++  let make_unsigned_int bi arg dbg =
-++@@ -2689,7 +2689,7 @@
-++    then zero_extend_32 dbg arg
-++    else arg
-++  
-++-@@ -1207,7 +1180,6 @@ let unaligned_set_32 ptr idx newval dbg =
-+++@@ -1211,7 +1184,6 @@ let unaligned_set_32 ptr idx newval dbg =
-++                  dbg)))
-++  
-++  let unaligned_load_64 ptr idx dbg =
-++@@ -2697,7 +2697,7 @@
-++    if Arch.allow_unaligned_access
-++    then Cop(mk_load_mut Word_int, [add_int ptr idx dbg], dbg)
-++    else
-++-@@ -1246,7 +1218,6 @@ let unaligned_load_64 ptr idx dbg =
-+++@@ -1250,7 +1222,6 @@ let unaligned_load_64 ptr idx dbg =
-++               dbg)], dbg)
-++  
-++  let unaligned_set_64 ptr idx newval dbg =
-++@@ -2705,7 +2705,7 @@
-++    if Arch.allow_unaligned_access
-++    then Cop(Cstore (Word_int, Assignment), [add_int ptr idx dbg; newval], dbg)
-++    else
-++-@@ -1370,65 +1341,6 @@ let box_sized size dbg exp =
-+++@@ -1374,65 +1345,6 @@ let box_sized size dbg exp =
-++  let default_prim name =
-++    Primitive.simple ~name ~arity:0(*ignored*) ~alloc:true
-++  
-++@@ -2771,7 +2771,7 @@
-++  let simplif_primitive p : Clambda_primitives.primitive =
-++    match (p : Clambda_primitives.primitive) with
-++    | Pduprecord _ ->
-++-@@ -1442,7 +1354,7 @@ let simplif_primitive p : Clambda_primitives.primitive =
-+++@@ -1446,7 +1358,7 @@ let simplif_primitive p : Clambda_primitives.primitive =
-++    | Pbigarrayset(_unsafe, n, _kind, Pbigarray_unknown_layout) ->
-++        Pccall (default_prim ("caml_ba_set_" ^ string_of_int n))
-++    | p ->
-++@@ -2780,7 +2780,7 @@
-++  
-++  (* Build switchers both for constants and blocks *)
-++  
-++-@@ -2549,22 +2461,11 @@ let emit_string_constant_fields s cont =
-+++@@ -2558,22 +2470,11 @@ let emit_string_constant_fields s cont =
-++  
-++  let emit_boxed_int32_constant_fields n cont =
-++    let n = Nativeint.of_int32 n in
-++@@ -3272,1044 +3272,6 @@
-++ -(* Specific operations that can raise *)
-++ -
-++ -val operation_can_raise : specific_operation -> bool
-++-diff --git a/asmcomp/i386/emit.mlp b/asmcomp/i386/emit.mlp
-++-deleted file mode 100644
-++---- a/asmcomp/i386/emit.mlp
-++-+++ /dev/null
-++-@@ -1,1033 +0,0 @@
-++--(**************************************************************************)
-++--(*                                                                        *)
-++--(*                                 OCaml                                  *)
-++--(*                                                                        *)
-++--(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
-++--(*                                                                        *)
-++--(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
-++--(*     en Automatique.                                                    *)
-++--(*                                                                        *)
-++--(*   All rights reserved.  This file is distributed under the terms of    *)
-++--(*   the GNU Lesser General Public License version 2.1, with the          *)
-++--(*   special exception on linking described in the file LICENSE.          *)
-++--(*                                                                        *)
-++--(**************************************************************************)
-++--
-++--(* Emission of Intel 386 assembly code *)
-++--
-++--open Misc
-++--open Cmm
-++--open Arch
-++--open Proc
-++--open Reg
-++--open Mach
-++--open Linear
-++--open Emitaux
-++--open Emitenv
-++--module String = Misc.Stdlib.String
-++--
-++--open X86_ast
-++--open X86_proc
-++--open X86_dsl
-++--
-++--let _label s = D.label ~typ:DWORD s
-++--
-++--let mem_sym typ ?(ofs = 0) sym =
-++--  mem32 typ ~scale:0 ?base:None ~sym ofs RAX (*ignored since scale=0*)
-++--
-++--(* CFI directives *)
-++--
-++--let cfi_startproc () =
-++--  if Config.asm_cfi_supported then D.cfi_startproc ()
-++--
-++--let cfi_endproc () =
-++--  if Config.asm_cfi_supported then D.cfi_endproc ()
-++--
-++--let cfi_adjust_cfa_offset n =
-++--  if Config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
-++--
-++--let emit_debug_info dbg =
-++--  emit_debug_info_gen dbg D.file D.loc
-++--
-++--let frame_size env =                     (* includes return address *)
-++--  let sz =
-++--    env.stack_offset
-++--    + 4 * env.f.fun_num_stack_slots.(0)
-++--    + 8 * env.f.fun_num_stack_slots.(1) + 4
-++--  in Misc.align sz stack_alignment
-++--
-++--let slot_offset env loc cl =
-++--  match loc with
-++--  | Incoming n ->
-++--      assert (n >= 0);
-++--      frame_size env + n
-++--  | Local n ->
-++--      if cl = 0
-++--      then env.stack_offset + n * 4
-++--      else env.stack_offset + env.f.fun_num_stack_slots.(0) * 4 + n * 8
-++--  | Outgoing n ->
-++--      assert (n >= 0);
-++--      n
-++--  | Domainstate _ -> assert false  (* not a stack slot *)
-++--
-++--(* Record symbols used and defined - at the end generate extern for those
-++--   used but not defined *)
-++--
-++--let symbols_defined = ref String.Set.empty
-++--let symbols_used = ref String.Set.empty
-++--
-++--let add_def_symbol s = symbols_defined := String.Set.add s !symbols_defined
-++--let add_used_symbol s = symbols_used := String.Set.add s !symbols_used
-++--
-++--let trap_frame_size = Misc.align 8 stack_alignment
-++--
-++--(* Prefixing of symbols with "_" *)
-++--
-++--let symbol_prefix =
-++--  match system with
-++--  | S_linux_elf -> ""
-++--  | S_bsd_elf -> ""
-++--  | S_solaris -> ""
-++--  | S_beos -> ""
-++--  | S_gnu -> ""
-++--  | _ -> "_" (* win32 & others *)
-++--
-++--let emit_symbol s = string_of_symbol symbol_prefix s
-++--
-++--let immsym s = sym (emit_symbol s)
-++--
-++--let emit_call s = I.call (immsym s)
-++--
-++--(* Output a label *)
-++--
-++--let label_prefix =
-++--  match system with
-++--  | S_linux_elf -> ".L"
-++--  | S_bsd_elf -> ".L"
-++--  | S_solaris -> ".L"
-++--  | S_beos -> ".L"
-++--  | S_gnu -> ".L"
-++--  | _ -> "L"
-++--
-++--let emit_label lbl =
-++--  Printf.sprintf "%s%d" label_prefix lbl
-++--
-++--let label s = sym (emit_label s)
-++--
-++--let def_label s = D.label (emit_label s)
-++--
-++--let emit_Llabel env fallthrough lbl =
-++--  if not fallthrough && env.f.fun_fast then D.align 16 ;
-++--  def_label lbl
-++--
-++--(* Output a pseudo-register *)
-++--
-++--let int_reg_name =  [| RAX; RBX; RCX; RDX; RSI; RDI; RBP  |]
-++--
-++--let float_reg_name = [| TOS |]
-++--
-++--let register_name r =
-++--  if r < 100 then Reg32 (int_reg_name.(r))
-++--  else Regf (float_reg_name.(r - 100))
-++--
-++--let sym32 ?ofs s = mem_sym ?ofs DWORD (emit_symbol s)
-++--
-++--let domain_field f r =
-++--  mem32 DWORD (Domainstate.idx_of_field f * 8) r
-++--
-++--let load_domain_state r =
-++--  I.mov (sym32 "Caml_state") r
-++--
-++--let x86_data_type_for_stack_slot = function
-++--  | Float -> REAL8
-++--  | _ -> DWORD
-++--
-++--(* The Domainstate locations are mapped to a global array "caml_extra_params"
-++--   defined in runtime/i386*.  We cannot access the domain state here
-++--   because in the i386 port there is no register that always point to the
-++--   domain state.  A global array works because i386 does not
-++--   support multiple domains. *)
-++--
-++--let reg env = function
-++--  | { loc = Reg r } -> register_name r
-++--  | { loc = Stack(Domainstate n); typ = ty } ->
-++--      mem_sym (x86_data_type_for_stack_slot ty)
-++--              (emit_symbol "caml_extra_params") ~ofs:n
-++--  | { loc = Stack s; typ = ty } as r ->
-++--      let ofs = slot_offset env s (register_class r) in
-++--      mem32 (x86_data_type_for_stack_slot ty) ofs RSP
-++--  | { loc = Unknown } ->
-++--      fatal_error "Emit_i386.reg"
-++--
-++--(* Output a reference to the lower 8 bits or lower 16 bits of a register *)
-++--
-++--let reg_low_8_name  = Array.map (fun r -> Reg8L r) int_reg_name
-++--let reg_low_16_name = Array.map (fun r -> Reg16 r) int_reg_name
-++--
-++--let reg8 r =
-++--  match r.loc with
-++--  | Reg r when r < 4 -> reg_low_8_name.(r)
-++--  | _ -> fatal_error "Emit_i386.reg8"
-++--
-++--let reg16 r =
-++--  match r.loc with
-++--  | Reg r when r < 7 -> reg_low_16_name.(r)
-++--  | _ -> fatal_error "Emit_i386.reg16"
-++--
-++--let reg32 = function
-++--  | { loc = Reg.Reg r } -> int_reg_name.(r)
-++--  | _ -> assert false
-++--
-++--let arg32 i n = reg32 i.arg.(n)
-++--
-++--(* Output an addressing mode *)
-++--
-++--let addressing addr typ i n =
-++--  match addr with
-++--  | Ibased(s, ofs) ->
-++--      add_used_symbol s;
-++--      mem_sym typ (emit_symbol s) ~ofs
-++--  | Iindexed d ->
-++--      mem32 typ d (arg32 i n)
-++--  | Iindexed2 d ->
-++--      mem32 typ ~base:(arg32 i n) d (arg32 i (n+1))
-++--  | Iscaled(2, d) ->
-++--      mem32 typ ~base:(arg32 i n) d (arg32 i n)
-++--  | Iscaled(scale, d) ->
-++--      mem32 typ ~scale d (arg32 i n)
-++--  | Iindexed2scaled(scale, d) ->
-++--      mem32 typ ~scale ~base:(arg32 i n) d (arg32 i (n+1))
-++--
-++--(* Record live pointers at call points *)
-++--
-++--let record_frame_label env live dbg =
-++--  let lbl = new_label () in
-++--  let live_offset = ref [] in
-++--  Reg.Set.iter
-++--    (function
-++--      | {typ = Val; loc = Reg r} ->
-++--          live_offset := ((r lsl 1) + 1) :: !live_offset
-++--      | {typ = Val; loc = Stack s} as reg ->
-++--          live_offset := slot_offset env s (register_class reg) :: !live_offset
-++--      | {typ = Addr} as r ->
-++--          Misc.fatal_error ("bad GC root " ^ Reg.name r)
-++--      | _ -> ())
-++--    live;
-++--  record_frame_descr ~label:lbl ~frame_size:(frame_size env)
-++--    ~live_offset:!live_offset dbg;
-++--  lbl
-++--
-++--let record_frame env live dbg =
-++--  let lbl = record_frame_label env live dbg in
-++--  def_label lbl
-++--
-++--let emit_call_gc gc =
-++--  def_label gc.gc_lbl;
-++--  emit_call "caml_call_gc";
-++--  def_label gc.gc_frame_lbl;
-++--  I.jmp (label gc.gc_return_lbl)
-++--
-++--let bound_error_label env dbg =
-++--  if !Clflags.debug then begin
-++--    let lbl_bound_error = new_label() in
-++--    let lbl_frame = record_frame_label env Reg.Set.empty (Dbg_other dbg) in
-++--    env.bound_error_sites <-
-++--      { bd_lbl = lbl_bound_error; bd_frame = lbl_frame; }
-++--      :: env.bound_error_sites;
-++--    lbl_bound_error
-++--  end else begin
-++--    match env.bound_error_call with
-++--    | None->
-++--      let lbl = new_label () in
-++--      env.bound_error_call <- Some lbl;
-++--      lbl
-++--    | Some lbl -> lbl
-++--  end
-++--
-++--let emit_call_bound_error bd =
-++--  def_label bd.bd_lbl;
-++--  emit_call "caml_ml_array_bound_error";
-++--  def_label bd.bd_frame
-++--
-++--let emit_call_bound_errors env =
-++--  List.iter emit_call_bound_error env.bound_error_sites;
-++--  match env.bound_error_call with
-++--  | Some lbl ->
-++--    def_label lbl;
-++--    emit_call "caml_ml_array_bound_error"
-++--  | None -> ()
-++--
-++--(* Names for instructions *)
-++--
-++--let instr_for_intop = function
-++--  | Iadd -> I.add
-++--  | Isub -> I.sub
-++--  | Imul -> (fun arg1 arg2 ->  I.imul arg1 (Some arg2))
-++--  | Iand -> I.and_
-++--  | Ior -> I.or_
-++--  | Ixor -> I.xor
-++--  | Ilsl -> I.sal
-++--  | Ilsr -> I.shr
-++--  | Iasr -> I.sar
-++--  | _ -> fatal_error "Emit_i386: instr_for_intop"
-++--
-++--let unary_instr_for_floatop = function
-++--  | Inegf -> I.fchs ()
-++--  | Iabsf -> I.fabs ()
-++--  | _ -> fatal_error "Emit_i386: unary_instr_for_floatop"
-++--
-++--let instr_for_floatop = function
-++--  | Iaddf -> I.fadd
-++--  | Isubf -> I.fsub
-++--  | Imulf -> I.fmul
-++--  | Idivf -> I.fdiv
-++--  | Ispecific Isubfrev -> I.fsubr
-++--  | Ispecific Idivfrev -> I.fdivr
-++--  | _ -> fatal_error "Emit_i386: instr_for_floatop"
-++--
-++--let instr_for_floatop_reversed = function
-++--  | Iaddf -> I.fadd
-++--  | Isubf -> I.fsubr
-++--  | Imulf -> I.fmul
-++--  | Idivf -> I.fdivr
-++--  | Ispecific Isubfrev -> I.fsub
-++--  | Ispecific Idivfrev -> I.fdiv
-++--  | _ -> fatal_error "Emit_i386: instr_for_floatop_reversed"
-++--
-++--
-++--let instr_for_floatop_reversed_pop = function
-++--  | Iaddf -> I.faddp
-++--  | Isubf -> I.fsubrp
-++--  | Imulf -> I.fmulp
-++--  | Idivf -> I.fdivrp
-++--  | Ispecific Isubfrev -> I.fsubp
-++--  | Ispecific Idivfrev -> I.fdivp
-++--  | _ -> fatal_error "Emit_i386: instr_for_floatop_reversed_pop"
-++--
-++--let instr_for_floatarithmem = function
-++--  | Ifloatadd -> I.fadd
-++--  | Ifloatsub -> I.fsub
-++--  | Ifloatsubrev -> I.fsubr
-++--  | Ifloatmul -> I.fmul
-++--  | Ifloatdiv -> I.fdiv
-++--  | Ifloatdivrev -> I.fdivr
-++--
-++--let cond = function
-++--  | Isigned Ceq   -> E   | Isigned Cne   -> NE
-++--  | Isigned Cle   -> LE  | Isigned Cgt   -> G
-++--  | Isigned Clt   -> L   | Isigned Cge   -> GE
-++--  | Iunsigned Ceq -> E   | Iunsigned Cne -> NE
-++--  | Iunsigned Cle -> BE  | Iunsigned Cgt -> A
-++--  | Iunsigned Clt -> B   | Iunsigned Cge -> AE
-++--
-++--(* Output an = 0 or <> 0 test. *)
-++--
-++--let output_test_zero env arg =
-++--  match arg.loc with
-++--  | Reg.Reg _ -> I.test (reg env arg) (reg env arg)
-++--  | _  -> I.cmp (int 0) (reg env arg)
-++--
-++--(* Deallocate the stack frame before a return or tail call *)
-++--
-++--let output_epilogue env f =
-++--  let n = frame_size env - 4 in
-++--  if n > 0 then
-++--    begin
-++--      I.add (int n) esp;
-++--      cfi_adjust_cfa_offset (-n);
-++--      f ();
-++--      (* reset CFA back cause function body may continue *)
-++--      cfi_adjust_cfa_offset n
-++--    end
-++--  else
-++--    f ()
-++--
-++--(* Determine if the given register is the top of the floating-point stack *)
-++--
-++--let is_tos = function { loc = Reg _; typ = Float } -> true | _ -> false
-++--
-++--(* Emit the code for a floating-point comparison *)
-++--
-++--let emit_float_test env cmp arg lbl =
-++--  let actual_cmp =
-++--    match (is_tos arg.(0), is_tos arg.(1)) with
-++--    | (true, true) ->
-++--        (* both args on top of FP stack *)
-++--        I.fcompp ();
-++--        cmp
-++--    | (true, false) ->
-++--        (* first arg on top of FP stack *)
-++--        I.fcomp (reg env arg.(1));
-++--        cmp
-++--    | (false, true) ->
-++--        (* second arg on top of FP stack *)
-++--        I.fcomp (reg env arg.(0));
-++--        Cmm.swap_float_comparison cmp
-++--    | (false, false) ->
-++--        I.fld     (reg env arg.(0));
-++--        I.fcomp   (reg env arg.(1));
-++--        cmp
-++--  in
-++--  I.fnstsw ax;
-++--  match actual_cmp with
-++--  | CFeq ->
-++--      I.and_ (int 69) ah;
-++--      I.cmp (int 64) ah;
-++--      I.je lbl
-++--  | CFneq ->
-++--      I.and_ (int 68) ah;
-++--      I.xor (int 64) ah;
-++--      I.jne lbl
-++--  | CFle ->
-++--      I.and_ (int 69) ah;
-++--      I.dec ah;
-++--      I.cmp (int 64) ah;
-++--      I.jb lbl
-++--  | CFnle ->
-++--      I.and_ (int 69) ah;
-++--      I.dec ah;
-++--      I.cmp (int 64) ah;
-++--      I.jae lbl
-++--  | CFge ->
-++--      I.and_ (int 5) ah;
-++--      I.je lbl
-++--  | CFnge ->
-++--      I.and_ (int 5) ah;
-++--      I.jne lbl
-++--  | CFlt ->
-++--      I.and_ (int 69) ah;
-++--      I.cmp (int 1) ah;
-++--      I.je lbl
-++--  | CFnlt ->
-++--      I.and_ (int 69) ah;
-++--      I.cmp (int 1) ah;
-++--      I.jne lbl
-++--  | CFgt ->
-++--      I.and_ (int 69) ah;
-++--      I.je lbl
-++--  | CFngt ->
-++--      I.and_ (int 69) ah;
-++--      I.jne lbl
-++--
-++--(* Emit a Ifloatspecial instruction *)
-++--
-++--let emit_floatspecial = function
-++--  | "atan"  -> I.fld1 (); I.fpatan ()
-++--  | "atan2" -> I.fpatan ()
-++--  | "cos"   -> I.fcos ()
-++--  | "log"   -> I.fldln2 (); I.fxch st1; I.fyl2x ()
-++--  | "log10" -> I.fldlg2 (); I.fxch st1; I.fyl2x ()
-++--  | "sin"   -> I.fsin ()
-++--  | "sqrt"  -> I.fsqrt ()
-++--  | "tan"   -> I.fptan (); I.fstp st0
-++--  | _ -> assert false
-++--
-++--(* Floating-point constants *)
-++--
-++--let float_constants = ref ([] : (int64 * int) list)
-++--
-++--let add_float_constant cst =
-++--  try
-++--    List.assoc cst !float_constants
-++--  with
-++--    Not_found ->
-++--      let lbl = new_label() in
-++--      float_constants := (cst, lbl) :: !float_constants;
-++--      lbl
-++--
-++--let emit_float64_split_directive x =
-++--  let lo = Int64.logand x 0xFFFF_FFFFL
-++--  and hi = Int64.shift_right_logical x 32 in
-++--  D.long (Const (if Arch.big_endian then hi else lo));
-++--  D.long (Const (if Arch.big_endian then lo else hi))
-++--
-++--let emit_float_constant cst lbl =
-++--  _label (emit_label lbl);
-++--  emit_float64_split_directive cst
-++--
-++--let emit_global_label s =
-++--  let lbl = Compilenv.make_symbol (Some s) in
-++--  add_def_symbol lbl;
-++--  let lbl = emit_symbol lbl in
-++--  D.global lbl;
-++--  _label lbl
-++--
-++--(* Output .text section directive, or named .text.caml.<name> if enabled. *)
-++--
-++--let emit_named_text_section func_name =
-++--  if !Clflags.function_sections then
-++--    begin match system with
-++--    | S_macosx | S_mingw | S_cygwin | S_win32 -> D.text ()
-++--    | _ -> D.section [ ".text.caml."^(emit_symbol func_name) ]
-++--             (Some "ax") ["@progbits"]
-++--    end
-++--  else D.text ()
-++--
-++--(* Output the assembly code for an instruction *)
-++--let emit_instr env fallthrough i =
-++--  let reg = reg env in
-++--  emit_debug_info i.dbg;
-++--  match i.desc with
-++--  | Lend -> ()
-++--  | Lprologue ->
-++--    assert (env.f.fun_prologue_required);
-++--    let n = frame_size env - 4 in
-++--    if n > 0 then  begin
-++--      I.sub (int n) esp;
-++--      cfi_adjust_cfa_offset n;
-++--    end;
-++--  | Lop(Imove | Ispill | Ireload) ->
-++--      let src = i.arg.(0) and dst = i.res.(0) in
-++--      if src.loc <> dst.loc then begin
-++--        if src.typ = Float then
-++--          if is_tos src then
-++--            I.fstp (reg dst)
-++--          else if is_tos dst then
-++--            I.fld (reg src)
-++--          else begin
-++--            I.fld (reg src);
-++--            I.fstp (reg dst)
-++--          end
-++--        else
-++--          I.mov (reg src) (reg dst)
-++--      end
-++--  | Lop(Iconst_int n) ->
-++--      if n = 0n then begin
-++--        match i.res.(0).loc with
-++--        | Reg _ -> I.xor (reg i.res.(0)) (reg i.res.(0))
-++--        | _     -> I.mov (int 0) (reg i.res.(0))
-++--      end else
-++--        I.mov (nat n) (reg i.res.(0))
-++--  | Lop(Iconst_float f) ->
-++--      begin match f with
-++--      | 0x0000_0000_0000_0000L ->       (* +0.0 *)
-++--          I.fldz ()
-++--      | 0x8000_0000_0000_0000L ->       (* -0.0 *)
-++--          I.fldz (); I.fchs ()
-++--      | 0x3FF0_0000_0000_0000L ->       (*  1.0 *)
-++--          I.fld1 ()
-++--      | 0xBFF0_0000_0000_0000L ->       (* -1.0 *)
-++--          I.fld1 (); I.fchs ()
-++--      | _ ->
-++--          let lbl = add_float_constant f in
-++--          I.fld (mem_sym REAL8 (emit_label lbl))
-++--      end
-++--  | Lop(Iconst_symbol s) ->
-++--      add_used_symbol s;
-++--      I.mov (immsym s) (reg i.res.(0))
-++--  | Lop(Icall_ind) ->
-++--      I.call (reg i.arg.(0));
-++--      record_frame env i.live (Dbg_other i.dbg)
-++--  | Lop(Icall_imm { func; }) ->
-++--      add_used_symbol func;
-++--      emit_call func;
-++--      record_frame env i.live (Dbg_other i.dbg)
-++--  | Lop(Itailcall_ind) ->
-++--      output_epilogue env (fun () -> I.jmp (reg i.arg.(0)))
-++--  | Lop(Itailcall_imm { func; }) ->
-++--      if func = env.f.fun_name then
-++--        I.jmp (label env.f.fun_tailrec_entry_point_label)
-++--      else begin
-++--        output_epilogue env begin fun () ->
-++--          add_used_symbol func;
-++--          I.jmp (immsym func)
-++--        end
-++--      end
-++--  | Lop(Iextcall { func; alloc; }) ->
-++--      add_used_symbol func;
-++--      if alloc then begin
-++--        I.mov (immsym func) eax;
-++--        emit_call "caml_c_call";
-++--        record_frame env i.live (Dbg_other i.dbg)
-++--      end else begin
-++--        emit_call func
-++--      end
-++--  | Lop(Istackoffset n) ->
-++--      if n < 0
-++--      then I.add (int (-n)) esp
-++--      else I.sub (int n) esp;
-++--      cfi_adjust_cfa_offset n;
-++--      env.stack_offset <- env.stack_offset + n
-++--  | Lop(Iload { memory_chunk; addressing_mode; _ }) ->
-++--      let dest = i.res.(0) in
-++--      begin match memory_chunk with
-++--      | Word_int | Word_val | Thirtytwo_signed | Thirtytwo_unsigned ->
-++--          I.mov (addressing addressing_mode DWORD i 0) (reg dest)
-++--      | Byte_unsigned ->
-++--          I.movzx (addressing addressing_mode BYTE i 0) (reg dest)
-++--      | Byte_signed ->
-++--          I.movsx (addressing addressing_mode BYTE i 0) (reg dest)
-++--      | Sixteen_unsigned ->
-++--          I.movzx (addressing addressing_mode WORD i 0) (reg dest)
-++--      | Sixteen_signed ->
-++--          I.movsx (addressing addressing_mode WORD i 0) (reg dest)
-++--      | Single ->
-++--          I.fld (addressing addressing_mode REAL4 i 0)
-++--      | Double ->
-++--          I.fld (addressing addressing_mode REAL8 i 0)
-++--      end
-++--  | Lop(Istore(chunk, addr, _)) ->
-++--      begin match chunk with
-++--      | Word_int | Word_val | Thirtytwo_signed | Thirtytwo_unsigned ->
-++--          I.mov (reg i.arg.(0)) (addressing addr DWORD i 1)
-++--      | Byte_unsigned | Byte_signed ->
-++--          I.mov (reg8 i.arg.(0)) (addressing addr BYTE i 1)
-++--      | Sixteen_unsigned | Sixteen_signed ->
-++--          I.mov (reg16 i.arg.(0)) (addressing addr WORD i 1)
-++--      | Single ->
-++--          if is_tos i.arg.(0) then
-++--            I.fstp (addressing addr REAL4 i 1)
-++--          else begin
-++--            I.fld (reg i.arg.(0));
-++--            I.fstp (addressing addr REAL4 i 1)
-++--          end
-++--      | Double ->
-++--          if is_tos i.arg.(0) then
-++--            I.fstp (addressing addr REAL8 i 1)
-++--          else begin
-++--            I.fld (reg i.arg.(0));
-++--            I.fstp (addressing addr REAL8 i 1)
-++--          end
-++--      end
-++--  | Lop(Ipoll { return_label }) ->
-++--    begin match return_label with
-++--      None -> ()
-++--    | Some lbl -> I.jmp (label lbl)
-++--    end
-++--  | Lop(Ialloc { bytes = n; dbginfo }) ->
-++--      if env.f.fun_fast then begin
-++--        load_domain_state ebx;
-++--        I.mov (domain_field Domain_young_ptr RBX) eax;
-++--        I.sub (int n) eax;
-++--        I.mov eax (domain_field Domain_young_ptr RBX);
-++--        I.cmp (domain_field Domain_young_limit RBX) eax;
-++--        let lbl_call_gc = new_label() in
-++--        let lbl_frame =
-++--          record_frame_label env i.live (Dbg_alloc dbginfo) in
-++--        I.jb (label lbl_call_gc);
-++--        let lbl_after_alloc = new_label() in
-++--        def_label lbl_after_alloc;
-++--        I.lea (mem32 NONE 4 RAX) (reg i.res.(0));
-++--        env.call_gc_sites <-
-++--          { gc_lbl = lbl_call_gc;
-++--            gc_return_lbl = lbl_after_alloc;
-++--            gc_frame_lbl = lbl_frame; } :: env.call_gc_sites
-++--      end else begin
-++--        begin match n with
-++--          8  -> emit_call "caml_alloc1"
-++--        | 12 -> emit_call "caml_alloc2"
-++--        | 16 -> emit_call "caml_alloc3"
-++--        | _  ->
-++--            I.mov (int n) eax;
-++--            emit_call "caml_allocN"
-++--        end;
-++--        let label = record_frame_label env i.live (Dbg_alloc dbginfo) in
-++--        def_label label;
-++--        I.lea (mem32 NONE 4 RAX) (reg i.res.(0))
-++--      end
-++--  | Lop(Iintop(Icomp cmp)) ->
-++--      I.cmp (reg i.arg.(1)) (reg i.arg.(0));
-++--      I.set (cond cmp) al;
-++--      I.movzx al (reg i.res.(0));
-++--  | Lop(Iintop_imm(Icomp cmp, n)) ->
-++--      I.cmp (int n) (reg i.arg.(0));
-++--      I.set (cond cmp) al;
-++--      I.movzx al (reg i.res.(0))
-++--  | Lop(Iintop (Icheckbound)) ->
-++--      let lbl = bound_error_label env i.dbg in
-++--      I.cmp (reg i.arg.(1)) (reg i.arg.(0));
-++--      I.jbe (label lbl)
-++--  | Lop(Iintop_imm(Icheckbound, n)) ->
-++--      let lbl = bound_error_label env i.dbg in
-++--      I.cmp (int n) (reg i.arg.(0));
-++--      I.jbe (label lbl)
-++--  | Lop(Iintop(Idiv | Imod)) ->
-++--      I.cdq ();
-++--      I.idiv (reg i.arg.(1))
-++--  | Lop(Iintop(Ilsl | Ilsr | Iasr as op)) ->
-++--      (* We have i.arg.(0) = i.res.(0) and i.arg.(1) = %ecx *)
-++--      instr_for_intop op cl (reg i.res.(0))
-++--  | Lop(Iintop Imulh) ->
-++--      I.imul (reg i.arg.(1)) None
-++--  | Lop(Iintop op) ->
-++--      (* We have i.arg.(0) = i.res.(0) *)
-++--      instr_for_intop op (reg i.arg.(1)) (reg i.res.(0))
-++--  | Lop(Iintop_imm(Iadd, n)) when i.arg.(0).loc <> i.res.(0).loc ->
-++--      I.lea (mem32 NONE n (reg32 i.arg.(0))) (reg i.res.(0))
-++--  | Lop(Iintop_imm(Iadd, 1) | Iintop_imm(Isub, -1)) ->
-++--      I.inc (reg i.res.(0))
-++--  | Lop(Iintop_imm(Iadd, -1) | Iintop_imm(Isub, 1)) ->
-++--      I.dec (reg i.res.(0))
-++--  | Lop(Iintop_imm(op, n)) ->
-++--      (* We have i.arg.(0) = i.res.(0) *)
-++--      instr_for_intop op (int n) (reg i.res.(0))
-++--  | Lop(Inegf | Iabsf as floatop) ->
-++--      if not (is_tos i.arg.(0)) then
-++--        I.fld (reg i.arg.(0));
-++--      unary_instr_for_floatop floatop
-++--  | Lop(Iaddf | Isubf | Imulf | Idivf | Ispecific(Isubfrev | Idivfrev)
-++--        as floatop) ->
-++--      begin match (is_tos i.arg.(0), is_tos i.arg.(1)) with
-++--        (true, true) ->
-++--          (* both operands on top of FP stack *)
-++--          instr_for_floatop_reversed_pop floatop st0 st1
-++--      | (true, false) ->
-++--          (* first operand on stack *)
-++--          instr_for_floatop floatop (reg i.arg.(1))
-++--      | (false, true) ->
-++--          (* second operand on stack *)
-++--          instr_for_floatop_reversed floatop (reg i.arg.(0))
-++--      | (false, false) ->
-++--          (* both operands in memory *)
-++--          I.fld (reg i.arg.(0));
-++--          instr_for_floatop floatop (reg i.arg.(1))
-++--      end
-++--  | Lop(Ifloatofint) ->
-++--      begin match i.arg.(0).loc with
-++--      | Stack _ ->
-++--          I.fild (reg i.arg.(0))
-++--      | _ ->
-++--          I.push (reg i.arg.(0));
-++--          I.fild (mem32 DWORD 0 RSP);
-++--          I.add (int 4) esp
-++--      end
-++--  | Lop(Iintoffloat) ->
-++--      if not (is_tos i.arg.(0)) then
-++--        I.fld (reg i.arg.(0));
-++--      env.stack_offset <- env.stack_offset - 8;
-++--      I.sub (int 8) esp;
-++--      cfi_adjust_cfa_offset 8;
-++--      I.fnstcw (mem32 NONE 4 RSP);
-++--      I.mov (mem32 WORD 4 RSP) ax;
-++--      I.mov (int 12) ah;
-++--      I.mov ax (mem32 WORD 0 RSP);
-++--      I.fldcw (mem32 NONE 0 RSP);
-++--      begin match i.res.(0).loc with
-++--      | Stack _ ->
-++--          I.fistp (reg i.res.(0))
-++--      | _ ->
-++--          I.fistp (mem32 DWORD 0 RSP);
-++--          I.mov (mem32 DWORD 0 RSP) (reg i.res.(0))
-++--      end;
-++--      I.fldcw (mem32 NONE 4 RSP);
-++--      I.add (int 8) esp;
-++--      cfi_adjust_cfa_offset (-8);
-++--      env.stack_offset <- env.stack_offset + 8
-++--  | Lop(Iopaque) ->
-++--      assert (i.arg.(0).loc = i.res.(0).loc)
-++--  | Lop(Ispecific(Ilea addr)) ->
-++--      I.lea (addressing addr DWORD i 0) (reg i.res.(0))
-++--  | Lop(Ispecific(Istore_int(n, addr, _))) ->
-++--      I.mov (nat n) (addressing addr DWORD i 0)
-++--  | Lop(Ispecific(Istore_symbol(s, addr, _))) ->
-++--      add_used_symbol s;
-++--      I.mov (immsym s) (addressing addr DWORD i 0)
-++--  | Lop(Ispecific(Ioffset_loc(n, addr))) ->
-++--      I.add (int n) (addressing addr DWORD i 0)
-++--  | Lop(Ispecific(Ipush)) ->
-++--      (* Push arguments in reverse order *)
-++--      for n = Array.length i.arg - 1 downto 0 do
-++--        let r = i.arg.(n) in
-++--        match r with
-++--          {loc = Reg _; typ = Float} ->
-++--            I.sub (int 8) esp;
-++--            cfi_adjust_cfa_offset 8;
-++--            I.fstp (mem32 REAL8 0 RSP);
-++--            env.stack_offset <- env.stack_offset + 8
-++--        | {loc = Stack sl; typ = Float} ->
-++--            let ofs = slot_offset env sl 1 in
-++--            (* Use x87 stack to move from stack to stack,
-++--               instead of two 32-bit push instructions,
-++--               which could kill performance on modern CPUs (see #6979).
-++--            *)
-++--            I.fld (mem32 REAL8 ofs RSP);
-++--            I.sub (int 8) esp;
-++--            cfi_adjust_cfa_offset 8;
-++--            I.fstp (mem32 REAL8 0 RSP);
-++--            env.stack_offset <- env.stack_offset + 8
-++--        | _ ->
-++--            I.push (reg r);
-++--            cfi_adjust_cfa_offset 4;
-++--            env.stack_offset <- env.stack_offset + 4
-++--      done
-++--  | Lop(Ispecific(Ipush_int n)) ->
-++--      I.push (nat n);
-++--      cfi_adjust_cfa_offset 4;
-++--      env.stack_offset <- env.stack_offset + 4
-++--  | Lop(Ispecific(Ipush_symbol s)) ->
-++--      add_used_symbol s;
-++--      I.push (immsym s);
-++--      cfi_adjust_cfa_offset 4;
-++--      env.stack_offset <- env.stack_offset + 4
-++--  | Lop(Ispecific(Ipush_load addr)) ->
-++--      I.push (addressing addr DWORD i 0);
-++--      cfi_adjust_cfa_offset 4;
-++--      env.stack_offset <- env.stack_offset + 4
-++--  | Lop(Ispecific(Ipush_load_float addr)) ->
-++--      I.push (addressing (offset_addressing addr 4) DWORD i 0);
-++--      I.push (addressing addr DWORD i 0);
-++--      cfi_adjust_cfa_offset 8;
-++--      env.stack_offset <- env.stack_offset + 8
-++--  | Lop(Ispecific(Ifloatarithmem(double, op, addr))) ->
-++--      if not (is_tos i.arg.(0)) then
-++--        I.fld (reg i.arg.(0));
-++--      instr_for_floatarithmem op
-++--          (addressing addr
-++--             (if double then REAL8 else REAL4) i 1)
-++--  | Lop(Ispecific(Ifloatspecial s)) ->
-++--      (* Push args on float stack if necessary *)
-++--      for k = 0 to Array.length i.arg - 1 do
-++--        if not (is_tos i.arg.(k)) then I.fld (reg i.arg.(k))
-++--      done;
-++--      (* Fix-up for binary instrs whose args were swapped *)
-++--      if Array.length i.arg = 2 && is_tos i.arg.(1) then
-++--        I.fxch st1;
-++--      emit_floatspecial s
-++--  | Lop (Idls_get) ->
-++--      (* Here to maintain build *)
-++--      assert false
-++--  | Lreloadretaddr ->
-++--      ()
-++--  | Lreturn ->
-++--      output_epilogue env begin fun () ->
-++--        I.ret ()
-++--      end
-++--  | Llabel lbl ->
-++--      emit_Llabel env fallthrough lbl
-++--  | Lbranch lbl ->
-++--      I.jmp (label lbl)
-++--  | Lcondbranch(tst, lbl) ->
-++--      let lbl = label lbl in
-++--      begin match tst with
-++--      | Itruetest ->
-++--          output_test_zero env i.arg.(0);
-++--          I.jne lbl;
-++--      | Ifalsetest ->
-++--          output_test_zero env i.arg.(0);
-++--          I.je lbl
-++--      | Iinttest cmp ->
-++--          I.cmp (reg i.arg.(1)) (reg i.arg.(0));
-++--          I.j (cond cmp) lbl
-++--      | Iinttest_imm((Isigned Ceq | Isigned Cne |
-++--                      Iunsigned Ceq | Iunsigned Cne) as cmp, 0) ->
-++--          output_test_zero env i.arg.(0);
-++--          I.j (cond cmp) lbl
-++--      | Iinttest_imm(cmp, n) ->
-++--          I.cmp (int n) (reg i.arg.(0));
-++--          I.j (cond cmp) lbl
-++--      | Ifloattest cmp ->
-++--          emit_float_test env cmp i.arg lbl
-++--      | Ioddtest ->
-++--          I.test (int 1) (reg i.arg.(0));
-++--          I.jne lbl
-++--      | Ieventest ->
-++--          I.test (int 1) (reg i.arg.(0));
-++--          I.je lbl
-++--      end
-++--  | Lcondbranch3(lbl0, lbl1, lbl2) ->
-++--      I.cmp (int 1) (reg i.arg.(0));
-++--      begin match lbl0 with
-++--        None -> ()
-++--      | Some lbl -> I.jb (label lbl)
-++--      end;
-++--      begin match lbl1 with
-++--        None -> ()
-++--      | Some lbl -> I.je (label lbl)
-++--      end;
-++--      begin match lbl2 with
-++--        None -> ()
-++--      | Some lbl -> I.ja (label lbl)
-++--      end
-++--  | Lswitch jumptbl ->
-++--      let lbl = new_label() in
-++--      I.jmp (mem32 NONE 0 (reg32 i.arg.(0)) ~scale:4 ~sym:(emit_label lbl));
-++--      D.data ();
-++--      _label (emit_label lbl);
-++--      for i = 0 to Array.length jumptbl - 1 do
-++--        D.long (ConstLabel (emit_label jumptbl.(i)))
-++--      done;
-++--      emit_named_text_section env.f.fun_name
-++--  | Lentertrap ->
-++--      ()
-++--  | Ladjust_trap_depth { delta_traps } ->
-++--      let delta = trap_frame_size * delta_traps in
-++--      cfi_adjust_cfa_offset delta;
-++--      env.stack_offset <- env.stack_offset + delta
-++--  | Lpushtrap { lbl_handler; } ->
-++--      I.push (label lbl_handler);
-++--      if trap_frame_size > 8 then
-++--        I.sub (int (trap_frame_size - 8)) esp;
-++--      load_domain_state edx;
-++--      I.push (domain_field Domain_exn_handler RDX);
-++--      cfi_adjust_cfa_offset trap_frame_size;
-++--      I.mov esp (domain_field Domain_exn_handler RDX);
-++--      env.stack_offset <- env.stack_offset + trap_frame_size
-++--  | Lpoptrap ->
-++--      I.mov edx (mem32 DWORD 4 RSP);
-++--      load_domain_state edx;
-++--      I.pop (domain_field Domain_exn_handler RDX);
-++--      I.pop edx;
-++--      if trap_frame_size > 8 then
-++--        I.add (int (trap_frame_size - 8)) esp;
-++--      cfi_adjust_cfa_offset (-trap_frame_size);
-++--      env.stack_offset <- env.stack_offset - trap_frame_size
-++--  | Lraise k  ->
-++--      begin match k with
-++--      | Lambda.Raise_regular ->
-++--          load_domain_state ebx;
-++--          I.mov (int 0) (domain_field Domain_backtrace_pos RBX);
-++--          emit_call "caml_raise_exn";
-++--          record_frame env Reg.Set.empty (Dbg_raise i.dbg)
-++--      | Lambda.Raise_reraise ->
-++--          emit_call "caml_raise_exn";
-++--          record_frame env Reg.Set.empty (Dbg_raise i.dbg)
-++--      | Lambda.Raise_notrace ->
-++--          load_domain_state ebx;
-++--          I.mov (domain_field Domain_exn_handler RBX) esp;
-++--          I.pop (domain_field Domain_exn_handler RBX);
-++--          if trap_frame_size > 8 then
-++--            I.add (int (trap_frame_size - 8)) esp;
-++--          I.pop ebx;
-++--          I.jmp ebx
-++--      end
-++--
-++--let rec emit_all env fallthrough i =
-++--  match i.desc with
-++--  |  Lend -> ()
-++--  | _ ->
-++--      emit_instr env fallthrough i;
-++--      emit_all env
-++--        (system = S_win32 || Linear.has_fallthrough i.desc)
-++--        i.next
-++--
-++--(* Emission of a function declaration *)
-++--
-++--let fundecl fundecl =
-++--  let env = mk_env fundecl in
-++--  emit_named_text_section fundecl.fun_name;
-++--  add_def_symbol fundecl.fun_name;
-++--  D.align (if system = S_win32 then 4 else 16);
-++--  D.global (emit_symbol fundecl.fun_name);
-++--  D.label (emit_symbol fundecl.fun_name);
-++--  emit_debug_info fundecl.fun_dbg;
-++--  cfi_startproc ();
-++--  emit_all env true fundecl.fun_body;
-++--  List.iter emit_call_gc env.call_gc_sites;
-++--  emit_call_bound_errors env;
-++--  cfi_endproc ();
-++--  begin match system with
-++--  | S_linux_elf | S_bsd_elf | S_gnu ->
-++--      D.type_ (emit_symbol fundecl.fun_name) "@function";
-++--      D.size (emit_symbol fundecl.fun_name)
-++--        (ConstSub (
-++--            ConstThis,
-++--            ConstLabel (emit_symbol fundecl.fun_name)))
-++--  | _ -> ()
-++--  end
-++--
-++--
-++--(* Emission of data *)
-++--
-++--let emit_item = function
-++--  | Cglobal_symbol s -> D.global (emit_symbol s)
-++--  | Cdefine_symbol s -> add_def_symbol s; _label (emit_symbol s)
-++--  | Cint8 n -> D.byte (const n)
-++--  | Cint16 n -> D.word (const n)
-++--  | Cint32 n -> D.long (const_nat n)
-++--  | Cint n -> D.long (const_nat n)
-++--  | Csingle f -> D.long (Const (Int64.of_int32 (Int32.bits_of_float f)))
-++--  | Cdouble f -> emit_float64_split_directive (Int64.bits_of_float f)
-++--  | Csymbol_address s -> add_used_symbol s; D.long (ConstLabel (emit_symbol s))
-++--  | Cstring s -> D.bytes s
-++--  | Cskip n -> if n > 0 then D.space n
-++--  | Calign n -> D.align n
-++--
-++--let data l =
-++--  D.data ();
-++--  List.iter emit_item l
-++--
-++--(* Beginning / end of an assembly file *)
-++--
-++--let begin_assembly() =
-++--  X86_proc.reset_asm_code ();
-++--  reset_debug_info();                   (* PR#5603 *)
-++--  float_constants := [];
-++--  if system = S_win32 then begin
-++--    D.mode386 ();
-++--    D.model "FLAT";
-++--    D.extrn "_caml_extra_params" DWORD;
-++--    D.extrn "_caml_call_gc" PROC;
-++--    D.extrn "_caml_c_call" PROC;
-++--    D.extrn "_caml_allocN" PROC;
-++--    D.extrn "_caml_alloc1" PROC;
-++--    D.extrn "_caml_alloc2" PROC;
-++--    D.extrn "_caml_alloc3" PROC;
-++--    D.extrn "_caml_ml_array_bound_error" PROC;
-++--    D.extrn "_caml_raise_exn" PROC;
-++--    D.extrn "_Caml_state" DWORD;
-++--  end;
-++--
-++--  D.data ();
-++--  emit_global_label "data_begin";
-++--  emit_named_text_section (Compilenv.make_symbol (Some "code_begin"));
-++--  emit_global_label "code_begin"
-++--
-++--let end_assembly() =
-++--  if !float_constants <> [] then begin
-++--    D.data ();
-++--    List.iter (fun (cst,lbl) -> emit_float_constant cst lbl) !float_constants
-++--  end;
-++--
-++--  emit_named_text_section (Compilenv.make_symbol (Some "code_end"));
-++--  emit_global_label "code_end";
-++--
-++--  D.data ();
-++--  D.long (const 0);  (* PR#6329 *)
-++--  emit_global_label "data_end";
-++--  D.long (const 0);
-++--
-++--  emit_global_label "frametable";
-++--
-++--  emit_frames
-++--    { efa_code_label = (fun l -> D.long (ConstLabel (emit_label l)));
-++--      efa_data_label = (fun l -> D.long (ConstLabel (emit_label l)));
-++--      efa_8 = (fun n -> D.byte (const n));
-++--      efa_16 = (fun n -> D.word (const n));
-++--      efa_32 = (fun n -> D.long (const_32 n));
-++--      efa_word = (fun n -> D.long (const n));
-++--      efa_align = D.align;
-++--      efa_label_rel = (fun lbl ofs ->
-++--          D.long (ConstAdd (
-++--              ConstSub(ConstLabel(emit_label lbl),
-++--                       ConstThis),
-++--              const_32 ofs)));
-++--      efa_def_label = (fun l -> _label (emit_label l));
-++--      efa_string = (fun s -> D.bytes (s ^ "\000"))
-++--    };
-++--
-++--  if system = S_linux_elf then
-++--    (* Mark stack as non-executable, PR#4564 *)
-++--    D.section [".note.GNU-stack"] (Some "") ["%progbits"];
-++--
-++--  if system = S_win32 then begin
-++--    D.comment "External functions";
-++--    String.Set.iter
-++--      (fun s ->
-++--         if not (String.Set.mem s !symbols_defined) then
-++--           D.extrn (emit_symbol s) PROC)
-++--      !symbols_used;
-++--    symbols_used := String.Set.empty;
-++--    symbols_defined := String.Set.empty;
-++--  end;
-++--
-++--  let asm =
-++--    if !Emitaux.create_asm_file then
-++--      Some
-++--        (
-++--         (if X86_proc.masm then X86_masm.generate_asm
-++--          else X86_gas.generate_asm) !Emitaux.output_channel
-++--        )
-++--    else
-++--      None
-++--  in
-++--  X86_proc.generate_code asm
-++ diff --git a/asmcomp/i386/proc.ml b/asmcomp/i386/proc.ml
-++ deleted file mode 100644
-++ --- a/asmcomp/i386/proc.ml
-++@@ -5102,7 +4064,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -2107,7 +2107,7 @@ oc_native_cflags=''
-+++@@ -2156,7 +2156,7 @@ oc_native_cflags=''
-++  AS_IF([test x"$enable_function_sections" = "xno"],
-++    [function_sections=false],
-++    [AS_CASE([$arch],
-++@@ -5125,81 +4087,6 @@
-++  %.cmi: %.mli
-++  	$(OCAMLC) $(COMPFLAGS) -c $<
-++  
-++-diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++-deleted file mode 100644
-++---- a/testsuite/tools/asmgen_i386.S
-++-+++ /dev/null
-++-@@ -1,70 +0,0 @@
-++--/**************************************************************************/
-++--/*                                                                        */
-++--/*                                OCaml                                   */
-++--/*                                                                        */
-++--/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
-++--/*                                                                        */
-++--/*   Copyright 1996 Institut National de Recherche en Informatique et     */
-++--/*     en Automatique.                                                    */
-++--/*                                                                        */
-++--/*   All rights reserved.  This file is distributed under the terms of    */
-++--/*   the GNU Lesser General Public License version 2.1, with the          */
-++--/*   special exception on linking described in the file LICENSE.          */
-++--/*                                                                        */
-++--/**************************************************************************/
-++--
-++--/* Linux with ELF binaries does not prefix identifiers with _.
-++--   Linux with a.out binaries, FreeBSD, and NextStep do. */
-++--
-++--#if defined(SYS_linux_elf) || defined(SYS_bsd_elf) \
-++-- || defined(SYS_solaris) || defined(SYS_beos) || defined(SYS_gnu)
-++--#define G(x) x
-++--#define FUNCTION_ALIGN 16
-++--#else
-++--#define G(x) _##x
-++--#define FUNCTION_ALIGN 4
-++--#endif
-++--
-++--        .globl  G(call_gen_code)
-++--        .align  FUNCTION_ALIGN
-++--G(call_gen_code):
-++--        pushl %ebp
-++--        movl %esp,%ebp
-++--        pushl %ebx
-++--        pushl %esi
-++--        pushl %edi
-++--        movl 12(%ebp),%eax
-++--        movl 16(%ebp),%ebx
-++--        movl 20(%ebp),%ecx
-++--        movl 24(%ebp),%edx
-++--        call *8(%ebp)
-++--        popl %edi
-++--        popl %esi
-++--        popl %ebx
-++--        popl %ebp
-++--        ret
-++--
-++--        .globl  G(caml_c_call)
-++--        .align  FUNCTION_ALIGN
-++--G(caml_c_call):
-++--        jmp     *%eax
-++--
-++--        .comm   G(Caml_state), 4
-++--
-++--/* Some tests are designed to cause registers to spill; on
-++-- * x86 we require the caml_extra_params symbol from the RTS. */
-++--        .data
-++--        .globl  G(caml_extra_params)
-++--G(caml_extra_params):
-++--#ifndef SYS_solaris
-++--        .space  64
-++--#else
-++--        .zero   64
-++--#endif
-++--
-++--
-++--
-++--#if defined(SYS_linux_elf)
-++--    /* Mark stack as non-executable */
-++--        .section .note.GNU-stack,"",%progbits
-++--#endif
-++ diff --git a/testsuite/tools/asmgen_i386nt.asm b/testsuite/tools/asmgen_i386nt.asm
-++ deleted file mode 100644
-++ --- a/testsuite/tools/asmgen_i386nt.asm
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -12587,10 +10280,10 @@ index 0000000000..75e5bb5e84
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index bfe3494c7c..e6237d6a4c 100644
++index a60c88a612..440e3d3f53 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -451,6 +451,10 @@ Working version
++@@ -455,6 +455,10 @@ Working version
 +   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
 +    Nicolás Ojeda Bär)
 + 
@@ -12601,7 +10294,7 @@ index 0000000000..75e5bb5e84
 + OCaml 5.0
 + ---------
 + 
-+@@ -987,11 +991,6 @@ OCaml 5.0
++@@ -991,11 +995,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -12613,7 +10306,7 @@ index 0000000000..75e5bb5e84
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1020,6 +1019,30 @@ OCaml 5.0
++@@ -1024,6 +1023,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -12644,7 +10337,7 @@ index 0000000000..75e5bb5e84
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1055,13 +1078,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1059,13 +1082,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -12660,7 +10353,7 @@ index 0000000000..75e5bb5e84
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1168,6 +1191,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1172,6 +1195,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -12670,7 +10363,7 @@ index 0000000000..75e5bb5e84
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1427,6 +1453,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1431,6 +1457,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -12793,10 +10486,10 @@ index 0000000000..75e5bb5e84
 + 	   utils/*.cmi \
 + 	   parsing/*.cmi \
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index acfa023b4d..26804870b7 100644
++index c8d6966c40..6a1cbd16a0 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -244,7 +244,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -243,7 +243,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
@@ -13226,10 +10919,10 @@ index 0000000000..75e5bb5e84
 +   cfi_endproc();
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index e7dc40430a..d64f28d2d3 100644
++index 40ff3fccdd..773655f1f9 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
++@@ -812,7 +812,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
 +     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
 +                           fill_fields (idx + 2) el) in
 +     Clet(VP.create id,
@@ -13241,7 +10934,7 @@ index 0000000000..75e5bb5e84
 +                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
 +          fill_fields 1 args)
 +   end
-+@@ -2115,8 +2119,13 @@ let assignment_kind
++@@ -2111,8 +2115,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -15732,13 +13425,13 @@ index 0000000000..75e5bb5e84
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index d67d3991a0..d3e59fdd66 100755
++index 10c226ad83..eeecac1107 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 6f143c3f46..2aa34aa349 100644
++index a4d3a064c0..3d67ca996a 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -15747,7 +13440,7 @@ index 0000000000..75e5bb5e84
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -221,6 +223,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -15755,7 +13448,7 @@ index 0000000000..75e5bb5e84
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -371,15 +374,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -369,15 +372,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -15787,7 +13480,7 @@ index 0000000000..75e5bb5e84
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -614,7 +625,8 @@ AS_CASE([$host],
++@@ -608,7 +619,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -15797,7 +13490,7 @@ index 0000000000..75e5bb5e84
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -688,8 +700,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -682,8 +694,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -15809,7 +13502,7 @@ index 0000000000..75e5bb5e84
 + 
 + AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
 +   [yes,*|,true],
-+@@ -1029,9 +1042,9 @@ AS_IF([! $arch64],
++@@ -1023,9 +1036,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -15822,7 +13515,7 @@ index 0000000000..75e5bb5e84
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1189,13 +1202,14 @@ AS_CASE([$host],
++@@ -1183,13 +1196,14 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -15841,7 +13534,7 @@ index 0000000000..75e5bb5e84
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -1232,9 +1246,9 @@ AS_CASE([$host],
++@@ -1226,9 +1240,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -15853,7 +13546,7 @@ index 0000000000..75e5bb5e84
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1244,7 +1258,7 @@ AS_CASE([$host],
++@@ -1238,7 +1252,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -15862,7 +13555,7 @@ index 0000000000..75e5bb5e84
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1264,7 +1278,7 @@ AS_CASE([$host],
++@@ -1258,7 +1272,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -15871,7 +13564,7 @@ index 0000000000..75e5bb5e84
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1956,11 +1970,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1950,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -15896,7 +13589,7 @@ index 0000000000..75e5bb5e84
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2011,6 +2037,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2005,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -15927,7 +13620,7 @@ index 0000000000..75e5bb5e84
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2158,8 +2208,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2151,8 +2201,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -18666,10 +16359,10 @@ index 0000000000..75e5bb5e84
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..be26a84e20
++index 0000000000..a455c16e94
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3952 @@
++@@ -0,0 +1,3953 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -18738,15 +16431,16 @@ index 0000000000..75e5bb5e84
 ++ cache:
 ++   - C:\cygwin64\var\cache\setup
 ++diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-++index 0bc17bc281..0bb0042339 100644
+++index 0bc17bc281..faae83cf0e 100644
 ++--- a/ocamltest/builtin_actions.ml
 +++++ b/ocamltest/builtin_actions.ml
-++@@ -204,6 +204,12 @@ let function_sections = make
+++@@ -204,6 +204,13 @@ let function_sections = make
 ++      "Target supports function sections"
 ++      "Target does not support function sections")
 ++ 
 +++let naked_pointers = make
-+++  "naked_pointers"
++++  ~name:"naked_pointers"
++++  ~description:"Pass if target supports naked pointers"
 +++  (Actions_helpers.pass_or_skip (Ocamltest_config.naked_pointers)
 +++     "Runtime system supports naked pointers"
 +++     "Runtime system does not support naked pointers")
@@ -18754,7 +16448,7 @@ index 0000000000..75e5bb5e84
 ++ let frame_pointers = make
 ++   ~name:"frame_pointers"
 ++   ~description:"Pass if frame pointers are available"
-++@@ -343,6 +349,7 @@ let _ =
+++@@ -343,6 +350,7 @@ let _ =
 ++     arch_i386;
 ++     arch_power;
 ++     function_sections;
@@ -22556,7 +20250,54 @@ index 0000000000..75e5bb5e84
 ++     ;;
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    r
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if n
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
