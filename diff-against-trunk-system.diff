@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..b66798426f
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:46:51.263120743 +0100
+++++ b	2023-09-28 18:46:51.279121337 +0100
++@@ -16,7 +16,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -611,6 +611,7 @@ stdlib__Queue.cmx : queue.ml \
+++@@ -562,6 +562,7 @@ stdlib__Queue.cmx : queue.ml \
++  stdlib__Queue.cmi : queue.mli \
++      stdlib__Seq.cmi
++  stdlib__Random.cmo : random.ml \
++@@ -24,7 +24,7 @@
++      stdlib__String.cmi \
++      stdlib__Nativeint.cmi \
++      stdlib__Int64.cmi \
++-@@ -622,6 +623,7 @@ stdlib__Random.cmo : random.ml \
+++@@ -572,6 +573,7 @@ stdlib__Random.cmo : random.ml \
++      stdlib__Array.cmi \
++      stdlib__Random.cmi
++  stdlib__Random.cmx : random.ml \
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +37,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 66a4d127d3..089bab82eb 100644
+index bf1963d384..6a96413306 100644
 --- a/Changes
 +++ b/Changes
-@@ -458,6 +458,10 @@ Working version
+@@ -463,6 +463,10 @@ Working version
    (Andrei Paskevich and Charlène Gros, review by David Allsopp and
     Nicolás Ojeda Bär)
  
@@ -28,7 +51,7 @@ index 66a4d127d3..089bab82eb 100644
  OCaml 5.0
  ---------
  
-@@ -994,11 +998,6 @@ OCaml 5.0
+@@ -999,11 +1003,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +63,7 @@ index 66a4d127d3..089bab82eb 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1027,6 +1026,30 @@ OCaml 5.0
+@@ -1032,6 +1031,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +94,7 @@ index 66a4d127d3..089bab82eb 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1062,13 +1085,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1067,13 +1090,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +110,7 @@ index 66a4d127d3..089bab82eb 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1175,6 +1198,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1180,6 +1203,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +120,7 @@ index 66a4d127d3..089bab82eb 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1434,6 +1460,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1439,6 +1465,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10052,13 +10075,36 @@ index 0000000000..a455c16e94
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c37326241a
+index 0000000000..aa92a6994f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10033 @@
+@@ -0,0 +1,10039 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..b66798426f
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:46:51.263120743 +0100
++++++ b	2023-09-28 18:46:51.279121337 +0100
+++@@ -16,7 +16,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -611,6 +611,7 @@ stdlib__Queue.cmx : queue.ml \
++++@@ -562,6 +562,7 @@ stdlib__Queue.cmx : queue.ml \
+++  stdlib__Queue.cmi : queue.mli \
+++      stdlib__Seq.cmi
+++  stdlib__Random.cmo : random.ml \
+++@@ -24,7 +24,7 @@
+++      stdlib__String.cmi \
+++      stdlib__Nativeint.cmi \
+++      stdlib__Int64.cmi \
+++-@@ -622,6 +623,7 @@ stdlib__Random.cmo : random.ml \
++++@@ -572,6 +573,7 @@ stdlib__Random.cmo : random.ml \
+++      stdlib__Array.cmi \
+++      stdlib__Random.cmi
+++  stdlib__Random.cmx : random.ml \
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10072,10 +10118,10 @@ index 0000000000..c37326241a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 66a4d127d3..089bab82eb 100644
++index bf1963d384..6a96413306 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -458,6 +458,10 @@ Working version
++@@ -463,6 +463,10 @@ Working version
 +   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
 +    Nicolás Ojeda Bär)
 + 
@@ -10086,7 +10132,7 @@ index 0000000000..c37326241a
 + OCaml 5.0
 + ---------
 + 
-+@@ -994,11 +998,6 @@ OCaml 5.0
++@@ -999,11 +1003,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10098,7 +10144,7 @@ index 0000000000..c37326241a
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1027,6 +1026,30 @@ OCaml 5.0
++@@ -1032,6 +1031,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10129,7 +10175,7 @@ index 0000000000..c37326241a
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1062,13 +1085,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1067,13 +1090,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10145,7 +10191,7 @@ index 0000000000..c37326241a
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1175,6 +1198,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1180,6 +1203,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10155,7 +10201,7 @@ index 0000000000..c37326241a
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1434,6 +1460,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1439,6 +1465,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20071,24 +20117,7 @@ index 0000000000..c37326241a
 +++      run "test dynlink $PORT" \
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
 +++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++     
++++      sed -i '/native_/s/true/false/
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -21575,7 +21604,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index da86e8bbe0..cc1842fbb2 100644
+index ed9cd8f0ce..734424a438 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21715,7 +21744,7 @@ index da86e8bbe0..cc1842fbb2 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -615,7 +566,6 @@ stdlib__Random.cmo : random.ml \
+@@ -616,7 +567,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -21723,7 +21752,7 @@ index da86e8bbe0..cc1842fbb2 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -626,7 +576,6 @@ stdlib__Random.cmx : random.ml \
+@@ -628,7 +578,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -21731,7 +21760,7 @@ index da86e8bbe0..cc1842fbb2 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -666,15 +615,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -668,15 +617,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -22159,10 +22188,10 @@ index ab29d404c9..8534cb3222 100644
  let from_fun (f : unit -> 'arg) =
    let x = Obj.new_block Obj.lazy_tag 1 in
 diff --git a/stdlib/random.ml b/stdlib/random.ml
-index 02112d6bbd..c91195d2ff 100644
+index ff3b90480f..4a5f7f8032 100644
 --- a/stdlib/random.ml
 +++ b/stdlib/random.ml
-@@ -175,6 +175,7 @@ let mk_default () =
+@@ -217,6 +217,7 @@ let mk_default () =
             (-8591268803865043407L)
             6388613595849772044L
  
@@ -22170,7 +22199,7 @@ index 02112d6bbd..c91195d2ff 100644
  let random_key =
    Domain.DLS.new_key ~split_from_parent:State.split mk_default
  
-@@ -191,14 +192,39 @@ let bits64 () = State.bits64 (Domain.DLS.get random_key)
+@@ -233,14 +234,39 @@ let bits64 () = State.bits64 (Domain.DLS.get random_key)
  let nativebits () = State.nativebits (Domain.DLS.get random_key)
  
  let full_init seed = State.reinit (Domain.DLS.get random_key) seed
