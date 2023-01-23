@@ -1,110 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..8441dbde64
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,101 @@
-+--- a	2023-09-28 18:46:50.575095192 +0100
-++++ b	2023-09-28 18:46:50.591095786 +0100
-+@@ -62,7 +62,7 @@
-+  
-+  (* Array indexing *)
-+  
-+-@@ -2063,7 +2059,7 @@ let offsetref n arg dbg =
-++@@ -2067,7 +2063,7 @@ let offsetref n arg dbg =
-+               dbg)))
-+  
-+  let arraylength kind arg dbg =
-+@@ -71,7 +71,7 @@
-+    match (kind : Lambda.array_kind) with
-+      Pgenarray ->
-+        let len =
-+-@@ -2263,7 +2259,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++@@ -2272,7 +2268,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+    | Pgenarray ->
-+        bind "index" arg2 (fun idx ->
-+        bind "arr" arg1 (fun arr ->
-+@@ -80,7 +80,7 @@
-+          if wordsize_shift = numfloat_shift then
-+            Csequence(
-+              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
-+-@@ -2290,7 +2286,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++@@ -2299,7 +2295,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+              Csequence(
-+                make_checkbound dbg [
-+                  addr_array_length_shifted
-+@@ -89,7 +89,7 @@
-+                addr_array_ref arr idx dbg)))
-+        | Pintarray ->
-+            bind "index" arg2 (fun idx ->
-+-@@ -2298,7 +2294,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+              Csequence(
-+                make_checkbound dbg [
-+                  addr_array_length_shifted
-+@@ -98,7 +98,7 @@
-+                int_array_ref arr idx dbg)))
-+        | Pfloatarray ->
-+            box_float dbg (
-+-@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++@@ -2316,7 +2312,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+                Csequence(
-+                  make_checkbound dbg [
-+                    float_array_length_shifted
-+@@ -107,7 +107,7 @@
-+                    idx],
-+                  unboxed_float_array_ref arr idx dbg))))
-+  
-+-@@ -2366,7 +2362,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++@@ -2375,7 +2371,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+        bind "newval" arg3 (fun newval ->
-+        bind "index" arg2 (fun idx ->
-+        bind "arr" arg1 (fun arr ->
-+@@ -116,7 +116,7 @@
-+          if wordsize_shift = numfloat_shift then
-+            Csequence(
-+              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
-+-@@ -2398,7 +2394,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++@@ -2407,7 +2403,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+          Csequence(
-+            make_checkbound dbg [
-+              addr_array_length_shifted
-+@@ -125,7 +125,7 @@
-+              idx],
-+            addr_array_set arr idx newval dbg))))
-+    | Pintarray ->
-+-@@ -2408,7 +2404,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++@@ -2417,7 +2413,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+          Csequence(
-+            make_checkbound dbg [
-+              addr_array_length_shifted
-+@@ -134,7 +134,7 @@
-+              idx],
-+            int_array_set arr idx newval dbg))))
-+    | Pfloatarray ->
-+-@@ -2418,7 +2414,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++@@ -2427,7 +2423,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+          Csequence(
-+            make_checkbound dbg [
-+              float_array_length_shifted
-+@@ -193,7 +193,7 @@
-+  AC_SUBST([frame_pointers])
-+  AC_SUBST([flambda])
-+  AC_SUBST([flambda_invariants])
-+-@@ -424,15 +422,11 @@ AC_ARG_WITH([target-bindir],
-++@@ -435,15 +433,11 @@ AC_ARG_WITH([target-bindir],
-+  
-+  AC_ARG_ENABLE([reserved-header-bits],
-+    [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
-+@@ -213,7 +213,7 @@
-+  
-+  AC_ARG_ENABLE([stdlib-manpages],
-+    [AS_HELP_STRING([--disable-stdlib-manpages],
-+-@@ -2014,8 +2008,7 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
-++@@ -2064,8 +2058,7 @@ AS_IF([test x"$enable_naked_pointers_checker" = "xyes" ],
-+  ## Check for mmap support for huge pages and contiguous heap
-+  OCAML_MMAP_SUPPORTS_HUGE_PAGES
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -118,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index a60c88a612..440e3d3f53 100644
+index 66a4d127d3..089bab82eb 100644
 --- a/Changes
 +++ b/Changes
-@@ -455,6 +455,10 @@ Working version
+@@ -458,6 +458,10 @@ Working version
    (Andrei Paskevich and Charlène Gros, review by David Allsopp and
     Nicolás Ojeda Bär)
  
@@ -132,7 +28,7 @@ index a60c88a612..440e3d3f53 100644
  OCaml 5.0
  ---------
  
-@@ -991,11 +995,6 @@ OCaml 5.0
+@@ -994,11 +998,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -144,7 +40,7 @@ index a60c88a612..440e3d3f53 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1024,6 +1023,30 @@ OCaml 5.0
+@@ -1027,6 +1026,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -175,7 +71,7 @@ index a60c88a612..440e3d3f53 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1059,13 +1082,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1062,13 +1085,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -191,7 +87,7 @@ index a60c88a612..440e3d3f53 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1172,6 +1195,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1175,6 +1198,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -201,7 +97,7 @@ index a60c88a612..440e3d3f53 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1431,6 +1457,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1434,6 +1460,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10156,117 +10052,13 @@ index 0000000000..a455c16e94
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a2215e0cab
+index 0000000000..c37326241a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10138 @@
+@@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..8441dbde64
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,101 @@
-++--- a	2023-09-28 18:46:50.575095192 +0100
-+++++ b	2023-09-28 18:46:50.591095786 +0100
-++@@ -62,7 +62,7 @@
-++  
-++  (* Array indexing *)
-++  
-++-@@ -2063,7 +2059,7 @@ let offsetref n arg dbg =
-+++@@ -2067,7 +2063,7 @@ let offsetref n arg dbg =
-++               dbg)))
-++  
-++  let arraylength kind arg dbg =
-++@@ -71,7 +71,7 @@
-++    match (kind : Lambda.array_kind) with
-++      Pgenarray ->
-++        let len =
-++-@@ -2263,7 +2259,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+++@@ -2272,7 +2268,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++    | Pgenarray ->
-++        bind "index" arg2 (fun idx ->
-++        bind "arr" arg1 (fun arr ->
-++@@ -80,7 +80,7 @@
-++          if wordsize_shift = numfloat_shift then
-++            Csequence(
-++              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
-++-@@ -2290,7 +2286,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+++@@ -2299,7 +2295,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++              Csequence(
-++                make_checkbound dbg [
-++                  addr_array_length_shifted
-++@@ -89,7 +89,7 @@
-++                addr_array_ref arr idx dbg)))
-++        | Pintarray ->
-++            bind "index" arg2 (fun idx ->
-++-@@ -2298,7 +2294,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+++@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++              Csequence(
-++                make_checkbound dbg [
-++                  addr_array_length_shifted
-++@@ -98,7 +98,7 @@
-++                int_array_ref arr idx dbg)))
-++        | Pfloatarray ->
-++            box_float dbg (
-++-@@ -2307,7 +2303,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-+++@@ -2316,7 +2312,7 @@ let arrayref_safe kind arg1 arg2 dbg =
-++                Csequence(
-++                  make_checkbound dbg [
-++                    float_array_length_shifted
-++@@ -107,7 +107,7 @@
-++                    idx],
-++                  unboxed_float_array_ref arr idx dbg))))
-++  
-++-@@ -2366,7 +2362,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+++@@ -2375,7 +2371,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++        bind "newval" arg3 (fun newval ->
-++        bind "index" arg2 (fun idx ->
-++        bind "arr" arg1 (fun arr ->
-++@@ -116,7 +116,7 @@
-++          if wordsize_shift = numfloat_shift then
-++            Csequence(
-++              make_checkbound dbg [addr_array_length_shifted hdr dbg; idx],
-++-@@ -2398,7 +2394,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+++@@ -2407,7 +2403,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++          Csequence(
-++            make_checkbound dbg [
-++              addr_array_length_shifted
-++@@ -125,7 +125,7 @@
-++              idx],
-++            addr_array_set arr idx newval dbg))))
-++    | Pintarray ->
-++-@@ -2408,7 +2404,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+++@@ -2417,7 +2413,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++          Csequence(
-++            make_checkbound dbg [
-++              addr_array_length_shifted
-++@@ -134,7 +134,7 @@
-++              idx],
-++            int_array_set arr idx newval dbg))))
-++    | Pfloatarray ->
-++-@@ -2418,7 +2414,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-+++@@ -2427,7 +2423,7 @@ let arrayset_safe kind arg1 arg2 arg3 dbg =
-++          Csequence(
-++            make_checkbound dbg [
-++              float_array_length_shifted
-++@@ -193,7 +193,7 @@
-++  AC_SUBST([frame_pointers])
-++  AC_SUBST([flambda])
-++  AC_SUBST([flambda_invariants])
-++-@@ -424,15 +422,11 @@ AC_ARG_WITH([target-bindir],
-+++@@ -435,15 +433,11 @@ AC_ARG_WITH([target-bindir],
-++  
-++  AC_ARG_ENABLE([reserved-header-bits],
-++    [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
-++@@ -213,7 +213,7 @@
-++  
-++  AC_ARG_ENABLE([stdlib-manpages],
-++    [AS_HELP_STRING([--disable-stdlib-manpages],
-++-@@ -2014,8 +2008,7 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
-+++@@ -2064,8 +2058,7 @@ AS_IF([test x"$enable_naked_pointers_checker" = "xyes" ],
-++  ## Check for mmap support for huge pages and contiguous heap
-++  OCAML_MMAP_SUPPORTS_HUGE_PAGES
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10280,10 +10072,10 @@ index 0000000000..a2215e0cab
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index a60c88a612..440e3d3f53 100644
++index 66a4d127d3..089bab82eb 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -455,6 +455,10 @@ Working version
++@@ -458,6 +458,10 @@ Working version
 +   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
 +    Nicolás Ojeda Bär)
 + 
@@ -10294,7 +10086,7 @@ index 0000000000..a2215e0cab
 + OCaml 5.0
 + ---------
 + 
-+@@ -991,11 +995,6 @@ OCaml 5.0
++@@ -994,11 +998,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10306,7 +10098,7 @@ index 0000000000..a2215e0cab
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1024,6 +1023,30 @@ OCaml 5.0
++@@ -1027,6 +1026,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10337,7 +10129,7 @@ index 0000000000..a2215e0cab
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1059,13 +1082,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1062,13 +1085,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10353,7 +10145,7 @@ index 0000000000..a2215e0cab
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1172,6 +1195,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1175,6 +1198,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10363,7 +10155,7 @@ index 0000000000..a2215e0cab
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1431,6 +1457,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1434,6 +1460,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20296,8 +20088,7 @@ index 0000000000..a2215e0cab
 +++      git config --global safe.directory '*'
 +++
 ++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if n
+++     
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
