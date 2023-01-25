@@ -1,83 +1,21 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..4d7e6cd2cb
+index 0000000000..5ca6c82319
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,74 @@
-+--- a	2023-09-28 18:46:51.931145543 +0100
-++++ b	2023-09-28 18:46:51.959146582 +0100
-+@@ -104,7 +104,7 @@
-+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+ --- a/asmcomp/amd64/emit.mlp
-+ +++ b/asmcomp/amd64/emit.mlp
-+-@@ -698,6 +698,12 @@ let emit_instr env fallthrough i =
-++@@ -720,6 +720,12 @@ let emit_instr env fallthrough i =
-+    | Lop(Iintop_imm(op, n)) ->
-+        (* We have i.arg.(0) = i.res.(0) *)
-+        instr_for_intop op (int n) (res i 0)
-+@@ -120,7 +120,7 @@
-+ diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-+ --- a/asmcomp/amd64/proc.ml
-+ +++ b/asmcomp/amd64/proc.ml
-+-@@ -342,22 +342,28 @@ let safe_register_pressure = function
-++@@ -350,22 +350,28 @@ let safe_register_pressure = function
-+      Iextcall _ -> if win64 then if fp then 7 else 8 else 0
-+    | _ -> if fp then 10 else 11
-+  
-+@@ -185,7 +185,7 @@
-+ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+ --- a/asmcomp/arm64/emit.mlp
-+ +++ b/asmcomp/arm64/emit.mlp
-+-@@ -490,6 +490,7 @@ module BR = Branch_relaxation.Make (struct
-++@@ -506,6 +506,7 @@ module BR = Branch_relaxation.Make (struct
-+        | _ -> 1 + num_instructions_for_intconst (Nativeint.of_int num_bytes)
-+        end
-+      | Lop (Iintop (Icomp _)) -> 2
-+@@ -193,7 +193,7 @@
-+      | Lop (Iintop_imm (Icomp _, _)) -> 2
-+      | Lop (Iintop (Icheckbound)) -> 2
-+      | Lop (Ispecific (Ifar_intop_checkbound)) -> 3
-+-@@ -656,6 +657,19 @@ let emit_load_literal dst lbl =
-++@@ -676,6 +677,19 @@ let emit_load_literal dst lbl =
-+      `	ldr	{emit_reg dst}, [{emit_reg reg_tmp1}, #:lo12:{emit_label lbl}]\n`
-+    end
-+  
-+@@ -213,7 +213,7 @@
-+  (* Output the assembly code for an instruction *)
-+  
-+  let emit_instr env i =
-+-@@ -833,6 +847,10 @@ let emit_instr env i =
-++@@ -871,6 +885,10 @@ let emit_instr env i =
-+      | Lop(Iintop(Icomp cmp)) ->
-+          `	cmp	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`;
-+          `	cset	{emit_reg i.res.(0)}, {emit_string (name_for_comparison cmp)}\n`
-+@@ -224,7 +224,7 @@
-+      | Lop(Iintop_imm(Icomp cmp, n)) ->
-+          emit_cmpimm i.arg.(0) n;
-+          `	cset	{emit_reg i.res.(0)}, {emit_string (name_for_comparison cmp)}\n`
-+-@@ -963,19 +981,7 @@ let emit_instr env i =
-++@@ -1006,19 +1024,7 @@ let emit_instr env i =
-+              let comp = name_for_comparison cmp in
-+              `	b.{emit_string comp}	{emit_label lbl}\n`
-+          | Ifloattest cmp ->
-+@@ -408,7 +408,7 @@
-+  (* Record live pointers at call points *)
-+  
-+  let record_frame_label env live dbg =
-+-@@ -455,6 +470,9 @@ let emit_instr env i =
-++@@ -457,6 +472,9 @@ let emit_instr env i =
-+            `	sltu	{emit_reg i.res.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(0)}\n`;
-+            `	xori	{emit_reg i.res.(0)}, {emit_reg i.res.(0)}, 1\n`;
-+        end
-+@@ -418,7 +418,7 @@
-+    | Lop(Iintop (Icheckbound)) ->
-+        let lbl = bound_error_label env i.dbg in
-+        `	bleu	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_label lbl}\n`
-+-@@ -514,18 +532,12 @@ let emit_instr env i =
-++@@ -520,18 +538,12 @@ let emit_instr env i =
-+        | Iinttest_imm _ ->
-+            Misc.fatal_error "Emit.emit_instr (Iinttest_imm _)"
-+        | Ifloattest cmp ->
+@@ -0,0 +1,12 @@
++--- a	2023-09-28 18:46:52.279158457 +0100
+++++ b	2023-09-28 18:46:52.299159199 +0100
++@@ -70,6 +70,6 @@
++ +- #11879: Bugfix for Ctype.nondep_type
++ +  (Stephen Dolan, review by Gabriel Scherer)
++ +
++- OCaml 5.0
++- ---------
++- 
+++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
+++   that causes very slow compaction.
+++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -91,12 +29,12 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index d9bd626179..9ca1558d29 100644
+index bd1d274a63..e5527368c6 100644
 --- a/Changes
 +++ b/Changes
-@@ -474,6 +474,10 @@ Working version
-   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
-    Nicolás Ojeda Bär)
+@@ -481,6 +481,10 @@ Working version
+ - #11879: Bugfix for Ctype.nondep_type
+   (Stephen Dolan, review by Gabriel Scherer)
  
 +- #12264, #12289: Fix compact_allocate to avoid a pathological case
 +  that causes very slow compaction.
@@ -105,7 +43,7 @@ index d9bd626179..9ca1558d29 100644
  OCaml 5.0
  ---------
  
-@@ -1010,11 +1014,6 @@ OCaml 5.0
+@@ -1017,11 +1021,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -117,7 +55,7 @@ index d9bd626179..9ca1558d29 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1043,6 +1042,30 @@ OCaml 5.0
+@@ -1050,6 +1049,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -148,7 +86,7 @@ index d9bd626179..9ca1558d29 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1078,13 +1101,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1085,13 +1108,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -164,7 +102,7 @@ index d9bd626179..9ca1558d29 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1191,6 +1214,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1198,6 +1221,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -174,7 +112,7 @@ index d9bd626179..9ca1558d29 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1450,6 +1476,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1457,6 +1483,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10129,90 +10067,28 @@ index 0000000000..a455c16e94
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..de7a56dd61
+index 0000000000..a3295d044b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10129 @@
+@@ -0,0 +1,10037 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..4d7e6cd2cb
++index 0000000000..5ca6c82319
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,74 @@
-++--- a	2023-09-28 18:46:51.931145543 +0100
-+++++ b	2023-09-28 18:46:51.959146582 +0100
-++@@ -104,7 +104,7 @@
-++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-++ --- a/asmcomp/amd64/emit.mlp
-++ +++ b/asmcomp/amd64/emit.mlp
-++-@@ -698,6 +698,12 @@ let emit_instr env fallthrough i =
-+++@@ -720,6 +720,12 @@ let emit_instr env fallthrough i =
-++    | Lop(Iintop_imm(op, n)) ->
-++        (* We have i.arg.(0) = i.res.(0) *)
-++        instr_for_intop op (int n) (res i 0)
-++@@ -120,7 +120,7 @@
-++ diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-++ --- a/asmcomp/amd64/proc.ml
-++ +++ b/asmcomp/amd64/proc.ml
-++-@@ -342,22 +342,28 @@ let safe_register_pressure = function
-+++@@ -350,22 +350,28 @@ let safe_register_pressure = function
-++      Iextcall _ -> if win64 then if fp then 7 else 8 else 0
-++    | _ -> if fp then 10 else 11
-++  
-++@@ -185,7 +185,7 @@
-++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-++ --- a/asmcomp/arm64/emit.mlp
-++ +++ b/asmcomp/arm64/emit.mlp
-++-@@ -490,6 +490,7 @@ module BR = Branch_relaxation.Make (struct
-+++@@ -506,6 +506,7 @@ module BR = Branch_relaxation.Make (struct
-++        | _ -> 1 + num_instructions_for_intconst (Nativeint.of_int num_bytes)
-++        end
-++      | Lop (Iintop (Icomp _)) -> 2
-++@@ -193,7 +193,7 @@
-++      | Lop (Iintop_imm (Icomp _, _)) -> 2
-++      | Lop (Iintop (Icheckbound)) -> 2
-++      | Lop (Ispecific (Ifar_intop_checkbound)) -> 3
-++-@@ -656,6 +657,19 @@ let emit_load_literal dst lbl =
-+++@@ -676,6 +677,19 @@ let emit_load_literal dst lbl =
-++      `	ldr	{emit_reg dst}, [{emit_reg reg_tmp1}, #:lo12:{emit_label lbl}]\n`
-++    end
-++  
-++@@ -213,7 +213,7 @@
-++  (* Output the assembly code for an instruction *)
-++  
-++  let emit_instr env i =
-++-@@ -833,6 +847,10 @@ let emit_instr env i =
-+++@@ -871,6 +885,10 @@ let emit_instr env i =
-++      | Lop(Iintop(Icomp cmp)) ->
-++          `	cmp	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`;
-++          `	cset	{emit_reg i.res.(0)}, {emit_string (name_for_comparison cmp)}\n`
-++@@ -224,7 +224,7 @@
-++      | Lop(Iintop_imm(Icomp cmp, n)) ->
-++          emit_cmpimm i.arg.(0) n;
-++          `	cset	{emit_reg i.res.(0)}, {emit_string (name_for_comparison cmp)}\n`
-++-@@ -963,19 +981,7 @@ let emit_instr env i =
-+++@@ -1006,19 +1024,7 @@ let emit_instr env i =
-++              let comp = name_for_comparison cmp in
-++              `	b.{emit_string comp}	{emit_label lbl}\n`
-++          | Ifloattest cmp ->
-++@@ -408,7 +408,7 @@
-++  (* Record live pointers at call points *)
-++  
-++  let record_frame_label env live dbg =
-++-@@ -455,6 +470,9 @@ let emit_instr env i =
-+++@@ -457,6 +472,9 @@ let emit_instr env i =
-++            `	sltu	{emit_reg i.res.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(0)}\n`;
-++            `	xori	{emit_reg i.res.(0)}, {emit_reg i.res.(0)}, 1\n`;
-++        end
-++@@ -418,7 +418,7 @@
-++    | Lop(Iintop (Icheckbound)) ->
-++        let lbl = bound_error_label env i.dbg in
-++        `	bleu	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_label lbl}\n`
-++-@@ -514,18 +532,12 @@ let emit_instr env i =
-+++@@ -520,18 +538,12 @@ let emit_instr env i =
-++        | Iinttest_imm _ ->
-++            Misc.fatal_error "Emit.emit_instr (Iinttest_imm _)"
-++        | Ifloattest cmp ->
++@@ -0,0 +1,12 @@
+++--- a	2023-09-28 18:46:52.279158457 +0100
++++++ b	2023-09-28 18:46:52.299159199 +0100
+++@@ -70,6 +70,6 @@
+++ +- #11879: Bugfix for Ctype.nondep_type
+++ +  (Stephen Dolan, review by Gabriel Scherer)
+++ +
+++- OCaml 5.0
+++- ---------
+++- 
++++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
++++   that causes very slow compaction.
++++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10226,12 +10102,12 @@ index 0000000000..de7a56dd61
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index d9bd626179..9ca1558d29 100644
++index bd1d274a63..e5527368c6 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -474,6 +474,10 @@ Working version
-+   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
-+    Nicolás Ojeda Bär)
++@@ -481,6 +481,10 @@ Working version
++ - #11879: Bugfix for Ctype.nondep_type
++   (Stephen Dolan, review by Gabriel Scherer)
 + 
 ++- #12264, #12289: Fix compact_allocate to avoid a pathological case
 ++  that causes very slow compaction.
@@ -10240,7 +10116,7 @@ index 0000000000..de7a56dd61
 + OCaml 5.0
 + ---------
 + 
-+@@ -1010,11 +1014,6 @@ OCaml 5.0
++@@ -1017,11 +1021,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10252,7 +10128,7 @@ index 0000000000..de7a56dd61
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1043,6 +1042,30 @@ OCaml 5.0
++@@ -1050,6 +1049,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10283,7 +10159,7 @@ index 0000000000..de7a56dd61
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1078,13 +1101,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1085,13 +1108,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10299,7 +10175,7 @@ index 0000000000..de7a56dd61
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1191,6 +1214,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1198,6 +1221,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10309,7 +10185,7 @@ index 0000000000..de7a56dd61
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1450,6 +1476,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1457,6 +1483,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20231,37 +20107,7 @@ index 0000000000..de7a56dd61
 +++      # And run the entire testsuite, skipping all the native-code tests
 +++    fi
 ++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../$BUILD_PREFIX-$PORT/build.log" |
-++             sed -e 's/\d027\[K//g' \
-++                 -e 's/\d027\[m/\d027[0
+++         make -C "$FULL_BUILD_PREFIX-$POR
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644

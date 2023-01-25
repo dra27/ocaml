@@ -1,74 +1,12 @@
---- a	2023-09-28 18:46:51.931145543 +0100
-+++ b	2023-09-28 18:46:51.959146582 +0100
-@@ -104,7 +104,7 @@
- diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
- --- a/asmcomp/amd64/emit.mlp
- +++ b/asmcomp/amd64/emit.mlp
--@@ -698,6 +698,12 @@ let emit_instr env fallthrough i =
-+@@ -720,6 +720,12 @@ let emit_instr env fallthrough i =
-    | Lop(Iintop_imm(op, n)) ->
-        (* We have i.arg.(0) = i.res.(0) *)
-        instr_for_intop op (int n) (res i 0)
-@@ -120,7 +120,7 @@
- diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
- --- a/asmcomp/amd64/proc.ml
- +++ b/asmcomp/amd64/proc.ml
--@@ -342,22 +342,28 @@ let safe_register_pressure = function
-+@@ -350,22 +350,28 @@ let safe_register_pressure = function
-      Iextcall _ -> if win64 then if fp then 7 else 8 else 0
-    | _ -> if fp then 10 else 11
-  
-@@ -185,7 +185,7 @@
- diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
- --- a/asmcomp/arm64/emit.mlp
- +++ b/asmcomp/arm64/emit.mlp
--@@ -490,6 +490,7 @@ module BR = Branch_relaxation.Make (struct
-+@@ -506,6 +506,7 @@ module BR = Branch_relaxation.Make (struct
-        | _ -> 1 + num_instructions_for_intconst (Nativeint.of_int num_bytes)
-        end
-      | Lop (Iintop (Icomp _)) -> 2
-@@ -193,7 +193,7 @@
-      | Lop (Iintop_imm (Icomp _, _)) -> 2
-      | Lop (Iintop (Icheckbound)) -> 2
-      | Lop (Ispecific (Ifar_intop_checkbound)) -> 3
--@@ -656,6 +657,19 @@ let emit_load_literal dst lbl =
-+@@ -676,6 +677,19 @@ let emit_load_literal dst lbl =
-      `	ldr	{emit_reg dst}, [{emit_reg reg_tmp1}, #:lo12:{emit_label lbl}]\n`
-    end
-  
-@@ -213,7 +213,7 @@
-  (* Output the assembly code for an instruction *)
-  
-  let emit_instr env i =
--@@ -833,6 +847,10 @@ let emit_instr env i =
-+@@ -871,6 +885,10 @@ let emit_instr env i =
-      | Lop(Iintop(Icomp cmp)) ->
-          `	cmp	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`;
-          `	cset	{emit_reg i.res.(0)}, {emit_string (name_for_comparison cmp)}\n`
-@@ -224,7 +224,7 @@
-      | Lop(Iintop_imm(Icomp cmp, n)) ->
-          emit_cmpimm i.arg.(0) n;
-          `	cset	{emit_reg i.res.(0)}, {emit_string (name_for_comparison cmp)}\n`
--@@ -963,19 +981,7 @@ let emit_instr env i =
-+@@ -1006,19 +1024,7 @@ let emit_instr env i =
-              let comp = name_for_comparison cmp in
-              `	b.{emit_string comp}	{emit_label lbl}\n`
-          | Ifloattest cmp ->
-@@ -408,7 +408,7 @@
-  (* Record live pointers at call points *)
-  
-  let record_frame_label env live dbg =
--@@ -455,6 +470,9 @@ let emit_instr env i =
-+@@ -457,6 +472,9 @@ let emit_instr env i =
-            `	sltu	{emit_reg i.res.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(0)}\n`;
-            `	xori	{emit_reg i.res.(0)}, {emit_reg i.res.(0)}, 1\n`;
-        end
-@@ -418,7 +418,7 @@
-    | Lop(Iintop (Icheckbound)) ->
-        let lbl = bound_error_label env i.dbg in
-        `	bleu	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_label lbl}\n`
--@@ -514,18 +532,12 @@ let emit_instr env i =
-+@@ -520,18 +538,12 @@ let emit_instr env i =
-        | Iinttest_imm _ ->
-            Misc.fatal_error "Emit.emit_instr (Iinttest_imm _)"
-        | Ifloattest cmp ->
+--- a	2023-09-28 18:46:52.279158457 +0100
++++ b	2023-09-28 18:46:52.299159199 +0100
+@@ -70,6 +70,6 @@
+ +- #11879: Bugfix for Ctype.nondep_type
+ +  (Stephen Dolan, review by Gabriel Scherer)
+ +
+- OCaml 5.0
+- ---------
+- 
++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
++   that causes very slow compaction.
++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
