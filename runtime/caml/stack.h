@@ -42,6 +42,10 @@
 #define Trap_frame_size 16
 #endif
 
+#ifdef TARGET_arm
+#define Saved_return_address(sp) *((intnat *)((sp) - 4))
+#endif
+
 #ifdef TARGET_amd64
 /* Size of the gc_regs structure, in words.
    See amd64.S and amd64/proc.ml for the indices */
