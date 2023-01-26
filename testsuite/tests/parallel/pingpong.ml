@@ -1,4 +1,5 @@
 (* TEST
+multi_domain = "true"
 *)
 
 let r = ref (Some 0)

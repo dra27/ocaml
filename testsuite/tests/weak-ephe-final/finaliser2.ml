@@ -1,4 +1,6 @@
-(* TEST *)
+(* TEST
+   multi_domain = "true"
+*)
 
 let () = Out_channel.set_buffered stdout false
 

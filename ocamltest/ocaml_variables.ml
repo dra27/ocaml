@@ -238,6 +238,9 @@ let use_runtime =
   Variables.make ("use_runtime",
     "Whether the -use-runtime option should be used" )
 
+let multi_domain = make ("multi_domain",
+  "Set to \"true\" if the test requires multiple domains")
+
 let _ = List.iter register_variable
   [
     all_modules;
@@ -299,4 +302,5 @@ let _ = List.iter register_variable
     shared_library_cflags;
     sharedobjext;
     use_runtime;
+    multi_domain;
   ]

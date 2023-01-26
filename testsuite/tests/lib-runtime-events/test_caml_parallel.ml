@@ -1,4 +1,5 @@
 (* TEST
+multi_domain = "true"
 include runtime_events
 *)
 open Runtime_events

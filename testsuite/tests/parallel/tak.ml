@@ -1,4 +1,5 @@
 (* TEST
+multi_domain = "true"
 *)
 
 (* filling minor heaps in parallel to trigger

@@ -1,4 +1,5 @@
 (* TEST
+multi_domain = "true"
 *)
 
 (* when run with the bytecode debug runtime, this test

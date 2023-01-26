@@ -1,5 +1,6 @@
 (* TEST
    ocamlopt_flags += " -O3 "
+   multi_domain = "true"
 *)
 let rec safe_force l =
   try Lazy.force l with

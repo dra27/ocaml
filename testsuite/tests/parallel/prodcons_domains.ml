@@ -1,4 +1,5 @@
 (* TEST
+multi_domain = "true"
 *)
 
 (* Classic producer-consumer *)

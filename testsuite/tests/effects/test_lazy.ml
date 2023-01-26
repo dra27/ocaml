@@ -1,4 +1,6 @@
-(* TEST *)
+(* TEST
+   multi_domain = "true"
+*)
 
 open Effect
 open Effect.Deep

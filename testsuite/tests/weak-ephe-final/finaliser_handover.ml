@@ -1,4 +1,6 @@
-(* TEST *)
+(* TEST
+multi_domain = "true"
+*)
 
 (* ocaml-multicore issues 528 and 468 *)
 

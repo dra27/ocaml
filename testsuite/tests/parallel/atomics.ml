@@ -1,4 +1,5 @@
 (* TEST
+   multi_domain = "true"
 *)
 
 type u = U of unit

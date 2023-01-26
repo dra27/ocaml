@@ -1,4 +1,5 @@
 (* TEST
+multi_domain = "true"
 * hasunix
 include unix
 ** bytecode

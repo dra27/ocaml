@@ -1,5 +1,6 @@
 (* TEST
    modules = "stubs.c"
+   multi_domain = "true"
 *)
 
 external init_skiplist : unit -> unit = "init_skiplist"

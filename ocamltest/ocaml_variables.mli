@@ -134,3 +134,5 @@ val shared_library_cflags : Variables.t
 val sharedobjext : Variables.t
 
 val use_runtime : Variables.t
+
+val multi_domain : Variables.t

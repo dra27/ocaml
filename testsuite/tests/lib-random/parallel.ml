@@ -1,5 +1,6 @@
 (* TEST
    include unix
+   multi_domain = "true"
    * libunix
    ** bytecode
    ** native

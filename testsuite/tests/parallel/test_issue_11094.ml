@@ -1,6 +1,5 @@
 (* TEST
-* bytecode
-* native
+multi_domain = "true"
 *)
 
 open Effect

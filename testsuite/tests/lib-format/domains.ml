@@ -1,4 +1,6 @@
-(* TEST *)
+(* TEST
+   multi_domain = "true"
+*)
 
 (** Test that domains stdout and stderr are flushed at domain exit *)
 

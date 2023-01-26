@@ -397,22 +397,31 @@ let setup_tool_build_env tool log env =
   Actions_helpers.setup_build_env false source_modules log env
 
 let setup_compiler_build_env (compiler : Ocaml_compilers.compiler) log env =
-  let (r, env) = setup_tool_build_env compiler log env in
-  if Result.is_pass r then
-  begin
-    let prog_var = compiler#program_variable in
-    let prog_output_var = compiler#program_output_variable in
-    let default_prog_file = get_program_file compiler#target env in
-    let env = Environments.add_if_undefined prog_var default_prog_file env in
-    let prog_file = Environments.safe_lookup prog_var env in
-    let prog_output_file = prog_file ^ ".output" in
-    let env = match prog_output_var with
-      | None -> env
-      | Some outputvar ->
-        Environments.add_if_undefined outputvar prog_output_file env
-    in
-    (r, env)
-  end else (r, env)
+  let needs_multi_domain =
+    Environments.lookup_as_bool Ocaml_variables.multi_domain env = Some true
+  in
+  let is_single_domain =
+    Sys.word_size = 32 && Ocaml_backends.is_native (compiler#target)
+  in
+  if needs_multi_domain && is_single_domain then
+    (Result.skip_with_reason "single-domain runtime", env)
+  else
+    let (r, env) = setup_tool_build_env compiler log env in
+    if Result.is_pass r then
+    begin
+      let prog_var = compiler#program_variable in
+      let prog_output_var = compiler#program_output_variable in
+      let default_prog_file = get_program_file compiler#target env in
+      let env = Environments.add_if_undefined prog_var default_prog_file env in
+      let prog_file = Environments.safe_lookup prog_var env in
+      let prog_output_file = prog_file ^ ".output" in
+      let env = match prog_output_var with
+        | None -> env
+        | Some outputvar ->
+          Environments.add_if_undefined outputvar prog_output_file env
+      in
+      (r, env)
+    end else (r, env)
 
 let setup_toplevel_build_env (toplevel : Ocaml_toplevels.toplevel) log env =
   setup_tool_build_env toplevel log env

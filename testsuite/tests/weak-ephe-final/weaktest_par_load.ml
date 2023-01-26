@@ -1,4 +1,6 @@
-(* TEST *)
+(* TEST
+multi_domain = "true"
+*)
 
 (* Testing unsynchronized, parallel Weak usage *)
 

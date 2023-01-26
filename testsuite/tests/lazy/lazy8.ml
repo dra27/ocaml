@@ -1,5 +1,6 @@
 (* TEST
    ocamlopt_flags += " -O3 "
+   multi_domain = "true"
 *)
 
 exception E

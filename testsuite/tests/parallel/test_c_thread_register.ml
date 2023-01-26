@@ -1,4 +1,5 @@
 (* TEST
+   multi_domain = "true"
    modules = "test_c_thread_register_cstubs.c"
    * hassysthreads
    include systhreads
