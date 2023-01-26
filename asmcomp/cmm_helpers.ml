@@ -640,6 +640,10 @@ let get_field_gen mutability ptr n dbg =
   Cop(Cload {memory_chunk=Word_val; mutability; is_atomic=false},
       [field_address ptr n dbg], dbg)
 
+let get_field_codepointer mutability ptr n dbg =
+  Cop(Cload {memory_chunk=Word_int; mutability; is_atomic=false},
+      [field_address ptr n dbg], dbg)
+
 let set_field ptr n newval init dbg =
   Cop(Cstore (Word_val, init), [field_address ptr n dbg; newval], dbg)
 
@@ -1617,7 +1621,7 @@ let generic_apply mut clos args dbg =
   match args with
   | [arg] ->
       bind "fun" clos (fun clos ->
-        Cop(Capply typ_val, [get_field_gen mut clos 0 dbg; arg; clos],
+        Cop(Capply typ_val, [get_field_codepointer mut clos 0 dbg; arg; clos],
           dbg))
   | _ ->
       let arity = List.length args in
@@ -1727,7 +1731,7 @@ let apply_function_body arity =
   let rec app_fun clos n =
     if n = arity-1 then
       Cop(Capply typ_val,
-          [get_field_gen Asttypes.Mutable (Cvar clos) 0 (dbg ());
+          [get_field_codepointer Asttypes.Mutable (Cvar clos) 0 (dbg ());
            Cvar arg.(n);
            Cvar clos],
           dbg ())
@@ -1735,7 +1739,7 @@ let apply_function_body arity =
       let newclos = V.create_local "clos" in
       Clet(VP.create newclos,
            Cop(Capply typ_val,
-               [get_field_gen Asttypes.Mutable (Cvar clos) 0 (dbg ());
+               [get_field_codepointer Asttypes.Mutable (Cvar clos) 0 (dbg ());
                 Cvar arg.(n); Cvar clos], dbg ()),
            app_fun newclos (n+1))
     end in
@@ -1750,7 +1754,7 @@ let apply_function_body arity =
                    Cconst_int(arity, dbg())], dbg()),
    dbg (),
    Cop(Capply typ_val,
-       get_field_gen Asttypes.Mutable (Cvar clos) 2 (dbg ())
+       get_field_codepointer Asttypes.Mutable (Cvar clos) 2 (dbg ())
        :: List.map (fun s -> Cvar s) all_args,
        dbg ()),
    dbg (),
@@ -1843,7 +1847,7 @@ let tuplify_function arity =
     fun_args = [VP.create arg, typ_val; VP.create clos, typ_val];
     fun_body =
       Cop(Capply typ_val,
-          get_field_gen Asttypes.Mutable (Cvar clos) 2 (dbg ())
+          get_field_codepointer Asttypes.Mutable (Cvar clos) 2 (dbg ())
           :: access_components 0 @ [Cvar clos],
           (dbg ()));
     fun_codegen_options = [];
@@ -1887,7 +1891,7 @@ let final_curry_function arity =
   let rec curry_fun args clos n =
     if n = 0 then
       Cop(Capply typ_val,
-          get_field_gen Asttypes.Mutable (Cvar clos) 2 (dbg ()) ::
+          get_field_codepointer Asttypes.Mutable (Cvar clos) 2 (dbg ()) ::
             args @ [Cvar last_arg; Cvar clos],
           dbg ())
     else
@@ -1967,7 +1971,8 @@ let rec intermediate_curry_functions arity num =
           let rec iter i args clos =
             if i = 0 then
               Cop(Capply typ_val,
-                  (get_field_gen Asttypes.Mutable (Cvar clos) 2 (dbg ()))
+                  (get_field_codepointer
+                     Asttypes.Mutable (Cvar clos) 2 (dbg ()))
                   :: args @ [Cvar clos],
                   dbg ())
             else

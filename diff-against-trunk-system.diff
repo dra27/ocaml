@@ -1,21 +1,74 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..5ca6c82319
+index 0000000000..7d521b533f
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,12 @@
-+--- a	2023-09-28 18:46:52.279158457 +0100
-++++ b	2023-09-28 18:46:52.299159199 +0100
-+@@ -70,6 +70,6 @@
-+ +- #11879: Bugfix for Ctype.nondep_type
-+ +  (Stephen Dolan, review by Gabriel Scherer)
-+ +
-+- OCaml 5.0
-+- ---------
-+- 
-++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-++   that causes very slow compaction.
-++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+@@ -0,0 +1,65 @@
++--- a	2023-09-28 18:46:52.595170183 +0100
+++++ b	2023-09-28 18:46:52.611170776 +0100
++@@ -25,7 +25,7 @@
++  let set_field ptr n newval init dbg =
++    Cop(Cstore (Word_val, init), [field_address ptr n dbg; newval], dbg)
++  
++-@@ -1613,7 +1617,7 @@ let generic_apply mut clos args dbg =
+++@@ -1617,7 +1621,7 @@ let generic_apply mut clos args dbg =
++    match args with
++    | [arg] ->
++        bind "fun" clos (fun clos ->
++@@ -34,7 +34,7 @@
++            dbg))
++    | _ ->
++        let arity = List.length args in
++-@@ -1723,7 +1727,7 @@ let apply_function_body arity =
+++@@ -1727,7 +1731,7 @@ let apply_function_body arity =
++    let rec app_fun clos n =
++      if n = arity-1 then
++        Cop(Capply typ_val,
++@@ -43,7 +43,7 @@
++             Cvar arg.(n);
++             Cvar clos],
++            dbg ())
++-@@ -1731,7 +1735,7 @@ let apply_function_body arity =
+++@@ -1735,7 +1739,7 @@ let apply_function_body arity =
++        let newclos = V.create_local "clos" in
++        Clet(VP.create newclos,
++             Cop(Capply typ_val,
++@@ -52,7 +52,7 @@
++                  Cvar arg.(n); Cvar clos], dbg ()),
++             app_fun newclos (n+1))
++      end in
++-@@ -1746,7 +1750,7 @@ let apply_function_body arity =
+++@@ -1750,7 +1754,7 @@ let apply_function_body arity =
++                     Cconst_int(arity, dbg())], dbg()),
++     dbg (),
++     Cop(Capply typ_val,
++@@ -61,7 +61,7 @@
++         :: List.map (fun s -> Cvar s) all_args,
++         dbg ()),
++     dbg (),
++-@@ -1839,7 +1843,7 @@ let tuplify_function arity =
+++@@ -1843,7 +1847,7 @@ let tuplify_function arity =
++      fun_args = [VP.create arg, typ_val; VP.create clos, typ_val];
++      fun_body =
++        Cop(Capply typ_val,
++@@ -70,7 +70,7 @@
++            :: access_components 0 @ [Cvar clos],
++            (dbg ()));
++      fun_codegen_options = [];
++-@@ -1883,7 +1887,7 @@ let final_curry_function arity =
+++@@ -1887,7 +1891,7 @@ let final_curry_function arity =
++    let rec curry_fun args clos n =
++      if n = 0 then
++        Cop(Capply typ_val,
++@@ -79,7 +79,7 @@
++              args @ [Cvar last_arg; Cvar clos],
++            dbg ())
++      else
++-@@ -1963,7 +1967,8 @@ let rec intermediate_curry_functions arity num =
+++@@ -1967,7 +1971,8 @@ let rec intermediate_curry_functions arity num =
++            let rec iter i args clos =
++              if i = 0 then
++                Cop(Capply typ_val,
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -29,10 +82,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index bd1d274a63..e5527368c6 100644
+index 53adb5d543..89a1d0e8bc 100644
 --- a/Changes
 +++ b/Changes
-@@ -481,6 +481,10 @@ Working version
+@@ -484,6 +484,10 @@ Working version
  - #11879: Bugfix for Ctype.nondep_type
    (Stephen Dolan, review by Gabriel Scherer)
  
@@ -43,7 +96,7 @@ index bd1d274a63..e5527368c6 100644
  OCaml 5.0
  ---------
  
-@@ -1017,11 +1021,6 @@ OCaml 5.0
+@@ -1020,11 +1024,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -55,7 +108,7 @@ index bd1d274a63..e5527368c6 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1050,6 +1049,30 @@ OCaml 5.0
+@@ -1053,6 +1052,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -86,7 +139,7 @@ index bd1d274a63..e5527368c6 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1085,13 +1108,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1088,13 +1111,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -102,7 +155,7 @@ index bd1d274a63..e5527368c6 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1198,6 +1221,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1201,6 +1224,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -112,7 +165,7 @@ index bd1d274a63..e5527368c6 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1457,6 +1483,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1460,6 +1486,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -668,10 +721,10 @@ index a0c9f62442..f335149b20 100644
    cfi_endproc();
    emit_symbol_type emit_symbol fundecl.fun_name "function";
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index 40ff3fccdd..773655f1f9 100644
+index 730f295e63..e982c214b6 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -812,7 +812,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
+@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
      | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
                            fill_fields (idx + 2) el) in
      Clet(VP.create id,
@@ -683,7 +736,7 @@ index 40ff3fccdd..773655f1f9 100644
                   [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
           fill_fields 1 args)
    end
-@@ -2111,8 +2115,13 @@ let assignment_kind
+@@ -2116,8 +2120,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -10067,28 +10120,81 @@ index 0000000000..a455c16e94
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a3295d044b
+index 0000000000..ed5692035a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10037 @@
+@@ -0,0 +1,10054 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..5ca6c82319
++index 0000000000..7d521b533f
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,12 @@
-++--- a	2023-09-28 18:46:52.279158457 +0100
-+++++ b	2023-09-28 18:46:52.299159199 +0100
-++@@ -70,6 +70,6 @@
-++ +- #11879: Bugfix for Ctype.nondep_type
-++ +  (Stephen Dolan, review by Gabriel Scherer)
-++ +
-++- OCaml 5.0
-++- ---------
-++- 
-+++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-+++   that causes very slow compaction.
-+++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
++@@ -0,0 +1,65 @@
+++--- a	2023-09-28 18:46:52.595170183 +0100
++++++ b	2023-09-28 18:46:52.611170776 +0100
+++@@ -25,7 +25,7 @@
+++  let set_field ptr n newval init dbg =
+++    Cop(Cstore (Word_val, init), [field_address ptr n dbg; newval], dbg)
+++  
+++-@@ -1613,7 +1617,7 @@ let generic_apply mut clos args dbg =
++++@@ -1617,7 +1621,7 @@ let generic_apply mut clos args dbg =
+++    match args with
+++    | [arg] ->
+++        bind "fun" clos (fun clos ->
+++@@ -34,7 +34,7 @@
+++            dbg))
+++    | _ ->
+++        let arity = List.length args in
+++-@@ -1723,7 +1727,7 @@ let apply_function_body arity =
++++@@ -1727,7 +1731,7 @@ let apply_function_body arity =
+++    let rec app_fun clos n =
+++      if n = arity-1 then
+++        Cop(Capply typ_val,
+++@@ -43,7 +43,7 @@
+++             Cvar arg.(n);
+++             Cvar clos],
+++            dbg ())
+++-@@ -1731,7 +1735,7 @@ let apply_function_body arity =
++++@@ -1735,7 +1739,7 @@ let apply_function_body arity =
+++        let newclos = V.create_local "clos" in
+++        Clet(VP.create newclos,
+++             Cop(Capply typ_val,
+++@@ -52,7 +52,7 @@
+++                  Cvar arg.(n); Cvar clos], dbg ()),
+++             app_fun newclos (n+1))
+++      end in
+++-@@ -1746,7 +1750,7 @@ let apply_function_body arity =
++++@@ -1750,7 +1754,7 @@ let apply_function_body arity =
+++                     Cconst_int(arity, dbg())], dbg()),
+++     dbg (),
+++     Cop(Capply typ_val,
+++@@ -61,7 +61,7 @@
+++         :: List.map (fun s -> Cvar s) all_args,
+++         dbg ()),
+++     dbg (),
+++-@@ -1839,7 +1843,7 @@ let tuplify_function arity =
++++@@ -1843,7 +1847,7 @@ let tuplify_function arity =
+++      fun_args = [VP.create arg, typ_val; VP.create clos, typ_val];
+++      fun_body =
+++        Cop(Capply typ_val,
+++@@ -70,7 +70,7 @@
+++            :: access_components 0 @ [Cvar clos],
+++            (dbg ()));
+++      fun_codegen_options = [];
+++-@@ -1883,7 +1887,7 @@ let final_curry_function arity =
++++@@ -1887,7 +1891,7 @@ let final_curry_function arity =
+++    let rec curry_fun args clos n =
+++      if n = 0 then
+++        Cop(Capply typ_val,
+++@@ -79,7 +79,7 @@
+++              args @ [Cvar last_arg; Cvar clos],
+++            dbg ())
+++      else
+++-@@ -1963,7 +1967,8 @@ let rec intermediate_curry_functions arity num =
++++@@ -1967,7 +1971,8 @@ let rec intermediate_curry_functions arity num =
+++            let rec iter i args clos =
+++              if i = 0 then
+++                Cop(Capply typ_val,
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10102,10 +10208,10 @@ index 0000000000..a3295d044b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index bd1d274a63..e5527368c6 100644
++index 53adb5d543..89a1d0e8bc 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -481,6 +481,10 @@ Working version
++@@ -484,6 +484,10 @@ Working version
 + - #11879: Bugfix for Ctype.nondep_type
 +   (Stephen Dolan, review by Gabriel Scherer)
 + 
@@ -10116,7 +10222,7 @@ index 0000000000..a3295d044b
 + OCaml 5.0
 + ---------
 + 
-+@@ -1017,11 +1021,6 @@ OCaml 5.0
++@@ -1020,11 +1024,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10128,7 +10234,7 @@ index 0000000000..a3295d044b
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1050,6 +1049,30 @@ OCaml 5.0
++@@ -1053,6 +1052,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10159,7 +10265,7 @@ index 0000000000..a3295d044b
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1085,13 +1108,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1088,13 +1111,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10175,7 +10281,7 @@ index 0000000000..a3295d044b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1198,6 +1221,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1201,6 +1224,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10185,7 +10291,7 @@ index 0000000000..a3295d044b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1457,6 +1483,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1460,6 +1486,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10741,10 +10847,10 @@ index 0000000000..a3295d044b
 +   cfi_endproc();
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index 40ff3fccdd..773655f1f9 100644
++index 730f295e63..e982c214b6 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -812,7 +812,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
++@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
 +     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
 +                           fill_fields (idx + 2) el) in
 +     Clet(VP.create id,
@@ -10756,7 +10862,7 @@ index 0000000000..a3295d044b
 +                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
 +          fill_fields 1 args)
 +   end
-+@@ -2111,8 +2115,13 @@ let assignment_kind
++@@ -2116,8 +2120,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -20071,43 +20177,7 @@ index 0000000000..a3295d044b
 ++@@ -139,29 +139,40 @@ case "$1" in
 ++     ;;
 ++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$POR
+++     FULL_BUILD_PR
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644

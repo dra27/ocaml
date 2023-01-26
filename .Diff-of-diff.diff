@@ -1,12 +1,65 @@
---- a	2023-09-28 18:46:52.279158457 +0100
-+++ b	2023-09-28 18:46:52.299159199 +0100
-@@ -70,6 +70,6 @@
- +- #11879: Bugfix for Ctype.nondep_type
- +  (Stephen Dolan, review by Gabriel Scherer)
- +
-- OCaml 5.0
-- ---------
-- 
-+ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-+   that causes very slow compaction.
-+   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+--- a	2023-09-28 18:46:52.595170183 +0100
++++ b	2023-09-28 18:46:52.611170776 +0100
+@@ -25,7 +25,7 @@
+  let set_field ptr n newval init dbg =
+    Cop(Cstore (Word_val, init), [field_address ptr n dbg; newval], dbg)
+  
+-@@ -1613,7 +1617,7 @@ let generic_apply mut clos args dbg =
++@@ -1617,7 +1621,7 @@ let generic_apply mut clos args dbg =
+    match args with
+    | [arg] ->
+        bind "fun" clos (fun clos ->
+@@ -34,7 +34,7 @@
+            dbg))
+    | _ ->
+        let arity = List.length args in
+-@@ -1723,7 +1727,7 @@ let apply_function_body arity =
++@@ -1727,7 +1731,7 @@ let apply_function_body arity =
+    let rec app_fun clos n =
+      if n = arity-1 then
+        Cop(Capply typ_val,
+@@ -43,7 +43,7 @@
+             Cvar arg.(n);
+             Cvar clos],
+            dbg ())
+-@@ -1731,7 +1735,7 @@ let apply_function_body arity =
++@@ -1735,7 +1739,7 @@ let apply_function_body arity =
+        let newclos = V.create_local "clos" in
+        Clet(VP.create newclos,
+             Cop(Capply typ_val,
+@@ -52,7 +52,7 @@
+                  Cvar arg.(n); Cvar clos], dbg ()),
+             app_fun newclos (n+1))
+      end in
+-@@ -1746,7 +1750,7 @@ let apply_function_body arity =
++@@ -1750,7 +1754,7 @@ let apply_function_body arity =
+                     Cconst_int(arity, dbg())], dbg()),
+     dbg (),
+     Cop(Capply typ_val,
+@@ -61,7 +61,7 @@
+         :: List.map (fun s -> Cvar s) all_args,
+         dbg ()),
+     dbg (),
+-@@ -1839,7 +1843,7 @@ let tuplify_function arity =
++@@ -1843,7 +1847,7 @@ let tuplify_function arity =
+      fun_args = [VP.create arg, typ_val; VP.create clos, typ_val];
+      fun_body =
+        Cop(Capply typ_val,
+@@ -70,7 +70,7 @@
+            :: access_components 0 @ [Cvar clos],
+            (dbg ()));
+      fun_codegen_options = [];
+-@@ -1883,7 +1887,7 @@ let final_curry_function arity =
++@@ -1887,7 +1891,7 @@ let final_curry_function arity =
+    let rec curry_fun args clos n =
+      if n = 0 then
+        Cop(Capply typ_val,
+@@ -79,7 +79,7 @@
+              args @ [Cvar last_arg; Cvar clos],
+            dbg ())
+      else
+-@@ -1963,7 +1967,8 @@ let rec intermediate_curry_functions arity num =
++@@ -1967,7 +1971,8 @@ let rec intermediate_curry_functions arity num =
+            let rec iter i args clos =
+              if i = 0 then
+                Cop(Capply typ_val,
