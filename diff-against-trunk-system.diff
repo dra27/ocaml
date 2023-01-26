@@ -1,74 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7d521b533f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,65 @@
-+--- a	2023-09-28 18:46:52.595170183 +0100
-++++ b	2023-09-28 18:46:52.611170776 +0100
-+@@ -25,7 +25,7 @@
-+  let set_field ptr n newval init dbg =
-+    Cop(Cstore (Word_val, init), [field_address ptr n dbg; newval], dbg)
-+  
-+-@@ -1613,7 +1617,7 @@ let generic_apply mut clos args dbg =
-++@@ -1617,7 +1621,7 @@ let generic_apply mut clos args dbg =
-+    match args with
-+    | [arg] ->
-+        bind "fun" clos (fun clos ->
-+@@ -34,7 +34,7 @@
-+            dbg))
-+    | _ ->
-+        let arity = List.length args in
-+-@@ -1723,7 +1727,7 @@ let apply_function_body arity =
-++@@ -1727,7 +1731,7 @@ let apply_function_body arity =
-+    let rec app_fun clos n =
-+      if n = arity-1 then
-+        Cop(Capply typ_val,
-+@@ -43,7 +43,7 @@
-+             Cvar arg.(n);
-+             Cvar clos],
-+            dbg ())
-+-@@ -1731,7 +1735,7 @@ let apply_function_body arity =
-++@@ -1735,7 +1739,7 @@ let apply_function_body arity =
-+        let newclos = V.create_local "clos" in
-+        Clet(VP.create newclos,
-+             Cop(Capply typ_val,
-+@@ -52,7 +52,7 @@
-+                  Cvar arg.(n); Cvar clos], dbg ()),
-+             app_fun newclos (n+1))
-+      end in
-+-@@ -1746,7 +1750,7 @@ let apply_function_body arity =
-++@@ -1750,7 +1754,7 @@ let apply_function_body arity =
-+                     Cconst_int(arity, dbg())], dbg()),
-+     dbg (),
-+     Cop(Capply typ_val,
-+@@ -61,7 +61,7 @@
-+         :: List.map (fun s -> Cvar s) all_args,
-+         dbg ()),
-+     dbg (),
-+-@@ -1839,7 +1843,7 @@ let tuplify_function arity =
-++@@ -1843,7 +1847,7 @@ let tuplify_function arity =
-+      fun_args = [VP.create arg, typ_val; VP.create clos, typ_val];
-+      fun_body =
-+        Cop(Capply typ_val,
-+@@ -70,7 +70,7 @@
-+            :: access_components 0 @ [Cvar clos],
-+            (dbg ()));
-+      fun_codegen_options = [];
-+-@@ -1883,7 +1887,7 @@ let final_curry_function arity =
-++@@ -1887,7 +1891,7 @@ let final_curry_function arity =
-+    let rec curry_fun args clos n =
-+      if n = 0 then
-+        Cop(Capply typ_val,
-+@@ -79,7 +79,7 @@
-+              args @ [Cvar last_arg; Cvar clos],
-+            dbg ())
-+      else
-+-@@ -1963,7 +1967,8 @@ let rec intermediate_curry_functions arity num =
-++@@ -1967,7 +1971,8 @@ let rec intermediate_curry_functions arity num =
-+            let rec iter i args clos =
-+              if i = 0 then
-+                Cop(Capply typ_val,
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -82,7 +14,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 53adb5d543..89a1d0e8bc 100644
+index 38c4bac351..dbf6c99a90 100644
 --- a/Changes
 +++ b/Changes
 @@ -484,6 +484,10 @@ Working version
@@ -10120,81 +10052,13 @@ index 0000000000..a455c16e94
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ed5692035a
+index 0000000000..19f5bc5f8f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10054 @@
+@@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..7d521b533f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,65 @@
-++--- a	2023-09-28 18:46:52.595170183 +0100
-+++++ b	2023-09-28 18:46:52.611170776 +0100
-++@@ -25,7 +25,7 @@
-++  let set_field ptr n newval init dbg =
-++    Cop(Cstore (Word_val, init), [field_address ptr n dbg; newval], dbg)
-++  
-++-@@ -1613,7 +1617,7 @@ let generic_apply mut clos args dbg =
-+++@@ -1617,7 +1621,7 @@ let generic_apply mut clos args dbg =
-++    match args with
-++    | [arg] ->
-++        bind "fun" clos (fun clos ->
-++@@ -34,7 +34,7 @@
-++            dbg))
-++    | _ ->
-++        let arity = List.length args in
-++-@@ -1723,7 +1727,7 @@ let apply_function_body arity =
-+++@@ -1727,7 +1731,7 @@ let apply_function_body arity =
-++    let rec app_fun clos n =
-++      if n = arity-1 then
-++        Cop(Capply typ_val,
-++@@ -43,7 +43,7 @@
-++             Cvar arg.(n);
-++             Cvar clos],
-++            dbg ())
-++-@@ -1731,7 +1735,7 @@ let apply_function_body arity =
-+++@@ -1735,7 +1739,7 @@ let apply_function_body arity =
-++        let newclos = V.create_local "clos" in
-++        Clet(VP.create newclos,
-++             Cop(Capply typ_val,
-++@@ -52,7 +52,7 @@
-++                  Cvar arg.(n); Cvar clos], dbg ()),
-++             app_fun newclos (n+1))
-++      end in
-++-@@ -1746,7 +1750,7 @@ let apply_function_body arity =
-+++@@ -1750,7 +1754,7 @@ let apply_function_body arity =
-++                     Cconst_int(arity, dbg())], dbg()),
-++     dbg (),
-++     Cop(Capply typ_val,
-++@@ -61,7 +61,7 @@
-++         :: List.map (fun s -> Cvar s) all_args,
-++         dbg ()),
-++     dbg (),
-++-@@ -1839,7 +1843,7 @@ let tuplify_function arity =
-+++@@ -1843,7 +1847,7 @@ let tuplify_function arity =
-++      fun_args = [VP.create arg, typ_val; VP.create clos, typ_val];
-++      fun_body =
-++        Cop(Capply typ_val,
-++@@ -70,7 +70,7 @@
-++            :: access_components 0 @ [Cvar clos],
-++            (dbg ()));
-++      fun_codegen_options = [];
-++-@@ -1883,7 +1887,7 @@ let final_curry_function arity =
-+++@@ -1887,7 +1891,7 @@ let final_curry_function arity =
-++    let rec curry_fun args clos n =
-++      if n = 0 then
-++        Cop(Capply typ_val,
-++@@ -79,7 +79,7 @@
-++              args @ [Cvar last_arg; Cvar clos],
-++            dbg ())
-++      else
-++-@@ -1963,7 +1967,8 @@ let rec intermediate_curry_functions arity num =
-+++@@ -1967,7 +1971,8 @@ let rec intermediate_curry_functions arity num =
-++            let rec iter i args clos =
-++              if i = 0 then
-++                Cop(Capply typ_val,
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10208,7 +10072,7 @@ index 0000000000..ed5692035a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 53adb5d543..89a1d0e8bc 100644
++index 38c4bac351..dbf6c99a90 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -484,6 +484,10 @@ Working version
@@ -20177,7 +20041,54 @@ index 0000000000..ed5692035a
 ++@@ -139,29 +139,40 @@ case "$1" in
 ++     ;;
 ++   test)
-++     FULL_BUILD_PR
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
