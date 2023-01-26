@@ -34,7 +34,11 @@ extern "C" {
 #ifdef ARCH_SIXTYFOUR
 #define Max_domains 128
 #else
+#ifdef NATIVE_CODE
+#define Max_domains 1
+#else
 #define Max_domains 16
+#endif
 #endif
 
 /* is the minor heap full or an external interrupt has been triggered */
