@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..8ed0e020c6
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:53.199192591 +0100
+++++ b	2023-09-28 18:46:53.219193333 +0100
++@@ -96,7 +96,7 @@
++      Cop(mk_load_mut Byte_unsigned,
++          [Cop(Cadda, [ptr; Cconst_int(tag_offset, dbg)], dbg)], dbg)
++  
++-@@ -1048,7 +1045,7 @@ let unbox_int dbg bi =
+++@@ -1052,7 +1049,7 @@ let unbox_int dbg bi =
++        then Thirtytwo_signed else Word_int
++      in
++      Cop(
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 38c4bac351..dbf6c99a90 100644
+index 494bb85e4f..62b2b657e9 100644
 --- a/Changes
 +++ b/Changes
-@@ -484,6 +484,10 @@ Working version
+@@ -488,6 +488,10 @@ Working version
  - #11879: Bugfix for Ctype.nondep_type
    (Stephen Dolan, review by Gabriel Scherer)
  
@@ -28,7 +42,7 @@ index 38c4bac351..dbf6c99a90 100644
  OCaml 5.0
  ---------
  
-@@ -1020,11 +1024,6 @@ OCaml 5.0
+@@ -1024,11 +1028,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index 38c4bac351..dbf6c99a90 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1053,6 +1052,30 @@ OCaml 5.0
+@@ -1057,6 +1056,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index 38c4bac351..dbf6c99a90 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1088,13 +1111,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1092,13 +1115,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index 38c4bac351..dbf6c99a90 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1201,6 +1224,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1205,6 +1228,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index 38c4bac351..dbf6c99a90 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1460,6 +1486,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1464,6 +1490,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -653,10 +667,10 @@ index a0c9f62442..f335149b20 100644
    cfi_endproc();
    emit_symbol_type emit_symbol fundecl.fun_name "function";
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index 730f295e63..e982c214b6 100644
+index ca57632f4a..567dba44cc 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
+@@ -813,7 +813,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
      | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
                            fill_fields (idx + 2) el) in
      Clet(VP.create id,
@@ -668,7 +682,7 @@ index 730f295e63..e982c214b6 100644
                   [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
           fill_fields 1 args)
    end
-@@ -2116,8 +2120,13 @@ let assignment_kind
+@@ -2113,8 +2117,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -10052,13 +10066,27 @@ index 0000000000..a455c16e94
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..19f5bc5f8f
+index 0000000000..dde771a11f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10033 @@
+@@ -0,0 +1,10037 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..8ed0e020c6
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:53.199192591 +0100
++++++ b	2023-09-28 18:46:53.219193333 +0100
+++@@ -96,7 +96,7 @@
+++      Cop(mk_load_mut Byte_unsigned,
+++          [Cop(Cadda, [ptr; Cconst_int(tag_offset, dbg)], dbg)], dbg)
+++  
+++-@@ -1048,7 +1045,7 @@ let unbox_int dbg bi =
++++@@ -1052,7 +1049,7 @@ let unbox_int dbg bi =
+++        then Thirtytwo_signed else Word_int
+++      in
+++      Cop(
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10072,10 +10100,10 @@ index 0000000000..19f5bc5f8f
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 38c4bac351..dbf6c99a90 100644
++index 494bb85e4f..62b2b657e9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -484,6 +484,10 @@ Working version
++@@ -488,6 +488,10 @@ Working version
 + - #11879: Bugfix for Ctype.nondep_type
 +   (Stephen Dolan, review by Gabriel Scherer)
 + 
@@ -10086,7 +10114,7 @@ index 0000000000..19f5bc5f8f
 + OCaml 5.0
 + ---------
 + 
-+@@ -1020,11 +1024,6 @@ OCaml 5.0
++@@ -1024,11 +1028,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10098,7 +10126,7 @@ index 0000000000..19f5bc5f8f
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1053,6 +1052,30 @@ OCaml 5.0
++@@ -1057,6 +1056,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10129,7 +10157,7 @@ index 0000000000..19f5bc5f8f
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1088,13 +1111,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1092,13 +1115,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10145,7 +10173,7 @@ index 0000000000..19f5bc5f8f
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1201,6 +1224,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1205,6 +1228,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10155,7 +10183,7 @@ index 0000000000..19f5bc5f8f
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1460,6 +1486,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1464,6 +1490,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10711,10 +10739,10 @@ index 0000000000..19f5bc5f8f
 +   cfi_endproc();
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index 730f295e63..e982c214b6 100644
++index ca57632f4a..567dba44cc 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
++@@ -813,7 +813,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
 +     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
 +                           fill_fields (idx + 2) el) in
 +     Clet(VP.create id,
@@ -10726,7 +10754,7 @@ index 0000000000..19f5bc5f8f
 +                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
 +          fill_fields 1 args)
 +   end
-+@@ -2116,8 +2120,13 @@ let assignment_kind
++@@ -2113,8 +2117,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -20078,17 +20106,7 @@ index 0000000000..19f5bc5f8f
 +++    fi
 ++     run "test $PORT" \
 ++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or
+++  
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
