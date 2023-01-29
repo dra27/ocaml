@@ -1,29 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..222737d78b
+index 0000000000..1a21bc6aa3
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:46:55.039260811 +0100
-++++ b	2023-09-28 18:46:55.055261404 +0100
-+@@ -15,7 +15,7 @@
-+ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-+ --- a/stdlib/filename.ml
-+ +++ b/stdlib/filename.ml
-+-@@ -347,7 +347,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
-++@@ -367,7 +367,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
-+        close_desc(open_desc name [Open_wronly; Open_creat; Open_excl] 0o600);
-+        name
-+      with Sys_error _ as e ->
-+@@ -24,7 +24,7 @@
-+    in try_name 0
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:55.359272667 +0100
+++++ b	2023-09-28 18:46:55.379273407 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -1289,6 +1289,10 @@ OCaml 4.14.0 (28 March 2022)
+++@@ -1315,6 +1315,10 @@ OCaml 4.14.0 (28 March 2022)
 +  
-+  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-+-@@ -359,5 +359,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-++@@ -379,5 +379,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-+        (name,
-+         open_out_gen (Open_wronly::Open_creat::Open_excl::mode) perms name)
-+      with Sys_error _ as e ->
++  ### Manual and documentation:
++  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -37,7 +28,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 23b3fe8495..09aa81d64b 100644
+index 2993acfe0b..e2ca145edb 100644
 --- a/Changes
 +++ b/Changes
 @@ -501,6 +501,10 @@ Working version
@@ -120,7 +111,7 @@ index 23b3fe8495..09aa81d64b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1477,6 +1503,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1481,6 +1507,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10111,36 +10102,27 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b68c76fcaf
+index 0000000000..3244236548
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10033 @@
+@@ -0,0 +1,10038 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..222737d78b
++index 0000000000..1a21bc6aa3
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:46:55.039260811 +0100
-+++++ b	2023-09-28 18:46:55.055261404 +0100
-++@@ -15,7 +15,7 @@
-++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-++ --- a/stdlib/filename.ml
-++ +++ b/stdlib/filename.ml
-++-@@ -347,7 +347,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
-+++@@ -367,7 +367,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
-++        close_desc(open_desc name [Open_wronly; Open_creat; Open_excl] 0o600);
-++        name
-++      with Sys_error _ as e ->
-++@@ -24,7 +24,7 @@
-++    in try_name 0
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:55.359272667 +0100
++++++ b	2023-09-28 18:46:55.379273407 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -1289,6 +1289,10 @@ OCaml 4.14.0 (28 March 2022)
++++@@ -1315,6 +1315,10 @@ OCaml 4.14.0 (28 March 2022)
 ++  
-++  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-++-@@ -359,5 +359,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-+++@@ -379,5 +379,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
-++        (name,
-++         open_out_gen (Open_wronly::Open_creat::Open_excl::mode) perms name)
-++      with Sys_error _ as e ->
+++  ### Manual and documentation:
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10154,7 +10136,7 @@ index 0000000000..b68c76fcaf
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 23b3fe8495..09aa81d64b 100644
++index 2993acfe0b..e2ca145edb 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -501,6 +501,10 @@ Working version
@@ -10237,7 +10219,7 @@ index 0000000000..b68c76fcaf
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1477,6 +1503,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1481,6 +1507,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20147,7 +20129,21 @@ index 0000000000..b68c76fcaf
 +++++ b/tools/ci/appveyor/appveyor_build.sh
 ++@@ -64,8 +64,8 @@ function set_configuration {
 ++         mingw64)
-++  
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/oc
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
