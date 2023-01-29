@@ -43,6 +43,8 @@ codegen_LIBS = $(addprefix $(COMPILERLIBSDIR)/,\
 codegen_OBJECTS = $(addsuffix .cmo,\
   parsecmmaux parsecmm lexcmm codegen_main)
 
+ALL_LIBS = $(expect_LIBS) $(codegen_LIBS)
+
 tools := $(expect_PROG)
 
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -74,13 +76,13 @@ lexcmm.cmo: lexcmm.cmi
 
 parsecmm.cmo: parsecmm.cmi
 
-%.cmi: %.mli
+%.cmi: %.mli $(ALL_LIBS:=.cma)
 	$(OCAMLC) $(COMPFLAGS) -c $<
 
-%.cmo: %.ml
+%.cmo: %.ml $(ALL_LIBS:=.cma)
 	$(OCAMLC) $(COMPFLAGS) -c $<
 
-%.cmx: %.ml
+%.cmx: %.ml $(ALL_LIBS:=.cmxa)
 	$(OCAMLOPT) $(COMPFLAGS) -c $<
 
 %.$(O): %.S
