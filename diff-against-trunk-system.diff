@@ -1,20 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..317ebc8e38
+index 0000000000..222737d78b
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:54.707248505 +0100
-++++ b	2023-09-28 18:46:54.723249098 +0100
-+@@ -88,7 +88,7 @@
-+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-+ --- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-+ +++ b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-+-@@ -12,9 +12,19 @@ let () =
-++@@ -14,9 +14,19 @@ let () =
-+      start ();
-+      let cursor = create_cursor None in
-+      let callbacks = Callbacks.create ~runtime_counter () in
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:46:55.039260811 +0100
+++++ b	2023-09-28 18:46:55.055261404 +0100
++@@ -15,7 +15,7 @@
++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
++ --- a/stdlib/filename.ml
++ +++ b/stdlib/filename.ml
++-@@ -347,7 +347,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
+++@@ -367,7 +367,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
++        close_desc(open_desc name [Open_wronly; Open_creat; Open_excl] 0o600);
++        name
++      with Sys_error _ as e ->
++@@ -24,7 +24,7 @@
++    in try_name 0
++  
++  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
++-@@ -359,5 +359,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
+++@@ -379,5 +379,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
++        (name,
++         open_out_gen (Open_wronly::Open_creat::Open_excl::mode) perms name)
++      with Sys_error _ as e ->
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,10 +37,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 02be170f12..2b310bb49c 100644
+index 23b3fe8495..09aa81d64b 100644
 --- a/Changes
 +++ b/Changes
-@@ -497,6 +497,10 @@ Working version
+@@ -501,6 +501,10 @@ Working version
  - #11879: Bugfix for Ctype.nondep_type
    (Stephen Dolan, review by Gabriel Scherer)
  
@@ -42,7 +51,7 @@ index 02be170f12..2b310bb49c 100644
  OCaml 5.0
  ---------
  
-@@ -1033,11 +1037,6 @@ OCaml 5.0
+@@ -1037,11 +1041,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -54,7 +63,7 @@ index 02be170f12..2b310bb49c 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1066,6 +1065,30 @@ OCaml 5.0
+@@ -1070,6 +1069,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -85,7 +94,7 @@ index 02be170f12..2b310bb49c 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1101,13 +1124,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1105,13 +1128,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -101,7 +110,7 @@ index 02be170f12..2b310bb49c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1214,6 +1237,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1218,6 +1241,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -111,7 +120,7 @@ index 02be170f12..2b310bb49c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1473,6 +1499,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1477,6 +1503,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6135,7 +6144,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..2b2b90b46e
+index 0000000000..ebedc45128
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3961 @@
@@ -8279,7 +8288,7 @@ index 0000000000..2b2b90b46e
 + open Runtime_events
 + 
 +diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-+index 73b30a0eab..a491d089ff 100644
++index af43fd47af..e64a4fec09 100644
 +--- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
 ++++ b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
 +@@ -1,5 +1,7 @@
@@ -10102,27 +10111,36 @@ index 0000000000..2b2b90b46e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a598147ddb
+index 0000000000..b68c76fcaf
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..317ebc8e38
++index 0000000000..222737d78b
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:54.707248505 +0100
-+++++ b	2023-09-28 18:46:54.723249098 +0100
-++@@ -88,7 +88,7 @@
-++ diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-++ --- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-++ +++ b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-++-@@ -12,9 +12,19 @@ let () =
-+++@@ -14,9 +14,19 @@ let () =
-++      start ();
-++      let cursor = create_cursor None in
-++      let callbacks = Callbacks.create ~runtime_counter () in
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:46:55.039260811 +0100
++++++ b	2023-09-28 18:46:55.055261404 +0100
+++@@ -15,7 +15,7 @@
+++ diff --git a/stdlib/filename.ml b/stdlib/filename.ml
+++ --- a/stdlib/filename.ml
+++ +++ b/stdlib/filename.ml
+++-@@ -347,7 +347,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
++++@@ -367,7 +367,7 @@ let temp_file ?(temp_dir = Domain.DLS.get current_temp_dir_name) prefix suffix =
+++        close_desc(open_desc name [Open_wronly; Open_creat; Open_excl] 0o600);
+++        name
+++      with Sys_error _ as e ->
+++@@ -24,7 +24,7 @@
+++    in try_name 0
+++  
+++  let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
+++-@@ -359,5 +359,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
++++@@ -379,5 +379,16 @@ let open_temp_file ?(mode = [Open_text]) ?(perms = 0o600)
+++        (name,
+++         open_out_gen (Open_wronly::Open_creat::Open_excl::mode) perms name)
+++      with Sys_error _ as e ->
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10136,10 +10154,10 @@ index 0000000000..a598147ddb
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 02be170f12..2b310bb49c 100644
++index 23b3fe8495..09aa81d64b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -497,6 +497,10 @@ Working version
++@@ -501,6 +501,10 @@ Working version
 + - #11879: Bugfix for Ctype.nondep_type
 +   (Stephen Dolan, review by Gabriel Scherer)
 + 
@@ -10150,7 +10168,7 @@ index 0000000000..a598147ddb
 + OCaml 5.0
 + ---------
 + 
-+@@ -1033,11 +1037,6 @@ OCaml 5.0
++@@ -1037,11 +1041,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10162,7 +10180,7 @@ index 0000000000..a598147ddb
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1066,6 +1065,30 @@ OCaml 5.0
++@@ -1070,6 +1069,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10193,7 +10211,7 @@ index 0000000000..a598147ddb
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1101,13 +1124,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1105,13 +1128,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10209,7 +10227,7 @@ index 0000000000..a598147ddb
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1214,6 +1237,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1218,6 +1241,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10219,7 +10237,7 @@ index 0000000000..a598147ddb
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1473,6 +1499,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1477,6 +1503,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16243,7 +16261,7 @@ index 0000000000..a598147ddb
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..2b2b90b46e
++index 0000000000..ebedc45128
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3961 @@
@@ -18387,7 +18405,7 @@ index 0000000000..a598147ddb
 ++ open Runtime_events
 ++ 
 ++diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
-++index 73b30a0eab..a491d089ff 100644
+++index af43fd47af..e64a4fec09 100644
 ++--- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
 +++++ b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
 ++@@ -1,5 +1,7 @@
@@ -20129,16 +20147,7 @@ index 0000000000..a598147ddb
 +++++ b/tools/ci/appveyor/appveyor_build.sh
 ++@@ -64,8 +64,8 @@ function set_configuration {
 ++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29
+++  
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -22027,7 +22036,7 @@ index ac8b7a8bee..2fd6aa2bf4 100644
  val force_gen : only_val:bool -> 'a lazy_t -> 'a
 +*)
 diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-index 1406d1d4bf..920a3b91b5 100644
+index a2fafafc9d..7c72614ce6 100644
 --- a/stdlib/filename.ml
 +++ b/stdlib/filename.ml
 @@ -326,14 +326,34 @@ let remove_extension name =
