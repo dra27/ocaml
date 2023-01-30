@@ -1,306 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..34a5483c89
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,297 @@
-+--- a	2023-09-28 18:46:55.707285559 +0100
-++++ b	2023-09-28 18:46:55.723286152 +0100
-+@@ -55,7 +55,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -277,7 +277,7 @@ AS_CASE([$host],
-++@@ -280,7 +280,7 @@ AS_CASE([$host],
-+    syslib='-l$(1)'])
-+  
-+  AS_CASE([$host],
-+@@ -64,7 +64,7 @@
-+      [CSC=csc
-+      CSCFLAGS="/nologo /nowarn:1668"
-+      AS_CASE([$host_cpu], [i*86], [CSCFLAGS="$CSCFLAGS /platform:x86"])])
-+-@@ -592,7 +592,7 @@ ocamlsrcdir=${ocamlsrcdir%X}
-++@@ -603,7 +603,7 @@ ocamlsrcdir=${ocamlsrcdir%X}
-+  # Libraries to build depending on the host
-+  
-+  AS_CASE([$host],
-+@@ -73,7 +73,7 @@
-+      [unix_or_win32="win32"
-+      ln='cp -pf'
-+      ocamltest_libunix="Some false"
-+-@@ -604,7 +604,7 @@ AS_CASE([$host],
-++@@ -615,7 +615,7 @@ AS_CASE([$host],
-+    ocamlyacc_wstr_module=""])
-+  
-+  AS_CASE([$host],
-+@@ -82,7 +82,7 @@
-+      [exeext=".exe"],
-+    [exeext=''])
-+  
-+-@@ -637,7 +637,7 @@ long_shebang=false
-++@@ -649,7 +649,7 @@ long_shebang=false
-+  AS_IF(
-+    [test "x$interpval" = "xyes"],
-+      [AS_CASE([$host],
-+@@ -91,7 +91,7 @@
-+          [shebangscripts=false],
-+        [shebangscripts=true
-+         prev_exec_prefix="$exec_prefix"
-+-@@ -703,7 +703,7 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-++@@ -716,7 +716,7 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-+  # the vendor only as a fall-back. We could put tis part of the logic
-+  # in the macro itself, too
-+  AS_CASE([$host],
-+@@ -100,7 +100,7 @@
-+      [AS_CASE([$ocaml_cv_cc_vendor],
-+        [gcc-[[01234]]-*],
-+          [AC_MSG_ERROR(m4_normalize([This version of MinGW-w64 GCC is too old.
-+-@@ -748,14 +748,14 @@ AS_CASE([$host],
-++@@ -761,14 +761,14 @@ AS_CASE([$host],
-+  
-+  # Enable SSE2 on x86 mingw to avoid using 80-bit registers.
-+  AS_CASE([$host],
-+@@ -117,7 +117,7 @@
-+    [common_cppflags="$common_cppflags -D_FILE_OFFSET_BITS=64"])
-+  
-+  # Adjust according to target
-+-@@ -769,7 +769,7 @@ AS_CASE([$host],
-++@@ -782,7 +782,7 @@ AS_CASE([$host],
-+  AS_IF([test x"$enable_shared" = "xno"],
-+    [supports_shared_libraries=false
-+    AS_CASE([$host],
-+@@ -126,7 +126,7 @@
-+      [AC_MSG_ERROR([Cannot build native Win32 with --disable-shared])])],
-+    [supports_shared_libraries=true])
-+  
-+-@@ -784,10 +784,10 @@ AS_CASE([$host],
-++@@ -797,10 +797,10 @@ AS_CASE([$host],
-+      flexlink_flags='-merge-manifest -stack 16777216'],
-+    [*-*-cygwin*],
-+      [AC_MSG_ERROR([unknown cygwin variant])],
-+@@ -139,7 +139,7 @@
-+      [flexdll_chain='mingw64'
-+      flexlink_flags='-stack 33554432'],
-+    [i686-pc-windows],
-+-@@ -805,7 +805,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -818,7 +818,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+      AC_MSG_RESULT([disabled])],
-+      [flexmsg=''
-+      AS_CASE([$target],
-+@@ -148,7 +148,7 @@
-+        [AS_IF([m4_normalize([test x"$with_flexdll" = 'x'
-+                              || test x"$with_flexdll" = 'xflexdll'])],
-+          [AS_IF([test -f 'flexdll/flexdll.h'],
-+-@@ -842,7 +842,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -855,7 +855,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+                          [$internal_cppflags], [$host])
-+  
-+      AS_CASE([$host],
-+@@ -157,7 +157,7 @@
-+        [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
-+        AS_IF([test -z "$flexlink_where"],
-+          [AC_MSG_ERROR([$flexlink is not executable from a native Win32 process])
-+-@@ -862,14 +862,14 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-++@@ -875,14 +875,14 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-+   [no,true,*-*-cygwin*],
-+     [supports_shared_libraries=false
-+     AC_MSG_WARN([flexdll.h not found: shared library support disabled.])],
-+@@ -174,7 +174,7 @@
-+      [AC_MSG_ERROR([flexlink is required for native Win32])])
-+  
-+  mkexe_cmd_exp="$CC"
-+-@@ -897,7 +897,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -910,7 +910,7 @@ AS_CASE([$cc_basename,$host],
-+        oc_ldflags='-Wl,--stack,16777216']
-+      )
-+      ostype="Cygwin"],
-+@@ -183,7 +183,7 @@
-+      [AS_CASE([$host],
-+        [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
-+      ostype="Win32"
-+-@@ -1037,7 +1037,7 @@ AS_IF([! $cc_supports_atomic],
-++@@ -1050,7 +1050,7 @@ AS_IF([! $cc_supports_atomic],
-+  # macOS and MinGW-64 have problems with __thread variables accessed from DLLs
-+  
-+  AS_CASE([$host],
-+@@ -192,7 +192,7 @@
-+    [AC_DEFINE([HAS_FULL_THREAD_VARIABLES])]
-+  )
-+  
-+-@@ -1060,7 +1060,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -1073,7 +1073,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-+      [aarch64-apple-darwin*|arm64-apple-darwin*],
-+        [mkdll_flags='-shared -undefined dynamic_lookup -Wl,-w'
-+        supports_shared_libraries=true],
-+@@ -201,7 +201,7 @@
-+        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
-+        mkdll_exp="flexlink ${mkdll_flags}"
-+        mkdll="${flexlink_cmd} ${mkdll_flags}"
-+-@@ -1109,7 +1109,7 @@ natdynlink=false
-++@@ -1122,7 +1122,7 @@ natdynlink=false
-+  AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-+    [AS_CASE(["$host"],
-+      [*-*-cygwin*], [natdynlink=true],
-+@@ -210,7 +210,7 @@
-+      [*-pc-windows], [natdynlink=true],
-+      [[i[3456]86-*-linux*]], [natdynlink=true],
-+      [[i[3456]86-*-gnu*]], [natdynlink=true],
-+-@@ -1178,7 +1178,7 @@ AS_CASE([$host],
-++@@ -1191,7 +1191,7 @@ AS_CASE([$host],
-+      [arch=i386; system=cygwin],
-+    [[i[3456]86-*-gnu*]],
-+      [arch=i386; system=gnu],
-+@@ -219,7 +219,7 @@
-+      [arch=i386; system=mingw],
-+    [i686-pc-windows],
-+      [arch=i386; system=win32],
-+-@@ -1245,7 +1245,7 @@ AS_CASE([$host],
-++@@ -1259,7 +1259,7 @@ AS_CASE([$host],
-+      [has_native_backend=yes; arch=arm64; system=macosx],
-+    [x86_64-*-darwin*],
-+      [has_native_backend=yes; arch=amd64; system=macosx],
-+@@ -228,7 +228,7 @@
-+      [has_native_backend=yes; arch=amd64; system=mingw64],
-+    [aarch64-*-linux*],
-+      [has_native_backend=yes; arch=arm64; system=linux],
-+-@@ -1551,7 +1551,7 @@ but no proper monotonic clock source was found.])
-++@@ -1565,7 +1565,7 @@ but no proper monotonic clock source was found.])
-+  sockets=true
-+  
-+  AS_CASE([$host],
-+@@ -237,7 +237,7 @@
-+      [cclibs="$cclibs -lws2_32"
-+      AC_SEARCH_LIBS([socket], [ws2_32])
-+      AC_CHECK_FUNC([socketpair], [AC_DEFINE([HAS_SOCKETPAIR])])],
-+-@@ -1575,7 +1575,7 @@ AS_IF([$sockets], [AC_DEFINE([HAS_SOCKETS])])
-++@@ -1589,7 +1589,7 @@ AS_IF([$sockets], [AC_DEFINE([HAS_SOCKETS])])
-+  ## socklen_t
-+  
-+  AS_CASE([$host],
-+@@ -246,7 +246,7 @@
-+      [AC_CHECK_TYPE([socklen_t], [AC_DEFINE([HAS_SOCKLEN_T])], [],
-+        [#include <ws2tcpip.h>])],
-+    [AC_CHECK_TYPE([socklen_t], [AC_DEFINE([HAS_SOCKLEN_T])], [],
-+-@@ -1586,7 +1586,7 @@ AC_CHECK_FUNC([inet_aton], [AC_DEFINE([HAS_INET_ATON])])
-++@@ -1600,7 +1600,7 @@ AC_CHECK_FUNC([inet_aton], [AC_DEFINE([HAS_INET_ATON])])
-+  ## Unix domain sockets support on Windows
-+  
-+  AS_CASE([$host],
-+@@ -255,7 +255,7 @@
-+      [AC_CHECK_HEADERS([afunix.h], [AC_DEFINE([HAS_AFUNIX_H])], [],
-+        [#include <winsock2.h>])])
-+  
-+-@@ -1595,7 +1595,7 @@ AS_CASE([$host],
-++@@ -1609,7 +1609,7 @@ AS_CASE([$host],
-+  ipv6=true
-+  
-+  AS_CASE([$host],
-+@@ -264,7 +264,7 @@
-+      [AC_CHECK_TYPE(
-+        [struct sockaddr_in6], [], [ipv6=false], [#include <ws2tcpip.h>])],
-+    [AC_CHECK_TYPE(
-+-@@ -1635,7 +1635,7 @@ AC_CHECK_DECL([system], [AC_DEFINE([HAS_SYSTEM])], [], [[#include <stdlib.h>]])
-++@@ -1649,7 +1649,7 @@ AC_CHECK_DECL([system], [AC_DEFINE([HAS_SYSTEM])], [], [[#include <stdlib.h>]])
-+  # seem to detect it properly on Windows so we hardcode the definition
-+  # of HAS_UTIME on Windows but this will probably need to be clarified
-+  AS_CASE([$host],
-+@@ -273,7 +273,7 @@
-+    [AC_CHECK_HEADER([sys/types.h],
-+      [AC_CHECK_HEADER([utime.h],
-+        [AC_CHECK_FUNC([utime], [AC_DEFINE([HAS_UTIME])])])])])
-+-@@ -1712,7 +1712,7 @@ AC_CHECK_FUNC([setitimer],
-++@@ -1726,7 +1726,7 @@ AC_CHECK_FUNC([setitimer],
-+  # Note: detection fails on Windows so hardcoding the result
-+  # (should be debugged later)
-+  AS_CASE([$host],
-+@@ -282,7 +282,7 @@
-+    [AC_CHECK_FUNC([gethostname], [AC_DEFINE([HAS_GETHOSTNAME])])])
-+  
-+  ## uname
-+-@@ -1736,7 +1736,7 @@ AC_CHECK_FUNC([mktime], [AC_DEFINE([HAS_MKTIME])])
-++@@ -1750,7 +1750,7 @@ AC_CHECK_FUNC([mktime], [AC_DEFINE([HAS_MKTIME])])
-+  ## setsid
-+  
-+  AS_CASE([$host],
-+@@ -291,7 +291,7 @@
-+    [AC_CHECK_FUNC([setsid], [AC_DEFINE([HAS_SETSID])])])
-+  
-+  ## putenv
-+-@@ -1773,7 +1773,7 @@ AS_CASE([$host],
-++@@ -1787,7 +1787,7 @@ AS_CASE([$host],
-+  ## shared library support
-+  AS_IF([$supports_shared_libraries],
-+    [AS_CASE([$host],
-+@@ -300,7 +300,7 @@
-+        [DLLIBS=""],
-+      [AC_CHECK_FUNC([dlopen],
-+        [supports_shared_libraries=true DLLIBS=""],
-+-@@ -1799,7 +1799,7 @@ AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
-++@@ -1813,7 +1813,7 @@ AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
-+  
-+  ## -fdebug-prefix-map support by the C compiler
-+  AS_CASE([$ocaml_cv_cc_vendor,$host],
-+@@ -309,16 +309,16 @@
-+    [*,*-pc-windows], [cc_has_debug_prefix_map=false],
-+    [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
-+    [sunc*,sparc-sun-*], [cc_has_debug_prefix_map=false],
-+-@@ -1953,7 +1953,7 @@ AS_CASE([$enable_debug_runtime],
-++@@ -1978,7 +1978,7 @@ AS_CASE([$arch,$system],
-+  ## Determine how to link with the POSIX threads library
-+  
-+  AS_CASE([$host],
-+ -  [*-*-mingw32|*-pc-windows],
-+ +  [*-*-mingw32*|*-pc-windows],
-+-     [PTHREAD_LIBS="-l:libpthread.a"],
-++ dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-++     [PTHREAD_LIBS=''],
-+    [AX_PTHREAD(
-+-     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
-+-@@ -1987,7 +1987,7 @@ as_has_debug_prefix_map=false
-++@@ -2013,7 +2013,7 @@ as_has_debug_prefix_map=false
-+  asm_cfi_supported=false
-+  AS_IF([$native_compiler],
-+    [AS_CASE([$host],
-+@@ -327,16 +327,16 @@
-+      [OCAML_AS_HAS_DEBUG_PREFIX_MAP
-+      OCAML_AS_HAS_CFI_DIRECTIVES])])
-+  
-+-@@ -2150,7 +2150,7 @@ cclibs="$cclibs $mathlib"
-++@@ -2200,7 +2200,7 @@ cclibs="$cclibs $mathlib"
-+  AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-+  
-+  AS_CASE([$host],
-+ -  [*-*-mingw32],
-+ +  [*-*-mingw32*],
-+-     [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-+-     nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-+-   [*-pc-windows],
-+-@@ -2166,7 +2166,7 @@ AS_IF([test x"$mandir" = x'${datarootdir}/man'],
-++ dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-++ dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-++     [bytecclibs="-lws2_32 -lversion -lgcc_eh"
-++@@ -2218,7 +2218,7 @@ AS_IF([test x"$mandir" = x'${datarootdir}/man'],
-+    [mandir='${prefix}/man'])
-+  
-+  AS_CASE([$host],
-+@@ -345,7 +345,7 @@
-+      [AS_CASE([$WINDOWS_UNICODE_MODE],
-+        [ansi],
-+          [windows_unicode=0],
-+-@@ -2178,8 +2178,8 @@ AS_CASE([$host],
-++@@ -2230,8 +2230,8 @@ AS_CASE([$host],
-+  # Define default prefix correctly for the different Windows ports
-+  AS_IF([test x"$prefix" = "xNONE"],
-+    [AS_CASE([$host],
-+@@ -356,7 +356,7 @@
-+      [i686-pc-windows], [prefix='C:/ocamlms'],
-+      [x86_64-pc-windows], [prefix='C:/ocamlms64'])],
-+    [AS_IF([test x"$unix_or_win32" = "xwin32" \
-+-@@ -2191,7 +2191,7 @@ AS_IF([test x"$prefix" = "xNONE"],
-++@@ -2243,7 +2243,7 @@ AS_IF([test x"$prefix" = "xNONE"],
-+  # but whose value is not guessed properly by configure
-+  # (all this should be understood and fixed)
-+  AS_CASE([$host],
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -314,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 5d2d825fa0..2d6a1ac17e 100644
+index b82d9e2994..05fd92b391 100644
 --- a/Changes
 +++ b/Changes
-@@ -504,6 +504,10 @@ Working version
+@@ -508,6 +508,10 @@ Working version
  - #11879: Bugfix for Ctype.nondep_type
    (Stephen Dolan, review by Gabriel Scherer)
  
@@ -328,7 +28,7 @@ index 5d2d825fa0..2d6a1ac17e 100644
  OCaml 5.0
  ---------
  
-@@ -1040,11 +1044,6 @@ OCaml 5.0
+@@ -1044,11 +1048,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -340,7 +40,7 @@ index 5d2d825fa0..2d6a1ac17e 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1073,6 +1072,30 @@ OCaml 5.0
+@@ -1077,6 +1076,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -371,7 +71,7 @@ index 5d2d825fa0..2d6a1ac17e 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1108,13 +1131,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1112,13 +1135,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -387,7 +87,7 @@ index 5d2d825fa0..2d6a1ac17e 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1221,6 +1244,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1225,6 +1248,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -397,7 +97,7 @@ index 5d2d825fa0..2d6a1ac17e 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1484,6 +1510,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1488,6 +1514,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10388,313 +10088,13 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5afa8cd013
+index 0000000000..e149e804f1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10345 @@
+@@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..34a5483c89
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,297 @@
-++--- a	2023-09-28 18:46:55.707285559 +0100
-+++++ b	2023-09-28 18:46:55.723286152 +0100
-++@@ -55,7 +55,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -277,7 +277,7 @@ AS_CASE([$host],
-+++@@ -280,7 +280,7 @@ AS_CASE([$host],
-++    syslib='-l$(1)'])
-++  
-++  AS_CASE([$host],
-++@@ -64,7 +64,7 @@
-++      [CSC=csc
-++      CSCFLAGS="/nologo /nowarn:1668"
-++      AS_CASE([$host_cpu], [i*86], [CSCFLAGS="$CSCFLAGS /platform:x86"])])
-++-@@ -592,7 +592,7 @@ ocamlsrcdir=${ocamlsrcdir%X}
-+++@@ -603,7 +603,7 @@ ocamlsrcdir=${ocamlsrcdir%X}
-++  # Libraries to build depending on the host
-++  
-++  AS_CASE([$host],
-++@@ -73,7 +73,7 @@
-++      [unix_or_win32="win32"
-++      ln='cp -pf'
-++      ocamltest_libunix="Some false"
-++-@@ -604,7 +604,7 @@ AS_CASE([$host],
-+++@@ -615,7 +615,7 @@ AS_CASE([$host],
-++    ocamlyacc_wstr_module=""])
-++  
-++  AS_CASE([$host],
-++@@ -82,7 +82,7 @@
-++      [exeext=".exe"],
-++    [exeext=''])
-++  
-++-@@ -637,7 +637,7 @@ long_shebang=false
-+++@@ -649,7 +649,7 @@ long_shebang=false
-++  AS_IF(
-++    [test "x$interpval" = "xyes"],
-++      [AS_CASE([$host],
-++@@ -91,7 +91,7 @@
-++          [shebangscripts=false],
-++        [shebangscripts=true
-++         prev_exec_prefix="$exec_prefix"
-++-@@ -703,7 +703,7 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-+++@@ -716,7 +716,7 @@ AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
-++  # the vendor only as a fall-back. We could put tis part of the logic
-++  # in the macro itself, too
-++  AS_CASE([$host],
-++@@ -100,7 +100,7 @@
-++      [AS_CASE([$ocaml_cv_cc_vendor],
-++        [gcc-[[01234]]-*],
-++          [AC_MSG_ERROR(m4_normalize([This version of MinGW-w64 GCC is too old.
-++-@@ -748,14 +748,14 @@ AS_CASE([$host],
-+++@@ -761,14 +761,14 @@ AS_CASE([$host],
-++  
-++  # Enable SSE2 on x86 mingw to avoid using 80-bit registers.
-++  AS_CASE([$host],
-++@@ -117,7 +117,7 @@
-++    [common_cppflags="$common_cppflags -D_FILE_OFFSET_BITS=64"])
-++  
-++  # Adjust according to target
-++-@@ -769,7 +769,7 @@ AS_CASE([$host],
-+++@@ -782,7 +782,7 @@ AS_CASE([$host],
-++  AS_IF([test x"$enable_shared" = "xno"],
-++    [supports_shared_libraries=false
-++    AS_CASE([$host],
-++@@ -126,7 +126,7 @@
-++      [AC_MSG_ERROR([Cannot build native Win32 with --disable-shared])])],
-++    [supports_shared_libraries=true])
-++  
-++-@@ -784,10 +784,10 @@ AS_CASE([$host],
-+++@@ -797,10 +797,10 @@ AS_CASE([$host],
-++      flexlink_flags='-merge-manifest -stack 16777216'],
-++    [*-*-cygwin*],
-++      [AC_MSG_ERROR([unknown cygwin variant])],
-++@@ -139,7 +139,7 @@
-++      [flexdll_chain='mingw64'
-++      flexlink_flags='-stack 33554432'],
-++    [i686-pc-windows],
-++-@@ -805,7 +805,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -818,7 +818,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++      AC_MSG_RESULT([disabled])],
-++      [flexmsg=''
-++      AS_CASE([$target],
-++@@ -148,7 +148,7 @@
-++        [AS_IF([m4_normalize([test x"$with_flexdll" = 'x'
-++                              || test x"$with_flexdll" = 'xflexdll'])],
-++          [AS_IF([test -f 'flexdll/flexdll.h'],
-++-@@ -842,7 +842,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -855,7 +855,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++                          [$internal_cppflags], [$host])
-++  
-++      AS_CASE([$host],
-++@@ -157,7 +157,7 @@
-++        [flexlink_where="$(cmd /c "$flexlink" -where 2>/dev/null)"
-++        AS_IF([test -z "$flexlink_where"],
-++          [AC_MSG_ERROR([$flexlink is not executable from a native Win32 process])
-++-@@ -862,14 +862,14 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-+++@@ -875,14 +875,14 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-++   [no,true,*-*-cygwin*],
-++     [supports_shared_libraries=false
-++     AC_MSG_WARN([flexdll.h not found: shared library support disabled.])],
-++@@ -174,7 +174,7 @@
-++      [AC_MSG_ERROR([flexlink is required for native Win32])])
-++  
-++  mkexe_cmd_exp="$CC"
-++-@@ -897,7 +897,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -910,7 +910,7 @@ AS_CASE([$cc_basename,$host],
-++        oc_ldflags='-Wl,--stack,16777216']
-++      )
-++      ostype="Cygwin"],
-++@@ -183,7 +183,7 @@
-++      [AS_CASE([$host],
-++        [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
-++      ostype="Win32"
-++-@@ -1037,7 +1037,7 @@ AS_IF([! $cc_supports_atomic],
-+++@@ -1050,7 +1050,7 @@ AS_IF([! $cc_supports_atomic],
-++  # macOS and MinGW-64 have problems with __thread variables accessed from DLLs
-++  
-++  AS_CASE([$host],
-++@@ -192,7 +192,7 @@
-++    [AC_DEFINE([HAS_FULL_THREAD_VARIABLES])]
-++  )
-++  
-++-@@ -1060,7 +1060,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -1073,7 +1073,7 @@ AS_IF([test x"$enable_shared" != "xno"],
-++      [aarch64-apple-darwin*|arm64-apple-darwin*],
-++        [mkdll_flags='-shared -undefined dynamic_lookup -Wl,-w'
-++        supports_shared_libraries=true],
-++@@ -201,7 +201,7 @@
-++        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
-++        mkdll_exp="flexlink ${mkdll_flags}"
-++        mkdll="${flexlink_cmd} ${mkdll_flags}"
-++-@@ -1109,7 +1109,7 @@ natdynlink=false
-+++@@ -1122,7 +1122,7 @@ natdynlink=false
-++  AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
-++    [AS_CASE(["$host"],
-++      [*-*-cygwin*], [natdynlink=true],
-++@@ -210,7 +210,7 @@
-++      [*-pc-windows], [natdynlink=true],
-++      [[i[3456]86-*-linux*]], [natdynlink=true],
-++      [[i[3456]86-*-gnu*]], [natdynlink=true],
-++-@@ -1178,7 +1178,7 @@ AS_CASE([$host],
-+++@@ -1191,7 +1191,7 @@ AS_CASE([$host],
-++      [arch=i386; system=cygwin],
-++    [[i[3456]86-*-gnu*]],
-++      [arch=i386; system=gnu],
-++@@ -219,7 +219,7 @@
-++      [arch=i386; system=mingw],
-++    [i686-pc-windows],
-++      [arch=i386; system=win32],
-++-@@ -1245,7 +1245,7 @@ AS_CASE([$host],
-+++@@ -1259,7 +1259,7 @@ AS_CASE([$host],
-++      [has_native_backend=yes; arch=arm64; system=macosx],
-++    [x86_64-*-darwin*],
-++      [has_native_backend=yes; arch=amd64; system=macosx],
-++@@ -228,7 +228,7 @@
-++      [has_native_backend=yes; arch=amd64; system=mingw64],
-++    [aarch64-*-linux*],
-++      [has_native_backend=yes; arch=arm64; system=linux],
-++-@@ -1551,7 +1551,7 @@ but no proper monotonic clock source was found.])
-+++@@ -1565,7 +1565,7 @@ but no proper monotonic clock source was found.])
-++  sockets=true
-++  
-++  AS_CASE([$host],
-++@@ -237,7 +237,7 @@
-++      [cclibs="$cclibs -lws2_32"
-++      AC_SEARCH_LIBS([socket], [ws2_32])
-++      AC_CHECK_FUNC([socketpair], [AC_DEFINE([HAS_SOCKETPAIR])])],
-++-@@ -1575,7 +1575,7 @@ AS_IF([$sockets], [AC_DEFINE([HAS_SOCKETS])])
-+++@@ -1589,7 +1589,7 @@ AS_IF([$sockets], [AC_DEFINE([HAS_SOCKETS])])
-++  ## socklen_t
-++  
-++  AS_CASE([$host],
-++@@ -246,7 +246,7 @@
-++      [AC_CHECK_TYPE([socklen_t], [AC_DEFINE([HAS_SOCKLEN_T])], [],
-++        [#include <ws2tcpip.h>])],
-++    [AC_CHECK_TYPE([socklen_t], [AC_DEFINE([HAS_SOCKLEN_T])], [],
-++-@@ -1586,7 +1586,7 @@ AC_CHECK_FUNC([inet_aton], [AC_DEFINE([HAS_INET_ATON])])
-+++@@ -1600,7 +1600,7 @@ AC_CHECK_FUNC([inet_aton], [AC_DEFINE([HAS_INET_ATON])])
-++  ## Unix domain sockets support on Windows
-++  
-++  AS_CASE([$host],
-++@@ -255,7 +255,7 @@
-++      [AC_CHECK_HEADERS([afunix.h], [AC_DEFINE([HAS_AFUNIX_H])], [],
-++        [#include <winsock2.h>])])
-++  
-++-@@ -1595,7 +1595,7 @@ AS_CASE([$host],
-+++@@ -1609,7 +1609,7 @@ AS_CASE([$host],
-++  ipv6=true
-++  
-++  AS_CASE([$host],
-++@@ -264,7 +264,7 @@
-++      [AC_CHECK_TYPE(
-++        [struct sockaddr_in6], [], [ipv6=false], [#include <ws2tcpip.h>])],
-++    [AC_CHECK_TYPE(
-++-@@ -1635,7 +1635,7 @@ AC_CHECK_DECL([system], [AC_DEFINE([HAS_SYSTEM])], [], [[#include <stdlib.h>]])
-+++@@ -1649,7 +1649,7 @@ AC_CHECK_DECL([system], [AC_DEFINE([HAS_SYSTEM])], [], [[#include <stdlib.h>]])
-++  # seem to detect it properly on Windows so we hardcode the definition
-++  # of HAS_UTIME on Windows but this will probably need to be clarified
-++  AS_CASE([$host],
-++@@ -273,7 +273,7 @@
-++    [AC_CHECK_HEADER([sys/types.h],
-++      [AC_CHECK_HEADER([utime.h],
-++        [AC_CHECK_FUNC([utime], [AC_DEFINE([HAS_UTIME])])])])])
-++-@@ -1712,7 +1712,7 @@ AC_CHECK_FUNC([setitimer],
-+++@@ -1726,7 +1726,7 @@ AC_CHECK_FUNC([setitimer],
-++  # Note: detection fails on Windows so hardcoding the result
-++  # (should be debugged later)
-++  AS_CASE([$host],
-++@@ -282,7 +282,7 @@
-++    [AC_CHECK_FUNC([gethostname], [AC_DEFINE([HAS_GETHOSTNAME])])])
-++  
-++  ## uname
-++-@@ -1736,7 +1736,7 @@ AC_CHECK_FUNC([mktime], [AC_DEFINE([HAS_MKTIME])])
-+++@@ -1750,7 +1750,7 @@ AC_CHECK_FUNC([mktime], [AC_DEFINE([HAS_MKTIME])])
-++  ## setsid
-++  
-++  AS_CASE([$host],
-++@@ -291,7 +291,7 @@
-++    [AC_CHECK_FUNC([setsid], [AC_DEFINE([HAS_SETSID])])])
-++  
-++  ## putenv
-++-@@ -1773,7 +1773,7 @@ AS_CASE([$host],
-+++@@ -1787,7 +1787,7 @@ AS_CASE([$host],
-++  ## shared library support
-++  AS_IF([$supports_shared_libraries],
-++    [AS_CASE([$host],
-++@@ -300,7 +300,7 @@
-++        [DLLIBS=""],
-++      [AC_CHECK_FUNC([dlopen],
-++        [supports_shared_libraries=true DLLIBS=""],
-++-@@ -1799,7 +1799,7 @@ AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
-+++@@ -1813,7 +1813,7 @@ AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
-++  
-++  ## -fdebug-prefix-map support by the C compiler
-++  AS_CASE([$ocaml_cv_cc_vendor,$host],
-++@@ -309,16 +309,16 @@
-++    [*,*-pc-windows], [cc_has_debug_prefix_map=false],
-++    [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
-++    [sunc*,sparc-sun-*], [cc_has_debug_prefix_map=false],
-++-@@ -1953,7 +1953,7 @@ AS_CASE([$enable_debug_runtime],
-+++@@ -1978,7 +1978,7 @@ AS_CASE([$arch,$system],
-++  ## Determine how to link with the POSIX threads library
-++  
-++  AS_CASE([$host],
-++ -  [*-*-mingw32|*-pc-windows],
-++ +  [*-*-mingw32*|*-pc-windows],
-++-     [PTHREAD_LIBS="-l:libpthread.a"],
-+++ dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-+++     [PTHREAD_LIBS=''],
-++    [AX_PTHREAD(
-++-     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
-++-@@ -1987,7 +1987,7 @@ as_has_debug_prefix_map=false
-+++@@ -2013,7 +2013,7 @@ as_has_debug_prefix_map=false
-++  asm_cfi_supported=false
-++  AS_IF([$native_compiler],
-++    [AS_CASE([$host],
-++@@ -327,16 +327,16 @@
-++      [OCAML_AS_HAS_DEBUG_PREFIX_MAP
-++      OCAML_AS_HAS_CFI_DIRECTIVES])])
-++  
-++-@@ -2150,7 +2150,7 @@ cclibs="$cclibs $mathlib"
-+++@@ -2200,7 +2200,7 @@ cclibs="$cclibs $mathlib"
-++  AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-++  
-++  AS_CASE([$host],
-++ -  [*-*-mingw32],
-++ +  [*-*-mingw32*],
-++-     [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-++-     nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-++-   [*-pc-windows],
-++-@@ -2166,7 +2166,7 @@ AS_IF([test x"$mandir" = x'${datarootdir}/man'],
-+++ dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-+++ dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-+++     [bytecclibs="-lws2_32 -lversion -lgcc_eh"
-+++@@ -2218,7 +2218,7 @@ AS_IF([test x"$mandir" = x'${datarootdir}/man'],
-++    [mandir='${prefix}/man'])
-++  
-++  AS_CASE([$host],
-++@@ -345,7 +345,7 @@
-++      [AS_CASE([$WINDOWS_UNICODE_MODE],
-++        [ansi],
-++          [windows_unicode=0],
-++-@@ -2178,8 +2178,8 @@ AS_CASE([$host],
-+++@@ -2230,8 +2230,8 @@ AS_CASE([$host],
-++  # Define default prefix correctly for the different Windows ports
-++  AS_IF([test x"$prefix" = "xNONE"],
-++    [AS_CASE([$host],
-++@@ -356,7 +356,7 @@
-++      [i686-pc-windows], [prefix='C:/ocamlms'],
-++      [x86_64-pc-windows], [prefix='C:/ocamlms64'])],
-++    [AS_IF([test x"$unix_or_win32" = "xwin32" \
-++-@@ -2191,7 +2191,7 @@ AS_IF([test x"$prefix" = "xNONE"],
-+++@@ -2243,7 +2243,7 @@ AS_IF([test x"$prefix" = "xNONE"],
-++  # but whose value is not guessed properly by configure
-++  # (all this should be understood and fixed)
-++  AS_CASE([$host],
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10708,10 +10108,10 @@ index 0000000000..5afa8cd013
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 5d2d825fa0..2d6a1ac17e 100644
++index b82d9e2994..05fd92b391 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -504,6 +504,10 @@ Working version
++@@ -508,6 +508,10 @@ Working version
 + - #11879: Bugfix for Ctype.nondep_type
 +   (Stephen Dolan, review by Gabriel Scherer)
 + 
@@ -10722,7 +10122,7 @@ index 0000000000..5afa8cd013
 + OCaml 5.0
 + ---------
 + 
-+@@ -1040,11 +1044,6 @@ OCaml 5.0
++@@ -1044,11 +1048,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10734,7 +10134,7 @@ index 0000000000..5afa8cd013
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1073,6 +1072,30 @@ OCaml 5.0
++@@ -1077,6 +1076,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10765,7 +10165,7 @@ index 0000000000..5afa8cd013
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1108,13 +1131,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1112,13 +1135,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10781,7 +10181,7 @@ index 0000000000..5afa8cd013
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1221,6 +1244,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1225,6 +1248,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10791,7 +10191,7 @@ index 0000000000..5afa8cd013
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1484,6 +1510,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1488,6 +1514,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20724,19 +20124,7 @@ index 0000000000..5afa8cd013
 +++    fi
 ++     if [[ $PORT =~ mingw* ]] ; then
 ++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all 
+++      
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
