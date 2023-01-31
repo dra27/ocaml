@@ -278,7 +278,7 @@ and really_load_file recursive ppf name filename ic =
         List.iter
           (fun dllib ->
             let name = CamlinternalDynlink.extract_dll_name dllib in
-            try Dll.open_dlls Dll.For_execution [name]
+            try Dll.open_dll_for_execution name
             with Failure reason ->
               fprintf ppf
                 "Cannot load required shared library %s.@.Reason: %s.@."

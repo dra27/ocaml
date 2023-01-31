@@ -166,9 +166,12 @@ module Bytecode = struct
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
         let lib = (input_value ic : Cmo_format.library) in
+        let open_dll dll_name =
+          Dll.open_dll_for_execution
+            (CamlinternalDynlink.extract_dll_name dll_name)
+        in
         begin try
-          Dll.open_dlls Dll.For_execution
-            (List.map CamlinternalDynlink.extract_dll_name lib.lib_dllibs)
+          List.iter open_dll lib.lib_dllibs
         with exn ->
           raise (DT.Error (Cannot_open_dynamic_library exn))
         end;

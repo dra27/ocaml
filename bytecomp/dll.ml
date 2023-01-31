@@ -17,7 +17,6 @@
 
 type dll_handle
 type dll_address
-type dll_mode = For_checking | For_execution
 
 external dll_open: string -> dll_handle = "caml_dynlink_open_lib"
 external dll_close: dll_handle -> unit = "caml_dynlink_close_lib"
@@ -44,9 +43,17 @@ let add_path dirs =
 let remove_path dirs =
   search_path := List.filter (fun d -> not (List.mem d dirs)) !search_path
 
-(* Open a list of DLLs, adding them to the appropriate list of opened DLLs
-   Raise [Failure msg] in case of error. *)
-let open_dll_for_checking fullname =
+let fullname_of_name name =
+  let name = name ^ Config.ext_dll in
+  try
+    let fullname = Misc.find_in_path !search_path name in
+    if Filename.is_implicit fullname then
+      Filename.concat Filename.current_dir_name fullname
+    else fullname
+  with Not_found -> name
+
+let open_dll_for_checking name =
+  let fullname = fullname_of_name name in
   match List.assoc_opt fullname !dlls_opened_for_checking with
   | Some _ -> () (* DLL already opened *)
   | None ->
@@ -57,7 +64,8 @@ let open_dll_for_checking fullname =
           failwith (fullname ^ ": " ^ Binutils.error_to_string err)
       end
 
-let open_dll_for_execution fullname =
+let open_dll_for_execution name =
+  let fullname = fullname_of_name name in
   match List.assoc_opt fullname !dlls_opened_for_execution with
   | Some _ -> () (* DLL has already been opened *)
   | None ->
@@ -68,25 +76,6 @@ let open_dll_for_execution fullname =
       | exception Failure msg ->
           failwith (fullname ^ ": " ^ msg)
       end
-
-let open_dll mode name =
-  let name = name ^ Config.ext_dll in
-  let fullname =
-    try
-      let fullname = Misc.find_in_path !search_path name in
-      if Filename.is_implicit fullname then
-        Filename.concat Filename.current_dir_name fullname
-      else fullname
-    with Not_found -> name
-  in
-  let open_func = match mode with
-  | For_checking -> open_dll_for_checking
-  | For_execution -> open_dll_for_execution
-  in
-  open_func fullname
-
-let open_dlls mode names =
-  List.iter (open_dll mode) names
 
 (* Close all DLLs *)
 

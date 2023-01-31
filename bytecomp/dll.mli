@@ -15,15 +15,13 @@
 
 (* Handling of dynamically-linked libraries *)
 
-type dll_mode =
-  | For_checking     (* will just check existence of symbols;
-                        no need to do full symbol resolution *)
-  | For_execution    (* will call functions from this DLL;
-                        must resolve symbols completely *)
+(* Open a DLL to check the existence of symbols (no need to do full
+     symbol resolution).  Raise [Failure msg] in case of error. *)
+val open_dll_for_checking: string -> unit
 
-(* Open a list of DLLs.  First argument indicates whether to perform
-   full symbol resolution.  Raise [Failure msg] in case of error. *)
-val open_dlls: dll_mode -> string list -> unit
+(* Open a DLL so that its function can be called (complete symbol resolution
+     must be possible).  Raise [Failure msg] in case of error. *)
+val open_dll_for_execution: string -> unit
 
 (* Close all DLLs *)
 val close_all_dlls: unit -> unit
