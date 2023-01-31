@@ -224,7 +224,8 @@ let link_compunit output_fun currpos_fun inchan file_name compunit =
   let code_block =
     CamlinternalDynlink.LongString.input_bytes inchan compunit.cu_codesize
   in
-  Symtable.patch_object code_block compunit.cu_reloc;
+  Symtable.patch_object
+    Dll.find_primitive_for_checking code_block compunit.cu_reloc;
   if !Clflags.debug && compunit.cu_debug > 0 then begin
     seek_in inchan compunit.cu_debug;
     let debug_event_list : Instruct.debug_event list = input_value inchan in

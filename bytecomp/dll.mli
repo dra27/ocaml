@@ -38,7 +38,8 @@ type primitive_address =
 
 (* Find a primitive in the currently opened DLLs and return its address.
    Return [None] if the primitive is not found. *)
-val find_primitive: string -> primitive_address option
+val find_primitive_for_checking: string -> primitive_address option
+val find_primitive_for_execution: string -> primitive_address option
 
 (* If linking in core (dynlink or toplevel), synchronize the VM
    table of primitive with the linker's table of primitive

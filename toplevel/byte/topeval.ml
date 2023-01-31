@@ -79,7 +79,8 @@ let load_lambda ppf lam =
   in
   let can_free = (fun_code = []) in
   let initial_symtable = Symtable.current_state() in
-  Symtable.patch_object code reloc;
+  Symtable.patch_object
+    Dll.find_primitive_for_execution code reloc;
   Symtable.check_global_initialized reloc;
   Symtable.update_global_table();
   let initial_bindings = !toplevel_value_bindings in
@@ -212,7 +213,8 @@ let load_compunit ic filename ppf compunit =
     CamlinternalDynlink.load_compunit_code ic compunit.cu_codesize
   in
   let initial_symtable = Symtable.current_state() in
-  Symtable.patch_object code compunit.cu_reloc;
+  Symtable.patch_object
+    Dll.find_primitive_for_execution code compunit.cu_reloc;
   Symtable.update_global_table();
   let events =
     if compunit.cu_debug = 0 then [| |]

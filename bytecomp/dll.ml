@@ -97,7 +97,20 @@ type primitive_address =
   | Prim_loaded of dll_address
   | Prim_exists
 
-let find_primitive prim_name =
+let find_primitive_for_checking prim_name =
+  let rec find seen = function
+    [] ->
+      None
+  | (_,Execution _dll) as curr :: rem -> find (curr :: seen) rem
+  | (_,Checking t) as curr :: rem ->
+      if Binutils.defines_symbol t prim_name then
+        Some Prim_exists
+      else
+        find (curr :: seen) rem
+  in
+  find [] !opened_dlls
+
+let find_primitive_for_execution prim_name =
   let rec find seen = function
     [] ->
       None
@@ -107,11 +120,7 @@ let find_primitive prim_name =
         if seen <> [] then opened_dlls := curr :: List.rev_append seen rem;
         Some (Prim_loaded addr)
       end
-  | (_,Checking t) as curr :: rem ->
-      if Binutils.defines_symbol t prim_name then
-        Some Prim_exists
-      else
-        find (curr :: seen) rem
+  | (_,Checking _t) as curr :: rem -> find (curr :: seen) rem
   in
   find [] !opened_dlls
 

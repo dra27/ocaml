@@ -2174,6 +2174,7 @@ bytecomp/symtable.cmx : \
     bytecomp/symtable.cmi
 bytecomp/symtable.cmi : \
     lambda/lambda.cmi \
+    bytecomp/dll.cmi \
     file_formats/cmo_format.cmi
 asmcomp/CSE.cmo : \
     asmcomp/mach.cmi \
