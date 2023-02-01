@@ -215,6 +215,8 @@ AC_SUBST([naked_pointers_checker])
 AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([QS])
+AC_SUBST([ac_config_files])
+AC_SUBST([ac_config_headers])
 
 ## Generated files
 
