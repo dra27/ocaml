@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..ddc02daf0e
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:46:56.335308820 +0100
-++++ b	2023-09-28 18:46:56.343309116 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -1856,6 +1856,11 @@ endif
-++@@ -1859,6 +1859,11 @@ endif
-+  
-+  include .depend
-+  
-+@@ -28,7 +28,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -213,6 +213,8 @@ AC_SUBST([compute_deps])
-++@@ -215,6 +215,8 @@ AC_SUBST([naked_pointers_checker])
-+  AC_SUBST([ocaml_bindir])
-+  AC_SUBST([ocaml_libdir])
-+  AC_SUBST([QS])
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10111,36 +10088,13 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fa05743783
+index 0000000000..1bc6b67618
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10042 @@
+@@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..ddc02daf0e
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:46:56.335308820 +0100
-+++++ b	2023-09-28 18:46:56.343309116 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -1856,6 +1856,11 @@ endif
-+++@@ -1859,6 +1859,11 @@ endif
-++  
-++  include .depend
-++  
-++@@ -28,7 +28,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -213,6 +213,8 @@ AC_SUBST([compute_deps])
-+++@@ -215,6 +215,8 @@ AC_SUBST([naked_pointers_checker])
-++  AC_SUBST([ocaml_bindir])
-++  AC_SUBST([ocaml_libdir])
-++  AC_SUBST([QS])
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20156,7 +20110,21 @@ index 0000000000..fa05743783
 ++         ;;
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +1
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++      
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
