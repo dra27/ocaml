@@ -125,12 +125,12 @@ jobs:
         tools\ci\actions\build-cygwin.cmd ${{ matrix.packages }}
       if: steps.cache.outputs.cache-hit == 'true'
 
-    - name: Temporarily get flexdll-0.39
-      run: |
-        Invoke-WebRequest -Uri 'http://mirrors.kernel.org/sourceware/cygwin/x86_64/release/flexdll/flexdll-0.39-1.tar.xz' -OutFile 'D:\cygwin\flexdll.tar.xz'
-        D:\cygwin\bin\bash -lc 'cd / ; tar -xJf flexdll.tar.xz ; rm flexdll.tar.xz'
-      if: steps.cache.outputs.cache-hit == 'true' && matrix.port == 'cygwin64'
-
+#    - name: Temporarily get flexdll-0.39
+#      run: |
+#        Invoke-WebRequest -Uri 'http://mirrors.kernel.org/sourceware/cygwin/x86_64/release/flexdll/flexdll-0.39-1.tar.xz' -OutFile 'D:\cygwin\flexdll.tar.xz'
+#        D:\cygwin\bin\bash -lc 'cd / ; tar -xJf flexdll.tar.xz ; rm flexdll.tar.xz'
+#      if: steps.cache.outputs.cache-hit == 'true' && matrix.port == 'cygwin64'
+#
     - name: Worktree
       run: |
         # Set-up the git worktree for the build
