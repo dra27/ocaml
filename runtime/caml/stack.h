@@ -43,7 +43,12 @@
 #endif
 
 #ifdef TARGET_arm
+/* Size of the gc_regs structure, in words.
+   See arm.S and arm/proc.ml for the indices */
+/* XXX Do the math */
+#define Wosize_gc_regs (13 /* int regs */ + 16 /* float regs */)
 #define Saved_return_address(sp) *((intnat *)((sp) - 4))
+#define Pop_frame_pointer(sp)
 #endif
 
 #ifdef TARGET_amd64

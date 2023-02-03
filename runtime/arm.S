@@ -82,6 +82,8 @@
 trap_ptr          .req    r8
 alloc_ptr         .req    r10
 domain_state_ptr  .req    r11
+stack_arg_begin   .req    r4
+stack_arg_end     .req    r5
 
 /* Support for CFI directives */
 
@@ -131,46 +133,122 @@ caml_hot.code_end:
 
 #define Caml_state(var) [domain_state_ptr, 8*domain_field_caml_##var]
 
+/* Stack switching operations */
+
+/* struct stack_info */
+/* XXX */
+
+/* struct c_stack_link */
+/* XXX */
+
+/* struct stack_handler */
+/* XXX */
+
+/* Switch from OCaml to C stack. Clobbers r12. */
+.macro SWITCH_OCAML_TO_C
+    /* Fill in Caml_state->current_stack->sp */
+        ldr     r12, Caml_state(current_stack)
+        str     sp, Stack_sp(r12)
+    /* Switch to C stack */
+        ldr     sp, Caml_state(c_stack)
+    /* Fill in Caml_state->c_stack */
+        str     r12, Cstack_stack(sp)
+        ldr     r12, Stack_sp(r12)
+        str     r12, Cstack_sp(sp)
+.endm
+
+/* Switch from C to OCaml stack. */
+.macro SWITCH_C_TO_OCAML
+        ldr     sp, Cstack_sp(sp)
+.endm
+
+/* Save all of the registers that may be in use to a free gc_regs bucket
+   and store ALLOC_PTR and TRAP_PTR back to Caml_state
+   At the end the saved registers are placed in Caml_state(gc_regs)
+ */
+.macro SAVE_ALL_REGS
+    /* First, save the young_ptr & exn_handler */
+        str     alloc_ptr, Caml_state(young_ptr)
+        str     trap_ptr, Caml_state(exn_handler)
+    /* Now, use alloc_ptr (which we just saved) to point to the gc_regs
+       bucket */
+        ldr     alloc_ptr, Caml_state(gc_regs_buckets)
+    /* We save r12 first to allow it to be scratch */ \
+        str     r12, [alloc_ptr, 32]
+        ldr     r12, [alloc_ptr, 0] /* next ptr */
+        str     r12, Caml_state(gc_regs_buckets)
+    /* Save allocatable registers */
+        str     r0, [alloc_ptr, 0]
+        str     r1, [alloc_ptr, 4]
+        str     r2, [alloc_ptr, 8]
+        str     r3, [alloc_ptr, 12]
+        str     r4, [alloc_ptr, 16]
+        str     r5, [alloc_ptr, 20]
+        str     r6, [alloc_ptr, 24]
+        str     r7, [alloc_ptr, 28]
+    /*  str     r12, [alloc_ptr, 32] - done above */
+    /* Save caller floating-point registers */
+#if defined(SYS_linux_eabihf) || defined(SYS_netbsd)
+        str     d0, [alloc_ptr, 32]
+        str     d1, [alloc_ptr, 40]
+        str     d2, [alloc_ptr, 48]
+        str     d3, [alloc_ptr, 56]
+        str     d4, [alloc_ptr, 64]
+        str     d5, [alloc_ptr, 72]
+        str     d6, [alloc_ptr, 80]
+        str     d7, [alloc_ptr, 88]
+        str     alloc_ptr, Caml_state(gc_regs)
+#endif
+.endm
+
+/* Undo SAVE_ALL_REGS by loading the registers saved in Caml_state(gc_regs)
+   and refreshing ALLOC_PTR & TRAP_PTR from Caml_state */
+.macro RESTORE_ALL_REGS
+        ldr     alloc_ptr, Caml_state(gc_regs)
+    /* Restore registers*/
+        ldr     r0, [alloc_ptr, 0]
+        ldr     r1, [alloc_ptr, 4]
+        ldr     r2, [alloc_ptr, 8]
+        ldr     r3, [alloc_ptr, 12]
+        ldr     r4, [alloc_ptr, 16]
+        ldr     r5, [alloc_ptr, 20]
+        ldr     r6, [alloc_ptr, 24]
+        ldr     r7, [alloc_ptr, 28]
+        ldr     r12, [alloc_ptr, 32]
+    /* Save caller floating-point registers */
+#if defined(SYS_linux_eabihf) || defined(SYS_netbsd)
+        ldr     d0, [alloc_ptr, 40]
+        ldr     d1, [alloc_ptr, 48]
+        ldr     d2, [alloc_ptr, 56]
+        ldr     d3, [alloc_ptr, 64]
+        ldr     d4, [alloc_ptr, 72]
+        ldr     d5, [alloc_ptr, 80]
+        ldr     d6, [alloc_ptr, 88]
+        ldr     d7, [alloc_ptr, 96]
+        ldr     alloc_ptr, Caml_state(gc_regs)
+.endm
+
 /* Allocation functions and GC interface */
         TEXT_SECTION(caml_system__code_begin)
         .globl  caml_system__code_begin
 caml_system__code_begin:
 
+/* XXX caml_call_realloc_stack */
+
 FUNCTION(caml_call_gc)
         CFI_STARTPROC
 .Lcaml_call_gc:
-    /* Record return address */
-        str     lr, Caml_state(last_return_address)
-    /* Record lowest stack address */
-        str     sp, Caml_state(bottom_of_stack)
-#if defined(SYS_linux_eabihf) || defined(SYS_netbsd)
-    /* Save caller floating-point registers on the stack */
-        vpush   {d0-d7}; CFI_ADJUST(64)
-#endif
-    /* Save integer registers and return address on the stack */
-        push    {r0-r7,r12,lr}; CFI_ADJUST(40)
-#if defined(SYS_linux_eabihf) || defined(SYS_netbsd)
-        CFI_OFFSET(lr, -68)
-#else
-        CFI_OFFSET(lr, -4)
-#endif
-    /* Store pointer to saved integer registers in Caml_state->gc_regs */
-        str     sp, Caml_state(gc_regs)
-    /* Save current allocation pointer for debugging purposes */
-        str     alloc_ptr, Caml_state(young_ptr)
-    /* Save trap pointer in case an exception is raised during GC */
-        str     trap_ptr, Caml_state(exception_pointer)
+    /* Save return address */
+        str     lr, [sp, -4]!
+    /* Store all registers (including ALLOC_PTR & TRAP_PTR) */
+        SAVE_ALL_REGS
+        SWITCH_OCAML_TO_C
     /* Call the garbage collector */
         bl      caml_garbage_collection
-    /* Restore integer registers and return address from the stack */
-        pop     {r0-r7,r12,lr}; CFI_ADJUST(-40)
-#if defined(SYS_linux_eabihf) || defined(SYS_netbsd)
-    /* Restore floating-point registers from the stack */
-        vpop    {d0-d7}; CFI_ADJUST(-64)
-#endif
-    /* Reload new allocation pointer */
-        ldr     alloc_ptr, Caml_state(young_ptr)
-    /* Return to caller */
+        SWITCH_C_TO_OCAML
+        RESTORE_ALL_REGS
+    /* Free stack space and Return to caller */
+        ldr     lr, [sp], 4
         bx      lr
         CFI_ENDPROC
         .size   caml_call_gc, .-caml_call_gc
