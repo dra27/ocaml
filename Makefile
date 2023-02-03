@@ -795,7 +795,7 @@ runtime/primitives: \
                     echo runtime/primitives.new)
 	cp $^ $@
 
-runtime/prims.c : runtime/primitives
+runtime/prims.c : runtime/primitives Makefile
 	export LC_ALL=C; \
 	(echo '#include "caml/config.h"'; \
 	 echo 'typedef intnat value;'; \
