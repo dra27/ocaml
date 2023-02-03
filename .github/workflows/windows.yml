@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   BASE_EPOCH: 14
-  FLEXDLL_VERSION: 0.39
+  FLEXDLL_VERSION: 0.42
   BUILD_EPOCH: 16
   CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
   CYG_ROOT: D:\cygwin
