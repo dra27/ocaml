@@ -27,7 +27,7 @@ jobs:
       id: cache
       with:
         path: ${{ env.CACHE_ROOT }}\base
-        key: cygwin-x86_64-${{ env.BASE_EPOCH }}-${{ hashFiles('cache-key') }}
+        key: cygwin-x86_64-${{ env.BASE_EPOCH }}-${{ env.FLEXDLL_VERSION }}-${{ hashFiles('cache-key') }}
 
     - name: Download
       run: |
