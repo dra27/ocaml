@@ -1570,13 +1570,13 @@ endif
 
 # Default rules
 
-%.cmo: %.ml
+%.cmo: %.ml boot/stdlib.cmi
 	$(CAMLC) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) -c $<
 
-%.cmi: %.mli
+%.cmi: %.mli boot/stdlib.cmi
 	$(CAMLC) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) -c $<
 
-%.cmx: %.ml
+%.cmx: %.ml boot/stdlib.cmi
 	$(COMPILE_NATIVE_MODULE) -c $<
 
 partialclean::

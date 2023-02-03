@@ -72,10 +72,10 @@ distclean: clean
 ocamldebug_entry.cmo: ocamldebug_entry.ml ocamldebug.cmo
 	$(CAMLC) -c $(COMPFLAGS) $<
 
-%.cmo: %.ml
+%.cmo: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLC) -c $(COMPFLAGS) -for-pack ocamldebug $<
 
-%.cmi: %.mli
+%.cmi: %.mli $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLC) -c $(COMPFLAGS) -for-pack ocamldebug $<
 
 depend: beforedepend

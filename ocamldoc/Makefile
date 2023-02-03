@@ -194,16 +194,16 @@ DEPEND_PREREQS = $(LEXERS:.mll=.ml) \
 # generic rules :
 #################
 
-%.cmo: %.ml
+%.cmo: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(OCAMLC) $(COMPFLAGS) -c $<
 
-%.cmi: %.mli
+%.cmi: %.mli $(ROOTDIR)/boot/stdlib.cmi
 	$(OCAMLC) $(COMPFLAGS) -c $<
 
-%.cmx: %.ml
+%.cmx: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(OCAMLOPT) $(COMPFLAGS) -c $<
 
-%.cmxs: %.ml
+%.cmxs: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(OCAMLOPT_CMD) -shared -o $@ $(COMPFLAGS) $<
 
 # Installation targets

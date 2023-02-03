@@ -145,7 +145,7 @@ $(eval $(call PROGRAM_SYNONYM,ocamltest.opt))
 ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
 	$(ocamlopt_cmd) $(ocamltest_unix_include)-o $@ $^
 
-%.cmx: %.ml $(deps_opt)
+%.cmx: %.ml $(deps_opt) $(ROOTDIR)/boot/stdlib.cmi
 	$(ocamlopt) -c $<
 
 %.cmi: %.mli $(deps_byte)

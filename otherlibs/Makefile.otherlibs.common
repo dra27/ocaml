@@ -155,13 +155,13 @@ clean:: partialclean
 distclean:: clean
 	rm -f META
 
-%.cmi: %.mli
+%.cmi: %.mli $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLC) -c $(COMPFLAGS) $<
 
-%.cmo: %.ml
+%.cmo: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLC) -c $(COMPFLAGS) $<
 
-%.cmx: %.ml
+%.cmx: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLOPT) -c $(COMPFLAGS) $(OPTCOMPFLAGS) $<
 
 %.b.$(O): %.c $(REQUIRED_HEADERS)

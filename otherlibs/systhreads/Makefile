@@ -136,13 +136,13 @@ installopt:
 	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
 	  "$(INSTALL_THREADSLIBDIR)"
 
-%.cmi: %.mli
+%.cmi: %.mli $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLC) -c $(COMPFLAGS) $<
 
-%.cmo: %.ml
+%.cmo: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLC) -c $(COMPFLAGS) $<
 
-%.cmx: %.ml
+%.cmx: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(CAMLOPT) -c $(COMPFLAGS) $(OPTCOMPFLAGS) $<
 
 DEP_FILES := st_stubs.b.$(D)
