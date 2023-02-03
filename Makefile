@@ -58,12 +58,6 @@ COMPLIBDIR=$(LIBDIR)/compiler-libs
 
 TOPINCLUDES=$(addprefix -I otherlibs/,$(filter-out %threads,$(OTHERLIBRARIES)))
 
-ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-  COLDSTART_DEPS =
-else
-  COLDSTART_DEPS = boot/ocamlruns$(EXE)
-endif
-
 expunge := expunge$(EXE)
 
 # targets for the compilerlibs/*.{cma,cmxa} archives
@@ -176,7 +170,7 @@ FLEXDLL_SOURCE_FILES = \
 boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
 	cp $< $@
 
-boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
+boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES) boot/stdlib.cmi
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
 	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
@@ -196,24 +190,32 @@ boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 #   - Build the runtime
 # runtime/ocamlrun is then installed to boot/ocamlrun and the stdlib artefacts
 # are copied to boot/
-.PHONY: coldstart
-coldstart: $(COLDSTART_DEPS)
+
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+boot/ocamlrun$(EXE):
+else
+boot/ocamlrun$(EXE): boot/flexlink.byte$(EXE)
+endif
 	$(MAKE) runtime-all
+	rm -f boot/ocamlrun$(EXE)
+	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+boot/stdlib.cmi: boot/ocamlrun$(EXE)
 	$(MAKE) -C stdlib \
 	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
 	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
 else
+boot/stdlib.cmi: boot/ocamlruns$(EXE)
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
     CAMLC='$$(BOOT_OCAMLC)' all
-	$(MAKE) boot/flexlink.byte$(EXE)
-	$(MAKE) runtime-all
-endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-	rm -f boot/ocamlrun$(EXE)
-	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+endif
 	cd boot; rm -f $(LIBFILES)
 	cd stdlib; cp $(LIBFILES) ../boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+
+.PHONY: coldstart
+coldstart: boot/ocamlrun$(EXE) boot/stdlib.cmi
 
 # Recompile the core system using the bootstrap compiler
 .PHONY: coreall
