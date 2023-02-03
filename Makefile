@@ -1542,10 +1542,10 @@ endif
 
 # Default rules
 
-%.cmo: %.ml
+%.cmo: %.ml boot/stdlib.cmi
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) -c $<
 
-%.cmi: %.mli
+%.cmi: %.mli boot/stdlib.cmi
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) -c $<
 
 %.cmx: %.ml

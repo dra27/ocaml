@@ -173,11 +173,11 @@ COMPILERLIBS_COPIED_SOURCES_INTFS=\
 COMPILERLIBS_CMO=$(COMPILERLIBS_COPIED_SOURCES:.ml=.cmo)
 COMPILERLIBS_CMX=$(COMPILERLIBS_COPIED_SOURCES:.ml=.cmx)
 
-$(LOCAL_SRC)/%.cmi: $(LOCAL_SRC)/%.mli
+$(LOCAL_SRC)/%.cmi: $(LOCAL_SRC)/%.mli $(ROOTDIR)/boot/stdlib.cmi
 	$(V_OCAMLC)$(OCAMLC) -c -for-pack Dynlink_compilerlibs $(COMPFLAGS) \
           -I $(LOCAL_SRC) -o $@ $(LOCAL_SRC)/$*.mli
 
-$(LOCAL_SRC)/%.cmo: $(LOCAL_SRC)/%.ml
+$(LOCAL_SRC)/%.cmo: $(LOCAL_SRC)/%.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(V_OCAMLC)$(OCAMLC) -c -for-pack Dynlink_compilerlibs $(COMPFLAGS) \
           -I $(LOCAL_SRC) -o $@ $(LOCAL_SRC)/$*.ml
 
@@ -295,10 +295,10 @@ depend: beforedepend
 
 include .depend
 
-%.cmi: %.mli
+%.cmi: %.mli $(ROOTDIR)/boot/stdlib.cmi
 	$(V_OCAMLC)$(OCAMLC) -c $(COMPFLAGS) $<
 
-%.cmo: %.ml
+%.cmo: %.ml $(ROOTDIR)/boot/stdlib.cmi
 	$(V_OCAMLC)$(OCAMLC) -c $(COMPFLAGS) $<
 
 %.cmx: %.ml
