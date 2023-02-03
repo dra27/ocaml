@@ -738,7 +738,7 @@ libasmruni_OBJECTS = \
   $(runtime_NATIVE_C_SOURCES:.c=.ni.$(O)) $(runtime_ASM_OBJECTS:.$(O)=.i.$(O))
 
 libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
-  $(runtime_ASM_OBJECTS:.$(O)=_libasmrunpic.$(O))
+  $(runtime_ASM_OBJECTS:.$(O)=.npic.$(O))
 
 ## General (non target-specific) assembler and compiler flags
 
@@ -986,7 +986,7 @@ runtime/%.d.o: runtime/%.S
 runtime/%.i.o: runtime/%.S
 	$(ASPP) $(OC_ASPPFLAGS) $(OC_INSTR_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 
-runtime/%_libasmrunpic.o: runtime/%.S
+runtime/%.npic.o: runtime/%.S
 	$(ASPP) $(OC_ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
 
 runtime/domain_state64.inc: \
@@ -1015,7 +1015,7 @@ runtime/amd64nt.i.obj: runtime/amd64nt.asm runtime/domain_state64.inc
 runtime/i386nt.i.obj: runtime/i386nt.asm runtime/domain_state32.inc
 	$(ASM)$@ $(ocamlruni_CPPFLAGS) $<
 
-runtime/%_libasmrunpic.obj: runtime/%.asm
+runtime/%.npic.obj: runtime/%.asm
 	$(ASM)$@ $<
 
 ## Runtime dependencies
