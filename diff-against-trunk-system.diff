@@ -1,20 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..9431e545db
+index 0000000000..723a22309f
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:57.259343030 +0100
-++++ b	2023-09-28 18:46:57.275343622 +0100
-+@@ -75,7 +75,7 @@
-+  endif
-+  	$(MAKE) -C stdlib install
-+  ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-+-@@ -1735,7 +1738,8 @@ ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-++@@ -1738,7 +1741,8 @@ ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-+  	$(INSTALL_PROG) $(runtime_NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-+  endif
-+  ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:46:57.583355022 +0100
+++++ b	2023-09-28 18:46:57.591355318 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -1860,11 +1860,6 @@ endif
+++@@ -1863,11 +1863,6 @@ endif
++  
++  include .depend
++  
++@@ -28,7 +28,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -213,8 +213,6 @@ AC_SUBST([compute_deps])
+++@@ -215,8 +215,6 @@ AC_SUBST([naked_pointers_checker])
++  AC_SUBST([ocaml_bindir])
++  AC_SUBST([ocaml_libdir])
++  AC_SUBST([QS])
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -122,7 +131,7 @@ index 33ab0941c3..339f433a04 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index ee14f2e76e..4542ed88c8 100644
+index d7ac2bcb22..5f0fa3a427 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -605,7 +605,6 @@ partialclean::
@@ -3201,10 +3210,10 @@ index 8e600d7fa0..a71d53aecc 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index a32d99cd20..334ab7a00b 100755
+index b0c4c4ccfe..6a1e8a809c 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 1c4931ce3c..da1fbad61f 100644
+index ba0ecc38b6..66a2ecd848 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3216,7 +3225,7 @@ index 1c4931ce3c..da1fbad61f 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -221,6 +223,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -3224,7 +3233,7 @@ index 1c4931ce3c..da1fbad61f 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -371,15 +374,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -369,15 +372,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3256,7 +3265,7 @@ index 1c4931ce3c..da1fbad61f 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -610,7 +621,8 @@ AS_CASE([$host],
+@@ -608,7 +619,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3266,7 +3275,7 @@ index 1c4931ce3c..da1fbad61f 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -684,8 +696,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -682,8 +694,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -3278,7 +3287,7 @@ index 1c4931ce3c..da1fbad61f 100644
  
  AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
    [yes,*|,true],
-@@ -1025,9 +1038,9 @@ AS_IF([! $arch64],
+@@ -1023,9 +1036,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3291,7 +3300,7 @@ index 1c4931ce3c..da1fbad61f 100644
  
  # Support for C11 atomic types
  
-@@ -1185,13 +1198,14 @@ AS_CASE([$host],
+@@ -1183,13 +1196,14 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -3310,7 +3319,7 @@ index 1c4931ce3c..da1fbad61f 100644
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux_eabihf],
-@@ -1228,9 +1242,9 @@ AS_CASE([$host],
+@@ -1226,9 +1240,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -3322,7 +3331,7 @@ index 1c4931ce3c..da1fbad61f 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1240,7 +1254,7 @@ AS_CASE([$host],
+@@ -1238,7 +1252,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3331,7 +3340,7 @@ index 1c4931ce3c..da1fbad61f 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1260,7 +1274,7 @@ AS_CASE([$host],
+@@ -1258,7 +1272,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3340,7 +3349,7 @@ index 1c4931ce3c..da1fbad61f 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1952,11 +1966,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1950,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3365,7 +3374,7 @@ index 1c4931ce3c..da1fbad61f 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2007,6 +2033,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2005,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3396,7 +3405,7 @@ index 1c4931ce3c..da1fbad61f 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2153,8 +2203,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2151,8 +2201,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32*],
@@ -10102,27 +10111,36 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..90c54f6ef8
+index 0000000000..bddad6578a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10036 @@
+@@ -0,0 +1,10042 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..9431e545db
++index 0000000000..723a22309f
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:57.259343030 +0100
-+++++ b	2023-09-28 18:46:57.275343622 +0100
-++@@ -75,7 +75,7 @@
-++  endif
-++  	$(MAKE) -C stdlib install
-++  ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
-++-@@ -1735,7 +1738,8 @@ ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-+++@@ -1738,7 +1741,8 @@ ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-++  	$(INSTALL_PROG) $(runtime_NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-++  endif
-++  ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:46:57.583355022 +0100
++++++ b	2023-09-28 18:46:57.591355318 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -1860,11 +1860,6 @@ endif
++++@@ -1863,11 +1863,6 @@ endif
+++  
+++  include .depend
+++  
+++@@ -28,7 +28,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -213,8 +213,6 @@ AC_SUBST([compute_deps])
++++@@ -215,8 +215,6 @@ AC_SUBST([naked_pointers_checker])
+++  AC_SUBST([ocaml_bindir])
+++  AC_SUBST([ocaml_libdir])
+++  AC_SUBST([QS])
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10230,7 +10248,7 @@ index 0000000000..90c54f6ef8
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index ee14f2e76e..4542ed88c8 100644
++index d7ac2bcb22..5f0fa3a427 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -605,7 +605,6 @@ partialclean::
@@ -13309,10 +13327,10 @@ index 0000000000..90c54f6ef8
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index a32d99cd20..334ab7a00b 100755
++index b0c4c4ccfe..6a1e8a809c 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 1c4931ce3c..da1fbad61f 100644
++index ba0ecc38b6..66a2ecd848 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13324,7 +13342,7 @@ index 0000000000..90c54f6ef8
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -221,6 +223,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -13332,7 +13350,7 @@ index 0000000000..90c54f6ef8
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -371,15 +374,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -369,15 +372,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -13364,7 +13382,7 @@ index 0000000000..90c54f6ef8
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -610,7 +621,8 @@ AS_CASE([$host],
++@@ -608,7 +619,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13374,7 +13392,7 @@ index 0000000000..90c54f6ef8
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -684,8 +696,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -682,8 +694,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -13386,7 +13404,7 @@ index 0000000000..90c54f6ef8
 + 
 + AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
 +   [yes,*|,true],
-+@@ -1025,9 +1038,9 @@ AS_IF([! $arch64],
++@@ -1023,9 +1036,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -13399,7 +13417,7 @@ index 0000000000..90c54f6ef8
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1185,13 +1198,14 @@ AS_CASE([$host],
++@@ -1183,13 +1196,14 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -13418,7 +13436,7 @@ index 0000000000..90c54f6ef8
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -1228,9 +1242,9 @@ AS_CASE([$host],
++@@ -1226,9 +1240,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -13430,7 +13448,7 @@ index 0000000000..90c54f6ef8
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1240,7 +1254,7 @@ AS_CASE([$host],
++@@ -1238,7 +1252,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13439,7 +13457,7 @@ index 0000000000..90c54f6ef8
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1260,7 +1274,7 @@ AS_CASE([$host],
++@@ -1258,7 +1272,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -13448,7 +13466,7 @@ index 0000000000..90c54f6ef8
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1952,11 +1966,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1950,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13473,7 +13491,7 @@ index 0000000000..90c54f6ef8
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2007,6 +2033,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2005,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13504,7 +13522,7 @@ index 0000000000..90c54f6ef8
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2153,8 +2203,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2151,8 +2201,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32*],
@@ -20138,10 +20156,7 @@ index 0000000000..90c54f6ef8
 ++         ;;
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_F
+++@@ -139,29 +1
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644

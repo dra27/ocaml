@@ -1,11 +1,20 @@
---- a	2023-09-28 18:46:57.259343030 +0100
-+++ b	2023-09-28 18:46:57.275343622 +0100
-@@ -75,7 +75,7 @@
-  endif
-  	$(MAKE) -C stdlib install
-  ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
--@@ -1735,7 +1738,8 @@ ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-+@@ -1738,7 +1741,8 @@ ifneq "$(runtime_NATIVE_SHARED_LIBRARIES)" ""
-  	$(INSTALL_PROG) $(runtime_NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-  endif
-  ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
+--- a	2023-09-28 18:46:57.583355022 +0100
++++ b	2023-09-28 18:46:57.591355318 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -1860,11 +1860,6 @@ endif
++@@ -1863,11 +1863,6 @@ endif
+  
+  include .depend
+  
+@@ -28,7 +28,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -213,8 +213,6 @@ AC_SUBST([compute_deps])
++@@ -215,8 +215,6 @@ AC_SUBST([naked_pointers_checker])
+  AC_SUBST([ocaml_bindir])
+  AC_SUBST([ocaml_libdir])
+  AC_SUBST([QS])
