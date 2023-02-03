@@ -191,6 +191,9 @@ boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES) boot/stdlib.cmi
 # runtime/ocamlrun is then installed to boot/ocamlrun and the stdlib artefacts
 # are copied to boot/
 
+boot/ocamlrun$(EXE): boot/ocamlc boot/ocamllex
+boot/stdlib.cmi: boot/ocamlc boot/ocamllex
+
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 boot/ocamlrun$(EXE):
 else
