@@ -1863,11 +1863,6 @@ endif
 
 include .depend
 
-ifneq "$(GENERATED_BY_CONFIG_STATUS)" ""
-$(GENERATED_BY_CONFIG_STATUS): %: %.in
-	$(error $@ needs regenerating - please re-run configure)
-endif
-
 Makefile.config Makefile.build_config: config.status
 config.status:
 	@echo "Please refer to the installation instructions:"
