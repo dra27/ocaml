@@ -972,6 +972,20 @@ $(foreach runtime_OBJECT_TYPE,$(subst %,,$(runtime_OBJECT_TYPES)), \
 
 ## Compilation of runtime assembly files
 
+define DEP_WITH_ASPP
+ifeq "$(COMPUTE_DEPS)" "true"
+$(DEPDIR)/runtime/$(1).$(D): runtime/%.S | $(DEPDIR)/runtime \
+                                           $(runtime_BUILT_HEADERS)
+	$$(DEP_CC) $$(OC_CPPFLAGS) $$(CPPFLAGS) $$< -MT \
+	  'runtime/$$*$(subst %,,$(1)).o' -MF $$@
+else
+runtime/$(1).o: $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
+  $(RUNTIME_HEADERS)
+endif
+endef
+
+$(foreach type,% %.d %.i %.npic, $(eval $(call DEP_WITH_ASPP,$(type))))
+
 ASPP_ERROR = \
   { echo "If your assembler produced syntax errors, it is probably";\
           echo "unhappy with the preprocessor. Check your assembler, or";\
@@ -1028,6 +1042,13 @@ endif
 runtime_DEP_FILES += $(addsuffix d, $(runtime_DEP_FILES)) \
              $(addsuffix i, $(runtime_DEP_FILES)) \
              $(addsuffix pic, $(runtime_DEP_FILES))
+ifeq "$(NATIVE_COMPILER)" "true"
+runtime_DEP_FILES += \
+  $(basename $(filter %.o,$(runtime_ASM_OBJECTS))) \
+  $(addsuffix .d, $(basename $(filter %.o,$(runtime_ASM_OBJECTS)))) \
+  $(addsuffix .i, $(basename $(filter %.o,$(runtime_ASM_OBJECTS)))) \
+  $(addsuffix .npic, $(basename $(filter %.o,$(runtime_ASM_OBJECTS))))
+endif
 runtime_DEP_FILES := $(addsuffix .$(D), $(runtime_DEP_FILES))
 
 ifeq "$(COMPUTE_DEPS)" "true"
