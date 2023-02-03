@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..723a22309f
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:46:57.583355022 +0100
-++++ b	2023-09-28 18:46:57.591355318 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -1860,11 +1860,6 @@ endif
-++@@ -1863,11 +1863,6 @@ endif
-+  
-+  include .depend
-+  
-+@@ -28,7 +28,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -213,8 +213,6 @@ AC_SUBST([compute_deps])
-++@@ -215,8 +215,6 @@ AC_SUBST([naked_pointers_checker])
-+  AC_SUBST([ocaml_bindir])
-+  AC_SUBST([ocaml_libdir])
-+  AC_SUBST([QS])
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -37,7 +14,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 33ab0941c3..339f433a04 100644
+index 15f5a16aeb..80b2813024 100644
 --- a/Changes
 +++ b/Changes
 @@ -517,6 +517,10 @@ Working version
@@ -10111,36 +10088,13 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bddad6578a
+index 0000000000..cfae7c4e1d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10042 @@
+@@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..723a22309f
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:46:57.583355022 +0100
-+++++ b	2023-09-28 18:46:57.591355318 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -1860,11 +1860,6 @@ endif
-+++@@ -1863,11 +1863,6 @@ endif
-++  
-++  include .depend
-++  
-++@@ -28,7 +28,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -213,8 +213,6 @@ AC_SUBST([compute_deps])
-+++@@ -215,8 +215,6 @@ AC_SUBST([naked_pointers_checker])
-++  AC_SUBST([ocaml_bindir])
-++  AC_SUBST([ocaml_libdir])
-++  AC_SUBST([QS])
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10154,7 +10108,7 @@ index 0000000000..bddad6578a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 33ab0941c3..339f433a04 100644
++index 15f5a16aeb..80b2813024 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -517,6 +517,10 @@ Working version
@@ -20156,7 +20110,21 @@ index 0000000000..bddad6578a
 ++         ;;
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +1
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++      
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
