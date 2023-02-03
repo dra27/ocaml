@@ -20,6 +20,7 @@ jobs:
     - name: Generate date-based cache key
       run: |
         # Put year and week number in cache-key
+        # XXX Output variable, etc.
         Get-Date -UFormat '%Y-%W' | Out-File -FilePath .\cache-key
 
     - name: Base cache
