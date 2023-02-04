@@ -1,20 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..52bfd2a1e0
+index 0000000000..23ecb303c0
 --- /dev/null
 +++ b/.Diff-of-diff.diff
 @@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:58.231379000 +0100
-++++ b	2023-09-28 18:46:58.243379444 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
-+ --- a/otherlibs/unix/unixsupport_win32.c
-+ +++ b/otherlibs/unix/unixsupport_win32.c
-+-@@ -93,6 +93,7 @@ static struct error_entry win_error_table[] = {
-++@@ -101,6 +101,7 @@ static struct error_entry win_error_table[] = {
-+    { ERROR_FILE_NOT_FOUND, 0, ENOENT},
-+    { ERROR_PATH_NOT_FOUND, 0, ENOENT},
-+    { ERROR_TOO_MANY_OPEN_FILES, 0, EMFILE},
++--- a	2023-09-28 18:46:58.539390393 +0100
+++++ b	2023-09-28 18:46:58.551390837 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -1005,7 +1005,7 @@ OCaml 5.0
+++@@ -1009,7 +1009,7 @@ OCaml 5.0
++    socket and deadlock the parent.
++    (Antonin Décimo, review by Xavier Leroy)
++  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,7 +28,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index e3190a0f19..29aa0209d4 100644
+index 212fb63d4d..587ca12223 100644
 --- a/Changes
 +++ b/Changes
 @@ -520,6 +520,10 @@ Working version
@@ -10102,27 +10102,27 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6cbcaf095e
+index 0000000000..2828e5db14
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10033 @@
+@@ -0,0 +1,10038 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..52bfd2a1e0
++index 0000000000..23ecb303c0
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
 +@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:58.231379000 +0100
-+++++ b	2023-09-28 18:46:58.243379444 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
-++ --- a/otherlibs/unix/unixsupport_win32.c
-++ +++ b/otherlibs/unix/unixsupport_win32.c
-++-@@ -93,6 +93,7 @@ static struct error_entry win_error_table[] = {
-+++@@ -101,6 +101,7 @@ static struct error_entry win_error_table[] = {
-++    { ERROR_FILE_NOT_FOUND, 0, ENOENT},
-++    { ERROR_PATH_NOT_FOUND, 0, ENOENT},
-++    { ERROR_TOO_MANY_OPEN_FILES, 0, EMFILE},
+++--- a	2023-09-28 18:46:58.539390393 +0100
++++++ b	2023-09-28 18:46:58.551390837 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -1005,7 +1005,7 @@ OCaml 5.0
++++@@ -1009,7 +1009,7 @@ OCaml 5.0
+++    socket and deadlock the parent.
+++    (Antonin Décimo, review by Xavier Leroy)
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10136,7 +10136,7 @@ index 0000000000..6cbcaf095e
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index e3190a0f19..29aa0209d4 100644
++index 212fb63d4d..587ca12223 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -520,6 +520,10 @@ Working version
@@ -20138,7 +20138,12 @@ index 0000000000..6cbcaf095e
 ++         ;;
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
