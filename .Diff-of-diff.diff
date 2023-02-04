@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:46:58.231379000 +0100
++++ b	2023-09-28 18:46:58.243379444 +0100
+@@ -14,7 +14,7 @@
+ diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
+ --- a/otherlibs/unix/unixsupport_win32.c
+ +++ b/otherlibs/unix/unixsupport_win32.c
+-@@ -93,6 +93,7 @@ static struct error_entry win_error_table[] = {
++@@ -101,6 +101,7 @@ static struct error_entry win_error_table[] = {
+    { ERROR_FILE_NOT_FOUND, 0, ENOENT},
+    { ERROR_PATH_NOT_FOUND, 0, ENOENT},
+    { ERROR_TOO_MANY_OPEN_FILES, 0, EMFILE},

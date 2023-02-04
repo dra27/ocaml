@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..52bfd2a1e0
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:46:58.231379000 +0100
+++++ b	2023-09-28 18:46:58.243379444 +0100
++@@ -14,7 +14,7 @@
++ diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
++ --- a/otherlibs/unix/unixsupport_win32.c
++ +++ b/otherlibs/unix/unixsupport_win32.c
++-@@ -93,6 +93,7 @@ static struct error_entry win_error_table[] = {
+++@@ -101,6 +101,7 @@ static struct error_entry win_error_table[] = {
++    { ERROR_FILE_NOT_FOUND, 0, ENOENT},
++    { ERROR_PATH_NOT_FOUND, 0, ENOENT},
++    { ERROR_TOO_MANY_OPEN_FILES, 0, EMFILE},
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 15f5a16aeb..80b2813024 100644
+index e3190a0f19..29aa0209d4 100644
 --- a/Changes
 +++ b/Changes
-@@ -517,6 +517,10 @@ Working version
+@@ -520,6 +520,10 @@ Working version
  - #11879: Bugfix for Ctype.nondep_type
    (Stephen Dolan, review by Gabriel Scherer)
  
@@ -28,7 +42,7 @@ index 15f5a16aeb..80b2813024 100644
  OCaml 5.0
  ---------
  
-@@ -1053,11 +1057,6 @@ OCaml 5.0
+@@ -1056,11 +1060,6 @@ OCaml 5.0
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index 15f5a16aeb..80b2813024 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1086,6 +1085,30 @@ OCaml 5.0
+@@ -1089,6 +1088,30 @@ OCaml 5.0
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index 15f5a16aeb..80b2813024 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1121,13 +1144,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1124,13 +1147,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index 15f5a16aeb..80b2813024 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1234,6 +1257,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1237,6 +1260,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index 15f5a16aeb..80b2813024 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1497,6 +1523,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1500,6 +1526,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10088,13 +10102,27 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..cfae7c4e1d
+index 0000000000..6cbcaf095e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10033 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..52bfd2a1e0
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:46:58.231379000 +0100
++++++ b	2023-09-28 18:46:58.243379444 +0100
+++@@ -14,7 +14,7 @@
+++ diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
+++ --- a/otherlibs/unix/unixsupport_win32.c
+++ +++ b/otherlibs/unix/unixsupport_win32.c
+++-@@ -93,6 +93,7 @@ static struct error_entry win_error_table[] = {
++++@@ -101,6 +101,7 @@ static struct error_entry win_error_table[] = {
+++    { ERROR_FILE_NOT_FOUND, 0, ENOENT},
+++    { ERROR_PATH_NOT_FOUND, 0, ENOENT},
+++    { ERROR_TOO_MANY_OPEN_FILES, 0, EMFILE},
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10108,10 +10136,10 @@ index 0000000000..cfae7c4e1d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 15f5a16aeb..80b2813024 100644
++index e3190a0f19..29aa0209d4 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -517,6 +517,10 @@ Working version
++@@ -520,6 +520,10 @@ Working version
 + - #11879: Bugfix for Ctype.nondep_type
 +   (Stephen Dolan, review by Gabriel Scherer)
 + 
@@ -10122,7 +10150,7 @@ index 0000000000..cfae7c4e1d
 + OCaml 5.0
 + ---------
 + 
-+@@ -1053,11 +1057,6 @@ OCaml 5.0
++@@ -1056,11 +1060,6 @@ OCaml 5.0
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10134,7 +10162,7 @@ index 0000000000..cfae7c4e1d
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1086,6 +1085,30 @@ OCaml 5.0
++@@ -1089,6 +1088,30 @@ OCaml 5.0
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10165,7 +10193,7 @@ index 0000000000..cfae7c4e1d
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1121,13 +1144,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1124,13 +1147,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10181,7 +10209,7 @@ index 0000000000..cfae7c4e1d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1234,6 +1257,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1237,6 +1260,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10191,7 +10219,7 @@ index 0000000000..cfae7c4e1d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1497,6 +1523,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1500,6 +1526,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20110,21 +20138,7 @@ index 0000000000..cfae7c4e1d
 ++         ;;
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++      
+++@@ -139,29 +
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -21612,7 +21626,7 @@ index 2d9f95d8a3..77054318ba 100644
 +
  #endif /* CAML_UNIXSUPPORT_H */
 diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
-index 00b9ae40df..4ce758fa2b 100644
+index f9e85a4586..a83368a381 100644
 --- a/otherlibs/unix/unixsupport_win32.c
 +++ b/otherlibs/unix/unixsupport_win32.c
 @@ -55,7 +55,11 @@ value caml_win32_alloc_handle(HANDLE h)
