@@ -524,8 +524,8 @@ Working version
   that causes very slow compaction.
   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 
-OCaml 5.0
----------
+OCaml 5.0.0 (15 December 2022)
+------------------------------
 
 - #10831: Multicore OCaml
   (Enguerrand Decorne, Stephen Dolan, Tom Kelly, Sadiq Jaffer,

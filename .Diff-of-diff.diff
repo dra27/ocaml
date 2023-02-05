@@ -1,11 +1,15 @@
---- a	2023-09-28 18:46:58.539390393 +0100
-+++ b	2023-09-28 18:46:58.551390837 +0100
-@@ -1,7 +1,7 @@
+--- a	2023-09-28 18:46:58.831401195 +0100
++++ b	2023-09-28 18:46:58.843401639 +0100
+@@ -1,9 +1,9 @@
  diff --git a/Changes b/Changes
  --- a/Changes
  +++ b/Changes
--@@ -1005,7 +1005,7 @@ OCaml 5.0
-+@@ -1009,7 +1009,7 @@ OCaml 5.0
-    socket and deadlock the parent.
-    (Antonin Décimo, review by Xavier Leroy)
+-@@ -520,8 +520,8 @@ Working version
+- - #11879: Bugfix for Ctype.nondep_type
+-   (Stephen Dolan, review by Gabriel Scherer)
++@@ -524,8 +524,8 @@ Working version
++   that causes very slow compaction.
++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
   
+ -OCaml 5.0
+ ----------

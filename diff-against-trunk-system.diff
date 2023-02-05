@@ -1,20 +1,24 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..23ecb303c0
+index 0000000000..b469e66d32
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:46:58.539390393 +0100
-++++ b	2023-09-28 18:46:58.551390837 +0100
-+@@ -1,7 +1,7 @@
+@@ -0,0 +1,15 @@
++--- a	2023-09-28 18:46:58.831401195 +0100
+++++ b	2023-09-28 18:46:58.843401639 +0100
++@@ -1,9 +1,9 @@
 + diff --git a/Changes b/Changes
 + --- a/Changes
 + +++ b/Changes
-+-@@ -1005,7 +1005,7 @@ OCaml 5.0
-++@@ -1009,7 +1009,7 @@ OCaml 5.0
-+    socket and deadlock the parent.
-+    (Antonin Décimo, review by Xavier Leroy)
++-@@ -520,8 +520,8 @@ Working version
++- - #11879: Bugfix for Ctype.nondep_type
++-   (Stephen Dolan, review by Gabriel Scherer)
+++@@ -524,8 +524,8 @@ Working version
+++   that causes very slow compaction.
+++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 +  
++ -OCaml 5.0
++ ----------
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,7 +32,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 212fb63d4d..587ca12223 100644
+index 7bd6afb027..30cd8ae13e 100644
 --- a/Changes
 +++ b/Changes
 @@ -520,6 +520,10 @@ Working version
@@ -39,10 +43,10 @@ index 212fb63d4d..587ca12223 100644
 +  that causes very slow compaction.
 +  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 +
- OCaml 5.0
- ---------
+ OCaml 5.0.0 (15 December 2022)
+ ------------------------------
  
-@@ -1056,11 +1060,6 @@ OCaml 5.0
+@@ -1056,11 +1060,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -54,7 +58,7 @@ index 212fb63d4d..587ca12223 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1089,6 +1088,30 @@ OCaml 5.0
+@@ -1089,6 +1088,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -10102,27 +10106,31 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2828e5db14
+index 0000000000..e1943e1772
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10038 @@
+@@ -0,0 +1,10036 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..23ecb303c0
++index 0000000000..b469e66d32
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:46:58.539390393 +0100
-+++++ b	2023-09-28 18:46:58.551390837 +0100
-++@@ -1,7 +1,7 @@
++@@ -0,0 +1,15 @@
+++--- a	2023-09-28 18:46:58.831401195 +0100
++++++ b	2023-09-28 18:46:58.843401639 +0100
+++@@ -1,9 +1,9 @@
 ++ diff --git a/Changes b/Changes
 ++ --- a/Changes
 ++ +++ b/Changes
-++-@@ -1005,7 +1005,7 @@ OCaml 5.0
-+++@@ -1009,7 +1009,7 @@ OCaml 5.0
-++    socket and deadlock the parent.
-++    (Antonin Décimo, review by Xavier Leroy)
+++-@@ -520,8 +520,8 @@ Working version
+++- - #11879: Bugfix for Ctype.nondep_type
+++-   (Stephen Dolan, review by Gabriel Scherer)
++++@@ -524,8 +524,8 @@ Working version
++++   that causes very slow compaction.
++++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 ++  
+++ -OCaml 5.0
+++ ----------
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10136,7 +10144,7 @@ index 0000000000..2828e5db14
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 212fb63d4d..587ca12223 100644
++index 7bd6afb027..30cd8ae13e 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -520,6 +520,10 @@ Working version
@@ -10147,10 +10155,10 @@ index 0000000000..2828e5db14
 ++  that causes very slow compaction.
 ++  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 ++
-+ OCaml 5.0
-+ ---------
++ OCaml 5.0.0 (15 December 2022)
++ ------------------------------
 + 
-+@@ -1056,11 +1060,6 @@ OCaml 5.0
++@@ -1056,11 +1060,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10162,7 +10170,7 @@ index 0000000000..2828e5db14
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1089,6 +1088,30 @@ OCaml 5.0
++@@ -1089,6 +1088,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -20137,13 +20145,7 @@ index 0000000000..2828e5db14
 +++            dep='--enable-dependency-generation'
 ++         ;;
 ++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX
+++             build='--build=i686-pc-cyg
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
