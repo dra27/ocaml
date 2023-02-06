@@ -295,9 +295,9 @@ let read_sections () =
         (fun () -> ()) }
   with Not_found ->
     let ic = open_in_bin Sys.executable_name in
-    Bytesections.read_toc ic;
-    { read_string = Bytesections.read_section_string ic;
-      read_struct = Bytesections.read_section_struct ic;
+    CamlinternalDynlink.MiniBytesections.read_toc ic;
+    { read_string = CamlinternalDynlink.MiniBytesections.read_section_string ic;
+      read_struct = CamlinternalDynlink.MiniBytesections.read_section_struct ic;
       close_reader = fun () -> close_in ic }
 
 (* Initialize the linker for toplevel use *)
@@ -327,7 +327,8 @@ let init_toplevel () =
     (* Done *)
     sect.close_reader();
     crcintfs
-  with Bytesections.Bad_magic_number | Not_found | Failure _ ->
+  with CamlinternalDynlink.MiniBytesections.Bad_magic_number
+  | Not_found | Failure _ ->
     fatal_error "Toplevel bytecode executable is corrupted"
 
 (* Find the value of a global identifier *)

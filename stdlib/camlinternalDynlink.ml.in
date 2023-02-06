@@ -81,6 +81,7 @@ let magic_length = 12
 let cmo_magic_number = {@QS@|@CMO_MAGIC_NUMBER@|@QS@}
 and cma_magic_number = {@QS@|@CMA_MAGIC_NUMBER@|@QS@}
 and cmxs_magic_number = {@QS@|@CMXS_MAGIC_NUMBER@|@QS@}
+and exec_magic_number = {@QS@|@EXEC_MAGIC_NUMBER@|@QS@}
 
 (* The CMO format, keep in sync with file_formats/cmo_format.mli *)
 
@@ -359,3 +360,45 @@ external invoke_traced_function : Obj.raw_data -> Obj.t -> Obj.t -> Obj.t
                                 = "caml_invoke_traced_function"
 external get_section_table : unit -> (string * Obj.t) list
                            = "caml_get_section_table"
+module MiniBytesections = struct
+  (* This code is copied from bytecomp/bytesections.ml  and adapted *)
+  (* We use a different module name to make sure all the references
+     get updated *)
+  exception Bad_magic_number (* Possibly add a string argument? *)
+
+  let section_table = ref ([] : (string * int) list)
+
+  let read_toc ic =
+    let pos_trailer = in_channel_length ic - 16 in
+    seek_in ic pos_trailer;
+    let num_sections = input_binary_int ic in
+    let header =
+      really_input_string ic (String.length exec_magic_number)
+    in
+    if header <> exec_magic_number then raise Bad_magic_number;
+    seek_in ic (pos_trailer - 8 * num_sections);
+    section_table := [];
+    for _i = 1 to num_sections do
+      let name = really_input_string ic 4 in
+      let len = input_binary_int ic in
+      section_table := (name, len) :: !section_table
+    done
+
+  let seek_section ic name =
+    let rec seek_sec curr_ofs = function
+      [] -> raise Not_found
+    | (n, len) :: rem ->
+        if n = name
+        then begin seek_in ic (curr_ofs - len); len end
+        else seek_sec (curr_ofs - len) rem in
+    seek_sec (in_channel_length ic - 16 - 8 * List.length !section_table)
+             !section_table
+
+  let read_section_string ic name =
+    really_input_string ic (seek_section ic name)
+
+  let read_section_struct ic name =
+    ignore (seek_section ic name);
+    input_value ic
+
+end

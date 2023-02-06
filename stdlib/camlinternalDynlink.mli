@@ -191,3 +191,9 @@ external invoke_traced_function : Obj.raw_data -> Obj.t -> Obj.t -> Obj.t
                                 = "caml_invoke_traced_function"
 external get_section_table : unit -> (string * Obj.t) list
                            = "caml_get_section_table"
+module MiniBytesections : sig
+  exception Bad_magic_number
+  val read_toc: in_channel -> unit
+  val read_section_string: in_channel -> string -> string
+  val read_section_struct: in_channel -> string -> 'a
+end
