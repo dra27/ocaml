@@ -108,7 +108,8 @@ module Bytecode = struct
         in
         begin try
           Symtable.patch_object
-            Dll.find_primitive_for_execution code compunit.cu_reloc;
+            CamlinternalDynlink.find_primitive_for_execution
+              code compunit.cu_reloc;
           Symtable.check_global_initialized compunit.cu_reloc;
           Symtable.update_global_table ()
         with Symtable.Error error ->
@@ -167,7 +168,7 @@ module Bytecode = struct
         seek_in ic toc_pos;
         let lib = (input_value ic : Cmo_format.library) in
         let open_dll dll_name =
-          Dll.open_dll_for_execution
+          CamlinternalDynlink.open_dll_for_execution
             (CamlinternalDynlink.extract_dll_name dll_name)
         in
         begin try

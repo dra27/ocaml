@@ -21,7 +21,7 @@ open Cmo_format
 
 val init: unit -> unit
 val patch_object:
-  (string -> Dll.primitive_address option) ->
+  (string -> CamlinternalDynlink.primitive_address option) ->
   CamlinternalDynlink.LongString.t -> (reloc_info * int) list -> unit
 val require_primitive: string -> unit
 val initial_global_table: unit -> Obj.t array

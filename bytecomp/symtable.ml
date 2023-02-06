@@ -97,16 +97,17 @@ let of_prim find_primitive name =
     else begin
       match find_primitive name with
       | None -> raise(Error(Unavailable_primitive name))
-      | Some Dll.Prim_exists ->
+      | Some CamlinternalDynlink.Prim_exists ->
           PrimMap.enter c_prim_table name
-      | Some (Dll.Prim_loaded symb) ->
+      | Some (CamlinternalDynlink.Prim_loaded symb) ->
           let num = PrimMap.enter c_prim_table name in
-          Dll.synchronize_primitive num symb;
+          CamlinternalDynlink.synchronize_primitive num symb;
           num
     end
 
 let require_primitive name =
-  if name.[0] <> '%' then ignore(of_prim Dll.find_primitive_for_execution name)
+  if name.[0] <> '%' then 
+    ignore(of_prim CamlinternalDynlink.find_primitive_for_execution name)
 
 let all_primitives () =
   let prim = Array.make !c_prim_table.cnt "" in
@@ -315,7 +316,7 @@ let init_toplevel () =
     done;
     (* DLL initialization *)
     let dllpath = try sect.read_string "DLPT" with Not_found -> "" in
-    Dll.init_toplevel dllpath;
+    CamlinternalDynlink.init_toplevel dllpath;
     (* Recover CRC infos for interfaces *)
     let crcintfs =
       try

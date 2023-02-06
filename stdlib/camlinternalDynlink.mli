@@ -125,3 +125,51 @@ val fatal_error: string -> 'a
 
 (* Extract the name of a DLL from its external name (xxx.so or -lxxx) *)
 val extract_dll_name: string -> string
+
+(* Handling of dynamically-linked libraries *)
+
+(* The abstract type representing C function pointers *)
+type dll_address
+
+type primitive_address =
+  | Prim_loaded of dll_address (* Primitive found in a DLL opened
+                                  "for execution" *)
+  | Prim_exists (* Primitive found in a DLL opened "for checking" *)
+
+(* Resolve a DLL name, i.e. find the correspoinding file *)
+val fullname_of_name: string -> string
+
+(* Open a DLL so that its function can be called (complete symbol resolution
+     must be possible).  Raise [Failure msg] in case of error. *)
+val open_dll_for_execution: string -> unit
+
+(* Close all DLLs *)
+val close_all_dlls: unit -> unit
+
+(* Find a primitive in the DLLs currently opened for execution and return
+   its address. Return [None] if the primitive is not found. *)
+val find_primitive_for_execution: string -> primitive_address option
+
+(* If linking in core (dynlink or toplevel), synchronize the VM
+   table of primitive with the linker's table of primitive
+   by storing the given primitive function at the given position
+   in the VM table of primitives.  *)
+val synchronize_primitive: int -> dll_address -> unit
+
+(* Add the given directories at the head of the search path for DLLs *)
+val add_path: string list -> unit
+
+(* Use the given directories as the search path for DLLs *)
+val set_path: string list -> unit
+
+(* Remove the given directories from the search path for DLLs *)
+val remove_path: string list -> unit
+
+val ld_library_path_contents: unit -> string list
+
+(* Initialization for linking in core (dynlink or toplevel).
+   Initialize the search path to the same path that was used to start
+   the running program (CAML_LD_LIBRARY_PATH + directories in executable +
+   contents of ld.conf file).  Take note of the DLLs that were opened
+   when starting the running program. *)
+val init_toplevel: string -> unit

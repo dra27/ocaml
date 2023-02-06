@@ -80,7 +80,7 @@ let load_lambda ppf lam =
   let can_free = (fun_code = []) in
   let initial_symtable = Symtable.current_state() in
   Symtable.patch_object
-    Dll.find_primitive_for_execution code reloc;
+    CamlinternalDynlink.find_primitive_for_execution code reloc;
   Symtable.check_global_initialized reloc;
   Symtable.update_global_table();
   let initial_bindings = !toplevel_value_bindings in
@@ -214,7 +214,7 @@ let load_compunit ic filename ppf compunit =
   in
   let initial_symtable = Symtable.current_state() in
   Symtable.patch_object
-    Dll.find_primitive_for_execution code compunit.cu_reloc;
+    CamlinternalDynlink.find_primitive_for_execution code compunit.cu_reloc;
   Symtable.update_global_table();
   let events =
     if compunit.cu_debug = 0 then [| |]
@@ -278,7 +278,7 @@ and really_load_file recursive ppf name filename ic =
         List.iter
           (fun dllib ->
             let name = CamlinternalDynlink.extract_dll_name dllib in
-            try Dll.open_dll_for_execution name
+            try CamlinternalDynlink.open_dll_for_execution name
             with Failure reason ->
               fprintf ppf
                 "Cannot load required shared library %s.@.Reason: %s.@."

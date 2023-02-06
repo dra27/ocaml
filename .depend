@@ -2041,13 +2041,9 @@ bytecomp/bytesections.cmx : \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmi :
 bytecomp/dll.cmo : \
-    utils/misc.cmi \
-    utils/config.cmi \
     utils/binutils.cmi \
     bytecomp/dll.cmi
 bytecomp/dll.cmx : \
-    utils/misc.cmx \
-    utils/config.cmx \
     utils/binutils.cmx \
     bytecomp/dll.cmi
 bytecomp/dll.cmi :
@@ -2152,7 +2148,6 @@ bytecomp/symtable.cmo : \
     parsing/location.cmi \
     lambda/lambda.cmi \
     typing/ident.cmi \
-    bytecomp/dll.cmi \
     utils/config.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
@@ -2166,7 +2161,6 @@ bytecomp/symtable.cmx : \
     parsing/location.cmx \
     lambda/lambda.cmx \
     typing/ident.cmx \
-    bytecomp/dll.cmx \
     utils/config.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
@@ -2174,7 +2168,6 @@ bytecomp/symtable.cmx : \
     bytecomp/symtable.cmi
 bytecomp/symtable.cmi : \
     lambda/lambda.cmi \
-    bytecomp/dll.cmi \
     file_formats/cmo_format.cmi
 asmcomp/CSE.cmo : \
     asmcomp/mach.cmi \
@@ -6289,7 +6282,6 @@ toplevel/topcommon.cmo : \
     typing/ident.cmi \
     toplevel/genprintval.cmi \
     typing/env.cmi \
-    bytecomp/dll.cmi \
     utils/config.cmi \
     driver/compmisc.cmi \
     driver/compenv.cmi \
@@ -6316,7 +6308,6 @@ toplevel/topcommon.cmx : \
     typing/ident.cmx \
     toplevel/genprintval.cmx \
     typing/env.cmx \
-    bytecomp/dll.cmx \
     utils/config.cmx \
     driver/compmisc.cmx \
     driver/compenv.cmx \
@@ -6352,7 +6343,6 @@ toplevel/topdirs.cmo : \
     utils/load_path.cmi \
     typing/ident.cmi \
     typing/env.cmi \
-    bytecomp/dll.cmi \
     typing/ctype.cmi \
     utils/config.cmi \
     driver/compenv.cmi \
@@ -6376,7 +6366,6 @@ toplevel/topdirs.cmx : \
     utils/load_path.cmx \
     typing/ident.cmx \
     typing/env.cmx \
-    bytecomp/dll.cmx \
     typing/ctype.cmx \
     utils/config.cmx \
     driver/compenv.cmx \
@@ -6469,7 +6458,6 @@ toplevel/byte/topeval.cmo : \
     typing/ident.cmi \
     typing/env.cmi \
     bytecomp/emitcode.cmi \
-    bytecomp/dll.cmi \
     utils/config.cmi \
     driver/compmisc.cmi \
     file_formats/cmo_format.cmi \
@@ -6503,7 +6491,6 @@ toplevel/byte/topeval.cmx : \
     typing/ident.cmx \
     typing/env.cmx \
     bytecomp/emitcode.cmx \
-    bytecomp/dll.cmx \
     utils/config.cmx \
     driver/compmisc.cmx \
     file_formats/cmo_format.cmi \
