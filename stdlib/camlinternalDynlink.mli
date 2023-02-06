@@ -197,3 +197,28 @@ module MiniBytesections : sig
   val read_section_string: in_channel -> string -> string
   val read_section_struct: in_channel -> string -> 'a
 end
+
+module MiniSymtable : sig
+  type error =
+      Undefined_global of string
+    | Unavailable_primitive of string
+    | Wrong_vm of string
+    | Uninitialized_global of string
+
+  exception Error of error
+
+  type global_map
+  val empty_global_map: global_map
+  val required_globals: (reloc_info * int) list -> string list
+  val defined_globals: (reloc_info * int) list -> string list
+  val init_toplevel: unit -> (string * Digest.t option) list
+  val current_state: unit -> global_map
+  val is_defined_in_global_map: global_map -> string -> bool
+  val patch_object:
+    (string -> primitive_address option) ->
+    LongString.t -> (reloc_info * int) list -> unit
+  val check_global_initialized: (reloc_info * int) list -> unit
+  val update_global_table: unit -> unit
+  val hide_additions: global_map -> unit  
+  val get_global_value: string -> Obj.t
+end

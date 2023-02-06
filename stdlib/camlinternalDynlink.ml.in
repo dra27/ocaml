@@ -15,6 +15,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+[@@@ocaml.warning "-40"]
+
 module LongString = struct
   type t = bytes array
 
@@ -400,5 +402,214 @@ module MiniBytesections = struct
   let read_section_struct ic name =
     ignore (seek_section ic name);
     input_value ic
+end
 
+module MiniSymtable = struct
+  type error =
+      Undefined_global of string
+    | Unavailable_primitive of string
+    | Wrong_vm of string
+    | Uninitialized_global of string
+
+  exception Error of error
+
+  module StringMap = Map.Make(String)
+
+  module Num_tbl (M : Map.S) = struct
+    type t = {
+      cnt: int; (* The next number *)
+      tbl: int M.t ; (* The table of already numbered objects *)
+    }
+
+    let empty = { cnt = 0; tbl = M.empty }
+
+    let find nt key =
+      M.find key nt.tbl
+
+    let enter nt key =
+      let n = !nt.cnt in
+      nt := { cnt = n + 1; tbl = M.add key n !nt.tbl };
+      n
+
+    let incr nt =
+      let n = !nt.cnt in
+      nt := { cnt = n + 1; tbl = !nt.tbl };
+      n
+
+  end
+  module GlobalMap = Num_tbl(StringMap)
+
+  module PrimMap = Num_tbl(StringMap)
+
+  type global_map = GlobalMap.t
+
+  let empty_global_map = GlobalMap.empty
+
+  let global_table = ref GlobalMap.empty
+  and literal_table = ref([] : (int * Obj.t) list)
+
+  let c_prim_table = ref PrimMap.empty
+
+  let set_prim_table name =
+    ignore(PrimMap.enter c_prim_table name)
+
+  let host = {@QS@|@host@|@QS@}
+  let target = {@QS@|@target@|@QS@}
+
+  let of_prim find_primitive name =
+    try
+      PrimMap.find !c_prim_table name
+    with Not_found ->
+      if (* !Clflags.custom_runtime || *) host <> target
+         (* || !Clflags.no_check_prims *)
+      then
+        PrimMap.enter c_prim_table name
+      else begin
+        match find_primitive name with
+        | None -> raise(Error(Unavailable_primitive name))
+        | Some Prim_exists ->
+            PrimMap.enter c_prim_table name
+        | Some (Prim_loaded symb) ->
+            let num = PrimMap.enter c_prim_table name in
+            synchronize_primitive num symb;
+            num
+      end
+
+  let required_globals patchlist =
+    List.fold_left (fun accu rel ->
+        match rel with
+        | (Reloc_getglobal id, _pos) -> id :: accu
+        | _ -> accu)
+      []
+      patchlist
+  
+  let defined_globals patchlist =
+    List.fold_left (fun accu rel ->
+        match rel with
+        | (Reloc_setglobal id, _pos) -> id :: accu
+        | _ -> accu)
+      []
+      patchlist
+
+  let slot_for_getglobal id =
+    try
+      GlobalMap.find !global_table id
+    with Not_found ->
+      raise(Error(Undefined_global id))
+
+  let slot_for_setglobal id =
+    GlobalMap.enter global_table id
+
+  let slot_for_literal cst =
+    let n = GlobalMap.incr global_table in
+    literal_table := (n, cst) :: !literal_table;
+    n
+
+  type section_reader = {
+    read_string: string -> string;
+    read_struct: string -> Obj.t;
+    close_reader: unit -> unit
+  }
+
+  let read_sections () =
+    try
+      let sections = get_section_table () in
+      { read_string =
+          (fun name -> (Obj.magic(List.assoc name sections) : string));
+        read_struct =
+          (fun name -> List.assoc name sections);
+        close_reader =
+          (fun () -> ()) }
+    with Not_found ->
+      let ic = open_in_bin Sys.executable_name in
+      MiniBytesections.read_toc ic;
+      { read_string = MiniBytesections.read_section_string ic;
+        read_struct = MiniBytesections.read_section_struct ic;
+        close_reader = fun () -> close_in ic }
+
+  let init_toplevel () =
+    try
+      let sect = read_sections () in
+      (* Locations of globals *)
+      global_table := (Obj.magic (sect.read_struct "SYMB") : GlobalMap.t);
+      (* Primitives *)
+      let prims = sect.read_string "PRIM" in
+      c_prim_table := PrimMap.empty;
+      let pos = ref 0 in
+      while !pos < String.length prims do
+        let i = String.index_from prims !pos '\000' in
+        set_prim_table (String.sub prims !pos (i - !pos));
+        pos := i + 1
+      done;
+      (* DLL initialization *)
+      let dllpath = try sect.read_string "DLPT" with Not_found -> "" in
+      init_toplevel dllpath;
+      (* Recover CRC infos for interfaces *)
+      let crcintfs =
+        try
+          (Obj.magic (sect.read_struct "CRCS") : (string * Digest.t option) list)
+        with Not_found -> [] in
+      (* Done *)
+      sect.close_reader();
+      crcintfs
+    with MiniBytesections.Bad_magic_number
+    | Not_found | Failure _ ->
+      fatal_error "Toplevel bytecode executable is corrupted"
+
+  let current_state () = !global_table
+
+  let is_defined_in_global_map (gmap : global_map) id =
+    StringMap.mem id gmap.tbl
+
+  let patch_int buff pos n =
+    LongString.set buff pos (Char.unsafe_chr n);
+    LongString.set buff (pos + 1) (Char.unsafe_chr (n asr 8));
+    LongString.set buff (pos + 2) (Char.unsafe_chr (n asr 16));
+    LongString.set buff (pos + 3) (Char.unsafe_chr (n asr 24))
+
+  let patch_object find_primitive buff patchlist =
+    List.iter
+      (function
+          (Reloc_literal sc, pos) ->
+            patch_int buff pos (slot_for_literal sc)
+        | (Reloc_getglobal id, pos) | (Reloc_getpredef id, pos) ->
+            patch_int buff pos (slot_for_getglobal id)
+        | (Reloc_setglobal id, pos) ->
+            patch_int buff pos (slot_for_setglobal id)
+        | (Reloc_primitive name, pos) ->
+            patch_int buff pos (of_prim find_primitive name))
+      patchlist
+
+  let get_global_value id = (global_data()).(slot_for_getglobal id)
+
+  let check_global_initialized patchlist =
+    (* First determine the globals we will define *)
+    let defined_globals = defined_globals patchlist in
+    (* Then check that all referenced, not defined globals have a value *)
+    let check_reference = function
+        (Reloc_getglobal id, _pos) ->
+          if not (List.mem id defined_globals)
+          && Obj.is_int (get_global_value id)
+          then raise (Error(Uninitialized_global id))
+      | _ -> () in
+    List.iter check_reference patchlist
+
+  let update_global_table () =
+    let ng = !global_table.cnt in
+    let glob = global_data() in
+    if ng > Array.length(glob) then 
+      realloc_global_data ng;
+    let glob = global_data() in
+    List.iter
+      (fun (slot, cst) -> glob.(slot) <- cst)
+      !literal_table;
+    literal_table := []
+
+  let hide_additions (st : global_map) =
+    if st.cnt > !global_table.cnt then
+      fatal_error "Symtable.hide_additions";
+    global_table :=
+      {GlobalMap.
+        cnt = !global_table.cnt;
+        tbl = st.tbl }
 end

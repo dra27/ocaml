@@ -18,16 +18,15 @@
 
 [@@@ocaml.warning "+a-4-30-40-41-42"]
 
-open! Dynlink_compilerlibs
-
 module DC = Dynlink_common
 module DT = Dynlink_types
 
 module Bytecode = struct
+  module Symtable = CamlinternalDynlink.MiniSymtable
   type filename = string
 
   module Unit_header = struct
-    type t = Cmo_format.compilation_unit
+    type t = CamlinternalDynlink.compilation_unit
 
     let name (t : t) = t.cu_name
     let crc _t = None
@@ -101,7 +100,7 @@ module Bytecode = struct
   let run lock (ic, file_name, file_digest) ~unit_header ~priv =
     let clos = with_lock lock (fun () ->
         let old_state = Symtable.current_state () in
-        let compunit : Cmo_format.compilation_unit = unit_header in
+        let compunit : CamlinternalDynlink.compilation_unit = unit_header in
         seek_in ic compunit.cu_pos;
         let code =
           CamlinternalDynlink.load_compunit_code ic compunit.cu_codesize
@@ -162,13 +161,13 @@ module Bytecode = struct
       if buffer = CamlinternalDynlink.cmo_magic_number then begin
         let compunit_pos = input_binary_int ic in  (* Go to descriptor *)
         seek_in ic compunit_pos;
-        let cu = (input_value ic : Cmo_format.compilation_unit) in
+        let cu = (input_value ic : CamlinternalDynlink.compilation_unit) in
         handle, [cu]
       end else
       if buffer = CamlinternalDynlink.cma_magic_number then begin
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
-        let lib = (input_value ic : Cmo_format.library) in
+        let lib = (input_value ic : CamlinternalDynlink.library) in
         let open_dll dll_name =
           CamlinternalDynlink.open_dll_for_execution
             (CamlinternalDynlink.extract_dll_name dll_name)
