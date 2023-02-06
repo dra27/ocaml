@@ -84,20 +84,22 @@ let load_lambda ppf lam =
   Symtable.check_global_initialized reloc;
   Symtable.update_global_table();
   let initial_bindings = !toplevel_value_bindings in
-  let bytecode, closure = Meta.reify_bytecode code [| events |] None in
+  let bytecode, closure =
+    CamlinternalDynlink.reify_bytecode code [| events |] None
+  in
   match
     may_trace := true;
     closure ()
   with
   | retval ->
     may_trace := false;
-    if can_free then Meta.release_bytecode bytecode;
+    if can_free then CamlinternalDynlink.release_bytecode bytecode;
 
     Result retval
   | exception x ->
     may_trace := false;
     record_backtrace ();
-    if can_free then Meta.release_bytecode bytecode;
+    if can_free then CamlinternalDynlink.release_bytecode bytecode;
 
     toplevel_value_bindings := initial_bindings; (* PR#6211 *)
     Symtable.restore_state initial_symtable;
@@ -224,7 +226,9 @@ let load_compunit ic filename ppf compunit =
     end in
   begin try
     may_trace := true;
-    let _bytecode, closure = Meta.reify_bytecode code events None in
+    let _bytecode, closure =
+      CamlinternalDynlink.reify_bytecode code events None
+    in
     ignore (closure ());
     may_trace := false;
   with exn ->

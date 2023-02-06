@@ -141,7 +141,6 @@ LAMBDA = \
 LAMBDA_CMI =
 
 COMP = \
-  bytecomp/meta.cmo \
   bytecomp/opcodes.cmo \
   bytecomp/bytesections.cmo \
   bytecomp/dll.cmo \

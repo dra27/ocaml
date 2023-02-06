@@ -266,8 +266,10 @@ let data_global_map () =
 
 let update_global_table () =
   let ng = !global_table.cnt in
-  if ng > Array.length(Meta.global_data()) then Meta.realloc_global_data ng;
-  let glob = Meta.global_data() in
+  let glob = CamlinternalDynlink.global_data() in
+  if ng > Array.length(glob) then 
+    CamlinternalDynlink.realloc_global_data ng;
+  let glob = CamlinternalDynlink.global_data() in
   List.iter
     (fun (slot, cst) -> glob.(slot) <- cst)
     !literal_table;
@@ -284,7 +286,7 @@ type section_reader = {
 
 let read_sections () =
   try
-    let sections = Meta.get_section_table () in
+    let sections = CamlinternalDynlink.get_section_table () in
     { read_string =
         (fun name -> (Obj.magic(List.assoc name sections) : string));
       read_struct =
@@ -333,9 +335,9 @@ let init_toplevel () =
 let get_global_position id = slot_for_getglobal id
 
 let get_global_value id =
-  (Meta.global_data()).(slot_for_getglobal id)
+  (CamlinternalDynlink.global_data()).(slot_for_getglobal id)
 let assign_global_value id v =
-  (Meta.global_data()).(slot_for_getglobal id) <- v
+  (CamlinternalDynlink.global_data()).(slot_for_getglobal id) <- v
 
 (* Check that all globals referenced in the given patch list
    have been initialized already *)

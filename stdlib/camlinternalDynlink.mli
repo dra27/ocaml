@@ -173,3 +173,21 @@ val ld_library_path_contents: unit -> string list
    contents of ld.conf file).  Take note of the DLLs that were opened
    when starting the running program. *)
 val init_toplevel: string -> unit
+
+(* To control the runtime system and bytecode interpreter *)
+(* Formerly in bytecomp/meta.mli *)
+
+external global_data : unit -> Obj.t array = "caml_get_global_data"
+external realloc_global_data : int -> unit = "caml_realloc_global"
+type closure = unit -> Obj.t
+type bytecode
+external reify_bytecode :
+  bytes array -> 'a -> string option ->
+    bytecode * closure
+                           = "caml_reify_bytecode"
+external release_bytecode : bytecode -> unit
+                                 = "caml_static_release_bytecode"
+external invoke_traced_function : Obj.raw_data -> Obj.t -> Obj.t -> Obj.t
+                                = "caml_invoke_traced_function"
+external get_section_table : unit -> (string * Obj.t) list
+                           = "caml_get_section_table"

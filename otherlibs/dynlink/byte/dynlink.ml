@@ -134,7 +134,9 @@ module Bytecode = struct
             [| input_value ic |]
           end in
         if priv then Symtable.hide_additions old_state;
-        let _, clos = Meta.reify_bytecode code events (Some digest) in
+        let _, clos =
+          CamlinternalDynlink.reify_bytecode code events (Some digest)
+        in
         clos
       )
     in

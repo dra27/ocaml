@@ -116,7 +116,6 @@ COMPILERLIBS_SOURCES=\
   bytecomp/opcodes.ml \
   bytecomp/bytesections.ml \
   bytecomp/dll.ml \
-  bytecomp/meta.ml \
   bytecomp/symtable.ml
 
 # Rules to make a local copy of the .ml and .mli files required.  We also

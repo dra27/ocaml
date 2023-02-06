@@ -53,12 +53,12 @@ let set_code_pointer cls ptr =
 
 (* Call a traced function (use old code pointer, but new closure as
    environment so that recursive calls are also traced).
-   It is necessary to wrap Meta.invoke_traced_function in an ML function
-   so that the RETURN at the end of the ML wrapper takes us to the
-   code of the function. *)
+   It is necessary to wrap CamlinternalDynlink.invoke_traced_function
+   in an ML function so that the RETURN at the end of the ML wrapper
+   takes us to the code of the function. *)
 
 let invoke_traced_function codeptr env arg =
-  Meta.invoke_traced_function codeptr env arg
+  CamlinternalDynlink.invoke_traced_function codeptr env arg
 
 let print_label ppf l =
   if l <> Asttypes.Nolabel then fprintf ppf "%s:" (Printtyp.string_of_label l)

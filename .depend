@@ -2111,11 +2111,6 @@ bytecomp/instruct.cmi : \
     lambda/lambda.cmi \
     typing/ident.cmi \
     typing/env.cmi
-bytecomp/meta.cmo : \
-    bytecomp/meta.cmi
-bytecomp/meta.cmx : \
-    bytecomp/meta.cmi
-bytecomp/meta.cmi :
 bytecomp/opcodes.cmo : \
     bytecomp/opcodes.cmi
 bytecomp/opcodes.cmx : \
@@ -2141,7 +2136,6 @@ bytecomp/symtable.cmo : \
     lambda/runtimedef.cmi \
     typing/predef.cmi \
     utils/misc.cmi \
-    bytecomp/meta.cmi \
     parsing/location.cmi \
     lambda/lambda.cmi \
     typing/ident.cmi \
@@ -2154,7 +2148,6 @@ bytecomp/symtable.cmx : \
     lambda/runtimedef.cmx \
     typing/predef.cmx \
     utils/misc.cmx \
-    bytecomp/meta.cmx \
     parsing/location.cmx \
     lambda/lambda.cmx \
     typing/ident.cmx \
@@ -6448,7 +6441,6 @@ toplevel/byte/topeval.cmo : \
     parsing/parsetree.cmi \
     typing/outcometree.cmi \
     utils/misc.cmi \
-    bytecomp/meta.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
     typing/includemod.cmi \
@@ -6481,7 +6473,6 @@ toplevel/byte/topeval.cmx : \
     parsing/parsetree.cmi \
     typing/outcometree.cmi \
     utils/misc.cmx \
-    bytecomp/meta.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
     typing/includemod.cmx \
@@ -6540,7 +6531,6 @@ toplevel/byte/trace.cmo : \
     typing/predef.cmi \
     typing/path.cmi \
     utils/misc.cmi \
-    bytecomp/meta.cmi \
     parsing/longident.cmi \
     typing/ctype.cmi \
     parsing/asttypes.cmi \
@@ -6553,7 +6543,6 @@ toplevel/byte/trace.cmx : \
     typing/predef.cmx \
     typing/path.cmx \
     utils/misc.cmx \
-    bytecomp/meta.cmx \
     parsing/longident.cmx \
     typing/ctype.cmx \
     parsing/asttypes.cmi \

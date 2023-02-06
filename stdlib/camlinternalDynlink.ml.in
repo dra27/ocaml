@@ -342,3 +342,20 @@ let init_toplevel dllpath =
   dlls_opened_for_execution :=
     List.map (fun dll -> "", dll)
       (Array.to_list (get_current_dlls()));
+
+(* The following declarations were in bytecomp/meta.ml *)
+
+external global_data : unit -> Obj.t array = "caml_get_global_data"
+external realloc_global_data : int -> unit = "caml_realloc_global"
+type closure = unit -> Obj.t
+type bytecode
+external reify_bytecode :
+  bytes array -> 'a -> string option ->
+    bytecode * closure
+                           = "caml_reify_bytecode"
+external release_bytecode : bytecode -> unit
+                                 = "caml_static_release_bytecode"
+external invoke_traced_function : Obj.raw_data -> Obj.t -> Obj.t -> Obj.t
+                                = "caml_invoke_traced_function"
+external get_section_table : unit -> (string * Obj.t) list
+                           = "caml_get_section_table"
