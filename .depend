@@ -2112,13 +2112,10 @@ bytecomp/instruct.cmi : \
     typing/ident.cmi \
     typing/env.cmi
 bytecomp/meta.cmo : \
-    bytecomp/instruct.cmi \
     bytecomp/meta.cmi
 bytecomp/meta.cmx : \
-    bytecomp/instruct.cmx \
     bytecomp/meta.cmi
-bytecomp/meta.cmi : \
-    bytecomp/instruct.cmi
+bytecomp/meta.cmi :
 bytecomp/opcodes.cmo : \
     bytecomp/opcodes.cmi
 bytecomp/opcodes.cmx : \
