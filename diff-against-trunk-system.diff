@@ -14,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index dcf8cf6e96..355fd8b01a 100644
+index 36e975a045..a4f1f782be 100644
 --- a/Changes
 +++ b/Changes
-@@ -528,6 +528,10 @@ Working version
+@@ -531,6 +531,10 @@ Working version
  - #11879: Bugfix for Ctype.nondep_type
    (Stephen Dolan, review by Gabriel Scherer)
  
@@ -28,7 +28,7 @@ index dcf8cf6e96..355fd8b01a 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1064,11 +1068,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1067,11 +1071,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +40,7 @@ index dcf8cf6e96..355fd8b01a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1097,6 +1096,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1100,6 +1099,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +71,7 @@ index dcf8cf6e96..355fd8b01a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1132,13 +1155,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1135,13 +1158,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +87,7 @@ index dcf8cf6e96..355fd8b01a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1245,6 +1268,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1248,6 +1271,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +97,7 @@ index dcf8cf6e96..355fd8b01a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1508,6 +1534,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1511,6 +1537,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6121,10 +6121,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ebedc45128
+index 0000000000..5a9552ed2c
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3961 @@
+@@ -0,0 +1,3974 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -7856,6 +7856,19 @@ index 0000000000..ebedc45128
 +   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
 +   test_result=${TEST_SKIP}
 + else
++diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
++index 2986e5b8c9..8c51c7d52c 100644
++--- a/testsuite/tests/lib-channels/close_in.ml
+++++ b/testsuite/tests/lib-channels/close_in.ml
++@@ -1,4 +1,7 @@
++-(* TEST *)
+++(* TEST
+++* skip
+++reason = "OCaml 5 only"
+++ *)
++ 
++ (* Test that inputting bytes from a closed in_channel triggers an exception *)
++ 
 +diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
 +index bc0b8dfe66..deaba0a3ee 100644
 +--- a/testsuite/tests/lib-channels/refcounting.ml
@@ -10088,10 +10101,10 @@ index 0000000000..ebedc45128
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1d00514ef9
+index 0000000000..aa29298342
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10030 @@
+@@ -0,0 +1,10036 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -10108,10 +10121,10 @@ index 0000000000..1d00514ef9
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index dcf8cf6e96..355fd8b01a 100644
++index 36e975a045..a4f1f782be 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -528,6 +528,10 @@ Working version
++@@ -531,6 +531,10 @@ Working version
 + - #11879: Bugfix for Ctype.nondep_type
 +   (Stephen Dolan, review by Gabriel Scherer)
 + 
@@ -10122,7 +10135,7 @@ index 0000000000..1d00514ef9
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1064,11 +1068,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1067,11 +1071,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10134,7 +10147,7 @@ index 0000000000..1d00514ef9
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1097,6 +1096,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1100,6 +1099,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10165,7 +10178,7 @@ index 0000000000..1d00514ef9
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1132,13 +1155,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1135,13 +1158,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10181,7 +10194,7 @@ index 0000000000..1d00514ef9
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1245,6 +1268,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1248,6 +1271,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10191,7 +10204,7 @@ index 0000000000..1d00514ef9
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1508,6 +1534,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1511,6 +1537,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16215,10 +16228,10 @@ index 0000000000..1d00514ef9
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ebedc45128
++index 0000000000..5a9552ed2c
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3961 @@
++@@ -0,0 +1,3974 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -17950,6 +17963,19 @@ index 0000000000..1d00514ef9
 ++   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
 ++   test_result=${TEST_SKIP}
 ++ else
+++diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
+++index 2986e5b8c9..8c51c7d52c 100644
+++--- a/testsuite/tests/lib-channels/close_in.ml
++++++ b/testsuite/tests/lib-channels/close_in.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++* skip
++++reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Test that inputting bytes from a closed in_channel triggers an exception *)
+++ 
 ++diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
 ++index bc0b8dfe66..deaba0a3ee 100644
 ++--- a/testsuite/tests/lib-channels/refcounting.ml
@@ -20114,14 +20140,7 @@ index 0000000000..1d00514ef9
 ++     ;;
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
+++-    run
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
