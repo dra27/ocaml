@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..055cce1bd6
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:47:00.323456355 +0100
+++++ b	2023-09-28 18:47:00.351457390 +0100
++@@ -33,7 +33,7 @@
++ diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++ --- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++ +++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++-@@ -13,6 +13,9 @@ type User.tag += Ev of int
+++@@ -15,6 +15,9 @@ type User.tag += Ev of int
++  let ev0 =
++    User.register "ev0" (Ev 0) Type.int
++  
++@@ -43,7 +43,7 @@
++  let () =
++    start ();
++    let parent_cwd = Sys.getcwd () in
++-@@ -23,11 +26,14 @@ let () =
+++@@ -25,11 +28,14 @@ let () =
++      let ev1 = User.register "ev1" (Ev 1) Type.int in
++      let ev2 = User.register "ev2" (Ev 2) Type.int in
++      let ev3 = User.register "ev3" (Ev 3) Type.span in
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,7 +37,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 36e975a045..a4f1f782be 100644
+index 43bc6370e9..78290976f0 100644
 --- a/Changes
 +++ b/Changes
 @@ -531,6 +531,10 @@ Working version
@@ -10101,13 +10124,36 @@ index 0000000000..5a9552ed2c
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..aa29298342
+index 0000000000..2551ad5b2f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10036 @@
+@@ -0,0 +1,10123 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..055cce1bd6
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:47:00.323456355 +0100
++++++ b	2023-09-28 18:47:00.351457390 +0100
+++@@ -33,7 +33,7 @@
+++ diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+++ --- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+++ +++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+++-@@ -13,6 +13,9 @@ type User.tag += Ev of int
++++@@ -15,6 +15,9 @@ type User.tag += Ev of int
+++  let ev0 =
+++    User.register "ev0" (Ev 0) Type.int
+++  
+++@@ -43,7 +43,7 @@
+++  let () =
+++    start ();
+++    let parent_cwd = Sys.getcwd () in
+++-@@ -23,11 +26,14 @@ let () =
++++@@ -25,11 +28,14 @@ let () =
+++      let ev1 = User.register "ev1" (Ev 1) Type.int in
+++      let ev2 = User.register "ev2" (Ev 2) Type.int in
+++      let ev3 = User.register "ev3" (Ev 3) Type.span in
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10121,7 +10167,7 @@ index 0000000000..aa29298342
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 36e975a045..a4f1f782be 100644
++index 43bc6370e9..78290976f0 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -531,6 +531,10 @@ Working version
@@ -20140,8 +20186,71 @@ index 0000000000..aa29298342
 ++     ;;
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run
-\ No newline at end of file
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+++           "../$BUILD_PREFIX-$PORT/build.log" |
+++             sed -e 's/\d027\[K//g' \
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
 --- a/lambda/matching.ml

@@ -2335,7 +2335,7 @@ index a4cb09175b..51566e99ed 100644
  open Runtime_events
  
 diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
-index c45c1d85da..3137ba09f1 100644
+index f5a63d46fd..a6b5740ae7 100644
 --- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
 +++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
 @@ -2,9 +2,11 @@
