@@ -14,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 8f3bc0d100..1f916a8992 100644
+index 5eceae33ef..54e5730d37 100644
 --- a/Changes
 +++ b/Changes
-@@ -548,6 +548,10 @@ Working version
+@@ -552,6 +552,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -28,7 +28,7 @@ index 8f3bc0d100..1f916a8992 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1084,11 +1088,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1088,11 +1092,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +40,7 @@ index 8f3bc0d100..1f916a8992 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1117,6 +1116,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1121,6 +1120,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +71,7 @@ index 8f3bc0d100..1f916a8992 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1152,13 +1175,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1156,13 +1179,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +87,7 @@ index 8f3bc0d100..1f916a8992 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1265,6 +1288,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1269,6 +1292,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +97,7 @@ index 8f3bc0d100..1f916a8992 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1528,6 +1554,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1532,6 +1558,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10101,7 +10101,7 @@ index 0000000000..381be8cdc2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ecaf111301
+index 0000000000..44b08b7230
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10036 @@
@@ -10121,10 +10121,10 @@ index 0000000000..ecaf111301
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 8f3bc0d100..1f916a8992 100644
++index 5eceae33ef..54e5730d37 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -548,6 +548,10 @@ Working version
++@@ -552,6 +552,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10135,7 +10135,7 @@ index 0000000000..ecaf111301
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1084,11 +1088,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1088,11 +1092,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10147,7 +10147,7 @@ index 0000000000..ecaf111301
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1117,6 +1116,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1121,6 +1120,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10178,7 +10178,7 @@ index 0000000000..ecaf111301
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1152,13 +1175,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1156,13 +1179,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10194,7 +10194,7 @@ index 0000000000..ecaf111301
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1265,6 +1288,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1269,6 +1292,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10204,7 +10204,7 @@ index 0000000000..ecaf111301
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1528,6 +1554,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1532,6 +1558,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
