@@ -1568,46 +1568,6 @@ index 6bf995bf96..dc732ce6a3 100644
  *)
  open Globroots
  
-diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
-index 0041d91889..cf0eb4eed3 100644
---- a/testsuite/tests/generalized-open/gpr1506.ml
-+++ b/testsuite/tests/generalized-open/gpr1506.ml
-@@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
- Line 1, characters 15-41:
- 1 | include struct open struct type t = T end let x = T end
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
--Error: The type t/339 introduced by this open appears in the signature
-+Error: The type t/334 introduced by this open appears in the signature
-        Line 1, characters 46-47:
--         The value x has no valid type if t/339 is hidden
-+         The value x has no valid type if t/334 is hidden
- |}];;
- 
- module A = struct
-@@ -123,9 +123,9 @@ Lines 3-6, characters 4-7:
- 4 |       type t = T
- 5 |       let x = T
- 6 |     end
--Error: The type t/344 introduced by this open appears in the signature
-+Error: The type t/339 introduced by this open appears in the signature
-        Line 7, characters 8-9:
--         The value y has no valid type if t/344 is hidden
-+         The value y has no valid type if t/339 is hidden
- |}];;
- 
- module A = struct
-@@ -142,9 +142,9 @@ Lines 3-5, characters 4-7:
- 3 | ....open struct
- 4 |       type t = T
- 5 |     end
--Error: The type t/349 introduced by this open appears in the signature
-+Error: The type t/344 introduced by this open appears in the signature
-        Line 6, characters 8-9:
--         The value y has no valid type if t/349 is hidden
-+         The value y has no valid type if t/344 is hidden
- |}]
- 
- (* It was decided to not allow this anymore. *)
 diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 index cccbd96d71..35dd7fd85b 100644
 --- a/testsuite/tests/lazy/lazy2.ml
@@ -3769,25 +3729,6 @@ index 28e2aabb8b..563be966a8 100644
  let _ =
    Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
      { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-index 6e3a30306e..7e48ca4534 100644
---- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-@@ -24,11 +24,11 @@ end
- Line 3, characters 2-36:
- 3 |   include Comparable with type t = t
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
--Error: Illegal shadowing of included type t/286 by t/291
-+Error: Illegal shadowing of included type t/281 by t/286
-        Line 2, characters 2-19:
--         Type t/286 came from this include
-+         Type t/281 came from this include
-        Line 3, characters 2-23:
--         The value print has no valid type if t/286 is shadowed
-+         The value print has no valid type if t/281 is shadowed
- |}]
- 
- module type Sunderscore = sig
 diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 index b3804d00e5..827cc4affc 100644
 --- a/testsuite/tests/unwind/unwind_test.reference

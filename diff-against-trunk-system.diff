@@ -1,6 +1,62 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..0107f0aa8b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,53 @@
++--- a	2023-09-28 18:47:03.583576733 +0100
+++++ b	2023-09-28 18:47:03.615577914 +0100
++@@ -46,9 +46,9 @@
++  Line 1, characters 15-41:
++  1 | include struct open struct type t = T end let x = T end
++                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
++--Error: The type t/339 introduced by this open appears in the signature
+++-Error: The type t/334 introduced by this open appears in the signature
++ -       Line 1, characters 46-47:
++--         The value x has no valid type if t/339 is hidden
+++-         The value x has no valid type if t/334 is hidden
++ +Error: The type t introduced by this open appears in the signature.
++ +Line 1, characters 46-47:
++ +1 | include struct open struct type t = T end let x = T end
++@@ -61,9 +61,9 @@
++  4 |       type t = T
++  5 |       let x = T
++  6 |     end
++--Error: The type t/344 introduced by this open appears in the signature
+++-Error: The type t/339 introduced by this open appears in the signature
++ -       Line 7, characters 8-9:
++--         The value y has no valid type if t/344 is hidden
+++-         The value y has no valid type if t/339 is hidden
++ +Error: The type t introduced by this open appears in the signature.
++ +Line 7, characters 8-9:
++ +7 |     let y = x
++@@ -76,9 +76,9 @@
++  3 | ....open struct
++  4 |       type t = T
++  5 |     end
++--Error: The type t/349 introduced by this open appears in the signature
+++-Error: The type t/344 introduced by this open appears in the signature
++ -       Line 6, characters 8-9:
++--         The value y has no valid type if t/349 is hidden
+++-         The value y has no valid type if t/344 is hidden
++ +Error: The type t introduced by this open appears in the signature.
++ +Line 6, characters 8-9:
++ +6 |     let y = T
++@@ -233,11 +233,11 @@
++  Line 3, characters 2-36:
++  3 |   include Comparable with type t = t
++        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++--Error: Illegal shadowing of included type t/286 by t/291
+++-Error: Illegal shadowing of included type t/281 by t/286
++ -       Line 2, characters 2-19:
++--         Type t/286 came from this include
+++-         Type t/281 came from this include
++ -       Line 3, characters 2-23:
++--         The value print has no valid type if t/286 is shadowed
+++-         The value print has no valid type if t/281 is shadowed
++ +Error: Illegal shadowing of included type t/2 by t.
++ +Line 2, characters 2-19:
++ +2 |   include Printable
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +70,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 7ef34cb229..1951e05c00 100644
+index 2e73511b1d..351b03e2ce 100644
 --- a/Changes
 +++ b/Changes
-@@ -555,6 +555,10 @@ Working version
+@@ -559,6 +559,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -28,7 +84,7 @@ index 7ef34cb229..1951e05c00 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1091,11 +1095,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1095,11 +1099,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +96,7 @@ index 7ef34cb229..1951e05c00 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1124,6 +1123,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1128,6 +1127,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +127,7 @@ index 7ef34cb229..1951e05c00 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1159,13 +1182,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1163,13 +1186,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +143,7 @@ index 7ef34cb229..1951e05c00 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1272,6 +1295,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1276,6 +1299,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +153,7 @@ index 7ef34cb229..1951e05c00 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1535,6 +1561,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1539,6 +1565,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10101,13 +10157,69 @@ index 0000000000..381be8cdc2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..730ff49aa6
+index 0000000000..61dcdb4420
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10036 @@
+@@ -0,0 +1,10122 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..0107f0aa8b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,53 @@
+++--- a	2023-09-28 18:47:03.583576733 +0100
++++++ b	2023-09-28 18:47:03.615577914 +0100
+++@@ -46,9 +46,9 @@
+++  Line 1, characters 15-41:
+++  1 | include struct open struct type t = T end let x = T end
+++                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+++--Error: The type t/339 introduced by this open appears in the signature
++++-Error: The type t/334 introduced by this open appears in the signature
+++ -       Line 1, characters 46-47:
+++--         The value x has no valid type if t/339 is hidden
++++-         The value x has no valid type if t/334 is hidden
+++ +Error: The type t introduced by this open appears in the signature.
+++ +Line 1, characters 46-47:
+++ +1 | include struct open struct type t = T end let x = T end
+++@@ -61,9 +61,9 @@
+++  4 |       type t = T
+++  5 |       let x = T
+++  6 |     end
+++--Error: The type t/344 introduced by this open appears in the signature
++++-Error: The type t/339 introduced by this open appears in the signature
+++ -       Line 7, characters 8-9:
+++--         The value y has no valid type if t/344 is hidden
++++-         The value y has no valid type if t/339 is hidden
+++ +Error: The type t introduced by this open appears in the signature.
+++ +Line 7, characters 8-9:
+++ +7 |     let y = x
+++@@ -76,9 +76,9 @@
+++  3 | ....open struct
+++  4 |       type t = T
+++  5 |     end
+++--Error: The type t/349 introduced by this open appears in the signature
++++-Error: The type t/344 introduced by this open appears in the signature
+++ -       Line 6, characters 8-9:
+++--         The value y has no valid type if t/349 is hidden
++++-         The value y has no valid type if t/344 is hidden
+++ +Error: The type t introduced by this open appears in the signature.
+++ +Line 6, characters 8-9:
+++ +6 |     let y = T
+++@@ -233,11 +233,11 @@
+++  Line 3, characters 2-36:
+++  3 |   include Comparable with type t = t
+++        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++--Error: Illegal shadowing of included type t/286 by t/291
++++-Error: Illegal shadowing of included type t/281 by t/286
+++ -       Line 2, characters 2-19:
+++--         Type t/286 came from this include
++++-         Type t/281 came from this include
+++ -       Line 3, characters 2-23:
+++--         The value print has no valid type if t/286 is shadowed
++++-         The value print has no valid type if t/281 is shadowed
+++ +Error: Illegal shadowing of included type t/2 by t.
+++ +Line 2, characters 2-19:
+++ +2 |   include Printable
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10121,10 +10233,10 @@ index 0000000000..730ff49aa6
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 7ef34cb229..1951e05c00 100644
++index 2e73511b1d..351b03e2ce 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -555,6 +555,10 @@ Working version
++@@ -559,6 +559,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10135,7 +10247,7 @@ index 0000000000..730ff49aa6
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1091,11 +1095,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1095,11 +1099,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10147,7 +10259,7 @@ index 0000000000..730ff49aa6
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1124,6 +1123,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1128,6 +1127,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10178,7 +10290,7 @@ index 0000000000..730ff49aa6
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1159,13 +1182,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1163,13 +1186,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10194,7 +10306,7 @@ index 0000000000..730ff49aa6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1272,6 +1295,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1276,6 +1299,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10204,7 +10316,7 @@ index 0000000000..730ff49aa6
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1535,6 +1561,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1539,6 +1565,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20140,7 +20252,37 @@ index 0000000000..730ff49aa6
 ++     ;;
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FU
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
