@@ -24,11 +24,29 @@ end
 Line 3, characters 2-36:
 3 |   include Comparable with type t = t
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<<<<<<< HEAD
 Error: Illegal shadowing of included type t/281 by t/286
        Line 2, characters 2-19:
          Type t/281 came from this include
        Line 3, characters 2-23:
          The value print has no valid type if t/281 is shadowed
+||||||| parent of 0afb0aa151 (Merge pull request PR#11910 from Octachron/simpler_shadow_id)
+Error: Illegal shadowing of included type t/286 by t/291
+       Line 2, characters 2-19:
+         Type t/286 came from this include
+       Line 3, characters 2-23:
+         The value print has no valid type if t/286 is shadowed
+=======
+Error: Illegal shadowing of included type t/2 by t.
+Line 2, characters 2-19:
+2 |   include Printable
+      ^^^^^^^^^^^^^^^^^
+  Type t/2 came from this include.
+Line 3, characters 2-23:
+3 |   val print : t -> unit
+      ^^^^^^^^^^^^^^^^^^^^^
+  The value print has no valid type if t/2 is shadowed.
+>>>>>>> 0afb0aa151 (Merge pull request PR#11910 from Octachron/simpler_shadow_id)
 |}]
 
 module type Sunderscore = sig
