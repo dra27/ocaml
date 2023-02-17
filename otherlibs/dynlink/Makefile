@@ -35,6 +35,8 @@ COMPFLAGS=-strict-sequence -principal -absname \
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives \
+                 -use-runtime $(RUNTIME_NAME)
 
 COMPFLAGS += -I byte
 OPTCOMPFLAGS += -I native
@@ -240,7 +242,7 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 $(eval $(call PROGRAM_SYNONYM,extract_crc))
 
 $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) $(BYTELINK_FLAGS) -o $@ $^
 
 INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
 
