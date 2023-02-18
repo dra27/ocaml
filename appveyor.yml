@@ -19,7 +19,7 @@ platform:
 image: Visual Studio 2022
 
 # Do not build feature branch with open Pull Requests
-skip_branch_with_pr: true
+#skip_branch_with_pr: true
 
 # Do a shallow clone of the repo to speed up the build
 clone_depth: 1
