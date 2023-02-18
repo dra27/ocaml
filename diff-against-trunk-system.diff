@@ -1,62 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0107f0aa8b
+index 0000000000..a5946580a3
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,53 @@
-+--- a	2023-09-28 18:47:03.583576733 +0100
-++++ b	2023-09-28 18:47:03.615577914 +0100
-+@@ -46,9 +46,9 @@
-+  Line 1, characters 15-41:
-+  1 | include struct open struct type t = T end let x = T end
-+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--Error: The type t/339 introduced by this open appears in the signature
-++-Error: The type t/334 introduced by this open appears in the signature
-+ -       Line 1, characters 46-47:
-+--         The value x has no valid type if t/339 is hidden
-++-         The value x has no valid type if t/334 is hidden
-+ +Error: The type t introduced by this open appears in the signature.
-+ +Line 1, characters 46-47:
-+ +1 | include struct open struct type t = T end let x = T end
-+@@ -61,9 +61,9 @@
-+  4 |       type t = T
-+  5 |       let x = T
-+  6 |     end
-+--Error: The type t/344 introduced by this open appears in the signature
-++-Error: The type t/339 introduced by this open appears in the signature
-+ -       Line 7, characters 8-9:
-+--         The value y has no valid type if t/344 is hidden
-++-         The value y has no valid type if t/339 is hidden
-+ +Error: The type t introduced by this open appears in the signature.
-+ +Line 7, characters 8-9:
-+ +7 |     let y = x
-+@@ -76,9 +76,9 @@
-+  3 | ....open struct
-+  4 |       type t = T
-+  5 |     end
-+--Error: The type t/349 introduced by this open appears in the signature
-++-Error: The type t/344 introduced by this open appears in the signature
-+ -       Line 6, characters 8-9:
-+--         The value y has no valid type if t/349 is hidden
-++-         The value y has no valid type if t/344 is hidden
-+ +Error: The type t introduced by this open appears in the signature.
-+ +Line 6, characters 8-9:
-+ +6 |     let y = T
-+@@ -233,11 +233,11 @@
-+  Line 3, characters 2-36:
-+  3 |   include Comparable with type t = t
-+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+--Error: Illegal shadowing of included type t/286 by t/291
-++-Error: Illegal shadowing of included type t/281 by t/286
-+ -       Line 2, characters 2-19:
-+--         Type t/286 came from this include
-++-         Type t/281 came from this include
-+ -       Line 3, characters 2-23:
-+--         The value print has no valid type if t/286 is shadowed
-++-         The value print has no valid type if t/281 is shadowed
-+ +Error: Illegal shadowing of included type t/2 by t.
-+ +Line 2, characters 2-19:
-+ +2 |   include Printable
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:47:04.031593263 +0100
+++++ b	2023-09-28 18:47:04.055594148 +0100
++@@ -14,7 +14,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -358,6 +358,7 @@ stdlib__Gc.cmo : gc.ml \
+++@@ -314,6 +314,7 @@ stdlib__Gc.cmo : gc.ml \
++      stdlib__String.cmi \
++      stdlib__Printf.cmi \
++      stdlib__Printexc.cmi \
++@@ -22,7 +22,7 @@
++      stdlib__Atomic.cmi \
++      stdlib__Gc.cmi
++  stdlib__Gc.cmx : gc.ml \
++-@@ -365,6 +366,7 @@ stdlib__Gc.cmx : gc.ml \
+++@@ -321,6 +322,7 @@ stdlib__Gc.cmx : gc.ml \
++      stdlib__String.cmx \
++      stdlib__Printf.cmx \
++      stdlib__Printexc.cmx \
++@@ -33,7 +33,7 @@
++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
++ --- a/stdlib/gc.ml
++ +++ b/stdlib/gc.ml
++-@@ -108,8 +108,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
+++@@ -114,8 +114,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
++  
++  let rec call_alarm arec =
++    if Atomic.get arec.active then begin
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -70,10 +46,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 2e73511b1d..351b03e2ce 100644
+index 6c7d2f0648..728f1b3b1f 100644
 --- a/Changes
 +++ b/Changes
-@@ -559,6 +559,10 @@ Working version
+@@ -562,6 +562,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -84,7 +60,7 @@ index 2e73511b1d..351b03e2ce 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1095,11 +1099,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1098,11 +1102,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -96,7 +72,7 @@ index 2e73511b1d..351b03e2ce 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1128,6 +1127,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1131,6 +1130,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -127,7 +103,7 @@ index 2e73511b1d..351b03e2ce 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1163,13 +1186,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1166,13 +1189,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -143,7 +119,7 @@ index 2e73511b1d..351b03e2ce 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1276,6 +1299,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1279,6 +1302,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -153,7 +129,7 @@ index 2e73511b1d..351b03e2ce 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1539,6 +1565,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1542,6 +1568,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6177,10 +6153,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..381be8cdc2
+index 0000000000..b98c34d073
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3974 @@
+@@ -0,0 +1,3915 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -7751,46 +7727,6 @@ index 0000000000..381be8cdc2
 + *)
 + open Globroots
 + 
-+diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
-+index 0041d91889..cf0eb4eed3 100644
-+--- a/testsuite/tests/generalized-open/gpr1506.ml
-++++ b/testsuite/tests/generalized-open/gpr1506.ml
-+@@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
-+ Line 1, characters 15-41:
-+ 1 | include struct open struct type t = T end let x = T end
-+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-Error: The type t/339 introduced by this open appears in the signature
-++Error: The type t/334 introduced by this open appears in the signature
-+        Line 1, characters 46-47:
-+-         The value x has no valid type if t/339 is hidden
-++         The value x has no valid type if t/334 is hidden
-+ |}];;
-+ 
-+ module A = struct
-+@@ -123,9 +123,9 @@ Lines 3-6, characters 4-7:
-+ 4 |       type t = T
-+ 5 |       let x = T
-+ 6 |     end
-+-Error: The type t/344 introduced by this open appears in the signature
-++Error: The type t/339 introduced by this open appears in the signature
-+        Line 7, characters 8-9:
-+-         The value y has no valid type if t/344 is hidden
-++         The value y has no valid type if t/339 is hidden
-+ |}];;
-+ 
-+ module A = struct
-+@@ -142,9 +142,9 @@ Lines 3-5, characters 4-7:
-+ 3 | ....open struct
-+ 4 |       type t = T
-+ 5 |     end
-+-Error: The type t/349 introduced by this open appears in the signature
-++Error: The type t/344 introduced by this open appears in the signature
-+        Line 6, characters 8-9:
-+-         The value y has no valid type if t/349 is hidden
-++         The value y has no valid type if t/344 is hidden
-+ |}]
-+ 
-+ (* It was decided to not allow this anymore. *)
 +diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 +index cccbd96d71..35dd7fd85b 100644
 +--- a/testsuite/tests/lazy/lazy2.ml
@@ -9952,25 +9888,6 @@ index 0000000000..381be8cdc2
 + let _ =
 +   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 +     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-+diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-+index 6e3a30306e..7e48ca4534 100644
-+--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-+@@ -24,11 +24,11 @@ end
-+ Line 3, characters 2-36:
-+ 3 |   include Comparable with type t = t
-+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+-Error: Illegal shadowing of included type t/286 by t/291
-++Error: Illegal shadowing of included type t/281 by t/286
-+        Line 2, characters 2-19:
-+-         Type t/286 came from this include
-++         Type t/281 came from this include
-+        Line 3, characters 2-23:
-+-         The value print has no valid type if t/286 is shadowed
-++         The value print has no valid type if t/281 is shadowed
-+ |}]
-+ 
-+ module type Sunderscore = sig
 +diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 +index b3804d00e5..827cc4affc 100644
 +--- a/testsuite/tests/unwind/unwind_test.reference
@@ -10157,69 +10074,45 @@ index 0000000000..381be8cdc2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..61dcdb4420
+index 0000000000..02cf4bc551
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10122 @@
+@@ -0,0 +1,10037 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0107f0aa8b
++index 0000000000..a5946580a3
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,53 @@
-++--- a	2023-09-28 18:47:03.583576733 +0100
-+++++ b	2023-09-28 18:47:03.615577914 +0100
-++@@ -46,9 +46,9 @@
-++  Line 1, characters 15-41:
-++  1 | include struct open struct type t = T end let x = T end
-++                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-++--Error: The type t/339 introduced by this open appears in the signature
-+++-Error: The type t/334 introduced by this open appears in the signature
-++ -       Line 1, characters 46-47:
-++--         The value x has no valid type if t/339 is hidden
-+++-         The value x has no valid type if t/334 is hidden
-++ +Error: The type t introduced by this open appears in the signature.
-++ +Line 1, characters 46-47:
-++ +1 | include struct open struct type t = T end let x = T end
-++@@ -61,9 +61,9 @@
-++  4 |       type t = T
-++  5 |       let x = T
-++  6 |     end
-++--Error: The type t/344 introduced by this open appears in the signature
-+++-Error: The type t/339 introduced by this open appears in the signature
-++ -       Line 7, characters 8-9:
-++--         The value y has no valid type if t/344 is hidden
-+++-         The value y has no valid type if t/339 is hidden
-++ +Error: The type t introduced by this open appears in the signature.
-++ +Line 7, characters 8-9:
-++ +7 |     let y = x
-++@@ -76,9 +76,9 @@
-++  3 | ....open struct
-++  4 |       type t = T
-++  5 |     end
-++--Error: The type t/349 introduced by this open appears in the signature
-+++-Error: The type t/344 introduced by this open appears in the signature
-++ -       Line 6, characters 8-9:
-++--         The value y has no valid type if t/349 is hidden
-+++-         The value y has no valid type if t/344 is hidden
-++ +Error: The type t introduced by this open appears in the signature.
-++ +Line 6, characters 8-9:
-++ +6 |     let y = T
-++@@ -233,11 +233,11 @@
-++  Line 3, characters 2-36:
-++  3 |   include Comparable with type t = t
-++        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++--Error: Illegal shadowing of included type t/286 by t/291
-+++-Error: Illegal shadowing of included type t/281 by t/286
-++ -       Line 2, characters 2-19:
-++--         Type t/286 came from this include
-+++-         Type t/281 came from this include
-++ -       Line 3, characters 2-23:
-++--         The value print has no valid type if t/286 is shadowed
-+++-         The value print has no valid type if t/281 is shadowed
-++ +Error: Illegal shadowing of included type t/2 by t.
-++ +Line 2, characters 2-19:
-++ +2 |   include Printable
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:47:04.031593263 +0100
++++++ b	2023-09-28 18:47:04.055594148 +0100
+++@@ -14,7 +14,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -358,6 +358,7 @@ stdlib__Gc.cmo : gc.ml \
++++@@ -314,6 +314,7 @@ stdlib__Gc.cmo : gc.ml \
+++      stdlib__String.cmi \
+++      stdlib__Printf.cmi \
+++      stdlib__Printexc.cmi \
+++@@ -22,7 +22,7 @@
+++      stdlib__Atomic.cmi \
+++      stdlib__Gc.cmi
+++  stdlib__Gc.cmx : gc.ml \
+++-@@ -365,6 +366,7 @@ stdlib__Gc.cmx : gc.ml \
++++@@ -321,6 +322,7 @@ stdlib__Gc.cmx : gc.ml \
+++      stdlib__String.cmx \
+++      stdlib__Printf.cmx \
+++      stdlib__Printexc.cmx \
+++@@ -33,7 +33,7 @@
+++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
+++ --- a/stdlib/gc.ml
+++ +++ b/stdlib/gc.ml
+++-@@ -108,8 +108,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
++++@@ -114,8 +114,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
+++  
+++  let rec call_alarm arec =
+++    if Atomic.get arec.active then begin
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10233,10 +10126,10 @@ index 0000000000..61dcdb4420
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 2e73511b1d..351b03e2ce 100644
++index 6c7d2f0648..728f1b3b1f 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -559,6 +559,10 @@ Working version
++@@ -562,6 +562,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10247,7 +10140,7 @@ index 0000000000..61dcdb4420
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1095,11 +1099,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1098,11 +1102,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10259,7 +10152,7 @@ index 0000000000..61dcdb4420
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1128,6 +1127,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1131,6 +1130,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10290,7 +10183,7 @@ index 0000000000..61dcdb4420
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1163,13 +1186,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1166,13 +1189,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10306,7 +10199,7 @@ index 0000000000..61dcdb4420
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1276,6 +1299,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1279,6 +1302,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10316,7 +10209,7 @@ index 0000000000..61dcdb4420
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1539,6 +1565,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1542,6 +1568,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16340,10 +16233,10 @@ index 0000000000..61dcdb4420
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..381be8cdc2
++index 0000000000..b98c34d073
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3974 @@
++@@ -0,0 +1,3915 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -17914,46 +17807,6 @@ index 0000000000..61dcdb4420
 ++ *)
 ++ open Globroots
 ++ 
-++diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
-++index 0041d91889..cf0eb4eed3 100644
-++--- a/testsuite/tests/generalized-open/gpr1506.ml
-+++++ b/testsuite/tests/generalized-open/gpr1506.ml
-++@@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
-++ Line 1, characters 15-41:
-++ 1 | include struct open struct type t = T end let x = T end
-++                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: The type t/339 introduced by this open appears in the signature
-+++Error: The type t/334 introduced by this open appears in the signature
-++        Line 1, characters 46-47:
-++-         The value x has no valid type if t/339 is hidden
-+++         The value x has no valid type if t/334 is hidden
-++ |}];;
-++ 
-++ module A = struct
-++@@ -123,9 +123,9 @@ Lines 3-6, characters 4-7:
-++ 4 |       type t = T
-++ 5 |       let x = T
-++ 6 |     end
-++-Error: The type t/344 introduced by this open appears in the signature
-+++Error: The type t/339 introduced by this open appears in the signature
-++        Line 7, characters 8-9:
-++-         The value y has no valid type if t/344 is hidden
-+++         The value y has no valid type if t/339 is hidden
-++ |}];;
-++ 
-++ module A = struct
-++@@ -142,9 +142,9 @@ Lines 3-5, characters 4-7:
-++ 3 | ....open struct
-++ 4 |       type t = T
-++ 5 |     end
-++-Error: The type t/349 introduced by this open appears in the signature
-+++Error: The type t/344 introduced by this open appears in the signature
-++        Line 6, characters 8-9:
-++-         The value y has no valid type if t/349 is hidden
-+++         The value y has no valid type if t/344 is hidden
-++ |}]
-++ 
-++ (* It was decided to not allow this anymore. *)
 ++diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 ++index cccbd96d71..35dd7fd85b 100644
 ++--- a/testsuite/tests/lazy/lazy2.ml
@@ -20115,25 +19968,6 @@ index 0000000000..61dcdb4420
 ++ let _ =
 ++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 ++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 6e3a30306e..7e48ca4534 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/286 by t/291
-+++Error: Illegal shadowing of included type t/281 by t/286
-++        Line 2, characters 2-19:
-++-         Type t/286 came from this include
-+++         Type t/281 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/286 is shadowed
-+++         The value print has no valid type if t/281 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
 ++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 ++index b3804d00e5..827cc4affc 100644
 ++--- a/testsuite/tests/unwind/unwind_test.reference
@@ -20280,9 +20114,7 @@ index 0000000000..61dcdb4420
 +++      # tests now (to include natdynlink)
 +++      run "test dynlink $PORT" \
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.
++++     
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -21798,7 +21630,7 @@ index f9e85a4586..a83368a381 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index ed9cd8f0ce..734424a438 100644
+index 86efe6cb0f..505935ed50 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21906,7 +21738,7 @@ index ed9cd8f0ce..734424a438 100644
      stdlib__Buffer.cmi
  stdlib__Fun.cmo : fun.ml \
      stdlib__Printexc.cmi \
-@@ -375,8 +331,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+@@ -377,8 +333,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
      stdlib__Seq.cmi \
      stdlib__Random.cmi \
      stdlib__Obj.cmi \
@@ -21916,7 +21748,7 @@ index ed9cd8f0ce..734424a438 100644
      stdlib__Atomic.cmi \
      stdlib__Array.cmi \
      stdlib__Hashtbl.cmi
-@@ -386,8 +342,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -388,8 +344,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
      stdlib__Seq.cmx \
      stdlib__Random.cmx \
      stdlib__Obj.cmx \
@@ -21926,7 +21758,7 @@ index ed9cd8f0ce..734424a438 100644
      stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
-@@ -507,11 +463,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -509,11 +465,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -21938,7 +21770,7 @@ index ed9cd8f0ce..734424a438 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -616,7 +567,6 @@ stdlib__Random.cmo : random.ml \
+@@ -618,7 +569,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -21946,7 +21778,7 @@ index ed9cd8f0ce..734424a438 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -628,7 +578,6 @@ stdlib__Random.cmx : random.ml \
+@@ -630,7 +580,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -21954,7 +21786,7 @@ index ed9cd8f0ce..734424a438 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -668,15 +617,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -670,15 +619,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -22306,7 +22138,7 @@ index ef8093bb1b..7be04ac538 100644
  val formatter_of_out_functions :
    formatter_out_functions -> formatter
 diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-index 832cfedb4d..84611ad812 100644
+index 0ac8ea0902..ae9376079a 100644
 --- a/stdlib/gc.ml
 +++ b/stdlib/gc.ml
 @@ -61,9 +61,15 @@ external major : unit -> unit = "caml_gc_major"

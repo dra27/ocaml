@@ -1,53 +1,29 @@
---- a	2023-09-28 18:47:03.583576733 +0100
-+++ b	2023-09-28 18:47:03.615577914 +0100
-@@ -46,9 +46,9 @@
-  Line 1, characters 15-41:
-  1 | include struct open struct type t = T end let x = T end
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
---Error: The type t/339 introduced by this open appears in the signature
-+-Error: The type t/334 introduced by this open appears in the signature
- -       Line 1, characters 46-47:
---         The value x has no valid type if t/339 is hidden
-+-         The value x has no valid type if t/334 is hidden
- +Error: The type t introduced by this open appears in the signature.
- +Line 1, characters 46-47:
- +1 | include struct open struct type t = T end let x = T end
-@@ -61,9 +61,9 @@
-  4 |       type t = T
-  5 |       let x = T
-  6 |     end
---Error: The type t/344 introduced by this open appears in the signature
-+-Error: The type t/339 introduced by this open appears in the signature
- -       Line 7, characters 8-9:
---         The value y has no valid type if t/344 is hidden
-+-         The value y has no valid type if t/339 is hidden
- +Error: The type t introduced by this open appears in the signature.
- +Line 7, characters 8-9:
- +7 |     let y = x
-@@ -76,9 +76,9 @@
-  3 | ....open struct
-  4 |       type t = T
-  5 |     end
---Error: The type t/349 introduced by this open appears in the signature
-+-Error: The type t/344 introduced by this open appears in the signature
- -       Line 6, characters 8-9:
---         The value y has no valid type if t/349 is hidden
-+-         The value y has no valid type if t/344 is hidden
- +Error: The type t introduced by this open appears in the signature.
- +Line 6, characters 8-9:
- +6 |     let y = T
-@@ -233,11 +233,11 @@
-  Line 3, characters 2-36:
-  3 |   include Comparable with type t = t
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
---Error: Illegal shadowing of included type t/286 by t/291
-+-Error: Illegal shadowing of included type t/281 by t/286
- -       Line 2, characters 2-19:
---         Type t/286 came from this include
-+-         Type t/281 came from this include
- -       Line 3, characters 2-23:
---         The value print has no valid type if t/286 is shadowed
-+-         The value print has no valid type if t/281 is shadowed
- +Error: Illegal shadowing of included type t/2 by t.
- +Line 2, characters 2-19:
- +2 |   include Printable
+--- a	2023-09-28 18:47:04.031593263 +0100
++++ b	2023-09-28 18:47:04.055594148 +0100
+@@ -14,7 +14,7 @@
+ diff --git a/stdlib/.depend b/stdlib/.depend
+ --- a/stdlib/.depend
+ +++ b/stdlib/.depend
+-@@ -358,6 +358,7 @@ stdlib__Gc.cmo : gc.ml \
++@@ -314,6 +314,7 @@ stdlib__Gc.cmo : gc.ml \
+      stdlib__String.cmi \
+      stdlib__Printf.cmi \
+      stdlib__Printexc.cmi \
+@@ -22,7 +22,7 @@
+      stdlib__Atomic.cmi \
+      stdlib__Gc.cmi
+  stdlib__Gc.cmx : gc.ml \
+-@@ -365,6 +366,7 @@ stdlib__Gc.cmx : gc.ml \
++@@ -321,6 +322,7 @@ stdlib__Gc.cmx : gc.ml \
+      stdlib__String.cmx \
+      stdlib__Printf.cmx \
+      stdlib__Printexc.cmx \
+@@ -33,7 +33,7 @@
+ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
+ --- a/stdlib/gc.ml
+ +++ b/stdlib/gc.ml
+-@@ -108,8 +108,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
++@@ -114,8 +114,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
+  
+  let rec call_alarm arec =
+    if Atomic.get arec.active then begin
