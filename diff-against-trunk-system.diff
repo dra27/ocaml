@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..a5946580a3
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:47:04.031593263 +0100
-++++ b	2023-09-28 18:47:04.055594148 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/stdlib/.depend b/stdlib/.depend
-+ --- a/stdlib/.depend
-+ +++ b/stdlib/.depend
-+-@@ -358,6 +358,7 @@ stdlib__Gc.cmo : gc.ml \
-++@@ -314,6 +314,7 @@ stdlib__Gc.cmo : gc.ml \
-+      stdlib__String.cmi \
-+      stdlib__Printf.cmi \
-+      stdlib__Printexc.cmi \
-+@@ -22,7 +22,7 @@
-+      stdlib__Atomic.cmi \
-+      stdlib__Gc.cmi
-+  stdlib__Gc.cmx : gc.ml \
-+-@@ -365,6 +366,7 @@ stdlib__Gc.cmx : gc.ml \
-++@@ -321,6 +322,7 @@ stdlib__Gc.cmx : gc.ml \
-+      stdlib__String.cmx \
-+      stdlib__Printf.cmx \
-+      stdlib__Printexc.cmx \
-+@@ -33,7 +33,7 @@
-+ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-+ --- a/stdlib/gc.ml
-+ +++ b/stdlib/gc.ml
-+-@@ -108,8 +108,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-++@@ -114,8 +114,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-+  
-+  let rec call_alarm arec =
-+    if Atomic.get arec.active then begin
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -46,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 6c7d2f0648..728f1b3b1f 100644
+index 2ddc893e97..56cd13d606 100644
 --- a/Changes
 +++ b/Changes
-@@ -562,6 +562,10 @@ Working version
+@@ -566,6 +566,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -60,7 +28,7 @@ index 6c7d2f0648..728f1b3b1f 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1098,11 +1102,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1102,11 +1106,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -72,7 +40,7 @@ index 6c7d2f0648..728f1b3b1f 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1131,6 +1130,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1135,6 +1134,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -103,7 +71,7 @@ index 6c7d2f0648..728f1b3b1f 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1166,13 +1189,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1170,13 +1193,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -119,7 +87,7 @@ index 6c7d2f0648..728f1b3b1f 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1279,6 +1302,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1283,6 +1306,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -129,7 +97,7 @@ index 6c7d2f0648..728f1b3b1f 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1542,6 +1568,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1546,6 +1572,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10074,45 +10042,13 @@ index 0000000000..b98c34d073
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..02cf4bc551
+index 0000000000..bd757e1232
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10037 @@
+@@ -0,0 +1,10027 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..a5946580a3
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:47:04.031593263 +0100
-+++++ b	2023-09-28 18:47:04.055594148 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/stdlib/.depend b/stdlib/.depend
-++ --- a/stdlib/.depend
-++ +++ b/stdlib/.depend
-++-@@ -358,6 +358,7 @@ stdlib__Gc.cmo : gc.ml \
-+++@@ -314,6 +314,7 @@ stdlib__Gc.cmo : gc.ml \
-++      stdlib__String.cmi \
-++      stdlib__Printf.cmi \
-++      stdlib__Printexc.cmi \
-++@@ -22,7 +22,7 @@
-++      stdlib__Atomic.cmi \
-++      stdlib__Gc.cmi
-++  stdlib__Gc.cmx : gc.ml \
-++-@@ -365,6 +366,7 @@ stdlib__Gc.cmx : gc.ml \
-+++@@ -321,6 +322,7 @@ stdlib__Gc.cmx : gc.ml \
-++      stdlib__String.cmx \
-++      stdlib__Printf.cmx \
-++      stdlib__Printexc.cmx \
-++@@ -33,7 +33,7 @@
-++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-++ --- a/stdlib/gc.ml
-++ +++ b/stdlib/gc.ml
-++-@@ -108,8 +108,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-+++@@ -114,8 +114,8 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-++  
-++  let rec call_alarm arec =
-++    if Atomic.get arec.active then begin
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10126,10 +10062,10 @@ index 0000000000..02cf4bc551
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 6c7d2f0648..728f1b3b1f 100644
++index 2ddc893e97..56cd13d606 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -562,6 +562,10 @@ Working version
++@@ -566,6 +566,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10140,7 +10076,7 @@ index 0000000000..02cf4bc551
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1098,11 +1102,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1102,11 +1106,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10152,7 +10088,7 @@ index 0000000000..02cf4bc551
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1131,6 +1130,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1135,6 +1134,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10183,7 +10119,7 @@ index 0000000000..02cf4bc551
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1166,13 +1189,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1170,13 +1193,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10199,7 +10135,7 @@ index 0000000000..02cf4bc551
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1279,6 +1302,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1283,6 +1306,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10209,7 +10145,7 @@ index 0000000000..02cf4bc551
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1542,6 +1568,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1546,6 +1572,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20114,7 +20050,29 @@ index 0000000000..02cf4bc551
 +++      # tests now (to include natdynlink)
 +++      run "test dynlink $PORT" \
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++     
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
