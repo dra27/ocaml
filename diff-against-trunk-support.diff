@@ -3804,10 +3804,10 @@ index f5e0711b79..8beb1f6433 100644
  (* Testing unsynchronized, parallel Weak usage *)
  
 diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-index de10bd1fd3..5f9e31bc66 100755
+index f64c2ce4e0..49f5a8b697 100755
 --- a/tools/ci/actions/runner.sh
 +++ b/tools/ci/actions/runner.sh
-@@ -40,19 +40,7 @@ EOF
+@@ -42,19 +42,7 @@ EOF
      --enable-debug-runtime \
      $CONFIG_ARG"
  

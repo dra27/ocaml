@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1692b68a80
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:47:05.067631467 +0100
+++++ b	2023-09-28 18:47:05.075631762 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -983,10 +983,10 @@ runtime/%.o: runtime/%.S
+++@@ -980,10 +980,10 @@ runtime/%.o: runtime/%.S
++  	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
++  
++  runtime/%.d.o: runtime/%.S
++@@ -46,7 +46,7 @@
++  export PATH=$PREFIX/bin:$PATH
++  
++  Configure () {
++-@@ -56,9 +58,24 @@ EOF
+++@@ -44,9 +46,24 @@ EOF
++  }
++  
++  Build () {
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -108,7 +131,7 @@ index 2ddc893e97..56cd13d606 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index d7ac2bcb22..5f0fa3a427 100644
+index dba82b2b24..8d5f90e46e 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -605,7 +605,6 @@ partialclean::
@@ -10042,13 +10065,36 @@ index 0000000000..b98c34d073
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bd757e1232
+index 0000000000..1c7c68ee0d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10027 @@
+@@ -0,0 +1,10036 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1692b68a80
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:47:05.067631467 +0100
++++++ b	2023-09-28 18:47:05.075631762 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -983,10 +983,10 @@ runtime/%.o: runtime/%.S
++++@@ -980,10 +980,10 @@ runtime/%.o: runtime/%.S
+++  	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+++  
+++  runtime/%.d.o: runtime/%.S
+++@@ -46,7 +46,7 @@
+++  export PATH=$PREFIX/bin:$PATH
+++  
+++  Configure () {
+++-@@ -56,9 +58,24 @@ EOF
++++@@ -44,9 +46,24 @@ EOF
+++  }
+++  
+++  Build () {
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10156,7 +10202,7 @@ index 0000000000..bd757e1232
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index d7ac2bcb22..5f0fa3a427 100644
++index dba82b2b24..8d5f90e46e 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -605,7 +605,6 @@ partialclean::
@@ -20058,21 +20104,7 @@ index 0000000000..bd757e1232
 +++    fi
 ++     run "test $PORT" \
 ++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd
+++     run "install $PORT" $MAKE -C "$FULL_BUIL
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
