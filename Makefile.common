@@ -28,7 +28,6 @@ EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
 # $( ) suppresses warning from the alignments in the V_ macros below
-$(SPACE) :=
 
 V ?= 0
 
