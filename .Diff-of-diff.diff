@@ -1,20 +1,10 @@
---- a	2023-09-28 18:47:05.067631467 +0100
-+++ b	2023-09-28 18:47:05.075631762 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Makefile b/Makefile
- --- a/Makefile
- +++ b/Makefile
--@@ -983,10 +983,10 @@ runtime/%.o: runtime/%.S
-+@@ -980,10 +980,10 @@ runtime/%.o: runtime/%.S
-  	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
-  
-  runtime/%.d.o: runtime/%.S
-@@ -46,7 +46,7 @@
-  export PATH=$PREFIX/bin:$PATH
-  
-  Configure () {
--@@ -56,9 +58,24 @@ EOF
-+@@ -44,9 +46,24 @@ EOF
-  }
-  
-  Build () {
+--- a	2023-09-28 18:47:05.331641198 +0100
++++ b	2023-09-28 18:47:05.351641935 +0100
+@@ -119,5 +119,5 @@
+ -	  $(INSTALL_PROG) tools/ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
+ -	fi
+  	$(INSTALL_DATA) \
+- 	   utils/*.cmi \
+- 	   parsing/*.cmi \
++ 	  tools/eventlog_metadata \
++ 	  "$(INSTALL_LIBDIR)"

@@ -1,29 +1,19 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..1692b68a80
+index 0000000000..47cc159e2a
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:47:05.067631467 +0100
-++++ b	2023-09-28 18:47:05.075631762 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -983,10 +983,10 @@ runtime/%.o: runtime/%.S
-++@@ -980,10 +980,10 @@ runtime/%.o: runtime/%.S
-+  	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
-+  
-+  runtime/%.d.o: runtime/%.S
-+@@ -46,7 +46,7 @@
-+  export PATH=$PREFIX/bin:$PATH
-+  
-+  Configure () {
-+-@@ -56,9 +58,24 @@ EOF
-++@@ -44,9 +46,24 @@ EOF
-+  }
-+  
-+  Build () {
+@@ -0,0 +1,10 @@
++--- a	2023-09-28 18:47:05.331641198 +0100
+++++ b	2023-09-28 18:47:05.351641935 +0100
++@@ -119,5 +119,5 @@
++ -	  $(INSTALL_PROG) tools/ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
++ -	fi
++  	$(INSTALL_DATA) \
++- 	   utils/*.cmi \
++- 	   parsing/*.cmi \
+++ 	  tools/eventlog_metadata \
+++ 	  "$(INSTALL_LIBDIR)"
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -37,10 +27,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 2ddc893e97..56cd13d606 100644
+index a9e38cb99d..19108441a9 100644
 --- a/Changes
 +++ b/Changes
-@@ -566,6 +566,10 @@ Working version
+@@ -573,6 +573,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -51,7 +41,7 @@ index 2ddc893e97..56cd13d606 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1102,11 +1106,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1109,11 +1113,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -63,7 +53,7 @@ index 2ddc893e97..56cd13d606 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1135,6 +1134,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1142,6 +1141,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -94,7 +84,7 @@ index 2ddc893e97..56cd13d606 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1170,13 +1193,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1177,13 +1200,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -110,7 +100,7 @@ index 2ddc893e97..56cd13d606 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1283,6 +1306,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1290,6 +1313,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -120,7 +110,7 @@ index 2ddc893e97..56cd13d606 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1546,6 +1572,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1553,6 +1579,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -131,10 +121,10 @@ index 2ddc893e97..56cd13d606 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index dba82b2b24..8d5f90e46e 100644
+index 4ce297cfea..f4ce64acbd 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -605,7 +605,6 @@ partialclean::
+@@ -612,7 +612,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -142,7 +132,7 @@ index dba82b2b24..8d5f90e46e 100644
    afl \
    alloc \
    array \
-@@ -613,24 +612,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -620,24 +619,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -170,7 +160,7 @@ index dba82b2b24..8d5f90e46e 100644
    main \
    major_gc \
    md5 \
-@@ -641,17 +640,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -648,17 +647,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -188,7 +178,7 @@ index dba82b2b24..8d5f90e46e 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -661,6 +655,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -668,6 +662,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -198,7 +188,7 @@ index dba82b2b24..8d5f90e46e 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -671,7 +668,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -678,7 +675,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -207,7 +197,7 @@ index dba82b2b24..8d5f90e46e 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1066,12 +1063,14 @@ clean::
+@@ -1073,12 +1070,14 @@ clean::
  
  # Dependencies
  
@@ -224,7 +214,7 @@ index dba82b2b24..8d5f90e46e 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1144,6 +1143,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1151,6 +1150,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -232,10 +222,10 @@ index dba82b2b24..8d5f90e46e 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1643,6 +1643,9 @@ endif
- 	else \
- 	  $(INSTALL_PROG) tools/ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
- 	fi
+@@ -1648,6 +1648,9 @@ endif
+ 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
+ 	done
+ 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
 +	$(INSTALL_DATA) \
 +	  tools/eventlog_metadata \
 +	  "$(INSTALL_LIBDIR)"
@@ -6144,7 +6134,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..b98c34d073
+index 0000000000..5e37abae6e
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3915 @@
@@ -9954,10 +9944,10 @@ index 0000000000..b98c34d073
 + (* Testing unsynchronized, parallel Weak usage *)
 + 
 +diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-+index de10bd1fd3..5f9e31bc66 100755
++index f64c2ce4e0..49f5a8b697 100755
 +--- a/tools/ci/actions/runner.sh
 ++++ b/tools/ci/actions/runner.sh
-+@@ -40,19 +40,7 @@ EOF
++@@ -42,19 +42,7 @@ EOF
 +     --enable-debug-runtime \
 +     $CONFIG_ARG"
 + 
@@ -10065,36 +10055,26 @@ index 0000000000..b98c34d073
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1c7c68ee0d
+index 0000000000..2135105970
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10036 @@
+@@ -0,0 +1,10030 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..1692b68a80
++index 0000000000..47cc159e2a
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:47:05.067631467 +0100
-+++++ b	2023-09-28 18:47:05.075631762 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -983,10 +983,10 @@ runtime/%.o: runtime/%.S
-+++@@ -980,10 +980,10 @@ runtime/%.o: runtime/%.S
-++  	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
-++  
-++  runtime/%.d.o: runtime/%.S
-++@@ -46,7 +46,7 @@
-++  export PATH=$PREFIX/bin:$PATH
-++  
-++  Configure () {
-++-@@ -56,9 +58,24 @@ EOF
-+++@@ -44,9 +46,24 @@ EOF
-++  }
-++  
-++  Build () {
++@@ -0,0 +1,10 @@
+++--- a	2023-09-28 18:47:05.331641198 +0100
++++++ b	2023-09-28 18:47:05.351641935 +0100
+++@@ -119,5 +119,5 @@
+++ -	  $(INSTALL_PROG) tools/ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
+++ -	fi
+++  	$(INSTALL_DATA) \
+++- 	   utils/*.cmi \
+++- 	   parsing/*.cmi \
++++ 	  tools/eventlog_metadata \
++++ 	  "$(INSTALL_LIBDIR)"
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10108,10 +10088,10 @@ index 0000000000..1c7c68ee0d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 2ddc893e97..56cd13d606 100644
++index a9e38cb99d..19108441a9 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -566,6 +566,10 @@ Working version
++@@ -573,6 +573,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10122,7 +10102,7 @@ index 0000000000..1c7c68ee0d
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1102,11 +1106,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1109,11 +1113,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10134,7 +10114,7 @@ index 0000000000..1c7c68ee0d
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1135,6 +1134,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1142,6 +1141,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10165,7 +10145,7 @@ index 0000000000..1c7c68ee0d
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1170,13 +1193,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1177,13 +1200,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10181,7 +10161,7 @@ index 0000000000..1c7c68ee0d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1283,6 +1306,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1290,6 +1313,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10191,7 +10171,7 @@ index 0000000000..1c7c68ee0d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1546,6 +1572,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1553,6 +1579,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10202,10 +10182,10 @@ index 0000000000..1c7c68ee0d
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index dba82b2b24..8d5f90e46e 100644
++index 4ce297cfea..f4ce64acbd 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -605,7 +605,6 @@ partialclean::
++@@ -612,7 +612,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -10213,7 +10193,7 @@ index 0000000000..1c7c68ee0d
 +   afl \
 +   alloc \
 +   array \
-+@@ -613,24 +612,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -620,24 +619,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -10241,7 +10221,7 @@ index 0000000000..1c7c68ee0d
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -641,17 +640,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -648,17 +647,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -10259,7 +10239,7 @@ index 0000000000..1c7c68ee0d
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -661,6 +655,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -668,6 +662,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10269,7 +10249,7 @@ index 0000000000..1c7c68ee0d
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -671,7 +668,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -678,7 +675,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10278,7 +10258,7 @@ index 0000000000..1c7c68ee0d
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1066,12 +1063,14 @@ clean::
++@@ -1073,12 +1070,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10295,7 +10275,7 @@ index 0000000000..1c7c68ee0d
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1144,6 +1143,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1151,6 +1150,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10303,10 +10283,10 @@ index 0000000000..1c7c68ee0d
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1643,6 +1643,9 @@ endif
-+ 	else \
-+ 	  $(INSTALL_PROG) tools/ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
-+ 	fi
++@@ -1648,6 +1648,9 @@ endif
++ 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
++ 	done
++ 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
 ++	$(INSTALL_DATA) \
 ++	  tools/eventlog_metadata \
 ++	  "$(INSTALL_LIBDIR)"
@@ -16215,7 +16195,7 @@ index 0000000000..1c7c68ee0d
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..b98c34d073
++index 0000000000..5e37abae6e
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3915 @@
@@ -20025,10 +20005,10 @@ index 0000000000..1c7c68ee0d
 ++ (* Testing unsynchronized, parallel Weak usage *)
 ++ 
 ++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index de10bd1fd3..5f9e31bc66 100755
+++index f64c2ce4e0..49f5a8b697 100755
 ++--- a/tools/ci/actions/runner.sh
 +++++ b/tools/ci/actions/runner.sh
-++@@ -40,19 +40,7 @@ EOF
+++@@ -42,19 +42,7 @@ EOF
 ++     --enable-debug-runtime \
 ++     $CONFIG_ARG"
 ++ 
@@ -20104,7 +20084,11 @@ index 0000000000..1c7c68ee0d
 +++    fi
 ++     run "test $PORT" \
 ++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUIL
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
