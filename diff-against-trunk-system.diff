@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..ecb8b36335
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:06.843696913 +0100
+++++ b	2023-09-28 18:47:06.863697649 +0100
++@@ -44,7 +44,7 @@
++  
++  
++  (* To get a newline when one does not want to close the current box. *)
++-@@ -1077,7 +1077,7 @@ let get_stdbuf () = DLS.get stdbuf_key
+++@@ -1089,7 +1089,7 @@ let get_stdbuf () = DLS.get stdbuf_key
++     Formatter [ppf] is supposed to print to buffer [buf], otherwise this
++     function is not really useful. *)
++  let flush_buffer_formatter buf ppf =
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 293c10efa3..820d1db51a 100644
+index 90ddfaa00d..19be90fe34 100644
 --- a/Changes
 +++ b/Changes
-@@ -582,6 +582,10 @@ Working version
+@@ -586,6 +586,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -28,7 +42,7 @@ index 293c10efa3..820d1db51a 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1118,11 +1122,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1122,11 +1126,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index 293c10efa3..820d1db51a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1151,6 +1150,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1155,6 +1154,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index 293c10efa3..820d1db51a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1186,13 +1209,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1190,13 +1213,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index 293c10efa3..820d1db51a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1299,6 +1322,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1303,6 +1326,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index 293c10efa3..820d1db51a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1562,6 +1588,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1566,6 +1592,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10042,13 +10056,27 @@ index 0000000000..5e37abae6e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3341016f1c
+index 0000000000..e39cc2127c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10024 @@
+@@ -0,0 +1,10027 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..ecb8b36335
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:06.843696913 +0100
++++++ b	2023-09-28 18:47:06.863697649 +0100
+++@@ -44,7 +44,7 @@
+++  
+++  
+++  (* To get a newline when one does not want to close the current box. *)
+++-@@ -1077,7 +1077,7 @@ let get_stdbuf () = DLS.get stdbuf_key
++++@@ -1089,7 +1089,7 @@ let get_stdbuf () = DLS.get stdbuf_key
+++     Formatter [ppf] is supposed to print to buffer [buf], otherwise this
+++     function is not really useful. *)
+++  let flush_buffer_formatter buf ppf =
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10062,10 +10090,10 @@ index 0000000000..3341016f1c
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 293c10efa3..820d1db51a 100644
++index 90ddfaa00d..19be90fe34 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -582,6 +582,10 @@ Working version
++@@ -586,6 +586,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10076,7 +10104,7 @@ index 0000000000..3341016f1c
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1118,11 +1122,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1122,11 +1126,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10088,7 +10116,7 @@ index 0000000000..3341016f1c
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1151,6 +1150,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1155,6 +1154,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10119,7 +10147,7 @@ index 0000000000..3341016f1c
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1186,13 +1209,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1190,13 +1213,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10135,7 +10163,7 @@ index 0000000000..3341016f1c
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1299,6 +1322,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1303,6 +1326,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10145,7 +10173,7 @@ index 0000000000..3341016f1c
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1562,6 +1588,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1566,6 +1592,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20058,18 +20086,7 @@ index 0000000000..3341016f1c
 +++    fi
 ++     run "test $PORT" \
 ++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necess
+++     run "install $PORT" $MAKE -C "
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -21997,7 +22014,7 @@ index a2fafafc9d..7c72614ce6 100644
    Domain.DLS.new_key ~split_from_parent:Fun.id (fun () -> temp_dir_name)
  
 diff --git a/stdlib/format.ml b/stdlib/format.ml
-index 669494be53..8b92d36cb9 100644
+index b7c53a7703..bf854e876c 100644
 --- a/stdlib/format.ml
 +++ b/stdlib/format.ml
 @@ -1020,6 +1020,7 @@ and err_formatter = formatter_of_out_channel Stdlib.stderr
@@ -22056,10 +22073,10 @@ index 669494be53..8b92d36cb9 100644
  )
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
-index ef8093bb1b..7be04ac538 100644
+index b2544b8e6c..ab48e65d29 100644
 --- a/stdlib/format.mli
 +++ b/stdlib/format.mli
-@@ -963,6 +963,7 @@ val formatter_of_out_channel : out_channel -> formatter
+@@ -964,6 +964,7 @@ val formatter_of_out_channel : out_channel -> formatter
      to the corresponding output channel [oc].
  *)
  
@@ -22067,7 +22084,7 @@ index ef8093bb1b..7be04ac538 100644
  val synchronized_formatter_of_out_channel :
    out_channel -> formatter Domain.DLS.key
  [@@alert unstable][@@alert "-unstable"]
-@@ -974,7 +975,7 @@ val synchronized_formatter_of_out_channel :
+@@ -975,7 +976,7 @@ val synchronized_formatter_of_out_channel :
      domains will be interleaved with each other at points where the formatter
      is flushed, such as with {!print_flush}.
  *)
@@ -22076,7 +22093,7 @@ index ef8093bb1b..7be04ac538 100644
  
  val std_formatter : formatter
  (** The initial domain's standard formatter to write to standard output.
-@@ -1046,6 +1047,7 @@ val make_formatter :
+@@ -1047,6 +1048,7 @@ val make_formatter :
    returns a formatter to the {!Stdlib.out_channel} [oc].
  *)
  
@@ -22084,7 +22101,7 @@ index ef8093bb1b..7be04ac538 100644
  val make_synchronized_formatter :
    (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
  [@@alert unstable][@@alert "-unstable"]
-@@ -1058,6 +1060,7 @@ val make_synchronized_formatter :
+@@ -1059,6 +1061,7 @@ val make_synchronized_formatter :
      is flushed, such as with {!print_flush}.
      @since 5.0
  *)
