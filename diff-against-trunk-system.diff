@@ -1,31 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e9b21da64b
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,22 @@
-+--- a	2023-09-28 18:47:05.707655057 +0100
-++++ b	2023-09-28 18:47:05.731655941 +0100
-+@@ -68,10 +68,6 @@
-+  ### Build system:
-+  
-+  - #11590: Allow installing to a destination path containing spaces.
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-+ --- a/bytecomp/emitcode.ml
-+ +++ b/bytecomp/emitcode.ml
-+@@ -257,7 +253,7 @@
-+          | _ -> print_string "<wrong reloc>"
-+      with Not_found ->
-+        print_string "<no reloc>"
-+-@@ -484,7 +450,7 @@ let print_code ic len =
-++@@ -486,7 +452,7 @@ let print_code ic len =
-+  let print_reloc (info, pos) =
-+    printf "    %d    (%d)    " pos (pos/4);
-+    match info with
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -39,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 27f7d9063c..887445c882 100644
+index 293c10efa3..820d1db51a 100644
 --- a/Changes
 +++ b/Changes
-@@ -579,6 +579,10 @@ Working version
+@@ -582,6 +582,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -53,7 +28,7 @@ index 27f7d9063c..887445c882 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1115,11 +1119,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1118,11 +1122,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -65,7 +40,7 @@ index 27f7d9063c..887445c882 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1148,6 +1147,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1151,6 +1150,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -96,7 +71,7 @@ index 27f7d9063c..887445c882 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1183,13 +1206,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1186,13 +1209,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -112,7 +87,7 @@ index 27f7d9063c..887445c882 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1296,6 +1319,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1299,6 +1322,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -122,7 +97,7 @@ index 27f7d9063c..887445c882 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1559,6 +1585,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1562,6 +1588,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10067,38 +10042,13 @@ index 0000000000..5e37abae6e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..35d2241e4b
+index 0000000000..3341016f1c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10031 @@
+@@ -0,0 +1,10024 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e9b21da64b
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,22 @@
-++--- a	2023-09-28 18:47:05.707655057 +0100
-+++++ b	2023-09-28 18:47:05.731655941 +0100
-++@@ -68,10 +68,6 @@
-++  ### Build system:
-++  
-++  - #11590: Allow installing to a destination path containing spaces.
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-++ --- a/bytecomp/emitcode.ml
-++ +++ b/bytecomp/emitcode.ml
-++@@ -257,7 +253,7 @@
-++          | _ -> print_string "<wrong reloc>"
-++      with Not_found ->
-++        print_string "<no reloc>"
-++-@@ -484,7 +450,7 @@ let print_code ic len =
-+++@@ -486,7 +452,7 @@ let print_code ic len =
-++  let print_reloc (info, pos) =
-++    printf "    %d    (%d)    " pos (pos/4);
-++    match info with
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10112,10 +10062,10 @@ index 0000000000..35d2241e4b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 27f7d9063c..887445c882 100644
++index 293c10efa3..820d1db51a 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -579,6 +579,10 @@ Working version
++@@ -582,6 +582,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10126,7 +10076,7 @@ index 0000000000..35d2241e4b
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1115,11 +1119,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1118,11 +1122,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10138,7 +10088,7 @@ index 0000000000..35d2241e4b
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1148,6 +1147,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1151,6 +1150,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10169,7 +10119,7 @@ index 0000000000..35d2241e4b
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1183,13 +1206,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1186,13 +1209,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10185,7 +10135,7 @@ index 0000000000..35d2241e4b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1296,6 +1319,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1299,6 +1322,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10195,7 +10145,7 @@ index 0000000000..35d2241e4b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1559,6 +1585,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1562,6 +1588,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20101,7 +20051,25 @@ index 0000000000..35d2241e4b
 +++      run "test dynlink $PORT" \
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
 +++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/f
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necess
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
