@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:08.023740365 +0100
++++ b	2023-09-28 18:47:08.031740659 +0100
+@@ -40,7 +40,7 @@
+ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
+ --- a/stdlib/gc.ml
+ +++ b/stdlib/gc.ml
+-@@ -109,7 +109,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
++@@ -115,7 +115,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
+  let rec call_alarm arec =
+    if Atomic.get arec.active then begin
+      let finally () = finalise call_alarm arec in

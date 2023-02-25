@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..78ddcf7c92
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:08.023740365 +0100
+++++ b	2023-09-28 18:47:08.031740659 +0100
++@@ -40,7 +40,7 @@
++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
++ --- a/stdlib/gc.ml
++ +++ b/stdlib/gc.ml
++-@@ -109,7 +109,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
+++@@ -115,7 +115,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
++  let rec call_alarm arec =
++    if Atomic.get arec.active then begin
++      let finally () = finalise call_alarm arec in
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10042,13 +10056,27 @@ index 0000000000..5e37abae6e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e1b5e0d08e
+index 0000000000..1dab1bef39
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10024 @@
+@@ -0,0 +1,10027 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..78ddcf7c92
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:08.023740365 +0100
++++++ b	2023-09-28 18:47:08.031740659 +0100
+++@@ -40,7 +40,7 @@
+++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
+++ --- a/stdlib/gc.ml
+++ +++ b/stdlib/gc.ml
+++-@@ -109,7 +109,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
++++@@ -115,7 +115,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
+++  let rec call_alarm arec =
+++    if Atomic.get arec.active then begin
+++      let finally () = finalise call_alarm arec in
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20058,18 +20086,7 @@ index 0000000000..e1b5e0d08e
 +++    fi
 ++     run "test $PORT" \
 ++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necess
+++     run "install $PORT" $MAKE -C "$FULL_BU
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -22093,7 +22110,7 @@ index b2544b8e6c..ab48e65d29 100644
  val formatter_of_out_functions :
    formatter_out_functions -> formatter
 diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-index 0ac8ea0902..ae9376079a 100644
+index 8bb07719c3..b798f75b09 100644
 --- a/stdlib/gc.ml
 +++ b/stdlib/gc.ml
 @@ -61,9 +61,15 @@ external major : unit -> unit = "caml_gc_major"
