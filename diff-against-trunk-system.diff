@@ -1,20 +1,83 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..78ddcf7c92
+index 0000000000..51fc87193c
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:08.023740365 +0100
-++++ b	2023-09-28 18:47:08.031740659 +0100
-+@@ -40,7 +40,7 @@
-+ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-+ --- a/stdlib/gc.ml
-+ +++ b/stdlib/gc.ml
-+-@@ -109,7 +109,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-++@@ -115,7 +115,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-+  let rec call_alarm arec =
-+    if Atomic.get arec.active then begin
-+      let finally () = finalise call_alarm arec in
+@@ -0,0 +1,74 @@
++--- a	2023-09-28 18:47:08.299750522 +0100
+++++ b	2023-09-28 18:47:08.323751405 +0100
++@@ -25,8 +25,6 @@
++  ### Manual and documentation:
++  
++  - #9430, #11291: Document the general desugaring rules for binding operators.
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++ diff --git a/bytecomp/bytepackager.ml b/bytecomp/bytepackager.ml
++ --- a/bytecomp/bytepackager.ml
++ +++ b/bytecomp/bytepackager.ml
++@@ -45,7 +43,7 @@
++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
++ --- a/bytecomp/emitcode.ml
++ +++ b/bytecomp/emitcode.ml
++-@@ -416,8 +416,9 @@ let to_file outchan unit_name objfile ~required_globals code =
+++@@ -420,8 +420,9 @@ let to_file outchan unit_name objfile ~required_globals code =
++          (Filename.dirname (Location.absolute_path objfile))
++          !debug_dirs;
++        let p = pos_out outchan in
++@@ -62,7 +60,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -471,6 +471,10 @@ AC_ARG_WITH([flexdll],
+++@@ -482,6 +482,10 @@ AC_ARG_WITH([flexdll],
++      [bootstrap FlexDLL from the given sources])],
++    [AS_IF([test x"$withval" = 'xyes'],[with_flexdll=flexdll])])
++  
++@@ -73,7 +71,7 @@
++  AS_IF([test x"$enable_unix_lib" = "xno"],
++    [AS_IF([test x"$enable_debugger" = "xyes"],
++      [AC_MSG_ERROR([replay debugger requires the unix library])],
++-@@ -1929,6 +1933,42 @@ AC_COMPILE_IFELSE(
+++@@ -1943,6 +1947,42 @@ AC_COMPILE_IFELSE(
++          pthread_getaffinity_np(pthread_self(), sizeof(cs), &cs);]])],
++      [AC_DEFINE([HAS_BSD_GETAFFINITY_NP])])])
++  
++@@ -143,7 +141,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -488,9 +488,11 @@ stdlib__Map.cmx : map.ml \
+++@@ -444,9 +444,11 @@ stdlib__Map.cmx : map.ml \
++  stdlib__Map.cmi : map.mli \
++      stdlib__Seq.cmi
++  stdlib__Marshal.cmo : marshal.ml \
++@@ -507,7 +505,7 @@
++ diff --git a/utils/config.common.ml b/utils/config.common.ml
++ --- a/utils/config.common.ml
++ +++ b/utils/config.common.ml
++-@@ -74,7 +74,7 @@ type configuration_value =
+++@@ -79,7 +79,7 @@ type configuration_value =
++    | Int of int
++    | Bool of bool
++  
++@@ -516,7 +514,7 @@
++    let p x v = (x, String v) in
++    let p_int x v = (x, Int v) in
++    let p_bool x v = (x, Bool v) in
++-@@ -122,6 +122,7 @@ let configuration_variables =
+++@@ -127,6 +127,7 @@ let configuration_variables =
++    p_bool "supports_shared_libraries" supports_shared_libraries;
++    p_bool "native_dynlink" native_dynlink;
++    p_bool "naked_pointers" naked_pointers;
++@@ -524,7 +522,7 @@
++  
++    p "exec_magic_number" exec_magic_number;
++    p "cmi_magic_number" cmi_magic_number;
++-@@ -147,11 +148,11 @@ let print_config_value oc = function
+++@@ -152,11 +153,11 @@ let print_config_value oc = function
++  let print_config oc =
++    let print (x, v) =
++      Printf.fprintf oc "%s: %a\n" x print_config_value v in
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,10 +91,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 929b1c1f82..f5d8768543 100644
+index 09a8ba75ab..c1af2e31cd 100644
 --- a/Changes
 +++ b/Changes
-@@ -594,6 +594,10 @@ Working version
+@@ -604,6 +604,10 @@ Working version
    types.
    (Chris Casinghino, review by Gabriel Scherer)
  
@@ -42,7 +105,7 @@ index 929b1c1f82..f5d8768543 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1130,11 +1134,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1140,11 +1144,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -54,7 +117,7 @@ index 929b1c1f82..f5d8768543 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1163,6 +1162,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1173,6 +1172,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -85,7 +148,7 @@ index 929b1c1f82..f5d8768543 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1198,13 +1221,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1208,13 +1231,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -101,7 +164,7 @@ index 929b1c1f82..f5d8768543 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1311,6 +1334,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1321,6 +1344,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -111,7 +174,7 @@ index 929b1c1f82..f5d8768543 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1574,6 +1600,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1584,6 +1610,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -783,7 +846,7 @@ index bcc9d12947..5252fa4473 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
-index e349405e6f..27ed8287ab 100755
+index cda447d30d..27ed8287ab 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
 index 76fea58895..17a7582aeb 100755
@@ -3182,7 +3245,7 @@ index 1675a6ca21..75809c8285 100644
            let opened = match current with
              | None -> List.remove_assoc fullname !opened_dlls
 diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-index 9e70bebd9c..61fbe8115c 100644
+index bd3c3f2fb5..540d639197 100644
 --- a/bytecomp/emitcode.ml
 +++ b/bytecomp/emitcode.ml
 @@ -309,10 +309,14 @@ let emit_instr = function
@@ -3201,10 +3264,10 @@ index 9e70bebd9c..61fbe8115c 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index b0c4c4ccfe..6a1e8a809c 100755
+index 75bd09d149..580e876c64 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index ba0ecc38b6..66a2ecd848 100644
+index c614da5a38..c6cdc330f8 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3256,7 +3319,7 @@ index ba0ecc38b6..66a2ecd848 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -608,7 +619,8 @@ AS_CASE([$host],
+@@ -612,7 +623,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3266,7 +3329,7 @@ index ba0ecc38b6..66a2ecd848 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -682,8 +694,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -686,8 +698,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -3278,7 +3341,7 @@ index ba0ecc38b6..66a2ecd848 100644
  
  AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
    [yes,*|,true],
-@@ -1023,9 +1036,9 @@ AS_IF([! $arch64],
+@@ -1027,9 +1040,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3291,7 +3354,7 @@ index ba0ecc38b6..66a2ecd848 100644
  
  # Support for C11 atomic types
  
-@@ -1183,13 +1196,14 @@ AS_CASE([$host],
+@@ -1187,13 +1200,14 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -3310,7 +3373,7 @@ index ba0ecc38b6..66a2ecd848 100644
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux_eabihf],
-@@ -1226,9 +1240,9 @@ AS_CASE([$host],
+@@ -1230,9 +1244,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -3322,7 +3385,7 @@ index ba0ecc38b6..66a2ecd848 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1238,7 +1252,7 @@ AS_CASE([$host],
+@@ -1242,7 +1256,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3331,7 +3394,7 @@ index ba0ecc38b6..66a2ecd848 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1258,7 +1272,7 @@ AS_CASE([$host],
+@@ -1262,7 +1276,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3340,7 +3403,7 @@ index ba0ecc38b6..66a2ecd848 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1950,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1990,11 +2004,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3365,7 +3428,7 @@ index ba0ecc38b6..66a2ecd848 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2005,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2045,6 +2071,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3396,7 +3459,7 @@ index ba0ecc38b6..66a2ecd848 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2151,8 +2201,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2191,8 +2241,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32*],
@@ -10056,27 +10119,90 @@ index 0000000000..5e37abae6e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1dab1bef39
+index 0000000000..afd5b007e4
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10027 @@
+@@ -0,0 +1,10041 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..78ddcf7c92
++index 0000000000..51fc87193c
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:08.023740365 +0100
-+++++ b	2023-09-28 18:47:08.031740659 +0100
-++@@ -40,7 +40,7 @@
-++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-++ --- a/stdlib/gc.ml
-++ +++ b/stdlib/gc.ml
-++-@@ -109,7 +109,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-+++@@ -115,7 +115,7 @@ type alarm_rec = {active : alarm; f : unit -> unit}
-++  let rec call_alarm arec =
-++    if Atomic.get arec.active then begin
-++      let finally () = finalise call_alarm arec in
++@@ -0,0 +1,74 @@
+++--- a	2023-09-28 18:47:08.299750522 +0100
++++++ b	2023-09-28 18:47:08.323751405 +0100
+++@@ -25,8 +25,6 @@
+++  ### Manual and documentation:
+++  
+++  - #9430, #11291: Document the general desugaring rules for binding operators.
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++ diff --git a/bytecomp/bytepackager.ml b/bytecomp/bytepackager.ml
+++ --- a/bytecomp/bytepackager.ml
+++ +++ b/bytecomp/bytepackager.ml
+++@@ -45,7 +43,7 @@
+++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
+++ --- a/bytecomp/emitcode.ml
+++ +++ b/bytecomp/emitcode.ml
+++-@@ -416,8 +416,9 @@ let to_file outchan unit_name objfile ~required_globals code =
++++@@ -420,8 +420,9 @@ let to_file outchan unit_name objfile ~required_globals code =
+++          (Filename.dirname (Location.absolute_path objfile))
+++          !debug_dirs;
+++        let p = pos_out outchan in
+++@@ -62,7 +60,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -471,6 +471,10 @@ AC_ARG_WITH([flexdll],
++++@@ -482,6 +482,10 @@ AC_ARG_WITH([flexdll],
+++      [bootstrap FlexDLL from the given sources])],
+++    [AS_IF([test x"$withval" = 'xyes'],[with_flexdll=flexdll])])
+++  
+++@@ -73,7 +71,7 @@
+++  AS_IF([test x"$enable_unix_lib" = "xno"],
+++    [AS_IF([test x"$enable_debugger" = "xyes"],
+++      [AC_MSG_ERROR([replay debugger requires the unix library])],
+++-@@ -1929,6 +1933,42 @@ AC_COMPILE_IFELSE(
++++@@ -1943,6 +1947,42 @@ AC_COMPILE_IFELSE(
+++          pthread_getaffinity_np(pthread_self(), sizeof(cs), &cs);]])],
+++      [AC_DEFINE([HAS_BSD_GETAFFINITY_NP])])])
+++  
+++@@ -143,7 +141,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -488,9 +488,11 @@ stdlib__Map.cmx : map.ml \
++++@@ -444,9 +444,11 @@ stdlib__Map.cmx : map.ml \
+++  stdlib__Map.cmi : map.mli \
+++      stdlib__Seq.cmi
+++  stdlib__Marshal.cmo : marshal.ml \
+++@@ -507,7 +505,7 @@
+++ diff --git a/utils/config.common.ml b/utils/config.common.ml
+++ --- a/utils/config.common.ml
+++ +++ b/utils/config.common.ml
+++-@@ -74,7 +74,7 @@ type configuration_value =
++++@@ -79,7 +79,7 @@ type configuration_value =
+++    | Int of int
+++    | Bool of bool
+++  
+++@@ -516,7 +514,7 @@
+++    let p x v = (x, String v) in
+++    let p_int x v = (x, Int v) in
+++    let p_bool x v = (x, Bool v) in
+++-@@ -122,6 +122,7 @@ let configuration_variables =
++++@@ -127,6 +127,7 @@ let configuration_variables =
+++    p_bool "supports_shared_libraries" supports_shared_libraries;
+++    p_bool "native_dynlink" native_dynlink;
+++    p_bool "naked_pointers" naked_pointers;
+++@@ -524,7 +522,7 @@
+++  
+++    p "exec_magic_number" exec_magic_number;
+++    p "cmi_magic_number" cmi_magic_number;
+++-@@ -147,11 +148,11 @@ let print_config_value oc = function
++++@@ -152,11 +153,11 @@ let print_config_value oc = function
+++  let print_config oc =
+++    let print (x, v) =
+++      Printf.fprintf oc "%s: %a\n" x print_config_value v in
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10090,10 +10216,10 @@ index 0000000000..1dab1bef39
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 929b1c1f82..f5d8768543 100644
++index 09a8ba75ab..c1af2e31cd 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -594,6 +594,10 @@ Working version
++@@ -604,6 +604,10 @@ Working version
 +   types.
 +   (Chris Casinghino, review by Gabriel Scherer)
 + 
@@ -10104,7 +10230,7 @@ index 0000000000..1dab1bef39
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1130,11 +1134,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1140,11 +1144,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10116,7 +10242,7 @@ index 0000000000..1dab1bef39
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1163,6 +1162,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1173,6 +1172,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10147,7 +10273,7 @@ index 0000000000..1dab1bef39
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1198,13 +1221,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1208,13 +1231,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10163,7 +10289,7 @@ index 0000000000..1dab1bef39
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1311,6 +1334,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1321,6 +1344,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10173,7 +10299,7 @@ index 0000000000..1dab1bef39
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1574,6 +1600,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1584,6 +1610,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10845,7 +10971,7 @@ index 0000000000..1dab1bef39
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index e349405e6f..27ed8287ab 100755
++index cda447d30d..27ed8287ab 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
 +index 76fea58895..17a7582aeb 100755
@@ -13244,7 +13370,7 @@ index 0000000000..1dab1bef39
 +           let opened = match current with
 +             | None -> List.remove_assoc fullname !opened_dlls
 +diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-+index 9e70bebd9c..61fbe8115c 100644
++index bd3c3f2fb5..540d639197 100644
 +--- a/bytecomp/emitcode.ml
 ++++ b/bytecomp/emitcode.ml
 +@@ -309,10 +309,14 @@ let emit_instr = function
@@ -13263,10 +13389,10 @@ index 0000000000..1dab1bef39
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index b0c4c4ccfe..6a1e8a809c 100755
++index 75bd09d149..580e876c64 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index ba0ecc38b6..66a2ecd848 100644
++index c614da5a38..c6cdc330f8 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13318,7 +13444,7 @@ index 0000000000..1dab1bef39
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -608,7 +619,8 @@ AS_CASE([$host],
++@@ -612,7 +623,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13328,7 +13454,7 @@ index 0000000000..1dab1bef39
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -682,8 +694,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -686,8 +698,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -13340,7 +13466,7 @@ index 0000000000..1dab1bef39
 + 
 + AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
 +   [yes,*|,true],
-+@@ -1023,9 +1036,9 @@ AS_IF([! $arch64],
++@@ -1027,9 +1040,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -13353,7 +13479,7 @@ index 0000000000..1dab1bef39
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1183,13 +1196,14 @@ AS_CASE([$host],
++@@ -1187,13 +1200,14 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -13372,7 +13498,7 @@ index 0000000000..1dab1bef39
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -1226,9 +1240,9 @@ AS_CASE([$host],
++@@ -1230,9 +1244,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -13384,7 +13510,7 @@ index 0000000000..1dab1bef39
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1238,7 +1252,7 @@ AS_CASE([$host],
++@@ -1242,7 +1256,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13393,7 +13519,7 @@ index 0000000000..1dab1bef39
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1258,7 +1272,7 @@ AS_CASE([$host],
++@@ -1262,7 +1276,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -13402,7 +13528,7 @@ index 0000000000..1dab1bef39
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1950,11 +1964,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1990,11 +2004,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13427,7 +13553,7 @@ index 0000000000..1dab1bef39
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2005,6 +2031,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2045,6 +2071,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13458,7 +13584,7 @@ index 0000000000..1dab1bef39
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2151,8 +2201,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2191,8 +2241,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32*],
@@ -20037,56 +20163,7 @@ index 0000000000..1dab1bef39
 +++++ b/tools/ci/appveyor/appveyor_build.sh
 ++@@ -64,8 +64,8 @@ function set_configuration {
 ++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BU
+++             build='--build=i686
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
@@ -21602,7 +21679,7 @@ index f9e85a4586..a83368a381 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 86efe6cb0f..505935ed50 100644
+index 54dab1bde2..c51ec4b672 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -21730,7 +21807,7 @@ index 86efe6cb0f..505935ed50 100644
      stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
-@@ -509,11 +465,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -511,11 +467,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -21742,7 +21819,7 @@ index 86efe6cb0f..505935ed50 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -618,7 +569,6 @@ stdlib__Random.cmo : random.ml \
+@@ -620,7 +571,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -21750,7 +21827,7 @@ index 86efe6cb0f..505935ed50 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -630,7 +580,6 @@ stdlib__Random.cmx : random.ml \
+@@ -632,7 +582,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -21758,7 +21835,7 @@ index 86efe6cb0f..505935ed50 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -670,15 +619,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -672,15 +621,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
@@ -22656,7 +22733,7 @@ index 0000000000..00d51897e0
 +     };
 +};
 diff --git a/utils/config.common.ml b/utils/config.common.ml
-index 32781cb2d9..aa5f8e7398 100644
+index 9707cd0fc3..9e72ba4c42 100644
 --- a/utils/config.common.ml
 +++ b/utils/config.common.ml
 @@ -28,26 +28,26 @@ let standard_library =
