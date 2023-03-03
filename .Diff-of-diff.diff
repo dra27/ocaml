@@ -1,0 +1,12 @@
+--- a	2023-09-28 18:47:10.879845422 +0100
++++ b	2023-09-28 18:47:10.891845863 +0100
+@@ -8,6 +8,6 @@
+ +- #12046: Flush stderr when tracing the parser
+ +  (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
+ +
+- OCaml 5.0.0 (15 December 2022)
+- ------------------------------
+- 
++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
++   that causes very slow compaction.
++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)

@@ -1,6 +1,21 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..d597d70932
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,12 @@
++--- a	2023-09-28 18:47:10.879845422 +0100
+++++ b	2023-09-28 18:47:10.891845863 +0100
++@@ -8,6 +8,6 @@
++ +- #12046: Flush stderr when tracing the parser
++ +  (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
++ +
++- OCaml 5.0.0 (15 December 2022)
++- ------------------------------
++- 
+++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
+++   that causes very slow compaction.
+++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,12 +29,12 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 7408deefd0..5066558b3c 100644
+index 4e2bd6e6c5..278d2e6654 100644
 --- a/Changes
 +++ b/Changes
-@@ -618,6 +618,10 @@ Working version
-   types.
-   (Chris Casinghino, review by Gabriel Scherer)
+@@ -621,6 +621,10 @@ Working version
+ - #12046: Flush stderr when tracing the parser
+   (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
  
 +- #12264, #12289: Fix compact_allocate to avoid a pathological case
 +  that causes very slow compaction.
@@ -28,7 +43,7 @@ index 7408deefd0..5066558b3c 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1154,11 +1158,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1157,11 +1161,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +55,7 @@ index 7408deefd0..5066558b3c 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1187,6 +1186,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1190,6 +1189,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +86,7 @@ index 7408deefd0..5066558b3c 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1222,13 +1245,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1225,13 +1248,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +102,7 @@ index 7408deefd0..5066558b3c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1335,6 +1358,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1338,6 +1361,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +112,7 @@ index 7408deefd0..5066558b3c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1598,6 +1624,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1601,6 +1627,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10043,13 +10058,28 @@ index 0000000000..845943c6a2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..165f928ccc
+index 0000000000..a3c6c0745b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10024 @@
+@@ -0,0 +1,10025 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..d597d70932
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,12 @@
+++--- a	2023-09-28 18:47:10.879845422 +0100
++++++ b	2023-09-28 18:47:10.891845863 +0100
+++@@ -8,6 +8,6 @@
+++ +- #12046: Flush stderr when tracing the parser
+++ +  (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
+++ +
+++- OCaml 5.0.0 (15 December 2022)
+++- ------------------------------
+++- 
++++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
++++   that causes very slow compaction.
++++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10063,12 +10093,12 @@ index 0000000000..165f928ccc
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 7408deefd0..5066558b3c 100644
++index 4e2bd6e6c5..278d2e6654 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -618,6 +618,10 @@ Working version
-+   types.
-+   (Chris Casinghino, review by Gabriel Scherer)
++@@ -621,6 +621,10 @@ Working version
++ - #12046: Flush stderr when tracing the parser
++   (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
 + 
 ++- #12264, #12289: Fix compact_allocate to avoid a pathological case
 ++  that causes very slow compaction.
@@ -10077,7 +10107,7 @@ index 0000000000..165f928ccc
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1154,11 +1158,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1157,11 +1161,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10089,7 +10119,7 @@ index 0000000000..165f928ccc
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1187,6 +1186,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1190,6 +1189,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10120,7 +10150,7 @@ index 0000000000..165f928ccc
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1222,13 +1245,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1225,13 +1248,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10136,7 +10166,7 @@ index 0000000000..165f928ccc
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1335,6 +1358,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1338,6 +1361,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10146,7 +10176,7 @@ index 0000000000..165f928ccc
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1598,6 +1624,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1601,6 +1627,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20056,21 +20086,7 @@ index 0000000000..165f928ccc
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files
++++      # And run the entire testsuite, 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
