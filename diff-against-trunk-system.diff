@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0b62278771
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:11.191856890 +0100
-++++ b	2023-09-28 18:47:11.199857184 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
-+ --- a/testsuite/tests/lib-marshal/intext_par.ml
-+ +++ b/testsuite/tests/lib-marshal/intext_par.ml
-+-@@ -482,7 +482,7 @@ let test_objects () =
-++@@ -484,7 +484,7 @@ let test_objects () =
-+    test 509 (x#test2 = false);
-+    test 510 (x#test3 = "footest5test3test442");
-+    test 511 (x#test4 = 42L);
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 4e2bd6e6c5..278d2e6654 100644
+index fa1e36ab33..c227a694f6 100644
 --- a/Changes
 +++ b/Changes
-@@ -621,6 +621,10 @@ Working version
+@@ -622,6 +622,10 @@ Working version
  - #12046: Flush stderr when tracing the parser
    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
  
@@ -42,7 +28,7 @@ index 4e2bd6e6c5..278d2e6654 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1157,11 +1161,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1158,11 +1162,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -54,7 +40,7 @@ index 4e2bd6e6c5..278d2e6654 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1190,6 +1189,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1191,6 +1190,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -85,7 +71,7 @@ index 4e2bd6e6c5..278d2e6654 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1225,13 +1248,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1226,13 +1249,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -101,7 +87,7 @@ index 4e2bd6e6c5..278d2e6654 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1338,6 +1361,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1339,6 +1362,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -111,7 +97,7 @@ index 4e2bd6e6c5..278d2e6654 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1601,6 +1627,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1602,6 +1628,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6135,7 +6121,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..845943c6a2
+index 0000000000..80b2beb9a4
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3916 @@
@@ -8170,7 +8156,7 @@ index 0000000000..845943c6a2
 + let () =
 +   let fmt_key = Format.synchronized_formatter_of_out_channel stdout in
 +diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
-+index 2efb846665..68ad0e1edb 100644
++index 8db6e91a5a..68d859d28f 100644
 +--- a/testsuite/tests/lib-marshal/intext_par.ml
 ++++ b/testsuite/tests/lib-marshal/intext_par.ml
 +@@ -1,5 +1,7 @@
@@ -10057,27 +10043,13 @@ index 0000000000..845943c6a2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2d58296452
+index 0000000000..f52bedf67e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10024 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0b62278771
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:11.191856890 +0100
-+++++ b	2023-09-28 18:47:11.199857184 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
-++ --- a/testsuite/tests/lib-marshal/intext_par.ml
-++ +++ b/testsuite/tests/lib-marshal/intext_par.ml
-++-@@ -482,7 +482,7 @@ let test_objects () =
-+++@@ -484,7 +484,7 @@ let test_objects () =
-++    test 509 (x#test2 = false);
-++    test 510 (x#test3 = "footest5test3test442");
-++    test 511 (x#test4 = 42L);
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10091,10 +10063,10 @@ index 0000000000..2d58296452
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 4e2bd6e6c5..278d2e6654 100644
++index fa1e36ab33..c227a694f6 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -621,6 +621,10 @@ Working version
++@@ -622,6 +622,10 @@ Working version
 + - #12046: Flush stderr when tracing the parser
 +   (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
 + 
@@ -10105,7 +10077,7 @@ index 0000000000..2d58296452
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1157,11 +1161,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1158,11 +1162,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10117,7 +10089,7 @@ index 0000000000..2d58296452
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1190,6 +1189,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1191,6 +1190,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10148,7 +10120,7 @@ index 0000000000..2d58296452
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1225,13 +1248,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1226,13 +1249,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10164,7 +10136,7 @@ index 0000000000..2d58296452
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1338,6 +1361,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1339,6 +1362,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10174,7 +10146,7 @@ index 0000000000..2d58296452
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1601,6 +1627,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1602,6 +1628,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16198,7 +16170,7 @@ index 0000000000..2d58296452
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..845943c6a2
++index 0000000000..80b2beb9a4
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3916 @@
@@ -18233,7 +18205,7 @@ index 0000000000..2d58296452
 ++ let () =
 ++   let fmt_key = Format.synchronized_formatter_of_out_channel stdout in
 ++diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
-++index 2efb846665..68ad0e1edb 100644
+++index 8db6e91a5a..68d859d28f 100644
 ++--- a/testsuite/tests/lib-marshal/intext_par.ml
 +++++ b/testsuite/tests/lib-marshal/intext_par.ml
 ++@@ -1,5 +1,7 @@
@@ -20084,7 +20056,20 @@ index 0000000000..2d58296452
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - th
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
