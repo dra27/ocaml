@@ -2029,7 +2029,7 @@ index 0ead3627b5..8a96be1456 100644
  let () =
    let fmt_key = Format.synchronized_formatter_of_out_channel stdout in
 diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
-index 2efb846665..68ad0e1edb 100644
+index 8db6e91a5a..68d859d28f 100644
 --- a/testsuite/tests/lib-marshal/intext_par.ml
 +++ b/testsuite/tests/lib-marshal/intext_par.ml
 @@ -1,5 +1,7 @@

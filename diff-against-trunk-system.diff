@@ -1,21 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..d597d70932
+index 0000000000..0b62278771
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,12 @@
-+--- a	2023-09-28 18:47:10.879845422 +0100
-++++ b	2023-09-28 18:47:10.891845863 +0100
-+@@ -8,6 +8,6 @@
-+ +- #12046: Flush stderr when tracing the parser
-+ +  (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
-+ +
-+- OCaml 5.0.0 (15 December 2022)
-+- ------------------------------
-+- 
-++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-++   that causes very slow compaction.
-++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:11.191856890 +0100
+++++ b	2023-09-28 18:47:11.199857184 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
++ --- a/testsuite/tests/lib-marshal/intext_par.ml
++ +++ b/testsuite/tests/lib-marshal/intext_par.ml
++-@@ -482,7 +482,7 @@ let test_objects () =
+++@@ -484,7 +484,7 @@ let test_objects () =
++    test 509 (x#test2 = false);
++    test 510 (x#test3 = "footest5test3test442");
++    test 511 (x#test4 = 42L);
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10058,28 +10057,27 @@ index 0000000000..845943c6a2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a3c6c0745b
+index 0000000000..2d58296452
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10025 @@
+@@ -0,0 +1,10024 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..d597d70932
++index 0000000000..0b62278771
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,12 @@
-++--- a	2023-09-28 18:47:10.879845422 +0100
-+++++ b	2023-09-28 18:47:10.891845863 +0100
-++@@ -8,6 +8,6 @@
-++ +- #12046: Flush stderr when tracing the parser
-++ +  (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
-++ +
-++- OCaml 5.0.0 (15 December 2022)
-++- ------------------------------
-++- 
-+++ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-+++   that causes very slow compaction.
-+++   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:11.191856890 +0100
++++++ b	2023-09-28 18:47:11.199857184 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
+++ --- a/testsuite/tests/lib-marshal/intext_par.ml
+++ +++ b/testsuite/tests/lib-marshal/intext_par.ml
+++-@@ -482,7 +482,7 @@ let test_objects () =
++++@@ -484,7 +484,7 @@ let test_objects () =
+++    test 509 (x#test2 = false);
+++    test 510 (x#test3 = "footest5test3test442");
+++    test 511 (x#test4 = 42L);
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20086,7 +20084,7 @@ index 0000000000..a3c6c0745b
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, 
++++      # And run
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644

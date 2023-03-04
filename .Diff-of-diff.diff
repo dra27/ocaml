@@ -1,12 +1,11 @@
---- a	2023-09-28 18:47:10.879845422 +0100
-+++ b	2023-09-28 18:47:10.891845863 +0100
-@@ -8,6 +8,6 @@
- +- #12046: Flush stderr when tracing the parser
- +  (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
- +
-- OCaml 5.0.0 (15 December 2022)
-- ------------------------------
-- 
-+ - #12264, #12289: Fix compact_allocate to avoid a pathological case
-+   that causes very slow compaction.
-+   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+--- a	2023-09-28 18:47:11.191856890 +0100
++++ b	2023-09-28 18:47:11.199857184 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
+ --- a/testsuite/tests/lib-marshal/intext_par.ml
+ +++ b/testsuite/tests/lib-marshal/intext_par.ml
+-@@ -482,7 +482,7 @@ let test_objects () =
++@@ -484,7 +484,7 @@ let test_objects () =
+    test 509 (x#test2 = false);
+    test 510 (x#test3 = "footest5test3test442");
+    test 511 (x#test4 = 42L);
