@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..ad32efc888
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:11.783878644 +0100
+++++ b	2023-09-28 18:47:11.799879232 +0100
++@@ -17,7 +17,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -731,7 +731,8 @@ AS_CASE([$host],
+++@@ -744,7 +744,8 @@ AS_CASE([$host],
++          Please use GCC version 4.9 or above.]), 69)],
++      [gcc-*],
++        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index fa1e36ab33..c227a694f6 100644
+index 2a1e045835..98ada8d116 100644
 --- a/Changes
 +++ b/Changes
-@@ -622,6 +622,10 @@ Working version
+@@ -626,6 +626,10 @@ Working version
  - #12046: Flush stderr when tracing the parser
    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
  
@@ -28,7 +42,7 @@ index fa1e36ab33..c227a694f6 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1158,11 +1162,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1162,11 +1166,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -40,7 +54,7 @@ index fa1e36ab33..c227a694f6 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1191,6 +1190,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1195,6 +1194,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -71,7 +85,7 @@ index fa1e36ab33..c227a694f6 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1226,13 +1249,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1230,13 +1253,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -87,7 +101,7 @@ index fa1e36ab33..c227a694f6 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1339,6 +1362,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1343,6 +1366,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -97,7 +111,7 @@ index fa1e36ab33..c227a694f6 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1602,6 +1628,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1606,6 +1632,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3187,10 +3201,10 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 75bd09d149..580e876c64 100755
+index 9781d73a3b..324763f33f 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index c614da5a38..c6cdc330f8 100644
+index 2da8b27860..96d5fec8b9 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3264,7 +3278,7 @@ index c614da5a38..c6cdc330f8 100644
  
  AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
    [yes,*|,true],
-@@ -1027,9 +1040,9 @@ AS_IF([! $arch64],
+@@ -1028,9 +1041,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3277,7 +3291,7 @@ index c614da5a38..c6cdc330f8 100644
  
  # Support for C11 atomic types
  
-@@ -1187,13 +1200,14 @@ AS_CASE([$host],
+@@ -1188,13 +1201,14 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -3296,7 +3310,7 @@ index c614da5a38..c6cdc330f8 100644
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux_eabihf],
-@@ -1230,9 +1244,9 @@ AS_CASE([$host],
+@@ -1231,9 +1245,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -3308,7 +3322,7 @@ index c614da5a38..c6cdc330f8 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1242,7 +1256,7 @@ AS_CASE([$host],
+@@ -1243,7 +1257,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3317,7 +3331,7 @@ index c614da5a38..c6cdc330f8 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1262,7 +1276,7 @@ AS_CASE([$host],
+@@ -1263,7 +1277,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3326,7 +3340,7 @@ index c614da5a38..c6cdc330f8 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1990,11 +2004,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1991,11 +2005,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3351,7 +3365,7 @@ index c614da5a38..c6cdc330f8 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2045,6 +2071,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2046,6 +2072,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3382,7 +3396,7 @@ index c614da5a38..c6cdc330f8 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2191,8 +2241,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2192,8 +2242,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32*],
@@ -10043,13 +10057,27 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f52bedf67e
+index 0000000000..26b38a3530
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10023 @@
+@@ -0,0 +1,10027 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..ad32efc888
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:11.783878644 +0100
++++++ b	2023-09-28 18:47:11.799879232 +0100
+++@@ -17,7 +17,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -731,7 +731,8 @@ AS_CASE([$host],
++++@@ -744,7 +744,8 @@ AS_CASE([$host],
+++          Please use GCC version 4.9 or above.]), 69)],
+++      [gcc-*],
+++        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10063,10 +10091,10 @@ index 0000000000..f52bedf67e
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index fa1e36ab33..c227a694f6 100644
++index 2a1e045835..98ada8d116 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -622,6 +622,10 @@ Working version
++@@ -626,6 +626,10 @@ Working version
 + - #12046: Flush stderr when tracing the parser
 +   (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
 + 
@@ -10077,7 +10105,7 @@ index 0000000000..f52bedf67e
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1158,11 +1162,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1162,11 +1166,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10089,7 +10117,7 @@ index 0000000000..f52bedf67e
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1191,6 +1190,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1195,6 +1194,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10120,7 +10148,7 @@ index 0000000000..f52bedf67e
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1226,13 +1249,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1230,13 +1253,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10136,7 +10164,7 @@ index 0000000000..f52bedf67e
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1339,6 +1362,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1343,6 +1366,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10146,7 +10174,7 @@ index 0000000000..f52bedf67e
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1602,6 +1628,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1606,6 +1632,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13236,10 +13264,10 @@ index 0000000000..f52bedf67e
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 75bd09d149..580e876c64 100755
++index 9781d73a3b..324763f33f 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index c614da5a38..c6cdc330f8 100644
++index 2da8b27860..96d5fec8b9 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13313,7 +13341,7 @@ index 0000000000..f52bedf67e
 + 
 + AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
 +   [yes,*|,true],
-+@@ -1027,9 +1040,9 @@ AS_IF([! $arch64],
++@@ -1028,9 +1041,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -13326,7 +13354,7 @@ index 0000000000..f52bedf67e
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1187,13 +1200,14 @@ AS_CASE([$host],
++@@ -1188,13 +1201,14 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -13345,7 +13373,7 @@ index 0000000000..f52bedf67e
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -1230,9 +1244,9 @@ AS_CASE([$host],
++@@ -1231,9 +1245,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -13357,7 +13385,7 @@ index 0000000000..f52bedf67e
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1242,7 +1256,7 @@ AS_CASE([$host],
++@@ -1243,7 +1257,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13366,7 +13394,7 @@ index 0000000000..f52bedf67e
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1262,7 +1276,7 @@ AS_CASE([$host],
++@@ -1263,7 +1277,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -13375,7 +13403,7 @@ index 0000000000..f52bedf67e
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1990,11 +2004,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1991,11 +2005,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13400,7 +13428,7 @@ index 0000000000..f52bedf67e
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2045,6 +2071,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2046,6 +2072,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13431,7 +13459,7 @@ index 0000000000..f52bedf67e
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2191,8 +2241,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2192,8 +2242,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32*],
@@ -20059,17 +20087,7 @@ index 0000000000..f52bedf67e
 +++      # And run the entire testsuite, skipping all the native-code tests
 +++    fi
 ++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - th
+++         mak
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
