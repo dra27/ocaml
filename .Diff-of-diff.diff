@@ -1,0 +1,20 @@
+--- a	2023-09-28 18:47:12.347899363 +0100
++++ b	2023-09-28 18:47:12.363899950 +0100
+@@ -14,7 +14,7 @@
+ diff --git a/lambda/matching.ml b/lambda/matching.ml
+ --- a/lambda/matching.ml
+ +++ b/lambda/matching.ml
+-@@ -2853,24 +2853,52 @@ let combine_constructor loc arg pat_env cstr partial ctx def
++@@ -2901,24 +2901,52 @@ let combine_constructor loc arg pat_env cstr partial ctx def
+        let descr_lambda_list = fails @ descr_lambda_list in
+        let consts, nonconsts =
+          split_cases (List.map tag_lambda descr_lambda_list) in
+@@ -74,7 +74,7 @@
+                  call_switcher loc fail_opt arg 0 (n - 1) consts
+              | n, _, _, _ -> (
+                  let act0 =
+-@@ -2886,13 +2914,26 @@ let combine_constructor loc arg pat_env cstr partial ctx def
++@@ -2934,13 +2962,26 @@ let combine_constructor loc arg pat_env cstr partial ctx def
+                  in
+                  match act0 with
+                  | Some act ->
