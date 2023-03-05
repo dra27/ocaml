@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..ad32efc888
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:11.783878644 +0100
-++++ b	2023-09-28 18:47:11.799879232 +0100
-+@@ -17,7 +17,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -731,7 +731,8 @@ AS_CASE([$host],
-++@@ -744,7 +744,8 @@ AS_CASE([$host],
-+          Please use GCC version 4.9 or above.]), 69)],
-+      [gcc-*],
-+        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10057,27 +10043,13 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..26b38a3530
+index 0000000000..6ce921192f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10027 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..ad32efc888
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:11.783878644 +0100
-+++++ b	2023-09-28 18:47:11.799879232 +0100
-++@@ -17,7 +17,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -731,7 +731,8 @@ AS_CASE([$host],
-+++@@ -744,7 +744,8 @@ AS_CASE([$host],
-++          Please use GCC version 4.9 or above.]), 69)],
-++      [gcc-*],
-++        [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20087,7 +20059,17 @@ index 0000000000..26b38a3530
 +++      # And run the entire testsuite, skipping all the native-code tests
 +++    fi
 ++     run "test $PORT" \
-++         mak
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - th
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644
