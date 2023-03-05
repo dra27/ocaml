@@ -1,29 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..561a1a6232
+index 0000000000..f244135049
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:47:12.347899363 +0100
-++++ b	2023-09-28 18:47:12.363899950 +0100
-+@@ -14,7 +14,7 @@
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:12.675911410 +0100
+++++ b	2023-09-28 18:47:12.683911703 +0100
++@@ -1,7 +1,7 @@
 + diff --git a/lambda/matching.ml b/lambda/matching.ml
 + --- a/lambda/matching.ml
 + +++ b/lambda/matching.ml
-+-@@ -2853,24 +2853,52 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-++@@ -2901,24 +2901,52 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-+        let descr_lambda_list = fails @ descr_lambda_list in
-+        let consts, nonconsts =
-+          split_cases (List.map tag_lambda descr_lambda_list) in
-+@@ -74,7 +74,7 @@
-+                  call_switcher loc fail_opt arg 0 (n - 1) consts
-+              | n, _, _, _ -> (
-+                  let act0 =
-+-@@ -2886,13 +2914,26 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-++@@ -2934,13 +2962,26 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-+                  in
-+                  match act0 with
-+                  | Some act ->
++-@@ -2888,7 +2888,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
+++@@ -2936,7 +2936,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
++                  (* This case is very frequent, it corresponds to
++                     options and lists. *)
++                  (* Keeping the Pisint test would make the bytecode
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10066,36 +10057,27 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a7c49d7b82
+index 0000000000..bd7413b3f9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10025 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..561a1a6232
++index 0000000000..f244135049
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:47:12.347899363 +0100
-+++++ b	2023-09-28 18:47:12.363899950 +0100
-++@@ -14,7 +14,7 @@
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:12.675911410 +0100
++++++ b	2023-09-28 18:47:12.683911703 +0100
+++@@ -1,7 +1,7 @@
 ++ diff --git a/lambda/matching.ml b/lambda/matching.ml
 ++ --- a/lambda/matching.ml
 ++ +++ b/lambda/matching.ml
-++-@@ -2853,24 +2853,52 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-+++@@ -2901,24 +2901,52 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-++        let descr_lambda_list = fails @ descr_lambda_list in
-++        let consts, nonconsts =
-++          split_cases (List.map tag_lambda descr_lambda_list) in
-++@@ -74,7 +74,7 @@
-++                  call_switcher loc fail_opt arg 0 (n - 1) consts
-++              | n, _, _, _ -> (
-++                  let act0 =
-++-@@ -2886,13 +2914,26 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-+++@@ -2934,13 +2962,26 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-++                  in
-++                  match act0 with
-++                  | Some act ->
+++-@@ -2888,7 +2888,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
++++@@ -2936,7 +2936,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
+++                  (* This case is very frequent, it corresponds to
+++                     options and lists. *)
+++                  (* Keeping the Pisint test would make the bytecode
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20094,10 +20076,17 @@ index 0000000000..a7c49d7b82
 ++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
 ++-    # And run the entire testsuite, skipping all the native-code tests
 +++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on 
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUI
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 1b311fd87f..83b6328fe6 100644
+index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
