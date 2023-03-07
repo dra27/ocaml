@@ -1,51 +1,37 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b595ec5233
+index 0000000000..120ce31942
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,43 @@
-+--- a	2023-09-28 18:47:14.083963102 +0100
-++++ b	2023-09-28 18:47:14.103963836 +0100
-+@@ -1,25 +1,27 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -629,6 +629,12 @@ Working version
-++@@ -629,9 +629,11 @@ Working version
-+  - #12046: Flush stderr when tracing the parser
-+    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:47:14.431975870 +0100
+++++ b	2023-09-28 18:47:14.447976458 +0100
++@@ -48,7 +48,7 @@
++ diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
++ --- a/bytecomp/dll.ml
++ +++ b/bytecomp/dll.ml
++-@@ -164,9 +164,6 @@ let ld_library_path_contents () =
+++@@ -172,9 +172,6 @@ let ld_library_path_contents () =
++    | s ->
++        Misc.split_path_contents s
 +  
-++-- #12264, #12289: Fix compact_allocate to avoid a pathological case
-++-  that causes very slow compaction.
-++-  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
-+ +- #12075: auto-detect whether `ar` support @FILE arguments at
-+ +  configure-time to avoid using this feature with toolchains
-+ +  that do not support it (eg FreeBSD/Darwin).
-+ +  (Nicolás Ojeda Bär, review by Xavier Leroy, David Allsop, Javier
-+ +  Chávarri, Anil Madhavapeddy)
-+-+
-++ 
-+  OCaml 5.0.0 (15 December 2022)
-+  ------------------------------
-+- 
-+ diff --git a/configure b/configure
-+ Binary files a/configure and b/configure differ
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -213,6 +213,7 @@ AC_SUBST([compute_deps])
-++@@ -215,6 +215,7 @@ AC_SUBST([naked_pointers_checker])
-+  AC_SUBST([ocaml_bindir])
-+  AC_SUBST([ocaml_libdir])
-+  AC_SUBST([QS])
-+@@ -27,7 +29,7 @@
++@@ -58,7 +58,7 @@
++  (* Initialization for separate compilation *)
 +  
-+  ## Generated files
++  let init_compile nostdlib =
++-@@ -176,10 +173,10 @@ let init_compile nostdlib =
+++@@ -184,10 +181,10 @@ let init_compile nostdlib =
 +  
-+-@@ -593,6 +594,12 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++@@ -604,6 +605,12 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+  ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-+  ocamlsrcdir=${ocamlsrcdir%X}
++  (* Initialization for linking in core (dynlink or toplevel) *)
++  
++@@ -128,7 +128,7 @@
++ diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
++ --- a/tools/dumpobj.ml
++ +++ b/tools/dumpobj.ml
++-@@ -477,18 +477,13 @@ let dump_obj ic =
+++@@ -479,18 +479,13 @@ let dump_obj ic =
++    seek_in ic cu.cu_pos;
++    print_code ic cu.cu_codesize
 +  
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
@@ -3175,7 +3161,7 @@ index 41776d2578..0a59107ea8 100644
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
 diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
-index 1675a6ca21..75809c8285 100644
+index 21023d3799..019805d2f9 100644
 --- a/bytecomp/dll.ml
 +++ b/bytecomp/dll.ml
 @@ -19,7 +19,11 @@ type dll_handle
@@ -10078,58 +10064,44 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..01b38fe324
+index 0000000000..2d2783ea05
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10035 @@
+@@ -0,0 +1,10031 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b595ec5233
++index 0000000000..120ce31942
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,43 @@
-++--- a	2023-09-28 18:47:14.083963102 +0100
-+++++ b	2023-09-28 18:47:14.103963836 +0100
-++@@ -1,25 +1,27 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -629,6 +629,12 @@ Working version
-+++@@ -629,9 +629,11 @@ Working version
-++  - #12046: Flush stderr when tracing the parser
-++    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:47:14.431975870 +0100
++++++ b	2023-09-28 18:47:14.447976458 +0100
+++@@ -48,7 +48,7 @@
+++ diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
+++ --- a/bytecomp/dll.ml
+++ +++ b/bytecomp/dll.ml
+++-@@ -164,9 +164,6 @@ let ld_library_path_contents () =
++++@@ -172,9 +172,6 @@ let ld_library_path_contents () =
+++    | s ->
+++        Misc.split_path_contents s
 ++  
-+++-- #12264, #12289: Fix compact_allocate to avoid a pathological case
-+++-  that causes very slow compaction.
-+++-  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
-++ +- #12075: auto-detect whether `ar` support @FILE arguments at
-++ +  configure-time to avoid using this feature with toolchains
-++ +  that do not support it (eg FreeBSD/Darwin).
-++ +  (Nicolás Ojeda Bär, review by Xavier Leroy, David Allsop, Javier
-++ +  Chávarri, Anil Madhavapeddy)
-++-+
-+++ 
-++  OCaml 5.0.0 (15 December 2022)
-++  ------------------------------
-++- 
-++ diff --git a/configure b/configure
-++ Binary files a/configure and b/configure differ
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -213,6 +213,7 @@ AC_SUBST([compute_deps])
-+++@@ -215,6 +215,7 @@ AC_SUBST([naked_pointers_checker])
-++  AC_SUBST([ocaml_bindir])
-++  AC_SUBST([ocaml_libdir])
-++  AC_SUBST([QS])
-++@@ -27,7 +29,7 @@
+++@@ -58,7 +58,7 @@
+++  (* Initialization for separate compilation *)
 ++  
-++  ## Generated files
+++  let init_compile nostdlib =
+++-@@ -176,10 +173,10 @@ let init_compile nostdlib =
++++@@ -184,10 +181,10 @@ let init_compile nostdlib =
 ++  
-++-@@ -593,6 +594,12 @@ AS_CASE([$ocaml_cv_cc_vendor],
-+++@@ -604,6 +605,12 @@ AS_CASE([$ocaml_cv_cc_vendor],
-++  ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-++  ocamlsrcdir=${ocamlsrcdir%X}
+++  (* Initialization for linking in core (dynlink or toplevel) *)
+++  
+++@@ -128,7 +128,7 @@
+++ diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
+++ --- a/tools/dumpobj.ml
+++ +++ b/tools/dumpobj.ml
+++-@@ -477,18 +477,13 @@ let dump_obj ic =
++++@@ -479,18 +479,13 @@ let dump_obj ic =
+++    seek_in ic cu.cu_pos;
+++    print_code ic cu.cu_codesize
 ++  
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
@@ -13259,7 +13231,7 @@ index 0000000000..01b38fe324
 + # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
 + # single character:
 +diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
-+index 1675a6ca21..75809c8285 100644
++index 21023d3799..019805d2f9 100644
 +--- a/bytecomp/dll.ml
 ++++ b/bytecomp/dll.ml
 +@@ -19,7 +19,11 @@ type dll_handle
@@ -20116,7 +20088,17 @@ index 0000000000..01b38fe324
 ++-    sed -i '/native_/s/true/false/' \
 ++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 ++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    #
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++    
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -22423,7 +22405,7 @@ index 0e1c829de4..8a88cfa1f3 100755
  { found=1; print $1 " " $2 " " $3 }
  # fail if there were any results
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-index f914b1ea60..da55a25951 100644
+index 004e1af494..a419fad78e 100644
 --- a/tools/dumpobj.ml
 +++ b/tools/dumpobj.ml
 @@ -360,10 +360,12 @@ let op_shapes = [
