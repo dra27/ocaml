@@ -1,0 +1,43 @@
+--- a	2023-09-28 18:47:14.083963102 +0100
++++ b	2023-09-28 18:47:14.103963836 +0100
+@@ -1,25 +1,27 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -629,6 +629,12 @@ Working version
++@@ -629,9 +629,11 @@ Working version
+  - #12046: Flush stderr when tracing the parser
+    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
+  
++-- #12264, #12289: Fix compact_allocate to avoid a pathological case
++-  that causes very slow compaction.
++-  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+ +- #12075: auto-detect whether `ar` support @FILE arguments at
+ +  configure-time to avoid using this feature with toolchains
+ +  that do not support it (eg FreeBSD/Darwin).
+ +  (Nicolás Ojeda Bär, review by Xavier Leroy, David Allsop, Javier
+ +  Chávarri, Anil Madhavapeddy)
+-+
++ 
+  OCaml 5.0.0 (15 December 2022)
+  ------------------------------
+- 
+ diff --git a/configure b/configure
+ Binary files a/configure and b/configure differ
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -213,6 +213,7 @@ AC_SUBST([compute_deps])
++@@ -215,6 +215,7 @@ AC_SUBST([naked_pointers_checker])
+  AC_SUBST([ocaml_bindir])
+  AC_SUBST([ocaml_libdir])
+  AC_SUBST([QS])
+@@ -27,7 +29,7 @@
+  
+  ## Generated files
+  
+-@@ -593,6 +594,12 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -604,6 +605,12 @@ AS_CASE([$ocaml_cv_cc_vendor],
+  ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+  ocamlsrcdir=${ocamlsrcdir%X}
+  

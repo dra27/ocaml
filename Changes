@@ -629,9 +629,11 @@ Working version
 - #12046: Flush stderr when tracing the parser
   (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
 
-- #12264, #12289: Fix compact_allocate to avoid a pathological case
-  that causes very slow compaction.
-  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+- #12075: auto-detect whether `ar` support @FILE arguments at
+  configure-time to avoid using this feature with toolchains
+  that do not support it (eg FreeBSD/Darwin).
+  (Nicolás Ojeda Bär, review by Xavier Leroy, David Allsop, Javier
+  Chávarri, Anil Madhavapeddy)
 
 OCaml 5.0.0 (15 December 2022)
 ------------------------------
