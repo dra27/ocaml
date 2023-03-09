@@ -255,9 +255,9 @@ ifeq "$(TOOLCHAIN)" "msvc"
           || mt -nologo -outputresource:$(1) -manifest $(1).manifest \
           && rm -f $(1).manifest
   MKEXE_USING_COMPILER=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OUTPUTEXE)$(1) $(2) \
-    /link /subsystem:console $(OC_LDFLAGS) $(LDFLAGS) && ($(MERGEMANIFESTEXE))
+    /link /subsystem:console $(3) $(LDFLAGS) && ($(MERGEMANIFESTEXE))
 else
-  MKEXE_USING_COMPILER=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) \
+  MKEXE_USING_COMPILER=$(CC) $(OC_CFLAGS) $(CFLAGS) $(3) $(LDFLAGS) \
     $(OUTPUTEXE)$(1) $(2)
 endif # ifeq "$(TOOLCHAIN)" "msvc"
 

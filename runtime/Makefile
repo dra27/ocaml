@@ -250,7 +250,7 @@ SAK_CFLAGS ?= $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS)
 SAK_LINK ?= $(MKEXE_USING_COMPILER)
 
 sak$(EXE): sak.$(O)
-	$(call SAK_LINK,$@,$^)
+	$(call SAK_LINK,$@,$^,$(OC_LDFLAGS))
 
 sak.$(O): sak.c caml/misc.h caml/config.h
 	$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
@@ -268,7 +268,7 @@ ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
 	$(MKEXE) -o $@ $^ $(LIBS)
 
 ocamlruns$(EXE): prims.$(O) libcamlrun_non_shared.$(A)
-	$(call MKEXE_USING_COMPILER,$@,$^ $(LIBS))
+	$(call MKEXE_USING_COMPILER,$@,$^ $(LIBS),$(OC_LDFLAGS))
 
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
 	$(call MKLIB,$@, $^)
