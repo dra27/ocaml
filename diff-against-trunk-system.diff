@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..120ce31942
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:47:14.431975870 +0100
-++++ b	2023-09-28 18:47:14.447976458 +0100
-+@@ -48,7 +48,7 @@
-+ diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
-+ --- a/bytecomp/dll.ml
-+ +++ b/bytecomp/dll.ml
-+-@@ -164,9 +164,6 @@ let ld_library_path_contents () =
-++@@ -172,9 +172,6 @@ let ld_library_path_contents () =
-+    | s ->
-+        Misc.split_path_contents s
-+  
-+@@ -58,7 +58,7 @@
-+  (* Initialization for separate compilation *)
-+  
-+  let init_compile nostdlib =
-+-@@ -176,10 +173,10 @@ let init_compile nostdlib =
-++@@ -184,10 +181,10 @@ let init_compile nostdlib =
-+  
-+  (* Initialization for linking in core (dynlink or toplevel) *)
-+  
-+@@ -128,7 +128,7 @@
-+ diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-+ --- a/tools/dumpobj.ml
-+ +++ b/tools/dumpobj.ml
-+-@@ -477,18 +477,13 @@ let dump_obj ic =
-++@@ -479,18 +479,13 @@ let dump_obj ic =
-+    seek_in ic cu.cu_pos;
-+    print_code ic cu.cu_codesize
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10064,45 +10032,13 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2d2783ea05
+index 0000000000..58eb884412
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10031 @@
+@@ -0,0 +1,10021 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..120ce31942
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:47:14.431975870 +0100
-+++++ b	2023-09-28 18:47:14.447976458 +0100
-++@@ -48,7 +48,7 @@
-++ diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
-++ --- a/bytecomp/dll.ml
-++ +++ b/bytecomp/dll.ml
-++-@@ -164,9 +164,6 @@ let ld_library_path_contents () =
-+++@@ -172,9 +172,6 @@ let ld_library_path_contents () =
-++    | s ->
-++        Misc.split_path_contents s
-++  
-++@@ -58,7 +58,7 @@
-++  (* Initialization for separate compilation *)
-++  
-++  let init_compile nostdlib =
-++-@@ -176,10 +173,10 @@ let init_compile nostdlib =
-+++@@ -184,10 +181,10 @@ let init_compile nostdlib =
-++  
-++  (* Initialization for linking in core (dynlink or toplevel) *)
-++  
-++@@ -128,7 +128,7 @@
-++ diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-++ --- a/tools/dumpobj.ml
-++ +++ b/tools/dumpobj.ml
-++-@@ -477,18 +477,13 @@ let dump_obj ic =
-+++@@ -479,18 +479,13 @@ let dump_obj ic =
-++    seek_in ic cu.cu_pos;
-++    print_code ic cu.cu_codesize
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20098,7 +20034,29 @@ index 0000000000..2d2783ea05
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++    
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run fro
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
