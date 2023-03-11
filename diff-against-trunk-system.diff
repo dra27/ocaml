@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..9317768173
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:15.124001259 +0100
+++++ b	2023-09-28 18:47:15.148002139 +0100
++@@ -653,7 +653,7 @@
++    end
++  
++  let print_setglobal_name ic =
++-@@ -480,32 +478,31 @@ let dump_obj ic =
+++@@ -482,32 +480,31 @@ let dump_obj ic =
++  (* Print an executable file *)
++  
++  let dump_exe ic =
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,7 +28,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index e3c7d0e368..0bea5c9485 100644
+index c39ea30eb8..de4498a31a 100644
 --- a/Changes
 +++ b/Changes
 @@ -1171,11 +1171,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -10032,13 +10046,27 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..58eb884412
+index 0000000000..783a15c719
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10021 @@
+@@ -0,0 +1,10027 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..9317768173
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:15.124001259 +0100
++++++ b	2023-09-28 18:47:15.148002139 +0100
+++@@ -653,7 +653,7 @@
+++    end
+++  
+++  let print_setglobal_name ic =
+++-@@ -480,32 +478,31 @@ let dump_obj ic =
++++@@ -482,32 +480,31 @@ let dump_obj ic =
+++  (* Print an executable file *)
+++  
+++  let dump_exe ic =
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10052,7 +10080,7 @@ index 0000000000..58eb884412
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index e3c7d0e368..0bea5c9485 100644
++index c39ea30eb8..de4498a31a 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1171,11 +1171,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -20048,15 +20076,7 @@ index 0000000000..58eb884412
 +++      git config --global safe.directory '*'
 +++
 ++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run fro
+++       # or altere
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -22363,10 +22383,10 @@ index 0e1c829de4..8a88cfa1f3 100755
  { found=1; print $1 " " $2 " " $3 }
  # fail if there were any results
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-index 004e1af494..a419fad78e 100644
+index 9ec07fd213..1f0cadba17 100644
 --- a/tools/dumpobj.ml
 +++ b/tools/dumpobj.ml
-@@ -360,10 +360,12 @@ let op_shapes = [
+@@ -358,10 +358,12 @@ let op_shapes = [
    opUGEINT, Nothing;
    opBULTINT, Uint_Disp;
    opBUGEINT, Uint_Disp;

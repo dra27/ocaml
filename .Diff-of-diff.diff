@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:15.124001259 +0100
++++ b	2023-09-28 18:47:15.148002139 +0100
+@@ -653,7 +653,7 @@
+    end
+  
+  let print_setglobal_name ic =
+-@@ -480,32 +478,31 @@ let dump_obj ic =
++@@ -482,32 +480,31 @@ let dump_obj ic =
+  (* Print an executable file *)
+  
+  let dump_exe ic =
