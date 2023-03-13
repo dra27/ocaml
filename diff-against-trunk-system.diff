@@ -1,20 +1,87 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..9317768173
+index 0000000000..253e5989d6
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:15.124001259 +0100
-++++ b	2023-09-28 18:47:15.148002139 +0100
-+@@ -653,7 +653,7 @@
-+    end
-+  
-+  let print_setglobal_name ic =
-+-@@ -480,32 +478,31 @@ let dump_obj ic =
-++@@ -482,32 +480,31 @@ let dump_obj ic =
-+  (* Print an executable file *)
-+  
-+  let dump_exe ic =
+@@ -0,0 +1,78 @@
++--- a	2023-09-28 18:47:15.484014461 +0100
+++++ b	2023-09-28 18:47:15.504015194 +0100
++@@ -87,27 +87,6 @@
++    and with_scope ~scope lam =
++      let old_scope = !current_scope in
++      current_scope := scope;
++-diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++---- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++-+++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++-@@ -2,7 +2,7 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
++- Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 12-29
++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 86, characters 4-273
++--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
++-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
++-@@ -12,7 +12,7 @@ Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dyn
++- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 89, characters 10-149
++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 86, characters 4-273
++--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
++-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
++ diff --git a/testsuite/tests/backtrace/lazy.flambda.reference b/testsuite/tests/backtrace/lazy.flambda.reference
++ new file mode 100644
++ --- /dev/null
++@@ -115,14 +94,14 @@
++ @@ -0,0 +1,12 @@
++ +Uncaught exception Not_found
++ +Raised at Lazy.l1 in file "lazy.ml", line 3, characters 28-45
++-+Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
++-+Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
++++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
++ +Called from Lazy.test1 in file "lazy.ml", line 6, characters 11-24
++ +Called from Lazy.run in file "lazy.ml", line 15, characters 4-11
++ +Uncaught exception Not_found
++ +Raised at Lazy.l2 in file "lazy.ml", line 8, characters 28-45
++-+Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
++-+Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
++++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
++ +Called from Lazy.test2 in file "lazy.ml", line 11, characters 6-15
++ +Called from Lazy.run in file "lazy.ml", line 15, characters 4-11
++ diff --git a/testsuite/tests/backtrace/lazy.ml b/testsuite/tests/backtrace/lazy.ml
++@@ -157,13 +136,12 @@
++ diff --git a/testsuite/tests/backtrace/lazy.reference b/testsuite/tests/backtrace/lazy.reference
++ --- a/testsuite/tests/backtrace/lazy.reference
++ +++ b/testsuite/tests/backtrace/lazy.reference
++-@@ -1,14 +1,14 @@
+++@@ -1,12 +1,12 @@
++  Uncaught exception Not_found
++ -Raised at Lazy.l1 in file "lazy.ml", line 7, characters 28-45
++ +Raised at Lazy.l1 in file "lazy.ml", line 3, characters 28-45
++- Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
++- Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
++- Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
+++ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
+++ Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
++ -Called from Lazy.test1 in file "lazy.ml", line 10, characters 11-24
++ -Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
++ +Called from Lazy.test1 in file "lazy.ml", line 6, characters 11-24
++@@ -171,9 +149,8 @@
++  Uncaught exception Not_found
++ -Raised at Lazy.l2 in file "lazy.ml", line 12, characters 28-45
++ +Raised at Lazy.l2 in file "lazy.ml", line 8, characters 28-45
++- Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
++- Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
++- Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
+++ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
+++ Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
++ -Called from Lazy.test2 in file "lazy.ml", line 15, characters 6-15
++ -Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
++ +Called from Lazy.test2 in file "lazy.ml", line 11, characters 6-15
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,10 +95,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index c39ea30eb8..de4498a31a 100644
+index df7c842a79..d64eb5fcbe 100644
 --- a/Changes
 +++ b/Changes
-@@ -1171,11 +1171,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1175,11 +1175,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -43,7 +110,7 @@ index c39ea30eb8..de4498a31a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1204,6 +1199,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1208,6 +1203,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -74,7 +141,7 @@ index c39ea30eb8..de4498a31a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1239,13 +1258,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1243,13 +1262,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -90,7 +157,7 @@ index c39ea30eb8..de4498a31a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1352,6 +1371,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1356,6 +1375,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -100,7 +167,7 @@ index c39ea30eb8..de4498a31a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1615,6 +1637,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1619,6 +1641,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10046,27 +10113,94 @@ index 0000000000..80b2beb9a4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..783a15c719
+index 0000000000..e87e3d6ea7
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10027 @@
+@@ -0,0 +1,10060 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..9317768173
++index 0000000000..253e5989d6
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:15.124001259 +0100
-+++++ b	2023-09-28 18:47:15.148002139 +0100
-++@@ -653,7 +653,7 @@
-++    end
-++  
-++  let print_setglobal_name ic =
-++-@@ -480,32 +478,31 @@ let dump_obj ic =
-+++@@ -482,32 +480,31 @@ let dump_obj ic =
-++  (* Print an executable file *)
-++  
-++  let dump_exe ic =
++@@ -0,0 +1,78 @@
+++--- a	2023-09-28 18:47:15.484014461 +0100
++++++ b	2023-09-28 18:47:15.504015194 +0100
+++@@ -87,27 +87,6 @@
+++    and with_scope ~scope lam =
+++      let old_scope = !current_scope in
+++      current_scope := scope;
+++-diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+++---- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+++-+++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+++-@@ -2,7 +2,7 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
+++- Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 12-29
+++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 86, characters 4-273
+++--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
+++-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
+++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+++- Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
+++-@@ -12,7 +12,7 @@ Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dyn
+++- Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 89, characters 10-149
+++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++- Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 86, characters 4-273
+++--Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
+++-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
+++- Called from Stdlib__List.iter in file "list.ml" (inlined), line 112, characters 12-15
+++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
+++- Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
+++ diff --git a/testsuite/tests/backtrace/lazy.flambda.reference b/testsuite/tests/backtrace/lazy.flambda.reference
+++ new file mode 100644
+++ --- /dev/null
+++@@ -115,14 +94,14 @@
+++ @@ -0,0 +1,12 @@
+++ +Uncaught exception Not_found
+++ +Raised at Lazy.l1 in file "lazy.ml", line 3, characters 28-45
+++-+Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+++-+Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+++++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
+++++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
+++ +Called from Lazy.test1 in file "lazy.ml", line 6, characters 11-24
+++ +Called from Lazy.run in file "lazy.ml", line 15, characters 4-11
+++ +Uncaught exception Not_found
+++ +Raised at Lazy.l2 in file "lazy.ml", line 8, characters 28-45
+++-+Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+++-+Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+++++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
+++++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
+++ +Called from Lazy.test2 in file "lazy.ml", line 11, characters 6-15
+++ +Called from Lazy.run in file "lazy.ml", line 15, characters 4-11
+++ diff --git a/testsuite/tests/backtrace/lazy.ml b/testsuite/tests/backtrace/lazy.ml
+++@@ -157,13 +136,12 @@
+++ diff --git a/testsuite/tests/backtrace/lazy.reference b/testsuite/tests/backtrace/lazy.reference
+++ --- a/testsuite/tests/backtrace/lazy.reference
+++ +++ b/testsuite/tests/backtrace/lazy.reference
+++-@@ -1,14 +1,14 @@
++++@@ -1,12 +1,12 @@
+++  Uncaught exception Not_found
+++ -Raised at Lazy.l1 in file "lazy.ml", line 7, characters 28-45
+++ +Raised at Lazy.l1 in file "lazy.ml", line 3, characters 28-45
+++- Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+++- Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+++- Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
++++ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++++ Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
+++ -Called from Lazy.test1 in file "lazy.ml", line 10, characters 11-24
+++ -Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
+++ +Called from Lazy.test1 in file "lazy.ml", line 6, characters 11-24
+++@@ -171,9 +149,8 @@
+++  Uncaught exception Not_found
+++ -Raised at Lazy.l2 in file "lazy.ml", line 12, characters 28-45
+++ +Raised at Lazy.l2 in file "lazy.ml", line 8, characters 28-45
+++- Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+++- Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+++- Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
++++ Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++++ Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
+++ -Called from Lazy.test2 in file "lazy.ml", line 15, characters 6-15
+++ -Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
+++ +Called from Lazy.test2 in file "lazy.ml", line 11, characters 6-15
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10080,10 +10214,10 @@ index 0000000000..783a15c719
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index c39ea30eb8..de4498a31a 100644
++index df7c842a79..d64eb5fcbe 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1171,11 +1171,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1175,11 +1175,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10095,7 +10229,7 @@ index 0000000000..783a15c719
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1204,6 +1199,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1208,6 +1203,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10126,7 +10260,7 @@ index 0000000000..783a15c719
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1239,13 +1258,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1243,13 +1262,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10142,7 +10276,7 @@ index 0000000000..783a15c719
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1352,6 +1371,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1356,6 +1375,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10152,7 +10286,7 @@ index 0000000000..783a15c719
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1615,6 +1637,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1619,6 +1641,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20042,41 +20176,7 @@ index 0000000000..783a15c719
 ++       run "Check runtime symbols" \
 ++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
 ++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altere
+++           $FULL_BUILD_P
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
