@@ -79,7 +79,7 @@ CAMLexport value caml_alloc_shr_check_gc (mlsize_t wosize, tag_t tag)
 /* This has to be done with a macro, rather than an inline function, since
    otherwise the wosize parameter to CAMLlocalN expands to be a VLA, which
    breaks MSVC. */
-#define Do_alloc_small(wosize, tag, ...)                \
+#define Do_alloc_small_aux(wosize, tag, ...)            \
 {                                                       \
   Caml_check_caml_state();                              \
   value v;                                              \
@@ -94,54 +94,58 @@ CAMLexport value caml_alloc_shr_check_gc (mlsize_t wosize, tag_t tag)
   return v;                                             \
 }
 
+#define Do_alloc_small(tag, ...) \
+  Do_alloc_small_aux(sizeof((value[]){__VA_ARGS__}) / sizeof(value), \
+                     tag, __VA_ARGS__)
+
 CAMLexport value caml_alloc_1 (tag_t tag, value a)
 {
-  Do_alloc_small(1, tag, a);
+  Do_alloc_small(tag, a);
 }
 
 CAMLexport value caml_alloc_2 (tag_t tag, value a, value b)
 {
-  Do_alloc_small(2, tag, a, b);
+  Do_alloc_small(tag, a, b);
 }
 
 CAMLexport value caml_alloc_3 (tag_t tag, value a, value b, value c)
 {
-  Do_alloc_small(3, tag, a, b, c);
+  Do_alloc_small(tag, a, b, c);
 }
 
 CAMLexport value caml_alloc_4 (tag_t tag, value a, value b, value c, value d)
 {
-  Do_alloc_small(4, tag, a, b, c, d);
+  Do_alloc_small(tag, a, b, c, d);
 }
 
 CAMLexport value caml_alloc_5 (tag_t tag, value a, value b, value c, value d,
                                value e)
 {
-  Do_alloc_small(5, tag, a, b, c, d, e);
+  Do_alloc_small(tag, a, b, c, d, e);
 }
 
 CAMLexport value caml_alloc_6 (tag_t tag, value a, value b, value c, value d,
                                value e, value f)
 {
-  Do_alloc_small(6, tag, a, b, c, d, e, f);
+  Do_alloc_small(tag, a, b, c, d, e, f);
 }
 
 CAMLexport value caml_alloc_7 (tag_t tag, value a, value b, value c, value d,
                                value e, value f, value g)
 {
-  Do_alloc_small(7, tag, a, b, c, d, e, f, g);
+  Do_alloc_small(tag, a, b, c, d, e, f, g);
 }
 
 CAMLexport value caml_alloc_8 (tag_t tag, value a, value b, value c, value d,
                                value e, value f, value g, value h)
 {
-  Do_alloc_small(8, tag, a, b, c, d, e, f, g, h);
+  Do_alloc_small(tag, a, b, c, d, e, f, g, h);
 }
 
 CAMLexport value caml_alloc_9 (tag_t tag, value a, value b, value c, value d,
                                value e, value f, value g, value h, value i)
 {
-  Do_alloc_small(9, tag, a, b, c, d, e, f, g, h, i);
+  Do_alloc_small(tag, a, b, c, d, e, f, g, h, i);
 }
 
 CAMLexport value caml_alloc_small (mlsize_t wosize, tag_t tag)
