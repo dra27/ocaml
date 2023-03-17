@@ -1,0 +1,39 @@
+--- a	2023-09-28 18:47:19.232151784 +0100
++++ b	2023-09-28 18:47:19.252152516 +0100
+@@ -12,10 +12,6 @@
+  ### Build system:
+  
+  - #11590: Allow installing to a destination path containing spaces.
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/bytecomp/bytelink.ml b/bytecomp/bytelink.ml
+ --- a/bytecomp/bytelink.ml
+ +++ b/bytecomp/bytelink.ml
+@@ -67,7 +63,7 @@
+ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
+ --- a/otherlibs/dynlink/byte/dynlink.ml
+ +++ b/otherlibs/dynlink/byte/dynlink.ml
+-@@ -41,8 +41,7 @@ module Bytecode = struct
++@@ -44,8 +44,7 @@ module Bytecode = struct
+        let required =
+          List.filter
+            (fun id ->
+@@ -86,10 +82,10 @@
+  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
+  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
+--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
+-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 148, characters 16-25
+-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 6-137
+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 16-25
+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 6-137
++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
+  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
