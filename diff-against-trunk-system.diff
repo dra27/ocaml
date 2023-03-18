@@ -1,48 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6581be3cd6
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,39 @@
-+--- a	2023-09-28 18:47:19.232151784 +0100
-++++ b	2023-09-28 18:47:19.252152516 +0100
-+@@ -12,10 +12,6 @@
-+  ### Build system:
-+  
-+  - #11590: Allow installing to a destination path containing spaces.
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/bytecomp/bytelink.ml b/bytecomp/bytelink.ml
-+ --- a/bytecomp/bytelink.ml
-+ +++ b/bytecomp/bytelink.ml
-+@@ -67,7 +63,7 @@
-+ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-+ --- a/otherlibs/dynlink/byte/dynlink.ml
-+ +++ b/otherlibs/dynlink/byte/dynlink.ml
-+-@@ -41,8 +41,7 @@ module Bytecode = struct
-++@@ -44,8 +44,7 @@ module Bytecode = struct
-+        let required =
-+          List.filter
-+            (fun id ->
-+@@ -86,10 +82,10 @@
-+  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-+  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-+--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
-+--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
-+-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 148, characters 16-25
-+-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 6-137
-+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
-++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
-++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
-+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 16-25
-+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 6-137
-++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-+  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-+- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
-++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -56,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index bb03e29d97..a466ca107b 100644
+index e724808a23..64b091154a 100644
 --- a/Changes
 +++ b/Changes
-@@ -1210,11 +1210,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1213,11 +1213,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -71,7 +29,7 @@ index bb03e29d97..a466ca107b 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1243,6 +1238,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1246,6 +1241,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -102,7 +60,7 @@ index bb03e29d97..a466ca107b 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1278,13 +1297,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1281,13 +1300,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -118,7 +76,7 @@ index bb03e29d97..a466ca107b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1391,6 +1410,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1394,6 +1413,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -128,7 +86,7 @@ index bb03e29d97..a466ca107b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1654,6 +1676,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1657,6 +1679,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10109,55 +10067,13 @@ index 0000000000..07d0d959c6
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..76ffa8bf1b
+index 0000000000..9e719f0657
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10089 @@
+@@ -0,0 +1,10017 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6581be3cd6
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,39 @@
-++--- a	2023-09-28 18:47:19.232151784 +0100
-+++++ b	2023-09-28 18:47:19.252152516 +0100
-++@@ -12,10 +12,6 @@
-++  ### Build system:
-++  
-++  - #11590: Allow installing to a destination path containing spaces.
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/bytecomp/bytelink.ml b/bytecomp/bytelink.ml
-++ --- a/bytecomp/bytelink.ml
-++ +++ b/bytecomp/bytelink.ml
-++@@ -67,7 +63,7 @@
-++ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-++ --- a/otherlibs/dynlink/byte/dynlink.ml
-++ +++ b/otherlibs/dynlink/byte/dynlink.ml
-++-@@ -41,8 +41,7 @@ module Bytecode = struct
-+++@@ -44,8 +44,7 @@ module Bytecode = struct
-++        let required =
-++          List.filter
-++            (fun id ->
-++@@ -86,10 +82,10 @@
-++  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-++  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-++  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-++--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
-++--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
-++-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 148, characters 16-25
-++-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 6-137
-++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
-+++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
-+++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
-++++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 16-25
-++++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 6-137
-+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
-++  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-++- Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
-+++ Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10171,10 +10087,10 @@ index 0000000000..76ffa8bf1b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index bb03e29d97..a466ca107b 100644
++index e724808a23..64b091154a 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1210,11 +1210,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1213,11 +1213,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10186,7 +10102,7 @@ index 0000000000..76ffa8bf1b
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1243,6 +1238,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1246,6 +1241,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10217,7 +10133,7 @@ index 0000000000..76ffa8bf1b
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1278,13 +1297,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1281,13 +1300,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10233,7 +10149,7 @@ index 0000000000..76ffa8bf1b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1391,6 +1410,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1394,6 +1413,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10243,7 +10159,7 @@ index 0000000000..76ffa8bf1b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1654,6 +1676,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1657,6 +1679,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20171,37 +20087,7 @@ index 0000000000..76ffa8bf1b
 ++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
 ++     fi
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # E
+++-    # tests now (to 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
