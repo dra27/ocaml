@@ -55,6 +55,7 @@ META
 /libtool
 /ocamlc.opt
 /expunge
+/ocaml_compiler_internal_params
 /ocaml
 /ocamlopt
 /ocamlopt.opt
@@ -72,11 +73,13 @@ META
 /asmcomp/scheduling.ml
 /asmcomp/CSE.ml
 
+/boot/bin/**
 /boot/ocamlrun
 /boot/ocamlruns
 /boot/camlheader
 /boot/ocamlc.opt
 /boot/flexlink.byte
+/boot/ocaml_compiler_internal_params
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
@@ -232,13 +235,12 @@ META
 /parsing/camlinternalMenhirLib.ml
 /parsing/camlinternalMenhirLib.mli
 
-/runtime/caml/jumptbl.h
+/runtime/domain_state.inc
 /runtime/caml/m.h
 /runtime/caml/s.h
 /runtime/primitives
 /runtime/primitives.new
-/runtime/prims.c
-/runtime/caml/opnames.h
+/runtime/primitives.h
 /runtime/caml/version.h
 /runtime/ocamlrun
 /runtime/ocamlrund
@@ -267,9 +269,6 @@ META
 /testsuite/**/program
 /testsuite/**/_log*
 /testsuite/failure.stamp
-
-/testsuite/_retries
-
 
 /testsuite/tools/codegen
 /testsuite/tools/expect_test
@@ -306,8 +305,6 @@ META
 /tools/cmpbyt.opt
 /tools/stripdebug
 /tools/stripdebug.opt
-/tools/make_opcodes
-/tools/make_opcodes.ml
 /tools/ocamltex
 /tools/eventlog_metadata
 /tools/lintapidiff.opt
@@ -329,5 +326,4 @@ META
 /utils/domainstate.mli
 
 /yacc/ocamlyacc
-/yacc/version.h
 /yacc/.gdb_history

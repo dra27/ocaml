@@ -27,8 +27,15 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
+# $(NEWLINE) contains exactly one newline character
+define NEWLINE
+
+
+endef
 # $( ) suppresses warning from the alignments in the V_ macros below
 $(SPACE) :=
+LBRACKET = (
+RBRACKET = )
 
 V ?= 0
 
@@ -116,28 +123,13 @@ endif
 
 BOOT_OCAMLDEP = $(BOOT_OCAMLC) -depend
 
-ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-  FLEXLINK_ENV =
-  CAMLOPT_CMD = $(CAMLOPT)
-  OCAMLOPT_CMD = $(OCAMLOPT)
-  MKLIB_CMD = $(MKLIB)
-  ocamlc_cmd = $(ocamlc)
-  ocamlopt_cmd = $(ocamlopt)
-else
-ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
-  FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
-                    $(ROOTDIR)/boot/flexlink.byte$(EXE)"
-else
-  FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/stdlib/flexdll"
-endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
-  CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
-  OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
-  MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
-  ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
-  ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
-endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+  DIR := $(realpath $(ROOTDIR))/boot/bin
+ifeq "$(filter $(DIR), $(subst :, ,$(PATH)))" ""
+  export PATH := $(DIR):$(PATH)
+endif
+  undefine DIR
+endif
 
 # List of other libraries
 ALL_OTHERLIBS = dynlink str systhreads unix runtime_events
@@ -155,14 +147,21 @@ endif
 # This rule is similar to GNU make's implicit rule, except that it is more
 # general (it supports both .o and .obj)
 
-ifeq "$(COMPUTE_DEPS)" "true"
-RUNTIME_HEADERS :=
-REQUIRED_HEADERS :=
-else
-RUNTIME_HEADERS := $(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
-                   $(wildcard $(ROOTDIR)/runtime/caml/*.h)
-REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
-endif
+RUNTIME_HEADERS = $(eval \
+  RUNTIME_HEADERS := \
+    $$(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
+    $$(wildcard $(ROOTDIR)/runtime/caml/*.h))$(RUNTIME_HEADERS)
+# This looks incorrect - it probably works for systhreads, but it won't work for runtime anymore?
+REQUIRED_HEADERS = $(RUNTIME_HEADERS) $(wildcard *.h)
+
+#ifeq "$(COMPUTE_DEPS)" "true"
+#RUNTIME_HEADERS :=
+#REQUIRED_HEADERS :=
+#else
+#RUNTIME_HEADERS := $(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
+#                   $(wildcard $(ROOTDIR)/runtime/caml/*.h)
+#REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
+#endif
 
 %.$(O): %.c $(REQUIRED_HEADERS)
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
@@ -219,18 +218,6 @@ OCAMLYACCFLAGS ?= --strict -v
 
 SAK = $(ROOTDIR)/runtime/sak$(EXE)
 
-# stdlib/StdlibModules cannot be include'd unless $(SAK) has been built. These
-# two rules add that dependency. They have to be pattern rules since
-# Makefile.common is included before default targets.
-$(ROOTDIR)/%/sak$(EXE):
-	$(MAKE) -C $(ROOTDIR)/$* sak$(EXE)
-
-ifneq "$(REQUIRES_CONFIGURATION)" ""
-ifneq "$(wildcard $(ROOTDIR)/Makefile.config)" ""
-$(ROOTDIR)/%/StdlibModules: $(SAK) ;
-endif
-endif
-
 # Used with the Microsoft toolchain to merge generated manifest files into
 # executables
 if_file_exists = ( test ! -f $(1) || $(2) && rm -f $(1) )
@@ -249,8 +236,15 @@ MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
 LINK_BYTECODE_PROGRAM =\
   $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
 
+# $(CAMLC) may include -use-prims $(ROOTDIR)/runtime/primitives. We do not
+# automatically re-link programs when the the compiler chnages
+# (cf. stdlib/Makefile where this is done explictly), but we do need to be sure
+# that runtime/primitives has been generated, hence the order-only dependency
+# on it. Being order-only both prevents an updated runtime/primitives forcing a
+# re-link and, conveniently, order-only dependencies are not included in $^.
 define OCAML_BYTECODE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
+$(1)$(EXE): | $(ROOTDIR)/runtime/primitives
 $(1)$(EXE): \
   $$$$(patsubst %,%.cma, $$$$($(basename $(notdir $(1)))_LIBRARIES)) \
   $$$$(patsubst %,%.cmo, $$$$($(basename $(notdir $(1)))_MODULES))
@@ -258,7 +252,7 @@ $(1)$(EXE): \
 endef # OCAML_BYTECODE_PROGRAM
 
 LINK_NATIVE_PROGRAM =\
-  $(CAMLOPT_CMD) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
+  $(CAMLOPT) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
 
 define OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
@@ -279,3 +273,10 @@ $(OCAMLRUN) $(ROOTDIR)/tools/stripdebug $(1) $(1).tmp \
 && $(INSTALL_PROG) $(1).tmp $(2) \
 && rm $(1).tmp
 endef # INSTALL_STRIPPED_BYTE_PROG
+
+# Determine if we're using GNU make 3.82 or later (macOS ships with 3.81)
+ifeq "$(filter undefine, $(.FEATURES))" "undefine"
+LEGACY_MAKE = false
+else
+LEGACY_MAKE = true
+endif
