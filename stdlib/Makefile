@@ -27,7 +27,7 @@ COMPILER=$(ROOTDIR)/ocamlc$(EXE)
 CAMLC=$(OCAMLRUN) $(COMPILER)
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
           -g -warn-error +A -bin-annot -nostdlib -principal
-OPTCOMPILER=$(ROOTDIR)/ocamlopt
+OPTCOMPILER=$(ROOTDIR)/ocamlopt$(EXE)
 CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
 
 include StdlibModules
