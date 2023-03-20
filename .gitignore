@@ -232,6 +232,7 @@ META
 /parsing/camlinternalMenhirLib.ml
 /parsing/camlinternalMenhirLib.mli
 
+/runtime/domain_state.inc
 /runtime/caml/jumptbl.h
 /runtime/caml/m.h
 /runtime/caml/s.h
