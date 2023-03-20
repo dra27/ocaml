@@ -1,58 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c147199b50
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,49 @@
-+--- a	2023-09-28 18:47:20.436195842 +0100
-++++ b	2023-09-28 18:47:20.448196281 +0100
-+@@ -31,7 +31,7 @@
-+  ocaml.tmp: $(ocaml_LIBRARIES:=.cma) $(ocaml_MODULES:=.cmo)
-+  	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
-+  
-+-@@ -912,22 +912,24 @@ runtime/%.bi.$(O): OC_CPPFLAGS += $(ocamlruni_CPPFLAGS)
-++@@ -909,22 +909,24 @@ runtime/%.bi.$(O): OC_CPPFLAGS += $(ocamlruni_CPPFLAGS)
-+  $(DEPDIR)/runtime/%.bi.$(D): OC_CPPFLAGS += $(ocamlruni_CPPFLAGS)
-+  
-+  runtime/%.bpic.$(O): OC_CFLAGS += $(SHAREDLIB_CFLAGS)
-+@@ -60,7 +60,7 @@
-+  
-+  ## Compilation of runtime C files
-+  
-+-@@ -1120,7 +1122,7 @@ ocamllex: ocamlyacc
-++@@ -1119,7 +1121,7 @@ ocamllex: ocamlyacc
-+  ocamllex.opt: ocamlopt
-+  	$(MAKE) lex-allopt
-+  
-+@@ -315,8 +315,8 @@
-+  AC_SUBST([afl])
-+  AC_SUBST([flexlink_cmd])
-+  AC_SUBST([flexdll_chain])
-+-@@ -1273,6 +1275,9 @@ AS_CASE([$host],
-+-     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
-++@@ -1287,6 +1289,9 @@ AS_CASE([$host],
-++     [arch=riscv; model=riscv64; system=linux]
-+  )
-+  
-+ +native_cflags=''
-+@@ -325,7 +325,7 @@
-+  AS_CASE([$ccomptype],
-+    [msvc],
-+      [runtime_asm_objects=${arch}nt.${OBJEXT}],
-+-@@ -2143,7 +2148,7 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
-++@@ -2193,7 +2198,7 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
-+       [with_mmap_map_stack=false])
-+    ])
-+  
-+@@ -334,7 +334,7 @@
-+  
-+  AS_IF([test x"$enable_function_sections" = "xno"],
-+    [function_sections=false],
-+-@@ -2165,7 +2170,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
-++@@ -2215,7 +2220,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
-+                in Clang prior to version 3.5.])],
-+              [gcc-*|clang-*],
-+                [function_sections=true;
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -66,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index e724808a23..64b091154a 100644
+index f69fc18787..65d6dab3cd 100644
 --- a/Changes
 +++ b/Changes
-@@ -1213,11 +1213,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1218,11 +1218,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -81,7 +29,7 @@ index e724808a23..64b091154a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1246,6 +1241,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1251,6 +1246,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -112,7 +60,7 @@ index e724808a23..64b091154a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1281,13 +1300,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1286,13 +1305,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -128,7 +76,7 @@ index e724808a23..64b091154a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1394,6 +1413,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1399,6 +1418,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -138,7 +86,7 @@ index e724808a23..64b091154a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1657,6 +1679,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1662,6 +1684,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10138,65 +10086,13 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d9b354309a
+index 0000000000..d267291342
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10120 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c147199b50
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,49 @@
-++--- a	2023-09-28 18:47:20.436195842 +0100
-+++++ b	2023-09-28 18:47:20.448196281 +0100
-++@@ -31,7 +31,7 @@
-++  ocaml.tmp: $(ocaml_LIBRARIES:=.cma) $(ocaml_MODULES:=.cmo)
-++  	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
-++  
-++-@@ -912,22 +912,24 @@ runtime/%.bi.$(O): OC_CPPFLAGS += $(ocamlruni_CPPFLAGS)
-+++@@ -909,22 +909,24 @@ runtime/%.bi.$(O): OC_CPPFLAGS += $(ocamlruni_CPPFLAGS)
-++  $(DEPDIR)/runtime/%.bi.$(D): OC_CPPFLAGS += $(ocamlruni_CPPFLAGS)
-++  
-++  runtime/%.bpic.$(O): OC_CFLAGS += $(SHAREDLIB_CFLAGS)
-++@@ -60,7 +60,7 @@
-++  
-++  ## Compilation of runtime C files
-++  
-++-@@ -1120,7 +1122,7 @@ ocamllex: ocamlyacc
-+++@@ -1119,7 +1121,7 @@ ocamllex: ocamlyacc
-++  ocamllex.opt: ocamlopt
-++  	$(MAKE) lex-allopt
-++  
-++@@ -315,8 +315,8 @@
-++  AC_SUBST([afl])
-++  AC_SUBST([flexlink_cmd])
-++  AC_SUBST([flexdll_chain])
-++-@@ -1273,6 +1275,9 @@ AS_CASE([$host],
-++-     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
-+++@@ -1287,6 +1289,9 @@ AS_CASE([$host],
-+++     [arch=riscv; model=riscv64; system=linux]
-++  )
-++  
-++ +native_cflags=''
-++@@ -325,7 +325,7 @@
-++  AS_CASE([$ccomptype],
-++    [msvc],
-++      [runtime_asm_objects=${arch}nt.${OBJEXT}],
-++-@@ -2143,7 +2148,7 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
-+++@@ -2193,7 +2198,7 @@ AS_IF([test x"$enable_mmap_map_stack" = "xyes"],
-++       [with_mmap_map_stack=false])
-++    ])
-++  
-++@@ -334,7 +334,7 @@
-++  
-++  AS_IF([test x"$enable_function_sections" = "xno"],
-++    [function_sections=false],
-++-@@ -2165,7 +2170,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
-+++@@ -2215,7 +2220,7 @@ AS_IF([test x"$enable_function_sections" = "xno"],
-++                in Clang prior to version 3.5.])],
-++              [gcc-*|clang-*],
-++                [function_sections=true;
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10210,10 +10106,10 @@ index 0000000000..d9b354309a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index e724808a23..64b091154a 100644
++index f69fc18787..65d6dab3cd 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1213,11 +1213,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1218,11 +1218,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10225,7 +10121,7 @@ index 0000000000..d9b354309a
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1246,6 +1241,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1251,6 +1246,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10256,7 +10152,7 @@ index 0000000000..d9b354309a
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1281,13 +1300,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1286,13 +1305,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10272,7 +10168,7 @@ index 0000000000..d9b354309a
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1394,6 +1413,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1399,6 +1418,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10282,7 +10178,7 @@ index 0000000000..d9b354309a
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1657,6 +1679,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1662,6 +1684,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20216,52 +20112,7 @@ index 0000000000..d9b354309a
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
 +++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if ne
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFI
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
