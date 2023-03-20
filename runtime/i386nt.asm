@@ -26,6 +26,26 @@
         EXTERN  _caml_stash_backtrace: PROC
         EXTERN  _Caml_state: DWORD
 
+; Load caml/domain_state.tbl (via domain_state.inc, to remove C-style comments)
+        domain_curr_field = 0
+DOMAIN_STATE MACRO _type:REQ, name:REQ
+        domain_field_caml_&name EQU domain_curr_field
+        domain_curr_field = domain_curr_field + 1
+        ; Returning a value turns DOMAIN_STATE into a macro function, which
+        ; causes the bracketed parameters to be both required and correctly
+        ; parsed. Returning an empty string allows this to be used as though
+        ; it were a macro procedure.
+        EXITM <>
+ENDM
+
+INCLUDE domain_state.inc
+
+; Caml_state(field[, reg]) expands to the address of field in Caml_state.
+; Caml_state is assumed to be in ebx if reg is not specified.
+Caml_state MACRO field:REQ, reg:=<ebx>
+        EXITM @CatStr(<[>, reg, <+>, %(domain_field_caml_&field), <*8]>)
+ENDM
+
         .CODE
 
         PUBLIC  _caml_system__code_begin
@@ -40,15 +60,13 @@ _caml_system__code_begin:
         PUBLIC  _caml_alloc3
         PUBLIC  _caml_allocN
 
-INCLUDE domain_state32.inc
-
 _caml_call_gc:
     ; Record lowest stack address and return address
         mov     ebx, _Caml_state
         mov     eax, [esp]
-        Store_last_return_address ebx, eax
+        mov     Caml_state(last_return_address), eax
         lea     eax, [esp+4]
-        Store_bottom_of_stack ebx, eax
+        mov     Caml_state(bottom_of_stack), eax
     ; Save all regs used by the code generator
         push    ebp
         push    edi
@@ -57,7 +75,7 @@ _caml_call_gc:
         push    ecx
         push    ebx
         push    eax
-        Store_gc_regs ebx, esp
+        mov     Caml_state(gc_regs), esp
     ; Call the garbage collector
         call    _caml_garbage_collection
     ; Restore all regs used by the code generator
@@ -69,46 +87,46 @@ _caml_call_gc:
         pop     edi
         pop     ebp
     ; Return to caller. Returns young_ptr in eax
-        Load_young_ptr ebx, eax
+        mov     eax, Caml_state(young_ptr)
         ret
 
         ALIGN  4
 _caml_alloc1:
         mov     ebx, _Caml_state
-        Load_young_ptr ebx, eax
+        mov     eax, Caml_state(young_ptr)
         sub     eax, 8
-        Store_young_ptr ebx, eax
-        Cmp_young_limit ebx, eax
+        mov     Caml_state(young_ptr), eax
+        cmp     eax, Caml_state(young_limit)
         jb      _caml_call_gc
         ret
 
         ALIGN  4
 _caml_alloc2:
         mov     ebx, _Caml_state
-        Load_young_ptr ebx, eax
+        mov     eax, Caml_state(young_ptr)
         sub     eax, 12
-        Store_young_ptr ebx, eax
-        Cmp_young_limit ebx, eax
+        mov     Caml_state(young_ptr), eax
+        cmp     eax, Caml_state(young_limit)
         jb      _caml_call_gc
         ret
 
         ALIGN  4
 _caml_alloc3:
         mov     ebx, _Caml_state
-        Load_young_ptr ebx, eax
+        mov     eax, Caml_state(young_ptr)
         sub     eax, 16
-        Store_young_ptr ebx, eax
-        Cmp_young_limit ebx, eax
+        mov     Caml_state(young_ptr), eax
+        cmp     eax, Caml_state(young_limit)
         jb      _caml_call_gc
         ret
 
         ALIGN  4
 _caml_allocN:
         mov     ebx, _Caml_state
-        Sub_young_ptr ebx, eax ; eax = size - young_ptr
-        neg     eax            ; eax = young_ptr - size
-        Store_young_ptr ebx, eax
-        Cmp_young_limit ebx, eax
+        sub     eax, Caml_state(young_ptr) ; eax = size - young_ptr
+        neg     eax                        ; eax = young_ptr - size
+        mov     Caml_state(young_ptr), eax
+        cmp     eax, Caml_state(young_limit)
         jb      _caml_call_gc
         ret
 
@@ -121,9 +139,9 @@ _caml_c_call:
     ; ecx and edx are destroyed at C call. Use them as temp.
         mov     ecx, _Caml_state
         mov     edx, [esp]
-        Store_last_return_address ecx, edx
+        mov     Caml_state(last_return_address, ecx), edx
         lea     edx, [esp+4]
-        Store_bottom_of_stack ecx, edx
+        mov     Caml_state(bottom_of_stack, ecx), edx
     ; Call the function (address in %eax)
         jmp     eax
 
@@ -145,27 +163,27 @@ _caml_start_program:
 L106:
         mov     edi, _Caml_state
     ; Build a callback link
-        Push_gc_regs edi
-        Push_last_return_address edi
-        Push_bottom_of_stack edi
+        push    Caml_state(gc_regs, edi)
+        push    Caml_state(last_return_address, edi)
+        push    Caml_state(bottom_of_stack, edi)
     ; Build an exception handler
         push    L108
-        Push_exception_pointer edi
-        Store_exception_pointer edi, esp
+        push    Caml_state(exception_pointer, edi)
+        mov     Caml_state(exception_pointer, edi), esp
     ; Call the OCaml code
         call    esi
 L107:
         mov     edi, _Caml_state
     ; Pop the exception handler
-        Pop_exception_pointer edi
+        pop     Caml_state(exception_pointer, edi)
         add     esp, 4
 L109:
         mov     edi, _Caml_state
     ; Pop the callback link, restoring the global variables
     ; used by caml_c_call
-        Pop_bottom_of_stack edi
-        Pop_last_return_address edi
-        Pop_gc_regs edi
+        pop     Caml_state(bottom_of_stack, edi)
+        pop     Caml_state(last_return_address, edi)
+        pop     Caml_state(gc_regs, edi)
     ; Restore callee-save registers.
         pop     ebp
         pop     edi
@@ -185,25 +203,25 @@ L108:
         ALIGN   4
 _caml_raise_exn:
         mov     ebx, _Caml_state
-        Load_backtrace_active ebx, ecx
+        mov     ecx, Caml_state(backtrace_active)
         test    ecx, 1
         jne     L110
-        Load_exception_pointer ebx, esp
-        Pop_exception_pointer ebx
+        mov     esp, Caml_state(exception_pointer)
+        pop     Caml_state(exception_pointer)
         ret
 L110:
-        mov     esi, eax                ; Save exception bucket in esi
-        Load_exception_pointer ebx, edi ; SP of handler
-        mov     eax, [esp]              ; PC of raise
-        lea     edx, [esp+4]            ; SP of raise
-        push    edi                     ; arg 4: SP of handler
-        push    edx                     ; arg 3: SP of raise
-        push    eax                     ; arg 2: PC of raise
-        push    esi                     ; arg 1: exception bucket
+        mov     esi, eax                           ; Save exception bucket
+        mov     edi, Caml_state(exception_pointer) ; SP of handler
+        mov     eax, [esp]                         ; PC of raise
+        lea     edx, [esp+4]                       ; SP of raise
+        push    edi                                ; arg 4: SP of handler
+        push    edx                                ; arg 3: SP of raise
+        push    eax                                ; arg 2: PC of raise
+        push    esi                                ; arg 1: exception bucket
         call    _caml_stash_backtrace
-        mov     eax, esi                ; recover exception bucket
-        mov     esp, edi                ; cut the stack
-        Pop_exception_pointer ebx
+        mov     eax, esi                           ; recover exception bucket
+        mov     esp, edi                           ; cut the stack
+        pop     Caml_state(exception_pointer)
         ret
 
 ; Raise an exception from C
@@ -212,23 +230,23 @@ L110:
         ALIGN  4
 _caml_raise_exception:
         mov     ebx, _Caml_state
-        Load_backtrace_active ebx, ecx
+        mov     ecx, Caml_state(backtrace_active)
         test    ecx, 1
         jne     L112
         mov     eax, [esp+8]
-        Load_exception_pointer ebx, esp
-        Pop_exception_pointer ebx
+        mov     esp, Caml_state(exception_pointer)
+        pop     Caml_state(exception_pointer)
         ret
 L112:
-        mov     esi, [esp+8]            ; Save exception bucket in esi
-        Push_exception_pointer ebx      ; arg 4: SP of handler
-        Push_bottom_of_stack ebx        ; arg 3: SP of raise
-        Push_last_return_address ebx    ; arg 2: PC of raise
-        push    esi                     ; arg 1: exception bucket
+        mov     esi, [esp+8]                       ; Save exception bucket
+        push    Caml_state(exception_pointer)      ; arg 4: SP of handler
+        push    Caml_state(bottom_of_stack)        ; arg 3: SP of raise
+        push    Caml_state(last_return_address)    ; arg 2: PC of raise
+        push    esi                                ; arg 1: exception bucket
         call    _caml_stash_backtrace
-        mov     eax, esi                ; recover exception bucket
-        Load_exception_pointer ebx, esp ; cut the stack
-        Pop_exception_pointer ebx
+        mov     eax, esi                           ; recover exception bucket
+        mov     esp, Caml_state(exception_pointer) ; cut the stack
+        pop     Caml_state(exception_pointer)
         ret
 
 ; Callback from C to OCaml

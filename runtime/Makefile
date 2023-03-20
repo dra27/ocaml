@@ -180,7 +180,7 @@ clean:
 	rm -f ocamlrun ocamlrund ocamlruni ocamlruns sak
 	rm -f ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe
 	rm -f primitives primitives.new prims.c $(BUILT_HEADERS)
-	rm -f domain_state*.inc
+	rm -f domain_state.inc
 	rm -rf $(DEPDIR)
 
 .PHONY: distclean
@@ -385,16 +385,13 @@ $(foreach object_type,$(subst %,,$(object_types)), \
 %_libasmrunpic.o: %.S
 	$(ASPP) $(ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
 
-domain_state64.inc: caml/domain_state.tbl gen_domain_state64_inc.awk
-	$(AWK) -f ./gen_domain_state64_inc.awk $< > $@
+domain_state.inc: caml/domain_state.tbl
+	$(CPP) $< > $@
 
-domain_state32.inc: caml/domain_state.tbl gen_domain_state32_inc.awk
-	$(AWK) -f ./gen_domain_state32_inc.awk $< > $@
-
-amd64nt.obj: amd64nt.asm domain_state64.inc
+amd64nt.obj: amd64nt.asm domain_state.inc
 	$(ASM)$@ $(ASMFLAGS) $<
 
-i386nt.obj: i386nt.asm domain_state32.inc
+i386nt.obj: i386nt.asm domain_state.inc
 	$(ASM)$@ $(ASMFLAGS) $<
 
 %_libasmrunpic.obj: %.asm
