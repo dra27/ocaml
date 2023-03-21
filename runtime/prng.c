@@ -39,7 +39,7 @@ Caml_inline uint64_t rotl(const uint64_t x, int k) {
   return (x << k) | (x >> (64 - k));
 }
 
-CAMLprim uint64_t caml_lxm_next_unboxed(value v)
+uint64_t caml_lxm_next_unboxed(value v)
 {
   uint64_t z, q0, q1;
   struct LXM_state * st = LXM_val(v);

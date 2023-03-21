@@ -191,7 +191,7 @@ static value alloc_callstack(frame_descr** trace, intnat trace_len)
   CAMLreturn(callstack);
 }
 
-CAMLprim value caml_get_current_callstack (value max_frames_value) {
+value caml_get_current_callstack (value max_frames_value) {
   frame_descr** trace;
   intnat trace_len;
   get_callstack(Caml_state->current_stack, Long_val(max_frames_value),
@@ -199,7 +199,7 @@ CAMLprim value caml_get_current_callstack (value max_frames_value) {
   return alloc_callstack(trace, trace_len);
 }
 
-CAMLprim value caml_get_continuation_callstack (value cont, value max_frames)
+value caml_get_continuation_callstack (value cont, value max_frames)
 {
   frame_descr** trace;
   intnat trace_len;
