@@ -249,8 +249,15 @@ MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
 LINK_BYTECODE_PROGRAM =\
   $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
 
+# $(CAMLC) may include -use-prims $(ROOTDIR)/runtime/primitives. We do not
+# automatically re-link programs when the the compiler chnages
+# (cf. stdlib/Makefile where this is done explictly), but we do need to be sure
+# that runtime/primitives has been generated, hence the order-only dependency
+# on it. Being order-only both prevents an updated runtime/primitives forcing a
+# re-link and, conveniently, order-only dependencies are not included in $^.
 define OCAML_BYTECODE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
+$(1)$(EXE): | $(ROOTDIR)/runtime/primitives
 $(1)$(EXE): \
   $$$$(patsubst %,%.cma, $$$$($(basename $(notdir $(1)))_LIBRARIES)) \
   $$$$(patsubst %,%.cmo, $$$$($(basename $(notdir $(1)))_MODULES))
