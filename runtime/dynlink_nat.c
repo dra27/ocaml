@@ -57,17 +57,17 @@ static void *getsym(void *handle, const char *module, const char *name){
 
 extern char caml_globals_map[];
 
-CAMLprim value caml_natdynlink_getmap(value unit)
+value caml_natdynlink_getmap(value unit)
 {
   return caml_input_value_from_block(caml_globals_map, INT_MAX);
 }
 
-CAMLprim value caml_natdynlink_globals_inited(value unit)
+value caml_natdynlink_globals_inited(value unit)
 {
   return Val_int(caml_globals_inited);
 }
 
-CAMLprim value caml_natdynlink_open(value filename, value global)
+value caml_natdynlink_open(value filename, value global)
 {
   CAMLparam2 (filename, global);
   CAMLlocal3 (res, handle, header);
@@ -99,7 +99,7 @@ CAMLprim value caml_natdynlink_open(value filename, value global)
   CAMLreturn(res);
 }
 
-CAMLprim value caml_natdynlink_register(value handle_v, value symbols) {
+value caml_natdynlink_register(value handle_v, value symbols) {
   CAMLparam2 (handle_v, symbols);
   int i;
   int nsymbols = Wosize_val(symbols);
@@ -145,7 +145,7 @@ CAMLprim value caml_natdynlink_register(value handle_v, value symbols) {
   CAMLreturn (Val_unit);
 }
 
-CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
+value caml_natdynlink_run(value handle_v, value symbol) {
   CAMLparam2 (handle_v, symbol);
   CAMLlocal1 (result);
   void* handle = Handle_val(handle_v);
@@ -163,7 +163,7 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
   CAMLreturn (result);
 }
 
-CAMLprim value caml_natdynlink_run_toplevel(value filename, value symbol)
+value caml_natdynlink_run_toplevel(value filename, value symbol)
 {
   CAMLparam2 (filename, symbol);
   CAMLlocal3 (res, v, handle_v);
@@ -191,7 +191,7 @@ CAMLprim value caml_natdynlink_run_toplevel(value filename, value symbol)
   CAMLreturn(res);
 }
 
-CAMLprim value caml_natdynlink_loadsym(value symbol)
+value caml_natdynlink_loadsym(value symbol)
 {
   CAMLparam1 (symbol);
   CAMLlocal1 (sym);
