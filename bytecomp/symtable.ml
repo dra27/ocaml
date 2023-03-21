@@ -191,11 +191,8 @@ let init () =
     Misc.try_finally
       ~always:(fun () -> close_in ic)
       (fun () ->
-         try
-           while true do
-             set_prim_table (input_line ic)
-           done
-         with End_of_file -> ()
+         let prims = String.Set.of_list (In_channel.input_lines ic) in
+         String.Set.iter set_prim_table (String.Set.remove "" prims)
       )
   in
   if String.length !Clflags.use_prims > 0 then
