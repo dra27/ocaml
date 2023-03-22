@@ -304,7 +304,7 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
 else
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
-    CAMLC='$$(BOOT_OCAMLC)' all
+    CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
 	$(MAKE) boot/flexlink.byte$(EXE)
 	$(MAKE) runtime-all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
