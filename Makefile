@@ -879,20 +879,66 @@ runtime/ld.conf: $(ROOTDIR)/Makefile.config
 # the bytecode interpreter is confused.
 # We sort the primitive file and remove duplicates to avoid this problem.
 
-# Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
-# port, the "sort" program in the path is Microsoft's and not cygwin's
+SOURCES_WITH_PRIMITIVES = $(addprefix runtime/, \
+  alloc.c array.c compare.c extern.c floats.c gc_ctrl.c hash.c intern.c \
+  interp.c ints.c io.c lexing.c md5.c meta.c memprof.c obj.c parsing.c \
+  signals.c str.c sys.c callback.c weak.c finalise.c domain.c platform.c \
+  fiber.c memory.c startup_aux.c runtime_events.c sync.c dynlink.c \
+  backtrace_byt.c backtrace.c afl.c bigarray.c prng.c)
 
-# Warning: POSIX sort is locale dependent, that's why we set LC_ALL explicitly.
-# Sort is unstable for "is_directory" and "isatty"
-# see http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sort.html:
-# "using sort to process pathnames, it is recommended that LC_ALL .. set to C"
+# To speed up builds, we avoid changing "primitives" when files containing
+# primitives change but the primitives table does not (if the primitives table
+# changes, then the Standard Library is recompiled and hence the world).
 
-# To speed up builds, we avoid changing "primitives" when files
-# containing primitives change but the primitives table does not
-runtime/primitives.h: \
-  $(shell runtime/gen_primitives.sh > runtime/primitives.new; \
-                    cmp -s runtime/primitives.h runtime/primitives.new || \
-                    echo runtime/primitives.new)
+# We don't need to check if runtime/primitives.h needs rebuilding if it hasn't
+# yet been built.
+ifneq "$(and $(wildcard runtime/primitives.h), $(REQUIRES_CONFIGURATION))" ""
+# runtime/primitives.new needs to exist before the main Makefile is evaluated,
+# so it's plumbed as a "dependency" of Makefile.config
+Makefile.config: runtime/primitives.new
+endif
+
+# Lazily calculate the primitives contained in $(SOURCES_WITH_PRIMITIVES)
+RAW_PRIMITIVES = \
+  $(eval RAW_PRIMITIVES := \
+    $$(sort $$(shell cat $(SOURCES_WITH_PRIMITIVES) \
+                       | $(SAK) extract-primitives)))$(RAW_PRIMITIVES)
+
+NEW_PRIMITIVES = \
+  \#define CAML_RUNTIME_PRIMITIVES(P) \+$\
+  $(SPACE) $(subst $(SPACE),$(SPACE)\+ $(SPACE),$(RAW_PRIMITIVES))
+
+runtime/primitives.new: $(SOURCES_WITH_PRIMITIVES) | $(SAK)
+# .ONESHELL was technically added in GNU make 3.82, but the oneshell indicator
+# wasn't added to .FEATURES until GNU Make 4.0 (see 5acda13ac). We use this as
+# an indicator that the $(file ) function will be available. This short-circuits
+# the need for tr (or an extra function in sak) on Windows, where we guarantee
+# GNU make 4.0+
+ifeq "$(filter oneshell, $(.FEATURES))" ""
+	echo '#define CAML_RUNTIME_PRIMITIVES(P) \' > $@
+	echo '$(NEW_PRIMITIVES)' | tr '+' '\n' >> $@
+else
+	$(file >$@,$(subst +,$(NEWLINE),$(NEW_PRIMITIVES)))
+endif
+
+# Lazily read the contents of runtime/primitives.h, if it exists
+CURRENT_PRIMITIVES = \
+  $(eval CURRENT_PRIMITIVES := \
+    $$(if $$(wildcard runtime/primitives.h),$\
+      $$(shell cat runtime/primitives.h)))$(CURRENT_PRIMITIVES)
+
+# $(PRIMITIVES_CHANGED) evaluates to runtime/primitives.new if the file differs
+# from runtime/primitives.h. Unfortunately, GNU make's $(eq ..) function is
+# "experimental", so there's a slight hack to change spaces into hyphens so that
+# we can use $(filter ..) instead as a test for equality. If $(NEW_PRIMITIVES)
+# and $(CURRENT_PRIMITIVES) are both the same, then the filter will return
+# string-true (i.e. not the empty string).
+PRIMITIVES_CHANGED = $(if $(and \
+  $(CURRENT_PRIMITIVES), \
+  $(filter $(subst $(SPACE),-,$(subst +,$(SPACE),$(NEW_PRIMITIVES))), \
+           $(subst $(SPACE),-,$(CURRENT_PRIMITIVES)))),,runtime/primitives.new)
+
+runtime/primitives.h: $(PRIMITIVES_CHANGED)
 	$(V_GEN)cp $^ $@
 
 # This rule is a little subtle owing to the flexdll bootstrap. When
