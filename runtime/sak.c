@@ -32,12 +32,14 @@
 #define strncmp_os wcsncmp
 #define toupper_os towupper
 #define printf_os wprintf
+#define sscanf_os sscanf_s
 #else
 #define strncmp_os strncmp
 /* NOTE: See CAVEATS section in https://man.netbsd.org/ctype.3 */
 /* and NOTE section in https://man7.org/linux/man-pages/man3/toupper.3.html */
 #define toupper_os(x) toupper((unsigned char)x)
 #define printf_os printf
+#define sscanf_os sscanf
 #endif
 
 /* Operations
@@ -55,6 +57,8 @@
 
      For example, `sak add-stdlib-prefix stdlib camlinternalAtomic Sys` returns
      ` stdlib camlinternalAtomic stdlib__Sys`
+   - extract-primitives. Used when constructing runtime/primitives.tbl in place
+     of sed.
  */
 
 void usage(void)
@@ -65,6 +69,7 @@ void usage(void)
     "Commands:\n"
     " * encode-C-literal path - encodes path as a C string literal\n"
     " * add-stdlib-prefix name1 ... - prefix standard library module names\n"
+    " * extract-primitives - print primitive names read from C piped to stdin\n"
   );
 }
 
@@ -131,12 +136,30 @@ void add_stdlib_prefix(int count, char_os **names)
   }
 }
 
+void extract_primitives(void)
+{
+  char buf[256];
+  char primitive[101];
+  char *line;
+  while ((line = fgets(buf, 256, stdin)) != NULL) {
+    if (sscanf_os(line, "CAMLprim value %100[^ (\n]%*[ (\n]", primitive) == 1) {
+      printf("P(%s)\n", primitive);
+    } else if (sscanf_os(line, "CAMLprim_int64_%*1[12](%100[^)])",
+                         primitive) == 1) {
+      printf("P(caml_int64_%1$s)\n"
+             "P(caml_int64_%1$s_native)\n", primitive);
+    }
+  }
+}
+
 int main_os(int argc, char_os **argv)
 {
   if (argc == 3 && !strcmp_os(argv[1], T("encode-C-literal"))) {
     encode_C_literal(argv[2]);
   } else if (argc > 1 && !strcmp_os(argv[1], T("add-stdlib-prefix"))) {
     add_stdlib_prefix(argc - 2, &argv[2]);
+  } else if (argc == 2 && !strcmp_os(argv[1], T("extract-primitives"))) {
+    extract_primitives();
   } else {
     usage();
     return 1;

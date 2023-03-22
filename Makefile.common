@@ -27,6 +27,11 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
+# $(NEWLINE) contains exactly one newline character
+define NEWLINE
+
+
+endef
 # $( ) suppresses warning from the alignments in the V_ macros below
 $(SPACE) :=
 
