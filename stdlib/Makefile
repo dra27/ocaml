@@ -194,34 +194,57 @@ ifeq "$(FLAMBDA)" "true"
 %.cmx: private COMPFLAGS += -O3
 endif
 
-export AWK
+$(addprefix stdlib.cm, i o x): \
+  private COMPFLAGS += -nopervasives -no-alias-deps -w -49
+$(addprefix camlinternalFormatBasics.cm, i o x): \
+  private COMPFLAGS += -nopervasives
+camlinternalOO.cmx: \
+  private COMPFLAGS += -inline 0 -afl-inst-ratio 0
+camlinternalLazy.cmx: \
+  private COMPFLAGS += -afl-inst-ratio 0
+stdlib__Buffer.cmx: \
+  private COMPFLAGS += -inline 3
+$(addprefix stdlib__Buffer.cm, i o): \
+  private COMPFLAGS += -w +A
+$(addprefix stdlib__Printf.cm, i o) \
+$(addprefix stdlib__Format.cm, i o) \
+$(addprefix stdlib__Scanf.cm, i o) \
+$(addprefix camlinternalFormat.cm, i o): \
+  private COMPFLAGS += -w +A -w -fragile-match
+stdlib__Scanf.cmx: \
+  private COMPFLAGS += -inline 9
+%Labels.cmo: \
+  private COMPFLAGS += -nolabels -no-alias-deps
+%Labels.cmx: \
+  private COMPFLAGS += -nolabels -no-alias-deps
+$(addprefix stdlib__Float.cm, o x): \
+  private COMPFLAGS += -nolabels -no-alias-deps
+stdlib__Oo.cmi: \
+  private COMPFLAGS += -no-principal
 
 %.cmi: %.mli
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -c $<
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
-	         -o $@ -c $(filter %.mli, $^)
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -o $@ -c $(filter %.mli, $^)
 
 %.cmo: %.ml
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
-	         -o $@ -c $(filter %.ml, $^)
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(shell ./Compflags $@) \
-	           -o $@ -c $(filter %.ml, $^)
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) -o $@ -c $(filter %.ml, $^)
 
 # Dependencies on the compiler
 COMPILER_DEPS=$(filter-out -use-prims $(OCAMLRUN), $(CAMLC))
