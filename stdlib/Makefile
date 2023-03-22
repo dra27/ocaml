@@ -195,8 +195,7 @@ ifeq "$(FLAMBDA)" "true"
 endif
 
 $(addprefix stdlib.cm, i o x): \
-  private COMPFLAGS += -nopervasives -no-alias-deps -w -49 \
-                       -pp '$(AWK) -f ./expand_module_aliases.awk'
+  private COMPFLAGS += -nopervasives -no-alias-deps -w -49
 $(addprefix camlinternalFormatBasics.cm, i o x): \
   private COMPFLAGS += -nopervasives
 camlinternalOO.cmx: \
@@ -214,8 +213,6 @@ $(addprefix camlinternalFormat.cm, i o): \
   private COMPFLAGS += -w +A -w -fragile-match
 stdlib__Scanf.cmx: \
   private COMPFLAGS += -inline 9
-%Labels.cmi: \
-  private COMPFLAGS += -pp '$(AWK) -f ./expand_module_aliases.awk'
 %Labels.cmo: \
   private COMPFLAGS += -nolabels -no-alias-deps
 %Labels.cmx: \
