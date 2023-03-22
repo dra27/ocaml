@@ -27,9 +27,6 @@ COMPILER=$(ROOTDIR)/ocamlc$(EXE)
 CAMLC=$(OCAMLRUN) $(COMPILER)
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
           -g -warn-error +A -bin-annot -nostdlib -principal
-ifeq "$(FLAMBDA)" "true"
-OPTCOMPFLAGS += -O3
-endif
 OPTCOMPILER=$(ROOTDIR)/ocamlopt
 CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
 
@@ -190,6 +187,13 @@ distclean: clean
 clean::
 	rm -f $(CAMLHEADERS)
 
+ifeq "$(FUNCTION_SECTIONS)" "true"
+%.cmx: private COMPFLAGS += -function-sections
+endif
+ifeq "$(FLAMBDA)" "true"
+%.cmx: private COMPFLAGS += -O3
+endif
+
 export AWK
 
 %.cmi: %.mli
@@ -211,12 +215,12 @@ stdlib__%.cmo:
 	         -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) \
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(shell ./Compflags $@) \
 	           -o $@ -c $(filter %.ml, $^)
 
 # Dependencies on the compiler
