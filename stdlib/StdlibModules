@@ -104,9 +104,20 @@ STDLIB_MODULE_BASENAMES = \
 STDLIB_PREFIXED_MODULES = \
   $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
 
-# The pattern FOO = $(eval FOO := $$(shell <cmd>)$(FOO) ensures that <cmd> is
-# executed either once or not at all, giving us GNU make's equivalent of a
-# string lazy_t.
+CAPITALIZE = \
+  $(if $(strip $(2)), \
+    $(call CAPITALIZE, $(patsubst $(strip $(2))%, $(strip $(4))%, $(1)), \
+                       $(firstword $(3)), $(wordlist 2, 26, $(3)), \
+                       $(firstword $(5)), $(wordlist 2, 26, $(5))), \
+    $(1))
+
+PREFIX_MODULE = \
+  $(if $(filter stdlib camlinternal%, $(1)), \
+    $(1), \
+    stdlib__$(strip \
+      $(call CAPITALIZE, $(1), \
+                         a, b c d e f g h i j k l m n o p q r s t u v w x y z, \
+                         A, B C D E F G H I J K L M N O P Q R S T U V W X Y Z)))
+
 STDLIB_MODULES = \
-  $(eval STDLIB_MODULES := $$(shell \
-          $(SAK) add-stdlib-prefix $(STDLIB_MODULE_BASENAMES)))$(STDLIB_MODULES)
+  $(foreach name, $(STDLIB_MODULE_BASENAMES), $(call PREFIX_MODULE, $(name)))
