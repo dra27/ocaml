@@ -34,6 +34,8 @@ define NEWLINE
 endef
 # $( ) suppresses warning from the alignments in the V_ macros below
 $(SPACE) :=
+LBRACKET = (
+RBRACKET = )
 
 V ?= 0
 
