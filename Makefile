@@ -879,36 +879,86 @@ runtime/ld.conf: $(ROOTDIR)/Makefile.config
 # the bytecode interpreter is confused.
 # We sort the primitive file and remove duplicates to avoid this problem.
 
-SOURCES_WITH_PRIMITIVES = $(addprefix runtime/, \
+SOURCES_WITH_PRIMITIVES = \
   alloc.c array.c compare.c extern.c floats.c gc_ctrl.c hash.c intern.c \
   interp.c ints.c io.c lexing.c md5.c meta.c memprof.c obj.c parsing.c \
   signals.c str.c sys.c callback.c weak.c finalise.c domain.c platform.c \
   fiber.c memory.c startup_aux.c runtime_events.c sync.c dynlink.c \
-  backtrace_byt.c backtrace.c afl.c bigarray.c prng.c)
+  backtrace_byt.c backtrace.c afl.c bigarray.c prng.c
+
+# Read all the lines beginning CAMLprim for the relevant C files
+ifeq "$(UNIX_OR_WIN32)" "unix"
+PRIMITIVE_LINES = $(eval PRIMITIVE_LINES := \
+  $$(shell cd runtime ; \
+           grep '^CAMLprim' $(SOURCES_WITH_PRIMITIVES)))$(PRIMITIVE_LINES)
+else
+PRIMITIVE_LINES = $(eval PRIMITIVE_LINES := \
+  $$(shell cd runtime && \
+           findstr /b CAMLprim $(SOURCES_WITH_PRIMITIVES)))$(PRIMITIVE_LINES)
+endif
+
+# Convert tokens in PRIMITIVE_LINES to a list of P(caml_primitive) tokens. This
+# is simpler than make makes it look!
+# - RAW_PRIMITIVES scans the list of tokens looking for ones containing `.c:`
+#   (this pattern arises at the beginning of the lines from the grep,
+#   e.g. `alloc.c:CAMLprim`)
+# - If the part after the `:` is exactly `CAMLprim` then a simple state machine
+#   continues to check that the next token is `value` and then the token after
+#   that is the primitive name, which may need the first part of the parameter
+#   list removing (cf. `CAMLprim prim (value...)` vs `CAMLprim prim(value...`)
+# - Alternatively, if the part after the `:` begins `CAMLprim_int64_` then
+#   capture the macro parameter (e.g. `CAMLprim_int64_1(neg)` in ints.c)
+# - Otherwise skip onto the next token
+
+# Emit a normal primitive; the subst removes the start of the C function
+# parameter list, if the primitive was written `caml_prim(...)` instead of
+# `caml_prim (...)`
+PRINT_PRIMITIVE = \
+  P($(word 1,$(subst $(LBRACKET), $(SPACE), $(1))))
+
+# Emit a pair of int64 primitives (special case in runtime/ints.c)
+PRINT_INT64_PRIMITIVE = \
+  P(caml_int64_$(strip $(1))) P(caml_int64_$(strip $(1))_native)
+
+# $(1) may be more than two words, e.g. `CAMLprim_int64_2 add) int64_t`
+PARSE_CAMLprim_int64 = \
+  $(if $(filter CAMLprim_int64_%, $(firstword $(1))), \
+    $(call PRINT_INT64_PRIMITIVE, \
+           $(subst $(RBRACKET), $(SPACE), $(word 2, $(1)))))
+
+# $(1) is the token, split on `:`. If the word after it is `CAMLprim`, update
+# $(PARSE_CAMLprim_STATE) to record that the next token should be `value` and
+# then that the token after that is the primitive name itself (which gets passed
+# to $(PRINT_PRIMITIVE) above).
+PARSE_CAMLprim_STATE := 0
+PARSE_CAMLprim = \
+  $(if $(filter 2, $(words $(1))), \
+    $(if $(filter CAMLprim, $(lastword $(1))), \
+      $(eval PARSE_CAMLprim_STATE := 1), \
+      $(eval PARSE_CAMLprim_STATE := 0) \
+      $(call PARSE_CAMLprim_int64, \
+             $(subst $(LBRACKET),$(SPACE),$(lastword $(1))))), \
+    $(if $(filter 1, $(PARSE_CAMLprim_STATE)), \
+      $(eval PARSE_CAMLprim_STATE := $(if $(filter value, $(1)), 2, 0)), \
+      $(if $(filter 2, $(PARSE_CAMLprim_STATE)), \
+        $(eval PARSE_CAMLprim_STATE := 0) \
+        $(call PRINT_PRIMITIVE, $(1)))))
+
+# Loop over the tokens read into $(PRIMITIVE_NAMES) harvesting the names of C
+# primitives. The final result is `P(primitive1) P(primitive2) ...`
+RAW_PRIMITIVES = $(sort $(strip \
+  $(foreach token, $(PRIMITIVE_LINES), \
+    $(call PARSE_CAMLprim, $(subst .c:,$(SPACE),$(token))))))
 
 # To speed up builds, we avoid changing "primitives" when files containing
 # primitives change but the primitives table does not (if the primitives table
 # changes, then the Standard Library is recompiled and hence the world).
 
-# We don't need to check if runtime/primitives.h needs rebuilding if it hasn't
-# yet been built.
-ifneq "$(and $(wildcard runtime/primitives.h), $(REQUIRES_CONFIGURATION))" ""
-# runtime/primitives.new needs to exist before the main Makefile is evaluated,
-# so it's plumbed as a "dependency" of Makefile.config
-Makefile.config: runtime/primitives.new
-endif
-
-# Lazily calculate the primitives contained in $(SOURCES_WITH_PRIMITIVES)
-RAW_PRIMITIVES = \
-  $(eval RAW_PRIMITIVES := \
-    $$(sort $$(shell cat $(SOURCES_WITH_PRIMITIVES) \
-                       | $(SAK) extract-primitives)))$(RAW_PRIMITIVES)
-
 NEW_PRIMITIVES = \
   \#define CAML_RUNTIME_PRIMITIVES(P) \+$\
   $(SPACE) $(subst $(SPACE),$(SPACE)\+ $(SPACE),$(RAW_PRIMITIVES))
 
-runtime/primitives.new: $(SOURCES_WITH_PRIMITIVES) | $(SAK)
+runtime/primitives.new: $(addprefix runtime/, $(SOURCES_WITH_PRIMITIVES))
 # .ONESHELL was technically added in GNU make 3.82, but the oneshell indicator
 # wasn't added to .FEATURES until GNU Make 4.0 (see 5acda13ac). We use this as
 # an indicator that the $(file ) function will be available. This short-circuits
@@ -922,10 +972,9 @@ else
 endif
 
 # Lazily read the contents of runtime/primitives.h, if it exists
-CURRENT_PRIMITIVES = \
-  $(eval CURRENT_PRIMITIVES := \
-    $$(if $$(wildcard runtime/primitives.h),$\
-      $$(shell cat runtime/primitives.h)))$(CURRENT_PRIMITIVES)
+CURRENT_PRIMITIVES = $(eval CURRENT_PRIMITIVES := \
+  $$(if $$(wildcard runtime/primitives.h),$\
+    $$(shell cat runtime/primitives.h)))$(CURRENT_PRIMITIVES)
 
 # $(PRIMITIVES_CHANGED) evaluates to runtime/primitives.new if the file differs
 # from runtime/primitives.h. Unfortunately, GNU make's $(eq ..) function is
