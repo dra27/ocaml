@@ -298,3 +298,10 @@ $(OCAMLRUN) $(ROOTDIR)/tools/stripdebug $(1) $(1).tmp \
 && $(INSTALL_PROG) $(1).tmp $(2) \
 && rm $(1).tmp
 endef # INSTALL_STRIPPED_BYTE_PROG
+
+# Determine if we're using GNU make 3.82 or later (macOS ships with 3.81)
+ifeq "$(filter undefine, $(.FEATURES))" "undefine"
+LEGACY_MAKE = false
+else
+LEGACY_MAKE = true
+endif

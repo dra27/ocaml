@@ -187,65 +187,86 @@ distclean: clean
 clean::
 	rm -f $(CAMLHEADERS)
 
+# Module-specific flags
+# GNU make provides target-specific variables, which would deal with this in a
+# clean and logical way but for one limitation. Target-specific variables also
+# apply to the prequisites of a target (for example, this would mean that flags
+# applied when compiling a .cmo would then be applied to its .cmi file).
+# GNU make 3.82 added the concept of "private" assignment to variables to
+# disable this inheritance, but macOS ships with GNU make 3.81 for GPL reasons.
+# To work around this, flags are specified using a FLAGS macro, and for
+# GNU make 3.82+ target-specific assignments are generated on COMPFLAGS.
+# Otherwise, for target foo.cmo, $(COMPFLAGS_foo.cmo) contains the flags.
+# $(STDLIB_MODULES) is used to filter the specific flags.
+
+ifeq "$(LEGACY_MAKE)" "true"
+
+# "Legacy" way, for macOS compatibility
+FLAGS = \
+  $(foreach item, $(1), \
+    $(foreach artefact, $(addsuffix $(suffix $(item)), \
+                                    $(filter $(basename $(item)), \
+                                    $(STDLIB_MODULES))), \
+      $(eval COMPFLAGS_$(artefact) += $(2))))
+MODULE_COMPFLAGS = $(COMPFLAGS_$@)
+
+else
+
+# "Modern" way, for GNU make 3.82+
+define CREATE_FLAGS_RULE
+$(1): private COMPFLAGS += $(2)
+endef
+FLAGS = \
+  $(foreach item, $(1), $(eval $(call CREATE_FLAGS_RULE, $(item), $(2))))
+MODULE_COMPFLAGS =
+
+endif # "$(LEGACY_MAKE)" "true"
+
 ifeq "$(FUNCTION_SECTIONS)" "true"
-%.cmx: private COMPFLAGS += -function-sections
+$(call FLAGS, %.cmx, -function-sections)
 endif
 ifeq "$(FLAMBDA)" "true"
-%.cmx: private COMPFLAGS += -O3
+$(call FLAGS, %.cmx, -O3)
 endif
-
-$(addprefix stdlib.cm, i o x): \
-  private COMPFLAGS += -nopervasives -no-alias-deps \
-                       -w -49 -pp '$(SAK_HOST) namespace'
-$(addprefix camlinternalFormatBasics.cm, i o x): \
-  private COMPFLAGS += -nopervasives
-camlinternalOO.cmx: \
-  private COMPFLAGS += -inline 0 -afl-inst-ratio 0
-camlinternalLazy.cmx: \
-  private COMPFLAGS += -afl-inst-ratio 0
-stdlib__Buffer.cmx: \
-  private COMPFLAGS += -inline 3
-$(addprefix stdlib__Buffer.cm, i o): \
-  private COMPFLAGS += -w +A
-$(addprefix stdlib__Printf.cm, i o) \
-$(addprefix stdlib__Format.cm, i o) \
-$(addprefix stdlib__Scanf.cm, i o) \
-$(addprefix camlinternalFormat.cm, i o): \
-  private COMPFLAGS += -w +A -w -fragile-match
-stdlib__Scanf.cmx: \
-  private COMPFLAGS += -inline 9
-%Labels.cmo: \
-  private COMPFLAGS += -nolabels -no-alias-deps
-%Labels.cmx: \
-  private COMPFLAGS += -nolabels -no-alias-deps
-$(addprefix stdlib__Float.cm, o x): \
-  private COMPFLAGS += -nolabels -no-alias-deps
-stdlib__Oo.cmi: \
-  private COMPFLAGS += -no-principal
+$(call FLAGS, $(addprefix stdlib.cm, i o x), \
+  -nopervasives -no-alias-deps -w -49 -pp '$(SAK_HOST) namespace')
+$(call FLAGS, $(addprefix camlinternalFormatBasics.cm, i o x), -nopervasives)
+$(call FLAGS, camlinternalOO.cmx, -inline 0 -afl-inst-ratio 0)
+$(call FLAGS, camlinternalLazy.cmx, -afl-inst-ratio 0)
+$(call FLAGS, stdlib__Buffer.cmx, -inline 3)
+$(call FLAGS, $(addprefix stdlib__Buffer.cm, i o), -w +A)
+$(call FLAGS, $(addprefix stdlib__Printf.cm, i o) \
+              $(addprefix stdlib__Format.cm, i o) \
+              $(addprefix stdlib__Scanf.cm, i o) \
+              $(addprefix camlinternalFormat.cm, i o), -w +A -w -fragile-match)
+$(call FLAGS, stdlib__Scanf.cmx, -inline 9)
+$(call FLAGS, %Labels.cmo %Labels.cmx, -nolabels -no-alias-deps)
+$(call FLAGS, $(addprefix stdlib__Float.cm, o x), -nolabels -no-alias-deps)
+$(call FLAGS, stdlib__Oo.cmi, -no-principal)
 
 %.cmi: %.mli
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(MODULE_COMPFLAGS) -c $<
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -o $@ -c $(filter %.mli, $^)
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(MODULE_COMPFLAGS) -o $@ -c $(filter %.mli, $^)
 
 %.cmo: %.ml
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(MODULE_COMPFLAGS) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) -o $@ -c $(filter %.ml, $^)
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(MODULE_COMPFLAGS) -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) -c $<
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(MODULE_COMPFLAGS) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) -o $@ -c \
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(MODULE_COMPFLAGS) -o $@ -c \
                           $(filter %.ml, $^)
 
 # Dependencies on the compiler
