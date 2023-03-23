@@ -50,12 +50,6 @@
 
      On Windows, `sak encode-C-literal "C:\OCaml🐫\lib"` returns
      `L"C:\\OCaml\xd83d\xdc2b\\lib"`
-   - add-stdlib-prefix. Used in stdlib/StdlibModules to convert the list of
-     basenames given in STDLIB_MODULE_BASENAMES to the actual file basenames
-     in STDLIB_MODULES.
-
-     For example, `sak add-stdlib-prefix stdlib camlinternalAtomic Sys` returns
-     ` stdlib camlinternalAtomic stdlib__Sys`
    - namespace. Used to expand the module aliases in stdlib.ml and stdlib.mli
      and used with the compiler's `-pp` flag.
  */
@@ -67,7 +61,6 @@ void usage(void)
     "Usage: sak command\n"
     "Commands:\n"
     " * encode-C-literal path - encodes path as a C string literal\n"
-    " * add-stdlib-prefix name1 ... - prefix standard library module names\n"
     " * namespace - translate aliased modules in Stdlib\n"
   );
 }
@@ -110,31 +103,6 @@ void encode_C_literal(char_os *path)
   putchar('"');
 }
 
-/* Print the given array of module names to stdout. "stdlib" and names beginning
-   "camlinternal" are printed unaltered. All other names are prefixed "stdlib__"
-   with the original name capitalised (i.e. "foo" prints "stdlib__Foo"). */
-void add_stdlib_prefix(int count, char_os **names)
-{
-  int i;
-  char_os *name;
-
-  for (i = 0; i < count; i++) {
-    name = *names++;
-
-    /* "stdlib" and camlinternal* do not get changed. All other names get
-       capitalised and prefixed "stdlib__". */
-    if (strcmp_os(T("stdlib"), name) == 0
-     || strncmp_os(T("camlinternal"), name, 12) == 0) {
-      printf_os(T(" %s"), name);
-    } else {
-      /* name is a null-terminated string, so an empty string simply has the
-         null-terminator "capitalised". */
-      *name = toupper_os(*name);
-      printf_os(T(" stdlib__%s"), name);
-    }
-  }
-}
-
 void stdlib_prefixing(char_os *file)
 {
   char buf[256];
@@ -172,8 +140,6 @@ int main_os(int argc, char_os **argv)
 {
   if (argc == 3 && !strcmp_os(argv[1], T("encode-C-literal"))) {
     encode_C_literal(argv[2]);
-  } else if (argc > 1 && !strcmp_os(argv[1], T("add-stdlib-prefix"))) {
-    add_stdlib_prefix(argc - 2, &argv[2]);
   } else if (argc == 3 && !strcmp_os(argv[1], T("namespace"))) {
     stdlib_prefixing(argv[2]);
   } else {
