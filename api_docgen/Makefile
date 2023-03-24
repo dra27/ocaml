@@ -12,6 +12,7 @@
 #*   special exception on linking described in the file LICENSE.          *
 #*                                                                        *
 #**************************************************************************
+
 # Used by included Makefiles
 ROOTDIR = ..
 -include ../Makefile.build_config

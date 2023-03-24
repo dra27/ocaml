@@ -75,7 +75,7 @@ HEADERS=unixsupport.h socketaddr.h
 include ../Makefile.otherlibs.common
 
 unix.ml: unix_$(UNIX_OR_WIN32).ml
-	cp $< $@
+	$(call CP, $<, $@)
 
 distclean::
 	rm -f unix.ml

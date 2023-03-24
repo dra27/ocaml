@@ -150,6 +150,7 @@ AC_SUBST([long_shebang])
 AC_SUBST([shebangscripts])
 AC_SUBST([AR])
 AC_SUBST([mklib])
+AC_SUBST([mklib_raw])
 AC_SUBST([supports_shared_libraries])
 AC_SUBST([natdynlink])
 AC_SUBST([natdynlinkopts])
@@ -540,10 +541,12 @@ AS_CASE([$host],
       AS_IF([test "$host_cpu" = "x86_64" ],
         [machine="-machine:AMD64 "],
         [machine=""])
-      mklib="link -lib -nologo $machine /out:\$(1) \$(2)"
+      mklib_raw="link -lib -nologo $machine /out:\$(1) \$(2)"
+      mklib="$mklib_raw"
     ],
   [
-    mklib="rm -f \$(1) && ${AR} rc \$(1) \$(2)"
+    mklib_raw="${AR} rc \$(1) \$(2)"
+    mklib="rm -f \$(1) && $mklib_raw"
   ])
 
 ## Find vendor of the C compiler

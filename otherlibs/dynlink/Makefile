@@ -123,21 +123,16 @@ COMPILERLIBS_SOURCES=\
 # not seem to be located by the type checker inside bytecode packs.
 # Note: .ml-only modules are not supported by the (.mli.cmi) rule below.
 
-$(LOCAL_SRC)/Makefile: $(LOCAL_SRC)/Makefile.copy-sources Makefile
-	$(V_GEN)cp -f $< $@ && \
-	for ml in $(COMPILERLIBS_SOURCES); do \
-          echo "$(LOCAL_SRC)/$$(basename $$ml): $(ROOTDIR)/$$ml" \
-            >> $@; \
-          echo "$(LOCAL_SRC)/$$(basename $$ml)i: $(ROOTDIR)/$${ml}i" \
-            >> $@; \
-        done && \
-	for mli in $(COMPILERLIBS_INTFS); do \
-          echo "$(LOCAL_SRC)/$$(basename $$mli): $(ROOTDIR)/$$mli" \
-            >> $@; \
-          echo \
-            "$(LOCAL_SRC)/$$(basename $$mli .mli).ml: $(ROOTDIR)/$$mli"\
-            >> $@; \
-        done
+define GEN_DEPEND
+$(LOCAL_SRC)/$(notdir $(1)): $(ROOTDIR)/$(1)$(2)
+
+endef
+
+define LOCAL_MAKE
+$(subst $(NEWLINE)$(SPACE),$(NEWLINE),$(foreach ml, $(COMPILERLIBS_SOURCES),$(call GEN_DEPEND,$(ml))$(call GEN_DEPEND,$(ml)i))$(foreach mli, $(COMPILERLIBS_INTFS),$(call GEN_DEPEND,$(mli))$(call GEN_DEPEND,$(mli:%.mli=%.ml),i)))
+endef
+
+$(eval $(call LOCAL_MAKE))
 
 # Rules to automatically generate dependencies for the local copy of the
 # compilerlibs sources.
@@ -163,9 +158,20 @@ COMPILERLIBS_SOURCES_INTFS=\
 COMPILERLIBS_COPIED_SOURCES_INTFS=\
   $(addsuffix i, $(COMPILERLIBS_COPIED_SOURCES))
 
-# $(LOCAL_SRC)/Makefile uses the variables above in dependencies, so must be
-# include'd after they've been defined.
--include $(LOCAL_SRC)/Makefile
+$(LOCAL_SRC):
+	$(call MKDIR, $@)
+
+$(LOCAL_SRC)/.depend: $(COMPILERLIBS_COPIED_SOURCES) \
+  $(COMPILERLIBS_COPIED_SOURCES_INTFS) | $(LOCAL_SRC)
+	$(V_OCAMLDEP)$(OCAMLDEP_CMD) -I $(LOCAL_SRC) $^ > $@
+
+$(LOCAL_SRC)/%.ml: | $(LOCAL_SRC)
+	$(call CP, $<, $@)
+
+$(LOCAL_SRC)/%.mli: | $(LOCAL_SRC)
+	$(call CP, $<, $@)
+
+include $(LOCAL_SRC)/.depend
 
 # Rules to build the local copy of the compilerlibs sources in such a way
 # that the resulting .cm{o,x} files can be packed.
@@ -201,7 +207,7 @@ native/dynlink_compilerlibs.cmx: $(COMPILERLIBS_CMX)
 	$(V_OCAMLOPT)$(OCAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -pack -o $@ $(COMPILERLIBS_CMX)
 
 %/dynlink.cmi: dynlink.cmi dynlink.mli
-	cp $^ $*/
+	$(call CP, $^, $*/)
 
 # Rules for building the interface of the [Dynlink_compilerlibs] packs.
 # To avoid falling foul of the problem described below, the .cmo and .cmx
@@ -225,14 +231,14 @@ dynlink.cmxa: $(NATOBJS)
 # with a -opaque warning. Note that installopt refers to $(NATOBJS) so doesn't
 # require this file to exist, hence its inclusion in the recipe for dynlink.cmxa
 # rather than as a dependency elsewhere.
-	cp native/dynlink.cmx dynlink.cmx
+	$(call CP, native/dynlink.cmx, dynlink.cmx)
 
 # Since there is no .mli for [Dynlink_platform_intf], we need to be
 # careful that compilation of the .cmx file does not write the .cmi file again,
 # which would cause rebuilding of ocamlopt.  The easiest way to do this seems
 # to be to copy the .ml file, which is a valid .mli, to the .mli.
 dynlink_platform_intf.mli: dynlink_platform_intf.ml
-	cp $< $@
+	$(call CP, $<, $@)
 
 INSTALL_LIBDIR_DYNLINK = $(INSTALL_LIBDIR)/dynlink
 
@@ -268,7 +274,7 @@ partialclean:
 
 clean: partialclean
 	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink_platform_intf.mli \
-	      $(LOCAL_SRC)/*.ml $(LOCAL_SRC)/*.mli $(LOCAL_SRC)/Makefile \
+	      $(LOCAL_SRC)/*.ml $(LOCAL_SRC)/*.mli \
 	      $(LOCAL_SRC)/.depend byte/dynlink.mli native/dynlink.mli
 
 .PHONY: distclean

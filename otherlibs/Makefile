@@ -23,20 +23,32 @@ include $(ROOTDIR)/Makefile.common
 # OTHERLIBRARIES would be empty and the clean targets would thus not work.
 OTHERLIBRARIES ?= dynlink str systhreads unix runtime_events
 
+define TAB
+	
+endef
+
+define dispatch_one
+	$$(MAKE) -C $(1) $(2)
+
+endef
 # $1: target name to dispatch to all otherlibs/*/Makefile
 define dispatch_
-$1:
-	for lib in $$(OTHERLIBRARIES); do \
-	  ($$(MAKE) -C $$$$lib $1) || exit $$$$?; \
-	done
+$1: 
+$(foreach lib,$(OTHERLIBRARIES),$(call dispatch_one,$(lib),$(1)))
+
 endef
 define dispatch
-$(eval $(call dispatch_,$1))
+$(eval $(subst $(SPACE)$(TAB),$(TAB),$(call dispatch_,$1)))
 endef
 
 .PHONY: all allopt clean distclean partialclean
+
 $(call dispatch,all)
+
 $(call dispatch,allopt)
+
 $(call dispatch,clean)
+
 $(call dispatch,distclean)
+
 $(call dispatch,partialclean)

@@ -12,6 +12,7 @@
 #*   special exception on linking described in the file LICENSE.          *
 #*                                                                        *
 #**************************************************************************
+
 # Used by included Makefiles
 ROOTDIR = ../..
 include ../Makefile.common
@@ -42,11 +43,15 @@ build/latex/ifocamldoc.tex: | build/latex
 
 OCAMLDOC_FLAGS =
 
+ifeq "$(SHELL_IS_CMD)" ""
 build/libref/stdlib.odoc: OCAMLDOC_FLAGS += -pp "grep -F -v @canonical"
+else
+build/libref/stdlib.odoc: OCAMLDOC_FLAGS += -pp "findstr /L /V @canonical"
+endif
 
 $(libref:%=build/libref/%.odoc): build/libref/%.odoc: %.mli | build/libref
 	$(V_OCAMLDOC)$(OCAMLDOC_RUN) -nostdlib -hide Stdlib -lib Stdlib \
-	$(OCAMLDOC_FLAGS) $(DOC_STDLIB_INCLUDES) -hide-warnings  $< -dump  $@
+	$(OCAMLDOC_FLAGS) $(DOC_STDLIB_INCLUDES) -hide-warnings $(subst /,$(DIR_SEP),$<) -dump  $@
 
 $(compilerlibref:%=build/compilerlibref/%.odoc):\
 build/compilerlibref/%.odoc: %.mli | build/compilerlibref

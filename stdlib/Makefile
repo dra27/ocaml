@@ -131,8 +131,8 @@ $(CAMLHEADERS): $(HEADERPROGRAM).c $(ROOTDIR)/Makefile.config Makefile
 
 # $@.exe is deleted to ensure no Cygwin .exe mangling takes place
 camlhead%: tmphead%.exe
-	$(V_GEN)rm -f $@.exe && \
-	mv $< $@
+	$(V_GEN)$(call RM_F, $@.exe)
+	$(call RENAME, $<, $@)
 
 # Again, pattern weirdness here means that the dot is always present so that
 # tmpheader.exe matches.
@@ -151,7 +151,7 @@ $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	  $(OUTPUTOBJ)$@ $^
 
 camlheader_ur: camlheader
-	$(V_GEN)cp camlheader $@
+	$(V_GEN)$(call CP, camlheader, $@)
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
 tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
@@ -164,11 +164,11 @@ $(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	      $(OUTPUTOBJ)$@ $^
 
 target_%: tmptarget%.exe
-	$(V_GEN)rm -f $@.exe && \
-	mv $< $@
+	$(V_GEN)$(call RM_F, $@.exe)
+	$(call RENAME, $<, $@)
 else
 target_%: %
-	$(V_GEN)cp $< $@
+	$(V_GEN)$(call CP, $<, $@)
 endif
 
 endif # ifeq "$(SHEBANGSCRIPTS)" "true"

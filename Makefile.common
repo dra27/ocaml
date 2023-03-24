@@ -16,12 +16,115 @@
 # This makefile contains common definitions and rules shared by
 # other Makefiles
 
+# XXX Use the same equality check as in flexdll/Makefile on SHELL
+#SHELL = cmd
+
 include $(ROOTDIR)/Makefile.config_if_required
+
+# $(SENSIBLE_MAKE) is empty on a default macOS installation and undefine on any
+# other reasonable system!
+SENSIBLE_MAKE := $(filter undefine, $(.FEATURES))
+
+# GNU make's detection of the shell on Windows is complicated, and the end
+# result is a little bit strange.
+# If we're using Cygwin (or MSYS2's) make, and we execute the binary directly
+# from a Windows shell (e.g. as C:\cygwin64\bin\make.exe) then SHELL will most
+# likely end up at its default value /bin/sh. Cygwin will find this, since
+# make is a Cygwin executable (so `/bin/sh` is translated). Things will fail
+# fairly quickly, though, if Cygwin's build directly is not in PATH, since no
+# login shell will have been invoked.
+# The story is more complicated for a native Windows GNU make (and is covered
+# in the SHELL section of the GNU make manual). In essence, GNU make tries very
+# hard to find sh.exe in as compatible a way as possible to create "portable"
+# (in the POSIX sense) Makefiles. One can force selection of cmd by setting
+# SHELL=cmd in Makefile (the logic means that it will correctly find where
+# cmd.exe is in PATH). If sh.exe is not found and SHELL has not been specified,
+# the COMSPEC environment variable will be used for SHELL. Curiously (at least
+# with GNU make 4.4.1), the value of SHELL does not reflect this decision and
+# $(SHELL) appears just to be `sh.exe`. The detection of cmd is therefore done
+# by feature-checking the shell.
+
+# $(SHELL_IS_CMD) lazily expands to a GNU make boolean variable (i.e. the empty
+# string when false, and non-empty otherwise). The detection is done by seeing
+# if %VAR% notation expands environment variables.
+
+define DETECT_WINDOWS_SHELL
+export override OCAML_DETECT_CMD = detect
+SHELL_IS_CMD := \
+  $$(if $$(filter %OCAML_DETECT_CMD%, $$(shell echo %OCAML_DETECT_CMD%)),,true)
+unexport OCAML_DETECT_CMD
+ifneq "$(SENSIBLE_MAKE)" ""
+undefine DETECT_WINDOWS_SHELL
+endif
+endef
+
+SHELL_IS_CMD = $(eval $(call DETECT_WINDOWS_SHELL))$(SHELL_IS_CMD)
+
+SHELL_COMMANDS =
+define MAKE_SHELL_COMMAND
+SHELL_COMMANDS := $(SHELL_COMMANDS) $(1)
+$(1) = \
+  $$(foreach command, $$(SHELL_COMMANDS), \
+    $$(eval $$(command) = \
+      $$(if $$(SHELL_IS_CMD), \
+        $$$$(call $$(command)_CMD,$\
+          $$$$(subst /,\,$$$$(strip $$$$(1))),$\
+          $$$$(subst /,\,$$$$(strip $$$$(2))),$\
+          $$$$(subst /,\,$$$$(strip $$$$(3))),$\
+          $$$$(subst /,\,$$$$(strip $$$$(4)))),\
+        $$$$(call $$(command)_SH,$\
+          $$$$(strip $$$$(1)),$\
+          $$$$(strip $$$$(2)),$\
+          $$$$(strip $$$$(3)),$\
+          $$$$(strip $$$$(4)))))) \
+  $$(call $(1),$$(1),$$(2),$$(3),$$(4))
+endef
+
+MKDIR_SH = mkdir -p $(1)
+CP_SH = cp $(1) $(2)
+CAT_SH = cat $(1)
+CAT_TO_SH = cat $(1) > $(2)
+RM_F_SH = rm -f $(1)
+RENAME_SH = mv $(1) $(2)
+LN_IN_SH = cd $(1) && $(LN) $(2) $(3)
+
+MKDIR_CMD = md $(1)
+CP_CMD = $(if $(filter 1, $(words $(1))), copy $(1) $(2) > nul, for %%f in ($(1)) do @copy %%f $(2) > nul)
+CAT_CMD = type $(1)
+CAT_TO_CMD = copy /b $(firstword $(1))$(addprefix $(SPACE)+ /b ,$(wordlist 2, 100, $(1))) $(2) > nul
+RM_F_CMD = $(if $(wildcard $(1)), del /f $(wildcard $(1)))
+RENAME_CMD = $(if $(wildcard $(2)), del /f $(subst /,\,$(2)) && )$(subst /,\,ren $(1) $(2))
+LN_IN_CMD = $(if $(wildcard $(strip $(1))/$(strip $(3))),$(call RM_F,$(strip $(1))/$(strip $(3))) && )cd $(1) && mklink $(3) $(2)
+
+$(eval $(call MAKE_SHELL_COMMAND, MKDIR))
+$(eval $(call MAKE_SHELL_COMMAND, CP))
+$(eval $(call MAKE_SHELL_COMMAND, CAT))
+$(eval $(call MAKE_SHELL_COMMAND, CAT_TO))
+$(eval $(call MAKE_SHELL_COMMAND, RM_F))
+$(eval $(call MAKE_SHELL_COMMAND, RENAME))
+$(eval $(call MAKE_SHELL_COMMAND, LN_IN))
+
+# XXX The laziness of these is harder to determine! Temporarily just forcing the shell detection, but these need converting too
+ifeq "$(SHELL_IS_CMD)" ""
+DIR_SEP = /
+SAK_BUILD = $(SAK)
+SHELL_QUOT = '$(1)'
+# MKLIB from Makefile.config can be used as-is
+else
+# There must be another trick??
+DIR_SEP := $(subst /,\,/)
+SAK_BUILD = $(subst /,\,$(SAK))
+SHELL_QUOT = "$(1)"
+MKLIB = $(if $(wildcard $(1)), del /f $(subst /,\,$(wildcard $(1))) &&)$(call MKLIB_RAW,$(1),$(2))
+endif
+
+ifneq "$(SENSIBLE_MAKE)" ""
+undefine MAKE_SHELL_COMMAND
+endif
 
 # %(DEPDIR) must be kept in sync with entries in .gitignore
 DEPDIR=.dep
 D=d
-MKDIR=mkdir -p
 
 # $(EMPTY) is defined in Makefile.config, but may not have been loaded
 EMPTY :=
@@ -103,30 +206,44 @@ IN_COREBOOT_CYCLE ?= false
 # Boot/ocamlrun is the most frequently used in the build system, so
 # we use OCAMLRUN to designate it and keep NEW_OCAMLRUN to refer
 # to runtime/ocamlrun, because it's less frequently used.
-OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
+# Have to be careful about just changing OCAMLRUN to have backslashes - *make* needs forward-slashes!
+OCAMLRUN ?= $(subst /,$(DIR_SEP),$(ROOTDIR)/boot/ocamlrun$(EXE))
 NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 
 # Standard library flags
 STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
 BOOT_STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/boot
 
+# XXX This can possibly be done with a directory ordering trick for Windows?
+#     i.e. something like dir /b /od
 TEST_BOOT_OCAMLC_OPT = $(shell \
   test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
   echo $$?)
+TEST_BOOT_OCAMLC_OPT =
 
 # Use boot/ocamlc.opt if available
 ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
 else
-  BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+  BOOT_OCAMLC = $(subst /,$(DIR_SEP),$(OCAMLRUN) $(ROOTDIR)/boot/ocamlc)
 endif
 
 BOOT_OCAMLDEP = $(BOOT_OCAMLC) -depend
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+  # Native GNU make will translate colon separators in $(PATH) back to
+  # semi-colon when calling cmd, which means that sub-make invocations won't
+  # detect that the elements are already in PATH
   DIR := $(realpath $(ROOTDIR))/boot/bin
+# XXX Refactor, etc.
+ifeq "$(SHELL_IS_CMD)" ""
 ifeq "$(filter $(DIR), $(subst :, ,$(PATH)))" ""
   export PATH := $(DIR):$(PATH)
+endif
+else
+ifeq "$(filter $(DIR), $(subst ;, ,$(PATH)))" ""
+  export PATH := $(DIR);$(PATH)
+endif
 endif
   undefine DIR
 endif
@@ -187,7 +304,7 @@ OCAMLDEP_CMD = $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) \
 
 # Lexer generation
 
-BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
+BOOT_OCAMLLEX ?= $(subst /,$(DIR_SEP),$(OCAMLRUN) $(ROOTDIR)/boot/ocamllex)
 
 # Default value for OCAMLLEX
 # In those directories where this needs to be overridden, the overriding
@@ -202,7 +319,7 @@ OCAMLLEXFLAGS ?= -q
 
 # Parser generation
 
-OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
+OCAMLYACC ?= $(subst /,$(DIR_SEP),$(ROOTDIR)/yacc/ocamlyacc$(EXE))
 
 OCAMLYACCFLAGS ?= --strict -v
 

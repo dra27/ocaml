@@ -152,8 +152,7 @@ ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
 	$(V_OCAMLC)$(ocamlc) -c $<
 
 ocamltest_unix.ml: ocamltest_unix_$(ocamltest_unix_impl).ml
-	$(V_GEN)echo '# 1 "$<"' > $@ && \
-	cat $< >> $@
+	$(V_GEN)$(file >$@,# 1 "$<")$(call CAT, $<) >> $@
 
 # Manual
 

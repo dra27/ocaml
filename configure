@@ -844,6 +844,7 @@ natdynlink_archive
 natdynlinkopts
 natdynlink
 supports_shared_libraries
+mklib_raw
 mklib
 AR
 shebangscripts
@@ -3289,6 +3290,7 @@ OCAML_VERSION_SHORT=5.1
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -13252,11 +13254,13 @@ then :
 else $as_nop
   machine=""
 fi
-      mklib="link -lib -nologo $machine /out:\$(1) \$(2)"
+      mklib_raw="link -lib -nologo $machine /out:\$(1) \$(2)"
+      mklib="$mklib_raw"
      ;; #(
   *) :
 
-    mklib="rm -f \$(1) && ${AR} rc \$(1) \$(2)"
+    mklib_raw="${AR} rc \$(1) \$(2)"
+    mklib="rm -f \$(1) && $mklib_raw"
    ;;
 esac
 

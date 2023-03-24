@@ -20,16 +20,8 @@ include $(ROOTDIR)/Makefile.best_binaries
 include $(DOCGEN)/Makefile.docfiles
 
 # Capitalize first letter of argument
-define up
-$(shell echo $(1) | cut -c1 | tr '[:lower:]' '[:upper:]')
-endef
-
-define capitalize_one
-$(call up,$(1))$(shell echo $(1) | cut -c2-)
-endef
-
 define capitalize
-$(foreach m,$(1),$(call capitalize_one,$m))
+$(foreach m,$(1),$(call CAPITALIZE,$m))
 endef
 
 compilerlibref_C=$(call capitalize,$(compilerlibref))
@@ -43,11 +35,14 @@ DOC_STDLIB_DIRS = $(addprefix $(ROOTDIR)/, stdlib \
 .PHONY: all
 all: html pdf man
 
-DIRS = build/ $(addprefix build/,libref compilerlibref man latex texi \
+DIRS = $(addprefix build/,libref compilerlibref man latex texi \
   html html/libref html/compilerlibref)
 
-$(DIRS):
-	$(MKDIR) $@
+build/:
+	$(call MKDIR, $@)
+
+$(DIRS): build/
+	$(call MKDIR, $@)
 
 pdf: build/latex/alldoc.pdf
 latex:
@@ -57,12 +52,12 @@ build/latex/alldoc.pdf: build/latex/stdlib_input.tex \
   build/latex/compilerlibs_input.tex | build/latex/ifocamldoc.tex
 
 build/Compiler_libs.mld: $(DOCGEN)/Compiler_libs.pre.mld | build/
-	$(V_GEN)cp $< $@ && echo "{!modules:$(compilerlibref_C)}" >> $@
+	$(V_GEN)$(call CP, $<, $@) && echo {!modules:$(compilerlibref_C)} >> $@
 
 build/latex/ifocamldoc.tex: $(ROOTDIR)/Makefile.config | build/latex
 
 build/latex/alldoc.tex:$(DOCGEN)/alldoc.tex | build/latex
-	$(V_GEN)cp $< $@
+	$(V_GEN)$(call CP, $<, $@)
 
 build/%.mld: $(DOCGEN)/%.mld | build/
-	$(V_GEN)cp $< $@
+	$(V_GEN)$(call CP, $<, $@)
