@@ -124,9 +124,11 @@ endif
 BOOT_OCAMLDEP = $(BOOT_OCAMLC) -depend
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+  # XXX There might be a better way to do this! It avoids a race condition
+  #     when promoting flexlink.opt.exe when a link is already taking place
   DIR := $(realpath $(ROOTDIR))/boot/bin
-ifeq "$(filter $(DIR), $(subst :, ,$(PATH)))" ""
-  export PATH := $(DIR):$(PATH)
+ifeq "$(filter $(DIR).byte, $(subst :, ,$(PATH)))" ""
+  export PATH := $(DIR).opt:$(DIR).byte:$(PATH)
 endif
   undefine DIR
 endif
@@ -147,14 +149,21 @@ endif
 # This rule is similar to GNU make's implicit rule, except that it is more
 # general (it supports both .o and .obj)
 
-ifeq "$(COMPUTE_DEPS)" "true"
-RUNTIME_HEADERS :=
-REQUIRED_HEADERS :=
-else
-RUNTIME_HEADERS := $(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
-                   $(wildcard $(ROOTDIR)/runtime/caml/*.h)
-REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
-endif
+RUNTIME_HEADERS = $(eval \
+  RUNTIME_HEADERS := \
+    $$(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
+    $$(wildcard $(ROOTDIR)/runtime/caml/*.h))$(RUNTIME_HEADERS)
+# This looks incorrect - it probably works for systhreads, but it won't work for runtime anymore?
+REQUIRED_HEADERS = $(RUNTIME_HEADERS) $(wildcard *.h)
+
+#ifeq "$(COMPUTE_DEPS)" "true"
+#RUNTIME_HEADERS :=
+#REQUIRED_HEADERS :=
+#else
+#RUNTIME_HEADERS := $(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
+#                   $(wildcard $(ROOTDIR)/runtime/caml/*.h)
+#REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
+#endif
 
 %.$(O): %.c $(REQUIRED_HEADERS)
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
