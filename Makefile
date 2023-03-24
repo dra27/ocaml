@@ -86,7 +86,7 @@ partialclean::
 	cd toplevel/native ; rm -f $(TOPLEVEL_SHARED_ARTEFACTS)
 
 $(COMMON:.cmo=.cmx) $(BYTECOMP:.cmo=.cmx) $(OPTCOMP:.cmo=.cmx): ocamlopt$(EXE)
-$(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE)
+$(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE) otherlibs/dynlink/dynlink.cmxa
 
 ALL_CONFIG_CMO = utils/config_main.cmo utils/config_boot.cmo
 
@@ -1375,18 +1375,18 @@ partialclean:: partialclean-menhir
 # OCamldoc
 
 .PHONY: ocamldoc
-ocamldoc: ocamlyacc ocamllex otherlibs/str/str.cma otherlibs/unix/unix.cma otherlibs/dynlink/dynlink.cma
+ocamldoc: ocamlc.opt ocamlyacc ocamllex otherlibs/str/str.cma otherlibs/unix/unix.cma otherlibs/dynlink/dynlink.cma
 	$(MAKE) -C ocamldoc all
 
 .PHONY: ocamldoc.opt
-ocamldoc.opt: stdlib/stdlib.cmxa compilerlibs/ocamlcommon.cmxa otherlibs/str/str.cmxa otherlibs/unix/unix.cmxa otherlibs/dynlink/dynlink.cmxa
+ocamldoc.opt: ocamlopt.opt stdlib/stdlib.cmxa compilerlibs/ocamlcommon.cmxa otherlibs/str/str.cmxa otherlibs/unix/unix.cmxa otherlibs/dynlink/dynlink.cmxa
 	$(MAKE) -C ocamldoc opt.opt
 
 # OCamltest
-ocamltest: ocamlyacc ocamllex otherlibs/unix/unix.cma
+ocamltest: ocamlyacc ocamllex otherlibs/unix/unix.cma ocamlc.opt
 	$(MAKE) -C ocamltest all
 
-ocamltest.opt: stdlib/stdlib.cmxa otherlibs/unix/unix.cmxa compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa
+ocamltest.opt: ocamlopt.opt stdlib/stdlib.cmxa otherlibs/unix/unix.cmxa compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa
 	$(MAKE) -C ocamltest allopt
 
 partialclean::
@@ -1427,7 +1427,7 @@ clean::
 # The replay debugger
 
 .PHONY: ocamldebugger
-ocamldebugger: otherlibs/unix/unix.cma otherlibs/dynlink/dynlink.cma
+ocamldebugger: otherlibs/unix/unix.cma otherlibs/dynlink/dynlink.cma ocamlc.opt
 	$(MAKE) -C debugger all
 
 partialclean::
@@ -2057,10 +2057,10 @@ lex/ocamllex$(EXE): | ocamlyacc
 otherlibs/%.cma: tools/ocamlmklib$(EXE)
 otherlibs/%.cmxa: tools/ocamlmklib$(EXE)
 
-otherlibs/dynlink/dynlink.cma: ocamlc$(EXE)
+otherlibs/dynlink/dynlink.cma: ocamlc.opt
 	$(MAKE) -C otherlibs/dynlink all
 
-otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/dynlink.cma stdlib/stdlib.cmxa
+otherlibs/dynlink/dynlink.cmxa: ocamlopt.opt otherlibs/dynlink/dynlink.cma stdlib/stdlib.cmxa
 	$(MAKE) -C otherlibs/dynlink allopt
 
 otherlibs/str/str.cma: ocamlc$(EXE)
