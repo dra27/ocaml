@@ -495,7 +495,7 @@ else
   FLEXLINK_OCAMLOPT=../ocamlopt.opt$(EXE)
 endif
 
-flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES)
+flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES) stdlib/stdlib.cmxa
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
 	  OCAMLOPT='$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib' -B flexlink.exe
@@ -1193,6 +1193,7 @@ runtime/%_libasmrunpic.obj: runtime/%.asm
 runtime: stdlib/libcamlrun.$(A)
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+stdlib/stdlib.cma: $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS))
 runtime: $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS))
 stdlib/flexdll/flexdll%.$(O): $(FLEXDLL_SOURCES)/flexdll%.$(O) | stdlib/flexdll
 	cp $< $@
@@ -1206,10 +1207,13 @@ makeruntime: runtime-all
 stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
 	$(call LN_IN, stdlib, ../$^, libcamlrun.$(A))
 
-stdlib/%lib.cma stdlib/%_exit.cmo: stdlib/libcamlrun.$(A)
+# stdlib/stdlib.cma is only needed for auxiliaries which are waiting on ocamlc.opt anyway
+# so make stdlib.cmxa a higher priority!
+stdlib/%lib.cma stdlib/%_exit.cmo: stdlib/libcamlrun.$(A) ocamlc$(EXE) stdlib/stdlib.cmxa
 	$(MAKE) -C stdlib stdlib.cma std_exit.cmo
 
 # XXX This risks racing on .cmi files, but in practice that won't happen. Disappears when the Makefile is merged
+# XXX Actually, the racing does happen on Windows! Temporarily ensure that stdlib.cmxa is built first
 stdlib/%lib.cmxa stdlib/%_exit.cmx: stdlib/libasmrun.$(A) ocamlopt$(EXE)
 	$(MAKE) -C stdlib stdlib.cmxa std_exit.cmx
 
@@ -2057,31 +2061,32 @@ lex/ocamllex$(EXE): | ocamlyacc
 otherlibs/%.cma: tools/ocamlmklib$(EXE)
 otherlibs/%.cmxa: tools/ocamlmklib$(EXE)
 
+# Wait for ocamlopt.opt / ocamlc.opt since dynlink_compilers is so large - should make much less difference when it's gone
 otherlibs/dynlink/dynlink.cma: ocamlc.opt
 	$(MAKE) -C otherlibs/dynlink all
 
 otherlibs/dynlink/dynlink.cmxa: ocamlopt.opt otherlibs/dynlink/dynlink.cma stdlib/stdlib.cmxa
 	$(MAKE) -C otherlibs/dynlink allopt
 
-otherlibs/str/str.cma: ocamlc$(EXE)
+otherlibs/str/str.cma: stdlib/stdlib.cma
 	$(MAKE) -C otherlibs/str all
 
 otherlibs/str/str.cmxa: otherlibs/str/str.cma stdlib/stdlib.cmxa
 	$(MAKE) -C otherlibs/str allopt
 
-otherlibs/unix/unix.cma: ocamlc$(EXE)
+otherlibs/unix/unix.cma: stdlib/stdlib.cma
 	$(MAKE) -C otherlibs/unix all
 
 otherlibs/unix/unix.cmxa: otherlibs/unix/unix.cma stdlib/stdlib.cmxa
 	$(MAKE) -C otherlibs/unix allopt
 
-otherlibs/runtime_events/runtime_events.cma: ocamlc$(EXE)
+otherlibs/runtime_events/runtime_events.cma: stdlib/stdlib.cma
 	$(MAKE) -C otherlibs/runtime_events all
 
 otherlibs/runtime_events/runtime_events.cmxa: otherlibs/runtime_events/runtime_events.cma stdlib/stdlib.cmxa
 	$(MAKE) -C otherlibs/runtime_events allopt
 
-otherlibs/systhreads/systhreads.cma: ocamlc$(EXE) otherlibs/unix/unix.cma
+otherlibs/systhreads/systhreads.cma: stdlib/stdlib.cma otherlibs/unix/unix.cma
 	$(MAKE) -C otherlibs/systhreads all
 
 otherlibs/systhreads/systhreads.cmxa: otherlibs/systhreads/systhreads.cma otherlibs/unix/unix.cmxa stdlib/stdlib.cmxa
@@ -2091,7 +2096,7 @@ otherlibs/systhreads/systhreads.cmxa: otherlibs/systhreads/systhreads.cma otherl
 #  - Removed library, which means that stdlib/camlheader isn't guaranteed
 #  - Not sure, for example, that dependency in tools is strictly working
 .PHONY: system
-system: ocamlc ocamlyacc ocamllex $(TOOLS_BYTECODE_TARGETS) runtime-all runtime-allopt stdlib/stdlib.cma ocaml ocamlopt stdlib/stdlib.cmxa ocamlc.opt \
+system: ocamlc$(EXE) $(if $(filter true, $(BOOTSTRAPPING_FLEXDLL)),flexlink.opt$(EXE)) ocamlyacc ocamllex $(TOOLS_BYTECODE_TARGETS) runtime-all runtime-allopt stdlib/stdlib.cma ocaml ocamlopt stdlib/stdlib.cmxa ocamlc.opt \
         ocamlopt.opt ocamllex.opt $(foreach lib, $(OTHERLIBRARIES), otherlibs/$(lib)/$(lib).cma otherlibs/$(lib)/$(lib).cmxa) \
         ocamlnat $(TOOLS_NATIVE_TARGETS) $(TOOLS_OPT_TARGETS) $(OTHER_TOOLS) $(WITH_DEBUGGER) $(WITH_OCAMLDOC) $(OCAMLDOC_OPT) $(WITH_OCAMLTEST) $(OCAMLTEST_OPT) \
         $(if $(filter ocamldoc-true, $(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)), manpages)
