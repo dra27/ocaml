@@ -296,22 +296,7 @@ opt: checknative
 .PHONY: opt.opt
 opt.opt: checknative
 	$(MAKE) checkstack
-	$(MAKE) coreall
-	$(MAKE) ocaml
-	$(MAKE) opt-core
-ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-	$(MAKE) flexlink.opt$(EXE)
-endif
-	$(MAKE) ocamlc.opt
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
-	  $(WITH_OCAMLTEST)
-	$(MAKE) ocamlopt.opt
-	$(MAKE) otherlibrariesopt
-	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
-	  $(OCAMLTEST_OPT) othertools ocamlnat
-ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
-	$(MAKE) manpages
-endif
+	$(MAKE) system
 
 # Core bootstrapping cycle
 .PHONY: coreboot
@@ -418,7 +403,7 @@ else
   FLEXLINK_OCAMLOPT=../ocamlopt.opt$(EXE)
 endif
 
-flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES)
+flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES) stdlib/stdlib.cmxa boot/flexlink.byte$(EXE)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
 	  OCAMLOPT='$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib' -B flexlink.exe
@@ -536,8 +521,8 @@ natruntop:
 
 # Native dynlink
 
-otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
-	$(MAKE) -C otherlibs/dynlink allopt
+#otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
+#	$(MAKE) -C otherlibs/dynlink allopt
 
 # Cleanup the lexer
 
@@ -755,12 +740,32 @@ runtime_CPPFLAGS = -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
 ocamlrund_CPPFLAGS = -DDEBUG
 ocamlruni_CPPFLAGS = -DCAML_INSTR
 
+## Runtime dependencies
+
+ifeq "$(COMPUTE_DEPS)" "true"
+# XXX Proper comment - note that we _always_ include the instrumented and debug runtimes etc.
+#     here _because_ they are included in the C compilation rules.
+runtime_DEP_FILES := $(addsuffix .b, \
+  $(basename $(runtime_BYTECODE_C_SOURCES) runtime/instrtrace))
+ifeq "$(NATIVE_COMPILER)" "true"
+runtime_DEP_FILES += $(addsuffix .n, $(basename $(runtime_NATIVE_C_SOURCES)))
+endif
+runtime_DEP_FILES += $(addsuffix d, $(runtime_DEP_FILES)) \
+             $(addsuffix i, $(runtime_DEP_FILES)) \
+             $(addsuffix pic, $(runtime_DEP_FILES))
+runtime_DEP_FILES := $(addprefix $(DEPDIR)/,$(addsuffix .$(D), $(runtime_DEP_FILES)))
+
+ifneq "$(wildcard $(DEPDIR)/runtime)" ""
+include $(runtime_DEP_FILES)
+endif
+endif
+
 ## Runtime targets
 
 .PHONY: runtime-all
 runtime-all: \
   $(runtime_BYTECODE_STATIC_LIBRARIES) $(runtime_BYTECODE_SHARED_LIBRARIES) \
-  $(runtime_PROGRAMS) $(SAK)
+  $(runtime_PROGRAMS) $(runtime_DEP_FILES) $(SAK)
 
 .PHONY: runtime-allopt
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -950,7 +955,7 @@ $(DEPDIR)/$(1).$(D): runtime/%.c | $(DEPDIR)/runtime $(runtime_BUILT_HEADERS)
 	$$(V_CCDEPS)$$(DEP_CC) $$(OC_CPPFLAGS) $$(CPPFLAGS) $$< -MT \
 	  'runtime/$$*$(subst runtime/%,,$(1)).$(O)' -MF $$@
 endif # ifneq "$(1)" "%"
-$(1).$(O): $(2).c
+$(1).$(O): $(2).c $(if $(wildcard $(DEPDIR)/runtime),,$(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) $(RUNTIME_HEADERS))
 else
 $(1).$(O): $(2).c \
   $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
@@ -1020,27 +1025,11 @@ runtime/amd64nt.i.obj: runtime/amd64nt.asm runtime/domain_state64.inc
 runtime/%_libasmrunpic.obj: runtime/%.asm
 	$(V_ASM)$(ASM)$@ $<
 
-## Runtime dependencies
-
-runtime_DEP_FILES := $(addsuffix .b, \
-  $(basename $(runtime_BYTECODE_C_SOURCES) runtime/instrtrace))
-ifeq "$(NATIVE_COMPILER)" "true"
-runtime_DEP_FILES += $(addsuffix .n, $(basename $(runtime_NATIVE_C_SOURCES)))
-endif
-runtime_DEP_FILES += $(addsuffix d, $(runtime_DEP_FILES)) \
-             $(addsuffix i, $(runtime_DEP_FILES)) \
-             $(addsuffix pic, $(runtime_DEP_FILES))
-runtime_DEP_FILES := $(addsuffix .$(D), $(runtime_DEP_FILES))
-
-ifeq "$(COMPUTE_DEPS)" "true"
-include $(addprefix $(DEPDIR)/, $(runtime_DEP_FILES))
-endif
-
 .PHONY: runtime
 runtime: stdlib/libcamlrun.$(A)
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-runtime: $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS))
+stdlib/stdlib.cmxa: $(addprefix stdlib/flexdll/, $(FLEXDLL_OBJECTS))
 stdlib/flexdll/flexdll%.$(O): $(FLEXDLL_SOURCES)/flexdll%.$(O) | stdlib/flexdll
 	cp $< $@
 stdlib/flexdll:
@@ -1049,8 +1038,20 @@ endif
 
 .PHONY: makeruntime
 makeruntime: runtime-all
-stdlib/libcamlrun.$(A): runtime-all
-	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+# XXX Caution - didn't Sebastien try this before when doing the merge?
+stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
+	cd stdlib; $(LN) ../$^ libcamlrun.$(A)
+
+# stdlib/stdlib.cma is only needed for auxiliaries which are waiting on ocamlc.opt anyway
+# so make stdlib.cmxa a higher priority!
+stdlib/%lib.cma stdlib/%_exit.cmo: stdlib/libcamlrun.$(A) ocamlc$(EXE) stdlib/stdlib.cmxa
+	$(MAKE) -C stdlib stdlib.cma std_exit.cmo
+
+# XXX This risks racing on .cmi files, but in practice that won't happen. Disappears when the Makefile is merged
+# XXX Actually, the racing does happen on Windows! Temporarily ensure that stdlib.cmxa is built first
+stdlib/%lib.cmxa stdlib/%_exit.cmx: stdlib/libasmrun.$(A) ocamlopt$(EXE)
+	$(MAKE) -C stdlib stdlib.cmxa std_exit.cmx
+
 clean::
 	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
 	rm -f $(addprefix runtime/, ocamlrun ocamlrund ocamlruni ocamlruns sak)
@@ -1067,8 +1068,9 @@ runtimeopt: stdlib/libasmrun.$(A)
 
 .PHONY: makeruntimeopt
 makeruntimeopt: runtime-allopt
-stdlib/libasmrun.$(A): runtime-allopt
-	cd stdlib; $(LN) ../runtime/libasmrun.$(A) .
+# XXX Caution - didn't Sebastien try this before when doing the merge?
+stdlib/libasmrun.$(A): runtime/libasmrun.$(A)
+	cd stdlib; $(LN) ../$^ libasmrun.$(A)
 
 clean::
 	rm -f stdlib/libasmrun.a stdlib/libasmrun.lib
@@ -1119,7 +1121,7 @@ ocamllex: ocamlyacc
 	$(MAKE) lex-all
 
 .PHONY: ocamllex.opt
-ocamllex.opt: ocamlopt
+ocamllex.opt: stdlib/stdlib.cmxa
 	$(MAKE) lex-allopt
 
 lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
@@ -1213,18 +1215,18 @@ partialclean:: partialclean-menhir
 # OCamldoc
 
 .PHONY: ocamldoc
-ocamldoc: ocamlc ocamlyacc ocamllex otherlibraries
+ocamldoc: ocamlyacc ocamllex otherlibs/str/str.cma otherlibs/unix/unix.cma otherlibs/dynlink/dynlink.cma
 	$(MAKE) -C ocamldoc all
 
 .PHONY: ocamldoc.opt
-ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
+ocamldoc.opt: stdlib/stdlib.cmxa compilerlibs/ocamlcommon.cmxa otherlibs/str/str.cmxa otherlibs/unix/unix.cmxa otherlibs/dynlink/dynlink.cmxa
 	$(MAKE) -C ocamldoc opt.opt
 
 # OCamltest
-ocamltest: ocamlc ocamlyacc ocamllex otherlibraries
+ocamltest: ocamlyacc ocamllex otherlibs/unix/unix.cma
 	$(MAKE) -C ocamltest all
 
-ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
+ocamltest.opt: stdlib/stdlib.cmxa otherlibs/unix/unix.cmxa compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa
 	$(MAKE) -C ocamltest allopt
 
 partialclean::
@@ -1237,7 +1239,7 @@ html_doc: ocamldoc
 	$(MAKE) -C api_docgen html
 
 .PHONY: manpages
-manpages:
+manpages: ocamldoc
 	$(MAKE) -C api_docgen man
 
 partialclean::
@@ -1265,7 +1267,7 @@ clean::
 # The replay debugger
 
 .PHONY: ocamldebugger
-ocamldebugger: ocamlc ocamlyacc ocamllex otherlibraries
+ocamldebugger: otherlibs/unix/unix.cma otherlibs/dynlink/dynlink.cma
 	$(MAKE) -C debugger all
 
 partialclean::
@@ -1353,6 +1355,8 @@ ocamltex = tools/ocamltex$(EXE)
 ifeq "$(build_ocamltex)" "true"
 OTHER_TOOLS += $(ocamltex)
 endif
+
+$(ocamltex): | ocamlc$(EXE)
 
 .PHONY: othertools
 othertools: $(OTHER_TOOLS)
@@ -1458,11 +1462,17 @@ ocamltex_MODULES = tools/ocamltex
 # configuration.
 # Note: the following definitions apply to all the prerequisites
 # of ocamltex.
-$(ocamltex): CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
-$(ocamltex): OC_COMMON_LINKFLAGS += -linkall
+# In parallel, this doesn't actually work
+$(ocamltex): private CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+$(ocamltex): private OC_COMMON_LINKFLAGS += -linkall
 $(ocamltex): VPATH += $(addprefix otherlibs/,str unix)
 
-tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
+tools/ocamltex.cmo: private OC_COMMON_COMPFLAGS += -no-alias-deps
+tools/ocamltex.cmo: private CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+# The need for these dependencies is a possible future issue? We depend on them
+# for linking, but we're not propagating the type information. Again, not clear
+# what the fix is here - should our .depend information simply be better?
+tools/ocamltex.cmo: otherlibs/unix/unix.cma otherlibs/str/str.cma | ocamlc$(EXE)
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we use the othertools target
@@ -1548,13 +1558,17 @@ endif
 
 # Default rules
 
-%.cmo: %.ml
+# Does firstword actually work here - e.g. for ocamltex?
+%.cmo: %.ml | $(firstword $(CAMLC))
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
 
-%.cmi: %.mli
+%.cmi: %.mli | $(firstword $(CAMLC))
 	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) -c $<
 
-%.cmx: %.ml
+# The dependency on stdlib.cmxa can either be dealt with by better dependencies (our modules _should_ depend
+# on stdlib modules or the modules directly should depend on stdlib.cmxa?) or in the target-specific ones (this
+# will break when stdlib Makefile is merged, unless care taken)
+%.cmx: %.ml | stdlib/stdlib.cmxa
 	$(V_OCAMLOPT)$(COMPILE_NATIVE_MODULE) -c $<
 
 partialclean::
@@ -1881,3 +1895,62 @@ config.status:
 	@echo "  make install"
 	@echo "should work."
 	@false
+
+# Order-only dependencies
+lex/ocamllex$(EXE): | ocamlyacc
+#ocamlc.opt$(EXE): | ocamlopt$(EXE)
+
+otherlibs/%.cma: tools/ocamlmklib$(EXE)
+otherlibs/%.cmxa: tools/ocamlmklib$(EXE)
+
+otherlibs/dynlink/dynlink.cma: ocamlc$(EXE)
+	$(MAKE) -C otherlibs/dynlink all
+
+otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/dynlink.cma stdlib/stdlib.cmxa
+	$(MAKE) -C otherlibs/dynlink allopt
+
+otherlibs/str/str.cma: stdlib/stdlib.cma
+	$(MAKE) -C otherlibs/str all
+
+otherlibs/str/str.cmxa: otherlibs/str/str.cma stdlib/stdlib.cmxa
+	$(MAKE) -C otherlibs/str allopt
+
+otherlibs/unix/unix.cma: stdlib/stdlib.cma
+	$(MAKE) -C otherlibs/unix all
+
+otherlibs/unix/unix.cmxa: otherlibs/unix/unix.cma stdlib/stdlib.cmxa
+	$(MAKE) -C otherlibs/unix allopt
+
+otherlibs/runtime_events/runtime_events.cma: stdlib/stdlib.cma
+	$(MAKE) -C otherlibs/runtime_events all
+
+otherlibs/runtime_events/runtime_events.cmxa: otherlibs/runtime_events/runtime_events.cma stdlib/stdlib.cmxa
+	$(MAKE) -C otherlibs/runtime_events allopt
+
+otherlibs/systhreads/systhreads.cma: stdlib/stdlib.cma otherlibs/unix/unix.cma
+	$(MAKE) -C otherlibs/systhreads all
+
+otherlibs/systhreads/systhreads.cmxa: otherlibs/systhreads/systhreads.cma otherlibs/unix/unix.cmxa stdlib/stdlib.cmxa
+	$(MAKE) -C otherlibs/systhreads allopt
+
+# XXX Checks
+#  - Removed library, which means that stdlib/camlheader isn't guaranteed
+#  - Not sure, for example, that dependency in tools is strictly working
+.PHONY: system
+system: ocamlc$(EXE) $(if $(filter true, $(BOOTSTRAPPING_FLEXDLL)),flexlink.opt$(EXE)) ocamlyacc ocamllex $(TOOLS_BYTECODE_TARGETS) runtime-all runtime-allopt stdlib/stdlib.cma ocaml ocamlopt stdlib/stdlib.cmxa ocamlc.opt \
+        ocamlopt.opt ocamllex.opt $(foreach lib, $(OTHERLIBRARIES), otherlibs/$(lib)/$(lib).cma otherlibs/$(lib)/$(lib).cmxa) \
+        ocamlnat $(TOOLS_NATIVE_TARGETS) $(TOOLS_OPT_TARGETS) $(OTHER_TOOLS) $(WITH_DEBUGGER) $(WITH_OCAMLDOC) $(OCAMLDOC_OPT) $(WITH_OCAMLTEST) $(OCAMLTEST_OPT) \
+        $(if $(filter true, $(build_stdlib_manpages)), manpages)
+#ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+#	$(MAKE) flexlink.opt$(EXE)
+#endif
+#	$(MAKE) ocamlc.opt
+#	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+#	  $(WITH_OCAMLTEST)
+#	$(MAKE) ocamlopt.opt
+#	$(MAKE) otherlibrariesopt
+#	$(MAKE) ocamllex.opt ocamltoolsopt ocamltoolsopt.opt $(OCAMLDOC_OPT) \
+#	  $(OCAMLTEST_OPT) othertools ocamlnat
+#ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
+#	$(MAKE) manpages
+#endif
