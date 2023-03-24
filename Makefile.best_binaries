@@ -28,6 +28,7 @@
 # Set this to empty to force use of the bytecode compilers at all times
 USE_BEST_BINARIES ?= true
 
+# XXX See note in Makefile.common for TEST_BOOT_OCAMLC_OPT - test needs updating
 check_not_stale = \
   $(if $(shell test $(ROOTDIR)/$1 -nt $(ROOTDIR)/$2 && echo stale), \
     $(info Warning: we are not using the native binary $2 \
@@ -35,11 +36,13 @@ because it is older than the bytecode binary $1; \
 you should silence this warning by either removing $2 \
 or rebuilding it (or `touch`-ing it) if you want it used.), \
     ok)
+# We're not developing - just use them!
+check_not_stale = ok
 
 choose_best = $(strip $(if \
    $(and $(USE_BEST_BINARIES),$(wildcard $(ROOTDIR)/$1.opt$(EXE)),$(strip \
       $(call check_not_stale,$1$(EXE),$1.opt$(EXE)))), \
-    $(ROOTDIR)/$1.opt$(EXE), \
+    $(subst /,$(DIR_SEP),$(ROOTDIR)/$1.opt$(EXE)), \
     $(OCAMLRUN) $(ROOTDIR)/$1$(EXE)))
 
 BEST_OCAMLC := $(call choose_best,ocamlc)
@@ -55,5 +58,5 @@ BEST_OCAMLLEX := $(call choose_best,lex/ocamllex)
 BEST_OCAMLDEP := $(strip $(if \
    $(and $(USE_BEST_BINARIES),$(wildcard $(ROOTDIR)/ocamlc.opt$(EXE)),$(strip \
       $(call check_not_stale,boot/ocamlc,ocamlc.opt$(EXE)))), \
-    $(ROOTDIR)/ocamlc.opt$(EXE) -depend, \
+    $(subst /,$(DIR_SEP),$(ROOTDIR)/ocamlc.opt$(EXE) -depend), \
     $(BOOT_OCAMLC) -depend))

@@ -23,7 +23,7 @@ $(LOCAL_SRC)/.depend: $(COMPILERLIBS_COPIED_SOURCES) \
 -include $(LOCAL_SRC)/.depend
 
 $(LOCAL_SRC)/%.ml:
-	cp $< $@
+	$(call CP, $<, $@)
 
 $(LOCAL_SRC)/%.mli:
-	cp $< $@
+	$(call CP, $<, $@)

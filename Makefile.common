@@ -16,12 +16,41 @@
 # This makefile contains common definitions and rules shared by
 # other Makefiles
 
+SHELL = cmd
+
 include $(ROOTDIR)/Makefile.config_if_required
 
 # %(DEPDIR) must be kept in sync with entries in .gitignore
 DEPDIR=.dep
 D=d
-MKDIR=mkdir -p
+ifneq "$(SHELL)" "cmd"
+MKDIR = mkdir -p $(1)
+CP = cp $(1) $(2)
+CAT = cat $(1)
+CAT_TO = cat $(1) > $(2)
+RM_F = rm -f $(1)
+DIR_SEP = /
+RENAME = mv $(1) $(2)
+# Overriding the build_config.h one
+LN_IN = cd $(1) && ln -sf $(2) $(3)
+SAK_BUILD = $(SAK)
+SHELL_QUOT = '$(1)'
+else
+MKDIR = md $(subst /,\,$(1))
+# XXX Could just do the subst over the whole command
+CP = $(if $(filter 1, $(words $(1))), copy $(subst /,\,$(1) $(2)) > nul, for %%f in ($(subst /,\,$(1))) do @copy %%f $(subst /,\,$(2)) > nul)
+CAT = type $(subst /,\,$(1))
+# Perhaps better named "JOIN_FILES" or summat?
+CAT_TO = copy /b $(subst /,\,$(firstword $(1)))$(addprefix $(SPACE)+ /b ,$(subst /,\,$(wordlist 2, 100, $(1)))) $(subst /,\,$(2)) > nul
+RM_F = $(if $(wildcard $(1)), del /f $(subst /,\,$(wildcard $(1))))
+# There must be another trick??
+DIR_SEP = $(subst /,\,/)
+RENAME = $(if $(wildcard $(2)), del /f $(subst /,\,$(2)) && )$(subst /,\,ren $(1) $(2))
+# Relying on not symlinking directories
+LN_IN = $(if $(wildcard $(strip $(1))/$(strip $(3))),$(call RM_F,$(strip $(1))/$(strip $(3))) && )cd $(1) && $(subst /,\,mklink $(3) $(2))
+SAK_BUILD = $(SAK_HOST)
+SHELL_QUOT = "$(1)"
+endif
 
 # $(EMPTY) is defined in Makefile.config, but may not have been loaded
 EMPTY :=
@@ -37,7 +66,7 @@ $(SPACE) :=
 LBRACKET = (
 RBRACKET = )
 
-V ?= 0
+V ?= 1
 
 ifeq "$(V)" "0"
 
@@ -103,22 +132,26 @@ IN_COREBOOT_CYCLE ?= false
 # Boot/ocamlrun is the most frequently used in the build system, so
 # we use OCAMLRUN to designate it and keep NEW_OCAMLRUN to refer
 # to runtime/ocamlrun, because it's less frequently used.
-OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
+# Have to be careful about just changing OCAMLRUN to have backslashes - *make* needs forward-slashes!
+OCAMLRUN ?= $(subst /,$(DIR_SEP),$(ROOTDIR)/boot/ocamlrun$(EXE))
 NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 
 # Standard library flags
 STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
 BOOT_STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/boot
 
+# XXX This can possibly be done with a directory ordering trick for Windows?
+#     i.e. something like dir /b /od
 TEST_BOOT_OCAMLC_OPT = $(shell \
   test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
   echo $$?)
+TEST_BOOT_OCAMLC_OPT =
 
 # Use boot/ocamlc.opt if available
 ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
 else
-  BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+  BOOT_OCAMLC = $(subst /,$(DIR_SEP),$(OCAMLRUN) $(ROOTDIR)/boot/ocamlc)
 endif
 
 BOOT_OCAMLDEP = $(BOOT_OCAMLC) -depend
@@ -202,7 +235,7 @@ OCAMLDEP_CMD = $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) \
 
 # Lexer generation
 
-BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
+BOOT_OCAMLLEX ?= $(subst /,$(DIR_SEP),$(OCAMLRUN) $(ROOTDIR)/boot/ocamllex)
 
 # Default value for OCAMLLEX
 # In those directories where this needs to be overridden, the overriding
@@ -217,7 +250,7 @@ OCAMLLEXFLAGS ?= -q
 
 # Parser generation
 
-OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
+OCAMLYACC ?= $(subst /,$(DIR_SEP),$(ROOTDIR)/yacc/ocamlyacc$(EXE))
 
 OCAMLYACCFLAGS ?= --strict -v
 

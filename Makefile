@@ -71,11 +71,11 @@ include compilerlibs/Makefile.compilerlibs
 
 $(addprefix toplevel/byte/, $(TOPLEVEL_SHARED_CMIS)):\
 toplevel/byte/%.cmi: toplevel/%.cmi
-	cp $< toplevel/$*.mli $(@D)
+	$(call CP, $< toplevel/$*.mli, $(@D))
 
 $(addprefix toplevel/native/, $(TOPLEVEL_SHARED_CMIS)):\
 toplevel/native/%.cmi: toplevel/%.cmi
-	cp $< toplevel/$*.mli $(@D)
+	$(call CP, $< toplevel/$*.mli, $(@D))
 
 beforedepend::
 	cd toplevel ; cp $(TOPLEVEL_SHARED_MLIS) byte/
@@ -91,7 +91,7 @@ $(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE)
 ALL_CONFIG_CMO = utils/config_main.cmo utils/config_boot.cmo
 
 utils/config_%.mli: utils/config.mli
-	cp $^ $@
+	$(call CP, $^, $@)
 
 beforedepend:: utils/config_main.mli utils/config_boot.mli
 
@@ -166,12 +166,12 @@ partialclean::
 
 utils/config.ml: \
   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
-	$(V_GEN)cp $< $@
+	$(V_GEN)$(call CP, $<, $@)
 utils/config_boot.ml: utils/config.fixed.ml utils/config.common.ml
-	$(V_GEN)cat $^ > $@
+	$(V_GEN)$(call CAT_TO, $^, $@)
 
 utils/config_main.ml: utils/config.generated.ml utils/config.common.ml
-	$(V_GEN)cat $^ > $@
+	$(V_GEN)$(call CAT_TO, $^, $@)
 
 .PHONY: reconfigure
 reconfigure:
@@ -273,15 +273,15 @@ FLEXDLL_SOURCE_FILES = \
   $(wildcard $(FLEXDLL_SOURCES)/*.ml)
 
 boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
-	cp $< $@
+	$(call CP, $<, $@)
 
 boot/flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
 	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
 	  -B flexlink.exe support
-	cp $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
-	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
+	$(call CP, $(FLEXDLL_SOURCES)/flexlink.exe, boot/flexlink.byte$(EXE))
+	$(call CP, $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)), boot/)
 
 # Start up the system from the distribution compiler
 # The process depends on whether FlexDLL is also being bootstrapped.
@@ -300,19 +300,19 @@ coldstart: $(COLDSTART_DEPS)
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	$(MAKE) runtime-all
 	$(MAKE) -C stdlib \
-	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
-	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	  OCAMLRUN=$(call SHELL_QUOT,$$(ROOTDIR)/runtime/ocamlrun$(EXE)) \
+	  CAMLC=$(call SHELL_QUOT,$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)) all
 else
-	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
-    CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	$(MAKE) -C stdlib OCAMLRUN=$(call SHELL_QUOT,$$(ROOTDIR)/boot/ocamlruns$(EXE)) \
+    CAMLC=$(call SHELL_QUOT,$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)) all
 	$(MAKE) boot/flexlink.byte$(EXE)
 	$(MAKE) runtime-all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-	rm -f boot/ocamlrun$(EXE)
-	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
-	cd boot; rm -f $(LIBFILES)
-	cd stdlib; cp $(LIBFILES) ../boot
-	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+	$(call RM_F, boot/ocamlrun$(EXE))
+	$(call CP, runtime/ocamlrun$(EXE), boot/ocamlrun$(EXE))
+	$(call RM_F, $(addprefix boot/, $(LIBFILES)))
+	cd stdlib && $(call CP, $(LIBFILES), ../boot)
+	$(call LN_IN, boot, ../runtime/libcamlrun.$(A), libcamlrun.$(A))
 
 # Recompile the core system using the bootstrap compiler
 .PHONY: coreall
@@ -356,7 +356,7 @@ PROMOTE ?= cp
 promote-common:
 	$(PROMOTE) ocamlc$(EXE) boot/ocamlc
 	$(PROMOTE) lex/ocamllex$(EXE) boot/ocamllex
-	cd stdlib; cp $(LIBFILES) ../boot
+	cd stdlib; $(call CP, $(LIBFILES), ../boot)
 
 # Promote the newly compiled system to the rank of cross compiler
 # (Runs on the old runtime, produces code for the new runtime)
@@ -514,7 +514,7 @@ flexlink.opt$(EXE): $(FLEXDLL_SOURCE_FILES)
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
     OCAML_FLEXLINK='$(value OCAMLRUN) $$(ROOTDIR)/boot/flexlink.byte$(EXE)' \
 	  OCAMLOPT='$(FLEXLINK_OCAMLOPT) -nostdlib -I ../stdlib' -B flexlink.exe
-	cp $(FLEXDLL_SOURCES)/flexlink.exe $@
+	$(call CP, $(FLEXDLL_SOURCES)/flexlink.exe, $@)
 
 partialclean::
 	rm -f flexlink.opt$(EXE)
@@ -652,35 +652,34 @@ beforedepend:: lambda/runtimedef.ml
 # Choose the right machine-dependent files
 
 asmcomp/arch.mli: asmcomp/$(ARCH)/arch.mli
-	cd asmcomp; $(LN) $(ARCH)/arch.mli .
+	$(call LN_IN, asmcomp, $(ARCH)/arch.mli, arch.mli)
 
 asmcomp/arch.ml: asmcomp/$(ARCH)/arch.ml
-	cd asmcomp; $(LN) $(ARCH)/arch.ml .
+	$(call LN_IN, asmcomp, $(ARCH)/arch.ml, arch.ml)
 
 asmcomp/proc.ml: asmcomp/$(ARCH)/proc.ml
-	cd asmcomp; $(LN) $(ARCH)/proc.ml .
+	$(call LN_IN, asmcomp, $(ARCH)/proc.ml, proc.ml)
 
 asmcomp/selection.ml: asmcomp/$(ARCH)/selection.ml
-	cd asmcomp; $(LN) $(ARCH)/selection.ml .
+	$(call LN_IN, asmcomp, $(ARCH)/selection.ml, selection.ml)
 
 asmcomp/CSE.ml: asmcomp/$(ARCH)/CSE.ml
-	cd asmcomp; $(LN) $(ARCH)/CSE.ml .
+	$(call LN_IN, asmcomp, $(ARCH)/CSE.ml, CSE.ml)
 
 asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
-	cd asmcomp; $(LN) $(ARCH)/reload.ml .
+	$(call LN_IN, asmcomp, $(ARCH)/reload.ml, reload.ml)
 
 asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
-	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+	$(call LN_IN, asmcomp, $(ARCH)/scheduling.ml, scheduling.ml)
 
 # Preprocess the code emitters
 cvt_emit = tools/cvt_emit$(EXE)
 
 beforedepend:: tools/cvt_emit.ml
 
+# FIXME Can't we do .DELETE_ON_ERROR?
 asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
-	$(V_GEN)echo \# 1 \"asmcomp/$(ARCH)/emit.mlp\" > $@ && \
-	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
-	|| { rm -f $@; exit 2; }
+	$(V_GEN)$(file >$@,# 1 "asmcomp/$(ARCH)/emit.mlp")$(OCAMLRUN) $(cvt_emit) < $< >> $@
 
 partialclean::
 	rm -f asmcomp/emit.ml tools/cvt_emit.ml
@@ -974,7 +973,7 @@ endif
 # Lazily read the contents of runtime/primitives.h, if it exists
 CURRENT_PRIMITIVES = $(eval CURRENT_PRIMITIVES := \
   $$(if $$(wildcard runtime/primitives.h),$\
-    $$(shell cat runtime/primitives.h)))$(CURRENT_PRIMITIVES)
+    $$(shell $(call CAT, runtime/primitives.h))))$(CURRENT_PRIMITIVES)
 
 # $(PRIMITIVES_CHANGED) evaluates to runtime/primitives.new if the file differs
 # from runtime/primitives.h. Unfortunately, GNU make's $(eq ..) function is
@@ -988,7 +987,7 @@ PRIMITIVES_CHANGED = $(if $(and \
            $(subst $(SPACE),-,$(CURRENT_PRIMITIVES)))),,runtime/primitives.new)
 
 runtime/primitives.h: $(PRIMITIVES_CHANGED)
-	$(V_GEN)cp $^ $@
+	$(V_GEN)$(call CP, $^, $@)
 
 # This rule is a little subtle owing to the flexdll bootstrap. When
 # bootstrapping flexdll, runtime/primitives will be generated as a side-effect
@@ -997,7 +996,7 @@ runtime/primitives.h: $(PRIMITIVES_CHANGED)
 # future, it would also mean that the dependency in stdlib/Makefile on the
 # primitives file will still work.
 runtime/primitives: runtime/primitives.h | runtime/ocamlrun$(EXE)
-	$(V_GEN)runtime/ocamlrun$(EXE) -p > $@
+	$(V_GEN)runtime$(DIR_SEP)ocamlrun$(EXE) -p > $@
 
 # These are provided as a temporary shim to allow cross-compilation systems
 # to supply a host C compiler and different flags and a linking macro.
@@ -1011,12 +1010,14 @@ $(SAK): runtime/sak.$(O)
 runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(V_CC)$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
 
-C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
+# Would it be better to be reading the literal from stdin?
+C_LITERAL = $(shell $(SAK_BUILD) encode-C-literal "$(1)")
 
+# XXX This obviously needs hiding behind a macro properly!
 runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
-	$(V_GEN)echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@ && \
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@ && \
-	echo '#define HOST "$(HOST)"' >> $@
+	$(V_GEN)$(file >$@,/* This file is generated from $(ROOTDIR)/Makefile.config */) \
+  $(file >>$@,#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))) \
+  $(file >>$@,#define HOST "$(HOST)")
 
 ## Runtime libraries and programs
 
@@ -1129,7 +1130,7 @@ endef
 runtime/prims.$(O): runtime/caml/config.h runtime/primitives.h
 
 $(DEPDIR)/runtime:
-	$(MKDIR) $@
+	$(call MKDIR, $@)
 
 runtime_OBJECT_TYPES = % %.b %.bd %.bi %.bpic
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -1213,7 +1214,7 @@ endif
 .PHONY: makeruntime
 makeruntime: runtime-all
 stdlib/libcamlrun.$(A): runtime-all
-	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+	$(call LN_IN, stdlib, ../runtime/libcamlrun.$(A), libcamlrun.$(A))
 clean::
 	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
 	rm -f $(addprefix runtime/, ocamlrun ocamlrund ocamlruni ocamlruns sak)
@@ -1230,7 +1231,7 @@ runtimeopt: stdlib/libasmrun.$(A)
 .PHONY: makeruntimeopt
 makeruntimeopt: runtime-allopt
 stdlib/libasmrun.$(A): runtime-allopt
-	cd stdlib; $(LN) ../runtime/libasmrun.$(A) .
+	$(call LN_IN, stdlib, ../runtime/libasmrun.$(A), libasmrun.$(A))
 
 clean::
 	rm -f stdlib/libasmrun.a stdlib/libasmrun.lib
@@ -1344,10 +1345,9 @@ include Makefile.menhir
 # generated parser.ml.
 
 parsing/camlinternalMenhirLib.ml: boot/menhir/menhirLib.ml
-	$(V_GEN)cp $< $@
+	$(V_GEN)$(call CP, $<, $@)
 parsing/camlinternalMenhirLib.mli: boot/menhir/menhirLib.mli
-	$(V_GEN)echo '[@@@ocaml.warning "-67"]' > $@ && \
-	cat $< >> $@
+	$(V_GEN)$(file >$@,[@@@ocaml.warning "-67"])$(call CAT, $<) >> $@
 
 # Copy parsing/parser.ml from boot/
 
@@ -1361,11 +1361,9 @@ parsing/parser.ml: $(PARSER_DEPS)
 ifeq "$(OCAML_DEVELOPMENT_VERSION)" "true"
 	@-tools/check-parser-uptodate-or-warn.sh
 endif
-	$(V_GEN)echo 'module MenhirLib = CamlinternalMenhirLib' > $@
-	@cat $< >> $@
+	$(V_GEN)$(file >$@,module MenhirLib = CamlinternalMenhirLib)$(call CAT, $<) >> $@
 parsing/parser.mli: boot/menhir/parser.mli
-	$(V_GEN)echo 'module MenhirLib = CamlinternalMenhirLib' > $@
-	@cat $< >> $@
+	$(V_GEN)$(file >$@,module MenhirLib = CamlinternalMenhirLib)$(call CAT, $<) >> $@
 
 beforedepend:: parsing/camlinternalMenhirLib.ml \
   parsing/camlinternalMenhirLib.mli \
