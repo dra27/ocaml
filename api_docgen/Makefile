@@ -13,7 +13,7 @@
 #*                                                                        *
 #**************************************************************************
 
-SHELL = cmd
+#SHELL = cmd
 
 # Used by included Makefiles
 ROOTDIR = ..

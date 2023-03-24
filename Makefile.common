@@ -16,7 +16,7 @@
 # This makefile contains common definitions and rules shared by
 # other Makefiles
 
-SHELL = cmd
+#SHELL = cmd
 
 include $(ROOTDIR)/Makefile.config_if_required
 
