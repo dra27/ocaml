@@ -1234,7 +1234,6 @@ runtimeopt: stdlib/libasmrun.$(A)
 makeruntimeopt: runtime-allopt
 # XXX Caution - didn't Sebastien try this before when doing the merge?
 stdlib/libasmrun.$(A): runtime/libasmrun.$(A)
-	cd stdlib; $(LN) ../$^ .
 	$(call LN_IN, stdlib, ../$^, libasmrun.$(A))
 
 clean::
@@ -2099,7 +2098,7 @@ otherlibs/systhreads/systhreads.cmxa: otherlibs/systhreads/systhreads.cma otherl
 system: ocamlc$(EXE) $(if $(filter true, $(BOOTSTRAPPING_FLEXDLL)),flexlink.opt$(EXE)) ocamlyacc ocamllex $(TOOLS_BYTECODE_TARGETS) runtime-all runtime-allopt stdlib/stdlib.cma ocaml ocamlopt stdlib/stdlib.cmxa ocamlc.opt \
         ocamlopt.opt ocamllex.opt $(foreach lib, $(OTHERLIBRARIES), otherlibs/$(lib)/$(lib).cma otherlibs/$(lib)/$(lib).cmxa) \
         ocamlnat $(TOOLS_NATIVE_TARGETS) $(TOOLS_OPT_TARGETS) $(OTHER_TOOLS) $(WITH_DEBUGGER) $(WITH_OCAMLDOC) $(OCAMLDOC_OPT) $(WITH_OCAMLTEST) $(OCAMLTEST_OPT) \
-        $(if $(filter ocamldoc-true, $(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)), manpages)
+        $(if $(filter true, $(build_stdlib_manpages)), manpages)
 #ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 #	$(MAKE) flexlink.opt$(EXE)
 #endif
