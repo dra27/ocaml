@@ -123,28 +123,13 @@ endif
 
 BOOT_OCAMLDEP = $(BOOT_OCAMLC) -depend
 
-ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-  FLEXLINK_ENV =
-  CAMLOPT_CMD = $(CAMLOPT)
-  OCAMLOPT_CMD = $(OCAMLOPT)
-  MKLIB_CMD = $(MKLIB)
-  ocamlc_cmd = $(ocamlc)
-  ocamlopt_cmd = $(ocamlopt)
-else
-ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
-  FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/boot/ocamlrun$(EXE) \
-                    $(ROOTDIR)/boot/flexlink.byte$(EXE)"
-else
-  FLEXLINK_ENV = \
-    OCAML_FLEXLINK="$(ROOTDIR)/flexlink.opt$(EXE) -I $(ROOTDIR)/stdlib/flexdll"
-endif # ifeq "$(wildcard $(ROOTDIR)/flexlink.opt$(EXE))" ""
-  CAMLOPT_CMD = $(FLEXLINK_ENV) $(CAMLOPT)
-  OCAMLOPT_CMD = $(FLEXLINK_ENV) $(OCAMLOPT)
-  MKLIB_CMD = $(FLEXLINK_ENV) $(MKLIB)
-  ocamlc_cmd = $(FLEXLINK_ENV) $(ocamlc)
-  ocamlopt_cmd = $(FLEXLINK_ENV) $(ocamlopt)
-endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
+ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+  DIR := $(realpath $(ROOTDIR))/boot/bin
+ifeq "$(filter $(DIR), $(subst :, ,$(PATH)))" ""
+  export PATH := $(DIR):$(PATH)
+endif
+  undefine DIR
+endif
 
 # List of other libraries
 ALL_OTHERLIBS = dynlink str systhreads unix runtime_events
@@ -260,7 +245,7 @@ $(1)$(EXE): \
 endef # OCAML_BYTECODE_PROGRAM
 
 LINK_NATIVE_PROGRAM =\
-  $(CAMLOPT_CMD) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
+  $(CAMLOPT) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
 
 define OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
