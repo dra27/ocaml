@@ -582,12 +582,18 @@ let matching_filename filename { pattern } =
     filename = pattern
 
 let apply_config_file ppf position =
-  let config_file =
-    Filename.concat Config.standard_library "ocaml_compiler_internal_params"
-  in
   let config =
-    if Sys.file_exists config_file then
-      load_config ppf config_file
+    let bindir = Filename.dirname Sys.executable_name in
+    (* Sys.executable_name is usually resolved, but if it's been called as, say
+       ocamlc.opt then skip looking for ocaml_compiler_internal_params *)
+    if not (Filename.is_implicit bindir) then
+      let config_file =
+        Filename.concat bindir "ocaml_compiler_internal_params"
+      in
+      if Sys.file_exists config_file then
+        load_config ppf config_file
+      else
+        []
     else
       []
   in

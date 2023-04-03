@@ -180,7 +180,7 @@ the command line arguments, i.e. "a=x,_,b=y" means that "a=x" should be
 executed before parsing the arguments, and "b=y" after. Finally,
 an alternative separator can be specified as the
 first character of the string, within the set ":|; ,".
-\item["ocaml_compiler_internal_params" \rm(file in the stdlib directory)]
+\item["ocaml_compiler_internal_params" \rm(file in the same directory as ocamlc/ocamlopt)]
 A mapping of file names to lists of arguments that
 will be added to the command line (and "OCAMLPARAM") arguments.
 \item["OCAML_FLEXLINK" \rm(environment variable)]

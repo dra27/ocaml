@@ -55,6 +55,7 @@ META
 /libtool
 /ocamlc.opt
 /expunge
+/ocaml_compiler_internal_params
 /ocaml
 /ocamlopt
 /ocamlopt.opt
@@ -77,6 +78,7 @@ META
 /boot/camlheader
 /boot/ocamlc.opt
 /boot/flexlink.byte
+/boot/ocaml_compiler_internal_params
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli

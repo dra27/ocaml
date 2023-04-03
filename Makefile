@@ -1591,10 +1591,12 @@ distclean: clean
 	rm -f tools/eventlog_metadata tools/*.bak
 	rm -f utils/config.generated.ml
 	rm -f compilerlibs/META
+	rm -f ocaml_compiler_internal_params
 	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
 	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexlink.byte boot/flexlink.byte.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
+	      boot/ocaml_compiler_internal_params \
 	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
 	rm -rf autom4te.cache flexdll-sources
