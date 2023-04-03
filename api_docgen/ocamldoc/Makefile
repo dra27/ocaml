@@ -44,7 +44,7 @@ build/latex/ifocamldoc.tex: | build/latex
 OCAMLDOC_FLAGS =
 
 build/libref/stdlib.odoc: OCAMLDOC_FLAGS += -pp \
-  "$(subst /,\,$(ROOTDIR)/runtime/sak) namespace"
+  "$(subst /,$(DIR_SEP),$(ROOTDIR)/runtime/sak) namespace"
 
 #build/libref/%Labels.odoc: OCAMLDOC_FLAGS += -pp \
 #  "$(AWK) -f $(ROOTDIR)/api_docgen/ocamldoc/expand_module_aliases.awk"
