@@ -72,6 +72,7 @@ META
 /asmcomp/scheduling.ml
 /asmcomp/CSE.ml
 
+/boot/bin/**
 /boot/ocamlrun
 /boot/ocamlruns
 /boot/camlheader
