@@ -1,0 +1,58 @@
+--- a	2023-09-28 18:47:29.428524060 +0100
++++ b	2023-09-28 18:47:29.432524205 +0100
+@@ -1,7 +1,3 @@
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/utils/config.common.ml b/utils/config.common.ml
+ --- a/utils/config.common.ml
+ +++ b/utils/config.common.ml
+@@ -9,33 +5,33 @@
+    with Not_found ->
+      standard_library_default
+  
+--let exec_magic_number = "Caml1999X032"
+-+let exec_magic_number = "Caml1999X033"
++-let exec_magic_number = "Caml1999X031"
+++let exec_magic_number = "Caml1999X032"
+      (* exec_magic_number is duplicated in runtime/caml/exec.h *)
+--and cmi_magic_number = "Caml1999I032"
+--and cmo_magic_number = "Caml1999O032"
+--and cma_magic_number = "Caml1999A032"
++-and cmi_magic_number = "Caml1999I031"
++-and cmo_magic_number = "Caml1999O031"
++-and cma_magic_number = "Caml1999A031"
+ +and cmi_magic_number = "Caml1999I033"
+ +and cmo_magic_number = "Caml1999O033"
+ +and cma_magic_number = "Caml1999A033"
+  and cmx_magic_number =
+    if flambda then
+--    "Caml1999y032"
++-    "Caml1999y031"
+ +    "Caml1999y033"
+    else
+--    "Caml1999Y032"
++-    "Caml1999Y031"
+ +    "Caml1999Y033"
+  and cmxa_magic_number =
+    if flambda then
+--    "Caml1999z032"
++-    "Caml1999z031"
+ +    "Caml1999z033"
+    else
+--    "Caml1999Z032"
+--and ast_impl_magic_number = "Caml1999M032"
+--and ast_intf_magic_number = "Caml1999N032"
+--and cmxs_magic_number = "Caml1999D032"
+--and cmt_magic_number = "Caml1999T032"
+--and linear_magic_number = "Caml1999L032"
++-    "Caml1999Z031"
++-and ast_impl_magic_number = "Caml1999M031"
++-and ast_intf_magic_number = "Caml1999N031"
++-and cmxs_magic_number = "Caml1999D031"
++-and cmt_magic_number = "Caml1999T031"
++-and linear_magic_number = "Caml1999L031"
+ +    "Caml1999Z033"
+ +and ast_impl_magic_number = "Caml1999M033"
+ +and ast_intf_magic_number = "Caml1999N033"
