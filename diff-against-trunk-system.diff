@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..ecea519562
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:28.580493169 +0100
+++++ b	2023-09-28 18:47:28.588493461 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/stdlib/format.mli b/stdlib/format.mli
++ --- a/stdlib/format.mli
++ +++ b/stdlib/format.mli
++-@@ -1356,7 +1356,8 @@ val sprintf : ('a, unit, string) format -> 'a
+++@@ -1359,7 +1359,8 @@ val sprintf : ('a, unit, string) format -> 'a
++  (** Same as [printf] above, but instead of printing on a formatter,
++    returns a string containing the result of formatting the arguments.
++    Note that the pretty-printer queue is flushed at the end of {e each
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10086,13 +10100,27 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..adec26b26c
+index 0000000000..52c11f5be6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..ecea519562
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:28.580493169 +0100
++++++ b	2023-09-28 18:47:28.588493461 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/stdlib/format.mli b/stdlib/format.mli
+++ --- a/stdlib/format.mli
+++ +++ b/stdlib/format.mli
+++-@@ -1356,7 +1356,8 @@ val sprintf : ('a, unit, string) format -> 'a
++++@@ -1359,7 +1359,8 @@ val sprintf : ('a, unit, string) format -> 'a
+++  (** Same as [printf] above, but instead of printing on a formatter,
+++    returns a string containing the result of formatting the arguments.
+++    Note that the pretty-printer queue is flushed at the end of {e each
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20098,21 +20126,7 @@ index 0000000000..adec26b26c
 ++@@ -64,8 +64,8 @@ function set_configuration {
 ++         mingw64)
 ++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFI
+++             host='--host=x86_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -22107,7 +22121,7 @@ index b7c53a7703..bf854e876c 100644
  )
 +*)
 diff --git a/stdlib/format.mli b/stdlib/format.mli
-index b2544b8e6c..ab48e65d29 100644
+index aba1303f4f..ea80928c3f 100644
 --- a/stdlib/format.mli
 +++ b/stdlib/format.mli
 @@ -964,6 +964,7 @@ val formatter_of_out_channel : out_channel -> formatter

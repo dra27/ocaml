@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:28.580493169 +0100
++++ b	2023-09-28 18:47:28.588493461 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/stdlib/format.mli b/stdlib/format.mli
+ --- a/stdlib/format.mli
+ +++ b/stdlib/format.mli
+-@@ -1356,7 +1356,8 @@ val sprintf : ('a, unit, string) format -> 'a
++@@ -1359,7 +1359,8 @@ val sprintf : ('a, unit, string) format -> 'a
+  (** Same as [printf] above, but instead of printing on a formatter,
+    returns a string containing the result of formatting the arguments.
+    Note that the pretty-printer queue is flushed at the end of {e each
