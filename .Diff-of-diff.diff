@@ -1,58 +1,29 @@
---- a	2023-09-28 18:47:29.428524060 +0100
-+++ b	2023-09-28 18:47:29.432524205 +0100
-@@ -1,7 +1,3 @@
--diff --git a/boot/ocamlc b/boot/ocamlc
--Binary files a/boot/ocamlc and b/boot/ocamlc differ
--diff --git a/boot/ocamllex b/boot/ocamllex
--Binary files a/boot/ocamllex and b/boot/ocamllex differ
- diff --git a/utils/config.common.ml b/utils/config.common.ml
- --- a/utils/config.common.ml
- +++ b/utils/config.common.ml
-@@ -9,33 +5,33 @@
-    with Not_found ->
-      standard_library_default
+--- a	2023-09-28 18:47:29.928542269 +0100
++++ b	2023-09-28 18:47:29.940542706 +0100
+@@ -7,26 +7,3 @@
+  ---------------
   
---let exec_magic_number = "Caml1999X032"
--+let exec_magic_number = "Caml1999X033"
-+-let exec_magic_number = "Caml1999X031"
-++let exec_magic_number = "Caml1999X032"
-      (* exec_magic_number is duplicated in runtime/caml/exec.h *)
---and cmi_magic_number = "Caml1999I032"
---and cmo_magic_number = "Caml1999O032"
---and cma_magic_number = "Caml1999A032"
-+-and cmi_magic_number = "Caml1999I031"
-+-and cmo_magic_number = "Caml1999O031"
-+-and cma_magic_number = "Caml1999A031"
- +and cmi_magic_number = "Caml1999I033"
- +and cmo_magic_number = "Caml1999O033"
- +and cma_magic_number = "Caml1999A033"
-  and cmx_magic_number =
-    if flambda then
---    "Caml1999y032"
-+-    "Caml1999y031"
- +    "Caml1999y033"
-    else
---    "Caml1999Y032"
-+-    "Caml1999Y031"
- +    "Caml1999Y033"
-  and cmxa_magic_number =
-    if flambda then
---    "Caml1999z032"
-+-    "Caml1999z031"
- +    "Caml1999z033"
-    else
---    "Caml1999Z032"
---and ast_impl_magic_number = "Caml1999M032"
---and ast_intf_magic_number = "Caml1999N032"
---and cmxs_magic_number = "Caml1999D032"
---and cmt_magic_number = "Caml1999T032"
---and linear_magic_number = "Caml1999L032"
-+-    "Caml1999Z031"
-+-and ast_impl_magic_number = "Caml1999M031"
-+-and ast_intf_magic_number = "Caml1999N031"
-+-and cmxs_magic_number = "Caml1999D031"
-+-and cmt_magic_number = "Caml1999T031"
-+-and linear_magic_number = "Caml1999L031"
- +    "Caml1999Z033"
- +and ast_impl_magic_number = "Caml1999M033"
- +and ast_intf_magic_number = "Caml1999N033"
+  ### Language features:
+-diff --git a/VERSION b/VERSION
+---- a/VERSION
+-+++ b/VERSION
+-@@ -1,4 +1,4 @@
+--5.1.0+dev1-2022-06-09
+-+5.1.0+dev2-2023-04-11
+- 
+- # Starting with OCaml 4.14, although the version string that appears above is
+- # still correct and this file can thus still be used to figure it out,
+-diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
+---- a/build-aux/ocaml_version.m4
+-+++ b/build-aux/ocaml_version.m4
+-@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [1])
+- m4_define([OCAML__VERSION_PATCHLEVEL], [0])
+- # Note that the OCAML__VERSION_EXTRA string defined below is always empty
+- # for officially-released versions of OCaml.
+--m4_define([OCAML__VERSION_EXTRA], [dev1-2022-06-09])
+-+m4_define([OCAML__VERSION_EXTRA], [dev2-2023-04-11])
+- 
+- # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
+- # single character:
+-diff --git a/configure b/configure
+-Binary files a/configure and b/configure differ
