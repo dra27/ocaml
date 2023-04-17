@@ -1386,72 +1386,190 @@ val do_domain_local_at_exit : (unit -> unit) ref
 
 (** {1:modules Standard library modules } *)
 
-(*MODULE_ALIASES*)
-module Arg            = Arg
-module Array          = Array
-module ArrayLabels    = ArrayLabels
-module Atomic         = Atomic
-module Bigarray       = Bigarray
-module Bool           = Bool
-module Buffer         = Buffer
-module Bytes          = Bytes
-module BytesLabels    = BytesLabels
-module Callback       = Callback
-module Char           = Char
-module Complex        = Complex
-module Condition      = Condition
-module Digest         = Digest
-module Domain         = Domain
+(** @canonical Stdlib.Arg *)
+module Arg = Stdlib__Arg
+
+(** @canonical Stdlib.Array *)
+module Array = Stdlib__Array
+
+(** @canonical Stdlib.ArrayLabels *)
+module ArrayLabels = Stdlib__ArrayLabels
+
+(** @canonical Stdlib.Atomic *)
+module Atomic = Stdlib__Atomic
+
+(** @canonical Stdlib.Bigarray *)
+module Bigarray = Stdlib__Bigarray
+
+(** @canonical Stdlib.Bool *)
+module Bool = Stdlib__Bool
+
+(** @canonical Stdlib.Buffer *)
+module Buffer = Stdlib__Buffer
+
+(** @canonical Stdlib.Bytes *)
+module Bytes = Stdlib__Bytes
+
+(** @canonical Stdlib.BytesLabels *)
+module BytesLabels = Stdlib__BytesLabels
+
+(** @canonical Stdlib.Callback *)
+module Callback = Stdlib__Callback
+
+(** @canonical Stdlib.Char *)
+module Char = Stdlib__Char
+
+(** @canonical Stdlib.Complex *)
+module Complex = Stdlib__Complex
+
+(** @canonical Stdlib.Condition *)
+module Condition = Stdlib__Condition
+
+(** @canonical Stdlib.Digest *)
+module Digest = Stdlib__Digest
+
+(** @canonical Stdlib.Domain *)
+module Domain = Stdlib__Domain
 [@@alert "-unstable"]
 [@@alert unstable
     "The Domain interface may change in incompatible ways in the future."
 ]
-module Effect         = Effect
+
+(** @canonical Stdlib.Effect *)
+module Effect = Stdlib__Effect
 [@@alert "-unstable"]
 [@@alert unstable
     "The Effect interface may change in incompatible ways in the future."
 ]
-module Either         = Either
-module Ephemeron      = Ephemeron
-module Filename       = Filename
-module Float          = Float
-module Format         = Format
-module Fun            = Fun
-module Gc             = Gc
-module Hashtbl        = Hashtbl
-module In_channel     = In_channel
-module Int            = Int
-module Int32          = Int32
-module Int64          = Int64
-module Lazy           = Lazy
-module Lexing         = Lexing
-module List           = List
-module ListLabels     = ListLabels
-module Map            = Map
-module Marshal        = Marshal
-module MoreLabels     = MoreLabels
-module Mutex          = Mutex
-module Nativeint      = Nativeint
-module Obj            = Obj
-module Oo             = Oo
-module Option         = Option
-module Out_channel    = Out_channel
-module Parsing        = Parsing
-module Printexc       = Printexc
-module Printf         = Printf
-module Queue          = Queue
-module Random         = Random
-module Result         = Result
-module Scanf          = Scanf
-module Semaphore      = Semaphore
-module Seq            = Seq
-module Set            = Set
-module Stack          = Stack
-module StdLabels      = StdLabels
-module String         = String
-module StringLabels   = StringLabels
-module Sys            = Sys
-module Type           = Type
-module Uchar          = Uchar
-module Unit           = Unit
-module Weak           = Weak
+
+(** @canonical Stdlib.Either *)
+module Either = Stdlib__Either
+
+(** @canonical Stdlib.Ephemeron *)
+module Ephemeron = Stdlib__Ephemeron
+
+(** @canonical Stdlib.Filename *)
+module Filename = Stdlib__Filename
+
+(** @canonical Stdlib.Float *)
+module Float = Stdlib__Float
+
+(** @canonical Stdlib.Format *)
+module Format = Stdlib__Format
+
+(** @canonical Stdlib.Fun *)
+module Fun = Stdlib__Fun
+
+(** @canonical Stdlib.Gc *)
+module Gc = Stdlib__Gc
+
+(** @canonical Stdlib.Hashtbl *)
+module Hashtbl = Stdlib__Hashtbl
+
+(** @canonical Stdlib.In_channel *)
+module In_channel = Stdlib__In_channel
+
+(** @canonical Stdlib.Int *)
+module Int = Stdlib__Int
+
+(** @canonical Stdlib.Int32 *)
+module Int32 = Stdlib__Int32
+
+(** @canonical Stdlib.Int64 *)
+module Int64 = Stdlib__Int64
+
+(** @canonical Stdlib.Lazy *)
+module Lazy = Stdlib__Lazy
+
+(** @canonical Stdlib.Lexing *)
+module Lexing = Stdlib__Lexing
+
+(** @canonical Stdlib.List *)
+module List = Stdlib__List
+
+(** @canonical Stdlib.ListLabels *)
+module ListLabels = Stdlib__ListLabels
+
+(** @canonical Stdlib.Map *)
+module Map = Stdlib__Map
+
+(** @canonical Stdlib.Marshal *)
+module Marshal = Stdlib__Marshal
+
+(** @canonical Stdlib.MoreLabels *)
+module MoreLabels = Stdlib__MoreLabels
+
+(** @canonical Stdlib.Mutex *)
+module Mutex = Stdlib__Mutex
+
+(** @canonical Stdlib.Nativeint *)
+module Nativeint = Stdlib__Nativeint
+
+(** @canonical Stdlib.Obj *)
+module Obj = Stdlib__Obj
+
+(** @canonical Stdlib.Oo *)
+module Oo = Stdlib__Oo
+
+(** @canonical Stdlib.Option *)
+module Option = Stdlib__Option
+
+(** @canonical Stdlib.Out_channel *)
+module Out_channel = Stdlib__Out_channel
+
+(** @canonical Stdlib.Parsing *)
+module Parsing = Stdlib__Parsing
+
+(** @canonical Stdlib.Printexc *)
+module Printexc = Stdlib__Printexc
+
+(** @canonical Stdlib.Printf *)
+module Printf = Stdlib__Printf
+
+(** @canonical Stdlib.Queue *)
+module Queue = Stdlib__Queue
+
+(** @canonical Stdlib.Random *)
+module Random = Stdlib__Random
+
+(** @canonical Stdlib.Result *)
+module Result = Stdlib__Result
+
+(** @canonical Stdlib.Scanf *)
+module Scanf = Stdlib__Scanf
+
+(** @canonical Stdlib.Semaphore *)
+module Semaphore = Stdlib__Semaphore
+
+(** @canonical Stdlib.Seq *)
+module Seq = Stdlib__Seq
+
+(** @canonical Stdlib.Set *)
+module Set = Stdlib__Set
+
+(** @canonical Stdlib.Stack *)
+module Stack = Stdlib__Stack
+
+(** @canonical Stdlib.StdLabels *)
+module StdLabels = Stdlib__StdLabels
+
+(** @canonical Stdlib.String *)
+module String = Stdlib__String
+
+(** @canonical Stdlib.StringLabels *)
+module StringLabels = Stdlib__StringLabels
+
+(** @canonical Stdlib.Sys *)
+module Sys = Stdlib__Sys
+
+(** @canonical Stdlib.Type *)
+module Type = Stdlib__Type
+
+(** @canonical Stdlib.Uchar *)
+module Uchar = Stdlib__Uchar
+
+(** @canonical Stdlib.Unit *)
+module Unit = Stdlib__Unit
+
+(** @canonical Stdlib.Weak *)
+module Weak = Stdlib__Weak

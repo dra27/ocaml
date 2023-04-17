@@ -25,8 +25,7 @@
     ((action
       (progn
        (run sed -i s/%atomic_load/%identity/ %{input-file})
-       (run sed -i s/%atomic_cas/%obj_set_field/ %{input-file})
-       (run awk -f %{dep:expand_module_aliases.awk} %{input-file})))
+       (run sed -i s/%atomic_cas/%obj_set_field/ %{input-file})))
       stdlib)
      ;; AWFUL HACKS: remove once 5.0 is released
      ;; (this is needed because we're building with a compiler which doesn't
