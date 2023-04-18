@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..2d6f11ab83
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:32.592639203 +0100
-++++ b	2023-09-28 18:47:32.600639494 +0100
-+@@ -3,7 +3,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1950,16 +1950,18 @@ AC_LINK_IFELSE(
-++@@ -1964,16 +1964,18 @@ AC_LINK_IFELSE(
-+      AC_DEFINE([HAS_BSD_GETAFFINITY_NP])],
-+      [AC_MSG_RESULT([pthread_getaffinity_np not found])])])
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -28,10 +14,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 36a9c78b17..6985844c00 100644
+index 5a273962ce..5e4ce911dd 100644
 --- a/Changes
 +++ b/Changes
-@@ -1323,11 +1323,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1336,11 +1336,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -43,7 +29,7 @@ index 36a9c78b17..6985844c00 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1356,6 +1351,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1369,6 +1364,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -74,7 +60,7 @@ index 36a9c78b17..6985844c00 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1391,13 +1410,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1404,13 +1423,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -90,7 +76,7 @@ index 36a9c78b17..6985844c00 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1504,6 +1523,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1517,6 +1536,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -100,7 +86,7 @@ index 36a9c78b17..6985844c00 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1767,6 +1789,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1780,6 +1802,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10100,27 +10086,13 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..65552f8d3d
+index 0000000000..2b81e4faf1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10027 @@
+@@ -0,0 +1,10023 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..2d6f11ab83
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:32.592639203 +0100
-+++++ b	2023-09-28 18:47:32.600639494 +0100
-++@@ -3,7 +3,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1950,16 +1950,18 @@ AC_LINK_IFELSE(
-+++@@ -1964,16 +1964,18 @@ AC_LINK_IFELSE(
-++      AC_DEFINE([HAS_BSD_GETAFFINITY_NP])],
-++      [AC_MSG_RESULT([pthread_getaffinity_np not found])])])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10134,10 +10106,10 @@ index 0000000000..65552f8d3d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 36a9c78b17..6985844c00 100644
++index 5a273962ce..5e4ce911dd 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1323,11 +1323,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1336,11 +1336,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10149,7 +10121,7 @@ index 0000000000..65552f8d3d
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1356,6 +1351,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1369,6 +1364,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10180,7 +10152,7 @@ index 0000000000..65552f8d3d
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1391,13 +1410,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1404,13 +1423,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10196,7 +10168,7 @@ index 0000000000..65552f8d3d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1504,6 +1523,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1517,6 +1536,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10206,7 +10178,7 @@ index 0000000000..65552f8d3d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1767,6 +1789,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1780,6 +1802,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20130,7 +20102,17 @@ index 0000000000..65552f8d3d
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
 +++            # Explicitly test dependency generation on msvc64
-+++  
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFI
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
