@@ -1,38 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7e54c30212
+index 0000000000..2d6f11ab83
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:47:32.268627421 +0100
-++++ b	2023-09-28 18:47:32.284628003 +0100
-+@@ -16,7 +16,7 @@
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:32.592639203 +0100
+++++ b	2023-09-28 18:47:32.600639494 +0100
++@@ -3,7 +3,7 @@
 + diff --git a/configure.ac b/configure.ac
 + --- a/configure.ac
 + +++ b/configure.ac
-+-@@ -1924,7 +1924,8 @@ AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
-++@@ -1938,7 +1938,8 @@ AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
-+  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
++-@@ -1950,16 +1950,18 @@ AC_LINK_IFELSE(
+++@@ -1964,16 +1964,18 @@ AC_LINK_IFELSE(
++      AC_DEFINE([HAS_BSD_GETAFFINITY_NP])],
++      [AC_MSG_RESULT([pthread_getaffinity_np not found])])])
 +  
-+  ## pthread_getaffinity_np, args differ from GNU and BSD
-+@@ -26,7 +26,7 @@
-+    [AC_LANG_PROGRAM(
-+      [[#define _GNU_SOURCE
-+        #include <sched.h>
-+-@@ -1933,8 +1934,9 @@ AC_COMPILE_IFELSE(
-++@@ -1947,8 +1948,9 @@ AC_COMPILE_IFELSE(
-+        CPU_ZERO(&cs);
-+        CPU_COUNT(&cs);
-+        pthread_getaffinity_np(pthread_self(), sizeof(cs), &cs);]])],
-+@@ -38,7 +38,7 @@
-+      [AC_LANG_PROGRAM(
-+        [[#include <pthread.h>
-+          #include <pthread_np.h>
-+-@@ -1944,7 +1946,9 @@ AC_COMPILE_IFELSE(
-++@@ -1958,7 +1960,9 @@ AC_COMPILE_IFELSE(
-+          CPU_ZERO(&cs);
-+          CPU_COUNT(&cs);
-+          pthread_getaffinity_np(pthread_self(), sizeof(cs), &cs);]])],
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -3208,10 +3190,10 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index eca34d36e2..698c4e3df9 100755
+index 75fd072a3b..9df710a879 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 32c5f703e6..e6bbdba831 100644
+index 5973e93c01..c1ba33910a 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3347,7 +3329,7 @@ index 32c5f703e6..e6bbdba831 100644
  )
  
  native_cflags=''
-@@ -2007,11 +2021,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -2009,11 +2023,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3372,7 +3354,7 @@ index 32c5f703e6..e6bbdba831 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2062,6 +2088,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2064,6 +2090,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3403,7 +3385,7 @@ index 32c5f703e6..e6bbdba831 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2208,8 +2258,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2210,8 +2260,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32*],
@@ -10118,45 +10100,27 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..14dbe05d8f
+index 0000000000..65552f8d3d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10116 @@
+@@ -0,0 +1,10027 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..7e54c30212
++index 0000000000..2d6f11ab83
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:47:32.268627421 +0100
-+++++ b	2023-09-28 18:47:32.284628003 +0100
-++@@ -16,7 +16,7 @@
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:32.592639203 +0100
++++++ b	2023-09-28 18:47:32.600639494 +0100
+++@@ -3,7 +3,7 @@
 ++ diff --git a/configure.ac b/configure.ac
 ++ --- a/configure.ac
 ++ +++ b/configure.ac
-++-@@ -1924,7 +1924,8 @@ AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
-+++@@ -1938,7 +1938,8 @@ AC_CHECK_FUNC([ffs], [AC_DEFINE([HAS_FFS])])
-++  AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
+++-@@ -1950,16 +1950,18 @@ AC_LINK_IFELSE(
++++@@ -1964,16 +1964,18 @@ AC_LINK_IFELSE(
+++      AC_DEFINE([HAS_BSD_GETAFFINITY_NP])],
+++      [AC_MSG_RESULT([pthread_getaffinity_np not found])])])
 ++  
-++  ## pthread_getaffinity_np, args differ from GNU and BSD
-++@@ -26,7 +26,7 @@
-++    [AC_LANG_PROGRAM(
-++      [[#define _GNU_SOURCE
-++        #include <sched.h>
-++-@@ -1933,8 +1934,9 @@ AC_COMPILE_IFELSE(
-+++@@ -1947,8 +1948,9 @@ AC_COMPILE_IFELSE(
-++        CPU_ZERO(&cs);
-++        CPU_COUNT(&cs);
-++        pthread_getaffinity_np(pthread_self(), sizeof(cs), &cs);]])],
-++@@ -38,7 +38,7 @@
-++      [AC_LANG_PROGRAM(
-++        [[#include <pthread.h>
-++          #include <pthread_np.h>
-++-@@ -1944,7 +1946,9 @@ AC_COMPILE_IFELSE(
-+++@@ -1958,7 +1960,9 @@ AC_COMPILE_IFELSE(
-++          CPU_ZERO(&cs);
-++          CPU_COUNT(&cs);
-++          pthread_getaffinity_np(pthread_self(), sizeof(cs), &cs);]])],
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -13332,10 +13296,10 @@ index 0000000000..14dbe05d8f
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index eca34d36e2..698c4e3df9 100755
++index 75fd072a3b..9df710a879 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 32c5f703e6..e6bbdba831 100644
++index 5973e93c01..c1ba33910a 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13471,7 +13435,7 @@ index 0000000000..14dbe05d8f
 + )
 + 
 + native_cflags=''
-+@@ -2007,11 +2021,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -2009,11 +2023,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13496,7 +13460,7 @@ index 0000000000..14dbe05d8f
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2062,6 +2088,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2064,6 +2090,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13527,7 +13491,7 @@ index 0000000000..14dbe05d8f
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2208,8 +2258,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2210,8 +2260,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32*],
@@ -20166,78 +20130,7 @@ index 0000000000..14dbe05d8f
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
 +++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../$BUILD_PREFIX-$PORT/bu
++++  
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
