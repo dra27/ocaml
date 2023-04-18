@@ -17949,6 +17949,8 @@ fi
 
 
 ## pthread_getaffinity_np, args differ from GNU and BSD
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking arguments for pthread_getaffinity_np" >&5
+printf %s "checking arguments for pthread_getaffinity_np... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #define _GNU_SOURCE
@@ -17965,8 +17967,10 @@ cpu_set_t cs;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_compile "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: gnu" >&5
+printf "%s\n" "gnu" >&6; }
   printf "%s\n" "#define HAS_GNU_GETAFFINITY_NP 1" >>confdefs.h
 
 else $as_nop
@@ -17987,14 +17991,21 @@ cpuset_t cs;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_compile "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
-  printf "%s\n" "#define HAS_BSD_GETAFFINITY_NP 1" >>confdefs.h
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: BSD" >&5
+printf "%s\n" "BSD" >&6; }
+    printf "%s\n" "#define HAS_BSD_GETAFFINITY_NP 1" >>confdefs.h
 
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: pthread_getaffinity_np not found" >&5
+printf "%s\n" "pthread_getaffinity_np not found" >&6; }
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
 
 ## ZSTD compression library
 
