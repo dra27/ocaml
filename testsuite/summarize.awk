@@ -13,6 +13,14 @@
 #*                                                                        *
 #**************************************************************************
 
+BEGIN {
+  # awk trick to detect whether a function exists. x is undefined. If asort is
+  # present then asort (x) returns 0 (no elements sorted). If asort is not
+  # present then the _space_ before the bracket turns it into string
+  # concatenation of two undefined variables (which returns "").
+  has_asort = (asort (x) == "0")
+}
+
 function check() {
     if (!in_test){
         printf("error at line %d: found test result without test start\n", NR);
@@ -172,6 +180,12 @@ END {
             }else if (r == "n"){
                 ++ ignored;
             }
+        }
+        if (has_asort) {
+          asort(skips);
+          asort(blanks);
+          asort(fail);
+          asort(unexp);
         }
         printf("\n");
         if (skipped != 0){
