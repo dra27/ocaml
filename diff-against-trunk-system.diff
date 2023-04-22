@@ -1,6 +1,52 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e547775704
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,43 @@
++--- a	2023-09-28 18:47:33.700679483 +0100
+++++ b	2023-09-28 18:47:33.716680065 +0100
++@@ -19,10 +19,10 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -537,13 +537,8 @@ let emit_instr env fallthrough i =
++-       end
++-   | Lop(Iextcall { func; alloc; stack_ofs }) ->
+++@@ -542,13 +542,8 @@ let emit_instr env fallthrough i =
+++   | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
++        add_used_symbol func;
+++ (* BACKPORT
++ -      let base_stack_size =
++ -        if Arch.win64 then
++ -          32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
++@@ -47,19 +47,23 @@
++    for i = 0 to Array.length arg - 1 do
++      match arg.(i) with
++      | Val | Int | Addr as ty ->
++-@@ -291,12 +291,12 @@ let destroyed_at_c_call =
+++@@ -291,16 +291,16 @@ let destroyed_at_c_call =
++       by the code sequence used for C calls in emit.mlp, so it
++       is marked as destroyed. *)
++    if win64 then
++ -    (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
++ +    (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
++      Array.of_list(List.map phys_reg
+++ (* BACKPORT BEGIN
++ -      [0;4;5;6;7;10;11;12;
++-+      [0;1;4;5;6;7;10;11;12;
++++      [0;1;4;5;6;7;10;11;12
+++ *)
+++       [0;4;5;6;7;10;11;
+++ (* BACKPORT END *)
++         100;101;102;103;104;105])
++    else
++ -    (* Unix: rbx, r12-r15 preserved *)
++ +    (* Unix: r12-r15 preserved *)
++      Array.of_list(List.map phys_reg
+++ (* BACKPORT BEGIN
++        [0;1;2;3;4;5;6;7;10;11;
++-        100;101;102;103;104;105;106;107;
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -14,10 +60,10 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 5a273962ce..5e4ce911dd 100644
+index fa12a07ff8..ab83acdb0b 100644
 --- a/Changes
 +++ b/Changes
-@@ -1336,11 +1336,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1344,11 +1344,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +75,7 @@ index 5a273962ce..5e4ce911dd 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1369,6 +1364,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1377,6 +1372,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +106,7 @@ index 5a273962ce..5e4ce911dd 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1404,13 +1423,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1412,13 +1431,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +122,7 @@ index 5a273962ce..5e4ce911dd 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1517,6 +1536,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1525,6 +1544,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +132,7 @@ index 5a273962ce..5e4ce911dd 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1780,6 +1802,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1788,6 +1810,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -246,7 +292,7 @@ index ce0406e3d8..20f7595c89 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index e2da778605..061e684bdc 100644
+index 7efbe75aa6..3a3b2845c2 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -274,7 +320,7 @@ index e2da778605..061e684bdc 100644
  
  let frame_size env =                     (* includes return address *)
    if env.f.fun_frame_required then begin
-@@ -535,8 +539,9 @@ let emit_instr env fallthrough i =
+@@ -535,19 +539,35 @@ let emit_instr env fallthrough i =
            end
          end
        end
@@ -282,10 +328,9 @@ index e2da778605..061e684bdc 100644
 +  | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
        add_used_symbol func;
 +(* BACKPORT
-       let base_stack_size =
-         if Arch.win64 then
-           32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
-@@ -548,11 +553,26 @@ let emit_instr env fallthrough i =
+       if stack_ofs > 0 then begin
+         I.mov rsp r13;
+         I.lea (mem64 QWORD stack_ofs RSP) r12;
          load_symbol_addr func rax;
          emit_call "caml_c_call_stack_args";
          record_frame env i.live (Dbg_other i.dbg);
@@ -313,7 +358,7 @@ index e2da778605..061e684bdc 100644
          I.mov rsp rbx;
          cfi_remember_state ();
          cfi_def_cfa_register "rbx";
-@@ -560,10 +580,12 @@ let emit_instr env fallthrough i =
+@@ -555,10 +575,12 @@ let emit_instr env fallthrough i =
             will not unwind through this unless we were to tag this
             calling frame with cfi_signal_frame in it's definition. *)
          I.mov (domain_field Domainstate.Domain_c_stack) rsp;
@@ -327,7 +372,7 @@ index e2da778605..061e684bdc 100644
        end
    | Lop(Istackoffset n) ->
        if n < 0
-@@ -746,7 +768,10 @@ let emit_instr env fallthrough i =
+@@ -741,7 +763,10 @@ let emit_instr env fallthrough i =
    | Lop(Ispecific(Izextend32)) ->
        I.mov (arg32 i 0) (res32 i 0)
    | Lop (Idls_get) ->
@@ -338,7 +383,7 @@ index e2da778605..061e684bdc 100644
    | Lreloadretaddr ->
        ()
    | Lreturn ->
-@@ -850,12 +875,24 @@ let emit_instr env fallthrough i =
+@@ -845,12 +870,24 @@ let emit_instr env fallthrough i =
        load_label_addr lbl_handler r11;
        I.push r11;
        cfi_adjust_cfa_offset 8;
@@ -363,7 +408,7 @@ index e2da778605..061e684bdc 100644
        cfi_adjust_cfa_offset (-8);
        I.add (int 8) rsp;
        cfi_adjust_cfa_offset (-8);
-@@ -863,14 +900,26 @@ let emit_instr env fallthrough i =
+@@ -858,14 +895,26 @@ let emit_instr env fallthrough i =
    | Lraise k ->
        begin match k with
        | Lambda.Raise_regular ->
@@ -390,7 +435,7 @@ index e2da778605..061e684bdc 100644
            I.pop r11;
            I.jmp r11
        end
-@@ -903,6 +952,7 @@ let fundecl fundecl =
+@@ -898,6 +947,7 @@ let fundecl fundecl =
    D.label (emit_symbol fundecl.fun_name);
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc ();
@@ -398,7 +443,7 @@ index e2da778605..061e684bdc 100644
    if !Clflags.runtime_variant = "d" then
      emit_call "caml_assert_stack_invariants";
    let { max_frame_size; contains_nontail_calls} =
-@@ -920,9 +970,11 @@ let fundecl fundecl =
+@@ -915,9 +965,11 @@ let fundecl fundecl =
        Some (overflow, ret)
      end else None
    in
@@ -410,7 +455,7 @@ index e2da778605..061e684bdc 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -939,6 +991,7 @@ let fundecl fundecl =
+@@ -934,6 +986,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -419,21 +464,22 @@ index e2da778605..061e684bdc 100644
      let n = (frame_size env) - 8 - (if fp then 8 else 0) in
      if n <> 0
 diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-index 56377b322c..f3453793cc 100644
+index cd50cba52b..2fc913dd83 100644
 --- a/asmcomp/amd64/proc.ml
 +++ b/asmcomp/amd64/proc.ml
 @@ -293,12 +293,20 @@ let destroyed_at_c_call =
    if win64 then
-     (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
+     (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
      Array.of_list(List.map phys_reg
+-      [0;1;4;5;6;7;10;11;12;
 +(* BACKPORT BEGIN
-       [0;4;5;6;7;10;11;12;
++      [0;1;4;5;6;7;10;11;12
 +*)
 +      [0;4;5;6;7;10;11;
 +(* BACKPORT END *)
         100;101;102;103;104;105])
    else
-     (* Unix: rbx, r12-r15 preserved *)
+     (* Unix: r12-r15 preserved *)
      Array.of_list(List.map phys_reg
 +(* BACKPORT BEGIN
        [0;1;2;3;4;5;6;7;10;11;
@@ -10086,13 +10132,59 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2b81e4faf1
+index 0000000000..090b12356a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10023 @@
+@@ -0,0 +1,10121 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e547775704
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,43 @@
+++--- a	2023-09-28 18:47:33.700679483 +0100
++++++ b	2023-09-28 18:47:33.716680065 +0100
+++@@ -19,10 +19,10 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -537,13 +537,8 @@ let emit_instr env fallthrough i =
+++-       end
+++-   | Lop(Iextcall { func; alloc; stack_ofs }) ->
++++@@ -542,13 +542,8 @@ let emit_instr env fallthrough i =
++++   | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
+++        add_used_symbol func;
++++ (* BACKPORT
+++ -      let base_stack_size =
+++ -        if Arch.win64 then
+++ -          32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
+++@@ -47,19 +47,23 @@
+++    for i = 0 to Array.length arg - 1 do
+++      match arg.(i) with
+++      | Val | Int | Addr as ty ->
+++-@@ -291,12 +291,12 @@ let destroyed_at_c_call =
++++@@ -291,16 +291,16 @@ let destroyed_at_c_call =
+++       by the code sequence used for C calls in emit.mlp, so it
+++       is marked as destroyed. *)
+++    if win64 then
+++ -    (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
+++ +    (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
+++      Array.of_list(List.map phys_reg
++++ (* BACKPORT BEGIN
+++ -      [0;4;5;6;7;10;11;12;
+++-+      [0;1;4;5;6;7;10;11;12;
+++++      [0;1;4;5;6;7;10;11;12
++++ *)
++++       [0;4;5;6;7;10;11;
++++ (* BACKPORT END *)
+++         100;101;102;103;104;105])
+++    else
+++ -    (* Unix: rbx, r12-r15 preserved *)
+++ +    (* Unix: r12-r15 preserved *)
+++      Array.of_list(List.map phys_reg
++++ (* BACKPORT BEGIN
+++        [0;1;2;3;4;5;6;7;10;11;
+++-        100;101;102;103;104;105;106;107;
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -10106,10 +10198,10 @@ index 0000000000..2b81e4faf1
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 5a273962ce..5e4ce911dd 100644
++index fa12a07ff8..ab83acdb0b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1336,11 +1336,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1344,11 +1344,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10121,7 +10213,7 @@ index 0000000000..2b81e4faf1
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1369,6 +1364,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1377,6 +1372,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10152,7 +10244,7 @@ index 0000000000..2b81e4faf1
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1404,13 +1423,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1412,13 +1431,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10168,7 +10260,7 @@ index 0000000000..2b81e4faf1
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1517,6 +1536,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1525,6 +1544,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10178,7 +10270,7 @@ index 0000000000..2b81e4faf1
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1780,6 +1802,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1788,6 +1810,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10338,7 +10430,7 @@ index 0000000000..2b81e4faf1
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index e2da778605..061e684bdc 100644
++index 7efbe75aa6..3a3b2845c2 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -10366,7 +10458,7 @@ index 0000000000..2b81e4faf1
 + 
 + let frame_size env =                     (* includes return address *)
 +   if env.f.fun_frame_required then begin
-+@@ -535,8 +539,9 @@ let emit_instr env fallthrough i =
++@@ -535,19 +539,35 @@ let emit_instr env fallthrough i =
 +           end
 +         end
 +       end
@@ -10374,10 +10466,9 @@ index 0000000000..2b81e4faf1
 ++  | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
 +       add_used_symbol func;
 ++(* BACKPORT
-+       let base_stack_size =
-+         if Arch.win64 then
-+           32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
-+@@ -548,11 +553,26 @@ let emit_instr env fallthrough i =
++       if stack_ofs > 0 then begin
++         I.mov rsp r13;
++         I.lea (mem64 QWORD stack_ofs RSP) r12;
 +         load_symbol_addr func rax;
 +         emit_call "caml_c_call_stack_args";
 +         record_frame env i.live (Dbg_other i.dbg);
@@ -10405,7 +10496,7 @@ index 0000000000..2b81e4faf1
 +         I.mov rsp rbx;
 +         cfi_remember_state ();
 +         cfi_def_cfa_register "rbx";
-+@@ -560,10 +580,12 @@ let emit_instr env fallthrough i =
++@@ -555,10 +575,12 @@ let emit_instr env fallthrough i =
 +            will not unwind through this unless we were to tag this
 +            calling frame with cfi_signal_frame in it's definition. *)
 +         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
@@ -10419,7 +10510,7 @@ index 0000000000..2b81e4faf1
 +       end
 +   | Lop(Istackoffset n) ->
 +       if n < 0
-+@@ -746,7 +768,10 @@ let emit_instr env fallthrough i =
++@@ -741,7 +763,10 @@ let emit_instr env fallthrough i =
 +   | Lop(Ispecific(Izextend32)) ->
 +       I.mov (arg32 i 0) (res32 i 0)
 +   | Lop (Idls_get) ->
@@ -10430,7 +10521,7 @@ index 0000000000..2b81e4faf1
 +   | Lreloadretaddr ->
 +       ()
 +   | Lreturn ->
-+@@ -850,12 +875,24 @@ let emit_instr env fallthrough i =
++@@ -845,12 +870,24 @@ let emit_instr env fallthrough i =
 +       load_label_addr lbl_handler r11;
 +       I.push r11;
 +       cfi_adjust_cfa_offset 8;
@@ -10455,7 +10546,7 @@ index 0000000000..2b81e4faf1
 +       cfi_adjust_cfa_offset (-8);
 +       I.add (int 8) rsp;
 +       cfi_adjust_cfa_offset (-8);
-+@@ -863,14 +900,26 @@ let emit_instr env fallthrough i =
++@@ -858,14 +895,26 @@ let emit_instr env fallthrough i =
 +   | Lraise k ->
 +       begin match k with
 +       | Lambda.Raise_regular ->
@@ -10482,7 +10573,7 @@ index 0000000000..2b81e4faf1
 +           I.pop r11;
 +           I.jmp r11
 +       end
-+@@ -903,6 +952,7 @@ let fundecl fundecl =
++@@ -898,6 +947,7 @@ let fundecl fundecl =
 +   D.label (emit_symbol fundecl.fun_name);
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc ();
@@ -10490,7 +10581,7 @@ index 0000000000..2b81e4faf1
 +   if !Clflags.runtime_variant = "d" then
 +     emit_call "caml_assert_stack_invariants";
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -920,9 +970,11 @@ let fundecl fundecl =
++@@ -915,9 +965,11 @@ let fundecl fundecl =
 +       Some (overflow, ret)
 +     end else None
 +   in
@@ -10502,7 +10593,7 @@ index 0000000000..2b81e4faf1
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -939,6 +991,7 @@ let fundecl fundecl =
++@@ -934,6 +986,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -10511,21 +10602,22 @@ index 0000000000..2b81e4faf1
 +     let n = (frame_size env) - 8 - (if fp then 8 else 0) in
 +     if n <> 0
 +diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-+index 56377b322c..f3453793cc 100644
++index cd50cba52b..2fc913dd83 100644
 +--- a/asmcomp/amd64/proc.ml
 ++++ b/asmcomp/amd64/proc.ml
 +@@ -293,12 +293,20 @@ let destroyed_at_c_call =
 +   if win64 then
-+     (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
++     (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
 +     Array.of_list(List.map phys_reg
++-      [0;1;4;5;6;7;10;11;12;
 ++(* BACKPORT BEGIN
-+       [0;4;5;6;7;10;11;12;
+++      [0;1;4;5;6;7;10;11;12
 ++*)
 ++      [0;4;5;6;7;10;11;
 ++(* BACKPORT END *)
 +        100;101;102;103;104;105])
 +   else
-+     (* Unix: rbx, r12-r15 preserved *)
++     (* Unix: r12-r15 preserved *)
 +     Array.of_list(List.map phys_reg
 ++(* BACKPORT BEGIN
 +       [0;1;2;3;4;5;6;7;10;11;
@@ -20112,7 +20204,59 @@ index 0000000000..2b81e4faf1
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
 +++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFI
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
