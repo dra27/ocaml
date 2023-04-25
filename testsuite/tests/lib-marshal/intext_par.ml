@@ -1,7 +1,7 @@
 (* TEST
-   modules = "intextaux_par.c"
-   * skip
-   reason = "OCaml 5 only"
+ modules = "intextaux_par.c";
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 (* Test for output_value / input_value *)

@@ -1,12 +1,10 @@
 (* TEST
-
-* skip
-reason = "OCaml 5 only"
-** frame_pointers
-*** native
-readonly_files = "fp_backtrace.c c_call_.c"
-all_modules = "${readonly_files} c_call.ml"
-
+ frame_pointers;
+ readonly_files = "fp_backtrace.c c_call_.c";
+ all_modules = "${readonly_files} c_call.ml";
+ reason = "OCaml 5 only";
+ skip;
+ native;
 *)
 
 external fp_backtrace : unit -> unit = "fp_backtrace"

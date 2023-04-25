@@ -1,5 +1,5 @@
 (* TEST
-   modules = "stubs.c"
+ modules = "stubs.c";
 *)
 
 (* C version of ephetest.ml *)

@@ -1,0 +1,3247 @@
+--- a	2023-09-28 18:47:34.688715382 +0100
++++ b	2023-09-28 18:47:34.800719451 +0100
+@@ -1907,11 +1907,13 @@
+ diff --git a/testsuite/tests/backtrace/backtrace_c_exn.ml b/testsuite/tests/backtrace/backtrace_c_exn.ml
+ --- a/testsuite/tests/backtrace/backtrace_c_exn.ml
+ +++ b/testsuite/tests/backtrace/backtrace_c_exn.ml
+-@@ -1,7 +1,7 @@
++@@ -1,9 +1,7 @@
+ -(* TEST
+ -   modules = "backtrace_c_exn_.c"
+ -   flags = "-g"
+ -   ocamlrunparam += ",b=1"
++-   * skip
++-   reason = "OCaml 5 only"
+ +(* TEST_BELOW
+ +(* Blank lines added here to preserve locations. *)
+ +
+@@ -1919,7 +1921,7 @@
+  *)
+  
+  (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
+-@@ -18,3 +18,9 @@ let () =
++@@ -20,3 +18,11 @@ let () =
+    | exn ->
+      Printexc.to_string exn |> print_endline;
+      Printexc.print_backtrace stdout
+@@ -1928,6 +1930,8 @@
+ + modules = "backtrace_c_exn_.c";
+ + flags = "-g";
+ + ocamlrunparam += ",b=1";
+++ reason = "OCaml 5 only";
+++ skip;
+ +*)
+ diff --git a/testsuite/tests/backtrace/backtrace_deprecated.ml b/testsuite/tests/backtrace/backtrace_deprecated.ml
+ --- a/testsuite/tests/backtrace/backtrace_deprecated.ml
+@@ -2056,11 +2060,13 @@
+ diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
+ --- a/testsuite/tests/backtrace/backtrace_effects.ml
+ +++ b/testsuite/tests/backtrace/backtrace_effects.ml
+-@@ -1,7 +1,7 @@
++@@ -1,9 +1,7 @@
+ -(* TEST
+ -   flags = "-g"
+ -   ocamlrunparam += ",b=1"
+ -   exit_status = "2"
++-   * skip
++-   reason = "OCaml 5 only"
+ +(* TEST_BELOW
+ +(* Blank lines added here to preserve locations. *)
+ +
+@@ -2068,7 +2074,7 @@
+  *)
+  
+  open Effect
+-@@ -39,3 +39,9 @@ let baz () =
++@@ -41,3 +39,11 @@ let baz () =
+        | _ -> None }
+  
+  let _ = baz ()
+@@ -2077,11 +2083,13 @@
+ + flags = "-g";
+ + ocamlrunparam += ",b=1";
+ + exit_status = "2";
+++ reason = "OCaml 5 only";
+++ skip;
+ +*)
+ diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+ --- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
+ +++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+-@@ -1,12 +1,12 @@
++@@ -1,14 +1,12 @@
+ -(* TEST
+ +(* TEST_BELOW
+ +(* Blank lines added here to preserve locations. *)
+@@ -2093,22 +2101,26 @@
+ +
+  
+ -flags = "-g"
+--* bytecode
+--* no-flambda
+--** native
+--* flambda
++-* skip
++-reason = "OCaml 5 only"
++-** bytecode
++-** no-flambda
++-*** native
++-** flambda
+ -reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+--** native
++-*** native
+  
+  *)
+  
+-@@ -43,3 +43,17 @@ let f () =
++@@ -45,3 +43,19 @@ let f () =
+            | _ -> None }
+  
+  let () = f ()
+ +
+ +(* TEST
+ + flags = "-g";
+++ reason = "OCaml 5 only";
+++ skip;
+ + {
+ +   bytecode;
+ + }{
+@@ -3045,26 +3057,26 @@
+ diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
+ --- a/testsuite/tests/c-api/alloc_async.ml
+ +++ b/testsuite/tests/c-api/alloc_async.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   modules = "alloc_async_stubs.c"
+--   * skip
+--   reason = "alloc async changes: https://github.com/ocaml/ocaml/pull/8897"
+ + modules = "alloc_async_stubs.c";
+-+ reason = "alloc async changes: https://github.com/ocaml/ocaml/pull/8897";
+-+ skip;
+  *)
+  
+  external test : int ref -> unit = "stub"
+ diff --git a/testsuite/tests/c-api/test_c_thread_has_lock.ml b/testsuite/tests/c-api/test_c_thread_has_lock.ml
+ --- a/testsuite/tests/c-api/test_c_thread_has_lock.ml
+ +++ b/testsuite/tests/c-api/test_c_thread_has_lock.ml
+-@@ -1,7 +1,10 @@
++@@ -1,9 +1,12 @@
+  (* TEST
+ -   modules = "test_c_thread_has_lock_cstubs.c"
+--   * bytecode
+--   * native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** bytecode
++-   ** native
+ + modules = "test_c_thread_has_lock_cstubs.c";
+++ reason = "OCaml 5 only";
+++ skip;
+ + {
+ +   bytecode;
+ + }{
+@@ -3076,16 +3088,20 @@
+ diff --git a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+ --- a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+ +++ b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -   modules = "test_c_thread_has_lock_cstubs.c"
+--   * hassysthreads
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** hassysthreads
+ -   include systhreads
+--   ** bytecode
+--   ** native
++-   *** bytecode
++-   *** native
+ + modules = "test_c_thread_has_lock_cstubs.c";
+ + include systhreads;
+ + hassysthreads;
+++ reason = "OCaml 5 only";
+++ skip;
+ + {
+ +   bytecode;
+ + }{
+@@ -3097,11 +3113,15 @@
+ diff --git a/testsuite/tests/callback/callback_effects_gc.ml b/testsuite/tests/callback/callback_effects_gc.ml
+ --- a/testsuite/tests/callback/callback_effects_gc.ml
+ +++ b/testsuite/tests/callback/callback_effects_gc.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -   ocamlrunparam += ",s=512"
+--   * native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** native
+ + ocamlrunparam += ",s=512";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -3130,15 +3150,19 @@
+ diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
+ --- a/testsuite/tests/callback/nested_fiber.ml
+ +++ b/testsuite/tests/callback/nested_fiber.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -   include unix
+ -   modules = "nested_fiber_.c"
+--   * libunix
+--   ** bytecode
+--   ** native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native
+ + include unix;
+ + modules = "nested_fiber_.c";
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -3172,15 +3196,19 @@
+ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
+ --- a/testsuite/tests/callback/stack_overflow.ml
+ +++ b/testsuite/tests/callback/stack_overflow.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -   include unix
+ -   modules = "stack_overflow_.c"
+--   * libunix
+--   ** bytecode
+--   ** native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native
+ + include unix;
+ + modules = "stack_overflow_.c";
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -3319,15 +3347,19 @@
+ diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
+ --- a/testsuite/tests/callback/test7.ml
+ +++ b/testsuite/tests/callback/test7.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -   include unix
+ -   modules = "test7_.c"
+--   * libunix
+--   ** bytecode
+--   ** native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native
+ + include unix;
+ + modules = "test7_.c";
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -3353,12 +3385,12 @@
+ @@ -1,9 +1,12 @@
+  (* TEST
+ -   include unix
+--   modules = "test_signalhandler_.c"
++-   modules = "callbackprim.c"
+ -   * libunix
+ -   ** bytecode
+ -   ** native
+ + include unix;
+-+ modules = "test_signalhandler_.c";
+++ modules = "callbackprim.c";
+ + libunix;
+ + {
+ +   bytecode;
+@@ -3400,17 +3432,19 @@
+ diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
+ --- a/testsuite/tests/effects/backtrace.ml
+ +++ b/testsuite/tests/effects/backtrace.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,6 @@
+ -(* TEST
+ -   flags = "-g"
+ -   ocamlrunparam += ",b=1"
++-   * skip
++-   reason = "OCaml 5 only"
+ +(* TEST_BELOW
+ +(* Blank lines added here to preserve locations. *)
+ +
+  *)
+  
+  open Effect
+-@@ -52,3 +52,8 @@ let main () =
++@@ -54,3 +52,10 @@ let main () =
+        | _ -> None }
+  
+  let _ = main ()
+@@ -3418,33 +3452,43 @@
+ +(* TEST
+ + flags = "-g";
+ + ocamlrunparam += ",b=1";
+++ reason = "OCaml 5 only";
+++ skip;
+ +*)
+ diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
+ --- a/testsuite/tests/effects/cmphash.ml
+ +++ b/testsuite/tests/effects/cmphash.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
+ --- a/testsuite/tests/effects/evenodd.ml
+ +++ b/testsuite/tests/effects/evenodd.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
+ --- a/testsuite/tests/effects/issue479.ml
+ +++ b/testsuite/tests/effects/issue479.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+--   * toplevel
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** toplevel
+++ reason = "OCaml 5 only";
+++ skip;
+ + toplevel;
+  *)
+  
+@@ -3462,173 +3506,223 @@
+ diff --git a/testsuite/tests/effects/marshal.ml b/testsuite/tests/effects/marshal.ml
+ --- a/testsuite/tests/effects/marshal.ml
+ +++ b/testsuite/tests/effects/marshal.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
+ --- a/testsuite/tests/effects/overflow.ml
+ +++ b/testsuite/tests/effects/overflow.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
+ --- a/testsuite/tests/effects/partial.ml
+ +++ b/testsuite/tests/effects/partial.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
+ --- a/testsuite/tests/effects/reperform.ml
+ +++ b/testsuite/tests/effects/reperform.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
+ --- a/testsuite/tests/effects/sched.ml
+ +++ b/testsuite/tests/effects/sched.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
+ --- a/testsuite/tests/effects/shallow_state.ml
+ +++ b/testsuite/tests/effects/shallow_state.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Shallow
+ diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
+ --- a/testsuite/tests/effects/shallow_state_io.ml
+ +++ b/testsuite/tests/effects/shallow_state_io.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Shallow
+ diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
+ --- a/testsuite/tests/effects/test1.ml
+ +++ b/testsuite/tests/effects/test1.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
+ --- a/testsuite/tests/effects/test10.ml
+ +++ b/testsuite/tests/effects/test10.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
+ --- a/testsuite/tests/effects/test11.ml
+ +++ b/testsuite/tests/effects/test11.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* Tests RESUMETERM with extra_args != 0 in bytecode,
+     by calling a handler with a tail-continue that returns a function *)
+ diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
+ --- a/testsuite/tests/effects/test2.ml
+ +++ b/testsuite/tests/effects/test2.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Printf
+- open Effect
+ diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
+ --- a/testsuite/tests/effects/test3.ml
+ +++ b/testsuite/tests/effects/test3.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
+ --- a/testsuite/tests/effects/test4.ml
+ +++ b/testsuite/tests/effects/test4.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
+ --- a/testsuite/tests/effects/test5.ml
+ +++ b/testsuite/tests/effects/test5.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
+ --- a/testsuite/tests/effects/test6.ml
+ +++ b/testsuite/tests/effects/test6.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
++ 
++ open Effect
++diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
++--- a/testsuite/tests/effects/test_lazy.ml
+++++ b/testsuite/tests/effects/test_lazy.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/effects/unhandled_unlinked.ml b/testsuite/tests/effects/unhandled_unlinked.ml
+ --- a/testsuite/tests/effects/unhandled_unlinked.ml
+ +++ b/testsuite/tests/effects/unhandled_unlinked.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -     exit_status= "2"
++-     * skip
++-     reason = "OCaml 5 only"
+ + exit_status = "2";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  open Effect
+ diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
+ --- a/testsuite/tests/effects/used_cont.ml
+ +++ b/testsuite/tests/effects/used_cont.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
+-- *)
+-+(* TEST *)
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
+  
+  open Effect
+- open Effect.Deep
+ diff --git a/testsuite/tests/embedded/cmcaml.ml b/testsuite/tests/embedded/cmcaml.ml
+ --- a/testsuite/tests/embedded/cmcaml.ml
+ +++ b/testsuite/tests/embedded/cmcaml.ml
+@@ -3642,14 +3736,10 @@
+ diff --git a/testsuite/tests/ephe-c-api/test.ml b/testsuite/tests/ephe-c-api/test.ml
+ --- a/testsuite/tests/ephe-c-api/test.ml
+ +++ b/testsuite/tests/ephe-c-api/test.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   modules = "stubs.c"
+--   * skip
+--   reason = "port the new Ephemeron C-api to multicore : https://github.com/ocaml/ocaml/pull/676"
+ + modules = "stubs.c";
+-+ reason = "port the new Ephemeron C-api to multicore : https://github.com/ocaml/ocaml/pull/676";
+-+ skip;
+  *)
+  
+  (* C version of ephetest.ml *)
+@@ -3891,17 +3981,21 @@
+ diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
+ --- a/testsuite/tests/frame-pointers/c_call.ml
+ +++ b/testsuite/tests/frame-pointers/c_call.ml
+-@@ -1,10 +1,8 @@
++@@ -1,12 +1,10 @@
+  (* TEST
+ -
+--* frame_pointers
+--** native
++-* skip
++-reason = "OCaml 5 only"
++-** frame_pointers
++-*** native
+ -readonly_files = "fp_backtrace.c c_call_.c"
+ -all_modules = "${readonly_files} c_call.ml"
+ -
+ + frame_pointers;
+ + readonly_files = "fp_backtrace.c c_call_.c";
+ + all_modules = "${readonly_files} c_call.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -3909,17 +4003,21 @@
+ diff --git a/testsuite/tests/frame-pointers/effects.ml b/testsuite/tests/frame-pointers/effects.ml
+ --- a/testsuite/tests/frame-pointers/effects.ml
+ +++ b/testsuite/tests/frame-pointers/effects.ml
+-@@ -1,10 +1,8 @@
++@@ -1,12 +1,10 @@
+  (* TEST
+ -
+--* frame_pointers
+--** native
++-* skip
++-reason - "OCaml 5 only"
++-** frame_pointers
++-*** native
+ -readonly_files = "fp_backtrace.c"
+ -all_modules = "${readonly_files} effects.ml"
+ -
+ + frame_pointers;
+ + readonly_files = "fp_backtrace.c";
+ + all_modules = "${readonly_files} effects.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -3927,17 +4025,21 @@
+ diff --git a/testsuite/tests/frame-pointers/exception_handler.ml b/testsuite/tests/frame-pointers/exception_handler.ml
+ --- a/testsuite/tests/frame-pointers/exception_handler.ml
+ +++ b/testsuite/tests/frame-pointers/exception_handler.ml
+-@@ -1,10 +1,8 @@
++@@ -1,12 +1,10 @@
+  (* TEST
+ -
+--* frame_pointers
+--** native
++-* skip
++-reason = "OCaml 5 only"
++-** frame_pointers
++-*** native
+ -readonly_files = "fp_backtrace.c"
+ -all_modules = "${readonly_files} exception_handler.ml"
+ -
+ + frame_pointers;
+ + readonly_files = "fp_backtrace.c";
+ + all_modules = "${readonly_files} exception_handler.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -3945,11 +4047,13 @@
+ diff --git a/testsuite/tests/frame-pointers/reperform.ml b/testsuite/tests/frame-pointers/reperform.ml
+ --- a/testsuite/tests/frame-pointers/reperform.ml
+ +++ b/testsuite/tests/frame-pointers/reperform.ml
+-@@ -1,11 +1,8 @@
++@@ -1,13 +1,10 @@
+  (* TEST
+ -
+--* frame_pointers
+--** native
++-* skip
++-reason - "OCaml 5 only"
++-** frame_pointers
++-*** native
+ -
+ -readonly_files = "fp_backtrace.c"
+ -all_modules = "${readonly_files} reperform.ml"
+@@ -3957,6 +4061,8 @@
+ + frame_pointers;
+ + readonly_files = "fp_backtrace.c";
+ + all_modules = "${readonly_files} reperform.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -3964,11 +4070,13 @@
+ diff --git a/testsuite/tests/frame-pointers/stack_realloc.ml b/testsuite/tests/frame-pointers/stack_realloc.ml
+ --- a/testsuite/tests/frame-pointers/stack_realloc.ml
+ +++ b/testsuite/tests/frame-pointers/stack_realloc.ml
+-@@ -1,11 +1,8 @@
++@@ -1,13 +1,10 @@
+  (* TEST
+ -
+--* frame_pointers
+--** native
++-* skip
++-reason - "OCaml 5 only"
++-** frame_pointers
++-*** native
+ -
+ -readonly_files = "fp_backtrace.c stack_realloc_.c"
+ -all_modules = "${readonly_files} stack_realloc.ml"
+@@ -3976,6 +4084,8 @@
+ + frame_pointers;
+ + readonly_files = "fp_backtrace.c stack_realloc_.c";
+ + all_modules = "${readonly_files} stack_realloc.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -3983,11 +4093,13 @@
+ diff --git a/testsuite/tests/frame-pointers/stack_realloc2.ml b/testsuite/tests/frame-pointers/stack_realloc2.ml
+ --- a/testsuite/tests/frame-pointers/stack_realloc2.ml
+ +++ b/testsuite/tests/frame-pointers/stack_realloc2.ml
+-@@ -1,11 +1,8 @@
++@@ -1,13 +1,10 @@
+  (* TEST
+ -
+--* frame_pointers
+--** native
++-* skip
++-reason - "OCaml 5 only"
++-** frame_pointers
++-*** native
+ -
+ -readonly_files = "fp_backtrace.c stack_realloc_.c"
+ -all_modules = "${readonly_files} stack_realloc2.ml"
+@@ -3995,6 +4107,8 @@
+ + frame_pointers;
+ + readonly_files = "fp_backtrace.c stack_realloc_.c";
+ + all_modules = "${readonly_files} stack_realloc2.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + native;
+  *)
+  
+@@ -4018,46 +4132,62 @@
+ diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
+ --- a/testsuite/tests/gc-roots/globroots.ml
+ +++ b/testsuite/tests/gc-roots/globroots.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   modules = "globrootsprim.c"
++-   * skip
++-   reason = "OCaml 5 only"
+ + modules = "globrootsprim.c";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  module type GLOBREF = sig
+ diff --git a/testsuite/tests/gc-roots/globroots_parallel.ml b/testsuite/tests/gc-roots/globroots_parallel.ml
+ --- a/testsuite/tests/gc-roots/globroots_parallel.ml
+ +++ b/testsuite/tests/gc-roots/globroots_parallel.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -   flags += " -w a "
+ -   modules = "globrootsprim.c globroots.ml"
++-   * skip
++-   reason = "OCaml 5 only"
+ + flags += " -w a ";
+ + modules = "globrootsprim.c globroots.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  open Globroots
+ diff --git a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+ --- a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+ +++ b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -   flags += " -w a "
+ -   modules = "globrootsprim.c globroots.ml"
++-   * skip
++-   reason = "OCaml 5 only"
+ + flags += " -w a ";
+ + modules = "globrootsprim.c globroots.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  open Globroots
+ diff --git a/testsuite/tests/gc-roots/globroots_sequential.ml b/testsuite/tests/gc-roots/globroots_sequential.ml
+ --- a/testsuite/tests/gc-roots/globroots_sequential.ml
+ +++ b/testsuite/tests/gc-roots/globroots_sequential.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -   flags += " -w a "
+ -   modules = "globrootsprim.c globroots.ml"
++-   * skip
++-   reason = "OCaml 5 only"
+ + flags += " -w a ";
+ + modules = "globrootsprim.c globroots.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Globroots
+  
+@@ -4207,20 +4337,28 @@
+ diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
+ --- a/testsuite/tests/lazy/lazy2.ml
+ +++ b/testsuite/tests/lazy/lazy2.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  open Domain
+ diff --git a/testsuite/tests/lazy/lazy3.ml b/testsuite/tests/lazy/lazy3.ml
+ --- a/testsuite/tests/lazy/lazy3.ml
+ +++ b/testsuite/tests/lazy/lazy3.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  let f count =
+@@ -4237,50 +4375,70 @@
+ diff --git a/testsuite/tests/lazy/lazy5.ml b/testsuite/tests/lazy/lazy5.ml
+ --- a/testsuite/tests/lazy/lazy5.ml
+ +++ b/testsuite/tests/lazy/lazy5.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  let rec safe_force l =
+    try Lazy.force l with
+ diff --git a/testsuite/tests/lazy/lazy6.ml b/testsuite/tests/lazy/lazy6.ml
+ --- a/testsuite/tests/lazy/lazy6.ml
+ +++ b/testsuite/tests/lazy/lazy6.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  let flag1 = Atomic.make false
+ diff --git a/testsuite/tests/lazy/lazy7.ml b/testsuite/tests/lazy/lazy7.ml
+ --- a/testsuite/tests/lazy/lazy7.ml
+ +++ b/testsuite/tests/lazy/lazy7.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  let num_domains = 4
+ diff --git a/testsuite/tests/lazy/lazy8.ml b/testsuite/tests/lazy/lazy8.ml
+ --- a/testsuite/tests/lazy/lazy8.ml
+ +++ b/testsuite/tests/lazy/lazy8.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  exception E
+ diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
+ --- a/testsuite/tests/lazy/minor_major_force.ml
+ +++ b/testsuite/tests/lazy/minor_major_force.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   ocamlopt_flags += " -O3 "
++-   * skip
++-   reason = "OCaml 5 only"
+ + ocamlopt_flags += " -O3 ";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  (*
+@@ -4493,20 +4651,28 @@
+ diff --git a/testsuite/tests/lf_skiplist/test.ml b/testsuite/tests/lf_skiplist/test.ml
+ --- a/testsuite/tests/lf_skiplist/test.ml
+ +++ b/testsuite/tests/lf_skiplist/test.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   modules = "stubs.c"
++-   * skip
++-   reason = "OCaml 5 only"
+ + modules = "stubs.c";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  external test_skiplist_serial : unit -> unit = "test_skiplist_serial"
+ diff --git a/testsuite/tests/lf_skiplist/test_parallel.ml b/testsuite/tests/lf_skiplist/test_parallel.ml
+ --- a/testsuite/tests/lf_skiplist/test_parallel.ml
+ +++ b/testsuite/tests/lf_skiplist/test_parallel.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   modules = "stubs.c"
++-   * skip
++-   reason = "OCaml 5 only"
+ + modules = "stubs.c";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  external init_skiplist : unit -> unit = "init_skiplist"
+@@ -4716,6 +4882,18 @@
+  *)
+  
+  let test_raises_invalid_argument f x =
++diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
++--- a/testsuite/tests/lib-channels/close_in.ml
+++++ b/testsuite/tests/lib-channels/close_in.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
++ 
++ (* Test that inputting bytes from a closed in_channel triggers an exception *)
+ diff --git a/testsuite/tests/lib-channels/input_all.ml b/testsuite/tests/lib-channels/input_all.ml
+ --- a/testsuite/tests/lib-channels/input_all.ml
+ +++ b/testsuite/tests/lib-channels/input_all.ml
+@@ -4753,9 +4931,13 @@
+ diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
+ --- a/testsuite/tests/lib-channels/refcounting.ml
+ +++ b/testsuite/tests/lib-channels/refcounting.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+--   * expect
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** expect
+++ reason = "OCaml 5 only";
+++ skip;
+ + expect;
+  *)
+  
+@@ -5047,179 +5229,183 @@
+ diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
+ --- a/testsuite/tests/lib-dynlink-domains/main.ml
+ +++ b/testsuite/tests/lib-dynlink-domains/main.ml
+-@@ -1,172 +1,172 @@
++@@ -1,174 +1,174 @@
+  (* TEST
+ -
+ -include dynlink
+ -libraries = ""
+ -readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml"
+ -
+--*01 not-windows
+--*02 shared-libraries
+--*03 setup-ocamlc.byte-build-env
+--*04 ocamlc.byte
++-* skip
++-reason = "OCaml 5 only"
++-**01 not-windows
++-**02 shared-libraries
++-**03 setup-ocamlc.byte-build-env
++-**04 ocamlc.byte
+ -module = "store.ml"
+--*05 ocamlc.byte
++-**05 ocamlc.byte
+ -module = "Plugin_0.ml"
+--*06 ocamlc.byte
++-**06 ocamlc.byte
+ -module = "Plugin_0_0.ml"
+--*07 ocamlc.byte
++-**07 ocamlc.byte
+ -module = "Plugin_0_0_0.ml"
+--*08 ocamlc.byte
++-**08 ocamlc.byte
+ -module = "Plugin_0_0_0_0.ml"
+--*09 ocamlc.byte
++-**09 ocamlc.byte
+ -module = "Plugin_0_0_0_1.ml"
+--*10 ocamlc.byte
++-**10 ocamlc.byte
+ -module = "Plugin_0_0_0_2.ml"
+--*11 ocamlc.byte
++-**11 ocamlc.byte
+ -module = "Plugin_1.ml"
+--*12 ocamlc.byte
++-**12 ocamlc.byte
+ -module = "Plugin_1_0.ml"
+--*13 ocamlc.byte
++-**13 ocamlc.byte
+ -module = "Plugin_1_0_0.ml"
+--*14 ocamlc.byte
++-**14 ocamlc.byte
+ -module = "Plugin_1_0_0_0.ml"
+--*15 ocamlc.byte
++-**15 ocamlc.byte
+ -module = "Plugin_1_1.ml"
+--*16 ocamlc.byte
++-**16 ocamlc.byte
+ -module = "Plugin_1_2.ml"
+--*17 ocamlc.byte
++-**17 ocamlc.byte
+ -module = "Plugin_1_2_0.ml"
+--*18 ocamlc.byte
++-**18 ocamlc.byte
+ -module = "Plugin_1_2_0_0.ml"
+--*19 ocamlc.byte
++-**19 ocamlc.byte
+ -module = "Plugin_1_2_1.ml"
+--*20 ocamlc.byte
++-**20 ocamlc.byte
+ -module = "Plugin_1_2_2.ml"
+--*21 ocamlc.byte
++-**21 ocamlc.byte
+ -module = "Plugin_1_2_2_0.ml"
+--*22 ocamlc.byte
++-**22 ocamlc.byte
+ -module = "Plugin_1_2_3.ml"
+--*23 ocamlc.byte
++-**23 ocamlc.byte
+ -module = "Plugin_1_2_3_0.ml"
+--*24 ocamlc.byte
++-**24 ocamlc.byte
+ -module = "main.ml"
+--*25 ocamlc.byte
++-**25 ocamlc.byte
+ -program = "./main.byte.exe"
+ -libraries= "dynlink"
+ -all_modules = "store.cmo main.cmo"
+ -module = ""
+--*26 run
+--*27 check-program-output
++-**26 run
++-**27 check-program-output
+ -
+--*02 native-dynlink
+--*03 setup-ocamlopt.byte-build-env
+--*04 ocamlopt.byte
++-**02 native-dynlink
++-**03 setup-ocamlopt.byte-build-env
++-**04 ocamlopt.byte
+ -flags = ""
+ -module = "store.ml"
+--*05 ocamlopt.byte
++-**05 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_0.ml"
+--*06 ocamlopt.byte
++-**06 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_0_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_0_0.ml"
+--*07 ocamlopt.byte
++-**07 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_0_0_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_0_0_0.ml"
+--*08 ocamlopt.byte
++-**08 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_0_0_0_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_0_0_0_0.ml"
+--*09 ocamlopt.byte
++-**09 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_0_0_0_1.cmxs"
+ -module = ""
+ -all_modules = "Plugin_0_0_0_1.ml"
+--*10 ocamlopt.byte
++-**10 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_0_0_0_2.cmxs"
+ -module = ""
+ -all_modules = "Plugin_0_0_0_2.ml"
+--*11 ocamlopt.byte
++-**11 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1.ml"
+--*12 ocamlopt.byte
++-**12 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_0.ml"
+--*13 ocamlopt.byte
++-**13 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_0_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_0_0.ml"
+--*14 ocamlopt.byte
++-**14 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_0_0_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_0_0_0.ml"
+--*15 ocamlopt.byte
++-**15 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_1.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_1.ml"
+--*16 ocamlopt.byte
++-**16 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2.ml"
+--*17 ocamlopt.byte
++-**17 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_0.ml"
+--*18 ocamlopt.byte
++-**18 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_0_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_0_0.ml"
+--*19 ocamlopt.byte
++-**19 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_1.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_1.ml"
+--*20 ocamlopt.byte
++-**20 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_2.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_2.ml"
+--*21 ocamlopt.byte
++-**21 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_2_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_2_0.ml"
+--*22 ocamlopt.byte
++-**22 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_3.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_3.ml"
+--*23 ocamlopt.byte
++-**23 ocamlopt.byte
+ -flags = "-shared"
+ -program= "Plugin_1_2_3_0.cmxs"
+ -module = ""
+ -all_modules = "Plugin_1_2_3_0.ml"
+--*24 ocamlopt.byte
++-**24 ocamlopt.byte
+ -flags = ""
+ -module = "main.ml"
+--*25 ocamlopt.byte
++-**25 ocamlopt.byte
+ -program = "./main.exe"
+ -libraries="dynlink"
+ -all_modules = "store.cmx main.cmx"
+ -module = ""
+--*26 run
+--*27 check-program-output
++-**26 run
++-**27 check-program-output
+ + include dynlink;
+ + libraries = "";
+ + readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + not-windows;
+ + {
+ +   shared-libraries;
+@@ -8328,6 +8514,42 @@
+  
+  open Printf
+  
++diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
++--- a/testsuite/tests/lib-format/domains.ml
+++++ b/testsuite/tests/lib-format/domains.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ 
++ (** Test that domains stdout and stderr are flushed at domain exit *)
++diff --git a/testsuite/tests/lib-format/mc_pr586_par.ml b/testsuite/tests/lib-format/mc_pr586_par.ml
++--- a/testsuite/tests/lib-format/mc_pr586_par.ml
+++++ b/testsuite/tests/lib-format/mc_pr586_par.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ 
++ let () =
++diff --git a/testsuite/tests/lib-format/mc_pr586_par2.ml b/testsuite/tests/lib-format/mc_pr586_par2.ml
++--- a/testsuite/tests/lib-format/mc_pr586_par2.ml
+++++ b/testsuite/tests/lib-format/mc_pr586_par2.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ 
++ let () =
+ diff --git a/testsuite/tests/lib-format/pr6824.ml b/testsuite/tests/lib-format/pr6824.ml
+ --- a/testsuite/tests/lib-format/pr6824.ml
+ +++ b/testsuite/tests/lib-format/pr6824.ml
+@@ -8483,10 +8705,14 @@
+ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
+ --- a/testsuite/tests/lib-marshal/intext_par.ml
+ +++ b/testsuite/tests/lib-marshal/intext_par.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -   modules = "intextaux_par.c"
++-   * skip
++-   reason = "OCaml 5 only"
+ + modules = "intextaux_par.c";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  (* Test for output_value / input_value *)
+@@ -8609,14 +8835,18 @@
+ diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
+ --- a/testsuite/tests/lib-random/parallel.ml
+ +++ b/testsuite/tests/lib-random/parallel.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -   include unix
+--   * libunix
+--   ** bytecode
+--   ** native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native
+ - *)
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -8660,111 +8890,151 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test.ml b/testsuite/tests/lib-runtime-events/test.ml
+ --- a/testsuite/tests/lib-runtime-events/test.ml
+ +++ b/testsuite/tests/lib-runtime-events/test.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -modules = "stubs.c"
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + modules = "stubs.c";
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  external start_runtime_events : unit -> unit = "start_runtime_events"
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_exception.ml b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -include runtime_events
+ -ocamlrunparam += ",e=4"
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+ + ocamlrunparam += ",e=4";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  (* We set the ring buffer size smaller and witness that we do indeed
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+ --- a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_dropped_events.ml b/testsuite/tests/lib-runtime-events/test_dropped_events.ml
+ --- a/testsuite/tests/lib-runtime-events/test_dropped_events.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_dropped_events.ml
+-@@ -1,10 +1,13 @@
++@@ -1,12 +1,15 @@
+  (* TEST
+ -   include runtime_events
+ -   include unix
+ -   set OCAMLRUNPARAM = "e=6"
+--   * libunix
+--   ** native
+--   ** bytecode
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** native
++-   *** bytecode
+ + include runtime_events;
+ + include unix;
+ + set OCAMLRUNPARAM = "e=6";
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   native;
+@@ -8777,27 +9047,35 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_env_start.ml b/testsuite/tests/lib-runtime-events/test_env_start.ml
+ --- a/testsuite/tests/lib-runtime-events/test_env_start.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_env_start.ml
+-@@ -1,6 +1,6 @@
++@@ -1,8 +1,8 @@
+  (* TEST
+ -include runtime_events
+ -set OCAML_RUNTIME_EVENTS_START = "1"
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+ + set OCAML_RUNTIME_EVENTS_START = "1";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  (* In this test the runtime_events should already be started by the environment
+ diff --git a/testsuite/tests/lib-runtime-events/test_external.ml b/testsuite/tests/lib-runtime-events/test_external.ml
+ --- a/testsuite/tests/lib-runtime-events/test_external.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_external.ml
+-@@ -1,9 +1,13 @@
++@@ -1,11 +1,15 @@
+  (* TEST
+ -   include runtime_events
+ -   include unix
+--   * libunix
+--   ** bytecode
+--   ** native *)
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native *)
+ + include runtime_events;
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -8811,16 +9089,20 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_external_preserve.ml b/testsuite/tests/lib-runtime-events/test_external_preserve.ml
+ --- a/testsuite/tests/lib-runtime-events/test_external_preserve.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_external_preserve.ml
+-@@ -1,10 +1,14 @@
++@@ -1,12 +1,16 @@
+  (* TEST
+ -  include runtime_events
+ -  include unix
+ -  set OCAML_RUNTIME_EVENTS_PRESERVE = "1"
+--  * libunix
+--  ** bytecode
+--  ** native *)
++-  * skip
++-  reason = "OCaml 5 only"
++-  ** libunix
++-  *** bytecode
++-  *** native *)
+ + include runtime_events;
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + set OCAML_RUNTIME_EVENTS_PRESERVE = "1";
+ + libunix;
+ + {
+@@ -8835,15 +9117,19 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
+ --- a/testsuite/tests/lib-runtime-events/test_fork.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_fork.ml
+-@@ -1,9 +1,13 @@
++@@ -1,11 +1,15 @@
+  (* TEST
+ -   include runtime_events
+ -   include unix
+--   * libunix
+--   ** bytecode
+--   ** native *)
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native *)
+ + include runtime_events;
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -8857,15 +9143,19 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+ --- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+-@@ -1,9 +1,8 @@
++@@ -1,11 +1,10 @@
+  (* TEST
+ -   include runtime_events
+ -   flags = "-runtime-variant=i"
+ -
+--   * instrumented-runtime
+--   ** native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** instrumented-runtime
++-   *** native
+ + include runtime_events;
+ + flags = "-runtime-variant=i";
+++ reason = "OCaml 5 only";
+++ skip;
+ + instrumented-runtime;
+ + native;
+  *)
+@@ -8874,27 +9164,35 @@
+ diff --git a/testsuite/tests/lib-runtime-events/test_user_event.ml b/testsuite/tests/lib-runtime-events/test_user_event.ml
+ --- a/testsuite/tests/lib-runtime-events/test_user_event.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_user_event.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -include runtime_events
++-* skip
++-reason = "OCaml 5 only"
+ + include runtime_events;
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  open Runtime_events
+  
+ diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+ --- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+ +++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+-@@ -1,10 +1,13 @@
++@@ -1,12 +1,15 @@
+  (* TEST
+ -   include runtime_events
+ -   include unix
+ -   set OCAML_RUNTIME_EVENTS_PRESERVE = "1"
+--   * libunix
+--   ** bytecode
+--   ** native
++-   * skip
++-   reason = "OCaml 5 only"
++-   ** libunix
++-   *** bytecode
++-   *** native
+ + include runtime_events;
+ + include unix;
+ + set OCAML_RUNTIME_EVENTS_PRESERVE = "1";
+++ reason = "OCaml 5 only";
+++ skip;
+ + libunix;
+ + {
+ +   bytecode;
+@@ -9062,13 +9360,17 @@
+ diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
+ --- a/testsuite/tests/lib-str/parallel.ml
+ +++ b/testsuite/tests/lib-str/parallel.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasstr
++-* skip
++-reason = "OCaml 5 only"
++-** hasstr
+ -include str
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include str;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasstr;
+ + {
+ +   bytecode;
+@@ -9120,30 +9422,42 @@
+ diff --git a/testsuite/tests/lib-sync/prodcons.ml b/testsuite/tests/lib-sync/prodcons.ml
+ --- a/testsuite/tests/lib-sync/prodcons.ml
+ +++ b/testsuite/tests/lib-sync/prodcons.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* Classic producer-consumer *)
+  
+ diff --git a/testsuite/tests/lib-sync/trylock.ml b/testsuite/tests/lib-sync/trylock.ml
+ --- a/testsuite/tests/lib-sync/trylock.ml
+ +++ b/testsuite/tests/lib-sync/trylock.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* Test Mutex.try_lock *)
+  
+ diff --git a/testsuite/tests/lib-sync/trylock2.ml b/testsuite/tests/lib-sync/trylock2.ml
+ --- a/testsuite/tests/lib-sync/trylock2.ml
+ +++ b/testsuite/tests/lib-sync/trylock2.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* Test Mutex.try_lock *)
+  
+@@ -9170,15 +9484,19 @@
+ diff --git a/testsuite/tests/lib-systhreads/boundscheck.ml b/testsuite/tests/lib-systhreads/boundscheck.ml
+ --- a/testsuite/tests/lib-systhreads/boundscheck.ml
+ +++ b/testsuite/tests/lib-systhreads/boundscheck.ml
+-@@ -1,10 +1,11 @@
++@@ -1,12 +1,13 @@
+  (* TEST
+ -
+ -include systhreads
+--* hassysthreads
+--** bytecode
+--** native
++-* skip
++-reason = "OCaml 5 only"
++-** hassysthreads
++-*** bytecode
++-*** native
+ -
+ + include systhreads;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hassysthreads;
+ + {
+ +   bytecode;
+@@ -9213,13 +9531,17 @@
+ diff --git a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml b/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
+ --- a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
+ +++ b/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hassysthreads
++-* skip
++-reason = "OCaml 5 only"
++-** hassysthreads
+ -include systhreads
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include systhreads;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hassysthreads;
+ + {
+ +   bytecode;
+@@ -9232,17 +9554,19 @@
+ diff --git a/testsuite/tests/lib-systhreads/test_c_thread_register.ml b/testsuite/tests/lib-systhreads/test_c_thread_register.ml
+ --- a/testsuite/tests/lib-systhreads/test_c_thread_register.ml
+ +++ b/testsuite/tests/lib-systhreads/test_c_thread_register.ml
+-@@ -1,10 +1,13 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -   modules = "test_c_thread_register_cstubs.c"
+ -   * hassysthreads
+ -   include systhreads
+--   ** not-bsd
+--   *** bytecode
+--   *** native
++-   ** not-windows
++-   *** not-bsd
++-   **** bytecode
++-   **** native
+ + modules = "test_c_thread_register_cstubs.c";
+ + include systhreads;
+ + hassysthreads;
+++ not-windows;
+ + not-bsd;
+ + {
+ +   bytecode;
+@@ -10216,14 +10540,18 @@
+ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -include unix
+--* hasunix
+--** not-windows
+--*** bytecode
+--*** native
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
++-*** not-windows
++-**** bytecode
++-**** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + not-windows;
+ + {
+@@ -10237,14 +10565,18 @@
+ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -include unix
+--* hasunix
+--** not-windows
+--*** bytecode
+--*** native
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
++-*** not-windows
++-**** bytecode
++-**** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + not-windows;
+ + {
+@@ -10753,15 +11085,19 @@
+ diff --git a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+ --- a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+ +++ b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -modules = "fd_of_channel.c"
+--* libwin32unix
++-reason = "OCaml 5 only"
++-* skip
++-** libwin32unix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + modules = "fd_of_channel.c";
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + libwin32unix;
+ + {
+ +   bytecode;
+@@ -10880,16 +11216,20 @@
+ diff --git a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+ --- a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+ +++ b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -* libwin32unix
+ -include unix
+ -** has_symlink
+--*** bytecode
+--*** native
++-*** skip
++-reason = "OCaml 5 only"
++-**** bytecode
++-**** native
+ + include unix;
+ + libwin32unix;
+ + has_symlink;
+++ reason = "OCaml 5 only";
+++ skip;
+ + {
+ +   bytecode;
+ + }{
+@@ -11385,13 +11725,17 @@
+ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
+ --- a/testsuite/tests/memory-model/forbidden.ml
+ +++ b/testsuite/tests/memory-model/forbidden.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+ -  modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+--  * not-bsd
+--  ** bytecode
+--  ** native
++-  * skip
++-  reason = "OCaml 5 only"
++-  ** not-bsd
++-  *** bytecode
++-  *** native
+ + modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + not-bsd;
+ + {
+ +   bytecode;
+@@ -11404,14 +11748,18 @@
+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+ --- a/testsuite/tests/memory-model/publish.ml
+ +++ b/testsuite/tests/memory-model/publish.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
+ -  modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+--  * not-bsd
+--  ** not-windows
+--  *** bytecode
+--  ** native
++-  * skip
++-  reason = "OCaml 5 only"
++-  ** not-bsd
++-  *** not-windows
++-  **** bytecode
++-  **** native
+ + modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+++ reason = "OCaml 5 only";
+++ skip;
+ + not-bsd;
+ + {
+ +   not-windows;
+@@ -11990,23 +12338,31 @@
+ diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
+ --- a/testsuite/tests/parallel/atomics.ml
+ +++ b/testsuite/tests/parallel/atomics.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  type u = U of unit
+  let () =
+ diff --git a/testsuite/tests/parallel/backup_thread.ml b/testsuite/tests/parallel/backup_thread.ml
+ --- a/testsuite/tests/parallel/backup_thread.ml
+ +++ b/testsuite/tests/parallel/backup_thread.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   bytecode;
+@@ -12019,13 +12375,17 @@
+ diff --git a/testsuite/tests/parallel/backup_thread_pipe.ml b/testsuite/tests/parallel/backup_thread_pipe.ml
+ --- a/testsuite/tests/parallel/backup_thread_pipe.ml
+ +++ b/testsuite/tests/parallel/backup_thread_pipe.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   bytecode;
+@@ -12038,83 +12398,115 @@
+ diff --git a/testsuite/tests/parallel/constpromote.ml b/testsuite/tests/parallel/constpromote.ml
+ --- a/testsuite/tests/parallel/constpromote.ml
+ +++ b/testsuite/tests/parallel/constpromote.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* when run with the bytecode debug runtime, this test
+     used to trigger a bug where the constant [13]
+ diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
+ --- a/testsuite/tests/parallel/deadcont.ml
+ +++ b/testsuite/tests/parallel/deadcont.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (*
+    Test handling of continuations created by a domain that has since terminated.
+ diff --git a/testsuite/tests/parallel/domain_dls.ml b/testsuite/tests/parallel/domain_dls.ml
+ --- a/testsuite/tests/parallel/domain_dls.ml
+ +++ b/testsuite/tests/parallel/domain_dls.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  let check_dls () =
+    let k1 = Domain.DLS.new_key (fun () -> 10) in
+ diff --git a/testsuite/tests/parallel/domain_dls2.ml b/testsuite/tests/parallel/domain_dls2.ml
+ --- a/testsuite/tests/parallel/domain_dls2.ml
+ +++ b/testsuite/tests/parallel/domain_dls2.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  let _ =
+    let key_array =
+ diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
+ --- a/testsuite/tests/parallel/domain_id.ml
+ +++ b/testsuite/tests/parallel/domain_id.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  open Domain
+  
+ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  open Domain
+  
+ diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+ --- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+ +++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  open Domain
+  
+ diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+ --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+ +++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   bytecode;
+@@ -12127,13 +12519,17 @@
+ diff --git a/testsuite/tests/parallel/fib_threads.ml b/testsuite/tests/parallel/fib_threads.ml
+ --- a/testsuite/tests/parallel/fib_threads.ml
+ +++ b/testsuite/tests/parallel/fib_threads.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hassysthreads
++-* skip
++-reason = "OCaml 5 only"
++-** hassysthreads
+ -include systhreads
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include systhreads;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hassysthreads;
+ + {
+ +   bytecode;
+@@ -12146,23 +12542,31 @@
+ diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
+ --- a/testsuite/tests/parallel/join.ml
+ +++ b/testsuite/tests/parallel/join.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  let test_size =
+    try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
+ diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
+ --- a/testsuite/tests/parallel/major_gc_wait_backup.ml
+ +++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** native
+--** bytecode
++-*** native
++-*** bytecode
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   native;
+@@ -12175,13 +12579,17 @@
+ diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
+ --- a/testsuite/tests/parallel/mctest.ml
+ +++ b/testsuite/tests/parallel/mctest.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   bytecode;
+@@ -12194,13 +12602,17 @@
+ diff --git a/testsuite/tests/parallel/multicore_systhreads.ml b/testsuite/tests/parallel/multicore_systhreads.ml
+ --- a/testsuite/tests/parallel/multicore_systhreads.ml
+ +++ b/testsuite/tests/parallel/multicore_systhreads.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hassysthreads
++-* skip
++-reason = "OCaml 5 only"
++-** hassysthreads
+ -include systhreads
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include systhreads;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hassysthreads;
+ + {
+ +   bytecode;
+@@ -12213,23 +12625,31 @@
+ diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
+ --- a/testsuite/tests/parallel/pingpong.ml
+ +++ b/testsuite/tests/parallel/pingpong.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  let r = ref (Some 0)
+  
+ diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
+ --- a/testsuite/tests/parallel/poll.ml
+ +++ b/testsuite/tests/parallel/poll.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   bytecode;
+@@ -12242,33 +12662,45 @@
+ diff --git a/testsuite/tests/parallel/prodcons_domains.ml b/testsuite/tests/parallel/prodcons_domains.ml
+ --- a/testsuite/tests/parallel/prodcons_domains.ml
+ +++ b/testsuite/tests/parallel/prodcons_domains.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* Classic producer-consumer *)
+  
+ diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
+ --- a/testsuite/tests/parallel/recommended_domain_count.ml
+ +++ b/testsuite/tests/parallel/recommended_domain_count.ml
+-@@ -1,5 +1,5 @@
++@@ -1,7 +1,7 @@
+  (* TEST
+ -modules = "recommended_domain_count_cstubs.c"
++-* skip
++-reason = "OCaml 5 only"
+ + modules = "recommended_domain_count_cstubs.c";
+++ reason = "OCaml 5 only";
+++ skip;
+  *)
+  
+  external get_max_domains : unit -> int = "caml_get_max_domains"
+ diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
+ --- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
+ +++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
+-@@ -1,8 +1,11 @@
++@@ -1,10 +1,13 @@
+  (* TEST
+--* hasunix
++-* skip
++-reason = "OCaml 5 only"
++-** hasunix
+ -include unix
+--** bytecode
+--** native
++-*** bytecode
++-*** native
+ + include unix;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hasunix;
+ + {
+ +   bytecode;
+@@ -12281,25 +12713,33 @@
+ diff --git a/testsuite/tests/parallel/tak.ml b/testsuite/tests/parallel/tak.ml
+ --- a/testsuite/tests/parallel/tak.ml
+ +++ b/testsuite/tests/parallel/tak.ml
+-@@ -1,5 +1,4 @@
+--(* TEST
++@@ -1,7 +1,7 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+ -*)
+-+(* TEST *)
+++ reason = "OCaml 5 only";
+++ skip;
+++ *)
+  
+  (* filling minor heaps in parallel to trigger
+     minor heap exhaustion codepath organically *)
+ diff --git a/testsuite/tests/parallel/test_c_thread_register.ml b/testsuite/tests/parallel/test_c_thread_register.ml
+ --- a/testsuite/tests/parallel/test_c_thread_register.ml
+ +++ b/testsuite/tests/parallel/test_c_thread_register.ml
+-@@ -1,9 +1,12 @@
++@@ -1,11 +1,14 @@
+  (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+ -   modules = "test_c_thread_register_cstubs.c"
+--   * hassysthreads
++-   ** hassysthreads
+ -   include systhreads
+--   ** bytecode
+--   ** native
++-   *** bytecode
++-   *** native
+ + modules = "test_c_thread_register_cstubs.c";
+ + include systhreads;
+++ reason = "OCaml 5 only";
+++ skip;
+ + hassysthreads;
+ + {
+ +   bytecode;
+@@ -12312,10 +12752,14 @@
+ diff --git a/testsuite/tests/parallel/test_issue_11094.ml b/testsuite/tests/parallel/test_issue_11094.ml
+ --- a/testsuite/tests/parallel/test_issue_11094.ml
+ +++ b/testsuite/tests/parallel/test_issue_11094.ml
+-@@ -1,6 +1,9 @@
++@@ -1,8 +1,11 @@
+  (* TEST
+--* bytecode
+--* native
++-* skip
++-reason = "OCaml 5 only"
++-** bytecode
++-** native
+++ reason = "OCaml 5 only";
+++ skip;
+ + {
+ +   bytecode;
+ + }{
+@@ -13931,99 +14375,188 @@
+  *)
+  
+  module type S = sig
+-diff --git a/testsuite/tests/statmemprof/alloc_counts.ml b/testsuite/tests/statmemprof/alloc_counts.ml
+---- a/testsuite/tests/statmemprof/alloc_counts.ml
+-+++ b/testsuite/tests/statmemprof/alloc_counts.ml
+-@@ -1,6 +1,6 @@
+- (* TEST
+--* skip
+--reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+- *)
+- module MP = Gc.Memprof
+- 
+ diff --git a/testsuite/tests/statmemprof/arrays_in_major.ml b/testsuite/tests/statmemprof/arrays_in_major.ml
+ --- a/testsuite/tests/statmemprof/arrays_in_major.ml
+ +++ b/testsuite/tests/statmemprof/arrays_in_major.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   flags = "-g"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + flags = "-g";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/arrays_in_minor.ml b/testsuite/tests/statmemprof/arrays_in_minor.ml
+ --- a/testsuite/tests/statmemprof/arrays_in_minor.ml
+ +++ b/testsuite/tests/statmemprof/arrays_in_minor.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   flags = "-g"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + flags = "-g";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/blocking_in_callback.ml b/testsuite/tests/statmemprof/blocking_in_callback.ml
+ --- a/testsuite/tests/statmemprof/blocking_in_callback.ml
+ +++ b/testsuite/tests/statmemprof/blocking_in_callback.ml
+-@@ -1,10 +1,16 @@
++@@ -1,8 +1,11 @@
+  (* TEST
+ -* hassysthreads
+ -include systhreads
+--* skip
+--reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ -** bytecode
+ -** native
+++ include systhreads;
+++ hassysthreads;
+ + {
+-+   include systhreads;
+-+   hassysthreads;
+++   bytecode;
+ + }{
+-+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+   skip;
+-+   {
+-+     bytecode;
+-+   }{
+-+     native;
+-+   }
+++   native;
+ + }
+  *)
+  
+  let cnt = ref 0
++diff --git a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
++--- a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
+++++ b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
++@@ -1,74 +1,74 @@
++ -----------
++-Raised by primitive operation at Callstacks.alloc_list_literal in file "callstacks.ml", line 18, characters 30-53
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_list_literal in file "callstacks.ml", line 25, characters 30-53
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_pair in file "callstacks.ml", line 21, characters 30-76
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_pair in file "callstacks.ml", line 28, characters 30-76
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_record in file "callstacks.ml", line 26, characters 12-66
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_record in file "callstacks.ml", line 33, characters 12-66
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_some in file "callstacks.ml", line 29, characters 30-60
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_some in file "callstacks.ml", line 36, characters 30-60
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_array_literal in file "callstacks.ml", line 32, characters 30-55
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_array_literal in file "callstacks.ml", line 39, characters 30-55
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_float_array_literal in file "callstacks.ml", line 36, characters 12-62
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_float_array_literal in file "callstacks.ml", line 43, characters 12-62
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.do_alloc_unknown_array_literal in file "callstacks.ml", line 39, characters 22-27
++-Called from Callstacks.alloc_unknown_array_literal in file "callstacks.ml", line 41, characters 30-65
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.do_alloc_unknown_array_literal in file "callstacks.ml", line 46, characters 22-27
+++Called from Callstacks.alloc_unknown_array_literal in file "callstacks.ml", line 48, characters 30-65
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_small_array in file "callstacks.ml", line 44, characters 30-69
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_small_array in file "callstacks.ml", line 51, characters 30-69
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_large_array in file "callstacks.ml", line 47, characters 30-73
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_large_array in file "callstacks.ml", line 54, characters 30-73
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_closure.(fun) in file "callstacks.ml", line 51, characters 30-43
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_closure.(fun) in file "callstacks.ml", line 58, characters 30-43
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.get0 in file "callstacks.ml", line 54, characters 28-33
++-Called from Callstacks.getfloatfield in file "callstacks.ml", line 56, characters 30-47
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.get0 in file "callstacks.ml", line 61, characters 28-33
+++Called from Callstacks.getfloatfield in file "callstacks.ml", line 63, characters 30-47
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++ Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 66, characters 9-35
++-Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 62, characters 12-87
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 69, characters 12-87
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_ref in file "callstacks.ml", line 65, characters 30-59
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.alloc_ref in file "callstacks.ml", line 72, characters 30-59
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.prod_floats in file "callstacks.ml", line 68, characters 37-43
++-Called from Callstacks.alloc_boxedfloat in file "callstacks.ml", line 70, characters 30-49
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
+++Raised by primitive operation at Callstacks.prod_floats in file "callstacks.ml", line 75, characters 37-43
+++Called from Callstacks.alloc_boxedfloat in file "callstacks.ml", line 77, characters 30-49
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
+ diff --git a/testsuite/tests/statmemprof/callstacks.ml b/testsuite/tests/statmemprof/callstacks.ml
+ --- a/testsuite/tests/statmemprof/callstacks.ml
+ +++ b/testsuite/tests/statmemprof/callstacks.ml
+-@@ -1,19 +1,28 @@
++@@ -1,15 +1,22 @@
+  (* TEST
+ -   flags = "-g -w -5"
+ -
+ -   * flat-float-array
+ -     reference = "${test_source_directory}/callstacks.flat-float-array.reference"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ -   ** native
+ -   ** bytecode
+ -
+ -   * no-flat-float-array
+ -     reference = "${test_source_directory}/callstacks.no-flat-float-array.reference"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ -   ** native
+ -   ** bytecode
+ + flags = "-g -w -5";
+ + {
+ +   reference = "${test_source_directory}/callstacks.flat-float-array.reference";
+ +   flat-float-array;
+-+ }{
+-+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+   skip;
+ +   {
+ +     native;
+ +   }{
+@@ -14032,9 +14565,6 @@
+ + }{
+ +   reference = "${test_source_directory}/callstacks.no-flat-float-array.reference";
+ +   no-flat-float-array;
+-+ }{
+-+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+   skip;
+ +   {
+ +     native;
+ +   }{
+@@ -14044,21 +14574,229 @@
+  *)
+  
+  open Gc.Memprof
++diff --git a/testsuite/tests/statmemprof/callstacks.no-flat-float-array.reference b/testsuite/tests/statmemprof/callstacks.no-flat-float-array.reference
++--- a/testsuite/tests/statmemprof/callstacks.no-flat-float-array.reference
+++++ b/testsuite/tests/statmemprof/callstacks.no-flat-float-array.reference
++@@ -1,70 +1,70 @@
++ -----------
++-Raised by primitive operation at Callstacks.alloc_list_literal in file "callstacks.ml", line 18, characters 30-53
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_list_literal in file "callstacks.ml", line 25, characters 30-53
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_pair in file "callstacks.ml", line 21, characters 30-76
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_pair in file "callstacks.ml", line 28, characters 30-76
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_record in file "callstacks.ml", line 26, characters 12-66
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_record in file "callstacks.ml", line 33, characters 12-66
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_some in file "callstacks.ml", line 29, characters 30-60
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_some in file "callstacks.ml", line 36, characters 30-60
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_array_literal in file "callstacks.ml", line 32, characters 30-55
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_array_literal in file "callstacks.ml", line 39, characters 30-55
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_float_array_literal in file "callstacks.ml", line 36, characters 12-62
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_float_array_literal in file "callstacks.ml", line 43, characters 12-62
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.do_alloc_unknown_array_literal in file "callstacks.ml", line 39, characters 22-27
++-Called from Callstacks.alloc_unknown_array_literal in file "callstacks.ml", line 41, characters 30-65
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.do_alloc_unknown_array_literal in file "callstacks.ml", line 46, characters 22-27
+++Called from Callstacks.alloc_unknown_array_literal in file "callstacks.ml", line 48, characters 30-65
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_small_array in file "callstacks.ml", line 44, characters 30-69
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_small_array in file "callstacks.ml", line 51, characters 30-69
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_large_array in file "callstacks.ml", line 47, characters 30-73
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_large_array in file "callstacks.ml", line 54, characters 30-73
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_closure.(fun) in file "callstacks.ml", line 51, characters 30-43
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_closure.(fun) in file "callstacks.ml", line 58, characters 30-43
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++ No callstack
++ -----------
++-Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 61, characters 9-35
++-Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 62, characters 12-87
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 65, characters 9-35
+++Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 69, characters 12-87
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.alloc_ref in file "callstacks.ml", line 65, characters 30-59
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.alloc_ref in file "callstacks.ml", line 72, characters 30-59
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++ -----------
++-Raised by primitive operation at Callstacks.prod_floats in file "callstacks.ml", line 68, characters 37-43
++-Called from Callstacks.alloc_boxedfloat in file "callstacks.ml", line 70, characters 30-49
++-Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
++-Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
++-Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
+++Raised by primitive operation at Callstacks.prod_floats in file "callstacks.ml", line 75, characters 37-43
+++Called from Callstacks.alloc_boxedfloat in file "callstacks.ml", line 77, characters 30-49
+++Called from Callstacks.test in file "callstacks.ml", line 99, characters 2-10
+++Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++Called from Callstacks in file "callstacks.ml", line 106, characters 2-27
++diff --git a/testsuite/tests/statmemprof/comballoc.byte.reference b/testsuite/tests/statmemprof/comballoc.byte.reference
++--- a/testsuite/tests/statmemprof/comballoc.byte.reference
+++++ b/testsuite/tests/statmemprof/comballoc.byte.reference
++@@ -1,49 +1,49 @@
++ 2: 0.42 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 2-19
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 3: 0.42 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 6-18
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 4: 0.42 true
++-Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
++-Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 14, characters 11-20
+++Called from Comballoc.f in file "comballoc.ml", line 17, characters 13-17
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 2: 0.01 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 2-19
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 3: 0.01 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 6-18
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 4: 0.01 true
++-Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
++-Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 14, characters 11-20
+++Called from Comballoc.f in file "comballoc.ml", line 17, characters 13-17
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 2: 0.83 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 2-19
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 3: 0.83 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 6-18
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 4: 0.83 true
++-Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 11, characters 11-20
++-Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f4 in file "comballoc.ml", line 14, characters 11-20
+++Called from Comballoc.f in file "comballoc.ml", line 17, characters 13-17
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ OK
+ diff --git a/testsuite/tests/statmemprof/comballoc.ml b/testsuite/tests/statmemprof/comballoc.ml
+ --- a/testsuite/tests/statmemprof/comballoc.ml
+ +++ b/testsuite/tests/statmemprof/comballoc.ml
+-@@ -1,11 +1,14 @@
++@@ -1,9 +1,12 @@
+  (* TEST
+ -   flags = "-g"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+--   ** bytecode
++-   * bytecode
+ -     reference = "${test_source_directory}/comballoc.byte.reference"
+--   ** native
++-   * native
+ -     reference = "${test_source_directory}/comballoc.opt.reference"
+ + flags = "-g";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+ + {
+ +   reference = "${test_source_directory}/comballoc.byte.reference";
+ +   bytecode;
+@@ -14069,110 +14807,154 @@
+  *)
+  
+  open Gc.Memprof
+-diff --git a/testsuite/tests/statmemprof/custom.ml b/testsuite/tests/statmemprof/custom.ml
+---- a/testsuite/tests/statmemprof/custom.ml
+-+++ b/testsuite/tests/statmemprof/custom.ml
+-@@ -1,6 +1,6 @@
+- (* TEST
+--* skip
+--reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+- *)
+- 
+- open Gc.Memprof
++diff --git a/testsuite/tests/statmemprof/comballoc.opt.reference b/testsuite/tests/statmemprof/comballoc.opt.reference
++--- a/testsuite/tests/statmemprof/comballoc.opt.reference
+++++ b/testsuite/tests/statmemprof/comballoc.opt.reference
++@@ -1,49 +1,49 @@
++ 2: 0.42 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 2-19
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 3: 0.42 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 6-18
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 4: 0.42 true
++-Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
++-Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 14, characters 11-20
+++Called from Comballoc.f in file "comballoc.ml", line 17, characters 13-17
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 2: 0.01 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 2-19
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 3: 0.01 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 6-18
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 4: 0.01 true
++-Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
++-Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 14, characters 11-20
+++Called from Comballoc.f in file "comballoc.ml", line 17, characters 13-17
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 2: 0.83 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 2-19
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 2-19
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 3: 0.83 false
++-Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 14, characters 6-18
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f in file "comballoc.ml", line 17, characters 6-18
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ 4: 0.83 true
++-Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 11, characters 11-20
++-Called from Comballoc.f in file "comballoc.ml", line 14, characters 13-17
++-Called from Comballoc.test in file "comballoc.ml", line 39, characters 25-48
+++Raised by primitive operation at Comballoc.f4 in file "comballoc.ml" (inlined), line 14, characters 11-20
+++Called from Comballoc.f in file "comballoc.ml", line 17, characters 13-17
+++Called from Comballoc.test in file "comballoc.ml", line 42, characters 25-48
++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++-Called from Comballoc in file "comballoc.ml", line 69, characters 2-35
+++Called from Comballoc in file "comballoc.ml", line 72, characters 2-35
++ OK
+ diff --git a/testsuite/tests/statmemprof/exception_callback.ml b/testsuite/tests/statmemprof/exception_callback.ml
+ --- a/testsuite/tests/statmemprof/exception_callback.ml
+ +++ b/testsuite/tests/statmemprof/exception_callback.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   exit_status = "2"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + exit_status = "2";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/exception_callback_minor.ml b/testsuite/tests/statmemprof/exception_callback_minor.ml
+ --- a/testsuite/tests/statmemprof/exception_callback_minor.ml
+ +++ b/testsuite/tests/statmemprof/exception_callback_minor.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   exit_status = "2"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + exit_status = "2";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/intern.ml b/testsuite/tests/statmemprof/intern.ml
+ --- a/testsuite/tests/statmemprof/intern.ml
+ +++ b/testsuite/tests/statmemprof/intern.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   flags = "-g"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + flags = "-g";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/lists_in_minor.ml b/testsuite/tests/statmemprof/lists_in_minor.ml
+ --- a/testsuite/tests/statmemprof/lists_in_minor.ml
+ +++ b/testsuite/tests/statmemprof/lists_in_minor.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   flags = "-g"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + flags = "-g";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/minor_no_postpone.ml b/testsuite/tests/statmemprof/minor_no_postpone.ml
+ --- a/testsuite/tests/statmemprof/minor_no_postpone.ml
+ +++ b/testsuite/tests/statmemprof/minor_no_postpone.ml
+-@@ -1,7 +1,7 @@
++@@ -1,5 +1,5 @@
+  (* TEST
+ -   modules = "minor_no_postpone_stub.c"
+--   * skip
+--   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ + modules = "minor_no_postpone_stub.c";
+-+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+ skip;
+  *)
+  
+  open Gc.Memprof
+ diff --git a/testsuite/tests/statmemprof/moved_while_blocking.ml b/testsuite/tests/statmemprof/moved_while_blocking.ml
+ --- a/testsuite/tests/statmemprof/moved_while_blocking.ml
+ +++ b/testsuite/tests/statmemprof/moved_while_blocking.ml
+-@@ -1,10 +1,16 @@
++@@ -1,8 +1,11 @@
+  (* TEST
+ -* hassysthreads
+ -include systhreads
+--* skip
+--reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ -** bytecode
+ -** native
+++ include systhreads;
+++ hassysthreads;
+ + {
+-+   include systhreads;
+-+   hassysthreads;
+++   bytecode;
+ + }{
+-+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+   skip;
+-+   {
+-+     bytecode;
+-+   }{
+-+     native;
+-+   }
+++   native;
+ + }
+  *)
+  
+@@ -14180,25 +14962,18 @@
+ diff --git a/testsuite/tests/statmemprof/thread_exit_in_callback.ml b/testsuite/tests/statmemprof/thread_exit_in_callback.ml
+ --- a/testsuite/tests/statmemprof/thread_exit_in_callback.ml
+ +++ b/testsuite/tests/statmemprof/thread_exit_in_callback.ml
+-@@ -1,10 +1,16 @@
++@@ -1,8 +1,11 @@
+  (* TEST
+ -* hassysthreads
+ -include systhreads
+--* skip
+--reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ -** bytecode
+ -** native
+++ include systhreads;
+++ hassysthreads;
+ + {
+-+   include systhreads;
+-+   hassysthreads;
+++   bytecode;
+ + }{
+-+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+-+   skip;
+-+   {
+-+     bytecode;
+-+   }{
+-+     native;
+-+   }
+++   native;
+ + }
+  *)
+  
+@@ -25612,6 +26387,18 @@
+  
+  (** This test weak table by application to the memoization of collatz
+      (also known as syracuse) algorithm suite computation *)
++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++  *)
++ 
++ (* Due to GCs running at non-deterministic places, the output from these tests
+ diff --git a/testsuite/tests/weak-ephe-final/finaliser.ml b/testsuite/tests/weak-ephe-final/finaliser.ml
+ --- a/testsuite/tests/weak-ephe-final/finaliser.ml
+ +++ b/testsuite/tests/weak-ephe-final/finaliser.ml
+@@ -25622,6 +26409,30 @@
+  
+  let m = 1000
+  let m' = 100
++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ 
++ let () = Out_channel.set_buffered stdout false
++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ 
++ (* ocaml-multicore issues 528 and 468 *)
+ diff --git a/testsuite/tests/weak-ephe-final/pr12001.ml b/testsuite/tests/weak-ephe-final/pr12001.ml
+ --- a/testsuite/tests/weak-ephe-final/pr12001.ml
+ +++ b/testsuite/tests/weak-ephe-final/pr12001.ml
+@@ -25652,6 +26463,18 @@
+  
+  let n = 500
+  let loop = 2
++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-   * skip
++-   reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ (* This test is currently disabled,
++    until the random failures have been investigated.
+ diff --git a/testsuite/tests/weak-ephe-final/weaktest.ml b/testsuite/tests/weak-ephe-final/weaktest.ml
+ --- a/testsuite/tests/weak-ephe-final/weaktest.ml
+ +++ b/testsuite/tests/weak-ephe-final/weaktest.ml
+@@ -25662,6 +26485,18 @@
+  
+  let debug = false;;
+  
++diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++@@ -1,6 +1,6 @@
++ (* TEST
++-* skip
++-reason = "OCaml 5 only"
+++ reason = "OCaml 5 only";
+++ skip;
++ *)
++ 
++ (* Testing unsynchronized, parallel Weak usage *)
+ diff --git a/testsuite/tests/win-unicode/mltest.ml b/testsuite/tests/win-unicode/mltest.ml
+ --- a/testsuite/tests/win-unicode/mltest.ml
+ +++ b/testsuite/tests/win-unicode/mltest.ml

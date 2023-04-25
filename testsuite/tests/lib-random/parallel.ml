@@ -1,11 +1,14 @@
 (* TEST
-   include unix
-   * skip
-   reason = "OCaml 5 only"
-   ** libunix
-   *** bytecode
-   *** native
- *)
+ include unix;
+ reason = "OCaml 5 only";
+ skip;
+ libunix;
+ {
+   bytecode;
+ }{
+   native;
+ }
+*)
 
 let () = Random.init 42
 

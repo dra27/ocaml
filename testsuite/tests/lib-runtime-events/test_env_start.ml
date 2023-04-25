@@ -1,8 +1,8 @@
 (* TEST
-include runtime_events
-set OCAML_RUNTIME_EVENTS_START = "1"
-* skip
-reason = "OCaml 5 only"
+ include runtime_events;
+ set OCAML_RUNTIME_EVENTS_START = "1";
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 (* In this test the runtime_events should already be started by the environment

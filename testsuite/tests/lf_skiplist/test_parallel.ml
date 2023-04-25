@@ -1,7 +1,7 @@
 (* TEST
-   modules = "stubs.c"
-   * skip
-   reason = "OCaml 5 only"
+ modules = "stubs.c";
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 external init_skiplist : unit -> unit = "init_skiplist"

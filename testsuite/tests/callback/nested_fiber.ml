@@ -1,11 +1,14 @@
 (* TEST
-   include unix
-   modules = "nested_fiber_.c"
-   * skip
-   reason = "OCaml 5 only"
-   ** libunix
-   *** bytecode
-   *** native
+ include unix;
+ modules = "nested_fiber_.c";
+ reason = "OCaml 5 only";
+ skip;
+ libunix;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"

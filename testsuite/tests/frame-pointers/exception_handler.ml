@@ -1,12 +1,10 @@
 (* TEST
-
-* skip
-reason = "OCaml 5 only"
-** frame_pointers
-*** native
-readonly_files = "fp_backtrace.c"
-all_modules = "${readonly_files} exception_handler.ml"
-
+ frame_pointers;
+ readonly_files = "fp_backtrace.c";
+ all_modules = "${readonly_files} exception_handler.ml";
+ reason = "OCaml 5 only";
+ skip;
+ native;
 *)
 
 (* https://github.com/ocaml/ocaml/pull/11031 *)

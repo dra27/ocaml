@@ -1,7 +1,7 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
-*)
+ reason = "OCaml 5 only";
+ skip;
+ *)
 
 (*
   Test handling of continuations created by a domain that has since terminated.

@@ -1,6 +1,6 @@
 (* TEST
-   * skip
-   reason = "OCaml 5 only"
+ reason = "OCaml 5 only";
+ skip;
 *)
 (* This test is currently disabled,
    until the random failures have been investigated.

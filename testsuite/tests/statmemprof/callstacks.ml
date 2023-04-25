@@ -1,15 +1,22 @@
 (* TEST
-   flags = "-g -w -5"
-
-   * flat-float-array
-     reference = "${test_source_directory}/callstacks.flat-float-array.reference"
-   ** native
-   ** bytecode
-
-   * no-flat-float-array
-     reference = "${test_source_directory}/callstacks.no-flat-float-array.reference"
-   ** native
-   ** bytecode
+ flags = "-g -w -5";
+ {
+   reference = "${test_source_directory}/callstacks.flat-float-array.reference";
+   flat-float-array;
+   {
+     native;
+   }{
+     bytecode;
+   }
+ }{
+   reference = "${test_source_directory}/callstacks.no-flat-float-array.reference";
+   no-flat-float-array;
+   {
+     native;
+   }{
+     bytecode;
+   }
+ }
 *)
 
 open Gc.Memprof

@@ -1,7 +1,7 @@
 (* TEST
-   modules = "globrootsprim.c"
-   * skip
-   reason = "OCaml 5 only"
+ modules = "globrootsprim.c";
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 module type GLOBREF = sig

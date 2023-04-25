@@ -1,8 +1,11 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
-** bytecode
-** native
+ reason = "OCaml 5 only";
+ skip;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 open Effect

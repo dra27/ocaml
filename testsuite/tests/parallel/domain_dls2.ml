@@ -1,7 +1,7 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
-*)
+ reason = "OCaml 5 only";
+ skip;
+ *)
 
 let _ =
   let key_array =

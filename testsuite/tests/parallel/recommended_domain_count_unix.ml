@@ -1,10 +1,13 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
-** hasunix
-include unix
-*** bytecode
-*** native
+ include unix;
+ reason = "OCaml 5 only";
+ skip;
+ hasunix;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 let try_ext cmd =
