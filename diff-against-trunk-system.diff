@@ -1,52 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e547775704
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,43 @@
-+--- a	2023-09-28 18:47:33.700679483 +0100
-++++ b	2023-09-28 18:47:33.716680065 +0100
-+@@ -19,10 +19,10 @@
-+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+ --- a/asmcomp/amd64/emit.mlp
-+ +++ b/asmcomp/amd64/emit.mlp
-+-@@ -537,13 +537,8 @@ let emit_instr env fallthrough i =
-+-       end
-+-   | Lop(Iextcall { func; alloc; stack_ofs }) ->
-++@@ -542,13 +542,8 @@ let emit_instr env fallthrough i =
-++   | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
-+        add_used_symbol func;
-++ (* BACKPORT
-+ -      let base_stack_size =
-+ -        if Arch.win64 then
-+ -          32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
-+@@ -47,19 +47,23 @@
-+    for i = 0 to Array.length arg - 1 do
-+      match arg.(i) with
-+      | Val | Int | Addr as ty ->
-+-@@ -291,12 +291,12 @@ let destroyed_at_c_call =
-++@@ -291,16 +291,16 @@ let destroyed_at_c_call =
-+       by the code sequence used for C calls in emit.mlp, so it
-+       is marked as destroyed. *)
-+    if win64 then
-+ -    (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
-+ +    (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
-+      Array.of_list(List.map phys_reg
-++ (* BACKPORT BEGIN
-+ -      [0;4;5;6;7;10;11;12;
-+-+      [0;1;4;5;6;7;10;11;12;
-+++      [0;1;4;5;6;7;10;11;12
-++ *)
-++       [0;4;5;6;7;10;11;
-++ (* BACKPORT END *)
-+         100;101;102;103;104;105])
-+    else
-+ -    (* Unix: rbx, r12-r15 preserved *)
-+ +    (* Unix: r12-r15 preserved *)
-+      Array.of_list(List.map phys_reg
-++ (* BACKPORT BEGIN
-+        [0;1;2;3;4;5;6;7;10;11;
-+-        100;101;102;103;104;105;106;107;
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10144,59 +10098,13 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..572718c18a
+index 0000000000..f248eb1cff
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10124 @@
+@@ -0,0 +1,10029 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e547775704
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,43 @@
-++--- a	2023-09-28 18:47:33.700679483 +0100
-+++++ b	2023-09-28 18:47:33.716680065 +0100
-++@@ -19,10 +19,10 @@
-++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-++ --- a/asmcomp/amd64/emit.mlp
-++ +++ b/asmcomp/amd64/emit.mlp
-++-@@ -537,13 +537,8 @@ let emit_instr env fallthrough i =
-++-       end
-++-   | Lop(Iextcall { func; alloc; stack_ofs }) ->
-+++@@ -542,13 +542,8 @@ let emit_instr env fallthrough i =
-+++   | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
-++        add_used_symbol func;
-+++ (* BACKPORT
-++ -      let base_stack_size =
-++ -        if Arch.win64 then
-++ -          32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
-++@@ -47,19 +47,23 @@
-++    for i = 0 to Array.length arg - 1 do
-++      match arg.(i) with
-++      | Val | Int | Addr as ty ->
-++-@@ -291,12 +291,12 @@ let destroyed_at_c_call =
-+++@@ -291,16 +291,16 @@ let destroyed_at_c_call =
-++       by the code sequence used for C calls in emit.mlp, so it
-++       is marked as destroyed. *)
-++    if win64 then
-++ -    (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
-++ +    (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
-++      Array.of_list(List.map phys_reg
-+++ (* BACKPORT BEGIN
-++ -      [0;4;5;6;7;10;11;12;
-++-+      [0;1;4;5;6;7;10;11;12;
-++++      [0;1;4;5;6;7;10;11;12
-+++ *)
-+++       [0;4;5;6;7;10;11;
-+++ (* BACKPORT END *)
-++         100;101;102;103;104;105])
-++    else
-++ -    (* Unix: rbx, r12-r15 preserved *)
-++ +    (* Unix: r12-r15 preserved *)
-++      Array.of_list(List.map phys_reg
-+++ (* BACKPORT BEGIN
-++        [0;1;2;3;4;5;6;7;10;11;
-++-        100;101;102;103;104;105;106;107;
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20222,56 +20130,7 @@ index 0000000000..572718c18a
 ++         ;;
 ++         msvc32)
 ++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will f
+++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
