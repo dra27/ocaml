@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
 
 * skip
 reason = "OCaml 5 only"
@@ -7,6 +8,19 @@ reason = "OCaml 5 only"
 readonly_files = "fp_backtrace.c"
 all_modules = "${readonly_files} exception_handler.ml"
 
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+
+* frame_pointers
+** native
+readonly_files = "fp_backtrace.c"
+all_modules = "${readonly_files} exception_handler.ml"
+
+=======
+ frame_pointers;
+ readonly_files = "fp_backtrace.c";
+ all_modules = "${readonly_files} exception_handler.ml";
+ native;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* https://github.com/ocaml/ocaml/pull/11031 *)

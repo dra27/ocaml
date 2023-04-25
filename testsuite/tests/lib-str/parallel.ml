@@ -1,10 +1,25 @@
 (* TEST
+<<<<<<< HEAD
 * skip
 reason = "OCaml 5 only"
 ** hasstr
 include str
 *** bytecode
 *** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+* hasstr
+include str
+** bytecode
+** native
+=======
+ include str;
+ hasstr;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 let total = Atomic.make 0

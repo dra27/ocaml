@@ -1,5 +1,15 @@
 (* TEST
+<<<<<<< HEAD
    modules = "alloc_async_stubs.c"
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   modules = "alloc_async_stubs.c"
+   * skip
+   reason = "alloc async changes: https://github.com/ocaml/ocaml/pull/8897"
+=======
+ modules = "alloc_async_stubs.c";
+ reason = "alloc async changes: https://github.com/ocaml/ocaml/pull/8897";
+ skip;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 external test : int ref -> unit = "stub"

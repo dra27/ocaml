@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
    include runtime_events
    include unix
    set OCAMLRUNPARAM = "e=6"
@@ -7,6 +8,24 @@
    ** libunix
    *** native
    *** bytecode
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   include runtime_events
+   include unix
+   set OCAMLRUNPARAM = "e=6"
+   * libunix
+   ** native
+   ** bytecode
+=======
+ include runtime_events;
+ include unix;
+ set OCAMLRUNPARAM = "e=6";
+ libunix;
+ {
+   native;
+ }{
+   bytecode;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 type Runtime_events.User.tag += Ev

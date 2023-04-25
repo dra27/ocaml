@@ -1,10 +1,25 @@
 (* TEST
+<<<<<<< HEAD
   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
   * skip
   reason = "OCaml 5 only"
   ** not-bsd
   *** bytecode
   *** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+  modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+  * not-bsd
+  ** bytecode
+  ** native
+=======
+ modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+ not-bsd;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* Memory model test:

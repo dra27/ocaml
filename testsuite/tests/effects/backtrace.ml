@@ -1,8 +1,18 @@
+<<<<<<< HEAD
 (* TEST
    flags = "-g"
    ocamlrunparam += ",b=1"
    * skip
    reason = "OCaml 5 only"
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+(* TEST
+   flags = "-g"
+   ocamlrunparam += ",b=1"
+=======
+(* TEST_BELOW
+(* Blank lines added here to preserve locations. *)
+
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Effect
@@ -54,3 +64,8 @@ let main () =
       | _ -> None }
 
 let _ = main ()
+
+(* TEST
+ flags = "-g";
+ ocamlrunparam += ",b=1";
+*)

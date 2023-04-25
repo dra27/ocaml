@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
    include unix
    modules = "stack_overflow_.c"
    * skip
@@ -6,6 +7,22 @@
    ** libunix
    *** bytecode
    *** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   include unix
+   modules = "stack_overflow_.c"
+   * libunix
+   ** bytecode
+   ** native
+=======
+ include unix;
+ modules = "stack_overflow_.c";
+ libunix;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"

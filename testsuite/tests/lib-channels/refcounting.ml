@@ -1,7 +1,13 @@
 (* TEST
+<<<<<<< HEAD
    * skip
    reason = "OCaml 5 only"
    ** expect
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   * expect
+=======
+ expect;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* Test the behavior of channel refcounting. *)

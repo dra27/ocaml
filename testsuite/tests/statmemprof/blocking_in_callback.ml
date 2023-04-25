@@ -1,8 +1,30 @@
 (* TEST
+<<<<<<< HEAD
 * hassysthreads
 include systhreads
 ** bytecode
 ** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+* hassysthreads
+include systhreads
+* skip
+reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+** bytecode
+** native
+=======
+ {
+   include systhreads;
+   hassysthreads;
+ }{
+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+   skip;
+   {
+     bytecode;
+   }{
+     native;
+   }
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 let cnt = ref 0

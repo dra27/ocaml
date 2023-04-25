@@ -1,8 +1,16 @@
 (* TEST
+<<<<<<< HEAD
    ocamlrunparam += ",s=512"
    * skip
    reason = "OCaml 5 only"
    ** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   ocamlrunparam += ",s=512"
+   * native
+=======
+ ocamlrunparam += ",s=512";
+ native;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 let count = ref 0

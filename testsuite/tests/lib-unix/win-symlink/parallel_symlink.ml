@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
 * libwin32unix
 include unix
 ** has_symlink
@@ -6,6 +7,22 @@ include unix
 reason = "OCaml 5 only"
 **** bytecode
 **** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+* libwin32unix
+include unix
+** has_symlink
+*** bytecode
+*** native
+=======
+ include unix;
+ libwin32unix;
+ has_symlink;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 let create_symlink barrier src dst () =

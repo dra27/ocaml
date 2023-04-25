@@ -1,9 +1,26 @@
 (* TEST
+<<<<<<< HEAD
    include unix
    modules = "callbackprim.c"
    * libunix
    ** bytecode
    ** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   include unix
+   modules = "test_signalhandler_.c"
+   * libunix
+   ** bytecode
+   ** native
+=======
+ include unix;
+ modules = "test_signalhandler_.c";
+ libunix;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (**************************************************************************)

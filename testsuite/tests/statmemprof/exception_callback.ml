@@ -1,5 +1,15 @@
 (* TEST
+<<<<<<< HEAD
    exit_status = "2"
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   exit_status = "2"
+   * skip
+   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+=======
+ exit_status = "2";
+ reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
+ skip;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Gc.Memprof

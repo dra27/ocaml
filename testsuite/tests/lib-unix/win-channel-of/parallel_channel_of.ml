@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
 modules = "fd_of_channel.c"
 reason = "OCaml 5 only"
 * skip
@@ -6,6 +7,22 @@ reason = "OCaml 5 only"
 include unix
 *** bytecode
 *** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+modules = "fd_of_channel.c"
+* libwin32unix
+include unix
+** bytecode
+** native
+=======
+ modules = "fd_of_channel.c";
+ include unix;
+ libwin32unix;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"

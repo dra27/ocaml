@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
    include unix
    modules = "test7_.c"
    * skip
@@ -6,6 +7,22 @@
    ** libunix
    *** bytecode
    *** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   include unix
+   modules = "test7_.c"
+   * libunix
+   ** bytecode
+   ** native
+=======
+ include unix;
+ modules = "test7_.c";
+ libunix;
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* Tests nested calls from C (main C) to OCaml (main OCaml) to C (caml_to_c) to

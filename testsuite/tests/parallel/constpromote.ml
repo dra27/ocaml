@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 (* TEST
 * skip
 reason = "OCaml 5 only"
 *)
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+(* TEST
+*)
+=======
+(* TEST *)
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 
 (* when run with the bytecode debug runtime, this test
    used to trigger a bug where the constant [13]

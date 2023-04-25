@@ -1,8 +1,19 @@
 (* TEST
+<<<<<<< HEAD
 * skip
 reason = "OCaml 5 only"
 ** bytecode
 ** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+* bytecode
+* native
+=======
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Effect

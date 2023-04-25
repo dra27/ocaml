@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
 
 * skip
 reason = "OCaml 5 only"
@@ -7,6 +8,19 @@ reason = "OCaml 5 only"
 readonly_files = "fp_backtrace.c c_call_.c"
 all_modules = "${readonly_files} c_call.ml"
 
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+
+* frame_pointers
+** native
+readonly_files = "fp_backtrace.c c_call_.c"
+all_modules = "${readonly_files} c_call.ml"
+
+=======
+ frame_pointers;
+ readonly_files = "fp_backtrace.c c_call_.c";
+ all_modules = "${readonly_files} c_call.ml";
+ native;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 external fp_backtrace : unit -> unit = "fp_backtrace"

@@ -1,7 +1,13 @@
 (* TEST
+<<<<<<< HEAD
    modules = "globrootsprim.c"
    * skip
    reason = "OCaml 5 only"
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   modules = "globrootsprim.c"
+=======
+ modules = "globrootsprim.c";
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 module type GLOBREF = sig

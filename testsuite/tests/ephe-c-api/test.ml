@@ -1,5 +1,15 @@
 (* TEST
+<<<<<<< HEAD
    modules = "stubs.c"
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+   modules = "stubs.c"
+   * skip
+   reason = "port the new Ephemeron C-api to multicore : https://github.com/ocaml/ocaml/pull/676"
+=======
+ modules = "stubs.c";
+ reason = "port the new Ephemeron C-api to multicore : https://github.com/ocaml/ocaml/pull/676";
+ skip;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* C version of ephetest.ml *)

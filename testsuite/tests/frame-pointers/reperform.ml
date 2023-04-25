@@ -1,4 +1,5 @@
 (* TEST
+<<<<<<< HEAD
 
 * skip
 reason - "OCaml 5 only"
@@ -8,6 +9,20 @@ reason - "OCaml 5 only"
 readonly_files = "fp_backtrace.c"
 all_modules = "${readonly_files} reperform.ml"
 
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+
+* frame_pointers
+** native
+
+readonly_files = "fp_backtrace.c"
+all_modules = "${readonly_files} reperform.ml"
+
+=======
+ frame_pointers;
+ readonly_files = "fp_backtrace.c";
+ all_modules = "${readonly_files} reperform.ml";
+ native;
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Effect

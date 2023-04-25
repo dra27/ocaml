@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 (* TEST
    * skip
    reason = "OCaml 5 only"
 *)
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+(* TEST
+*)
+=======
+(* TEST *)
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 
 (* filling minor heaps in parallel to trigger
    minor heap exhaustion codepath organically *)

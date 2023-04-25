@@ -1,5 +1,13 @@
-(* TEST
+(* TEST_BELOW
+(* Blank lines added here to preserve locations. *)
 
+
+
+
+
+
+
+<<<<<<< HEAD
 flags = "-g"
 * skip
 reason = "OCaml 5 only"
@@ -9,6 +17,16 @@ reason = "OCaml 5 only"
 ** flambda
 reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
 *** native
+||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
+flags = "-g"
+* bytecode
+* no-flambda
+** native
+* flambda
+reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+** native
+=======
+>>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 
 *)
 
@@ -45,3 +63,17 @@ let f () =
           | _ -> None }
 
 let () = f ()
+
+(* TEST
+ flags = "-g";
+ {
+   bytecode;
+ }{
+   no-flambda;
+   native;
+ }{
+   reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference";
+   flambda;
+   native;
+ }
+*)
