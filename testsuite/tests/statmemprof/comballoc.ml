@@ -1,9 +1,12 @@
 (* TEST
-   flags = "-g"
-   * bytecode
-     reference = "${test_source_directory}/comballoc.byte.reference"
-   * native
-     reference = "${test_source_directory}/comballoc.opt.reference"
+ flags = "-g";
+ {
+   reference = "${test_source_directory}/comballoc.byte.reference";
+   bytecode;
+ }{
+   reference = "${test_source_directory}/comballoc.opt.reference";
+   native;
+ }
 *)
 
 open Gc.Memprof

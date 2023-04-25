@@ -1,11 +1,14 @@
 (* TEST
-  modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
-  * skip
-  reason = "OCaml 5 only"
-  ** not-bsd
-  *** not-windows
-  **** bytecode
-  **** native
+ modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+ reason = "OCaml 5 only";
+ skip;
+ not-bsd;
+ {
+   not-windows;
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 (* Memory model: test the _publish idiom *)

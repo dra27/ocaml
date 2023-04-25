@@ -1,12 +1,10 @@
 (* TEST
-
-* skip
-reason - "OCaml 5 only"
-** frame_pointers
-*** native
-readonly_files = "fp_backtrace.c"
-all_modules = "${readonly_files} effects.ml"
-
+ frame_pointers;
+ readonly_files = "fp_backtrace.c";
+ all_modules = "${readonly_files} effects.ml";
+ reason = "OCaml 5 only";
+ skip;
+ native;
 *)
 
 open Printf

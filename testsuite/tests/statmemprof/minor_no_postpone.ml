@@ -1,5 +1,5 @@
 (* TEST
-   modules = "minor_no_postpone_stub.c"
+ modules = "minor_no_postpone_stub.c";
 *)
 
 open Gc.Memprof

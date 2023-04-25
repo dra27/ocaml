@@ -1,10 +1,13 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
-** hassysthreads
-include systhreads
-*** bytecode
-*** native
+ include systhreads;
+ reason = "OCaml 5 only";
+ skip;
+ hassysthreads;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 let _ =

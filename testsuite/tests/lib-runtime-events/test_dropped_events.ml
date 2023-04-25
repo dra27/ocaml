@@ -1,12 +1,15 @@
 (* TEST
-   include runtime_events
-   include unix
-   set OCAMLRUNPARAM = "e=6"
-   * skip
-   reason = "OCaml 5 only"
-   ** libunix
-   *** native
-   *** bytecode
+ include runtime_events;
+ include unix;
+ set OCAMLRUNPARAM = "e=6";
+ reason = "OCaml 5 only";
+ skip;
+ libunix;
+ {
+   native;
+ }{
+   bytecode;
+ }
 *)
 
 type Runtime_events.User.tag += Ev

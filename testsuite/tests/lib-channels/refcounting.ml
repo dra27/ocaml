@@ -1,7 +1,7 @@
 (* TEST
-   * skip
-   reason = "OCaml 5 only"
-   ** expect
+ reason = "OCaml 5 only";
+ skip;
+ expect;
 *)
 
 (* Test the behavior of channel refcounting. *)

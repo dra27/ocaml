@@ -1,14 +1,12 @@
-(* TEST
+(* TEST_BELOW
+(* Blank lines added here to preserve locations. *)
 
-flags = "-g"
-* skip
-reason = "OCaml 5 only"
-** bytecode
-** no-flambda
-*** native
-** flambda
-reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
-*** native
+
+
+
+
+
+
 
 *)
 
@@ -45,3 +43,19 @@ let f () =
           | _ -> None }
 
 let () = f ()
+
+(* TEST
+ flags = "-g";
+ reason = "OCaml 5 only";
+ skip;
+ {
+   bytecode;
+ }{
+   no-flambda;
+   native;
+ }{
+   reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference";
+   flambda;
+   native;
+ }
+*)

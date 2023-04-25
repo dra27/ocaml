@@ -1,7 +1,7 @@
 (* TEST
-  * instrumented-runtime
-  ** native
-    flags = "-runtime-variant=i"
+ instrumented-runtime;
+ flags = "-runtime-variant=i";
+ native;
 *)
 
 (* Test if the instrumented runtime is in working condition *)

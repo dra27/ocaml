@@ -1,7 +1,10 @@
 (* TEST
- * naked_pointers
- ** bytecode
- ** native
+ naked_pointers;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 let native =

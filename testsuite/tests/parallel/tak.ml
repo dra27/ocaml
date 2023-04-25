@@ -1,7 +1,7 @@
 (* TEST
-   * skip
-   reason = "OCaml 5 only"
-*)
+ reason = "OCaml 5 only";
+ skip;
+ *)
 
 (* filling minor heaps in parallel to trigger
    minor heap exhaustion codepath organically *)

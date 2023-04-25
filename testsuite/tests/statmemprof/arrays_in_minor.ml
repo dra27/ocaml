@@ -1,5 +1,5 @@
 (* TEST
-   flags = "-g"
+ flags = "-g";
 *)
 
 open Gc.Memprof

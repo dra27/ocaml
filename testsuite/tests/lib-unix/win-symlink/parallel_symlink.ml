@@ -1,11 +1,14 @@
 (* TEST
-* libwin32unix
-include unix
-** has_symlink
-*** skip
-reason = "OCaml 5 only"
-**** bytecode
-**** native
+ include unix;
+ libwin32unix;
+ has_symlink;
+ reason = "OCaml 5 only";
+ skip;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 let create_symlink barrier src dst () =

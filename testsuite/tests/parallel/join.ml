@@ -1,7 +1,7 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
-*)
+ reason = "OCaml 5 only";
+ skip;
+ *)
 
 let test_size =
   try int_of_string (Sys.getenv "OCAML_TEST_SIZE")

@@ -1,8 +1,6 @@
-(* TEST
-   flags = "-g"
-   ocamlrunparam += ",b=1"
-   * skip
-   reason = "OCaml 5 only"
+(* TEST_BELOW
+(* Blank lines added here to preserve locations. *)
+
 *)
 
 open Effect
@@ -54,3 +52,10 @@ let main () =
       | _ -> None }
 
 let _ = main ()
+
+(* TEST
+ flags = "-g";
+ ocamlrunparam += ",b=1";
+ reason = "OCaml 5 only";
+ skip;
+*)

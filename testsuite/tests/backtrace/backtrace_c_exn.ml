@@ -1,9 +1,7 @@
-(* TEST
-   modules = "backtrace_c_exn_.c"
-   flags = "-g"
-   ocamlrunparam += ",b=1"
-   * skip
-   reason = "OCaml 5 only"
+(* TEST_BELOW
+(* Blank lines added here to preserve locations. *)
+
+
 *)
 
 (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
@@ -20,3 +18,11 @@ let () =
   | exn ->
     Printexc.to_string exn |> print_endline;
     Printexc.print_backtrace stdout
+
+(* TEST
+ modules = "backtrace_c_exn_.c";
+ flags = "-g";
+ ocamlrunparam += ",b=1";
+ reason = "OCaml 5 only";
+ skip;
+*)
