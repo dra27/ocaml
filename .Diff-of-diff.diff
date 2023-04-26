@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:35.564747197 +0100
++++ b	2023-09-28 18:47:35.572747487 +0100
+@@ -148,7 +148,7 @@
+  #include "unixsupport.h"
+  #include "cst2constr.h"
+  #include <errno.h>
+-@@ -297,7 +300,7 @@ void caml_unix_error(int errcode, const char *cmdname, value cmdarg)
++@@ -305,7 +308,7 @@ void caml_unix_error(int errcode, const char *cmdname, value cmdarg)
+    value res;
+    const value * exn;
+  
