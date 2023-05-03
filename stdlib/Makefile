@@ -30,7 +30,7 @@ COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
-OPTCOMPILER=$(ROOTDIR)/ocamlopt
+OPTCOMPILER=$(ROOTDIR)/ocamlopt$(EXE)
 CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
 
 include StdlibModules
@@ -147,7 +147,7 @@ ifneq "$(UNIX_OR_WIN32)" "win32"
 endif
 
 $(HEADERPROGRAM)%$(O): \
-  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
+  OC_CPPFLAGS += -DRUNTIME_NAME="$(HEADER_PATH)ocamlrun$(subst .,,$*)"
 
 $(HEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
@@ -163,7 +163,7 @@ tmptargetcamlheader%exe: $(TARGETHEADERPROGRAM)%$(O)
 
 $(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
+	      -DRUNTIME_NAME="$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)" \
 	      $(OUTPUTOBJ)$@ $^
 
 target_%: tmptarget%.exe
@@ -190,34 +190,33 @@ distclean: clean
 clean::
 	rm -f $(CAMLHEADERS)
 
-COMPFLAGS_CMD = SAK='$(SAK_HOST)' ./Compflags
 export AWK
 
 %.cmi: %.mli
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
 
 # The dependency on the .mli file is in .depend (since stdlib__Foo.cmi
 # depends on stdlib__foo.mli)
 stdlib__%.cmi:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
 	         -o $@ -c $(filter %.mli, $^)
 
 %.cmo: %.ml
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmo
 # depends on stdlib__foo.ml)
 stdlib__%.cmo:
-	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
+	$(V_OCAMLC)$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
 	         -o $@ -c $(filter %.ml, $^)
 
 %.cmx: %.ml
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) -c $<
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
 
 # The dependency on the .ml file is in .depend (since stdlib__Foo.cmx
 # depends on stdlib__foo.ml)
 stdlib__%.cmx:
-	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell $(COMPFLAGS_CMD) $@) \
+	$(V_OCAMLOPT)$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) \
 	           -o $@ -c $(filter %.ml, $^)
 
 # Dependencies on the compiler
