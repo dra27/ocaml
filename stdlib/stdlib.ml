@@ -581,7 +581,7 @@ let exit retcode =
 
 let _ = register_named_value "Pervasives.do_at_exit" do_at_exit
 
-(*MODULE_ALIASES*)
+[%%ocaml.stdlib_aliases]
 module Arg            = Arg
 module Array          = Array
 module ArrayLabels    = ArrayLabels

@@ -14,6 +14,7 @@
 (**************************************************************************)
 
 open Format
+open Ast_mapper
 
 type error =
   | CannotRun of string
@@ -109,6 +110,9 @@ let rewrite kind ppxs ast =
   read_ast kind fn
 
 let apply_rewriters_str ?(restore = true) ~tool_name ast =
+  let ast =
+    let mapper = Compiler_ppx.stdlib_aliases () in
+    mapper.structure mapper ast in
   match !Clflags.all_ppx with
   | [] -> ast
   | ppxs ->
@@ -121,6 +125,9 @@ let apply_rewriters_str ?(restore = true) ~tool_name ast =
       Ast_invariants.structure ast; ast
 
 let apply_rewriters_sig ?(restore = true) ~tool_name ast =
+  let ast =
+    let mapper = Compiler_ppx.stdlib_aliases () in
+    mapper.signature mapper ast in
   match !Clflags.all_ppx with
   | [] -> ast
   | ppxs ->
