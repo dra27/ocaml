@@ -146,7 +146,6 @@ COMP = \
   bytecomp/bytesections.cmo \
   bytecomp/dll.cmo \
   bytecomp/symtable.cmo \
-  driver/compiler_ppx.cmo \
   driver/pparse.cmo \
   driver/compenv.cmo \
   driver/main_args.cmo \

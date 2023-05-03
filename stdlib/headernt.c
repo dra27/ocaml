@@ -31,10 +31,7 @@
 #endif
 #endif
 
-#define Q(x) #x
-#define QUOTE(x) Q(x)
-
-char * default_runtime_name = QUOTE(RUNTIME_NAME);
+char * default_runtime_name = RUNTIME_NAME;
 
 static
 #ifdef _MSC_VER
