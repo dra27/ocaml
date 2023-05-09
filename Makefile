@@ -176,16 +176,13 @@ FLEXDLL_SOURCE_FILES = \
   $(wildcard $(FLEXDLL_SOURCE_DIR)/*.c) $(wildcard $(FLEXDLL_SOURCE_DIR)/*.h) \
   $(wildcard $(FLEXDLL_SOURCE_DIR)/*.ml)
 
-boot/ocamlruns$(EXE): runtime/ocamlruns$(EXE)
-	cp $< $@
-
 $(BYTE_BINDIR) $(OPT_BINDIR):
 	$(MKDIR) $@
 
 flexlink.byte$(EXE): $(FLEXDLL_SOURCE_FILES)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
-	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
+	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlrun$(EXE)' NATDYNLINK=false \
 	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
 	  flexlink.exe support
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe flexlink.byte$(EXE)
@@ -196,7 +193,7 @@ partialclean::
 $(BYTE_BINDIR)/flexlink$(EXE): flexlink.byte$(EXE) | $(BYTE_BINDIR)
 	rm -f $@
 # Start with a copy to ensure that the result is always executable
-	cp boot/ocamlruns$(EXE) $@
+	cp boot/ocamlrun$(EXE) $@
 	cat flexlink.byte$(EXE) >> $@
 	cp $(addprefix $(FLEXDLL_SOURCE_DIR)/, $(FLEXDLL_OBJECTS)) $(BYTE_BINDIR)
 
@@ -204,26 +201,26 @@ partialclean::
 	rm -f $(BYTE_BINDIR)/flexlink $(BYTE_BINDIR)/flexlink.exe
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
-  COLDSTART_STDLIB_RUNTIME = runtime/ocamlrun$(EXE) runtime/primitives
+boot/ocamlrun$(EXE): runtime/ocamlrun$(EXE) runtime/primitives
 else
-  # The boot/ocamlruns$(EXE) produces runtime/primitives as a side-effect
-  COLDSTART_STDLIB_RUNTIME = boot/ocamlruns$(EXE)
+# The recipe for runtime/ocamlruns$(EXE) directly produces runtime/primitives
+boot/ocamlrun$(EXE): runtime/ocamlruns$(EXE)
 
 $(foreach runtime, n nd ni, \
   $(eval runtime/ocamlru$(runtime)$(EXE): | $(BYTE_BINDIR)/flexlink$(EXE)))
 endif
 
+# $< refers to runtime/ocamlruns when bootstrapping flexlink and
+# runtime/ocamlrun otherwise (see above).
+boot/ocamlrun$(EXE):
+	cp $< $@
+
 # Start up the system from the distribution compiler
 .PHONY: coldstart
-coldstart: $(COLDSTART_STDLIB_RUNTIME)
+coldstart: boot/ocamlrun$(EXE) runtime/libcamlrun.$(A)
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/$<' \
 	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
-	$(MAKE) setup-boot
-
-.PHONY: setup-boot
-setup-boot: runtime/ocamlrun$(EXE)
-	rm -f $(addprefix boot/, ocamlrun$(EXE) libcamlrun.$(A) $(LIBFILES))
-	cp $< boot/ocamlrun$(EXE)
+	rm -f $(addprefix boot/, libcamlrun.$(A) $(LIBFILES))
 	cp $(addprefix stdlib/, $(LIBFILES)) boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
 
@@ -1653,7 +1650,6 @@ distclean: clean
 	rm -f utils/config.generated.ml
 	rm -f compilerlibs/META
 	rm -f boot/ocamlrun boot/ocamlrun.exe boot/camlheader \
-	      boot/ocamlruns boot/ocamlruns.exe \
 	      boot/flexdll_*.o boot/flexdll_*.obj \
 	      boot/*.cm* boot/libcamlrun.a boot/libcamlrun.lib boot/ocamlc.opt
 	rm -f Makefile.config Makefile.build_config
