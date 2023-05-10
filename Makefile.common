@@ -247,28 +247,74 @@ MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
 LINK_BYTECODE_PROGRAM =\
   $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
 
-define OCAML_BYTECODE_PROGRAM
+# In the build system itself, the .opt versions are preferred in order to speed
+# up the build, especially when working on the compiler (i.e. when recompiling
+# parts of the compiler). For a tool foo, defining BEST_foo below to be
+# non-empty changes the behaviour of OCAML_BYTECODE_PROGRAM and
+# OCAML_NATIVE_PROGRAM. OCAML_BYTECODE_PROGRAM maintains a standalone copy of
+# the executable in $(BYTE_BINDIR) and OCAML_NATIVE_PROGRAM maintains a symlink
+# to the native executable in $(OPT_BINDIR). OCAML_BYTECODE_PROGRAM also
+# deletes the symlink from $(OPT_BINDIR), if found. In this way, PATH will
+# always find the "newest" version, while preferring native over bytecode.
+
+BEST_ocamlc = true
+BEST_ocamlopt = true
+BEST_ocamllex = true
+
+# $(1) = implicit path to executable (without .exe)
+# $(2) = executable basename only (still without .exe)
+define OCAML_BYTECODE_PROGRAM2
 $(eval $(call PROGRAM_SYNONYM,$(1)))
-$(basename $(notdir $(1)))_BCOBJS = \
-  $$(patsubst %,%.cma, $$($(basename $(notdir $(1)))_LIBRARIES)) \
-  $$(patsubst %,%.cmo, $$($(basename $(notdir $(1)))_MODULES))
-$(1)$(EXE): $$$$($(basename $(notdir $(1)))_BCOBJS)
+$(2)_BCOBJS = \
+  $$(patsubst %,%.cma, $$($(2)_LIBRARIES)) \
+  $$(patsubst %,%.cmo, $$($(2)_MODULES))
+$(1)$(EXE): $$$$($(2)_BCOBJS)
+ifneq "$(BEST_$(2))" ""
+	rm -f $(BYTE_BINDIR)/$(2)$(EXE)
+endif
 	$$(V_LINKC)$$(LINK_BYTECODE_PROGRAM) -o $$@ \
-	  $$($(basename $(notdir $(1)))_BCOBJS)
-endef # OCAML_BYTECODE_PROGRAM
+	  $$($(2)_BCOBJS)
+ifneq "$(BEST_$(2))" ""
+	cp -f boot/ocamlrun$(EXE) $(BYTE_BINDIR)/$(2).tmp
+	cat $(1)$(EXE) >> $(BYTE_BINDIR)/$(2).tmp
+	mv $(BYTE_BINDIR)/$(2).tmp $(BYTE_BINDIR)/$(2)$(EXE)
+	rm -f $(OPT_BINDIR)/$(2)$(EXE)
+
+$(1)$(EXE): | $(BYTE_BINDIR) $(OPT_BINDIR)
+partialclean::
+	rm -f $(addprefix $(BYTE_BINDIR)/,$(2) $(2).exe) \
+        $(addprefix $(OPT_BINDIR)/,$(2) $(2).exe)
+endif # ifneq "$(BEST_$(2))" ""
+endef # OCAML_BYTECODE_PROGRAM2
+
+OCAML_BYTECODE_PROGRAM =\
+  $(call OCAML_BYTECODE_PROGRAM2,$(1),$(notdir $(1)))
 
 LINK_NATIVE_PROGRAM =\
   $(CAMLOPT) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
 
-define OCAML_NATIVE_PROGRAM
+# $(1) = implicit path to executable (without .exe)
+# $(2) = executable basename only; stripped of extension (still without .exe)
+define OCAML_NATIVE_PROGRAM2
 $(eval $(call PROGRAM_SYNONYM,$(1)))
-$(basename $(notdir $(1)))_NCOBJS = \
-  $$(patsubst %,%.cmxa, $$($(basename $(notdir $(1)))_LIBRARIES)) \
-  $$(patsubst %,%.cmx, $$($(basename $(notdir $(1)))_MODULES))
-$(1)$(EXE): $$$$($(basename $(notdir $(1)))_NCOBJS)
+$(2)_NCOBJS = \
+  $$(patsubst %,%.cmxa, $$($(2)_LIBRARIES)) \
+  $$(patsubst %,%.cmx, $$($(2)_MODULES))
+$(1)$(EXE): $$$$($(2)_NCOBJS)
+ifneq "$(BEST_$(2))" ""
+	rm -f $(OPT_BINDIR)/$(2)$(EXE)
+endif
 	$$(V_LINKOPT)$$(LINK_NATIVE_PROGRAM) -o $$@ \
-	  $$($(basename $(notdir $(1)))_NCOBJS)
-endef # OCAML_NATIVE_PROGRAM
+	  $$($(2)_NCOBJS)
+ifneq "$(BEST_$(2))" ""
+	cd $(OPT_BINDIR); $(LN) ../../$(1)$(EXE) $(2)$(EXE)
+
+$(1)$(EXE): | $(OPT_BINDIR)
+endif # ifneq "$(BEST_$(2))" ""
+endef # OCAML_NATIVE_PROGRAM2
+
+OCAML_NATIVE_PROGRAM =\
+  $(call OCAML_NATIVE_PROGRAM2,$(1),$(basename $(notdir $(1))))
 
 define OCAML_PROGRAM
 $(eval $(call OCAML_BYTECODE_PROGRAM,$(1)))
