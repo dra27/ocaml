@@ -1289,9 +1289,11 @@ ocamldebug_MODULES = $(ocamldebug_COMPILER_MODULES) \
 
 debugger/%: OC_BYTECODE_LINKFLAGS = -linkall
 
+debugger/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+
 .PHONY: ocamldebugger
 ocamldebugger: ocamlc ocamlyacc ocamllex otherlibraries
-	$(MAKE) 'CAMLC=$(BEST_OCAMLC) $(STDLIBFLAGS)' debugger/ocamldebug$(EXE)
+	$(MAKE) debugger/ocamldebug$(EXE)
 
 $(ocamldebug_DEBUGGER_OBJECTS): OC_COMMON_COMPFLAGS += -for-pack ocamldebug
 debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
