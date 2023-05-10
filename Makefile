@@ -1269,6 +1269,14 @@ clean::
 ocamldebug_LIBRARIES = compilerlibs/ocamlcommon \
   $(addprefix otherlibs/,unix/unix dynlink/dynlink)
 
+# The following dependencies are necessary at the moment, because the
+# root Makefile does not know yet how to build the other libraries
+# Once their build will happen in this root Makefile, too, it will become
+# possible to get rid of these dependencies
+
+otherlibs/unix/unix.cma: otherlibraries
+otherlibs/dynlink/dynlink.cma: otherlibraries
+
 debugger/%: VPATH += otherlibs/unix otherlibs/dynlink
 
 ocamldebug_COMPILER_MODULES = $(addprefix toplevel/, genprintval topprinters)
@@ -1292,8 +1300,9 @@ debugger/%: OC_BYTECODE_LINKFLAGS = -linkall
 debugger/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
 .PHONY: ocamldebugger
-ocamldebugger: ocamlc ocamlyacc ocamllex otherlibraries
-	$(MAKE) debugger/ocamldebug$(EXE)
+ocamldebugger: debugger/ocamldebug$(EXE)
+
+debugger/ocamldebug$(EXE): ocamlc ocamlyacc ocamllex
 
 $(ocamldebug_DEBUGGER_OBJECTS): OC_COMMON_COMPFLAGS += -for-pack ocamldebug
 debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
