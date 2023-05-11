@@ -20,7 +20,6 @@ COMPFLAGS ?=
 RUNTIME_VARIANT ?=
 
 include $(ROOTDIR)/Makefile.common
-include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLC ?= $(BEST_OCAMLC) $(STDLIBFLAGS)
 OCAMLOPT ?= $(BEST_OCAMLOPT) $(STDLIBFLAGS)

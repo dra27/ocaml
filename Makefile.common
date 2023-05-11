@@ -184,6 +184,45 @@ endef # PROGRAM_SYNONYM
 # In those directories where this needs to be overridden, the overriding
 # should take place *before* Makefile.common is included.
 
+# We want to be able to compute dependencies even if the bytecode compiler
+# is not built yet, using the bootstrap compiler.
+# Unlike other tools, there is no risk of mixing incompatible
+# bootstrap-compiler and host-compiler object files, as ocamldep only
+# produces text output.
+
+# Set this to empty to force use of the bytecode compilers at all times
+USE_BEST_BINARIES ?= true
+
+CHOOSE_BEST_TOOL2 = \
+  $(if $(and $(USE_BEST_BINARIES), \
+             $(wildcard $(ROOTDIR)/$(OPT_BINDIR)/$(1)$(EXE))), \
+    $(ROOTDIR)/$(1).opt$(EXE), \
+    $(OCAMLRUN) $(ROOTDIR)/$(1)$(EXE))
+CHOOSE_BEST_TOOL = $(strip $(call CHOOSE_BEST_TOOL2,$(strip $(1))))
+
+BEST_OCAMLC := $(call CHOOSE_BEST_TOOL, ocamlc)
+BEST_OCAMLOPT := $(call CHOOSE_BEST_TOOL, ocamlopt)
+BEST_OCAMLLEX := $(call CHOOSE_BEST_TOOL, lex/ocamllex)
+
+STALE_WARNING = $(info \
+  Warning: we are not using the native binary $(ROOTDIR)/$(strip $(1)) because \
+  it is older than the bytecode binary $(ROOTDIR)/$(strip $(2)); you should \
+  silence this warning by either removing $(ROOTDIR)/$(strip $(1)) or \
+  rebuilding it (or `touch`-ing it) if you want it used.)
+
+TEST_BEST_OCAMLDEP = \
+  $(if $(and $(USE_BEST_BINARIES), \
+             $(wildcard $(ROOTDIR)/ocamlc.opt$(EXE)), \
+             $(if $(filter Stale, \
+                    $(shell $(MAKE) -f $(ROOTDIR)/tools/check-ocamlc.opt \
+                                       ROOTDIR=$(ROOTDIR) \
+                                       $(ROOTDIR)/ocamlc.opt$(EXE))), \
+               $(call STALE_WARNING, ocamlc.opt$(EXE), boot/ocamlc), \
+               Current)), \
+    $(ROOTDIR)/ocamlc.opt$(EXE) -depend, \
+    $(BOOT_OCAMLDEP))
+BEST_OCAMLDEP = $(eval BEST_OCAMLDEP := $(TEST_BEST_OCAMLDEP))$(BEST_OCAMLDEP)
+
 OCAMLDEP ?= $(BEST_OCAMLDEP)
 OCAMLDEPFLAGS ?=
 OC_OCAMLDEPFLAGS = -slash
@@ -251,11 +290,13 @@ LINK_BYTECODE_PROGRAM =\
 # up the build, especially when working on the compiler (i.e. when recompiling
 # parts of the compiler). For a tool foo, defining BEST_foo below to be
 # non-empty changes the behaviour of OCAML_BYTECODE_PROGRAM and
-# OCAML_NATIVE_PROGRAM. OCAML_BYTECODE_PROGRAM maintains a standalone copy of
-# the executable in $(BYTE_BINDIR) and OCAML_NATIVE_PROGRAM maintains a symlink
-# to the native executable in $(OPT_BINDIR). OCAML_BYTECODE_PROGRAM also
-# deletes the symlink from $(OPT_BINDIR), if found. In this way, PATH will
-# always find the "newest" version, while preferring native over bytecode.
+# OCAML_NATIVE_PROGRAM. OCAML_NATIVE_PROGRAM maintains a symlink to the .opt
+# version of the tool in $(OPT_BINDIR). Conversely, on successfully linking,
+# OCAML_BYTECODE_PROGRAM will erase this symlink. The presence of the a symlink
+# in $(OPT_BINDIR) therefore indicates both that the .opt version of the tool
+# exists and is newer than the bytecode version, and this fact is used to select
+# which executable to use. This is preferable to using PATH as it's then clear
+# on the build log which command has actually been used.
 
 BEST_ocamlc = true
 BEST_ocamlopt = true
@@ -269,22 +310,14 @@ $(2)_BCOBJS = \
   $$(patsubst %,%.cma, $$($(2)_LIBRARIES)) \
   $$(patsubst %,%.cmo, $$($(2)_MODULES))
 $(1)$(EXE): $$$$($(2)_BCOBJS)
-ifneq "$(BEST_$(2))" ""
-	rm -f $(BYTE_BINDIR)/$(2)$(EXE)
-endif
 	$$(V_LINKC)$$(LINK_BYTECODE_PROGRAM) -o $$@ \
 	  $$($(2)_BCOBJS)
 ifneq "$(BEST_$(2))" ""
-	cp -f boot/ocamlrun$(EXE) $(BYTE_BINDIR)/$(2).tmp
-	cat $(1)$(EXE) >> $(BYTE_BINDIR)/$(2).tmp
-	mv $(BYTE_BINDIR)/$(2).tmp $(BYTE_BINDIR)/$(2)$(EXE)
 	rm -f $(OPT_BINDIR)/$(2)$(EXE)
 
-$(1)$(EXE): | $(BYTE_BINDIR) $(OPT_BINDIR)
 partialclean::
-	rm -f $(addprefix $(BYTE_BINDIR)/,$(2) $(2).exe) \
-        $(addprefix $(OPT_BINDIR)/,$(2) $(2).exe)
-endif # ifneq "$(BEST_$(2))" ""
+	rm -f $(OPT_BINDIR)/$(2) $(OPT_BINDIR)/$(2).exe
+endif
 endef # OCAML_BYTECODE_PROGRAM2
 
 OCAML_BYTECODE_PROGRAM =\

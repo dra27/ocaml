@@ -22,7 +22,6 @@
 ROOTDIR = ../..
 
 include $(ROOTDIR)/Makefile.common
-include $(ROOTDIR)/Makefile.best_binaries
 
 OCAMLC=$(BEST_OCAMLC) $(STDLIBFLAGS) -g
 OCAMLOPT=$(BEST_OCAMLOPT) $(STDLIBFLAGS) -g

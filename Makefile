@@ -23,7 +23,6 @@ ROOTDIR = .
 OCAMLDEP ?= $(BOOT_OCAMLDEP)
 OCAMLLEX ?= $(BOOT_OCAMLLEX)
 include Makefile.common
-include Makefile.best_binaries
 
 .PHONY: defaultentry
 defaultentry: $(DEFAULT_BUILD_TARGET)

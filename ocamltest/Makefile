@@ -18,7 +18,6 @@
 ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.common
-include $(ROOTDIR)/Makefile.best_binaries
 
 # List of source files from which ocamltest is compiled
 # (all the different sorts of files are derived from this)
