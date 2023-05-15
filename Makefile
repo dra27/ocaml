@@ -1632,8 +1632,8 @@ depend: beforedepend debugger/.depend
 	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
 	   || exit; \
          done) > .depend
-	# cat debugger/.depend >> .depend
-	# rm debugger/.depend
+	cat debugger/.depend >> .depend
+	rm debugger/.depend
 
 .PHONY: distclean
 distclean: clean
@@ -1924,7 +1924,6 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 endif
 
 include .depend
-include debugger/.depend
 
 Makefile.config Makefile.build_config: config.status
 config.status:
