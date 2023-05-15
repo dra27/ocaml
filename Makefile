@@ -1081,10 +1081,12 @@ subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
   ocamldoc ocamltest
 
 .PHONY: alldepend
-alldepend: depend
+alldepend: depend debugger/.depend
 	for dir in $(subdirs); do \
 	  $(MAKE) -C $$dir depend || exit; \
 	done
+	cat debugger/.depend >> .depend
+	rm debugger/.depend
 
 # The standard library
 
@@ -1620,9 +1622,11 @@ debugger/.depend: OC_OCAMLDEPDIRS = \
   toplevel driver file_formats lambda
 
 debugger/.depend:
+	rm -f $@
 	$(V_OCAMLDEP)$(OCAMLDEP_CMD) debugger/*.mli debugger/*.ml > $@
+
 .PHONY: depend
-depend: beforedepend debugger/.depend
+depend: beforedepend
 	$(V_GEN)(for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
          middle_end/flambda/base_types \
@@ -1632,8 +1636,6 @@ depend: beforedepend debugger/.depend
 	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
 	   || exit; \
          done) > .depend
-	cat debugger/.depend >> .depend
-	rm debugger/.depend
 
 .PHONY: distclean
 distclean: clean
