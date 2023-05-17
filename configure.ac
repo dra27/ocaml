@@ -175,6 +175,7 @@ AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([QS])
+AC_SUBST([ln])
 
 ## Generated files
 
