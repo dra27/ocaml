@@ -57,7 +57,7 @@ ocamlc-dedup3@4.08 63536c55fc9bcecd99ab2d3f2e916a6320cff9bd
 shared_args-4.09@4.09 cf89b13e3e5730adf8d2eebd9e21e7d04565baf7
 shared_args-4.08@4.08 00b2a963e59a06822419a50bf32a8250c9ee3a65
 misc-win-fixes ecad1d658c6f0a21b50866a985e53a6e5ea2767b
-windows-ln f9d1a548bb1befb13af5dd70a93b5607f6874474
+windows-ln 74979f26c9816bbba3dcbea5f96f9baff4dd075d
 windows-ln-5.0@fixup dbfed4975b3587cb841811f47adaf1a2b8f8c142
 windows-ln-4.11@fixup 76ec431e43d5563f83a74e343cf61b20b093a40f
 one-camlheader 8cb14352a43125c0fa59b577d94e729bb7885487

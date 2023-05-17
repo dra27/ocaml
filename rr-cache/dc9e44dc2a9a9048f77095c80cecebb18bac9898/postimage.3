@@ -691,13 +691,11 @@ build_os
 build_vendor
 build_cpu
 build
-stdlib_manpages
 PACKLD
 flexlink_flags
 flexdll_chain
 default_safe_string
 force_safe_string
-ln
 afl
 flat_float_array
 windows_unicode
@@ -730,7 +728,6 @@ libbfd_include
 x_libraries
 x_includes
 pthread_link
-ocamltest
 ocamldoc
 with_camltex
 with_debugger
@@ -747,7 +744,7 @@ mklib
 RANLIBCMD
 RANLIB
 AR
-shebangscripts
+hashbangscripts
 bootstrapping_flexdll
 flexdir
 ocamlopt_cppflags
@@ -842,7 +839,6 @@ enable_str_lib
 enable_unix_lib
 enable_bigarray_lib
 enable_ocamldoc
-enable_ocamltest
 enable_frame_pointers
 enable_naked_pointers
 enable_spacetime
@@ -855,8 +851,6 @@ enable_flambda
 enable_flambda_invariants
 with_target_bindir
 enable_reserved_header_bits
-enable_stdlib_manpages
-enable_warn_error
 enable_force_safe_string
 enable_flat_float_array
 with_afl
@@ -1530,7 +1524,6 @@ Optional Features:
   --disable-unix-lib      do not build the unix library
   --disable-bigarray-lib  do not build the legacy separate bigarray library
   --disable-ocamldoc      do not build the ocamldoc documentation system
-  --disable-ocamltest     do not build the ocamltest driver
   --enable-frame-pointers use frame pointers in runtime and generated code
   --disable-naked-pointers
                           do not allow naked pointers
@@ -1549,9 +1542,6 @@ Optional Features:
   --enable-reserved-header-bits=BITS
                           reserve BITS (between 0 and 31) bits in block
                           headers for profiling info
-  --disable-stdlib-manpages
-                          do not build or install the library man pages
-  --enable-warn-error     treat C compiler warnings as errors
   --enable-force-safe-string
                           force strings to be safe
   --disable-flat-float-array
@@ -2860,9 +2850,6 @@ VERSION=4.08.1
 
 
 
-
-
-
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.common"
@@ -3091,12 +3078,6 @@ else
 fi
 
 
-# Check whether --enable-ocamltest was given.
-if test "${enable_ocamltest+set}" = set; then :
-  enableval=$enable_ocamltest;
-fi
-
-
 # Check whether --enable-frame-pointers was given.
 if test "${enable_frame_pointers+set}" = set; then :
   enableval=$enable_frame_pointers;
@@ -3175,18 +3156,6 @@ if test "${enable_reserved_header_bits+set}" = set; then :
   *) :
     as_fn_error $? "invalid argument to --enable-reserved-header-bits" "$LINENO" 5 ;;
 esac
-fi
-
-
-# Check whether --enable-stdlib-manpages was given.
-if test "${enable_stdlib_manpages+set}" = set; then :
-  enableval=$enable_stdlib_manpages;
-fi
-
-
-# Check whether --enable-warn-error was given.
-if test "${enable_warn_error+set}" = set; then :
-  enableval=$enable_warn_error;
 fi
 
 
@@ -12279,32 +12248,11 @@ esac
 case $host in #(
   *-*-mingw32|*-pc-windows) :
     unix_or_win32="win32"
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
-$as_echo_n "checking for a workable solution for ln -sf... " >&6; }
-  ln -sf configure conftestLink
-  if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
-  rm -f conftestLink
-    CYGWIN=winsymlinks:native ln -sf configure conftestLink
-    if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"; then :
-  ln='cp -pf'
-else
-  ln='CYGWIN=winsymlinks:native ln -sf'
-
-fi
-else
-  ln='ln -sf'
-
-fi
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
-$as_echo "$ln" >&6; }
-
     unixlib="win32unix"
     graphlib="win32graph"
     cc_profile='' ;; #(
   *) :
     unix_or_win32="unix"
-  ln='ln -sf'
   unixlib="unix"
   graphlib="graph"
   cc_profile='-pg' ;;
@@ -12354,29 +12302,16 @@ $as_echo "$ac_cv_sys_interpreter" >&6; }
 interpval=$ac_cv_sys_interpreter
 
 
-long_shebang=false
 if test "x$interpval" = "xyes"; then :
   case $host in #(
   *-cygwin|*-*-mingw32|*-pc-windows) :
-    shebangscripts=false ;; #(
+    hashbangscripts=false ;; #(
   *) :
-    shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       if test "x$exec_prefix" = "xNONE"; then :
-  exec_prefix="$prefix"
-fi
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       if test "${#expanded_bindir}" -gt 115; then :
-  long_shebang=true
-fi
-
+    hashbangscripts=true
      ;;
 esac
 else
-  shebangscripts=false
+  hashbangscripts=false
 
 fi
 
@@ -12442,26 +12377,19 @@ $as_echo "$ocaml_cv_cc_vendor" >&6; }
 
 case $ocaml_cv_cc_vendor in #(
   xlc-*) :
-    outputobj='-o $(EMPTY)'
-    warn_error_flag=''
-    gcc_warnings='-qflag=i:i' ;; #(
+    outputobj='-o $(EMPTY)'; gcc_warnings="-qflag=i:i" ;; #(
   # all warnings enabled
   msvc-*) :
-    outputobj='-Fo'
-    warn_error_flag='-WX'
-    CPP='cl -nologo -EP'
-    gcc_warnings='' ;; #(
+    outputobj=-Fo; CPP="cl -nologo -EP"; gcc_warnings="" ;; #(
   *) :
-    outputobj='-o $(EMPTY)'
-  warn_error_flag='-Werror'
-  gcc_warnings='-Wall' ;;
+    outputobj='-o $(EMPTY)'; case 4.08.1 in #(
+  *+dev*) :
+    gcc_warnings="-Wall -Werror" ;; #(
+  *) :
+    gcc_warnings="-Wall"
+   ;;
 esac
-
-case $enable_warn_error,4.08.1 in #(
-  yes,*|,*+dev*) :
-    gcc_warnings="$gcc_warnings $warn_error_flag" ;; #(
-  *) :
-     ;;
+ ;;
 esac
 
 # We select high optimization levels, provided we can turn off:
@@ -12516,7 +12444,7 @@ $as_echo "$as_me: WARNING: Consider using GCC version 4.2 or above." >&2;};
     common_cflags="-O2 -fno-strict-aliasing -fwrapv";
       internal_cflags="$gcc_warnings" ;; #(
   msvc-*) :
-    common_cflags="-nologo -O2 -Gy- -MD $gcc_warnings"
+    common_cflags="-nologo -O2 -Gy- -MD"
       common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
       internal_cppflags='-DUNICODE -D_UNICODE'
       internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
@@ -14736,13 +14664,6 @@ if test "x$ac_cv_func_lstat" = xyes; then :
 fi
 
 fi
-
-fi
-
-
-ac_fn_c_check_func "$LINENO" "realpath" "ac_cv_func_realpath"
-if test "x$ac_cv_func_realpath" = xyes; then :
-  $as_echo "#define HAS_REALPATH 1" >>confdefs.h
 
 fi
 
@@ -17326,13 +17247,6 @@ else
   ocamldoc=ocamldoc
 fi
 
-case $enable_ocamltest,4.08.1 in #(
-  yes,*|,*+dev*) :
-    ocamltest='ocamltest' ;; #(
-  *) :
-    ocamltest='' ;;
-esac
-
 if test x"$enable_flambda" = "xyes"; then :
   flambda=true
   if test x"$enable_flambda_invariants" = "xyes"; then :
@@ -17449,12 +17363,6 @@ case $host in #(
   *) :
      ;;
 esac
-
-if test x"$enable_stdlib_manpages" != "xno"; then :
-  stdlib_manpages=true
-else
-  stdlib_manpages=false
-fi
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h

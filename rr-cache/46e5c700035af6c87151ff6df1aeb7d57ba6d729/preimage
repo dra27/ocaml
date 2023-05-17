@@ -27,9 +27,6 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
-# $( ) allows line breaking with $\ at the end of the line
-$(SPACE) :=
-
 
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
@@ -113,15 +110,7 @@ ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
 
-ifeq "$(LIBDIR_REL)" ""
-  SET_RELATIVE_STDLIB =
-else
-  SET_RELATIVE_STDLIB = \
--set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
-endif
-
-DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
-
+<<<<<<<
 # Escape special characters in the argument string.
 # There are four characters that need escaping:
 # - backslash and ampersand, which are special in the replacement text
@@ -143,6 +132,16 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # SUBST_STRING does the same, for a variable that occurs between "..."
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
+=======
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
+>>>>>>>
 
 # The rule to compile C files
 
@@ -227,3 +226,58 @@ endif
 if_file_exists = ( test ! -f $(1) || $(2) && rm -f $(1) )
 MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
   mt -nologo -outputresource:$(1) -manifest $(1).manifest)
+
+<<<<<<<
+=======
+# Macros and rules to compile OCaml programs
+
+# We use secondary expansion here so that variables like
+# foo_LIBRARIES and foo_MODULES can be defined after the calls
+# to the macros below. Without secondary expansion, those variables
+# would have to be defined before the calls to OCAML_BYTECODE_PROGRAM etc.
+
+.SECONDEXPANSION:
+
+LINK_BYTECODE_PROGRAM =\
+  $(CAMLC) $(OC_COMMON_LDFLAGS) $(OC_BYTECODE_LDFLAGS)
+
+define OCAML_BYTECODE_PROGRAM
+$(eval $(call PROGRAM_SYNONYM,$(1)))
+$(1)$(EXE): \
+  $$$$(patsubst %,%.cma, $$$$($(basename $(notdir $(1)))_LIBRARIES)) \
+  $$$$(patsubst %,%.cmo, $$$$($(basename $(notdir $(1)))_MODULES))
+	$$(V_LINKC)$$(LINK_BYTECODE_PROGRAM) -o $$@ $$^
+endef # OCAML_BYTECODE_PROGRAM
+
+LINK_NATIVE_PROGRAM =\
+  $(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) $(DOTOPT_LINKFLAGS) $(OC_NATIVE_LDFLAGS)
+
+define OCAML_NATIVE_PROGRAM
+$(eval $(call PROGRAM_SYNONYM,$(1)))
+$(1)$(EXE): \
+  $$$$(patsubst %,%.cmxa, $$$$($(basename $(notdir $(1)))_LIBRARIES)) \
+  $$$$(patsubst %,%.cmx, $$$$($(basename $(notdir $(1)))_MODULES))
+	$$(V_LINKOPT)$$(LINK_NATIVE_PROGRAM) -o $$@ $$^
+endef # OCAML_NATIVE_PROGRAM
+
+define OCAML_PROGRAM
+$(eval $(call OCAML_BYTECODE_PROGRAM,$(1)))
+$(eval $(call OCAML_NATIVE_PROGRAM,$(1).opt))
+endef # OCAML_PROGRAM
+
+# Installing a bytecode executable, with debug information removed
+define INSTALL_STRIPPED_BYTE_PROG
+$(OCAMLRUN) $(ROOTDIR)/tools/stripdebug $(1) $(1).tmp \
+&& $(INSTALL_PROG) $(1).tmp $(2) \
+&& rm $(1).tmp
+endef # INSTALL_STRIPPED_BYTE_PROG
+
+>>>>>>>
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif

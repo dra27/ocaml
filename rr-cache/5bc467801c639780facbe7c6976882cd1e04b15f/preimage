@@ -110,7 +110,6 @@ ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
 
-<<<<<<<
 # Escape special characters in the argument string.
 # There are four characters that need escaping:
 # - backslash and ampersand, which are special in the replacement text
@@ -132,16 +131,6 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # SUBST_STRING does the same, for a variable that occurs between "..."
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
-=======
-ifeq "$(LIBDIR_REL)" ""
-  SET_RELATIVE_STDLIB =
-else
-  SET_RELATIVE_STDLIB = \
--set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
-endif
-
-DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
->>>>>>>
 
 # The rule to compile C files
 
@@ -218,9 +207,7 @@ $(ROOTDIR)/%/sak$(EXE):
 	$(MAKE) -C $(ROOTDIR)/$* sak$(EXE)
 
 ifneq "$(REQUIRES_CONFIGURATION)" ""
-ifneq "$(wildcard $(ROOTDIR)/Makefile.config)" ""
 $(ROOTDIR)/%/StdlibModules: $(SAK) ;
-endif
 endif
 
 # Used with the Microsoft toolchain to merge generated manifest files into
@@ -252,7 +239,7 @@ $(1)$(EXE): \
 endef # OCAML_BYTECODE_PROGRAM
 
 LINK_NATIVE_PROGRAM =\
-  $(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) $(DOTOPT_LINKFLAGS) $(OC_NATIVE_LDFLAGS)
+  $(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) $(OC_NATIVE_LDFLAGS)
 
 define OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
@@ -273,4 +260,13 @@ $(OCAMLRUN) $(ROOTDIR)/tools/stripdebug $(1) $(1).tmp \
 && $(INSTALL_PROG) $(1).tmp $(2) \
 && rm $(1).tmp
 endef # INSTALL_STRIPPED_BYTE_PROG
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif
 >>>>>>>

@@ -166,13 +166,8 @@ AC_SUBST([flexlink_flags])
 AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
-<<<<<<<
-AC_SUBST([QS])
-AC_SUBST([ln])
-=======
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
->>>>>>>
 
 ## Generated files
 
