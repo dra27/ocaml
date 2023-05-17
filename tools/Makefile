@@ -204,12 +204,6 @@ addlabels: addlabels.cmo
 #install::
 #	$(INSTALL_PROG) addlabels "$(INSTALL_LIBDIR)"
 
-ifeq ($(UNIX_OR_WIN32),unix)
-LN := ln -sf
-else
-LN := cp -pf
-endif
-
 install::
 ifeq "$(INSTALL_BYTECODE_PROGRAMS)" "true"
 	for i in $(install_files); \
