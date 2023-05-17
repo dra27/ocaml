@@ -13828,37 +13828,29 @@ esac
 
 # Libraries to build depending on the host
 
-case $host in #(
-  *-*-mingw32*|*-pc-windows) :
-    unix_or_win32="win32"
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
 printf %s "checking for a workable solution for ln -sf... " >&6; }
   ln -sf configure conftestLink
-  if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"
+  if MSYS=winsymlinks:nativestrict CYGWIN=winsymlinks:nativestrict ln -sf configure conftestLink 2>/dev/null
 then :
-  rm -f conftestLink
-    CYGWIN=winsymlinks:native ln -sf configure conftestLink
-    if test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"
-then :
-  ln='cp -pf'
-else $as_nop
-  ln='CYGWIN=winsymlinks:native ln -sf'
-
-fi
-else $as_nop
   ln='ln -sf'
+else $as_nop
+  ln='cp -pf'
 
 fi
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
 printf "%s\n" "$ln" >&6; }
 
+
+case $host in #(
+  *-*-mingw32*|*-pc-windows) :
+    unix_or_win32="win32"
     ocamltest_libunix="Some false"
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr" ;; #(
   *) :
     unix_or_win32="unix"
-  ln='ln -sf'
   ocamltest_libunix="Some true"
   ocamlyacc_wstr_module="" ;;
 esac

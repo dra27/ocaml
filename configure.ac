@@ -723,15 +723,15 @@ AS_CASE([$lt_cv_ar_at_file],
 
 # Libraries to build depending on the host
 
+OCAML_CHECK_LN
+
 AS_CASE([$host],
   [*-*-mingw32*|*-pc-windows],
     [unix_or_win32="win32"
-    OCAML_CHECK_LN_ON_WINDOWS
     ocamltest_libunix="Some false"
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr"],
   [unix_or_win32="unix"
-  ln='ln -sf'
   ocamltest_libunix="Some true"
   ocamlyacc_wstr_module=""])
 
