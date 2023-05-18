@@ -14,7 +14,7 @@ index c972b3bc0b..18b5a6ee4f 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 40c4e43318..dce934cdfa 100644
+index 1f30d3c91b..da5e943d49 100644
 --- a/Changes
 +++ b/Changes
 @@ -1379,11 +1379,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -10105,7 +10105,7 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..cee07717e7
+index 0000000000..283c104a85
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10044 @@
@@ -10125,7 +10125,7 @@ index 0000000000..cee07717e7
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 40c4e43318..dce934cdfa 100644
++index 1f30d3c91b..da5e943d49 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1379,11 +1379,6 @@ OCaml 5.0.0 (15 December 2022)
