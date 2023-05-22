@@ -695,8 +695,8 @@ OCaml 5.1.0
 - #11590: Allow installing to a destination path containing spaces.
    (Élie Brami, review by Sébastien Hinderer and David Allsopp)
 
-- #11243, #11248, #11268, #11420, #11675: merge the sub-makefiles into
-  the root Makefile.
+- #11243, #11248, #11268, #11420, #11675, #12198: merge the sub-makefiles
+  into the root Makefile.
   (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
 
 - #11828: Compile otherlibs/ C stubs in two version for native and bytecode
