@@ -1080,13 +1080,14 @@ clean::
 subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
   ocamldoc ocamltest
 
+.INTERMEDIATE: debugger/.depend
+
 .PHONY: alldepend
 alldepend: depend debugger/.depend
 	for dir in $(subdirs); do \
 	  $(MAKE) -C $$dir depend || exit; \
 	done
 	cat debugger/.depend >> .depend
-	rm debugger/.depend
 
 # The standard library
 
