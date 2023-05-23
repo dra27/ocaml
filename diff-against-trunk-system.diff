@@ -1,27 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..9a9e61f0fe
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,18 @@
-+--- a	2023-09-28 18:47:40.560928384 +0100
-++++ b	2023-09-28 18:47:40.580929109 +0100
-+@@ -9,14 +9,13 @@
-+  OCaml 5.1.0
-+  ---------------
-+  
-+-@@ -839,6 +838,10 @@ OCaml 5.1.0
-++@@ -839,6 +838,9 @@ OCaml 5.1.0
-+  - #12178: Fix runtime events consumer poll function returning an invalid value
-+    instead of an OCaml integer value. (Lucas Pluvinage)
-+  
-+ +- #12252: Fix shared library build error on RISC-V.
-+ +  (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
-+ +
-+-+
-+  OCaml 5.0.0 (15 December 2022)
-+  ------------------------------
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index c972b3bc0b..18b5a6ee4f 100644
 --- a/.gitattributes
@@ -10134,34 +10113,13 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3d30979084
+index 0000000000..abef087c4e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10053 @@
+@@ -0,0 +1,10048 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..9a9e61f0fe
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,18 @@
-++--- a	2023-09-28 18:47:40.560928384 +0100
-+++++ b	2023-09-28 18:47:40.580929109 +0100
-++@@ -9,14 +9,13 @@
-++  OCaml 5.1.0
-++  ---------------
-++  
-++-@@ -839,6 +838,10 @@ OCaml 5.1.0
-+++@@ -839,6 +838,9 @@ OCaml 5.1.0
-++  - #12178: Fix runtime events consumer poll function returning an invalid value
-++    instead of an OCaml integer value. (Lucas Pluvinage)
-++  
-++ +- #12252: Fix shared library build error on RISC-V.
-++ +  (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
-++ +
-++-+
-++  OCaml 5.0.0 (15 December 2022)
-++  ------------------------------
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index c972b3bc0b..18b5a6ee4f 100644
 +--- a/.gitattributes
@@ -20190,7 +20148,23 @@ index 0000000000..3d30979084
 ++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
 ++index 3292ad9c31..f69aeb342c 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_bu
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_B
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
