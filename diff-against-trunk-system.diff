@@ -1,55 +1,22 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..17b6d9d3e5
+index 0000000000..921f849e3e
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,44 @@
-+--- a	2023-09-28 18:47:42.116984727 +0100
-++++ b	2023-09-28 18:47:42.140985595 +0100
-+@@ -693,10 +693,10 @@
-+  
-+  $(foreach PROGRAM, $(OCAML_BYTECODE_PROGRAMS),\
-+    $(eval $(call OCAML_BYTECODE_PROGRAM,$(PROGRAM))))
-+-@@ -1076,7 +1078,7 @@ clean::
-+- # Dependencies
-+- 
-+- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-++@@ -1075,7 +1077,7 @@ clean::
-++ subdirs = \
-++   stdlib $(addprefix otherlibs/, \
-++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-+ -  debugger ocamldoc ocamltest
-+ +  ocamldoc ocamltest
-+  
-+@@ -805,7 +805,7 @@
-+  	$(MAKE) -C manual distclean
-+  	$(MAKE) -C ocamldoc distclean
-+  	$(MAKE) -C ocamltest distclean
-+-@@ -1710,7 +1768,7 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
-++@@ -1713,7 +1771,7 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
-+  	$(MAKE) -C api_docgen install
-+  endif
-+  	if test -n "$(WITH_DEBUGGER)"; then \
-+@@ -856,7 +856,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -253,6 +253,16 @@ AC_CANONICAL_BUILD
-++@@ -256,6 +256,16 @@ AC_CANONICAL_BUILD
-+  AC_CANONICAL_HOST
-+  AC_CANONICAL_TARGET
-+  
-+@@ -873,7 +873,7 @@
-+  # Systems that are known not to work, even in bytecode only.
-+  
-+  AS_CASE([$host],
-+-@@ -629,6 +639,9 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-++@@ -641,6 +651,9 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-+    AC_CONFIG_FILES([otherlibs/unix/META])
-+    otherlibraries="$otherlibraries unix"
-+    lib_unix=true
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:42.456997031 +0100
+++++ b	2023-09-28 18:47:42.460997176 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/.gitattributes b/.gitattributes
++ --- a/.gitattributes
++ +++ b/.gitattributes
++-@@ -175,7 +175,7 @@ build-aux/install text eol=lf
+++@@ -176,7 +176,7 @@ build-aux/install text eol=lf
++  build-aux/missing text eol=lf
++  ocamldoc/remove_DEBUG text eol=lf
++  ocamltest/getocamloptdefaultflags text eol=lf
 diff --git a/.gitattributes b/.gitattributes
-index c972b3bc0b..18b5a6ee4f 100644
+index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
 +++ b/.gitattributes
 @@ -142,6 +142,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
@@ -10202,62 +10169,29 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5e1d537fa1
+index 0000000000..870d54a8c1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10152 @@
+@@ -0,0 +1,10137 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..17b6d9d3e5
++index 0000000000..921f849e3e
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,44 @@
-++--- a	2023-09-28 18:47:42.116984727 +0100
-+++++ b	2023-09-28 18:47:42.140985595 +0100
-++@@ -693,10 +693,10 @@
-++  
-++  $(foreach PROGRAM, $(OCAML_BYTECODE_PROGRAMS),\
-++    $(eval $(call OCAML_BYTECODE_PROGRAM,$(PROGRAM))))
-++-@@ -1076,7 +1078,7 @@ clean::
-++- # Dependencies
-++- 
-++- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-+++@@ -1075,7 +1077,7 @@ clean::
-+++ subdirs = \
-+++   stdlib $(addprefix otherlibs/, \
-+++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-++ -  debugger ocamldoc ocamltest
-++ +  ocamldoc ocamltest
-++  
-++@@ -805,7 +805,7 @@
-++  	$(MAKE) -C manual distclean
-++  	$(MAKE) -C ocamldoc distclean
-++  	$(MAKE) -C ocamltest distclean
-++-@@ -1710,7 +1768,7 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
-+++@@ -1713,7 +1771,7 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
-++  	$(MAKE) -C api_docgen install
-++  endif
-++  	if test -n "$(WITH_DEBUGGER)"; then \
-++@@ -856,7 +856,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -253,6 +253,16 @@ AC_CANONICAL_BUILD
-+++@@ -256,6 +256,16 @@ AC_CANONICAL_BUILD
-++  AC_CANONICAL_HOST
-++  AC_CANONICAL_TARGET
-++  
-++@@ -873,7 +873,7 @@
-++  # Systems that are known not to work, even in bytecode only.
-++  
-++  AS_CASE([$host],
-++-@@ -629,6 +639,9 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-+++@@ -641,6 +651,9 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-++    AC_CONFIG_FILES([otherlibs/unix/META])
-++    otherlibraries="$otherlibraries unix"
-++    lib_unix=true
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:42.456997031 +0100
++++++ b	2023-09-28 18:47:42.460997176 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/.gitattributes b/.gitattributes
+++ --- a/.gitattributes
+++ +++ b/.gitattributes
+++-@@ -175,7 +175,7 @@ build-aux/install text eol=lf
++++@@ -176,7 +176,7 @@ build-aux/install text eol=lf
+++  build-aux/missing text eol=lf
+++  ocamldoc/remove_DEBUG text eol=lf
+++  ocamltest/getocamloptdefaultflags text eol=lf
 +diff --git a/.gitattributes b/.gitattributes
-+index c972b3bc0b..18b5a6ee4f 100644
++index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
 ++++ b/.gitattributes
 +@@ -142,6 +142,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
@@ -20357,8 +20291,25 @@ index 0000000000..5e1d537fa1
 ++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
 ++     fi
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to
-\ No newline at end of file
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
