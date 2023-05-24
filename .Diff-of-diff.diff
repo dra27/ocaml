@@ -1,20 +1,44 @@
---- a	2023-09-28 18:47:41.428959819 +0100
-+++ b	2023-09-28 18:47:41.448960543 +0100
-@@ -295,17 +295,3 @@
- -
- -let fundecl f = (new scheduler)#schedule_fundecl f
- +let fundecl f = f
--diff --git a/configure b/configure
--Binary files a/configure and b/configure differ
--diff --git a/configure.ac b/configure.ac
----- a/configure.ac
--+++ b/configure.ac
--@@ -1203,7 +1203,7 @@ AS_CASE([$host],
--   [[powerpc*-*-linux*]],
--     [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
--   [[s390x*-*-linux*]],
---    [arch=s390x; model=z10; system=elf],
--+    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
--   # expected to match "gnueabihf" as well as "musleabihf"
--   [armv6*-*-linux-*eabihf],
--     [arch=arm; model=armv6; system=linux_eabihf],
+--- a	2023-09-28 18:47:42.116984727 +0100
++++ b	2023-09-28 18:47:42.140985595 +0100
+@@ -693,10 +693,10 @@
+  
+  $(foreach PROGRAM, $(OCAML_BYTECODE_PROGRAMS),\
+    $(eval $(call OCAML_BYTECODE_PROGRAM,$(PROGRAM))))
+-@@ -1076,7 +1078,7 @@ clean::
+- # Dependencies
+- 
+- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
++@@ -1075,7 +1077,7 @@ clean::
++ subdirs = \
++   stdlib $(addprefix otherlibs/, \
++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
+ -  debugger ocamldoc ocamltest
+ +  ocamldoc ocamltest
+  
+@@ -805,7 +805,7 @@
+  	$(MAKE) -C manual distclean
+  	$(MAKE) -C ocamldoc distclean
+  	$(MAKE) -C ocamltest distclean
+-@@ -1710,7 +1768,7 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
++@@ -1713,7 +1771,7 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
+  	$(MAKE) -C api_docgen install
+  endif
+  	if test -n "$(WITH_DEBUGGER)"; then \
+@@ -856,7 +856,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -253,6 +253,16 @@ AC_CANONICAL_BUILD
++@@ -256,6 +256,16 @@ AC_CANONICAL_BUILD
+  AC_CANONICAL_HOST
+  AC_CANONICAL_TARGET
+  
+@@ -873,7 +873,7 @@
+  # Systems that are known not to work, even in bytecode only.
+  
+  AS_CASE([$host],
+-@@ -629,6 +639,9 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
++@@ -641,6 +651,9 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
+    AC_CONFIG_FILES([otherlibs/unix/META])
+    otherlibraries="$otherlibraries unix"
+    lib_unix=true
