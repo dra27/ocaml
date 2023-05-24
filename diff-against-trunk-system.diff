@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b005ec5a10
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:47:43.649040156 +0100
-++++ b	2023-09-28 18:47:43.669040880 +0100
-+@@ -35,7 +35,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -307,11 +307,17 @@ AC_ARG_ENABLE([debug-runtime],
-++@@ -310,11 +310,17 @@ AC_ARG_ENABLE([debug-runtime],
-+    [AS_HELP_STRING([--disable-debug-runtime],
-+      [do not build runtime with debugging support])])
-+  
-+@@ -56,7 +56,7 @@
-+  
-+  AC_ARG_ENABLE([dependency-generation],
-+    [AS_HELP_STRING([--disable-dependency-generation],
-+-@@ -489,9 +495,9 @@ AC_ARG_WITH([zstd],
-++@@ -500,9 +506,9 @@ AC_ARG_WITH([zstd],
-+      [disable compression of marshaled data])])
-+  
-+  AS_IF([test x"$enable_unix_lib" = "xno"],
-+@@ -69,7 +69,7 @@
-+  
-+  AS_IF([test x"$enable_unix_lib" = "xno" || test x"$enable_str_lib" = "xno"],
-+    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
-+-@@ -2003,18 +2009,18 @@ AS_IF([test x"$zstd_status" = "xok"],
-++@@ -2019,18 +2025,18 @@ AS_IF([test x"$zstd_status" = "xok"],
-+  
-+  ## Determine whether the debugger should/can be built
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -46,10 +14,10 @@ index f1335f6b95..6d311793da 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index dc615ad4f1..83888542b1 100644
+index 2d823f3817..f7cb0c3daa 100644
 --- a/Changes
 +++ b/Changes
-@@ -859,7 +859,6 @@ OCaml 5.1.0
+@@ -862,7 +862,6 @@ OCaml 5.1.0
  - #12252: Fix shared library build error on RISC-V.
    (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
  
@@ -57,7 +25,7 @@ index dc615ad4f1..83888542b1 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1404,11 +1403,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1407,11 +1406,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -69,7 +37,7 @@ index dc615ad4f1..83888542b1 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1437,6 +1431,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1440,6 +1434,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -100,7 +68,7 @@ index dc615ad4f1..83888542b1 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1472,13 +1490,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1475,13 +1493,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -116,7 +84,7 @@ index dc615ad4f1..83888542b1 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1585,6 +1603,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1588,6 +1606,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -126,7 +94,7 @@ index dc615ad4f1..83888542b1 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1848,6 +1869,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1851,6 +1872,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10187,45 +10155,13 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e9fb7f2abe
+index 0000000000..6041be2e3d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10144 @@
+@@ -0,0 +1,10135 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b005ec5a10
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:47:43.649040156 +0100
-+++++ b	2023-09-28 18:47:43.669040880 +0100
-++@@ -35,7 +35,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -307,11 +307,17 @@ AC_ARG_ENABLE([debug-runtime],
-+++@@ -310,11 +310,17 @@ AC_ARG_ENABLE([debug-runtime],
-++    [AS_HELP_STRING([--disable-debug-runtime],
-++      [do not build runtime with debugging support])])
-++  
-++@@ -56,7 +56,7 @@
-++  
-++  AC_ARG_ENABLE([dependency-generation],
-++    [AS_HELP_STRING([--disable-dependency-generation],
-++-@@ -489,9 +495,9 @@ AC_ARG_WITH([zstd],
-+++@@ -500,9 +506,9 @@ AC_ARG_WITH([zstd],
-++      [disable compression of marshaled data])])
-++  
-++  AS_IF([test x"$enable_unix_lib" = "xno"],
-++@@ -69,7 +69,7 @@
-++  
-++  AS_IF([test x"$enable_unix_lib" = "xno" || test x"$enable_str_lib" = "xno"],
-++    [AS_IF([test x"$enable_ocamldoc" = "xyes"],
-++-@@ -2003,18 +2009,18 @@ AS_IF([test x"$zstd_status" = "xok"],
-+++@@ -2019,18 +2025,18 @@ AS_IF([test x"$zstd_status" = "xok"],
-++  
-++  ## Determine whether the debugger should/can be built
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -10239,10 +10175,10 @@ index 0000000000..e9fb7f2abe
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index dc615ad4f1..83888542b1 100644
++index 2d823f3817..f7cb0c3daa 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -859,7 +859,6 @@ OCaml 5.1.0
++@@ -862,7 +862,6 @@ OCaml 5.1.0
 + - #12252: Fix shared library build error on RISC-V.
 +   (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
 + 
@@ -10250,7 +10186,7 @@ index 0000000000..e9fb7f2abe
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1404,11 +1403,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1407,11 +1406,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10262,7 +10198,7 @@ index 0000000000..e9fb7f2abe
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1437,6 +1431,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1440,6 +1434,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10293,7 +10229,7 @@ index 0000000000..e9fb7f2abe
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1472,13 +1490,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1475,13 +1493,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10309,7 +10245,7 @@ index 0000000000..e9fb7f2abe
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1585,6 +1603,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1588,6 +1606,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10319,7 +10255,7 @@ index 0000000000..e9fb7f2abe
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1848,6 +1869,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1851,6 +1872,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20334,7 +20270,30 @@ index 0000000000..e9fb7f2abe
 ++-    sed -i '/native_/s/true/false/' \
 ++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 ++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tes
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignor
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
