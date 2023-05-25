@@ -2432,7 +2432,7 @@ index 05cc4ea882..c602b70c3a 100644
  let test_size =
    try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
 diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
-index 7c11863047..ccfa3aa2aa 100644
+index 0b1ff9f49b..e1af775bbb 100644
 --- a/testsuite/tests/parallel/major_gc_wait_backup.ml
 +++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
 @@ -1,5 +1,7 @@
