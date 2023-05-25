@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..488759aea4
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:44.461069519 +0100
-++++ b	2023-09-28 18:47:44.477070098 +0100
-+@@ -22,7 +22,7 @@
-+ diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
-+ --- a/testsuite/tests/parallel/major_gc_wait_backup.ml
-+ +++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
-+-@@ -37,6 +37,6 @@ let _ =
-++@@ -39,6 +39,6 @@ let _ =
-+    ) in
-+    Gc.full_major ();
-+    let n = major_collections () in
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -28,10 +14,10 @@ index f1335f6b95..6d311793da 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index c46ad400ec..ed3214a93a 100644
+index 3f0cd7a145..00205a8398 100644
 --- a/Changes
 +++ b/Changes
-@@ -867,7 +867,6 @@ OCaml 5.1.0
+@@ -873,7 +873,6 @@ OCaml 5.1.0
  - #12252: Fix shared library build error on RISC-V.
    (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
  
@@ -39,7 +25,7 @@ index c46ad400ec..ed3214a93a 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1412,11 +1411,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1418,11 +1417,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -51,7 +37,7 @@ index c46ad400ec..ed3214a93a 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1445,6 +1439,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1451,6 +1445,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -82,7 +68,7 @@ index c46ad400ec..ed3214a93a 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1480,13 +1498,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1486,13 +1504,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -98,7 +84,7 @@ index c46ad400ec..ed3214a93a 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1593,6 +1611,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1599,6 +1617,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -108,7 +94,7 @@ index c46ad400ec..ed3214a93a 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1856,6 +1877,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1862,6 +1883,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6300,7 +6286,7 @@ index 0000000000..53e11a35d8
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..0bedb64bd4
+index 0000000000..50efc9345b
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3863 @@
@@ -8738,7 +8724,7 @@ index 0000000000..0bedb64bd4
 + let test_size =
 +   try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
 +diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
-+index 7c11863047..ccfa3aa2aa 100644
++index 0b1ff9f49b..e1af775bbb 100644
 +--- a/testsuite/tests/parallel/major_gc_wait_backup.ml
 ++++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
 +@@ -1,5 +1,7 @@
@@ -10169,27 +10155,13 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bbf621fc8d
+index 0000000000..6464c75f5f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10136 @@
+@@ -0,0 +1,10135 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..488759aea4
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:44.461069519 +0100
-+++++ b	2023-09-28 18:47:44.477070098 +0100
-++@@ -22,7 +22,7 @@
-++ diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
-++ --- a/testsuite/tests/parallel/major_gc_wait_backup.ml
-++ +++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
-++-@@ -37,6 +37,6 @@ let _ =
-+++@@ -39,6 +39,6 @@ let _ =
-++    ) in
-++    Gc.full_major ();
-++    let n = major_collections () in
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -10203,10 +10175,10 @@ index 0000000000..bbf621fc8d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index c46ad400ec..ed3214a93a 100644
++index 3f0cd7a145..00205a8398 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -867,7 +867,6 @@ OCaml 5.1.0
++@@ -873,7 +873,6 @@ OCaml 5.1.0
 + - #12252: Fix shared library build error on RISC-V.
 +   (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
 + 
@@ -10214,7 +10186,7 @@ index 0000000000..bbf621fc8d
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1412,11 +1411,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1418,11 +1417,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10226,7 +10198,7 @@ index 0000000000..bbf621fc8d
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1445,6 +1439,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1451,6 +1445,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10257,7 +10229,7 @@ index 0000000000..bbf621fc8d
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1480,13 +1498,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1486,13 +1504,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10273,7 +10245,7 @@ index 0000000000..bbf621fc8d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1593,6 +1611,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1599,6 +1617,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10283,7 +10255,7 @@ index 0000000000..bbf621fc8d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1856,6 +1877,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1862,6 +1883,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -16475,7 +16447,7 @@ index 0000000000..bbf621fc8d
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..0bedb64bd4
++index 0000000000..50efc9345b
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3863 @@
@@ -18913,7 +18885,7 @@ index 0000000000..bbf621fc8d
 ++ let test_size =
 ++   try int_of_string (Sys.getenv "OCAML_TEST_SIZE")
 ++diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
-++index 7c11863047..ccfa3aa2aa 100644
+++index 0b1ff9f49b..e1af775bbb 100644
 ++--- a/testsuite/tests/parallel/major_gc_wait_backup.ml
 +++++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
 ++@@ -1,5 +1,7 @@
@@ -20308,7 +20280,20 @@ index 0000000000..bbf621fc8d
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, ski
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignor
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
