@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..753cde1fe4
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:46.073127779 +0100
+++++ b	2023-09-28 18:47:46.077127924 +0100
++@@ -13,7 +13,7 @@
++ diff --git a/testsuite/tests/lib-sync/trylock.ml b/testsuite/tests/lib-sync/trylock.ml
++ --- a/testsuite/tests/lib-sync/trylock.ml
++ +++ b/testsuite/tests/lib-sync/trylock.ml
++-@@ -6,6 +6,7 @@ let () =
+++@@ -9,6 +9,7 @@ let () =
++    let m = Mutex.create () in
++    Mutex.lock m;
++    let res = Mutex.try_lock m in
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -10155,13 +10169,27 @@ index 0000000000..50efc9345b
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8e0e7faf9d
+index 0000000000..35cfae560f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10135 @@
+@@ -0,0 +1,10137 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..753cde1fe4
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:46.073127779 +0100
++++++ b	2023-09-28 18:47:46.077127924 +0100
+++@@ -13,7 +13,7 @@
+++ diff --git a/testsuite/tests/lib-sync/trylock.ml b/testsuite/tests/lib-sync/trylock.ml
+++ --- a/testsuite/tests/lib-sync/trylock.ml
+++ +++ b/testsuite/tests/lib-sync/trylock.ml
+++-@@ -6,6 +6,7 @@ let () =
++++@@ -9,6 +9,7 @@ let () =
+++    let m = Mutex.create () in
+++    Mutex.lock m;
+++    let res = Mutex.try_lock m in
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -20281,19 +20309,7 @@ index 0000000000..8e0e7faf9d
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
 +++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignor
++++    
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

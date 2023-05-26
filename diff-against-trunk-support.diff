@@ -2106,7 +2106,7 @@ index 34e5612fda..396b463b01 100644
  (* Classic producer-consumer *)
  
 diff --git a/testsuite/tests/lib-sync/trylock.ml b/testsuite/tests/lib-sync/trylock.ml
-index 56b4691346..07060c2db7 100644
+index 3695ddce5d..dcd70e38fc 100644
 --- a/testsuite/tests/lib-sync/trylock.ml
 +++ b/testsuite/tests/lib-sync/trylock.ml
 @@ -1,4 +1,7 @@
