@@ -1,11 +1,70 @@
---- a	2023-09-28 18:47:46.657148873 +0100
-+++ b	2023-09-28 18:47:46.665149162 +0100
-@@ -1,7 +1,7 @@
- diff --git a/Makefile b/Makefile
- --- a/Makefile
- +++ b/Makefile
--@@ -1127,14 +1127,13 @@ ocamllex.opt: ocamlopt
-+@@ -1126,14 +1126,13 @@ ocamllex.opt: ocamlopt
-  lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+--- a	2023-09-28 18:47:46.989160864 +0100
++++ b	2023-09-28 18:47:47.005161442 +0100
+@@ -51,7 +51,7 @@
+  AC_SUBST([ocamlc_cflags])
+  AC_SUBST([ocamlc_cppflags])
+  AC_SUBST([flexdir])
+-@@ -918,7 +917,6 @@ AS_CASE([$cc_basename,$host],
++@@ -931,7 +930,6 @@ AS_CASE([$cc_basename,$host],
+      AC_DEFINE([HAS_ARCH_CODE32], [1])],
+    [*,aarch64-*-darwin*|arm64-*-darwin*],
+      AC_DEFINE([HAS_ARCH_CODE32], [1]),
+@@ -59,7 +59,7 @@
+    [*,*-*-cygwin*],
+      [common_cppflags="$common_cppflags -U_WIN32"
+      AS_IF([$supports_shared_libraries],
+-@@ -967,9 +965,11 @@ AC_PROG_INSTALL
++@@ -980,9 +978,11 @@ AC_PROG_INSTALL
+  # Checks for libraries
   
-  partialclean::
+  ## Mathematical library
+@@ -74,7 +74,7 @@
+  
+  # Checks for header files
+  
+-@@ -1587,10 +1587,14 @@ but no proper monotonic clock source was found.])
++@@ -1603,10 +1603,14 @@ but no proper monotonic clock source was found.])
+  sockets=true
+  
+  AS_CASE([$host],
+@@ -90,20 +90,21 @@
+    [*-*-haiku],
+      [cclibs="$cclibs -lnetwork"
+      AC_SEARCH_LIBS([socket], [network])],
+-@@ -2031,8 +2035,10 @@ AS_CASE([$enable_debug_runtime],
++@@ -2058,8 +2062,11 @@ AS_CASE([$arch,$system],
+  ## Determine how to link with the POSIX threads library
+  
+  AS_CASE([$host],
+ -  [*-*-mingw32*|*-pc-windows],
+--    [PTHREAD_LIBS="-l:libpthread.a"],
++-dnl    [PTHREAD_LIBS="-l:libpthread.a"],
+ +  [*-*-mingw32*],
+-+    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+++    [PTHREAD_LIBS=''],
+ +  [*-pc-windows],
+-+    [PTHREAD_LIBS="-l:libpthread.lib"],
+++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
++     [PTHREAD_LIBS=''],
+    [AX_PTHREAD(
+      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
+-     saved_CFLAGS="$CFLAGS"
+-@@ -2223,19 +2229,16 @@ oc_cflags="$common_cflags $internal_cflags"
++@@ -2275,21 +2282,16 @@ oc_cflags="$common_cflags $internal_cflags"
+  oc_cppflags="$common_cppflags $internal_cppflags"
+  ocamlc_cflags="$common_cflags $sharedlib_cflags $CFLAGS"
+  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
+@@ -113,8 +114,10 @@
+  
+  AS_CASE([$host],
+    [*-*-mingw32*],
+--    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
+--    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
++-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
++-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
++-    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
++-    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
+ +    [cclibs="$cclibs -lversion"],
+    [*-pc-windows],
+ -    [bytecclibs="advapi32.lib ws2_32.lib version.lib"

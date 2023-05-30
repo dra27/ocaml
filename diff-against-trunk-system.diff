@@ -1,20 +1,79 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..2b80ae86e1
+index 0000000000..760691d485
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:46.657148873 +0100
-++++ b	2023-09-28 18:47:46.665149162 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -1127,14 +1127,13 @@ ocamllex.opt: ocamlopt
-++@@ -1126,14 +1126,13 @@ ocamllex.opt: ocamlopt
-+  lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+@@ -0,0 +1,70 @@
++--- a	2023-09-28 18:47:46.989160864 +0100
+++++ b	2023-09-28 18:47:47.005161442 +0100
++@@ -51,7 +51,7 @@
++  AC_SUBST([ocamlc_cflags])
++  AC_SUBST([ocamlc_cppflags])
++  AC_SUBST([flexdir])
++-@@ -918,7 +917,6 @@ AS_CASE([$cc_basename,$host],
+++@@ -931,7 +930,6 @@ AS_CASE([$cc_basename,$host],
++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
++    [*,aarch64-*-darwin*|arm64-*-darwin*],
++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
++@@ -59,7 +59,7 @@
++    [*,*-*-cygwin*],
++      [common_cppflags="$common_cppflags -U_WIN32"
++      AS_IF([$supports_shared_libraries],
++-@@ -967,9 +965,11 @@ AC_PROG_INSTALL
+++@@ -980,9 +978,11 @@ AC_PROG_INSTALL
++  # Checks for libraries
 +  
-+  partialclean::
++  ## Mathematical library
++@@ -74,7 +74,7 @@
++  
++  # Checks for header files
++  
++-@@ -1587,10 +1587,14 @@ but no proper monotonic clock source was found.])
+++@@ -1603,10 +1603,14 @@ but no proper monotonic clock source was found.])
++  sockets=true
++  
++  AS_CASE([$host],
++@@ -90,20 +90,21 @@
++    [*-*-haiku],
++      [cclibs="$cclibs -lnetwork"
++      AC_SEARCH_LIBS([socket], [network])],
++-@@ -2031,8 +2035,10 @@ AS_CASE([$enable_debug_runtime],
+++@@ -2058,8 +2062,11 @@ AS_CASE([$arch,$system],
++  ## Determine how to link with the POSIX threads library
++  
++  AS_CASE([$host],
++ -  [*-*-mingw32*|*-pc-windows],
++--    [PTHREAD_LIBS="-l:libpthread.a"],
+++-dnl    [PTHREAD_LIBS="-l:libpthread.a"],
++ +  [*-*-mingw32*],
++-+    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
++++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
++++    [PTHREAD_LIBS=''],
++ +  [*-pc-windows],
++-+    [PTHREAD_LIBS="-l:libpthread.lib"],
++++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
+++     [PTHREAD_LIBS=''],
++    [AX_PTHREAD(
++      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
++-     saved_CFLAGS="$CFLAGS"
++-@@ -2223,19 +2229,16 @@ oc_cflags="$common_cflags $internal_cflags"
+++@@ -2275,21 +2282,16 @@ oc_cflags="$common_cflags $internal_cflags"
++  oc_cppflags="$common_cppflags $internal_cppflags"
++  ocamlc_cflags="$common_cflags $sharedlib_cflags $CFLAGS"
++  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
++@@ -113,8 +114,10 @@
++  
++  AS_CASE([$host],
++    [*-*-mingw32*],
++--    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
++--    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
+++-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
+++-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
+++-    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
+++-    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
++ +    [cclibs="$cclibs -lversion"],
++    [*-pc-windows],
++ -    [bytecclibs="advapi32.lib ws2_32.lib version.lib"
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -28,10 +87,10 @@ index f1335f6b95..6d311793da 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 3c3660ec58..4bd88f3bbf 100644
+index fcb643083d..f3ab0eebcf 100644
 --- a/Changes
 +++ b/Changes
-@@ -883,7 +883,6 @@ OCaml 5.1.0
+@@ -890,7 +890,6 @@ OCaml 5.1.0
  - #12252: Fix shared library build error on RISC-V.
    (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
  
@@ -39,7 +98,7 @@ index 3c3660ec58..4bd88f3bbf 100644
  OCaml 5.0.0 (15 December 2022)
  ------------------------------
  
-@@ -1428,11 +1427,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1435,11 +1434,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -51,7 +110,7 @@ index 3c3660ec58..4bd88f3bbf 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1461,6 +1455,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1468,6 +1462,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -82,7 +141,7 @@ index 3c3660ec58..4bd88f3bbf 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1496,13 +1514,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1503,13 +1521,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -98,7 +157,7 @@ index 3c3660ec58..4bd88f3bbf 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1609,6 +1627,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1616,6 +1634,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -108,7 +167,7 @@ index 3c3660ec58..4bd88f3bbf 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1872,6 +1893,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1879,6 +1900,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -231,7 +290,7 @@ index d91f60b5a3..b8b19b2f78 100644
  	   utils/*.cmi \
  	   parsing/*.cmi \
 diff --git a/Makefile.config.in b/Makefile.config.in
-index d56dc96ecd..61d1a0ef56 100644
+index afd73b2921..449bb7dc6d 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
 @@ -232,7 +232,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -3252,13 +3311,13 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index ec2b87f68d..4e7d5e708e 100755
+index 28d04c27fe..58eb4eafab 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index b9dbfc6809..ae50febce7 100644
+index 6ca3cf7035..669d72fde7 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -3267,7 +3326,7 @@ index b9dbfc6809..ae50febce7 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -224,6 +226,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -3275,7 +3334,7 @@ index b9dbfc6809..ae50febce7 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -388,15 +391,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -387,15 +390,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3307,7 +3366,7 @@ index b9dbfc6809..ae50febce7 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -637,7 +648,8 @@ AS_CASE([$host],
+@@ -636,7 +647,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3317,7 +3376,7 @@ index b9dbfc6809..ae50febce7 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -714,8 +726,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -713,8 +725,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -3406,7 +3465,7 @@ index b9dbfc6809..ae50febce7 100644
        ],
        [has_monotonic_clock=false])],
    [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-@@ -2028,11 +2044,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -2032,13 +2048,26 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3424,14 +3483,18 @@ index b9dbfc6809..ae50febce7 100644
  ## Determine how to link with the POSIX threads library
  
  AS_CASE([$host],
-   [*-*-mingw32*|*-pc-windows],
--    [PTHREAD_LIBS="-l:libpthread.a"],
-+dnl    [PTHREAD_LIBS="-l:libpthread.a"],
+   [*-*-mingw32*],
+-    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
++    [PTHREAD_LIBS=''],
+   [*-pc-windows],
+-    [PTHREAD_LIBS="-l:libpthread.lib"],
++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
 +    [PTHREAD_LIBS=''],
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2083,6 +2111,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2089,6 +2118,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3462,19 +3525,6 @@ index b9dbfc6809..ae50febce7 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2229,8 +2281,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
- 
- AS_CASE([$host],
-   [*-*-mingw32*],
--    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
--    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-+dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-+dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-+    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
-+    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
-   [*-pc-windows],
-     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
-     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/debugger/debugcom.ml b/debugger/debugcom.ml
 index 5705cd73db..e852b3bb97 100644
 --- a/debugger/debugcom.ml
@@ -10169,27 +10219,86 @@ index 0000000000..bf0d6e1d6a
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ec6ffbe41d
+index 0000000000..b8fccd72d3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10139 @@
+@@ -0,0 +1,10155 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..2b80ae86e1
++index 0000000000..760691d485
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:46.657148873 +0100
-+++++ b	2023-09-28 18:47:46.665149162 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -1127,14 +1127,13 @@ ocamllex.opt: ocamlopt
-+++@@ -1126,14 +1126,13 @@ ocamllex.opt: ocamlopt
-++  lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
++@@ -0,0 +1,70 @@
+++--- a	2023-09-28 18:47:46.989160864 +0100
++++++ b	2023-09-28 18:47:47.005161442 +0100
+++@@ -51,7 +51,7 @@
+++  AC_SUBST([ocamlc_cflags])
+++  AC_SUBST([ocamlc_cppflags])
+++  AC_SUBST([flexdir])
+++-@@ -918,7 +917,6 @@ AS_CASE([$cc_basename,$host],
++++@@ -931,7 +930,6 @@ AS_CASE([$cc_basename,$host],
+++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
+++    [*,aarch64-*-darwin*|arm64-*-darwin*],
+++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
+++@@ -59,7 +59,7 @@
+++    [*,*-*-cygwin*],
+++      [common_cppflags="$common_cppflags -U_WIN32"
+++      AS_IF([$supports_shared_libraries],
+++-@@ -967,9 +965,11 @@ AC_PROG_INSTALL
++++@@ -980,9 +978,11 @@ AC_PROG_INSTALL
+++  # Checks for libraries
 ++  
-++  partialclean::
+++  ## Mathematical library
+++@@ -74,7 +74,7 @@
+++  
+++  # Checks for header files
+++  
+++-@@ -1587,10 +1587,14 @@ but no proper monotonic clock source was found.])
++++@@ -1603,10 +1603,14 @@ but no proper monotonic clock source was found.])
+++  sockets=true
+++  
+++  AS_CASE([$host],
+++@@ -90,20 +90,21 @@
+++    [*-*-haiku],
+++      [cclibs="$cclibs -lnetwork"
+++      AC_SEARCH_LIBS([socket], [network])],
+++-@@ -2031,8 +2035,10 @@ AS_CASE([$enable_debug_runtime],
++++@@ -2058,8 +2062,11 @@ AS_CASE([$arch,$system],
+++  ## Determine how to link with the POSIX threads library
+++  
+++  AS_CASE([$host],
+++ -  [*-*-mingw32*|*-pc-windows],
+++--    [PTHREAD_LIBS="-l:libpthread.a"],
++++-dnl    [PTHREAD_LIBS="-l:libpthread.a"],
+++ +  [*-*-mingw32*],
+++-+    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+++++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+++++    [PTHREAD_LIBS=''],
+++ +  [*-pc-windows],
+++-+    [PTHREAD_LIBS="-l:libpthread.lib"],
+++++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
++++     [PTHREAD_LIBS=''],
+++    [AX_PTHREAD(
+++      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
+++-     saved_CFLAGS="$CFLAGS"
+++-@@ -2223,19 +2229,16 @@ oc_cflags="$common_cflags $internal_cflags"
++++@@ -2275,21 +2282,16 @@ oc_cflags="$common_cflags $internal_cflags"
+++  oc_cppflags="$common_cppflags $internal_cppflags"
+++  ocamlc_cflags="$common_cflags $sharedlib_cflags $CFLAGS"
+++  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
+++@@ -113,8 +114,10 @@
+++  
+++  AS_CASE([$host],
+++    [*-*-mingw32*],
+++--    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
+++--    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
++++-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
++++-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
++++-    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
++++-    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
+++ +    [cclibs="$cclibs -lversion"],
+++    [*-pc-windows],
+++ -    [bytecclibs="advapi32.lib ws2_32.lib version.lib"
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -10203,10 +10312,10 @@ index 0000000000..ec6ffbe41d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 3c3660ec58..4bd88f3bbf 100644
++index fcb643083d..f3ab0eebcf 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -883,7 +883,6 @@ OCaml 5.1.0
++@@ -890,7 +890,6 @@ OCaml 5.1.0
 + - #12252: Fix shared library build error on RISC-V.
 +   (Edwin Török, review by Nicolás Ojeda Bär and Xavier Leroy)
 + 
@@ -10214,7 +10323,7 @@ index 0000000000..ec6ffbe41d
 + OCaml 5.0.0 (15 December 2022)
 + ------------------------------
 + 
-+@@ -1428,11 +1427,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1435,11 +1434,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10226,7 +10335,7 @@ index 0000000000..ec6ffbe41d
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1461,6 +1455,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1468,6 +1462,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10257,7 +10366,7 @@ index 0000000000..ec6ffbe41d
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1496,13 +1514,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1503,13 +1521,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10273,7 +10382,7 @@ index 0000000000..ec6ffbe41d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1609,6 +1627,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1616,6 +1634,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10283,7 +10392,7 @@ index 0000000000..ec6ffbe41d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1872,6 +1893,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1879,6 +1900,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10406,7 +10515,7 @@ index 0000000000..ec6ffbe41d
 + 	   utils/*.cmi \
 + 	   parsing/*.cmi \
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index d56dc96ecd..61d1a0ef56 100644
++index afd73b2921..449bb7dc6d 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
 +@@ -232,7 +232,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
@@ -13427,13 +13536,13 @@ index 0000000000..ec6ffbe41d
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index ec2b87f68d..4e7d5e708e 100755
++index 28d04c27fe..58eb4eafab 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index b9dbfc6809..ae50febce7 100644
++index 6ca3cf7035..669d72fde7 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -13442,7 +13551,7 @@ index 0000000000..ec6ffbe41d
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -224,6 +226,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -13450,7 +13559,7 @@ index 0000000000..ec6ffbe41d
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -388,15 +391,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -387,15 +390,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -13482,7 +13591,7 @@ index 0000000000..ec6ffbe41d
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -637,7 +648,8 @@ AS_CASE([$host],
++@@ -636,7 +647,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13492,7 +13601,7 @@ index 0000000000..ec6ffbe41d
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -714,8 +726,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -713,8 +725,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -13581,7 +13690,7 @@ index 0000000000..ec6ffbe41d
 +       ],
 +       [has_monotonic_clock=false])],
 +   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-+@@ -2028,11 +2044,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -2032,13 +2048,26 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13599,14 +13708,18 @@ index 0000000000..ec6ffbe41d
 + ## Determine how to link with the POSIX threads library
 + 
 + AS_CASE([$host],
-+   [*-*-mingw32*|*-pc-windows],
-+-    [PTHREAD_LIBS="-l:libpthread.a"],
-++dnl    [PTHREAD_LIBS="-l:libpthread.a"],
++   [*-*-mingw32*],
++-    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+++    [PTHREAD_LIBS=''],
++   [*-pc-windows],
++-    [PTHREAD_LIBS="-l:libpthread.lib"],
+++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
 ++    [PTHREAD_LIBS=''],
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2083,6 +2111,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2089,6 +2118,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13637,19 +13750,6 @@ index 0000000000..ec6ffbe41d
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2229,8 +2281,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
-+ 
-+ AS_CASE([$host],
-+   [*-*-mingw32*],
-+-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-+-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-++dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-++dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-++    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
-++    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
-+   [*-pc-windows],
-+     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
-+     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/debugger/debugcom.ml b/debugger/debugcom.ml
 +index 5705cd73db..e852b3bb97 100644
 +--- a/debugger/debugcom.ml
@@ -20277,41 +20377,7 @@ index 0000000000..ec6ffbe41d
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]];
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

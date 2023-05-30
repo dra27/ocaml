@@ -92,7 +92,7 @@ index 0bc17bc281..faae83cf0e 100644
      file_exists;
      copy;
 diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-index 282090b4c3..dfda7b1f87 100644
+index 95dcba707a..3e5e06db72 100644
 --- a/ocamltest/ocamltest_config.ml.in
 +++ b/ocamltest/ocamltest_config.ml.in
 @@ -90,4 +90,6 @@ let function_sections = @function_sections@
