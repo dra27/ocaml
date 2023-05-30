@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..2b80ae86e1
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:46.657148873 +0100
+++++ b	2023-09-28 18:47:46.665149162 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -1127,14 +1127,13 @@ ocamllex.opt: ocamlopt
+++@@ -1126,14 +1126,13 @@ ocamllex.opt: ocamlopt
++  lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
++  
++  partialclean::
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -105,7 +119,7 @@ index 3c3660ec58..4bd88f3bbf 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index c8e28c52ec..26b7bf78e0 100644
+index d91f60b5a3..b8b19b2f78 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -614,7 +614,6 @@ partialclean::
@@ -198,7 +212,7 @@ index c8e28c52ec..26b7bf78e0 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1155,6 +1154,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1154,6 +1153,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -206,7 +220,7 @@ index c8e28c52ec..26b7bf78e0 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1715,6 +1715,9 @@ endif
+@@ -1714,6 +1714,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -10155,13 +10169,27 @@ index 0000000000..bf0d6e1d6a
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..26f9af041f
+index 0000000000..ec6ffbe41d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10135 @@
+@@ -0,0 +1,10139 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..2b80ae86e1
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:46.657148873 +0100
++++++ b	2023-09-28 18:47:46.665149162 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -1127,14 +1127,13 @@ ocamllex.opt: ocamlopt
++++@@ -1126,14 +1126,13 @@ ocamllex.opt: ocamlopt
+++  lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+++  
+++  partialclean::
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -10266,7 +10294,7 @@ index 0000000000..26f9af041f
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index c8e28c52ec..26b7bf78e0 100644
++index d91f60b5a3..b8b19b2f78 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -614,7 +614,6 @@ partialclean::
@@ -10359,7 +10387,7 @@ index 0000000000..26f9af041f
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1155,6 +1154,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1154,6 +1153,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10367,7 +10395,7 @@ index 0000000000..26f9af041f
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1715,6 +1715,9 @@ endif
++@@ -1714,6 +1714,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -20283,17 +20311,7 @@ index 0000000000..26f9af041f
 +++      # And run the entire testsuite, skipping all the native-code tests
 +++    fi
 ++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignor
+++         make -C "$FULL_BUILD_PREFIX-$PORT
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

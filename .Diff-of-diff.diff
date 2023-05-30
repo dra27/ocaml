@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:46.657148873 +0100
++++ b	2023-09-28 18:47:46.665149162 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -1127,14 +1127,13 @@ ocamllex.opt: ocamlopt
++@@ -1126,14 +1126,13 @@ ocamllex.opt: ocamlopt
+  lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
+  
+  partialclean::
