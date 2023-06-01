@@ -1,79 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..760691d485
+index 0000000000..2e74d53b6c
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,70 @@
-+--- a	2023-09-28 18:47:46.989160864 +0100
-++++ b	2023-09-28 18:47:47.005161442 +0100
-+@@ -51,7 +51,7 @@
-+  AC_SUBST([ocamlc_cflags])
-+  AC_SUBST([ocamlc_cppflags])
-+  AC_SUBST([flexdir])
-+-@@ -918,7 +917,6 @@ AS_CASE([$cc_basename,$host],
-++@@ -931,7 +930,6 @@ AS_CASE([$cc_basename,$host],
-+      AC_DEFINE([HAS_ARCH_CODE32], [1])],
-+    [*,aarch64-*-darwin*|arm64-*-darwin*],
-+      AC_DEFINE([HAS_ARCH_CODE32], [1]),
-+@@ -59,7 +59,7 @@
-+    [*,*-*-cygwin*],
-+      [common_cppflags="$common_cppflags -U_WIN32"
-+      AS_IF([$supports_shared_libraries],
-+-@@ -967,9 +965,11 @@ AC_PROG_INSTALL
-++@@ -980,9 +978,11 @@ AC_PROG_INSTALL
-+  # Checks for libraries
-+  
-+  ## Mathematical library
-+@@ -74,7 +74,7 @@
-+  
-+  # Checks for header files
-+  
-+-@@ -1587,10 +1587,14 @@ but no proper monotonic clock source was found.])
-++@@ -1603,10 +1603,14 @@ but no proper monotonic clock source was found.])
-+  sockets=true
-+  
-+  AS_CASE([$host],
-+@@ -90,20 +90,21 @@
-+    [*-*-haiku],
-+      [cclibs="$cclibs -lnetwork"
-+      AC_SEARCH_LIBS([socket], [network])],
-+-@@ -2031,8 +2035,10 @@ AS_CASE([$enable_debug_runtime],
-++@@ -2058,8 +2062,11 @@ AS_CASE([$arch,$system],
-+  ## Determine how to link with the POSIX threads library
-+  
-+  AS_CASE([$host],
-+ -  [*-*-mingw32*|*-pc-windows],
-+--    [PTHREAD_LIBS="-l:libpthread.a"],
-++-dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-+ +  [*-*-mingw32*],
-+-+    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
-+++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
-+++    [PTHREAD_LIBS=''],
-+ +  [*-pc-windows],
-+-+    [PTHREAD_LIBS="-l:libpthread.lib"],
-+++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
-++     [PTHREAD_LIBS=''],
-+    [AX_PTHREAD(
-+      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
-+-     saved_CFLAGS="$CFLAGS"
-+-@@ -2223,19 +2229,16 @@ oc_cflags="$common_cflags $internal_cflags"
-++@@ -2275,21 +2282,16 @@ oc_cflags="$common_cflags $internal_cflags"
-+  oc_cppflags="$common_cppflags $internal_cppflags"
-+  ocamlc_cflags="$common_cflags $sharedlib_cflags $CFLAGS"
-+  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
-+@@ -113,8 +114,10 @@
-+  
-+  AS_CASE([$host],
-+    [*-*-mingw32*],
-+--    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-+--    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-++-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-++-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-++-    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
-++-    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
-+ +    [cclibs="$cclibs -lversion"],
-+    [*-pc-windows],
-+ -    [bytecclibs="advapi32.lib ws2_32.lib version.lib"
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:47.289171695 +0100
+++++ b	2023-09-28 18:47:47.297171984 +0100
++@@ -3,7 +3,7 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1281,7 +1281,9 @@ AS_CASE([$host],
+++@@ -1295,7 +1295,9 @@ AS_CASE([$host],
++    [x86_64-*-mingw32*],
++      [has_native_backend=yes; arch=amd64; system=mingw64],
++    [aarch64-*-linux*],
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -3311,10 +3252,10 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 28d04c27fe..58eb4eafab 100755
+index 5309546522..daccb5c71c 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 6ca3cf7035..669d72fde7 100644
+index 31c10c8dee..f62e291d68 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3441,7 +3382,7 @@ index 6ca3cf7035..669d72fde7 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1291,7 +1305,7 @@ AS_CASE([$host],
+@@ -1293,7 +1307,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3450,7 +3391,7 @@ index 6ca3cf7035..669d72fde7 100644
  )
  
  native_cflags=''
-@@ -1503,10 +1517,12 @@ AS_CASE([$host],
+@@ -1505,10 +1519,12 @@ AS_CASE([$host],
    [*-*-windows],
      [has_monotonic_clock=true],
    [*-apple-darwin*], [
@@ -3465,7 +3406,7 @@ index 6ca3cf7035..669d72fde7 100644
        ],
        [has_monotonic_clock=false])],
    [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-@@ -2032,13 +2048,26 @@ AS_CASE([$enable_debug_runtime],
+@@ -2034,13 +2050,26 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3494,7 +3435,7 @@ index 6ca3cf7035..669d72fde7 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2089,6 +2118,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2091,6 +2120,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -6350,7 +6291,7 @@ index 0000000000..53e11a35d8
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..bf0d6e1d6a
+index 0000000000..c55951ffb0
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3863 @@
@@ -6448,7 +6389,7 @@ index 0000000000..bf0d6e1d6a
 +     file_exists;
 +     copy;
 +diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-+index 282090b4c3..dfda7b1f87 100644
++index 95dcba707a..3e5e06db72 100644
 +--- a/ocamltest/ocamltest_config.ml.in
 ++++ b/ocamltest/ocamltest_config.ml.in
 +@@ -90,4 +90,6 @@ let function_sections = @function_sections@
@@ -10219,86 +10160,27 @@ index 0000000000..bf0d6e1d6a
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b8fccd72d3
+index 0000000000..76cb842766
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10155 @@
+@@ -0,0 +1,10140 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..760691d485
++index 0000000000..2e74d53b6c
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,70 @@
-++--- a	2023-09-28 18:47:46.989160864 +0100
-+++++ b	2023-09-28 18:47:47.005161442 +0100
-++@@ -51,7 +51,7 @@
-++  AC_SUBST([ocamlc_cflags])
-++  AC_SUBST([ocamlc_cppflags])
-++  AC_SUBST([flexdir])
-++-@@ -918,7 +917,6 @@ AS_CASE([$cc_basename,$host],
-+++@@ -931,7 +930,6 @@ AS_CASE([$cc_basename,$host],
-++      AC_DEFINE([HAS_ARCH_CODE32], [1])],
-++    [*,aarch64-*-darwin*|arm64-*-darwin*],
-++      AC_DEFINE([HAS_ARCH_CODE32], [1]),
-++@@ -59,7 +59,7 @@
-++    [*,*-*-cygwin*],
-++      [common_cppflags="$common_cppflags -U_WIN32"
-++      AS_IF([$supports_shared_libraries],
-++-@@ -967,9 +965,11 @@ AC_PROG_INSTALL
-+++@@ -980,9 +978,11 @@ AC_PROG_INSTALL
-++  # Checks for libraries
-++  
-++  ## Mathematical library
-++@@ -74,7 +74,7 @@
-++  
-++  # Checks for header files
-++  
-++-@@ -1587,10 +1587,14 @@ but no proper monotonic clock source was found.])
-+++@@ -1603,10 +1603,14 @@ but no proper monotonic clock source was found.])
-++  sockets=true
-++  
-++  AS_CASE([$host],
-++@@ -90,20 +90,21 @@
-++    [*-*-haiku],
-++      [cclibs="$cclibs -lnetwork"
-++      AC_SEARCH_LIBS([socket], [network])],
-++-@@ -2031,8 +2035,10 @@ AS_CASE([$enable_debug_runtime],
-+++@@ -2058,8 +2062,11 @@ AS_CASE([$arch,$system],
-++  ## Determine how to link with the POSIX threads library
-++  
-++  AS_CASE([$host],
-++ -  [*-*-mingw32*|*-pc-windows],
-++--    [PTHREAD_LIBS="-l:libpthread.a"],
-+++-dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-++ +  [*-*-mingw32*],
-++-+    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
-++++dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
-++++    [PTHREAD_LIBS=''],
-++ +  [*-pc-windows],
-++-+    [PTHREAD_LIBS="-l:libpthread.lib"],
-++++dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
-+++     [PTHREAD_LIBS=''],
-++    [AX_PTHREAD(
-++      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
-++-     saved_CFLAGS="$CFLAGS"
-++-@@ -2223,19 +2229,16 @@ oc_cflags="$common_cflags $internal_cflags"
-+++@@ -2275,21 +2282,16 @@ oc_cflags="$common_cflags $internal_cflags"
-++  oc_cppflags="$common_cppflags $internal_cppflags"
-++  ocamlc_cflags="$common_cflags $sharedlib_cflags $CFLAGS"
-++  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
-++@@ -113,8 +114,10 @@
-++  
-++  AS_CASE([$host],
-++    [*-*-mingw32*],
-++--    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-++--    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-+++-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-+++-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-+++-    [bytecclibs="-lws2_32 -lversion -lgcc_eh"
-+++-    nativecclibs="-lws2_32 -lversion -lgcc_eh"],
-++ +    [cclibs="$cclibs -lversion"],
-++    [*-pc-windows],
-++ -    [bytecclibs="advapi32.lib ws2_32.lib version.lib"
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:47.289171695 +0100
++++++ b	2023-09-28 18:47:47.297171984 +0100
+++@@ -3,7 +3,7 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1281,7 +1281,9 @@ AS_CASE([$host],
++++@@ -1295,7 +1295,9 @@ AS_CASE([$host],
+++    [x86_64-*-mingw32*],
+++      [has_native_backend=yes; arch=amd64; system=mingw64],
+++    [aarch64-*-linux*],
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -13536,10 +13418,10 @@ index 0000000000..b8fccd72d3
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 28d04c27fe..58eb4eafab 100755
++index 5309546522..daccb5c71c 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 6ca3cf7035..669d72fde7 100644
++index 31c10c8dee..f62e291d68 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13666,7 +13548,7 @@ index 0000000000..b8fccd72d3
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1291,7 +1305,7 @@ AS_CASE([$host],
++@@ -1293,7 +1307,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -13675,7 +13557,7 @@ index 0000000000..b8fccd72d3
 + )
 + 
 + native_cflags=''
-+@@ -1503,10 +1517,12 @@ AS_CASE([$host],
++@@ -1505,10 +1519,12 @@ AS_CASE([$host],
 +   [*-*-windows],
 +     [has_monotonic_clock=true],
 +   [*-apple-darwin*], [
@@ -13690,7 +13572,7 @@ index 0000000000..b8fccd72d3
 +       ],
 +       [has_monotonic_clock=false])],
 +   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-+@@ -2032,13 +2048,26 @@ AS_CASE([$enable_debug_runtime],
++@@ -2034,13 +2050,26 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13719,7 +13601,7 @@ index 0000000000..b8fccd72d3
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2089,6 +2118,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2091,6 +2120,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -16575,7 +16457,7 @@ index 0000000000..b8fccd72d3
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..bf0d6e1d6a
++index 0000000000..c55951ffb0
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3863 @@
@@ -16673,7 +16555,7 @@ index 0000000000..b8fccd72d3
 ++     file_exists;
 ++     copy;
 ++diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-++index 282090b4c3..dfda7b1f87 100644
+++index 95dcba707a..3e5e06db72 100644
 ++--- a/ocamltest/ocamltest_config.ml.in
 +++++ b/ocamltest/ocamltest_config.ml.in
 ++@@ -90,4 +90,6 @@ let function_sections = @function_sections@
@@ -20377,8 +20259,51 @@ index 0000000000..b8fccd72d3
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]];
-\ No newline at end of file
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
