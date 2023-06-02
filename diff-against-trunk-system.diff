@@ -1,55 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..167eb196b1
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,46 @@
-+--- a	2023-09-28 18:47:47.941195233 +0100
-++++ b	2023-09-28 18:47:47.961195955 +0100
-+@@ -22,7 +22,7 @@
-+ diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
-+ --- a/asmcomp/s390x/emit.mlp
-+ +++ b/asmcomp/s390x/emit.mlp
-+-@@ -378,20 +378,17 @@ let emit_instr env i =
-++@@ -378,22 +378,19 @@ let emit_instr env i =
-+            emit_call "caml_c_call";
-+            `{record_frame env i.live (Dbg_other i.dbg)}\n`
-+          end else begin
-+@@ -38,8 +38,10 @@
-+ -             Also, for some reason ocaml compiler uses %r12, can't use it here.
-+ -             Just save stack pointer to temporary pointer and then to new stack *)
-+ +             calling frame with cfi_signal_frame in it's definition. *)
-++ (* BACKPORT
-+            let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
-+            ` lg %r15, {emit_int offset}(%r10)\n`;
-++ *)
-+ -          ` lay %r15, -168(%r15)\n`;
-+ -          ` stg %r1, 160(%r15)\n`;
-+            emit_call func;
-+@@ -48,19 +50,20 @@
-+            cfi_restore_state ()
-+          end
-+  
-+-@@ -733,9 +730,8 @@ let fundecl fundecl =
-++@@ -740,10 +737,9 @@ let fundecl fundecl =
-+      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
-+      let f = max_frame_size + threshold_offset in
-+      let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
-+ -    `  lg %r1, {emit_int offset}(%r10)\n`;
-+ -    `  lay %r1, {emit_int f}(%r1)\n`;
-+--    `  clgr %r15, %r1\n`;
-+ +    `  lay %r1, {emit_int (-f)}(%r15)\n`;
-+ +    `  clg %r1, {emit_int offset}(%r10)\n`;
-++ *)
-++-    `  clgr %r15, %r1\n`;
-+      `  brcl 4, {emit_label overflow}\n`;
-+      `{emit_label ret}:\n`;
-+      handle_overflow := Some (overflow, ret);
-+-@@ -751,16 +747,13 @@ let fundecl fundecl =
-++@@ -759,16 +755,13 @@ let fundecl fundecl =
-+    | None -> ()
-+    | Some (overflow,ret) -> begin
-+        `{emit_label overflow}:\n`;
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index f1335f6b95..6d311793da 100644
 --- a/.gitattributes
@@ -10177,62 +10128,13 @@ index 0000000000..c55951ffb0
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6cccb99b2d
+index 0000000000..5f854fd4c3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10135 @@
+@@ -0,0 +1,10128 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..167eb196b1
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,46 @@
-++--- a	2023-09-28 18:47:47.941195233 +0100
-+++++ b	2023-09-28 18:47:47.961195955 +0100
-++@@ -22,7 +22,7 @@
-++ diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
-++ --- a/asmcomp/s390x/emit.mlp
-++ +++ b/asmcomp/s390x/emit.mlp
-++-@@ -378,20 +378,17 @@ let emit_instr env i =
-+++@@ -378,22 +378,19 @@ let emit_instr env i =
-++            emit_call "caml_c_call";
-++            `{record_frame env i.live (Dbg_other i.dbg)}\n`
-++          end else begin
-++@@ -38,8 +38,10 @@
-++ -             Also, for some reason ocaml compiler uses %r12, can't use it here.
-++ -             Just save stack pointer to temporary pointer and then to new stack *)
-++ +             calling frame with cfi_signal_frame in it's definition. *)
-+++ (* BACKPORT
-++            let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
-++            ` lg %r15, {emit_int offset}(%r10)\n`;
-+++ *)
-++ -          ` lay %r15, -168(%r15)\n`;
-++ -          ` stg %r1, 160(%r15)\n`;
-++            emit_call func;
-++@@ -48,19 +50,20 @@
-++            cfi_restore_state ()
-++          end
-++  
-++-@@ -733,9 +730,8 @@ let fundecl fundecl =
-+++@@ -740,10 +737,9 @@ let fundecl fundecl =
-++      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
-++      let f = max_frame_size + threshold_offset in
-++      let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
-++ -    `  lg %r1, {emit_int offset}(%r10)\n`;
-++ -    `  lay %r1, {emit_int f}(%r1)\n`;
-++--    `  clgr %r15, %r1\n`;
-++ +    `  lay %r1, {emit_int (-f)}(%r15)\n`;
-++ +    `  clg %r1, {emit_int offset}(%r10)\n`;
-+++ *)
-+++-    `  clgr %r15, %r1\n`;
-++      `  brcl 4, {emit_label overflow}\n`;
-++      `{emit_label ret}:\n`;
-++      handle_overflow := Some (overflow, ret);
-++-@@ -751,16 +747,13 @@ let fundecl fundecl =
-+++@@ -759,16 +755,13 @@ let fundecl fundecl =
-++    | None -> ()
-++    | Some (overflow,ret) -> begin
-++        `{emit_label overflow}:\n`;
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index f1335f6b95..6d311793da 100644
 +--- a/.gitattributes
@@ -20315,7 +20217,49 @@ index 0000000000..6cccb99b2d
 ++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 ++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
 ++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+++           "../$BUILD_PREFIX-$PORT/build.log" |
+++             sed -e 's/\d027\[K//g' \
+++    
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
