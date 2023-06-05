@@ -6259,12 +6259,12 @@ index 0000000000..53e11a35d8
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..c55951ffb0
+index 0000000000..be0e4f326e
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3863 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
-+index 59b5162a2f..13cd6abde1 100644
++index 9d502e1c90..f14374c9c3 100644
 +--- a/.github/workflows/build.yml
 ++++ b/.github/workflows/build.yml
 +@@ -57,7 +57,7 @@ jobs:
@@ -10128,7 +10128,7 @@ index 0000000000..c55951ffb0
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..dfe8d55c5b
+index 0000000000..7f73bbae02
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10128 @@
@@ -16393,12 +16393,12 @@ index 0000000000..dfe8d55c5b
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..c55951ffb0
++index 0000000000..be0e4f326e
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3863 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
-++index 59b5162a2f..13cd6abde1 100644
+++index 9d502e1c90..f14374c9c3 100644
 ++--- a/.github/workflows/build.yml
 +++++ b/.github/workflows/build.yml
 ++@@ -57,7 +57,7 @@ jobs:
