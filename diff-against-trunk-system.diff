@@ -14,10 +14,10 @@ index f1335f6b95..6d311793da 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 178c75f22f..d93034f0e1 100644
+index 6483178c30..55fb274d18 100644
 --- a/Changes
 +++ b/Changes
-@@ -1443,11 +1443,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1452,11 +1452,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +29,7 @@ index 178c75f22f..d93034f0e1 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1476,6 +1471,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1485,6 +1480,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +60,7 @@ index 178c75f22f..d93034f0e1 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1511,13 +1530,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1520,13 +1539,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +76,7 @@ index 178c75f22f..d93034f0e1 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1624,6 +1643,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1633,6 +1652,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +86,7 @@ index 178c75f22f..d93034f0e1 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1887,6 +1909,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1896,6 +1918,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10128,7 +10128,7 @@ index 0000000000..be0e4f326e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7f73bbae02
+index 0000000000..03c0e17498
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10128 @@
@@ -10148,10 +10148,10 @@ index 0000000000..7f73bbae02
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 178c75f22f..d93034f0e1 100644
++index 6483178c30..55fb274d18 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1443,11 +1443,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1452,11 +1452,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10163,7 +10163,7 @@ index 0000000000..7f73bbae02
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1476,6 +1471,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1485,6 +1480,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10194,7 +10194,7 @@ index 0000000000..7f73bbae02
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1511,13 +1530,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1520,13 +1539,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10210,7 +10210,7 @@ index 0000000000..7f73bbae02
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1624,6 +1643,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1633,6 +1652,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10220,7 +10220,7 @@ index 0000000000..7f73bbae02
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1887,6 +1909,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1896,6 +1918,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
