@@ -97,7 +97,7 @@ index 6483178c30..55fb274d18 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index d91f60b5a3..b8b19b2f78 100644
+index 78c5fbfa98..f5e8addf0d 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -614,7 +614,6 @@ partialclean::
@@ -10128,7 +10128,7 @@ index 0000000000..be0e4f326e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..03c0e17498
+index 0000000000..1dbc2111d3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10128 @@
@@ -10231,7 +10231,7 @@ index 0000000000..03c0e17498
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index d91f60b5a3..b8b19b2f78 100644
++index 78c5fbfa98..f5e8addf0d 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -614,7 +614,6 @@ partialclean::
@@ -21961,7 +21961,7 @@ index 54dab1bde2..c51ec4b672 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index ffd472eaef..04a7812d9c 100644
+index 719fa883dc..ce491aaf2a 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -247,7 +247,8 @@ GNUISH_SED = \
