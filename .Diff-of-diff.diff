@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:50.181276040 +0100
++++ b	2023-09-28 18:47:50.197276617 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/.gitattributes b/.gitattributes
+ --- a/.gitattributes
+ +++ b/.gitattributes
+-@@ -197,6 +197,7 @@ runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
++@@ -198,6 +198,7 @@ runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
+  # Tests which include references spanning multiple lines fail with \r\n
+  # endings, so use \n endings only, even on Windows.
+  testsuite/tests/backtrace/names.ml text eol=lf
