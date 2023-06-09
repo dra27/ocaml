@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:51.053307474 +0100
++++ b	2023-09-28 18:47:51.057307619 +0100
+@@ -10,7 +10,7 @@
+ diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+ --- a/tools/ci/actions/runner.sh
+ +++ b/tools/ci/actions/runner.sh
+-@@ -155,7 +155,7 @@ ReportBuildStatus () {
++@@ -143,7 +143,7 @@ ReportBuildStatus () {
+    else
+      STATUS='success'
+    fi

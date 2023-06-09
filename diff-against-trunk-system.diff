@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..26d54a1a2a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:51.053307474 +0100
+++++ b	2023-09-28 18:47:51.057307619 +0100
++@@ -10,7 +10,7 @@
++ diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
++ --- a/tools/ci/actions/runner.sh
++ +++ b/tools/ci/actions/runner.sh
++-@@ -155,7 +155,7 @@ ReportBuildStatus () {
+++@@ -143,7 +143,7 @@ ReportBuildStatus () {
++    else
++      STATUS='success'
++    fi
 diff --git a/.gitattributes b/.gitattributes
 index a7153fd8fa..de38d7ec67 100644
 --- a/.gitattributes
@@ -10393,13 +10407,27 @@ index 0000000000..be0e4f326e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..618b03167a
+index 0000000000..b7443b3259
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10340 @@
+@@ -0,0 +1,10344 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..26d54a1a2a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:51.053307474 +0100
++++++ b	2023-09-28 18:47:51.057307619 +0100
+++@@ -10,7 +10,7 @@
+++ diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++ --- a/tools/ci/actions/runner.sh
+++ +++ b/tools/ci/actions/runner.sh
+++-@@ -155,7 +155,7 @@ ReportBuildStatus () {
++++@@ -143,7 +143,7 @@ ReportBuildStatus () {
+++    else
+++      STATUS='success'
+++    fi
 +diff --git a/.gitattributes b/.gitattributes
 +index a7153fd8fa..de38d7ec67 100644
 +--- a/.gitattributes
@@ -20726,17 +20754,7 @@ index 0000000000..618b03167a
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
 +++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt"
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
