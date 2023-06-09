@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..113777bafc
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:50.181276040 +0100
-++++ b	2023-09-28 18:47:50.197276617 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/.gitattributes b/.gitattributes
-+ --- a/.gitattributes
-+ +++ b/.gitattributes
-+-@@ -197,6 +197,7 @@ runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
-++@@ -198,6 +198,7 @@ runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
-+  # Tests which include references spanning multiple lines fail with \r\n
-+  # endings, so use \n endings only, even on Windows.
-+  testsuite/tests/backtrace/names.ml text eol=lf
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index a7153fd8fa..de38d7ec67 100644
 --- a/.gitattributes
@@ -10407,27 +10393,13 @@ index 0000000000..be0e4f326e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6dbac64c9c
+index 0000000000..618b03167a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10342 @@
+@@ -0,0 +1,10340 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..113777bafc
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:50.181276040 +0100
-+++++ b	2023-09-28 18:47:50.197276617 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/.gitattributes b/.gitattributes
-++ --- a/.gitattributes
-++ +++ b/.gitattributes
-++-@@ -197,6 +197,7 @@ runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
-+++@@ -198,6 +198,7 @@ runtime/caml/sizeclasses.h typo.missing-header typo.white-at-eol
-++  # Tests which include references spanning multiple lines fail with \r\n
-++  # endings, so use \n endings only, even on Windows.
-++  testsuite/tests/backtrace/names.ml text eol=lf
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index a7153fd8fa..de38d7ec67 100644
 +--- a/.gitattributes
@@ -20752,7 +20724,19 @@ index 0000000000..6dbac64c9c
 ++     ;;
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUI
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
