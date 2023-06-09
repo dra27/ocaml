@@ -1,6 +1,5 @@
 all: tools manual tests
 
-
 # The tools and the tests are rebuilt each time in order to avoid issues with
 # different compiler versions
 tests: manual

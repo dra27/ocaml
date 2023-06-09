@@ -171,7 +171,7 @@ BasicCompiler () {
   # And generated files (ocamllex compiles ocamlyacc)
   make -j ocamllex
 
-  ReportBuildStatus 0
+  ReportBuildStatus 1
 }
 
 case $1 in
