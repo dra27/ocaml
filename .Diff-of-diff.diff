@@ -1,11 +1,20 @@
---- a	2023-09-28 18:47:51.053307474 +0100
-+++ b	2023-09-28 18:47:51.057307619 +0100
-@@ -10,7 +10,7 @@
- diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
- --- a/tools/ci/actions/runner.sh
- +++ b/tools/ci/actions/runner.sh
--@@ -155,7 +155,7 @@ ReportBuildStatus () {
-+@@ -143,7 +143,7 @@ ReportBuildStatus () {
-    else
-      STATUS='success'
-    fi
+--- a	2023-09-28 18:47:51.297316266 +0100
++++ b	2023-09-28 18:47:51.301316411 +0100
+@@ -40,7 +40,7 @@
+  testsuite/tests/messages/highlight_tabs.ml              typo.tab
+  
+  # prune testsuite reference files
+-@@ -146,8 +137,6 @@ tools/magic                       typo.missing-header
++@@ -147,8 +138,6 @@ tools/eventlog_metadata.in        typo.missing-header
+  # TODO we should fix the long-line errors in yacc/*.c
+  /yacc/*.[ch]         typo.very-long-line=may
+  
+@@ -49,7 +49,7 @@
+  # bootstrap files produced by Menhir
+  /boot/menhir/** typo.long-line=may typo.very-long-line=may
+  /boot/menhir/** typo.missing-header=may
+-@@ -171,27 +160,20 @@ configure.ac text eol=lf
++@@ -172,27 +161,20 @@ configure.ac text eol=lf
+  build-aux/compile text eol=lf
+  build-aux/config.guess text eol=lf
+  build-aux/config.sub text eol=lf

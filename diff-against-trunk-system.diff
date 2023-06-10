@@ -1,25 +1,34 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..26d54a1a2a
+index 0000000000..19a6540a64
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:51.053307474 +0100
-++++ b	2023-09-28 18:47:51.057307619 +0100
-+@@ -10,7 +10,7 @@
-+ diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-+ --- a/tools/ci/actions/runner.sh
-+ +++ b/tools/ci/actions/runner.sh
-+-@@ -155,7 +155,7 @@ ReportBuildStatus () {
-++@@ -143,7 +143,7 @@ ReportBuildStatus () {
-+    else
-+      STATUS='success'
-+    fi
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:47:51.297316266 +0100
+++++ b	2023-09-28 18:47:51.301316411 +0100
++@@ -40,7 +40,7 @@
++  testsuite/tests/messages/highlight_tabs.ml              typo.tab
++  
++  # prune testsuite reference files
++-@@ -146,8 +137,6 @@ tools/magic                       typo.missing-header
+++@@ -147,8 +138,6 @@ tools/eventlog_metadata.in        typo.missing-header
++  # TODO we should fix the long-line errors in yacc/*.c
++  /yacc/*.[ch]         typo.very-long-line=may
++  
++@@ -49,7 +49,7 @@
++  # bootstrap files produced by Menhir
++  /boot/menhir/** typo.long-line=may typo.very-long-line=may
++  /boot/menhir/** typo.missing-header=may
++-@@ -171,27 +160,20 @@ configure.ac text eol=lf
+++@@ -172,27 +161,20 @@ configure.ac text eol=lf
++  build-aux/compile text eol=lf
++  build-aux/config.guess text eol=lf
++  build-aux/config.sub text eol=lf
 diff --git a/.gitattributes b/.gitattributes
-index a7153fd8fa..de38d7ec67 100644
+index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
 +++ b/.gitattributes
-@@ -142,6 +142,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
+@@ -133,6 +133,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
  testsuite/tests/tool-ocamltest/norm*.reference binary
  
  tools/magic                       typo.missing-header
@@ -6538,7 +6547,7 @@ index 0000000000..d2a1e96521
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..be0e4f326e
+index 0000000000..e899ebe6ec
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3863 @@
@@ -10296,7 +10305,7 @@ index 0000000000..be0e4f326e
 + (* Testing unsynchronized, parallel Weak usage *)
 + 
 +diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-+index f64c2ce4e0..49f5a8b697 100755
++index 6a6163279e..7fa37526d5 100755
 +--- a/tools/ci/actions/runner.sh
 ++++ b/tools/ci/actions/runner.sh
 +@@ -42,19 +42,7 @@ EOF
@@ -10407,32 +10416,41 @@ index 0000000000..be0e4f326e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b7443b3259
+index 0000000000..835b935690
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10344 @@
+@@ -0,0 +1,10342 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..26d54a1a2a
++index 0000000000..19a6540a64
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:51.053307474 +0100
-+++++ b	2023-09-28 18:47:51.057307619 +0100
-++@@ -10,7 +10,7 @@
-++ diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++ --- a/tools/ci/actions/runner.sh
-++ +++ b/tools/ci/actions/runner.sh
-++-@@ -155,7 +155,7 @@ ReportBuildStatus () {
-+++@@ -143,7 +143,7 @@ ReportBuildStatus () {
-++    else
-++      STATUS='success'
-++    fi
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:47:51.297316266 +0100
++++++ b	2023-09-28 18:47:51.301316411 +0100
+++@@ -40,7 +40,7 @@
+++  testsuite/tests/messages/highlight_tabs.ml              typo.tab
+++  
+++  # prune testsuite reference files
+++-@@ -146,8 +137,6 @@ tools/magic                       typo.missing-header
++++@@ -147,8 +138,6 @@ tools/eventlog_metadata.in        typo.missing-header
+++  # TODO we should fix the long-line errors in yacc/*.c
+++  /yacc/*.[ch]         typo.very-long-line=may
+++  
+++@@ -49,7 +49,7 @@
+++  # bootstrap files produced by Menhir
+++  /boot/menhir/** typo.long-line=may typo.very-long-line=may
+++  /boot/menhir/** typo.missing-header=may
+++-@@ -171,27 +160,20 @@ configure.ac text eol=lf
++++@@ -172,27 +161,20 @@ configure.ac text eol=lf
+++  build-aux/compile text eol=lf
+++  build-aux/config.guess text eol=lf
+++  build-aux/config.sub text eol=lf
 +diff --git a/.gitattributes b/.gitattributes
-+index a7153fd8fa..de38d7ec67 100644
++index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
 ++++ b/.gitattributes
-+@@ -142,6 +142,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
++@@ -133,6 +133,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
 + testsuite/tests/tool-ocamltest/norm*.reference binary
 + 
 + tools/magic                       typo.missing-header
@@ -16951,7 +16969,7 @@ index 0000000000..b7443b3259
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..be0e4f326e
++index 0000000000..e899ebe6ec
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3863 @@
@@ -20709,7 +20727,7 @@ index 0000000000..b7443b3259
 ++ (* Testing unsynchronized, parallel Weak usage *)
 ++ 
 ++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
-++index f64c2ce4e0..49f5a8b697 100755
+++index 6a6163279e..7fa37526d5 100755
 ++--- a/tools/ci/actions/runner.sh
 +++++ b/tools/ci/actions/runner.sh
 ++@@ -42,19 +42,7 @@ EOF
@@ -20743,18 +20761,7 @@ index 0000000000..b7443b3259
 ++             host='--host=x86_64-w64-mingw32'
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt"
++++            # Explicitly test dependency generation on msv
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
