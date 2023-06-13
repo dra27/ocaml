@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..19a6540a64
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:47:51.297316266 +0100
-++++ b	2023-09-28 18:47:51.301316411 +0100
-+@@ -40,7 +40,7 @@
-+  testsuite/tests/messages/highlight_tabs.ml              typo.tab
-+  
-+  # prune testsuite reference files
-+-@@ -146,8 +137,6 @@ tools/magic                       typo.missing-header
-++@@ -147,8 +138,6 @@ tools/eventlog_metadata.in        typo.missing-header
-+  # TODO we should fix the long-line errors in yacc/*.c
-+  /yacc/*.[ch]         typo.very-long-line=may
-+  
-+@@ -49,7 +49,7 @@
-+  # bootstrap files produced by Menhir
-+  /boot/menhir/** typo.long-line=may typo.very-long-line=may
-+  /boot/menhir/** typo.missing-header=may
-+-@@ -171,27 +160,20 @@ configure.ac text eol=lf
-++@@ -172,27 +161,20 @@ configure.ac text eol=lf
-+  build-aux/compile text eol=lf
-+  build-aux/config.guess text eol=lf
-+  build-aux/config.sub text eol=lf
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -37,10 +14,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 7aae4436db..263cb3614c 100644
+index f270e454f9..072209531b 100644
 --- a/Changes
 +++ b/Changes
-@@ -1456,11 +1456,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1457,11 +1457,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -52,7 +29,7 @@ index 7aae4436db..263cb3614c 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1489,6 +1484,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1490,6 +1485,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -83,7 +60,7 @@ index 7aae4436db..263cb3614c 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1524,13 +1543,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1525,13 +1544,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -99,7 +76,7 @@ index 7aae4436db..263cb3614c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1637,6 +1656,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1638,6 +1657,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -109,7 +86,7 @@ index 7aae4436db..263cb3614c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1900,6 +1922,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1901,6 +1923,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10416,36 +10393,13 @@ index 0000000000..e899ebe6ec
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..835b935690
+index 0000000000..e09db0a599
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10342 @@
+@@ -0,0 +1,10340 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..19a6540a64
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:47:51.297316266 +0100
-+++++ b	2023-09-28 18:47:51.301316411 +0100
-++@@ -40,7 +40,7 @@
-++  testsuite/tests/messages/highlight_tabs.ml              typo.tab
-++  
-++  # prune testsuite reference files
-++-@@ -146,8 +137,6 @@ tools/magic                       typo.missing-header
-+++@@ -147,8 +138,6 @@ tools/eventlog_metadata.in        typo.missing-header
-++  # TODO we should fix the long-line errors in yacc/*.c
-++  /yacc/*.[ch]         typo.very-long-line=may
-++  
-++@@ -49,7 +49,7 @@
-++  # bootstrap files produced by Menhir
-++  /boot/menhir/** typo.long-line=may typo.very-long-line=may
-++  /boot/menhir/** typo.missing-header=may
-++-@@ -171,27 +160,20 @@ configure.ac text eol=lf
-+++@@ -172,27 +161,20 @@ configure.ac text eol=lf
-++  build-aux/compile text eol=lf
-++  build-aux/config.guess text eol=lf
-++  build-aux/config.sub text eol=lf
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10459,10 +10413,10 @@ index 0000000000..835b935690
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 7aae4436db..263cb3614c 100644
++index f270e454f9..072209531b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1456,11 +1456,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1457,11 +1457,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10474,7 +10428,7 @@ index 0000000000..835b935690
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1489,6 +1484,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1490,6 +1485,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10505,7 +10459,7 @@ index 0000000000..835b935690
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1524,13 +1543,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1525,13 +1544,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10521,7 +10475,7 @@ index 0000000000..835b935690
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1637,6 +1656,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1638,6 +1657,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10531,7 +10485,7 @@ index 0000000000..835b935690
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1900,6 +1922,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1901,6 +1923,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -20761,7 +20715,28 @@ index 0000000000..835b935690
 ++             host='--host=x86_64-w64-mingw32'
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msv
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
