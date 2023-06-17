@@ -19,10 +19,19 @@
 
 -include $(ROOTDIR)/Makefile.build_config
 
+ifeq "$(UNIX_OR_WIN32)" "win32"
+DIR_SEP := \$ # There must a space following the $
+CONVERT_PATH = $(subst /,$(DIR_SEP),$(strip $(1)))
+else
+DIR_SEP = /
+CONVERT_PATH = $(strip $(1))
+endif
+
 # note: these are defined by lazy expansions
 # as some parts of the makefiles change BINDIR, etc.
 # and expect INSTALL_BINDIR, etc. to stay in synch
 # (see `shellquote` in tools/Makefile)
+
 DESTDIR ?=
 INSTALL_BINDIR = $(DESTDIR)$(BINDIR)
 INSTALL_LIBDIR = $(DESTDIR)$(LIBDIR)
