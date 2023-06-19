@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..825400ef29
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:47:54.585434661 +0100
-++++ b	2023-09-28 18:47:54.609435524 +0100
-+@@ -32,7 +32,7 @@
-+  (* Complex *)
-+  
-+  let box_complex dbg c_re c_im =
-+-@@ -852,6 +859,7 @@ let curry_function_sym n =
-++@@ -856,6 +863,7 @@ let curry_function_sym n =
-+  
-+  let bigarray_elt_size : Lambda.bigarray_kind -> int = function
-+      Pbigarray_unknown -> assert false
-+@@ -40,7 +40,7 @@
-+    | Pbigarray_float32 -> 4
-+    | Pbigarray_float64 -> 8
-+    | Pbigarray_sint8 -> 1
-+-@@ -925,6 +933,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
-++@@ -929,6 +937,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
-+  
-+  let bigarray_word_kind : Lambda.bigarray_kind -> memory_chunk = function
-+      Pbigarray_unknown -> assert false
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -37,7 +14,7 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 58ab91eed8..7f151914ca 100644
+index fef71804c9..ca0d0c837f 100644
 --- a/Changes
 +++ b/Changes
 @@ -1507,11 +1507,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -868,10 +845,10 @@ index 35ade079f6..d9d6477860 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 4573fe7e28..142a300014 100755
+index de78226838..142a300014 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index bfba37d35f..2bae84c3e9 100755
+index 726df23f5b..2bae84c3e9 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -6588,10 +6565,10 @@ index 0000000000..d2a1e96521
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..15317da274
+index 0000000000..fb49c279b7
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3863 @@
+@@ -0,0 +1,3922 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 9d502e1c90..f14374c9c3 100644
 +--- a/.github/workflows/build.yml
@@ -8291,6 +8268,65 @@ index 0000000000..15317da274
 +   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
 +   test_result=${TEST_SKIP}
 + else
++diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
++index 840e456a68..b3fedb2705 100644
++--- a/testsuite/tests/lib-bigarray/bigarrays.ml
+++++ b/testsuite/tests/lib-bigarray/bigarrays.ml
++@@ -243,6 +243,7 @@ let tests () =
++     done;
++     test 16 true !return
++   end;
+++(*
++   test 17 true
++     (test_setget float16
++                  [0.0, 0.0;
++@@ -258,6 +259,7 @@ let tests () =
++                   -65519.0, -65504.0;
++                   65520.0, infinity;
++                   -65520.0, neg_infinity]);
+++*)
++ 
++   testing_function "set/get (specialized)";
++   let a = Array1.create int c_layout 3 in
++diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
++index da6893a14a..7fb39b0766 100644
++--- a/testsuite/tests/lib-bigarray/bigarrays.reference
+++++ b/testsuite/tests/lib-bigarray/bigarrays.reference
++@@ -2,7 +2,7 @@
++ ------ Array1 --------
++ 
++ create/set/get
++- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17...
+++ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16...
++ set/get (specialized)
++  1... 2... 3... 4... 5... 6... 7... 8... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
++ set/get (unsafe, specialized)
++diff --git a/testsuite/tests/lib-bigarray/specialized.ml b/testsuite/tests/lib-bigarray/specialized.ml
++index 6f30527a55..11a11dccbf 100644
++--- a/testsuite/tests/lib-bigarray/specialized.ml
+++++ b/testsuite/tests/lib-bigarray/specialized.ml
++@@ -9,9 +9,11 @@ let generic (a: ('a, 'b, 'c) Array1.t) v0 v1 v2 =
++   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
++   (a.{0}, a.{1}, a.{2})
++ 
+++(*
++ let special_float16 (a: (float, float16_elt, c_layout) Array1.t) v0 v1 v2 =
++   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
++   (a.{0}, a.{1}, a.{2})
+++*)
++ 
++ let special_float32 (a: (float, float32_elt, c_layout) Array1.t) v0 v1 v2 =
++   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
++@@ -75,7 +77,9 @@ let test kind special v0 v1 v2 =
++   assert (s = g)
++ 
++ let _ =
+++(*
++   test float16 special_float16 1.0 (-2.0) Float.pi;
+++*)
++   test float32 special_float32 1.0 (-2.0) Float.pi;
++   test float64 special_float64 1.0 (-2.0) Float.pi;
++   test int8_signed special_int8s 123 (-456) 0xFF00FF;
 +diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
 +index 2986e5b8c9..47456f2554 100644
 +--- a/testsuite/tests/lib-channels/close_in.ml
@@ -10457,36 +10493,13 @@ index 0000000000..15317da274
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a6bf440049
+index 0000000000..3576c30699
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10438 @@
+@@ -0,0 +1,10446 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..825400ef29
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:47:54.585434661 +0100
-+++++ b	2023-09-28 18:47:54.609435524 +0100
-++@@ -32,7 +32,7 @@
-++  (* Complex *)
-++  
-++  let box_complex dbg c_re c_im =
-++-@@ -852,6 +859,7 @@ let curry_function_sym n =
-+++@@ -856,6 +863,7 @@ let curry_function_sym n =
-++  
-++  let bigarray_elt_size : Lambda.bigarray_kind -> int = function
-++      Pbigarray_unknown -> assert false
-++@@ -40,7 +40,7 @@
-++    | Pbigarray_float32 -> 4
-++    | Pbigarray_float64 -> 8
-++    | Pbigarray_sint8 -> 1
-++-@@ -925,6 +933,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
-+++@@ -929,6 +937,7 @@ let bigarray_indexing unsafe elt_kind layout b args dbg =
-++  
-++  let bigarray_word_kind : Lambda.bigarray_kind -> memory_chunk = function
-++      Pbigarray_unknown -> assert false
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10500,7 +10513,7 @@ index 0000000000..a6bf440049
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 58ab91eed8..7f151914ca 100644
++index fef71804c9..ca0d0c837f 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1507,11 +1507,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -11331,10 +11344,10 @@ index 0000000000..a6bf440049
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 4573fe7e28..142a300014 100755
++index de78226838..142a300014 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index bfba37d35f..2bae84c3e9 100755
++index 726df23f5b..2bae84c3e9 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -17051,10 +17064,10 @@ index 0000000000..a6bf440049
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..15317da274
++index 0000000000..fb49c279b7
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3863 @@
++@@ -0,0 +1,3922 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 9d502e1c90..f14374c9c3 100644
 ++--- a/.github/workflows/build.yml
@@ -18754,6 +18767,65 @@ index 0000000000..a6bf440049
 ++   echo "OCaml was not compiled with gcc" > ${ocamltest_response}
 ++   test_result=${TEST_SKIP}
 ++ else
+++diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
+++index 840e456a68..b3fedb2705 100644
+++--- a/testsuite/tests/lib-bigarray/bigarrays.ml
++++++ b/testsuite/tests/lib-bigarray/bigarrays.ml
+++@@ -243,6 +243,7 @@ let tests () =
+++     done;
+++     test 16 true !return
+++   end;
++++(*
+++   test 17 true
+++     (test_setget float16
+++                  [0.0, 0.0;
+++@@ -258,6 +259,7 @@ let tests () =
+++                   -65519.0, -65504.0;
+++                   65520.0, infinity;
+++                   -65520.0, neg_infinity]);
++++*)
+++ 
+++   testing_function "set/get (specialized)";
+++   let a = Array1.create int c_layout 3 in
+++diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
+++index da6893a14a..7fb39b0766 100644
+++--- a/testsuite/tests/lib-bigarray/bigarrays.reference
++++++ b/testsuite/tests/lib-bigarray/bigarrays.reference
+++@@ -2,7 +2,7 @@
+++ ------ Array1 --------
+++ 
+++ create/set/get
+++- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17...
++++ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16...
+++ set/get (specialized)
+++  1... 2... 3... 4... 5... 6... 7... 8... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
+++ set/get (unsafe, specialized)
+++diff --git a/testsuite/tests/lib-bigarray/specialized.ml b/testsuite/tests/lib-bigarray/specialized.ml
+++index 6f30527a55..11a11dccbf 100644
+++--- a/testsuite/tests/lib-bigarray/specialized.ml
++++++ b/testsuite/tests/lib-bigarray/specialized.ml
+++@@ -9,9 +9,11 @@ let generic (a: ('a, 'b, 'c) Array1.t) v0 v1 v2 =
+++   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
+++   (a.{0}, a.{1}, a.{2})
+++ 
++++(*
+++ let special_float16 (a: (float, float16_elt, c_layout) Array1.t) v0 v1 v2 =
+++   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
+++   (a.{0}, a.{1}, a.{2})
++++*)
+++ 
+++ let special_float32 (a: (float, float32_elt, c_layout) Array1.t) v0 v1 v2 =
+++   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
+++@@ -75,7 +77,9 @@ let test kind special v0 v1 v2 =
+++   assert (s = g)
+++ 
+++ let _ =
++++(*
+++   test float16 special_float16 1.0 (-2.0) Float.pi;
++++*)
+++   test float32 special_float32 1.0 (-2.0) Float.pi;
+++   test float64 special_float64 1.0 (-2.0) Float.pi;
+++   test int8_signed special_int8s 123 (-456) 0xFF00FF;
 ++diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
 ++index 2986e5b8c9..47456f2554 100644
 ++--- a/testsuite/tests/lib-channels/close_in.ml
@@ -20870,35 +20942,7 @@ index 0000000000..a6bf440049
 ++-    # tests now (to include natdynlink)
 ++-    run "test dynlink $PORT" \
 ++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change fr
+++-    # Now reconfigure ocamlt
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
