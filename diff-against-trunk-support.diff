@@ -1094,7 +1094,7 @@ index 2d144c09e7..26681a87e5 100644
   {
     bytecode;
 diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-index 9b48df20e9..d9926036d6 100644
+index d50ba6a9c4..d2b8189fe4 100644
 --- a/testsuite/tests/callback/stack_overflow.ml
 +++ b/testsuite/tests/callback/stack_overflow.ml
 @@ -1,6 +1,8 @@

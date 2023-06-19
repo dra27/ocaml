@@ -1,6 +1,44 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..780d54f43c
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,35 @@
++--- a	2023-09-28 18:47:54.037414943 +0100
+++++ b	2023-09-28 18:47:54.053415519 +0100
++@@ -1701,16 +1701,15 @@
++ diff --git a/configure.ac b/configure.ac
++ --- a/configure.ac
++ +++ b/configure.ac
++-@@ -1218,9 +1218,7 @@ AS_CASE([$host],
++-   [x86_64-pc-windows],
++-     [arch=amd64; system=win64],
+++@@ -1233,8 +1233,7 @@ AS_CASE([$host],
++    [[powerpc64le*-*-linux*]],
++--    [arch=power; model=ppc64le; system=elf],
++--  [[powerpc*-*-linux*]],
++--    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++-+    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+++     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+++   [[powerpc*-*-linux*]],
+++-    [has_native_backend=yes; arch=power
+++-    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
++    [[s390x*-*-linux*]],
++-     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
+++     [arch=s390x; model=z10; system=elf],
++    # expected to match "gnueabihf" as well as "musleabihf"
++ diff --git a/manual/src/cmds/native.etex b/manual/src/cmds/native.etex
++ --- a/manual/src/cmds/native.etex
++@@ -1747,7 +1746,7 @@
++ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
++ --- a/testsuite/tests/callback/stack_overflow.ml
++ +++ b/testsuite/tests/callback/stack_overflow.ml
++-@@ -23,8 +23,8 @@ open Effect.Deep
+++@@ -25,8 +25,8 @@ open Effect.Deep
++  type _ t += E : unit t
++  
++  let () =
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,10 +52,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index ca019e41c2..f6c72d8697 100644
+index 4a5bc24695..1195008694 100644
 --- a/Changes
 +++ b/Changes
-@@ -1498,11 +1498,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1503,11 +1503,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +67,7 @@ index ca019e41c2..f6c72d8697 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1531,6 +1526,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1536,6 +1531,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +98,7 @@ index ca019e41c2..f6c72d8697 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1566,13 +1585,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1571,13 +1590,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +114,7 @@ index ca019e41c2..f6c72d8697 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1679,6 +1698,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1684,6 +1703,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +124,7 @@ index ca019e41c2..f6c72d8697 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1942,6 +1964,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1947,6 +1969,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -3220,10 +3258,10 @@ index 8cfa8b35d2..8fbc0f4164 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 5309546522..daccb5c71c 100755
+index 22f2a28873..60c920671f 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 31c10c8dee..f62e291d68 100644
+index 55725773fa..55f30e3525 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3310,26 +3348,23 @@ index 31c10c8dee..f62e291d68 100644
  
  # Support for C11 atomic types
  
-@@ -1216,13 +1229,14 @@ AS_CASE([$host],
+@@ -1216,11 +1229,13 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
 -    [arch=amd64; system=win64],
 +    [has_native_backend=yes; arch=amd64; system=win64],
    [[powerpc64le*-*-linux*]],
--    [arch=power; model=ppc64le; system=elf],
-+    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-   [[powerpc*-*-linux*]],
--    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-+    [has_native_backend=yes; arch=power
-+    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++  [[powerpc*-*-linux*]],
++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
    [[s390x*-*-linux*]],
 -    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
 +    [arch=s390x; model=z10; system=elf],
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux_eabihf],
-@@ -1259,9 +1273,9 @@ AS_CASE([$host],
+@@ -1257,9 +1272,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -3341,7 +3376,7 @@ index 31c10c8dee..f62e291d68 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1271,7 +1285,7 @@ AS_CASE([$host],
+@@ -1269,7 +1284,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3350,7 +3385,7 @@ index 31c10c8dee..f62e291d68 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1293,7 +1307,7 @@ AS_CASE([$host],
+@@ -1291,7 +1306,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3359,7 +3394,7 @@ index 31c10c8dee..f62e291d68 100644
  )
  
  native_cflags=''
-@@ -1505,10 +1519,12 @@ AS_CASE([$host],
+@@ -1503,10 +1518,12 @@ AS_CASE([$host],
    [*-*-windows],
      [has_monotonic_clock=true],
    [*-apple-darwin*], [
@@ -3374,7 +3409,7 @@ index 31c10c8dee..f62e291d68 100644
        ],
        [has_monotonic_clock=false])],
    [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-@@ -2034,13 +2050,26 @@ AS_CASE([$enable_debug_runtime],
+@@ -2032,13 +2049,26 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3403,7 +3438,7 @@ index 31c10c8dee..f62e291d68 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2091,6 +2120,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2089,6 +2119,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -10393,13 +10428,51 @@ index 0000000000..ac45d23896
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f60103cb27
+index 0000000000..0eda74db3d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10340 @@
+@@ -0,0 +1,10344 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..780d54f43c
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,35 @@
+++--- a	2023-09-28 18:47:54.037414943 +0100
++++++ b	2023-09-28 18:47:54.053415519 +0100
+++@@ -1701,16 +1701,15 @@
+++ diff --git a/configure.ac b/configure.ac
+++ --- a/configure.ac
+++ +++ b/configure.ac
+++-@@ -1218,9 +1218,7 @@ AS_CASE([$host],
+++-   [x86_64-pc-windows],
+++-     [arch=amd64; system=win64],
++++@@ -1233,8 +1233,7 @@ AS_CASE([$host],
+++    [[powerpc64le*-*-linux*]],
+++--    [arch=power; model=ppc64le; system=elf],
+++--  [[powerpc*-*-linux*]],
+++--    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+++-+    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++++     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++++   [[powerpc*-*-linux*]],
++++-    [has_native_backend=yes; arch=power
++++-    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+++++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
+++    [[s390x*-*-linux*]],
+++-     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
++++     [arch=s390x; model=z10; system=elf],
+++    # expected to match "gnueabihf" as well as "musleabihf"
+++ diff --git a/manual/src/cmds/native.etex b/manual/src/cmds/native.etex
+++ --- a/manual/src/cmds/native.etex
+++@@ -1747,7 +1746,7 @@
+++ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
+++ --- a/testsuite/tests/callback/stack_overflow.ml
+++ +++ b/testsuite/tests/callback/stack_overflow.ml
+++-@@ -23,8 +23,8 @@ open Effect.Deep
++++@@ -25,8 +25,8 @@ open Effect.Deep
+++  type _ t += E : unit t
+++  
+++  let () =
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10413,10 +10486,10 @@ index 0000000000..f60103cb27
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index ca019e41c2..f6c72d8697 100644
++index 4a5bc24695..1195008694 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1498,11 +1498,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1503,11 +1503,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10428,7 +10501,7 @@ index 0000000000..f60103cb27
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1531,6 +1526,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1536,6 +1531,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10459,7 +10532,7 @@ index 0000000000..f60103cb27
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1566,13 +1585,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1571,13 +1590,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10475,7 +10548,7 @@ index 0000000000..f60103cb27
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1679,6 +1698,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1684,6 +1703,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10485,7 +10558,7 @@ index 0000000000..f60103cb27
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1942,6 +1964,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1947,6 +1969,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13619,10 +13692,10 @@ index 0000000000..f60103cb27
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 5309546522..daccb5c71c 100755
++index 22f2a28873..60c920671f 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 31c10c8dee..f62e291d68 100644
++index 55725773fa..55f30e3525 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13709,26 +13782,23 @@ index 0000000000..f60103cb27
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1216,13 +1229,14 @@ AS_CASE([$host],
++@@ -1216,11 +1229,13 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
 +-    [arch=amd64; system=win64],
 ++    [has_native_backend=yes; arch=amd64; system=win64],
 +   [[powerpc64le*-*-linux*]],
-+-    [arch=power; model=ppc64le; system=elf],
-++    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-+   [[powerpc*-*-linux*]],
-+-    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-++    [has_native_backend=yes; arch=power
-++    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+++  [[powerpc*-*-linux*]],
+++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
 +   [[s390x*-*-linux*]],
 +-    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
 ++    [arch=s390x; model=z10; system=elf],
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -1259,9 +1273,9 @@ AS_CASE([$host],
++@@ -1257,9 +1272,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -13740,7 +13810,7 @@ index 0000000000..f60103cb27
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1271,7 +1285,7 @@ AS_CASE([$host],
++@@ -1269,7 +1284,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -13749,7 +13819,7 @@ index 0000000000..f60103cb27
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1293,7 +1307,7 @@ AS_CASE([$host],
++@@ -1291,7 +1306,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -13758,7 +13828,7 @@ index 0000000000..f60103cb27
 + )
 + 
 + native_cflags=''
-+@@ -1505,10 +1519,12 @@ AS_CASE([$host],
++@@ -1503,10 +1518,12 @@ AS_CASE([$host],
 +   [*-*-windows],
 +     [has_monotonic_clock=true],
 +   [*-apple-darwin*], [
@@ -13773,7 +13843,7 @@ index 0000000000..f60103cb27
 +       ],
 +       [has_monotonic_clock=false])],
 +   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-+@@ -2034,13 +2050,26 @@ AS_CASE([$enable_debug_runtime],
++@@ -2032,13 +2049,26 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13802,7 +13872,7 @@ index 0000000000..f60103cb27
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2091,6 +2120,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2089,6 +2119,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -20705,38 +20775,7 @@ index 0000000000..f60103cb27
 ++ }
 ++ 
 ++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs
+++diff -
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

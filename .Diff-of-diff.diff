@@ -1,0 +1,35 @@
+--- a	2023-09-28 18:47:54.037414943 +0100
++++ b	2023-09-28 18:47:54.053415519 +0100
+@@ -1701,16 +1701,15 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1218,9 +1218,7 @@ AS_CASE([$host],
+-   [x86_64-pc-windows],
+-     [arch=amd64; system=win64],
++@@ -1233,8 +1233,7 @@ AS_CASE([$host],
+    [[powerpc64le*-*-linux*]],
+--    [arch=power; model=ppc64le; system=elf],
+--  [[powerpc*-*-linux*]],
+--    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+-+    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++   [[powerpc*-*-linux*]],
++-    [has_native_backend=yes; arch=power
++-    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
+    [[s390x*-*-linux*]],
+-     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
++     [arch=s390x; model=z10; system=elf],
+    # expected to match "gnueabihf" as well as "musleabihf"
+ diff --git a/manual/src/cmds/native.etex b/manual/src/cmds/native.etex
+ --- a/manual/src/cmds/native.etex
+@@ -1747,7 +1746,7 @@
+ diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
+ --- a/testsuite/tests/callback/stack_overflow.ml
+ +++ b/testsuite/tests/callback/stack_overflow.ml
+-@@ -23,8 +23,8 @@ open Effect.Deep
++@@ -25,8 +25,8 @@ open Effect.Deep
+  type _ t += E : unit t
+  
+  let () =
