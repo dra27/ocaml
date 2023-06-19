@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..6b87b21505
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:53.337389745 +0100
-++++ b	2023-09-28 18:47:53.345390033 +0100
-+@@ -23,7 +23,7 @@
-+ diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
-+ --- a/stdlib/StdlibModules
-+ +++ b/stdlib/StdlibModules
-+-@@ -104,9 +104,23 @@ STDLIB_MODULE_BASENAMES = \
-++@@ -99,9 +99,23 @@ STDLIB_MODULE_BASENAMES = \
-+  STDLIB_PREFIXED_MODULES = \
-+    $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -111,10 +97,10 @@ index ca019e41c2..f6c72d8697 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 78c5fbfa98..f5e8addf0d 100644
+index bb885f6ad2..91df9340d1 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -614,7 +614,6 @@ partialclean::
+@@ -613,7 +613,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -122,7 +108,7 @@ index 78c5fbfa98..f5e8addf0d 100644
    afl \
    alloc \
    array \
-@@ -622,24 +621,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -621,24 +620,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -150,7 +136,7 @@ index 78c5fbfa98..f5e8addf0d 100644
    main \
    major_gc \
    md5 \
-@@ -650,17 +649,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -649,17 +648,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -168,7 +154,7 @@ index 78c5fbfa98..f5e8addf0d 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -670,6 +664,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -669,6 +663,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -178,7 +164,7 @@ index 78c5fbfa98..f5e8addf0d 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -680,7 +677,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -679,7 +676,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -187,7 +173,7 @@ index 78c5fbfa98..f5e8addf0d 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1077,12 +1074,14 @@ clean::
+@@ -1076,12 +1073,14 @@ clean::
  
  # Dependencies
  
@@ -204,7 +190,7 @@ index 78c5fbfa98..f5e8addf0d 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1154,6 +1153,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1153,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -212,7 +198,7 @@ index 78c5fbfa98..f5e8addf0d 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1714,6 +1714,9 @@ endif
+@@ -1702,6 +1702,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -10407,27 +10393,13 @@ index 0000000000..ac45d23896
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..56701901a4
+index 0000000000..f60103cb27
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10344 @@
+@@ -0,0 +1,10340 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..6b87b21505
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:53.337389745 +0100
-+++++ b	2023-09-28 18:47:53.345390033 +0100
-++@@ -23,7 +23,7 @@
-++ diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
-++ --- a/stdlib/StdlibModules
-++ +++ b/stdlib/StdlibModules
-++-@@ -104,9 +104,23 @@ STDLIB_MODULE_BASENAMES = \
-+++@@ -99,9 +99,23 @@ STDLIB_MODULE_BASENAMES = \
-++  STDLIB_PREFIXED_MODULES = \
-++    $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10524,10 +10496,10 @@ index 0000000000..56701901a4
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 78c5fbfa98..f5e8addf0d 100644
++index bb885f6ad2..91df9340d1 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -614,7 +614,6 @@ partialclean::
++@@ -613,7 +613,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -10535,7 +10507,7 @@ index 0000000000..56701901a4
 +   afl \
 +   alloc \
 +   array \
-+@@ -622,24 +621,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -621,24 +620,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -10563,7 +10535,7 @@ index 0000000000..56701901a4
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -650,17 +649,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -649,17 +648,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -10581,7 +10553,7 @@ index 0000000000..56701901a4
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -670,6 +664,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -669,6 +663,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10591,7 +10563,7 @@ index 0000000000..56701901a4
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -680,7 +677,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -679,7 +676,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10600,7 +10572,7 @@ index 0000000000..56701901a4
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1077,12 +1074,14 @@ clean::
++@@ -1076,12 +1073,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10617,7 +10589,7 @@ index 0000000000..56701901a4
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1154,6 +1153,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1153,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10625,7 +10597,7 @@ index 0000000000..56701901a4
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1714,6 +1714,9 @@ endif
++@@ -1702,6 +1702,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -20754,7 +20726,17 @@ index 0000000000..56701901a4
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
 +++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt 
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
