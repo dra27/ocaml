@@ -1222,9 +1222,16 @@ AS_CASE([$host],
     [has_native_backend=yes; arch=amd64; system=win64],
   [[powerpc64le*-*-linux*]],
     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+<<<<<<< HEAD
   [[powerpc*-*-linux*]],
     [has_native_backend=yes; arch=power
     AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+||||||| parent of 1ba37d4c83 (Merge pull request PR#12276 from xavierleroy/resurrect-power)
+    [arch=power; model=ppc64le; system=elf],
+  [[powerpc*-*-linux*]],
+    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+=======
+>>>>>>> 1ba37d4c83 (Merge pull request PR#12276 from xavierleroy/resurrect-power)
   [[s390x*-*-linux*]],
     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
   # expected to match "gnueabihf" as well as "musleabihf"
