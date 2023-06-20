@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:47:55.561469769 +0100
++++ b	2023-09-28 18:47:55.581470488 +0100
+@@ -12,8 +12,6 @@
+  ### Runtime system:
+  
+  - #10111: Increase the detail of location information for debugging events to
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+ diff --git a/manual/src/refman/expr.etex b/manual/src/refman/expr.etex
+ --- a/manual/src/refman/expr.etex
+ +++ b/manual/src/refman/expr.etex
