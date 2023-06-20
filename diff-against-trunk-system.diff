@@ -1,46 +1,128 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..59dea5c0c9
+index 0000000000..e0e5cb204c
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,37 @@
-+--- a	2023-09-28 18:47:56.345497959 +0100
-++++ b	2023-09-28 18:47:56.421500691 +0100
-+@@ -148,7 +148,7 @@
-+ diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
-+ --- a/asmcomp/asmlink.ml
-+ +++ b/asmcomp/asmlink.ml
-+-@@ -373,61 +373,68 @@ let link ~ppf_dump objfiles output_name =
-++@@ -381,61 +381,68 @@ let link ~ppf_dump objfiles output_name =
-+  (* Error report *)
+@@ -0,0 +1,119 @@
++--- a	2023-09-28 18:47:57.093524846 +0100
+++++ b	2023-09-28 18:47:57.117525708 +0100
++@@ -231,7 +231,7 @@
 +  
-+  open Format
-+@@ -828,7 +828,7 @@
-+ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-+ --- a/otherlibs/dynlink/byte/dynlink.ml
-+ +++ b/otherlibs/dynlink/byte/dynlink.ml
-+-@@ -120,7 +120,8 @@ module Bytecode = struct
-++@@ -123,7 +123,8 @@ module Bytecode = struct
-+            let new_error : DT.linking_error =
-+              match error with
-+              | Symtable.Undefined_global global ->
-+@@ -3153,11 +3153,11 @@
-+  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-+  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-+--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
-+--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
-+-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
-+-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
-+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
-++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
-+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
-+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
-++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
-+  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-+  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
-+ diff --git a/testsuite/tests/match-exception-warnings/no_value_clauses.ml b/testsuite/tests/match-exception-warnings/no_value_clauses.ml
++  # Native dynlink
++  
++-@@ -1040,14 +1047,6 @@ endif
+++@@ -1037,14 +1044,6 @@ endif
++  .PHONY: runtime
++  runtime: stdlib/libcamlrun.$(A)
++  
++@@ -269,7 +269,7 @@
++  	rm -f config.log config.status libtool
++  
++  # Installation
++-@@ -1764,15 +1761,15 @@ endif
+++@@ -1767,15 +1764,15 @@ endif
++  	fi
++  ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
++  ifeq "$(TOOLCHAIN)" "msvc"
++@@ -399,7 +399,7 @@
++  AC_SUBST([flexdll_chain])
++  AC_SUBST([mkdll_ldflags_exp])
++  AC_SUBST([mkexe_ldflags_exp])
++-@@ -833,15 +832,21 @@ AS_CASE([$host],
+++@@ -846,15 +845,21 @@ AS_CASE([$host],
++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++    AC_MSG_CHECKING([for flexdll sources])
++    AS_IF([test x"$with_flexdll" = "xno"],
++@@ -424,7 +424,7 @@
++            iflexdir='$(ROOTDIR)/flexdll'
++            with_flexdll="$iflexdir"],
++            [AS_IF([test x"$with_flexdll" != 'x'],
++-@@ -851,12 +856,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++@@ -864,12 +869,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++          AS_IF([test -f "$with_flexdll/flexdll.h"],
++            [mkdir -p flexdll-sources
++            cp -r "$with_flexdll"/* flexdll-sources/
++@@ -439,7 +439,7 @@
++          [AC_MSG_RESULT([no])],
++          [AC_MSG_RESULT([$iflexdir$flexmsg])
++          bootstrapping_flexdll=true
++-@@ -869,7 +874,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++@@ -882,7 +887,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++  
++    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
++  
++@@ -448,7 +448,7 @@
++      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
++                          [$internal_cppflags], [$host])
++  
++-@@ -881,7 +886,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++@@ -894,7 +899,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++        ])])
++    ])
++  
++@@ -457,7 +457,7 @@
++  
++    AS_IF([test -n "$flexlink" && test x"$have_flexdll_h" = 'xno'],
++      [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
++-@@ -897,7 +902,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
+++@@ -910,7 +915,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
++   [no,*,*-w64-mingw32*|no,*,*-pc-windows],
++     [AC_MSG_ERROR([flexdll.h is required for native Win32])])
++  
++@@ -466,7 +466,7 @@
++    [,true,,*-*-cygwin*],
++      [supports_shared_libraries=false
++      AC_MSG_WARN([flexlink not found: shared library support disabled.])],
++-@@ -906,11 +911,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+++@@ -919,11 +924,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++  
++  mkexe_cmd_exp="$CC"
++  
++@@ -478,7 +478,7 @@
++  AS_CASE([$cc_basename,$host],
++    [*,x86_64-*-darwin*],
++      [oc_ldflags='-Wl,-no_compact_unwind';
++-@@ -921,7 +921,7 @@ AS_CASE([$cc_basename,$host],
+++@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
++      [common_cppflags="$common_cppflags -U_WIN32"
++      AS_IF([$supports_shared_libraries],
++        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
++@@ -487,7 +487,7 @@
++        mkexe_cflags=''
++        mkexe_ldflags_prefix='-link '],
++        [mkexe_extra_flags=''
++-@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
+++@@ -947,7 +947,7 @@ AS_CASE([$cc_basename,$host],
++      ostype="Win32"
++      toolchain="mingw"
++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
++@@ -496,7 +496,7 @@
++      mkexe_cflags=''
++      mkexe_ldflags_prefix='-link '
++      oc_exe_ldflags='-municode'
++-@@ -944,7 +944,7 @@ AS_CASE([$cc_basename,$host],
+++@@ -957,7 +957,7 @@ AS_CASE([$cc_basename,$host],
++      [toolchain=msvc
++      ostype="Win32"
++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
++@@ -505,7 +505,7 @@
++      mkexe_cflags=''
++      mkexe_ldflags_prefix='-link '
++      mkexe_via_cc_ldflags_prefix='/link '
++-@@ -1096,9 +1096,9 @@ AS_IF([test x"$enable_shared" != "xno"],
+++@@ -1109,9 +1109,9 @@ AS_IF([test x"$enable_shared" != "xno"],
++      [*-*-mingw32*|*-pc-windows|*-*-cygwin*],
++        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
++        mkdll_exp="flexlink ${mkdll_flags}"
++@@ -517,7 +517,7 @@
++      [powerpc-ibm-aix*],
++        [AS_CASE([$ocaml_cv_cc_vendor],
++                 [xlc*],
++-@@ -2369,6 +2369,7 @@ ${mkdll_ldflags}"
+++@@ -2423,6 +2423,7 @@ ${mkdll_ldflags}"
++    mkdll="$mkdll $mkdll_ldflags"
++    mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
++    mkmaindll="$mkmaindll $mkdll_ldflags_exp"
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -54,10 +136,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index aff64a7070..d656d6f0b5 100644
+index 21127cd109..4adf84bf28 100644
 --- a/Changes
 +++ b/Changes
-@@ -1514,11 +1514,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1520,11 +1520,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -69,7 +151,7 @@ index aff64a7070..d656d6f0b5 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1547,6 +1542,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1553,6 +1548,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -100,7 +182,7 @@ index aff64a7070..d656d6f0b5 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1582,13 +1601,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1588,13 +1607,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -116,7 +198,7 @@ index aff64a7070..d656d6f0b5 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1695,6 +1714,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1701,6 +1720,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -126,7 +208,7 @@ index aff64a7070..d656d6f0b5 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1958,6 +1980,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1964,6 +1986,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -137,10 +219,10 @@ index aff64a7070..d656d6f0b5 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index bb885f6ad2..91df9340d1 100644
+index 7ea9344892..e4dc9ef4cf 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -613,7 +613,6 @@ partialclean::
+@@ -620,7 +620,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -148,7 +230,7 @@ index bb885f6ad2..91df9340d1 100644
    afl \
    alloc \
    array \
-@@ -621,24 +620,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -628,24 +627,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -176,7 +258,7 @@ index bb885f6ad2..91df9340d1 100644
    main \
    major_gc \
    md5 \
-@@ -649,17 +648,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -656,17 +655,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -194,7 +276,7 @@ index bb885f6ad2..91df9340d1 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -669,6 +663,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -676,6 +670,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -204,7 +286,7 @@ index bb885f6ad2..91df9340d1 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -679,7 +676,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -686,7 +683,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -213,7 +295,7 @@ index bb885f6ad2..91df9340d1 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1076,12 +1073,14 @@ clean::
+@@ -1075,12 +1072,14 @@ clean::
  
  # Dependencies
  
@@ -230,7 +312,7 @@ index bb885f6ad2..91df9340d1 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1153,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1152,6 +1151,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -238,7 +320,7 @@ index bb885f6ad2..91df9340d1 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1702,6 +1702,9 @@ endif
+@@ -1699,6 +1699,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -249,10 +331,10 @@ index bb885f6ad2..91df9340d1 100644
  	   utils/*.cmi \
  	   parsing/*.cmi \
 diff --git a/Makefile.config.in b/Makefile.config.in
-index afd73b2921..449bb7dc6d 100644
+index efac769171..b36902542a 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -232,7 +232,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -227,7 +227,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
@@ -3303,13 +3385,13 @@ index 8cfa8b35d2..8fbc0f4164 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 22f2a28873..023b8d43fa 100755
+index 8f5600ec50..058b50be19 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 55725773fa..d063645cd7 100644
+index b52d324891..c87d4690d5 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -3318,7 +3400,7 @@ index 55725773fa..d063645cd7 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -3326,7 +3408,7 @@ index 55725773fa..d063645cd7 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -387,15 +390,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -386,15 +389,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3358,7 +3440,7 @@ index 55725773fa..d063645cd7 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -636,7 +647,8 @@ AS_CASE([$host],
+@@ -635,7 +646,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3368,7 +3450,7 @@ index 55725773fa..d063645cd7 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -713,8 +725,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -712,8 +724,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -6605,7 +6687,7 @@ index 0000000000..d2a1e96521
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..fb49c279b7
+index 0000000000..6eecbb6fb4
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3922 @@
@@ -8405,18 +8487,18 @@ index 0000000000..fb49c279b7
 +  {
 +    shared-libraries;
 +diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
-+index 13555a9b22..f55039c4ad 100644
++index 144247f7b4..3a8c2dc9cd 100644
 +--- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 ++++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 +@@ -3,9 +3,9 @@ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
 + Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
 + Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
 + Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-+-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
-+-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
 +-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
-++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
 ++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
 + Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
 + Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
@@ -10533,53 +10615,135 @@ index 0000000000..fb49c279b7
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..10085a50ae
+index 0000000000..3f282e23ac
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10516 @@
+@@ -0,0 +1,10556 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..59dea5c0c9
++index 0000000000..e0e5cb204c
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,37 @@
-++--- a	2023-09-28 18:47:56.345497959 +0100
-+++++ b	2023-09-28 18:47:56.421500691 +0100
-++@@ -148,7 +148,7 @@
-++ diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
-++ --- a/asmcomp/asmlink.ml
-++ +++ b/asmcomp/asmlink.ml
-++-@@ -373,61 +373,68 @@ let link ~ppf_dump objfiles output_name =
-+++@@ -381,61 +381,68 @@ let link ~ppf_dump objfiles output_name =
-++  (* Error report *)
++@@ -0,0 +1,119 @@
+++--- a	2023-09-28 18:47:57.093524846 +0100
++++++ b	2023-09-28 18:47:57.117525708 +0100
+++@@ -231,7 +231,7 @@
 ++  
-++  open Format
-++@@ -828,7 +828,7 @@
-++ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-++ --- a/otherlibs/dynlink/byte/dynlink.ml
-++ +++ b/otherlibs/dynlink/byte/dynlink.ml
-++-@@ -120,7 +120,8 @@ module Bytecode = struct
-+++@@ -123,7 +123,8 @@ module Bytecode = struct
-++            let new_error : DT.linking_error =
-++              match error with
-++              | Symtable.Undefined_global global ->
-++@@ -3153,11 +3153,11 @@
-++  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-++  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-++  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-++--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
-++--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
-++-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
-++-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
-++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-+++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
-+++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
-++++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
-++++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
-+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
-++  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-++  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
-++ diff --git a/testsuite/tests/match-exception-warnings/no_value_clauses.ml b/testsuite/tests/match-exception-warnings/no_value_clauses.ml
+++  # Native dynlink
+++  
+++-@@ -1040,14 +1047,6 @@ endif
++++@@ -1037,14 +1044,6 @@ endif
+++  .PHONY: runtime
+++  runtime: stdlib/libcamlrun.$(A)
+++  
+++@@ -269,7 +269,7 @@
+++  	rm -f config.log config.status libtool
+++  
+++  # Installation
+++-@@ -1764,15 +1761,15 @@ endif
++++@@ -1767,15 +1764,15 @@ endif
+++  	fi
+++  ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+++  ifeq "$(TOOLCHAIN)" "msvc"
+++@@ -399,7 +399,7 @@
+++  AC_SUBST([flexdll_chain])
+++  AC_SUBST([mkdll_ldflags_exp])
+++  AC_SUBST([mkexe_ldflags_exp])
+++-@@ -833,15 +832,21 @@ AS_CASE([$host],
++++@@ -846,15 +845,21 @@ AS_CASE([$host],
+++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++    AC_MSG_CHECKING([for flexdll sources])
+++    AS_IF([test x"$with_flexdll" = "xno"],
+++@@ -424,7 +424,7 @@
+++            iflexdir='$(ROOTDIR)/flexdll'
+++            with_flexdll="$iflexdir"],
+++            [AS_IF([test x"$with_flexdll" != 'x'],
+++-@@ -851,12 +856,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++++@@ -864,12 +869,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++          AS_IF([test -f "$with_flexdll/flexdll.h"],
+++            [mkdir -p flexdll-sources
+++            cp -r "$with_flexdll"/* flexdll-sources/
+++@@ -439,7 +439,7 @@
+++          [AC_MSG_RESULT([no])],
+++          [AC_MSG_RESULT([$iflexdir$flexmsg])
+++          bootstrapping_flexdll=true
+++-@@ -869,7 +874,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++++@@ -882,7 +887,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++  
+++    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
+++  
+++@@ -448,7 +448,7 @@
+++      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
+++                          [$internal_cppflags], [$host])
+++  
+++-@@ -881,7 +886,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++++@@ -894,7 +899,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+++        ])])
+++    ])
+++  
+++@@ -457,7 +457,7 @@
+++  
+++    AS_IF([test -n "$flexlink" && test x"$have_flexdll_h" = 'xno'],
+++      [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
+++-@@ -897,7 +902,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
++++@@ -910,7 +915,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
+++   [no,*,*-w64-mingw32*|no,*,*-pc-windows],
+++     [AC_MSG_ERROR([flexdll.h is required for native Win32])])
+++  
+++@@ -466,7 +466,7 @@
+++    [,true,,*-*-cygwin*],
+++      [supports_shared_libraries=false
+++      AC_MSG_WARN([flexlink not found: shared library support disabled.])],
+++-@@ -906,11 +911,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++++@@ -919,11 +924,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+++  
+++  mkexe_cmd_exp="$CC"
+++  
+++@@ -478,7 +478,7 @@
+++  AS_CASE([$cc_basename,$host],
+++    [*,x86_64-*-darwin*],
+++      [oc_ldflags='-Wl,-no_compact_unwind';
+++-@@ -921,7 +921,7 @@ AS_CASE([$cc_basename,$host],
++++@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
+++      [common_cppflags="$common_cppflags -U_WIN32"
+++      AS_IF([$supports_shared_libraries],
+++        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+++@@ -487,7 +487,7 @@
+++        mkexe_cflags=''
+++        mkexe_ldflags_prefix='-link '],
+++        [mkexe_extra_flags=''
+++-@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
++++@@ -947,7 +947,7 @@ AS_CASE([$cc_basename,$host],
+++      ostype="Win32"
+++      toolchain="mingw"
+++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+++@@ -496,7 +496,7 @@
+++      mkexe_cflags=''
+++      mkexe_ldflags_prefix='-link '
+++      oc_exe_ldflags='-municode'
+++-@@ -944,7 +944,7 @@ AS_CASE([$cc_basename,$host],
++++@@ -957,7 +957,7 @@ AS_CASE([$cc_basename,$host],
+++      [toolchain=msvc
+++      ostype="Win32"
+++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+++@@ -505,7 +505,7 @@
+++      mkexe_cflags=''
+++      mkexe_ldflags_prefix='-link '
+++      mkexe_via_cc_ldflags_prefix='/link '
+++-@@ -1096,9 +1096,9 @@ AS_IF([test x"$enable_shared" != "xno"],
++++@@ -1109,9 +1109,9 @@ AS_IF([test x"$enable_shared" != "xno"],
+++      [*-*-mingw32*|*-pc-windows|*-*-cygwin*],
+++        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
+++        mkdll_exp="flexlink ${mkdll_flags}"
+++@@ -517,7 +517,7 @@
+++      [powerpc-ibm-aix*],
+++        [AS_CASE([$ocaml_cv_cc_vendor],
+++                 [xlc*],
+++-@@ -2369,6 +2369,7 @@ ${mkdll_ldflags}"
++++@@ -2423,6 +2423,7 @@ ${mkdll_ldflags}"
+++    mkdll="$mkdll $mkdll_ldflags"
+++    mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
+++    mkmaindll="$mkmaindll $mkdll_ldflags_exp"
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10593,10 +10757,10 @@ index 0000000000..10085a50ae
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index aff64a7070..d656d6f0b5 100644
++index 21127cd109..4adf84bf28 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1514,11 +1514,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1520,11 +1520,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10608,7 +10772,7 @@ index 0000000000..10085a50ae
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1547,6 +1542,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1553,6 +1548,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10639,7 +10803,7 @@ index 0000000000..10085a50ae
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1582,13 +1601,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1588,13 +1607,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10655,7 +10819,7 @@ index 0000000000..10085a50ae
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1695,6 +1714,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1701,6 +1720,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10665,7 +10829,7 @@ index 0000000000..10085a50ae
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1958,6 +1980,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1964,6 +1986,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10676,10 +10840,10 @@ index 0000000000..10085a50ae
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index bb885f6ad2..91df9340d1 100644
++index 7ea9344892..e4dc9ef4cf 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -613,7 +613,6 @@ partialclean::
++@@ -620,7 +620,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -10687,7 +10851,7 @@ index 0000000000..10085a50ae
 +   afl \
 +   alloc \
 +   array \
-+@@ -621,24 +620,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -628,24 +627,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -10715,7 +10879,7 @@ index 0000000000..10085a50ae
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -649,17 +648,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -656,17 +655,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -10733,7 +10897,7 @@ index 0000000000..10085a50ae
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -669,6 +663,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -676,6 +670,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10743,7 +10907,7 @@ index 0000000000..10085a50ae
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -679,7 +676,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -686,7 +683,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10752,7 +10916,7 @@ index 0000000000..10085a50ae
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1076,12 +1073,14 @@ clean::
++@@ -1075,12 +1072,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10769,7 +10933,7 @@ index 0000000000..10085a50ae
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1153,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1152,6 +1151,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10777,7 +10941,7 @@ index 0000000000..10085a50ae
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1702,6 +1702,9 @@ endif
++@@ -1699,6 +1699,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -10788,10 +10952,10 @@ index 0000000000..10085a50ae
 + 	   utils/*.cmi \
 + 	   parsing/*.cmi \
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index afd73b2921..449bb7dc6d 100644
++index efac769171..b36902542a 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -232,7 +232,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -227,7 +227,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
@@ -13842,13 +14006,13 @@ index 0000000000..10085a50ae
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 22f2a28873..023b8d43fa 100755
++index 8f5600ec50..058b50be19 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 55725773fa..d063645cd7 100644
++index b52d324891..c87d4690d5 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -13857,7 +14021,7 @@ index 0000000000..10085a50ae
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -223,6 +225,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -13865,7 +14029,7 @@ index 0000000000..10085a50ae
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -387,15 +390,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -386,15 +389,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -13897,7 +14061,7 @@ index 0000000000..10085a50ae
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -636,7 +647,8 @@ AS_CASE([$host],
++@@ -635,7 +646,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -13907,7 +14071,7 @@ index 0000000000..10085a50ae
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -713,8 +725,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -712,8 +724,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -17144,7 +17308,7 @@ index 0000000000..10085a50ae
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..fb49c279b7
++index 0000000000..6eecbb6fb4
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3922 @@
@@ -18944,18 +19108,18 @@ index 0000000000..10085a50ae
 ++  {
 ++    shared-libraries;
 ++diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
-++index 13555a9b22..f55039c4ad 100644
+++index 144247f7b4..3a8c2dc9cd 100644
 ++--- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 +++++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 ++@@ -3,9 +3,9 @@ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
 ++ Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
 ++ Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
 ++ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
-++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
+++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
+++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
 ++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
-+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
++++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
++++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
 +++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
 ++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
 ++ Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
@@ -21010,49 +21174,7 @@ index 0000000000..10085a50ae
 +++    else
 +++      run 'ocamlc -version' \
 +++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7
++++        "$(cygpath -w "$F
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -21699,7 +21821,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index a098f0bafd..41445c3536 100644
+index a67ec6777c..9141e4f550 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
@@ -22754,10 +22876,10 @@ index 54dab1bde2..c51ec4b672 100644
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 719fa883dc..ce491aaf2a 100644
+index 1b9b0ff59b..2ea5de9775 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
-@@ -247,7 +247,8 @@ GNUISH_SED = \
+@@ -246,7 +246,8 @@ GNUISH_SED = \
  .PHONY: depend
  depend:
  	$(V_OCAMLDEP){ \

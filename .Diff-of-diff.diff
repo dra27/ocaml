@@ -1,37 +1,119 @@
---- a	2023-09-28 18:47:56.345497959 +0100
-+++ b	2023-09-28 18:47:56.421500691 +0100
-@@ -148,7 +148,7 @@
- diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
- --- a/asmcomp/asmlink.ml
- +++ b/asmcomp/asmlink.ml
--@@ -373,61 +373,68 @@ let link ~ppf_dump objfiles output_name =
-+@@ -381,61 +381,68 @@ let link ~ppf_dump objfiles output_name =
-  (* Error report *)
+--- a	2023-09-28 18:47:57.093524846 +0100
++++ b	2023-09-28 18:47:57.117525708 +0100
+@@ -231,7 +231,7 @@
   
-  open Format
-@@ -828,7 +828,7 @@
- diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
- --- a/otherlibs/dynlink/byte/dynlink.ml
- +++ b/otherlibs/dynlink/byte/dynlink.ml
--@@ -120,7 +120,8 @@ module Bytecode = struct
-+@@ -123,7 +123,8 @@ module Bytecode = struct
-            let new_error : DT.linking_error =
-              match error with
-              | Symtable.Undefined_global global ->
-@@ -3153,11 +3153,11 @@
-  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
---Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
---Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
--+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
--+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
-- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-+-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
-+-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
-++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
-++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
-+ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
-  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
- diff --git a/testsuite/tests/match-exception-warnings/no_value_clauses.ml b/testsuite/tests/match-exception-warnings/no_value_clauses.ml
+  # Native dynlink
+  
+-@@ -1040,14 +1047,6 @@ endif
++@@ -1037,14 +1044,6 @@ endif
+  .PHONY: runtime
+  runtime: stdlib/libcamlrun.$(A)
+  
+@@ -269,7 +269,7 @@
+  	rm -f config.log config.status libtool
+  
+  # Installation
+-@@ -1764,15 +1761,15 @@ endif
++@@ -1767,15 +1764,15 @@ endif
+  	fi
+  ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+  ifeq "$(TOOLCHAIN)" "msvc"
+@@ -399,7 +399,7 @@
+  AC_SUBST([flexdll_chain])
+  AC_SUBST([mkdll_ldflags_exp])
+  AC_SUBST([mkexe_ldflags_exp])
+-@@ -833,15 +832,21 @@ AS_CASE([$host],
++@@ -846,15 +845,21 @@ AS_CASE([$host],
+  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+    AC_MSG_CHECKING([for flexdll sources])
+    AS_IF([test x"$with_flexdll" = "xno"],
+@@ -424,7 +424,7 @@
+            iflexdir='$(ROOTDIR)/flexdll'
+            with_flexdll="$iflexdir"],
+            [AS_IF([test x"$with_flexdll" != 'x'],
+-@@ -851,12 +856,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -864,12 +869,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+          AS_IF([test -f "$with_flexdll/flexdll.h"],
+            [mkdir -p flexdll-sources
+            cp -r "$with_flexdll"/* flexdll-sources/
+@@ -439,7 +439,7 @@
+          [AC_MSG_RESULT([no])],
+          [AC_MSG_RESULT([$iflexdir$flexmsg])
+          bootstrapping_flexdll=true
+-@@ -869,7 +874,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -882,7 +887,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+  
+    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
+  
+@@ -448,7 +448,7 @@
+      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
+                          [$internal_cppflags], [$host])
+  
+-@@ -881,7 +886,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
++@@ -894,7 +899,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
+        ])])
+    ])
+  
+@@ -457,7 +457,7 @@
+  
+    AS_IF([test -n "$flexlink" && test x"$have_flexdll_h" = 'xno'],
+      [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
+-@@ -897,7 +902,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
++@@ -910,7 +915,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
+   [no,*,*-w64-mingw32*|no,*,*-pc-windows],
+     [AC_MSG_ERROR([flexdll.h is required for native Win32])])
+  
+@@ -466,7 +466,7 @@
+    [,true,,*-*-cygwin*],
+      [supports_shared_libraries=false
+      AC_MSG_WARN([flexlink not found: shared library support disabled.])],
+-@@ -906,11 +911,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
++@@ -919,11 +924,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
+  
+  mkexe_cmd_exp="$CC"
+  
+@@ -478,7 +478,7 @@
+  AS_CASE([$cc_basename,$host],
+    [*,x86_64-*-darwin*],
+      [oc_ldflags='-Wl,-no_compact_unwind';
+-@@ -921,7 +921,7 @@ AS_CASE([$cc_basename,$host],
++@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
+      [common_cppflags="$common_cppflags -U_WIN32"
+      AS_IF([$supports_shared_libraries],
+        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+@@ -487,7 +487,7 @@
+        mkexe_cflags=''
+        mkexe_ldflags_prefix='-link '],
+        [mkexe_extra_flags=''
+-@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
++@@ -947,7 +947,7 @@ AS_CASE([$cc_basename,$host],
+      ostype="Win32"
+      toolchain="mingw"
+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+@@ -496,7 +496,7 @@
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '
+      oc_exe_ldflags='-municode'
+-@@ -944,7 +944,7 @@ AS_CASE([$cc_basename,$host],
++@@ -957,7 +957,7 @@ AS_CASE([$cc_basename,$host],
+      [toolchain=msvc
+      ostype="Win32"
+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+@@ -505,7 +505,7 @@
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '
+      mkexe_via_cc_ldflags_prefix='/link '
+-@@ -1096,9 +1096,9 @@ AS_IF([test x"$enable_shared" != "xno"],
++@@ -1109,9 +1109,9 @@ AS_IF([test x"$enable_shared" != "xno"],
+      [*-*-mingw32*|*-pc-windows|*-*-cygwin*],
+        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
+        mkdll_exp="flexlink ${mkdll_flags}"
+@@ -517,7 +517,7 @@
+      [powerpc-ibm-aix*],
+        [AS_CASE([$ocaml_cv_cc_vendor],
+                 [xlc*],
+-@@ -2369,6 +2369,7 @@ ${mkdll_ldflags}"
++@@ -2423,6 +2423,7 @@ ${mkdll_ldflags}"
+    mkdll="$mkdll $mkdll_ldflags"
+    mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
+    mkmaindll="$mkmaindll $mkdll_ldflags_exp"
