@@ -5,7 +5,15 @@ Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
 Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
 Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
 Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
+<<<<<<< HEAD
 Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 11-54
+||||||| parent of d16e8106f0 (Merge pull request PR#12210 from Octachron/semantic_tags_for_quoting)
+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
+=======
+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
+>>>>>>> d16e8106f0 (Merge pull request PR#12210 from Octachron/semantic_tags_for_quoting)
 Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
 Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
 Re-raised at Stdlib__Fun.protect in file "fun.ml", line 38, characters 6-52
