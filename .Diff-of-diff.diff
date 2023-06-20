@@ -1,11 +1,37 @@
---- a	2023-09-28 18:47:55.561469769 +0100
-+++ b	2023-09-28 18:47:55.581470488 +0100
-@@ -12,8 +12,6 @@
-  ### Runtime system:
+--- a	2023-09-28 18:47:56.345497959 +0100
++++ b	2023-09-28 18:47:56.421500691 +0100
+@@ -148,7 +148,7 @@
+ diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
+ --- a/asmcomp/asmlink.ml
+ +++ b/asmcomp/asmlink.ml
+-@@ -373,61 +373,68 @@ let link ~ppf_dump objfiles output_name =
++@@ -381,61 +381,68 @@ let link ~ppf_dump objfiles output_name =
+  (* Error report *)
   
-  - #10111: Increase the detail of location information for debugging events to
--diff --git a/boot/ocamlc b/boot/ocamlc
--Binary files a/boot/ocamlc and b/boot/ocamlc differ
- diff --git a/manual/src/refman/expr.etex b/manual/src/refman/expr.etex
- --- a/manual/src/refman/expr.etex
- +++ b/manual/src/refman/expr.etex
+  open Format
+@@ -828,7 +828,7 @@
+ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
+ --- a/otherlibs/dynlink/byte/dynlink.ml
+ +++ b/otherlibs/dynlink/byte/dynlink.ml
+-@@ -120,7 +120,8 @@ module Bytecode = struct
++@@ -123,7 +123,8 @@ module Bytecode = struct
+            let new_error : DT.linking_error =
+              match error with
+              | Symtable.Undefined_global global ->
+@@ -3153,11 +3153,11 @@
+  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
+  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
+--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
+-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
+-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
+- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
+  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
+ diff --git a/testsuite/tests/match-exception-warnings/no_value_clauses.ml b/testsuite/tests/match-exception-warnings/no_value_clauses.ml

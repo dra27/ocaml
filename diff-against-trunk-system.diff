@@ -1,20 +1,46 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..f8d51796cc
+index 0000000000..59dea5c0c9
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:55.561469769 +0100
-++++ b	2023-09-28 18:47:55.581470488 +0100
-+@@ -12,8 +12,6 @@
-+  ### Runtime system:
+@@ -0,0 +1,37 @@
++--- a	2023-09-28 18:47:56.345497959 +0100
+++++ b	2023-09-28 18:47:56.421500691 +0100
++@@ -148,7 +148,7 @@
++ diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
++ --- a/asmcomp/asmlink.ml
++ +++ b/asmcomp/asmlink.ml
++-@@ -373,61 +373,68 @@ let link ~ppf_dump objfiles output_name =
+++@@ -381,61 +381,68 @@ let link ~ppf_dump objfiles output_name =
++  (* Error report *)
 +  
-+  - #10111: Increase the detail of location information for debugging events to
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+ diff --git a/manual/src/refman/expr.etex b/manual/src/refman/expr.etex
-+ --- a/manual/src/refman/expr.etex
-+ +++ b/manual/src/refman/expr.etex
++  open Format
++@@ -828,7 +828,7 @@
++ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
++ --- a/otherlibs/dynlink/byte/dynlink.ml
++ +++ b/otherlibs/dynlink/byte/dynlink.ml
++-@@ -120,7 +120,8 @@ module Bytecode = struct
+++@@ -123,7 +123,8 @@ module Bytecode = struct
++            let new_error : DT.linking_error =
++              match error with
++              | Symtable.Undefined_global global ->
++@@ -3153,11 +3153,11 @@
++  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
++  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
++  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
++--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
++--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
++-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
++-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
+++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
+++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
++++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
++++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
+++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
++  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
++  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
++ diff --git a/testsuite/tests/match-exception-warnings/no_value_clauses.ml b/testsuite/tests/match-exception-warnings/no_value_clauses.ml
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -28,10 +54,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 6678d4f579..b8779b42ea 100644
+index aff64a7070..d656d6f0b5 100644
 --- a/Changes
 +++ b/Changes
-@@ -1511,11 +1511,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1514,11 +1514,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -43,7 +69,7 @@ index 6678d4f579..b8779b42ea 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1544,6 +1539,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1547,6 +1542,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -74,7 +100,7 @@ index 6678d4f579..b8779b42ea 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1579,13 +1598,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1582,13 +1601,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -90,7 +116,7 @@ index 6678d4f579..b8779b42ea 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1692,6 +1711,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1695,6 +1714,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -100,7 +126,7 @@ index 6678d4f579..b8779b42ea 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1955,6 +1977,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1958,6 +1980,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -658,7 +684,7 @@ index 781d2443c9..e533055d48 100644
    in
  
 diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
-index 7021f8c3d1..a10abb9502 100644
+index 32c35137a9..c75e15c99d 100644
 --- a/asmcomp/asmlink.ml
 +++ b/asmcomp/asmlink.ml
 @@ -236,7 +236,11 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
@@ -10507,27 +10533,53 @@ index 0000000000..fb49c279b7
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..130e82e67f
+index 0000000000..10085a50ae
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10450 @@
+@@ -0,0 +1,10516 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..f8d51796cc
++index 0000000000..59dea5c0c9
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:55.561469769 +0100
-+++++ b	2023-09-28 18:47:55.581470488 +0100
-++@@ -12,8 +12,6 @@
-++  ### Runtime system:
++@@ -0,0 +1,37 @@
+++--- a	2023-09-28 18:47:56.345497959 +0100
++++++ b	2023-09-28 18:47:56.421500691 +0100
+++@@ -148,7 +148,7 @@
+++ diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
+++ --- a/asmcomp/asmlink.ml
+++ +++ b/asmcomp/asmlink.ml
+++-@@ -373,61 +373,68 @@ let link ~ppf_dump objfiles output_name =
++++@@ -381,61 +381,68 @@ let link ~ppf_dump objfiles output_name =
+++  (* Error report *)
 ++  
-++  - #10111: Increase the detail of location information for debugging events to
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++ diff --git a/manual/src/refman/expr.etex b/manual/src/refman/expr.etex
-++ --- a/manual/src/refman/expr.etex
-++ +++ b/manual/src/refman/expr.etex
+++  open Format
+++@@ -828,7 +828,7 @@
+++ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
+++ --- a/otherlibs/dynlink/byte/dynlink.ml
+++ +++ b/otherlibs/dynlink/byte/dynlink.ml
+++-@@ -120,7 +120,8 @@ module Bytecode = struct
++++@@ -123,7 +123,8 @@ module Bytecode = struct
+++            let new_error : DT.linking_error =
+++              match error with
+++              | Symtable.Undefined_global global ->
+++@@ -3153,11 +3153,11 @@
+++  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
+++  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
+++  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+++--Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
+++--Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
+++-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 16-25
+++-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 6-137
+++- Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
++++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
++++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
+++++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 156, characters 16-25
+++++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 158, characters 6-137
++++ Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
+++  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+++  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
+++ diff --git a/testsuite/tests/match-exception-warnings/no_value_clauses.ml b/testsuite/tests/match-exception-warnings/no_value_clauses.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10541,10 +10593,10 @@ index 0000000000..130e82e67f
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 6678d4f579..b8779b42ea 100644
++index aff64a7070..d656d6f0b5 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1511,11 +1511,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1514,11 +1514,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10556,7 +10608,7 @@ index 0000000000..130e82e67f
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1544,6 +1539,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1547,6 +1542,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10587,7 +10639,7 @@ index 0000000000..130e82e67f
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1579,13 +1598,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1582,13 +1601,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10603,7 +10655,7 @@ index 0000000000..130e82e67f
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1692,6 +1711,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1695,6 +1714,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10613,7 +10665,7 @@ index 0000000000..130e82e67f
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1955,6 +1977,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1958,6 +1980,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11171,7 +11223,7 @@ index 0000000000..130e82e67f
 +   in
 + 
 +diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
-+index 7021f8c3d1..a10abb9502 100644
++index 32c35137a9..c75e15c99d 100644
 +--- a/asmcomp/asmlink.ml
 ++++ b/asmcomp/asmlink.ml
 +@@ -236,7 +236,11 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
@@ -20960,7 +21012,47 @@ index 0000000000..130e82e67f
 +++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
 +++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
 +++    fi
-++     if 
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -21444,7 +21536,7 @@ index a1db688727..cf04170107 100644
    type 'a t
    val make : unit -> 'a t
 diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-index 86d449cfd9..5c600f8202 100644
+index 8f8c854625..1ed6a600b8 100644
 --- a/otherlibs/dynlink/byte/dynlink.ml
 +++ b/otherlibs/dynlink/byte/dynlink.ml
 @@ -22,6 +22,9 @@ open! Dynlink_compilerlibs
@@ -23320,10 +23412,10 @@ index 0e1c829de4..8a88cfa1f3 100755
  { found=1; print $1 " " $2 " " $3 }
  # fail if there were any results
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
-index df054e0039..df8315ff54 100644
+index d947e08cf6..c90add60ac 100644
 --- a/tools/dumpobj.ml
 +++ b/tools/dumpobj.ml
-@@ -384,10 +384,12 @@ let op_shapes = [
+@@ -387,10 +387,12 @@ let op_shapes = [
    opUGEINT, Nothing;
    opBULTINT, Uint_Disp;
    opBUGEINT, Uint_Disp;
