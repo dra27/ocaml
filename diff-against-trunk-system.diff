@@ -1,128 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e0e5cb204c
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,119 @@
-+--- a	2023-09-28 18:47:57.093524846 +0100
-++++ b	2023-09-28 18:47:57.117525708 +0100
-+@@ -231,7 +231,7 @@
-+  
-+  # Native dynlink
-+  
-+-@@ -1040,14 +1047,6 @@ endif
-++@@ -1037,14 +1044,6 @@ endif
-+  .PHONY: runtime
-+  runtime: stdlib/libcamlrun.$(A)
-+  
-+@@ -269,7 +269,7 @@
-+  	rm -f config.log config.status libtool
-+  
-+  # Installation
-+-@@ -1764,15 +1761,15 @@ endif
-++@@ -1767,15 +1764,15 @@ endif
-+  	fi
-+  ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-+  ifeq "$(TOOLCHAIN)" "msvc"
-+@@ -399,7 +399,7 @@
-+  AC_SUBST([flexdll_chain])
-+  AC_SUBST([mkdll_ldflags_exp])
-+  AC_SUBST([mkexe_ldflags_exp])
-+-@@ -833,15 +832,21 @@ AS_CASE([$host],
-++@@ -846,15 +845,21 @@ AS_CASE([$host],
-+  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+    AC_MSG_CHECKING([for flexdll sources])
-+    AS_IF([test x"$with_flexdll" = "xno"],
-+@@ -424,7 +424,7 @@
-+            iflexdir='$(ROOTDIR)/flexdll'
-+            with_flexdll="$iflexdir"],
-+            [AS_IF([test x"$with_flexdll" != 'x'],
-+-@@ -851,12 +856,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -864,12 +869,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+          AS_IF([test -f "$with_flexdll/flexdll.h"],
-+            [mkdir -p flexdll-sources
-+            cp -r "$with_flexdll"/* flexdll-sources/
-+@@ -439,7 +439,7 @@
-+          [AC_MSG_RESULT([no])],
-+          [AC_MSG_RESULT([$iflexdir$flexmsg])
-+          bootstrapping_flexdll=true
-+-@@ -869,7 +874,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -882,7 +887,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+  
-+    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
-+  
-+@@ -448,7 +448,7 @@
-+      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
-+                          [$internal_cppflags], [$host])
-+  
-+-@@ -881,7 +886,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++@@ -894,7 +899,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+        ])])
-+    ])
-+  
-+@@ -457,7 +457,7 @@
-+  
-+    AS_IF([test -n "$flexlink" && test x"$have_flexdll_h" = 'xno'],
-+      [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
-+-@@ -897,7 +902,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-++@@ -910,7 +915,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-+   [no,*,*-w64-mingw32*|no,*,*-pc-windows],
-+     [AC_MSG_ERROR([flexdll.h is required for native Win32])])
-+  
-+@@ -466,7 +466,7 @@
-+    [,true,,*-*-cygwin*],
-+      [supports_shared_libraries=false
-+      AC_MSG_WARN([flexlink not found: shared library support disabled.])],
-+-@@ -906,11 +911,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-++@@ -919,11 +924,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-+  
-+  mkexe_cmd_exp="$CC"
-+  
-+@@ -478,7 +478,7 @@
-+  AS_CASE([$cc_basename,$host],
-+    [*,x86_64-*-darwin*],
-+      [oc_ldflags='-Wl,-no_compact_unwind';
-+-@@ -921,7 +921,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
-+      [common_cppflags="$common_cppflags -U_WIN32"
-+      AS_IF([$supports_shared_libraries],
-+        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-+@@ -487,7 +487,7 @@
-+        mkexe_cflags=''
-+        mkexe_ldflags_prefix='-link '],
-+        [mkexe_extra_flags=''
-+-@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -947,7 +947,7 @@ AS_CASE([$cc_basename,$host],
-+      ostype="Win32"
-+      toolchain="mingw"
-+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-+@@ -496,7 +496,7 @@
-+      mkexe_cflags=''
-+      mkexe_ldflags_prefix='-link '
-+      oc_exe_ldflags='-municode'
-+-@@ -944,7 +944,7 @@ AS_CASE([$cc_basename,$host],
-++@@ -957,7 +957,7 @@ AS_CASE([$cc_basename,$host],
-+      [toolchain=msvc
-+      ostype="Win32"
-+      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-+@@ -505,7 +505,7 @@
-+      mkexe_cflags=''
-+      mkexe_ldflags_prefix='-link '
-+      mkexe_via_cc_ldflags_prefix='/link '
-+-@@ -1096,9 +1096,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -1109,9 +1109,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-+      [*-*-mingw32*|*-pc-windows|*-*-cygwin*],
-+        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
-+        mkdll_exp="flexlink ${mkdll_flags}"
-+@@ -517,7 +517,7 @@
-+      [powerpc-ibm-aix*],
-+        [AS_CASE([$ocaml_cv_cc_vendor],
-+                 [xlc*],
-+-@@ -2369,6 +2369,7 @@ ${mkdll_ldflags}"
-++@@ -2423,6 +2423,7 @@ ${mkdll_ldflags}"
-+    mkdll="$mkdll $mkdll_ldflags"
-+    mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
-+    mkmaindll="$mkmaindll $mkdll_ldflags_exp"
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -136,10 +14,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 21127cd109..4adf84bf28 100644
+index 7b5a854499..2a581f3f25 100644
 --- a/Changes
 +++ b/Changes
-@@ -1520,11 +1520,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1523,11 +1523,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -151,7 +29,7 @@ index 21127cd109..4adf84bf28 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1553,6 +1548,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1556,6 +1551,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -182,7 +60,7 @@ index 21127cd109..4adf84bf28 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1588,13 +1607,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1591,13 +1610,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -198,7 +76,7 @@ index 21127cd109..4adf84bf28 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1701,6 +1720,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1704,6 +1723,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -208,7 +86,7 @@ index 21127cd109..4adf84bf28 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1964,6 +1986,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1967,6 +1989,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10636,135 +10514,13 @@ index 0000000000..6eecbb6fb4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a5bf698bd5
+index 0000000000..2667ee12fa
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10562 @@
+@@ -0,0 +1,10453 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e0e5cb204c
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,119 @@
-++--- a	2023-09-28 18:47:57.093524846 +0100
-+++++ b	2023-09-28 18:47:57.117525708 +0100
-++@@ -231,7 +231,7 @@
-++  
-++  # Native dynlink
-++  
-++-@@ -1040,14 +1047,6 @@ endif
-+++@@ -1037,14 +1044,6 @@ endif
-++  .PHONY: runtime
-++  runtime: stdlib/libcamlrun.$(A)
-++  
-++@@ -269,7 +269,7 @@
-++  	rm -f config.log config.status libtool
-++  
-++  # Installation
-++-@@ -1764,15 +1761,15 @@ endif
-+++@@ -1767,15 +1764,15 @@ endif
-++  	fi
-++  ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-++  ifeq "$(TOOLCHAIN)" "msvc"
-++@@ -399,7 +399,7 @@
-++  AC_SUBST([flexdll_chain])
-++  AC_SUBST([mkdll_ldflags_exp])
-++  AC_SUBST([mkexe_ldflags_exp])
-++-@@ -833,15 +832,21 @@ AS_CASE([$host],
-+++@@ -846,15 +845,21 @@ AS_CASE([$host],
-++  AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++    AC_MSG_CHECKING([for flexdll sources])
-++    AS_IF([test x"$with_flexdll" = "xno"],
-++@@ -424,7 +424,7 @@
-++            iflexdir='$(ROOTDIR)/flexdll'
-++            with_flexdll="$iflexdir"],
-++            [AS_IF([test x"$with_flexdll" != 'x'],
-++-@@ -851,12 +856,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -864,12 +869,12 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++          AS_IF([test -f "$with_flexdll/flexdll.h"],
-++            [mkdir -p flexdll-sources
-++            cp -r "$with_flexdll"/* flexdll-sources/
-++@@ -439,7 +439,7 @@
-++          [AC_MSG_RESULT([no])],
-++          [AC_MSG_RESULT([$iflexdir$flexmsg])
-++          bootstrapping_flexdll=true
-++-@@ -869,7 +874,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -882,7 +887,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++  
-++    AC_CHECK_PROG([flexlink],[flexlink],[flexlink])
-++  
-++@@ -448,7 +448,7 @@
-++      OCAML_TEST_FLEXLINK([$flexlink], [$flexdll_chain],
-++                          [$internal_cppflags], [$host])
-++  
-++-@@ -881,7 +886,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-+++@@ -894,7 +899,7 @@ AS_IF([test x"$supports_shared_libraries" != 'xfalse'], [
-++        ])])
-++    ])
-++  
-++@@ -457,7 +457,7 @@
-++  
-++    AS_IF([test -n "$flexlink" && test x"$have_flexdll_h" = 'xno'],
-++      [OCAML_TEST_FLEXLINK_WHERE([$flexlink])
-++-@@ -897,7 +902,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-+++@@ -910,7 +915,7 @@ AS_CASE([$have_flexdll_h,$supports_shared_libraries,$host],
-++   [no,*,*-w64-mingw32*|no,*,*-pc-windows],
-++     [AC_MSG_ERROR([flexdll.h is required for native Win32])])
-++  
-++@@ -466,7 +466,7 @@
-++    [,true,,*-*-cygwin*],
-++      [supports_shared_libraries=false
-++      AC_MSG_WARN([flexlink not found: shared library support disabled.])],
-++-@@ -906,11 +911,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-+++@@ -919,11 +924,6 @@ AS_CASE([$flexdir,$supports_shared_libraries,$flexlink,$host],
-++  
-++  mkexe_cmd_exp="$CC"
-++  
-++@@ -478,7 +478,7 @@
-++  AS_CASE([$cc_basename,$host],
-++    [*,x86_64-*-darwin*],
-++      [oc_ldflags='-Wl,-no_compact_unwind';
-++-@@ -921,7 +921,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
-++      [common_cppflags="$common_cppflags -U_WIN32"
-++      AS_IF([$supports_shared_libraries],
-++        [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-++@@ -487,7 +487,7 @@
-++        mkexe_cflags=''
-++        mkexe_ldflags_prefix='-link '],
-++        [mkexe_extra_flags=''
-++-@@ -934,7 +934,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -947,7 +947,7 @@ AS_CASE([$cc_basename,$host],
-++      ostype="Win32"
-++      toolchain="mingw"
-++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-++@@ -496,7 +496,7 @@
-++      mkexe_cflags=''
-++      mkexe_ldflags_prefix='-link '
-++      oc_exe_ldflags='-municode'
-++-@@ -944,7 +944,7 @@ AS_CASE([$cc_basename,$host],
-+++@@ -957,7 +957,7 @@ AS_CASE([$cc_basename,$host],
-++      [toolchain=msvc
-++      ostype="Win32"
-++      mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-++@@ -505,7 +505,7 @@
-++      mkexe_cflags=''
-++      mkexe_ldflags_prefix='-link '
-++      mkexe_via_cc_ldflags_prefix='/link '
-++-@@ -1096,9 +1096,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -1109,9 +1109,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-++      [*-*-mingw32*|*-pc-windows|*-*-cygwin*],
-++        [mkdll_flags="-chain ${flexdll_chain} ${flexlink_flags}"
-++        mkdll_exp="flexlink ${mkdll_flags}"
-++@@ -517,7 +517,7 @@
-++      [powerpc-ibm-aix*],
-++        [AS_CASE([$ocaml_cv_cc_vendor],
-++                 [xlc*],
-++-@@ -2369,6 +2369,7 @@ ${mkdll_ldflags}"
-+++@@ -2423,6 +2423,7 @@ ${mkdll_ldflags}"
-++    mkdll="$mkdll $mkdll_ldflags"
-++    mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
-++    mkmaindll="$mkmaindll $mkdll_ldflags_exp"
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10778,10 +10534,10 @@ index 0000000000..a5bf698bd5
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 21127cd109..4adf84bf28 100644
++index 7b5a854499..2a581f3f25 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1520,11 +1520,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1523,11 +1523,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10793,7 +10549,7 @@ index 0000000000..a5bf698bd5
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1553,6 +1548,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1556,6 +1551,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10824,7 +10580,7 @@ index 0000000000..a5bf698bd5
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1588,13 +1607,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1591,13 +1610,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10840,7 +10596,7 @@ index 0000000000..a5bf698bd5
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1701,6 +1720,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1704,6 +1723,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10850,7 +10606,7 @@ index 0000000000..a5bf698bd5
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1964,6 +1986,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1967,6 +1989,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -21201,8 +20957,20 @@ index 0000000000..a5bf698bd5
 ++             host='--host=x86_64-w64-mingw32'
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
-+++    
-\ No newline at end of file
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
