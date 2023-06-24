@@ -1,22 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..2e13a54b32
+index 0000000000..1a777f3bb0
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,13 @@
-+--- a	2023-09-28 18:47:59.025594246 +0100
-++++ b	2023-09-28 18:47:59.041594820 +0100
-+@@ -15,8 +15,8 @@
-+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+ --- a/asmcomp/amd64/emit.mlp
-+ +++ b/asmcomp/amd64/emit.mlp
-+-@@ -79,14 +79,12 @@ let fp = Config.with_frame_pointers
-+- let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
-++@@ -83,14 +83,12 @@ let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
-++ *)
-+  
-+  let frame_size env =                     (* includes return address *)
-+ -  if env.f.fun_frame_required then begin
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:47:59.601614922 +0100
+++++ b	2023-09-28 18:47:59.629615927 +0100
++@@ -74,7 +74,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -1425,8 +1425,8 @@ ocamlprof_LIBRARIES =
+++@@ -1426,8 +1426,8 @@ ocamlprof_LIBRARIES =
++  ocamlprof_MODULES = \
++    config build_path_prefix_map misc identifiable numbers arg_helper \
++    local_store load_path clflags terminfo warnings location longident \
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -30,10 +28,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index b0f6b7e13c..96503884bd 100644
+index 9b63cbee5c..f34ca893e5 100644
 --- a/Changes
 +++ b/Changes
-@@ -1533,11 +1533,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1536,11 +1536,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -45,7 +43,7 @@ index b0f6b7e13c..96503884bd 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1566,6 +1561,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1569,6 +1564,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -76,7 +74,7 @@ index b0f6b7e13c..96503884bd 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1601,13 +1620,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1604,13 +1623,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -92,7 +90,7 @@ index b0f6b7e13c..96503884bd 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1714,6 +1733,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1717,6 +1736,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -102,7 +100,7 @@ index b0f6b7e13c..96503884bd 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1977,6 +1999,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1980,6 +2002,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -113,7 +111,7 @@ index b0f6b7e13c..96503884bd 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 7ea9344892..65c816d0aa 100644
+index 727ae78c6c..d224509052 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -413,9 +413,6 @@ flexlink.opt$(EXE): \
@@ -10543,29 +10541,27 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..7b2f33c226
+index 0000000000..d9d70b5622
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10485 @@
+@@ -0,0 +1,10486 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..2e13a54b32
++index 0000000000..1a777f3bb0
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,13 @@
-++--- a	2023-09-28 18:47:59.025594246 +0100
-+++++ b	2023-09-28 18:47:59.041594820 +0100
-++@@ -15,8 +15,8 @@
-++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-++ --- a/asmcomp/amd64/emit.mlp
-++ +++ b/asmcomp/amd64/emit.mlp
-++-@@ -79,14 +79,12 @@ let fp = Config.with_frame_pointers
-++- let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
-+++@@ -83,14 +83,12 @@ let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
-+++ *)
-++  
-++  let frame_size env =                     (* includes return address *)
-++ -  if env.f.fun_frame_required then begin
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:47:59.601614922 +0100
++++++ b	2023-09-28 18:47:59.629615927 +0100
+++@@ -74,7 +74,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -1425,8 +1425,8 @@ ocamlprof_LIBRARIES =
++++@@ -1426,8 +1426,8 @@ ocamlprof_LIBRARIES =
+++  ocamlprof_MODULES = \
+++    config build_path_prefix_map misc identifiable numbers arg_helper \
+++    local_store load_path clflags terminfo warnings location longident \
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10579,10 +10575,10 @@ index 0000000000..7b2f33c226
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index b0f6b7e13c..96503884bd 100644
++index 9b63cbee5c..f34ca893e5 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1533,11 +1533,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1536,11 +1536,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10594,7 +10590,7 @@ index 0000000000..7b2f33c226
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1566,6 +1561,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1569,6 +1564,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10625,7 +10621,7 @@ index 0000000000..7b2f33c226
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1601,13 +1620,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1604,13 +1623,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10641,7 +10637,7 @@ index 0000000000..7b2f33c226
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1714,6 +1733,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1717,6 +1736,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10651,7 +10647,7 @@ index 0000000000..7b2f33c226
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1977,6 +1999,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1980,6 +2002,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10662,7 +10658,7 @@ index 0000000000..7b2f33c226
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 7ea9344892..65c816d0aa 100644
++index 727ae78c6c..d224509052 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -413,9 +413,6 @@ flexlink.opt$(EXE): \
@@ -21031,7 +21027,10 @@ index 0000000000..7b2f33c226
 +++      run 'ocamlc -version' \
 +++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
 +++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++ 
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-sym
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
