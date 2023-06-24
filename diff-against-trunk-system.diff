@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..1a777f3bb0
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:47:59.601614922 +0100
-++++ b	2023-09-28 18:47:59.629615927 +0100
-+@@ -74,7 +74,7 @@
-+ diff --git a/Makefile b/Makefile
-+ --- a/Makefile
-+ +++ b/Makefile
-+-@@ -1425,8 +1425,8 @@ ocamlprof_LIBRARIES =
-++@@ -1426,8 +1426,8 @@ ocamlprof_LIBRARIES =
-+  ocamlprof_MODULES = \
-+    config build_path_prefix_map misc identifiable numbers arg_helper \
-+    local_store load_path clflags terminfo warnings location longident \
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -28,7 +14,7 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 9b63cbee5c..f34ca893e5 100644
+index 58562d70a4..5363b1e678 100644
 --- a/Changes
 +++ b/Changes
 @@ -1536,11 +1536,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -111,10 +97,10 @@ index 9b63cbee5c..f34ca893e5 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 727ae78c6c..d224509052 100644
+index 569c00fb07..2811f17ebb 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -413,9 +413,6 @@ flexlink.opt$(EXE): \
+@@ -415,9 +415,6 @@ flexlink.opt$(EXE): \
  	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
  	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
  
@@ -124,7 +110,7 @@ index 727ae78c6c..d224509052 100644
  else
  
  flexdll flexlink flexlink.opt:
-@@ -436,6 +433,10 @@ flexdll flexlink flexlink.opt:
+@@ -438,6 +435,10 @@ flexdll flexlink flexlink.opt:
  
  endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
  
@@ -135,7 +121,7 @@ index 727ae78c6c..d224509052 100644
  INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
  INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
  FLEXDLL_MANIFEST = default_$(ARCH).manifest
-@@ -620,7 +621,6 @@ partialclean::
+@@ -622,7 +623,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -143,7 +129,7 @@ index 727ae78c6c..d224509052 100644
    afl \
    alloc \
    array \
-@@ -628,24 +628,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -630,24 +630,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -171,7 +157,7 @@ index 727ae78c6c..d224509052 100644
    main \
    major_gc \
    md5 \
-@@ -656,17 +656,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -658,17 +658,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -189,7 +175,7 @@ index 727ae78c6c..d224509052 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -676,6 +671,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -678,6 +673,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -199,7 +185,7 @@ index 727ae78c6c..d224509052 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -686,7 +684,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -688,7 +686,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -208,7 +194,7 @@ index 727ae78c6c..d224509052 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1075,12 +1073,14 @@ clean::
+@@ -1077,12 +1075,14 @@ clean::
  
  # Dependencies
  
@@ -225,7 +211,7 @@ index 727ae78c6c..d224509052 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1152,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1154,6 +1154,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -233,7 +219,7 @@ index 727ae78c6c..d224509052 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1699,6 +1700,9 @@ endif
+@@ -1701,6 +1702,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -10541,27 +10527,13 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d9d70b5622
+index 0000000000..904fa7dd21
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10486 @@
+@@ -0,0 +1,10482 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..1a777f3bb0
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:47:59.601614922 +0100
-+++++ b	2023-09-28 18:47:59.629615927 +0100
-++@@ -74,7 +74,7 @@
-++ diff --git a/Makefile b/Makefile
-++ --- a/Makefile
-++ +++ b/Makefile
-++-@@ -1425,8 +1425,8 @@ ocamlprof_LIBRARIES =
-+++@@ -1426,8 +1426,8 @@ ocamlprof_LIBRARIES =
-++  ocamlprof_MODULES = \
-++    config build_path_prefix_map misc identifiable numbers arg_helper \
-++    local_store load_path clflags terminfo warnings location longident \
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10575,7 +10547,7 @@ index 0000000000..d9d70b5622
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 9b63cbee5c..f34ca893e5 100644
++index 58562d70a4..5363b1e678 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1536,11 +1536,6 @@ OCaml 5.0.0 (15 December 2022)
@@ -10658,10 +10630,10 @@ index 0000000000..d9d70b5622
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 727ae78c6c..d224509052 100644
++index 569c00fb07..2811f17ebb 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -413,9 +413,6 @@ flexlink.opt$(EXE): \
++@@ -415,9 +415,6 @@ flexlink.opt$(EXE): \
 + 	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
 + 	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
 + 
@@ -10671,7 +10643,7 @@ index 0000000000..d9d70b5622
 + else
 + 
 + flexdll flexlink flexlink.opt:
-+@@ -436,6 +433,10 @@ flexdll flexlink flexlink.opt:
++@@ -438,6 +435,10 @@ flexdll flexlink flexlink.opt:
 + 
 + endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 + 
@@ -10682,7 +10654,7 @@ index 0000000000..d9d70b5622
 + INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 + INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 + FLEXDLL_MANIFEST = default_$(ARCH).manifest
-+@@ -620,7 +621,6 @@ partialclean::
++@@ -622,7 +623,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -10690,7 +10662,7 @@ index 0000000000..d9d70b5622
 +   afl \
 +   alloc \
 +   array \
-+@@ -628,24 +628,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -630,24 +630,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -10718,7 +10690,7 @@ index 0000000000..d9d70b5622
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -656,17 +656,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -658,17 +658,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -10736,7 +10708,7 @@ index 0000000000..d9d70b5622
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -676,6 +671,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -678,6 +673,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10746,7 +10718,7 @@ index 0000000000..d9d70b5622
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -686,7 +684,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -688,7 +686,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10755,7 +10727,7 @@ index 0000000000..d9d70b5622
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1075,12 +1073,14 @@ clean::
++@@ -1077,12 +1075,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10772,7 +10744,7 @@ index 0000000000..d9d70b5622
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1152,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1154,6 +1154,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10780,7 +10752,7 @@ index 0000000000..d9d70b5622
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1699,6 +1700,9 @@ endif
++@@ -1701,6 +1702,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -21030,7 +21002,17 @@ index 0000000000..d9d70b5622
 +++    fi
 ++     if [[ $PORT =~ mingw* ]] ; then
 ++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-sym
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
