@@ -21171,7 +21171,7 @@ index 7c90119eb4..39518d86cb 100644
  \stddocitem{StdLabels}{include modules \texttt{Array}, \texttt{List} and \texttt{String} with labels}
  \stddocitem{String}{string operations}
 diff --git a/manual/src/refman/extensions/effects.etex b/manual/src/refman/extensions/effects.etex
-index 0d6826cfc7..a054ed30a6 100644
+index be5ca6887e..f76ada3def 100644
 --- a/manual/src/refman/extensions/effects.etex
 +++ b/manual/src/refman/extensions/effects.etex
 @@ -24,7 +24,7 @@ To understand the basics, let us define an effect (that is, an operation) that
