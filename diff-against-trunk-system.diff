@@ -1,6 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..6a25c91369
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:48:01.489682661 +0100
+++++ b	2023-09-28 18:48:01.509683378 +0100
++@@ -29,7 +29,7 @@
++      | Lop(Ialloc _) -> 5
++      | Lop(Ispecific(Ialloc_far _)) -> 6
++      | Lop(Ipoll { return_label = Some(_) }) -> 5
++-@@ -678,6 +683,10 @@ let emit_instr env i =
+++@@ -680,6 +685,10 @@ let emit_instr env i =
++          end;
++          if memory_chunk = Byte_signed then
++            `	extsb	{emit_reg i.res.(0)}, {emit_reg i.res.(0)}\n`
++@@ -40,7 +40,7 @@
++      | Lop(Istore(chunk, addr, assignment)) ->
++          let storeinstr =
++            match chunk with
++-@@ -685,7 +694,7 @@ let emit_instr env i =
+++@@ -687,7 +696,7 @@ let emit_instr env i =
++            | Sixteen_unsigned | Sixteen_signed -> "sth"
++            | Thirtytwo_unsigned | Thirtytwo_signed -> "stw"
++            | Word_int | Word_val -> "std"
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,10 +37,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 4c9a675326..e2d0031d2d 100644
+index 950c989fac..647035824f 100644
 --- a/Changes
 +++ b/Changes
-@@ -1553,11 +1553,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1557,11 +1557,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +52,7 @@ index 4c9a675326..e2d0031d2d 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1586,6 +1581,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1590,6 +1585,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +83,7 @@ index 4c9a675326..e2d0031d2d 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1621,13 +1640,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1625,13 +1644,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +99,7 @@ index 4c9a675326..e2d0031d2d 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1734,6 +1753,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1738,6 +1757,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +109,7 @@ index 4c9a675326..e2d0031d2d 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -1997,6 +2019,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2001,6 +2023,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -736,10 +759,10 @@ index c2752503b3..9e50ffe636 100644
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
 diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
-index 6a34eb597b..76a26facad 100644
+index 61ff6dd854..1190e82440 100644
 --- a/asmcomp/power/emit.mlp
 +++ b/asmcomp/power/emit.mlp
-@@ -646,8 +646,10 @@ let emit_instr env i =
+@@ -651,8 +651,10 @@ let emit_instr env i =
            (* Save OCaml stack pointer in a callee-save register *)
            `	mr	28, 1\n`;
            (* Switch to C stack *)
@@ -750,7 +773,7 @@ index 6a34eb597b..76a26facad 100644
            emit_call func;
            emit_call_nop();
            (* Switch back to OCaml stack *)
-@@ -767,8 +769,12 @@ let emit_instr env i =
+@@ -776,8 +778,12 @@ let emit_instr env i =
          let instr = name_for_specific sop in
          `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
      | Lop (Idls_get) ->
@@ -763,7 +786,7 @@ index 6a34eb597b..76a26facad 100644
      | Lreloadretaddr ->
          `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
          `	mtlr	11\n`
-@@ -919,12 +925,14 @@ let fundecl fundecl =
+@@ -928,12 +934,14 @@ let fundecl fundecl =
    begin match !handle_overflow with
    | None -> ()
    | Some(overflow, ret) ->
@@ -10527,13 +10550,36 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..29b3a8a1b2
+index 0000000000..b748a5970a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10482 @@
+@@ -0,0 +1,10487 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..6a25c91369
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:48:01.489682661 +0100
++++++ b	2023-09-28 18:48:01.509683378 +0100
+++@@ -29,7 +29,7 @@
+++      | Lop(Ialloc _) -> 5
+++      | Lop(Ispecific(Ialloc_far _)) -> 6
+++      | Lop(Ipoll { return_label = Some(_) }) -> 5
+++-@@ -678,6 +683,10 @@ let emit_instr env i =
++++@@ -680,6 +685,10 @@ let emit_instr env i =
+++          end;
+++          if memory_chunk = Byte_signed then
+++            `	extsb	{emit_reg i.res.(0)}, {emit_reg i.res.(0)}\n`
+++@@ -40,7 +40,7 @@
+++      | Lop(Istore(chunk, addr, assignment)) ->
+++          let storeinstr =
+++            match chunk with
+++-@@ -685,7 +694,7 @@ let emit_instr env i =
++++@@ -687,7 +696,7 @@ let emit_instr env i =
+++            | Sixteen_unsigned | Sixteen_signed -> "sth"
+++            | Thirtytwo_unsigned | Thirtytwo_signed -> "stw"
+++            | Word_int | Word_val -> "std"
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10547,10 +10593,10 @@ index 0000000000..29b3a8a1b2
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 4c9a675326..e2d0031d2d 100644
++index 950c989fac..647035824f 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1553,11 +1553,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1557,11 +1557,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10562,7 +10608,7 @@ index 0000000000..29b3a8a1b2
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1586,6 +1581,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1590,6 +1585,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10593,7 +10639,7 @@ index 0000000000..29b3a8a1b2
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1621,13 +1640,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1625,13 +1644,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10609,7 +10655,7 @@ index 0000000000..29b3a8a1b2
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1734,6 +1753,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1738,6 +1757,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10619,7 +10665,7 @@ index 0000000000..29b3a8a1b2
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -1997,6 +2019,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2001,6 +2023,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11269,10 +11315,10 @@ index 0000000000..29b3a8a1b2
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
 +diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
-+index 6a34eb597b..76a26facad 100644
++index 61ff6dd854..1190e82440 100644
 +--- a/asmcomp/power/emit.mlp
 ++++ b/asmcomp/power/emit.mlp
-+@@ -646,8 +646,10 @@ let emit_instr env i =
++@@ -651,8 +651,10 @@ let emit_instr env i =
 +           (* Save OCaml stack pointer in a callee-save register *)
 +           `	mr	28, 1\n`;
 +           (* Switch to C stack *)
@@ -11283,7 +11329,7 @@ index 0000000000..29b3a8a1b2
 +           emit_call func;
 +           emit_call_nop();
 +           (* Switch back to OCaml stack *)
-+@@ -767,8 +769,12 @@ let emit_instr env i =
++@@ -776,8 +778,12 @@ let emit_instr env i =
 +         let instr = name_for_specific sop in
 +         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
 +     | Lop (Idls_get) ->
@@ -11296,7 +11342,7 @@ index 0000000000..29b3a8a1b2
 +     | Lreloadretaddr ->
 +         `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
 +         `	mtlr	11\n`
-+@@ -919,12 +925,14 @@ let fundecl fundecl =
++@@ -928,12 +934,14 @@ let fundecl fundecl =
 +   begin match !handle_overflow with
 +   | None -> ()
 +   | Some(overflow, ret) ->
@@ -20994,25 +21040,7 @@ index 0000000000..29b3a8a1b2
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
 ++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
 +++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX
++++  
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
