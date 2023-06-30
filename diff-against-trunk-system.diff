@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..09ca418618
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:48:02.473717942 +0100
+++++ b	2023-09-28 18:48:02.493718659 +0100
++@@ -16,7 +16,7 @@
++ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
++ --- a/otherlibs/unix/unixsupport.h
++ +++ b/otherlibs/unix/unixsupport.h
++-@@ -100,13 +100,10 @@ extern void caml_win32_maperr(DWORD errcode);
+++@@ -109,13 +109,10 @@ extern void caml_win32_maperr(DWORD errcode);
++  extern value caml_unix_error_of_code (int errcode);
++  extern int caml_unix_code_of_unix_error (value error);
++  
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 95e11dc999..e8293ad7c2 100644
+index 2a35bf9cf3..8fcdca22c0 100644
 --- a/Changes
 +++ b/Changes
-@@ -1571,11 +1571,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1576,11 +1576,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +43,7 @@ index 95e11dc999..e8293ad7c2 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1604,6 +1599,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1609,6 +1604,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +74,7 @@ index 95e11dc999..e8293ad7c2 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1639,13 +1658,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1644,13 +1663,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +90,7 @@ index 95e11dc999..e8293ad7c2 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1752,6 +1771,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1757,6 +1776,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +100,7 @@ index 95e11dc999..e8293ad7c2 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2015,6 +2037,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2020,6 +2042,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10527,13 +10541,27 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8714b1f206
+index 0000000000..6bc82838d9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10482 @@
+@@ -0,0 +1,10485 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..09ca418618
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:48:02.473717942 +0100
++++++ b	2023-09-28 18:48:02.493718659 +0100
+++@@ -16,7 +16,7 @@
+++ diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
+++ --- a/otherlibs/unix/unixsupport.h
+++ +++ b/otherlibs/unix/unixsupport.h
+++-@@ -100,13 +100,10 @@ extern void caml_win32_maperr(DWORD errcode);
++++@@ -109,13 +109,10 @@ extern void caml_win32_maperr(DWORD errcode);
+++  extern value caml_unix_error_of_code (int errcode);
+++  extern int caml_unix_code_of_unix_error (value error);
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10547,10 +10575,10 @@ index 0000000000..8714b1f206
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 95e11dc999..e8293ad7c2 100644
++index 2a35bf9cf3..8fcdca22c0 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1571,11 +1571,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1576,11 +1576,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10562,7 +10590,7 @@ index 0000000000..8714b1f206
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1604,6 +1599,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1609,6 +1604,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10593,7 +10621,7 @@ index 0000000000..8714b1f206
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1639,13 +1658,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1644,13 +1663,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10609,7 +10637,7 @@ index 0000000000..8714b1f206
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1752,6 +1771,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1757,6 +1776,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10619,7 +10647,7 @@ index 0000000000..8714b1f206
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2015,6 +2037,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2020,6 +2042,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -21001,18 +21029,7 @@ index 0000000000..8714b1f206
 +++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
 +++    fi
 ++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX
+++       run "Check
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -22468,7 +22485,7 @@ index b9cc32040e..7f83d8b537 100644
  }
  
 diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
-index 2d9f95d8a3..77054318ba 100644
+index 575266284b..11a233d158 100644
 --- a/otherlibs/unix/unixsupport.h
 +++ b/otherlibs/unix/unixsupport.h
 @@ -46,7 +46,11 @@ struct filedescr {
@@ -22503,7 +22520,7 @@ index 2d9f95d8a3..77054318ba 100644
  
  extern SOCKET caml_win32_socket(int domain, int type, int protocol,
                                  LPWSAPROTOCOL_INFO info,
-@@ -170,4 +179,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
+@@ -167,4 +176,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
  #define EXECV_CAST
  #endif
  
