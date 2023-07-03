@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:48:03.933770261 +0100
++++ b	2023-09-28 18:48:03.949770835 +0100
+@@ -17,7 +17,7 @@
+ diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
+ --- a/stdlib/atomic.ml
+ +++ b/stdlib/atomic.ml
+-@@ -15,6 +15,7 @@
++@@ -16,6 +16,7 @@
+  type !'a t
+  
+  external make : 'a -> 'a t = "%makemutable"

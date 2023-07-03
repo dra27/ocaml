@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..136fc410a1
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:48:03.933770261 +0100
+++++ b	2023-09-28 18:48:03.949770835 +0100
++@@ -17,7 +17,7 @@
++ diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
++ --- a/stdlib/atomic.ml
++ +++ b/stdlib/atomic.ml
++-@@ -15,6 +15,7 @@
+++@@ -16,6 +16,7 @@
++  type !'a t
++  
++  external make : 'a -> 'a t = "%makemutable"
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index cbd0298cc6..22ac0e7139 100644
+index 43327dc2a2..38464a7f1c 100644
 --- a/Changes
 +++ b/Changes
-@@ -1580,11 +1580,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1586,11 +1586,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -29,7 +43,7 @@ index cbd0298cc6..22ac0e7139 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1613,6 +1608,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1619,6 +1614,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -60,7 +74,7 @@ index cbd0298cc6..22ac0e7139 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1648,13 +1667,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1654,13 +1673,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +90,7 @@ index cbd0298cc6..22ac0e7139 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1761,6 +1780,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1767,6 +1786,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +100,7 @@ index cbd0298cc6..22ac0e7139 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2024,6 +2046,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2030,6 +2052,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10580,13 +10594,27 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ffc5112d3e
+index 0000000000..dbcd4b971d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10495 @@
+@@ -0,0 +1,10588 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..136fc410a1
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:48:03.933770261 +0100
++++++ b	2023-09-28 18:48:03.949770835 +0100
+++@@ -17,7 +17,7 @@
+++ diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
+++ --- a/stdlib/atomic.ml
+++ +++ b/stdlib/atomic.ml
+++-@@ -15,6 +15,7 @@
++++@@ -16,6 +16,7 @@
+++  type !'a t
+++  
+++  external make : 'a -> 'a t = "%makemutable"
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10600,10 +10628,10 @@ index 0000000000..ffc5112d3e
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index cbd0298cc6..22ac0e7139 100644
++index 43327dc2a2..38464a7f1c 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1580,11 +1580,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1586,11 +1586,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10615,7 +10643,7 @@ index 0000000000..ffc5112d3e
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1613,6 +1608,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1619,6 +1614,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10646,7 +10674,7 @@ index 0000000000..ffc5112d3e
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1648,13 +1667,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1654,13 +1673,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10662,7 +10690,7 @@ index 0000000000..ffc5112d3e
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1761,6 +1780,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1767,6 +1786,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10672,7 +10700,7 @@ index 0000000000..ffc5112d3e
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2024,6 +2046,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2030,6 +2052,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -21078,7 +21106,86 @@ index 0000000000..ffc5112d3e
 +++  ./configure $configure_flags
 ++ }
 ++ 
-++ Build ()
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..f69aeb342c 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/iss
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -22819,7 +22926,7 @@ index 8e53530ea4..4239d89348 100644
  STDLIB_PREFIXED_MODULES = \
    $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
 diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
-index d5d6e99e1d..aa057e3985 100644
+index f4fc737d4e..2c2d756483 100644
 --- a/stdlib/atomic.ml
 +++ b/stdlib/atomic.ml
 @@ -12,6 +12,7 @@
@@ -22830,7 +22937,7 @@ index d5d6e99e1d..aa057e3985 100644
  type !'a t
  
  external make : 'a -> 'a t = "%makemutable"
-@@ -19,8 +20,53 @@ external get : 'a t -> 'a = "%atomic_load"
+@@ -20,8 +21,53 @@ external get : 'a t -> 'a = "%atomic_load"
  external exchange : 'a t -> 'a -> 'a = "%atomic_exchange"
  external compare_and_set : 'a t -> 'a -> 'a -> bool = "%atomic_cas"
  external fetch_and_add : int t -> int -> int = "%atomic_fetch_add"
