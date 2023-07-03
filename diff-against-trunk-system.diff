@@ -1,20 +1,28 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..136fc410a1
+index 0000000000..8fa701764a
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:48:03.933770261 +0100
-++++ b	2023-09-28 18:48:03.949770835 +0100
-+@@ -17,7 +17,7 @@
-+ diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
-+ --- a/stdlib/atomic.ml
-+ +++ b/stdlib/atomic.ml
-+-@@ -15,6 +15,7 @@
-++@@ -16,6 +16,7 @@
-+  type !'a t
+@@ -0,0 +1,19 @@
++--- a	2023-09-28 18:48:04.453788885 +0100
+++++ b	2023-09-28 18:48:04.469789458 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -173,6 +173,11 @@ Working version
+++@@ -173,6 +173,10 @@ Working version
++    type to be ignored (see tests/typing-misc/constraints.ml).
++    (Jacques Garrigue, report by Richard Eisenberg, review by Leo White)
 +  
-+  external make : 'a -> 'a t = "%makemutable"
++@@ -9,7 +9,6 @@
++ +  functions instead of quadratic
++ +  (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
++ +  and Gabriel Scherer)
++-+
++  
++  OCaml 5.1.0
++  ---------------
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -28,10 +36,18 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 43327dc2a2..38464a7f1c 100644
+index 8fc31bfe49..3f87843bf5 100644
 --- a/Changes
 +++ b/Changes
-@@ -1586,11 +1586,6 @@ OCaml 5.0.0 (15 December 2022)
+@@ -178,7 +178,6 @@ Working version
+   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
+   and Gabriel Scherer)
+ 
+-
+ OCaml 5.1.0
+ ---------------
+ 
+@@ -1591,11 +1590,6 @@ OCaml 5.0.0 (15 December 2022)
    (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
     Xavier Leroy)
  
@@ -43,7 +59,7 @@ index 43327dc2a2..38464a7f1c 100644
  - #11516, #11524: Fix the `deprecated_mutable` attribute.
    (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
  
-@@ -1619,6 +1614,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1624,6 +1618,30 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -74,7 +90,7 @@ index 43327dc2a2..38464a7f1c 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1654,13 +1673,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1659,13 +1677,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -90,7 +106,7 @@ index 43327dc2a2..38464a7f1c 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1767,6 +1786,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1772,6 +1790,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -100,7 +116,7 @@ index 43327dc2a2..38464a7f1c 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2030,6 +2052,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2035,6 +2056,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -6666,10 +6682,10 @@ index 0000000000..7aa1b8d11f
 +      generally not accessible. */
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..572a4697e2
+index 0000000000..e9d43c92fa
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3922 @@
+@@ -0,0 +1,3934 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 9d502e1c90..f14374c9c3 100644
 +--- a/.github/workflows/build.yml
@@ -7703,6 +7719,18 @@ index 0000000000..572a4697e2
 ++   with (13 p/352) p/352))
 + - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 + |}]
++diff --git a/testsuite/tests/c-api/aligned_alloc.ml b/testsuite/tests/c-api/aligned_alloc.ml
++index 24d65c33f7..d4abe520a4 100644
++--- a/testsuite/tests/c-api/aligned_alloc.ml
+++++ b/testsuite/tests/c-api/aligned_alloc.ml
++@@ -1,5 +1,7 @@
++ (* TEST
++   modules = "aligned_alloc_stubs.c";
+++  reason = "OCaml 5 only";
+++  skip;
++ *)
++ 
++ external is_aligned : 'a Atomic.t -> bool = "caml_atomic_is_aligned"
 +diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
 +index abbf729bd6..5dbd63af46 100644
 +--- a/testsuite/tests/c-api/alloc_async.ml
@@ -10594,27 +10622,35 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..dbcd4b971d
+index 0000000000..62be2fbe8a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10588 @@
+@@ -0,0 +1,10595 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..136fc410a1
++index 0000000000..8fa701764a
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:48:03.933770261 +0100
-+++++ b	2023-09-28 18:48:03.949770835 +0100
-++@@ -17,7 +17,7 @@
-++ diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
-++ --- a/stdlib/atomic.ml
-++ +++ b/stdlib/atomic.ml
-++-@@ -15,6 +15,7 @@
-+++@@ -16,6 +16,7 @@
-++  type !'a t
++@@ -0,0 +1,19 @@
+++--- a	2023-09-28 18:48:04.453788885 +0100
++++++ b	2023-09-28 18:48:04.469789458 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -173,6 +173,11 @@ Working version
++++@@ -173,6 +173,10 @@ Working version
+++    type to be ignored (see tests/typing-misc/constraints.ml).
+++    (Jacques Garrigue, report by Richard Eisenberg, review by Leo White)
 ++  
-++  external make : 'a -> 'a t = "%makemutable"
+++@@ -9,7 +9,6 @@
+++ +  functions instead of quadratic
+++ +  (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
+++ +  and Gabriel Scherer)
+++-+
+++  
+++  OCaml 5.1.0
+++  ---------------
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10628,10 +10664,18 @@ index 0000000000..dbcd4b971d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 43327dc2a2..38464a7f1c 100644
++index 8fc31bfe49..3f87843bf5 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1586,11 +1586,6 @@ OCaml 5.0.0 (15 December 2022)
++@@ -178,7 +178,6 @@ Working version
++   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
++   and Gabriel Scherer)
++ 
++-
++ OCaml 5.1.0
++ ---------------
++ 
++@@ -1591,11 +1590,6 @@ OCaml 5.0.0 (15 December 2022)
 +   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
 +    Xavier Leroy)
 + 
@@ -10643,7 +10687,7 @@ index 0000000000..dbcd4b971d
 + - #11516, #11524: Fix the `deprecated_mutable` attribute.
 +   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
 + 
-+@@ -1619,6 +1614,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1624,6 +1618,30 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10674,7 +10718,7 @@ index 0000000000..dbcd4b971d
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1654,13 +1673,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1659,13 +1677,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10690,7 +10734,7 @@ index 0000000000..dbcd4b971d
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1767,6 +1786,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1772,6 +1790,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10700,7 +10744,7 @@ index 0000000000..dbcd4b971d
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2030,6 +2052,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2035,6 +2056,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -17266,10 +17310,10 @@ index 0000000000..dbcd4b971d
 ++      generally not accessible. */
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..572a4697e2
++index 0000000000..e9d43c92fa
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3922 @@
++@@ -0,0 +1,3934 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 9d502e1c90..f14374c9c3 100644
 ++--- a/.github/workflows/build.yml
@@ -18303,6 +18347,18 @@ index 0000000000..dbcd4b971d
 +++   with (13 p/352) p/352))
 ++ - : bool -> bool tuplist -> bool * bool tuplist = <fun>
 ++ |}]
+++diff --git a/testsuite/tests/c-api/aligned_alloc.ml b/testsuite/tests/c-api/aligned_alloc.ml
+++index 24d65c33f7..d4abe520a4 100644
+++--- a/testsuite/tests/c-api/aligned_alloc.ml
++++++ b/testsuite/tests/c-api/aligned_alloc.ml
+++@@ -1,5 +1,7 @@
+++ (* TEST
+++   modules = "aligned_alloc_stubs.c";
++++  reason = "OCaml 5 only";
++++  skip;
+++ *)
+++ 
+++ external is_aligned : 'a Atomic.t -> bool = "caml_atomic_is_aligned"
 ++diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
 ++index abbf729bd6..5dbd63af46 100644
 ++--- a/testsuite/tests/c-api/alloc_async.ml
@@ -21164,28 +21220,7 @@ index 0000000000..dbcd4b971d
 ++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 ++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
 ++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/iss
++++    if [[ $PORT = 'mingw64'
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

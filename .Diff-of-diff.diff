@@ -1,11 +1,19 @@
---- a	2023-09-28 18:48:03.933770261 +0100
-+++ b	2023-09-28 18:48:03.949770835 +0100
-@@ -17,7 +17,7 @@
- diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
- --- a/stdlib/atomic.ml
- +++ b/stdlib/atomic.ml
--@@ -15,6 +15,7 @@
-+@@ -16,6 +16,7 @@
-  type !'a t
+--- a	2023-09-28 18:48:04.453788885 +0100
++++ b	2023-09-28 18:48:04.469789458 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -173,6 +173,11 @@ Working version
++@@ -173,6 +173,10 @@ Working version
+    type to be ignored (see tests/typing-misc/constraints.ml).
+    (Jacques Garrigue, report by Richard Eisenberg, review by Leo White)
   
-  external make : 'a -> 'a t = "%makemutable"
+@@ -9,7 +9,6 @@
+ +  functions instead of quadratic
+ +  (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
+ +  and Gabriel Scherer)
+-+
+  
+  OCaml 5.1.0
+  ---------------
