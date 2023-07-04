@@ -188,6 +188,10 @@ Working version
   (Fabrice Buoro and Olivier Nicole, review by Guillaume Munch-Maccagnoni,
   Gabriel Scherer and Luc Maranget)
 
+- #12264, #12289: Fix compact_allocate to avoid a pathological case
+  that causes very slow compaction.
+  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+
 OCaml 5.1.0
 ---------------
 
