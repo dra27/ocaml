@@ -1,6 +1,53 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..e4f3c65f1e
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,44 @@
++--- a	2023-09-28 18:48:06.037845594 +0100
+++++ b	2023-09-28 18:48:06.053846166 +0100
++@@ -1,16 +1,37 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -8,6 +8,10 @@ OCaml 4.14 maintenance version
+++@@ -1600,6 +1600,11 @@ OCaml 5.0.0 (15 December 2022)
+++   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
+++    Xavier Leroy)
++  
++- ### Bug fixes:
++++- #11508, #11509: make Bytes.escaped domain-safe
++++  (Christiano Haesbaert and Gabriel Scherer,
++++   review by Xavier Leroy,
++++   report by Jan Midtgaard and Tom Kelly)
++++
+++ - #11516, #11524: Fix the `deprecated_mutable` attribute.
+++   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
+++ 
+++@@ -1631,10 +1636,15 @@ OCaml 5.0.0 (15 December 2022)
+++ OCaml 4.14 maintenance branch
+++ -----------------------------
++  
+++-- #11508, #11509: make Bytes.escaped domain-safe
+++-  (Christiano Haesbaert and Gabriel Scherer,
+++-   review by Xavier Leroy,
+++-   report by Jan Midtgaard and Tom Kelly)
++++### Bug fixes:
++++
++ +- #12264, #12289: Fix compact_allocate to avoid a pathological case
++ +  that causes very slow compaction.
++ +  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
++ +
++- OCaml 4.14.1 (20 December 2022)
++- ------------------------------
++++
++++OCaml 4.14.1 (20 December 2022)
++++------------------------------
+++ 
+++ ### Manual and documentation:
++  
++ diff --git a/runtime/compact.c b/runtime/compact.c
++ --- a/runtime/compact.c
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,32 +61,25 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index dae6018f41..83d1953bc2 100644
+index dae6018f41..fd194bf188 100644
 --- a/Changes
 +++ b/Changes
-@@ -1600,11 +1600,6 @@ OCaml 5.0.0 (15 December 2022)
-   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
-    Xavier Leroy)
- 
--- #11508, #11509: make Bytes.escaped domain-safe
--  (Christiano Haesbaert and Gabriel Scherer,
--   review by Xavier Leroy,
--   report by Jan Midtgaard and Tom Kelly)
--
- - #11516, #11524: Fix the `deprecated_mutable` attribute.
-   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
- 
-@@ -1633,6 +1628,30 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1633,6 +1633,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
 +OCaml 4.14 maintenance branch
 +-----------------------------
 +
-+- #11508, #11509: make Bytes.escaped domain-safe
-+  (Christiano Haesbaert and Gabriel Scherer,
-+   review by Xavier Leroy,
-+   report by Jan Midtgaard and Tom Kelly)
++### Bug fixes:
++
++- #12264, #12289: Fix compact_allocate to avoid a pathological case
++  that causes very slow compaction.
++  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
++
++
++OCaml 4.14.1 (20 December 2022)
++------------------------------
 +
 +### Manual and documentation:
 +
@@ -60,7 +100,7 @@ index dae6018f41..83d1953bc2 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1668,13 +1687,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1668,13 +1697,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -76,7 +116,7 @@ index dae6018f41..83d1953bc2 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1781,6 +1800,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1781,6 +1810,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -86,7 +126,7 @@ index dae6018f41..83d1953bc2 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2044,6 +2066,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2044,6 +2076,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10592,13 +10632,60 @@ index 0000000000..e9d43c92fa
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..fa56bfea1b
+index 0000000000..7ee56d93d7
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10586 @@
+@@ -0,0 +1,10598 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..e4f3c65f1e
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,44 @@
+++--- a	2023-09-28 18:48:06.037845594 +0100
++++++ b	2023-09-28 18:48:06.053846166 +0100
+++@@ -1,16 +1,37 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -8,6 +8,10 @@ OCaml 4.14 maintenance version
++++@@ -1600,6 +1600,11 @@ OCaml 5.0.0 (15 December 2022)
++++   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
++++    Xavier Leroy)
+++  
+++- ### Bug fixes:
+++++- #11508, #11509: make Bytes.escaped domain-safe
+++++  (Christiano Haesbaert and Gabriel Scherer,
+++++   review by Xavier Leroy,
+++++   report by Jan Midtgaard and Tom Kelly)
+++++
++++ - #11516, #11524: Fix the `deprecated_mutable` attribute.
++++   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
++++ 
++++@@ -1631,10 +1636,15 @@ OCaml 5.0.0 (15 December 2022)
++++ OCaml 4.14 maintenance branch
++++ -----------------------------
+++  
++++-- #11508, #11509: make Bytes.escaped domain-safe
++++-  (Christiano Haesbaert and Gabriel Scherer,
++++-   review by Xavier Leroy,
++++-   report by Jan Midtgaard and Tom Kelly)
+++++### Bug fixes:
+++++
+++ +- #12264, #12289: Fix compact_allocate to avoid a pathological case
+++ +  that causes very slow compaction.
+++ +  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+++ +
+++- OCaml 4.14.1 (20 December 2022)
+++- ------------------------------
+++++
+++++OCaml 4.14.1 (20 December 2022)
+++++------------------------------
++++ 
++++ ### Manual and documentation:
+++  
+++ diff --git a/runtime/compact.c b/runtime/compact.c
+++ --- a/runtime/compact.c
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10612,32 +10699,25 @@ index 0000000000..fa56bfea1b
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index dae6018f41..83d1953bc2 100644
++index dae6018f41..fd194bf188 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1600,11 +1600,6 @@ OCaml 5.0.0 (15 December 2022)
-+   (Damien Doligez, report by Thierry Martinez and Vincent Laviron, review by
-+    Xavier Leroy)
-+ 
-+-- #11508, #11509: make Bytes.escaped domain-safe
-+-  (Christiano Haesbaert and Gabriel Scherer,
-+-   review by Xavier Leroy,
-+-   report by Jan Midtgaard and Tom Kelly)
-+-
-+ - #11516, #11524: Fix the `deprecated_mutable` attribute.
-+   (Chris Casinghino, review by Nicolás Ojeda Bär and Florian Angeletti)
-+ 
-+@@ -1633,6 +1628,30 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1633,6 +1633,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
 ++OCaml 4.14 maintenance branch
 ++-----------------------------
 ++
-++- #11508, #11509: make Bytes.escaped domain-safe
-++  (Christiano Haesbaert and Gabriel Scherer,
-++   review by Xavier Leroy,
-++   report by Jan Midtgaard and Tom Kelly)
+++### Bug fixes:
+++
+++- #12264, #12289: Fix compact_allocate to avoid a pathological case
+++  that causes very slow compaction.
+++  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+++
+++
+++OCaml 4.14.1 (20 December 2022)
+++------------------------------
 ++
 ++### Manual and documentation:
 ++
@@ -10658,7 +10738,7 @@ index 0000000000..fa56bfea1b
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1668,13 +1687,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1668,13 +1697,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10674,7 +10754,7 @@ index 0000000000..fa56bfea1b
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1781,6 +1800,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1781,6 +1810,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10684,7 +10764,7 @@ index 0000000000..fa56bfea1b
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2044,6 +2066,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2044,6 +2076,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -21153,35 +21233,7 @@ index 0000000000..fa56bfea1b
 +++      # Now reconfigure ocamltest to run in bytecode-only mode
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++     
++++      $MAKE -C "$FUL
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
