@@ -1,42 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..5e28ec2ff8
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,33 @@
-+--- a	2023-09-28 18:48:07.009880371 +0100
-++++ b	2023-09-28 18:48:07.021880800 +0100
-+@@ -22,18 +22,17 @@
-+  - #12037: get_extern_state potential NULL dereference.
-+    (Alexander Skvortsov, report by Török Edwin,
-+     design by Gabriel Scherer, Xavier Leroy)
-+-@@ -188,10 +187,6 @@ Working version
-++@@ -188,9 +187,6 @@ Working version
-+    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-+    and Gabriel Scherer)
-+  
-+ -- #12037: Fix some data races by using volatile when necessary
-+ -  (Fabrice Buoro and Olivier Nicole, review by Guillaume Munch-Maccagnoni,
-+ -  Gabriel Scherer and Luc Maranget)
-+--
-++ 
-+  OCaml 5.1.0
-+  ---------------
-+- 
-+-@@ -1006,13 +1001,14 @@ Some of those changes will benefit all OCaml packages.
-++@@ -1006,13 +1002,14 @@ Some of those changes will benefit all OCaml packages.
-+  - #11879: Bugfix for Ctype.nondep_type
-+    (Stephen Dolan, review by Gabriel Scherer)
-+  
-+@@ -51,7 +50,7 @@
-+  - #12046: Flush stderr when tracing the parser
-+    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
-+  
-+-@@ -1060,6 +1056,10 @@ Some of those changes will benefit all OCaml packages.
-++@@ -1060,6 +1057,10 @@ Some of those changes will benefit all OCaml packages.
-+    emitting stack reallocation code before the body of the function.
-+    (Xavier Leroy, review by KC Sivaramakrishnan)
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -50,10 +14,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 17eeb75b53..99dd2aa0c4 100644
+index 4abc4f5b36..8671865729 100644
 --- a/Changes
 +++ b/Changes
-@@ -187,6 +187,7 @@ Working version
+@@ -191,6 +191,7 @@ Working version
    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
    and Gabriel Scherer)
  
@@ -61,7 +25,7 @@ index 17eeb75b53..99dd2aa0c4 100644
  OCaml 5.1.0
  ---------------
  
-@@ -1637,6 +1638,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1641,6 +1642,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -97,7 +61,7 @@ index 17eeb75b53..99dd2aa0c4 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1672,13 +1702,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1676,13 +1706,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -113,7 +77,7 @@ index 17eeb75b53..99dd2aa0c4 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1785,6 +1815,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1789,6 +1819,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -123,7 +87,7 @@ index 17eeb75b53..99dd2aa0c4 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2048,6 +2081,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2052,6 +2085,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10629,49 +10593,13 @@ index 0000000000..e9d43c92fa
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..f8d659c858
+index 0000000000..5677a0aa18
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10594 @@
+@@ -0,0 +1,10590 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..5e28ec2ff8
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,33 @@
-++--- a	2023-09-28 18:48:07.009880371 +0100
-+++++ b	2023-09-28 18:48:07.021880800 +0100
-++@@ -22,18 +22,17 @@
-++  - #12037: get_extern_state potential NULL dereference.
-++    (Alexander Skvortsov, report by Török Edwin,
-++     design by Gabriel Scherer, Xavier Leroy)
-++-@@ -188,10 +187,6 @@ Working version
-+++@@ -188,9 +187,6 @@ Working version
-++    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-++    and Gabriel Scherer)
-++  
-++ -- #12037: Fix some data races by using volatile when necessary
-++ -  (Fabrice Buoro and Olivier Nicole, review by Guillaume Munch-Maccagnoni,
-++ -  Gabriel Scherer and Luc Maranget)
-++--
-+++ 
-++  OCaml 5.1.0
-++  ---------------
-++- 
-++-@@ -1006,13 +1001,14 @@ Some of those changes will benefit all OCaml packages.
-+++@@ -1006,13 +1002,14 @@ Some of those changes will benefit all OCaml packages.
-++  - #11879: Bugfix for Ctype.nondep_type
-++    (Stephen Dolan, review by Gabriel Scherer)
-++  
-++@@ -51,7 +50,7 @@
-++  - #12046: Flush stderr when tracing the parser
-++    (Hugo Heuzard, review by David Allsopp and Nicolás Ojeda Bär)
-++  
-++-@@ -1060,6 +1056,10 @@ Some of those changes will benefit all OCaml packages.
-+++@@ -1060,6 +1057,10 @@ Some of those changes will benefit all OCaml packages.
-++    emitting stack reallocation code before the body of the function.
-++    (Xavier Leroy, review by KC Sivaramakrishnan)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10685,10 +10613,10 @@ index 0000000000..f8d659c858
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 17eeb75b53..99dd2aa0c4 100644
++index 4abc4f5b36..8671865729 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -187,6 +187,7 @@ Working version
++@@ -191,6 +191,7 @@ Working version
 +   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
 +   and Gabriel Scherer)
 + 
@@ -10696,7 +10624,7 @@ index 0000000000..f8d659c858
 + OCaml 5.1.0
 + ---------------
 + 
-+@@ -1637,6 +1638,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1641,6 +1642,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10732,7 +10660,7 @@ index 0000000000..f8d659c858
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1672,13 +1702,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1676,13 +1706,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10748,7 +10676,7 @@ index 0000000000..f8d659c858
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1785,6 +1815,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1789,6 +1819,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10758,7 +10686,7 @@ index 0000000000..f8d659c858
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2048,6 +2081,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2052,6 +2085,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -21226,7 +21154,39 @@ index 0000000000..f8d659c858
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
 +++      # Now reconfigure ocamltest to run in bytecode-only mode
 +++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/oca
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BU
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
