@@ -7,6 +7,8 @@ OCaml 4.14 maintenance version
   "unexpected error".
   (Damien Doligez, review by Sébastien Hinderer)
 
+### Internal/compiler-libs changes:
+
 - #12896: Simplify the compilation of custom bytecode runtimes by explicitly
   compiling the primitives file before calling the linker.
   (David Allsopp, review by Vincent Laviron)
