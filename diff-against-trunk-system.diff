@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1d0cca2de0
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:48:07.957914273 +0100
+++++ b	2023-09-28 18:48:07.973914846 +0100
++@@ -1,7 +1,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -826,8 +826,10 @@ Some of those changes will benefit all OCaml packages.
+++@@ -827,8 +827,10 @@ Some of those changes will benefit all OCaml packages.
++    opened for checking
++    (Hugo Heuzard, review by Nicolás Ojeda Bär)
++  
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,7 +28,7 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 4abc4f5b36..8671865729 100644
+index 57bd6c54c0..3e584ba0a7 100644
 --- a/Changes
 +++ b/Changes
 @@ -191,6 +191,7 @@ Working version
@@ -25,7 +39,7 @@ index 4abc4f5b36..8671865729 100644
  OCaml 5.1.0
  ---------------
  
-@@ -1641,6 +1642,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1643,6 +1644,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -61,7 +75,7 @@ index 4abc4f5b36..8671865729 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1676,13 +1706,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1678,13 +1708,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -77,7 +91,7 @@ index 4abc4f5b36..8671865729 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1789,6 +1819,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1791,6 +1821,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -87,7 +101,7 @@ index 4abc4f5b36..8671865729 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2052,6 +2085,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2054,6 +2087,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -10593,13 +10607,27 @@ index 0000000000..e9d43c92fa
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..5677a0aa18
+index 0000000000..33cfb7e3a9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10590 @@
+@@ -0,0 +1,10594 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1d0cca2de0
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:48:07.957914273 +0100
++++++ b	2023-09-28 18:48:07.973914846 +0100
+++@@ -1,7 +1,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -826,8 +826,10 @@ Some of those changes will benefit all OCaml packages.
++++@@ -827,8 +827,10 @@ Some of those changes will benefit all OCaml packages.
+++    opened for checking
+++    (Hugo Heuzard, review by Nicolás Ojeda Bär)
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10613,7 +10641,7 @@ index 0000000000..5677a0aa18
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 4abc4f5b36..8671865729 100644
++index 57bd6c54c0..3e584ba0a7 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -191,6 +191,7 @@ Working version
@@ -10624,7 +10652,7 @@ index 0000000000..5677a0aa18
 + OCaml 5.1.0
 + ---------------
 + 
-+@@ -1641,6 +1642,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1643,6 +1644,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10660,7 +10688,7 @@ index 0000000000..5677a0aa18
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1676,13 +1706,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1678,13 +1708,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10676,7 +10704,7 @@ index 0000000000..5677a0aa18
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1789,6 +1819,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1791,6 +1821,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10686,7 +10714,7 @@ index 0000000000..5677a0aa18
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2052,6 +2085,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2054,6 +2087,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -21176,17 +21204,7 @@ index 0000000000..5677a0aa18
 ++   *)
 ++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 ++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BU
+++-    if [[ $PORT
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

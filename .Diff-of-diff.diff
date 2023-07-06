@@ -1,0 +1,11 @@
+--- a	2023-09-28 18:48:07.957914273 +0100
++++ b	2023-09-28 18:48:07.973914846 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -826,8 +826,10 @@ Some of those changes will benefit all OCaml packages.
++@@ -827,8 +827,10 @@ Some of those changes will benefit all OCaml packages.
+    opened for checking
+    (Hugo Heuzard, review by Nicolás Ojeda Bär)
+  
