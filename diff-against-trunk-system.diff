@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b6c2dac5f1
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:48:08.269925427 +0100
-++++ b	2023-09-28 18:48:08.285925999 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -640,6 +640,10 @@ Some of those changes will benefit all OCaml packages.
-++@@ -641,6 +641,10 @@ Some of those changes will benefit all OCaml packages.
-+    `pp_print_newline` flushes its newline
-+    (Florian Angeletti, review by Gabriel Scherer)
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -28,7 +14,7 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index bbb56a0246..7d4c6c8451 100644
+index 4d3b41ed3c..73e8ea4d4b 100644
 --- a/Changes
 +++ b/Changes
 @@ -191,6 +191,7 @@ Working version
@@ -10607,27 +10593,13 @@ index 0000000000..e9d43c92fa
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0323adf27d
+index 0000000000..48e570e149
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10592 @@
+@@ -0,0 +1,10590 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b6c2dac5f1
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:48:08.269925427 +0100
-+++++ b	2023-09-28 18:48:08.285925999 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -640,6 +640,10 @@ Some of those changes will benefit all OCaml packages.
-+++@@ -641,6 +641,10 @@ Some of those changes will benefit all OCaml packages.
-++    `pp_print_newline` flushes its newline
-++    (Florian Angeletti, review by Gabriel Scherer)
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10641,7 +10613,7 @@ index 0000000000..0323adf27d
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index bbb56a0246..7d4c6c8451 100644
++index 4d3b41ed3c..73e8ea4d4b 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -191,6 +191,7 @@ Working version
@@ -21203,6 +21175,19 @@ index 0000000000..0323adf27d
 ++@@ -181,7 +192,7 @@ case "$1" in
 ++   *)
 ++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BU
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
