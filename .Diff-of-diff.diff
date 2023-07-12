@@ -1,56 +1,405 @@
---- a	2023-09-28 18:48:10.770014749 +0100
-+++ b	2023-09-28 18:48:10.774014892 +0100
-@@ -1,11 +1,7 @@
--diff --git a/boot/ocamlc b/boot/ocamlc
--Binary files a/boot/ocamlc and b/boot/ocamlc differ
--diff --git a/boot/ocamllex b/boot/ocamllex
--Binary files a/boot/ocamllex and b/boot/ocamllex differ
- diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
- --- a/stdlib/bigarray.ml
- +++ b/stdlib/bigarray.ml
--@@ -32,8 +32,10 @@ type nativeint_elt = Nativeint_elt
-+@@ -32,6 +32,9 @@ type nativeint_elt = Nativeint_elt
-  type complex32_elt = Complex32_elt
-  type complex64_elt = Complex64_elt
+--- a	2023-09-28 18:48:11.122027318 +0100
++++ b	2023-09-28 18:48:11.158028603 +0100
+@@ -59,7 +59,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -366,6 +366,11 @@ Some of those changes will benefit all OCaml packages.
++@@ -367,6 +367,11 @@ Some of those changes will benefit all OCaml packages.
+    `ocamlmklib.opt` are no longer installed to `$BINDIR`.
+    (Xavier Leroy, review by Gabriel Scherer)
   
-@@ -13,18 +9,8 @@
- +   enumeration in bigarray.h *)
+@@ -74,9 +74,9 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -670,6 +670,7 @@ runtime_COMMON_C_SOURCES = \
++@@ -665,6 +665,7 @@ runtime_COMMON_C_SOURCES = \
++   startup_aux \
+    str \
+-   sync \
+    sys \
+ +  $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
+    $(UNIX_OR_WIN32) \
+@@ -158,32 +158,39 @@
+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+ --- a/asmcomp/amd64/emit.mlp
+ +++ b/asmcomp/amd64/emit.mlp
+-@@ -740,6 +740,9 @@ let emit_instr env fallthrough i =
+-       I.mov (arg32 i 0) (res32 i 0)
+-   | Lop (Idls_get) ->
++@@ -771,6 +771,9 @@ let emit_instr env fallthrough i =
++ (* BACKPORT
+        I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
++ *)
+ +  | Lop (Ireturn_addr) ->
+ +      let offset = frame_size env - 8 in
+ +      I.mov (mem64 QWORD offset RSP) (res i 0)
+    | Lreloadretaddr ->
+        ()
+    | Lreturn ->
+-@@ -862,10 +865,17 @@ let emit_instr env fallthrough i =
+-           emit_call "caml_reraise_exn";
++@@ -912,15 +915,22 @@ let emit_instr env fallthrough i =
++ (* BACKPORT END *)
+            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+        | Lambda.Raise_notrace ->
+--          I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+--          I.pop (domain_field Domainstate.Domain_exn_handler);
+--          I.pop r11;
+--          I.jmp r11
+ +          if Config.tsan then begin
+ +            (* TSan requires to signal function exits upon exceptions,
+ +               even with [Raise_notrace] *)
+ +            emit_call "caml_tsan_raise_notrace_exn";
+ +            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+ +          end else begin
++ (* BACKPORT BEGIN
++-          I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
++-          I.pop (domain_field Domainstate.Domain_exn_handler);
+ +            I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+ +            I.pop (domain_field Domainstate.Domain_exn_handler);
++ *)
++-          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
++-          I.pop (domain_field Domainstate.Domain_exception_pointer);
+++            I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
+++            I.pop (domain_field Domainstate.Domain_exception_pointer);
++ (* BACKPORT END *)
++-          I.pop r11;
++-          I.jmp r11
+ +            I.pop r11;
+ +            I.jmp r11
+ +          end
+@@ -193,7 +200,7 @@
+ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+ --- a/asmcomp/arm64/emit.mlp
+ +++ b/asmcomp/arm64/emit.mlp
+-@@ -513,6 +513,10 @@ module BR = Branch_relaxation.Make (struct
++@@ -529,6 +529,10 @@ module BR = Branch_relaxation.Make (struct
+      | Lop (Ispecific Imove32) -> 1
+      | Lop (Ispecific (Isignext _)) -> 1
+      | Lop (Idls_get) -> 1
+@@ -204,10 +211,10 @@
+      | Lreloadretaddr -> 0
+      | Lreturn -> epilogue_size f
+      | Llabel _ -> 0
+-@@ -958,6 +962,10 @@ let emit_instr env i =
+-     | Lop(Idls_get) ->
++@@ -1001,6 +1005,10 @@ let emit_instr env i =
+          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+          `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
++ *)
+ +    | Lop(Ireturn_addr) ->
+ +        invalid_arg (
+ +          "Support for Ireturn_addr is not implemented on architecture "
+@@ -237,8 +244,8 @@
+ +  compile_phrase entry;
+    let units = List.map (fun (info,_,_) -> info) units_list in
+    List.iter compile_phrase
+-     (Cmm_helpers.emit_preallocated_blocks [] (* add gc_roots (for dynlink) *)
+-@@ -313,9 +324,10 @@ let call_linker file_list startup_file output_name =
++ (* BACKPORT BEGIN
++@@ -321,9 +332,10 @@ let call_linker file_list startup_file output_name =
+    and main_obj_runtime = !Clflags.output_complete_object
+    in
+    let files = startup_file :: (List.rev file_list) in
+@@ -250,7 +257,7 @@
+        (if !Clflags.nopervasives || (main_obj_runtime && not main_dll)
+         then "" else Config.native_c_libraries)
+      else
+-@@ -326,7 +338,7 @@ let call_linker file_list startup_file output_name =
++@@ -334,7 +346,7 @@ let call_linker file_list startup_file output_name =
+      else if !Clflags.output_c_object then Ccomp.Partial
+      else Ccomp.Exe
+    in
+@@ -451,10 +458,10 @@
+      | Lreloadretaddr -> 2
+      | Lreturn -> 2
+      | Llabel _ -> 0
+-@@ -778,6 +782,10 @@ let emit_instr env i =
+-     | Lop (Idls_get) ->
+-         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+-         `	ld {emit_reg i.res.(0)}, {emit_int offset}(30)\n`
++@@ -784,6 +788,10 @@ let emit_instr env i =
++ *)
++         assert false
++ (* BACKPORT END *)
+ +    | Lop (Ireturn_addr) ->
+ +        invalid_arg (
+ +          "Support for Ireturn_addr is not implemented on architecture "
+@@ -487,10 +494,10 @@
+ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
+ --- a/asmcomp/riscv/emit.mlp
+ +++ b/asmcomp/riscv/emit.mlp
+-@@ -500,6 +500,10 @@ let emit_instr env i =
+-   | Lop (Idls_get) ->
+-       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+-       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
++@@ -506,6 +506,10 @@ let emit_instr env i =
++ *)
++       assert false
++ (* BACKPORT END *)
+ +  | Lop (Ireturn_addr) ->
+ +      invalid_arg (
+ +        "Support for Ireturn_addr is not implemented on architecture "
+@@ -501,10 +508,10 @@
+ diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
+ --- a/asmcomp/s390x/emit.mlp
+ +++ b/asmcomp/s390x/emit.mlp
+-@@ -595,6 +595,10 @@ let emit_instr env i =
+-     | Lop (Idls_get) ->
+-         let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+-         `	lg	{emit_reg i.res.(0)}, {emit_int ofs}(%r10)\n`
++@@ -601,6 +601,10 @@ let emit_instr env i =
++ *)
++         assert false
++ (* BACKPORT END *)
+ +    | Lop (Ireturn_addr) ->
+ +        invalid_arg (
+ +          "Support for Ireturn_addr is not implemented on architecture "
+@@ -943,7 +950,7 @@
+  AC_SUBST([ocamlc_cflags])
+  AC_SUBST([ocamlc_cppflags])
+  AC_SUBST([flexdll_source_dir])
+-@@ -342,6 +352,21 @@ AC_ARG_ENABLE([systhreads],
++@@ -345,6 +355,21 @@ AC_ARG_ENABLE([systhreads],
+    [AS_HELP_STRING([--disable-systhreads],
+      [disable the Win32/POSIX threads library])])
+  
+@@ -965,7 +972,7 @@
+  AC_ARG_ENABLE([graph-lib], [],
+    [AS_IF([test "x$enableval" != 'xno'],
+      [AC_MSG_ERROR(m4_normalize([The graphics library is no longer distributed
+-@@ -1200,6 +1225,7 @@ model=default
++@@ -1213,6 +1238,7 @@ model=default
+  system=unknown
+  
+  has_native_backend=no
+@@ -973,7 +980,7 @@
+  AS_CASE([$host],
+    [[i[3456]86-*-linux*]],
+      [arch=i386; system=linux_elf],
+-@@ -1580,6 +1606,99 @@ but no proper monotonic clock source was found.])
++@@ -1597,6 +1623,99 @@ but no proper monotonic clock source was found.])
+      )]
+  )
+  
+@@ -1073,7 +1080,7 @@
+  ## Sockets
+  
+  ## TODO: check whether the different libraries are really useful
+-@@ -2227,7 +2346,7 @@ AS_IF([test "$ccomptype" != "msvc"],
++@@ -2281,7 +2400,7 @@ AS_IF([test "$ccomptype" != "msvc"],
+  
+  oc_cflags="$common_cflags $internal_cflags"
+  oc_cppflags="$common_cppflags $internal_cppflags"
+@@ -1082,7 +1089,7 @@
+  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
+  
+  AS_CASE([$host],
+-@@ -2240,6 +2359,9 @@ AS_CASE([$host],
++@@ -2294,6 +2413,9 @@ AS_CASE([$host],
+  
+  AC_CONFIG_COMMANDS_PRE([cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"])
+  
+@@ -1107,7 +1114,7 @@
+ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
+ --- a/ocamltest/builtin_actions.ml
+ +++ b/ocamltest/builtin_actions.ml
+-@@ -211,6 +211,20 @@ let frame_pointers = make
++@@ -218,6 +218,20 @@ let frame_pointers = make
+       "frame-pointers available"
+       "frame-pointers not available")
+  
+@@ -1128,7 +1135,7 @@
+  let has_symlink = make
+    ~name:"has_symlink"
+    ~description:"Pass if symbolic links are available"
+-@@ -346,4 +360,6 @@ let _ =
++@@ -354,4 +368,6 @@ let _ =
+      frame_pointers;
+      file_exists;
+      copy;
+@@ -1138,8 +1145,8 @@
+ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
+ --- a/ocamltest/ocamltest_config.ml.in
+ +++ b/ocamltest/ocamltest_config.ml.in
+-@@ -91,3 +91,5 @@ let function_sections = @function_sections@
+- let instrumented_runtime = @instrumented_runtime@
++@@ -93,3 +93,5 @@ let instrumented_runtime = @instrumented_runtime@
++ let naked_pointers = @naked_pointers@
+  
+  let frame_pointers = @frame_pointers@
  +
-  type ('a, 'b) kind =
---    Float16 : (float, float16_elt) kind
-    | Float32 : (float, float32_elt) kind
-    | Float64 : (float, float64_elt) kind
--   | Int8_signed : (int, int8_signed_elt) kind
--@@ -47,6 +49,7 @@ type ('a, 'b) kind =
--   | Complex32 : (Complex.t, complex32_elt) kind
--   | Complex64 : (Complex.t, complex64_elt) kind
--   | Char : (char, int8_unsigned_elt) kind
--+  | Float16 : (float, float16_elt) kind
+@@ -1147,7 +1154,7 @@
+ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
+ --- a/ocamltest/ocamltest_config.mli
+ +++ b/ocamltest/ocamltest_config.mli
+-@@ -127,3 +127,6 @@ val instrumented_runtime : bool
++@@ -130,3 +130,6 @@ val naked_pointers : bool
+  
+  val frame_pointers : bool
+  (** Whether frame-pointers have been enabled at configure time *)
+@@ -1169,6 +1176,31 @@
+      }
+    }
+  
++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
++--- a/runtime/HACKING.adoc
+++++ b/runtime/HACKING.adoc
++@@ -148,6 +148,21 @@ TODO: it would be nice to migrate some information here.
++ 
++ == Compiling with sanitizers ==
++ 
+++=== ThreadSanitizer ===
+++
+++You can instrument the runtime to detect data races in it, by adding
+++`-fsanitize=thread` to the `CFLAGS`. It will make the compiler build rather
+++slow.
+++
+++Note that this is different from passing `--enable-tsan` to the configure
+++script. `--enable-tsan` not only instruments the runtime, but also the code
+++generated by ocamlopt. In addition, it suppresses a number of race reports from
+++the runtime to avoid clogging the output of user programs, and it gives to the
+++TSan runtime a slightly altered version of the real memory accesses (see
+++#12114).
+++
+++=== Other sanitizers ===
+++
++ TODO: I would be curious to know!
++ 
++ (For the brave there are some scripts in
+ diff --git a/testsuite/tests/asmgen/soli.cmm b/testsuite/tests/asmgen/soli.cmm
+ --- a/testsuite/tests/asmgen/soli.cmm
+ +++ b/testsuite/tests/asmgen/soli.cmm
+@@ -1205,9 +1237,10 @@
+ diff --git a/testsuite/tests/lf_skiplist/test_parallel.ml b/testsuite/tests/lf_skiplist/test_parallel.ml
+ --- a/testsuite/tests/lf_skiplist/test_parallel.ml
+ +++ b/testsuite/tests/lf_skiplist/test_parallel.ml
+-@@ -1,5 +1,12 @@
+- (* TEST
++@@ -2,6 +2,13 @@
+   modules = "stubs.c";
++  reason = "OCaml 5 only";
++  skip;
+ + no-tsan; (* Takes too much time and memory with tsan *)
+ + {
+ +   bytecode;
+@@ -1221,9 +1254,10 @@
+ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
+ --- a/testsuite/tests/lib-marshal/intext_par.ml
+ +++ b/testsuite/tests/lib-marshal/intext_par.ml
+-@@ -1,5 +1,12 @@
+- (* TEST
++@@ -2,6 +2,13 @@
+   modules = "intextaux_par.c";
++  reason = "OCaml 5 only";
++  skip;
+ + no-tsan; (* Takes too much time and memory with tsan *)
+ + {
+ +   bytecode;
+@@ -1237,9 +1271,9 @@
+ diff --git a/testsuite/tests/lib-systhreads/boundscheck.ml b/testsuite/tests/lib-systhreads/boundscheck.ml
+ --- a/testsuite/tests/lib-systhreads/boundscheck.ml
+ +++ b/testsuite/tests/lib-systhreads/boundscheck.ml
+-@@ -1,6 +1,7 @@
+- (* TEST
+-  include systhreads;
++@@ -3,6 +3,7 @@
++  reason = "OCaml 5 only";
++  skip;
+   hassysthreads;
+ + no-tsan; (* See https://github.com/ocaml-multicore/ocaml-tsan/issues/31 *)
+   {
+@@ -1270,9 +1304,9 @@
+ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
+ --- a/testsuite/tests/memory-model/forbidden.ml
+ +++ b/testsuite/tests/memory-model/forbidden.ml
+-@@ -1,6 +1,7 @@
+- (* TEST
+-  modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
++@@ -3,6 +3,7 @@
++  reason = "OCaml 5 only";
++  skip;
+   not-bsd;
+ + no-tsan; (* tsan detects the intentional data races and fails *)
+   {
+@@ -1281,9 +1315,10 @@
+ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+ --- a/testsuite/tests/memory-model/publish.ml
+ +++ b/testsuite/tests/memory-model/publish.ml
+-@@ -1,5 +1,6 @@
+- (* TEST
++@@ -2,6 +2,7 @@
+   modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
++  reason = "OCaml 5 only";
++  skip;
+ + no-tsan; (* tsan detects data races and fails *)
+   not-bsd;
+   {
+@@ -1316,9 +1351,11 @@
+ diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
+ --- a/testsuite/tests/parallel/pingpong.ml
+ +++ b/testsuite/tests/parallel/pingpong.ml
+-@@ -1,4 +1,12 @@
+--(* TEST *)
+-+(* TEST
++@@ -1,7 +1,14 @@
++ (* TEST
++  reason = "OCaml 5 only";
++  skip;
++- *)
+ + no-tsan; (* TSan detects the intentional data race *)
+ + {
+ +   bytecode;
+@@ -2656,18 +2693,18 @@
+ diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+ --- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+ +++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+-@@ -1,4 +1,10 @@
+--(* TEST *)
+-+(* TEST
++@@ -1,6 +1,11 @@
++ (* TEST
++  reason = "OCaml 5 only";
++  skip;
+ + {
+ +   bytecode;
+ + }{
+ +   native;
+ + }
+-+*)
++ *)
+  
+  (* Testing unsynchronized, parallel Weak usage *)
 - 
-- type c_layout = C_layout_typ
-- type fortran_layout = Fortran_layout_typ (**)
- @@ -55,9 +58,6 @@ type 'a layout =
-      C_layout: c_layout layout
-    | Fortran_layout: fortran_layout layout
-@@ -38,19 +24,12 @@
- diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
- --- a/stdlib/bigarray.mli
- +++ b/stdlib/bigarray.mli
--@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
-- type complex64_elt = Complex64_elt
-- 
-- type ('a, 'b) kind =
---    Float16 : (float, float16_elt) kind
--   | Float32 : (float, float32_elt) kind
--   | Float64 : (float, float64_elt) kind
--   | Int8_signed : (int, int8_signed_elt) kind
--@@ -121,7 +120,8 @@ type ('a, 'b) kind =
-+@@ -120,8 +120,8 @@ type ('a, 'b) kind =
-    | Nativeint : (nativeint, nativeint_elt) kind
-    | Complex32 : (Complex.t, complex32_elt) kind
-    | Complex64 : (Complex.t, complex64_elt) kind
- -  | Char : (char, int8_unsigned_elt) kind (**)
-+-  | Float16 : (float, float16_elt) kind
- +  | Char : (char, int8_unsigned_elt) kind
- +  | Float16 : (float, float16_elt) kind  (**)
-  (** To each element kind is associated an OCaml type, which is
+ diff --git a/tools/check-symbol-names b/tools/check-symbol-names
+ --- a/tools/check-symbol-names
+ +++ b/tools/check-symbol-names
+@@ -2679,13 +2716,13 @@
+ +$2 ~ /^___?tsan_default_suppressions$/ { next }
+ +# ignore custom handlers of volatile reads/writes for TSan
+ +$2 ~ /^___?tsan(_unaligned)?_volatile_(read|write)[0-9]+$/ { next }
+- # print the rest
+- { found=1; print $1 " " $2 " " $3 }
+- # fail if there were any results
++ # windows unicode support
++ $2 ~ /^_?win_multi_byte_to_wide_char$/ { next }
++ $2 ~ /^_?win_wide_char_to_multi_byte$/ { next }
+ diff --git a/utils/config.common.ml b/utils/config.common.ml
+ --- a/utils/config.common.ml
+ +++ b/utils/config.common.ml
+-@@ -92,6 +92,7 @@ let configuration_variables () =
++@@ -97,6 +97,7 @@ let configuration_variables () =
+    p "native_c_compiler" native_c_compiler;
+    p "bytecomp_c_libraries" bytecomp_c_libraries;
+    p "native_c_libraries" native_c_libraries;
+@@ -2693,7 +2730,7 @@
+    p "native_pack_linker" native_pack_linker;
+    p_bool "native_compiler" native_compiler;
+    p "architecture" architecture;
+-@@ -118,6 +119,7 @@ let configuration_variables () =
++@@ -123,6 +124,7 @@ let configuration_variables () =
+    p_bool "flat_float_array" flat_float_array;
+    p_bool "function_sections" function_sections;
+    p_bool "afl_instrument" afl_instrument;

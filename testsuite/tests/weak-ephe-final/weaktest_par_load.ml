@@ -1,6 +1,11 @@
 (* TEST
  reason = "OCaml 5 only";
  skip;
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 (* Testing unsynchronized, parallel Weak usage *)

@@ -66,7 +66,7 @@ index 333bcad1af..94ee1cfe3d 100644
  cache:
    - C:\cygwin64\var\cache\setup
 diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-index 0bc17bc281..faae83cf0e 100644
+index 1af3b08559..a84122bfec 100644
 --- a/ocamltest/builtin_actions.ml
 +++ b/ocamltest/builtin_actions.ml
 @@ -204,6 +204,13 @@ let function_sections = make
@@ -83,7 +83,7 @@ index 0bc17bc281..faae83cf0e 100644
  let frame_pointers = make
    ~name:"frame_pointers"
    ~description:"Pass if frame pointers are available"
-@@ -343,6 +350,7 @@ let _ =
+@@ -357,6 +364,7 @@ let _ =
      arch_i386;
      arch_power;
      function_sections;
@@ -92,21 +92,23 @@ index 0bc17bc281..faae83cf0e 100644
      file_exists;
      copy;
 diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
-index 95dcba707a..3e5e06db72 100644
+index b76bac5701..16276799c3 100644
 --- a/ocamltest/ocamltest_config.ml.in
 +++ b/ocamltest/ocamltest_config.ml.in
-@@ -90,4 +90,6 @@ let function_sections = @function_sections@
+@@ -90,6 +90,8 @@ let function_sections = @function_sections@
  
  let instrumented_runtime = @instrumented_runtime@
  
 +let naked_pointers = @naked_pointers@
 +
  let frame_pointers = @frame_pointers@
+ 
+ let tsan = @tsan@
 diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
-index cbe1432466..d20ec18ff3 100644
+index 0abe7f1406..8fa8a7c19d 100644
 --- a/ocamltest/ocamltest_config.mli
 +++ b/ocamltest/ocamltest_config.mli
-@@ -125,5 +125,8 @@ val function_sections : bool
+@@ -125,6 +125,9 @@ val function_sections : bool
  val instrumented_runtime : bool
  (** Whether the instrumented runtime is available *)
  
@@ -115,11 +117,12 @@ index cbe1432466..d20ec18ff3 100644
 +
  val frame_pointers : bool
  (** Whether frame-pointers have been enabled at configure time *)
+ 
 diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
-index 80eac2d727..f8f264f471 100644
+index 60a0e5f9df..efeb7fb8f0 100644
 --- a/ocamltest/run_unix.c
 +++ b/ocamltest/run_unix.c
-@@ -349,7 +349,9 @@ int run_command(const command_settings *settings)
+@@ -352,7 +352,9 @@ int run_command(const command_settings *settings)
        myperror("fork");
        return -1;
      case 0: /* child process */
@@ -1685,7 +1688,7 @@ index 9a4a19cee7..bdaeed2cef 100644
  
  external test_skiplist_serial : unit -> unit = "test_skiplist_serial"
 diff --git a/testsuite/tests/lf_skiplist/test_parallel.ml b/testsuite/tests/lf_skiplist/test_parallel.ml
-index 1bbd8166bc..c8cb3b1b73 100644
+index 6e3655eb29..56a8ce4718 100644
 --- a/testsuite/tests/lf_skiplist/test_parallel.ml
 +++ b/testsuite/tests/lf_skiplist/test_parallel.ml
 @@ -1,5 +1,7 @@
@@ -1693,9 +1696,9 @@ index 1bbd8166bc..c8cb3b1b73 100644
   modules = "stubs.c";
 + reason = "OCaml 5 only";
 + skip;
- *)
- 
- external init_skiplist : unit -> unit = "init_skiplist"
+  no-tsan; (* Takes too much time and memory with tsan *)
+  {
+    bytecode;
 diff --git a/testsuite/tests/lib-bigarray-2/has-gfortran.sh b/testsuite/tests/lib-bigarray-2/has-gfortran.sh
 index 051122113a..7eef1e662e 100644
 --- a/testsuite/tests/lib-bigarray-2/has-gfortran.sh
@@ -1885,7 +1888,7 @@ index 0ead3627b5..4ec11d2ca1 100644
  let () =
    let fmt_key = Format.synchronized_formatter_of_out_channel stdout in
 diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
-index 3aade5bacc..5ff07ee2de 100644
+index 3e2eae0198..bc9df6fa0f 100644
 --- a/testsuite/tests/lib-marshal/intext_par.ml
 +++ b/testsuite/tests/lib-marshal/intext_par.ml
 @@ -1,5 +1,7 @@
@@ -1893,9 +1896,9 @@ index 3aade5bacc..5ff07ee2de 100644
   modules = "intextaux_par.c";
 + reason = "OCaml 5 only";
 + skip;
- *)
- 
- (* Test for output_value / input_value *)
+  no-tsan; (* Takes too much time and memory with tsan *)
+  {
+    bytecode;
 diff --git a/testsuite/tests/lib-obj/reachable_words_np.ml b/testsuite/tests/lib-obj/reachable_words_np.ml
 new file mode 100644
 index 0000000000..2bad8f2369
@@ -2203,7 +2206,7 @@ index 5cd8bdea60..d038d9a347 100644
  (* Test Mutex.try_lock *)
  
 diff --git a/testsuite/tests/lib-systhreads/boundscheck.ml b/testsuite/tests/lib-systhreads/boundscheck.ml
-index 254b89ba08..190256961b 100644
+index 757a73e7af..91fe89f24c 100644
 --- a/testsuite/tests/lib-systhreads/boundscheck.ml
 +++ b/testsuite/tests/lib-systhreads/boundscheck.ml
 @@ -1,5 +1,7 @@
@@ -2212,8 +2215,8 @@ index 254b89ba08..190256961b 100644
 + reason = "OCaml 5 only";
 + skip;
   hassysthreads;
+  no-tsan; (* See https://github.com/ocaml-multicore/ocaml-tsan/issues/31 *)
   {
-    bytecode;
 diff --git a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml b/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
 index 7a8e019024..199a0e3612 100644
 --- a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
@@ -2314,7 +2317,7 @@ index 3d36ad1935..1a8a4b7ed7 100644
     bytecode;
   }{
 diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
-index dac3be076f..26d0852a86 100644
+index 9227a2f559..8952d39633 100644
 --- a/testsuite/tests/memory-model/forbidden.ml
 +++ b/testsuite/tests/memory-model/forbidden.ml
 @@ -1,5 +1,7 @@
@@ -2323,10 +2326,10 @@ index dac3be076f..26d0852a86 100644
 + reason = "OCaml 5 only";
 + skip;
   not-bsd;
+  no-tsan; (* tsan detects the intentional data races and fails *)
   {
-    bytecode;
 diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
-index e5750d3636..5392e042c7 100644
+index a857c6cf3c..8a8aa6946b 100644
 --- a/testsuite/tests/memory-model/publish.ml
 +++ b/testsuite/tests/memory-model/publish.ml
 @@ -1,5 +1,7 @@
@@ -2334,9 +2337,9 @@ index e5750d3636..5392e042c7 100644
   modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
 + reason = "OCaml 5 only";
 + skip;
+  no-tsan; (* tsan detects data races and fails *)
   not-bsd;
   {
-    not-windows;
 diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
 index b2c36f6765..304b06bdf7 100644
 --- a/testsuite/tests/parallel/atomics.ml
@@ -2539,18 +2542,16 @@ index a2e1130a7b..f69500eb6d 100644
   {
     bytecode;
 diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
-index 8f900d6de3..fe265e71cb 100644
+index eb43734aab..51c2d09427 100644
 --- a/testsuite/tests/parallel/pingpong.ml
 +++ b/testsuite/tests/parallel/pingpong.ml
-@@ -1,4 +1,7 @@
--(* TEST *)
-+(* TEST
+@@ -1,4 +1,6 @@
+ (* TEST
 + reason = "OCaml 5 only";
 + skip;
-+ *)
- 
- let r = ref (Some 0)
- 
+  no-tsan; (* TSan detects the intentional data race *)
+  {
+    bytecode;
 diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
 index e0774ec642..33b1f76ab5 100644
 --- a/testsuite/tests/parallel/poll.ml
@@ -3810,18 +3811,16 @@ index b42d399907..05bae59c69 100644
     until the random failures have been investigated.
  *)
 diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-index f5e0711b79..70041e3788 100644
+index 9d9b06ff57..ad6d224bfb 100644
 --- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
 +++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
-@@ -1,4 +1,7 @@
--(* TEST *)
-+(* TEST
+@@ -1,4 +1,6 @@
+ (* TEST
 + reason = "OCaml 5 only";
 + skip;
-+*)
- 
- (* Testing unsynchronized, parallel Weak usage *)
- 
+  {
+    bytecode;
+  }{
 diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
 index 6a6163279e..7fa37526d5 100755
 --- a/tools/ci/actions/runner.sh

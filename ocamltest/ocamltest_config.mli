@@ -130,3 +130,6 @@ val naked_pointers : bool
 
 val frame_pointers : bool
 (** Whether frame-pointers have been enabled at configure time *)
+
+val tsan : bool
+(** Whether ThreadSanitizer support has been enabled at configure time *)

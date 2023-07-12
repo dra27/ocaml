@@ -3,6 +3,7 @@
  reason = "OCaml 5 only";
  skip;
  not-bsd;
+ no-tsan; (* tsan detects the intentional data races and fails *)
  {
    bytecode;
  }{

@@ -1,65 +1,414 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..1f70d3b5f2
+index 0000000000..69e5147421
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,56 @@
-+--- a	2023-09-28 18:48:10.770014749 +0100
-++++ b	2023-09-28 18:48:10.774014892 +0100
-+@@ -1,11 +1,7 @@
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+-diff --git a/boot/ocamllex b/boot/ocamllex
-+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-+ diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
-+ --- a/stdlib/bigarray.ml
-+ +++ b/stdlib/bigarray.ml
-+-@@ -32,8 +32,10 @@ type nativeint_elt = Nativeint_elt
-++@@ -32,6 +32,9 @@ type nativeint_elt = Nativeint_elt
-+  type complex32_elt = Complex32_elt
-+  type complex64_elt = Complex64_elt
+@@ -0,0 +1,405 @@
++--- a	2023-09-28 18:48:11.122027318 +0100
+++++ b	2023-09-28 18:48:11.158028603 +0100
++@@ -59,7 +59,7 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -366,6 +366,11 @@ Some of those changes will benefit all OCaml packages.
+++@@ -367,6 +367,11 @@ Some of those changes will benefit all OCaml packages.
++    `ocamlmklib.opt` are no longer installed to `$BINDIR`.
++    (Xavier Leroy, review by Gabriel Scherer)
 +  
-+@@ -13,18 +9,8 @@
-+ +   enumeration in bigarray.h *)
++@@ -74,9 +74,9 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -670,6 +670,7 @@ runtime_COMMON_C_SOURCES = \
+++@@ -665,6 +665,7 @@ runtime_COMMON_C_SOURCES = \
+++   startup_aux \
++    str \
++-   sync \
++    sys \
++ +  $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
++    $(UNIX_OR_WIN32) \
++@@ -158,32 +158,39 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -740,6 +740,9 @@ let emit_instr env fallthrough i =
++-       I.mov (arg32 i 0) (res32 i 0)
++-   | Lop (Idls_get) ->
+++@@ -771,6 +771,9 @@ let emit_instr env fallthrough i =
+++ (* BACKPORT
++        I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
+++ *)
++ +  | Lop (Ireturn_addr) ->
++ +      let offset = frame_size env - 8 in
++ +      I.mov (mem64 QWORD offset RSP) (res i 0)
++    | Lreloadretaddr ->
++        ()
++    | Lreturn ->
++-@@ -862,10 +865,17 @@ let emit_instr env fallthrough i =
++-           emit_call "caml_reraise_exn";
+++@@ -912,15 +915,22 @@ let emit_instr env fallthrough i =
+++ (* BACKPORT END *)
++            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
++        | Lambda.Raise_notrace ->
++--          I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
++--          I.pop (domain_field Domainstate.Domain_exn_handler);
++--          I.pop r11;
++--          I.jmp r11
++ +          if Config.tsan then begin
++ +            (* TSan requires to signal function exits upon exceptions,
++ +               even with [Raise_notrace] *)
++ +            emit_call "caml_tsan_raise_notrace_exn";
++ +            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
++ +          end else begin
+++ (* BACKPORT BEGIN
+++-          I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+++-          I.pop (domain_field Domainstate.Domain_exn_handler);
++ +            I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
++ +            I.pop (domain_field Domainstate.Domain_exn_handler);
+++ *)
+++-          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
+++-          I.pop (domain_field Domainstate.Domain_exception_pointer);
++++            I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
++++            I.pop (domain_field Domainstate.Domain_exception_pointer);
+++ (* BACKPORT END *)
+++-          I.pop r11;
+++-          I.jmp r11
++ +            I.pop r11;
++ +            I.jmp r11
++ +          end
++@@ -193,7 +200,7 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -513,6 +513,10 @@ module BR = Branch_relaxation.Make (struct
+++@@ -529,6 +529,10 @@ module BR = Branch_relaxation.Make (struct
++      | Lop (Ispecific Imove32) -> 1
++      | Lop (Ispecific (Isignext _)) -> 1
++      | Lop (Idls_get) -> 1
++@@ -204,10 +211,10 @@
++      | Lreloadretaddr -> 0
++      | Lreturn -> epilogue_size f
++      | Llabel _ -> 0
++-@@ -958,6 +962,10 @@ let emit_instr env i =
++-     | Lop(Idls_get) ->
+++@@ -1001,6 +1005,10 @@ let emit_instr env i =
++          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++          `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
+++ *)
++ +    | Lop(Ireturn_addr) ->
++ +        invalid_arg (
++ +          "Support for Ireturn_addr is not implemented on architecture "
++@@ -237,8 +244,8 @@
++ +  compile_phrase entry;
++    let units = List.map (fun (info,_,_) -> info) units_list in
++    List.iter compile_phrase
++-     (Cmm_helpers.emit_preallocated_blocks [] (* add gc_roots (for dynlink) *)
++-@@ -313,9 +324,10 @@ let call_linker file_list startup_file output_name =
+++ (* BACKPORT BEGIN
+++@@ -321,9 +332,10 @@ let call_linker file_list startup_file output_name =
++    and main_obj_runtime = !Clflags.output_complete_object
++    in
++    let files = startup_file :: (List.rev file_list) in
++@@ -250,7 +257,7 @@
++        (if !Clflags.nopervasives || (main_obj_runtime && not main_dll)
++         then "" else Config.native_c_libraries)
++      else
++-@@ -326,7 +338,7 @@ let call_linker file_list startup_file output_name =
+++@@ -334,7 +346,7 @@ let call_linker file_list startup_file output_name =
++      else if !Clflags.output_c_object then Ccomp.Partial
++      else Ccomp.Exe
++    in
++@@ -451,10 +458,10 @@
++      | Lreloadretaddr -> 2
++      | Lreturn -> 2
++      | Llabel _ -> 0
++-@@ -778,6 +782,10 @@ let emit_instr env i =
++-     | Lop (Idls_get) ->
++-         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++-         `	ld {emit_reg i.res.(0)}, {emit_int offset}(30)\n`
+++@@ -784,6 +788,10 @@ let emit_instr env i =
+++ *)
+++         assert false
+++ (* BACKPORT END *)
++ +    | Lop (Ireturn_addr) ->
++ +        invalid_arg (
++ +          "Support for Ireturn_addr is not implemented on architecture "
++@@ -487,10 +494,10 @@
++ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
++ --- a/asmcomp/riscv/emit.mlp
++ +++ b/asmcomp/riscv/emit.mlp
++-@@ -500,6 +500,10 @@ let emit_instr env i =
++-   | Lop (Idls_get) ->
++-       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++-       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
+++@@ -506,6 +506,10 @@ let emit_instr env i =
+++ *)
+++       assert false
+++ (* BACKPORT END *)
++ +  | Lop (Ireturn_addr) ->
++ +      invalid_arg (
++ +        "Support for Ireturn_addr is not implemented on architecture "
++@@ -501,10 +508,10 @@
++ diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
++ --- a/asmcomp/s390x/emit.mlp
++ +++ b/asmcomp/s390x/emit.mlp
++-@@ -595,6 +595,10 @@ let emit_instr env i =
++-     | Lop (Idls_get) ->
++-         let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++-         `	lg	{emit_reg i.res.(0)}, {emit_int ofs}(%r10)\n`
+++@@ -601,6 +601,10 @@ let emit_instr env i =
+++ *)
+++         assert false
+++ (* BACKPORT END *)
++ +    | Lop (Ireturn_addr) ->
++ +        invalid_arg (
++ +          "Support for Ireturn_addr is not implemented on architecture "
++@@ -943,7 +950,7 @@
++  AC_SUBST([ocamlc_cflags])
++  AC_SUBST([ocamlc_cppflags])
++  AC_SUBST([flexdll_source_dir])
++-@@ -342,6 +352,21 @@ AC_ARG_ENABLE([systhreads],
+++@@ -345,6 +355,21 @@ AC_ARG_ENABLE([systhreads],
++    [AS_HELP_STRING([--disable-systhreads],
++      [disable the Win32/POSIX threads library])])
++  
++@@ -965,7 +972,7 @@
++  AC_ARG_ENABLE([graph-lib], [],
++    [AS_IF([test "x$enableval" != 'xno'],
++      [AC_MSG_ERROR(m4_normalize([The graphics library is no longer distributed
++-@@ -1200,6 +1225,7 @@ model=default
+++@@ -1213,6 +1238,7 @@ model=default
++  system=unknown
++  
++  has_native_backend=no
++@@ -973,7 +980,7 @@
++  AS_CASE([$host],
++    [[i[3456]86-*-linux*]],
++      [arch=i386; system=linux_elf],
++-@@ -1580,6 +1606,99 @@ but no proper monotonic clock source was found.])
+++@@ -1597,6 +1623,99 @@ but no proper monotonic clock source was found.])
++      )]
++  )
++  
++@@ -1073,7 +1080,7 @@
++  ## Sockets
++  
++  ## TODO: check whether the different libraries are really useful
++-@@ -2227,7 +2346,7 @@ AS_IF([test "$ccomptype" != "msvc"],
+++@@ -2281,7 +2400,7 @@ AS_IF([test "$ccomptype" != "msvc"],
++  
++  oc_cflags="$common_cflags $internal_cflags"
++  oc_cppflags="$common_cppflags $internal_cppflags"
++@@ -1082,7 +1089,7 @@
++  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
++  
++  AS_CASE([$host],
++-@@ -2240,6 +2359,9 @@ AS_CASE([$host],
+++@@ -2294,6 +2413,9 @@ AS_CASE([$host],
++  
++  AC_CONFIG_COMMANDS_PRE([cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"])
++  
++@@ -1107,7 +1114,7 @@
++ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
++ --- a/ocamltest/builtin_actions.ml
++ +++ b/ocamltest/builtin_actions.ml
++-@@ -211,6 +211,20 @@ let frame_pointers = make
+++@@ -218,6 +218,20 @@ let frame_pointers = make
++       "frame-pointers available"
++       "frame-pointers not available")
++  
++@@ -1128,7 +1135,7 @@
++  let has_symlink = make
++    ~name:"has_symlink"
++    ~description:"Pass if symbolic links are available"
++-@@ -346,4 +360,6 @@ let _ =
+++@@ -354,4 +368,6 @@ let _ =
++      frame_pointers;
++      file_exists;
++      copy;
++@@ -1138,8 +1145,8 @@
++ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
++ --- a/ocamltest/ocamltest_config.ml.in
++ +++ b/ocamltest/ocamltest_config.ml.in
++-@@ -91,3 +91,5 @@ let function_sections = @function_sections@
++- let instrumented_runtime = @instrumented_runtime@
+++@@ -93,3 +93,5 @@ let instrumented_runtime = @instrumented_runtime@
+++ let naked_pointers = @naked_pointers@
++  
++  let frame_pointers = @frame_pointers@
 + +
-+  type ('a, 'b) kind =
-+--    Float16 : (float, float16_elt) kind
-+    | Float32 : (float, float32_elt) kind
-+    | Float64 : (float, float64_elt) kind
-+-   | Int8_signed : (int, int8_signed_elt) kind
-+-@@ -47,6 +49,7 @@ type ('a, 'b) kind =
-+-   | Complex32 : (Complex.t, complex32_elt) kind
-+-   | Complex64 : (Complex.t, complex64_elt) kind
-+-   | Char : (char, int8_unsigned_elt) kind
-+-+  | Float16 : (float, float16_elt) kind
++@@ -1147,7 +1154,7 @@
++ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
++ --- a/ocamltest/ocamltest_config.mli
++ +++ b/ocamltest/ocamltest_config.mli
++-@@ -127,3 +127,6 @@ val instrumented_runtime : bool
+++@@ -130,3 +130,6 @@ val naked_pointers : bool
++  
++  val frame_pointers : bool
++  (** Whether frame-pointers have been enabled at configure time *)
++@@ -1169,6 +1176,31 @@
++      }
++    }
++  
+++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
+++--- a/runtime/HACKING.adoc
++++++ b/runtime/HACKING.adoc
+++@@ -148,6 +148,21 @@ TODO: it would be nice to migrate some information here.
+++ 
+++ == Compiling with sanitizers ==
+++ 
++++=== ThreadSanitizer ===
++++
++++You can instrument the runtime to detect data races in it, by adding
++++`-fsanitize=thread` to the `CFLAGS`. It will make the compiler build rather
++++slow.
++++
++++Note that this is different from passing `--enable-tsan` to the configure
++++script. `--enable-tsan` not only instruments the runtime, but also the code
++++generated by ocamlopt. In addition, it suppresses a number of race reports from
++++the runtime to avoid clogging the output of user programs, and it gives to the
++++TSan runtime a slightly altered version of the real memory accesses (see
++++#12114).
++++
++++=== Other sanitizers ===
++++
+++ TODO: I would be curious to know!
+++ 
+++ (For the brave there are some scripts in
++ diff --git a/testsuite/tests/asmgen/soli.cmm b/testsuite/tests/asmgen/soli.cmm
++ --- a/testsuite/tests/asmgen/soli.cmm
++ +++ b/testsuite/tests/asmgen/soli.cmm
++@@ -1205,9 +1237,10 @@
++ diff --git a/testsuite/tests/lf_skiplist/test_parallel.ml b/testsuite/tests/lf_skiplist/test_parallel.ml
++ --- a/testsuite/tests/lf_skiplist/test_parallel.ml
++ +++ b/testsuite/tests/lf_skiplist/test_parallel.ml
++-@@ -1,5 +1,12 @@
++- (* TEST
+++@@ -2,6 +2,13 @@
++   modules = "stubs.c";
+++  reason = "OCaml 5 only";
+++  skip;
++ + no-tsan; (* Takes too much time and memory with tsan *)
++ + {
++ +   bytecode;
++@@ -1221,9 +1254,10 @@
++ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
++ --- a/testsuite/tests/lib-marshal/intext_par.ml
++ +++ b/testsuite/tests/lib-marshal/intext_par.ml
++-@@ -1,5 +1,12 @@
++- (* TEST
+++@@ -2,6 +2,13 @@
++   modules = "intextaux_par.c";
+++  reason = "OCaml 5 only";
+++  skip;
++ + no-tsan; (* Takes too much time and memory with tsan *)
++ + {
++ +   bytecode;
++@@ -1237,9 +1271,9 @@
++ diff --git a/testsuite/tests/lib-systhreads/boundscheck.ml b/testsuite/tests/lib-systhreads/boundscheck.ml
++ --- a/testsuite/tests/lib-systhreads/boundscheck.ml
++ +++ b/testsuite/tests/lib-systhreads/boundscheck.ml
++-@@ -1,6 +1,7 @@
++- (* TEST
++-  include systhreads;
+++@@ -3,6 +3,7 @@
+++  reason = "OCaml 5 only";
+++  skip;
++   hassysthreads;
++ + no-tsan; (* See https://github.com/ocaml-multicore/ocaml-tsan/issues/31 *)
++   {
++@@ -1270,9 +1304,9 @@
++ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
++ --- a/testsuite/tests/memory-model/forbidden.ml
++ +++ b/testsuite/tests/memory-model/forbidden.ml
++-@@ -1,6 +1,7 @@
++- (* TEST
++-  modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+++@@ -3,6 +3,7 @@
+++  reason = "OCaml 5 only";
+++  skip;
++   not-bsd;
++ + no-tsan; (* tsan detects the intentional data races and fails *)
++   {
++@@ -1281,9 +1315,10 @@
++ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
++ --- a/testsuite/tests/memory-model/publish.ml
++ +++ b/testsuite/tests/memory-model/publish.ml
++-@@ -1,5 +1,6 @@
++- (* TEST
+++@@ -2,6 +2,7 @@
++   modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+++  reason = "OCaml 5 only";
+++  skip;
++ + no-tsan; (* tsan detects data races and fails *)
++   not-bsd;
++   {
++@@ -1316,9 +1351,11 @@
++ diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
++ --- a/testsuite/tests/parallel/pingpong.ml
++ +++ b/testsuite/tests/parallel/pingpong.ml
++-@@ -1,4 +1,12 @@
++--(* TEST *)
++-+(* TEST
+++@@ -1,7 +1,14 @@
+++ (* TEST
+++  reason = "OCaml 5 only";
+++  skip;
+++- *)
++ + no-tsan; (* TSan detects the intentional data race *)
++ + {
++ +   bytecode;
++@@ -2656,18 +2693,18 @@
++ diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++ --- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++ +++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++-@@ -1,4 +1,10 @@
++--(* TEST *)
++-+(* TEST
+++@@ -1,6 +1,11 @@
+++ (* TEST
+++  reason = "OCaml 5 only";
+++  skip;
++ + {
++ +   bytecode;
++ + }{
++ +   native;
++ + }
++-+*)
+++ *)
++  
++  (* Testing unsynchronized, parallel Weak usage *)
 +- 
-+- type c_layout = C_layout_typ
-+- type fortran_layout = Fortran_layout_typ (**)
-+ @@ -55,9 +58,6 @@ type 'a layout =
-+      C_layout: c_layout layout
-+    | Fortran_layout: fortran_layout layout
-+@@ -38,19 +24,12 @@
-+ diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
-+ --- a/stdlib/bigarray.mli
-+ +++ b/stdlib/bigarray.mli
-+-@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
-+- type complex64_elt = Complex64_elt
-+- 
-+- type ('a, 'b) kind =
-+--    Float16 : (float, float16_elt) kind
-+-   | Float32 : (float, float32_elt) kind
-+-   | Float64 : (float, float64_elt) kind
-+-   | Int8_signed : (int, int8_signed_elt) kind
-+-@@ -121,7 +120,8 @@ type ('a, 'b) kind =
-++@@ -120,8 +120,8 @@ type ('a, 'b) kind =
-+    | Nativeint : (nativeint, nativeint_elt) kind
-+    | Complex32 : (Complex.t, complex32_elt) kind
-+    | Complex64 : (Complex.t, complex64_elt) kind
-+ -  | Char : (char, int8_unsigned_elt) kind (**)
-++-  | Float16 : (float, float16_elt) kind
-+ +  | Char : (char, int8_unsigned_elt) kind
-+ +  | Float16 : (float, float16_elt) kind  (**)
-+  (** To each element kind is associated an OCaml type, which is
++ diff --git a/tools/check-symbol-names b/tools/check-symbol-names
++ --- a/tools/check-symbol-names
++ +++ b/tools/check-symbol-names
++@@ -2679,13 +2716,13 @@
++ +$2 ~ /^___?tsan_default_suppressions$/ { next }
++ +# ignore custom handlers of volatile reads/writes for TSan
++ +$2 ~ /^___?tsan(_unaligned)?_volatile_(read|write)[0-9]+$/ { next }
++- # print the rest
++- { found=1; print $1 " " $2 " " $3 }
++- # fail if there were any results
+++ # windows unicode support
+++ $2 ~ /^_?win_multi_byte_to_wide_char$/ { next }
+++ $2 ~ /^_?win_wide_char_to_multi_byte$/ { next }
++ diff --git a/utils/config.common.ml b/utils/config.common.ml
++ --- a/utils/config.common.ml
++ +++ b/utils/config.common.ml
++-@@ -92,6 +92,7 @@ let configuration_variables () =
+++@@ -97,6 +97,7 @@ let configuration_variables () =
++    p "native_c_compiler" native_c_compiler;
++    p "bytecomp_c_libraries" bytecomp_c_libraries;
++    p "native_c_libraries" native_c_libraries;
++@@ -2693,7 +2730,7 @@
++    p "native_pack_linker" native_pack_linker;
++    p_bool "native_compiler" native_compiler;
++    p "architecture" architecture;
++-@@ -118,6 +119,7 @@ let configuration_variables () =
+++@@ -123,6 +124,7 @@ let configuration_variables () =
++    p_bool "flat_float_array" flat_float_array;
++    p_bool "function_sections" function_sections;
++    p_bool "afl_instrument" afl_instrument;
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -73,7 +422,7 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index fbcb7440ab..872a688198 100644
+index e6784d5266..d3bc1d2841 100644
 --- a/Changes
 +++ b/Changes
 @@ -202,6 +202,7 @@ Working version
@@ -84,7 +433,7 @@ index fbcb7440ab..872a688198 100644
  OCaml 5.1.0
  ---------------
  
-@@ -1658,6 +1659,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1663,6 +1664,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -120,7 +469,7 @@ index fbcb7440ab..872a688198 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1693,13 +1723,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1698,13 +1728,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -136,7 +485,7 @@ index fbcb7440ab..872a688198 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1806,6 +1836,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1811,6 +1841,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -146,7 +495,7 @@ index fbcb7440ab..872a688198 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2069,6 +2102,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2074,6 +2107,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -157,7 +506,7 @@ index fbcb7440ab..872a688198 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 569c00fb07..2811f17ebb 100644
+index 54ff52034c..9705487845 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -415,9 +415,6 @@ flexlink.opt$(EXE): \
@@ -233,9 +582,9 @@ index 569c00fb07..2811f17ebb 100644
    str \
 -  sync \
    sys \
+   $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
    $(UNIX_OR_WIN32) \
-   weak
-@@ -678,6 +673,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -679,6 +674,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -245,7 +594,7 @@ index 569c00fb07..2811f17ebb 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -688,7 +686,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -689,7 +687,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -254,7 +603,7 @@ index 569c00fb07..2811f17ebb 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1077,12 +1075,14 @@ clean::
+@@ -1078,12 +1076,14 @@ clean::
  
  # Dependencies
  
@@ -271,7 +620,7 @@ index 569c00fb07..2811f17ebb 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1154,6 +1154,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1155,6 +1155,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -279,7 +628,7 @@ index 569c00fb07..2811f17ebb 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1701,6 +1702,9 @@ endif
+@@ -1702,6 +1703,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -290,10 +639,10 @@ index 569c00fb07..2811f17ebb 100644
  	   utils/*.cmi \
  	   parsing/*.cmi \
 diff --git a/Makefile.config.in b/Makefile.config.in
-index efac769171..b36902542a 100644
+index 5940dfa2c4..852412714e 100644
 --- a/Makefile.config.in
 +++ b/Makefile.config.in
-@@ -227,7 +227,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+@@ -224,7 +224,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
  FUNCTION_SECTIONS=@function_sections@
  AWK=@AWK@
  STDLIB_MANPAGES=@stdlib_manpages@
@@ -327,7 +676,7 @@ index ce0406e3d8..20f7595c89 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index c4e43e0cc0..2a4327ad9c 100644
+index d549fc5dfd..76fd0c2f75 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -428,10 +777,10 @@ index c4e43e0cc0..2a4327ad9c 100644
 +(* BACKPORT
        I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
 +*)
-   | Lreloadretaddr ->
-       ()
-   | Lreturn ->
-@@ -843,12 +874,24 @@ let emit_instr env fallthrough i =
+   | Lop (Ireturn_addr) ->
+       let offset = frame_size env - 8 in
+       I.mov (mem64 QWORD offset RSP) (res i 0)
+@@ -846,12 +877,24 @@ let emit_instr env fallthrough i =
        load_label_addr lbl_handler r11;
        I.push r11;
        cfi_adjust_cfa_offset 8;
@@ -456,7 +805,7 @@ index c4e43e0cc0..2a4327ad9c 100644
        cfi_adjust_cfa_offset (-8);
        I.add (int 8) rsp;
        cfi_adjust_cfa_offset (-8);
-@@ -856,14 +899,26 @@ let emit_instr env fallthrough i =
+@@ -859,10 +902,17 @@ let emit_instr env fallthrough i =
    | Lraise k ->
        begin match k with
        | Lambda.Raise_regular ->
@@ -473,17 +822,22 @@ index c4e43e0cc0..2a4327ad9c 100644
 +(* BACKPORT END *)
            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
        | Lambda.Raise_notrace ->
+           if Config.tsan then begin
+@@ -871,8 +921,13 @@ let emit_instr env fallthrough i =
+             emit_call "caml_tsan_raise_notrace_exn";
+             record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+           end else begin
 +(* BACKPORT BEGIN
-           I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
-           I.pop (domain_field Domainstate.Domain_exn_handler);
+             I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+             I.pop (domain_field Domainstate.Domain_exn_handler);
 +*)
-+          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
-+          I.pop (domain_field Domainstate.Domain_exception_pointer);
++            I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
++            I.pop (domain_field Domainstate.Domain_exception_pointer);
 +(* BACKPORT END *)
-           I.pop r11;
-           I.jmp r11
-       end
-@@ -896,6 +951,7 @@ let fundecl fundecl =
+             I.pop r11;
+             I.jmp r11
+           end
+@@ -906,6 +961,7 @@ let fundecl fundecl =
    D.label (emit_symbol fundecl.fun_name);
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc ();
@@ -491,7 +845,7 @@ index c4e43e0cc0..2a4327ad9c 100644
    if !Clflags.runtime_variant = "d" then
      emit_call "caml_assert_stack_invariants";
    let { max_frame_size; contains_nontail_calls} =
-@@ -913,9 +969,11 @@ let fundecl fundecl =
+@@ -923,9 +979,11 @@ let fundecl fundecl =
        Some (overflow, ret)
      end else None
    in
@@ -503,7 +857,7 @@ index c4e43e0cc0..2a4327ad9c 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -932,6 +990,7 @@ let fundecl fundecl =
+@@ -942,6 +1000,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -550,7 +904,7 @@ index cd50cba52b..32726ea7dc 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index 781d2443c9..e533055d48 100644
+index 785d43d6cd..502ded4b13 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -605,7 +959,7 @@ index 781d2443c9..e533055d48 100644
      | Lop (Ialloc _) when f.fun_fast -> 5
      | Lop (Ispecific (Ifar_alloc _)) when f.fun_fast -> 6
      | Lop (Ipoll _) -> 3
-@@ -538,7 +554,11 @@ module BR = Branch_relaxation.Make (struct
+@@ -542,7 +558,11 @@ module BR = Branch_relaxation.Make (struct
      | Lpoptrap -> 1
      | Lraise k ->
        begin match k with
@@ -617,7 +971,7 @@ index 781d2443c9..e533055d48 100644
        | Lambda.Raise_reraise -> 1
        | Lambda.Raise_notrace -> 4
        end
-@@ -739,7 +759,8 @@ let emit_instr env i =
+@@ -743,7 +763,8 @@ let emit_instr env i =
            `	b	{emit_label env.f.fun_tailrec_entry_point_label}\n`
          else
            output_epilogue env (fun () -> `	b	{emit_symbol func}\n`)
@@ -627,7 +981,7 @@ index 781d2443c9..e533055d48 100644
          if stack_ofs > 0 then begin
            `	mov	{emit_reg reg_stack_arg_begin}, sp\n`;
            `	add	{emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
-@@ -747,9 +768,18 @@ let emit_instr env i =
+@@ -751,9 +772,18 @@ let emit_instr env i =
            `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
            `{record_frame env i.live (Dbg_other i.dbg)}\n`
          end else if alloc then begin
@@ -646,7 +1000,7 @@ index 781d2443c9..e533055d48 100644
          end else begin
            (* store ocaml stack in the frame pointer register
               NB: no need to store previous x29 because OCaml frames don't
-@@ -764,6 +794,7 @@ let emit_instr env i =
+@@ -768,6 +798,7 @@ let emit_instr env i =
            `	mov	sp, x29\n`;
            cfi_restore_state ()
          end
@@ -654,7 +1008,7 @@ index 781d2443c9..e533055d48 100644
      | Lop(Istackoffset n) ->
          assert (n mod 16 = 0);
          emit_stack_adjustment (-n);
-@@ -804,7 +835,11 @@ let emit_instr env i =
+@@ -808,7 +839,11 @@ let emit_instr env i =
          | Double ->
              `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
          end
@@ -666,7 +1020,7 @@ index 781d2443c9..e533055d48 100644
          (* NB: assignments other than Word_int and Word_val do not follow the
          Multicore OCaml memory model and so do not emit a barrier *)
          let src = i.arg.(0) in
-@@ -827,7 +862,10 @@ let emit_instr env i =
+@@ -831,7 +866,10 @@ let emit_instr env i =
              `	str	s7, {emit_addressing addr base}\n`;
          | Word_int | Word_val ->
              (* memory model barrier for non-initializing store *)
@@ -677,7 +1031,7 @@ index 781d2443c9..e533055d48 100644
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
          | Double ->
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
-@@ -956,8 +994,13 @@ let emit_instr env i =
+@@ -960,8 +998,13 @@ let emit_instr env i =
      | Lop(Ispecific(Isignext size)) ->
          `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
      | Lop(Idls_get) ->
@@ -688,10 +1042,10 @@ index 781d2443c9..e533055d48 100644
          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
          `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
 +*)
-     | Lreloadretaddr ->
-         ()
-     | Lreturn ->
-@@ -1044,10 +1087,18 @@ let emit_instr env i =
+     | Lop(Ireturn_addr) ->
+         invalid_arg (
+           "Support for Ireturn_addr is not implemented on architecture "
+@@ -1052,10 +1095,18 @@ let emit_instr env i =
      | Lraise k ->
          begin match k with
          | Lambda.Raise_regular ->
@@ -710,7 +1064,7 @@ index 781d2443c9..e533055d48 100644
            `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
          | Lambda.Raise_notrace ->
            `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-@@ -1069,6 +1120,14 @@ let fundecl fundecl =
+@@ -1077,6 +1128,14 @@ let fundecl fundecl =
    `	.align	3\n`;
    `	.globl	{emit_symbol fundecl.fun_name}\n`;
    emit_symbol_type emit_symbol fundecl.fun_name "function";
@@ -725,7 +1079,7 @@ index 781d2443c9..e533055d48 100644
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
    let { max_frame_size; contains_nontail_calls} =
-@@ -1107,8 +1166,11 @@ let fundecl fundecl =
+@@ -1115,8 +1174,11 @@ let fundecl fundecl =
    let num_call_gc, num_check_bound =
      num_call_gc_and_check_bound_points env
    in
@@ -738,11 +1092,11 @@ index 781d2443c9..e533055d48 100644
    in
  
 diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
-index 32c35137a9..c75e15c99d 100644
+index 2e10f82387..1a76b6dc2f 100644
 --- a/asmcomp/asmlink.ml
 +++ b/asmcomp/asmlink.ml
-@@ -236,7 +236,11 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
-   compile_phrase (Cmm_helpers.entry_point name_list);
+@@ -247,7 +247,11 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
+   compile_phrase entry;
    let units = List.map (fun (info,_,_) -> info) units_list in
    List.iter compile_phrase
 +(* BACKPORT BEGIN
@@ -753,7 +1107,7 @@ index 32c35137a9..c75e15c99d 100644
        (Cmm_helpers.generic_functions false units));
    Array.iteri
      (fun i name -> compile_phrase (Cmm_helpers.predef_exception i name))
-@@ -262,7 +266,11 @@ let make_shared_startup_file ~ppf_dump units =
+@@ -273,7 +277,11 @@ let make_shared_startup_file ~ppf_dump units =
    Compilenv.reset "_shared_startup";
    Emit.begin_assembly ();
    List.iter compile_phrase
@@ -766,10 +1120,10 @@ index 32c35137a9..c75e15c99d 100644
    compile_phrase (Cmm_helpers.plugin_header units);
    compile_phrase
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index c2752503b3..9e50ffe636 100644
+index 44b3e0928d..003bf48455 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -820,7 +820,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
+@@ -826,7 +826,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
      | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
                            fill_fields (idx + 2) el) in
      Clet(VP.create id,
@@ -781,7 +1135,7 @@ index c2752503b3..9e50ffe636 100644
                   [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
           fill_fields 1 args)
    end
-@@ -2122,8 +2126,13 @@ let assignment_kind
+@@ -2128,8 +2132,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -796,10 +1150,10 @@ index c2752503b3..9e50ffe636 100644
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
 diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
-index 61ff6dd854..1190e82440 100644
+index 386c30bd74..a51bbda15e 100644
 --- a/asmcomp/power/emit.mlp
 +++ b/asmcomp/power/emit.mlp
-@@ -651,8 +651,10 @@ let emit_instr env i =
+@@ -655,8 +655,10 @@ let emit_instr env i =
            (* Save OCaml stack pointer in a callee-save register *)
            `	mr	28, 1\n`;
            (* Switch to C stack *)
@@ -810,7 +1164,7 @@ index 61ff6dd854..1190e82440 100644
            emit_call func;
            emit_call_nop();
            (* Switch back to OCaml stack *)
-@@ -776,8 +778,12 @@ let emit_instr env i =
+@@ -780,8 +782,12 @@ let emit_instr env i =
          let instr = name_for_specific sop in
          `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
      | Lop (Idls_get) ->
@@ -820,10 +1174,10 @@ index 61ff6dd854..1190e82440 100644
 +*)
 +        assert false
 +(* BACKPORT END *)
-     | Lreloadretaddr ->
-         `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
-         `	mtlr	11\n`
-@@ -928,12 +934,14 @@ let fundecl fundecl =
+     | Lop (Ireturn_addr) ->
+         invalid_arg (
+           "Support for Ireturn_addr is not implemented on architecture "
+@@ -936,12 +942,14 @@ let fundecl fundecl =
    begin match !handle_overflow with
    | None -> ()
    | Some(overflow, ret) ->
@@ -839,7 +1193,7 @@ index 61ff6dd854..1190e82440 100644
        `	ble-	{emit_label overflow}\n`;
        `{emit_label ret}:\n`
 diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-index 3ad4a92357..fccbbf0b66 100644
+index 1d8c3a4db4..d6318bcf6f 100644
 --- a/asmcomp/riscv/emit.mlp
 +++ b/asmcomp/riscv/emit.mlp
 @@ -341,8 +341,10 @@ let emit_instr env i =
@@ -863,10 +1217,10 @@ index 3ad4a92357..fccbbf0b66 100644
 +*)
 +      assert false
 +(* BACKPORT END *)
-   | Lreloadretaddr ->
-       let n = frame_size env in
-       reload_ra n
-@@ -621,6 +627,7 @@ let fundecl fundecl =
+   | Lop (Ireturn_addr) ->
+       invalid_arg (
+         "Support for Ireturn_addr is not implemented on architecture "
+@@ -625,6 +631,7 @@ let fundecl fundecl =
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc();
  
@@ -874,7 +1228,7 @@ index 3ad4a92357..fccbbf0b66 100644
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
    let { max_frame_size; contains_nontail_calls } =
-@@ -640,11 +647,13 @@ let fundecl fundecl =
+@@ -644,11 +651,13 @@ let fundecl fundecl =
        Some (overflow, ret)
      end else None
    in
@@ -888,7 +1242,7 @@ index 3ad4a92357..fccbbf0b66 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow, ret) ->
-@@ -661,6 +670,7 @@ let fundecl fundecl =
+@@ -665,6 +674,7 @@ let fundecl fundecl =
        `	addi	sp, sp, 16\n`;
        `	j	{emit_label ret}\n`
    end;
@@ -897,7 +1251,7 @@ index 3ad4a92357..fccbbf0b66 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
-index 35ade079f6..d9d6477860 100644
+index 49b4e61640..f0afd9e4b8 100644
 --- a/asmcomp/s390x/emit.mlp
 +++ b/asmcomp/s390x/emit.mlp
 @@ -385,8 +385,10 @@ let emit_instr env i =
@@ -921,10 +1275,10 @@ index 35ade079f6..d9d6477860 100644
 +*)
 +        assert false
 +(* BACKPORT END *)
-     | Lreloadretaddr ->
-         let n = frame_size env in
-         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`
-@@ -727,11 +733,13 @@ let fundecl fundecl =
+     | Lop (Ireturn_addr) ->
+         invalid_arg (
+           "Support for Ireturn_addr is not implemented on architecture "
+@@ -731,11 +737,13 @@ let fundecl fundecl =
    let handle_overflow = ref None in
    if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
      let overflow = new_label () and ret = new_label () in
@@ -3357,13 +3711,13 @@ index 8cfa8b35d2..8fbc0f4164 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 8f5600ec50..058b50be19 100755
+index 04c0307cf9..a743fce115 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index b52d324891..c87d4690d5 100644
+index 7c0bef1352..20929e4307 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -220,6 +220,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -3372,7 +3726,7 @@ index b52d324891..c87d4690d5 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -232,6 +234,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -3380,7 +3734,7 @@ index b52d324891..c87d4690d5 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -386,15 +389,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -411,15 +414,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -3412,7 +3766,7 @@ index b52d324891..c87d4690d5 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -635,7 +646,8 @@ AS_CASE([$host],
+@@ -660,7 +671,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -3422,7 +3776,7 @@ index b52d324891..c87d4690d5 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -712,8 +724,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -737,8 +749,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -3434,7 +3788,7 @@ index b52d324891..c87d4690d5 100644
  
  AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
    [yes,*|,true],
-@@ -1056,9 +1069,9 @@ AS_IF([! $arch64],
+@@ -1081,9 +1094,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -3447,7 +3801,7 @@ index b52d324891..c87d4690d5 100644
  
  # Support for C11 atomic types
  
-@@ -1216,11 +1229,13 @@ AS_CASE([$host],
+@@ -1242,11 +1255,13 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -3464,7 +3818,7 @@ index b52d324891..c87d4690d5 100644
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux_eabihf],
-@@ -1257,9 +1272,9 @@ AS_CASE([$host],
+@@ -1283,9 +1298,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -3476,7 +3830,7 @@ index b52d324891..c87d4690d5 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1269,7 +1284,7 @@ AS_CASE([$host],
+@@ -1295,7 +1310,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -3485,7 +3839,7 @@ index b52d324891..c87d4690d5 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1291,7 +1306,7 @@ AS_CASE([$host],
+@@ -1317,7 +1332,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -3494,7 +3848,7 @@ index b52d324891..c87d4690d5 100644
  )
  
  native_cflags=''
-@@ -1503,10 +1518,12 @@ AS_CASE([$host],
+@@ -1529,10 +1544,12 @@ AS_CASE([$host],
    [*-*-windows],
      [has_monotonic_clock=true],
    [*-apple-darwin*], [
@@ -3509,7 +3863,7 @@ index b52d324891..c87d4690d5 100644
        ],
        [has_monotonic_clock=false])],
    [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-@@ -2032,13 +2049,26 @@ AS_CASE([$enable_debug_runtime],
+@@ -2151,13 +2168,26 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3538,7 +3892,7 @@ index b52d324891..c87d4690d5 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2089,6 +2119,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2208,6 +2238,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3837,10 +4191,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..7aa1b8d11f
+index 0000000000..1f155e15f7
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2869 @@
+@@ -0,0 +1,2884 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -4040,10 +4394,10 @@ index 0000000000..7aa1b8d11f
 +   return Val_int(0);            /* not reached */
 +diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
 +new file mode 100644
-+index 0000000000..bf18b5a7d1
++index 0000000000..0cac8f131d
 +--- /dev/null
 ++++ b/runtime/HACKING.adoc
-+@@ -0,0 +1,156 @@
++@@ -0,0 +1,171 @@
 ++= Tips on hacking the OCaml runtime system =
 ++
 ++== Linking a test program with the debug runtime ==
@@ -4193,6 +4547,21 @@ index 0000000000..7aa1b8d11f
 ++TODO: it would be nice to migrate some information here.
 ++
 ++== Compiling with sanitizers ==
+++
+++=== ThreadSanitizer ===
+++
+++You can instrument the runtime to detect data races in it, by adding
+++`-fsanitize=thread` to the `CFLAGS`. It will make the compiler build rather
+++slow.
+++
+++Note that this is different from passing `--enable-tsan` to the configure
+++script. `--enable-tsan` not only instruments the runtime, but also the code
+++generated by ocamlopt. In addition, it suppresses a number of race reports from
+++the runtime to avoid clogging the output of user programs, and it gives to the
+++TSan runtime a slightly altered version of the real memory accesses (see
+++#12114).
+++
+++=== Other sanitizers ===
 ++
 ++TODO: I would be curious to know!
 ++
@@ -10652,72 +11021,421 @@ index 0000000000..e9d43c92fa
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ab5b7864d6
+index 0000000000..cf1a999225
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10603 @@
+@@ -0,0 +1,10936 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..1f70d3b5f2
++index 0000000000..69e5147421
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,56 @@
-++--- a	2023-09-28 18:48:10.770014749 +0100
-+++++ b	2023-09-28 18:48:10.774014892 +0100
-++@@ -1,11 +1,7 @@
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++-diff --git a/boot/ocamllex b/boot/ocamllex
-++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
-++ diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
-++ --- a/stdlib/bigarray.ml
-++ +++ b/stdlib/bigarray.ml
-++-@@ -32,8 +32,10 @@ type nativeint_elt = Nativeint_elt
-+++@@ -32,6 +32,9 @@ type nativeint_elt = Nativeint_elt
-++  type complex32_elt = Complex32_elt
-++  type complex64_elt = Complex64_elt
++@@ -0,0 +1,405 @@
+++--- a	2023-09-28 18:48:11.122027318 +0100
++++++ b	2023-09-28 18:48:11.158028603 +0100
+++@@ -59,7 +59,7 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -366,6 +366,11 @@ Some of those changes will benefit all OCaml packages.
++++@@ -367,6 +367,11 @@ Some of those changes will benefit all OCaml packages.
+++    `ocamlmklib.opt` are no longer installed to `$BINDIR`.
+++    (Xavier Leroy, review by Gabriel Scherer)
 ++  
-++@@ -13,18 +9,8 @@
-++ +   enumeration in bigarray.h *)
+++@@ -74,9 +74,9 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -670,6 +670,7 @@ runtime_COMMON_C_SOURCES = \
++++@@ -665,6 +665,7 @@ runtime_COMMON_C_SOURCES = \
++++   startup_aux \
+++    str \
+++-   sync \
+++    sys \
+++ +  $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
+++    $(UNIX_OR_WIN32) \
+++@@ -158,32 +158,39 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -740,6 +740,9 @@ let emit_instr env fallthrough i =
+++-       I.mov (arg32 i 0) (res32 i 0)
+++-   | Lop (Idls_get) ->
++++@@ -771,6 +771,9 @@ let emit_instr env fallthrough i =
++++ (* BACKPORT
+++        I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
++++ *)
+++ +  | Lop (Ireturn_addr) ->
+++ +      let offset = frame_size env - 8 in
+++ +      I.mov (mem64 QWORD offset RSP) (res i 0)
+++    | Lreloadretaddr ->
+++        ()
+++    | Lreturn ->
+++-@@ -862,10 +865,17 @@ let emit_instr env fallthrough i =
+++-           emit_call "caml_reraise_exn";
++++@@ -912,15 +915,22 @@ let emit_instr env fallthrough i =
++++ (* BACKPORT END *)
+++            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+++        | Lambda.Raise_notrace ->
+++--          I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+++--          I.pop (domain_field Domainstate.Domain_exn_handler);
+++--          I.pop r11;
+++--          I.jmp r11
+++ +          if Config.tsan then begin
+++ +            (* TSan requires to signal function exits upon exceptions,
+++ +               even with [Raise_notrace] *)
+++ +            emit_call "caml_tsan_raise_notrace_exn";
+++ +            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+++ +          end else begin
++++ (* BACKPORT BEGIN
++++-          I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
++++-          I.pop (domain_field Domainstate.Domain_exn_handler);
+++ +            I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+++ +            I.pop (domain_field Domainstate.Domain_exn_handler);
++++ *)
++++-          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
++++-          I.pop (domain_field Domainstate.Domain_exception_pointer);
+++++            I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
+++++            I.pop (domain_field Domainstate.Domain_exception_pointer);
++++ (* BACKPORT END *)
++++-          I.pop r11;
++++-          I.jmp r11
+++ +            I.pop r11;
+++ +            I.jmp r11
+++ +          end
+++@@ -193,7 +200,7 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -513,6 +513,10 @@ module BR = Branch_relaxation.Make (struct
++++@@ -529,6 +529,10 @@ module BR = Branch_relaxation.Make (struct
+++      | Lop (Ispecific Imove32) -> 1
+++      | Lop (Ispecific (Isignext _)) -> 1
+++      | Lop (Idls_get) -> 1
+++@@ -204,10 +211,10 @@
+++      | Lreloadretaddr -> 0
+++      | Lreturn -> epilogue_size f
+++      | Llabel _ -> 0
+++-@@ -958,6 +962,10 @@ let emit_instr env i =
+++-     | Lop(Idls_get) ->
++++@@ -1001,6 +1005,10 @@ let emit_instr env i =
+++          let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+++          `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
++++ *)
+++ +    | Lop(Ireturn_addr) ->
+++ +        invalid_arg (
+++ +          "Support for Ireturn_addr is not implemented on architecture "
+++@@ -237,8 +244,8 @@
+++ +  compile_phrase entry;
+++    let units = List.map (fun (info,_,_) -> info) units_list in
+++    List.iter compile_phrase
+++-     (Cmm_helpers.emit_preallocated_blocks [] (* add gc_roots (for dynlink) *)
+++-@@ -313,9 +324,10 @@ let call_linker file_list startup_file output_name =
++++ (* BACKPORT BEGIN
++++@@ -321,9 +332,10 @@ let call_linker file_list startup_file output_name =
+++    and main_obj_runtime = !Clflags.output_complete_object
+++    in
+++    let files = startup_file :: (List.rev file_list) in
+++@@ -250,7 +257,7 @@
+++        (if !Clflags.nopervasives || (main_obj_runtime && not main_dll)
+++         then "" else Config.native_c_libraries)
+++      else
+++-@@ -326,7 +338,7 @@ let call_linker file_list startup_file output_name =
++++@@ -334,7 +346,7 @@ let call_linker file_list startup_file output_name =
+++      else if !Clflags.output_c_object then Ccomp.Partial
+++      else Ccomp.Exe
+++    in
+++@@ -451,10 +458,10 @@
+++      | Lreloadretaddr -> 2
+++      | Lreturn -> 2
+++      | Llabel _ -> 0
+++-@@ -778,6 +782,10 @@ let emit_instr env i =
+++-     | Lop (Idls_get) ->
+++-         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+++-         `	ld {emit_reg i.res.(0)}, {emit_int offset}(30)\n`
++++@@ -784,6 +788,10 @@ let emit_instr env i =
++++ *)
++++         assert false
++++ (* BACKPORT END *)
+++ +    | Lop (Ireturn_addr) ->
+++ +        invalid_arg (
+++ +          "Support for Ireturn_addr is not implemented on architecture "
+++@@ -487,10 +494,10 @@
+++ diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
+++ --- a/asmcomp/riscv/emit.mlp
+++ +++ b/asmcomp/riscv/emit.mlp
+++-@@ -500,6 +500,10 @@ let emit_instr env i =
+++-   | Lop (Idls_get) ->
+++-       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+++-       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
++++@@ -506,6 +506,10 @@ let emit_instr env i =
++++ *)
++++       assert false
++++ (* BACKPORT END *)
+++ +  | Lop (Ireturn_addr) ->
+++ +      invalid_arg (
+++ +        "Support for Ireturn_addr is not implemented on architecture "
+++@@ -501,10 +508,10 @@
+++ diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
+++ --- a/asmcomp/s390x/emit.mlp
+++ +++ b/asmcomp/s390x/emit.mlp
+++-@@ -595,6 +595,10 @@ let emit_instr env i =
+++-     | Lop (Idls_get) ->
+++-         let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+++-         `	lg	{emit_reg i.res.(0)}, {emit_int ofs}(%r10)\n`
++++@@ -601,6 +601,10 @@ let emit_instr env i =
++++ *)
++++         assert false
++++ (* BACKPORT END *)
+++ +    | Lop (Ireturn_addr) ->
+++ +        invalid_arg (
+++ +          "Support for Ireturn_addr is not implemented on architecture "
+++@@ -943,7 +950,7 @@
+++  AC_SUBST([ocamlc_cflags])
+++  AC_SUBST([ocamlc_cppflags])
+++  AC_SUBST([flexdll_source_dir])
+++-@@ -342,6 +352,21 @@ AC_ARG_ENABLE([systhreads],
++++@@ -345,6 +355,21 @@ AC_ARG_ENABLE([systhreads],
+++    [AS_HELP_STRING([--disable-systhreads],
+++      [disable the Win32/POSIX threads library])])
+++  
+++@@ -965,7 +972,7 @@
+++  AC_ARG_ENABLE([graph-lib], [],
+++    [AS_IF([test "x$enableval" != 'xno'],
+++      [AC_MSG_ERROR(m4_normalize([The graphics library is no longer distributed
+++-@@ -1200,6 +1225,7 @@ model=default
++++@@ -1213,6 +1238,7 @@ model=default
+++  system=unknown
+++  
+++  has_native_backend=no
+++@@ -973,7 +980,7 @@
+++  AS_CASE([$host],
+++    [[i[3456]86-*-linux*]],
+++      [arch=i386; system=linux_elf],
+++-@@ -1580,6 +1606,99 @@ but no proper monotonic clock source was found.])
++++@@ -1597,6 +1623,99 @@ but no proper monotonic clock source was found.])
+++      )]
+++  )
+++  
+++@@ -1073,7 +1080,7 @@
+++  ## Sockets
+++  
+++  ## TODO: check whether the different libraries are really useful
+++-@@ -2227,7 +2346,7 @@ AS_IF([test "$ccomptype" != "msvc"],
++++@@ -2281,7 +2400,7 @@ AS_IF([test "$ccomptype" != "msvc"],
+++  
+++  oc_cflags="$common_cflags $internal_cflags"
+++  oc_cppflags="$common_cppflags $internal_cppflags"
+++@@ -1082,7 +1089,7 @@
+++  ocamlc_cppflags="$common_cppflags $CPPFLAGS"
+++  
+++  AS_CASE([$host],
+++-@@ -2240,6 +2359,9 @@ AS_CASE([$host],
++++@@ -2294,6 +2413,9 @@ AS_CASE([$host],
+++  
+++  AC_CONFIG_COMMANDS_PRE([cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"])
+++  
+++@@ -1107,7 +1114,7 @@
+++ diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
+++ --- a/ocamltest/builtin_actions.ml
+++ +++ b/ocamltest/builtin_actions.ml
+++-@@ -211,6 +211,20 @@ let frame_pointers = make
++++@@ -218,6 +218,20 @@ let frame_pointers = make
+++       "frame-pointers available"
+++       "frame-pointers not available")
+++  
+++@@ -1128,7 +1135,7 @@
+++  let has_symlink = make
+++    ~name:"has_symlink"
+++    ~description:"Pass if symbolic links are available"
+++-@@ -346,4 +360,6 @@ let _ =
++++@@ -354,4 +368,6 @@ let _ =
+++      frame_pointers;
+++      file_exists;
+++      copy;
+++@@ -1138,8 +1145,8 @@
+++ diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
+++ --- a/ocamltest/ocamltest_config.ml.in
+++ +++ b/ocamltest/ocamltest_config.ml.in
+++-@@ -91,3 +91,5 @@ let function_sections = @function_sections@
+++- let instrumented_runtime = @instrumented_runtime@
++++@@ -93,3 +93,5 @@ let instrumented_runtime = @instrumented_runtime@
++++ let naked_pointers = @naked_pointers@
+++  
+++  let frame_pointers = @frame_pointers@
 ++ +
-++  type ('a, 'b) kind =
-++--    Float16 : (float, float16_elt) kind
-++    | Float32 : (float, float32_elt) kind
-++    | Float64 : (float, float64_elt) kind
-++-   | Int8_signed : (int, int8_signed_elt) kind
-++-@@ -47,6 +49,7 @@ type ('a, 'b) kind =
-++-   | Complex32 : (Complex.t, complex32_elt) kind
-++-   | Complex64 : (Complex.t, complex64_elt) kind
-++-   | Char : (char, int8_unsigned_elt) kind
-++-+  | Float16 : (float, float16_elt) kind
+++@@ -1147,7 +1154,7 @@
+++ diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
+++ --- a/ocamltest/ocamltest_config.mli
+++ +++ b/ocamltest/ocamltest_config.mli
+++-@@ -127,3 +127,6 @@ val instrumented_runtime : bool
++++@@ -130,3 +130,6 @@ val naked_pointers : bool
+++  
+++  val frame_pointers : bool
+++  (** Whether frame-pointers have been enabled at configure time *)
+++@@ -1169,6 +1176,31 @@
+++      }
+++    }
+++  
++++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
++++--- a/runtime/HACKING.adoc
+++++++ b/runtime/HACKING.adoc
++++@@ -148,6 +148,21 @@ TODO: it would be nice to migrate some information here.
++++ 
++++ == Compiling with sanitizers ==
++++ 
+++++=== ThreadSanitizer ===
+++++
+++++You can instrument the runtime to detect data races in it, by adding
+++++`-fsanitize=thread` to the `CFLAGS`. It will make the compiler build rather
+++++slow.
+++++
+++++Note that this is different from passing `--enable-tsan` to the configure
+++++script. `--enable-tsan` not only instruments the runtime, but also the code
+++++generated by ocamlopt. In addition, it suppresses a number of race reports from
+++++the runtime to avoid clogging the output of user programs, and it gives to the
+++++TSan runtime a slightly altered version of the real memory accesses (see
+++++#12114).
+++++
+++++=== Other sanitizers ===
+++++
++++ TODO: I would be curious to know!
++++ 
++++ (For the brave there are some scripts in
+++ diff --git a/testsuite/tests/asmgen/soli.cmm b/testsuite/tests/asmgen/soli.cmm
+++ --- a/testsuite/tests/asmgen/soli.cmm
+++ +++ b/testsuite/tests/asmgen/soli.cmm
+++@@ -1205,9 +1237,10 @@
+++ diff --git a/testsuite/tests/lf_skiplist/test_parallel.ml b/testsuite/tests/lf_skiplist/test_parallel.ml
+++ --- a/testsuite/tests/lf_skiplist/test_parallel.ml
+++ +++ b/testsuite/tests/lf_skiplist/test_parallel.ml
+++-@@ -1,5 +1,12 @@
+++- (* TEST
++++@@ -2,6 +2,13 @@
+++   modules = "stubs.c";
++++  reason = "OCaml 5 only";
++++  skip;
+++ + no-tsan; (* Takes too much time and memory with tsan *)
+++ + {
+++ +   bytecode;
+++@@ -1221,9 +1254,10 @@
+++ diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
+++ --- a/testsuite/tests/lib-marshal/intext_par.ml
+++ +++ b/testsuite/tests/lib-marshal/intext_par.ml
+++-@@ -1,5 +1,12 @@
+++- (* TEST
++++@@ -2,6 +2,13 @@
+++   modules = "intextaux_par.c";
++++  reason = "OCaml 5 only";
++++  skip;
+++ + no-tsan; (* Takes too much time and memory with tsan *)
+++ + {
+++ +   bytecode;
+++@@ -1237,9 +1271,9 @@
+++ diff --git a/testsuite/tests/lib-systhreads/boundscheck.ml b/testsuite/tests/lib-systhreads/boundscheck.ml
+++ --- a/testsuite/tests/lib-systhreads/boundscheck.ml
+++ +++ b/testsuite/tests/lib-systhreads/boundscheck.ml
+++-@@ -1,6 +1,7 @@
+++- (* TEST
+++-  include systhreads;
++++@@ -3,6 +3,7 @@
++++  reason = "OCaml 5 only";
++++  skip;
+++   hassysthreads;
+++ + no-tsan; (* See https://github.com/ocaml-multicore/ocaml-tsan/issues/31 *)
+++   {
+++@@ -1270,9 +1304,9 @@
+++ diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
+++ --- a/testsuite/tests/memory-model/forbidden.ml
+++ +++ b/testsuite/tests/memory-model/forbidden.ml
+++-@@ -1,6 +1,7 @@
+++- (* TEST
+++-  modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
++++@@ -3,6 +3,7 @@
++++  reason = "OCaml 5 only";
++++  skip;
+++   not-bsd;
+++ + no-tsan; (* tsan detects the intentional data races and fails *)
+++   {
+++@@ -1281,9 +1315,10 @@
+++ diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+++ --- a/testsuite/tests/memory-model/publish.ml
+++ +++ b/testsuite/tests/memory-model/publish.ml
+++-@@ -1,5 +1,6 @@
+++- (* TEST
++++@@ -2,6 +2,7 @@
+++   modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
++++  reason = "OCaml 5 only";
++++  skip;
+++ + no-tsan; (* tsan detects data races and fails *)
+++   not-bsd;
+++   {
+++@@ -1316,9 +1351,11 @@
+++ diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
+++ --- a/testsuite/tests/parallel/pingpong.ml
+++ +++ b/testsuite/tests/parallel/pingpong.ml
+++-@@ -1,4 +1,12 @@
+++--(* TEST *)
+++-+(* TEST
++++@@ -1,7 +1,14 @@
++++ (* TEST
++++  reason = "OCaml 5 only";
++++  skip;
++++- *)
+++ + no-tsan; (* TSan detects the intentional data race *)
+++ + {
+++ +   bytecode;
+++@@ -2656,18 +2693,18 @@
+++ diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++ --- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++ +++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+++-@@ -1,4 +1,10 @@
+++--(* TEST *)
+++-+(* TEST
++++@@ -1,6 +1,11 @@
++++ (* TEST
++++  reason = "OCaml 5 only";
++++  skip;
+++ + {
+++ +   bytecode;
+++ + }{
+++ +   native;
+++ + }
+++-+*)
++++ *)
+++  
+++  (* Testing unsynchronized, parallel Weak usage *)
 ++- 
-++- type c_layout = C_layout_typ
-++- type fortran_layout = Fortran_layout_typ (**)
-++ @@ -55,9 +58,6 @@ type 'a layout =
-++      C_layout: c_layout layout
-++    | Fortran_layout: fortran_layout layout
-++@@ -38,19 +24,12 @@
-++ diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
-++ --- a/stdlib/bigarray.mli
-++ +++ b/stdlib/bigarray.mli
-++-@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
-++- type complex64_elt = Complex64_elt
-++- 
-++- type ('a, 'b) kind =
-++--    Float16 : (float, float16_elt) kind
-++-   | Float32 : (float, float32_elt) kind
-++-   | Float64 : (float, float64_elt) kind
-++-   | Int8_signed : (int, int8_signed_elt) kind
-++-@@ -121,7 +120,8 @@ type ('a, 'b) kind =
-+++@@ -120,8 +120,8 @@ type ('a, 'b) kind =
-++    | Nativeint : (nativeint, nativeint_elt) kind
-++    | Complex32 : (Complex.t, complex32_elt) kind
-++    | Complex64 : (Complex.t, complex64_elt) kind
-++ -  | Char : (char, int8_unsigned_elt) kind (**)
-+++-  | Float16 : (float, float16_elt) kind
-++ +  | Char : (char, int8_unsigned_elt) kind
-++ +  | Float16 : (float, float16_elt) kind  (**)
-++  (** To each element kind is associated an OCaml type, which is
+++ diff --git a/tools/check-symbol-names b/tools/check-symbol-names
+++ --- a/tools/check-symbol-names
+++ +++ b/tools/check-symbol-names
+++@@ -2679,13 +2716,13 @@
+++ +$2 ~ /^___?tsan_default_suppressions$/ { next }
+++ +# ignore custom handlers of volatile reads/writes for TSan
+++ +$2 ~ /^___?tsan(_unaligned)?_volatile_(read|write)[0-9]+$/ { next }
+++- # print the rest
+++- { found=1; print $1 " " $2 " " $3 }
+++- # fail if there were any results
++++ # windows unicode support
++++ $2 ~ /^_?win_multi_byte_to_wide_char$/ { next }
++++ $2 ~ /^_?win_wide_char_to_multi_byte$/ { next }
+++ diff --git a/utils/config.common.ml b/utils/config.common.ml
+++ --- a/utils/config.common.ml
+++ +++ b/utils/config.common.ml
+++-@@ -92,6 +92,7 @@ let configuration_variables () =
++++@@ -97,6 +97,7 @@ let configuration_variables () =
+++    p "native_c_compiler" native_c_compiler;
+++    p "bytecomp_c_libraries" bytecomp_c_libraries;
+++    p "native_c_libraries" native_c_libraries;
+++@@ -2693,7 +2730,7 @@
+++    p "native_pack_linker" native_pack_linker;
+++    p_bool "native_compiler" native_compiler;
+++    p "architecture" architecture;
+++-@@ -118,6 +119,7 @@ let configuration_variables () =
++++@@ -123,6 +124,7 @@ let configuration_variables () =
+++    p_bool "flat_float_array" flat_float_array;
+++    p_bool "function_sections" function_sections;
+++    p_bool "afl_instrument" afl_instrument;
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10731,7 +11449,7 @@ index 0000000000..ab5b7864d6
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index fbcb7440ab..872a688198 100644
++index e6784d5266..d3bc1d2841 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -202,6 +202,7 @@ Working version
@@ -10742,7 +11460,7 @@ index 0000000000..ab5b7864d6
 + OCaml 5.1.0
 + ---------------
 + 
-+@@ -1658,6 +1659,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1663,6 +1664,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10778,7 +11496,7 @@ index 0000000000..ab5b7864d6
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1693,13 +1723,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1698,13 +1728,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10794,7 +11512,7 @@ index 0000000000..ab5b7864d6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1806,6 +1836,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1811,6 +1841,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10804,7 +11522,7 @@ index 0000000000..ab5b7864d6
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2069,6 +2102,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2074,6 +2107,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -10815,7 +11533,7 @@ index 0000000000..ab5b7864d6
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 569c00fb07..2811f17ebb 100644
++index 54ff52034c..9705487845 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -415,9 +415,6 @@ flexlink.opt$(EXE): \
@@ -10891,9 +11609,9 @@ index 0000000000..ab5b7864d6
 +   str \
 +-  sync \
 +   sys \
++   $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
 +   $(UNIX_OR_WIN32) \
-+   weak
-+@@ -678,6 +673,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -679,6 +674,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10903,7 +11621,7 @@ index 0000000000..ab5b7864d6
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -688,7 +686,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -689,7 +687,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10912,7 +11630,7 @@ index 0000000000..ab5b7864d6
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1077,12 +1075,14 @@ clean::
++@@ -1078,12 +1076,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10929,7 +11647,7 @@ index 0000000000..ab5b7864d6
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1154,6 +1154,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1155,6 +1155,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10937,7 +11655,7 @@ index 0000000000..ab5b7864d6
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1701,6 +1702,9 @@ endif
++@@ -1702,6 +1703,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -10948,10 +11666,10 @@ index 0000000000..ab5b7864d6
 + 	   utils/*.cmi \
 + 	   parsing/*.cmi \
 +diff --git a/Makefile.config.in b/Makefile.config.in
-+index efac769171..b36902542a 100644
++index 5940dfa2c4..852412714e 100644
 +--- a/Makefile.config.in
 ++++ b/Makefile.config.in
-+@@ -227,7 +227,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++@@ -224,7 +224,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 + FUNCTION_SECTIONS=@function_sections@
 + AWK=@AWK@
 + STDLIB_MANPAGES=@stdlib_manpages@
@@ -10985,7 +11703,7 @@ index 0000000000..ab5b7864d6
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index c4e43e0cc0..2a4327ad9c 100644
++index d549fc5dfd..76fd0c2f75 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -11086,10 +11804,10 @@ index 0000000000..ab5b7864d6
 ++(* BACKPORT
 +       I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
 ++*)
-+   | Lreloadretaddr ->
-+       ()
-+   | Lreturn ->
-+@@ -843,12 +874,24 @@ let emit_instr env fallthrough i =
++   | Lop (Ireturn_addr) ->
++       let offset = frame_size env - 8 in
++       I.mov (mem64 QWORD offset RSP) (res i 0)
++@@ -846,12 +877,24 @@ let emit_instr env fallthrough i =
 +       load_label_addr lbl_handler r11;
 +       I.push r11;
 +       cfi_adjust_cfa_offset 8;
@@ -11114,7 +11832,7 @@ index 0000000000..ab5b7864d6
 +       cfi_adjust_cfa_offset (-8);
 +       I.add (int 8) rsp;
 +       cfi_adjust_cfa_offset (-8);
-+@@ -856,14 +899,26 @@ let emit_instr env fallthrough i =
++@@ -859,10 +902,17 @@ let emit_instr env fallthrough i =
 +   | Lraise k ->
 +       begin match k with
 +       | Lambda.Raise_regular ->
@@ -11131,17 +11849,22 @@ index 0000000000..ab5b7864d6
 ++(* BACKPORT END *)
 +           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
 +       | Lambda.Raise_notrace ->
++           if Config.tsan then begin
++@@ -871,8 +921,13 @@ let emit_instr env fallthrough i =
++             emit_call "caml_tsan_raise_notrace_exn";
++             record_frame env Reg.Set.empty (Dbg_raise i.dbg)
++           end else begin
 ++(* BACKPORT BEGIN
-+           I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
-+           I.pop (domain_field Domainstate.Domain_exn_handler);
++             I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
++             I.pop (domain_field Domainstate.Domain_exn_handler);
 ++*)
-++          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
-++          I.pop (domain_field Domainstate.Domain_exception_pointer);
+++            I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
+++            I.pop (domain_field Domainstate.Domain_exception_pointer);
 ++(* BACKPORT END *)
-+           I.pop r11;
-+           I.jmp r11
-+       end
-+@@ -896,6 +951,7 @@ let fundecl fundecl =
++             I.pop r11;
++             I.jmp r11
++           end
++@@ -906,6 +961,7 @@ let fundecl fundecl =
 +   D.label (emit_symbol fundecl.fun_name);
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc ();
@@ -11149,7 +11872,7 @@ index 0000000000..ab5b7864d6
 +   if !Clflags.runtime_variant = "d" then
 +     emit_call "caml_assert_stack_invariants";
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -913,9 +969,11 @@ let fundecl fundecl =
++@@ -923,9 +979,11 @@ let fundecl fundecl =
 +       Some (overflow, ret)
 +     end else None
 +   in
@@ -11161,7 +11884,7 @@ index 0000000000..ab5b7864d6
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -932,6 +990,7 @@ let fundecl fundecl =
++@@ -942,6 +1000,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -11208,7 +11931,7 @@ index 0000000000..ab5b7864d6
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index 781d2443c9..e533055d48 100644
++index 785d43d6cd..502ded4b13 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -11263,7 +11986,7 @@ index 0000000000..ab5b7864d6
 +     | Lop (Ialloc _) when f.fun_fast -> 5
 +     | Lop (Ispecific (Ifar_alloc _)) when f.fun_fast -> 6
 +     | Lop (Ipoll _) -> 3
-+@@ -538,7 +554,11 @@ module BR = Branch_relaxation.Make (struct
++@@ -542,7 +558,11 @@ module BR = Branch_relaxation.Make (struct
 +     | Lpoptrap -> 1
 +     | Lraise k ->
 +       begin match k with
@@ -11275,7 +11998,7 @@ index 0000000000..ab5b7864d6
 +       | Lambda.Raise_reraise -> 1
 +       | Lambda.Raise_notrace -> 4
 +       end
-+@@ -739,7 +759,8 @@ let emit_instr env i =
++@@ -743,7 +763,8 @@ let emit_instr env i =
 +           `	b	{emit_label env.f.fun_tailrec_entry_point_label}\n`
 +         else
 +           output_epilogue env (fun () -> `	b	{emit_symbol func}\n`)
@@ -11285,7 +12008,7 @@ index 0000000000..ab5b7864d6
 +         if stack_ofs > 0 then begin
 +           `	mov	{emit_reg reg_stack_arg_begin}, sp\n`;
 +           `	add	{emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
-+@@ -747,9 +768,18 @@ let emit_instr env i =
++@@ -751,9 +772,18 @@ let emit_instr env i =
 +           `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
 +           `{record_frame env i.live (Dbg_other i.dbg)}\n`
 +         end else if alloc then begin
@@ -11304,7 +12027,7 @@ index 0000000000..ab5b7864d6
 +         end else begin
 +           (* store ocaml stack in the frame pointer register
 +              NB: no need to store previous x29 because OCaml frames don't
-+@@ -764,6 +794,7 @@ let emit_instr env i =
++@@ -768,6 +798,7 @@ let emit_instr env i =
 +           `	mov	sp, x29\n`;
 +           cfi_restore_state ()
 +         end
@@ -11312,7 +12035,7 @@ index 0000000000..ab5b7864d6
 +     | Lop(Istackoffset n) ->
 +         assert (n mod 16 = 0);
 +         emit_stack_adjustment (-n);
-+@@ -804,7 +835,11 @@ let emit_instr env i =
++@@ -808,7 +839,11 @@ let emit_instr env i =
 +         | Double ->
 +             `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
 +         end
@@ -11324,7 +12047,7 @@ index 0000000000..ab5b7864d6
 +         (* NB: assignments other than Word_int and Word_val do not follow the
 +         Multicore OCaml memory model and so do not emit a barrier *)
 +         let src = i.arg.(0) in
-+@@ -827,7 +862,10 @@ let emit_instr env i =
++@@ -831,7 +866,10 @@ let emit_instr env i =
 +             `	str	s7, {emit_addressing addr base}\n`;
 +         | Word_int | Word_val ->
 +             (* memory model barrier for non-initializing store *)
@@ -11335,7 +12058,7 @@ index 0000000000..ab5b7864d6
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
 +         | Double ->
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
-+@@ -956,8 +994,13 @@ let emit_instr env i =
++@@ -960,8 +998,13 @@ let emit_instr env i =
 +     | Lop(Ispecific(Isignext size)) ->
 +         `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
 +     | Lop(Idls_get) ->
@@ -11346,10 +12069,10 @@ index 0000000000..ab5b7864d6
 +         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
 +         `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
 ++*)
-+     | Lreloadretaddr ->
-+         ()
-+     | Lreturn ->
-+@@ -1044,10 +1087,18 @@ let emit_instr env i =
++     | Lop(Ireturn_addr) ->
++         invalid_arg (
++           "Support for Ireturn_addr is not implemented on architecture "
++@@ -1052,10 +1095,18 @@ let emit_instr env i =
 +     | Lraise k ->
 +         begin match k with
 +         | Lambda.Raise_regular ->
@@ -11368,7 +12091,7 @@ index 0000000000..ab5b7864d6
 +           `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
 +         | Lambda.Raise_notrace ->
 +           `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-+@@ -1069,6 +1120,14 @@ let fundecl fundecl =
++@@ -1077,6 +1128,14 @@ let fundecl fundecl =
 +   `	.align	3\n`;
 +   `	.globl	{emit_symbol fundecl.fun_name}\n`;
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
@@ -11383,7 +12106,7 @@ index 0000000000..ab5b7864d6
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -1107,8 +1166,11 @@ let fundecl fundecl =
++@@ -1115,8 +1174,11 @@ let fundecl fundecl =
 +   let num_call_gc, num_check_bound =
 +     num_call_gc_and_check_bound_points env
 +   in
@@ -11396,11 +12119,11 @@ index 0000000000..ab5b7864d6
 +   in
 + 
 +diff --git a/asmcomp/asmlink.ml b/asmcomp/asmlink.ml
-+index 32c35137a9..c75e15c99d 100644
++index 2e10f82387..1a76b6dc2f 100644
 +--- a/asmcomp/asmlink.ml
 ++++ b/asmcomp/asmlink.ml
-+@@ -236,7 +236,11 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
-+   compile_phrase (Cmm_helpers.entry_point name_list);
++@@ -247,7 +247,11 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
++   compile_phrase entry;
 +   let units = List.map (fun (info,_,_) -> info) units_list in
 +   List.iter compile_phrase
 ++(* BACKPORT BEGIN
@@ -11411,7 +12134,7 @@ index 0000000000..ab5b7864d6
 +       (Cmm_helpers.generic_functions false units));
 +   Array.iteri
 +     (fun i name -> compile_phrase (Cmm_helpers.predef_exception i name))
-+@@ -262,7 +266,11 @@ let make_shared_startup_file ~ppf_dump units =
++@@ -273,7 +277,11 @@ let make_shared_startup_file ~ppf_dump units =
 +   Compilenv.reset "_shared_startup";
 +   Emit.begin_assembly ();
 +   List.iter compile_phrase
@@ -11424,10 +12147,10 @@ index 0000000000..ab5b7864d6
 +   compile_phrase (Cmm_helpers.plugin_header units);
 +   compile_phrase
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index c2752503b3..9e50ffe636 100644
++index 44b3e0928d..003bf48455 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -820,7 +820,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
++@@ -826,7 +826,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
 +     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
 +                           fill_fields (idx + 2) el) in
 +     Clet(VP.create id,
@@ -11439,7 +12162,7 @@ index 0000000000..ab5b7864d6
 +                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
 +          fill_fields 1 args)
 +   end
-+@@ -2122,8 +2126,13 @@ let assignment_kind
++@@ -2128,8 +2132,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -11454,10 +12177,10 @@ index 0000000000..ab5b7864d6
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
 +diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
-+index 61ff6dd854..1190e82440 100644
++index 386c30bd74..a51bbda15e 100644
 +--- a/asmcomp/power/emit.mlp
 ++++ b/asmcomp/power/emit.mlp
-+@@ -651,8 +651,10 @@ let emit_instr env i =
++@@ -655,8 +655,10 @@ let emit_instr env i =
 +           (* Save OCaml stack pointer in a callee-save register *)
 +           `	mr	28, 1\n`;
 +           (* Switch to C stack *)
@@ -11468,7 +12191,7 @@ index 0000000000..ab5b7864d6
 +           emit_call func;
 +           emit_call_nop();
 +           (* Switch back to OCaml stack *)
-+@@ -776,8 +778,12 @@ let emit_instr env i =
++@@ -780,8 +782,12 @@ let emit_instr env i =
 +         let instr = name_for_specific sop in
 +         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
 +     | Lop (Idls_get) ->
@@ -11478,10 +12201,10 @@ index 0000000000..ab5b7864d6
 ++*)
 ++        assert false
 ++(* BACKPORT END *)
-+     | Lreloadretaddr ->
-+         `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
-+         `	mtlr	11\n`
-+@@ -928,12 +934,14 @@ let fundecl fundecl =
++     | Lop (Ireturn_addr) ->
++         invalid_arg (
++           "Support for Ireturn_addr is not implemented on architecture "
++@@ -936,12 +942,14 @@ let fundecl fundecl =
 +   begin match !handle_overflow with
 +   | None -> ()
 +   | Some(overflow, ret) ->
@@ -11497,7 +12220,7 @@ index 0000000000..ab5b7864d6
 +       `	ble-	{emit_label overflow}\n`;
 +       `{emit_label ret}:\n`
 +diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-+index 3ad4a92357..fccbbf0b66 100644
++index 1d8c3a4db4..d6318bcf6f 100644
 +--- a/asmcomp/riscv/emit.mlp
 ++++ b/asmcomp/riscv/emit.mlp
 +@@ -341,8 +341,10 @@ let emit_instr env i =
@@ -11521,10 +12244,10 @@ index 0000000000..ab5b7864d6
 ++*)
 ++      assert false
 ++(* BACKPORT END *)
-+   | Lreloadretaddr ->
-+       let n = frame_size env in
-+       reload_ra n
-+@@ -621,6 +627,7 @@ let fundecl fundecl =
++   | Lop (Ireturn_addr) ->
++       invalid_arg (
++         "Support for Ireturn_addr is not implemented on architecture "
++@@ -625,6 +631,7 @@ let fundecl fundecl =
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc();
 + 
@@ -11532,7 +12255,7 @@ index 0000000000..ab5b7864d6
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
 +   let { max_frame_size; contains_nontail_calls } =
-+@@ -640,11 +647,13 @@ let fundecl fundecl =
++@@ -644,11 +651,13 @@ let fundecl fundecl =
 +       Some (overflow, ret)
 +     end else None
 +   in
@@ -11546,7 +12269,7 @@ index 0000000000..ab5b7864d6
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow, ret) ->
-+@@ -661,6 +670,7 @@ let fundecl fundecl =
++@@ -665,6 +674,7 @@ let fundecl fundecl =
 +       `	addi	sp, sp, 16\n`;
 +       `	j	{emit_label ret}\n`
 +   end;
@@ -11555,7 +12278,7 @@ index 0000000000..ab5b7864d6
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
-+index 35ade079f6..d9d6477860 100644
++index 49b4e61640..f0afd9e4b8 100644
 +--- a/asmcomp/s390x/emit.mlp
 ++++ b/asmcomp/s390x/emit.mlp
 +@@ -385,8 +385,10 @@ let emit_instr env i =
@@ -11579,10 +12302,10 @@ index 0000000000..ab5b7864d6
 ++*)
 ++        assert false
 ++(* BACKPORT END *)
-+     | Lreloadretaddr ->
-+         let n = frame_size env in
-+         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`
-+@@ -727,11 +733,13 @@ let fundecl fundecl =
++     | Lop (Ireturn_addr) ->
++         invalid_arg (
++           "Support for Ireturn_addr is not implemented on architecture "
++@@ -731,11 +737,13 @@ let fundecl fundecl =
 +   let handle_overflow = ref None in
 +   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
 +     let overflow = new_label () and ret = new_label () in
@@ -14015,13 +14738,13 @@ index 0000000000..ab5b7864d6
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 8f5600ec50..058b50be19 100755
++index 04c0307cf9..a743fce115 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index b52d324891..c87d4690d5 100644
++index 7c0bef1352..20929e4307 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -210,6 +210,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -220,6 +220,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -14030,7 +14753,7 @@ index 0000000000..ab5b7864d6
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -222,6 +224,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -232,6 +234,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -14038,7 +14761,7 @@ index 0000000000..ab5b7864d6
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -386,15 +389,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -411,15 +414,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -14070,7 +14793,7 @@ index 0000000000..ab5b7864d6
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -635,7 +646,8 @@ AS_CASE([$host],
++@@ -660,7 +671,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -14080,7 +14803,7 @@ index 0000000000..ab5b7864d6
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -712,8 +724,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -737,8 +749,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -14092,7 +14815,7 @@ index 0000000000..ab5b7864d6
 + 
 + AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
 +   [yes,*|,true],
-+@@ -1056,9 +1069,9 @@ AS_IF([! $arch64],
++@@ -1081,9 +1094,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -14105,7 +14828,7 @@ index 0000000000..ab5b7864d6
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1216,11 +1229,13 @@ AS_CASE([$host],
++@@ -1242,11 +1255,13 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -14122,7 +14845,7 @@ index 0000000000..ab5b7864d6
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -1257,9 +1272,9 @@ AS_CASE([$host],
++@@ -1283,9 +1298,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -14134,7 +14857,7 @@ index 0000000000..ab5b7864d6
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1269,7 +1284,7 @@ AS_CASE([$host],
++@@ -1295,7 +1310,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -14143,7 +14866,7 @@ index 0000000000..ab5b7864d6
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1291,7 +1306,7 @@ AS_CASE([$host],
++@@ -1317,7 +1332,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -14152,7 +14875,7 @@ index 0000000000..ab5b7864d6
 + )
 + 
 + native_cflags=''
-+@@ -1503,10 +1518,12 @@ AS_CASE([$host],
++@@ -1529,10 +1544,12 @@ AS_CASE([$host],
 +   [*-*-windows],
 +     [has_monotonic_clock=true],
 +   [*-apple-darwin*], [
@@ -14167,7 +14890,7 @@ index 0000000000..ab5b7864d6
 +       ],
 +       [has_monotonic_clock=false])],
 +   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-+@@ -2032,13 +2049,26 @@ AS_CASE([$enable_debug_runtime],
++@@ -2151,13 +2168,26 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -14196,7 +14919,7 @@ index 0000000000..ab5b7864d6
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2089,6 +2119,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2208,6 +2238,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -14495,10 +15218,10 @@ index 0000000000..ab5b7864d6
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..7aa1b8d11f
++index 0000000000..1f155e15f7
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2869 @@
++@@ -0,0 +1,2884 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -14698,10 +15421,10 @@ index 0000000000..ab5b7864d6
 ++   return Val_int(0);            /* not reached */
 ++diff --git a/runtime/HACKING.adoc b/runtime/HACKING.adoc
 ++new file mode 100644
-++index 0000000000..bf18b5a7d1
+++index 0000000000..0cac8f131d
 ++--- /dev/null
 +++++ b/runtime/HACKING.adoc
-++@@ -0,0 +1,156 @@
+++@@ -0,0 +1,171 @@
 +++= Tips on hacking the OCaml runtime system =
 +++
 +++== Linking a test program with the debug runtime ==
@@ -14851,6 +15574,21 @@ index 0000000000..ab5b7864d6
 +++TODO: it would be nice to migrate some information here.
 +++
 +++== Compiling with sanitizers ==
++++
++++=== ThreadSanitizer ===
++++
++++You can instrument the runtime to detect data races in it, by adding
++++`-fsanitize=thread` to the `CFLAGS`. It will make the compiler build rather
++++slow.
++++
++++Note that this is different from passing `--enable-tsan` to the configure
++++script. `--enable-tsan` not only instruments the runtime, but also the code
++++generated by ocamlopt. In addition, it suppresses a number of race reports from
++++the runtime to avoid clogging the output of user programs, and it gives to the
++++TSan runtime a slightly altered version of the real memory accesses (see
++++#12114).
++++
++++=== Other sanitizers ===
 +++
 +++TODO: I would be curious to know!
 +++
@@ -21222,43 +21960,7 @@ index 0000000000..ab5b7864d6
 +++  ./configure $configure_flags
 ++ }
 ++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink 
+++ Build
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -23565,13 +24267,13 @@ index 3d2ffe10e8..d590e714dd 100644
  module Set            = Set
  module Stack          = Stack
 diff --git a/tools/check-symbol-names b/tools/check-symbol-names
-index 0e1c829de4..8a88cfa1f3 100755
+index f133724ba9..e17a7d4254 100755
 --- a/tools/check-symbol-names
 +++ b/tools/check-symbol-names
-@@ -32,6 +32,9 @@ $2 ~ /^_?wmain$/ { next }
- $2 ~ /^__x86.get_pc_thunk./ { next }
- # for mingw32
- $2 ~ /^.debug_/ { next }
+@@ -36,6 +36,9 @@ $2 ~ /^.debug_/ { next }
+ $2 ~ /^___?tsan_default_suppressions$/ { next }
+ # ignore custom handlers of volatile reads/writes for TSan
+ $2 ~ /^___?tsan(_unaligned)?_volatile_(read|write)[0-9]+$/ { next }
 +# windows unicode support
 +$2 ~ /^_?win_multi_byte_to_wide_char$/ { next }
 +$2 ~ /^_?win_wide_char_to_multi_byte$/ { next }
@@ -23858,7 +24560,7 @@ index 0000000000..00d51897e0
 +     };
 +};
 diff --git a/utils/config.common.ml b/utils/config.common.ml
-index 9fa25b1dfa..9e72ba4c42 100644
+index 224ab2d95b..279f7d306f 100644
 --- a/utils/config.common.ml
 +++ b/utils/config.common.ml
 @@ -28,26 +28,26 @@ let standard_library =

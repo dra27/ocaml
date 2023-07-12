@@ -2,6 +2,13 @@
  modules = "stubs.c";
  reason = "OCaml 5 only";
  skip;
+ no-tsan; (* Takes too much time and memory with tsan *)
+ {
+   bytecode;
+ }
+ {
+   native;
+ }
 *)
 
 external init_skiplist : unit -> unit = "init_skiplist"
