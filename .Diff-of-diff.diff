@@ -1,0 +1,56 @@
+--- a	2023-09-28 18:48:10.770014749 +0100
++++ b	2023-09-28 18:48:10.774014892 +0100
+@@ -1,11 +1,7 @@
+-diff --git a/boot/ocamlc b/boot/ocamlc
+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+-diff --git a/boot/ocamllex b/boot/ocamllex
+-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+ diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
+ --- a/stdlib/bigarray.ml
+ +++ b/stdlib/bigarray.ml
+-@@ -32,8 +32,10 @@ type nativeint_elt = Nativeint_elt
++@@ -32,6 +32,9 @@ type nativeint_elt = Nativeint_elt
+  type complex32_elt = Complex32_elt
+  type complex64_elt = Complex64_elt
+  
+@@ -13,18 +9,8 @@
+ +   enumeration in bigarray.h *)
+ +
+  type ('a, 'b) kind =
+--    Float16 : (float, float16_elt) kind
+    | Float32 : (float, float32_elt) kind
+    | Float64 : (float, float64_elt) kind
+-   | Int8_signed : (int, int8_signed_elt) kind
+-@@ -47,6 +49,7 @@ type ('a, 'b) kind =
+-   | Complex32 : (Complex.t, complex32_elt) kind
+-   | Complex64 : (Complex.t, complex64_elt) kind
+-   | Char : (char, int8_unsigned_elt) kind
+-+  | Float16 : (float, float16_elt) kind
+- 
+- type c_layout = C_layout_typ
+- type fortran_layout = Fortran_layout_typ (**)
+ @@ -55,9 +58,6 @@ type 'a layout =
+      C_layout: c_layout layout
+    | Fortran_layout: fortran_layout layout
+@@ -38,19 +24,12 @@
+ diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
+ --- a/stdlib/bigarray.mli
+ +++ b/stdlib/bigarray.mli
+-@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
+- type complex64_elt = Complex64_elt
+- 
+- type ('a, 'b) kind =
+--    Float16 : (float, float16_elt) kind
+-   | Float32 : (float, float32_elt) kind
+-   | Float64 : (float, float64_elt) kind
+-   | Int8_signed : (int, int8_signed_elt) kind
+-@@ -121,7 +120,8 @@ type ('a, 'b) kind =
++@@ -120,8 +120,8 @@ type ('a, 'b) kind =
+    | Nativeint : (nativeint, nativeint_elt) kind
+    | Complex32 : (Complex.t, complex32_elt) kind
+    | Complex64 : (Complex.t, complex64_elt) kind
+ -  | Char : (char, int8_unsigned_elt) kind (**)
++-  | Float16 : (float, float16_elt) kind
+ +  | Char : (char, int8_unsigned_elt) kind
+ +  | Float16 : (float, float16_elt) kind  (**)
+  (** To each element kind is associated an OCaml type, which is

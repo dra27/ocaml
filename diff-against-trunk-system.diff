@@ -1,6 +1,65 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..1f70d3b5f2
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,56 @@
++--- a	2023-09-28 18:48:10.770014749 +0100
+++++ b	2023-09-28 18:48:10.774014892 +0100
++@@ -1,11 +1,7 @@
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
++ --- a/stdlib/bigarray.ml
++ +++ b/stdlib/bigarray.ml
++-@@ -32,8 +32,10 @@ type nativeint_elt = Nativeint_elt
+++@@ -32,6 +32,9 @@ type nativeint_elt = Nativeint_elt
++  type complex32_elt = Complex32_elt
++  type complex64_elt = Complex64_elt
++  
++@@ -13,18 +9,8 @@
++ +   enumeration in bigarray.h *)
++ +
++  type ('a, 'b) kind =
++--    Float16 : (float, float16_elt) kind
++    | Float32 : (float, float32_elt) kind
++    | Float64 : (float, float64_elt) kind
++-   | Int8_signed : (int, int8_signed_elt) kind
++-@@ -47,6 +49,7 @@ type ('a, 'b) kind =
++-   | Complex32 : (Complex.t, complex32_elt) kind
++-   | Complex64 : (Complex.t, complex64_elt) kind
++-   | Char : (char, int8_unsigned_elt) kind
++-+  | Float16 : (float, float16_elt) kind
++- 
++- type c_layout = C_layout_typ
++- type fortran_layout = Fortran_layout_typ (**)
++ @@ -55,9 +58,6 @@ type 'a layout =
++      C_layout: c_layout layout
++    | Fortran_layout: fortran_layout layout
++@@ -38,19 +24,12 @@
++ diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
++ --- a/stdlib/bigarray.mli
++ +++ b/stdlib/bigarray.mli
++-@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
++- type complex64_elt = Complex64_elt
++- 
++- type ('a, 'b) kind =
++--    Float16 : (float, float16_elt) kind
++-   | Float32 : (float, float32_elt) kind
++-   | Float64 : (float, float64_elt) kind
++-   | Int8_signed : (int, int8_signed_elt) kind
++-@@ -121,7 +120,8 @@ type ('a, 'b) kind =
+++@@ -120,8 +120,8 @@ type ('a, 'b) kind =
++    | Nativeint : (nativeint, nativeint_elt) kind
++    | Complex32 : (Complex.t, complex32_elt) kind
++    | Complex64 : (Complex.t, complex64_elt) kind
++ -  | Char : (char, int8_unsigned_elt) kind (**)
+++-  | Float16 : (float, float16_elt) kind
++ +  | Char : (char, int8_unsigned_elt) kind
++ +  | Float16 : (float, float16_elt) kind  (**)
++  (** To each element kind is associated an OCaml type, which is
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -880,10 +939,10 @@ index 35ade079f6..d9d6477860 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index d9a4f885fb..3e38377cbf 100755
+index 2a7c43cf1a..3e38377cbf 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 726df23f5b..562d1d9d47 100755
+index 32fc5f1673..562d1d9d47 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -10593,13 +10652,72 @@ index 0000000000..e9d43c92fa
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b63842708a
+index 0000000000..ab5b7864d6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10590 @@
+@@ -0,0 +1,10603 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..1f70d3b5f2
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,56 @@
+++--- a	2023-09-28 18:48:10.770014749 +0100
++++++ b	2023-09-28 18:48:10.774014892 +0100
+++@@ -1,11 +1,7 @@
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
+++ --- a/stdlib/bigarray.ml
+++ +++ b/stdlib/bigarray.ml
+++-@@ -32,8 +32,10 @@ type nativeint_elt = Nativeint_elt
++++@@ -32,6 +32,9 @@ type nativeint_elt = Nativeint_elt
+++  type complex32_elt = Complex32_elt
+++  type complex64_elt = Complex64_elt
+++  
+++@@ -13,18 +9,8 @@
+++ +   enumeration in bigarray.h *)
+++ +
+++  type ('a, 'b) kind =
+++--    Float16 : (float, float16_elt) kind
+++    | Float32 : (float, float32_elt) kind
+++    | Float64 : (float, float64_elt) kind
+++-   | Int8_signed : (int, int8_signed_elt) kind
+++-@@ -47,6 +49,7 @@ type ('a, 'b) kind =
+++-   | Complex32 : (Complex.t, complex32_elt) kind
+++-   | Complex64 : (Complex.t, complex64_elt) kind
+++-   | Char : (char, int8_unsigned_elt) kind
+++-+  | Float16 : (float, float16_elt) kind
+++- 
+++- type c_layout = C_layout_typ
+++- type fortran_layout = Fortran_layout_typ (**)
+++ @@ -55,9 +58,6 @@ type 'a layout =
+++      C_layout: c_layout layout
+++    | Fortran_layout: fortran_layout layout
+++@@ -38,19 +24,12 @@
+++ diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
+++ --- a/stdlib/bigarray.mli
+++ +++ b/stdlib/bigarray.mli
+++-@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
+++- type complex64_elt = Complex64_elt
+++- 
+++- type ('a, 'b) kind =
+++--    Float16 : (float, float16_elt) kind
+++-   | Float32 : (float, float32_elt) kind
+++-   | Float64 : (float, float64_elt) kind
+++-   | Int8_signed : (int, int8_signed_elt) kind
+++-@@ -121,7 +120,8 @@ type ('a, 'b) kind =
++++@@ -120,8 +120,8 @@ type ('a, 'b) kind =
+++    | Nativeint : (nativeint, nativeint_elt) kind
+++    | Complex32 : (Complex.t, complex32_elt) kind
+++    | Complex64 : (Complex.t, complex64_elt) kind
+++ -  | Char : (char, int8_unsigned_elt) kind (**)
++++-  | Float16 : (float, float16_elt) kind
+++ +  | Char : (char, int8_unsigned_elt) kind
+++ +  | Float16 : (float, float16_elt) kind  (**)
+++  (** To each element kind is associated an OCaml type, which is
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -11479,10 +11597,10 @@ index 0000000000..b63842708a
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index d9a4f885fb..3e38377cbf 100755
++index 2a7c43cf1a..3e38377cbf 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 726df23f5b..562d1d9d47 100755
++index 32fc5f1673..562d1d9d47 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -21140,53 +21258,7 @@ index 0000000000..b63842708a
 ++     fi
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
 ++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BU
+++-    run "test dynlink 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
@@ -22993,46 +23065,6 @@ index f4fc737d4e..59804a556f 100644
 +*)
  let incr r = ignore (fetch_and_add r 1)
  let decr r = ignore (fetch_and_add r (-1))
-diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
-index cc9ea9cd37..d92a9f2069 100644
---- a/stdlib/bigarray.ml
-+++ b/stdlib/bigarray.ml
-@@ -33,7 +33,6 @@ type complex32_elt = Complex32_elt
- type complex64_elt = Complex64_elt
- 
- type ('a, 'b) kind =
--    Float16 : (float, float16_elt) kind
-   | Float32 : (float, float32_elt) kind
-   | Float64 : (float, float64_elt) kind
-   | Int8_signed : (int, int8_signed_elt) kind
-@@ -47,6 +46,7 @@ type ('a, 'b) kind =
-   | Complex32 : (Complex.t, complex32_elt) kind
-   | Complex64 : (Complex.t, complex64_elt) kind
-   | Char : (char, int8_unsigned_elt) kind
-+  | Float16 : (float, float16_elt) kind
- 
- type c_layout = C_layout_typ
- type fortran_layout = Fortran_layout_typ (**)
-diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
-index e6e3b2b875..2923971a0c 100644
---- a/stdlib/bigarray.mli
-+++ b/stdlib/bigarray.mli
-@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
- type complex64_elt = Complex64_elt
- 
- type ('a, 'b) kind =
--    Float16 : (float, float16_elt) kind
-   | Float32 : (float, float32_elt) kind
-   | Float64 : (float, float64_elt) kind
-   | Int8_signed : (int, int8_signed_elt) kind
-@@ -122,6 +121,7 @@ type ('a, 'b) kind =
-   | Complex32 : (Complex.t, complex32_elt) kind
-   | Complex64 : (Complex.t, complex64_elt) kind
-   | Char : (char, int8_unsigned_elt) kind (**)
-+  | Float16 : (float, float16_elt) kind
- (** To each element kind is associated an OCaml type, which is
-    the type of OCaml values that can be stored in the Bigarray
-    or read back from it.  This type is not necessarily the same
 diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
 index 6035541601..247bfcfb58 100644
 --- a/stdlib/camlinternalLazy.ml
