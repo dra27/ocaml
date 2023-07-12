@@ -1,20 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..0f1101d3c3
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:48:11.890054732 +0100
-++++ b	2023-09-28 18:48:11.906055303 +0100
-+@@ -23,7 +23,7 @@
-+  #include "unixsupport.h"
-+  #include "cst2constr.h"
-+  #include <errno.h>
-+-@@ -89,89 +90,16 @@ value win_alloc_handle_or_socket(HANDLE h)
-++@@ -97,89 +98,16 @@ value win_alloc_handle_or_socket(HANDLE h)
-+  
-+  /* Mapping of Windows error codes to POSIX error codes */
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -10907,27 +10893,13 @@ index 0000000000..67b924972b
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9784ab1f2f
+index 0000000000..745bceee4b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10857 @@
+@@ -0,0 +1,10851 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..0f1101d3c3
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:48:11.890054732 +0100
-+++++ b	2023-09-28 18:48:11.906055303 +0100
-++@@ -23,7 +23,7 @@
-++  #include "unixsupport.h"
-++  #include "cst2constr.h"
-++  #include <errno.h>
-++-@@ -89,89 +90,16 @@ value win_alloc_handle_or_socket(HANDLE h)
-+++@@ -97,89 +98,16 @@ value win_alloc_handle_or_socket(HANDLE h)
-++  
-++  /* Mapping of Windows error codes to POSIX error codes */
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -21768,6 +21740,15 @@ index 0000000000..9784ab1f2f
 ++     fi
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
 ++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e 
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
