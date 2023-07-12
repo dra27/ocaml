@@ -2,6 +2,7 @@
  modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
  reason = "OCaml 5 only";
  skip;
+ no-tsan; (* tsan detects data races and fails *)
  not-bsd;
  {
    not-windows;

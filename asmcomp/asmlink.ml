@@ -233,7 +233,18 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Emit.begin_assembly ();
   let name_list =
     List.flatten (List.map (fun (info,_,_) -> info.ui_defines) units_list) in
-  compile_phrase (Cmm_helpers.entry_point name_list);
+  let entry = Cmm_helpers.entry_point name_list in
+  let entry =
+    if Config.tsan then
+      match entry with
+      | Cfunction ({ fun_body; _ } as cf) ->
+          Cmm.Cfunction
+            { cf with fun_body = Thread_sanitizer.wrap_entry_exit fun_body }
+      | _ -> assert false
+    else
+      entry
+  in
+  compile_phrase entry;
   let units = List.map (fun (info,_,_) -> info) units_list in
   List.iter compile_phrase
 (* BACKPORT BEGIN
@@ -321,9 +332,10 @@ let call_linker file_list startup_file output_name =
   and main_obj_runtime = !Clflags.output_complete_object
   in
   let files = startup_file :: (List.rev file_list) in
-  let files, c_lib =
+  let files, ldflags =
     if (not !Clflags.output_c_object) || main_dll || main_obj_runtime then
       files @ (List.rev !Clflags.ccobjs) @ runtime_lib (),
+      native_ldflags ^ " " ^
       (if !Clflags.nopervasives || (main_obj_runtime && not main_dll)
        then "" else Config.native_c_libraries)
     else
@@ -334,7 +346,7 @@ let call_linker file_list startup_file output_name =
     else if !Clflags.output_c_object then Ccomp.Partial
     else Ccomp.Exe
   in
-  let exitcode = Ccomp.call_linker mode output_name files c_lib in
+  let exitcode = Ccomp.call_linker mode output_name files ldflags in
   if not (exitcode = 0)
   then raise(Error(Linking_error exitcode))
 

@@ -2,6 +2,13 @@
  modules = "intextaux_par.c";
  reason = "OCaml 5 only";
  skip;
+ no-tsan; (* Takes too much time and memory with tsan *)
+ {
+   bytecode;
+ }
+ {
+   native;
+ }
 *)
 
 (* Test for output_value / input_value *)

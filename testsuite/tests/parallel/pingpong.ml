@@ -1,7 +1,14 @@
 (* TEST
  reason = "OCaml 5 only";
  skip;
- *)
+ no-tsan; (* TSan detects the intentional data race *)
+ {
+   bytecode;
+ }
+ {
+   native;
+ }
+*)
 
 let r = ref (Some 0)
 

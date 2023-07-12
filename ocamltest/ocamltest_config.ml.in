@@ -93,3 +93,5 @@ let instrumented_runtime = @instrumented_runtime@
 let naked_pointers = @naked_pointers@
 
 let frame_pointers = @frame_pointers@
+
+let tsan = @tsan@
