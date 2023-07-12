@@ -1,7 +1,12 @@
 (* TEST
  modules = "opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml";
+<<<<<<< HEAD
  reason = "OCaml 5 only";
  skip;
+||||||| parent of 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
+=======
+ no-tsan; (* tsan detects data races and fails *)
+>>>>>>> 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
  not-bsd;
  {
    not-windows;

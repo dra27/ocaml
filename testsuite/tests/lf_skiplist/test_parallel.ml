@@ -1,7 +1,18 @@
 (* TEST
  modules = "stubs.c";
+<<<<<<< HEAD
  reason = "OCaml 5 only";
  skip;
+||||||| parent of 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
+=======
+ no-tsan; (* Takes too much time and memory with tsan *)
+ {
+   bytecode;
+ }
+ {
+   native;
+ }
+>>>>>>> 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
 *)
 
 external init_skiplist : unit -> unit = "init_skiplist"

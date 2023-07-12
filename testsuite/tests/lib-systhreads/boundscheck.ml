@@ -3,6 +3,7 @@
  reason = "OCaml 5 only";
  skip;
  hassysthreads;
+ no-tsan; (* See https://github.com/ocaml-multicore/ocaml-tsan/issues/31 *)
  {
    bytecode;
  }{

@@ -1,6 +1,16 @@
 (* TEST
+<<<<<<< HEAD
  reason = "OCaml 5 only";
  skip;
+||||||| parent of 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
+(* TEST *)
+=======
+ {
+   bytecode;
+ }{
+   native;
+ }
+>>>>>>> 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
 *)
 
 (* Testing unsynchronized, parallel Weak usage *)

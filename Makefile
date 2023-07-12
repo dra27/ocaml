@@ -664,6 +664,7 @@ runtime_COMMON_C_SOURCES = \
   startup_aux \
   str \
   sys \
+  $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
   $(UNIX_OR_WIN32) \
   weak
 
