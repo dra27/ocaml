@@ -222,6 +222,8 @@ let can_discard = ref []
 let parse_warnings error v =
   Option.iter Location.(prerr_alert none) @@ Warnings.parse_options error v
 
+let prepend_to_list l x = l := x :: !l
+
 let read_one_param ppf position name v =
   let set name options s =  setter ppf (fun b -> b) name options s in
   let clear name options s = setter ppf (fun b -> not b) name options s in
@@ -409,9 +411,9 @@ let read_one_param ppf position name v =
 
   | "I" -> begin
       match position with
-      | Before_args -> first_include_dirs := v :: !first_include_dirs
+      | Before_args -> prepend_to_list first_include_dirs v
       | Before_link | Before_compile _ ->
-        last_include_dirs := v :: !last_include_dirs
+        prepend_to_list last_include_dirs v
     end
 
   | "cclib" ->
@@ -428,18 +430,18 @@ let read_one_param ppf position name v =
     begin
       match position with
       | Before_link | Before_compile _ ->
-        last_ccopts := v :: !last_ccopts
+        prepend_to_list last_ccopts v
       | Before_args ->
-        first_ccopts := v :: !first_ccopts
+        prepend_to_list first_ccopts v
     end
 
   | "ppx" ->
     begin
       match position with
       | Before_link | Before_compile _ ->
-        last_ppx := v :: !last_ppx
+        prepend_to_list last_ppx v
       | Before_args ->
-        first_ppx := v :: !first_ppx
+        prepend_to_list first_ppx v
     end
 
 
@@ -448,9 +450,9 @@ let read_one_param ppf position name v =
     begin
       match position with
       | Before_link | Before_compile _ ->
-        last_objfiles := v ::! last_objfiles
+        prepend_to_list last_objfiles v
       | Before_args ->
-        first_objfiles := v :: !first_objfiles
+        prepend_to_list first_objfiles v
     end
 
   | "cmx" | "cmxa" ->
@@ -458,9 +460,9 @@ let read_one_param ppf position name v =
     begin
       match position with
       | Before_link | Before_compile _ ->
-        last_objfiles := v ::! last_objfiles
+        prepend_to_list last_objfiles v
       | Before_args ->
-        first_objfiles := v :: !first_objfiles
+        prepend_to_list first_objfiles v
     end
 
   | "pic" ->
@@ -468,7 +470,7 @@ let read_one_param ppf position name v =
       set "pic" [ pic_code ] v
 
   | "can-discard" ->
-    can_discard := v ::!can_discard
+    prepend_to_list can_discard v
 
   | "timings" | "profile" ->
      let if_on = if name = "timings" then [ `Time ] else Profile.all_columns in
@@ -489,7 +491,7 @@ let read_one_param ppf position name v =
 
   | _ ->
     if not (List.mem name !can_discard) then begin
-      can_discard := name :: !can_discard;
+      prepend_to_list can_discard name;
       Printf.ksprintf (print_error ppf)
         "Warning: discarding value of variable %S in OCAMLPARAM\n%!"
         name
@@ -640,7 +642,7 @@ let process_action
     readenv ppf (Before_compile name);
     let opref = output_prefix name in
     implementation ~start_from ~source_file:name ~output_prefix:opref;
-    objfiles := (opref ^ ocaml_mod_ext) :: !objfiles
+    prepend_to_list objfiles (opref ^ ocaml_mod_ext)
   in
   match action with
   | ProcessImplementation name ->
@@ -649,7 +651,7 @@ let process_action
       readenv ppf (Before_compile name);
       let opref = output_prefix name in
       interface ~source_file:name ~output_prefix:opref;
-      if !make_package then objfiles := (opref ^ ".cmi") :: !objfiles
+      if !make_package then prepend_to_list objfiles (opref ^ ".cmi")
   | ProcessCFile name ->
       readenv ppf (Before_compile name);
       Location.input_name := name;
@@ -659,7 +661,7 @@ let process_action
       in
       if Ccomp.compile_file ?output:!output_name name <> 0
       then raise (Exit_with_status 2);
-      ccobjs := obj_name :: !ccobjs
+      prepend_to_list ccobjs obj_name
   | ProcessObjects names ->
       ccobjs := names @ !ccobjs
   | ProcessDLLs names ->
@@ -667,16 +669,16 @@ let process_action
   | ProcessOtherFile name ->
       if Filename.check_suffix name ocaml_mod_ext
       || Filename.check_suffix name ocaml_lib_ext then
-        objfiles := name :: !objfiles
+        prepend_to_list objfiles name
       else if Filename.check_suffix name ".cmi" && !make_package then
-        objfiles := name :: !objfiles
+        prepend_to_list objfiles name
       else if Filename.check_suffix name Config.ext_obj
            || Filename.check_suffix name Config.ext_lib then begin
         has_linker_inputs := true;
-        ccobjs := name :: !ccobjs
+        prepend_to_list ccobjs name
       end
       else if not !native_code && Filename.check_suffix name Config.ext_dll then
-        dllibs := name :: !dllibs
+        prepend_to_list dllibs name
       else
         match Compiler_pass.of_input_filename name with
         | Some start_from ->
@@ -698,7 +700,7 @@ let action_of_file name =
 
 let deferred_actions = ref []
 let defer action =
-  deferred_actions := action :: !deferred_actions
+  prepend_to_list deferred_actions action
 
 let anonymous filename = defer (action_of_file filename)
 let impl filename = defer (ProcessImplementation filename)

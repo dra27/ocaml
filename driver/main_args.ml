@@ -1502,15 +1502,17 @@ struct
   ]
 end;;
 
+let prepend_to_list l x = l := x :: !l
+
 [@@@ocaml.warning "-40"]
 let options_with_command_line_syntax_inner r after_rest =
   let rec loop ~name_opt (spec : Arg.spec) : Arg.spec =
     let option =
       match name_opt with
       | None -> ignore
-      | Some name -> (fun () -> r := name :: !r)
+      | Some name -> (fun () -> prepend_to_list r name)
     in
-    let arg a = r := Filename.quote a :: !r in
+    let arg a = prepend_to_list r (Filename.quote a) in
     let option_with_arg a = option (); arg a in
     let rest a =
       if not !after_rest then (after_rest := true; option ());
@@ -1570,7 +1572,7 @@ module Default = struct
     let _nolabels = set classic
     let _nostdlib = set no_std_include
     let _nocwd = set no_cwd
-    let _open s = open_modules := (s :: (!open_modules))
+    let _open = prepend_to_list open_modules
     let _principal = set principal
     let _rectypes = set recursive_types
     let _safer_matching = set safer_matching
@@ -1587,7 +1589,7 @@ module Default = struct
 
   module Core = struct
     include Common
-    let _I dir = include_dirs := (dir :: (!include_dirs))
+    let _I = prepend_to_list include_dirs
     let _color = Misc.set_or_ignore color_reader.parse color
     let _dlambda = set dump_lambda
     let _dparsetree = set dump_parsetree
@@ -1602,7 +1604,7 @@ module Default = struct
     let _error_style =
       Misc.set_or_ignore error_style_reader.parse error_style
     let _nopervasives = set nopervasives
-    let _ppx s = Compenv.first_ppx := (s :: (!Compenv.first_ppx))
+    let _ppx = prepend_to_list Compenv.first_ppx
     let _unsafe = set unsafe
     let _warn_error s =
       Warnings.parse_options true s |> Option.iter Location.(prerr_alert none)
@@ -1721,7 +1723,7 @@ module Default = struct
     let _c = set compile_only
     let _cc s = c_compiler := (Some s)
     let _cclib s = Compenv.defer (ProcessObjects (Misc.rev_split_words s))
-    let _ccopt s = Compenv.first_ccopts := (s :: (!Compenv.first_ccopts))
+    let _ccopt = prepend_to_list Compenv.first_ccopts
     let _cmi_file s = cmi_file := (Some s)
     let _config = Misc.show_config_and_exit
     let _config_var = Misc.show_config_variable_and_exit
@@ -1819,7 +1821,7 @@ module Default = struct
     let _afl_instrument = set afl_instrument
     let _function_sections () =
       assert Config.function_sections;
-      Compenv.first_ccopts := ("-ffunction-sections" ::(!Compenv.first_ccopts));
+      prepend_to_list Compenv.first_ccopts "-ffunction-sections";
       function_sections := true
     let _nodynlink = clear dlcode
     let _output_complete_obj () =
@@ -1848,7 +1850,7 @@ module Default = struct
                   *) ()
     let _intf_suffix s = Config.interface_suffix := s
     let _pp s = Clflags.preprocessor := (Some s)
-    let _ppx s = Clflags.all_ppx := (s :: (!Clflags.all_ppx))
+    let _ppx = prepend_to_list Clflags.all_ppx
     let _thread = set Clflags.use_threads
     let _v () = Compenv.print_version_and_library "documentation generator"
     let _verbose = set Clflags.verbose
