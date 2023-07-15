@@ -1613,8 +1613,8 @@ module Default = struct
 
   module Native = struct
     let _S = set keep_asm_file
-    let _clambda_checks () = clambda_checks := true
-    let _classic_inlining () = classic_inlining := true
+    let _clambda_checks = set clambda_checks
+    let _classic_inlining = set classic_inlining
     let _compact = clear optimize_for_speed
     let _dalloc = set dump_regalloc
     let _dclambda = set dump_clambda
@@ -1627,11 +1627,11 @@ module Default = struct
     let _dflambda_let stamp = dump_flambda_let := (Some stamp)
     let _dflambda_no_invariants = clear flambda_invariant_checks
     let _dflambda_verbose () =
-      set dump_flambda (); set dump_flambda_verbose ()
+      dump_flambda := true; dump_flambda_verbose := true
     let _dinterval = set dump_interval
     let _dinterf = set dump_interf
     let _dlinear = set dump_linear
-    let _dlive () = dump_live := true
+    let _dlive = set dump_live
     let _dprefer = set dump_prefer
     let _drawclambda = set dump_rawclambda
     let _drawflambda = set dump_rawflambda
@@ -1682,7 +1682,7 @@ module Default = struct
       Int_arg_helper.parse spec
         "Syntax: -inline-toplevel <n> | <round>=<n>[,...]"
         inline_toplevel_threshold
-    let _inlining_report () = inlining_report := true
+    let _inlining_report = set inlining_report
     let _insn_sched = set insn_sched
     let _no_insn_sched = clear insn_sched
     let _linscan = set use_linscan
@@ -1825,7 +1825,7 @@ module Default = struct
       function_sections := true
     let _nodynlink = clear dlcode
     let _output_complete_obj () =
-      set output_c_object (); set output_complete_object ()
+      output_c_object := true; output_complete_object := true
     let _output_obj = set output_c_object
     let _p () =
       Compenv.fatal
