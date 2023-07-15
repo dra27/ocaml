@@ -16,7 +16,6 @@
 (* Build libraries of .cmx files *)
 
 open Misc
-open Config
 open Cmx_format
 
 type error =
@@ -44,16 +43,16 @@ let read_info name =
      The linker, which is the only one that reads .cmxa files, does not
      need the approximation. *)
   info.ui_export_info <- default_ui_export_info;
-  (Filename.chop_suffix filename ".cmx" ^ ext_obj, (info, crc))
+  (Filename.chop_suffix filename ".cmx" ^ Config.ext_obj, (info, crc))
 
 let create_archive file_list lib_name =
-  let archive_name = Filename.remove_extension lib_name ^ ext_lib in
+  let archive_name = Filename.remove_extension lib_name ^ Config.ext_lib in
   let outchan = open_out_bin lib_name in
   Misc.try_finally
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file lib_name; remove_file archive_name)
     (fun () ->
-       output_string outchan cmxa_magic_number;
+       output_string outchan Config.cmxa_magic_number;
        let (objfile_list, descr_list) =
          List.split (List.map read_info file_list) in
        List.iter2
