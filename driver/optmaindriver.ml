@@ -64,12 +64,10 @@ let main argv ppf =
       end
     end;
     Compenv.readenv ppf Before_link;
-    if
-      List.length (List.filter (fun x -> !x)
-                     [make_package; make_archive; shared;
-                      Compenv.stop_early; output_c_object]) > 1
-    then
-    begin
+    if List.fold_left
+         (fun c x -> if !x then succ c else c) 0
+         [make_package; make_archive; shared; Compenv.stop_early;
+          output_c_object] > 1 then begin
       let module P = Clflags.Compiler_pass in
       match !stop_after with
       | None ->

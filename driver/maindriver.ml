@@ -48,12 +48,10 @@ let main argv ppf =
     if Clflags.(should_stop_after Compiler_pass.Lambda)
       then raise Continue;
     Compenv.readenv ppf Before_link;
-    if
-      List.length
-        (List.filter (fun x -> !x)
-           [make_archive;make_package;Compenv.stop_early;output_c_object])
-        > 1
-    then begin
+    if List.fold_left
+         (fun c x -> if !x then succ c else c) 0
+         [make_archive; make_package; Compenv.stop_early;
+          output_c_object] > 1 then begin
       let module P = Clflags.Compiler_pass in
       match !stop_after with
       | None ->
