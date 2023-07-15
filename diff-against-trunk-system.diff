@@ -1,6 +1,45 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..3f40b2bc6b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,36 @@
++--- a	2023-09-28 18:48:13.602115808 +0100
+++++ b	2023-09-28 18:48:13.650117519 +0100
++@@ -100,14 +100,10 @@
++  - #12198: continue the merge of the sub-makefiles into the root Makefile
++ diff --git a/boot/menhir/parser.ml b/boot/menhir/parser.ml
++ Binary files a/boot/menhir/parser.ml and b/boot/menhir/parser.ml differ
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++-diff --git a/boot/ocamllex b/boot/ocamllex
++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
++ diff --git a/lambda/matching.ml b/lambda/matching.ml
++ --- a/lambda/matching.ml
++ +++ b/lambda/matching.ml
++-@@ -2793,6 +2793,15 @@ let split_extension_cases tag_lambda_list =
+++@@ -2841,6 +2841,15 @@ let split_extension_cases tag_lambda_list =
++    in
++    split_rec tag_lambda_list
++  
++@@ -123,7 +119,7 @@
++  let combine_constructor loc arg pat_env cstr partial ctx def
++      (descr_lambda_list, total1, pats) =
++    let tag_lambda (cstr, act) = (cstr.cstr_tag, act) in
++-@@ -2887,13 +2896,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
+++@@ -2935,13 +2944,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
++              | 1, 1, [ (0, act1) ], [ (0, act2) ] ->
++                  (* This case is very frequent, it corresponds to
++                     options and lists. *)
++@@ -138,7 +134,7 @@
++              | n, 0, _, [] ->
++                  (* The matched type defines constant constructors only.
++                     (typically the constant cases are dense, so
++-@@ -3877,3 +3880,17 @@ let for_multiple_match ~scopes loc paraml pat_act_list partial =
+++@@ -3925,3 +3928,17 @@ let for_multiple_match ~scopes loc paraml pat_act_list partial =
++    let paraml = List.map (fun (v, _) -> Lvar v) v_paraml in
++    List.fold_right bind_opt v_paraml
++      (do_for_multiple_match ~scopes loc paraml pat_act_list partial)
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,10 +53,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index f0a85ce96c..a86c3aa3d0 100644
+index f93ba8c42e..06dbdfb13d 100644
 --- a/Changes
 +++ b/Changes
-@@ -210,6 +210,7 @@ Working version
+@@ -225,6 +225,7 @@ Working version
    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
    and Gabriel Scherer)
  
@@ -25,7 +64,7 @@ index f0a85ce96c..a86c3aa3d0 100644
  OCaml 5.1.0
  ---------------
  
-@@ -1671,6 +1672,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1686,6 +1687,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -61,7 +100,7 @@ index f0a85ce96c..a86c3aa3d0 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1706,13 +1736,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1721,13 +1751,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -77,7 +116,7 @@ index f0a85ce96c..a86c3aa3d0 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1819,6 +1849,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1834,6 +1864,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -87,7 +126,7 @@ index f0a85ce96c..a86c3aa3d0 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2082,6 +2115,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2097,6 +2130,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -935,10 +974,10 @@ index 49b4e61640..f0afd9e4b8 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 2a7c43cf1a..3e38377cbf 100755
+index 7b124e8b87..3e38377cbf 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 32fc5f1673..562d1d9d47 100755
+index 9471acb6b1..562d1d9d47 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -10893,13 +10932,52 @@ index 0000000000..67b924972b
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..70c64e08de
+index 0000000000..1a36102981
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10851 @@
+@@ -0,0 +1,10848 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..3f40b2bc6b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,36 @@
+++--- a	2023-09-28 18:48:13.602115808 +0100
++++++ b	2023-09-28 18:48:13.650117519 +0100
+++@@ -100,14 +100,10 @@
+++  - #12198: continue the merge of the sub-makefiles into the root Makefile
+++ diff --git a/boot/menhir/parser.ml b/boot/menhir/parser.ml
+++ Binary files a/boot/menhir/parser.ml and b/boot/menhir/parser.ml differ
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++-diff --git a/boot/ocamllex b/boot/ocamllex
+++-Binary files a/boot/ocamllex and b/boot/ocamllex differ
+++ diff --git a/lambda/matching.ml b/lambda/matching.ml
+++ --- a/lambda/matching.ml
+++ +++ b/lambda/matching.ml
+++-@@ -2793,6 +2793,15 @@ let split_extension_cases tag_lambda_list =
++++@@ -2841,6 +2841,15 @@ let split_extension_cases tag_lambda_list =
+++    in
+++    split_rec tag_lambda_list
+++  
+++@@ -123,7 +119,7 @@
+++  let combine_constructor loc arg pat_env cstr partial ctx def
+++      (descr_lambda_list, total1, pats) =
+++    let tag_lambda (cstr, act) = (cstr.cstr_tag, act) in
+++-@@ -2887,13 +2896,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
++++@@ -2935,13 +2944,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
+++              | 1, 1, [ (0, act1) ], [ (0, act2) ] ->
+++                  (* This case is very frequent, it corresponds to
+++                     options and lists. *)
+++@@ -138,7 +134,7 @@
+++              | n, 0, _, [] ->
+++                  (* The matched type defines constant constructors only.
+++                     (typically the constant cases are dense, so
+++-@@ -3877,3 +3880,17 @@ let for_multiple_match ~scopes loc paraml pat_act_list partial =
++++@@ -3925,3 +3928,17 @@ let for_multiple_match ~scopes loc paraml pat_act_list partial =
+++    let paraml = List.map (fun (v, _) -> Lvar v) v_paraml in
+++    List.fold_right bind_opt v_paraml
+++      (do_for_multiple_match ~scopes loc paraml pat_act_list partial)
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -10913,10 +10991,10 @@ index 0000000000..70c64e08de
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index f0a85ce96c..a86c3aa3d0 100644
++index f93ba8c42e..06dbdfb13d 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -210,6 +210,7 @@ Working version
++@@ -225,6 +225,7 @@ Working version
 +   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
 +   and Gabriel Scherer)
 + 
@@ -10924,7 +11002,7 @@ index 0000000000..70c64e08de
 + OCaml 5.1.0
 + ---------------
 + 
-+@@ -1671,6 +1672,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1686,6 +1687,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -10960,7 +11038,7 @@ index 0000000000..70c64e08de
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1706,13 +1736,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1721,13 +1751,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -10976,7 +11054,7 @@ index 0000000000..70c64e08de
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1819,6 +1849,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1834,6 +1864,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -10986,7 +11064,7 @@ index 0000000000..70c64e08de
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2082,6 +2115,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2097,6 +2130,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -11834,10 +11912,10 @@ index 0000000000..70c64e08de
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 2a7c43cf1a..3e38377cbf 100755
++index 7b124e8b87..3e38377cbf 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 32fc5f1673..562d1d9d47 100755
++index 9471acb6b1..562d1d9d47 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -21705,52 +21783,10 @@ index 0000000000..70c64e08de
 ++ }
 ++ 
 ++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e 
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 6c305fae24..9e9d622e0b 100644
+index 806cf30e06..c71b85a5b0 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
