@@ -196,7 +196,7 @@ let function_placeholder () =
 
 let report report_error error =
   eprintf "Debugger [version %s] environment error:@ @[@;%a@]@.;"
-    Config.version report_error error
+    Sys.ocaml_version report_error error
 
 let main () =
   Callback.register "Debugger.function_placeholder" function_placeholder;
@@ -223,7 +223,7 @@ let main () =
       done
     end;
     if !Parameters.version
-    then printf "\tOCaml Debugger version %s@.@." Config.version;
+    then printf "\tOCaml Debugger version %s@.@." Sys.ocaml_version;
     Load_path.init ~auto_include:Compmisc.auto_include !default_load_path;
     Clflags.recursive_types := true;    (* Allow recursive types. *)
     toplevel_loop ();                   (* Toplevel. *)

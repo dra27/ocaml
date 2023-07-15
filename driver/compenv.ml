@@ -27,13 +27,13 @@ let output_prefix name =
 
 let print_version_and_library compiler =
   Printf.printf "The OCaml %s, version " compiler;
-  print_string Config.version; print_newline();
+  print_string Sys.ocaml_version; print_newline();
   print_string "Standard library directory: ";
   print_string Config.standard_library; print_newline();
   raise (Exit_with_status 0)
 
 let print_version_string () =
-  print_string Config.version; print_newline();
+  print_string Sys.ocaml_version; print_newline();
   raise (Exit_with_status 0)
 
 let print_standard_library () =
