@@ -261,9 +261,11 @@ let rec load_file recursive ppf name =
         (fun () -> really_load_file recursive ppf name filename ic)
 
 and really_load_file recursive ppf name filename ic =
-  let buffer = really_input_string ic (String.length Config.cmo_magic_number) in
+  let buffer =
+    really_input_string ic (String.length Config_constants.cmo_magic_number)
+  in
   try
-    if buffer = Config.cmo_magic_number then begin
+    if buffer = Config_constants.cmo_magic_number then begin
       let compunit_pos = input_binary_int ic in  (* Go to descriptor *)
       seek_in ic compunit_pos;
       let cu : compilation_unit = input_value ic in
@@ -287,7 +289,7 @@ and really_load_file recursive ppf name filename ic =
       load_compunit ic filename ppf cu;
       true
     end else
-      if buffer = Config.cma_magic_number then begin
+      if buffer = Config_constants.cma_magic_number then begin
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
         let lib = (input_value ic : library) in

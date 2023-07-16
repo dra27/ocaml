@@ -76,7 +76,7 @@ let emit_debug_info dbg =
 
 let fp = Config.with_frame_pointers
 
-let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
+let stack_threshold_size = Config_constants.stack_threshold * 8 (* bytes *)
 
 let frame_size env =                     (* includes return address *)
   if env.f.fun_frame_required then
@@ -605,7 +605,7 @@ let emit_instr env fallthrough i =
           I.movsd (arg i 0) (addressing addr REAL8 i 1)
       end
   | Lop(Ialloc { bytes = n; dbginfo }) ->
-      assert (n <= (Config.max_young_wosize + 1) * Arch.size_addr);
+      assert (n <= (Config_constants.max_young_wosize + 1) * Arch.size_addr);
       if env.f.fun_fast then begin
         I.sub (int n) r15;
         I.cmp (domain_field Domainstate.Domain_young_limit) r15;
@@ -933,7 +933,7 @@ let fundecl fundecl =
       (* Pass the desired frame size on the stack, since all of the
         argument-passing registers may be in use.
         Also serves to align the stack properly before the call *)
-      I.push (int (Config.stack_threshold + max_frame_size / 8));
+      I.push (int (Config_constants.stack_threshold + max_frame_size / 8));
       cfi_adjust_cfa_offset 8;
         (* measured in words *)
       emit_call "caml_call_realloc_stack";

@@ -45,25 +45,38 @@ utils/clflags.cmx : \
 utils/clflags.cmi : \
     utils/profile.cmi \
     utils/misc.cmi
-utils/config.common.cmo :
-utils/config.common.cmx :
+utils/config.common.cmo : \
+    utils/config_constants.cmi
+utils/config.common.cmx : \
+    utils/config_constants.cmx
 utils/config.fixed.cmo :
 utils/config.fixed.cmx :
 utils/config.generated.cmo :
 utils/config.generated.cmx :
 utils/config.cmo : \
+    utils/config_constants.cmi \
     utils/config.cmi
 utils/config.cmx : \
+    utils/config_constants.cmx \
     utils/config.cmi
 utils/config.cmi :
 utils/config_boot.cmo : \
+    utils/config_constants.cmi \
     utils/config_boot.cmi
 utils/config_boot.cmx : \
+    utils/config_constants.cmx \
     utils/config_boot.cmi
 utils/config_boot.cmi :
+utils/config_constants.cmo : \
+    utils/config_constants.cmi
+utils/config_constants.cmx : \
+    utils/config_constants.cmi
+utils/config_constants.cmi :
 utils/config_main.cmo : \
+    utils/config_constants.cmi \
     utils/config_main.cmi
 utils/config_main.cmx : \
+    utils/config_constants.cmx \
     utils/config_main.cmi
 utils/config_main.cmi :
 utils/consistbl.cmo : \
@@ -117,11 +130,13 @@ utils/lazy_backtrack.cmi :
 utils/load_path.cmo : \
     utils/misc.cmi \
     utils/local_store.cmi \
+    utils/config_constants.cmi \
     utils/config.cmi \
     utils/load_path.cmi
 utils/load_path.cmx : \
     utils/misc.cmx \
     utils/local_store.cmx \
+    utils/config_constants.cmx \
     utils/config.cmx \
     utils/load_path.cmi
 utils/load_path.cmi :
@@ -131,10 +146,12 @@ utils/local_store.cmx : \
     utils/local_store.cmi
 utils/local_store.cmi :
 utils/misc.cmo : \
+    utils/config_constants.cmi \
     utils/config.cmi \
     utils/build_path_prefix_map.cmi \
     utils/misc.cmi
 utils/misc.cmx : \
+    utils/config_constants.cmx \
     utils/config.cmx \
     utils/build_path_prefix_map.cmx \
     utils/misc.cmi
@@ -247,7 +264,7 @@ parsing/ast_mapper.cmo : \
     parsing/longident.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     utils/clflags.cmi \
     parsing/asttypes.cmi \
     parsing/ast_helper.cmi \
@@ -258,7 +275,7 @@ parsing/ast_mapper.cmx : \
     parsing/longident.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     utils/clflags.cmx \
     parsing/asttypes.cmi \
     parsing/ast_helper.cmx \
@@ -1492,7 +1509,7 @@ typing/typedecl.cmo : \
     typing/errortrace.cmi \
     typing/env.cmi \
     typing/ctype.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     utils/clflags.cmi \
     parsing/builtin_attributes.cmi \
     typing/btype.cmi \
@@ -1527,7 +1544,7 @@ typing/typedecl.cmx : \
     typing/errortrace.cmx \
     typing/env.cmx \
     typing/ctype.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     utils/clflags.cmx \
     parsing/builtin_attributes.cmx \
     typing/btype.cmx \
@@ -1941,7 +1958,7 @@ bytecomp/bytegen.cmo : \
     typing/ident.cmi \
     typing/env.cmi \
     lambda/debuginfo.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     utils/clflags.cmi \
     parsing/asttypes.cmi \
     bytecomp/bytegen.cmi
@@ -1957,7 +1974,7 @@ bytecomp/bytegen.cmx : \
     typing/ident.cmx \
     typing/env.cmx \
     lambda/debuginfo.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     utils/clflags.cmx \
     parsing/asttypes.cmi \
     bytecomp/bytegen.cmi
@@ -1969,7 +1986,7 @@ bytecomp/bytelibrarian.cmo : \
     parsing/location.cmi \
     utils/load_path.cmi \
     bytecomp/emitcode.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
     bytecomp/bytelink.cmi \
@@ -1979,7 +1996,7 @@ bytecomp/bytelibrarian.cmx : \
     parsing/location.cmx \
     utils/load_path.cmx \
     bytecomp/emitcode.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
     bytecomp/bytelink.cmx \
@@ -1995,6 +2012,7 @@ bytecomp/bytelink.cmo : \
     bytecomp/emitcode.cmi \
     bytecomp/dll.cmi \
     utils/consistbl.cmi \
+    utils/config_constants.cmi \
     utils/config.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
@@ -2011,6 +2029,7 @@ bytecomp/bytelink.cmx : \
     bytecomp/emitcode.cmx \
     bytecomp/dll.cmx \
     utils/consistbl.cmx \
+    utils/config_constants.cmx \
     utils/config.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
@@ -2036,7 +2055,7 @@ bytecomp/bytepackager.cmo : \
     typing/ident.cmi \
     typing/env.cmi \
     bytecomp/emitcode.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
     bytecomp/bytelink.cmi \
@@ -2057,7 +2076,7 @@ bytecomp/bytepackager.cmx : \
     typing/ident.cmx \
     typing/env.cmx \
     bytecomp/emitcode.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
     bytecomp/bytelink.cmx \
@@ -2067,10 +2086,10 @@ bytecomp/bytepackager.cmi : \
     typing/env.cmi \
     file_formats/cmo_format.cmi
 bytecomp/bytesections.cmo : \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmx : \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmi :
 bytecomp/dll.cmo : \
@@ -2095,7 +2114,7 @@ bytecomp/emitcode.cmo : \
     bytecomp/instruct.cmi \
     typing/ident.cmi \
     typing/env.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
     bytecomp/bytegen.cmi \
@@ -2113,7 +2132,7 @@ bytecomp/emitcode.cmx : \
     bytecomp/instruct.cmx \
     typing/ident.cmx \
     typing/env.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
     bytecomp/bytegen.cmx \
@@ -2538,6 +2557,7 @@ asmcomp/cmm_helpers.cmo : \
     utils/misc.cmi \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
+    utils/config_constants.cmi \
     utils/config.cmi \
     middle_end/compilenv.cmi \
     file_formats/cmxs_format.cmi \
@@ -2561,6 +2581,7 @@ asmcomp/cmm_helpers.cmx : \
     utils/misc.cmx \
     lambda/lambda.cmx \
     lambda/debuginfo.cmx \
+    utils/config_constants.cmx \
     utils/config.cmx \
     middle_end/compilenv.cmx \
     file_formats/cmxs_format.cmi \
@@ -2667,14 +2688,14 @@ asmcomp/comballoc.cmo : \
     asmcomp/reg.cmi \
     asmcomp/mach.cmi \
     lambda/debuginfo.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     asmcomp/arch.cmi \
     asmcomp/comballoc.cmi
 asmcomp/comballoc.cmx : \
     asmcomp/reg.cmx \
     asmcomp/mach.cmx \
     lambda/debuginfo.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     asmcomp/arch.cmx \
     asmcomp/comballoc.cmi
 asmcomp/comballoc.cmi : \
@@ -2719,6 +2740,7 @@ asmcomp/emit.cmo : \
     asmcomp/emitenv.cmi \
     asmcomp/emitaux.cmi \
     utils/domainstate.cmi \
+    utils/config_constants.cmi \
     utils/config.cmi \
     middle_end/compilenv.cmi \
     asmcomp/cmm.cmi \
@@ -2742,6 +2764,7 @@ asmcomp/emit.cmx : \
     asmcomp/emitenv.cmi \
     asmcomp/emitaux.cmx \
     utils/domainstate.cmx \
+    utils/config_constants.cmx \
     utils/config.cmx \
     middle_end/compilenv.cmx \
     asmcomp/cmm.cmx \
@@ -2756,6 +2779,7 @@ asmcomp/emitaux.cmo : \
     asmcomp/linear.cmi \
     asmcomp/emitenv.cmi \
     lambda/debuginfo.cmi \
+    utils/config_constants.cmi \
     utils/config.cmi \
     asmcomp/cmm.cmi \
     utils/clflags.cmi \
@@ -2765,6 +2789,7 @@ asmcomp/emitaux.cmx : \
     asmcomp/linear.cmx \
     asmcomp/emitenv.cmi \
     lambda/debuginfo.cmx \
+    utils/config_constants.cmx \
     utils/config.cmx \
     asmcomp/cmm.cmx \
     utils/clflags.cmx \
@@ -3776,7 +3801,7 @@ lambda/translcore.cmo : \
     typing/ident.cmi \
     typing/env.cmi \
     lambda/debuginfo.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     utils/clflags.cmi \
     typing/btype.cmi \
     parsing/asttypes.cmi \
@@ -3800,7 +3825,7 @@ lambda/translcore.cmx : \
     typing/ident.cmx \
     typing/env.cmx \
     lambda/debuginfo.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     utils/clflags.cmx \
     typing/btype.cmx \
     parsing/asttypes.cmi \
@@ -3939,13 +3964,13 @@ file_formats/cmi_format.cmo : \
     typing/types.cmi \
     utils/misc.cmi \
     parsing/location.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmi_format.cmi
 file_formats/cmi_format.cmx : \
     typing/types.cmx \
     utils/misc.cmx \
     parsing/location.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmi_format.cmi
 file_formats/cmi_format.cmi : \
     typing/types.cmi \
@@ -3962,7 +3987,7 @@ file_formats/cmt_format.cmo : \
     utils/load_path.cmi \
     parsing/lexer.cmi \
     typing/env.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmi_format.cmi \
     utils/clflags.cmi \
     file_formats/cmt_format.cmi
@@ -3976,7 +4001,7 @@ file_formats/cmt_format.cmx : \
     utils/load_path.cmx \
     parsing/lexer.cmx \
     typing/env.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmi_format.cmx \
     utils/clflags.cmx \
     file_formats/cmt_format.cmi
@@ -3998,14 +4023,14 @@ file_formats/linear_format.cmo : \
     utils/misc.cmi \
     parsing/location.cmi \
     asmcomp/linear.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     asmcomp/cmm.cmi \
     file_formats/linear_format.cmi
 file_formats/linear_format.cmx : \
     utils/misc.cmx \
     parsing/location.cmx \
     asmcomp/linear.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     asmcomp/cmm.cmx \
     file_formats/linear_format.cmi
 file_formats/linear_format.cmi : \
@@ -6273,7 +6298,7 @@ driver/pparse.cmo : \
     parsing/parse.cmi \
     utils/misc.cmi \
     parsing/location.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     utils/clflags.cmi \
     utils/ccomp.cmi \
     parsing/ast_mapper.cmi \
@@ -6286,7 +6311,7 @@ driver/pparse.cmx : \
     parsing/parse.cmx \
     utils/misc.cmx \
     parsing/location.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     utils/clflags.cmx \
     utils/ccomp.cmx \
     parsing/ast_mapper.cmx \
@@ -6484,7 +6509,6 @@ toplevel/toploop.cmo : \
     utils/load_path.cmi \
     parsing/lexer.cmi \
     typing/env.cmi \
-    utils/config.cmi \
     driver/compmisc.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
@@ -6500,7 +6524,6 @@ toplevel/toploop.cmx : \
     utils/load_path.cmx \
     parsing/lexer.cmx \
     typing/env.cmx \
-    utils/config.cmx \
     driver/compmisc.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
@@ -6576,7 +6599,7 @@ toplevel/byte/topeval.cmo : \
     typing/env.cmi \
     bytecomp/emitcode.cmi \
     bytecomp/dll.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     driver/compmisc.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
@@ -6611,7 +6634,7 @@ toplevel/byte/topeval.cmx : \
     typing/env.cmx \
     bytecomp/emitcode.cmx \
     bytecomp/dll.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     driver/compmisc.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
@@ -6960,7 +6983,7 @@ tools/dumpobj.cmo : \
     utils/misc.cmi \
     parsing/location.cmi \
     bytecomp/instruct.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmo_format.cmi \
     bytecomp/bytesections.cmi \
     tools/dumpobj.cmi
@@ -6971,7 +6994,7 @@ tools/dumpobj.cmx : \
     utils/misc.cmx \
     parsing/location.cmx \
     bytecomp/instruct.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmo_format.cmi \
     bytecomp/bytesections.cmx \
     tools/dumpobj.cmi
@@ -7188,12 +7211,12 @@ tools/opnames.cmx : \
 tools/opnames.cmi :
 tools/primreq.cmo : \
     utils/misc.cmi \
-    utils/config.cmi \
+    utils/config_constants.cmi \
     file_formats/cmo_format.cmi \
     tools/primreq.cmi
 tools/primreq.cmx : \
     utils/misc.cmx \
-    utils/config.cmx \
+    utils/config_constants.cmx \
     file_formats/cmo_format.cmi \
     tools/primreq.cmi
 tools/primreq.cmi :

@@ -527,7 +527,7 @@ and transl_exp0 ~in_new_scope ~scopes e =
                             ~attr:default_function_attribute
                             ~loc:(of_location ~scopes e.exp_loc)
                             ~body:(transl_exp ~scopes e) in
-          Lprim(Pmakeblock(Config.lazy_tag, Mutable, None), [fn],
+          Lprim(Pmakeblock(Config_constants.lazy_tag, Mutable, None), [fn],
                 of_location ~scopes e.exp_loc)
       end
   | Texp_object (cs, meths) ->
@@ -929,7 +929,7 @@ and transl_record ~scopes loc env fields repres opt_init_expr =
   (* Determine if there are "enough" fields (only relevant if this is a
      functional-style record update *)
   let no_init = match opt_init_expr with None -> true | _ -> false in
-  if no_init || size < Config.max_young_wosize
+  if no_init || size < Config_constants.max_young_wosize
   then begin
     (* Allocate new record with given fields (and remaining fields
        taken from init_expr if any *)

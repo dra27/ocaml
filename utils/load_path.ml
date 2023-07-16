@@ -68,7 +68,7 @@ let no_auto_include _ _ = raise Not_found
 let auto_include_callback = ref no_auto_include
 
 let reset () =
-  assert (not Config.merlin || Local_store.is_bound ());
+  assert (not Config_constants.merlin || Local_store.is_bound ());
   STbl.clear !files;
   STbl.clear !files_uncap;
   dirs := [];
@@ -95,7 +95,7 @@ let init ~auto_include l =
   auto_include_callback := auto_include
 
 let remove_dir dir =
-  assert (not Config.merlin || Local_store.is_bound ());
+  assert (not Config_constants.merlin || Local_store.is_bound ());
   let new_dirs = List.filter (fun d -> Dir.path d <> dir) !dirs in
   if List.compare_lengths new_dirs !dirs <> 0 then begin
     reset ();
@@ -107,7 +107,7 @@ let remove_dir dir =
    add a basename to the cache if it is not already present in the cache, in
    order to enforce left-to-right precedence. *)
 let add dir =
-  assert (not Config.merlin || Local_store.is_bound ());
+  assert (not Config_constants.merlin || Local_store.is_bound ());
   List.iter
     (fun base ->
        let fn = Filename.concat dir.Dir.path base in
@@ -126,7 +126,7 @@ let add_dir dir = add (Dir.create dir)
 (* Add the directory at the start of load path - so basenames are
    unconditionally added. *)
 let prepend_dir dir =
-  assert (not Config.merlin || Local_store.is_bound ());
+  assert (not Config_constants.merlin || Local_store.is_bound ());
   prepend_add dir;
   dirs := !dirs @ [dir]
 
@@ -155,7 +155,7 @@ let auto_include_otherlibs =
   auto_include_libs otherlibs
 
 let find fn =
-  assert (not Config.merlin || Local_store.is_bound ());
+  assert (not Config_constants.merlin || Local_store.is_bound ());
   try
     if is_basename fn && not !Sys.interactive then
       STbl.find !files fn
@@ -165,7 +165,7 @@ let find fn =
     !auto_include_callback Dir.find fn
 
 let find_uncap fn =
-  assert (not Config.merlin || Local_store.is_bound ());
+  assert (not Config_constants.merlin || Local_store.is_bound ());
   try
     if is_basename fn && not !Sys.interactive then
       STbl.find !files_uncap (String.uncapitalize_ascii fn)

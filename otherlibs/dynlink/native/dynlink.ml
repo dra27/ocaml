@@ -94,7 +94,7 @@ module Native = struct
       try ndl_open filename (not priv)
       with exn -> raise (DT.Error (Cannot_open_dynamic_library exn))
     in
-    if header.dynu_magic <> Config.cmxs_magic_number then begin
+    if header.dynu_magic <> Config_constants.cmxs_magic_number then begin
       raise (DT.Error (Not_a_bytecode_file filename))
     end;
     let syms =

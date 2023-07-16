@@ -1193,8 +1193,10 @@ and comp_binary_test stack_info env cond ifso ifnot sz cont =
 let comp_block env exp sz cont =
   let stack_info = create_stack_info () in
   let code = comp_expr stack_info env exp sz cont in
-  let used_safe = !(stack_info.max_stack_used) + Config.stack_safety_margin in
-  if used_safe > Config.stack_threshold then
+  let used_safe =
+    !(stack_info.max_stack_used) + Config_constants.stack_safety_margin
+  in
+  if used_safe > Config_constants.stack_threshold then
     Kconst(Const_base(Const_int used_safe)) ::
     Kccall("caml_ensure_stack_capacity", 1) ::
     code

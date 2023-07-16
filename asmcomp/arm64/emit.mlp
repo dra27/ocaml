@@ -1078,7 +1078,7 @@ let fundecl fundecl =
   `	.globl	{emit_symbol fundecl.fun_name}\n`;
   emit_symbol_type emit_symbol fundecl.fun_name "function";
   (* Dynamic stack checking *)
-  let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+  let stack_threshold_size = Config_constants.stack_threshold * 8 in (* bytes *)
   let { max_frame_size; contains_nontail_calls} =
     preproc_stack_check
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
@@ -1089,7 +1089,7 @@ let fundecl fundecl =
       `{emit_label overflow}:\n`;
       (* Pass the desired frame size on the stack, since all of the
         argument-passing registers may be in use. *)
-      let s = (Config.stack_threshold + max_frame_size / 8) in
+      let s = (Config_constants.stack_threshold + max_frame_size / 8) in
       `	mov	{emit_reg reg_tmp1}, #{emit_int s}\n`;
       `	stp	{emit_reg reg_tmp1}, x30, [sp, #-16]!\n`;
       `	bl	{emit_symbol "caml_call_realloc_stack"}\n`;

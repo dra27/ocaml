@@ -561,10 +561,8 @@ odoc_merge.cmi : \
     odoc_types.cmi \
     odoc_module.cmi
 odoc_messages.cmo : \
-    ../utils/config.cmi \
     odoc_messages.cmi
 odoc_messages.cmx : \
-    ../utils/config.cmx \
     odoc_messages.cmi
 odoc_messages.cmi :
 odoc_misc.cmo : \

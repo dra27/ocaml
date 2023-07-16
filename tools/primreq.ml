@@ -39,15 +39,17 @@ let scan_info cu =
 
 let scan_obj filename =
   let ic = open_in_bin filename in
-  let buffer = really_input_string ic (String.length Config.cmo_magic_number) in
-  if buffer = Config.cmo_magic_number then begin
+  let buffer =
+    really_input_string ic (String.length Config_constants.cmo_magic_number)
+  in
+  if buffer = Config_constants.cmo_magic_number then begin
     let cu_pos = input_binary_int ic in
     seek_in ic cu_pos;
     let cu = (input_value ic : compilation_unit) in
     close_in ic;
     scan_info cu
   end else
-  if buffer = Config.cma_magic_number then begin
+  if buffer = Config_constants.cma_magic_number then begin
     let toc_pos = input_binary_int ic in
     seek_in ic toc_pos;
     let toc = (input_value ic : library) in

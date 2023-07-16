@@ -16,6 +16,8 @@
 
 (* Portions of the Config module common to both the boot and main compiler. *)
 
+include Config_constants
+
 (* The main OCaml version string has moved to ../build-aux/ocaml_version.m4 *)
 let version = Sys.ocaml_version
 
@@ -28,26 +30,16 @@ let standard_library =
   with Not_found ->
     standard_library_default
 
-let exec_magic_number = "Caml1999X033"
-    (* exec_magic_number is duplicated in runtime/caml/exec.h *)
-and cmi_magic_number = "Caml1999I033"
-and cmo_magic_number = "Caml1999O033"
-and cma_magic_number = "Caml1999A033"
-and cmx_magic_number =
+let cmx_magic_number =
   if flambda then
-    "Caml1999y033"
+    cmx_magic_number_flambda
   else
-    "Caml1999Y033"
+    cmx_magic_number_clambda
 and cmxa_magic_number =
   if flambda then
-    "Caml1999z033"
+    cmxa_magic_number_flambda
   else
-    "Caml1999Z033"
-and ast_impl_magic_number = "Caml1999M033"
-and ast_intf_magic_number = "Caml1999N033"
-and cmxs_magic_number = "Caml1999D033"
-and cmt_magic_number = "Caml1999T033"
-and linear_magic_number = "Caml1999L033"
+    cmxa_magic_number_clambda
 
 let safe_string = true
 let default_safe_string = true
@@ -55,15 +47,6 @@ let naked_pointers = false
 
 let interface_suffix = ref ".mli"
 
-let max_tag = 243
-(* This is normally the same as in obj.ml, but we have to define it
-   separately because it can differ when we're in the middle of a
-   bootstrapping phase. *)
-let lazy_tag = 246
-
-let max_young_wosize = 256
-let stack_threshold = 32 (* see runtime/caml/config.h *)
-let stack_safety_margin = 6
 let default_executable_name =
   match Sys.os_type with
     "Unix" -> "a.out"
@@ -163,5 +146,3 @@ let config_var x =
         | Bool b -> string_of_bool b
       in
       Some s
-
-let merlin = false

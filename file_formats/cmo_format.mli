@@ -51,7 +51,7 @@ type compilation_unit =
     cu_debugsize: int }                 (* Length of debugging info *)
 
 (* Format of a .cmo file:
-     magic number (Config.cmo_magic_number)
+     magic number (Config_constants.cmo_magic_number)
      absolute offset of compilation unit descriptor
      block of relocatable bytecode
      debugging information if any
@@ -69,7 +69,7 @@ type library =
     lib_dllibs: string list }           (* DLLs needed *)
 
 (* Format of a .cma file:
-     magic number (Config.cma_magic_number)
+     magic number (Config_constants.cma_magic_number)
      absolute offset of library descriptor
      object code for first library member
      ...

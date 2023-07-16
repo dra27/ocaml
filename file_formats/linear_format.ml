@@ -38,7 +38,7 @@ exception Error of error
 let save filename linear_unit_info =
   let ch = open_out_bin filename in
   Misc.try_finally (fun () ->
-    output_string ch Config.linear_magic_number;
+    output_string ch Config_constants.linear_magic_number;
     output_value ch linear_unit_info;
     (* Saved because Linearize and Emit depend on Cmm.label. *)
     output_value ch (Cmm.cur_label ());
@@ -54,7 +54,7 @@ let restore filename =
   let ic = open_in_bin filename in
   Misc.try_finally
     (fun () ->
-       let magic = Config.linear_magic_number in
+       let magic = Config_constants.linear_magic_number in
        let buffer = really_input_string ic (String.length magic) in
        if String.equal buffer magic then begin
          try

@@ -817,7 +817,7 @@ let call_cached_method obj tag cache pos args dbg =
 (* Allocation *)
 
 let make_alloc_generic set_fn dbg tag wordsize args =
-  if wordsize <= Config.max_young_wosize then
+  if wordsize <= Config_constants.max_young_wosize then
     Cop(Calloc, Cconst_natint(block_header tag wordsize, dbg) :: args, dbg)
   else begin
     let id = V.create_local "*alloc*" in
@@ -2619,7 +2619,7 @@ let plugin_header units =
       dynu_defines = ui.ui_defines
     } in
   global_data "caml_plugin_header"
-    ({ dynu_magic = Config.cmxs_magic_number;
+    ({ dynu_magic = Config_constants.cmxs_magic_number;
        dynu_units = List.map mk units }
      : Cmxs_format.dynheader)
 

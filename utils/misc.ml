@@ -1128,10 +1128,10 @@ module Magic_number = struct
 
   let current_raw kind =
     match[@warning "+9"] kind with
-      | Exec -> Config.exec_magic_number
-      | Cmi -> Config.cmi_magic_number
-      | Cmo -> Config.cmo_magic_number
-      | Cma -> Config.cma_magic_number
+      | Exec -> Config_constants.exec_magic_number
+      | Cmi -> Config_constants.cmi_magic_number
+      | Cmo -> Config_constants.cmo_magic_number
+      | Cma -> Config_constants.cma_magic_number
       | Cmx config ->
          (* the 'if' guarantees that in the common case
             we return the "trusted" value from Config. *)
@@ -1152,10 +1152,10 @@ module Magic_number = struct
            let raw_kind = raw_kind kind in
            let len = String.length raw_kind in
            raw_kind ^ String.sub reference len (String.length reference - len)
-      | Cmxs -> Config.cmxs_magic_number
-      | Cmt -> Config.cmt_magic_number
-      | Ast_intf -> Config.ast_intf_magic_number
-      | Ast_impl -> Config.ast_impl_magic_number
+      | Cmxs -> Config_constants.cmxs_magic_number
+      | Cmt -> Config_constants.cmt_magic_number
+      | Ast_intf -> Config_constants.ast_intf_magic_number
+      | Ast_impl -> Config_constants.ast_impl_magic_number
 
   (* it would seem more direct to define current_version with the
      correct numbers and current_raw on top of it, but for now we
