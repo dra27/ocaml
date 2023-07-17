@@ -77,6 +77,10 @@ let display_msvc_output file name =
     close_in c;
     Sys.remove file
 
+let std_include_flag prefix =
+  if !Clflags.no_std_include then ""
+  else (prefix ^ (Filename.quote Config.standard_library))
+
 let compile_file ?output ?(opt="") ?stable_name name =
   let (pipe, file) =
     if Config_settings.ccomp_type = "msvc" && not !Clflags.verbose then
@@ -117,7 +121,7 @@ let compile_file ?output ?(opt="") ?stable_name name =
          (quote_prefixed ~response_files:true "-I"
             (List.map (Misc.expand_directory Config.standard_library)
                (List.rev !Clflags.include_dirs)))
-         (Clflags.std_include_flag "-I")
+         (std_include_flag "-I")
          (Filename.quote name)
          (* cl tediously includes the name of the C file as the first thing it
             outputs (in fairness, the tedious thing is that there's no switch to
@@ -200,7 +204,7 @@ let call_linker mode output_name files extra =
           | None, Partial -> assert false
           )
           (Filename.quote output_name)
-          ""  (*(Clflags.std_include_flag "-I")*)
+          ""  (*(std_include_flag "-I")*)
           (quote_prefixed ~response_files:true "-L" (Load_path.get_paths ()))
           (String.concat " " (List.rev !Clflags.all_ccopts))
           (quote_files ~response_files:true files)

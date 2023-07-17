@@ -152,10 +152,6 @@ let dont_write_files = ref false        (* set to true under ocamldoc *)
 let insn_sched_default = true
 let insn_sched = ref insn_sched_default (* -[no-]insn-sched *)
 
-let std_include_flag prefix =
-  if !no_std_include then ""
-  else (prefix ^ (Filename.quote Config.standard_library))
-
 let std_include_dir () =
   if !no_std_include then [] else [Config.standard_library]
 

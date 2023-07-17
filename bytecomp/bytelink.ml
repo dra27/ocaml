@@ -601,7 +601,7 @@ let build_custom_runtime prim_name exec_name =
     else
       [] in
   let exitcode =
-    (Clflags.std_include_flag "-I" ^ " " ^ Config_settings.bytecomp_c_libraries)
+    (Ccomp.std_include_flag "-I" ^ " " ^ Config_settings.bytecomp_c_libraries)
   in
   Ccomp.call_linker Ccomp.Exe exec_name
     (debug_prefix_map @ [prim_name] @ List.rev !Clflags.ccobjs @ [runtime_lib])

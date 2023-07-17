@@ -22,6 +22,7 @@
 
 val command: string -> int
 val run_command: string -> unit
+val std_include_flag : string -> string
 val compile_file:
   ?output:string -> ?opt:string -> ?stable_name:string -> string -> int
 val create_archive: string -> string list -> int
