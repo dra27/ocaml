@@ -74,7 +74,6 @@ COMPILERLIBS_SOURCES=\
   utils/binutils.ml \
   utils/config_constants.ml \
   utils/config_settings.ml \
-  utils/config.ml \
   utils/build_path_prefix_map.ml \
   utils/misc.ml \
   utils/identifiable.ml \

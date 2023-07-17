@@ -1,8 +1,8 @@
 (* TEST
  include config;
  flags = "-w -55";
- ocamlc_flags = "config_constants.cmo config_settings.cmo config.cmo";
- ocamlopt_flags = "-inline 20 config_constants.cmx config_settings.cmx config.cmx";
+ ocamlc_flags = "config_constants.cmo config_settings.cmo";
+ ocamlopt_flags = "-inline 20 config_constants.cmx config_settings.cmx";
  native;
 *)
 

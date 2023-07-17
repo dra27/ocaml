@@ -44,13 +44,128 @@ let print_standard_library () =
   print_string standard_library; print_newline();
   raise (Exit_with_status 0)
 
+let default_executable_name =
+  match Sys.os_type with
+    "Unix" -> "a.out"
+  | "Win32" | "Cygwin" -> "camlprog.exe"
+  | _ -> "camlprog"
+
+type configuration_value =
+  | String of string
+  | Int of int
+  | Bool of bool
+
+let configuration_variables () =
+  let open Config_constants in
+  let open Config_settings in
+  let p x v = (x, String v) in
+  let p_int x v = (x, Int v) in
+  let p_bool x v = (x, Bool v) in
+  (* bytecomp_c_compiler and native_c_compiler have been supported for a
+     long time and are retained for backwards compatibility.
+     For programs that don't need compatibility with older OCaml releases
+     the recommended approach is to use the constituent variables
+     c_compiler, ocamlc_cflags, ocamlc_cppflagsetc., directly.
+  *)
+  let legacy_c_compiler =
+    c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags in
+  let cmx_magic_number =
+    Misc.Magic_number.(current_raw (Cmx native_obj_config)) in
+  let cmxa_magic_number =
+    Misc.Magic_number.(current_raw (Cmxa native_obj_config)) in
+[
+  p "version" Sys.ocaml_version;
+  p "standard_library_default" standard_library_default;
+  p "standard_library" (Misc.get_stdlib standard_library_default);
+  p "ccomp_type" ccomp_type;
+  p "c_compiler" c_compiler;
+  p "ocamlc_cflags" ocamlc_cflags;
+  p "ocamlc_cppflags" ocamlc_cppflags;
+  p "ocamlopt_cflags" ocamlc_cflags;
+  p "ocamlopt_cppflags" ocamlc_cppflags;
+  p "bytecomp_c_compiler" legacy_c_compiler;
+  p "native_c_compiler" legacy_c_compiler;
+  p "bytecomp_c_libraries" bytecomp_c_libraries;
+  p "native_c_libraries" native_c_libraries;
+  p "native_ldflags" native_ldflags;
+  p "native_pack_linker" native_pack_linker;
+  p_bool "native_compiler" native_compiler;
+  p "architecture" architecture;
+  p "model" model;
+  p_int "int_size" Sys.int_size;
+  p_int "word_size" Sys.word_size;
+  p "system" system;
+  p "asm" asm;
+  p_bool "asm_cfi_supported" asm_cfi_supported;
+  p_bool "with_frame_pointers" with_frame_pointers;
+  p "ext_exe" ext_exe;
+  p "ext_obj" ext_obj;
+  p "ext_asm" ext_asm;
+  p "ext_lib" ext_lib;
+  p "ext_dll" ext_dll;
+  p "os_type" Sys.os_type;
+  p "default_executable_name" default_executable_name;
+  p_bool "systhread_supported" systhread_supported;
+  p "host" host;
+  p "target" target;
+  p_bool "flambda" flambda;
+  p_bool "safe_string" true;
+  p_bool "default_safe_string" true;
+  p_bool "flat_float_array" flat_float_array;
+  p_bool "function_sections" function_sections;
+  p_bool "afl_instrument" afl_instrument;
+  p_bool "tsan" tsan;
+  p_bool "windows_unicode" windows_unicode;
+  p_bool "supports_shared_libraries" supports_shared_libraries;
+  p_bool "native_dynlink" native_dynlink;
+  p_bool "naked_pointers" false;
+  p_bool "compression_supported" (Marshal.compression_supported());
+
+  p "exec_magic_number" exec_magic_number;
+  p "cmi_magic_number" cmi_magic_number;
+  p "cmo_magic_number" cmo_magic_number;
+  p "cma_magic_number" cma_magic_number;
+  p "cmx_magic_number" cmx_magic_number;
+  p "cmxa_magic_number" cmxa_magic_number;
+  p "ast_impl_magic_number" ast_impl_magic_number;
+  p "ast_intf_magic_number" ast_intf_magic_number;
+  p "cmxs_magic_number" cmxs_magic_number;
+  p "cmt_magic_number" cmt_magic_number;
+  p "linear_magic_number" linear_magic_number;
+]
+
+let print_config_value oc = function
+  | String s ->
+      Printf.fprintf oc "%s" s
+  | Int n ->
+      Printf.fprintf oc "%d" n
+  | Bool p ->
+      Printf.fprintf oc "%B" p
+
+let print_config oc =
+  let print (x, v) =
+    Printf.fprintf oc "%s: %a\n" x print_config_value v in
+  List.iter print (configuration_variables ());
+  flush oc
+
+let config_var x =
+  match List.assoc_opt x (configuration_variables()) with
+  | None -> None
+  | Some v ->
+      let s = match v with
+        | String s -> s
+        | Int n -> Int.to_string n
+        | Bool b -> string_of_bool b
+      in
+      Some s
+
 (* showing configuration and configuration variables *)
 let show_config_and_exit () =
-  Config.print_config stdout;
+  print_config stdout;
   exit 0
 
 let show_config_variable_and_exit x =
-  match Config.config_var x with
+  match config_var x with
   | Some v ->
       (* we intentionally don't print a newline to avoid Windows \r
          issues: bash only strips the trailing \n when using a command
@@ -74,7 +189,7 @@ let extract_output = function
 
 let default_output = function
   | Some s -> s
-  | None -> Config.default_executable_name
+  | None -> default_executable_name
 
 let first_include_dirs = ref []
 let last_include_dirs = ref []
