@@ -143,7 +143,11 @@ let synchronize_primitive num symb =
 let ld_conf_contents () =
   let path = ref [] in
   begin try
-    let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
+    let ic =
+      let standard_library =
+        Misc.get_stdlib Config_settings.standard_library_default in
+      open_in (Filename.concat standard_library "ld.conf")
+    in
     begin try
       while true do
         path := input_line ic :: !path

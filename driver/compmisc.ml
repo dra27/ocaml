@@ -38,10 +38,14 @@ let init_path ?(auto_include=auto_include) ?(dir="") () =
     !Compenv.first_include_dirs
   in
   let exp_dirs =
-    List.map (Misc.expand_directory Config.standard_library) dirs
+    List.map (Misc.expand_stdlib Config_settings.standard_library_default) dirs
   in
   let std_include_dir =
-    if !Clflags.no_std_include then [] else [Config.standard_library]
+    if !Clflags.no_std_include then [] else
+      let standard_library =
+        Misc.get_stdlib Config_settings.standard_library_default
+      in
+      [standard_library]
   in
   let dirs =
     (if !Clflags.no_cwd then [] else [dir])

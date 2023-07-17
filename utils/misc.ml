@@ -303,6 +303,18 @@ let expand_directory alt s =
                        (String.sub s 1 (String.length s - 1))
   else s
 
+let env_stdlib =
+  let ocamllib = Sys.getenv_opt "OCAMLLIB" in
+  if ocamllib = None then
+    Sys.getenv_opt "CAMLLIB"
+  else
+    ocamllib
+
+let get_stdlib default = Option.value ~default env_stdlib
+
+let expand_stdlib standard_library_default =
+  expand_directory (get_stdlib standard_library_default)
+
 let path_separator =
   match Sys.os_type with
   | "Win32" -> ';'

@@ -148,7 +148,7 @@ let auto_include_libs libs alert find_in_dir fn =
 
 let auto_include_otherlibs =
   (* Ensure directories are only ever scanned once *)
-  let expand = Misc.expand_directory Config.standard_library in
+  let expand = Misc.expand_stdlib Config_settings.standard_library_default in
   let otherlibs =
     let read_lib lib = lazy (Dir.create (expand ("+" ^ lib))) in
     List.map (fun lib -> (lib, read_lib lib)) ["dynlink"; "str"; "unix"] in

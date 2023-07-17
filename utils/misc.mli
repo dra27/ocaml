@@ -224,6 +224,19 @@ val expand_directory: string -> string -> string
        (** [expand_directory alt file] eventually expands a [+] at the
            beginning of file into [alt] (an alternate root directory) *)
 
+val env_stdlib: string option
+       (** [Some dir] if the Standard Library has been set using environment
+           variables. *)
+
+val get_stdlib: string -> string
+       (** [get_stdlib standard_library_default] is the directory containing the
+           standard libraries. *)
+
+val expand_stdlib: string -> string -> string
+       (** [expand_stdlib standard_library_default file] expands a [+] at the
+           beginning of [file] into {!env_stdlib} or [standard_library_default]
+           if [env_stdlib] is [None]. *)
+
 val split_path_contents: ?sep:char -> string -> string list
       (** [split_path_contents ?sep s] interprets [s] as the value of
           a "PATH"-like variable and returns the corresponding list of

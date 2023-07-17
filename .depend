@@ -18,7 +18,6 @@ utils/ccomp.cmo : \
     utils/misc.cmi \
     utils/load_path.cmi \
     utils/config_settings.cmi \
-    utils/config.cmi \
     utils/clflags.cmi \
     utils/ccomp.cmi
 utils/ccomp.cmx : \
@@ -26,7 +25,6 @@ utils/ccomp.cmx : \
     utils/misc.cmx \
     utils/load_path.cmx \
     utils/config_settings.cmx \
-    utils/config.cmx \
     utils/clflags.cmx \
     utils/ccomp.cmi
 utils/ccomp.cmi :
@@ -133,14 +131,14 @@ utils/lazy_backtrack.cmi :
 utils/load_path.cmo : \
     utils/misc.cmi \
     utils/local_store.cmi \
+    utils/config_settings.cmi \
     utils/config_constants.cmi \
-    utils/config.cmi \
     utils/load_path.cmi
 utils/load_path.cmx : \
     utils/misc.cmx \
     utils/local_store.cmx \
+    utils/config_settings.cmx \
     utils/config_constants.cmx \
-    utils/config.cmx \
     utils/load_path.cmi
 utils/load_path.cmi :
 utils/local_store.cmo : \
@@ -2096,13 +2094,11 @@ bytecomp/bytesections.cmi :
 bytecomp/dll.cmo : \
     utils/misc.cmi \
     utils/config_settings.cmi \
-    utils/config.cmi \
     utils/binutils.cmi \
     bytecomp/dll.cmi
 bytecomp/dll.cmx : \
     utils/misc.cmx \
     utils/config_settings.cmx \
-    utils/config.cmx \
     utils/binutils.cmx \
     bytecomp/dll.cmi
 bytecomp/dll.cmi :
@@ -6093,7 +6089,6 @@ driver/compmisc.cmo : \
     typing/ident.cmi \
     typing/env.cmi \
     utils/config_settings.cmi \
-    utils/config.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
     driver/compmisc.cmi
@@ -6107,7 +6102,6 @@ driver/compmisc.cmx : \
     typing/ident.cmx \
     typing/env.cmx \
     utils/config_settings.cmx \
-    utils/config.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
     driver/compmisc.cmi
@@ -6188,7 +6182,7 @@ driver/makedepend.cmo : \
     parsing/location.cmi \
     parsing/lexer.cmi \
     parsing/depend.cmi \
-    utils/config.cmi \
+    utils/config_settings.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
     driver/makedepend.cmi
@@ -6201,7 +6195,7 @@ driver/makedepend.cmx : \
     parsing/location.cmx \
     parsing/lexer.cmx \
     parsing/depend.cmx \
-    utils/config.cmx \
+    utils/config_settings.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
     driver/makedepend.cmi
@@ -6401,7 +6395,7 @@ toplevel/topcommon.cmo : \
     toplevel/genprintval.cmi \
     typing/env.cmi \
     bytecomp/dll.cmi \
-    utils/config.cmi \
+    utils/config_settings.cmi \
     driver/compmisc.cmi \
     driver/compenv.cmi \
     file_formats/cmo_format.cmi \
@@ -6430,7 +6424,7 @@ toplevel/topcommon.cmx : \
     toplevel/genprintval.cmx \
     typing/env.cmx \
     bytecomp/dll.cmx \
-    utils/config.cmx \
+    utils/config_settings.cmx \
     driver/compmisc.cmx \
     driver/compenv.cmx \
     file_formats/cmo_format.cmi \
@@ -6469,7 +6463,7 @@ toplevel/topdirs.cmo : \
     typing/env.cmi \
     bytecomp/dll.cmi \
     typing/ctype.cmi \
-    utils/config.cmi \
+    utils/config_settings.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
     typing/btype.cmi \
@@ -6494,7 +6488,7 @@ toplevel/topdirs.cmx : \
     typing/env.cmx \
     bytecomp/dll.cmx \
     typing/ctype.cmx \
-    utils/config.cmx \
+    utils/config_settings.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
     typing/btype.cmx \
@@ -7139,12 +7133,10 @@ tools/ocamldep.cmi :
 tools/ocamlmklib.cmo : \
     utils/misc.cmi \
     utils/config_settings.cmi \
-    utils/config.cmi \
     tools/ocamlmklib.cmi
 tools/ocamlmklib.cmx : \
     utils/misc.cmx \
     utils/config_settings.cmx \
-    utils/config.cmx \
     tools/ocamlmklib.cmi
 tools/ocamlmklib.cmi :
 tools/ocamlmktop.cmo : \
@@ -7570,7 +7562,7 @@ debugger/main.cmo : \
     debugger/frames.cmi \
     debugger/exec.cmi \
     debugger/debugger_config.cmi \
-    utils/config.cmi \
+    utils/config_settings.cmi \
     driver/compmisc.cmi \
     debugger/command_line.cmi \
     file_formats/cmi_format.cmi \
@@ -7593,7 +7585,7 @@ debugger/main.cmx : \
     debugger/frames.cmx \
     debugger/exec.cmx \
     debugger/debugger_config.cmx \
-    utils/config.cmx \
+    utils/config_settings.cmx \
     driver/compmisc.cmx \
     debugger/command_line.cmx \
     file_formats/cmi_format.cmx \
@@ -7609,16 +7601,18 @@ debugger/ocamldebug_entry.cmx : \
     debugger/ocamldebug_entry.cmi
 debugger/ocamldebug_entry.cmi :
 debugger/parameters.cmo : \
+    utils/misc.cmi \
     utils/load_path.cmi \
     typing/envaux.cmi \
     debugger/debugger_config.cmi \
-    utils/config.cmi \
+    utils/config_settings.cmi \
     debugger/parameters.cmi
 debugger/parameters.cmx : \
+    utils/misc.cmx \
     utils/load_path.cmx \
     typing/envaux.cmx \
     debugger/debugger_config.cmx \
-    utils/config.cmx \
+    utils/config_settings.cmx \
     debugger/parameters.cmi
 debugger/parameters.cmi :
 debugger/parser_aux.cmi : \

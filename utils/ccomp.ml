@@ -78,8 +78,10 @@ let display_msvc_output file name =
     Sys.remove file
 
 let std_include_flag prefix =
+  let standard_library =
+    Misc.get_stdlib Config_settings.standard_library_default in
   if !Clflags.no_std_include then ""
-  else (prefix ^ (Filename.quote Config.standard_library))
+  else (prefix ^ Filename.quote standard_library)
 
 let compile_file ?output ?(opt="") ?stable_name name =
   let (pipe, file) =
@@ -97,6 +99,8 @@ let compile_file ?output ?(opt="") ?stable_name name =
     | Some stable when Config_settings.c_has_debug_prefix_map ->
       Printf.sprintf " -fdebug-prefix-map=%s=%s" name stable
     | Some _ | None -> "" in
+  let expand_stdlib =
+    Misc.expand_stdlib Config_settings.standard_library_default in
   let exit =
     command
       (Printf.sprintf
@@ -119,8 +123,7 @@ let compile_file ?output ?(opt="") ?stable_name name =
            "-g" else "")
          (String.concat " " (List.rev !Clflags.all_ccopts))
          (quote_prefixed ~response_files:true "-I"
-            (List.map (Misc.expand_directory Config.standard_library)
-               (List.rev !Clflags.include_dirs)))
+            (List.map expand_stdlib (List.rev !Clflags.include_dirs)))
          (std_include_flag "-I")
          (Filename.quote name)
          (* cl tediously includes the name of the C file as the first thing it

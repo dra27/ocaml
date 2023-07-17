@@ -26,10 +26,12 @@ let output_prefix name =
   Filename.remove_extension oname
 
 let print_version_and_library compiler =
+  let standard_library =
+    Misc.get_stdlib Config_settings.standard_library_default in
   Printf.printf "The OCaml %s, version " compiler;
   print_string Sys.ocaml_version; print_newline();
   print_string "Standard library directory: ";
-  print_string Config.standard_library; print_newline();
+  print_string standard_library; print_newline();
   raise (Exit_with_status 0)
 
 let print_version_string () =
@@ -37,7 +39,9 @@ let print_version_string () =
   raise (Exit_with_status 0)
 
 let print_standard_library () =
-  print_string Config.standard_library; print_newline();
+  let standard_library =
+    Misc.get_stdlib Config_settings.standard_library_default in
+  print_string standard_library; print_newline();
   raise (Exit_with_status 0)
 
 (* showing configuration and configuration variables *)
@@ -607,8 +611,10 @@ let matching_filename filename { pattern } =
     filename = pattern
 
 let apply_config_file ppf position =
+  let standard_library =
+    Misc.get_stdlib Config_settings.standard_library_default in
   let config_file =
-    Filename.concat Config.standard_library "ocaml_compiler_internal_params"
+    Filename.concat standard_library "ocaml_compiler_internal_params"
   in
   let config =
     if Sys.file_exists config_file then
