@@ -1028,14 +1028,10 @@ module Magic_number = struct
     | Cmi -> "Caml1999I"
     | Cmo -> "Caml1999O"
     | Cma -> "Caml1999A"
-    | Cmx config ->
-       if config.flambda
-       then "Caml1999y"
-       else "Caml1999Y"
-    | Cmxa config ->
-       if config.flambda
-       then "Caml1999z"
-       else "Caml1999Z"
+    | Cmx {flambda = true} -> "Caml1999y"
+    | Cmx {flambda = false} -> "Caml1999Y"
+    | Cmxa {flambda = true} -> "Caml1999z"
+    | Cmxa {flambda = false} -> "Caml1999Z"
     | Cmxs -> "Caml1999D"
     | Cmt -> "Caml1999T"
     | Ast_impl -> "Caml1999M"
@@ -1132,26 +1128,10 @@ module Magic_number = struct
       | Cmi -> Config_constants.cmi_magic_number
       | Cmo -> Config_constants.cmo_magic_number
       | Cma -> Config_constants.cma_magic_number
-      | Cmx config ->
-         (* the 'if' guarantees that in the common case
-            we return the "trusted" value from Config. *)
-         let reference = Config.cmx_magic_number in
-         if config = native_obj_config then reference
-         else
-           (* otherwise we stitch together the magic number
-              for a different configuration by concatenating
-              the right magic kind at this configuration
-              and the rest of the current raw number for our configuration. *)
-           let raw_kind = raw_kind kind in
-           let len = String.length raw_kind in
-           raw_kind ^ String.sub reference len (String.length reference - len)
-      | Cmxa config ->
-         let reference = Config.cmxa_magic_number in
-         if config = native_obj_config then reference
-         else
-           let raw_kind = raw_kind kind in
-           let len = String.length raw_kind in
-           raw_kind ^ String.sub reference len (String.length reference - len)
+      | Cmx {flambda = true} -> Config_constants.cmx_magic_number_flambda
+      | Cmx {flambda = false} -> Config_constants.cmx_magic_number_clambda
+      | Cmxa {flambda = true} -> Config_constants.cmxa_magic_number_flambda
+      | Cmxa {flambda = false} -> Config_constants.cmxa_magic_number_clambda
       | Cmxs -> Config_constants.cmxs_magic_number
       | Cmt -> Config_constants.cmt_magic_number
       | Ast_intf -> Config_constants.ast_intf_magic_number

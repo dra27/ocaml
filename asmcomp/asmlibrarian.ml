@@ -52,7 +52,9 @@ let create_archive file_list lib_name =
     ~always:(fun () -> close_out outchan)
     ~exceptionally:(fun () -> remove_file lib_name; remove_file archive_name)
     (fun () ->
-       output_string outchan Config.cmxa_magic_number;
+       let cmxa_magic_number =
+         Misc.Magic_number.(current_raw (Cmxa native_obj_config)) in
+       output_string outchan cmxa_magic_number;
        let (objfile_list, descr_list) =
          List.split (List.map read_info file_list) in
        List.iter2
