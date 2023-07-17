@@ -141,7 +141,7 @@ let of_prim name =
   try
     PrimMap.find !c_prim_table name
   with Not_found ->
-    if !Clflags.custom_runtime || Config.host <> Config.target
+    if !Clflags.custom_runtime || Config_settings.host <> Config_settings.target
        || !Clflags.no_check_prims
     then
       PrimMap.enter c_prim_table name

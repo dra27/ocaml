@@ -19,7 +19,7 @@
     (the values of this type) are floating-point numbers, or none of them are.
 
     (Note: This assumption is required for the dynamic float array optimization;
-    it is only made if Config.flat_float_array is set,
+    it is only made if Config_settings.flat_float_array is set,
     otherwise the code in this module becomes trivial
     -- see {!compute_decl}.)
 
@@ -117,9 +117,9 @@ val compute_decl : Env.t -> Types.type_declaration -> mode list
     (or labels), are always separable. In particular, their mode signatures
     do not require anything of their type parameters, which are marked [Ind].
 
-    Finally, if {!Config.flat_float_array} is not set, then separability
-    is not required anymore; we just use [Ind] as the mode of each parameter
-    without any check.
+    Finally, if {!Config_settings.flat_float_array} is not set, then
+    separability is not required anymore; we just use [Ind] as the mode of each
+    parameter without any check.
 *)
 
 (** Property interface (see {!Typedecl_properties}). These functions

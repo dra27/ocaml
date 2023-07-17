@@ -85,15 +85,15 @@ let main argv ppf =
         if !Clflags.output_c_object
         && not !Clflags.output_complete_executable then
           let s = Compenv.extract_output !Clflags.output_name in
-          if (Filename.check_suffix s Config.ext_obj
-            || Filename.check_suffix s Config.ext_dll
+          if (Filename.check_suffix s Config_settings.ext_obj
+            || Filename.check_suffix s Config_settings.ext_dll
             || Filename.check_suffix s ".c")
           then s
           else
             Compenv.fatal
               (Printf.sprintf
                  "The extension of the output file must be .c, %s or %s"
-                 Config.ext_obj Config.ext_dll
+                 Config_settings.ext_obj Config_settings.ext_dll
               )
         else
           Compenv.default_output !Clflags.output_name

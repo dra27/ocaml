@@ -88,17 +88,17 @@ let reg_stack_arg_begin = check_phys_reg 7 "%r9"
 let reg_stack_arg_end = check_phys_reg 6 "%r8"
 
 let cfi_startproc () =
-  if Config.asm_cfi_supported then begin
+  if Config_settings.asm_cfi_supported then begin
     emit_string "\t.cfi_startproc\n";
   end
 
 let cfi_endproc () =
-  if Config.asm_cfi_supported then begin
+  if Config_settings.asm_cfi_supported then begin
     emit_string "\t.cfi_endproc\n";
   end
 
 let cfi_def_cfa_register reg =
-  if Config.asm_cfi_supported then begin
+  if Config_settings.asm_cfi_supported then begin
     emit_string "\t.cfi_def_cfa_register ";
     emit_string reg;
     emit_string "\n"
@@ -598,7 +598,7 @@ let emit_instr env i =
     | Lop (Ireturn_addr) ->
         invalid_arg (
           "Support for Ireturn_addr is not implemented on architecture "
-          ^ Config.architecture)
+          ^ Config_settings.architecture)
     | Lreloadretaddr ->
         let n = frame_size env in
         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`

@@ -71,7 +71,7 @@ let exported_constants = Hashtbl.create 17
 let merged_environment = ref Export_info.empty
 
 let default_ui_export_info =
-  if Config.flambda then
+  if Config_settings.flambda then
     Cmx_format.Flambda Export_info.empty
   else
     Cmx_format.Clambda Value_unknown
@@ -230,7 +230,7 @@ let cache_unit_info ui =
 (* Return the approximation of a global identifier *)
 
 let get_clambda_approx ui =
-  assert(not Config.flambda);
+  assert(not Config_settings.flambda);
   match ui.ui_export_info with
   | Flambda _ -> assert false
   | Clambda approx -> approx
@@ -288,19 +288,19 @@ let symbol_for_global' id =
     Symbol.of_global_linkage (unit_for_global id) sym_label
 
 let set_global_approx approx =
-  assert(not Config.flambda);
+  assert(not Config_settings.flambda);
   current_unit.ui_export_info <- Clambda approx
 
 (* Exporting and importing cross module information *)
 
 let get_flambda_export_info ui =
-  assert(Config.flambda);
+  assert(Config_settings.flambda);
   match ui.ui_export_info with
   | Clambda _ -> assert false
   | Flambda ei -> ei
 
 let set_export_info export_info =
-  assert(Config.flambda);
+  assert(Config_settings.flambda);
   current_unit.ui_export_info <- Flambda export_info
 
 let approx_for_global comp_unit =

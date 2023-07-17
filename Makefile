@@ -65,14 +65,14 @@ include compilerlibs/Makefile.compilerlibs
 
 # The configuration file
 
-utils/config.ml: \
+utils/config_settings.ml: \
   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
 	$(V_GEN)cp $< $@
-utils/config_boot.ml: utils/config.fixed.ml utils/config.common.ml
-	$(V_GEN)cat $^ > $@
+utils/config_boot.ml: utils/config.fixed.ml
+	$(V_GEN)cp $< $@
 
-utils/config_main.ml: utils/config.generated.ml utils/config.common.ml
-	$(V_GEN)cat $^ > $@
+utils/config_main.ml: utils/config.generated.ml
+	$(V_GEN)cp $< $@
 
 .PHONY: reconfigure
 reconfigure:
@@ -89,14 +89,14 @@ configure: tools/autogen configure.ac aclocal.m4 build-aux/ocaml_version.m4
 
 .PHONY: partialclean
 partialclean::
-	rm -f utils/config.ml \
+	rm -f utils/config_settings.ml \
 	      utils/config_main.ml utils/config_main.mli \
 	      utils/config_boot.ml utils/config_boot.mli \
         utils/domainstate.ml utils/domainstate.mli
 
 .PHONY: beforedepend
 beforedepend:: \
-  utils/config.ml utils/config_boot.ml utils/config_main.ml \
+  utils/config_settings.ml utils/config_boot.ml utils/config_main.ml \
   utils/domainstate.ml utils/domainstate.mli
 
 ocamllex_PROGRAMS = $(addprefix lex/,ocamllex ocamllex.opt)
@@ -326,7 +326,7 @@ coreboot:
 # runtime/ocamlrun
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
-# utils/config.ml will have the fixed bootstrap configuration
+# utils/config_settings.ml will have the fixed bootstrap configuration
 	$(MAKE) partialclean
 	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
@@ -334,7 +334,7 @@ coreboot:
 # Promote the new compiler and the new runtime
 	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
 # Rebuild the core system
-# utils/config.ml must still have the fixed bootstrap configuration
+# utils/config_settings.ml must still have the fixed bootstrap configuration
 	$(MAKE) partialclean
 	$(MAKE) IN_COREBOOT_CYCLE=true core
 # Check if fixpoint reached
@@ -362,9 +362,9 @@ endif
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
 bootstrap: coreboot
-# utils/config.ml must be restored to config.status's configuration
+# utils/config_settings.ml must be restored to config.status's configuration
 # lex/ocamllex$(EXE) was stripped in order to compare it
-	rm -f utils/config.ml lex/ocamllex$(EXE)
+	rm -f utils/config_settings.ml lex/ocamllex$(EXE)
 	$(MAKE) all
 
 # Compile everything the first time

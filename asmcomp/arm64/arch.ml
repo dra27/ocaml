@@ -20,7 +20,7 @@
 
 open Format
 
-let macosx = (Config.system = "macosx")
+let macosx = (Config_settings.system = "macosx")
 
 (* Machine-specific command-line options *)
 

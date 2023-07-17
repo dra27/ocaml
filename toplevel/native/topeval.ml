@@ -64,7 +64,10 @@ let close_phrase lam =
 
 let toplevel_value id =
   let glob, pos =
-    if Config.flambda then toplevel_value id else Translmod.nat_toplevel_name id
+    if Config_settings.flambda then
+      toplevel_value id
+    else
+      Translmod.nat_toplevel_name id
   in
   (Obj.magic (global_symbol glob)).(pos)
 
@@ -193,7 +196,7 @@ let execute_phrase print_outcome ppf phr =
          | None -> str, sg', false
       in
       let module_ident, res, required_globals, size =
-        if Config.flambda then
+        if Config_settings.flambda then
           let { Lambda.module_ident; main_module_block_size = size;
                 required_globals; code = res } =
             Translmod.transl_implementation_flambda phrase_name
@@ -214,7 +217,7 @@ let execute_phrase print_outcome ppf phr =
         let out_phr =
           match res with
           | Result _ ->
-              if Config.flambda then
+              if Config_settings.flambda then
                 (* CR-someday trefis: *)
                 Env.register_import_as_opaque (Ident.name module_ident)
               else

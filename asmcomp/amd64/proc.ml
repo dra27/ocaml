@@ -22,7 +22,7 @@ open Cmm
 open Reg
 open Mach
 
-let fp = Config.with_frame_pointers
+let fp = Config_settings.with_frame_pointers
 
 (* Which ABI to use *)
 
@@ -77,7 +77,7 @@ let win64 = Arch.win64
 *)
 
 let int_reg_name =
-  match Config.ccomp_type with
+  match Config_settings.ccomp_type with
   | "msvc" ->
       [| "rax"; "rbx"; "rdi"; "rsi"; "rdx"; "rcx"; "r8"; "r9";
          "r12"; "r13"; "r10"; "r11"; "rbp" |]
@@ -86,7 +86,7 @@ let int_reg_name =
          "%r12"; "%r13"; "%r10"; "%r11"; "%rbp" |]
 
 let float_reg_name =
-  match Config.ccomp_type with
+  match Config_settings.ccomp_type with
   | "msvc" ->
       [| "xmm0"; "xmm1"; "xmm2"; "xmm3"; "xmm4"; "xmm5"; "xmm6"; "xmm7";
          "xmm8"; "xmm9"; "xmm10"; "xmm11";

@@ -91,7 +91,7 @@ let mk_eval f =
   "<script>  Evaluate given script"
 
 let mk_function_sections f =
-  if Config.function_sections then
+  if Config_settings.function_sections then
     "-function-sections",  Arg.Unit f,
     " Generate each function in a separate section if target supports it"
   else
@@ -1824,7 +1824,7 @@ module Default = struct
     let _afl_inst_ratio n = Clflags.afl_inst_ratio := n
     let _afl_instrument = set Clflags.afl_instrument
     let _function_sections () =
-      assert Config.function_sections;
+      assert Config_settings.function_sections;
       prepend_to_list Compenv.first_ccopts "-ffunction-sections";
       Clflags.function_sections := true
     let _nodynlink = clear Clflags.dlcode

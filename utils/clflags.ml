@@ -142,10 +142,10 @@ let native_code = ref false             (* set to true under ocamlopt *)
 let force_slash = ref false             (* for ocamldep *)
 let clambda_checks = ref false          (* -clambda-checks *)
 let cmm_invariants =
-  ref Config.with_cmm_invariants        (* -dcmm-invariants *)
+  ref Config_settings.with_cmm_invariants        (* -dcmm-invariants *)
 
 let flambda_invariant_checks =
-  ref Config.with_flambda_invariants    (* -flambda-(no-)invariants *)
+  ref Config_settings.with_flambda_invariants    (* -flambda-(no-)invariants *)
 
 let dont_write_files = ref false        (* set to true under ocamldoc *)
 
@@ -162,7 +162,7 @@ let std_include_dir () =
 let shared = ref false (* -shared *)
 let dlcode = ref true (* not -nodynlink *)
 
-let pic_code = ref (match Config.architecture with (* -fPIC *)
+let pic_code = ref (match Config_settings.architecture with (* -fPIC *)
                      | "amd64" -> true
                      | _       -> false)
 
@@ -176,7 +176,7 @@ let keep_locs = ref true               (* -keep-locs *)
 let classic_inlining = ref false       (* -Oclassic *)
 let inlining_report = ref false    (* -inlining-report *)
 
-let afl_instrument = ref Config.afl_instrument (* -afl-instrument *)
+let afl_instrument = ref Config_settings.afl_instrument (* -afl-instrument *)
 let afl_inst_ratio = ref 100           (* -afl-inst-ratio *)
 
 let function_sections = ref false      (* -function-sections *)
@@ -188,7 +188,8 @@ let rounds () =
   | None -> !default_simplify_rounds
   | Some r -> r
 
-let default_inline_threshold = if Config.flambda then 10. else 10. /. 8.
+let default_inline_threshold =
+  if Config_settings.flambda then 10. else 10. /. 8.
 let inline_toplevel_multiplier = 16
 let default_inline_toplevel_threshold =
   int_of_float ((float inline_toplevel_multiplier) *. default_inline_threshold)

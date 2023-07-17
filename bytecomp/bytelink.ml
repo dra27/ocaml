@@ -365,7 +365,8 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Symtable.init();
        clear_crc_interfaces ();
        let sharedobjs = List.map Dll.extract_dll_name !Clflags.dllibs in
-       let check_dlls = standalone && Config.target = Config.host in
+       let check_dlls =
+         standalone && Config_settings.target = Config_settings.host in
        if check_dlls then begin
          (* Initialize the DLL machinery *)
          Dll.init_compile !Clflags.no_std_include;
@@ -588,7 +589,8 @@ let build_custom_runtime prim_name exec_name =
     then ""
     else "-lcamlrun" ^ !Clflags.runtime_variant in
   let debug_prefix_map =
-    if Config.c_has_debug_prefix_map && not !Clflags.keep_camlprimc_file then
+    if Config_settings.c_has_debug_prefix_map
+       && not !Clflags.keep_camlprimc_file then
       let flag =
         [Printf.sprintf "-fdebug-prefix-map=%s=camlprim.c" prim_name]
       in
@@ -599,7 +601,7 @@ let build_custom_runtime prim_name exec_name =
     else
       [] in
   let exitcode =
-    (Clflags.std_include_flag "-I" ^ " " ^ Config.bytecomp_c_libraries)
+    (Clflags.std_include_flag "-I" ^ " " ^ Config_settings.bytecomp_c_libraries)
   in
   Ccomp.call_linker Ccomp.Exe exec_name
     (debug_prefix_map @ [prim_name] @ List.rev !Clflags.ccobjs @ [runtime_lib])
@@ -706,8 +708,8 @@ let link objfiles output_name =
     in
     let obj_file =
       if !Clflags.output_complete_object
-      then (Filename.chop_extension c_file) ^ Config.ext_obj
-      else basename ^ Config.ext_obj
+      then (Filename.chop_extension c_file) ^ Config_settings.ext_obj
+      else basename ^ Config_settings.ext_obj
     in
     let temps = ref [] in
     Misc.try_finally
@@ -722,13 +724,13 @@ let link objfiles output_name =
            temps := c_file :: !temps;
            if Ccomp.compile_file ~output:obj_file ?stable_name c_file <> 0 then
              raise(Error Custom_runtime);
-           if not (Filename.check_suffix output_name Config.ext_obj) ||
+           if not (Filename.check_suffix output_name Config_settings.ext_obj) ||
               !Clflags.output_complete_object then begin
              temps := obj_file :: !temps;
              let mode, c_libs =
-               if Filename.check_suffix output_name Config.ext_obj
+               if Filename.check_suffix output_name Config_settings.ext_obj
                then Ccomp.Partial, ""
-               else Ccomp.MainDll, Config.bytecomp_c_libraries
+               else Ccomp.MainDll, Config_settings.bytecomp_c_libraries
              in
              if not (
                  let runtime_lib =

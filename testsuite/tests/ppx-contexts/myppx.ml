@@ -18,7 +18,7 @@ let () =
       Printf.eprintf "include_dirs: [%s]\n"
         (quote_strings !Clflags.include_dirs);
       Printf.eprintf "load_path: [%s]\n"
-        (quote_strings !Config.load_path);
+        (quote_strings !Config_settings.load_path);
       *)
       Printf.eprintf "open_modules: [%s]\n"
         (quote_strings !Clflags.open_modules);

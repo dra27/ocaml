@@ -1040,7 +1040,7 @@ and simplify_named env r (tree : Flambda.named) : Flambda.named * R.t =
           in
           match A.descr block_approx, A.descr value_approx with
           | (Value_float_array _, _) -> check (); Lambda.Pfloatarray
-          | (_, Value_float _) when Config.flat_float_array ->
+          | (_, Value_float _) when Config_settings.flat_float_array ->
             check (); Lambda.Pfloatarray
             (* CR pchambart: This should be accounted by the benefit *)
           | _ ->

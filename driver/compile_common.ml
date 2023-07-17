@@ -26,7 +26,7 @@ type info = {
 }
 
 let cmx i = i.output_prefix ^ ".cmx"
-let obj i = i.output_prefix ^ Config.ext_obj
+let obj i = i.output_prefix ^ Config_settings.ext_obj
 let cmo i = i.output_prefix ^ ".cmo"
 let annot i = i.output_prefix ^ ".annot"
 

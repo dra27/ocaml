@@ -316,7 +316,8 @@ let stack_ptr_dwarf_register_number = 2
 (* Calling the assembler *)
 
 let assemble_file infile outfile =
+  let asm = Config_settings.asm in
   Ccomp.command
-    (Config.asm ^ " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
+    (asm ^ " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
 
 let init () = ()

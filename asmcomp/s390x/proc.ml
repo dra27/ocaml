@@ -227,7 +227,7 @@ let prologue_required fd =
 (* Calling the assembler *)
 
 let assemble_file infile outfile =
-  Ccomp.command (Config.asm ^ " " ^
+  Ccomp.command (Config_settings.asm ^ " " ^
                  (String.concat " " (Misc.debug_prefix_map_flags ())) ^
                  " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
 

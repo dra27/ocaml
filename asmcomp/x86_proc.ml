@@ -40,7 +40,7 @@ type system =
   | S_unknown
 
 
-let system = match Config.system with
+let system = match Config_settings.system with
   | "macosx" -> S_macosx
   | "solaris" -> S_solaris
   | "win32" -> S_win32
@@ -261,11 +261,11 @@ let binary_content = ref None
 
 let compile infile outfile =
   if masm then
-    Ccomp.command (Config.asm ^
+    Ccomp.command (Config_settings.asm ^
                    Filename.quote outfile ^ " " ^ Filename.quote infile ^
                    (if !Clflags.verbose then "" else ">NUL"))
   else
-    Ccomp.command (Config.asm ^ " " ^
+    Ccomp.command (Config_settings.asm ^ " " ^
                    (String.concat " " (Misc.debug_prefix_map_flags ())) ^
                    " -o " ^ Filename.quote outfile ^ " " ^
                    Filename.quote infile)

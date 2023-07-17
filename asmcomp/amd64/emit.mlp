@@ -54,27 +54,27 @@ let register_name r =
 (* CFI directives *)
 
 let cfi_startproc () =
-  if Config.asm_cfi_supported then D.cfi_startproc ()
+  if Config_settings.asm_cfi_supported then D.cfi_startproc ()
 
 let cfi_endproc () =
-  if Config.asm_cfi_supported then D.cfi_endproc ()
+  if Config_settings.asm_cfi_supported then D.cfi_endproc ()
 
 let cfi_adjust_cfa_offset n =
-  if Config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
+  if Config_settings.asm_cfi_supported then D.cfi_adjust_cfa_offset n
 
 let cfi_remember_state () =
-  if Config.asm_cfi_supported then D.cfi_remember_state ()
+  if Config_settings.asm_cfi_supported then D.cfi_remember_state ()
 
 let cfi_restore_state () =
-  if Config.asm_cfi_supported then D.cfi_restore_state ()
+  if Config_settings.asm_cfi_supported then D.cfi_restore_state ()
 
 let cfi_def_cfa_register reg =
-  if Config.asm_cfi_supported then D.cfi_def_cfa_register reg
+  if Config_settings.asm_cfi_supported then D.cfi_def_cfa_register reg
 
 let emit_debug_info dbg =
   emit_debug_info_gen dbg D.file D.loc
 
-let fp = Config.with_frame_pointers
+let fp = Config_settings.with_frame_pointers
 
 let stack_threshold_size = Config_constants.stack_threshold * 8 (* bytes *)
 
@@ -865,7 +865,7 @@ let emit_instr env fallthrough i =
           emit_call "caml_reraise_exn";
           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
       | Lambda.Raise_notrace ->
-          if Config.tsan then begin
+          if Config_settings.tsan then begin
             (* TSan requires to signal function exits upon exceptions,
                even with [Raise_notrace] *)
             emit_call "caml_tsan_raise_notrace_exn";

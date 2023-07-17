@@ -1,7 +1,9 @@
 (* TEST
  include config;
  include testing;
- binary_modules = "config_constants config build_path_prefix_map misc identifiable numbers strongly_connected_components";
+ binary_modules = "config_constants config_settings config \
+                   build_path_prefix_map misc identifiable numbers \
+                   strongly_connected_components";
  bytecode;
 *)
 

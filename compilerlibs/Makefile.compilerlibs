@@ -26,6 +26,7 @@
 
 UTILS = \
   utils/config_constants.cmo \
+  utils/config_settings.cmo \
   utils/config.cmo \
   utils/build_path_prefix_map.cmo \
   utils/misc.cmo \
@@ -413,7 +414,7 @@ $(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE)
 
 ALL_CONFIG_CMO = utils/config_main.cmo utils/config_boot.cmo
 
-utils/config_main.mli utils/config_boot.mli: utils/config.mli
+utils/config_main.mli utils/config_boot.mli: utils/config_settings.mli
 	cp $^ $@
 
 beforedepend:: utils/config_main.mli utils/config_boot.mli

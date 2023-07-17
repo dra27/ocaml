@@ -102,7 +102,7 @@ let emit i =
 let implementation ~backend ~start_from ~source_file ~output_prefix =
   let backend info typed =
     Compilenv.reset ?packname:!Clflags.for_package info.module_name;
-    if Config.flambda
+    if Config_settings.flambda
     then flambda info backend typed
     else clambda info backend typed
   in

@@ -79,7 +79,7 @@ let display_msvc_output file name =
 
 let compile_file ?output ?(opt="") ?stable_name name =
   let (pipe, file) =
-    if Config.ccomp_type = "msvc" && not !Clflags.verbose then
+    if Config_settings.ccomp_type = "msvc" && not !Clflags.verbose then
       try
         let (t, c) = Filename.open_temp_file "msvc" "stdout" in
         close_out c;
@@ -90,7 +90,7 @@ let compile_file ?output ?(opt="") ?stable_name name =
       ("", "") in
   let debug_prefix_map =
     match stable_name with
-    | Some stable when Config.c_has_debug_prefix_map ->
+    | Some stable when Config_settings.c_has_debug_prefix_map ->
       Printf.sprintf " -fdebug-prefix-map=%s=%s" name stable
     | Some _ | None -> "" in
   let exit =
@@ -103,15 +103,16 @@ let compile_file ?output ?(opt="") ?stable_name name =
               (* #7678: ocamlopt only calls the C compiler to process .c files
                  from the command line, and the behaviour between
                  ocamlc/ocamlopt should be identical. *)
-              (String.concat " " [Config.c_compiler;
-                                  Config.ocamlc_cflags;
-                                  Config.ocamlc_cppflags]))
+              (String.concat " " [Config_settings.c_compiler;
+                                  Config_settings.ocamlc_cflags;
+                                  Config_settings.ocamlc_cppflags]))
          debug_prefix_map
          (match output with
           | None -> ""
-          | Some o -> Printf.sprintf "%s%s" Config.c_output_obj o)
+          | Some o -> Printf.sprintf "%s%s" Config_settings.c_output_obj o)
          opt
-         (if !Clflags.debug && Config.ccomp_type <> "msvc" then "-g" else "")
+         (if !Clflags.debug && Config_settings.ccomp_type <> "msvc" then
+           "-g" else "")
          (String.concat " " (List.rev !Clflags.all_ccopts))
          (quote_prefixed ~response_files:true "-I"
             (List.map (Misc.expand_directory Config.standard_library)
@@ -135,23 +136,24 @@ let create_archive archive file_list =
   if file_list = [] then
     0 (* Don't call the archiver: #6550/#1094/#9011 *)
   else
-    match Config.ccomp_type with
+    match Config_settings.ccomp_type with
       "msvc" ->
         command(Printf.sprintf "link /lib /nologo /out:%s %s"
                                quoted_archive
                                (quote_files ~response_files:true file_list))
     | _ ->
-        assert(String.length Config.ar > 0);
+        assert(String.length Config_settings.ar > 0);
+        let response_files = Config_settings.ar_supports_response_files in
         command(Printf.sprintf "%s rc %s %s"
-                Config.ar quoted_archive
-                (quote_files ~response_files:Config.ar_supports_response_files
-                  file_list))
+                Config_settings.ar quoted_archive
+                (quote_files ~response_files file_list))
 
 let expand_libname cclibs =
+  let ext_lib = Config_settings.ext_lib in
   cclibs |> List.map (fun cclib ->
     if String.starts_with ~prefix:"-l" cclib then
       let libname =
-        "lib" ^ String.sub cclib 2 (String.length cclib - 2) ^ Config.ext_lib in
+        "lib" ^ String.sub cclib 2 (String.length cclib - 2) ^ ext_lib in
       try
         Load_path.find libname
       with Not_found ->
@@ -177,12 +179,12 @@ let call_linker mode output_name files extra =
     let cmd =
       if mode = Partial then
         let (l_prefix, files) =
-          match Config.ccomp_type with
+          match Config_settings.ccomp_type with
           | "msvc" -> ("/libpath:", expand_libname files)
           | _ -> ("-L", files)
         in
         Printf.sprintf "%s%s %s %s %s"
-          Config.native_pack_linker
+          Config_settings.native_pack_linker
           (Filename.quote output_name)
           (quote_prefixed ~response_files:true
             l_prefix (Load_path.get_paths ()))
@@ -192,9 +194,9 @@ let call_linker mode output_name files extra =
         Printf.sprintf "%s -o %s %s %s %s %s %s"
           (match !Clflags.c_compiler, mode with
           | Some cc, _ -> cc
-          | None, Exe -> Config.mkexe
-          | None, Dll -> Config.mkdll
-          | None, MainDll -> Config.mkmaindll
+          | None, Exe -> Config_settings.mkexe
+          | None, Dll -> Config_settings.mkdll
+          | None, MainDll -> Config_settings.mkmaindll
           | None, Partial -> assert false
           )
           (Filename.quote output_name)
@@ -208,7 +210,7 @@ let call_linker mode output_name files extra =
   )
 
 let linker_is_flexlink =
-  (* Config.mkexe, Config.mkdll and Config.mkmaindll are all flexlink
-     invocations for the native Windows ports and for Cygwin, if shared library
-     support is enabled. *)
-  Sys.win32 || Config.supports_shared_libraries && Sys.cygwin
+  (* Config_settings.mkexe, Config_settings.mkdll and Config_settings.mkmaindll
+     are all flexlink invocations for the native Windows ports and for Cygwin,
+     if shared library support is enabled. *)
+  Sys.win32 || Config_settings.supports_shared_libraries && Sys.cygwin

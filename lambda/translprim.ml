@@ -108,7 +108,7 @@ let get_used_primitives () =
   Hashtbl.fold (fun path _ acc -> path :: acc) used_primitives []
 
 let gen_array_kind =
-  if Config.flat_float_array then Pgenarray else Paddrarray
+  if Config_settings.flat_float_array then Pgenarray else Paddrarray
 
 let prim_sys_argv =
   Primitive.simple ~name:"caml_sys_argv" ~arity:1 ~alloc:true
@@ -725,9 +725,9 @@ let lambda_of_prim prim_name prim loc args arg_exps =
         Lsend(Public, meth, obj, [], loc)
   | Frame_pointers, [] ->
       let frame_pointers =
-        if !Clflags.native_code && Config.with_frame_pointers then 1 else 0
+        !Clflags.native_code && Config_settings.with_frame_pointers
       in
-      Lconst (const_int frame_pointers)
+      Lconst (const_int (Bool.to_int frame_pointers))
   | Identity, [arg] -> arg
   | Apply, [func; arg]
   | Revapply, [arg; func] ->

@@ -34,7 +34,7 @@ let init_path ?(auto_include=auto_include) ?(dir="") () =
       !Clflags.include_dirs
   in
   let dirs =
-    !Compenv.last_include_dirs @ dirs @ Config.flexdll_dirs @
+    !Compenv.last_include_dirs @ dirs @ Config_settings.flexdll_dirs @
     !Compenv.first_include_dirs
   in
   let exp_dirs =

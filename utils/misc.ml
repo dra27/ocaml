@@ -920,7 +920,7 @@ let get_build_path_prefix_map =
     !map_cache
 
 let debug_prefix_map_flags () =
-  if not Config.as_has_debug_prefix_map then
+  if not Config_settings.as_has_debug_prefix_map then
     []
   else begin
     match get_build_path_prefix_map () with
@@ -960,7 +960,7 @@ module Magic_number = struct
     flambda : bool;
   }
   let native_obj_config = {
-    flambda = Config.flambda;
+    flambda = Config_settings.flambda;
   }
 
   type version = int
@@ -1139,7 +1139,7 @@ module Magic_number = struct
 
   (* it would seem more direct to define current_version with the
      correct numbers and current_raw on top of it, but for now we
-     consider the Config.foo values to be ground truth, and don't want
+     consider the Config_settings.foo values to be ground truth, and don't want
      to trust the present module instead. *)
   let current_version kind =
     let raw = current_raw kind in

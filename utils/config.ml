@@ -1,4 +1,3 @@
-#2 "utils/config.common.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -14,9 +13,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Portions of the Config module common to both the boot and main compiler. *)
-
 include Config_constants
+include Config_settings
 
 (* The main OCaml version string has moved to ../build-aux/ocaml_version.m4 *)
 let version = Sys.ocaml_version
@@ -29,6 +27,11 @@ let standard_library =
     Sys.getenv "CAMLLIB"
   with Not_found ->
     standard_library_default
+
+(* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
+          the two drivers should be identical. *)
+let ocamlopt_cflags = ocamlc_cflags
+let ocamlopt_cppflags = ocamlc_cppflags
 
 let cmx_magic_number =
   if flambda then
@@ -61,6 +64,14 @@ let configuration_variables () =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  (* bytecomp_c_compiler and native_c_compiler have been supported for a
+     long time and are retained for backwards compatibility.
+     For programs that don't need compatibility with older OCaml releases
+     the recommended approach is to use the constituent variables
+     c_compiler, ocamlc_cflags, ocamlc_cppflags etc., directly.
+  *)
+  let legacy_c_compiler =
+    c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags in
 [
   p "version" version;
   p "standard_library_default" standard_library_default;
@@ -71,8 +82,8 @@ let configuration_variables () =
   p "ocamlc_cppflags" ocamlc_cppflags;
   p "ocamlopt_cflags" ocamlopt_cflags;
   p "ocamlopt_cppflags" ocamlopt_cppflags;
-  p "bytecomp_c_compiler" bytecomp_c_compiler;
-  p "native_c_compiler" native_c_compiler;
+  p "bytecomp_c_compiler" legacy_c_compiler;
+  p "native_c_compiler" legacy_c_compiler;
   p "bytecomp_c_libraries" bytecomp_c_libraries;
   p "native_c_libraries" native_c_libraries;
   p "native_ldflags" native_ldflags;

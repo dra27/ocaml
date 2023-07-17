@@ -516,7 +516,7 @@ module BR = Branch_relaxation.Make (struct
     | Lop (Ireturn_addr) ->
         invalid_arg (
           "Support for Ireturn_addr is not implemented on architecture "
-          ^ Config.architecture)
+          ^ Config_settings.architecture)
     | Lreloadretaddr -> 0
     | Lreturn -> epilogue_size f
     | Llabel _ -> 0
@@ -965,7 +965,7 @@ let emit_instr env i =
     | Lop(Ireturn_addr) ->
         invalid_arg (
           "Support for Ireturn_addr is not implemented on architecture "
-          ^ Config.architecture)
+          ^ Config_settings.architecture)
     | Lreloadretaddr ->
         ()
     | Lreturn ->
@@ -1219,7 +1219,7 @@ let end_assembly () =
       efa_string = (fun s -> emit_string_directive "	.asciz	" s) };
   emit_symbol_type emit_symbol lbl "object";
   emit_symbol_size lbl;
-  begin match Config.system with
+  begin match Config_settings.system with
   | "linux" ->
       (* Mark stack as non-executable *)
       `	.section	.note.GNU-stack,\"\",%progbits\n`

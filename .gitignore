@@ -326,7 +326,7 @@ META
 /utils/config.generated.ml
 /utils/config_main.ml
 /utils/config_main.mli
-/utils/config.ml
+/utils/config_settings.ml
 /utils/domainstate.ml
 /utils/domainstate.mli
 

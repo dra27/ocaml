@@ -138,7 +138,7 @@ let print_specific_operation printreg op ppf arg =
 (* Are we using the Windows 64-bit ABI? *)
 
 let win64 =
-  match Config.system with
+  match Config_settings.system with
   | "win64" | "mingw64" | "cygwin" -> true
   | _                   -> false
 

@@ -638,7 +638,7 @@ type deferred_action =
   | ProcessDLLs of string list
 
 let c_object_of_filename name =
-  Filename.chop_suffix (Filename.basename name) ".c" ^ Config.ext_obj
+  Filename.chop_suffix (Filename.basename name) ".c" ^ Config_settings.ext_obj
 
 let process_action
     (ppf, implementation, interface, ocaml_mod_ext, ocaml_lib_ext) action =
@@ -677,13 +677,13 @@ let process_action
         prepend_to_list Clflags.objfiles name
       else if Filename.check_suffix name ".cmi" && !Clflags.make_package then
         prepend_to_list Clflags.objfiles name
-      else if Filename.check_suffix name Config.ext_obj
-           || Filename.check_suffix name Config.ext_lib then begin
+      else if Filename.check_suffix name Config_settings.ext_obj
+           || Filename.check_suffix name Config_settings.ext_lib then begin
         has_linker_inputs := true;
         prepend_to_list Clflags.ccobjs name
       end
       else if not !Clflags.native_code
-           && Filename.check_suffix name Config.ext_dll then
+           && Filename.check_suffix name Config_settings.ext_dll then
         prepend_to_list Clflags.dllibs name
       else
         match Clflags.Compiler_pass.of_input_filename name with

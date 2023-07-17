@@ -236,7 +236,7 @@ let compile_program (compiler : Ocaml_compilers.compiler) log env =
   let output = if compile_only then "" else "-o " ^ program_file in
   let libraries = libraries compiler#target env in
   let cmas_need_dynamic_loading =
-    if not Config.supports_shared_libraries &&
+    if not Config_settings.supports_shared_libraries &&
        compiler#target = Ocaml_backends.Bytecode then
       cmas_need_dynamic_loading (directories env) libraries
     else
@@ -975,7 +975,7 @@ let compile_module compiler compilername compileroutput log env
         compile_commandline filename (Some module_output_name) "" in
       exec commandline
     | Ocaml_filetypes.C ->
-      let object_extension = Config.ext_obj in
+      let object_extension = Config_settings.ext_obj in
       let _object_filename = module_basename ^ object_extension in
       let commandline =
         compile_commandline filename None
@@ -1007,7 +1007,8 @@ let run_test_program_in_toplevel (toplevel : Ocaml_toplevels.toplevel) log env =
      C stubs are loaded. It would be better at this point to build a custom
      toplevel. *)
   let toplevel_supports_dynamic_loading =
-    Config.supports_shared_libraries || backend <> Ocaml_backends.Bytecode
+    Config_settings.supports_shared_libraries
+    || backend <> Ocaml_backends.Bytecode
   in
   match cmas_need_dynamic_loading (directories env) libraries with
     | Some (Error reason) ->
