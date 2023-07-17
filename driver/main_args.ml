@@ -1729,8 +1729,8 @@ module Default = struct
     let _cclib s = Compenv.defer (ProcessObjects (Misc.rev_split_words s))
     let _ccopt = prepend_to_list Compenv.first_ccopts
     let _cmi_file s = Clflags.cmi_file := (Some s)
-    let _config = Misc.show_config_and_exit
-    let _config_var = Misc.show_config_variable_and_exit
+    let _config = Compenv.show_config_and_exit
+    let _config_var = Compenv.show_config_variable_and_exit
     let _dprofile () = Clflags.profile_columns := Profile.all_columns
     let _dtimings () = Clflags.profile_columns := [`Time]
     let _dump_into_file = set Clflags.dump_into_file

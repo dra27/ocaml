@@ -572,16 +572,6 @@ val pp_two_columns :
 val print_see_manual : Format.formatter -> int list -> unit
 (** See manual section *)
 
-(** {1 Displaying configuration variables} *)
-
-val show_config_and_exit : unit -> unit
-  (** Display the values of all compiler configuration variables from module
-      [Config], then exit the program with code 0. *)
-
-val show_config_variable_and_exit : string -> unit
-  (** Display the value of the given configuration variable,
-      then exit the program with code 0. *)
-
 (** {1 Handling of build maps} *)
 
 (** Build maps cause the compiler to normalize file names embedded in

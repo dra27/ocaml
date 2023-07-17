@@ -40,6 +40,25 @@ let print_standard_library () =
   print_string Config.standard_library; print_newline();
   raise (Exit_with_status 0)
 
+(* showing configuration and configuration variables *)
+let show_config_and_exit () =
+  Config.print_config stdout;
+  exit 0
+
+let show_config_variable_and_exit x =
+  match Config.config_var x with
+  | Some v ->
+      (* we intentionally don't print a newline to avoid Windows \r
+         issues: bash only strips the trailing \n when using a command
+         substitution $(ocamlc -config-var foo), so a trailing \r would
+         remain if printing a newline under Windows and scripts would
+         have to use $(ocamlc -config-var foo | tr -d '\r')
+         for portability. Ugh. *)
+      print_string v;
+      exit 0
+  | None ->
+      exit 2
+
 let fatal err =
   prerr_endline err;
   raise (Exit_with_status 2)

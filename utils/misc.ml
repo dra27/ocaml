@@ -882,25 +882,6 @@ let pp_two_columns ?(sep = "|") ?max_lines ppf (lines: (string * string) list) =
   ) lines;
   Format.fprintf ppf "@]"
 
-(* showing configuration and configuration variables *)
-let show_config_and_exit () =
-  Config.print_config stdout;
-  exit 0
-
-let show_config_variable_and_exit x =
-  match Config.config_var x with
-  | Some v ->
-      (* we intentionally don't print a newline to avoid Windows \r
-         issues: bash only strips the trailing \n when using a command
-         substitution $(ocamlc -config-var foo), so a trailing \r would
-         remain if printing a newline under Windows and scripts would
-         have to use $(ocamlc -config-var foo | tr -d '\r')
-         for portability. Ugh. *)
-      print_string v;
-      exit 0
-  | None ->
-      exit 2
-
 let get_build_path_prefix_map =
   let init = ref false in
   let map_cache = ref None in

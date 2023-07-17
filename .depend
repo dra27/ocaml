@@ -149,13 +149,11 @@ utils/local_store.cmi :
 utils/misc.cmo : \
     utils/config_settings.cmi \
     utils/config_constants.cmi \
-    utils/config.cmi \
     utils/build_path_prefix_map.cmi \
     utils/misc.cmi
 utils/misc.cmx : \
     utils/config_settings.cmx \
     utils/config_constants.cmx \
-    utils/config.cmx \
     utils/build_path_prefix_map.cmx \
     utils/misc.cmi
 utils/misc.cmi : \
