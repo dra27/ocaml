@@ -35,6 +35,7 @@ utils/clflags.cmo : \
     utils/numbers.cmi \
     utils/misc.cmi \
     utils/config_settings.cmi \
+    utils/config.cmi \
     utils/arg_helper.cmi \
     utils/clflags.cmi
 utils/clflags.cmx : \
@@ -42,6 +43,7 @@ utils/clflags.cmx : \
     utils/numbers.cmx \
     utils/misc.cmx \
     utils/config_settings.cmx \
+    utils/config.cmx \
     utils/arg_helper.cmx \
     utils/clflags.cmi
 utils/clflags.cmi : \
@@ -1738,7 +1740,6 @@ typing/typemod.cmo : \
     typing/ident.cmi \
     typing/env.cmi \
     typing/ctype.cmi \
-    utils/config.cmi \
     file_formats/cmt_format.cmi \
     typing/cmt2annot.cmi \
     file_formats/cmi_format.cmi \
@@ -1773,7 +1774,6 @@ typing/typemod.cmx : \
     typing/ident.cmx \
     typing/env.cmx \
     typing/ctype.cmx \
-    utils/config.cmx \
     file_formats/cmt_format.cmx \
     typing/cmt2annot.cmx \
     file_formats/cmi_format.cmx \
@@ -6135,7 +6135,6 @@ driver/main_args.cmo : \
     utils/misc.cmi \
     parsing/location.cmi \
     utils/config_settings.cmi \
-    utils/config.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
     driver/main_args.cmi
@@ -6145,7 +6144,6 @@ driver/main_args.cmx : \
     utils/misc.cmx \
     parsing/location.cmx \
     utils/config_settings.cmx \
-    utils/config.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
     driver/main_args.cmi

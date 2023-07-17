@@ -430,7 +430,7 @@ let read_one_param ppf position name v =
       | Some setting -> Clflags.error_style := Some setting
       end
 
-  | "intf-suffix" -> Config.interface_suffix := v
+  | "intf-suffix" -> Clflags.interface_suffix := v
 
   | "I" -> begin
       match position with
@@ -716,7 +716,7 @@ let action_of_file name =
   if Filename.check_suffix name ".ml"
   || Filename.check_suffix name ".mlt" then
     ProcessImplementation name
-  else if Filename.check_suffix name !Config.interface_suffix then
+  else if Filename.check_suffix name !Clflags.interface_suffix then
     ProcessInterface name
   else if Filename.check_suffix name ".c" then
     ProcessCFile name

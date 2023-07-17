@@ -1741,7 +1741,7 @@ module Default = struct
     let _i = set Clflags.print_types
     let _impl = Compenv.impl
     let _intf = Compenv.intf
-    let _intf_suffix s = Config.interface_suffix := s
+    let _intf_suffix s = Clflags.interface_suffix := s
     let _keep_docs = set Clflags.keep_docs
     let _keep_locs = set Clflags.keep_locs
     let _linkall = set Clflags.link_everything
@@ -1852,7 +1852,7 @@ module Default = struct
     let _intf (_:string) = (* placeholder:
       Odoc_global.files := ((!Odoc_global.files) @ [Odoc_global.Intf_file s])
                   *) ()
-    let _intf_suffix s = Config.interface_suffix := s
+    let _intf_suffix s = Clflags.interface_suffix := s
     let _pp s = Clflags.preprocessor := (Some s)
     let _ppx = prepend_to_list Clflags.all_ppx
     let _thread = set Clflags.use_threads

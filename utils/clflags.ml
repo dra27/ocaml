@@ -137,6 +137,9 @@ let keep_startup_file = ref false       (* -dstartup *)
 let dump_combine = ref false            (* -dcombine *)
 let profile_columns : Profile.column list ref = ref [] (* -dprofile/-dtimings *)
 
+let interface_suffix =
+  Config.interface_suffix               (* -intf-suffix *)
+
 let native_code = ref false             (* set to true under ocamlopt *)
 
 let force_slash = ref false             (* for ocamldep *)
