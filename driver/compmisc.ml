@@ -40,9 +40,12 @@ let init_path ?(auto_include=auto_include) ?(dir="") () =
   let exp_dirs =
     List.map (Misc.expand_directory Config.standard_library) dirs
   in
+  let std_include_dir =
+    if !Clflags.no_std_include then [] else [Config.standard_library]
+  in
   let dirs =
     (if !Clflags.no_cwd then [] else [dir])
-    @ List.rev_append exp_dirs (Clflags.std_include_dir ())
+    @ List.rev_append exp_dirs std_include_dir
   in
   Load_path.init ~auto_include dirs;
   Env.reset_cache ()

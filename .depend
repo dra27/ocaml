@@ -35,7 +35,6 @@ utils/clflags.cmo : \
     utils/numbers.cmi \
     utils/misc.cmi \
     utils/config_settings.cmi \
-    utils/config.cmi \
     utils/arg_helper.cmi \
     utils/clflags.cmi
 utils/clflags.cmx : \
@@ -43,7 +42,6 @@ utils/clflags.cmx : \
     utils/numbers.cmx \
     utils/misc.cmx \
     utils/config_settings.cmx \
-    utils/config.cmx \
     utils/arg_helper.cmx \
     utils/clflags.cmi
 utils/clflags.cmi : \
