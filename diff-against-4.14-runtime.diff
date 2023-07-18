@@ -374,10 +374,10 @@ index 0000000000..0cac8f131d
 +destroying changed/uncommitted files in your development repository!)
 diff --git a/runtime/Makefile b/runtime/Makefile
 deleted file mode 100644
-index f5c08d8798..0000000000
+index b62a5791a9..0000000000
 --- a/runtime/Makefile
 +++ /dev/null
-@@ -1,421 +0,0 @@
+@@ -1,425 +0,0 @@
 -#**************************************************************************
 -#*                                                                        *
 -#*                                 OCaml                                  *
@@ -599,16 +599,20 @@ index f5c08d8798..0000000000
 -	cp $^ $@
 -
 -prims.c : primitives
--	(echo '#define CAML_INTERNALS'; \
--         echo '#include "caml/mlvalues.h"'; \
--	 echo '#include "caml/prims.h"'; \
--	 sed -e 's/.*/extern value &();/' primitives; \
+-	export LC_ALL=C; \
+-	(echo '#include "caml/config.h"'; \
+-	 echo 'typedef intnat value;'; \
+-	 echo 'typedef value (*c_primitive)(void);'; \
+-	 echo; \
+-	 sed -e 's/.*/extern value &(void);/' $<; \
+-	 echo; \
 -	 echo 'c_primitive caml_builtin_cprim[] = {'; \
--	 sed -e 's/.*/  &,/' primitives; \
+-	 sed -e 's/.*/  &,/' $<; \
 -	 echo '  0 };'; \
+-	 echo; \
 -	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
--	 sed -e 's/.*/  "&",/' primitives; \
--	 echo '  0 };') > prims.c
+-	 sed -e 's/.*/  "&",/' $<; \
+-	 echo '  0 };') > $@
 -
 -caml/opnames.h : caml/instruct.h
 -	tr -d '\r' < $< | \
@@ -799,6 +803,19 @@ index f5c08d8798..0000000000
 -# without doing anything else.
 -.PHONY: setup-depend
 -setup-depend:
+diff --git a/runtime/afl.c b/runtime/afl.c
+index 560efc62ab..9d58524244 100644
+--- a/runtime/afl.c
++++ b/runtime/afl.c
+@@ -66,7 +66,7 @@ static void afl_write(uint32_t msg)
+     caml_fatal_error("writing to afl-fuzz");
+ }
+ 
+-static uint32_t afl_read(void)
++static uint32_t afl_read()
+ {
+   uint32_t msg;
+   if (read(FORKSRV_FD_READ, &msg, 4) != 4)
 diff --git a/runtime/alloc.c b/runtime/alloc.c
 index 189d309d31..7d4d7f8214 100644
 --- a/runtime/alloc.c
@@ -1908,6 +1925,19 @@ index 1c3dee1779..ba0074318d 100644
  
  #undef FLAT_FLOAT_ARRAY
  
+diff --git a/runtime/caml/major_gc.h b/runtime/caml/major_gc.h
+index 7501acfb6d..054aa90dc8 100644
+--- a/runtime/caml/major_gc.h
++++ b/runtime/caml/major_gc.h
+@@ -92,7 +92,7 @@ void caml_init_major_heap (asize_t);           /* size in bytes */
+ asize_t caml_clip_heap_chunk_wsz (asize_t wsz);
+ void caml_darken (value, value *);
+ void caml_major_collection_slice (intnat);
+-void caml_shrink_mark_stack (void);
++void caml_shrink_mark_stack ();
+ void major_collection (void);
+ void caml_finish_major_cycle (void);
+ void caml_set_major_window (int);
 diff --git a/runtime/caml/memory.h b/runtime/caml/memory.h
 index d9e58bc2d0..8837d33d25 100644
 --- a/runtime/caml/memory.h
@@ -2128,6 +2158,39 @@ index 0000000000..c6178190cf
 +#endif /* CAML_INTERNALS */
 +
 +#endif /* CAML_PLATFORM_H */
+diff --git a/runtime/caml/prims.h b/runtime/caml/prims.h
+index cb26f4012a..147cd98a60 100644
+--- a/runtime/caml/prims.h
++++ b/runtime/caml/prims.h
+@@ -20,7 +20,7 @@
+ 
+ #ifdef CAML_INTERNALS
+ 
+-typedef value (*c_primitive)(void);
++typedef value (*c_primitive)();
+ 
+ extern c_primitive caml_builtin_cprim[];
+ extern char * caml_names_of_builtin_cprim[];
+@@ -30,18 +30,7 @@ extern struct ext_table caml_prim_table;
+ extern struct ext_table caml_prim_name_table;
+ #endif
+ 
+-#define Primitive1(n) \
+-    ((value (*)(value)) caml_prim_table.contents[n])
+-#define Primitive2(n) \
+-    ((value (*)(value,value)) caml_prim_table.contents[n])
+-#define Primitive3(n) \
+-    ((value (*)(value,value,value)) caml_prim_table.contents[n])
+-#define Primitive4(n) \
+-    ((value (*)(value,value,value,value)) caml_prim_table.contents[n])
+-#define Primitive5(n) \
+-    ((value (*)(value,value,value,value,value)) caml_prim_table.contents[n])
+-#define PrimitiveN(n) \
+-    ((value (*)(value*,int)) caml_prim_table.contents[n])
++#define Primitive(n) ((c_primitive)(caml_prim_table.contents[n]))
+ 
+ extern char * caml_section_table;
+ extern asize_t caml_section_table_size;
 diff --git a/runtime/caml/s.h.in b/runtime/caml/s.h.in
 index 8e4efdcc72..9a5d9f4a91 100644
 --- a/runtime/caml/s.h.in
@@ -2223,18 +2286,21 @@ index 97d22832a0..c10c7d0f8f 100644
    dbg_out = caml_open_descriptor_out(dbg_socket);
    /* The code in this file does not bracket channel I/O operations with
 diff --git a/runtime/domain.c b/runtime/domain.c
-index d4d8de53fc..a6f0a3028e 100644
+index 811007e235..a6f0a3028e 100644
 --- a/runtime/domain.c
 +++ b/runtime/domain.c
-@@ -19,7 +19,7 @@
+@@ -19,9 +19,9 @@
  #include "caml/domain_state.h"
  #include "caml/memory.h"
  
 -CAMLexport caml_domain_state* Caml_state;
 +CAMLexport caml_domain_state* caml_state;
  
- void caml_init_domain ()
+-void caml_init_domain (void)
++void caml_init_domain ()
  {
+   if (Caml_state != NULL)
+     return;
 diff --git a/runtime/dune b/runtime/dune
 index 78c39300ed..23eb1d1e8a 100644
 --- a/runtime/dune
@@ -2306,8 +2372,111 @@ index dba30c3848..628d837208 100644
    if (NULL != entrypoint) result = caml_callback((value)(&entrypoint), 0);
    else result = Val_unit;
  
+diff --git a/runtime/eventlog.c b/runtime/eventlog.c
+index fe02a7cb31..d9aca44aed 100644
+--- a/runtime/eventlog.c
++++ b/runtime/eventlog.c
+@@ -120,7 +120,7 @@ static int64_t time_counter(void)
+ #endif
+ }
+ 
+-static void setup_evbuf(void)
++static void setup_evbuf()
+ {
+   CAMLassert(!evbuf);
+   evbuf = caml_stat_alloc_noexc(sizeof(*evbuf));
+@@ -132,7 +132,7 @@ static void setup_evbuf(void)
+ }
+ 
+ #define OUTPUT_FILE_LEN 4096
+-static void setup_eventlog_file(void)
++static void setup_eventlog_file()
+ {
+   char_os output_file[OUTPUT_FILE_LEN];
+   char_os *eventlog_filename = NULL;
+@@ -239,7 +239,7 @@ static void teardown_eventlog(void)
+   }
+ }
+ 
+-void caml_eventlog_init(void)
++void caml_eventlog_init()
+ {
+   char_os *toggle = caml_secure_getenv(T("OCAML_EVENTLOG_ENABLED"));
+ 
+@@ -330,7 +330,7 @@ void caml_ev_alloc(uint64_t sz)
+ /*  Note that this function does not trigger an actual disk flush, it just
+     pushes events in the event buffer.
+ */
+-void caml_ev_alloc_flush(void)
++void caml_ev_alloc_flush()
+ {
+   int i;
+ 
+@@ -345,7 +345,7 @@ void caml_ev_alloc_flush(void)
+   }
+ }
+ 
+-void caml_ev_flush(void)
++void caml_ev_flush()
+ {
+   if (!Caml_state->eventlog_enabled) return;
+   if (Caml_state->eventlog_paused) return;
+@@ -357,7 +357,7 @@ void caml_ev_flush(void)
+   };
+ }
+ 
+-void caml_eventlog_disable(void)
++void caml_eventlog_disable()
+ {
+   Caml_state->eventlog_enabled = 0;
+   teardown_eventlog();
+diff --git a/runtime/finalise.c b/runtime/finalise.c
+index a1e26cf2de..46e1b7dd4f 100644
+--- a/runtime/finalise.c
++++ b/runtime/finalise.c
+@@ -152,11 +152,11 @@ static void generic_final_update (struct finalisable * final, int darken_value)
+   }
+ }
+ 
+-void caml_final_update_mark_phase (void){
++void caml_final_update_mark_phase (){
+   generic_final_update(&finalisable_first, /* darken_value */ 1);
+ }
+ 
+-void caml_final_update_clean_phase (void){
++void caml_final_update_clean_phase (){
+   generic_final_update(&finalisable_last, /* darken_value */ 0);
+ }
+ 
+@@ -227,7 +227,7 @@ void caml_final_do_roots (scanning_action f)
+ /* Call caml_invert_root on the values of the finalisable set. This is called
+    directly by the compactor.
+ */
+-void caml_final_invert_finalisable_values (void)
++void caml_final_invert_finalisable_values ()
+ {
+   uintnat i;
+ 
+@@ -247,7 +247,7 @@ void caml_final_invert_finalisable_values (void)
+ /* Call [caml_oldify_one] on the closures and values of the recent set.
+    This is called by the minor GC through [caml_oldify_local_roots].
+ */
+-void caml_final_oldify_young_roots (void)
++void caml_final_oldify_young_roots ()
+ {
+   uintnat i;
+ 
+@@ -337,7 +337,7 @@ static void generic_final_minor_update (struct finalisable * final)
+    minor heap when moved to major heap or moved them to the finalising
+    set when dead.
+ */
+-void caml_final_update_minor_roots (void)
++void caml_final_update_minor_roots ()
+ {
+   generic_final_minor_update(&finalisable_last);
+ }
 diff --git a/runtime/fix_code.c b/runtime/fix_code.c
-index 5584019867..aa059be5df 100644
+index 1259f535b3..aa059be5df 100644
 --- a/runtime/fix_code.c
 +++ b/runtime/fix_code.c
 @@ -82,14 +82,8 @@ void caml_fixup_endianness(code_t code, asize_t len)
@@ -2327,6 +2496,28 @@ index 5584019867..aa059be5df 100644
  
  static int* opcode_nargs = NULL;
  int* caml_init_opcode_nargs(void)
+@@ -158,7 +152,7 @@ void caml_thread_code (code_t code, asize_t len)
+ 
+ #else
+ 
+-int* caml_init_opcode_nargs(void)
++int* caml_init_opcode_nargs()
+ {
+   return NULL;
+ }
+diff --git a/runtime/gc_ctrl.c b/runtime/gc_ctrl.c
+index 9c47b916a0..250a6a27f7 100644
+--- a/runtime/gc_ctrl.c
++++ b/runtime/gc_ctrl.c
+@@ -319,7 +319,7 @@ CAMLprim value caml_gc_quick_stat(value v)
+   CAMLreturn (res);
+ }
+ 
+-double caml_gc_minor_words_unboxed(void)
++double caml_gc_minor_words_unboxed()
+ {
+   return (Caml_state->stat_minor_words
+           + (double) (Caml_state->young_alloc_end - Caml_state->young_ptr));
 diff --git a/runtime/gen_primitives.sh b/runtime/gen_primitives.sh
 index a727d5c25c..01644a8a17 100755
 --- a/runtime/gen_primitives.sh
@@ -2520,8 +2711,25 @@ index 4d273c9f04..585c2e4c5b 100644
          .long   1               /* one descriptor */
          .long   LBL(107)        /* return address into callback */
  #ifndef SYS_solaris
+diff --git a/runtime/instrtrace.c b/runtime/instrtrace.c
+index 540bc0b931..2760475ed5 100644
+--- a/runtime/instrtrace.c
++++ b/runtime/instrtrace.c
+@@ -36,9 +36,10 @@ extern code_t caml_start_code;
+ 
+ intnat caml_icount = 0;
+ 
+-void caml_stop_here (void) {}
++void caml_stop_here () {}
+ 
+-void caml_disasm_instr(code_t pc)
++void caml_disasm_instr(pc)
++     code_t pc;
+ {
+   int instr = *pc;
+   printf("%6ld  %s", (long) (pc - caml_start_code),
 diff --git a/runtime/interp.c b/runtime/interp.c
-index e6700994bc..a59811c87d 100644
+index 9b18f3c5ec..a59811c87d 100644
 --- a/runtime/interp.c
 +++ b/runtime/interp.c
 @@ -50,9 +50,9 @@ sp is a local copy of the global variable Caml_state->extern_sp. */
@@ -2546,6 +2754,103 @@ index e6700994bc..a59811c87d 100644
  #endif
      return Val_unit;
    }
+@@ -927,34 +928,34 @@ value caml_interprete(code_t prog, asize_t prog_size)
+ 
+     Instruct(C_CALL1):
+       Setup_for_c_call;
+-      accu = Primitive1(*pc)(accu);
++      accu = Primitive(*pc)(accu);
+       Restore_after_c_call;
+       pc++;
+       Next;
+     Instruct(C_CALL2):
+       Setup_for_c_call;
+-      accu = Primitive2(*pc)(accu, sp[2]);
++      accu = Primitive(*pc)(accu, sp[2]);
+       Restore_after_c_call;
+       sp += 1;
+       pc++;
+       Next;
+     Instruct(C_CALL3):
+       Setup_for_c_call;
+-      accu = Primitive3(*pc)(accu, sp[2], sp[3]);
++      accu = Primitive(*pc)(accu, sp[2], sp[3]);
+       Restore_after_c_call;
+       sp += 2;
+       pc++;
+       Next;
+     Instruct(C_CALL4):
+       Setup_for_c_call;
+-      accu = Primitive4(*pc)(accu, sp[2], sp[3], sp[4]);
++      accu = Primitive(*pc)(accu, sp[2], sp[3], sp[4]);
+       Restore_after_c_call;
+       sp += 3;
+       pc++;
+       Next;
+     Instruct(C_CALL5):
+       Setup_for_c_call;
+-      accu = Primitive5(*pc)(accu, sp[2], sp[3], sp[4], sp[5]);
++      accu = Primitive(*pc)(accu, sp[2], sp[3], sp[4], sp[5]);
+       Restore_after_c_call;
+       sp += 4;
+       pc++;
+@@ -963,7 +964,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
+       int nargs = *pc++;
+       *--sp = accu;
+       Setup_for_c_call;
+-      accu = PrimitiveN(*pc)(sp + 2, nargs);
++      accu = Primitive(*pc)(sp + 2, nargs);
+       Restore_after_c_call;
+       sp += nargs;
+       pc++;
+diff --git a/runtime/major_gc.c b/runtime/major_gc.c
+index 3da350e9b1..089d2d856e 100644
+--- a/runtime/major_gc.c
++++ b/runtime/major_gc.c
+@@ -315,7 +315,7 @@ void caml_darken (value v, value *p)
+ /* This function shrinks the mark stack back to the MARK_STACK_INIT_SIZE size
+    and is called at the end of a GC compaction to avoid a mark stack greater
+    than 1/32th of the heap. */
+-void caml_shrink_mark_stack (void) {
++void caml_shrink_mark_stack () {
+   struct mark_stack* stk = Caml_state->mark_stack;
+   intnat init_stack_bsize = MARK_STACK_INIT_SIZE * sizeof(mark_entry);
+   mark_entry* shrunk_stack;
+diff --git a/runtime/memprof.c b/runtime/memprof.c
+index 1f6d9cb8dd..b381db2e0c 100644
+--- a/runtime/memprof.c
++++ b/runtime/memprof.c
+@@ -340,7 +340,7 @@ static uintnat rand_binom(uintnat len)
+    which may call the GC, but prefer using [caml_alloc_shr], which
+    gives this guarantee. The return value is either a valid callstack
+    or 0 in out-of-memory scenarios. */
+-static value capture_callstack_postponed(void)
++static value capture_callstack_postponed()
+ {
+   value res;
+   intnat callstack_len =
+@@ -1099,7 +1099,7 @@ static void th_ctx_iter_default(th_ctx_action f, void* data) {
+ CAMLexport void (*caml_memprof_th_ctx_iter_hook)(th_ctx_action, void*)
+   = th_ctx_iter_default;
+ 
+-CAMLexport struct caml_memprof_th_ctx* caml_memprof_new_th_ctx(void)
++CAMLexport struct caml_memprof_th_ctx* caml_memprof_new_th_ctx()
+ {
+   struct caml_memprof_th_ctx* ctx =
+     caml_stat_alloc(sizeof(struct caml_memprof_th_ctx));
+diff --git a/runtime/minor_gc.c b/runtime/minor_gc.c
+index 18cfe3e517..9155a6fd63 100644
+--- a/runtime/minor_gc.c
++++ b/runtime/minor_gc.c
+@@ -63,7 +63,7 @@
+ 
+ struct generic_table CAML_TABLE_STRUCT(char);
+ 
+-void caml_alloc_minor_tables (void)
++void caml_alloc_minor_tables ()
+ {
+   Caml_state->ref_table =
+     caml_stat_alloc_noexc(sizeof(struct caml_ref_table));
 diff --git a/runtime/power.S b/runtime/power.S
 index 4ca1a14538..68486cb7dc 100644
 --- a/runtime/power.S
@@ -2691,6 +2996,19 @@ index b7e5c721c2..7499dbf46f 100644
  #define printf_os printf
  #endif
  
+diff --git a/runtime/signals.c b/runtime/signals.c
+index ee775c7e9d..7cf746f275 100644
+--- a/runtime/signals.c
++++ b/runtime/signals.c
+@@ -305,7 +305,7 @@ Caml_inline value process_pending_actions_with_root_exn(value extra_root)
+ }
+ 
+ CAMLno_tsan /* The access to [caml_something_to_do] is not synchronized. */
+-int caml_check_pending_actions(void)
++int caml_check_pending_actions()
+ {
+   return caml_something_to_do;
+ }
 diff --git a/runtime/sys.c b/runtime/sys.c
 index a77fd9d1cf..9508d3f903 100644
 --- a/runtime/sys.c

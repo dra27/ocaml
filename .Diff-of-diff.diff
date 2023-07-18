@@ -1,36 +1,29 @@
---- a	2023-09-28 18:48:13.602115808 +0100
-+++ b	2023-09-28 18:48:13.650117519 +0100
-@@ -100,14 +100,10 @@
-  - #12198: continue the merge of the sub-makefiles into the root Makefile
- diff --git a/boot/menhir/parser.ml b/boot/menhir/parser.ml
- Binary files a/boot/menhir/parser.ml and b/boot/menhir/parser.ml differ
--diff --git a/boot/ocamlc b/boot/ocamlc
--Binary files a/boot/ocamlc and b/boot/ocamlc differ
--diff --git a/boot/ocamllex b/boot/ocamllex
--Binary files a/boot/ocamllex and b/boot/ocamllex differ
- diff --git a/lambda/matching.ml b/lambda/matching.ml
- --- a/lambda/matching.ml
- +++ b/lambda/matching.ml
--@@ -2793,6 +2793,15 @@ let split_extension_cases tag_lambda_list =
-+@@ -2841,6 +2841,15 @@ let split_extension_cases tag_lambda_list =
-    in
-    split_rec tag_lambda_list
+--- a	2023-09-28 18:48:14.466146613 +0100
++++ b	2023-09-28 18:48:14.478147040 +0100
+@@ -1,7 +1,7 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -959,6 +959,11 @@ Some of those changes will benefit all OCaml packages.
++@@ -960,6 +960,11 @@ Some of those changes will benefit all OCaml packages.
+    with ZSTD support.
+    (David Allsopp, review by Sébastien Hinderer)
   
-@@ -123,7 +119,7 @@
-  let combine_constructor loc arg pat_env cstr partial ctx def
-      (descr_lambda_list, total1, pats) =
-    let tag_lambda (cstr, act) = (cstr.cstr_tag, act) in
--@@ -2887,13 +2896,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-+@@ -2935,13 +2944,7 @@ let combine_constructor loc arg pat_env cstr partial ctx def
-              | 1, 1, [ (0, act1) ], [ (0, act2) ] ->
-                  (* This case is very frequent, it corresponds to
-                     options and lists. *)
-@@ -138,7 +134,7 @@
-              | n, 0, _, [] ->
-                  (* The matched type defines constant constructors only.
-                     (typically the constant cases are dense, so
--@@ -3877,3 +3880,17 @@ let for_multiple_match ~scopes loc paraml pat_act_list partial =
-+@@ -3925,3 +3928,17 @@ let for_multiple_match ~scopes loc paraml pat_act_list partial =
-    let paraml = List.map (fun (v, _) -> Lvar v) v_paraml in
-    List.fold_right bind_opt v_paraml
-      (do_for_multiple_match ~scopes loc paraml pat_act_list partial)
+@@ -18,7 +18,7 @@
+ diff --git a/configure.ac b/configure.ac
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1146,6 +1146,9 @@ AS_IF([test x"$enable_shared" != "xno"],
++@@ -1159,6 +1159,9 @@ AS_IF([test x"$enable_shared" != "xno"],
+             # See https://github.com/ocaml/ocaml/issues/9800
+             [mkdll_flags='-shared -Wl,-z,notext'],
+             [mkdll_flags='-shared'])
+@@ -28,7 +28,7 @@
+        oc_ldflags="$oc_ldflags -Wl,-E"
+        rpath="-Wl,-rpath,"
+        mksharedlibrpath="-Wl,-rpath,"
+-@@ -1160,6 +1163,14 @@ AS_IF([test -z "$mkmaindll"],
++@@ -1173,6 +1176,14 @@ AS_IF([test -z "$mkmaindll"],
+    [mkmaindll_exp="$mkdll_exp"
+    mkmaindll="$mkdll"])
+  
