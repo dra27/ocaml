@@ -53,6 +53,11 @@ OCaml 4.10 maintenance branch
 - #11675: Stop installing ocamloptp when the native compiler is not built.
   (Sébastien Hinderer, review by David Allsopp and Florian Angeletti)
 
+- #12372, #14572: Pass option -no-execute-only to the linker for OpenBSD >= 7.3
+  so that code sections remain readable, as needed for closure marshaling.
+  (Xavier Leroy and Anil Madhavapeddy, review by Anil Madhavapeddy and
+  Sébastien Hinderer)
+
 ### Bug fixes:
 
 - #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
