@@ -83,34 +83,15 @@ let exit () =
   exit_stub ()
 (* BACKPORT END *)
 
-(* Preemption *)
-
-let preempt signal = yield()
-
 (* Initialization of the scheduler *)
-
-let preempt_signal =
-  match Sys.os_type with
-  | "Win32" -> Sys.sigterm
-  | _       -> Sys.sigvtalrm
 
 let () =
 (* BACKPORT BEGIN *)
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
 (* BACKPORT END *)
   thread_initialize ();
-(* BACKPORT
-  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-*)
-  (* Callback in [caml_shutdown], when the last domain exits. *)
-  Callback.register "Thread.at_shutdown" (fun () ->
-    thread_cleanup();
-    (* In case of DLL-embedded OCaml the preempt_signal handler
-       will point to nowhere after DLL unloading and an accidental
-       preempt_signal will crash the main program. So restore the
-       default handler. *)
-    Sys.set_signal preempt_signal Sys.Signal_default
-  )
+  (* Called back in [caml_shutdown], when the last domain exits. *)
+  Callback.register "Thread.at_shutdown" thread_cleanup
 
 (* Wait functions *)
 
