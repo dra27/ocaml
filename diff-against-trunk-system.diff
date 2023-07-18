@@ -1,6 +1,73 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..4f31d6dd03
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,64 @@
++--- a	2023-09-28 18:48:15.206172988 +0100
+++++ b	2023-09-28 18:48:15.222173558 +0100
++@@ -60,9 +60,9 @@
++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
++ --- a/otherlibs/systhreads/thread.ml
++ +++ b/otherlibs/systhreads/thread.ml
++-@@ -71,29 +71,12 @@ let create fn arg =
++- let exit () =
++-   raise Exit
+++@@ -88,32 +88,13 @@ let exit () =
+++ let kill th = invalid_arg "Thread.kill: not implemented"
+++ (* BACKPORT END *)
++  
++ -(* Preemption *)
++ -
++@@ -76,8 +76,11 @@
++ -  | _       -> Sys.sigvtalrm
++ -
++  let () =
+++   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++    thread_initialize ();
+++-(* BACKPORT
++ -  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++-*)
++ -  (* Callback in [caml_shutdown], when the last domain exits. *)
++ -  Callback.register "Thread.at_shutdown" (fun () ->
++ -    thread_cleanup();
++@@ -95,15 +98,15 @@
++ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
++ --- a/otherlibs/unix/fork.c
++ +++ b/otherlibs/unix/fork.c
++-@@ -38,7 +38,7 @@ CAMLprim value caml_unix_fork(value unit)
++-   int ret;
+++@@ -45,7 +45,7 @@ CAMLprim value caml_unix_fork(value unit)
+++ #if 0 /* BACKPORT */
++    if (caml_domain_is_multicore()) {
++      caml_failwith
++ -      ("Unix.fork may not be called while other domains were created");
++ +      ("Unix.fork may not be called after any domain has been spawned");
++    }
+++ #endif
++  
++-   ret = fork();
++ diff --git a/otherlibs/unix/unix.mli b/otherlibs/unix/unix.mli
++ --- a/otherlibs/unix/unix.mli
++ +++ b/otherlibs/unix/unix.mli
++@@ -151,7 +154,7 @@
++ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
++ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
++ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
++-@@ -12,16 +12,11 @@
+++@@ -14,16 +14,11 @@
++  (* on Multicore, fork is not allowed is another domain is, and was running. *)
++  (* this test checks that we can't fork if a domain is currently running. *)
++  
++@@ -183,7 +186,7 @@
++ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
++ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
++ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
++-@@ -12,15 +12,11 @@
+++@@ -14,15 +14,11 @@
++  (* on Multicore, fork is not allowed is another domain is, and was running. *)
++  (* this test checks that we can't fork if another domain ran before. *)
++  
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,10 +81,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 96d2a52856..3d76f942f9 100644
+index ee56f112d8..066d89eea6 100644
 --- a/Changes
 +++ b/Changes
-@@ -225,6 +225,7 @@ Working version
+@@ -229,6 +229,7 @@ Working version
    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
    and Gabriel Scherer)
  
@@ -25,7 +92,7 @@ index 96d2a52856..3d76f942f9 100644
  OCaml 5.1.0
  ---------------
  
-@@ -1691,6 +1692,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1695,6 +1696,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -61,7 +128,7 @@ index 96d2a52856..3d76f942f9 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1726,13 +1756,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1730,13 +1760,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -77,7 +144,7 @@ index 96d2a52856..3d76f942f9 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1839,6 +1869,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1843,6 +1873,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -87,7 +154,7 @@ index 96d2a52856..3d76f942f9 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2102,6 +2135,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2106,6 +2139,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -11211,13 +11278,80 @@ index 0000000000..67b924972b
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2e08cfd107
+index 0000000000..727540229f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11127 @@
+@@ -0,0 +1,11227 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..4f31d6dd03
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,64 @@
+++--- a	2023-09-28 18:48:15.206172988 +0100
++++++ b	2023-09-28 18:48:15.222173558 +0100
+++@@ -60,9 +60,9 @@
+++ diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+++ --- a/otherlibs/systhreads/thread.ml
+++ +++ b/otherlibs/systhreads/thread.ml
+++-@@ -71,29 +71,12 @@ let create fn arg =
+++- let exit () =
+++-   raise Exit
++++@@ -88,32 +88,13 @@ let exit () =
++++ let kill th = invalid_arg "Thread.kill: not implemented"
++++ (* BACKPORT END *)
+++  
+++ -(* Preemption *)
+++ -
+++@@ -76,8 +76,11 @@
+++ -  | _       -> Sys.sigvtalrm
+++ -
+++  let () =
++++   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+++    thread_initialize ();
++++-(* BACKPORT
+++ -  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++++-*)
+++ -  (* Callback in [caml_shutdown], when the last domain exits. *)
+++ -  Callback.register "Thread.at_shutdown" (fun () ->
+++ -    thread_cleanup();
+++@@ -95,15 +98,15 @@
+++ diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
+++ --- a/otherlibs/unix/fork.c
+++ +++ b/otherlibs/unix/fork.c
+++-@@ -38,7 +38,7 @@ CAMLprim value caml_unix_fork(value unit)
+++-   int ret;
++++@@ -45,7 +45,7 @@ CAMLprim value caml_unix_fork(value unit)
++++ #if 0 /* BACKPORT */
+++    if (caml_domain_is_multicore()) {
+++      caml_failwith
+++ -      ("Unix.fork may not be called while other domains were created");
+++ +      ("Unix.fork may not be called after any domain has been spawned");
+++    }
++++ #endif
+++  
+++-   ret = fork();
+++ diff --git a/otherlibs/unix/unix.mli b/otherlibs/unix/unix.mli
+++ --- a/otherlibs/unix/unix.mli
+++ +++ b/otherlibs/unix/unix.mli
+++@@ -151,7 +154,7 @@
+++ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+++ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+++ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+++-@@ -12,16 +12,11 @@
++++@@ -14,16 +14,11 @@
+++  (* on Multicore, fork is not allowed is another domain is, and was running. *)
+++  (* this test checks that we can't fork if a domain is currently running. *)
+++  
+++@@ -183,7 +186,7 @@
+++ diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+++ --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+++ +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+++-@@ -12,15 +12,11 @@
++++@@ -14,15 +14,11 @@
+++  (* on Multicore, fork is not allowed is another domain is, and was running. *)
+++  (* this test checks that we can't fork if another domain ran before. *)
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -11231,10 +11365,10 @@ index 0000000000..2e08cfd107
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 96d2a52856..3d76f942f9 100644
++index ee56f112d8..066d89eea6 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -225,6 +225,7 @@ Working version
++@@ -229,6 +229,7 @@ Working version
 +   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
 +   and Gabriel Scherer)
 + 
@@ -11242,7 +11376,7 @@ index 0000000000..2e08cfd107
 + OCaml 5.1.0
 + ---------------
 + 
-+@@ -1691,6 +1692,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1695,6 +1696,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -11278,7 +11412,7 @@ index 0000000000..2e08cfd107
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1726,13 +1756,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1730,13 +1760,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -11294,7 +11428,7 @@ index 0000000000..2e08cfd107
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1839,6 +1869,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1843,6 +1873,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -11304,7 +11438,7 @@ index 0000000000..2e08cfd107
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2102,6 +2135,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2106,6 +2139,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -22341,7 +22475,40 @@ index 0000000000..2e08cfd107
 ++ }
 ++ 
 ++ Build () {
-++diff --git
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..f69aeb342c 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The tes
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 806cf30e06..c71b85a5b0 100644
@@ -23430,7 +23597,7 @@ index 0000000000..3a62747829
 +
 +end
 diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-index 83cbb80ca8..0324c2c617 100644
+index b5a4d8fbf4..ee9ac6455d 100644
 --- a/otherlibs/systhreads/thread.ml
 +++ b/otherlibs/systhreads/thread.ml
 @@ -18,6 +18,10 @@
@@ -23454,7 +23621,7 @@ index 83cbb80ca8..0324c2c617 100644
  
  (* For new, make sure the function passed to thread_new never
     raises an exception. *)
-@@ -69,7 +76,17 @@ let create fn arg =
+@@ -69,11 +76,22 @@ let create fn arg =
            flush stderr)
  
  let exit () =
@@ -23470,21 +23637,14 @@ index 83cbb80ca8..0324c2c617 100644
 +let kill th = invalid_arg "Thread.kill: not implemented"
 +(* BACKPORT END *)
  
- (* Preemption *)
- 
-@@ -83,8 +100,11 @@ let preempt_signal =
-   | _       -> Sys.sigvtalrm
+ (* Initialization of the scheduler *)
  
  let () =
 +  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
    thread_initialize ();
-+(* BACKPORT
-   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-+*)
-   (* Callback in [caml_shutdown], when the last domain exits. *)
-   Callback.register "Thread.at_shutdown" (fun () ->
-     thread_cleanup();
-@@ -99,6 +119,11 @@ let () =
+   (* Called back in [caml_shutdown], when the last domain exits. *)
+   Callback.register "Thread.at_shutdown" thread_cleanup
+@@ -82,6 +100,11 @@ let () =
  
  let delay = Unix.sleepf
  
@@ -23643,7 +23803,7 @@ index d2e677a0bf..dd96b7f0b1 100644
            caml_win32_CRT_fd_of_filedescr(fd2));
    CAMLreturn(Val_unit);
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
-index 653034ac4b..5bd650d14b 100644
+index 799f9f9e5a..4435490f02 100644
 --- a/otherlibs/unix/fork.c
 +++ b/otherlibs/unix/fork.c
 @@ -17,11 +17,16 @@
@@ -23675,7 +23835,7 @@ index 653034ac4b..5bd650d14b 100644
 +#if 0 /* BACKPORT */
    if (caml_domain_is_multicore()) {
      caml_failwith
-       ("Unix.fork may not be called while other domains were created");
+       ("Unix.fork may not be called after any domain has been spawned");
    }
 +#endif
  

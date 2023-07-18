@@ -45,7 +45,7 @@ CAMLprim value caml_unix_fork(value unit)
 #if 0 /* BACKPORT */
   if (caml_domain_is_multicore()) {
     caml_failwith
-      ("Unix.fork may not be called while other domains were created");
+      ("Unix.fork may not be called after any domain has been spawned");
   }
 #endif
 

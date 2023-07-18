@@ -2267,7 +2267,7 @@ index 23ff3ade39..cd68534b54 100644
 -Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
 +Called from Thread.create.(fun) in file "thread.ml", line 55, characters 8-14
 diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-index 1f0f57a183..49aef665db 100644
+index cb20813498..d39ddf372a 100644
 --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 @@ -1,5 +1,7 @@
@@ -2279,7 +2279,7 @@ index 1f0f57a183..49aef665db 100644
   not-windows;
   {
 diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
-index 79b9d6c253..ae21f65edc 100644
+index edcf0ae071..c60afacaa0 100644
 --- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
 +++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
 @@ -1,5 +1,7 @@
