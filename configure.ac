@@ -835,6 +835,9 @@ AS_IF([test x"$enable_shared" != "xno"],
            # See https://github.com/ocaml/ocaml/issues/9800
            [mksharedlib="$CC -shared -Wl,-z,notext"],
            [mksharedlib="$CC -shared"])
+       AS_CASE([$host],
+           [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+           [mksharedlib="${mksharedlib} -Wl,--no-execute-only"])
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
@@ -842,6 +845,14 @@ AS_IF([test x"$enable_shared" != "xno"],
       shared_libraries_supported=true])])
 
 AS_IF([test -z "$mkmaindll"], [mkmaindll=$mksharedlib])
+
+# Make sure code sections in OCaml-generated executables are readable
+# (required for marshaling of function closures)
+
+AS_CASE([$host],
+  [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+    [oc_ldflags="$oc_ldflags -Wl,--no-execute-only"
+     natdynlinkopts="$natdynlinkopts -Wl,--no-execute-only"])
 
 # Configure native dynlink
 
