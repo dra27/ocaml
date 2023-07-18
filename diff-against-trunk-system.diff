@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..7ffa5df311
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:48:14.466146613 +0100
-++++ b	2023-09-28 18:48:14.478147040 +0100
-+@@ -1,7 +1,7 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -959,6 +959,11 @@ Some of those changes will benefit all OCaml packages.
-++@@ -960,6 +960,11 @@ Some of those changes will benefit all OCaml packages.
-+    with ZSTD support.
-+    (David Allsopp, review by Sébastien Hinderer)
-+  
-+@@ -18,7 +18,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1146,6 +1146,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-++@@ -1159,6 +1159,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-+             # See https://github.com/ocaml/ocaml/issues/9800
-+             [mkdll_flags='-shared -Wl,-z,notext'],
-+             [mkdll_flags='-shared'])
-+@@ -28,7 +28,7 @@
-+        oc_ldflags="$oc_ldflags -Wl,-E"
-+        rpath="-Wl,-rpath,"
-+        mksharedlibrpath="-Wl,-rpath,"
-+-@@ -1160,6 +1163,14 @@ AS_IF([test -z "$mkmaindll"],
-++@@ -1173,6 +1176,14 @@ AS_IF([test -z "$mkmaindll"],
-+    [mkmaindll_exp="$mkdll_exp"
-+    mkmaindll="$mkdll"])
-+  
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -11243,45 +11211,13 @@ index 0000000000..67b924972b
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..dbed33ddd8
+index 0000000000..2e08cfd107
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11218 @@
+@@ -0,0 +1,11127 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..7ffa5df311
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:48:14.466146613 +0100
-+++++ b	2023-09-28 18:48:14.478147040 +0100
-++@@ -1,7 +1,7 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -959,6 +959,11 @@ Some of those changes will benefit all OCaml packages.
-+++@@ -960,6 +960,11 @@ Some of those changes will benefit all OCaml packages.
-++    with ZSTD support.
-++    (David Allsopp, review by Sébastien Hinderer)
-++  
-++@@ -18,7 +18,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1146,6 +1146,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-+++@@ -1159,6 +1159,9 @@ AS_IF([test x"$enable_shared" != "xno"],
-++             # See https://github.com/ocaml/ocaml/issues/9800
-++             [mkdll_flags='-shared -Wl,-z,notext'],
-++             [mkdll_flags='-shared'])
-++@@ -28,7 +28,7 @@
-++        oc_ldflags="$oc_ldflags -Wl,-E"
-++        rpath="-Wl,-rpath,"
-++        mksharedlibrpath="-Wl,-rpath,"
-++-@@ -1160,6 +1163,14 @@ AS_IF([test -z "$mkmaindll"],
-+++@@ -1173,6 +1176,14 @@ AS_IF([test -z "$mkmaindll"],
-++    [mkmaindll_exp="$mkdll_exp"
-++    mkmaindll="$mkdll"])
-++  
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -22405,66 +22341,7 @@ index 0000000000..dbed33ddd8
 ++ }
 ++ 
 ++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PO
+++diff --git
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 806cf30e06..c71b85a5b0 100644
