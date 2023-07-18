@@ -78,18 +78,10 @@ let exit () =
 
 let kill th = invalid_arg "Thread.kill: not implemented"
 
-(* Preemption *)
-
-let preempt signal = yield()
-
 (* Initialization of the scheduler *)
 
-let preempt_signal =
-  match Sys.os_type with
-  | "Win32" -> Sys.sigterm
-  | _       -> Sys.sigvtalrm
-
 let () =
+<<<<<<< HEAD
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
   thread_initialize ();
   (* Callback in [caml_shutdown], when the last domain exits. *)
@@ -101,6 +93,23 @@ let () =
        default handler. *)
     Sys.set_signal preempt_signal Sys.Signal_default
   )
+||||||| parent of 6422116d02 (Merge pull request PR#11386 from gadmm/systhread_simpl_and_fixes3)
+  thread_initialize ();
+  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+  (* Callback in [caml_shutdown], when the last domain exits. *)
+  Callback.register "Thread.at_shutdown" (fun () ->
+    thread_cleanup();
+    (* In case of DLL-embedded OCaml the preempt_signal handler
+       will point to nowhere after DLL unloading and an accidental
+       preempt_signal will crash the main program. So restore the
+       default handler. *)
+    Sys.set_signal preempt_signal Sys.Signal_default
+  )
+=======
+  thread_initialize ();
+  (* Called back in [caml_shutdown], when the last domain exits. *)
+  Callback.register "Thread.at_shutdown" thread_cleanup
+>>>>>>> 6422116d02 (Merge pull request PR#11386 from gadmm/systhread_simpl_and_fixes3)
 
 (* Wait functions *)
 
