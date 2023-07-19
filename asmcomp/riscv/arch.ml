@@ -20,7 +20,11 @@ open Format
 
 (* Machine-specific command-line options *)
 
-let command_line_options = []
+let command_line_options =
+  [ "-fPIC", Arg.Set Clflags.pic_code,
+      " Generate position-independent machine code (default for shared code)";
+    "-fno-PIC", Arg.Clear Clflags.pic_code,
+      " Generate position-dependent machine code (default for static code)" ]
 
 (* Specific operations *)
 
