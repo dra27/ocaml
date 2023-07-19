@@ -57,6 +57,7 @@ PARSING = \
   parsing/ast_helper.cmo \
   parsing/camlinternalMenhirLib.cmo \
   parsing/parser.cmo \
+  parsing/keywords.cmo \
   parsing/lexer.cmo \
   parsing/pprintast.cmo \
   parsing/parse.cmo \

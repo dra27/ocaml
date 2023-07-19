@@ -344,6 +344,13 @@ parsing/docstrings.cmx : \
 parsing/docstrings.cmi : \
     parsing/parsetree.cmi \
     parsing/location.cmi
+parsing/keywords.cmo : \
+    utils/misc.cmi \
+    parsing/keywords.cmi
+parsing/keywords.cmx : \
+    utils/misc.cmx \
+    parsing/keywords.cmi
+parsing/keywords.cmi :
 parsing/lexer.cmo : \
     utils/warnings.cmi \
     parsing/parser.cmi \
@@ -441,14 +448,14 @@ parsing/pprintast.cmo : \
     parsing/parsetree.cmi \
     parsing/longident.cmi \
     parsing/location.cmi \
-    parsing/lexer.cmi \
+    parsing/keywords.cmi \
     parsing/asttypes.cmi \
     parsing/pprintast.cmi
 parsing/pprintast.cmx : \
     parsing/parsetree.cmi \
     parsing/longident.cmx \
     parsing/location.cmx \
-    parsing/lexer.cmx \
+    parsing/keywords.cmx \
     parsing/asttypes.cmi \
     parsing/pprintast.cmi
 parsing/pprintast.cmi : \
@@ -894,13 +901,13 @@ typing/mtype.cmi : \
 typing/oprint.cmo : \
     parsing/pprintast.cmi \
     typing/outcometree.cmi \
-    parsing/lexer.cmi \
+    parsing/keywords.cmi \
     parsing/asttypes.cmi \
     typing/oprint.cmi
 typing/oprint.cmx : \
     parsing/pprintast.cmx \
     typing/outcometree.cmi \
-    parsing/lexer.cmx \
+    parsing/keywords.cmx \
     parsing/asttypes.cmi \
     typing/oprint.cmi
 typing/oprint.cmi : \
@@ -956,11 +963,11 @@ typing/parmatch.cmi : \
     typing/env.cmi \
     parsing/asttypes.cmi
 typing/path.cmo : \
-    parsing/lexer.cmi \
+    parsing/keywords.cmi \
     typing/ident.cmi \
     typing/path.cmi
 typing/path.cmx : \
-    parsing/lexer.cmx \
+    parsing/keywords.cmx \
     typing/ident.cmx \
     typing/path.cmi
 typing/path.cmi : \

@@ -99,7 +99,7 @@ let needs_spaces txt =
   operator. *)
 let ident_of_name ppf txt =
   let format : (_, _, _) format =
-    if Lexer.is_keyword txt then "\\#%s"
+    if Keywords.is_keyword txt then "\\#%s"
     else if not (needs_parens txt) then "%s"
     else if needs_spaces txt then "(@;%s@;)"
     else "(%s)"
@@ -281,7 +281,7 @@ let tyvar_of_name s =
     (* without the space, this would be parsed as
        a character literal *)
     "' " ^ s
-  else if Lexer.is_keyword s then
+  else if Keywords.is_keyword s then
     "'\\#" ^ s
   else if String.equal s "_" then
     s
