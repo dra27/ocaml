@@ -187,7 +187,7 @@ val inline_branch_factor : Float_arg_helper.parsed ref
 val dont_write_files : bool ref
 val shared : bool ref
 val dlcode : bool ref
-val pic_code : bool ref
+val pic_code : bool option ref
 val runtime_variant : string ref
 val with_runtime : bool ref
 val force_slash : bool ref
@@ -195,20 +195,20 @@ val keep_docs : bool ref
 val keep_locs : bool ref
 val opaque : bool ref
 val profile_columns : Profile.column list ref
-val flambda_invariant_checks : bool ref
+val flambda_invariant_checks : bool option ref
 val unbox_closures : bool ref
 val unbox_closures_factor : int ref
 val default_unbox_closures_factor : int
 val unbox_free_vars_of_closures : bool ref
 val unbox_specialised_args : bool ref
 val clambda_checks : bool ref
-val cmm_invariants : bool ref
+val cmm_invariants : bool option ref
 val default_inline_max_depth : int
 val inline_max_depth : Int_arg_helper.parsed ref
 val remove_unused_arguments : bool ref
 val dump_flambda_verbose : bool ref
 val classic_inlining : bool ref
-val afl_instrument : bool ref
+val afl_instrument : bool option ref
 val afl_inst_ratio : int ref
 val function_sections : bool ref
 val interface_suffix: string ref

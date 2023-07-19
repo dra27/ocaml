@@ -79,3 +79,5 @@ val operation_can_raise : specific_operation -> bool
 
 val float_cond_and_need_swap
   :  Lambda.float_comparison -> X86_ast.float_condition * bool
+
+val pic_code : unit -> bool

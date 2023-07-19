@@ -1966,7 +1966,11 @@ let inline_lazy_force_switch arg loc =
               loc ) ) )
 
 let inline_lazy_force arg loc =
-  if !Clflags.afl_instrument then
+  let afl_instrument =
+    Option.value ~default:Config_settings.afl_instrument
+                 !Clflags.afl_instrument
+  in
+  if afl_instrument then
     (* Disable inlining optimisation if AFL instrumentation active,
        so that the GC forwarding optimisation is not visible in the
        instrumentation output.

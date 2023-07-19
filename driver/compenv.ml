@@ -364,7 +364,8 @@ let parse_warnings error v =
 let prepend_to_list l x = l := x :: !l
 
 let read_one_param ppf position name v =
-  let set name options s =  setter ppf (fun b -> b) name options s in
+  let set name options s = setter ppf (fun b -> b) name options s in
+  let set_opt name options s = setter ppf Option.some name options s in
   let clear name options s = setter ppf (fun b -> not b) name options s in
   let compat name s =
     let error_if_unset = function
@@ -379,7 +380,7 @@ let read_one_param ppf position name v =
   match name with
   | "g" -> set "g" [ Clflags.debug ] v
   | "bin-annot" -> set "bin-annot" [ Clflags.binary_annotations ] v
-  | "afl-instrument" -> set "afl-instrument" [ Clflags.afl_instrument ] v
+  | "afl-instrument" -> set_opt "afl-instrument" [ Clflags.afl_instrument ] v
   | "afl-inst-ratio" ->
       int_setter ppf "afl-inst-ratio" Clflags.afl_inst_ratio v
   | "annot" -> set "annot" [ Clflags.annotations ] v
@@ -523,9 +524,9 @@ let read_one_param ppf position name v =
   | "flambda-verbose" ->
       set "flambda-verbose" [ Clflags.dump_flambda_verbose ] v
   | "flambda-invariants" ->
-      set "flambda-invariants" [ Clflags.flambda_invariant_checks ] v
+      set_opt "flambda-invariants" [ Clflags.flambda_invariant_checks ] v
   | "cmm-invariants" ->
-      set "cmm-invariants" [ Clflags.cmm_invariants ] v
+      set_opt "cmm-invariants" [ Clflags.cmm_invariants ] v
   | "linscan" ->
       set "linscan" [ Clflags.use_linscan ] v
   | "insn-sched" -> set "insn-sched" [ Clflags.insn_sched ] v
@@ -609,7 +610,7 @@ let read_one_param ppf position name v =
 
   | "pic" ->
     if !Clflags.native_code then
-      set "pic" [ Clflags.pic_code ] v
+      set_opt "pic" [ Clflags.pic_code ] v
 
   | "can-discard" ->
     prepend_to_list can_discard v

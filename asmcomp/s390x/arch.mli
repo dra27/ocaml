@@ -20,6 +20,8 @@
 
 (* Machine-specific command-line options *)
 
+val pic_code : unit -> bool
+
 val command_line_options : (string * Arg.spec * string) list
 
 (* Specific operations *)

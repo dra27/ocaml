@@ -1468,7 +1468,11 @@ let transl_function f =
   let body = f.body in
   let cmm_body =
     let env = create_env ~environment_param:f.env in
-    if !Clflags.afl_instrument then
+    let afl_instrument =
+      Option.value ~default:Config_settings.afl_instrument
+                   !Clflags.afl_instrument
+    in
+    if afl_instrument then
       Afl_instrument.instrument_function (transl env body) f.dbg
     else
       transl env body in
@@ -1573,7 +1577,11 @@ let compunit (ulam, preallocated_blocks, constants) =
   let dbg = Debuginfo.none in
   Cmmgen_state.set_structured_constants constants;
   let init_code =
-    if !Clflags.afl_instrument then
+    let afl_instrument =
+      Option.value ~default:Config_settings.afl_instrument
+                   !Clflags.afl_instrument
+    in
+    if afl_instrument then
       Afl_instrument.instrument_initialiser (transl empty_env ulam)
         (fun () -> dbg)
     else

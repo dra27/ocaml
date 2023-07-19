@@ -54,8 +54,12 @@ let lambda_to_flambda ~ppf_dump ~prefixname ~backend ~size
       (fun () ->
          let pass_number = ref 0 in
          let round_number = ref 0 in
+         let flambda_invariant_checks =
+           Option.value ~default:Config_settings.with_flambda_invariants
+                        !Clflags.flambda_invariant_checks
+         in
          let check flam =
-           if !Clflags.flambda_invariant_checks then begin
+           if flambda_invariant_checks then begin
              try Flambda_invariants.check_exn flam
              with exn ->
                Misc.fatal_errorf "After Flambda pass %d, round %d:@.%s:@.%a"
@@ -72,7 +76,7 @@ let lambda_to_flambda ~ppf_dump ~prefixname ~backend ~size
              Format.fprintf ppf_dump "\n@?"
            end;
            let flam = Profile.record ~accumulate:true name pass flam in
-           if !Clflags.flambda_invariant_checks then begin
+           if flambda_invariant_checks then begin
              Profile.record ~accumulate:true "check" check flam
            end;
            flam

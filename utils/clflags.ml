@@ -143,11 +143,9 @@ let native_code = ref false             (* set to true under ocamlopt *)
 
 let force_slash = ref false             (* for ocamldep *)
 let clambda_checks = ref false          (* -clambda-checks *)
-let cmm_invariants =
-  ref Config_settings.with_cmm_invariants        (* -dcmm-invariants *)
+let cmm_invariants = ref None           (* -dcmm-invariants *)
 
-let flambda_invariant_checks =
-  ref Config_settings.with_flambda_invariants    (* -flambda-(no-)invariants *)
+let flambda_invariant_checks = ref None (* -flambda-(no-)invariants *)
 
 let dont_write_files = ref false        (* set to true under ocamldoc *)
 
@@ -157,9 +155,7 @@ let insn_sched = ref insn_sched_default (* -[no-]insn-sched *)
 let shared = ref false (* -shared *)
 let dlcode = ref true (* not -nodynlink *)
 
-let pic_code = ref (match Config_settings.architecture with (* -fPIC *)
-                     | "amd64" -> true
-                     | _       -> false)
+let pic_code = ref None
 
 let runtime_variant = ref ""
 
@@ -171,7 +167,7 @@ let keep_locs = ref true               (* -keep-locs *)
 let classic_inlining = ref false       (* -Oclassic *)
 let inlining_report = ref false    (* -inlining-report *)
 
-let afl_instrument = ref Config_settings.afl_instrument (* -afl-instrument *)
+let afl_instrument = ref None          (* -afl-instrument *)
 let afl_inst_ratio = ref 100           (* -afl-inst-ratio *)
 
 let function_sections = ref false      (* -function-sections *)

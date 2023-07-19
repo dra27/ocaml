@@ -1121,7 +1121,11 @@ let import_function_declarations_for_pack function_decls
 
 let create_set_of_closures ~function_decls ~free_vars ~specialised_args
       ~direct_call_surrogates =
-  if !Clflags.flambda_invariant_checks then begin
+  let flambda_invariant_checks =
+    Option.value ~default:Config_settings.with_flambda_invariants
+                 !Clflags.flambda_invariant_checks
+  in
+  if flambda_invariant_checks then begin
     let all_fun_vars = Variable.Map.keys function_decls.funs in
     let expected_free_vars =
       Variable.Map.fold (fun _fun_var function_decl expected_free_vars ->

@@ -154,7 +154,7 @@ let load_symbol_addr s arg =
       (* I.mov (mem__imp s) arg (\* mov __caml_imp_foo(%rip), ... *\) *)
       I.mov (sym (emit_symbol s)) arg (* movabsq $foo, ... *)
     end else I.mov (mem64_rip QWORD (emit_symbol s ^ "@GOTPCREL")) arg
-  else if !Clflags.pic_code then
+  else if Arch.pic_code () then
     I.lea (mem64_rip NONE (emit_symbol s)) arg
   else
     I.mov (sym (emit_symbol s)) arg
@@ -838,7 +838,7 @@ let emit_instr env fallthrough i =
       env.stack_offset <- env.stack_offset + delta
   | Lpushtrap { lbl_handler; } ->
       let load_label_addr s arg =
-        if !Clflags.pic_code then
+        if Arch.pic_code () then
           I.lea (mem64_rip NONE (emit_label s)) arg
         else
           I.mov (sym (emit_label s)) arg

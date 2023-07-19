@@ -1551,7 +1551,9 @@ let options_with_command_line_syntax options r =
 
 module Default = struct
   let set r () = r := true
+  let set_opt r () = r := Some true
   let clear r () = r := false
+  let clear_opt r () = r := Some false
 
   module Common = struct
     let _absname = set Clflags.absname
@@ -1618,13 +1620,13 @@ module Default = struct
     let _dalloc = set Clflags.dump_regalloc
     let _dclambda = set Clflags.dump_clambda
     let _dcmm = set Clflags.dump_cmm
-    let _dcmm_invariants = set Clflags.cmm_invariants
+    let _dcmm_invariants = set_opt Clflags.cmm_invariants
     let _dcombine = set Clflags.dump_combine
     let _dcse = set Clflags.dump_cse
     let _dflambda = set Clflags.dump_flambda
-    let _dflambda_invariants = set Clflags.flambda_invariant_checks
+    let _dflambda_invariants = set_opt Clflags.flambda_invariant_checks
     let _dflambda_let stamp = Clflags.dump_flambda_let := (Some stamp)
-    let _dflambda_no_invariants = clear Clflags.flambda_invariant_checks
+    let _dflambda_no_invariants = clear_opt Clflags.flambda_invariant_checks
     let _dflambda_verbose () =
       Clflags.dump_flambda := true; Clflags.dump_flambda_verbose := true
     let _dinterval = set Clflags.dump_interval
@@ -1822,7 +1824,7 @@ module Default = struct
     include Core
     include Compiler
     let _afl_inst_ratio n = Clflags.afl_inst_ratio := n
-    let _afl_instrument = set Clflags.afl_instrument
+    let _afl_instrument = set_opt Clflags.afl_instrument
     let _function_sections () =
       assert Config_settings.function_sections;
       prepend_to_list Compenv.first_ccopts "-ffunction-sections";

@@ -17,9 +17,9 @@
 (* Machine-specific command-line options *)
 
 let command_line_options =
-  [ "-fPIC", Arg.Set Clflags.pic_code,
+  [ "-fPIC", Arg.Unit (fun () -> Clflags.pic_code := Some true),
       " Generate position-independent machine code (default)";
-    "-fno-PIC", Arg.Clear Clflags.pic_code,
+    "-fno-PIC", Arg.Unit (fun () -> Clflags.pic_code := Some false),
       " Generate position-dependent machine code" ]
 
 (* Specific operations for the AMD64 processor *)
@@ -170,3 +170,5 @@ let float_cond_and_need_swap cond =
   | CFnle -> NLEf, false
   | CFge  -> LEf,  true
   | CFnge -> NLEf, true
+
+let pic_code () = Option.value !Clflags.pic_code ~default:true

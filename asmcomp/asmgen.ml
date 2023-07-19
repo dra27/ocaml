@@ -33,7 +33,11 @@ let cmm_invariants ppf fd_cmm =
     if !Clflags.dump_cmm then Printcmm.fundecl
     else fun ppf fdecl -> Format.fprintf ppf "%s" fdecl.fun_name
   in
-  if !Clflags.cmm_invariants && Cmm_invariants.run ppf fd_cmm then
+  let cmm_invariants =
+    Option.value ~default:Config_settings.with_cmm_invariants
+                 !Clflags.cmm_invariants
+  in
+  if cmm_invariants && Cmm_invariants.run ppf fd_cmm then
     Misc.fatal_errorf "Cmm invariants failed on following fundecl:@.%a@."
       print_fundecl fd_cmm;
   fd_cmm
