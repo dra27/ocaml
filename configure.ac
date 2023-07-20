@@ -1041,13 +1041,13 @@ AS_IF([! $arch64],
       [AC_DEFINE([ARCH_ALIGN_INT64], [1])])])
     ])])
 
-AS_CASE([$cc_basename,$host],
-  [*,x86_64-*-darwin*],
+AS_CASE([$cc_basename,$host,$arch64],
+  [*,x86_64-*-darwin*,*],
     [oc_ldflags='-Wl,-no_compact_unwind';
     AC_DEFINE([HAS_ARCH_CODE32], [1])],
-  [*,aarch64-*-darwin*|arm64-*-darwin*],
+  [*,aarch64-*-darwin*,*|arm64-*-darwin*,*],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
-  [*,*-*-cygwin*],
+  [*,*-*-cygwin*,*],
     [common_cppflags="$common_cppflags -U_WIN32"
     AS_IF([$supports_shared_libraries],
       [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
@@ -1058,7 +1058,7 @@ AS_CASE([$cc_basename,$host],
       oc_ldflags='-Wl,--stack,16777216']
     )
     ostype="Cygwin"],
-  [*,*-*-mingw32*],
+  [*,*-*-mingw32*,*],
     [AS_CASE([$host],
       [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
     ostype="Win32"
@@ -1070,7 +1070,7 @@ AS_CASE([$cc_basename,$host],
     oc_exe_ldflags='-municode'
     mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
     SO="dll"],
-  [*,*-pc-windows],
+  [*,*-pc-windows,*],
     [toolchain=msvc
     ostype="Win32"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
@@ -1081,12 +1081,12 @@ AS_CASE([$cc_basename,$host],
     oc_exe_ldflags='/ENTRY:wmainCRTStartup'
     mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
     mkexedebugflag=''],
-  [*,x86_64-*-linux*],
+  [*,x86_64-*-linux*,true|*,i686-*-linux*,true],
     AC_DEFINE([HAS_ARCH_CODE32], [1]),
-  [xlc*,powerpc-ibm-aix*],
+  [xlc*,powerpc-ibm-aix*,*],
     [oc_ldflags='-brtl -bexpfull'
     AC_DEFINE([HAS_ARCH_CODE32], [1])],
-  [gcc*,powerpc-*-linux*],
+  [gcc*,powerpc-*-linux*,*],
     [oc_ldflags="-mbss-plt"])
 
 # Atomics library
@@ -1148,10 +1148,10 @@ AS_IF([test x"$enable_shared" != "xno"],
     [[*-*-linux*|*-*-freebsd[3-9]*|*-*-freebsd[1-9][0-9]*\
     |*-*-openbsd*|*-*-netbsd*|*-*-dragonfly*|*-*-gnu*|*-*-haiku*]],
       [sharedlib_cflags="-fPIC"
-       AS_CASE([$cc_basename,$host],
-           [*gcc*,powerpc-*-linux*],
+       AS_CASE([$cc_basename,$host,$arch64],
+           [*gcc*,powerpc-*-linux*,*],
            [mkdll_flags='-shared -mbss-plt'],
-           [[*,i[3456]86-*]],
+           [[*,i[3456]86-*,false]],
            # Disable DT_TEXTREL warnings on Linux and BSD i386
            # See https://github.com/ocaml/ocaml/issues/9800
            [mkdll_flags='-shared -Wl,-z,notext'],
@@ -1247,104 +1247,113 @@ system=unknown
 
 has_native_backend=no
 native_ldflags=""
-AS_CASE([$host],
+replace_cpu=''
+AS_CASE([$host,$arch64],
   dnl Intel (arch=i386 & arch=amd64)
-  [[i[3456]86-*-linux*]],
+  [[i[3456]86-*-linux*,false]],
     [arch=i386; system=linux_elf],
-  [[i[3456]86-*-*bsd*]],
+  [i686-*-linux*,true],
+    [arch=amd64; system=linux; has_native_backend=yes; replace_cpu=x86_64],
+  [[i[3456]86-*-*bsd*,*]],
     [arch=i386; system=bsd_elf],
-  [[i[3456]86-*-haiku*]],
+  [[i[3456]86-*-haiku*,*]],
     [arch=i386; system=beos],
-  [[i[3456]86-*-cygwin]],
+  [[i[3456]86-*-cygwin,*]],
     [arch=i386; system=cygwin],
-  [[i[3456]86-*-gnu*]],
+  [[i[3456]86-*-gnu*,*]],
     [arch=i386; system=gnu],
-  [[i[3456]86-*-mingw32*]],
+  [[i[3456]86-*-mingw32*,*]],
     [arch=i386; system=mingw],
-  [i686-pc-windows],
+  [i686-pc-windows,*],
     [arch=i386; system=win32],
-  [x86_64-pc-windows],
+  [x86_64-pc-windows,*],
     [arch=amd64; system=win64],
-  [x86_64-*-linux*],
+  [x86_64-*-linux*,true],
     [arch=amd64; system=linux; has_native_backend=yes],
-  [x86_64-*-gnu*],
+  [x86_64-*-gnu*,*],
     [arch=amd64; system=gnu],
-  [x86_64-*-dragonfly*],
+  [x86_64-*-dragonfly*,*],
     [arch=amd64; system=dragonfly],
-  [x86_64-*-solaris*],
+  [x86_64-*-solaris*,*],
     [arch=amd64; system=solaris; has_native_backend=yes],
-  [x86_64-*-freebsd*],
+  [x86_64-*-freebsd*,*],
     [arch=amd64; system=freebsd; has_native_backend=yes],
-  [x86_64-*-netbsd*],
+  [x86_64-*-netbsd*,*],
     [arch=amd64; system=netbsd; has_native_backend=yes],
-  [x86_64-*-openbsd*],
+  [x86_64-*-openbsd*,*],
     [arch=amd64; system=openbsd; has_native_backend=yes],
-  [x86_64-*-haiku*],
+  [x86_64-*-haiku*,*],
     [arch=amd64; system=beos],
-  [x86_64-*-darwin*],
+  [x86_64-*-darwin*,*],
     [arch=amd64; system=macosx; has_native_backend=yes],
-  [x86_64-*-mingw32*],
+  [x86_64-*-mingw32*,*],
     [arch=amd64; system=mingw64; has_native_backend=yes],
-  [x86_64-*-cygwin*],
+  [x86_64-*-cygwin*,*],
     [arch=amd64; system=cygwin; has_native_backend=yes],
   dnl IBM POWER (arch=power)
-  [[powerpc64le*-*-linux*]],
+  [[powerpc64le*-*-linux*,*]],
     [arch=power; model=ppc64le; system=elf; has_native_backend=yes],
   dnl IBM Z (arch=s390x)
-  [[s390x*-*-linux*]],
+  [[s390x*-*-linux*,*]],
     [arch=s390x; model=z10; system=elf; has_native_backend=yes],
   dnl ARM (arch=arm and arch=arm64)
   # expected to match "gnueabihf" as well as "musleabihf"
-  [armv6*-*-linux-*eabihf],
+  [armv6*-*-linux-*eabihf,*],
     [arch=arm; model=armv6; system=linux_eabihf],
-  [armv7*-*-linux-*eabihf],
+  [armv7*-*-linux-*eabihf,*],
     [arch=arm; model=armv7; system=linux_eabihf],
-  [armv8*-*-linux-*eabihf],
+  [armv8*-*-linux-*eabihf,false],
     [arch=arm; model=armv8; system=linux_eabihf],
-  [armv8*-*-linux-*eabi],
+  [armv8*-*-linux-*eabi,false],
     [arch=arm; model=armv8; system=linux_eabi],
-  [armv7*-*-linux-*eabi],
+  [armv8*-*-linux-*,true],
+    [arch=arm64; system=linux; has_native_backend=yes; replace_cpu=aarch64],
+  [armv7*-*-linux-*eabi,*],
     [arch=arm; model=armv7; system=linux_eabi],
-  [armv6t2*-*-linux-*eabi],
+  [armv6t2*-*-linux-*eabi,*],
     [arch=arm; model=armv6t2; system=linux_eabi],
-  [armv6*-*-linux-*eabi],
+  [armv6*-*-linux-*eabi,*],
     [arch=arm; model=armv6; system=linux_eabi],
-  [armv6*-*-freebsd*],
+  [armv6*-*-freebsd*,*],
     [arch=arm; model=armv6; system=freebsd],
-  [earmv6*-*-netbsd*],
+  [earmv6*-*-netbsd*,*],
     [arch=arm; model=armv6; system=netbsd],
-  [earmv7*-*-netbsd*],
+  [earmv7*-*-netbsd*,*],
     [arch=arm; model=armv7; system=netbsd],
-  [armv5te*-*-linux-*eabi],
+  [armv5te*-*-linux-*eabi,*],
     [arch=arm; model=armv5te; system=linux_eabi],
-  [armv5*-*-linux-*eabi],
+  [armv5*-*-linux-*eabi,*],
     [arch=arm; model=armv5; system=linux_eabi],
-  [arm*-*-linux-*eabihf],
+  [arm*-*-linux-*eabihf,*],
     [arch=arm; system=linux_eabihf],
-  [arm*-*-linux-*eabi],
+  [arm*-*-linux-*eabi,*],
     [arch=arm; system=linux_eabi],
-  [arm*-*-openbsd*],
+  [arm*-*-openbsd*,*],
     [arch=arm; system=bsd],
-  [zaurus*-*-openbsd*],
+  [zaurus*-*-openbsd*,*],
     [arch=arm; system=bsd],
-  [arm64-*-darwin*],
+  [arm64-*-darwin*,*],
     [arch=arm64; system=macosx; has_native_backend=yes],
-  [aarch64-*-darwin*],
+  [aarch64-*-darwin*,*],
     [arch=arm64; system=macosx; has_native_backend=yes],
-  [aarch64-*-linux*],
-    [AS_IF([$arch64],
-       [arch=arm64; system=linux; has_native_backend=yes],
-       [arch=arm; model=armv8; system=linux_eabihf])],
-  [aarch64-*-freebsd*],
+  [aarch64-*-linux*,true],
+    [arch=arm64; system=linux; has_native_backend=yes],
+  [aarch64-*-linux*,false],
+    [arch=arm; model=armv8; system=linux_eabihf; replace_cpu='armv8l'],
+  [aarch64-*-freebsd*,*],
     [arch=arm64; system=freebsd; has_native_backend=yes],
-  [aarch64-*-openbsd*],
+  [aarch64-*-openbsd*,*],
     [arch=arm64; system=openbsd; has_native_backend=yes],
-  [aarch64-*-netbsd*],
+  [aarch64-*-netbsd*,*],
     [arch=arm64; system=netbsd; has_native_backend=yes],
   dnl RISC-V (arch=riscv)
-  [riscv64-*-linux*],
+  [riscv64-*-linux*,*],
     [arch=riscv; model=riscv64; system=linux; has_native_backend=yes]
 )
+
+AS_IF([test x"$replace_cpu" != 'x'], [
+  AS_IF([! $user_host], [host_ocaml="$replace_cpu-${host#*-}"])
+  AS_IF([! $user_target], [target_ocaml="$replace_cpu-${target#*-}"])])
 
 native_cflags=''
 native_cppflags="-DTARGET_${arch} -DMODEL_${model} -DSYS_${system}"
