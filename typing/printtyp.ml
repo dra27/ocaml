@@ -30,7 +30,91 @@ module Sig_component_kind = Shape.Sig_component_kind
 module Style = Misc.Style
 
 (* Print a long identifier *)
-let longident = Pprintast.longident
+(*let longident = Pprintast.longident*)
+
+let prefix_symbols  = [ '!'; '?'; '~' ]
+let infix_symbols = [ '='; '<'; '>'; '@'; '^'; '|'; '&'; '+'; '-'; '*'; '/';
+                      '$'; '%'; '#' ]
+
+(* type fixity = Infix| Prefix  *)
+let special_infix_strings =
+  ["asr"; "land"; "lor"; "lsl"; "lsr"; "lxor"; "mod"; "or"; ":="; "!="; "::" ]
+
+let letop s =
+  String.length s > 3
+  && s.[0] = 'l'
+  && s.[1] = 'e'
+  && s.[2] = 't'
+  && List.mem s.[3] infix_symbols
+
+let andop s =
+  String.length s > 3
+  && s.[0] = 'a'
+  && s.[1] = 'n'
+  && s.[2] = 'd'
+  && List.mem s.[3] infix_symbols
+
+(* determines if the string is an infix string.
+   checks backwards, first allowing a renaming postfix ("_102") which
+   may have resulted from Pexp -> Texp -> Pexp translation, then checking
+   if all the characters in the beginning of the string are valid infix
+   characters. *)
+let fixity_of_string  = function
+  | "" -> `Normal
+  | s when List.mem s special_infix_strings -> `Infix s
+  | s when List.mem s.[0] infix_symbols -> `Infix s
+  | s when List.mem s.[0] prefix_symbols -> `Prefix s
+  | s when s.[0] = '.' -> `Mixfix s
+  | s when letop s -> `Letop s
+  | s when andop s -> `Andop s
+  | _ -> `Normal
+
+let is_infix  = function `Infix _ -> true | _  -> false
+let is_mixfix = function `Mixfix _ -> true | _ -> false
+let is_kwdop = function `Letop _ | `Andop _ -> true | _ -> false
+
+let first_is c str =
+  str <> "" && str.[0] = c
+let last_is c str =
+  str <> "" && str.[String.length str - 1] = c
+
+let first_is_in cs str =
+  str <> "" && List.mem str.[0] cs
+
+(* which identifiers are in fact operators needing parentheses *)
+let needs_parens txt =
+  let fix = fixity_of_string txt in
+  is_infix fix
+  || is_mixfix fix
+  || is_kwdop fix
+  || first_is_in prefix_symbols txt
+
+(* some infixes need spaces around parens to avoid clashes with comment
+   syntax *)
+let needs_spaces txt =
+  first_is '*' txt || last_is '*' txt
+
+let ident_of_name ppf txt =
+  let format : (_, _, _) format =
+    if Keywords.is_keyword txt then "\\#%s"
+    else if not (needs_parens txt) then "%s"
+    else if needs_spaces txt then "(@;%s@;)"
+    else "(%s)"
+  in fprintf ppf format txt
+
+let protect_longident ppf print_longident longprefix txt =
+  let format : (_, _, _) format =
+    if not (needs_parens txt) then "%a.%s"
+    else if needs_spaces txt then  "%a.(@;%s@;)"
+    else "%a.(%s)" in
+  fprintf ppf format print_longident longprefix txt
+
+let rec longident f = function
+  | Lident s -> ident_of_name f s
+  | Ldot(y,s) -> protect_longident f longident y s
+  | Lapply (y,s) ->
+      fprintf f "%a(%a)" longident y longident s
+
 
 let () = Env.print_longident := longident
 
