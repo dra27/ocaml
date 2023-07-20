@@ -1,7 +1,7 @@
 (* TEST
  include runtime_events;
  include unix;
- ocamlrunparam += ",e=6";
+ ocamlrunparam += ",e=4";
  libunix;
  {
    native;
@@ -36,7 +36,8 @@ let _ =
 
 let dropped = ref false
 
-let lost_events _ _ =
+let lost_events _ num =
+  Printf.printf "Lost %d events\n" num;
   dropped := true
 
 let callbacks =
