@@ -14244,68 +14244,6 @@ esac
 
 mkexe_cmd_exp="$CC"
 
-case $cc_basename,$host in #(
-  *,x86_64-*-darwin*) :
-    oc_ldflags='-Wl,-no_compact_unwind';
-    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
- ;; #(
-  *,aarch64-*-darwin*|arm64-*-darwin*) :
-    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
- ;; #(
-  *,*-*-cygwin*) :
-    common_cppflags="$common_cppflags -U_WIN32"
-    if $supports_shared_libraries
-then :
-  mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-      mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-      mkexe_cflags=''
-      mkexe_ldflags_prefix='-link '
-else $as_nop
-  mkexe_extra_flags=''
-      oc_ldflags='-Wl,--stack,16777216'
-
-fi
-    ostype="Cygwin" ;; #(
-  *,*-*-mingw32*) :
-    case $host in #(
-  i686-*-*) :
-    oc_dll_ldflags="-static-libgcc" ;; #(
-  *) :
-     ;;
-esac
-    ostype="Win32"
-    toolchain="mingw"
-    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cflags=''
-    mkexe_ldflags_prefix='-link '
-    oc_exe_ldflags='-municode'
-    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
-    SO="dll" ;; #(
-  *,*-pc-windows) :
-    toolchain=msvc
-    ostype="Win32"
-    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cflags=''
-    mkexe_ldflags_prefix='-link '
-    mkexe_via_cc_ldflags_prefix='/link '
-    oc_exe_ldflags='/ENTRY:wmainCRTStartup'
-    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
-    mkexedebugflag='' ;; #(
-  *,x86_64-*-linux*) :
-    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
- ;; #(
-  xlc*,powerpc-ibm-aix*) :
-    oc_ldflags='-brtl -bexpfull'
-    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
- ;; #(
-  gcc*,powerpc-*-linux*) :
-    oc_ldflags="-mbss-plt" ;; #(
-  *) :
-     ;;
-esac
-
 ## Program to use to install files
 
   # Find a good install program.  We prefer a C program (faster),
@@ -15122,6 +15060,68 @@ fi
      ;;
 esac
 fi
+
+case $cc_basename,$host in #(
+  *,x86_64-*-darwin*) :
+    oc_ldflags='-Wl,-no_compact_unwind';
+    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
+ ;; #(
+  *,aarch64-*-darwin*|arm64-*-darwin*) :
+    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
+ ;; #(
+  *,*-*-cygwin*) :
+    common_cppflags="$common_cppflags -U_WIN32"
+    if $supports_shared_libraries
+then :
+  mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '
+else $as_nop
+  mkexe_extra_flags=''
+      oc_ldflags='-Wl,--stack,16777216'
+
+fi
+    ostype="Cygwin" ;; #(
+  *,*-*-mingw32*) :
+    case $host in #(
+  i686-*-*) :
+    oc_dll_ldflags="-static-libgcc" ;; #(
+  *) :
+     ;;
+esac
+    ostype="Win32"
+    toolchain="mingw"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cflags=''
+    mkexe_ldflags_prefix='-link '
+    oc_exe_ldflags='-municode'
+    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
+    SO="dll" ;; #(
+  *,*-pc-windows) :
+    toolchain=msvc
+    ostype="Win32"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cflags=''
+    mkexe_ldflags_prefix='-link '
+    mkexe_via_cc_ldflags_prefix='/link '
+    oc_exe_ldflags='/ENTRY:wmainCRTStartup'
+    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
+    mkexedebugflag='' ;; #(
+  *,x86_64-*-linux*) :
+    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
+ ;; #(
+  xlc*,powerpc-ibm-aix*) :
+    oc_ldflags='-brtl -bexpfull'
+    printf "%s\n" "#define HAS_ARCH_CODE32 1" >>confdefs.h
+ ;; #(
+  gcc*,powerpc-*-linux*) :
+    oc_ldflags="-mbss-plt" ;; #(
+  *) :
+     ;;
+esac
 
 # Atomics library
 

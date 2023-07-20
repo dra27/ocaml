@@ -946,54 +946,6 @@ AS_CASE([$flexdll_source_dir,$supports_shared_libraries,$flexlink,$host],
 
 mkexe_cmd_exp="$CC"
 
-AS_CASE([$cc_basename,$host],
-  [*,x86_64-*-darwin*],
-    [oc_ldflags='-Wl,-no_compact_unwind';
-    AC_DEFINE([HAS_ARCH_CODE32], [1])],
-  [*,aarch64-*-darwin*|arm64-*-darwin*],
-    AC_DEFINE([HAS_ARCH_CODE32], [1]),
-  [*,*-*-cygwin*],
-    [common_cppflags="$common_cppflags -U_WIN32"
-    AS_IF([$supports_shared_libraries],
-      [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-      mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-      mkexe_cflags=''
-      mkexe_ldflags_prefix='-link '],
-      [mkexe_extra_flags=''
-      oc_ldflags='-Wl,--stack,16777216']
-    )
-    ostype="Cygwin"],
-  [*,*-*-mingw32*],
-    [AS_CASE([$host],
-      [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
-    ostype="Win32"
-    toolchain="mingw"
-    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cflags=''
-    mkexe_ldflags_prefix='-link '
-    oc_exe_ldflags='-municode'
-    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
-    SO="dll"],
-  [*,*-pc-windows],
-    [toolchain=msvc
-    ostype="Win32"
-    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
-    mkexe_cflags=''
-    mkexe_ldflags_prefix='-link '
-    mkexe_via_cc_ldflags_prefix='/link '
-    oc_exe_ldflags='/ENTRY:wmainCRTStartup'
-    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
-    mkexedebugflag=''],
-  [*,x86_64-*-linux*],
-    AC_DEFINE([HAS_ARCH_CODE32], [1]),
-  [xlc*,powerpc-ibm-aix*],
-    [oc_ldflags='-brtl -bexpfull'
-    AC_DEFINE([HAS_ARCH_CODE32], [1])],
-  [gcc*,powerpc-*-linux*],
-    [oc_ldflags="-mbss-plt"])
-
 ## Program to use to install files
 AC_PROG_INSTALL
 
@@ -1088,6 +1040,54 @@ AS_IF([! $arch64],
               test "$ac_cv_alignof_long_long" -gt 4],
       [AC_DEFINE([ARCH_ALIGN_INT64], [1])])])
     ])])
+
+AS_CASE([$cc_basename,$host],
+  [*,x86_64-*-darwin*],
+    [oc_ldflags='-Wl,-no_compact_unwind';
+    AC_DEFINE([HAS_ARCH_CODE32], [1])],
+  [*,aarch64-*-darwin*|arm64-*-darwin*],
+    AC_DEFINE([HAS_ARCH_CODE32], [1]),
+  [*,*-*-cygwin*],
+    [common_cppflags="$common_cppflags -U_WIN32"
+    AS_IF([$supports_shared_libraries],
+      [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '],
+      [mkexe_extra_flags=''
+      oc_ldflags='-Wl,--stack,16777216']
+    )
+    ostype="Cygwin"],
+  [*,*-*-mingw32*],
+    [AS_CASE([$host],
+      [i686-*-*], [oc_dll_ldflags="-static-libgcc"])
+    ostype="Win32"
+    toolchain="mingw"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cflags=''
+    mkexe_ldflags_prefix='-link '
+    oc_exe_ldflags='-municode'
+    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
+    SO="dll"],
+  [*,*-pc-windows],
+    [toolchain=msvc
+    ostype="Win32"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cflags=''
+    mkexe_ldflags_prefix='-link '
+    mkexe_via_cc_ldflags_prefix='/link '
+    oc_exe_ldflags='/ENTRY:wmainCRTStartup'
+    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
+    mkexedebugflag=''],
+  [*,x86_64-*-linux*],
+    AC_DEFINE([HAS_ARCH_CODE32], [1]),
+  [xlc*,powerpc-ibm-aix*],
+    [oc_ldflags='-brtl -bexpfull'
+    AC_DEFINE([HAS_ARCH_CODE32], [1])],
+  [gcc*,powerpc-*-linux*],
+    [oc_ldflags="-mbss-plt"])
 
 # Atomics library
 
