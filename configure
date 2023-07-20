@@ -780,6 +780,8 @@ build_os
 build_vendor
 build_cpu
 build
+target_ocaml
+host_ocaml
 ar_supports_response_files
 QS
 ocaml_libdir
@@ -3424,6 +3426,8 @@ OCAML_VERSION_SHORT=5.2
 
 
 
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3475,6 +3479,22 @@ printf "%s\n" "#define OCAML_VERSION_STRING \"5.2.0+dev0-2023-04-11\"" >>confdef
 
 
 # Checks for system types
+
+# If the user specifies --host / --target, always use those for
+# Config.host / Config.target
+if test x"$host" = 'x'
+then :
+  user_host=false
+else $as_nop
+  user_host=true
+fi
+if test x"$target" = 'x'
+then :
+  user_target=false
+else $as_nop
+  user_target=true
+fi
+
 
 
 
@@ -15518,7 +15538,7 @@ case $host in #(
 then :
   arch=arm64; system=linux; has_native_backend=yes
 else $as_nop
-  arch=arm; model=armv8; system=linux
+  arch=arm; model=armv8; system=linux_eabihf
 fi ;; #(
   aarch64-*-freebsd*) :
     arch=arm64; system=freebsd; has_native_backend=yes ;; #(
@@ -20200,6 +20220,15 @@ LTLIBOBJS=$ac_ltlibobjs
     fi
   done
 
+
+  if test x"$host_ocaml" = 'x'
+then :
+  host_ocaml="$host"
+fi
+  if test x"$target_ocaml" = 'x'
+then :
+  target_ocaml="$target"
+fi
 cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"
 
   saved_exec_prefix="$exec_prefix"

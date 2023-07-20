@@ -224,6 +224,8 @@ AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
+AC_SUBST([host_ocaml])
+AC_SUBST([target_ocaml])
 
 ## Generated files
 
@@ -256,6 +258,14 @@ AC_DEFINE([OCAML_VERSION_STRING], ["][OCAML__VERSION]["])
 AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
 
 # Checks for system types
+
+# If the user specifies --host / --target, always use those for
+# Config.host / Config.target
+AS_IF([test x"$host" = 'x'], [user_host=false], [user_host=true])
+AS_IF([test x"$target" = 'x'], [user_target=false], [user_target=true])
+AC_CONFIG_COMMANDS_PRE([
+  AS_IF([test x"$host_ocaml" = 'x'], [host_ocaml="$host"])
+  AS_IF([test x"$target_ocaml" = 'x'], [target_ocaml="$target"])])
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -1324,7 +1334,7 @@ AS_CASE([$host],
   [aarch64-*-linux*],
     [AS_IF([$arch64],
        [arch=arm64; system=linux; has_native_backend=yes],
-       [arch=arm; model=armv8; system=linux])],
+       [arch=arm; model=armv8; system=linux_eabihf])],
   [aarch64-*-freebsd*],
     [arch=arm64; system=freebsd; has_native_backend=yes],
   [aarch64-*-openbsd*],

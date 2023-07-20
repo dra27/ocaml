@@ -83,8 +83,8 @@ let ext_asm = "." ^ {@QS@|@S@|@QS@}
 let ext_lib = "." ^ {@QS@|@libext@|@QS@}
 let ext_dll = "." ^ {@QS@|@SO@|@QS@}
 
-let host = {@QS@|@host@|@QS@}
-let target = {@QS@|@target@|@QS@}
+let host = {@QS@|@host_ocaml@|@QS@}
+let target = {@QS@|@target_ocaml@|@QS@}
 
 let systhread_supported = @systhread_support@
 
