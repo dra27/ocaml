@@ -15,28 +15,50 @@
 
 (* Command-line parameters *)
 
-module Int_arg_helper = Arg_helper.Make (struct
-  module Key = struct
-    include Numbers.Int
-    let of_string = int_of_string
-  end
+type 'a switchable =
+| Atom of 'a
+| Switched of bool ref * 'a * 'a
 
-  module Value = struct
-    include Numbers.Int
-    let of_string = int_of_string
-  end
-end)
-module Float_arg_helper = Arg_helper.Make (struct
-  module Key = struct
-    include Numbers.Int
-    let of_string = int_of_string
-  end
+let expand = function
+| Atom v
+| Switched({contents = true}, v, _)
+| Switched({contents = false}, _, v) -> v
 
-  module Value = struct
-    include Numbers.Float
-    let of_string = float_of_string
-  end
-end)
+let map_switchable f = function
+| Atom v -> Atom (f v)
+| Switched(b, l, r) -> Switched(b, f l, f r)
+
+module type Parseable = sig
+  type t
+  val of_string : string -> t
+end
+
+module Switchable_arg_helper(T : Parseable) = struct
+  include Arg_helper.Make(struct
+    module Key = struct
+      include Numbers.Int
+      let of_string = int_of_string
+    end
+
+    module Value = struct
+      type t = T.t switchable
+      let of_string s = Atom (T.of_string s)
+    end
+  end)
+
+  let default_switchable = default
+
+  let default v = default (Atom v)
+
+  let get ~key parsed = expand (get ~key parsed)
+
+  let get_default parsed = expand (get_default parsed)
+end
+
+module Int_arg_helper =
+  Switchable_arg_helper(struct type t = int let of_string = int_of_string end)
+
+module Float_arg_helper = Switchable_arg_helper(Float)
 
 let objfiles = ref ([] : string list)   (* .cmo and .cma files *)
 and ccobjs = ref ([] : string list)     (* .o, .a, .so and -cclib -lxxx *)
@@ -180,10 +202,11 @@ let rounds () =
   | Some r -> r
 
 let default_inline_threshold =
-  if Config_settings.flambda then 10. else 10. /. 8.
+  Switched(ref Config_settings.flambda, 10., 10. /. 8.)
 let inline_toplevel_multiplier = 16
 let default_inline_toplevel_threshold =
-  int_of_float ((float inline_toplevel_multiplier) *. default_inline_threshold)
+  let f v = int_of_float (float inline_toplevel_multiplier *. v) in
+  map_switchable f default_inline_threshold
 let default_inline_call_cost = 5
 let default_inline_alloc_cost = 7
 let default_inline_prim_cost = 3
@@ -194,9 +217,10 @@ let default_inline_lifting_benefit = 1300
 let default_inline_max_unroll = 0
 let default_inline_max_depth = 1
 
-let inline_threshold = ref (Float_arg_helper.default default_inline_threshold)
+let inline_threshold =
+  ref (Float_arg_helper.default_switchable default_inline_threshold)
 let inline_toplevel_threshold =
-  ref (Int_arg_helper.default default_inline_toplevel_threshold)
+  ref (Int_arg_helper.default_switchable default_inline_toplevel_threshold)
 let inline_call_cost = ref (Int_arg_helper.default default_inline_call_cost)
 let inline_alloc_cost = ref (Int_arg_helper.default default_inline_alloc_cost)
 let inline_prim_cost = ref (Int_arg_helper.default default_inline_prim_cost)
@@ -237,10 +261,10 @@ type inlining_arguments = {
 }
 
 let set_int_arg round (arg:Int_arg_helper.parsed ref) default value =
-  let value : int =
+  let value : int switchable =
     match value with
     | None -> default
-    | Some value -> value
+    | Some value -> Atom value
   in
   match round with
   | None ->
@@ -253,7 +277,7 @@ let set_float_arg round (arg:Float_arg_helper.parsed ref) default value =
   let value =
     match value with
     | None -> default
-    | Some value -> value
+    | Some value -> Atom value
   in
   match round with
   | None ->
@@ -263,8 +287,8 @@ let set_float_arg round (arg:Float_arg_helper.parsed ref) default value =
     arg := Float_arg_helper.add_base_override round value !arg
 
 let use_inlining_arguments_set ?round (arg:inlining_arguments) =
-  let set_int = set_int_arg round in
-  let set_float = set_float_arg round in
+  let set_int arg default = set_int_arg round arg (Atom default) in
+  let set_float arg default = set_float_arg round arg (Atom default) in
   set_int inline_call_cost default_inline_call_cost arg.inline_call_cost;
   set_int inline_alloc_cost default_inline_alloc_cost arg.inline_alloc_cost;
   set_int inline_prim_cost default_inline_prim_cost arg.inline_prim_cost;
@@ -280,9 +304,9 @@ let use_inlining_arguments_set ?round (arg:inlining_arguments) =
     default_inline_max_depth arg.inline_max_depth;
   set_int inline_max_unroll
     default_inline_max_unroll arg.inline_max_unroll;
-  set_float inline_threshold
+  set_float_arg round inline_threshold
     default_inline_threshold arg.inline_threshold;
-  set_int inline_toplevel_threshold
+  set_int_arg round inline_toplevel_threshold
     default_inline_toplevel_threshold arg.inline_toplevel_threshold
 
 (* o1 is the default *)
