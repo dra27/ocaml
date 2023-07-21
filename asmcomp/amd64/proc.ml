@@ -339,7 +339,7 @@ let destroyed_at_reloadretaddr = [| |]
 
 
 let safe_register_pressure = function
-    Iextcall _ -> if win64 then if fp then 7 else 8 else 0
+    Iextcall _ -> if win64 then 8 else 0
   | _ -> if fp then 10 else 11
 
 let max_register_pressure =
