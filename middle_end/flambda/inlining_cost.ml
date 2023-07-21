@@ -466,7 +466,7 @@ module Whether_sufficient_benefit = struct
               !Clflags.inline_branch_factor
           in
           if is_nan factor then
-            Clflags.default_inline_branch_factor
+            Clflags.(Float_arg_helper.get_default !inline_branch_factor)
           else if Float.compare factor 0. < 0 then
             0.
           else

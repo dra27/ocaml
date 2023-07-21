@@ -158,7 +158,7 @@ let mk_inline f =
   "-inline", Arg.String f,
     Printf.sprintf "<n>|<round>=<n>[,...]  Aggressiveness of inlining \
         (default %.02f, higher numbers mean more aggressive)"
-      Clflags.default_inline_threshold
+      Clflags.(Float_arg_helper.get_default !inline_threshold)
 
 let mk_inline_toplevel f =
   "-inline-toplevel", Arg.String f,
@@ -195,7 +195,7 @@ let mk_inline_max_unroll f =
   "-inline-max-unroll", Arg.String f,
     Printf.sprintf "<n>|<round>=<n>[,...]  Unroll recursive functions at most \
       this many times (default %d)"
-      Clflags.default_inline_max_unroll
+      Clflags.(Int_arg_helper.get_default !inline_max_unroll)
 
 let mk_classic_inlining f =
   "-Oclassic", Arg.Unit f, " Make inlining decisions at function definition \
@@ -203,6 +203,7 @@ let mk_classic_inlining f =
      compiler)"
 
 let mk_inline_cost arg descr default f =
+  let default = Clflags.Int_arg_helper.get_default !default in
   Printf.sprintf "-inline-%s-cost" arg,
   Arg.String f,
   Printf.sprintf "<n>|<round>=<n>[,...]  The cost of not removing %s during \
@@ -211,29 +212,28 @@ let mk_inline_cost arg descr default f =
     default
 
 let mk_inline_call_cost =
-  mk_inline_cost "call" "a call" Clflags.default_inline_call_cost
+  mk_inline_cost "call" "a call" Clflags.inline_call_cost
 let mk_inline_alloc_cost =
-  mk_inline_cost "alloc" "an allocation" Clflags.default_inline_alloc_cost
+  mk_inline_cost "alloc" "an allocation" Clflags.inline_alloc_cost
 let mk_inline_prim_cost =
-  mk_inline_cost "prim" "a primitive" Clflags.default_inline_prim_cost
+  mk_inline_cost "prim" "a primitive" Clflags.inline_prim_cost
 let mk_inline_branch_cost =
-  mk_inline_cost "branch" "a conditional" Clflags.default_inline_branch_cost
+  mk_inline_cost "branch" "a conditional" Clflags.inline_branch_cost
 let mk_inline_indirect_cost =
-  mk_inline_cost "indirect" "an indirect call"
-    Clflags.default_inline_indirect_cost
+  mk_inline_cost "indirect" "an indirect call" Clflags.inline_indirect_cost
 
 let mk_inline_lifting_benefit f =
   "-inline-lifting-benefit",
   Arg.String f,
   Printf.sprintf "<n>|<round>=<n>[,...]  The benefit of lifting definitions \
     to toplevel during inlining (default %d, higher numbers more beneficial)"
-    Clflags.default_inline_lifting_benefit
+    Clflags.(Int_arg_helper.get_default !inline_lifting_benefit)
 
 let mk_inline_branch_factor f =
   "-inline-branch-factor", Arg.String f,
     Printf.sprintf "<n>|<round>=<n>[,...]  Estimate the probability of a \
         branch being cold as 1/(1+n) (used for inlining) (default %.2f)"
-    Clflags.default_inline_branch_factor
+    Clflags.(Float_arg_helper.get_default !inline_branch_factor)
 
 let mk_intf f =
   "-intf", Arg.String f, "<file>  Compile <file> as a .mli file"
@@ -288,7 +288,7 @@ let mk_inline_max_depth f =
   "-inline-max-depth", Arg.String f,
     Printf.sprintf "<n>|<round>=<n>[,...]  Maximum depth of search for \
       inlining opportunities inside inlined functions (default %d)"
-      Clflags.default_inline_max_depth
+      Clflags.(Int_arg_helper.get_default !inline_max_depth)
 
 let mk_modern f =
   "-modern", Arg.Unit f, " (deprecated) same as -labels"
