@@ -1,24 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..b5b39e6a35
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,15 @@
-+--- a	2023-09-28 18:48:17.710262166 +0100
-++++ b	2023-09-28 18:48:17.730262878 +0100
-+@@ -1,10 +1,10 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -237,6 +237,11 @@ Working version
-+-   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-++@@ -238,6 +238,11 @@ Working version
-+    and Gabriel Scherer)
-+  
-++ 
-+ +- #12401: `seek_in` and `seek_out` sometimes returned normally when given
-+ +  negative offsets, instead of failing. Now both functions should consistently
-+ +  raise `Sys_error` in this case.
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -11229,31 +11211,13 @@ index 0000000000..98cbc51883
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ceb13cf4d0
+index 0000000000..a06c6208d1
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11214 @@
+@@ -0,0 +1,11210 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..b5b39e6a35
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,15 @@
-++--- a	2023-09-28 18:48:17.710262166 +0100
-+++++ b	2023-09-28 18:48:17.730262878 +0100
-++@@ -1,10 +1,10 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -237,6 +237,11 @@ Working version
-++-   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-+++@@ -238,6 +238,11 @@ Working version
-++    and Gabriel Scherer)
-++  
-+++ 
-++ +- #12401: `seek_in` and `seek_out` sometimes returned normally when given
-++ +  negative offsets, instead of failing. Now both functions should consistently
-++ +  raise `Sys_error` in this case.
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -22446,7 +22410,21 @@ index 0000000000..ceb13cf4d0
 ++       # would have failed the build earlier if necessary)
 ++@@ -181,7 +192,7 @@ case "$1" in
 ++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 ++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+++           "../$BUILD_PREFIX-$PORT/build.log" |
+++            
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 806cf30e06..c71b85a5b0 100644
