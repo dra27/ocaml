@@ -1,0 +1,15 @@
+--- a	2023-09-28 18:48:17.710262166 +0100
++++ b	2023-09-28 18:48:17.730262878 +0100
+@@ -1,10 +1,10 @@
+ diff --git a/Changes b/Changes
+ --- a/Changes
+ +++ b/Changes
+-@@ -237,6 +237,11 @@ Working version
+-   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
++@@ -238,6 +238,11 @@ Working version
+    and Gabriel Scherer)
+  
++ 
+ +- #12401: `seek_in` and `seek_out` sometimes returned normally when given
+ +  negative offsets, instead of failing. Now both functions should consistently
+ +  raise `Sys_error` in this case.
