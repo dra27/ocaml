@@ -241,6 +241,11 @@ Working version
   that causes very slow compaction.
   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 
+- #12401: `seek_in` and `seek_out` sometimes returned normally when given
+  negative offsets, instead of failing. Now both functions should consistently
+  raise `Sys_error` in this case.
+  (Nicolás Ojeda Bär, review by Gabriel Scherer)
+
 OCaml 5.1.0
 ---------------
 
