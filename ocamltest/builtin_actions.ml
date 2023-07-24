@@ -120,10 +120,7 @@ let not_windows = make
     "not running on Windows"
     "running on Windows")
 
-let is_bsd_system s =
-  match s with
-  | "bsd_elf" | "netbsd" | "freebsd" | "openbsd" -> true
-  | _ -> false
+let is_bsd_system = Config_constants.System.is_bsd_system
 
 let bsd = make
   ~name:"bsd"
@@ -139,12 +136,12 @@ let not_bsd = make
     "not on a BSD system"
     "on a BSD system")
 
-let macos_system = "macosx"
+let macos_system = Config_constants.System.is_macOS
 
 let macos = make
   ~name:"macos"
   ~description:"Pass if running on a MacOS system"
-  (Actions_helpers.pass_or_skip (Ocamltest_config.system = macos_system)
+  (Actions_helpers.pass_or_skip (macos_system Ocamltest_config.system)
     "on a MacOS system"
     "not on a MacOS system")
 

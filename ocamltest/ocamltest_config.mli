@@ -61,7 +61,7 @@ val libext : string
 val asmext : string
 (** Extension of assembly files *)
 
-val system : string
+val system : Config_constants.System.t
 (** The content of the SYSTEM Make variable *)
 
 val c_preprocessor : string

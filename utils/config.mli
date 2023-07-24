@@ -164,7 +164,7 @@ val architecture: string
 val model: string
 (** Name of processor submodel for the native-code compiler *)
 
-val system: string
+val system: Config_constants.System.t
 (** Name of operating system for the native-code compiler *)
 
 val abi: string

@@ -46,7 +46,7 @@ let libext = {@QS@|@libext@|@QS@}
 
 let asmext = {@QS@|@S@|@QS@}
 
-let system = {@QS@|@system@|@QS@}
+let system = Config_constants.System.S_@system@
 
 let c_preprocessor = {@QS@|@ocamltest_CPP@|@QS@}
 

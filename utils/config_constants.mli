@@ -85,6 +85,47 @@ val stack_safety_margin: int
     intermediate computations of some instructions, or the event
     handler. *)
 
+(** Possible values and properties for {!Config_settings.system} *)
+module System : sig
+  type t =
+  | S_unknown   (** Unidentified architecture and system *)
+  | S_linux     (** GNU/Linux *)
+  | S_gnu       (** GNU/Hurd *)
+  | S_dragonfly (** DragonFly BSD *)
+  | S_freebsd   (** FreeBSD *)
+  | S_netbsd    (** NetBSD *)
+  | S_openbsd   (** OpenBSD *)
+  | S_macosx    (** Apple macOS *)
+  | S_solaris   (** Oracle Solaris *)
+  | S_beos      (** Haiku *)
+  | S_cygwin    (** Cygwin (technically both 32 and 64-bit *)
+  | S_mingw     (** Microsoft Windows; mingw-w64 32-bit GCC (i686) *)
+  | S_mingw64   (** Microsoft Windows; mingw-w64 64-bit GCC (x86_64) *)
+  | S_win32     (** Microsoft Windows; Visual Studio 32-bit (x86) *)
+  | S_win64     (** Microsoft Windows; Visual Studio 64-bit (x64) *)
+
+  val to_string: t -> string
+
+  val uses_masm: t -> bool
+  (** [uses_masm system] is [true] if [system] uses the Microsoft Macro
+      Assembler (MASM). *)
+
+  val is_windows: t -> bool
+  (** [is_windows system] is [true] if [system] is native Windows {b or}
+      Cygwin. *)
+
+  val is_macOS: t -> bool
+  (** [is_macOS system] is [true] if [system] is Apple macOS, Mac OS X,
+      etc. *)
+
+  val is_solaris: t -> bool
+  (** [is_solaris system] is [true] if [system] is Oracle Solaris, or
+      equivalent. *)
+
+  val is_bsd_system: t -> bool
+  (** [is_bsd_system] is [true] for FreeBSD, NetBSD and OpenBSD. *)
+end
+
 (**/**)
 
 val merlin : bool

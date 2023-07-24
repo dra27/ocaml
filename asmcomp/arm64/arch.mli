@@ -18,7 +18,7 @@
 
 (* Specific operations for the ARM processor, 64-bit mode *)
 
-val macosx : bool
+val macOS : bool
 
 (* Machine-specific command-line options *)
 

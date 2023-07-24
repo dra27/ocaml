@@ -72,6 +72,7 @@ val print_specific_operation :
   Format.formatter -> 'a array -> unit
 
 val win64 : bool
+val macOS : bool
 
 val operation_is_pure : specific_operation -> bool
 

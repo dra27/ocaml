@@ -16,6 +16,11 @@
 open X86_ast
 open X86_proc
 
+let macOS =
+  Config_constants.System.is_macOS Config_settings.system
+let solaris =
+  Config_constants.System.is_solaris Config_settings.system
+
 let bprintf = Printf.bprintf
 
 let print_reg b f r =
@@ -248,11 +253,11 @@ let print_line b = function
 
   | Align (_data,n) ->
       (* MacOSX assembler interprets the integer n as a 2^n alignment *)
-      let n = if system = S_macosx then Misc.log2 n else n in
+      let n = if macOS then Misc.log2 n else n in
       bprintf b "\t.align\t%d" n
   | Byte n -> bprintf b "\t.byte\t%a" cst n
   | Bytes s ->
-      if system = S_solaris then buf_bytes_directive b ".byte" s
+      if solaris then buf_bytes_directive b ".byte" s
       else bprintf b "\t.ascii\t\"%s\"" (string_of_string_literal s)
   | Comment s -> bprintf b "\t\t\t\t/* %s */" s
   | Global s -> bprintf b "\t.globl\t%s" s;
@@ -272,10 +277,10 @@ let print_line b = function
       | _ -> bprintf b ",%s" (String.concat "," args)
       end
   | Space n ->
-      if system = S_solaris then bprintf b "\t.zero\t%d" n
+      if solaris then bprintf b "\t.zero\t%d" n
       else bprintf b "\t.space\t%d" n
   | Word n ->
-      if system = S_solaris then bprintf b "\t.value\t%a" cst n
+      if solaris then bprintf b "\t.value\t%a" cst n
       else bprintf b "\t.word\t%a" cst n
 
   (* gas only *)

@@ -54,6 +54,7 @@ type configuration_value =
   | String of string
   | Int of int
   | Bool of bool
+  | System of Config_constants.System.t
 
 let configuration_variables () =
   let open Config_constants in
@@ -61,6 +62,7 @@ let configuration_variables () =
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
+  let p_system x v = (x, System v) in
   (* bytecomp_c_compiler and native_c_compiler have been supported for a
      long time and are retained for backwards compatibility.
      For programs that don't need compatibility with older OCaml releases
@@ -94,7 +96,7 @@ let configuration_variables () =
   p "model" model;
   p_int "int_size" Sys.int_size;
   p_int "word_size" Sys.word_size;
-  p "system" system;
+  p_system "system" system;
   p "abi" abi;
   p "asm" asm;
   p_bool "asm_cfi_supported" asm_cfi_supported;
@@ -142,6 +144,8 @@ let print_config_value oc = function
       Printf.fprintf oc "%d" n
   | Bool p ->
       Printf.fprintf oc "%B" p
+  | System system ->
+      Printf.fprintf oc "%s" (Config_constants.System.to_string system)
 
 let print_config oc =
   let print (x, v) =
@@ -157,6 +161,7 @@ let config_var x =
         | String s -> s
         | Int n -> Int.to_string n
         | Bool b -> string_of_bool b
+        | System system -> Config_constants.System.to_string system
       in
       Some s
 

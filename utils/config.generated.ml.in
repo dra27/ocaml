@@ -53,7 +53,7 @@ let native_compiler = @native_compiler@
 
 let architecture = {@QS@|@arch@|@QS@}
 let model = {@QS@|@model@|@QS@}
-let system = {@QS@|@system@|@QS@}
+let system = Config_constants.System.S_@system@
 let abi = {@QS@|@abi@|@QS@}
 
 let asm = {@QS@|@AS@|@QS@}

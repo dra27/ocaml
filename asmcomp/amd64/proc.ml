@@ -26,8 +26,6 @@ let fp = Config_settings.with_frame_pointers
 
 (* Which ABI to use *)
 
-let win64 = Arch.win64
-
 (* Registers available for register allocation *)
 
 (* Register map:

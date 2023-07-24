@@ -44,4 +44,50 @@ let max_young_wosize = 256
 let stack_threshold = 32 (* Stack_threshold_words in runtime/caml/config.h *)
 let stack_safety_margin = 6
 
+module System = struct
+  type t =
+  | S_unknown
+  | S_linux | S_gnu
+  | S_dragonfly | S_freebsd | S_netbsd | S_openbsd
+  | S_macosx | S_solaris | S_beos | S_cygwin
+  | S_mingw | S_mingw64 | S_win32 | S_win64
+
+  let to_string = function
+  | S_unknown -> "unknown"
+  | S_linux -> "linux"
+  | S_gnu -> "gnu"
+  | S_dragonfly -> "dragonfly"
+  | S_freebsd -> "freebsd"
+  | S_netbsd -> "netbsd"
+  | S_openbsd -> "openbsd"
+  | S_macosx -> "macosx"
+  | S_solaris -> "solaris"
+  | S_beos -> "beos"
+  | S_cygwin -> "cygwin"
+  | S_mingw -> "mingw"
+  | S_mingw64 -> "mingw64"
+  | S_win32 -> "win32"
+  | S_win64 -> "win64"
+
+  let is_windows = function
+  | S_mingw64 | S_mingw | S_cygwin | S_win64 | S_win32 -> true
+  | _ -> false
+
+  let is_macOS = function
+  | S_macosx -> true
+  | _ -> false
+
+  let is_solaris = function
+  | S_solaris -> true
+  | _ -> false
+
+  let uses_masm = function
+  | S_win32 | S_win64 -> true
+  | _ -> false
+
+  let is_bsd_system = function
+  | S_netbsd | S_freebsd | S_openbsd -> true
+  | _ -> false
+end
+
 let merlin = false
