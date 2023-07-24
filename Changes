@@ -238,6 +238,11 @@ Working version
   and Gabriel Scherer)
 
 
+- #12401: `seek_in` and `seek_out` sometimes returned normally when given
+  negative offsets, instead of failing. Now both functions should consistently
+  raise `Sys_error` in this case.
+  (Nicolás Ojeda Bär, review by Gabriel Scherer)
+
 OCaml 5.1.0
 ---------------
 
