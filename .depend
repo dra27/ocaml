@@ -164,14 +164,21 @@ utils/local_store.cmo : \
 utils/local_store.cmx : \
     utils/local_store.cmi
 utils/local_store.cmi :
-utils/misc.cmo : \
+utils/magic_number.cmo : \
     utils/config_settings.cmi \
     utils/config_constants.cmi \
+    utils/magic_number.cmi
+utils/magic_number.cmx : \
+    utils/config_settings.cmx \
+    utils/config_constants.cmx \
+    utils/magic_number.cmi
+utils/magic_number.cmi :
+utils/misc.cmo : \
+    utils/config_settings.cmi \
     utils/build_path_prefix_map.cmi \
     utils/misc.cmi
 utils/misc.cmx : \
     utils/config_settings.cmx \
-    utils/config_constants.cmx \
     utils/build_path_prefix_map.cmx \
     utils/misc.cmi
 utils/misc.cmi : \
@@ -2405,6 +2412,7 @@ asmcomp/asmgen.cmi : \
     middle_end/backend_intf.cmi
 asmcomp/asmlibrarian.cmo : \
     utils/misc.cmi \
+    utils/magic_number.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
     middle_end/flambda/export_info.cmi \
@@ -2418,6 +2426,7 @@ asmcomp/asmlibrarian.cmo : \
     asmcomp/asmlibrarian.cmi
 asmcomp/asmlibrarian.cmx : \
     utils/misc.cmx \
+    utils/magic_number.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
     middle_end/flambda/export_info.cmx \
@@ -3392,6 +3401,7 @@ middle_end/compilenv.cmo : \
     middle_end/flambda/base_types/set_of_closures_id.cmi \
     typing/path.cmi \
     utils/misc.cmi \
+    utils/magic_number.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
     middle_end/linkage_name.cmi \
@@ -3412,6 +3422,7 @@ middle_end/compilenv.cmx : \
     middle_end/flambda/base_types/set_of_closures_id.cmx \
     typing/path.cmx \
     utils/misc.cmx \
+    utils/magic_number.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
     middle_end/linkage_name.cmx \
@@ -6017,6 +6028,7 @@ driver/compenv.cmo : \
     utils/warnings.cmi \
     utils/profile.cmi \
     utils/misc.cmi \
+    utils/magic_number.cmi \
     parsing/location.cmi \
     utils/config_settings.cmi \
     utils/config_constants.cmi \
@@ -6027,6 +6039,7 @@ driver/compenv.cmx : \
     utils/warnings.cmx \
     utils/profile.cmx \
     utils/misc.cmx \
+    utils/magic_number.cmx \
     parsing/location.cmx \
     utils/config_settings.cmx \
     utils/config_constants.cmx \
@@ -7084,6 +7097,7 @@ tools/objinfo.cmo : \
     typing/shape.cmi \
     middle_end/printclambda.cmi \
     utils/misc.cmi \
+    utils/magic_number.cmi \
     middle_end/linkage_name.cmi \
     typing/ident.cmi \
     middle_end/flambda/export_info.cmi \
@@ -7102,6 +7116,7 @@ tools/objinfo.cmx : \
     typing/shape.cmx \
     middle_end/printclambda.cmx \
     utils/misc.cmx \
+    utils/magic_number.cmx \
     middle_end/linkage_name.cmx \
     typing/ident.cmx \
     middle_end/flambda/export_info.cmx \

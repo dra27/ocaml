@@ -152,7 +152,7 @@ let symbol_in_current_unit name =
 let read_unit_info filename =
   let ic = open_in_bin filename in
   let cmx_magic_number =
-    Misc.Magic_number.(current_raw (Cmx native_obj_config)) in
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   try
     let buffer =
       really_input_string ic (String.length cmx_magic_number) in
@@ -171,7 +171,7 @@ let read_unit_info filename =
 let read_library_info filename =
   let ic = open_in_bin filename in
   let cmxa_magic_number =
-    Misc.Magic_number.(current_raw (Cmxa native_obj_config)) in
+    Magic_number.(current_raw (Cmxa native_obj_config)) in
   let buffer =
     really_input_string ic (String.length cmxa_magic_number) in
   if buffer <> cmxa_magic_number then
@@ -345,7 +345,7 @@ let need_send_fun n =
 let write_unit_info info filename =
   let oc = open_out_bin filename in
   let cmx_magic_number =
-    Misc.Magic_number.(current_raw (Cmx native_obj_config)) in
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   output_string oc cmx_magic_number;
   output_value oc info;
   flush oc;
