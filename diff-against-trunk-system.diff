@@ -1,6 +1,33 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..9514cfb90a
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,24 @@
++--- a	2023-09-28 18:48:18.346284801 +0100
+++++ b	2023-09-28 18:48:18.378285939 +0100
++@@ -1,19 +1,16 @@
++ diff --git a/Changes b/Changes
++ --- a/Changes
++ +++ b/Changes
++-@@ -237,6 +237,10 @@ Working version
+++@@ -237,6 +237,9 @@ Working version
++    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
++    and Gabriel Scherer)
++  
++ +- #12334, #12368: Bad error message with mutually recursive abbreviations
++ +  (Jacques Garrigue, report by Richard Eisenberg, review by Gabriel Scherer
++ +   and Richard Eisenberg)
++-+
+++ 
++  - #12401: `seek_in` and `seek_out` sometimes returned normally when given
++    negative offsets, instead of failing. Now both functions should consistently
++-   raise `Sys_error` in this case.
++-diff --git a/boot/ocamlc b/boot/ocamlc
++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
++ diff --git a/ocamldoc/odoc_sig.ml b/ocamldoc/odoc_sig.ml
++ --- a/ocamldoc/odoc_sig.ml
++ +++ b/ocamldoc/odoc_sig.ml
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -14,18 +41,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 0428851614..18b57b5fec 100644
+index 0d2c45d13a..86d5ea4705 100644
 --- a/Changes
 +++ b/Changes
-@@ -237,6 +237,7 @@ Working version
-   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-   and Gabriel Scherer)
- 
-+
- - #12401: `seek_in` and `seek_out` sometimes returned normally when given
-   negative offsets, instead of failing. Now both functions should consistently
-   raise `Sys_error` in this case.
-@@ -1708,6 +1709,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1712,6 +1712,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -61,7 +80,7 @@ index 0428851614..18b57b5fec 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1743,13 +1773,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1747,13 +1776,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -77,7 +96,7 @@ index 0428851614..18b57b5fec 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1856,6 +1886,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1860,6 +1889,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -87,7 +106,7 @@ index 0428851614..18b57b5fec 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2119,6 +2152,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2123,6 +2155,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -935,7 +954,7 @@ index 49b4e61640..f0afd9e4b8 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 7b124e8b87..0c0a657109 100755
+index 644f7e1b83..0c0a657109 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
 index 9471acb6b1..5a0be25e5e 100755
@@ -11211,13 +11230,40 @@ index 0000000000..98cbc51883
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a06c6208d1
+index 0000000000..da57e13b75
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11210 @@
+@@ -0,0 +1,11212 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..9514cfb90a
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,24 @@
+++--- a	2023-09-28 18:48:18.346284801 +0100
++++++ b	2023-09-28 18:48:18.378285939 +0100
+++@@ -1,19 +1,16 @@
+++ diff --git a/Changes b/Changes
+++ --- a/Changes
+++ +++ b/Changes
+++-@@ -237,6 +237,10 @@ Working version
++++@@ -237,6 +237,9 @@ Working version
+++    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
+++    and Gabriel Scherer)
+++  
+++ +- #12334, #12368: Bad error message with mutually recursive abbreviations
+++ +  (Jacques Garrigue, report by Richard Eisenberg, review by Gabriel Scherer
+++ +   and Richard Eisenberg)
+++-+
++++ 
+++  - #12401: `seek_in` and `seek_out` sometimes returned normally when given
+++    negative offsets, instead of failing. Now both functions should consistently
+++-   raise `Sys_error` in this case.
+++-diff --git a/boot/ocamlc b/boot/ocamlc
+++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
+++ diff --git a/ocamldoc/odoc_sig.ml b/ocamldoc/odoc_sig.ml
+++ --- a/ocamldoc/odoc_sig.ml
+++ +++ b/ocamldoc/odoc_sig.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -11231,18 +11277,10 @@ index 0000000000..a06c6208d1
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 0428851614..18b57b5fec 100644
++index 0d2c45d13a..86d5ea4705 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -237,6 +237,7 @@ Working version
-+   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-+   and Gabriel Scherer)
-+ 
-++
-+ - #12401: `seek_in` and `seek_out` sometimes returned normally when given
-+   negative offsets, instead of failing. Now both functions should consistently
-+   raise `Sys_error` in this case.
-+@@ -1708,6 +1709,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1712,6 +1712,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -11278,7 +11316,7 @@ index 0000000000..a06c6208d1
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1743,13 +1773,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1747,13 +1776,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -11294,7 +11332,7 @@ index 0000000000..a06c6208d1
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1856,6 +1886,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1860,6 +1889,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -11304,7 +11342,7 @@ index 0000000000..a06c6208d1
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2119,6 +2152,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2123,6 +2155,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -12152,7 +12190,7 @@ index 0000000000..a06c6208d1
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 7b124e8b87..0c0a657109 100755
++index 644f7e1b83..0c0a657109 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
 +index 9471acb6b1..5a0be25e5e 100755
@@ -22407,24 +22445,7 @@ index 0000000000..a06c6208d1
 +++
 ++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
 ++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../$BUILD_PREFIX-$PORT/build.log" |
-++            
+++       # would have failed the build 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 806cf30e06..c71b85a5b0 100644
