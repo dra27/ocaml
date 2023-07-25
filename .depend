@@ -19,6 +19,7 @@ utils/ccomp.cmo : \
     utils/load_path.cmi \
     utils/config_settings.cmi \
     utils/clflags.cmi \
+    utils/build_path_prefix_map.cmi \
     utils/ccomp.cmi
 utils/ccomp.cmx : \
     utils/profile.cmx \
@@ -26,6 +27,7 @@ utils/ccomp.cmx : \
     utils/load_path.cmx \
     utils/config_settings.cmx \
     utils/clflags.cmx \
+    utils/build_path_prefix_map.cmx \
     utils/ccomp.cmi
 utils/ccomp.cmi :
 utils/clflags.cmo : \
@@ -174,11 +176,9 @@ utils/magic_number.cmx : \
     utils/magic_number.cmi
 utils/magic_number.cmi :
 utils/misc.cmo : \
-    utils/config_settings.cmi \
     utils/build_path_prefix_map.cmi \
     utils/misc.cmi
 utils/misc.cmx : \
-    utils/config_settings.cmx \
     utils/build_path_prefix_map.cmx \
     utils/misc.cmi
 utils/misc.cmi : \

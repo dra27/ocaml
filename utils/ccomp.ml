@@ -221,3 +221,22 @@ let linker_is_flexlink =
      are all flexlink invocations for the native Windows ports and for Cygwin,
      if shared library support is enabled. *)
   Sys.win32 || Config_settings.supports_shared_libraries && Sys.cygwin
+
+let debug_prefix_map_flags () =
+  if not Config_settings.as_has_debug_prefix_map then
+    []
+  else begin
+    match Misc.get_build_path_prefix_map () with
+    | None -> []
+    | Some map ->
+      List.fold_right
+        (fun map_elem acc ->
+           match map_elem with
+           | None -> acc
+           | Some { Build_path_prefix_map.target; source; } ->
+             (Printf.sprintf "--debug-prefix-map %s=%s"
+                (Filename.quote source)
+                (Filename.quote target)) :: acc)
+        map
+        []
+  end

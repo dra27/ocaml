@@ -912,25 +912,6 @@ let get_build_path_prefix_map =
     end;
     !map_cache
 
-let debug_prefix_map_flags () =
-  if not Config_settings.as_has_debug_prefix_map then
-    []
-  else begin
-    match get_build_path_prefix_map () with
-    | None -> []
-    | Some map ->
-      List.fold_right
-        (fun map_elem acc ->
-           match map_elem with
-           | None -> acc
-           | Some { Build_path_prefix_map.target; source; } ->
-             (Printf.sprintf "--debug-prefix-map %s=%s"
-                (Filename.quote source)
-                (Filename.quote target)) :: acc)
-        map
-        []
-  end
-
 let print_if ppf flag printer arg =
   if !flag then Format.fprintf ppf "%a@." printer arg;
   arg

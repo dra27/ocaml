@@ -304,7 +304,7 @@ let prologue_required fd =
 
 let assemble_file infile outfile =
   Ccomp.command (Config_settings.asm ^ " " ^
-                 (String.concat " " (Misc.debug_prefix_map_flags ())) ^
+                 (String.concat " " (Ccomp.debug_prefix_map_flags ())) ^
                  " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
 
 

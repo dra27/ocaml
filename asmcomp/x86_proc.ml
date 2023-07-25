@@ -217,7 +217,7 @@ let compile infile outfile =
                    (if !Clflags.verbose then "" else ">NUL"))
   else
     Ccomp.command (Config_settings.asm ^ " " ^
-                   (String.concat " " (Misc.debug_prefix_map_flags ())) ^
+                   (String.concat " " (Ccomp.debug_prefix_map_flags ())) ^
                    " -o " ^ Filename.quote outfile ^ " " ^
                    Filename.quote infile)
 
