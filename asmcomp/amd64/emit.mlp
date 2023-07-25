@@ -74,8 +74,6 @@ let cfi_def_cfa_register reg =
 let emit_debug_info dbg =
   emit_debug_info_gen dbg D.file D.loc
 
-let fp = Config_settings.with_frame_pointers
-
 let stack_threshold_size = Config_constants.stack_threshold * 8 (* bytes *)
 
 let frame_size env =                     (* includes return address *)
@@ -83,7 +81,7 @@ let frame_size env =                     (* includes return address *)
     env.stack_offset
     + 8 * (env.f.fun_num_stack_slots.(0) + env.f.fun_num_stack_slots.(1))
     + 8
-    + (if fp then 8 else 0)
+    + (if Config_settings.with_frame_pointers then 8 else 0)
   else
     env.stack_offset + 8
 
@@ -388,13 +386,13 @@ let emit_float_test env cmp i lbl =
 
 let output_epilogue env f =
   if env.f.fun_frame_required then begin
-    let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+    let n = (frame_size env) - 8 - (if Config_settings.with_frame_pointers then 8 else 0) in
     if n <> 0
     then begin
       I.add (int n) rsp;
       cfi_adjust_cfa_offset (-n);
     end;
-    if fp then I.pop rbp;
+    if Config_settings.with_frame_pointers then I.pop rbp;
     f ();
     (* reset CFA back cause function body may continue *)
     if n <> 0
@@ -462,13 +460,13 @@ let emit_instr env fallthrough i =
   | Lend -> ()
   | Lprologue ->
     assert (env.f.fun_prologue_required);
-    if fp then begin
+    if Config_settings.with_frame_pointers then begin
       I.push rbp;
       cfi_adjust_cfa_offset 8;
       I.mov rsp rbp;
     end;
     if env.f.fun_frame_required then begin
-      let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+      let n = (frame_size env) - 8 - (if Config_settings.with_frame_pointers then 8 else 0) in
       if n <> 0
       then begin
         I.sub (int n) rsp;
@@ -827,7 +825,7 @@ let emit_instr env fallthrough i =
       done;
       emit_named_text_section env.f.fun_name
   | Lentertrap ->
-      if fp then begin
+      if Config_settings.with_frame_pointers then begin
         let delta = frame_size env - 16 (* retaddr + rbp *) in
         I.lea (mem64 NONE delta RSP) rbp
       end;
@@ -943,7 +941,7 @@ let fundecl fundecl =
     end
   end;
   if fundecl.fun_frame_required then begin
-    let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+    let n = (frame_size env) - 8 - (if Config_settings.with_frame_pointers then 8 else 0) in
     if n <> 0
     then begin
       cfi_adjust_cfa_offset (-n);

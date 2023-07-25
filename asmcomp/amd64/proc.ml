@@ -22,8 +22,6 @@ open Cmm
 open Reg
 open Mach
 
-let fp = Config_settings.with_frame_pointers
-
 (* Which ABI to use *)
 
 (* Registers available for register allocation *)
@@ -322,7 +320,7 @@ let destroyed_at_oper = function
   | Iswitch(_, _) -> [| rax; rdx |]
   | Itrywith _ -> [| r11 |]
   | _ ->
-    if fp then
+    if Config_settings.with_frame_pointers then
 (* prevent any use of the frame pointer ! *)
       [| rbp |]
     else
@@ -338,11 +336,11 @@ let destroyed_at_reloadretaddr = [| |]
 
 let safe_register_pressure = function
     Iextcall _ -> if win64 then 8 else 0
-  | _ -> if fp then 10 else 11
+  | _ -> if Config_settings.with_frame_pointers then 10 else 11
 
 let max_register_pressure =
   let consumes ~int ~float =
-    if fp
+    if Config_settings.with_frame_pointers
     then [| 12 - int; 16 - float |]
     else [| 13 - int; 16 - float |]
   in
@@ -366,7 +364,7 @@ let max_register_pressure =
 (* Layout of the stack frame *)
 
 let frame_required fd =
-  fp || fd.fun_contains_calls ||
+  Config_settings.with_frame_pointers || fd.fun_contains_calls ||
   fd.fun_num_stack_slots.(0) > 0 || fd.fun_num_stack_slots.(1) > 0
 
 let prologue_required fd =
@@ -378,7 +376,7 @@ let assemble_file infile outfile =
   X86_proc.assemble_file infile outfile
 
 let init () =
-  if fp then begin
+  if Config_settings.with_frame_pointers then begin
     num_available_registers.(0) <- 12
   end else
     num_available_registers.(0) <- 13
