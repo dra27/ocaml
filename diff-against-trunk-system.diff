@@ -1,33 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..9514cfb90a
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,24 @@
-+--- a	2023-09-28 18:48:18.346284801 +0100
-++++ b	2023-09-28 18:48:18.378285939 +0100
-+@@ -1,19 +1,16 @@
-+ diff --git a/Changes b/Changes
-+ --- a/Changes
-+ +++ b/Changes
-+-@@ -237,6 +237,10 @@ Working version
-++@@ -237,6 +237,9 @@ Working version
-+    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-+    and Gabriel Scherer)
-+  
-+ +- #12334, #12368: Bad error message with mutually recursive abbreviations
-+ +  (Jacques Garrigue, report by Richard Eisenberg, review by Gabriel Scherer
-+ +   and Richard Eisenberg)
-+-+
-++ 
-+  - #12401: `seek_in` and `seek_out` sometimes returned normally when given
-+    negative offsets, instead of failing. Now both functions should consistently
-+-   raise `Sys_error` in this case.
-+-diff --git a/boot/ocamlc b/boot/ocamlc
-+-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-+ diff --git a/ocamldoc/odoc_sig.ml b/ocamldoc/odoc_sig.ml
-+ --- a/ocamldoc/odoc_sig.ml
-+ +++ b/ocamldoc/odoc_sig.ml
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -11230,40 +11203,13 @@ index 0000000000..98cbc51883
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..501cb20902
+index 0000000000..fddfbe72d8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11212 @@
+@@ -0,0 +1,11122 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..9514cfb90a
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,24 @@
-++--- a	2023-09-28 18:48:18.346284801 +0100
-+++++ b	2023-09-28 18:48:18.378285939 +0100
-++@@ -1,19 +1,16 @@
-++ diff --git a/Changes b/Changes
-++ --- a/Changes
-++ +++ b/Changes
-++-@@ -237,6 +237,10 @@ Working version
-+++@@ -237,6 +237,9 @@ Working version
-++    (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
-++    and Gabriel Scherer)
-++  
-++ +- #12334, #12368: Bad error message with mutually recursive abbreviations
-++ +  (Jacques Garrigue, report by Richard Eisenberg, review by Gabriel Scherer
-++ +   and Richard Eisenberg)
-++-+
-+++ 
-++  - #12401: `seek_in` and `seek_out` sometimes returned normally when given
-++    negative offsets, instead of failing. Now both functions should consistently
-++-   raise `Sys_error` in this case.
-++-diff --git a/boot/ocamlc b/boot/ocamlc
-++-Binary files a/boot/ocamlc and b/boot/ocamlc differ
-++ diff --git a/ocamldoc/odoc_sig.ml b/ocamldoc/odoc_sig.ml
-++ --- a/ocamldoc/odoc_sig.ml
-++ +++ b/ocamldoc/odoc_sig.ml
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -22382,70 +22328,7 @@ index 0000000000..501cb20902
 ++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
 ++index 3292ad9c31..f69aeb342c 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build 
++++++ b/tools/ci/appv
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 806cf30e06..c71b85a5b0 100644
