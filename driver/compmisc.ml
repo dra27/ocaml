@@ -18,7 +18,8 @@ let auto_include find_in_dir fn =
     raise Not_found
   else
     let alert = Location.auto_include_alert in
-    Load_path.auto_include_otherlibs alert find_in_dir fn
+    Load_path.auto_include_otherlibs Config_settings.standard_library_default
+                                     alert find_in_dir fn
 
 (* Initialize the search path.
    [dir] (default: the current directory)

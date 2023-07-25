@@ -146,13 +146,13 @@ let auto_include_libs libs alert find_in_dir fn =
   | Some base -> base
   | None -> raise Not_found
 
-let auto_include_otherlibs =
+let auto_include_otherlibs standard_library_default alert =
   (* Ensure directories are only ever scanned once *)
-  let expand = Misc.expand_stdlib Config_settings.standard_library_default in
+  let expand = Misc.expand_stdlib standard_library_default in
   let otherlibs =
     let read_lib lib = lazy (Dir.create (expand ("+" ^ lib))) in
     List.map (fun lib -> (lib, read_lib lib)) ["dynlink"; "str"; "unix"] in
-  auto_include_libs otherlibs
+  auto_include_libs otherlibs alert
 
 let find fn =
   assert (not Config_constants.merlin || Local_store.is_bound ());

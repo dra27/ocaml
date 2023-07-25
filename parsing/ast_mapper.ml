@@ -956,7 +956,10 @@ module PpxContext = struct
               raise Not_found
             else
               let alert = Location.auto_include_alert in
-              Load_path.auto_include_otherlibs alert find_in_dir fn
+              let standard_library_default =
+                Config_settings.standard_library_default in
+              Load_path.auto_include_otherlibs standard_library_default
+                                               alert find_in_dir fn
           in
           Load_path.init ~auto_include (get_list get_string payload)
       | "open_modules" ->
