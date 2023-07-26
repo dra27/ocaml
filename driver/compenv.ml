@@ -72,9 +72,9 @@ let configuration_variables () =
   let legacy_c_compiler =
     c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags in
   let cmx_magic_number =
-    Magic_number.(current_raw (Cmx native_obj_config)) in
+    Magic_number.(current_raw (Cmx (native_obj_config ()))) in
   let cmxa_magic_number =
-    Magic_number.(current_raw (Cmxa native_obj_config)) in
+    Magic_number.(current_raw (Cmxa (native_obj_config ()))) in
 [
   p "version" Sys.ocaml_version;
   p "standard_library_default" standard_library_default;

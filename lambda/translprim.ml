@@ -15,7 +15,6 @@
 
 (* Translation of primitives *)
 
-open Misc
 open Asttypes
 open Primitive
 open Types
@@ -107,14 +106,17 @@ let clear_used_primitives () = Hashtbl.clear used_primitives
 let get_used_primitives () =
   Hashtbl.fold (fun path _ acc -> path :: acc) used_primitives []
 
-let gen_array_kind =
-  if Config_settings.flat_float_array then Pgenarray else Paddrarray
-
 let prim_sys_argv =
   Primitive.simple ~name:"caml_sys_argv" ~arity:1 ~alloc:true
 
-let primitives_table =
-  create_hashtable 57 [
+let primitives_table = Hashtbl.create 57
+
+let init_primitives () =
+  let gen_array_kind =
+    if Config_settings.flat_float_array then Pgenarray else Paddrarray in
+  let add_primitive (name, primitive) =
+    Hashtbl.add primitives_table name primitive in
+  List.iter add_primitive [
     "%identity", Identity;
     "%bytes_to_string", Primitive (Pbytes_to_string, 1);
     "%bytes_of_string", Primitive (Pbytes_of_string, 1);
@@ -376,13 +378,16 @@ let primitives_table =
   ]
 
 
-let lookup_primitive loc p =
+let rec lookup_primitive loc p =
   match Hashtbl.find primitives_table p.prim_name with
   | prim -> prim
   | exception Not_found ->
-      if String.length p.prim_name > 0 && p.prim_name.[0] = '%' then
-        raise(Error(loc, Unknown_builtin_primitive p.prim_name));
-      External p
+      if Hashtbl.length primitives_table = 0 then begin
+        init_primitives (); lookup_primitive loc p
+      end else if String.length p.prim_name > 0 && p.prim_name.[0] = '%' then
+        raise(Error(loc, Unknown_builtin_primitive p.prim_name))
+      else
+        External p
 
 let lookup_primitive_and_mark_used loc p env path =
   match lookup_primitive loc p with

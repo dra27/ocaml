@@ -151,13 +151,11 @@ utils/lazy_backtrack.cmi :
 utils/load_path.cmo : \
     utils/misc.cmi \
     utils/local_store.cmi \
-    utils/config_settings.cmi \
     utils/config_constants.cmi \
     utils/load_path.cmi
 utils/load_path.cmx : \
     utils/misc.cmx \
     utils/local_store.cmx \
-    utils/config_settings.cmx \
     utils/config_constants.cmx \
     utils/load_path.cmi
 utils/load_path.cmi :
@@ -290,6 +288,7 @@ parsing/ast_mapper.cmo : \
     parsing/longident.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
+    utils/config_settings.cmi \
     utils/config_constants.cmi \
     utils/clflags.cmi \
     parsing/asttypes.cmi \
@@ -301,6 +300,7 @@ parsing/ast_mapper.cmx : \
     parsing/longident.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
+    utils/config_settings.cmx \
     utils/config_constants.cmx \
     utils/clflags.cmx \
     parsing/asttypes.cmi \

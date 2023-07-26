@@ -137,8 +137,14 @@ let print_specific_operation printreg op ppf arg =
 
 (* Are we using the Windows 64-bit ABI? *)
 
-let win64 = Config_constants.System.is_windows Config_settings.system
-let macOS = Config_constants.System.is_macOS Config_settings.system
+let masm () = Config_constants.System.uses_masm Config_settings.system
+let win64 () = Config_constants.System.is_windows Config_settings.system
+let macOS () = Config_constants.System.is_macOS Config_settings.system
+
+let use_plt () =
+  match Config_settings.system with
+  | S_macosx | S_mingw64 | S_cygwin | S_win64 -> false
+  | _ -> !Clflags.dlcode
 
 (* Specific operations that are pure *)
 

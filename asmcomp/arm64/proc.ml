@@ -136,7 +136,7 @@ let loc_int32 last_int make_stack int ofs =
     incr int; l
   end else begin
     let l = stack_slot (make_stack !ofs) Int in
-    ofs := !ofs + (if Arch.macOS then 4 else 8);
+    ofs := !ofs + (if Arch.macOS () then 4 else 8);
     l
   end
 
@@ -173,7 +173,7 @@ let not_supported _ofs = fatal_error "Proc.loc_results: cannot call"
 
 let max_arguments_for_tailcalls = 16 (* in regs *) + 64 (* in domain state *)
 
-let last_int_register = if Arch.macOS then 7 else 15
+let last_int_register = if Arch.macOS () then 7 else 15
 
 let loc_arguments arg =
   calling_conventions 0 last_int_register 100 115

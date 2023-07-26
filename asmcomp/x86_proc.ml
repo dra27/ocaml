@@ -15,8 +15,6 @@
 
 open X86_ast
 
-let windows = Config_constants.System.is_windows Config_settings.system
-
 let string_of_string_literal s =
   let b = Buffer.create (String.length s + 2) in
   let last_was_escape = ref false in
@@ -195,15 +193,6 @@ let register_internal_assembler f = internal_assembler := Some f
 let with_internal_assembler assemble k =
   Misc.protect_refs [ R (internal_assembler, Some assemble) ] k
 
-(* Which asm conventions to use *)
-
-let masm = Config_constants.System.uses_masm Config_settings.system
-
-let use_plt =
-  match Config_settings.system with
-  | S_macosx | S_mingw64 | S_cygwin | S_win64 -> false
-  | _ -> !Clflags.dlcode
-
 (* Shall we use an external assembler command ?
    If [binary_content] contains some data, we can directly
    save it. Otherwise, we have to ask an external command.
@@ -211,7 +200,7 @@ let use_plt =
 let binary_content = ref None
 
 let compile infile outfile =
-  if masm then
+  if Config_constants.System.uses_masm Config_settings.system then
     Ccomp.command (Config_settings.asm ^
                    Filename.quote outfile ^ " " ^ Filename.quote infile ^
                    (if !Clflags.verbose then "" else ">NUL"))

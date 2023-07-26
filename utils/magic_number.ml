@@ -16,7 +16,7 @@
 type native_obj_config = {
   flambda : bool;
 }
-let native_obj_config = {
+let native_obj_config () = {
   flambda = Config_settings.flambda;
 }
 

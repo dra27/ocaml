@@ -55,12 +55,6 @@ val assemble_file: (*infile*) string -> (*outfile*) string -> (*retcode*) int
     the input file is ignored). Otherwise, the source asm file with an
     external assembler. *)
 
-val masm: bool
-val windows:bool
-
-(** Whether calls need to go via the PLT. *)
-val use_plt : bool
-
 (** Support for plumbing a binary code emitter *)
 
 val register_internal_assembler: (asm_program -> string -> unit) -> unit

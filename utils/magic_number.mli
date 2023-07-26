@@ -77,7 +77,7 @@ type native_obj_config = {
    configuration space is expressed by the [native_obj_config]
    type. *)
 
-val native_obj_config : native_obj_config
+val native_obj_config : unit -> native_obj_config
 (** the native object file configuration of the active/configured compiler. *)
 
 type version = int

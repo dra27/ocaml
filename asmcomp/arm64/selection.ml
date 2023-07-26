@@ -52,7 +52,7 @@ let inline_ops =
     "caml_int64_direct_bswap"; "caml_nativeint_direct_bswap" ]
 
 let use_direct_addressing _symb =
-  (not !Clflags.dlcode) && (not Arch.macOS)
+  (not !Clflags.dlcode) && (not (Arch.macOS ()))
 
 let is_stack_slot rv =
   Reg.(match rv with
@@ -213,7 +213,7 @@ method! select_operation op args dbg =
       super#select_operation op args dbg
 
 method! insert_move_extcall_arg env ty_arg src dst =
-  if Arch.macOS && ty_arg = XInt32 && is_stack_slot dst
+  if Arch.macOS () && ty_arg = XInt32 && is_stack_slot dst
   then self#insert env (Iop (Ispecific Imove32)) src dst
   else self#insert_moves env src dst
 end

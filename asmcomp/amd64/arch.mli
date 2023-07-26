@@ -71,8 +71,9 @@ val print_specific_operation :
   (Format.formatter -> 'a -> unit) -> specific_operation ->
   Format.formatter -> 'a array -> unit
 
-val win64 : bool
-val macOS : bool
+val masm : unit -> bool
+val win64 : unit -> bool
+val macOS : unit -> bool
 
 val operation_is_pure : specific_operation -> bool
 
@@ -82,3 +83,5 @@ val float_cond_and_need_swap
   :  Lambda.float_comparison -> X86_ast.float_condition * bool
 
 val pic_code : unit -> bool
+
+val use_plt : unit -> bool
