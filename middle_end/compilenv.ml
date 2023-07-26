@@ -70,8 +70,8 @@ let exported_constants = Hashtbl.create 17
 
 let merged_environment = ref Export_info.empty
 
-let default_ui_export_info =
-  if Config_settings.flambda then
+let default_ui_export_info flambda =
+  if flambda then
     Cmx_format.Flambda Export_info.empty
   else
     Cmx_format.Clambda Value_unknown
@@ -86,7 +86,8 @@ let current_unit =
     ui_apply_fun = [];
     ui_send_fun = [];
     ui_force_link = false;
-    ui_export_info = default_ui_export_info;
+    (* The correct default is assigned by reset *)
+    ui_export_info = Cmx_format.Clambda Value_unknown;
     ui_for_pack = None }
 
 let concat_symbol unitname id =
@@ -124,7 +125,7 @@ let reset ?packname name =
   current_unit.ui_for_pack <- packname;
   Hashtbl.clear exported_constants;
   structured_constants := structured_constants_empty;
-  current_unit.ui_export_info <- default_ui_export_info;
+  current_unit.ui_export_info <- default_ui_export_info Config_settings.flambda;
   merged_environment := Export_info.empty;
   Hashtbl.clear export_infos_table;
   let compilation_unit =
