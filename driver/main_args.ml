@@ -91,15 +91,15 @@ let mk_eval f =
   "<script>  Evaluate given script"
 
 let mk_function_sections f =
-  if Config_settings.function_sections then
-    "-function-sections",  Arg.Unit f,
-    " Generate each function in a separate section if target supports it"
-  else
-    let err () =
+  let f () =
+    if Config_settings.function_sections then
+      f ()
+    else
       raise (Arg.Bad "OCaml has been configured without support for \
                       -function-sections")
-    in
-    "-function-sections", Arg.Unit err, " (option not available)"
+  in
+  "-function-sections", Arg.Unit f,
+  " Generate each function in a separate section if target supports it"
 
 let mk_stop_after ~native f =
   let pass_names = Clflags.Compiler_pass.available_pass_names
@@ -1826,7 +1826,6 @@ module Default = struct
     let _afl_inst_ratio n = Clflags.afl_inst_ratio := n
     let _afl_instrument = set_opt Clflags.afl_instrument
     let _function_sections () =
-      assert Config_settings.function_sections;
       prepend_to_list Compenv.first_ccopts "-ffunction-sections";
       Clflags.function_sections := true
     let _nodynlink = clear Clflags.dlcode
