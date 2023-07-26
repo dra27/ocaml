@@ -866,6 +866,7 @@ tsan
 oc_cflags
 toolchain
 ccomptype
+linker_is_flexlink
 mkexe_via_cc_ldflags
 mkexe_extra_flags
 mkexedebugflag
@@ -3233,6 +3234,7 @@ mkexe_extra_flags=''
 mkexe_via_cc_extra_cmd=''
 mkexe_ldflags_prefix=''
 mkexe_via_cc_ldflags_prefix=''
+linker_is_flexlink=false
 
 # Flags for building executable files with debugging symbols
 mkexedebugflag="-g"
@@ -3311,6 +3313,7 @@ OCAML_VERSION_SHORT=5.2
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -14240,6 +14243,7 @@ case $cc_basename,$host in #(
 then :
   mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
       mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      linker_is_flexlink=true
       mkexe_cflags=''
       mkexe_ldflags_prefix='-link '
 else $as_nop
@@ -14259,6 +14263,7 @@ esac
     toolchain="mingw"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
     mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    linker_is_flexlink=true
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     oc_exe_ldflags='-municode'
@@ -14269,6 +14274,7 @@ esac
     ostype="Win32"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
     mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    linker_is_flexlink=true
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     mkexe_via_cc_ldflags_prefix='/link '

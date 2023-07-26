@@ -594,7 +594,7 @@ let build_custom_runtime prim_name exec_name =
       let flag =
         [Printf.sprintf "-fdebug-prefix-map=%s=camlprim.c" prim_name]
       in
-        if Ccomp.linker_is_flexlink then
+        if Config_settings.linker_is_flexlink then
           "-link" :: flag
         else
           flag

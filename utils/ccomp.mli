@@ -38,8 +38,6 @@ type link_mode =
 
 val call_linker: link_mode -> string -> string list -> string -> int
 
-val linker_is_flexlink : bool
-
 val debug_prefix_map_flags: unit -> string list
 (** Returns the list of [--debug-prefix-map] flags to be passed to the
     assembler, built from the [BUILD_PATH_PREFIX_MAP] environment variable. *)

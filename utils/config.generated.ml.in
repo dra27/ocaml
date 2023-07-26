@@ -38,6 +38,7 @@ let native_dynlink = @natdynlink@
 let mkdll = {@QS@|@mkdll_exp@|@QS@}
 let mkexe = {@QS@|@mkexe_exp@|@QS@}
 let mkmaindll = {@QS@|@mkmaindll_exp@|@QS@}
+let linker_is_flexlink = @linker_is_flexlink@
 
 let flambda = @flambda@
 let with_flambda_invariants = @flambda_invariants@

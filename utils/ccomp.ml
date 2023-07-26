@@ -216,12 +216,6 @@ let call_linker mode output_name files extra =
     command cmd
   )
 
-let linker_is_flexlink =
-  (* Config_settings.mkexe, Config_settings.mkdll and Config_settings.mkmaindll
-     are all flexlink invocations for the native Windows ports and for Cygwin,
-     if shared library support is enabled. *)
-  Sys.win32 || Config_settings.supports_shared_libraries && Sys.cygwin
-
 let debug_prefix_map_flags () =
   if not Config_settings.as_has_debug_prefix_map then
     []

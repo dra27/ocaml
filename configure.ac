@@ -41,6 +41,7 @@ mkexe_extra_flags=''
 mkexe_via_cc_extra_cmd=''
 mkexe_ldflags_prefix=''
 mkexe_via_cc_ldflags_prefix=''
+linker_is_flexlink=false
 
 # Flags for building executable files with debugging symbols
 mkexedebugflag="-g"
@@ -139,6 +140,7 @@ AC_SUBST([mkexe_exp])
 AC_SUBST([mkexedebugflag])
 AC_SUBST([mkexe_extra_flags])
 AC_SUBST([mkexe_via_cc_ldflags])
+AC_SUBST([linker_is_flexlink])
 AC_SUBST([ccomptype])
 AC_SUBST([toolchain])
 AC_SUBST([oc_cflags])
@@ -948,6 +950,7 @@ AS_CASE([$cc_basename,$host],
     AS_IF([$supports_shared_libraries],
       [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
       mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      linker_is_flexlink=true
       mkexe_cflags=''
       mkexe_ldflags_prefix='-link '],
       [mkexe_extra_flags=''
@@ -961,6 +964,7 @@ AS_CASE([$cc_basename,$host],
     toolchain="mingw"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
     mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    linker_is_flexlink=true
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     oc_exe_ldflags='-municode'
@@ -971,6 +975,7 @@ AS_CASE([$cc_basename,$host],
     ostype="Win32"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
     mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    linker_is_flexlink=true
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     mkexe_via_cc_ldflags_prefix='/link '

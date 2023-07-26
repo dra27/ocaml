@@ -141,6 +141,9 @@ val mkexe: string
 val mkmaindll: string
 (** The linker command line to build main programs as dlls. *)
 
+val linker_is_flexlink: bool
+(** The linker command line calls [flexlink] rather than the C compiler *)
+
 val default_rpath: string
 (** Option to add a directory to be searched for libraries at runtime
     (used by ocamlmklib) *)
