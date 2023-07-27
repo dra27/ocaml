@@ -31,11 +31,13 @@ module Backend = struct
 end
 let backend = (module Backend : Backend_intf.S)
 
-
-module Options = Main_args.Make_optcomp_options (Main_args.Default.Optmain)
 let main argv ppf =
+  Compmisc.process_use_config argv;
   Clflags.native_code := true;
   let program = "ocamlopt" in
+  (* The functor must be called _after_ Compmisc.process_use_config *)
+  let module Options =
+    Main_args.Make_optcomp_options (Main_args.Default.Optmain) in
   match
     Compenv.readenv ppf Before_args;
     Clflags.add_arguments __LOC__ (Arch.command_line_options @ Options.list);

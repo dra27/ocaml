@@ -16,6 +16,7 @@
 (* Command-line parameters *)
 
 type config = {
+  mutable file: string option;
   mutable bindir: string;
   mutable standard_library_default: string;
   mutable host : string;
@@ -71,12 +72,12 @@ module type Config = module type of Config_settings
 
 let config =
   let open Config_settings in {
-    bindir; standard_library_default; host; target; reserved_header_bits;
-    flat_float_array; windows_unicode; supports_shared_libraries;
-    native_dynlink; native_compiler; architecture; model; system; abi;
-    with_frame_pointers; flambda; with_flambda_invariants; with_cmm_invariants;
-    function_sections; afl_instrument; tsan; ccomp_type; c_compiler;
-    c_output_obj; c_has_debug_prefix_map; as_has_debug_prefix_map;
+    file = None; bindir; standard_library_default; host; target;
+    reserved_header_bits; flat_float_array; windows_unicode;
+    supports_shared_libraries; native_dynlink; native_compiler; architecture;
+    model; system; abi; with_frame_pointers; flambda; with_flambda_invariants;
+    with_cmm_invariants; function_sections; afl_instrument; tsan; ccomp_type;
+    c_compiler; c_output_obj; c_has_debug_prefix_map; as_has_debug_prefix_map;
     ocamlc_cflags; ocamlc_cppflags; bytecomp_c_libraries; native_c_libraries;
     native_ldflags; native_pack_linker; mkdll; mkexe; mkmaindll;
     linker_is_flexlink; default_rpath; mksharedlibrpath; ar; asm;
@@ -90,8 +91,9 @@ let config_hook f =
   Queue.push f config_hooks;
   f config
 
-let load_config settings =
+let load_config ?file settings =
   let open (val settings : Config) in
+  config.file <- file;
   config.bindir <- bindir;
   config.standard_library_default <- standard_library_default;
   config.host <- host;

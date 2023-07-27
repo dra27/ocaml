@@ -252,6 +252,10 @@ val should_save_ir_after : Compiler_pass.t -> bool
 (** Distribution configurable settings. Values in this record can all be set
     via [configure.ac]. *)
 type config = private {
+  mutable file: string option;
+  (** The filename the configuration was loaded from, or [None] if the
+      compiler's configure'd configuration is in use. *)
+
   mutable bindir: string;
   (** The directory containing the binary programs *)
 
@@ -422,7 +426,7 @@ val config_hook : (config -> unit) -> unit
 
 module type Config = module type of Config_settings
 
-val load_config : (module Config) -> unit
+val load_config : ?file:string -> (module Config) -> unit
 (** Replaces {!config} with the fields from the supplied module. *)
 
 val arg_spec : (string * Arg.spec * string) list ref

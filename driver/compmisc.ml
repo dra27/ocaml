@@ -124,3 +124,12 @@ let with_ppf_dump ~file_prefix f =
 
   in
   Misc.try_finally (fun () -> f ppf_dump) ~always:finally
+
+let process_use_config args =
+  if Array.length args > 2 && args.(1) = "-use-config" then
+    let file = args.(2) in
+    try
+      In_channel.with_open_bin file (fun ic ->
+        Clflags.load_config ~file (Marshal.from_channel ic);
+        Main_args.use_config_state := Some false)
+    with e -> raise e

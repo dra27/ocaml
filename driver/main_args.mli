@@ -124,6 +124,8 @@ module type Compiler_options = sig
   val _dump_into_file : unit -> unit
   val _dump_dir : string -> unit
 
+  val _use_config: string -> unit
+
   val _args: string -> string array
   val _args0: string -> string array
 end
@@ -277,6 +279,9 @@ val options_with_command_line_syntax
   : (string * Arg.spec * string) list
   -> string list ref
   -> (string * Arg.spec * string) list
+
+val use_config_state : bool option ref
+(** Controls the positional checking of the -use-config option *)
 
 module Default: sig
   module Topmain: Bytetop_options

@@ -746,6 +746,11 @@ let mk_afl_inst_ratio f =
   "Configure percentage of branches instrumented\n\
   \     (advanced, see afl-fuzz docs for AFL_INST_RATIO)"
 
+let use_config_state = ref None
+let mk_use_config f =
+  "-use-config", Arg.String f,
+  "<file>  Override the compiler's configuration with the from <file>"
+
 let mk__ f =
   "-", Arg.String f,
   "<file>  Treat <file> as a file name (even if it starts with `-')"
@@ -857,6 +862,7 @@ module type Compiler_options = sig
   val _dprofile : unit -> unit
   val _dump_into_file : unit -> unit
   val _dump_dir : string -> unit
+  val _use_config : string -> unit
 
   val _args: string -> string array
   val _args0: string -> string array
@@ -1110,6 +1116,7 @@ struct
     mk_dprofile F._dprofile;
     mk_dump_into_file F._dump_into_file;
     mk_dump_dir F._dump_dir;
+    mk_use_config F._use_config;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1342,6 +1349,7 @@ struct
     mk_dump_into_file F._dump_into_file;
     mk_dump_dir F._dump_dir;
     mk_dump_pass F._dump_pass;
+    mk_use_config F._use_config;
 
     mk_args F._args;
     mk_args0 F._args0;
@@ -1780,6 +1788,15 @@ module Default = struct
     let _where () = Compenv.print_standard_library ()
     let _with_runtime = set Clflags.with_runtime
     let _without_runtime = clear Clflags.with_runtime
+    let _use_config _file =
+      match !use_config_state with
+      | None ->
+          Compenv.fatal "-use-config must appear before all other arguments."
+      | Some false ->
+          (* First -use-config argument - already processed by the driver *)
+          use_config_state := Some true
+      | Some true ->
+          Compenv.fatal "-use-config can only be used once."
   end
 
   module Toplevel = struct

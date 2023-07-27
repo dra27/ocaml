@@ -13,10 +13,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Options = Main_args.Make_bytecomp_options (Main_args.Default.Main)
-
 let main argv ppf =
+  Compmisc.process_use_config argv;
   let program = "ocamlc" in
+  (* The functor must be called _after_ Compmisc.process_use_config *)
+  let module Options =
+    Main_args.Make_bytecomp_options (Main_args.Default.Main) in
   Clflags.add_arguments __LOC__ Options.list;
   Clflags.add_arguments __LOC__
     ["-depend", Arg.Unit Makedepend.main_from_option,
