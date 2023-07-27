@@ -1967,7 +1967,7 @@ let inline_lazy_force_switch arg loc =
 
 let inline_lazy_force arg loc =
   let afl_instrument =
-    Option.value ~default:Config_settings.afl_instrument
+    Option.value ~default:Clflags.config.afl_instrument
                  !Clflags.afl_instrument
   in
   if afl_instrument then

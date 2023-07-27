@@ -225,7 +225,7 @@ module Separability = struct
 
   let default_signature ~arity =
     let default_mode =
-      if Config_settings.flat_float_array then Deepsep else Ind in
+      if Clflags.config.flat_float_array then Deepsep else Ind in
     Misc.replicate_list default_mode arity
 end
 

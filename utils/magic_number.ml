@@ -14,11 +14,17 @@
 (**************************************************************************)
 
 type native_obj_config = {
-  flambda : bool;
+  mutable flambda : bool;
 }
-let native_obj_config () = {
-  flambda = Config_settings.flambda;
+let flambda_obj_config = {flambda = true}
+let clambda_obj_config = {flambda = false}
+let native_obj_config = {
+  flambda = Clflags.config.flambda;
 }
+
+let () =
+  Clflags.config_hook @@ fun config ->
+    native_obj_config.flambda <- config.flambda
 
 type version = int
 
@@ -196,7 +202,7 @@ let current_raw kind =
 
 (* it would seem more direct to define current_version with the
    correct numbers and current_raw on top of it, but for now we
-   consider the Config_settings.foo values to be ground truth, and don't want
+   consider the Config_constants.foo values to be ground truth, and don't want
    to trust the present module instead. *)
 let current_version kind =
   let raw = current_raw kind in

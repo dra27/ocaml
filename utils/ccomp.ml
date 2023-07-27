@@ -79,13 +79,13 @@ let display_msvc_output file name =
 
 let std_include_flag prefix =
   let standard_library =
-    Misc.get_stdlib Config_settings.standard_library_default in
+    Misc.get_stdlib Clflags.config.standard_library_default in
   if !Clflags.no_std_include then ""
   else (prefix ^ Filename.quote standard_library)
 
 let compile_file ?output ?(opt="") ?stable_name name =
   let (pipe, file) =
-    if Config_settings.ccomp_type = "msvc" && not !Clflags.verbose then
+    if Clflags.config.ccomp_type = "msvc" && not !Clflags.verbose then
       try
         let (t, c) = Filename.open_temp_file "msvc" "stdout" in
         close_out c;
@@ -96,11 +96,11 @@ let compile_file ?output ?(opt="") ?stable_name name =
       ("", "") in
   let debug_prefix_map =
     match stable_name with
-    | Some stable when Config_settings.c_has_debug_prefix_map ->
+    | Some stable when Clflags.config.c_has_debug_prefix_map ->
       Printf.sprintf " -fdebug-prefix-map=%s=%s" name stable
     | Some _ | None -> "" in
   let expand_stdlib =
-    Misc.expand_stdlib Config_settings.standard_library_default in
+    Misc.expand_stdlib Clflags.config.standard_library_default in
   let exit =
     command
       (Printf.sprintf
@@ -111,15 +111,15 @@ let compile_file ?output ?(opt="") ?stable_name name =
               (* #7678: ocamlopt only calls the C compiler to process .c files
                  from the command line, and the behaviour between
                  ocamlc/ocamlopt should be identical. *)
-              (String.concat " " [Config_settings.c_compiler;
-                                  Config_settings.ocamlc_cflags;
-                                  Config_settings.ocamlc_cppflags]))
+              (String.concat " " [Clflags.config.c_compiler;
+                                  Clflags.config.ocamlc_cflags;
+                                  Clflags.config.ocamlc_cppflags]))
          debug_prefix_map
          (match output with
           | None -> ""
-          | Some o -> Printf.sprintf "%s%s" Config_settings.c_output_obj o)
+          | Some o -> Printf.sprintf "%s%s" Clflags.config.c_output_obj o)
          opt
-         (if !Clflags.debug && Config_settings.ccomp_type <> "msvc" then
+         (if !Clflags.debug && Clflags.config.ccomp_type <> "msvc" then
            "-g" else "")
          (String.concat " " (List.rev !Clflags.all_ccopts))
          (quote_prefixed ~response_files:true "-I"
@@ -143,20 +143,20 @@ let create_archive archive file_list =
   if file_list = [] then
     0 (* Don't call the archiver: #6550/#1094/#9011 *)
   else
-    match Config_settings.ccomp_type with
+    match Clflags.config.ccomp_type with
       "msvc" ->
         command(Printf.sprintf "link /lib /nologo /out:%s %s"
                                quoted_archive
                                (quote_files ~response_files:true file_list))
     | _ ->
-        assert(String.length Config_settings.ar > 0);
-        let response_files = Config_settings.ar_supports_response_files in
+        assert(String.length Clflags.config.ar > 0);
+        let response_files = Clflags.config.ar_supports_response_files in
         command(Printf.sprintf "%s rc %s %s"
-                Config_settings.ar quoted_archive
+                Clflags.config.ar quoted_archive
                 (quote_files ~response_files file_list))
 
 let expand_libname cclibs =
-  let ext_lib = Config_settings.ext_lib in
+  let ext_lib = Clflags.config.ext_lib in
   cclibs |> List.map (fun cclib ->
     if String.starts_with ~prefix:"-l" cclib then
       let libname =
@@ -186,12 +186,12 @@ let call_linker mode output_name files extra =
     let cmd =
       if mode = Partial then
         let (l_prefix, files) =
-          match Config_settings.ccomp_type with
+          match Clflags.config.ccomp_type with
           | "msvc" -> ("/libpath:", expand_libname files)
           | _ -> ("-L", files)
         in
         Printf.sprintf "%s%s %s %s %s"
-          Config_settings.native_pack_linker
+          Clflags.config.native_pack_linker
           (Filename.quote output_name)
           (quote_prefixed ~response_files:true
             l_prefix (Load_path.get_paths ()))
@@ -201,9 +201,9 @@ let call_linker mode output_name files extra =
         Printf.sprintf "%s -o %s %s %s %s %s %s"
           (match !Clflags.c_compiler, mode with
           | Some cc, _ -> cc
-          | None, Exe -> Config_settings.mkexe
-          | None, Dll -> Config_settings.mkdll
-          | None, MainDll -> Config_settings.mkmaindll
+          | None, Exe -> Clflags.config.mkexe
+          | None, Dll -> Clflags.config.mkdll
+          | None, MainDll -> Clflags.config.mkmaindll
           | None, Partial -> assert false
           )
           (Filename.quote output_name)
@@ -217,7 +217,7 @@ let call_linker mode output_name files extra =
   )
 
 let debug_prefix_map_flags () =
-  if not Config_settings.as_has_debug_prefix_map then
+  if not Clflags.config.as_has_debug_prefix_map then
     []
   else begin
     match Misc.get_build_path_prefix_map () with

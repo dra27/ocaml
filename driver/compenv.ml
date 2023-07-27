@@ -27,7 +27,7 @@ let output_prefix name =
 
 let print_version_and_library compiler =
   let standard_library =
-    Misc.get_stdlib Config_settings.standard_library_default in
+    Misc.get_stdlib Clflags.config.standard_library_default in
   Printf.printf "The OCaml %s, version " compiler;
   print_string Sys.ocaml_version; print_newline();
   print_string "Standard library directory: ";
@@ -40,7 +40,7 @@ let print_version_string () =
 
 let print_standard_library () =
   let standard_library =
-    Misc.get_stdlib Config_settings.standard_library_default in
+    Misc.get_stdlib Clflags.config.standard_library_default in
   print_string standard_library; print_newline();
   raise (Exit_with_status 0)
 
@@ -58,7 +58,7 @@ type configuration_value =
 
 let configuration_variables () =
   let open Config_constants in
-  let open Config_settings in
+  let config = Clflags.config in
   let p x v = (x, String v) in
   let p_int x v = (x, Int v) in
   let p_bool x v = (x, Bool v) in
@@ -70,57 +70,59 @@ let configuration_variables () =
      c_compiler, ocamlc_cflags, ocamlc_cppflagsetc., directly.
   *)
   let legacy_c_compiler =
-    c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags in
+    Printf.sprintf "%s %s %s" config.c_compiler
+                              config.ocamlc_cflags
+                              config.ocamlc_cppflags in
   let cmx_magic_number =
-    Magic_number.(current_raw (Cmx (native_obj_config ()))) in
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   let cmxa_magic_number =
-    Magic_number.(current_raw (Cmxa (native_obj_config ()))) in
+    Magic_number.(current_raw (Cmxa native_obj_config)) in
 [
   p "version" Sys.ocaml_version;
-  p "standard_library_default" standard_library_default;
-  p "standard_library" (Misc.get_stdlib standard_library_default);
-  p "ccomp_type" ccomp_type;
-  p "c_compiler" c_compiler;
-  p "ocamlc_cflags" ocamlc_cflags;
-  p "ocamlc_cppflags" ocamlc_cppflags;
-  p "ocamlopt_cflags" ocamlc_cflags;
-  p "ocamlopt_cppflags" ocamlc_cppflags;
+  p "standard_library_default" config.standard_library_default;
+  p "standard_library" (Misc.get_stdlib config.standard_library_default);
+  p "ccomp_type" config.ccomp_type;
+  p "c_compiler" config.c_compiler;
+  p "ocamlc_cflags" config.ocamlc_cflags;
+  p "ocamlc_cppflags" config.ocamlc_cppflags;
+  p "ocamlopt_cflags" config.ocamlc_cflags;
+  p "ocamlopt_cppflags" config.ocamlc_cppflags;
   p "bytecomp_c_compiler" legacy_c_compiler;
   p "native_c_compiler" legacy_c_compiler;
-  p "bytecomp_c_libraries" bytecomp_c_libraries;
-  p "native_c_libraries" native_c_libraries;
-  p "native_ldflags" native_ldflags;
-  p "native_pack_linker" native_pack_linker;
-  p_bool "native_compiler" native_compiler;
-  p "architecture" architecture;
-  p "model" model;
+  p "bytecomp_c_libraries" config.bytecomp_c_libraries;
+  p "native_c_libraries" config.native_c_libraries;
+  p "native_ldflags" config.native_ldflags;
+  p "native_pack_linker" config.native_pack_linker;
+  p_bool "native_compiler" config.native_compiler;
+  p "architecture" config.architecture;
+  p "model" config.model;
   p_int "int_size" Sys.int_size;
   p_int "word_size" Sys.word_size;
-  p_system "system" system;
-  p "abi" abi;
-  p "asm" asm;
-  p_bool "asm_cfi_supported" asm_cfi_supported;
-  p_bool "with_frame_pointers" with_frame_pointers;
-  p "ext_exe" ext_exe;
-  p "ext_obj" ext_obj;
-  p "ext_asm" ext_asm;
-  p "ext_lib" ext_lib;
-  p "ext_dll" ext_dll;
+  p_system "system" config.system;
+  p "abi" config.abi;
+  p "asm" config.asm;
+  p_bool "asm_cfi_supported" config.asm_cfi_supported;
+  p_bool "with_frame_pointers" config.with_frame_pointers;
+  p "ext_exe" config.ext_exe;
+  p "ext_obj" config.ext_obj;
+  p "ext_asm" config.ext_asm;
+  p "ext_lib" config.ext_lib;
+  p "ext_dll" config.ext_dll;
   p "os_type" Sys.os_type;
   p "default_executable_name" default_executable_name;
-  p_bool "systhread_supported" systhread_supported;
-  p "host" host;
-  p "target" target;
-  p_bool "flambda" flambda;
+  p_bool "systhread_supported" config.systhread_supported;
+  p "host" config.host;
+  p "target" config.target;
+  p_bool "flambda" config.flambda;
   p_bool "safe_string" true;
   p_bool "default_safe_string" true;
-  p_bool "flat_float_array" flat_float_array;
-  p_bool "function_sections" function_sections;
-  p_bool "afl_instrument" afl_instrument;
-  p_bool "tsan" tsan;
-  p_bool "windows_unicode" windows_unicode;
-  p_bool "supports_shared_libraries" supports_shared_libraries;
-  p_bool "native_dynlink" native_dynlink;
+  p_bool "flat_float_array" config.flat_float_array;
+  p_bool "function_sections" config.function_sections;
+  p_bool "afl_instrument" config.afl_instrument;
+  p_bool "tsan" config.tsan;
+  p_bool "windows_unicode" config.windows_unicode;
+  p_bool "supports_shared_libraries" config.supports_shared_libraries;
+  p_bool "native_dynlink" config.native_dynlink;
   p_bool "naked_pointers" false;
   p_bool "compression_supported" (Marshal.compression_supported());
 
@@ -734,7 +736,7 @@ let matching_filename filename { pattern } =
 
 let apply_config_file ppf position =
   let standard_library =
-    Misc.get_stdlib Config_settings.standard_library_default in
+    Misc.get_stdlib Clflags.config.standard_library_default in
   let config_file =
     Filename.concat standard_library "ocaml_compiler_internal_params"
   in
@@ -785,7 +787,7 @@ type deferred_action =
   | ProcessDLLs of string list
 
 let c_object_of_filename name =
-  Filename.chop_suffix (Filename.basename name) ".c" ^ Config_settings.ext_obj
+  Filename.chop_suffix (Filename.basename name) ".c" ^ Clflags.config.ext_obj
 
 let process_action
     (ppf, implementation, interface, ocaml_mod_ext, ocaml_lib_ext) action =
@@ -824,13 +826,13 @@ let process_action
         prepend_to_list Clflags.objfiles name
       else if Filename.check_suffix name ".cmi" && !Clflags.make_package then
         prepend_to_list Clflags.objfiles name
-      else if Filename.check_suffix name Config_settings.ext_obj
-           || Filename.check_suffix name Config_settings.ext_lib then begin
+      else if Filename.check_suffix name Clflags.config.ext_obj
+           || Filename.check_suffix name Clflags.config.ext_lib then begin
         has_linker_inputs := true;
         prepend_to_list Clflags.ccobjs name
       end
       else if not !Clflags.native_code
-           && Filename.check_suffix name Config_settings.ext_dll then
+           && Filename.check_suffix name Clflags.config.ext_dll then
         prepend_to_list Clflags.dllibs name
       else
         match Clflags.Compiler_pass.of_input_filename name with

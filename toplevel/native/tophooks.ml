@@ -62,19 +62,19 @@ let backend = (module Backend : Backend_intf.S)
 
 let load ppf phrase_name program =
   let dll =
-    if !Clflags.keep_asm_file then phrase_name ^ Config_settings.ext_dll
-    else Filename.temp_file ("caml" ^ phrase_name) Config_settings.ext_dll
+    if !Clflags.keep_asm_file then phrase_name ^ Clflags.config.ext_dll
+    else Filename.temp_file ("caml" ^ phrase_name) Clflags.config.ext_dll
   in
   let filename = Filename.chop_extension dll in
   let middle_end =
-    if Config_settings.flambda then Flambda_middle_end.lambda_to_clambda
+    if Clflags.config.flambda then Flambda_middle_end.lambda_to_clambda
     else Closure_middle_end.lambda_to_clambda
   in
   Asmgen.compile_implementation ~toplevel:need_symbol
     ~backend ~prefixname:filename
     ~middle_end ~ppf_dump:ppf program;
-  Asmlink.call_linker_shared [filename ^ Config_settings.ext_obj] dll;
-  Sys.remove (filename ^ Config_settings.ext_obj);
+  Asmlink.call_linker_shared [filename ^ Clflags.config.ext_obj] dll;
+  Sys.remove (filename ^ Clflags.config.ext_obj);
 
   let dll =
     if Filename.is_implicit dll

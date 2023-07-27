@@ -107,14 +107,14 @@ let main argv ppf =
       let target =
         if !Clflags.output_c_object then
           let s = Compenv.extract_output !Clflags.output_name in
-          if (Filename.check_suffix s Config_settings.ext_obj
-            || Filename.check_suffix s Config_settings.ext_dll)
+          if (Filename.check_suffix s Clflags.config.ext_obj
+            || Filename.check_suffix s Clflags.config.ext_dll)
           then s
           else
             Compenv.fatal
               (Printf.sprintf
                  "The extension of the output file must be %s or %s"
-                 Config_settings.ext_obj Config_settings.ext_dll
+                 Clflags.config.ext_obj Clflags.config.ext_dll
               )
         else
           Compenv.default_output !Clflags.output_name

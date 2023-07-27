@@ -193,6 +193,33 @@ let register_internal_assembler f = internal_assembler := Some f
 let with_internal_assembler assemble k =
   Misc.protect_refs [ R (internal_assembler, Some assemble) ] k
 
+(* Which asm conventions to use *)
+
+type config = {
+  mutable masm: bool;
+  mutable windows: bool;
+  mutable macOS: bool;
+  mutable solaris: bool;
+  mutable use_plt: bool
+}
+let config = {
+  masm = false;
+  windows = false;
+  macOS = false;
+  solaris = false;
+  use_plt = false
+}
+
+let () = Clflags.config_hook @@ fun new_config ->
+  config.windows <- Config_constants.System.is_windows new_config.system;
+  config.macOS <- Config_constants.System.is_macOS new_config.system;
+  config.solaris <- Config_constants.System.is_solaris new_config.system;
+  config.masm <- Config_constants.System.uses_masm new_config.system;
+  config.use_plt <-
+    match new_config.system with
+    | S_macosx | S_mingw64 | S_cygwin | S_win64 -> false
+    | _ -> !Clflags.dlcode
+
 (* Shall we use an external assembler command ?
    If [binary_content] contains some data, we can directly
    save it. Otherwise, we have to ask an external command.
@@ -200,12 +227,12 @@ let with_internal_assembler assemble k =
 let binary_content = ref None
 
 let compile infile outfile =
-  if Config_constants.System.uses_masm Config_settings.system then
-    Ccomp.command (Config_settings.asm ^
+  if config.masm then
+    Ccomp.command (Clflags.config.asm ^
                    Filename.quote outfile ^ " " ^ Filename.quote infile ^
                    (if !Clflags.verbose then "" else ">NUL"))
   else
-    Ccomp.command (Config_settings.asm ^ " " ^
+    Ccomp.command (Clflags.config.asm ^ " " ^
                    (String.concat " " (Ccomp.debug_prefix_map_flags ())) ^
                    " -o " ^ Filename.quote outfile ^ " " ^
                    Filename.quote infile)

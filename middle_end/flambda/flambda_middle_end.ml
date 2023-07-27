@@ -55,7 +55,7 @@ let lambda_to_flambda ~ppf_dump ~prefixname ~backend ~size
          let pass_number = ref 0 in
          let round_number = ref 0 in
          let flambda_invariant_checks =
-           Option.value ~default:Config_settings.with_flambda_invariants
+           Option.value ~default:Clflags.config.with_flambda_invariants
                         !Clflags.flambda_invariant_checks
          in
          let check flam =

@@ -83,7 +83,7 @@ let make_package_object ~ppf_dump members targetobj targetname coercion
       ~backend =
   Profile.record_call (Printf.sprintf "pack(%s)" targetname) (fun () ->
     let objtemp =
-      let ext_obj = Config_settings.ext_obj in
+      let ext_obj = Clflags.config.ext_obj in
       if !Clflags.keep_asm_file
       then Filename.remove_extension targetobj ^ ".pack" ^ ext_obj
       else
@@ -102,7 +102,7 @@ let make_package_object ~ppf_dump members targetobj targetname coercion
     let prefixname = Filename.remove_extension objtemp in
     let required_globals = Ident.Set.empty in
     let program, middle_end =
-      if Config_settings.flambda then
+      if Clflags.config.flambda then
         let main_module_block_size, code =
           Translmod.transl_package_flambda components coercion
         in
@@ -139,7 +139,7 @@ let make_package_object ~ppf_dump members targetobj targetname coercion
       program;
     let objfiles =
       List.map
-        (fun m -> Filename.remove_extension m.pm_file ^ Config_settings.ext_obj)
+        (fun m -> Filename.remove_extension m.pm_file ^ Clflags.config.ext_obj)
         (List.filter (fun m -> m.pm_kind <> PM_intf) members) in
     let exitcode =
       Ccomp.call_linker Ccomp.Partial targetobj (objtemp :: objfiles) ""
@@ -151,13 +151,13 @@ let make_package_object ~ppf_dump members targetobj targetname coercion
 (* Make the .cmx file for the package *)
 
 let get_export_info ui =
-  assert(Config_settings.flambda);
+  assert(Clflags.config.flambda);
   match ui.ui_export_info with
   | Clambda _ -> assert false
   | Flambda info -> info
 
 let get_approx ui =
-  assert(not Config_settings.flambda);
+  assert(not Clflags.config.flambda);
   match ui.ui_export_info with
   | Flambda _ -> assert false
   | Clambda info -> info
@@ -185,7 +185,7 @@ let build_package_cmx members cmxfile =
            (Compilenv.unit_for_global unit_id) set)
       Compilation_unit.Set.empty units in
   let units =
-    if Config_settings.flambda then
+    if Clflags.config.flambda then
       List.map (fun info ->
           { info with
             ui_export_info =
@@ -199,7 +199,7 @@ let build_package_cmx members cmxfile =
   in
   let ui = Compilenv.current_unit_infos() in
   let ui_export_info =
-    if Config_settings.flambda then
+    if Clflags.config.flambda then
       let ui_export_info =
         List.fold_left (fun acc info ->
             Export_info.merge acc (get_export_info info))
@@ -262,7 +262,7 @@ let package_files ~ppf_dump initial_env files targetcmx ~backend =
   let prefix = chop_extensions targetcmx in
   let targetcmi = prefix ^ ".cmi" in
   let targetobj =
-    Filename.remove_extension targetcmx ^ Config_settings.ext_obj in
+    Filename.remove_extension targetcmx ^ Clflags.config.ext_obj in
   let targetname = String.capitalize_ascii(Filename.basename prefix) in
   (* Set the name of the current "input" *)
   Location.input_name := targetcmx;

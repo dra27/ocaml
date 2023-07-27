@@ -18,7 +18,11 @@
 
 (* Specific operations for the ARM processor, 64-bit mode *)
 
-val macOS : unit -> bool
+type config = private {
+  mutable macOS: bool
+}
+
+val config : config
 
 (* Machine-specific command-line options *)
 

@@ -55,6 +55,16 @@ val assemble_file: (*infile*) string -> (*outfile*) string -> (*retcode*) int
     the input file is ignored). Otherwise, the source asm file with an
     external assembler. *)
 
+type config = private {
+  mutable masm: bool;
+  mutable windows: bool;
+  mutable macOS: bool;
+  mutable solaris: bool;
+  mutable use_plt: bool
+}
+
+val config : config
+
 (** Support for plumbing a binary code emitter *)
 
 val register_internal_assembler: (asm_program -> string -> unit) -> unit

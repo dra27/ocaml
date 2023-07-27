@@ -69,15 +69,21 @@
     @since 4.11
 *)
 
-type native_obj_config = {
-  flambda : bool;
+type native_obj_config = private {
+  mutable flambda : bool;
 }
 (** native object files have a format and magic number that depend
    on certain native-compiler configuration parameters. This
    configuration space is expressed by the [native_obj_config]
    type. *)
 
-val native_obj_config : unit -> native_obj_config
+val flambda_obj_config : native_obj_config
+(** the native object file configuration in flambda mode. *)
+
+val clambda_obj_config : native_obj_config
+(** the native object file configuration in non-flambda mode. *)
+
+val native_obj_config : native_obj_config
 (** the native object file configuration of the active/configured compiler. *)
 
 type version = int

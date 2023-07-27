@@ -354,7 +354,7 @@ let is_generic_function name =
 (* CFI directives *)
 
 let is_cfi_enabled () =
-  Config_settings.asm_cfi_supported
+  Clflags.config.asm_cfi_supported
 
 let cfi_startproc () =
   if is_cfi_enabled () then
@@ -417,7 +417,7 @@ let reset_debug_info () =
    display .loc for every instruction. *)
 let emit_debug_info_gen dbg file_emitter loc_emitter =
   if is_cfi_enabled () &&
-    (!Clflags.debug || Config_settings.with_frame_pointers) then begin
+    (!Clflags.debug || Clflags.config.with_frame_pointers) then begin
     match List.rev dbg with
     | [] -> ()
     | { Debuginfo.dinfo_line = line;

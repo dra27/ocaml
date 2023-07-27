@@ -34,7 +34,7 @@ let cmm_invariants ppf fd_cmm =
     else fun ppf fdecl -> Format.fprintf ppf "%s" fdecl.fun_name
   in
   let cmm_invariants =
-    Option.value ~default:Config_settings.with_cmm_invariants
+    Option.value ~default:Clflags.config.with_cmm_invariants
                  !Clflags.cmm_invariants
   in
   if cmm_invariants && Cmm_invariants.run ppf fd_cmm then
@@ -275,14 +275,14 @@ type middle_end =
 
 let asm_filename output_prefix =
     if !Clflags.keep_asm_file || !Emitaux.binary_backend_available
-    then output_prefix ^ Config_settings.ext_asm
-    else Filename.temp_file "camlasm" Config_settings.ext_asm
+    then output_prefix ^ Clflags.config.ext_asm
+    else Filename.temp_file "camlasm" Clflags.config.ext_asm
 
 let compile_implementation ?toplevel ~backend ~prefixname ~middle_end
       ~ppf_dump (program : Lambda.program) =
   compile_unit ~output_prefix:prefixname
     ~asm_filename:(asm_filename prefixname) ~keep_asm:!Clflags.keep_asm_file
-    ~obj_filename:(prefixname ^ Config_settings.ext_obj)
+    ~obj_filename:(prefixname ^ Clflags.config.ext_obj)
     (fun () ->
       Ident.Set.iter Compilenv.require_global program.required_globals;
       let clambda_with_constants =
@@ -309,7 +309,7 @@ let linear_gen_implementation filename =
 let compile_implementation_linear output_prefix ~progname =
   compile_unit ~output_prefix
     ~asm_filename:(asm_filename output_prefix) ~keep_asm:!Clflags.keep_asm_file
-    ~obj_filename:(output_prefix ^ Config_settings.ext_obj)
+    ~obj_filename:(output_prefix ^ Clflags.config.ext_obj)
     (fun () ->
       linear_gen_implementation progname)
 

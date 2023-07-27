@@ -23,16 +23,16 @@ let is_inline_attribute = function
 
 let is_inlined_attribute = function
   | {txt=("inlined"|"ocaml.inlined")} -> true
-  | {txt=("unrolled"|"ocaml.unrolled")} when Config_settings.flambda -> true
+  | {txt=("unrolled"|"ocaml.unrolled")} when Clflags.config.flambda -> true
   | _ -> false
 
 let is_specialise_attribute = function
-  | {txt=("specialise"|"ocaml.specialise")} when Config_settings.flambda -> true
+  | {txt=("specialise"|"ocaml.specialise")} when Clflags.config.flambda -> true
   | _ -> false
 
 let is_specialised_attribute = function
   | {txt=("specialised"|"ocaml.specialised")}
-      when Config_settings.flambda -> true
+      when Clflags.config.flambda -> true
   | _ -> false
 
 let is_local_attribute = function

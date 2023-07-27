@@ -15,6 +15,136 @@
 
 (* Command-line parameters *)
 
+type config = {
+  mutable bindir: string;
+  mutable standard_library_default: string;
+  mutable host : string;
+  mutable target : string;
+  mutable reserved_header_bits : int;
+  mutable flat_float_array : bool;
+  mutable windows_unicode: bool;
+  mutable supports_shared_libraries: bool;
+  mutable native_dynlink: bool;
+  mutable native_compiler: bool;
+  mutable architecture: string;
+  mutable model: string;
+  mutable system: Config_constants.System.t;
+  mutable abi: string;
+  mutable with_frame_pointers : bool;
+  mutable flambda : bool;
+  mutable with_flambda_invariants : bool;
+  mutable with_cmm_invariants : bool;
+  mutable function_sections : bool;
+  mutable afl_instrument : bool;
+  mutable tsan : bool;
+  mutable ccomp_type: string;
+  mutable c_compiler: string;
+  mutable c_output_obj: string;
+  mutable c_has_debug_prefix_map : bool;
+  mutable as_has_debug_prefix_map : bool;
+  mutable ocamlc_cflags : string;
+  mutable ocamlc_cppflags : string;
+  mutable bytecomp_c_libraries: string;
+  mutable native_c_libraries: string;
+  mutable native_ldflags : string;
+  mutable native_pack_linker: string;
+  mutable mkdll: string;
+  mutable mkexe: string;
+  mutable mkmaindll: string;
+  mutable linker_is_flexlink: bool;
+  mutable default_rpath: string;
+  mutable mksharedlibrpath: string;
+  mutable ar: string;
+  mutable asm: string;
+  mutable asm_cfi_supported: bool;
+  mutable ext_obj: string;
+  mutable ext_asm: string;
+  mutable ext_lib: string;
+  mutable ext_dll: string;
+  mutable ext_exe: string;
+  mutable systhread_supported : bool;
+  mutable flexdll_dirs : string list;
+  mutable ar_supports_response_files: bool
+}
+
+module type Config = module type of Config_settings
+
+let config =
+  let open Config_settings in {
+    bindir; standard_library_default; host; target; reserved_header_bits;
+    flat_float_array; windows_unicode; supports_shared_libraries;
+    native_dynlink; native_compiler; architecture; model; system; abi;
+    with_frame_pointers; flambda; with_flambda_invariants; with_cmm_invariants;
+    function_sections; afl_instrument; tsan; ccomp_type; c_compiler;
+    c_output_obj; c_has_debug_prefix_map; as_has_debug_prefix_map;
+    ocamlc_cflags; ocamlc_cppflags; bytecomp_c_libraries; native_c_libraries;
+    native_ldflags; native_pack_linker; mkdll; mkexe; mkmaindll;
+    linker_is_flexlink; default_rpath; mksharedlibrpath; ar; asm;
+    asm_cfi_supported; ext_obj; ext_asm; ext_lib; ext_dll; ext_exe;
+    systhread_supported; flexdll_dirs; ar_supports_response_files;
+  }
+
+let config_hooks = Queue.create ()
+
+let config_hook f =
+  Queue.push f config_hooks;
+  f config
+
+let load_config settings =
+  let open (val settings : Config) in
+  config.bindir <- bindir;
+  config.standard_library_default <- standard_library_default;
+  config.host <- host;
+  config.target <- target;
+  config.reserved_header_bits <- reserved_header_bits;
+  config.flat_float_array <- flat_float_array;
+  config.windows_unicode <- windows_unicode;
+  config.supports_shared_libraries <- supports_shared_libraries;
+  config.native_dynlink <- native_dynlink;
+  config.native_compiler <- native_compiler;
+  config.architecture <- architecture;
+  config.model <- model;
+  config.system <- system;
+  config.abi <- abi;
+  config.with_frame_pointers <- with_frame_pointers;
+  config.flambda <- flambda;
+  config.with_flambda_invariants <- with_flambda_invariants;
+  config.with_cmm_invariants <- with_cmm_invariants;
+  config.function_sections <- function_sections;
+  config.afl_instrument <- afl_instrument;
+  config.tsan <- tsan;
+  config.ccomp_type <- ccomp_type;
+  config.c_compiler <- c_compiler;
+  config.c_output_obj <- c_output_obj;
+  config.c_has_debug_prefix_map <- c_has_debug_prefix_map;
+  config.as_has_debug_prefix_map <- as_has_debug_prefix_map;
+  config.ocamlc_cflags <- ocamlc_cflags;
+  config.ocamlc_cppflags <- ocamlc_cppflags;
+  config.bytecomp_c_libraries <- bytecomp_c_libraries;
+  config.native_c_libraries <- native_c_libraries;
+  config.native_ldflags <- native_ldflags;
+  config.native_pack_linker <- native_pack_linker;
+  config.mkdll <- mkdll;
+  config.mkexe <- mkexe;
+  config.mkmaindll <- mkmaindll;
+  config.linker_is_flexlink <- linker_is_flexlink;
+  config.default_rpath <- default_rpath;
+  config.mksharedlibrpath <- mksharedlibrpath;
+  config.ar <- ar;
+  config.asm <- asm;
+  config.asm_cfi_supported <- asm_cfi_supported;
+  config.ext_obj <- ext_obj;
+  config.ext_asm <- ext_asm;
+  config.ext_lib <- ext_lib;
+  config.ext_dll <- ext_dll;
+  config.ext_exe <- ext_exe;
+  config.systhread_supported <- systhread_supported;
+  config.flexdll_dirs <- flexdll_dirs;
+  config.ar_supports_response_files <- ar_supports_response_files;
+  Queue.iter (fun f -> f config) config_hooks
+
+let () = load_config (module Config_settings)
+
 type 'a switchable =
 | Atom of 'a
 | Switched of bool ref * 'a * 'a
@@ -202,7 +332,11 @@ let rounds () =
   | Some r -> r
 
 let default_inline_threshold =
-  Switched(ref Config_settings.flambda, 10., 10. /. 8.)
+  let flambda = ref false in
+  let () = config_hook @@ function config ->
+    flambda := config.flambda
+  in
+  Switched(flambda, 10., 10. /. 8.)
 let inline_toplevel_multiplier = 16
 let default_inline_toplevel_threshold =
   let f v = int_of_float (float inline_toplevel_multiplier *. v) in

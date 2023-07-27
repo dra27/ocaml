@@ -1122,7 +1122,7 @@ let import_function_declarations_for_pack function_decls
 let create_set_of_closures ~function_decls ~free_vars ~specialised_args
       ~direct_call_surrogates =
   let flambda_invariant_checks =
-    Option.value ~default:Config_settings.with_flambda_invariants
+    Option.value ~default:Clflags.config.with_flambda_invariants
                  !Clflags.flambda_invariant_checks
   in
   if flambda_invariant_checks then begin

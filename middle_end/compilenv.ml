@@ -125,7 +125,7 @@ let reset ?packname name =
   current_unit.ui_for_pack <- packname;
   Hashtbl.clear exported_constants;
   structured_constants := structured_constants_empty;
-  current_unit.ui_export_info <- default_ui_export_info Config_settings.flambda;
+  current_unit.ui_export_info <- default_ui_export_info Clflags.config.flambda;
   merged_environment := Export_info.empty;
   Hashtbl.clear export_infos_table;
   let compilation_unit =
@@ -153,7 +153,7 @@ let symbol_in_current_unit name =
 let read_unit_info filename =
   let ic = open_in_bin filename in
   let cmx_magic_number =
-    Magic_number.(current_raw (Cmx (native_obj_config ()))) in
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   try
     let buffer =
       really_input_string ic (String.length cmx_magic_number) in
@@ -172,7 +172,7 @@ let read_unit_info filename =
 let read_library_info filename =
   let ic = open_in_bin filename in
   let cmxa_magic_number =
-    Magic_number.(current_raw (Cmxa (native_obj_config ()))) in
+    Magic_number.(current_raw (Cmxa native_obj_config)) in
   let buffer =
     really_input_string ic (String.length cmxa_magic_number) in
   if buffer <> cmxa_magic_number then
@@ -231,7 +231,7 @@ let cache_unit_info ui =
 (* Return the approximation of a global identifier *)
 
 let get_clambda_approx ui =
-  assert(not Config_settings.flambda);
+  assert(not Clflags.config.flambda);
   match ui.ui_export_info with
   | Flambda _ -> assert false
   | Clambda approx -> approx
@@ -289,19 +289,19 @@ let symbol_for_global' id =
     Symbol.of_global_linkage (unit_for_global id) sym_label
 
 let set_global_approx approx =
-  assert(not Config_settings.flambda);
+  assert(not Clflags.config.flambda);
   current_unit.ui_export_info <- Clambda approx
 
 (* Exporting and importing cross module information *)
 
 let get_flambda_export_info ui =
-  assert(Config_settings.flambda);
+  assert(Clflags.config.flambda);
   match ui.ui_export_info with
   | Clambda _ -> assert false
   | Flambda ei -> ei
 
 let set_export_info export_info =
-  assert(Config_settings.flambda);
+  assert(Clflags.config.flambda);
   current_unit.ui_export_info <- Flambda export_info
 
 let approx_for_global comp_unit =
@@ -346,7 +346,7 @@ let need_send_fun n =
 let write_unit_info info filename =
   let oc = open_out_bin filename in
   let cmx_magic_number =
-    Magic_number.(current_raw (Cmx (native_obj_config ()))) in
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   output_string oc cmx_magic_number;
   output_value oc info;
   flush oc;

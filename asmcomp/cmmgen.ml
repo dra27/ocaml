@@ -1469,7 +1469,7 @@ let transl_function f =
   let cmm_body =
     let env = create_env ~environment_param:f.env in
     let afl_instrument =
-      Option.value ~default:Config_settings.afl_instrument
+      Option.value ~default:Clflags.config.afl_instrument
                    !Clflags.afl_instrument
     in
     if afl_instrument then
@@ -1477,7 +1477,7 @@ let transl_function f =
     else
       transl env body in
   let cmm_body =
-    if Config_settings.tsan then
+    if Clflags.config.tsan then
       Thread_sanitizer.instrument cmm_body
     else
       cmm_body
@@ -1578,7 +1578,7 @@ let compunit (ulam, preallocated_blocks, constants) =
   Cmmgen_state.set_structured_constants constants;
   let init_code =
     let afl_instrument =
-      Option.value ~default:Config_settings.afl_instrument
+      Option.value ~default:Clflags.config.afl_instrument
                    !Clflags.afl_instrument
     in
     if afl_instrument then
@@ -1587,7 +1587,7 @@ let compunit (ulam, preallocated_blocks, constants) =
     else
       transl empty_env ulam in
   let init_code =
-    if Config_settings.tsan then Thread_sanitizer.instrument init_code
+    if Clflags.config.tsan then Thread_sanitizer.instrument init_code
     else init_code
   in
   let c1 = [Cfunction {fun_name = Compilenv.make_symbol (Some "entry");
@@ -1597,7 +1597,7 @@ let compunit (ulam, preallocated_blocks, constants) =
                           Compilation time matter more than runtime.
                           See MPR#7630 *)
                        fun_codegen_options =
-                         if Config_settings.flambda then [
+                         if Clflags.config.flambda then [
                            Reduce_code_size;
                            No_CSE;
                          ]

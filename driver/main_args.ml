@@ -92,7 +92,7 @@ let mk_eval f =
 
 let mk_function_sections f =
   let f () =
-    if Config_settings.function_sections then
+    if Clflags.config.function_sections then
       f ()
     else
       raise (Arg.Bad "OCaml has been configured without support for \

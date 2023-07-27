@@ -1,6 +1,5 @@
 (* TEST
- include config;
- binary_modules = "config_constants config_settings build_path_prefix_map misc";
+ include ocamlcommon;
  bytecode;
 *)
 

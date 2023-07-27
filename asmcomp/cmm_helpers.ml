@@ -663,8 +663,8 @@ let get_header ptr dbg =
     [Cop(Cadda, [ptr; Cconst_int(-size_int, dbg)], dbg)], dbg)
 
 let get_header_masked ptr dbg =
-  if Config_settings.reserved_header_bits > 0 then
-    let header_mask = (1 lsl (64 - Config_settings.reserved_header_bits)) - 1
+  if Clflags.config.reserved_header_bits > 0 then
+    let header_mask = (1 lsl (64 - Clflags.config.reserved_header_bits)) - 1
     in Cop(Cand, [get_header ptr dbg; Cconst_int (header_mask, dbg)], dbg)
   else
     get_header ptr dbg
@@ -2647,7 +2647,7 @@ let fundecls_size fundecls =
 
 let emit_constant_closure ((_, global_symb) as symb) fundecls clos_vars cont =
   let closure_symbol (f : Clambda.ufunction) =
-    if Config_settings.flambda then
+    if Clflags.config.flambda then
       cdefine_symbol (f.label ^ "_closure", global_symb)
     else
       []

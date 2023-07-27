@@ -365,7 +365,7 @@ module P = Processed_what_to_specialise
 let check_invariants ~pass_name ~(set_of_closures : Flambda.set_of_closures)
       ~original_set_of_closures =
   let flambda_invariant_checks =
-    Option.value ~default:Config_settings.with_flambda_invariants
+    Option.value ~default:Clflags.config.with_flambda_invariants
                  !Clflags.flambda_invariant_checks
   in
   if flambda_invariant_checks then begin
@@ -747,7 +747,7 @@ module Make (T : S) = struct
           ~direct_call_surrogates
       in
       let flambda_invariant_checks =
-        Option.value ~default:Config_settings.with_flambda_invariants
+        Option.value ~default:Clflags.config.with_flambda_invariants
                      !Clflags.flambda_invariant_checks
       in
       if flambda_invariant_checks then begin

@@ -114,8 +114,6 @@ let i1_call_jmp b s = function
   | Sym x -> bprintf b "\t%s\t%s" s x
   | _ -> assert false
 
-let windows () = Config_constants.System.is_windows Config_settings.system
-
 let print_instr b = function
   | ADD (arg1, arg2) -> i2_s b "add" arg1 arg2
   | ADDSD (arg1, arg2) -> i2 b "addsd" arg1 arg2
@@ -189,7 +187,7 @@ let print_instr b = function
   | MOV ((Imm n as arg1), (Reg64 _ as arg2))
     when not (n <= 0x7FFF_FFFFL && n >= -0x8000_0000L) ->
       i2 b "movabsq" arg1 arg2
-  | MOV ((Sym _ as arg1), (Reg64 _ as arg2)) when windows () ->
+  | MOV ((Sym _ as arg1), (Reg64 _ as arg2)) when config.windows ->
       i2 b "movabsq" arg1 arg2
   | MOV (arg1, arg2) -> i2_s b "mov" arg1 arg2
   | MOVAPD (arg1, arg2) -> i2 b "movapd" arg1 arg2
@@ -245,21 +243,16 @@ let print_instr b = function
 *)
 
 
-let print_line b line =
-  let solaris = Config_constants.System.is_solaris Config_settings.system in
-  match line with
+let print_line b = function
   | Ins instr -> print_instr b instr
 
   | Align (_data,n) ->
       (* MacOSX assembler interprets the integer n as a 2^n alignment *)
-      let n =
-        if Config_constants.System.is_macOS Config_settings.system then
-          Misc.log2 n
-        else n in
+      let n = if config.macOS then Misc.log2 n else n in
       bprintf b "\t.align\t%d" n
   | Byte n -> bprintf b "\t.byte\t%a" cst n
   | Bytes s ->
-      if solaris then buf_bytes_directive b ".byte" s
+      if config.solaris then buf_bytes_directive b ".byte" s
       else bprintf b "\t.ascii\t\"%s\"" (string_of_string_literal s)
   | Comment s -> bprintf b "\t\t\t\t/* %s */" s
   | Global s -> bprintf b "\t.globl\t%s" s;
@@ -279,10 +272,10 @@ let print_line b line =
       | _ -> bprintf b ",%s" (String.concat "," args)
       end
   | Space n ->
-      if solaris then bprintf b "\t.zero\t%d" n
+      if config.solaris then bprintf b "\t.zero\t%d" n
       else bprintf b "\t.space\t%d" n
   | Word n ->
-      if solaris then bprintf b "\t.value\t%a" cst n
+      if config.solaris then bprintf b "\t.value\t%a" cst n
       else bprintf b "\t.word\t%a" cst n
 
   (* gas only *)

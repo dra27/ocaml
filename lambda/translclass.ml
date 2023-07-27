@@ -916,7 +916,7 @@ let transl_class ~scopes ids cl_id pub_meths cl vflag =
                     [transl_meth_list pub_meths;
                      Lvar class_init; Lvar cached])) in
   let afl_instrument =
-    Option.value ~default:Config_settings.afl_instrument !Clflags.afl_instrument
+    Option.value ~default:Clflags.config.afl_instrument !Clflags.afl_instrument
   in
   let lcheck_cache =
     if !Clflags.native_code && afl_instrument then

@@ -20,7 +20,14 @@
 
 open Format
 
-let macOS () = Config_constants.System.is_macOS Config_settings.system
+type config = {
+  mutable macOS: bool
+}
+
+let config = {macOS = false}
+
+let () = Clflags.config_hook @@ fun new_config ->
+  config.macOS <- Config_constants.System.is_macOS new_config.system
 
 (* Machine-specific command-line options *)
 

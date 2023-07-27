@@ -957,7 +957,7 @@ module PpxContext = struct
             else
               let alert = Location.auto_include_alert in
               let standard_library_default =
-                Config_settings.standard_library_default in
+                Clflags.config.standard_library_default in
               Load_path.auto_include_otherlibs standard_library_default
                                                alert find_in_dir fn
           in

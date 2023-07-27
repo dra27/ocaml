@@ -497,13 +497,13 @@ and transl_exp0 ~in_new_scope ~scopes e =
       begin match Typeopt.classify_lazy_argument e with
       | `Constant_or_function ->
         (* A constant expr (of type <> float if
-           [Config_settings.flat_float_array] is true) gets compiled as
+           [Clflags.config.flat_float_array] is true) gets compiled as
            itself. *)
          transl_exp ~scopes e
       | `Float_that_cannot_be_shortcut ->
           (* We don't need to wrap with Popaque: this forward
              block will never be shortcutted since it points to a float
-             and Config_settings.flat_float_array is true. *)
+             and Clflags.config.flat_float_array is true. *)
           Lprim(Pmakeblock(Obj.forward_tag, Immutable, None),
                 [transl_exp ~scopes e], of_location ~scopes e.exp_loc)
       | `Identifier `Forward_value ->

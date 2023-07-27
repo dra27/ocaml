@@ -73,7 +73,7 @@ let _ = add_directive "quit" (Directive_none dir_quit)
 (* To add a directory to the load path *)
 
 let dir_directory s =
-  let d = expand_stdlib Config_settings.standard_library_default s in
+  let d = expand_stdlib Clflags.config.standard_library_default s in
   Dll.add_path [d];
   let dir = Load_path.Dir.create d in
   Load_path.prepend_dir dir;
@@ -93,7 +93,7 @@ let _ = add_directive "directory" (Directive_string dir_directory)
 
 (* To remove a directory from the load path *)
 let dir_remove_directory s =
-  let d = expand_stdlib Config_settings.standard_library_default s in
+  let d = expand_stdlib Clflags.config.standard_library_default s in
   let keep id =
     match Load_path.find_uncap (Ident.name id ^ ".cmi") with
     | exception Not_found -> true

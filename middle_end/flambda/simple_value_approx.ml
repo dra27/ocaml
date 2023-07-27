@@ -553,7 +553,7 @@ let all_not_useful ts = List.for_all (fun t -> not (useful t)) ts
 
 let warn_on_mutation t =
   let flambda_invariant_checks =
-    Option.value ~default:Config_settings.with_flambda_invariants
+    Option.value ~default:Clflags.config.with_flambda_invariants
                  !Clflags.flambda_invariant_checks
   in
   if not flambda_invariant_checks then false

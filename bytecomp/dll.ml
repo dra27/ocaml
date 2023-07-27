@@ -52,8 +52,8 @@ let remove_path dirs =
 (* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
 
 let extract_dll_name file =
-  if Filename.check_suffix file Config_settings.ext_dll then
-    Filename.chop_suffix file Config_settings.ext_dll
+  if Filename.check_suffix file Clflags.config.ext_dll then
+    Filename.chop_suffix file Clflags.config.ext_dll
   else if String.length file >= 2 && String.sub file 0 2 = "-l" then
     "dll" ^ String.sub file 2 (String.length file - 2)
   else
@@ -63,7 +63,7 @@ let extract_dll_name file =
    Raise [Failure msg] in case of error. *)
 
 let open_dll mode name =
-  let name = name ^ Config_settings.ext_dll in
+  let name = name ^ Clflags.config.ext_dll in
   let fullname =
     try
       let fullname = Misc.find_in_path !search_path name in
@@ -145,7 +145,7 @@ let ld_conf_contents () =
   begin try
     let ic =
       let standard_library =
-        Misc.get_stdlib Config_settings.standard_library_default in
+        Misc.get_stdlib Clflags.config.standard_library_default in
       open_in (Filename.concat standard_library "ld.conf")
     in
     begin try
