@@ -319,5 +319,3 @@ let assemble_file infile outfile =
   let asm = Clflags.config.asm in
   Ccomp.command
     (asm ^ " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
-
-let init () = ()

@@ -409,8 +409,8 @@ let prologue_required fd =
 let assemble_file infile outfile =
   X86_proc.assemble_file infile outfile
 
-let init () =
-  if Clflags.config.with_frame_pointers then begin
+let () = Clflags.config_hook @@ fun config ->
+  if config.with_frame_pointers then
     num_available_registers.(0) <- 12
-  end else
+  else
     num_available_registers.(0) <- 13

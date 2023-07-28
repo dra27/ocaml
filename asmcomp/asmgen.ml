@@ -139,7 +139,6 @@ let rec regalloc ~ppf_dump round fd =
 let (++) x f = f x
 
 let compile_fundecl ~ppf_dump ~funcnames fd_cmm =
-  Proc.init ();
   Reg.reset();
   fd_cmm
   ++ Profile.record ~accumulate:true "cmm_invariants" (cmm_invariants ppf_dump)

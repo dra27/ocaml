@@ -230,5 +230,3 @@ let assemble_file infile outfile =
   Ccomp.command (Clflags.config.asm ^ " " ^
                  (String.concat " " (Ccomp.debug_prefix_map_flags ())) ^
                  " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
-
-let init () = ()
