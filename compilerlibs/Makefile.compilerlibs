@@ -197,14 +197,34 @@ ARCH_SPECIFIC_ASMCOMP = $(INTEL_ASM)
 ARCH_SPECIFIC_ASMCOMP_CMI = $(INTEL_ASM_CMI)
 endif
 
+# Backend-specific modules shared by more than one backend
 ASMCOMP = \
-  $(ARCH_SPECIFIC_ASMCOMP) \
+  $(ARCH_SPECIFIC_ASMCOMP)
+# Core IR and platform-description modules
+ASMCOMP += \
   asmcomp/arch.cmo \
   asmcomp/cmm.cmo \
-  asmcomp/printcmm.cmo \
   asmcomp/reg.cmo \
   asmcomp/mach.cmo \
-  asmcomp/proc.cmo \
+  asmcomp/linear.cmo \
+  asmcomp/proc.cmo
+# Architecture-specific implementations and support modules
+ASMCOMP += \
+  asmcomp/CSEgen.cmo \
+  asmcomp/CSE.cmo \
+  asmcomp/reloadgen.cmo \
+  asmcomp/reload.cmo \
+  asmcomp/schedgen.cmo \
+  asmcomp/scheduling.cmo \
+  asmcomp/branch_relaxation.cmo \
+  asmcomp/emitaux.cmo \
+  asmcomp/emit.cmo \
+  asmcomp/dataflow.cmo \
+  asmcomp/polling.cmo \
+  asmcomp/selectgen.cmo \
+  asmcomp/selection.cmo
+# Cmm and the rest of ocamlopt
+ASMCOMP += \
   asmcomp/strmatch.cmo \
   asmcomp/cmmgen_state.cmo \
   asmcomp/cmm_helpers.cmo \
@@ -213,32 +233,19 @@ ASMCOMP = \
   asmcomp/cmmgen.cmo \
   asmcomp/cmm_invariants.cmo \
   asmcomp/interval.cmo \
-  asmcomp/printmach.cmo \
-  asmcomp/dataflow.cmo \
-  asmcomp/polling.cmo \
-  asmcomp/selectgen.cmo \
-  asmcomp/selection.cmo \
   asmcomp/comballoc.cmo \
-  asmcomp/CSEgen.cmo \
-  asmcomp/CSE.cmo \
-  asmcomp/liveness.cmo \
   asmcomp/spill.cmo \
   asmcomp/split.cmo \
   asmcomp/interf.cmo \
   asmcomp/coloring.cmo \
   asmcomp/linscan.cmo \
-  asmcomp/reloadgen.cmo \
-  asmcomp/reload.cmo \
   asmcomp/deadcode.cmo \
-  asmcomp/linear.cmo \
-  asmcomp/printlinear.cmo \
   asmcomp/linearize.cmo \
   file_formats/linear_format.cmo \
-  asmcomp/schedgen.cmo \
-  asmcomp/scheduling.cmo \
-  asmcomp/branch_relaxation.cmo \
-  asmcomp/emitaux.cmo \
-  asmcomp/emit.cmo \
+  asmcomp/printcmm.cmo \
+  asmcomp/printmach.cmo \
+  asmcomp/printlinear.cmo \
+  asmcomp/liveness.cmo \
   asmcomp/asmgen.cmo \
   asmcomp/asmlink.cmo \
   asmcomp/asmlibrarian.cmo \
