@@ -215,14 +215,36 @@ intel_SOURCES = \
   x86_gas.mli x86_gas.ml \
   x86_masm.mli x86_masm.ml
 
+# Backend-specific modules shared by more than one backend
 asmcomp_SOURCES = \
-  $(addprefix asmcomp/, $(arch_specific_SOURCES)) \
+  $(addprefix asmcomp/, $(arch_specific_SOURCES))
+# Core IR and platform-description modules
+asmcomp_SOURCES += \
   asmcomp/arch.mli asmcomp/arch.ml \
   asmcomp/cmm.mli asmcomp/cmm.ml \
-  asmcomp/printcmm.mli asmcomp/printcmm.ml \
   asmcomp/reg.mli asmcomp/reg.ml \
   asmcomp/mach.mli asmcomp/mach.ml \
-  asmcomp/proc.mli asmcomp/proc.ml \
+  asmcomp/linear.mli asmcomp/linear.ml \
+  asmcomp/proc.mli asmcomp/proc.ml
+# Architecture-specific implementations and support modules
+asmcomp_SOURCES += \
+  asmcomp/dataflow.mli asmcomp/dataflow.ml \
+  asmcomp/polling.mli asmcomp/polling.ml \
+  asmcomp/selectgen.mli asmcomp/selectgen.ml \
+  asmcomp/selection.mli asmcomp/selection.ml \
+  asmcomp/CSEgen.mli asmcomp/CSEgen.ml \
+  asmcomp/CSE.mli asmcomp/CSE.ml \
+  asmcomp/reloadgen.mli asmcomp/reloadgen.ml \
+  asmcomp/reload.mli asmcomp/reload.ml \
+  asmcomp/stackframegen.mli asmcomp/stackframegen.ml \
+  asmcomp/stackframe.mli asmcomp/stackframe.ml \
+  asmcomp/schedgen.mli asmcomp/schedgen.ml \
+  asmcomp/scheduling.mli asmcomp/scheduling.ml \
+  asmcomp/branch_relaxation.mli asmcomp/branch_relaxation.ml \
+  asmcomp/emitaux.mli asmcomp/emitaux.ml \
+  asmcomp/emit.mli asmcomp/emit.ml \
+# Cmm and the rest of ocamlopt
+asmcomp_SOURCES += \
   asmcomp/strmatch.mli asmcomp/strmatch.ml \
   asmcomp/cmmgen_state.mli asmcomp/cmmgen_state.ml \
   asmcomp/cmm_helpers.mli asmcomp/cmm_helpers.ml \
@@ -231,34 +253,19 @@ asmcomp_SOURCES = \
   asmcomp/cmmgen.mli asmcomp/cmmgen.ml \
   asmcomp/cmm_invariants.mli asmcomp/cmm_invariants.ml \
   asmcomp/interval.mli asmcomp/interval.ml \
-  asmcomp/printmach.mli asmcomp/printmach.ml \
-  asmcomp/dataflow.mli asmcomp/dataflow.ml \
-  asmcomp/polling.mli asmcomp/polling.ml \
-  asmcomp/selectgen.mli asmcomp/selectgen.ml \
-  asmcomp/selection.mli asmcomp/selection.ml \
   asmcomp/comballoc.mli asmcomp/comballoc.ml \
-  asmcomp/CSEgen.mli asmcomp/CSEgen.ml \
-  asmcomp/CSE.mli asmcomp/CSE.ml \
-  asmcomp/liveness.mli asmcomp/liveness.ml \
   asmcomp/spill.mli asmcomp/spill.ml \
   asmcomp/split.mli asmcomp/split.ml \
   asmcomp/interf.mli asmcomp/interf.ml \
   asmcomp/coloring.mli asmcomp/coloring.ml \
   asmcomp/linscan.mli asmcomp/linscan.ml \
-  asmcomp/reloadgen.mli asmcomp/reloadgen.ml \
-  asmcomp/reload.mli asmcomp/reload.ml \
   asmcomp/deadcode.mli asmcomp/deadcode.ml \
-  asmcomp/stackframegen.mli asmcomp/stackframegen.ml \
-  asmcomp/stackframe.mli asmcomp/stackframe.ml \
-  asmcomp/linear.mli asmcomp/linear.ml \
-  asmcomp/printlinear.mli asmcomp/printlinear.ml \
   asmcomp/linearize.mli asmcomp/linearize.ml \
   file_formats/linear_format.mli file_formats/linear_format.ml \
-  asmcomp/schedgen.mli asmcomp/schedgen.ml \
-  asmcomp/scheduling.mli asmcomp/scheduling.ml \
-  asmcomp/branch_relaxation.mli asmcomp/branch_relaxation.ml \
-  asmcomp/emitaux.mli asmcomp/emitaux.ml \
-  asmcomp/emit.mli asmcomp/emit.ml \
+  asmcomp/printcmm.mli asmcomp/printcmm.ml \
+  asmcomp/printmach.mli asmcomp/printmach.ml \
+  asmcomp/printlinear.mli asmcomp/printlinear.ml \
+  asmcomp/liveness.mli asmcomp/liveness.ml \
   asmcomp/asmgen.mli asmcomp/asmgen.ml \
   asmcomp/asmlink.mli asmcomp/asmlink.ml \
   asmcomp/asmlibrarian.mli asmcomp/asmlibrarian.ml \
