@@ -51,7 +51,7 @@ val black_closure_header : int -> nativeint
 val infix_header : int -> nativeint
 
 (** Header for a boxed float value *)
-val float_header : nativeint
+val float_header : unit -> nativeint
 
 (** Header for an unboxed float array of the given size *)
 val floatarray_header : int -> nativeint
@@ -61,7 +61,7 @@ val string_header : int -> nativeint
 
 (** Boxed integer headers *)
 val boxedint32_header : nativeint
-val boxedint64_header : nativeint
+val boxedint64_header : unit -> nativeint
 val boxedintnat_header : nativeint
 
 (** Closure info for a closure of given arity and distance to environment *)

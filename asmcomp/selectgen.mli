@@ -27,8 +27,6 @@ val env_add
 
 val env_find : Backend_var.t -> environment -> Reg.t array
 
-val size_expr : environment -> Cmm.expression -> int
-
 module Effect : sig
   type t =
     | None

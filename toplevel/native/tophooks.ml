@@ -39,27 +39,6 @@ let dll_run dll entry =
           | Ok x -> Result x
           | Err s -> fatal_error ("Toploop.dll_run " ^ s)
 
-(* CR-soon trefis for mshinwell: copy/pasted from Optmain. Should it be shared
-   or?
-   mshinwell: It should be shared, but after 4.03. *)
-module Backend = struct
-  (* See backend_intf.mli. *)
-
-  let symbol_for_global' = Compilenv.symbol_for_global'
-  let closure_symbol = Compilenv.closure_symbol
-
-  let really_import_approx = Import_approx.really_import_approx
-  let import_symbol = Import_approx.import_symbol
-
-  let size_int = Arch.size_int
-  let big_endian = Arch.big_endian
-
-  let max_sensible_number_of_arguments =
-    (* The "-1" is to allow for a potential closure environment parameter. *)
-    Proc.max_arguments_for_tailcalls - 1
-end
-let backend = (module Backend : Backend_intf.S)
-
 let load ppf phrase_name program =
   let dll =
     if !Clflags.keep_asm_file then phrase_name ^ Clflags.config.ext_dll
@@ -70,6 +49,26 @@ let load ppf phrase_name program =
     if Clflags.config.flambda then Flambda_middle_end.lambda_to_clambda
     else Closure_middle_end.lambda_to_clambda
   in
+  (* CR-soon trefis for mshinwell: copy/pasted from Optmain. Should it be shared
+     or?
+     mshinwell: It should be shared, but after 4.03. *)
+  let module Backend = struct
+    (* See backend_intf.mli. *)
+
+    let symbol_for_global' = Compilenv.symbol_for_global'
+    let closure_symbol = Compilenv.closure_symbol
+
+    let really_import_approx = Import_approx.really_import_approx
+    let import_symbol = Import_approx.import_symbol
+
+    let size_int = Platform.info.size_int
+    let big_endian = Platform.info.big_endian
+
+    let max_sensible_number_of_arguments =
+      (* The "-1" is to allow for a potential closure environment parameter. *)
+      Platform.info.max_arguments_for_tailcalls - 1
+  end in
+  let backend = (module Backend : Backend_intf.S) in
   Asmgen.compile_implementation ~toplevel:need_symbol
     ~backend ~prefixname:filename
     ~middle_end ~ppf_dump:ppf program;

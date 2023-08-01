@@ -202,9 +202,10 @@ ASMCOMP = \
   $(ARCH_SPECIFIC_ASMCOMP)
 # Core IR and platform-description modules
 ASMCOMP += \
-  asmcomp/arch.cmo \
   asmcomp/cmm.cmo \
   asmcomp/reg.cmo \
+  asmcomp/arch.cmo \
+  asmcomp/platform.cmo \
   asmcomp/mach.cmo \
   asmcomp/linear.cmo \
   asmcomp/proc.cmo
