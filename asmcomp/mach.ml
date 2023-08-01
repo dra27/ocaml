@@ -100,18 +100,20 @@ type fundecl =
     fun_contains_calls: bool;
   }
 
-let rec dummy_instr =
-  { desc = Iend;
-    next = dummy_instr;
-    arg = [||];
-    res = [||];
-    dbg = Debuginfo.none;
-    live = Reg.Set.empty
-  }
+let dummy_instr () =
+  let rec dummy_instr =
+    { desc = Iend;
+      next = dummy_instr;
+      arg = [||];
+      res = [||];
+      dbg = Debuginfo.none;
+      live = Reg.Set.empty
+    }
+  in dummy_instr
 
 let end_instr () =
   { desc = Iend;
-    next = dummy_instr;
+    next = dummy_instr ();
     arg = [||];
     res = [||];
     dbg = Debuginfo.none;

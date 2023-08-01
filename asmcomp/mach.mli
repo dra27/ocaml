@@ -101,7 +101,7 @@ type fundecl =
     fun_contains_calls: bool;
   }
 
-val dummy_instr: instruction
+val dummy_instr : unit -> instruction
 val end_instr: unit -> instruction
 val instr_cons:
       instruction_desc -> Reg.t array -> Reg.t array -> instruction ->
