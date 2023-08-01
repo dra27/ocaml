@@ -19,6 +19,8 @@
 open Arch
 open Mach
 
+module Schedgen = Schedgen.Make(Arch)(Proc)
+
 class scheduler = object
 
 inherit Schedgen.scheduler_generic
