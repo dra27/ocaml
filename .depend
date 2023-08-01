@@ -2583,6 +2583,7 @@ asmcomp/cmm_helpers.cmo : \
     lambda/switch.cmi \
     asmcomp/strmatch.cmi \
     typing/primitive.cmi \
+    asmcomp/platform.cmi \
     utils/numbers.cmi \
     utils/misc.cmi \
     lambda/lambda.cmi \
@@ -2598,13 +2599,13 @@ asmcomp/cmm_helpers.cmo : \
     middle_end/clambda.cmi \
     middle_end/backend_var.cmi \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmi \
     asmcomp/cmm_helpers.cmi
 asmcomp/cmm_helpers.cmx : \
     utils/targetint.cmx \
     lambda/switch.cmx \
     asmcomp/strmatch.cmx \
     typing/primitive.cmx \
+    asmcomp/platform.cmx \
     utils/numbers.cmx \
     utils/misc.cmx \
     lambda/lambda.cmx \
@@ -2620,7 +2621,6 @@ asmcomp/cmm_helpers.cmx : \
     middle_end/clambda.cmx \
     middle_end/backend_var.cmx \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmx \
     asmcomp/cmm_helpers.cmi
 asmcomp/cmm_helpers.cmi : \
     utils/targetint.cmi \
@@ -2706,26 +2706,26 @@ asmcomp/cmmgen_state.cmi : \
     middle_end/clambda.cmi
 asmcomp/coloring.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     asmcomp/coloring.cmi
 asmcomp/coloring.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     asmcomp/coloring.cmi
 asmcomp/coloring.cmi :
 asmcomp/comballoc.cmo : \
     asmcomp/reg.cmi \
+    asmcomp/platform.cmi \
     asmcomp/mach.cmi \
     lambda/debuginfo.cmi \
     utils/config.cmi \
-    asmcomp/arch.cmi \
     asmcomp/comballoc.cmi
 asmcomp/comballoc.cmx : \
     asmcomp/reg.cmx \
+    asmcomp/platform.cmx \
     asmcomp/mach.cmx \
     lambda/debuginfo.cmx \
     utils/config.cmx \
-    asmcomp/arch.cmx \
     asmcomp/comballoc.cmi
 asmcomp/comballoc.cmi : \
     asmcomp/mach.cmi
@@ -2803,22 +2803,22 @@ asmcomp/emit.cmi : \
     asmcomp/linear.cmi \
     asmcomp/cmm.cmi
 asmcomp/emitaux.cmo : \
+    asmcomp/platform.cmi \
     asmcomp/emitenv.cmi \
     lambda/debuginfo.cmi \
     utils/config.cmi \
     middle_end/compilenv.cmi \
     asmcomp/cmm.cmi \
     utils/clflags.cmi \
-    asmcomp/arch.cmi \
     asmcomp/emitaux.cmi
 asmcomp/emitaux.cmx : \
+    asmcomp/platform.cmx \
     asmcomp/emitenv.cmi \
     lambda/debuginfo.cmx \
     utils/config.cmx \
     middle_end/compilenv.cmx \
     asmcomp/cmm.cmx \
     utils/clflags.cmx \
-    asmcomp/arch.cmx \
     asmcomp/emitaux.cmi
 asmcomp/emitaux.cmi : \
     asmcomp/linear.cmi \
@@ -2947,6 +2947,14 @@ asmcomp/mach.cmi : \
     asmcomp/cmm.cmi \
     parsing/asttypes.cmi \
     asmcomp/arch.cmi
+asmcomp/platform.cmo : \
+    asmcomp/reg.cmi \
+    asmcomp/platform.cmi
+asmcomp/platform.cmx : \
+    asmcomp/reg.cmx \
+    asmcomp/platform.cmi
+asmcomp/platform.cmi : \
+    asmcomp/reg.cmi
 asmcomp/polling.cmo : \
     utils/numbers.cmi \
     utils/misc.cmi \
@@ -3009,8 +3017,8 @@ asmcomp/printlinear.cmi : \
     asmcomp/linear.cmi
 asmcomp/printmach.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
     asmcomp/printcmm.cmi \
+    asmcomp/platform.cmi \
     asmcomp/mach.cmi \
     lambda/lambda.cmi \
     asmcomp/interval.cmi \
@@ -3021,8 +3029,8 @@ asmcomp/printmach.cmo : \
     asmcomp/printmach.cmi
 asmcomp/printmach.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
     asmcomp/printcmm.cmx \
+    asmcomp/platform.cmx \
     asmcomp/mach.cmx \
     lambda/lambda.cmx \
     asmcomp/interval.cmx \
@@ -3038,6 +3046,7 @@ asmcomp/printmach.cmi : \
 asmcomp/proc.cmo : \
     asmcomp/x86_proc.cmi \
     asmcomp/reg.cmi \
+    asmcomp/platform.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     utils/config.cmi \
@@ -3047,6 +3056,7 @@ asmcomp/proc.cmo : \
 asmcomp/proc.cmx : \
     asmcomp/x86_proc.cmx \
     asmcomp/reg.cmx \
+    asmcomp/platform.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     utils/config.cmx \
@@ -3243,20 +3253,20 @@ asmcomp/stackframegen.cmx : \
 asmcomp/stackframegen.cmi : \
     asmcomp/mach.cmi
 asmcomp/strmatch.cmo : \
+    asmcomp/platform.cmi \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
     middle_end/backend_var.cmi \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmi \
     asmcomp/strmatch.cmi
 asmcomp/strmatch.cmx : \
+    asmcomp/platform.cmx \
     lambda/lambda.cmx \
     lambda/debuginfo.cmx \
     asmcomp/cmm.cmx \
     middle_end/backend_var.cmx \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmx \
     asmcomp/strmatch.cmi
 asmcomp/strmatch.cmi : \
     lambda/debuginfo.cmi \
@@ -6325,7 +6335,7 @@ driver/optmain.cmi :
 driver/optmaindriver.cmo : \
     utils/warnings.cmi \
     utils/profile.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     driver/optcompile.cmi \
     driver/makedepend.cmi \
     driver/main_args.cmi \
@@ -6340,12 +6350,11 @@ driver/optmaindriver.cmo : \
     asmcomp/asmpackager.cmi \
     asmcomp/asmlink.cmi \
     asmcomp/asmlibrarian.cmi \
-    asmcomp/arch.cmi \
     driver/optmaindriver.cmi
 driver/optmaindriver.cmx : \
     utils/warnings.cmx \
     utils/profile.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     driver/optcompile.cmx \
     driver/makedepend.cmx \
     driver/main_args.cmx \
@@ -6360,7 +6369,6 @@ driver/optmaindriver.cmx : \
     asmcomp/asmpackager.cmx \
     asmcomp/asmlink.cmx \
     asmcomp/asmlibrarian.cmx \
-    asmcomp/arch.cmx \
     driver/optmaindriver.cmi
 driver/optmaindriver.cmi :
 driver/pparse.cmo : \
@@ -6852,7 +6860,7 @@ toplevel/native/topeval.cmi : \
     parsing/parsetree.cmi
 toplevel/native/tophooks.cmo : \
     toplevel/topcommon.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     utils/misc.cmi \
     lambda/lambda.cmi \
     middle_end/flambda/import_approx.cmi \
@@ -6865,11 +6873,10 @@ toplevel/native/tophooks.cmo : \
     middle_end/backend_intf.cmi \
     asmcomp/asmlink.cmi \
     asmcomp/asmgen.cmi \
-    asmcomp/arch.cmi \
     toplevel/native/tophooks.cmi
 toplevel/native/tophooks.cmx : \
     toplevel/topcommon.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     utils/misc.cmx \
     lambda/lambda.cmx \
     middle_end/flambda/import_approx.cmx \
@@ -6882,7 +6889,6 @@ toplevel/native/tophooks.cmx : \
     middle_end/backend_intf.cmi \
     asmcomp/asmlink.cmx \
     asmcomp/asmgen.cmx \
-    asmcomp/arch.cmx \
     toplevel/native/tophooks.cmi
 toplevel/native/tophooks.cmi : \
     toplevel/topcommon.cmi \

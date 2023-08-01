@@ -368,7 +368,7 @@ let is_unboxed_number_cmm ~strict cmm =
   in
   let rec aux = function
     | Cop(Calloc, [Cconst_natint (hdr, _); _], dbg)
-      when Nativeint.equal hdr float_header ->
+      when Nativeint.equal hdr (float_header ()) ->
         notify (Boxed (Boxed_float dbg, false))
     | Cop(Calloc, [Cconst_natint (hdr, _); Cconst_symbol (ops, _); _], dbg) ->
         if Nativeint.equal hdr boxedintnat_header
@@ -381,7 +381,7 @@ let is_unboxed_number_cmm ~strict cmm =
         then
           notify (Boxed (Boxed_integer (Pint32, dbg), false))
         else
-        if Nativeint.equal hdr boxedint64_header
+        if Nativeint.equal hdr (boxedint64_header ())
         && String.equal ops caml_int64_ops
         then
           notify (Boxed (Boxed_integer (Pint64, dbg), false))

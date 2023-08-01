@@ -34,7 +34,8 @@ let rec combine i allocstate =
       assert (List.length dbginfo = 1);
       begin match allocstate with
       | Pending_alloc {reg; dbginfos; totalsz}
-          when totalsz + sz <= (Config.max_young_wosize + 1) * Arch.size_addr ->
+          when totalsz + sz <= (Config.max_young_wosize + 1)
+                                 * Platform.info.size_addr ->
           let (next, state) =
            combine i.next
              (Pending_alloc { reg = i.res.(0);

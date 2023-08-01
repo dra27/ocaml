@@ -220,9 +220,10 @@ asmcomp_SOURCES = \
   $(addprefix asmcomp/, $(arch_specific_SOURCES))
 # Core IR and platform-description modules
 asmcomp_SOURCES += \
-  asmcomp/arch.mli asmcomp/arch.ml \
   asmcomp/cmm.mli asmcomp/cmm.ml \
   asmcomp/reg.mli asmcomp/reg.ml \
+  asmcomp/arch.mli asmcomp/arch.ml \
+  asmcomp/platform.mli asmcomp/platform.ml \
   asmcomp/mach.mli asmcomp/mach.ml \
   asmcomp/linear.mli asmcomp/linear.ml \
   asmcomp/proc.mli asmcomp/proc.ml

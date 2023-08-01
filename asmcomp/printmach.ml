@@ -31,7 +31,7 @@ let reg ppf r =
   begin match r.loc with
   | Unknown -> ()
   | Reg r ->
-      fprintf ppf "[%s]" (Proc.register_name r)
+      fprintf ppf "[%s]" (Platform.info.register_name r)
   | Stack(Local s) ->
       fprintf ppf "[s%i]" s
   | Stack(Incoming s) ->
