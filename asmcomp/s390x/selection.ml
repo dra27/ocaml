@@ -62,6 +62,8 @@ let pseudoregs_for_operation op arg res =
 let is_immediate n = n <= 0x7FFF_FFFF && n >= -0x8000_0000
 let is_immediate_logical n = n <= 0xFFFF_FFFF && n >= 0
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object (self)
 
 inherit Selectgen.selector_generic as super

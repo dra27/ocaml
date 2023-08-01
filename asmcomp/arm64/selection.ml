@@ -61,6 +61,8 @@ let is_stack_slot rv =
 
 (* Instruction selection *)
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object(self)
 
 inherit Selectgen.selector_generic as super

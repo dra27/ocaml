@@ -23,6 +23,7 @@ type op_class =
   | Op_store of bool  (* memory store, false = init, true = assign *)
   | Op_other   (* anything else that does not allocate nor store in memory *)
 
+module Make (_: module type of Proc) : sig
   class cse_generic : object
     (* The following methods can be overridden to handle processor-specific
        operations. *)
@@ -36,3 +37,4 @@ type op_class =
     method fundecl: Mach.fundecl -> Mach.fundecl
 
   end
+end

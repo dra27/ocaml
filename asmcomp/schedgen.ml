@@ -19,6 +19,8 @@ open Reg
 open Mach
 open Linear
 
+module Make (Arch : module type of struct include Arch end)
+            (Proc : module type of Proc) = struct
   (* Representation of the code DAG. *)
 
   type code_dag_node = {
@@ -404,3 +406,4 @@ open Linear
       f
 
   end
+end

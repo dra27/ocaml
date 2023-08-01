@@ -214,6 +214,7 @@ let insert_move srcs dsts i =
          let i1 = array_fold2 insert_single_move i tmps dsts in
          array_fold2 insert_single_move i1 srcs tmps
 
+module Make (Proc : module type of Proc) = struct
   class cse_generic = object (self)
 
   (* Default classification of operations.  Can be overridden in
@@ -373,3 +374,4 @@ let insert_move srcs dsts i =
       {f with fun_body = self#cse empty_numbering f.fun_body }
 
   end
+end

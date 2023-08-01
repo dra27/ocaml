@@ -27,6 +27,9 @@ val env_add
 
 val env_find : Backend_var.t -> environment -> Reg.t array
 
+module Make (_ : module type of struct include Arch end)
+            (_ : module type of Proc) : sig
+
   val size_expr : environment -> Cmm.expression -> int
 
   module Effect : sig
@@ -143,3 +146,4 @@ val env_find : Backend_var.t -> environment -> Reg.t array
   end
 
   val reset : unit -> unit
+end

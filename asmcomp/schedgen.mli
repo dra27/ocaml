@@ -15,15 +15,8 @@
 
 (* Instruction scheduling *)
 
-type code_dag_node =
-  { instr: Linear.instruction;
-    delay: int;
-    mutable sons: (code_dag_node * int) list;
-    mutable date: int;
-    mutable length: int;
-    mutable ancestors: int;
-    mutable emitted_ancestors: int }
-
+module Make (_ : module type of struct include Arch end)
+            (_ : module type of Proc) : sig
   class virtual scheduler_generic : object
     (* Can be overridden by processor description *)
     method virtual oper_issue_cycles : Mach.operation -> int
@@ -46,3 +39,4 @@ type code_dag_node =
     (* Entry point *)
     method schedule_fundecl : Linear.fundecl -> Linear.fundecl
   end
+end

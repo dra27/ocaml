@@ -64,6 +64,11 @@ let env_empty = {
 
   (* Infer the type of the result of an operation *)
 
+module Make (Arch : module type of struct include Arch end)
+            (Proc : module type of Proc) = struct
+
+  (* Infer the type of the result of an operation *)
+
   let oper_result_type = function
       Capply ty -> ty
     | Cextcall(_s, ty_res, _ty_args, _alloc) -> ty_res
@@ -1175,3 +1180,4 @@ let env_empty = {
 
   let reset () =
     current_function_name := ""
+end

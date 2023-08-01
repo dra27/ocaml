@@ -140,6 +140,8 @@ let is_immediate_natint n = n <= 0x7FFF_FFFFn && n >= -0x8000_0000n
 
 (* The selector class *)
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object (self)
 
 inherit Selectgen.selector_generic as super

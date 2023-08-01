@@ -2258,11 +2258,13 @@ bytecomp/symtable.cmi : \
     typing/ident.cmi \
     file_formats/cmo_format.cmi
 asmcomp/CSE.cmo : \
+    asmcomp/proc.cmi \
     asmcomp/mach.cmi \
     asmcomp/CSEgen.cmi \
     asmcomp/arch.cmi \
     asmcomp/CSE.cmi
 asmcomp/CSE.cmx : \
+    asmcomp/proc.cmx \
     asmcomp/mach.cmx \
     asmcomp/CSEgen.cmx \
     asmcomp/arch.cmx \
@@ -2284,6 +2286,7 @@ asmcomp/CSEgen.cmx : \
     parsing/asttypes.cmi \
     asmcomp/CSEgen.cmi
 asmcomp/CSEgen.cmi : \
+    asmcomp/proc.cmi \
     asmcomp/mach.cmi \
     parsing/asttypes.cmi
 asmcomp/afl_instrument.cmo : \
@@ -3128,8 +3131,10 @@ asmcomp/schedgen.cmx : \
     asmcomp/arch.cmx \
     asmcomp/schedgen.cmi
 asmcomp/schedgen.cmi : \
+    asmcomp/proc.cmi \
     asmcomp/mach.cmi \
-    asmcomp/linear.cmi
+    asmcomp/linear.cmi \
+    asmcomp/arch.cmi
 asmcomp/scheduling.cmo : \
     asmcomp/schedgen.cmi \
     asmcomp/scheduling.cmi
@@ -3168,6 +3173,7 @@ asmcomp/selectgen.cmx : \
     asmcomp/selectgen.cmi
 asmcomp/selectgen.cmi : \
     asmcomp/reg.cmi \
+    asmcomp/proc.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     lambda/debuginfo.cmi \
