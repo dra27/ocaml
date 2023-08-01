@@ -62,6 +62,81 @@ let env_empty = {
   static_exceptions = Int.Map.empty;
 }
 
+module Effect = struct
+  type t =
+    | None
+    | Raise
+    | Arbitrary
+
+  let join t1 t2 =
+    match t1, t2 with
+    | None, t2 -> t2
+    | t1, None -> t1
+    | Raise, Raise -> Raise
+    | Arbitrary, _ | _, Arbitrary -> Arbitrary
+
+  let pure = function
+    | None -> true
+    | Raise | Arbitrary -> false
+end
+
+module Coeffect = struct
+  type t =
+    | None
+    | Read_mutable
+    | Arbitrary
+
+  let join t1 t2 =
+    match t1, t2 with
+    | None, t2 -> t2
+    | t1, None -> t1
+    | Read_mutable, Read_mutable -> Read_mutable
+    | Arbitrary, _ | _, Arbitrary -> Arbitrary
+
+  let copure = function
+    | None -> true
+    | Read_mutable | Arbitrary -> false
+end
+
+module Effect_and_coeffect : sig
+  type t
+
+  val none : t
+  val arbitrary : t
+
+  val effect : t -> Effect.t
+  val coeffect : t -> Coeffect.t
+
+  val pure_and_copure : t -> bool
+
+  val effect_only : Effect.t -> t
+  val coeffect_only : Coeffect.t -> t
+
+  val join : t -> t -> t
+  val join_list_map : 'a list -> ('a -> t) -> t
+end = struct
+  type t = Effect.t * Coeffect.t
+
+  let none = Effect.None, Coeffect.None
+  let arbitrary = Effect.Arbitrary, Coeffect.Arbitrary
+
+  let effect (e, _ce) = e
+  let coeffect (_e, ce) = ce
+
+  let pure_and_copure (e, ce) = Effect.pure e && Coeffect.copure ce
+
+  let effect_only e = e, Coeffect.None
+  let coeffect_only ce = Effect.None, ce
+
+  let join (e1, ce1) (e2, ce2) =
+    Effect.join e1 e2, Coeffect.join ce1 ce2
+
+  let join_list_map xs f =
+    match xs with
+    | [] -> none
+    | x::xs -> List.fold_left (fun acc x -> join acc (f x)) (f x) xs
+end
+
 (* Infer the type of the result of an operation *)
 
 let oper_result_type = function
@@ -225,81 +300,6 @@ let join_array env rs =
 
 (* Name of function being compiled *)
 let current_function_name = ref ""
-
-module Effect = struct
-  type t =
-    | None
-    | Raise
-    | Arbitrary
-
-  let join t1 t2 =
-    match t1, t2 with
-    | None, t2 -> t2
-    | t1, None -> t1
-    | Raise, Raise -> Raise
-    | Arbitrary, _ | _, Arbitrary -> Arbitrary
-
-  let pure = function
-    | None -> true
-    | Raise | Arbitrary -> false
-end
-
-module Coeffect = struct
-  type t =
-    | None
-    | Read_mutable
-    | Arbitrary
-
-  let join t1 t2 =
-    match t1, t2 with
-    | None, t2 -> t2
-    | t1, None -> t1
-    | Read_mutable, Read_mutable -> Read_mutable
-    | Arbitrary, _ | _, Arbitrary -> Arbitrary
-
-  let copure = function
-    | None -> true
-    | Read_mutable | Arbitrary -> false
-end
-
-module Effect_and_coeffect : sig
-  type t
-
-  val none : t
-  val arbitrary : t
-
-  val effect : t -> Effect.t
-  val coeffect : t -> Coeffect.t
-
-  val pure_and_copure : t -> bool
-
-  val effect_only : Effect.t -> t
-  val coeffect_only : Coeffect.t -> t
-
-  val join : t -> t -> t
-  val join_list_map : 'a list -> ('a -> t) -> t
-end = struct
-  type t = Effect.t * Coeffect.t
-
-  let none = Effect.None, Coeffect.None
-  let arbitrary = Effect.Arbitrary, Coeffect.Arbitrary
-
-  let effect (e, _ce) = e
-  let coeffect (_e, ce) = ce
-
-  let pure_and_copure (e, ce) = Effect.pure e && Coeffect.copure ce
-
-  let effect_only e = e, Coeffect.None
-  let coeffect_only ce = Effect.None, ce
-
-  let join (e1, ce1) (e2, ce2) =
-    Effect.join e1 e2, Coeffect.join ce1 ce2
-
-  let join_list_map xs f =
-    match xs with
-    | [] -> none
-    | x::xs -> List.fold_left (fun acc x -> join acc (f x)) (f x) xs
-end
 
 (* The default instruction selection class *)
 
