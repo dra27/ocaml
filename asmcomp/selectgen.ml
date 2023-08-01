@@ -532,7 +532,7 @@ let env_empty = {
 
   method extract_onto o =
     let rec extract res i =
-      if i == dummy_instr
+      if i.next == i
         then res
         else extract {i with next = res} i.next in
       extract o instr_seq
