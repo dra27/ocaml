@@ -100,7 +100,7 @@ type fundecl =
     fun_num_stack_slots: int array;
   }
 
-val dummy_instr: instruction
+val dummy_instr : unit -> instruction
 val end_instr: unit -> instruction
 val instr_cons:
       instruction_desc -> Reg.t array -> Reg.t array -> instruction ->

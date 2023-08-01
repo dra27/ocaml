@@ -522,7 +522,7 @@ let env_empty = {
 
   (* Buffering of instruction sequences *)
 
-  val mutable instr_seq = dummy_instr
+  val mutable instr_seq = dummy_instr ()
 
   method insert_debug _env desc dbg arg res =
     instr_seq <- instr_cons_debug desc arg res dbg instr_seq
@@ -812,7 +812,7 @@ let env_empty = {
         r
 
   method private emit_sequence (env:environment) exp =
-    let s = {< instr_seq = dummy_instr >} in
+    let s = {< instr_seq = dummy_instr () >} in
     let r = s#emit_expr env exp in
     (r, s)
 
@@ -1130,7 +1130,7 @@ let env_empty = {
       self#emit_return env exp
 
   method private emit_tail_sequence env exp =
-    let s = {< instr_seq = dummy_instr >} in
+    let s = {< instr_seq = dummy_instr () >} in
     s#emit_tail env exp;
     s#extract
 
@@ -1150,7 +1150,7 @@ let env_empty = {
         f.Cmm.fun_args rargs env_empty in
     self#emit_tail env f.Cmm.fun_body;
     let body = self#extract in
-    instr_seq <- dummy_instr;
+    instr_seq <- dummy_instr ();
     self#insert_moves env loc_arg rarg;
     let polled_body =
       if Polling.requires_prologue_poll ~future_funcnames

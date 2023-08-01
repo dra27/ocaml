@@ -123,7 +123,7 @@ let insert_moves src dst next =
           (Icatch(rec_flag, new_handlers, self#reload body)) [||] [||]
           (self#reload i.next)
     | Iexit i ->
-        instr_cons (Iexit i) [||] [||] dummy_instr
+        instr_cons (Iexit i) [||] [||] (dummy_instr ())
     | Itrywith(body, handler) ->
         instr_cons (Itrywith(self#reload body, self#reload handler)) [||] [||]
           (self#reload i.next)
