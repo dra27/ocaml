@@ -77,13 +77,15 @@ let invert_test = function
 
 (* The "end" instruction *)
 
-let rec end_instr =
-  { desc = Lend;
-    next = end_instr;
-    arg = [||];
-    res = [||];
-    dbg = Debuginfo.none;
-    live = Reg.Set.empty }
+let end_instr () =
+  let rec end_instr =
+    { desc = Lend;
+      next = end_instr;
+      arg = [||];
+      res = [||];
+      dbg = Debuginfo.none;
+      live = Reg.Set.empty }
+  in end_instr
 
 (* Cons an instruction (live, debug empty) *)
 

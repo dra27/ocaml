@@ -43,7 +43,7 @@ and instruction_desc =
   | Lraise of Lambda.raise_kind
 
 val has_fallthrough :  instruction_desc -> bool
-val end_instr: instruction
+val end_instr: unit -> instruction
 val instr_cons:
   instruction_desc -> Reg.t array -> Reg.t array -> instruction -> instruction
 val invert_test: Mach.test -> Mach.test

@@ -32,10 +32,6 @@ open Linear
       mutable emitted_ancestors: int      (* Number of emitted ancestors *)
     }
 
-  let dummy_node =
-    { instr = end_instr; delay = 0; sons = []; date = 0;
-      length = -1; ancestors = 0; emitted_ancestors = 0 }
-
   (* The code dag itself is represented by two tables from registers to nodes:
      - "results" maps registers to the instructions that produced them;
      - "uses" maps registers to the instructions that use them.
@@ -328,6 +324,9 @@ open Linear
      This does not take multiple issues into account, though. *)
 
   method private ready_instruction date queue =
+    let dummy_node =
+      { instr = end_instr (); delay = 0; sons = []; date = 0;
+        length = -1; ancestors = 0; emitted_ancestors = 0 } in
     let rec extract best = function
       [] ->
         if best == dummy_node then None else Some best
