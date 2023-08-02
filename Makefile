@@ -222,8 +222,9 @@ asmcomp_SOURCES = \
 asmcomp_SOURCES += \
   asmcomp/cmm.mli asmcomp/cmm.ml \
   asmcomp/reg.mli asmcomp/reg.ml \
-  asmcomp/arch.mli asmcomp/arch.ml \
   asmcomp/platform.mli asmcomp/platform.ml \
+  asmcomp/operations.mli asmcomp/operations.ml \
+  asmcomp/arch.mli asmcomp/arch.ml \
   asmcomp/mach.mli asmcomp/mach.ml \
   asmcomp/linear.mli asmcomp/linear.ml \
   asmcomp/proc.mli asmcomp/proc.ml

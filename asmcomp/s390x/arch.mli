@@ -16,6 +16,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+include module type of Operations.S390x
+
 (* Specific operations for the Z processor *)
 
 (* Machine-specific command-line options *)
@@ -23,18 +25,6 @@
 val pic_code : bool ref
 
 val command_line_options : (string * Arg.spec * string) list
-
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-
-(* Addressing modes *)
-
-type addressing_mode =
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2 of int                    (* reg + reg + displ *)
 
 (* Sizes, endianness *)
 

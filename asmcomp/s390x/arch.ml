@@ -16,6 +16,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+include Operations.S390x
+
 (* Specific operations for the Z processor *)
 
 open Format
@@ -29,18 +31,6 @@ let command_line_options =
       " Generate position-independent machine code (default)";
     "-fno-PIC", Arg.Clear pic_code,
       " Generate position-dependent machine code" ]
-
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-
-(* Addressing modes *)
-
-type addressing_mode =
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2 of int                    (* reg + reg + displ *)
 
 (* Sizes, endianness *)
 

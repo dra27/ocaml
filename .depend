@@ -2308,18 +2308,21 @@ asmcomp/afl_instrument.cmi : \
     asmcomp/cmm.cmi
 asmcomp/arch.cmo : \
     asmcomp/x86_ast.cmi \
+    asmcomp/operations.cmi \
     lambda/lambda.cmi \
     utils/config.cmi \
     utils/clflags.cmi \
     asmcomp/arch.cmi
 asmcomp/arch.cmx : \
     asmcomp/x86_ast.cmi \
+    asmcomp/operations.cmx \
     lambda/lambda.cmx \
     utils/config.cmx \
     utils/clflags.cmx \
     asmcomp/arch.cmi
 asmcomp/arch.cmi : \
     asmcomp/x86_ast.cmi \
+    asmcomp/operations.cmi \
     lambda/lambda.cmi
 asmcomp/asmgen.cmo : \
     parsing/unit_info.cmi \
@@ -2950,6 +2953,14 @@ asmcomp/mach.cmi : \
     asmcomp/cmm.cmi \
     parsing/asttypes.cmi \
     asmcomp/arch.cmi
+asmcomp/operations.cmo : \
+    lambda/debuginfo.cmi \
+    asmcomp/operations.cmi
+asmcomp/operations.cmx : \
+    lambda/debuginfo.cmx \
+    asmcomp/operations.cmi
+asmcomp/operations.cmi : \
+    lambda/debuginfo.cmi
 asmcomp/platform.cmo : \
     asmcomp/reg.cmi \
     asmcomp/platform.cmi
