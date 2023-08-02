@@ -14,30 +14,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Specific operations for the PowerPC processor *)
+include module type of Operations.Power
 
-type cmm_label = int
-(* Do not introduce a dependency to Cmm *)
+(* Specific operations for the PowerPC processor *)
 
 (* Machine-specific command-line options *)
 
 val command_line_options : (string * Arg.spec * string) list
-
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-  | Ialloc_far of                       (* allocation in large functions *)
-      { bytes : int; dbginfo : Debuginfo.alloc_dbginfo }
-  | Ipoll_far of { return_label : cmm_label option }
-
-(* Addressing modes *)
-
-type addressing_mode =
-    Ibased of string * int              (* symbol + displ *)
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2                           (* reg + reg *)
 
 (* Sizes, endianness *)
 

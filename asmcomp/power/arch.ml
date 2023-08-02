@@ -14,32 +14,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+include Operations.Power
+
 (* Specific operations for the PowerPC processor *)
 
 open Format
 
-type cmm_label = int
-(* Do not introduce a dependency to Cmm *)
-
 (* Machine-specific command-line options *)
 
 let command_line_options = []
-
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-  | Ialloc_far of                       (* allocation in large functions *)
-      { bytes : int; dbginfo : Debuginfo.alloc_dbginfo }
-  | Ipoll_far of { return_label : cmm_label option }
-
-(* Addressing modes *)
-
-type addressing_mode =
-    Ibased of string * int              (* symbol + displ *)
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2                           (* reg + reg *)
 
 (* Sizes, endianness *)
 

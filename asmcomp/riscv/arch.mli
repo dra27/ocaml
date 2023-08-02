@@ -14,22 +14,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+include module type of Operations.Riscv
+
 (* Specific operations for the RISC-V processor *)
 
 (* Machine-specific command-line options *)
 
 val command_line_options : (string * Arg.spec * string) list
-
-(* Specific operations *)
-
-type specific_operation =
-  | Imultaddf of bool        (* multiply, optionally negate, and add *)
-  | Imultsubf of bool        (* multiply, optionally negate, and subtract *)
-
-(* Addressing modes *)
-
-type addressing_mode =
-  | Iindexed of int                     (* reg + displ *)
 
 val is_immediate : int -> bool
 

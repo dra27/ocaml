@@ -204,8 +204,9 @@ ASMCOMP = \
 ASMCOMP += \
   asmcomp/cmm.cmo \
   asmcomp/reg.cmo \
-  asmcomp/arch.cmo \
   asmcomp/platform.cmo \
+  asmcomp/operations.cmo \
+  asmcomp/arch.cmo \
   asmcomp/mach.cmo \
   asmcomp/linear.cmo \
   asmcomp/proc.cmo

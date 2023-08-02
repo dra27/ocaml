@@ -14,6 +14,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+include Operations.Riscv
+
 (* Specific operations for the RISC-V processor *)
 
 open Format
@@ -25,17 +27,6 @@ let command_line_options =
       " Generate position-independent machine code (default for shared code)";
     "-fno-PIC", Arg.Unit (fun () -> Clflags.pic_code := Some false),
       " Generate position-dependent machine code (default for static code)" ]
-
-(* Specific operations *)
-
-type specific_operation =
-  | Imultaddf of bool        (* multiply, optionally negate, and add *)
-  | Imultsubf of bool        (* multiply, optionally negate, and subtract *)
-
-(* Addressing modes *)
-
-type addressing_mode =
-  | Iindexed of int                     (* reg + displ *)
 
 let is_immediate n =
   (n <= 0x7FF) && (n >= -0x800)
