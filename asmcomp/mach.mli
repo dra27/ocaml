@@ -36,7 +36,7 @@ type test =
   | Ioddtest
   | Ieventest
 
-type operation =
+type ('am, 'so) gen_operation =
     Imove
   | Ispill
   | Ireload
@@ -53,10 +53,10 @@ type operation =
                   stack_ofs : int; }
   | Istackoffset of int
   | Iload of { memory_chunk : Cmm.memory_chunk;
-               addressing_mode : Arch.addressing_mode;
+               addressing_mode : 'am;
                mutability : Asttypes.mutable_flag;
                is_atomic : bool }
-  | Istore of Cmm.memory_chunk * Arch.addressing_mode * bool
+  | Istore of Cmm.memory_chunk * 'am * bool
                                  (* false = initialization, true = assignment *)
   | Ialloc of { bytes : int; dbginfo : Debuginfo.alloc_dbginfo; }
   | Iintop of integer_operation
@@ -65,10 +65,12 @@ type operation =
   | Inegf | Iabsf | Iaddf | Isubf | Imulf | Idivf
   | Ifloatofint | Iintoffloat
   | Iopaque
-  | Ispecific of Arch.specific_operation
+  | Ispecific of 'so
   | Ipoll of { return_label: Cmm.label option }
   | Idls_get
   | Ireturn_addr (** Retrieve the return address from the stack frame *)
+
+type operation = (Arch.addressing_mode, Arch.specific_operation) gen_operation
 
 type instruction =
   { desc: instruction_desc;
