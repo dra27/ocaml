@@ -13,6 +13,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open (val Platform.info.backend : Platform.Backend)
+
 let write_asm_file = ref false
 
 let compile_file filename =

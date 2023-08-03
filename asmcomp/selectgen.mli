@@ -27,7 +27,7 @@ val env_add
 
 val env_find : Backend_var.t -> environment -> Reg.t array
 
-module Make (Arch : Operations.S) (_ : module type of Proc) : sig
+module Make (Arch : Operations.S) (_ : module type of Processor) : sig
   type operation =
     (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
 

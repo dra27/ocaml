@@ -2249,23 +2249,9 @@ bytecomp/symtable.cmi : \
     lambda/lambda.cmi \
     typing/ident.cmi \
     file_formats/cmo_format.cmi
-asmcomp/CSE.cmo : \
-    asmcomp/proc.cmi \
-    asmcomp/mach.cmi \
-    asmcomp/CSEgen.cmi \
-    asmcomp/arch.cmi \
-    asmcomp/CSE.cmi
-asmcomp/CSE.cmx : \
-    asmcomp/proc.cmx \
-    asmcomp/mach.cmx \
-    asmcomp/CSEgen.cmx \
-    asmcomp/arch.cmx \
-    asmcomp/CSE.cmi
-asmcomp/CSE.cmi : \
-    asmcomp/mach.cmi
 asmcomp/CSEgen.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     asmcomp/cmm.cmi \
@@ -2273,14 +2259,14 @@ asmcomp/CSEgen.cmo : \
     asmcomp/CSEgen.cmi
 asmcomp/CSEgen.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmx \
     asmcomp/mach.cmx \
     asmcomp/cmm.cmx \
     parsing/asttypes.cmi \
     asmcomp/CSEgen.cmi
 asmcomp/CSEgen.cmi : \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     parsing/asttypes.cmi
@@ -2301,32 +2287,16 @@ asmcomp/afl_instrument.cmx : \
 asmcomp/afl_instrument.cmi : \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi
-asmcomp/arch.cmo : \
-    asmcomp/x86_ast.cmi \
-    asmcomp/operations.cmi \
-    lambda/lambda.cmi \
-    utils/clflags.cmi \
-    asmcomp/arch.cmi
-asmcomp/arch.cmx : \
-    asmcomp/x86_ast.cmi \
-    asmcomp/operations.cmx \
-    lambda/lambda.cmx \
-    utils/clflags.cmx \
-    asmcomp/arch.cmi
-asmcomp/arch.cmi : \
-    asmcomp/x86_ast.cmi \
-    asmcomp/operations.cmi \
-    lambda/lambda.cmi
+asmcomp/amd64.cmo :
+asmcomp/amd64.cmx :
+asmcomp/arm64.cmo :
+asmcomp/arm64.cmx :
 asmcomp/asmgen.cmo : \
     lambda/translmod.cmi \
     asmcomp/split.cmi \
     asmcomp/spill.cmi \
-    asmcomp/selection.cmi \
-    asmcomp/scheduling.cmi \
-    asmcomp/reload.cmi \
     asmcomp/reg.cmi \
     utils/profile.cmi \
-    asmcomp/proc.cmi \
     asmcomp/printmach.cmi \
     asmcomp/printlinear.cmi \
     asmcomp/printcmm.cmi \
@@ -2346,7 +2316,6 @@ asmcomp/asmgen.cmo : \
     asmcomp/interf.cmi \
     typing/ident.cmi \
     asmcomp/emitaux.cmi \
-    asmcomp/emit.cmi \
     asmcomp/default.cmi \
     asmcomp/deadcode.cmi \
     middle_end/compilenv.cmi \
@@ -2358,19 +2327,14 @@ asmcomp/asmgen.cmo : \
     asmcomp/cmm.cmi \
     utils/clflags.cmi \
     middle_end/clambda.cmi \
-    asmcomp/CSE.cmi \
     middle_end/backend_intf.cmi \
     asmcomp/asmgen.cmi
 asmcomp/asmgen.cmx : \
     lambda/translmod.cmx \
     asmcomp/split.cmx \
     asmcomp/spill.cmx \
-    asmcomp/selection.cmx \
-    asmcomp/scheduling.cmx \
-    asmcomp/reload.cmx \
     asmcomp/reg.cmx \
     utils/profile.cmx \
-    asmcomp/proc.cmx \
     asmcomp/printmach.cmx \
     asmcomp/printlinear.cmx \
     asmcomp/printcmm.cmx \
@@ -2390,7 +2354,6 @@ asmcomp/asmgen.cmx : \
     asmcomp/interf.cmx \
     typing/ident.cmx \
     asmcomp/emitaux.cmx \
-    asmcomp/emit.cmx \
     asmcomp/default.cmx \
     asmcomp/deadcode.cmx \
     middle_end/compilenv.cmx \
@@ -2402,7 +2365,6 @@ asmcomp/asmgen.cmx : \
     asmcomp/cmm.cmx \
     utils/clflags.cmx \
     middle_end/clambda.cmx \
-    asmcomp/CSE.cmx \
     middle_end/backend_intf.cmi \
     asmcomp/asmgen.cmi
 asmcomp/asmgen.cmi : \
@@ -2442,11 +2404,11 @@ asmcomp/asmlink.cmo : \
     asmcomp/thread_sanitizer.cmi \
     lambda/runtimedef.cmi \
     utils/profile.cmi \
+    asmcomp/platform.cmi \
     utils/misc.cmi \
     parsing/location.cmi \
     utils/load_path.cmi \
     asmcomp/emitaux.cmi \
-    asmcomp/emit.cmi \
     utils/consistbl.cmi \
     middle_end/compilenv.cmi \
     file_formats/cmx_format.cmi \
@@ -2460,11 +2422,11 @@ asmcomp/asmlink.cmx : \
     asmcomp/thread_sanitizer.cmx \
     lambda/runtimedef.cmx \
     utils/profile.cmx \
+    asmcomp/platform.cmx \
     utils/misc.cmx \
     parsing/location.cmx \
     utils/load_path.cmx \
     asmcomp/emitaux.cmx \
-    asmcomp/emit.cmx \
     utils/consistbl.cmx \
     middle_end/compilenv.cmx \
     file_formats/cmx_format.cmi \
@@ -2742,74 +2704,21 @@ asmcomp/deadcode.cmx : \
 asmcomp/deadcode.cmi : \
     asmcomp/mach.cmi
 asmcomp/default.cmo : \
-    asmcomp/selection.cmi \
-    asmcomp/scheduling.cmi \
-    asmcomp/reload.cmi \
-    asmcomp/proc.cmi \
-    asmcomp/emit.cmi \
-    asmcomp/CSE.cmi \
-    asmcomp/arch.cmi \
+    asmcomp/s390x.cmo \
+    asmcomp/riscv.cmo \
+    asmcomp/power.cmo \
+    asmcomp/arm64.cmo \
+    asmcomp/amd64.cmo \
     asmcomp/default.cmi
 asmcomp/default.cmx : \
-    asmcomp/selection.cmx \
-    asmcomp/scheduling.cmx \
-    asmcomp/reload.cmx \
-    asmcomp/proc.cmx \
-    asmcomp/emit.cmx \
-    asmcomp/CSE.cmx \
-    asmcomp/arch.cmx \
+    asmcomp/s390x.cmx \
+    asmcomp/riscv.cmx \
+    asmcomp/power.cmx \
+    asmcomp/arm64.cmx \
+    asmcomp/amd64.cmx \
     asmcomp/default.cmi
 asmcomp/default.cmi : \
     asmcomp/platform.cmi
-asmcomp/emit.cmo : \
-    asmcomp/x86_proc.cmi \
-    asmcomp/x86_masm.cmi \
-    asmcomp/x86_gas.cmi \
-    asmcomp/x86_dsl.cmi \
-    asmcomp/x86_ast.cmi \
-    asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
-    utils/numbers.cmi \
-    utils/misc.cmi \
-    asmcomp/mach.cmi \
-    asmcomp/linear.cmi \
-    lambda/lambda.cmi \
-    asmcomp/emitenv.cmi \
-    asmcomp/emitaux.cmi \
-    utils/domainstate.cmi \
-    utils/config_constants.cmi \
-    middle_end/compilenv.cmi \
-    asmcomp/cmm.cmi \
-    utils/clflags.cmi \
-    asmcomp/branch_relaxation.cmi \
-    asmcomp/arch.cmi \
-    asmcomp/emit.cmi
-asmcomp/emit.cmx : \
-    asmcomp/x86_proc.cmx \
-    asmcomp/x86_masm.cmx \
-    asmcomp/x86_gas.cmx \
-    asmcomp/x86_dsl.cmx \
-    asmcomp/x86_ast.cmi \
-    asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
-    utils/numbers.cmx \
-    utils/misc.cmx \
-    asmcomp/mach.cmx \
-    asmcomp/linear.cmx \
-    lambda/lambda.cmx \
-    asmcomp/emitenv.cmi \
-    asmcomp/emitaux.cmx \
-    utils/domainstate.cmx \
-    utils/config_constants.cmx \
-    middle_end/compilenv.cmx \
-    asmcomp/cmm.cmx \
-    utils/clflags.cmx \
-    asmcomp/branch_relaxation.cmx \
-    asmcomp/arch.cmx \
-    asmcomp/emit.cmi
-asmcomp/emit.cmi : \
-    asmcomp/linear.cmi \
-    asmcomp/cmm.cmi
 asmcomp/emitaux.cmo : \
     asmcomp/platform.cmi \
     asmcomp/linear.cmi \
@@ -2836,13 +2745,13 @@ asmcomp/emitenv.cmi : \
     asmcomp/linear.cmi
 asmcomp/interf.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     asmcomp/mach.cmi \
     asmcomp/cmm.cmi \
     asmcomp/interf.cmi
 asmcomp/interf.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     asmcomp/mach.cmx \
     asmcomp/cmm.cmx \
     asmcomp/interf.cmi
@@ -2850,12 +2759,12 @@ asmcomp/interf.cmi : \
     asmcomp/mach.cmi
 asmcomp/interval.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     asmcomp/mach.cmi \
     asmcomp/interval.cmi
 asmcomp/interval.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     asmcomp/mach.cmx \
     asmcomp/interval.cmi
 asmcomp/interval.cmi : \
@@ -2886,7 +2795,7 @@ asmcomp/linear.cmi : \
     asmcomp/cmm.cmi
 asmcomp/linearize.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     asmcomp/linear.cmi \
@@ -2895,7 +2804,7 @@ asmcomp/linearize.cmo : \
     asmcomp/linearize.cmi
 asmcomp/linearize.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     asmcomp/linear.cmx \
@@ -2907,28 +2816,28 @@ asmcomp/linearize.cmi : \
     asmcomp/linear.cmi
 asmcomp/linscan.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     asmcomp/interval.cmi \
     asmcomp/linscan.cmi
 asmcomp/linscan.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     asmcomp/interval.cmx \
     asmcomp/linscan.cmi
 asmcomp/linscan.cmi : \
     asmcomp/interval.cmi
 asmcomp/liveness.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
     asmcomp/printmach.cmi \
+    asmcomp/platform.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     asmcomp/dataflow.cmi \
     asmcomp/liveness.cmi
 asmcomp/liveness.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
     asmcomp/printmach.cmx \
+    asmcomp/platform.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     asmcomp/dataflow.cmx \
@@ -2968,7 +2877,7 @@ asmcomp/operations.cmi : \
     lambda/debuginfo.cmi
 asmcomp/platform.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
@@ -2976,11 +2885,10 @@ asmcomp/platform.cmo : \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
-    asmcomp/arch.cmi \
     asmcomp/platform.cmi
 asmcomp/platform.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
@@ -2988,17 +2896,15 @@ asmcomp/platform.cmx : \
     lambda/lambda.cmx \
     lambda/debuginfo.cmx \
     asmcomp/cmm.cmx \
-    asmcomp/arch.cmx \
     asmcomp/platform.cmi
 asmcomp/platform.cmi : \
-    asmcomp/selection.cmi \
-    asmcomp/scheduling.cmi \
-    asmcomp/reload.cmi \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
-    asmcomp/emit.cmi \
-    asmcomp/CSE.cmi
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    asmcomp/cmm.cmi
 asmcomp/polling.cmo : \
     utils/numbers.cmi \
     utils/misc.cmi \
@@ -3020,6 +2926,8 @@ asmcomp/polling.cmx : \
 asmcomp/polling.cmi : \
     utils/misc.cmi \
     asmcomp/mach.cmi
+asmcomp/power.cmo :
+asmcomp/power.cmx :
 asmcomp/printcmm.cmo : \
     utils/targetint.cmi \
     lambda/lambda.cmi \
@@ -3087,25 +2995,7 @@ asmcomp/printmach.cmi : \
     asmcomp/reg.cmi \
     asmcomp/mach.cmi \
     asmcomp/interval.cmi
-asmcomp/proc.cmo : \
-    asmcomp/x86_proc.cmi \
-    asmcomp/reg.cmi \
-    utils/misc.cmi \
-    asmcomp/mach.cmi \
-    asmcomp/cmm.cmi \
-    utils/clflags.cmi \
-    asmcomp/arch.cmi \
-    asmcomp/proc.cmi
-asmcomp/proc.cmx : \
-    asmcomp/x86_proc.cmx \
-    asmcomp/reg.cmx \
-    utils/misc.cmx \
-    asmcomp/mach.cmx \
-    asmcomp/cmm.cmx \
-    utils/clflags.cmx \
-    asmcomp/arch.cmx \
-    asmcomp/proc.cmi
-asmcomp/proc.cmi : \
+asmcomp/processor.cmi : \
     asmcomp/reg.cmi \
     asmcomp/mach.cmi \
     asmcomp/cmm.cmi
@@ -3120,26 +3010,6 @@ asmcomp/reg.cmx : \
 asmcomp/reg.cmi : \
     asmcomp/cmm.cmi \
     middle_end/backend_var.cmi
-asmcomp/reload.cmo : \
-    asmcomp/x86_proc.cmi \
-    asmcomp/reloadgen.cmi \
-    asmcomp/reg.cmi \
-    asmcomp/mach.cmi \
-    asmcomp/cmm.cmi \
-    utils/clflags.cmi \
-    asmcomp/arch.cmi \
-    asmcomp/reload.cmi
-asmcomp/reload.cmx : \
-    asmcomp/x86_proc.cmx \
-    asmcomp/reloadgen.cmx \
-    asmcomp/reg.cmx \
-    asmcomp/mach.cmx \
-    asmcomp/cmm.cmx \
-    utils/clflags.cmx \
-    asmcomp/arch.cmx \
-    asmcomp/reload.cmi
-asmcomp/reload.cmi : \
-    asmcomp/mach.cmi
 asmcomp/reloadgen.cmo : \
     asmcomp/reg.cmi \
     asmcomp/operations.cmi \
@@ -3156,9 +3026,13 @@ asmcomp/reloadgen.cmi : \
     asmcomp/reg.cmi \
     asmcomp/operations.cmi \
     asmcomp/mach.cmi
+asmcomp/riscv.cmo :
+asmcomp/riscv.cmx :
+asmcomp/s390x.cmo :
+asmcomp/s390x.cmx :
 asmcomp/schedgen.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     asmcomp/linear.cmi \
@@ -3167,7 +3041,7 @@ asmcomp/schedgen.cmo : \
     asmcomp/schedgen.cmi
 asmcomp/schedgen.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmx \
     asmcomp/mach.cmx \
     asmcomp/linear.cmx \
@@ -3175,21 +3049,13 @@ asmcomp/schedgen.cmx : \
     utils/clflags.cmx \
     asmcomp/schedgen.cmi
 asmcomp/schedgen.cmi : \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     asmcomp/linear.cmi
-asmcomp/scheduling.cmo : \
-    asmcomp/schedgen.cmi \
-    asmcomp/scheduling.cmi
-asmcomp/scheduling.cmx : \
-    asmcomp/schedgen.cmx \
-    asmcomp/scheduling.cmi
-asmcomp/scheduling.cmi : \
-    asmcomp/linear.cmi
 asmcomp/selectgen.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/polling.cmi \
     asmcomp/operations.cmi \
     utils/numbers.cmi \
@@ -3204,7 +3070,7 @@ asmcomp/selectgen.cmo : \
     asmcomp/selectgen.cmi
 asmcomp/selectgen.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/processor.cmi \
     asmcomp/polling.cmx \
     asmcomp/operations.cmx \
     utils/numbers.cmx \
@@ -3219,7 +3085,7 @@ asmcomp/selectgen.cmx : \
     asmcomp/selectgen.cmi
 asmcomp/selectgen.cmi : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/processor.cmi \
     asmcomp/operations.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
@@ -3227,40 +3093,16 @@ asmcomp/selectgen.cmi : \
     asmcomp/cmm.cmi \
     middle_end/backend_var.cmi \
     parsing/asttypes.cmi
-asmcomp/selection.cmo : \
-    asmcomp/selectgen.cmi \
-    asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
-    utils/misc.cmi \
-    asmcomp/mach.cmi \
-    asmcomp/cmm.cmi \
-    utils/clflags.cmi \
-    asmcomp/arch.cmi \
-    asmcomp/selection.cmi
-asmcomp/selection.cmx : \
-    asmcomp/selectgen.cmx \
-    asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
-    utils/misc.cmx \
-    asmcomp/mach.cmx \
-    asmcomp/cmm.cmx \
-    utils/clflags.cmx \
-    asmcomp/arch.cmx \
-    asmcomp/selection.cmi
-asmcomp/selection.cmi : \
-    utils/misc.cmi \
-    asmcomp/mach.cmi \
-    asmcomp/cmm.cmi
 asmcomp/spill.cmo : \
     asmcomp/reg.cmi \
-    asmcomp/proc.cmi \
+    asmcomp/platform.cmi \
     asmcomp/mach.cmi \
     asmcomp/cmm.cmi \
     utils/clflags.cmi \
     asmcomp/spill.cmi
 asmcomp/spill.cmx : \
     asmcomp/reg.cmx \
-    asmcomp/proc.cmx \
+    asmcomp/platform.cmx \
     asmcomp/mach.cmx \
     asmcomp/cmm.cmx \
     utils/clflags.cmx \
@@ -6055,6 +5897,620 @@ middle_end/flambda/base_types/var_within_closure.cmx : \
     middle_end/flambda/base_types/var_within_closure.cmi
 middle_end/flambda/base_types/var_within_closure.cmi : \
     middle_end/flambda/base_types/closure_element.cmi
+asmcomp/amd64/CSE.cmo : \
+    asmcomp/amd64/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/CSEgen.cmi \
+    asmcomp/amd64/arch.cmi \
+    asmcomp/amd64/CSE.cmi
+asmcomp/amd64/CSE.cmx : \
+    asmcomp/amd64/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/CSEgen.cmx \
+    asmcomp/amd64/arch.cmx \
+    asmcomp/amd64/CSE.cmi
+asmcomp/amd64/CSE.cmi : \
+    asmcomp/platform.cmi
+asmcomp/amd64/arch.cmo : \
+    asmcomp/x86_ast.cmi \
+    asmcomp/operations.cmi \
+    lambda/lambda.cmi \
+    utils/clflags.cmi \
+    asmcomp/amd64/arch.cmi
+asmcomp/amd64/arch.cmx : \
+    asmcomp/x86_ast.cmi \
+    asmcomp/operations.cmx \
+    lambda/lambda.cmx \
+    utils/clflags.cmx \
+    asmcomp/amd64/arch.cmi
+asmcomp/amd64/arch.cmi : \
+    asmcomp/x86_ast.cmi \
+    asmcomp/operations.cmi \
+    lambda/lambda.cmi
+asmcomp/amd64/emit.cmo : \
+    asmcomp/x86_proc.cmi \
+    asmcomp/x86_masm.cmi \
+    asmcomp/x86_gas.cmi \
+    asmcomp/x86_dsl.cmi \
+    asmcomp/x86_ast.cmi \
+    asmcomp/reg.cmi \
+    asmcomp/amd64/proc.cmi \
+    utils/numbers.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    lambda/lambda.cmi \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmi \
+    utils/domainstate.cmi \
+    utils/config_constants.cmi \
+    middle_end/compilenv.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/amd64/arch.cmi \
+    asmcomp/amd64/emit.cmi
+asmcomp/amd64/emit.cmx : \
+    asmcomp/x86_proc.cmx \
+    asmcomp/x86_masm.cmx \
+    asmcomp/x86_gas.cmx \
+    asmcomp/x86_dsl.cmx \
+    asmcomp/x86_ast.cmi \
+    asmcomp/reg.cmx \
+    asmcomp/amd64/proc.cmx \
+    utils/numbers.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/linear.cmx \
+    lambda/lambda.cmx \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmx \
+    utils/domainstate.cmx \
+    utils/config_constants.cmx \
+    middle_end/compilenv.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/amd64/arch.cmx \
+    asmcomp/amd64/emit.cmi
+asmcomp/amd64/emit.cmi : \
+    asmcomp/platform.cmi
+asmcomp/amd64/proc.cmo : \
+    asmcomp/x86_proc.cmi \
+    asmcomp/reg.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/amd64/arch.cmi \
+    asmcomp/amd64/proc.cmi
+asmcomp/amd64/proc.cmx : \
+    asmcomp/x86_proc.cmx \
+    asmcomp/reg.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/amd64/arch.cmx \
+    asmcomp/amd64/proc.cmi
+asmcomp/amd64/proc.cmi : \
+    asmcomp/processor.cmi
+asmcomp/amd64/reload.cmo : \
+    asmcomp/x86_proc.cmi \
+    asmcomp/reloadgen.cmi \
+    asmcomp/reg.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/amd64/arch.cmi \
+    asmcomp/amd64/reload.cmi
+asmcomp/amd64/reload.cmx : \
+    asmcomp/x86_proc.cmx \
+    asmcomp/reloadgen.cmx \
+    asmcomp/reg.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/amd64/arch.cmx \
+    asmcomp/amd64/reload.cmi
+asmcomp/amd64/reload.cmi : \
+    asmcomp/platform.cmi
+asmcomp/amd64/scheduling.cmo : \
+    asmcomp/schedgen.cmi \
+    asmcomp/amd64/scheduling.cmi
+asmcomp/amd64/scheduling.cmx : \
+    asmcomp/schedgen.cmx \
+    asmcomp/amd64/scheduling.cmi
+asmcomp/amd64/scheduling.cmi : \
+    asmcomp/platform.cmi
+asmcomp/amd64/selection.cmo : \
+    asmcomp/selectgen.cmi \
+    asmcomp/reg.cmi \
+    asmcomp/amd64/proc.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/amd64/arch.cmi \
+    asmcomp/amd64/selection.cmi
+asmcomp/amd64/selection.cmx : \
+    asmcomp/selectgen.cmx \
+    asmcomp/reg.cmx \
+    asmcomp/amd64/proc.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/amd64/arch.cmx \
+    asmcomp/amd64/selection.cmi
+asmcomp/amd64/selection.cmi : \
+    asmcomp/platform.cmi
+asmcomp/arm64/CSE.cmo : \
+    asmcomp/arm64/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/CSEgen.cmi \
+    asmcomp/arm64/arch.cmi \
+    asmcomp/arm64/CSE.cmi
+asmcomp/arm64/CSE.cmx : \
+    asmcomp/arm64/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/CSEgen.cmx \
+    asmcomp/arm64/arch.cmx \
+    asmcomp/arm64/CSE.cmi
+asmcomp/arm64/CSE.cmi : \
+    asmcomp/platform.cmi
+asmcomp/arm64/arch.cmo : \
+    asmcomp/operations.cmi \
+    utils/config_constants.cmi \
+    utils/clflags.cmi \
+    asmcomp/arm64/arch.cmi
+asmcomp/arm64/arch.cmx : \
+    asmcomp/operations.cmx \
+    utils/config_constants.cmx \
+    utils/clflags.cmx \
+    asmcomp/arm64/arch.cmi
+asmcomp/arm64/arch.cmi : \
+    asmcomp/operations.cmi
+asmcomp/arm64/emit.cmo : \
+    asmcomp/reg.cmi \
+    asmcomp/arm64/proc.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    lambda/lambda.cmi \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmi \
+    utils/domainstate.cmi \
+    utils/config_constants.cmi \
+    middle_end/compilenv.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/branch_relaxation.cmi \
+    asmcomp/arm64/arch.cmi \
+    asmcomp/arm64/emit.cmi
+asmcomp/arm64/emit.cmx : \
+    asmcomp/reg.cmx \
+    asmcomp/arm64/proc.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/linear.cmx \
+    lambda/lambda.cmx \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmx \
+    utils/domainstate.cmx \
+    utils/config_constants.cmx \
+    middle_end/compilenv.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/branch_relaxation.cmx \
+    asmcomp/arm64/arch.cmx \
+    asmcomp/arm64/emit.cmi
+asmcomp/arm64/emit.cmi : \
+    asmcomp/platform.cmi
+asmcomp/arm64/proc.cmo : \
+    asmcomp/reg.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    utils/ccomp.cmi \
+    asmcomp/arm64/arch.cmi \
+    asmcomp/arm64/proc.cmi
+asmcomp/arm64/proc.cmx : \
+    asmcomp/reg.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    utils/ccomp.cmx \
+    asmcomp/arm64/arch.cmx \
+    asmcomp/arm64/proc.cmi
+asmcomp/arm64/proc.cmi : \
+    asmcomp/processor.cmi
+asmcomp/arm64/reload.cmo : \
+    asmcomp/reloadgen.cmi \
+    asmcomp/reg.cmi \
+    asmcomp/arm64/arch.cmi \
+    asmcomp/arm64/reload.cmi
+asmcomp/arm64/reload.cmx : \
+    asmcomp/reloadgen.cmx \
+    asmcomp/reg.cmx \
+    asmcomp/arm64/arch.cmx \
+    asmcomp/arm64/reload.cmi
+asmcomp/arm64/reload.cmi : \
+    asmcomp/platform.cmi
+asmcomp/arm64/scheduling.cmo : \
+    asmcomp/schedgen.cmi \
+    asmcomp/arm64/scheduling.cmi
+asmcomp/arm64/scheduling.cmx : \
+    asmcomp/schedgen.cmx \
+    asmcomp/arm64/scheduling.cmi
+asmcomp/arm64/scheduling.cmi : \
+    asmcomp/platform.cmi
+asmcomp/arm64/selection.cmo : \
+    asmcomp/selectgen.cmi \
+    asmcomp/reg.cmi \
+    asmcomp/arm64/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/arm64/arch.cmi \
+    asmcomp/arm64/selection.cmi
+asmcomp/arm64/selection.cmx : \
+    asmcomp/selectgen.cmx \
+    asmcomp/reg.cmx \
+    asmcomp/arm64/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/arm64/arch.cmx \
+    asmcomp/arm64/selection.cmi
+asmcomp/arm64/selection.cmi : \
+    asmcomp/platform.cmi
+asmcomp/power/CSE.cmo : \
+    asmcomp/power/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/CSEgen.cmi \
+    asmcomp/power/arch.cmi \
+    asmcomp/power/CSE.cmi
+asmcomp/power/CSE.cmx : \
+    asmcomp/power/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/CSEgen.cmx \
+    asmcomp/power/arch.cmx \
+    asmcomp/power/CSE.cmi
+asmcomp/power/CSE.cmi : \
+    asmcomp/platform.cmi
+asmcomp/power/arch.cmo : \
+    asmcomp/operations.cmi \
+    asmcomp/power/arch.cmi
+asmcomp/power/arch.cmx : \
+    asmcomp/operations.cmx \
+    asmcomp/power/arch.cmi
+asmcomp/power/arch.cmi : \
+    asmcomp/operations.cmi
+asmcomp/power/emit.cmo : \
+    asmcomp/reg.cmi \
+    asmcomp/power/proc.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    lambda/lambda.cmi \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmi \
+    utils/domainstate.cmi \
+    utils/config_constants.cmi \
+    middle_end/compilenv.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/branch_relaxation.cmi \
+    asmcomp/power/arch.cmi \
+    asmcomp/power/emit.cmi
+asmcomp/power/emit.cmx : \
+    asmcomp/reg.cmx \
+    asmcomp/power/proc.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/linear.cmx \
+    lambda/lambda.cmx \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmx \
+    utils/domainstate.cmx \
+    utils/config_constants.cmx \
+    middle_end/compilenv.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/branch_relaxation.cmx \
+    asmcomp/power/arch.cmx \
+    asmcomp/power/emit.cmi
+asmcomp/power/emit.cmi : \
+    asmcomp/platform.cmi
+asmcomp/power/proc.cmo : \
+    asmcomp/reg.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    utils/ccomp.cmi \
+    asmcomp/power/arch.cmi \
+    asmcomp/power/proc.cmi
+asmcomp/power/proc.cmx : \
+    asmcomp/reg.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    utils/ccomp.cmx \
+    asmcomp/power/arch.cmx \
+    asmcomp/power/proc.cmi
+asmcomp/power/proc.cmi : \
+    asmcomp/processor.cmi
+asmcomp/power/reload.cmo : \
+    asmcomp/reloadgen.cmi \
+    asmcomp/power/arch.cmi \
+    asmcomp/power/reload.cmi
+asmcomp/power/reload.cmx : \
+    asmcomp/reloadgen.cmx \
+    asmcomp/power/arch.cmx \
+    asmcomp/power/reload.cmi
+asmcomp/power/reload.cmi : \
+    asmcomp/platform.cmi
+asmcomp/power/scheduling.cmo : \
+    asmcomp/schedgen.cmi \
+    asmcomp/power/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/power/arch.cmi \
+    asmcomp/power/scheduling.cmi
+asmcomp/power/scheduling.cmx : \
+    asmcomp/schedgen.cmx \
+    asmcomp/power/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/power/arch.cmx \
+    asmcomp/power/scheduling.cmi
+asmcomp/power/scheduling.cmi : \
+    asmcomp/platform.cmi
+asmcomp/power/selection.cmo : \
+    asmcomp/selectgen.cmi \
+    asmcomp/power/proc.cmi \
+    asmcomp/mach.cmi \
+    lambda/debuginfo.cmi \
+    asmcomp/cmm.cmi \
+    asmcomp/power/arch.cmi \
+    asmcomp/power/selection.cmi
+asmcomp/power/selection.cmx : \
+    asmcomp/selectgen.cmx \
+    asmcomp/power/proc.cmx \
+    asmcomp/mach.cmx \
+    lambda/debuginfo.cmx \
+    asmcomp/cmm.cmx \
+    asmcomp/power/arch.cmx \
+    asmcomp/power/selection.cmi
+asmcomp/power/selection.cmi : \
+    asmcomp/platform.cmi
+asmcomp/s390x/CSE.cmo : \
+    asmcomp/s390x/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/CSEgen.cmi \
+    asmcomp/s390x/arch.cmi \
+    asmcomp/s390x/CSE.cmi
+asmcomp/s390x/CSE.cmx : \
+    asmcomp/s390x/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/CSEgen.cmx \
+    asmcomp/s390x/arch.cmx \
+    asmcomp/s390x/CSE.cmi
+asmcomp/s390x/CSE.cmi : \
+    asmcomp/platform.cmi
+asmcomp/s390x/arch.cmo : \
+    asmcomp/operations.cmi \
+    utils/clflags.cmi \
+    asmcomp/s390x/arch.cmi
+asmcomp/s390x/arch.cmx : \
+    asmcomp/operations.cmx \
+    utils/clflags.cmx \
+    asmcomp/s390x/arch.cmi
+asmcomp/s390x/arch.cmi : \
+    asmcomp/operations.cmi
+asmcomp/s390x/emit.cmo : \
+    asmcomp/reg.cmi \
+    asmcomp/s390x/proc.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    lambda/lambda.cmi \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmi \
+    utils/domainstate.cmi \
+    utils/config_constants.cmi \
+    middle_end/compilenv.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/s390x/arch.cmi \
+    asmcomp/s390x/emit.cmi
+asmcomp/s390x/emit.cmx : \
+    asmcomp/reg.cmx \
+    asmcomp/s390x/proc.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/linear.cmx \
+    lambda/lambda.cmx \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmx \
+    utils/domainstate.cmx \
+    utils/config_constants.cmx \
+    middle_end/compilenv.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/s390x/arch.cmx \
+    asmcomp/s390x/emit.cmi
+asmcomp/s390x/emit.cmi : \
+    asmcomp/platform.cmi
+asmcomp/s390x/proc.cmo : \
+    asmcomp/reg.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    utils/ccomp.cmi \
+    asmcomp/s390x/arch.cmi \
+    asmcomp/s390x/proc.cmi
+asmcomp/s390x/proc.cmx : \
+    asmcomp/reg.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    utils/ccomp.cmx \
+    asmcomp/s390x/arch.cmx \
+    asmcomp/s390x/proc.cmi
+asmcomp/s390x/proc.cmi : \
+    asmcomp/processor.cmi
+asmcomp/s390x/reload.cmo : \
+    asmcomp/reloadgen.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/s390x/arch.cmi \
+    asmcomp/s390x/reload.cmi
+asmcomp/s390x/reload.cmx : \
+    asmcomp/reloadgen.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/s390x/arch.cmx \
+    asmcomp/s390x/reload.cmi
+asmcomp/s390x/reload.cmi : \
+    asmcomp/platform.cmi
+asmcomp/s390x/scheduling.cmo : \
+    asmcomp/schedgen.cmi \
+    asmcomp/s390x/scheduling.cmi
+asmcomp/s390x/scheduling.cmx : \
+    asmcomp/schedgen.cmx \
+    asmcomp/s390x/scheduling.cmi
+asmcomp/s390x/scheduling.cmi : \
+    asmcomp/platform.cmi
+asmcomp/s390x/selection.cmo : \
+    asmcomp/selectgen.cmi \
+    asmcomp/s390x/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    asmcomp/s390x/arch.cmi \
+    asmcomp/s390x/selection.cmi
+asmcomp/s390x/selection.cmx : \
+    asmcomp/selectgen.cmx \
+    asmcomp/s390x/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    asmcomp/s390x/arch.cmx \
+    asmcomp/s390x/selection.cmi
+asmcomp/s390x/selection.cmi : \
+    asmcomp/platform.cmi
+asmcomp/riscv/CSE.cmo : \
+    asmcomp/riscv/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/CSEgen.cmi \
+    asmcomp/riscv/arch.cmi \
+    asmcomp/riscv/CSE.cmi
+asmcomp/riscv/CSE.cmx : \
+    asmcomp/riscv/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/CSEgen.cmx \
+    asmcomp/riscv/arch.cmx \
+    asmcomp/riscv/CSE.cmi
+asmcomp/riscv/CSE.cmi : \
+    asmcomp/platform.cmi
+asmcomp/riscv/arch.cmo : \
+    asmcomp/operations.cmi \
+    utils/clflags.cmi \
+    asmcomp/riscv/arch.cmi
+asmcomp/riscv/arch.cmx : \
+    asmcomp/operations.cmx \
+    utils/clflags.cmx \
+    asmcomp/riscv/arch.cmi
+asmcomp/riscv/arch.cmi : \
+    asmcomp/operations.cmi
+asmcomp/riscv/emit.cmo : \
+    asmcomp/reg.cmi \
+    asmcomp/riscv/proc.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    lambda/lambda.cmi \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmi \
+    utils/domainstate.cmi \
+    utils/config_constants.cmi \
+    middle_end/compilenv.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    asmcomp/riscv/arch.cmi \
+    asmcomp/riscv/emit.cmi
+asmcomp/riscv/emit.cmx : \
+    asmcomp/reg.cmx \
+    asmcomp/riscv/proc.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/linear.cmx \
+    lambda/lambda.cmx \
+    asmcomp/emitenv.cmi \
+    asmcomp/emitaux.cmx \
+    utils/domainstate.cmx \
+    utils/config_constants.cmx \
+    middle_end/compilenv.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    asmcomp/riscv/arch.cmx \
+    asmcomp/riscv/emit.cmi
+asmcomp/riscv/emit.cmi : \
+    asmcomp/platform.cmi
+asmcomp/riscv/proc.cmo : \
+    asmcomp/reg.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    utils/clflags.cmi \
+    utils/ccomp.cmi \
+    asmcomp/riscv/arch.cmi \
+    asmcomp/riscv/proc.cmi
+asmcomp/riscv/proc.cmx : \
+    asmcomp/reg.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    utils/clflags.cmx \
+    utils/ccomp.cmx \
+    asmcomp/riscv/arch.cmx \
+    asmcomp/riscv/proc.cmi
+asmcomp/riscv/proc.cmi : \
+    asmcomp/processor.cmi
+asmcomp/riscv/reload.cmo : \
+    asmcomp/reloadgen.cmi \
+    asmcomp/riscv/arch.cmi \
+    asmcomp/riscv/reload.cmi
+asmcomp/riscv/reload.cmx : \
+    asmcomp/reloadgen.cmx \
+    asmcomp/riscv/arch.cmx \
+    asmcomp/riscv/reload.cmi
+asmcomp/riscv/reload.cmi : \
+    asmcomp/platform.cmi
+asmcomp/riscv/scheduling.cmo : \
+    asmcomp/schedgen.cmi \
+    asmcomp/riscv/scheduling.cmi
+asmcomp/riscv/scheduling.cmx : \
+    asmcomp/schedgen.cmx \
+    asmcomp/riscv/scheduling.cmi
+asmcomp/riscv/scheduling.cmi : \
+    asmcomp/platform.cmi
+asmcomp/riscv/selection.cmo : \
+    asmcomp/selectgen.cmi \
+    asmcomp/riscv/proc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/cmm.cmi \
+    asmcomp/riscv/arch.cmi \
+    asmcomp/riscv/selection.cmi
+asmcomp/riscv/selection.cmx : \
+    asmcomp/selectgen.cmx \
+    asmcomp/riscv/proc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/cmm.cmx \
+    asmcomp/riscv/arch.cmx \
+    asmcomp/riscv/selection.cmi
+asmcomp/riscv/selection.cmi : \
+    asmcomp/platform.cmi
 driver/compenv.cmo : \
     utils/warnings.cmi \
     utils/profile.cmi \

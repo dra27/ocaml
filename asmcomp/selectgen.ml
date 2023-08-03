@@ -137,7 +137,7 @@ end = struct
     | x::xs -> List.fold_left (fun acc x -> join acc (f x)) (f x) xs
 end
 
-module Make (Arch : Operations.S) (Proc : module type of Proc) = struct
+module Make (Arch : Operations.S) (Proc : module type of Processor) = struct
   type operation =
     (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
 

@@ -120,6 +120,7 @@ AC_SUBST([S])
 AC_SUBST([runtime_asm_objects])
 AC_SUBST([SO])
 AC_SUBST([arch])
+AC_SUBST([Arch])
 AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
@@ -244,6 +245,7 @@ AC_CONFIG_FILES([compilerlibs/META])
 AC_CONFIG_FILES([otherlibs/dynlink/META])
 AC_CONFIG_FILES([otherlibs/runtime_events/META])
 AC_CONFIG_FILES([stdlib/META])
+AC_CONFIG_FILES([asmcomp/default.ml])
 
 # Definitions related to the version of OCaml
 AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
@@ -1230,6 +1232,10 @@ arch=none
 model=default
 system=unknown
 abi=default
+
+AC_CONFIG_COMMANDS_PRE([
+  Arch="$(echo "$arch" | cut -c 1 | tr 'a-z' 'A-Z')$(echo "$arch" | cut -c 2-)"
+])
 
 # In all the cases below, if $arch is set so then so too must $system,
 # preserving $arch = 'none' <=> $system = 'unknown'

@@ -94,6 +94,7 @@ let record_use t regv =
    at that point. If so, spill enough registers to lower the pressure. *)
 
 let add_superpressure_regs t op live_regs res_regs spilled =
+  let open (val Platform.info.backend : Platform.Backend) in
   let max_pressure = Proc.max_register_pressure op in
   let regs = Reg.add_set_array live_regs res_regs in
   (* Compute the pressure in each register class *)
@@ -159,6 +160,7 @@ let set_reload_at_exit t k s =
   Hashtbl.replace t.reload_at_exit k s
 
 let rec reload (t : reload_data) i before =
+  let open (val Platform.info.backend : Platform.Backend) in
   t.current_date <- succ t.current_date;
   record_use t i.arg;
   record_use t i.res;

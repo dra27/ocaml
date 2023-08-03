@@ -220,13 +220,11 @@ ASMCOMP += \
   asmcomp/selectgen.cmo
 # Architecture-specific modules
 ASMCOMP += \
-  asmcomp/arch.cmo \
-  asmcomp/proc.cmo \
-  asmcomp/CSE.cmo \
-  asmcomp/reload.cmo \
-  asmcomp/scheduling.cmo \
-  asmcomp/emit.cmo \
-  asmcomp/selection.cmo \
+  asmcomp/amd64.cmo \
+  asmcomp/arm64.cmo \
+  asmcomp/power.cmo \
+  asmcomp/riscv.cmo \
+  asmcomp/s390x.cmo \
   asmcomp/default.cmo
 # Cmm and the rest of ocamlopt
 ASMCOMP += \

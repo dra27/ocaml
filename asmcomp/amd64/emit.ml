@@ -30,14 +30,8 @@ open X86_dsl
 module String = Misc.Stdlib.String
 module Int = Numbers.Int
 
-let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
-
-(* [Branch_relaxation] is not used in this file, but is required by
-   emit.mlp files for certain other targets; the reference here ensures
-   that when releases are being prepared the .depend files are correct
-   for all targets. *)
-[@@@ocaml.warning "-66"]
-open! Branch_relaxation
+let map_desc =
+  Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
 
 let _label s = D.label ~typ:QWORD s
 
@@ -400,7 +394,9 @@ let emit_float_test env cmp i lbl =
 
 let output_epilogue env f =
   if env.f.fun_frame_required then begin
-    let n = (frame_size env) - 8 - (if Clflags.config.with_frame_pointers then 8 else 0) in
+    let n =
+      (frame_size env) - 8
+        - (if Clflags.config.with_frame_pointers then 8 else 0) in
     if n <> 0
     then begin
       I.add (int n) rsp;
@@ -480,7 +476,9 @@ let emit_instr env fallthrough i =
       I.mov rsp rbp;
     end;
     if env.f.fun_frame_required then begin
-      let n = (frame_size env) - 8 - (if Clflags.config.with_frame_pointers then 8 else 0) in
+      let n =
+        (frame_size env) - 8
+          - (if Clflags.config.with_frame_pointers then 8 else 0) in
       if n <> 0
       then begin
         I.sub (int n) rsp;
@@ -925,9 +923,11 @@ let fundecl fundecl =
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
   in
   let handle_overflow =
-    if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
+    if contains_nontail_calls
+       || max_frame_size >= stack_threshold_size then begin
       let overflow = new_label () and ret = new_label () in
-      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+      let threshold_offset =
+        Domainstate.stack_ctx_words * 8 + stack_threshold_size in
       I.lea (mem64 NONE (-(max_frame_size + threshold_offset)) RSP) r10;
       I.cmp (domain_field Domainstate.Domain_current_stack) r10;
       I.jb (label overflow);
@@ -955,7 +955,9 @@ let fundecl fundecl =
     end
   end;
   if fundecl.fun_frame_required then begin
-    let n = (frame_size env) - 8 - (if Clflags.config.with_frame_pointers then 8 else 0) in
+    let n =
+      (frame_size env) - 8
+        - (if Clflags.config.with_frame_pointers then 8 else 0) in
     if n <> 0
     then begin
       cfi_adjust_cfa_offset (-n);

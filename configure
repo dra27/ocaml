@@ -887,6 +887,7 @@ abi
 system
 model
 arch64
+Arch
 arch
 SO
 runtime_asm_objects
@@ -3386,6 +3387,7 @@ OCAML_VERSION_SHORT=5.2
 
 
 
+
  # TODO: rename this variable
 
 
@@ -3458,6 +3460,8 @@ ac_config_files="$ac_config_files otherlibs/dynlink/META"
 ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
+
+ac_config_files="$ac_config_files asmcomp/default.ml"
 
 
 # Definitions related to the version of OCaml
@@ -15423,6 +15427,8 @@ model=default
 system=unknown
 abi=default
 
+
+
 # In all the cases below, if $arch is set so then so too must $system,
 # preserving $arch = 'none' <=> $system = 'unknown'
 has_native_backend=no
@@ -20198,6 +20204,9 @@ LTLIBOBJS=$ac_ltlibobjs
     fi
   done
 
+
+  Arch="$(echo "$arch" | cut -c 1 | tr 'a-z' 'A-Z')$(echo "$arch" | cut -c 2-)"
+
 cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"
 
   saved_exec_prefix="$exec_prefix"
@@ -21205,6 +21214,7 @@ do
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
+    "asmcomp/default.ml") CONFIG_FILES="$CONFIG_FILES asmcomp/default.ml" ;;
     "native-symlinks") CONFIG_COMMANDS="$CONFIG_COMMANDS native-symlinks" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "otherlibs/unix/META") CONFIG_FILES="$CONFIG_FILES otherlibs/unix/META" ;;

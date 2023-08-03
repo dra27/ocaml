@@ -23,7 +23,7 @@ type op_class =
   | Op_store of bool  (* memory store, false = init, true = assign *)
   | Op_other   (* anything else that does not allocate nor store in memory *)
 
-module Make (Arch : Operations.S) (_: module type of Proc) : sig
+module Make (Arch : Operations.S) (_: module type of Processor) : sig
   type operation =
     (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
 
