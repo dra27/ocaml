@@ -18,8 +18,6 @@ include Operations.Riscv
 
 (* Specific operations for the RISC-V processor *)
 
-open Format
-
 (* Machine-specific command-line options *)
 
 let command_line_options = []
@@ -52,28 +50,23 @@ let offset_addressing addr delta =
 let num_args_addressing = function
   | Iindexed _ -> 1
 
-(* Printing operations and addressing modes *)
+(* Working around the lack of more exotic typing *)
 
-let print_addressing printreg addr ppf arg =
+let box_addressing_mode addressing_mode =
+  (Riscv addressing_mode : Operations.addressing_modes)
+
+let unbox_addressing_mode (addr : Operations.addressing_modes) =
   match addr with
-  | Iindexed n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a%s" printreg arg.(0) idx
+  | Riscv addressing_mode -> addressing_mode
+  | _ -> assert false
 
-let print_specific_operation printreg op ppf arg =
-  match op with
-  | Imultaddf false ->
-      fprintf ppf "%a *f %a +f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Imultaddf true ->
-      fprintf ppf "-f (%a *f %a +f %a)"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Imultsubf false ->
-      fprintf ppf "%a *f %a -f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Imultsubf true ->
-      fprintf ppf "-f (%a *f %a -f %a)"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
+let box_specific_operation sop =
+  (Riscv sop : Operations.specific_operations)
+
+let unbox_specific_operation (sop : Operations.specific_operations) =
+  match sop with
+  | Riscv specific_operation -> specific_operation
+  | _ -> assert false
 
 (* Specific operations that are pure *)
 

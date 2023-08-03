@@ -30,6 +30,8 @@ open X86_dsl
 module String = Misc.Stdlib.String
 module Int = Numbers.Int
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 (* [Branch_relaxation] is not used in this file, but is required by
    emit.mlp files for certain other targets; the reference here ensures
    that when releases are being prepared the .depend files are correct
@@ -458,7 +460,7 @@ let emit_instr env fallthrough i =
   let arg = arg env in
   let res = res env in
   emit_debug_info i.dbg;
-  match i.desc with
+  match map_desc i.desc with
   | Lend -> ()
   | Lprologue ->
     if fp then begin

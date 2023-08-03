@@ -24,6 +24,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 (* Reserved space at bottom of stack *)
 
 let reserved_stack_space = 32
@@ -352,6 +354,8 @@ let name_for_specific = function
 (* Relaxation of branches that exceed the span of a relative branch. *)
 
 module BR = Branch_relaxation.Make (struct
+  include Arch
+
   type distance = int
 
   module Cond_branch = struct
@@ -568,7 +572,7 @@ let emit_call_bound_errors env =
 
 let emit_instr env i =
     emit_debug_info i.dbg;
-    match i.desc with
+    match map_desc i.desc with
     | Lend -> ()
     | Lprologue ->
       let n = frame_size env in
@@ -963,7 +967,7 @@ let rec emit_all env i =
 
 let max_out_of_line_code_offset fundecl =
   let rec num_checkbounds count instr =
-    match instr.desc with
+    match map_desc instr.desc with
     | Lend -> count
     | Lop (Iintop Icheckbound)
     | Lop (Iintop_imm (Icheckbound, _)) ->

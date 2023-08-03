@@ -14,7 +14,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include module type of Operations.Amd64
+include module type of struct include Operations.Amd64 end
 
 (* Machine-specific command-line options *)
 
@@ -38,13 +38,13 @@ val offset_addressing : addressing_mode -> int -> addressing_mode
 
 val num_args_addressing : addressing_mode -> int
 
-val print_addressing :
-  (Format.formatter -> 'a -> unit) -> addressing_mode ->
-  Format.formatter -> 'a array -> unit
+val box_addressing_mode : addressing_mode -> Operations.addressing_modes
+val unbox_addressing_mode : Operations.addressing_modes -> addressing_mode
 
-val print_specific_operation :
-  (Format.formatter -> 'a -> unit) -> specific_operation ->
-  Format.formatter -> 'a array -> unit
+val box_specific_operation :
+  specific_operation -> Operations.specific_operations
+val unbox_specific_operation :
+  Operations.specific_operations -> specific_operation
 
 val win64 : bool
 

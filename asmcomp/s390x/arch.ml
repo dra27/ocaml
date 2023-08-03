@@ -20,8 +20,6 @@ include Operations.S390x
 
 (* Specific operations for the Z processor *)
 
-open Format
-
 (* Machine-specific command-line options *)
 
 let pic_code = ref true
@@ -59,25 +57,23 @@ let num_args_addressing = function
   | Iindexed _ -> 1
   | Iindexed2 _ -> 2
 
-(* Printing operations and addressing modes *)
+(* Working around the lack of more exotic typing *)
 
-let print_addressing printreg addr ppf arg =
+let box_addressing_mode addressing_mode =
+  (S390x addressing_mode : Operations.addressing_modes)
+
+let unbox_addressing_mode (addr : Operations.addressing_modes) =
   match addr with
-  | Iindexed n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a%s" printreg arg.(0) idx
-  | Iindexed2 n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a + %a%s" printreg arg.(0) printreg arg.(1) idx
+  | S390x addressing_mode -> addressing_mode
+  | _ -> assert false
 
-let print_specific_operation printreg op ppf arg =
-  match op with
-  | Imultaddf ->
-      fprintf ppf "%a *f %a +f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Imultsubf ->
-      fprintf ppf "%a *f %a -f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
+let box_specific_operation sop =
+  (S390x sop : Operations.specific_operations)
+
+let unbox_specific_operation (sop : Operations.specific_operations) =
+  match sop with
+  | S390x specific_operation -> specific_operation
+  | _ -> assert false
 
 (* Specific operations that are pure *)
 

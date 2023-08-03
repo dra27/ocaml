@@ -27,8 +27,9 @@ val env_add
 
 val env_find : Backend_var.t -> environment -> Reg.t array
 
-module Make (_ : module type of struct include Arch end)
-            (_ : module type of Proc) : sig
+module Make (Arch : Operations.S) (_ : module type of Proc) : sig
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
 
   val size_expr : environment -> Cmm.expression -> int
 
@@ -84,13 +85,13 @@ module Make (_ : module type of struct include Arch end)
       Cmm.operation ->
       Cmm.expression list ->
       Debuginfo.t ->
-      Mach.operation * Cmm.expression list
+      operation * Cmm.expression list
       (* Can be overridden to deal with special arithmetic instructions *)
     method select_condition : Cmm.expression -> Mach.test * Cmm.expression
       (* Can be overridden to deal with special test instructions *)
     method select_store :
       bool -> Arch.addressing_mode -> Cmm.expression ->
-                                           Mach.operation * Cmm.expression
+                                           operation * Cmm.expression
       (* Can be overridden to deal with special store constant instructions *)
     method regs_for : Cmm.machtype -> Reg.t array
       (* Return an array of fresh registers of the given type.
@@ -98,11 +99,11 @@ module Make (_ : module type of struct include Arch end)
          Can be overridden if float values are stored as pairs of
          integer registers. *)
     method insert_op :
-      environment -> Mach.operation -> Reg.t array -> Reg.t array -> Reg.t array
+      environment -> operation -> Reg.t array -> Reg.t array -> Reg.t array
       (* Can be overridden to deal with 2-address instructions
          or instructions with hardwired input/output registers *)
     method insert_op_debug :
-      environment -> Mach.operation -> Debuginfo.t -> Reg.t array
+      environment -> operation -> Debuginfo.t -> Reg.t array
         -> Reg.t array -> Reg.t array
       (* Can be overridden to deal with 2-address instructions
          or instructions with hardwired input/output registers *)

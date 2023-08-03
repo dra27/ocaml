@@ -20,8 +20,6 @@ include Operations.Arm64
 
 (* Specific operations for the ARM processor, 64-bit mode *)
 
-open Format
-
 let macosx = (Config.system = "macosx")
 
 (* Machine-specific command-line options *)
@@ -55,90 +53,23 @@ let num_args_addressing = function
   | Iindexed _ -> 1
   | Ibased _ -> 0
 
-(* Printing operations and addressing modes *)
+(* Working around the lack of more exotic typing *)
 
-let print_addressing printreg addr ppf arg =
+let box_addressing_mode addressing_mode =
+  (Arm64 addressing_mode : Operations.addressing_modes)
+
+let unbox_addressing_mode (addr : Operations.addressing_modes) =
   match addr with
-  | Iindexed n ->
-      printreg ppf arg.(0);
-      if n <> 0 then fprintf ppf " + %i" n
-  | Ibased(s, 0) ->
-      fprintf ppf "\"%s\"" s
-  | Ibased(s, n) ->
-      fprintf ppf "\"%s\" + %i" s n
+  | Arm64 addressing_mode -> addressing_mode
+  | _ -> assert false
 
-let print_specific_operation printreg op ppf arg =
-  match op with
-  | Ifar_poll _ ->
-    fprintf ppf "(far) poll"
-  | Ifar_alloc { bytes; } ->
-    fprintf ppf "(far) alloc %i" bytes
-  | Ifar_intop_checkbound ->
-    fprintf ppf "%a (far) check > %a" printreg arg.(0) printreg arg.(1)
-  | Ifar_intop_imm_checkbound { bound; } ->
-    fprintf ppf "%a (far) check > %i" printreg arg.(0) bound
-  | Ishiftarith(op, shift) ->
-      let op_name = function
-      | Ishiftadd -> "+"
-      | Ishiftsub -> "-" in
-      let shift_mark =
-       if shift >= 0
-       then sprintf "<< %i" shift
-       else sprintf ">> %i" (-shift) in
-      fprintf ppf "%a %s %a %s"
-       printreg arg.(0) (op_name op) printreg arg.(1) shift_mark
-  | Ishiftcheckbound { shift; } ->
-      fprintf ppf "check %a >> %i > %a" printreg arg.(0) shift
-        printreg arg.(1)
-  | Ifar_shiftcheckbound { shift; } ->
-      fprintf ppf
-        "(far) check %a >> %i > %a" printreg arg.(0) shift printreg arg.(1)
-  | Imuladd ->
-      fprintf ppf "(%a * %a) + %a"
-        printreg arg.(0)
-        printreg arg.(1)
-        printreg arg.(2)
-  | Imulsub ->
-      fprintf ppf "-(%a * %a) + %a"
-        printreg arg.(0)
-        printreg arg.(1)
-        printreg arg.(2)
-  | Inegmulf ->
-      fprintf ppf "-f (%a *f %a)"
-        printreg arg.(0)
-        printreg arg.(1)
-  | Imuladdf ->
-      fprintf ppf "%a +f (%a *f %a)"
-        printreg arg.(0)
-        printreg arg.(1)
-        printreg arg.(2)
-  | Inegmuladdf ->
-      fprintf ppf "(-f %a) -f (%a *f %a)"
-        printreg arg.(0)
-        printreg arg.(1)
-        printreg arg.(2)
-  | Imulsubf ->
-      fprintf ppf "%a -f (%a *f %a)"
-        printreg arg.(0)
-        printreg arg.(1)
-        printreg arg.(2)
-  | Inegmulsubf ->
-      fprintf ppf "(-f %a) +f (%a *f %a)"
-        printreg arg.(0)
-        printreg arg.(1)
-        printreg arg.(2)
-  | Isqrtf ->
-      fprintf ppf "sqrtf %a"
-        printreg arg.(0)
-  | Ibswap n ->
-      fprintf ppf "bswap%i %a" n
-        printreg arg.(0)
-  | Imove32 ->
-      fprintf ppf "move32 %a"
-        printreg arg.(0)
-  | Isignext n ->
-      fprintf ppf "signext%d %a"
-        n printreg arg.(0)
+let box_specific_operation sop =
+  (Arm64 sop : Operations.specific_operations)
+
+let unbox_specific_operation (sop : Operations.specific_operations) =
+  match sop with
+  | Arm64 specific_operation -> specific_operation
+  | _ -> assert false
 
 (* Recognition of logical immediate arguments *)
 

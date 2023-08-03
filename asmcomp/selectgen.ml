@@ -64,8 +64,23 @@ let env_empty = {
 
   (* Infer the type of the result of an operation *)
 
-module Make (Arch : module type of struct include Arch end)
-            (Proc : module type of Proc) = struct
+module Make (Arch : Operations.S) (Proc : module type of Proc) = struct
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
+
+  let box_op = function
+  | Iload {memory_chunk; addressing_mode; mutability; is_atomic} ->
+      let addressing_mode = Arch.box_addressing_mode addressing_mode in
+      Iload {memory_chunk; addressing_mode; mutability; is_atomic}
+  | Istore (memory_chunk, addressing_mode, is_assignment) ->
+      let addressing_mode = Arch.box_addressing_mode addressing_mode in
+      Istore (memory_chunk, addressing_mode, is_assignment)
+  | Ispecific sop -> Ispecific (Arch.box_specific_operation sop)
+  | (Imove | Ispill | Ireload | Iconst_int _ | Iconst_float _ | Iconst_symbol _
+    | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _  | Iextcall _
+    | Istackoffset _ | Ialloc _ | Iintop _ | Iintop_imm (_, _) | Icompf _
+    | Inegf | Iabsf | Iaddf | Isubf | Imulf | Idivf | Ifloatofint | Iintoffloat
+    | Iopaque | Ipoll _ | Idls_get | Ireturn_addr) as op -> op
 
   (* Infer the type of the result of an operation *)
 
@@ -575,7 +590,7 @@ module Make (Arch : module type of struct include Arch end)
      instructions, or instructions using dedicated registers. *)
 
   method insert_op_debug env op dbg rs rd =
-    self#insert_debug env (Iop op) dbg rs rd;
+    self#insert_debug env (Iop (box_op op)) dbg rs rd;
     rd
 
   method insert_op env op rs rd =
@@ -675,19 +690,21 @@ module Make (Arch : module type of struct include Arch end)
                 let rarg = Array.sub r1 1 (Array.length r1 - 1) in
                 let rd = self#regs_for ty in
                 let (loc_arg, stack_ofs) = Proc.loc_arguments (Reg.typv rarg) in
-                let loc_res = Proc.loc_results (Reg.typv rd) in
                 self#insert_move_args env rarg loc_arg stack_ofs;
-                self#insert_debug env (Iop new_op) dbg
-                            (Array.append [|r1.(0)|] loc_arg) loc_res;
+                let loc_res =
+                  self#insert_op_debug env new_op dbg
+                                       (Array.append [|r1.(0)|] loc_arg)
+                                       (Proc.loc_results (Reg.typv rd)) in
                 self#insert_move_results env loc_res rd stack_ofs;
                 Some rd
             | Icall_imm _ ->
                 let r1 = self#emit_tuple env new_args in
                 let rd = self#regs_for ty in
                 let (loc_arg, stack_ofs) = Proc.loc_arguments (Reg.typv r1) in
-                let loc_res = Proc.loc_results (Reg.typv rd) in
                 self#insert_move_args env r1 loc_arg stack_ofs;
-                self#insert_debug env (Iop new_op) dbg loc_arg loc_res;
+                let loc_res =
+                  self#insert_op_debug env new_op dbg loc_arg
+                                       (Proc.loc_results (Reg.typv rd)) in
                 self#insert_move_results env loc_res rd stack_ofs;
                 Some rd
             | Iextcall r ->
@@ -979,12 +996,14 @@ module Make (Arch : module type of struct include Arch end)
                   let r = regs.(i) in
                   let kind = if r.typ = Float then Double else Word_val in
                   self#insert env
-                              (Iop(Istore(kind, !a, false)))
-                              (Array.append [|r|] regs_addr) [||];
+                    (Iop(Istore(kind, Arch.box_addressing_mode !a, false)))
+                    (Array.append [|r|] regs_addr) [||];
                   a := Arch.offset_addressing !a (size_component r.typ)
                 done
             | _ ->
-                self#insert env (Iop op) (Array.append regs regs_addr) [||];
+                self#insert env
+                            (Iop (box_op op))
+                            (Array.append regs regs_addr) [||];
                 a := Arch.offset_addressing !a (size_expr env e))
       data
 
@@ -1029,10 +1048,11 @@ module Make (Arch : module type of struct include Arch end)
                               (Array.append [|r1.(0)|] loc_arg) [||];
                 end else begin
                   let rd = self#regs_for ty in
-                  let loc_res = Proc.loc_results (Reg.typv rd) in
                   self#insert_move_args env rarg loc_arg stack_ofs;
-                  self#insert_debug env (Iop new_op) dbg
-                              (Array.append [|r1.(0)|] loc_arg) loc_res;
+                  let loc_res =
+                    self#insert_op_debug env new_op dbg
+                                         (Array.append [|r1.(0)|] loc_arg)
+                                         (Proc.loc_results (Reg.typv rd)) in
                   self#insert env (Iop(Istackoffset(-stack_ofs))) [||] [||];
                   self#insert env Ireturn loc_res [||]
                 end
@@ -1050,9 +1070,10 @@ module Make (Arch : module type of struct include Arch end)
                   self#insert_debug env call dbg loc_arg' [||];
                 end else begin
                   let rd = self#regs_for ty in
-                  let loc_res = Proc.loc_results (Reg.typv rd) in
                   self#insert_move_args env r1 loc_arg stack_ofs;
-                  self#insert_debug env (Iop new_op) dbg loc_arg loc_res;
+                  let loc_res =
+                    self#insert_op_debug env new_op dbg loc_arg
+                                         (Proc.loc_results (Reg.typv rd)) in
                   self#insert env (Iop(Istackoffset(-stack_ofs))) [||] [||];
                   self#insert env Ireturn loc_res [||]
                 end

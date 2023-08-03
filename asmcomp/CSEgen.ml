@@ -214,7 +214,13 @@ let insert_move srcs dsts i =
          let i1 = array_fold2 insert_single_move i tmps dsts in
          array_fold2 insert_single_move i1 srcs tmps
 
-module Make (Proc : module type of Proc) = struct
+module Make (Arch : Operations.S) (Proc : module type of Proc) = struct
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
+
+  let unbox_op =
+    Mach.map_op Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
   class cse_generic = object (self)
 
   (* Default classification of operations.  Can be overridden in
@@ -300,7 +306,7 @@ module Make (Proc : module type of Proc) = struct
          let n2 = set_unknown_regs n1 i.res in
          {i with next = self#cse n2 i.next}
     | Iop op ->
-        begin match self#class_of_operation op with
+        begin match self#class_of_operation (unbox_op op) with
         | (Op_pure | Op_checkbound | Op_load _) as op_class ->
             let (n1, varg) = valnum_regs n i.arg in
             let n2 = set_unknown_regs n1 (Proc.destroyed_at_oper i.desc) in
@@ -310,7 +316,7 @@ module Make (Proc : module type of Proc) = struct
                 (* Are there registers that hold the results computed
                    earlier? *)
                 begin match find_regs_containing n1 vres with
-                | Some res when (not (self#is_cheap_operation op)) ->
+                | Some res when (not (self#is_cheap_operation (unbox_op op))) ->
                     (* We can replace res <- op args with r <- move res,
                        provided res are stable (non-volatile) registers.
                        If the operation is very cheap to compute, e.g.

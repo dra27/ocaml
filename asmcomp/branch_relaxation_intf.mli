@@ -15,6 +15,16 @@
 (**************************************************************************)
 
 module type S = sig
+  type addressing_mode
+  type specific_operation
+
+  val box_addressing_mode : addressing_mode -> Operations.addressing_modes
+  val unbox_addressing_mode : Operations.addressing_modes -> addressing_mode
+  val box_specific_operation :
+    specific_operation -> Operations.specific_operations
+  val unbox_specific_operation :
+    Operations.specific_operations -> specific_operation
+
   (* The distance between two instructions, in arbitrary units (typically
      the natural word size of instructions). *)
   type distance = int
@@ -47,7 +57,9 @@ module type S = sig
                 - Lcondbranch3 (_, _, _)
        [classify_instr] is expected to return [None] when called on any
        instruction not in this list. *)
-    val classify_instr : Linear.instruction_desc -> t option
+    val classify_instr :
+      (addressing_mode, specific_operation) Linear.gen_instruction_desc
+        -> t option
   end
 
   (* The value to be added to the program counter (in [distance] units)
@@ -56,7 +68,10 @@ module type S = sig
   val offset_pc_at_branch : distance
 
   (* The maximum size of a given instruction. *)
-  val instr_size : Linear.fundecl -> Linear.instruction_desc -> distance
+  val instr_size :
+    Linear.fundecl
+      -> (addressing_mode, specific_operation) Linear.gen_instruction_desc
+      -> distance
 
   (* Insertion of target-specific code to relax operations that cannot be
      relaxed generically.  It is assumed that these rewrites do not change
@@ -64,17 +79,19 @@ module type S = sig
   val relax_allocation
      : num_bytes:int
     -> dbginfo:Debuginfo.alloc_dbginfo
-    -> Linear.instruction_desc
+    -> (addressing_mode, specific_operation) Linear.gen_instruction_desc
 
   val relax_poll
      : return_label:Cmm.label option
-    -> Linear.instruction_desc
+    -> (addressing_mode, specific_operation) Linear.gen_instruction_desc
 
   val relax_intop_checkbound
      : unit
-    -> Linear.instruction_desc
+    -> (addressing_mode, specific_operation) Linear.gen_instruction_desc
   val relax_intop_imm_checkbound
      : bound:int
-    -> Linear.instruction_desc
-  val relax_specific_op : Arch.specific_operation -> Linear.instruction_desc
+    -> (addressing_mode, specific_operation) Linear.gen_instruction_desc
+  val relax_specific_op :
+    specific_operation
+      -> (addressing_mode, specific_operation) Linear.gen_instruction_desc
 end

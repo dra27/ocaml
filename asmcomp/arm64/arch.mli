@@ -16,7 +16,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include module type of Operations.Arm64
+include module type of struct include Operations.Arm64 end
 
 (* Specific operations for the ARM processor, 64-bit mode *)
 
@@ -50,15 +50,15 @@ val offset_addressing : addressing_mode -> int -> addressing_mode
 
 val num_args_addressing : addressing_mode -> int
 
+val box_addressing_mode : addressing_mode -> Operations.addressing_modes
+val unbox_addressing_mode : Operations.addressing_modes -> addressing_mode
+
+val box_specific_operation :
+  specific_operation -> Operations.specific_operations
+val unbox_specific_operation :
+  Operations.specific_operations -> specific_operation
+
 (* Printing operations and addressing modes *)
-
-val print_addressing :
-  (Format.formatter -> 'a -> unit) -> addressing_mode ->
-  Format.formatter -> 'a array -> unit
-
-val print_specific_operation :
-  (Format.formatter -> 'a -> unit) -> specific_operation ->
-  Format.formatter -> 'a array -> unit
 
 val is_logical_immediate : nativeint -> bool
 

@@ -69,7 +69,8 @@ type ('am, 'so) gen_operation =
   | Idls_get
   | Ireturn_addr
 
-type operation = (Arch.addressing_mode, Arch.specific_operation) gen_operation
+type operation =
+  (Operations.addressing_modes, Operations.specific_operations) gen_operation
 
 type instruction =
   { desc: instruction_desc;
@@ -155,12 +156,27 @@ let rec instr_iter f i =
       | _ ->
           instr_iter f i.next
 
+let map_op map_addressing_mode map_specific_operation = function
+| Iload { memory_chunk; addressing_mode; mutability; is_atomic } ->
+    let addressing_mode = map_addressing_mode addressing_mode in
+    Iload { memory_chunk; addressing_mode; mutability; is_atomic}
+| Istore (memory_chunk, addressing_mode, is_assignment) ->
+    let addressing_mode = map_addressing_mode addressing_mode in
+    Istore (memory_chunk, addressing_mode, is_assignment)
+| Ispecific sop ->
+    Ispecific (map_specific_operation sop)
+| (Imove | Ispill | Ireload | Iconst_int _ | Iconst_float _ | Iconst_symbol _
+   | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _ | Iextcall _
+   | Istackoffset _ | Ialloc _ | Iintop _ | Iintop_imm (_, _) | Icompf _ | Inegf
+   | Iabsf | Iaddf | Isubf | Imulf | Idivf | Ifloatofint | Iintoffloat | Iopaque
+   | Ipoll _ | Idls_get | Ireturn_addr) as desc -> desc
+
 let operation_is_pure = function
   | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _
   | Iextcall _ | Istackoffset _ | Istore _ | Ialloc _ | Ipoll _
   | Idls_get
   | Iintop(Icheckbound) | Iintop_imm(Icheckbound, _) | Iopaque -> false
-  | Ispecific sop -> Arch.operation_is_pure sop
+  | Ispecific sop -> Arch.(operation_is_pure (unbox_specific_operation sop))
   | _ -> true
 
 let operation_can_raise op =
@@ -168,5 +184,5 @@ let operation_can_raise op =
   | Icall_ind | Icall_imm _ | Iextcall _
   | Iintop (Icheckbound) | Iintop_imm (Icheckbound, _)
   | Ialloc _ | Ipoll _ -> true
-  | Ispecific sop -> Arch.operation_can_raise sop
+  | Ispecific sop -> Arch.(operation_can_raise (unbox_specific_operation sop))
   | _ -> false

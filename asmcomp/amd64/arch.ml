@@ -24,8 +24,6 @@ let command_line_options =
     "-fno-PIC", Arg.Clear Clflags.pic_code,
       " Generate position-dependent machine code" ]
 
-open Format
-
 (* Sizes, endianness *)
 
 let big_endian = false
@@ -59,56 +57,23 @@ let num_args_addressing = function
   | Iscaled _ -> 1
   | Iindexed2scaled _ -> 2
 
-(* Printing operations and addressing modes *)
+(* Working around the lack of more exotic typing *)
 
-let print_addressing printreg addr ppf arg =
+let box_addressing_mode addressing_mode =
+  (Amd64 addressing_mode : Operations.addressing_modes)
+
+let unbox_addressing_mode (addr : Operations.addressing_modes) =
   match addr with
-  | Ibased(s, 0) ->
-      fprintf ppf "\"%s\"" s
-  | Ibased(s, n) ->
-      fprintf ppf "\"%s\" + %i" s n
-  | Iindexed n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a%s" printreg arg.(0) idx
-  | Iindexed2 n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a + %a%s" printreg arg.(0) printreg arg.(1) idx
-  | Iscaled(scale, n) ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a  * %i%s" printreg arg.(0) scale idx
-  | Iindexed2scaled(scale, n) ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a + %a * %i%s" printreg arg.(0) printreg arg.(1) scale idx
+  | Amd64 addressing_mode -> addressing_mode
+  | _ -> assert false
 
-let print_specific_operation printreg op ppf arg =
-  match op with
-  | Ilea addr -> print_addressing printreg addr ppf arg
-  | Istore_int(n, addr, is_assign) ->
-      fprintf ppf "[%a] := %nd %s"
-         (print_addressing printreg addr) arg n
-         (if is_assign then "(assign)" else "(init)")
-  | Ioffset_loc(n, addr) ->
-      fprintf ppf "[%a] +:= %i" (print_addressing printreg addr) arg n
-  | Isqrtf ->
-      fprintf ppf "sqrtf %a" printreg arg.(0)
-  | Ifloatsqrtf addr ->
-     fprintf ppf "sqrtf float64[%a]"
-             (print_addressing printreg addr) [|arg.(0)|]
-  | Ifloatarithmem(op, addr) ->
-      let op_name = function
-      | Ifloatadd -> "+f"
-      | Ifloatsub -> "-f"
-      | Ifloatmul -> "*f"
-      | Ifloatdiv -> "/f" in
-      fprintf ppf "%a %s float64[%a]" printreg arg.(0) (op_name op)
-                   (print_addressing printreg addr)
-                   (Array.sub arg 1 (Array.length arg - 1))
-  | Ibswap i ->
-      fprintf ppf "bswap_%i %a" i printreg arg.(0)
-  | Isextend32 ->
-      fprintf ppf "sextend32 %a" printreg arg.(0)
-  | Izextend32 ->
-      fprintf ppf "zextend32 %a" printreg arg.(0)
+let box_specific_operation sop =
+  (Amd64 sop : Operations.specific_operations)
+
+let unbox_specific_operation (sop : Operations.specific_operations) =
+  match sop with
+  | Amd64 specific_operation -> specific_operation
+  | _ -> assert false
 
 (* Are we using the Windows 64-bit ABI? *)
 

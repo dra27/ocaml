@@ -18,7 +18,7 @@
 
 open Arch
 open Mach
-open CSEgen.Make(Proc)
+open CSEgen.Make(Arch)(Proc)
 
 class cse = object
 
@@ -26,7 +26,7 @@ inherit cse_generic as super
 
 method! class_of_operation op =
   match op with
-  | Ispecific(Ishiftcheckbound _) -> Op_checkbound
+  | Ispecific((Ishiftcheckbound _)) -> Op_checkbound
   | Ispecific _ -> Op_pure
   | _ -> super#class_of_operation op
 

@@ -25,10 +25,10 @@ type instruction =
     dbg: Debuginfo.t;
     live: Reg.Set.t }
 
-and instruction_desc =
+and ('am, 'so) gen_instruction_desc =
   | Lprologue
   | Lend
-  | Lop of Mach.operation
+  | Lop of ('am, 'so) Mach.gen_operation
   | Lreloadretaddr
   | Lreturn
   | Llabel of label
@@ -42,11 +42,19 @@ and instruction_desc =
   | Lpoptrap
   | Lraise of Lambda.raise_kind
 
+and instruction_desc =
+  (Operations.addressing_modes,
+   Operations.specific_operations) gen_instruction_desc
+
 val has_fallthrough :  instruction_desc -> bool
 val end_instr: unit -> instruction
 val instr_cons:
   instruction_desc -> Reg.t array -> Reg.t array -> instruction -> instruction
 val invert_test: Mach.test -> Mach.test
+
+val map_desc :
+  ('a -> 'b) -> ('c -> 'd)
+    -> ('a, 'c) gen_instruction_desc -> ('b, 'd) gen_instruction_desc
 
 type fundecl =
   { fun_name: string;

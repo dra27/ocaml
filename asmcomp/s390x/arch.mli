@@ -16,7 +16,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include module type of Operations.S390x
+include module type of struct include Operations.S390x end
 
 (* Specific operations for the Z processor *)
 
@@ -50,15 +50,13 @@ val offset_addressing : addressing_mode -> int -> addressing_mode
 
 val num_args_addressing : addressing_mode -> int
 
-(* Printing operations and addressing modes *)
+val box_addressing_mode : addressing_mode -> Operations.addressing_modes
+val unbox_addressing_mode : Operations.addressing_modes -> addressing_mode
 
-val print_addressing :
-  (Format.formatter -> 'a -> unit) -> addressing_mode ->
-  Format.formatter -> 'a array -> unit
-
-val print_specific_operation :
-  (Format.formatter -> 'a -> unit) -> specific_operation ->
-  Format.formatter -> 'a array -> unit
+val box_specific_operation :
+  specific_operation -> Operations.specific_operations
+val unbox_specific_operation :
+  Operations.specific_operations -> specific_operation
 
 (* Specific operations that are pure *)
 

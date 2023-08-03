@@ -24,6 +24,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 (* Layout of the stack.  The C stack must be 16-aligned, but 8-alignment
    is enough for the OCaml stack. *)
 
@@ -260,7 +262,7 @@ let name_for_specific = function
 
 let emit_instr env i =
   emit_debug_info i.dbg;
-  match i.desc with
+  match map_desc i.desc with
     Lend -> ()
   | Lprologue ->
       let n = frame_size env in

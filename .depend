@@ -2274,6 +2274,7 @@ asmcomp/CSE.cmi : \
 asmcomp/CSEgen.cmo : \
     asmcomp/reg.cmi \
     asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     asmcomp/cmm.cmi \
     parsing/asttypes.cmi \
@@ -2281,12 +2282,14 @@ asmcomp/CSEgen.cmo : \
 asmcomp/CSEgen.cmx : \
     asmcomp/reg.cmx \
     asmcomp/proc.cmx \
+    asmcomp/operations.cmx \
     asmcomp/mach.cmx \
     asmcomp/cmm.cmx \
     parsing/asttypes.cmi \
     asmcomp/CSEgen.cmi
 asmcomp/CSEgen.cmi : \
     asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     parsing/asttypes.cmi
 asmcomp/afl_instrument.cmo : \
@@ -2558,10 +2561,10 @@ asmcomp/branch_relaxation.cmi : \
     asmcomp/linear.cmi \
     asmcomp/branch_relaxation_intf.cmi
 asmcomp/branch_relaxation_intf.cmi : \
+    asmcomp/operations.cmi \
     asmcomp/linear.cmi \
     lambda/debuginfo.cmi \
-    asmcomp/cmm.cmi \
-    asmcomp/arch.cmi
+    asmcomp/cmm.cmi
 asmcomp/cmm.cmo : \
     utils/targetint.cmi \
     utils/misc.cmi \
@@ -2861,6 +2864,7 @@ asmcomp/interval.cmi : \
     asmcomp/mach.cmi
 asmcomp/linear.cmo : \
     asmcomp/reg.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
@@ -2868,6 +2872,7 @@ asmcomp/linear.cmo : \
     asmcomp/linear.cmi
 asmcomp/linear.cmx : \
     asmcomp/reg.cmx \
+    asmcomp/operations.cmx \
     asmcomp/mach.cmx \
     lambda/lambda.cmx \
     lambda/debuginfo.cmx \
@@ -2875,6 +2880,7 @@ asmcomp/linear.cmx : \
     asmcomp/linear.cmi
 asmcomp/linear.cmi : \
     asmcomp/reg.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
@@ -2932,6 +2938,7 @@ asmcomp/liveness.cmi : \
     asmcomp/mach.cmi
 asmcomp/mach.cmo : \
     asmcomp/reg.cmi \
+    asmcomp/operations.cmi \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
@@ -2940,6 +2947,7 @@ asmcomp/mach.cmo : \
     asmcomp/mach.cmi
 asmcomp/mach.cmx : \
     asmcomp/reg.cmx \
+    asmcomp/operations.cmx \
     lambda/lambda.cmx \
     lambda/debuginfo.cmx \
     asmcomp/cmm.cmx \
@@ -2948,11 +2956,11 @@ asmcomp/mach.cmx : \
     asmcomp/mach.cmi
 asmcomp/mach.cmi : \
     asmcomp/reg.cmi \
+    asmcomp/operations.cmi \
     lambda/lambda.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
-    parsing/asttypes.cmi \
-    asmcomp/arch.cmi
+    parsing/asttypes.cmi
 asmcomp/operations.cmo : \
     lambda/debuginfo.cmi \
     asmcomp/operations.cmi
@@ -3033,25 +3041,25 @@ asmcomp/printmach.cmo : \
     asmcomp/reg.cmi \
     asmcomp/printcmm.cmi \
     asmcomp/platform.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     lambda/lambda.cmi \
     asmcomp/interval.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
     utils/clflags.cmi \
-    asmcomp/arch.cmi \
     asmcomp/printmach.cmi
 asmcomp/printmach.cmx : \
     asmcomp/reg.cmx \
     asmcomp/printcmm.cmx \
     asmcomp/platform.cmx \
+    asmcomp/operations.cmx \
     asmcomp/mach.cmx \
     lambda/lambda.cmx \
     asmcomp/interval.cmx \
     lambda/debuginfo.cmx \
     asmcomp/cmm.cmx \
     utils/clflags.cmx \
-    asmcomp/arch.cmx \
     asmcomp/printmach.cmi
 asmcomp/printmach.cmi : \
     asmcomp/reg.cmi \
@@ -3112,40 +3120,43 @@ asmcomp/reload.cmi : \
     asmcomp/mach.cmi
 asmcomp/reloadgen.cmo : \
     asmcomp/reg.cmi \
+    asmcomp/operations.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     asmcomp/reloadgen.cmi
 asmcomp/reloadgen.cmx : \
     asmcomp/reg.cmx \
+    asmcomp/operations.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     asmcomp/reloadgen.cmi
 asmcomp/reloadgen.cmi : \
     asmcomp/reg.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi
 asmcomp/schedgen.cmo : \
     asmcomp/reg.cmi \
     asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
     asmcomp/linear.cmi \
     asmcomp/cmm.cmi \
     utils/clflags.cmi \
-    asmcomp/arch.cmi \
     asmcomp/schedgen.cmi
 asmcomp/schedgen.cmx : \
     asmcomp/reg.cmx \
     asmcomp/proc.cmx \
+    asmcomp/operations.cmx \
     asmcomp/mach.cmx \
     asmcomp/linear.cmx \
     asmcomp/cmm.cmx \
     utils/clflags.cmx \
-    asmcomp/arch.cmx \
     asmcomp/schedgen.cmi
 asmcomp/schedgen.cmi : \
     asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
     asmcomp/mach.cmi \
-    asmcomp/linear.cmi \
-    asmcomp/arch.cmi
+    asmcomp/linear.cmi
 asmcomp/scheduling.cmo : \
     asmcomp/schedgen.cmi \
     asmcomp/scheduling.cmi
@@ -3158,6 +3169,7 @@ asmcomp/selectgen.cmo : \
     asmcomp/reg.cmi \
     asmcomp/proc.cmi \
     asmcomp/polling.cmi \
+    asmcomp/operations.cmi \
     utils/numbers.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
@@ -3166,12 +3178,12 @@ asmcomp/selectgen.cmo : \
     asmcomp/cmm.cmi \
     middle_end/backend_var.cmi \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmi \
     asmcomp/selectgen.cmi
 asmcomp/selectgen.cmx : \
     asmcomp/reg.cmx \
     asmcomp/proc.cmx \
     asmcomp/polling.cmx \
+    asmcomp/operations.cmx \
     utils/numbers.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
@@ -3180,18 +3192,17 @@ asmcomp/selectgen.cmx : \
     asmcomp/cmm.cmx \
     middle_end/backend_var.cmx \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmx \
     asmcomp/selectgen.cmi
 asmcomp/selectgen.cmi : \
     asmcomp/reg.cmi \
     asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
     middle_end/backend_var.cmi \
-    parsing/asttypes.cmi \
-    asmcomp/arch.cmi
+    parsing/asttypes.cmi
 asmcomp/selection.cmo : \
     asmcomp/selectgen.cmi \
     asmcomp/reg.cmi \

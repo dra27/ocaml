@@ -131,3 +131,44 @@ module S390x : sig
     | Iindexed2 of int                    (* reg + reg + displ *)
 end
 
+type addressing_modes =
+| Amd64 of Amd64.addressing_mode
+| Arm64 of Arm64.addressing_mode
+| Power of Power.addressing_mode
+| Riscv of Riscv.addressing_mode
+| S390x of S390x.addressing_mode
+
+type specific_operations =
+| Amd64 of Amd64.specific_operation
+| Arm64 of Arm64.specific_operation
+| Power of Power.specific_operation
+| Riscv of Riscv.specific_operation
+| S390x of S390x.specific_operation
+
+module type S = sig
+  type addressing_mode
+  type specific_operation
+
+  val box_addressing_mode : addressing_mode -> addressing_modes
+  val unbox_addressing_mode : addressing_modes -> addressing_mode
+
+  val box_specific_operation : specific_operation -> specific_operations
+  val unbox_specific_operation : specific_operations -> specific_operation
+
+  val size_addr : int
+  val size_int : int
+  val size_float : int
+
+  val identity_addressing : addressing_mode
+  val offset_addressing : addressing_mode -> int -> addressing_mode
+end
+
+(* Printing operations and addressing modes *)
+
+val print_addressing :
+  (Format.formatter -> 'a -> unit) -> addressing_modes ->
+  Format.formatter -> 'a array -> unit
+
+val print_specific_operation :
+  (Format.formatter -> 'a -> unit) -> specific_operations ->
+  Format.formatter -> 'a array -> unit
