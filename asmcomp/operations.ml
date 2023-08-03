@@ -322,6 +322,28 @@ let print_specific_operation printreg = function
 | Riscv op -> Riscv.print_specific_operation printreg op
 | S390x op -> S390x.print_specific_operation printreg op
 
+let operation_is_pure = function
+| Amd64 (Ilea _ | Ibswap _ | Isqrtf | Isextend32 | Izextend32
+         | Ifloatarithmem _ | Ifloatsqrtf _) -> true
+| Amd64 _ -> false
+| Arm64 (Ifar_alloc _ | Ifar_intop_checkbound | Ifar_intop_imm_checkbound _
+         | Ishiftcheckbound _ | Ifar_shiftcheckbound _) -> false
+| Arm64 _ -> true
+| Power (Ialloc_far _ | Ipoll_far _) -> false
+| Power _ -> true
+| Riscv _ -> true
+| S390x _ -> true
+
+let operation_can_raise = function
+| Amd64 _ -> false
+| Arm64 (Ifar_alloc _ | Ifar_intop_checkbound | Ifar_intop_imm_checkbound _
+         | Ishiftcheckbound _ | Ifar_shiftcheckbound _) -> true
+| Arm64 _ -> false
+| Power (Ialloc_far _ | Ipoll_far _) -> true
+| Power _ -> false
+| Riscv _ -> false
+| S390x _ -> false
+
 module type S = sig
   type addressing_mode
   type specific_operation

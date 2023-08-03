@@ -55,11 +55,3 @@ val box_specific_operation :
   specific_operation -> Operations.specific_operations
 val unbox_specific_operation :
   Operations.specific_operations -> specific_operation
-
-(* Specific operations that are pure *)
-
-val operation_is_pure : specific_operation -> bool
-
-(* Specific operations that can raise *)
-
-val operation_can_raise : specific_operation -> bool

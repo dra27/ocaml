@@ -2943,7 +2943,6 @@ asmcomp/mach.cmo : \
     lambda/debuginfo.cmi \
     asmcomp/cmm.cmi \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmi \
     asmcomp/mach.cmi
 asmcomp/mach.cmx : \
     asmcomp/reg.cmx \
@@ -2952,7 +2951,6 @@ asmcomp/mach.cmx : \
     lambda/debuginfo.cmx \
     asmcomp/cmm.cmx \
     parsing/asttypes.cmi \
-    asmcomp/arch.cmx \
     asmcomp/mach.cmi
 asmcomp/mach.cmi : \
     asmcomp/reg.cmi \

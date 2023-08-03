@@ -172,3 +172,11 @@ val print_addressing :
 val print_specific_operation :
   (Format.formatter -> 'a -> unit) -> specific_operations ->
   Format.formatter -> 'a array -> unit
+
+(* Specific operations that are pure *)
+
+val operation_is_pure : specific_operations -> bool
+
+(* Specific operations that can raise *)
+
+val operation_can_raise : specific_operations -> bool

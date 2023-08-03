@@ -61,11 +61,3 @@ val unbox_specific_operation :
 (* Printing operations and addressing modes *)
 
 val is_logical_immediate : nativeint -> bool
-
-(* Specific operations that are pure *)
-
-val operation_is_pure : specific_operation -> bool
-
-(* Specific operations that can raise *)
-
-val operation_can_raise : specific_operation -> bool

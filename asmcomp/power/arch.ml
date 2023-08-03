@@ -67,21 +67,3 @@ let unbox_specific_operation (sop : Operations.specific_operations) =
   match sop with
   | Power specific_operation -> specific_operation
   | _ -> assert false
-
-(* Specific operations that are pure *)
-
-let operation_is_pure = function
-  | Ialloc_far _
-  | Ipoll_far _
-  | Icheckbound_far
-  | Icheckbound_imm_far _ -> false
-  | _ -> true
-
-(* Specific operations that can raise *)
-
-let operation_can_raise = function
-  | Ialloc_far _
-  | Ipoll_far _
-  | Icheckbound_far
-  | Icheckbound_imm_far _ -> true
-  | _ -> false

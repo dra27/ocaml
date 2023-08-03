@@ -176,7 +176,7 @@ let operation_is_pure = function
   | Iextcall _ | Istackoffset _ | Istore _ | Ialloc _ | Ipoll _
   | Idls_get
   | Iintop(Icheckbound) | Iintop_imm(Icheckbound, _) | Iopaque -> false
-  | Ispecific sop -> Arch.(operation_is_pure (unbox_specific_operation sop))
+  | Ispecific sop -> Operations.operation_is_pure sop
   | _ -> true
 
 let operation_can_raise op =
@@ -184,5 +184,5 @@ let operation_can_raise op =
   | Icall_ind | Icall_imm _ | Iextcall _
   | Iintop (Icheckbound) | Iintop_imm (Icheckbound, _)
   | Ialloc _ | Ipoll _ -> true
-  | Ispecific sop -> Arch.(operation_can_raise (unbox_specific_operation sop))
+  | Ispecific sop -> Operations.operation_can_raise sop
   | _ -> false

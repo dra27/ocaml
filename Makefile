@@ -222,29 +222,31 @@ asmcomp_SOURCES = \
 asmcomp_SOURCES += \
   asmcomp/cmm.mli asmcomp/cmm.ml \
   asmcomp/reg.mli asmcomp/reg.ml \
-  asmcomp/platform.mli asmcomp/platform.ml \
   asmcomp/operations.mli asmcomp/operations.ml \
-  asmcomp/arch.mli asmcomp/arch.ml \
   asmcomp/mach.mli asmcomp/mach.ml \
   asmcomp/linear.mli asmcomp/linear.ml \
-  asmcomp/proc.mli asmcomp/proc.ml
-# Architecture-specific implementations and support modules
+  asmcomp/platform.mli asmcomp/platform.ml
+# Architecture-specific support modules
 asmcomp_SOURCES += \
   asmcomp/dataflow.mli asmcomp/dataflow.ml \
   asmcomp/polling.mli asmcomp/polling.ml \
   asmcomp/selectgen.mli asmcomp/selectgen.ml \
-  asmcomp/selection.mli asmcomp/selection.ml \
   asmcomp/CSEgen.mli asmcomp/CSEgen.ml \
-  asmcomp/CSE.mli asmcomp/CSE.ml \
   asmcomp/reloadgen.mli asmcomp/reloadgen.ml \
-  asmcomp/reload.mli asmcomp/reload.ml \
   asmcomp/stackframegen.mli asmcomp/stackframegen.ml \
-  asmcomp/stackframe.mli asmcomp/stackframe.ml \
   asmcomp/schedgen.mli asmcomp/schedgen.ml \
-  asmcomp/scheduling.mli asmcomp/scheduling.ml \
   asmcomp/branch_relaxation.mli asmcomp/branch_relaxation.ml \
-  asmcomp/emitaux.mli asmcomp/emitaux.ml \
-  asmcomp/emit.mli asmcomp/emit.ml \
+  asmcomp/emitaux.mli asmcomp/emitaux.ml
+# Architecture-specific modules
+asmcomp_SOURCES += \
+  asmcomp/arch.mli asmcomp/arch.ml \
+  asmcomp/proc.mli asmcomp/proc.ml \
+  asmcomp/selection.mli asmcomp/selection.ml \
+  asmcomp/CSE.mli asmcomp/CSE.ml \
+  asmcomp/reload.mli asmcomp/reload.ml \
+  asmcomp/stackframe.mli asmcomp/stackframe.ml \
+  asmcomp/scheduling.mli asmcomp/scheduling.ml \
+  asmcomp/emit.mli asmcomp/emit.ml
 # Cmm and the rest of ocamlopt
 asmcomp_SOURCES += \
   asmcomp/strmatch.mli asmcomp/strmatch.ml \
