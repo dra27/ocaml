@@ -143,6 +143,9 @@ type specific_operations =
 | S390x of S390x.specific_operation
 
 module type S = sig
+  (* XXX Temporary! *)
+  val command_line_options : (string * Arg.spec * string) list
+
   type addressing_mode
   type specific_operation
 
@@ -151,6 +154,12 @@ module type S = sig
 
   val box_specific_operation : specific_operation -> specific_operations
   val unbox_specific_operation : specific_operations -> specific_operation
+
+  val big_endian : bool
+
+  val allow_unaligned_access : bool
+
+  val division_crashes_on_overflow : bool
 
   val size_addr : int
   val size_int : int

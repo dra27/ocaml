@@ -226,7 +226,8 @@ ASMCOMP += \
   asmcomp/reload.cmo \
   asmcomp/scheduling.cmo \
   asmcomp/emit.cmo \
-  asmcomp/selection.cmo
+  asmcomp/selection.cmo \
+  asmcomp/default.cmo
 # Cmm and the rest of ocamlopt
 ASMCOMP += \
   asmcomp/strmatch.cmo \
