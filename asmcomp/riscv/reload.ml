@@ -16,5 +16,7 @@
 
 (* Reloading for the RISC-V *)
 
+open Reloadgen.Make(Arch)
+
 let fundecl f =
-  (new Reloadgen.reload_generic)#fundecl f
+  (new reload_generic)#fundecl f

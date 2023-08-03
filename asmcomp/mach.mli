@@ -70,7 +70,12 @@ type ('am, 'so) gen_operation =
   | Idls_get
   | Ireturn_addr (** Retrieve the return address from the stack frame *)
 
-type operation = (Arch.addressing_mode, Arch.specific_operation) gen_operation
+type operation =
+  (Operations.addressing_modes, Operations.specific_operations) gen_operation
+
+val map_op :
+  ('a -> 'b) -> ('c -> 'd)
+    -> ('a, 'c) gen_operation -> ('b, 'd) gen_operation
 
 type instruction =
   { desc: instruction_desc;

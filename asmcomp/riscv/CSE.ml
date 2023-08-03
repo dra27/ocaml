@@ -18,7 +18,7 @@
 
 open Arch
 open Mach
-open CSEgen.Make(Proc)
+open CSEgen.Make(Arch)(Proc)
 
 class cse = object (_self)
 

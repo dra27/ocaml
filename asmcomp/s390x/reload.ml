@@ -18,10 +18,11 @@
 
 open Arch
 open Mach
+open Reloadgen.Make(Arch)
 
 class reload = object (self)
 
-inherit Reloadgen.reload_generic as super
+inherit reload_generic as super
 
 (* For 2-address instructions, reloading must make sure that the
    temporary result register is the same as the appropriate

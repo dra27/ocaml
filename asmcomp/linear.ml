@@ -25,10 +25,10 @@ type instruction =
     dbg: Debuginfo.t;
     live: Reg.Set.t }
 
-and instruction_desc =
+and ('am, 'so) gen_instruction_desc =
   | Lprologue
   | Lend
-  | Lop of Mach.operation
+  | Lop of ('am, 'so) Mach.gen_operation
   | Lreloadretaddr
   | Lreturn
   | Llabel of label
@@ -41,6 +41,10 @@ and instruction_desc =
   | Lpushtrap of { lbl_handler : label; }
   | Lpoptrap
   | Lraise of Lambda.raise_kind
+
+and instruction_desc =
+  (Operations.addressing_modes,
+   Operations.specific_operations) gen_instruction_desc
 
 let has_fallthrough = function
   | Lreturn | Lbranch _ | Lswitch _ | Lraise _
@@ -92,3 +96,9 @@ let end_instr () =
 let instr_cons d a r n =
   { desc = d; next = n; arg = a; res = r;
     dbg = Debuginfo.none; live = Reg.Set.empty }
+
+let map_desc map_addressing_mode map_specific_operation = function
+| Lop op -> Lop (Mach.map_op map_addressing_mode map_specific_operation op)
+| (Lprologue | Lend | Lreloadretaddr | Lreturn | Llabel _ | Lbranch _
+   | Lcondbranch (_, _) | Lcondbranch3 (_, _, _) | Lswitch _ | Lentertrap
+   | Ladjust_trap_depth _ | Lpushtrap _ | Lpoptrap | Lraise _) as desc -> desc

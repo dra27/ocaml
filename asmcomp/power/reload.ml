@@ -16,5 +16,7 @@
 
 (* Reloading for the PowerPC *)
 
+open Reloadgen.Make(Arch)
+
 let fundecl f num_stack_slots =
-  (new Reloadgen.reload_generic)#fundecl f num_stack_slots
+  (new reload_generic)#fundecl f num_stack_slots
