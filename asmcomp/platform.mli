@@ -12,23 +12,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type S = sig
-  val command_line_options: (string * Arg.spec * string) list
-  val big_endian: bool
-  val size_addr: int
-  val size_int: int
-  val size_float: int
-  val allow_unaligned_access: bool
-  val division_crashes_on_overflow: bool
-  val num_register_classes: int
-  val register_class: Reg.t -> int
-  val num_available_registers: int array
-  val first_available_register: int array
-  val register_name: int -> string
-  val phys_reg: int -> Reg.t
-  val rotate_registers: bool
-  val loc_exn_bucket: Reg.t
-  val max_arguments_for_tailcalls: int
+module type Backend = sig
+  module Arch : Operations.S
+  module CSE : sig
+    val fundecl: Mach.fundecl -> Mach.fundecl
+  end
+  module Emit : sig
+    val fundecl: Linear.fundecl -> unit
+    val data: Cmm.data_item list -> unit
+    val begin_assembly: unit -> unit
+    val end_assembly: unit -> unit
+  end
+  module Proc : module type of Proc
+  module Reload : sig
+    val fundecl: Mach.fundecl -> int array -> Mach.fundecl * bool
+  end
+  module Scheduling : sig
+    val fundecl: Linear.fundecl -> Linear.fundecl
+  end
+  module Selection : sig
+    val fundecl:
+      future_funcnames:Misc.Stdlib.String.Set.t -> Cmm.fundecl -> Mach.fundecl
+  end
+  module Stackframe : sig
+    val trap_handler_size : int
+    val analyze : Mach.fundecl -> Stackframegen.analysis_result
+  end
 end
 
 type platform = private {
@@ -47,11 +56,12 @@ type platform = private {
   mutable phys_reg: int -> Reg.t;
   mutable rotate_registers: bool;
   mutable loc_exn_bucket: Reg.t;
-  mutable max_arguments_for_tailcalls: int
+  mutable max_arguments_for_tailcalls: int;
+  mutable backend: (module Backend)
 }
 
 val info : platform
 
-val load_info : (module S) -> unit
+val load_backend : (module Backend) -> unit
 
 val platform_hook : (platform -> unit) -> unit

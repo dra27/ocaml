@@ -306,24 +306,3 @@ let assemble_file infile outfile =
     (Config.asm ^ " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
 
 let init () = ()
-
-module Info = struct
-  let command_line_options = Arch.command_line_options
-  let big_endian = Arch.big_endian
-  let size_addr = Arch.size_addr
-  let size_int = Arch.size_int
-  let size_float = Arch.size_float
-  let allow_unaligned_access = Arch.allow_unaligned_access
-  let division_crashes_on_overflow = Arch.division_crashes_on_overflow
-  let num_register_classes = num_register_classes
-  let register_class = register_class
-  let num_available_registers = num_available_registers
-  let first_available_register = first_available_register
-  let register_name = register_name
-  let phys_reg = phys_reg
-  let rotate_registers = rotate_registers
-  let loc_exn_bucket = loc_exn_bucket
-  let max_arguments_for_tailcalls = max_arguments_for_tailcalls
-end
-
-let () = Platform.load_info (module Info : Platform.S)

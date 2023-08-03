@@ -335,3 +335,6 @@ let () =
       | Error err -> Some (Location.error_of_printer_file report_error err)
       | _ -> None
     )
+
+let () =
+  Platform.load_backend (module Default.Backend : Platform.Backend)

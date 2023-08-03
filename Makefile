@@ -225,6 +225,7 @@ asmcomp_SOURCES += \
   asmcomp/operations.mli asmcomp/operations.ml \
   asmcomp/mach.mli asmcomp/mach.ml \
   asmcomp/linear.mli asmcomp/linear.ml \
+  asmcomp/stackframegen.mli asmcomp/stackframegen.ml \
   asmcomp/platform.mli asmcomp/platform.ml
 # Architecture-specific support modules
 asmcomp_SOURCES += \
@@ -233,7 +234,6 @@ asmcomp_SOURCES += \
   asmcomp/selectgen.mli asmcomp/selectgen.ml \
   asmcomp/CSEgen.mli asmcomp/CSEgen.ml \
   asmcomp/reloadgen.mli asmcomp/reloadgen.ml \
-  asmcomp/stackframegen.mli asmcomp/stackframegen.ml \
   asmcomp/schedgen.mli asmcomp/schedgen.ml \
   asmcomp/branch_relaxation.mli asmcomp/branch_relaxation.ml \
   asmcomp/emitaux.mli asmcomp/emitaux.ml
@@ -246,7 +246,8 @@ asmcomp_SOURCES += \
   asmcomp/reload.mli asmcomp/reload.ml \
   asmcomp/stackframe.mli asmcomp/stackframe.ml \
   asmcomp/scheduling.mli asmcomp/scheduling.ml \
-  asmcomp/emit.mli asmcomp/emit.ml
+  asmcomp/emit.mli asmcomp/emit.ml \
+  asmcomp/default.mli asmcomp/default.ml
 # Cmm and the rest of ocamlopt
 asmcomp_SOURCES += \
   asmcomp/strmatch.mli asmcomp/strmatch.ml \

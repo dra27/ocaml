@@ -2343,6 +2343,7 @@ asmcomp/asmgen.cmo : \
     asmcomp/printcmm.cmi \
     typing/primitive.cmi \
     asmcomp/polling.cmi \
+    asmcomp/platform.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     parsing/location.cmi \
@@ -2357,6 +2358,7 @@ asmcomp/asmgen.cmo : \
     typing/ident.cmi \
     asmcomp/emitaux.cmi \
     asmcomp/emit.cmi \
+    asmcomp/default.cmi \
     asmcomp/deadcode.cmi \
     utils/config.cmi \
     middle_end/compilenv.cmi \
@@ -2387,6 +2389,7 @@ asmcomp/asmgen.cmx : \
     asmcomp/printcmm.cmx \
     typing/primitive.cmx \
     asmcomp/polling.cmx \
+    asmcomp/platform.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     parsing/location.cmx \
@@ -2401,6 +2404,7 @@ asmcomp/asmgen.cmx : \
     typing/ident.cmx \
     asmcomp/emitaux.cmx \
     asmcomp/emit.cmx \
+    asmcomp/default.cmx \
     asmcomp/deadcode.cmx \
     utils/config.cmx \
     middle_end/compilenv.cmx \
@@ -2762,6 +2766,28 @@ asmcomp/deadcode.cmx : \
     asmcomp/deadcode.cmi
 asmcomp/deadcode.cmi : \
     asmcomp/mach.cmi
+asmcomp/default.cmo : \
+    asmcomp/stackframe.cmi \
+    asmcomp/selection.cmi \
+    asmcomp/scheduling.cmi \
+    asmcomp/reload.cmi \
+    asmcomp/proc.cmi \
+    asmcomp/emit.cmi \
+    asmcomp/CSE.cmi \
+    asmcomp/arch.cmi \
+    asmcomp/default.cmi
+asmcomp/default.cmx : \
+    asmcomp/stackframe.cmx \
+    asmcomp/selection.cmx \
+    asmcomp/scheduling.cmx \
+    asmcomp/reload.cmx \
+    asmcomp/proc.cmx \
+    asmcomp/emit.cmx \
+    asmcomp/CSE.cmx \
+    asmcomp/arch.cmx \
+    asmcomp/default.cmi
+asmcomp/default.cmi : \
+    asmcomp/platform.cmi
 asmcomp/emit.cmo : \
     asmcomp/x86_proc.cmi \
     asmcomp/x86_masm.cmi \
@@ -2968,13 +2994,40 @@ asmcomp/operations.cmx : \
 asmcomp/operations.cmi : \
     lambda/debuginfo.cmi
 asmcomp/platform.cmo : \
+    asmcomp/stackframegen.cmi \
     asmcomp/reg.cmi \
+    asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    lambda/lambda.cmi \
+    lambda/debuginfo.cmi \
+    asmcomp/cmm.cmi \
+    asmcomp/arch.cmi \
     asmcomp/platform.cmi
 asmcomp/platform.cmx : \
+    asmcomp/stackframegen.cmx \
     asmcomp/reg.cmx \
+    asmcomp/proc.cmx \
+    asmcomp/operations.cmx \
+    utils/misc.cmx \
+    asmcomp/mach.cmx \
+    asmcomp/linear.cmx \
+    lambda/lambda.cmx \
+    lambda/debuginfo.cmx \
+    asmcomp/cmm.cmx \
+    asmcomp/arch.cmx \
     asmcomp/platform.cmi
 asmcomp/platform.cmi : \
-    asmcomp/reg.cmi
+    asmcomp/stackframegen.cmi \
+    asmcomp/reg.cmi \
+    asmcomp/proc.cmi \
+    asmcomp/operations.cmi \
+    utils/misc.cmi \
+    asmcomp/mach.cmi \
+    asmcomp/linear.cmi \
+    asmcomp/cmm.cmi
 asmcomp/polling.cmo : \
     utils/numbers.cmi \
     utils/misc.cmi \
@@ -3066,7 +3119,6 @@ asmcomp/printmach.cmi : \
 asmcomp/proc.cmo : \
     asmcomp/x86_proc.cmi \
     asmcomp/reg.cmi \
-    asmcomp/platform.cmi \
     utils/misc.cmi \
     asmcomp/mach.cmi \
     utils/config.cmi \
@@ -3076,7 +3128,6 @@ asmcomp/proc.cmo : \
 asmcomp/proc.cmx : \
     asmcomp/x86_proc.cmx \
     asmcomp/reg.cmx \
-    asmcomp/platform.cmx \
     utils/misc.cmx \
     asmcomp/mach.cmx \
     utils/config.cmx \
