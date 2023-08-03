@@ -12,33 +12,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module type CSE = sig
+  val fundecl: Mach.fundecl -> Mach.fundecl
+end
+module type Emit = sig
+  val fundecl: Linear.fundecl -> unit
+  val data: Cmm.data_item list -> unit
+  val begin_assembly: unit -> unit
+  val end_assembly: unit -> unit
+end
+module type Reload = sig
+  val fundecl: Mach.fundecl -> int array -> Mach.fundecl * bool
+end
+module type Scheduling = sig
+  val fundecl: Linear.fundecl -> Linear.fundecl
+end
+module type Selection = sig
+  val fundecl:
+    future_funcnames:Misc.Stdlib.String.Set.t -> Cmm.fundecl -> Mach.fundecl
+end
+module type Stackframe = sig
+  val trap_handler_size : int
+  val analyze : Mach.fundecl -> Stackframegen.analysis_result
+end
 module type Backend = sig
   module Arch : Operations.S
-  module CSE : sig
-    val fundecl: Mach.fundecl -> Mach.fundecl
-  end
-  module Emit : sig
-    val fundecl: Linear.fundecl -> unit
-    val data: Cmm.data_item list -> unit
-    val begin_assembly: unit -> unit
-    val end_assembly: unit -> unit
-  end
-  module Proc : module type of Proc
-  module Reload : sig
-    val fundecl: Mach.fundecl -> int array -> Mach.fundecl * bool
-  end
-  module Scheduling : sig
-    val fundecl: Linear.fundecl -> Linear.fundecl
-  end
-  module Selection : sig
-    val fundecl:
-      future_funcnames:Misc.Stdlib.String.Set.t -> Cmm.fundecl -> Mach.fundecl
-  end
-  module Stackframe : sig
-    val trap_handler_size : int
-
-    val analyze : Mach.fundecl -> Stackframegen.analysis_result
-  end
+  module Proc : module type of Processor
+  module CSE : CSE
+  module Emit : Emit
+  module Reload : Reload
+  module Scheduling : Scheduling
+  module Selection : Selection
+  module Stackframe : Stackframe
 end
 
 let dummy_mach_fundecl = Mach.({

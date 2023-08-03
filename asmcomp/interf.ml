@@ -38,6 +38,7 @@ let build_graph fundecl =
 
   (* Record an interference between two registers *)
   let add_interf ri rj =
+    let open (val Platform.info.backend : Platform.Backend) in
     if Proc.register_class ri = Proc.register_class rj then begin
       let i = ri.stamp and j = rj.stamp in
       if i <> j then begin
@@ -82,6 +83,7 @@ let build_graph fundecl =
   (* Compute interferences *)
 
   let rec interf i =
+    let open (val Platform.info.backend : Platform.Backend) in
     let destroyed = Proc.destroyed_at_oper i.desc in
     if Array.length destroyed > 0 then add_interf_set destroyed i.live;
     match i.desc with
@@ -124,6 +126,7 @@ let build_graph fundecl =
       float arguments in integer registers, PR#6227.) *)
 
   let add_pref weight r1 r2 =
+    let open (val Platform.info.backend : Platform.Backend) in
     let i = r1.stamp and j = r2.stamp in
     if i <> j
     && r1.loc = Unknown

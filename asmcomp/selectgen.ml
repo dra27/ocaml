@@ -64,7 +64,7 @@ let env_empty = {
 
   (* Infer the type of the result of an operation *)
 
-module Make (Arch : Operations.S) (Proc : module type of Proc) = struct
+module Make (Arch : Operations.S) (Proc : module type of Processor) = struct
   type operation =
     (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
 

@@ -885,7 +885,7 @@ native_cflags
 system
 model
 arch64
-arch_specific_SOURCES
+Arch
 arch
 SO
 runtime_asm_objects
@@ -3499,6 +3499,8 @@ ac_config_files="$ac_config_files otherlibs/dynlink/META"
 ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
+
+ac_config_files="$ac_config_files asmcomp/default.ml"
 
 
 # Definitions related to the version of OCaml
@@ -15540,6 +15542,8 @@ arch=none
 model=default
 system=unknown
 
+
+
 # In all the cases below, if $arch is set so then so too must $system,
 # preserving $arch = 'none' <=> $system = 'unknown'
 has_native_backend=no
@@ -15648,13 +15652,6 @@ fi ;; #(
  ;; #(
   *) :
      ;;
-esac
-
-case $arch in #(
-  amd64) :
-    arch_specific_SOURCES='$(intel_SOURCES)' ;; #(
-  *) :
-    arch_specific_SOURCES='' ;;
 esac
 
 native_cflags=''
@@ -20351,6 +20348,9 @@ LTLIBOBJS=$ac_ltlibobjs
     fi
   done
 
+
+  Arch="$(echo "$arch" | cut -c 1 | tr 'a-z' 'A-Z')$(echo "$arch" | cut -c 2-)"
+
 cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"
 
   saved_exec_prefix="$exec_prefix"
@@ -21360,6 +21360,7 @@ do
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
+    "asmcomp/default.ml") CONFIG_FILES="$CONFIG_FILES asmcomp/default.ml" ;;
     "native-symlinks") CONFIG_COMMANDS="$CONFIG_COMMANDS native-symlinks" ;;
     "ocamldoc/META") CONFIG_FILES="$CONFIG_FILES ocamldoc/META" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;

@@ -133,7 +133,7 @@ AC_SUBST([S])
 AC_SUBST([runtime_asm_objects])
 AC_SUBST([SO])
 AC_SUBST([arch])
-AC_SUBST([arch_specific_SOURCES])
+AC_SUBST([Arch])
 AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
@@ -258,6 +258,7 @@ AC_CONFIG_FILES([compilerlibs/META])
 AC_CONFIG_FILES([otherlibs/dynlink/META])
 AC_CONFIG_FILES([otherlibs/runtime_events/META])
 AC_CONFIG_FILES([stdlib/META])
+AC_CONFIG_FILES([asmcomp/default.ml])
 
 # Definitions related to the version of OCaml
 AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
@@ -1272,6 +1273,10 @@ arch=none
 model=default
 system=unknown
 
+AC_CONFIG_COMMANDS_PRE([
+  Arch="$(echo "$arch" | cut -c 1 | tr 'a-z' 'A-Z')$(echo "$arch" | cut -c 2-)"
+])
+
 # In all the cases below, if $arch is set so then so too must $system,
 # preserving $arch = 'none' <=> $system = 'unknown'
 has_native_backend=no
@@ -1375,11 +1380,6 @@ AS_CASE([$host],
   [riscv64-*-linux*],
     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
 )
-
-AS_CASE([$arch],
-  [amd64],
-    [arch_specific_SOURCES='$(intel_SOURCES)'],
-  [arch_specific_SOURCES=''])
 
 native_cflags=''
 native_cppflags="-DTARGET_${arch} -DMODEL_${model} -DSYS_${system}"

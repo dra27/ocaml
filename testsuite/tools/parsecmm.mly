@@ -58,6 +58,7 @@ let access_array base numelt size =
                   dbg)],
           dbg)
 
+open (val Platform.info.backend : Platform.Backend)
 %}
 
 %token ABSF

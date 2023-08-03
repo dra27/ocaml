@@ -15,8 +15,7 @@
 
 (* Instruction scheduling *)
 
-module Make (Arch : Operations.S)
-            (_ : module type of Proc) : sig
+module Make (Arch : Operations.S) (_ : module type of Processor) : sig
   type operation =
     (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
   class virtual scheduler_generic : Arch.addressing_mode -> object

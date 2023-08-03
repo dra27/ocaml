@@ -217,7 +217,7 @@ intel_SOURCES = \
 
 # Backend-specific modules shared by more than one backend
 asmcomp_SOURCES = \
-  $(addprefix asmcomp/, $(arch_specific_SOURCES))
+  $(addprefix asmcomp/, $(intel_SOURCES))
 # Core IR and platform-description modules
 asmcomp_SOURCES += \
   asmcomp/cmm.mli asmcomp/cmm.ml \
@@ -239,14 +239,11 @@ asmcomp_SOURCES += \
   asmcomp/emitaux.mli asmcomp/emitaux.ml
 # Architecture-specific modules
 asmcomp_SOURCES += \
-  asmcomp/arch.mli asmcomp/arch.ml \
-  asmcomp/proc.mli asmcomp/proc.ml \
-  asmcomp/selection.mli asmcomp/selection.ml \
-  asmcomp/CSE.mli asmcomp/CSE.ml \
-  asmcomp/reload.mli asmcomp/reload.ml \
-  asmcomp/stackframe.mli asmcomp/stackframe.ml \
-  asmcomp/scheduling.mli asmcomp/scheduling.ml \
-  asmcomp/emit.mli asmcomp/emit.ml \
+  asmcomp/amd64.ml \
+  asmcomp/arm64.ml \
+  asmcomp/power.ml \
+  asmcomp/riscv.ml \
+  asmcomp/s390x.ml \
   asmcomp/default.mli asmcomp/default.ml
 # Cmm and the rest of ocamlopt
 asmcomp_SOURCES += \
@@ -1038,46 +1035,118 @@ partialclean::
 
 beforedepend:: lambda/runtimedef.ml
 
-# Choose the right machine-dependent files
+# Machine-dependent packs
 
-asmcomp/arch.mli: asmcomp/$(ARCH)/arch.mli
-	cd asmcomp; $(LN) $(ARCH)/arch.mli .
+ARCH_SPECIFIC = arch proc emit CSE selection scheduling stackframe reload
 
-asmcomp/arch.ml: asmcomp/$(ARCH)/arch.ml
-	cd asmcomp; $(LN) $(ARCH)/arch.ml .
+# XXX Factorise further
+$(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Amd64
+$(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Arm64
+$(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Power
+$(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Riscv
+$(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack S390x
 
-asmcomp/proc.ml: asmcomp/$(ARCH)/proc.ml
-	cd asmcomp; $(LN) $(ARCH)/proc.ml .
+# There's a hack in default.ml.in to generate .depend consistently, but these
+# are the "true" dependencies.
+asmcomp/default.cmo: $(foreach ARCH, $(ARCHES), asmcomp/$(ARCH).cmo)
+asmcomp/default.cmx: $(foreach ARCH, $(ARCHES), asmcomp/$(ARCH).cmx)
 
-asmcomp/selection.ml: asmcomp/$(ARCH)/selection.ml
-	cd asmcomp; $(LN) $(ARCH)/selection.ml .
+asmcomp/%/CSE.mli:
+	$(V_GEN)echo 'include Platform.CSE' > $@
+asmcomp/%/emit.mli:
+	$(V_GEN)echo 'include Platform.Emit' > $@
+asmcomp/%/proc.mli:
+	$(V_GEN)echo 'include module type of Processor' > $@
+asmcomp/%/reload.mli:
+	$(V_GEN)echo 'include Platform.Reload' > $@
+asmcomp/%/scheduling.mli:
+	$(V_GEN)echo 'include Platform.Scheduling' > $@
+asmcomp/%/selection.mli:
+	$(V_GEN)echo 'include Platform.Selection' > $@
+asmcomp/%/stackframe.mli:
+	$(V_GEN)echo 'include Platform.Stackframe' > $@
 
-asmcomp/CSE.ml: asmcomp/$(ARCH)/CSE.ml
-	cd asmcomp; $(LN) $(ARCH)/CSE.ml .
+beforedepend:: $(foreach ARCH, $(ARCHES), \
+  $(addprefix asmcomp/$(ARCH)/, $(ARCH_SPECIFIC:=.mli)))
 
-asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
-	cd asmcomp; $(LN) $(ARCH)/reload.ml .
+partialclean::
+	rm -f $(foreach ARCH, $(ARCHES), \
+    $(addprefix asmcomp/$(ARCH)/, \
+      $(filter-out arch.mli, $(ARCH_SPECIFIC:=.mli))))
 
-asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
-	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+asmcomp/amd64.ml asmcomp/arm64.ml asmcomp/power.ml:
+	$(V_GEN)touch $@
+asmcomp/riscv.ml asmcomp/s390x.ml:
+	$(V_GEN)touch $@
 
-asmcomp/stackframe.ml: asmcomp/$(ARCH)/stackframe.ml
-	cd asmcomp; $(LN) $(ARCH)/stackframe.ml .
+asmcomp/amd64.cmo: $(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+# The ocamlopt$(EXE) comes from compilerlibs/Makefile.compilerlibs
+asmcomp/amd64.cmx: $(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/arm64.cmo: $(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/arm64.cmx: $(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/power.cmo: $(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/power.cmx: $(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/riscv.cmo: $(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/riscv.cmx: $(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/s390x.cmo: $(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/s390x.cmx: $(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+partialclean::
+	rm -f $(addprefix asmcomp/, $(ARCHES:=.ml))
+
+beforedepend:: $(addprefix asmcomp/, $(ARCHES:=.ml))
 
 # Preprocess the code emitters
 cvt_emit = tools/cvt_emit$(EXE)
 
 beforedepend:: tools/cvt_emit.ml
 
-asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
-	$(V_GEN)echo \# 1 \"asmcomp/$(ARCH)/emit.mlp\" > $@ && \
+asmcomp/%/emit.ml: asmcomp/%/emit.mlp $(cvt_emit)
+	$(V_GEN)echo \# 1 \"asmcomp/$*/emit.mlp\" > $@ && \
 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
 	|| { rm -f $@; exit 2; }
 
 partialclean::
-	rm -f asmcomp/emit.ml tools/cvt_emit.ml
+	rm -f $(subst .mlp,.ml, $(wildcard asmcomp/*/emit.mlp))
 
-beforedepend:: asmcomp/emit.ml
+partialclean::
+	rm -f tools/cvt_emit.ml
+
+beforedepend:: $(foreach ARCH, $(ARCHES), asmcomp/$(ARCH)/emit.ml)
 
 cvt_emit_LIBRARIES =
 cvt_emit_SOURCES = tools/cvt_emit.mli tools/cvt_emit.mll
@@ -2248,40 +2317,6 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we use the othertools target
-## Test compilation of backend-specific parts
-
-ARCH_SPECIFIC =\
-  asmcomp/arch.mli asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml \
-  asmcomp/selection.ml asmcomp/scheduling.ml asmcomp/reload.ml \
-  asmcomp/stackframe.ml
-
-partialclean::
-	rm -f $(ARCH_SPECIFIC)
-
-beforedepend:: $(ARCH_SPECIFIC)
-
-# This rule provides a quick way to check that machine-dependent
-# files compiles fine for a foreign architecture (passed as ARCH=xxx).
-
-.PHONY: check_arch
-check_arch:
-	@echo "========= CHECKING asmcomp/$(ARCH) =============="
-	@rm -f $(ARCH_SPECIFIC) asmcomp/emit.ml asmcomp/*.cm*
-	@$(MAKE) compilerlibs/ocamloptcomp.cma \
-	            >/dev/null
-	@rm -f $(ARCH_SPECIFIC) asmcomp/emit.ml asmcomp/*.cm*
-
-.PHONY: check_all_arches
-check_all_arches:
-ifeq ($(ARCH64),true)
-	@STATUS=0; \
-	 for i in $(ARCHES); do \
-	   $(MAKE) --no-print-directory check_arch ARCH=$$i || STATUS=1; \
-	 done; \
-	 exit $$STATUS
-else
-	 @echo "Architecture tests are disabled on 32-bit platforms."
-endif
 
 # The native toplevel
 
@@ -2343,7 +2378,7 @@ endif
 partialclean::
 	for d in utils parsing typing bytecomp asmcomp middle_end file_formats \
            lambda middle_end/closure middle_end/flambda \
-           middle_end/flambda/base_types \
+           middle_end/flambda/base_types $(addprefix asmcomp/, $(ARCHES)) \
            driver toplevel toplevel/byte toplevel/native tools debugger; do \
 	  rm -f $$d/*.cm[ioxt] $$d/*.cmti $$d/*.annot $$d/*.s $$d/*.asm \
 	    $$d/*.o $$d/*.obj $$d/*.so $$d/*.dll; \
@@ -2353,7 +2388,7 @@ partialclean::
 depend: beforedepend
 	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types \
+         middle_end/flambda/base_types $(addprefix asmcomp/, $(ARCHES)) \
          driver toplevel toplevel/byte toplevel/native lex tools debugger \
 	 ocamldoc ocamltest; \
 	 do \
@@ -2380,6 +2415,7 @@ distclean: clean
 	rm -f Makefile.config Makefile.build_config
 	rm -rf autom4te.cache flexdll-sources $(BYTE_BUILD_TREE) $(OPT_BUILD_TREE)
 	rm -f config.log config.status libtool
+	rm -f asmcomp/default.ml
 
 # Installation
 .PHONY: install

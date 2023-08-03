@@ -12,32 +12,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module type CSE = sig
+  (** Common interface to all architecture-specific CSE modules *)
+  val fundecl: Mach.fundecl -> Mach.fundecl
+end
+module type Emit = sig
+  (* Generation of assembly code *)
+  val fundecl: Linear.fundecl -> unit
+  val data: Cmm.data_item list -> unit
+  val begin_assembly: unit -> unit
+  val end_assembly: unit -> unit
+end
+module type Reload = sig
+  (* Insert load/stores for pseudoregs that got assigned to stack locations. *)
+  val fundecl: Mach.fundecl -> int array -> Mach.fundecl * bool
+end
+module type Scheduling = sig
+  (* Instruction scheduling *)
+  val fundecl: Linear.fundecl -> Linear.fundecl
+end
+module type Selection = sig
+  (* Selection of pseudo-instructions, assignment of pseudo-registers,
+     sequentialization. *)
+  val fundecl:
+    future_funcnames:Misc.Stdlib.String.Set.t -> Cmm.fundecl -> Mach.fundecl
+end
+module type Stackframe = sig
+  (* Compute the parameters needed for allocating and managing stack frames
+     in the Emit phase. *)
+  val trap_handler_size : int
+  val analyze : Mach.fundecl -> Stackframegen.analysis_result
+end
 module type Backend = sig
   module Arch : Operations.S
-  module CSE : sig
-    val fundecl: Mach.fundecl -> Mach.fundecl
-  end
-  module Emit : sig
-    val fundecl: Linear.fundecl -> unit
-    val data: Cmm.data_item list -> unit
-    val begin_assembly: unit -> unit
-    val end_assembly: unit -> unit
-  end
-  module Proc : module type of Proc
-  module Reload : sig
-    val fundecl: Mach.fundecl -> int array -> Mach.fundecl * bool
-  end
-  module Scheduling : sig
-    val fundecl: Linear.fundecl -> Linear.fundecl
-  end
-  module Selection : sig
-    val fundecl:
-      future_funcnames:Misc.Stdlib.String.Set.t -> Cmm.fundecl -> Mach.fundecl
-  end
-  module Stackframe : sig
-    val trap_handler_size : int
-    val analyze : Mach.fundecl -> Stackframegen.analysis_result
-  end
+  module Proc : module type of Processor
+  module CSE : CSE
+  module Emit : Emit
+  module Reload : Reload
+  module Scheduling : Scheduling
+  module Selection : Selection
+  module Stackframe : Stackframe
 end
 
 type platform = private {

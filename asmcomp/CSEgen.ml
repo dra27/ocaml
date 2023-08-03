@@ -214,7 +214,7 @@ let insert_move srcs dsts i =
          let i1 = array_fold2 insert_single_move i tmps dsts in
          array_fold2 insert_single_move i1 srcs tmps
 
-module Make (Arch : Operations.S) (Proc : module type of Proc) = struct
+module Make (Arch : Operations.S) (Proc : module type of Processor) = struct
   type operation =
     (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
 

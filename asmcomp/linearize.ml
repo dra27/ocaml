@@ -333,6 +333,7 @@ let add_prologue first_insn prologue_required =
     tailrec_entry_point_label, tailrec_entry_point
 
 let fundecl f =
+  let open (val Platform.info.backend : Platform.Backend) in
   let fa = Stackframe.analyze f in
   let (fun_tailrec_entry_point_label, fun_body) =
     add_prologue (linear f.Mach.fun_body (end_instr ()) fa.frame_required)

@@ -104,11 +104,13 @@ let update_interval_position_by_instr intervals instr pos =
   update_interval_position_by_set intervals instr.live pos Live
 
 let insert_destroyed_at_oper intervals instr pos =
+  let open (val Platform.info.backend : Platform.Backend) in
   let destroyed = Proc.destroyed_at_oper instr.desc in
   if Array.length destroyed > 0 then
     update_interval_position_by_array intervals destroyed pos Result
 
 let insert_destroyed_at_raise intervals pos =
+  let open (val Platform.info.backend : Platform.Backend) in
   let destroyed = Proc.destroyed_at_raise in
   if Array.length destroyed > 0 then
     update_interval_position_by_array intervals destroyed pos Result
