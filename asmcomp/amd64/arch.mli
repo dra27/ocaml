@@ -46,10 +46,6 @@ val box_specific_operation :
 val unbox_specific_operation :
   Operations.specific_operations -> specific_operation
 
-val operation_is_pure : specific_operation -> bool
-
-val operation_can_raise : specific_operation -> bool
-
 val float_cond_and_need_swap :
   Lambda.float_comparison -> X86_ast.float_condition * bool
 
