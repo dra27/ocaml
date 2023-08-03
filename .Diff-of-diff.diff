@@ -1,20 +1,47 @@
---- a	2023-09-28 18:48:22.458430983 +0100
-+++ b	2023-09-28 18:48:22.466431268 +0100
-@@ -1,7 +1,7 @@
- diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
- --- a/testsuite/tests/lib-marshal/intext_par.ml
- +++ b/testsuite/tests/lib-marshal/intext_par.ml
--@@ -11,6 +11,12 @@
-+@@ -13,6 +13,12 @@
+--- a	2023-09-28 18:48:22.802443201 +0100
++++ b	2023-09-28 18:48:22.822443911 +0100
+@@ -176,7 +176,7 @@
+    val extract : int -> t -> Context.t * t
   
-  (* Test for output_value / input_value *)
+    val eprintf : t -> unit
+-@@ -2638,7 +2657,7 @@ let mk_failaction_neg partial ctx def =
++@@ -2686,7 +2705,7 @@ let mk_failaction_neg partial ctx def =
+    match partial with
+    | Partial -> (
+        match Default_environment.pop def with
+@@ -185,7 +185,7 @@
+            (Some (Lstaticraise (idef, [])), Jumps.singleton idef ctx)
+        | None ->
+            (* Act as Total, this means
+-@@ -2660,7 +2679,7 @@ let mk_failaction_pos partial seen ctx defs =
++@@ -2708,7 +2727,7 @@ let mk_failaction_pos partial seen ctx defs =
+      | [], _
+      | _, None ->
+          List.fold_left
+@@ -194,7 +194,7 @@
+              let action = Lstaticraise (i, []) in
+              let klist =
+                List.fold_right
+-@@ -2671,13 +2690,13 @@ let mk_failaction_pos partial seen ctx defs =
++@@ -2719,13 +2738,13 @@ let mk_failaction_pos partial seen ctx defs =
+              in
+              (klist, jumps))
+            ([], Jumps.empty) env
+@@ -210,7 +210,7 @@
+        )
+    in
+    let fail_pats = complete_pats_constrs seen in
+-@@ -3188,47 +3207,42 @@ let bind_check str v arg lam =
++@@ -3236,47 +3255,42 @@ let bind_check str v arg lam =
   
-@@ -14,7 +14,7 @@
-  let max_data_depth = 500000
+  let comp_exit ctx m =
+    match Default_environment.pop m.default with
+@@ -276,7 +276,7 @@
+      )
   
-  type t = A | B of int | C of float | D of string | E of char
--@@ -595,7 +601,7 @@ let main_domain id =
-+@@ -597,7 +603,7 @@ let main_domain id =
-    ()
+  (* To find reasonable names for variables *)
+-@@ -3257,7 +3271,7 @@ let arg_to_var arg cls =
++@@ -3305,7 +3319,7 @@ let arg_to_var arg cls =
+        ctx=a context
+        m=a pattern matching
   
-  let main () =
