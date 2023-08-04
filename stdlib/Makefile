@@ -22,9 +22,15 @@ OCAMLDEP ?= $(BOOT_OCAMLDEP)
 include $(ROOTDIR)/Makefile.common
 
 TARGET_BINDIR ?= $(BINDIR)
+CAMLC_FLAGS ?=
+USE_BOOT ?=
 
 COMPILER=$(ROOTDIR)/ocamlc$(EXE)
+ifeq "$(USE_BOOT)" ""
 CAMLC=$(OCAMLRUN) $(COMPILER)
+else
+CAMLC=$(BOOT_OCAMLC) $(CAMLC_FLAGS)
+endif
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
           -g -warn-error +A -bin-annot -nostdlib -principal
 ifeq "$(FLAMBDA)" "true"
