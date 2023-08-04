@@ -14,10 +14,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index a20d65a68b..917d9b2f47 100644
+index 814dd68573..d9d90572f1 100644
 --- a/Changes
 +++ b/Changes
-@@ -1729,6 +1729,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1734,6 +1734,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -53,7 +53,7 @@ index a20d65a68b..917d9b2f47 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1764,13 +1793,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1769,13 +1798,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -69,7 +69,7 @@ index a20d65a68b..917d9b2f47 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1877,6 +1906,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1882,6 +1911,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -79,7 +79,7 @@ index a20d65a68b..917d9b2f47 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2140,6 +2172,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2145,6 +2177,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -11203,7 +11203,7 @@ index 0000000000..2ed248342e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e247c3bea2
+index 0000000000..e64d403d45
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,11122 @@
@@ -11223,10 +11223,10 @@ index 0000000000..e247c3bea2
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index a20d65a68b..917d9b2f47 100644
++index 814dd68573..d9d90572f1 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1729,6 +1729,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1734,6 +1734,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -11262,7 +11262,7 @@ index 0000000000..e247c3bea2
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1764,13 +1793,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1769,13 +1798,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -11278,7 +11278,7 @@ index 0000000000..e247c3bea2
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1877,6 +1906,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1882,6 +1911,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -11288,7 +11288,7 @@ index 0000000000..e247c3bea2
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2140,6 +2172,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2145,6 +2177,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -22487,7 +22487,7 @@ index 7c90119eb4..39518d86cb 100644
  \stddocitem{StdLabels}{include modules \texttt{Array}, \texttt{List} and \texttt{String} with labels}
  \stddocitem{String}{string operations}
 diff --git a/manual/src/refman/extensions/effects.etex b/manual/src/refman/extensions/effects.etex
-index be5ca6887e..f76ada3def 100644
+index 80d7d04333..9b2fb221b7 100644
 --- a/manual/src/refman/extensions/effects.etex
 +++ b/manual/src/refman/extensions/effects.etex
 @@ -24,7 +24,7 @@ To understand the basics, let us define an effect (that is, an operation) that
@@ -22508,7 +22508,7 @@ index be5ca6887e..f76ada3def 100644
  try_with comp1 ()
  { effc = fun (type a) (eff: a t) ->
      match eff with
-@@ -99,7 +99,7 @@ computations \textit{tasks}.
+@@ -114,7 +114,7 @@ computations \textit{tasks}.
  A task either is in a suspended state or is completed. We represent the task
  status as follows:
  
@@ -22517,7 +22517,7 @@ index be5ca6887e..f76ada3def 100644
  type 'a status =
    Complete of 'a
  | Suspended of {msg: int; cont: (int, 'a status) continuation}
-@@ -113,7 +113,7 @@ resume and returns a "'a status" value when resumed.
+@@ -128,7 +128,7 @@ resume and returns a "'a status" value when resumed.
  Next, we define a "step" function that executes one step of computation until
  it completes or suspends:
  
@@ -22526,7 +22526,7 @@ index be5ca6887e..f76ada3def 100644
  let step (f : unit -> 'a) () : 'a status =
    match_with f ()
    { retc = (fun v -> Complete v);
-@@ -156,7 +156,7 @@ the status does not perform the "Xchg" effect.
+@@ -171,7 +171,7 @@ the status does not perform the "Xchg" effect.
  
  We can now write a simple scheduler that runs a pair of tasks to completion:
  
@@ -22535,7 +22535,7 @@ index be5ca6887e..f76ada3def 100644
  let rec run_both a b =
    match a (), b () with
    | Complete va, Complete vb -> (va, vb)
-@@ -175,13 +175,13 @@ the handler to raise an exception
+@@ -190,13 +190,13 @@ the handler to raise an exception
  
  We can now define a second computation that also exchanges two messages:
  
@@ -22551,7 +22551,7 @@ index be5ca6887e..f76ada3def 100644
  run_both (step comp1) (step comp2)
  \end{caml_example}
  
-@@ -202,7 +202,7 @@ user-level threading systems provide a "fork" primitive to spawn off a new
+@@ -217,7 +217,7 @@ user-level threading systems provide a "fork" primitive to spawn off a new
  concurrent task and a "yield" primitive to yield control to some other task.
  Correspondingly, we shall declare two effects as follows:
  
@@ -22560,7 +22560,7 @@ index be5ca6887e..f76ada3def 100644
  type _ Effect.t += Fork : (unit -> unit) -> unit t
                   | Yield : unit t
  \end{caml_example*}
-@@ -215,7 +215,7 @@ also offering to exchange a value.
+@@ -230,7 +230,7 @@ also offering to exchange a value.
  
  We shall also define helper functions that simply perform these effects:
  
@@ -22569,7 +22569,7 @@ index be5ca6887e..f76ada3def 100644
  let fork f = perform (Fork f)
  let yield () = perform Yield
  let xchg v = perform (Xchg v)
-@@ -223,7 +223,7 @@ let xchg v = perform (Xchg v)
+@@ -238,7 +238,7 @@ let xchg v = perform (Xchg v)
  
  A top-level "run" function defines the scheduler:
  
@@ -22578,7 +22578,7 @@ index be5ca6887e..f76ada3def 100644
  (* A concurrent round-robin scheduler *)
  let run (main : unit -> unit) : unit =
    let exchanger = ref None in (* waiting exchanger *)
-@@ -296,7 +296,7 @@ explain and fix this in the next section~\ref{s:effects-discontinue}.
+@@ -311,7 +311,7 @@ explain and fix this in the next section~\ref{s:effects-discontinue}.
  Now we can write a concurrent program that utilises the newly defined
  operations:
  
@@ -22587,7 +22587,7 @@ index be5ca6887e..f76ada3def 100644
  open Printf
  
  let _ = run (fun _ ->
-@@ -341,7 +341,7 @@ exchange a value (stored in the reference cell "exchanger"), which remains
+@@ -356,7 +356,7 @@ exchange a value (stored in the reference cell "exchanger"), which remains
  blocked forever! If the blocked task holds onto resources, these resources are
  leaked. For example, consider the following task:
  
@@ -22596,7 +22596,7 @@ index be5ca6887e..f76ada3def 100644
  let leaky_task () =
    fork (fun _ ->
      let oc = open_out "secret.txt" in
-@@ -442,7 +442,7 @@ lst_iter (fun i -> Printf.printf "%d\n" i)
+@@ -457,7 +457,7 @@ lst_iter (fun i -> Printf.printf "%d\n" i)
  The expression "invert lst_iter" returns a sequence that allows the consumer to
  traverse the list on demand. For example,
  
@@ -22605,7 +22605,7 @@ index be5ca6887e..f76ada3def 100644
  let s = invert ~iter:lst_iter
  let next = Seq.to_dispenser s;;
  next();;
-@@ -453,7 +453,7 @@ next();;
+@@ -468,7 +468,7 @@ next();;
  
  We can use the same "invert" function on any "iter" function. For example,
  
@@ -22614,7 +22614,7 @@ index be5ca6887e..f76ada3def 100644
  let s = invert ~iter:(Fun.flip String.iter "OCaml")
  let next = Seq.to_dispenser s;;
  next();;
-@@ -468,7 +468,7 @@ next();;
+@@ -483,7 +483,7 @@ next();;
  
  The implementation of the "invert" function is given below:
  
@@ -22623,7 +22623,7 @@ index be5ca6887e..f76ada3def 100644
  let invert (type a) ~(iter : (a -> unit) -> unit) : a Seq.t =
    let module M = struct
      type _ Effect.t += Yield : a -> unit t
-@@ -517,7 +517,7 @@ examples.
+@@ -532,7 +532,7 @@ examples.
  
  Like exception handlers, effect handlers can be nested.
  
@@ -22632,7 +22632,7 @@ index be5ca6887e..f76ada3def 100644
  type _ Effect.t += E : int t
                   | F : string t
  
-@@ -544,7 +544,7 @@ In this example, the computation "foo" performs "F", the inner handler handles
+@@ -559,7 +559,7 @@ In this example, the computation "foo" performs "F", the inner handler handles
  only "E" and the outer handler handles "F". The call to "baz" returns "Hello,
  world!".
  
@@ -22641,7 +22641,7 @@ index be5ca6887e..f76ada3def 100644
  baz ()
  \end{caml_example}
  
-@@ -606,7 +606,7 @@ corresponding "perform". For example, in the previous example, "bar" does not
+@@ -621,7 +621,7 @@ corresponding "perform". For example, in the previous example, "bar" does not
  handle the effect "F". Hence, we will get an "Effect.Unhandled F" exception
  when we run "bar".
  
@@ -22650,7 +22650,7 @@ index be5ca6887e..f76ada3def 100644
  try bar () with Effect.Unhandled F -> "Saw Effect.Unhandled exception"
  \end{caml_example}
  
-@@ -618,7 +618,7 @@ must be resumed either with a "continue" or "discontinue" exactly once}}.
+@@ -633,7 +633,7 @@ must be resumed either with a "continue" or "discontinue" exactly once}}.
  Attempting to use a continuation more than once raises a
  "Continuation_already_resumed" exception. For example:
  
@@ -22659,7 +22659,7 @@ index be5ca6887e..f76ada3def 100644
  try_with perform (Xchg 0)
  { effc = fun (type a) (eff : a t) ->
      match eff with
-@@ -685,7 +685,7 @@ implement a shallow handler that enforces a particular sequence of effects (a
+@@ -700,7 +700,7 @@ implement a shallow handler that enforces a particular sequence of effects (a
  protocol) on a computation. For this example, let us consider that the
  computation may perform the following effects:
  
@@ -22668,7 +22668,7 @@ index be5ca6887e..f76ada3def 100644
  type _ Effect.t += Send : int -> unit Effect.t
                   | Recv : int Effect.t
  \end{caml_example*}
-@@ -698,7 +698,7 @@ not "[Recv]", "[Send;Send]", "[Send;Recv;Recv]", etc. The key observation here
+@@ -713,7 +713,7 @@ not "[Recv]", "[Send;Send]", "[Send;Recv;Recv]", etc. The key observation here
  is that the set of effects handled evolves over time. We can enforce this
  protocol quite naturally using shallow handlers as shown below:
  
@@ -22677,7 +22677,7 @@ index be5ca6887e..f76ada3def 100644
  open Effect.Shallow
  
  let run (comp: unit -> unit) : unit =
-@@ -753,7 +753,7 @@ be handled by an outer handler.
+@@ -768,7 +768,7 @@ be handled by an outer handler.
  We can see that the "run" function will permit a computation that follows the
  protocol:
  
@@ -22686,7 +22686,7 @@ index be5ca6887e..f76ada3def 100644
  run (fun () ->
    printf "Send 42\n";
    perform (Send 42);
-@@ -765,7 +765,7 @@ run (fun () ->
+@@ -780,7 +780,7 @@ run (fun () ->
  
  and aborts those that do not:
  
