@@ -120,8 +120,10 @@ let array_type_kind env ty =
   match scrape_poly env ty with
   | Tconstr(p, [elt_ty], _) when Path.same p Predef.path_array ->
       begin match classify env elt_ty with
-      | Any -> if Config.flat_float_array then Pgenarray else Paddrarray
-      | Float -> if Config.flat_float_array then Pfloatarray else Paddrarray
+      | Any ->
+          if Clflags.config.flat_float_array then Pgenarray else Paddrarray
+      | Float ->
+          if Clflags.config.flat_float_array then Pfloatarray else Paddrarray
       | Addr | Lazy -> Paddrarray
       | Int -> Pintarray
       end
@@ -193,7 +195,7 @@ let value_kind env ty =
 let lazy_val_requires_forward env ty =
   match classify env ty with
   | Any | Lazy -> true
-  | Float -> Config.flat_float_array
+  | Float -> Clflags.config.flat_float_array
   | Addr | Int -> false
 
 (** The compilation of the expression [lazy e] depends on the form of e:
@@ -212,7 +214,7 @@ let classify_lazy_argument : Typedtree.expression ->
     | Texp_construct (_, {cstr_arity = 0}, _) ->
        `Constant_or_function
     | Texp_constant(Const_float _) ->
-       if Config.flat_float_array
+       if Clflags.config.flat_float_array
        then `Float_that_cannot_be_shortcut
        else `Constant_or_function
     | Texp_ident _ when lazy_val_requires_forward e.exp_env e.exp_type ->

@@ -22,11 +22,28 @@ open Cmm
 open Reg
 open Mach
 
-let fp = Config.with_frame_pointers
-
 (* Which ABI to use *)
 
-let win64 = Arch.win64
+type config = {
+  mutable int_reg_name: string array;
+  mutable float_reg_name: string array;
+  mutable loc_external_arguments:
+    Cmm.machtype_component array -> Reg.t array * int;
+  mutable destroyed_at_c_call: Reg.t array;
+  mutable destroyed_by_plt_stub: Reg.Set.t;
+  mutable num_destroyed_by_plt_stub: int;
+  mutable destroyed_at_alloc_or_poll: Reg.t array
+}
+
+let config = {
+  int_reg_name = [| |];
+  float_reg_name = [| |];
+  loc_external_arguments = (fun _ -> ([| |], 0));
+  destroyed_at_c_call = [| |];
+  destroyed_by_plt_stub = Reg.Set.empty;
+  num_destroyed_by_plt_stub = 0;
+  destroyed_at_alloc_or_poll = [| |]
+}
 
 (* Registers available for register allocation *)
 
@@ -76,25 +93,32 @@ let win64 = Arch.win64
      stub saves them into the GC regs block).
 *)
 
-let int_reg_name =
-  match Config.ccomp_type with
-  | "msvc" ->
-      [| "rax"; "rbx"; "rdi"; "rsi"; "rdx"; "rcx"; "r8"; "r9";
-         "r12"; "r13"; "r10"; "r11"; "rbp" |]
-  | _ ->
-      [| "%rax"; "%rbx"; "%rdi"; "%rsi"; "%rdx"; "%rcx"; "%r8"; "%r9";
-         "%r12"; "%r13"; "%r10"; "%r11"; "%rbp" |]
+let masm_int_reg_name =
+  [| "rax"; "rbx"; "rdi"; "rsi"; "rdx"; "rcx"; "r8"; "r9";
+     "r12"; "r13"; "r10"; "r11"; "rbp" |]
 
-let float_reg_name =
-  match Config.ccomp_type with
-  | "msvc" ->
-      [| "xmm0"; "xmm1"; "xmm2"; "xmm3"; "xmm4"; "xmm5"; "xmm6"; "xmm7";
-         "xmm8"; "xmm9"; "xmm10"; "xmm11";
-         "xmm12"; "xmm13"; "xmm14"; "xmm15" |]
-  | _ ->
-      [| "%xmm0"; "%xmm1"; "%xmm2"; "%xmm3"; "%xmm4"; "%xmm5"; "%xmm6"; "%xmm7";
-         "%xmm8"; "%xmm9"; "%xmm10"; "%xmm11";
-         "%xmm12"; "%xmm13"; "%xmm14"; "%xmm15" |]
+let masm_float_reg_name =
+  [| "xmm0"; "xmm1"; "xmm2"; "xmm3"; "xmm4"; "xmm5"; "xmm6"; "xmm7";
+     "xmm8"; "xmm9"; "xmm10"; "xmm11";
+     "xmm12"; "xmm13"; "xmm14"; "xmm15" |]
+
+let gas_int_reg_name =
+  [| "%rax"; "%rbx"; "%rdi"; "%rsi"; "%rdx"; "%rcx"; "%r8"; "%r9";
+     "%r12"; "%r13"; "%r10"; "%r11"; "%rbp" |]
+
+let gas_float_reg_name =
+  [| "%xmm0"; "%xmm1"; "%xmm2"; "%xmm3"; "%xmm4"; "%xmm5"; "%xmm6"; "%xmm7";
+     "%xmm8"; "%xmm9"; "%xmm10"; "%xmm11";
+     "%xmm12"; "%xmm13"; "%xmm14"; "%xmm15" |]
+
+let () = Clflags.config_hook @@ fun _ ->
+  if X86_proc.config.masm then begin
+    config.int_reg_name <- masm_int_reg_name;
+    config.float_reg_name <- masm_float_reg_name
+  end else begin
+    config.int_reg_name <- gas_int_reg_name;
+    config.float_reg_name <- gas_float_reg_name
+  end
 
 let num_register_classes = 2
 
@@ -108,7 +132,7 @@ let num_available_registers = [| 13; 16 |]
 let first_available_register = [| 0; 100 |]
 
 let register_name r =
-  if r < 100 then int_reg_name.(r) else float_reg_name.(r - 100)
+  if r < 100 then config.int_reg_name.(r) else config.float_reg_name.(r - 100)
 
 (* Pack registers starting at %rax so as to reduce the number of REX
    prefixes and thus improve code density *)
@@ -139,19 +163,19 @@ let r11 = phys_reg 11
 let rbp = phys_reg 12
 let rxmm15 = phys_reg 115
 
-let destroyed_by_plt_stub =
-  if not X86_proc.use_plt then [| |] else [| r10; r11 |]
-
-let num_destroyed_by_plt_stub = Array.length destroyed_by_plt_stub
-
-let destroyed_by_plt_stub_set = Reg.set_of_array destroyed_by_plt_stub
+let () = Clflags.config_hook @@ fun _ ->
+  let destroyed_by_plt_stub =
+    if X86_proc.config.use_plt then [| r10; r11 |] else [| |] in
+  config.num_destroyed_by_plt_stub <- Array.length destroyed_by_plt_stub;
+  config.destroyed_by_plt_stub <- Reg.set_of_array destroyed_by_plt_stub;
+  config.destroyed_at_alloc_or_poll <-
+    if X86_proc.config.use_plt then
+      destroyed_by_plt_stub
+    else
+      [| r11 |]
 
 let stack_slot slot ty =
   Reg.at_location ty (Stack slot)
-
-(* Instruction selection *)
-
-let word_addressed = false
 
 (* Calling conventions *)
 
@@ -174,7 +198,7 @@ let calling_conventions first_int last_int first_float last_float
           loc.(i) <- stack_slot (make_stack !ofs) ty;
           ofs := !ofs + size_int
         end;
-        assert (not (Reg.Set.mem loc.(i) destroyed_by_plt_stub_set))
+        assert (not (Reg.Set.mem loc.(i) config.destroyed_by_plt_stub))
     | Float ->
         if !float <= last_float then begin
           loc.(i) <- phys_reg !float;
@@ -257,13 +281,15 @@ let win64_loc_external_arguments arg =
   done;
   (loc, Misc.align !ofs 16)  (* keep stack 16-aligned *)
 
+let () = Clflags.config_hook @@ fun _ ->
+  config.loc_external_arguments <-
+    if X86_proc.config.windows
+    then win64_loc_external_arguments
+    else unix_loc_external_arguments
+
 let loc_external_arguments ty_args =
   let arg = Cmm.machtype_of_exttype_list ty_args in
-  let loc, stack_ofs =
-    if win64
-    then win64_loc_external_arguments arg
-    else unix_loc_external_arguments arg
-  in
+  let loc, stack_ofs = config.loc_external_arguments arg in
   Array.map (fun reg -> [|reg|]) loc, stack_ofs
 
 let loc_exn_bucket = rax
@@ -286,27 +312,27 @@ let stack_ptr_dwarf_register_number = 7
 
 (* Registers destroyed by operations *)
 
-let destroyed_at_c_call =
-  (* C calling conventions preserve rbx, but it is clobbered
-     by the code sequence used for C calls in emit.mlp, so it
-     is marked as destroyed. *)
-  if win64 then
-    (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
-    Array.of_list(List.map phys_reg
-      [0;1;4;5;6;7;10;11;12;
-       100;101;102;103;104;105])
-  else
-    (* Unix: r12-r15 preserved *)
-    Array.of_list(List.map phys_reg
-      [0;1;2;3;4;5;6;7;10;11;
-       100;101;102;103;104;105;106;107;
-       108;109;110;111;112;113;114;115])
+(* C calling conventions preserve rbx, but it is clobbered
+   by the code sequence used for C calls in emit.mlp, so it
+   is marked as destroyed. *)
+let win64_destroyed_at_c_call =
+  (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
+  Array.of_list(List.map phys_reg
+    [0;1;4;5;6;7;10;11;12;
+     100;101;102;103;104;105])
 
-let destroyed_at_alloc_or_poll =
-  if X86_proc.use_plt then
-    destroyed_by_plt_stub
-  else
-    [| r11 |]
+let unix_destroyed_at_c_call =
+  (* Unix: r12-r15 preserved *)
+  Array.of_list(List.map phys_reg
+    [0;1;2;3;4;5;6;7;10;11;
+     100;101;102;103;104;105;106;107;
+     108;109;110;111;112;113;114;115])
+
+let () = Clflags.config_hook @@ fun _ ->
+  config.destroyed_at_c_call <-
+    if X86_proc.config.windows
+    then win64_destroyed_at_c_call
+    else unix_destroyed_at_c_call
 
 let destroyed_at_oper = function
     Iop(Icall_ind | Icall_imm _) ->
@@ -314,17 +340,17 @@ let destroyed_at_oper = function
   | Iop(Iextcall {alloc; stack_ofs; }) ->
       assert (stack_ofs >= 0);
       if alloc || stack_ofs > 0 then all_phys_regs
-      else destroyed_at_c_call
+      else config.destroyed_at_c_call
   | Iop(Iintop(Idiv | Imod)) | Iop(Iintop_imm((Idiv | Imod), _))
         -> [| rax; rdx |]
   | Iop(Istore(Single, _, _)) -> [| rxmm15 |]
-  | Iop(Ialloc _ | Ipoll _) -> destroyed_at_alloc_or_poll
+  | Iop(Ialloc _ | Ipoll _) -> config.destroyed_at_alloc_or_poll
   | Iop(Iintop(Imulh | Icomp _) | Iintop_imm((Icomp _), _))
         -> [| rax |]
   | Iswitch(_, _) -> [| rax; rdx |]
   | Itrywith _ -> [| r11 |]
   | _ ->
-    if fp then
+    if Clflags.config.with_frame_pointers then
 (* prevent any use of the frame pointer ! *)
       [| rbp |]
     else
@@ -339,24 +365,24 @@ let destroyed_at_reloadretaddr = [| |]
 
 
 let safe_register_pressure = function
-    Iextcall _ -> if win64 then if fp then 7 else 8 else 0
-  | _ -> if fp then 10 else 11
+    Iextcall _ -> if X86_proc.config.windows then 8 else 0
+  | _ -> if Clflags.config.with_frame_pointers then 10 else 11
 
 let max_register_pressure =
   let consumes ~int ~float =
-    if fp
+    if Clflags.config.with_frame_pointers
     then [| 12 - int; 16 - float |]
     else [| 13 - int; 16 - float |]
   in
   function
     Iextcall _ ->
-      if win64
+      if X86_proc.config.windows
       then consumes ~int:5 ~float:6
       else consumes ~int:9 ~float:16
   | Iintop(Idiv | Imod) | Iintop_imm((Idiv | Imod), _) ->
       consumes ~int:2 ~float:0
   | Ialloc _ | Ipoll _ ->
-      consumes ~int:(1 + num_destroyed_by_plt_stub) ~float:0
+      consumes ~int:(1 + config.num_destroyed_by_plt_stub) ~float:0
   | Iintop(Icomp _) | Iintop_imm((Icomp _), _) ->
       consumes ~int:1 ~float:0
   | Istore(Single, _, _) ->
@@ -368,7 +394,7 @@ let max_register_pressure =
 (* Layout of the stack frame *)
 
 let frame_required fd =
-  fp || fd.fun_contains_calls ||
+  Clflags.config.with_frame_pointers || fd.fun_contains_calls ||
   fd.fun_num_stack_slots.(0) > 0 || fd.fun_num_stack_slots.(1) > 0
 
 let prologue_required fd =
@@ -379,8 +405,8 @@ let prologue_required fd =
 let assemble_file infile outfile =
   X86_proc.assemble_file infile outfile
 
-let init () =
-  if fp then begin
+let () = Clflags.config_hook @@ fun config ->
+  if config.with_frame_pointers then
     num_available_registers.(0) <- 12
-  end else
+  else
     num_available_registers.(0) <- 13

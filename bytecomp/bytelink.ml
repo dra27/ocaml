@@ -16,7 +16,6 @@
 (* Link a set of .cmo files and produce a bytecode executable. *)
 
 open Misc
-open Config
 open Cmo_format
 
 module Compunit = Symtable.Compunit
@@ -135,8 +134,10 @@ let scan_file obj_name tolink =
       raise(Error(File_not_found obj_name)) in
   let ic = open_in_bin file_name in
   try
-    let buffer = really_input_string ic (String.length cmo_magic_number) in
-    if buffer = cmo_magic_number then begin
+    let buffer =
+      really_input_string ic (String.length Config_constants.cmo_magic_number)
+    in
+    if buffer = Config_constants.cmo_magic_number then begin
       (* This is a .cmo file. It must be linked in any case.
          Read the relocation information to see which modules it
          requires. *)
@@ -148,7 +149,7 @@ let scan_file obj_name tolink =
       List.iter remove_required compunit.cu_reloc;
       Link_object(file_name, compunit) :: tolink
     end
-    else if buffer = cma_magic_number then begin
+    else if buffer = Config_constants.cma_magic_number then begin
       (* This is an archive file. Each unit contained in it will be linked
          in only if needed. *)
       let pos_toc = input_binary_int ic in    (* Go to table of contents *)
@@ -364,7 +365,8 @@ let link_bytecode ?final_name tolink exec_name standalone =
        Symtable.init();
        clear_crc_interfaces ();
        let sharedobjs = List.map Dll.extract_dll_name !Clflags.dllibs in
-       let check_dlls = standalone && Config.target = Config.host in
+       let check_dlls =
+         standalone && Clflags.config.target = Clflags.config.host in
        if check_dlls then begin
          (* Initialize the DLL machinery *)
          Dll.init_compile !Clflags.no_std_include;
@@ -587,18 +589,19 @@ let build_custom_runtime prim_name exec_name =
     then ""
     else "-lcamlrun" ^ !Clflags.runtime_variant in
   let debug_prefix_map =
-    if Config.c_has_debug_prefix_map && not !Clflags.keep_camlprimc_file then
+    if Clflags.config.c_has_debug_prefix_map
+       && not !Clflags.keep_camlprimc_file then
       let flag =
         [Printf.sprintf "-fdebug-prefix-map=%s=camlprim.c" prim_name]
       in
-        if Ccomp.linker_is_flexlink then
+        if Clflags.config.linker_is_flexlink then
           "-link" :: flag
         else
           flag
     else
       [] in
   let exitcode =
-    (Clflags.std_include_flag "-I" ^ " " ^ Config.bytecomp_c_libraries)
+    (Ccomp.std_include_flag "-I" ^ " " ^ Clflags.config.bytecomp_c_libraries)
   in
   Ccomp.call_linker Ccomp.Exe exec_name
     (debug_prefix_map @ [prim_name] @ List.rev !Clflags.ccobjs @ [runtime_lib])
@@ -705,8 +708,8 @@ let link objfiles output_name =
     in
     let obj_file =
       if !Clflags.output_complete_object
-      then (Filename.chop_extension c_file) ^ Config.ext_obj
-      else basename ^ Config.ext_obj
+      then (Filename.chop_extension c_file) ^ Clflags.config.ext_obj
+      else basename ^ Clflags.config.ext_obj
     in
     let temps = ref [] in
     Misc.try_finally
@@ -721,13 +724,13 @@ let link objfiles output_name =
            temps := c_file :: !temps;
            if Ccomp.compile_file ~output:obj_file ?stable_name c_file <> 0 then
              raise(Error Custom_runtime);
-           if not (Filename.check_suffix output_name Config.ext_obj) ||
+           if not (Filename.check_suffix output_name Clflags.config.ext_obj) ||
               !Clflags.output_complete_object then begin
              temps := obj_file :: !temps;
              let mode, c_libs =
-               if Filename.check_suffix output_name Config.ext_obj
+               if Filename.check_suffix output_name Clflags.config.ext_obj
                then Ccomp.Partial, ""
-               else Ccomp.MainDll, Config.bytecomp_c_libraries
+               else Ccomp.MainDll, Clflags.config.bytecomp_c_libraries
              in
              if not (
                  let runtime_lib =

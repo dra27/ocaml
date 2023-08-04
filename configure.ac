@@ -41,6 +41,7 @@ mkexe_extra_flags=''
 mkexe_via_cc_extra_cmd=''
 mkexe_ldflags_prefix=''
 mkexe_via_cc_ldflags_prefix=''
+linker_is_flexlink=false
 
 # Flags for building executable files with debugging symbols
 mkexedebugflag="-g"
@@ -119,9 +120,11 @@ AC_SUBST([S])
 AC_SUBST([runtime_asm_objects])
 AC_SUBST([SO])
 AC_SUBST([arch])
+AC_SUBST([Arch])
 AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
+AC_SUBST([abi])
 AC_SUBST([native_cflags])
 AC_SUBST([native_cppflags])
 AC_SUBST([systhread_support])
@@ -138,6 +141,7 @@ AC_SUBST([mkexe_exp])
 AC_SUBST([mkexedebugflag])
 AC_SUBST([mkexe_extra_flags])
 AC_SUBST([mkexe_via_cc_ldflags])
+AC_SUBST([linker_is_flexlink])
 AC_SUBST([ccomptype])
 AC_SUBST([toolchain])
 AC_SUBST([oc_cflags])
@@ -241,6 +245,7 @@ AC_CONFIG_FILES([compilerlibs/META])
 AC_CONFIG_FILES([otherlibs/dynlink/META])
 AC_CONFIG_FILES([otherlibs/runtime_events/META])
 AC_CONFIG_FILES([stdlib/META])
+AC_CONFIG_FILES([asmcomp/default.ml])
 
 # Definitions related to the version of OCaml
 AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
@@ -947,6 +952,7 @@ AS_CASE([$cc_basename,$host],
     AS_IF([$supports_shared_libraries],
       [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
       mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      linker_is_flexlink=true
       mkexe_cflags=''
       mkexe_ldflags_prefix='-link '],
       [mkexe_extra_flags=''
@@ -960,6 +966,7 @@ AS_CASE([$cc_basename,$host],
     toolchain="mingw"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
     mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    linker_is_flexlink=true
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     oc_exe_ldflags='-municode'
@@ -970,6 +977,7 @@ AS_CASE([$cc_basename,$host],
     ostype="Win32"
     mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
     mkexe_cmd="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    linker_is_flexlink=true
     mkexe_cflags=''
     mkexe_ldflags_prefix='-link '
     mkexe_via_cc_ldflags_prefix='/link '
@@ -1234,14 +1242,25 @@ OCAML_CC_SUPPORTS_TREE_VECTORIZE
 arch=none
 model=default
 system=unknown
+abi=default
 
+AC_CONFIG_COMMANDS_PRE([
+  Arch="$(echo "$arch" | cut -c 1 | tr 'a-z' 'A-Z')$(echo "$arch" | cut -c 2-)"
+])
+
+# In all the cases below, if $arch is set so then so too must $system,
+# preserving $arch = 'none' <=> $system = 'unknown'
 has_native_backend=no
 native_ldflags=""
 AS_CASE([$host],
   [[i[3456]86-*-linux*]],
-    [arch=i386; system=linux_elf],
-  [[i[3456]86-*-*bsd*]],
-    [arch=i386; system=bsd_elf],
+    [arch=i386; system=linux],
+  [[i[3456]86-*-freebsd*]],
+    [arch=i386; system=freebsd],
+  [[i[3456]86-*-netbsd*]],
+    [arch=i386; system=netbsd],
+  [[i[3456]86-*-openbsd*]],
+    [arch=i386; system=openbsd],
   [[i[3456]86-*-haiku*]],
     [arch=i386; system=beos],
   [[i[3456]86-*-cygwin]],
@@ -1255,24 +1274,24 @@ AS_CASE([$host],
   [x86_64-pc-windows],
     [arch=amd64; system=win64],
   [[powerpc64le*-*-linux*]],
-    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+    [has_native_backend=yes; arch=power; model=ppc64le; system=linux],
   [[s390x*-*-linux*]],
-    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
+    [has_native_backend=yes; arch=s390x; model=z10; system=linux],
   # expected to match "gnueabihf" as well as "musleabihf"
   [armv6*-*-linux-*eabihf],
-    [arch=arm; model=armv6; system=linux_eabihf],
+    [arch=arm; model=armv6; system=linux; abi=eabihf],
   [armv7*-*-linux-*eabihf],
-    [arch=arm; model=armv7; system=linux_eabihf],
+    [arch=arm; model=armv7; system=linux; abi=eabihf],
   [armv8*-*-linux-*eabihf],
-    [arch=arm; model=armv8; system=linux_eabihf],
+    [arch=arm; model=armv8; system=linux; abi=eabihf],
   [armv8*-*-linux-*eabi],
-    [arch=arm; model=armv8; system=linux_eabi],
+    [arch=arm; model=armv8; system=linux; abi=eabi],
   [armv7*-*-linux-*eabi],
-    [arch=arm; model=armv7; system=linux_eabi],
+    [arch=arm; model=armv7; system=linux; abi=eabi],
   [armv6t2*-*-linux-*eabi],
-    [arch=arm; model=armv6t2; system=linux_eabi],
+    [arch=arm; model=armv6t2; system=linux; abi=eabi],
   [armv6*-*-linux-*eabi],
-    [arch=arm; model=armv6; system=linux_eabi],
+    [arch=arm; model=armv6; system=linux; abi=eabi],
   [armv6*-*-freebsd*],
     [arch=arm; model=armv6; system=freebsd],
   [earmv6*-*-netbsd*],
@@ -1280,17 +1299,17 @@ AS_CASE([$host],
   [earmv7*-*-netbsd*],
     [arch=arm; model=armv7; system=netbsd],
   [armv5te*-*-linux-*eabi],
-    [arch=arm; model=armv5te; system=linux_eabi],
+    [arch=arm; model=armv5te; system=linux; abi=eabi],
   [armv5*-*-linux-*eabi],
-    [arch=arm; model=armv5; system=linux_eabi],
+    [arch=arm; model=armv5; system=linux; abi=eabi],
   [arm*-*-linux-*eabihf],
-    [arch=arm; system=linux_eabihf],
+    [arch=arm; system=linux; abi=eabihf],
   [arm*-*-linux-*eabi],
-    [arch=arm; system=linux_eabi],
+    [arch=arm; system=linux; abi=eabi],
   [arm*-*-openbsd*],
-    [arch=arm; system=bsd],
+    [arch=arm; system=openbsd],
   [zaurus*-*-openbsd*],
-    [arch=arm; system=bsd],
+    [arch=arm; system=openbsd],
   [x86_64-*-linux*],
     [has_native_backend=yes; arch=amd64; system=linux],
   [x86_64-*-gnu*],

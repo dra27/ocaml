@@ -13,16 +13,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-class reload_generic : object
-  method reload_operation :
-    Mach.operation -> Reg.t array -> Reg.t array -> Reg.t array * Reg.t array
-  method reload_test : Mach.test -> Reg.t array -> Reg.t array
-    (* Can be overridden to reflect instructions that can operate
-       directly on stack locations *)
-  method makereg : Reg.t -> Reg.t
-  method makeregs : Reg.t array -> Reg.t array
-    (* Can be overridden to avoid creating new registers of some class
-       (i.e. if all "registers" of that class are actually on stack) *)
-  method fundecl : Mach.fundecl -> int array -> Mach.fundecl * bool
-    (* The entry point *)
+module Make (Arch : Operations.S) : sig
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
+  class reload_generic : object
+    method reload_operation :
+      operation -> Reg.t array -> Reg.t array -> Reg.t array * Reg.t array
+    method reload_test : Mach.test -> Reg.t array -> Reg.t array
+      (* Can be overridden to reflect instructions that can operate
+         directly on stack locations *)
+    method makereg : Reg.t -> Reg.t
+    method makeregs : Reg.t array -> Reg.t array
+      (* Can be overridden to avoid creating new registers of some class
+         (i.e. if all "registers" of that class are actually on stack) *)
+    method fundecl : Mach.fundecl -> int array -> Mach.fundecl * bool
+      (* The entry point *)
+  end
 end

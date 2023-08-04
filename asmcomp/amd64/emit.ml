@@ -30,12 +30,8 @@ open X86_dsl
 module String = Misc.Stdlib.String
 module Int = Numbers.Int
 
-(* [Branch_relaxation] is not used in this file, but is required by
-   emit.mlp files for certain other targets; the reference here ensures
-   that when releases are being prepared the .depend files are correct
-   for all targets. *)
-[@@@ocaml.warning "-66"]
-open! Branch_relaxation
+let map_desc =
+  Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
 
 let _label s = D.label ~typ:QWORD s
 
@@ -54,36 +50,34 @@ let register_name r =
 (* CFI directives *)
 
 let cfi_startproc () =
-  if Config.asm_cfi_supported then D.cfi_startproc ()
+  if Clflags.config.asm_cfi_supported then D.cfi_startproc ()
 
 let cfi_endproc () =
-  if Config.asm_cfi_supported then D.cfi_endproc ()
+  if Clflags.config.asm_cfi_supported then D.cfi_endproc ()
 
 let cfi_adjust_cfa_offset n =
-  if Config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
+  if Clflags.config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
 
 let cfi_remember_state () =
-  if Config.asm_cfi_supported then D.cfi_remember_state ()
+  if Clflags.config.asm_cfi_supported then D.cfi_remember_state ()
 
 let cfi_restore_state () =
-  if Config.asm_cfi_supported then D.cfi_restore_state ()
+  if Clflags.config.asm_cfi_supported then D.cfi_restore_state ()
 
 let cfi_def_cfa_register reg =
-  if Config.asm_cfi_supported then D.cfi_def_cfa_register reg
+  if Clflags.config.asm_cfi_supported then D.cfi_def_cfa_register reg
 
 let emit_debug_info dbg =
   emit_debug_info_gen dbg D.file D.loc
 
-let fp = Config.with_frame_pointers
-
-let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
+let stack_threshold_size = Config_constants.stack_threshold * 8 (* bytes *)
 
 let frame_size env =                     (* includes return address *)
   if env.f.fun_frame_required then
     env.stack_offset
     + 8 * (env.f.fun_num_stack_slots.(0) + env.f.fun_num_stack_slots.(1))
     + 8
-    + (if fp then 8 else 0)
+    + (if Clflags.config.with_frame_pointers then 8 else 0)
   else
     env.stack_offset + 8
 
@@ -99,9 +93,15 @@ let slot_offset env loc cl =
 
 (* Symbols *)
 
-let symbol_prefix = if system = S_macosx then "_" else ""
+let symbol_prefix = ref ""
 
-let emit_symbol s = string_of_symbol symbol_prefix s
+let () = Clflags.config_hook @@ fun new_config ->
+  if Config_constants.System.is_macOS new_config.system then
+    symbol_prefix := "_"
+  else
+    symbol_prefix := ""
+
+let emit_symbol s = string_of_symbol !symbol_prefix s
 
 (* Record symbols used and defined - at the end generate extern for those
    used but not defined *)
@@ -140,9 +140,11 @@ let mem__imp s =
   mem64_rip QWORD (emit_symbol imp_s)
 
 let rel_plt s =
-  if windows && !Clflags.dlcode then mem__imp s
+  if X86_proc.config.windows && !Clflags.dlcode then mem__imp s
+  else if X86_proc.config.use_plt then
+    sym (emit_symbol s ^ "@PLT")
   else
-    sym (if use_plt then emit_symbol s ^ "@PLT" else emit_symbol s)
+    sym (emit_symbol s)
 
 let emit_call s = I.call (rel_plt s)
 
@@ -150,11 +152,11 @@ let emit_jump s = I.jmp (rel_plt s)
 
 let load_symbol_addr s arg =
   if !Clflags.dlcode then
-    if windows then begin
+    if X86_proc.config.windows then begin
       (* I.mov (mem__imp s) arg (\* mov __caml_imp_foo(%rip), ... *\) *)
       I.mov (sym (emit_symbol s)) arg (* movabsq $foo, ... *)
     end else I.mov (mem64_rip QWORD (emit_symbol s ^ "@GOTPCREL")) arg
-  else if !Clflags.pic_code then
+  else if Arch.pic_code () then
     I.lea (mem64_rip NONE (emit_symbol s)) arg
   else
     I.mov (sym (emit_symbol s)) arg
@@ -164,10 +166,14 @@ let domain_field f =
 
 (* Output a label *)
 
-let emit_label lbl =
-  match system with
-  | S_macosx | S_win64 -> "L" ^ Int.to_string lbl
-  | _ -> ".L" ^ Int.to_string lbl
+let label_prefix = ref ".L"
+
+let () = Clflags.config_hook @@ fun new_config ->
+  match new_config.system with
+  | S_macosx | S_win64 -> label_prefix := "L"
+  | _ -> label_prefix := ".L"
+
+let emit_label lbl = !label_prefix ^ Int.to_string lbl
 
 let label s = sym (emit_label s)
 
@@ -388,13 +394,15 @@ let emit_float_test env cmp i lbl =
 
 let output_epilogue env f =
   if env.f.fun_frame_required then begin
-    let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+    let n =
+      (frame_size env) - 8
+        - (if Clflags.config.with_frame_pointers then 8 else 0) in
     if n <> 0
     then begin
       I.add (int n) rsp;
       cfi_adjust_cfa_offset (-n);
     end;
-    if fp then I.pop rbp;
+    if Clflags.config.with_frame_pointers then I.pop rbp;
     f ();
     (* reset CFA back cause function body may continue *)
     if n <> 0
@@ -431,7 +439,7 @@ let emit_global_label s =
 
 let emit_named_text_section func_name =
   if !Clflags.function_sections then
-    begin match system with
+    begin match Clflags.config.system with
     | S_macosx
     (* Names of section segments in macosx are restricted to 16 characters,
        but function names are often longer, especially anonymous functions. *)
@@ -458,17 +466,19 @@ let emit_instr env fallthrough i =
   let arg = arg env in
   let res = res env in
   emit_debug_info i.dbg;
-  match i.desc with
+  match map_desc i.desc with
   | Lend -> ()
   | Lprologue ->
     assert (env.f.fun_prologue_required);
-    if fp then begin
+    if Clflags.config.with_frame_pointers then begin
       I.push rbp;
       cfi_adjust_cfa_offset 8;
       I.mov rsp rbp;
     end;
     if env.f.fun_frame_required then begin
-      let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+      let n =
+        (frame_size env) - 8
+          - (if Clflags.config.with_frame_pointers then 8 else 0) in
       if n <> 0
       then begin
         I.sub (int n) rsp;
@@ -605,7 +615,7 @@ let emit_instr env fallthrough i =
           I.movsd (arg i 0) (addressing addr REAL8 i 1)
       end
   | Lop(Ialloc { bytes = n; dbginfo }) ->
-      assert (n <= (Config.max_young_wosize + 1) * Arch.size_addr);
+      assert (n <= (Config_constants.max_young_wosize + 1) * Arch.size_addr);
       if env.f.fun_fast then begin
         I.sub (int n) r15;
         I.cmp (domain_field Domainstate.Domain_young_limit) r15;
@@ -813,7 +823,7 @@ let emit_instr env fallthrough i =
       I.add (reg env tmp2) (reg env tmp1);
       I.jmp (reg env tmp1);
 
-      begin match system with
+      begin match Clflags.config.system with
       | S_mingw64 | S_cygwin -> D.section [".rdata"] (Some "dr") []
       | S_macosx | S_win64 -> ()
         (* with LLVM/OS X and MASM, use the text segment *)
@@ -827,7 +837,7 @@ let emit_instr env fallthrough i =
       done;
       emit_named_text_section env.f.fun_name
   | Lentertrap ->
-      if fp then begin
+      if Clflags.config.with_frame_pointers then begin
         let delta = frame_size env - 16 (* retaddr + rbp *) in
         I.lea (mem64 NONE delta RSP) rbp
       end;
@@ -838,7 +848,7 @@ let emit_instr env fallthrough i =
       env.stack_offset <- env.stack_offset + delta
   | Lpushtrap { lbl_handler; } ->
       let load_label_addr s arg =
-        if !Clflags.pic_code then
+        if Arch.pic_code () then
           I.lea (mem64_rip NONE (emit_label s)) arg
         else
           I.mov (sym (emit_label s)) arg
@@ -865,7 +875,7 @@ let emit_instr env fallthrough i =
           emit_call "caml_reraise_exn";
           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
       | Lambda.Raise_notrace ->
-          if Config.tsan then begin
+          if Clflags.config.tsan then begin
             (* TSan requires to signal function exits upon exceptions,
                even with [Raise_notrace] *)
             emit_call "caml_tsan_raise_notrace_exn";
@@ -896,7 +906,7 @@ let fundecl fundecl =
   emit_named_text_section fundecl.fun_name;
   D.align 16;
   add_def_symbol fundecl.fun_name;
-  if system = S_macosx
+  if X86_proc.config.macOS
   && not !Clflags.output_c_object
   && is_generic_function fundecl.fun_name
   then (* PR#4690 *)
@@ -913,9 +923,11 @@ let fundecl fundecl =
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
   in
   let handle_overflow =
-    if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
+    if contains_nontail_calls
+       || max_frame_size >= stack_threshold_size then begin
       let overflow = new_label () and ret = new_label () in
-      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+      let threshold_offset =
+        Domainstate.stack_ctx_words * 8 + stack_threshold_size in
       I.lea (mem64 NONE (-(max_frame_size + threshold_offset)) RSP) r10;
       I.cmp (domain_field Domainstate.Domain_current_stack) r10;
       I.jb (label overflow);
@@ -933,7 +945,7 @@ let fundecl fundecl =
       (* Pass the desired frame size on the stack, since all of the
         argument-passing registers may be in use.
         Also serves to align the stack properly before the call *)
-      I.push (int (Config.stack_threshold + max_frame_size / 8));
+      I.push (int (Config_constants.stack_threshold + max_frame_size / 8));
       cfi_adjust_cfa_offset 8;
         (* measured in words *)
       emit_call "caml_call_realloc_stack";
@@ -943,14 +955,16 @@ let fundecl fundecl =
     end
   end;
   if fundecl.fun_frame_required then begin
-    let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+    let n =
+      (frame_size env) - 8
+        - (if Clflags.config.with_frame_pointers then 8 else 0) in
     if n <> 0
     then begin
       cfi_adjust_cfa_offset (-n);
     end;
   end;
   cfi_endproc ();
-  begin match system with
+  begin match Clflags.config.system with
   | S_gnu | S_linux ->
       D.type_ (emit_symbol fundecl.fun_name) "@function";
       D.size (emit_symbol fundecl.fun_name)
@@ -989,7 +1003,7 @@ let begin_assembly() =
   reset_imp_table();
   float_constants := [];
   all_functions := [];
-  if system = S_win64 then begin
+  if X86_proc.config.masm then begin
     D.extrn "caml_call_gc" NEAR;
     D.extrn "caml_c_call" NEAR;
     D.extrn "caml_allocN" NEAR;
@@ -1001,9 +1015,9 @@ let begin_assembly() =
   end;
 
 
-  if !Clflags.dlcode || Arch.win64 then begin
+  if !Clflags.dlcode || X86_proc.config.windows then begin
     (* from amd64.S; could emit these constants on demand *)
-    begin match system with
+    begin match Clflags.config.system with
     | S_macosx -> D.section ["__TEXT";"__literal16"] None ["16byte_literals"]
     | S_mingw64 | S_cygwin -> D.section [".rdata"] (Some "dr") []
     | S_win64 -> D.data ()
@@ -1024,12 +1038,12 @@ let begin_assembly() =
 
   emit_named_text_section (Compilenv.make_symbol (Some "code_begin"));
   emit_global_label "code_begin";
-  if system = S_macosx then I.nop (); (* PR#4690 *)
+  if X86_proc.config.macOS then I.nop (); (* PR#4690 *)
   ()
 
 let end_assembly() =
   if !float_constants <> [] then begin
-    begin match system with
+    begin match Clflags.config.system with
     | S_macosx -> D.section ["__TEXT";"__literal8"] None ["8byte_literals"]
     | S_mingw64 | S_cygwin -> D.section [".rdata"] (Some "dr") []
     | S_win64 -> D.data ()
@@ -1040,7 +1054,7 @@ let end_assembly() =
   end;
 
   emit_named_text_section (Compilenv.make_symbol (Some "code_end"));
-  if system = S_macosx then I.nop ();
+  if X86_proc.config.macOS then I.nop ();
   (* suppress "ld warning: atom sorting error" *)
 
   emit_global_label "code_end";
@@ -1071,7 +1085,7 @@ let end_assembly() =
                ConstSub(ConstLabel(emit_label lbl), ConstThis),
                const_32 ofs
              ) in
-           if system = S_macosx then begin
+           if X86_proc.config.macOS then begin
              incr setcnt;
              let s = Printf.sprintf "L$set$%d" !setcnt in
              D.setvar (s, c);
@@ -1083,31 +1097,35 @@ let end_assembly() =
       efa_string = (fun s -> D.bytes (s ^ "\000"))
     };
 
-  if system = S_linux || system = S_freebsd || system = S_netbsd || system = S_openbsd then begin
-    let frametable = emit_symbol (Compilenv.make_symbol (Some "frametable")) in
-    D.size frametable (ConstSub (ConstThis, ConstLabel frametable))
+  begin match Clflags.config.system with
+  | S_linux | S_freebsd | S_netbsd | S_openbsd ->
+      let frametable =
+        emit_symbol (Compilenv.make_symbol (Some "frametable")) in
+       D.size frametable (ConstSub (ConstThis, ConstLabel frametable))
+  | _ -> ()
   end;
 
-  if system = S_linux then
-    (* Mark stack as non-executable, PR#4564 *)
-    D.section [".note.GNU-stack"] (Some "") [ "%progbits" ];
-
-  if system = S_win64 then begin
-    D.comment "External functions";
-    String.Set.iter
-      (fun s ->
-         if not (String.Set.mem s !symbols_defined) then
-           D.extrn (emit_symbol s) NEAR)
-      !symbols_used;
-    symbols_used := String.Set.empty;
-    symbols_defined := String.Set.empty;
+  begin match Clflags.config.system with
+  | S_linux ->
+      (* Mark stack as non-executable, PR#4564 *)
+      D.section [".note.GNU-stack"] (Some "") [ "%progbits" ]
+  | S_win64 ->
+      D.comment "External functions";
+      String.Set.iter
+        (fun s ->
+           if not (String.Set.mem s !symbols_defined) then
+             D.extrn (emit_symbol s) NEAR)
+        !symbols_used;
+      symbols_used := String.Set.empty;
+      symbols_defined := String.Set.empty
+  | _ -> ()
   end;
 
   let asm =
     if !Emitaux.create_asm_file then
       Some
         (
-         (if X86_proc.masm then X86_masm.generate_asm
+         (if X86_proc.config.masm then X86_masm.generate_asm
           else X86_gas.generate_asm) !Emitaux.output_channel
         )
     else

@@ -56,16 +56,19 @@ let read_cmi filename =
   let ic = open_in_bin filename in
   try
     let buffer =
-      really_input_string ic (String.length Config.cmi_magic_number)
+      really_input_string ic (String.length Config_constants.cmi_magic_number)
     in
-    if buffer <> Config.cmi_magic_number then begin
+    if buffer <> Config_constants.cmi_magic_number then begin
       close_in ic;
-      let pre_len = String.length Config.cmi_magic_number - 3 in
+      let pre_len = String.length Config_constants.cmi_magic_number - 3 in
       if String.sub buffer 0 pre_len
-          = String.sub Config.cmi_magic_number 0 pre_len then
+          = String.sub Config_constants.cmi_magic_number 0 pre_len then
       begin
         let msg =
-          if buffer < Config.cmi_magic_number then "an older" else "a newer" in
+          if buffer < Config_constants.cmi_magic_number then
+            "an older"
+          else
+            "a newer" in
         raise (Error (Wrong_version_interface (filename, msg)))
       end else begin
         raise(Error(Not_an_interface filename))
@@ -83,7 +86,7 @@ let read_cmi filename =
 
 let output_cmi filename oc cmi =
 (* beware: the provided signature must have been substituted for saving *)
-  output_string oc Config.cmi_magic_number;
+  output_string oc Config_constants.cmi_magic_number;
   Marshal.(to_channel oc ((cmi.cmi_name, cmi.cmi_sign) : header) [Compression]);
   flush oc;
   let crc = Digest.file filename in

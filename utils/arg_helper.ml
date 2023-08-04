@@ -43,6 +43,9 @@ end) = struct
       user_default = None;
       user_override = S.Key.Map.empty; }
 
+  let get_default v =
+    v.base_default
+
   let set_base_default value t =
     { t with base_default = value }
 

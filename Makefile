@@ -65,14 +65,14 @@ include compilerlibs/Makefile.compilerlibs
 
 # The configuration file
 
-utils/config.ml: \
+utils/config_settings.ml: \
   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
 	$(V_GEN)cp $< $@
-utils/config_boot.ml: utils/config.fixed.ml utils/config.common.ml
-	$(V_GEN)cat $^ > $@
+utils/config_boot.ml: utils/config.fixed.ml
+	$(V_GEN)cp $< $@
 
-utils/config_main.ml: utils/config.generated.ml utils/config.common.ml
-	$(V_GEN)cat $^ > $@
+utils/config_main.ml: utils/config.generated.ml
+	$(V_GEN)cp $< $@
 
 .PHONY: reconfigure
 reconfigure:
@@ -89,14 +89,14 @@ configure: tools/autogen configure.ac aclocal.m4 build-aux/ocaml_version.m4
 
 .PHONY: partialclean
 partialclean::
-	rm -f utils/config.ml \
+	rm -f utils/config_settings.ml \
 	      utils/config_main.ml utils/config_main.mli \
 	      utils/config_boot.ml utils/config_boot.mli \
         utils/domainstate.ml utils/domainstate.mli
 
 .PHONY: beforedepend
 beforedepend:: \
-  utils/config.ml utils/config_boot.ml utils/config_main.ml \
+  utils/config_settings.ml utils/config_boot.ml utils/config_main.ml \
   utils/domainstate.ml utils/domainstate.mli
 
 ocamllex_PROGRAMS = $(addprefix lex/,ocamllex ocamllex.opt)
@@ -221,7 +221,7 @@ boot/ocamlrun$(EXE):
 .PHONY: coldstart
 coldstart: boot/ocamlrun$(EXE) runtime/libcamlrun.$(A)
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/$<' \
-	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	  USE_BOOT=true CAMLC_FLAGS='$(USE_RUNTIME_PRIMS)' all
 	rm -f $(addprefix boot/, libcamlrun.$(A) $(LIBFILES))
 	cp $(addprefix stdlib/, $(LIBFILES)) boot
 	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
@@ -301,12 +301,12 @@ opt: checknative
 opt.opt: checknative
 	$(MAKE) checkstack
 	$(MAKE) coreall
-	$(MAKE) ocaml
+	$(MAKE) compilerlibs/ocamlcommon.cma ocaml
 	$(MAKE) opt-core
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(MAKE) flexlink.opt$(EXE)
 endif
-	$(MAKE) ocamlc.opt
+	$(MAKE) compilerlibs/ocamlcommon.cmxa ocamlc.opt
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
 	  $(WITH_OCAMLTEST)
 	$(MAKE) ocamlopt.opt
@@ -326,7 +326,7 @@ coreboot:
 # runtime/ocamlrun
 	$(MAKE) promote-cross
 # Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
-# utils/config.ml will have the fixed bootstrap configuration
+# utils/config_settings.ml will have the fixed bootstrap configuration
 	$(MAKE) partialclean
 	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools
 # Rebuild the library (using runtime/ocamlrun ./ocamlc)
@@ -334,7 +334,7 @@ coreboot:
 # Promote the new compiler and the new runtime
 	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
 # Rebuild the core system
-# utils/config.ml must still have the fixed bootstrap configuration
+# utils/config_settings.ml must still have the fixed bootstrap configuration
 	$(MAKE) partialclean
 	$(MAKE) IN_COREBOOT_CYCLE=true core
 # Check if fixpoint reached
@@ -349,7 +349,7 @@ endif
 
 .PHONY: all
 all: coreall
-	$(MAKE) ocaml
+	$(MAKE) compilerlibs/ocamlcommon.cma ocaml
 	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
          $(WITH_OCAMLTEST)
 	$(MAKE) othertools
@@ -362,9 +362,9 @@ endif
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
 bootstrap: coreboot
-# utils/config.ml must be restored to config.status's configuration
+# utils/config_settings.ml must be restored to config.status's configuration
 # lex/ocamllex$(EXE) was stripped in order to compare it
-	rm -f utils/config.ml lex/ocamllex$(EXE)
+	rm -f utils/config_settings.ml lex/ocamllex$(EXE)
 	$(MAKE) all
 
 # Compile everything the first time
@@ -480,7 +480,7 @@ clean:: partialclean
 
 # The bytecode compiler
 
-ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 
 ocamlc_MODULES = driver/main
 
@@ -493,7 +493,7 @@ partialclean::
 
 # The native-code compiler
 
-ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
+ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon-private ocamloptcomp)
 
 ocamlopt_MODULES = driver/optmain
 
@@ -505,7 +505,7 @@ partialclean::
 # The toplevel
 
 ocaml_LIBRARIES = \
-  $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamltoplevel)
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp ocamltoplevel)
 
 ocaml_MODULES = toplevel/topstart
 
@@ -567,50 +567,123 @@ partialclean::
 
 beforedepend:: lambda/runtimedef.ml
 
-# Choose the right machine-dependent files
+# Machine-dependent packs
 
-asmcomp/arch.mli: asmcomp/$(ARCH)/arch.mli
-	cd asmcomp; $(LN) $(ARCH)/arch.mli .
+ARCH_SPECIFIC = arch proc emit CSE selection scheduling reload
 
-asmcomp/arch.ml: asmcomp/$(ARCH)/arch.ml
-	cd asmcomp; $(LN) $(ARCH)/arch.ml .
+# XXX Factorise further
+$(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Amd64
+$(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Arm64
+$(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Power
+$(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack Riscv
+$(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmx)) \
+$(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmo)): \
+  private OC_COMMON_COMPFLAGS += -for-pack S390x
 
-asmcomp/proc.ml: asmcomp/$(ARCH)/proc.ml
-	cd asmcomp; $(LN) $(ARCH)/proc.ml .
+# There's a hack in default.ml.in to generate .depend consistently, but these
+# are the "true" dependencies.
+asmcomp/default.cmo: $(foreach ARCH, $(ARCHES), asmcomp/$(ARCH).cmo)
+asmcomp/default.cmx: $(foreach ARCH, $(ARCHES), asmcomp/$(ARCH).cmx)
 
-asmcomp/selection.ml: asmcomp/$(ARCH)/selection.ml
-	cd asmcomp; $(LN) $(ARCH)/selection.ml .
+asmcomp/%/CSE.mli:
+	$(V_GEN)echo 'include Platform.CSE' > $@
+asmcomp/%/emit.mli:
+	$(V_GEN)echo 'include Platform.Emit' > $@
+asmcomp/%/proc.mli:
+	$(V_GEN)echo 'include module type of Processor' > $@
+asmcomp/%/reload.mli:
+	$(V_GEN)echo 'include Platform.Reload' > $@
+asmcomp/%/scheduling.mli:
+	$(V_GEN)echo 'include Platform.Scheduling' > $@
+asmcomp/%/selection.mli:
+	$(V_GEN)echo 'include Platform.Selection' > $@
 
-asmcomp/CSE.ml: asmcomp/$(ARCH)/CSE.ml
-	cd asmcomp; $(LN) $(ARCH)/CSE.ml .
+beforedepend:: $(foreach ARCH, $(ARCHES), \
+  $(addprefix asmcomp/$(ARCH)/, $(ARCH_SPECIFIC:=.mli)))
 
-asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
-	cd asmcomp; $(LN) $(ARCH)/reload.ml .
+partialclean::
+	rm -f $(foreach ARCH, $(ARCHES), \
+    $(addprefix asmcomp/$(ARCH)/, \
+      $(filter-out arch.mli, $(ARCH_SPECIFIC:=.mli))))
 
-asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
-	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+asmcomp/amd64.ml asmcomp/arm64.ml asmcomp/power.ml:
+	$(V_GEN)touch $@
+asmcomp/riscv.ml asmcomp/s390x.ml:
+	$(V_GEN)touch $@
+
+asmcomp/amd64.cmo: $(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+# The ocamlopt$(EXE) comes from compilerlibs/Makefile.compilerlibs
+asmcomp/amd64.cmx: $(addprefix asmcomp/amd64/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/arm64.cmo: $(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/arm64.cmx: $(addprefix asmcomp/arm64/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/power.cmo: $(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/power.cmx: $(addprefix asmcomp/power/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/riscv.cmo: $(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/riscv.cmx: $(addprefix asmcomp/riscv/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+asmcomp/s390x.cmo: $(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmo))
+	$(V_OCAMLC)$(CAMLC) $(OC_COMMON_COMPFLAGS) -pack -o $@ $^
+
+asmcomp/s390x.cmx: $(addprefix asmcomp/s390x/, $(ARCH_SPECIFIC:=.cmx))
+	$(V_OCAMLOPT)$(CAMLOPT) $(OC_COMMON_COMPFLAGS) -pack -o $@ \
+    $(filter-out ocamlopt$(EXE), $^)
+
+partialclean::
+	rm -f $(addprefix asmcomp/, $(ARCHES:=.ml))
+
+beforedepend:: $(addprefix asmcomp/, $(ARCHES:=.ml))
 
 # Preprocess the code emitters
 cvt_emit = tools/cvt_emit$(EXE)
 
 beforedepend:: tools/cvt_emit.ml
 
-asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
-	$(V_GEN)echo \# 1 \"asmcomp/$(ARCH)/emit.mlp\" > $@ && \
+asmcomp/%/emit.ml: asmcomp/%/emit.mlp $(cvt_emit)
+	$(V_GEN)echo \# 1 \"asmcomp/$*/emit.mlp\" > $@ && \
 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
 	|| { rm -f $@; exit 2; }
 
 partialclean::
-	rm -f asmcomp/emit.ml tools/cvt_emit.ml
+	rm -f $(subst .mlp,.ml, $(wildcard asmcomp/*/emit.mlp))
 
-beforedepend:: asmcomp/emit.ml
+partialclean::
+	rm -f tools/cvt_emit.ml
+
+beforedepend:: $(foreach ARCH, $(ARCHES), asmcomp/$(ARCH)/emit.ml)
 
 cvt_emit_LIBRARIES =
 cvt_emit_MODULES = tools/cvt_emit
 
 # The "expunge" utility
 
-expunge_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+expunge_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 
 expunge_MODULES = toplevel/expunge
 
@@ -1215,11 +1288,11 @@ partialclean:: partialclean-menhir
 # OCamldoc
 
 .PHONY: ocamldoc
-ocamldoc: ocamlc ocamlyacc ocamllex otherlibraries
+ocamldoc: ocamlc ocamlyacc ocamllex otherlibraries compilerlibs/ocamlcommon.cma
 	$(MAKE) -C ocamldoc all
 
 .PHONY: ocamldoc.opt
-ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
+ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex compilerlibs/ocamlcommon.cmxa
 	$(MAKE) -C ocamldoc opt.opt
 
 # OCamltest
@@ -1266,7 +1339,7 @@ clean::
 
 # The replay debugger
 
-ocamldebug_LIBRARIES = compilerlibs/ocamlcommon \
+ocamldebug_LIBRARIES = compilerlibs/ocamlcommon-private \
   $(addprefix otherlibs/,unix/unix dynlink/dynlink)
 
 # The following dependencies are necessary at the moment, because the
@@ -1354,7 +1427,7 @@ endif
 # Lint @since and @deprecated annotations
 
 lintapidiff_LIBRARIES = \
-  $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp) \
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp) \
   otherlibs/str/str
 lintapidiff_MODULES = tools/lintapidiff
 
@@ -1417,50 +1490,41 @@ partialclean::
 
 # The dependency generator
 
-ocamldep_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+ocamldep_LIBRARIES = \
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 ocamldep_MODULES = tools/ocamldep
 
 tools/ocamldep$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
 
 # The profiler
 
-ocamlprof_LIBRARIES =
-ocamlprof_MODULES = \
-  config build_path_prefix_map misc identifiable numbers arg_helper \
-  local_store load_path clflags terminfo warnings location longident \
-  docstrings syntaxerr ast_helper camlinternalMenhirLib parser \
-  lexer pprintast parse ocamlprof
+ocamlprof_LIBRARIES = compilerlibs/ocamlcommon-private
+ocamlprof_MODULES = ocamlprof
 
-ocamlcp_ocamloptp_MODULES = \
-  config build_path_prefix_map misc profile warnings identifiable numbers \
-  arg_helper local_store load_path clflags terminfo location ccomp compenv \
-  main_args ocamlcp_common
+ocamlcp_LIBRARIES = compilerlibs/ocamlcommon-private
+ocamlcp_MODULES = ocamlcp_common ocamlcp
 
-ocamlcp_LIBRARIES =
-ocamlcp_MODULES = $(ocamlcp_ocamloptp_MODULES) ocamlcp
-
-ocamloptp_LIBRARIES =
-ocamloptp_MODULES = $(ocamlcp_ocamloptp_MODULES) ocamloptp
+ocamloptp_LIBRARIES = compilerlibs/ocamlcommon-private
+ocamloptp_MODULES = ocamlcp_common ocamloptp
 
 # To help building mixed-mode libraries (OCaml + C)
-ocamlmklib_LIBRARIES =
-ocamlmklib_MODULES = config build_path_prefix_map misc ocamlmklib
+ocamlmklib_LIBRARIES = compilerlibs/ocamlcommon-private
+ocamlmklib_MODULES = ocamlmklib
 
 # To make custom toplevels
 
-ocamlmktop_LIBRARIES =
-ocamlmktop_MODULES = \
-  config build_path_prefix_map misc identifiable numbers arg_helper \
-  local_store load_path clflags profile ccomp ocamlmktop
+ocamlmktop_LIBRARIES = compilerlibs/ocamlcommon-private
+ocamlmktop_MODULES = ocamlmktop
 
 # Reading cmt files
 
-ocamlcmt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+ocamlcmt_LIBRARIES = \
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 ocamlcmt_MODULES = tools/ocamlcmt
 
 # The bytecode disassembler
 
-dumpobj_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+dumpobj_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 dumpobj_MODULES = $(addprefix tools/,opnames dumpobj)
 
 make_opcodes = tools/make_opcodes$(EXE)
@@ -1479,29 +1543,29 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
 # Display info on compiled files
 
 ocamlobjinfo_LIBRARIES = \
-  $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp ocamlmiddleend)
 ocamlobjinfo_MODULES = tools/objinfo
 
 # Scan object files for required primitives
 
-primreq_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+primreq_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 primreq_MODULES = tools/primreq
 
 # Copy a bytecode executable, stripping debug info
 
 stripdebug_LIBRARIES = \
-  $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 stripdebug_MODULES = tools/stripdebug
 
 # Compare two bytecode executables
 
-cmpbyt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+cmpbyt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp)
 cmpbyt_MODULES = tools/cmpbyt
 
 # Scan latex files, and run ocaml code examples
 
 ocamltex_LIBRARIES = \
-  $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamltoplevel) \
+  $(addprefix compilerlibs/,ocamlcommon-private ocamlbytecomp ocamltoplevel) \
   $(addprefix otherlibs/,str/str unix/unix)
 ocamltex_MODULES = tools/ocamltex
 
@@ -1519,44 +1583,11 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we use the othertools target
-## Test compilation of backend-specific parts
-
-ARCH_SPECIFIC =\
-  asmcomp/arch.mli asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml \
-  asmcomp/selection.ml asmcomp/scheduling.ml asmcomp/reload.ml
-
-partialclean::
-	rm -f $(ARCH_SPECIFIC)
-
-beforedepend:: $(ARCH_SPECIFIC)
-
-# This rule provides a quick way to check that machine-dependent
-# files compiles fine for a foreign architecture (passed as ARCH=xxx).
-
-.PHONY: check_arch
-check_arch:
-	@echo "========= CHECKING asmcomp/$(ARCH) =============="
-	@rm -f $(ARCH_SPECIFIC) asmcomp/emit.ml asmcomp/*.cm*
-	@$(MAKE) compilerlibs/ocamloptcomp.cma \
-	            >/dev/null
-	@rm -f $(ARCH_SPECIFIC) asmcomp/emit.ml asmcomp/*.cm*
-
-.PHONY: check_all_arches
-check_all_arches:
-ifeq ($(ARCH64),true)
-	@STATUS=0; \
-	 for i in $(ARCHES); do \
-	   $(MAKE) --no-print-directory check_arch ARCH=$$i || STATUS=1; \
-	 done; \
-	 exit $$STATUS
-else
-	 @echo "Architecture tests are disabled on 32-bit platforms."
-endif
 
 # The native toplevel
 
 ocamlnat_LIBRARIES = \
-  compilerlibs/ocamlcommon compilerlibs/ocamloptcomp \
+  compilerlibs/ocamlcommon-private compilerlibs/ocamloptcomp \
   compilerlibs/ocamlbytecomp otherlibs/dynlink/dynlink \
   compilerlibs/ocamltoplevel
 
@@ -1613,7 +1644,7 @@ endif
 partialclean::
 	for d in utils parsing typing bytecomp asmcomp middle_end file_formats \
            lambda middle_end/closure middle_end/flambda \
-           middle_end/flambda/base_types \
+           middle_end/flambda/base_types $(addprefix asmcomp/, $(ARCHES)) \
            driver toplevel toplevel/byte toplevel/native tools debugger; do \
 	  rm -f $$d/*.cm[ioxt] $$d/*.cmti $$d/*.annot $$d/*.s $$d/*.asm \
 	    $$d/*.o $$d/*.obj $$d/*.so $$d/*.dll; \
@@ -1623,7 +1654,7 @@ partialclean::
 depend: beforedepend
 	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types \
+         middle_end/flambda/base_types $(addprefix asmcomp/, $(ARCHES)) \
          driver toplevel toplevel/byte toplevel/native lex tools debugger; \
 	 do \
 	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
@@ -1649,6 +1680,12 @@ distclean: clean
 	rm -f Makefile.config Makefile.build_config
 	rm -rf autom4te.cache flexdll-sources $(BYTE_BUILD_TREE) $(OPT_BUILD_TREE)
 	rm -f config.log config.status libtool
+	rm -f asmcomp/default.ml
+
+COMPILER_LIBS = ocamlcommon ocamlbytecomp ocamlmiddleend ocamltoplevel
+ifeq "$(NATIVE_COMPILER)" "true"
+COMPILER_LIBS += ocamloptcomp
+endif
 
 # Installation
 .PHONY: install
@@ -1734,7 +1771,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	  "$(INSTALL_LIBDIR_PROFILING)"
 endif
 	$(INSTALL_DATA) \
-	  compilerlibs/*.cma compilerlibs/META \
+	  $(addprefix compilerlibs/, $(COMPILER_LIBS:=.cma)) compilerlibs/META \
 	  "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	   $(ocamlc_MODULES:=.cmo) $(ocaml_MODULES:=.cmo) \
@@ -1890,7 +1927,8 @@ endif
            middle_end/flambda/base_types/*.cmx \
           "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
-	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
+	   $(addprefix compilerlibs/, $(COMPILER_LIBS:=.cmxa)) \
+	   $(addprefix compilerlibs/, $(COMPILER_LIBS:=.$(A))) \
 	   "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	   $(ocamlc_MODULES:=.cmx) $(ocamlc_MODULES:=.$(O)) \

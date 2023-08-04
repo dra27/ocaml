@@ -49,6 +49,8 @@ let is_immediate_logical n = n <= 0xFFFF && n >= 0
 
 (* Instruction selection *)
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object (self)
 
 inherit Selectgen.selector_generic as super

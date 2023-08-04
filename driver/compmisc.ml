@@ -18,7 +18,8 @@ let auto_include find_in_dir fn =
     raise Not_found
   else
     let alert = Location.auto_include_alert in
-    Load_path.auto_include_otherlibs alert find_in_dir fn
+    Load_path.auto_include_otherlibs Clflags.config.standard_library_default
+                                     alert find_in_dir fn
 
 (* Initialize the search path.
    [dir] (default: the current directory)
@@ -34,15 +35,22 @@ let init_path ?(auto_include=auto_include) ?(dir="") () =
       !Clflags.include_dirs
   in
   let dirs =
-    !Compenv.last_include_dirs @ dirs @ Config.flexdll_dirs @
+    !Compenv.last_include_dirs @ dirs @ Clflags.config.flexdll_dirs @
     !Compenv.first_include_dirs
   in
   let exp_dirs =
-    List.map (Misc.expand_directory Config.standard_library) dirs
+    List.map (Misc.expand_stdlib Clflags.config.standard_library_default) dirs
+  in
+  let std_include_dir =
+    if !Clflags.no_std_include then [] else
+      let standard_library =
+        Misc.get_stdlib Clflags.config.standard_library_default
+      in
+      [standard_library]
   in
   let dirs =
     (if !Clflags.no_cwd then [] else [dir])
-    @ List.rev_append exp_dirs (Clflags.std_include_dir ())
+    @ List.rev_append exp_dirs std_include_dir
   in
   Load_path.init ~auto_include dirs;
   Env.reset_cache ()
@@ -116,3 +124,12 @@ let with_ppf_dump ~file_prefix f =
 
   in
   Misc.try_finally (fun () -> f ppf_dump) ~always:finally
+
+let process_use_config args =
+  if Array.length args > 2 && args.(1) = "-use-config" then
+    let file = args.(2) in
+    try
+      In_channel.with_open_bin file (fun ic ->
+        Clflags.load_config ~file (Marshal.from_channel ic);
+        Main_args.use_config_state := Some false)
+    with e -> raise e

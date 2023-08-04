@@ -15,28 +15,182 @@
 
 (* Command-line parameters *)
 
-module Int_arg_helper = Arg_helper.Make (struct
-  module Key = struct
-    include Numbers.Int
-    let of_string = int_of_string
-  end
+type config = {
+  mutable file: string option;
+  mutable bindir: string;
+  mutable standard_library_default: string;
+  mutable host : string;
+  mutable target : string;
+  mutable reserved_header_bits : int;
+  mutable flat_float_array : bool;
+  mutable windows_unicode: bool;
+  mutable supports_shared_libraries: bool;
+  mutable native_dynlink: bool;
+  mutable native_compiler: bool;
+  mutable architecture: string;
+  mutable model: string;
+  mutable system: Config_constants.System.t;
+  mutable abi: string;
+  mutable with_frame_pointers : bool;
+  mutable flambda : bool;
+  mutable with_flambda_invariants : bool;
+  mutable with_cmm_invariants : bool;
+  mutable function_sections : bool;
+  mutable afl_instrument : bool;
+  mutable tsan : bool;
+  mutable ccomp_type: string;
+  mutable c_compiler: string;
+  mutable c_output_obj: string;
+  mutable c_has_debug_prefix_map : bool;
+  mutable as_has_debug_prefix_map : bool;
+  mutable ocamlc_cflags : string;
+  mutable ocamlc_cppflags : string;
+  mutable bytecomp_c_libraries: string;
+  mutable native_c_libraries: string;
+  mutable native_ldflags : string;
+  mutable native_pack_linker: string;
+  mutable mkdll: string;
+  mutable mkexe: string;
+  mutable mkmaindll: string;
+  mutable linker_is_flexlink: bool;
+  mutable default_rpath: string;
+  mutable mksharedlibrpath: string;
+  mutable ar: string;
+  mutable asm: string;
+  mutable asm_cfi_supported: bool;
+  mutable ext_obj: string;
+  mutable ext_asm: string;
+  mutable ext_lib: string;
+  mutable ext_dll: string;
+  mutable ext_exe: string;
+  mutable systhread_supported : bool;
+  mutable flexdll_dirs : string list;
+  mutable ar_supports_response_files: bool
+}
 
-  module Value = struct
-    include Numbers.Int
-    let of_string = int_of_string
-  end
-end)
-module Float_arg_helper = Arg_helper.Make (struct
-  module Key = struct
-    include Numbers.Int
-    let of_string = int_of_string
-  end
+module type Config = module type of Config_settings
 
-  module Value = struct
-    include Numbers.Float
-    let of_string = float_of_string
-  end
-end)
+let config =
+  let open Config_settings in {
+    file = None; bindir; standard_library_default; host; target;
+    reserved_header_bits; flat_float_array; windows_unicode;
+    supports_shared_libraries; native_dynlink; native_compiler; architecture;
+    model; system; abi; with_frame_pointers; flambda; with_flambda_invariants;
+    with_cmm_invariants; function_sections; afl_instrument; tsan; ccomp_type;
+    c_compiler; c_output_obj; c_has_debug_prefix_map; as_has_debug_prefix_map;
+    ocamlc_cflags; ocamlc_cppflags; bytecomp_c_libraries; native_c_libraries;
+    native_ldflags; native_pack_linker; mkdll; mkexe; mkmaindll;
+    linker_is_flexlink; default_rpath; mksharedlibrpath; ar; asm;
+    asm_cfi_supported; ext_obj; ext_asm; ext_lib; ext_dll; ext_exe;
+    systhread_supported; flexdll_dirs; ar_supports_response_files;
+  }
+
+let config_hooks = Queue.create ()
+
+let config_hook f =
+  Queue.push f config_hooks;
+  f config
+
+let load_config ?file settings =
+  let open (val settings : Config) in
+  config.file <- file;
+  config.bindir <- bindir;
+  config.standard_library_default <- standard_library_default;
+  config.host <- host;
+  config.target <- target;
+  config.reserved_header_bits <- reserved_header_bits;
+  config.flat_float_array <- flat_float_array;
+  config.windows_unicode <- windows_unicode;
+  config.supports_shared_libraries <- supports_shared_libraries;
+  config.native_dynlink <- native_dynlink;
+  config.native_compiler <- native_compiler;
+  config.architecture <- architecture;
+  config.model <- model;
+  config.system <- system;
+  config.abi <- abi;
+  config.with_frame_pointers <- with_frame_pointers;
+  config.flambda <- flambda;
+  config.with_flambda_invariants <- with_flambda_invariants;
+  config.with_cmm_invariants <- with_cmm_invariants;
+  config.function_sections <- function_sections;
+  config.afl_instrument <- afl_instrument;
+  config.tsan <- tsan;
+  config.ccomp_type <- ccomp_type;
+  config.c_compiler <- c_compiler;
+  config.c_output_obj <- c_output_obj;
+  config.c_has_debug_prefix_map <- c_has_debug_prefix_map;
+  config.as_has_debug_prefix_map <- as_has_debug_prefix_map;
+  config.ocamlc_cflags <- ocamlc_cflags;
+  config.ocamlc_cppflags <- ocamlc_cppflags;
+  config.bytecomp_c_libraries <- bytecomp_c_libraries;
+  config.native_c_libraries <- native_c_libraries;
+  config.native_ldflags <- native_ldflags;
+  config.native_pack_linker <- native_pack_linker;
+  config.mkdll <- mkdll;
+  config.mkexe <- mkexe;
+  config.mkmaindll <- mkmaindll;
+  config.linker_is_flexlink <- linker_is_flexlink;
+  config.default_rpath <- default_rpath;
+  config.mksharedlibrpath <- mksharedlibrpath;
+  config.ar <- ar;
+  config.asm <- asm;
+  config.asm_cfi_supported <- asm_cfi_supported;
+  config.ext_obj <- ext_obj;
+  config.ext_asm <- ext_asm;
+  config.ext_lib <- ext_lib;
+  config.ext_dll <- ext_dll;
+  config.ext_exe <- ext_exe;
+  config.systhread_supported <- systhread_supported;
+  config.flexdll_dirs <- flexdll_dirs;
+  config.ar_supports_response_files <- ar_supports_response_files;
+  Queue.iter (fun f -> f config) config_hooks
+
+let () = load_config (module Config_settings)
+
+type 'a switchable =
+| Atom of 'a
+| Switched of bool ref * 'a * 'a
+
+let expand = function
+| Atom v
+| Switched({contents = true}, v, _)
+| Switched({contents = false}, _, v) -> v
+
+let map_switchable f = function
+| Atom v -> Atom (f v)
+| Switched(b, l, r) -> Switched(b, f l, f r)
+
+module type Parseable = sig
+  type t
+  val of_string : string -> t
+end
+
+module Switchable_arg_helper(T : Parseable) = struct
+  include Arg_helper.Make(struct
+    module Key = struct
+      include Numbers.Int
+      let of_string = int_of_string
+    end
+
+    module Value = struct
+      type t = T.t switchable
+      let of_string s = Atom (T.of_string s)
+    end
+  end)
+
+  let default_switchable = default
+
+  let default v = default (Atom v)
+
+  let get ~key parsed = expand (get ~key parsed)
+
+  let get_default parsed = expand (get_default parsed)
+end
+
+module Int_arg_helper =
+  Switchable_arg_helper(struct type t = int let of_string = int_of_string end)
+
+module Float_arg_helper = Switchable_arg_helper(Float)
 
 let objfiles = ref ([] : string list)   (* .cmo and .cma files *)
 and ccobjs = ref ([] : string list)     (* .o, .a, .so and -cclib -lxxx *)
@@ -137,34 +291,25 @@ let keep_startup_file = ref false       (* -dstartup *)
 let dump_combine = ref false            (* -dcombine *)
 let profile_columns : Profile.column list ref = ref [] (* -dprofile/-dtimings *)
 
+let interface_suffix = ref ".mli"       (* -intf-suffix *)
+
 let native_code = ref false             (* set to true under ocamlopt *)
 
 let force_slash = ref false             (* for ocamldep *)
 let clambda_checks = ref false          (* -clambda-checks *)
-let cmm_invariants =
-  ref Config.with_cmm_invariants        (* -dcmm-invariants *)
+let cmm_invariants = ref None           (* -dcmm-invariants *)
 
-let flambda_invariant_checks =
-  ref Config.with_flambda_invariants    (* -flambda-(no-)invariants *)
+let flambda_invariant_checks = ref None (* -flambda-(no-)invariants *)
 
 let dont_write_files = ref false        (* set to true under ocamldoc *)
 
 let insn_sched_default = true
 let insn_sched = ref insn_sched_default (* -[no-]insn-sched *)
 
-let std_include_flag prefix =
-  if !no_std_include then ""
-  else (prefix ^ (Filename.quote Config.standard_library))
-
-let std_include_dir () =
-  if !no_std_include then [] else [Config.standard_library]
-
 let shared = ref false (* -shared *)
 let dlcode = ref true (* not -nodynlink *)
 
-let pic_code = ref (match Config.architecture with (* -fPIC *)
-                     | "amd64" -> true
-                     | _       -> false)
+let pic_code = ref None
 
 let runtime_variant = ref ""
 
@@ -176,7 +321,7 @@ let keep_locs = ref true               (* -keep-locs *)
 let classic_inlining = ref false       (* -Oclassic *)
 let inlining_report = ref false    (* -inlining-report *)
 
-let afl_instrument = ref Config.afl_instrument (* -afl-instrument *)
+let afl_instrument = ref None          (* -afl-instrument *)
 let afl_inst_ratio = ref 100           (* -afl-inst-ratio *)
 
 let function_sections = ref false      (* -function-sections *)
@@ -188,10 +333,16 @@ let rounds () =
   | None -> !default_simplify_rounds
   | Some r -> r
 
-let default_inline_threshold = if Config.flambda then 10. else 10. /. 8.
+let default_inline_threshold =
+  let flambda = ref false in
+  let () = config_hook @@ function config ->
+    flambda := config.flambda
+  in
+  Switched(flambda, 10., 10. /. 8.)
 let inline_toplevel_multiplier = 16
 let default_inline_toplevel_threshold =
-  int_of_float ((float inline_toplevel_multiplier) *. default_inline_threshold)
+  let f v = int_of_float (float inline_toplevel_multiplier *. v) in
+  map_switchable f default_inline_threshold
 let default_inline_call_cost = 5
 let default_inline_alloc_cost = 7
 let default_inline_prim_cost = 3
@@ -202,9 +353,10 @@ let default_inline_lifting_benefit = 1300
 let default_inline_max_unroll = 0
 let default_inline_max_depth = 1
 
-let inline_threshold = ref (Float_arg_helper.default default_inline_threshold)
+let inline_threshold =
+  ref (Float_arg_helper.default_switchable default_inline_threshold)
 let inline_toplevel_threshold =
-  ref (Int_arg_helper.default default_inline_toplevel_threshold)
+  ref (Int_arg_helper.default_switchable default_inline_toplevel_threshold)
 let inline_call_cost = ref (Int_arg_helper.default default_inline_call_cost)
 let inline_alloc_cost = ref (Int_arg_helper.default default_inline_alloc_cost)
 let inline_prim_cost = ref (Int_arg_helper.default default_inline_prim_cost)
@@ -245,10 +397,10 @@ type inlining_arguments = {
 }
 
 let set_int_arg round (arg:Int_arg_helper.parsed ref) default value =
-  let value : int =
+  let value : int switchable =
     match value with
     | None -> default
-    | Some value -> value
+    | Some value -> Atom value
   in
   match round with
   | None ->
@@ -261,7 +413,7 @@ let set_float_arg round (arg:Float_arg_helper.parsed ref) default value =
   let value =
     match value with
     | None -> default
-    | Some value -> value
+    | Some value -> Atom value
   in
   match round with
   | None ->
@@ -271,8 +423,8 @@ let set_float_arg round (arg:Float_arg_helper.parsed ref) default value =
     arg := Float_arg_helper.add_base_override round value !arg
 
 let use_inlining_arguments_set ?round (arg:inlining_arguments) =
-  let set_int = set_int_arg round in
-  let set_float = set_float_arg round in
+  let set_int arg default = set_int_arg round arg (Atom default) in
+  let set_float arg default = set_float_arg round arg (Atom default) in
   set_int inline_call_cost default_inline_call_cost arg.inline_call_cost;
   set_int inline_alloc_cost default_inline_alloc_cost arg.inline_alloc_cost;
   set_int inline_prim_cost default_inline_prim_cost arg.inline_prim_cost;
@@ -288,9 +440,9 @@ let use_inlining_arguments_set ?round (arg:inlining_arguments) =
     default_inline_max_depth arg.inline_max_depth;
   set_int inline_max_unroll
     default_inline_max_unroll arg.inline_max_unroll;
-  set_float inline_threshold
+  set_float_arg round inline_threshold
     default_inline_threshold arg.inline_threshold;
-  set_int inline_toplevel_threshold
+  set_int_arg round inline_toplevel_threshold
     default_inline_toplevel_threshold arg.inline_toplevel_threshold
 
 (* o1 is the default *)

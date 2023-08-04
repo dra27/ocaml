@@ -2,10 +2,9 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
+(*                         David Allsopp, Tarides                         *)
 (*                                                                        *)
-(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
-(*     en Automatique.                                                    *)
+(*   Copyright 2023 David Allsopp Ltd.                                    *)
 (*                                                                        *)
 (*   All rights reserved.  This file is distributed under the terms of    *)
 (*   the GNU Lesser General Public License version 2.1, with the          *)
@@ -13,6 +12,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Insert load/stores for pseudoregs that got assigned to stack locations. *)
-
-val fundecl: Mach.fundecl -> int array -> Mach.fundecl * bool
+module Backend : Platform.Backend

@@ -15,7 +15,6 @@
 
 (* Generation of bytecode + relocation information *)
 
-open Config
 open Misc
 open Asttypes
 open Lambda
@@ -415,7 +414,7 @@ let rec emit = function
 let to_file outchan unit_name objfile ~required_globals code =
   init();
   Fun.protect ~finally:clear (fun () ->
-  output_string outchan cmo_magic_number;
+  output_string outchan Config_constants.cmo_magic_number;
   let pos_depl = pos_out outchan in
   output_binary_int outchan 0;
   let pos_code = pos_out outchan in

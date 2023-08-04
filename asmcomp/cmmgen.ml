@@ -363,7 +363,7 @@ let is_unboxed_number_cmm ~strict cmm =
   in
   let rec aux = function
     | Cop(Calloc, [Cconst_natint (hdr, _); _], dbg)
-      when Nativeint.equal hdr float_header ->
+      when Nativeint.equal hdr (float_header ()) ->
         notify (Boxed (Boxed_float dbg, false))
     | Cop(Calloc, [Cconst_natint (hdr, _); Cconst_symbol (ops, _); _], dbg) ->
         if Nativeint.equal hdr boxedintnat_header
@@ -376,7 +376,7 @@ let is_unboxed_number_cmm ~strict cmm =
         then
           notify (Boxed (Boxed_integer (Pint32, dbg), false))
         else
-        if Nativeint.equal hdr boxedint64_header
+        if Nativeint.equal hdr (boxedint64_header ())
         && String.equal ops caml_int64_ops
         then
           notify (Boxed (Boxed_integer (Pint64, dbg), false))
@@ -1468,12 +1468,19 @@ let transl_function f =
   let body = f.body in
   let cmm_body =
     let env = create_env ~environment_param:f.env in
-    if !Clflags.afl_instrument then
+    let afl_instrument =
+      Option.value ~default:Clflags.config.afl_instrument
+                   !Clflags.afl_instrument
+    in
+    if afl_instrument then
       Afl_instrument.instrument_function (transl env body) f.dbg
     else
       transl env body in
   let cmm_body =
-    if Config.tsan then Thread_sanitizer.instrument cmm_body else cmm_body
+    if Clflags.config.tsan then
+      Thread_sanitizer.instrument cmm_body
+    else
+      cmm_body
   in
   let fun_codegen_options =
     if !Clflags.optimize_for_speed then
@@ -1570,13 +1577,17 @@ let compunit (ulam, preallocated_blocks, constants) =
   let dbg = Debuginfo.none in
   Cmmgen_state.set_structured_constants constants;
   let init_code =
-    if !Clflags.afl_instrument then
+    let afl_instrument =
+      Option.value ~default:Clflags.config.afl_instrument
+                   !Clflags.afl_instrument
+    in
+    if afl_instrument then
       Afl_instrument.instrument_initialiser (transl empty_env ulam)
         (fun () -> dbg)
     else
       transl empty_env ulam in
   let init_code =
-    if Config.tsan then Thread_sanitizer.instrument init_code
+    if Clflags.config.tsan then Thread_sanitizer.instrument init_code
     else init_code
   in
   let c1 = [Cfunction {fun_name = Compilenv.make_symbol (Some "entry");
@@ -1586,7 +1597,7 @@ let compunit (ulam, preallocated_blocks, constants) =
                           Compilation time matter more than runtime.
                           See MPR#7630 *)
                        fun_codegen_options =
-                         if Config.flambda then [
+                         if Clflags.config.flambda then [
                            Reduce_code_size;
                            No_CSE;
                          ]

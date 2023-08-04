@@ -27,6 +27,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 (* Names for special regs *)
 
 let reg_domain_state_ptr = phys_reg 25 (* x28 *)
@@ -39,28 +41,30 @@ let reg_stack_arg_end  = phys_reg 18 (* x21 *)
 
 (* Output a label *)
 
-let label_prefix =
-  if macosx then "L" else ".L"
+let label_prefix = ref ".L"
+
+let () = Clflags.config_hook @@ fun _ ->
+  label_prefix := (if config.macOS then "L" else ".L")
 
 let emit_label lbl =
-  emit_string label_prefix; emit_int lbl
+  emit_string !label_prefix; emit_int lbl
 
 (* Symbols *)
 
 let emit_symbol s =
-  if macosx then emit_string "_";
+  if config.macOS then emit_string "_";
   Emitaux.emit_symbol s
 
 (* Object types *)
 
 let emit_symbol_type emit_lbl_or_sym lbl_or_sym ty =
-  if not macosx then begin
+  if not config.macOS then begin
     `	.type	{emit_lbl_or_sym lbl_or_sym}, %{emit_string ty}\n`
   end
 
 
 let emit_symbol_size sym =
-  if not macosx then begin
+  if not config.macOS then begin
     `	.size	{emit_symbol sym}, .-{emit_symbol sym}\n`
   end
 
@@ -326,7 +330,7 @@ let float_literal env fl =
 (* Emit all pending literals *)
 let emit_literals env =
   if env.float_literals <> [] then begin
-    if macosx then
+    if config.macOS then
       `	.section	__TEXT,__literal8,8byte_literals\n`;
     `	.align	3\n`;
     List.iter
@@ -339,7 +343,7 @@ let emit_literals env =
 (* Emit code to load the address of a symbol *)
 
 let emit_load_symbol_addr dst s =
-  if macosx then begin
+  if config.macOS then begin
     `	adrp	{emit_reg dst}, {emit_symbol s}@GOTPAGE\n`;
     `	ldr	{emit_reg dst}, [{emit_reg dst}, {emit_symbol s}@GOTPAGEOFF]\n`
   end else if not !Clflags.dlcode then begin
@@ -356,7 +360,7 @@ let emit_load_symbol_addr dst s =
 
 let num_call_gc_and_check_bound_points env =
   let rec loop instr ((call_gc, check_bound) as totals) =
-    match instr.desc with
+    match map_desc instr.desc with
     | Lend -> totals
     | Lop (Ialloc _) when env.f.fun_fast ->
       loop instr.next (call_gc + 1, check_bound)
@@ -405,6 +409,8 @@ module BR = Branch_relaxation.Make (struct
      occur for branches between functions; in this case, the linker should be
      able to insert veneers anyway.  (See section 4.6.7 of the document
      "ELF for the ARM 64-bit architecture (AArch64)".) *)
+
+  include Arch
 
   type distance = int
 
@@ -516,7 +522,7 @@ module BR = Branch_relaxation.Make (struct
     | Lop (Ireturn_addr) ->
         invalid_arg (
           "Support for Ireturn_addr is not implemented on architecture "
-          ^ Config.architecture)
+          ^ Clflags.config.architecture)
     | Lreloadretaddr -> 0
     | Lreturn -> epilogue_size f
     | Llabel _ -> 0
@@ -653,7 +659,7 @@ let emit_named_text_section func_name =
 (* Emit code to load an emitted literal *)
 
 let emit_load_literal dst lbl =
-  if macosx then begin
+  if config.macOS then begin
     `	adrp	{emit_reg reg_tmp1}, {emit_label lbl}@PAGE\n`;
     `	ldr	{emit_reg dst}, [{emit_reg reg_tmp1}, {emit_label lbl}@PAGEOFF]\n`
   end else begin
@@ -678,7 +684,7 @@ let name_for_float_comparison = function
 
 let emit_instr env i =
     emit_debug_info i.dbg;
-    match i.desc with
+    match map_desc i.desc with
     | Lend -> ()
     | Lprologue ->
       assert (env.f.fun_prologue_required);
@@ -965,7 +971,7 @@ let emit_instr env i =
     | Lop(Ireturn_addr) ->
         invalid_arg (
           "Support for Ireturn_addr is not implemented on architecture "
-          ^ Config.architecture)
+          ^ Clflags.config.architecture)
     | Lreloadretaddr ->
         ()
     | Lreturn ->
@@ -1078,7 +1084,7 @@ let fundecl fundecl =
   `	.globl	{emit_symbol fundecl.fun_name}\n`;
   emit_symbol_type emit_symbol fundecl.fun_name "function";
   (* Dynamic stack checking *)
-  let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+  let stack_threshold_size = Config_constants.stack_threshold * 8 in (* bytes *)
   let { max_frame_size; contains_nontail_calls} =
     preproc_stack_check
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
@@ -1089,7 +1095,7 @@ let fundecl fundecl =
       `{emit_label overflow}:\n`;
       (* Pass the desired frame size on the stack, since all of the
         argument-passing registers may be in use. *)
-      let s = (Config.stack_threshold + max_frame_size / 8) in
+      let s = (Config_constants.stack_threshold + max_frame_size / 8) in
       `	mov	{emit_reg reg_tmp1}, #{emit_int s}\n`;
       `	stp	{emit_reg reg_tmp1}, x30, [sp, #-16]!\n`;
       `	bl	{emit_symbol "caml_call_realloc_stack"}\n`;
@@ -1180,7 +1186,7 @@ let begin_assembly() =
      Alignment is needed to avoid linker warnings for
      shared_startup__code_{begin,end} (e.g. tests/lib-dynlink-pr4839).
    *)
-  if macosx then begin
+  if config.macOS then begin
     `	nop\n`;
     `	.align	3\n`
   end;
@@ -1219,8 +1225,8 @@ let end_assembly () =
       efa_string = (fun s -> emit_string_directive "	.asciz	" s) };
   emit_symbol_type emit_symbol lbl "object";
   emit_symbol_size lbl;
-  begin match Config.system with
-  | "linux" ->
+  begin match Clflags.config.system with
+  | S_linux ->
       (* Mark stack as non-executable *)
       `	.section	.note.GNU-stack,\"\",%progbits\n`
   | _ -> ()

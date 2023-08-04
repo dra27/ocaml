@@ -14,32 +14,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+include Operations.Power
+
 (* Specific operations for the PowerPC processor *)
-
-open Format
-
-type cmm_label = int
-(* Do not introduce a dependency to Cmm *)
 
 (* Machine-specific command-line options *)
 
 let command_line_options = []
-
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-  | Ialloc_far of                       (* allocation in large functions *)
-      { bytes : int; dbginfo : Debuginfo.alloc_dbginfo }
-  | Ipoll_far of { return_label : cmm_label option }
-
-(* Addressing modes *)
-
-type addressing_mode =
-    Ibased of string * int              (* symbol + displ *)
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2                           (* reg + reg *)
 
 (* Sizes, endianness *)
 
@@ -69,40 +50,20 @@ let num_args_addressing = function
   | Iindexed _ -> 1
   | Iindexed2 -> 2
 
-(* Printing operations and addressing modes *)
+(* Working around the lack of more exotic typing *)
 
-let print_addressing printreg addr ppf arg =
+let box_addressing_mode addressing_mode =
+  (Power addressing_mode : Operations.addressing_modes)
+
+let unbox_addressing_mode (addr : Operations.addressing_modes) =
   match addr with
-  | Ibased(s, n) ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "\"%s\"%s" s idx
-  | Iindexed n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a%s" printreg arg.(0) idx
-  | Iindexed2 ->
-      fprintf ppf "%a + %a" printreg arg.(0) printreg arg.(1)
+  | Power addressing_mode -> addressing_mode
+  | _ -> assert false
 
-let print_specific_operation printreg op ppf arg =
-  match op with
-  | Imultaddf ->
-      fprintf ppf "%a *f %a +f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Imultsubf ->
-      fprintf ppf "%a *f %a -f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Ialloc_far { bytes; _ } ->
-      fprintf ppf "alloc_far %d" bytes
-  | Ipoll_far _ ->
-      fprintf ppf "poll_far"
+let box_specific_operation sop =
+  (Power sop : Operations.specific_operations)
 
-(* Specific operations that are pure *)
-
-let operation_is_pure = function
-  | Ialloc_far _ | Ipoll_far _ -> false
-  | _ -> true
-
-(* Specific operations that can raise *)
-
-let operation_can_raise = function
-  | Ialloc_far _ | Ipoll_far _ -> true
-  | _ -> false
+let unbox_specific_operation (sop : Operations.specific_operations) =
+  match sop with
+  | Power specific_operation -> specific_operation
+  | _ -> assert false

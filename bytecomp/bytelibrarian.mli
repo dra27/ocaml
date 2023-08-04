@@ -16,7 +16,7 @@
 (* Build libraries of .cmo files *)
 
 (* Format of a library file:
-      magic number (Config.cma_magic_number)
+      magic number (Config_constants.cma_magic_number)
       absolute offset of content table
       blocks of relocatable bytecode
       content table = list of compilation units

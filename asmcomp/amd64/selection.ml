@@ -140,6 +140,8 @@ let is_immediate_natint n = n <= 0x7FFF_FFFFn && n >= -0x8000_0000n
 
 (* The selector class *)
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object (self)
 
 inherit Selectgen.selector_generic as super
@@ -284,7 +286,7 @@ method! insert_op_debug env op dbg rs rd =
   try
     let (rsrc, rdst) = pseudoregs_for_operation op rs rd in
     self#insert_moves env rs rsrc;
-    self#insert_debug env (Iop op) dbg rsrc rdst;
+    let _ = super#insert_op_debug env op dbg rsrc rdst in
     self#insert_moves env rdst rd;
     rd
   with Use_default ->

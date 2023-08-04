@@ -391,7 +391,7 @@ let transl_declaration env sdecl (id, uid) =
           scstrs;
         if List.length
             (List.filter (fun cd -> cd.pcd_args <> Pcstr_tuple []) scstrs)
-           > (Config.max_tag + 1) then
+           > (Config_constants.max_tag + 1) then
           raise(Error(sdecl.ptype_loc, Too_many_constructors));
         let make_cstr scstr =
           let name = Ident.create_local scstr.pcd_name.txt in
@@ -1929,7 +1929,7 @@ let report_error ppf = function
   | Too_many_constructors ->
       fprintf ppf
         "@[Too many non-constant constructors@ -- maximum is %i %s@]"
-        (Config.max_tag + 1) "non-constant constructors"
+        (Config_constants.max_tag + 1) "non-constant constructors"
   | Duplicate_label s ->
       fprintf ppf "Two labels are named %a" Style.inline_code s
   | Recursive_abbrev (s, env, reaching_path) ->

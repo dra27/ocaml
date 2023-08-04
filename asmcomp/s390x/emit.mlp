@@ -25,6 +25,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 let frame_size env =
   let size =
     env.stack_offset +      (* Trap frame, outgoing parameters *)
@@ -47,7 +49,7 @@ let slot_offset env loc cls =
 (* Output function call *)
 
 let emit_call s =
-  if !pic_code then
+  if Arch.pic_code () then
    `	brasl	%r14, {emit_symbol s}@PLT\n`
   else
    `	brasl	%r14, {emit_symbol s}\n`
@@ -88,17 +90,17 @@ let reg_stack_arg_begin = check_phys_reg 7 "%r9"
 let reg_stack_arg_end = check_phys_reg 6 "%r8"
 
 let cfi_startproc () =
-  if Config.asm_cfi_supported then begin
+  if Clflags.config.asm_cfi_supported then begin
     emit_string "\t.cfi_startproc\n";
   end
 
 let cfi_endproc () =
-  if Config.asm_cfi_supported then begin
+  if Clflags.config.asm_cfi_supported then begin
     emit_string "\t.cfi_endproc\n";
   end
 
 let cfi_def_cfa_register reg =
-  if Config.asm_cfi_supported then begin
+  if Clflags.config.asm_cfi_supported then begin
     emit_string "\t.cfi_def_cfa_register ";
     emit_string reg;
     emit_string "\n"
@@ -120,7 +122,7 @@ let emit_stack env r =
 (* Output a load of the address of a global symbol *)
 
 let emit_load_symbol_addr reg s =
-  if !pic_code then
+  if Arch.pic_code () then
   `	lgrl	{emit_reg reg}, {emit_symbol s}@GOTENT\n`
   else
   `	larl	{emit_reg reg}, {emit_symbol s}\n`
@@ -295,7 +297,7 @@ let name_for_specific = function
 
 let emit_instr env i =
     emit_debug_info i.dbg;
-    match i.desc with
+    match map_desc i.desc with
       Lend -> ()
     | Lprologue ->
       assert (env.f.fun_prologue_required);
@@ -360,7 +362,7 @@ let emit_instr env i =
           if env.f.fun_contains_calls then
             `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`;
           emit_stack_adjust (-n);
-          if !pic_code then
+          if Arch.pic_code () then
             `	brcl	15, {emit_symbol func}@PLT\n`
           else
             `	brcl	15, {emit_symbol func}\n`
@@ -598,7 +600,7 @@ let emit_instr env i =
     | Lop (Ireturn_addr) ->
         invalid_arg (
           "Support for Ireturn_addr is not implemented on architecture "
-          ^ Config.architecture)
+          ^ Clflags.config.architecture)
     | Lreloadretaddr ->
         let n = frame_size env in
         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`
@@ -723,7 +725,7 @@ let fundecl fundecl =
   cfi_startproc ();
 
   (* Dynamic stack checking *)
-  let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+  let stack_threshold_size = Config_constants.stack_threshold * 8 in (* bytes *)
   let { max_frame_size; contains_nontail_calls} =
     preproc_stack_check
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
@@ -751,7 +753,7 @@ let fundecl fundecl =
   | None -> ()
   | Some (overflow,ret) -> begin
       `{emit_label overflow}:\n`;
-      let s = (Config.stack_threshold + max_frame_size / 8) in
+      let s = (Config_constants.stack_threshold + max_frame_size / 8) in
       `  lay  %r15, -8(%r15)\n`;
       `  stg  %r14, 0(%r15)\n`;
       `  lgfi %r12, {emit_int s}\n`;

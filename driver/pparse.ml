@@ -52,8 +52,8 @@ type 'a ast_kind =
 | Signature : Parsetree.signature ast_kind
 
 let magic_of_kind : type a . a ast_kind -> string = function
-  | Structure -> Config.ast_impl_magic_number
-  | Signature -> Config.ast_intf_magic_number
+  | Structure -> Config_constants.ast_impl_magic_number
+  | Signature -> Config_constants.ast_intf_magic_number
 
 (* Note: some of the functions here should go to Ast_mapper instead,
    which would encapsulate the "binary AST" protocol. *)

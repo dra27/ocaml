@@ -274,7 +274,7 @@ let () =
   let f = Array.create_float 10 in
   Array.fill f 0 10 1.0;
   (* FIXME
-  if Config.flat_float_array then assert (not (Array.memq 1.0 f));
+  if Config_settings.flat_float_array then assert (not (Array.memq 1.0 f));
   *)
 ;;
 

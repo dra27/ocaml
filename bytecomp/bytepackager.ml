@@ -134,9 +134,10 @@ let read_member_info targetname file =
       let ic = open_in_bin file in
       Fun.protect ~finally:(fun () -> close_in ic) (fun () ->
         let buffer =
-          really_input_string ic (String.length Config.cmo_magic_number)
+          really_input_string ic
+                              (String.length Config_constants.cmo_magic_number)
         in
-        if buffer <> Config.cmo_magic_number then
+        if buffer <> Config_constants.cmo_magic_number then
           raise(Error(Not_an_object_file file));
         let compunit_pos = input_binary_int ic in
         seek_in ic compunit_pos;
@@ -264,7 +265,7 @@ let package_object_files ~ppf_dump files targetfile targetname coercion =
   in
   let oc = open_out_bin targetfile in
   Fun.protect ~finally:(fun () -> close_out oc) (fun () ->
-    output_string oc Config.cmo_magic_number;
+    output_string oc Config_constants.cmo_magic_number;
     let pos_depl = pos_out oc in
     output_binary_int oc 0;
     let pos_code = pos_out oc in

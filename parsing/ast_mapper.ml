@@ -960,7 +960,10 @@ module PpxContext = struct
               raise Not_found
             else
               let alert = Location.auto_include_alert in
-              Load_path.auto_include_otherlibs alert find_in_dir fn
+              let standard_library_default =
+                Clflags.config.standard_library_default in
+              Load_path.auto_include_otherlibs standard_library_default
+                                               alert find_in_dir fn
           in
           Load_path.init ~auto_include (get_list get_string payload)
       | "open_modules" ->
@@ -1057,7 +1060,8 @@ let apply_lazy ~source ~target mapper =
 
   let ic = open_in_bin source in
   let magic =
-    really_input_string ic (String.length Config.ast_impl_magic_number)
+    really_input_string ic
+                        (String.length Config_constants.ast_impl_magic_number)
   in
 
   let rewrite transform =
@@ -1075,9 +1079,9 @@ let apply_lazy ~source ~target mapper =
     failwith "Ast_mapper: OCaml version mismatch or malformed input";
   in
 
-  if magic = Config.ast_impl_magic_number then
+  if magic = Config_constants.ast_impl_magic_number then
     rewrite (implem : structure -> structure)
-  else if magic = Config.ast_intf_magic_number then
+  else if magic = Config_constants.ast_intf_magic_number then
     rewrite (iface : signature -> signature)
   else fail ()
 

@@ -14,7 +14,7 @@
 (**************************************************************************)
 
 let custom_generators_path =
-  Filename.concat Config.standard_library
+  Filename.concat (Misc.get_stdlib Config_settings.standard_library_default)
     (Filename.concat "ocamldoc" "custom")
 
 let print_warnings = ref true

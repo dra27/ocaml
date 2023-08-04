@@ -102,8 +102,8 @@ let emit_float64_split_directive directive x =
   and hi = Int64.shift_right_logical x 32 in
   emit_printf "\t%s\t0x%Lx, 0x%Lx\n"
     directive
-    (if Arch.big_endian then hi else lo)
-    (if Arch.big_endian then lo else hi)
+    (if Platform.info.big_endian then hi else lo)
+    (if Platform.info.big_endian then lo else hi)
 
 let emit_float32_directive directive x =
   emit_printf "\t%s\t0x%lx\n" directive x
@@ -220,8 +220,8 @@ let emit_frames a =
       List.iter (fun Debuginfo.{alloc_words;_} ->
         (* Possible allocations range between 2 and 257 *)
         assert (2 <= alloc_words &&
-                alloc_words - 1 <= Config.max_young_wosize &&
-                Config.max_young_wosize <= 256);
+                alloc_words - 1 <= Config_constants.max_young_wosize &&
+                Config_constants.max_young_wosize <= 256);
         a.efa_8 (alloc_words - 2)) dbg;
       if flags = 3 then begin
         a.efa_align 4;
@@ -232,7 +232,7 @@ let emit_frames a =
             a.efa_label_rel (label_debuginfos false alloc_dbg) Int32.zero) dbg
       end
     end;
-    a.efa_align Arch.size_addr
+    a.efa_align Platform.info.size_addr
   in
   let emit_filename name lbl =
     a.efa_def_label lbl;
@@ -336,7 +336,7 @@ let emit_frames a =
   Label_table.iter emit_debuginfo debuginfos;
   Hashtbl.iter emit_filename filenames;
   Hashtbl.iter emit_defname defnames;
-  a.efa_align Arch.size_addr;
+  a.efa_align Platform.info.size_addr;
   frame_descriptors := []
 
 (* Detection of functions that can be duplicated between a DLL and
@@ -354,7 +354,7 @@ let is_generic_function name =
 (* CFI directives *)
 
 let is_cfi_enabled () =
-  Config.asm_cfi_supported
+  Clflags.config.asm_cfi_supported
 
 let cfi_startproc () =
   if is_cfi_enabled () then
@@ -417,7 +417,7 @@ let reset_debug_info () =
    display .loc for every instruction. *)
 let emit_debug_info_gen dbg file_emitter loc_emitter =
   if is_cfi_enabled () &&
-    (!Clflags.debug || Config.with_frame_pointers) then begin
+    (!Clflags.debug || Clflags.config.with_frame_pointers) then begin
     match List.rev dbg with
     | [] -> ()
     | { Debuginfo.dinfo_line = line;

@@ -31,7 +31,7 @@ let reg ppf r =
   begin match r.loc with
   | Unknown -> ()
   | Reg r ->
-      fprintf ppf "[%s]" (Proc.register_name r)
+      fprintf ppf "[%s]" (Platform.info.register_name r)
   | Stack(Local s) ->
       fprintf ppf "[s%i]" s
   | Stack(Incoming s) ->
@@ -126,16 +126,16 @@ let operation op arg ppf res =
       fprintf ppf "%s %a[%a]"
        (Printcmm.chunk memory_chunk)
        (fun pp a -> if a then fprintf pp "atomic" else ()) is_atomic
-       (Arch.print_addressing reg addressing_mode) arg
+       (Operations.print_addressing reg addressing_mode) arg
   | Iload { memory_chunk; addressing_mode; mutability=Mutable; is_atomic } ->
       fprintf ppf "%s %a mut[%a]"
        (Printcmm.chunk memory_chunk)
        (fun pp a -> if a then fprintf pp "atomic" else ()) is_atomic
-       (Arch.print_addressing reg addressing_mode) arg
+       (Operations.print_addressing reg addressing_mode) arg
   | Istore(chunk, addr, is_assign) ->
       fprintf ppf "%s[%a] := %a %s"
        (Printcmm.chunk chunk)
-       (Arch.print_addressing reg addr)
+       (Operations.print_addressing reg addr)
        (Array.sub arg 1 (Array.length arg - 1))
        reg arg.(0)
        (if is_assign then "(assign)" else "(init)")
@@ -154,7 +154,7 @@ let operation op arg ppf res =
   | Iintoffloat -> fprintf ppf "intoffloat %a" reg arg.(0)
   | Iopaque -> fprintf ppf "opaque %a" reg arg.(0)
   | Ispecific op ->
-      Arch.print_specific_operation reg op ppf arg
+      Operations.print_specific_operation reg op ppf arg
   | Idls_get -> fprintf ppf "dls_get"
   | Ireturn_addr -> fprintf ppf "return_addr"
   | Ipoll { return_label } ->

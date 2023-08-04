@@ -17,10 +17,11 @@
 (* Reloading for the ARM 64 bits *)
 
 open Reg
+open Reloadgen.Make(Arch)
 
 class reload = object (self)
 
-inherit Reloadgen.reload_generic as super
+inherit reload_generic as super
 
 method! reload_operation op arg res =
   match op with

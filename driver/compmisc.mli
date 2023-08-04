@@ -27,3 +27,8 @@ val auto_include : Load_path.auto_include_callback
 (** [auto_include find_in_dir fn] is a callback function to be passed to
     {!Load_path.init} and automatically adds [-I +lib] to the load path after
     displaying an alert. *)
+
+val process_use_config : string array -> unit
+(** [process_use_config args] scans [args] for ["-use-config"], loads the given
+    file and passes the result to {!Clflags.load_config}. ["-use-config"] is
+    only permitted as the first argument. *)

@@ -1,8 +1,8 @@
 (* TEST
  include config;
  flags = "-w -55";
- ocamlc_flags = "config.cmo";
- ocamlopt_flags = "-inline 20 config.cmx";
+ ocamlc_flags = "config_constants.cmo config_settings.cmo";
+ ocamlopt_flags = "-inline 20 config_constants.cmx config_settings.cmx";
  native;
 *)
 
@@ -176,7 +176,7 @@ let () =
   check_noalloc "unbox only if useful" unbox_only_if_useful;
   check_noalloc "ignore useless args" ignore_useless_args;
 
-  if Config.flambda then begin
+  if Config_settings.flambda then begin
     check_noalloc "float and int32 record" unbox_record;
     check_noalloc "eliminate intermediate immutable float record"
       eliminate_intermediate_float_record;

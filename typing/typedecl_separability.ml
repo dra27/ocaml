@@ -621,7 +621,7 @@ let check_def
            ~parameters:constructor.result_type_parameter_instances
 
 let compute_decl env decl =
-  if Config.flat_float_array then check_def env decl
+  if Clflags.config.flat_float_array then check_def env decl
   else
     (* Hack: in -no-flat-float-array mode, instead of always returning
        [best_msig], we first compute the separability signature --

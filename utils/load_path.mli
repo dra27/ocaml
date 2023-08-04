@@ -63,10 +63,11 @@ val init : auto_include:auto_include_callback -> string list -> unit
 (** [init l] is the same as [reset (); List.iter add_dir (List.rev l)] *)
 
 val auto_include_otherlibs :
-  (string -> unit) -> auto_include_callback
-(** [auto_include_otherlibs alert] is a callback function to be passed to
-    {!Load_path.init} and automatically adds [-I +lib] to the load path after
-    calling [alert lib]. *)
+  string -> (string -> unit) -> auto_include_callback
+(** [auto_include_otherlibs standard_library_default alert] is a callback
+    function to be passed to {!Load_path.init} and automatically adds [-I +lib]
+    to the load path after calling [alert lib]. *)
+
 
 val get_paths : unit -> string list
 (** Return the list of directories passed to [add_dir] so far. *)

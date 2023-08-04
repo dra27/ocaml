@@ -46,6 +46,8 @@ end) : sig
 
   val default : S.Value.t -> parsed
 
+  val get_default : parsed -> S.Value.t
+
   val set_base_default : S.Value.t -> parsed -> parsed
 
   val add_base_override : S.Key.t -> S.Value.t -> parsed -> parsed

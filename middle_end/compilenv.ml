@@ -21,7 +21,6 @@
 
 [@@@ocaml.warning "+a-4-9-40-41-42"]
 
-open Config
 open Cmx_format
 
 type error =
@@ -71,8 +70,8 @@ let exported_constants = Hashtbl.create 17
 
 let merged_environment = ref Export_info.empty
 
-let default_ui_export_info =
-  if Config.flambda then
+let default_ui_export_info flambda =
+  if flambda then
     Cmx_format.Flambda Export_info.empty
   else
     Cmx_format.Clambda Value_unknown
@@ -87,7 +86,8 @@ let current_unit =
     ui_apply_fun = [];
     ui_send_fun = [];
     ui_force_link = false;
-    ui_export_info = default_ui_export_info;
+    (* The correct default is assigned by reset *)
+    ui_export_info = Cmx_format.Clambda Value_unknown;
     ui_for_pack = None }
 
 let concat_symbol unitname id =
@@ -125,7 +125,7 @@ let reset ?packname name =
   current_unit.ui_for_pack <- packname;
   Hashtbl.clear exported_constants;
   structured_constants := structured_constants_empty;
-  current_unit.ui_export_info <- default_ui_export_info;
+  current_unit.ui_export_info <- default_ui_export_info Clflags.config.flambda;
   merged_environment := Export_info.empty;
   Hashtbl.clear export_infos_table;
   let compilation_unit =
@@ -152,8 +152,11 @@ let symbol_in_current_unit name =
 
 let read_unit_info filename =
   let ic = open_in_bin filename in
+  let cmx_magic_number =
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   try
-    let buffer = really_input_string ic (String.length cmx_magic_number) in
+    let buffer =
+      really_input_string ic (String.length cmx_magic_number) in
     if buffer <> cmx_magic_number then begin
       close_in ic;
       raise(Error(Not_a_unit_info filename))
@@ -168,7 +171,10 @@ let read_unit_info filename =
 
 let read_library_info filename =
   let ic = open_in_bin filename in
-  let buffer = really_input_string ic (String.length cmxa_magic_number) in
+  let cmxa_magic_number =
+    Magic_number.(current_raw (Cmxa native_obj_config)) in
+  let buffer =
+    really_input_string ic (String.length cmxa_magic_number) in
   if buffer <> cmxa_magic_number then
     raise(Error(Not_a_unit_info filename));
   let infos = (input_value ic : library_infos) in
@@ -225,7 +231,7 @@ let cache_unit_info ui =
 (* Return the approximation of a global identifier *)
 
 let get_clambda_approx ui =
-  assert(not Config.flambda);
+  assert(not Clflags.config.flambda);
   match ui.ui_export_info with
   | Flambda _ -> assert false
   | Clambda approx -> approx
@@ -283,19 +289,19 @@ let symbol_for_global' id =
     Symbol.of_global_linkage (unit_for_global id) sym_label
 
 let set_global_approx approx =
-  assert(not Config.flambda);
+  assert(not Clflags.config.flambda);
   current_unit.ui_export_info <- Clambda approx
 
 (* Exporting and importing cross module information *)
 
 let get_flambda_export_info ui =
-  assert(Config.flambda);
+  assert(Clflags.config.flambda);
   match ui.ui_export_info with
   | Clambda _ -> assert false
   | Flambda ei -> ei
 
 let set_export_info export_info =
-  assert(Config.flambda);
+  assert(Clflags.config.flambda);
   current_unit.ui_export_info <- Flambda export_info
 
 let approx_for_global comp_unit =
@@ -339,6 +345,8 @@ let need_send_fun n =
 
 let write_unit_info info filename =
   let oc = open_out_bin filename in
+  let cmx_magic_number =
+    Magic_number.(current_raw (Cmx native_obj_config)) in
   output_string oc cmx_magic_number;
   output_value oc info;
   flush oc;

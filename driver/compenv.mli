@@ -20,10 +20,27 @@ val module_of_filename : string -> string -> string
 val output_prefix : string -> string
 val extract_output : string option -> string
 val default_output : string option -> string
+val default_executable_name: string
+(** Name of executable produced by linking if none is given with -o,
+    e.g. [a.out] under Unix. *)
+
+(** Access to configuration values *)
+val print_config : out_channel -> unit
+
+val config_var : string -> string option
+(** the configuration value of a variable, if it exists *)
 
 val print_version_and_library : string -> 'a
 val print_version_string : unit -> 'a
 val print_standard_library : unit -> 'a
+val show_config_and_exit : unit -> unit
+  (** Display the values of all compiler configuration variables from module
+      [Config], then exit the program with code 0. *)
+
+val show_config_variable_and_exit : string -> unit
+  (** Display the value of the given configuration variable,
+      then exit the program with code 0. *)
+
 val fatal : string -> 'a
 
 val first_ccopts : string list ref

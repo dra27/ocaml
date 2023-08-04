@@ -15,9 +15,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* This file is included in config_main.ml during the build rather
-   than compiled on its own *)
-
 let bindir = {@QS@|@ocaml_bindir@|@QS@}
 
 let standard_library_default = {@QS@|@ocaml_libdir@|@QS@}
@@ -29,21 +26,7 @@ let c_has_debug_prefix_map = @cc_has_debug_prefix_map@
 let as_has_debug_prefix_map = @as_has_debug_prefix_map@
 let ocamlc_cflags = {@QS@|@ocamlc_cflags@|@QS@}
 let ocamlc_cppflags = {@QS@|@ocamlc_cppflags@|@QS@}
-(* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
-          the two drivers should be identical. *)
-let ocamlopt_cflags = {@QS@|@ocamlc_cflags@|@QS@}
-let ocamlopt_cppflags = {@QS@|@ocamlc_cppflags@|@QS@}
 let bytecomp_c_libraries = {@QS@|@cclibs@|@QS@}
-(* bytecomp_c_compiler and native_c_compiler have been supported for a
-   long time and are retained for backwards compatibility.
-   For programs that don't need compatibility with older OCaml releases
-   the recommended approach is to use the constituent variables
-   c_compiler, ocamlc_cflags, ocamlc_cppflags etc., directly.
-*)
-let bytecomp_c_compiler =
-  c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags
-let native_c_compiler =
-  c_compiler ^ " " ^ ocamlopt_cflags ^ " " ^ ocamlopt_cppflags
 let native_c_libraries = {@QS@|@cclibs@|@QS@}
 let native_ldflags = {@QS@|@native_ldflags@|@QS@}
 let native_pack_linker = {@QS@|@PACKLD@|@QS@}
@@ -55,6 +38,7 @@ let native_dynlink = @natdynlink@
 let mkdll = {@QS@|@mkdll_exp@|@QS@}
 let mkexe = {@QS@|@mkexe_exp@|@QS@}
 let mkmaindll = {@QS@|@mkmaindll_exp@|@QS@}
+let linker_is_flexlink = @linker_is_flexlink@
 
 let flambda = @flambda@
 let with_flambda_invariants = @flambda_invariants@
@@ -70,7 +54,8 @@ let native_compiler = @native_compiler@
 
 let architecture = {@QS@|@arch@|@QS@}
 let model = {@QS@|@model@|@QS@}
-let system = {@QS@|@system@|@QS@}
+let system = Config_constants.System.S_@system@
+let abi = {@QS@|@abi@|@QS@}
 
 let asm = {@QS@|@AS@|@QS@}
 let asm_cfi_supported = @asm_cfi_supported@

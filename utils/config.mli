@@ -164,8 +164,14 @@ val architecture: string
 val model: string
 (** Name of processor submodel for the native-code compiler *)
 
-val system: string
+val system: Config_constants.System.t
 (** Name of operating system for the native-code compiler *)
+
+val abi: string
+(** ["default"] or the name of the Application Binary Interface (ABI) in use for
+    {!system} (e.g. ["eabi"] or ["eabihf"] for 32-bit arm on Linux)
+
+    @since 5.2 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling

@@ -58,6 +58,7 @@ let access_array base numelt size =
                   dbg)],
           dbg)
 
+open (val Platform.info.backend : Platform.Backend)
 %}
 
 %token ABSF
@@ -175,7 +176,7 @@ fundecl:
       { List.iter (fun (id, ty) -> unbind_ident id) $5;
         {fun_name = $3; fun_args = $5; fun_body = $7;
          fun_codegen_options =
-           if Config.flambda then [
+           if Config_settings.flambda then [
              Reduce_code_size;
              No_CSE;
            ]

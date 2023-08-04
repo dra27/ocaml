@@ -24,10 +24,6 @@ open Reg
 open Arch
 open Mach
 
-(* Instruction selection *)
-
-let word_addressed = false
-
 (* Registers available for register allocation *)
 
 (* Integer register map:
@@ -136,7 +132,7 @@ let loc_int32 last_int make_stack int ofs =
     incr int; l
   end else begin
     let l = stack_slot (make_stack !ofs) Int in
-    ofs := !ofs + (if macosx then 4 else 8);
+    ofs := !ofs + (if config.macOS then 4 else 8);
     l
   end
 
@@ -173,20 +169,23 @@ let not_supported _ofs = fatal_error "Proc.loc_results: cannot call"
 
 let max_arguments_for_tailcalls = 16 (* in regs *) + 64 (* in domain state *)
 
-let last_int_register = if macosx then 7 else 15
+let last_int_register = ref 0
+
+let () = Clflags.config_hook @@ fun _ ->
+  last_int_register := (if config.macOS then 7 else 15)
 
 let loc_arguments arg =
-  calling_conventions 0 last_int_register 100 115
+  calling_conventions 0 !last_int_register 100 115
                       outgoing (- size_domainstate_args) arg
 let loc_parameters arg =
   let (loc, _) =
-    calling_conventions 0 last_int_register 100 115
+    calling_conventions 0 !last_int_register 100 115
                         incoming (- size_domainstate_args) arg
   in
   loc
 let loc_results res =
   let (loc, _) =
-    calling_conventions 0 last_int_register 100 115 not_supported 0 res
+    calling_conventions 0 !last_int_register 100 115 not_supported 0 res
   in
   loc
 
@@ -303,9 +302,6 @@ let prologue_required fd =
 (* Calling the assembler *)
 
 let assemble_file infile outfile =
-  Ccomp.command (Config.asm ^ " " ^
-                 (String.concat " " (Misc.debug_prefix_map_flags ())) ^
+  Ccomp.command (Clflags.config.asm ^ " " ^
+                 (String.concat " " (Ccomp.debug_prefix_map_flags ())) ^
                  " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
-
-
-let init () = ()

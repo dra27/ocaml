@@ -364,7 +364,11 @@ module P = Processed_what_to_specialise
 
 let check_invariants ~pass_name ~(set_of_closures : Flambda.set_of_closures)
       ~original_set_of_closures =
-  if !Clflags.flambda_invariant_checks then begin
+  let flambda_invariant_checks =
+    Option.value ~default:Clflags.config.with_flambda_invariants
+                 !Clflags.flambda_invariant_checks
+  in
+  if flambda_invariant_checks then begin
     Variable.Map.iter (fun fun_var
               (function_decl : Flambda.function_declaration) ->
         let params = Parameter.Set.vars function_decl.params in
@@ -742,7 +746,11 @@ module Make (T : S) = struct
           ~specialised_args
           ~direct_call_surrogates
       in
-      if !Clflags.flambda_invariant_checks then begin
+      let flambda_invariant_checks =
+        Option.value ~default:Clflags.config.with_flambda_invariants
+                     !Clflags.flambda_invariant_checks
+      in
+      if flambda_invariant_checks then begin
         check_invariants ~set_of_closures ~original_set_of_closures
           ~pass_name:T.pass_name
       end;

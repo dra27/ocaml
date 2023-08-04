@@ -3066,7 +3066,7 @@ let type_implementation sourcefile outputprefix modulename initial_env ast =
         } (* result is ignored by Compile.implementation *)
       end else begin
         let sourceintf =
-          Filename.remove_extension sourcefile ^ !Config.interface_suffix in
+          Filename.remove_extension sourcefile ^ !Clflags.interface_suffix in
         if !Clflags.cmi_file <> None || Sys.file_exists sourceintf then begin
           let intf_file =
             match !Clflags.cmi_file with
@@ -3209,7 +3209,7 @@ let package_units initial_env objfiles cmifile modulename =
     |> Shape.str ~uid:pack_uid
   in
   (* See if explicit interface is provided *)
-  let mlifile = prefix ^ !Config.interface_suffix in
+  let mlifile = prefix ^ !Clflags.interface_suffix in
   if Sys.file_exists mlifile then begin
     if not (Sys.file_exists cmifile) then begin
       raise(Error(Location.in_file mlifile, Env.empty,

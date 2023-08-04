@@ -15,9 +15,6 @@
 
 (* Processor descriptions *)
 
-(* Instruction selection *)
-val word_addressed: bool
-
 (* Registers available for register allocation *)
 val num_register_classes: int
 val register_class: Reg.t -> int
@@ -72,6 +69,3 @@ val stack_ptr_dwarf_register_number : int
 
 (* Calling the assembler *)
 val assemble_file: string -> string -> int
-
-(* Called before translating a fundecl. *)
-val init : unit -> unit

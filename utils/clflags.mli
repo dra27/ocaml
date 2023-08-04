@@ -29,6 +29,8 @@ module Int_arg_helper : sig
   val parse_no_error : string -> parsed ref -> parse_result
 
   val get : key:int -> parsed -> int
+
+  val get_default : parsed -> int
 end
 
 (** Optimization parameters represented as floats indexed by round number. *)
@@ -43,6 +45,8 @@ module Float_arg_helper : sig
   val parse_no_error : string -> parsed ref -> parse_result
 
   val get : key:int -> parsed -> float
+
+  val get_default : parsed -> float
 end
 
 type inlining_arguments = {
@@ -160,36 +164,24 @@ val dump_interval : bool ref
 val keep_startup_file : bool ref
 val dump_combine : bool ref
 val native_code : bool ref
-val default_inline_threshold : float
 val inline_threshold : Float_arg_helper.parsed ref
 val inlining_report : bool ref
 val simplify_rounds : int option ref
 val default_simplify_rounds : int ref
 val rounds : unit -> int
-val default_inline_max_unroll : int
 val inline_max_unroll : Int_arg_helper.parsed ref
-val default_inline_toplevel_threshold : int
 val inline_toplevel_threshold : Int_arg_helper.parsed ref
-val default_inline_call_cost : int
-val default_inline_alloc_cost : int
-val default_inline_prim_cost : int
-val default_inline_branch_cost : int
-val default_inline_indirect_cost : int
-val default_inline_lifting_benefit : int
 val inline_call_cost : Int_arg_helper.parsed ref
 val inline_alloc_cost : Int_arg_helper.parsed ref
 val inline_prim_cost : Int_arg_helper.parsed ref
 val inline_branch_cost : Int_arg_helper.parsed ref
 val inline_indirect_cost : Int_arg_helper.parsed ref
 val inline_lifting_benefit : Int_arg_helper.parsed ref
-val default_inline_branch_factor : float
 val inline_branch_factor : Float_arg_helper.parsed ref
 val dont_write_files : bool ref
-val std_include_flag : string -> string
-val std_include_dir : unit -> string list
 val shared : bool ref
 val dlcode : bool ref
-val pic_code : bool ref
+val pic_code : bool option ref
 val runtime_variant : string ref
 val with_runtime : bool ref
 val force_slash : bool ref
@@ -197,22 +189,23 @@ val keep_docs : bool ref
 val keep_locs : bool ref
 val opaque : bool ref
 val profile_columns : Profile.column list ref
-val flambda_invariant_checks : bool ref
+val flambda_invariant_checks : bool option ref
 val unbox_closures : bool ref
 val unbox_closures_factor : int ref
 val default_unbox_closures_factor : int
 val unbox_free_vars_of_closures : bool ref
 val unbox_specialised_args : bool ref
 val clambda_checks : bool ref
-val cmm_invariants : bool ref
-val default_inline_max_depth : int
+val cmm_invariants : bool option ref
 val inline_max_depth : Int_arg_helper.parsed ref
 val remove_unused_arguments : bool ref
 val dump_flambda_verbose : bool ref
 val classic_inlining : bool ref
-val afl_instrument : bool ref
+val afl_instrument : bool option ref
 val afl_inst_ratio : int ref
 val function_sections : bool ref
+val interface_suffix: string ref
+(** Suffix for interface file names *)
 
 val all_passes : string list ref
 val dumped_pass : string -> bool
@@ -255,6 +248,186 @@ val stop_after : Compiler_pass.t option ref
 val should_stop_after : Compiler_pass.t -> bool
 val set_save_ir_after : Compiler_pass.t -> bool -> unit
 val should_save_ir_after : Compiler_pass.t -> bool
+
+(** Distribution configurable settings. Values in this record can all be set
+    via [configure.ac]. *)
+type config = private {
+  mutable file: string option;
+  (** The filename the configuration was loaded from, or [None] if the
+      compiler's configure'd configuration is in use. *)
+
+  mutable bindir: string;
+  (** The directory containing the binary programs *)
+
+  mutable standard_library_default: string;
+  (** The default directory containing the standard libraries (when OCAMLLIB and
+      CAMLLIB are not set). *)
+
+  mutable host : string;
+  (** Whether the compiler is a cross-compiler *)
+
+  mutable target : string;
+  (** Whether the compiler is a cross-compiler *)
+
+  mutable reserved_header_bits : int;
+  (** How many bits of a block's header are reserved *)
+
+  mutable flat_float_array : bool;
+  (** Whether the compiler and runtime automagically flatten float
+      arrays *)
+
+  mutable windows_unicode: bool;
+  (** Whether Windows Unicode runtime is enabled *)
+
+  mutable supports_shared_libraries: bool;
+  (** Whether shared libraries are supported *)
+
+  mutable native_dynlink: bool;
+  (** Whether native shared libraries are supported *)
+
+  mutable native_compiler: bool;
+  (** Whether the native compiler is available or not *)
+
+  mutable architecture: string;
+  (** Name of processor type for the native-code compiler *)
+
+  mutable model: string;
+  (** Name of processor submodel for the native-code compiler *)
+
+  mutable system: Config_constants.System.t;
+  (** Name of operating system for the native-code compiler *)
+
+  mutable abi: string;
+  (** ["default"] or the name of the Application Binary Interface (ABI) in use
+      for {!system} (e.g. ["eabi"] or ["eabihf"] for 32-bit arm on Linux) *)
+
+  mutable with_frame_pointers : bool;
+  (** Whether assembler should maintain frame pointers *)
+
+  mutable flambda : bool;
+  (** Whether the compiler was configured for flambda *)
+
+  mutable with_flambda_invariants : bool;
+  (** Whether the invariants checks for flambda are enabled *)
+
+  mutable with_cmm_invariants : bool;
+  (** Whether the invariants checks for Cmm are enabled *)
+
+  mutable function_sections : bool;
+  (** Whether the compiler was configured to generate
+      each function in a separate section *)
+
+  mutable afl_instrument : bool;
+  (** Whether afl-fuzz instrumentation is generated by default *)
+
+  mutable tsan : bool;
+  (** Whether ThreadSanitizer instrumentation is enabled *)
+
+  mutable ccomp_type: string;
+  (** The "kind" of the C compiler, assembler and linker used: one of
+      "cc" (for Unix-style C compilers)
+      "msvc" (for Microsoft Visual C++ and MASM) *)
+
+  mutable c_compiler: string;
+  (** The compiler to use for compiling C files *)
+
+  mutable c_output_obj: string;
+  (** Name of the option of the C compiler for specifying the output
+      file *)
+
+  mutable c_has_debug_prefix_map : bool;
+  (** Whether the C compiler supports -fdebug-prefix-map *)
+
+  mutable as_has_debug_prefix_map : bool;
+  (** Whether the assembler supports --debug-prefix-map *)
+
+  mutable ocamlc_cflags : string;
+  (** The flags ocamlc should pass to the C compiler *)
+
+  mutable ocamlc_cppflags : string;
+  (** The flags ocamlc should pass to the C preprocessor *)
+
+  mutable bytecomp_c_libraries: string;
+  (** The C libraries to link with custom runtimes *)
+
+  mutable native_c_libraries: string;
+  (** The C libraries to link with native-code programs *)
+
+  mutable native_ldflags : string;
+  (* Flags to pass to the system linker *)
+
+  mutable native_pack_linker: string;
+  (** The linker to use for packaging (ocamlopt -pack) and for partial
+      links (ocamlopt -output-obj). *)
+
+  mutable mkdll: string;
+  (** The linker command line to build dynamic libraries. *)
+
+  mutable mkexe: string;
+  (** The linker command line to build executables. *)
+
+  mutable mkmaindll: string;
+  (** The linker command line to build main programs as dlls. *)
+
+  mutable linker_is_flexlink: bool;
+  (** The linker command line calls [flexlink] rather than the C compiler *)
+
+  mutable default_rpath: string;
+  (** Option to add a directory to be searched for libraries at runtime
+      (used by ocamlmklib) *)
+
+  mutable mksharedlibrpath: string;
+  (** Option to add a directory to be searched for shared libraries at runtime
+      (used by ocamlmklib) *)
+
+  mutable ar: string;
+  (** Name of the ar command, or "" if not needed  (MSVC) *)
+
+  mutable asm: string;
+  (** The assembler (and flags) to use for assembling
+      ocamlopt-generated code. *)
+
+  mutable asm_cfi_supported: bool;
+  (** Whether assembler understands CFI directives *)
+
+  mutable ext_obj: string;
+  (** Extension for object files, e.g. [.o] under Unix. *)
+
+  mutable ext_asm: string;
+  (** Extension for assembler files, e.g. [.s] under Unix. *)
+
+  mutable ext_lib: string;
+  (** Extension for library files, e.g. [.a] under Unix. *)
+
+  mutable ext_dll: string;
+  (** Extension for dynamically-loaded libraries, e.g. [.so] under Unix.*)
+
+  mutable ext_exe: string;
+  (** Extension for executable programs, e.g. [.exe] under Windows. *)
+
+  mutable systhread_supported : bool;
+  (** Whether the system thread library is implemented *)
+
+  mutable flexdll_dirs : string list;
+  (** Directories needed for the FlexDLL objects *)
+
+  mutable ar_supports_response_files: bool
+  (** Whether ar supports @FILE arguments. *)
+}
+
+val config : config
+(** The active distribution configuration. Initially set with
+    {!Config_settings}. The configuration can be replaced by passing an
+    alternate module to {!load_config}. *)
+
+val config_hook : (config -> unit) -> unit
+(** Registers a hook function to be called after {!load_config} has applied a
+    new configuration. *)
+
+module type Config = module type of Config_settings
+
+val load_config : ?file:string -> (module Config) -> unit
+(** Replaces {!config} with the fields from the supplied module. *)
 
 val arg_spec : (string * Arg.spec * string) list ref
 

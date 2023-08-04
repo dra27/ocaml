@@ -55,38 +55,15 @@ val assemble_file: (*infile*) string -> (*outfile*) string -> (*retcode*) int
     the input file is ignored). Otherwise, the source asm file with an
     external assembler. *)
 
-(** System detection *)
+type config = private {
+  mutable masm: bool;
+  mutable windows: bool;
+  mutable macOS: bool;
+  mutable solaris: bool;
+  mutable use_plt: bool
+}
 
-type system =
-  (* 32 bits and 64 bits *)
-  | S_macosx
-  | S_gnu
-  | S_cygwin
-
-  (* 32 bits only *)
-  | S_solaris
-  | S_win32
-  | S_linux_elf
-  | S_bsd_elf
-  | S_beos
-  | S_mingw
-
-  (* 64 bits only *)
-  | S_win64
-  | S_linux
-  | S_mingw64
-  | S_freebsd
-  | S_netbsd
-  | S_openbsd
-
-  | S_unknown
-
-val system: system
-val masm: bool
-val windows:bool
-
-(** Whether calls need to go via the PLT. *)
-val use_plt : bool
+val config : config
 
 (** Support for plumbing a binary code emitter *)
 

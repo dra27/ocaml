@@ -29,8 +29,6 @@ let no_code = ref false
 let no_crc = ref false
 let shape = ref false
 
-module Magic_number = Misc.Magic_number
-
 let dummy_crc = String.make 32 '-'
 let null_crc = String.make 32 '0'
 

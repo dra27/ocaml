@@ -496,13 +496,14 @@ and transl_exp0 ~in_new_scope ~scopes e =
          do *)
       begin match Typeopt.classify_lazy_argument e with
       | `Constant_or_function ->
-        (* A constant expr (of type <> float if [Config.flat_float_array] is
-           true) gets compiled as itself. *)
+        (* A constant expr (of type <> float if
+           [Clflags.config.flat_float_array] is true) gets compiled as
+           itself. *)
          transl_exp ~scopes e
       | `Float_that_cannot_be_shortcut ->
           (* We don't need to wrap with Popaque: this forward
              block will never be shortcutted since it points to a float
-             and Config.flat_float_array is true. *)
+             and Clflags.config.flat_float_array is true. *)
           Lprim(Pmakeblock(Obj.forward_tag, Immutable, None),
                 [transl_exp ~scopes e], of_location ~scopes e.exp_loc)
       | `Identifier `Forward_value ->
@@ -527,7 +528,7 @@ and transl_exp0 ~in_new_scope ~scopes e =
                             ~attr:default_function_attribute
                             ~loc:(of_location ~scopes e.exp_loc)
                             ~body:(transl_exp ~scopes e) in
-          Lprim(Pmakeblock(Config.lazy_tag, Mutable, None), [fn],
+          Lprim(Pmakeblock(Config_constants.lazy_tag, Mutable, None), [fn],
                 of_location ~scopes e.exp_loc)
       end
   | Texp_object (cs, meths) ->
@@ -930,7 +931,7 @@ and transl_record ~scopes loc env fields repres opt_init_expr =
   (* Determine if there are "enough" fields (only relevant if this is a
      functional-style record update *)
   let no_init = match opt_init_expr with None -> true | _ -> false in
-  if no_init || size < Config.max_young_wosize
+  if no_init || size < Config_constants.max_young_wosize
   then begin
     (* Allocate new record with given fields (and remaining fields
        taken from init_expr if any *)

@@ -52,7 +52,7 @@ let inline_ops =
     "caml_int64_direct_bswap"; "caml_nativeint_direct_bswap" ]
 
 let use_direct_addressing _symb =
-  (not !Clflags.dlcode) && (not Arch.macosx)
+  (not !Clflags.dlcode) && (not config.macOS)
 
 let is_stack_slot rv =
   Reg.(match rv with
@@ -60,6 +60,8 @@ let is_stack_slot rv =
         | _ -> false)
 
 (* Instruction selection *)
+
+module Selectgen = Selectgen.Make(Arch)(Proc)
 
 class selector = object(self)
 
@@ -213,8 +215,8 @@ method! select_operation op args dbg =
       super#select_operation op args dbg
 
 method! insert_move_extcall_arg env ty_arg src dst =
-  if macosx && ty_arg = XInt32 && is_stack_slot dst
-  then self#insert env (Iop (Ispecific Imove32)) src dst
+  if config.macOS && ty_arg = XInt32 && is_stack_slot dst
+  then ignore (self#insert_op env (Ispecific Imove32) src dst)
   else self#insert_moves env src dst
 end
 

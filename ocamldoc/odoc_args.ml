@@ -174,7 +174,7 @@ let anonymous f =
     if Filename.check_suffix f "ml" then
       Odoc_global.Impl_file f
     else
-        if Filename.check_suffix f !Config.interface_suffix then
+        if Filename.check_suffix f !Clflags.interface_suffix then
         Odoc_global.Intf_file f
       else
         if Filename.check_suffix f "txt" then

@@ -25,7 +25,7 @@
 # that they are consistent with the interface digests in the archives.
 
 UTILS = \
-  utils/config.cmo \
+  utils/config_constants.cmo \
   utils/build_path_prefix_map.cmo \
   utils/misc.cmo \
   utils/identifiable.cmo \
@@ -33,6 +33,7 @@ UTILS = \
   utils/arg_helper.cmo \
   utils/local_store.cmo \
   utils/load_path.cmo \
+  utils/config_settings.cmo \
   utils/clflags.cmo \
   utils/profile.cmo \
   utils/terminfo.cmo \
@@ -46,7 +47,8 @@ UTILS = \
   utils/binutils.cmo \
   utils/lazy_backtrack.cmo \
   utils/diffing.cmo \
-  utils/diffing_with_keys.cmo
+  utils/diffing_with_keys.cmo \
+  utils/magic_number.cmo
 UTILS_CMI =
 
 PARSING = \
@@ -195,14 +197,37 @@ ARCH_SPECIFIC_ASMCOMP = $(INTEL_ASM)
 ARCH_SPECIFIC_ASMCOMP_CMI = $(INTEL_ASM_CMI)
 endif
 
+# Backend-specific modules shared by more than one backend
 ASMCOMP = \
-  $(ARCH_SPECIFIC_ASMCOMP) \
-  asmcomp/arch.cmo \
+  $(ARCH_SPECIFIC_ASMCOMP)
+# Core IR and platform-description modules
+ASMCOMP += \
   asmcomp/cmm.cmo \
-  asmcomp/printcmm.cmo \
   asmcomp/reg.cmo \
+  asmcomp/operations.cmo \
   asmcomp/mach.cmo \
-  asmcomp/proc.cmo \
+  asmcomp/linear.cmo \
+  asmcomp/platform.cmo
+# Architecture-specific support modules
+ASMCOMP += \
+  asmcomp/CSEgen.cmo \
+  asmcomp/reloadgen.cmo \
+  asmcomp/schedgen.cmo \
+  asmcomp/branch_relaxation.cmo \
+  asmcomp/emitaux.cmo \
+  asmcomp/dataflow.cmo \
+  asmcomp/polling.cmo \
+  asmcomp/selectgen.cmo
+# Architecture-specific modules
+ASMCOMP += \
+  asmcomp/amd64.cmo \
+  asmcomp/arm64.cmo \
+  asmcomp/power.cmo \
+  asmcomp/riscv.cmo \
+  asmcomp/s390x.cmo \
+  asmcomp/default.cmo
+# Cmm and the rest of ocamlopt
+ASMCOMP += \
   asmcomp/strmatch.cmo \
   asmcomp/cmmgen_state.cmo \
   asmcomp/cmm_helpers.cmo \
@@ -211,32 +236,19 @@ ASMCOMP = \
   asmcomp/cmmgen.cmo \
   asmcomp/cmm_invariants.cmo \
   asmcomp/interval.cmo \
-  asmcomp/printmach.cmo \
-  asmcomp/dataflow.cmo \
-  asmcomp/polling.cmo \
-  asmcomp/selectgen.cmo \
-  asmcomp/selection.cmo \
   asmcomp/comballoc.cmo \
-  asmcomp/CSEgen.cmo \
-  asmcomp/CSE.cmo \
-  asmcomp/liveness.cmo \
   asmcomp/spill.cmo \
   asmcomp/split.cmo \
   asmcomp/interf.cmo \
   asmcomp/coloring.cmo \
   asmcomp/linscan.cmo \
-  asmcomp/reloadgen.cmo \
-  asmcomp/reload.cmo \
   asmcomp/deadcode.cmo \
-  asmcomp/linear.cmo \
-  asmcomp/printlinear.cmo \
   asmcomp/linearize.cmo \
   file_formats/linear_format.cmo \
-  asmcomp/schedgen.cmo \
-  asmcomp/scheduling.cmo \
-  asmcomp/branch_relaxation.cmo \
-  asmcomp/emitaux.cmo \
-  asmcomp/emit.cmo \
+  asmcomp/printcmm.cmo \
+  asmcomp/printmach.cmo \
+  asmcomp/printlinear.cmo \
+  asmcomp/liveness.cmo \
   asmcomp/asmgen.cmo \
   asmcomp/asmlink.cmo \
   asmcomp/asmlibrarian.cmo \
@@ -412,7 +424,7 @@ $(OPTTOPLEVEL:.cmo=.cmx): ocamlopt$(EXE)
 
 ALL_CONFIG_CMO = utils/config_main.cmo utils/config_boot.cmo
 
-utils/config_%.mli: utils/config.mli
+utils/config_main.mli utils/config_boot.mli: utils/config_settings.mli
 	cp $^ $@
 
 beforedepend:: utils/config_main.mli utils/config_boot.mli
@@ -426,16 +438,23 @@ $(addprefix compilerlibs/,\
   ocamltoplevel.cma): \
   CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
 
-compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(ALL_CONFIG_CMO) $(COMMON)
-	$(V_LINKC)$(CAMLC) -a -linkall -o $@ $(COMMON)
+compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(ALL_CONFIG_CMO) \
+    $(COMMON) utils/config.cmo
+	$(V_LINKC)$(CAMLC) -a -linkall -o $@ $(COMMON) utils/config.cmo
+compilerlibs/ocamlcommon-private.cma: $(COMMON_CMI) $(ALL_CONFIG_CMO) $(COMMON)
+	$(V_LINKC)$(CAMLC) -a -o $@ $(COMMON)
 partialclean::
-	rm -f compilerlibs/ocamlcommon.cma
+	rm -f compilerlibs/ocamlcommon.cma compilerlibs/ocamlcommon-private.cma
 
-compilerlibs/ocamlcommon.cmxa: $(COMMON_CMI) $(COMMON:.cmo=.cmx)
-	$(V_LINKOPT)$(CAMLOPT) -a -linkall -o $@ $(COMMON:.cmo=.cmx)
+compilerlibs/ocamlcommon.cmxa: $(COMMON_CMI) \
+    $(COMMON:.cmo=.cmx) utils/config.cmx
+	$(V_LINKOPT)$(CAMLOPT) -a -linkall -o $@ $(COMMON:.cmo=.cmx) utils/config.cmx
+compilerlibs/ocamlcommon-private.cmxa: $(COMMON_CMI) $(COMMON:.cmo=.cmx)
+	$(V_LINKOPT)$(CAMLOPT) -a -o $@ $(COMMON:.cmo=.cmx)
 partialclean::
-	rm -f compilerlibs/ocamlcommon.cmxa \
-	      compilerlibs/ocamlcommon.a compilerlibs/ocamlcommon.lib
+	rm -f compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon-private.cmxa \
+	      compilerlibs/ocamlcommon.a compilerlibs/ocamlcommon.lib \
+	      compilerlibs/ocamlcommon-private.a compilerlibs/ocamlcommon-private.lib
 
 
 compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)

@@ -17,7 +17,7 @@
 
 let ok = "Ok"
 let software = "OCamldoc"
-let config_version = Config.version
+let config_version = Sys.ocaml_version
 let magic = config_version^""
 
 (** Messages for command line *)

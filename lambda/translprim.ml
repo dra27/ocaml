@@ -107,9 +107,6 @@ let clear_used_primitives () = Hashtbl.clear used_primitives
 let get_used_primitives () =
   Hashtbl.fold (fun path _ acc -> path :: acc) used_primitives []
 
-let gen_array_kind =
-  if Config.flat_float_array then Pgenarray else Paddrarray
-
 let prim_sys_argv =
   Primitive.simple ~name:"caml_sys_argv" ~arity:1 ~alloc:true
 
@@ -194,14 +191,6 @@ let primitives_table =
     "%bytes_safe_set", Primitive (Pbytessets, 3);
     "%bytes_unsafe_get", Primitive (Pbytesrefu, 2);
     "%bytes_unsafe_set", Primitive (Pbytessetu, 3);
-    "%array_length", Primitive ((Parraylength gen_array_kind), 1);
-    "%array_safe_get", Primitive ((Parrayrefs gen_array_kind), 2);
-    "%array_safe_set", Primitive ((Parraysets gen_array_kind), 3);
-    "%array_unsafe_get", Primitive ((Parrayrefu gen_array_kind), 2);
-    "%array_unsafe_set", Primitive ((Parraysetu gen_array_kind), 3);
-    "%obj_size", Primitive ((Parraylength gen_array_kind), 1);
-    "%obj_field", Primitive ((Parrayrefu gen_array_kind), 2);
-    "%obj_set_field", Primitive ((Parraysetu gen_array_kind), 3);
     "%floatarray_length", Primitive ((Parraylength Pfloatarray), 1);
     "%floatarray_safe_get", Primitive ((Parrayrefs Pfloatarray), 2);
     "%floatarray_safe_set", Primitive ((Parraysets Pfloatarray), 3);
@@ -375,6 +364,23 @@ let primitives_table =
     "%dls_get", Primitive (Pdls_get, 1);
   ]
 
+let () = Clflags.config_hook @@ fun new_config ->
+  let gen_array_kind =
+    if new_config.flat_float_array then Pgenarray else Paddrarray
+  in
+  let replace (name, primitive) =
+    Hashtbl.replace primitives_table name primitive
+  in
+  List.iter replace [
+    "%array_length", Primitive ((Parraylength gen_array_kind), 1);
+    "%array_safe_get", Primitive ((Parrayrefs gen_array_kind), 2);
+    "%array_safe_set", Primitive ((Parraysets gen_array_kind), 3);
+    "%array_unsafe_get", Primitive ((Parrayrefu gen_array_kind), 2);
+    "%array_unsafe_set", Primitive ((Parraysetu gen_array_kind), 3);
+    "%obj_size", Primitive ((Parraylength gen_array_kind), 1);
+    "%obj_field", Primitive ((Parrayrefu gen_array_kind), 2);
+    "%obj_set_field", Primitive ((Parraysetu gen_array_kind), 3);
+  ]
 
 let lookup_primitive loc p =
   match Hashtbl.find primitives_table p.prim_name with
@@ -725,9 +731,9 @@ let lambda_of_prim prim_name prim loc args arg_exps =
         Lsend(Public, meth, obj, [], loc)
   | Frame_pointers, [] ->
       let frame_pointers =
-        if !Clflags.native_code && Config.with_frame_pointers then 1 else 0
+        !Clflags.native_code && Clflags.config.with_frame_pointers
       in
-      Lconst (const_int frame_pointers)
+      Lconst (const_int (Bool.to_int frame_pointers))
   | Identity, [arg] -> arg
   | Apply, [func; arg]
   | Revapply, [arg; func] ->

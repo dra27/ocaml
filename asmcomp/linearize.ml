@@ -333,10 +333,11 @@ let add_prologue first_insn prologue_required =
     tailrec_entry_point_label, tailrec_entry_point
 
 let fundecl f =
+  let open (val Platform.info.backend : Platform.Backend) in
   let fun_prologue_required = Proc.prologue_required f in
   let contains_calls = f.Mach.fun_contains_calls in
   let fun_tailrec_entry_point_label, fun_body =
-    add_prologue (linear f.Mach.fun_body end_instr contains_calls)
+    add_prologue (linear f.Mach.fun_body (end_instr ()) contains_calls)
       fun_prologue_required
   in
   { fun_name = f.Mach.fun_name;

@@ -163,17 +163,19 @@ module Bytecode = struct
       let file_digest = Digest.channel ic (-1) in
       seek_in ic 0;
       let buffer =
-        try really_input_string ic (String.length Config.cmo_magic_number)
+        try
+          really_input_string ic
+                              (String.length Config_constants.cmo_magic_number)
         with End_of_file -> raise (DT.Error (Not_a_bytecode_file file_name))
       in
       let handle = ic, file_name, file_digest in
-      if buffer = Config.cmo_magic_number then begin
+      if buffer = Config_constants.cmo_magic_number then begin
         let compunit_pos = input_binary_int ic in  (* Go to descriptor *)
         seek_in ic compunit_pos;
         let cu = (input_value ic : Cmo_format.compilation_unit) in
         handle, [cu]
       end else
-      if buffer = Config.cma_magic_number then begin
+      if buffer = Config_constants.cma_magic_number then begin
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
         let lib = (input_value ic : Cmo_format.library) in

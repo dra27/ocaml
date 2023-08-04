@@ -16,7 +16,6 @@
 (* Link a set of .cmx/.o files and produce an executable *)
 
 open Misc
-open Config
 open Cmx_format
 open Compilenv
 
@@ -114,7 +113,8 @@ let add_ccobjs origin l =
   end
 
 let runtime_lib () =
-  let libname = "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
+  let libname =
+    "libasmrun" ^ !Clflags.runtime_variant ^ Clflags.config.ext_lib in
   try
     if !Clflags.nopervasives || not !Clflags.with_runtime then []
     else [ Load_path.find libname ]
@@ -149,9 +149,11 @@ type file =
   | Library of string * library_infos
 
 let object_file_name_of_file = function
-  | Unit (fname, _, _) -> Some (Filename.chop_suffix fname ".cmx" ^ ext_obj)
+  | Unit (fname, _, _) ->
+      Some (Filename.chop_suffix fname ".cmx" ^ Clflags.config.ext_obj)
   | Library (fname, infos) ->
-      let obj_file = Filename.chop_suffix fname ".cmxa" ^ ext_lib in
+      let obj_file =
+        Filename.chop_suffix fname ".cmxa" ^ Clflags.config.ext_lib in
       (* MSVC doesn't support empty .lib files, and macOS struggles to make
          them (#6550), so there shouldn't be one if the .cmxa contains no
          units. The file_exists check is added to be ultra-defensive for the
@@ -226,6 +228,7 @@ let make_globals_map units_list ~crc_interfaces =
     crc_interfaces defined
 
 let make_startup_file ~ppf_dump units_list ~crc_interfaces =
+  let open (val Platform.info.backend : Platform.Backend) in
   let compile_phrase p = Asmgen.compile_phrase ~ppf_dump p in
   Location.input_name := "caml_startup"; (* set name of "current" input *)
   Compilenv.reset "_startup";
@@ -235,7 +238,7 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
     List.flatten (List.map (fun (info,_,_) -> info.ui_defines) units_list) in
   let entry = Cmm_helpers.entry_point name_list in
   let entry =
-    if Config.tsan then
+    if Clflags.config.tsan then
       match entry with
       | Cfunction ({ fun_body; _ } as cf) ->
           Cmm.Cfunction
@@ -268,6 +271,7 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Emit.end_assembly ()
 
 let make_shared_startup_file ~ppf_dump units =
+  let open (val Platform.info.backend : Platform.Backend) in
   let compile_phrase p = Asmgen.compile_phrase ~ppf_dump p in
   Location.input_name := "caml_startup";
   Compilenv.reset "_shared_startup";
@@ -304,9 +308,9 @@ let link_shared ~ppf_dump objfiles output_name =
       (List.rev !Clflags.ccobjs) in
     let startup =
       if !Clflags.keep_startup_file || !Emitaux.binary_backend_available
-      then output_name ^ ".startup" ^ ext_asm
-      else Filename.temp_file "camlstartup" ext_asm in
-    let startup_obj = output_name ^ ".startup" ^ ext_obj in
+      then output_name ^ ".startup" ^ Clflags.config.ext_asm
+      else Filename.temp_file "camlstartup" Clflags.config.ext_asm in
+    let startup_obj = output_name ^ ".startup" ^ Clflags.config.ext_obj in
     Asmgen.compile_unit ~output_prefix:output_name
       ~asm_filename:startup ~keep_asm:!Clflags.keep_startup_file
       ~obj_filename:startup_obj
@@ -320,16 +324,16 @@ let link_shared ~ppf_dump objfiles output_name =
 
 let call_linker file_list startup_file output_name =
   let main_dll = !Clflags.output_c_object
-                 && Filename.check_suffix output_name Config.ext_dll
+                 && Filename.check_suffix output_name Clflags.config.ext_dll
   and main_obj_runtime = !Clflags.output_complete_object
   in
   let files = startup_file :: (List.rev file_list) in
   let files, ldflags =
     if (not !Clflags.output_c_object) || main_dll || main_obj_runtime then
       files @ (List.rev !Clflags.ccobjs) @ runtime_lib (),
-      native_ldflags ^ " " ^
+      Clflags.config.native_ldflags ^ " " ^
       (if !Clflags.nopervasives || (main_obj_runtime && not main_dll)
-       then "" else Config.native_c_libraries)
+       then "" else Clflags.config.native_c_libraries)
     else
       files, ""
   in
@@ -368,9 +372,10 @@ let link ~ppf_dump objfiles output_name =
                                                  (* put user's opts first *)
     let startup =
       if !Clflags.keep_startup_file || !Emitaux.binary_backend_available
-      then output_name ^ ".startup" ^ ext_asm
-      else Filename.temp_file "camlstartup" ext_asm in
-    let startup_obj = Filename.temp_file "camlstartup" ext_obj in
+      then output_name ^ ".startup" ^ Clflags.config.ext_asm
+      else Filename.temp_file "camlstartup" Clflags.config.ext_asm in
+    let startup_obj =
+      Filename.temp_file "camlstartup" Clflags.config.ext_obj in
     Asmgen.compile_unit ~output_prefix:output_name
       ~asm_filename:startup ~keep_asm:!Clflags.keep_startup_file
       ~obj_filename:startup_obj

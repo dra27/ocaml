@@ -25,7 +25,7 @@ open Typedtree
 
 
 let read_magic_number ic =
-  let len_magic_number = String.length Config.cmt_magic_number in
+  let len_magic_number = String.length Config_constants.cmt_magic_number in
   really_input_string ic len_magic_number
 
 type binary_annots =
@@ -108,7 +108,7 @@ exception Error of error
 let input_cmt ic = (input_value ic : cmt_infos)
 
 let output_cmt oc cmt =
-  output_string oc Config.cmt_magic_number;
+  output_string oc Config_constants.cmt_magic_number;
   Marshal.(to_channel oc (cmt : cmt_infos) [Compression])
 
 let read filename =
@@ -119,13 +119,13 @@ let read filename =
     (fun () ->
        let magic_number = read_magic_number ic in
        let cmi, cmt =
-         if magic_number = Config.cmt_magic_number then
+         if magic_number = Config_constants.cmt_magic_number then
            None, Some (input_cmt ic)
-         else if magic_number = Config.cmi_magic_number then
+         else if magic_number = Config_constants.cmi_magic_number then
            let cmi = Cmi_format.input_cmi ic in
            let cmt = try
                let magic_number = read_magic_number ic in
-               if magic_number = Config.cmt_magic_number then
+               if magic_number = Config_constants.cmt_magic_number then
                  let cmt = input_cmt ic in
                  Some cmt
                else None

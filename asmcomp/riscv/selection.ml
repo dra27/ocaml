@@ -22,6 +22,8 @@ open Mach
 
 (* Instruction selection *)
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object
 
 inherit Selectgen.selector_generic as super

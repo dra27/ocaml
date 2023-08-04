@@ -72,7 +72,8 @@ COMPILERLIBS_INTFS=\
 # .ml files from compilerlibs that have corresponding .mli files.
 COMPILERLIBS_SOURCES=\
   utils/binutils.ml \
-  utils/config.ml \
+  utils/config_constants.ml \
+  utils/config_settings.ml \
   utils/build_path_prefix_map.ml \
   utils/misc.ml \
   utils/identifiable.ml \

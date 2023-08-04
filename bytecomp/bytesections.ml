@@ -102,7 +102,7 @@ let write_toc_and_trailer t =
       output_string t.outchan name; output_binary_int t.outchan len)
     section_table;
   output_binary_int t.outchan (List.length section_table);
-  output_string t.outchan Config.exec_magic_number
+  output_string t.outchan Config_constants.exec_magic_number
 
 (* Read the table of sections from a bytecode executable *)
 
@@ -113,9 +113,9 @@ let read_toc ic =
   seek_in ic pos_trailer;
   let num_sections = input_binary_int ic in
   let header =
-    really_input_string ic (String.length Config.exec_magic_number)
+    really_input_string ic (String.length Config_constants.exec_magic_number)
   in
-  if header <> Config.exec_magic_number then raise Bad_magic_number;
+  if header <> Config_constants.exec_magic_number then raise Bad_magic_number;
   let toc_pos = pos_trailer - 8 * num_sections in
   seek_in ic toc_pos;
   let section_table_rev = ref [] in

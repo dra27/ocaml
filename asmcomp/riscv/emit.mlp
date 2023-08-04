@@ -24,6 +24,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 (* Layout of the stack.  The C stack must be 16-aligned, but 8-alignment
    is enough for the OCaml stack. *)
 
@@ -50,8 +52,11 @@ let slot_offset env loc cls =
 
 (* Output a symbol *)
 
+let need_pic () =
+  !Clflags.dlcode || Option.value !Clflags.pic_code ~default:false
+
 let emit_jump op s =
-  if !Clflags.dlcode || !Clflags.pic_code
+  if need_pic ()
   then `{emit_string op}	{emit_symbol s}@plt`
   else `{emit_string op}	{emit_symbol s}`
 
@@ -260,7 +265,7 @@ let name_for_specific = function
 
 let emit_instr env i =
   emit_debug_info i.dbg;
-  match i.desc with
+  match map_desc i.desc with
     Lend -> ()
   | Lprologue ->
       assert (env.f.fun_prologue_required);
@@ -503,7 +508,7 @@ let emit_instr env i =
   | Lop (Ireturn_addr) ->
       invalid_arg (
         "Support for Ireturn_addr is not implemented on architecture "
-        ^ Config.architecture)
+        ^ Clflags.config.architecture)
   | Lreloadretaddr ->
       let n = frame_size env in
       reload_ra n
@@ -626,7 +631,7 @@ let fundecl fundecl =
   cfi_startproc();
 
   (* Dynamic stack checking *)
-  let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+  let stack_threshold_size = Config_constants.stack_threshold * 8 in (* bytes *)
   let { max_frame_size; contains_nontail_calls } =
     preproc_stack_check
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
@@ -655,7 +660,7 @@ let fundecl fundecl =
       `{emit_label overflow}:\n`;
       (* Pass the desired frame size on the stack, since all of the
          argument-passing registers may be in use. *)
-      let s = Config.stack_threshold + max_frame_size / 8 in
+      let s = Config_constants.stack_threshold + max_frame_size / 8 in
       `	li	{emit_reg reg_tmp}, {emit_int s}\n`;
       `	addi	sp, sp, -16\n`;
       `	sd	{emit_reg reg_tmp}, 0(sp)\n`;
@@ -717,8 +722,9 @@ let data l =
 
 (* Beginning / end of an assembly file *)
 
+
 let begin_assembly() =
-  if !Clflags.dlcode || !Clflags.pic_code then `	.option pic\n`;
+  if need_pic () then `	.option pic\n`;
   `	.file \"\"\n`; (* PR#7073 *)
   reset_debug_info ();
   (* Emit the beginning of the segments *)

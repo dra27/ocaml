@@ -15,55 +15,6 @@
 
 open X86_ast
 
-type system =
-  (* 32 bits and 64 bits *)
-  | S_macosx
-  | S_gnu
-  | S_cygwin
-
-  (* 32 bits only *)
-  | S_solaris
-  | S_win32
-  | S_linux_elf
-  | S_bsd_elf
-  | S_beos
-  | S_mingw
-
-  (* 64 bits only *)
-  | S_win64
-  | S_linux
-  | S_mingw64
-  | S_freebsd
-  | S_netbsd
-  | S_openbsd
-
-  | S_unknown
-
-
-let system = match Config.system with
-  | "macosx" -> S_macosx
-  | "solaris" -> S_solaris
-  | "win32" -> S_win32
-  | "linux_elf" -> S_linux_elf
-  | "bsd_elf" -> S_bsd_elf
-  | "beos" -> S_beos
-  | "gnu" -> S_gnu
-  | "cygwin" -> S_cygwin
-  | "mingw" -> S_mingw
-  | "mingw64" -> S_mingw64
-  | "win64" -> S_win64
-  | "linux" -> S_linux
-  | "freebsd" -> S_freebsd
-  | "netbsd" -> S_netbsd
-  | "openbsd" -> S_openbsd
-
-  | _ -> S_unknown
-
-let windows =
-  match system with
-  | S_mingw64 | S_cygwin | S_win64 -> true
-  | _ -> false
-
 let string_of_string_literal s =
   let b = Buffer.create (String.length s + 2) in
   let last_was_escape = ref false in
@@ -243,15 +194,31 @@ let with_internal_assembler assemble k =
   Misc.protect_refs [ R (internal_assembler, Some assemble) ] k
 
 (* Which asm conventions to use *)
-let masm =
-  match system with
-  | S_win32 | S_win64 -> true
-  | _ -> false
 
-let use_plt =
-  match system with
-  | S_macosx | S_mingw64 | S_cygwin | S_win64 -> false
-  | _ -> !Clflags.dlcode
+type config = {
+  mutable masm: bool;
+  mutable windows: bool;
+  mutable macOS: bool;
+  mutable solaris: bool;
+  mutable use_plt: bool
+}
+let config = {
+  masm = false;
+  windows = false;
+  macOS = false;
+  solaris = false;
+  use_plt = false
+}
+
+let () = Clflags.config_hook @@ fun new_config ->
+  config.windows <- Config_constants.System.is_windows new_config.system;
+  config.macOS <- Config_constants.System.is_macOS new_config.system;
+  config.solaris <- Config_constants.System.is_solaris new_config.system;
+  config.masm <- Config_constants.System.uses_masm new_config.system;
+  config.use_plt <-
+    match new_config.system with
+    | S_macosx | S_mingw64 | S_cygwin | S_win64 -> false
+    | _ -> !Clflags.dlcode
 
 (* Shall we use an external assembler command ?
    If [binary_content] contains some data, we can directly
@@ -260,13 +227,13 @@ let use_plt =
 let binary_content = ref None
 
 let compile infile outfile =
-  if masm then
-    Ccomp.command (Config.asm ^
+  if config.masm then
+    Ccomp.command (Clflags.config.asm ^
                    Filename.quote outfile ^ " " ^ Filename.quote infile ^
                    (if !Clflags.verbose then "" else ">NUL"))
   else
-    Ccomp.command (Config.asm ^ " " ^
-                   (String.concat " " (Misc.debug_prefix_map_flags ())) ^
+    Ccomp.command (Clflags.config.asm ^ " " ^
+                   (String.concat " " (Ccomp.debug_prefix_map_flags ())) ^
                    " -o " ^ Filename.quote outfile ^ " " ^
                    Filename.quote infile)
 

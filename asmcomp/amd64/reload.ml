@@ -17,6 +17,7 @@
 open Cmm
 open Reg
 open Mach
+open Reloadgen.Make(Arch)
 
 (* Reloading for the AMD64 *)
 
@@ -64,7 +65,7 @@ let stackp r =
 
 class reload = object (self)
 
-inherit Reloadgen.reload_generic as super
+inherit reload_generic as super
 
 method! reload_operation op arg res =
   match op with
@@ -112,7 +113,7 @@ method! reload_operation op arg res =
       then (arg, res)
       else super#reload_operation op arg res
   | Iconst_symbol _ ->
-      if !Clflags.pic_code || !Clflags.dlcode || Arch.win64
+      if Arch.pic_code () || !Clflags.dlcode || X86_proc.config.windows
       then super#reload_operation op arg res
       else (arg, res)
   | _ -> (* Other operations: all args and results in registers *)
