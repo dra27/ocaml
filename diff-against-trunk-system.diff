@@ -1,56 +1,38 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e52b071a29
+index 0000000000..fabc9099c8
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,47 @@
-+--- a	2023-09-28 18:48:22.802443201 +0100
-++++ b	2023-09-28 18:48:22.822443911 +0100
-+@@ -176,7 +176,7 @@
-+    val extract : int -> t -> Context.t * t
+@@ -0,0 +1,29 @@
++--- a	2023-09-28 18:48:23.138455132 +0100
+++++ b	2023-09-28 18:48:23.158455842 +0100
++@@ -14,7 +14,7 @@
++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
++ --- a/stdlib/gc.ml
++ +++ b/stdlib/gc.ml
++-@@ -123,6 +123,7 @@ let delete_alarm a = Atomic.set a false
+++@@ -129,6 +129,7 @@ let delete_alarm a = Atomic.set a false
 +  
-+    val eprintf : t -> unit
-+-@@ -2638,7 +2657,7 @@ let mk_failaction_neg partial ctx def =
-++@@ -2686,7 +2705,7 @@ let mk_failaction_neg partial ctx def =
-+    match partial with
-+    | Partial -> (
-+        match Default_environment.pop def with
-+@@ -185,7 +185,7 @@
-+            (Some (Lstaticraise (idef, [])), Jumps.singleton idef ctx)
-+        | None ->
-+            (* Act as Total, this means
-+-@@ -2660,7 +2679,7 @@ let mk_failaction_pos partial seen ctx defs =
-++@@ -2708,7 +2727,7 @@ let mk_failaction_pos partial seen ctx defs =
-+      | [], _
-+      | _, None ->
-+          List.fold_left
-+@@ -194,7 +194,7 @@
-+              let action = Lstaticraise (i, []) in
-+              let klist =
-+                List.fold_right
-+-@@ -2671,13 +2690,13 @@ let mk_failaction_pos partial seen ctx defs =
-++@@ -2719,13 +2738,13 @@ let mk_failaction_pos partial seen ctx defs =
-+              in
-+              (klist, jumps))
-+            ([], Jumps.empty) env
-+@@ -210,7 +210,7 @@
-+        )
-+    in
-+    let fail_pats = complete_pats_constrs seen in
-+-@@ -3188,47 +3207,42 @@ let bind_check str v arg lam =
-++@@ -3236,47 +3255,42 @@ let bind_check str v arg lam =
++  module Memprof =
++    struct
++@@ -22,7 +22,7 @@
++      type allocation_source = Normal | Marshal | Custom
++      type allocation =
++        { n_samples : int;
++-@@ -147,7 +148,7 @@ module Memprof =
+++@@ -153,7 +154,7 @@ module Memprof =
++      }
 +  
-+  let comp_exit ctx m =
-+    match Default_environment.pop m.default with
-+@@ -276,7 +276,7 @@
-+      )
++      external c_start :
++@@ -31,7 +31,7 @@
++        = "caml_memprof_start"
 +  
-+  (* To find reasonable names for variables *)
-+-@@ -3257,7 +3271,7 @@ let arg_to_var arg cls =
-++@@ -3305,7 +3319,7 @@ let arg_to_var arg cls =
-+        ctx=a context
-+        m=a pattern matching
++      let start
++-@@ -157,4 +158,6 @@ module Memprof =
+++@@ -163,4 +164,6 @@ module Memprof =
++        c_start sampling_rate callstack_size tracker
 +  
++      external stop : unit -> unit = "caml_memprof_stop"
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -64,10 +46,10 @@ index 497af4ceed..3f264d87a5 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index f1b322063d..66f9067041 100644
+index a20d65a68b..917d9b2f47 100644
 --- a/Changes
 +++ b/Changes
-@@ -1726,6 +1726,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1729,6 +1729,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -103,7 +85,7 @@ index f1b322063d..66f9067041 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1761,13 +1790,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1764,13 +1793,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -119,7 +101,7 @@ index f1b322063d..66f9067041 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1874,6 +1903,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1877,6 +1906,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -129,7 +111,7 @@ index f1b322063d..66f9067041 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2137,6 +2169,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2140,6 +2172,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -11253,63 +11235,45 @@ index 0000000000..2ed248342e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..dd73d6a304
+index 0000000000..07ac945d38
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,11220 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e52b071a29
++index 0000000000..fabc9099c8
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,47 @@
-++--- a	2023-09-28 18:48:22.802443201 +0100
-+++++ b	2023-09-28 18:48:22.822443911 +0100
-++@@ -176,7 +176,7 @@
-++    val extract : int -> t -> Context.t * t
++@@ -0,0 +1,29 @@
+++--- a	2023-09-28 18:48:23.138455132 +0100
++++++ b	2023-09-28 18:48:23.158455842 +0100
+++@@ -14,7 +14,7 @@
+++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
+++ --- a/stdlib/gc.ml
+++ +++ b/stdlib/gc.ml
+++-@@ -123,6 +123,7 @@ let delete_alarm a = Atomic.set a false
++++@@ -129,6 +129,7 @@ let delete_alarm a = Atomic.set a false
 ++  
-++    val eprintf : t -> unit
-++-@@ -2638,7 +2657,7 @@ let mk_failaction_neg partial ctx def =
-+++@@ -2686,7 +2705,7 @@ let mk_failaction_neg partial ctx def =
-++    match partial with
-++    | Partial -> (
-++        match Default_environment.pop def with
-++@@ -185,7 +185,7 @@
-++            (Some (Lstaticraise (idef, [])), Jumps.singleton idef ctx)
-++        | None ->
-++            (* Act as Total, this means
-++-@@ -2660,7 +2679,7 @@ let mk_failaction_pos partial seen ctx defs =
-+++@@ -2708,7 +2727,7 @@ let mk_failaction_pos partial seen ctx defs =
-++      | [], _
-++      | _, None ->
-++          List.fold_left
-++@@ -194,7 +194,7 @@
-++              let action = Lstaticraise (i, []) in
-++              let klist =
-++                List.fold_right
-++-@@ -2671,13 +2690,13 @@ let mk_failaction_pos partial seen ctx defs =
-+++@@ -2719,13 +2738,13 @@ let mk_failaction_pos partial seen ctx defs =
-++              in
-++              (klist, jumps))
-++            ([], Jumps.empty) env
-++@@ -210,7 +210,7 @@
-++        )
-++    in
-++    let fail_pats = complete_pats_constrs seen in
-++-@@ -3188,47 +3207,42 @@ let bind_check str v arg lam =
-+++@@ -3236,47 +3255,42 @@ let bind_check str v arg lam =
+++  module Memprof =
+++    struct
+++@@ -22,7 +22,7 @@
+++      type allocation_source = Normal | Marshal | Custom
+++      type allocation =
+++        { n_samples : int;
+++-@@ -147,7 +148,7 @@ module Memprof =
++++@@ -153,7 +154,7 @@ module Memprof =
+++      }
 ++  
-++  let comp_exit ctx m =
-++    match Default_environment.pop m.default with
-++@@ -276,7 +276,7 @@
-++      )
+++      external c_start :
+++@@ -31,7 +31,7 @@
+++        = "caml_memprof_start"
 ++  
-++  (* To find reasonable names for variables *)
-++-@@ -3257,7 +3271,7 @@ let arg_to_var arg cls =
-+++@@ -3305,7 +3319,7 @@ let arg_to_var arg cls =
-++        ctx=a context
-++        m=a pattern matching
+++      let start
+++-@@ -157,4 +158,6 @@ module Memprof =
++++@@ -163,4 +164,6 @@ module Memprof =
+++        c_start sampling_rate callstack_size tracker
 ++  
+++      external stop : unit -> unit = "caml_memprof_stop"
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -11323,10 +11287,10 @@ index 0000000000..dd73d6a304
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index f1b322063d..66f9067041 100644
++index a20d65a68b..917d9b2f47 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1726,6 +1726,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1729,6 +1729,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -11362,7 +11326,7 @@ index 0000000000..dd73d6a304
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1761,13 +1790,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1764,13 +1793,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -11378,7 +11342,7 @@ index 0000000000..dd73d6a304
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1874,6 +1903,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1877,6 +1906,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -11388,7 +11352,7 @@ index 0000000000..dd73d6a304
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2137,6 +2169,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2140,6 +2172,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -22476,7 +22440,25 @@ index 0000000000..dd73d6a304
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
 +++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skippin
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/..
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
@@ -24532,7 +24514,7 @@ index aba1303f4f..ea80928c3f 100644
  val formatter_of_out_functions :
    formatter_out_functions -> formatter
 diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-index 8bb07719c3..b798f75b09 100644
+index 4826131c67..9903ccbd97 100644
 --- a/stdlib/gc.ml
 +++ b/stdlib/gc.ml
 @@ -61,9 +61,15 @@ external major : unit -> unit = "caml_gc_major"
