@@ -1,38 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..fabc9099c8
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,29 @@
-+--- a	2023-09-28 18:48:23.138455132 +0100
-++++ b	2023-09-28 18:48:23.158455842 +0100
-+@@ -14,7 +14,7 @@
-+ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-+ --- a/stdlib/gc.ml
-+ +++ b/stdlib/gc.ml
-+-@@ -123,6 +123,7 @@ let delete_alarm a = Atomic.set a false
-++@@ -129,6 +129,7 @@ let delete_alarm a = Atomic.set a false
-+  
-+  module Memprof =
-+    struct
-+@@ -22,7 +22,7 @@
-+      type allocation_source = Normal | Marshal | Custom
-+      type allocation =
-+        { n_samples : int;
-+-@@ -147,7 +148,7 @@ module Memprof =
-++@@ -153,7 +154,7 @@ module Memprof =
-+      }
-+  
-+      external c_start :
-+@@ -31,7 +31,7 @@
-+        = "caml_memprof_start"
-+  
-+      let start
-+-@@ -157,4 +158,6 @@ module Memprof =
-++@@ -163,4 +164,6 @@ module Memprof =
-+        c_start sampling_rate callstack_size tracker
-+  
-+      external stop : unit -> unit = "caml_memprof_stop"
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index 497af4ceed..3f264d87a5 100644
 --- a/.gitattributes
@@ -11235,45 +11203,13 @@ index 0000000000..2ed248342e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..07ac945d38
+index 0000000000..e247c3bea2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11220 @@
+@@ -0,0 +1,11122 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..fabc9099c8
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,29 @@
-++--- a	2023-09-28 18:48:23.138455132 +0100
-+++++ b	2023-09-28 18:48:23.158455842 +0100
-++@@ -14,7 +14,7 @@
-++ diff --git a/stdlib/gc.ml b/stdlib/gc.ml
-++ --- a/stdlib/gc.ml
-++ +++ b/stdlib/gc.ml
-++-@@ -123,6 +123,7 @@ let delete_alarm a = Atomic.set a false
-+++@@ -129,6 +129,7 @@ let delete_alarm a = Atomic.set a false
-++  
-++  module Memprof =
-++    struct
-++@@ -22,7 +22,7 @@
-++      type allocation_source = Normal | Marshal | Custom
-++      type allocation =
-++        { n_samples : int;
-++-@@ -147,7 +148,7 @@ module Memprof =
-+++@@ -153,7 +154,7 @@ module Memprof =
-++      }
-++  
-++      external c_start :
-++@@ -31,7 +31,7 @@
-++        = "caml_memprof_start"
-++  
-++      let start
-++-@@ -157,4 +158,6 @@ module Memprof =
-+++@@ -163,4 +164,6 @@ module Memprof =
-++        c_start sampling_rate callstack_size tracker
-++  
-++      external stop : unit -> unit = "caml_memprof_stop"
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index 497af4ceed..3f264d87a5 100644
 +--- a/.gitattributes
@@ -22392,73 +22328,7 @@ index 0000000000..07ac945d38
 ++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
 ++index 3292ad9c31..f69aeb342c 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/..
++++++ b/tools/ci/appv
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
@@ -22826,7 +22696,7 @@ index be5ca6887e..f76ada3def 100644
    Printf.printf "Send 0\n";
    perform (Send 0);
 diff --git a/manual/src/tutorials/memorymodel.etex b/manual/src/tutorials/memorymodel.etex
-index a04c7bb29d..44d19fd4e1 100644
+index 61f59b51cc..e6bf2d6766 100644
 --- a/manual/src/tutorials/memorymodel.etex
 +++ b/manual/src/tutorials/memorymodel.etex
 @@ -25,7 +25,7 @@ can be explained through some interleaving of the operations from different
