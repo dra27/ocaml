@@ -23,7 +23,7 @@ SHELL=dash
 
 MAKE_WARN="$MAKE --warn-undefined-variables"
 
-export PATH=$PREFIX/bin:$PATH
+export PATH=$PREFIX/bin:/usr/local/opt/make/libexec/gnubin:$PATH
 
 Configure () {
   mkdir -p $PREFIX
