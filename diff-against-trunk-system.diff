@@ -1,29 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..aa980a5274
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:48:25.026522140 +0100
-++++ b	2023-09-28 18:48:25.054523133 +0100
-+@@ -50,7 +50,7 @@
-+ diff --git a/asmcomp/cmmgen.ml b/asmcomp/cmmgen.ml
-+ --- a/asmcomp/cmmgen.ml
-+ +++ b/asmcomp/cmmgen.ml
-+-@@ -814,7 +814,7 @@ and transl_ccall env prim args dbg =
-++@@ -821,7 +821,7 @@ and transl_ccall env prim args dbg =
-+            | Pint32 -> XInt32
-+            | Pint64 -> XInt64 in
-+          (xty, transl_unbox_int dbg env bi arg)
-+@@ -59,7 +59,7 @@
-+          (XInt, untag_int (transl env arg) dbg)
-+    in
-+    let rec transl_args native_repr_args args =
-+-@@ -835,7 +835,7 @@ and transl_ccall env prim args dbg =
-++@@ -842,7 +842,7 @@ and transl_ccall env prim args dbg =
-+      | Same_as_ocaml_repr -> (typ_val, fun x -> x)
-+      | Unboxed_float -> (typ_float, box_float dbg)
-+      | Unboxed_integer bi -> (typ_int, box_int dbg bi)
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -37,10 +14,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 31f19a7757..07e62b9fa4 100644
+index 0829876c1f..28ae33a38e 100644
 --- a/Changes
 +++ b/Changes
-@@ -1738,6 +1738,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1744,6 +1744,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -76,7 +53,7 @@ index 31f19a7757..07e62b9fa4 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1773,13 +1802,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1779,13 +1808,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -92,7 +69,7 @@ index 31f19a7757..07e62b9fa4 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1886,6 +1915,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1892,6 +1921,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -102,7 +79,7 @@ index 31f19a7757..07e62b9fa4 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2149,6 +2181,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2155,6 +2187,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -8827,36 +8804,13 @@ index 0000000000..1b8a93e358
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..61117b81e6
+index 0000000000..d25203f679
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8770 @@
+@@ -0,0 +1,8763 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..aa980a5274
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:48:25.026522140 +0100
-+++++ b	2023-09-28 18:48:25.054523133 +0100
-++@@ -50,7 +50,7 @@
-++ diff --git a/asmcomp/cmmgen.ml b/asmcomp/cmmgen.ml
-++ --- a/asmcomp/cmmgen.ml
-++ +++ b/asmcomp/cmmgen.ml
-++-@@ -814,7 +814,7 @@ and transl_ccall env prim args dbg =
-+++@@ -821,7 +821,7 @@ and transl_ccall env prim args dbg =
-++            | Pint32 -> XInt32
-++            | Pint64 -> XInt64 in
-++          (xty, transl_unbox_int dbg env bi arg)
-++@@ -59,7 +59,7 @@
-++          (XInt, untag_int (transl env arg) dbg)
-++    in
-++    let rec transl_args native_repr_args args =
-++-@@ -835,7 +835,7 @@ and transl_ccall env prim args dbg =
-+++@@ -842,7 +842,7 @@ and transl_ccall env prim args dbg =
-++      | Same_as_ocaml_repr -> (typ_val, fun x -> x)
-++      | Unboxed_float -> (typ_float, box_float dbg)
-++      | Unboxed_integer bi -> (typ_int, box_int dbg bi)
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -8870,10 +8824,10 @@ index 0000000000..61117b81e6
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 31f19a7757..07e62b9fa4 100644
++index 0829876c1f..28ae33a38e 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1738,6 +1738,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1744,6 +1744,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -8909,7 +8863,7 @@ index 0000000000..61117b81e6
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1773,13 +1802,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1779,13 +1808,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -8925,7 +8879,7 @@ index 0000000000..61117b81e6
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1886,6 +1915,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1892,6 +1921,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -8935,7 +8889,7 @@ index 0000000000..61117b81e6
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2149,6 +2181,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2155,6 +2187,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -17600,7 +17554,23 @@ index 0000000000..61117b81e6
 +++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
 +++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
 +++    fi
-++     if [[ $PORT =~ mingw
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
