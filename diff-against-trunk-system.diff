@@ -1,54 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..cc47223c7b
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,45 @@
-+--- a	2023-09-28 18:48:26.006556898 +0100
-++++ b	2023-09-28 18:48:26.022557466 +0100
-+@@ -24,7 +24,7 @@
-+ diff --git a/configure.ac b/configure.ac
-+ --- a/configure.ac
-+ +++ b/configure.ac
-+-@@ -1235,13 +1235,19 @@ arch=none
-++@@ -1248,13 +1248,19 @@ arch=none
-+  model=default
-+  system=unknown
-+  
-+@@ -47,15 +47,18 @@
-+    [[i[3456]86-*-haiku*]],
-+      [arch=i386; system=beos],
-+    [[i[3456]86-*-cygwin]],
-+-@@ -1255,24 +1261,24 @@ AS_CASE([$host],
-++@@ -1268,26 +1274,26 @@ AS_CASE([$host],
-+    [x86_64-pc-windows],
-+-     [arch=amd64; system=win64],
-++     [has_native_backend=yes; arch=amd64; system=win64],
-+    [[powerpc64le*-*-linux*]],
-+--    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-+-+    [has_native_backend=yes; arch=power; model=ppc64le; system=linux],
-++-    [arch=power; model=ppc64le; system=elf],
-+++    [arch=power; model=ppc64le; system=linux],
-++   [[powerpc*-*-linux*]],
-++-    [arch=power; model=ppc; system=elf],
-+++    [arch=power; model=ppc; system=linux],
-+    [[s390x*-*-linux*]],
-+--    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
-+-+    [has_native_backend=yes; arch=s390x; model=z10; system=linux],
-++-    [arch=s390x; model=z10; system=elf],
-+++    [arch=s390x; model=z10; system=linux],
-+    # expected to match "gnueabihf" as well as "musleabihf"
-+    [armv6*-*-linux-*eabihf],
-+ -    [arch=arm; model=armv6; system=linux_eabihf],
-+@@ -81,7 +84,7 @@
-+    [armv6*-*-freebsd*],
-+      [arch=arm; model=armv6; system=freebsd],
-+    [earmv6*-*-netbsd*],
-+-@@ -1280,17 +1286,17 @@ AS_CASE([$host],
-++@@ -1295,17 +1301,17 @@ AS_CASE([$host],
-+    [earmv7*-*-netbsd*],
-+      [arch=arm; model=armv7; system=netbsd],
-+    [armv5te*-*-linux-*eabi],
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -8852,61 +8804,13 @@ index 0000000000..1b8a93e358
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1169c2f848
+index 0000000000..59df919a5f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8775 @@
+@@ -0,0 +1,8763 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..cc47223c7b
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,45 @@
-++--- a	2023-09-28 18:48:26.006556898 +0100
-+++++ b	2023-09-28 18:48:26.022557466 +0100
-++@@ -24,7 +24,7 @@
-++ diff --git a/configure.ac b/configure.ac
-++ --- a/configure.ac
-++ +++ b/configure.ac
-++-@@ -1235,13 +1235,19 @@ arch=none
-+++@@ -1248,13 +1248,19 @@ arch=none
-++  model=default
-++  system=unknown
-++  
-++@@ -47,15 +47,18 @@
-++    [[i[3456]86-*-haiku*]],
-++      [arch=i386; system=beos],
-++    [[i[3456]86-*-cygwin]],
-++-@@ -1255,24 +1261,24 @@ AS_CASE([$host],
-+++@@ -1268,26 +1274,26 @@ AS_CASE([$host],
-++    [x86_64-pc-windows],
-++-     [arch=amd64; system=win64],
-+++     [has_native_backend=yes; arch=amd64; system=win64],
-++    [[powerpc64le*-*-linux*]],
-++--    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-++-+    [has_native_backend=yes; arch=power; model=ppc64le; system=linux],
-+++-    [arch=power; model=ppc64le; system=elf],
-++++    [arch=power; model=ppc64le; system=linux],
-+++   [[powerpc*-*-linux*]],
-+++-    [arch=power; model=ppc; system=elf],
-++++    [arch=power; model=ppc; system=linux],
-++    [[s390x*-*-linux*]],
-++--    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
-++-+    [has_native_backend=yes; arch=s390x; model=z10; system=linux],
-+++-    [arch=s390x; model=z10; system=elf],
-++++    [arch=s390x; model=z10; system=linux],
-++    # expected to match "gnueabihf" as well as "musleabihf"
-++    [armv6*-*-linux-*eabihf],
-++ -    [arch=arm; model=armv6; system=linux_eabihf],
-++@@ -81,7 +84,7 @@
-++    [armv6*-*-freebsd*],
-++      [arch=arm; model=armv6; system=freebsd],
-++    [earmv6*-*-netbsd*],
-++-@@ -1280,17 +1286,17 @@ AS_CASE([$host],
-+++@@ -1295,17 +1301,17 @@ AS_CASE([$host],
-++    [earmv7*-*-netbsd*],
-++      [arch=arm; model=armv7; system=netbsd],
-++    [armv5te*-*-linux-*eabi],
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -17630,7 +17534,43 @@ index 0000000000..1169c2f848
 ++@@ -64,8 +64,8 @@ function set_configuration {
 ++         mingw64)
 ++             build='--build=i686-pc-cygwin'
-++             host='--host=
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
