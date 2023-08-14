@@ -1,0 +1,37 @@
+--- a	2023-09-28 18:48:26.810585402 +0100
++++ b	2023-09-28 18:48:26.834586252 +0100
+@@ -83,7 +83,7 @@
+ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
+ --- a/bytecomp/emitcode.ml
+ +++ b/bytecomp/emitcode.ml
+-@@ -460,11 +460,10 @@ let to_file outchan unit_name objfile ~required_globals code =
++@@ -464,11 +464,10 @@ let to_file outchan unit_name objfile ~required_globals code =
+  
+  (* Emission to a memory block *)
+  
+@@ -112,7 +112,7 @@
+ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
+ --- a/otherlibs/dynlink/byte/dynlink.ml
+ +++ b/otherlibs/dynlink/byte/dynlink.ml
+-@@ -105,12 +105,7 @@ module Bytecode = struct
++@@ -108,12 +108,7 @@ module Bytecode = struct
+          let old_state = Symtable.current_state () in
+          let compunit : Cmo_format.compilation_unit = unit_header in
+          seek_in ic compunit.cu_pos;
+@@ -133,11 +133,11 @@
+  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
+  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+--Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 151, characters 16-25
+--Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 153, characters 6-137
+-+Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 146, characters 16-25
+-+Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 148, characters 6-137
+- Called from Dynlink_common.Make.load.(fun) in file "dynlink_common.ml", line 360, characters 11-54
++-Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 154, characters 16-25
++-Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 156, characters 6-137
+++Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 149, characters 16-25
+++Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 151, characters 6-137
++ Called from Dynlink_common.Make.load.(fun) in file "dynlink_common.ml", line 369, characters 11-54
+  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
+  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
+ diff --git a/testsuite/tests/tool-toplevel/pr6468.compilers.reference b/testsuite/tests/tool-toplevel/pr6468.compilers.reference
