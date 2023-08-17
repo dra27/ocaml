@@ -1,46 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..96d5e97b2d
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,37 @@
-+--- a	2023-09-28 18:48:26.810585402 +0100
-++++ b	2023-09-28 18:48:26.834586252 +0100
-+@@ -83,7 +83,7 @@
-+ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-+ --- a/bytecomp/emitcode.ml
-+ +++ b/bytecomp/emitcode.ml
-+-@@ -460,11 +460,10 @@ let to_file outchan unit_name objfile ~required_globals code =
-++@@ -464,11 +464,10 @@ let to_file outchan unit_name objfile ~required_globals code =
-+  
-+  (* Emission to a memory block *)
-+  
-+@@ -112,7 +112,7 @@
-+ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-+ --- a/otherlibs/dynlink/byte/dynlink.ml
-+ +++ b/otherlibs/dynlink/byte/dynlink.ml
-+-@@ -105,12 +105,7 @@ module Bytecode = struct
-++@@ -108,12 +108,7 @@ module Bytecode = struct
-+          let old_state = Symtable.current_state () in
-+          let compunit : Cmo_format.compilation_unit = unit_header in
-+          seek_in ic compunit.cu_pos;
-+@@ -133,11 +133,11 @@
-+  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-+  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-+  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-+--Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 151, characters 16-25
-+--Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 153, characters 6-137
-+-+Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 146, characters 16-25
-+-+Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 148, characters 6-137
-+- Called from Dynlink_common.Make.load.(fun) in file "dynlink_common.ml", line 360, characters 11-54
-++-Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 154, characters 16-25
-++-Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 156, characters 6-137
-+++Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 149, characters 16-25
-+++Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 151, characters 6-137
-++ Called from Dynlink_common.Make.load.(fun) in file "dynlink_common.ml", line 369, characters 11-54
-+  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-+  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
-+ diff --git a/testsuite/tests/tool-toplevel/pr6468.compilers.reference b/testsuite/tests/tool-toplevel/pr6468.compilers.reference
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -54,7 +14,7 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 0c0369790b..c2bac61a97 100644
+index ead2e8e9a4..505757d364 100644
 --- a/Changes
 +++ b/Changes
 @@ -1764,6 +1764,35 @@ OCaml 5.0.0 (15 December 2022)
@@ -8949,53 +8909,13 @@ index 0000000000..da379f02ec
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1dfc692783
+index 0000000000..9a1a03b57b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8875 @@
+@@ -0,0 +1,8884 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..96d5e97b2d
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,37 @@
-++--- a	2023-09-28 18:48:26.810585402 +0100
-+++++ b	2023-09-28 18:48:26.834586252 +0100
-++@@ -83,7 +83,7 @@
-++ diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
-++ --- a/bytecomp/emitcode.ml
-++ +++ b/bytecomp/emitcode.ml
-++-@@ -460,11 +460,10 @@ let to_file outchan unit_name objfile ~required_globals code =
-+++@@ -464,11 +464,10 @@ let to_file outchan unit_name objfile ~required_globals code =
-++  
-++  (* Emission to a memory block *)
-++  
-++@@ -112,7 +112,7 @@
-++ diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
-++ --- a/otherlibs/dynlink/byte/dynlink.ml
-++ +++ b/otherlibs/dynlink/byte/dynlink.ml
-++-@@ -105,12 +105,7 @@ module Bytecode = struct
-+++@@ -108,12 +108,7 @@ module Bytecode = struct
-++          let old_state = Symtable.current_state () in
-++          let compunit : Cmo_format.compilation_unit = unit_header in
-++          seek_in ic compunit.cu_pos;
-++@@ -133,11 +133,11 @@
-++  Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
-++  Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
-++  Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-++--Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 151, characters 16-25
-++--Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 153, characters 6-137
-++-+Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 146, characters 16-25
-++-+Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 148, characters 6-137
-++- Called from Dynlink_common.Make.load.(fun) in file "dynlink_common.ml", line 360, characters 11-54
-+++-Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 154, characters 16-25
-+++-Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 156, characters 6-137
-++++Called from Dynlink.Bytecode.run in file "byte/dynlink.ml", line 149, characters 16-25
-++++Re-raised at Dynlink.Bytecode.run in file "byte/dynlink.ml", line 151, characters 6-137
-+++ Called from Dynlink_common.Make.load.(fun) in file "dynlink_common.ml", line 369, characters 11-54
-++  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-++  Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
-++ diff --git a/testsuite/tests/tool-toplevel/pr6468.compilers.reference b/testsuite/tests/tool-toplevel/pr6468.compilers.reference
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -9009,7 +8929,7 @@ index 0000000000..1dfc692783
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 0c0369790b..c2bac61a97 100644
++index ead2e8e9a4..505757d364 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1764,6 +1764,35 @@ OCaml 5.0.0 (15 December 2022)
@@ -17827,7 +17747,56 @@ index 0000000000..1dfc692783
 ++             host='--host=x86_64-w64-mingw32'
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on 
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
