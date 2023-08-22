@@ -16498,31 +16498,9 @@ then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: using thread sanitizer with vendor=$ocaml_cv_cc_vendor" >&5
 printf "%s\n" "$as_me: using thread sanitizer with vendor=$ocaml_cv_cc_vendor" >&6;}
 
-  # Check for libtsan library files (necessary on some Linux distributions)
-  SAVED_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS -fsanitize=thread"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-void __tsan_func_entry(void *retaddr);
-int
-main (void)
-{
-__tsan_func_entry((void *)0);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
 
-else $as_nop
-  as_fn_error $? "libtsan is necessary for TSan but cannot be found.
-                   Try installing it on your system." "$LINENO" 5
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-  LDFLAGS="$SAVED_LDFLAGS"
-
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking C compiler flags for thread sanitizer support" >&5
+printf %s "checking C compiler flags for thread sanitizer support... " >&6; }
   case $ocaml_cv_cc_vendor in #(
   gcc-[0123456789]-*|gcc-10-*|clang-*) :
      ;; #(
@@ -16537,6 +16515,41 @@ esac
   *) :
      ;;
 esac
+
+    SAVED_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -fsanitize=thread"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+void __tsan_func_entry(void *retaddr);
+int
+main (void)
+{
+__tsan_func_entry((void *)0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  libtsan_available=true
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $oc_tsan_cflags" >&5
+printf "%s\n" "$oc_tsan_cflags" >&6; }
+else $as_nop
+  libtsan_available=false
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not supported" >&5
+printf "%s\n" "not supported" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+  LDFLAGS="$SAVED_LDFLAGS"
+
+
+  if ! $libtsan_available
+then :
+  as_fn_error $? "libtsan is necessary for TSan but cannot be found.
+                   Try installing it on your system." "$LINENO" 5
+fi
+
   common_cppflags="$common_cppflags $oc_tsan_cppflags"
   native_cflags="$native_cflags $oc_tsan_cflags"
   ocamlc_cflags="$ocamlc_cflags $oc_tsan_cflags"

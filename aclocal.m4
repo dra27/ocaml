@@ -558,3 +558,27 @@ AC_DEFUN([OCAML_CC_SUPPORTS_ATOMIC], [
    AC_MSG_RESULT([no])])
   LIBS="$saved_LIBS"
 ])
+
+AC_DEFUN([OCAML_CHECK_TSAN], [
+  AC_MSG_CHECKING([C compiler flags for thread sanitizer support])
+  AS_CASE([$ocaml_cv_cc_vendor],
+    [gcc-[[0123456789]]-*|gcc-10-*|clang-*],
+    [],
+    [oc_tsan_cflags="$oc_tsan_cflags -Wno-tsan"])
+  AS_CASE([$ocaml_cv_cc_vendor],
+    [gcc*],
+    [oc_tsan_cflags="$oc_tsan_cflags --param=tsan-distinguish-volatile=1"],
+    [clang*],
+    [oc_tsan_cflags="$oc_tsan_cflags -mllvm -tsan-distinguish-volatile"])
+
+  dnl Check for libtsan library files (necessary on some Linux distributions)
+  SAVED_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -fsanitize=thread"
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([void __tsan_func_entry(void *retaddr);],
+      [__tsan_func_entry((void *)0);])],
+    [libtsan_available=true
+    AC_MSG_RESULT([$oc_tsan_cflags])],
+    [libtsan_available=false
+    AC_MSG_RESULT([not supported])])
+  LDFLAGS="$SAVED_LDFLAGS"
+])
