@@ -1,51 +1,6 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..1da8b3688e
---- /dev/null
-+++ b/.Diff-of-diff.diff
-@@ -0,0 +1,42 @@
-+--- a	2023-09-28 18:48:27.614613895 +0100
-++++ b	2023-09-28 18:48:27.618614037 +0100
-+@@ -1,9 +1,9 @@
-+ diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
-+ --- a/testsuite/tests/lib-runtime-events/test_caml.ml
-+ +++ b/testsuite/tests/lib-runtime-events/test_caml.ml
-+-@@ -1,14 +1,17 @@
-+- (* TEST
-+-  include runtime_events;
-++@@ -3,14 +3,17 @@
-++  reason = "OCaml 5 only";
-++  skip;
-+  *)
-+ +
-+ +(* Tests that:
-+@@ -25,7 +25,7 @@
-+  
-+  let got_start = ref false
-+  
-+-@@ -16,24 +19,32 @@ let lifecycle domain_id ts lifecycle_event data =
-++@@ -18,24 +21,32 @@ let lifecycle domain_id ts lifecycle_event data =
-+      match lifecycle_event with
-+      | EV_RING_START ->
-+          begin
-+@@ -65,7 +65,7 @@
-+          end
-+      | _ -> ()
-+  
-+-@@ -41,22 +52,30 @@ let runtime_end domain_id ts phase =
-++@@ -43,22 +54,30 @@ let runtime_end domain_id ts phase =
-+      match phase with
-+      | EV_MAJOR_FINISH_CYCLE ->
-+          begin
-+@@ -100,7 +100,7 @@
-+  
-+  let () =
-+      let list_ref = ref [] in
-+-@@ -66,14 +85,14 @@ let () =
-++@@ -68,14 +87,14 @@ let () =
-+                                      ~lost_events ()
-+      in
-+      for epoch = 1 to epochs do
+index 0000000000..e69de29bb2
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -59,10 +14,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index ead2e8e9a4..505757d364 100644
+index 3d8797d9b6..942cbf3b30 100644
 --- a/Changes
 +++ b/Changes
-@@ -1764,6 +1764,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -98,7 +53,7 @@ index ead2e8e9a4..505757d364 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1799,13 +1828,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1802,13 +1831,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -114,7 +69,7 @@ index ead2e8e9a4..505757d364 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1912,6 +1941,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1915,6 +1944,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -124,7 +79,7 @@ index ead2e8e9a4..505757d364 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2175,6 +2207,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2178,6 +2210,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -4937,7 +4892,7 @@ index 0000000000..3cd85b7c5f
 ++}
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..da379f02ec
+index 0000000000..21d2df04e6
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,4011 @@
@@ -6871,7 +6826,7 @@ index 0000000000..da379f02ec
 + 
 + external start_runtime_events : unit -> unit = "start_runtime_events"
 +diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
-+index 4d656f3e01..38e3281c45 100644
++index 518c7134ae..5a64a112c0 100644
 +--- a/testsuite/tests/lib-runtime-events/test_caml.ml
 ++++ b/testsuite/tests/lib-runtime-events/test_caml.ml
 +@@ -1,5 +1,7 @@
@@ -6880,8 +6835,8 @@ index 0000000000..da379f02ec
 ++ reason = "OCaml 5 only";
 ++ skip;
 + *)
-+ open Runtime_events
 + 
++ (* Tests that:
 +diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
 +index 75fa99341d..76b915455d 100644
 +--- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
@@ -8954,58 +8909,13 @@ index 0000000000..da379f02ec
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..99be81b6f4
+index 0000000000..addb4f195c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8906 @@
+@@ -0,0 +1,8884 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..1da8b3688e
-+--- /dev/null
-++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,42 @@
-++--- a	2023-09-28 18:48:27.614613895 +0100
-+++++ b	2023-09-28 18:48:27.618614037 +0100
-++@@ -1,9 +1,9 @@
-++ diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
-++ --- a/testsuite/tests/lib-runtime-events/test_caml.ml
-++ +++ b/testsuite/tests/lib-runtime-events/test_caml.ml
-++-@@ -1,14 +1,17 @@
-++- (* TEST
-++-  include runtime_events;
-+++@@ -3,14 +3,17 @@
-+++  reason = "OCaml 5 only";
-+++  skip;
-++  *)
-++ +
-++ +(* Tests that:
-++@@ -25,7 +25,7 @@
-++  
-++  let got_start = ref false
-++  
-++-@@ -16,24 +19,32 @@ let lifecycle domain_id ts lifecycle_event data =
-+++@@ -18,24 +21,32 @@ let lifecycle domain_id ts lifecycle_event data =
-++      match lifecycle_event with
-++      | EV_RING_START ->
-++          begin
-++@@ -65,7 +65,7 @@
-++          end
-++      | _ -> ()
-++  
-++-@@ -41,22 +52,30 @@ let runtime_end domain_id ts phase =
-+++@@ -43,22 +54,30 @@ let runtime_end domain_id ts phase =
-++      match phase with
-++      | EV_MAJOR_FINISH_CYCLE ->
-++          begin
-++@@ -100,7 +100,7 @@
-++  
-++  let () =
-++      let list_ref = ref [] in
-++-@@ -66,14 +85,14 @@ let () =
-+++@@ -68,14 +87,14 @@ let () =
-++                                      ~lost_events ()
-++      in
-++      for epoch = 1 to epochs do
++index 0000000000..e69de29bb2
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -9019,10 +8929,10 @@ index 0000000000..99be81b6f4
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index ead2e8e9a4..505757d364 100644
++index 3d8797d9b6..942cbf3b30 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1764,6 +1764,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -9058,7 +8968,7 @@ index 0000000000..99be81b6f4
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1799,13 +1828,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1802,13 +1831,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9074,7 +8984,7 @@ index 0000000000..99be81b6f4
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1912,6 +1941,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1915,6 +1944,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -9084,7 +8994,7 @@ index 0000000000..99be81b6f4
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2175,6 +2207,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2178,6 +2210,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13897,7 +13807,7 @@ index 0000000000..99be81b6f4
 +++}
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..da379f02ec
++index 0000000000..21d2df04e6
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,4011 @@
@@ -15831,7 +15741,7 @@ index 0000000000..99be81b6f4
 ++ 
 ++ external start_runtime_events : unit -> unit = "start_runtime_events"
 ++diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
-++index 4d656f3e01..38e3281c45 100644
+++index 518c7134ae..5a64a112c0 100644
 ++--- a/testsuite/tests/lib-runtime-events/test_caml.ml
 +++++ b/testsuite/tests/lib-runtime-events/test_caml.ml
 ++@@ -1,5 +1,7 @@
@@ -15840,8 +15750,8 @@ index 0000000000..99be81b6f4
 +++ reason = "OCaml 5 only";
 +++ skip;
 ++ *)
-++ open Runtime_events
 ++ 
+++ (* Tests that:
 ++diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
 ++index 75fa99341d..76b915455d 100644
 ++--- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
@@ -17863,7 +17773,30 @@ index 0000000000..99be81b6f4
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
 ++-    # tests now (to include natdynlink)
 ++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynl
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" che
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
