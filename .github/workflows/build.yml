@@ -55,6 +55,10 @@ jobs:
          '${{ github.event.ref }}'
          '${{ github.event.after }}'
          '${{ github.event.repository.full_name }}'
+      - name: OS Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libunwind-dev
       - name: Configure tree
         run: |
           MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
@@ -152,7 +156,7 @@ jobs:
       - name: OS Dependencies
         run: |
           apt-get update
-          apt-get install -y git gcc make parallel
+          apt-get install -y git gcc make parallel libunwind-dev
       - name: Checkout
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
