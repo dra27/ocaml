@@ -157,4 +157,4 @@ ocamlyacc_WSTR_MODULE = @ocamlyacc_wstr_module@
 TSAN=@tsan@
 # Contains TSan-specific runtime files, or nothing if TSan support is
 # disabled
-TSAN_NATIVE_RUNTIME_C_SOURCES = @tsan_native_runtime_c_sources@
+TSAN_RUNTIME_C_SOURCES = @tsan_runtime_c_sources@

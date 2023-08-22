@@ -861,7 +861,7 @@ oc_exe_ldflags
 oc_dll_ldflags
 oc_ldflags
 oc_cppflags
-tsan_native_runtime_c_sources
+tsan_runtime_c_sources
 tsan
 oc_cflags
 toolchain
@@ -16596,9 +16596,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 # runtime/tsan.c can be compiled as long as we have libunwind
 if $libunwind_available && $libtsan_available
 then :
-  tsan_native_runtime_c_sources='tsan'
+  tsan_runtime_c_sources='tsan'
 else $as_nop
-  tsan_native_runtime_c_sources=''
+  tsan_runtime_c_sources=''
 fi
 
 if $tsan

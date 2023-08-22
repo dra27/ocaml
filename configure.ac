@@ -142,7 +142,7 @@ AC_SUBST([ccomptype])
 AC_SUBST([toolchain])
 AC_SUBST([oc_cflags])
 AC_SUBST([tsan])
-AC_SUBST([tsan_native_runtime_c_sources])
+AC_SUBST([tsan_runtime_c_sources])
 AC_SUBST([oc_cppflags])
 AC_SUBST([oc_ldflags])
 AC_SUBST([oc_dll_ldflags])
@@ -1674,8 +1674,8 @@ OCAML_CHECK_TSAN
 
 # runtime/tsan.c can be compiled as long as we have libunwind
 AS_IF([$libunwind_available && $libtsan_available],
-  [tsan_native_runtime_c_sources='tsan'],
-  [tsan_native_runtime_c_sources=''])
+  [tsan_runtime_c_sources='tsan'],
+  [tsan_runtime_c_sources=''])
 
 AS_IF([$tsan],
   [AC_MSG_NOTICE([using thread sanitizer with vendor=$ocaml_cv_cc_vendor])
