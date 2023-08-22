@@ -1642,66 +1642,67 @@ $cc_basename"])]
   )],
   [tsan=false])
 
-AS_IF([$tsan],
-  [AC_MSG_NOTICE([using thread sanitizer with vendor=$ocaml_cv_cc_vendor])
+# Check for libunwind (for runtime/tsan.c)
 
-  OCAML_CHECK_TSAN
-
-  AS_IF([! $libtsan_available],
-    [AC_MSG_ERROR([libtsan is necessary for TSan but cannot be found.
-                   Try installing it on your system.])])
-
-  common_cppflags="$common_cppflags $oc_tsan_cppflags"
-  native_cflags="$native_cflags $oc_tsan_cflags"
-  ocamlc_cflags="$ocamlc_cflags $oc_tsan_cflags"
-  tsan_native_runtime_c_sources="tsan"],
-  [AC_MSG_NOTICE([not using thread sanitizer])
-  tsan_native_runtime_c_sources=""]
-)
-
-# libunwind detection when TSan is enabled
 libunwind_cppflags=""
 libunwind_ldflags=""
 
+AS_IF([test "$system" = "macosx"],
+  [AS_IF([test x"$LIBUNWIND_CPPFLAGS" != x -o \
+               x"$LIBUNWIND_LDFLAGS" != x],
+    [AC_MSG_WARN(m4_normalize([
+      On MacOSX, specifying paths for libunwind headers or libraries is
+      strongly discouraged. It is recommended to rely on the defaults
+      provided by the configure script
+    ]))])])
+
+AS_IF([test x"$LIBUNWIND_CPPFLAGS" != x],
+  [libunwind_cppflags="$LIBUNWIND_CPPFLAGS"],
+  [libunwind_cppflags=""])
+
+AS_CASE(["$system"],
+  ["macosx"], [libunwind_ldflags="-framework System"],
+  [libunwind_ldflags="-lunwind -lunwind-x86_64"])
+
+AS_IF([test x"$LIBUNWIND_LDFLAGS" != x],
+  [libunwind_ldflags="$LIBUNWIND_LDFLAGS $libunwind_ldflags"])
+
+OCAML_CHECK_LIBUNWIND
+
+# Check for libtsan library files (necessary on some Linux distributions)
+OCAML_CHECK_TSAN
+
+# runtime/tsan.c can be compiled as long as we have libunwind
+AS_IF([$libunwind_available && $libtsan_available],
+  [tsan_native_runtime_c_sources='tsan'],
+  [tsan_native_runtime_c_sources=''])
+
 AS_IF([$tsan],
-  [AS_IF([test "$system" = "macosx"],
-    [AS_IF([test x"$LIBUNWIND_CPPFLAGS" != x -o \
-                 x"$LIBUNWIND_LDFLAGS" != x],
-      [AC_MSG_WARN(m4_normalize([
-        On MacOSX, specifying paths for libunwind headers or libraries is
-        strongly discouraged. It is recommended to rely on the defaults
-        provided by the configure script
-      ]))])])
-
-  AS_IF([test x"$LIBUNWIND_CPPFLAGS" != x],
-    [libunwind_cppflags="$LIBUNWIND_CPPFLAGS"],
-    [libunwind_cppflags=""])
-
-  AS_CASE(["$system"],
-    ["macosx"], [libunwind_ldflags="-framework System"],
-    [libunwind_ldflags="-lunwind -lunwind-x86_64"])
-
-  AS_IF([test x"$LIBUNWIND_LDFLAGS" != x],
-    [libunwind_ldflags="$LIBUNWIND_LDFLAGS $libunwind_ldflags"])
-
-  native_cppflags="$native_cppflags $libunwind_cppflags"
-  native_ldflags="$native_ldflags -fsanitize=thread $libunwind_ldflags"
-
-  OCAML_CHECK_LIBUNWIND
+  [AC_MSG_NOTICE([using thread sanitizer with vendor=$ocaml_cv_cc_vendor])
+  AS_IF([! $libtsan_available],
+    [AC_MSG_ERROR([libtsan is necessary for TSan but cannot be found.
+                       Try installing it on your system.])])
 
   AS_IF([! $libunwind_available],
-    [AC_MSG_ERROR([libunwind is necessary for TSan but cannot be found])])
+   [AC_MSG_ERROR([libunwind is necessary for TSan but cannot be found])])
 
-    # We need unwinding information at runtime, but since we use
-    # -no_compact_unwind, we also need -keep_dwarf_unwind otherwise
-    # the OS X linker will chuck away the DWARF-like (.eh_frame)
-    # information.  (Older versions of OS X don't provide this.)
+  common_cppflags="$common_cppflags $oc_tsan_cppflags"
+  native_cppflags="$native_cppflags $libunwind_cppflags"
+  native_cflags="$native_cflags $oc_tsan_cflags"
+  ocamlc_cflags="$ocamlc_cflags $oc_tsan_cflags"
+  native_ldflags="$native_ldflags -fsanitize=thread $libunwind_ldflags"
 
-    AS_IF([$libunwind_available && test x"$system" = "xmacosx"],
-      [extra_flags="-Wl,-keep_dwarf_unwind"
-      mkexe="$mkexe $extra_flags"
-      mksharedlib="$mksharedlib $extra_flags"])
-  ])
+  # We need unwinding information at runtime, but since we use
+  # -no_compact_unwind, we also need -keep_dwarf_unwind otherwise
+  # the OS X linker will chuck away the DWARF-like (.eh_frame)
+  # information.  (Older versions of OS X don't provide this.)
+
+  AS_IF([test x"$system" = "xmacosx"],
+    [extra_flags="-Wl,-keep_dwarf_unwind"
+    mkexe="$mkexe $extra_flags"
+    mksharedlib="$mksharedlib $extra_flags"])],
+  [AC_MSG_NOTICE([not using thread sanitizer])]
+)
 
 ## Sockets
 
