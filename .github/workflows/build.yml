@@ -156,7 +156,7 @@ jobs:
       - name: OS Dependencies
         run: |
           apt-get update
-          apt-get install -y git gcc make parallel libunwind-dev
+          apt-get install -y git gcc make parallel libunwind-dev libzstd-dev
       - name: Checkout
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
