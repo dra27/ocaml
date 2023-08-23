@@ -19894,10 +19894,10 @@ index 4826131c67..95b0cc4b92 100644
 +(* BACKPORT END *)
    end
 diff --git a/stdlib/gc.mli b/stdlib/gc.mli
-index be26bb7072..b77bcdf09e 100644
+index 3d13958c34..9f20e808d7 100644
 --- a/stdlib/gc.mli
 +++ b/stdlib/gc.mli
-@@ -454,7 +454,11 @@ val eventlog_resume : unit -> unit
+@@ -431,7 +431,11 @@ val eventlog_resume : unit -> unit
     notice. *)
  module Memprof :
    sig
