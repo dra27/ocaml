@@ -1329,8 +1329,20 @@ ocamltest.opt: ocamltest/ocamltest.opt$(EXE)
 
 ocamltest/ocamltest.opt$(EXE): ocamlc.opt ocamlyacc ocamllex
 
-ocamltest/ocamltest_unix.%: \
+# ocamltest does _not_ want to have access to the Unix interface by default,
+# to ensure functions and types are only used via Ocamltest_stdlib.Unix
+# (see #9797)
+ocamltest/%: \
+  VPATH := $(filter-out otherlibs/%, $(VPATH))
+
+# Ocamltest_unix and the linking of the executable itself should include the
+# Unix library, if it's being built.
+ocamltest/ocamltest_unix.% \
+ocamltest/ocamltest$(EXE) ocamltest/ocamltest.opt$(EXE): \
   VPATH += $(unix_directory)
+
+# For flambda mode, it is necessary for Ocamltest_unix to be compiled with
+# -opaque to prevent errors compiling the other modules of ocamltest.
 ocamltest/ocamltest_unix.%: \
   OC_COMMON_COMPFLAGS += -opaque
 
