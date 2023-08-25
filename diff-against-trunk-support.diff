@@ -3925,7 +3925,7 @@ index 9d9b06ff57..ad6d224bfb 100644
     bytecode;
   }{
 diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-index 3292ad9c31..f69aeb342c 100644
+index c35092e914..bbf1271cdf 100644
 --- a/tools/ci/appveyor/appveyor_build.sh
 +++ b/tools/ci/appveyor/appveyor_build.sh
 @@ -64,8 +64,8 @@ function set_configuration {
@@ -3964,7 +3964,7 @@ index 3292ad9c31..f69aeb342c 100644
 -    # Now reconfigure ocamltest to run in bytecode-only mode
 -    sed -i '/native_/s/true/false/' \
 -           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
--    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
 -    # And run the entire testsuite, skipping all the native-code tests
 +    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
 +      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
@@ -3974,7 +3974,7 @@ index 3292ad9c31..f69aeb342c 100644
 +      # Now reconfigure ocamltest to run in bytecode-only mode
 +      sed -i '/native_/s/true/false/' \
 +             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
 +      # And run the entire testsuite, skipping all the native-code tests
 +    fi
      run "test $PORT" \

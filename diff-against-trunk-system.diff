@@ -1,6 +1,216 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..c0921a248b
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,207 @@
++--- a	2023-09-28 18:48:28.498645213 +0100
+++++ b	2023-09-28 18:48:28.518645921 +0100
++@@ -536,7 +536,7 @@
++  
++  $(foreach PROGRAM, $(OCAML_PROGRAMS),\
++    $(eval $(call OCAML_PROGRAM,$(PROGRAM))))
++-@@ -482,7 +483,7 @@ clean:: partialclean
+++@@ -483,7 +484,7 @@ clean:: partialclean
++  
++  ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
++  
++@@ -545,7 +545,7 @@
++  
++  ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
++  
++-@@ -495,7 +496,7 @@ partialclean::
+++@@ -496,7 +497,7 @@ partialclean::
++  
++  ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
++  
++@@ -554,7 +554,7 @@
++  
++  ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
++  
++-@@ -504,14 +505,22 @@ partialclean::
+++@@ -505,14 +506,22 @@ partialclean::
++  
++  # The toplevel
++  
++@@ -579,7 +579,7 @@
++  	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
++  
++  $(eval $(call PROGRAM_SYNONYM,ocaml))
++-@@ -606,13 +615,13 @@ partialclean::
+++@@ -607,13 +616,13 @@ partialclean::
++  beforedepend:: asmcomp/emit.ml
++  
++  cvt_emit_LIBRARIES =
++@@ -596,9 +596,9 @@
++  partialclean::
++  	rm -f expunge expunge.exe
++ @@ -1079,7 +1088,7 @@ clean::
++- # Dependencies
++- 
++- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
+++ subdirs = \
+++   stdlib $(addprefix otherlibs/, \
+++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
++ -  ocamldoc ocamltest
++ +  ocamldoc
++  
++@@ -625,7 +625,7 @@
++  
++  .PHONY: lex-all
++  lex-all: lex/ocamllex
++-@@ -1223,14 +1242,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
+++@@ -1224,14 +1243,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
++  	$(MAKE) -C ocamldoc opt.opt
++  
++  # OCamltest
++@@ -747,7 +747,7 @@
++  
++  # Documentation
++  
++-@@ -1248,6 +1369,14 @@ partialclean::
+++@@ -1249,6 +1370,14 @@ partialclean::
++  partialclean::
++  	$(MAKE) -C api_docgen clean
++  
++@@ -762,7 +762,7 @@
++  # The extra libraries
++  
++  .PHONY: otherlibraries
++-@@ -1279,21 +1408,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
+++@@ -1280,21 +1409,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
++  
++  debugger/%: VPATH += otherlibs/unix otherlibs/dynlink
++  
++@@ -830,7 +830,7 @@
++  
++  debugger/%: OC_BYTECODE_LINKFLAGS = -linkall
++  
++-@@ -1356,7 +1519,7 @@ endif
+++@@ -1357,7 +1520,7 @@ endif
++  lintapidiff_LIBRARIES = \
++    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp) \
++    otherlibs/str/str
++@@ -839,7 +839,7 @@
++  
++  tools/lintapidiff.opt$(EXE): VPATH += otherlibs/str
++  
++-@@ -1418,55 +1581,103 @@ partialclean::
+++@@ -1419,55 +1582,103 @@ partialclean::
++  # The dependency generator
++  
++  ocamldep_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
++@@ -963,7 +963,7 @@
++  
++  tools/opnames.ml: runtime/caml/instruct.h $(make_opcodes)
++  	$(V_GEN)$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
++-@@ -1480,30 +1691,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
+++@@ -1481,30 +1692,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
++  
++  ocamlobjinfo_LIBRARIES = \
++    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
++@@ -999,7 +999,7 @@
++  
++  # ocamltex uses str.cma and unix.cma and so must be compiled with
++  # $(ROOTDIR)/ocamlc rather than with $(ROOTDIR)/boot/ocamlc since the boot
++-@@ -1560,7 +1771,7 @@ ocamlnat_LIBRARIES = \
+++@@ -1561,7 +1772,7 @@ ocamlnat_LIBRARIES = \
++    compilerlibs/ocamlbytecomp otherlibs/dynlink/dynlink \
++    compilerlibs/ocamltoplevel
++  
++@@ -1008,7 +1008,7 @@
++  
++  ocamlnat$(EXE): OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native
++  
++-@@ -1569,12 +1780,12 @@ COMPILE_NATIVE_MODULE = \
+++@@ -1570,12 +1781,12 @@ COMPILE_NATIVE_MODULE = \
++    $(OC_NATIVE_COMPFLAGS)
++  
++  
++@@ -1023,7 +1023,7 @@
++  
++  partialclean::
++  	rm -f ocamlnat ocamlnat.exe
++-@@ -1624,7 +1835,8 @@ depend: beforedepend
+++@@ -1625,7 +1836,8 @@ depend: beforedepend
++  	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
++           lambda file_formats middle_end/closure middle_end/flambda \
++           middle_end/flambda/base_types \
++@@ -1033,7 +1033,7 @@
++  	 do \
++  	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
++  	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
++-@@ -1635,7 +1847,7 @@ depend: beforedepend
+++@@ -1636,7 +1848,7 @@ depend: beforedepend
++  distclean: clean
++  	$(MAKE) -C manual distclean
++  	$(MAKE) -C ocamldoc distclean
++@@ -1042,7 +1042,7 @@
++  	$(MAKE) -C otherlibs distclean
++  	rm -f $(runtime_CONFIGURED_HEADERS)
++  	$(MAKE) -C stdlib distclean
++-@@ -1737,7 +1949,7 @@ endif
+++@@ -1741,7 +1953,7 @@ endif
++  	  compilerlibs/*.cma compilerlibs/META \
++  	  "$(INSTALL_COMPLIBDIR)"
++  	$(INSTALL_DATA) \
++@@ -1051,7 +1051,7 @@
++  	   "$(INSTALL_COMPLIBDIR)"
++  	$(INSTALL_PROG) $(expunge) "$(INSTALL_LIBDIR)"
++  # If installing over a previous OCaml version, ensure some modules are removed
++-@@ -1840,7 +2052,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+++@@ -1844,7 +2056,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
++  	    "$(INSTALL_COMPLIBDIR)"
++  endif
++  	$(INSTALL_DATA) \
++@@ -1060,7 +1060,7 @@
++  	    "$(INSTALL_COMPLIBDIR)"
++  ifeq "$(build_ocamldoc)" "true"
++  	$(MAKE) -C ocamldoc installopt
++-@@ -1893,9 +2105,9 @@ endif
+++@@ -1897,9 +2109,9 @@ endif
++  	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
++  	   "$(INSTALL_COMPLIBDIR)"
++  	$(INSTALL_DATA) \
++@@ -1245,7 +1245,7 @@
++  AC_SUBST([cc_has_debug_prefix_map])
++  AC_SUBST([as_has_debug_prefix_map])
++  AC_SUBST([with_debugger]) # TODO: rename this variable
++-@@ -672,9 +669,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
+++@@ -684,9 +681,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
++      otherlibs/unix/unix.ml:otherlibs/unix/unix_${unix_or_win32}.ml
++    ])
++    ocamltest_unix_impl="real"
++@@ -1257,7 +1257,7 @@
++    [ocamltest_libunix="None"])
++  
++  AS_IF([test x"$enable_str_lib" != "xno"],
++-@@ -2264,7 +2260,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
+++@@ -2318,7 +2314,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
++    [ocamltest=''])
++  
++  AS_IF([test -n "$ocamltest"],
++@@ -1944,12 +1944,12 @@
++ diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
++ --- a/tools/ci/appveyor/appveyor_build.sh
++ +++ b/tools/ci/appveyor/appveyor_build.sh
++-@@ -153,7 +153,7 @@ case "$1" in
++-     # Now reconfigure ocamltest to run in bytecode-only mode
++-     sed -i '/native_/s/true/false/' \
++-            "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++--    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++-+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
++-     # And run the entire testsuite, skipping all the native-code tests
+++@@ -160,7 +160,7 @@ case "$1" in
+++       # Now reconfigure ocamltest to run in bytecode-only mode
+++       sed -i '/native_/s/true/false/' \
+++              "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+++       # And run the entire testsuite, skipping all the native-code tests
+++     fi
++      run "test $PORT" \
++-         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -14,7 +224,7 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 3d8797d9b6..942cbf3b30 100644
+index 075d5fc2dc..fa60ab5977 100644
 --- a/Changes
 +++ b/Changes
 @@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
@@ -90,10 +300,10 @@ index 3d8797d9b6..942cbf3b30 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 54ff52034c..9705487845 100644
+index 3a9966ba52..705d8ac003 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -415,9 +415,6 @@ flexlink.opt$(EXE): \
+@@ -416,9 +416,6 @@ flexlink.opt$(EXE): \
  	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
  	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
  
@@ -103,7 +313,7 @@ index 54ff52034c..9705487845 100644
  else
  
  flexdll flexlink flexlink.opt:
-@@ -438,6 +435,10 @@ flexdll flexlink flexlink.opt:
+@@ -439,6 +436,10 @@ flexdll flexlink flexlink.opt:
  
  endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
  
@@ -114,7 +324,7 @@ index 54ff52034c..9705487845 100644
  INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
  INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
  FLEXDLL_MANIFEST = default_$(ARCH).manifest
-@@ -622,7 +623,6 @@ partialclean::
+@@ -631,7 +632,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -122,7 +332,7 @@ index 54ff52034c..9705487845 100644
    afl \
    alloc \
    array \
-@@ -630,24 +630,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -639,24 +639,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -150,7 +360,7 @@ index 54ff52034c..9705487845 100644
    main \
    major_gc \
    md5 \
-@@ -658,17 +658,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -667,17 +667,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -168,7 +378,7 @@ index 54ff52034c..9705487845 100644
    sys \
    $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
    $(UNIX_OR_WIN32) \
-@@ -679,6 +674,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -688,6 +683,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -178,7 +388,7 @@ index 54ff52034c..9705487845 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -689,7 +687,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -698,7 +696,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -187,7 +397,7 @@ index 54ff52034c..9705487845 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1078,12 +1076,14 @@ clean::
+@@ -1087,12 +1085,14 @@ clean::
  
  # Dependencies
  
@@ -195,7 +405,7 @@ index 54ff52034c..9705487845 100644
 +subdirs = \
 +  stdlib $(addprefix otherlibs/, \
 +    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-   ocamldoc ocamltest
+   ocamldoc
  
  .PHONY: alldepend
  alldepend: depend
@@ -204,7 +414,7 @@ index 54ff52034c..9705487845 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1155,6 +1155,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1174,6 +1174,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -212,7 +422,7 @@ index 54ff52034c..9705487845 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1702,6 +1703,9 @@ endif
+@@ -1914,6 +1915,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -998,13 +1208,13 @@ index f5180902f3..617146c9a4 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 0b36b33ad5..7a6e71fc9b 100755
+index da48d8f472..e3a83f358b 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 924741cdb1..692579ca96 100644
+index 2f1cb8bba4..d63444c001 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -220,6 +220,8 @@ AC_SUBST([mkexe_ldflags_exp])
+@@ -217,6 +217,8 @@ AC_SUBST([mkexe_ldflags_exp])
  AC_SUBST([PACKLD])
  AC_SUBST([stdlib_manpages])
  AC_SUBST([compute_deps])
@@ -1013,7 +1223,7 @@ index 924741cdb1..692579ca96 100644
  AC_SUBST([ocaml_bindir])
  AC_SUBST([ocaml_libdir])
  AC_SUBST([QS])
-@@ -232,6 +234,7 @@ AC_CONFIG_FILES([Makefile.config])
+@@ -229,6 +231,7 @@ AC_CONFIG_FILES([Makefile.config])
  AC_CONFIG_FILES([stdlib/sys.ml])
  AC_CONFIG_FILES([manual/src/version.tex])
  AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -1021,7 +1231,7 @@ index 924741cdb1..692579ca96 100644
  AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
  AC_CONFIG_FILES([utils/config.generated.ml])
  AC_CONFIG_HEADERS([runtime/caml/m.h])
-@@ -411,15 +414,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -408,15 +411,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -1053,7 +1263,7 @@ index 924741cdb1..692579ca96 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -660,7 +671,8 @@ AS_CASE([$host],
+@@ -657,7 +668,8 @@ AS_CASE([$host],
      [exeext=".exe"],
    [exeext=''])
  
@@ -1063,7 +1273,7 @@ index 924741cdb1..692579ca96 100644
  lib_dynlink=true
  lib_runtime_events=true
  AS_IF([test x"$enable_unix_lib" != "xno"],
-@@ -737,8 +749,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
+@@ -733,8 +745,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
      cc_warnings=''],
    [outputobj='-o '
    warn_error_flag='-Werror'
@@ -1075,7 +1285,7 @@ index 924741cdb1..692579ca96 100644
  
  AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
    [yes,*|,true],
-@@ -1081,9 +1094,9 @@ AS_IF([! $arch64],
+@@ -1077,9 +1090,9 @@ AS_IF([! $arch64],
  
  # Atomics library
  
@@ -1088,7 +1298,7 @@ index 924741cdb1..692579ca96 100644
  
  # Support for C11 atomic types
  
-@@ -1259,11 +1272,13 @@ AS_CASE([$host],
+@@ -1255,11 +1268,13 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -1105,7 +1315,7 @@ index 924741cdb1..692579ca96 100644
    # expected to match "gnueabihf" as well as "musleabihf"
    [armv6*-*-linux-*eabihf],
      [arch=arm; model=armv6; system=linux],
-@@ -1300,9 +1315,9 @@ AS_CASE([$host],
+@@ -1296,9 +1311,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
    [x86_64-*-gnu*],
@@ -1117,7 +1327,7 @@ index 924741cdb1..692579ca96 100644
    [x86_64-*-solaris*],
      [has_native_backend=yes; arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1312,7 +1327,7 @@ AS_CASE([$host],
+@@ -1308,7 +1323,7 @@ AS_CASE([$host],
    [x86_64-*-openbsd*],
      [has_native_backend=yes; arch=amd64; system=openbsd],
    [x86_64-*-haiku*],
@@ -1126,7 +1336,7 @@ index 924741cdb1..692579ca96 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1334,7 +1349,7 @@ AS_CASE([$host],
+@@ -1330,7 +1345,7 @@ AS_CASE([$host],
    [x86_64-*-cygwin*],
      [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
@@ -1135,7 +1345,7 @@ index 924741cdb1..692579ca96 100644
  )
  
  native_cflags=''
-@@ -1546,10 +1561,12 @@ AS_CASE([$host],
+@@ -1542,10 +1557,12 @@ AS_CASE([$host],
    [*-*-windows],
      [has_monotonic_clock=true],
    [*-apple-darwin*], [
@@ -1150,7 +1360,7 @@ index 924741cdb1..692579ca96 100644
        ],
        [has_monotonic_clock=false])],
    [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-@@ -2168,13 +2185,26 @@ AS_CASE([$enable_debug_runtime],
+@@ -2164,13 +2181,26 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -1179,7 +1389,7 @@ index 924741cdb1..692579ca96 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2225,6 +2255,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2221,6 +2251,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -8909,13 +9119,223 @@ index 0000000000..21d2df04e6
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..addb4f195c
+index 0000000000..a6fd67824a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8884 @@
+@@ -0,0 +1,9117 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..c0921a248b
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,207 @@
+++--- a	2023-09-28 18:48:28.498645213 +0100
++++++ b	2023-09-28 18:48:28.518645921 +0100
+++@@ -536,7 +536,7 @@
+++  
+++  $(foreach PROGRAM, $(OCAML_PROGRAMS),\
+++    $(eval $(call OCAML_PROGRAM,$(PROGRAM))))
+++-@@ -482,7 +483,7 @@ clean:: partialclean
++++@@ -483,7 +484,7 @@ clean:: partialclean
+++  
+++  ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+++  
+++@@ -545,7 +545,7 @@
+++  
+++  ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
+++  
+++-@@ -495,7 +496,7 @@ partialclean::
++++@@ -496,7 +497,7 @@ partialclean::
+++  
+++  ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
+++  
+++@@ -554,7 +554,7 @@
+++  
+++  ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
+++  
+++-@@ -504,14 +505,22 @@ partialclean::
++++@@ -505,14 +506,22 @@ partialclean::
+++  
+++  # The toplevel
+++  
+++@@ -579,7 +579,7 @@
+++  	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
+++  
+++  $(eval $(call PROGRAM_SYNONYM,ocaml))
+++-@@ -606,13 +615,13 @@ partialclean::
++++@@ -607,13 +616,13 @@ partialclean::
+++  beforedepend:: asmcomp/emit.ml
+++  
+++  cvt_emit_LIBRARIES =
+++@@ -596,9 +596,9 @@
+++  partialclean::
+++  	rm -f expunge expunge.exe
+++ @@ -1079,7 +1088,7 @@ clean::
+++- # Dependencies
+++- 
+++- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
++++ subdirs = \
++++   stdlib $(addprefix otherlibs/, \
++++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
+++ -  ocamldoc ocamltest
+++ +  ocamldoc
+++  
+++@@ -625,7 +625,7 @@
+++  
+++  .PHONY: lex-all
+++  lex-all: lex/ocamllex
+++-@@ -1223,14 +1242,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
++++@@ -1224,14 +1243,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
+++  	$(MAKE) -C ocamldoc opt.opt
+++  
+++  # OCamltest
+++@@ -747,7 +747,7 @@
+++  
+++  # Documentation
+++  
+++-@@ -1248,6 +1369,14 @@ partialclean::
++++@@ -1249,6 +1370,14 @@ partialclean::
+++  partialclean::
+++  	$(MAKE) -C api_docgen clean
+++  
+++@@ -762,7 +762,7 @@
+++  # The extra libraries
+++  
+++  .PHONY: otherlibraries
+++-@@ -1279,21 +1408,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
++++@@ -1280,21 +1409,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
+++  
+++  debugger/%: VPATH += otherlibs/unix otherlibs/dynlink
+++  
+++@@ -830,7 +830,7 @@
+++  
+++  debugger/%: OC_BYTECODE_LINKFLAGS = -linkall
+++  
+++-@@ -1356,7 +1519,7 @@ endif
++++@@ -1357,7 +1520,7 @@ endif
+++  lintapidiff_LIBRARIES = \
+++    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp) \
+++    otherlibs/str/str
+++@@ -839,7 +839,7 @@
+++  
+++  tools/lintapidiff.opt$(EXE): VPATH += otherlibs/str
+++  
+++-@@ -1418,55 +1581,103 @@ partialclean::
++++@@ -1419,55 +1582,103 @@ partialclean::
+++  # The dependency generator
+++  
+++  ocamldep_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+++@@ -963,7 +963,7 @@
+++  
+++  tools/opnames.ml: runtime/caml/instruct.h $(make_opcodes)
+++  	$(V_GEN)$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+++-@@ -1480,30 +1691,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
++++@@ -1481,30 +1692,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
+++  
+++  ocamlobjinfo_LIBRARIES = \
+++    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
+++@@ -999,7 +999,7 @@
+++  
+++  # ocamltex uses str.cma and unix.cma and so must be compiled with
+++  # $(ROOTDIR)/ocamlc rather than with $(ROOTDIR)/boot/ocamlc since the boot
+++-@@ -1560,7 +1771,7 @@ ocamlnat_LIBRARIES = \
++++@@ -1561,7 +1772,7 @@ ocamlnat_LIBRARIES = \
+++    compilerlibs/ocamlbytecomp otherlibs/dynlink/dynlink \
+++    compilerlibs/ocamltoplevel
+++  
+++@@ -1008,7 +1008,7 @@
+++  
+++  ocamlnat$(EXE): OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native
+++  
+++-@@ -1569,12 +1780,12 @@ COMPILE_NATIVE_MODULE = \
++++@@ -1570,12 +1781,12 @@ COMPILE_NATIVE_MODULE = \
+++    $(OC_NATIVE_COMPFLAGS)
+++  
+++  
+++@@ -1023,7 +1023,7 @@
+++  
+++  partialclean::
+++  	rm -f ocamlnat ocamlnat.exe
+++-@@ -1624,7 +1835,8 @@ depend: beforedepend
++++@@ -1625,7 +1836,8 @@ depend: beforedepend
+++  	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
+++           lambda file_formats middle_end/closure middle_end/flambda \
+++           middle_end/flambda/base_types \
+++@@ -1033,7 +1033,7 @@
+++  	 do \
+++  	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
+++  	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
+++-@@ -1635,7 +1847,7 @@ depend: beforedepend
++++@@ -1636,7 +1848,7 @@ depend: beforedepend
+++  distclean: clean
+++  	$(MAKE) -C manual distclean
+++  	$(MAKE) -C ocamldoc distclean
+++@@ -1042,7 +1042,7 @@
+++  	$(MAKE) -C otherlibs distclean
+++  	rm -f $(runtime_CONFIGURED_HEADERS)
+++  	$(MAKE) -C stdlib distclean
+++-@@ -1737,7 +1949,7 @@ endif
++++@@ -1741,7 +1953,7 @@ endif
+++  	  compilerlibs/*.cma compilerlibs/META \
+++  	  "$(INSTALL_COMPLIBDIR)"
+++  	$(INSTALL_DATA) \
+++@@ -1051,7 +1051,7 @@
+++  	   "$(INSTALL_COMPLIBDIR)"
+++  	$(INSTALL_PROG) $(expunge) "$(INSTALL_LIBDIR)"
+++  # If installing over a previous OCaml version, ensure some modules are removed
+++-@@ -1840,7 +2052,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
++++@@ -1844,7 +2056,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
+++  	    "$(INSTALL_COMPLIBDIR)"
+++  endif
+++  	$(INSTALL_DATA) \
+++@@ -1060,7 +1060,7 @@
+++  	    "$(INSTALL_COMPLIBDIR)"
+++  ifeq "$(build_ocamldoc)" "true"
+++  	$(MAKE) -C ocamldoc installopt
+++-@@ -1893,9 +2105,9 @@ endif
++++@@ -1897,9 +2109,9 @@ endif
+++  	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
+++  	   "$(INSTALL_COMPLIBDIR)"
+++  	$(INSTALL_DATA) \
+++@@ -1245,7 +1245,7 @@
+++  AC_SUBST([cc_has_debug_prefix_map])
+++  AC_SUBST([as_has_debug_prefix_map])
+++  AC_SUBST([with_debugger]) # TODO: rename this variable
+++-@@ -672,9 +669,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
++++@@ -684,9 +681,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
+++      otherlibs/unix/unix.ml:otherlibs/unix/unix_${unix_or_win32}.ml
+++    ])
+++    ocamltest_unix_impl="real"
+++@@ -1257,7 +1257,7 @@
+++    [ocamltest_libunix="None"])
+++  
+++  AS_IF([test x"$enable_str_lib" != "xno"],
+++-@@ -2264,7 +2260,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
++++@@ -2318,7 +2314,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
+++    [ocamltest=''])
+++  
+++  AS_IF([test -n "$ocamltest"],
+++@@ -1944,12 +1944,12 @@
+++ diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++ --- a/tools/ci/appveyor/appveyor_build.sh
+++ +++ b/tools/ci/appveyor/appveyor_build.sh
+++-@@ -153,7 +153,7 @@ case "$1" in
+++-     # Now reconfigure ocamltest to run in bytecode-only mode
+++-     sed -i '/native_/s/true/false/' \
+++-            "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++--    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+++-     # And run the entire testsuite, skipping all the native-code tests
++++@@ -160,7 +160,7 @@ case "$1" in
++++       # Now reconfigure ocamltest to run in bytecode-only mode
++++       sed -i '/native_/s/true/false/' \
++++              "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
++++       # And run the entire testsuite, skipping all the native-code tests
++++     fi
+++      run "test $PORT" \
+++-         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -8929,7 +9349,7 @@ index 0000000000..addb4f195c
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 3d8797d9b6..942cbf3b30 100644
++index 075d5fc2dc..fa60ab5977 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
@@ -9005,10 +9425,10 @@ index 0000000000..addb4f195c
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 54ff52034c..9705487845 100644
++index 3a9966ba52..705d8ac003 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -415,9 +415,6 @@ flexlink.opt$(EXE): \
++@@ -416,9 +416,6 @@ flexlink.opt$(EXE): \
 + 	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
 + 	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
 + 
@@ -9018,7 +9438,7 @@ index 0000000000..addb4f195c
 + else
 + 
 + flexdll flexlink flexlink.opt:
-+@@ -438,6 +435,10 @@ flexdll flexlink flexlink.opt:
++@@ -439,6 +436,10 @@ flexdll flexlink flexlink.opt:
 + 
 + endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 + 
@@ -9029,7 +9449,7 @@ index 0000000000..addb4f195c
 + INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 + INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 + FLEXDLL_MANIFEST = default_$(ARCH).manifest
-+@@ -622,7 +623,6 @@ partialclean::
++@@ -631,7 +632,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -9037,7 +9457,7 @@ index 0000000000..addb4f195c
 +   afl \
 +   alloc \
 +   array \
-+@@ -630,24 +630,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -639,24 +639,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -9065,7 +9485,7 @@ index 0000000000..addb4f195c
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -658,17 +658,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -667,17 +667,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -9083,7 +9503,7 @@ index 0000000000..addb4f195c
 +   sys \
 +   $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
 +   $(UNIX_OR_WIN32) \
-+@@ -679,6 +674,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -688,6 +683,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -9093,7 +9513,7 @@ index 0000000000..addb4f195c
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -689,7 +687,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -698,7 +696,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -9102,7 +9522,7 @@ index 0000000000..addb4f195c
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1078,12 +1076,14 @@ clean::
++@@ -1087,12 +1085,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -9110,7 +9530,7 @@ index 0000000000..addb4f195c
 ++subdirs = \
 ++  stdlib $(addprefix otherlibs/, \
 ++    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-+   ocamldoc ocamltest
++   ocamldoc
 + 
 + .PHONY: alldepend
 + alldepend: depend
@@ -9119,7 +9539,7 @@ index 0000000000..addb4f195c
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1155,6 +1155,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1174,6 +1174,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -9127,7 +9547,7 @@ index 0000000000..addb4f195c
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1702,6 +1703,9 @@ endif
++@@ -1914,6 +1915,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -9913,13 +10333,13 @@ index 0000000000..addb4f195c
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 0b36b33ad5..7a6e71fc9b 100755
++index da48d8f472..e3a83f358b 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 924741cdb1..692579ca96 100644
++index 2f1cb8bba4..d63444c001 100644
 +--- a/configure.ac
 ++++ b/configure.ac
-+@@ -220,6 +220,8 @@ AC_SUBST([mkexe_ldflags_exp])
++@@ -217,6 +217,8 @@ AC_SUBST([mkexe_ldflags_exp])
 + AC_SUBST([PACKLD])
 + AC_SUBST([stdlib_manpages])
 + AC_SUBST([compute_deps])
@@ -9928,7 +10348,7 @@ index 0000000000..addb4f195c
 + AC_SUBST([ocaml_bindir])
 + AC_SUBST([ocaml_libdir])
 + AC_SUBST([QS])
-+@@ -232,6 +234,7 @@ AC_CONFIG_FILES([Makefile.config])
++@@ -229,6 +231,7 @@ AC_CONFIG_FILES([Makefile.config])
 + AC_CONFIG_FILES([stdlib/sys.ml])
 + AC_CONFIG_FILES([manual/src/version.tex])
 + AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
@@ -9936,7 +10356,7 @@ index 0000000000..addb4f195c
 + AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 + AC_CONFIG_FILES([utils/config.generated.ml])
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
-+@@ -411,15 +414,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -408,15 +411,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -9968,7 +10388,7 @@ index 0000000000..addb4f195c
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -660,7 +671,8 @@ AS_CASE([$host],
++@@ -657,7 +668,8 @@ AS_CASE([$host],
 +     [exeext=".exe"],
 +   [exeext=''])
 + 
@@ -9978,7 +10398,7 @@ index 0000000000..addb4f195c
 + lib_dynlink=true
 + lib_runtime_events=true
 + AS_IF([test x"$enable_unix_lib" != "xno"],
-+@@ -737,8 +749,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
++@@ -733,8 +745,9 @@ AS_CASE([$ocaml_cv_cc_vendor],
 +     cc_warnings=''],
 +   [outputobj='-o '
 +   warn_error_flag='-Werror'
@@ -9990,7 +10410,7 @@ index 0000000000..addb4f195c
 + 
 + AS_CASE([$enable_warn_error,OCAML__DEVELOPMENT_VERSION],
 +   [yes,*|,true],
-+@@ -1081,9 +1094,9 @@ AS_IF([! $arch64],
++@@ -1077,9 +1090,9 @@ AS_IF([! $arch64],
 + 
 + # Atomics library
 + 
@@ -10003,7 +10423,7 @@ index 0000000000..addb4f195c
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1259,11 +1272,13 @@ AS_CASE([$host],
++@@ -1255,11 +1268,13 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -10020,7 +10440,7 @@ index 0000000000..addb4f195c
 +   # expected to match "gnueabihf" as well as "musleabihf"
 +   [armv6*-*-linux-*eabihf],
 +     [arch=arm; model=armv6; system=linux],
-+@@ -1300,9 +1315,9 @@ AS_CASE([$host],
++@@ -1296,9 +1311,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
 +   [x86_64-*-gnu*],
@@ -10032,7 +10452,7 @@ index 0000000000..addb4f195c
 +   [x86_64-*-solaris*],
 +     [has_native_backend=yes; arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1312,7 +1327,7 @@ AS_CASE([$host],
++@@ -1308,7 +1323,7 @@ AS_CASE([$host],
 +   [x86_64-*-openbsd*],
 +     [has_native_backend=yes; arch=amd64; system=openbsd],
 +   [x86_64-*-haiku*],
@@ -10041,7 +10461,7 @@ index 0000000000..addb4f195c
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1334,7 +1349,7 @@ AS_CASE([$host],
++@@ -1330,7 +1345,7 @@ AS_CASE([$host],
 +   [x86_64-*-cygwin*],
 +     [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
@@ -10050,7 +10470,7 @@ index 0000000000..addb4f195c
 + )
 + 
 + native_cflags=''
-+@@ -1546,10 +1561,12 @@ AS_CASE([$host],
++@@ -1542,10 +1557,12 @@ AS_CASE([$host],
 +   [*-*-windows],
 +     [has_monotonic_clock=true],
 +   [*-apple-darwin*], [
@@ -10065,7 +10485,7 @@ index 0000000000..addb4f195c
 +       ],
 +       [has_monotonic_clock=false])],
 +   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-+@@ -2168,13 +2185,26 @@ AS_CASE([$enable_debug_runtime],
++@@ -2164,13 +2181,26 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -10094,7 +10514,7 @@ index 0000000000..addb4f195c
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2225,6 +2255,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2221,6 +2251,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -17796,7 +18216,30 @@ index 0000000000..addb4f195c
 ++-    if [[ $PORT = 'msvc64' ]] ; then
 +++    if [[ $PORT = 'mingw64' ]] ; then
 ++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" che
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+++           "../$BUILD_PRE
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
