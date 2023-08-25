@@ -152,6 +152,7 @@ case "$1" in
           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
     fi
+<<<<<<< HEAD
     if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
       # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
       # tests now (to include natdynlink)
@@ -163,6 +164,27 @@ case "$1" in
       $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
       # And run the entire testsuite, skipping all the native-code tests
     fi
+||||||| parent of 4d98e8ae5e (Merge pull request PR#12321 from shindere/merge-ocamltest-makefile)
+    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+    # tests now (to include natdynlink)
+    run "test dynlink $PORT" \
+        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+    # Now reconfigure ocamltest to run in bytecode-only mode
+    sed -i '/native_/s/true/false/' \
+           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+    # And run the entire testsuite, skipping all the native-code tests
+=======
+    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+    # tests now (to include natdynlink)
+    run "test dynlink $PORT" \
+        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+    # Now reconfigure ocamltest to run in bytecode-only mode
+    sed -i '/native_/s/true/false/' \
+           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+    # And run the entire testsuite, skipping all the native-code tests
+>>>>>>> 4d98e8ae5e (Merge pull request PR#12321 from shindere/merge-ocamltest-makefile)
     run "test $PORT" \
         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
