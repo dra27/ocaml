@@ -1686,7 +1686,7 @@ index 051122113a..7eef1e662e 100644
    test_result=${TEST_SKIP}
  else
 diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
-index 840e456a68..b3fedb2705 100644
+index d8846babdd..f4e35b0c25 100644
 --- a/testsuite/tests/lib-bigarray/bigarrays.ml
 +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
 @@ -243,6 +243,7 @@ let tests () =
@@ -1706,7 +1706,7 @@ index 840e456a68..b3fedb2705 100644
    testing_function "set/get (specialized)";
    let a = Array1.create int c_layout 3 in
 diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
-index da6893a14a..7fb39b0766 100644
+index 2ca2df4ae5..e82bdd548f 100644
 --- a/testsuite/tests/lib-bigarray/bigarrays.reference
 +++ b/testsuite/tests/lib-bigarray/bigarrays.reference
 @@ -2,7 +2,7 @@

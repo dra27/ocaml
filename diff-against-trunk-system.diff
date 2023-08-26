@@ -1,216 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..c0921a248b
+index 0000000000..e8d1d95e61
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,207 @@
-+--- a	2023-09-28 18:48:28.498645213 +0100
-++++ b	2023-09-28 18:48:28.518645921 +0100
-+@@ -536,7 +536,7 @@
-+  
-+  $(foreach PROGRAM, $(OCAML_PROGRAMS),\
-+    $(eval $(call OCAML_PROGRAM,$(PROGRAM))))
-+-@@ -482,7 +483,7 @@ clean:: partialclean
-++@@ -483,7 +484,7 @@ clean:: partialclean
-+  
-+  ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
-+  
-+@@ -545,7 +545,7 @@
-+  
-+  ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
-+  
-+-@@ -495,7 +496,7 @@ partialclean::
-++@@ -496,7 +497,7 @@ partialclean::
-+  
-+  ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
-+  
-+@@ -554,7 +554,7 @@
-+  
-+  ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
-+  
-+-@@ -504,14 +505,22 @@ partialclean::
-++@@ -505,14 +506,22 @@ partialclean::
-+  
-+  # The toplevel
-+  
-+@@ -579,7 +579,7 @@
-+  	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
-+  
-+  $(eval $(call PROGRAM_SYNONYM,ocaml))
-+-@@ -606,13 +615,13 @@ partialclean::
-++@@ -607,13 +616,13 @@ partialclean::
-+  beforedepend:: asmcomp/emit.ml
-+  
-+  cvt_emit_LIBRARIES =
-+@@ -596,9 +596,9 @@
-+  partialclean::
-+  	rm -f expunge expunge.exe
-+ @@ -1079,7 +1088,7 @@ clean::
-+- # Dependencies
-+- 
-+- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-++ subdirs = \
-++   stdlib $(addprefix otherlibs/, \
-++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-+ -  ocamldoc ocamltest
-+ +  ocamldoc
-+  
-+@@ -625,7 +625,7 @@
-+  
-+  .PHONY: lex-all
-+  lex-all: lex/ocamllex
-+-@@ -1223,14 +1242,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
-++@@ -1224,14 +1243,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
-+  	$(MAKE) -C ocamldoc opt.opt
-+  
-+  # OCamltest
-+@@ -747,7 +747,7 @@
-+  
-+  # Documentation
-+  
-+-@@ -1248,6 +1369,14 @@ partialclean::
-++@@ -1249,6 +1370,14 @@ partialclean::
-+  partialclean::
-+  	$(MAKE) -C api_docgen clean
-+  
-+@@ -762,7 +762,7 @@
-+  # The extra libraries
-+  
-+  .PHONY: otherlibraries
-+-@@ -1279,21 +1408,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
-++@@ -1280,21 +1409,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
-+  
-+  debugger/%: VPATH += otherlibs/unix otherlibs/dynlink
-+  
-+@@ -830,7 +830,7 @@
-+  
-+  debugger/%: OC_BYTECODE_LINKFLAGS = -linkall
-+  
-+-@@ -1356,7 +1519,7 @@ endif
-++@@ -1357,7 +1520,7 @@ endif
-+  lintapidiff_LIBRARIES = \
-+    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp) \
-+    otherlibs/str/str
-+@@ -839,7 +839,7 @@
-+  
-+  tools/lintapidiff.opt$(EXE): VPATH += otherlibs/str
-+  
-+-@@ -1418,55 +1581,103 @@ partialclean::
-++@@ -1419,55 +1582,103 @@ partialclean::
-+  # The dependency generator
-+  
-+  ocamldep_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
-+@@ -963,7 +963,7 @@
-+  
-+  tools/opnames.ml: runtime/caml/instruct.h $(make_opcodes)
-+  	$(V_GEN)$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
-+-@@ -1480,30 +1691,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
-++@@ -1481,30 +1692,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
-+  
-+  ocamlobjinfo_LIBRARIES = \
-+    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
-+@@ -999,7 +999,7 @@
-+  
-+  # ocamltex uses str.cma and unix.cma and so must be compiled with
-+  # $(ROOTDIR)/ocamlc rather than with $(ROOTDIR)/boot/ocamlc since the boot
-+-@@ -1560,7 +1771,7 @@ ocamlnat_LIBRARIES = \
-++@@ -1561,7 +1772,7 @@ ocamlnat_LIBRARIES = \
-+    compilerlibs/ocamlbytecomp otherlibs/dynlink/dynlink \
-+    compilerlibs/ocamltoplevel
-+  
-+@@ -1008,7 +1008,7 @@
-+  
-+  ocamlnat$(EXE): OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native
-+  
-+-@@ -1569,12 +1780,12 @@ COMPILE_NATIVE_MODULE = \
-++@@ -1570,12 +1781,12 @@ COMPILE_NATIVE_MODULE = \
-+    $(OC_NATIVE_COMPFLAGS)
-+  
-+  
-+@@ -1023,7 +1023,7 @@
-+  
-+  partialclean::
-+  	rm -f ocamlnat ocamlnat.exe
-+-@@ -1624,7 +1835,8 @@ depend: beforedepend
-++@@ -1625,7 +1836,8 @@ depend: beforedepend
-+  	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
-+           lambda file_formats middle_end/closure middle_end/flambda \
-+           middle_end/flambda/base_types \
-+@@ -1033,7 +1033,7 @@
-+  	 do \
-+  	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
-+  	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
-+-@@ -1635,7 +1847,7 @@ depend: beforedepend
-++@@ -1636,7 +1848,7 @@ depend: beforedepend
-+  distclean: clean
-+  	$(MAKE) -C manual distclean
-+  	$(MAKE) -C ocamldoc distclean
-+@@ -1042,7 +1042,7 @@
-+  	$(MAKE) -C otherlibs distclean
-+  	rm -f $(runtime_CONFIGURED_HEADERS)
-+  	$(MAKE) -C stdlib distclean
-+-@@ -1737,7 +1949,7 @@ endif
-++@@ -1741,7 +1953,7 @@ endif
-+  	  compilerlibs/*.cma compilerlibs/META \
-+  	  "$(INSTALL_COMPLIBDIR)"
-+  	$(INSTALL_DATA) \
-+@@ -1051,7 +1051,7 @@
-+  	   "$(INSTALL_COMPLIBDIR)"
-+  	$(INSTALL_PROG) $(expunge) "$(INSTALL_LIBDIR)"
-+  # If installing over a previous OCaml version, ensure some modules are removed
-+-@@ -1840,7 +2052,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-++@@ -1844,7 +2056,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-+  	    "$(INSTALL_COMPLIBDIR)"
-+  endif
-+  	$(INSTALL_DATA) \
-+@@ -1060,7 +1060,7 @@
-+  	    "$(INSTALL_COMPLIBDIR)"
-+  ifeq "$(build_ocamldoc)" "true"
-+  	$(MAKE) -C ocamldoc installopt
-+-@@ -1893,9 +2105,9 @@ endif
-++@@ -1897,9 +2109,9 @@ endif
-+  	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
-+  	   "$(INSTALL_COMPLIBDIR)"
-+  	$(INSTALL_DATA) \
-+@@ -1245,7 +1245,7 @@
-+  AC_SUBST([cc_has_debug_prefix_map])
-+  AC_SUBST([as_has_debug_prefix_map])
-+  AC_SUBST([with_debugger]) # TODO: rename this variable
-+-@@ -672,9 +669,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-++@@ -684,9 +681,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-+      otherlibs/unix/unix.ml:otherlibs/unix/unix_${unix_or_win32}.ml
-+    ])
-+    ocamltest_unix_impl="real"
-+@@ -1257,7 +1257,7 @@
-+    [ocamltest_libunix="None"])
-+  
-+  AS_IF([test x"$enable_str_lib" != "xno"],
-+-@@ -2264,7 +2260,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-++@@ -2318,7 +2314,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-+    [ocamltest=''])
-+  
-+  AS_IF([test -n "$ocamltest"],
-+@@ -1944,12 +1944,12 @@
-+ diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-+ --- a/tools/ci/appveyor/appveyor_build.sh
-+ +++ b/tools/ci/appveyor/appveyor_build.sh
-+-@@ -153,7 +153,7 @@ case "$1" in
-+-     # Now reconfigure ocamltest to run in bytecode-only mode
-+-     sed -i '/native_/s/true/false/' \
-+-            "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+--    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+-+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
-+-     # And run the entire testsuite, skipping all the native-code tests
-++@@ -160,7 +160,7 @@ case "$1" in
-++       # Now reconfigure ocamltest to run in bytecode-only mode
-++       sed -i '/native_/s/true/false/' \
-++              "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
-++       # And run the entire testsuite, skipping all the native-code tests
-++     fi
-+      run "test $PORT" \
-+-         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:48:28.878658672 +0100
+++++ b	2023-09-28 18:48:28.894659239 +0100
++@@ -25,7 +25,7 @@
++ diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
++ --- a/testsuite/tests/lib-bigarray/bigarrays.ml
++ +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
++-@@ -1164,7 +1164,7 @@ let tests () =
+++@@ -1166,7 +1166,7 @@ let tests () =
++    test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
++    test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
++                                       makecomplex);
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -224,7 +28,7 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 075d5fc2dc..fa60ab5977 100644
+index c8bc07d3fe..73e4e89236 100644
 --- a/Changes
 +++ b/Changes
 @@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
@@ -5102,7 +4906,7 @@ index 0000000000..3cd85b7c5f
 ++}
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..21d2df04e6
+index 0000000000..c7a3ee0fe0
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,4011 @@
@@ -9033,7 +8837,7 @@ index 0000000000..21d2df04e6
 +    bytecode;
 +  }{
 +diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-+index 3292ad9c31..f69aeb342c 100644
++index c35092e914..bbf1271cdf 100644
 +--- a/tools/ci/appveyor/appveyor_build.sh
 ++++ b/tools/ci/appveyor/appveyor_build.sh
 +@@ -64,8 +64,8 @@ function set_configuration {
@@ -9072,7 +8876,7 @@ index 0000000000..21d2df04e6
 +-    # Now reconfigure ocamltest to run in bytecode-only mode
 +-    sed -i '/native_/s/true/false/' \
 +-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
 +-    # And run the entire testsuite, skipping all the native-code tests
 ++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
 ++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
@@ -9082,7 +8886,7 @@ index 0000000000..21d2df04e6
 ++      # Now reconfigure ocamltest to run in bytecode-only mode
 ++      sed -i '/native_/s/true/false/' \
 ++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
 ++      # And run the entire testsuite, skipping all the native-code tests
 ++    fi
 +     run "test $PORT" \
@@ -9119,223 +8923,27 @@ index 0000000000..21d2df04e6
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a6fd67824a
+index 0000000000..20a5300f16
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9117 @@
+@@ -0,0 +1,8886 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..c0921a248b
++index 0000000000..e8d1d95e61
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,207 @@
-++--- a	2023-09-28 18:48:28.498645213 +0100
-+++++ b	2023-09-28 18:48:28.518645921 +0100
-++@@ -536,7 +536,7 @@
-++  
-++  $(foreach PROGRAM, $(OCAML_PROGRAMS),\
-++    $(eval $(call OCAML_PROGRAM,$(PROGRAM))))
-++-@@ -482,7 +483,7 @@ clean:: partialclean
-+++@@ -483,7 +484,7 @@ clean:: partialclean
-++  
-++  ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
-++  
-++@@ -545,7 +545,7 @@
-++  
-++  ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
-++  
-++-@@ -495,7 +496,7 @@ partialclean::
-+++@@ -496,7 +497,7 @@ partialclean::
-++  
-++  ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
-++  
-++@@ -554,7 +554,7 @@
-++  
-++  ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
-++  
-++-@@ -504,14 +505,22 @@ partialclean::
-+++@@ -505,14 +506,22 @@ partialclean::
-++  
-++  # The toplevel
-++  
-++@@ -579,7 +579,7 @@
-++  	$(V_LINKC)$(LINK_BYTECODE_PROGRAM) -o $@ $^
-++  
-++  $(eval $(call PROGRAM_SYNONYM,ocaml))
-++-@@ -606,13 +615,13 @@ partialclean::
-+++@@ -607,13 +616,13 @@ partialclean::
-++  beforedepend:: asmcomp/emit.ml
-++  
-++  cvt_emit_LIBRARIES =
-++@@ -596,9 +596,9 @@
-++  partialclean::
-++  	rm -f expunge expunge.exe
-++ @@ -1079,7 +1088,7 @@ clean::
-++- # Dependencies
-++- 
-++- subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-+++ subdirs = \
-+++   stdlib $(addprefix otherlibs/, \
-+++     $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
-++ -  ocamldoc ocamltest
-++ +  ocamldoc
-++  
-++@@ -625,7 +625,7 @@
-++  
-++  .PHONY: lex-all
-++  lex-all: lex/ocamllex
-++-@@ -1223,14 +1242,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
-+++@@ -1224,14 +1243,116 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
-++  	$(MAKE) -C ocamldoc opt.opt
-++  
-++  # OCamltest
-++@@ -747,7 +747,7 @@
-++  
-++  # Documentation
-++  
-++-@@ -1248,6 +1369,14 @@ partialclean::
-+++@@ -1249,6 +1370,14 @@ partialclean::
-++  partialclean::
-++  	$(MAKE) -C api_docgen clean
-++  
-++@@ -762,7 +762,7 @@
-++  # The extra libraries
-++  
-++  .PHONY: otherlibraries
-++-@@ -1279,21 +1408,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
-+++@@ -1280,21 +1409,55 @@ otherlibs/dynlink/dynlink.cma: otherlibraries
-++  
-++  debugger/%: VPATH += otherlibs/unix otherlibs/dynlink
-++  
-++@@ -830,7 +830,7 @@
-++  
-++  debugger/%: OC_BYTECODE_LINKFLAGS = -linkall
-++  
-++-@@ -1356,7 +1519,7 @@ endif
-+++@@ -1357,7 +1520,7 @@ endif
-++  lintapidiff_LIBRARIES = \
-++    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp) \
-++    otherlibs/str/str
-++@@ -839,7 +839,7 @@
-++  
-++  tools/lintapidiff.opt$(EXE): VPATH += otherlibs/str
-++  
-++-@@ -1418,55 +1581,103 @@ partialclean::
-+++@@ -1419,55 +1582,103 @@ partialclean::
-++  # The dependency generator
-++  
-++  ocamldep_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
-++@@ -963,7 +963,7 @@
-++  
-++  tools/opnames.ml: runtime/caml/instruct.h $(make_opcodes)
-++  	$(V_GEN)$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
-++-@@ -1480,30 +1691,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
-+++@@ -1481,30 +1692,30 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
-++  
-++  ocamlobjinfo_LIBRARIES = \
-++    $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
-++@@ -999,7 +999,7 @@
-++  
-++  # ocamltex uses str.cma and unix.cma and so must be compiled with
-++  # $(ROOTDIR)/ocamlc rather than with $(ROOTDIR)/boot/ocamlc since the boot
-++-@@ -1560,7 +1771,7 @@ ocamlnat_LIBRARIES = \
-+++@@ -1561,7 +1772,7 @@ ocamlnat_LIBRARIES = \
-++    compilerlibs/ocamlbytecomp otherlibs/dynlink/dynlink \
-++    compilerlibs/ocamltoplevel
-++  
-++@@ -1008,7 +1008,7 @@
-++  
-++  ocamlnat$(EXE): OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native
-++  
-++-@@ -1569,12 +1780,12 @@ COMPILE_NATIVE_MODULE = \
-+++@@ -1570,12 +1781,12 @@ COMPILE_NATIVE_MODULE = \
-++    $(OC_NATIVE_COMPFLAGS)
-++  
-++  
-++@@ -1023,7 +1023,7 @@
-++  
-++  partialclean::
-++  	rm -f ocamlnat ocamlnat.exe
-++-@@ -1624,7 +1835,8 @@ depend: beforedepend
-+++@@ -1625,7 +1836,8 @@ depend: beforedepend
-++  	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
-++           lambda file_formats middle_end/closure middle_end/flambda \
-++           middle_end/flambda/base_types \
-++@@ -1033,7 +1033,7 @@
-++  	 do \
-++  	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
-++  	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
-++-@@ -1635,7 +1847,7 @@ depend: beforedepend
-+++@@ -1636,7 +1848,7 @@ depend: beforedepend
-++  distclean: clean
-++  	$(MAKE) -C manual distclean
-++  	$(MAKE) -C ocamldoc distclean
-++@@ -1042,7 +1042,7 @@
-++  	$(MAKE) -C otherlibs distclean
-++  	rm -f $(runtime_CONFIGURED_HEADERS)
-++  	$(MAKE) -C stdlib distclean
-++-@@ -1737,7 +1949,7 @@ endif
-+++@@ -1741,7 +1953,7 @@ endif
-++  	  compilerlibs/*.cma compilerlibs/META \
-++  	  "$(INSTALL_COMPLIBDIR)"
-++  	$(INSTALL_DATA) \
-++@@ -1051,7 +1051,7 @@
-++  	   "$(INSTALL_COMPLIBDIR)"
-++  	$(INSTALL_PROG) $(expunge) "$(INSTALL_LIBDIR)"
-++  # If installing over a previous OCaml version, ensure some modules are removed
-++-@@ -1840,7 +2052,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-+++@@ -1844,7 +2056,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
-++  	    "$(INSTALL_COMPLIBDIR)"
-++  endif
-++  	$(INSTALL_DATA) \
-++@@ -1060,7 +1060,7 @@
-++  	    "$(INSTALL_COMPLIBDIR)"
-++  ifeq "$(build_ocamldoc)" "true"
-++  	$(MAKE) -C ocamldoc installopt
-++-@@ -1893,9 +2105,9 @@ endif
-+++@@ -1897,9 +2109,9 @@ endif
-++  	   compilerlibs/*.cmxa compilerlibs/*.$(A) \
-++  	   "$(INSTALL_COMPLIBDIR)"
-++  	$(INSTALL_DATA) \
-++@@ -1245,7 +1245,7 @@
-++  AC_SUBST([cc_has_debug_prefix_map])
-++  AC_SUBST([as_has_debug_prefix_map])
-++  AC_SUBST([with_debugger]) # TODO: rename this variable
-++-@@ -672,9 +669,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-+++@@ -684,9 +681,8 @@ AS_IF([test x"$enable_unix_lib" != "xno"],
-++      otherlibs/unix/unix.ml:otherlibs/unix/unix_${unix_or_win32}.ml
-++    ])
-++    ocamltest_unix_impl="real"
-++@@ -1257,7 +1257,7 @@
-++    [ocamltest_libunix="None"])
-++  
-++  AS_IF([test x"$enable_str_lib" != "xno"],
-++-@@ -2264,7 +2260,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-+++@@ -2318,7 +2314,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
-++    [ocamltest=''])
-++  
-++  AS_IF([test -n "$ocamltest"],
-++@@ -1944,12 +1944,12 @@
-++ diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++ --- a/tools/ci/appveyor/appveyor_build.sh
-++ +++ b/tools/ci/appveyor/appveyor_build.sh
-++-@@ -153,7 +153,7 @@ case "$1" in
-++-     # Now reconfigure ocamltest to run in bytecode-only mode
-++-     sed -i '/native_/s/true/false/' \
-++-            "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++--    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-+    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
-++-     # And run the entire testsuite, skipping all the native-code tests
-+++@@ -160,7 +160,7 @@ case "$1" in
-+++       # Now reconfigure ocamltest to run in bytecode-only mode
-+++       sed -i '/native_/s/true/false/' \
-+++              "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
-+++       # And run the entire testsuite, skipping all the native-code tests
-+++     fi
-++      run "test $PORT" \
-++-         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:48:28.878658672 +0100
++++++ b	2023-09-28 18:48:28.894659239 +0100
+++@@ -25,7 +25,7 @@
+++ diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
+++ --- a/testsuite/tests/lib-bigarray/bigarrays.ml
+++ +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
+++-@@ -1164,7 +1164,7 @@ let tests () =
++++@@ -1166,7 +1166,7 @@ let tests () =
+++    test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
+++    test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
+++                                       makecomplex);
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -9349,7 +8957,7 @@ index 0000000000..a6fd67824a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 075d5fc2dc..fa60ab5977 100644
++index c8bc07d3fe..73e4e89236 100644
 +--- a/Changes
 ++++ b/Changes
 +@@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
@@ -14227,7 +13835,7 @@ index 0000000000..a6fd67824a
 +++}
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..21d2df04e6
++index 0000000000..c7a3ee0fe0
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,4011 @@
@@ -18158,7 +17766,7 @@ index 0000000000..a6fd67824a
 ++    bytecode;
 ++  }{
 ++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
+++index c35092e914..bbf1271cdf 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
 +++++ b/tools/ci/appveyor/appveyor_build.sh
 ++@@ -64,8 +64,8 @@ function set_configuration {
@@ -18197,49 +17805,14 @@ index 0000000000..a6fd67824a
 ++-    # Now reconfigure ocamltest to run in bytecode-only mode
 ++-    sed -i '/native_/s/true/false/' \
 ++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
 ++-    # And run the entire testsuite, skipping all the native-code tests
 +++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
 +++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
 +++      # tests now (to include natdynlink)
 +++      run "test dynlink $PORT" \
 +++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../$BUILD_PRE
++++      # Now reconfigur
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
