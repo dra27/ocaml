@@ -1,11 +1,20 @@
---- a	2023-09-28 18:48:28.878658672 +0100
-+++ b	2023-09-28 18:48:28.894659239 +0100
-@@ -25,7 +25,7 @@
- diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
- --- a/testsuite/tests/lib-bigarray/bigarrays.ml
- +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
--@@ -1164,7 +1164,7 @@ let tests () =
-+@@ -1166,7 +1166,7 @@ let tests () =
-    test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
-    test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
-                                       makecomplex);
+--- a	2023-09-28 18:48:29.438678500 +0100
++++ b	2023-09-28 18:48:29.458679208 +0100
+@@ -408,7 +408,7 @@
+ diff --git a/stdlib/.depend b/stdlib/.depend
+ --- a/stdlib/.depend
+ +++ b/stdlib/.depend
+-@@ -400,15 +400,18 @@ stdlib__In_channel.cmo : in_channel.ml \
++@@ -356,15 +356,18 @@ stdlib__In_channel.cmo : in_channel.ml \
+      stdlib.cmi \
+      stdlib__Fun.cmi \
+      stdlib__Bytes.cmi \
+@@ -428,7 +428,7 @@
+  stdlib__Int.cmo : int.ml \
+      stdlib.cmi \
+      stdlib__Int.cmi
+-@@ -556,13 +559,16 @@ stdlib__Option.cmi : option.mli \
++@@ -507,13 +510,16 @@ stdlib__Option.cmi : option.mli \
+  stdlib__Out_channel.cmo : out_channel.ml \
+      stdlib.cmi \
+      stdlib__Fun.cmi \

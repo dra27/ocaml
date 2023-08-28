@@ -1,20 +1,29 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e8d1d95e61
+index 0000000000..74355782a5
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,11 @@
-+--- a	2023-09-28 18:48:28.878658672 +0100
-++++ b	2023-09-28 18:48:28.894659239 +0100
-+@@ -25,7 +25,7 @@
-+ diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
-+ --- a/testsuite/tests/lib-bigarray/bigarrays.ml
-+ +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
-+-@@ -1164,7 +1164,7 @@ let tests () =
-++@@ -1166,7 +1166,7 @@ let tests () =
-+    test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
-+    test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
-+                                       makecomplex);
+@@ -0,0 +1,20 @@
++--- a	2023-09-28 18:48:29.438678500 +0100
+++++ b	2023-09-28 18:48:29.458679208 +0100
++@@ -408,7 +408,7 @@
++ diff --git a/stdlib/.depend b/stdlib/.depend
++ --- a/stdlib/.depend
++ +++ b/stdlib/.depend
++-@@ -400,15 +400,18 @@ stdlib__In_channel.cmo : in_channel.ml \
+++@@ -356,15 +356,18 @@ stdlib__In_channel.cmo : in_channel.ml \
++      stdlib.cmi \
++      stdlib__Fun.cmi \
++      stdlib__Bytes.cmi \
++@@ -428,7 +428,7 @@
++  stdlib__Int.cmo : int.ml \
++      stdlib.cmi \
++      stdlib__Int.cmi
++-@@ -556,13 +559,16 @@ stdlib__Option.cmi : option.mli \
+++@@ -507,13 +510,16 @@ stdlib__Option.cmi : option.mli \
++  stdlib__Out_channel.cmo : out_channel.ml \
++      stdlib.cmi \
++      stdlib__Fun.cmi \
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -28,10 +37,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index c8bc07d3fe..73e4e89236 100644
+index fe803de046..99219923d6 100644
 --- a/Changes
 +++ b/Changes
-@@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1773,6 +1773,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -67,7 +76,7 @@ index c8bc07d3fe..73e4e89236 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1802,13 +1831,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1808,13 +1837,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -83,7 +92,7 @@ index c8bc07d3fe..73e4e89236 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1915,6 +1944,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1921,6 +1950,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -93,7 +102,7 @@ index c8bc07d3fe..73e4e89236 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2178,6 +2210,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2184,6 +2216,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -4906,10 +4915,10 @@ index 0000000000..3cd85b7c5f
 ++}
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..fb574cb8b9
+index 0000000000..82ceae78d2
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,4011 @@
+@@ -0,0 +1,4027 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index d5a2898dae..f14374c9c3 100644
 +--- a/.github/workflows/build.yml
@@ -6598,7 +6607,7 @@ index 0000000000..fb574cb8b9
 +   test_result=${TEST_SKIP}
 + else
 +diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
-+index d8846babdd..f4e35b0c25 100644
++index d8846babdd..5d0b805e20 100644
 +--- a/testsuite/tests/lib-bigarray/bigarrays.ml
 ++++ b/testsuite/tests/lib-bigarray/bigarrays.ml
 +@@ -243,6 +243,7 @@ let tests () =
@@ -6617,8 +6626,18 @@ index 0000000000..fb574cb8b9
 + 
 +   testing_function "set/get (specialized)";
 +   let a = Array1.create int c_layout 3 in
++@@ -1164,7 +1166,9 @@ let tests () =
++   test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
++   test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
++                                      makecomplex);
+++(*
++   test_structured_io 15 (from_list float16 [0.0; 0.25; -4.0; 3.141592654]);
+++*)
++   ()
++   [@@inline never]
++ 
 +diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
-+index 2ca2df4ae5..e82bdd548f 100644
++index 2ca2df4ae5..7fb39b0766 100644
 +--- a/testsuite/tests/lib-bigarray/bigarrays.reference
 ++++ b/testsuite/tests/lib-bigarray/bigarrays.reference
 +@@ -2,7 +2,7 @@
@@ -6630,6 +6649,12 @@ index 0000000000..fb574cb8b9
 + set/get (specialized)
 +  1... 2... 3... 4... 5... 6... 7... 8... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
 + set/get (unsafe, specialized)
++@@ -84,4 +84,4 @@ reshape
++ ------ I/O --------
++ 
++ output_value/input_value
++- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15...
+++ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14...
 +diff --git a/testsuite/tests/lib-bigarray/specialized.ml b/testsuite/tests/lib-bigarray/specialized.ml
 +index 6f30527a55..11a11dccbf 100644
 +--- a/testsuite/tests/lib-bigarray/specialized.ml
@@ -8923,27 +8948,36 @@ index 0000000000..fb574cb8b9
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bcf648da84
+index 0000000000..0550f291c8
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8886 @@
+@@ -0,0 +1,8900 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e8d1d95e61
++index 0000000000..74355782a5
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,11 @@
-++--- a	2023-09-28 18:48:28.878658672 +0100
-+++++ b	2023-09-28 18:48:28.894659239 +0100
-++@@ -25,7 +25,7 @@
-++ diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
-++ --- a/testsuite/tests/lib-bigarray/bigarrays.ml
-++ +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
-++-@@ -1164,7 +1164,7 @@ let tests () =
-+++@@ -1166,7 +1166,7 @@ let tests () =
-++    test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
-++    test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
-++                                       makecomplex);
++@@ -0,0 +1,20 @@
+++--- a	2023-09-28 18:48:29.438678500 +0100
++++++ b	2023-09-28 18:48:29.458679208 +0100
+++@@ -408,7 +408,7 @@
+++ diff --git a/stdlib/.depend b/stdlib/.depend
+++ --- a/stdlib/.depend
+++ +++ b/stdlib/.depend
+++-@@ -400,15 +400,18 @@ stdlib__In_channel.cmo : in_channel.ml \
++++@@ -356,15 +356,18 @@ stdlib__In_channel.cmo : in_channel.ml \
+++      stdlib.cmi \
+++      stdlib__Fun.cmi \
+++      stdlib__Bytes.cmi \
+++@@ -428,7 +428,7 @@
+++  stdlib__Int.cmo : int.ml \
+++      stdlib.cmi \
+++      stdlib__Int.cmi
+++-@@ -556,13 +559,16 @@ stdlib__Option.cmi : option.mli \
++++@@ -507,13 +510,16 @@ stdlib__Option.cmi : option.mli \
+++  stdlib__Out_channel.cmo : out_channel.ml \
+++      stdlib.cmi \
+++      stdlib__Fun.cmi \
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -8957,10 +8991,10 @@ index 0000000000..bcf648da84
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index c8bc07d3fe..73e4e89236 100644
++index fe803de046..99219923d6 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1767,6 +1767,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1773,6 +1773,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -8996,7 +9030,7 @@ index 0000000000..bcf648da84
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1802,13 +1831,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1808,13 +1837,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9012,7 +9046,7 @@ index 0000000000..bcf648da84
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1915,6 +1944,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1921,6 +1950,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -9022,7 +9056,7 @@ index 0000000000..bcf648da84
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2178,6 +2210,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2184,6 +2216,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13835,10 +13869,10 @@ index 0000000000..bcf648da84
 +++}
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..fb574cb8b9
++index 0000000000..82ceae78d2
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,4011 @@
++@@ -0,0 +1,4027 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index d5a2898dae..f14374c9c3 100644
 ++--- a/.github/workflows/build.yml
@@ -15527,7 +15561,7 @@ index 0000000000..bcf648da84
 ++   test_result=${TEST_SKIP}
 ++ else
 ++diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
-++index d8846babdd..f4e35b0c25 100644
+++index d8846babdd..5d0b805e20 100644
 ++--- a/testsuite/tests/lib-bigarray/bigarrays.ml
 +++++ b/testsuite/tests/lib-bigarray/bigarrays.ml
 ++@@ -243,6 +243,7 @@ let tests () =
@@ -15546,8 +15580,18 @@ index 0000000000..bcf648da84
 ++ 
 ++   testing_function "set/get (specialized)";
 ++   let a = Array1.create int c_layout 3 in
+++@@ -1164,7 +1166,9 @@ let tests () =
+++   test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
+++   test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
+++                                      makecomplex);
++++(*
+++   test_structured_io 15 (from_list float16 [0.0; 0.25; -4.0; 3.141592654]);
++++*)
+++   ()
+++   [@@inline never]
+++ 
 ++diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
-++index 2ca2df4ae5..e82bdd548f 100644
+++index 2ca2df4ae5..7fb39b0766 100644
 ++--- a/testsuite/tests/lib-bigarray/bigarrays.reference
 +++++ b/testsuite/tests/lib-bigarray/bigarrays.reference
 ++@@ -2,7 +2,7 @@
@@ -15559,6 +15603,12 @@ index 0000000000..bcf648da84
 ++ set/get (specialized)
 ++  1... 2... 3... 4... 5... 6... 7... 8... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
 ++ set/get (unsafe, specialized)
+++@@ -84,4 +84,4 @@ reshape
+++ ------ I/O --------
+++ 
+++ output_value/input_value
+++- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15...
++++ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14...
 ++diff --git a/testsuite/tests/lib-bigarray/specialized.ml b/testsuite/tests/lib-bigarray/specialized.ml
 ++index 6f30527a55..11a11dccbf 100644
 ++--- a/testsuite/tests/lib-bigarray/specialized.ml
@@ -17801,18 +17851,7 @@ index 0000000000..bcf648da84
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
 ++-    # tests now (to include natdynlink)
 ++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigur
+++-    
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
@@ -19359,7 +19398,7 @@ index d019a3f7db..0b7f89c25e 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index 54dab1bde2..c51ec4b672 100644
+index 2ec28052e0..6e93896515 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -19487,7 +19526,7 @@ index 54dab1bde2..c51ec4b672 100644
      stdlib__Atomic.cmx \
      stdlib__Array.cmx \
      stdlib__Hashtbl.cmi
-@@ -511,11 +467,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+@@ -514,11 +470,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
      stdlib__Seq.cmi \
      stdlib__Map.cmi \
      stdlib__Hashtbl.cmi
@@ -19499,7 +19538,7 @@ index 54dab1bde2..c51ec4b672 100644
  stdlib__Nativeint.cmo : nativeint.ml \
      stdlib__Sys.cmi \
      stdlib.cmi \
-@@ -620,7 +571,6 @@ stdlib__Random.cmo : random.ml \
+@@ -626,7 +577,6 @@ stdlib__Random.cmo : random.ml \
      stdlib__Nativeint.cmi \
      stdlib__Int64.cmi \
      stdlib__Int32.cmi \
@@ -19507,7 +19546,7 @@ index 54dab1bde2..c51ec4b672 100644
      stdlib__Digest.cmi \
      stdlib__Bytes.cmi \
      stdlib__Bigarray.cmi \
-@@ -632,7 +582,6 @@ stdlib__Random.cmx : random.ml \
+@@ -638,7 +588,6 @@ stdlib__Random.cmx : random.ml \
      stdlib__Nativeint.cmx \
      stdlib__Int64.cmx \
      stdlib__Int32.cmx \
@@ -19515,7 +19554,7 @@ index 54dab1bde2..c51ec4b672 100644
      stdlib__Digest.cmx \
      stdlib__Bytes.cmx \
      stdlib__Bigarray.cmx \
-@@ -672,15 +621,6 @@ stdlib__Scanf.cmx : scanf.ml \
+@@ -678,15 +627,6 @@ stdlib__Scanf.cmx : scanf.ml \
      stdlib__Scanf.cmi
  stdlib__Scanf.cmi : scanf.mli \
      stdlib.cmi
