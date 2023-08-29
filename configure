@@ -14730,6 +14730,15 @@ fi
 done
 
 
+case $host in #(
+  *-*-cygwin*|*-*-mingw32) :
+    common_cflags="$common_cflags -mfma" ;; #(
+  *-pc-windows) :
+    common_cflags="$common_cflags -ARCH:AVX2" ;; #(
+  *) :
+     ;;
+esac
+
 if $has_c99_float_ops; then :
   $as_echo "#define HAS_C99_FLOAT_OPS 1" >>confdefs.h
 

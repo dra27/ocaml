@@ -1268,6 +1268,12 @@ has_c99_float_ops=true
 AC_CHECK_FUNCS(m4_normalize([expm1 log1p hypot fma exp2 log2 cbrt acosh asinh
   atanh erf erfc trunc round copysign]), [], [has_c99_float_ops=false])
 
+AS_CASE([$host],
+  [*-*-cygwin*|*-*-mingw32],
+    [common_cflags="$common_cflags -mfma"],
+  [*-pc-windows],
+    [common_cflags="$common_cflags -ARCH:AVX2"])
+
 AS_IF([$has_c99_float_ops],
   [AC_DEFINE([HAS_C99_FLOAT_OPS])
   # Check whether round works (known bug in mingw-w64)
