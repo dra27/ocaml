@@ -14,10 +14,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 72609c135e..a0d8dad234 100644
+index 9f8b271bd2..a9924c746b 100644
 --- a/Changes
 +++ b/Changes
-@@ -1781,6 +1781,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1784,6 +1784,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -53,7 +53,7 @@ index 72609c135e..a0d8dad234 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1816,13 +1845,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1819,13 +1848,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -69,7 +69,7 @@ index 72609c135e..a0d8dad234 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1929,6 +1958,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1932,6 +1961,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -79,7 +79,7 @@ index 72609c135e..a0d8dad234 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2192,6 +2224,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2195,6 +2227,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -4949,10 +4949,10 @@ index 0000000000..653227f4f7
 ++}
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..82ceae78d2
+index 0000000000..7214b521a1
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,4027 @@
+@@ -0,0 +1,4041 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index d5a2898dae..f14374c9c3 100644
 +--- a/.github/workflows/build.yml
@@ -5046,6 +5046,20 @@ index 0000000000..82ceae78d2
 + val frame_pointers : bool
 + (** Whether frame-pointers have been enabled at configure time *)
 + 
++diff --git a/ocamltest/run_stubs.c b/ocamltest/run_stubs.c
++index 29fa27456f..01ef44a1b3 100644
++--- a/ocamltest/run_stubs.c
+++++ b/ocamltest/run_stubs.c
++@@ -54,6 +54,9 @@ static void free_cstringvect(array v)
++   caml_stat_free(v);
++ }
++ 
+++#define caml_channel_lock Lock
+++#define caml_channel_unlock Unlock
+++
++ static void logToChannel(void *voidchannel, const char *fmt, va_list ap)
++ {
++   struct channel *channel = (struct channel *) voidchannel;
 +diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
 +index 60a0e5f9df..efeb7fb8f0 100644
 +--- a/ocamltest/run_unix.c
@@ -8982,10 +8996,10 @@ index 0000000000..82ceae78d2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..2e88f418e4
+index 0000000000..71a9e44d8a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8913 @@
+@@ -0,0 +1,8916 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -9002,10 +9016,10 @@ index 0000000000..2e88f418e4
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 72609c135e..a0d8dad234 100644
++index 9f8b271bd2..a9924c746b 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1781,6 +1781,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1784,6 +1784,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -9041,7 +9055,7 @@ index 0000000000..2e88f418e4
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1816,13 +1845,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1819,13 +1848,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9057,7 +9071,7 @@ index 0000000000..2e88f418e4
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1929,6 +1958,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1932,6 +1961,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -9067,7 +9081,7 @@ index 0000000000..2e88f418e4
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2192,6 +2224,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2195,6 +2227,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -13937,10 +13951,10 @@ index 0000000000..2e88f418e4
 +++}
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..82ceae78d2
++index 0000000000..7214b521a1
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,4027 @@
++@@ -0,0 +1,4041 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index d5a2898dae..f14374c9c3 100644
 ++--- a/.github/workflows/build.yml
@@ -14034,6 +14048,20 @@ index 0000000000..2e88f418e4
 ++ val frame_pointers : bool
 ++ (** Whether frame-pointers have been enabled at configure time *)
 ++ 
+++diff --git a/ocamltest/run_stubs.c b/ocamltest/run_stubs.c
+++index 29fa27456f..01ef44a1b3 100644
+++--- a/ocamltest/run_stubs.c
++++++ b/ocamltest/run_stubs.c
+++@@ -54,6 +54,9 @@ static void free_cstringvect(array v)
+++   caml_stat_free(v);
+++ }
+++ 
++++#define caml_channel_lock Lock
++++#define caml_channel_unlock Unlock
++++
+++ static void logToChannel(void *voidchannel, const char *fmt, va_list ap)
+++ {
+++   struct channel *channel = (struct channel *) voidchannel;
 ++diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
 ++index 60a0e5f9df..efeb7fb8f0 100644
 ++--- a/ocamltest/run_unix.c
@@ -17887,18 +17915,7 @@ index 0000000000..2e88f418e4
 ++index c35092e914..bbf1271cdf 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
 +++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case 
+++@@ -64,8 +64,8 @@ f
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
