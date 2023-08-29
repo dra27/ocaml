@@ -432,12 +432,15 @@ int main (void) {
 
 AC_DEFUN([OCAML_C99_CHECK_FMA], [
   AC_MSG_CHECKING([whether fma works])
+  has_working_fma=true
+  OCAML_CC_SAVE_VARIABLES
+  CFLAGS="$common_cflags $internal_cflags $CFLAGS"
   OCAML_RUN_IFELSE(
     [AC_LANG_SOURCE([[
 #include <math.h>
 int main (void) {
   /* Tests 264-266 from testsuite/tests/fma/fma.ml. These tests trigger the
-     broken implementations of Cygwin64, mingw-w64 (x86_64) and VS2013-2017.
+     broken emulated implementations of Cygwin64, mingw-w64 (x86_64) and MSVC.
      The static volatile variables aim to thwart GCC's constant folding. */
   static volatile double x, y, z;
   volatile double t264, t265, t266;
@@ -462,27 +465,19 @@ int main (void) {
        || !(t266 == 0x8p-1076));
 }
     ]])],
-    [AC_MSG_RESULT([yes])
-    AC_DEFINE([HAS_WORKING_FMA])],
+    [AC_MSG_RESULT([yes])],
     [AC_MSG_RESULT([no])
+    has_working_fma=false
     AS_CASE([$enable_imprecise_c99_float_ops,$target],
-      [no,*], [hard_error=true],
       [yes,*], [hard_error=false],
-      [*,x86_64-w64-mingw32|*,x86_64-*-cygwin*], [hard_error=false],
-      [AS_CASE([$ocaml_cv_cc_vendor],
-        [msvc-*], [AS_IF([test "${ocaml_cv_cc_vendor#msvc-}" -lt 1920 ],
-          [hard_error=false],
-          [hard_error=true])],
-        [hard_error=true])])
+      [hard_error=true])
     AS_IF([test x"$hard_error" = "xtrue"],
       [AC_MSG_ERROR(m4_normalize([
         fma does not work, enable emulation with
         --enable-imprecise-c99-float-ops]))],
       [AC_MSG_WARN(m4_normalize([
         fma does not work; emulation enabled]))])],
-    [AS_CASE([$target],
-      [x86_64-w64-mingw32|x86_64-*-cygwin*],
-        [AC_MSG_RESULT([cross-compiling; assume not])],
-      [AC_MSG_RESULT([cross-compiling; assume yes])
-      AC_DEFINE([HAS_WORKING_FMA])])])
+    [AC_MSG_RESULT([cross-compiling; assume yes])])
+  OCAML_CC_RESTORE_VARIABLES
+  AS_IF([$has_working_fma],[AC_DEFINE([HAS_WORKING_FMA])])
 ])

@@ -14801,22 +14801,28 @@ fi
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether fma works" >&5
 $as_echo_n "checking whether fma works... " >&6; }
+  has_working_fma=true
+
+  saved_CC="$CC"
+  saved_CFLAGS="$CFLAGS"
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+  saved_ac_ext="$ac_ext"
+  saved_ac_compile="$ac_compile"
+  # Move the content of confdefs.h to another file so it does not
+  # get included
+  mv confdefs.h confdefs.h.bak
+  touch confdefs.h
+
+  CFLAGS="$common_cflags $internal_cflags $CFLAGS"
 
   old_cross_compiling="$cross_compiling"
   if test "x$host_runnable" = 'xtrue'; then :
   cross_compiling='no'
 fi
   if test "$cross_compiling" = yes; then :
-  case $target in #(
-  x86_64-w64-mingw32|x86_64-*-cygwin*) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: cross-compiling; assume not" >&5
-$as_echo "cross-compiling; assume not" >&6; } ;; #(
-  *) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: cross-compiling; assume yes" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: cross-compiling; assume yes" >&5
 $as_echo "cross-compiling; assume yes" >&6; }
-      $as_echo "#define HAS_WORKING_FMA 1" >>confdefs.h
- ;;
-esac
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -14824,7 +14830,7 @@ else
 #include <math.h>
 int main (void) {
   /* Tests 264-266 from testsuite/tests/fma/fma.ml. These tests trigger the
-     broken implementations of Cygwin64, mingw-w64 (x86_64) and VS2013-2017.
+     broken emulated implementations of Cygwin64, mingw-w64 (x86_64) and MSVC.
      The static volatile variables aim to thwart GCC's constant folding. */
   static volatile double x, y, z;
   volatile double t264, t265, t266;
@@ -14853,29 +14859,15 @@ _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-    $as_echo "#define HAS_WORKING_FMA 1" >>confdefs.h
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+    has_working_fma=false
     case $enable_imprecise_c99_float_ops,$target in #(
-  no,*) :
-    hard_error=true ;; #(
   yes,*) :
     hard_error=false ;; #(
-  *,x86_64-w64-mingw32|*,x86_64-*-cygwin*) :
-    hard_error=false ;; #(
-  *) :
-    case $ocaml_cv_cc_vendor in #(
-  msvc-*) :
-    if test "${ocaml_cv_cc_vendor#msvc-}" -lt 1920 ; then :
-  hard_error=false
-else
-  hard_error=true
-fi ;; #(
   *) :
     hard_error=true ;;
-esac ;;
 esac
     if test x"$hard_error" = "xtrue"; then :
   as_fn_error $? "fma does not work, enable emulation with --enable-imprecise-c99-float-ops" "$LINENO" 5
@@ -14890,6 +14882,20 @@ fi
 
   cross_compiling="$old_cross_compiling"
 
+
+  # Restore the content of confdefs.h
+  mv confdefs.h.bak confdefs.h
+  ac_compile="$saved_ac_compile"
+  ac_ext="$saved_ac_ext"
+  CPPFLAGS="$saved_CPPFLAGS"
+  CFLAGS="$saved_CFLAGS"
+  CC="$saved_CC"
+  LIBS="$saved_LIBS"
+
+  if $has_working_fma; then :
+  $as_echo "#define HAS_WORKING_FMA 1" >>confdefs.h
+
+fi
 
 else
   if test x"$enable_imprecise_c99_float_ops" != "xyes" ; then :
