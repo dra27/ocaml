@@ -1,29 +1,144 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..74355782a5
+index 0000000000..4a35f26cd5
 --- /dev/null
 +++ b/.Diff-of-diff.diff
-@@ -0,0 +1,20 @@
-+--- a	2023-09-28 18:48:29.438678500 +0100
-++++ b	2023-09-28 18:48:29.458679208 +0100
-+@@ -408,7 +408,7 @@
-+ diff --git a/stdlib/.depend b/stdlib/.depend
-+ --- a/stdlib/.depend
-+ +++ b/stdlib/.depend
-+-@@ -400,15 +400,18 @@ stdlib__In_channel.cmo : in_channel.ml \
-++@@ -356,15 +356,18 @@ stdlib__In_channel.cmo : in_channel.ml \
-+      stdlib.cmi \
-+      stdlib__Fun.cmi \
-+      stdlib__Bytes.cmi \
-+@@ -428,7 +428,7 @@
-+  stdlib__Int.cmo : int.ml \
-+      stdlib.cmi \
-+      stdlib__Int.cmi
-+-@@ -556,13 +559,16 @@ stdlib__Option.cmi : option.mli \
-++@@ -507,13 +510,16 @@ stdlib__Option.cmi : option.mli \
-+  stdlib__Out_channel.cmo : out_channel.ml \
-+      stdlib.cmi \
-+      stdlib__Fun.cmi \
+@@ -0,0 +1,135 @@
++--- a	2023-09-28 18:48:30.070700875 +0100
+++++ b	2023-09-28 18:48:30.102702007 +0100
++@@ -114,7 +114,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -599,6 +599,9 @@ asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
+++@@ -600,6 +600,9 @@ asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
++  asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
++  	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
++  
++@@ -124,7 +124,7 @@
++  # Preprocess the code emitters
++  cvt_emit = tools/cvt_emit$(EXE)
++  
++-@@ -1734,7 +1737,8 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
+++@@ -1735,7 +1738,8 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
++  
++  ARCH_SPECIFIC =\
++    asmcomp/arch.mli asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml \
++@@ -137,7 +137,7 @@
++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++ --- a/asmcomp/amd64/emit.mlp
++ +++ b/asmcomp/amd64/emit.mlp
++-@@ -461,7 +461,6 @@ let emit_instr env fallthrough i =
+++@@ -471,7 +471,6 @@ let emit_instr env fallthrough i =
++    match i.desc with
++    | Lend -> ()
++    | Lprologue ->
++@@ -145,8 +145,8 @@
++      if fp then begin
++        I.push rbp;
++        cfi_adjust_cfa_offset 8;
++-@@ -908,12 +907,11 @@ let fundecl fundecl =
++-   cfi_startproc ();
+++@@ -964,12 +963,11 @@ let fundecl fundecl =
+++ (* BACKPORT
++    if !Clflags.runtime_variant = "d" then
++      emit_call "caml_assert_stack_invariants";
++ -  let { max_frame_size; contains_nontail_calls} =
++@@ -165,7 +165,7 @@
++ diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
++ --- a/asmcomp/amd64/proc.ml
++ +++ b/asmcomp/amd64/proc.ml
++-@@ -365,15 +365,6 @@ let max_register_pressure =
+++@@ -377,15 +377,6 @@ let max_register_pressure =
++        consumes ~int:0 ~float:1
++    | _ -> consumes ~int:0 ~float:0
++  
++@@ -228,7 +228,7 @@
++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
++ --- a/asmcomp/arm64/emit.mlp
++ +++ b/asmcomp/arm64/emit.mlp
++-@@ -85,7 +85,7 @@ let emit_wreg = function
+++@@ -87,7 +87,7 @@ let emit_wreg = function
++  let initial_stack_offset f =
++    8 * f.fun_num_stack_slots.(0) +
++    8 * f.fun_num_stack_slots.(1) +
++@@ -237,7 +237,7 @@
++  
++  let frame_size env =
++    let sz =
++-@@ -274,7 +274,7 @@ let emit_stack_adjustment n =
+++@@ -276,7 +276,7 @@ let emit_stack_adjustment n =
++  
++  let output_epilogue env f =
++    let n = frame_size env in
++@@ -246,7 +246,7 @@
++      `	ldr	x30, [sp, #{emit_int (n-8)}]\n`;
++    if n > 0 then
++      emit_stack_adjustment n;
++-@@ -443,10 +443,10 @@ module BR = Branch_relaxation.Make (struct
+++@@ -445,10 +445,10 @@ module BR = Branch_relaxation.Make (struct
++  
++    let prologue_size f =
++      (if initial_stack_offset f > 0 then 2 else 0)
++@@ -259,7 +259,7 @@
++  
++    let instr_size f = function
++      | Lend -> 0
++-@@ -681,11 +681,10 @@ let emit_instr env i =
+++@@ -701,11 +701,10 @@ let emit_instr env i =
++      match i.desc with
++      | Lend -> ()
++      | Lprologue ->
++@@ -272,8 +272,8 @@
++          cfi_offset ~reg:30 (* return address *) ~offset:(-8);
++          `	str	x30, [sp, #{emit_int (n-8)}]\n`
++        end
++-@@ -1079,12 +1078,10 @@ let fundecl fundecl =
++-   emit_symbol_type emit_symbol fundecl.fun_name "function";
+++@@ -1138,12 +1137,10 @@ let fundecl fundecl =
+++ (* BACKPORT
++    (* Dynamic stack checking *)
++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
++ -  let { max_frame_size; contains_nontail_calls} =
++@@ -570,7 +570,7 @@
++              `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
++              `	mtlr	11\n`
++            end;
++-@@ -907,12 +906,10 @@ let fundecl fundecl =
+++@@ -913,12 +912,10 @@ let fundecl fundecl =
++    `	.align	2\n`;
++    (* Dynamic stack checking *)
++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
++@@ -717,8 +717,8 @@
++          emit_stack_adjustment n;
++          `	{emit_tail func}\n`
++        end
++-@@ -627,12 +626,10 @@ let fundecl fundecl =
++- 
+++@@ -634,12 +633,10 @@ let fundecl fundecl =
+++ (* BACKPORT
++    (* Dynamic stack checking *)
++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
++ -  let { max_frame_size; contains_nontail_calls } =
++@@ -832,7 +832,7 @@
++              `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`;
++            emit_stack_adjust (-n);
++            if !pic_code then
++-@@ -724,12 +723,10 @@ let fundecl fundecl =
+++@@ -730,12 +729,10 @@ let fundecl fundecl =
++  
++    (* Dynamic stack checking *)
++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
++@@ -846,8 +846,8 @@
++ +  if fundecl.fun_contains_nontail_calls
++ +  || max_frame_size >= stack_threshold_size then begin
++      let overflow = new_label () and ret = new_label () in
+++ (* BACKPORT
++      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
++-     let f = max_frame_size + threshold_offset in
++ diff --git a/asmcomp/s390x/proc.ml b/asmcomp/s390x/proc.ml
++ --- a/asmcomp/s390x/proc.ml
++ +++ b/asmcomp/s390x/proc.ml
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -37,10 +152,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index fe803de046..99219923d6 100644
+index eae2d8e5d7..b51e733f50 100644
 --- a/Changes
 +++ b/Changes
-@@ -1773,6 +1773,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1778,6 +1778,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -76,7 +191,7 @@ index fe803de046..99219923d6 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1808,13 +1837,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1813,13 +1842,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -92,7 +207,7 @@ index fe803de046..99219923d6 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1921,6 +1950,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1926,6 +1955,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -102,7 +217,7 @@ index fe803de046..99219923d6 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2184,6 +2216,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2189,6 +2221,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -113,7 +228,7 @@ index fe803de046..99219923d6 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 3a9966ba52..705d8ac003 100644
+index 365eb72668..b9dfc003a4 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -416,9 +416,6 @@ flexlink.opt$(EXE): \
@@ -137,7 +252,7 @@ index 3a9966ba52..705d8ac003 100644
  INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
  INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
  FLEXDLL_MANIFEST = default_$(ARCH).manifest
-@@ -631,7 +632,6 @@ partialclean::
+@@ -634,7 +635,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -145,7 +260,7 @@ index 3a9966ba52..705d8ac003 100644
    afl \
    alloc \
    array \
-@@ -639,24 +639,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -642,24 +642,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -173,7 +288,7 @@ index 3a9966ba52..705d8ac003 100644
    main \
    major_gc \
    md5 \
-@@ -667,17 +667,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -670,17 +670,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -191,7 +306,7 @@ index 3a9966ba52..705d8ac003 100644
    sys \
    $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
    $(UNIX_OR_WIN32) \
-@@ -688,6 +683,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -691,6 +686,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -201,7 +316,7 @@ index 3a9966ba52..705d8ac003 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -698,7 +696,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -701,7 +699,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -210,7 +325,7 @@ index 3a9966ba52..705d8ac003 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1087,12 +1085,14 @@ clean::
+@@ -1090,12 +1088,14 @@ clean::
  
  # Dependencies
  
@@ -227,7 +342,7 @@ index 3a9966ba52..705d8ac003 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1174,6 +1174,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1177,6 +1177,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -235,7 +350,7 @@ index 3a9966ba52..705d8ac003 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1914,6 +1915,9 @@ endif
+@@ -1918,6 +1919,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -283,7 +398,7 @@ index ce0406e3d8..20f7595c89 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index d549fc5dfd..76fd0c2f75 100644
+index 09c8b79089..d2b7413316 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -324,7 +439,7 @@ index d549fc5dfd..76fd0c2f75 100644
    else
      env.stack_offset + 8
  
-@@ -533,19 +543,35 @@ let emit_instr env fallthrough i =
+@@ -532,19 +542,35 @@ let emit_instr env fallthrough i =
            end
          end
        end
@@ -362,7 +477,7 @@ index d549fc5dfd..76fd0c2f75 100644
          I.mov rsp rbx;
          cfi_remember_state ();
          cfi_def_cfa_register "rbx";
-@@ -553,10 +579,12 @@ let emit_instr env fallthrough i =
+@@ -552,10 +578,12 @@ let emit_instr env fallthrough i =
             will not unwind through this unless we were to tag this
             calling frame with cfi_signal_frame in it's definition. *)
          I.mov (domain_field Domainstate.Domain_c_stack) rsp;
@@ -376,7 +491,7 @@ index d549fc5dfd..76fd0c2f75 100644
        end
    | Lop(Istackoffset n) ->
        if n < 0
-@@ -739,7 +767,10 @@ let emit_instr env fallthrough i =
+@@ -738,7 +766,10 @@ let emit_instr env fallthrough i =
    | Lop(Ispecific(Izextend32)) ->
        I.mov (arg32 i 0) (res32 i 0)
    | Lop (Idls_get) ->
@@ -387,7 +502,7 @@ index d549fc5dfd..76fd0c2f75 100644
    | Lop (Ireturn_addr) ->
        let offset = frame_size env - 8 in
        I.mov (mem64 QWORD offset RSP) (res i 0)
-@@ -846,12 +877,24 @@ let emit_instr env fallthrough i =
+@@ -845,12 +876,24 @@ let emit_instr env fallthrough i =
        load_label_addr lbl_handler r11;
        I.push r11;
        cfi_adjust_cfa_offset 8;
@@ -412,7 +527,7 @@ index d549fc5dfd..76fd0c2f75 100644
        cfi_adjust_cfa_offset (-8);
        I.add (int 8) rsp;
        cfi_adjust_cfa_offset (-8);
-@@ -859,10 +902,17 @@ let emit_instr env fallthrough i =
+@@ -858,10 +901,17 @@ let emit_instr env fallthrough i =
    | Lraise k ->
        begin match k with
        | Lambda.Raise_regular ->
@@ -430,7 +545,7 @@ index d549fc5dfd..76fd0c2f75 100644
            record_frame env Reg.Set.empty (Dbg_raise i.dbg)
        | Lambda.Raise_notrace ->
            if Config.tsan then begin
-@@ -871,8 +921,13 @@ let emit_instr env fallthrough i =
+@@ -870,8 +920,13 @@ let emit_instr env fallthrough i =
              emit_call "caml_tsan_raise_notrace_exn";
              record_frame env Reg.Set.empty (Dbg_raise i.dbg)
            end else begin
@@ -444,15 +559,15 @@ index d549fc5dfd..76fd0c2f75 100644
              I.pop r11;
              I.jmp r11
            end
-@@ -906,6 +961,7 @@ let fundecl fundecl =
+@@ -905,6 +960,7 @@ let fundecl fundecl =
    D.label (emit_symbol fundecl.fun_name);
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc ();
 +(* BACKPORT
    if !Clflags.runtime_variant = "d" then
      emit_call "caml_assert_stack_invariants";
-   let { max_frame_size; contains_nontail_calls} =
-@@ -923,9 +979,11 @@ let fundecl fundecl =
+   let max_frame_size =
+@@ -921,9 +977,11 @@ let fundecl fundecl =
        Some (overflow, ret)
      end else None
    in
@@ -464,7 +579,7 @@ index d549fc5dfd..76fd0c2f75 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -942,6 +1000,7 @@ let fundecl fundecl =
+@@ -940,6 +998,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -473,7 +588,7 @@ index d549fc5dfd..76fd0c2f75 100644
      let n = (frame_size env) - 8 - (if fp then 8 else 0) in
      if n <> 0
 diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-index cd50cba52b..32726ea7dc 100644
+index 97e55e80ff..811bb8e98d 100644
 --- a/asmcomp/amd64/proc.ml
 +++ b/asmcomp/amd64/proc.ml
 @@ -235,7 +235,11 @@ let win64_float_external_arguments =
@@ -511,7 +626,7 @@ index cd50cba52b..32726ea7dc 100644
         108;109;110;111;112;113;114;115])
  
 diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-index 785d43d6cd..502ded4b13 100644
+index 630ff9eaff..5a563a6b7e 100644
 --- a/asmcomp/arm64/emit.mlp
 +++ b/asmcomp/arm64/emit.mlp
 @@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -578,7 +693,7 @@ index 785d43d6cd..502ded4b13 100644
        | Lambda.Raise_reraise -> 1
        | Lambda.Raise_notrace -> 4
        end
-@@ -743,7 +763,8 @@ let emit_instr env i =
+@@ -742,7 +762,8 @@ let emit_instr env i =
            `	b	{emit_label env.f.fun_tailrec_entry_point_label}\n`
          else
            output_epilogue env (fun () -> `	b	{emit_symbol func}\n`)
@@ -588,7 +703,7 @@ index 785d43d6cd..502ded4b13 100644
          if stack_ofs > 0 then begin
            `	mov	{emit_reg reg_stack_arg_begin}, sp\n`;
            `	add	{emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
-@@ -751,9 +772,18 @@ let emit_instr env i =
+@@ -750,9 +771,18 @@ let emit_instr env i =
            `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
            `{record_frame env i.live (Dbg_other i.dbg)}\n`
          end else if alloc then begin
@@ -607,7 +722,7 @@ index 785d43d6cd..502ded4b13 100644
          end else begin
            (* store ocaml stack in the frame pointer register
               NB: no need to store previous x29 because OCaml frames don't
-@@ -768,6 +798,7 @@ let emit_instr env i =
+@@ -767,6 +797,7 @@ let emit_instr env i =
            `	mov	sp, x29\n`;
            cfi_restore_state ()
          end
@@ -615,7 +730,7 @@ index 785d43d6cd..502ded4b13 100644
      | Lop(Istackoffset n) ->
          assert (n mod 16 = 0);
          emit_stack_adjustment (-n);
-@@ -808,7 +839,11 @@ let emit_instr env i =
+@@ -807,7 +838,11 @@ let emit_instr env i =
          | Double ->
              `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
          end
@@ -627,7 +742,7 @@ index 785d43d6cd..502ded4b13 100644
          (* NB: assignments other than Word_int and Word_val do not follow the
          Multicore OCaml memory model and so do not emit a barrier *)
          let src = i.arg.(0) in
-@@ -831,7 +866,10 @@ let emit_instr env i =
+@@ -830,7 +865,10 @@ let emit_instr env i =
              `	str	s7, {emit_addressing addr base}\n`;
          | Word_int | Word_val ->
              (* memory model barrier for non-initializing store *)
@@ -638,7 +753,7 @@ index 785d43d6cd..502ded4b13 100644
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
          | Double ->
              `	str	{emit_reg src}, {emit_addressing addr base}\n`
-@@ -960,8 +998,13 @@ let emit_instr env i =
+@@ -959,8 +997,13 @@ let emit_instr env i =
      | Lop(Ispecific(Isignext size)) ->
          `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
      | Lop(Idls_get) ->
@@ -652,7 +767,7 @@ index 785d43d6cd..502ded4b13 100644
      | Lop(Ireturn_addr) ->
          invalid_arg (
            "Support for Ireturn_addr is not implemented on architecture "
-@@ -1052,10 +1095,18 @@ let emit_instr env i =
+@@ -1051,10 +1094,18 @@ let emit_instr env i =
      | Lraise k ->
          begin match k with
          | Lambda.Raise_regular ->
@@ -671,7 +786,7 @@ index 785d43d6cd..502ded4b13 100644
            `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
          | Lambda.Raise_notrace ->
            `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-@@ -1077,6 +1128,14 @@ let fundecl fundecl =
+@@ -1076,6 +1127,14 @@ let fundecl fundecl =
    `	.align	3\n`;
    `	.globl	{emit_symbol fundecl.fun_name}\n`;
    emit_symbol_type emit_symbol fundecl.fun_name "function";
@@ -685,8 +800,8 @@ index 785d43d6cd..502ded4b13 100644
 +(* BACKPORT
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
-   let { max_frame_size; contains_nontail_calls} =
-@@ -1115,8 +1174,11 @@ let fundecl fundecl =
+   let max_frame_size = frame_size env + fundecl.fun_extra_stack_used in
+@@ -1112,8 +1171,11 @@ let fundecl fundecl =
    let num_call_gc, num_check_bound =
      num_call_gc_and_check_bound_points env
    in
@@ -807,10 +922,10 @@ index 35af8ebebf..eb4bbf812b 100644
  
  type rhs_kind =
 diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
-index 386c30bd74..a51bbda15e 100644
+index 6630728a37..e323f2f76d 100644
 --- a/asmcomp/power/emit.mlp
 +++ b/asmcomp/power/emit.mlp
-@@ -655,8 +655,10 @@ let emit_instr env i =
+@@ -654,8 +654,10 @@ let emit_instr env i =
            (* Save OCaml stack pointer in a callee-save register *)
            `	mr	28, 1\n`;
            (* Switch to C stack *)
@@ -821,7 +936,7 @@ index 386c30bd74..a51bbda15e 100644
            emit_call func;
            emit_call_nop();
            (* Switch back to OCaml stack *)
-@@ -780,8 +782,12 @@ let emit_instr env i =
+@@ -779,8 +781,12 @@ let emit_instr env i =
          let instr = name_for_specific sop in
          `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
      | Lop (Idls_get) ->
@@ -834,7 +949,7 @@ index 386c30bd74..a51bbda15e 100644
      | Lop (Ireturn_addr) ->
          invalid_arg (
            "Support for Ireturn_addr is not implemented on architecture "
-@@ -936,12 +942,14 @@ let fundecl fundecl =
+@@ -933,12 +939,14 @@ let fundecl fundecl =
    begin match !handle_overflow with
    | None -> ()
    | Some(overflow, ret) ->
@@ -850,10 +965,10 @@ index 386c30bd74..a51bbda15e 100644
        `	ble-	{emit_label overflow}\n`;
        `{emit_label ret}:\n`
 diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-index 1d8c3a4db4..d6318bcf6f 100644
+index 01d4b5d717..844efd2048 100644
 --- a/asmcomp/riscv/emit.mlp
 +++ b/asmcomp/riscv/emit.mlp
-@@ -341,8 +341,10 @@ let emit_instr env i =
+@@ -340,8 +340,10 @@ let emit_instr env i =
          `	mv	s0, sp\n`;
          cfi_remember_state ();
          cfi_def_cfa_register ~reg:21;
@@ -864,7 +979,7 @@ index 1d8c3a4db4..d6318bcf6f 100644
          `	{emit_call func}\n`;
          `	mv	sp, s0\n`;
          cfi_restore_state ()
-@@ -498,8 +500,12 @@ let emit_instr env i =
+@@ -497,8 +499,12 @@ let emit_instr env i =
        let instr = name_for_specific sop in
        `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
    | Lop (Idls_get) ->
@@ -877,15 +992,15 @@ index 1d8c3a4db4..d6318bcf6f 100644
    | Lop (Ireturn_addr) ->
        invalid_arg (
          "Support for Ireturn_addr is not implemented on architecture "
-@@ -625,6 +631,7 @@ let fundecl fundecl =
+@@ -624,6 +630,7 @@ let fundecl fundecl =
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc();
  
 +(* BACKPORT
    (* Dynamic stack checking *)
    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
-   let { max_frame_size; contains_nontail_calls } =
-@@ -644,11 +651,13 @@ let fundecl fundecl =
+   let max_frame_size = frame_size env + fundecl.fun_extra_stack_used in
+@@ -641,11 +648,13 @@ let fundecl fundecl =
        Some (overflow, ret)
      end else None
    in
@@ -899,7 +1014,7 @@ index 1d8c3a4db4..d6318bcf6f 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow, ret) ->
-@@ -665,6 +674,7 @@ let fundecl fundecl =
+@@ -662,6 +671,7 @@ let fundecl fundecl =
        `	addi	sp, sp, 16\n`;
        `	j	{emit_label ret}\n`
    end;
@@ -908,10 +1023,10 @@ index 1d8c3a4db4..d6318bcf6f 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
-index 49b4e61640..f0afd9e4b8 100644
+index e72f2ba97d..6919cb2bef 100644
 --- a/asmcomp/s390x/emit.mlp
 +++ b/asmcomp/s390x/emit.mlp
-@@ -385,8 +385,10 @@ let emit_instr env i =
+@@ -384,8 +384,10 @@ let emit_instr env i =
            (* NB: gdb has asserts on contiguous stacks that mean it
               will not unwind through this unless we were to tag this
               calling frame with cfi_signal_frame in it's definition. *)
@@ -922,7 +1037,7 @@ index 49b4e61640..f0afd9e4b8 100644
            emit_call func;
            ` lgr %r15, %r12\n`;
            cfi_restore_state ()
-@@ -593,8 +595,12 @@ let emit_instr env i =
+@@ -592,8 +594,12 @@ let emit_instr env i =
          let instr = name_for_specific sop in
          `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
      | Lop (Idls_get) ->
@@ -935,9 +1050,9 @@ index 49b4e61640..f0afd9e4b8 100644
      | Lop (Ireturn_addr) ->
          invalid_arg (
            "Support for Ireturn_addr is not implemented on architecture "
-@@ -731,11 +737,13 @@ let fundecl fundecl =
-   let handle_overflow = ref None in
-   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
+@@ -728,11 +734,13 @@ let fundecl fundecl =
+   if fundecl.fun_contains_nontail_calls
+   || max_frame_size >= stack_threshold_size then begin
      let overflow = new_label () and ret = new_label () in
 +(* BACKPORT
      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
@@ -9005,36 +9120,151 @@ index 0000000000..82ceae78d2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..aa26e80e73
+index 0000000000..4e2047ea65
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9005 @@
+@@ -0,0 +1,9117 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..74355782a5
++index 0000000000..4a35f26cd5
 +--- /dev/null
 ++++ b/.Diff-of-diff.diff
-+@@ -0,0 +1,20 @@
-++--- a	2023-09-28 18:48:29.438678500 +0100
-+++++ b	2023-09-28 18:48:29.458679208 +0100
-++@@ -408,7 +408,7 @@
-++ diff --git a/stdlib/.depend b/stdlib/.depend
-++ --- a/stdlib/.depend
-++ +++ b/stdlib/.depend
-++-@@ -400,15 +400,18 @@ stdlib__In_channel.cmo : in_channel.ml \
-+++@@ -356,15 +356,18 @@ stdlib__In_channel.cmo : in_channel.ml \
-++      stdlib.cmi \
-++      stdlib__Fun.cmi \
-++      stdlib__Bytes.cmi \
-++@@ -428,7 +428,7 @@
-++  stdlib__Int.cmo : int.ml \
-++      stdlib.cmi \
-++      stdlib__Int.cmi
-++-@@ -556,13 +559,16 @@ stdlib__Option.cmi : option.mli \
-+++@@ -507,13 +510,16 @@ stdlib__Option.cmi : option.mli \
-++  stdlib__Out_channel.cmo : out_channel.ml \
-++      stdlib.cmi \
-++      stdlib__Fun.cmi \
++@@ -0,0 +1,135 @@
+++--- a	2023-09-28 18:48:30.070700875 +0100
++++++ b	2023-09-28 18:48:30.102702007 +0100
+++@@ -114,7 +114,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -599,6 +599,9 @@ asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
++++@@ -600,6 +600,9 @@ asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
+++  asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
+++  	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+++  
+++@@ -124,7 +124,7 @@
+++  # Preprocess the code emitters
+++  cvt_emit = tools/cvt_emit$(EXE)
+++  
+++-@@ -1734,7 +1737,8 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
++++@@ -1735,7 +1738,8 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
+++  
+++  ARCH_SPECIFIC =\
+++    asmcomp/arch.mli asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml \
+++@@ -137,7 +137,7 @@
+++ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+++ --- a/asmcomp/amd64/emit.mlp
+++ +++ b/asmcomp/amd64/emit.mlp
+++-@@ -461,7 +461,6 @@ let emit_instr env fallthrough i =
++++@@ -471,7 +471,6 @@ let emit_instr env fallthrough i =
+++    match i.desc with
+++    | Lend -> ()
+++    | Lprologue ->
+++@@ -145,8 +145,8 @@
+++      if fp then begin
+++        I.push rbp;
+++        cfi_adjust_cfa_offset 8;
+++-@@ -908,12 +907,11 @@ let fundecl fundecl =
+++-   cfi_startproc ();
++++@@ -964,12 +963,11 @@ let fundecl fundecl =
++++ (* BACKPORT
+++    if !Clflags.runtime_variant = "d" then
+++      emit_call "caml_assert_stack_invariants";
+++ -  let { max_frame_size; contains_nontail_calls} =
+++@@ -165,7 +165,7 @@
+++ diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
+++ --- a/asmcomp/amd64/proc.ml
+++ +++ b/asmcomp/amd64/proc.ml
+++-@@ -365,15 +365,6 @@ let max_register_pressure =
++++@@ -377,15 +377,6 @@ let max_register_pressure =
+++        consumes ~int:0 ~float:1
+++    | _ -> consumes ~int:0 ~float:0
+++  
+++@@ -228,7 +228,7 @@
+++ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+++ --- a/asmcomp/arm64/emit.mlp
+++ +++ b/asmcomp/arm64/emit.mlp
+++-@@ -85,7 +85,7 @@ let emit_wreg = function
++++@@ -87,7 +87,7 @@ let emit_wreg = function
+++  let initial_stack_offset f =
+++    8 * f.fun_num_stack_slots.(0) +
+++    8 * f.fun_num_stack_slots.(1) +
+++@@ -237,7 +237,7 @@
+++  
+++  let frame_size env =
+++    let sz =
+++-@@ -274,7 +274,7 @@ let emit_stack_adjustment n =
++++@@ -276,7 +276,7 @@ let emit_stack_adjustment n =
+++  
+++  let output_epilogue env f =
+++    let n = frame_size env in
+++@@ -246,7 +246,7 @@
+++      `	ldr	x30, [sp, #{emit_int (n-8)}]\n`;
+++    if n > 0 then
+++      emit_stack_adjustment n;
+++-@@ -443,10 +443,10 @@ module BR = Branch_relaxation.Make (struct
++++@@ -445,10 +445,10 @@ module BR = Branch_relaxation.Make (struct
+++  
+++    let prologue_size f =
+++      (if initial_stack_offset f > 0 then 2 else 0)
+++@@ -259,7 +259,7 @@
+++  
+++    let instr_size f = function
+++      | Lend -> 0
+++-@@ -681,11 +681,10 @@ let emit_instr env i =
++++@@ -701,11 +701,10 @@ let emit_instr env i =
+++      match i.desc with
+++      | Lend -> ()
+++      | Lprologue ->
+++@@ -272,8 +272,8 @@
+++          cfi_offset ~reg:30 (* return address *) ~offset:(-8);
+++          `	str	x30, [sp, #{emit_int (n-8)}]\n`
+++        end
+++-@@ -1079,12 +1078,10 @@ let fundecl fundecl =
+++-   emit_symbol_type emit_symbol fundecl.fun_name "function";
++++@@ -1138,12 +1137,10 @@ let fundecl fundecl =
++++ (* BACKPORT
+++    (* Dynamic stack checking *)
+++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+++ -  let { max_frame_size; contains_nontail_calls} =
+++@@ -570,7 +570,7 @@
+++              `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
+++              `	mtlr	11\n`
+++            end;
+++-@@ -907,12 +906,10 @@ let fundecl fundecl =
++++@@ -913,12 +912,10 @@ let fundecl fundecl =
+++    `	.align	2\n`;
+++    (* Dynamic stack checking *)
+++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+++@@ -717,8 +717,8 @@
+++          emit_stack_adjustment n;
+++          `	{emit_tail func}\n`
+++        end
+++-@@ -627,12 +626,10 @@ let fundecl fundecl =
+++- 
++++@@ -634,12 +633,10 @@ let fundecl fundecl =
++++ (* BACKPORT
+++    (* Dynamic stack checking *)
+++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+++ -  let { max_frame_size; contains_nontail_calls } =
+++@@ -832,7 +832,7 @@
+++              `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`;
+++            emit_stack_adjust (-n);
+++            if !pic_code then
+++-@@ -724,12 +723,10 @@ let fundecl fundecl =
++++@@ -730,12 +729,10 @@ let fundecl fundecl =
+++  
+++    (* Dynamic stack checking *)
+++    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+++@@ -846,8 +846,8 @@
+++ +  if fundecl.fun_contains_nontail_calls
+++ +  || max_frame_size >= stack_threshold_size then begin
+++      let overflow = new_label () and ret = new_label () in
++++ (* BACKPORT
+++      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+++-     let f = max_frame_size + threshold_offset in
+++ diff --git a/asmcomp/s390x/proc.ml b/asmcomp/s390x/proc.ml
+++ --- a/asmcomp/s390x/proc.ml
+++ +++ b/asmcomp/s390x/proc.ml
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -9048,10 +9278,10 @@ index 0000000000..aa26e80e73
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index fe803de046..99219923d6 100644
++index eae2d8e5d7..b51e733f50 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1773,6 +1773,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1778,6 +1778,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -9087,7 +9317,7 @@ index 0000000000..aa26e80e73
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1808,13 +1837,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1813,13 +1842,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9103,7 +9333,7 @@ index 0000000000..aa26e80e73
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1921,6 +1950,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1926,6 +1955,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -9113,7 +9343,7 @@ index 0000000000..aa26e80e73
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2184,6 +2216,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2189,6 +2221,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -9124,7 +9354,7 @@ index 0000000000..aa26e80e73
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 3a9966ba52..705d8ac003 100644
++index 365eb72668..b9dfc003a4 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -416,9 +416,6 @@ flexlink.opt$(EXE): \
@@ -9148,7 +9378,7 @@ index 0000000000..aa26e80e73
 + INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 + INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
 + FLEXDLL_MANIFEST = default_$(ARCH).manifest
-+@@ -631,7 +632,6 @@ partialclean::
++@@ -634,7 +635,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -9156,7 +9386,7 @@ index 0000000000..aa26e80e73
 +   afl \
 +   alloc \
 +   array \
-+@@ -639,24 +639,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -642,24 +642,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -9184,7 +9414,7 @@ index 0000000000..aa26e80e73
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -667,17 +667,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -670,17 +670,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -9202,7 +9432,7 @@ index 0000000000..aa26e80e73
 +   sys \
 +   $(TSAN_NATIVE_RUNTIME_C_SOURCES) \
 +   $(UNIX_OR_WIN32) \
-+@@ -688,6 +683,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -691,6 +686,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -9212,7 +9442,7 @@ index 0000000000..aa26e80e73
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -698,7 +696,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -701,7 +699,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -9221,7 +9451,7 @@ index 0000000000..aa26e80e73
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1087,12 +1085,14 @@ clean::
++@@ -1090,12 +1088,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -9238,7 +9468,7 @@ index 0000000000..aa26e80e73
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1174,6 +1174,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1177,6 +1177,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -9246,7 +9476,7 @@ index 0000000000..aa26e80e73
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1914,6 +1915,9 @@ endif
++@@ -1918,6 +1919,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -9294,7 +9524,7 @@ index 0000000000..aa26e80e73
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index d549fc5dfd..76fd0c2f75 100644
++index 09c8b79089..d2b7413316 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -9335,7 +9565,7 @@ index 0000000000..aa26e80e73
 +   else
 +     env.stack_offset + 8
 + 
-+@@ -533,19 +543,35 @@ let emit_instr env fallthrough i =
++@@ -532,19 +542,35 @@ let emit_instr env fallthrough i =
 +           end
 +         end
 +       end
@@ -9373,7 +9603,7 @@ index 0000000000..aa26e80e73
 +         I.mov rsp rbx;
 +         cfi_remember_state ();
 +         cfi_def_cfa_register "rbx";
-+@@ -553,10 +579,12 @@ let emit_instr env fallthrough i =
++@@ -552,10 +578,12 @@ let emit_instr env fallthrough i =
 +            will not unwind through this unless we were to tag this
 +            calling frame with cfi_signal_frame in it's definition. *)
 +         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
@@ -9387,7 +9617,7 @@ index 0000000000..aa26e80e73
 +       end
 +   | Lop(Istackoffset n) ->
 +       if n < 0
-+@@ -739,7 +767,10 @@ let emit_instr env fallthrough i =
++@@ -738,7 +766,10 @@ let emit_instr env fallthrough i =
 +   | Lop(Ispecific(Izextend32)) ->
 +       I.mov (arg32 i 0) (res32 i 0)
 +   | Lop (Idls_get) ->
@@ -9398,7 +9628,7 @@ index 0000000000..aa26e80e73
 +   | Lop (Ireturn_addr) ->
 +       let offset = frame_size env - 8 in
 +       I.mov (mem64 QWORD offset RSP) (res i 0)
-+@@ -846,12 +877,24 @@ let emit_instr env fallthrough i =
++@@ -845,12 +876,24 @@ let emit_instr env fallthrough i =
 +       load_label_addr lbl_handler r11;
 +       I.push r11;
 +       cfi_adjust_cfa_offset 8;
@@ -9423,7 +9653,7 @@ index 0000000000..aa26e80e73
 +       cfi_adjust_cfa_offset (-8);
 +       I.add (int 8) rsp;
 +       cfi_adjust_cfa_offset (-8);
-+@@ -859,10 +902,17 @@ let emit_instr env fallthrough i =
++@@ -858,10 +901,17 @@ let emit_instr env fallthrough i =
 +   | Lraise k ->
 +       begin match k with
 +       | Lambda.Raise_regular ->
@@ -9441,7 +9671,7 @@ index 0000000000..aa26e80e73
 +           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
 +       | Lambda.Raise_notrace ->
 +           if Config.tsan then begin
-+@@ -871,8 +921,13 @@ let emit_instr env fallthrough i =
++@@ -870,8 +920,13 @@ let emit_instr env fallthrough i =
 +             emit_call "caml_tsan_raise_notrace_exn";
 +             record_frame env Reg.Set.empty (Dbg_raise i.dbg)
 +           end else begin
@@ -9455,15 +9685,15 @@ index 0000000000..aa26e80e73
 +             I.pop r11;
 +             I.jmp r11
 +           end
-+@@ -906,6 +961,7 @@ let fundecl fundecl =
++@@ -905,6 +960,7 @@ let fundecl fundecl =
 +   D.label (emit_symbol fundecl.fun_name);
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc ();
 ++(* BACKPORT
 +   if !Clflags.runtime_variant = "d" then
 +     emit_call "caml_assert_stack_invariants";
-+   let { max_frame_size; contains_nontail_calls} =
-+@@ -923,9 +979,11 @@ let fundecl fundecl =
++   let max_frame_size =
++@@ -921,9 +977,11 @@ let fundecl fundecl =
 +       Some (overflow, ret)
 +     end else None
 +   in
@@ -9475,7 +9705,7 @@ index 0000000000..aa26e80e73
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -942,6 +1000,7 @@ let fundecl fundecl =
++@@ -940,6 +998,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -9484,7 +9714,7 @@ index 0000000000..aa26e80e73
 +     let n = (frame_size env) - 8 - (if fp then 8 else 0) in
 +     if n <> 0
 +diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-+index cd50cba52b..32726ea7dc 100644
++index 97e55e80ff..811bb8e98d 100644
 +--- a/asmcomp/amd64/proc.ml
 ++++ b/asmcomp/amd64/proc.ml
 +@@ -235,7 +235,11 @@ let win64_float_external_arguments =
@@ -9522,7 +9752,7 @@ index 0000000000..aa26e80e73
 +        108;109;110;111;112;113;114;115])
 + 
 +diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
-+index 785d43d6cd..502ded4b13 100644
++index 630ff9eaff..5a563a6b7e 100644
 +--- a/asmcomp/arm64/emit.mlp
 ++++ b/asmcomp/arm64/emit.mlp
 +@@ -34,8 +34,10 @@ let reg_trap_ptr = phys_reg 23 (* x26 *)
@@ -9589,7 +9819,7 @@ index 0000000000..aa26e80e73
 +       | Lambda.Raise_reraise -> 1
 +       | Lambda.Raise_notrace -> 4
 +       end
-+@@ -743,7 +763,8 @@ let emit_instr env i =
++@@ -742,7 +762,8 @@ let emit_instr env i =
 +           `	b	{emit_label env.f.fun_tailrec_entry_point_label}\n`
 +         else
 +           output_epilogue env (fun () -> `	b	{emit_symbol func}\n`)
@@ -9599,7 +9829,7 @@ index 0000000000..aa26e80e73
 +         if stack_ofs > 0 then begin
 +           `	mov	{emit_reg reg_stack_arg_begin}, sp\n`;
 +           `	add	{emit_reg reg_stack_arg_end}, sp, #{emit_int (Misc.align stack_ofs 16)}\n`;
-+@@ -751,9 +772,18 @@ let emit_instr env i =
++@@ -750,9 +771,18 @@ let emit_instr env i =
 +           `	bl	{emit_symbol "caml_c_call_stack_args"}\n`;
 +           `{record_frame env i.live (Dbg_other i.dbg)}\n`
 +         end else if alloc then begin
@@ -9618,7 +9848,7 @@ index 0000000000..aa26e80e73
 +         end else begin
 +           (* store ocaml stack in the frame pointer register
 +              NB: no need to store previous x29 because OCaml frames don't
-+@@ -768,6 +798,7 @@ let emit_instr env i =
++@@ -767,6 +797,7 @@ let emit_instr env i =
 +           `	mov	sp, x29\n`;
 +           cfi_restore_state ()
 +         end
@@ -9626,7 +9856,7 @@ index 0000000000..aa26e80e73
 +     | Lop(Istackoffset n) ->
 +         assert (n mod 16 = 0);
 +         emit_stack_adjustment (-n);
-+@@ -808,7 +839,11 @@ let emit_instr env i =
++@@ -807,7 +838,11 @@ let emit_instr env i =
 +         | Double ->
 +             `	ldr	{emit_reg dst}, {emit_addressing addressing_mode base}\n`
 +         end
@@ -9638,7 +9868,7 @@ index 0000000000..aa26e80e73
 +         (* NB: assignments other than Word_int and Word_val do not follow the
 +         Multicore OCaml memory model and so do not emit a barrier *)
 +         let src = i.arg.(0) in
-+@@ -831,7 +866,10 @@ let emit_instr env i =
++@@ -830,7 +865,10 @@ let emit_instr env i =
 +             `	str	s7, {emit_addressing addr base}\n`;
 +         | Word_int | Word_val ->
 +             (* memory model barrier for non-initializing store *)
@@ -9649,7 +9879,7 @@ index 0000000000..aa26e80e73
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
 +         | Double ->
 +             `	str	{emit_reg src}, {emit_addressing addr base}\n`
-+@@ -960,8 +998,13 @@ let emit_instr env i =
++@@ -959,8 +997,13 @@ let emit_instr env i =
 +     | Lop(Ispecific(Isignext size)) ->
 +         `	sbfm	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, #0, #{emit_int (size - 1)}\n`
 +     | Lop(Idls_get) ->
@@ -9663,7 +9893,7 @@ index 0000000000..aa26e80e73
 +     | Lop(Ireturn_addr) ->
 +         invalid_arg (
 +           "Support for Ireturn_addr is not implemented on architecture "
-+@@ -1052,10 +1095,18 @@ let emit_instr env i =
++@@ -1051,10 +1094,18 @@ let emit_instr env i =
 +     | Lraise k ->
 +         begin match k with
 +         | Lambda.Raise_regular ->
@@ -9682,7 +9912,7 @@ index 0000000000..aa26e80e73
 +           `{record_frame env Reg.Set.empty (Dbg_raise i.dbg)}\n`
 +         | Lambda.Raise_notrace ->
 +           `	mov	sp, {emit_reg reg_trap_ptr}\n`;
-+@@ -1077,6 +1128,14 @@ let fundecl fundecl =
++@@ -1076,6 +1127,14 @@ let fundecl fundecl =
 +   `	.align	3\n`;
 +   `	.globl	{emit_symbol fundecl.fun_name}\n`;
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
@@ -9696,8 +9926,8 @@ index 0000000000..aa26e80e73
 ++(* BACKPORT
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
-+   let { max_frame_size; contains_nontail_calls} =
-+@@ -1115,8 +1174,11 @@ let fundecl fundecl =
++   let max_frame_size = frame_size env + fundecl.fun_extra_stack_used in
++@@ -1112,8 +1171,11 @@ let fundecl fundecl =
 +   let num_call_gc, num_check_bound =
 +     num_call_gc_and_check_bound_points env
 +   in
@@ -9818,10 +10048,10 @@ index 0000000000..aa26e80e73
 + 
 + type rhs_kind =
 +diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
-+index 386c30bd74..a51bbda15e 100644
++index 6630728a37..e323f2f76d 100644
 +--- a/asmcomp/power/emit.mlp
 ++++ b/asmcomp/power/emit.mlp
-+@@ -655,8 +655,10 @@ let emit_instr env i =
++@@ -654,8 +654,10 @@ let emit_instr env i =
 +           (* Save OCaml stack pointer in a callee-save register *)
 +           `	mr	28, 1\n`;
 +           (* Switch to C stack *)
@@ -9832,7 +10062,7 @@ index 0000000000..aa26e80e73
 +           emit_call func;
 +           emit_call_nop();
 +           (* Switch back to OCaml stack *)
-+@@ -780,8 +782,12 @@ let emit_instr env i =
++@@ -779,8 +781,12 @@ let emit_instr env i =
 +         let instr = name_for_specific sop in
 +         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
 +     | Lop (Idls_get) ->
@@ -9845,7 +10075,7 @@ index 0000000000..aa26e80e73
 +     | Lop (Ireturn_addr) ->
 +         invalid_arg (
 +           "Support for Ireturn_addr is not implemented on architecture "
-+@@ -936,12 +942,14 @@ let fundecl fundecl =
++@@ -933,12 +939,14 @@ let fundecl fundecl =
 +   begin match !handle_overflow with
 +   | None -> ()
 +   | Some(overflow, ret) ->
@@ -9861,10 +10091,10 @@ index 0000000000..aa26e80e73
 +       `	ble-	{emit_label overflow}\n`;
 +       `{emit_label ret}:\n`
 +diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
-+index 1d8c3a4db4..d6318bcf6f 100644
++index 01d4b5d717..844efd2048 100644
 +--- a/asmcomp/riscv/emit.mlp
 ++++ b/asmcomp/riscv/emit.mlp
-+@@ -341,8 +341,10 @@ let emit_instr env i =
++@@ -340,8 +340,10 @@ let emit_instr env i =
 +         `	mv	s0, sp\n`;
 +         cfi_remember_state ();
 +         cfi_def_cfa_register ~reg:21;
@@ -9875,7 +10105,7 @@ index 0000000000..aa26e80e73
 +         `	{emit_call func}\n`;
 +         `	mv	sp, s0\n`;
 +         cfi_restore_state ()
-+@@ -498,8 +500,12 @@ let emit_instr env i =
++@@ -497,8 +499,12 @@ let emit_instr env i =
 +       let instr = name_for_specific sop in
 +       `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
 +   | Lop (Idls_get) ->
@@ -9888,15 +10118,15 @@ index 0000000000..aa26e80e73
 +   | Lop (Ireturn_addr) ->
 +       invalid_arg (
 +         "Support for Ireturn_addr is not implemented on architecture "
-+@@ -625,6 +631,7 @@ let fundecl fundecl =
++@@ -624,6 +630,7 @@ let fundecl fundecl =
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc();
 + 
 ++(* BACKPORT
 +   (* Dynamic stack checking *)
 +   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
-+   let { max_frame_size; contains_nontail_calls } =
-+@@ -644,11 +651,13 @@ let fundecl fundecl =
++   let max_frame_size = frame_size env + fundecl.fun_extra_stack_used in
++@@ -641,11 +648,13 @@ let fundecl fundecl =
 +       Some (overflow, ret)
 +     end else None
 +   in
@@ -9910,7 +10140,7 @@ index 0000000000..aa26e80e73
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow, ret) ->
-+@@ -665,6 +674,7 @@ let fundecl fundecl =
++@@ -662,6 +671,7 @@ let fundecl fundecl =
 +       `	addi	sp, sp, 16\n`;
 +       `	j	{emit_label ret}\n`
 +   end;
@@ -9919,10 +10149,10 @@ index 0000000000..aa26e80e73
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
-+index 49b4e61640..f0afd9e4b8 100644
++index e72f2ba97d..6919cb2bef 100644
 +--- a/asmcomp/s390x/emit.mlp
 ++++ b/asmcomp/s390x/emit.mlp
-+@@ -385,8 +385,10 @@ let emit_instr env i =
++@@ -384,8 +384,10 @@ let emit_instr env i =
 +           (* NB: gdb has asserts on contiguous stacks that mean it
 +              will not unwind through this unless we were to tag this
 +              calling frame with cfi_signal_frame in it's definition. *)
@@ -9933,7 +10163,7 @@ index 0000000000..aa26e80e73
 +           emit_call func;
 +           ` lgr %r15, %r12\n`;
 +           cfi_restore_state ()
-+@@ -593,8 +595,12 @@ let emit_instr env i =
++@@ -592,8 +594,12 @@ let emit_instr env i =
 +         let instr = name_for_specific sop in
 +         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
 +     | Lop (Idls_get) ->
@@ -9946,9 +10176,9 @@ index 0000000000..aa26e80e73
 +     | Lop (Ireturn_addr) ->
 +         invalid_arg (
 +           "Support for Ireturn_addr is not implemented on architecture "
-+@@ -731,11 +737,13 @@ let fundecl fundecl =
-+   let handle_overflow = ref None in
-+   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
++@@ -728,11 +734,13 @@ let fundecl fundecl =
++   if fundecl.fun_contains_nontail_calls
++   || max_frame_size >= stack_threshold_size then begin
 +     let overflow = new_label () and ret = new_label () in
 ++(* BACKPORT
 +     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
@@ -18010,10 +18240,7 @@ index 0000000000..aa26e80e73
 ++         # https://github.com/appveyor/ci/issues/1824
 ++         script --quiet --return --command \
 ++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../$BUILD_PREFIX-$PORT/build.log" |
-++             sed -e 's/\d027\[K//g' \
-++                 -e 's/\d027\[m/\d0
++++          "$MAKE -C
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644

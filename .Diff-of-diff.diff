@@ -1,20 +1,135 @@
---- a	2023-09-28 18:48:29.438678500 +0100
-+++ b	2023-09-28 18:48:29.458679208 +0100
-@@ -408,7 +408,7 @@
- diff --git a/stdlib/.depend b/stdlib/.depend
- --- a/stdlib/.depend
- +++ b/stdlib/.depend
--@@ -400,15 +400,18 @@ stdlib__In_channel.cmo : in_channel.ml \
-+@@ -356,15 +356,18 @@ stdlib__In_channel.cmo : in_channel.ml \
-      stdlib.cmi \
-      stdlib__Fun.cmi \
-      stdlib__Bytes.cmi \
-@@ -428,7 +428,7 @@
-  stdlib__Int.cmo : int.ml \
-      stdlib.cmi \
-      stdlib__Int.cmi
--@@ -556,13 +559,16 @@ stdlib__Option.cmi : option.mli \
-+@@ -507,13 +510,16 @@ stdlib__Option.cmi : option.mli \
-  stdlib__Out_channel.cmo : out_channel.ml \
-      stdlib.cmi \
-      stdlib__Fun.cmi \
+--- a	2023-09-28 18:48:30.070700875 +0100
++++ b	2023-09-28 18:48:30.102702007 +0100
+@@ -114,7 +114,7 @@
+ diff --git a/Makefile b/Makefile
+ --- a/Makefile
+ +++ b/Makefile
+-@@ -599,6 +599,9 @@ asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
++@@ -600,6 +600,9 @@ asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
+  asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
+  	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+  
+@@ -124,7 +124,7 @@
+  # Preprocess the code emitters
+  cvt_emit = tools/cvt_emit$(EXE)
+  
+-@@ -1734,7 +1737,8 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
++@@ -1735,7 +1738,8 @@ tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
+  
+  ARCH_SPECIFIC =\
+    asmcomp/arch.mli asmcomp/arch.ml asmcomp/proc.ml asmcomp/CSE.ml \
+@@ -137,7 +137,7 @@
+ diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+ --- a/asmcomp/amd64/emit.mlp
+ +++ b/asmcomp/amd64/emit.mlp
+-@@ -461,7 +461,6 @@ let emit_instr env fallthrough i =
++@@ -471,7 +471,6 @@ let emit_instr env fallthrough i =
+    match i.desc with
+    | Lend -> ()
+    | Lprologue ->
+@@ -145,8 +145,8 @@
+      if fp then begin
+        I.push rbp;
+        cfi_adjust_cfa_offset 8;
+-@@ -908,12 +907,11 @@ let fundecl fundecl =
+-   cfi_startproc ();
++@@ -964,12 +963,11 @@ let fundecl fundecl =
++ (* BACKPORT
+    if !Clflags.runtime_variant = "d" then
+      emit_call "caml_assert_stack_invariants";
+ -  let { max_frame_size; contains_nontail_calls} =
+@@ -165,7 +165,7 @@
+ diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
+ --- a/asmcomp/amd64/proc.ml
+ +++ b/asmcomp/amd64/proc.ml
+-@@ -365,15 +365,6 @@ let max_register_pressure =
++@@ -377,15 +377,6 @@ let max_register_pressure =
+        consumes ~int:0 ~float:1
+    | _ -> consumes ~int:0 ~float:0
+  
+@@ -228,7 +228,7 @@
+ diff --git a/asmcomp/arm64/emit.mlp b/asmcomp/arm64/emit.mlp
+ --- a/asmcomp/arm64/emit.mlp
+ +++ b/asmcomp/arm64/emit.mlp
+-@@ -85,7 +85,7 @@ let emit_wreg = function
++@@ -87,7 +87,7 @@ let emit_wreg = function
+  let initial_stack_offset f =
+    8 * f.fun_num_stack_slots.(0) +
+    8 * f.fun_num_stack_slots.(1) +
+@@ -237,7 +237,7 @@
+  
+  let frame_size env =
+    let sz =
+-@@ -274,7 +274,7 @@ let emit_stack_adjustment n =
++@@ -276,7 +276,7 @@ let emit_stack_adjustment n =
+  
+  let output_epilogue env f =
+    let n = frame_size env in
+@@ -246,7 +246,7 @@
+      `	ldr	x30, [sp, #{emit_int (n-8)}]\n`;
+    if n > 0 then
+      emit_stack_adjustment n;
+-@@ -443,10 +443,10 @@ module BR = Branch_relaxation.Make (struct
++@@ -445,10 +445,10 @@ module BR = Branch_relaxation.Make (struct
+  
+    let prologue_size f =
+      (if initial_stack_offset f > 0 then 2 else 0)
+@@ -259,7 +259,7 @@
+  
+    let instr_size f = function
+      | Lend -> 0
+-@@ -681,11 +681,10 @@ let emit_instr env i =
++@@ -701,11 +701,10 @@ let emit_instr env i =
+      match i.desc with
+      | Lend -> ()
+      | Lprologue ->
+@@ -272,8 +272,8 @@
+          cfi_offset ~reg:30 (* return address *) ~offset:(-8);
+          `	str	x30, [sp, #{emit_int (n-8)}]\n`
+        end
+-@@ -1079,12 +1078,10 @@ let fundecl fundecl =
+-   emit_symbol_type emit_symbol fundecl.fun_name "function";
++@@ -1138,12 +1137,10 @@ let fundecl fundecl =
++ (* BACKPORT
+    (* Dynamic stack checking *)
+    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+ -  let { max_frame_size; contains_nontail_calls} =
+@@ -570,7 +570,7 @@
+              `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
+              `	mtlr	11\n`
+            end;
+-@@ -907,12 +906,10 @@ let fundecl fundecl =
++@@ -913,12 +912,10 @@ let fundecl fundecl =
+    `	.align	2\n`;
+    (* Dynamic stack checking *)
+    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+@@ -717,8 +717,8 @@
+          emit_stack_adjustment n;
+          `	{emit_tail func}\n`
+        end
+-@@ -627,12 +626,10 @@ let fundecl fundecl =
+- 
++@@ -634,12 +633,10 @@ let fundecl fundecl =
++ (* BACKPORT
+    (* Dynamic stack checking *)
+    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+ -  let { max_frame_size; contains_nontail_calls } =
+@@ -832,7 +832,7 @@
+              `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`;
+            emit_stack_adjust (-n);
+            if !pic_code then
+-@@ -724,12 +723,10 @@ let fundecl fundecl =
++@@ -730,12 +729,10 @@ let fundecl fundecl =
+  
+    (* Dynamic stack checking *)
+    let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+@@ -846,8 +846,8 @@
+ +  if fundecl.fun_contains_nontail_calls
+ +  || max_frame_size >= stack_threshold_size then begin
+      let overflow = new_label () and ret = new_label () in
++ (* BACKPORT
+      let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+-     let f = max_frame_size + threshold_offset in
+ diff --git a/asmcomp/s390x/proc.ml b/asmcomp/s390x/proc.ml
+ --- a/asmcomp/s390x/proc.ml
+ +++ b/asmcomp/s390x/proc.ml
