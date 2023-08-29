@@ -1,6 +1,20 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..62360c4fd6
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,11 @@
++--- a	2023-09-28 18:48:32.450785068 +0100
+++++ b	2023-09-28 18:48:32.466785634 +0100
++@@ -15,7 +15,7 @@
++ diff --git a/Makefile b/Makefile
++ --- a/Makefile
++ +++ b/Makefile
++-@@ -835,11 +835,11 @@ runtime/prims.c : runtime/primitives
+++@@ -833,11 +833,11 @@ runtime/prims.c : runtime/primitives
++  	 echo; \
++  	 sed -e 's/.*/extern value &(void);/' $<; \
++  	 echo; \
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -14,10 +28,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 9f8b271bd2..a9924c746b 100644
+index 1ecf1a23f5..7c846968bf 100644
 --- a/Changes
 +++ b/Changes
-@@ -1784,6 +1784,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1788,6 +1788,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -53,7 +67,7 @@ index 9f8b271bd2..a9924c746b 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1819,13 +1848,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1823,13 +1852,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -69,7 +83,7 @@ index 9f8b271bd2..a9924c746b 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1932,6 +1961,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1936,6 +1965,9 @@ OCaml 4.14.0 (28 March 2022)
  - #10464: Add List.is_empty.
    (Craig Ferguson, review by David Allsopp)
  
@@ -79,7 +93,7 @@ index 9f8b271bd2..a9924c746b 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2195,6 +2227,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2199,6 +2231,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -90,7 +104,7 @@ index 9f8b271bd2..a9924c746b 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 365eb72668..b9dfc003a4 100644
+index 5934361377..3311419f5b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -416,9 +416,6 @@ flexlink.opt$(EXE): \
@@ -8996,13 +9010,27 @@ index 0000000000..7214b521a1
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..71a9e44d8a
+index 0000000000..b7173a8e07
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8916 @@
+@@ -0,0 +1,9008 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..62360c4fd6
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,11 @@
+++--- a	2023-09-28 18:48:32.450785068 +0100
++++++ b	2023-09-28 18:48:32.466785634 +0100
+++@@ -15,7 +15,7 @@
+++ diff --git a/Makefile b/Makefile
+++ --- a/Makefile
+++ +++ b/Makefile
+++-@@ -835,11 +835,11 @@ runtime/prims.c : runtime/primitives
++++@@ -833,11 +833,11 @@ runtime/prims.c : runtime/primitives
+++  	 echo; \
+++  	 sed -e 's/.*/extern value &(void);/' $<; \
+++  	 echo; \
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -9016,10 +9044,10 @@ index 0000000000..71a9e44d8a
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 9f8b271bd2..a9924c746b 100644
++index 1ecf1a23f5..7c846968bf 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1784,6 +1784,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1788,6 +1788,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -9055,7 +9083,7 @@ index 0000000000..71a9e44d8a
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1819,13 +1848,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1823,13 +1852,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9071,7 +9099,7 @@ index 0000000000..71a9e44d8a
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1932,6 +1961,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1936,6 +1965,9 @@ OCaml 4.14.0 (28 March 2022)
 + - #10464: Add List.is_empty.
 +   (Craig Ferguson, review by David Allsopp)
 + 
@@ -9081,7 +9109,7 @@ index 0000000000..71a9e44d8a
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2195,6 +2227,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2199,6 +2231,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -9092,7 +9120,7 @@ index 0000000000..71a9e44d8a
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 365eb72668..b9dfc003a4 100644
++index 5934361377..3311419f5b 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -416,9 +416,6 @@ flexlink.opt$(EXE): \
@@ -17915,7 +17943,85 @@ index 0000000000..71a9e44d8a
 ++index c35092e914..bbf1271cdf 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
 +++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ f
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+++       
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
