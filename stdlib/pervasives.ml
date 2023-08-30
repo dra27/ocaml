@@ -80,9 +80,9 @@ external exp : float -> float = "caml_exp_float" "exp" [@@unboxed] [@@noalloc]
 external log : float -> float = "caml_log_float" "log" [@@unboxed] [@@noalloc]
 external log10 : float -> float = "caml_log10_float" "log10"
   [@@unboxed] [@@noalloc]
-external expm1 : float -> float = "caml_expm1_float" "caml_expm1"
+external expm1 : float -> float = "caml_expm1_float" "expm1"
   [@@unboxed] [@@noalloc]
-external log1p : float -> float = "caml_log1p_float" "caml_log1p"
+external log1p : float -> float = "caml_log1p_float" "log1p"
   [@@unboxed] [@@noalloc]
 external cos : float -> float = "caml_cos_float" "cos" [@@unboxed] [@@noalloc]
 external sin : float -> float = "caml_sin_float" "sin" [@@unboxed] [@@noalloc]
@@ -95,7 +95,7 @@ external atan : float -> float = "caml_atan_float" "atan"
   [@@unboxed] [@@noalloc]
 external atan2 : float -> float -> float = "caml_atan2_float" "atan2"
   [@@unboxed] [@@noalloc]
-external hypot : float -> float -> float = "caml_hypot_float" "caml_hypot"
+external hypot : float -> float -> float = "caml_hypot_float" "hypot"
   [@@unboxed] [@@noalloc]
 external cosh : float -> float = "caml_cosh_float" "cosh"
   [@@unboxed] [@@noalloc]
@@ -109,7 +109,7 @@ external floor : float -> float = "caml_floor_float" "floor"
   [@@unboxed] [@@noalloc]
 external abs_float : float -> float = "%absfloat"
 external copysign : float -> float -> float
-                  = "caml_copysign_float" "caml_copysign"
+                  = "caml_copysign_float" "copysign"
                   [@@unboxed] [@@noalloc]
 external mod_float : float -> float -> float = "caml_fmod_float" "fmod"
   [@@unboxed] [@@noalloc]
