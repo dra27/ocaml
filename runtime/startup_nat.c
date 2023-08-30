@@ -139,6 +139,9 @@ value caml_startup_common(char_os **argv, int pooling)
                 caml_init_custom_minor_max_bsz, caml_init_policy);
   init_static();
   caml_init_signals();
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+  caml_win32_fma_detection();
+#endif
 #ifdef _WIN32
   caml_win32_overflow_detection();
 #endif

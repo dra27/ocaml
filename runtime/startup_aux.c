@@ -190,6 +190,9 @@ CAMLexport void caml_shutdown(void)
   caml_free_shared_libs();
 #endif
   caml_stat_destroy_pool();
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+  caml_win32_unregister_fma_detection();
+#endif
 #if defined(_WIN32) && defined(NATIVE_CODE)
   caml_win32_unregister_overflow_detection();
 #endif

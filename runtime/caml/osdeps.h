@@ -138,6 +138,11 @@ CAMLextern clock_t caml_win32_clock(void);
 
 #endif /* _WIN32 */
 
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+extern void caml_win32_fma_detection(void);
+extern void caml_win32_unregister_fma_detection(void);
+#endif
+
 #endif /* CAML_INTERNALS */
 
 #ifdef _WIN32

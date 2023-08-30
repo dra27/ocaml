@@ -546,6 +546,9 @@ CAMLexport void caml_main(char_os **argv)
   caml_init_stack (caml_init_max_stack_wsz);
   caml_init_atom_table();
   caml_init_backtrace();
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+  caml_win32_fma_detection();
+#endif
   /* Initialize the interpreter */
   caml_interprete(NULL, 0);
   /* Initialize the debugger, if needed */
@@ -645,6 +648,9 @@ CAMLexport value caml_startup_code_exn(
   caml_init_stack (caml_init_max_stack_wsz);
   caml_init_atom_table();
   caml_init_backtrace();
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+  caml_win32_fma_detection();
+#endif
   /* Initialize the interpreter */
   caml_interprete(NULL, 0);
   /* Initialize the debugger, if needed */
