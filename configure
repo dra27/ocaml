@@ -1580,10 +1580,6 @@ Optional Features:
   --enable-naked-pointers-checker
                           enable the naked pointers checker
   --disable-cfi           disable the CFI directives in assembly files
-  --enable-imprecise-c99-float-ops
-                          enables potentially imprecise replacement
-                          implementations of C99 float ops if unavailable on
-                          this platform
   --enable-installing-source-artifacts
                           install *.cmt* and *.mli files
   --enable-installing-bytecode-programs
@@ -3267,7 +3263,9 @@ fi
 
 # Check whether --enable-imprecise-c99-float-ops was given.
 if test "${enable_imprecise_c99_float_ops+set}" = set; then :
-  enableval=$enable_imprecise_c99_float_ops;
+  enableval=$enable_imprecise_c99_float_ops; if test x"$enableval" != 'xno'; then :
+  as_fn_error $? "OCaml has required C99 float operations since 5.2." "$LINENO" 5
+fi
 fi
 
 
@@ -14730,10 +14728,9 @@ fi
 done
 
 
-if $has_c99_float_ops; then :
-  $as_echo "#define HAS_C99_FLOAT_OPS 1" >>confdefs.h
-
-  # Check whether round works (known bug in mingw-w64)
+case $has_c99_float_ops,$host in #(
+  true,*-*-mingw32) :
+    # Check whether round works (known bug in mingw-w64)
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether round works" >&5
 $as_echo_n "checking whether round works... " >&6; }
@@ -14775,15 +14772,13 @@ $as_echo "no" >&6; }
     case $enable_imprecise_c99_float_ops,$target in #(
   no,*) :
     hard_error=true ;; #(
-  yes,*) :
-    hard_error=false ;; #(
   *,x86_64-w64-mingw32) :
     hard_error=false ;; #(
   *) :
     hard_error=true ;;
 esac
     if test x"$hard_error" = "xtrue"; then :
-  as_fn_error $? "round does not work, enable emulation with --enable-imprecise-c99-float-ops" "$LINENO" 5
+  as_fn_error $? "round does not work" "$LINENO" 5
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: round does not work; emulation enabled" >&5
 $as_echo "$as_me: WARNING: round does not work; emulation enabled" >&2;}
@@ -14795,29 +14790,12 @@ fi
 
   cross_compiling="$old_cross_compiling"
 
-
-else
-  if test x"$enable_imprecise_c99_float_ops" != "xyes" ; then :
-  case $enable_imprecise_c99_float_ops,$ocaml_cv_cc_vendor in #(
-  no,*) :
-    hard_error=true ;; #(
-  ,msvc-*) :
-    if test "${ocaml_cv_cc_vendor#msvc-}" -lt 1800 ; then :
-  hard_error=false
-else
-  hard_error=true
-fi ;; #(
+ ;; #(
+  false,*) :
+    as_fn_error $? "OCaml requires C99 float operations" "$LINENO" 5 ;; #(
   *) :
-    hard_error=true ;;
+     ;;
 esac
-     if test x"$hard_error" = 'xtrue'; then :
-  as_fn_error $? "C99 float ops unavailable, enable replacements with --enable-imprecise-c99-float-ops" "$LINENO" 5
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: C99 float ops unavailable, replacements enabled (ancient Visual Studio)" >&5
-$as_echo "$as_me: WARNING: C99 float ops unavailable, replacements enabled (ancient Visual Studio)" >&2;}
-fi
-fi
-fi
 
 ## getrusage
 ac_fn_c_check_func "$LINENO" "getrusage" "ac_cv_func_getrusage"
