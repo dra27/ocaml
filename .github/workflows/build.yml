@@ -6,6 +6,10 @@ jobs:
   no-naked-pointers:
     runs-on: ubuntu-latest
     steps:
+    - name: OS Dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libx11-dev
     - name: Checkout
       uses: actions/checkout@v2
     - name: configure tree
@@ -25,7 +29,7 @@ jobs:
       - name: OS Dependencies
         run: |
           apt-get update
-          apt-get install -y git gcc make parallel
+          apt-get install -y git gcc make parallel libx11-dev
       - name: Checkout
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
@@ -47,7 +51,7 @@ jobs:
         fetch-depth: 50
     - name: Packages
       run: |
-        sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended
+        sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended libx11-dev
   # Ensure that make distclean can be run from an empty tree
     - name: distclean
       run: |
