@@ -1,6 +1,33 @@
 diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 new file mode 100644
-index 0000000000..e69de29bb2
+index 0000000000..4c6b8bc801
+--- /dev/null
++++ b/.Diff-of-diff.diff
+@@ -0,0 +1,24 @@
++--- a	2023-09-28 18:48:34.758866630 +0100
+++++ b	2023-09-28 18:48:34.770867054 +0100
++@@ -165,17 +165,17 @@
++  - #11533, #11534: follow synonyms again in #show_module_type
++    (this had stopped working in 4.14.0)
++    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
++-@@ -1947,9 +1956,6 @@ OCaml 4.14.0 (28 March 2022)
+++@@ -1976,9 +1985,6 @@ OCaml 4.14.0 (28 March 2022)
++  - #10786: The implementation of Complex.norm now uses Float.hypot.
++    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
++  
++ -- #10464: Add List.is_empty.
++ -  (Craig Ferguson, review by David Allsopp)
++ -
++- ### Other libraries:
+++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
+++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
++  
++- - #10192: Add support for Unix domain sockets on Windows and use them
++-@@ -2021,10 +2027,6 @@ OCaml 4.14.0 (28 March 2022)
+++@@ -2053,10 +2059,6 @@ OCaml 4.14.0 (28 March 2022)
++  
++  ### Manual and documentation:
++  
 diff --git a/.gitattributes b/.gitattributes
 index d944f09490..cffe786f7d 100644
 --- a/.gitattributes
@@ -14,10 +41,10 @@ index d944f09490..cffe786f7d 100644
  # TODO we should fix the long-line errors in yacc/*.c
  /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
-index 6a4e23fa9a..8eee02c073 100644
+index f142149570..bf0915daea 100644
 --- a/Changes
 +++ b/Changes
-@@ -1802,6 +1802,35 @@ OCaml 5.0.0 (15 December 2022)
+@@ -1811,6 +1811,35 @@ OCaml 5.0.0 (15 December 2022)
    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
     report by Yaron Minsky)
  
@@ -53,7 +80,7 @@ index 6a4e23fa9a..8eee02c073 100644
  OCaml 4.14.0 (28 March 2022)
  ----------------------------
  
-@@ -1837,13 +1866,13 @@ OCaml 4.14.0 (28 March 2022)
+@@ -1846,13 +1875,13 @@ OCaml 4.14.0 (28 March 2022)
  - #10549: Stack overflow detection and naked pointers checking for ARM64
    (Xavier Leroy, review by Stephen Dolan)
  
@@ -69,9 +96,9 @@ index 6a4e23fa9a..8eee02c073 100644
     code or an OCaml thread stops
    (Xavier Leroy, review by David Allsopp and Damien Doligez)
  
-@@ -1950,6 +1979,9 @@ OCaml 4.14.0 (28 March 2022)
- - #10464: Add List.is_empty.
-   (Craig Ferguson, review by David Allsopp)
+@@ -1956,6 +1985,9 @@ OCaml 4.14.0 (28 March 2022)
+ - #10786: The implementation of Complex.norm now uses Float.hypot.
+   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
  
 +* #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
 +  (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
@@ -79,7 +106,7 @@ index 6a4e23fa9a..8eee02c073 100644
  ### Other libraries:
  
  - #10192: Add support for Unix domain sockets on Windows and use them
-@@ -2213,6 +2245,9 @@ OCaml 4.14.0 (28 March 2022)
+@@ -2215,6 +2247,9 @@ OCaml 4.14.0 (28 March 2022)
  
  ### Build system:
  
@@ -8996,13 +9023,40 @@ index 0000000000..7214b521a1
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d067821ed7
+index 0000000000..513c2f6eb7
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8916 @@
+@@ -0,0 +1,9004 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
-+index 0000000000..e69de29bb2
++index 0000000000..4c6b8bc801
++--- /dev/null
+++++ b/.Diff-of-diff.diff
++@@ -0,0 +1,24 @@
+++--- a	2023-09-28 18:48:34.758866630 +0100
++++++ b	2023-09-28 18:48:34.770867054 +0100
+++@@ -165,17 +165,17 @@
+++  - #11533, #11534: follow synonyms again in #show_module_type
+++    (this had stopped working in 4.14.0)
+++    (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
+++-@@ -1947,9 +1956,6 @@ OCaml 4.14.0 (28 March 2022)
++++@@ -1976,9 +1985,6 @@ OCaml 4.14.0 (28 March 2022)
+++  - #10786: The implementation of Complex.norm now uses Float.hypot.
+++    (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+++  
+++ -- #10464: Add List.is_empty.
+++ -  (Craig Ferguson, review by David Allsopp)
+++ -
+++- ### Other libraries:
++++ * #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
++++   (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
+++  
+++- - #10192: Add support for Unix domain sockets on Windows and use them
+++-@@ -2021,10 +2027,6 @@ OCaml 4.14.0 (28 March 2022)
++++@@ -2053,10 +2059,6 @@ OCaml 4.14.0 (28 March 2022)
+++  
+++  ### Manual and documentation:
+++  
 +diff --git a/.gitattributes b/.gitattributes
 +index d944f09490..cffe786f7d 100644
 +--- a/.gitattributes
@@ -9016,10 +9070,10 @@ index 0000000000..d067821ed7
 + # TODO we should fix the long-line errors in yacc/*.c
 + /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
-+index 6a4e23fa9a..8eee02c073 100644
++index f142149570..bf0915daea 100644
 +--- a/Changes
 ++++ b/Changes
-+@@ -1802,6 +1802,35 @@ OCaml 5.0.0 (15 December 2022)
++@@ -1811,6 +1811,35 @@ OCaml 5.0.0 (15 December 2022)
 +   (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
 +    report by Yaron Minsky)
 + 
@@ -9055,7 +9109,7 @@ index 0000000000..d067821ed7
 + OCaml 4.14.0 (28 March 2022)
 + ----------------------------
 + 
-+@@ -1837,13 +1866,13 @@ OCaml 4.14.0 (28 March 2022)
++@@ -1846,13 +1875,13 @@ OCaml 4.14.0 (28 March 2022)
 + - #10549: Stack overflow detection and naked pointers checking for ARM64
 +   (Xavier Leroy, review by Stephen Dolan)
 + 
@@ -9071,9 +9125,9 @@ index 0000000000..d067821ed7
 +    code or an OCaml thread stops
 +   (Xavier Leroy, review by David Allsopp and Damien Doligez)
 + 
-+@@ -1950,6 +1979,9 @@ OCaml 4.14.0 (28 March 2022)
-+ - #10464: Add List.is_empty.
-+   (Craig Ferguson, review by David Allsopp)
++@@ -1956,6 +1985,9 @@ OCaml 4.14.0 (28 March 2022)
++ - #10786: The implementation of Complex.norm now uses Float.hypot.
++   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
 + 
 ++* #10922: Add deprecation warnings on {Int32,Int64,Nativeint}.format.
 ++  (Nicolás Ojeda Bär, review by Xavier Leroy and Florian Angeletti)
@@ -9081,7 +9135,7 @@ index 0000000000..d067821ed7
 + ### Other libraries:
 + 
 + - #10192: Add support for Unix domain sockets on Windows and use them
-+@@ -2213,6 +2245,9 @@ OCaml 4.14.0 (28 March 2022)
++@@ -2215,6 +2247,9 @@ OCaml 4.14.0 (28 March 2022)
 + 
 + ### Build system:
 + 
@@ -17915,7 +17969,68 @@ index 0000000000..d067821ed7
 ++index c35092e914..bbf1271cdf 100644
 ++--- a/tools/ci/appveyor/appveyor_build.sh
 +++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ f
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We r
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
