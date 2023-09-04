@@ -17917,7 +17917,7 @@ index 0000000000..87be90d0cf
 +++
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index e18ab5e197..de0964b98c 100644
+index 0a929ad0b4..4ff2f361d0 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1896,7 +1896,11 @@ let get_mod_field modname field =
