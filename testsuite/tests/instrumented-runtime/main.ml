@@ -1,7 +1,5 @@
 (* TEST
   * instrumented-runtime
-  * skip
-  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
   ** native
     flags = "-runtime-variant=i"
 *)
