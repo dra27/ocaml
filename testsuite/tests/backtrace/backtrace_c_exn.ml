@@ -2,6 +2,8 @@
    modules = "backtrace_c_exn_.c"
    flags = "-g"
    ocamlrunparam += ",b=1"
+   * skip
+   reason = "OCaml 5 only"
 *)
 
 (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
