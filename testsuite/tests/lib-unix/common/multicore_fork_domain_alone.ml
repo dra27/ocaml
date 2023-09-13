@@ -1,9 +1,11 @@
 (* TEST
 include unix
-* hasunix
-** not-windows
-*** bytecode
-*** native
+* skip
+reason = "OCaml 5 only"
+** hasunix
+*** not-windows
+**** bytecode
+**** native
 *)
 
 (* on Multicore, fork is not allowed is another domain is, and was running. *)
