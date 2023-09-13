@@ -584,10 +584,14 @@ module BytesLabels    = BytesLabels
 module Callback       = Callback
 module Char           = Char
 module Complex        = Complex
+(*
 module Condition      = Condition
+*)
 module Digest         = Digest
+(*
 module Domain         = Domain
 module EffectHandlers = EffectHandlers
+*)
 module Either         = Either
 module Ephemeron      = Ephemeron
 module Filename       = Filename
@@ -608,7 +612,9 @@ module ListLabels     = ListLabels
 module Map            = Map
 module Marshal        = Marshal
 module MoreLabels     = MoreLabels
+(*
 module Mutex          = Mutex
+*)
 module Nativeint      = Nativeint
 module Obj            = Obj
 module Oo             = Oo
@@ -622,7 +628,9 @@ module Queue          = Queue
 module Random         = Random
 module Result         = Result
 module Scanf          = Scanf
+(*
 module Semaphore      = Semaphore
+*)
 module Seq            = Seq
 module Set            = Set
 module Stack          = Stack
