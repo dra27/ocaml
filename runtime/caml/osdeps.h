@@ -138,8 +138,6 @@ CAMLextern clock_t caml_win32_clock(void);
 
 #endif /* _WIN32 */
 
-extern void caml_init_os_params(void);
-
 #endif /* CAML_INTERNALS */
 
 #ifdef _WIN32

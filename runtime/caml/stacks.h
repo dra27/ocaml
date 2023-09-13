@@ -13,23 +13,35 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Trace the instructions executed */
+/* structure of the stacks */
 
-#ifndef _instrtrace_
-#define _instrtrace_
+#ifndef CAML_STACKS_H
+#define CAML_STACKS_H
 
 #ifdef CAML_INTERNALS
 
-#include "mlvalues.h"
 #include "misc.h"
+#include "mlvalues.h"
+#include "memory.h"
 
-extern intnat caml_icount;
-void caml_stop_here (void);
-void caml_disasm_instr (code_t pc);
-void caml_trace_value_file (value v, code_t prog, asize_t proglen, FILE * f);
-void caml_trace_accu_sp_file(value accu, value * sp, code_t prog,
-                             asize_t proglen, FILE * f);
+/* Global variables moved to Caml_state in 4.10 */
+#define caml_stack_low (Caml_state_field(stack_low))
+#define caml_stack_high (Caml_state_field(stack_high))
+#define caml_stack_threshold (Caml_state_field(stack_threshold))
+#define caml_extern_sp (Caml_state_field(extern_sp))
+#define caml_trapsp (Caml_state_field(trapsp))
+#define caml_trap_barrier (Caml_state_field(trap_barrier))
+
+#define Trap_pc(tp) (((code_t *)(tp))[0])
+#define Trap_link_offset(tp) (((value *)(tp))[1])
+
+void caml_init_stack (uintnat init_max_size);
+void caml_realloc_stack (asize_t required_size);
+void caml_change_max_stack_size (uintnat new_max_size);
+uintnat caml_stack_usage (void);
+
+CAMLextern uintnat (*caml_stack_usage_hook)(void);
 
 #endif /* CAML_INTERNALS */
 
-#endif
+#endif /* CAML_STACKS_H */

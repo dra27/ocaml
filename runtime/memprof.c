@@ -15,21 +15,6 @@
 
 #define CAML_INTERNALS
 
-#include "caml/fail.h"
-
-CAMLprim value caml_memprof_start(value lv, value szv, value tracker_param)
-{
-  caml_failwith("Gc.memprof.start: not implemented in multicore");
-}
-
-CAMLprim value caml_memprof_stop(value unit)
-{
-  caml_failwith("Gc.memprof.stop: not implemented in multicore");
-}
-
-/* FIXME: integrate memprof with multicore */
-#if 0
-
 #include <string.h>
 #include "caml/memprof.h"
 #include "caml/fail.h"
@@ -1149,5 +1134,3 @@ CAMLexport void caml_memprof_enter_thread(struct caml_memprof_th_ctx* ctx)
   local = ctx;
   caml_memprof_set_suspended(ctx->suspended);
 }
-
-#endif
