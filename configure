@@ -2959,7 +2959,6 @@ OCAML_VERSION_SHORT=4.14
 
 
 
-
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -16696,7 +16695,7 @@ $as_echo "$as_me: the Win32/POSIX threads library is disabled" >&6;} ;; #(
   *-*-mingw32|*-pc-windows) :
     systhread_support=true
       otherlibraries="$otherlibraries systhreads"
-      PTHREAD_LIBS="-lpthread"
+      PTHREAD_LIBS=''
       { $as_echo "$as_me:${as_lineno-$LINENO}: the Win32 threads library is supported" >&5
 $as_echo "$as_me: the Win32 threads library is supported" >&6;} ;; #(
   *) :
@@ -17910,8 +17909,8 @@ fi
 
 case $host in #(
   *-*-mingw32) :
-    bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp" ;; #(
+        bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
+    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp" ;; #(
   *-pc-windows) :
     bytecclibs="advapi32.lib ws2_32.lib version.lib"
     nativecclibs="advapi32.lib ws2_32.lib version.lib" ;; #(
