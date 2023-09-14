@@ -240,6 +240,7 @@ stdlib__Filename.cmo : filename.ml \
     stdlib__Random.cmi \
     stdlib__Printf.cmi \
     stdlib__List.cmi \
+    stdlib__Lazy.cmi \
     stdlib__Buffer.cmi \
     stdlib__Filename.cmi
 stdlib__Filename.cmx : filename.ml \
@@ -248,6 +249,7 @@ stdlib__Filename.cmx : filename.ml \
     stdlib__Random.cmx \
     stdlib__Printf.cmx \
     stdlib__List.cmx \
+    stdlib__Lazy.cmx \
     stdlib__Buffer.cmx \
     stdlib__Filename.cmi
 stdlib__Filename.cmi : filename.mli
@@ -274,6 +276,7 @@ stdlib__Format.cmo : format.ml \
     stdlib__Queue.cmi \
     stdlib__List.cmi \
     stdlib__Int.cmi \
+    stdlib__Fun.cmi \
     stdlib__Either.cmi \
     camlinternalFormatBasics.cmi \
     camlinternalFormat.cmi \
@@ -288,6 +291,7 @@ stdlib__Format.cmx : format.ml \
     stdlib__Queue.cmx \
     stdlib__List.cmx \
     stdlib__Int.cmx \
+    stdlib__Fun.cmx \
     stdlib__Either.cmx \
     camlinternalFormatBasics.cmx \
     camlinternalFormat.cmx \
@@ -344,6 +348,7 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
     stdlib__Seq.cmi \
     stdlib__Random.cmi \
     stdlib__Obj.cmi \
+    stdlib__Lazy.cmi \
     stdlib__Int.cmi \
     stdlib__Array.cmi \
     stdlib__Hashtbl.cmi
@@ -353,6 +358,7 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
     stdlib__Seq.cmx \
     stdlib__Random.cmx \
     stdlib__Obj.cmx \
+    stdlib__Lazy.cmx \
     stdlib__Int.cmx \
     stdlib__Array.cmx \
     stdlib__Hashtbl.cmi

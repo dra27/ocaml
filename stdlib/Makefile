@@ -260,7 +260,8 @@ STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
 
 .PHONY: depend
 depend:
-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
+	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
+    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
 	  > .depend.tmp
 	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli >> .depend.tmp
