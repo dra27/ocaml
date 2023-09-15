@@ -220,3 +220,25 @@ testsuite/tests/translprim/module_coercion.ml text eol=lf
 # This is forced to \n to allow the Cygwin testsuite to pass on a
 # Windows-checkout
 testsuite/tests/parsetree/locations_test.ml text eol=lf
+
+# This is ignored for now, because workflows are not in sync
+.github/workflows/*.yml -diff
+appveyor.yml -diff
+
+# Generated files which only differ for automated reasons
+.depend -diff
+
+# These files are ignored in diffs because they would be completely replaced with trunk
+# versions
+api_docgen/Makefile.docfiles -diff
+manual/src/library/stdlib-blurb.etex -diff
+otherlibs/systhreads/.depend -diff
+otherlibs/systhreads/Makefile -diff
+otherlibs/systhreads/condition.ml* -diff
+otherlibs/systhreads/mutex.ml* -diff
+otherlibs/systhreads/semaphore.ml* -diff
+otherlibs/systhreads/st_posix.h -diff
+otherlibs/systhreads/st_win32.h -diff
+otherlibs/systhreads/st_stubs.c -diff
+runtime/** -diff
+stdlib/Makefile -diff
