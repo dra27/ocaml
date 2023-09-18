@@ -202,6 +202,7 @@ partialclean::
 	rm -f $(BYTE_BINDIR)/flexlink $(BYTE_BINDIR)/flexlink.exe
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+# XXX runtime/ocamlruns would simply include the zstd object if it's wanted
 # The recipe for runtime/ocamlruns$(EXE) also produces runtime/primitives
 boot/ocamlrun$(EXE): runtime/ocamlruns$(EXE)
 
@@ -210,7 +211,8 @@ $(foreach runtime, ocamlrun ocamlrund ocamlruni, \
 
 tools/checkstack$(EXE): | $(BYTE_BINDIR)/flexlink$(EXE)
 else
-boot/ocamlrun$(EXE): runtime/ocamlrun$(EXE) runtime/primitives
+# XXX Select between runtime/ocamlrunz and runtime/ocamlrun
+boot/ocamlrun$(EXE): runtime/ocamlrunz$(EXE) runtime/primitives
 endif
 
 # $< refers to runtime/ocamlruns when bootstrapping flexlink and
@@ -483,11 +485,15 @@ clean:: partialclean
 
 ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
 
+otherlibs/marshal_zstd/marshal_zstd.cmxa: otherlibrariesopt
+ocamlc_NATIVE_LIBRARIES = otherlibs/marshal_zstd/marshal_zstd
+
 ocamlc_SOURCES = driver/main.mli driver/main.ml
 
 ocamlc$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32 -g
 
-ocamlc.opt$(EXE): OC_NATIVE_LINKFLAGS += $(addprefix -cclib ,$(BYTECCLIBS))
+ocamlc.opt$(EXE): \
+  OC_NATIVE_LINKFLAGS += $(addprefix -cclib ,$(BYTECCLIBS) $(ZSTD_LIBS))
 
 partialclean::
 	rm -f ocamlc ocamlc.exe ocamlc.opt ocamlc.opt.exe
@@ -496,9 +502,12 @@ partialclean::
 
 ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
 
+ocamlopt_NATIVE_LIBRARIES = otherlibs/marshal_zstd/marshal_zstd
+
 ocamlopt_SOURCES = driver/optmain.mli driver/optmain.ml
 
 ocamlopt$(EXE): OC_BYTECODE_LINKFLAGS += -g
+ocamlopt.opt$(EXE): OC_NATIVE_LINKFLAGS += $(addprefix -cclib ,$(ZSTD_LIBS))
 
 partialclean::
 	rm -f ocamlopt ocamlopt.exe ocamlopt.opt ocamlopt.opt.exe
@@ -902,6 +911,14 @@ runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/libcamlruni.$(A)
 
 runtime/libcamlruni.$(A): $(libcamlruni_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
+
+otherlibs/marshal_zstd/zstd_static.$(O):
+	$(MAKE) -C otherlibs/marshal_zstd zstd_static.$(O)
+
+runtime/ocamlrunz$(EXE): runtime/prims.$(O) \
+                         otherlibs/marshal_zstd/zstd_static.$(O) \
+                         runtime/libcamlrun.$(A)
+	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS) $(ZSTD_LIBS)
 
 runtime/libcamlrun_pic.$(A): $(libcamlrunpic_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
@@ -1778,7 +1795,10 @@ ocamlnat_LIBRARIES = \
 
 ocamlnat_SOURCES = $(ocaml_SOURCES)
 
-ocamlnat$(EXE): OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native
+ocamlnat_NATIVE_LIBRARIES = otherlibs/marshal_zstd/marshal_zstd
+
+ocamlnat$(EXE): \
+  OC_NATIVE_LINKFLAGS += -linkall -I toplevel/native -cclib $(ZSTD_LIBS)
 
 COMPILE_NATIVE_MODULE = \
   $(CAMLOPT) $(OC_COMMON_COMPFLAGS) -I $(@D) $(INCLUDES) \
