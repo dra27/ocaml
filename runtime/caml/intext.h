@@ -24,6 +24,8 @@
 #ifdef CAML_INTERNALS
 #include "io.h"
 
+#include <stdbool.h>
+
 /* Magic number */
 
 #define Intext_magic_number_small 0x8495A6BE
@@ -132,6 +134,15 @@ void caml_output_val (struct channel * chan, value v, value flags);
   /* Output [v] with flags [flags] on the channel [chan]. */
 
 void caml_free_intern_state (void);
+
+/* Compression hooks */
+
+CAMLextern bool caml_zstd_available;
+CAMLextern bool (*caml_extern_compress_output)(struct caml_output_block **);
+CAMLextern size_t (*caml_intern_decompress_input)(unsigned char *,
+                                                  uintnat,
+                                                  const unsigned char *,
+                                                  uintnat);
 
 #endif /* CAML_INTERNALS */
 

@@ -417,11 +417,7 @@ static void do_print_config(void)
 #endif
   printf("no_naked_pointers: true\n");
   printf("compression_supported: %s\n",
-#ifdef HAS_ZSTD
-         "true");
-#else
-         "false");
-#endif
+         (caml_zstd_available ? "true" : "false"));
   printf("reserved header bits: %d\n", HEADER_RESERVED_BITS);
   printf("exec_magic_number: %s\n", EXEC_MAGIC);
 

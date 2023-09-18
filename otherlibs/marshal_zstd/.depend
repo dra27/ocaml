@@ -1,0 +1,5 @@
+stdlib_marshal_zstd_support.cmo : \
+    stdlib_marshal_zstd_support.cmi
+stdlib_marshal_zstd_support.cmx : \
+    stdlib_marshal_zstd_support.cmi
+stdlib_marshal_zstd_support.cmi :

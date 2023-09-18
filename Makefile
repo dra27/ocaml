@@ -656,6 +656,7 @@ runtime_COMMON_C_SOURCES = \
   globroots \
   hash \
   intern \
+  intext_no_zstd \
   ints \
   io \
   lexing \
