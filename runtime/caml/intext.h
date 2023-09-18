@@ -118,6 +118,12 @@
 #define ENTRIES_PER_TRAIL_BLOCK  1025
 #define SIZE_EXTERN_OUTPUT_BLOCK 8100
 
+struct caml_output_block {
+  struct caml_output_block * next;
+  char * end;
+  char data[SIZE_EXTERN_OUTPUT_BLOCK];
+};
+
 void caml_free_extern_state (void);
 
 /* The entry points */
