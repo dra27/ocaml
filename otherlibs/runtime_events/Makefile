@@ -22,8 +22,6 @@ C_SOURCES=runtime_events_consumer.c
 HEADERS=runtime_events_consumer.h
 
 include ../Makefile.otherlibs.common
-runtime_events.cmo: runtime_events.cmi
-runtime_events.cmx: runtime_events.cmi
 
 .PHONY: depend
 depend:
