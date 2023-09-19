@@ -319,7 +319,8 @@ define _OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
 $(basename $(notdir $(1)))_CMXA_FILES = \
   $$(patsubst %,%.cmxa, $$($(basename $(notdir $(1)))_LIBRARIES) \
-                        $$($(basename $(notdir $(1)))_NATIVE_LIBRARIES))
+       $$(if $$(value $(basename $(notdir $(1)))_NATIVE_LIBRARIES),\
+             $$($(basename $(notdir $(1)))_NATIVE_LIBRARIES)))
 $(basename $(notdir $(1)))_NO_FILES = \
   $$(patsubst %.c,%.n.$(O), $$($(basename $(notdir $(1)))_C_FILES))
 $(basename $(notdir $(1)))_CMX_FILES = \

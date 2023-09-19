@@ -374,12 +374,34 @@ static int parse_command_line(char_os **argv)
   return i;
 }
 
+static void init_zstd_plumbing(void)
+{
+  if (!caml_zstd_available) {
+    int i;
+    for (i = 0; caml_names_of_builtin_cprim[i] != NULL; i++) {
+      if (strcmp("caml_plumb_marshal_zstd",
+                 caml_names_of_builtin_cprim[i]) == 0) {
+        /* Runtime has been linked with caml_plumb_marshal_zstd it's a
+           noalloc unit -> unit primitive, so safe to call. This
+           slight hack allows
+             ocamlc -make-runtime -I +marshal_zstd marshal_zstd.cma
+           to produce a working zstd runtime */
+        caml_builtin_cprim[i]();
+        break;
+      }
+    }
+  }
+}
+
 /* Print the configuration of the runtime to stdout; memory allocated is not
    freed, since the runtime will terminate after calling this. */
 static void do_print_config(void)
 {
   int i;
   char_os * dir;
+
+  /* Needed to report compression support accurately */
+  init_zstd_plumbing();
 
   /* Print the runtime configuration */
   printf("version: %s\n", OCAML_VERSION_STRING);
@@ -557,6 +579,8 @@ CAMLexport void caml_main(char_os **argv)
   caml_stat_free(shared_lib_path);
   caml_stat_free(shared_libs);
   caml_stat_free(req_prims);
+  /* Initialise zstd, if necessary */
+  init_zstd_plumbing();
   /* Load the globals */
   caml_seek_section(fd, &trail, "DATA");
   chan = caml_open_descriptor_in(fd);
@@ -648,6 +672,8 @@ CAMLexport value caml_startup_code_exn(
 #endif
   /* Use the builtin table of primitives */
   caml_build_primitive_table_builtin();
+  /* Initialise zstd, if necessary */
+  init_zstd_plumbing();
   /* Load the globals */
   caml_modify_generational_global_root
     (&caml_global_data, caml_input_value_from_block(data, data_size));
