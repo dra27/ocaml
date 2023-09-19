@@ -416,12 +416,8 @@ static void do_print_config(void)
          "false");
 #endif
   printf("no_naked_pointers: true\n");
-  printf("compression_supported: %s\n",
-#ifdef HAS_ZSTD
-         "true");
-#else
-         "false");
-#endif
+  /* For compatibility: OCaml 5.1 supported zstd in the runtime */
+  printf("compression_supported: false\n");
   printf("reserved header bits: %d\n", HEADER_RESERVED_BITS);
   printf("exec_magic_number: %s\n", EXEC_MAGIC);
 
