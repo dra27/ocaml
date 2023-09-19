@@ -1028,12 +1028,10 @@ void read_declarations(void)
 void output_token_type(void)
 {
   bucket * bp;
-  int n;
 
   fprintf(interface_file, "type token =\n");
   if (!rflag) ++outline;
   fprintf(output_file, "type token =\n");
-  n = 0;
   for (bp = first_symbol; bp; bp = bp->next) {
     if (bp->class == TERM && bp->true_token) {
       fprintf(interface_file, "  | %s", bp->name);
@@ -1047,7 +1045,6 @@ void output_token_type(void)
       fprintf(interface_file, "\n");
       if (!rflag) ++outline;
       fprintf(output_file, "\n");
-      n++;
     }
   }
   fprintf(interface_file, "\n");
