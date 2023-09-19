@@ -417,7 +417,8 @@ static void do_print_config(void)
 #endif
   printf("no_naked_pointers: true\n");
   /* For compatibility: OCaml 5.1 supported zstd in the runtime */
-  printf("compression_supported: false\n");
+  printf("compression_supported: %s\n",
+         (caml_zstd_available ? "true" : "false"));
   printf("reserved header bits: %d\n", HEADER_RESERVED_BITS);
   printf("exec_magic_number: %s\n", EXEC_MAGIC);
 

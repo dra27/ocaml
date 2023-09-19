@@ -158,3 +158,5 @@ TSAN=@tsan@
 TSAN_NATIVE_RUNTIME_C_SOURCES = @tsan_native_runtime_c_sources@
 
 ZSTD_LIBS = @zstd_libs@
+MARSHAL_ZSTD_LIB = @marshal_zstd_lib@
+ZSTD_NATIVE_RUNTIME_C_SOURCES = @zstd_native_runtime_c_sources@

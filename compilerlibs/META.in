@@ -4,7 +4,7 @@ version = "@VERSION@"
 description = "compiler-libs support library"
 
 package "common" (
-  requires = "compiler-libs"
+  requires = "compiler-libs stdlib.marshal-zstd"
   version = "@VERSION@"
   description = "Common compiler routines"
   archive(byte) = "ocamlcommon.cma"

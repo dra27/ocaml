@@ -787,23 +787,6 @@ static void caml_parse_header(struct caml_intern_state* s,
    when the memory block for the compressed input can be freed
    before more memory is allocated. */
 
-/* This global flag is shared with extern.c */
-bool caml_zstd_available = false;
-
-static size_t default_intern_decompress_input(unsigned char * blk,
-                                              uintnat uncompressed_data_len,
-                                              const unsigned char * intern_src,
-                                              uintnat data_len)
-{
-  return 0;
-}
-
-size_t (*caml_intern_decompress_input)(unsigned char *,
-                                       uintnat,
-                                       const unsigned char *,
-                                       uintnat) =
-  default_intern_decompress_input;
-
 static void intern_decompress_input(struct caml_intern_state * s,
                                     const char * fun_name,
                                     struct marshal_header * h)

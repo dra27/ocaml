@@ -67,7 +67,10 @@ endif
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
 all: $(STUBSLIB_BYTECODE) $(LIBNAME).cma $(CMIFILES)
 
-allopt: $(STUBSLIB_NATIVE) $(LIBNAME).cmxa $(LIBNAME).$(CMXS) $(CMIFILES)
+allopt: $(STUBSLIB_NATIVE) $(LIBNAME).cmxa $(CMIFILES)
+ifeq "$(NATDYNLINK)" "true"
+allopt: $(LIBNAME).$(CMXS)
+endif
 opt.opt: allopt
 
 $(LIBNAME).cma: $(CAMLOBJS)

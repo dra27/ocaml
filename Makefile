@@ -482,6 +482,14 @@ clean:: partialclean
 # The bytecode compiler
 
 ocamlc_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp)
+ocamlc_NATIVE_LIBRARIES = $(MARSHAL_ZSTD_LIB)
+
+# The following dependency is necessary at the moment, because the root
+# Makefile does not know yet how to build the other libraries
+# Once their build will happen in this root Makefile, too, it will become
+# possible to get rid of these dependencies
+otherlibs/marshal_zstd/marshal_zstd.cmxa:
+	$(MAKE) -C otherlibs/marshal_zstd allopt
 
 ocamlc_SOURCES = driver/main.mli driver/main.ml
 
@@ -495,6 +503,7 @@ partialclean::
 # The native-code compiler
 
 ocamlopt_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamloptcomp)
+ocamlopt_NATIVE_LIBRARIES = $(MARSHAL_ZSTD_LIB)
 
 ocamlopt_SOURCES = driver/optmain.mli driver/optmain.ml
 
@@ -651,6 +660,7 @@ runtime_COMMON_C_SOURCES = \
   callback \
   codefrag \
   compare \
+  compression \
   custom \
   debugger \
   domain \
@@ -886,11 +896,17 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 
 ## Runtime libraries and programs
 
-runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
-	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+runtime/ocamlrun$(EXE): \
+    runtime/prims.$(O) \
+    $(addprefix runtime/, $(ZSTD_NATIVE_RUNTIME_C_SOURCES:=.b.$(O))) \
+    runtime/libcamlrun.$(A)
+	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS) $(ZSTD_LIBS)
 
-runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
-	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
+runtime/ocamlruns$(EXE): \
+    runtime/prims.$(O) \
+    $(addprefix runtime/, $(ZSTD_NATIVE_RUNTIME_C_SOURCES:=.b.$(O))) \
+    runtime/libcamlrun_non_shared.$(A)
+	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS) $(ZSTD_LIBS))
 
 runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
@@ -898,14 +914,21 @@ runtime/libcamlrun.$(A): $(libcamlrun_OBJECTS)
 runtime/libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 
-runtime/ocamlrund$(EXE): runtime/prims.$(O) runtime/libcamlrund.$(A)
-	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS)
+runtime/ocamlrund$(EXE): \
+    runtime/prims.$(O) \
+    $(addprefix runtime/, $(ZSTD_NATIVE_RUNTIME_C_SOURCES:=.bd.$(O))) \
+    runtime/libcamlrund.$(A)
+	$(V_MKEXE)$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(BYTECCLIBS) $(ZSTD_LIBS)
 
 runtime/libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
 
-runtime/ocamlruni$(EXE): runtime/prims.$(O) runtime/libcamlruni.$(A)
-	$(V_MKEXE)$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(BYTECCLIBS)
+runtime/ocamlruni$(EXE): \
+    runtime/prims.$(O) \
+    $(addprefix runtime/, $(ZSTD_NATIVE_RUNTIME_C_SOURCES:=.bi.$(O))) \
+    runtime/libcamlruni.$(A)
+	$(V_MKEXE)$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) \
+                              $(BYTECCLIBS) $(ZSTD_LIBS)
 
 runtime/libcamlruni.$(A): $(libcamlruni_OBJECTS)
 	$(V_MKLIB)$(call MKLIB,$@, $^)
@@ -1408,6 +1431,9 @@ clean::
 
 ocamldebug_LIBRARIES = compilerlibs/ocamlcommon \
   $(addprefix otherlibs/,unix/unix dynlink/dynlink)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+ocamldebug_LIBRARIES += $(MARSHAL_ZSTD_LIB)
+endif
 
 # The following dependencies are necessary at the moment, because the
 # root Makefile does not know yet how to build the other libraries
@@ -1416,6 +1442,7 @@ ocamldebug_LIBRARIES = compilerlibs/ocamlcommon \
 
 otherlibs/unix/unix.cma: otherlibraries
 otherlibs/dynlink/dynlink.cma: otherlibraries
+otherlibs/marshal_zstd/marshal_zstd.cma: otherlibraries
 
 debugger/%: VPATH += otherlibs/unix otherlibs/dynlink
 
@@ -1702,6 +1729,7 @@ beforedepend:: $(addprefix tools/,opnames.ml make_opcodes.ml)
 
 ocamlobjinfo_LIBRARIES = \
   $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamlmiddleend)
+ocamlobjinfo_NATIVE_LIBRARIES = $(MARSHAL_ZSTD_LIB)
 ocamlobjinfo_SOURCES = tools/objinfo.mli tools/objinfo.ml
 
 # Scan object files for required primitives
@@ -1725,6 +1753,9 @@ cmpbyt_SOURCES = tools/cmpbyt.mli tools/cmpbyt.ml
 ocamltex_LIBRARIES = \
   $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp ocamltoplevel) \
   $(addprefix otherlibs/,str/str unix/unix)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+ocamltex_LIBRARIES += $(MARSHAL_ZSTD_LIB)
+endif
 ocamltex_SOURCES = tools/ocamltex.mli tools/ocamltex.ml
 
 # ocamltex uses str.cma and unix.cma and so must be compiled with
@@ -1781,7 +1812,7 @@ endif
 ocamlnat_LIBRARIES = \
   compilerlibs/ocamlcommon compilerlibs/ocamloptcomp \
   compilerlibs/ocamlbytecomp otherlibs/dynlink/dynlink \
-  compilerlibs/ocamltoplevel
+  compilerlibs/ocamltoplevel $(MARSHAL_ZSTD_LIB)
 
 ocamlnat_SOURCES = $(ocaml_SOURCES)
 

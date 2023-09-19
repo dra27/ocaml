@@ -147,6 +147,8 @@ AC_SUBST([oc_dll_ldflags])
 AC_SUBST([oc_exe_ldflags])
 AC_SUBST([cclibs])
 AC_SUBST([zstd_libs])
+AC_SUBST([marshal_zstd_lib])
+AC_SUBST([zstd_native_runtime_c_sources])
 AC_SUBST([native_ldflags])
 AC_SUBST([ocamlc_cflags])
 AC_SUBST([ocamlc_cppflags])
@@ -2118,6 +2120,8 @@ AS_IF([test x"$zstd_status" = "xok"],
   [AC_MSG_NOTICE([compressed marshaling supported])
    cclibs="$cclibs"
    internal_cppflags="$internal_cppflags $zstd_flags"
+   marshal_zstd_lib='otherlibs/marshal_zstd/marshal_zstd'
+   zstd_native_runtime_c_sources='zstd'
    otherlibraries="$otherlibraries marshal_zstd"
    AC_DEFINE([HAS_ZSTD])],
   [AS_CASE(["$with_zstd"],

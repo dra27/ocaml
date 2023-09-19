@@ -3,3 +3,13 @@
 version = "@VERSION@"
 description = "Standard library"
 directory = "+"
+
+package "marshal-zstd" (
+  requires = "stdlib"
+  version = "@VERSION@"
+  description = "Enable support for the Compression flag in Marshal"
+  directory = "+marshal_zstd"
+  archive(byte) = "marshal_zstd.cma"
+  archive(native) = "marshal_zstd.cmxa"
+  exists_if = "marshal_zstd.cma"
+)

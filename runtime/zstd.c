@@ -93,10 +93,18 @@ size_t caml_zstd_decompress(unsigned char * blk,
   return ZSTD_decompress(blk, uncompressed_data_len, intern_src, data_len);
 }
 
-CAMLprim value caml_plumb_marshal_zstd (value unit)
-{
-  caml_zstd_available = true;
-  caml_extern_compress_output = caml_zstd_compress;
-  caml_intern_decompress_input = caml_zstd_decompress;
-  return Val_unit;
-}
+/* This section allows runtime/zstd.*b.o to be linked when creating ocamlrun*
+   with zstd support enabled, but is skipped when building the C stubs in the
+   marshal_zstd library. */
+#ifndef CAML_BUILDING_STUBS
+bool caml_zstd_available = true;
+
+size_t (*caml_intern_decompress_input)(unsigned char *,
+                                       uintnat,
+                                       const unsigned char *,
+                                       uintnat) =
+  caml_zstd_decompress;
+
+bool (*caml_extern_compress_output)(struct caml_output_block **) =
+  caml_zstd_compress;
+#endif

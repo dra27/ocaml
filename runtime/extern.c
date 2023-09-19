@@ -906,19 +906,6 @@ static void extern_rec(struct caml_extern_state* s, value v)
   /* Never reached as function leaves with return */
 }
 
-/* Compress the output */
-
-/* caml_zstd_available is defined in intern.c */
-
-static bool default_extern_compress_output(
-  struct caml_output_block **extern_output_first)
-{
-  return false;
-}
-
-bool (*caml_extern_compress_output)(struct caml_output_block **) =
-  default_extern_compress_output;
-
 static const int extern_flag_values[] = {
   NO_SHARING, CLOSURES, COMPAT_32, COMPRESSED
 };

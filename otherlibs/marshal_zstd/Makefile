@@ -17,14 +17,24 @@
 LIBNAME = marshal_zstd
 CLIBNAME = camlzstd
 CAMLOBJS = stdlib_marshal_zstd_support.cmo
-C_SOURCES = zstd.c
+C_SOURCES = zstdstubs.c
 LINKOPTS = $(addprefix -cclib , $(ZSTD_LIBS))
 LDOPTS = $(addprefix -ldopt , $(ZSTD_LIBS))
 
 include ../Makefile.otherlibs.common
 
-.PHONY: depend
-depend:
+zstdstubs.b.$(O): zstd.c
+zstdstubs.n.$(O): zstd.c
+zstdstubs.c: zstd.c
+
+zstd.c: $(ROOTDIR)/runtime/zstd.c
+	$(V_GEN)cp $^ $@
+
+clean::
+	rm -f zstd.c
+
+.PHONY:
+depend: zstd.c
 	$(OCAMLRUN) $(ROOTDIR)/boot/ocamlc -depend -slash *.mli *.ml > .depend
 
 include .depend

@@ -58,7 +58,8 @@ INCLUDE_DIRS = $(addprefix $(ROOTDIR)/,\
 INCLUDES_DEP = $(addprefix -I ,$(INCLUDE_DIRS))
 INCLUDES_NODEP = $(addprefix -I $(ROOTDIR)/,\
   compilerlibs otherlibs/str otherlibs/dynlink \
-  otherlibs/dynlink/native otherlibs/unix)
+  otherlibs/dynlink/native otherlibs/marshal_zstd \
+  otherlibs/unix)
 
 OC_OCAMLDEPDIRS = $(INCLUDE_DIRS)
 INCLUDES=$(INCLUDES_DEP) $(INCLUDES_NODEP)
@@ -157,7 +158,13 @@ generatorsopt: $(GENERATORS_CMXS)
 OCAMLDOC_LIBRARIES = ocamlcommon unix str dynlink
 
 OCAMLDOC_BCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cma)
-OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+OCAMLDOC_BCLIBRARIES += \
+  $(addprefix $(ROOTDIR)/, $(MARSHAL_ZSTD_LIB:%=%.cma))
+endif
+OCAMLDOC_NCLIBRARIES = \
+  $(addprefix $(ROOTDIR)/, $(MARSHAL_ZSTD_LIB:%=%.cmxa)) \
+  $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 

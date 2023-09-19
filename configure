@@ -854,6 +854,8 @@ flexdll_source_dir
 ocamlc_cppflags
 ocamlc_cflags
 native_ldflags
+zstd_native_runtime_c_sources
+marshal_zstd_lib
 zstd_libs
 cclibs
 oc_exe_ldflags
@@ -3307,6 +3309,8 @@ OCAML_VERSION_SHORT=5.2
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
 
 
 
@@ -18533,6 +18537,8 @@ then :
 printf "%s\n" "$as_me: compressed marshaling supported" >&6;}
    cclibs="$cclibs"
    internal_cppflags="$internal_cppflags $zstd_flags"
+   marshal_zstd_lib='otherlibs/marshal_zstd/marshal_zstd'
+   zstd_native_runtime_c_sources='zstd'
    otherlibraries="$otherlibraries marshal_zstd"
    printf "%s\n" "#define HAS_ZSTD 1" >>confdefs.h
 
