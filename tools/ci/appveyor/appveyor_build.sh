@@ -158,7 +158,7 @@ case "$1" in
     run "test $PORT" \
         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-    if [[ $PORT = 'msvc64' ]] ; then
+    if [[ $EXTRA_CHECKS = 'true' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
       cd "$FULL_BUILD_PREFIX-$PORT"
@@ -181,7 +181,7 @@ case "$1" in
   *)
     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 
-    if [[ $PORT = 'msvc64' ]] ; then
+    if [[ $EXTRA_CHECKS = 'true' ]] ; then
       # Ensure that make distclean can be run from an empty tree
       run "$MAKE distclean" $MAKE distclean
     fi
