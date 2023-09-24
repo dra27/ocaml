@@ -45,13 +45,7 @@ STDLIB_MODULE_BASENAMES = \
   printexc fun gc digest bigarray random hashtbl weak \
   format scanf callback camlinternalOO oo camlinternalMod genlex ephemeron \
   filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
-<<<<<<< HEAD
-  stdLabels bigarray in_channel out_channel
-||||||| parent of f47caedeb3 (Reimplementation of Random using an LXM pseudo-random number generator (PR#10742))
-  stdLabels bigarray in_channel out_channel effect
-=======
-  stdLabels in_channel out_channel effect
->>>>>>> f47caedeb3 (Reimplementation of Random using an LXM pseudo-random number generator (PR#10742))
+  stdLabels in_channel out_channel
 
 STDLIB_PREFIXED_MODULES = \
   $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
