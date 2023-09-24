@@ -615,10 +615,10 @@ index 2a7ef8637c..1775ea8435 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..73a1c0d390
+index 0000000000..c0fff52807
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,750 @@
+@@ -0,0 +1,772 @@
 +diff --git a/runtime/Makefile b/runtime/Makefile
 +index f5c08d8798..dee25dc02a 100644
 +--- a/runtime/Makefile
@@ -1267,6 +1267,28 @@ index 0000000000..73a1c0d390
 + #include "misc.h"
 + #include "mlvalues.h"
 + 
++diff --git a/runtime/dune b/runtime/dune
++index 78c39300ed..23eb1d1e8a 100644
++--- a/runtime/dune
+++++ b/runtime/dune
++@@ -21,7 +21,7 @@
++      interp.c ints.c io.c
++    lexing.c md5.c meta.c memprof.c obj.c parsing.c signals.c str.c sys.c
++      callback.c weak.c
++-   finalise.c stacks.c dynlink.c backtrace_byt.c backtrace.c
+++   finalise.c dynlink.c backtrace_byt.c backtrace.c
++      afl.c
++    bigarray.c eventlog.c)
++  (action  (with-stdout-to %{targets} (run %{dep:gen_primitives.sh}))))
++@@ -36,7 +36,7 @@
++    ../Makefile.common Makefile
++    (glob_files caml/*.h)
++    ; matches the line structure of files in Makefile/BYTECODE_C_SOURCES
++-   interp.c misc.c stacks.c fix_code.c startup_aux.c startup_byt.c freelist.c
+++   interp.c misc.c fix_code.c startup_aux.c startup_byt.c freelist.c
++      major_gc.c
++    minor_gc.c memory.c alloc.c roots_byt.c globroots.c fail_byt.c signals.c
++    signals_byt.c printexc.c backtrace_byt.c backtrace.c compare.c ints.c
 +diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
 +index dba30c3848..7eea86f8c0 100644
 +--- a/runtime/dynlink_nat.c
@@ -3987,10 +4009,10 @@ index 0000000000..de1762df35
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..41ccec9a5b
+index 0000000000..ca1c944ced
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3983 @@
+@@ -0,0 +1,3975 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -4608,10 +4630,10 @@ index 0000000000..41ccec9a5b
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..73a1c0d390
++index 0000000000..c0fff52807
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,750 @@
++@@ -0,0 +1,772 @@
 ++diff --git a/runtime/Makefile b/runtime/Makefile
 ++index f5c08d8798..dee25dc02a 100644
 ++--- a/runtime/Makefile
@@ -5260,6 +5282,28 @@ index 0000000000..41ccec9a5b
 ++ #include "misc.h"
 ++ #include "mlvalues.h"
 ++ 
+++diff --git a/runtime/dune b/runtime/dune
+++index 78c39300ed..23eb1d1e8a 100644
+++--- a/runtime/dune
++++++ b/runtime/dune
+++@@ -21,7 +21,7 @@
+++      interp.c ints.c io.c
+++    lexing.c md5.c meta.c memprof.c obj.c parsing.c signals.c str.c sys.c
+++      callback.c weak.c
+++-   finalise.c stacks.c dynlink.c backtrace_byt.c backtrace.c
++++   finalise.c dynlink.c backtrace_byt.c backtrace.c
+++      afl.c
+++    bigarray.c eventlog.c)
+++  (action  (with-stdout-to %{targets} (run %{dep:gen_primitives.sh}))))
+++@@ -36,7 +36,7 @@
+++    ../Makefile.common Makefile
+++    (glob_files caml/*.h)
+++    ; matches the line structure of files in Makefile/BYTECODE_C_SOURCES
+++-   interp.c misc.c stacks.c fix_code.c startup_aux.c startup_byt.c freelist.c
++++   interp.c misc.c fix_code.c startup_aux.c startup_byt.c freelist.c
+++      major_gc.c
+++    minor_gc.c memory.c alloc.c roots_byt.c globroots.c fail_byt.c signals.c
+++    signals_byt.c printexc.c backtrace_byt.c backtrace.c compare.c ints.c
 ++diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
 ++index dba30c3848..7eea86f8c0 100644
 ++--- a/runtime/dynlink_nat.c
@@ -7943,37 +7987,7 @@ index 0000000000..41ccec9a5b
 ++  * are unreliable except the bad value checks and as a check for catastrophic
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++ 
+++--- a/testsui
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
