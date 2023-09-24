@@ -739,6 +739,49 @@ index ca57632f4a..567dba44cc 100644
    | Assignment, Immediate
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
+diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
+index 6a34eb597b..76a26facad 100644
+--- a/asmcomp/power/emit.mlp
++++ b/asmcomp/power/emit.mlp
+@@ -646,8 +646,10 @@ let emit_instr env i =
+           (* Save OCaml stack pointer in a callee-save register *)
+           `	mr	28, 1\n`;
+           (* Switch to C stack *)
++(* BACKPORT
+           let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
+           `	ld	1, {emit_int offset}(30)\n`;
++*)
+           emit_call func;
+           emit_call_nop();
+           (* Switch back to OCaml stack *)
+@@ -767,8 +769,12 @@ let emit_instr env i =
+         let instr = name_for_specific sop in
+         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
+     | Lop (Idls_get) ->
++(* BACKPORT BEGIN
+         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+         `	ld {emit_reg i.res.(0)}, {emit_int offset}(30)\n`
++*)
++        assert false
++(* BACKPORT END *)
+     | Lreloadretaddr ->
+         `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
+         `	mtlr	11\n`
+@@ -919,12 +925,14 @@ let fundecl fundecl =
+   begin match !handle_overflow with
+   | None -> ()
+   | Some(overflow, ret) ->
++(* BACKPORT
+       let threshold_offset =
+         Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+       let f = max_frame_size + threshold_offset in
+       let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
+       `	ld	11, {emit_int offset}(30)\n`;
+       `	addi	11, 11, {emit_int f}\n`;
++*)
+       `	cmpld	1, 11\n`;
+       `	ble-	{emit_label overflow}\n`;
+       `{emit_label ret}:\n`
 diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
 index bcc9d12947..5252fa4473 100644
 --- a/asmcomp/riscv/emit.mlp
@@ -3258,10 +3301,10 @@ index 8cfa8b35d2..8fbc0f4164 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 22f2a28873..60c920671f 100755
+index 22f2a28873..023b8d43fa 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 55725773fa..55f30e3525 100644
+index 55725773fa..d063645cd7 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3355,9 +3398,10 @@ index 55725773fa..55f30e3525 100644
 -    [arch=amd64; system=win64],
 +    [has_native_backend=yes; arch=amd64; system=win64],
    [[powerpc64le*-*-linux*]],
-     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+-    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++    [arch=power; model=ppc64le; system=elf],
 +  [[powerpc*-*-linux*]],
-+    [has_native_backend=yes; arch=power; model=ppc; system=elf],
++    [arch=power; model=ppc; system=elf],
    [[s390x*-*-linux*]],
 -    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
 +    [arch=s390x; model=z10; system=elf],
@@ -6559,7 +6603,7 @@ index 0000000000..d2a1e96521
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ac45d23896
+index 0000000000..15317da274
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3863 @@
@@ -7659,7 +7703,7 @@ index 0000000000..ac45d23896
 +  {
 +    bytecode;
 +diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-+index 9b48df20e9..d9926036d6 100644
++index d50ba6a9c4..d2b8189fe4 100644
 +--- a/testsuite/tests/callback/stack_overflow.ml
 ++++ b/testsuite/tests/callback/stack_overflow.ml
 +@@ -1,6 +1,8 @@
@@ -10428,10 +10472,10 @@ index 0000000000..ac45d23896
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0eda74db3d
+index 0000000000..793a7fd791
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10344 @@
+@@ -0,0 +1,10437 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..780d54f43c
@@ -11173,6 +11217,49 @@ index 0000000000..0eda74db3d
 +   | Assignment, Immediate
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
++diff --git a/asmcomp/power/emit.mlp b/asmcomp/power/emit.mlp
++index 6a34eb597b..76a26facad 100644
++--- a/asmcomp/power/emit.mlp
+++++ b/asmcomp/power/emit.mlp
++@@ -646,8 +646,10 @@ let emit_instr env i =
++           (* Save OCaml stack pointer in a callee-save register *)
++           `	mr	28, 1\n`;
++           (* Switch to C stack *)
+++(* BACKPORT
++           let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
++           `	ld	1, {emit_int offset}(30)\n`;
+++*)
++           emit_call func;
++           emit_call_nop();
++           (* Switch back to OCaml stack *)
++@@ -767,8 +769,12 @@ let emit_instr env i =
++         let instr = name_for_specific sop in
++         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
++     | Lop (Idls_get) ->
+++(* BACKPORT BEGIN
++         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++         `	ld {emit_reg i.res.(0)}, {emit_int offset}(30)\n`
+++*)
+++        assert false
+++(* BACKPORT END *)
++     | Lreloadretaddr ->
++         `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
++         `	mtlr	11\n`
++@@ -919,12 +925,14 @@ let fundecl fundecl =
++   begin match !handle_overflow with
++   | None -> ()
++   | Some(overflow, ret) ->
+++(* BACKPORT
++       let threshold_offset =
++         Domainstate.stack_ctx_words * 8 + stack_threshold_size in
++       let f = max_frame_size + threshold_offset in
++       let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
++       `	ld	11, {emit_int offset}(30)\n`;
++       `	addi	11, 11, {emit_int f}\n`;
+++*)
++       `	cmpld	1, 11\n`;
++       `	ble-	{emit_label overflow}\n`;
++       `{emit_label ret}:\n`
 +diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
 +index bcc9d12947..5252fa4473 100644
 +--- a/asmcomp/riscv/emit.mlp
@@ -13692,10 +13779,10 @@ index 0000000000..0eda74db3d
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 22f2a28873..60c920671f 100755
++index 22f2a28873..023b8d43fa 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 55725773fa..55f30e3525 100644
++index 55725773fa..d063645cd7 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13789,9 +13876,10 @@ index 0000000000..0eda74db3d
 +-    [arch=amd64; system=win64],
 ++    [has_native_backend=yes; arch=amd64; system=win64],
 +   [[powerpc64le*-*-linux*]],
-+     [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++-    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+++    [arch=power; model=ppc64le; system=elf],
 ++  [[powerpc*-*-linux*]],
-++    [has_native_backend=yes; arch=power; model=ppc; system=elf],
+++    [arch=power; model=ppc; system=elf],
 +   [[s390x*-*-linux*]],
 +-    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
 ++    [arch=s390x; model=z10; system=elf],
@@ -16993,7 +17081,7 @@ index 0000000000..0eda74db3d
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ac45d23896
++index 0000000000..15317da274
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3863 @@
@@ -18093,7 +18181,7 @@ index 0000000000..0eda74db3d
 ++  {
 ++    bytecode;
 ++diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
-++index 9b48df20e9..d9926036d6 100644
+++index d50ba6a9c4..d2b8189fe4 100644
 ++--- a/testsuite/tests/callback/stack_overflow.ml
 +++++ b/testsuite/tests/callback/stack_overflow.ml
 ++@@ -1,6 +1,8 @@
@@ -20775,7 +20863,56 @@ index 0000000000..0eda74db3d
 ++ }
 ++ 
 ++ Build () {
-++diff -
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..f69aeb342c 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
