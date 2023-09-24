@@ -846,7 +846,7 @@ index bcc9d12947..5252fa4473 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
-index cda447d30d..27ed8287ab 100755
+index cda447d30d..9b4257ad76 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
 index 76fea58895..17a7582aeb 100755
@@ -10119,7 +10119,7 @@ index 0000000000..5e37abae6e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..afd5b007e4
+index 0000000000..44787d8216
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10041 @@
@@ -10971,7 +10971,7 @@ index 0000000000..afd5b007e4
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index cda447d30d..27ed8287ab 100755
++index cda447d30d..9b4257ad76 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
 +index 76fea58895..17a7582aeb 100755
@@ -22262,6 +22262,22 @@ index ab29d404c9..8534cb3222 100644
  
  let from_fun (f : unit -> 'arg) =
    let x = Obj.new_block Obj.lazy_tag 1 in
+diff --git a/stdlib/marshal.ml b/stdlib/marshal.ml
+index 7e1beed265..7c72a5a319 100644
+--- a/stdlib/marshal.ml
++++ b/stdlib/marshal.ml
+@@ -45,7 +45,11 @@ external from_channel: in_channel -> 'a = "caml_input_value"
+ external from_bytes_unsafe: bytes -> int -> 'a = "caml_input_value_from_bytes"
+ external data_size_unsafe: bytes -> int -> int = "caml_marshal_data_size"
+ 
++(* BACKPORT BEGIN
+ let header_size = 16
++*)
++let header_size = 20
++(* BACKPORT END *)
+ let data_size buff ofs =
+   if ofs < 0 || ofs > Bytes.length buff - header_size
+   then invalid_arg "Marshal.data_size"
 diff --git a/stdlib/random.ml b/stdlib/random.ml
 index ff3b90480f..4a5f7f8032 100644
 --- a/stdlib/random.ml

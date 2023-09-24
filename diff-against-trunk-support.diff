@@ -3327,7 +3327,7 @@ index e1e40f1fb6..00f49cfc74 100644
  ** native
  *)
 diff --git a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
-index baea29a0d5..d71791641d 100644
+index baea29a0d5..d7f5445d5a 100644
 --- a/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
 +++ b/testsuite/tests/statmemprof/callstacks.flat-float-array.reference
 @@ -1,74 +1,74 @@
@@ -3400,7 +3400,8 @@ index baea29a0d5..d71791641d 100644
 +Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
  Called from Callstacks in file "callstacks.ml", line 99, characters 2-27
  -----------
- Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 61, characters 9-35
+-Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 61, characters 9-35
++Raised by primitive operation at Stdlib__Marshal.from_bytes in file "marshal.ml", line 66, characters 9-35
  Called from Callstacks.alloc_unmarshal in file "callstacks.ml", line 62, characters 12-87
  Called from Callstacks.test in file "callstacks.ml", line 92, characters 2-10
 -Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
