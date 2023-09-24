@@ -1,22 +1,6 @@
 (* TEST
-<<<<<<< HEAD
-
 * skip
 reason = "OCaml 5 only"
-** hassysthreads
-include systhreads
-*** bytecode
-*** native
-
-||||||| parent of 5fac555874 (Do not link unix library when not necessary (PR#11197))
-
-* hassysthreads
-include systhreads
-** bytecode
-** native
-
-=======
->>>>>>> 5fac555874 (Do not link unix library when not necessary (PR#11197))
 *)
 
 (* Classic producer-consumer *)

@@ -1,18 +1,6 @@
 (* TEST
-<<<<<<< HEAD
 * skip
 reason = "OCaml 5 only"
-** hasunix
-include unix
-*** bytecode
-*** native
-||||||| parent of 5fac555874 (Do not link unix library when not necessary (PR#11197))
-* hasunix
-include unix
-** bytecode
-** native
-=======
->>>>>>> 5fac555874 (Do not link unix library when not necessary (PR#11197))
 *)
 
 type u = U of unit
