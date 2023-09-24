@@ -790,10 +790,10 @@ index 2d8b5f168f..b982a6247e 100644
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 11ca18dfc5..ebad0d2bba 100755
+index 11ca18dfc5..6928214439 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index d109f64080..5393f87ab3 100755
+index d109f64080..4eed63a618 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -10081,7 +10081,7 @@ index 0000000000..113c234ed3
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..21b34ccba3
+index 0000000000..3e325d3132
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,9999 @@
@@ -10877,10 +10877,10 @@ index 0000000000..21b34ccba3
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 11ca18dfc5..ebad0d2bba 100755
++index 11ca18dfc5..6928214439 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index d109f64080..5393f87ab3 100755
++index d109f64080..4eed63a618 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
