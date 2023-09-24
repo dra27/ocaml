@@ -548,20 +548,12 @@ OCaml 4.14.0
   toplevel, as in the bytecode toplevel.
   (David Allsopp, report by Nathan Rebours, review by Gabriel Scherer)
 
-<<<<<<< HEAD
-||||||| parent of d3202e90a2 (Merge pull request PR#10959 from COCTI/fix10907)
-- #10853: `Obj.reachable_words` could crash if called after a marshaling
-  operation in `NO_SHARING` mode.
-  (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
-
-=======
 - #10853: `Obj.reachable_words` could crash if called after a marshaling
   operation in `NO_SHARING` mode.
   (Xavier Leroy, report by Anil Madhavapeddy, review by Alain Frisch)
 
 - #10907, #10959: Wrong type inferred from existential types
   (Jacques Garrigue and Gabriel Scherer, report by @dyzsr, review by Leo White)
->>>>>>> d3202e90a2 (Merge pull request PR#10959 from COCTI/fix10907)
 
 OCaml 4.13 maintenance branch
 -----------------------------
