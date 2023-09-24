@@ -665,6 +665,7 @@ std_exit.cmo : \
     std_exit.cmi
 std_exit.cmx : \
     std_exit.cmi
+std_exit.cmi :
 stdlib__String.cmo : string.ml \
     stdlib.cmi \
     stdlib__Bytes.cmi \

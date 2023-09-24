@@ -1049,7 +1049,7 @@ subdirs = \
 
 .PHONY: alldepend
 alldepend: depend
-	for dir in $(subdirs); do \
+	for dir in $(filter-out %/runtime_events, $(subdirs)); do \
 	  $(MAKE) -C $$dir depend || exit; \
 	done
 

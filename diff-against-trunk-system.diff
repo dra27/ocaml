@@ -135,7 +135,7 @@ index f2170e8631..605247c87c 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 078f469385..20f00cdc03 100644
+index 078f469385..a3f71e309f 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -579,7 +579,6 @@ partialclean::
@@ -211,7 +211,7 @@ index 078f469385..20f00cdc03 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1045,7 +1042,9 @@ clean::
+@@ -1045,12 +1042,14 @@ clean::
  
  # Dependencies
  
@@ -222,6 +222,12 @@ index 078f469385..20f00cdc03 100644
    debugger lex ocamldoc ocamltest tools
  
  .PHONY: alldepend
+ alldepend: depend
+-	for dir in $(subdirs); do \
++	for dir in $(filter-out %/runtime_events, $(subdirs)); do \
+ 	  $(MAKE) -C $$dir depend || exit; \
+ 	done
+ 
 @@ -1101,6 +1100,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
@@ -6899,10 +6905,10 @@ index 0000000000..4265571c05
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..99f958617f
+index 0000000000..8acd2dbeaa
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6795 @@
+@@ -0,0 +1,6794 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..7308a65294
@@ -7040,7 +7046,7 @@ index 0000000000..99f958617f
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 078f469385..20f00cdc03 100644
++index 078f469385..a3f71e309f 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -579,7 +579,6 @@ partialclean::
@@ -7116,7 +7122,7 @@ index 0000000000..99f958617f
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1045,7 +1042,9 @@ clean::
++@@ -1045,12 +1042,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -7127,6 +7133,12 @@ index 0000000000..99f958617f
 +   debugger lex ocamldoc ocamltest tools
 + 
 + .PHONY: alldepend
++ alldepend: depend
++-	for dir in $(subdirs); do \
+++	for dir in $(filter-out %/runtime_events, $(subdirs)); do \
++ 	  $(MAKE) -C $$dir depend || exit; \
++ 	done
++ 
 +@@ -1101,6 +1100,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
@@ -13690,14 +13702,7 @@ index 0000000000..99f958617f
 ++-* skip
 ++-reason = "ocamldebug is broken (#34)"
 ++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "pr
+++-*** shared-librar
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -15008,7 +15013,7 @@ index 00b9ae40df..4ce758fa2b 100644
    return res;
  }
 diff --git a/stdlib/.depend b/stdlib/.depend
-index a0a1132ff8..0f2d95219e 100644
+index a0a1132ff8..a741b83cc5 100644
 --- a/stdlib/.depend
 +++ b/stdlib/.depend
 @@ -188,14 +188,6 @@ stdlib__Complex.cmx : complex.ml \
@@ -15174,16 +15179,8 @@ index a0a1132ff8..0f2d95219e 100644
  stdlib__Seq.cmo : seq.ml \
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
-@@ -719,7 +665,6 @@ std_exit.cmo : \
-     std_exit.cmi
- std_exit.cmx : \
-     std_exit.cmi
--std_exit.cmi :
- stdlib__String.cmo : string.ml \
-     stdlib.cmi \
-     stdlib__Bytes.cmi \
 diff --git a/stdlib/Makefile b/stdlib/Makefile
-index 306dfc9604..1a8a47c161 100644
+index 306dfc9604..973b8cf5d9 100644
 --- a/stdlib/Makefile
 +++ b/stdlib/Makefile
 @@ -263,7 +263,8 @@ GNUISH_SED = \
@@ -15191,7 +15188,7 @@ index 306dfc9604..1a8a47c161 100644
  
  .depend.tmp:
 -	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
-+	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml \
++	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
 +    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
  	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
  	  stdlib.ml stdlib.mli >> $@
