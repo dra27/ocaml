@@ -1293,6 +1293,102 @@ index ff1646835a..a29cd8516b 100644
  *)
  
  (* C version of ephetest.ml *)
+diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
+index 3f0a02e4a1..3c5b1b621b 100644
+--- a/testsuite/tests/frame-pointers/c_call.ml
++++ b/testsuite/tests/frame-pointers/c_call.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+ 
+-* frame_pointers
+-** native
++* skip
++reason = "OCaml 5 only"
++** frame_pointers
++*** native
+ readonly_files = "fp_backtrace.c c_call_.c"
+ all_modules = "${readonly_files} c_call.ml"
+ 
+diff --git a/testsuite/tests/frame-pointers/effects.ml b/testsuite/tests/frame-pointers/effects.ml
+index e14633a374..03068242a4 100644
+--- a/testsuite/tests/frame-pointers/effects.ml
++++ b/testsuite/tests/frame-pointers/effects.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+ 
+-* frame_pointers
+-** native
++* skip
++reason - "OCaml 5 only"
++** frame_pointers
++*** native
+ readonly_files = "fp_backtrace.c"
+ all_modules = "${readonly_files} effects.ml"
+ 
+diff --git a/testsuite/tests/frame-pointers/exception_handler.ml b/testsuite/tests/frame-pointers/exception_handler.ml
+index 575f7329bf..56676119b7 100644
+--- a/testsuite/tests/frame-pointers/exception_handler.ml
++++ b/testsuite/tests/frame-pointers/exception_handler.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+ 
+-* frame_pointers
+-** native
++* skip
++reason = "OCaml 5 only"
++** frame_pointers
++*** native
+ readonly_files = "fp_backtrace.c"
+ all_modules = "${readonly_files} exception_handler.ml"
+ 
+diff --git a/testsuite/tests/frame-pointers/reperform.ml b/testsuite/tests/frame-pointers/reperform.ml
+index 1af8452e5f..5e7a76f0e3 100644
+--- a/testsuite/tests/frame-pointers/reperform.ml
++++ b/testsuite/tests/frame-pointers/reperform.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+ 
+-* frame_pointers
+-** native
++* skip
++reason - "OCaml 5 only"
++** frame_pointers
++*** native
+ 
+ readonly_files = "fp_backtrace.c"
+ all_modules = "${readonly_files} reperform.ml"
+diff --git a/testsuite/tests/frame-pointers/stack_realloc.ml b/testsuite/tests/frame-pointers/stack_realloc.ml
+index 79e70c2add..b36bcd3a70 100644
+--- a/testsuite/tests/frame-pointers/stack_realloc.ml
++++ b/testsuite/tests/frame-pointers/stack_realloc.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+ 
+-* frame_pointers
+-** native
++* skip
++reason - "OCaml 5 only"
++** frame_pointers
++*** native
+ 
+ readonly_files = "fp_backtrace.c stack_realloc_.c"
+ all_modules = "${readonly_files} stack_realloc.ml"
+diff --git a/testsuite/tests/frame-pointers/stack_realloc2.ml b/testsuite/tests/frame-pointers/stack_realloc2.ml
+index a3d21bf2bf..df4a074443 100644
+--- a/testsuite/tests/frame-pointers/stack_realloc2.ml
++++ b/testsuite/tests/frame-pointers/stack_realloc2.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+ 
+-* frame_pointers
+-** native
++* skip
++reason - "OCaml 5 only"
++** frame_pointers
++*** native
+ 
+ readonly_files = "fp_backtrace.c stack_realloc_.c"
+ all_modules = "${readonly_files} stack_realloc2.ml"
 diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
 index 56d1586331..6bdb7fdaf3 100644
 --- a/testsuite/tests/gc-roots/globroots.ml
