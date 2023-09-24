@@ -12411,21 +12411,23 @@ index b6605d7bf2..3dc08b7994 100644
    opEVENT, Nothing;
    opBREAK, Nothing;
 diff --git a/utils/config.mlp b/utils/config.mlp
-index fc92ba77ec..f86974a362 100644
+index fc92ba77ec..75087e4b2f 100644
 --- a/utils/config.mlp
 +++ b/utils/config.mlp
-@@ -122,7 +122,11 @@ let max_tag = 243
+@@ -122,8 +122,13 @@ let max_tag = 243
  let lazy_tag = 246
  
  let max_young_wosize = 256
 +(* BACKPORT BEGIN
  let stack_threshold = 32 (* see runtime/caml/config.h *)
+ let stack_safety_margin = 6
 +*)
 +let stack_threshold = 256 (* see runtime/caml/config.h *)
++let stack_safety_margin = 60
 +(* BACKPORT END *)
- let stack_safety_margin = 6
  
  let architecture = "%%ARCH%%"
+ let model = "%%MODEL%%"
 diff --git a/utils/domainstate.ml.c b/utils/domainstate.ml.c
 index 6dbae1d07a..1eee2142ad 100644
 --- a/utils/domainstate.ml.c
