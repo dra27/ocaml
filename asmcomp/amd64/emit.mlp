@@ -569,14 +569,8 @@ let emit_instr env fallthrough i =
           I.mov (domain_field Domainstate.Domain_young_ptr) r15
         end
       end else begin
-<<<<<<< HEAD
 (*
-        I.mov rsp rbp;
-||||||| parent of e22529e6dd (Merge pull request PR#11144 from fabbing/fp_redux)
-        I.mov rsp rbp;
-=======
         I.mov rsp rbx;
->>>>>>> e22529e6dd (Merge pull request PR#11144 from fabbing/fp_redux)
         cfi_remember_state ();
         cfi_def_cfa_register "rbx";
         (* NB: gdb has asserts on contiguous stacks that mean it
@@ -585,14 +579,8 @@ let emit_instr env fallthrough i =
         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
 *)
         emit_call func;
-<<<<<<< HEAD
 (*
-        I.mov rbp rsp;
-||||||| parent of e22529e6dd (Merge pull request PR#11144 from fabbing/fp_redux)
-        I.mov rbp rsp;
-=======
         I.mov rbx rsp;
->>>>>>> e22529e6dd (Merge pull request PR#11144 from fabbing/fp_redux)
         cfi_restore_state ();
 *)
       end
