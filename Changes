@@ -359,6 +359,10 @@ Working version
   temporary assembly file is no longer left in the file system.
   (Nicolás Ojeda Bär, review by Gabriel Scherer and Xavier Leroy)
 
+- #12264, #12289: Fix compact_allocate to avoid a pathological case
+  that causes very slow compaction.
+  (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
+
 OCaml 5.0
 ---------
 
