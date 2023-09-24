@@ -23,9 +23,11 @@ open! Dynlink_compilerlibs
 (* Dynlink is only allowed on the main domain.
    Entrypoints to public functions should check for this. *)
 let is_dynlink_allowed () =
+(* BACKPORT
   if not (Domain.is_main_domain ()) then
     failwith "Dynlink can only be called from the main domain."
   else
+*)
     ()
 
 module String = struct

@@ -57,9 +57,11 @@ external field : t -> int -> t = "%obj_field"
     be propagated.
 *)
 external set_field : t -> int -> t -> unit = "%obj_set_field"
+(* BACKPORT
 external compare_and_swap_field : t -> int -> t -> t -> bool
   = "caml_obj_compare_and_swap"
 external is_shared : t -> bool = "caml_obj_is_shared"
+*)
 external set_tag : t -> int -> unit = "caml_obj_set_tag"
   [@@ocaml.deprecated "Use with_tag instead."]
 

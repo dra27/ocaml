@@ -959,6 +959,7 @@ val formatter_of_out_channel : out_channel -> formatter
     to the corresponding output channel [oc].
 *)
 
+(* BACKPORT
 val synchronized_formatter_of_out_channel :
   out_channel -> formatter Domain.DLS.key
 (** [synchronized_formatter_of_out_channel oc] returns the key to the
@@ -969,7 +970,7 @@ val synchronized_formatter_of_out_channel :
     domains will be interleaved with each other at points where the formatter
     is flushed, such as with {!print_flush}.
 *)
-
+*)
 
 val std_formatter : formatter
 (** The initial domain's standard formatter to write to standard output.
@@ -1035,6 +1036,7 @@ val make_formatter :
   returns a formatter to the {!Stdlib.out_channel} [oc].
 *)
 
+(* BACKPORT
 val make_synchronized_formatter :
   (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
 (** [make_synchronized_formatter out flush] returns the key to the domain-local
@@ -1044,6 +1046,7 @@ val make_synchronized_formatter :
     When the formatter is used with multiple domains, the output from the
     domains will be interleaved with each other at points where the formatter
     is flushed, such as with {!print_flush}.
+*)
 *)
 
 val formatter_of_out_functions :

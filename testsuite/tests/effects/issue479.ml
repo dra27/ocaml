@@ -1,5 +1,7 @@
 (* TEST
-   * toplevel
+   * skip
+   reason = "OCaml 5 only"
+   ** toplevel
 *)
 
 (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)

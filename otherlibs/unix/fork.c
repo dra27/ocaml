@@ -25,15 +25,19 @@
 CAMLprim value unix_fork(value unit)
 {
   int ret;
+#if 0 /* BACKPORT */
   if (caml_domain_is_multicore()) {
     caml_failwith
       ("Unix.fork may not be called while other domains were created");
   }
+#endif
 
   CAML_EV_FLUSH();
 
   ret = fork();
+#if 0 /* BACKPORT */
   if (ret == 0) caml_atfork_hook();
+#endif
   if (ret == -1) uerror("fork", Nothing);
 
   CAML_EVENTLOG_DO({

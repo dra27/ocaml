@@ -1,4 +1,6 @@
 (* TEST
+   * skip
+   reason = "OCaml 5 only"
 *)
 
 (* Tests RESUMETERM with extra_args != 0 in bytecode,

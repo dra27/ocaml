@@ -13,7 +13,11 @@ CAMLprim value request_minor_gc(value v) {
     tests are only run in a single domain, so we're probably
     good.
   */
+#if 0
   Caml_state->young_limit = (uintnat)Caml_state->young_end;
+#endif
+  caml_something_to_do = 1;
+  Caml_state->young_limit = Caml_state->young_alloc_end;
 
   return Val_unit;
 }

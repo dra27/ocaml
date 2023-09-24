@@ -23,4 +23,13 @@ exception Undefined
 
 val force_lazy_block : 'a lazy_t -> 'a
 
+(* BACKPORT BEGIN *)
+val force_val_lazy_block : 'a lazy_t -> 'a
+
+val force : 'a lazy_t -> 'a
+val force_val : 'a lazy_t -> 'a
+(* BACKPORT END *)
+
+(* BACKPORT
 val force_gen : only_val:bool -> 'a lazy_t -> 'a
+*)

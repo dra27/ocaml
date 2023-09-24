@@ -1,0 +1,2526 @@
+diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
+index 74b4646679..30d068b6b8 100644
+--- a/testsuite/tests/asmcomp/polling.c
++++ b/testsuite/tests/asmcomp/polling.c
+@@ -13,7 +13,11 @@ CAMLprim value request_minor_gc(value v) {
+     tests are only run in a single domain, so we're probably
+     good.
+   */
++#if 0
+   Caml_state->young_limit = (uintnat)Caml_state->young_end;
++#endif
++  caml_something_to_do = 1;
++  Caml_state->young_limit = Caml_state->young_alloc_end;
+ 
+   return Val_unit;
+ }
+diff --git a/testsuite/tests/backtrace/backtrace2.reference b/testsuite/tests/backtrace/backtrace2.reference
+index 20ef708fe0..e75c2e2982 100644
+--- a/testsuite/tests/backtrace/backtrace2.reference
++++ b/testsuite/tests/backtrace/backtrace2.reference
+@@ -35,7 +35,7 @@ Uncaught exception Invalid_argument("index out of bounds")
+ Raised by primitive operation at Backtrace2.run in file "backtrace2.ml", line 62, characters 14-22
+ test_Not_found
+ Uncaught exception Not_found
+-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
+ Called from Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 9-42
+ Re-raised at Backtrace2.test_Not_found in file "backtrace2.ml", line 43, characters 61-70
+ Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
+@@ -46,13 +46,13 @@ Called from Backtrace2.test_lazy.aux in file "backtrace2.ml", line 47, character
+ Called from Backtrace2.test_lazy.aux in file "backtrace2.ml", line 47, characters 43-52
+ Called from Backtrace2.test_lazy.aux in file "backtrace2.ml", line 47, characters 43-52
+ Called from Backtrace2.test_lazy.aux in file "backtrace2.ml", line 47, characters 43-52
+-Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+-Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
+ Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
+ Uncaught exception Not_found
+-Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
++Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 549, characters 13-28
+ Called from Backtrace2.test_lazy.exception_raised_internally in file "backtrace2.ml", line 50, characters 8-41
+-Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
+-Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+-Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
++Re-raised at CamlinternalLazy.force_lazy_block.(fun) in file "camlinternalLazy.ml", line 114, characters 56-63
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
+ Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
+diff --git a/testsuite/tests/backtrace/backtrace_c_exn.ml b/testsuite/tests/backtrace/backtrace_c_exn.ml
+index 9b0077d509..1680c23f7b 100644
+--- a/testsuite/tests/backtrace/backtrace_c_exn.ml
++++ b/testsuite/tests/backtrace/backtrace_c_exn.ml
+@@ -2,6 +2,8 @@
+    modules = "backtrace_c_exn_.c"
+    flags = "-g"
+    ocamlrunparam += ",b=1"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
+diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
+index 12390de624..5ee294030f 100644
+--- a/testsuite/tests/backtrace/backtrace_dynlink.reference
++++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
+@@ -1,18 +1,22 @@
+ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 6, characters 13-38
+ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+ execution of module initializers in the shared library failed: Failure("SUCCESS")
+-Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++Called from Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 3, characters 4-22
++Re-raised at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 8, characters 5-12
++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
+index 68ffcd420c..d616d54eb9 100644
+--- a/testsuite/tests/backtrace/backtrace_effects.ml
++++ b/testsuite/tests/backtrace/backtrace_effects.ml
+@@ -2,6 +2,8 @@
+    flags = "-g"
+    ocamlrunparam += ",b=1"
+    exit_status = "2"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+index c5e41cfd0a..a536c944e9 100644
+--- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
++++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    flags = "-g"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
+index c1b45f1b63..b6e95802e6 100644
+--- a/testsuite/tests/backtrace/backtrace_systhreads.reference
++++ b/testsuite/tests/backtrace/backtrace_systhreads.reference
+@@ -2,24 +2,24 @@ Thread 2 killed on uncaught exception Failure("0")
+ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+ Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+ Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ Thread 3 killed on uncaught exception Failure("1")
+ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+ Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+ Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ Thread 4 killed on uncaught exception Failure("2")
+ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+ Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+ Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ Thread 5 killed on uncaught exception Failure("3")
+ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+ Called from Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 14, characters 6-37
+ Re-raised at Backtrace_systhreads.thread_func in file "backtrace_systhreads.ml", line 18, characters 5-14
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ Thread 1 killed on uncaught exception Failure("backtrace")
+ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
+ Called from Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 22, characters 6-27
+ Re-raised at Backtrace_systhreads.thread_backtrace in file "backtrace_systhreads.ml", line 26, characters 5-14
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+diff --git a/testsuite/tests/backtrace/callstack.reference b/testsuite/tests/backtrace/callstack.reference
+index 2243abe4fd..c83ca05156 100644
+--- a/testsuite/tests/backtrace/callstack.reference
++++ b/testsuite/tests/backtrace/callstack.reference
+@@ -12,4 +12,4 @@ Raised by primitive operation at Callstack.f0 in file "callstack.ml", line 11, c
+ Called from Callstack.f1 in file "callstack.ml", line 12, characters 27-32
+ Called from Callstack.f2 in file "callstack.ml", line 13, characters 27-32
+ Called from Callstack.f3 in file "callstack.ml", line 14, characters 27-32
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+diff --git a/testsuite/tests/backtrace/lazy.reference b/testsuite/tests/backtrace/lazy.reference
+index 5e8f53482f..72b9ef2117 100644
+--- a/testsuite/tests/backtrace/lazy.reference
++++ b/testsuite/tests/backtrace/lazy.reference
+@@ -1,14 +1,12 @@
+ Uncaught exception Not_found
+ Raised at Lazy.l1 in file "lazy.ml", line 7, characters 28-45
+-Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+-Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+-Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
+ Called from Lazy.test1 in file "lazy.ml", line 10, characters 11-24
+ Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
+ Uncaught exception Not_found
+ Raised at Lazy.l2 in file "lazy.ml", line 12, characters 28-45
+-Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+-Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+-Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
+ Called from Lazy.test2 in file "lazy.ml", line 15, characters 6-15
+ Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
+diff --git a/testsuite/tests/basic/patmatch_for_multiple.ml b/testsuite/tests/basic/patmatch_for_multiple.ml
+index 7b45d08c19..6433f3d9a4 100644
+--- a/testsuite/tests/basic/patmatch_for_multiple.ml
++++ b/testsuite/tests/basic/patmatch_for_multiple.ml
+@@ -26,15 +26,15 @@ match (3, 2, 1) with
+ | _ -> false
+ ;;
+ [%%expect{|
+-(let (*match*/279 = 3 *match*/280 = 2 *match*/281 = 1)
++(let (*match*/274 = 3 *match*/275 = 2 *match*/276 = 1)
+   (catch
+     (catch
+-      (catch (if (!= *match*/280 3) (exit 3) (exit 1)) with (3)
+-        (if (!= *match*/279 1) (exit 2) (exit 1)))
++      (catch (if (!= *match*/275 3) (exit 3) (exit 1)) with (3)
++        (if (!= *match*/274 1) (exit 2) (exit 1)))
+      with (2) 0)
+    with (1) 1))
+-(let (*match*/279 = 3 *match*/280 = 2 *match*/281 = 1)
+-  (catch (if (!= *match*/280 3) (if (!= *match*/279 1) 0 (exit 1)) (exit 1))
++(let (*match*/274 = 3 *match*/275 = 2 *match*/276 = 1)
++  (catch (if (!= *match*/275 3) (if (!= *match*/274 1) 0 (exit 1)) (exit 1))
+    with (1) 1))
+ - : bool = false
+ |}];;
+@@ -47,26 +47,26 @@ match (3, 2, 1) with
+ | _ -> false
+ ;;
+ [%%expect{|
+-(let (*match*/284 = 3 *match*/285 = 2 *match*/286 = 1)
++(let (*match*/279 = 3 *match*/280 = 2 *match*/281 = 1)
+   (catch
+     (catch
+       (catch
+-        (if (!= *match*/285 3) (exit 6)
+-          (let (x/288 =a (makeblock 0 *match*/284 *match*/285 *match*/286))
+-            (exit 4 x/288)))
++        (if (!= *match*/280 3) (exit 6)
++          (let (x/283 =a (makeblock 0 *match*/279 *match*/280 *match*/281))
++            (exit 4 x/283)))
+        with (6)
+-        (if (!= *match*/284 1) (exit 5)
+-          (let (x/287 =a (makeblock 0 *match*/284 *match*/285 *match*/286))
+-            (exit 4 x/287))))
++        (if (!= *match*/279 1) (exit 5)
++          (let (x/282 =a (makeblock 0 *match*/279 *match*/280 *match*/281))
++            (exit 4 x/282))))
+      with (5) 0)
+-   with (4 x/282) (seq (ignore x/282) 1)))
+-(let (*match*/284 = 3 *match*/285 = 2 *match*/286 = 1)
++   with (4 x/277) (seq (ignore x/277) 1)))
++(let (*match*/279 = 3 *match*/280 = 2 *match*/281 = 1)
+   (catch
+-    (if (!= *match*/285 3)
+-      (if (!= *match*/284 1) 0
+-        (exit 4 (makeblock 0 *match*/284 *match*/285 *match*/286)))
+-      (exit 4 (makeblock 0 *match*/284 *match*/285 *match*/286)))
+-   with (4 x/282) (seq (ignore x/282) 1)))
++    (if (!= *match*/280 3)
++      (if (!= *match*/279 1) 0
++        (exit 4 (makeblock 0 *match*/279 *match*/280 *match*/281)))
++      (exit 4 (makeblock 0 *match*/279 *match*/280 *match*/281)))
++   with (4 x/277) (seq (ignore x/277) 1)))
+ - : bool = false
+ |}];;
+ 
+@@ -76,8 +76,8 @@ let _ = fun a b ->
+   | ((true, _) as _g)
+   | ((false, _) as _g) -> ()
+ [%%expect{|
+-(function a/289[int] b/290 : int 0)
+-(function a/289[int] b/290 : int 0)
++(function a/284[int] b/285 : int 0)
++(function a/284[int] b/285 : int 0)
+ - : bool -> 'a -> unit = <fun>
+ |}];;
+ 
+@@ -96,8 +96,8 @@ let _ = fun a b -> match a, b with
+ | (false, _) as p -> p
+ (* outside, trivial *)
+ [%%expect {|
+-(function a/293[int] b/294 (let (p/295 =a (makeblock 0 a/293 b/294)) p/295))
+-(function a/293[int] b/294 (makeblock 0 a/293 b/294))
++(function a/288[int] b/289 (let (p/290 =a (makeblock 0 a/288 b/289)) p/290))
++(function a/288[int] b/289 (makeblock 0 a/288 b/289))
+ - : bool -> 'a -> bool * 'a = <fun>
+ |}]
+ 
+@@ -106,8 +106,8 @@ let _ = fun a b -> match a, b with
+ | ((false, _) as p) -> p
+ (* inside, trivial *)
+ [%%expect{|
+-(function a/297[int] b/298 (let (p/299 =a (makeblock 0 a/297 b/298)) p/299))
+-(function a/297[int] b/298 (makeblock 0 a/297 b/298))
++(function a/292[int] b/293 (let (p/294 =a (makeblock 0 a/292 b/293)) p/294))
++(function a/292[int] b/293 (makeblock 0 a/292 b/293))
+ - : bool -> 'a -> bool * 'a = <fun>
+ |}];;
+ 
+@@ -116,11 +116,11 @@ let _ = fun a b -> match a, b with
+ | (false as x, _) as p -> x, p
+ (* outside, simple *)
+ [%%expect {|
+-(function a/303[int] b/304
+-  (let (x/305 =a[int] a/303 p/306 =a (makeblock 0 a/303 b/304))
+-    (makeblock 0 (int,*) x/305 p/306)))
+-(function a/303[int] b/304
+-  (makeblock 0 (int,*) a/303 (makeblock 0 a/303 b/304)))
++(function a/298[int] b/299
++  (let (x/300 =a[int] a/298 p/301 =a (makeblock 0 a/298 b/299))
++    (makeblock 0 (int,*) x/300 p/301)))
++(function a/298[int] b/299
++  (makeblock 0 (int,*) a/298 (makeblock 0 a/298 b/299)))
+ - : bool -> 'a -> bool * (bool * 'a) = <fun>
+ |}]
+ 
+@@ -129,11 +129,11 @@ let _ = fun a b -> match a, b with
+ | ((false as x, _) as p) -> x, p
+ (* inside, simple *)
+ [%%expect {|
+-(function a/309[int] b/310
+-  (let (x/311 =a[int] a/309 p/312 =a (makeblock 0 a/309 b/310))
+-    (makeblock 0 (int,*) x/311 p/312)))
+-(function a/309[int] b/310
+-  (makeblock 0 (int,*) a/309 (makeblock 0 a/309 b/310)))
++(function a/304[int] b/305
++  (let (x/306 =a[int] a/304 p/307 =a (makeblock 0 a/304 b/305))
++    (makeblock 0 (int,*) x/306 p/307)))
++(function a/304[int] b/305
++  (makeblock 0 (int,*) a/304 (makeblock 0 a/304 b/305)))
+ - : bool -> 'a -> bool * (bool * 'a) = <fun>
+ |}]
+ 
+@@ -142,15 +142,15 @@ let _ = fun a b -> match a, b with
+ | (false, x) as p -> x, p
+ (* outside, complex *)
+ [%%expect{|
+-(function a/319[int] b/320[int]
+-  (if a/319
+-    (let (x/321 =a[int] a/319 p/322 =a (makeblock 0 a/319 b/320))
+-      (makeblock 0 (int,*) x/321 p/322))
+-    (let (x/323 =a b/320 p/324 =a (makeblock 0 a/319 b/320))
+-      (makeblock 0 (int,*) x/323 p/324))))
+-(function a/319[int] b/320[int]
+-  (if a/319 (makeblock 0 (int,*) a/319 (makeblock 0 a/319 b/320))
+-    (makeblock 0 (int,*) b/320 (makeblock 0 a/319 b/320))))
++(function a/314[int] b/315[int]
++  (if a/314
++    (let (x/316 =a[int] a/314 p/317 =a (makeblock 0 a/314 b/315))
++      (makeblock 0 (int,*) x/316 p/317))
++    (let (x/318 =a b/315 p/319 =a (makeblock 0 a/314 b/315))
++      (makeblock 0 (int,*) x/318 p/319))))
++(function a/314[int] b/315[int]
++  (if a/314 (makeblock 0 (int,*) a/314 (makeblock 0 a/314 b/315))
++    (makeblock 0 (int,*) b/315 (makeblock 0 a/314 b/315))))
+ - : bool -> bool -> bool * (bool * bool) = <fun>
+ |}]
+ 
+@@ -160,19 +160,19 @@ let _ = fun a b -> match a, b with
+   -> x, p
+ (* inside, complex *)
+ [%%expect{|
+-(function a/325[int] b/326[int]
++(function a/320[int] b/321[int]
+   (catch
+-    (if a/325
+-      (let (x/333 =a[int] a/325 p/334 =a (makeblock 0 a/325 b/326))
+-        (exit 10 x/333 p/334))
+-      (let (x/331 =a b/326 p/332 =a (makeblock 0 a/325 b/326))
+-        (exit 10 x/331 p/332)))
+-   with (10 x/327[int] p/328) (makeblock 0 (int,*) x/327 p/328)))
+-(function a/325[int] b/326[int]
++    (if a/320
++      (let (x/328 =a[int] a/320 p/329 =a (makeblock 0 a/320 b/321))
++        (exit 10 x/328 p/329))
++      (let (x/326 =a b/321 p/327 =a (makeblock 0 a/320 b/321))
++        (exit 10 x/326 p/327)))
++   with (10 x/322[int] p/323) (makeblock 0 (int,*) x/322 p/323)))
++(function a/320[int] b/321[int]
+   (catch
+-    (if a/325 (exit 10 a/325 (makeblock 0 a/325 b/326))
+-      (exit 10 b/326 (makeblock 0 a/325 b/326)))
+-   with (10 x/327[int] p/328) (makeblock 0 (int,*) x/327 p/328)))
++    (if a/320 (exit 10 a/320 (makeblock 0 a/320 b/321))
++      (exit 10 b/321 (makeblock 0 a/320 b/321)))
++   with (10 x/322[int] p/323) (makeblock 0 (int,*) x/322 p/323)))
+ - : bool -> bool -> bool * (bool * bool) = <fun>
+ |}]
+ 
+@@ -185,15 +185,15 @@ let _ = fun a b -> match a, b with
+ | (false as x, _) as p -> x, p
+ (* outside, onecase *)
+ [%%expect {|
+-(function a/335[int] b/336[int]
+-  (if a/335
+-    (let (x/337 =a[int] a/335 _p/338 =a (makeblock 0 a/335 b/336))
+-      (makeblock 0 (int,*) x/337 [0: 1 1]))
+-    (let (x/339 =a[int] a/335 p/340 =a (makeblock 0 a/335 b/336))
+-      (makeblock 0 (int,*) x/339 p/340))))
+-(function a/335[int] b/336[int]
+-  (if a/335 (makeblock 0 (int,*) a/335 [0: 1 1])
+-    (makeblock 0 (int,*) a/335 (makeblock 0 a/335 b/336))))
++(function a/330[int] b/331[int]
++  (if a/330
++    (let (x/332 =a[int] a/330 _p/333 =a (makeblock 0 a/330 b/331))
++      (makeblock 0 (int,*) x/332 [0: 1 1]))
++    (let (x/334 =a[int] a/330 p/335 =a (makeblock 0 a/330 b/331))
++      (makeblock 0 (int,*) x/334 p/335))))
++(function a/330[int] b/331[int]
++  (if a/330 (makeblock 0 (int,*) a/330 [0: 1 1])
++    (makeblock 0 (int,*) a/330 (makeblock 0 a/330 b/331))))
+ - : bool -> bool -> bool * (bool * bool) = <fun>
+ |}]
+ 
+@@ -202,11 +202,11 @@ let _ = fun a b -> match a, b with
+ | ((false as x, _) as p) -> x, p
+ (* inside, onecase *)
+ [%%expect{|
+-(function a/341[int] b/342
+-  (let (x/343 =a[int] a/341 p/344 =a (makeblock 0 a/341 b/342))
+-    (makeblock 0 (int,*) x/343 p/344)))
+-(function a/341[int] b/342
+-  (makeblock 0 (int,*) a/341 (makeblock 0 a/341 b/342)))
++(function a/336[int] b/337
++  (let (x/338 =a[int] a/336 p/339 =a (makeblock 0 a/336 b/337))
++    (makeblock 0 (int,*) x/338 p/339)))
++(function a/336[int] b/337
++  (makeblock 0 (int,*) a/336 (makeblock 0 a/336 b/337)))
+ - : bool -> 'a -> bool * (bool * 'a) = <fun>
+ |}]
+ 
+@@ -223,14 +223,14 @@ let _ =fun a b -> match a, b with
+ | (_, _) as p -> p
+ (* outside, tuplist *)
+ [%%expect {|
+-(function a/354[int] b/355
++(function a/349[int] b/350
+   (catch
+-    (if a/354 (if b/355 (let (p/356 =a (field_imm 0 b/355)) p/356) (exit 12))
++    (if a/349 (if b/350 (let (p/351 =a (field_imm 0 b/350)) p/351) (exit 12))
+       (exit 12))
+-   with (12) (let (p/357 =a (makeblock 0 a/354 b/355)) p/357)))
+-(function a/354[int] b/355
+-  (catch (if a/354 (if b/355 (field_imm 0 b/355) (exit 12)) (exit 12))
+-   with (12) (makeblock 0 a/354 b/355)))
++   with (12) (let (p/352 =a (makeblock 0 a/349 b/350)) p/352)))
++(function a/349[int] b/350
++  (catch (if a/349 (if b/350 (field_imm 0 b/350) (exit 12)) (exit 12))
++   with (12) (makeblock 0 a/349 b/350)))
+ - : bool -> bool tuplist -> bool * bool tuplist = <fun>
+ |}]
+ 
+@@ -239,20 +239,20 @@ let _ = fun a b -> match a, b with
+ | ((_, _) as p) -> p
+ (* inside, tuplist *)
+ [%%expect{|
+-(function a/358[int] b/359
++(function a/353[int] b/354
+   (catch
+     (catch
+-      (if a/358
+-        (if b/359 (let (p/363 =a (field_imm 0 b/359)) (exit 13 p/363))
++      (if a/353
++        (if b/354 (let (p/358 =a (field_imm 0 b/354)) (exit 13 p/358))
+           (exit 14))
+         (exit 14))
+-     with (14) (let (p/362 =a (makeblock 0 a/358 b/359)) (exit 13 p/362)))
+-   with (13 p/360) p/360))
+-(function a/358[int] b/359
++     with (14) (let (p/357 =a (makeblock 0 a/353 b/354)) (exit 13 p/357)))
++   with (13 p/355) p/355))
++(function a/353[int] b/354
+   (catch
+     (catch
+-      (if a/358 (if b/359 (exit 13 (field_imm 0 b/359)) (exit 14)) (exit 14))
+-     with (14) (exit 13 (makeblock 0 a/358 b/359)))
+-   with (13 p/360) p/360))
++      (if a/353 (if b/354 (exit 13 (field_imm 0 b/354)) (exit 14)) (exit 14))
++     with (14) (exit 13 (makeblock 0 a/353 b/354)))
++   with (13 p/355) p/355))
+ - : bool -> bool tuplist -> bool * bool tuplist = <fun>
+ |}]
+diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
+index b8c99a4b07..0ed35acf16 100644
+--- a/testsuite/tests/c-api/alloc_async.ml
++++ b/testsuite/tests/c-api/alloc_async.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    modules = "alloc_async_stubs.c"
+-   * skip
+-   reason = "alloc async changes: https://github.com/ocaml/ocaml/pull/8897"
+ *)
+ 
+ external test : int ref -> unit = "stub"
+diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
+index d7e792729a..cfdcf96d4e 100644
+--- a/testsuite/tests/callback/nested_fiber.ml
++++ b/testsuite/tests/callback/nested_fiber.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+    include unix
+    modules = "nested_fiber_.c"
+-   * libunix
+-   ** bytecode
+-   ** native
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native
+ *)
+ 
+ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
+diff --git a/testsuite/tests/callback/stack_overflow.ml b/testsuite/tests/callback/stack_overflow.ml
+index df0e4f5c4d..a14ee4d09a 100644
+--- a/testsuite/tests/callback/stack_overflow.ml
++++ b/testsuite/tests/callback/stack_overflow.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+    include unix
+    modules = "stack_overflow_.c"
+-   * libunix
+-   ** bytecode
+-   ** native
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native
+ *)
+ 
+ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
+diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
+index 00aca09afe..85a7377371 100644
+--- a/testsuite/tests/callback/test7.ml
++++ b/testsuite/tests/callback/test7.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+    include unix
+    modules = "test7_.c"
+-   * libunix
+-   ** bytecode
+-   ** native
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native
+ *)
+ 
+ (* Tests nested calls from C (main C) to OCaml (main OCaml) to C (caml_to_c) to
+diff --git a/testsuite/tests/callback/test_signalhandler.ml b/testsuite/tests/callback/test_signalhandler.ml
+index 9d0ecaac13..1c24a38f9d 100644
+--- a/testsuite/tests/callback/test_signalhandler.ml
++++ b/testsuite/tests/callback/test_signalhandler.ml
+@@ -1,6 +1,6 @@
+ (* TEST
+    include unix
+-   modules = "test_signalhandler_.c"
++   modules = "callbackprim.c"
+    * libunix
+    ** bytecode
+    ** native
+@@ -52,17 +52,19 @@ let sighandler signo =
+   (* Thoroughly wipe the minor heap *)
+   ignore (tak (18, 12, 6))
+ 
++external raise_sigusr1 : unit -> unit = "raise_sigusr1" [@@noalloc]
+ external unix_getpid : unit -> int = "unix_getpid" [@@noalloc]
+ external unix_kill : int -> int -> unit = "unix_kill" [@@noalloc]
+ 
+ let callbacksig () =
+-  let pid = unix_getpid() in
++  let _pid = unix_getpid() in
+   (* Allocate a block in the minor heap *)
+   let s = String.make 5 'b' in
+   (* Send a signal to self.  We want s to remain in a register and
+      not be spilled on the stack, hence we declare unix_kill
+      [@@noalloc]. *)
+-  unix_kill pid Sys.sigusr1;
++  (*unix_kill pid Sys.sigusr1;*)
++  raise_sigusr1 ();
+   (* Allocate some more so that the signal will be tested *)
+   let u = (s, s) in
+   fst u
+diff --git a/testsuite/tests/effects/backtrace.ml b/testsuite/tests/effects/backtrace.ml
+index 9e8813c2a1..f96b5e6650 100644
+--- a/testsuite/tests/effects/backtrace.ml
++++ b/testsuite/tests/effects/backtrace.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+    flags = "-g"
+    ocamlrunparam += ",b=1"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/cmphash.ml b/testsuite/tests/effects/cmphash.ml
+index 49f2cd3285..952886d628 100644
+--- a/testsuite/tests/effects/cmphash.ml
++++ b/testsuite/tests/effects/cmphash.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/evenodd.ml b/testsuite/tests/effects/evenodd.ml
+index 0a0b735988..450fcea011 100644
+--- a/testsuite/tests/effects/evenodd.ml
++++ b/testsuite/tests/effects/evenodd.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/issue479.ml b/testsuite/tests/effects/issue479.ml
+index 8d526f8639..691d2757ae 100644
+--- a/testsuite/tests/effects/issue479.ml
++++ b/testsuite/tests/effects/issue479.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+-   * toplevel
++   * skip
++   reason = "OCaml 5 only"
++   ** toplevel
+ *)
+ 
+ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
+diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
+index 28325d47e2..7e332f1c5c 100644
+--- a/testsuite/tests/effects/overflow.ml
++++ b/testsuite/tests/effects/overflow.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/partial.ml b/testsuite/tests/effects/partial.ml
+index 440ce14d6f..3e10697e68 100644
+--- a/testsuite/tests/effects/partial.ml
++++ b/testsuite/tests/effects/partial.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/reperform.ml b/testsuite/tests/effects/reperform.ml
+index 759c1e4804..48ca55ca81 100644
+--- a/testsuite/tests/effects/reperform.ml
++++ b/testsuite/tests/effects/reperform.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/sched.ml b/testsuite/tests/effects/sched.ml
+index b78014ecb1..48e72f8b3b 100644
+--- a/testsuite/tests/effects/sched.ml
++++ b/testsuite/tests/effects/sched.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/shallow_state.ml b/testsuite/tests/effects/shallow_state.ml
+index 7d74a8e1b8..b7813fc9b0 100644
+--- a/testsuite/tests/effects/shallow_state.ml
++++ b/testsuite/tests/effects/shallow_state.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/shallow_state_io.ml b/testsuite/tests/effects/shallow_state_io.ml
+index ecf431db73..e6ebe39ba7 100644
+--- a/testsuite/tests/effects/shallow_state_io.ml
++++ b/testsuite/tests/effects/shallow_state_io.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test1.ml b/testsuite/tests/effects/test1.ml
+index 2654f113dd..30002f6fb3 100644
+--- a/testsuite/tests/effects/test1.ml
++++ b/testsuite/tests/effects/test1.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test10.ml b/testsuite/tests/effects/test10.ml
+index 612692ac9d..984278638c 100644
+--- a/testsuite/tests/effects/test10.ml
++++ b/testsuite/tests/effects/test10.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test11.ml b/testsuite/tests/effects/test11.ml
+index 32b706a580..d01ea66203 100644
+--- a/testsuite/tests/effects/test11.ml
++++ b/testsuite/tests/effects/test11.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* Tests RESUMETERM with extra_args != 0 in bytecode,
+diff --git a/testsuite/tests/effects/test2.ml b/testsuite/tests/effects/test2.ml
+index c7cd9d51bc..3bb4becf1f 100644
+--- a/testsuite/tests/effects/test2.ml
++++ b/testsuite/tests/effects/test2.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open Printf
+diff --git a/testsuite/tests/effects/test3.ml b/testsuite/tests/effects/test3.ml
+index 9d413920de..99a4008f02 100644
+--- a/testsuite/tests/effects/test3.ml
++++ b/testsuite/tests/effects/test3.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test4.ml b/testsuite/tests/effects/test4.ml
+index 0169bab840..3e50bbe582 100644
+--- a/testsuite/tests/effects/test4.ml
++++ b/testsuite/tests/effects/test4.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test5.ml b/testsuite/tests/effects/test5.ml
+index 4529e4b6df..131985cd54 100644
+--- a/testsuite/tests/effects/test5.ml
++++ b/testsuite/tests/effects/test5.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
+index c6c9991a38..286efaa95f 100644
+--- a/testsuite/tests/effects/test6.ml
++++ b/testsuite/tests/effects/test6.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/effects/test_lazy.ml b/testsuite/tests/effects/test_lazy.ml
+index 697fddd2d1..68045a4bb1 100644
+--- a/testsuite/tests/effects/test_lazy.ml
++++ b/testsuite/tests/effects/test_lazy.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++   * skip
++   reason = "OCaml 5 only"
++*)
+ 
+ open EffectHandlers
+ open EffectHandlers.Deep
+diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
+index e302d72318..a8134975cc 100644
+--- a/testsuite/tests/effects/used_cont.ml
++++ b/testsuite/tests/effects/used_cont.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+  *)
+ 
+ open EffectHandlers
+diff --git a/testsuite/tests/ephe-c-api/test.ml b/testsuite/tests/ephe-c-api/test.ml
+index ff1646835a..a29cd8516b 100644
+--- a/testsuite/tests/ephe-c-api/test.ml
++++ b/testsuite/tests/ephe-c-api/test.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    modules = "stubs.c"
+-   * skip
+-   reason = "port the new Ephemeron C-api to multicore : https://github.com/ocaml/ocaml/pull/676"
+ *)
+ 
+ (* C version of ephetest.ml *)
+diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
+index b11aff1f67..2e1146adef 100644
+--- a/testsuite/tests/gc-roots/globroots.ml
++++ b/testsuite/tests/gc-roots/globroots.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    modules = "globrootsprim.c"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ module type GLOBREF = sig
+diff --git a/testsuite/tests/gc-roots/globroots_parallel.ml b/testsuite/tests/gc-roots/globroots_parallel.ml
+index 4c3e36d140..fabbaa8ec6 100644
+--- a/testsuite/tests/gc-roots/globroots_parallel.ml
++++ b/testsuite/tests/gc-roots/globroots_parallel.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+    flags += " -w a "
+    modules = "globrootsprim.c globroots.ml"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ open Globroots
+diff --git a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+index bf392c13b0..cf932d9491 100644
+--- a/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
++++ b/testsuite/tests/gc-roots/globroots_parallel_spawn_burn.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+    flags += " -w a "
+    modules = "globrootsprim.c globroots.ml"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ open Globroots
+diff --git a/testsuite/tests/gc-roots/globroots_sequential.ml b/testsuite/tests/gc-roots/globroots_sequential.ml
+index 6bf995bf96..dc732ce6a3 100644
+--- a/testsuite/tests/gc-roots/globroots_sequential.ml
++++ b/testsuite/tests/gc-roots/globroots_sequential.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+    flags += " -w a "
+    modules = "globrootsprim.c globroots.ml"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ open Globroots
+ 
+diff --git a/testsuite/tests/generalized-open/gpr1506.ml b/testsuite/tests/generalized-open/gpr1506.ml
+index dd55e349af..bd72ed302f 100644
+--- a/testsuite/tests/generalized-open/gpr1506.ml
++++ b/testsuite/tests/generalized-open/gpr1506.ml
+@@ -103,9 +103,9 @@ include struct open struct type t = T end let x = T end
+ Line 1, characters 15-41:
+ 1 | include struct open struct type t = T end let x = T end
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+-Error: The type t/342 introduced by this open appears in the signature
++Error: The type t/337 introduced by this open appears in the signature
+        Line 1, characters 46-47:
+-         The value x has no valid type if t/342 is hidden
++         The value x has no valid type if t/337 is hidden
+ |}];;
+ 
+ module A = struct
+@@ -123,9 +123,9 @@ Lines 3-6, characters 4-7:
+ 4 |       type t = T
+ 5 |       let x = T
+ 6 |     end
+-Error: The type t/347 introduced by this open appears in the signature
++Error: The type t/342 introduced by this open appears in the signature
+        Line 7, characters 8-9:
+-         The value y has no valid type if t/347 is hidden
++         The value y has no valid type if t/342 is hidden
+ |}];;
+ 
+ module A = struct
+@@ -142,9 +142,9 @@ Lines 3-5, characters 4-7:
+ 3 | ....open struct
+ 4 |       type t = T
+ 5 |     end
+-Error: The type t/352 introduced by this open appears in the signature
++Error: The type t/347 introduced by this open appears in the signature
+        Line 6, characters 8-9:
+-         The value y has no valid type if t/352 is hidden
++         The value y has no valid type if t/347 is hidden
+ |}]
+ 
+ (* It was decided to not allow this anymore. *)
+diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
+index 084ceb03ca..94200ec67f 100644
+--- a/testsuite/tests/instrumented-runtime/main.ml
++++ b/testsuite/tests/instrumented-runtime/main.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+   * instrumented-runtime
+-  * skip
+-  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
+   ** native
+     flags = "-runtime-variant=i"
+ *)
+diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
+index cccbd96d71..35dd7fd85b 100644
+--- a/testsuite/tests/lazy/lazy2.ml
++++ b/testsuite/tests/lazy/lazy2.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ open Domain
+diff --git a/testsuite/tests/lazy/lazy3.ml b/testsuite/tests/lazy/lazy3.ml
+index a22a0893b9..737791b7db 100644
+--- a/testsuite/tests/lazy/lazy3.ml
++++ b/testsuite/tests/lazy/lazy3.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ let f count =
+diff --git a/testsuite/tests/lazy/lazy5.ml b/testsuite/tests/lazy/lazy5.ml
+index 217b84175e..e37b499268 100644
+--- a/testsuite/tests/lazy/lazy5.ml
++++ b/testsuite/tests/lazy/lazy5.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ let rec safe_force l =
+   try Lazy.force l with
+diff --git a/testsuite/tests/lazy/lazy6.ml b/testsuite/tests/lazy/lazy6.ml
+index 098848769a..29067f1a41 100644
+--- a/testsuite/tests/lazy/lazy6.ml
++++ b/testsuite/tests/lazy/lazy6.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ let flag1 = Atomic.make false
+diff --git a/testsuite/tests/lazy/lazy7.ml b/testsuite/tests/lazy/lazy7.ml
+index 6c96f32907..d9c9b82127 100644
+--- a/testsuite/tests/lazy/lazy7.ml
++++ b/testsuite/tests/lazy/lazy7.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ let num_domains = 4
+diff --git a/testsuite/tests/lazy/lazy8.ml b/testsuite/tests/lazy/lazy8.ml
+index c9b5781617..ddadf48a1b 100644
+--- a/testsuite/tests/lazy/lazy8.ml
++++ b/testsuite/tests/lazy/lazy8.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ exception E
+diff --git a/testsuite/tests/lazy/minor_major_force.ml b/testsuite/tests/lazy/minor_major_force.ml
+index b18fe44a9b..d7497f986d 100644
+--- a/testsuite/tests/lazy/minor_major_force.ml
++++ b/testsuite/tests/lazy/minor_major_force.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    ocamlopt_flags += " -O3 "
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (*
+diff --git a/testsuite/tests/lf_skiplist/test.ml b/testsuite/tests/lf_skiplist/test.ml
+index f3b11bf411..4dcffc523d 100644
+--- a/testsuite/tests/lf_skiplist/test.ml
++++ b/testsuite/tests/lf_skiplist/test.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    modules = "stubs.c"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ external test_skiplist_serial : unit -> unit = "test_skiplist_serial"
+diff --git a/testsuite/tests/lf_skiplist/test_parallel.ml b/testsuite/tests/lf_skiplist/test_parallel.ml
+index ac02717889..c882a8dac7 100644
+--- a/testsuite/tests/lf_skiplist/test_parallel.ml
++++ b/testsuite/tests/lf_skiplist/test_parallel.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    modules = "stubs.c"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ external init_skiplist : unit -> unit = "init_skiplist"
+diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
+index 8f70ff73cd..04083e8f47 100755
+--- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
++++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
+@@ -5,8 +5,8 @@ Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
+ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
+ Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 137, characters 16-25
+ Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 139, characters 6-137
+-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
+ Called from Test10_main in file "test10_main.ml", line 51, characters 13-69
+diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+index 6496b8870f..fd2a2d84b1 100755
+--- a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
++++ b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
+@@ -1,10 +1,14 @@
+ Error: Failure("Plugin error")
+-Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++Called from Test10_plugin.g in file "test10_plugin.ml", line 2, characters 15-38
++Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 13-44
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 352, characters 13-44
+ Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
+-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 348, characters 8-240
+-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 358, characters 8-17
+-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
+ Called from Test10_main in file "test10_main.ml", line 49, characters 30-87
+diff --git a/testsuite/tests/lib-format/mc_pr586_par.ml b/testsuite/tests/lib-format/mc_pr586_par.ml
+index 456a306ce7..da5c148416 100644
+--- a/testsuite/tests/lib-format/mc_pr586_par.ml
++++ b/testsuite/tests/lib-format/mc_pr586_par.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++   * skip
++   reason = "OCaml 5 only"
++*)
+ 
+ let () =
+   let domains = Array.init 7 (fun i ->
+diff --git a/testsuite/tests/lib-format/mc_pr586_par2.ml b/testsuite/tests/lib-format/mc_pr586_par2.ml
+index 0ead3627b5..8a96be1456 100644
+--- a/testsuite/tests/lib-format/mc_pr586_par2.ml
++++ b/testsuite/tests/lib-format/mc_pr586_par2.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++   * skip
++   reason = "OCaml 5 only"
++*)
+ 
+ let () =
+   let fmt_key = Format.synchronized_formatter_of_out_channel stdout in
+diff --git a/testsuite/tests/lib-marshal/intext_par.ml b/testsuite/tests/lib-marshal/intext_par.ml
+index 2efb846665..68ad0e1edb 100644
+--- a/testsuite/tests/lib-marshal/intext_par.ml
++++ b/testsuite/tests/lib-marshal/intext_par.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+    modules = "intextaux_par.c"
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* Test for output_value / input_value *)
+diff --git a/testsuite/tests/lib-obj/reachable_words_np.ml b/testsuite/tests/lib-obj/reachable_words_np.ml
+new file mode 100644
+index 0000000000..8a50268d20
+--- /dev/null
++++ b/testsuite/tests/lib-obj/reachable_words_np.ml
+@@ -0,0 +1,21 @@
++(* TEST
++ * naked_pointers
++ ** bytecode
++ ** native
++*)
++
++let native =
++  match Sys.backend_type with
++  | Sys.Native -> true
++  | Sys.Bytecode -> false
++  | Sys.Other s -> print_endline s; assert false
++
++let size x = Obj.reachable_words (Obj.repr x)
++
++let expect_size s x =
++  let i = size x in
++  if i <> s then
++    Printf.printf "size = %i; expected = %i\n%!" i s
++
++let () =
++  expect_size (if native then 0 else 3) (1, 2)
+diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
+index 23f2a5f7de..08055698e7 100644
+--- a/testsuite/tests/lib-str/parallel.ml
++++ b/testsuite/tests/lib-str/parallel.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasstr
++* skip
++reason = "OCaml 5 only"
++** hasstr
+ include str
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let total = Atomic.make 0
+diff --git a/testsuite/tests/lib-sync/prodcons.ml b/testsuite/tests/lib-sync/prodcons.ml
+index 2e2c09756c..093d8740be 100644
+--- a/testsuite/tests/lib-sync/prodcons.ml
++++ b/testsuite/tests/lib-sync/prodcons.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* Classic producer-consumer *)
+diff --git a/testsuite/tests/lib-sync/trylock.ml b/testsuite/tests/lib-sync/trylock.ml
+index 314f1142ca..b4719fff04 100644
+--- a/testsuite/tests/lib-sync/trylock.ml
++++ b/testsuite/tests/lib-sync/trylock.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* Test Mutex.try_lock *)
+diff --git a/testsuite/tests/lib-sync/trylock2.ml b/testsuite/tests/lib-sync/trylock2.ml
+index b31ace08b5..e29ee93f9e 100644
+--- a/testsuite/tests/lib-sync/trylock2.ml
++++ b/testsuite/tests/lib-sync/trylock2.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* Test Mutex.try_lock *)
+diff --git a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml b/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
+index f481464906..0138046146 100644
+--- a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
++++ b/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hassysthreads
++* skip
++reason = "OCaml 5 only"
++** hassysthreads
+ include systhreads
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let _ =
+diff --git a/testsuite/tests/lib-systhreads/test_c_thread_register.ml b/testsuite/tests/lib-systhreads/test_c_thread_register.ml
+index a8ec98aa9a..784fe6945f 100644
+--- a/testsuite/tests/lib-systhreads/test_c_thread_register.ml
++++ b/testsuite/tests/lib-systhreads/test_c_thread_register.ml
+@@ -2,9 +2,10 @@
+    modules = "test_c_thread_register_cstubs.c"
+    * hassysthreads
+    include systhreads
+-   ** not-bsd
+-   *** bytecode
+-   *** native
++   ** not-windows
++   *** not-bsd
++   **** bytecode
++   **** native
+ *)
+ 
+ (* spins a external thread from C and register it to the OCaml runtime *)
+diff --git a/testsuite/tests/lib-threads/uncaught_exception_handler.reference b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
+index 34a8e2d7f6..b18e7dc5bb 100644
+--- a/testsuite/tests/lib-threads/uncaught_exception_handler.reference
++++ b/testsuite/tests/lib-threads/uncaught_exception_handler.reference
+@@ -1,12 +1,12 @@
+ Thread 1 killed on uncaught exception Uncaught_exception_handler.CallbackExn
+ Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ [thread 2] caught Uncaught_exception_handler.CallbackExn
+ Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ Thread 2 killed on uncaught exception Uncaught_exception_handler.CallbackExn
+ Raised at Uncaught_exception_handler.fn in file "uncaught_exception_handler.ml", line 28, characters 12-113
+-Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
++Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
+ Thread 2 uncaught exception handler raised Uncaught_exception_handler.UncaughtHandlerExn
+ Raised at Uncaught_exception_handler.handler in file "uncaught_exception_handler.ml", line 26, characters 2-26
+-Called from Thread.create.(fun) in file "thread.ml", line 55, characters 10-41
++Called from Thread.create.(fun) in file "thread.ml", line 57, characters 10-41
+diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+index 9549f256ea..169cf9a260 100644
+--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+ include unix
+-* hasunix
+-** not-windows
+-*** bytecode
+-*** native
++* skip
++reason = "OCaml 5 only"
++** hasunix
++*** not-windows
++**** bytecode
++**** native
+ *)
+ 
+ (* on Multicore, fork is not allowed is another domain is, and was running. *)
+diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+index 929ed5ecf7..61f75dce4a 100644
+--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+ include unix
+-* hasunix
+-** not-windows
+-*** bytecode
+-*** native
++* skip
++reason = "OCaml 5 only"
++** hasunix
++*** not-windows
++**** bytecode
++**** native
+ *)
+ 
+ (* on Multicore, fork is not allowed is another domain is, and was running. *)
+diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
+index 9c1d0a3cf2..b1f5813b4a 100644
+--- a/testsuite/tests/parallel/atomics.ml
++++ b/testsuite/tests/parallel/atomics.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ type u = U of unit
+diff --git a/testsuite/tests/parallel/backup_thread.ml b/testsuite/tests/parallel/backup_thread.ml
+index 05b06cc47c..c69f164ce7 100644
+--- a/testsuite/tests/parallel/backup_thread.ml
++++ b/testsuite/tests/parallel/backup_thread.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ 
+diff --git a/testsuite/tests/parallel/backup_thread_pipe.ml b/testsuite/tests/parallel/backup_thread_pipe.ml
+index 41fd101c1f..d0c5bb6e35 100644
+--- a/testsuite/tests/parallel/backup_thread_pipe.ml
++++ b/testsuite/tests/parallel/backup_thread_pipe.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ 
+diff --git a/testsuite/tests/parallel/constpromote.ml b/testsuite/tests/parallel/constpromote.ml
+index fc9fd65ff6..466c846ed1 100644
+--- a/testsuite/tests/parallel/constpromote.ml
++++ b/testsuite/tests/parallel/constpromote.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ (* when run with the bytecode debug runtime, this test
+diff --git a/testsuite/tests/parallel/deadcont.ml b/testsuite/tests/parallel/deadcont.ml
+index 34e59f0e93..6a10ab3938 100644
+--- a/testsuite/tests/parallel/deadcont.ml
++++ b/testsuite/tests/parallel/deadcont.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ (*
+diff --git a/testsuite/tests/parallel/domain_dls.ml b/testsuite/tests/parallel/domain_dls.ml
+index db4ebe0c56..82d8f55e5a 100644
+--- a/testsuite/tests/parallel/domain_dls.ml
++++ b/testsuite/tests/parallel/domain_dls.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let check_dls () =
+diff --git a/testsuite/tests/parallel/domain_dls2.ml b/testsuite/tests/parallel/domain_dls2.ml
+index 6c79145ba7..279f178774 100644
+--- a/testsuite/tests/parallel/domain_dls2.ml
++++ b/testsuite/tests/parallel/domain_dls2.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let _ =
+diff --git a/testsuite/tests/parallel/domain_id.ml b/testsuite/tests/parallel/domain_id.ml
+index 023d425346..79a2fe48a8 100644
+--- a/testsuite/tests/parallel/domain_id.ml
++++ b/testsuite/tests/parallel/domain_id.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ open Domain
+diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+index 8dd2398ac8..ffb7e2f969 100644
+--- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
++++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ open Domain
+diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+index 2d1961d9f1..89c3f3d5c5 100644
+--- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
++++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ open Domain
+diff --git a/testsuite/tests/parallel/fib_threads.ml b/testsuite/tests/parallel/fib_threads.ml
+index f6005729b7..3ab3dde90d 100644
+--- a/testsuite/tests/parallel/fib_threads.ml
++++ b/testsuite/tests/parallel/fib_threads.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hassysthreads
++* skip
++reason = "OCaml 5 only"
++** hassysthreads
+ include systhreads
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ 
+diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
+index fba31533e3..388d8ef8c3 100644
+--- a/testsuite/tests/parallel/join.ml
++++ b/testsuite/tests/parallel/join.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let main_join n =
+diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
+index e418500774..f11190aee3 100644
+--- a/testsuite/tests/parallel/major_gc_wait_backup.ml
++++ b/testsuite/tests/parallel/major_gc_wait_backup.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** native
+-** bytecode
++*** native
++*** bytecode
+ *)
+ 
+ type 'a tree = Empty | Node of 'a tree * 'a tree
+diff --git a/testsuite/tests/parallel/mctest.ml b/testsuite/tests/parallel/mctest.ml
+index 96f34c941c..6e3bbe9aad 100644
+--- a/testsuite/tests/parallel/mctest.ml
++++ b/testsuite/tests/parallel/mctest.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ (*
+diff --git a/testsuite/tests/parallel/multicore_systhreads.ml b/testsuite/tests/parallel/multicore_systhreads.ml
+index 2f0fcf20b0..5ce5ea86ea 100644
+--- a/testsuite/tests/parallel/multicore_systhreads.ml
++++ b/testsuite/tests/parallel/multicore_systhreads.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hassysthreads
++* skip
++reason = "OCaml 5 only"
++** hassysthreads
+ include systhreads
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ 
+diff --git a/testsuite/tests/parallel/pingpong.ml b/testsuite/tests/parallel/pingpong.ml
+index 30fb9eee71..6113340ccf 100644
+--- a/testsuite/tests/parallel/pingpong.ml
++++ b/testsuite/tests/parallel/pingpong.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let r = ref (Some 0)
+diff --git a/testsuite/tests/parallel/poll.ml b/testsuite/tests/parallel/poll.ml
+index b6c06be354..5af3ad1082 100644
+--- a/testsuite/tests/parallel/poll.ml
++++ b/testsuite/tests/parallel/poll.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let rec loop () =
+diff --git a/testsuite/tests/parallel/prodcons_domains.ml b/testsuite/tests/parallel/prodcons_domains.ml
+index 67499d342a..e8e9d736f3 100644
+--- a/testsuite/tests/parallel/prodcons_domains.ml
++++ b/testsuite/tests/parallel/prodcons_domains.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+ 
+-* hassysthreads
++* skip
++reason = "OCaml 5 only"
++** hassysthreads
+ include systhreads
+-** bytecode
+-** native
++*** bytecode
++*** native
+ 
+ *)
+ 
+diff --git a/testsuite/tests/parallel/tak.ml b/testsuite/tests/parallel/tak.ml
+index a9b6874c4f..bdc4173266 100644
+--- a/testsuite/tests/parallel/tak.ml
++++ b/testsuite/tests/parallel/tak.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ (* filling minor heaps in parallel to trigger
+diff --git a/testsuite/tests/parallel/test_c_thread_register.ml b/testsuite/tests/parallel/test_c_thread_register.ml
+index 352424a377..9e2073c4ef 100644
+--- a/testsuite/tests/parallel/test_c_thread_register.ml
++++ b/testsuite/tests/parallel/test_c_thread_register.ml
+@@ -1,9 +1,11 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+    modules = "test_c_thread_register_cstubs.c"
+-   * hassysthreads
++   ** hassysthreads
+    include systhreads
+-   ** bytecode
+-   ** native
++   *** bytecode
++   *** native
+ *)
+ 
+ (* spins a external thread from C and register it to the OCaml runtime *)
+diff --git a/testsuite/tests/regression/pr9326/gc_set.ml b/testsuite/tests/regression/pr9326/gc_set.ml
+index 2570aec28e..e9d7dbcd4c 100644
+--- a/testsuite/tests/regression/pr9326/gc_set.ml
++++ b/testsuite/tests/regression/pr9326/gc_set.ml
+@@ -4,35 +4,32 @@
+ open Gc
+ 
+ let min_heap_sz = 524288 (* 512k *)
+-let space_overhead = 70
+-let stack_limit = 4194304 (* 4M *)
+-let custom_major_ratio = 40
+-let custom_minor_ratio = 99
+-let custom_minor_max_size = 4096
++let maj_heap_inc = 4194304 (* 4M *)
+ 
+ let _ =
+   let g1 = Gc.get() in
+   (* Do not use { g1 with ... }, so that the code will break if more fields
+      are added to the Gc.control record type *)
+   Gc.set { minor_heap_size = min_heap_sz;
+-           major_heap_increment = g1.major_heap_increment;
+-           space_overhead = space_overhead;
++           major_heap_increment = maj_heap_inc;
++           space_overhead = g1.space_overhead;
+            verbose = g1.verbose;
+            max_overhead = g1.max_overhead;
+-           stack_limit = stack_limit;
++           stack_limit = g1.stack_limit;
+            allocation_policy = g1.allocation_policy;
+            window_size = g1.window_size;
+-           custom_major_ratio = custom_major_ratio;
+-           custom_minor_ratio = custom_minor_ratio;
+-           custom_minor_max_size = custom_minor_max_size };
++           custom_major_ratio = g1.custom_major_ratio;
++           custom_minor_ratio = g1.custom_minor_ratio;
++           custom_minor_max_size = g1.custom_minor_max_size };
+   let g2 = Gc.get() in
+   assert (g2.minor_heap_size = min_heap_sz);
+-  assert (g2.space_overhead = space_overhead);
++  assert (g2.major_heap_increment = maj_heap_inc);
++  assert (g2.space_overhead = g1.space_overhead);
+   assert (g2.verbose = g1.verbose);
+   assert (g2.max_overhead = g1.max_overhead);
+-  assert (g2.stack_limit = stack_limit);
++  assert (g2.stack_limit = g1.stack_limit);
+   assert (g2.allocation_policy = g1.allocation_policy);
+   assert (g2.window_size = g1.window_size);
+-  assert (g2.custom_major_ratio = custom_major_ratio);
+-  assert (g2.custom_minor_ratio = custom_minor_ratio);
+-  assert (g2.custom_minor_max_size = custom_minor_max_size)
++  assert (g2.custom_major_ratio = g1.custom_major_ratio);
++  assert (g2.custom_minor_ratio = g1.custom_minor_ratio);
++  assert (g2.custom_minor_max_size = g1.custom_minor_max_size)
+diff --git a/testsuite/tests/runtime-naked-pointers/cstubs.c b/testsuite/tests/runtime-naked-pointers/cstubs.c
+new file mode 100644
+index 0000000000..e9315f3aea
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/cstubs.c
+@@ -0,0 +1,20 @@
++#include <string.h>
++#include "caml/mlvalues.h"
++#include "caml/gc.h"
++#include "caml/memory.h"
++
++static int colors[4] = { Caml_white, Caml_gray, Caml_blue, Caml_black };
++
++value make_block(value header_size, value color, value size)
++{
++  intnat sz = Nativeint_val(size);
++  value * p = caml_stat_alloc((1 + sz) * sizeof(value));
++  p[0] = Make_header(Nativeint_val(header_size), 0, colors[Int_val(color)]);
++  memset(p + 1, 0x80, sz * sizeof(value));
++  return (value) (p + 1);
++}
++
++value make_raw_pointer (value v)
++{
++  return (value) Nativeint_val(v);
++}
+diff --git a/testsuite/tests/runtime-naked-pointers/np.ml b/testsuite/tests/runtime-naked-pointers/np.ml
+new file mode 100644
+index 0000000000..1738934ff0
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np.ml
+@@ -0,0 +1,11 @@
++type color = White | Gray | Blue | Black
++
++external make_block: nativeint -> color -> nativeint -> Obj.t
++         = "make_block"
++
++external make_raw_pointer: nativeint -> Obj.t
++         = "make_raw_pointer"
++
++let do_gc root =
++  Gc.compact();   (* full major + compaction *)
++  root
+diff --git a/testsuite/tests/runtime-naked-pointers/np1.ml b/testsuite/tests/runtime-naked-pointers/np1.ml
+new file mode 100644
+index 0000000000..be4c677a23
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np1.ml
+@@ -0,0 +1,12 @@
++(* TEST
++   modules = "cstubs.c np.ml"
++   * bytecode
++   * native
++*)
++
++open Np
++
++(* Out-of-heap object with black header is accepted even in no-naked-pointers
++   mode.  GC doesn't scan black objects. *)
++
++let x = do_gc [ make_block 100n Black 100n ]
+diff --git a/testsuite/tests/runtime-naked-pointers/np2.ml b/testsuite/tests/runtime-naked-pointers/np2.ml
+new file mode 100644
+index 0000000000..f24c813c2b
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np2.ml
+@@ -0,0 +1,13 @@
++(* TEST
++   modules = "cstubs.c np.ml"
++   * bytecode
++   * native
++*)
++
++open Np
++
++(* Out-of-heap object with black header is accepted even in no-naked-pointers
++   mode.  GC doesn't scan black objects.  However, if the size in the
++   head is crazily big, the naked pointer detector will warn. *)
++
++let x = do_gc [ make_block (-1n) Black 100n ]
+diff --git a/testsuite/tests/runtime-naked-pointers/np2.run b/testsuite/tests/runtime-naked-pointers/np2.run
+new file mode 100755
+index 0000000000..c03f6f688d
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np2.run
+@@ -0,0 +1,3 @@
++#!/bin/sh
++
++exec ${test_source_directory}/runtest.sh
+diff --git a/testsuite/tests/runtime-naked-pointers/np3.ml b/testsuite/tests/runtime-naked-pointers/np3.ml
+new file mode 100644
+index 0000000000..d207279df1
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np3.ml
+@@ -0,0 +1,15 @@
++(* TEST
++   modules = "cstubs.c np.ml"
++   * naked_pointers
++   ** bytecode
++   ** native
++*)
++
++open Np
++
++(* Out-of-heap object with non-black header is OK in naked pointers mode only *)
++(* Note that the header size can be wrong as it should not be used by the GC *)
++
++let x = do_gc [ make_block 10000n White 10n;
++                make_block 1n Blue 0n;
++                make_block (-1n) Gray 5n ]
+diff --git a/testsuite/tests/runtime-naked-pointers/np3.run b/testsuite/tests/runtime-naked-pointers/np3.run
+new file mode 100755
+index 0000000000..c03f6f688d
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np3.run
+@@ -0,0 +1,3 @@
++#!/bin/sh
++
++exec ${test_source_directory}/runtest.sh
+diff --git a/testsuite/tests/runtime-naked-pointers/np4.ml b/testsuite/tests/runtime-naked-pointers/np4.ml
+new file mode 100644
+index 0000000000..98966ddffc
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np4.ml
+@@ -0,0 +1,13 @@
++(* TEST
++   modules = "cstubs.c np.ml"
++   * naked_pointers
++   ** bytecode
++   ** native
++*)
++
++open Np
++
++(* Null pointers and bad pointers outside the heap are OK
++   in naked pointers mode only *)
++
++let x = do_gc [ make_raw_pointer 0n; make_raw_pointer 42n ]
+diff --git a/testsuite/tests/runtime-naked-pointers/np4.run b/testsuite/tests/runtime-naked-pointers/np4.run
+new file mode 100755
+index 0000000000..c03f6f688d
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/np4.run
+@@ -0,0 +1,3 @@
++#!/bin/sh
++
++exec ${test_source_directory}/runtest.sh
+diff --git a/testsuite/tests/runtime-naked-pointers/runtest.sh b/testsuite/tests/runtime-naked-pointers/runtest.sh
+new file mode 100755
+index 0000000000..f5d4df561c
+--- /dev/null
++++ b/testsuite/tests/runtime-naked-pointers/runtest.sh
+@@ -0,0 +1,10 @@
++#!/bin/sh
++
++if grep -q "#define NAKED_POINTERS_CHECKER" ${ocamlsrcdir}/runtime/caml/m.h \
++&& (echo ${program} | grep -q '\.opt')
++then
++  (${program} > ${output}) 2>&1 | grep -q '^Out-of-heap '
++  exit $?
++else
++  exec ${program} > ${output}
++fi
+diff --git a/testsuite/tests/shapes/comp_units.ml b/testsuite/tests/shapes/comp_units.ml
+index c3417b55b1..8c81ea5042 100644
+--- a/testsuite/tests/shapes/comp_units.ml
++++ b/testsuite/tests/shapes/comp_units.ml
+@@ -25,7 +25,7 @@ module Mproj = Unit
+ module F (X : sig type t end) = X
+ [%%expect{|
+ {
+- ("F", module) -> Abs<.4>(X/282, X/282<.3>);
++ ("F", module) -> Abs<.4>(X/277, X/277<.3>);
+  }
+ module F : functor (X : sig type t end) -> sig type t = X.t end
+ |}]
+diff --git a/testsuite/tests/shapes/functors.ml b/testsuite/tests/shapes/functors.ml
+index 0fe6ef7e3e..e0b32367fb 100644
+--- a/testsuite/tests/shapes/functors.ml
++++ b/testsuite/tests/shapes/functors.ml
+@@ -17,7 +17,7 @@ module type S = sig type t val x : t end
+ module Falias (X : S) = X
+ [%%expect{|
+ {
+- ("Falias", module) -> Abs<.4>(X/284, X/284<.3>);
++ ("Falias", module) -> Abs<.4>(X/279, X/279<.3>);
+  }
+ module Falias : functor (X : S) -> sig type t = X.t val x : t end
+ |}]
+@@ -29,10 +29,10 @@ end
+ {
+  ("Finclude", module) ->
+      Abs<.6>
+-        (X/288,
++        (X/283,
+          {
+-          ("t", type) -> X/288<.5> . "t"[type];
+-          ("x", value) -> X/288<.5> . "x"[value];
++          ("t", type) -> X/283<.5> . "t"[type];
++          ("x", value) -> X/283<.5> . "x"[value];
+           });
+  }
+ module Finclude : functor (X : S) -> sig type t = X.t val x : t end
+@@ -45,7 +45,7 @@ end
+ [%%expect{|
+ {
+  ("Fredef", module) ->
+-     Abs<.10>(X/295, {
++     Abs<.10>(X/290, {
+                       ("t", type) -> <.8>;
+                       ("x", value) -> <.9>;
+                       });
+@@ -225,9 +225,9 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
+ {
+  ("Big_to_small1", module) ->
+      Abs<.40>
+-        (shape-var/391,
++        (shape-var/386,
+          {<<internal>>
+-          ("t", type) -> shape-var/391<<internal>> . "t"[type];
++          ("t", type) -> shape-var/386<<internal>> . "t"[type];
+           });
+  }
+ module Big_to_small1 : B2S
+@@ -238,9 +238,9 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
+ {
+  ("Big_to_small2", module) ->
+      Abs<.42>
+-        (shape-var/397,
++        (shape-var/392,
+          {
+-          ("t", type) -> (shape-var/397<<internal>> . "t"[type])<.41>;
++          ("t", type) -> (shape-var/392<<internal>> . "t"[type])<.41>;
+           });
+  }
+ module Big_to_small2 : B2S
+diff --git a/testsuite/tests/shapes/open_arg.ml b/testsuite/tests/shapes/open_arg.ml
+index cc58238222..84123baca2 100644
+--- a/testsuite/tests/shapes/open_arg.ml
++++ b/testsuite/tests/shapes/open_arg.ml
+@@ -22,7 +22,7 @@ end = struct end
+ 
+ [%%expect{|
+ {
+- ("Make", module) -> Abs<.3>(I/284, {
++ ("Make", module) -> Abs<.3>(I/279, {
+                                      });
+  }
+ module Make : functor (I : sig end) -> sig end
+diff --git a/testsuite/tests/shapes/recmodules.ml b/testsuite/tests/shapes/recmodules.ml
+index 93a3fabacf..305a80a97d 100644
+--- a/testsuite/tests/shapes/recmodules.ml
++++ b/testsuite/tests/shapes/recmodules.ml
+@@ -44,10 +44,10 @@ end = B
+ [%%expect{|
+ {
+  ("A", module) -> {<.11>
+-                   ("t", type) -> A/307<.11> . "t"[type];
++                   ("t", type) -> A/302<.11> . "t"[type];
+                    };
+  ("B", module) -> {<.12>
+-                   ("t", type) -> B/308<.12> . "t"[type];
++                   ("t", type) -> B/303<.12> . "t"[type];
+                    };
+  }
+ module rec A : sig type t = Leaf of B.t end
+@@ -86,13 +86,13 @@ end = Set.Make(A)
+  ("ASet", module) ->
+      {
+       ("compare", value) ->
+-          CU Stdlib . "Set"[module] . "Make"[module](A/329<.19>) .
++          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
+           "compare"[value];
+       ("elt", type) ->
+-          CU Stdlib . "Set"[module] . "Make"[module](A/329<.19>) .
++          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
+           "elt"[type];
+       ("t", type) ->
+-          CU Stdlib . "Set"[module] . "Make"[module](A/329<.19>) . "t"[type];
++          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) . "t"[type];
+       };
+  }
+ module rec A :
+diff --git a/testsuite/tests/shapes/rotor_example.ml b/testsuite/tests/shapes/rotor_example.ml
+index 465c63afbf..b78757d0e3 100644
+--- a/testsuite/tests/shapes/rotor_example.ml
++++ b/testsuite/tests/shapes/rotor_example.ml
+@@ -26,8 +26,8 @@ end
+ {
+  ("Pair", module) ->
+      Abs<.9>
+-        (X/284,
+-         Abs(Y/285, {
++        (X/279,
++         Abs(Y/280, {
+                      ("t", type) -> <.5>;
+                      ("to_string", value) -> <.6>;
+                      }));
+diff --git a/testsuite/tests/statmemprof/alloc_counts.ml b/testsuite/tests/statmemprof/alloc_counts.ml
+index de0d1e9e49..f8cbb5658d 100644
+--- a/testsuite/tests/statmemprof/alloc_counts.ml
++++ b/testsuite/tests/statmemprof/alloc_counts.ml
+@@ -1,7 +1,4 @@
+-(* TEST
+-* skip
+-reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+-*)
++(* TEST *)
+ module MP = Gc.Memprof
+ 
+ let allocs_by_memprof f =
+diff --git a/testsuite/tests/statmemprof/arrays_in_major.ml b/testsuite/tests/statmemprof/arrays_in_major.ml
+index eb627324ba..78907a18e3 100644
+--- a/testsuite/tests/statmemprof/arrays_in_major.ml
++++ b/testsuite/tests/statmemprof/arrays_in_major.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    flags = "-g"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/arrays_in_major.reference b/testsuite/tests/statmemprof/arrays_in_major.reference
+new file mode 100644
+index 0000000000..1f34ad8ec8
+--- /dev/null
++++ b/testsuite/tests/statmemprof/arrays_in_major.reference
+@@ -0,0 +1,11 @@
++check_nosample
++check_counts_full_major
++check_counts_full_major
++check_no_nested
++check_distrib 300 3000 3 0.000010
++check_distrib 300 3000 1 0.000100
++check_distrib 300 3000 1 0.010000
++check_distrib 300 3000 1 0.900000
++check_distrib 300 300 100000 0.100000
++check_distrib 300000 300000 30 0.100000
++OK !
+diff --git a/testsuite/tests/statmemprof/arrays_in_minor.ml b/testsuite/tests/statmemprof/arrays_in_minor.ml
+index 4359642d0e..432f8b1d09 100644
+--- a/testsuite/tests/statmemprof/arrays_in_minor.ml
++++ b/testsuite/tests/statmemprof/arrays_in_minor.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    flags = "-g"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/arrays_in_minor.reference b/testsuite/tests/statmemprof/arrays_in_minor.reference
+new file mode 100644
+index 0000000000..1dad91939c
+--- /dev/null
++++ b/testsuite/tests/statmemprof/arrays_in_minor.reference
+@@ -0,0 +1,11 @@
++check_nosample
++check_counts_full_major
++check_counts_full_major
++check_no_nested
++check_distrib 1 250 1000 0.000010
++check_distrib 1 250 1000 0.000100
++check_distrib 1 250 1000 0.010000
++check_distrib 1 250 1000 0.900000
++check_distrib 1 1 10000000 0.010000
++check_distrib 250 250 100000 0.100000
++OK !
+diff --git a/testsuite/tests/statmemprof/blocking_in_callback.ml b/testsuite/tests/statmemprof/blocking_in_callback.ml
+index e1e40f1fb6..00f49cfc74 100644
+--- a/testsuite/tests/statmemprof/blocking_in_callback.ml
++++ b/testsuite/tests/statmemprof/blocking_in_callback.ml
+@@ -1,8 +1,6 @@
+ (* TEST
+ * hassysthreads
+ include systhreads
+-* skip
+-reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ ** bytecode
+ ** native
+ *)
+diff --git a/testsuite/tests/statmemprof/callstacks.ml b/testsuite/tests/statmemprof/callstacks.ml
+index e864a50019..ec5a4199f0 100644
+--- a/testsuite/tests/statmemprof/callstacks.ml
++++ b/testsuite/tests/statmemprof/callstacks.ml
+@@ -3,15 +3,11 @@
+ 
+    * flat-float-array
+      reference = "${test_source_directory}/callstacks.flat-float-array.reference"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+    ** native
+    ** bytecode
+ 
+    * no-flat-float-array
+      reference = "${test_source_directory}/callstacks.no-flat-float-array.reference"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+    ** native
+    ** bytecode
+ *)
+diff --git a/testsuite/tests/statmemprof/comballoc.ml b/testsuite/tests/statmemprof/comballoc.ml
+index 60ca4a0123..22b2547101 100644
+--- a/testsuite/tests/statmemprof/comballoc.ml
++++ b/testsuite/tests/statmemprof/comballoc.ml
+@@ -1,10 +1,8 @@
+ (* TEST
+    flags = "-g"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+-   ** bytecode
++   * bytecode
+      reference = "${test_source_directory}/comballoc.byte.reference"
+-   ** native
++   * native
+      reference = "${test_source_directory}/comballoc.opt.reference"
+ *)
+ 
+diff --git a/testsuite/tests/statmemprof/custom.ml b/testsuite/tests/statmemprof/custom.ml
+index 41cf902ec8..f0ddfa7eed 100644
+--- a/testsuite/tests/statmemprof/custom.ml
++++ b/testsuite/tests/statmemprof/custom.ml
+@@ -1,7 +1,4 @@
+-(* TEST
+-* skip
+-reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+-*)
++(* TEST *)
+ 
+ open Gc.Memprof
+ 
+diff --git a/testsuite/tests/statmemprof/exception_callback.ml b/testsuite/tests/statmemprof/exception_callback.ml
+index f9f02f690f..e1589372ab 100644
+--- a/testsuite/tests/statmemprof/exception_callback.ml
++++ b/testsuite/tests/statmemprof/exception_callback.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    exit_status = "2"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/exception_callback_minor.ml b/testsuite/tests/statmemprof/exception_callback_minor.ml
+index 0bb37782be..f514123276 100644
+--- a/testsuite/tests/statmemprof/exception_callback_minor.ml
++++ b/testsuite/tests/statmemprof/exception_callback_minor.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    exit_status = "2"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/intern.ml b/testsuite/tests/statmemprof/intern.ml
+index bebcc3c8ff..bce6f89c5c 100644
+--- a/testsuite/tests/statmemprof/intern.ml
++++ b/testsuite/tests/statmemprof/intern.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    flags = "-g"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/intern.reference b/testsuite/tests/statmemprof/intern.reference
+new file mode 100644
+index 0000000000..d83e8d6d50
+--- /dev/null
++++ b/testsuite/tests/statmemprof/intern.reference
+@@ -0,0 +1,10 @@
++check_nosample
++check_counts_full_major
++check_counts_full_major
++check_no_nested
++check_distrib 2 3000 3 0.000010
++check_distrib 2 3000 1 0.000100
++check_distrib 2 2000 1 0.010000
++check_distrib 2 2000 1 0.900000
++check_distrib 300000 300000 20 0.100000
++OK !
+diff --git a/testsuite/tests/statmemprof/lists_in_minor.ml b/testsuite/tests/statmemprof/lists_in_minor.ml
+index d08716c71b..ebd434857e 100644
+--- a/testsuite/tests/statmemprof/lists_in_minor.ml
++++ b/testsuite/tests/statmemprof/lists_in_minor.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    flags = "-g"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/lists_in_minor.reference b/testsuite/tests/statmemprof/lists_in_minor.reference
+new file mode 100644
+index 0000000000..11cfe0ca12
+--- /dev/null
++++ b/testsuite/tests/statmemprof/lists_in_minor.reference
+@@ -0,0 +1,8 @@
++check_distrib 10 1000000 0.010000
++check_distrib 1000000 10 0.000010
++check_distrib 1000000 10 0.000100
++check_distrib 1000000 10 0.001000
++check_distrib 1000000 10 0.010000
++check_distrib 100000 10 0.100000
++check_distrib 100000 10 0.900000
++OK !
+diff --git a/testsuite/tests/statmemprof/minor_no_postpone.ml b/testsuite/tests/statmemprof/minor_no_postpone.ml
+index 21c8bfb244..fcb94cf81d 100644
+--- a/testsuite/tests/statmemprof/minor_no_postpone.ml
++++ b/testsuite/tests/statmemprof/minor_no_postpone.ml
+@@ -1,7 +1,5 @@
+ (* TEST
+    modules = "minor_no_postpone_stub.c"
+-   * skip
+-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ *)
+ 
+ open Gc.Memprof
+diff --git a/testsuite/tests/statmemprof/moved_while_blocking.ml b/testsuite/tests/statmemprof/moved_while_blocking.ml
+index bb8dfc9848..8efc172aea 100644
+--- a/testsuite/tests/statmemprof/moved_while_blocking.ml
++++ b/testsuite/tests/statmemprof/moved_while_blocking.ml
+@@ -1,8 +1,6 @@
+ (* TEST
+ * hassysthreads
+ include systhreads
+-* skip
+-reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ ** bytecode
+ ** native
+ *)
+diff --git a/testsuite/tests/statmemprof/thread_exit_in_callback.ml b/testsuite/tests/statmemprof/thread_exit_in_callback.ml
+index 28e2aabb8b..753f7726f5 100644
+--- a/testsuite/tests/statmemprof/thread_exit_in_callback.ml
++++ b/testsuite/tests/statmemprof/thread_exit_in_callback.ml
+@@ -1,8 +1,6 @@
+ (* TEST
+ * hassysthreads
+ include systhreads
+-* skip
+-reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
+ ** bytecode
+ ** native
+ *)
+diff --git a/testsuite/tests/tool-debugger/basic/debuggee.ml b/testsuite/tests/tool-debugger/basic/debuggee.ml
+index 8604edf239..91ad3c21dc 100644
+--- a/testsuite/tests/tool-debugger/basic/debuggee.ml
++++ b/testsuite/tests/tool-debugger/basic/debuggee.ml
+@@ -2,15 +2,13 @@
+ set foo = "bar"
+ flags += " -g "
+ ocamldebug_script = "${test_source_directory}/input_script"
+-* skip
+-reason = "ocamldebug is broken (#34)"
+-** debugger
+-*** shared-libraries
+-**** setup-ocamlc.byte-build-env
+-***** ocamlc.byte
+-****** check-ocamlc.byte-output
+-******* ocamldebug
+-******** check-program-output
++* debugger
++** shared-libraries
++*** setup-ocamlc.byte-build-env
++**** ocamlc.byte
++***** check-ocamlc.byte-output
++****** ocamldebug
++******* check-program-output
+ *)
+ 
+ print_endline Sys.argv.(1);;
+diff --git a/testsuite/tests/tool-debugger/dynlink/host.ml b/testsuite/tests/tool-debugger/dynlink/host.ml
+index c445c8acd3..f46ef8a022 100644
+--- a/testsuite/tests/tool-debugger/dynlink/host.ml
++++ b/testsuite/tests/tool-debugger/dynlink/host.ml
+@@ -7,29 +7,27 @@ libraries = ""
+ flags += " -g "
+ ocamldebug_script = "${test_source_directory}/input_script"
+ 
+-* skip
+-reason = "ocamldebug is broken (#34)"
+-** debugger
+-*** shared-libraries
+-**** setup-ocamlc.byte-build-env
+-***** ocamlc.byte
++* debugger
++** shared-libraries
++*** setup-ocamlc.byte-build-env
++**** ocamlc.byte
+ module = "host.ml"
+-****** ocamlc.byte
++***** ocamlc.byte
+ module = "plugin.ml"
+-******* ocamlc.byte
++****** ocamlc.byte
+ module = ""
+ all_modules = "host.cmo"
+ program = "${test_build_directory}/host.byte"
+ libraries = "dynlink"
+ 
+-******** run
++******* run
+ output = "host.output"
+-********* check-program-output
++******** check-program-output
+ reference = "${test_source_directory}/host.reference"
+ 
+-********* ocamldebug
++******** ocamldebug
+ output = "host.debug.output"
+-********** check-program-output
++********* check-program-output
+ reference = "${test_source_directory}/host.debug.reference"
+ 
+ *)
+diff --git a/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml b/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
+index 7c6f00c70f..70aee3ff04 100644
+--- a/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
++++ b/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
+@@ -1,27 +1,25 @@
+ (* TEST
+ ocamldebug_script = "${test_source_directory}/input_script"
+-* skip
+-reason = "ocamldebug is broken (#34)"
+-** debugger
+-*** shared-libraries
+-**** setup-ocamlc.byte-build-env
+-***** script
++* debugger
++** shared-libraries
++*** setup-ocamlc.byte-build-env
++**** script
+ script = "mkdir out"
+-****** ocamlc.byte
++***** ocamlc.byte
+ flags = "-g -c"
+ all_modules = "${test_source_directory}/in/blah.ml"
+ program = "out/blah.cmo"
+-******* ocamlc.byte
++****** ocamlc.byte
+ program = "out/foo.cmo"
+ flags = "-I out -g -c"
+ all_modules = "${test_source_directory}/in/foo.ml"
+-******** ocamlc.byte
++******* ocamlc.byte
+ all_modules = "out/blah.cmo out/foo.cmo"
+ flags = " -g "
+ program = "debuggee.exe"
+-********* check-ocamlc.byte-output
+-********** ocamldebug
+-*********** check-program-output
++******** check-ocamlc.byte-output
++********* ocamldebug
++********** check-program-output
+ *)
+ 
+ (* This file only contains the specification of how to run the test *)
+diff --git a/testsuite/tests/tool-debugger/module_named_main/main.ml b/testsuite/tests/tool-debugger/module_named_main/main.ml
+index e31c16391e..25eebe7c02 100644
+--- a/testsuite/tests/tool-debugger/module_named_main/main.ml
++++ b/testsuite/tests/tool-debugger/module_named_main/main.ml
+@@ -1,15 +1,13 @@
+ (* TEST
+ flags += " -g "
+ ocamldebug_script = "${test_source_directory}/input_script"
+-* skip
+-reason = "ocamldebug is broken (#34)"
+-** debugger
+-*** shared-libraries
+-**** setup-ocamlc.byte-build-env
+-***** ocamlc.byte
+-****** check-ocamlc.byte-output
+-******* ocamldebug
+-******** check-program-output
++* debugger
++** shared-libraries
++*** setup-ocamlc.byte-build-env
++**** ocamlc.byte
++***** check-ocamlc.byte-output
++****** ocamldebug
++******* check-program-output
+ *)
+ 
+ module Submodule = struct
+diff --git a/testsuite/tests/tool-debugger/no_debug_event/noev.ml b/testsuite/tests/tool-debugger/no_debug_event/noev.ml
+index f06c14a117..4eb334ea84 100644
+--- a/testsuite/tests/tool-debugger/no_debug_event/noev.ml
++++ b/testsuite/tests/tool-debugger/no_debug_event/noev.ml
+@@ -1,30 +1,28 @@
+ (* TEST
+ readonly_files = "a.ml b.ml"
+ ocamldebug_script = "${test_source_directory}/input_script"
+-* skip
+-reason = "ocamldebug is broken (#34)"
+-** debugger
+-*** shared-libraries
+-**** setup-ocamlc.byte-build-env
+-***** ocamlc.byte
++* debugger
++** shared-libraries
++*** setup-ocamlc.byte-build-env
++**** ocamlc.byte
+ module = "a.ml"
+ flags = "-g -for-pack foo"
+-****** ocamlc.byte
++***** ocamlc.byte
+ module = ""
+ all_modules = "a.cmo"
+ program = "foo.cmo"
+ flags = "-g -pack"
+-******* ocamlc.byte
++****** ocamlc.byte
+ module = "b.ml"
+ flags = " -g "
+-******** ocamlc.byte
++******* ocamlc.byte
+ module = ""
+ flags = " -g "
+ all_modules = "foo.cmo b.cmo"
+ program = "${test_build_directory}/noev.exe"
+-********* check-ocamlc.byte-output
+-********** ocamldebug
+-*********** check-program-output
++******** check-ocamlc.byte-output
++********* ocamldebug
++********** check-program-output
+ *)
+ 
+ (* This file only contains the specification of how to run the test *)
+diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
+index b2d6e6e7c5..f22a4bd50f 100644
+--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
+@@ -3,17 +3,15 @@ flags += " -g "
+ ocamldebug_script = "${test_source_directory}/input_script"
+ readonly_files = "printer.ml"
+ include debugger
+-* skip
+-reason = "ocamldebug is broken (#34)"
+-** debugger
+-*** shared-libraries
+-**** setup-ocamlc.byte-build-env
+-***** ocamlc.byte
++* debugger
++** shared-libraries
++*** setup-ocamlc.byte-build-env
++**** ocamlc.byte
+ module = "printer.ml"
+-***** ocamlc.byte
+-****** check-ocamlc.byte-output
+-******* ocamldebug
+-******** check-program-output
++**** ocamlc.byte
++***** check-ocamlc.byte-output
++****** ocamldebug
++******* check-program-output
+ *)
+ 
+ let f x =
+diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+index 0068e25ae5..5636e9abe2 100644
+--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+@@ -24,11 +24,11 @@ end
+ Line 3, characters 2-36:
+ 3 |   include Comparable with type t = t
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-Error: Illegal shadowing of included type t/289 by t/294
++Error: Illegal shadowing of included type t/284 by t/289
+        Line 2, characters 2-19:
+-         Type t/289 came from this include
++         Type t/284 came from this include
+        Line 3, characters 2-23:
+-         The value print has no valid type if t/289 is shadowed
++         The value print has no valid type if t/284 is shadowed
+ |}]
+ 
+ module type Sunderscore = sig
+diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+index b3804d00e5..827cc4affc 100644
+--- a/testsuite/tests/unwind/unwind_test.reference
++++ b/testsuite/tests/unwind/unwind_test.reference
+@@ -1,5 +1,4 @@
+ ml_perform_stack_walk
+-caml_c_call
+ Mylib.baz
+ Driver.entry
+ caml_program
+diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+index 744c4e844d..621d7292ff 100644
+--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++   * skip
++   reason = "OCaml 5 only"
++ *)
+ 
+ (* Due to GCs running at non-deterministic places, the output from these tests
+  * are unreliable except the bad value checks and as a check for catastrophic
+diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+index c12d2cfd6b..2035bee588 100644
+--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++   * skip
++   reason = "OCaml 5 only"
++*)
+ 
+ let test1 =
+   let r' = ref 0 in
+diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+index fa2d2efc43..752a7eeabf 100644
+--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++   * skip
++   reason = "OCaml 5 only"
++*)
+ 
+ (* ocaml-multicore issues 528 and 468 *)
+ 
+diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+index dede2971e3..6028ef1f0c 100644
+--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++   * skip
++   reason = "OCaml 5 only"
+ *)
+ 
+ let size = 1000;;

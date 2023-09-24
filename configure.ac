@@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
 AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
+AC_SUBST([naked_pointers])
+AC_SUBST([naked_pointers_checker])
 AC_SUBST([force_instrumented_runtime])
 
 ## Generated files
@@ -300,9 +302,16 @@ AC_ARG_ENABLE([frame-pointers],
   [AS_HELP_STRING([--enable-frame-pointers],
     [use frame pointers in runtime and generated code])])
 
-AC_ARG_ENABLE([naked-pointers], [],
-  [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
-  [AC_DEFINE([NO_NAKED_POINTERS])])
+dnl AC_ARG_ENABLE([naked-pointers], [],
+dnl   [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
+dnl   [AC_DEFINE([NO_NAKED_POINTERS])])
+AC_ARG_ENABLE([naked-pointers],
+  [AS_HELP_STRING([--disable-naked-pointers],
+    [do not allow naked pointers])])
+
+AC_ARG_ENABLE([naked-pointers-checker],
+  [AS_HELP_STRING([--enable-naked-pointers-checker],
+    [enable the naked pointers checker])])
 
 AC_ARG_ENABLE([spacetime], [],
   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
@@ -1814,7 +1823,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
     [*-*-mingw32|*-pc-windows],
       [systhread_support=true
       otherlibraries="$otherlibraries systhreads"
-      PTHREAD_LIBS="-lpthread"
+dnl      PTHREAD_LIBS="-lpthread"
+      PTHREAD_LIBS=''
       AC_MSG_NOTICE([the Win32 threads library is supported])],
     [AX_PTHREAD(
       [systhread_support=true
@@ -1855,6 +1865,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
   )],
   [AC_MSG_NOTICE([not using frame pointers])
   frame_pointers=false])
+
+## No naked pointers
+
+AS_IF([test x"$enable_naked_pointers" = "xno" ],
+  [naked_pointers=false
+   AC_DEFINE([NO_NAKED_POINTERS])],
+  [naked_pointers=true])
+
+AS_IF([test x"$enable_naked_pointers_checker" = "xyes" ],
+  [AS_IF([test x"$enable_naked_pointers" = "xno" ],
+         [AC_MSG_ERROR(m4_normalize([
+               --enable-naked-pointers-checker and --disable-naked-pointers
+               are incompatible]))])
+   AS_CASE(["$arch","$system"],
+    [amd64,linux|amd64,macosx \
+    |amd64,openbsd|amd64,win64 \
+    |amd64,freebsd|amd64,solaris \
+    |arm64,linux|arm64,macosx],
+      [naked_pointers_checker=true
+      AC_DEFINE([NAKED_POINTERS_CHECKER])],
+    [*],
+      [AC_MSG_ERROR([naked pointers checker not supported on this platform])]
+  )],
+  [naked_pointers_checker=false])
 
 ## Check for mmap support for huge pages and contiguous heap
 OCAML_MMAP_SUPPORTS_HUGE_PAGES
@@ -1965,8 +1999,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 
 AS_CASE([$host],
   [*-*-mingw32],
-    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
+dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+    [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
+    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
   [*-pc-windows],
     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
     nativecclibs="advapi32.lib ws2_32.lib version.lib"],

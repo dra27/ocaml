@@ -53,75 +53,421 @@ index 3542c327e5..c80b6167d5 100644
  
  OCaml 4.13 maintenance branch
  -----------------------------
+diff --git a/Makefile.config.in b/Makefile.config.in
+index 63bdc810a4..fb7ab00998 100644
+--- a/Makefile.config.in
++++ b/Makefile.config.in
+@@ -255,7 +255,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
+ FUNCTION_SECTIONS=@function_sections@
+ AWK=@AWK@
+ STDLIB_MANPAGES=@stdlib_manpages@
+-NAKED_POINTERS=false
++NAKED_POINTERS=@naked_pointers@
+ 
+ ### Native command to build ocamlrun.exe
+ 
 diff --git a/VERSION b/VERSION
-index d9d76e3115..ca456ac135 100644
+index d9d76e3115..4ef434f979 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1,4 +1,4 @@
 -5.00.0+dev0-2021-11-05
-+4.14.0+dev1-2021-10-05
++5.0.0+jst-backport
  
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
+diff --git a/api_docgen/Makefile.docfiles b/api_docgen/Makefile.docfiles
+index 09c24557b5..14a3b18322 100644
+--- a/api_docgen/Makefile.docfiles
++++ b/api_docgen/Makefile.docfiles
+@@ -35,8 +35,8 @@ str_MLIS := str.mli
+ unix_MLIS := unix.mli unixLabels.mli
+ dynlink_MLIS := dynlink.mli
+ thread_MLIS := \
+-  thread.mli event.mli \
+-  threadUnix.mli
++  thread.mli condition.mli mutex.mli event.mli \
++  threadUnix.mli semaphore.mli
+ 
+ STDLIB=$(filter-out stdlib__Pervasives, $(STDLIB_MODULES))
+ 
+diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
+index ef768b11d8..e7dec0460a 100644
+--- a/asmcomp/amd64/emit.mlp
++++ b/asmcomp/amd64/emit.mlp
+@@ -63,6 +63,7 @@ let cfi_endproc () =
+ let cfi_adjust_cfa_offset n =
+   if Config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
+ 
++(* BACKPORT
+ let cfi_remember_state () =
+   if Config.asm_cfi_supported then D.cfi_remember_state ()
+ 
+@@ -71,13 +72,16 @@ let cfi_restore_state () =
+ 
+ let cfi_def_cfa_register reg =
+   if Config.asm_cfi_supported then D.cfi_def_cfa_register reg
++*)
+ 
+ let emit_debug_info dbg =
+   emit_debug_info_gen dbg D.file D.loc
+ 
+ let fp = Config.with_frame_pointers
+ 
++(* BACKPORT
+ let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
++*)
+ 
+ let frame_size env =                     (* includes return address *)
+   if env.f.fun_frame_required then begin
+@@ -536,8 +540,9 @@ let emit_instr env fallthrough i =
+           end
+         end
+       end
+-  | Lop(Iextcall { func; alloc; stack_ofs }) ->
++  | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
+       add_used_symbol func;
++(* BACKPORT
+       let base_stack_size =
+         if Arch.win64 then
+           32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
+@@ -549,11 +554,26 @@ let emit_instr env fallthrough i =
+         load_symbol_addr func rax;
+         emit_call "caml_c_call_stack_args";
+         record_frame env i.live (Dbg_other i.dbg);
+-      end else if alloc then begin
++      end else*) if alloc then begin
+         load_symbol_addr func rax;
+         emit_call "caml_c_call";
+         record_frame env i.live (Dbg_other i.dbg);
++(* BACKPORT BEGIN *)
++        if system <> S_win64 then begin
++
++          (* In amd64.S, "caml_c_call" tail-calls the C function (in order to
++             produce nicer backtraces), so we need to restore r15 manually after
++             it returns (note that this increases code size).
++
++             In amd64nt.asm (used for Win64), "caml_c_call" invokes the C
++             function via a regular call, and restores r15 itself, thus avoiding
++             the code size increase. *)
++
++          I.mov (domain_field Domainstate.Domain_young_ptr) r15
++        end
++(* BACKPORT END *)
+       end else begin
++(* BACKPORT
+         I.mov rsp rbp;
+         cfi_remember_state ();
+         cfi_def_cfa_register "rbp";
+@@ -561,10 +581,12 @@ let emit_instr env fallthrough i =
+            will not unwind through this unless we were to tag this
+            calling frame with cfi_signal_frame in it's definition. *)
+         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
+-
++*)
+         emit_call func;
++(* BACKPORT
+         I.mov rbp rsp;
+         cfi_restore_state ();
++*)
+       end
+   | Lop(Istackoffset n) ->
+       if n < 0
+@@ -741,7 +763,10 @@ let emit_instr env fallthrough i =
+   | Lop(Ispecific(Izextend32)) ->
+       I.mov (arg32 i 0) (res32 i 0)
+   | Lop (Idls_get) ->
++      assert false
++(* BACKPORT
+       I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
++*)
+   | Lreloadretaddr ->
+       ()
+   | Lreturn ->
+@@ -842,12 +867,24 @@ let emit_instr env fallthrough i =
+       load_label_addr lbl_handler r11;
+       I.push r11;
+       cfi_adjust_cfa_offset 8;
++(* BACKPORT BEGIN
+       I.push (domain_field Domainstate.Domain_exn_handler);
++*)
++      I.push (domain_field Domainstate.Domain_exception_pointer);
++(* BACKPORT END *)
+       cfi_adjust_cfa_offset 8;
++(* BACKPORT BEGIN
+       I.mov rsp (domain_field Domainstate.Domain_exn_handler);
++*)
++      I.mov rsp (domain_field Domainstate.Domain_exception_pointer);
++(* BACKPORT END *)
+       env.stack_offset <- env.stack_offset + 16;
+   | Lpoptrap ->
++(* BACKPORT BEGIN
+       I.pop (domain_field Domainstate.Domain_exn_handler);
++*)
++      I.pop (domain_field Domainstate.Domain_exception_pointer);
++(* BACKPORT END *)
+       cfi_adjust_cfa_offset (-8);
+       I.add (int 8) rsp;
+       cfi_adjust_cfa_offset (-8);
+@@ -855,14 +892,26 @@ let emit_instr env fallthrough i =
+   | Lraise k ->
+       begin match k with
+       | Lambda.Raise_regular ->
++(* BACKPORT BEGIN *)
++          I.mov (int 0) (domain_field Domainstate.Domain_backtrace_pos);
++(* BACKPORT END *)
+           emit_call "caml_raise_exn";
+           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+       | Lambda.Raise_reraise ->
++(* BACKPORT BEGIN
+           emit_call "caml_reraise_exn";
++*)
++          emit_call "caml_raise_exn";
++(* BACKPORT END *)
+           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+       | Lambda.Raise_notrace ->
++(* BACKPORT BEGIN
+           I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
+           I.pop (domain_field Domainstate.Domain_exn_handler);
++*)
++          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
++          I.pop (domain_field Domainstate.Domain_exception_pointer);
++(* BACKPORT END *)
+           I.pop r11;
+           I.jmp r11
+       end
+@@ -876,6 +925,7 @@ let rec emit_all env fallthrough i =
+ 
+ let all_functions = ref []
+ 
++(* BACKPORT
+ type preproc_fun_result =
+   { max_stack_size : int;
+     contains_nontail_calls : bool }
+@@ -899,6 +949,7 @@ let preproc_fun env fun_body _fun_name =
+   let fs = frame_size env in
+   let r = {max_stack_size = fs; contains_nontail_calls = false} in
+   proc_instr r fs fun_body
++*)
+ 
+ (* Emission of a function declaration *)
+ 
+@@ -918,6 +969,7 @@ let fundecl fundecl =
+   D.label (emit_symbol fundecl.fun_name);
+   emit_debug_info fundecl.fun_dbg;
+   cfi_startproc ();
++(* BACKPORT
+   if !Clflags.runtime_variant = "d" then
+     emit_call "caml_assert_stack_invariants";
+   let { max_stack_size; contains_nontail_calls} =
+@@ -933,9 +985,11 @@ let fundecl fundecl =
+     def_label ret;
+     handle_overflow := Some (overflow, ret)
+   end;
++*)
+   emit_all env true fundecl.fun_body;
+   List.iter emit_call_gc env.call_gc_sites;
+   emit_call_bound_errors env;
++(* BACKPORT
+   begin match !handle_overflow with
+   | None -> ()
+   | Some (overflow,ret) -> begin
+@@ -950,6 +1004,7 @@ let fundecl fundecl =
+       I.jmp (label ret)
+     end
+   end;
++*)
+   if fundecl.fun_frame_required then begin
+     let n = (frame_size env) - 8 - (if fp then 8 else 0) in
+     if n <> 0
+diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
+index 64b05a95c8..dbeaff0cbe 100644
+--- a/asmcomp/amd64/proc.ml
++++ b/asmcomp/amd64/proc.ml
+@@ -297,12 +297,20 @@ let destroyed_at_c_call =
+   if win64 then
+     (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
+     Array.of_list(List.map phys_reg
++(* BACKPORT BEGIN
+       [0;4;5;6;7;10;11;12;
++*)
++      [0;4;5;6;7;10;11;
++(* BACKPORT END *)
+        100;101;102;103;104;105])
+   else
+     (* Unix: rbx, r12-r15 preserved *)
+     Array.of_list(List.map phys_reg
++(* BACKPORT BEGIN
+       [0;2;3;4;5;6;7;10;11;12;
++*)
++      [0;2;3;4;5;6;7;10;11;
++(* BACKPORT END *)
+        100;101;102;103;104;105;106;107;
+        108;109;110;111;112;113;114;115])
+ 
+diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
+index 4e0b391338..9823a80f19 100644
+--- a/asmcomp/cmm_helpers.ml
++++ b/asmcomp/cmm_helpers.ml
+@@ -2200,8 +2200,13 @@ let assignment_kind
+     (init: Lambda.initialization_or_assignment) =
+   match init, ptr with
+   | Assignment, Pointer -> Caml_modify
++(* BACKPORT BEGIN
+   | Heap_initialization, Pointer
+   | Root_initialization, Pointer -> Caml_initialize
++*)
++  | Heap_initialization, Pointer -> Caml_initialize
++  | Root_initialization, Pointer -> Simple
++(* BACKPORT END *)
+   | Assignment, Immediate
+   | Heap_initialization, Immediate
+   | Root_initialization, Immediate -> Simple
 diff --git a/boot/ocamlc b/boot/ocamlc
-index d431dbd1f4..6590409c5d 100755
+index d431dbd1f4..804880e707 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index b35488cadc..f7298c9f3b 100755
+index b35488cadc..9c4fe66628 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-index 681f116bbb..21c95d87de 100644
+index 681f116bbb..0a59107ea8 100644
 --- a/build-aux/ocaml_version.m4
 +++ b/build-aux/ocaml_version.m4
-@@ -31,12 +31,12 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
- # integers. They MUST NOT be left-padded with zeros and all of them,
+@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
  # including the patchlevel, are mandatory.
  
--m4_define([OCAML__VERSION_MAJOR], [5])
+ m4_define([OCAML__VERSION_MAJOR], [5])
 -m4_define([OCAML__VERSION_MINOR], [00])
-+m4_define([OCAML__VERSION_MAJOR], [4])
-+m4_define([OCAML__VERSION_MINOR], [14])
++m4_define([OCAML__VERSION_MINOR], [0])
  m4_define([OCAML__VERSION_PATCHLEVEL], [0])
  # Note that the OCAML__VERSION_EXTRA string defined below is always empty
  # for officially-released versions of OCaml.
 -m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
-+m4_define([OCAML__VERSION_EXTRA], [dev1-2021-10-05])
++m4_define([OCAML__VERSION_EXTRA], [jst-backport])
  
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
+diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
+index ea423e50b7..bd961633a9 100644
+--- a/bytecomp/emitcode.ml
++++ b/bytecomp/emitcode.ml
+@@ -300,10 +300,14 @@ let emit_instr = function
+   | Kgetpubmet tag -> out opGETPUBMET; out_int tag; out_int 0
+   | Kgetdynmet -> out opGETDYNMET
+   | Kevent ev -> record_event ev
++(* BACKPORT BEGIN
+   | Kperform -> out opPERFORM
+   | Kresume -> out opRESUME
+   | Kresumeterm n -> out opRESUMETERM; out_int n
+   | Kreperformterm n -> out opREPERFORMTERM; out_int n
++*)
++  | Kperform | Kresume | Kresumeterm _ | Kreperformterm _ -> assert false
++(* BACKPORT END *)
+   | Kstop -> out opSTOP
+ 
+ (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 35d8993e47..a30346e3ad 100755
+index 35d8993e47..15538f4f48 100755
 Binary files a/configure and b/configure differ
+diff --git a/configure.ac b/configure.ac
+index 89ccd2b251..fd05ab1ec8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -169,6 +169,8 @@ AC_SUBST([flexlink_flags])
+ AC_SUBST([PACKLD])
+ AC_SUBST([stdlib_manpages])
+ AC_SUBST([compute_deps])
++AC_SUBST([naked_pointers])
++AC_SUBST([naked_pointers_checker])
+ AC_SUBST([force_instrumented_runtime])
+ 
+ ## Generated files
+@@ -300,9 +302,16 @@ AC_ARG_ENABLE([frame-pointers],
+   [AS_HELP_STRING([--enable-frame-pointers],
+     [use frame pointers in runtime and generated code])])
+ 
+-AC_ARG_ENABLE([naked-pointers], [],
+-  [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
+-  [AC_DEFINE([NO_NAKED_POINTERS])])
++dnl AC_ARG_ENABLE([naked-pointers], [],
++dnl   [AC_MSG_ERROR([Naked pointers are not allowed in OCaml Multicore.])],
++dnl   [AC_DEFINE([NO_NAKED_POINTERS])])
++AC_ARG_ENABLE([naked-pointers],
++  [AS_HELP_STRING([--disable-naked-pointers],
++    [do not allow naked pointers])])
++
++AC_ARG_ENABLE([naked-pointers-checker],
++  [AS_HELP_STRING([--enable-naked-pointers-checker],
++    [enable the naked pointers checker])])
+ 
+ AC_ARG_ENABLE([spacetime], [],
+   [AC_MSG_ERROR([spacetime profiling was deleted in OCaml 4.12.])],
+@@ -1814,7 +1823,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
+     [*-*-mingw32|*-pc-windows],
+       [systhread_support=true
+       otherlibraries="$otherlibraries systhreads"
+-      PTHREAD_LIBS="-lpthread"
++dnl      PTHREAD_LIBS="-lpthread"
++      PTHREAD_LIBS=''
+       AC_MSG_NOTICE([the Win32 threads library is supported])],
+     [AX_PTHREAD(
+       [systhread_support=true
+@@ -1856,6 +1866,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+   [AC_MSG_NOTICE([not using frame pointers])
+   frame_pointers=false])
+ 
++## No naked pointers
++
++AS_IF([test x"$enable_naked_pointers" = "xno" ],
++  [naked_pointers=false
++   AC_DEFINE([NO_NAKED_POINTERS])],
++  [naked_pointers=true])
++
++AS_IF([test x"$enable_naked_pointers_checker" = "xyes" ],
++  [AS_IF([test x"$enable_naked_pointers" = "xno" ],
++         [AC_MSG_ERROR(m4_normalize([
++               --enable-naked-pointers-checker and --disable-naked-pointers
++               are incompatible]))])
++   AS_CASE(["$arch","$system"],
++    [amd64,linux|amd64,macosx \
++    |amd64,openbsd|amd64,win64 \
++    |amd64,freebsd|amd64,solaris \
++    |arm64,linux|arm64,macosx],
++      [naked_pointers_checker=true
++      AC_DEFINE([NAKED_POINTERS_CHECKER])],
++    [*],
++      [AC_MSG_ERROR([naked pointers checker not supported on this platform])]
++  )],
++  [naked_pointers_checker=false])
++
+ ## Check for mmap support for huge pages and contiguous heap
+ OCAML_MMAP_SUPPORTS_HUGE_PAGES
+ 
+@@ -1965,8 +1999,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+ 
+ AS_CASE([$host],
+   [*-*-mingw32],
+-    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
+-    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
++dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
++dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
++    [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
++    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
+   [*-pc-windows],
+     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
+     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
 index 0000000000..e69de29bb2
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..1621fa8862
---- /dev/null
-+++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,15 @@
-+diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
-+new file mode 100644
-+index 0000000000..15969eb421
-+--- /dev/null
-++++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
-+@@ -0,0 +1,9 @@
-++(* TEST
-++*)
-++
-++let _ =
-++  (* In 4.13 this causes Obj.reachable_words to segfault
-++     because of a missing initialization in caml_obj_reachable_words *)
-++  ignore (Marshal.(to_string 123 [No_sharing]));
-++  let n = Obj.reachable_words (Obj.repr (Array.init 10 (fun i -> i))) in
-++  assert (n = 11)
+index 0000000000..e69de29bb2
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..87aeb1723c
+index 0000000000..05f2ffee09
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,110 @@
+@@ -0,0 +1,368 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..b7b564118c
@@ -177,59 +523,1853 @@ index 0000000000..87aeb1723c
 + 
 + OCaml 4.13 maintenance branch
 + -----------------------------
++diff --git a/Makefile.config.in b/Makefile.config.in
++index 63bdc810a4..fb7ab00998 100644
++--- a/Makefile.config.in
+++++ b/Makefile.config.in
++@@ -255,7 +255,7 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
++ FUNCTION_SECTIONS=@function_sections@
++ AWK=@AWK@
++ STDLIB_MANPAGES=@stdlib_manpages@
++-NAKED_POINTERS=false
+++NAKED_POINTERS=@naked_pointers@
++ 
++ ### Native command to build ocamlrun.exe
++ 
 +diff --git a/VERSION b/VERSION
-+index d9d76e3115..ca456ac135 100644
++index d9d76e3115..4ef434f979 100644
 +--- a/VERSION
 ++++ b/VERSION
 +@@ -1,4 +1,4 @@
 +-5.00.0+dev0-2021-11-05
-++4.14.0+dev1-2021-10-05
+++5.0.0+jst-backport
 + 
 + # Starting with OCaml 4.14, although the version string that appears above is
 + # still correct and this file can thus still be used to figure it out,
++diff --git a/api_docgen/Makefile.docfiles b/api_docgen/Makefile.docfiles
++index 09c24557b5..14a3b18322 100644
++--- a/api_docgen/Makefile.docfiles
+++++ b/api_docgen/Makefile.docfiles
++@@ -35,8 +35,8 @@ str_MLIS := str.mli
++ unix_MLIS := unix.mli unixLabels.mli
++ dynlink_MLIS := dynlink.mli
++ thread_MLIS := \
++-  thread.mli event.mli \
++-  threadUnix.mli
+++  thread.mli condition.mli mutex.mli event.mli \
+++  threadUnix.mli semaphore.mli
++ 
++ STDLIB=$(filter-out stdlib__Pervasives, $(STDLIB_MODULES))
++ 
++diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
++index ef768b11d8..e7dec0460a 100644
++--- a/asmcomp/amd64/emit.mlp
+++++ b/asmcomp/amd64/emit.mlp
++@@ -63,6 +63,7 @@ let cfi_endproc () =
++ let cfi_adjust_cfa_offset n =
++   if Config.asm_cfi_supported then D.cfi_adjust_cfa_offset n
++ 
+++(* BACKPORT
++ let cfi_remember_state () =
++   if Config.asm_cfi_supported then D.cfi_remember_state ()
++ 
++@@ -71,13 +72,16 @@ let cfi_restore_state () =
++ 
++ let cfi_def_cfa_register reg =
++   if Config.asm_cfi_supported then D.cfi_def_cfa_register reg
+++*)
++ 
++ let emit_debug_info dbg =
++   emit_debug_info_gen dbg D.file D.loc
++ 
++ let fp = Config.with_frame_pointers
++ 
+++(* BACKPORT
++ let stack_threshold_size = Config.stack_threshold * 8 (* bytes *)
+++*)
++ 
++ let frame_size env =                     (* includes return address *)
++   if env.f.fun_frame_required then begin
++@@ -536,8 +540,9 @@ let emit_instr env fallthrough i =
++           end
++         end
++       end
++-  | Lop(Iextcall { func; alloc; stack_ofs }) ->
+++  | Lop(Iextcall { func; alloc; stack_ofs = _ }) ->
++       add_used_symbol func;
+++(* BACKPORT
++       let base_stack_size =
++         if Arch.win64 then
++           32 (* Windows x64 rcx+rdx+r8+r9 shadow stack *)
++@@ -549,11 +554,26 @@ let emit_instr env fallthrough i =
++         load_symbol_addr func rax;
++         emit_call "caml_c_call_stack_args";
++         record_frame env i.live (Dbg_other i.dbg);
++-      end else if alloc then begin
+++      end else*) if alloc then begin
++         load_symbol_addr func rax;
++         emit_call "caml_c_call";
++         record_frame env i.live (Dbg_other i.dbg);
+++(* BACKPORT BEGIN *)
+++        if system <> S_win64 then begin
+++
+++          (* In amd64.S, "caml_c_call" tail-calls the C function (in order to
+++             produce nicer backtraces), so we need to restore r15 manually after
+++             it returns (note that this increases code size).
+++
+++             In amd64nt.asm (used for Win64), "caml_c_call" invokes the C
+++             function via a regular call, and restores r15 itself, thus avoiding
+++             the code size increase. *)
+++
+++          I.mov (domain_field Domainstate.Domain_young_ptr) r15
+++        end
+++(* BACKPORT END *)
++       end else begin
+++(* BACKPORT
++         I.mov rsp rbp;
++         cfi_remember_state ();
++         cfi_def_cfa_register "rbp";
++@@ -561,10 +581,12 @@ let emit_instr env fallthrough i =
++            will not unwind through this unless we were to tag this
++            calling frame with cfi_signal_frame in it's definition. *)
++         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
++-
+++*)
++         emit_call func;
+++(* BACKPORT
++         I.mov rbp rsp;
++         cfi_restore_state ();
+++*)
++       end
++   | Lop(Istackoffset n) ->
++       if n < 0
++@@ -741,7 +763,10 @@ let emit_instr env fallthrough i =
++   | Lop(Ispecific(Izextend32)) ->
++       I.mov (arg32 i 0) (res32 i 0)
++   | Lop (Idls_get) ->
+++      assert false
+++(* BACKPORT
++       I.mov (domain_field Domainstate.Domain_dls_root) (res i 0)
+++*)
++   | Lreloadretaddr ->
++       ()
++   | Lreturn ->
++@@ -842,12 +867,24 @@ let emit_instr env fallthrough i =
++       load_label_addr lbl_handler r11;
++       I.push r11;
++       cfi_adjust_cfa_offset 8;
+++(* BACKPORT BEGIN
++       I.push (domain_field Domainstate.Domain_exn_handler);
+++*)
+++      I.push (domain_field Domainstate.Domain_exception_pointer);
+++(* BACKPORT END *)
++       cfi_adjust_cfa_offset 8;
+++(* BACKPORT BEGIN
++       I.mov rsp (domain_field Domainstate.Domain_exn_handler);
+++*)
+++      I.mov rsp (domain_field Domainstate.Domain_exception_pointer);
+++(* BACKPORT END *)
++       env.stack_offset <- env.stack_offset + 16;
++   | Lpoptrap ->
+++(* BACKPORT BEGIN
++       I.pop (domain_field Domainstate.Domain_exn_handler);
+++*)
+++      I.pop (domain_field Domainstate.Domain_exception_pointer);
+++(* BACKPORT END *)
++       cfi_adjust_cfa_offset (-8);
++       I.add (int 8) rsp;
++       cfi_adjust_cfa_offset (-8);
++@@ -855,14 +892,26 @@ let emit_instr env fallthrough i =
++   | Lraise k ->
++       begin match k with
++       | Lambda.Raise_regular ->
+++(* BACKPORT BEGIN *)
+++          I.mov (int 0) (domain_field Domainstate.Domain_backtrace_pos);
+++(* BACKPORT END *)
++           emit_call "caml_raise_exn";
++           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
++       | Lambda.Raise_reraise ->
+++(* BACKPORT BEGIN
++           emit_call "caml_reraise_exn";
+++*)
+++          emit_call "caml_raise_exn";
+++(* BACKPORT END *)
++           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
++       | Lambda.Raise_notrace ->
+++(* BACKPORT BEGIN
++           I.mov (domain_field Domainstate.Domain_exn_handler) rsp;
++           I.pop (domain_field Domainstate.Domain_exn_handler);
+++*)
+++          I.mov (domain_field Domainstate.Domain_exception_pointer) rsp;
+++          I.pop (domain_field Domainstate.Domain_exception_pointer);
+++(* BACKPORT END *)
++           I.pop r11;
++           I.jmp r11
++       end
++@@ -876,6 +925,7 @@ let rec emit_all env fallthrough i =
++ 
++ let all_functions = ref []
++ 
+++(* BACKPORT
++ type preproc_fun_result =
++   { max_stack_size : int;
++     contains_nontail_calls : bool }
++@@ -899,6 +949,7 @@ let preproc_fun env fun_body _fun_name =
++   let fs = frame_size env in
++   let r = {max_stack_size = fs; contains_nontail_calls = false} in
++   proc_instr r fs fun_body
+++*)
++ 
++ (* Emission of a function declaration *)
++ 
++@@ -918,6 +969,7 @@ let fundecl fundecl =
++   D.label (emit_symbol fundecl.fun_name);
++   emit_debug_info fundecl.fun_dbg;
++   cfi_startproc ();
+++(* BACKPORT
++   if !Clflags.runtime_variant = "d" then
++     emit_call "caml_assert_stack_invariants";
++   let { max_stack_size; contains_nontail_calls} =
++@@ -933,9 +985,11 @@ let fundecl fundecl =
++     def_label ret;
++     handle_overflow := Some (overflow, ret)
++   end;
+++*)
++   emit_all env true fundecl.fun_body;
++   List.iter emit_call_gc env.call_gc_sites;
++   emit_call_bound_errors env;
+++(* BACKPORT
++   begin match !handle_overflow with
++   | None -> ()
++   | Some (overflow,ret) -> begin
++@@ -950,6 +1004,7 @@ let fundecl fundecl =
++       I.jmp (label ret)
++     end
++   end;
+++*)
++   if fundecl.fun_frame_required then begin
++     let n = (frame_size env) - 8 - (if fp then 8 else 0) in
++     if n <> 0
++diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
++index 64b05a95c8..dbeaff0cbe 100644
++--- a/asmcomp/amd64/proc.ml
+++++ b/asmcomp/amd64/proc.ml
++@@ -297,12 +297,20 @@ let destroyed_at_c_call =
++   if win64 then
++     (* Win64: rbx, rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
++     Array.of_list(List.map phys_reg
+++(* BACKPORT BEGIN
++       [0;4;5;6;7;10;11;12;
+++*)
+++      [0;4;5;6;7;10;11;
+++(* BACKPORT END *)
++        100;101;102;103;104;105])
++   else
++     (* Unix: rbx, r12-r15 preserved *)
++     Array.of_list(List.map phys_reg
+++(* BACKPORT BEGIN
++       [0;2;3;4;5;6;7;10;11;12;
+++*)
+++      [0;2;3;4;5;6;7;10;11;
+++(* BACKPORT END *)
++        100;101;102;103;104;105;106;107;
++        108;109;110;111;112;113;114;115])
++ 
++diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
++index 4e0b391338..9823a80f19 100644
++--- a/asmcomp/cmm_helpers.ml
+++++ b/asmcomp/cmm_helpers.ml
++@@ -2200,8 +2200,13 @@ let assignment_kind
++     (init: Lambda.initialization_or_assignment) =
++   match init, ptr with
++   | Assignment, Pointer -> Caml_modify
+++(* BACKPORT BEGIN
++   | Heap_initialization, Pointer
++   | Root_initialization, Pointer -> Caml_initialize
+++*)
+++  | Heap_initialization, Pointer -> Caml_initialize
+++  | Root_initialization, Pointer -> Simple
+++(* BACKPORT END *)
++   | Assignment, Immediate
++   | Heap_initialization, Immediate
++   | Root_initialization, Immediate -> Simple
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index d431dbd1f4..6590409c5d 100755
++index d431dbd1f4..804880e707 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index b35488cadc..f7298c9f3b 100755
++index b35488cadc..9c4fe66628 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+index 681f116bbb..21c95d87de 100644
++index 681f116bbb..0a59107ea8 100644
 +--- a/build-aux/ocaml_version.m4
 ++++ b/build-aux/ocaml_version.m4
-+@@ -31,12 +31,12 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
-+ # integers. They MUST NOT be left-padded with zeros and all of them,
++@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
 + # including the patchlevel, are mandatory.
 + 
-+-m4_define([OCAML__VERSION_MAJOR], [5])
++ m4_define([OCAML__VERSION_MAJOR], [5])
 +-m4_define([OCAML__VERSION_MINOR], [00])
-++m4_define([OCAML__VERSION_MAJOR], [4])
-++m4_define([OCAML__VERSION_MINOR], [14])
+++m4_define([OCAML__VERSION_MINOR], [0])
 + m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 + # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 + # for officially-released versions of OCaml.
 +-m4_define([OCAML__VERSION_EXTRA], [dev0-2021-11-05])
-++m4_define([OCAML__VERSION_EXTRA], [dev1-2021-10-05])
+++m4_define([OCAML__VERSION_EXTRA], [jst-backport])
 + 
 + # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
 + # single character:
-+diff --git a/configure b/configure
-+index 35d8993e47..a30346e3ad 100755
-+Binary files a/configure and b/configure differ
-+diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
-+new file mode 100644
-+index 0000000000..e69de29bb2
-+diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
-+new file mode 100644
-+index 0000000000..1621fa8862
-+--- /dev/null
-++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,15 @@
-++diff --git a/testsuite/tests/lib-obj/reachable_words_bug.ml b/testsuite/tests/lib-obj/reachable_words_bug.ml
-++new file mode 100644
-++index 0000000000..15969eb421
-++--- /dev/null
-+++++ b/testsuite/tests/lib-obj/reachable_words_bug.ml
-++@@ -0,0 +1,9 @@
-+++(* TES
++diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
++index ea423e50b7..bd961633a9 100644
++--- a/bytecomp/emitcode.ml
+++++ b/bytecomp/emitcode.ml
++@@ -300,10 +300,14 @@ let emit_instr = function
++   | Kgetpubmet tag -> out opGETPUBMET; out_int tag; out_int 0
++   | Kgetdynmet -> out opGETDYNMET
++   | Kevent ev -> record_event ev
+++(* BACKPORT BEGIN
++   | Kperform -> out opPERFORM
++   | Kresume -> out opRESUME
++   | Kresumeterm n -> out opRESUMETERM; out_int n
++   | Kreperformterm n -> out opREPERFORMTERM; out_int n
+++*)
+++  | Kperform | Kresume | Kresumeterm _ | Kreperformterm _ -> assert false
+++(* BACKPORT END *)
++   | Kstop -> out opSTOP
++ 
++ (* 
 \ No newline at end of file
+diff --git a/lambda/matching.ml b/lambda/matching.ml
+index 43bccf6e2c..e404f6b040 100644
+--- a/lambda/matching.ml
++++ b/lambda/matching.ml
+@@ -1877,7 +1877,11 @@ let get_mod_field modname field =
+ 
+ let code_force_lazy_block = get_mod_field "CamlinternalLazy" "force_lazy_block"
+ 
++(* BACKPORT_BEGIN
+ let code_force_lazy = get_mod_field "CamlinternalLazy" "force_gen"
++*)
++let code_force_lazy = get_mod_field "CamlinternalLazy" "force"
++(* BACKPORT END *)
+ 
+ (* inline_lazy_force inlines the beginning of the code of Lazy.force. When
+    the value argument is tagged as:
+@@ -1893,10 +1897,15 @@ let inline_lazy_force_cond arg loc =
+   let idarg = Ident.create_local "lzarg" in
+   let varg = Lvar idarg in
+   let tag = Ident.create_local "tag" in
++(* BACKPORT BEGIN *)
++  let tag_var = Lvar tag in
++(* BACKPORT END *)
+   let force_fun = Lazy.force code_force_lazy_block in
++(* BACKPORT
+   let test_tag t =
+     Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
+   in
++*)
+ 
+   Llet
+     ( Strict,
+@@ -1909,16 +1918,32 @@ let inline_lazy_force_cond arg loc =
+           tag,
+           Lprim (Pccall prim_obj_tag, [ varg ], loc),
+           Lifthenelse
++(* BACKPORT BEGIN
+             ( (* if (tag == Obj.forward_tag) then varg.(0) else ... *)
+               test_tag Obj.forward_tag,
+               Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc),
++*)
++            ( Lprim
++                ( Pintcomp Ceq,
++                  [ tag_var; Lconst (Const_base (Const_int Obj.forward_tag)) ],
++                  loc ),
++              Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc),
++(* BACKPORT END *)
+               Lifthenelse
++(* BACKPORT BEGIN *)
++                ( Lprim
++                    ( Pintcomp Ceq,
++                      [ tag_var; Lconst (Const_base (Const_int Obj.lazy_tag)) ],
++                      loc ),
++(* BACKPORT END *)
++(* BACKPORT
+                 (
+                   (* ... if tag == Obj.lazy_tag || tag == Obj.forcing_tag then
+                          Lazy.force varg
+                        else ... *)
+                   Lprim (Psequor,
+                        [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
++*)
+                   Lapply
+                     { ap_tailcall = Default_tailcall;
+                       ap_loc = loc;
+@@ -1943,11 +1968,25 @@ let inline_lazy_force_switch arg loc =
+         ( Lprim (Pisint, [ varg ], loc),
+           varg,
+           Lswitch
++(* BACKPORT BEGIN
+             ( Lprim (Pccall prim_obj_tag, [ varg ], loc),
+               { sw_numblocks = 0;
+                 sw_blocks = [];
+                 sw_numconsts = 256;
++*)
++            ( varg,
++              { sw_numconsts = 0;
++                sw_consts = [];
++                sw_numblocks = 256;
++(* BACKPORT END *)
+                 (* PR#6033 - tag ranges from 0 to 255 *)
++(* BACKPORT BEGIN *)
++                sw_blocks =
++                  [ (Obj.forward_tag,
++                     Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
++                    ( Obj.lazy_tag,
++(* BACKPORT END *)
++(* BACKPORT
+                 sw_consts =
+                   [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
+                                              [ varg ], loc));
+@@ -1963,6 +2002,7 @@ let inline_lazy_force_switch arg loc =
+                         } );
+ 
+                     (Obj.forcing_tag,
++*)
+                       Lapply
+                         { ap_tailcall = Default_tailcall;
+                           ap_loc = loc;
+@@ -1986,7 +2026,11 @@ let inline_lazy_force arg loc =
+       { ap_tailcall = Default_tailcall;
+         ap_loc = loc;
+         ap_func = Lazy.force code_force_lazy;
++(* BACKPORT BEGIN
+         ap_args = [ Lconst (Const_base (Const_int 0)); arg ];
++*)
++        ap_args = [ arg ];
++(* BACKPORT END *)
+         ap_inlined = Default_inline;
+         ap_specialised = Default_specialise
+       }
+diff --git a/manual/src/library/stdlib-blurb.etex b/manual/src/library/stdlib-blurb.etex
+index f175b0efa1..6772c5f3bb 100644
+--- a/manual/src/library/stdlib-blurb.etex
++++ b/manual/src/library/stdlib-blurb.etex
+@@ -130,10 +130,10 @@ be called from C \\
+ \stddocitem{Callback}{registering OCaml values with the C runtime}
+ \stddocitem{Char}{character operations}
+ \stddocitem{Complex}{complex numbers}
+-\stddocitem{Condition}{condition variables to synchronize between threads}
+-\stddocitem{Domain}{Domain spawn/join and domain local variables}
++%\stddocitem{Condition}{condition variables to synchronize between threads}
++%\stddocitem{Domain}{Domain spawn/join and domain local variables}
+ \stddocitem{Digest}{MD5 message digest}
+-\stddocitem{EffectHandlers}{deep and shallow effect handlers}
++%\stddocitem{EffectHandlers}{deep and shallow effect handlers}
+ \stddocitem{Either}{either values}
+ \stddocitem{Ephemeron}{Ephemerons and weak hash table}
+ \stddocitem{Filename}{operations on file names}
+@@ -154,7 +154,7 @@ be called from C \\
+ \stddocitem{Map}{association tables over ordered types}
+ \stddocitem{Marshal}{marshaling of data structures}
+ \stddocitem{MoreLabels}{include modules \texttt{Hashtbl}, \texttt{Map} and \texttt{Set} with labels}
+-\stddocitem{Mutex}{locks for mutual exclusion}
++%\stddocitem{Mutex}{locks for mutual exclusion}
+ \stddocitem{Nativeint}{processor-native integers}
+ \stddocitem{Oo}{object-oriented extension}
+ \stddocitem{Option}{option values}
+@@ -168,7 +168,7 @@ be called from C \\
+ \stddocitem{Scanf}{formatted input functions}
+ \stddocitem{Seq}{functional iterators}
+ \stddocitem{Set}{sets over ordered types}
+-\stddocitem{Semaphore}{semaphores, another thread synchronization mechanism}
++%\stddocitem{Semaphore}{semaphores, another thread synchronization mechanism}
+ \stddocitem{Stack}{last-in first-out stacks}
+ \stddocitem{StdLabels}{include modules \texttt{Array}, \texttt{List} and \texttt{String} with labels}
+ \stddocitem{Stream}{streams and parsers}
+diff --git a/otherlibs/dynlink/dynlink_common.ml b/otherlibs/dynlink/dynlink_common.ml
+index 3f5933aeb0..d8374a5b72 100644
+--- a/otherlibs/dynlink/dynlink_common.ml
++++ b/otherlibs/dynlink/dynlink_common.ml
+@@ -23,9 +23,11 @@ open! Dynlink_compilerlibs
+ (* Dynlink is only allowed on the main domain.
+    Entrypoints to public functions should check for this. *)
+ let is_dynlink_allowed () =
++(* BACKPORT
+   if not (Domain.is_main_domain ()) then
+     failwith "Dynlink can only be called from the main domain."
+   else
++*)
+     ()
+ 
+ module String = struct
+diff --git a/otherlibs/str/str.ml b/otherlibs/str/str.ml
+index 5be37c18fe..759d16f100 100644
+--- a/otherlibs/str/str.ml
++++ b/otherlibs/str/str.ml
+@@ -595,7 +595,18 @@ external re_search_forward: regexp -> string -> int -> int array
+ external re_search_backward: regexp -> string -> int -> int array
+      = "re_search_backward"
+ 
++(* BACKPORT BEGIN
+ let last_search_result_key = Domain.DLS.new_key (fun () -> [||])
++*)
++let last_search_result_key = ref [||]
++
++module Domain = struct
++  module DLS = struct
++    let get = (!)
++    let set = (:=)
++  end
++end
++(* BACKPORT END *)
+ 
+ let string_match re s pos =
+   let res = re_string_match re s pos in
+diff --git a/otherlibs/systhreads/.depend b/otherlibs/systhreads/.depend
+index 68f4b2f351..3bd0a0078f 100644
+--- a/otherlibs/systhreads/.depend
++++ b/otherlibs/systhreads/.depend
+@@ -1,8 +1,34 @@
++condition.cmo : \
++    mutex.cmi \
++    condition.cmi
++condition.cmx : \
++    mutex.cmx \
++    condition.cmi
++condition.cmi : \
++    mutex.cmi
+ event.cmo : \
++    mutex.cmi \
++    condition.cmi \
+     event.cmi
+ event.cmx : \
++    mutex.cmx \
++    condition.cmx \
+     event.cmi
+ event.cmi :
++mutex.cmo : \
++    mutex.cmi
++mutex.cmx : \
++    mutex.cmi
++mutex.cmi :
++semaphore.cmo : \
++    mutex.cmi \
++    condition.cmi \
++    semaphore.cmi
++semaphore.cmx : \
++    mutex.cmx \
++    condition.cmx \
++    semaphore.cmi
++semaphore.cmi :
+ thread.cmo : \
+     thread.cmi
+ thread.cmx : \
+diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
+index 4e8a53257f..82279456db 100644
+--- a/otherlibs/systhreads/Makefile
++++ b/otherlibs/systhreads/Makefile
+@@ -50,12 +50,14 @@ LIBNAME=threads
+ BYTECODE_C_OBJS=st_stubs.b.$(O)
+ NATIVECODE_C_OBJS=st_stubs.n.$(O)
+ 
+-THREADS_SOURCES = thread.ml event.ml threadUnix.ml
++THREADS_SOURCES = thread.ml mutex.ml condition.ml event.ml threadUnix.ml \
++  semaphore.ml
+ 
+ THREADS_BCOBJS = $(THREADS_SOURCES:.ml=.cmo)
+ THREADS_NCOBJS = $(THREADS_SOURCES:.ml=.cmx)
+ 
+-MLIFILES=thread.mli event.mli threadUnix.mli
++MLIFILES=thread.mli mutex.mli condition.mli event.mli threadUnix.mli \
++  semaphore.mli
+ 
+ CMIFILES=$(MLIFILES:.mli=.cmi)
+ 
+diff --git a/otherlibs/systhreads/condition.ml b/otherlibs/systhreads/condition.ml
+new file mode 100644
+index 0000000000..9a014528ab
+--- /dev/null
++++ b/otherlibs/systhreads/condition.ml
+@@ -0,0 +1,20 @@
++(**************************************************************************)
++(*                                                                        *)
++(*                                 OCaml                                  *)
++(*                                                                        *)
++(*   Xavier Leroy and Pascal Cuoq, projet Cristal, INRIA Rocquencourt     *)
++(*                                                                        *)
++(*   Copyright 1995 Institut National de Recherche en Informatique et     *)
++(*     en Automatique.                                                    *)
++(*                                                                        *)
++(*   All rights reserved.  This file is distributed under the terms of    *)
++(*   the GNU Lesser General Public License version 2.1, with the          *)
++(*   special exception on linking described in the file LICENSE.          *)
++(*                                                                        *)
++(**************************************************************************)
++
++type t
++external create: unit -> t = "caml_condition_new"
++external wait: t -> Mutex.t -> unit = "caml_condition_wait"
++external signal: t -> unit = "caml_condition_signal"
++external broadcast: t -> unit = "caml_condition_broadcast"
+diff --git a/otherlibs/systhreads/condition.mli b/otherlibs/systhreads/condition.mli
+new file mode 100644
+index 0000000000..36c71fc818
+--- /dev/null
++++ b/otherlibs/systhreads/condition.mli
+@@ -0,0 +1,53 @@
++(**************************************************************************)
++(*                                                                        *)
++(*                                 OCaml                                  *)
++(*                                                                        *)
++(*          Xavier Leroy and Damien Doligez, INRIA Rocquencourt           *)
++(*                                                                        *)
++(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
++(*     en Automatique.                                                    *)
++(*                                                                        *)
++(*   All rights reserved.  This file is distributed under the terms of    *)
++(*   the GNU Lesser General Public License version 2.1, with the          *)
++(*   special exception on linking described in the file LICENSE.          *)
++(*                                                                        *)
++(**************************************************************************)
++
++(** Condition variables to synchronize between threads.
++
++   Condition variables are used when one thread wants to wait until another
++   thread has finished doing something: the former thread 'waits' on the
++   condition variable, the latter thread 'signals' the condition when it
++   is done. Condition variables should always be protected by a mutex.
++   The typical use is (if [D] is a shared data structure, [m] its mutex,
++   and [c] is a condition variable):
++   {[
++     Mutex.lock m;
++     while (* some predicate P over D is not satisfied *) do
++       Condition.wait c m
++     done;
++     (* Modify D *)
++     if (* the predicate P over D is now satisfied *) then Condition.signal c;
++     Mutex.unlock m
++   ]}
++*)
++
++type t
++(** The type of condition variables. *)
++
++val create : unit -> t
++(** Return a new condition variable. *)
++
++val wait : t -> Mutex.t -> unit
++(** [wait c m] atomically unlocks the mutex [m] and suspends the
++   calling process on the condition variable [c]. The process will
++   restart after the condition variable [c] has been signalled.
++   The mutex [m] is locked again before [wait] returns. *)
++
++val signal : t -> unit
++(** [signal c] restarts one of the processes waiting on the
++   condition variable [c]. *)
++
++val broadcast : t -> unit
++(** [broadcast c] restarts all processes waiting on the
++   condition variable [c]. *)
+diff --git a/otherlibs/systhreads/mutex.ml b/otherlibs/systhreads/mutex.ml
+new file mode 100644
+index 0000000000..836109e761
+--- /dev/null
++++ b/otherlibs/systhreads/mutex.ml
+@@ -0,0 +1,20 @@
++(**************************************************************************)
++(*                                                                        *)
++(*                                 OCaml                                  *)
++(*                                                                        *)
++(*           Xavier Leroy and Pascal Cuoq, INRIA Rocquencourt             *)
++(*                                                                        *)
++(*   Copyright 1995 Institut National de Recherche en Informatique et     *)
++(*     en Automatique.                                                    *)
++(*                                                                        *)
++(*   All rights reserved.  This file is distributed under the terms of    *)
++(*   the GNU Lesser General Public License version 2.1, with the          *)
++(*   special exception on linking described in the file LICENSE.          *)
++(*                                                                        *)
++(**************************************************************************)
++
++type t
++external create: unit -> t = "caml_mutex_new"
++external lock: t -> unit = "caml_mutex_lock"
++external try_lock: t -> bool = "caml_mutex_try_lock"
++external unlock: t -> unit = "caml_mutex_unlock"
+diff --git a/otherlibs/systhreads/mutex.mli b/otherlibs/systhreads/mutex.mli
+new file mode 100644
+index 0000000000..70a67ce408
+--- /dev/null
++++ b/otherlibs/systhreads/mutex.mli
+@@ -0,0 +1,60 @@
++(**************************************************************************)
++(*                                                                        *)
++(*                                 OCaml                                  *)
++(*                                                                        *)
++(*          Xavier Leroy and Damien Doligez, INRIA Rocquencourt           *)
++(*                                                                        *)
++(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
++(*     en Automatique.                                                    *)
++(*                                                                        *)
++(*   All rights reserved.  This file is distributed under the terms of    *)
++(*   the GNU Lesser General Public License version 2.1, with the          *)
++(*   special exception on linking described in the file LICENSE.          *)
++(*                                                                        *)
++(**************************************************************************)
++
++(** Locks for mutual exclusion.
++
++   Mutexes (mutual-exclusion locks) are used to implement critical sections
++   and protect shared mutable data structures against concurrent accesses.
++   The typical use is (if [m] is the mutex associated with the data structure
++   [D]):
++   {[
++     Mutex.lock m;
++     (* Critical section that operates over D *);
++     Mutex.unlock m
++   ]}
++*)
++
++type t
++(** The type of mutexes. *)
++
++val create : unit -> t
++(** Return a new mutex. *)
++
++val lock : t -> unit
++(** Lock the given mutex. Only one thread can have the mutex locked
++   at any time. A thread that attempts to lock a mutex already locked
++   by another thread will suspend until the other thread unlocks
++   the mutex.
++
++   @raise Sys_error if the mutex is already locked by the thread calling
++   {!Mutex.lock}.
++
++   @before 4.12 {!Sys_error} was not raised for recursive locking
++   (platform-dependent behaviour) *)
++
++val try_lock : t -> bool
++(** Same as {!Mutex.lock}, but does not suspend the calling thread if
++   the mutex is already locked: just return [false] immediately
++   in that case. If the mutex is unlocked, lock it and
++   return [true]. *)
++
++val unlock : t -> unit
++(** Unlock the given mutex. Other threads suspended trying to lock
++   the mutex will restart.  The mutex must have been previously locked
++   by the thread that calls {!Mutex.unlock}.
++   @raise Sys_error if the mutex is unlocked or was locked by another thread.
++
++   @before 4.12 {!Sys_error} was not raised when unlocking an unlocked mutex
++   or when unlocking a mutex from a different thread. *)
+diff --git a/otherlibs/systhreads/semaphore.ml b/otherlibs/systhreads/semaphore.ml
+new file mode 100644
+index 0000000000..e4fa4181a0
+--- /dev/null
++++ b/otherlibs/systhreads/semaphore.ml
+@@ -0,0 +1,86 @@
++(**************************************************************************)
++(*                                                                        *)
++(*                                 OCaml                                  *)
++(*                                                                        *)
++(*          Xavier Leroy, Collège de France and INRIA Paris               *)
++(*                                                                        *)
++(*   Copyright 2020 Institut National de Recherche en Informatique et     *)
++(*     en Automatique.                                                    *)
++(*                                                                        *)
++(*   All rights reserved.  This file is distributed under the terms of    *)
++(*   the GNU Lesser General Public License version 2.1, with the          *)
++(*   special exception on linking described in the file LICENSE.          *)
++(*                                                                        *)
++(**************************************************************************)
++
++(** Semaphores *)
++
++type sem = {
++  mut: Mutex.t;                         (* protects [v] *)
++  mutable v: int;                       (* the current value *)
++  nonzero: Condition.t                  (* signaled when [v > 0] *)
++}
++
++module Counting = struct
++
++type t = sem
++
++let make v =
++  if v < 0 then invalid_arg "Semaphore.Counting.init: wrong initial value";
++  { mut = Mutex.create(); v; nonzero = Condition.create() }
++
++let release s =
++  Mutex.lock s.mut;
++  if s.v < max_int then begin
++    s.v <- s.v + 1;
++    Condition.signal s.nonzero;
++    Mutex.unlock s.mut
++  end else begin
++    Mutex.unlock s.mut;
++    raise (Sys_error "Semaphore.Counting.release: overflow")
++  end
++
++let acquire s =
++  Mutex.lock s.mut;
++  while s.v = 0 do Condition.wait s.nonzero s.mut done;
++  s.v <- s.v - 1;
++  Mutex.unlock s.mut
++
++let try_acquire s =
++  Mutex.lock s.mut;
++  let ret = if s.v = 0 then false else (s.v <- s.v - 1; true) in
++  Mutex.unlock s.mut;
++  ret
++
++let get_value s = s.v
++
++end
++
++module Binary = struct
++
++type t = sem
++
++let make b =
++  { mut = Mutex.create();
++    v = if b then 1 else 0;
++    nonzero = Condition.create() }
++
++let release s =
++  Mutex.lock s.mut;
++  s.v <- 1;
++  Condition.signal s.nonzero;
++  Mutex.unlock s.mut
++
++let acquire s =
++  Mutex.lock s.mut;
++  while s.v = 0 do Condition.wait s.nonzero s.mut done;
++  s.v <- 0;
++  Mutex.unlock s.mut
++
++let try_acquire s =
++  Mutex.lock s.mut;
++  let ret = if s.v = 0 then false else (s.v <- 0; true) in
++  Mutex.unlock s.mut;
++  ret
++
++end
+diff --git a/otherlibs/systhreads/semaphore.mli b/otherlibs/systhreads/semaphore.mli
+new file mode 100644
+index 0000000000..3a62747829
+--- /dev/null
++++ b/otherlibs/systhreads/semaphore.mli
+@@ -0,0 +1,140 @@
++(**************************************************************************)
++(*                                                                        *)
++(*                                 OCaml                                  *)
++(*                                                                        *)
++(*          Xavier Leroy, Collège de France and INRIA Paris               *)
++(*                                                                        *)
++(*   Copyright 2020 Institut National de Recherche en Informatique et     *)
++(*     en Automatique.                                                    *)
++(*                                                                        *)
++(*   All rights reserved.  This file is distributed under the terms of    *)
++(*   the GNU Lesser General Public License version 2.1, with the          *)
++(*   special exception on linking described in the file LICENSE.          *)
++(*                                                                        *)
++(**************************************************************************)
++
++(** Semaphores
++
++  A semaphore is a thread synchronization device that can be used to
++  control access to a shared resource.
++
++  Two flavors of semaphores are provided: counting semaphores and
++  binary semaphores.
++
++  @since 4.12 *)
++
++(** {2 Counting semaphores} *)
++
++(**
++  A counting semaphore is a counter that can be accessed concurrently
++  by several threads.  The typical use is to synchronize producers and
++  consumers of a resource by counting how many units of the resource
++  are available.
++
++  The two basic operations on semaphores are:
++- "release" (also called "V", "post", "up", and "signal"), which
++  increments the value of the counter.  This corresponds to producing
++  one more unit of the shared resource and making it available to others.
++- "acquire" (also called "P", "wait", "down", and "pend"), which
++  waits until the counter is greater than zero and decrements it.
++  This corresponds to consuming one unit of the shared resource.
++
++  @since 4.12 *)
++
++module Counting : sig
++
++type t
++(** The type of counting semaphores. *)
++
++val make : int -> t
++(** [make n] returns a new counting semaphore, with initial value [n].
++    The initial value [n] must be nonnegative.
++
++    @raise Invalid_argument if [n < 0]
++*)
++
++val release : t -> unit
++(** [release s] increments the value of semaphore [s].
++    If other threads are waiting on [s], one of them is restarted.
++    If the current value of [s] is equal to [max_int], the value of
++    the semaphore is unchanged and a [Sys_error] exception is raised
++    to signal overflow.
++
++    @raise Sys_error if the value of the semaphore would overflow [max_int]
++*)
++
++val acquire : t -> unit
++(** [acquire s] blocks the calling thread until the value of semaphore [s]
++    is not zero, then atomically decrements the value of [s] and returns.
++*)
++
++val try_acquire : t -> bool
++(** [try_acquire s] immediately returns [false] if the value of semaphore [s]
++    is zero.  Otherwise, the value of [s] is atomically decremented
++    and [try_acquire s] returns [true].
++*)
++
++val get_value : t -> int
++(** [get_value s] returns the current value of semaphore [s].
++    The current value can be modified at any time by concurrent
++    {!release} and {!acquire} operations.  Hence, the [get_value]
++    operation is racy, and its result should only be used for debugging
++    or informational messages.
++*)
++
++end
++
++(** {2 Binary semaphores} *)
++
++(** Binary semaphores are a variant of counting semaphores
++    where semaphores can only take two values, 0 and 1.
++
++    A binary semaphore can be used to control access to a single
++    shared resource, with value 1 meaning "resource is available" and
++    value 0 meaning "resource is unavailable".
++
++    The "release" operation of a binary semaphore sets its value to 1,
++    and "acquire" waits until the value is 1 and sets it to 0.
++
++    A binary semaphore can be used instead of a mutex (see module
++    {!Mutex}) when the mutex discipline (of unlocking the mutex from the
++    thread that locked it) is too restrictive.  The "acquire" operation
++    corresponds to locking the mutex, and the "release" operation to
++    unlocking it, but "release" can be performed in a thread different
++    than the one that performed the "acquire".  Likewise, it is safe
++    to release a binary semaphore that is already available.
++
++    @since 4.12
++*)
++
++module Binary : sig
++
++type t
++(** The type of binary semaphores. *)
++
++val make : bool -> t
++(** [make b] returns a new binary semaphore.
++    If [b] is [true], the initial value of the semaphore is 1, meaning
++    "available".  If [b] is [false], the initial value of the
++    semaphore is 0, meaning "unavailable".
++*)
++
++val release : t -> unit
++(** [release s] sets the value of semaphore [s] to 1, putting it in the
++    "available" state.  If other threads are waiting on [s], one of them is
++    restarted.
++*)
++
++val acquire : t -> unit
++(** [acquire s] blocks the calling thread until the semaphore [s]
++    has value 1 (is available), then atomically sets it to 0
++    and returns.
++*)
++
++val try_acquire : t -> bool
++(** [try_acquire s] immediately returns [false] if the semaphore [s]
++    has value 0.  If [s] has value 1, its value is atomically set to 0
++    and [try_acquire s] returns [true].
++*)
++
++end
+diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
+index 3e507f63b6..85d7e199c4 100644
+--- a/otherlibs/systhreads/thread.ml
++++ b/otherlibs/systhreads/thread.ml
+@@ -18,8 +18,10 @@
+ type t
+ 
+ external thread_initialize : unit -> unit = "caml_thread_initialize"
++(* BACKPORT
+ external thread_initialize_domain : unit -> unit =
+             "caml_thread_initialize_domain"
++*)
+ external thread_cleanup : unit -> unit = "caml_thread_cleanup"
+ external thread_new : (unit -> unit) -> t = "caml_thread_new"
+ external thread_uncaught_exception : exn -> unit =
+@@ -86,7 +88,9 @@ let preempt_signal =
+ 
+ let () =
+   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
++(* BACKPORT
+   Domain.at_startup thread_initialize_domain;
++*)
+   thread_initialize ();
+   Callback.register "Thread.at_shutdown" (fun () ->
+     thread_cleanup();
+diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
+index 6367f61aa8..7f2beca3af 100644
+--- a/otherlibs/unix/fork.c
++++ b/otherlibs/unix/fork.c
+@@ -25,15 +25,19 @@
+ CAMLprim value unix_fork(value unit)
+ {
+   int ret;
++#if 0 /* BACKPORT */
+   if (caml_domain_is_multicore()) {
+     caml_failwith
+       ("Unix.fork may not be called while other domains were created");
+   }
++#endif
+ 
+   CAML_EV_FLUSH();
+ 
+   ret = fork();
++#if 0 /* BACKPORT */
+   if (ret == 0) caml_atfork_hook();
++#endif
+   if (ret == -1) uerror("fork", Nothing);
+ 
+   CAML_EVENTLOG_DO({
+diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
+index e1b516bd28..9b8f1baa7f 100644
+--- a/otherlibs/unix/signals.c
++++ b/otherlibs/unix/signals.c
+@@ -49,9 +49,16 @@ static value encode_sigset(sigset_t * set)
+   Begin_root(res)
+     for (i = 1; i < NSIG; i++)
+       if (sigismember(set, i) > 0) {
++/* BACKPORT BEGIN */
++        value newcons = caml_alloc_small(2, 0);
++        Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
++        Field(newcons, 1) = res;
++/* BACKPORT END */
++#if 0 /* BACKPORT */
+         value newcons = caml_alloc_2(0,
+           Val_int(caml_rev_convert_signal_number(i)),
+           res);
++#endif
+         res = newcons;
+       }
+   End_roots();
+@@ -69,7 +76,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
+   how = sigprocmask_cmd[Int_val(vaction)];
+   decode_sigset(vset, &set);
+   caml_enter_blocking_section();
++#if 0 /* BACKPORT BEGIN */
+   retcode = sigprocmask(how, &set, &oldset);
++#endif
++  retcode = caml_sigmask_hook(how, &set, &oldset);
++/* BACKPORT END */
+   caml_leave_blocking_section();
+   /* Run any handlers for just-unmasked pending signals */
+   caml_process_pending_signals();
+@@ -83,7 +94,11 @@ CAMLprim value unix_sigpending(value unit)
+   int i;
+   if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
+   for (i = 1; i < NSIG; i++)
++#if 0 /* BACKPORT BEGIN */
+     if(atomic_load_explicit(&caml_pending_signals[i], memory_order_seq_cst))
++#endif
++    if(caml_pending_signals[i])
++/* BACKPORT END */
+       sigaddset(&pending, i);
+   return encode_sigset(&pending);
+ }
+diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
+index fe345466de..e9a1d2a31b 100644
+--- a/otherlibs/unix/unixsupport.h
++++ b/otherlibs/unix/unixsupport.h
+@@ -57,4 +57,8 @@ extern void unix_clear_cloexec(int fd, char * cmdname, value arg);
+ 
+ #define EXECV_CAST
+ 
++/* BACKPORT BEGIN */
++#define caml_process_pending_signals caml_process_pending_actions
++/* BACKPORT END */
++
+ #endif /* CAML_UNIXSUPPORT_H */
+diff --git a/stdlib/.depend b/stdlib/.depend
+index 08a3866219..5202bf7793 100644
+--- a/stdlib/.depend
++++ b/stdlib/.depend
+@@ -193,14 +193,6 @@ stdlib__Complex.cmo : complex.ml \
+ stdlib__Complex.cmx : complex.ml \
+     stdlib__Complex.cmi
+ stdlib__Complex.cmi : complex.mli
+-stdlib__Condition.cmo : condition.ml \
+-    stdlib__Mutex.cmi \
+-    stdlib__Condition.cmi
+-stdlib__Condition.cmx : condition.ml \
+-    stdlib__Mutex.cmx \
+-    stdlib__Condition.cmi
+-stdlib__Condition.cmi : condition.mli \
+-    stdlib__Mutex.cmi
+ stdlib__Digest.cmo : digest.ml \
+     stdlib__String.cmi \
+     stdlib__Char.cmi \
+@@ -212,33 +204,6 @@ stdlib__Digest.cmx : digest.ml \
+     stdlib__Bytes.cmx \
+     stdlib__Digest.cmi
+ stdlib__Digest.cmi : digest.mli
+-stdlib__Domain.cmo : domain.ml \
+-    stdlib__Sys.cmi \
+-    stdlib.cmi \
+-    stdlib__Obj.cmi \
+-    stdlib__Mutex.cmi \
+-    stdlib__Atomic.cmi \
+-    stdlib__Array.cmi \
+-    stdlib__Domain.cmi
+-stdlib__Domain.cmx : domain.ml \
+-    stdlib__Sys.cmx \
+-    stdlib.cmx \
+-    stdlib__Obj.cmx \
+-    stdlib__Mutex.cmx \
+-    stdlib__Atomic.cmx \
+-    stdlib__Array.cmx \
+-    stdlib__Domain.cmi
+-stdlib__Domain.cmi : domain.mli
+-stdlib__EffectHandlers.cmo : effectHandlers.ml \
+-    stdlib__Printexc.cmi \
+-    stdlib__Obj.cmi \
+-    stdlib__EffectHandlers.cmi
+-stdlib__EffectHandlers.cmx : effectHandlers.ml \
+-    stdlib__Printexc.cmx \
+-    stdlib__Obj.cmx \
+-    stdlib__EffectHandlers.cmi
+-stdlib__EffectHandlers.cmi : effectHandlers.mli \
+-    stdlib__Printexc.cmi
+ stdlib__Either.cmo : either.ml \
+     stdlib__Either.cmi
+ stdlib__Either.cmx : either.ml \
+@@ -275,7 +240,7 @@ stdlib__Filename.cmo : filename.ml \
+     stdlib__Random.cmi \
+     stdlib__Printf.cmi \
+     stdlib__List.cmi \
+-    stdlib__Domain.cmi \
++    stdlib__Lazy.cmi \
+     stdlib__Buffer.cmi \
+     stdlib__Filename.cmi
+ stdlib__Filename.cmx : filename.ml \
+@@ -284,7 +249,7 @@ stdlib__Filename.cmx : filename.ml \
+     stdlib__Random.cmx \
+     stdlib__Printf.cmx \
+     stdlib__List.cmx \
+-    stdlib__Domain.cmx \
++    stdlib__Lazy.cmx \
+     stdlib__Buffer.cmx \
+     stdlib__Filename.cmi
+ stdlib__Filename.cmi : filename.mli
+@@ -311,8 +276,8 @@ stdlib__Format.cmo : format.ml \
+     stdlib__Queue.cmi \
+     stdlib__List.cmi \
+     stdlib__Int.cmi \
++    stdlib__Fun.cmi \
+     stdlib__Either.cmi \
+-    stdlib__Domain.cmi \
+     camlinternalFormatBasics.cmi \
+     camlinternalFormat.cmi \
+     stdlib__Bytes.cmi \
+@@ -326,8 +291,8 @@ stdlib__Format.cmx : format.ml \
+     stdlib__Queue.cmx \
+     stdlib__List.cmx \
+     stdlib__Int.cmx \
++    stdlib__Fun.cmx \
+     stdlib__Either.cmx \
+-    stdlib__Domain.cmx \
+     camlinternalFormatBasics.cmx \
+     camlinternalFormat.cmx \
+     stdlib__Bytes.cmx \
+@@ -337,7 +302,6 @@ stdlib__Format.cmi : format.mli \
+     stdlib.cmi \
+     stdlib__Seq.cmi \
+     stdlib__Either.cmi \
+-    stdlib__Domain.cmi \
+     stdlib__Buffer.cmi
+ stdlib__Fun.cmo : fun.ml \
+     stdlib__Printexc.cmi \
+@@ -384,8 +348,8 @@ stdlib__Hashtbl.cmo : hashtbl.ml \
+     stdlib__Seq.cmi \
+     stdlib__Random.cmi \
+     stdlib__Obj.cmi \
++    stdlib__Lazy.cmi \
+     stdlib__Int.cmi \
+-    stdlib__Domain.cmi \
+     stdlib__Array.cmi \
+     stdlib__Hashtbl.cmi
+ stdlib__Hashtbl.cmx : hashtbl.ml \
+@@ -394,8 +358,8 @@ stdlib__Hashtbl.cmx : hashtbl.ml \
+     stdlib__Seq.cmx \
+     stdlib__Random.cmx \
+     stdlib__Obj.cmx \
++    stdlib__Lazy.cmx \
+     stdlib__Int.cmx \
+-    stdlib__Domain.cmx \
+     stdlib__Array.cmx \
+     stdlib__Hashtbl.cmi
+ stdlib__Hashtbl.cmi : hashtbl.mli \
+@@ -514,11 +478,6 @@ stdlib__MoreLabels.cmi : moreLabels.mli \
+     stdlib__Seq.cmi \
+     stdlib__Map.cmi \
+     stdlib__Hashtbl.cmi
+-stdlib__Mutex.cmo : mutex.ml \
+-    stdlib__Mutex.cmi
+-stdlib__Mutex.cmx : mutex.ml \
+-    stdlib__Mutex.cmi
+-stdlib__Mutex.cmi : mutex.mli
+ stdlib__Nativeint.cmo : nativeint.ml \
+     stdlib__Sys.cmi \
+     stdlib.cmi \
+@@ -627,7 +586,6 @@ stdlib__Random.cmo : random.ml \
+     stdlib__Int64.cmi \
+     stdlib__Int32.cmi \
+     stdlib__Int.cmi \
+-    stdlib__Domain.cmi \
+     stdlib__Digest.cmi \
+     stdlib__Char.cmi \
+     stdlib__Array.cmi \
+@@ -639,7 +597,6 @@ stdlib__Random.cmx : random.ml \
+     stdlib__Int64.cmx \
+     stdlib__Int32.cmx \
+     stdlib__Int.cmx \
+-    stdlib__Domain.cmx \
+     stdlib__Digest.cmx \
+     stdlib__Char.cmx \
+     stdlib__Array.cmx \
+@@ -680,15 +637,6 @@ stdlib__Scanf.cmx : scanf.ml \
+     stdlib__Scanf.cmi
+ stdlib__Scanf.cmi : scanf.mli \
+     stdlib.cmi
+-stdlib__Semaphore.cmo : semaphore.ml \
+-    stdlib__Mutex.cmi \
+-    stdlib__Condition.cmi \
+-    stdlib__Semaphore.cmi
+-stdlib__Semaphore.cmx : semaphore.ml \
+-    stdlib__Mutex.cmx \
+-    stdlib__Condition.cmx \
+-    stdlib__Semaphore.cmi
+-stdlib__Semaphore.cmi : semaphore.mli
+ stdlib__Seq.cmo : seq.ml \
+     stdlib__Lazy.cmi \
+     stdlib__Either.cmi \
+diff --git a/stdlib/Makefile b/stdlib/Makefile
+index df34bc2d49..06140760ad 100644
+--- a/stdlib/Makefile
++++ b/stdlib/Makefile
+@@ -260,7 +260,8 @@ STDLIB_NAMESPACE_MODULES = $(subst $(SPACE),|,$(STDLIB_PREFIXED_MODULES))
+ 
+ .PHONY: depend
+ depend:
+-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
++	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
++    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
+ 	  > .depend.tmp
+ 	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+ 	  stdlib.ml stdlib.mli >> .depend.tmp
+diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
+index 12c546b068..5aaa2488bf 100644
+--- a/stdlib/StdlibModules
++++ b/stdlib/StdlibModules
+@@ -40,12 +40,12 @@ STDLIB_MODULE_BASENAMES = \
+   seq option result bool char uchar \
+   list int bytes string unit marshal array float int32 int64 nativeint \
+   lexing parsing set map stack queue stream buffer \
+-  atomic mutex condition semaphore domain \
++  atomic \
+   camlinternalFormat printf arg \
+   printexc fun gc digest random hashtbl weak \
+   format scanf callback camlinternalOO oo camlinternalMod genlex ephemeron \
+   filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
+-  stdLabels bigarray in_channel out_channel effectHandlers
++  stdLabels bigarray in_channel out_channel
+ 
+ STDLIB_PREFIXED_MODULES = \
+   $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
+diff --git a/stdlib/camlinternalAtomic.ml b/stdlib/camlinternalAtomic.ml
+index 7cb9554751..30f1db7e41 100644
+--- a/stdlib/camlinternalAtomic.ml
++++ b/stdlib/camlinternalAtomic.ml
+@@ -14,8 +14,11 @@
+ (*                                                                        *)
+ (**************************************************************************)
+ 
++(* BACKPORT - REVERTED to 4.14 STATE *)
++
+ (* CamlinternalAtomic is a dependency of Stdlib, so it is compiled with
+    -nopervasives. *)
++(*
+ type !'a t
+ 
+ (* Atomic is a dependency of Stdlib, so it is compiled with
+@@ -25,8 +28,50 @@ external get : 'a t -> 'a = "%atomic_load"
+ external exchange : 'a t -> 'a -> 'a = "%atomic_exchange"
+ external compare_and_set : 'a t -> 'a -> 'a -> bool = "%atomic_cas"
+ external fetch_and_add : int t -> int -> int = "%atomic_fetch_add"
++*)
++external ( == ) : 'a -> 'a -> bool = "%eq"
++external ( + ) : int -> int -> int = "%addint"
+ external ignore : 'a -> unit = "%ignore"
+ 
++(* We are not reusing ('a ref) directly to make it easier to reason
++   about atomicity if we wish to: even in a sequential implementation,
++   signals and other asynchronous callbacks might break atomicity. *)
++type 'a t = {mutable v: 'a}
++
++let make v = {v}
++let get r = r.v
++let set r v = r.v <- v
++
++(* The following functions are set to never be inlined: Flambda is
++   allowed to move surrounding code inside the critical section,
++   including allocations. *)
++
++let[@inline never] exchange r v =
++  (* BEGIN ATOMIC *)
++  let cur = r.v in
++  r.v <- v;
++  (* END ATOMIC *)
++  cur
++
++let[@inline never] compare_and_set r seen v =
++  (* BEGIN ATOMIC *)
++  let cur = r.v in
++  if cur == seen then (
++    r.v <- v;
++    (* END ATOMIC *)
++    true
++  ) else
++    false
++
++let[@inline never] fetch_and_add r n =
++  (* BEGIN ATOMIC *)
++  let cur = r.v in
++  r.v <- (cur + n);
++  (* END ATOMIC *)
++  cur
++
++(*
+ let set r x = ignore (exchange r x)
++*)
+ let incr r = ignore (fetch_and_add r 1)
+ let decr r = ignore (fetch_and_add r (-1))
+diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
+index b8764064c5..1948c76412 100644
+--- a/stdlib/camlinternalLazy.ml
++++ b/stdlib/camlinternalLazy.ml
+@@ -13,12 +13,15 @@
+ (*                                                                        *)
+ (**************************************************************************)
+ 
++(* BACKPORT - REVERTED to 4.14 STATE *)
++
+ (* Internals of forcing lazy values. *)
+ 
+ type 'a t = 'a lazy_t
+ 
+ exception Undefined
+ 
++(*
+ (* [update_to_forcing blk] tries to update a [blk] with [lazy_tag] to
+    [forcing_tag] using compare-and-swap (CAS), taking care to handle concurrent
+    marking of the header word by a concurrent GC thread. Returns [0] if the
+@@ -94,3 +97,56 @@ let force_gen ~only_val (lzv : 'arg lazy_t) =
+   else if t = Obj.forcing_tag then raise Undefined
+   else if t <> Obj.lazy_tag then (Obj.obj x : 'arg)
+   else force_gen_lazy_block ~only_val lzv
++*)
++let raise_undefined = Obj.repr (fun () -> raise Undefined)
++
++external make_forward : Obj.t -> Obj.t -> unit = "caml_obj_make_forward"
++
++(* Assume [blk] is a block with tag lazy *)
++let force_lazy_block (blk : 'arg lazy_t) =
++  let closure = (Obj.obj (Obj.field (Obj.repr blk) 0) : unit -> 'arg) in
++  Obj.set_field (Obj.repr blk) 0 raise_undefined;
++  try
++    let result = closure () in
++    make_forward (Obj.repr blk) (Obj.repr result);
++    result
++  with e ->
++    Obj.set_field (Obj.repr blk) 0 (Obj.repr (fun () -> raise e));
++    raise e
++
++
++(* Assume [blk] is a block with tag lazy *)
++let force_val_lazy_block (blk : 'arg lazy_t) =
++  let closure = (Obj.obj (Obj.field (Obj.repr blk) 0) : unit -> 'arg) in
++  Obj.set_field (Obj.repr blk) 0 raise_undefined;
++  let result = closure () in
++  make_forward (Obj.repr blk) (Obj.repr result);
++  result
++
++
++(* [force] is not used, since [Lazy.force] is declared as a primitive
++   whose code inlines the tag tests of its argument, except when afl
++   instrumentation is turned on. *)
++
++let force (lzv : 'arg lazy_t) =
++  (* Using [Sys.opaque_identity] prevents two potential problems:
++     - If the value is known to have Forward_tag, then its tag could have
++       changed during GC, so that information must be forgotten (see GPR#713
++       and issue #7301)
++     - If the value is known to be immutable, then if the compiler
++       cannot prove that the last branch is not taken it will issue a
++       warning 59 (modification of an immutable value) *)
++  let lzv = Sys.opaque_identity lzv in
++  let x = Obj.repr lzv in
++  let t = Obj.tag x in
++  if t = Obj.forward_tag then (Obj.obj (Obj.field x 0) : 'arg) else
++  if t <> Obj.lazy_tag then (Obj.obj x : 'arg)
++  else force_lazy_block lzv
++
++
++let force_val (lzv : 'arg lazy_t) =
++  let x = Obj.repr lzv in
++  let t = Obj.tag x in
++  if t = Obj.forward_tag then (Obj.obj (Obj.field x 0) : 'arg) else
++  if t <> Obj.lazy_tag then (Obj.obj x : 'arg)
++  else force_val_lazy_block lzv
+diff --git a/stdlib/camlinternalLazy.mli b/stdlib/camlinternalLazy.mli
+index ac8b7a8bee..2fd6aa2bf4 100644
+--- a/stdlib/camlinternalLazy.mli
++++ b/stdlib/camlinternalLazy.mli
+@@ -23,4 +23,13 @@ exception Undefined
+ 
+ val force_lazy_block : 'a lazy_t -> 'a
+ 
++(* BACKPORT BEGIN *)
++val force_val_lazy_block : 'a lazy_t -> 'a
++
++val force : 'a lazy_t -> 'a
++val force_val : 'a lazy_t -> 'a
++(* BACKPORT END *)
++
++(* BACKPORT
+ val force_gen : only_val:bool -> 'a lazy_t -> 'a
++*)
+diff --git a/stdlib/filename.ml b/stdlib/filename.ml
+index 09410192ff..f995748115 100644
+--- a/stdlib/filename.ml
++++ b/stdlib/filename.ml
+@@ -328,10 +328,18 @@ let remove_extension name =
+ external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
+ external close_desc: int -> unit = "caml_sys_close"
+ 
++(* BACKPORT BEGIN
+ let prng_key = Domain.DLS.new_key Random.State.make_self_init
++*)
++let prng_key = lazy(Random.State.make_self_init ())
++(* BACKPORT END *)
+ 
+ let temp_file_name temp_dir prefix suffix =
++(* BACKPORT BEGIN
+   let random_state = Domain.DLS.get prng_key in
++*)
++  let random_state = Lazy.force prng_key in
++(* BACKPORT END *)
+   let rnd = (Random.State.bits random_state) land 0xFFFFFF in
+   concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
+ 
+diff --git a/stdlib/format.ml b/stdlib/format.ml
+index 31314d3e99..a1c0792536 100644
+--- a/stdlib/format.ml
++++ b/stdlib/format.ml
+@@ -1023,6 +1023,7 @@ and err_formatter = formatter_of_out_channel Stdlib.stderr
+ and str_formatter = formatter_of_buffer stdbuf
+ 
+ (* Initialise domain local state *)
++(* BACKPORT BEGIN
+ module DLS = Domain.DLS
+ 
+ let stdbuf_key = DLS.new_key pp_make_buffer
+@@ -1067,6 +1068,17 @@ let err_formatter_key = DLS.new_key (fun () ->
+   ppf.pp_out_indent <- display_indent ppf;
+   ppf)
+ let _ = DLS.set err_formatter_key err_formatter
++*)
++
++let std_formatter_key = std_formatter
++let err_formatter_key = err_formatter
++let str_formatter_key = str_formatter
++let stdbuf_key = stdbuf
++
++module DLS = struct
++  let get = Fun.id
++end
++(* BACKPORT END *)
+ 
+ let get_std_formatter () = DLS.get std_formatter_key
+ let get_err_formatter () = DLS.get err_formatter_key
+@@ -1089,6 +1101,7 @@ let flush_str_formatter () =
+   let str_formatter = DLS.get str_formatter_key in
+   flush_buffer_formatter stdbuf str_formatter
+ 
++(* BACKPORT
+ let make_synchronized_formatter output flush =
+   DLS.new_key (fun () ->
+     let buf = Buffer.create pp_buffer_size in
+@@ -1102,6 +1115,7 @@ let make_synchronized_formatter output flush =
+ 
+ let synchronized_formatter_of_out_channel oc =
+   make_synchronized_formatter (output_substring oc) (fun () -> flush oc)
++*)
+ 
+ (*
+   Symbolic pretty-printing
+@@ -1479,6 +1493,7 @@ let flush_standard_formatters () =
+ 
+ let () = at_exit flush_standard_formatters
+ 
++(* BACKPORT
+ let () = Domain.at_first_spawn (fun () ->
+   flush_standard_formatters ();
+ 
+@@ -1493,6 +1508,7 @@ let () = Domain.at_first_spawn (fun () ->
+              out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
+ 
+   Domain.at_exit flush_standard_formatters)
++*)
+ 
+ (*
+ 
+diff --git a/stdlib/format.mli b/stdlib/format.mli
+index 09b11cbe28..fbecd2224c 100644
+--- a/stdlib/format.mli
++++ b/stdlib/format.mli
+@@ -959,6 +959,7 @@ val formatter_of_out_channel : out_channel -> formatter
+     to the corresponding output channel [oc].
+ *)
+ 
++(* BACKPORT
+ val synchronized_formatter_of_out_channel :
+   out_channel -> formatter Domain.DLS.key
+ (** [synchronized_formatter_of_out_channel oc] returns the key to the
+@@ -969,7 +970,7 @@ val synchronized_formatter_of_out_channel :
+     domains will be interleaved with each other at points where the formatter
+     is flushed, such as with {!print_flush}.
+ *)
+-
++*)
+ 
+ val std_formatter : formatter
+ (** The initial domain's standard formatter to write to standard output.
+@@ -1035,6 +1036,7 @@ val make_formatter :
+   returns a formatter to the {!Stdlib.out_channel} [oc].
+ *)
+ 
++(* BACKPORT
+ val make_synchronized_formatter :
+   (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
+ (** [make_synchronized_formatter out flush] returns the key to the domain-local
+@@ -1045,6 +1047,7 @@ val make_synchronized_formatter :
+     domains will be interleaved with each other at points where the formatter
+     is flushed, such as with {!print_flush}.
+ *)
++*)
+ 
+ val formatter_of_out_functions :
+   formatter_out_functions -> formatter
+diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
+index 7006bc4a4b..02a8ed7fc2 100644
+--- a/stdlib/hashtbl.ml
++++ b/stdlib/hashtbl.ml
+@@ -57,7 +57,11 @@ let randomized = ref randomized_default
+ let randomize () = randomized := true
+ let is_randomized () = !randomized
+ 
++(* BACKPORT BEGIN
+ let prng_key = Domain.DLS.new_key Random.State.make_self_init
++*)
++let prng = lazy (Random.State.make_self_init())
++(* BACKPORT END *)
+ 
+ (* Functions which appear before the functorial interface must either be
+    independent of the hash function or take it as a parameter (see #2202 and
+@@ -73,7 +77,11 @@ let rec power_2_above x n =
+ let create ?(random = !randomized) initial_size =
+   let s = power_2_above 16 initial_size in
+   let seed =
++(* BACKPORT BEGIN
+     if random then Random.State.bits (Domain.DLS.get prng_key) else 0
++*)
++    if random then Random.State.bits (Lazy.force prng) else 0
++(* BACKPORT END *)
+   in
+   { initial_size = s; size = 0; seed = seed; data = Array.make s Empty }
+ 
+@@ -619,7 +627,11 @@ let of_seq i =
+ let rebuild ?(random = !randomized) h =
+   let s = power_2_above 16 (Array.length h.data) in
+   let seed =
++(* BACKPORT BEGIN
+     if random then Random.State.bits (Domain.DLS.get prng_key)
++*)
++    if random then Random.State.bits (Lazy.force prng)
++(* BACKPORT END *)
+     else if Obj.size (Obj.repr h) >= 4 then h.seed
+     else 0 in
+   let h' = {
+diff --git a/stdlib/lazy.ml b/stdlib/lazy.ml
+index ebc979b4cb..ee9cabf884 100644
+--- a/stdlib/lazy.ml
++++ b/stdlib/lazy.ml
+@@ -53,7 +53,11 @@ exception Undefined = CamlinternalLazy.Undefined
+ external make_forward : 'a -> 'a lazy_t = "caml_lazy_make_forward"
+ external force : 'a t -> 'a = "%lazy_force"
+ 
++(* BACKPORT BEGIN
+ let force_val l = CamlinternalLazy.force_gen ~only_val:true l
++*)
++let force_val = CamlinternalLazy.force_val
++(* BACKPORT END *)
+ 
+ let from_fun (f : unit -> 'arg) =
+   let x = Obj.new_block Obj.lazy_tag 1 in
+diff --git a/stdlib/obj.ml b/stdlib/obj.ml
+index e4477d19ee..cd7ca6321a 100644
+--- a/stdlib/obj.ml
++++ b/stdlib/obj.ml
+@@ -30,9 +30,11 @@ external size : t -> int = "%obj_size"
+ external reachable_words : t -> int = "caml_obj_reachable_words"
+ external field : t -> int -> t = "%obj_field"
+ external set_field : t -> int -> t -> unit = "%obj_set_field"
++(* BACKPORT
+ external compare_and_swap_field : t -> int -> t -> t -> bool
+   = "caml_obj_compare_and_swap"
+ external is_shared : t -> bool = "caml_obj_is_shared"
++*)
+ external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
+ external floatarray_set :
+     floatarray -> int -> float -> unit = "caml_floatarray_set"
+diff --git a/stdlib/obj.mli b/stdlib/obj.mli
+index afb08e5da7..2ba7003115 100644
+--- a/stdlib/obj.mli
++++ b/stdlib/obj.mli
+@@ -57,9 +57,11 @@ external field : t -> int -> t = "%obj_field"
+     be propagated.
+ *)
+ external set_field : t -> int -> t -> unit = "%obj_set_field"
++(* BACKPORT
+ external compare_and_swap_field : t -> int -> t -> t -> bool
+   = "caml_obj_compare_and_swap"
+ external is_shared : t -> bool = "caml_obj_is_shared"
++*)
+ external set_tag : t -> int -> unit = "caml_obj_set_tag"
+   [@@ocaml.deprecated "Use with_tag instead."]
+ 
+diff --git a/stdlib/random.ml b/stdlib/random.ml
+index 791ef968b9..c4d07c3d74 100644
+--- a/stdlib/random.ml
++++ b/stdlib/random.ml
+@@ -212,6 +212,7 @@ let mk_default () = {
+   State.idx = 0;
+ }
+ 
++(* BACKPORT BEGIN
+ let random_key = Domain.DLS.new_key mk_default
+ 
+ let bits () = State.bits (Domain.DLS.get random_key)
+@@ -228,12 +229,34 @@ let nativebits () = State.nativebits (Domain.DLS.get random_key)
+ 
+ let full_init seed = State.full_init (Domain.DLS.get random_key) seed
+ let init seed = State.full_init (Domain.DLS.get random_key) [| seed |]
++*)
++let default = mk_default ()
++let bits () = State.bits default
++let int bound = State.int default bound
++let full_int bound = State.full_int default bound
++let int32 bound = State.int32 default bound
++let nativeint bound = State.nativeint default bound
++let int64 bound = State.int64 default bound
++let float scale = State.float default scale
++let bool () = State.bool default
++let bits32 () = State.bits32 default
++let bits64 () = State.bits64 default
++let nativebits () = State.nativebits default
++
++let full_init seed = State.full_init default seed
++let init seed = State.full_init default [| seed |]
++(* BACKPORT END *)
+ let self_init () = full_init (random_seed())
+ 
+ (* Manipulating the current state. *)
+ 
++(* BACKPORT BEGIN
+ let get_state () = State.copy (Domain.DLS.get random_key)
+ let set_state s = State.assign (Domain.DLS.get random_key) s
++*)
++let get_state () = State.copy default
++let set_state s = State.assign default s
++(* BACKPORT END *)
+ 
+ (********************
+ 
+diff --git a/stdlib/stdlib.ml b/stdlib/stdlib.ml
+index 1e77c3eca3..7a0e6ff4ef 100644
+--- a/stdlib/stdlib.ml
++++ b/stdlib/stdlib.ml
+@@ -571,6 +571,13 @@ let exit retcode =
+ 
+ let _ = register_named_value "Pervasives.do_at_exit" do_at_exit
+ 
++(* BACKPORT BEGIN *)
++external major : unit -> unit = "caml_gc_major"
++external naked_pointers_checked : unit -> bool
++  = "caml_sys_const_naked_pointers_checked"
++let () = if naked_pointers_checked () then at_exit major
++(* BACKPORT END *)
++
+ (*MODULE_ALIASES*)
+ module Arg            = Arg
+ module Array          = Array
+@@ -584,10 +591,14 @@ module BytesLabels    = BytesLabels
+ module Callback       = Callback
+ module Char           = Char
+ module Complex        = Complex
++(* BACKPORT
+ module Condition      = Condition
++*)
+ module Digest         = Digest
++(* BACKPORT
+ module Domain         = Domain
+ module EffectHandlers = EffectHandlers
++*)
+ module Either         = Either
+ module Ephemeron      = Ephemeron
+ module Filename       = Filename
+@@ -608,7 +619,9 @@ module ListLabels     = ListLabels
+ module Map            = Map
+ module Marshal        = Marshal
+ module MoreLabels     = MoreLabels
++(* BACKPORT
+ module Mutex          = Mutex
++*)
+ module Nativeint      = Nativeint
+ module Obj            = Obj
+ module Oo             = Oo
+@@ -622,7 +635,9 @@ module Queue          = Queue
+ module Random         = Random
+ module Result         = Result
+ module Scanf          = Scanf
++(* BACKPORT
+ module Semaphore      = Semaphore
++*)
+ module Seq            = Seq
+ module Set            = Set
+ module Stack          = Stack
+diff --git a/stdlib/stdlib.mli b/stdlib/stdlib.mli
+index 9e66103744..85b89d141b 100644
+--- a/stdlib/stdlib.mli
++++ b/stdlib/stdlib.mli
+@@ -1388,10 +1388,14 @@ module BytesLabels    = BytesLabels
+ module Callback       = Callback
+ module Char           = Char
+ module Complex        = Complex
++(* BACKPORT
+ module Condition      = Condition
++*)
+ module Digest         = Digest
++(* BACKPORT
+ module Domain         = Domain
+ module EffectHandlers = EffectHandlers
++*)
+ module Either         = Either
+ module Ephemeron      = Ephemeron
+ module Filename       = Filename
+@@ -1413,7 +1417,9 @@ module ListLabels     = ListLabels
+ module Map            = Map
+ module Marshal        = Marshal
+ module MoreLabels     = MoreLabels
++(* BACKPORT
+ module Mutex          = Mutex
++*)
+ module Nativeint      = Nativeint
+ module Obj            = Obj
+ module Oo             = Oo
+@@ -1431,7 +1437,9 @@ module Queue          = Queue
+ module Random         = Random
+ module Result         = Result
+ module Scanf          = Scanf
++(* BACKPORT
+ module Semaphore      = Semaphore
++*)
+ module Seq            = Seq
+ module Set            = Set
+ module Stack          = Stack
+diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
+index 7c7ee74fbf..f2878b7bb3 100644
+--- a/tools/dumpobj.ml
++++ b/tools/dumpobj.ml
+@@ -395,10 +395,12 @@ let op_shapes = [
+   opUGEINT, Nothing;
+   opBULTINT, Uint_Disp;
+   opBUGEINT, Uint_Disp;
++(* BACKPORT
+   opPERFORM, Nothing;
+   opRESUME, Nothing;
+   opRESUMETERM, Uint;
+   opREPERFORMTERM, Uint;
++*)
+   opSTOP, Nothing;
+   opEVENT, Nothing;
+   opBREAK, Nothing;
+diff --git a/utils/config.mlp b/utils/config.mlp
+index 7f927f1fe6..8ea002b166 100644
+--- a/utils/config.mlp
++++ b/utils/config.mlp
+@@ -122,7 +122,11 @@ let max_tag = 243
+ let lazy_tag = 246
+ 
+ let max_young_wosize = 256
++(* BACKPORT BEGIN
+ let stack_threshold = 16 (* see runtime/caml/config.h *)
++*)
++let stack_threshold = 256 (* see runtime/caml/config.h *)
++(* BACKPORT END *)
+ let stack_safety_margin = 60
+ 
+ let architecture = "%%ARCH%%"
+diff --git a/utils/domainstate.ml.c b/utils/domainstate.ml.c
+index 6dbae1d07a..1eee2142ad 100644
+--- a/utils/domainstate.ml.c
++++ b/utils/domainstate.ml.c
+@@ -16,7 +16,9 @@
+ 
+ #define CAML_CONFIG_H_NO_TYPEDEFS
+ #include "config.h"
++/* BACKPORT
+ let stack_ctx_words = Stack_ctx_words
++*/
+ 
+ type t =
+ #define DOMAIN_STATE(type, name) | Domain_##name
+diff --git a/utils/domainstate.mli.c b/utils/domainstate.mli.c
+index 66a4750d4c..c4a77ff976 100644
+--- a/utils/domainstate.mli.c
++++ b/utils/domainstate.mli.c
+@@ -14,7 +14,9 @@
+ /*                                                                        */
+ /**************************************************************************/
+ 
++/* BACKPORT
+ val stack_ctx_words : int
++*/
+ 
+ type t =
+ #define DOMAIN_STATE(type, name) | Domain_##name

@@ -212,6 +212,7 @@ let mk_default () = {
   State.idx = 0;
 }
 
+(* BACKPORT BEGIN
 let random_key = Domain.DLS.new_key mk_default
 
 let bits () = State.bits (Domain.DLS.get random_key)
@@ -228,12 +229,34 @@ let nativebits () = State.nativebits (Domain.DLS.get random_key)
 
 let full_init seed = State.full_init (Domain.DLS.get random_key) seed
 let init seed = State.full_init (Domain.DLS.get random_key) [| seed |]
+*)
+let default = mk_default ()
+let bits () = State.bits default
+let int bound = State.int default bound
+let full_int bound = State.full_int default bound
+let int32 bound = State.int32 default bound
+let nativeint bound = State.nativeint default bound
+let int64 bound = State.int64 default bound
+let float scale = State.float default scale
+let bool () = State.bool default
+let bits32 () = State.bits32 default
+let bits64 () = State.bits64 default
+let nativebits () = State.nativebits default
+
+let full_init seed = State.full_init default seed
+let init seed = State.full_init default [| seed |]
+(* BACKPORT END *)
 let self_init () = full_init (random_seed())
 
 (* Manipulating the current state. *)
 
+(* BACKPORT BEGIN
 let get_state () = State.copy (Domain.DLS.get random_key)
 let set_state s = State.assign (Domain.DLS.get random_key) s
+*)
+let get_state () = State.copy default
+let set_state s = State.assign default s
+(* BACKPORT END *)
 
 (********************
 
