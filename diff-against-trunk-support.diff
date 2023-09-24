@@ -1987,6 +1987,19 @@ index 29346d3089..b2ba8773d8 100755
 +Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
 +Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
  Called from Test10_main in file "test10_main.ml", line 49, characters 30-87
+diff --git a/testsuite/tests/lib-format/domains.ml b/testsuite/tests/lib-format/domains.ml
+index 941aa681cf..0daaad5171 100644
+--- a/testsuite/tests/lib-format/domains.ml
++++ b/testsuite/tests/lib-format/domains.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++* skip
++reason = "OCaml 5 only"
++*)
+ 
+ (** Test that domains stdout and stderr are flushed at domain exit *)
+ 
 diff --git a/testsuite/tests/lib-format/mc_pr586_par.ml b/testsuite/tests/lib-format/mc_pr586_par.ml
 index 456a306ce7..da5c148416 100644
 --- a/testsuite/tests/lib-format/mc_pr586_par.ml
