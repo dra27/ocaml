@@ -6123,7 +6123,7 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ff747f3b06
+index 0000000000..2facd2c1d3
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3814 @@
@@ -6168,7 +6168,7 @@ index 0000000000..ff747f3b06
 +         run: |
 +           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
 +diff --git a/appveyor.yml b/appveyor.yml
-+index 150b3e8048..6d97b5350f 100644
++index 333bcad1af..94ee1cfe3d 100644
 +--- a/appveyor.yml
 ++++ b/appveyor.yml
 +@@ -31,9 +31,10 @@ environment:
@@ -9909,7 +9909,7 @@ index 0000000000..ff747f3b06
 + 
 + Build () {
 +diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-+index ebee82eb6f..8936f1e9dd 100644
++index 58e081081f..a5d887d284 100644
 +--- a/tools/ci/appveyor/appveyor_build.sh
 ++++ b/tools/ci/appveyor/appveyor_build.sh
 +@@ -64,8 +64,8 @@ function set_configuration {
@@ -9923,16 +9923,16 @@ index 0000000000..ff747f3b06
 +         ;;
 +         msvc32)
 +             build='--build=i686-pc-cygwin'
-+@@ -153,7 +153,7 @@ case "$1" in
-+     #run "test $PORT" \
-+     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
++@@ -161,7 +161,7 @@ case "$1" in
++     run "test $PORT" \
++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 +     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
 +-    if [[ $PORT = 'msvc64' ]] ; then
 ++    if [[ $PORT = 'mingw64' ]] ; then
 +       run "$MAKE check_all_arches" \
 +            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
 +       cd "$FULL_BUILD_PREFIX-$PORT"
-+@@ -176,7 +176,7 @@ case "$1" in
++@@ -184,7 +184,7 @@ case "$1" in
 +   *)
 +     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 + 
@@ -9943,7 +9943,7 @@ index 0000000000..ff747f3b06
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..36992e81ad
+index 0000000000..4853c07b3a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,9902 @@
@@ -16072,7 +16072,7 @@ index 0000000000..36992e81ad
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ff747f3b06
++index 0000000000..2facd2c1d3
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3814 @@
@@ -16117,7 +16117,7 @@ index 0000000000..36992e81ad
 ++         run: |
 ++           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
 ++diff --git a/appveyor.yml b/appveyor.yml
-++index 150b3e8048..6d97b5350f 100644
+++index 333bcad1af..94ee1cfe3d 100644
 ++--- a/appveyor.yml
 +++++ b/appveyor.yml
 ++@@ -31,9 +31,10 @@ environment:

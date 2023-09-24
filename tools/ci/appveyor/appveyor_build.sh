@@ -165,6 +165,9 @@ case "$1" in
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
       cd "$FULL_BUILD_PREFIX-$PORT"
+
+      git config --global safe.directory '*'
+
       # Ensure that .gitignore is up-to-date - this will fail if any untracked
       # or altered files exist. We revert the change from the bootstrap (that
       # would have failed the build earlier if necessary)
