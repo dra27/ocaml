@@ -647,10 +647,10 @@ index 2a7ef8637c..1775ea8435 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..db9d751f4d
+index 0000000000..73a1c0d390
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,725 @@
+@@ -0,0 +1,750 @@
 +diff --git a/runtime/Makefile b/runtime/Makefile
 +index f5c08d8798..dee25dc02a 100644
 +--- a/runtime/Makefile
@@ -1218,6 +1218,19 @@ index 0000000000..db9d751f4d
 + #include "misc.h"
 + #include "mlvalues.h"
 + 
++diff --git a/runtime/caml/m.h.in b/runtime/caml/m.h.in
++index 1c3dee1779..ba0074318d 100644
++--- a/runtime/caml/m.h.in
+++++ b/runtime/caml/m.h.in
++@@ -90,7 +90,7 @@
++ 
++ #undef CAML_WITH_FPIC
++ 
++-#undef CAML_SAFE_STRING
+++#define CAML_SAFE_STRING 1
++ 
++ #undef FLAT_FLOAT_ARRAY
++ 
 +diff --git a/runtime/caml/memory.h b/runtime/caml/memory.h
 +index 1e9cdf6d9b..8837d33d25 100644
 +--- a/runtime/caml/memory.h
@@ -1247,7 +1260,7 @@ index 0000000000..db9d751f4d
 + 
 + /* Standard definitions */
 +diff --git a/runtime/caml/mlvalues.h b/runtime/caml/mlvalues.h
-+index 677e44e183..9173ab8c2b 100644
++index 677e44e183..00143e5ea0 100644
 +--- a/runtime/caml/mlvalues.h
 ++++ b/runtime/caml/mlvalues.h
 +@@ -16,9 +16,6 @@
@@ -1260,6 +1273,18 @@ index 0000000000..db9d751f4d
 + #include "config.h"
 + #include "misc.h"
 + 
++@@ -286,11 +283,7 @@ CAMLextern value caml_hash_variant(char const * tag);
++ 
++ /* Strings. */
++ #define String_tag 252
++-#ifdef CAML_SAFE_STRING
++ #define String_val(x) ((const char *) Bp_val(x))
++-#else
++-#define String_val(x) ((char *) Bp_val(x))
++-#endif
++ #define Bytes_val(x) ((unsigned char *) Bp_val(x))
++ CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
++ CAMLextern int caml_string_is_c_safe (value);
 +diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
 +index c6aeebfc78..3a3b86911c 100644
 +--- a/runtime/caml/signals.h
@@ -3994,10 +4019,10 @@ index 0000000000..0de170ef92
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1df01bce0f
+index 0000000000..e27ae2915d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3979 @@
+@@ -0,0 +1,3983 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..2db0859b9b
@@ -4647,10 +4672,10 @@ index 0000000000..1df01bce0f
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..db9d751f4d
++index 0000000000..73a1c0d390
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,725 @@
++@@ -0,0 +1,750 @@
 ++diff --git a/runtime/Makefile b/runtime/Makefile
 ++index f5c08d8798..dee25dc02a 100644
 ++--- a/runtime/Makefile
@@ -5218,6 +5243,19 @@ index 0000000000..1df01bce0f
 ++ #include "misc.h"
 ++ #include "mlvalues.h"
 ++ 
+++diff --git a/runtime/caml/m.h.in b/runtime/caml/m.h.in
+++index 1c3dee1779..ba0074318d 100644
+++--- a/runtime/caml/m.h.in
++++++ b/runtime/caml/m.h.in
+++@@ -90,7 +90,7 @@
+++ 
+++ #undef CAML_WITH_FPIC
+++ 
+++-#undef CAML_SAFE_STRING
++++#define CAML_SAFE_STRING 1
+++ 
+++ #undef FLAT_FLOAT_ARRAY
+++ 
 ++diff --git a/runtime/caml/memory.h b/runtime/caml/memory.h
 ++index 1e9cdf6d9b..8837d33d25 100644
 ++--- a/runtime/caml/memory.h
@@ -5247,7 +5285,7 @@ index 0000000000..1df01bce0f
 ++ 
 ++ /* Standard definitions */
 ++diff --git a/runtime/caml/mlvalues.h b/runtime/caml/mlvalues.h
-++index 677e44e183..9173ab8c2b 100644
+++index 677e44e183..00143e5ea0 100644
 ++--- a/runtime/caml/mlvalues.h
 +++++ b/runtime/caml/mlvalues.h
 ++@@ -16,9 +16,6 @@
@@ -5260,6 +5298,18 @@ index 0000000000..1df01bce0f
 ++ #include "config.h"
 ++ #include "misc.h"
 ++ 
+++@@ -286,11 +283,7 @@ CAMLextern value caml_hash_variant(char const * tag);
+++ 
+++ /* Strings. */
+++ #define String_tag 252
+++-#ifdef CAML_SAFE_STRING
+++ #define String_val(x) ((const char *) Bp_val(x))
+++-#else
+++-#define String_val(x) ((char *) Bp_val(x))
+++-#endif
+++ #define Bytes_val(x) ((unsigned char *) Bp_val(x))
+++ CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
+++ CAMLextern int caml_string_is_c_safe (value);
 ++diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
 ++index c6aeebfc78..3a3b86911c 100644
 ++--- a/runtime/caml/signals.h
@@ -7955,28 +8005,7 @@ index 0000000000..1df01bce0f
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
 ++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   rea
+++diff --git a/testsuite/tests/weak-
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

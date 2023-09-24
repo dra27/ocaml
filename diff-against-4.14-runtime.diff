@@ -565,6 +565,19 @@ index a2a3fb8248..b68030aad8 100644
  #include "misc.h"
  #include "mlvalues.h"
  
+diff --git a/runtime/caml/m.h.in b/runtime/caml/m.h.in
+index 1c3dee1779..ba0074318d 100644
+--- a/runtime/caml/m.h.in
++++ b/runtime/caml/m.h.in
+@@ -90,7 +90,7 @@
+ 
+ #undef CAML_WITH_FPIC
+ 
+-#undef CAML_SAFE_STRING
++#define CAML_SAFE_STRING 1
+ 
+ #undef FLAT_FLOAT_ARRAY
+ 
 diff --git a/runtime/caml/memory.h b/runtime/caml/memory.h
 index 1e9cdf6d9b..8837d33d25 100644
 --- a/runtime/caml/memory.h
@@ -594,7 +607,7 @@ index 5915c30a7b..46bc21511b 100644
  
  /* Standard definitions */
 diff --git a/runtime/caml/mlvalues.h b/runtime/caml/mlvalues.h
-index 677e44e183..9173ab8c2b 100644
+index 677e44e183..00143e5ea0 100644
 --- a/runtime/caml/mlvalues.h
 +++ b/runtime/caml/mlvalues.h
 @@ -16,9 +16,6 @@
@@ -607,6 +620,18 @@ index 677e44e183..9173ab8c2b 100644
  #include "config.h"
  #include "misc.h"
  
+@@ -286,11 +283,7 @@ CAMLextern value caml_hash_variant(char const * tag);
+ 
+ /* Strings. */
+ #define String_tag 252
+-#ifdef CAML_SAFE_STRING
+ #define String_val(x) ((const char *) Bp_val(x))
+-#else
+-#define String_val(x) ((char *) Bp_val(x))
+-#endif
+ #define Bytes_val(x) ((unsigned char *) Bp_val(x))
+ CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
+ CAMLextern int caml_string_is_c_safe (value);
 diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
 index c6aeebfc78..3a3b86911c 100644
 --- a/runtime/caml/signals.h
