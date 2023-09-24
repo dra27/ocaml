@@ -1904,7 +1904,11 @@ let call_force_lazy_block varg loc =
     { ap_tailcall = Default_tailcall;
       ap_loc = loc;
       ap_func = force_fun;
+(* BACKPORT BEGIN
       ap_args = [ Lprim (Popaque, [ varg ], loc) ];
+*)
+      ap_args = [ varg ];
+(* BACKPORT END *)
       ap_inlined = Default_inline;
       ap_specialised = Default_specialise
     }

@@ -1172,10 +1172,10 @@ index 0000000000..9db6af5522
 + 
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..f3aa036bc2
+index 0000000000..1a403533e2
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,2544 @@
+@@ -0,0 +1,2556 @@
 +diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
 +index 93620c9bcc..4f6bf1dcab 100644
 +--- a/testsuite/tests/asmcomp/polling.c
@@ -1239,7 +1239,7 @@ index 0000000000..f3aa036bc2
 + 
 + (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 +diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
-+index 12390de624..5ee294030f 100644
++index 8f12a2dcbc..6992dbc04f 100644
 +--- a/testsuite/tests/backtrace/backtrace_dynlink.reference
 ++++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
 +@@ -1,18 +1,22 @@
@@ -1253,7 +1253,7 @@ index 0000000000..f3aa036bc2
 +-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
 ++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
-+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 + execution of module initializers in the shared library failed: Failure("SUCCESS")
 +-Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 ++Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
@@ -1272,7 +1272,7 @@ index 0000000000..f3aa036bc2
 ++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
 ++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
 ++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
-+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 +diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
 +index dcd4480a02..39d9880db6 100644
 +--- a/testsuite/tests/backtrace/backtrace_effects.ml
@@ -1287,17 +1287,29 @@ index 0000000000..f3aa036bc2
 + 
 + open Effect
 +diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-+index b28f151fe4..10c88febc5 100644
++index 6bb1597761..b818ede59e 100644
 +--- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
 ++++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-+@@ -1,5 +1,7 @@
++@@ -1,12 +1,14 @@
 + (* TEST
-+    flags = "-g"
-++   * skip
-++   reason = "OCaml 5 only"
++ 
++ flags = "-g"
++-* bytecode
++-* no-flambda
++-** native
++-* flambda
+++* skip
+++reason = "OCaml 5 only"
+++** bytecode
+++** no-flambda
+++*** native
+++** flambda
++ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
++-** native
+++*** native
++ 
 + *)
 + 
-+ open Effect
 +diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
 +index c1b45f1b63..b6e95802e6 100644
 +--- a/testsuite/tests/backtrace/backtrace_systhreads.reference
@@ -3684,7 +3696,7 @@ index 0000000000..f3aa036bc2
 + (* Due to GCs running at non-deterministic places, the output from these tests
 +  * are unreliable except the bad value checks and as a check for catastrophic
 +diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-+index c12d2cfd6b..2035bee588 100644
++index e8ab88e807..5cf871e7ac 100644
 +--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
 +@@ -1,4 +1,7 @@
@@ -3694,7 +3706,7 @@ index 0000000000..f3aa036bc2
 ++   reason = "OCaml 5 only"
 ++*)
 + 
-+ let test1 =
++ let[@inline never][@local never] test1 () =
 +   let r' = ref 0 in
 +diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 +index fa2d2efc43..752a7eeabf 100644
@@ -3722,10 +3734,10 @@ index 0000000000..f3aa036bc2
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8782268268
+index 0000000000..977fcba50b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,3662 @@
+@@ -0,0 +1,3668 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..0ba1492ff0
@@ -4900,10 +4912,10 @@ index 0000000000..8782268268
 ++ 
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..f3aa036bc2
++index 0000000000..1a403533e2
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,2544 @@
++@@ -0,0 +1,2556 @@
 ++diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
 ++index 93620c9bcc..4f6bf1dcab 100644
 ++--- a/testsuite/tests/asmcomp/polling.c
@@ -4967,7 +4979,7 @@ index 0000000000..8782268268
 ++ 
 ++ (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 ++diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
-++index 12390de624..5ee294030f 100644
+++index 8f12a2dcbc..6992dbc04f 100644
 ++--- a/testsuite/tests/backtrace/backtrace_dynlink.reference
 +++++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
 ++@@ -1,18 +1,22 @@
@@ -4981,7 +4993,7 @@ index 0000000000..8782268268
 ++-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 26-45
 +++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
-++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 ++ execution of module initializers in the shared library failed: Failure("SUCCESS")
 ++-Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
 +++Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
@@ -5000,7 +5012,7 @@ index 0000000000..8782268268
 +++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 350, characters 8-240
 +++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 8-17
 +++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 362, characters 26-45
-++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 35, characters 4-52
+++ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 ++diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
 ++index dcd4480a02..39d9880db6 100644
 ++--- a/testsuite/tests/backtrace/backtrace_effects.ml
@@ -5015,17 +5027,29 @@ index 0000000000..8782268268
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/backtrace/backtrace_effects_nested.ml b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-++index b28f151fe4..10c88febc5 100644
+++index 6bb1597761..b818ede59e 100644
 ++--- a/testsuite/tests/backtrace/backtrace_effects_nested.ml
 +++++ b/testsuite/tests/backtrace/backtrace_effects_nested.ml
-++@@ -1,5 +1,7 @@
+++@@ -1,12 +1,14 @@
 ++ (* TEST
-++    flags = "-g"
-+++   * skip
-+++   reason = "OCaml 5 only"
+++ 
+++ flags = "-g"
+++-* bytecode
+++-* no-flambda
+++-** native
+++-* flambda
++++* skip
++++reason = "OCaml 5 only"
++++** bytecode
++++** no-flambda
++++*** native
++++** flambda
+++ reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
+++-** native
++++*** native
+++ 
 ++ *)
 ++ 
-++ open Effect
 ++diff --git a/testsuite/tests/backtrace/backtrace_systhreads.reference b/testsuite/tests/backtrace/backtrace_systhreads.reference
 ++index c1b45f1b63..b6e95802e6 100644
 ++--- a/testsuite/tests/backtrace/backtrace_systhreads.reference
@@ -7381,16 +7405,10 @@ index 0000000000..8782268268
 +++Error: Illegal shadowing of included type t/282 by t/287
 ++        Line 2, characters 2-19:
 ++-         Type t/287 came from this include
-+++         Type t/282 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/287 is shadowed
-+++         The value print has no valid type if t/282 is shadowed
-++ |}]
-++ 
-++ module t
++++         Type t/282 came f
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
-index 65fc5e06a5..af9dd8af9b 100644
+index 65fc5e06a5..2da5f4b0bc 100644
 --- a/lambda/matching.ml
 +++ b/lambda/matching.ml
 @@ -1877,7 +1877,11 @@ let get_mod_field modname field =
@@ -7405,7 +7423,19 @@ index 65fc5e06a5..af9dd8af9b 100644
  
  (* inline_lazy_force inlines the beginning of the code of Lazy.force. When
     the value argument is tagged as:
-@@ -1909,9 +1913,14 @@ let inline_lazy_force_cond arg loc =
+@@ -1900,7 +1904,11 @@ let call_force_lazy_block varg loc =
+     { ap_tailcall = Default_tailcall;
+       ap_loc = loc;
+       ap_func = force_fun;
++(* BACKPORT BEGIN
+       ap_args = [ Lprim (Popaque, [ varg ], loc) ];
++*)
++      ap_args = [ varg ];
++(* BACKPORT END *)
+       ap_inlined = Default_inline;
+       ap_specialised = Default_specialise
+     }
+@@ -1909,9 +1917,14 @@ let inline_lazy_force_cond arg loc =
    let idarg = Ident.create_local "lzarg" in
    let varg = Lvar idarg in
    let tag = Ident.create_local "tag" in
@@ -7420,7 +7450,7 @@ index 65fc5e06a5..af9dd8af9b 100644
  
    Llet
      ( Strict,
-@@ -1924,16 +1933,32 @@ let inline_lazy_force_cond arg loc =
+@@ -1924,16 +1937,32 @@ let inline_lazy_force_cond arg loc =
            tag,
            Lprim (Pccall prim_obj_tag, [ varg ], loc),
            Lifthenelse
@@ -7453,7 +7483,7 @@ index 65fc5e06a5..af9dd8af9b 100644
                    call_force_lazy_block varg loc,
                    (* ... arg *)
                    varg ) ) ) )
-@@ -1950,16 +1975,31 @@ let inline_lazy_force_switch arg loc =
+@@ -1950,16 +1979,31 @@ let inline_lazy_force_switch arg loc =
          ( Lprim (Pisint, [ varg ], loc),
            varg,
            Lswitch
@@ -7485,7 +7515,7 @@ index 65fc5e06a5..af9dd8af9b 100644
                    ];
                  sw_failaction = Some varg
                },
-@@ -1975,7 +2015,11 @@ let inline_lazy_force arg loc =
+@@ -1975,7 +2019,11 @@ let inline_lazy_force arg loc =
        { ap_tailcall = Default_tailcall;
          ap_loc = loc;
          ap_func = Lazy.force code_force_lazy;

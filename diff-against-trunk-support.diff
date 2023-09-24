@@ -15,7 +15,7 @@ index 93620c9bcc..4f6bf1dcab 100644
    return Val_unit;
  }
 diff --git a/testsuite/tests/backtrace/backtrace2.reference b/testsuite/tests/backtrace/backtrace2.reference
-index 20ef708fe0..e75c2e2982 100644
+index 20ef708fe0..54c5ab7570 100644
 --- a/testsuite/tests/backtrace/backtrace2.reference
 +++ b/testsuite/tests/backtrace/backtrace2.reference
 @@ -35,7 +35,7 @@ Uncaught exception Invalid_argument("index out of bounds")
@@ -33,8 +33,8 @@ index 20ef708fe0..e75c2e2982 100644
  Called from Backtrace2.test_lazy.aux in file "backtrace2.ml", line 47, characters 43-52
 -Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
 -Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
-+Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
-+Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
  Uncaught exception Not_found
 -Raised at Stdlib__Hashtbl.find in file "hashtbl.ml", line 541, characters 13-28
@@ -43,9 +43,9 @@ index 20ef708fe0..e75c2e2982 100644
 -Re-raised at CamlinternalLazy.do_force_block.(fun) in file "camlinternalLazy.ml", line 54, characters 43-50
 -Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
 -Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
-+Re-raised at CamlinternalLazy.force_lazy_block.(fun) in file "camlinternalLazy.ml", line 114, characters 56-63
-+Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
-+Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
++Re-raised at CamlinternalLazy.force_lazy_block.(fun) in file "camlinternalLazy.ml", line 123, characters 56-63
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
  Called from Backtrace2.run in file "backtrace2.ml", line 62, characters 11-23
 diff --git a/testsuite/tests/backtrace/backtrace_c_exn.ml b/testsuite/tests/backtrace/backtrace_c_exn.ml
 index 9b0077d509..1680c23f7b 100644
@@ -60,6 +60,44 @@ index 9b0077d509..1680c23f7b 100644
  *)
  
  (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
+diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+index 17df8e7796..70b0651d3a 100644
+--- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
++++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
+@@ -2,20 +2,24 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
+ Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+ Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 13-44
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 352, characters 13-44
+ Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 348, characters 8-240
+-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 8-240
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 362, characters 26-45
+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
+ execution of module initializers in the shared library failed: Failure("SUCCESS")
+-Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
++Called from Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 3, characters 4-22
++Re-raised at Backtrace_dynlink_plugin in file "backtrace_dynlink_plugin.ml", line 8, characters 5-12
++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
++Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
+ Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
+ Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+ Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
+-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 13-44
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 352, characters 13-44
+ Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
+-Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 348, characters 8-240
+-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 26-45
+-Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 358, characters 8-17
+-Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 360, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 350, characters 8-240
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 362, characters 26-45
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 360, characters 8-17
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml", line 362, characters 26-45
+ Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
 index 8f12a2dcbc..6992dbc04f 100644
 --- a/testsuite/tests/backtrace/backtrace_dynlink.reference
@@ -177,7 +215,7 @@ index 2243abe4fd..c83ca05156 100644
 -Called from Thread.create.(fun) in file "thread.ml", line 49, characters 8-14
 +Called from Thread.create.(fun) in file "thread.ml", line 51, characters 8-14
 diff --git a/testsuite/tests/backtrace/lazy.reference b/testsuite/tests/backtrace/lazy.reference
-index 5e8f53482f..72b9ef2117 100644
+index 5e8f53482f..af15509686 100644
 --- a/testsuite/tests/backtrace/lazy.reference
 +++ b/testsuite/tests/backtrace/lazy.reference
 @@ -1,14 +1,12 @@
@@ -186,8 +224,8 @@ index 5e8f53482f..72b9ef2117 100644
 -Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
 -Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
 -Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
-+Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
-+Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
  Called from Lazy.test1 in file "lazy.ml", line 10, characters 11-24
  Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
  Uncaught exception Not_found
@@ -195,8 +233,8 @@ index 5e8f53482f..72b9ef2117 100644
 -Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
 -Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
 -Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml" (inlined), line 78, characters 27-67
-+Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 110, characters 17-27
-+Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 115, characters 4-11
++Called from CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 119, characters 17-27
++Re-raised at CamlinternalLazy.force_lazy_block in file "camlinternalLazy.ml", line 124, characters 4-11
  Called from Lazy.test2 in file "lazy.ml", line 15, characters 6-15
  Called from Lazy.run in file "lazy.ml", line 19, characters 4-11
 diff --git a/testsuite/tests/basic/patmatch_for_multiple.ml b/testsuite/tests/basic/patmatch_for_multiple.ml
