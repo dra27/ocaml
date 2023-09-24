@@ -1126,6 +1126,24 @@ index 0000000000..8a50268d20
 +
 +let () =
 +  expect_size (if native then 0 else 3) (1, 2)
+diff --git a/testsuite/tests/lib-random/parallel.ml b/testsuite/tests/lib-random/parallel.ml
+index e117e6eb71..929e041cfd 100644
+--- a/testsuite/tests/lib-random/parallel.ml
++++ b/testsuite/tests/lib-random/parallel.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+    include unix
+-   * libunix
+-   ** bytecode
+-   ** native
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native
+  *)
+ 
+ let () = Random.init 42
 diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 index 23f2a5f7de..08055698e7 100644
 --- a/testsuite/tests/lib-str/parallel.ml

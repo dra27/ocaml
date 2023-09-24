@@ -1089,7 +1089,7 @@ index 0000000000..9db6af5522
 + 
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..5eb40a4a9b
+index 0000000000..fa5e70438f
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,2526 @@
@@ -1906,7 +1906,7 @@ index 0000000000..5eb40a4a9b
 + 
 + (* C version of ephetest.ml *)
 +diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
-+index b11aff1f67..2e1146adef 100644
++index 56d1586331..6bdb7fdaf3 100644
 +--- a/testsuite/tests/gc-roots/globroots.ml
 ++++ b/testsuite/tests/gc-roots/globroots.ml
 +@@ -1,5 +1,7 @@
@@ -3609,7 +3609,7 @@ index 0000000000..5eb40a4a9b
 + (* ocaml-multicore issues 528 and 468 *)
 + 
 +diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+index dede2971e3..6028ef1f0c 100644
++index 7f80b8ab26..0791f4e53f 100644
 +--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 ++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
 +@@ -1,4 +1,6 @@
@@ -3621,7 +3621,7 @@ index 0000000000..5eb40a4a9b
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d17180b4d3
+index 0000000000..f735cc2597
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,3592 @@
@@ -4716,7 +4716,7 @@ index 0000000000..d17180b4d3
 ++ 
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..5eb40a4a9b
++index 0000000000..fa5e70438f
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,2526 @@
@@ -5533,7 +5533,7 @@ index 0000000000..d17180b4d3
 ++ 
 ++ (* C version of ephetest.ml *)
 ++diff --git a/testsuite/tests/gc-roots/globroots.ml b/testsuite/tests/gc-roots/globroots.ml
-++index b11aff1f67..2e1146adef 100644
+++index 56d1586331..6bdb7fdaf3 100644
 ++--- a/testsuite/tests/gc-roots/globroots.ml
 +++++ b/testsuite/tests/gc-roots/globroots.ml
 ++@@ -1,5 +1,7 @@
