@@ -283,7 +283,7 @@ index ce0406e3d8..20f7595c89 100644
  STDLIB=$(STDLIB_MODULES)
  
 diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-index c4e43e0cc0..d37c82e0da 100644
+index c4e43e0cc0..2a4327ad9c 100644
 --- a/asmcomp/amd64/emit.mlp
 +++ b/asmcomp/amd64/emit.mlp
 @@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -294,7 +294,7 @@ index c4e43e0cc0..d37c82e0da 100644
  let cfi_remember_state () =
    if Config.asm_cfi_supported then D.cfi_remember_state ()
  
-@@ -70,13 +71,16 @@ let cfi_restore_state () =
+@@ -70,20 +71,29 @@ let cfi_restore_state () =
  
  let cfi_def_cfa_register reg =
    if Config.asm_cfi_supported then D.cfi_def_cfa_register reg
@@ -311,7 +311,20 @@ index c4e43e0cc0..d37c82e0da 100644
  
  let frame_size env =                     (* includes return address *)
    if env.f.fun_frame_required then
-@@ -533,19 +537,35 @@ let emit_instr env fallthrough i =
++(* BACKPORT BEGIN *)
++    Misc.align (
++(* BACKPORT END *)
+     env.stack_offset
+     + 8 * (env.f.fun_num_stack_slots.(0) + env.f.fun_num_stack_slots.(1))
+     + 8
+     + (if fp then 8 else 0)
++(* BACKPORT BEGIN *)
++    ) 16
++(* BACKPORT END *)
+   else
+     env.stack_offset + 8
+ 
+@@ -533,19 +543,35 @@ let emit_instr env fallthrough i =
            end
          end
        end
@@ -349,7 +362,7 @@ index c4e43e0cc0..d37c82e0da 100644
          I.mov rsp rbx;
          cfi_remember_state ();
          cfi_def_cfa_register "rbx";
-@@ -553,10 +573,12 @@ let emit_instr env fallthrough i =
+@@ -553,10 +579,12 @@ let emit_instr env fallthrough i =
             will not unwind through this unless we were to tag this
             calling frame with cfi_signal_frame in it's definition. *)
          I.mov (domain_field Domainstate.Domain_c_stack) rsp;
@@ -363,7 +376,7 @@ index c4e43e0cc0..d37c82e0da 100644
        end
    | Lop(Istackoffset n) ->
        if n < 0
-@@ -739,7 +761,10 @@ let emit_instr env fallthrough i =
+@@ -739,7 +767,10 @@ let emit_instr env fallthrough i =
    | Lop(Ispecific(Izextend32)) ->
        I.mov (arg32 i 0) (res32 i 0)
    | Lop (Idls_get) ->
@@ -374,7 +387,7 @@ index c4e43e0cc0..d37c82e0da 100644
    | Lreloadretaddr ->
        ()
    | Lreturn ->
-@@ -843,12 +868,24 @@ let emit_instr env fallthrough i =
+@@ -843,12 +874,24 @@ let emit_instr env fallthrough i =
        load_label_addr lbl_handler r11;
        I.push r11;
        cfi_adjust_cfa_offset 8;
@@ -399,7 +412,7 @@ index c4e43e0cc0..d37c82e0da 100644
        cfi_adjust_cfa_offset (-8);
        I.add (int 8) rsp;
        cfi_adjust_cfa_offset (-8);
-@@ -856,14 +893,26 @@ let emit_instr env fallthrough i =
+@@ -856,14 +899,26 @@ let emit_instr env fallthrough i =
    | Lraise k ->
        begin match k with
        | Lambda.Raise_regular ->
@@ -426,7 +439,7 @@ index c4e43e0cc0..d37c82e0da 100644
            I.pop r11;
            I.jmp r11
        end
-@@ -896,6 +945,7 @@ let fundecl fundecl =
+@@ -896,6 +951,7 @@ let fundecl fundecl =
    D.label (emit_symbol fundecl.fun_name);
    emit_debug_info fundecl.fun_dbg;
    cfi_startproc ();
@@ -434,7 +447,7 @@ index c4e43e0cc0..d37c82e0da 100644
    if !Clflags.runtime_variant = "d" then
      emit_call "caml_assert_stack_invariants";
    let { max_frame_size; contains_nontail_calls} =
-@@ -913,9 +963,11 @@ let fundecl fundecl =
+@@ -913,9 +969,11 @@ let fundecl fundecl =
        Some (overflow, ret)
      end else None
    in
@@ -446,7 +459,7 @@ index c4e43e0cc0..d37c82e0da 100644
    begin match handle_overflow with
    | None -> ()
    | Some (overflow,ret) -> begin
-@@ -932,6 +984,7 @@ let fundecl fundecl =
+@@ -932,6 +990,7 @@ let fundecl fundecl =
        I.jmp (label ret)
      end
    end;
@@ -10530,10 +10543,10 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..afedaaf82f
+index 0000000000..7b2f33c226
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10479 @@
+@@ -0,0 +1,10485 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..2e13a54b32
@@ -10819,7 +10832,7 @@ index 0000000000..afedaaf82f
 + STDLIB=$(STDLIB_MODULES)
 + 
 +diff --git a/asmcomp/amd64/emit.mlp b/asmcomp/amd64/emit.mlp
-+index c4e43e0cc0..d37c82e0da 100644
++index c4e43e0cc0..2a4327ad9c 100644
 +--- a/asmcomp/amd64/emit.mlp
 ++++ b/asmcomp/amd64/emit.mlp
 +@@ -62,6 +62,7 @@ let cfi_endproc () =
@@ -10830,7 +10843,7 @@ index 0000000000..afedaaf82f
 + let cfi_remember_state () =
 +   if Config.asm_cfi_supported then D.cfi_remember_state ()
 + 
-+@@ -70,13 +71,16 @@ let cfi_restore_state () =
++@@ -70,20 +71,29 @@ let cfi_restore_state () =
 + 
 + let cfi_def_cfa_register reg =
 +   if Config.asm_cfi_supported then D.cfi_def_cfa_register reg
@@ -10847,7 +10860,20 @@ index 0000000000..afedaaf82f
 + 
 + let frame_size env =                     (* includes return address *)
 +   if env.f.fun_frame_required then
-+@@ -533,19 +537,35 @@ let emit_instr env fallthrough i =
+++(* BACKPORT BEGIN *)
+++    Misc.align (
+++(* BACKPORT END *)
++     env.stack_offset
++     + 8 * (env.f.fun_num_stack_slots.(0) + env.f.fun_num_stack_slots.(1))
++     + 8
++     + (if fp then 8 else 0)
+++(* BACKPORT BEGIN *)
+++    ) 16
+++(* BACKPORT END *)
++   else
++     env.stack_offset + 8
++ 
++@@ -533,19 +543,35 @@ let emit_instr env fallthrough i =
 +           end
 +         end
 +       end
@@ -10885,7 +10911,7 @@ index 0000000000..afedaaf82f
 +         I.mov rsp rbx;
 +         cfi_remember_state ();
 +         cfi_def_cfa_register "rbx";
-+@@ -553,10 +573,12 @@ let emit_instr env fallthrough i =
++@@ -553,10 +579,12 @@ let emit_instr env fallthrough i =
 +            will not unwind through this unless we were to tag this
 +            calling frame with cfi_signal_frame in it's definition. *)
 +         I.mov (domain_field Domainstate.Domain_c_stack) rsp;
@@ -10899,7 +10925,7 @@ index 0000000000..afedaaf82f
 +       end
 +   | Lop(Istackoffset n) ->
 +       if n < 0
-+@@ -739,7 +761,10 @@ let emit_instr env fallthrough i =
++@@ -739,7 +767,10 @@ let emit_instr env fallthrough i =
 +   | Lop(Ispecific(Izextend32)) ->
 +       I.mov (arg32 i 0) (res32 i 0)
 +   | Lop (Idls_get) ->
@@ -10910,7 +10936,7 @@ index 0000000000..afedaaf82f
 +   | Lreloadretaddr ->
 +       ()
 +   | Lreturn ->
-+@@ -843,12 +868,24 @@ let emit_instr env fallthrough i =
++@@ -843,12 +874,24 @@ let emit_instr env fallthrough i =
 +       load_label_addr lbl_handler r11;
 +       I.push r11;
 +       cfi_adjust_cfa_offset 8;
@@ -10935,7 +10961,7 @@ index 0000000000..afedaaf82f
 +       cfi_adjust_cfa_offset (-8);
 +       I.add (int 8) rsp;
 +       cfi_adjust_cfa_offset (-8);
-+@@ -856,14 +893,26 @@ let emit_instr env fallthrough i =
++@@ -856,14 +899,26 @@ let emit_instr env fallthrough i =
 +   | Lraise k ->
 +       begin match k with
 +       | Lambda.Raise_regular ->
@@ -10962,7 +10988,7 @@ index 0000000000..afedaaf82f
 +           I.pop r11;
 +           I.jmp r11
 +       end
-+@@ -896,6 +945,7 @@ let fundecl fundecl =
++@@ -896,6 +951,7 @@ let fundecl fundecl =
 +   D.label (emit_symbol fundecl.fun_name);
 +   emit_debug_info fundecl.fun_dbg;
 +   cfi_startproc ();
@@ -10970,7 +10996,7 @@ index 0000000000..afedaaf82f
 +   if !Clflags.runtime_variant = "d" then
 +     emit_call "caml_assert_stack_invariants";
 +   let { max_frame_size; contains_nontail_calls} =
-+@@ -913,9 +963,11 @@ let fundecl fundecl =
++@@ -913,9 +969,11 @@ let fundecl fundecl =
 +       Some (overflow, ret)
 +     end else None
 +   in
@@ -10982,7 +11008,7 @@ index 0000000000..afedaaf82f
 +   begin match handle_overflow with
 +   | None -> ()
 +   | Some (overflow,ret) -> begin
-+@@ -932,6 +984,7 @@ let fundecl fundecl =
++@@ -932,6 +990,7 @@ let fundecl fundecl =
 +       I.jmp (label ret)
 +     end
 +   end;
@@ -21005,14 +21031,7 @@ index 0000000000..afedaaf82f
 +++      run 'ocamlc -version' \
 +++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
 +++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsui
++++ 
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
