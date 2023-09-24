@@ -90,16 +90,8 @@ let preempt_signal =
   | _       -> Sys.sigvtalrm
 
 let () =
-<<<<<<< HEAD
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-||||||| parent of 5b1b4cf19c (Merge pull request PR#10965 from gadmm/hooks_thread_safety)
-  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-  Domain.at_startup thread_initialize_domain;
-=======
->>>>>>> 5b1b4cf19c (Merge pull request PR#10965 from gadmm/hooks_thread_safety)
   thread_initialize ();
-  Domain.at_startup thread_initialize_domain;
-  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
   Callback.register "Thread.at_shutdown" (fun () ->
     thread_cleanup();
     (* In case of DLL-embedded OCaml the preempt_signal handler
