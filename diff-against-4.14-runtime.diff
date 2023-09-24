@@ -2803,6 +2803,63 @@ index 9b18f3c5ec..a59811c87d 100644
        Restore_after_c_call;
        sp += nargs;
        pc++;
+diff --git a/runtime/io.c b/runtime/io.c
+index e40968ac7e..10aba4dd3d 100644
+--- a/runtime/io.c
++++ b/runtime/io.c
+@@ -40,6 +40,7 @@
+ #include "caml/osdeps.h"
+ #include "caml/signals.h"
+ #include "caml/sys.h"
++#include "caml/bigarray.h"
+ 
+ #ifndef SEEK_SET
+ #define SEEK_SET 0
+@@ -738,6 +739,21 @@ CAMLprim value caml_ml_output(value vchannel, value buff, value start,
+   return caml_ml_output_bytes (vchannel, buff, start, length);
+ }
+ 
++CAMLprim value caml_ml_output_bigarray(value vchannel, value vbuf,
++                                       value vpos, value vlen)
++{
++  CAMLparam4(vchannel, vbuf, vpos, vlen);
++  struct channel * channel = Channel(vchannel);
++  intnat pos = Long_val(vpos);
++  intnat len = Long_val(vlen);
++
++  Lock(channel);
++  caml_really_putblock(channel, Caml_ba_data_val(vbuf) + pos, len);
++  Unlock(channel);
++
++  CAMLreturn (Val_unit);
++}
++
+ CAMLprim value caml_ml_seek_out(value vchannel, value pos)
+ {
+   CAMLparam2 (vchannel, pos);
+@@ -837,6 +853,22 @@ CAMLprim value caml_ml_input(value vchannel, value buff, value vstart,
+   CAMLreturn (Val_long(n));
+ }
+ 
++CAMLprim value caml_ml_input_bigarray(value vchannel, value vbuf,
++                                      value vpos, value vlen)
++{
++  CAMLparam4(vchannel, vbuf, vpos, vlen);
++  struct channel * channel = Channel(vchannel);
++  intnat pos = Long_val(vpos);
++  intnat len = Long_val(vlen);
++  intnat n;
++
++  Lock(channel);
++  n = caml_getblock(channel, Caml_ba_data_val(vbuf) + pos, len);
++  Unlock(channel);
++
++  CAMLreturn (Val_long(n));
++}
++
+ CAMLprim value caml_ml_seek_in(value vchannel, value pos)
+ {
+   CAMLparam2 (vchannel, pos);
 diff --git a/runtime/major_gc.c b/runtime/major_gc.c
 index 3da350e9b1..089d2d856e 100644
 --- a/runtime/major_gc.c

@@ -1501,10 +1501,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..3cd85b7c5f
+index 0000000000..653227f4f7
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,3408 @@
+@@ -0,0 +1,3465 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -4310,6 +4310,63 @@ index 0000000000..3cd85b7c5f
 +       Restore_after_c_call;
 +       sp += nargs;
 +       pc++;
++diff --git a/runtime/io.c b/runtime/io.c
++index e40968ac7e..10aba4dd3d 100644
++--- a/runtime/io.c
+++++ b/runtime/io.c
++@@ -40,6 +40,7 @@
++ #include "caml/osdeps.h"
++ #include "caml/signals.h"
++ #include "caml/sys.h"
+++#include "caml/bigarray.h"
++ 
++ #ifndef SEEK_SET
++ #define SEEK_SET 0
++@@ -738,6 +739,21 @@ CAMLprim value caml_ml_output(value vchannel, value buff, value start,
++   return caml_ml_output_bytes (vchannel, buff, start, length);
++ }
++ 
+++CAMLprim value caml_ml_output_bigarray(value vchannel, value vbuf,
+++                                       value vpos, value vlen)
+++{
+++  CAMLparam4(vchannel, vbuf, vpos, vlen);
+++  struct channel * channel = Channel(vchannel);
+++  intnat pos = Long_val(vpos);
+++  intnat len = Long_val(vlen);
+++
+++  Lock(channel);
+++  caml_really_putblock(channel, Caml_ba_data_val(vbuf) + pos, len);
+++  Unlock(channel);
+++
+++  CAMLreturn (Val_unit);
+++}
+++
++ CAMLprim value caml_ml_seek_out(value vchannel, value pos)
++ {
++   CAMLparam2 (vchannel, pos);
++@@ -837,6 +853,22 @@ CAMLprim value caml_ml_input(value vchannel, value buff, value vstart,
++   CAMLreturn (Val_long(n));
++ }
++ 
+++CAMLprim value caml_ml_input_bigarray(value vchannel, value vbuf,
+++                                      value vpos, value vlen)
+++{
+++  CAMLparam4(vchannel, vbuf, vpos, vlen);
+++  struct channel * channel = Channel(vchannel);
+++  intnat pos = Long_val(vpos);
+++  intnat len = Long_val(vlen);
+++  intnat n;
+++
+++  Lock(channel);
+++  n = caml_getblock(channel, Caml_ba_data_val(vbuf) + pos, len);
+++  Unlock(channel);
+++
+++  CAMLreturn (Val_long(n));
+++}
+++
++ CAMLprim value caml_ml_seek_in(value vchannel, value pos)
++ {
++   CAMLparam2 (vchannel, pos);
 +diff --git a/runtime/major_gc.c b/runtime/major_gc.c
 +index 3da350e9b1..089d2d856e 100644
 +--- a/runtime/major_gc.c
@@ -8948,10 +9005,10 @@ index 0000000000..82ceae78d2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0550f291c8
+index 0000000000..aa26e80e73
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,8900 @@
+@@ -0,0 +1,9005 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..74355782a5
@@ -10455,10 +10512,10 @@ index 0000000000..0550f291c8
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..3cd85b7c5f
++index 0000000000..653227f4f7
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,3408 @@
++@@ -0,0 +1,3465 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -13264,6 +13321,63 @@ index 0000000000..0550f291c8
 ++       Restore_after_c_call;
 ++       sp += nargs;
 ++       pc++;
+++diff --git a/runtime/io.c b/runtime/io.c
+++index e40968ac7e..10aba4dd3d 100644
+++--- a/runtime/io.c
++++++ b/runtime/io.c
+++@@ -40,6 +40,7 @@
+++ #include "caml/osdeps.h"
+++ #include "caml/signals.h"
+++ #include "caml/sys.h"
++++#include "caml/bigarray.h"
+++ 
+++ #ifndef SEEK_SET
+++ #define SEEK_SET 0
+++@@ -738,6 +739,21 @@ CAMLprim value caml_ml_output(value vchannel, value buff, value start,
+++   return caml_ml_output_bytes (vchannel, buff, start, length);
+++ }
+++ 
++++CAMLprim value caml_ml_output_bigarray(value vchannel, value vbuf,
++++                                       value vpos, value vlen)
++++{
++++  CAMLparam4(vchannel, vbuf, vpos, vlen);
++++  struct channel * channel = Channel(vchannel);
++++  intnat pos = Long_val(vpos);
++++  intnat len = Long_val(vlen);
++++
++++  Lock(channel);
++++  caml_really_putblock(channel, Caml_ba_data_val(vbuf) + pos, len);
++++  Unlock(channel);
++++
++++  CAMLreturn (Val_unit);
++++}
++++
+++ CAMLprim value caml_ml_seek_out(value vchannel, value pos)
+++ {
+++   CAMLparam2 (vchannel, pos);
+++@@ -837,6 +853,22 @@ CAMLprim value caml_ml_input(value vchannel, value buff, value vstart,
+++   CAMLreturn (Val_long(n));
+++ }
+++ 
++++CAMLprim value caml_ml_input_bigarray(value vchannel, value vbuf,
++++                                      value vpos, value vlen)
++++{
++++  CAMLparam4(vchannel, vbuf, vpos, vlen);
++++  struct channel * channel = Channel(vchannel);
++++  intnat pos = Long_val(vpos);
++++  intnat len = Long_val(vlen);
++++  intnat n;
++++
++++  Lock(channel);
++++  n = caml_getblock(channel, Caml_ba_data_val(vbuf) + pos, len);
++++  Unlock(channel);
++++
++++  CAMLreturn (Val_long(n));
++++}
++++
+++ CAMLprim value caml_ml_seek_in(value vchannel, value pos)
+++ {
+++   CAMLparam2 (vchannel, pos);
 ++diff --git a/runtime/major_gc.c b/runtime/major_gc.c
 ++index 3da350e9b1..089d2d856e 100644
 ++--- a/runtime/major_gc.c
@@ -17851,7 +17965,55 @@ index 0000000000..0550f291c8
 ++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
 ++-    # tests now (to include natdynlink)
 ++-    run "test dynlink $PORT" \
-++-    
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++++      # Now reconfigure ocamltest to run in bytecode-only mode
++++      sed -i '/native_/s/true/false/' \
++++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
++++      # And run the entire testsuite, skipping all the native-code tests
++++    fi
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -181,7 +192,7 @@ case "$1" in
+++   *)
+++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+++ 
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       # Ensure that make distclean can be run from an empty tree
+++       run "$MAKE distclean" $MAKE distclean
+++     fi
+++@@ -205,7 +216,7 @@ case "$1" in
+++         # For an explanation of the sed command, see
+++         # https://github.com/appveyor/ci/issues/1824
+++         script --quiet --return --command \
+++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+++           "../$BUILD_PREFIX-$PORT/build.log" |
+++             sed -e 's/\d027\[K//g' \
+++                 -e 's/\d027\[m/\d0
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 4c56577c3b..4beaeded0f 100644
