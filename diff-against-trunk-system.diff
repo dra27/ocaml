@@ -925,10 +925,10 @@ index 35ade079f6..d9d6477860 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 4573fe7e28..06f01ece46 100755
+index 4573fe7e28..142a300014 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index bfba37d35f..279f9f37c9 100755
+index bfba37d35f..2bae84c3e9 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -6647,7 +6647,7 @@ index 0000000000..d2a1e96521
 +        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..e899ebe6ec
+index 0000000000..ac45d23896
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3863 @@
@@ -8388,18 +8388,18 @@ index 0000000000..e899ebe6ec
 +  {
 +    shared-libraries;
 +diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
-+index ea30752b30..881d922c95 100644
++index 13555a9b22..f55039c4ad 100644
 +--- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 ++++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 +@@ -3,9 +3,9 @@ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
 + Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
 + Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
 + Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-+-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 148, characters 16-25
-+-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 6-137
++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
 +-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 16-25
-++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 6-137
+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
 ++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
 + Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
 + Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
@@ -10516,7 +10516,7 @@ index 0000000000..e899ebe6ec
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6fbfe4c092
+index 0000000000..8db3c62d71
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10512 @@
@@ -11447,10 +11447,10 @@ index 0000000000..6fbfe4c092
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 4573fe7e28..06f01ece46 100755
++index 4573fe7e28..142a300014 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index bfba37d35f..279f9f37c9 100755
++index bfba37d35f..2bae84c3e9 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -17169,7 +17169,7 @@ index 0000000000..6fbfe4c092
 ++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..e899ebe6ec
++index 0000000000..ac45d23896
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3863 @@
@@ -18910,18 +18910,18 @@ index 0000000000..6fbfe4c092
 ++  {
 ++    shared-libraries;
 ++diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
-++index ea30752b30..881d922c95 100644
+++index 13555a9b22..f55039c4ad 100644
 ++--- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 +++++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 ++@@ -3,9 +3,9 @@ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
 ++ Called from Test10_plugin.g in file "test10_plugin.ml", line 3, characters 2-21
 ++ Called from Test10_plugin.f in file "test10_plugin.ml", line 6, characters 2-6
 ++ Called from Test10_plugin in file "test10_plugin.ml", line 10, characters 2-6
-++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 148, characters 16-25
-++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 6-137
+++-Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
+++-Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
 ++-Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 361, characters 11-54
-+++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 16-25
-+++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 153, characters 6-137
++++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 155, characters 16-25
++++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 157, characters 6-137
 +++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 11-54
 ++ Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
 ++ Called from Stdlib__Fun.protect in file "fun.ml", line 33, characters 8-15
