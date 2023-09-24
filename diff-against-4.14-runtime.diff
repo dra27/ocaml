@@ -63,7 +63,7 @@ index f5c08d8798..dee25dc02a 100644
  
  # Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
 diff --git a/runtime/bigarray.c b/runtime/bigarray.c
-index ed4ff67d21..fa8692bd11 100644
+index ed4ff67d21..03151f6946 100644
 --- a/runtime/bigarray.c
 +++ b/runtime/bigarray.c
 @@ -89,7 +89,7 @@ CAMLexport value
@@ -110,15 +110,6 @@ index ed4ff67d21..fa8692bd11 100644
    b = Caml_ba_array_val(res);
    b->data = data;
    b->num_dims = num_dims;
-@@ -524,7 +524,7 @@ CAMLprim value caml_ba_create(value vkind, value vlayout, value vdim)
-    are within the bounds and return the offset of the corresponding
-    array element in the data part of the array. */
- 
--static intnat caml_ba_offset(struct caml_ba_array * b, intnat * index)
-+static long caml_ba_offset(struct caml_ba_array * b, intnat * index)
- {
-   intnat offset;
-   int i;
 diff --git a/runtime/caml/alloc.h b/runtime/caml/alloc.h
 index 13f0fac2fb..816da799bb 100644
 --- a/runtime/caml/alloc.h
