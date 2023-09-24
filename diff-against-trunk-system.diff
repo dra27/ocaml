@@ -492,7 +492,7 @@ index f92ec296a1..7fe7ef5c96 100644
    | Heap_initialization, Immediate
    | Root_initialization, Immediate -> Simple
 diff --git a/asmcomp/i386/emit.mlp b/asmcomp/i386/emit.mlp
-index fe6a84cd24..71605eeb35 100644
+index fe6a84cd24..4a4a069aa3 100644
 --- a/asmcomp/i386/emit.mlp
 +++ b/asmcomp/i386/emit.mlp
 @@ -136,7 +136,7 @@ let domain_field f r =
@@ -504,6 +504,35 @@ index fe6a84cd24..71605eeb35 100644
  
  let x86_data_type_for_stack_slot = function
    | Float -> REAL8
+@@ -858,14 +858,14 @@ let emit_instr env fallthrough i =
+       if trap_frame_size > 8 then
+         I.sub (int (trap_frame_size - 8)) esp;
+       load_domain_state edx;
+-      I.push (domain_field Domain_exn_handler RDX);
++      I.push (domain_field Domain_exception_pointer RDX);
+       cfi_adjust_cfa_offset trap_frame_size;
+-      I.mov esp (domain_field Domain_exn_handler RDX);
++      I.mov esp (domain_field Domain_exception_pointer RDX);
+       env.stack_offset <- env.stack_offset + trap_frame_size
+   | Lpoptrap ->
+       I.mov edx (mem32 DWORD 4 RSP);
+       load_domain_state edx;
+-      I.pop (domain_field Domain_exn_handler RDX);
++      I.pop (domain_field Domain_exception_pointer RDX);
+       I.pop edx;
+       if trap_frame_size > 8 then
+         I.add (int (trap_frame_size - 8)) esp;
+@@ -883,8 +883,8 @@ let emit_instr env fallthrough i =
+           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
+       | Lambda.Raise_notrace ->
+           load_domain_state ebx;
+-          I.mov (domain_field Domain_exn_handler RBX) esp;
+-          I.pop (domain_field Domain_exn_handler RBX);
++          I.mov (domain_field Domain_exception_pointer RBX) esp;
++          I.pop (domain_field Domain_exception_pointer RBX);
+           if trap_frame_size > 8 then
+             I.add (int (trap_frame_size - 8)) esp;
+           I.pop ebx;
 @@ -964,7 +964,7 @@ let begin_assembly() =
      D.extrn "_caml_alloc3" PROC;
      D.extrn "_caml_ml_array_bound_error" PROC;
@@ -5958,10 +5987,10 @@ index 0000000000..17ac6b2e5e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..71e0eb30c9
+index 0000000000..9925c423e9
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5889 @@
+@@ -0,0 +1,5882 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -6456,7 +6485,7 @@ index 0000000000..71e0eb30c9
 +   | Heap_initialization, Immediate
 +   | Root_initialization, Immediate -> Simple
 +diff --git a/asmcomp/i386/emit.mlp b/asmcomp/i386/emit.mlp
-+index fe6a84cd24..71605eeb35 100644
++index fe6a84cd24..4a4a069aa3 100644
 +--- a/asmcomp/i386/emit.mlp
 ++++ b/asmcomp/i386/emit.mlp
 +@@ -136,7 +136,7 @@ let domain_field f r =
@@ -6468,6 +6497,35 @@ index 0000000000..71e0eb30c9
 + 
 + let x86_data_type_for_stack_slot = function
 +   | Float -> REAL8
++@@ -858,14 +858,14 @@ let emit_instr env fallthrough i =
++       if trap_frame_size > 8 then
++         I.sub (int (trap_frame_size - 8)) esp;
++       load_domain_state edx;
++-      I.push (domain_field Domain_exn_handler RDX);
+++      I.push (domain_field Domain_exception_pointer RDX);
++       cfi_adjust_cfa_offset trap_frame_size;
++-      I.mov esp (domain_field Domain_exn_handler RDX);
+++      I.mov esp (domain_field Domain_exception_pointer RDX);
++       env.stack_offset <- env.stack_offset + trap_frame_size
++   | Lpoptrap ->
++       I.mov edx (mem32 DWORD 4 RSP);
++       load_domain_state edx;
++-      I.pop (domain_field Domain_exn_handler RDX);
+++      I.pop (domain_field Domain_exception_pointer RDX);
++       I.pop edx;
++       if trap_frame_size > 8 then
++         I.add (int (trap_frame_size - 8)) esp;
++@@ -883,8 +883,8 @@ let emit_instr env fallthrough i =
++           record_frame env Reg.Set.empty (Dbg_raise i.dbg)
++       | Lambda.Raise_notrace ->
++           load_domain_state ebx;
++-          I.mov (domain_field Domain_exn_handler RBX) esp;
++-          I.pop (domain_field Domain_exn_handler RBX);
+++          I.mov (domain_field Domain_exception_pointer RBX) esp;
+++          I.pop (domain_field Domain_exception_pointer RBX);
++           if trap_frame_size > 8 then
++             I.add (int (trap_frame_size - 8)) esp;
++           I.pop ebx;
 +@@ -964,7 +964,7 @@ let begin_assembly() =
 +     D.extrn "_caml_alloc3" PROC;
 +     D.extrn "_caml_ml_array_bound_error" PROC;
@@ -11814,43 +11872,7 @@ index 0000000000..71e0eb30c9
 ++-***** ocamlc.byte
 +++* debugger
 +++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "printer.ml"
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsui
++++*
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
