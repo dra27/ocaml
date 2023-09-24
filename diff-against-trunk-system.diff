@@ -846,10 +846,10 @@ index dd7fc9a80c..940de94b1b 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..24125094cd
+index 0000000000..d9e135d7b5
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,1615 @@
+@@ -0,0 +1,1672 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -1930,10 +1930,19 @@ index 0000000000..24125094cd
 + CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
 + CAMLextern int caml_string_is_c_safe (value);
 +diff --git a/runtime/caml/s.h.in b/runtime/caml/s.h.in
-+index 8e4efdcc72..16ea4b8908 100644
++index 8e4efdcc72..9a5d9f4a91 100644
 +--- a/runtime/caml/s.h.in
 ++++ b/runtime/caml/s.h.in
-+@@ -70,6 +70,8 @@
++@@ -60,6 +60,8 @@
++ /* Define HAS_WORKING_ROUND is the round function is correctly implemented. This
++    hatch exists primarily for https://sourceforge.net/p/mingw-w64/bugs/573/ */
++ 
+++#undef HAS_GETENTROPY
+++
++ #undef HAS_GETRUSAGE
++ 
++ #undef HAS_TIMES
++@@ -70,6 +72,8 @@
 + 
 + #undef HAS_ISSETUGID
 + 
@@ -2426,10 +2435,20 @@ index 0000000000..24125094cd
 ++#endif
 + }
 +diff --git a/runtime/sys.c b/runtime/sys.c
-+index a77fd9d1cf..2021a4fd26 100644
++index a77fd9d1cf..f90d9ba2a8 100644
 +--- a/runtime/sys.c
 ++++ b/runtime/sys.c
-+@@ -61,9 +61,21 @@
++@@ -45,6 +45,9 @@
++ #ifdef HAS_GETTIMEOFDAY
++ #include <sys/time.h>
++ #endif
+++#ifdef __APPLE__
+++#include <sys/random.h> /* for getentropy */
+++#endif
++ #include "caml/alloc.h"
++ #include "caml/debugger.h"
++ #include "caml/fail.h"
++@@ -61,9 +64,21 @@
 + #include "caml/callback.h"
 + #include "caml/startup_aux.h"
 + 
@@ -2453,7 +2472,7 @@ index 0000000000..24125094cd
 + }
 + 
 + #ifndef EAGAIN
-+@@ -77,9 +89,10 @@ CAMLexport void caml_sys_error(value arg)
++@@ -77,9 +92,10 @@ CAMLexport void caml_sys_error(value arg)
 + {
 +   CAMLparam1 (arg);
 +   char * err;
@@ -2465,6 +2484,44 @@ index 0000000000..24125094cd
 +   if (arg == NO_ARG) {
 +     str = caml_copy_string(err);
 +   } else {
++@@ -565,20 +581,27 @@ extern int caml_win32_random_seed (intnat data[16]);
++ #else
++ int caml_unix_random_seed(intnat data[16])
++ {
++-  int fd;
++   int n = 0;
++-
++-  /* Try /dev/urandom first */
++-  fd = open("/dev/urandom", O_RDONLY, 0);
++-  if (fd != -1) {
++-    unsigned char buffer[12];
++-    int nread = read(fd, buffer, 12);
++-    close(fd);
++-    while (nread > 0) data[n++] = buffer[--nread];
+++  unsigned char buffer[12];
+++  int nread = 0;
+++
+++  /* Try kernel entropy first */
+++#if defined(HAS_GETENTROPY) || defined(__APPLE__)
+++  if (getentropy(buffer, 12) != -1) {
+++    nread = 12;
+++  } else
+++#endif
+++  { int fd = open("/dev/urandom", O_RDONLY, 0);
+++    if (fd != -1) {
+++      nread = read(fd, buffer, 12);
+++      close(fd);
+++    }
++   }
++-  /* If the read from /dev/urandom fully succeeded, we now have 96 bits
+++  while (nread > 0) data[n++] = buffer[--nread];
+++  /* If the kernel provided enough entropy, we now have 96 bits
++      of good random data and can stop here. */
++   if (n >= 12) return n;
+++
++   /* Otherwise, complement whatever we got (probably nothing)
++      with some not-very-random data. */
++   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
 index 0000000000..116f3b4e7a
@@ -5796,10 +5853,10 @@ index 0000000000..116f3b4e7a
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d953d03c26
+index 0000000000..76755913fd
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5701 @@
+@@ -0,0 +1,5825 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..86ef7e5c03
@@ -6648,10 +6705,10 @@ index 0000000000..d953d03c26
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..24125094cd
++index 0000000000..d9e135d7b5
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,1615 @@
++@@ -0,0 +1,1672 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -7732,10 +7789,19 @@ index 0000000000..d953d03c26
 ++ CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
 ++ CAMLextern int caml_string_is_c_safe (value);
 ++diff --git a/runtime/caml/s.h.in b/runtime/caml/s.h.in
-++index 8e4efdcc72..16ea4b8908 100644
+++index 8e4efdcc72..9a5d9f4a91 100644
 ++--- a/runtime/caml/s.h.in
 +++++ b/runtime/caml/s.h.in
-++@@ -70,6 +70,8 @@
+++@@ -60,6 +60,8 @@
+++ /* Define HAS_WORKING_ROUND is the round function is correctly implemented. This
+++    hatch exists primarily for https://sourceforge.net/p/mingw-w64/bugs/573/ */
+++ 
++++#undef HAS_GETENTROPY
++++
+++ #undef HAS_GETRUSAGE
+++ 
+++ #undef HAS_TIMES
+++@@ -70,6 +72,8 @@
 ++ 
 ++ #undef HAS_ISSETUGID
 ++ 
@@ -8228,10 +8294,20 @@ index 0000000000..d953d03c26
 +++#endif
 ++ }
 ++diff --git a/runtime/sys.c b/runtime/sys.c
-++index a77fd9d1cf..2021a4fd26 100644
+++index a77fd9d1cf..f90d9ba2a8 100644
 ++--- a/runtime/sys.c
 +++++ b/runtime/sys.c
-++@@ -61,9 +61,21 @@
+++@@ -45,6 +45,9 @@
+++ #ifdef HAS_GETTIMEOFDAY
+++ #include <sys/time.h>
+++ #endif
++++#ifdef __APPLE__
++++#include <sys/random.h> /* for getentropy */
++++#endif
+++ #include "caml/alloc.h"
+++ #include "caml/debugger.h"
+++ #include "caml/fail.h"
+++@@ -61,9 +64,21 @@
 ++ #include "caml/callback.h"
 ++ #include "caml/startup_aux.h"
 ++ 
@@ -8255,7 +8331,7 @@ index 0000000000..d953d03c26
 ++ }
 ++ 
 ++ #ifndef EAGAIN
-++@@ -77,9 +89,10 @@ CAMLexport void caml_sys_error(value arg)
+++@@ -77,9 +92,10 @@ CAMLexport void caml_sys_error(value arg)
 ++ {
 ++   CAMLparam1 (arg);
 ++   char * err;
@@ -8267,6 +8343,44 @@ index 0000000000..d953d03c26
 ++   if (arg == NO_ARG) {
 ++     str = caml_copy_string(err);
 ++   } else {
+++@@ -565,20 +581,27 @@ extern int caml_win32_random_seed (intnat data[16]);
+++ #else
+++ int caml_unix_random_seed(intnat data[16])
+++ {
+++-  int fd;
+++   int n = 0;
+++-
+++-  /* Try /dev/urandom first */
+++-  fd = open("/dev/urandom", O_RDONLY, 0);
+++-  if (fd != -1) {
+++-    unsigned char buffer[12];
+++-    int nread = read(fd, buffer, 12);
+++-    close(fd);
+++-    while (nread > 0) data[n++] = buffer[--nread];
++++  unsigned char buffer[12];
++++  int nread = 0;
++++
++++  /* Try kernel entropy first */
++++#if defined(HAS_GETENTROPY) || defined(__APPLE__)
++++  if (getentropy(buffer, 12) != -1) {
++++    nread = 12;
++++  } else
++++#endif
++++  { int fd = open("/dev/urandom", O_RDONLY, 0);
++++    if (fd != -1) {
++++      nread = read(fd, buffer, 12);
++++      close(fd);
++++    }
+++   }
+++-  /* If the read from /dev/urandom fully succeeded, we now have 96 bits
++++  while (nread > 0) data[n++] = buffer[--nread];
++++  /* If the kernel provided enough entropy, we now have 96 bits
+++      of good random data and can stop here. */
+++   if (n >= 12) return n;
++++
+++   /* Otherwise, complement whatever we got (probably nothing)
+++      with some not-very-random data. */
+++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
 +index 0000000000..116f3b4e7a
@@ -11500,7 +11614,74 @@ index 0000000000..d953d03c26
 +++**** ocamlc.byte
 +++***** check-ocamlc.byte-output
 +++****** ocamldebug
-+++******* check-program
++++******* check-program-output
+++ *)
+++ 
+++ let f x =
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 5636e9abe2..53e430713c 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/284 by t/289
++++Error: Illegal shadowing of included type t/279 by t/284
+++        Line 2, characters 2-19:
+++-         Type t/284 came from this include
++++         Type t/279 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/284 is shadowed
++++         The value print has no valid type if t/279 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index e8ab88e807..5cf871e7ac 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let[@inline never][@local never] test1 () =
+++   let r' = ref 0 in
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   r
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
