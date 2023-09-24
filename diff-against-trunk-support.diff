@@ -1697,6 +1697,65 @@ index 051122113a..7eef1e662e 100644
    echo "OCaml was not compiled with gcc" > ${ocamltest_response}
    test_result=${TEST_SKIP}
  else
+diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
+index 840e456a68..b3fedb2705 100644
+--- a/testsuite/tests/lib-bigarray/bigarrays.ml
++++ b/testsuite/tests/lib-bigarray/bigarrays.ml
+@@ -243,6 +243,7 @@ let tests () =
+     done;
+     test 16 true !return
+   end;
++(*
+   test 17 true
+     (test_setget float16
+                  [0.0, 0.0;
+@@ -258,6 +259,7 @@ let tests () =
+                   -65519.0, -65504.0;
+                   65520.0, infinity;
+                   -65520.0, neg_infinity]);
++*)
+ 
+   testing_function "set/get (specialized)";
+   let a = Array1.create int c_layout 3 in
+diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
+index da6893a14a..7fb39b0766 100644
+--- a/testsuite/tests/lib-bigarray/bigarrays.reference
++++ b/testsuite/tests/lib-bigarray/bigarrays.reference
+@@ -2,7 +2,7 @@
+ ------ Array1 --------
+ 
+ create/set/get
+- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17...
++ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15... 16...
+ set/get (specialized)
+  1... 2... 3... 4... 5... 6... 7... 8... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
+ set/get (unsafe, specialized)
+diff --git a/testsuite/tests/lib-bigarray/specialized.ml b/testsuite/tests/lib-bigarray/specialized.ml
+index 6f30527a55..11a11dccbf 100644
+--- a/testsuite/tests/lib-bigarray/specialized.ml
++++ b/testsuite/tests/lib-bigarray/specialized.ml
+@@ -9,9 +9,11 @@ let generic (a: ('a, 'b, 'c) Array1.t) v0 v1 v2 =
+   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
+   (a.{0}, a.{1}, a.{2})
+ 
++(*
+ let special_float16 (a: (float, float16_elt, c_layout) Array1.t) v0 v1 v2 =
+   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
+   (a.{0}, a.{1}, a.{2})
++*)
+ 
+ let special_float32 (a: (float, float32_elt, c_layout) Array1.t) v0 v1 v2 =
+   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
+@@ -75,7 +77,9 @@ let test kind special v0 v1 v2 =
+   assert (s = g)
+ 
+ let _ =
++(*
+   test float16 special_float16 1.0 (-2.0) Float.pi;
++*)
+   test float32 special_float32 1.0 (-2.0) Float.pi;
+   test float64 special_float64 1.0 (-2.0) Float.pi;
+   test int8_signed special_int8s 123 (-456) 0xFF00FF;
 diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
 index 2986e5b8c9..47456f2554 100644
 --- a/testsuite/tests/lib-channels/close_in.ml

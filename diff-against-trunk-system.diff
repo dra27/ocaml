@@ -22704,6 +22704,46 @@ index d5d6e99e1d..aa057e3985 100644
 +*)
  let incr r = ignore (fetch_and_add r 1)
  let decr r = ignore (fetch_and_add r (-1))
+diff --git a/stdlib/bigarray.ml b/stdlib/bigarray.ml
+index cc9ea9cd37..d92a9f2069 100644
+--- a/stdlib/bigarray.ml
++++ b/stdlib/bigarray.ml
+@@ -33,7 +33,6 @@ type complex32_elt = Complex32_elt
+ type complex64_elt = Complex64_elt
+ 
+ type ('a, 'b) kind =
+-    Float16 : (float, float16_elt) kind
+   | Float32 : (float, float32_elt) kind
+   | Float64 : (float, float64_elt) kind
+   | Int8_signed : (int, int8_signed_elt) kind
+@@ -47,6 +46,7 @@ type ('a, 'b) kind =
+   | Complex32 : (Complex.t, complex32_elt) kind
+   | Complex64 : (Complex.t, complex64_elt) kind
+   | Char : (char, int8_unsigned_elt) kind
++  | Float16 : (float, float16_elt) kind
+ 
+ type c_layout = C_layout_typ
+ type fortran_layout = Fortran_layout_typ (**)
+diff --git a/stdlib/bigarray.mli b/stdlib/bigarray.mli
+index e6e3b2b875..2923971a0c 100644
+--- a/stdlib/bigarray.mli
++++ b/stdlib/bigarray.mli
+@@ -108,7 +108,6 @@ type complex32_elt = Complex32_elt
+ type complex64_elt = Complex64_elt
+ 
+ type ('a, 'b) kind =
+-    Float16 : (float, float16_elt) kind
+   | Float32 : (float, float32_elt) kind
+   | Float64 : (float, float64_elt) kind
+   | Int8_signed : (int, int8_signed_elt) kind
+@@ -122,6 +121,7 @@ type ('a, 'b) kind =
+   | Complex32 : (Complex.t, complex32_elt) kind
+   | Complex64 : (Complex.t, complex64_elt) kind
+   | Char : (char, int8_unsigned_elt) kind (**)
++  | Float16 : (float, float16_elt) kind
+ (** To each element kind is associated an OCaml type, which is
+    the type of OCaml values that can be stored in the Bigarray
+    or read back from it.  This type is not necessarily the same
 diff --git a/stdlib/camlinternalLazy.ml b/stdlib/camlinternalLazy.ml
 index 6035541601..247bfcfb58 100644
 --- a/stdlib/camlinternalLazy.ml
