@@ -525,13 +525,13 @@ static DWORD st_atfork(void (*fn)(void))
 
 /* Signal handling -- none under Win32 */
 
-value caml_thread_sigmask(value cmd, value sigs) /* ML */
+value caml_thread_sigmask(value cmd, value sigs)
 {
   caml_invalid_argument("Thread.sigmask not implemented");
   return Val_int(0);            /* not reached */
 }
 
-value caml_wait_signal(value sigs) /* ML */
+value caml_wait_signal(value sigs)
 {
   caml_invalid_argument("Thread.wait_signal not implemented");
   return Val_int(0);            /* not reached */

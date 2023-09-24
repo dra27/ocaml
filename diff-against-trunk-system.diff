@@ -832,14 +832,54 @@ index 834ef1083b..929eacc690 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..dac4023f62
+index 0000000000..24125094cd
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,1425 @@
+@@ -0,0 +1,1615 @@
++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
++index 957f4717b6..09b243f6a5 100644
++--- a/otherlibs/systhreads/st_posix.h
+++++ b/otherlibs/systhreads/st_posix.h
++@@ -446,7 +446,7 @@ static value st_encode_sigset(sigset_t * set)
++ 
++ static int sigmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
++ 
++-value caml_thread_sigmask(value cmd, value sigs) /* ML */
+++value caml_thread_sigmask(value cmd, value sigs)
++ {
++   int how;
++   sigset_t set, oldset;
++@@ -463,7 +463,7 @@ value caml_thread_sigmask(value cmd, value sigs) /* ML */
++   return st_encode_sigset(&oldset);
++ }
++ 
++-value caml_wait_signal(value sigs) /* ML */
+++value caml_wait_signal(value sigs)
++ {
++ #ifdef HAS_SIGWAIT
++   sigset_t set;
 +diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
-+index 043e07031e..b7a6a9a6bb 100644
++index 043e07031e..c1d8358e93 100644
 +--- a/otherlibs/systhreads/st_stubs.c
 ++++ b/otherlibs/systhreads/st_stubs.c
++@@ -430,7 +430,7 @@ static void caml_thread_reinitialize(void)
++ 
++ /* Initialize the thread machinery */
++ 
++-CAMLprim value caml_thread_initialize(value unit)   /* ML */
+++CAMLprim value caml_thread_initialize(value unit)
++ {
++   /* Protect against repeated initialization (PR#3532) */
++   if (curr_thread != NULL) return Val_unit;
++@@ -483,7 +483,7 @@ CAMLprim value caml_thread_initialize(value unit)   /* ML */
++    thread take 25ms on average / 50ms in the worst case, so we don't do it on
++    program exit. */
++ 
++-CAMLprim value caml_thread_cleanup(value unit)   /* ML */
+++CAMLprim value caml_thread_cleanup(value unit)
++ {
++   if (caml_tick_thread_running){
++     caml_tick_thread_stop = 1;
 +@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 + {
 +   caml_thread_t th = (caml_thread_t) arg;
@@ -857,7 +897,7 @@ index 0000000000..dac4023f62
 + #ifdef NATIVE_CODE
 +   /* Setup termination handler (for caml_thread_exit) */
 +   if (sigsetjmp(termination_buf.buf, 0) == 0) {
-+@@ -551,7 +550,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
++@@ -551,12 +550,12 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 + #ifdef NATIVE_CODE
 +   }
 + #endif
@@ -866,6 +906,156 @@ index 0000000000..dac4023f62
 +   /* The thread now stops running */
 +   return 0;
 + }
++ 
++-CAMLprim value caml_thread_new(value clos)          /* ML */
+++CAMLprim value caml_thread_new(value clos)
++ {
++   caml_thread_t th;
++   st_retcode err;
++@@ -663,7 +662,7 @@ CAMLexport int caml_c_thread_unregister(void)
++ 
++ /* Return the current thread */
++ 
++-CAMLprim value caml_thread_self(value unit)         /* ML */
+++CAMLprim value caml_thread_self(value unit)
++ {
++   if (curr_thread == NULL)
++     caml_invalid_argument("Thread.self: not initialized");
++@@ -672,14 +671,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
++ 
++ /* Return the identifier of a thread */
++ 
++-CAMLprim value caml_thread_id(value th)          /* ML */
+++CAMLprim value caml_thread_id(value th)
++ {
++   return Ident(th);
++ }
++ 
++ /* Print uncaught exception and backtrace */
++ 
++-CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
+++CAMLprim value caml_thread_uncaught_exception(value exn)
++ {
++   char * msg = caml_format_exception(exn);
++   fprintf(stderr, "Thread %d killed on uncaught exception %s\n",
++@@ -692,7 +691,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
++ 
++ /* Terminate current thread */
++ 
++-CAMLprim value caml_thread_exit(value unit)   /* ML */
+++CAMLprim value caml_thread_exit(value unit)
++ {
++   struct longjmp_buffer * exit_buf = NULL;
++ 
++@@ -723,7 +722,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
++ 
++ /* Allow re-scheduling */
++ 
++-CAMLprim value caml_thread_yield(value unit)        /* ML */
+++CAMLprim value caml_thread_yield(value unit)
++ {
++   if (st_masterlock_waiters(&caml_master_lock) == 0) return Val_unit;
++ 
++@@ -744,7 +743,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
++ 
++ /* Suspend the current thread until another thread terminates */
++ 
++-CAMLprim value caml_thread_join(value th)          /* ML */
+++CAMLprim value caml_thread_join(value th)
++ {
++   st_retcode rc = caml_threadstatus_wait(Terminated(th));
++   st_check_error(rc, "Thread.join");
++@@ -783,7 +782,7 @@ static struct custom_operations caml_mutex_ops = {
++   custom_fixed_length_default
++ };
++ 
++-CAMLprim value caml_mutex_new(value unit)        /* ML */
+++CAMLprim value caml_mutex_new(value unit)
++ {
++   st_mutex mut = NULL;          /* suppress warning */
++   value wrapper;
++@@ -794,7 +793,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
++   return wrapper;
++ }
++ 
++-CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
+++CAMLprim value caml_mutex_lock(value wrapper)
++ {
++   st_mutex mut = Mutex_val(wrapper);
++   st_retcode retcode;
++@@ -811,7 +810,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
++   return Val_unit;
++ }
++ 
++-CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
+++CAMLprim value caml_mutex_unlock(value wrapper)
++ {
++   st_mutex mut = Mutex_val(wrapper);
++   st_retcode retcode;
++@@ -821,7 +820,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
++   return Val_unit;
++ }
++ 
++-CAMLprim value caml_mutex_try_lock(value wrapper)           /* ML */
+++CAMLprim value caml_mutex_try_lock(value wrapper)
++ {
++   st_mutex mut = Mutex_val(wrapper);
++   st_retcode retcode;
++@@ -863,7 +862,7 @@ static struct custom_operations caml_condition_ops = {
++   custom_fixed_length_default
++ };
++ 
++-CAMLprim value caml_condition_new(value unit)        /* ML */
+++CAMLprim value caml_condition_new(value unit)
++ {
++   st_condvar cond = NULL;       /* suppress warning */
++   value wrapper;
++@@ -874,7 +873,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
++   return wrapper;
++ }
++ 
++-CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
+++CAMLprim value caml_condition_wait(value wcond, value wmut)
++ {
++   st_condvar cond = Condition_val(wcond);
++   st_mutex mut = Mutex_val(wmut);
++@@ -889,14 +888,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
++   return Val_unit;
++ }
++ 
++-CAMLprim value caml_condition_signal(value wrapper)           /* ML */
+++CAMLprim value caml_condition_signal(value wrapper)
++ {
++   st_check_error(st_condvar_signal(Condition_val(wrapper)),
++                  "Condition.signal");
++   return Val_unit;
++ }
++ 
++-CAMLprim value caml_condition_broadcast(value wrapper)           /* ML */
+++CAMLprim value caml_condition_broadcast(value wrapper)
++ {
++   st_check_error(st_condvar_broadcast(Condition_val(wrapper)),
++                  "Condition.broadcast");
++diff --git a/otherlibs/systhreads/st_win32.h b/otherlibs/systhreads/st_win32.h
++index 3f598a715d..21eb674fc5 100644
++--- a/otherlibs/systhreads/st_win32.h
+++++ b/otherlibs/systhreads/st_win32.h
++@@ -525,13 +525,13 @@ static DWORD st_atfork(void (*fn)(void))
++ 
++ /* Signal handling -- none under Win32 */
++ 
++-value caml_thread_sigmask(value cmd, value sigs) /* ML */
+++value caml_thread_sigmask(value cmd, value sigs)
++ {
++   caml_invalid_argument("Thread.sigmask not implemented");
++   return Val_int(0);            /* not reached */
++ }
++ 
++-value caml_wait_signal(value sigs) /* ML */
+++value caml_wait_signal(value sigs)
++ {
++   caml_invalid_argument("Thread.wait_signal not implemented");
++   return Val_int(0);            /* not reached */
 +diff --git a/runtime/Makefile b/runtime/Makefile
 +index f5c08d8798..dee25dc02a 100644
 +--- a/runtime/Makefile
@@ -5592,10 +5782,10 @@ index 0000000000..cf1c62f286
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..113e2b1be8
+index 0000000000..6ed384d976
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5581 @@
+@@ -0,0 +1,5699 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -6430,14 +6620,54 @@ index 0000000000..113e2b1be8
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..dac4023f62
++index 0000000000..24125094cd
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,1425 @@
++@@ -0,0 +1,1615 @@
+++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
+++index 957f4717b6..09b243f6a5 100644
+++--- a/otherlibs/systhreads/st_posix.h
++++++ b/otherlibs/systhreads/st_posix.h
+++@@ -446,7 +446,7 @@ static value st_encode_sigset(sigset_t * set)
+++ 
+++ static int sigmask_cmd[3] = { SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK };
+++ 
+++-value caml_thread_sigmask(value cmd, value sigs) /* ML */
++++value caml_thread_sigmask(value cmd, value sigs)
+++ {
+++   int how;
+++   sigset_t set, oldset;
+++@@ -463,7 +463,7 @@ value caml_thread_sigmask(value cmd, value sigs) /* ML */
+++   return st_encode_sigset(&oldset);
+++ }
+++ 
+++-value caml_wait_signal(value sigs) /* ML */
++++value caml_wait_signal(value sigs)
+++ {
+++ #ifdef HAS_SIGWAIT
+++   sigset_t set;
 ++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
-++index 043e07031e..b7a6a9a6bb 100644
+++index 043e07031e..c1d8358e93 100644
 ++--- a/otherlibs/systhreads/st_stubs.c
 +++++ b/otherlibs/systhreads/st_stubs.c
+++@@ -430,7 +430,7 @@ static void caml_thread_reinitialize(void)
+++ 
+++ /* Initialize the thread machinery */
+++ 
+++-CAMLprim value caml_thread_initialize(value unit)   /* ML */
++++CAMLprim value caml_thread_initialize(value unit)
+++ {
+++   /* Protect against repeated initialization (PR#3532) */
+++   if (curr_thread != NULL) return Val_unit;
+++@@ -483,7 +483,7 @@ CAMLprim value caml_thread_initialize(value unit)   /* ML */
+++    thread take 25ms on average / 50ms in the worst case, so we don't do it on
+++    program exit. */
+++ 
+++-CAMLprim value caml_thread_cleanup(value unit)   /* ML */
++++CAMLprim value caml_thread_cleanup(value unit)
+++ {
+++   if (caml_tick_thread_running){
+++     caml_tick_thread_stop = 1;
 ++@@ -524,7 +524,6 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 ++ {
 ++   caml_thread_t th = (caml_thread_t) arg;
@@ -6455,7 +6685,7 @@ index 0000000000..113e2b1be8
 ++ #ifdef NATIVE_CODE
 ++   /* Setup termination handler (for caml_thread_exit) */
 ++   if (sigsetjmp(termination_buf.buf, 0) == 0) {
-++@@ -551,7 +550,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
+++@@ -551,12 +550,12 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
 ++ #ifdef NATIVE_CODE
 ++   }
 ++ #endif
@@ -6464,6 +6694,156 @@ index 0000000000..113e2b1be8
 ++   /* The thread now stops running */
 ++   return 0;
 ++ }
+++ 
+++-CAMLprim value caml_thread_new(value clos)          /* ML */
++++CAMLprim value caml_thread_new(value clos)
+++ {
+++   caml_thread_t th;
+++   st_retcode err;
+++@@ -663,7 +662,7 @@ CAMLexport int caml_c_thread_unregister(void)
+++ 
+++ /* Return the current thread */
+++ 
+++-CAMLprim value caml_thread_self(value unit)         /* ML */
++++CAMLprim value caml_thread_self(value unit)
+++ {
+++   if (curr_thread == NULL)
+++     caml_invalid_argument("Thread.self: not initialized");
+++@@ -672,14 +671,14 @@ CAMLprim value caml_thread_self(value unit)         /* ML */
+++ 
+++ /* Return the identifier of a thread */
+++ 
+++-CAMLprim value caml_thread_id(value th)          /* ML */
++++CAMLprim value caml_thread_id(value th)
+++ {
+++   return Ident(th);
+++ }
+++ 
+++ /* Print uncaught exception and backtrace */
+++ 
+++-CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
++++CAMLprim value caml_thread_uncaught_exception(value exn)
+++ {
+++   char * msg = caml_format_exception(exn);
+++   fprintf(stderr, "Thread %d killed on uncaught exception %s\n",
+++@@ -692,7 +691,7 @@ CAMLprim value caml_thread_uncaught_exception(value exn)  /* ML */
+++ 
+++ /* Terminate current thread */
+++ 
+++-CAMLprim value caml_thread_exit(value unit)   /* ML */
++++CAMLprim value caml_thread_exit(value unit)
+++ {
+++   struct longjmp_buffer * exit_buf = NULL;
+++ 
+++@@ -723,7 +722,7 @@ CAMLprim value caml_thread_exit(value unit)   /* ML */
+++ 
+++ /* Allow re-scheduling */
+++ 
+++-CAMLprim value caml_thread_yield(value unit)        /* ML */
++++CAMLprim value caml_thread_yield(value unit)
+++ {
+++   if (st_masterlock_waiters(&caml_master_lock) == 0) return Val_unit;
+++ 
+++@@ -744,7 +743,7 @@ CAMLprim value caml_thread_yield(value unit)        /* ML */
+++ 
+++ /* Suspend the current thread until another thread terminates */
+++ 
+++-CAMLprim value caml_thread_join(value th)          /* ML */
++++CAMLprim value caml_thread_join(value th)
+++ {
+++   st_retcode rc = caml_threadstatus_wait(Terminated(th));
+++   st_check_error(rc, "Thread.join");
+++@@ -783,7 +782,7 @@ static struct custom_operations caml_mutex_ops = {
+++   custom_fixed_length_default
+++ };
+++ 
+++-CAMLprim value caml_mutex_new(value unit)        /* ML */
++++CAMLprim value caml_mutex_new(value unit)
+++ {
+++   st_mutex mut = NULL;          /* suppress warning */
+++   value wrapper;
+++@@ -794,7 +793,7 @@ CAMLprim value caml_mutex_new(value unit)        /* ML */
+++   return wrapper;
+++ }
+++ 
+++-CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
++++CAMLprim value caml_mutex_lock(value wrapper)
+++ {
+++   st_mutex mut = Mutex_val(wrapper);
+++   st_retcode retcode;
+++@@ -811,7 +810,7 @@ CAMLprim value caml_mutex_lock(value wrapper)     /* ML */
+++   return Val_unit;
+++ }
+++ 
+++-CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
++++CAMLprim value caml_mutex_unlock(value wrapper)
+++ {
+++   st_mutex mut = Mutex_val(wrapper);
+++   st_retcode retcode;
+++@@ -821,7 +820,7 @@ CAMLprim value caml_mutex_unlock(value wrapper)           /* ML */
+++   return Val_unit;
+++ }
+++ 
+++-CAMLprim value caml_mutex_try_lock(value wrapper)           /* ML */
++++CAMLprim value caml_mutex_try_lock(value wrapper)
+++ {
+++   st_mutex mut = Mutex_val(wrapper);
+++   st_retcode retcode;
+++@@ -863,7 +862,7 @@ static struct custom_operations caml_condition_ops = {
+++   custom_fixed_length_default
+++ };
+++ 
+++-CAMLprim value caml_condition_new(value unit)        /* ML */
++++CAMLprim value caml_condition_new(value unit)
+++ {
+++   st_condvar cond = NULL;       /* suppress warning */
+++   value wrapper;
+++@@ -874,7 +873,7 @@ CAMLprim value caml_condition_new(value unit)        /* ML */
+++   return wrapper;
+++ }
+++ 
+++-CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
++++CAMLprim value caml_condition_wait(value wcond, value wmut)
+++ {
+++   st_condvar cond = Condition_val(wcond);
+++   st_mutex mut = Mutex_val(wmut);
+++@@ -889,14 +888,14 @@ CAMLprim value caml_condition_wait(value wcond, value wmut)           /* ML */
+++   return Val_unit;
+++ }
+++ 
+++-CAMLprim value caml_condition_signal(value wrapper)           /* ML */
++++CAMLprim value caml_condition_signal(value wrapper)
+++ {
+++   st_check_error(st_condvar_signal(Condition_val(wrapper)),
+++                  "Condition.signal");
+++   return Val_unit;
+++ }
+++ 
+++-CAMLprim value caml_condition_broadcast(value wrapper)           /* ML */
++++CAMLprim value caml_condition_broadcast(value wrapper)
+++ {
+++   st_check_error(st_condvar_broadcast(Condition_val(wrapper)),
+++                  "Condition.broadcast");
+++diff --git a/otherlibs/systhreads/st_win32.h b/otherlibs/systhreads/st_win32.h
+++index 3f598a715d..21eb674fc5 100644
+++--- a/otherlibs/systhreads/st_win32.h
++++++ b/otherlibs/systhreads/st_win32.h
+++@@ -525,13 +525,13 @@ static DWORD st_atfork(void (*fn)(void))
+++ 
+++ /* Signal handling -- none under Win32 */
+++ 
+++-value caml_thread_sigmask(value cmd, value sigs) /* ML */
++++value caml_thread_sigmask(value cmd, value sigs)
+++ {
+++   caml_invalid_argument("Thread.sigmask not implemented");
+++   return Val_int(0);            /* not reached */
+++ }
+++ 
+++-value caml_wait_signal(value sigs) /* ML */
++++value caml_wait_signal(value sigs)
+++ {
+++   caml_invalid_argument("Thread.wait_signal not implemented");
+++   return Val_int(0);            /* not reached */
 ++diff --git a/runtime/Makefile b/runtime/Makefile
 ++index f5c08d8798..dee25dc02a 100644
 ++--- a/runtime/Makefile
@@ -11104,79 +11484,7 @@ index 0000000000..113e2b1be8
 ++ Line 3, characters 2-36:
 ++ 3 |   include Comparable with type t = t
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,4 +1,6 @@
-++ (* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-++ *)
-++ 
-++ let size = 1000;;
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1
+++-Error: Illegal shadowing of included type t/284 by
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
