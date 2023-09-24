@@ -1917,7 +1917,7 @@ index d9e58bc2d0..8837d33d25 100644
      __pragma( warning (disable:4189 ) )
    #define CAMLunused_end __pragma( warning (pop))
 diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-index c605f8711e..b97d20c2bd 100644
+index c605f8711e..3a31e4dd5b 100644
 --- a/runtime/caml/misc.h
 +++ b/runtime/caml/misc.h
 @@ -18,9 +18,6 @@
@@ -1957,16 +1957,54 @@ index c605f8711e..b97d20c2bd 100644
  
  #define CAML_STRINGIFY(x) #x
  #ifdef _MSC_VER
-@@ -91,7 +89,7 @@ CAMLdeprecated_typedef(addr, char *);
-   #define CAMLnoreturn_start
-   #define CAMLnoreturn_end __attribute__ ((noreturn))
+@@ -76,28 +74,30 @@ typedef size_t asize_t;
+ CAMLdeprecated_typedef(addr, char *);
+ #endif /* CAML_INTERNALS */
+ 
+-/* Noreturn is preserved for compatibility reasons.
+-   Instead of the legacy GCC/Clang-only
+-     foo Noreturn;
+-   you should prefer
+-     CAMLnoreturn_start foo CAMLnoreturn_end;
+-   which supports both GCC/Clang and MSVC.
++/* Noreturn, CAMLnoreturn_start and CAMLnoreturn_end are preserved
++   for compatibility reasons.  Instead, we recommend using the CAMLnoret
++   macro, to be added as a modifier at the beginning of the
++   function definition or declaration.
+ 
+    Note: CAMLnoreturn is a different macro defined in memory.h,
+-   to be used in function bodies rather than as a prototype attribute.
++   to be used in function bodies rather than as a function attribute.
+ */
++#if __STDC_VERSION__ >= 202300L || __cplusplus >= 201103L
++  #define CAMLnoret [[noreturn]]
++#elif __STDC_VERSION__ >= 201112L
++  #define CAMLnoret _Noreturn
++#elif defined(__GNUC__)
++  #define CAMLnoret  __attribute__ ((noreturn))
++#else
++  #define CAMLnoret
++#endif
++
++#define CAMLnoreturn_start CAMLnoret
++#define CAMLnoreturn_end
++
+ #ifdef __GNUC__
+-  /* Works only in GCC 2.5 and later */
+-  #define CAMLnoreturn_start
+-  #define CAMLnoreturn_end __attribute__ ((noreturn))
    #define Noreturn __attribute__ ((noreturn))
 -#elif defined(_MSC_VER) && _MSC_VER >= 1500
-+#elif _MSC_VER >= 1500
-   #define CAMLnoreturn_start __declspec(noreturn)
-   #define CAMLnoreturn_end
+-  #define CAMLnoreturn_start __declspec(noreturn)
+-  #define CAMLnoreturn_end
+-  #define Noreturn
+ #else
+-  #define CAMLnoreturn_start
+-  #define CAMLnoreturn_end
    #define Noreturn
-@@ -139,12 +137,11 @@ CAMLdeprecated_typedef(addr, char *);
+ #endif
+ 
+@@ -139,12 +139,11 @@ CAMLdeprecated_typedef(addr, char *);
  /* we need to be able to compute the exact offset of each member. */
  #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
  #define CAMLalign(n) _Alignas(n)
@@ -1981,7 +2019,7 @@ index c605f8711e..b97d20c2bd 100644
  #define CAMLalign(n) __declspec(align(n))
  #else
  #error "How do I align values on this platform?"
-@@ -172,7 +169,7 @@ CAMLdeprecated_typedef(addr, char *);
+@@ -172,7 +171,7 @@ CAMLdeprecated_typedef(addr, char *);
    #define CAMLunused_start __attribute__ ((unused))
    #define CAMLunused_end
    #define CAMLunused __attribute__ ((unused))

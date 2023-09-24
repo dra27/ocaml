@@ -3791,10 +3791,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..d2a1e96521
+index 0000000000..beacc9429c
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2816 @@
+@@ -0,0 +1,2854 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -5714,7 +5714,7 @@ index 0000000000..d2a1e96521
 +     __pragma( warning (disable:4189 ) )
 +   #define CAMLunused_end __pragma( warning (pop))
 +diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-+index c605f8711e..b97d20c2bd 100644
++index c605f8711e..3a31e4dd5b 100644
 +--- a/runtime/caml/misc.h
 ++++ b/runtime/caml/misc.h
 +@@ -18,9 +18,6 @@
@@ -5754,16 +5754,54 @@ index 0000000000..d2a1e96521
 + 
 + #define CAML_STRINGIFY(x) #x
 + #ifdef _MSC_VER
-+@@ -91,7 +89,7 @@ CAMLdeprecated_typedef(addr, char *);
-+   #define CAMLnoreturn_start
-+   #define CAMLnoreturn_end __attribute__ ((noreturn))
++@@ -76,28 +74,30 @@ typedef size_t asize_t;
++ CAMLdeprecated_typedef(addr, char *);
++ #endif /* CAML_INTERNALS */
++ 
++-/* Noreturn is preserved for compatibility reasons.
++-   Instead of the legacy GCC/Clang-only
++-     foo Noreturn;
++-   you should prefer
++-     CAMLnoreturn_start foo CAMLnoreturn_end;
++-   which supports both GCC/Clang and MSVC.
+++/* Noreturn, CAMLnoreturn_start and CAMLnoreturn_end are preserved
+++   for compatibility reasons.  Instead, we recommend using the CAMLnoret
+++   macro, to be added as a modifier at the beginning of the
+++   function definition or declaration.
++ 
++    Note: CAMLnoreturn is a different macro defined in memory.h,
++-   to be used in function bodies rather than as a prototype attribute.
+++   to be used in function bodies rather than as a function attribute.
++ */
+++#if __STDC_VERSION__ >= 202300L || __cplusplus >= 201103L
+++  #define CAMLnoret [[noreturn]]
+++#elif __STDC_VERSION__ >= 201112L
+++  #define CAMLnoret _Noreturn
+++#elif defined(__GNUC__)
+++  #define CAMLnoret  __attribute__ ((noreturn))
+++#else
+++  #define CAMLnoret
+++#endif
+++
+++#define CAMLnoreturn_start CAMLnoret
+++#define CAMLnoreturn_end
+++
++ #ifdef __GNUC__
++-  /* Works only in GCC 2.5 and later */
++-  #define CAMLnoreturn_start
++-  #define CAMLnoreturn_end __attribute__ ((noreturn))
 +   #define Noreturn __attribute__ ((noreturn))
 +-#elif defined(_MSC_VER) && _MSC_VER >= 1500
-++#elif _MSC_VER >= 1500
-+   #define CAMLnoreturn_start __declspec(noreturn)
-+   #define CAMLnoreturn_end
++-  #define CAMLnoreturn_start __declspec(noreturn)
++-  #define CAMLnoreturn_end
++-  #define Noreturn
++ #else
++-  #define CAMLnoreturn_start
++-  #define CAMLnoreturn_end
 +   #define Noreturn
-+@@ -139,12 +137,11 @@ CAMLdeprecated_typedef(addr, char *);
++ #endif
++ 
++@@ -139,12 +139,11 @@ CAMLdeprecated_typedef(addr, char *);
 + /* we need to be able to compute the exact offset of each member. */
 + #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 + #define CAMLalign(n) _Alignas(n)
@@ -5778,7 +5816,7 @@ index 0000000000..d2a1e96521
 + #define CAMLalign(n) __declspec(align(n))
 + #else
 + #error "How do I align values on this platform?"
-+@@ -172,7 +169,7 @@ CAMLdeprecated_typedef(addr, char *);
++@@ -172,7 +171,7 @@ CAMLdeprecated_typedef(addr, char *);
 +   #define CAMLunused_start __attribute__ ((unused))
 +   #define CAMLunused_end
 +   #define CAMLunused __attribute__ ((unused))
@@ -10541,10 +10579,10 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6bc82838d9
+index 0000000000..af0e91349d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10485 @@
+@@ -0,0 +1,10494 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..09ca418618
@@ -14338,10 +14376,10 @@ index 0000000000..6bc82838d9
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..d2a1e96521
++index 0000000000..beacc9429c
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2816 @@
++@@ -0,0 +1,2854 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -16261,7 +16299,7 @@ index 0000000000..6bc82838d9
 ++     __pragma( warning (disable:4189 ) )
 ++   #define CAMLunused_end __pragma( warning (pop))
 ++diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-++index c605f8711e..b97d20c2bd 100644
+++index c605f8711e..3a31e4dd5b 100644
 ++--- a/runtime/caml/misc.h
 +++++ b/runtime/caml/misc.h
 ++@@ -18,9 +18,6 @@
@@ -16301,16 +16339,54 @@ index 0000000000..6bc82838d9
 ++ 
 ++ #define CAML_STRINGIFY(x) #x
 ++ #ifdef _MSC_VER
-++@@ -91,7 +89,7 @@ CAMLdeprecated_typedef(addr, char *);
-++   #define CAMLnoreturn_start
-++   #define CAMLnoreturn_end __attribute__ ((noreturn))
+++@@ -76,28 +74,30 @@ typedef size_t asize_t;
+++ CAMLdeprecated_typedef(addr, char *);
+++ #endif /* CAML_INTERNALS */
+++ 
+++-/* Noreturn is preserved for compatibility reasons.
+++-   Instead of the legacy GCC/Clang-only
+++-     foo Noreturn;
+++-   you should prefer
+++-     CAMLnoreturn_start foo CAMLnoreturn_end;
+++-   which supports both GCC/Clang and MSVC.
++++/* Noreturn, CAMLnoreturn_start and CAMLnoreturn_end are preserved
++++   for compatibility reasons.  Instead, we recommend using the CAMLnoret
++++   macro, to be added as a modifier at the beginning of the
++++   function definition or declaration.
+++ 
+++    Note: CAMLnoreturn is a different macro defined in memory.h,
+++-   to be used in function bodies rather than as a prototype attribute.
++++   to be used in function bodies rather than as a function attribute.
+++ */
++++#if __STDC_VERSION__ >= 202300L || __cplusplus >= 201103L
++++  #define CAMLnoret [[noreturn]]
++++#elif __STDC_VERSION__ >= 201112L
++++  #define CAMLnoret _Noreturn
++++#elif defined(__GNUC__)
++++  #define CAMLnoret  __attribute__ ((noreturn))
++++#else
++++  #define CAMLnoret
++++#endif
++++
++++#define CAMLnoreturn_start CAMLnoret
++++#define CAMLnoreturn_end
++++
+++ #ifdef __GNUC__
+++-  /* Works only in GCC 2.5 and later */
+++-  #define CAMLnoreturn_start
+++-  #define CAMLnoreturn_end __attribute__ ((noreturn))
 ++   #define Noreturn __attribute__ ((noreturn))
 ++-#elif defined(_MSC_VER) && _MSC_VER >= 1500
-+++#elif _MSC_VER >= 1500
-++   #define CAMLnoreturn_start __declspec(noreturn)
-++   #define CAMLnoreturn_end
+++-  #define CAMLnoreturn_start __declspec(noreturn)
+++-  #define CAMLnoreturn_end
+++-  #define Noreturn
+++ #else
+++-  #define CAMLnoreturn_start
+++-  #define CAMLnoreturn_end
 ++   #define Noreturn
-++@@ -139,12 +137,11 @@ CAMLdeprecated_typedef(addr, char *);
+++ #endif
+++ 
+++@@ -139,12 +139,11 @@ CAMLdeprecated_typedef(addr, char *);
 ++ /* we need to be able to compute the exact offset of each member. */
 ++ #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 ++ #define CAMLalign(n) _Alignas(n)
@@ -16325,7 +16401,7 @@ index 0000000000..6bc82838d9
 ++ #define CAMLalign(n) __declspec(align(n))
 ++ #else
 ++ #error "How do I align values on this platform?"
-++@@ -172,7 +169,7 @@ CAMLdeprecated_typedef(addr, char *);
+++@@ -172,7 +171,7 @@ CAMLdeprecated_typedef(addr, char *);
 ++   #define CAMLunused_start __attribute__ ((unused))
 ++   #define CAMLunused_end
 ++   #define CAMLunused __attribute__ ((unused))
@@ -21001,35 +21077,6 @@ index 0000000000..6bc82838d9
 ++ }
 ++ 
 ++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
