@@ -91,6 +91,20 @@ index 0abe7f1406..8fa8a7c19d 100644
  val frame_pointers : bool
  (** Whether frame-pointers have been enabled at configure time *)
  
+diff --git a/ocamltest/run_stubs.c b/ocamltest/run_stubs.c
+index 29fa27456f..01ef44a1b3 100644
+--- a/ocamltest/run_stubs.c
++++ b/ocamltest/run_stubs.c
+@@ -54,6 +54,9 @@ static void free_cstringvect(array v)
+   caml_stat_free(v);
+ }
+ 
++#define caml_channel_lock Lock
++#define caml_channel_unlock Unlock
++
+ static void logToChannel(void *voidchannel, const char *fmt, va_list ap)
+ {
+   struct channel *channel = (struct channel *) voidchannel;
 diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
 index 60a0e5f9df..efeb7fb8f0 100644
 --- a/ocamltest/run_unix.c
