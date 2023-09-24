@@ -213,8 +213,8 @@ AC_CANONICAL_TARGET
 # Systems that are known not to work, even in bytecode only.
 
 AS_CASE([$host],
-dnl   [*-pc-windows],
-dnl     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
+  [*-pc-windows],
+    [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
 dnl   [*-*-cygwin*],
 dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
   [i386-*-solaris*],
