@@ -20236,6 +20236,122 @@ index 19f712c108..71c54af549 100644
  run (fun () ->
    Printf.printf "Send 0\n";
    perform (Send 0);
+diff --git a/manual/src/tutorials/memorymodel.etex b/manual/src/tutorials/memorymodel.etex
+index a04c7bb29d..44d19fd4e1 100644
+--- a/manual/src/tutorials/memorymodel.etex
++++ b/manual/src/tutorials/memorymodel.etex
+@@ -25,7 +25,7 @@ can be explained through some interleaving of the operations from different
+ domains in the program. For example, consider the following program with two
+ domains "d1" and "d2" executing in parallel:
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ let d1 a b =
+   let r1 = !a * 2 in
+   let r2 = !b in
+@@ -52,7 +52,7 @@ of the operations from different domains.
+ 
+ Let us now assume that "a" and "b" are aliases of each other.
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ let d1 a b =
+   let r1 = !a * 2 in
+   let r2 = !b in
+@@ -83,7 +83,7 @@ Surprisingly, this assertion may fail in OCaml due to compiler optimisations.
+ The OCaml compiler observes the common sub-expression "!a * 2" in "d1" and
+ optimises the program to:
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ let d1 a b =
+   let r1 = !a * 2 in
+   let r2 = !b in
+@@ -138,7 +138,7 @@ location respect sequential consistency, the guarantees on programs that
+ operate on different memory locations are much weaker. Consider the following
+ program:
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ let a = ref 0
+ and b = ref 0
+ 
+@@ -660,7 +660,7 @@ B: 5,  [a -> t2; b -> t4; c -> t6]
+ 
+ Let us revisit an example from earlier (section \ref{s:why_relaxed_memory}).
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ let a = ref 0
+ and b = ref 0
+ 
+diff --git a/manual/src/tutorials/parallelism.etex b/manual/src/tutorials/parallelism.etex
+index 127335b8ab..5a0ac64701 100644
+--- a/manual/src/tutorials/parallelism.etex
++++ b/manual/src/tutorials/parallelism.etex
+@@ -27,7 +27,7 @@ Domains are the units of parallelism in OCaml. The module \stdmoduleref{Domain}
+ provides the primitives to create and manage domains. New domains can be
+ spawned using the "spawn" function.
+ 
+-\begin{caml_example}{verbatim}
++\begin{caml_example}{verbatim}[error]
+ Domain.spawn (fun _ -> print_endline "I ran in parallel")
+ \end{caml_example}
+ 
+@@ -90,7 +90,7 @@ Spawned domains can be joined using the "join" function to get their results.
+ The "join" function waits for target domain to terminate. The following program
+ computes the nth Fibonacci number twice in parallel.
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ (* fib_twice.ml *)
+ let n = int_of_string Sys.argv.(1)
+ 
+@@ -132,7 +132,7 @@ Let us attempt to parallelise the Fibonacci function. The two recursive calls
+ may be executed in parallel. However, naively parallelising the recursive calls
+ by spawning domains for each one will not work as it spawns too many domains.
+ 
+-\begin{caml_example}{verbatim}
++\begin{caml_example}{verbatim}[error]
+ (* fib_par1.ml *)
+ let n = try int_of_string Sys.argv.(1) with _ -> 1
+ 
+@@ -468,7 +468,7 @@ rest of this chapter, we shall call the threads created by the threads library
+ as \emph{systhreads}. The following program implements a concurrent stack using
+ mutex and condition variables.
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ module Blocking_stack : sig
+   type 'a t
+   val make : unit -> 'a t
+@@ -605,7 +605,7 @@ often compiled to atomic read-modify-write primitives that the hardware
+ provides. As an example, the following program increments a non-atomic counter
+ and an atomic counter in parallel.
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ (* incr.ml *)
+ let twice_in_parallel f =
+   let d1 = Domain.spawn f in
+@@ -662,7 +662,7 @@ The atomic variables can be used for low-level synchronisation between the
+ domains. The following example uses an atomic variable to exchange a message
+ between two domains.
+ 
+-\begin{caml_example}{verbatim}
++\begin{caml_example}{verbatim}[error]
+ let r = Atomic.make None
+ 
+ let sender () = Atomic.set r (Some "Hello")
+@@ -689,7 +689,7 @@ race since "r" is an atomic reference.
+ The Atomic module is used to implement non-blocking, lock-free data structures.
+ The following program implements a lock-free stack.
+ 
+-\begin{caml_example*}{verbatim}
++\begin{caml_example*}{verbatim}[error]
+ module Lockfree_stack : sig
+   type 'a t
+   val make : unit -> 'a t
 diff --git a/otherlibs/dynlink/byte/dynlink.ml b/otherlibs/dynlink/byte/dynlink.ml
 index 70ead03193..e0f77d8579 100644
 --- a/otherlibs/dynlink/byte/dynlink.ml
