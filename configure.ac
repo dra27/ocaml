@@ -1131,7 +1131,6 @@ AS_CASE([$host],
     [arch=amd64; system=mingw64],
   [aarch64-*-linux*],
     [arch=arm64; system=linux],
-<<<<<<< HEAD
   [aarch64-*-freebsd*],
     [arch=arm64; system=freebsd],
   [aarch64-*-openbsd*],
@@ -1140,25 +1139,6 @@ AS_CASE([$host],
     [arch=amd64; system=cygwin],
   [riscv64-*-linux*],
     [arch=riscv; model=riscv64; system=linux]
-||||||| parent of 59d91bae6e (Merge pull request PR#11092 from madroach/OpenBSD_aarch64)
-dnl [aarch64-*-freebsd*],
-dnl   [arch=arm64; system=freebsd],
-dnl [aarch64-*-openbsd*],
-dnl   [arch=arm64; system=openbsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
-=======
-dnl [aarch64-*-freebsd*],
-dnl   [arch=arm64; system=freebsd],
-  [aarch64-*-openbsd*],
-    [arch=arm64; system=openbsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
->>>>>>> 59d91bae6e (Merge pull request PR#11092 from madroach/OpenBSD_aarch64)
 )
 
 AS_CASE([$enable_native_compiler,$arch],
