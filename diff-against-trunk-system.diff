@@ -954,7 +954,7 @@ index 49b4e61640..f0afd9e4b8 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 644f7e1b83..0c0a657109 100755
+index 644f7e1b83..0f31958850 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
 index 9471acb6b1..5a0be25e5e 100755
@@ -11230,7 +11230,7 @@ index 0000000000..98cbc51883
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..da57e13b75
+index 0000000000..501cb20902
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,11212 @@
@@ -12190,7 +12190,7 @@ index 0000000000..da57e13b75
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 644f7e1b83..0c0a657109 100755
++index 644f7e1b83..0f31958850 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
 +index 9471acb6b1..5a0be25e5e 100755
