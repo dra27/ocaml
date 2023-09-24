@@ -26,7 +26,9 @@
 #include <caml/fail.h>
 #include <caml/signals.h>
 #include <caml/osdeps.h>
+/* BACKPORT
 #include <caml/platform.h>
+*/
 #include "unixsupport.h"
 
 #ifndef SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
