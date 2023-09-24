@@ -1778,6 +1778,22 @@ index 75b97818c1..3b2d537ac4 100644
  #define NO_ARG Val_int(0)
  
  CAMLnoreturn_start
+diff --git a/runtime/caml/winsupport.h b/runtime/caml/winsupport.h
+index 6851457e29..2978195337 100644
+--- a/runtime/caml/winsupport.h
++++ b/runtime/caml/winsupport.h
+@@ -60,6 +60,11 @@ typedef struct _REPARSE_DATA_BUFFER
+ } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+ #endif
+ 
++typedef union {
++  FILETIME ft;
++  ULONGLONG ul;
++} CAML_ULONGLONG_FILETIME;
++
+ #endif
+ 
+ #endif /* CAML_WINSUPPORT_H */
 diff --git a/runtime/debugger.c b/runtime/debugger.c
 index 97d22832a0..c10c7d0f8f 100644
 --- a/runtime/debugger.c

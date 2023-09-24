@@ -3678,10 +3678,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..c43abc17a9
+index 0000000000..5f898b6b8d
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2449 @@
+@@ -0,0 +1,2465 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -5462,6 +5462,22 @@ index 0000000000..c43abc17a9
 + #define NO_ARG Val_int(0)
 + 
 + CAMLnoreturn_start
++diff --git a/runtime/caml/winsupport.h b/runtime/caml/winsupport.h
++index 6851457e29..2978195337 100644
++--- a/runtime/caml/winsupport.h
+++++ b/runtime/caml/winsupport.h
++@@ -60,6 +60,11 @@ typedef struct _REPARSE_DATA_BUFFER
++ } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
++ #endif
++ 
+++typedef union {
+++  FILETIME ft;
+++  ULONGLONG ul;
+++} CAML_ULONGLONG_FILETIME;
+++
++ #endif
++ 
++ #endif /* CAML_WINSUPPORT_H */
 +diff --git a/runtime/debugger.c b/runtime/debugger.c
 +index 97d22832a0..c10c7d0f8f 100644
 +--- a/runtime/debugger.c
@@ -9991,10 +10007,10 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9b0fbe27ae
+index 0000000000..d8dfae8900
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9876 @@
+@@ -0,0 +1,9999 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..09306495ae
@@ -13675,10 +13691,10 @@ index 0000000000..9b0fbe27ae
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..c43abc17a9
++index 0000000000..5f898b6b8d
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2449 @@
++@@ -0,0 +1,2465 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -15459,6 +15475,22 @@ index 0000000000..9b0fbe27ae
 ++ #define NO_ARG Val_int(0)
 ++ 
 ++ CAMLnoreturn_start
+++diff --git a/runtime/caml/winsupport.h b/runtime/caml/winsupport.h
+++index 6851457e29..2978195337 100644
+++--- a/runtime/caml/winsupport.h
++++++ b/runtime/caml/winsupport.h
+++@@ -60,6 +60,11 @@ typedef struct _REPARSE_DATA_BUFFER
+++ } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+++ #endif
+++ 
++++typedef union {
++++  FILETIME ft;
++++  ULONGLONG ul;
++++} CAML_ULONGLONG_FILETIME;
++++
+++ #endif
+++ 
+++ #endif /* CAML_WINSUPPORT_H */
 ++diff --git a/runtime/debugger.c b/runtime/debugger.c
 ++index 97d22832a0..c10c7d0f8f 100644
 ++--- a/runtime/debugger.c
@@ -19870,7 +19902,114 @@ index 0000000000..9b0fbe27ae
 +++ *)
 ++ 
 ++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index cdeaf1b674..832812925d 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -152,10 +152,13 @@ case "$1" in
+++     run "test $PORT" \
+++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+++-    if [[ $PORT = 'msvc64' ]] ; then
++++    if [[ $PORT = 'mingw64' ]] ; then
+++       run "$MAKE check_all_arches" \
+++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+++       cd "$FULL_BUILD_PREFIX-$PORT"
++++
++++      git config --global safe.directory '*'
++++
+++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
+++       # or altered files exist. We revert the change from the bootstrap (that
+++       # would have failed the build earlier if necessary)
+++@@ -175,7 +17
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
