@@ -3313,10 +3313,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 84269da187..ad6cafcc0e 100755
+index 84269da187..4820f75e4e 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 62838e07e6..963603e1f7 100644
+index 62838e07e6..d9cf097556 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3402,6 +3402,118 @@ index 62838e07e6..963603e1f7 100644
  
  # Support for C11 atomic types
  
+@@ -1196,66 +1208,66 @@ system=unknown
+ has_native_backend=no
+ AS_CASE([$host],
+   [[i[3456]86-*-linux*]],
+-    [arch=i386; system=linux_elf],
++    [has_native_backend=yes; arch=i386; system=linux_elf],
+   [[i[3456]86-*-*bsd*]],
+-    [arch=i386; system=bsd_elf],
++    [has_native_backend=yes; arch=i386; system=bsd_elf],
+   [[i[3456]86-*-haiku*]],
+-    [arch=i386; system=beos],
++    [has_native_backend=yes; arch=i386; system=beos],
+   [[i[3456]86-*-cygwin]],
+-    [arch=i386; system=cygwin],
++    [has_native_backend=yes; arch=i386; system=cygwin],
+   [[i[3456]86-*-gnu*]],
+-    [arch=i386; system=gnu],
++    [has_native_backend=yes; arch=i386; system=gnu],
+   [[i[3456]86-*-mingw32]],
+-    [arch=i386; system=mingw],
++    [has_native_backend=yes; arch=i386; system=mingw],
+   [i686-pc-windows],
+     [arch=i386; system=win32],
+   [x86_64-pc-windows],
+     [arch=amd64; system=win64],
+   [[powerpc64le*-*-linux*]],
+-    [arch=power; model=ppc64le; system=elf],
++    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+   [[powerpc*-*-linux*]],
+-    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++    [has_native_backend=yes; arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+   [[s390x*-*-linux*]],
+-    [arch=s390x; model=z10; system=elf],
++    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
+   # expected to match "gnueabihf" as well as "musleabihf"
+   [armv6*-*-linux-*eabihf],
+-    [arch=arm; model=armv6; system=linux_eabihf],
++    [has_native_backend=yes; arch=arm; model=armv6; system=linux_eabihf],
+   [armv7*-*-linux-*eabihf],
+-    [arch=arm; model=armv7; system=linux_eabihf],
++    [has_native_backend=yes; arch=arm; model=armv7; system=linux_eabihf],
+   [armv8*-*-linux-*eabihf],
+-    [arch=arm; model=armv8; system=linux_eabihf],
++    [has_native_backend=yes; arch=arm; model=armv8; system=linux_eabihf],
+   [armv8*-*-linux-*eabi],
+-    [arch=arm; model=armv8; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; model=armv8; system=linux_eabi],
+   [armv7*-*-linux-*eabi],
+-    [arch=arm; model=armv7; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; model=armv7; system=linux_eabi],
+   [armv6t2*-*-linux-*eabi],
+-    [arch=arm; model=armv6t2; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; model=armv6t2; system=linux_eabi],
+   [armv6*-*-linux-*eabi],
+-    [arch=arm; model=armv6; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; model=armv6; system=linux_eabi],
+   [armv6*-*-freebsd*],
+-    [arch=arm; model=armv6; system=freebsd],
++    [has_native_backend=yes; arch=arm; model=armv6; system=freebsd],
+   [earmv6*-*-netbsd*],
+-    [arch=arm; model=armv6; system=netbsd],
++    [has_native_backend=yes; arch=arm; model=armv6; system=netbsd],
+   [earmv7*-*-netbsd*],
+-    [arch=arm; model=armv7; system=netbsd],
++    [has_native_backend=yes; arch=arm; model=armv7; system=netbsd],
+   [armv5te*-*-linux-*eabi],
+-    [arch=arm; model=armv5te; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; model=armv5te; system=linux_eabi],
+   [armv5*-*-linux-*eabi],
+-    [arch=arm; model=armv5; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; model=armv5; system=linux_eabi],
+   [arm*-*-linux-*eabihf],
+-    [arch=arm; system=linux_eabihf],
++    [has_native_backend=yes; arch=arm; system=linux_eabihf],
+   [arm*-*-linux-*eabi],
+-    [arch=arm; system=linux_eabi],
++    [has_native_backend=yes; arch=arm; system=linux_eabi],
+   [arm*-*-openbsd*],
+-    [arch=arm; system=bsd],
++    [has_native_backend=yes; arch=arm; system=bsd],
+   [zaurus*-*-openbsd*],
+-    [arch=arm; system=bsd],
++    [has_native_backend=yes; arch=arm; system=bsd],
+   [x86_64-*-linux*],
+     [has_native_backend=yes; arch=amd64; system=linux],
+   [x86_64-*-gnu*],
+-    [arch=amd64; system=gnu],
++    [has_native_backend=yes; arch=amd64; system=gnu],
+   [x86_64-*-dragonfly*],
+-    [arch=amd64; system=dragonfly],
++    [has_native_backend=yes; arch=amd64; system=dragonfly],
+   [x86_64-*-solaris*],
+     [has_native_backend=yes; arch=amd64; system=solaris],
+   [x86_64-*-freebsd*],
+@@ -1265,7 +1277,7 @@ AS_CASE([$host],
+   [x86_64-*-openbsd*],
+     [has_native_backend=yes; arch=amd64; system=openbsd],
+   [x86_64-*-haiku*],
+-    [arch=amd64; system=beos],
++    [has_native_backend=yes; arch=amd64; system=beos],
+   [arm64-*-darwin*],
+     [has_native_backend=yes; arch=arm64; system=macosx],
+   [aarch64-*-darwin*],
+@@ -1283,7 +1295,7 @@ AS_CASE([$host],
+   [aarch64-*-netbsd*],
+     [has_native_backend=yes; arch=arm64; system=netbsd],
+   [x86_64-*-cygwin*],
+-    [arch=amd64; system=cygwin],
++    [has_native_backend=yes; arch=amd64; system=cygwin],
+   [riscv64-*-linux*],
+     [arch=riscv; model=riscv64; system=linux]
+ )
 @@ -1981,11 +1993,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
@@ -10052,10 +10164,10 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e9b94261ea
+index 0000000000..872040455e
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10022 @@
+@@ -0,0 +1,10113 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..93250feb8b
@@ -13371,10 +13483,10 @@ index 0000000000..e9b94261ea
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 84269da187..ad6cafcc0e 100755
++index 84269da187..4820f75e4e 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 62838e07e6..963603e1f7 100644
++index 62838e07e6..d9cf097556 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -211,6 +211,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13460,6 +13572,118 @@ index 0000000000..e9b94261ea
 + 
 + # Support for C11 atomic types
 + 
++@@ -1196,66 +1208,66 @@ system=unknown
++ has_native_backend=no
++ AS_CASE([$host],
++   [[i[3456]86-*-linux*]],
++-    [arch=i386; system=linux_elf],
+++    [has_native_backend=yes; arch=i386; system=linux_elf],
++   [[i[3456]86-*-*bsd*]],
++-    [arch=i386; system=bsd_elf],
+++    [has_native_backend=yes; arch=i386; system=bsd_elf],
++   [[i[3456]86-*-haiku*]],
++-    [arch=i386; system=beos],
+++    [has_native_backend=yes; arch=i386; system=beos],
++   [[i[3456]86-*-cygwin]],
++-    [arch=i386; system=cygwin],
+++    [has_native_backend=yes; arch=i386; system=cygwin],
++   [[i[3456]86-*-gnu*]],
++-    [arch=i386; system=gnu],
+++    [has_native_backend=yes; arch=i386; system=gnu],
++   [[i[3456]86-*-mingw32]],
++-    [arch=i386; system=mingw],
+++    [has_native_backend=yes; arch=i386; system=mingw],
++   [i686-pc-windows],
++     [arch=i386; system=win32],
++   [x86_64-pc-windows],
++     [arch=amd64; system=win64],
++   [[powerpc64le*-*-linux*]],
++-    [arch=power; model=ppc64le; system=elf],
+++    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
++   [[powerpc*-*-linux*]],
++-    [arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
+++    [has_native_backend=yes; arch=power; AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
++   [[s390x*-*-linux*]],
++-    [arch=s390x; model=z10; system=elf],
+++    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
++   # expected to match "gnueabihf" as well as "musleabihf"
++   [armv6*-*-linux-*eabihf],
++-    [arch=arm; model=armv6; system=linux_eabihf],
+++    [has_native_backend=yes; arch=arm; model=armv6; system=linux_eabihf],
++   [armv7*-*-linux-*eabihf],
++-    [arch=arm; model=armv7; system=linux_eabihf],
+++    [has_native_backend=yes; arch=arm; model=armv7; system=linux_eabihf],
++   [armv8*-*-linux-*eabihf],
++-    [arch=arm; model=armv8; system=linux_eabihf],
+++    [has_native_backend=yes; arch=arm; model=armv8; system=linux_eabihf],
++   [armv8*-*-linux-*eabi],
++-    [arch=arm; model=armv8; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; model=armv8; system=linux_eabi],
++   [armv7*-*-linux-*eabi],
++-    [arch=arm; model=armv7; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; model=armv7; system=linux_eabi],
++   [armv6t2*-*-linux-*eabi],
++-    [arch=arm; model=armv6t2; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; model=armv6t2; system=linux_eabi],
++   [armv6*-*-linux-*eabi],
++-    [arch=arm; model=armv6; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; model=armv6; system=linux_eabi],
++   [armv6*-*-freebsd*],
++-    [arch=arm; model=armv6; system=freebsd],
+++    [has_native_backend=yes; arch=arm; model=armv6; system=freebsd],
++   [earmv6*-*-netbsd*],
++-    [arch=arm; model=armv6; system=netbsd],
+++    [has_native_backend=yes; arch=arm; model=armv6; system=netbsd],
++   [earmv7*-*-netbsd*],
++-    [arch=arm; model=armv7; system=netbsd],
+++    [has_native_backend=yes; arch=arm; model=armv7; system=netbsd],
++   [armv5te*-*-linux-*eabi],
++-    [arch=arm; model=armv5te; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; model=armv5te; system=linux_eabi],
++   [armv5*-*-linux-*eabi],
++-    [arch=arm; model=armv5; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; model=armv5; system=linux_eabi],
++   [arm*-*-linux-*eabihf],
++-    [arch=arm; system=linux_eabihf],
+++    [has_native_backend=yes; arch=arm; system=linux_eabihf],
++   [arm*-*-linux-*eabi],
++-    [arch=arm; system=linux_eabi],
+++    [has_native_backend=yes; arch=arm; system=linux_eabi],
++   [arm*-*-openbsd*],
++-    [arch=arm; system=bsd],
+++    [has_native_backend=yes; arch=arm; system=bsd],
++   [zaurus*-*-openbsd*],
++-    [arch=arm; system=bsd],
+++    [has_native_backend=yes; arch=arm; system=bsd],
++   [x86_64-*-linux*],
++     [has_native_backend=yes; arch=amd64; system=linux],
++   [x86_64-*-gnu*],
++-    [arch=amd64; system=gnu],
+++    [has_native_backend=yes; arch=amd64; system=gnu],
++   [x86_64-*-dragonfly*],
++-    [arch=amd64; system=dragonfly],
+++    [has_native_backend=yes; arch=amd64; system=dragonfly],
++   [x86_64-*-solaris*],
++     [has_native_backend=yes; arch=amd64; system=solaris],
++   [x86_64-*-freebsd*],
++@@ -1265,7 +1277,7 @@ AS_CASE([$host],
++   [x86_64-*-openbsd*],
++     [has_native_backend=yes; arch=amd64; system=openbsd],
++   [x86_64-*-haiku*],
++-    [arch=amd64; system=beos],
+++    [has_native_backend=yes; arch=amd64; system=beos],
++   [arm64-*-darwin*],
++     [has_native_backend=yes; arch=arm64; system=macosx],
++   [aarch64-*-darwin*],
++@@ -1283,7 +1295,7 @@ AS_CASE([$host],
++   [aarch64-*-netbsd*],
++     [has_native_backend=yes; arch=arm64; system=netbsd],
++   [x86_64-*-cygwin*],
++-    [arch=amd64; system=cygwin],
+++    [has_native_backend=yes; arch=amd64; system=cygwin],
++   [riscv64-*-linux*],
++     [arch=riscv; model=riscv64; system=linux]
++ )
 +@@ -1981,11 +1993,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
@@ -20057,28 +20281,6 @@ index 0000000000..e9b94261ea
 ++-    ./configure $configure_flags
 ++-    ;;
 ++-  i386)
-++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
-++-      $configure_flags
-++-    ;;
-++-  *)
-++-    echo unknown arch
-++-    exit 1
-++-    ;;
-++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index cdeaf1b674..832812925d 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-gen
-\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
 --- a/lambda/matching.ml
