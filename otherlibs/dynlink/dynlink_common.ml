@@ -31,6 +31,15 @@ module String = struct
   end
 end
 
+(* BACKPORT BEGIN *)
+module Mutex = struct
+  type t = unit
+  let create () = ()
+  let lock () = ()
+  let unlock () = ()
+end
+(* BACKPORT END *)
+
 module Make (P : Dynlink_platform_intf.S) = struct
   module DT = Dynlink_types
   module UH = P.Unit_header

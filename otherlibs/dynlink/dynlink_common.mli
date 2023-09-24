@@ -33,3 +33,12 @@ module Make (_ : Dynlink_platform_intf.S) : sig
   val all_units : unit -> string list
   val allow_unsafe_modules : bool -> unit
 end
+
+(* BACKPORT BEGIN *)
+module Mutex : sig
+  type t = unit
+  val create : unit -> t
+  val lock : t -> unit
+  val unlock : t -> unit
+end
+(* BACKPORT END *)
