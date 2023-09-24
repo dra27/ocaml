@@ -25,6 +25,8 @@
 #include <winioctl.h>
 #include <caml/winsupport.h>
 
+#define caml_win32_wide_char_to_multi_byte win_wide_char_to_multi_byte
+
 CAMLprim value caml_unix_readlink(value opath)
 {
   CAMLparam1(opath);

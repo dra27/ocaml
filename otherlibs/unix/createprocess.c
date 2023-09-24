@@ -99,6 +99,8 @@ static DWORD do_create_process_native(wchar_t * exefile, wchar_t * cmdline,
   return err;
 }
 
+#define caml_win32_multi_byte_to_wide_char win_multi_byte_to_wide_char
+
 value caml_unix_create_process_native(value cmd, value cmdline, value env,
                                  value fd1, value fd2, value fd3)
 {
