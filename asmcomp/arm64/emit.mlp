@@ -833,15 +833,10 @@ let emit_instr env i =
             `	str	s7, {emit_addressing addr base}\n`;
         | Word_int | Word_val ->
             (* memory model barrier for non-initializing store *)
-<<<<<<< HEAD
 (*
             if assignment then ` dmb ishld\n`;
-*)
-||||||| parent of 753fcc3943 (Tab align arm64 emit (PR#11852))
-            if assignment then ` dmb ishld\n`;
-=======
             if assignment then `	dmb	ishld\n`;
->>>>>>> 753fcc3943 (Tab align arm64 emit (PR#11852))
+*)
             `	str	{emit_reg src}, {emit_addressing addr base}\n`
         | Double ->
             `	str	{emit_reg src}, {emit_addressing addr base}\n`
@@ -969,14 +964,8 @@ let emit_instr env i =
         assert false
 (*
         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
-<<<<<<< HEAD
-        ` ldr {emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
-*)
-||||||| parent of 753fcc3943 (Tab align arm64 emit (PR#11852))
-        ` ldr {emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
-=======
         `	ldr	{emit_reg i.res.(0)}, [{emit_reg reg_domain_state_ptr}, {emit_int offset}]\n`
->>>>>>> 753fcc3943 (Tab align arm64 emit (PR#11852))
+*)
     | Lreloadretaddr ->
         ()
     | Lreturn ->
