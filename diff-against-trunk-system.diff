@@ -23,7 +23,7 @@ index d9d76e3115..ca456ac135 100644
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
 diff --git a/boot/ocamlc b/boot/ocamlc
-index b65bd9a15c..8c8de4d96c 100755
+index b65bd9a15c..6590409c5d 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
 index b6efefde1b..f7298c9f3b 100755
