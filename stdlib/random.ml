@@ -215,15 +215,9 @@ let mk_default () = {
   State.idx = 0;
 }
 
-<<<<<<< HEAD
 (*
-let random_key = Domain.DLS.new_key mk_default
-||||||| parent of 6839b3c856 (Merge pull request PR#10887 from gasche/multicore-random)
-let random_key = Domain.DLS.new_key mk_default
-=======
 let random_key =
   Domain.DLS.new_key ~split_from_parent:State.split mk_default
->>>>>>> 6839b3c856 (Merge pull request PR#10887 from gasche/multicore-random)
 
 let bits () = State.bits (Domain.DLS.get random_key)
 let int bound = State.int (Domain.DLS.get random_key) bound
