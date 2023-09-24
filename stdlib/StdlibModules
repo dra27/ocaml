@@ -45,13 +45,7 @@ STDLIB_MODULE_BASENAMES = \
   printexc fun gc digest random hashtbl weak \
   format scanf callback camlinternalOO oo camlinternalMod genlex ephemeron \
   filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
-<<<<<<< HEAD
   stdLabels bigarray in_channel out_channel
-||||||| parent of b1cf9cd99d (Rename EffectHandlers module to Effect (PR#10879))
-  stdLabels bigarray in_channel out_channel effectHandlers
-=======
-  stdLabels bigarray in_channel out_channel effect
->>>>>>> b1cf9cd99d (Rename EffectHandlers module to Effect (PR#10879))
 
 STDLIB_PREFIXED_MODULES = \
   $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))

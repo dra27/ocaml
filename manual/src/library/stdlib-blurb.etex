@@ -133,13 +133,7 @@ be called from C \\
 %\stddocitem{Condition}{condition variables to synchronize between threads}
 %\stddocitem{Domain}{Domain spawn/join and domain local variables}
 \stddocitem{Digest}{MD5 message digest}
-<<<<<<< HEAD
-%\stddocitem{EffectHandlers}{deep and shallow effect handlers}
-||||||| parent of b1cf9cd99d (Rename EffectHandlers module to Effect (PR#10879))
-\stddocitem{EffectHandlers}{deep and shallow effect handlers}
-=======
-\stddocitem{Effect}{deep and shallow effect handlers}
->>>>>>> b1cf9cd99d (Rename EffectHandlers module to Effect (PR#10879))
+%\stddocitem{Effect}{deep and shallow effect handlers}
 \stddocitem{Either}{either values}
 \stddocitem{Ephemeron}{Ephemerons and weak hash table}
 \stddocitem{Filename}{operations on file names}

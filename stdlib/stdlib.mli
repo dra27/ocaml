@@ -1382,14 +1382,8 @@ module Condition      = Condition
 module Digest         = Digest
 (*
 module Domain         = Domain
-<<<<<<< HEAD
-module EffectHandlers = EffectHandlers
-*)
-||||||| parent of b1cf9cd99d (Rename EffectHandlers module to Effect (PR#10879))
-module EffectHandlers = EffectHandlers
-=======
 module Effect         = Effect
->>>>>>> b1cf9cd99d (Rename EffectHandlers module to Effect (PR#10879))
+*)
 module Either         = Either
 module Ephemeron      = Ephemeron
 module Filename       = Filename
