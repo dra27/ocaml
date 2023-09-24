@@ -283,22 +283,36 @@ int code_of_unix_error (value error)
   }
 }
 
+/* BACKPORT BEGIN
 static const value * _Atomic unix_error_exn = NULL;
+*/
+static const value * unix_error_exn = NULL;
+/* BACKPORT END */
 
 void unix_error(int errcode, const char *cmdname, value cmdarg)
 {
   CAMLparam0();
   CAMLlocal3(name, err, arg);
   value res;
+/* BACKPORT BEGIN
   const value * exn;
+*/
+  const value * exn = unix_error_exn;
+/* BACKPORT END */
 
+/* BACKPORT
   exn = atomic_load_explicit(&unix_error_exn, memory_order_acquire);
+*/
   if (exn == NULL) {
     exn = caml_named_value("Unix.Unix_error");
     if (exn == NULL)
       caml_invalid_argument("Exception Unix.Unix_error not initialized,"
                             " please link unix.cma");
+/* BACKPORT BEGIN
     atomic_store(&unix_error_exn, exn);
+*/
+    unix_error_exn = exn;
+/* BACKPORT END */
   }
   arg = cmdarg == Nothing ? caml_copy_string("") : cmdarg;
   name = caml_copy_string(cmdname);
