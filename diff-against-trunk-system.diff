@@ -1306,10 +1306,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..9cebc7b422
+index 0000000000..79b2f0267d
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2253 @@
+@@ -0,0 +1,2323 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -3476,7 +3476,7 @@ index 0000000000..9cebc7b422
 ++#endif
 + }
 +diff --git a/runtime/sys.c b/runtime/sys.c
-+index a77fd9d1cf..f90d9ba2a8 100644
++index a77fd9d1cf..9508d3f903 100644
 +--- a/runtime/sys.c
 ++++ b/runtime/sys.c
 +@@ -45,6 +45,9 @@
@@ -3525,7 +3525,77 @@ index 0000000000..9cebc7b422
 +   if (arg == NO_ARG) {
 +     str = caml_copy_string(err);
 +   } else {
-+@@ -565,20 +581,27 @@ extern int caml_win32_random_seed (intnat data[16]);
++@@ -236,7 +252,7 @@ CAMLprim value caml_sys_close(value fd_v)
++   return Val_unit;
++ }
++ 
++-CAMLprim value caml_sys_file_exists(value name)
+++static int caml_sys_file_mode(value name)
++ {
++ #ifdef _WIN32
++   struct _stati64 st;
++@@ -246,39 +262,42 @@ CAMLprim value caml_sys_file_exists(value name)
++   char_os * p;
++   int ret;
++ 
++-  if (! caml_string_is_c_safe(name)) return Val_false;
+++  if (! caml_string_is_c_safe(name)) { errno = ENOENT; return -1; }
++   p = caml_stat_strdup_to_os(String_val(name));
++   caml_enter_blocking_section();
++   ret = stat_os(p, &st);
++   caml_leave_blocking_section();
++   caml_stat_free(p);
+++  if (ret == -1) return -1; else return st.st_mode;
+++}
++ 
++-  return Val_bool(ret == 0);
+++CAMLprim value caml_sys_file_exists(value name)
+++{
+++  int mode = caml_sys_file_mode(name);
+++  return (Val_bool(mode != -1));
++ }
++ 
++ CAMLprim value caml_sys_is_directory(value name)
++ {
++   CAMLparam1(name);
++-#ifdef _WIN32
++-  struct _stati64 st;
+++  int mode = caml_sys_file_mode(name);
+++  if (mode == -1) caml_sys_error(name);
+++#ifdef S_ISDIR
+++  CAMLreturn(Val_bool(S_ISDIR(mode)));
++ #else
++-  struct stat st;
+++  CAMLreturn(Val_bool(mode & S_IFDIR));
++ #endif
++-  char_os * p;
++-  int ret;
++-
++-  caml_sys_check_path(name);
++-  p = caml_stat_strdup_to_os(String_val(name));
++-  caml_enter_blocking_section();
++-  ret = stat_os(p, &st);
++-  caml_leave_blocking_section();
++-  caml_stat_free(p);
+++}
++ 
++-  if (ret == -1) caml_sys_error(name);
++-#ifdef S_ISDIR
++-  CAMLreturn(Val_bool(S_ISDIR(st.st_mode)));
+++CAMLprim value caml_sys_is_regular_file(value name)
+++{
+++  CAMLparam1(name);
+++  int mode = caml_sys_file_mode(name);
+++  if (mode == -1) caml_sys_error(name);
+++#ifdef S_ISREG
+++  CAMLreturn(Val_bool(S_ISREG(mode)));
++ #else
++-  CAMLreturn(Val_bool(st.st_mode & S_IFDIR));
+++  CAMLreturn(Val_bool(mode & S_IFREG));
++ #endif
++ }
++ 
++@@ -565,20 +584,27 @@ extern int caml_win32_random_seed (intnat data[16]);
 + #else
 + int caml_unix_random_seed(intnat data[16])
 + {
@@ -7168,10 +7238,10 @@ index 0000000000..b3cd4f7fb6
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..61ac1b5eae
+index 0000000000..e0124d5c69
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7061 @@
+@@ -0,0 +1,7188 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -8480,10 +8550,10 @@ index 0000000000..61ac1b5eae
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..9cebc7b422
++index 0000000000..79b2f0267d
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2253 @@
++@@ -0,0 +1,2323 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -10650,7 +10720,7 @@ index 0000000000..61ac1b5eae
 +++#endif
 ++ }
 ++diff --git a/runtime/sys.c b/runtime/sys.c
-++index a77fd9d1cf..f90d9ba2a8 100644
+++index a77fd9d1cf..9508d3f903 100644
 ++--- a/runtime/sys.c
 +++++ b/runtime/sys.c
 ++@@ -45,6 +45,9 @@
@@ -10699,7 +10769,77 @@ index 0000000000..61ac1b5eae
 ++   if (arg == NO_ARG) {
 ++     str = caml_copy_string(err);
 ++   } else {
-++@@ -565,20 +581,27 @@ extern int caml_win32_random_seed (intnat data[16]);
+++@@ -236,7 +252,7 @@ CAMLprim value caml_sys_close(value fd_v)
+++   return Val_unit;
+++ }
+++ 
+++-CAMLprim value caml_sys_file_exists(value name)
++++static int caml_sys_file_mode(value name)
+++ {
+++ #ifdef _WIN32
+++   struct _stati64 st;
+++@@ -246,39 +262,42 @@ CAMLprim value caml_sys_file_exists(value name)
+++   char_os * p;
+++   int ret;
+++ 
+++-  if (! caml_string_is_c_safe(name)) return Val_false;
++++  if (! caml_string_is_c_safe(name)) { errno = ENOENT; return -1; }
+++   p = caml_stat_strdup_to_os(String_val(name));
+++   caml_enter_blocking_section();
+++   ret = stat_os(p, &st);
+++   caml_leave_blocking_section();
+++   caml_stat_free(p);
++++  if (ret == -1) return -1; else return st.st_mode;
++++}
+++ 
+++-  return Val_bool(ret == 0);
++++CAMLprim value caml_sys_file_exists(value name)
++++{
++++  int mode = caml_sys_file_mode(name);
++++  return (Val_bool(mode != -1));
+++ }
+++ 
+++ CAMLprim value caml_sys_is_directory(value name)
+++ {
+++   CAMLparam1(name);
+++-#ifdef _WIN32
+++-  struct _stati64 st;
++++  int mode = caml_sys_file_mode(name);
++++  if (mode == -1) caml_sys_error(name);
++++#ifdef S_ISDIR
++++  CAMLreturn(Val_bool(S_ISDIR(mode)));
+++ #else
+++-  struct stat st;
++++  CAMLreturn(Val_bool(mode & S_IFDIR));
+++ #endif
+++-  char_os * p;
+++-  int ret;
+++-
+++-  caml_sys_check_path(name);
+++-  p = caml_stat_strdup_to_os(String_val(name));
+++-  caml_enter_blocking_section();
+++-  ret = stat_os(p, &st);
+++-  caml_leave_blocking_section();
+++-  caml_stat_free(p);
++++}
+++ 
+++-  if (ret == -1) caml_sys_error(name);
+++-#ifdef S_ISDIR
+++-  CAMLreturn(Val_bool(S_ISDIR(st.st_mode)));
++++CAMLprim value caml_sys_is_regular_file(value name)
++++{
++++  CAMLparam1(name);
++++  int mode = caml_sys_file_mode(name);
++++  if (mode == -1) caml_sys_error(name);
++++#ifdef S_ISREG
++++  CAMLreturn(Val_bool(S_ISREG(mode)));
+++ #else
+++-  CAMLreturn(Val_bool(st.st_mode & S_IFDIR));
++++  CAMLreturn(Val_bool(mode & S_IFREG));
+++ #endif
+++ }
+++ 
+++@@ -565,20 +584,27 @@ extern int caml_win32_random_seed (intnat data[16]);
 ++ #else
 ++ int caml_unix_random_seed(intnat data[16])
 ++ {
@@ -14232,7 +14372,64 @@ index 0000000000..61ac1b5eae
 ++@@ -12,7 +10,7 @@ let _ =
 ++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 ++                 { null_tracker with alloc_minor = fun _ ->
-++                     
+++                       if Thread.id (Thread.self ()) <> main_thread then
+++-                        Thread.exit ();
++++                        raise Thread.Exit;
+++                       None });
+++   let t = Thread.create (fun () ->
+++       ignore (Sys.opaque_identity (ref 1));
+++@@ -21,6 +19,8 @@ let _ =
+++   Thread.join t;
+++   Gc.Memprof.stop ()
+++ 
++++[@@@ocaml.alert "-deprecated"]
++++
+++ let _ =
+++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
+++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 4948e3e7e8..6a922581a0 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/285 by t/290
++++Error: Illegal shadowing of included type t/280 by t/285
+++        Line 2, characters 2-19:
+++-         Type t/285 came from this include
++++         Type t/280 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/285 is shadowed
++++         The value print has no valid type if t/280 is shadowed
+++ |}]
+++ 
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index e3cab0e83e..26b5878c7a 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
+++ 
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
