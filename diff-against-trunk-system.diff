@@ -13506,10 +13506,10 @@ index ac8b7a8bee..2fd6aa2bf4 100644
  val force_gen : only_val:bool -> 'a lazy_t -> 'a
 +*)
 diff --git a/stdlib/filename.ml b/stdlib/filename.ml
-index 6b3aeade39..2984f96073 100644
+index 6b3aeade39..b781bf7daf 100644
 --- a/stdlib/filename.ml
 +++ b/stdlib/filename.ml
-@@ -326,11 +326,19 @@ let remove_extension name =
+@@ -326,14 +326,34 @@ let remove_extension name =
  external open_desc: string -> open_flag list -> int -> int = "caml_sys_open"
  external close_desc: int -> unit = "caml_sys_close"
  
@@ -13528,6 +13528,21 @@ index 6b3aeade39..2984f96073 100644
 +(* BACKPORT END *)
    let rnd = (Random.State.bits random_state) land 0xFFFFFF in
    concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
+ 
++(* BACKPORT BEGIN *)
++module Domain = struct
++  module DLS = struct
++    let new_key ~split_from_parent:_ f =
++      ref (f ())
++
++    let get = (!)
++    let set = (:=)
++  end
++end
++(* BACKPORT END *)
++
+ let current_temp_dir_name =
+   Domain.DLS.new_key ~split_from_parent:Fun.id (fun () -> temp_dir_name)
  
 diff --git a/stdlib/format.ml b/stdlib/format.ml
 index 6ca2f8f03d..11580e7524 100644
