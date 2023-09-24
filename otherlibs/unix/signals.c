@@ -25,6 +25,10 @@
 #include <caml/signals.h>
 #include "unixsupport.h"
 
+#ifndef NSIG
+#define NSIG 64
+#endif
+
 #ifdef POSIX_SIGNALS
 
 static void decode_sigset(value vset, sigset_t * set)
@@ -84,21 +88,13 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
 CAMLprim value unix_sigpending(value unit)
 {
   sigset_t pending;
+  int i;
+#if 0
   int i, j;
   uintnat curr;
-  if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
-<<<<<<< HEAD
-  for (i = 1; i < NSIG; i++)
-#if 0
-    if(atomic_load_explicit(&caml_pending_signals[i], memory_order_seq_cst))
 #endif
-    if(caml_pending_signals[i])
-      sigaddset(&pending, i);
-||||||| parent of 73bc1a8e29 (Merge pull request PR#10880 from xavierleroy/bitvect-signals)
-  for (i = 1; i < NSIG; i++)
-    if(atomic_load_explicit(&caml_pending_signals[i], memory_order_seq_cst))
-      sigaddset(&pending, i);
-=======
+  if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
+#if 0
   for (i = 0; i < NSIG_WORDS; i++) {
     curr = atomic_load(&caml_pending_signals[i]);
     if (curr == 0) continue;
@@ -107,7 +103,10 @@ CAMLprim value unix_sigpending(value unit)
       sigaddset(&pending, i * BITS_PER_WORD + j + 1);
     }
   }
->>>>>>> 73bc1a8e29 (Merge pull request PR#10880 from xavierleroy/bitvect-signals)
+#endif
+  for (i = 1; i < NSIG; i++)
+    if(caml_pending_signals[i])
+      sigaddset(&pending, i);
   return encode_sigset(&pending);
 }
 
