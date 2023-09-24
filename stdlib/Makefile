@@ -246,17 +246,9 @@ GNUISH_SED = \
 
 .PHONY: depend
 depend:
-<<<<<<< HEAD
-	{ \
+	$(V_OCAMLDEP){ \
 	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
       $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
-||||||| parent of 4ca71f9251 (Less verbose logs from `make` (PR#11844))
-	{ \
-	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
-=======
-	$(V_OCAMLDEP){ \
-	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
->>>>>>> 4ca71f9251 (Less verbose logs from `make` (PR#11844))
 	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli; \
 	} | \
