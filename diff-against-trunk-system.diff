@@ -3078,6 +3078,34 @@ index 41776d2578..0a59107ea8 100644
  
  # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
  # single character:
+diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
+index 1675a6ca21..75809c8285 100644
+--- a/bytecomp/dll.ml
++++ b/bytecomp/dll.ml
+@@ -19,7 +19,11 @@ type dll_handle
+ type dll_address
+ type dll_mode = For_checking | For_execution
+ 
++(* BACKPORT BEGIN
+ external dll_open: string -> dll_handle = "caml_dynlink_open_lib"
++*)
++external dll_open: dll_mode -> string -> dll_handle = "caml_dynlink_open_lib"
++(* BACKPORT END *)
+ external dll_close: dll_handle -> unit = "caml_dynlink_close_lib"
+ external dll_sym: dll_handle -> string -> dll_address
+                 = "caml_dynlink_lookup_symbol"
+@@ -81,7 +85,11 @@ let open_dll mode name =
+           failwith (fullname ^ ": " ^ Binutils.error_to_string err)
+       end
+   | (None | Some (Checking _) as current), For_execution ->
++(* BACKPORT BEGIN
+       begin match dll_open fullname with
++*)
++      begin match dll_open For_execution fullname with
++(* BACKPORT END *)
+       | dll ->
+           let opened = match current with
+             | None -> List.remove_assoc fullname !opened_dlls
 diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
 index 0bb661f74b..c5ad0d8698 100644
 --- a/bytecomp/emitcode.ml
@@ -9977,10 +10005,10 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b0d77edd52
+index 0000000000..ae3c045e18
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9906 @@
+@@ -0,0 +1,9904 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -13061,6 +13089,34 @@ index 0000000000..b0d77edd52
 + 
 + # The OCAML__VERSION_EXTRA_PREFIX macro defined below should be a
 + # single character:
++diff --git a/bytecomp/dll.ml b/bytecomp/dll.ml
++index 1675a6ca21..75809c8285 100644
++--- a/bytecomp/dll.ml
+++++ b/bytecomp/dll.ml
++@@ -19,7 +19,11 @@ type dll_handle
++ type dll_address
++ type dll_mode = For_checking | For_execution
++ 
+++(* BACKPORT BEGIN
++ external dll_open: string -> dll_handle = "caml_dynlink_open_lib"
+++*)
+++external dll_open: dll_mode -> string -> dll_handle = "caml_dynlink_open_lib"
+++(* BACKPORT END *)
++ external dll_close: dll_handle -> unit = "caml_dynlink_close_lib"
++ external dll_sym: dll_handle -> string -> dll_address
++                 = "caml_dynlink_lookup_symbol"
++@@ -81,7 +85,11 @@ let open_dll mode name =
++           failwith (fullname ^ ": " ^ Binutils.error_to_string err)
++       end
++   | (None | Some (Checking _) as current), For_execution ->
+++(* BACKPORT BEGIN
++       begin match dll_open fullname with
+++*)
+++      begin match dll_open For_execution fullname with
+++(* BACKPORT END *)
++       | dll ->
++           let opened = match current with
++             | None -> List.remove_assoc fullname !opened_dlls
 +diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
 +index 0bb661f74b..c5ad0d8698 100644
 +--- a/bytecomp/emitcode.ml
@@ -19856,37 +19912,7 @@ index 0000000000..b0d77edd52
 ++ 
 ++ let () = Out_channel.set_buffered stdout false
 ++ 
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++@@ -1,3 +1,7 @@
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ (* This test is currently disabled,
-++    until the random failures have been investigated.
-++ *)
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -49,7 +49,7 @@ G(call_gen_code):
-++ G
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
