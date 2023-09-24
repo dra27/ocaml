@@ -634,10 +634,10 @@ index 4ca2310651..54dea21180 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..b47fc313c5
+index 0000000000..e761b63337
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,1057 @@
+@@ -0,0 +1,1139 @@
 +diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
 +index 043e07031e..b7a6a9a6bb 100644
 +--- a/otherlibs/systhreads/st_stubs.c
@@ -1415,6 +1415,48 @@ index 0000000000..b47fc313c5
 + CAMLextern void caml_init_signals(void);
 + CAMLextern void caml_terminate_signals(void);
 + CAMLextern void (*caml_enter_blocking_section_hook)(void);
++diff --git a/runtime/caml/sys.h b/runtime/caml/sys.h
++index 75b97818c1..3b2d537ac4 100644
++--- a/runtime/caml/sys.h
+++++ b/runtime/caml/sys.h
++@@ -24,6 +24,8 @@
++ extern "C" {
++ #endif
++ 
+++CAMLextern char * caml_strerror(int errnum, char * buf, size_t buflen);
+++
++ #define NO_ARG Val_int(0)
++ 
++ CAMLnoreturn_start
++diff --git a/runtime/debugger.c b/runtime/debugger.c
++index 97d22832a0..c10c7d0f8f 100644
++--- a/runtime/debugger.c
+++++ b/runtime/debugger.c
++@@ -30,6 +30,7 @@
++ #include "caml/misc.h"
++ #include "caml/osdeps.h"
++ #include "caml/skiplist.h"
+++#include "caml/sys.h"
++ 
++ int caml_debugger_in_use = 0;
++ uintnat caml_event_count;
++@@ -110,6 +111,7 @@ static struct skiplist event_points_table = SKIPLIST_STATIC_INITIALIZER;
++ 
++ static void open_connection(void)
++ {
+++  char buf[1024];
++ #ifdef _WIN32
++   /* Set socket to synchronous mode (= non-overlapped) so that file
++      descriptor-oriented functions (read()/write() etc.) can be
++@@ -133,7 +135,7 @@ static void open_connection(void)
++     caml_fatal_error("cannot connect to debugger at %s\n"
++                      "error: %s",
++                      (dbg_addr ? dbg_addr : "(none)"),
++-                     strerror (errno));
+++                     caml_strerror(errno, buf, sizeof(buf)));
++   dbg_in = caml_open_descriptor_in(dbg_socket);
++   dbg_out = caml_open_descriptor_out(dbg_socket);
++   /* The code in this file does not bracket channel I/O operations with
 +diff --git a/runtime/dune b/runtime/dune
 +index 78c39300ed..23eb1d1e8a 100644
 +--- a/runtime/dune
@@ -1695,6 +1737,46 @@ index 0000000000..b47fc313c5
 ++  return 0;
 ++#endif
 + }
++diff --git a/runtime/sys.c b/runtime/sys.c
++index a77fd9d1cf..2021a4fd26 100644
++--- a/runtime/sys.c
+++++ b/runtime/sys.c
++@@ -61,9 +61,21 @@
++ #include "caml/callback.h"
++ #include "caml/startup_aux.h"
++ 
++-static char * error_message(void)
+++CAMLexport char * caml_strerror(int errnum, char * buf, size_t buflen)
++ {
++-  return strerror(errno);
+++#ifdef _WIN32
+++  /* Windows has a thread-safe strerror */
+++  return strerror(errnum);
+++#else
+++  int res = strerror_r(errnum, buf, buflen);
+++  /* glibc<2.13 returns -1/sets errno, >2.13 returns +ve errno.
+++     We assume that buffer size is large enough not to get ERANGE,
+++     so we assume we got EINVAL. */
+++  if (res != 0) {
+++    snprintf(buf, buflen, "Unknown error %d", errnum);
+++  }
+++  return buf;
+++#endif
++ }
++ 
++ #ifndef EAGAIN
++@@ -77,9 +89,10 @@ CAMLexport void caml_sys_error(value arg)
++ {
++   CAMLparam1 (arg);
++   char * err;
+++  char buf[1024];
++   CAMLlocal1 (str);
++ 
++-  err = error_message();
+++  err = caml_strerror(errno, buf, sizeof(buf));
++   if (arg == NO_ARG) {
++     str = caml_copy_string(err);
++   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
 index 0000000000..22bb95ec4d
@@ -4313,10 +4395,10 @@ index 0000000000..22bb95ec4d
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..9ba43e3859
+index 0000000000..a8d482a87c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4305 @@
+@@ -0,0 +1,4318 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -4953,10 +5035,10 @@ index 0000000000..9ba43e3859
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..b47fc313c5
++index 0000000000..e761b63337
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,1057 @@
++@@ -0,0 +1,1139 @@
 ++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
 ++index 043e07031e..b7a6a9a6bb 100644
 ++--- a/otherlibs/systhreads/st_stubs.c
@@ -5734,6 +5816,48 @@ index 0000000000..9ba43e3859
 ++ CAMLextern void caml_init_signals(void);
 ++ CAMLextern void caml_terminate_signals(void);
 ++ CAMLextern void (*caml_enter_blocking_section_hook)(void);
+++diff --git a/runtime/caml/sys.h b/runtime/caml/sys.h
+++index 75b97818c1..3b2d537ac4 100644
+++--- a/runtime/caml/sys.h
++++++ b/runtime/caml/sys.h
+++@@ -24,6 +24,8 @@
+++ extern "C" {
+++ #endif
+++ 
++++CAMLextern char * caml_strerror(int errnum, char * buf, size_t buflen);
++++
+++ #define NO_ARG Val_int(0)
+++ 
+++ CAMLnoreturn_start
+++diff --git a/runtime/debugger.c b/runtime/debugger.c
+++index 97d22832a0..c10c7d0f8f 100644
+++--- a/runtime/debugger.c
++++++ b/runtime/debugger.c
+++@@ -30,6 +30,7 @@
+++ #include "caml/misc.h"
+++ #include "caml/osdeps.h"
+++ #include "caml/skiplist.h"
++++#include "caml/sys.h"
+++ 
+++ int caml_debugger_in_use = 0;
+++ uintnat caml_event_count;
+++@@ -110,6 +111,7 @@ static struct skiplist event_points_table = SKIPLIST_STATIC_INITIALIZER;
+++ 
+++ static void open_connection(void)
+++ {
++++  char buf[1024];
+++ #ifdef _WIN32
+++   /* Set socket to synchronous mode (= non-overlapped) so that file
+++      descriptor-oriented functions (read()/write() etc.) can be
+++@@ -133,7 +135,7 @@ static void open_connection(void)
+++     caml_fatal_error("cannot connect to debugger at %s\n"
+++                      "error: %s",
+++                      (dbg_addr ? dbg_addr : "(none)"),
+++-                     strerror (errno));
++++                     caml_strerror(errno, buf, sizeof(buf)));
+++   dbg_in = caml_open_descriptor_in(dbg_socket);
+++   dbg_out = caml_open_descriptor_out(dbg_socket);
+++   /* The code in this file does not bracket channel I/O operations with
 ++diff --git a/runtime/dune b/runtime/dune
 ++index 78c39300ed..23eb1d1e8a 100644
 ++--- a/runtime/dune
@@ -6014,6 +6138,46 @@ index 0000000000..9ba43e3859
 +++  return 0;
 +++#endif
 ++ }
+++diff --git a/runtime/sys.c b/runtime/sys.c
+++index a77fd9d1cf..2021a4fd26 100644
+++--- a/runtime/sys.c
++++++ b/runtime/sys.c
+++@@ -61,9 +61,21 @@
+++ #include "caml/callback.h"
+++ #include "caml/startup_aux.h"
+++ 
+++-static char * error_message(void)
++++CAMLexport char * caml_strerror(int errnum, char * buf, size_t buflen)
+++ {
+++-  return strerror(errno);
++++#ifdef _WIN32
++++  /* Windows has a thread-safe strerror */
++++  return strerror(errnum);
++++#else
++++  int res = strerror_r(errnum, buf, buflen);
++++  /* glibc<2.13 returns -1/sets errno, >2.13 returns +ve errno.
++++     We assume that buffer size is large enough not to get ERANGE,
++++     so we assume we got EINVAL. */
++++  if (res != 0) {
++++    snprintf(buf, buflen, "Unknown error %d", errnum);
++++  }
++++  return buf;
++++#endif
+++ }
+++ 
+++ #ifndef EAGAIN
+++@@ -77,9 +89,10 @@ CAMLexport void caml_sys_error(value arg)
+++ {
+++   CAMLparam1 (arg);
+++   char * err;
++++  char buf[1024];
+++   CAMLlocal1 (str);
+++ 
+++-  err = error_message();
++++  err = caml_strerror(errno, buf, sizeof(buf));
+++   if (arg == NO_ARG) {
+++     str = caml_copy_string(err);
+++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
 +index 0000000000..22bb95ec4d
@@ -8552,76 +8716,7 @@ index 0000000000..9ba43e3859
 ++ 
 ++ let f x =
 ++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeabf 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index 7f80b8ab26..0791f4e53f 100644
-++--- 
+++index 5636e9abe2..53e43
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
