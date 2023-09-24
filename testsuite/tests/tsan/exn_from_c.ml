@@ -6,6 +6,8 @@
  include unix;
  set TSAN_OPTIONS="detect_deadlocks=0";
 
+ reason = "OCaml 5 only";
+ skip;
  tsan;
  native;
 
