@@ -219,13 +219,9 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-<<<<<<< HEAD
 AC_CONFIG_FILES([tools/eventlog_metadata])
-||||||| parent of 16c1b65d5e (Merge pull request PR#11268 from shindere/merge-utils-makefile)
-=======
 AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 AC_CONFIG_FILES([utils/config.generated.ml])
->>>>>>> 16c1b65d5e (Merge pull request PR#11268 from shindere/merge-utils-makefile)
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 AC_CONFIG_HEADERS([runtime/caml/version.h])
@@ -619,15 +615,9 @@ AS_CASE([$host],
     [exeext=".exe"],
   [exeext=''])
 
-<<<<<<< HEAD
 dnl otherlibraries="dynlink runtime_events"
 otherlibraries="dynlink"
-||||||| parent of 16c1b65d5e (Merge pull request PR#11268 from shindere/merge-utils-makefile)
-otherlibraries="dynlink runtime_events"
-=======
-otherlibraries="dynlink runtime_events"
 lib_dynlink=true
->>>>>>> 16c1b65d5e (Merge pull request PR#11268 from shindere/merge-utils-makefile)
 AS_IF([test x"$enable_unix_lib" != "xno"],
   [enable_unix_lib=yes
   AC_CONFIG_FILES([otherlibs/unix/META])
