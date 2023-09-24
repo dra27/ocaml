@@ -263,7 +263,7 @@ GNUISH_SED = \
 .INTERMEDIATE: .depend.tmp
 
 .depend.tmp:
-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml \
+	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
     $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
 	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli >> $@
