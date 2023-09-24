@@ -901,6 +901,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 	$(MKEXE) -o $@ $^
 
 clean::
+	rm -f yacc/wstr.o yacc/wstr.obj
 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 
 $(ocamlyacc_OTHER_MODULES:.$(O)): ocamlyacc/defs.h
