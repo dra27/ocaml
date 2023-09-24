@@ -95,11 +95,14 @@ let preempt_signal =
   | _       -> Sys.sigvtalrm
 
 let () =
+(* BACKPORT BEGIN *)
+  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+(* BACKPORT END *)
   thread_initialize ();
 (* BACKPORT
   Domain.at_startup thread_initialize_domain;
-*)
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
+*)
   Callback.register "Thread.at_shutdown" (fun () ->
     thread_cleanup();
     (* In case of DLL-embedded OCaml the preempt_signal handler
