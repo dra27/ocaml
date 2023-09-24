@@ -1346,6 +1346,30 @@ index 929ed5ecf7..61f75dce4a 100644
  *)
  
  (* on Multicore, fork is not allowed is another domain is, and was running. *)
+diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
+index afaa814ca5..d696a26e82 100644
+--- a/testsuite/tests/memory-model/forbidden.ml
++++ b/testsuite/tests/memory-model/forbidden.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
++  * skip
++  reason = "OCaml 5 only"
+ *)
+ 
+ (* Memory model test:
+diff --git a/testsuite/tests/memory-model/publish.ml b/testsuite/tests/memory-model/publish.ml
+index 18fe866ccf..5e7e0bd565 100644
+--- a/testsuite/tests/memory-model/publish.ml
++++ b/testsuite/tests/memory-model/publish.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
++  * skip
++  reason = "OCaml 5 only"
+ *)
+ 
+ (* Memory model: test the _publish idiom *)
 diff --git a/testsuite/tests/parallel/atomics.ml b/testsuite/tests/parallel/atomics.ml
 index 9c1d0a3cf2..b1f5813b4a 100644
 --- a/testsuite/tests/parallel/atomics.ml
