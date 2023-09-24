@@ -1,16 +1,10 @@
-<<<<<<< HEAD
 (* TEST
    * skip
    reason = "OCaml 5 only"
-||||||| parent of 3d61f4243d (Disable the weaklifetime_par.ml test)
-(* TEST
-=======
+*)
 (* This test is currently disabled, 
    until the random failures have been investigated.
->>>>>>> 3d61f4243d (Disable the weaklifetime_par.ml test)
 *)
-
-let () = Random.self_init ()
 
 let size, num_domains, num_gcs, num_rounds =
   let test_size =
