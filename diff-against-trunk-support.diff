@@ -2372,6 +2372,21 @@ index 352424a377..9e2073c4ef 100644
  *)
  
  (* spins a external thread from C and register it to the OCaml runtime *)
+diff --git a/testsuite/tests/parallel/test_issue_11094.ml b/testsuite/tests/parallel/test_issue_11094.ml
+index ffc6d4bedd..8b9fb98c50 100644
+--- a/testsuite/tests/parallel/test_issue_11094.ml
++++ b/testsuite/tests/parallel/test_issue_11094.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+-* bytecode
+-* native
++* skip
++reason = "OCaml 5 only"
++** bytecode
++** native
+ *)
+ 
+ open Effect
 diff --git a/testsuite/tests/regression/pr9326/gc_set.ml b/testsuite/tests/regression/pr9326/gc_set.ml
 index 2570aec28e..e9d7dbcd4c 100644
 --- a/testsuite/tests/regression/pr9326/gc_set.ml
