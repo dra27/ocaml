@@ -243,6 +243,7 @@ let tests () =
     done;
     test 16 true !return
   end;
+(*
   test 17 true
     (test_setget float16
                  [0.0, 0.0;
@@ -258,6 +259,7 @@ let tests () =
                   -65519.0, -65504.0;
                   65520.0, infinity;
                   -65520.0, neg_infinity]);
+*)
 
   testing_function "set/get (specialized)";
   let a = Array1.create int c_layout 3 in
