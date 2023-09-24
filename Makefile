@@ -582,7 +582,6 @@ partialclean::
 ## Lists of source files
 
 runtime_COMMON_C_SOURCES = \
-  addrmap \
   afl \
   alloc \
   array \
@@ -590,6 +589,7 @@ runtime_COMMON_C_SOURCES = \
   bigarray \
   callback \
   codefrag \
+  compact \
   compare \
   custom \
   debugger \
@@ -597,18 +597,16 @@ runtime_COMMON_C_SOURCES = \
   dynlink \
   eventlog \
   extern \
-  fiber \
   finalise \
   floats \
+  freelist \
   gc_ctrl \
-  gc_stats \
   globroots \
   hash \
   intern \
   ints \
   io \
   lexing \
-  lf_skiplist \
   main \
   major_gc \
   md5 \
@@ -619,16 +617,12 @@ runtime_COMMON_C_SOURCES = \
   misc \
   obj \
   parsing \
-  platform \
   printexc \
   prng \
-  roots \
-  shared_heap \
   signals \
   skiplist \
   startup_aux \
   str \
-  sync \
   sys \
   $(UNIX_OR_WIN32) \
   weak
@@ -638,6 +632,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
   fail_byt \
   fix_code \
   interp \
+  roots_byt \
+  signals_byt \
+  stacks \
   startup_byt
 runtime_BYTECODE_C_SOURCES = \
   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
@@ -648,7 +645,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
   clambda_checks \
   dynlink_nat \
   fail_nat \
-  frame_descriptors \
+  roots_nat \
   startup_nat \
   signals_nat
 runtime_NATIVE_C_SOURCES = \
