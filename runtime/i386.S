@@ -116,7 +116,7 @@ FUNCTION(caml_call_gc)
         CFI_STARTPROC
 LBL(caml_call_gc):
     /* Record lowest stack address and return address */
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         movl    (%esp), %eax
         movl    %eax, CAML_STATE(last_return_address, %ebx)
         leal    4(%esp), %eax
@@ -128,7 +128,7 @@ LBL(caml_call_gc):
         movl    %eax, 0(%esp)
         addl    $(STACK_PROBE_SIZE), %esp; CFI_ADJUST(-STACK_PROBE_SIZE);
 #endif
-    /* Build array of registers, save it into Caml_state->gc_regs */
+    /* Build array of registers, save it into caml_state->gc_regs */
         pushl   %ebp; CFI_ADJUST(4)
         pushl   %edi; CFI_ADJUST(4)
         pushl   %esi; CFI_ADJUST(4)
@@ -156,7 +156,7 @@ LBL(caml_call_gc):
 
 FUNCTION(caml_alloc1)
         CFI_STARTPROC
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         movl    CAML_STATE(young_ptr, %ebx), %eax
         subl    $8, %eax
         movl    %eax, CAML_STATE(young_ptr, %ebx)
@@ -168,7 +168,7 @@ FUNCTION(caml_alloc1)
 
 FUNCTION(caml_alloc2)
         CFI_STARTPROC
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         movl    CAML_STATE(young_ptr, %ebx), %eax
         subl    $12, %eax
         movl    %eax, CAML_STATE(young_ptr, %ebx)
@@ -180,7 +180,7 @@ FUNCTION(caml_alloc2)
 
 FUNCTION(caml_alloc3)
         CFI_STARTPROC
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         movl    CAML_STATE(young_ptr, %ebx), %eax
         subl    $16, %eax
         movl    %eax, CAML_STATE(young_ptr, %ebx)
@@ -192,10 +192,10 @@ FUNCTION(caml_alloc3)
 
 FUNCTION(caml_allocN)
         CFI_STARTPROC
-        movl    G(Caml_state), %ebx
-        /* eax = size - Caml_state->young_ptr */
+        movl    G(caml_state), %ebx
+        /* eax = size - caml_state->young_ptr */
         subl    CAML_STATE(young_ptr, %ebx), %eax
-        negl    %eax              /* eax = Caml_state->young_ptr - size */
+        negl    %eax              /* eax = caml_state->young_ptr - size */
         movl    %eax, CAML_STATE(young_ptr, %ebx)
         cmpl    CAML_STATE(young_limit, %ebx), %eax
         jb      LBL(caml_call_gc)
@@ -209,7 +209,7 @@ FUNCTION(caml_c_call)
         CFI_STARTPROC
     /* Record lowest stack address and return address */
     /* ecx and edx are destroyed at C call. Use them as temp. */
-        movl    G(Caml_state), %ecx
+        movl    G(caml_state), %ecx
         movl    (%esp), %edx
         movl    %edx, CAML_STATE(last_return_address, %ecx)
         leal    4(%esp), %edx
@@ -239,7 +239,7 @@ FUNCTION(caml_start_program)
         movl    $ G(caml_program), %esi
     /* Common code for caml_start_program and caml_callback* */
 LBL(106):
-        movl    G(Caml_state), %edi
+        movl    G(caml_state), %edi
     /* Build a callback link */
         pushl   CAML_STATE(gc_regs, %edi); CFI_ADJUST(4)
         pushl   CAML_STATE(last_return_address, %edi); CFI_ADJUST(4)
@@ -253,12 +253,12 @@ LBL(106):
     /* Call the OCaml code */
         call    *%esi
 LBL(107):
-        movl    G(Caml_state), %edi
+        movl    G(caml_state), %edi
     /* Pop the exception handler */
         popl    CAML_STATE(exception_pointer, %edi); CFI_ADJUST(-4)
         addl    $12, %esp       ; CFI_ADJUST(-12)
 LBL(109):
-        movl    G(Caml_state), %edi /* Reload for LBL(109) entry */
+        movl    G(caml_state), %edi /* Reload for LBL(109) entry */
     /* Pop the callback link, restoring the global variables */
         popl    CAML_STATE(bottom_of_stack, %edi); CFI_ADJUST(-4)
         popl    CAML_STATE(last_return_address, %edi); CFI_ADJUST(-4)
@@ -282,7 +282,7 @@ LBL(108):
 
 FUNCTION(caml_raise_exn)
         CFI_STARTPROC
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         testl   $1, CAML_STATE(backtrace_active, %ebx)
         jne     LBL(110)
         movl    CAML_STATE(exception_pointer, %ebx), %esp
@@ -312,7 +312,7 @@ LBL(110):
 
 FUNCTION(caml_raise_exception)
         CFI_STARTPROC
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         testl   $1, CAML_STATE(backtrace_active, %ebx)
         jne     LBL(112)
         movl    8(%esp), %eax
@@ -405,7 +405,7 @@ FUNCTION(caml_ml_array_bound_error)
         ffree   %st(6)
         ffree   %st(7)
     /* Record lowest stack address and return address */
-        movl    G(Caml_state), %ebx
+        movl    G(caml_state), %ebx
         movl    (%esp), %edx
         movl    %edx, CAML_STATE(last_return_address, %ebx)
         leal    4(%esp), %edx

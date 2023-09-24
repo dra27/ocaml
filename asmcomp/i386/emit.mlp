@@ -137,7 +137,7 @@ let domain_field f r =
   mem32 DWORD (Domainstate.idx_of_field f * 8) r
 
 let load_domain_state r =
-  I.mov (sym32 "Caml_state") r
+  I.mov (sym32 "caml_state") r
 
 let x86_data_type_for_stack_slot = function
   | Float -> REAL8
@@ -962,7 +962,7 @@ let begin_assembly() =
     D.extrn "_caml_alloc3" PROC;
     D.extrn "_caml_ml_array_bound_error" PROC;
     D.extrn "_caml_raise_exn" PROC;
-    D.extrn "_Caml_state" DWORD;
+    D.extrn "_caml_state" DWORD;
   end;
 
   D.data ();
