@@ -707,6 +707,72 @@ index fe6a84cd24..4a4a069aa3 100644
    end;
  
    D.data ();
+diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
+index 2d8b5f168f..b982a6247e 100644
+--- a/asmcomp/riscv/emit.mlp
++++ b/asmcomp/riscv/emit.mlp
+@@ -328,8 +328,10 @@ let emit_instr env i =
+         `	mv	s0, sp\n`;
+         cfi_remember_state ();
+         cfi_def_cfa_register ~reg:21;
++(* BACKPORT
+         let ofs = Domainstate.(idx_of_field Domain_c_stack) * 8 in
+         `	ld	sp, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`;
++*)
+         `	{emit_call func}\n`;
+         `	mv	sp, s0\n`;
+         cfi_restore_state ()
+@@ -482,8 +484,12 @@ let emit_instr env i =
+       let instr = name_for_specific sop in
+       `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
+   | Lop (Idls_get) ->
++(* BACKPORT BEGIN
+       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
++*)
++      assert false
++(* BACKPORT END *)
+   | Lreloadretaddr ->
+       let n = frame_size env in
+       reload_ra n
+@@ -611,6 +617,7 @@ let fundecl fundecl =
+   emit_debug_info fundecl.fun_dbg;
+   cfi_startproc();
+ 
++(* BACKPORT
+   (* Dynamic stack checking *)
+   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
+   let { max_frame_size; contains_nontail_calls } =
+@@ -620,6 +627,7 @@ let fundecl fundecl =
+   let handle_overflow = ref None in
+   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
+     let overflow = new_label () and ret = new_label () in
++
+     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+     let f = max_frame_size + threshold_offset in
+     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
+@@ -629,11 +637,13 @@ let fundecl fundecl =
+     `{emit_label ret}:\n`;
+     handle_overflow := Some (overflow, ret)
+   end;
++*)
+ 
+   emit_all env fundecl.fun_body;
+   List.iter emit_call_gc env.call_gc_sites;
+   List.iter emit_call_bound_error env.bound_error_sites;
+ 
++(* BACKPORT
+   begin match !handle_overflow with
+   | None -> ()
+   | Some (overflow, ret) ->
+@@ -650,6 +660,7 @@ let fundecl fundecl =
+       `	addi	sp, sp, 16\n`;
+       `	j	{emit_label ret}\n`
+   end;
++*)
+ 
+   cfi_endproc();
+   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
 index c524f7052d..ebad0d2bba 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
@@ -9993,10 +10059,10 @@ index 0000000000..464eb345bc
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ed230ac4bc
+index 0000000000..4a2739d03f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9882 @@
+@@ -0,0 +1,10002 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -10706,6 +10772,72 @@ index 0000000000..ed230ac4bc
 +   end;
 + 
 +   D.data ();
++diff --git a/asmcomp/riscv/emit.mlp b/asmcomp/riscv/emit.mlp
++index 2d8b5f168f..b982a6247e 100644
++--- a/asmcomp/riscv/emit.mlp
+++++ b/asmcomp/riscv/emit.mlp
++@@ -328,8 +328,10 @@ let emit_instr env i =
++         `	mv	s0, sp\n`;
++         cfi_remember_state ();
++         cfi_def_cfa_register ~reg:21;
+++(* BACKPORT
++         let ofs = Domainstate.(idx_of_field Domain_c_stack) * 8 in
++         `	ld	sp, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`;
+++*)
++         `	{emit_call func}\n`;
++         `	mv	sp, s0\n`;
++         cfi_restore_state ()
++@@ -482,8 +484,12 @@ let emit_instr env i =
++       let instr = name_for_specific sop in
++       `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
++   | Lop (Idls_get) ->
+++(* BACKPORT BEGIN
++       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
+++*)
+++      assert false
+++(* BACKPORT END *)
++   | Lreloadretaddr ->
++       let n = frame_size env in
++       reload_ra n
++@@ -611,6 +617,7 @@ let fundecl fundecl =
++   emit_debug_info fundecl.fun_dbg;
++   cfi_startproc();
++ 
+++(* BACKPORT
++   (* Dynamic stack checking *)
++   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
++   let { max_frame_size; contains_nontail_calls } =
++@@ -620,6 +627,7 @@ let fundecl fundecl =
++   let handle_overflow = ref None in
++   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
++     let overflow = new_label () and ret = new_label () in
+++
++     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
++     let f = max_frame_size + threshold_offset in
++     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
++@@ -629,11 +637,13 @@ let fundecl fundecl =
++     `{emit_label ret}:\n`;
++     handle_overflow := Some (overflow, ret)
++   end;
+++*)
++ 
++   emit_all env fundecl.fun_body;
++   List.iter emit_call_gc env.call_gc_sites;
++   List.iter emit_call_bound_error env.bound_error_sites;
++ 
+++(* BACKPORT
++   begin match !handle_overflow with
++   | None -> ()
++   | Some (overflow, ret) ->
++@@ -650,6 +660,7 @@ let fundecl fundecl =
++       `	addi	sp, sp, 16\n`;
++       `	j	{emit_label ret}\n`
++   end;
+++*)
++ 
++   cfi_endproc();
++   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
 +index c524f7052d..ebad0d2bba 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
@@ -19878,7 +20010,61 @@ index 0000000000..ed230ac4bc
 ++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
 ++index 666a55efeb..5a36157e0e 100644
 ++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuit
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ let () = Out_channel.set_buffered stdout false
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser_handover.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ 
+++ (* ocaml-multicore issues 528 and 468 *)
+++ 
+++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++index b42d399907..656e318473 100644
+++--- a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
++++++ b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
+++@@ -1,3 +1,7 @@
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
+++ (* This test is currently disabled,
+++    until the random failures have been investigated.
+++ *)
+++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+++index 1d16b72d4e..956ec369ab 100644
+++--- a/testsuite/tools/asmgen_i386.S
++++++ b/testsuite/tools/asmgen_i386.S
+++@@ -49,7 +49,7 @@ G(call_gen_code):
+++ G(caml_c_call):
+++         jmp     *%eax
+++ 
+++-        .comm   G(Caml_state), 4
++++        .comm   G(caml_state), 4
+++ 
+++ /* Some tests are designed to cause registers to spill; on
+++  * x86 we require the caml_extra_params symbol from the RTS. */
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
