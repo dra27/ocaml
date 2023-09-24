@@ -32,7 +32,11 @@
 #define SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE (0x2)
 #endif
 
+/* BACKPORT BEGIN
 static _Atomic DWORD additional_symlink_flags = -1;
+*/
+static DWORD additional_symlink_flags = -1;
+/* BACKPORT END */
 
 // Developer Mode allows the creation of symlinks without elevation - see
 // https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinkw
@@ -71,20 +75,30 @@ static BOOL IsDeveloperModeEnabled()
 CAMLprim value caml_unix_symlink(value to_dir, value osource, value odest)
 {
   CAMLparam3(to_dir, osource, odest);
+/* BACKPORT BEGIN
   DWORD flags, additional_flags;
+*/
+  DWORD flags, additional_flags = additional_symlink_flags;
+/* BACKPORT END */
   BOOLEAN result;
   LPWSTR source;
   LPWSTR dest;
   caml_unix_check_path(osource, "symlink");
   caml_unix_check_path(odest, "symlink");
 
+/* BACKPORT
   additional_flags = atomic_load_explicit(&additional_symlink_flags,
       memory_order_relaxed);
+*/
   if (additional_flags == -1) {
     additional_flags = IsDeveloperModeEnabled() ?
       SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE : 0;
+/* BACKPORT BEGIN
     atomic_store_explicit(&additional_symlink_flags, additional_flags,
         memory_order_relaxed);
+*/
+    additional_symlink_flags = additional_flags;
+/* BACKPORT END */
   }
 
   flags =
