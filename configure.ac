@@ -1968,17 +1968,9 @@ AS_CASE([$arch,$system],
 ## Determine how to link with the POSIX threads library
 
 AS_CASE([$host],
-<<<<<<< HEAD
-  [*-*-mingw32|*-pc-windows],
+  [*-*-mingw32*|*-pc-windows],
 dnl    [PTHREAD_LIBS="-l:libpthread.a"],
     [PTHREAD_LIBS=''],
-||||||| parent of 3e0ed34d36 (Merge pull request PR#11973 from toots/mingw-postfixed-host)
-  [*-*-mingw32|*-pc-windows],
-    [PTHREAD_LIBS="-l:libpthread.a"],
-=======
-  [*-*-mingw32*|*-pc-windows],
-    [PTHREAD_LIBS="-l:libpthread.a"],
->>>>>>> 3e0ed34d36 (Merge pull request PR#11973 from toots/mingw-postfixed-host)
   [AX_PTHREAD(
     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
     saved_CFLAGS="$CFLAGS"
@@ -2174,21 +2166,11 @@ cclibs="$cclibs $mathlib"
 AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 
 AS_CASE([$host],
-<<<<<<< HEAD
-  [*-*-mingw32],
+  [*-*-mingw32*],
 dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
 dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
-||||||| parent of 3e0ed34d36 (Merge pull request PR#11973 from toots/mingw-postfixed-host)
-  [*-*-mingw32],
-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-=======
-  [*-*-mingw32*],
-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
->>>>>>> 3e0ed34d36 (Merge pull request PR#11973 from toots/mingw-postfixed-host)
   [*-pc-windows],
     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
