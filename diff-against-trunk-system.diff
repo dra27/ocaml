@@ -254,12 +254,12 @@ index d56dc96ecd..61d1a0ef56 100644
  # Deprecated variables
  
 diff --git a/VERSION b/VERSION
-index 7c40fb83e8..4ef434f979 100644
+index 7c40fb83e8..7adabdf9fb 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1,4 +1,4 @@
 -5.1.0+dev2-2023-04-11
-+5.0.0+jst-backport
++5.1.0+jst-backport
  
  # Starting with OCaml 4.14, although the version string that appears above is
  # still correct and this file can thus still be used to figure it out,
@@ -3143,15 +3143,10 @@ index 3d9a8dc3d5..6ae2502753 100755
  		;;
  esac
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-index 0156ff1da0..0a59107ea8 100644
+index 0156ff1da0..3259355a76 100644
 --- a/build-aux/ocaml_version.m4
 +++ b/build-aux/ocaml_version.m4
-@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
- # including the patchlevel, are mandatory.
- 
- m4_define([OCAML__VERSION_MAJOR], [5])
--m4_define([OCAML__VERSION_MINOR], [1])
-+m4_define([OCAML__VERSION_MINOR], [0])
+@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [1])
  m4_define([OCAML__VERSION_PATCHLEVEL], [0])
  # Note that the OCAML__VERSION_EXTRA string defined below is always empty
  # for officially-released versions of OCaml.
@@ -3208,7 +3203,7 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 81c7f29e87..ff63fa864d 100755
+index 81c7f29e87..9aa99a92a0 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
 index 907884293e..6ac792c0b7 100644
@@ -10118,10 +10113,10 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c734776caa
+index 0000000000..84ea8fbc0b
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10116 @@
+@@ -0,0 +1,10026 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..9425ea31f1
@@ -10378,12 +10373,12 @@ index 0000000000..c734776caa
 + # Deprecated variables
 + 
 +diff --git a/VERSION b/VERSION
-+index 7c40fb83e8..4ef434f979 100644
++index 7c40fb83e8..7adabdf9fb 100644
 +--- a/VERSION
 ++++ b/VERSION
 +@@ -1,4 +1,4 @@
 +-5.1.0+dev2-2023-04-11
-++5.0.0+jst-backport
+++5.1.0+jst-backport
 + 
 + # Starting with OCaml 4.14, although the version string that appears above is
 + # still correct and this file can thus still be used to figure it out,
@@ -13267,15 +13262,10 @@ index 0000000000..c734776caa
 + 		;;
 + esac
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
-+index 0156ff1da0..0a59107ea8 100644
++index 0156ff1da0..3259355a76 100644
 +--- a/build-aux/ocaml_version.m4
 ++++ b/build-aux/ocaml_version.m4
-+@@ -32,11 +32,11 @@ m4_define([OCAML__DEVELOPMENT_VERSION], [true])
-+ # including the patchlevel, are mandatory.
-+ 
-+ m4_define([OCAML__VERSION_MAJOR], [5])
-+-m4_define([OCAML__VERSION_MINOR], [1])
-++m4_define([OCAML__VERSION_MINOR], [0])
++@@ -36,7 +36,7 @@ m4_define([OCAML__VERSION_MINOR], [1])
 + m4_define([OCAML__VERSION_PATCHLEVEL], [0])
 + # Note that the OCAML__VERSION_EXTRA string defined below is always empty
 + # for officially-released versions of OCaml.
@@ -13332,7 +13322,7 @@ index 0000000000..c734776caa
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 81c7f29e87..ff63fa864d 100755
++index 81c7f29e87..9aa99a92a0 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
 +index 907884293e..6ac792c0b7 100644
@@ -20153,92 +20143,6 @@ index 0000000000..c734776caa
 ++-  esac
 +++  ./configure $configure_flags
 ++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../
-\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
 --- a/lambda/matching.ml
