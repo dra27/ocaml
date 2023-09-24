@@ -1112,20 +1112,8 @@ AS_CASE([$host],
     [arch=amd64; system=netbsd],
   [x86_64-*-openbsd*],
     [arch=amd64; system=openbsd],
-<<<<<<< HEAD
   [x86_64-*-haiku*],
     [arch=amd64; system=beos],
-||||||| parent of fbdaa043f6 (Merge pull request PR#10972 from ctk21/arm64_multicore_support)
-dnl [x86_64-*-haiku*],
-dnl   [arch=amd64; system=beos],
-dnl [arm64-*-darwin*],
-dnl   [arch=arm64; system=macosx],
-dnl [aarch64-*-darwin*],
-dnl   [arch=arm64; system=macosx],
-=======
-dnl [x86_64-*-haiku*],
-dnl   [arch=amd64; system=beos],
->>>>>>> fbdaa043f6 (Merge pull request PR#10972 from ctk21/arm64_multicore_support)
   [arm64-*-darwin*],
     [arch=arm64; system=macosx],
   [aarch64-*-darwin*],
@@ -1134,8 +1122,6 @@ dnl   [arch=amd64; system=beos],
     [arch=amd64; system=macosx],
   [x86_64-*-mingw32],
     [arch=amd64; system=mingw64],
-<<<<<<< HEAD
-<<<<<<< HEAD
   [aarch64-*-linux*],
     [arch=arm64; system=linux],
   [aarch64-*-freebsd*],
@@ -1146,34 +1132,6 @@ dnl   [arch=amd64; system=beos],
     [arch=amd64; system=cygwin],
   [riscv64-*-linux*],
     [arch=riscv; model=riscv64; system=linux]
-||||||| parent of f6f2d693d2 (Merge pull request PR#10828 from madroach/aarch64_openbsd)
-dnl [aarch64-*-linux*],
-dnl   [arch=arm64; system=linux],
-dnl [aarch64-*-freebsd*],
-dnl   [arch=arm64; system=freebsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
-=======
-dnl [aarch64-*-linux*],
-dnl   [arch=arm64; system=linux],
-||||||| parent of fbdaa043f6 (Merge pull request PR#10972 from ctk21/arm64_multicore_support)
-dnl [aarch64-*-linux*],
-dnl   [arch=arm64; system=linux],
-=======
-  [aarch64-*-linux*],
-    [arch=arm64; system=linux],
->>>>>>> fbdaa043f6 (Merge pull request PR#10972 from ctk21/arm64_multicore_support)
-dnl [aarch64-*-freebsd*],
-dnl   [arch=arm64; system=freebsd],
-dnl [aarch64-*-openbsd*],
-dnl   [arch=arm64; system=openbsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
->>>>>>> f6f2d693d2 (Merge pull request PR#10828 from madroach/aarch64_openbsd)
 )
 
 AS_CASE([$enable_native_compiler,$arch],
