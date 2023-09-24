@@ -1487,14 +1487,8 @@ let flush_standard_formatters () =
 
 let () = at_exit flush_standard_formatters
 
-<<<<<<< HEAD
 (*
-let () = Domain.at_first_spawn (fun () ->
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
-let () = Domain.at_first_spawn (fun () ->
-=======
 let () = Domain.before_first_spawn (fun () ->
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
   flush_standard_formatters ();
 
   let fs = pp_get_formatter_out_functions std_formatter () in
@@ -1507,11 +1501,5 @@ let () = Domain.before_first_spawn (fun () ->
     {fs with out_string = buffered_out_string err_buf_key;
              out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
 
-<<<<<<< HEAD
-  Domain.at_exit flush_standard_formatters)
-*)
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
-  Domain.at_exit flush_standard_formatters)
-=======
   Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+*)

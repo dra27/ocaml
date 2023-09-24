@@ -26,13 +26,7 @@ end
 {
  "Pair"[module] ->
      Abs<.9>
-<<<<<<< HEAD
-        (X/274, Abs(Y/275, {
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
-        (X/279, Abs(Y/280, {
-=======
-        (X/280, Abs(Y/281, {
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+        (X/275, Abs(Y/276, {
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));

@@ -43,16 +43,8 @@ and B : sig
 end = B
 [%%expect{|
 {
-<<<<<<< HEAD
- "A"[module] -> A/297<.11>;
- "B"[module] -> B/298<.12>;
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
- "A"[module] -> A/302<.11>;
- "B"[module] -> B/303<.12>;
-=======
- "A"[module] -> A/303<.11>;
- "B"[module] -> B/304<.12>;
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+ "A"[module] -> A/298<.11>;
+ "B"[module] -> B/299<.12>;
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -90,31 +82,13 @@ end = Set.Make(A)
  "ASet"[module] ->
      {
       "compare"[value] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/319<.19>) .
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
-          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
           "compare"[value];
       "elt"[type] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/319<.19>) .
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
-          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) .
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
           "elt"[type];
       "t"[type] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/319<.19>) . "t"[type];
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
-          CU Stdlib . "Set"[module] . "Make"[module](A/324<.19>) . "t"[type];
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
       };
  }
 module rec A :

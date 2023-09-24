@@ -25,13 +25,7 @@ module Mproj = Unit
 module F (X : sig type t end) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- "F"[module] -> Abs<.4>(X/272, X/272<.3>);
-||||||| parent of adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
- "F"[module] -> Abs<.4>(X/277, X/277<.3>);
-=======
- "F"[module] -> Abs<.4>(X/278, X/278<.3>);
->>>>>>> adc8419886 (Merge pull request PR#11213 from kayceesrk/refine_callback_semantics)
+ "F"[module] -> Abs<.4>(X/273, X/273<.3>);
  }
 module F : functor (X : sig type t end) -> sig type t = X.t end
 |}]
