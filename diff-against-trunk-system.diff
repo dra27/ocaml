@@ -3716,10 +3716,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..53e11a35d8
+index 0000000000..d2a1e96521
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2551 @@
+@@ -0,0 +1,2816 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -4639,6 +4639,252 @@ index 0000000000..53e11a35d8
 + 
 + #if !defined(SYS_macosx)
 + /* Mark stack as non-executable */
++diff --git a/runtime/backtrace.c b/runtime/backtrace.c
++index 3af8b9ec7e..38698a37d5 100644
++--- a/runtime/backtrace.c
+++++ b/runtime/backtrace.c
++@@ -99,8 +99,8 @@ static void print_location(struct caml_loc_info * li, int index)
++     fprintf(stderr, "%s unknown location%s\n", info, inlined);
++   } else {
++     fprintf (stderr, "%s %s in file \"%s\"%s, line %d, characters %d-%d\n",
++-             info, li->loc_defname, li->loc_filename, inlined, li->loc_lnum,
++-             li->loc_startchr, li->loc_endchr);
+++             info, li->loc_defname, li->loc_filename, inlined,
+++             li->loc_start_lnum, li->loc_start_chr, li->loc_end_offset);
++   }
++ }
++ 
++@@ -233,14 +233,16 @@ static value caml_convert_debuginfo(debuginfo dbg)
++   if (li.loc_valid) {
++     fname = caml_copy_string(li.loc_filename);
++     dname = caml_copy_string(li.loc_defname);
++-    p = caml_alloc_small(7, 0);
+++    p = caml_alloc_small(9, 0);
++     Field(p, 0) = Val_bool(li.loc_is_raise);
++     Field(p, 1) = fname;
++-    Field(p, 2) = Val_int(li.loc_lnum);
++-    Field(p, 3) = Val_int(li.loc_startchr);
++-    Field(p, 4) = Val_int(li.loc_endchr);
++-    Field(p, 5) = Val_bool(li.loc_is_inlined);
++-    Field(p, 6) = dname;
+++    Field(p, 2) = Val_int(li.loc_start_lnum);
+++    Field(p, 3) = Val_int(li.loc_start_chr);
+++    Field(p, 4) = Val_int(li.loc_end_offset);
+++    Field(p, 5) = Val_int(li.loc_end_lnum);
+++    Field(p, 6) = Val_int(li.loc_end_chr);
+++    Field(p, 7) = Val_bool(li.loc_is_inlined);
+++    Field(p, 8) = dname;
++   } else {
++     p = caml_alloc_small(1, 1);
++     Field(p, 0) = Val_bool(li.loc_is_raise);
++diff --git a/runtime/backtrace_byt.c b/runtime/backtrace_byt.c
++index 61ca5603d4..25f04f9c03 100644
++--- a/runtime/backtrace_byt.c
+++++ b/runtime/backtrace_byt.c
++@@ -79,9 +79,11 @@ struct ev_info {
++   code_t ev_pc;
++   char *ev_filename;
++   char *ev_defname;
++-  int ev_lnum;
++-  int ev_startchr;
++-  int ev_endchr;
+++  int ev_start_lnum;
+++  int ev_start_chr;  /* Relative to ev_start_lnum */
+++  int ev_end_lnum;
+++  int ev_end_chr;    /* Relative to ev_end_lnum */
+++  int ev_end_offset; /* Relative to ev_start_lnum */
++ };
++ 
++ struct debug_info {
++@@ -113,25 +115,27 @@ static int cmp_ev_info(const void *a, const void *b)
++   int num_b;
++ 
++   /* Perform a full lexicographic comparison to make sure the resulting order is
++-     the same under all implementations of qsort (which is not stable). */
+++     the same under all implementations of qsort (which is not stable).
+++     NB a->ev_end_offset == b->ev_end_offset =>
+++           a->ev_end_lnum == b->ev_end_lnum && a->ev_end_chr == b->ev_end_chr */
++ 
++   if (pc_a > pc_b) return 1;
++   if (pc_a < pc_b) return -1;
++ 
++-  num_a = ev_a->ev_lnum;
++-  num_b = ev_b->ev_lnum;
+++  num_a = ev_a->ev_start_lnum;
+++  num_b = ev_b->ev_start_lnum;
++ 
++   if (num_a > num_b) return 1;
++   if (num_a < num_b) return -1;
++ 
++-  num_a = ev_a->ev_startchr;
++-  num_b = ev_b->ev_startchr;
+++  num_a = ev_a->ev_start_chr;
+++  num_b = ev_b->ev_start_chr;
++ 
++   if (num_a > num_b) return 1;
++   if (num_a < num_b) return -1;
++ 
++-  num_a = ev_a->ev_endchr;
++-  num_b = ev_b->ev_endchr;
+++  num_a = ev_a->ev_end_offset;
+++  num_b = ev_b->ev_end_offset;
++ 
++   if (num_a > num_b) return 1;
++   if (num_a < num_b) return -1;
++@@ -144,7 +148,7 @@ static struct ev_info *process_debug_events(code_t code_start,
++                                             mlsize_t *num_events)
++ {
++   CAMLparam1(events_heap);
++-  CAMLlocal3(l, ev, ev_start);
+++  CAMLlocal4(l, ev, ev_start, ev_end);
++   mlsize_t i, j;
++   struct ev_info *events;
++ 
++@@ -170,6 +174,7 @@ static struct ev_info *process_debug_events(code_t code_start,
++                                  + Long_val(Field(ev, EV_POS)));
++ 
++       ev_start = Field(Field(ev, EV_LOC), LOC_START);
+++      ev_end = Field(Field(ev, EV_LOC), LOC_END);
++ 
++       {
++         const char *fname = String_val(Field(ev_start, POS_FNAME));
++@@ -188,13 +193,14 @@ static struct ev_info *process_debug_events(code_t code_start,
++         events[j].ev_defname = "<old bytecode>";
++       }
++ 
++-      events[j].ev_lnum = Int_val(Field(ev_start, POS_LNUM));
++-      events[j].ev_startchr =
++-        Int_val(Field(ev_start, POS_CNUM))
++-        - Int_val(Field(ev_start, POS_BOL));
++-      events[j].ev_endchr =
++-        Int_val(Field(Field(Field(ev, EV_LOC), LOC_END), POS_CNUM))
++-        - Int_val(Field(ev_start, POS_BOL));
+++      events[j].ev_start_lnum = Int_val(Field(ev_start, POS_LNUM));
+++      events[j].ev_start_chr =
+++        Int_val(Field(ev_start, POS_CNUM)) - Int_val(Field(ev_start, POS_BOL));
+++      events[j].ev_end_lnum = Int_val(Field(ev_end, POS_LNUM));
+++      events[j].ev_end_chr =
+++        Int_val(Field(ev_end, POS_CNUM)) - Int_val(Field(ev_end, POS_BOL));
+++      events[j].ev_end_offset =
+++        Int_val(Field(ev_end, POS_CNUM)) - Int_val(Field(ev_start, POS_BOL));
++ 
++       j++;
++     }
++@@ -494,9 +500,11 @@ void caml_debuginfo_location(debuginfo dbg,
++   li->loc_is_inlined = 0;
++   li->loc_filename = event->ev_filename;
++   li->loc_defname = event->ev_defname;
++-  li->loc_lnum = event->ev_lnum;
++-  li->loc_startchr = event->ev_startchr;
++-  li->loc_endchr = event->ev_endchr;
+++  li->loc_start_lnum = event->ev_start_lnum;
+++  li->loc_start_chr = event->ev_start_chr;
+++  li->loc_end_lnum = event->ev_end_lnum;
+++  li->loc_end_chr = event->ev_end_chr;
+++  li->loc_end_offset = event->ev_end_offset;
++ }
++ 
++ debuginfo caml_debuginfo_extract(backtrace_slot slot)
++diff --git a/runtime/backtrace_nat.c b/runtime/backtrace_nat.c
++index 61228311ad..a7246fb904 100644
++--- a/runtime/backtrace_nat.c
+++++ b/runtime/backtrace_nat.c
++@@ -238,11 +238,20 @@ struct name_info {
++   char name[1];
++ };
++ 
+++/* Extended version of name_info including location fields which didn't fit
+++   in the main debuginfo word. */
+++struct name_and_loc_info {
+++  int32_t filename_offs;
+++  uint16_t start_chr;
+++  uint16_t end_chr;
+++  int32_t end_offset; /* End character position relative to start bol */
+++  char name[1];
+++};
+++
++ /* Extract location information for the given frame descriptor */
++ void caml_debuginfo_location(debuginfo dbg, /*out*/ struct caml_loc_info * li)
++ {
++   uint32_t info1, info2;
++-  struct name_info * name_info;
++ 
++   /* If no debugging information available, print nothing.
++      When everything is compiled with -g, this corresponds to
++@@ -256,28 +265,55 @@ void caml_debuginfo_location(debuginfo dbg, /*out*/ struct caml_loc_info * li)
++   /* Recover debugging info */
++   info1 = ((uint32_t *)dbg)[0];
++   info2 = ((uint32_t *)dbg)[1];
++-  name_info = (struct name_info*)((char *) dbg + (info1 & 0x3FFFFFC));
++   /* Format of the two info words:
++-       llllllllllllllllllll aaaaaaaa bbbbbbbbbb ffffffffffffffffffffffff k n
++-                         44       36         26                        2 1 0
++-                       (32+12)    (32+4)
++-     n ( 1 bit ): 0 if this is the final debuginfo
++-                  1 if there's another following this one
++-     k ( 1 bit ): 0 if it's a call
++-                  1 if it's a raise
++-     f (24 bits): offset (in 4-byte words) of file name relative to dbg
++-     l (20 bits): line number
++-     a ( 8 bits): beginning of character range
++-     b (10 bits): end of character range */
+++     Two possible formats based on value of bit 63:
+++     Partially packed format
+++       |------------- info2 ------------||------------- info1 -------------|
+++       1 lllllllllllllllllll mmmmmmmmmmmmmmmmmm ffffffffffffffffffffffff k n
+++      63                  44                 26                        2 1 0
+++     Fully packed format:
+++       |-------------- info2 --------------||------------- info1 -------------|
+++       0 llllllllllll mmm aaaaaa bbbbbbb ooooooooo ffffffffffffffffffffffff k n
+++      63           51  48     42      35        26                        2 1 0
+++     n (    1 bit ): 0 if this is the final debuginfo
+++                     1 if there's another following this one
+++     k (    1 bit ): 0 if it's a call
+++                     1 if it's a raise
+++     f (   24 bits): offset (in 4-byte words) of struct relative to dbg. For
+++                     partially packed format, f is struct name_and_loc_info;
+++                     for fully packed format, f is struct name_info.
+++     m ( 17/3 bits): difference between start line and end line
+++     o (  0/9 bits): difference between start bol and end bol
+++     a (  0/6 bits): beginning of character range (relative to start bol)
+++     b (  0/7 bits): end of character range (relative to end bol)
+++     l (19/12 bits): start line number
+++   */
++   li->loc_valid = 1;
++   li->loc_is_raise = (info1 & 2) == 2;
++   li->loc_is_inlined = caml_debuginfo_next(dbg) != NULL;
++-  li->loc_defname = name_info->name;
++-  li->loc_filename =
++-    (char *)name_info + name_info->filename_offs;
++-  li->loc_lnum = info2 >> 12;
++-  li->loc_startchr = (info2 >> 4) & 0xFF;
++-  li->loc_endchr = ((info2 & 0xF) << 6) | (info1 >> 26);
+++  if (info2 & 0x80000000) {
+++    struct name_and_loc_info * name_and_loc_info =
+++      (struct name_and_loc_info*)((char *) dbg + (info1 & 0x3FFFFFC));
+++    li->loc_defname = name_and_loc_info->name;
+++    li->loc_filename =
+++      (char *)name_and_loc_info + name_and_loc_info->filename_offs;
+++    li->loc_start_lnum = li->loc_end_lnum = (info2 >> 12) & 0x7FFFF;
+++    li->loc_end_lnum += ((info2 & 0xFFF) << 6) | (info1 >> 26);
+++    li->loc_start_chr = name_and_loc_info->start_chr;
+++    li->loc_end_chr = name_and_loc_info->end_chr;
+++    li->loc_end_offset = name_and_loc_info->end_offset;
+++  } else {
+++    struct name_info * name_info =
+++      (struct name_info*)((char *) dbg + (info1 & 0x3FFFFFC));
+++    li->loc_defname = name_info->name;
+++    li->loc_filename =
+++      (char *)name_info + name_info->filename_offs;
+++    li->loc_start_lnum = li->loc_end_lnum = info2 >> 19;
+++    li->loc_end_lnum += (info2 >> 16) & 0x7;
+++    li->loc_start_chr = (info2 >> 10) & 0x3F;
+++    li->loc_end_chr = li->loc_end_offset = (info2 >> 3) & 0x7F;
+++    li->loc_end_offset += (((info2 & 0x7) << 6) | (info1 >> 26));
+++  }
++ }
++ 
++ value caml_add_debug_info(backtrace_slot start, value size, value events)
 +diff --git a/runtime/bigarray.c b/runtime/bigarray.c
 +index ed4ff67d21..03151f6946 100644
 +--- a/runtime/bigarray.c
@@ -4710,6 +4956,25 @@ index 0000000000..53e11a35d8
 + 
 + /* Convenience functions to deal with unboxable types. */
 + Caml_inline value caml_alloc_unboxed (value arg) { return arg; }
++diff --git a/runtime/caml/backtrace_prim.h b/runtime/caml/backtrace_prim.h
++index cd084da0c9..623106ca8a 100644
++--- a/runtime/caml/backtrace_prim.h
+++++ b/runtime/caml/backtrace_prim.h
++@@ -37,9 +37,11 @@ struct caml_loc_info {
++   int loc_is_raise;
++   char * loc_filename;
++   char * loc_defname;
++-  int loc_lnum;
++-  int loc_startchr;
++-  int loc_endchr;
+++  int loc_start_lnum;
+++  int loc_start_chr;
+++  int loc_end_lnum;
+++  int loc_end_chr;
+++  int loc_end_offset;
++   int loc_is_inlined;
++ };
++ 
 +diff --git a/runtime/caml/bigarray.h b/runtime/caml/bigarray.h
 +index fc1fb14570..1664ae3f6e 100644
 +--- a/runtime/caml/bigarray.h
@@ -10142,10 +10407,10 @@ index 0000000000..be0e4f326e
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6fcd1e9015
+index 0000000000..6dbac64c9c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10127 @@
+@@ -0,0 +1,10342 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..113777bafc
@@ -13864,10 +14129,10 @@ index 0000000000..6fcd1e9015
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..53e11a35d8
++index 0000000000..d2a1e96521
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2551 @@
++@@ -0,0 +1,2816 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -14787,6 +15052,252 @@ index 0000000000..6fcd1e9015
 ++ 
 ++ #if !defined(SYS_macosx)
 ++ /* Mark stack as non-executable */
+++diff --git a/runtime/backtrace.c b/runtime/backtrace.c
+++index 3af8b9ec7e..38698a37d5 100644
+++--- a/runtime/backtrace.c
++++++ b/runtime/backtrace.c
+++@@ -99,8 +99,8 @@ static void print_location(struct caml_loc_info * li, int index)
+++     fprintf(stderr, "%s unknown location%s\n", info, inlined);
+++   } else {
+++     fprintf (stderr, "%s %s in file \"%s\"%s, line %d, characters %d-%d\n",
+++-             info, li->loc_defname, li->loc_filename, inlined, li->loc_lnum,
+++-             li->loc_startchr, li->loc_endchr);
++++             info, li->loc_defname, li->loc_filename, inlined,
++++             li->loc_start_lnum, li->loc_start_chr, li->loc_end_offset);
+++   }
+++ }
+++ 
+++@@ -233,14 +233,16 @@ static value caml_convert_debuginfo(debuginfo dbg)
+++   if (li.loc_valid) {
+++     fname = caml_copy_string(li.loc_filename);
+++     dname = caml_copy_string(li.loc_defname);
+++-    p = caml_alloc_small(7, 0);
++++    p = caml_alloc_small(9, 0);
+++     Field(p, 0) = Val_bool(li.loc_is_raise);
+++     Field(p, 1) = fname;
+++-    Field(p, 2) = Val_int(li.loc_lnum);
+++-    Field(p, 3) = Val_int(li.loc_startchr);
+++-    Field(p, 4) = Val_int(li.loc_endchr);
+++-    Field(p, 5) = Val_bool(li.loc_is_inlined);
+++-    Field(p, 6) = dname;
++++    Field(p, 2) = Val_int(li.loc_start_lnum);
++++    Field(p, 3) = Val_int(li.loc_start_chr);
++++    Field(p, 4) = Val_int(li.loc_end_offset);
++++    Field(p, 5) = Val_int(li.loc_end_lnum);
++++    Field(p, 6) = Val_int(li.loc_end_chr);
++++    Field(p, 7) = Val_bool(li.loc_is_inlined);
++++    Field(p, 8) = dname;
+++   } else {
+++     p = caml_alloc_small(1, 1);
+++     Field(p, 0) = Val_bool(li.loc_is_raise);
+++diff --git a/runtime/backtrace_byt.c b/runtime/backtrace_byt.c
+++index 61ca5603d4..25f04f9c03 100644
+++--- a/runtime/backtrace_byt.c
++++++ b/runtime/backtrace_byt.c
+++@@ -79,9 +79,11 @@ struct ev_info {
+++   code_t ev_pc;
+++   char *ev_filename;
+++   char *ev_defname;
+++-  int ev_lnum;
+++-  int ev_startchr;
+++-  int ev_endchr;
++++  int ev_start_lnum;
++++  int ev_start_chr;  /* Relative to ev_start_lnum */
++++  int ev_end_lnum;
++++  int ev_end_chr;    /* Relative to ev_end_lnum */
++++  int ev_end_offset; /* Relative to ev_start_lnum */
+++ };
+++ 
+++ struct debug_info {
+++@@ -113,25 +115,27 @@ static int cmp_ev_info(const void *a, const void *b)
+++   int num_b;
+++ 
+++   /* Perform a full lexicographic comparison to make sure the resulting order is
+++-     the same under all implementations of qsort (which is not stable). */
++++     the same under all implementations of qsort (which is not stable).
++++     NB a->ev_end_offset == b->ev_end_offset =>
++++           a->ev_end_lnum == b->ev_end_lnum && a->ev_end_chr == b->ev_end_chr */
+++ 
+++   if (pc_a > pc_b) return 1;
+++   if (pc_a < pc_b) return -1;
+++ 
+++-  num_a = ev_a->ev_lnum;
+++-  num_b = ev_b->ev_lnum;
++++  num_a = ev_a->ev_start_lnum;
++++  num_b = ev_b->ev_start_lnum;
+++ 
+++   if (num_a > num_b) return 1;
+++   if (num_a < num_b) return -1;
+++ 
+++-  num_a = ev_a->ev_startchr;
+++-  num_b = ev_b->ev_startchr;
++++  num_a = ev_a->ev_start_chr;
++++  num_b = ev_b->ev_start_chr;
+++ 
+++   if (num_a > num_b) return 1;
+++   if (num_a < num_b) return -1;
+++ 
+++-  num_a = ev_a->ev_endchr;
+++-  num_b = ev_b->ev_endchr;
++++  num_a = ev_a->ev_end_offset;
++++  num_b = ev_b->ev_end_offset;
+++ 
+++   if (num_a > num_b) return 1;
+++   if (num_a < num_b) return -1;
+++@@ -144,7 +148,7 @@ static struct ev_info *process_debug_events(code_t code_start,
+++                                             mlsize_t *num_events)
+++ {
+++   CAMLparam1(events_heap);
+++-  CAMLlocal3(l, ev, ev_start);
++++  CAMLlocal4(l, ev, ev_start, ev_end);
+++   mlsize_t i, j;
+++   struct ev_info *events;
+++ 
+++@@ -170,6 +174,7 @@ static struct ev_info *process_debug_events(code_t code_start,
+++                                  + Long_val(Field(ev, EV_POS)));
+++ 
+++       ev_start = Field(Field(ev, EV_LOC), LOC_START);
++++      ev_end = Field(Field(ev, EV_LOC), LOC_END);
+++ 
+++       {
+++         const char *fname = String_val(Field(ev_start, POS_FNAME));
+++@@ -188,13 +193,14 @@ static struct ev_info *process_debug_events(code_t code_start,
+++         events[j].ev_defname = "<old bytecode>";
+++       }
+++ 
+++-      events[j].ev_lnum = Int_val(Field(ev_start, POS_LNUM));
+++-      events[j].ev_startchr =
+++-        Int_val(Field(ev_start, POS_CNUM))
+++-        - Int_val(Field(ev_start, POS_BOL));
+++-      events[j].ev_endchr =
+++-        Int_val(Field(Field(Field(ev, EV_LOC), LOC_END), POS_CNUM))
+++-        - Int_val(Field(ev_start, POS_BOL));
++++      events[j].ev_start_lnum = Int_val(Field(ev_start, POS_LNUM));
++++      events[j].ev_start_chr =
++++        Int_val(Field(ev_start, POS_CNUM)) - Int_val(Field(ev_start, POS_BOL));
++++      events[j].ev_end_lnum = Int_val(Field(ev_end, POS_LNUM));
++++      events[j].ev_end_chr =
++++        Int_val(Field(ev_end, POS_CNUM)) - Int_val(Field(ev_end, POS_BOL));
++++      events[j].ev_end_offset =
++++        Int_val(Field(ev_end, POS_CNUM)) - Int_val(Field(ev_start, POS_BOL));
+++ 
+++       j++;
+++     }
+++@@ -494,9 +500,11 @@ void caml_debuginfo_location(debuginfo dbg,
+++   li->loc_is_inlined = 0;
+++   li->loc_filename = event->ev_filename;
+++   li->loc_defname = event->ev_defname;
+++-  li->loc_lnum = event->ev_lnum;
+++-  li->loc_startchr = event->ev_startchr;
+++-  li->loc_endchr = event->ev_endchr;
++++  li->loc_start_lnum = event->ev_start_lnum;
++++  li->loc_start_chr = event->ev_start_chr;
++++  li->loc_end_lnum = event->ev_end_lnum;
++++  li->loc_end_chr = event->ev_end_chr;
++++  li->loc_end_offset = event->ev_end_offset;
+++ }
+++ 
+++ debuginfo caml_debuginfo_extract(backtrace_slot slot)
+++diff --git a/runtime/backtrace_nat.c b/runtime/backtrace_nat.c
+++index 61228311ad..a7246fb904 100644
+++--- a/runtime/backtrace_nat.c
++++++ b/runtime/backtrace_nat.c
+++@@ -238,11 +238,20 @@ struct name_info {
+++   char name[1];
+++ };
+++ 
++++/* Extended version of name_info including location fields which didn't fit
++++   in the main debuginfo word. */
++++struct name_and_loc_info {
++++  int32_t filename_offs;
++++  uint16_t start_chr;
++++  uint16_t end_chr;
++++  int32_t end_offset; /* End character position relative to start bol */
++++  char name[1];
++++};
++++
+++ /* Extract location information for the given frame descriptor */
+++ void caml_debuginfo_location(debuginfo dbg, /*out*/ struct caml_loc_info * li)
+++ {
+++   uint32_t info1, info2;
+++-  struct name_info * name_info;
+++ 
+++   /* If no debugging information available, print nothing.
+++      When everything is compiled with -g, this corresponds to
+++@@ -256,28 +265,55 @@ void caml_debuginfo_location(debuginfo dbg, /*out*/ struct caml_loc_info * li)
+++   /* Recover debugging info */
+++   info1 = ((uint32_t *)dbg)[0];
+++   info2 = ((uint32_t *)dbg)[1];
+++-  name_info = (struct name_info*)((char *) dbg + (info1 & 0x3FFFFFC));
+++   /* Format of the two info words:
+++-       llllllllllllllllllll aaaaaaaa bbbbbbbbbb ffffffffffffffffffffffff k n
+++-                         44       36         26                        2 1 0
+++-                       (32+12)    (32+4)
+++-     n ( 1 bit ): 0 if this is the final debuginfo
+++-                  1 if there's another following this one
+++-     k ( 1 bit ): 0 if it's a call
+++-                  1 if it's a raise
+++-     f (24 bits): offset (in 4-byte words) of file name relative to dbg
+++-     l (20 bits): line number
+++-     a ( 8 bits): beginning of character range
+++-     b (10 bits): end of character range */
++++     Two possible formats based on value of bit 63:
++++     Partially packed format
++++       |------------- info2 ------------||------------- info1 -------------|
++++       1 lllllllllllllllllll mmmmmmmmmmmmmmmmmm ffffffffffffffffffffffff k n
++++      63                  44                 26                        2 1 0
++++     Fully packed format:
++++       |-------------- info2 --------------||------------- info1 -------------|
++++       0 llllllllllll mmm aaaaaa bbbbbbb ooooooooo ffffffffffffffffffffffff k n
++++      63           51  48     42      35        26                        2 1 0
++++     n (    1 bit ): 0 if this is the final debuginfo
++++                     1 if there's another following this one
++++     k (    1 bit ): 0 if it's a call
++++                     1 if it's a raise
++++     f (   24 bits): offset (in 4-byte words) of struct relative to dbg. For
++++                     partially packed format, f is struct name_and_loc_info;
++++                     for fully packed format, f is struct name_info.
++++     m ( 17/3 bits): difference between start line and end line
++++     o (  0/9 bits): difference between start bol and end bol
++++     a (  0/6 bits): beginning of character range (relative to start bol)
++++     b (  0/7 bits): end of character range (relative to end bol)
++++     l (19/12 bits): start line number
++++   */
+++   li->loc_valid = 1;
+++   li->loc_is_raise = (info1 & 2) == 2;
+++   li->loc_is_inlined = caml_debuginfo_next(dbg) != NULL;
+++-  li->loc_defname = name_info->name;
+++-  li->loc_filename =
+++-    (char *)name_info + name_info->filename_offs;
+++-  li->loc_lnum = info2 >> 12;
+++-  li->loc_startchr = (info2 >> 4) & 0xFF;
+++-  li->loc_endchr = ((info2 & 0xF) << 6) | (info1 >> 26);
++++  if (info2 & 0x80000000) {
++++    struct name_and_loc_info * name_and_loc_info =
++++      (struct name_and_loc_info*)((char *) dbg + (info1 & 0x3FFFFFC));
++++    li->loc_defname = name_and_loc_info->name;
++++    li->loc_filename =
++++      (char *)name_and_loc_info + name_and_loc_info->filename_offs;
++++    li->loc_start_lnum = li->loc_end_lnum = (info2 >> 12) & 0x7FFFF;
++++    li->loc_end_lnum += ((info2 & 0xFFF) << 6) | (info1 >> 26);
++++    li->loc_start_chr = name_and_loc_info->start_chr;
++++    li->loc_end_chr = name_and_loc_info->end_chr;
++++    li->loc_end_offset = name_and_loc_info->end_offset;
++++  } else {
++++    struct name_info * name_info =
++++      (struct name_info*)((char *) dbg + (info1 & 0x3FFFFFC));
++++    li->loc_defname = name_info->name;
++++    li->loc_filename =
++++      (char *)name_info + name_info->filename_offs;
++++    li->loc_start_lnum = li->loc_end_lnum = info2 >> 19;
++++    li->loc_end_lnum += (info2 >> 16) & 0x7;
++++    li->loc_start_chr = (info2 >> 10) & 0x3F;
++++    li->loc_end_chr = li->loc_end_offset = (info2 >> 3) & 0x7F;
++++    li->loc_end_offset += (((info2 & 0x7) << 6) | (info1 >> 26));
++++  }
+++ }
+++ 
+++ value caml_add_debug_info(backtrace_slot start, value size, value events)
 ++diff --git a/runtime/bigarray.c b/runtime/bigarray.c
 ++index ed4ff67d21..03151f6946 100644
 ++--- a/runtime/bigarray.c
@@ -14858,6 +15369,25 @@ index 0000000000..6fcd1e9015
 ++ 
 ++ /* Convenience functions to deal with unboxable types. */
 ++ Caml_inline value caml_alloc_unboxed (value arg) { return arg; }
+++diff --git a/runtime/caml/backtrace_prim.h b/runtime/caml/backtrace_prim.h
+++index cd084da0c9..623106ca8a 100644
+++--- a/runtime/caml/backtrace_prim.h
++++++ b/runtime/caml/backtrace_prim.h
+++@@ -37,9 +37,11 @@ struct caml_loc_info {
+++   int loc_is_raise;
+++   char * loc_filename;
+++   char * loc_defname;
+++-  int loc_lnum;
+++-  int loc_startchr;
+++-  int loc_endchr;
++++  int loc_start_lnum;
++++  int loc_start_chr;
++++  int loc_end_lnum;
++++  int loc_end_chr;
++++  int loc_end_offset;
+++   int loc_is_inlined;
+++ };
+++ 
 ++diff --git a/runtime/caml/bigarray.h b/runtime/caml/bigarray.h
 ++index fc1fb14570..1664ae3f6e 100644
 ++--- a/runtime/caml/bigarray.h
@@ -20222,57 +20752,7 @@ index 0000000000..6fcd1e9015
 ++     ;;
 ++   test)
 ++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
-+++    fi
-++     if [[ $PORT =~ mingw* ]] ; then
-++       run "Check runtime symbols" \
-++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
-++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
-++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
-++     fi
-++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-++-    # tests now (to include natdynlink)
-++-    run "test dynlink $PORT" \
-++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-++-    # Now reconfigure ocamltest to run in bytecode-only mode
-++-    sed -i '/native_/s/true/false/' \
-++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-++-    # And run the entire testsuite, skipping all the native-code tests
-+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
-+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-+++      # tests now (to include natdynlink)
-+++      run "test dynlink $PORT" \
-+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-+++      # Now reconfigure ocamltest to run in bytecode-only mode
-+++      sed -i '/native_/s/true/false/' \
-+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_P
+++-    run 'ocamlc.opt -version' "$FULL_BUI
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
