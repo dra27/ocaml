@@ -938,6 +938,12 @@ type popen_process =
   | Process_full of in_channel * out_channel * in_channel
 
 let popen_processes = (Hashtbl.create 7 : (popen_process, int) Hashtbl.t)
+(* BACKPORT BEGIN *)
+module Mutex = struct
+  let create () = ()
+  let protect () f = f ()
+end
+(* BACKPORT END *)
 let popen_mutex = Mutex.create ()
 
 let open_proc prog args envopt proc input output error =
