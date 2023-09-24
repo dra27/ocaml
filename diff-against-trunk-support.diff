@@ -2230,6 +2230,25 @@ index 35ddd983a1..d63066e646 100644
  *)
  open Runtime_events
  
+diff --git a/testsuite/tests/lib-runtime-events/test_dropped_events.ml b/testsuite/tests/lib-runtime-events/test_dropped_events.ml
+index 7443833499..7d51efd32e 100644
+--- a/testsuite/tests/lib-runtime-events/test_dropped_events.ml
++++ b/testsuite/tests/lib-runtime-events/test_dropped_events.ml
+@@ -2,9 +2,11 @@
+    include runtime_events
+    include unix
+    set OCAMLRUNPARAM = "e=6"
+-   * libunix
+-   ** native
+-   ** bytecode
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** native
++   *** bytecode
+ *)
+ 
+ type Runtime_events.User.tag += Ev
 diff --git a/testsuite/tests/lib-runtime-events/test_env_start.ml b/testsuite/tests/lib-runtime-events/test_env_start.ml
 index 6b6bca5b09..cbdf114e57 100644
 --- a/testsuite/tests/lib-runtime-events/test_env_start.ml
