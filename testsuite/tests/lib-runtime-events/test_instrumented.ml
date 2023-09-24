@@ -1,21 +1,11 @@
 (* TEST
-<<<<<<< HEAD
-  * skip
-  reason = "OCaml 5 only"
-  ** native
-    include runtime_events
-    flags = "-runtime-variant=i"
-||||||| parent of a9e8c33052 (test_instrumented.ml: should only run if instrumented-runtime available (PR#11711))
-  * native
-    include runtime_events
-    flags = "-runtime-variant=i"
-=======
    include runtime_events
    flags = "-runtime-variant=i"
 
-   * instrumented-runtime
-   ** native
->>>>>>> a9e8c33052 (test_instrumented.ml: should only run if instrumented-runtime available (PR#11711))
+   * skip
+   reason = "OCaml 5 only"
+   ** instrumented-runtime
+   *** native
 *)
 
 open Runtime_events
