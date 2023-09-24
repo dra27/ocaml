@@ -52,43 +52,19 @@ let sighandler signo =
   (* Thoroughly wipe the minor heap *)
   ignore (tak (18, 12, 6))
 
-<<<<<<< HEAD
 external raise_sigusr1 : unit -> unit = "raise_sigusr1" [@@noalloc]
-external unix_getpid : unit -> int = "unix_getpid" [@@noalloc]
-external unix_kill : int -> int -> unit = "unix_kill" [@@noalloc]
-||||||| parent of c2679e876e (Merge pull request PR#11033 from xavierleroy/fix-test-signalhandler)
-external unix_getpid : unit -> int = "unix_getpid" [@@noalloc]
-external unix_kill : int -> int -> unit = "unix_kill" [@@noalloc]
-=======
-external mykill : int -> int -> unit = "mykill" [@@noalloc]
->>>>>>> c2679e876e (Merge pull request PR#11033 from xavierleroy/fix-test-signalhandler)
+(*external mykill : int -> int -> unit = "mykill" [@@noalloc]*)
 
 let callbacksig () =
-<<<<<<< HEAD
-  let _pid = unix_getpid() in
-||||||| parent of c2679e876e (Merge pull request PR#11033 from xavierleroy/fix-test-signalhandler)
-  let pid = unix_getpid() in
-=======
-  let pid = Unix.getpid () in
->>>>>>> c2679e876e (Merge pull request PR#11033 from xavierleroy/fix-test-signalhandler)
+  let _pid = Unix.getpid() in
   (* Allocate a block in the minor heap *)
   let s = String.make 5 'b' in
   (* Send a signal to self.  We want s to remain in a register and
-<<<<<<< HEAD
-     not be spilled on the stack, hence we declare unix_kill
-     [@@noalloc]. *)
-  (*unix_kill pid Sys.sigusr1;*)
-  raise_sigusr1 ();
-||||||| parent of c2679e876e (Merge pull request PR#11033 from xavierleroy/fix-test-signalhandler)
-     not be spilled on the stack, hence we declare unix_kill
-     [@@noalloc]. *)
-  unix_kill pid Sys.sigusr1;
-=======
      not be spilled on the stack, hence we use [mykill]
      (which is [@@noalloc] and doesn't trigger signal handling)
      instead of [Unix.kill]. *)
-  mykill pid Sys.sigusr1;
->>>>>>> c2679e876e (Merge pull request PR#11033 from xavierleroy/fix-test-signalhandler)
+  (*mykill pid Sys.sigusr1;*)
+  raise_sigusr1 ();
   (* Allocate some more so that the signal will be tested *)
   let u = (s, s) in
   fst u
