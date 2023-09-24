@@ -478,15 +478,12 @@ Working version
   (Andrei Paskevich and Charlène Gros, review by David Allsopp and
    Nicolás Ojeda Bär)
 
-<<<<<<< HEAD
+- #11879: Bugfix for Ctype.nondep_type
+  (Stephen Dolan, review by Gabriel Scherer)
+
 - #12264, #12289: Fix compact_allocate to avoid a pathological case
   that causes very slow compaction.
   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
-||||||| parent of 488c8d7030 (Changes improvements (direct push))
-=======
-- #11879: Bugfix for Ctype.nondep_type
-  (Stephen Dolan, review by Gabriel Scherer)
->>>>>>> 488c8d7030 (Changes improvements (direct push))
 
 OCaml 5.0
 ---------
