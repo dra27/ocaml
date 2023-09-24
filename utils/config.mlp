@@ -124,10 +124,11 @@ let lazy_tag = 246
 let max_young_wosize = 256
 (* BACKPORT BEGIN
 let stack_threshold = 32 (* see runtime/caml/config.h *)
+let stack_safety_margin = 6
 *)
 let stack_threshold = 256 (* see runtime/caml/config.h *)
+let stack_safety_margin = 60
 (* BACKPORT END *)
-let stack_safety_margin = 6
 
 let architecture = "%%ARCH%%"
 let model = "%%MODEL%%"
