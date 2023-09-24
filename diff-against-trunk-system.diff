@@ -2540,15 +2540,15 @@ index 0000000000..d9e135d7b5
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..7b67bd7785
+index 0000000000..b2acf00c70
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3341 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-+index 0aa5f92651..11782f7f9f 100644
++index 1b45ec3e38..f2d2b1d514 100644
 +--- a/ocamltest/Makefile
 ++++ b/ocamltest/Makefile
-+@@ -277,6 +277,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
++@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 + 	    $(call SUBST,DIFF_FLAGS) \
 + 	    $(call SUBST,WINDOWS_UNICODE) \
 + 	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -5887,7 +5887,7 @@ index 0000000000..7b67bd7785
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..53d1467bc9
+index 0000000000..12d0ecf242
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,5825 @@
@@ -8433,15 +8433,15 @@ index 0000000000..53d1467bc9
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..7b67bd7785
++index 0000000000..b2acf00c70
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3341 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
-++index 0aa5f92651..11782f7f9f 100644
+++index 1b45ec3e38..f2d2b1d514 100644
 ++--- a/ocamltest/Makefile
 +++++ b/ocamltest/Makefile
-++@@ -277,6 +277,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+++@@ -273,6 +273,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 ++ 	    $(call SUBST,DIFF_FLAGS) \
 ++ 	    $(call SUBST,WINDOWS_UNICODE) \
 ++ 	    $(call SUBST,FUNCTION_SECTIONS) \
@@ -12778,6 +12778,20 @@ index da23211543..ca0851f1ac 100644
  stdlib__Seq.cmo : seq.ml \
      stdlib__Lazy.cmi \
      stdlib__Either.cmi \
+diff --git a/stdlib/Makefile b/stdlib/Makefile
+index 4a52e3b159..9707f1f559 100644
+--- a/stdlib/Makefile
++++ b/stdlib/Makefile
+@@ -267,7 +267,8 @@ GNUISH_SED = \
+ .INTERMEDIATE: .depend.tmp
+ 
+ .depend.tmp:
+-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
++	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml \
++    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
+ 	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
+ 	  stdlib.ml stdlib.mli >> $@
+ 
 diff --git a/stdlib/StdlibModules b/stdlib/StdlibModules
 index fc299a5ea8..0780508c00 100644
 --- a/stdlib/StdlibModules
