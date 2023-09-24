@@ -139,22 +139,30 @@ case "$1" in
     ;;
   test)
     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
+      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    else
+      run 'ocamlc -version' \
+        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
+        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
+    fi
     if [[ $PORT =~ mingw* ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
     fi
-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
-    # tests now (to include natdynlink)
-    run "test dynlink $PORT" \
-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-    # Now reconfigure ocamltest to run in bytecode-only mode
-    sed -i '/native_/s/true/false/' \
-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-    # And run the entire testsuite, skipping all the native-code tests
+    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
+      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+      # tests now (to include natdynlink)
+      run "test dynlink $PORT" \
+          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+      # Now reconfigure ocamltest to run in bytecode-only mode
+      sed -i '/native_/s/true/false/' \
+             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+      # And run the entire testsuite, skipping all the native-code tests
+    fi
     run "test $PORT" \
         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
@@ -208,7 +216,7 @@ case "$1" in
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
         script --quiet --return --command \
-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \

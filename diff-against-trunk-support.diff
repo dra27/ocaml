@@ -3840,82 +3840,6 @@ index f5e0711b79..8beb1f6433 100644
  
  (* Testing unsynchronized, parallel Weak usage *)
  
-diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-new file mode 100644
-index 0000000000..956ec369ab
---- /dev/null
-+++ b/testsuite/tools/asmgen_i386.S
-@@ -0,0 +1,70 @@
-+/**************************************************************************/
-+/*                                                                        */
-+/*                                OCaml                                   */
-+/*                                                                        */
-+/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
-+/*                                                                        */
-+/*   Copyright 1996 Institut National de Recherche en Informatique et     */
-+/*     en Automatique.                                                    */
-+/*                                                                        */
-+/*   All rights reserved.  This file is distributed under the terms of    */
-+/*   the GNU Lesser General Public License version 2.1, with the          */
-+/*   special exception on linking described in the file LICENSE.          */
-+/*                                                                        */
-+/**************************************************************************/
-+
-+/* Linux with ELF binaries does not prefix identifiers with _.
-+   Linux with a.out binaries, FreeBSD, and NextStep do. */
-+
-+#if defined(SYS_linux_elf) || defined(SYS_bsd_elf) \
-+ || defined(SYS_solaris) || defined(SYS_beos) || defined(SYS_gnu)
-+#define G(x) x
-+#define FUNCTION_ALIGN 16
-+#else
-+#define G(x) _##x
-+#define FUNCTION_ALIGN 4
-+#endif
-+
-+        .globl  G(call_gen_code)
-+        .align  FUNCTION_ALIGN
-+G(call_gen_code):
-+        pushl %ebp
-+        movl %esp,%ebp
-+        pushl %ebx
-+        pushl %esi
-+        pushl %edi
-+        movl 12(%ebp),%eax
-+        movl 16(%ebp),%ebx
-+        movl 20(%ebp),%ecx
-+        movl 24(%ebp),%edx
-+        call *8(%ebp)
-+        popl %edi
-+        popl %esi
-+        popl %ebx
-+        popl %ebp
-+        ret
-+
-+        .globl  G(caml_c_call)
-+        .align  FUNCTION_ALIGN
-+G(caml_c_call):
-+        jmp     *%eax
-+
-+        .comm   G(caml_state), 4
-+
-+/* Some tests are designed to cause registers to spill; on
-+ * x86 we require the caml_extra_params symbol from the RTS. */
-+        .data
-+        .globl  G(caml_extra_params)
-+G(caml_extra_params):
-+#ifndef SYS_solaris
-+        .space  64
-+#else
-+        .zero   64
-+#endif
-+
-+
-+
-+#if defined(SYS_linux_elf)
-+    /* Mark stack as non-executable */
-+        .section .note.GNU-stack,"",%progbits
-+#endif
 diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
 index de10bd1fd3..5f9e31bc66 100755
 --- a/tools/ci/actions/runner.sh
@@ -3942,7 +3866,7 @@ index de10bd1fd3..5f9e31bc66 100755
  
  Build () {
 diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-index 3292ad9c31..24fd58adef 100644
+index 3292ad9c31..f69aeb342c 100644
 --- a/tools/ci/appveyor/appveyor_build.sh
 +++ b/tools/ci/appveyor/appveyor_build.sh
 @@ -64,8 +64,8 @@ function set_configuration {
@@ -3956,7 +3880,44 @@ index 3292ad9c31..24fd58adef 100644
          ;;
          msvc32)
              build='--build=i686-pc-cygwin'
-@@ -158,10 +158,13 @@ case "$1" in
+@@ -139,29 +139,40 @@ case "$1" in
+     ;;
+   test)
+     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++    else
++      run 'ocamlc -version' \
++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++    fi
+     if [[ $PORT =~ mingw* ]] ; then
+       run "Check runtime symbols" \
+           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+     fi
+-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+-    # tests now (to include natdynlink)
+-    run "test dynlink $PORT" \
+-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+-    # Now reconfigure ocamltest to run in bytecode-only mode
+-    sed -i '/native_/s/true/false/' \
+-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+-    # And run the entire testsuite, skipping all the native-code tests
++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++      # tests now (to include natdynlink)
++      run "test dynlink $PORT" \
++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++      # Now reconfigure ocamltest to run in bytecode-only mode
++      sed -i '/native_/s/true/false/' \
++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++      # And run the entire testsuite, skipping all the native-code tests
++    fi
      run "test $PORT" \
          make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
      run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
@@ -3971,7 +3932,7 @@ index 3292ad9c31..24fd58adef 100644
        # Ensure that .gitignore is up-to-date - this will fail if any untracked
        # or altered files exist. We revert the change from the bootstrap (that
        # would have failed the build earlier if necessary)
-@@ -181,7 +184,7 @@ case "$1" in
+@@ -181,7 +192,7 @@ case "$1" in
    *)
      cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
  
@@ -3980,3 +3941,12 @@ index 3292ad9c31..24fd58adef 100644
        # Ensure that make distclean can be run from an empty tree
        run "$MAKE distclean" $MAKE distclean
      fi
+@@ -205,7 +216,7 @@ case "$1" in
+         # For an explanation of the sed command, see
+         # https://github.com/appveyor/ci/issues/1824
+         script --quiet --return --command \
+-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
+           "../$BUILD_PREFIX-$PORT/build.log" |
+             sed -e 's/\d027\[K//g' \
+                 -e 's/\d027\[m/\d027[0m/g' \
