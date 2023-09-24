@@ -1729,6 +1729,19 @@ index 051122113a..7eef1e662e 100644
    echo "OCaml was not compiled with gcc" > ${ocamltest_response}
    test_result=${TEST_SKIP}
  else
+diff --git a/testsuite/tests/lib-channels/close_in.ml b/testsuite/tests/lib-channels/close_in.ml
+index 2986e5b8c9..8c51c7d52c 100644
+--- a/testsuite/tests/lib-channels/close_in.ml
++++ b/testsuite/tests/lib-channels/close_in.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++* skip
++reason = "OCaml 5 only"
++ *)
+ 
+ (* Test that inputting bytes from a closed in_channel triggers an exception *)
+ 
 diff --git a/testsuite/tests/lib-channels/refcounting.ml b/testsuite/tests/lib-channels/refcounting.ml
 index bc0b8dfe66..deaba0a3ee 100644
 --- a/testsuite/tests/lib-channels/refcounting.ml
