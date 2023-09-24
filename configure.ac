@@ -1264,16 +1264,10 @@ AS_CASE([$host],
   [x86_64-pc-windows],
     [has_native_backend=yes; arch=amd64; system=win64],
   [[powerpc64le*-*-linux*]],
-<<<<<<< HEAD
-    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
+    [has_native_backend=yes; arch=power; model=ppc64le; system=linux],
   [[powerpc*-*-linux*]],
     [has_native_backend=yes; arch=power
-    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
-||||||| parent of b3f605c81a (Merge pull request PR#12405 from dra27/harmonise-system)
-    [has_native_backend=yes; arch=power; model=ppc64le; system=elf],
-=======
-    [has_native_backend=yes; arch=power; model=ppc64le; system=linux],
->>>>>>> b3f605c81a (Merge pull request PR#12405 from dra27/harmonise-system)
+    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=linux],
   [[s390x*-*-linux*]],
     [has_native_backend=yes; arch=s390x; model=z10; system=linux],
   # expected to match "gnueabihf" as well as "musleabihf"
