@@ -725,10 +725,22 @@ index 12ad260b2e..6666e1a210 100644
    cfi_endproc();
    emit_symbol_type emit_symbol fundecl.fun_name "function";
 diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-index a0f8e6ade2..06d5feb02d 100644
+index a0f8e6ade2..2a05c2fd98 100644
 --- a/asmcomp/cmm_helpers.ml
 +++ b/asmcomp/cmm_helpers.ml
-@@ -2203,8 +2203,13 @@ let assignment_kind
+@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
+     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
+                           fill_fields (idx + 2) el) in
+     Clet(VP.create id,
++(* BACKPORT BEGIN
+          Cop(Cextcall("caml_alloc_shr_check_gc", typ_val, [], true),
++*)
++         Cop(Cextcall("caml_alloc", typ_val, [], true),
++(* BACKPORT END *)
+                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
+          fill_fields 1 args)
+   end
+@@ -2203,8 +2207,13 @@ let assignment_kind
      (init: Lambda.initialization_or_assignment) =
    match init, ptr with
    | Assignment, Pointer -> Caml_modify
@@ -794,10 +806,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index c524f7052d..4bf121515f 100755
+index c524f7052d..ebad0d2bba 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index fe5f665a7a..f8d315e9ac 100755
+index fe5f665a7a..5393f87ab3 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -6205,7 +6217,7 @@ index 0000000000..b3412f8bb4
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..caec05d055
+index 0000000000..100ce95a26
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3802 @@
@@ -7303,7 +7315,7 @@ index 0000000000..caec05d055
 + 
 + external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 +diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-+index 9419dd5c6f..e523ba85b7 100644
++index 8883a55f69..800c60e6de 100644
 +--- a/testsuite/tests/callback/test7.ml
 ++++ b/testsuite/tests/callback/test7.ml
 +@@ -1,9 +1,11 @@
@@ -7548,7 +7560,7 @@ index 0000000000..caec05d055
 + 
 + open Effect
 +diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-+index ddfb83a5b6..6d4842f9fa 100644
++index 40574561bf..451e9704bc 100644
 +--- a/testsuite/tests/effects/test6.ml
 ++++ b/testsuite/tests/effects/test6.ml
 +@@ -1,4 +1,6 @@
@@ -10013,10 +10025,10 @@ index 0000000000..caec05d055
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..d265912f8a
+index 0000000000..d5d4a4b511
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10012 @@
+@@ -0,0 +1,10011 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..099f664a53
@@ -10744,10 +10756,22 @@ index 0000000000..d265912f8a
 +   cfi_endproc();
 +   emit_symbol_type emit_symbol fundecl.fun_name "function";
 +diff --git a/asmcomp/cmm_helpers.ml b/asmcomp/cmm_helpers.ml
-+index a0f8e6ade2..06d5feb02d 100644
++index a0f8e6ade2..2a05c2fd98 100644
 +--- a/asmcomp/cmm_helpers.ml
 ++++ b/asmcomp/cmm_helpers.ml
-+@@ -2203,8 +2203,13 @@ let assignment_kind
++@@ -816,7 +816,11 @@ let make_alloc_generic set_fn dbg tag wordsize args =
++     | e1::el -> Csequence(set_fn (Cvar id) (Cconst_int (idx, dbg)) e1 dbg,
++                           fill_fields (idx + 2) el) in
++     Clet(VP.create id,
+++(* BACKPORT BEGIN
++          Cop(Cextcall("caml_alloc_shr_check_gc", typ_val, [], true),
+++*)
+++         Cop(Cextcall("caml_alloc", typ_val, [], true),
+++(* BACKPORT END *)
++                  [Cconst_int (wordsize, dbg); Cconst_int (tag, dbg)], dbg),
++          fill_fields 1 args)
++   end
++@@ -2203,8 +2207,13 @@ let assignment_kind
 +     (init: Lambda.initialization_or_assignment) =
 +   match init, ptr with
 +   | Assignment, Pointer -> Caml_modify
@@ -10813,10 +10837,10 @@ index 0000000000..d265912f8a
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index c524f7052d..4bf121515f 100755
++index c524f7052d..ebad0d2bba 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index fe5f665a7a..f8d315e9ac 100755
++index fe5f665a7a..5393f87ab3 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
@@ -16224,7 +16248,7 @@ index 0000000000..d265912f8a
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..caec05d055
++index 0000000000..100ce95a26
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3802 @@
@@ -17322,7 +17346,7 @@ index 0000000000..d265912f8a
 ++ 
 ++ external caml_to_c : (unit -> 'a) -> 'a = "caml_to_c"
 ++diff --git a/testsuite/tests/callback/test7.ml b/testsuite/tests/callback/test7.ml
-++index 9419dd5c6f..e523ba85b7 100644
+++index 8883a55f69..800c60e6de 100644
 ++--- a/testsuite/tests/callback/test7.ml
 +++++ b/testsuite/tests/callback/test7.ml
 ++@@ -1,9 +1,11 @@
@@ -17567,7 +17591,7 @@ index 0000000000..d265912f8a
 ++ 
 ++ open Effect
 ++diff --git a/testsuite/tests/effects/test6.ml b/testsuite/tests/effects/test6.ml
-++index ddfb83a5b6..6d4842f9fa 100644
+++index 40574561bf..451e9704bc 100644
 ++--- a/testsuite/tests/effects/test6.ml
 +++++ b/testsuite/tests/effects/test6.ml
 ++@@ -1,4 +1,6 @@
@@ -20015,20 +20039,7 @@ index 0000000000..d265912f8a
 ++@@ -153,7 +153,7 @@ case "$1" in
 ++     #run "test $PORT" \
 ++     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-++@@ -176,7 +176,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE dis
+++     run "install $PORT" $MAKE -C "$FULL_BUIL
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644

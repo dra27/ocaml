@@ -1360,6 +1360,18 @@ index 24f457f0af..036c7d5038 100644
  
  open Effect
  open Effect.Deep
+diff --git a/testsuite/tests/effects/unhandled_unlinked.ml b/testsuite/tests/effects/unhandled_unlinked.ml
+index bc2badb8e8..094eaad6e8 100644
+--- a/testsuite/tests/effects/unhandled_unlinked.ml
++++ b/testsuite/tests/effects/unhandled_unlinked.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+      exit_status= "2"
++     * skip
++     reason = "OCaml 5 only"
+ *)
+ 
+ open Effect
 diff --git a/testsuite/tests/effects/used_cont.ml b/testsuite/tests/effects/used_cont.ml
 index 71a33388ec..7972d000b7 100644
 --- a/testsuite/tests/effects/used_cont.ml
