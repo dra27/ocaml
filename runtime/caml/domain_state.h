@@ -49,7 +49,8 @@ CAML_STATIC_ASSERT(
     offsetof(caml_domain_state, LAST_DOMAIN_STATE_MEMBER) ==
     (Domain_state_num_fields - 1) * 8);
 
-CAMLextern caml_domain_state* Caml_state;
+CAMLextern caml_domain_state* caml_state;
+#define Caml_state caml_state
 #define Caml_state_field(field) Caml_state->field
 
 #endif /* CAML_STATE_H */

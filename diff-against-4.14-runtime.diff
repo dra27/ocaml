@@ -677,7 +677,7 @@ index 420121f43e..231019aef7 100644
  
  struct custom_fixed_length {
 diff --git a/runtime/caml/domain_state.h b/runtime/caml/domain_state.h
-index 84e677d041..911895a3aa 100644
+index 84e677d041..2ee932459a 100644
 --- a/runtime/caml/domain_state.h
 +++ b/runtime/caml/domain_state.h
 @@ -29,11 +29,7 @@ typedef value extra_params_area[NUM_EXTRA_PARAMS];
@@ -704,11 +704,14 @@ index 84e677d041..911895a3aa 100644
  
  /* Check that the structure was laid out without padding,
     since the runtime assumes this in computing offsets */
-@@ -58,10 +50,6 @@ CAML_STATIC_ASSERT(
+@@ -57,11 +49,8 @@ CAML_STATIC_ASSERT(
+     offsetof(caml_domain_state, LAST_DOMAIN_STATE_MEMBER) ==
      (Domain_state_num_fields - 1) * 8);
  
- CAMLextern caml_domain_state* Caml_state;
+-CAMLextern caml_domain_state* Caml_state;
 -#ifdef CAML_NAME_SPACE
++CAMLextern caml_domain_state* caml_state;
++#define Caml_state caml_state
  #define Caml_state_field(field) Caml_state->field
 -#else
 -#define Caml_state_field(field) Caml_state->_##field
@@ -973,6 +976,19 @@ index 97d22832a0..c10c7d0f8f 100644
    dbg_in = caml_open_descriptor_in(dbg_socket);
    dbg_out = caml_open_descriptor_out(dbg_socket);
    /* The code in this file does not bracket channel I/O operations with
+diff --git a/runtime/domain.c b/runtime/domain.c
+index d4d8de53fc..a6f0a3028e 100644
+--- a/runtime/domain.c
++++ b/runtime/domain.c
+@@ -19,7 +19,7 @@
+ #include "caml/domain_state.h"
+ #include "caml/memory.h"
+ 
+-CAMLexport caml_domain_state* Caml_state;
++CAMLexport caml_domain_state* caml_state;
+ 
+ void caml_init_domain ()
+ {
 diff --git a/runtime/dune b/runtime/dune
 index 78c39300ed..23eb1d1e8a 100644
 --- a/runtime/dune
@@ -1043,6 +1059,129 @@ index a727d5c25c..e76b3300b7 100755
    do
        sed -n -e 's/^CAMLprim value \([a-z0-9_][a-z0-9_]*\).*/\1/p' "$prim.c"
    done
+diff --git a/runtime/i386.S b/runtime/i386.S
+index 4d273c9f04..06a9cf5fa7 100644
+--- a/runtime/i386.S
++++ b/runtime/i386.S
+@@ -116,7 +116,7 @@ FUNCTION(caml_call_gc)
+         CFI_STARTPROC
+ LBL(caml_call_gc):
+     /* Record lowest stack address and return address */
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         movl    (%esp), %eax
+         movl    %eax, CAML_STATE(last_return_address, %ebx)
+         leal    4(%esp), %eax
+@@ -128,7 +128,7 @@ LBL(caml_call_gc):
+         movl    %eax, 0(%esp)
+         addl    $(STACK_PROBE_SIZE), %esp; CFI_ADJUST(-STACK_PROBE_SIZE);
+ #endif
+-    /* Build array of registers, save it into Caml_state->gc_regs */
++    /* Build array of registers, save it into caml_state->gc_regs */
+         pushl   %ebp; CFI_ADJUST(4)
+         pushl   %edi; CFI_ADJUST(4)
+         pushl   %esi; CFI_ADJUST(4)
+@@ -156,7 +156,7 @@ LBL(caml_call_gc):
+ 
+ FUNCTION(caml_alloc1)
+         CFI_STARTPROC
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         movl    CAML_STATE(young_ptr, %ebx), %eax
+         subl    $8, %eax
+         movl    %eax, CAML_STATE(young_ptr, %ebx)
+@@ -168,7 +168,7 @@ FUNCTION(caml_alloc1)
+ 
+ FUNCTION(caml_alloc2)
+         CFI_STARTPROC
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         movl    CAML_STATE(young_ptr, %ebx), %eax
+         subl    $12, %eax
+         movl    %eax, CAML_STATE(young_ptr, %ebx)
+@@ -180,7 +180,7 @@ FUNCTION(caml_alloc2)
+ 
+ FUNCTION(caml_alloc3)
+         CFI_STARTPROC
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         movl    CAML_STATE(young_ptr, %ebx), %eax
+         subl    $16, %eax
+         movl    %eax, CAML_STATE(young_ptr, %ebx)
+@@ -192,10 +192,10 @@ FUNCTION(caml_alloc3)
+ 
+ FUNCTION(caml_allocN)
+         CFI_STARTPROC
+-        movl    G(Caml_state), %ebx
+-        /* eax = size - Caml_state->young_ptr */
++        movl    G(caml_state), %ebx
++        /* eax = size - caml_state->young_ptr */
+         subl    CAML_STATE(young_ptr, %ebx), %eax
+-        negl    %eax              /* eax = Caml_state->young_ptr - size */
++        negl    %eax              /* eax = caml_state->young_ptr - size */
+         movl    %eax, CAML_STATE(young_ptr, %ebx)
+         cmpl    CAML_STATE(young_limit, %ebx), %eax
+         jb      LBL(caml_call_gc)
+@@ -209,7 +209,7 @@ FUNCTION(caml_c_call)
+         CFI_STARTPROC
+     /* Record lowest stack address and return address */
+     /* ecx and edx are destroyed at C call. Use them as temp. */
+-        movl    G(Caml_state), %ecx
++        movl    G(caml_state), %ecx
+         movl    (%esp), %edx
+         movl    %edx, CAML_STATE(last_return_address, %ecx)
+         leal    4(%esp), %edx
+@@ -239,7 +239,7 @@ FUNCTION(caml_start_program)
+         movl    $ G(caml_program), %esi
+     /* Common code for caml_start_program and caml_callback* */
+ LBL(106):
+-        movl    G(Caml_state), %edi
++        movl    G(caml_state), %edi
+     /* Build a callback link */
+         pushl   CAML_STATE(gc_regs, %edi); CFI_ADJUST(4)
+         pushl   CAML_STATE(last_return_address, %edi); CFI_ADJUST(4)
+@@ -253,12 +253,12 @@ LBL(106):
+     /* Call the OCaml code */
+         call    *%esi
+ LBL(107):
+-        movl    G(Caml_state), %edi
++        movl    G(caml_state), %edi
+     /* Pop the exception handler */
+         popl    CAML_STATE(exception_pointer, %edi); CFI_ADJUST(-4)
+         addl    $12, %esp       ; CFI_ADJUST(-12)
+ LBL(109):
+-        movl    G(Caml_state), %edi /* Reload for LBL(109) entry */
++        movl    G(caml_state), %edi /* Reload for LBL(109) entry */
+     /* Pop the callback link, restoring the global variables */
+         popl    CAML_STATE(bottom_of_stack, %edi); CFI_ADJUST(-4)
+         popl    CAML_STATE(last_return_address, %edi); CFI_ADJUST(-4)
+@@ -282,7 +282,7 @@ LBL(108):
+ 
+ FUNCTION(caml_raise_exn)
+         CFI_STARTPROC
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         testl   $1, CAML_STATE(backtrace_active, %ebx)
+         jne     LBL(110)
+         movl    CAML_STATE(exception_pointer, %ebx), %esp
+@@ -312,7 +312,7 @@ LBL(110):
+ 
+ FUNCTION(caml_raise_exception)
+         CFI_STARTPROC
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         testl   $1, CAML_STATE(backtrace_active, %ebx)
+         jne     LBL(112)
+         movl    8(%esp), %eax
+@@ -405,7 +405,7 @@ FUNCTION(caml_ml_array_bound_error)
+         ffree   %st(6)
+         ffree   %st(7)
+     /* Record lowest stack address and return address */
+-        movl    G(Caml_state), %ebx
++        movl    G(caml_state), %ebx
+         movl    (%esp), %edx
+         movl    %edx, CAML_STATE(last_return_address, %ebx)
+         leal    4(%esp), %edx
 diff --git a/runtime/interp.c b/runtime/interp.c
 index e6700994bc..a59811c87d 100644
 --- a/runtime/interp.c

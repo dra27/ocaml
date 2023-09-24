@@ -3294,3 +3294,16 @@ index 7f80b8ab26..0791f4e53f 100644
  *)
  
  let size = 1000;;
+diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
+index 1d16b72d4e..956ec369ab 100644
+--- a/testsuite/tools/asmgen_i386.S
++++ b/testsuite/tools/asmgen_i386.S
+@@ -49,7 +49,7 @@ G(call_gen_code):
+ G(caml_c_call):
+         jmp     *%eax
+ 
+-        .comm   G(Caml_state), 4
++        .comm   G(caml_state), 4
+ 
+ /* Some tests are designed to cause registers to spill; on
+  * x86 we require the caml_extra_params symbol from the RTS. */
