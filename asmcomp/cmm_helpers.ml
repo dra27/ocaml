@@ -659,7 +659,11 @@ let get_header ptr dbg =
      there is no data race on headers. This saves performance with
      ThreadSanitizer instrumentation by avoiding to instrument header loads. *)
   Cop(
+(* BACKPORT BEGIN
     mk_load_immut Word_int,
+*)
+    mk_load_mut Word_int,
+(* BACKPORT END *)
     [Cop(Cadda, [ptr; Cconst_int(-size_int, dbg)], dbg)], dbg)
 
 let get_header_masked ptr dbg =
@@ -678,7 +682,11 @@ let get_tag ptr dbg =
   else                                  (* If byte loads are efficient *)
     (* Same comment as [get_header] above *)
     Cop(
+(* BACKPORT BEGIN
       mk_load_immut Byte_unsigned,
+*)
+      mk_load_mut Byte_unsigned,
+(* BACKPORT END *)
       [Cop(Cadda, [ptr; Cconst_int(tag_offset, dbg)], dbg)], dbg)
 
 let get_size ptr dbg =

@@ -3749,6 +3749,136 @@ index 66d7c60183..d5837deeb9 100644
  let _ =
    Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
      { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
+diff --git a/testsuite/tests/tsan/array_elt.ml b/testsuite/tests/tsan/array_elt.ml
+index 52b7b92b76..5df01d1d47 100644
+--- a/testsuite/tests/tsan/array_elt.ml
++++ b/testsuite/tests/tsan/array_elt.ml
+@@ -3,6 +3,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/exn_from_c.ml b/testsuite/tests/tsan/exn_from_c.ml
+index 2e79ef71de..fa36508b94 100644
+--- a/testsuite/tests/tsan/exn_from_c.ml
++++ b/testsuite/tests/tsan/exn_from_c.ml
+@@ -6,6 +6,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/exn_in_callback.ml b/testsuite/tests/tsan/exn_in_callback.ml
+index a136e6db35..634a505dd1 100644
+--- a/testsuite/tests/tsan/exn_in_callback.ml
++++ b/testsuite/tests/tsan/exn_in_callback.ml
+@@ -6,6 +6,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/exn_reraise.ml b/testsuite/tests/tsan/exn_reraise.ml
+index 9ad6fb9193..828eef5e20 100644
+--- a/testsuite/tests/tsan/exn_reraise.ml
++++ b/testsuite/tests/tsan/exn_reraise.ml
+@@ -4,6 +4,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/handlers_at_tail.ml b/testsuite/tests/tsan/handlers_at_tail.ml
+index c44f10f28d..b3ead5808b 100644
+--- a/testsuite/tests/tsan/handlers_at_tail.ml
++++ b/testsuite/tests/tsan/handlers_at_tail.ml
+@@ -3,6 +3,8 @@
+  ocamlopt_flags = "-g";
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/norace_atomics.ml b/testsuite/tests/tsan/norace_atomics.ml
+index 1bd4229994..28c53b6c39 100644
+--- a/testsuite/tests/tsan/norace_atomics.ml
++++ b/testsuite/tests/tsan/norace_atomics.ml
+@@ -3,6 +3,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/perform.ml b/testsuite/tests/tsan/perform.ml
+index 0b0ad24b93..90353cec64 100644
+--- a/testsuite/tests/tsan/perform.ml
++++ b/testsuite/tests/tsan/perform.ml
+@@ -4,6 +4,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/raise_through_handler.ml b/testsuite/tests/tsan/raise_through_handler.ml
+index d72b6ba1a6..25250be8d8 100644
+--- a/testsuite/tests/tsan/raise_through_handler.ml
++++ b/testsuite/tests/tsan/raise_through_handler.ml
+@@ -4,6 +4,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/record_field.ml b/testsuite/tests/tsan/record_field.ml
+index e35947e069..caee528565 100644
+--- a/testsuite/tests/tsan/record_field.ml
++++ b/testsuite/tests/tsan/record_field.ml
+@@ -3,6 +3,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
+diff --git a/testsuite/tests/tsan/reperform.ml b/testsuite/tests/tsan/reperform.ml
+index 4d008e43f2..ffe18fae4f 100644
+--- a/testsuite/tests/tsan/reperform.ml
++++ b/testsuite/tests/tsan/reperform.ml
+@@ -4,6 +4,8 @@
+  include unix;
+  set TSAN_OPTIONS="detect_deadlocks=0";
+ 
++ reason = "OCaml 5 only";
++ skip;
+  tsan;
+  native;
+ 
 diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 index b3804d00e5..827cc4affc 100644
 --- a/testsuite/tests/unwind/unwind_test.reference
