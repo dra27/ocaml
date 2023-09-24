@@ -244,29 +244,11 @@ GNUISH_SED = \
   $(if $(filter X,$(shell echo x | $(SED) -E -e 's/./\u&/' 2>/dev/null)),\
        $(SED),$(error GNU sed is needed for make depend))
 
-<<<<<<< HEAD
-.INTERMEDIATE: .depend.tmp
-
-.depend.tmp:
-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
-	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> $@
-
-||||||| parent of 1e2ce35ecd (Merge pull request PR#11885 from shindere/fix-stdlib-deps-computation)
-.INTERMEDIATE: .depend.tmp
-
-.depend.tmp:
-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
-	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> $@
-
-=======
->>>>>>> 1e2ce35ecd (Merge pull request PR#11885 from shindere/fix-stdlib-deps-computation)
 .PHONY: depend
 depend:
 	{ \
-	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)); \
+	  $(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml std_exit.mli \
+      $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)); \
 	  $(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli; \
 	} | \
