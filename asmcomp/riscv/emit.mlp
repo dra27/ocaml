@@ -328,8 +328,10 @@ let emit_instr env i =
         `	mv	s0, sp\n`;
         cfi_remember_state ();
         cfi_def_cfa_register ~reg:21;
+(* BACKPORT
         let ofs = Domainstate.(idx_of_field Domain_c_stack) * 8 in
         `	ld	sp, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`;
+*)
         `	{emit_call func}\n`;
         `	mv	sp, s0\n`;
         cfi_restore_state ()
@@ -482,8 +484,12 @@ let emit_instr env i =
       let instr = name_for_specific sop in
       `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
   | Lop (Idls_get) ->
+(* BACKPORT BEGIN
       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
+*)
+      assert false
+(* BACKPORT END *)
   | Lreloadretaddr ->
       let n = frame_size env in
       reload_ra n
@@ -611,6 +617,7 @@ let fundecl fundecl =
   emit_debug_info fundecl.fun_dbg;
   cfi_startproc();
 
+(* BACKPORT
   (* Dynamic stack checking *)
   let stack_threshold_size = Config.stack_threshold * 8 in (* bytes *)
   let { max_frame_size; contains_nontail_calls } =
@@ -620,6 +627,7 @@ let fundecl fundecl =
   let handle_overflow = ref None in
   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
     let overflow = new_label () and ret = new_label () in
+
     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
     let f = max_frame_size + threshold_offset in
     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
@@ -629,11 +637,13 @@ let fundecl fundecl =
     `{emit_label ret}:\n`;
     handle_overflow := Some (overflow, ret)
   end;
+*)
 
   emit_all env fundecl.fun_body;
   List.iter emit_call_gc env.call_gc_sites;
   List.iter emit_call_bound_error env.bound_error_sites;
 
+(* BACKPORT
   begin match !handle_overflow with
   | None -> ()
   | Some (overflow, ret) ->
@@ -650,6 +660,7 @@ let fundecl fundecl =
       `	addi	sp, sp, 16\n`;
       `	j	{emit_label ret}\n`
   end;
+*)
 
   cfi_endproc();
   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
