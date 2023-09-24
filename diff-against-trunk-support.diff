@@ -3776,6 +3776,19 @@ index b42d399907..656e318473 100644
  (* This test is currently disabled,
     until the random failures have been investigated.
  *)
+diff --git a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+index f5e0711b79..8beb1f6433 100644
+--- a/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
++++ b/testsuite/tests/weak-ephe-final/weaktest_par_load.ml
+@@ -1,4 +1,7 @@
+-(* TEST *)
++(* TEST
++* skip
++reason = "OCaml 5 only"
++*)
+ 
+ (* Testing unsynchronized, parallel Weak usage *)
+ 
 diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
 index 1d16b72d4e..956ec369ab 100644
 --- a/testsuite/tools/asmgen_i386.S
