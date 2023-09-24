@@ -1973,6 +1973,25 @@ index ecea4b7e13..4f363941f4 100644
  
  let got_major = ref false
  let got_minor = ref false
+diff --git a/testsuite/tests/lib-runtime-events/test_external_preserve.ml b/testsuite/tests/lib-runtime-events/test_external_preserve.ml
+index 18c2ac578b..76d66b1b66 100644
+--- a/testsuite/tests/lib-runtime-events/test_external_preserve.ml
++++ b/testsuite/tests/lib-runtime-events/test_external_preserve.ml
+@@ -2,9 +2,11 @@
+   include runtime_events
+   include unix
+   set OCAML_RUNTIME_EVENTS_PRESERVE = "1"
+-  * libunix
+-  ** bytecode
+-  ** native *)
++  * skip
++  reason = "OCaml 5 only"
++  ** libunix
++  *** bytecode
++  *** native *)
+ 
+   (* this tests the preservation of ring buffers after termination *)
+ 
 diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
 index 87f556a659..097905b626 100644
 --- a/testsuite/tests/lib-runtime-events/test_fork.ml
