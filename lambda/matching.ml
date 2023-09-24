@@ -1877,7 +1877,11 @@ let get_mod_field modname field =
 
 let code_force_lazy_block = get_mod_field "CamlinternalLazy" "force_lazy_block"
 
+(* BACKPORT_BEGIN
 let code_force_lazy = get_mod_field "CamlinternalLazy" "force_gen"
+*)
+let code_force_lazy = get_mod_field "CamlinternalLazy" "force"
+(* BACKPORT END *)
 
 (* inline_lazy_force inlines the beginning of the code of Lazy.force. When
    the value argument is tagged as:
@@ -1893,10 +1897,15 @@ let inline_lazy_force_cond arg loc =
   let idarg = Ident.create_local "lzarg" in
   let varg = Lvar idarg in
   let tag = Ident.create_local "tag" in
+(* BACKPORT BEGIN *)
+  let tag_var = Lvar tag in
+(* BACKPORT END *)
   let force_fun = Lazy.force code_force_lazy_block in
+(* BACKPORT
   let test_tag t =
     Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
   in
+*)
 
   Llet
     ( Strict,
@@ -1909,16 +1918,32 @@ let inline_lazy_force_cond arg loc =
           tag,
           Lprim (Pccall prim_obj_tag, [ varg ], loc),
           Lifthenelse
+(* BACKPORT BEGIN
             ( (* if (tag == Obj.forward_tag) then varg.(0) else ... *)
               test_tag Obj.forward_tag,
               Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc),
+*)
+            ( Lprim
+                ( Pintcomp Ceq,
+                  [ tag_var; Lconst (Const_base (Const_int Obj.forward_tag)) ],
+                  loc ),
+              Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc),
+(* BACKPORT END *)
               Lifthenelse
+(* BACKPORT BEGIN *)
+                ( Lprim
+                    ( Pintcomp Ceq,
+                      [ tag_var; Lconst (Const_base (Const_int Obj.lazy_tag)) ],
+                      loc ),
+(* BACKPORT END *)
+(* BACKPORT
                 (
                   (* ... if tag == Obj.lazy_tag || tag == Obj.forcing_tag then
                          Lazy.force varg
                        else ... *)
                   Lprim (Psequor,
                        [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
+*)
                   Lapply
                     { ap_tailcall = Default_tailcall;
                       ap_loc = loc;
@@ -1943,11 +1968,25 @@ let inline_lazy_force_switch arg loc =
         ( Lprim (Pisint, [ varg ], loc),
           varg,
           Lswitch
+(* BACKPORT BEGIN
             ( Lprim (Pccall prim_obj_tag, [ varg ], loc),
               { sw_numblocks = 0;
                 sw_blocks = [];
                 sw_numconsts = 256;
+*)
+            ( varg,
+              { sw_numconsts = 0;
+                sw_consts = [];
+                sw_numblocks = 256;
+(* BACKPORT END *)
                 (* PR#6033 - tag ranges from 0 to 255 *)
+(* BACKPORT BEGIN *)
+                sw_blocks =
+                  [ (Obj.forward_tag,
+                     Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
+                    ( Obj.lazy_tag,
+(* BACKPORT END *)
+(* BACKPORT
                 sw_consts =
                   [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
                                              [ varg ], loc));
@@ -1963,6 +2002,7 @@ let inline_lazy_force_switch arg loc =
                         } );
 
                     (Obj.forcing_tag,
+*)
                       Lapply
                         { ap_tailcall = Default_tailcall;
                           ap_loc = loc;
@@ -1986,7 +2026,11 @@ let inline_lazy_force arg loc =
       { ap_tailcall = Default_tailcall;
         ap_loc = loc;
         ap_func = Lazy.force code_force_lazy;
+(* BACKPORT BEGIN
         ap_args = [ Lconst (Const_base (Const_int 0)); arg ];
+*)
+        ap_args = [ arg ];
+(* BACKPORT END *)
         ap_inlined = Default_inline;
         ap_specialised = Default_specialise
       }

@@ -2200,8 +2200,13 @@ let assignment_kind
     (init: Lambda.initialization_or_assignment) =
   match init, ptr with
   | Assignment, Pointer -> Caml_modify
+(* BACKPORT BEGIN
   | Heap_initialization, Pointer
   | Root_initialization, Pointer -> Caml_initialize
+*)
+  | Heap_initialization, Pointer -> Caml_initialize
+  | Root_initialization, Pointer -> Simple
+(* BACKPORT END *)
   | Assignment, Immediate
   | Heap_initialization, Immediate
   | Root_initialization, Immediate -> Simple

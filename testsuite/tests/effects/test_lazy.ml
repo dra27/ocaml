@@ -1,4 +1,7 @@
-(* TEST *)
+(* TEST
+   * skip
+   reason = "OCaml 5 only"
+*)
 
 open EffectHandlers
 open EffectHandlers.Deep

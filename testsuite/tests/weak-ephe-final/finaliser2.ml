@@ -1,4 +1,7 @@
-(* TEST *)
+(* TEST
+   * skip
+   reason = "OCaml 5 only"
+*)
 
 let test1 =
   let r' = ref 0 in

@@ -49,9 +49,16 @@ static value encode_sigset(sigset_t * set)
   Begin_root(res)
     for (i = 1; i < NSIG; i++)
       if (sigismember(set, i) > 0) {
+/* BACKPORT BEGIN */
+        value newcons = caml_alloc_small(2, 0);
+        Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
+        Field(newcons, 1) = res;
+/* BACKPORT END */
+#if 0 /* BACKPORT */
         value newcons = caml_alloc_2(0,
           Val_int(caml_rev_convert_signal_number(i)),
           res);
+#endif
         res = newcons;
       }
   End_roots();
@@ -69,7 +76,11 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
   how = sigprocmask_cmd[Int_val(vaction)];
   decode_sigset(vset, &set);
   caml_enter_blocking_section();
+#if 0 /* BACKPORT BEGIN */
   retcode = sigprocmask(how, &set, &oldset);
+#endif
+  retcode = caml_sigmask_hook(how, &set, &oldset);
+/* BACKPORT END */
   caml_leave_blocking_section();
   /* Run any handlers for just-unmasked pending signals */
   caml_process_pending_signals();
@@ -83,7 +94,11 @@ CAMLprim value unix_sigpending(value unit)
   int i;
   if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
   for (i = 1; i < NSIG; i++)
+#if 0 /* BACKPORT BEGIN */
     if(atomic_load_explicit(&caml_pending_signals[i], memory_order_seq_cst))
+#endif
+    if(caml_pending_signals[i])
+/* BACKPORT END */
       sigaddset(&pending, i);
   return encode_sigset(&pending);
 }

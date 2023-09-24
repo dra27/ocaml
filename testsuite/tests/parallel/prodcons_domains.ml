@@ -1,9 +1,11 @@
 (* TEST
 
-* hassysthreads
+* skip
+reason = "OCaml 5 only"
+** hassysthreads
 include systhreads
-** bytecode
-** native
+*** bytecode
+*** native
 
 *)
 
