@@ -25,13 +25,7 @@ module Mproj = Unit
 module F (X : sig type t end) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- ("F", module) -> Abs<.4>(X/275, X/275<.3>);
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
- ("F", module) -> Abs<.4>(X/280, X/280<.3>);
-=======
- "F"[module] -> Abs<.4>(X/280, X/280<.3>);
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+ "F"[module] -> Abs<.4>(X/275, X/275<.3>);
  }
 module F : functor (X : sig type t end) -> sig type t = X.t end
 |}]

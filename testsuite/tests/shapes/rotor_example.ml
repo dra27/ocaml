@@ -26,24 +26,10 @@ end
 {
  "Pair"[module] ->
      Abs<.9>
-<<<<<<< HEAD
-        (X/277,
-         Abs(Y/278, {
-                     ("t", type) -> <.5>;
-                     ("to_string", value) -> <.6>;
-                     }));
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
-        (X/282,
-         Abs(Y/283, {
-                     ("t", type) -> <.5>;
-                     ("to_string", value) -> <.6>;
-                     }));
-=======
-        (X/282, Abs(Y/283, {
+        (X/277, Abs(Y/278, {
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
  }
 module Pair :
   functor (X : Stringable) (Y : Stringable) ->

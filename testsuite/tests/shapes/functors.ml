@@ -17,13 +17,7 @@ module type S = sig type t val x : t end
 module Falias (X : S) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- ("Falias", module) -> Abs<.4>(X/277, X/277<.3>);
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
- ("Falias", module) -> Abs<.4>(X/282, X/282<.3>);
-=======
- "Falias"[module] -> Abs<.4>(X/282, X/282<.3>);
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+ "Falias"[module] -> Abs<.4>(X/277, X/277<.3>);
  }
 module Falias : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -37,16 +31,8 @@ end
      Abs<.6>
         (X/281,
          {
-<<<<<<< HEAD
-          ("t", type) -> X/281<.5> . "t"[type];
-          ("x", value) -> X/281<.5> . "x"[value];
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
-          ("t", type) -> X/286<.5> . "t"[type];
-          ("x", value) -> X/286<.5> . "x"[value];
-=======
-          "t"[type] -> X/286<.5> . "t"[type];
-          "x"[value] -> X/286<.5> . "x"[value];
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
+          "t"[type] -> X/281<.5> . "t"[type];
+          "x"[value] -> X/281<.5> . "x"[value];
           });
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -58,22 +44,10 @@ module Fredef (X : S) = struct
 end
 [%%expect{|
 {
-<<<<<<< HEAD
- ("Fredef", module) ->
-     Abs<.10>(X/288, {
-                      ("t", type) -> <.8>;
-                      ("x", value) -> <.9>;
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
- ("Fredef", module) ->
-     Abs<.10>(X/293, {
-                      ("t", type) -> <.8>;
-                      ("x", value) -> <.9>;
-=======
  "Fredef"[module] ->
-     Abs<.10>(X/293, {
+     Abs<.10>(X/288, {
                       "t"[type] -> <.8>;
                       "x"[value] -> <.9>;
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
                       });
  }
 module Fredef : functor (X : S) -> sig type t = X.t val x : X.t end
@@ -248,26 +222,10 @@ module type B2S = functor (X : Big) -> sig type t = X.t end
 module Big_to_small1 : B2S = functor (X : Big) -> X
 [%%expect{|
 {
-<<<<<<< HEAD
- ("Big_to_small1", module) ->
-     Abs<.40>
-        (shape-var/384,
-         {<<internal>>
-          ("t", type) -> shape-var/384<<internal>> . "t"[type];
-          });
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
- ("Big_to_small1", module) ->
-     Abs<.40>
-        (shape-var/389,
-         {<<internal>>
-          ("t", type) -> shape-var/389<<internal>> . "t"[type];
-          });
-=======
  "Big_to_small1"[module] ->
-     Abs<.40>(X/388, {<.39>
-                      "t"[type] -> X/388<.39> . "t"[type];
+     Abs<.40>(X/383, {<.39>
+                      "t"[type] -> X/383<.39> . "t"[type];
                       });
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
  }
 module Big_to_small1 : B2S
 |}]
@@ -275,26 +233,10 @@ module Big_to_small1 : B2S
 module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 [%%expect{|
 {
-<<<<<<< HEAD
- ("Big_to_small2", module) ->
-     Abs<.42>
-        (shape-var/390,
-         {
-          ("t", type) -> (shape-var/390<<internal>> . "t"[type])<.41>;
-          });
-||||||| parent of eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
- ("Big_to_small2", module) ->
-     Abs<.42>
-        (shape-var/395,
-         {
-          ("t", type) -> (shape-var/395<<internal>> . "t"[type])<.41>;
-          });
-=======
  "Big_to_small2"[module] ->
-     Abs<.42>(X/391, {
-                      "t"[type] -> X/391<.41> . "t"[type];
+     Abs<.42>(X/386, {
+                      "t"[type] -> X/386<.41> . "t"[type];
                       });
->>>>>>> eae9fc5c5e (Merge pull request PR#10825 from gasche/shape-strong-call-by-need)
  }
 module Big_to_small2 : B2S
 |}]
