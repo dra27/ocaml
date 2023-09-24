@@ -60,6 +60,7 @@ static DWORD check_stream_semantics(value handle)
   }
 }
 
+#if 0 /* BACKPORT BEGIN */
 #define CRT_field_val(v) (((struct filedescr *) Data_custom_val(v))->crt_fd)
 
 int caml_win32_get_CRT_fd(value handle)
@@ -94,6 +95,21 @@ int caml_win32_CRT_fd_of_filedescr(value handle)
     }
   }
 }
+#endif
+
+int caml_win32_CRT_fd_of_filedescr(value handle)
+{
+  if (CRT_fd_val(handle) != NO_CRT_FD) {
+    return CRT_fd_val(handle);
+  } else {
+    int fd = _open_osfhandle((intptr_t) Handle_val(handle), O_BINARY);
+    if (fd == -1) caml_uerror("channel_of_descr", Nothing);
+    CRT_fd_val(handle) = fd;
+    return fd;
+  }
+}
+#define CRT_field_val CRT_fd_val
+/* BACKPORT END */
 
 CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
 {

@@ -2176,6 +2176,25 @@ index 929ed5ecf7..61f75dce4a 100644
  *)
  
  (* on Multicore, fork is not allowed is another domain is, and was running. *)
+diff --git a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+index 01ae4df1c3..fb17641f40 100644
+--- a/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
++++ b/testsuite/tests/lib-unix/win-channel-of/parallel_channel_of.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+ modules = "fd_of_channel.c"
+-* libwin32unix
++reason = "OCaml 5 only"
++* skip
++** libwin32unix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
 diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
 index afaa814ca5..d696a26e82 100644
 --- a/testsuite/tests/memory-model/forbidden.ml

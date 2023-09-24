@@ -46,7 +46,11 @@ struct filedescr {
     SOCKET socket;
   } fd;                   /* Real windows handle */
   enum { KIND_HANDLE, KIND_SOCKET } kind;
+#if 0 /* BACKPORT BEGIN */
   _Atomic int crt_fd;     /* C runtime descriptor */
+#endif
+  int crt_fd;             /* C runtime descriptor */
+/* BACKPORT END */
   unsigned int flags_fd;  /* See FLAGS_FD_* */
 };
 
@@ -61,6 +65,9 @@ struct filedescr {
 #define Handle_val(v) (((struct filedescr *) Data_custom_val(v))->fd.handle)
 #define Socket_val(v) (((struct filedescr *) Data_custom_val(v))->fd.socket)
 #define Descr_kind_val(v) (((struct filedescr *) Data_custom_val(v))->kind)
+/* BACKPORT BEGIN */
+#define CRT_fd_val(v) (((struct filedescr *) Data_custom_val(v))->crt_fd)
+/* BACKPORT END */
 #define Flags_fd_val(v) (((struct filedescr *) Data_custom_val(v))->flags_fd)
 
 extern value caml_win32_alloc_handle(HANDLE);
@@ -80,7 +87,9 @@ extern int caml_win32_CRT_fd_of_filedescr(value handle);
 extern int caml_win32_get_CRT_fd(value handle);
 
 // Export this macro as an alias for the getter function, for compatibility
+#if 0 /* BACKPORT */
 #define CRT_fd_val caml_win32_get_CRT_fd
+#endif
 
 extern SOCKET caml_win32_socket(int domain, int type, int protocol,
                                 LPWSAPROTOCOL_INFO info,

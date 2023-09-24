@@ -14355,6 +14355,59 @@ index fa77d41b14..8c67db8ba3 100644
  let wait_timed_read fd d =
    match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
  let wait_timed_write fd d =
+diff --git a/otherlibs/unix/channels_win32.c b/otherlibs/unix/channels_win32.c
+index 97da8a23d2..804f084d8e 100644
+--- a/otherlibs/unix/channels_win32.c
++++ b/otherlibs/unix/channels_win32.c
+@@ -60,6 +60,7 @@ static DWORD check_stream_semantics(value handle)
+   }
+ }
+ 
++#if 0 /* BACKPORT BEGIN */
+ #define CRT_field_val(v) (((struct filedescr *) Data_custom_val(v))->crt_fd)
+ 
+ int caml_win32_get_CRT_fd(value handle)
+@@ -94,6 +95,21 @@ int caml_win32_CRT_fd_of_filedescr(value handle)
+     }
+   }
+ }
++#endif
++
++int caml_win32_CRT_fd_of_filedescr(value handle)
++{
++  if (CRT_fd_val(handle) != NO_CRT_FD) {
++    return CRT_fd_val(handle);
++  } else {
++    int fd = _open_osfhandle((intptr_t) Handle_val(handle), O_BINARY);
++    if (fd == -1) caml_uerror("channel_of_descr", Nothing);
++    CRT_fd_val(handle) = fd;
++    return fd;
++  }
++}
++#define CRT_field_val CRT_fd_val
++/* BACKPORT END */
+ 
+ CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
+ {
+diff --git a/otherlibs/unix/close_win32.c b/otherlibs/unix/close_win32.c
+index bd1f6e9acc..b605354c51 100644
+--- a/otherlibs/unix/close_win32.c
++++ b/otherlibs/unix/close_win32.c
+@@ -28,9 +28,14 @@ CAMLprim value caml_unix_close(value fd)
+     /* If we have an fd then closing it also closes
+      * the underlying handle. Also, closing only
+      * the handle and not the fd leads to fd leaks. */
++#if 0 /* BACKPORT BEGIN */
+     int crt_fd = caml_win32_get_CRT_fd(fd);
+     if (crt_fd != NO_CRT_FD) {
+       if (_close(crt_fd) != 0)
++#endif
++    if (CRT_fd_val(fd) != NO_CRT_FD) {
++      if (_close(CRT_fd_val(fd)) != 0)
++/* BACKPORT END */
+          caml_uerror("close", Nothing);
+     } else {
+       if (! CloseHandle(Handle_val(fd))) {
 diff --git a/otherlibs/unix/createprocess.c b/otherlibs/unix/createprocess.c
 index 132944b37e..fca240c49c 100644
 --- a/otherlibs/unix/createprocess.c
@@ -14370,6 +14423,23 @@ index 132944b37e..fca240c49c 100644
  value caml_unix_create_process_native(value cmd, value cmdline, value env,
                                   value fd1, value fd2, value fd3)
  {
+diff --git a/otherlibs/unix/dup_win32.c b/otherlibs/unix/dup_win32.c
+index d2e677a0bf..dd96b7f0b1 100644
+--- a/otherlibs/unix/dup_win32.c
++++ b/otherlibs/unix/dup_win32.c
+@@ -109,8 +109,12 @@ CAMLprim value caml_unix_dup2(value cloexec, value fd1, value fd2)
+   }
+ 
+   /* Reflect the dup2 on the CRT fds, if any */
++#if 0 /* BACKPORT BEGIN */
+   if (caml_win32_get_CRT_fd(fd1) != NO_CRT_FD ||
+       caml_win32_get_CRT_fd(fd2) != NO_CRT_FD)
++#endif
++  if (CRT_fd_val(fd1) != NO_CRT_FD || CRT_fd_val(fd2) != NO_CRT_FD)
++/* BACKPORT END */
+     _dup2(caml_win32_CRT_fd_of_filedescr(fd1),
+           caml_win32_CRT_fd_of_filedescr(fd2));
+   CAMLreturn(Val_unit);
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
 index 55206323de..c12e4db68f 100644
 --- a/otherlibs/unix/fork.c
@@ -14525,10 +14595,42 @@ index b9cc32040e..7f83d8b537 100644
  }
  
 diff --git a/otherlibs/unix/unixsupport.h b/otherlibs/unix/unixsupport.h
-index e64cccad0d..fff761195a 100644
+index e64cccad0d..3ed6f09d15 100644
 --- a/otherlibs/unix/unixsupport.h
 +++ b/otherlibs/unix/unixsupport.h
-@@ -147,4 +147,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
+@@ -46,7 +46,11 @@ struct filedescr {
+     SOCKET socket;
+   } fd;                   /* Real windows handle */
+   enum { KIND_HANDLE, KIND_SOCKET } kind;
++#if 0 /* BACKPORT BEGIN */
+   _Atomic int crt_fd;     /* C runtime descriptor */
++#endif
++  int crt_fd;             /* C runtime descriptor */
++/* BACKPORT END */
+   unsigned int flags_fd;  /* See FLAGS_FD_* */
+ };
+ 
+@@ -61,6 +65,9 @@ struct filedescr {
+ #define Handle_val(v) (((struct filedescr *) Data_custom_val(v))->fd.handle)
+ #define Socket_val(v) (((struct filedescr *) Data_custom_val(v))->fd.socket)
+ #define Descr_kind_val(v) (((struct filedescr *) Data_custom_val(v))->kind)
++/* BACKPORT BEGIN */
++#define CRT_fd_val(v) (((struct filedescr *) Data_custom_val(v))->crt_fd)
++/* BACKPORT END */
+ #define Flags_fd_val(v) (((struct filedescr *) Data_custom_val(v))->flags_fd)
+ 
+ extern value caml_win32_alloc_handle(HANDLE);
+@@ -80,7 +87,9 @@ extern int caml_win32_CRT_fd_of_filedescr(value handle);
+ extern int caml_win32_get_CRT_fd(value handle);
+ 
+ // Export this macro as an alias for the getter function, for compatibility
++#if 0 /* BACKPORT */
+ #define CRT_fd_val caml_win32_get_CRT_fd
++#endif
+ 
+ extern SOCKET caml_win32_socket(int domain, int type, int protocol,
+                                 LPWSAPROTOCOL_INFO info,
+@@ -147,4 +156,8 @@ extern void caml_unix_clear_cloexec(int fd, char * cmdname, value arg);
  #define EXECV_CAST
  #endif
  
@@ -14537,6 +14639,34 @@ index e64cccad0d..fff761195a 100644
 +/* BACKPORT END */
 +
  #endif /* CAML_UNIXSUPPORT_H */
+diff --git a/otherlibs/unix/unixsupport_win32.c b/otherlibs/unix/unixsupport_win32.c
+index 00b9ae40df..4ce758fa2b 100644
+--- a/otherlibs/unix/unixsupport_win32.c
++++ b/otherlibs/unix/unixsupport_win32.c
+@@ -55,7 +55,11 @@ value caml_win32_alloc_handle(HANDLE h)
+     caml_alloc_custom(&handle_ops, sizeof(struct filedescr), 0, 1);
+   Handle_val(res) = h;
+   Descr_kind_val(res) = KIND_HANDLE;
++#if 0 /* BACKPORT BEGIN */
+   ((struct filedescr *) Data_custom_val(res))->crt_fd = NO_CRT_FD;
++#endif
++  CRT_fd_val(res) = NO_CRT_FD;
++/* BACKPORT END */
+   Flags_fd_val(res) = FLAGS_FD_IS_BLOCKING;
+   return res;
+ }
+@@ -66,7 +70,11 @@ value caml_win32_alloc_socket(SOCKET s)
+     caml_alloc_custom(&handle_ops, sizeof(struct filedescr), 0, 1);
+   Socket_val(res) = s;
+   Descr_kind_val(res) = KIND_SOCKET;
++#if 0 /* BACKPORT BEGIN */
+   ((struct filedescr *) Data_custom_val(res))->crt_fd = NO_CRT_FD;
++#endif
++  CRT_fd_val(res) = NO_CRT_FD;
++/* BACKPORT END */
+   Flags_fd_val(res) = FLAGS_FD_IS_BLOCKING;
+   return res;
+ }
 diff --git a/stdlib/.depend b/stdlib/.depend
 index 497ac2d1bd..96ec1fc218 100644
 --- a/stdlib/.depend

@@ -1,9 +1,11 @@
 (* TEST
 modules = "fd_of_channel.c"
-* libwin32unix
+reason = "OCaml 5 only"
+* skip
+** libwin32unix
 include unix
-** bytecode
-** native
+*** bytecode
+*** native
 *)
 
 external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
