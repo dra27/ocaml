@@ -293,13 +293,7 @@ let destroyed_at_c_call =
   if win64 then
     (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
     Array.of_list(List.map phys_reg
-<<<<<<< HEAD
-      [0;4;5;6;7;10;11;(*12;*)
-||||||| parent of b2e9dbc530 (Merge pull request PR#11846 from dra27/win64-abi)
-      [0;4;5;6;7;10;11;12;
-=======
-      [0;1;4;5;6;7;10;11;12;
->>>>>>> b2e9dbc530 (Merge pull request PR#11846 from dra27/win64-abi)
+      [0;(*1;*)4;5;6;7;10;11;(*12;*)
        100;101;102;103;104;105])
   else
     (* Unix: r12-r15 preserved *)
