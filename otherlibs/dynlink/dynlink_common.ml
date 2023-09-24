@@ -20,28 +20,6 @@
 
 open! Dynlink_compilerlibs
 
-<<<<<<< HEAD
-(* Dynlink is only allowed on the main domain.
-   Entrypoints to public functions should check for this. *)
-let is_dynlink_allowed () =
-(*
-  if not (Domain.is_main_domain ()) then
-    failwith "Dynlink can only be called from the main domain."
-  else
-*)
-    ()
-
-||||||| parent of b1fc2fcab6 (Merge pull request PR#11032 from Octachron/locked_dynlink_with_test)
-(* Dynlink is only allowed on the main domain.
-   Entrypoints to public functions should check for this. *)
-let is_dynlink_allowed () =
-  if not (Domain.is_main_domain ()) then
-    failwith "Dynlink can only be called from the main domain."
-  else
-    ()
-
-=======
->>>>>>> b1fc2fcab6 (Merge pull request PR#11032 from Octachron/locked_dynlink_with_test)
 module String = struct
   include Misc.Stdlib.String
 
@@ -51,6 +29,13 @@ module String = struct
     let keys t =
       fold (fun key _data keys -> Set.add key keys) t Set.empty
   end
+end
+
+module Mutex = struct
+  type t = unit
+  let create () = ()
+  let lock () = ()
+  let unlock () = ()
 end
 
 module Make (P : Dynlink_platform_intf.S) = struct
