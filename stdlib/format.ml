@@ -1501,13 +1501,5 @@ let () = Domain.before_first_spawn (fun () ->
   pp_set_formatter_out_functions err_formatter
     {fs with out_string = buffered_out_string err_buf_key;
              out_flush = buffered_out_flush Stdlib.stderr err_buf_key};
-<<<<<<< HEAD
-
-  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
-*)
-||||||| parent of c9187a9bea (Merge pull request PR#11595 from Octachron/remove_at_each_spawn)
-
-  Domain.at_each_spawn (fun _ -> Domain.at_exit flush_standard_formatters))
-=======
 )
->>>>>>> c9187a9bea (Merge pull request PR#11595 from Octachron/remove_at_each_spawn)
+*)
