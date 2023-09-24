@@ -267,29 +267,15 @@ GNUISH_SED = \
 .INTERMEDIATE: .depend.tmp
 
 .depend.tmp:
-	$(OCAMLDEP_CMD) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) > $@
+	$(OCAMLDEP_CMD) $(filter-out stdlib.%,std_exit.ml \
+    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) > $@
 	$(OCAMLDEP_CMD) -pp "$(AWK) -f ./remove_module_aliases.awk" \
 	  stdlib.ml stdlib.mli >> $@
 
 .PHONY: depend
-<<<<<<< HEAD
-depend:
-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,std_exit.ml \
-    $(STDLIB_MODULE_BASENAMES:=.mli) $(STDLIB_MODULE_BASENAMES:=.ml)) \
-	  > .depend.tmp
-	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> .depend.tmp
-||||||| parent of ccf7bbe2db (Merge pull request PR#11126 from shindere/ocamldep)
-depend:
-	$(CAMLDEP) $(DEPFLAGS) $(filter-out stdlib.%,$(wildcard *.mli *.ml)) \
-	  > .depend.tmp
-	$(CAMLDEP) $(DEPFLAGS) -pp "$(AWK) -f ./remove_module_aliases.awk" \
-	  stdlib.ml stdlib.mli >> .depend.tmp
-=======
 depend: .depend
 
 .depend: .depend.tmp
->>>>>>> ccf7bbe2db (Merge pull request PR#11126 from shindere/ocamldep)
 	$(GNUISH_SED) -E \
 	-e 's/^(${STDLIB_NAMESPACE_MODULES})(\.[^i]*)(i?) :/\1\2\3 : \1.ml\3/' \
 	-e 's#(^| )(${STDLIB_NAMESPACE_MODULES})[.]#\1stdlib__\u\2.#' \
