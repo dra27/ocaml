@@ -2453,6 +2453,23 @@ index 01ae4df1c3..fb17641f40 100644
  *)
  
  external fd_of_in_channel: in_channel -> int = "caml_fd_of_channel"
+diff --git a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+index d27e7db02d..651e071303 100644
+--- a/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
++++ b/testsuite/tests/lib-unix/win-symlink/parallel_symlink.ml
+@@ -2,8 +2,10 @@
+ * libwin32unix
+ include unix
+ ** has_symlink
+-*** bytecode
+-*** native
++*** skip
++reason = "OCaml 5 only"
++**** bytecode
++**** native
+ *)
+ 
+ let create_symlink barrier src dst () =
 diff --git a/testsuite/tests/memory-model/forbidden.ml b/testsuite/tests/memory-model/forbidden.ml
 index 5504d94f04..32a8d9fa8c 100644
 --- a/testsuite/tests/memory-model/forbidden.ml
