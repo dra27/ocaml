@@ -86,15 +86,39 @@ let exit () =
    cleanup handlers on several platforms *)
 
 let kill th = invalid_arg "Thread.kill: not implemented"
+
+(* Preemption *)
+
+let preempt signal = yield()
 (* BACKPORT END *)
 
 (* Initialization of the scheduler *)
 
+(* BACKPORT BEGIN *)
+let preempt_signal =
+  match Sys.os_type with
+  | "Win32" -> Sys.sigterm
+  | _       -> Sys.sigvtalrm
+(* BACKPORT END *)
+
 let () =
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
   thread_initialize ();
+(* BEGIN BACKPORT *)
+  (* Callback in [caml_shutdown], when the last domain exits. *)
+  Callback.register "Thread.at_shutdown" (fun () ->
+    thread_cleanup();
+    (* In case of DLL-embedded OCaml the preempt_signal handler
+       will point to nowhere after DLL unloading and an accidental
+       preempt_signal will crash the main program. So restore the
+       default handler. *)
+    Sys.set_signal preempt_signal Sys.Signal_default
+  )
+(* BACKPORT END *)
   (* Called back in [caml_shutdown], when the last domain exits. *)
+(* BACKPORT
   Callback.register "Thread.at_shutdown" thread_cleanup
+*)
 
 (* Wait functions *)
 

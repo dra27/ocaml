@@ -7209,7 +7209,7 @@ index 0000000000..fdd6129fdc
 ++}
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..67b924972b
+index 0000000000..98cbc51883
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,4063 @@
@@ -9482,7 +9482,7 @@ index 0000000000..67b924972b
 +-Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
 ++Called from Thread.create.(fun) in file "thread.ml", line 55, characters 8-14
 +diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-+index 1f0f57a183..49aef665db 100644
++index cb20813498..d39ddf372a 100644
 +--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 ++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 +@@ -1,5 +1,7 @@
@@ -9494,7 +9494,7 @@ index 0000000000..67b924972b
 +  not-windows;
 +  {
 +diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
-+index 79b9d6c253..ae21f65edc 100644
++index edcf0ae071..c60afacaa0 100644
 +--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
 ++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
 +@@ -1,5 +1,7 @@
@@ -11278,7 +11278,7 @@ index 0000000000..67b924972b
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..727540229f
+index 0000000000..b770ad8d4a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,11227 @@
@@ -18493,7 +18493,7 @@ index 0000000000..727540229f
 +++}
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..67b924972b
++index 0000000000..98cbc51883
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,4063 @@
@@ -20766,7 +20766,7 @@ index 0000000000..727540229f
 ++-Called from Thread.create.(fun) in file "thread.ml", line 48, characters 8-14
 +++Called from Thread.create.(fun) in file "thread.ml", line 55, characters 8-14
 ++diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
-++index 1f0f57a183..49aef665db 100644
+++index cb20813498..d39ddf372a 100644
 ++--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 +++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone.ml
 ++@@ -1,5 +1,7 @@
@@ -20778,7 +20778,7 @@ index 0000000000..727540229f
 ++  not-windows;
 ++  {
 ++diff --git a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
-++index 79b9d6c253..ae21f65edc 100644
+++index edcf0ae071..c60afacaa0 100644
 ++--- a/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
 +++++ b/testsuite/tests/lib-unix/common/multicore_fork_domain_alone2.ml
 ++@@ -1,5 +1,7 @@
@@ -23597,7 +23597,7 @@ index 0000000000..3a62747829
 +
 +end
 diff --git a/otherlibs/systhreads/thread.ml b/otherlibs/systhreads/thread.ml
-index b5a4d8fbf4..ee9ac6455d 100644
+index b5a4d8fbf4..f19dfdbb08 100644
 --- a/otherlibs/systhreads/thread.ml
 +++ b/otherlibs/systhreads/thread.ml
 @@ -18,6 +18,10 @@
@@ -23621,7 +23621,7 @@ index b5a4d8fbf4..ee9ac6455d 100644
  
  (* For new, make sure the function passed to thread_new never
     raises an exception. *)
-@@ -69,11 +76,22 @@ let create fn arg =
+@@ -69,19 +76,59 @@ let create fn arg =
            flush stderr)
  
  let exit () =
@@ -23635,16 +23635,41 @@ index b5a4d8fbf4..ee9ac6455d 100644
 +   cleanup handlers on several platforms *)
 +
 +let kill th = invalid_arg "Thread.kill: not implemented"
++
++(* Preemption *)
++
++let preempt signal = yield()
 +(* BACKPORT END *)
  
  (* Initialization of the scheduler *)
  
++(* BACKPORT BEGIN *)
++let preempt_signal =
++  match Sys.os_type with
++  | "Win32" -> Sys.sigterm
++  | _       -> Sys.sigvtalrm
++(* BACKPORT END *)
++
  let () =
 +  Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
    thread_initialize ();
++(* BEGIN BACKPORT *)
++  (* Callback in [caml_shutdown], when the last domain exits. *)
++  Callback.register "Thread.at_shutdown" (fun () ->
++    thread_cleanup();
++    (* In case of DLL-embedded OCaml the preempt_signal handler
++       will point to nowhere after DLL unloading and an accidental
++       preempt_signal will crash the main program. So restore the
++       default handler. *)
++    Sys.set_signal preempt_signal Sys.Signal_default
++  )
++(* BACKPORT END *)
    (* Called back in [caml_shutdown], when the last domain exits. *)
++(* BACKPORT
    Callback.register "Thread.at_shutdown" thread_cleanup
-@@ -82,6 +100,11 @@ let () =
++*)
+ 
+ (* Wait functions *)
  
  let delay = Unix.sleepf
  
