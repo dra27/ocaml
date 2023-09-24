@@ -14852,7 +14852,7 @@ index fa77d41b14..8c67db8ba3 100644
    match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
  let wait_timed_write fd d =
 diff --git a/otherlibs/unix/channels_win32.c b/otherlibs/unix/channels_win32.c
-index 0a1531f616..0bb5023d5f 100644
+index 0a1531f616..7f915c3541 100644
 --- a/otherlibs/unix/channels_win32.c
 +++ b/otherlibs/unix/channels_win32.c
 @@ -60,6 +60,7 @@ static DWORD check_stream_semantics(value handle)
@@ -14863,7 +14863,7 @@ index 0a1531f616..0bb5023d5f 100644
  #define CRT_field_val(v) (((struct filedescr *) Data_custom_val(v))->crt_fd)
  
  int caml_win32_get_CRT_fd(value handle)
-@@ -94,6 +95,21 @@ int caml_win32_CRT_fd_of_filedescr(value handle)
+@@ -94,13 +95,30 @@ int caml_win32_CRT_fd_of_filedescr(value handle)
      }
    }
  }
@@ -14885,6 +14885,67 @@ index 0a1531f616..0bb5023d5f 100644
  
  CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
  {
+   CAMLparam1(handle);
+   CAMLlocal1(vchan);
++#if 0 /* BACKPORT */
+   int flags = 0;
+   int fd;
++#endif
+   struct channel * chan;
+   DWORD err;
+ 
+@@ -109,10 +127,20 @@ CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
+     caml_win32_maperr(err);
+     caml_uerror("in_channel_of_descr", Nothing);
+   }
++#if 0 /* BACKPORT BEGIN */
+   fd = caml_win32_CRT_fd_of_filedescr(handle);
++#endif
++  chan = caml_open_descriptor_in(caml_win32_CRT_fd_of_filedescr(handle));
++  chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC;
++                 /* as in caml_ml_open_descriptor_in() */
++/* BACKPORT END */
+   if (Descr_kind_val(handle) == KIND_SOCKET)
++    chan->flags |= CHANNEL_FLAG_FROM_SOCKET;
++  vchan = caml_alloc_channel(chan);
++#if 0 /* BACKPORT */
+     flags |= CHANNEL_FLAG_FROM_SOCKET;
+   vchan = caml_ml_open_descriptor_in_with_flags(fd, flags);
++#endif
+   CAMLreturn(vchan);
+ }
+ 
+@@ -121,7 +149,9 @@ CAMLprim value caml_unix_outchannel_of_filedescr(value handle)
+   CAMLparam1(handle);
+   CAMLlocal1(vchan);
+   int fd;
++#if 0 /* BACKPORT */
+   int flags = 0;
++#endif
+   struct channel * chan;
+   DWORD err;
+ 
+@@ -130,10 +160,20 @@ CAMLprim value caml_unix_outchannel_of_filedescr(value handle)
+     caml_win32_maperr(err);
+     caml_uerror("out_channel_of_descr", Nothing);
+   }
++#if 0 /* BACKPORT BEGIN */
+   fd = caml_win32_CRT_fd_of_filedescr(handle);
++#endif
++  chan = caml_open_descriptor_out(caml_win32_CRT_fd_of_filedescr(handle));
++  chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC;
++                 /* as in caml_ml_open_descriptor_out() */
++/* BACKPORT END */
+   if (Descr_kind_val(handle) == KIND_SOCKET)
++    chan->flags |= CHANNEL_FLAG_FROM_SOCKET;
++  vchan = caml_alloc_channel(chan);
++#if 0 /* BACKPORT */
+     flags |= CHANNEL_FLAG_FROM_SOCKET;
+   vchan = caml_ml_open_descriptor_out_with_flags(fd, flags);
++#endif
+   CAMLreturn(vchan);
+ }
+ 
 diff --git a/otherlibs/unix/close_win32.c b/otherlibs/unix/close_win32.c
 index bd1f6e9acc..b605354c51 100644
 --- a/otherlibs/unix/close_win32.c
