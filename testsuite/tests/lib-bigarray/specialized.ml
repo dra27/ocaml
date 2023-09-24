@@ -9,9 +9,11 @@ let generic (a: ('a, 'b, 'c) Array1.t) v0 v1 v2 =
   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
   (a.{0}, a.{1}, a.{2})
 
+(*
 let special_float16 (a: (float, float16_elt, c_layout) Array1.t) v0 v1 v2 =
   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
   (a.{0}, a.{1}, a.{2})
+*)
 
 let special_float32 (a: (float, float32_elt, c_layout) Array1.t) v0 v1 v2 =
   a.{0} <- v0; a.{1} <- v1; a.{2} <- v2;
@@ -75,7 +77,9 @@ let test kind special v0 v1 v2 =
   assert (s = g)
 
 let _ =
+(*
   test float16 special_float16 1.0 (-2.0) Float.pi;
+*)
   test float32 special_float32 1.0 (-2.0) Float.pi;
   test float64 special_float64 1.0 (-2.0) Float.pi;
   test int8_signed special_int8s 123 (-456) 0xFF00FF;

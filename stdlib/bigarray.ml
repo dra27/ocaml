@@ -33,7 +33,6 @@ type complex32_elt = Complex32_elt
 type complex64_elt = Complex64_elt
 
 type ('a, 'b) kind =
-    Float16 : (float, float16_elt) kind
   | Float32 : (float, float32_elt) kind
   | Float64 : (float, float64_elt) kind
   | Int8_signed : (int, int8_signed_elt) kind
@@ -47,6 +46,7 @@ type ('a, 'b) kind =
   | Complex32 : (Complex.t, complex32_elt) kind
   | Complex64 : (Complex.t, complex64_elt) kind
   | Char : (char, int8_unsigned_elt) kind
+  | Float16 : (float, float16_elt) kind
 
 type c_layout = C_layout_typ
 type fortran_layout = Fortran_layout_typ (**)
