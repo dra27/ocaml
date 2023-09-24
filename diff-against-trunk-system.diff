@@ -608,10 +608,10 @@ index 67831f74b9..0f72e5022d 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..bc89edac40
+index 0000000000..b340bcc3cf
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,695 @@
+@@ -0,0 +1,709 @@
 +diff --git a/runtime/Makefile b/runtime/Makefile
 +index f5c08d8798..dee25dc02a 100644
 +--- a/runtime/Makefile
@@ -1218,6 +1218,20 @@ index 0000000000..bc89edac40
 +-#endif
 + #include "misc.h"
 + #include "mlvalues.h"
++ 
++diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
++index dba30c3848..7eea86f8c0 100644
++--- a/runtime/dynlink_nat.c
+++++ b/runtime/dynlink_nat.c
++@@ -118,7 +118,8 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
++ 
++   sym = optsym("__code_begin");
++   sym2 = optsym("__code_end");
++-  if (NULL != sym && NULL != sym2)
+++  /* Do not register empty code fragments */
+++  if (NULL != sym && NULL != sym2 && sym != sym2)
++     caml_register_code_fragment((char *) sym, (char *) sym2,
++                                 DIGEST_LATER, NULL);
 + 
 +diff --git a/runtime/gen_primitives.sh b/runtime/gen_primitives.sh
 +index a727d5c25c..e76b3300b7 100755
@@ -3903,7 +3917,7 @@ index 0000000000..39658a617f
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..a1ed714eaa
+index 0000000000..1cc6875fa3
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,3868 @@
@@ -4517,10 +4531,10 @@ index 0000000000..a1ed714eaa
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..bc89edac40
++index 0000000000..b340bcc3cf
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,695 @@
++@@ -0,0 +1,709 @@
 ++diff --git a/runtime/Makefile b/runtime/Makefile
 ++index f5c08d8798..dee25dc02a 100644
 ++--- a/runtime/Makefile
@@ -5127,6 +5141,20 @@ index 0000000000..a1ed714eaa
 ++-#endif
 ++ #include "misc.h"
 ++ #include "mlvalues.h"
+++ 
+++diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
+++index dba30c3848..7eea86f8c0 100644
+++--- a/runtime/dynlink_nat.c
++++++ b/runtime/dynlink_nat.c
+++@@ -118,7 +118,8 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
+++ 
+++   sym = optsym("__code_begin");
+++   sym2 = optsym("__code_end");
+++-  if (NULL != sym && NULL != sym2)
++++  /* Do not register empty code fragments */
++++  if (NULL != sym && NULL != sym2 && sym != sym2)
+++     caml_register_code_fragment((char *) sym, (char *) sym2,
+++                                 DIGEST_LATER, NULL);
 ++ 
 ++diff --git a/runtime/gen_primitives.sh b/runtime/gen_primitives.sh
 ++index a727d5c25c..e76b3300b7 100755
@@ -7760,21 +7788,7 @@ index 0000000000..a1ed714eaa
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab8
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.m
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 65fc5e06a5..2da5f4b0bc 100644

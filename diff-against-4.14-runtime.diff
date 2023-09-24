@@ -605,6 +605,20 @@ index c6aeebfc78..3a3b86911c 100644
  #include "misc.h"
  #include "mlvalues.h"
  
+diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
+index dba30c3848..7eea86f8c0 100644
+--- a/runtime/dynlink_nat.c
++++ b/runtime/dynlink_nat.c
+@@ -118,7 +118,8 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
+ 
+   sym = optsym("__code_begin");
+   sym2 = optsym("__code_end");
+-  if (NULL != sym && NULL != sym2)
++  /* Do not register empty code fragments */
++  if (NULL != sym && NULL != sym2 && sym != sym2)
+     caml_register_code_fragment((char *) sym, (char *) sym2,
+                                 DIGEST_LATER, NULL);
+ 
 diff --git a/runtime/gen_primitives.sh b/runtime/gen_primitives.sh
 index a727d5c25c..e76b3300b7 100755
 --- a/runtime/gen_primitives.sh
