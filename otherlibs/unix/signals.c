@@ -25,6 +25,12 @@
 #include <caml/signals.h>
 #include "unixsupport.h"
 
+/* BACKPORT BEGIN */
+#ifndef NSIG
+#define NSIG 64
+#endif
+/* BACKPORT END */
+
 #ifdef POSIX_SIGNALS
 
 static void decode_sigset(value vset, sigset_t * set)
@@ -87,9 +93,15 @@ CAMLprim value unix_sigprocmask(value vaction, value vset)
 CAMLprim value unix_sigpending(value unit)
 {
   sigset_t pending;
+/* BACKPORT BEGIN */
+  int i;
+/* BACKPORT END */
+#if 0 /* BACKPORT */
   int i, j;
   uintnat curr;
+#endif
   if (sigpending(&pending) == -1) uerror("sigpending", Nothing);
+#if 0 /* BACKPORT */
   for (i = 0; i < NSIG_WORDS; i++) {
     curr = atomic_load(&caml_pending_signals[i]);
     if (curr == 0) continue;
@@ -98,6 +110,12 @@ CAMLprim value unix_sigpending(value unit)
       sigaddset(&pending, i * BITS_PER_WORD + j + 1);
     }
   }
+#endif
+/* BACKPORT BEGIN */
+  for (i = 1; i < NSIG; i++)
+    if(caml_pending_signals[i])
+      sigaddset(&pending, i);
+/* BACKPORT END */
   return encode_sigset(&pending);
 }
 
