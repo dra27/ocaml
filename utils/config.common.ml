@@ -62,8 +62,8 @@ let max_tag = 243
 let lazy_tag = 246
 
 let max_young_wosize = 256
-let stack_threshold = 32 (* see runtime/caml/config.h *)
-let stack_safety_margin = 6
+let stack_threshold = 16 (* see runtime/caml/config.h *)
+let stack_safety_margin = 60
 let default_executable_name =
   match Sys.os_type with
     "Unix" -> "a.out"
