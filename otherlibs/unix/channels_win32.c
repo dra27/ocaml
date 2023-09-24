@@ -115,8 +115,10 @@ CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
 {
   CAMLparam1(handle);
   CAMLlocal1(vchan);
+#if 0 /* BACKPORT */
   int flags = 0;
   int fd;
+#endif
   struct channel * chan;
   DWORD err;
 
@@ -125,10 +127,20 @@ CAMLprim value caml_unix_inchannel_of_filedescr(value handle)
     caml_win32_maperr(err);
     caml_uerror("in_channel_of_descr", Nothing);
   }
+#if 0 /* BACKPORT BEGIN */
   fd = caml_win32_CRT_fd_of_filedescr(handle);
+#endif
+  chan = caml_open_descriptor_in(caml_win32_CRT_fd_of_filedescr(handle));
+  chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC;
+                 /* as in caml_ml_open_descriptor_in() */
+/* BACKPORT END */
   if (Descr_kind_val(handle) == KIND_SOCKET)
+    chan->flags |= CHANNEL_FLAG_FROM_SOCKET;
+  vchan = caml_alloc_channel(chan);
+#if 0 /* BACKPORT */
     flags |= CHANNEL_FLAG_FROM_SOCKET;
   vchan = caml_ml_open_descriptor_in_with_flags(fd, flags);
+#endif
   CAMLreturn(vchan);
 }
 
@@ -137,7 +149,9 @@ CAMLprim value caml_unix_outchannel_of_filedescr(value handle)
   CAMLparam1(handle);
   CAMLlocal1(vchan);
   int fd;
+#if 0 /* BACKPORT */
   int flags = 0;
+#endif
   struct channel * chan;
   DWORD err;
 
@@ -146,10 +160,20 @@ CAMLprim value caml_unix_outchannel_of_filedescr(value handle)
     caml_win32_maperr(err);
     caml_uerror("out_channel_of_descr", Nothing);
   }
+#if 0 /* BACKPORT BEGIN */
   fd = caml_win32_CRT_fd_of_filedescr(handle);
+#endif
+  chan = caml_open_descriptor_out(caml_win32_CRT_fd_of_filedescr(handle));
+  chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC;
+                 /* as in caml_ml_open_descriptor_out() */
+/* BACKPORT END */
   if (Descr_kind_val(handle) == KIND_SOCKET)
+    chan->flags |= CHANNEL_FLAG_FROM_SOCKET;
+  vchan = caml_alloc_channel(chan);
+#if 0 /* BACKPORT */
     flags |= CHANNEL_FLAG_FROM_SOCKET;
   vchan = caml_ml_open_descriptor_out_with_flags(fd, flags);
+#endif
   CAMLreturn(vchan);
 }
 
