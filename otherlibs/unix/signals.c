@@ -48,17 +48,11 @@ static value encode_sigset(sigset_t * set)
 
   for (i = 1; i < NSIG; i++)
     if (sigismember(set, i) > 0) {
-<<<<<<< HEAD
       value newcons = caml_alloc_small(2, 0);
       Field(newcons, 0) = Val_int(caml_rev_convert_signal_number(i));
       Field(newcons, 1) = res;
 #if 0
-      value newcons = caml_alloc_2(0,
-||||||| parent of 186e72aaf3 (Merge pull request PR#10802 from MisterDA/more-mlvalues-macros)
-      value newcons = caml_alloc_2(0,
-=======
       value newcons = caml_alloc_2(Tag_cons,
->>>>>>> 186e72aaf3 (Merge pull request PR#10802 from MisterDA/more-mlvalues-macros)
         Val_int(caml_rev_convert_signal_number(i)),
         res);
 #endif
