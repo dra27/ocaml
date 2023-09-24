@@ -31,6 +31,9 @@ external yield : unit -> unit = "caml_thread_yield"
 external self : unit -> t = "caml_thread_self" [@@noalloc]
 external id : t -> int = "caml_thread_id" [@@noalloc]
 external join : t -> unit = "caml_thread_join"
+(* BACKPORT BEGIN *)
+external exit_stub : unit -> unit = "caml_thread_exit"
+(* BACKPORT END *)
 
 (* For new, make sure the function passed to thread_new never
    raises an exception. *)
@@ -73,7 +76,12 @@ let create fn arg =
           flush stderr)
 
 let exit () =
+(* BACKPORT BEGIN
   raise Exit
+*)
+  ignore (Sys.opaque_identity (check_memprof_cb ()));
+  exit_stub ()
+(* BACKPORT END *)
 
 (* Preemption *)
 
