@@ -646,8 +646,10 @@ let emit_instr env i =
           (* Save OCaml stack pointer in a callee-save register *)
           `	mr	28, 1\n`;
           (* Switch to C stack *)
+(* BACKPORT
           let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
           `	ld	1, {emit_int offset}(30)\n`;
+*)
           emit_call func;
           emit_call_nop();
           (* Switch back to OCaml stack *)
@@ -767,8 +769,12 @@ let emit_instr env i =
         let instr = name_for_specific sop in
         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
     | Lop (Idls_get) ->
+(* BACKPORT BEGIN
         let offset = Domainstate.(idx_of_field Domain_dls_root) * 8 in
         `	ld {emit_reg i.res.(0)}, {emit_int offset}(30)\n`
+*)
+        assert false
+(* BACKPORT END *)
     | Lreloadretaddr ->
         `	ld	11, {emit_int(retaddr_offset env)}(1)\n`;
         `	mtlr	11\n`
@@ -919,12 +925,14 @@ let fundecl fundecl =
   begin match !handle_overflow with
   | None -> ()
   | Some(overflow, ret) ->
+(* BACKPORT
       let threshold_offset =
         Domainstate.stack_ctx_words * 8 + stack_threshold_size in
       let f = max_frame_size + threshold_offset in
       let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
       `	ld	11, {emit_int offset}(30)\n`;
       `	addi	11, 11, {emit_int f}\n`;
+*)
       `	cmpld	1, 11\n`;
       `	ble-	{emit_label overflow}\n`;
       `{emit_label ret}:\n`
