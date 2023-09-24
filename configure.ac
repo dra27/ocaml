@@ -183,6 +183,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 AC_CONFIG_HEADERS([runtime/caml/version.h])
@@ -551,7 +552,8 @@ AS_CASE([$host],
     [exeext=".exe"],
   [exeext=''])
 
-otherlibraries="dynlink runtime_events"
+dnl otherlibraries="dynlink runtime_events"
+otherlibraries="dynlink"
 AS_IF([test x"$enable_unix_lib" != "xno"],
   [enable_unix_lib=yes
    otherlibraries="$otherlibraries unix"])
