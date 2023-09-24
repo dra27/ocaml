@@ -22,6 +22,9 @@ open! Dynlink_compilerlibs
 
 module DC = Dynlink_common
 module DT = Dynlink_types
+(* BACKPORT BEGIN *)
+module Mutex = DC.Mutex
+(* BACKPORT END *)
 
 module Bytecode = struct
   type filename = string

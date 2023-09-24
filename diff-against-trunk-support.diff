@@ -478,7 +478,7 @@ index 9b0077d509..1680c23f7b 100644
  
  (* https://github.com/ocaml-multicore/ocaml-multicore/issues/498 *)
 diff --git a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
-index b7907c99bd..7bae1ca5a8 100644
+index b7907c99bd..d47343fbe9 100644
 --- a/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
 +++ b/testsuite/tests/backtrace/backtrace_dynlink.flambda.reference
 @@ -2,19 +2,23 @@ Raised by primitive operation at Backtrace_dynlink_plugin in file "backtrace_dyn
@@ -486,12 +486,12 @@ index b7907c99bd..7bae1ca5a8 100644
  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
  Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 -Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
 -Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 -Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
  execution of module initializers in the shared library failed: Failure("SUCCESS")
 -Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
@@ -504,17 +504,17 @@ index b7907c99bd..7bae1ca5a8 100644
  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
  Called from Dynlink.Native.run in file "otherlibs/dynlink/native/dynlink.ml", line 84, characters 4-273
 -Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 363, characters 13-56
-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
  Called from Stdlib__List.iter in file "list.ml" (inlined), line 110, characters 12-15
 -Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 -Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 -Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 diff --git a/testsuite/tests/backtrace/backtrace_dynlink.reference b/testsuite/tests/backtrace/backtrace_dynlink.reference
-index 570aca891f..ccb0917fde 100644
+index 570aca891f..4c6999e85d 100644
 --- a/testsuite/tests/backtrace/backtrace_dynlink.reference
 +++ b/testsuite/tests/backtrace/backtrace_dynlink.reference
 @@ -1,18 +1,22 @@
@@ -522,12 +522,12 @@ index 570aca891f..ccb0917fde 100644
  Called from Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 -Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
  execution of module initializers in the shared library failed: Failure("SUCCESS")
 -Raised by primitive operation at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 85, characters 12-29
@@ -539,14 +539,14 @@ index 570aca891f..ccb0917fde 100644
  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 -Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 -Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
  Called from Backtrace_dynlink in file "backtrace_dynlink.ml", line 39, characters 4-52
 diff --git a/testsuite/tests/backtrace/backtrace_effects.ml b/testsuite/tests/backtrace/backtrace_effects.ml
 index 352b32cbd7..bafd2259e8 100644
@@ -1487,8 +1487,235 @@ index ac02717889..c882a8dac7 100644
  *)
  
  external init_skiplist : unit -> unit = "init_skiplist"
+diff --git a/testsuite/tests/lib-dynlink-domains/main.ml b/testsuite/tests/lib-dynlink-domains/main.ml
+index 1feeb3918a..781d82300a 100644
+--- a/testsuite/tests/lib-dynlink-domains/main.ml
++++ b/testsuite/tests/lib-dynlink-domains/main.ml
+@@ -4,168 +4,170 @@ include dynlink
+ libraries = ""
+ readonly_files = "store.ml main.ml Plugin_0.ml Plugin_0_0.ml Plugin_0_0_0.ml Plugin_0_0_0_0.ml Plugin_0_0_0_1.ml Plugin_0_0_0_2.ml Plugin_1.ml Plugin_1_0.ml Plugin_1_0_0.ml Plugin_1_0_0_0.ml Plugin_1_1.ml Plugin_1_2.ml Plugin_1_2_0.ml Plugin_1_2_0_0.ml Plugin_1_2_1.ml Plugin_1_2_2.ml Plugin_1_2_2_0.ml Plugin_1_2_3.ml Plugin_1_2_3_0.ml"
+ 
+-*01 shared-libraries
+-*02 setup-ocamlc.byte-build-env
+-*03 ocamlc.byte
++* skip
++reason = "OCaml 5 only"
++**01 shared-libraries
++**02 setup-ocamlc.byte-build-env
++**03 ocamlc.byte
+ module = "store.ml"
+-*04 ocamlc.byte
++**04 ocamlc.byte
+ module = "Plugin_0.ml"
+-*05 ocamlc.byte
++**05 ocamlc.byte
+ module = "Plugin_0_0.ml"
+-*06 ocamlc.byte
++**06 ocamlc.byte
+ module = "Plugin_0_0_0.ml"
+-*07 ocamlc.byte
++**07 ocamlc.byte
+ module = "Plugin_0_0_0_0.ml"
+-*08 ocamlc.byte
++**08 ocamlc.byte
+ module = "Plugin_0_0_0_1.ml"
+-*09 ocamlc.byte
++**09 ocamlc.byte
+ module = "Plugin_0_0_0_2.ml"
+-*10 ocamlc.byte
++**10 ocamlc.byte
+ module = "Plugin_1.ml"
+-*11 ocamlc.byte
++**11 ocamlc.byte
+ module = "Plugin_1_0.ml"
+-*12 ocamlc.byte
++**12 ocamlc.byte
+ module = "Plugin_1_0_0.ml"
+-*13 ocamlc.byte
++**13 ocamlc.byte
+ module = "Plugin_1_0_0_0.ml"
+-*14 ocamlc.byte
++**14 ocamlc.byte
+ module = "Plugin_1_1.ml"
+-*15 ocamlc.byte
++**15 ocamlc.byte
+ module = "Plugin_1_2.ml"
+-*16 ocamlc.byte
++**16 ocamlc.byte
+ module = "Plugin_1_2_0.ml"
+-*17 ocamlc.byte
++**17 ocamlc.byte
+ module = "Plugin_1_2_0_0.ml"
+-*18 ocamlc.byte
++**18 ocamlc.byte
+ module = "Plugin_1_2_1.ml"
+-*19 ocamlc.byte
++**19 ocamlc.byte
+ module = "Plugin_1_2_2.ml"
+-*20 ocamlc.byte
++**20 ocamlc.byte
+ module = "Plugin_1_2_2_0.ml"
+-*21 ocamlc.byte
++**21 ocamlc.byte
+ module = "Plugin_1_2_3.ml"
+-*22 ocamlc.byte
++**22 ocamlc.byte
+ module = "Plugin_1_2_3_0.ml"
+-*23 ocamlc.byte
++**23 ocamlc.byte
+ module = "main.ml"
+-*24 ocamlc.byte
++**24 ocamlc.byte
+ program = "./main.byte.exe"
+ libraries= "dynlink"
+ all_modules = "store.cmo main.cmo"
+ module = ""
+-*25 run
+-*26 check-program-output
++**25 run
++**26 check-program-output
+ 
+-*02 native-dynlink
+-*03 setup-ocamlopt.byte-build-env
+-*04 ocamlopt.byte
++**02 native-dynlink
++**03 setup-ocamlopt.byte-build-env
++**04 ocamlopt.byte
+ flags = ""
+ module = "store.ml"
+-*05 ocamlopt.byte
++**05 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_0.cmxs"
+ module = ""
+ all_modules = "Plugin_0.ml"
+-*06 ocamlopt.byte
++**06 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_0_0.cmxs"
+ module = ""
+ all_modules = "Plugin_0_0.ml"
+-*07 ocamlopt.byte
++**07 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_0_0_0.cmxs"
+ module = ""
+ all_modules = "Plugin_0_0_0.ml"
+-*08 ocamlopt.byte
++**08 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_0_0_0_0.cmxs"
+ module = ""
+ all_modules = "Plugin_0_0_0_0.ml"
+-*09 ocamlopt.byte
++**09 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_0_0_0_1.cmxs"
+ module = ""
+ all_modules = "Plugin_0_0_0_1.ml"
+-*10 ocamlopt.byte
++**10 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_0_0_0_2.cmxs"
+ module = ""
+ all_modules = "Plugin_0_0_0_2.ml"
+-*11 ocamlopt.byte
++**11 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1.cmxs"
+ module = ""
+ all_modules = "Plugin_1.ml"
+-*12 ocamlopt.byte
++**12 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_0.ml"
+-*13 ocamlopt.byte
++**13 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_0_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_0_0.ml"
+-*14 ocamlopt.byte
++**14 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_0_0_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_0_0_0.ml"
+-*15 ocamlopt.byte
++**15 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_1.cmxs"
+ module = ""
+ all_modules = "Plugin_1_1.ml"
+-*16 ocamlopt.byte
++**16 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2.ml"
+-*17 ocamlopt.byte
++**17 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_0.ml"
+-*18 ocamlopt.byte
++**18 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_0_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_0_0.ml"
+-*19 ocamlopt.byte
++**19 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_1.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_1.ml"
+-*20 ocamlopt.byte
++**20 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_2.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_2.ml"
+-*21 ocamlopt.byte
++**21 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_2_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_2_0.ml"
+-*22 ocamlopt.byte
++**22 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_3.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_3.ml"
+-*23 ocamlopt.byte
++**23 ocamlopt.byte
+ flags = "-shared"
+ program= "Plugin_1_2_3_0.cmxs"
+ module = ""
+ all_modules = "Plugin_1_2_3_0.ml"
+-*24 ocamlopt.byte
++**24 ocamlopt.byte
+ flags = ""
+ module = "main.ml"
+-*25 ocamlopt.byte
++**25 ocamlopt.byte
+ program = "./main.exe"
+ libraries="dynlink"
+ all_modules = "store.cmx main.cmx"
+ module = ""
+-*26 run
+-*27 check-program-output
++**26 run
++**27 check-program-output
+ *)
+ 
+ (*  This module and all plugin modules are generated by a call to test_generator.ml with parameters:
 diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
-index 7b948d4878..5bf0f5d882 100755
+index 7b948d4878..2850bc02d2 100755
 --- a/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.byte.reference
 @@ -3,10 +3,10 @@ Raised at Stdlib.failwith in file "stdlib.ml", line 29, characters 17-33
@@ -1498,17 +1725,17 @@ index 7b948d4878..5bf0f5d882 100755
 -Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 149, characters 16-25
 -Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 151, characters 6-137
 -Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
-+Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 150, characters 16-25
-+Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 6-137
-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
++Called from Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 152, characters 16-25
++Re-raised at Dynlink.Bytecode.run in file "otherlibs/dynlink/dynlink.ml", line 154, characters 6-137
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 -Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
  Called from Test10_main in file "test10_main.ml", line 51, characters 13-69
 diff --git a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
-index 26ef5fb57e..a9d5c1e5df 100755
+index 26ef5fb57e..0ae204cce9 100755
 --- a/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
 +++ b/testsuite/tests/lib-dynlink-initializers/test10_main.native.reference
 @@ -1,10 +1,14 @@
@@ -1522,14 +1749,14 @@ index 26ef5fb57e..a9d5c1e5df 100755
  Re-raised at Dynlink.Native.run.(fun) in file "otherlibs/dynlink/native/dynlink.ml", line 87, characters 10-149
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 363, characters 13-56
-+Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 370, characters 13-56
++Called from Dynlink_common.Make.load.(fun) in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 13-56
  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
 -Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 359, characters 8-392
 -Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 372, characters 8-17
 -Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 374, characters 26-45
-+Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 366, characters 8-392
-+Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 379, characters 8-17
-+Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 381, characters 26-45
++Called from Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 368, characters 8-392
++Re-raised at Dynlink_common.Make.load in file "otherlibs/dynlink/dynlink_common.ml", line 381, characters 8-17
++Called from Dynlink_common.Make.loadfile in file "otherlibs/dynlink/dynlink_common.ml" (inlined), line 383, characters 26-45
  Called from Test10_main in file "test10_main.ml", line 49, characters 30-87
 diff --git a/testsuite/tests/lib-format/mc_pr586_par.ml b/testsuite/tests/lib-format/mc_pr586_par.ml
 index 456a306ce7..da5c148416 100644
