@@ -26,13 +26,7 @@ end
 {
  "Pair"[module] ->
      Abs<.9>
-<<<<<<< HEAD
-        (X/294, Abs(Y/295, {
-||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
-        (X/299, Abs(Y/300, {
-=======
-        (X/280, Abs(Y/281, {
->>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+        (X/275, Abs(Y/276, {
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));

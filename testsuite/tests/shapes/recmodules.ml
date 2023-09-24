@@ -43,16 +43,8 @@ and B : sig
 end = B
 [%%expect{|
 {
-<<<<<<< HEAD
- "A"[module] -> A/317<.11>;
- "B"[module] -> B/318<.12>;
-||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
- "A"[module] -> A/322<.11>;
- "B"[module] -> B/323<.12>;
-=======
- "A"[module] -> A/303<.11>;
- "B"[module] -> B/304<.12>;
->>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+ "A"[module] -> A/298<.11>;
+ "B"[module] -> B/299<.12>;
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -90,31 +82,13 @@ end = Set.Make(A)
  "ASet"[module] ->
      {
       "compare"[value] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
-||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
->>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
           "compare"[value];
       "elt"[type] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
-||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
->>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
           "elt"[type];
       "t"[type] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) . "t"[type];
-||||||| parent of bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) . "t"[type];
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
->>>>>>> bc72d318d2 (Merge pull request PR#11382 from Octachron/topdir_fix)
+          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
       };
  }
 module rec A :
