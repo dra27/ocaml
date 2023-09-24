@@ -2274,6 +2274,25 @@ index b31ace08b5..e29ee93f9e 100644
  *)
  
  (* Test Mutex.try_lock *)
+diff --git a/testsuite/tests/lib-systhreads/boundscheck.ml b/testsuite/tests/lib-systhreads/boundscheck.ml
+index 216dcebae7..124d054ec7 100644
+--- a/testsuite/tests/lib-systhreads/boundscheck.ml
++++ b/testsuite/tests/lib-systhreads/boundscheck.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+ 
+ include systhreads
+-* hassysthreads
+-** bytecode
+-** native
++* skip
++reason = "OCaml 5 only"
++** hassysthreads
++*** bytecode
++*** native
+ 
+ *)
+ 
 diff --git a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml b/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
 index f481464906..0138046146 100644
 --- a/testsuite/tests/lib-systhreads/multicore_lifecycle.ml
