@@ -53,18 +53,6 @@ external field : t -> int -> t = "%obj_field"
     be propagated.
 *)
 external set_field : t -> int -> t -> unit = "%obj_set_field"
-<<<<<<< HEAD
-(*
-external compare_and_swap_field : t -> int -> t -> t -> bool
-  = "caml_obj_compare_and_swap"
-external is_shared : t -> bool = "caml_obj_is_shared"
-*)
-||||||| parent of 0e0242e3ff (Merge pull request PR#11778 from Octachron/multicore_comments_cleanup)
-external compare_and_swap_field : t -> int -> t -> t -> bool
-  = "caml_obj_compare_and_swap"
-external is_shared : t -> bool = "caml_obj_is_shared"
-=======
->>>>>>> 0e0242e3ff (Merge pull request PR#11778 from Octachron/multicore_comments_cleanup)
 
 val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
 val [@inline always] set_double_field : t -> int -> float -> unit

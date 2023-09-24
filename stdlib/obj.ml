@@ -29,18 +29,6 @@ external size : t -> int = "%obj_size"
 external reachable_words : t -> int = "caml_obj_reachable_words"
 external field : t -> int -> t = "%obj_field"
 external set_field : t -> int -> t -> unit = "%obj_set_field"
-<<<<<<< HEAD
-(*
-external compare_and_swap_field : t -> int -> t -> t -> bool
-  = "caml_obj_compare_and_swap"
-external is_shared : t -> bool = "caml_obj_is_shared"
-*)
-||||||| parent of 0e0242e3ff (Merge pull request PR#11778 from Octachron/multicore_comments_cleanup)
-external compare_and_swap_field : t -> int -> t -> t -> bool
-  = "caml_obj_compare_and_swap"
-external is_shared : t -> bool = "caml_obj_is_shared"
-=======
->>>>>>> 0e0242e3ff (Merge pull request PR#11778 from Octachron/multicore_comments_cleanup)
 external floatarray_get : floatarray -> int -> float = "caml_floatarray_get"
 external floatarray_set :
     floatarray -> int -> float -> unit = "caml_floatarray_set"
