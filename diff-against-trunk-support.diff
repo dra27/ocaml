@@ -1381,23 +1381,6 @@ index bd72ed302f..6d21977529 100644
  |}]
  
  (* It was decided to not allow this anymore. *)
-diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-new file mode 100644
-index 0000000000..94200ec67f
---- /dev/null
-+++ b/testsuite/tests/instrumented-runtime/main.ml
-@@ -0,0 +1,11 @@
-+(* TEST
-+  * instrumented-runtime
-+  ** native
-+    flags = "-runtime-variant=i"
-+*)
-+
-+(* Test if the instrumented runtime is in working condition *)
-+
-+let _ =
-+  Gc.eventlog_pause ();
-+  Gc.eventlog_resume()
 diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 index cccbd96d71..35dd7fd85b 100644
 --- a/testsuite/tests/lazy/lazy2.ml
@@ -1873,6 +1856,153 @@ index 68f567abec..90a78e2250 100644
   *)
  
  let () = Random.init 42
+diff --git a/testsuite/tests/lib-runtime-events/test.ml b/testsuite/tests/lib-runtime-events/test.ml
+index db08937089..8ccaccdf25 100644
+--- a/testsuite/tests/lib-runtime-events/test.ml
++++ b/testsuite/tests/lib-runtime-events/test.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+ modules = "stubs.c"
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ 
+ external start_runtime_events : unit -> unit = "start_runtime_events"
+diff --git a/testsuite/tests/lib-runtime-events/test_caml.ml b/testsuite/tests/lib-runtime-events/test_caml.ml
+index 02398467b7..88fb80b9cf 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_exception.ml b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+index e1df5aee0b..6738603ddd 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_exception.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+index 3cd4752282..dbcdf76434 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_parallel.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+index d69042e354..724466a63b 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_reentry.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+index 34b034a8e8..8656ca2e59 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+index 35ddd983a1..d63066e646 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_stubs_gc.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_env_start.ml b/testsuite/tests/lib-runtime-events/test_env_start.ml
+index 6b6bca5b09..cbdf114e57 100644
+--- a/testsuite/tests/lib-runtime-events/test_env_start.ml
++++ b/testsuite/tests/lib-runtime-events/test_env_start.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+ include runtime_events
+ set OCAML_RUNTIME_EVENTS_START = "1"
++* skip
++reason = "OCaml 5 only"
+ *)
+ 
+ (* In this test the runtime_events should already be started by the environment
+diff --git a/testsuite/tests/lib-runtime-events/test_external.ml b/testsuite/tests/lib-runtime-events/test_external.ml
+index b7269b7501..375564764f 100644
+--- a/testsuite/tests/lib-runtime-events/test_external.ml
++++ b/testsuite/tests/lib-runtime-events/test_external.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+    include runtime_events
+-   * libunix
+-   ** bytecode
+-   ** native *)
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native *)
+ 
+ let got_major = ref false
+ let got_minor = ref false
+diff --git a/testsuite/tests/lib-runtime-events/test_fork.ml b/testsuite/tests/lib-runtime-events/test_fork.ml
+index c3add88370..32d2367e26 100644
+--- a/testsuite/tests/lib-runtime-events/test_fork.ml
++++ b/testsuite/tests/lib-runtime-events/test_fork.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+    include runtime_events
+-   * libunix
+-   ** bytecode
+-   ** native *)
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native *)
+ 
+ let got_start = ref false
+ let got_fork_child = ref false
+diff --git a/testsuite/tests/lib-runtime-events/test_instrumented.ml b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+index 7a41c49b2a..63aded8114 100644
+--- a/testsuite/tests/lib-runtime-events/test_instrumented.ml
++++ b/testsuite/tests/lib-runtime-events/test_instrumented.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+-  * native
++  * skip
++  reason = "OCaml 5 only"
++  ** native
+     include runtime_events
+     flags = "-runtime-variant=i"
+ *)
 diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 index 23f2a5f7de..08055698e7 100644
 --- a/testsuite/tests/lib-str/parallel.ml

@@ -591,6 +591,7 @@ runtime_COMMON_C_SOURCES = \
   debugger \
   domain \
   dynlink \
+  eventlog \
   extern \
   finalise \
   floats \
@@ -614,7 +615,6 @@ runtime_COMMON_C_SOURCES = \
   parsing \
   printexc \
   prng \
-  runtime_events \
   signals \
   skiplist \
   startup_aux \
@@ -1041,7 +1041,9 @@ clean::
 
 # Dependencies
 
-subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
+subdirs = \
+  stdlib $(addprefix otherlibs/, \
+    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
   debugger lex ocamldoc ocamltest tools
 
 .PHONY: alldepend

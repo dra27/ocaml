@@ -109,6 +109,18 @@ index 0000000000..38d75e6f31
 + diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
 + deleted file mode 100644
 + --- a/testsuite/tests/instrumented-runtime/main.run
+diff --git a/.gitattributes b/.gitattributes
+index 7bb4730a7f..c6003a4193 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -137,6 +137,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
+ testsuite/tests/tool-ocamltest/norm*.reference binary
+ 
+ tools/magic                       typo.missing-header
++tools/eventlog_metadata.in        typo.missing-header
+ 
+ # TODO we should fix the long-line errors in yacc/*.c
+ /yacc/*.[ch]         typo.very-long-line=may
 diff --git a/Changes b/Changes
 index 35b005351e..6e9f5903c9 100644
 --- a/Changes
@@ -150,7 +162,7 @@ index 35b005351e..6e9f5903c9 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 5181edd869..13ca0d7a3a 100644
+index 5181edd869..23865a628b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -578,7 +578,6 @@ partialclean::
@@ -161,7 +173,7 @@ index 5181edd869..13ca0d7a3a 100644
    afl \
    alloc \
    array \
-@@ -586,24 +585,23 @@ runtime_COMMON_C_SOURCES = \
+@@ -586,24 +585,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -171,6 +183,7 @@ index 5181edd869..13ca0d7a3a 100644
    debugger \
    domain \
    dynlink \
++  eventlog \
    extern \
 -  fiber \
    finalise \
@@ -188,7 +201,7 @@ index 5181edd869..13ca0d7a3a 100644
    main \
    major_gc \
    md5 \
-@@ -614,17 +612,13 @@ runtime_COMMON_C_SOURCES = \
+@@ -614,17 +613,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -196,7 +209,7 @@ index 5181edd869..13ca0d7a3a 100644
    printexc \
    prng \
 -  roots \
-   runtime_events \
+-  runtime_events \
 -  shared_heap \
    signals \
    skiplist \
@@ -225,7 +238,18 @@ index 5181edd869..13ca0d7a3a 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1100,6 +1097,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1044,7 +1041,9 @@ clean::
+ 
+ # Dependencies
+ 
+-subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
++subdirs = \
++  stdlib $(addprefix otherlibs/, \
++    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
+   debugger lex ocamldoc ocamltest tools
+ 
+ .PHONY: alldepend
+@@ -1100,6 +1099,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(MKEXE) -o $@ $^
  
  clean::
@@ -773,10 +797,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 1bff929e3c..cbaf8a3457 100755
+index 1bff929e3c..d901d1a2f5 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 74b6a4cd40..e559b5560d 100644
+index 74b6a4cd40..57cff02ca3 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -788,7 +812,15 @@ index 74b6a4cd40..e559b5560d 100644
  AC_SUBST([force_instrumented_runtime])
  AC_SUBST([QS])
  
-@@ -207,10 +209,10 @@ AC_CANONICAL_TARGET
+@@ -181,6 +183,7 @@ AC_CONFIG_FILES([Makefile.config])
+ AC_CONFIG_FILES([stdlib/sys.ml])
+ AC_CONFIG_FILES([manual/src/version.tex])
+ AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
++AC_CONFIG_FILES([tools/eventlog_metadata])
+ AC_CONFIG_HEADERS([runtime/caml/m.h])
+ AC_CONFIG_HEADERS([runtime/caml/s.h])
+ AC_CONFIG_HEADERS([runtime/caml/version.h])
+@@ -207,10 +210,10 @@ AC_CANONICAL_TARGET
  # Systems that are known not to work, even in bytecode only.
  
  AS_CASE([$host],
@@ -803,7 +835,7 @@ index 74b6a4cd40..e559b5560d 100644
    [i386-*-solaris*],
      [AC_MSG_ERROR([Building for 32 bits target is not supported. \
  If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-@@ -319,15 +321,23 @@ AC_ARG_ENABLE([frame-pointers],
+@@ -319,15 +322,23 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
  
@@ -835,7 +867,17 @@ index 74b6a4cd40..e559b5560d 100644
  
  AC_ARG_ENABLE([spacetime], [],
    [AS_IF([test "x$enableval" != 'xno'],
-@@ -1076,67 +1086,67 @@ model=default
+@@ -541,7 +552,8 @@ AS_CASE([$host],
+     [exeext=".exe"],
+   [exeext=''])
+ 
+-otherlibraries="dynlink runtime_events"
++dnl otherlibraries="dynlink runtime_events"
++otherlibraries="dynlink"
+ AS_IF([test x"$enable_unix_lib" != "xno"],
+   [enable_unix_lib=yes
+    otherlibraries="$otherlibraries unix"])
+@@ -1076,67 +1088,67 @@ model=default
  system=unknown
  
  AS_CASE([$host],
@@ -962,7 +1004,7 @@ index 74b6a4cd40..e559b5560d 100644
    [x86_64-*-solaris*],
      [arch=amd64; system=solaris],
    [x86_64-*-freebsd*],
-@@ -1145,8 +1155,8 @@ dnl   [arch=amd64; system=dragonfly],
+@@ -1145,8 +1157,8 @@ dnl   [arch=amd64; system=dragonfly],
      [arch=amd64; system=netbsd],
    [x86_64-*-openbsd*],
      [arch=amd64; system=openbsd],
@@ -973,7 +1015,7 @@ index 74b6a4cd40..e559b5560d 100644
    [arm64-*-darwin*],
      [arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1157,14 +1167,14 @@ dnl   [arch=amd64; system=beos],
+@@ -1157,14 +1169,14 @@ dnl   [arch=amd64; system=beos],
      [arch=amd64; system=mingw64],
    [aarch64-*-linux*],
      [arch=arm64; system=linux],
@@ -994,7 +1036,7 @@ index 74b6a4cd40..e559b5560d 100644
  )
  
  AS_CASE([$ccomptype],
-@@ -1843,7 +1853,8 @@ AS_CASE([$arch,$system],
+@@ -1843,7 +1855,8 @@ AS_CASE([$arch,$system],
  
  AS_CASE([$host],
    [*-*-mingw32|*-pc-windows],
@@ -1004,7 +1046,7 @@ index 74b6a4cd40..e559b5560d 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -1892,6 +1903,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -1892,6 +1905,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -1035,7 +1077,7 @@ index 74b6a4cd40..e559b5560d 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2033,8 +2068,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2033,8 +2070,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32],
@@ -3309,10 +3351,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..ea6425c907
+index 0000000000..ccd22a4399
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3277 @@
+@@ -0,0 +1,3282 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 60b92e6c36..cdbf9e55f6 100644
 +--- a/ocamltest/Makefile
@@ -4697,17 +4739,22 @@ index 0000000000..ea6425c907
 + 
 + (* It was decided to not allow this anymore. *)
 +diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-+index 084ceb03ca..94200ec67f 100644
-+--- a/testsuite/tests/instrumented-runtime/main.ml
++new file mode 100644
++index 0000000000..94200ec67f
++--- /dev/null
 ++++ b/testsuite/tests/instrumented-runtime/main.ml
-+@@ -1,7 +1,5 @@
-+ (* TEST
-+   * instrumented-runtime
-+-  * skip
-+-  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
-+   ** native
-+     flags = "-runtime-variant=i"
-+ *)
++@@ -0,0 +1,11 @@
+++(* TEST
+++  * instrumented-runtime
+++  ** native
+++    flags = "-runtime-variant=i"
+++*)
+++
+++(* Test if the instrumented runtime is in working condition *)
+++
+++let _ =
+++  Gc.eventlog_pause ();
+++  Gc.eventlog_resume()
 +diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 +index cccbd96d71..35dd7fd85b 100644
 +--- a/testsuite/tests/lazy/lazy2.ml
@@ -6592,10 +6639,10 @@ index 0000000000..ea6425c907
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..b7c9b63731
+index 0000000000..52f63ff918
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6532 @@
+@@ -0,0 +1,6543 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..38d75e6f31
@@ -6707,6 +6754,18 @@ index 0000000000..b7c9b63731
 ++ diff --git a/testsuite/tests/instrumented-runtime/main.run b/testsuite/tests/instrumented-runtime/main.run
 ++ deleted file mode 100644
 ++ --- a/testsuite/tests/instrumented-runtime/main.run
++diff --git a/.gitattributes b/.gitattributes
++index 7bb4730a7f..c6003a4193 100644
++--- a/.gitattributes
+++++ b/.gitattributes
++@@ -137,6 +137,7 @@ testsuite/tests/lib-dynlink-domains/main.ml  typo.very-long-line
++ testsuite/tests/tool-ocamltest/norm*.reference binary
++ 
++ tools/magic                       typo.missing-header
+++tools/eventlog_metadata.in        typo.missing-header
++ 
++ # TODO we should fix the long-line errors in yacc/*.c
++ /yacc/*.[ch]         typo.very-long-line=may
 +diff --git a/Changes b/Changes
 +index 35b005351e..6e9f5903c9 100644
 +--- a/Changes
@@ -6748,7 +6807,7 @@ index 0000000000..b7c9b63731
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 5181edd869..13ca0d7a3a 100644
++index 5181edd869..23865a628b 100644
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -578,7 +578,6 @@ partialclean::
@@ -6759,7 +6818,7 @@ index 0000000000..b7c9b63731
 +   afl \
 +   alloc \
 +   array \
-+@@ -586,24 +585,23 @@ runtime_COMMON_C_SOURCES = \
++@@ -586,24 +585,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -6769,6 +6828,7 @@ index 0000000000..b7c9b63731
 +   debugger \
 +   domain \
 +   dynlink \
+++  eventlog \
 +   extern \
 +-  fiber \
 +   finalise \
@@ -6786,7 +6846,7 @@ index 0000000000..b7c9b63731
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -614,17 +612,13 @@ runtime_COMMON_C_SOURCES = \
++@@ -614,17 +613,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -6794,7 +6854,7 @@ index 0000000000..b7c9b63731
 +   printexc \
 +   prng \
 +-  roots \
-+   runtime_events \
++-  runtime_events \
 +-  shared_heap \
 +   signals \
 +   skiplist \
@@ -6823,7 +6883,18 @@ index 0000000000..b7c9b63731
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1100,6 +1097,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1044,7 +1041,9 @@ clean::
++ 
++ # Dependencies
++ 
++-subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
+++subdirs = \
+++  stdlib $(addprefix otherlibs/, \
+++    $(filter-out runtime_events, $(ALL_OTHERLIBS))) \
++   debugger lex ocamldoc ocamltest tools
++ 
++ .PHONY: alldepend
++@@ -1100,6 +1099,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -7371,10 +7442,10 @@ index 0000000000..b7c9b63731
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 1bff929e3c..cbaf8a3457 100755
++index 1bff929e3c..d901d1a2f5 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 74b6a4cd40..e559b5560d 100644
++index 74b6a4cd40..57cff02ca3 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -7386,7 +7457,15 @@ index 0000000000..b7c9b63731
 + AC_SUBST([force_instrumented_runtime])
 + AC_SUBST([QS])
 + 
-+@@ -207,10 +209,10 @@ AC_CANONICAL_TARGET
++@@ -181,6 +183,7 @@ AC_CONFIG_FILES([Makefile.config])
++ AC_CONFIG_FILES([stdlib/sys.ml])
++ AC_CONFIG_FILES([manual/src/version.tex])
++ AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+++AC_CONFIG_FILES([tools/eventlog_metadata])
++ AC_CONFIG_HEADERS([runtime/caml/m.h])
++ AC_CONFIG_HEADERS([runtime/caml/s.h])
++ AC_CONFIG_HEADERS([runtime/caml/version.h])
++@@ -207,10 +210,10 @@ AC_CANONICAL_TARGET
 + # Systems that are known not to work, even in bytecode only.
 + 
 + AS_CASE([$host],
@@ -7401,7 +7480,7 @@ index 0000000000..b7c9b63731
 +   [i386-*-solaris*],
 +     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
 + If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
-+@@ -319,15 +321,23 @@ AC_ARG_ENABLE([frame-pointers],
++@@ -319,15 +322,23 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
 + 
@@ -7433,7 +7512,17 @@ index 0000000000..b7c9b63731
 + 
 + AC_ARG_ENABLE([spacetime], [],
 +   [AS_IF([test "x$enableval" != 'xno'],
-+@@ -1076,67 +1086,67 @@ model=default
++@@ -541,7 +552,8 @@ AS_CASE([$host],
++     [exeext=".exe"],
++   [exeext=''])
++ 
++-otherlibraries="dynlink runtime_events"
+++dnl otherlibraries="dynlink runtime_events"
+++otherlibraries="dynlink"
++ AS_IF([test x"$enable_unix_lib" != "xno"],
++   [enable_unix_lib=yes
++    otherlibraries="$otherlibraries unix"])
++@@ -1076,67 +1088,67 @@ model=default
 + system=unknown
 + 
 + AS_CASE([$host],
@@ -7560,7 +7649,7 @@ index 0000000000..b7c9b63731
 +   [x86_64-*-solaris*],
 +     [arch=amd64; system=solaris],
 +   [x86_64-*-freebsd*],
-+@@ -1145,8 +1155,8 @@ dnl   [arch=amd64; system=dragonfly],
++@@ -1145,8 +1157,8 @@ dnl   [arch=amd64; system=dragonfly],
 +     [arch=amd64; system=netbsd],
 +   [x86_64-*-openbsd*],
 +     [arch=amd64; system=openbsd],
@@ -7571,7 +7660,7 @@ index 0000000000..b7c9b63731
 +   [arm64-*-darwin*],
 +     [arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1157,14 +1167,14 @@ dnl   [arch=amd64; system=beos],
++@@ -1157,14 +1169,14 @@ dnl   [arch=amd64; system=beos],
 +     [arch=amd64; system=mingw64],
 +   [aarch64-*-linux*],
 +     [arch=arm64; system=linux],
@@ -7592,7 +7681,7 @@ index 0000000000..b7c9b63731
 + )
 + 
 + AS_CASE([$ccomptype],
-+@@ -1843,7 +1853,8 @@ AS_CASE([$arch,$system],
++@@ -1843,7 +1855,8 @@ AS_CASE([$arch,$system],
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32|*-pc-windows],
@@ -7602,7 +7691,7 @@ index 0000000000..b7c9b63731
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -1892,6 +1903,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -1892,6 +1905,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -7633,7 +7722,7 @@ index 0000000000..b7c9b63731
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2033,8 +2068,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2033,8 +2070,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32],
@@ -9907,10 +9996,10 @@ index 0000000000..b7c9b63731
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..ea6425c907
++index 0000000000..ccd22a4399
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3277 @@
++@@ -0,0 +1,3282 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 60b92e6c36..cdbf9e55f6 100644
 ++--- a/ocamltest/Makefile
@@ -11295,17 +11384,22 @@ index 0000000000..b7c9b63731
 ++ 
 ++ (* It was decided to not allow this anymore. *)
 ++diff --git a/testsuite/tests/instrumented-runtime/main.ml b/testsuite/tests/instrumented-runtime/main.ml
-++index 084ceb03ca..94200ec67f 100644
-++--- a/testsuite/tests/instrumented-runtime/main.ml
+++new file mode 100644
+++index 0000000000..94200ec67f
+++--- /dev/null
 +++++ b/testsuite/tests/instrumented-runtime/main.ml
-++@@ -1,7 +1,5 @@
-++ (* TEST
-++   * instrumented-runtime
-++-  * skip
-++-  reason = "instrumented runtime test is not very useful and broken on multicore. (#9413)"
-++   ** native
-++     flags = "-runtime-variant=i"
-++ *)
+++@@ -0,0 +1,11 @@
++++(* TEST
++++  * instrumented-runtime
++++  ** native
++++    flags = "-runtime-variant=i"
++++*)
++++
++++(* Test if the instrumented runtime is in working condition *)
++++
++++let _ =
++++  Gc.eventlog_pause ();
++++  Gc.eventlog_resume()
 ++diff --git a/testsuite/tests/lazy/lazy2.ml b/testsuite/tests/lazy/lazy2.ml
 ++index cccbd96d71..35dd7fd85b 100644
 ++--- a/testsuite/tests/lazy/lazy2.ml
@@ -13091,43 +13185,7 @@ index 0000000000..b7c9b63731
 +++**** ocamlc.byte
 +++***** check-ocamlc.byte-output
 +++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ let f x =
-++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++index 5636e9abe2..53e430713c 100644
-++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
-+++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
-++@@ -24,11 +24,11 @@ end
-++ Line 3, characters 2-36:
-++ 3 |   include Comparable with type t = t
-++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-++-Error: Illegal shadowing of included type t/284 by t/289
-+++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-e
++++******* check-prog
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
@@ -14126,10 +14184,32 @@ index d3391e6884..d6fcaa8d91 100644
    match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
  let wait_timed_write fd d =
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
-index 38650426e4..ced3aa04f7 100644
+index 38650426e4..f8ecea8c9f 100644
 --- a/otherlibs/unix/fork.c
 +++ b/otherlibs/unix/fork.c
-@@ -36,13 +36,17 @@ void caml_atfork_child() {
+@@ -17,11 +17,16 @@
+ 
+ #include <caml/mlvalues.h>
+ #include <caml/debugger.h>
++#if 0 /* BACKPORT BEGIN */
+ #include <caml/runtime_events.h>
++#endif
++#include <caml/eventlog.h>
++/* BACKPORT END */
+ #include "unixsupport.h"
+ #include <caml/domain.h>
+ #include <caml/fail.h>
+ 
++#if 0 /* BACKPORT */
+ /* Post-fork tasks to be carried out in the parent */
+ void caml_atfork_parent(pid_t child_pid) {
+   CAML_EV_LIFECYCLE(EV_FORK_PARENT, child_pid);
+@@ -32,19 +37,29 @@ void caml_atfork_child() {
+   caml_runtime_events_post_fork();
+   CAML_EV_LIFECYCLE(EV_FORK_CHILD, 0);
+ }
++#endif
+ 
  CAMLprim value unix_fork(value unit)
  {
    int ret;
@@ -14140,14 +14220,34 @@ index 38650426e4..ced3aa04f7 100644
    }
 +#endif
  
-   ret = fork();
--
+-  ret = fork();
++/* BACKPORT BEGIN */
++  CAML_EV_FLUSH();
++/* BACKPORT END */
+ 
++  ret = fork();
 +#if 0 /* BACKPORT */
 +  if (ret == 0) caml_atfork_hook();
 +#endif
    if (ret == -1) uerror("fork", Nothing);
  
++#if 0 /* BACKPORT BEGIN */
    if (ret == 0) {
+     caml_atfork_child();
+     /* the following hook can be redefined in other places */
+@@ -52,6 +67,12 @@ CAMLprim value unix_fork(value unit)
+   } else {
+     caml_atfork_parent(ret);
+   }
++#endif
++  CAML_EVENTLOG_DO({
++      if (ret == 0)
++        caml_eventlog_disable();
++  });
++/* BACKPORT END */
+ 
+   if (caml_debugger_in_use)
+     if ((caml_debugger_fork_mode && ret == 0) ||
 diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
 index 3d03d5cff3..24e7218699 100644
 --- a/otherlibs/unix/signals.c
@@ -14728,6 +14828,26 @@ index 37c6f3136a..020c9466d3 100644
  
  val formatter_of_out_functions :
    formatter_out_functions -> formatter
+diff --git a/stdlib/gc.ml b/stdlib/gc.ml
+index 832cfedb4d..84611ad812 100644
+--- a/stdlib/gc.ml
++++ b/stdlib/gc.ml
+@@ -61,9 +61,15 @@ external major : unit -> unit = "caml_gc_major"
+ external full_major : unit -> unit = "caml_gc_full_major"
+ external compact : unit -> unit = "caml_gc_compaction"
+ external get_minor_free : unit -> int = "caml_get_minor_free"
++(* BACKPORT BEGIN *)
++external eventlog_pause : unit -> unit = "caml_eventlog_pause"
++external eventlog_resume : unit -> unit = "caml_eventlog_resume"
++(* BACKPORT END *)
+ 
++(* BACKPORT
+ let eventlog_pause () = ()
+ let eventlog_resume () = ()
++*)
+ 
+ open Printf
+ 
 diff --git a/stdlib/hashtbl.ml b/stdlib/hashtbl.ml
 index d1f4ca0bce..67bb7b7389 100644
 --- a/stdlib/hashtbl.ml
@@ -14988,6 +15108,24 @@ index 8775eadb88..0c2b22634f 100644
  module Seq            = Seq
  module Set            = Set
  module Stack          = Stack
+diff --git a/tools/Makefile b/tools/Makefile
+index 66ce89f9cd..fffcfe6cbe 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -275,6 +275,13 @@ clean::
+ 	rm -f -- lintapidiff.opt lintapidiff.opt.exe
+ 	rm -f lintapidiff.cm? lintapidiff.o lintapidiff.obj
+ 
++# Eventlog metadata file
++
++install::
++	$(INSTALL_DATA) \
++	  eventlog_metadata \
++	  "$(INSTALL_LIBDIR)"
++
+ # Copy a bytecode executable, stripping debug info
+ 
+ STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
 index 01722ed9ca..508dd3b226 100644
 --- a/tools/dumpobj.ml
@@ -15005,6 +15143,268 @@ index 01722ed9ca..508dd3b226 100644
    opSTOP, Nothing;
    opEVENT, Nothing;
    opBREAK, Nothing;
+diff --git a/tools/eventlog_metadata.in b/tools/eventlog_metadata.in
+new file mode 100644
+index 0000000000..00d51897e0
+--- /dev/null
++++ b/tools/eventlog_metadata.in
+@@ -0,0 +1,256 @@
++/* CTF 1.8 */
++
++typealias integer {size = 8;}  := uint8_t;
++typealias integer {size = 16;} := uint16_t;
++typealias integer {size = 32;} := uint32_t;
++typealias integer {size = 64;} := uint64_t;
++
++clock {
++    name = tracing_clock;
++    freq = 1000000000; /* tick = 1 ns */
++};
++
++typealias integer {
++    size = 64;
++    map = clock.tracing_clock.value;
++} := tracing_clock_int_t;
++
++
++/*
++
++Main trace description,
++major and minor refers to the CTF version being used.
++
++The packet header must contain at the very least
++a stream id and the CTF magic number.
++We only use one stream for now, and CTF magic number is 0xc1fc1fc1.
++
++We add an extra field ocaml_trace_version to enable simpler transition if we add
++or remove metrics in the future.
++
++*/
++trace {
++    major = 1;
++    minor = 8;
++    byte_order = @endianness@;
++    packet.header := struct {
++        uint32_t magic; /* required: must contain CTF magic number */
++        uint16_t ocaml_trace_version; /* our own trace format versioning */
++        uint16_t stream_id; /* required, although we have only one. */
++    };
++};
++
++/*
++
++We use only one stream at the moment.
++Each event payload must contain a header with a timestamp and a pid.
++The id field refers to the various event kinds defined further down this file.
++
++*/
++stream {
++    id = 0;
++    event.header := struct { /* for each event */
++        tracing_clock_int_t timestamp;
++        uint32_t id;
++    };
++    event.context := struct {
++        uint32_t tid;
++        uint8_t is_backup_thread;
++    };
++};
++
++/*
++
++These enumerations are mostly following the instrumented runtime datapoints.
++gc_phase aims to track the entry and exit time of each of the following events
++during collection.
++
++*/
++enum gc_phase : uint16_t {
++    "compact/main" = 0,
++    "compact/recompact",
++    "explicit/gc_set",
++    "explicit/gc_stat",
++    "explicit/gc_minor",
++    "explicit/gc_major",
++    "explicit/gc_full_major",
++    "explicit/gc_compact",
++    "major",
++    "major/roots",
++    "major/sweep",
++    "major/mark/roots",
++    "major/mark/main",
++    "major/mark/final",
++    "major/mark",
++    "major/mark/global_roots_slice",
++    "major_roots/global",
++    "major_roots/dynamic_global",
++    "major_roots/local",
++    "major_roots/C",
++    "major_roots/finalised",
++    "major_roots/memprof",
++    "major_roots/hook",
++    "major/check_and_compact",
++    "minor",
++    "minor/local_roots",
++    "minor/ref_tables",
++    "minor/copy",
++    "minor/update_weak",
++    "minor/finalized",
++    "explicit/gc_major_slice",
++    "domain/spawn",
++    "domain/send_interrupt",
++    "domain/idle_wait",
++    "finalise/update_first",
++    "finalise/update_last",
++    "interrupt/gc",
++    "interrupt/remote",
++    "major/ephe_mark",
++    "major/ephe_sweep",
++    "major/finish_marking",
++    "major_gc/cycle_domains",
++    "major_gc/phase_change",
++    "major_gc/stw",
++    "major/mark_opportunistic",
++    "major/slice",
++    "minor/clear",
++    "minor/finalizers/oldify",
++    "minor/global_roots",
++    "minor/leave_barrier",
++    "stw/api_barrier",
++    "stw/handler",
++    "stw/leader",
++    "minor/clear",
++    "minor_finalized",
++    "minor_finalizers_oldify",
++    "minor_global_roots",
++    "minor_leave_barrier",
++    "minor_local_roots",
++    "minor_ref_tables",
++    "minor_update_weak",
++    "stw_api_barrier",
++    "stw_handler",
++    "stw_leader",
++    "major_finish_sweeping",
++    "minor_finalizers_admin",
++    "domain/condition_wait",
++    "domain/resize_minor_heap_reservation"
++};
++
++/*
++
++Miscellaneous GC counters
++
++*/
++enum gc_counter : uint16_t {
++    "alloc_jump",
++    "force_minor/alloc_small",
++    "force_minor/make_vect",
++    "force_minor/set_minor_heap_size",
++    "force_minor/weak",
++    "force_minor/memprof",
++    "major/mark/slice/remain",
++    "major/mark/slice/fields",
++    "major/mark/slice/pointers",
++    "major/work/extra",
++    "major/work/mark",
++    "major/work/sweep",
++    "minor/promoted",
++    "request_major/alloc_shr",
++    "request_major/adjust_gc_speed",
++    "request_minor/realloc_ref_table",
++    "request_minor/realloc_ephe_ref_table",
++    "request_minor/realloc_custom_table"
++};
++
++/*
++
++Block allocation counters, per size buckets.
++
++*/
++enum alloc_bucket : uint8_t {
++  "alloc 01" = 1,
++  "alloc 02",
++  "alloc 03",
++  "alloc 04",
++  "alloc 05",
++  "alloc 06",
++  "alloc 07",
++  "alloc 08",
++  "alloc 09",
++  "alloc 10-19",
++  "alloc 20-29",
++  "alloc 30-39",
++  "alloc 40-49",
++  "alloc 50-59",
++  "alloc 60-69",
++  "alloc 70-79",
++  "alloc 80-89",
++  "alloc 90-99",
++  "alloc large"
++};
++
++/*
++
++Each event is comprised of the previously defined event.header
++and the fields defined here.
++
++An entry event marks the start of a gc phase.
++
++*/
++event {
++    id = 0;
++    name = "entry";
++    stream_id = 0;
++    fields := struct {
++        enum gc_phase phase;
++    };
++};
++
++/*
++
++exit counterparts to entry events
++
++*/
++event {
++    id = 1;
++    name = "exit";
++    stream_id = 0;
++    fields := struct {
++        enum gc_phase phase;
++    };
++};
++
++event {
++    id = 2;
++    name = "counter";
++    stream_id = 0;
++    fields := struct {
++        uint64_t count;
++        enum gc_counter kind;
++    };
++};
++
++event {
++    id = 3;
++    name = "alloc";
++    stream_id = 0;
++    fields := struct {
++        uint64_t count;
++        enum alloc_bucket bucket;
++    };
++};
++
++/*
++ Flush events are used to track the time spent by the tracing runtime flushing
++ data to disk, useful to remove flushing overhead for other runtime measurements
++ in the trace.
++*/
++event {
++     id = 4;
++     name = "flush";
++     stream_id = 0;
++     fields := struct {
++        tracing_clock_int_t duration;
++     };
++};
 diff --git a/utils/config.common.ml b/utils/config.common.ml
 index 13eb6392b8..d9d88cc19b 100644
 --- a/utils/config.common.ml
