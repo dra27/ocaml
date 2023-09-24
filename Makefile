@@ -1041,16 +1041,8 @@ clean::
 
 # Dependencies
 
-<<<<<<< HEAD
-subdirs = stdlib $(addprefix otherlibs/, $(AfiLL_OTHERLIBS)) \
-  debugger lex ocamldoc ocamltest tools
-||||||| parent of 1d53ced13a (Merge pull request PR#11420 from shindere/merge-lex-makefile)
-subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-  debugger lex ocamldoc ocamltest tools
-=======
 subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
   debugger ocamldoc ocamltest tools
->>>>>>> 1d53ced13a (Merge pull request PR#11420 from shindere/merge-lex-makefile)
 
 .PHONY: alldepend
 alldepend: depend
