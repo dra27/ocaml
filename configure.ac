@@ -1253,17 +1253,7 @@ AS_CASE([$host],
   [zaurus*-*-openbsd*],
     [arch=arm; system=bsd],
   [x86_64-*-linux*],
-<<<<<<< HEAD
-    [arch=amd64; system=linux],
-||||||| parent of 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
-    [arch=amd64; system=linux],
-dnl [x86_64-*-gnu*],
-dnl   [arch=amd64; system=gnu],
-dnl [x86_64-*-dragonfly*],
-dnl   [arch=amd64; system=dragonfly],
-=======
     [has_native_backend=yes; arch=amd64; system=linux],
->>>>>>> 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
   [x86_64-*-gnu*],
     [arch=amd64; system=gnu],
   [x86_64-*-dragonfly*],
@@ -1275,15 +1265,7 @@ dnl   [arch=amd64; system=dragonfly],
   [x86_64-*-netbsd*],
     [has_native_backend=yes; arch=amd64; system=netbsd],
   [x86_64-*-openbsd*],
-<<<<<<< HEAD
-    [arch=amd64; system=openbsd],
-||||||| parent of 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
-    [arch=amd64; system=openbsd],
-dnl [x86_64-*-haiku*],
-dnl   [arch=amd64; system=beos],
-=======
     [has_native_backend=yes; arch=amd64; system=openbsd],
->>>>>>> 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
   [x86_64-*-haiku*],
     [arch=amd64; system=beos],
   [arm64-*-darwin*],
@@ -1301,22 +1283,14 @@ dnl   [arch=amd64; system=beos],
   [aarch64-*-openbsd*],
     [has_native_backend=yes; arch=arm64; system=openbsd],
   [aarch64-*-netbsd*],
-<<<<<<< HEAD
-    [arch=arm64; system=netbsd],
-||||||| parent of 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
-    [arch=arm64; system=netbsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
-=======
     [has_native_backend=yes; arch=arm64; system=netbsd],
->>>>>>> 5e6e50119d (Merge pull request PR#11639 from dra27/system-arch)
   [x86_64-*-cygwin*],
     [arch=amd64; system=cygwin],
   [riscv64-*-linux*],
     [arch=riscv; model=riscv64; system=linux]
 )
+
+AS_IF([test x"$arch" != "xnone"], [has_native_backend=yes])
 
 AS_CASE([$ccomptype],
   [msvc],
