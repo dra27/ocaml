@@ -2091,6 +2091,19 @@ index d69042e354..724466a63b 100644
  *)
  open Runtime_events
  
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+index a574e7d341..4dc607eed3 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_runparams.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+ include runtime_events
+ ocamlrunparam += ",e=4"
++* skip
++reason = "OCaml 5 only"
+ *)
+ 
+ (* We set the ring buffer size smaller and witness that we do indeed
 diff --git a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml b/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
 index 34b034a8e8..8656ca2e59 100644
 --- a/testsuite/tests/lib-runtime-events/test_caml_slot_reuse.ml
