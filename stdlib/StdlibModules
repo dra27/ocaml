@@ -39,13 +39,6 @@ STDLIB_MODULE_BASENAMES = \
   seq option result bool char uchar \
   list int bytes string unit marshal array float int32 int64 nativeint \
   lexing parsing set map stack queue buffer \
-<<<<<<< HEAD
-  atomic \
-||||||| parent of 5fe1548abe (Merge pull request PR#11038 from gadmm/atomic_copyright)
-  atomic mutex condition semaphore domain \
-=======
-  mutex condition semaphore domain \
->>>>>>> 5fe1548abe (Merge pull request PR#11038 from gadmm/atomic_copyright)
   camlinternalFormat printf arg \
   printexc fun gc digest bigarray random hashtbl weak \
   format scanf callback camlinternalOO oo camlinternalMod ephemeron \
