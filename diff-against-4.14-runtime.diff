@@ -454,10 +454,26 @@ index 1c109aa470..0000000000
 -#endif /* CAML_NAME_SPACE */
 -#endif /* CAML_COMPATIBILITY_H */
 diff --git a/runtime/caml/config.h b/runtime/caml/config.h
-index 471a6bc6f4..70eef5c61d 100644
+index 471a6bc6f4..a7e56be8d9 100644
 --- a/runtime/caml/config.h
 +++ b/runtime/caml/config.h
-@@ -41,10 +41,6 @@
+@@ -16,6 +16,15 @@
+ #ifndef CAML_CONFIG_H
+ #define CAML_CONFIG_H
+ 
++/* CAML_NAME_SPACE was introduced in OCaml 3.08 to declare compatibility with
++   the newly caml_-prefixed names of C runtime functions and to disable the
++   definition of compatibility macros for the un-prefixed names. The
++   compatibility layer was removed in OCaml 5.00, so CAML_NAME_SPACE is the
++   default. */
++#ifndef CAML_NAME_SPACE
++#define CAML_NAME_SPACE
++#endif
++
+ #include "m.h"
+ 
+ /* If supported, tell gcc that we can use 32-bit code addresses for
+@@ -41,10 +50,6 @@
  
  #include "s.h"
  
