@@ -1411,6 +1411,26 @@ index a727d5c25c..e76b3300b7 100755
    do
        sed -n -e 's/^CAMLprim value \([a-z0-9_][a-z0-9_]*\).*/\1/p' "$prim.c"
    done
+diff --git a/runtime/hash.c b/runtime/hash.c
+index f33634c227..da111db629 100644
+--- a/runtime/hash.c
++++ b/runtime/hash.c
+@@ -301,6 +301,15 @@ CAMLprim value caml_hash(value count, value limit, value seed, value obj)
+   return Val_int(h & 0x3FFFFFFFU);
+ }
+ 
++CAMLprim value caml_string_hash(value seed, value string)
++{
++  uint32_t h;
++  h = Int_val(seed);
++  h = caml_hash_mix_string (h, string);
++  FINAL_MIX(h);
++  return Val_int(h & 0x3FFFFFFFU);
++}
++
+ /* Hashing variant tags */
+ 
+ CAMLexport value caml_hash_variant(char const * tag)
 diff --git a/runtime/i386.S b/runtime/i386.S
 index 4d273c9f04..06a9cf5fa7 100644
 --- a/runtime/i386.S
