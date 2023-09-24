@@ -22,13 +22,7 @@ end = struct end
 
 [%%expect{|
 {
-<<<<<<< HEAD
- "Make"[module] -> Abs<.3>(I/277, {
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
- "Make"[module] -> Abs<.3>(I/282, {
-=======
- "Make"[module] -> Abs<.3>(I/279, {
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+ "Make"[module] -> Abs<.3>(I/274, {
                                    });
  }
 module Make : functor (I : sig end) -> sig end

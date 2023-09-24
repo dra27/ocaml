@@ -39,16 +39,8 @@ STDLIB_MODULE_BASENAMES = \
   sys obj camlinternalLazy lazy \
   seq option result bool char uchar \
   list int bytes string unit marshal array float int32 int64 nativeint \
-<<<<<<< HEAD
-  lexing parsing set map stack queue stream buffer \
-  atomic \
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-  lexing parsing set map stack queue stream buffer \
-  atomic mutex condition semaphore domain \
-=======
   lexing parsing set map stack queue buffer \
-  atomic mutex condition semaphore domain \
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+  atomic \
   camlinternalFormat printf arg \
   printexc fun gc digest bigarray random hashtbl weak \
   format scanf callback camlinternalOO oo camlinternalMod ephemeron \

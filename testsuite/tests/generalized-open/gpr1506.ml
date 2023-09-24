@@ -103,21 +103,9 @@ include struct open struct type t = T end let x = T end
 Line 1, characters 15-41:
 1 | include struct open struct type t = T end let x = T end
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
-<<<<<<< HEAD
-Error: The type t/335 introduced by this open appears in the signature
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-Error: The type t/340 introduced by this open appears in the signature
-=======
-Error: The type t/337 introduced by this open appears in the signature
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+Error: The type t/332 introduced by this open appears in the signature
        Line 1, characters 46-47:
-<<<<<<< HEAD
-         The value x has no valid type if t/335 is hidden
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-         The value x has no valid type if t/340 is hidden
-=======
-         The value x has no valid type if t/337 is hidden
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+         The value x has no valid type if t/332 is hidden
 |}];;
 
 module A = struct
@@ -135,21 +123,9 @@ Lines 3-6, characters 4-7:
 4 |       type t = T
 5 |       let x = T
 6 |     end
-<<<<<<< HEAD
-Error: The type t/340 introduced by this open appears in the signature
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-Error: The type t/345 introduced by this open appears in the signature
-=======
-Error: The type t/342 introduced by this open appears in the signature
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+Error: The type t/337 introduced by this open appears in the signature
        Line 7, characters 8-9:
-<<<<<<< HEAD
-         The value y has no valid type if t/340 is hidden
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-         The value y has no valid type if t/345 is hidden
-=======
-         The value y has no valid type if t/342 is hidden
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+         The value y has no valid type if t/337 is hidden
 |}];;
 
 module A = struct
@@ -166,21 +142,9 @@ Lines 3-5, characters 4-7:
 3 | ....open struct
 4 |       type t = T
 5 |     end
-<<<<<<< HEAD
-Error: The type t/345 introduced by this open appears in the signature
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-Error: The type t/350 introduced by this open appears in the signature
-=======
-Error: The type t/347 introduced by this open appears in the signature
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+Error: The type t/342 introduced by this open appears in the signature
        Line 6, characters 8-9:
-<<<<<<< HEAD
-         The value y has no valid type if t/345 is hidden
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-         The value y has no valid type if t/350 is hidden
-=======
-         The value y has no valid type if t/347 is hidden
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+         The value y has no valid type if t/342 is hidden
 |}]
 
 (* It was decided to not allow this anymore. *)

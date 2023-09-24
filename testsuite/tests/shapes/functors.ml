@@ -17,13 +17,7 @@ module type S = sig type t val x : t end
 module Falias (X : S) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- "Falias"[module] -> Abs<.4>(X/277, X/277<.3>);
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
- "Falias"[module] -> Abs<.4>(X/282, X/282<.3>);
-=======
- "Falias"[module] -> Abs<.4>(X/279, X/279<.3>);
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+ "Falias"[module] -> Abs<.4>(X/274, X/274<.3>);
  }
 module Falias : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -35,24 +29,10 @@ end
 {
  "Finclude"[module] ->
      Abs<.6>
-<<<<<<< HEAD
-        (X/281,
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-        (X/286,
-=======
-        (X/283,
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+        (X/278,
          {
-<<<<<<< HEAD
-          "t"[type] -> X/281<.5> . "t"[type];
-          "x"[value] -> X/281<.5> . "x"[value];
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-          "t"[type] -> X/286<.5> . "t"[type];
-          "x"[value] -> X/286<.5> . "x"[value];
-=======
-          "t"[type] -> X/283<.5> . "t"[type];
-          "x"[value] -> X/283<.5> . "x"[value];
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+          "t"[type] -> X/278<.5> . "t"[type];
+          "x"[value] -> X/278<.5> . "x"[value];
           });
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -65,13 +45,7 @@ end
 [%%expect{|
 {
  "Fredef"[module] ->
-<<<<<<< HEAD
-     Abs<.10>(X/288, {
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-     Abs<.10>(X/293, {
-=======
-     Abs<.10>(X/290, {
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+     Abs<.10>(X/285, {
                       "t"[type] -> <.8>;
                       "x"[value] -> <.9>;
                       });
@@ -249,16 +223,8 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 [%%expect{|
 {
  "Big_to_small1"[module] ->
-<<<<<<< HEAD
-     Abs<.40>(X/383, {<.39>
-                      "t"[type] -> X/383<.39> . "t"[type];
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-     Abs<.40>(X/388, {<.39>
-                      "t"[type] -> X/388<.39> . "t"[type];
-=======
-     Abs<.40>(X/385, {<.39>
-                      "t"[type] -> X/385<.39> . "t"[type];
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+     Abs<.40>(X/380, {<.39>
+                      "t"[type] -> X/380<.39> . "t"[type];
                       });
  }
 module Big_to_small1 : B2S
@@ -268,16 +234,8 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 [%%expect{|
 {
  "Big_to_small2"[module] ->
-<<<<<<< HEAD
-     Abs<.42>(X/386, {
-                      "t"[type] -> X/386<.41> . "t"[type];
-||||||| parent of be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
-     Abs<.42>(X/391, {
-                      "t"[type] -> X/391<.41> . "t"[type];
-=======
-     Abs<.42>(X/388, {
-                      "t"[type] -> X/388<.41> . "t"[type];
->>>>>>> be15c3a3c3 (Remove `Stream`, `Genlex`, `Pervasives` & the legacy `bigarray` library (PR#10896))
+     Abs<.42>(X/383, {
+                      "t"[type] -> X/383<.41> . "t"[type];
                       });
  }
 module Big_to_small2 : B2S
