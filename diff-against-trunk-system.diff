@@ -3684,10 +3684,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..c6cd8e9031
+index 0000000000..b3412f8bb4
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2421 @@
+@@ -0,0 +1,2436 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -5951,6 +5951,21 @@ index 0000000000..c6cd8e9031
 +         .quad   1               /* one descriptor */
 +         .quad   .L105           /* return address into callback */
 +         .short  -1              /* negative size count => use callback link */
++diff --git a/runtime/sak.c b/runtime/sak.c
++index b7e5c721c2..7499dbf46f 100644
++--- a/runtime/sak.c
+++++ b/runtime/sak.c
++@@ -34,7 +34,9 @@
++ #define printf_os wprintf
++ #else
++ #define strncmp_os strncmp
++-#define toupper_os toupper
+++/* NOTE: See CAVEATS section in https://man.netbsd.org/ctype.3 */
+++/* and NOTE section in https://man7.org/linux/man-pages/man3/toupper.3.html */
+++#define toupper_os(x) toupper((unsigned char)x)
++ #define printf_os printf
++ #endif
++ 
 +diff --git a/runtime/sys.c b/runtime/sys.c
 +index a77fd9d1cf..9508d3f903 100644
 +--- a/runtime/sys.c
@@ -9931,10 +9946,10 @@ index 0000000000..bd8cbb2a05
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..09cf2c70a2
+index 0000000000..77381ada3f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,9908 @@
+@@ -0,0 +1,9910 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..79eff450e1
@@ -13621,10 +13636,10 @@ index 0000000000..09cf2c70a2
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..c6cd8e9031
++index 0000000000..b3412f8bb4
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2421 @@
++@@ -0,0 +1,2436 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -15888,6 +15903,21 @@ index 0000000000..09cf2c70a2
 ++         .quad   1               /* one descriptor */
 ++         .quad   .L105           /* return address into callback */
 ++         .short  -1              /* negative size count => use callback link */
+++diff --git a/runtime/sak.c b/runtime/sak.c
+++index b7e5c721c2..7499dbf46f 100644
+++--- a/runtime/sak.c
++++++ b/runtime/sak.c
+++@@ -34,7 +34,9 @@
+++ #define printf_os wprintf
+++ #else
+++ #define strncmp_os strncmp
+++-#define toupper_os toupper
++++/* NOTE: See CAVEATS section in https://man.netbsd.org/ctype.3 */
++++/* and NOTE section in https://man7.org/linux/man-pages/man3/toupper.3.html */
++++#define toupper_os(x) toupper((unsigned char)x)
+++ #define printf_os printf
+++ #endif
+++ 
 ++diff --git a/runtime/sys.c b/runtime/sys.c
 ++index a77fd9d1cf..9508d3f903 100644
 ++--- a/runtime/sys.c
@@ -19829,20 +19859,7 @@ index 0000000000..09cf2c70a2
 ++-    exit 1
 ++-    ;;
 ++-  esac
-+++  ./configure $configure_flags
-++ }
-++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index ebee82eb6f..8936f1e9dd 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-        
++++  ./confi
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 63f45da588..b81b324926 100644
