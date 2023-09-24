@@ -1,21 +1,8 @@
 (* TEST
-<<<<<<< HEAD
-   include runtime_events
-   include unix
-   * skip
-   reason = "OCaml 5 only"
-   ** libunix
-   *** bytecode
-   *** native *)
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   include runtime_events
-   include unix
-   * libunix
-   ** bytecode
-   ** native *)
-=======
  include runtime_events;
  include unix;
+ reason = "OCaml 5 only";
+ skip;
  libunix;
  {
    bytecode;
@@ -23,7 +10,6 @@
    native;
  }
 *)
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 
 let got_major = ref false
 let got_minor = ref false

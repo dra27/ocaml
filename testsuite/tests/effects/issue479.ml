@@ -1,13 +1,7 @@
 (* TEST
-<<<<<<< HEAD
-   * skip
-   reason = "OCaml 5 only"
-   ** toplevel
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   * toplevel
-=======
+ reason = "OCaml 5 only";
+ skip;
  toplevel;
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)

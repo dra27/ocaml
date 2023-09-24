@@ -1,22 +1,12 @@
 (* TEST
-<<<<<<< HEAD
-   modules = "test_c_thread_has_lock_cstubs.c"
-   * skip
-   reason = "OCaml 5 only"
-   ** bytecode
-   ** native
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   modules = "test_c_thread_has_lock_cstubs.c"
-   * bytecode
-   * native
-=======
  modules = "test_c_thread_has_lock_cstubs.c";
+ reason = "OCaml 5 only";
+ skip;
  {
    bytecode;
  }{
    native;
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 external test_with_lock : unit -> bool = "with_lock"

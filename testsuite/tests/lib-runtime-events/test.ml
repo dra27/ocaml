@@ -1,16 +1,8 @@
 (* TEST
-<<<<<<< HEAD
-modules = "stubs.c"
-include runtime_events
-* skip
-reason = "OCaml 5 only"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-modules = "stubs.c"
-include runtime_events
-=======
  modules = "stubs.c";
  include runtime_events;
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 external start_runtime_events : unit -> unit = "start_runtime_events"

@@ -1,15 +1,5 @@
 (* TEST
-<<<<<<< HEAD
-   modules = "minor_no_postpone_stub.c"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   modules = "minor_no_postpone_stub.c"
-   * skip
-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
-=======
  modules = "minor_no_postpone_stub.c";
- reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
- skip;
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Gc.Memprof

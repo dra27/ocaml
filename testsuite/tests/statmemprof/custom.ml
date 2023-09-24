@@ -1,16 +1,4 @@
-<<<<<<< HEAD
 (* TEST *)
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-(* TEST
-* skip
-reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
-*)
-=======
-(* TEST
- reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
- skip;
-*)
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 
 open Gc.Memprof
 

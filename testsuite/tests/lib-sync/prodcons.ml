@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 (* TEST
-   * skip
-   reason = "OCaml 5 only"
-*)
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-(* TEST
-*)
-=======
-(* TEST *)
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
+ *)
 
 (* Classic producer-consumer *)
 

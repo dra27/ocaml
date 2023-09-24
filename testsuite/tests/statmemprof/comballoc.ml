@@ -1,22 +1,5 @@
 (* TEST
-<<<<<<< HEAD
-   flags = "-g"
-   * bytecode
-     reference = "${test_source_directory}/comballoc.byte.reference"
-   * native
-     reference = "${test_source_directory}/comballoc.opt.reference"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   flags = "-g"
-   * skip
-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
-   ** bytecode
-     reference = "${test_source_directory}/comballoc.byte.reference"
-   ** native
-     reference = "${test_source_directory}/comballoc.opt.reference"
-=======
  flags = "-g";
- reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
- skip;
  {
    reference = "${test_source_directory}/comballoc.byte.reference";
    bytecode;
@@ -24,7 +7,6 @@
    reference = "${test_source_directory}/comballoc.opt.reference";
    native;
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Gc.Memprof

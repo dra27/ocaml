@@ -1,29 +1,13 @@
 (* TEST
-<<<<<<< HEAD
-
-include systhreads
-* skip
-reason = "OCaml 5 only"
-** hassysthreads
-*** bytecode
-*** native
-
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-
-include systhreads
-* hassysthreads
-** bytecode
-** native
-
-=======
  include systhreads;
+ reason = "OCaml 5 only";
+ skip;
  hassysthreads;
  {
    bytecode;
  }{
    native;
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 

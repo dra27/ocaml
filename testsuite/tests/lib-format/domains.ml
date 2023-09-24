@@ -1,6 +1,6 @@
 (* TEST
-* skip
-reason = "OCaml 5 only"
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 (** Test that domains stdout and stderr are flushed at domain exit *)

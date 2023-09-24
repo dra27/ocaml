@@ -1,13 +1,7 @@
 (* TEST
-<<<<<<< HEAD
-   modules = "intextaux_par.c"
-   * skip
-   reason = "OCaml 5 only"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   modules = "intextaux_par.c"
-=======
  modules = "intextaux_par.c";
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 (* Test for output_value / input_value *)

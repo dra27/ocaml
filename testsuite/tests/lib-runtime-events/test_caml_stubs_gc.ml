@@ -1,13 +1,7 @@
 (* TEST
-<<<<<<< HEAD
-include runtime_events
-* skip
-reason = "OCaml 5 only"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-include runtime_events
-=======
  include runtime_events;
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
 *)
 open Runtime_events
 

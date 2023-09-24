@@ -1,20 +1,7 @@
 (* TEST
-<<<<<<< HEAD
-include unix
-* skip
-reason = "OCaml 5 only"
-** hasunix
-*** not-windows
-**** bytecode
-**** native
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-include unix
-* hasunix
-** not-windows
-*** bytecode
-*** native
-=======
  include unix;
+ reason = "OCaml 5 only";
+ skip;
  hasunix;
  not-windows;
  {
@@ -22,7 +9,6 @@ include unix
  }{
    native;
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 (* on Multicore, fork is not allowed is another domain is, and was running. *)

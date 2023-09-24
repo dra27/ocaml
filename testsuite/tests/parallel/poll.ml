@@ -1,25 +1,13 @@
 (* TEST
-<<<<<<< HEAD
-* skip
-reason = "OCaml 5 only"
-** hasunix
-include unix
-*** bytecode
-*** native
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-* hasunix
-include unix
-** bytecode
-** native
-=======
  include unix;
+ reason = "OCaml 5 only";
+ skip;
  hasunix;
  {
    bytecode;
  }{
    native;
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 let continue = Atomic.make true

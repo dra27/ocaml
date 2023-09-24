@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 (* TEST
-* skip
-reason = "OCaml 5 only"
-*)
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-(* TEST
-*)
-=======
-(* TEST *)
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
+ *)
 
 let check_dls () =
   let k1 = Domain.DLS.new_key (fun () -> 10) in

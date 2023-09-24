@@ -1,25 +1,13 @@
 (* TEST
-<<<<<<< HEAD
-* skip
-reason = "OCaml 5 only"
-** hasunix
-include unix
-*** native
-*** bytecode
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-* hasunix
-include unix
-** native
-** bytecode
-=======
  include unix;
+ reason = "OCaml 5 only";
+ skip;
  hasunix;
  {
    native;
  }{
    bytecode;
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 type 'a tree = Empty | Node of 'a tree * 'a tree

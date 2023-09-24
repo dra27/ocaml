@@ -1,20 +1,7 @@
 (* TEST
-<<<<<<< HEAD
-   include unix
-   * skip
-   reason = "OCaml 5 only"
-   ** libunix
-   *** bytecode
-   *** native
- *)
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   include unix
-   * libunix
-   ** bytecode
-   ** native
- *)
-=======
  include unix;
+ reason = "OCaml 5 only";
+ skip;
  libunix;
  {
    bytecode;
@@ -22,7 +9,6 @@
    native;
  }
 *)
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 
 let () = Random.init 42
 

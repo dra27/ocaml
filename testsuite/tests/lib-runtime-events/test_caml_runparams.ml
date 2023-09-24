@@ -1,16 +1,8 @@
 (* TEST
-<<<<<<< HEAD
-include runtime_events
-ocamlrunparam += ",e=4"
-* skip
-reason = "OCaml 5 only"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-include runtime_events
-ocamlrunparam += ",e=4"
-=======
  include runtime_events;
  ocamlrunparam += ",e=4";
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 (* We set the ring buffer size smaller and witness that we do indeed

@@ -1,13 +1,7 @@
 (* TEST
-<<<<<<< HEAD
-   modules = "stubs.c"
-   * skip
-   reason = "OCaml 5 only"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   modules = "stubs.c"
-=======
  modules = "stubs.c";
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 external test_skiplist_serial : unit -> unit = "test_skiplist_serial"

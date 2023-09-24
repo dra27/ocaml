@@ -1,16 +1,8 @@
 (* TEST
-<<<<<<< HEAD
-include runtime_events
-set OCAML_RUNTIME_EVENTS_START = "1"
-* skip
-reason = "OCaml 5 only"
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-include runtime_events
-set OCAML_RUNTIME_EVENTS_START = "1"
-=======
  include runtime_events;
  set OCAML_RUNTIME_EVENTS_START = "1";
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
+ reason = "OCaml 5 only";
+ skip;
 *)
 
 (* In this test the runtime_events should already be started by the environment

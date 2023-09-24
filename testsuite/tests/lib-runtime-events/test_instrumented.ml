@@ -1,24 +1,10 @@
 (* TEST
-<<<<<<< HEAD
-   include runtime_events
-   flags = "-runtime-variant=i"
-
-   * skip
-   reason = "OCaml 5 only"
-   ** instrumented-runtime
-   *** native
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   include runtime_events
-   flags = "-runtime-variant=i"
-
-   * instrumented-runtime
-   ** native
-=======
  include runtime_events;
  flags = "-runtime-variant=i";
+ reason = "OCaml 5 only";
+ skip;
  instrumented-runtime;
  native;
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Runtime_events

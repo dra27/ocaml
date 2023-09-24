@@ -1,6 +1,6 @@
 (* TEST
-   * skip
-   reason = "OCaml 5 only"
+ reason = "OCaml 5 only";
+ skip;
  *)
 
 (* Due to GCs running at non-deterministic places, the output from these tests

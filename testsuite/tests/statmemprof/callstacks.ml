@@ -1,40 +1,8 @@
 (* TEST
-<<<<<<< HEAD
-   flags = "-g -w -5"
-
-   * flat-float-array
-     reference = "${test_source_directory}/callstacks.flat-float-array.reference"
-   ** native
-   ** bytecode
-
-   * no-flat-float-array
-     reference = "${test_source_directory}/callstacks.no-flat-float-array.reference"
-   ** native
-   ** bytecode
-||||||| parent of 18bd88faf2 (New script language for ocamltest (PR#12185))
-   flags = "-g -w -5"
-
-   * flat-float-array
-     reference = "${test_source_directory}/callstacks.flat-float-array.reference"
-   * skip
-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
-   ** native
-   ** bytecode
-
-   * no-flat-float-array
-     reference = "${test_source_directory}/callstacks.no-flat-float-array.reference"
-   * skip
-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634"
-   ** native
-   ** bytecode
-=======
  flags = "-g -w -5";
  {
    reference = "${test_source_directory}/callstacks.flat-float-array.reference";
    flat-float-array;
- }{
-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
-   skip;
    {
      native;
    }{
@@ -43,16 +11,12 @@
  }{
    reference = "${test_source_directory}/callstacks.no-flat-float-array.reference";
    no-flat-float-array;
- }{
-   reason = "port stat-mem-prof : https://github.com/ocaml/ocaml/pull/8634";
-   skip;
    {
      native;
    }{
      bytecode;
    }
  }
->>>>>>> 18bd88faf2 (New script language for ocamltest (PR#12185))
 *)
 
 open Gc.Memprof
