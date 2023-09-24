@@ -1,21 +1,11 @@
 (* TEST
    include runtime_events
-<<<<<<< HEAD
+   include unix
    * skip
    reason = "OCaml 5 only"
    ** libunix
    *** bytecode
    *** native *)
-||||||| parent of 65201131a3 (Explicitly include the path to the Unix library)
-   * libunix
-   ** bytecode
-   ** native *)
-=======
-   include unix
-   * libunix
-   ** bytecode
-   ** native *)
->>>>>>> 65201131a3 (Explicitly include the path to the Unix library)
 
 let got_major = ref false
 let got_minor = ref false
