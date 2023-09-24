@@ -690,10 +690,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 612ff353fa..3923a4144a 100755
+index 612ff353fa..4bf121515f 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 8349975dbe..a894307e35 100755
+index 8349975dbe..f8d315e9ac 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 41776d2578..0a59107ea8 100644
@@ -7624,7 +7624,7 @@ index 0000000000..2de217ced9
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ec3ac3e361
+index 0000000000..127536b5f0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,7541 @@
@@ -8320,10 +8320,10 @@ index 0000000000..ec3ac3e361
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 612ff353fa..3923a4144a 100755
++index 612ff353fa..4bf121515f 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 8349975dbe..a894307e35 100755
++index 8349975dbe..f8d315e9ac 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 41776d2578..0a59107ea8 100644
