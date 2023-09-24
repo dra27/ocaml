@@ -56,6 +56,20 @@ index 564ef7644e..92cf631912 100644
 +
 +val naked_pointers : bool
 +(** Whether the runtime system supports naked pointers outside the heap *)
+diff --git a/ocamltest/run_unix.c b/ocamltest/run_unix.c
+index 7b576135b7..5b2298e696 100644
+--- a/ocamltest/run_unix.c
++++ b/ocamltest/run_unix.c
+@@ -347,7 +347,9 @@ int run_command(const command_settings *settings)
+       myperror("fork");
+       return -1;
+     case 0: /* child process */
++#if 0
+       caml_atfork_hook();
++#endif
+       exit( run_command_child(settings) );
+     default:
+       return run_command_parent(settings, child_pid);
 diff --git a/testsuite/tests/asmcomp/is_in_static_data.c b/testsuite/tests/asmcomp/is_in_static_data.c
 new file mode 100644
 index 0000000000..ccf0582c0a
