@@ -1686,7 +1686,7 @@ index 051122113a..7eef1e662e 100644
    test_result=${TEST_SKIP}
  else
 diff --git a/testsuite/tests/lib-bigarray/bigarrays.ml b/testsuite/tests/lib-bigarray/bigarrays.ml
-index d8846babdd..f4e35b0c25 100644
+index d8846babdd..5d0b805e20 100644
 --- a/testsuite/tests/lib-bigarray/bigarrays.ml
 +++ b/testsuite/tests/lib-bigarray/bigarrays.ml
 @@ -243,6 +243,7 @@ let tests () =
@@ -1705,8 +1705,18 @@ index d8846babdd..f4e35b0c25 100644
  
    testing_function "set/get (specialized)";
    let a = Array1.create int c_layout 3 in
+@@ -1164,7 +1166,9 @@ let tests () =
+   test_structured_io 13 (make_array2 complex32 c_layout 0 100 100 makecomplex);
+   test_structured_io 14 (make_array3 complex64 fortran_layout 1 10 20 30
+                                      makecomplex);
++(*
+   test_structured_io 15 (from_list float16 [0.0; 0.25; -4.0; 3.141592654]);
++*)
+   ()
+   [@@inline never]
+ 
 diff --git a/testsuite/tests/lib-bigarray/bigarrays.reference b/testsuite/tests/lib-bigarray/bigarrays.reference
-index 2ca2df4ae5..e82bdd548f 100644
+index 2ca2df4ae5..7fb39b0766 100644
 --- a/testsuite/tests/lib-bigarray/bigarrays.reference
 +++ b/testsuite/tests/lib-bigarray/bigarrays.reference
 @@ -2,7 +2,7 @@
@@ -1718,6 +1728,12 @@ index 2ca2df4ae5..e82bdd548f 100644
  set/get (specialized)
   1... 2... 3... 4... 5... 6... 7... 8... 8... 9... 10... 11... 12... 13... 14... 15... 16... 17... 18... 19...
  set/get (unsafe, specialized)
+@@ -84,4 +84,4 @@ reshape
+ ------ I/O --------
+ 
+ output_value/input_value
+- 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14... 15...
++ 1... 2... 3... 4... 5... 6... 7... 8... 9... 10... 11... 12... 13... 14...
 diff --git a/testsuite/tests/lib-bigarray/specialized.ml b/testsuite/tests/lib-bigarray/specialized.ml
 index 6f30527a55..11a11dccbf 100644
 --- a/testsuite/tests/lib-bigarray/specialized.ml
