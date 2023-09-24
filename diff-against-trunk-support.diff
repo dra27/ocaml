@@ -2300,6 +2300,37 @@ index 94727d13fd..e353268013 100644
  *)
  
  open Runtime_events
+diff --git a/testsuite/tests/lib-runtime-events/test_user_event.ml b/testsuite/tests/lib-runtime-events/test_user_event.ml
+index a4cb09175b..51566e99ed 100644
+--- a/testsuite/tests/lib-runtime-events/test_user_event.ml
++++ b/testsuite/tests/lib-runtime-events/test_user_event.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
+diff --git a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+index c45c1d85da..3137ba09f1 100644
+--- a/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
++++ b/testsuite/tests/lib-runtime-events/test_user_event_unknown.ml
+@@ -2,9 +2,11 @@
+    include runtime_events
+    include unix
+    set OCAML_RUNTIME_EVENTS_PRESERVE = "1"
+-   * libunix
+-   ** bytecode
+-   ** native
++   * skip
++   reason = "OCaml 5 only"
++   ** libunix
++   *** bytecode
++   *** native
+ *)
+ open Runtime_events
+ 
 diff --git a/testsuite/tests/lib-str/parallel.ml b/testsuite/tests/lib-str/parallel.ml
 index 23f2a5f7de..08055698e7 100644
 --- a/testsuite/tests/lib-str/parallel.ml
