@@ -504,15 +504,11 @@ let emit_instr env i =
 (*
       let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
       `	ld	{emit_reg i.res.(0)}, {emit_int ofs}({emit_reg reg_domain_state_ptr})\n`
-<<<<<<< HEAD
 *)
-||||||| parent of 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
-=======
   | Lop (Ireturn_addr) ->
       invalid_arg (
         "Support for Ireturn_addr is not implemented on architecture "
         ^ Config.architecture)
->>>>>>> 281fea415e (Merge pull request PR#12114 from fabbing/tsan_patch)
   | Lreloadretaddr ->
       let n = frame_size env in
       reload_ra n

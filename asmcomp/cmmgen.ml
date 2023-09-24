@@ -116,14 +116,20 @@ let mut_from_env env ptr =
       else Mutable
     | _ -> Mutable
 
+(*
 (* Minimum of two [mutable_flag] values, assuming [Immutable < Mutable]. *)
 let min_mut x y =
   match x,y with
   | Immutable,_ | _,Immutable -> Immutable
   | Mutable,Mutable -> Mutable
+*)
 
+(*
 let get_field env mut ptr n dbg =
   let mut = min_mut mut (mut_from_env env ptr) in
+*)
+let get_field env _mut ptr n dbg =
+  let mut = mut_from_env env ptr in
   get_field_gen mut ptr n dbg
 
 type rhs_kind =
