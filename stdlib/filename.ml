@@ -340,6 +340,16 @@ let temp_file_name temp_dir prefix suffix =
   let rnd = (Random.State.bits random_state) land 0xFFFFFF in
   concat temp_dir (Printf.sprintf "%s%06x%s" prefix rnd suffix)
 
+module Domain = struct
+  module DLS = struct
+    let new_key ~split_from_parent:_ f =
+      ref (f ())
+
+    let get = (!)
+    let set = (:=)
+  end
+end
+
 let current_temp_dir_name =
   Domain.DLS.new_key ~split_from_parent:Fun.id (fun () -> temp_dir_name)
 
