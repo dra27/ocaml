@@ -1,5 +1,7 @@
 (* TEST
   modules="opt.ml barrier.ml hist.ml shared.ml run.ml outcome.ml"
+  * skip
+  reason = "OCaml 5 only"
 *)
 
 (* Memory model test:
