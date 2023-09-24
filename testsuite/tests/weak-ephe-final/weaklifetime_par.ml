@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 (* TEST
    * skip
    reason = "OCaml 5 only"
 *)
-(* This test is currently disabled, 
-||||||| parent of 117986e13d (Merge pull request PR#11244 from sadiqj/weaklifetime_par_hygiene_fix)
-(* This test is currently disabled, 
-=======
 (* This test is currently disabled,
->>>>>>> 117986e13d (Merge pull request PR#11244 from sadiqj/weaklifetime_par_hygiene_fix)
    until the random failures have been investigated.
 *)
 
