@@ -833,10 +833,10 @@ index 6d051e1dda..a5fa41e2fa 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..e761b63337
+index 0000000000..52a1b380eb
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,1139 @@
+@@ -0,0 +1,1251 @@
 +diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
 +index 043e07031e..b7a6a9a6bb 100644
 +--- a/otherlibs/systhreads/st_stubs.c
@@ -956,6 +956,97 @@ index 0000000000..e761b63337
 + #include "mlvalues.h"
 + 
 + #ifdef __cplusplus
++diff --git a/runtime/caml/camlatomic.h b/runtime/caml/camlatomic.h
++new file mode 100644
++index 0000000000..7206f0579a
++--- /dev/null
+++++ b/runtime/caml/camlatomic.h
++@@ -0,0 +1,85 @@
+++/**************************************************************************/
+++/*                                                                        */
+++/*                                 OCaml                                  */
+++/*                                                                        */
+++/*      KC Sivaramakrishnan, Indian Institute of Technology, Madras       */
+++/*                Stephen Dolan, University of Cambridge                  */
+++/*                                                                        */
+++/*   Copyright 2018 Indian Institute of Technology, Madras                */
+++/*   Copyright 2018 University of Cambridge                               */
+++/*                                                                        */
+++/*   All rights reserved.  This file is distributed under the terms of    */
+++/*   the GNU Lesser General Public License version 2.1, with the          */
+++/*   special exception on linking described in the file LICENSE.          */
+++/*                                                                        */
+++/**************************************************************************/
+++#ifndef CAML_ATOMIC_H
+++#define CAML_ATOMIC_H
+++
+++#include "config.h"
+++
+++/* On platforms supporting C11 atomics, this file just includes <stdatomic.h>.
+++
+++   On other platforms, this file includes platform-specific stubs for
+++   the subset of C11 atomics needed by the OCaml runtime
+++ */
+++
+++#ifdef __cplusplus
+++
+++extern "C++" {
+++#include <atomic>
+++#define ATOMIC_UINTNAT_INIT(x) (x)
+++typedef std::atomic<uintnat> atomic_uintnat;
+++typedef std::atomic<intnat> atomic_intnat;
+++using std::memory_order_relaxed;
+++using std::memory_order_acquire;
+++using std::memory_order_release;
+++using std::memory_order_acq_rel;
+++using std::memory_order_seq_cst;
+++}
+++
+++#elif defined(HAS_STDATOMIC_H)
+++
+++#include <stdatomic.h>
+++#define ATOMIC_UINTNAT_INIT(x) (x)
+++typedef _Atomic uintnat atomic_uintnat;
+++typedef _Atomic intnat atomic_intnat;
+++
+++#elif defined(__GNUC__)
+++
+++/* Support for versions of gcc which have built-in atomics but do not
+++   expose stdatomic.h (e.g. gcc 4.8) */
+++typedef enum memory_order {
+++  memory_order_relaxed = __ATOMIC_RELAXED,
+++  memory_order_acquire = __ATOMIC_ACQUIRE,
+++  memory_order_release = __ATOMIC_RELEASE,
+++  memory_order_acq_rel = __ATOMIC_ACQ_REL,
+++  memory_order_seq_cst = __ATOMIC_SEQ_CST
+++} memory_order;
+++
+++#define ATOMIC_UINTNAT_INIT(x) { (x) }
+++typedef struct { uintnat repr; } atomic_uintnat;
+++typedef struct { intnat repr; } atomic_intnat;
+++
+++#define atomic_load_explicit(x, m) __atomic_load_n(&(x)->repr, (m))
+++#define atomic_load(x) atomic_load_explicit((x), memory_order_seq_cst)
+++#define atomic_store_explicit(x, v, m) __atomic_store_n(&(x)->repr, (v), (m))
+++#define atomic_store(x, v) atomic_store_explicit((x), (v), memory_order_seq_cst)
+++#define atomic_compare_exchange_strong(x, oldv, newv) \
+++  __atomic_compare_exchange_n( \
+++    &(x)->repr, \
+++    (oldv), (newv), 0, \
+++    memory_order_seq_cst, memory_order_seq_cst)
+++#define atomic_exchange(x, newv) \
+++  __atomic_exchange_n(&(x)->repr, (newv), memory_order_seq_cst)
+++#define atomic_fetch_add(x, n) \
+++  __atomic_fetch_add(&(x)->repr, (n), memory_order_seq_cst)
+++#define atomic_fetch_or(x, n) \
+++  __atomic_fetch_or(&(x)->repr, (n), memory_order_seq_cst)
+++#define atomic_thread_fence __atomic_thread_fence
+++
+++#else
+++#error "C11 atomics are unavailable on this platform. See camlatomic.h"
+++#endif
+++
+++#endif /* CAML_ATOMIC_H */
 +diff --git a/runtime/caml/compatibility.h b/runtime/caml/compatibility.h
 +deleted file mode 100644
 +index 1c109aa470..0000000000
@@ -1498,7 +1589,7 @@ index 0000000000..e761b63337
 +     __pragma( warning (disable:4189 ) )
 +   #define CAMLunused_end __pragma( warning (pop))
 +diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-+index c605f8711e..46bc21511b 100644
++index c605f8711e..b97d20c2bd 100644
 +--- a/runtime/caml/misc.h
 ++++ b/runtime/caml/misc.h
 +@@ -18,9 +18,6 @@
@@ -1511,7 +1602,15 @@ index 0000000000..e761b63337
 + #include "config.h"
 + 
 + /* Standard definitions */
-+@@ -35,7 +32,7 @@
++@@ -29,13 +26,15 @@
++ #include <stdlib.h>
++ #include <stdarg.h>
++ 
+++#include "camlatomic.h"
+++
++ /* Deprecation warnings */
++ 
++ #if defined(__GNUC__) || defined(__clang__)
 +   /* Supported since at least GCC 3.1 */
 +   #define CAMLdeprecated_typedef(name, type) \
 +     typedef type name __attribute ((deprecated))
@@ -1520,7 +1619,7 @@ index 0000000000..e761b63337
 +   /* NB deprecated("message") only supported from _MSC_VER >= 1400 */
 +   #define CAMLdeprecated_typedef(name, type) \
 +     typedef __declspec(deprecated) type name
-+@@ -43,8 +40,7 @@
++@@ -43,8 +42,7 @@
 +   #define CAMLdeprecated_typedef(name, type) typedef type name
 + #endif
 + 
@@ -1530,7 +1629,7 @@ index 0000000000..e761b63337
 + 
 + #define CAML_STRINGIFY(x) #x
 + #ifdef _MSC_VER
-+@@ -91,7 +87,7 @@ CAMLdeprecated_typedef(addr, char *);
++@@ -91,7 +89,7 @@ CAMLdeprecated_typedef(addr, char *);
 +   #define CAMLnoreturn_start
 +   #define CAMLnoreturn_end __attribute__ ((noreturn))
 +   #define Noreturn __attribute__ ((noreturn))
@@ -1539,7 +1638,7 @@ index 0000000000..e761b63337
 +   #define CAMLnoreturn_start __declspec(noreturn)
 +   #define CAMLnoreturn_end
 +   #define Noreturn
-+@@ -139,12 +135,11 @@ CAMLdeprecated_typedef(addr, char *);
++@@ -139,12 +137,11 @@ CAMLdeprecated_typedef(addr, char *);
 + /* we need to be able to compute the exact offset of each member. */
 + #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 + #define CAMLalign(n) _Alignas(n)
@@ -1554,7 +1653,7 @@ index 0000000000..e761b63337
 + #define CAMLalign(n) __declspec(align(n))
 + #else
 + #error "How do I align values on this platform?"
-+@@ -172,7 +167,7 @@ CAMLdeprecated_typedef(addr, char *);
++@@ -172,7 +169,7 @@ CAMLdeprecated_typedef(addr, char *);
 +   #define CAMLunused_start __attribute__ ((unused))
 +   #define CAMLunused_end
 +   #define CAMLunused __attribute__ ((unused))
@@ -1589,6 +1688,19 @@ index 0000000000..e761b63337
 + #define Bytes_val(x) ((unsigned char *) Bp_val(x))
 + CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
 + CAMLextern int caml_string_is_c_safe (value);
++diff --git a/runtime/caml/s.h.in b/runtime/caml/s.h.in
++index 8e4efdcc72..16ea4b8908 100644
++--- a/runtime/caml/s.h.in
+++++ b/runtime/caml/s.h.in
++@@ -70,6 +70,8 @@
++ 
++ #undef HAS_ISSETUGID
++ 
+++#undef HAS_STDATOMIC_H
+++
++ /* 2. For the Unix library. */
++ 
++ #undef HAS_SOCKETS
 +diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
 +index 62b0e7fafa..3a3b86911c 100644
 +--- a/runtime/caml/signals.h
@@ -5036,10 +5148,10 @@ index 0000000000..ff47d10956
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..0765a7635f
+index 0000000000..a7ad9b54c6
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4943 @@
+@@ -0,0 +1,5051 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -5875,10 +5987,10 @@ index 0000000000..0765a7635f
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..e761b63337
++index 0000000000..52a1b380eb
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,1139 @@
++@@ -0,0 +1,1251 @@
 ++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
 ++index 043e07031e..b7a6a9a6bb 100644
 ++--- a/otherlibs/systhreads/st_stubs.c
@@ -5998,6 +6110,97 @@ index 0000000000..0765a7635f
 ++ #include "mlvalues.h"
 ++ 
 ++ #ifdef __cplusplus
+++diff --git a/runtime/caml/camlatomic.h b/runtime/caml/camlatomic.h
+++new file mode 100644
+++index 0000000000..7206f0579a
+++--- /dev/null
++++++ b/runtime/caml/camlatomic.h
+++@@ -0,0 +1,85 @@
++++/**************************************************************************/
++++/*                                                                        */
++++/*                                 OCaml                                  */
++++/*                                                                        */
++++/*      KC Sivaramakrishnan, Indian Institute of Technology, Madras       */
++++/*                Stephen Dolan, University of Cambridge                  */
++++/*                                                                        */
++++/*   Copyright 2018 Indian Institute of Technology, Madras                */
++++/*   Copyright 2018 University of Cambridge                               */
++++/*                                                                        */
++++/*   All rights reserved.  This file is distributed under the terms of    */
++++/*   the GNU Lesser General Public License version 2.1, with the          */
++++/*   special exception on linking described in the file LICENSE.          */
++++/*                                                                        */
++++/**************************************************************************/
++++#ifndef CAML_ATOMIC_H
++++#define CAML_ATOMIC_H
++++
++++#include "config.h"
++++
++++/* On platforms supporting C11 atomics, this file just includes <stdatomic.h>.
++++
++++   On other platforms, this file includes platform-specific stubs for
++++   the subset of C11 atomics needed by the OCaml runtime
++++ */
++++
++++#ifdef __cplusplus
++++
++++extern "C++" {
++++#include <atomic>
++++#define ATOMIC_UINTNAT_INIT(x) (x)
++++typedef std::atomic<uintnat> atomic_uintnat;
++++typedef std::atomic<intnat> atomic_intnat;
++++using std::memory_order_relaxed;
++++using std::memory_order_acquire;
++++using std::memory_order_release;
++++using std::memory_order_acq_rel;
++++using std::memory_order_seq_cst;
++++}
++++
++++#elif defined(HAS_STDATOMIC_H)
++++
++++#include <stdatomic.h>
++++#define ATOMIC_UINTNAT_INIT(x) (x)
++++typedef _Atomic uintnat atomic_uintnat;
++++typedef _Atomic intnat atomic_intnat;
++++
++++#elif defined(__GNUC__)
++++
++++/* Support for versions of gcc which have built-in atomics but do not
++++   expose stdatomic.h (e.g. gcc 4.8) */
++++typedef enum memory_order {
++++  memory_order_relaxed = __ATOMIC_RELAXED,
++++  memory_order_acquire = __ATOMIC_ACQUIRE,
++++  memory_order_release = __ATOMIC_RELEASE,
++++  memory_order_acq_rel = __ATOMIC_ACQ_REL,
++++  memory_order_seq_cst = __ATOMIC_SEQ_CST
++++} memory_order;
++++
++++#define ATOMIC_UINTNAT_INIT(x) { (x) }
++++typedef struct { uintnat repr; } atomic_uintnat;
++++typedef struct { intnat repr; } atomic_intnat;
++++
++++#define atomic_load_explicit(x, m) __atomic_load_n(&(x)->repr, (m))
++++#define atomic_load(x) atomic_load_explicit((x), memory_order_seq_cst)
++++#define atomic_store_explicit(x, v, m) __atomic_store_n(&(x)->repr, (v), (m))
++++#define atomic_store(x, v) atomic_store_explicit((x), (v), memory_order_seq_cst)
++++#define atomic_compare_exchange_strong(x, oldv, newv) \
++++  __atomic_compare_exchange_n( \
++++    &(x)->repr, \
++++    (oldv), (newv), 0, \
++++    memory_order_seq_cst, memory_order_seq_cst)
++++#define atomic_exchange(x, newv) \
++++  __atomic_exchange_n(&(x)->repr, (newv), memory_order_seq_cst)
++++#define atomic_fetch_add(x, n) \
++++  __atomic_fetch_add(&(x)->repr, (n), memory_order_seq_cst)
++++#define atomic_fetch_or(x, n) \
++++  __atomic_fetch_or(&(x)->repr, (n), memory_order_seq_cst)
++++#define atomic_thread_fence __atomic_thread_fence
++++
++++#else
++++#error "C11 atomics are unavailable on this platform. See camlatomic.h"
++++#endif
++++
++++#endif /* CAML_ATOMIC_H */
 ++diff --git a/runtime/caml/compatibility.h b/runtime/caml/compatibility.h
 ++deleted file mode 100644
 ++index 1c109aa470..0000000000
@@ -6540,7 +6743,7 @@ index 0000000000..0765a7635f
 ++     __pragma( warning (disable:4189 ) )
 ++   #define CAMLunused_end __pragma( warning (pop))
 ++diff --git a/runtime/caml/misc.h b/runtime/caml/misc.h
-++index c605f8711e..46bc21511b 100644
+++index c605f8711e..b97d20c2bd 100644
 ++--- a/runtime/caml/misc.h
 +++++ b/runtime/caml/misc.h
 ++@@ -18,9 +18,6 @@
@@ -6553,7 +6756,15 @@ index 0000000000..0765a7635f
 ++ #include "config.h"
 ++ 
 ++ /* Standard definitions */
-++@@ -35,7 +32,7 @@
+++@@ -29,13 +26,15 @@
+++ #include <stdlib.h>
+++ #include <stdarg.h>
+++ 
++++#include "camlatomic.h"
++++
+++ /* Deprecation warnings */
+++ 
+++ #if defined(__GNUC__) || defined(__clang__)
 ++   /* Supported since at least GCC 3.1 */
 ++   #define CAMLdeprecated_typedef(name, type) \
 ++     typedef type name __attribute ((deprecated))
@@ -6562,7 +6773,7 @@ index 0000000000..0765a7635f
 ++   /* NB deprecated("message") only supported from _MSC_VER >= 1400 */
 ++   #define CAMLdeprecated_typedef(name, type) \
 ++     typedef __declspec(deprecated) type name
-++@@ -43,8 +40,7 @@
+++@@ -43,8 +42,7 @@
 ++   #define CAMLdeprecated_typedef(name, type) typedef type name
 ++ #endif
 ++ 
@@ -6572,7 +6783,7 @@ index 0000000000..0765a7635f
 ++ 
 ++ #define CAML_STRINGIFY(x) #x
 ++ #ifdef _MSC_VER
-++@@ -91,7 +87,7 @@ CAMLdeprecated_typedef(addr, char *);
+++@@ -91,7 +89,7 @@ CAMLdeprecated_typedef(addr, char *);
 ++   #define CAMLnoreturn_start
 ++   #define CAMLnoreturn_end __attribute__ ((noreturn))
 ++   #define Noreturn __attribute__ ((noreturn))
@@ -6581,7 +6792,7 @@ index 0000000000..0765a7635f
 ++   #define CAMLnoreturn_start __declspec(noreturn)
 ++   #define CAMLnoreturn_end
 ++   #define Noreturn
-++@@ -139,12 +135,11 @@ CAMLdeprecated_typedef(addr, char *);
+++@@ -139,12 +137,11 @@ CAMLdeprecated_typedef(addr, char *);
 ++ /* we need to be able to compute the exact offset of each member. */
 ++ #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 ++ #define CAMLalign(n) _Alignas(n)
@@ -6596,7 +6807,7 @@ index 0000000000..0765a7635f
 ++ #define CAMLalign(n) __declspec(align(n))
 ++ #else
 ++ #error "How do I align values on this platform?"
-++@@ -172,7 +167,7 @@ CAMLdeprecated_typedef(addr, char *);
+++@@ -172,7 +169,7 @@ CAMLdeprecated_typedef(addr, char *);
 ++   #define CAMLunused_start __attribute__ ((unused))
 ++   #define CAMLunused_end
 ++   #define CAMLunused __attribute__ ((unused))
@@ -6631,6 +6842,19 @@ index 0000000000..0765a7635f
 ++ #define Bytes_val(x) ((unsigned char *) Bp_val(x))
 ++ CAMLextern mlsize_t caml_string_length (value);   /* size in bytes */
 ++ CAMLextern int caml_string_is_c_safe (value);
+++diff --git a/runtime/caml/s.h.in b/runtime/caml/s.h.in
+++index 8e4efdcc72..16ea4b8908 100644
+++--- a/runtime/caml/s.h.in
++++++ b/runtime/caml/s.h.in
+++@@ -70,6 +70,8 @@
+++ 
+++ #undef HAS_ISSETUGID
+++ 
++++#undef HAS_STDATOMIC_H
++++
+++ /* 2. For the Unix library. */
+++ 
+++ #undef HAS_SOCKETS
 ++diff --git a/runtime/caml/signals.h b/runtime/caml/signals.h
 ++index 62b0e7fafa..3a3b86911c 100644
 ++--- a/runtime/caml/signals.h
@@ -9978,11 +10202,8 @@ index 0000000000..0765a7635f
 ++-* skip
 ++-reason = "ocamldebug is broken (#34)"
 ++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
+++-*** shared-lib
+\ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
 --- a/lambda/matching.ml
