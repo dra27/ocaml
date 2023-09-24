@@ -406,10 +406,10 @@ index 0000000000..3a50f7cad4
 @@ -0,0 +1 @@
 +let pair = 1, 12
 diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
-index b10b9fa4ea..5ca29acc3c 100644
+index b10b9fa4ea..b4680dcd04 100644
 --- a/testsuite/tests/asmcomp/polling.c
 +++ b/testsuite/tests/asmcomp/polling.c
-@@ -14,7 +14,11 @@ CAMLprim value request_minor_gc(value v) {
+@@ -14,11 +14,18 @@ CAMLprim value request_minor_gc(value v) {
      tests are only run in a single domain, so we're probably
      good.
    */
@@ -420,6 +420,13 @@ index b10b9fa4ea..5ca29acc3c 100644
 +  Caml_state->young_limit = Caml_state->young_alloc_end;
  
    return Val_unit;
+ }
+ 
+ CAMLprim value minor_gcs(value v) {
++#if 0
+   return Val_long(atomic_load(&caml_minor_collections_count));
++#endif
++  return Val_long(Caml_state->stat_minor_collections);
  }
 diff --git a/testsuite/tests/asmcomp/simple_float_const.ml b/testsuite/tests/asmcomp/simple_float_const.ml
 new file mode 100644

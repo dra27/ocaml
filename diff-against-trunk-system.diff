@@ -6209,7 +6209,7 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..44e12356ad
+index 0000000000..d36b5872e9
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,3881 @@
@@ -6621,10 +6621,10 @@ index 0000000000..44e12356ad
 +@@ -0,0 +1 @@
 ++let pair = 1, 12
 +diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
-+index 93620c9bcc..4f6bf1dcab 100644
++index b10b9fa4ea..5ca29acc3c 100644
 +--- a/testsuite/tests/asmcomp/polling.c
 ++++ b/testsuite/tests/asmcomp/polling.c
-+@@ -12,7 +12,11 @@ CAMLprim value request_minor_gc(value v) {
++@@ -14,7 +14,11 @@ CAMLprim value request_minor_gc(value v) {
 +     tests are only run in a single domain, so we're probably
 +     good.
 +   */
@@ -10096,7 +10096,7 @@ index 0000000000..44e12356ad
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..8664086fac
+index 0000000000..f3ba7d52ac
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10021 @@
@@ -16311,7 +16311,7 @@ index 0000000000..8664086fac
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..44e12356ad
++index 0000000000..d36b5872e9
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,3881 @@
@@ -16723,10 +16723,10 @@ index 0000000000..8664086fac
 ++@@ -0,0 +1 @@
 +++let pair = 1, 12
 ++diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
-++index 93620c9bcc..4f6bf1dcab 100644
+++index b10b9fa4ea..5ca29acc3c 100644
 ++--- a/testsuite/tests/asmcomp/polling.c
 +++++ b/testsuite/tests/asmcomp/polling.c
-++@@ -12,7 +12,11 @@ CAMLprim value request_minor_gc(value v) {
+++@@ -14,7 +14,11 @@ CAMLprim value request_minor_gc(value v) {
 ++     tests are only run in a single domain, so we're probably
 ++     good.
 ++   */
