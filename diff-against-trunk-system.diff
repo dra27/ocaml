@@ -20903,7 +20903,7 @@ index 11b76f90bb..661d3575de 100644
      thread.cmi
  thread.cmx : \
 diff --git a/otherlibs/systhreads/Makefile b/otherlibs/systhreads/Makefile
-index a098f0bafd..ab16868107 100644
+index a098f0bafd..41445c3536 100644
 --- a/otherlibs/systhreads/Makefile
 +++ b/otherlibs/systhreads/Makefile
 @@ -45,12 +45,12 @@ LIBNAME=threads
@@ -20921,6 +20921,14 @@ index a098f0bafd..ab16868107 100644
  
  CMIFILES=$(MLIFILES:.mli=.cmi)
  
+@@ -154,6 +154,7 @@ ifeq "$(COMPUTE_DEPS)" "true"
+ include $(addprefix $(DEPDIR)/, $(DEP_FILES))
+ endif
+ 
++%.n.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
+ %.n.$(D): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
+ 
+ define GEN_RULE
 diff --git a/otherlibs/systhreads/condition.ml b/otherlibs/systhreads/condition.ml
 new file mode 100644
 index 0000000000..9a014528ab
