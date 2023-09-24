@@ -1,3 +1,30 @@
+diff --git a/appveyor.yml b/appveyor.yml
+index 150b3e8048..6d97b5350f 100644
+--- a/appveyor.yml
++++ b/appveyor.yml
+@@ -31,9 +31,10 @@ environment:
+     FORCE_CYGWIN_UPGRADE: 0
+     BUILD_MODE: world.opt
+   matrix:
++    - PORT: mingw32
++      BOOTSTRAP_FLEXDLL: true
+     - PORT: mingw64
+       BOOTSTRAP_FLEXDLL: true
+-# OCaml 5.0 does not yet support MSVC
+ #    - PORT: msvc64
+ #      BOOTSTRAP_FLEXDLL: false
+ #      BUILD_MODE: steps
+@@ -43,8 +44,8 @@ environment:
+ #      SDK: |-
+ #        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
+ 
+-matrix:
+-  fast_finish: true
++#matrix:
++#  fast_finish: true
+ 
+ cache:
+   - C:\cygwin64\var\cache\setup
 diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 index 7f2433adc9..68329c5bc1 100644
 --- a/ocamltest/Makefile
@@ -3595,3 +3622,36 @@ index 1d16b72d4e..956ec369ab 100644
  
  /* Some tests are designed to cause registers to spill; on
   * x86 we require the caml_extra_params symbol from the RTS. */
+diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+index ebee82eb6f..8936f1e9dd 100644
+--- a/tools/ci/appveyor/appveyor_build.sh
++++ b/tools/ci/appveyor/appveyor_build.sh
+@@ -64,8 +64,8 @@ function set_configuration {
+         mingw64)
+             build='--build=i686-pc-cygwin'
+             host='--host=x86_64-w64-mingw32'
+-            dep='--disable-dependency-generation'
+-            man='--disable-stdlib-manpages'
++            # Explicitly test dependency generation on msvc64
++            dep='--enable-dependency-generation'
+         ;;
+         msvc32)
+             build='--build=i686-pc-cygwin'
+@@ -153,7 +153,7 @@ case "$1" in
+     #run "test $PORT" \
+     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
+     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+-    if [[ $PORT = 'msvc64' ]] ; then
++    if [[ $PORT = 'mingw64' ]] ; then
+       run "$MAKE check_all_arches" \
+            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
+       cd "$FULL_BUILD_PREFIX-$PORT"
+@@ -176,7 +176,7 @@ case "$1" in
+   *)
+     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
+ 
+-    if [[ $PORT = 'msvc64' ]] ; then
++    if [[ $PORT = 'mingw64' ]] ; then
+       # Ensure that make distclean can be run from an empty tree
+       run "$MAKE distclean" $MAKE distclean
+     fi

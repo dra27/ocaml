@@ -64,8 +64,8 @@ function set_configuration {
         mingw64)
             build='--build=i686-pc-cygwin'
             host='--host=x86_64-w64-mingw32'
-            dep='--disable-dependency-generation'
-            man='--disable-stdlib-manpages'
+            # Explicitly test dependency generation on msvc64
+            dep='--enable-dependency-generation'
         ;;
         msvc32)
             build='--build=i686-pc-cygwin'
@@ -153,7 +153,7 @@ case "$1" in
     #run "test $PORT" \
     #    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-    if [[ $PORT = 'msvc64' ]] ; then
+    if [[ $PORT = 'mingw64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
       cd "$FULL_BUILD_PREFIX-$PORT"
@@ -176,7 +176,7 @@ case "$1" in
   *)
     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 
-    if [[ $PORT = 'msvc64' ]] ; then
+    if [[ $PORT = 'mingw64' ]] ; then
       # Ensure that make distclean can be run from an empty tree
       run "$MAKE distclean" $MAKE distclean
     fi

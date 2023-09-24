@@ -731,10 +731,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 30f8534ae9..345de8d92d 100755
+index 30f8534ae9..cf8a53325f 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index f4479e99a9..e4a55176ac 100644
+index f4479e99a9..3c4d97d0e9 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -754,16 +754,12 @@ index f4479e99a9..e4a55176ac 100644
  AC_CONFIG_HEADERS([runtime/caml/m.h])
  AC_CONFIG_HEADERS([runtime/caml/s.h])
  AC_CONFIG_HEADERS([runtime/caml/version.h])
-@@ -210,10 +213,10 @@ AC_CANONICAL_TARGET
- # Systems that are known not to work, even in bytecode only.
- 
+@@ -212,8 +215,8 @@ AC_CANONICAL_TARGET
  AS_CASE([$host],
--  [*-pc-windows],
--    [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
+   [*-pc-windows],
+     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
 -  [*-*-cygwin*],
 -    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
-+dnl   [*-pc-windows],
-+dnl     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
 +dnl   [*-*-cygwin*],
 +dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
    [i386-*-solaris*],
@@ -1320,10 +1316,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..79b2f0267d
+index 0000000000..68c246234e
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2323 @@
+@@ -0,0 +1,2564 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -2133,6 +2129,126 @@ index 0000000000..79b2f0267d
 +-# without doing anything else.
 +-.PHONY: setup-depend
 +-setup-depend:
++diff --git a/runtime/amd64.S b/runtime/amd64.S
++index 756d4a5a0a..8081087c68 100644
++--- a/runtime/amd64.S
+++++ b/runtime/amd64.S
++@@ -295,13 +295,13 @@
++         .text
++ 
++ #if defined(FUNCTION_SECTIONS)
++-        TEXT_SECTION(caml_hot__code_begin)
++-        .globl  G(caml_hot__code_begin)
++-G(caml_hot__code_begin):
+++        TEXT_SECTION(caml_hot.code_begin)
+++        .globl  G(caml_hot.code_begin)
+++G(caml_hot.code_begin):
++ 
++-        TEXT_SECTION(caml_hot__code_end)
++-        .globl  G(caml_hot__code_end)
++-G(caml_hot__code_end):
+++        TEXT_SECTION(caml_hot.code_end)
+++        .globl  G(caml_hot.code_end)
+++G(caml_hot.code_end):
++ #endif
++ 
++         TEXT_SECTION(caml_system__code_begin)
++@@ -664,9 +664,9 @@ ENDFUNCTION(G(caml_ml_array_bound_error))
++ G(caml_system__code_end):
++ 
++         .data
++-        .globl  G(caml_system__frametable)
+++        .globl  G(caml_system.frametable)
++         .align  EIGHT_ALIGN
++-G(caml_system__frametable):
+++G(caml_system.frametable):
++         .quad   1           /* one descriptor */
++         .quad   LBL(107)    /* return address into callback */
++         .value  -1          /* negative frame size => use callback link */
++diff --git a/runtime/arm.S b/runtime/arm.S
++index 612757a104..d2632bfceb 100644
++--- a/runtime/arm.S
+++++ b/runtime/arm.S
++@@ -113,13 +113,13 @@ domain_state_ptr  .req    r11
++ name:
++ 
++ #if defined(FUNCTION_SECTIONS)
++-        TEXT_SECTION(caml_hot__code_begin)
++-        .globl  caml_hot__code_begin
++-caml_hot__code_begin:
+++        TEXT_SECTION(caml_hot.code_begin)
+++        .globl  caml_hot.code_begin
+++caml_hot.code_begin:
++ 
++-        TEXT_SECTION(caml_hot__code_end)
++-        .globl  caml_hot__code_end
++-caml_hot__code_end:
+++        TEXT_SECTION(caml_hot.code_end)
+++        .globl  caml_hot.code_end
+++caml_hot.code_end:
++ #endif
++ 
++         .set    domain_curr_field, 0
++@@ -433,15 +433,15 @@ caml_system__code_end:
++ 
++         .data
++         .align  2
++-        .globl  caml_system__frametable
++-caml_system__frametable:
+++        .globl  caml_system.frametable
+++caml_system.frametable:
++         .word   1               /* one descriptor */
++         .word   .Lcaml_retaddr  /* return address into callback */
++         .short  -1              /* negative frame size => use callback link */
++         .short  0               /* no roots */
++         .align  2
++-        .type   caml_system__frametable, %object
++-        .size   caml_system__frametable, .-caml_system__frametable
+++        .type   caml_system.frametable, %object
+++        .size   caml_system.frametable, .-caml_system.frametable
++ 
++ /* Mark stack as non-executable */
++         .section .note.GNU-stack,"",%progbits
++diff --git a/runtime/arm64.S b/runtime/arm64.S
++index 02a7ba0832..abb38be6e7 100644
++--- a/runtime/arm64.S
+++++ b/runtime/arm64.S
++@@ -100,13 +100,13 @@
++ #endif
++ 
++ #if defined(FUNCTION_SECTIONS)
++-        TEXT_SECTION(caml_hot__code_begin)
++-        .globl  G(caml_hot__code_begin)
++-G(caml_hot__code_begin):
+++        TEXT_SECTION(caml_hot.code_begin)
+++        .globl  G(caml_hot.code_begin)
+++G(caml_hot.code_begin):
++ 
++-        TEXT_SECTION(caml_hot__code_end)
++-        .globl  G(caml_hot__code_end)
++-G(caml_hot__code_end):
+++        TEXT_SECTION(caml_hot.code_end)
+++        .globl  G(caml_hot.code_end)
+++G(caml_hot.code_end):
++ #endif
++ 
++ #if defined(SYS_macosx)
++@@ -533,13 +533,13 @@ G(caml_system__code_end):
++ 
++ /* GC roots for callback */
++ 
++-OBJECT(caml_system__frametable)
+++OBJECT(caml_system.frametable)
++         .quad   1               /* one descriptor */
++         .quad   L(caml_retaddr) /* return address into callback */
++         .short  -1              /* negative frame size => use callback link */
++         .short  0               /* no roots */
++         .align  3
++-        END_OBJECT(caml_system__frametable)
+++        END_OBJECT(caml_system.frametable)
++ 
++ #if !defined(SYS_macosx)
++ /* Mark stack as non-executable */
 +diff --git a/runtime/bigarray.c b/runtime/bigarray.c
 +index ed4ff67d21..03151f6946 100644
 +--- a/runtime/bigarray.c
@@ -3083,18 +3199,53 @@ index 0000000000..79b2f0267d
 +    minor_gc.c memory.c alloc.c roots_byt.c globroots.c fail_byt.c signals.c
 +    signals_byt.c printexc.c backtrace_byt.c backtrace.c compare.c ints.c
 +diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
-+index dba30c3848..7eea86f8c0 100644
++index dba30c3848..628d837208 100644
 +--- a/runtime/dynlink_nat.c
 ++++ b/runtime/dynlink_nat.c
-+@@ -118,7 +118,8 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
++@@ -43,7 +43,7 @@ static value Val_handle(void* handle) {
++ }
 + 
-+   sym = optsym("__code_begin");
-+   sym2 = optsym("__code_end");
++ static void *getsym(void *handle, const char *module, const char *name){
++-  char *fullname = caml_stat_strconcat(3, "caml", module, name);
+++  char *fullname = caml_stat_strconcat(4, "caml", module, ".", name);
++   void *sym;
++   sym = caml_dlsym (handle, fullname);
++   /*  printf("%s => %lx\n", fullname, (uintnat) sym); */
++@@ -105,26 +105,27 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
++ 
++   unit = String_val(symbol);
++ 
++-  sym = optsym("__frametable");
+++  sym = optsym("frametable");
++   if (NULL != sym) caml_register_frametable(sym);
++ 
++-  sym = optsym("__gc_roots");
+++  sym = optsym("gc_roots");
++   if (NULL != sym) caml_register_dyn_global(sym);
++ 
++-  sym = optsym("__data_begin");
++-  sym2 = optsym("__data_end");
+++  sym = optsym("data_begin");
+++  sym2 = optsym("data_end");
++   if (NULL != sym && NULL != sym2)
++     caml_page_table_add(In_static_data, sym, sym2);
++ 
++-  sym = optsym("__code_begin");
++-  sym2 = optsym("__code_end");
 +-  if (NULL != sym && NULL != sym2)
+++  sym = optsym("code_begin");
+++  sym2 = optsym("code_end");
 ++  /* Do not register empty code fragments */
 ++  if (NULL != sym && NULL != sym2 && sym != sym2)
 +     caml_register_code_fragment((char *) sym, (char *) sym2,
 +                                 DIGEST_LATER, NULL);
++ 
++   if( caml_natdynlink_hook != NULL ) caml_natdynlink_hook(handle,unit);
++ 
++-  entrypoint = optsym("__entry");
+++  entrypoint = optsym("entry");
++   if (NULL != entrypoint) result = caml_callback((value)(&entrypoint), 0);
++   else result = Val_unit;
 + 
 +diff --git a/runtime/fix_code.c b/runtime/fix_code.c
 +index 5584019867..aa059be5df 100644
@@ -3157,9 +3308,29 @@ index 0000000000..79b2f0267d
 + 
 + CAMLexport value caml_hash_variant(char const * tag)
 +diff --git a/runtime/i386.S b/runtime/i386.S
-+index 4d273c9f04..06a9cf5fa7 100644
++index 4d273c9f04..585c2e4c5b 100644
 +--- a/runtime/i386.S
 ++++ b/runtime/i386.S
++@@ -98,13 +98,13 @@
++ 
++         .text
++ #if defined(FUNCTION_SECTIONS)
++-        TEXT_SECTION(caml_hot__code_begin)
++-        .globl  G(caml_hot__code_begin)
++-G(caml_hot__code_begin):
+++        TEXT_SECTION(caml_hot.code_begin)
+++        .globl  G(caml_hot.code_begin)
+++G(caml_hot.code_begin):
++ 
++-        TEXT_SECTION(caml_hot__code_end)
++-        .globl  G(caml_hot__code_end)
++-G(caml_hot__code_end):
+++        TEXT_SECTION(caml_hot.code_end)
+++        .globl  G(caml_hot.code_end)
+++G(caml_hot.code_end):
++ #endif
++ 
++ /* Allocation */
 +@@ -116,7 +116,7 @@ FUNCTION(caml_call_gc)
 +         CFI_STARTPROC
 + LBL(caml_call_gc):
@@ -3279,6 +3450,17 @@ index 0000000000..79b2f0267d
 +         movl    (%esp), %edx
 +         movl    %edx, CAML_STATE(last_return_address, %ebx)
 +         leal    4(%esp), %edx
++@@ -422,8 +422,8 @@ FUNCTION(caml_ml_array_bound_error)
++ G(caml_system__code_end):
++ 
++         .data
++-        .globl  G(caml_system__frametable)
++-G(caml_system__frametable):
+++        .globl  G(caml_system.frametable)
+++G(caml_system.frametable):
++         .long   1               /* one descriptor */
++         .long   LBL(107)        /* return address into callback */
++ #ifndef SYS_solaris
 +diff --git a/runtime/interp.c b/runtime/interp.c
 +index e6700994bc..a59811c87d 100644
 +--- a/runtime/interp.c
@@ -3305,6 +3487,23 @@ index 0000000000..79b2f0267d
 + #endif
 +     return Val_unit;
 +   }
++diff --git a/runtime/power.S b/runtime/power.S
++index 4ca1a14538..68486cb7dc 100644
++--- a/runtime/power.S
+++++ b/runtime/power.S
++@@ -645,9 +645,9 @@ caml_system__code_end:
++ /* Frame table */
++ 
++         .section ".data"
++-        .globl  caml_system__frametable
++-        .type   caml_system__frametable, @object
++-caml_system__frametable:
+++        .globl  caml_system.frametable
+++        .type   caml_system.frametable, @object
+++caml_system.frametable:
++         datag   1               /* one descriptor */
++         datag   .L105 + 4       /* return address into callback */
++         .short  -1              /* negative size count => use callback link */
 +diff --git a/runtime/prng.c b/runtime/prng.c
 +new file mode 100644
 +index 0000000000..4357afbbfb
@@ -3380,6 +3579,44 @@ index 0000000000..79b2f0267d
 ++{
 ++  return caml_copy_int64(caml_lxm_next_unboxed(v));
 ++}
++diff --git a/runtime/riscv.S b/runtime/riscv.S
++index 25b624b56b..112627726f 100644
++--- a/runtime/riscv.S
+++++ b/runtime/riscv.S
++@@ -442,12 +442,12 @@ caml_system__code_end:
++ 
++         .section .data
++         .align  3
++-        .globl  caml_system__frametable
++-        .type   caml_system__frametable, @object
++-caml_system__frametable:
+++        .globl  caml_system.frametable
+++        .type   caml_system.frametable, @object
+++caml_system.frametable:
++         .quad   1               /* one descriptor */
++         .quad   .Lcaml_retaddr  /* return address into callback */
++         .short  -1              /* negative frame size => use callback link */
++         .short  0               /* no roots */
++         .align  3
++-        .size   caml_system__frametable, .-caml_system__frametable
+++        .size   caml_system.frametable, .-caml_system.frametable
++diff --git a/runtime/s390x.S b/runtime/s390x.S
++index aab63e9b24..a05f721836 100644
++--- a/runtime/s390x.S
+++++ b/runtime/s390x.S
++@@ -342,9 +342,9 @@ caml_system__code_end:
++ 
++         .section ".data"
++         .align 8
++-        .globl  caml_system__frametable
++-        .type   caml_system__frametable, @object
++-caml_system__frametable:
+++        .globl  caml_system.frametable
+++        .type   caml_system.frametable, @object
+++caml_system.frametable:
++         .quad   1               /* one descriptor */
++         .quad   .L105           /* return address into callback */
++         .short  -1              /* negative size count => use callback link */
 +diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
 +index 7cb461ac4d..439fb56404 100644
 +--- a/runtime/signals_byt.c
@@ -7252,10 +7489,10 @@ index 0000000000..b3cd4f7fb6
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..560ac7ad62
+index 0000000000..fbe063449c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,7189 @@
+@@ -0,0 +1,7427 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..d5aca4bea0
@@ -7989,10 +8226,10 @@ index 0000000000..560ac7ad62
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 30f8534ae9..345de8d92d 100755
++index 30f8534ae9..cf8a53325f 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index f4479e99a9..e4a55176ac 100644
++index f4479e99a9..3c4d97d0e9 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -173,6 +173,8 @@ AC_SUBST([flexdll_chain])
@@ -8012,16 +8249,12 @@ index 0000000000..560ac7ad62
 + AC_CONFIG_HEADERS([runtime/caml/m.h])
 + AC_CONFIG_HEADERS([runtime/caml/s.h])
 + AC_CONFIG_HEADERS([runtime/caml/version.h])
-+@@ -210,10 +213,10 @@ AC_CANONICAL_TARGET
-+ # Systems that are known not to work, even in bytecode only.
-+ 
++@@ -212,8 +215,8 @@ AC_CANONICAL_TARGET
 + AS_CASE([$host],
-+-  [*-pc-windows],
-+-    [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
++   [*-pc-windows],
++     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
 +-  [*-*-cygwin*],
 +-    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
-++dnl   [*-pc-windows],
-++dnl     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
 ++dnl   [*-*-cygwin*],
 ++dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
 +   [i386-*-solaris*],
@@ -8578,10 +8811,10 @@ index 0000000000..560ac7ad62
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..79b2f0267d
++index 0000000000..68c246234e
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2323 @@
++@@ -0,0 +1,2564 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -9391,6 +9624,126 @@ index 0000000000..560ac7ad62
 ++-# without doing anything else.
 ++-.PHONY: setup-depend
 ++-setup-depend:
+++diff --git a/runtime/amd64.S b/runtime/amd64.S
+++index 756d4a5a0a..8081087c68 100644
+++--- a/runtime/amd64.S
++++++ b/runtime/amd64.S
+++@@ -295,13 +295,13 @@
+++         .text
+++ 
+++ #if defined(FUNCTION_SECTIONS)
+++-        TEXT_SECTION(caml_hot__code_begin)
+++-        .globl  G(caml_hot__code_begin)
+++-G(caml_hot__code_begin):
++++        TEXT_SECTION(caml_hot.code_begin)
++++        .globl  G(caml_hot.code_begin)
++++G(caml_hot.code_begin):
+++ 
+++-        TEXT_SECTION(caml_hot__code_end)
+++-        .globl  G(caml_hot__code_end)
+++-G(caml_hot__code_end):
++++        TEXT_SECTION(caml_hot.code_end)
++++        .globl  G(caml_hot.code_end)
++++G(caml_hot.code_end):
+++ #endif
+++ 
+++         TEXT_SECTION(caml_system__code_begin)
+++@@ -664,9 +664,9 @@ ENDFUNCTION(G(caml_ml_array_bound_error))
+++ G(caml_system__code_end):
+++ 
+++         .data
+++-        .globl  G(caml_system__frametable)
++++        .globl  G(caml_system.frametable)
+++         .align  EIGHT_ALIGN
+++-G(caml_system__frametable):
++++G(caml_system.frametable):
+++         .quad   1           /* one descriptor */
+++         .quad   LBL(107)    /* return address into callback */
+++         .value  -1          /* negative frame size => use callback link */
+++diff --git a/runtime/arm.S b/runtime/arm.S
+++index 612757a104..d2632bfceb 100644
+++--- a/runtime/arm.S
++++++ b/runtime/arm.S
+++@@ -113,13 +113,13 @@ domain_state_ptr  .req    r11
+++ name:
+++ 
+++ #if defined(FUNCTION_SECTIONS)
+++-        TEXT_SECTION(caml_hot__code_begin)
+++-        .globl  caml_hot__code_begin
+++-caml_hot__code_begin:
++++        TEXT_SECTION(caml_hot.code_begin)
++++        .globl  caml_hot.code_begin
++++caml_hot.code_begin:
+++ 
+++-        TEXT_SECTION(caml_hot__code_end)
+++-        .globl  caml_hot__code_end
+++-caml_hot__code_end:
++++        TEXT_SECTION(caml_hot.code_end)
++++        .globl  caml_hot.code_end
++++caml_hot.code_end:
+++ #endif
+++ 
+++         .set    domain_curr_field, 0
+++@@ -433,15 +433,15 @@ caml_system__code_end:
+++ 
+++         .data
+++         .align  2
+++-        .globl  caml_system__frametable
+++-caml_system__frametable:
++++        .globl  caml_system.frametable
++++caml_system.frametable:
+++         .word   1               /* one descriptor */
+++         .word   .Lcaml_retaddr  /* return address into callback */
+++         .short  -1              /* negative frame size => use callback link */
+++         .short  0               /* no roots */
+++         .align  2
+++-        .type   caml_system__frametable, %object
+++-        .size   caml_system__frametable, .-caml_system__frametable
++++        .type   caml_system.frametable, %object
++++        .size   caml_system.frametable, .-caml_system.frametable
+++ 
+++ /* Mark stack as non-executable */
+++         .section .note.GNU-stack,"",%progbits
+++diff --git a/runtime/arm64.S b/runtime/arm64.S
+++index 02a7ba0832..abb38be6e7 100644
+++--- a/runtime/arm64.S
++++++ b/runtime/arm64.S
+++@@ -100,13 +100,13 @@
+++ #endif
+++ 
+++ #if defined(FUNCTION_SECTIONS)
+++-        TEXT_SECTION(caml_hot__code_begin)
+++-        .globl  G(caml_hot__code_begin)
+++-G(caml_hot__code_begin):
++++        TEXT_SECTION(caml_hot.code_begin)
++++        .globl  G(caml_hot.code_begin)
++++G(caml_hot.code_begin):
+++ 
+++-        TEXT_SECTION(caml_hot__code_end)
+++-        .globl  G(caml_hot__code_end)
+++-G(caml_hot__code_end):
++++        TEXT_SECTION(caml_hot.code_end)
++++        .globl  G(caml_hot.code_end)
++++G(caml_hot.code_end):
+++ #endif
+++ 
+++ #if defined(SYS_macosx)
+++@@ -533,13 +533,13 @@ G(caml_system__code_end):
+++ 
+++ /* GC roots for callback */
+++ 
+++-OBJECT(caml_system__frametable)
++++OBJECT(caml_system.frametable)
+++         .quad   1               /* one descriptor */
+++         .quad   L(caml_retaddr) /* return address into callback */
+++         .short  -1              /* negative frame size => use callback link */
+++         .short  0               /* no roots */
+++         .align  3
+++-        END_OBJECT(caml_system__frametable)
++++        END_OBJECT(caml_system.frametable)
+++ 
+++ #if !defined(SYS_macosx)
+++ /* Mark stack as non-executable */
 ++diff --git a/runtime/bigarray.c b/runtime/bigarray.c
 ++index ed4ff67d21..03151f6946 100644
 ++--- a/runtime/bigarray.c
@@ -10341,18 +10694,53 @@ index 0000000000..560ac7ad62
 ++    minor_gc.c memory.c alloc.c roots_byt.c globroots.c fail_byt.c signals.c
 ++    signals_byt.c printexc.c backtrace_byt.c backtrace.c compare.c ints.c
 ++diff --git a/runtime/dynlink_nat.c b/runtime/dynlink_nat.c
-++index dba30c3848..7eea86f8c0 100644
+++index dba30c3848..628d837208 100644
 ++--- a/runtime/dynlink_nat.c
 +++++ b/runtime/dynlink_nat.c
-++@@ -118,7 +118,8 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
+++@@ -43,7 +43,7 @@ static value Val_handle(void* handle) {
+++ }
 ++ 
-++   sym = optsym("__code_begin");
-++   sym2 = optsym("__code_end");
+++ static void *getsym(void *handle, const char *module, const char *name){
+++-  char *fullname = caml_stat_strconcat(3, "caml", module, name);
++++  char *fullname = caml_stat_strconcat(4, "caml", module, ".", name);
+++   void *sym;
+++   sym = caml_dlsym (handle, fullname);
+++   /*  printf("%s => %lx\n", fullname, (uintnat) sym); */
+++@@ -105,26 +105,27 @@ CAMLprim value caml_natdynlink_run(value handle_v, value symbol) {
+++ 
+++   unit = String_val(symbol);
+++ 
+++-  sym = optsym("__frametable");
++++  sym = optsym("frametable");
+++   if (NULL != sym) caml_register_frametable(sym);
+++ 
+++-  sym = optsym("__gc_roots");
++++  sym = optsym("gc_roots");
+++   if (NULL != sym) caml_register_dyn_global(sym);
+++ 
+++-  sym = optsym("__data_begin");
+++-  sym2 = optsym("__data_end");
++++  sym = optsym("data_begin");
++++  sym2 = optsym("data_end");
+++   if (NULL != sym && NULL != sym2)
+++     caml_page_table_add(In_static_data, sym, sym2);
+++ 
+++-  sym = optsym("__code_begin");
+++-  sym2 = optsym("__code_end");
 ++-  if (NULL != sym && NULL != sym2)
++++  sym = optsym("code_begin");
++++  sym2 = optsym("code_end");
 +++  /* Do not register empty code fragments */
 +++  if (NULL != sym && NULL != sym2 && sym != sym2)
 ++     caml_register_code_fragment((char *) sym, (char *) sym2,
 ++                                 DIGEST_LATER, NULL);
+++ 
+++   if( caml_natdynlink_hook != NULL ) caml_natdynlink_hook(handle,unit);
+++ 
+++-  entrypoint = optsym("__entry");
++++  entrypoint = optsym("entry");
+++   if (NULL != entrypoint) result = caml_callback((value)(&entrypoint), 0);
+++   else result = Val_unit;
 ++ 
 ++diff --git a/runtime/fix_code.c b/runtime/fix_code.c
 ++index 5584019867..aa059be5df 100644
@@ -10415,9 +10803,29 @@ index 0000000000..560ac7ad62
 ++ 
 ++ CAMLexport value caml_hash_variant(char const * tag)
 ++diff --git a/runtime/i386.S b/runtime/i386.S
-++index 4d273c9f04..06a9cf5fa7 100644
+++index 4d273c9f04..585c2e4c5b 100644
 ++--- a/runtime/i386.S
 +++++ b/runtime/i386.S
+++@@ -98,13 +98,13 @@
+++ 
+++         .text
+++ #if defined(FUNCTION_SECTIONS)
+++-        TEXT_SECTION(caml_hot__code_begin)
+++-        .globl  G(caml_hot__code_begin)
+++-G(caml_hot__code_begin):
++++        TEXT_SECTION(caml_hot.code_begin)
++++        .globl  G(caml_hot.code_begin)
++++G(caml_hot.code_begin):
+++ 
+++-        TEXT_SECTION(caml_hot__code_end)
+++-        .globl  G(caml_hot__code_end)
+++-G(caml_hot__code_end):
++++        TEXT_SECTION(caml_hot.code_end)
++++        .globl  G(caml_hot.code_end)
++++G(caml_hot.code_end):
+++ #endif
+++ 
+++ /* Allocation */
 ++@@ -116,7 +116,7 @@ FUNCTION(caml_call_gc)
 ++         CFI_STARTPROC
 ++ LBL(caml_call_gc):
@@ -10537,6 +10945,17 @@ index 0000000000..560ac7ad62
 ++         movl    (%esp), %edx
 ++         movl    %edx, CAML_STATE(last_return_address, %ebx)
 ++         leal    4(%esp), %edx
+++@@ -422,8 +422,8 @@ FUNCTION(caml_ml_array_bound_error)
+++ G(caml_system__code_end):
+++ 
+++         .data
+++-        .globl  G(caml_system__frametable)
+++-G(caml_system__frametable):
++++        .globl  G(caml_system.frametable)
++++G(caml_system.frametable):
+++         .long   1               /* one descriptor */
+++         .long   LBL(107)        /* return address into callback */
+++ #ifndef SYS_solaris
 ++diff --git a/runtime/interp.c b/runtime/interp.c
 ++index e6700994bc..a59811c87d 100644
 ++--- a/runtime/interp.c
@@ -10563,6 +10982,23 @@ index 0000000000..560ac7ad62
 ++ #endif
 ++     return Val_unit;
 ++   }
+++diff --git a/runtime/power.S b/runtime/power.S
+++index 4ca1a14538..68486cb7dc 100644
+++--- a/runtime/power.S
++++++ b/runtime/power.S
+++@@ -645,9 +645,9 @@ caml_system__code_end:
+++ /* Frame table */
+++ 
+++         .section ".data"
+++-        .globl  caml_system__frametable
+++-        .type   caml_system__frametable, @object
+++-caml_system__frametable:
++++        .globl  caml_system.frametable
++++        .type   caml_system.frametable, @object
++++caml_system.frametable:
+++         datag   1               /* one descriptor */
+++         datag   .L105 + 4       /* return address into callback */
+++         .short  -1              /* negative size count => use callback link */
 ++diff --git a/runtime/prng.c b/runtime/prng.c
 ++new file mode 100644
 ++index 0000000000..4357afbbfb
@@ -10638,6 +11074,44 @@ index 0000000000..560ac7ad62
 +++{
 +++  return caml_copy_int64(caml_lxm_next_unboxed(v));
 +++}
+++diff --git a/runtime/riscv.S b/runtime/riscv.S
+++index 25b624b56b..112627726f 100644
+++--- a/runtime/riscv.S
++++++ b/runtime/riscv.S
+++@@ -442,12 +442,12 @@ caml_system__code_end:
+++ 
+++         .section .data
+++         .align  3
+++-        .globl  caml_system__frametable
+++-        .type   caml_system__frametable, @object
+++-caml_system__frametable:
++++        .globl  caml_system.frametable
++++        .type   caml_system.frametable, @object
++++caml_system.frametable:
+++         .quad   1               /* one descriptor */
+++         .quad   .Lcaml_retaddr  /* return address into callback */
+++         .short  -1              /* negative frame size => use callback link */
+++         .short  0               /* no roots */
+++         .align  3
+++-        .size   caml_system__frametable, .-caml_system__frametable
++++        .size   caml_system.frametable, .-caml_system.frametable
+++diff --git a/runtime/s390x.S b/runtime/s390x.S
+++index aab63e9b24..a05f721836 100644
+++--- a/runtime/s390x.S
++++++ b/runtime/s390x.S
+++@@ -342,9 +342,9 @@ caml_system__code_end:
+++ 
+++         .section ".data"
+++         .align 8
+++-        .globl  caml_system__frametable
+++-        .type   caml_system__frametable, @object
+++-caml_system__frametable:
++++        .globl  caml_system.frametable
++++        .type   caml_system.frametable, @object
++++caml_system.frametable:
+++         .quad   1               /* one descriptor */
+++         .quad   .L105           /* return address into callback */
+++         .short  -1              /* negative size count => use callback link */
 ++diff --git a/runtime/signals_byt.c b/runtime/signals_byt.c
 ++index 7cb461ac4d..439fb56404 100644
 ++--- a/runtime/signals_byt.c
@@ -14444,7 +14918,8 @@ index 0000000000..560ac7ad62
 ++ Mylib.baz
 ++ Driver.entry
 ++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_pa
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index e3cab0e83e..26b5878c7a 100644
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
