@@ -2583,6 +2583,36 @@ index 2e2c09756c..2b86809df1 100644
  *)
  
  (* Classic producer-consumer *)
+diff --git a/testsuite/tests/parallel/recommended_domain_count.ml b/testsuite/tests/parallel/recommended_domain_count.ml
+index a0c5eab744..f31f507819 100644
+--- a/testsuite/tests/parallel/recommended_domain_count.ml
++++ b/testsuite/tests/parallel/recommended_domain_count.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ modules = "recommended_domain_count_cstubs.c"
++* skip
++reason = "OCaml 5 only"
+ *)
+ 
+ external get_max_domains : unit -> int = "caml_get_max_domains"
+diff --git a/testsuite/tests/parallel/recommended_domain_count_unix.ml b/testsuite/tests/parallel/recommended_domain_count_unix.ml
+index 64cf056ad8..8662a37fbd 100644
+--- a/testsuite/tests/parallel/recommended_domain_count_unix.ml
++++ b/testsuite/tests/parallel/recommended_domain_count_unix.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ let try_ext cmd =
 diff --git a/testsuite/tests/parallel/tak.ml b/testsuite/tests/parallel/tak.ml
 index a9b6874c4f..bdc4173266 100644
 --- a/testsuite/tests/parallel/tak.ml
