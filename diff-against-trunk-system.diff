@@ -1224,6 +1224,272 @@ index 59aabefb2f..0135950af7 100644
    [*-pc-windows],
      [bytecclibs="advapi32.lib ws2_32.lib version.lib"
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
+diff --git a/debugger/debugcom.ml b/debugger/debugcom.ml
+index 5705cd73db..e852b3bb97 100644
+--- a/debugger/debugcom.ml
++++ b/debugger/debugcom.ml
+@@ -52,6 +52,7 @@ type pc =
+ module Sp = struct
+ 
+   (* Position in the debuggee's stack. *)
++(* BACKPORT BEGIN
+   type t = {
+     block : int;
+     offset : int;
+@@ -65,6 +66,13 @@ module Sp = struct
+     match Stdlib.compare sp1.block sp2.block with
+     | 0 -> Stdlib.compare sp1.offset sp2.offset
+     | x -> x
++*)
++  type t = int
++
++  let null = 0
++  let base _ _ = assert false
++  let compare = Int.compare
++(* BACKPORT END *)
+ 
+ end
+ 
+@@ -72,7 +80,11 @@ end
+    Numbering starts at 1 and the runtime registers 2 fragments before
+    the main program: one for uncaught exceptions and one for callbacks.
+ *)
++(* BACKPOR BEGIN
+ let main_frag = 3
++*)
++let main_frag = 0
++(* BACKPORT END *)
+ 
+ let set_event {frag; pos} =
+   output_char !conn.io_out 'e';
+@@ -137,13 +149,21 @@ let do_go_smallint n =
+          |  c  -> Misc.fatal_error (Printf.sprintf "Debugcom.do_go %c" c)
+        in
+        let event_counter = input_binary_int !conn.io_in in
++(* BACKPORT BEGIN
+        let block = input_binary_int !conn.io_in in
+        let offset = input_binary_int !conn.io_in in
++*)
++       let rep_stack_pointer = input_binary_int !conn.io_in in
++(* BACKPORT END *)
+        let frag = input_binary_int !conn.io_in in
+        let pos = input_binary_int !conn.io_in in
+        { rep_type = summary;
+          rep_event_count = Int64.of_int event_counter;
++(* BACKPORT BEGIN
+          rep_stack_pointer = Sp.{block; offset};
++*)
++         rep_stack_pointer;
++(* BACKPORT END *)
+          rep_program_pointer = {frag; pos} })
+ 
+ let rec do_go n =
+@@ -192,11 +212,19 @@ let wait_child chan =
+ let initial_frame () =
+   output_char !conn.io_out '0';
+   flush !conn.io_out;
++(* BACKPORT BEGIN
+   let block = input_binary_int !conn.io_in in
+   let offset = input_binary_int !conn.io_in in
++*)
++  let stack_pos = input_binary_int !conn.io_in in
++(* BACKPORT END *)
+   let frag = input_binary_int !conn.io_in in
+   let pos = input_binary_int !conn.io_in in
++(* BACKPORT BEGIN
+   (Sp.{block; offset}, {frag; pos})
++*)
++  (stack_pos, {frag; pos})
++(* BACKPOR END *)
+ 
+ let set_initial_frame () =
+   ignore(initial_frame ())
+@@ -209,9 +237,14 @@ let up_frame stacksize =
+   output_char !conn.io_out 'U';
+   output_binary_int !conn.io_out stacksize;
+   flush !conn.io_out;
++(* BACKPORT BEGIN
+   let block = input_binary_int !conn.io_in in
+   let offset = input_binary_int !conn.io_in in
++*)
++  let stack_pos = input_binary_int !conn.io_in in
++(* BACKPORT END *)
+   let frag, pos =
++(* BACKPORT BEGIN
+     if block = -1 then
+     begin
+       assert (offset = -1);
+@@ -221,31 +254,56 @@ let up_frame stacksize =
+       let pos = input_binary_int !conn.io_in in
+       frag, pos
+     end
++*)
++    if stack_pos = -1
++    then 0, 0
++    else let frag = input_binary_int !conn.io_in in
++         let pos = input_binary_int !conn.io_in in
++         frag, pos
++(* BACKPORT END *)
+   in
++(* BACKPORT BEGIN
+   (Sp.{block; offset}, { frag; pos })
++*)
++  (stack_pos, { frag; pos })
++(* BACKPORT END *)
+ 
+ (* Get and set the current frame position *)
+ 
+ let get_frame () =
+   output_char !conn.io_out 'f';
+   flush !conn.io_out;
++  let stack_pos = input_binary_int !conn.io_in in
++(*
+   let block = input_binary_int !conn.io_in in
+   let offset = input_binary_int !conn.io_in in
++*)
+   let frag = input_binary_int !conn.io_in in
+   let pos = input_binary_int !conn.io_in in
++(*
+   (Sp.{block; offset}, {frag; pos})
++*)
++  (stack_pos, {frag; pos})
+ 
+ let set_frame stack_pos =
+   output_char !conn.io_out 'S';
++(* BACKPORT BEGIN
+   output_binary_int !conn.io_out stack_pos.Sp.block;
+   output_binary_int !conn.io_out stack_pos.Sp.offset
++*)
++  output_binary_int !conn.io_out stack_pos
++(* BACKPORT END *)
+ 
+ (* Set the trap barrier to given stack position. *)
+ 
+ let set_trap_barrier pos =
+   output_char !conn.io_out 'b';
++(* BACKPORT BEGIN
+   output_binary_int !conn.io_out pos.Sp.block;
+   output_binary_int !conn.io_out pos.Sp.offset
++*)
++  output_binary_int !conn.io_out pos
++(* BACKPORT END *)
+ 
+ (* Handling of remote values *)
+ 
+diff --git a/debugger/debugcom.mli b/debugger/debugcom.mli
+index 4e022dbf10..e9d19edae1 100644
+--- a/debugger/debugcom.mli
++++ b/debugger/debugcom.mli
+@@ -17,7 +17,11 @@
+ (* Low-level communication with the debuggee *)
+ 
+ module Sp : sig
++(* BACKPORT BEGIN
+   type t
++*)
++  type t = int
++(* BACKPORT END *)
+   val null : t
+   val base : t -> int -> t
+   val compare : t -> t -> int
+diff --git a/debugger/frames.ml b/debugger/frames.ml
+index d590367d6d..364fa4ca71 100644
+--- a/debugger/frames.ml
++++ b/debugger/frames.ml
+@@ -53,7 +53,11 @@ let selected_event_is_before () =
+ let rec move_up frame_count event =
+   if frame_count <= 0 then event else begin
+     let (sp, pc) = up_frame event.ev_ev.ev_stacksize in
++(* BACKPORT BEGIN
+     if sp = Sp.null then raise Not_found;
++*)
++    if sp < Sp.null then raise Not_found;
++(* BACKPORT END *)
+     move_up (frame_count - 1) (any_event_at_pc pc)
+   end
+ 
+@@ -113,7 +117,11 @@ let do_backtrace action =
+       begin try
+         while action (Some !event) do
+           let (sp, pc) = up_frame !event.ev_ev.ev_stacksize in
++(* BACKPORT BEGIN
+           if sp = Sp.null then raise Exit;
++*)
++          if sp < Sp.null then raise Exit;
++(* BACKPORT END *)
+           event := any_event_at_pc pc
+         done
+       with Exit -> ()
+diff --git a/debugger/time_travel.ml b/debugger/time_travel.ml
+index b05d05767b..7a2665d305 100644
+--- a/debugger/time_travel.ml
++++ b/debugger/time_travel.ml
+@@ -555,7 +555,11 @@ let finish () =
+   | Some {ev_ev={ev_stacksize}} ->
+       set_initial_frame();
+       let (frame, pc) = up_frame ev_stacksize in
++(* BACKPORT BEGIN
+       if frame = Sp.null then begin
++*)
++      if frame < Sp.null then begin
++(* BACKPORT END *)
+         prerr_endline "`finish' not meaningful in outermost frame.";
+         raise Toplevel
+       end;
+@@ -598,9 +602,14 @@ let next_1 () =
+         | Some {ev_ev={ev_stacksize=ev_stacksize2}} ->
+             let (frame2, _pc2) = initial_frame() in
+             (* Call `finish' if we've entered a function. *)
++(* BACKPORT BEGIN
+             if frame1 <> Sp.null && frame2 <> Sp.null &&
+                Sp.(compare (base frame2 ev_stacksize2)
+                      (base frame1 ev_stacksize1)) > 0
++*)
++            if frame1 >= 0 && frame2 >= 0 &&
++               frame2 - ev_stacksize2 > frame1 - ev_stacksize1
++(* BACKPORT END *)
+             then finish()
+       end
+ 
+@@ -623,7 +632,11 @@ let start () =
+   | Some {ev_ev={ev_stacksize}} ->
+       let (frame, _) = initial_frame() in
+       let (frame', pc) = up_frame ev_stacksize in
++(* BACKPORT BEGIN
+       if frame' = Sp.null then begin
++*)
++      if frame' < Sp.null then begin
++(* BACKPORT END *)
+         prerr_endline "`start not meaningful in outermost frame.";
+         raise Toplevel
+       end;
+@@ -645,7 +658,11 @@ let start () =
+             step _minus1;
+             (not !interrupted)
+               &&
++(* BACKPORT BEGIN
+             Sp.(compare (base frame' nargs) (base frame ev_stacksize)) > 0
++*)
++            (frame' - nargs > frame - ev_stacksize)
++(* BACKPORT END *)
+         | _ ->
+             false
+       do
+@@ -667,9 +684,14 @@ let previous_1 () =
+         | Some {ev_ev={ev_stacksize=ev_stacksize2}} ->
+             let (frame2, _pc2) = initial_frame() in
+             (* Call `start' if we've entered a function. *)
++(* BACKPORT BEGIN
+             if frame1 <> Sp.null && frame2 <> Sp.null &&
+               Sp.(compare (base frame2 ev_stacksize2)
+                     (base frame1 ev_stacksize1)) > 0
++*)
++            if frame1 >= 0 && frame2 >= 0 &&
++               frame2 - ev_stacksize2 > frame1 - ev_stacksize1
++(* BACKPORT END *)
+             then start()
+       end
+ 
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
 index 0000000000..9cebc7b422
@@ -3485,10 +3751,10 @@ index 0000000000..9cebc7b422
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..4265571c05
+index 0000000000..b63f8d86ff
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3551 @@
+@@ -0,0 +1,3336 @@
 +diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 +index 7f2433adc9..68329c5bc1 100644
 +--- a/ocamltest/Makefile
@@ -6732,221 +6998,6 @@ index 0000000000..4265571c05
 + let _ =
 +   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 +     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-+diff --git a/testsuite/tests/tool-debugger/basic/debuggee.ml b/testsuite/tests/tool-debugger/basic/debuggee.ml
-+index 8604edf239..91ad3c21dc 100644
-+--- a/testsuite/tests/tool-debugger/basic/debuggee.ml
-++++ b/testsuite/tests/tool-debugger/basic/debuggee.ml
-+@@ -2,15 +2,13 @@
-+ set foo = "bar"
-+ flags += " -g "
-+ ocamldebug_script = "${test_source_directory}/input_script"
-+-* skip
-+-reason = "ocamldebug is broken (#34)"
-+-** debugger
-+-*** shared-libraries
-+-**** setup-ocamlc.byte-build-env
-+-***** ocamlc.byte
-+-****** check-ocamlc.byte-output
-+-******* ocamldebug
-+-******** check-program-output
-++* debugger
-++** shared-libraries
-++*** setup-ocamlc.byte-build-env
-++**** ocamlc.byte
-++***** check-ocamlc.byte-output
-++****** ocamldebug
-++******* check-program-output
-+ *)
-+ 
-+ print_endline Sys.argv.(1);;
-+diff --git a/testsuite/tests/tool-debugger/dynlink/host.ml b/testsuite/tests/tool-debugger/dynlink/host.ml
-+index c445c8acd3..f46ef8a022 100644
-+--- a/testsuite/tests/tool-debugger/dynlink/host.ml
-++++ b/testsuite/tests/tool-debugger/dynlink/host.ml
-+@@ -7,29 +7,27 @@ libraries = ""
-+ flags += " -g "
-+ ocamldebug_script = "${test_source_directory}/input_script"
-+ 
-+-* skip
-+-reason = "ocamldebug is broken (#34)"
-+-** debugger
-+-*** shared-libraries
-+-**** setup-ocamlc.byte-build-env
-+-***** ocamlc.byte
-++* debugger
-++** shared-libraries
-++*** setup-ocamlc.byte-build-env
-++**** ocamlc.byte
-+ module = "host.ml"
-+-****** ocamlc.byte
-++***** ocamlc.byte
-+ module = "plugin.ml"
-+-******* ocamlc.byte
-++****** ocamlc.byte
-+ module = ""
-+ all_modules = "host.cmo"
-+ program = "${test_build_directory}/host.byte"
-+ libraries = "dynlink"
-+ 
-+-******** run
-++******* run
-+ output = "host.output"
-+-********* check-program-output
-++******** check-program-output
-+ reference = "${test_source_directory}/host.reference"
-+ 
-+-********* ocamldebug
-++******** ocamldebug
-+ output = "host.debug.output"
-+-********** check-program-output
-++********* check-program-output
-+ reference = "${test_source_directory}/host.debug.reference"
-+ 
-+ *)
-+diff --git a/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml b/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
-+index 7c6f00c70f..70aee3ff04 100644
-+--- a/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
-++++ b/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
-+@@ -1,27 +1,25 @@
-+ (* TEST
-+ ocamldebug_script = "${test_source_directory}/input_script"
-+-* skip
-+-reason = "ocamldebug is broken (#34)"
-+-** debugger
-+-*** shared-libraries
-+-**** setup-ocamlc.byte-build-env
-+-***** script
-++* debugger
-++** shared-libraries
-++*** setup-ocamlc.byte-build-env
-++**** script
-+ script = "mkdir out"
-+-****** ocamlc.byte
-++***** ocamlc.byte
-+ flags = "-g -c"
-+ all_modules = "${test_source_directory}/in/blah.ml"
-+ program = "out/blah.cmo"
-+-******* ocamlc.byte
-++****** ocamlc.byte
-+ program = "out/foo.cmo"
-+ flags = "-I out -g -c"
-+ all_modules = "${test_source_directory}/in/foo.ml"
-+-******** ocamlc.byte
-++******* ocamlc.byte
-+ all_modules = "out/blah.cmo out/foo.cmo"
-+ flags = " -g "
-+ program = "debuggee.exe"
-+-********* check-ocamlc.byte-output
-+-********** ocamldebug
-+-*********** check-program-output
-++******** check-ocamlc.byte-output
-++********* ocamldebug
-++********** check-program-output
-+ *)
-+ 
-+ (* This file only contains the specification of how to run the test *)
-+diff --git a/testsuite/tests/tool-debugger/module_named_main/main.ml b/testsuite/tests/tool-debugger/module_named_main/main.ml
-+index e31c16391e..25eebe7c02 100644
-+--- a/testsuite/tests/tool-debugger/module_named_main/main.ml
-++++ b/testsuite/tests/tool-debugger/module_named_main/main.ml
-+@@ -1,15 +1,13 @@
-+ (* TEST
-+ flags += " -g "
-+ ocamldebug_script = "${test_source_directory}/input_script"
-+-* skip
-+-reason = "ocamldebug is broken (#34)"
-+-** debugger
-+-*** shared-libraries
-+-**** setup-ocamlc.byte-build-env
-+-***** ocamlc.byte
-+-****** check-ocamlc.byte-output
-+-******* ocamldebug
-+-******** check-program-output
-++* debugger
-++** shared-libraries
-++*** setup-ocamlc.byte-build-env
-++**** ocamlc.byte
-++***** check-ocamlc.byte-output
-++****** ocamldebug
-++******* check-program-output
-+ *)
-+ 
-+ module Submodule = struct
-+diff --git a/testsuite/tests/tool-debugger/no_debug_event/noev.ml b/testsuite/tests/tool-debugger/no_debug_event/noev.ml
-+index f06c14a117..4eb334ea84 100644
-+--- a/testsuite/tests/tool-debugger/no_debug_event/noev.ml
-++++ b/testsuite/tests/tool-debugger/no_debug_event/noev.ml
-+@@ -1,30 +1,28 @@
-+ (* TEST
-+ readonly_files = "a.ml b.ml"
-+ ocamldebug_script = "${test_source_directory}/input_script"
-+-* skip
-+-reason = "ocamldebug is broken (#34)"
-+-** debugger
-+-*** shared-libraries
-+-**** setup-ocamlc.byte-build-env
-+-***** ocamlc.byte
-++* debugger
-++** shared-libraries
-++*** setup-ocamlc.byte-build-env
-++**** ocamlc.byte
-+ module = "a.ml"
-+ flags = "-g -for-pack foo"
-+-****** ocamlc.byte
-++***** ocamlc.byte
-+ module = ""
-+ all_modules = "a.cmo"
-+ program = "foo.cmo"
-+ flags = "-g -pack"
-+-******* ocamlc.byte
-++****** ocamlc.byte
-+ module = "b.ml"
-+ flags = " -g "
-+-******** ocamlc.byte
-++******* ocamlc.byte
-+ module = ""
-+ flags = " -g "
-+ all_modules = "foo.cmo b.cmo"
-+ program = "${test_build_directory}/noev.exe"
-+-********* check-ocamlc.byte-output
-+-********** ocamldebug
-+-*********** check-program-output
-++******** check-ocamlc.byte-output
-++********* ocamldebug
-++********** check-program-output
-+ *)
-+ 
-+ (* This file only contains the specification of how to run the test *)
-+diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
-+index b2d6e6e7c5..f22a4bd50f 100644
-+--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-+@@ -3,17 +3,15 @@ flags += " -g "
-+ ocamldebug_script = "${test_source_directory}/input_script"
-+ readonly_files = "printer.ml"
-+ include debugger
-+-* skip
-+-reason = "ocamldebug is broken (#34)"
-+-** debugger
-+-*** shared-libraries
-+-**** setup-ocamlc.byte-build-env
-+-***** ocamlc.byte
-++* debugger
-++** shared-libraries
-++*** setup-ocamlc.byte-build-env
-++**** ocamlc.byte
-+ module = "printer.ml"
-+-***** ocamlc.byte
-+-****** check-ocamlc.byte-output
-+-******* ocamldebug
-+-******** check-program-output
-++**** ocamlc.byte
-++***** check-ocamlc.byte-output
-++****** ocamldebug
-++******* check-program-output
-+ *)
-+ 
-+ let f x =
 +diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
 +index 1e35152097..d0cc6c5a5a 100644
 +--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
@@ -7042,10 +7093,10 @@ index 0000000000..4265571c05
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..1290345ba8
+index 0000000000..5288133475
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6929 @@
+@@ -0,0 +1,7057 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..45d3e2dde1
@@ -8272,6 +8323,272 @@ index 0000000000..1290345ba8
 +   [*-pc-windows],
 +     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
++diff --git a/debugger/debugcom.ml b/debugger/debugcom.ml
++index 5705cd73db..e852b3bb97 100644
++--- a/debugger/debugcom.ml
+++++ b/debugger/debugcom.ml
++@@ -52,6 +52,7 @@ type pc =
++ module Sp = struct
++ 
++   (* Position in the debuggee's stack. *)
+++(* BACKPORT BEGIN
++   type t = {
++     block : int;
++     offset : int;
++@@ -65,6 +66,13 @@ module Sp = struct
++     match Stdlib.compare sp1.block sp2.block with
++     | 0 -> Stdlib.compare sp1.offset sp2.offset
++     | x -> x
+++*)
+++  type t = int
+++
+++  let null = 0
+++  let base _ _ = assert false
+++  let compare = Int.compare
+++(* BACKPORT END *)
++ 
++ end
++ 
++@@ -72,7 +80,11 @@ end
++    Numbering starts at 1 and the runtime registers 2 fragments before
++    the main program: one for uncaught exceptions and one for callbacks.
++ *)
+++(* BACKPOR BEGIN
++ let main_frag = 3
+++*)
+++let main_frag = 0
+++(* BACKPORT END *)
++ 
++ let set_event {frag; pos} =
++   output_char !conn.io_out 'e';
++@@ -137,13 +149,21 @@ let do_go_smallint n =
++          |  c  -> Misc.fatal_error (Printf.sprintf "Debugcom.do_go %c" c)
++        in
++        let event_counter = input_binary_int !conn.io_in in
+++(* BACKPORT BEGIN
++        let block = input_binary_int !conn.io_in in
++        let offset = input_binary_int !conn.io_in in
+++*)
+++       let rep_stack_pointer = input_binary_int !conn.io_in in
+++(* BACKPORT END *)
++        let frag = input_binary_int !conn.io_in in
++        let pos = input_binary_int !conn.io_in in
++        { rep_type = summary;
++          rep_event_count = Int64.of_int event_counter;
+++(* BACKPORT BEGIN
++          rep_stack_pointer = Sp.{block; offset};
+++*)
+++         rep_stack_pointer;
+++(* BACKPORT END *)
++          rep_program_pointer = {frag; pos} })
++ 
++ let rec do_go n =
++@@ -192,11 +212,19 @@ let wait_child chan =
++ let initial_frame () =
++   output_char !conn.io_out '0';
++   flush !conn.io_out;
+++(* BACKPORT BEGIN
++   let block = input_binary_int !conn.io_in in
++   let offset = input_binary_int !conn.io_in in
+++*)
+++  let stack_pos = input_binary_int !conn.io_in in
+++(* BACKPORT END *)
++   let frag = input_binary_int !conn.io_in in
++   let pos = input_binary_int !conn.io_in in
+++(* BACKPORT BEGIN
++   (Sp.{block; offset}, {frag; pos})
+++*)
+++  (stack_pos, {frag; pos})
+++(* BACKPOR END *)
++ 
++ let set_initial_frame () =
++   ignore(initial_frame ())
++@@ -209,9 +237,14 @@ let up_frame stacksize =
++   output_char !conn.io_out 'U';
++   output_binary_int !conn.io_out stacksize;
++   flush !conn.io_out;
+++(* BACKPORT BEGIN
++   let block = input_binary_int !conn.io_in in
++   let offset = input_binary_int !conn.io_in in
+++*)
+++  let stack_pos = input_binary_int !conn.io_in in
+++(* BACKPORT END *)
++   let frag, pos =
+++(* BACKPORT BEGIN
++     if block = -1 then
++     begin
++       assert (offset = -1);
++@@ -221,31 +254,56 @@ let up_frame stacksize =
++       let pos = input_binary_int !conn.io_in in
++       frag, pos
++     end
+++*)
+++    if stack_pos = -1
+++    then 0, 0
+++    else let frag = input_binary_int !conn.io_in in
+++         let pos = input_binary_int !conn.io_in in
+++         frag, pos
+++(* BACKPORT END *)
++   in
+++(* BACKPORT BEGIN
++   (Sp.{block; offset}, { frag; pos })
+++*)
+++  (stack_pos, { frag; pos })
+++(* BACKPORT END *)
++ 
++ (* Get and set the current frame position *)
++ 
++ let get_frame () =
++   output_char !conn.io_out 'f';
++   flush !conn.io_out;
+++  let stack_pos = input_binary_int !conn.io_in in
+++(*
++   let block = input_binary_int !conn.io_in in
++   let offset = input_binary_int !conn.io_in in
+++*)
++   let frag = input_binary_int !conn.io_in in
++   let pos = input_binary_int !conn.io_in in
+++(*
++   (Sp.{block; offset}, {frag; pos})
+++*)
+++  (stack_pos, {frag; pos})
++ 
++ let set_frame stack_pos =
++   output_char !conn.io_out 'S';
+++(* BACKPORT BEGIN
++   output_binary_int !conn.io_out stack_pos.Sp.block;
++   output_binary_int !conn.io_out stack_pos.Sp.offset
+++*)
+++  output_binary_int !conn.io_out stack_pos
+++(* BACKPORT END *)
++ 
++ (* Set the trap barrier to given stack position. *)
++ 
++ let set_trap_barrier pos =
++   output_char !conn.io_out 'b';
+++(* BACKPORT BEGIN
++   output_binary_int !conn.io_out pos.Sp.block;
++   output_binary_int !conn.io_out pos.Sp.offset
+++*)
+++  output_binary_int !conn.io_out pos
+++(* BACKPORT END *)
++ 
++ (* Handling of remote values *)
++ 
++diff --git a/debugger/debugcom.mli b/debugger/debugcom.mli
++index 4e022dbf10..e9d19edae1 100644
++--- a/debugger/debugcom.mli
+++++ b/debugger/debugcom.mli
++@@ -17,7 +17,11 @@
++ (* Low-level communication with the debuggee *)
++ 
++ module Sp : sig
+++(* BACKPORT BEGIN
++   type t
+++*)
+++  type t = int
+++(* BACKPORT END *)
++   val null : t
++   val base : t -> int -> t
++   val compare : t -> t -> int
++diff --git a/debugger/frames.ml b/debugger/frames.ml
++index d590367d6d..364fa4ca71 100644
++--- a/debugger/frames.ml
+++++ b/debugger/frames.ml
++@@ -53,7 +53,11 @@ let selected_event_is_before () =
++ let rec move_up frame_count event =
++   if frame_count <= 0 then event else begin
++     let (sp, pc) = up_frame event.ev_ev.ev_stacksize in
+++(* BACKPORT BEGIN
++     if sp = Sp.null then raise Not_found;
+++*)
+++    if sp < Sp.null then raise Not_found;
+++(* BACKPORT END *)
++     move_up (frame_count - 1) (any_event_at_pc pc)
++   end
++ 
++@@ -113,7 +117,11 @@ let do_backtrace action =
++       begin try
++         while action (Some !event) do
++           let (sp, pc) = up_frame !event.ev_ev.ev_stacksize in
+++(* BACKPORT BEGIN
++           if sp = Sp.null then raise Exit;
+++*)
+++          if sp < Sp.null then raise Exit;
+++(* BACKPORT END *)
++           event := any_event_at_pc pc
++         done
++       with Exit -> ()
++diff --git a/debugger/time_travel.ml b/debugger/time_travel.ml
++index b05d05767b..7a2665d305 100644
++--- a/debugger/time_travel.ml
+++++ b/debugger/time_travel.ml
++@@ -555,7 +555,11 @@ let finish () =
++   | Some {ev_ev={ev_stacksize}} ->
++       set_initial_frame();
++       let (frame, pc) = up_frame ev_stacksize in
+++(* BACKPORT BEGIN
++       if frame = Sp.null then begin
+++*)
+++      if frame < Sp.null then begin
+++(* BACKPORT END *)
++         prerr_endline "`finish' not meaningful in outermost frame.";
++         raise Toplevel
++       end;
++@@ -598,9 +602,14 @@ let next_1 () =
++         | Some {ev_ev={ev_stacksize=ev_stacksize2}} ->
++             let (frame2, _pc2) = initial_frame() in
++             (* Call `finish' if we've entered a function. *)
+++(* BACKPORT BEGIN
++             if frame1 <> Sp.null && frame2 <> Sp.null &&
++                Sp.(compare (base frame2 ev_stacksize2)
++                      (base frame1 ev_stacksize1)) > 0
+++*)
+++            if frame1 >= 0 && frame2 >= 0 &&
+++               frame2 - ev_stacksize2 > frame1 - ev_stacksize1
+++(* BACKPORT END *)
++             then finish()
++       end
++ 
++@@ -623,7 +632,11 @@ let start () =
++   | Some {ev_ev={ev_stacksize}} ->
++       let (frame, _) = initial_frame() in
++       let (frame', pc) = up_frame ev_stacksize in
+++(* BACKPORT BEGIN
++       if frame' = Sp.null then begin
+++*)
+++      if frame' < Sp.null then begin
+++(* BACKPORT END *)
++         prerr_endline "`start not meaningful in outermost frame.";
++         raise Toplevel
++       end;
++@@ -645,7 +658,11 @@ let start () =
++             step _minus1;
++             (not !interrupted)
++               &&
+++(* BACKPORT BEGIN
++             Sp.(compare (base frame' nargs) (base frame ev_stacksize)) > 0
+++*)
+++            (frame' - nargs > frame - ev_stacksize)
+++(* BACKPORT END *)
++         | _ ->
++             false
++       do
++@@ -667,9 +684,14 @@ let previous_1 () =
++         | Some {ev_ev={ev_stacksize=ev_stacksize2}} ->
++             let (frame2, _pc2) = initial_frame() in
++             (* Call `start' if we've entered a function. *)
+++(* BACKPORT BEGIN
++             if frame1 <> Sp.null && frame2 <> Sp.null &&
++               Sp.(compare (base frame2 ev_stacksize2)
++                     (base frame1 ev_stacksize1)) > 0
+++*)
+++            if frame1 >= 0 && frame2 >= 0 &&
+++               frame2 - ev_stacksize2 > frame1 - ev_stacksize1
+++(* BACKPORT END *)
++             then start()
++       end
++ 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
 +index 0000000000..9cebc7b422
@@ -10533,10 +10850,10 @@ index 0000000000..1290345ba8
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..4265571c05
++index 0000000000..b63f8d86ff
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3551 @@
++@@ -0,0 +1,3336 @@
 ++diff --git a/ocamltest/Makefile b/ocamltest/Makefile
 ++index 7f2433adc9..68329c5bc1 100644
 ++--- a/ocamltest/Makefile
@@ -13780,201 +14097,63 @@ index 0000000000..1290345ba8
 ++ let _ =
 ++   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
 ++     { null_tracker with alloc_minor = fun _ -> Thread.exit (); None });
-++diff --git a/testsuite/tests/tool-debugger/basic/debuggee.ml b/testsuite/tests/tool-debugger/basic/debuggee.ml
-++index 8604edf239..91ad3c21dc 100644
-++--- a/testsuite/tests/tool-debugger/basic/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/basic/debuggee.ml
-++@@ -2,15 +2,13 @@
-++ set foo = "bar"
-++ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
+++diff --git a/testsuite/tests/typing-sigsubst/sigsubst.ml b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++index 1e35152097..d0cc6c5a5a 100644
+++--- a/testsuite/tests/typing-sigsubst/sigsubst.ml
++++++ b/testsuite/tests/typing-sigsubst/sigsubst.ml
+++@@ -24,11 +24,11 @@ end
+++ Line 3, characters 2-36:
+++ 3 |   include Comparable with type t = t
+++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++-Error: Illegal shadowing of included type t/304 by t/309
++++Error: Illegal shadowing of included type t/299 by t/304
+++        Line 2, characters 2-19:
+++-         Type t/304 came from this include
++++         Type t/299 came from this include
+++        Line 3, characters 2-23:
+++-         The value print has no valid type if t/304 is shadowed
++++         The value print has no valid type if t/299 is shadowed
+++ |}]
 ++ 
-++ print_endline Sys.argv.(1);;
-++diff --git a/testsuite/tests/tool-debugger/dynlink/host.ml b/testsuite/tests/tool-debugger/dynlink/host.ml
-++index c445c8acd3..f46ef8a022 100644
-++--- a/testsuite/tests/tool-debugger/dynlink/host.ml
-+++++ b/testsuite/tests/tool-debugger/dynlink/host.ml
-++@@ -7,29 +7,27 @@ libraries = ""
-++ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
+++ module type Sunderscore = sig
+++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
+++index fbcd16e8e1..56a5f30733 100644
+++--- a/testsuite/tests/unwind/unwind_test.reference
++++++ b/testsuite/tests/unwind/unwind_test.reference
+++@@ -1,5 +1,4 @@
+++ ml_perform_stack_walk
+++-caml_c_call
+++ Mylib.baz
+++ Driver.entry
+++ caml_program
+++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++index 744c4e844d..621d7292ff 100644
+++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
++++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++ *)
 ++ 
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "host.ml"
-++-****** ocamlc.byte
-+++***** ocamlc.byte
-++ module = "plugin.ml"
-++-******* ocamlc.byte
-+++****** ocamlc.byte
-++ module = ""
-++ all_modules = "host.cmo"
-++ program = "${test_build_directory}/host.byte"
-++ libraries = "dynlink"
+++ (* Due to GCs running at non-deterministic places, the output from these tests
+++  * are unreliable except the bad value checks and as a check for catastrophic
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++index 666a55efeb..5a36157e0e 100644
+++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
++++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
+++@@ -1,4 +1,7 @@
+++-(* TEST *)
++++(* TEST
++++   * skip
++++   reason = "OCaml 5 only"
++++*)
 ++ 
-++-******** run
-+++******* run
-++ output = "host.output"
-++-********* check-program-output
-+++******** check-program-output
-++ reference = "${test_source_directory}/host.reference"
+++ let () = Out_channel.set_buffered stdout false
 ++ 
-++-********* ocamldebug
-+++******** ocamldebug
-++ output = "host.debug.output"
-++-********** check-program-output
-+++********* check-program-output
-++ reference = "${test_source_directory}/host.debug.reference"
-++ 
-++ *)
-++diff --git a/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml b/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
-++index 7c6f00c70f..70aee3ff04 100644
-++--- a/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/find-artifacts/debuggee.ml
-++@@ -1,27 +1,25 @@
-++ (* TEST
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** script
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** script
-++ script = "mkdir out"
-++-****** ocamlc.byte
-+++***** ocamlc.byte
-++ flags = "-g -c"
-++ all_modules = "${test_source_directory}/in/blah.ml"
-++ program = "out/blah.cmo"
-++-******* ocamlc.byte
-+++****** ocamlc.byte
-++ program = "out/foo.cmo"
-++ flags = "-I out -g -c"
-++ all_modules = "${test_source_directory}/in/foo.ml"
-++-******** ocamlc.byte
-+++******* ocamlc.byte
-++ all_modules = "out/blah.cmo out/foo.cmo"
-++ flags = " -g "
-++ program = "debuggee.exe"
-++-********* check-ocamlc.byte-output
-++-********** ocamldebug
-++-*********** check-program-output
-+++******** check-ocamlc.byte-output
-+++********* ocamldebug
-+++********** check-program-output
-++ *)
-++ 
-++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool-debugger/module_named_main/main.ml b/testsuite/tests/tool-debugger/module_named_main/main.ml
-++index e31c16391e..25eebe7c02 100644
-++--- a/testsuite/tests/tool-debugger/module_named_main/main.ml
-+++++ b/testsuite/tests/tool-debugger/module_named_main/main.ml
-++@@ -1,15 +1,13 @@
-++ (* TEST
-++ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-++-****** check-ocamlc.byte-output
-++-******* ocamldebug
-++-******** check-program-output
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-+++***** check-ocamlc.byte-output
-+++****** ocamldebug
-+++******* check-program-output
-++ *)
-++ 
-++ module Submodule = struct
-++diff --git a/testsuite/tests/tool-debugger/no_debug_event/noev.ml b/testsuite/tests/tool-debugger/no_debug_event/noev.ml
-++index f06c14a117..4eb334ea84 100644
-++--- a/testsuite/tests/tool-debugger/no_debug_event/noev.ml
-+++++ b/testsuite/tests/tool-debugger/no_debug_event/noev.ml
-++@@ -1,30 +1,28 @@
-++ (* TEST
-++ readonly_files = "a.ml b.ml"
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++-* skip
-++-reason = "ocamldebug is broken (#34)"
-++-** debugger
-++-*** shared-libraries
-++-**** setup-ocamlc.byte-build-env
-++-***** ocamlc.byte
-+++* debugger
-+++** shared-libraries
-+++*** setup-ocamlc.byte-build-env
-+++**** ocamlc.byte
-++ module = "a.ml"
-++ flags = "-g -for-pack foo"
-++-****** ocamlc.byte
-+++***** ocamlc.byte
-++ module = ""
-++ all_modules = "a.cmo"
-++ program = "foo.cmo"
-++ flags = "-g -pack"
-++-******* ocamlc.byte
-+++****** ocamlc.byte
-++ module = "b.ml"
-++ flags = " -g "
-++-******** ocamlc.byte
-+++******* ocamlc.byte
-++ module = ""
-++ flags = " -g "
-++ all_modules = "foo.cmo b.cmo"
-++ program = "${test_build_directory}/noev.exe"
-++-********* check-ocamlc.byte-output
-++-********** ocamldebug
-++-*********** check-program-output
-+++******** check-ocamlc.byte-output
-+++********* ocamldebug
-+++********** check-program-output
-++ *)
-++ 
-++ (* This file only contains the specification of how to run the test *)
-++diff --git a/testsuite/tests/tool-debugger/printer/debuggee.ml b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++index b2d6e6e7c5..f22a4bd50f 100644
-++--- a/testsuite/tests/tool-debugger/printer/debuggee.ml
-+++++ b/testsuite/tests/tool-debugger/printer/debuggee.ml
-++@@ -3,17 +3,15 @@ flags += " -g "
-++ ocamldebug_script = "${test_source_directory}/input_script"
-++ readonly_files = "printer.ml"
-++ include debugger
-++-* skip
-++-reason = "ocamldebug is broken 
+++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
+++index fa2d2efc43..752a7eeabf 10064
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
