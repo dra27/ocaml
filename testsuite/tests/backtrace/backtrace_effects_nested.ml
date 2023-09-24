@@ -1,21 +1,15 @@
 (* TEST
-<<<<<<< HEAD
-   flags = "-g"
-   * skip
-   reason = "OCaml 5 only"
-||||||| parent of 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
-   flags = "-g"
-=======
 
 flags = "-g"
-* bytecode
-* no-flambda
-** native
-* flambda
+* skip
+reason = "OCaml 5 only"
+** bytecode
+** no-flambda
+*** native
+** flambda
 reference = "${test_source_directory}/backtrace_effects_nested.flambda.reference"
-** native
+*** native
 
->>>>>>> 118f54bd63 (Merge pull request PR#10909 from lthls/multicore-flambda-testsuite-fixes)
 *)
 
 open Effect
