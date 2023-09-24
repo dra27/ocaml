@@ -15328,25 +15328,26 @@ system=unknown
 has_native_backend=no
 case $host in #(
   i[3456]86-*-linux*) :
-    has_native_backend=yes; arch=i386; system=linux_elf ;; #(
+    arch=i386; system=linux_elf ;; #(
   i[3456]86-*-*bsd*) :
-    has_native_backend=yes; arch=i386; system=bsd_elf ;; #(
+    arch=i386; system=bsd_elf ;; #(
   i[3456]86-*-haiku*) :
-    has_native_backend=yes; arch=i386; system=beos ;; #(
+    arch=i386; system=beos ;; #(
   i[3456]86-*-cygwin) :
-    has_native_backend=yes; arch=i386; system=cygwin ;; #(
+    arch=i386; system=cygwin ;; #(
   i[3456]86-*-gnu*) :
-    has_native_backend=yes; arch=i386; system=gnu ;; #(
+    arch=i386; system=gnu ;; #(
   i[3456]86-*-mingw32) :
-    has_native_backend=yes; arch=i386; system=mingw ;; #(
+    arch=i386; system=mingw ;; #(
   i686-pc-windows) :
     arch=i386; system=win32 ;; #(
   x86_64-pc-windows) :
-    arch=amd64; system=win64 ;; #(
+    has_native_backend=yes; arch=amd64; system=win64 ;; #(
   powerpc64le*-*-linux*) :
     has_native_backend=yes; arch=power; model=ppc64le; system=elf ;; #(
   powerpc*-*-linux*) :
-    has_native_backend=yes; arch=power; if $arch64
+    has_native_backend=yes; arch=power
+    if $arch64
 then :
   model=ppc64
 else $as_nop
@@ -15356,37 +15357,37 @@ fi; system=elf ;; #(
     has_native_backend=yes; arch=s390x; model=z10; system=elf ;; #(
   # expected to match "gnueabihf" as well as "musleabihf"
   armv6*-*-linux-*eabihf) :
-    has_native_backend=yes; arch=arm; model=armv6; system=linux_eabihf ;; #(
+    arch=arm; model=armv6; system=linux_eabihf ;; #(
   armv7*-*-linux-*eabihf) :
-    has_native_backend=yes; arch=arm; model=armv7; system=linux_eabihf ;; #(
+    arch=arm; model=armv7; system=linux_eabihf ;; #(
   armv8*-*-linux-*eabihf) :
-    has_native_backend=yes; arch=arm; model=armv8; system=linux_eabihf ;; #(
+    arch=arm; model=armv8; system=linux_eabihf ;; #(
   armv8*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; model=armv8; system=linux_eabi ;; #(
+    arch=arm; model=armv8; system=linux_eabi ;; #(
   armv7*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; model=armv7; system=linux_eabi ;; #(
+    arch=arm; model=armv7; system=linux_eabi ;; #(
   armv6t2*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; model=armv6t2; system=linux_eabi ;; #(
+    arch=arm; model=armv6t2; system=linux_eabi ;; #(
   armv6*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; model=armv6; system=linux_eabi ;; #(
+    arch=arm; model=armv6; system=linux_eabi ;; #(
   armv6*-*-freebsd*) :
-    has_native_backend=yes; arch=arm; model=armv6; system=freebsd ;; #(
+    arch=arm; model=armv6; system=freebsd ;; #(
   earmv6*-*-netbsd*) :
-    has_native_backend=yes; arch=arm; model=armv6; system=netbsd ;; #(
+    arch=arm; model=armv6; system=netbsd ;; #(
   earmv7*-*-netbsd*) :
-    has_native_backend=yes; arch=arm; model=armv7; system=netbsd ;; #(
+    arch=arm; model=armv7; system=netbsd ;; #(
   armv5te*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; model=armv5te; system=linux_eabi ;; #(
+    arch=arm; model=armv5te; system=linux_eabi ;; #(
   armv5*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; model=armv5; system=linux_eabi ;; #(
+    arch=arm; model=armv5; system=linux_eabi ;; #(
   arm*-*-linux-*eabihf) :
-    has_native_backend=yes; arch=arm; system=linux_eabihf ;; #(
+    arch=arm; system=linux_eabihf ;; #(
   arm*-*-linux-*eabi) :
-    has_native_backend=yes; arch=arm; system=linux_eabi ;; #(
+    arch=arm; system=linux_eabi ;; #(
   arm*-*-openbsd*) :
-    has_native_backend=yes; arch=arm; system=bsd ;; #(
+    arch=arm; system=bsd ;; #(
   zaurus*-*-openbsd*) :
-    has_native_backend=yes; arch=arm; system=bsd ;; #(
+    arch=arm; system=bsd ;; #(
   x86_64-*-linux*) :
     has_native_backend=yes; arch=amd64; system=linux ;; #(
   x86_64-*-gnu*) :
