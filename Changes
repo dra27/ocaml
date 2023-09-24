@@ -520,20 +520,12 @@ Working version
 - #11879: Bugfix for Ctype.nondep_type
   (Stephen Dolan, review by Gabriel Scherer)
 
-<<<<<<< HEAD
 - #12264, #12289: Fix compact_allocate to avoid a pathological case
   that causes very slow compaction.
   (Damien Doligez, report by Arseniy Alekseyev, review by Sadiq Jaffer)
 
-OCaml 5.0
----------
-||||||| parent of 9c628f3e22 (Changes: correct entry for 5.0.0 release + date)
-OCaml 5.0
----------
-=======
 OCaml 5.0.0 (15 December 2022)
 ------------------------------
->>>>>>> 9c628f3e22 (Changes: correct entry for 5.0.0 release + date)
 
 - #10831: Multicore OCaml
   (Enguerrand Decorne, Stephen Dolan, Tom Kelly, Sadiq Jaffer,
