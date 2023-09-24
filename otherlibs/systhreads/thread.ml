@@ -18,10 +18,6 @@
 type t
 
 external thread_initialize : unit -> unit = "caml_thread_initialize"
-(*
-external thread_initialize_domain : unit -> unit =
-            "caml_thread_initialize_domain"
-*)
 external thread_cleanup : unit -> unit = "caml_thread_cleanup"
 external thread_new : (unit -> unit) -> t = "caml_thread_new"
 external thread_uncaught_exception : exn -> unit =
@@ -31,6 +27,7 @@ external yield : unit -> unit = "caml_thread_yield"
 external self : unit -> t = "caml_thread_self" [@@noalloc]
 external id : t -> int = "caml_thread_id" [@@noalloc]
 external join : t -> unit = "caml_thread_join"
+external exit_stub : unit -> unit = "caml_thread_exit"
 
 (* For new, make sure the function passed to thread_new never
    raises an exception. *)
@@ -73,7 +70,13 @@ let create fn arg =
           flush stderr)
 
 let exit () =
-  raise Exit
+  ignore (Sys.opaque_identity (check_memprof_cb ()));
+  exit_stub ()
+
+(* Thread.kill is currently not implemented due to problems with
+   cleanup handlers on several platforms *)
+
+let kill th = invalid_arg "Thread.kill: not implemented"
 
 (* Preemption *)
 
@@ -88,9 +91,6 @@ let preempt_signal =
 
 let () =
   Sys.set_signal preempt_signal (Sys.Signal_handle preempt);
-(*
-  Domain.at_startup thread_initialize_domain;
-*)
   thread_initialize ();
   Callback.register "Thread.at_shutdown" (fun () ->
     thread_cleanup();
@@ -104,6 +104,9 @@ let () =
 (* Wait functions *)
 
 let delay = Unix.sleepf
+
+let wait_read fd = ()
+let wait_write fd = ()
 
 let wait_timed_read fd d =
   match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true

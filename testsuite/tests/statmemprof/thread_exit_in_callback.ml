@@ -10,7 +10,7 @@ let _ =
   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
                 { null_tracker with alloc_minor = fun _ ->
                       if Thread.id (Thread.self ()) <> main_thread then
-                        Thread.exit ();
+                        raise Thread.Exit;
                       None });
   let t = Thread.create (fun () ->
       ignore (Sys.opaque_identity (ref 1));
@@ -18,6 +18,8 @@ let _ =
   in
   Thread.join t;
   Gc.Memprof.stop ()
+
+[@@@ocaml.alert "-deprecated"]
 
 let _ =
   Gc.Memprof.(start ~callstack_size:10 ~sampling_rate:1.
