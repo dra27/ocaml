@@ -1,3 +1,338 @@
+diff --git a/ocamltest/Makefile b/ocamltest/Makefile
+index 7dbc7d08dc..53ebb005ca 100644
+--- a/ocamltest/Makefile
++++ b/ocamltest/Makefile
+@@ -272,6 +272,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
+ 	    $(call SUBST,CCOMPTYPE) \
+ 	    $(call SUBST,WINDOWS_UNICODE) \
+ 	    $(call SUBST,FUNCTION_SECTIONS) \
++	    $(call SUBST,NAKED_POINTERS) \
+ 	    $< > $@
+ 
+ # Manual
+diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
+index 02a437db3a..0f2974d12a 100644
+--- a/ocamltest/builtin_actions.ml
++++ b/ocamltest/builtin_actions.ml
+@@ -181,6 +181,12 @@ let function_sections = make
+      "Target supports function sections"
+      "Target does not support function sections")
+ 
++let naked_pointers = make
++  "naked_pointers"
++  (Actions_helpers.pass_or_skip (Ocamltest_config.naked_pointers)
++     "Runtime system supports naked pointers"
++     "Runtime system does not support naked pointers")
++
+ let has_symlink = make
+   "has_symlink"
+   (Actions_helpers.pass_or_skip (Unix.has_symlink () )
+@@ -302,6 +308,7 @@ let _ =
+     arch_i386;
+     arch_power;
+     function_sections;
++    naked_pointers;
+     file_exists;
+     copy;
+   ]
+diff --git a/ocamltest/ocamltest_config.ml.in b/ocamltest/ocamltest_config.ml.in
+index 785235ab7e..2f03f01989 100644
+--- a/ocamltest/ocamltest_config.ml.in
++++ b/ocamltest/ocamltest_config.ml.in
+@@ -84,3 +84,5 @@ let windows_unicode = %%WINDOWS_UNICODE%% != 0
+ let function_sections = %%FUNCTION_SECTIONS%%
+ 
+ let instrumented_runtime = %%INSTRUMENTED_RUNTIME%%
++
++let naked_pointers = %%NAKED_POINTERS%%
+diff --git a/ocamltest/ocamltest_config.mli b/ocamltest/ocamltest_config.mli
+index ab01b62f34..ce9e084bdf 100644
+--- a/ocamltest/ocamltest_config.mli
++++ b/ocamltest/ocamltest_config.mli
+@@ -118,3 +118,6 @@ val function_sections : bool
+ 
+ val instrumented_runtime : bool
+ (** Whether the instrumented runtime is available *)
++
++val naked_pointers : bool
++(** Whether the runtime system supports naked pointers outside the heap *)
+diff --git a/testsuite/tests/asmcomp/is_in_static_data.c b/testsuite/tests/asmcomp/is_in_static_data.c
+new file mode 100644
+index 0000000000..ccf0582c0a
+--- /dev/null
++++ b/testsuite/tests/asmcomp/is_in_static_data.c
+@@ -0,0 +1,5 @@
++#include "caml/address_class.h"
++
++value caml_is_in_static_data(value v) {
++  return(Val_bool(Is_in_static_data(v)));
++}
+diff --git a/testsuite/tests/asmcomp/is_static.ml b/testsuite/tests/asmcomp/is_static.ml
+new file mode 100644
+index 0000000000..b8a3bef006
+--- /dev/null
++++ b/testsuite/tests/asmcomp/is_static.ml
+@@ -0,0 +1,40 @@
++(* TEST
++   modules = "is_in_static_data.c"
++   * naked_pointers
++   ** native
++*)
++
++(* Data that should be statically allocated by the compiler (all versions) *)
++
++external is_in_static_data : 'a -> bool = "caml_is_in_static_data"
++
++(* Basic constant blocks should be static *)
++let block1 = (1,2)
++let () = assert(is_in_static_data block1)
++
++(* as pattern shouldn't prevent it *)
++let (a, b) as block2 = (1,2)
++let () = assert(is_in_static_data block2)
++
++(* Also in functions *)
++let f () =
++  let block = (1,2) in
++  assert(is_in_static_data block)
++
++let () = (f [@inlined never]) ()
++
++(* Closed functions should be static *)
++let closed_function x = x + 1 (* + is a primitive, it cannot be in the closure*)
++let () = assert(is_in_static_data closed_function)
++
++(* And functions using closed functions *)
++let almost_closed_function x =
++  (closed_function [@inlined never]) x
++let () = assert(is_in_static_data almost_closed_function)
++
++(* Recursive constant functions should be static *)
++let rec f1 a = g1 a
++and g1 a = f1 a
++let () =
++  assert(is_in_static_data f1);
++  assert(is_in_static_data g1)
+diff --git a/testsuite/tests/asmcomp/is_static_flambda.ml b/testsuite/tests/asmcomp/is_static_flambda.ml
+new file mode 100644
+index 0000000000..63e53cfc42
+--- /dev/null
++++ b/testsuite/tests/asmcomp/is_static_flambda.ml
+@@ -0,0 +1,207 @@
++(* TEST
++   modules = "is_in_static_data.c is_static_flambda_dep.ml"
++   * flambda
++   ** naked_pointers
++   *** native
++*)
++
++(* Data that should be statically allocated by the compiler (flambda only) *)
++
++external is_in_static_data : 'a -> bool = "caml_is_in_static_data"
++
++(* Also after inlining *)
++let g x =
++  let block = (1,x) in
++  assert(is_in_static_data block)
++
++let () = (g [@inlined always]) 2
++
++(* Toplevel immutable blocks should be static *)
++let block3 = (Sys.opaque_identity 1, Sys.opaque_identity 2)
++let () = assert(is_in_static_data block3)
++
++(* Not being bound shouldn't prevent it *)
++let () =
++  assert(is_in_static_data (Sys.opaque_identity 1, Sys.opaque_identity 2))
++
++(* Only with rounds >= 2 currently !
++(* Also after inlining *)
++let h x =
++  let block = (Sys.opaque_identity 1,x) in
++  assert(is_in_static_data block)
++
++let () = (h [@inlined always]) (Sys.opaque_identity 2)
++*)
++
++(* Recursive constant values should be static *)
++let rec a = 1 :: b
++and b = 2 :: a
++let () =
++  assert(is_in_static_data a);
++  assert(is_in_static_data b)
++
++(* And a mix *)
++type e = E : 'a -> e
++
++let rec f1 a = E (g1 a, l1)
++and g1 a = E (f1 a, l2)
++and l1 = E (f1, l2)
++and l2 = E (g1, l1)
++
++let () =
++  assert(is_in_static_data f1);
++  assert(is_in_static_data g1);
++  assert(is_in_static_data l1);
++  assert(is_in_static_data l2)
++
++(* Also in functions *)
++let i () =
++  let rec f1 a = E (g1 a, l1)
++  and g1 a = E (f1 a, l2)
++  and l1 = E (f1, l2)
++  and l2 = E (g1, l1) in
++
++  assert(is_in_static_data f1);
++  assert(is_in_static_data g1);
++  assert(is_in_static_data l1);
++  assert(is_in_static_data l2)
++
++let () = (i [@inlined never]) ()
++
++module type P = module type of Stdlib
++(* Top-level modules should be static *)
++let () = assert(is_in_static_data (module Stdlib:P))
++
++(* Not constant let rec to test extraction to initialize_symbol *)
++let r = ref 0
++let rec a = (incr r; !r) :: b
++and b = (incr r; !r) :: a
++
++let next =
++  let r = ref 0 in
++  fun () -> incr r; !r
++
++let () =
++  assert(is_in_static_data next)
++
++(* Exceptions without arguments should be static *)
++exception No_argument
++let () = assert(is_in_static_data No_argument)
++
++(* And also with constant arguments *)
++exception Some_argument of string
++let () = assert(is_in_static_data (Some_argument "some string"))
++
++(* Even when exposed by inlining *)
++let () =
++  let exn =
++    try (failwith [@inlined always]) "some other string" with exn -> exn
++  in
++  assert(is_in_static_data exn)
++
++(* Verify that approximation intersection correctly loads exported
++   approximations.
++
++   Is_static_flambda_dep.pair is a pair with 1 as first element. The
++   intersection of approximations should return a block with
++   approximation: [tag 0: [tag 0: Int 1, Unknown], Unknown] *)
++let f x =
++  let pair =
++    if Sys.opaque_identity x then
++      (1, 2), 3
++    else
++      Is_static_flambda_dep.pair, 4
++  in
++  let n = fst (fst pair) in
++  let res = n, n in
++  assert(is_in_static_data res)
++  [@@inline never]
++
++let () =
++  f true;
++  f false
++
++(* Verify that physical equality/inequality is correctly propagated *)
++
++(* In these tests, tuple can be statically allocated only if it is a
++   known constant since the function is never inlined (hence this
++   code is never at toplevel) *)
++
++let () =
++  let f () =
++    let v = (1, 2) in
++    (* eq is supposed to be considered always true since v is a
++       constant, hence aliased to a symbol.
++       It is not yet optimized away if it is not constant *)
++    let eq = v == v in
++    let n = if eq then 1 else 2 in
++    let tuple = (n,n) in
++    assert(is_in_static_data tuple)
++  in
++  (f [@inlined never]) ()
++
++let () =
++  let f () =
++    let v = (1, 2) in
++    (* same with inequality *)
++    let eq = v != v in
++    let n = if eq then 1 else 2 in
++    let tuple = (n,n) in
++    assert(is_in_static_data tuple)
++  in
++  (f [@inlined never]) ()
++
++let () =
++  let f x =
++    let v1 = Some x in
++    let v2 = None in
++    let eq = v1 == v2 in
++    (* The values are structurally different, so must be physically
++       different *)
++    let n = if eq then 1 else 2 in
++    let tuple = (n,n) in
++    assert(is_in_static_data tuple)
++  in
++  (f [@inlined never]) ()
++
++let () =
++  let f x =
++    let v1 = Some x in
++    let v2 = None in
++    let eq = v1 != v2 in
++    (* same with inequality *)
++    let n = if eq then 1 else 2 in
++    let tuple = (n,n) in
++    assert(is_in_static_data tuple)
++  in
++  (f [@inlined never]) ()
++
++let () =
++  let f x =
++    let v1 = (1, 2) in
++    let v2 = (3, 2) in
++    let eq = v1 == v2 in
++    (* difference is deeper *)
++    let n = if eq then 1 else 2 in
++    let tuple = (n,n) in
++    assert(is_in_static_data tuple)
++  in
++  (f [@inlined never]) ()
++
++module Int = struct
++  type t = int
++  let compare (a:int) b = compare a b
++end
++module IntMap = Map.Make (Int)
++
++let () =
++  let f () =
++    let a = IntMap.empty in
++    let b = (IntMap.add [@inlined]) 1 (Some 1) a in
++    assert(is_in_static_data b);
++    let c = (IntMap.add [@inlined]) 1 (Some 2) b in
++    assert(is_in_static_data c);
++    let d = (IntMap.add [@inlined]) 1 (Some 2) c in
++    assert(is_in_static_data d);
++  in
++  (f [@inlined never]) ()
+diff --git a/testsuite/tests/asmcomp/is_static_flambda_dep.ml b/testsuite/tests/asmcomp/is_static_flambda_dep.ml
+new file mode 100644
+index 0000000000..3a50f7cad4
+--- /dev/null
++++ b/testsuite/tests/asmcomp/is_static_flambda_dep.ml
+@@ -0,0 +1 @@
++let pair = 1, 12
 diff --git a/testsuite/tests/asmcomp/polling.c b/testsuite/tests/asmcomp/polling.c
 index 93620c9bcc..4f6bf1dcab 100644
 --- a/testsuite/tests/asmcomp/polling.c
@@ -14,6 +349,88 @@ index 93620c9bcc..4f6bf1dcab 100644
  
    return Val_unit;
  }
+diff --git a/testsuite/tests/asmcomp/simple_float_const.ml b/testsuite/tests/asmcomp/simple_float_const.ml
+new file mode 100644
+index 0000000000..1aca414f7e
+--- /dev/null
++++ b/testsuite/tests/asmcomp/simple_float_const.ml
+@@ -0,0 +1 @@
++let f = 3.14
+diff --git a/testsuite/tests/asmcomp/simple_float_const_opaque.ml b/testsuite/tests/asmcomp/simple_float_const_opaque.ml
+new file mode 100644
+index 0000000000..1aca414f7e
+--- /dev/null
++++ b/testsuite/tests/asmcomp/simple_float_const_opaque.ml
+@@ -0,0 +1 @@
++let f = 3.14
+diff --git a/testsuite/tests/asmcomp/static_float_array_flambda.ml b/testsuite/tests/asmcomp/static_float_array_flambda.ml
+new file mode 100644
+index 0000000000..824a12ca89
+--- /dev/null
++++ b/testsuite/tests/asmcomp/static_float_array_flambda.ml
+@@ -0,0 +1,26 @@
++(* TEST
++   modules = "is_in_static_data.c simple_float_const.ml"
++   * flambda
++   ** flat-float-array
++   *** naked_pointers
++   **** native
++*)
++
++external is_in_static_data : 'a -> bool = "caml_is_in_static_data"
++
++let a = [|0.; 1.|]
++let f = 1.23
++let b = [|0.; f; f|]
++let g = Sys.opaque_identity 1.23
++let c = [|0.; g|]
++let d = [|0.; Simple_float_const.f|]
++
++let () = assert(is_in_static_data a)
++let () = assert(is_in_static_data f)
++let () = assert(is_in_static_data b)
++
++let () = assert(not (is_in_static_data c))
++(* In fact this one could be static by preallocating the array then
++   patching it when g is available *)
++
++let () = assert(is_in_static_data d)
+diff --git a/testsuite/tests/asmcomp/static_float_array_flambda_opaque.ml b/testsuite/tests/asmcomp/static_float_array_flambda_opaque.ml
+new file mode 100644
+index 0000000000..56ea9e1793
+--- /dev/null
++++ b/testsuite/tests/asmcomp/static_float_array_flambda_opaque.ml
+@@ -0,0 +1,30 @@
++(* TEST
++   modules = "is_in_static_data.c simple_float_const_opaque.ml"
++   flags = "-opaque"
++   * flambda
++   ** flat-float-array
++   *** naked_pointers
++   **** native
++*)
++
++external is_in_static_data : 'a -> bool = "caml_is_in_static_data"
++
++let a = [|0.; 1.|]
++let f = 1.23
++let b = [|0.; f; f|]
++let g = Sys.opaque_identity 1.23
++let c = [|0.; g|]
++let d = [|0.; Simple_float_const_opaque.f|]
++
++let () = assert(is_in_static_data a)
++let () = assert(is_in_static_data f)
++let () = assert(is_in_static_data b)
++
++let () = assert(not (is_in_static_data c))
++(* In fact this one could be static by preallocating the array then
++   patching it when g is available *)
++
++let () = assert(not (is_in_static_data d))
++(* The dependency Simple_float_const_opaque is built with opaque,
++   hence the value of Simple_float_const_opaque.f cannot be known
++   preventing the static allocation of d *)
 diff --git a/testsuite/tests/backtrace/backtrace2.reference b/testsuite/tests/backtrace/backtrace2.reference
 index 20ef708fe0..54c5ab7570 100644
 --- a/testsuite/tests/backtrace/backtrace2.reference
