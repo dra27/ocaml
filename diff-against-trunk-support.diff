@@ -1031,6 +1031,18 @@ index d3f3f1409e..9a4bfdf378 100644
 +   with (13 p/352) p/352))
  - : bool -> bool tuplist -> bool * bool tuplist = <fun>
  |}]
+diff --git a/testsuite/tests/c-api/aligned_alloc.ml b/testsuite/tests/c-api/aligned_alloc.ml
+index 24d65c33f7..d4abe520a4 100644
+--- a/testsuite/tests/c-api/aligned_alloc.ml
++++ b/testsuite/tests/c-api/aligned_alloc.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+   modules = "aligned_alloc_stubs.c";
++  reason = "OCaml 5 only";
++  skip;
+ *)
+ 
+ external is_aligned : 'a Atomic.t -> bool = "caml_atomic_is_aligned"
 diff --git a/testsuite/tests/c-api/alloc_async.ml b/testsuite/tests/c-api/alloc_async.ml
 index abbf729bd6..5dbd63af46 100644
 --- a/testsuite/tests/c-api/alloc_async.ml

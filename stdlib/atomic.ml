@@ -34,6 +34,7 @@ external ignore : 'a -> unit = "%ignore"
 type 'a t = {mutable v: 'a}
 
 let make v = {v}
+let make_contended = make
 let get r = r.v
 let set r v = r.v <- v
 

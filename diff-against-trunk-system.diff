@@ -22926,7 +22926,7 @@ index 8e53530ea4..4239d89348 100644
  STDLIB_PREFIXED_MODULES = \
    $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))
 diff --git a/stdlib/atomic.ml b/stdlib/atomic.ml
-index f4fc737d4e..2c2d756483 100644
+index f4fc737d4e..59804a556f 100644
 --- a/stdlib/atomic.ml
 +++ b/stdlib/atomic.ml
 @@ -12,6 +12,7 @@
@@ -22937,7 +22937,7 @@ index f4fc737d4e..2c2d756483 100644
  type !'a t
  
  external make : 'a -> 'a t = "%makemutable"
-@@ -20,8 +21,53 @@ external get : 'a t -> 'a = "%atomic_load"
+@@ -20,8 +21,54 @@ external get : 'a t -> 'a = "%atomic_load"
  external exchange : 'a t -> 'a -> 'a = "%atomic_exchange"
  external compare_and_set : 'a t -> 'a -> 'a -> bool = "%atomic_cas"
  external fetch_and_add : int t -> int -> int = "%atomic_fetch_add"
@@ -22954,6 +22954,7 @@ index f4fc737d4e..2c2d756483 100644
 +type 'a t = {mutable v: 'a}
 +
 +let make v = {v}
++let make_contended = make
 +let get r = r.v
 +let set r v = r.v <- v
 +

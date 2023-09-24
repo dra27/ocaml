@@ -1,5 +1,7 @@
 (* TEST
   modules = "aligned_alloc_stubs.c";
+  reason = "OCaml 5 only";
+  skip;
 *)
 
 external is_aligned : 'a Atomic.t -> bool = "caml_atomic_is_aligned"
