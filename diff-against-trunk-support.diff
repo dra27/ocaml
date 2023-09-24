@@ -1193,6 +1193,17 @@ index 228e098d2e..c00b55c6ff 100644
  *)
  
  (* https://github.com/ocaml-multicore/ocaml-multicore/issues/479 *)
+diff --git a/testsuite/tests/effects/marshal.ml b/testsuite/tests/effects/marshal.ml
+index 89eee89457..02b9d4e4af 100644
+--- a/testsuite/tests/effects/marshal.ml
++++ b/testsuite/tests/effects/marshal.ml
+@@ -1,4 +1,6 @@
+ (* TEST
++* skip
++reason = "OCaml 5 only"
+  *)
+ 
+ open Effect
 diff --git a/testsuite/tests/effects/overflow.ml b/testsuite/tests/effects/overflow.ml
 index a187e9e10d..c12503863e 100644
 --- a/testsuite/tests/effects/overflow.ml
