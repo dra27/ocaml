@@ -58,15 +58,7 @@ external set_field : t -> int -> t -> unit = "%obj_set_field"
 external compare_and_swap_field : t -> int -> t -> t -> bool
   = "caml_obj_compare_and_swap"
 external is_shared : t -> bool = "caml_obj_is_shared"
-<<<<<<< HEAD
 *)
-external set_tag : t -> int -> unit = "caml_obj_set_tag"
-  [@@ocaml.deprecated "Use with_tag instead."]
-||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
-external set_tag : t -> int -> unit = "caml_obj_set_tag"
-  [@@ocaml.deprecated "Use with_tag instead."]
-=======
->>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
 
 val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
 val [@inline always] set_double_field : t -> int -> float -> unit

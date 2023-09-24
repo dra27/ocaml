@@ -22,13 +22,7 @@ end = struct end
 
 [%%expect{|
 {
-<<<<<<< HEAD
- ("Make", module) -> Abs<.3>(I/279, {
-||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
- ("Make", module) -> Abs<.3>(I/284, {
-=======
- ("Make", module) -> Abs<.3>(I/282, {
->>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
+ ("Make", module) -> Abs<.3>(I/277, {
                                      });
  }
 module Make : functor (I : sig end) -> sig end

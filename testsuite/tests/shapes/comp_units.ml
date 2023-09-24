@@ -25,13 +25,7 @@ module Mproj = Unit
 module F (X : sig type t end) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- ("F", module) -> Abs<.4>(X/277, X/277<.3>);
-||||||| parent of 749037f069 (Remove deprecated functions (PR#10867))
- ("F", module) -> Abs<.4>(X/282, X/282<.3>);
-=======
- ("F", module) -> Abs<.4>(X/280, X/280<.3>);
->>>>>>> 749037f069 (Remove deprecated functions (PR#10867))
+ ("F", module) -> Abs<.4>(X/275, X/275<.3>);
  }
 module F : functor (X : sig type t end) -> sig type t = X.t end
 |}]
