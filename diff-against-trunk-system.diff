@@ -3202,10 +3202,10 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 176087a161..c78e1b8d02 100755
+index 176087a161..9df710a879 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index b33c5f977b..82bf78cdf8 100644
+index b33c5f977b..bcaae113c3 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3341,7 +3341,22 @@ index b33c5f977b..82bf78cdf8 100644
  )
  
  native_cflags=''
-@@ -2009,11 +2023,23 @@ AS_CASE([$enable_debug_runtime],
+@@ -1484,10 +1498,12 @@ AS_CASE([$host],
+   [*-*-windows],
+     [has_monotonic_clock=true],
+   [*-apple-darwin*], [
+-    AC_CHECK_FUNCS([clock_gettime_nsec_np],
++    AC_CHECK_FUNCS([mach_timebase_info mach_absolute_time],
++dnl    AC_CHECK_FUNCS([clock_gettime_nsec_np],
+       [
+         has_monotonic_clock=true
+-        AC_DEFINE([HAS_CLOCK_GETTIME_NSEC_NP])
++        AC_DEFINE([HAS_MACH_ABSOLUTE_TIME])
++dnl        AC_DEFINE([HAS_CLOCK_GETTIME_NSEC_NP])
+       ],
+       [has_monotonic_clock=false])],
+   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+@@ -2009,11 +2025,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
  
@@ -3366,7 +3381,7 @@ index b33c5f977b..82bf78cdf8 100644
    [AX_PTHREAD(
      [common_cflags="$common_cflags $PTHREAD_CFLAGS"
      saved_CFLAGS="$CFLAGS"
-@@ -2064,6 +2090,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
+@@ -2064,6 +2092,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
    [AC_MSG_NOTICE([not using frame pointers])
    frame_pointers=false])
  
@@ -3397,7 +3412,7 @@ index b33c5f977b..82bf78cdf8 100644
  ## Check for mmap support for huge pages and contiguous heap
  OCAML_MMAP_SUPPORTS_HUGE_PAGES
  
-@@ -2210,8 +2260,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
+@@ -2210,8 +2262,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
  
  AS_CASE([$host],
    [*-*-mingw32*],
@@ -10104,10 +10119,10 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..4c78d73f90
+index 0000000000..39d20009b0
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10045 @@
+@@ -0,0 +1,10049 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..33bd9d1eb2
@@ -13312,10 +13327,10 @@ index 0000000000..4c78d73f90
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 176087a161..c78e1b8d02 100755
++index 176087a161..9df710a879 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index b33c5f977b..82bf78cdf8 100644
++index b33c5f977b..bcaae113c3 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13451,7 +13466,22 @@ index 0000000000..4c78d73f90
 + )
 + 
 + native_cflags=''
-+@@ -2009,11 +2023,23 @@ AS_CASE([$enable_debug_runtime],
++@@ -1484,10 +1498,12 @@ AS_CASE([$host],
++   [*-*-windows],
++     [has_monotonic_clock=true],
++   [*-apple-darwin*], [
++-    AC_CHECK_FUNCS([clock_gettime_nsec_np],
+++    AC_CHECK_FUNCS([mach_timebase_info mach_absolute_time],
+++dnl    AC_CHECK_FUNCS([clock_gettime_nsec_np],
++       [
++         has_monotonic_clock=true
++-        AC_DEFINE([HAS_CLOCK_GETTIME_NSEC_NP])
+++        AC_DEFINE([HAS_MACH_ABSOLUTE_TIME])
+++dnl        AC_DEFINE([HAS_CLOCK_GETTIME_NSEC_NP])
++       ],
++       [has_monotonic_clock=false])],
++   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
++@@ -2009,11 +2025,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
 + 
@@ -13476,7 +13506,7 @@ index 0000000000..4c78d73f90
 +   [AX_PTHREAD(
 +     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
 +     saved_CFLAGS="$CFLAGS"
-+@@ -2064,6 +2090,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
++@@ -2064,6 +2092,30 @@ AS_IF([test x"$enable_frame_pointers" = "xyes"],
 +   [AC_MSG_NOTICE([not using frame pointers])
 +   frame_pointers=false])
 + 
@@ -13507,7 +13537,7 @@ index 0000000000..4c78d73f90
 + ## Check for mmap support for huge pages and contiguous heap
 + OCAML_MMAP_SUPPORTS_HUGE_PAGES
 + 
-+@@ -2210,8 +2260,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
++@@ -2210,8 +2262,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 + 
 + AS_CASE([$host],
 +   [*-*-mingw32*],
@@ -20141,18 +20171,7 @@ index 0000000000..4c78d73f90
 +++            dep='--enable-dependency-generation'
 ++         ;;
 ++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -ver
+++             b
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
