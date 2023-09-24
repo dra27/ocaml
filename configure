@@ -14552,10 +14552,9 @@ if $natdynlink; then :
 else
   cmxs="cmx"
 fi
-if $natdynlink
-then :
+if $natdynlink; then :
   natdynlink_archive="dynlink.cmxa"
-else $as_nop
+else
   natdynlink_archive=""
 fi
 
