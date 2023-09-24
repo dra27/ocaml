@@ -611,10 +611,10 @@ index fe6a84cd24..4a4a069aa3 100644
  
    D.data ();
 diff --git a/boot/ocamlc b/boot/ocamlc
-index 3085d4d863..804880e707 100755
+index 3085d4d863..3634dfd1f5 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index ff3bce2d1f..9c4fe66628 100755
+index ff3bce2d1f..89ef04e943 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 index 2c66a918a3..0a59107ea8 100644
@@ -6223,7 +6223,7 @@ index 0000000000..b163a4df3c
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..6cafbc92d9
+index 0000000000..12c570a2c2
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,6142 @@
@@ -6840,10 +6840,10 @@ index 0000000000..6cafbc92d9
 + 
 +   D.data ();
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index 3085d4d863..804880e707 100755
++index 3085d4d863..3634dfd1f5 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index ff3bce2d1f..9c4fe66628 100755
++index ff3bce2d1f..89ef04e943 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/ocaml_version.m4 b/build-aux/ocaml_version.m4
 +index 2c66a918a3..0a59107ea8 100644
