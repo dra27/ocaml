@@ -24,29 +24,11 @@ end
 Line 3, characters 2-36:
 3 |   include Comparable with type t = t
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-<<<<<<< HEAD
-Error: Illegal shadowing of included type t/280 by t/285
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-Error: Illegal shadowing of included type t/285 by t/290
-=======
-Error: Illegal shadowing of included type t/286 by t/291
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+Error: Illegal shadowing of included type t/281 by t/286
        Line 2, characters 2-19:
-<<<<<<< HEAD
-         Type t/280 came from this include
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-         Type t/285 came from this include
-=======
-         Type t/286 came from this include
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+         Type t/281 came from this include
        Line 3, characters 2-23:
-<<<<<<< HEAD
-         The value print has no valid type if t/280 is shadowed
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-         The value print has no valid type if t/285 is shadowed
-=======
-         The value print has no valid type if t/286 is shadowed
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+         The value print has no valid type if t/281 is shadowed
 |}]
 
 module type Sunderscore = sig

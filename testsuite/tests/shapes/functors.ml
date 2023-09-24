@@ -17,13 +17,7 @@ module type S = sig type t val x : t end
 module Falias (X : S) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- "Falias"[module] -> Abs<.4>(X/275, X/275<.3>);
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
- "Falias"[module] -> Abs<.4>(X/280, X/280<.3>);
-=======
- "Falias"[module] -> Abs<.4>(X/281, X/281<.3>);
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+ "Falias"[module] -> Abs<.4>(X/276, X/276<.3>);
  }
 module Falias : functor (X : S) -> sig type t = X.t val x : t end
 |}]
@@ -35,24 +29,10 @@ end
 {
  "Finclude"[module] ->
    Abs<.6>
-<<<<<<< HEAD
-      (X/279,
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-      (X/284,
-=======
-      (X/285,
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+      (X/280,
        {
-<<<<<<< HEAD
-        "t"[type] -> X/279<.5> . "t"[type];
-        "x"[value] -> X/279<.5> . "x"[value];
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-        "t"[type] -> X/284<.5> . "t"[type];
-        "x"[value] -> X/284<.5> . "x"[value];
-=======
-        "t"[type] -> X/285<.5> . "t"[type];
-        "x"[value] -> X/285<.5> . "x"[value];
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+        "t"[type] -> X/280<.5> . "t"[type];
+        "x"[value] -> X/280<.5> . "x"[value];
         });
  }
 module Finclude : functor (X : S) -> sig type t = X.t val x : t end
@@ -65,13 +45,7 @@ end
 [%%expect{|
 {
  "Fredef"[module] ->
-<<<<<<< HEAD
-   Abs<.10>(X/286, {
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-   Abs<.10>(X/291, {
-=======
-   Abs<.10>(X/292, {
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+   Abs<.10>(X/287, {
                     "t"[type] -> <.8>;
                     "x"[value] -> <.9>;
                     });
@@ -249,16 +223,8 @@ module Big_to_small1 : B2S = functor (X : Big) -> X
 [%%expect{|
 {
  "Big_to_small1"[module] ->
-<<<<<<< HEAD
-   Abs<.40>(X/381, {<.39>
-                    "t"[type] -> X/381<.39> . "t"[type];
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-   Abs<.40>(X/386, {<.39>
-                    "t"[type] -> X/386<.39> . "t"[type];
-=======
-   Abs<.40>(X/387, {<.39>
-                    "t"[type] -> X/387<.39> . "t"[type];
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+   Abs<.40>(X/382, {<.39>
+                    "t"[type] -> X/382<.39> . "t"[type];
                     });
  }
 module Big_to_small1 : B2S
@@ -268,16 +234,8 @@ module Big_to_small2 : B2S = functor (X : Big) -> struct include X end
 [%%expect{|
 {
  "Big_to_small2"[module] ->
-<<<<<<< HEAD
-   Abs<.42>(X/384, {
-                    "t"[type] -> X/384<.41> . "t"[type];
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-   Abs<.42>(X/389, {
-                    "t"[type] -> X/389<.41> . "t"[type];
-=======
-   Abs<.42>(X/390, {
-                    "t"[type] -> X/390<.41> . "t"[type];
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+   Abs<.42>(X/385, {
+                    "t"[type] -> X/385<.41> . "t"[type];
                     });
  }
 module Big_to_small2 : B2S

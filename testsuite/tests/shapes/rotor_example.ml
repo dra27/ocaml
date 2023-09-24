@@ -25,13 +25,7 @@ end
 [%%expect{|
 {
  "Pair"[module] ->
-<<<<<<< HEAD
-   Abs<.9>(X/275, Y/276, {
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-   Abs<.9>(X/280, Y/281, {
-=======
-   Abs<.9>(X/281, Y/282, {
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+   Abs<.9>(X/276, Y/277, {
                           "t"[type] -> <.5>;
                           "to_string"[value] -> <.6>;
                           });

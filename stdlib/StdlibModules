@@ -34,30 +34,6 @@
 # Basenames of the source files for the standard library (i.e. unprefixed and
 # with lowercase first letters). These must be listed in dependency order.
 STDLIB_MODULE_BASENAMES = \
-<<<<<<< HEAD
-  camlinternalFormatBasics stdlib either \
-  sys obj atomic camlinternalLazy lazy \
-  seq option result bool char uchar \
-  list int bytes string unit marshal array float int32 int64 nativeint \
-  lexing parsing set map stack queue buffer \
-  camlinternalFormat printf arg \
-  printexc fun gc digest bigarray random hashtbl weak \
-  format scanf callback camlinternalOO oo camlinternalMod ephemeron \
-  filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
-  stdLabels in_channel out_channel
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
-  camlinternalFormatBasics stdlib either \
-  sys obj atomic camlinternalLazy lazy \
-  seq option result bool char uchar \
-  list int bytes string unit marshal array float int32 int64 nativeint \
-  lexing parsing set map stack queue buffer \
-  mutex condition semaphore domain \
-  camlinternalFormat printf arg printexc \
-  fun gc digest bigarray random hashtbl weak \
-  format scanf callback camlinternalOO oo camlinternalMod ephemeron \
-  filename complex arrayLabels listLabels bytesLabels stringLabels moreLabels \
-  stdLabels in_channel out_channel effect
-=======
   camlinternalFormatBasics \
   stdlib \
   type \
@@ -81,9 +57,7 @@ STDLIB_MODULE_BASENAMES = \
   marshal \
   array \
   float \
-  int32 \
-  int64 \
-  nativeint \
+  int32 int64 nativeint \
   lexing \
   parsing \
   set \
@@ -91,10 +65,6 @@ STDLIB_MODULE_BASENAMES = \
   stack \
   queue \
   buffer \
-  mutex \
-  condition \
-  semaphore \
-  domain \
   camlinternalFormat \
   printf \
   arg \
@@ -122,9 +92,7 @@ STDLIB_MODULE_BASENAMES = \
   moreLabels \
   stdLabels \
   in_channel \
-  out_channel \
-  effect
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+  out_channel
 
 STDLIB_PREFIXED_MODULES = \
   $(filter-out stdlib camlinternal%, $(STDLIB_MODULE_BASENAMES))

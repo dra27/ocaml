@@ -25,13 +25,7 @@ module Mproj = Unit
 module F (X : sig type t end) = X
 [%%expect{|
 {
-<<<<<<< HEAD
- "F"[module] -> Abs<.4>(X/273, X/273<.3>);
-||||||| parent of a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
- "F"[module] -> Abs<.4>(X/278, X/278<.3>);
-=======
- "F"[module] -> Abs<.4>(X/279, X/279<.3>);
->>>>>>> a9eeaff1c3 (Add type equality witness to the standard library (PR#11581))
+ "F"[module] -> Abs<.4>(X/274, X/274<.3>);
  }
 module F : functor (X : sig type t end) -> sig type t = X.t end
 |}]
