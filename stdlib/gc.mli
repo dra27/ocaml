@@ -454,7 +454,7 @@ val eventlog_resume : unit -> unit
    notice. *)
 module Memprof :
   sig
-    type t
+    type t = unit
     (** the type of a profile *)
 
     type allocation_source = Normal | Marshal | Custom
