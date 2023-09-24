@@ -623,35 +623,6 @@ let fundecl fundecl =
     preproc_stack_check
       ~fun_body:fundecl.fun_body ~frame_size:(frame_size env) ~trap_size:16
   in
-<<<<<<< HEAD
-  let handle_overflow = ref None in
-  if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
-    let overflow = new_label () and ret = new_label () in
-
-    let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
-    let f = max_frame_size + threshold_offset in
-    let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
-    `	ld	{emit_reg reg_tmp}, {emit_int offset}({emit_reg reg_domain_state_ptr})\n`;
-    emit_addimm reg_tmp reg_tmp f;
-    `	bltu	sp, {emit_reg reg_tmp}, {emit_label overflow}\n`;
-    `{emit_label ret}:\n`;
-    handle_overflow := Some (overflow, ret)
-  end;
-*)
-||||||| parent of d5089fdb9d (emit.mlp: stop using references for variables initialised and never updated (PR#11802))
-  let handle_overflow = ref None in
-  if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
-    let overflow = new_label () and ret = new_label () in
-    let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
-    let f = max_frame_size + threshold_offset in
-    let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
-    `	ld	{emit_reg reg_tmp}, {emit_int offset}({emit_reg reg_domain_state_ptr})\n`;
-    emit_addimm reg_tmp reg_tmp f;
-    `	bltu	sp, {emit_reg reg_tmp}, {emit_label overflow}\n`;
-    `{emit_label ret}:\n`;
-    handle_overflow := Some (overflow, ret)
-  end;
-=======
   let handle_overflow =
     if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
       let overflow = new_label () and ret = new_label () in
@@ -665,20 +636,14 @@ let fundecl fundecl =
       Some (overflow, ret)
     end else None
   in
->>>>>>> d5089fdb9d (emit.mlp: stop using references for variables initialised and never updated (PR#11802))
+*)
 
   emit_all env fundecl.fun_body;
   List.iter emit_call_gc env.call_gc_sites;
   List.iter emit_call_bound_error env.bound_error_sites;
 
-<<<<<<< HEAD
 (*
-  begin match !handle_overflow with
-||||||| parent of d5089fdb9d (emit.mlp: stop using references for variables initialised and never updated (PR#11802))
-  begin match !handle_overflow with
-=======
   begin match handle_overflow with
->>>>>>> d5089fdb9d (emit.mlp: stop using references for variables initialised and never updated (PR#11802))
   | None -> ()
   | Some (overflow, ret) ->
       `{emit_label overflow}:\n`;
