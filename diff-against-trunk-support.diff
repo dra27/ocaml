@@ -1089,6 +1089,20 @@ index 65327be652..036068739a 100644
  *)
  
  external test_with_lock : unit -> bool = "with_lock"
+diff --git a/testsuite/tests/callback/callback_effects_gc.ml b/testsuite/tests/callback/callback_effects_gc.ml
+index 191a23e0ff..52d7fecb7a 100644
+--- a/testsuite/tests/callback/callback_effects_gc.ml
++++ b/testsuite/tests/callback/callback_effects_gc.ml
+@@ -1,6 +1,8 @@
+ (* TEST
+    ocamlrunparam += ",s=512"
+-   * native
++   * skip
++   reason = "OCaml 5 only"
++   ** native
+ *)
+ 
+ let count = ref 0
 diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
 index 3786e455ef..77478728df 100644
 --- a/testsuite/tests/callback/nested_fiber.ml
