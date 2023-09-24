@@ -1,6 +1,8 @@
-       0  GETGLOBAL 42L
-       2  PUSHACC0
-       3  MAKEBLOCK1 0
-       5  POP 1
-       7  SETGLOBAL Test
-       9  STOP
+       0  CONSTINT 61
+       2  C_CALL1 caml_ensure_stack_capacity
+       4  GETGLOBAL 42L
+       6  PUSHACC0
+       7  MAKEBLOCK1 0
+       9  POP 1
+      11  SETGLOBAL Test
+      13  STOP
