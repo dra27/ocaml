@@ -31,6 +31,9 @@ external yield : unit -> unit = "caml_thread_yield"
 external self : unit -> t = "caml_thread_self" [@@noalloc]
 external id : t -> int = "caml_thread_id" [@@noalloc]
 external join : t -> unit = "caml_thread_join"
+(* BACKPORT BEGIN *)
+external exit_stub : unit -> unit = "caml_thread_exit"
+(* BACKPORT END *)
 
 (* For new, make sure the function passed to thread_new never
    raises an exception. *)
@@ -73,7 +76,17 @@ let create fn arg =
           flush stderr)
 
 let exit () =
+(* BACKPORT BEGIN
   raise Exit
+*)
+  ignore (Sys.opaque_identity (check_memprof_cb ()));
+  exit_stub ()
+
+(* Thread.kill is currently not implemented due to problems with
+   cleanup handlers on several platforms *)
+
+let kill th = invalid_arg "Thread.kill: not implemented"
+(* BACKPORT END *)
 
 (* Preemption *)
 
@@ -104,6 +117,11 @@ let () =
 (* Wait functions *)
 
 let delay = Unix.sleepf
+
+(* BACKPORT BEGIN *)
+let wait_read fd = ()
+let wait_write fd = ()
+(* BACKPORT END *)
 
 let wait_timed_read fd d =
   match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
