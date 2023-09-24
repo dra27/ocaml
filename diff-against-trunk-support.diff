@@ -990,6 +990,41 @@ index b8c99a4b07..0ed35acf16 100644
  *)
  
  external test : int ref -> unit = "stub"
+diff --git a/testsuite/tests/c-api/test_c_thread_has_lock.ml b/testsuite/tests/c-api/test_c_thread_has_lock.ml
+index e826001559..f3e4a20be8 100644
+--- a/testsuite/tests/c-api/test_c_thread_has_lock.ml
++++ b/testsuite/tests/c-api/test_c_thread_has_lock.ml
+@@ -1,7 +1,9 @@
+ (* TEST
+    modules = "test_c_thread_has_lock_cstubs.c"
+-   * bytecode
+-   * native
++   * skip
++   reason = "OCaml 5 only"
++   ** bytecode
++   ** native
+ *)
+ 
+ external test_with_lock : unit -> bool = "with_lock"
+diff --git a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+index 65327be652..036068739a 100644
+--- a/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
++++ b/testsuite/tests/c-api/test_c_thread_has_lock_systhread.ml
+@@ -1,9 +1,11 @@
+ (* TEST
+    modules = "test_c_thread_has_lock_cstubs.c"
+-   * hassysthreads
++   * skip
++   reason = "OCaml 5 only"
++   ** hassysthreads
+    include systhreads
+-   ** bytecode
+-   ** native
++   *** bytecode
++   *** native
+ *)
+ 
+ external test_with_lock : unit -> bool = "with_lock"
 diff --git a/testsuite/tests/callback/nested_fiber.ml b/testsuite/tests/callback/nested_fiber.ml
 index 3786e455ef..77478728df 100644
 --- a/testsuite/tests/callback/nested_fiber.ml
