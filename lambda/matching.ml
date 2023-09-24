@@ -1893,10 +1893,13 @@ let inline_lazy_force_cond arg loc =
   let idarg = Ident.create_local "lzarg" in
   let varg = Lvar idarg in
   let tag = Ident.create_local "tag" in
+  let tag_var = Lvar tag in
   let force_fun = Lazy.force code_force_lazy_block in
+(*
   let test_tag t =
     Lprim(Pintcomp Ceq, [Lvar tag; Lconst(Const_base(Const_int t))], loc)
   in
+*)
 
   Llet
     ( Strict,
@@ -1909,16 +1912,29 @@ let inline_lazy_force_cond arg loc =
           tag,
           Lprim (Pccall prim_obj_tag, [ varg ], loc),
           Lifthenelse
+(*
             ( (* if (tag == Obj.forward_tag) then varg.(0) else ... *)
               test_tag Obj.forward_tag,
               Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc),
+*)
+            ( Lprim
+                ( Pintcomp Ceq,
+                  [ tag_var; Lconst (Const_base (Const_int Obj.forward_tag)) ],
+                  loc ),
+              Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc),
               Lifthenelse
+                ( Lprim
+                    ( Pintcomp Ceq,
+                      [ tag_var; Lconst (Const_base (Const_int Obj.lazy_tag)) ],
+                      loc ),
+(*
                 (
                   (* ... if tag == Obj.lazy_tag || tag == Obj.forcing_tag then
                          Lazy.force varg
                        else ... *)
                   Lprim (Psequor,
                        [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
+*)
                   Lapply
                     { ap_tailcall = Default_tailcall;
                       ap_loc = loc;
@@ -1943,11 +1959,22 @@ let inline_lazy_force_switch arg loc =
         ( Lprim (Pisint, [ varg ], loc),
           varg,
           Lswitch
+(*
             ( Lprim (Pccall prim_obj_tag, [ varg ], loc),
               { sw_numblocks = 0;
                 sw_blocks = [];
                 sw_numconsts = 256;
+*)
+            ( varg,
+              { sw_numconsts = 0;
+                sw_consts = [];
+                sw_numblocks = 256;
                 (* PR#6033 - tag ranges from 0 to 255 *)
+                sw_blocks =
+                  [ (Obj.forward_tag,
+                     Lprim (Pfield (0, Pointer, Mutable), [ varg ], loc));
+                    ( Obj.lazy_tag,
+(*
                 sw_consts =
                   [ (Obj.forward_tag, Lprim (Pfield(0, Pointer, Mutable),
                                              [ varg ], loc));
@@ -1963,6 +1990,7 @@ let inline_lazy_force_switch arg loc =
                         } );
 
                     (Obj.forcing_tag,
+*)
                       Lapply
                         { ap_tailcall = Default_tailcall;
                           ap_loc = loc;
@@ -1986,7 +2014,10 @@ let inline_lazy_force arg loc =
       { ap_tailcall = Default_tailcall;
         ap_loc = loc;
         ap_func = Lazy.force code_force_lazy;
+(*
         ap_args = [ Lconst (Const_base (Const_int 0)); arg ];
+*)
+        ap_args = [ arg ];
         ap_inlined = Default_inline;
         ap_specialised = Default_specialise
       }

@@ -1,8 +1,10 @@
 (* TEST
-* hasunix
+* skip
+reason = "OCaml 5 only"
+** hasunix
 include unix
-** bytecode
-** native
+*** bytecode
+*** native
 *)
 
 (* when run with the bytecode debug runtime, this test

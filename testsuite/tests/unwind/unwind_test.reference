@@ -1,5 +1,4 @@
 ml_perform_stack_walk
-caml_c_call
 Mylib.baz
 Driver.entry
 caml_program

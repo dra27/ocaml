@@ -1814,7 +1814,8 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
     [*-*-mingw32|*-pc-windows],
       [systhread_support=true
       otherlibraries="$otherlibraries systhreads"
-      PTHREAD_LIBS="-lpthread"
+dnl      PTHREAD_LIBS="-lpthread"
+      PTHREAD_LIBS=''
       AC_MSG_NOTICE([the Win32 threads library is supported])],
     [AX_PTHREAD(
       [systhread_support=true
@@ -1965,8 +1966,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 
 AS_CASE([$host],
   [*-*-mingw32],
-    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
-    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+dnl    [bytecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"
+dnl    nativecclibs="-lws2_32 -lversion -lpthread -lgcc_eh -lDbgHelp"],
+    [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
+    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
   [*-pc-windows],
     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
     nativecclibs="advapi32.lib ws2_32.lib version.lib"],

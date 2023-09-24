@@ -1,5 +1,7 @@
 (* TEST
    flags = "-g"
+   * skip
+   reason = "OCaml 5 only"
 *)
 
 open EffectHandlers
