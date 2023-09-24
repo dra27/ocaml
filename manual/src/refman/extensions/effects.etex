@@ -606,16 +606,8 @@ corresponding "perform". For example, in the previous example, "bar" does not
 handle the effect "F". Hence, we will get an "Effect.Unhandled F" exception
 when we run "bar".
 
-<<<<<<< HEAD
 \begin{caml_example}{verbatim}[error]
-try bar () with Unhandled -> "Saw unhandled exception"
-||||||| parent of a61b5a3e68 (Merge pull request PR#11423 from kayceesrk/effect_exceptions)
-\begin{caml_example}{verbatim}
-try bar () with Unhandled -> "Saw unhandled exception"
-=======
-\begin{caml_example}{verbatim}
 try bar () with Effect.Unhandled F -> "Saw Effect.Unhandled exception"
->>>>>>> a61b5a3e68 (Merge pull request PR#11423 from kayceesrk/effect_exceptions)
 \end{caml_example}
 
 \subsubsection{s:effects-linearity}{Linear continuations}

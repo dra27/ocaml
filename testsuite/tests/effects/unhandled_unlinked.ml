@@ -1,5 +1,7 @@
 (* TEST
      exit_status= "2"
+     * skip
+     reason = "OCaml 5 only"
 *)
 
 open Effect

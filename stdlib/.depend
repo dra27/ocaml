@@ -199,74 +199,6 @@ stdlib__Digest.cmx : digest.ml \
     stdlib__Bytes.cmx \
     stdlib__Digest.cmi
 stdlib__Digest.cmi : digest.mli
-<<<<<<< HEAD
-||||||| parent of a61b5a3e68 (Merge pull request PR#11423 from kayceesrk/effect_exceptions)
-stdlib__Domain.cmo : domain.ml \
-    stdlib__Sys.cmi \
-    stdlib.cmi \
-    stdlib__Obj.cmi \
-    stdlib__Mutex.cmi \
-    stdlib__List.cmi \
-    stdlib__Condition.cmi \
-    stdlib__Atomic.cmi \
-    stdlib__Array.cmi \
-    stdlib__Domain.cmi
-stdlib__Domain.cmx : domain.ml \
-    stdlib__Sys.cmx \
-    stdlib.cmx \
-    stdlib__Obj.cmx \
-    stdlib__Mutex.cmx \
-    stdlib__List.cmx \
-    stdlib__Condition.cmx \
-    stdlib__Atomic.cmx \
-    stdlib__Array.cmx \
-    stdlib__Domain.cmi
-stdlib__Domain.cmi : domain.mli
-stdlib__Effect.cmo : effect.ml \
-    stdlib__Printexc.cmi \
-    stdlib__Effect.cmi
-stdlib__Effect.cmx : effect.ml \
-    stdlib__Printexc.cmx \
-    stdlib__Effect.cmi
-stdlib__Effect.cmi : effect.mli \
-    stdlib__Printexc.cmi
-=======
-stdlib__Domain.cmo : domain.ml \
-    stdlib__Sys.cmi \
-    stdlib.cmi \
-    stdlib__Obj.cmi \
-    stdlib__Mutex.cmi \
-    stdlib__List.cmi \
-    stdlib__Condition.cmi \
-    stdlib__Atomic.cmi \
-    stdlib__Array.cmi \
-    stdlib__Domain.cmi
-stdlib__Domain.cmx : domain.ml \
-    stdlib__Sys.cmx \
-    stdlib.cmx \
-    stdlib__Obj.cmx \
-    stdlib__Mutex.cmx \
-    stdlib__List.cmx \
-    stdlib__Condition.cmx \
-    stdlib__Atomic.cmx \
-    stdlib__Array.cmx \
-    stdlib__Domain.cmi
-stdlib__Domain.cmi : domain.mli
-stdlib__Effect.cmo : effect.ml \
-    stdlib__Printf.cmi \
-    stdlib__Printexc.cmi \
-    stdlib__Obj.cmi \
-    stdlib__Callback.cmi \
-    stdlib__Effect.cmi
-stdlib__Effect.cmx : effect.ml \
-    stdlib__Printf.cmx \
-    stdlib__Printexc.cmx \
-    stdlib__Obj.cmx \
-    stdlib__Callback.cmx \
-    stdlib__Effect.cmi
-stdlib__Effect.cmi : effect.mli \
-    stdlib__Printexc.cmi
->>>>>>> a61b5a3e68 (Merge pull request PR#11423 from kayceesrk/effect_exceptions)
 stdlib__Either.cmo : either.ml \
     stdlib__Either.cmi
 stdlib__Either.cmx : either.ml \
@@ -478,12 +410,10 @@ stdlib__Lexing.cmx : lexing.ml \
     stdlib__Lexing.cmi
 stdlib__Lexing.cmi : lexing.mli
 stdlib__List.cmo : list.ml \
-    stdlib__Sys.cmi \
     stdlib__Seq.cmi \
     stdlib__Either.cmi \
     stdlib__List.cmi
 stdlib__List.cmx : list.ml \
-    stdlib__Sys.cmx \
     stdlib__Seq.cmx \
     stdlib__Either.cmx \
     stdlib__List.cmi
