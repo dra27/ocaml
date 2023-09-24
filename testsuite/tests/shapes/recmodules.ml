@@ -43,16 +43,8 @@ and B : sig
 end = B
 [%%expect{|
 {
-<<<<<<< HEAD
- "A"[module] -> A/298<.11>;
- "B"[module] -> B/299<.12>;
-||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
- "A"[module] -> A/303<.11>;
- "B"[module] -> B/304<.12>;
-=======
- "A"[module] -> A/322<.11>;
- "B"[module] -> B/323<.12>;
->>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+ "A"[module] -> A/317<.11>;
+ "B"[module] -> B/318<.12>;
  }
 module rec A : sig type t = Leaf of B.t end
 and B : sig type t = int end
@@ -90,31 +82,13 @@ end = Set.Make(A)
  "ASet"[module] ->
      {
       "compare"[value] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
->>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
           "compare"[value];
       "elt"[type] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) .
-||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) .
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) .
->>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) .
           "elt"[type];
       "t"[type] ->
-<<<<<<< HEAD
-          CU Stdlib . "Set"[module] . "Make"[module](A/320<.19>) . "t"[type];
-||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
-          CU Stdlib . "Set"[module] . "Make"[module](A/325<.19>) . "t"[type];
-=======
-          CU Stdlib . "Set"[module] . "Make"[module](A/344<.19>) . "t"[type];
->>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+          CU Stdlib . "Set"[module] . "Make"[module](A/339<.19>) . "t"[type];
       };
  }
 module rec A :

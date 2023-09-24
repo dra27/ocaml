@@ -26,13 +26,7 @@ end
 {
  "Pair"[module] ->
      Abs<.9>
-<<<<<<< HEAD
-        (X/275, Abs(Y/276, {
-||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
-        (X/280, Abs(Y/281, {
-=======
-        (X/299, Abs(Y/300, {
->>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+        (X/294, Abs(Y/295, {
                             "t"[type] -> <.5>;
                             "to_string"[value] -> <.6>;
                             }));

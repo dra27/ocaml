@@ -22,13 +22,7 @@ end = struct end
 
 [%%expect{|
 {
-<<<<<<< HEAD
- "Make"[module] -> Abs<.3>(I/275, {
-||||||| parent of b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
- "Make"[module] -> Abs<.3>(I/280, {
-=======
- "Make"[module] -> Abs<.3>(I/299, {
->>>>>>> b6d2214fb7 (Merge pull request PR#11318 from Octachron/topdir_and_expect_test)
+ "Make"[module] -> Abs<.3>(I/294, {
                                    });
  }
 module Make : functor (I : sig end) -> sig end
