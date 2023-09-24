@@ -17,11 +17,12 @@
 
 #include <caml/mlvalues.h>
 #include <caml/debugger.h>
-#include <caml/runtime_events.h>
+#include <caml/eventlog.h>
 #include "unixsupport.h"
 #include <caml/domain.h>
 #include <caml/fail.h>
 
+#if 0
 /* Post-fork tasks to be carried out in the parent */
 void caml_atfork_parent(pid_t child_pid) {
   CAML_EV_LIFECYCLE(EV_FORK_PARENT, child_pid);
@@ -32,6 +33,7 @@ void caml_atfork_child() {
   caml_runtime_events_post_fork();
   CAML_EV_LIFECYCLE(EV_FORK_CHILD, 0);
 }
+#endif
 
 CAMLprim value unix_fork(value unit)
 {
@@ -43,18 +45,15 @@ CAMLprim value unix_fork(value unit)
   }
 #endif
 
+  CAML_EV_FLUSH();
+
   ret = fork();
-<<<<<<< HEAD
 #if 0
   if (ret == 0) caml_atfork_hook();
 #endif
-||||||| parent of 9f696b86d2 (Merge pull request PR#10964 from sadiqj/eventring-pr)
-  if (ret == 0) caml_atfork_hook();
-=======
-
->>>>>>> 9f696b86d2 (Merge pull request PR#10964 from sadiqj/eventring-pr)
   if (ret == -1) uerror("fork", Nothing);
 
+#if 0
   if (ret == 0) {
     caml_atfork_child();
     /* the following hook can be redefined in other places */
@@ -62,6 +61,11 @@ CAMLprim value unix_fork(value unit)
   } else {
     caml_atfork_parent(ret);
   }
+#endif
+  CAML_EVENTLOG_DO({
+      if (ret == 0)
+        caml_eventlog_disable();
+  });
 
   if (caml_debugger_in_use)
     if ((caml_debugger_fork_mode && ret == 0) ||
