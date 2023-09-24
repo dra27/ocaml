@@ -555,7 +555,10 @@ let finish () =
   | Some {ev_ev={ev_stacksize}} ->
       set_initial_frame();
       let (frame, pc) = up_frame ev_stacksize in
+(*
       if frame = Sp.null then begin
+*)
+      if frame < Sp.null then begin
         prerr_endline "`finish' not meaningful in outermost frame.";
         raise Toplevel
       end;
@@ -598,9 +601,13 @@ let next_1 () =
         | Some {ev_ev={ev_stacksize=ev_stacksize2}} ->
             let (frame2, _pc2) = initial_frame() in
             (* Call `finish' if we've entered a function. *)
+            if frame1 >= 0 && frame2 >= 0 &&
+               frame2 - ev_stacksize2 > frame1 - ev_stacksize1
+(*
             if frame1 <> Sp.null && frame2 <> Sp.null &&
                Sp.(compare (base frame2 ev_stacksize2)
                      (base frame1 ev_stacksize1)) > 0
+*)
             then finish()
       end
 
@@ -623,7 +630,10 @@ let start () =
   | Some {ev_ev={ev_stacksize}} ->
       let (frame, _) = initial_frame() in
       let (frame', pc) = up_frame ev_stacksize in
+(*
       if frame' = Sp.null then begin
+*)
+      if frame' < Sp.null then begin
         prerr_endline "`start not meaningful in outermost frame.";
         raise Toplevel
       end;
@@ -645,7 +655,10 @@ let start () =
             step _minus1;
             (not !interrupted)
               &&
+(*
             Sp.(compare (base frame' nargs) (base frame ev_stacksize)) > 0
+*)
+            (frame' - nargs > frame - ev_stacksize)
         | _ ->
             false
       do
@@ -667,9 +680,13 @@ let previous_1 () =
         | Some {ev_ev={ev_stacksize=ev_stacksize2}} ->
             let (frame2, _pc2) = initial_frame() in
             (* Call `start' if we've entered a function. *)
+(*
             if frame1 <> Sp.null && frame2 <> Sp.null &&
               Sp.(compare (base frame2 ev_stacksize2)
                     (base frame1 ev_stacksize1)) > 0
+*)
+            if frame1 >= 0 && frame2 >= 0 &&
+               frame2 - ev_stacksize2 > frame1 - ev_stacksize1
             then start()
       end
 

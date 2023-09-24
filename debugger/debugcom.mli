@@ -17,7 +17,7 @@
 (* Low-level communication with the debuggee *)
 
 module Sp : sig
-  type t
+  type t = int
   val null : t
   val base : t -> int -> t
   val compare : t -> t -> int
