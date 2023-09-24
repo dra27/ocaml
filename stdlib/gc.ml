@@ -129,7 +129,11 @@ let delete_alarm a = Atomic.set a false
 
 module Memprof =
   struct
+(* BACKPORT BEGIN
     type t
+*)
+    type t = unit
+(* BACKPORT END *)
     type allocation_source = Normal | Marshal | Custom
     type allocation =
       { n_samples : int;
@@ -165,5 +169,9 @@ module Memprof =
 
     external stop : unit -> unit = "caml_memprof_stop"
 
+(* BACKPORT BEGIN
     external discard : t -> unit = "caml_memprof_discard"
+*)
+    let discard _ = failwith "4.x memprof doesn't support discard"
+(* BACKPORT END *)
   end
