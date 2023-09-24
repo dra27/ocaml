@@ -2052,19 +2052,12 @@ AS_CASE([$arch,$system],
 ## Determine how to link with the POSIX threads library
 
 AS_CASE([$host],
-<<<<<<< HEAD
-  [*-*-mingw32*|*-pc-windows],
-dnl    [PTHREAD_LIBS="-l:libpthread.a"],
-    [PTHREAD_LIBS=''],
-||||||| parent of f06778a363 (Merge pull request PR#12265 from dra27/zstd-mingw)
-  [*-*-mingw32*|*-pc-windows],
-    [PTHREAD_LIBS="-l:libpthread.a"],
-=======
   [*-*-mingw32*],
-    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+dnl    [PTHREAD_LIBS="-l:libpthread.a -lgcc_eh"],
+    [PTHREAD_LIBS=''],
   [*-pc-windows],
-    [PTHREAD_LIBS="-l:libpthread.lib"],
->>>>>>> f06778a363 (Merge pull request PR#12265 from dra27/zstd-mingw)
+dnl    [PTHREAD_LIBS="-l:libpthread.lib"],
+    [PTHREAD_LIBS=''],
   [AX_PTHREAD(
     [common_cflags="$common_cflags $PTHREAD_CFLAGS"
     saved_CFLAGS="$CFLAGS"
@@ -2258,17 +2251,7 @@ ocamlc_cppflags="$common_cppflags $CPPFLAGS"
 
 AS_CASE([$host],
   [*-*-mingw32*],
-<<<<<<< HEAD
-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-    [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
-    nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
-||||||| parent of f06778a363 (Merge pull request PR#12265 from dra27/zstd-mingw)
-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
-=======
     [cclibs="$cclibs -lversion"],
->>>>>>> f06778a363 (Merge pull request PR#12265 from dra27/zstd-mingw)
   [*-pc-windows],
     [# For whatever reason, flexlink includes -ladvapi32 for mingw-w64, but
     # doesn't include advapi32.lib for MSVC
