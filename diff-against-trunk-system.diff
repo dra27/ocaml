@@ -828,10 +828,10 @@ index 0ab2e41570..d4c0876e9f 100644
      nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..52a1b380eb
+index 0000000000..ed4592e809
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,1251 @@
+@@ -0,0 +1,1295 @@
 +diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
 +index 043e07031e..b7a6a9a6bb 100644
 +--- a/otherlibs/systhreads/st_stubs.c
@@ -897,9 +897,53 @@ index 0000000000..52a1b380eb
 + 
 + # Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
 +diff --git a/runtime/bigarray.c b/runtime/bigarray.c
-+index ed4ff67d21..871b81ef21 100644
++index ed4ff67d21..fa8692bd11 100644
 +--- a/runtime/bigarray.c
 ++++ b/runtime/bigarray.c
++@@ -89,7 +89,7 @@ CAMLexport value
++ caml_ba_alloc(int flags, int num_dims, void * data, intnat * dim)
++ {
++   uintnat num_elts, asize, size;
++-  int i;
+++  int i, is_managed;
++   value res;
++   struct caml_ba_array * b;
++   intnat dimcopy[CAML_BA_MAX_NUM_DIMS];
++@@ -97,23 +97,23 @@ caml_ba_alloc(int flags, int num_dims, void * data, intnat * dim)
++   CAMLassert(num_dims >= 0 && num_dims <= CAML_BA_MAX_NUM_DIMS);
++   CAMLassert((flags & CAML_BA_KIND_MASK) <= CAML_BA_CHAR);
++   for (i = 0; i < num_dims; i++) dimcopy[i] = dim[i];
++-  size = 0;
++-  if (data == NULL) {
++-    num_elts = 1;
++-    for (i = 0; i < num_dims; i++) {
++-      if (caml_umul_overflow(num_elts, dimcopy[i], &num_elts))
++-        caml_raise_out_of_memory();
++-    }
++-    if (caml_umul_overflow(num_elts,
++-                           caml_ba_element_size[flags & CAML_BA_KIND_MASK],
++-                           &size))
+++  num_elts = 1;
+++  for (i = 0; i < num_dims; i++) {
+++    if (caml_umul_overflow(num_elts, dimcopy[i], &num_elts))
++       caml_raise_out_of_memory();
+++  }
+++  if (caml_umul_overflow(num_elts,
+++                         caml_ba_element_size[flags & CAML_BA_KIND_MASK],
+++                         &size))
+++    caml_raise_out_of_memory();
+++  if (data == NULL) {
++     data = malloc(size);
++     if (data == NULL && size != 0) caml_raise_out_of_memory();
++     flags |= CAML_BA_MANAGED;
++   }
++   asize = SIZEOF_BA_ARRAY + num_dims * sizeof(intnat);
++-  res = caml_alloc_custom_mem(&caml_ba_ops, asize, size);
+++  is_managed = ((flags & CAML_BA_MANAGED_MASK) == CAML_BA_MANAGED);
+++  res = caml_alloc_custom_mem(&caml_ba_ops, asize, is_managed ? size : 0);
++   b = Caml_ba_array_val(res);
++   b->data = data;
++   b->num_dims = num_dims;
 +@@ -524,7 +524,7 @@ CAMLprim value caml_ba_create(value vkind, value vlayout, value vdim)
 +    are within the bounds and return the offset of the corresponding
 +    array element in the data part of the array. */
@@ -5372,10 +5416,10 @@ index 0000000000..2e88e50921
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..bae365cbbc
+index 0000000000..37c3003c4d
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,5350 @@
+@@ -0,0 +1,5348 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -6206,10 +6250,10 @@ index 0000000000..bae365cbbc
 +     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..52a1b380eb
++index 0000000000..ed4592e809
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,1251 @@
++@@ -0,0 +1,1295 @@
 ++diff --git a/otherlibs/systhreads/st_stubs.c b/otherlibs/systhreads/st_stubs.c
 ++index 043e07031e..b7a6a9a6bb 100644
 ++--- a/otherlibs/systhreads/st_stubs.c
@@ -6275,9 +6319,53 @@ index 0000000000..bae365cbbc
 ++ 
 ++ # Warning: we use "sort | uniq" instead of "sort -u" because in the MSVC
 ++diff --git a/runtime/bigarray.c b/runtime/bigarray.c
-++index ed4ff67d21..871b81ef21 100644
+++index ed4ff67d21..fa8692bd11 100644
 ++--- a/runtime/bigarray.c
 +++++ b/runtime/bigarray.c
+++@@ -89,7 +89,7 @@ CAMLexport value
+++ caml_ba_alloc(int flags, int num_dims, void * data, intnat * dim)
+++ {
+++   uintnat num_elts, asize, size;
+++-  int i;
++++  int i, is_managed;
+++   value res;
+++   struct caml_ba_array * b;
+++   intnat dimcopy[CAML_BA_MAX_NUM_DIMS];
+++@@ -97,23 +97,23 @@ caml_ba_alloc(int flags, int num_dims, void * data, intnat * dim)
+++   CAMLassert(num_dims >= 0 && num_dims <= CAML_BA_MAX_NUM_DIMS);
+++   CAMLassert((flags & CAML_BA_KIND_MASK) <= CAML_BA_CHAR);
+++   for (i = 0; i < num_dims; i++) dimcopy[i] = dim[i];
+++-  size = 0;
+++-  if (data == NULL) {
+++-    num_elts = 1;
+++-    for (i = 0; i < num_dims; i++) {
+++-      if (caml_umul_overflow(num_elts, dimcopy[i], &num_elts))
+++-        caml_raise_out_of_memory();
+++-    }
+++-    if (caml_umul_overflow(num_elts,
+++-                           caml_ba_element_size[flags & CAML_BA_KIND_MASK],
+++-                           &size))
++++  num_elts = 1;
++++  for (i = 0; i < num_dims; i++) {
++++    if (caml_umul_overflow(num_elts, dimcopy[i], &num_elts))
+++       caml_raise_out_of_memory();
++++  }
++++  if (caml_umul_overflow(num_elts,
++++                         caml_ba_element_size[flags & CAML_BA_KIND_MASK],
++++                         &size))
++++    caml_raise_out_of_memory();
++++  if (data == NULL) {
+++     data = malloc(size);
+++     if (data == NULL && size != 0) caml_raise_out_of_memory();
+++     flags |= CAML_BA_MANAGED;
+++   }
+++   asize = SIZEOF_BA_ARRAY + num_dims * sizeof(intnat);
+++-  res = caml_alloc_custom_mem(&caml_ba_ops, asize, size);
++++  is_managed = ((flags & CAML_BA_MANAGED_MASK) == CAML_BA_MANAGED);
++++  res = caml_alloc_custom_mem(&caml_ba_ops, asize, is_managed ? size : 0);
+++   b = Caml_ba_array_val(res);
+++   b->data = data;
+++   b->num_dims = num_dims;
 ++@@ -524,7 +524,7 @@ CAMLprim value caml_ba_create(value vkind, value vlayout, value vdim)
 ++    are within the bounds and return the offset of the corresponding
 ++    array element in the data part of the array. */
@@ -10679,53 +10767,7 @@ index 0000000000..bae365cbbc
 ++       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ++-Error: Illegal shadowing of included type t/284 by t/289
 +++Error: Illegal shadowing of included type t/279 by t/284
-++        Line 2, characters 2-19:
-++-         Type t/284 came from this include
-+++         Type t/279 came from this include
-++        Line 3, characters 2-23:
-++-         The value print has no valid type if t/284 is shadowed
-+++         The value print has no valid type if t/279 is shadowed
-++ |}]
-++ 
-++ module type Sunderscore = sig
-++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
-++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad value checks and as a check for catastrophic
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser2.ml b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++index e8ab88e807..5cf871e7ac 100644
-++--- a/testsuite/tests/weak-ephe-final/finaliser2.ml
-+++++ b/testsuite/tests/weak-ephe-final/finaliser2.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ let[@inline never][@local never] test1 () =
-++   let r' = ref 0 in
-++diff --git a/testsuite/tests/weak-ephe-final/finaliser_handover.ml b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
-++index fa2d2efc43..752a7eeab
+++       
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
