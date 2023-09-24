@@ -859,10 +859,10 @@ index 35ade079f6..d9d6477860 100644
      `{emit_label ret}:\n`;
      handle_overflow := Some (overflow, ret);
 diff --git a/boot/ocamlc b/boot/ocamlc
-index d9a4f885fb..142a300014 100755
+index d9a4f885fb..3e38377cbf 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
 diff --git a/boot/ocamllex b/boot/ocamllex
-index 726df23f5b..2bae84c3e9 100755
+index 726df23f5b..562d1d9d47 100755
 Binary files a/boot/ocamllex and b/boot/ocamllex differ
 diff --git a/build-aux/config.guess b/build-aux/config.guess
 index e94095c5fb..b187213930 100755
@@ -10507,7 +10507,7 @@ index 0000000000..fb49c279b7
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..16992e32f7
+index 0000000000..130e82e67f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
 @@ -0,0 +1,10450 @@
@@ -11372,10 +11372,10 @@ index 0000000000..16992e32f7
 +     `{emit_label ret}:\n`;
 +     handle_overflow := Some (overflow, ret);
 +diff --git a/boot/ocamlc b/boot/ocamlc
-+index d9a4f885fb..142a300014 100755
++index d9a4f885fb..3e38377cbf 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
 +diff --git a/boot/ocamllex b/boot/ocamllex
-+index 726df23f5b..2bae84c3e9 100755
++index 726df23f5b..562d1d9d47 100755
 +Binary files a/boot/ocamllex and b/boot/ocamllex differ
 +diff --git a/build-aux/config.guess b/build-aux/config.guess
 +index e94095c5fb..b187213930 100755
