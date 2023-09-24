@@ -1185,24 +1185,12 @@ AS_CASE([$host],
     [arch=arm64; system=freebsd],
   [aarch64-*-openbsd*],
     [arch=arm64; system=openbsd],
-<<<<<<< HEAD
+  [aarch64-*-netbsd*],
+    [arch=arm64; system=netbsd],
   [x86_64-*-cygwin*],
     [arch=amd64; system=cygwin],
   [riscv64-*-linux*],
     [arch=riscv; model=riscv64; system=linux]
-||||||| parent of 5e5f121e01 (Merge pull request PR#11097 from kit-ty-kate/netbsd-arm64)
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
-=======
-  [aarch64-*-netbsd*],
-    [arch=arm64; system=netbsd],
-dnl [x86_64-*-cygwin*],
-dnl   [arch=amd64; system=cygwin],
-dnl [riscv64-*-linux*],
-dnl   [arch=riscv; model=riscv64; system=linux]
->>>>>>> 5e5f121e01 (Merge pull request PR#11097 from kit-ty-kate/netbsd-arm64)
 )
 
 AS_CASE([$ccomptype],
