@@ -1646,6 +1646,9 @@ endif
 	  $(INSTALL_PROG) tools/ocamlcmt$(EXE) "$(INSTALL_BINDIR)"; \
 	fi
 	$(INSTALL_DATA) \
+	  tools/eventlog_metadata \
+	  "$(INSTALL_LIBDIR)"
+	$(INSTALL_DATA) \
 	   utils/*.cmi \
 	   parsing/*.cmi \
 	   typing/*.cmi \
