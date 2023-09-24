@@ -110,6 +110,9 @@ Working version
   DEFAULT_STRING=safe which are now the default unconditionally.
   (Kate Deplaix, review by Gabriel Scherer and David Allsopp)
 
+- Build native-code compilers on OpenBSD/aarch64
+  (Christopher Zimmermann, review by Anil Madhavapeddy)
+
 ### Bug fixes:
 
 OCaml 4.14.0
