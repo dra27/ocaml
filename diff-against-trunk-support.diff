@@ -2193,6 +2193,24 @@ index 8a8a115141..20fd12d705 100644
  *)
  
  open Domain
+diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+index c03791538a..2fd0eb4b9e 100644
+--- a/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
++++ b/testsuite/tests/parallel/domain_parallel_spawn_burn_gc_set.ml
+@@ -1,8 +1,10 @@
+ (* TEST
+-* hasunix
++* skip
++reason = "OCaml 5 only"
++** hasunix
+ include unix
+-** bytecode
+-** native
++*** bytecode
++*** native
+ *)
+ 
+ open Domain
 diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 index e853c25865..30fa17d116 100644
 --- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
