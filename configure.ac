@@ -2182,18 +2182,10 @@ AC_CHECK_LIB(execinfo, backtrace, cclibs="$cclibs -lexecinfo",[])
 
 AS_CASE([$host],
   [*-*-mingw32],
-<<<<<<< HEAD
-dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
-dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
+dnl    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
+dnl    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
     [bytecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"
     nativecclibs="-lws2_32 -lversion -lgcc_eh -lDbgHelp"],
-||||||| parent of c66fb2b282 (Merge pull request PR#11367 from dra27/caml_init_os_params)
-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"
-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh -lDbgHelp"],
-=======
-    [bytecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"
-    nativecclibs="-lws2_32 -lversion -l:libpthread.a -lgcc_eh"],
->>>>>>> c66fb2b282 (Merge pull request PR#11367 from dra27/caml_init_os_params)
   [*-pc-windows],
     [bytecclibs="advapi32.lib ws2_32.lib version.lib"
     nativecclibs="advapi32.lib ws2_32.lib version.lib"],
