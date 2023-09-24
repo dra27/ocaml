@@ -14573,6 +14573,21 @@ index fa77d41b14..8c67db8ba3 100644
  let wait_timed_read fd d =
    match Unix.select [fd] [] [] d with ([], _, _) -> false | (_, _, _) -> true
  let wait_timed_write fd d =
+diff --git a/otherlibs/unix/createprocess.c b/otherlibs/unix/createprocess.c
+index 132944b37e..fca240c49c 100644
+--- a/otherlibs/unix/createprocess.c
++++ b/otherlibs/unix/createprocess.c
+@@ -99,6 +99,10 @@ static DWORD do_create_process_native(wchar_t * exefile, wchar_t * cmdline,
+   return err;
+ }
+ 
++/* BACKPORT BEGIN */
++#define caml_win32_multi_byte_to_wide_char win_multi_byte_to_wide_char
++/* BACKPORT END */
++
+ value caml_unix_create_process_native(value cmd, value cmdline, value env,
+                                  value fd1, value fd2, value fd3)
+ {
 diff --git a/otherlibs/unix/fork.c b/otherlibs/unix/fork.c
 index 55206323de..c12e4db68f 100644
 --- a/otherlibs/unix/fork.c
@@ -14638,6 +14653,21 @@ index 55206323de..c12e4db68f 100644
  
    if (caml_debugger_in_use)
      if ((caml_debugger_fork_mode && ret == 0) ||
+diff --git a/otherlibs/unix/readlink_win32.c b/otherlibs/unix/readlink_win32.c
+index d03f0ff08a..cb0d6d3bb2 100644
+--- a/otherlibs/unix/readlink_win32.c
++++ b/otherlibs/unix/readlink_win32.c
+@@ -25,6 +25,10 @@
+ #include <winioctl.h>
+ #include <caml/winsupport.h>
+ 
++/* BACKPORT BEGIN */
++#define caml_win32_wide_char_to_multi_byte win_wide_char_to_multi_byte
++/* BACKPORT END */
++
+ CAMLprim value caml_unix_readlink(value opath)
+ {
+   CAMLparam1(opath);
 diff --git a/otherlibs/unix/signals.c b/otherlibs/unix/signals.c
 index b9cc32040e..7f83d8b537 100644
 --- a/otherlibs/unix/signals.c
@@ -15516,6 +15546,20 @@ index afbae6fae3..19e4d178f6 100644
  # Copy a bytecode executable, stripping debug info
  
  STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+diff --git a/tools/check-symbol-names b/tools/check-symbol-names
+index 0e1c829de4..8a88cfa1f3 100755
+--- a/tools/check-symbol-names
++++ b/tools/check-symbol-names
+@@ -32,6 +32,9 @@ $2 ~ /^_?wmain$/ { next }
+ $2 ~ /^__x86.get_pc_thunk./ { next }
+ # for mingw32
+ $2 ~ /^.debug_/ { next }
++# windows unicode support
++$2 ~ /^_?win_multi_byte_to_wide_char$/ { next }
++$2 ~ /^_?win_wide_char_to_multi_byte$/ { next }
+ # print the rest
+ { found=1; print $1 " " $2 " " $3 }
+ # fail if there were any results
 diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
 index 01722ed9ca..508dd3b226 100644
 --- a/tools/dumpobj.ml
