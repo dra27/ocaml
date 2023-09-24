@@ -1409,15 +1409,11 @@ module Domain         = Domain
     "The Domain interface may change in incompatible ways in the future."
 ]
 module Effect         = Effect
-<<<<<<< HEAD
-*)
-||||||| parent of 23b991c06e (Merge pull request PR#11526 from Octachron/experimental_alert)
-=======
 [@@alert "-unstable"]
 [@@alert unstable
     "The Effect interface may change in incompatible ways in the future."
 ]
->>>>>>> 23b991c06e (Merge pull request PR#11526 from Octachron/experimental_alert)
+*)
 module Either         = Either
 module Ephemeron      = Ephemeron
 module Filename       = Filename
