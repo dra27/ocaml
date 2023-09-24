@@ -2055,6 +2055,18 @@ index 1e96998149..6cc9474f2e 100644
  *)
  open Runtime_events
  
+diff --git a/testsuite/tests/lib-runtime-events/test_caml_counters.ml b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
+index 73b30a0eab..a491d089ff 100644
+--- a/testsuite/tests/lib-runtime-events/test_caml_counters.ml
++++ b/testsuite/tests/lib-runtime-events/test_caml_counters.ml
+@@ -1,5 +1,7 @@
+ (* TEST
+ include runtime_events
++* skip
++reason = "OCaml 5 only"
+ *)
+ open Runtime_events
+ 
 diff --git a/testsuite/tests/lib-runtime-events/test_caml_exception.ml b/testsuite/tests/lib-runtime-events/test_caml_exception.ml
 index e1df5aee0b..6738603ddd 100644
 --- a/testsuite/tests/lib-runtime-events/test_caml_exception.ml
