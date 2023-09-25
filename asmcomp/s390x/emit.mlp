@@ -386,8 +386,10 @@ let emit_instr env i =
              calling frame with cfi_signal_frame in it's definition.
              Also, for some reason ocaml compiler uses %r12, can't use it here.
              Just save stack pointer to temporary pointer and then to new stack *)
+(* BACKPORT
           let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
           ` lg %r15, {emit_int offset}(%r10)\n`;
+*)
           ` lay %r15, -168(%r15)\n`;
           ` stg %r1, 160(%r15)\n`;
           emit_call func;
@@ -596,8 +598,12 @@ let emit_instr env i =
         let instr = name_for_specific sop in
         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
     | Lop (Idls_get) ->
+(* BACKPORT BEGIN
         let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
         `	lg	{emit_reg i.res.(0)}, {emit_int ofs}(%r10)\n`
+*)
+        assert false
+(* BACKPORT END *)
     | Lreloadretaddr ->
         let n = frame_size env in
         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`
@@ -730,11 +736,13 @@ let fundecl fundecl =
   let handle_overflow = ref None in
   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
     let overflow = new_label () and ret = new_label () in
+(* BACKPORT
     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
     let f = max_frame_size + threshold_offset in
     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
     `  lg %r1, {emit_int offset}(%r10)\n`;
     `  lay %r1, {emit_int f}(%r1)\n`;
+*)
     `  clgr %r15, %r1\n`;
     `  brcl 4, {emit_label overflow}\n`;
     `{emit_label ret}:\n`;
