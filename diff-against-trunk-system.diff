@@ -800,6 +800,48 @@ index bcc9d12947..5252fa4473 100644
  
    cfi_endproc();
    `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
+diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
+index 6c874e82ff..2ff4f5e6bf 100644
+--- a/asmcomp/s390x/emit.mlp
++++ b/asmcomp/s390x/emit.mlp
+@@ -386,8 +386,10 @@ let emit_instr env i =
+              calling frame with cfi_signal_frame in it's definition.
+              Also, for some reason ocaml compiler uses %r12, can't use it here.
+              Just save stack pointer to temporary pointer and then to new stack *)
++(* BACKPORT
+           let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
+           ` lg %r15, {emit_int offset}(%r10)\n`;
++*)
+           ` lay %r15, -168(%r15)\n`;
+           ` stg %r1, 160(%r15)\n`;
+           emit_call func;
+@@ -596,8 +598,12 @@ let emit_instr env i =
+         let instr = name_for_specific sop in
+         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
+     | Lop (Idls_get) ->
++(* BACKPORT BEGIN
+         let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
+         `	lg	{emit_reg i.res.(0)}, {emit_int ofs}(%r10)\n`
++*)
++        assert false
++(* BACKPORT END *)
+     | Lreloadretaddr ->
+         let n = frame_size env in
+         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`
+@@ -730,11 +736,13 @@ let fundecl fundecl =
+   let handle_overflow = ref None in
+   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
+     let overflow = new_label () and ret = new_label () in
++(* BACKPORT
+     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
+     let f = max_frame_size + threshold_offset in
+     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
+     `  lg %r1, {emit_int offset}(%r10)\n`;
+     `  lay %r1, {emit_int f}(%r1)\n`;
++*)
+     `  clgr %r15, %r1\n`;
+     `  brcl 4, {emit_label overflow}\n`;
+     `{emit_label ret}:\n`;
 diff --git a/boot/ocamlc b/boot/ocamlc
 index 34f254514c..06f01ece46 100755
 Binary files a/boot/ocamlc and b/boot/ocamlc differ
@@ -3219,10 +3261,10 @@ index bd3c3f2fb5..540d639197 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 07f66af4e9..9df710a879 100755
+index 07f66af4e9..b45825b4f6 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 14905e6866..bcaae113c3 100644
+index 14905e6866..0c622de674 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3309,7 +3351,7 @@ index 14905e6866..bcaae113c3 100644
  
  # Support for C11 atomic types
  
-@@ -1197,11 +1210,12 @@ AS_CASE([$host],
+@@ -1197,13 +1210,14 @@ AS_CASE([$host],
    [i686-pc-windows],
      [arch=i386; system=win32],
    [x86_64-pc-windows],
@@ -3323,8 +3365,11 @@ index 14905e6866..bcaae113c3 100644
 +    [has_native_backend=yes; arch=power
 +    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
    [[s390x*-*-linux*]],
-     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
+-    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
++    [arch=s390x; model=z10; system=elf],
    # expected to match "gnueabihf" as well as "musleabihf"
+   [armv6*-*-linux-*eabihf],
+     [arch=arm; model=armv6; system=linux_eabihf],
 @@ -1240,9 +1254,9 @@ AS_CASE([$host],
    [x86_64-*-linux*],
      [has_native_backend=yes; arch=amd64; system=linux],
@@ -10133,10 +10178,10 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..c581f3759d
+index 0000000000..ca23c6b4ae
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10050 @@
+@@ -0,0 +1,10140 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..5412e559e5
@@ -10939,6 +10984,48 @@ index 0000000000..c581f3759d
 + 
 +   cfi_endproc();
 +   `	.size	{emit_symbol fundecl.fun_name}, .-{emit_symbol fundecl.fun_name}\n`;
++diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
++index 6c874e82ff..2ff4f5e6bf 100644
++--- a/asmcomp/s390x/emit.mlp
+++++ b/asmcomp/s390x/emit.mlp
++@@ -386,8 +386,10 @@ let emit_instr env i =
++              calling frame with cfi_signal_frame in it's definition.
++              Also, for some reason ocaml compiler uses %r12, can't use it here.
++              Just save stack pointer to temporary pointer and then to new stack *)
+++(* BACKPORT
++           let offset = Domainstate.(idx_of_field Domain_c_stack) * 8 in
++           ` lg %r15, {emit_int offset}(%r10)\n`;
+++*)
++           ` lay %r15, -168(%r15)\n`;
++           ` stg %r1, 160(%r15)\n`;
++           emit_call func;
++@@ -596,8 +598,12 @@ let emit_instr env i =
++         let instr = name_for_specific sop in
++         `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
++     | Lop (Idls_get) ->
+++(* BACKPORT BEGIN
++         let ofs = Domainstate.(idx_of_field Domain_dls_root) * 8 in
++         `	lg	{emit_reg i.res.(0)}, {emit_int ofs}(%r10)\n`
+++*)
+++        assert false
+++(* BACKPORT END *)
++     | Lreloadretaddr ->
++         let n = frame_size env in
++         `	lg	%r14, {emit_int(n - size_addr)}(%r15)\n`
++@@ -730,11 +736,13 @@ let fundecl fundecl =
++   let handle_overflow = ref None in
++   if contains_nontail_calls || max_frame_size >= stack_threshold_size then begin
++     let overflow = new_label () and ret = new_label () in
+++(* BACKPORT
++     let threshold_offset = Domainstate.stack_ctx_words * 8 + stack_threshold_size in
++     let f = max_frame_size + threshold_offset in
++     let offset = Domainstate.(idx_of_field Domain_current_stack) * 8 in
++     `  lg %r1, {emit_int offset}(%r10)\n`;
++     `  lay %r1, {emit_int f}(%r1)\n`;
+++*)
++     `  clgr %r15, %r1\n`;
++     `  brcl 4, {emit_label overflow}\n`;
++     `{emit_label ret}:\n`;
 +diff --git a/boot/ocamlc b/boot/ocamlc
 +index 34f254514c..06f01ece46 100755
 +Binary files a/boot/ocamlc and b/boot/ocamlc differ
@@ -13358,10 +13445,10 @@ index 0000000000..c581f3759d
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 07f66af4e9..9df710a879 100755
++index 07f66af4e9..b45825b4f6 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 14905e6866..bcaae113c3 100644
++index 14905e6866..0c622de674 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13448,7 +13535,7 @@ index 0000000000..c581f3759d
 + 
 + # Support for C11 atomic types
 + 
-+@@ -1197,11 +1210,12 @@ AS_CASE([$host],
++@@ -1197,13 +1210,14 @@ AS_CASE([$host],
 +   [i686-pc-windows],
 +     [arch=i386; system=win32],
 +   [x86_64-pc-windows],
@@ -13462,8 +13549,11 @@ index 0000000000..c581f3759d
 ++    [has_native_backend=yes; arch=power
 ++    AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
 +   [[s390x*-*-linux*]],
-+     [has_native_backend=yes; arch=s390x; model=z10; system=elf],
++-    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
+++    [arch=s390x; model=z10; system=elf],
 +   # expected to match "gnueabihf" as well as "musleabihf"
++   [armv6*-*-linux-*eabihf],
++     [arch=arm; model=armv6; system=linux_eabihf],
 +@@ -1240,9 +1254,9 @@ AS_CASE([$host],
 +   [x86_64-*-linux*],
 +     [has_native_backend=yes; arch=amd64; system=linux],
@@ -20186,7 +20276,52 @@ index 0000000000..c581f3759d
 ++ 
 ++ Build () {
 ++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 329
+++index 3292ad9c31..f69aeb342c 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
++++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
++++    else
++++      run 'ocamlc -version' \
++++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
++++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
++++    fi
+++     if [[ $PORT =~ mingw* ]] ; then
+++       run "Check runtime symbols" \
+++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
+++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
+++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
+++     fi
+++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++-    # tests now (to include natdynlink)
+++-    run "test dynlink $PORT" \
+++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++-    # Now reconfigure ocamltest to run in bytecode-only mode
+++-    sed -i '/native_/s/true/false/' \
+++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++-    # And run the entire testsuite, skipping all the native-code tests
++++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
++++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++++      # tests now (to include natdynlink)
++++      run "test dynlink $PORT" \
++++          $MAKE -C "$FULL_BUIL
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644

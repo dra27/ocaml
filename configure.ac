@@ -1217,7 +1217,7 @@ AS_CASE([$host],
     [has_native_backend=yes; arch=power
     AS_IF([$arch64],[model=ppc64],[model=ppc]); system=elf],
   [[s390x*-*-linux*]],
-    [has_native_backend=yes; arch=s390x; model=z10; system=elf],
+    [arch=s390x; model=z10; system=elf],
   # expected to match "gnueabihf" as well as "musleabihf"
   [armv6*-*-linux-*eabihf],
     [arch=arm; model=armv6; system=linux_eabihf],
