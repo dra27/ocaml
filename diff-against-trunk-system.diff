@@ -703,10 +703,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index a45f9841af..01125c58ee 100755
+index a45f9841af..ec2a26f914 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index 311f4c1554..459665c5ce 100644
+index 311f4c1554..04bf1d8fd9 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -783,6 +783,19 @@ index 311f4c1554..459665c5ce 100644
  AS_IF([test x"$enable_unix_lib" != "xno"],
    [enable_unix_lib=yes
     otherlibraries="$otherlibraries unix"])
+@@ -946,9 +958,9 @@ AS_IF([! $arch64],
+ 
+ # Atomics library
+ 
+-AS_IF([! $arch64],
+-  [AS_CASE([$ocaml_cv_cc_vendor],
+-    [gcc-*], [cclibs="$cclibs -latomic"])])
++dnl AS_IF([! $arch64],
++dnl  [AS_CASE([$ocaml_cv_cc_vendor],
++dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
+ 
+ # Shared library support
+ 
 @@ -1082,67 +1094,67 @@ model=default
  system=unknown
  
@@ -6675,10 +6688,10 @@ index 0000000000..3270d34f9e
 +  * x86 we require the caml_extra_params symbol from the RTS. */
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..97ffaa3eae
+index 0000000000..624fb3532c
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,6653 @@
+@@ -0,0 +1,6657 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..2a36fa1f4b
@@ -7384,10 +7397,10 @@ index 0000000000..97ffaa3eae
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index a45f9841af..01125c58ee 100755
++index a45f9841af..ec2a26f914 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index 311f4c1554..459665c5ce 100644
++index 311f4c1554..04bf1d8fd9 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -171,6 +171,8 @@ AC_SUBST([flexdll_chain])
@@ -7464,6 +7477,19 @@ index 0000000000..97ffaa3eae
 + AS_IF([test x"$enable_unix_lib" != "xno"],
 +   [enable_unix_lib=yes
 +    otherlibraries="$otherlibraries unix"])
++@@ -946,9 +958,9 @@ AS_IF([! $arch64],
++ 
++ # Atomics library
++ 
++-AS_IF([! $arch64],
++-  [AS_CASE([$ocaml_cv_cc_vendor],
++-    [gcc-*], [cclibs="$cclibs -latomic"])])
+++dnl AS_IF([! $arch64],
+++dnl  [AS_CASE([$ocaml_cv_cc_vendor],
+++dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
++ 
++ # Shared library support
++ 
 +@@ -1082,67 +1094,67 @@ model=default
 + system=unknown
 + 
@@ -13322,16 +13348,7 @@ index 0000000000..97ffaa3eae
 +++++ b/testsuite/tests/weak-ephe-final/finaliser_handover.ml
 ++@@ -1,4 +1,7 @@
 ++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++*)
-++ 
-++ (* ocaml-multicore issues 528 and 468 *)
-++ 
-++diff --git a/testsuite/tests/weak-ephe-final/weaklifetime_par.ml b/testsuite/tests/weak-ephe-final/weaklifetime_par.ml
-++index b42d399907..656e318473 100644
-++--- a/testsuite/tests/weak-ephe-final/weaklifet
++++(* TES
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644

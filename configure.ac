@@ -958,9 +958,9 @@ AS_IF([! $arch64],
 
 # Atomics library
 
-AS_IF([! $arch64],
-  [AS_CASE([$ocaml_cv_cc_vendor],
-    [gcc-*], [cclibs="$cclibs -latomic"])])
+dnl AS_IF([! $arch64],
+dnl  [AS_CASE([$ocaml_cv_cc_vendor],
+dnl    [gcc-*], [cclibs="$cclibs -latomic"])])
 
 # Shared library support
 

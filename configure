@@ -2971,6 +2971,8 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -14102,14 +14104,6 @@ fi
 
 # Atomics library
 
-if ! $arch64; then :
-  case $ocaml_cv_cc_vendor in #(
-  gcc-*) :
-    cclibs="$cclibs -latomic" ;; #(
-  *) :
-     ;;
-esac
-fi
 
 # Shared library support
 
