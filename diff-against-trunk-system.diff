@@ -3209,10 +3209,10 @@ index 0bb661f74b..c5ad0d8698 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index 7afd85dc68..733869fdcc 100755
+index 7afd85dc68..1ce97e375b 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index c4fd1bc0be..ab4a9b3a69 100644
+index c4fd1bc0be..6e6bedca20 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -3401,15 +3401,18 @@ index c4fd1bc0be..ab4a9b3a69 100644
    [arm64-*-darwin*],
      [has_native_backend=yes; arch=arm64; system=macosx],
    [aarch64-*-darwin*],
-@@ -1266,7 +1278,7 @@ AS_CASE([$host],
+@@ -1266,9 +1278,9 @@ AS_CASE([$host],
    [aarch64-*-netbsd*],
      [has_native_backend=yes; arch=arm64; system=netbsd],
    [x86_64-*-cygwin*],
 -    [arch=amd64; system=cygwin],
 +    [has_native_backend=yes; arch=amd64; system=cygwin],
    [riscv64-*-linux*],
-     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+-    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
++    [arch=riscv; model=riscv64; system=linux]
  )
+ 
+ AS_CASE([$ccomptype],
 @@ -1964,11 +1976,23 @@ AS_CASE([$enable_debug_runtime],
    [no], [debug_runtime=false],
    [debug_runtime=true])
@@ -10075,10 +10078,10 @@ index 0000000000..753a097933
 +     fi
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..ae6cdfa566
+index 0000000000..e13c0cc4f4
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10002 @@
+@@ -0,0 +1,10003 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..4354dcfff3
@@ -13290,10 +13293,10 @@ index 0000000000..ae6cdfa566
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index 7afd85dc68..733869fdcc 100755
++index 7afd85dc68..1ce97e375b 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index c4fd1bc0be..ab4a9b3a69 100644
++index c4fd1bc0be..6e6bedca20 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -212,6 +212,8 @@ AC_SUBST([mkexe_ldflags_exp])
@@ -13482,15 +13485,18 @@ index 0000000000..ae6cdfa566
 +   [arm64-*-darwin*],
 +     [has_native_backend=yes; arch=arm64; system=macosx],
 +   [aarch64-*-darwin*],
-+@@ -1266,7 +1278,7 @@ AS_CASE([$host],
++@@ -1266,9 +1278,9 @@ AS_CASE([$host],
 +   [aarch64-*-netbsd*],
 +     [has_native_backend=yes; arch=arm64; system=netbsd],
 +   [x86_64-*-cygwin*],
 +-    [arch=amd64; system=cygwin],
 ++    [has_native_backend=yes; arch=amd64; system=cygwin],
 +   [riscv64-*-linux*],
-+     [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
++-    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+++    [arch=riscv; model=riscv64; system=linux]
 + )
++ 
++ AS_CASE([$ccomptype],
 +@@ -1964,11 +1976,23 @@ AS_CASE([$enable_debug_runtime],
 +   [no], [debug_runtime=false],
 +   [debug_runtime=true])
@@ -20078,9 +20084,7 @@ index 0000000000..ae6cdfa566
 ++    until the random failures have been investigated.
 ++ *)
 ++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++index 1d16b72d4e..956ec369ab 100644
-++--- a/testsuite/tools/asmgen_i386.S
-++++
+++inde
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index a155076b11..c4b0f00cc5 100644
