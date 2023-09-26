@@ -1280,7 +1280,7 @@ AS_CASE([$host],
   [x86_64-*-cygwin*],
     [has_native_backend=yes; arch=amd64; system=cygwin],
   [riscv64-*-linux*],
-    [has_native_backend=yes; arch=riscv; model=riscv64; system=linux]
+    [arch=riscv; model=riscv64; system=linux]
 )
 
 AS_CASE([$ccomptype],
