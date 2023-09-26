@@ -642,10 +642,10 @@ index ea423e50b7..bd961633a9 100644
  
  (* Emission of a list of instructions. Include some peephole optimization. *)
 diff --git a/configure b/configure
-index aa3fa4047d..2e2d4ec060 100755
+index aa3fa4047d..8082cab86e 100755
 Binary files a/configure and b/configure differ
 diff --git a/configure.ac b/configure.ac
-index a60f1343d0..d21b7cf14e 100644
+index a60f1343d0..55c5a216aa 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -657,6 +657,21 @@ index a60f1343d0..d21b7cf14e 100644
  AC_SUBST([force_instrumented_runtime])
  
  ## Generated files
+@@ -200,10 +202,10 @@ AC_CANONICAL_TARGET
+ # Systems that are known not to work, even in bytecode only.
+ 
+ AS_CASE([$host],
+-  [*-pc-windows],
+-    [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
+-  [*-*-cygwin*],
+-    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
++dnl   [*-pc-windows],
++dnl     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
++dnl   [*-*-cygwin*],
++dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
+   [i386-*-solaris*],
+     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
+ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
 @@ -309,9 +311,16 @@ AC_ARG_ENABLE([frame-pointers],
    [AS_HELP_STRING([--enable-frame-pointers],
      [use frame pointers in runtime and generated code])])
@@ -2048,7 +2063,7 @@ index 0000000000..e761b63337
 +   } else {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..a9c69663a4
+index 0000000000..85d2c0ac9d
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
 @@ -0,0 +1,2635 @@
@@ -3570,7 +3585,7 @@ index 0000000000..a9c69663a4
 + 
 + open Domain
 +diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-+index 8dd2398ac8..ffb7e2f969 100644
++index 8a8a115141..20fd12d705 100644
 +--- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 ++++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 +@@ -1,8 +1,10 @@
@@ -3588,7 +3603,7 @@ index 0000000000..a9c69663a4
 + 
 + open Domain
 +diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-+index 2d1961d9f1..89c3f3d5c5 100644
++index e853c25865..30fa17d116 100644
 +--- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 ++++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 +@@ -1,8 +1,10 @@
@@ -3624,7 +3639,7 @@ index 0000000000..a9c69663a4
 + 
 + 
 +diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
-+index fba31533e3..388d8ef8c3 100644
++index d270cca9bc..5a5c5b2464 100644
 +--- a/testsuite/tests/parallel/join.ml
 ++++ b/testsuite/tests/parallel/join.ml
 +@@ -1,8 +1,10 @@
@@ -3640,7 +3655,7 @@ index 0000000000..a9c69663a4
 ++*** native
 + *)
 + 
-+ let main_join n =
++ let test_size =
 +diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
 +index e418500774..f11190aee3 100644
 +--- a/testsuite/tests/parallel/major_gc_wait_backup.ml
@@ -4689,10 +4704,10 @@ index 0000000000..a9c69663a4
 + let size = 1000;;
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..abae945d74
+index 0000000000..906265000f
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,4652 @@
+@@ -0,0 +1,4647 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..0397577527
@@ -5337,10 +5352,10 @@ index 0000000000..abae945d74
 + 
 + (* Emission of a list of instructions. Include some peephole optimization. *)
 +diff --git a/configure b/configure
-+index aa3fa4047d..2e2d4ec060 100755
++index aa3fa4047d..8082cab86e 100755
 +Binary files a/configure and b/configure differ
 +diff --git a/configure.ac b/configure.ac
-+index a60f1343d0..d21b7cf14e 100644
++index a60f1343d0..55c5a216aa 100644
 +--- a/configure.ac
 ++++ b/configure.ac
 +@@ -167,6 +167,8 @@ AC_SUBST([flexlink_flags])
@@ -5352,6 +5367,21 @@ index 0000000000..abae945d74
 + AC_SUBST([force_instrumented_runtime])
 + 
 + ## Generated files
++@@ -200,10 +202,10 @@ AC_CANONICAL_TARGET
++ # Systems that are known not to work, even in bytecode only.
++ 
++ AS_CASE([$host],
++-  [*-pc-windows],
++-    [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
++-  [*-*-cygwin*],
++-    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
+++dnl   [*-pc-windows],
+++dnl     [AC_MSG_ERROR([the MSVC compiler is not supported currently], 69)],
+++dnl   [*-*-cygwin*],
+++dnl    [AC_MSG_ERROR([Cygwin is not supported currently], 69)],
++   [i386-*-solaris*],
++     [AC_MSG_ERROR([Building for 32 bits target is not supported. \
++ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
 +@@ -309,9 +311,16 @@ AC_ARG_ENABLE([frame-pointers],
 +   [AS_HELP_STRING([--enable-frame-pointers],
 +     [use frame pointers in runtime and generated code])])
@@ -6743,7 +6773,7 @@ index 0000000000..abae945d74
 ++   } else {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..a9c69663a4
++index 0000000000..85d2c0ac9d
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
 +@@ -0,0 +1,2635 @@
@@ -8265,7 +8295,7 @@ index 0000000000..abae945d74
 ++ 
 ++ open Domain
 ++diff --git a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
-++index 8dd2398ac8..ffb7e2f969 100644
+++index 8a8a115141..20fd12d705 100644
 ++--- a/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 +++++ b/testsuite/tests/parallel/domain_parallel_spawn_burn.ml
 ++@@ -1,8 +1,10 @@
@@ -8283,7 +8313,7 @@ index 0000000000..abae945d74
 ++ 
 ++ open Domain
 ++diff --git a/testsuite/tests/parallel/domain_serial_spawn_burn.ml b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
-++index 2d1961d9f1..89c3f3d5c5 100644
+++index e853c25865..30fa17d116 100644
 ++--- a/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 +++++ b/testsuite/tests/parallel/domain_serial_spawn_burn.ml
 ++@@ -1,8 +1,10 @@
@@ -8319,7 +8349,7 @@ index 0000000000..abae945d74
 ++ 
 ++ 
 ++diff --git a/testsuite/tests/parallel/join.ml b/testsuite/tests/parallel/join.ml
-++index fba31533e3..388d8ef8c3 100644
+++index d270cca9bc..5a5c5b2464 100644
 ++--- a/testsuite/tests/parallel/join.ml
 +++++ b/testsuite/tests/parallel/join.ml
 ++@@ -1,8 +1,10 @@
@@ -8335,7 +8365,7 @@ index 0000000000..abae945d74
 +++*** native
 ++ *)
 ++ 
-++ let main_join n =
+++ let test_size =
 ++diff --git a/testsuite/tests/parallel/major_gc_wait_backup.ml b/testsuite/tests/parallel/major_gc_wait_backup.ml
 ++index e418500774..f11190aee3 100644
 ++--- a/testsuite/tests/parallel/major_gc_wait_backup.ml
@@ -9324,27 +9354,7 @@ index 0000000000..abae945d74
 ++ module type Sunderscore = sig
 ++diff --git a/testsuite/tests/unwind/unwind_test.reference b/testsuite/tests/unwind/unwind_test.reference
 ++index fbcd16e8e1..56a5f30733 100644
-++--- a/testsuite/tests/unwind/unwind_test.reference
-+++++ b/testsuite/tests/unwind/unwind_test.reference
-++@@ -1,5 +1,4 @@
-++ ml_perform_stack_walk
-++-caml_c_call
-++ Mylib.baz
-++ Driver.entry
-++ caml_program
-++diff --git a/testsuite/tests/weak-ephe-final/ephetest_par.ml b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++index 744c4e844d..621d7292ff 100644
-++--- a/testsuite/tests/weak-ephe-final/ephetest_par.ml
-+++++ b/testsuite/tests/weak-ephe-final/ephetest_par.ml
-++@@ -1,4 +1,7 @@
-++-(* TEST *)
-+++(* TEST
-+++   * skip
-+++   reason = "OCaml 5 only"
-+++ *)
-++ 
-++ (* Due to GCs running at non-deterministic places, the output from these tests
-++  * are unreliable except the bad valu
+++--- a/testsuite/tests/unw
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6a44270f76..b61f3a3d76 100644
