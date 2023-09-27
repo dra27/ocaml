@@ -1,7 +1,10 @@
 (* TEST
-   modules = "cstubs.c np.ml"
-   * bytecode
-   * native
+ modules = "cstubs.c np.ml";
+ {
+   bytecode;
+ }{
+   native;
+ }
 *)
 
 open Np

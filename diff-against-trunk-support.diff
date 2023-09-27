@@ -142,14 +142,14 @@ index 0000000000..ccf0582c0a
 +}
 diff --git a/testsuite/tests/asmcomp/is_static.ml b/testsuite/tests/asmcomp/is_static.ml
 new file mode 100644
-index 0000000000..b8a3bef006
+index 0000000000..78fb16bad4
 --- /dev/null
 +++ b/testsuite/tests/asmcomp/is_static.ml
 @@ -0,0 +1,40 @@
 +(* TEST
-+   modules = "is_in_static_data.c"
-+   * naked_pointers
-+   ** native
++ modules = "is_in_static_data.c";
++ naked_pointers;
++ native;
 +*)
 +
 +(* Data that should be statically allocated by the compiler (all versions) *)
@@ -188,15 +188,15 @@ index 0000000000..b8a3bef006
 +  assert(is_in_static_data g1)
 diff --git a/testsuite/tests/asmcomp/is_static_flambda.ml b/testsuite/tests/asmcomp/is_static_flambda.ml
 new file mode 100644
-index 0000000000..63e53cfc42
+index 0000000000..768c7ad5e2
 --- /dev/null
 +++ b/testsuite/tests/asmcomp/is_static_flambda.ml
 @@ -0,0 +1,207 @@
 +(* TEST
-+   modules = "is_in_static_data.c is_static_flambda_dep.ml"
-+   * flambda
-+   ** naked_pointers
-+   *** native
++ modules = "is_in_static_data.c is_static_flambda_dep.ml";
++ flambda;
++ naked_pointers;
++ native;
 +*)
 +
 +(* Data that should be statically allocated by the compiler (flambda only) *)
@@ -445,16 +445,16 @@ index 0000000000..1aca414f7e
 +let f = 3.14
 diff --git a/testsuite/tests/asmcomp/static_float_array_flambda.ml b/testsuite/tests/asmcomp/static_float_array_flambda.ml
 new file mode 100644
-index 0000000000..824a12ca89
+index 0000000000..3314db1c5e
 --- /dev/null
 +++ b/testsuite/tests/asmcomp/static_float_array_flambda.ml
 @@ -0,0 +1,26 @@
 +(* TEST
-+   modules = "is_in_static_data.c simple_float_const.ml"
-+   * flambda
-+   ** flat-float-array
-+   *** naked_pointers
-+   **** native
++ modules = "is_in_static_data.c simple_float_const.ml";
++ flambda;
++ flat-float-array;
++ naked_pointers;
++ native;
 +*)
 +
 +external is_in_static_data : 'a -> bool = "caml_is_in_static_data"
@@ -477,17 +477,17 @@ index 0000000000..824a12ca89
 +let () = assert(is_in_static_data d)
 diff --git a/testsuite/tests/asmcomp/static_float_array_flambda_opaque.ml b/testsuite/tests/asmcomp/static_float_array_flambda_opaque.ml
 new file mode 100644
-index 0000000000..56ea9e1793
+index 0000000000..33dad7cfe3
 --- /dev/null
 +++ b/testsuite/tests/asmcomp/static_float_array_flambda_opaque.ml
 @@ -0,0 +1,30 @@
 +(* TEST
-+   modules = "is_in_static_data.c simple_float_const_opaque.ml"
-+   flags = "-opaque"
-+   * flambda
-+   ** flat-float-array
-+   *** naked_pointers
-+   **** native
++ modules = "is_in_static_data.c simple_float_const_opaque.ml";
++ flags = "-opaque";
++ flambda;
++ flat-float-array;
++ naked_pointers;
++ native;
 +*)
 +
 +external is_in_static_data : 'a -> bool = "caml_is_in_static_data"
@@ -1828,14 +1828,17 @@ index 3aade5bacc..5ff07ee2de 100644
  (* Test for output_value / input_value *)
 diff --git a/testsuite/tests/lib-obj/reachable_words_np.ml b/testsuite/tests/lib-obj/reachable_words_np.ml
 new file mode 100644
-index 0000000000..8a50268d20
+index 0000000000..2bad8f2369
 --- /dev/null
 +++ b/testsuite/tests/lib-obj/reachable_words_np.ml
-@@ -0,0 +1,21 @@
+@@ -0,0 +1,24 @@
 +(* TEST
-+ * naked_pointers
-+ ** bytecode
-+ ** native
++ naked_pointers;
++ {
++   bytecode;
++ }{
++   native;
++ }
 +*)
 +
 +let native =
@@ -2662,14 +2665,17 @@ index 0000000000..1738934ff0
 +  root
 diff --git a/testsuite/tests/runtime-naked-pointers/np1.ml b/testsuite/tests/runtime-naked-pointers/np1.ml
 new file mode 100644
-index 0000000000..be4c677a23
+index 0000000000..8f08f5c792
 --- /dev/null
 +++ b/testsuite/tests/runtime-naked-pointers/np1.ml
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,15 @@
 +(* TEST
-+   modules = "cstubs.c np.ml"
-+   * bytecode
-+   * native
++ modules = "cstubs.c np.ml";
++ {
++   bytecode;
++ }{
++   native;
++ }
 +*)
 +
 +open Np
@@ -2680,14 +2686,17 @@ index 0000000000..be4c677a23
 +let x = do_gc [ make_block 100n Black 100n ]
 diff --git a/testsuite/tests/runtime-naked-pointers/np2.ml b/testsuite/tests/runtime-naked-pointers/np2.ml
 new file mode 100644
-index 0000000000..f24c813c2b
+index 0000000000..b94c4b2a75
 --- /dev/null
 +++ b/testsuite/tests/runtime-naked-pointers/np2.ml
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,16 @@
 +(* TEST
-+   modules = "cstubs.c np.ml"
-+   * bytecode
-+   * native
++ modules = "cstubs.c np.ml";
++ {
++   bytecode;
++ }{
++   native;
++ }
 +*)
 +
 +open Np
@@ -2708,15 +2717,18 @@ index 0000000000..c03f6f688d
 +exec ${test_source_directory}/runtest.sh
 diff --git a/testsuite/tests/runtime-naked-pointers/np3.ml b/testsuite/tests/runtime-naked-pointers/np3.ml
 new file mode 100644
-index 0000000000..d207279df1
+index 0000000000..6ea4c99e8a
 --- /dev/null
 +++ b/testsuite/tests/runtime-naked-pointers/np3.ml
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,18 @@
 +(* TEST
-+   modules = "cstubs.c np.ml"
-+   * naked_pointers
-+   ** bytecode
-+   ** native
++ modules = "cstubs.c np.ml";
++ naked_pointers;
++ {
++   bytecode;
++ }{
++   native;
++ }
 +*)
 +
 +open Np
@@ -2738,15 +2750,18 @@ index 0000000000..c03f6f688d
 +exec ${test_source_directory}/runtest.sh
 diff --git a/testsuite/tests/runtime-naked-pointers/np4.ml b/testsuite/tests/runtime-naked-pointers/np4.ml
 new file mode 100644
-index 0000000000..98966ddffc
+index 0000000000..87f67f4043
 --- /dev/null
 +++ b/testsuite/tests/runtime-naked-pointers/np4.ml
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,16 @@
 +(* TEST
-+   modules = "cstubs.c np.ml"
-+   * naked_pointers
-+   ** bytecode
-+   ** native
++ modules = "cstubs.c np.ml";
++ naked_pointers;
++ {
++   bytecode;
++ }{
++   native;
++ }
 +*)
 +
 +open Np
