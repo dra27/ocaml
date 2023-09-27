@@ -66,15 +66,16 @@ index 333bcad1af..94ee1cfe3d 100644
  cache:
    - C:\cygwin64\var\cache\setup
 diff --git a/ocamltest/builtin_actions.ml b/ocamltest/builtin_actions.ml
-index 0bc17bc281..0bb0042339 100644
+index 0bc17bc281..faae83cf0e 100644
 --- a/ocamltest/builtin_actions.ml
 +++ b/ocamltest/builtin_actions.ml
-@@ -204,6 +204,12 @@ let function_sections = make
+@@ -204,6 +204,13 @@ let function_sections = make
       "Target supports function sections"
       "Target does not support function sections")
  
 +let naked_pointers = make
-+  "naked_pointers"
++  ~name:"naked_pointers"
++  ~description:"Pass if target supports naked pointers"
 +  (Actions_helpers.pass_or_skip (Ocamltest_config.naked_pointers)
 +     "Runtime system supports naked pointers"
 +     "Runtime system does not support naked pointers")
@@ -82,7 +83,7 @@ index 0bc17bc281..0bb0042339 100644
  let frame_pointers = make
    ~name:"frame_pointers"
    ~description:"Pass if frame pointers are available"
-@@ -343,6 +349,7 @@ let _ =
+@@ -343,6 +350,7 @@ let _ =
      arch_i386;
      arch_power;
      function_sections;

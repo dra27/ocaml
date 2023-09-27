@@ -7351,10 +7351,10 @@ index 0000000000..7fe9834336
 +   {
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
-index 0000000000..5d1543973f
+index 0000000000..be26a84e20
 --- /dev/null
 +++ b/diff-against-trunk-support.diff
-@@ -0,0 +1,3982 @@
+@@ -0,0 +1,3952 @@
 +diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 +index 59b5162a2f..13cd6abde1 100644
 +--- a/.github/workflows/build.yml
@@ -11197,82 +11197,6 @@ index 0000000000..5d1543973f
 + 
 + (* Testing unsynchronized, parallel Weak usage *)
 + 
-+diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-+new file mode 100644
-+index 0000000000..956ec369ab
-+--- /dev/null
-++++ b/testsuite/tools/asmgen_i386.S
-+@@ -0,0 +1,70 @@
-++/**************************************************************************/
-++/*                                                                        */
-++/*                                OCaml                                   */
-++/*                                                                        */
-++/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
-++/*                                                                        */
-++/*   Copyright 1996 Institut National de Recherche en Informatique et     */
-++/*     en Automatique.                                                    */
-++/*                                                                        */
-++/*   All rights reserved.  This file is distributed under the terms of    */
-++/*   the GNU Lesser General Public License version 2.1, with the          */
-++/*   special exception on linking described in the file LICENSE.          */
-++/*                                                                        */
-++/**************************************************************************/
-++
-++/* Linux with ELF binaries does not prefix identifiers with _.
-++   Linux with a.out binaries, FreeBSD, and NextStep do. */
-++
-++#if defined(SYS_linux_elf) || defined(SYS_bsd_elf) \
-++ || defined(SYS_solaris) || defined(SYS_beos) || defined(SYS_gnu)
-++#define G(x) x
-++#define FUNCTION_ALIGN 16
-++#else
-++#define G(x) _##x
-++#define FUNCTION_ALIGN 4
-++#endif
-++
-++        .globl  G(call_gen_code)
-++        .align  FUNCTION_ALIGN
-++G(call_gen_code):
-++        pushl %ebp
-++        movl %esp,%ebp
-++        pushl %ebx
-++        pushl %esi
-++        pushl %edi
-++        movl 12(%ebp),%eax
-++        movl 16(%ebp),%ebx
-++        movl 20(%ebp),%ecx
-++        movl 24(%ebp),%edx
-++        call *8(%ebp)
-++        popl %edi
-++        popl %esi
-++        popl %ebx
-++        popl %ebp
-++        ret
-++
-++        .globl  G(caml_c_call)
-++        .align  FUNCTION_ALIGN
-++G(caml_c_call):
-++        jmp     *%eax
-++
-++        .comm   G(caml_state), 4
-++
-++/* Some tests are designed to cause registers to spill; on
-++ * x86 we require the caml_extra_params symbol from the RTS. */
-++        .data
-++        .globl  G(caml_extra_params)
-++G(caml_extra_params):
-++#ifndef SYS_solaris
-++        .space  64
-++#else
-++        .zero   64
-++#endif
-++
-++
-++
-++#if defined(SYS_linux_elf)
-++    /* Mark stack as non-executable */
-++        .section .note.GNU-stack,"",%progbits
-++#endif
 +diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
 +index de10bd1fd3..5f9e31bc66 100755
 +--- a/tools/ci/actions/runner.sh
@@ -11299,7 +11223,7 @@ index 0000000000..5d1543973f
 + 
 + Build () {
 +diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-+index 3292ad9c31..24fd58adef 100644
++index 3292ad9c31..f69aeb342c 100644
 +--- a/tools/ci/appveyor/appveyor_build.sh
 ++++ b/tools/ci/appveyor/appveyor_build.sh
 +@@ -64,8 +64,8 @@ function set_configuration {
@@ -11313,7 +11237,44 @@ index 0000000000..5d1543973f
 +         ;;
 +         msvc32)
 +             build='--build=i686-pc-cygwin'
-+@@ -158,10 +158,13 @@ case "$1" in
++@@ -139,29 +139,40 @@ case "$1" in
++     ;;
++   test)
++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+++    else
+++      run 'ocamlc -version' \
+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
+++        "$(cygpath -w "$FULL_BUILD_PREFIX-$PORT/ocamlc.exe")" -version
+++    fi
++     if [[ $PORT =~ mingw* ]] ; then
++       run "Check runtime symbols" \
++           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
++           $FULL_BUILD_PREFIX-$PORT/runtime/*.a \
++           $FULL_BUILD_PREFIX-$PORT/otherlibs/*/lib*.a
++     fi
++-    # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
++-    # tests now (to include natdynlink)
++-    run "test dynlink $PORT" \
++-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
++-    # Now reconfigure ocamltest to run in bytecode-only mode
++-    sed -i '/native_/s/true/false/' \
++-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
++-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
++-    # And run the entire testsuite, skipping all the native-code tests
+++    if [[ -e "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe" ]]; then
+++      # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
+++      # tests now (to include natdynlink)
+++      run "test dynlink $PORT" \
+++          $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+++      # Now reconfigure ocamltest to run in bytecode-only mode
+++      sed -i '/native_/s/true/false/' \
+++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
+++      # And run the entire testsuite, skipping all the native-code tests
+++    fi
 +     run "test $PORT" \
 +         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
 +     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
@@ -11328,7 +11289,7 @@ index 0000000000..5d1543973f
 +       # Ensure that .gitignore is up-to-date - this will fail if any untracked
 +       # or altered files exist. We revert the change from the bootstrap (that
 +       # would have failed the build earlier if necessary)
-+@@ -181,7 +184,7 @@ case "$1" in
++@@ -181,7 +192,7 @@ case "$1" in
 +   *)
 +     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
 + 
@@ -11337,12 +11298,21 @@ index 0000000000..5d1543973f
 +       # Ensure that make distclean can be run from an empty tree
 +       run "$MAKE distclean" $MAKE distclean
 +     fi
++@@ -205,7 +216,7 @@ case "$1" in
++         # For an explanation of the sed command, see
++         # https://github.com/appveyor/ci/issues/1824
++         script --quiet --return --command \
++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
++           "../$BUILD_PREFIX-$PORT/build.log" |
++             sed -e 's/\d027\[K//g' \
++                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..10785ae48a
+index 0000000000..75e5bb5e84
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,11221 @@
+@@ -0,0 +1,11244 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..c6d32355e3
@@ -18696,10 +18666,10 @@ index 0000000000..10785ae48a
 ++   {
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
-+index 0000000000..5d1543973f
++index 0000000000..be26a84e20
 +--- /dev/null
 ++++ b/diff-against-trunk-support.diff
-+@@ -0,0 +1,3982 @@
++@@ -0,0 +1,3952 @@
 ++diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
 ++index 59b5162a2f..13cd6abde1 100644
 ++--- a/.github/workflows/build.yml
@@ -22542,28 +22512,51 @@ index 0000000000..10785ae48a
 ++ 
 ++ (* Testing unsynchronized, parallel Weak usage *)
 ++ 
-++diff --git a/testsuite/tools/asmgen_i386.S b/testsuite/tools/asmgen_i386.S
-++new file mode 100644
-++index 0000000000..956ec369ab
-++--- /dev/null
-+++++ b/testsuite/tools/asmgen_i386.S
-++@@ -0,0 +1,70 @@
-+++/**************************************************************************/
-+++/*                                                                        */
-+++/*                                OCaml                                   */
-+++/*                                                                        */
-+++/*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           */
-+++/*                                                                        */
-+++/*   Copyright 1996 Institut National de Recherche en Informatique et     */
-+++/*     en Automatique.                                                    */
-+++/*                                                                        */
-+++/*   All rights reserved.  This file is distributed under the terms of    */
-+++/*   the GNU Lesser General Public License version 2.1, with the          */
-+++/*   special exception on linking described in the file LICENSE.          */
-+++/*                                                                        */
-+++/**************************************************************************/
-+++
-+++/* Linux with ELF binaries does no
+++diff --git a/tools/ci/actions/runner.sh b/tools/ci/actions/runner.sh
+++index de10bd1fd3..5f9e31bc66 100755
+++--- a/tools/ci/actions/runner.sh
++++++ b/tools/ci/actions/runner.sh
+++@@ -40,19 +40,7 @@ EOF
+++     --enable-debug-runtime \
+++     $CONFIG_ARG"
+++ 
+++-  case $XARCH in
+++-  x64)
+++-    ./configure $configure_flags
+++-    ;;
+++-  i386)
+++-    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+++-      $configure_flags
+++-    ;;
+++-  *)
+++-    echo unknown arch
+++-    exit 1
+++-    ;;
+++-  esac
++++  ./configure $configure_flags
+++ }
+++ 
+++ Build () {
+++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
+++index 3292ad9c31..f69aeb342c 100644
+++--- a/tools/ci/appveyor/appveyor_build.sh
++++++ b/tools/ci/appveyor/appveyor_build.sh
+++@@ -64,8 +64,8 @@ function set_configuration {
+++         mingw64)
+++             build='--build=i686-pc-cygwin'
+++             host='--host=x86_64-w64-mingw32'
+++-            dep='--disable-dependency-generation'
+++-            man='--disable-stdlib-manpages'
++++            # Explicitly test dependency generation on msvc64
++++            dep='--enable-dependency-generation'
+++         ;;
+++         msvc32)
+++             build='--build=i686-pc-cygwin'
+++@@ -139,29 +139,40 @@ case "$1" in
+++     ;;
+++   test)
+++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
+++-    r
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index e2d1b08fab..d80b0d7c24 100644

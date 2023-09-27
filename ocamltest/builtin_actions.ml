@@ -205,7 +205,8 @@ let function_sections = make
      "Target does not support function sections")
 
 let naked_pointers = make
-  "naked_pointers"
+  ~name:"naked_pointers"
+  ~description:"Pass if target supports naked pointers"
   (Actions_helpers.pass_or_skip (Ocamltest_config.naked_pointers)
      "Runtime system supports naked pointers"
      "Runtime system does not support naked pointers")
