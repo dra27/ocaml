@@ -464,10 +464,22 @@ index 7efbe75aa6..3a3b2845c2 100644
      let n = (frame_size env) - 8 - (if fp then 8 else 0) in
      if n <> 0
 diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-index cd50cba52b..2fc913dd83 100644
+index cd50cba52b..32726ea7dc 100644
 --- a/asmcomp/amd64/proc.ml
 +++ b/asmcomp/amd64/proc.ml
-@@ -293,12 +293,20 @@ let destroyed_at_c_call =
+@@ -235,7 +235,11 @@ let win64_float_external_arguments =
+ let win64_loc_external_arguments arg =
+   let loc = Array.make (Array.length arg) Reg.dummy in
+   let reg = ref 0
++(* BACKPORT BEGIN
+   and ofs = ref 0 in
++*)
++  and ofs = ref 32 in
++(* BACKPORT END *)
+   for i = 0 to Array.length arg - 1 do
+     match arg.(i) with
+     | Val | Int | Addr as ty ->
+@@ -293,12 +297,20 @@ let destroyed_at_c_call =
    if win64 then
      (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
      Array.of_list(List.map phys_reg
@@ -10132,10 +10144,10 @@ index 0000000000..5c2feef533
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..090b12356a
+index 0000000000..572718c18a
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10121 @@
+@@ -0,0 +1,10124 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e547775704
@@ -10602,10 +10614,22 @@ index 0000000000..090b12356a
 +     let n = (frame_size env) - 8 - (if fp then 8 else 0) in
 +     if n <> 0
 +diff --git a/asmcomp/amd64/proc.ml b/asmcomp/amd64/proc.ml
-+index cd50cba52b..2fc913dd83 100644
++index cd50cba52b..32726ea7dc 100644
 +--- a/asmcomp/amd64/proc.ml
 ++++ b/asmcomp/amd64/proc.ml
-+@@ -293,12 +293,20 @@ let destroyed_at_c_call =
++@@ -235,7 +235,11 @@ let win64_float_external_arguments =
++ let win64_loc_external_arguments arg =
++   let loc = Array.make (Array.length arg) Reg.dummy in
++   let reg = ref 0
+++(* BACKPORT BEGIN
++   and ofs = ref 0 in
+++*)
+++  and ofs = ref 32 in
+++(* BACKPORT END *)
++   for i = 0 to Array.length arg - 1 do
++     match arg.(i) with
++     | Val | Int | Addr as ty ->
++@@ -293,12 +297,20 @@ let destroyed_at_c_call =
 +   if win64 then
 +     (* Win64: rsi, rdi, r12-r15, xmm6-xmm15 preserved *)
 +     Array.of_list(List.map phys_reg
@@ -20247,16 +20271,7 @@ index 0000000000..090b12356a
 +++
 +++      git config --global safe.directory '*'
 +++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure 
+++       # Ensure that .gitignore is up-to-date - this will f
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
