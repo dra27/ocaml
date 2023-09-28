@@ -219,10 +219,31 @@ index 21127cd109..4adf84bf28 100644
    -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
    in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 diff --git a/Makefile b/Makefile
-index 7ea9344892..e4dc9ef4cf 100644
+index 7ea9344892..65c816d0aa 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -620,7 +620,6 @@ partialclean::
+@@ -413,9 +413,6 @@ flexlink.opt$(EXE): \
+ 	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
+ 	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
+ 
+-partialclean::
+-	rm -f flexlink.opt$(EXE) $(OPT_BINDIR)/flexlink$(EXE)
+-
+ else
+ 
+ flexdll flexlink flexlink.opt:
+@@ -436,6 +433,10 @@ flexdll flexlink flexlink.opt:
+ 
+ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
+ 
++partialclean::
++	rm -f flexlink.opt flexlink.opt.exe
++	rm -f $(OPT_BINDIR)/flexlink $(OPT_BINDIR)/flexlink.exe
++
+ INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
+ INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
+ FLEXDLL_MANIFEST = default_$(ARCH).manifest
+@@ -620,7 +621,6 @@ partialclean::
  ## Lists of source files
  
  runtime_COMMON_C_SOURCES = \
@@ -230,7 +251,7 @@ index 7ea9344892..e4dc9ef4cf 100644
    afl \
    alloc \
    array \
-@@ -628,24 +627,24 @@ runtime_COMMON_C_SOURCES = \
+@@ -628,24 +628,24 @@ runtime_COMMON_C_SOURCES = \
    bigarray \
    callback \
    codefrag \
@@ -258,7 +279,7 @@ index 7ea9344892..e4dc9ef4cf 100644
    main \
    major_gc \
    md5 \
-@@ -656,17 +655,12 @@ runtime_COMMON_C_SOURCES = \
+@@ -656,17 +656,12 @@ runtime_COMMON_C_SOURCES = \
    misc \
    obj \
    parsing \
@@ -276,7 +297,7 @@ index 7ea9344892..e4dc9ef4cf 100644
    sys \
    $(UNIX_OR_WIN32) \
    weak
-@@ -676,6 +670,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
+@@ -676,6 +671,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
    fail_byt \
    fix_code \
    interp \
@@ -286,7 +307,7 @@ index 7ea9344892..e4dc9ef4cf 100644
    startup_byt
  runtime_BYTECODE_C_SOURCES = \
    $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-@@ -686,7 +683,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
+@@ -686,7 +684,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
    clambda_checks \
    dynlink_nat \
    fail_nat \
@@ -295,7 +316,7 @@ index 7ea9344892..e4dc9ef4cf 100644
    startup_nat \
    signals_nat
  runtime_NATIVE_C_SOURCES = \
-@@ -1075,12 +1072,14 @@ clean::
+@@ -1075,12 +1073,14 @@ clean::
  
  # Dependencies
  
@@ -312,7 +333,7 @@ index 7ea9344892..e4dc9ef4cf 100644
  	  $(MAKE) -C $$dir depend || exit; \
  	done
  
-@@ -1152,6 +1151,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
+@@ -1152,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
  	$(V_MKEXE)$(MKEXE) -o $@ $^
  
  clean::
@@ -320,7 +341,7 @@ index 7ea9344892..e4dc9ef4cf 100644
  	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
  
  $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-@@ -1699,6 +1699,9 @@ endif
+@@ -1699,6 +1700,9 @@ endif
  	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
  	done
  	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -10615,10 +10636,10 @@ index 0000000000..6eecbb6fb4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..3f282e23ac
+index 0000000000..a5bf698bd5
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10556 @@
+@@ -0,0 +1,10562 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e0e5cb204c
@@ -10840,10 +10861,31 @@ index 0000000000..3f282e23ac
 +   -Wl,-z,notext in mksharedlib and mkmaindll. Fixes relocation issues, reported
 +   in #9800, making local patches in Debian, Alpine, and FreeBSD superfluous.
 +diff --git a/Makefile b/Makefile
-+index 7ea9344892..e4dc9ef4cf 100644
++index 7ea9344892..65c816d0aa 100644
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -620,7 +620,6 @@ partialclean::
++@@ -413,9 +413,6 @@ flexlink.opt$(EXE): \
++ 	cd $(OPT_BINDIR); $(LN) $(call ROOT_FROM, $(OPT_BINDIR))/$@ flexlink$(EXE)
++ 	cp $(addprefix $(BYTE_BINDIR)/, $(FLEXDLL_OBJECTS)) $(OPT_BINDIR)
++ 
++-partialclean::
++-	rm -f flexlink.opt$(EXE) $(OPT_BINDIR)/flexlink$(EXE)
++-
++ else
++ 
++ flexdll flexlink flexlink.opt:
++@@ -436,6 +433,10 @@ flexdll flexlink flexlink.opt:
++ 
++ endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
++ 
+++partialclean::
+++	rm -f flexlink.opt flexlink.opt.exe
+++	rm -f $(OPT_BINDIR)/flexlink $(OPT_BINDIR)/flexlink.exe
+++
++ INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
++ INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
++ FLEXDLL_MANIFEST = default_$(ARCH).manifest
++@@ -620,7 +621,6 @@ partialclean::
 + ## Lists of source files
 + 
 + runtime_COMMON_C_SOURCES = \
@@ -10851,7 +10893,7 @@ index 0000000000..3f282e23ac
 +   afl \
 +   alloc \
 +   array \
-+@@ -628,24 +627,24 @@ runtime_COMMON_C_SOURCES = \
++@@ -628,24 +628,24 @@ runtime_COMMON_C_SOURCES = \
 +   bigarray \
 +   callback \
 +   codefrag \
@@ -10879,7 +10921,7 @@ index 0000000000..3f282e23ac
 +   main \
 +   major_gc \
 +   md5 \
-+@@ -656,17 +655,12 @@ runtime_COMMON_C_SOURCES = \
++@@ -656,17 +656,12 @@ runtime_COMMON_C_SOURCES = \
 +   misc \
 +   obj \
 +   parsing \
@@ -10897,7 +10939,7 @@ index 0000000000..3f282e23ac
 +   sys \
 +   $(UNIX_OR_WIN32) \
 +   weak
-+@@ -676,6 +670,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
++@@ -676,6 +671,9 @@ runtime_BYTECODE_ONLY_C_SOURCES = \
 +   fail_byt \
 +   fix_code \
 +   interp \
@@ -10907,7 +10949,7 @@ index 0000000000..3f282e23ac
 +   startup_byt
 + runtime_BYTECODE_C_SOURCES = \
 +   $(runtime_COMMON_C_SOURCES:%=runtime/%.c) \
-+@@ -686,7 +683,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
++@@ -686,7 +684,7 @@ runtime_NATIVE_ONLY_C_SOURCES = \
 +   clambda_checks \
 +   dynlink_nat \
 +   fail_nat \
@@ -10916,7 +10958,7 @@ index 0000000000..3f282e23ac
 +   startup_nat \
 +   signals_nat
 + runtime_NATIVE_C_SOURCES = \
-+@@ -1075,12 +1072,14 @@ clean::
++@@ -1075,12 +1073,14 @@ clean::
 + 
 + # Dependencies
 + 
@@ -10933,7 +10975,7 @@ index 0000000000..3f282e23ac
 + 	  $(MAKE) -C $$dir depend || exit; \
 + 	done
 + 
-+@@ -1152,6 +1151,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
++@@ -1152,6 +1152,7 @@ $(ocamlyacc_PROGRAM)$(EXE): $(ocamlyacc_OBJECTS)
 + 	$(V_MKEXE)$(MKEXE) -o $@ $^
 + 
 + clean::
@@ -10941,7 +10983,7 @@ index 0000000000..3f282e23ac
 + 	rm -f $(ocamlyacc_MODULES:=.o) $(ocamlyacc_MODULES:=.obj)
 + 
 + $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
-+@@ -1699,6 +1699,9 @@ endif
++@@ -1699,6 +1700,9 @@ endif
 + 	  $(INSTALL_PROG) "tools/$$i$(EXE)" "$(INSTALL_BINDIR)";\
 + 	done
 + 	$(INSTALL_PROG) $(ocamlyacc_PROGRAM)$(EXE) "$(INSTALL_BINDIR)"
@@ -21159,22 +21201,7 @@ index 0000000000..3f282e23ac
 ++             host='--host=x86_64-w64-mingw32'
 ++-            dep='--disable-dependency-generation'
 ++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-dependency-generation'
-++         ;;
-++         msvc32)
-++             build='--build=i686-pc-cygwin'
-++@@ -139,29 +139,40 @@ case "$1" in
-++     ;;
-++   test)
-++     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-++-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    if [[ -e $FULL_BUILD_PREFIX-$PORT/ocamlc.opt.exe ]]; then
-+++      run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
-+++    else
-+++      run 'ocamlc -version' \
-+++        "$FULL_BUILD_PREFIX-$PORT/runtime/ocamlrun.exe" \
-+++        "$(cygpath -w "$F
++++    
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
