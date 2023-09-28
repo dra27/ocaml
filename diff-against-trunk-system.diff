@@ -3777,10 +3777,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..beacc9429c
+index 0000000000..7aa1b8d11f
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2854 @@
+@@ -0,0 +1,2869 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -6603,38 +6603,53 @@ index 0000000000..beacc9429c
 +      with some not-very-random data. */
 +   {
 +diff --git a/runtime/win32.c b/runtime/win32.c
-+index 77e5f39fb0..63be213997 100644
++index 77e5f39fb0..914a5beede 100644
 +--- a/runtime/win32.c
 ++++ b/runtime/win32.c
-+@@ -769,6 +769,28 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
++@@ -769,6 +769,19 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
 + 
 + int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
 + {
-++  /* First handle corner-cases not handled by MoveFileEx:
-++     - dir to empty dir - positive - should succeed
+++  /* First handle corner-case not handled by MoveFileEx:
 ++     - dir to existing file - should fail */
+++  DWORD new_attribs;
 ++  DWORD old_attribs = GetFileAttributes(oldpath);
 ++  if ((old_attribs != INVALID_FILE_ATTRIBUTES) &&
-++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
-++      (old_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
-++      (old_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
-++    DWORD new_attribs = GetFileAttributes(newpath);
+++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+++    new_attribs = GetFileAttributes(newpath);
 ++    if ((new_attribs != INVALID_FILE_ATTRIBUTES) &&
-++        (new_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
-++        (new_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
-++      if ((new_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-++        /* Try to delete and fall though.
-++           RemoveDirectoryW fails on non-empty dirs as intended. */
-++        RemoveDirectoryW(newpath);
-++      } else {
+++        (new_attribs & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 ++        errno = ENOTDIR;
 ++        return -1;
-++      }
 ++    }
 ++  }
 +   /* MOVEFILE_REPLACE_EXISTING: to be closer to POSIX
 +      MOVEFILE_COPY_ALLOWED: MoveFile performs a copy if old and new
 +        paths are on different devices, so we do the same here for
++@@ -780,6 +793,23 @@ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
++                  MOVEFILE_COPY_ALLOWED)) {
++     return 0;
++   }
+++
+++  /* Another cornercase not handled by MoveFileEx:
+++     - dir to empty dir - positive - should succeed */
+++  if ((old_attribs != INVALID_FILE_ATTRIBUTES) &&
+++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
+++      (new_attribs != INVALID_FILE_ATTRIBUTES) &&
+++      (new_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+++    /* Try to delete: RemoveDirectoryW fails on non-empty dirs as intended.
+++       Then try again. */
+++    RemoveDirectoryW(newpath);
+++    if (MoveFileEx(oldpath, newpath,
+++                   MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH |
+++                   MOVEFILE_COPY_ALLOWED)) {
+++      return 0;
+++    }
+++  }
+++
++   /* Modest attempt at mapping Win32 error codes to POSIX error codes.
++      The __dosmaperr() function from the CRT does a better job but is
++      generally not accessible. */
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
 index 0000000000..572a4697e2
@@ -10565,10 +10580,10 @@ index 0000000000..572a4697e2
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..e177820c18
+index 0000000000..396ac119a7
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10492 @@
+@@ -0,0 +1,10495 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -14348,10 +14363,10 @@ index 0000000000..e177820c18
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..beacc9429c
++index 0000000000..7aa1b8d11f
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2854 @@
++@@ -0,0 +1,2869 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -17174,38 +17189,53 @@ index 0000000000..e177820c18
 ++      with some not-very-random data. */
 ++   {
 ++diff --git a/runtime/win32.c b/runtime/win32.c
-++index 77e5f39fb0..63be213997 100644
+++index 77e5f39fb0..914a5beede 100644
 ++--- a/runtime/win32.c
 +++++ b/runtime/win32.c
-++@@ -769,6 +769,28 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
+++@@ -769,6 +769,19 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
 ++ 
 ++ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
 ++ {
-+++  /* First handle corner-cases not handled by MoveFileEx:
-+++     - dir to empty dir - positive - should succeed
++++  /* First handle corner-case not handled by MoveFileEx:
 +++     - dir to existing file - should fail */
++++  DWORD new_attribs;
 +++  DWORD old_attribs = GetFileAttributes(oldpath);
 +++  if ((old_attribs != INVALID_FILE_ATTRIBUTES) &&
-+++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
-+++      (old_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
-+++      (old_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
-+++    DWORD new_attribs = GetFileAttributes(newpath);
++++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
++++    new_attribs = GetFileAttributes(newpath);
 +++    if ((new_attribs != INVALID_FILE_ATTRIBUTES) &&
-+++        (new_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
-+++        (new_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
-+++      if ((new_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-+++        /* Try to delete and fall though.
-+++           RemoveDirectoryW fails on non-empty dirs as intended. */
-+++        RemoveDirectoryW(newpath);
-+++      } else {
++++        (new_attribs & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 +++        errno = ENOTDIR;
 +++        return -1;
-+++      }
 +++    }
 +++  }
 ++   /* MOVEFILE_REPLACE_EXISTING: to be closer to POSIX
 ++      MOVEFILE_COPY_ALLOWED: MoveFile performs a copy if old and new
 ++        paths are on different devices, so we do the same here for
+++@@ -780,6 +793,23 @@ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
+++                  MOVEFILE_COPY_ALLOWED)) {
+++     return 0;
+++   }
++++
++++  /* Another cornercase not handled by MoveFileEx:
++++     - dir to empty dir - positive - should succeed */
++++  if ((old_attribs != INVALID_FILE_ATTRIBUTES) &&
++++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
++++      (new_attribs != INVALID_FILE_ATTRIBUTES) &&
++++      (new_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
++++    /* Try to delete: RemoveDirectoryW fails on non-empty dirs as intended.
++++       Then try again. */
++++    RemoveDirectoryW(newpath);
++++    if (MoveFileEx(oldpath, newpath,
++++                   MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH |
++++                   MOVEFILE_COPY_ALLOWED)) {
++++      return 0;
++++    }
++++  }
++++
+++   /* Modest attempt at mapping Win32 error codes to POSIX error codes.
+++      The __dosmaperr() function from the CRT does a better job but is
+++      generally not accessible. */
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
 +index 0000000000..572a4697e2
@@ -21048,19 +21078,7 @@ index 0000000000..e177820c18
 +++  ./configure $configure_flags
 ++ }
 ++ 
-++ Build () {
-++diff --git a/tools/ci/appveyor/appveyor_build.sh b/tools/ci/appveyor/appveyor_build.sh
-++index 3292ad9c31..f69aeb342c 100644
-++--- a/tools/ci/appveyor/appveyor_build.sh
-+++++ b/tools/ci/appveyor/appveyor_build.sh
-++@@ -64,8 +64,8 @@ function set_configuration {
-++         mingw64)
-++             build='--build=i686-pc-cygwin'
-++             host='--host=x86_64-w64-mingw32'
-++-            dep='--disable-dependency-generation'
-++-            man='--disable-stdlib-manpages'
-+++            # Explicitly test dependency generation on msvc64
-+++            dep='--enable-depend
+++ Build ()
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
