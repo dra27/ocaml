@@ -3664,10 +3664,10 @@ index b05d05767b..7a2665d305 100644
  
 diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 new file mode 100644
-index 0000000000..f091636efa
+index 0000000000..7c8665c4af
 --- /dev/null
 +++ b/diff-against-4.14-runtime.diff
-@@ -0,0 +1,2496 @@
+@@ -0,0 +1,2529 @@
 +diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 +index 957f4717b6..09b243f6a5 100644
 +--- a/otherlibs/systhreads/st_posix.h
@@ -6164,6 +6164,39 @@ index 0000000000..f091636efa
 +   /* Otherwise, complement whatever we got (probably nothing)
 +      with some not-very-random data. */
 +   {
++diff --git a/runtime/win32.c b/runtime/win32.c
++index 77e5f39fb0..63be213997 100644
++--- a/runtime/win32.c
+++++ b/runtime/win32.c
++@@ -769,6 +769,28 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
++ 
++ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
++ {
+++  /* First handle corner-cases not handled by MoveFileEx:
+++     - dir to empty dir - positive - should succeed
+++     - dir to existing file - should fail */
+++  DWORD old_attribs = GetFileAttributes(oldpath);
+++  if ((old_attribs != INVALID_FILE_ATTRIBUTES) &&
+++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
+++      (old_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
+++      (old_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
+++    DWORD new_attribs = GetFileAttributes(newpath);
+++    if ((new_attribs != INVALID_FILE_ATTRIBUTES) &&
+++        (new_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
+++        (new_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
+++      if ((new_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+++        /* Try to delete and fall though.
+++           RemoveDirectoryW fails on non-empty dirs as intended. */
+++        RemoveDirectoryW(newpath);
+++      } else {
+++        errno = ENOTDIR;
+++        return -1;
+++      }
+++    }
+++  }
++   /* MOVEFILE_REPLACE_EXISTING: to be closer to POSIX
++      MOVEFILE_COPY_ALLOWED: MoveFile performs a copy if old and new
++        paths are on different devices, so we do the same here for
 diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 new file mode 100644
 index 0000000000..0bedb64bd4
@@ -10035,10 +10068,10 @@ index 0000000000..0bedb64bd4
 +                 -e 's/\d027\[m/\d027[0m/g' \
 diff --git a/diff-against-trunk-system.diff b/diff-against-trunk-system.diff
 new file mode 100644
-index 0000000000..13c539225d
+index 0000000000..8d308e97eb
 --- /dev/null
 +++ b/diff-against-trunk-system.diff
-@@ -0,0 +1,10033 @@
+@@ -0,0 +1,10034 @@
 +diff --git a/.Diff-of-diff.diff b/.Diff-of-diff.diff
 +new file mode 100644
 +index 0000000000..e69de29bb2
@@ -13705,10 +13738,10 @@ index 0000000000..13c539225d
 + 
 +diff --git a/diff-against-4.14-runtime.diff b/diff-against-4.14-runtime.diff
 +new file mode 100644
-+index 0000000000..f091636efa
++index 0000000000..7c8665c4af
 +--- /dev/null
 ++++ b/diff-against-4.14-runtime.diff
-+@@ -0,0 +1,2496 @@
++@@ -0,0 +1,2529 @@
 ++diff --git a/otherlibs/systhreads/st_posix.h b/otherlibs/systhreads/st_posix.h
 ++index 957f4717b6..09b243f6a5 100644
 ++--- a/otherlibs/systhreads/st_posix.h
@@ -16205,6 +16238,39 @@ index 0000000000..13c539225d
 ++   /* Otherwise, complement whatever we got (probably nothing)
 ++      with some not-very-random data. */
 ++   {
+++diff --git a/runtime/win32.c b/runtime/win32.c
+++index 77e5f39fb0..63be213997 100644
+++--- a/runtime/win32.c
++++++ b/runtime/win32.c
+++@@ -769,6 +769,28 @@ CAMLexport wchar_t *caml_win32_getenv(wchar_t const *lpName)
+++ 
+++ int caml_win32_rename(const wchar_t * oldpath, const wchar_t * newpath)
+++ {
++++  /* First handle corner-cases not handled by MoveFileEx:
++++     - dir to empty dir - positive - should succeed
++++     - dir to existing file - should fail */
++++  DWORD old_attribs = GetFileAttributes(oldpath);
++++  if ((old_attribs != INVALID_FILE_ATTRIBUTES) &&
++++      (old_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
++++      (old_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
++++      (old_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
++++    DWORD new_attribs = GetFileAttributes(newpath);
++++    if ((new_attribs != INVALID_FILE_ATTRIBUTES) &&
++++        (new_attribs & FILE_ATTRIBUTE_HIDDEN) == 0 &&
++++        (new_attribs & FILE_ATTRIBUTE_SYSTEM) == 0) {
++++      if ((new_attribs & FILE_ATTRIBUTE_DIRECTORY) != 0) {
++++        /* Try to delete and fall though.
++++           RemoveDirectoryW fails on non-empty dirs as intended. */
++++        RemoveDirectoryW(newpath);
++++      } else {
++++        errno = ENOTDIR;
++++        return -1;
++++      }
++++    }
++++  }
+++   /* MOVEFILE_REPLACE_EXISTING: to be closer to POSIX
+++      MOVEFILE_COPY_ALLOWED: MoveFile performs a copy if old and new
+++        paths are on different devices, so we do the same here for
 +diff --git a/diff-against-trunk-support.diff b/diff-against-trunk-support.diff
 +new file mode 100644
 +index 0000000000..0bedb64bd4
@@ -20039,39 +20105,7 @@ index 0000000000..13c539225d
 +++      # Now reconfigure ocamltest to run in bytecode-only mode
 +++      sed -i '/native_/s/true/false/' \
 +++             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-+++      $MAKE -C "$FULL_BUILD_PREFIX-$PORT/ocamltest" -j all allopt
-+++      # And run the entire testsuite, skipping all the native-code tests
-+++    fi
-++     run "test $PORT" \
-++         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
-++     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       run "$MAKE check_all_arches" \
-++            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
-++       cd "$FULL_BUILD_PREFIX-$PORT"
-+++
-+++      git config --global safe.directory '*'
-+++
-++       # Ensure that .gitignore is up-to-date - this will fail if any untracked
-++       # or altered files exist. We revert the change from the bootstrap (that
-++       # would have failed the build earlier if necessary)
-++@@ -181,7 +192,7 @@ case "$1" in
-++   *)
-++     cd "$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX-$PORT"
-++ 
-++-    if [[ $PORT = 'msvc64' ]] ; then
-+++    if [[ $PORT = 'mingw64' ]] ; then
-++       # Ensure that make distclean can be run from an empty tree
-++       run "$MAKE distclean" $MAKE distclean
-++     fi
-++@@ -205,7 +216,7 @@ case "$1" in
-++         # For an explanation of the sed command, see
-++         # https://github.com/appveyor/ci/issues/1824
-++         script --quiet --return --command \
-++-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
-+++          "$MAKE -C ../$BUILD_PREFIX-$PORT" \
-++           "../$BUILD_PREFIX-$POR
++++      $
 \ No newline at end of file
 diff --git a/lambda/matching.ml b/lambda/matching.ml
 index 6c305fae24..9e9d622e0b 100644
