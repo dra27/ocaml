@@ -223,9 +223,10 @@ allopt: dynlink.cmxa
 dynlink.cma: $(OBJS)
 	$(V_LINKC)$(OCAMLC) $(COMPFLAGS) -ccopt "$(NATDYNLINKOPTS)" -a -I byte -o $@ $^
 
-dynlink.cmxa: $(NATOBJS)
+dynlink.cmxa: $(NATOBJS) native/zstd.$(O)
 	$(V_LINKOPT)$(OCAMLOPT) $(COMPFLAGS) -ccopt "$(NATDYNLINKOPTS)" -a -I native \
-	            -o $@ $^
+	            -o $@ $(filter %.cmx, $^) \
+    && $(ARCMD) rs $(@:.cmxa=.$(A)) native/zstd.$(O)
 # As for all other .cmxa files, ensure that the .cmx files are in the same
 # directory. If this were omitted, ocamldoc in particular will fail to build
 # with a -opaque warning. Note that installopt refers to $(NATOBJS) so doesn't

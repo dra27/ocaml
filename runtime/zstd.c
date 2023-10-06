@@ -281,3 +281,23 @@ CAMLprim value caml_compressed_marshal_from_channel(value vchan)
   caml_channel_unlock(chan);
   CAMLreturn(v);
 }
+
+#ifndef NATIVE_CODE
+
+CAMLprim value caml_dynlink_compression_supported(value vunit)
+{
+  return caml_compression_supported(vunit);
+}
+
+CAMLprim value caml_dynlink_compressed_marshal_to_channel(value vchan, value v,
+                                                 value flags)
+{
+  return caml_compressed_marshal_to_channel(vchan, v, flags);
+}
+
+CAMLprim value caml_dynlink_compressed_marshal_from_channel(value vchan)
+{
+  return caml_compressed_marshal_from_channel(vchan);
+}
+
+#endif /* NATIVE_CODE */

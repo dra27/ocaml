@@ -854,7 +854,7 @@ flexdll_source_dir
 ocamlc_cppflags
 ocamlc_cflags
 native_ldflags
-bytecclibs
+zstd_libs
 cclibs
 oc_exe_ldflags
 oc_dll_ldflags
@@ -18531,7 +18531,6 @@ if test x"$zstd_status" = "xok"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: compressed marshaling supported" >&5
 printf "%s\n" "$as_me: compressed marshaling supported" >&6;}
-   bytecclibs="$bytecclibs $zstd_libs"
    internal_cppflags="$internal_cppflags $zstd_flags"
    printf "%s\n" "#define HAS_ZSTD 1" >>confdefs.h
 
