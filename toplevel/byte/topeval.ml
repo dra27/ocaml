@@ -231,7 +231,7 @@ let load_compunit ic filename ppf compunit =
     if compunit.cu_debug = 0 then [| |]
     else begin
       seek_in ic compunit.cu_debug;
-      [| input_value ic |]
+      [| Compression.Marshal.from_channel ic |]
     end in
   begin try
     may_trace := true;
