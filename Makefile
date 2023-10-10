@@ -811,14 +811,14 @@ runtime/prims.c : runtime/primitives
 	 echo 'typedef intnat value;'; \
 	 echo 'typedef value (*c_primitive)(void);'; \
 	 echo; \
-	 sed -e 's/.*/extern value &(void);/' $<; \
+	 sed -e 's/^\*//;s/.*/extern value &(void);/' $<; \
 	 echo; \
 	 echo 'const c_primitive caml_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  &,/' $<; \
+	 sed -e 's/^\*//;s/.*/  &,/' $<; \
 	 echo '  0 };'; \
 	 echo; \
 	 echo 'const char * const caml_names_of_builtin_cprim[] = {'; \
-	 sed -e 's/.*/  "&",/' $<; \
+	 sed -e 's/^\*//;s/.*/  "&",/' $<; \
 	 echo '  0 };') > $@
 
 runtime/caml/opnames.h : runtime/caml/instruct.h
