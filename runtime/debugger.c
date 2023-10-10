@@ -91,8 +91,6 @@ struct sockaddr_un {
 #include "caml/fiber.h"
 #include "caml/sys.h"
 
-static value marshal_flags;
-
 static int sock_domain;         /* Socket domain for the debugger */
 static union {                  /* Socket address for the debugger */
   struct sockaddr s_gen;
@@ -175,14 +173,7 @@ void caml_debugger_init(void)
   char_os * a;
   char * port, * p;
   struct hostent * host;
-  value flags;
   int n;
-
-  flags = caml_alloc(2, Tag_cons);
-  Store_field(flags, 0, Val_int(1)); /* Marshal.Closures */
-  Store_field(flags, 1, Val_emptylist);
-  marshal_flags = flags;
-  caml_register_generational_global_root(&marshal_flags);
 
   a = caml_secure_getenv(T("CAML_DEBUG_SOCKET"));
   address = a ? caml_stat_strdup_of_os(a) : NULL;
@@ -275,7 +266,7 @@ static void safe_output_value(struct channel *chan, value val)
   saved_external_raise = Caml_state->external_raise;
   if (sigsetjmp(raise_buf.buf, 0) == 0) {
     Caml_state->external_raise = &exception_ctx;
-    caml_output_val(chan, val, marshal_flags);
+    caml_output_val(chan, val, CLOSURES);
   } else {
     /* Send wrong magic number, will cause [caml_input_value] to fail */
     caml_really_putblock(chan, "\000\000\000\000", 4);
