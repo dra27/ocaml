@@ -18,9 +18,12 @@
 #define CAML_INTERNALS
 
 #include <stdbool.h>
+#include "caml/alloc.h"
 #include "caml/intext.h"
 #include "caml/memory.h"
 #include "caml/mlvalues.h"
+
+value caml_output_value(value, value, value);
 
 #ifdef HAS_ZSTD
 
@@ -90,6 +93,15 @@ oom1:
   return false;
 }
 
+CAMLprim value caml_compressed_output_value(value vchan, value v, value flags)
+{
+  CAMLparam3(vchan, v, flags);
+
+  flags = caml_alloc_2(Tag_cons, Val_int(3), flags);
+
+  CAMLreturn(caml_output_value(vchan, v, flags));
+}
+
 static size_t caml_zstd_decompress(unsigned char * blk,
                                    uintnat uncompressed_data_len,
                                    const unsigned char * intern_src,
@@ -107,7 +119,12 @@ CAMLprim value caml_zstd_initialize(value vunit)
 
 #else
 
-CAMLprim value caml_zstd_initialize(value vunit)
+value caml_compressed_output_value(value vchan, value v, value flags)
+{
+  return caml_output_value(vchan, v, flags);
+}
+
+value caml_zstd_initialize(value vunit)
 {
   return Val_unit;
 }

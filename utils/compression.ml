@@ -17,8 +17,5 @@ external zstd_initialize: unit -> unit = "caml_zstd_initialize"
 
 let () = zstd_initialize ()
 
-external to_channel: out_channel -> 'a -> int list -> unit = "caml_output_value"
-
-let to_channel ch v (flags : Marshal.extern_flags list) =
-  (* Add the Compression (constructor 4) to the list of flags *)
-  to_channel ch v (3 :: (Obj.magic flags : int list))
+external to_channel: out_channel -> 'a -> Marshal.extern_flags list -> unit
+    = "caml_compressed_output_value"
