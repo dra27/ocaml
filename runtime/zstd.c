@@ -23,8 +23,6 @@
 #include "caml/memory.h"
 #include "caml/mlvalues.h"
 
-value caml_output_value(value, value, value);
-
 #ifdef HAS_ZSTD
 
 #include <zstd.h>
@@ -93,15 +91,6 @@ oom1:
   return false;
 }
 
-CAMLprim value caml_compressed_output_value(value vchan, value v, value flags)
-{
-  CAMLparam3(vchan, v, flags);
-
-  flags = caml_alloc_2(Tag_cons, Val_int(3), flags);
-
-  CAMLreturn(caml_output_value(vchan, v, flags));
-}
-
 static size_t caml_zstd_decompress(unsigned char * blk,
                                    uintnat uncompressed_data_len,
                                    const unsigned char * intern_src,
@@ -117,16 +106,33 @@ CAMLprim value caml_zstd_initialize(value vunit)
   return Val_unit;
 }
 
-#else
+#define COMPRESSION_FLAG COMPRESSED
 
-value caml_compressed_output_value(value vchan, value v, value flags)
-{
-  return caml_output_value(vchan, v, flags);
-}
+#else
 
 value caml_zstd_initialize(value vunit)
 {
   return Val_unit;
 }
 
+#define COMPRESSION_FLAG 0
+
 #endif
+
+value caml_gen_output_value(value, value, value, int);
+value caml_gen_output_value_to_bytes(value, value, int);
+
+CAMLprim value caml_compressed_output_value(value vchan, value v, value flags)
+{
+  return caml_gen_output_value(vchan, v, flags, COMPRESSION_FLAG);
+}
+
+CAMLprim value caml_compressed_output_value_to_bytes(value v, value flags)
+{
+  return caml_gen_output_value_to_bytes(v, flags, COMPRESSION_FLAG);
+}
+
+CAMLprim value caml_compressed_output_value_to_string(value v, value flags)
+{
+  return caml_gen_output_value_to_bytes(v, flags, COMPRESSION_FLAG);
+}

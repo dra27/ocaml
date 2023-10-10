@@ -901,7 +901,7 @@ static void extern_rec(struct caml_extern_state* s, value v)
 }
 
 static const int extern_flag_values[] = {
-  NO_SHARING, CLOSURES, COMPAT_32, COMPRESSED
+  NO_SHARING, CLOSURES, COMPAT_32
 };
 
 static intnat extern_value(struct caml_extern_state* s, value v, int flags,
@@ -1012,11 +1012,11 @@ void caml_output_val(struct channel *chan, value v, int flags)
   }
 }
 
-CAMLprim value caml_output_value(value vchan, value v, value vflags)
+value caml_gen_output_value(value vchan, value v, value vflags, int flags)
 {
   CAMLparam3 (vchan, v, vflags);
   struct channel * channel = Channel(vchan);
-  int flags = caml_convert_flag_list(vflags, extern_flag_values);
+  flags |= caml_convert_flag_list(vflags, extern_flag_values);
 
   caml_channel_lock(channel);
   caml_output_val(channel, v, flags);
@@ -1025,7 +1025,12 @@ CAMLprim value caml_output_value(value vchan, value v, value vflags)
   CAMLreturn (Val_unit);
 }
 
-CAMLprim value caml_output_value_to_bytes(value v, value vflags)
+CAMLprim value caml_output_value(value chan, value v, value flags)
+{
+  return caml_gen_output_value(chan, v, flags, 0);
+}
+
+value caml_gen_output_value_to_bytes(value v, value vflags, int flags)
 {
   char header[MAX_INTEXT_HEADER_SIZE];
   int header_len;
@@ -1033,7 +1038,7 @@ CAMLprim value caml_output_value_to_bytes(value v, value vflags)
   value res;
   struct caml_output_block * blk, * nextblk;
   struct caml_extern_state* s = prepare_extern_state ();
-  int flags = caml_convert_flag_list(vflags, extern_flag_values);
+  flags |= caml_convert_flag_list(vflags, extern_flag_values);
 
   init_extern_output(s);
   data_len = extern_value(s, v, flags, header, &header_len);
@@ -1053,6 +1058,11 @@ CAMLprim value caml_output_value_to_bytes(value v, value vflags)
     blk = nextblk;
   }
   return res;
+}
+
+CAMLprim value caml_output_value_to_bytes(value v, value flags)
+{
+  return caml_gen_output_value_to_bytes(v, flags, 0);
 }
 
 CAMLprim value caml_output_value_to_string(value v, value flags)
