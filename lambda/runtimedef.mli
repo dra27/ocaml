@@ -17,3 +17,4 @@
 
 val builtin_exceptions: string array
 val builtin_primitives: string array
+val builtin_weak_primitives: string array

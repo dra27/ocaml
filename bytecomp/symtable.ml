@@ -129,6 +129,11 @@ let slot_for_literal cst =
 
 (* The C primitives *)
 
+let c_on_demand_prims = ref String.Set.empty
+
+let add_on_demand_prim name =
+  c_on_demand_prims := String.Set.add name !c_on_demand_prims
+
 let c_prim_table = ref PrimMap.empty
 
 let set_prim_table name =
@@ -138,7 +143,8 @@ let of_prim name =
   try
     PrimMap.find !c_prim_table name
   with Not_found ->
-    if !Clflags.custom_runtime || Config.host <> Config.target
+    if String.Set.mem name !c_on_demand_prims
+       || !Clflags.custom_runtime || Config.host <> Config.target
        || !Clflags.no_check_prims
     then
       PrimMap.enter c_prim_table name
@@ -238,7 +244,11 @@ let init () =
       (fun () ->
          try
            while true do
-             set_prim_table (input_line ic)
+             let prim = input_line ic in
+             if prim <> "" && prim.[0] <> '*' then
+               set_prim_table prim
+             else
+               add_on_demand_prim (String.sub prim 1 (String.length prim - 1))
            done
          with End_of_file -> ()
       )
@@ -261,7 +271,8 @@ let init () =
          set_prim_table_from_file primfile
       )
   end else begin
-    Array.iter set_prim_table Runtimedef.builtin_primitives
+    Array.iter set_prim_table Runtimedef.builtin_primitives;
+    Array.iter add_on_demand_prim Runtimedef.builtin_weak_primitives
   end
 
 (* Relocate a block of object bytecode *)
