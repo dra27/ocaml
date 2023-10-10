@@ -34,16 +34,6 @@
 #include "caml/reverse.h"
 #include "caml/shared_heap.h"
 
-/* Flags affecting marshaling */
-
-enum {
-  NO_SHARING = 1,               /* Flag to ignore sharing */
-  CLOSURES = 2,                 /* Flag to allow marshaling code pointers */
-  COMPAT_32 = 4,                /* Flag to ensure that output can safely
-                                   be read back on a 32-bit platform */
-  COMPRESSED = 8                /* Flag to request compression if available */
-};
-
 /* Stack for pending values to marshal */
 
 #define EXTERN_STACK_INIT_SIZE 256
@@ -998,13 +988,12 @@ static intnat extern_value(struct caml_extern_state* s, value v, int flags,
   return res_len;
 }
 
-void caml_output_val(struct channel *chan, value v, value vflags)
+void caml_output_val(struct channel *chan, value v, int flags)
 {
   char header[MAX_INTEXT_HEADER_SIZE];
   int header_len;
   struct caml_output_block * blk, * nextblk;
   struct caml_extern_state* s = prepare_extern_state ();
-  int flags = caml_convert_flag_list(vflags, extern_flag_values);
 
   if (! caml_channel_binary_mode(chan))
     caml_failwith("output_value: not a binary channel");
@@ -1023,10 +1012,11 @@ void caml_output_val(struct channel *chan, value v, value vflags)
   }
 }
 
-CAMLprim value caml_output_value(value vchan, value v, value flags)
+CAMLprim value caml_output_value(value vchan, value v, value vflags)
 {
-  CAMLparam3 (vchan, v, flags);
+  CAMLparam3 (vchan, v, vflags);
   struct channel * channel = Channel(vchan);
+  int flags = caml_convert_flag_list(vflags, extern_flag_values);
 
   caml_channel_lock(channel);
   caml_output_val(channel, v, flags);

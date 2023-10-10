@@ -128,9 +128,21 @@ struct caml_output_block {
 
 void caml_free_extern_state (void);
 
+/* Flags affecting marshaling */
+
+typedef enum {
+  NO_SHARING = 1,               /* Flag to ignore sharing */
+  CLOSURES = 2,                 /* Flag to allow marshaling code pointers */
+  COMPAT_32 = 4,                /* Flag to ensure that output can safely
+                                   be read back on a 32-bit platform */
+  COMPRESSED = 8                /* Flag to request compression if available.
+                                   Exposed to OCaml via explicit primitives,
+                                   rather than in Marshal.extern_flags */
+} extern_flags;
+
 /* The entry points */
 
-void caml_output_val (struct channel * chan, value v, value flags);
+void caml_output_val (struct channel * chan, value v, int flags);
   /* Output [v] with flags [flags] on the channel [chan]. */
 
 void caml_free_intern_state (void);
