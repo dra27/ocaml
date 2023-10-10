@@ -921,13 +921,17 @@ static const int extern_flag_values[] = {
   NO_SHARING, CLOSURES, COMPAT_32, COMPRESSED
 };
 
-static intnat extern_value(struct caml_extern_state* s, value v, value flags,
+static intnat extern_value(struct caml_extern_state* s, value v, int flags,
                            /*out*/ char header[MAX_INTEXT_HEADER_SIZE],
                            /*out*/ int * header_len)
 {
   intnat res_len;
-  /* Parse flag list */
-  s->extern_flags = caml_convert_flag_list(flags, extern_flag_values);
+  /* Compression requires the hook to be initialised and that we are allocating
+   the memory for the result. */
+  CAMLassert(((flags & COMPRESSED) == 0)
+             || (caml_extern_compress_output != NULL
+                 && s->extern_userprovided_output == NULL));
+  s->extern_flags = flags;
   /* Turn compression off if Zlib missing or if called from
      caml_output_value_to_block */
   if (caml_extern_compress_output == NULL || s->extern_userprovided_output)
@@ -1001,12 +1005,13 @@ static intnat extern_value(struct caml_extern_state* s, value v, value flags,
   return res_len;
 }
 
-void caml_output_val(struct channel *chan, value v, value flags)
+void caml_output_val(struct channel *chan, value v, value vflags)
 {
   char header[MAX_INTEXT_HEADER_SIZE];
   int header_len;
   struct caml_output_block * blk, * nextblk;
   struct caml_extern_state* s = prepare_extern_state ();
+  int flags = caml_convert_flag_list(vflags, extern_flag_values);
 
   if (! caml_channel_binary_mode(chan))
     caml_failwith("output_value: not a binary channel");
@@ -1037,7 +1042,7 @@ CAMLprim value caml_output_value(value vchan, value v, value flags)
   CAMLreturn (Val_unit);
 }
 
-CAMLprim value caml_output_value_to_bytes(value v, value flags)
+CAMLprim value caml_output_value_to_bytes(value v, value vflags)
 {
   char header[MAX_INTEXT_HEADER_SIZE];
   int header_len;
@@ -1045,6 +1050,7 @@ CAMLprim value caml_output_value_to_bytes(value v, value flags)
   value res;
   struct caml_output_block * blk, * nextblk;
   struct caml_extern_state* s = prepare_extern_state ();
+  int flags = caml_convert_flag_list(vflags, extern_flag_values);
 
   init_extern_output(s);
   data_len = extern_value(s, v, flags, header, &header_len);
@@ -1071,13 +1077,14 @@ CAMLprim value caml_output_value_to_string(value v, value flags)
   return caml_output_value_to_bytes(v,flags);
 }
 
-CAMLexport intnat caml_output_value_to_block(value v, value flags,
+CAMLexport intnat caml_output_value_to_block(value v, value vflags,
                                              char * buf, intnat len)
 {
   char header[MAX_INTEXT_HEADER_SIZE];
   int header_len;
   intnat data_len;
   struct caml_extern_state* s = prepare_extern_state ();
+  int flags = caml_convert_flag_list(vflags, extern_flag_values);
 
   /* At this point we don't know the size of the header.
      Guess that it is small, and fix up later if not. */
@@ -1105,7 +1112,7 @@ CAMLprim value caml_output_value_to_buffer(value buf, value ofs, value len,
   return Val_long(l);
 }
 
-CAMLexport void caml_output_value_to_malloc(value v, value flags,
+CAMLexport void caml_output_value_to_malloc(value v, value vflags,
                                             /*out*/ char ** buf,
                                             /*out*/ intnat * len)
 {
@@ -1115,6 +1122,7 @@ CAMLexport void caml_output_value_to_malloc(value v, value flags,
   char * res;
   struct caml_output_block * blk, * nextblk;
   struct caml_extern_state* s = prepare_extern_state ();
+  int flags = caml_convert_flag_list(vflags, extern_flag_values);
 
   init_extern_output(s);
   data_len = extern_value(s, v, flags, header, &header_len);
