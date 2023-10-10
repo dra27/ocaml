@@ -620,7 +620,7 @@ AS_CASE([$host],
     [exeext=".exe"],
   [exeext=''])
 
-otherlibraries="dynlink runtime_events"
+otherlibraries="dynlink marshal_compression runtime_events"
 lib_dynlink=true
 lib_runtime_events=true
 AS_IF([test x"$enable_unix_lib" != "xno"],

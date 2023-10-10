@@ -1,10 +1,10 @@
 (* TEST
-   include ocamlcommon;
+include marshal_compression;
 *)
 
 (* Test for compressed marshaling / unmarshaling *)
 
-open Compression
+open Compressed_marshal
 
 let from_channel = Marshal.from_channel
 

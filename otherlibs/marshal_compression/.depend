@@ -1,0 +1,5 @@
+compressed_marshal.cmo : \
+    compressed_marshal.cmi
+compressed_marshal.cmx : \
+    compressed_marshal.cmi
+compressed_marshal.cmi :

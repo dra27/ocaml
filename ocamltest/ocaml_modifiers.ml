@@ -101,6 +101,10 @@ let runtime_events =
   make_library_modifier
     "runtime_events" [compiler_subdir ["otherlibs"; "runtime_events"]]
 
+let marshal_compression =
+  make_library_modifier
+    "marshal_compression" [compiler_subdir ["otherlibs"; "marshal_compression"]]
+
 let compilerlibs_subdirs =
 [
   "asmcomp";
@@ -142,6 +146,7 @@ let _ =
       "ocamltoplevel";
     ];
   register_modifiers "runtime_events" runtime_events;
+  register_modifiers "marshal_compression" marshal_compression;
   register_modifiers "systhreads" systhreads;
   register_modifiers "latex" latex;
   register_modifiers "html" html;

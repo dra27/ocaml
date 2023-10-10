@@ -13557,7 +13557,7 @@ case $host in #(
     exeext='' ;;
 esac
 
-otherlibraries="dynlink runtime_events"
+otherlibraries="dynlink marshal_compression runtime_events"
 lib_dynlink=true
 lib_runtime_events=true
 if test x"$enable_unix_lib" != "xno"

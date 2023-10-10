@@ -3,3 +3,13 @@
 version = "@VERSION@"
 description = "Standard library"
 directory = "+"
+
+package "marshal-compression" (
+  requires = "stdlib"
+  version = "@VERSION@"
+  description = "Marshal functions with compression"
+  directory = "+marshal_compression"
+  archive(byte) = "marshal_compression.cma"
+  archive(native) = "marshal_compression.cmxa"
+  exists_if = "marshal_compression.cma"
+)
