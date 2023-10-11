@@ -428,12 +428,12 @@ $(addprefix compilerlibs/,\
   CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
 
 compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(ALL_CONFIG_CMO) $(COMMON)
-	$(V_LINKC)$(CAMLC) -a -linkall -o $@ $(COMMON)
+	$(V_LINKC)$(CAMLC) -a -o $@ $(COMMON)
 partialclean::
 	rm -f compilerlibs/ocamlcommon.cma
 
 compilerlibs/ocamlcommon.cmxa: $(COMMON_CMI) $(COMMON:.cmo=.cmx)
-	$(V_LINKOPT)$(CAMLOPT) -a -linkall -o $@ $(COMMON:.cmo=.cmx)
+	$(V_LINKOPT)$(CAMLOPT) -a -o $@ $(COMMON:.cmo=.cmx)
 partialclean::
 	rm -f compilerlibs/ocamlcommon.cmxa \
 	      compilerlibs/ocamlcommon.a compilerlibs/ocamlcommon.lib
