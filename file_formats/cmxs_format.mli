@@ -15,17 +15,15 @@
 
 (* Format of .cmxs files *)
 
-open Misc
-
 (* Each .cmxs dynamically-loaded plugin contains a symbol
    "caml_plugin_header" containing the following info
    (as an externed record) *)
 
 type dynunit = {
-  dynu_name: modname;
+  dynu_name: string;
   dynu_crc: Digest.t;
-  dynu_imports_cmi: crcs;
-  dynu_imports_cmx: crcs;
+  dynu_imports_cmi: (string * Digest.t option) list;
+  dynu_imports_cmx: (string * Digest.t option) list;
   dynu_defines: string list;
 }
 
