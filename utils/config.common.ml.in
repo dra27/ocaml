@@ -35,8 +35,6 @@ let magic_version = {@QS@|@MAGIC_VERSION@|@QS@}
 let make_magic_number kind =
   magic_prefix ^ (String.make 1 kind) ^ magic_version
 
-let magic_length = @MAGIC_LENGTH@
-
 let exec_magic_number = make_magic_number '@EXEC_FORMAT@'
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
 and cmi_magic_number = make_magic_number 'I'

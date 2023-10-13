@@ -1031,7 +1031,8 @@ module Magic_number = struct
 
   let kind_length = 9
   let version_length = 3
-  let magic_length = Config.magic_length
+  let magic_length =
+    kind_length + version_length
 
   type parse_error =
     | Truncated of string
