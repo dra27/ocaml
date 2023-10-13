@@ -2314,8 +2314,8 @@ AS_IF([test x"$enable_flambda" = "xyes"],
 AS_IF([$flambda],
   [CMX_FORMAT=CMX_FLAMBDA__FORMAT
   CMXA_FORMAT=CMXA_FLAMBDA__FORMAT],
-  [CMX_FORMAT=CMX__FORMAT
-  CMXA_FORMAT=CMXA__FORMAT])
+  [CMX_FORMAT=CMX_CLAMBDA__FORMAT
+  CMXA_FORMAT=CMXA_CLAMBDA__FORMAT])
 
 AS_IF([test x"$enable_cmm_invariants" = "xyes"],
   [cmm_invariants=true],

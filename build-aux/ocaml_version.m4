@@ -103,7 +103,7 @@ m4_define([MAGIC__LENGTH],
   m4_eval(m4_len(MAGIC__PREFIX) + 1 + m4_len(MAGIC__VERSION)))
 
 m4_define([EXEC__FORMAT], [X])
-m4_define([CMX__FORMAT], [Y])
+m4_define([CMX_CLAMBDA__FORMAT], [Y])
 m4_define([CMX_FLAMBDA__FORMAT], [y])
-m4_define([CMXA__FORMAT], [Z])
+m4_define([CMXA_CLAMBDA__FORMAT], [Z])
 m4_define([CMXA_FLAMBDA__FORMAT], [z])
