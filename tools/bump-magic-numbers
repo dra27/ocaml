@@ -33,6 +33,11 @@
 # Fail on error
 set -e
 
+if [ ${#1} != 3 ]; then
+  echo 'Version number must be 3 bytes'
+  exit 1
+fi
+
 new_num=$1
 
 # Bump magic numbers in runtime/caml/exec.h
