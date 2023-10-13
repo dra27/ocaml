@@ -99,7 +99,8 @@ m4_define([OCAML__RELEASE_EXTRA],
 m4_define([MAGIC__PREFIX], [Caml1999])
 m4_define([MAGIC__VERSION], [033])
 
-m4_define([MAGIC__LENGTH], [12])
+m4_define([MAGIC__LENGTH],
+  m4_eval(m4_len(MAGIC__PREFIX) + 1 + m4_len(MAGIC__VERSION)))
 
 m4_define([EXEC__FORMAT], [X])
 m4_define([CMX__FORMAT], [Y])
