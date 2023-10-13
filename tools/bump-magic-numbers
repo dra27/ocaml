@@ -47,8 +47,7 @@ sed -i -e s/'define MAGIC_VERSION "..."'/"define MAGIC_VERSION \"$new_num\""/ \
 
 # Bump magic numbers in utils/config.common.ml
 
-sed -i -e s/'let magic_version = {|...|}'/"let magic_version = {|$new_num|}"/ \
-  utils/config.common.ml
+sed -i -e s/'...|magic}'/"$new_num|magic}"/ utils/config.common.ml
 
 # Bump magic numbers in build-aux/ocaml_version.m4
 

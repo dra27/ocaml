@@ -3307,15 +3307,11 @@ OCAML_VERSION_SHORT=5.2
 
 MAGIC_PREFIX=Caml1999
 
-printf "%s\n" "#define MAGIC_PREFIX \"Caml1999\"" >>confdefs.h
-
 MAGIC_VERSION=033
-
-printf "%s\n" "#define MAGIC_VERSION \"033\"" >>confdefs.h
 
 EXEC_FORMAT=X
 
-printf "%s\n" "#define EXEC_FORMAT \"X\"" >>confdefs.h
+printf "%s\n" "#define EXEC_MAGIC \"Caml1999X033\"" >>confdefs.h
 
 MAGIC_LENGTH=12
 

@@ -58,15 +58,9 @@ struct exec_trailer {
 
 #define TRAILER_SIZE (4+EXEC_MAGIC_LENGTH)
 
-#undef MAGIC_PREFIX
-
-#undef MAGIC_VERSION
-
-#undef EXEC_FORMAT
-
 /* Magic number for this release */
 
-#define EXEC_MAGIC MAGIC_PREFIX EXEC_FORMAT MAGIC_VERSION
+#undef EXEC_MAGIC
 
 #endif /* CAML_INTERNALS */
 

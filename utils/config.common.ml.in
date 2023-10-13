@@ -29,24 +29,18 @@ let standard_library =
   with Not_found ->
     standard_library_default
 
-let magic_prefix = {@QS@|@MAGIC_PREFIX@|@QS@}
-let magic_version = {@QS@|@MAGIC_VERSION@|@QS@}
-
-let make_magic_number kind =
-  magic_prefix ^ (String.make 1 kind) ^ magic_version
-
-let exec_magic_number = make_magic_number '@EXEC_FORMAT@'
+let exec_magic_number = {magic|@MAGIC_PREFIX@@EXEC_FORMAT@@MAGIC_VERSION@|magic}
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
-and cmi_magic_number = make_magic_number 'I'
-and cmo_magic_number = make_magic_number 'O'
-and cma_magic_number = make_magic_number 'A'
-and cmx_magic_number = make_magic_number '@CMX_FORMAT@'
-and cmxa_magic_number = make_magic_number '@CMXA_FORMAT@'
-and ast_impl_magic_number = make_magic_number 'M'
-and ast_intf_magic_number = make_magic_number 'N'
-and cmxs_magic_number = make_magic_number 'D'
-and cmt_magic_number = make_magic_number 'T'
-and linear_magic_number = make_magic_number 'L'
+and cmi_magic_number = {magic|@MAGIC_PREFIX@I@MAGIC_VERSION@|magic}
+and cmo_magic_number = {magic|@MAGIC_PREFIX@O@MAGIC_VERSION@|magic}
+and cma_magic_number = {magic|@MAGIC_PREFIX@A@MAGIC_VERSION@|magic}
+and cmx_magic_number = {magic|@MAGIC_PREFIX@@CMX_FORMAT@@MAGIC_VERSION@|magic}
+and cmxa_magic_number = {magic|@MAGIC_PREFIX@@CMXA_FORMAT@@MAGIC_VERSION@|magic}
+and ast_impl_magic_number = {magic|@MAGIC_PREFIX@M@MAGIC_VERSION@|magic}
+and ast_intf_magic_number = {magic|@MAGIC_PREFIX@N@MAGIC_VERSION@|magic}
+and cmxs_magic_number = {magic|@MAGIC_PREFIX@D@MAGIC_VERSION@|magic}
+and cmt_magic_number = {magic|@MAGIC_PREFIX@T@MAGIC_VERSION@|magic}
+and linear_magic_number = {magic|@MAGIC_PREFIX@L@MAGIC_VERSION@|magic}
 
 let safe_string = true
 let default_safe_string = true
