@@ -47,12 +47,13 @@ m4_define([OCAML__VERSION_EXTRA], [dev0-2023-04-11])
 # Development releases, for instance, should use a [+] prefix.
 m4_define([OCAML__VERSION_EXTRA_PREFIX], [+])
 m4_define([OCAML__VERSION_SHORT], [OCAML__VERSION_MAJOR.OCAML__VERSION_MINOR])
+m4_define([OCAML__VERSION_FULL],
+  [OCAML__VERSION_SHORT.OCAML__VERSION_PATCHLEVEL])
+m4_define([OCAML__VERSION_SUFFIX], [m4_do(
+  m4_if(OCAML__VERSION_EXTRA,[],[],
+    OCAML__VERSION_EXTRA_PREFIX[]OCAML__VERSION_EXTRA))])
 # The OCAML__VERSION below must be in the format specified in stdlib/sys.mli
-m4_define([OCAML__VERSION],
-  [m4_do(
-    OCAML__VERSION_SHORT.OCAML__VERSION_PATCHLEVEL,
-    m4_if(OCAML__VERSION_EXTRA,[],[],
-      OCAML__VERSION_EXTRA_PREFIX[]OCAML__VERSION_EXTRA))])
+m4_define([OCAML__VERSION], [OCAML__VERSION_FULL[]OCAML__VERSION_SUFFIX])
 
 # Generate the VERSION file
 # The following command is invoked when autoconf is run to generate configure
@@ -74,6 +75,18 @@ m4_syscmd([cat > VERSION << END_OF_VERSION_FILE
 # The version string must be in the format described in stdlib/sys.mli
 END_OF_VERSION_FILE
 ])
+
+# Update the two version numbers in ocaml-variants.opam
+
+# TODO At the moment, development versions always use +trunk as the suffix, but
+#      is there any reason not to reflect the actual dev version?
+m4_define([OCAML__OPAM_VERSION],
+  [m4_do(OCAML__VERSION_SHORT.OCAML__VERSION_PATCHLEVEL[]m4_if(
+    OCAML__DEVELOPMENT_VERSION,[true],[+trunk],[OCAML__VERSION_SUFFIX]))])
+
+m4_syscmd([sed -i -e '/^version: /s/"[^"]*"/"]OCAML__OPAM_VERSION["/' \
+                  -e '/"ocaml"/s/{ *= *"[^"]*"/{= "]OCAML__VERSION_FULL["/' \
+               ocaml-variants.opam])
 
 # Other variants of the version needed here and there in the compiler
 
