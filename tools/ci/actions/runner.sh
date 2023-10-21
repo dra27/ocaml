@@ -21,7 +21,8 @@ PREFIX=~/local
 MAKE="make $MAKE_ARG"
 #SHELL=dash
 
-MAKE_WARN="$MAKE --warn-undefined-variables"
+#MAKE_WARN="$MAKE --warn-undefined-variables"
+MAKE_WARN="$MAKE"
 
 export PATH=$PREFIX/bin:$PATH
 
