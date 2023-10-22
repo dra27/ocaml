@@ -1,7 +1,7 @@
 (* TEST
  include unix;
  modules = "callbackprim.c";
- libunix;
+ libunix; (* not-windows covers Cygwin as well *)
  {
    bytecode;
  }{
