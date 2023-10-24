@@ -26,6 +26,8 @@ else
   MAKE=make
 fi
 
+git config --global --add safe.directory '*'
+
 function run {
     if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
     NAME=$1
@@ -55,29 +57,39 @@ function set_configuration {
         cygwin*)
         ;;
         mingw32)
-            build='--build=i686-pc-cygwin'
             host='--host=i686-w64-mingw32'
         ;;
         mingw64)
-            build='--build=i686-pc-cygwin'
             host='--host=x86_64-w64-mingw32'
         ;;
         msvc32)
-            build='--build=i686-pc-cygwin'
             host='--host=i686-pc-windows'
         ;;
         msvc64)
-            build='--build=x86_64-pc-cygwin'
             host='--host=x86_64-pc-windows'
         ;;
     esac
 
     mkdir -p "$CACHE_DIRECTORY"
-    ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $build $host --prefix="$2" || ( \
-      rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-      ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $build $host --prefix="$2" )
+
+    local CACHE_KEY CACHE_FILE_PREFIX CACHE_FILE
+    CACHE_KEY=$({ cat configure; uname; } | sha1sum | cut -c 1-7)
+    CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
+    CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
+
+    # Remove old configure cache if the configure script or the OS
+    # have changed
+    if [[ ! -f "$CACHE_FILE" ]] ; then
+        rm -f -- "$CACHE_FILE_PREFIX"*
+    fi
+
+    # Remove configure cache if the script has failed
+    if ! ./configure --cache-file="$CACHE_FILE" $host \
+                     --prefix="$2" ; then
+        rm -f -- "$CACHE_FILE"
+        ./configure --cache-file="$CACHE_FILE" $host \
+                    --prefix="$2"
+    fi
 
     FILE=$(pwd | cygpath -f - -m)/Makefile.config
     echo "Edit $FILE to turn C compiler warnings into errors"
