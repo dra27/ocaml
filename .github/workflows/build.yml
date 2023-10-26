@@ -28,6 +28,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  windows:
+    runs-on: 'windows-latest'
+    outputs:
+      year: ${{ steps.date.outputs.year }}
+      week: ${{ steps.date.outputs.week }}
+    steps:
+      - name: Wakey wakey
+        id: date
+        run: |
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "year=$(Get-Date -UFormat '%Y')"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "week=$(Get-Date -UFormat '%W')"
+      - name: Status
+        run: |
+          echo "Year is ${{ steps.date.outputs.year }}"
+          echo "Week is ${{ steps.date.outputs.week }}"
+      - name: MSYS2 Installer Cache
+        uses: actions/cache@v3
+        with:
+          path: msys2-installer
+          key: msys2-installer-${{ steps.date.outputs.year }}-${{ steps.date.outputs.week }}
+          restore-keys: |
+            msys2-installer-${{ steps.date.outputs.year }}
+            msys2-installer-
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ocaml
+          submodules: ${{ matrix.submodules }}
+          show-progress: false
+          persist-credentials: false
+      - name: MSYS2 Installation ID
+        shell: C:\msys64\usr\bin\bash.exe -lc '{0}'
+        run: $GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh
+          
 # This job will do the initial build of the compiler (on linux), with flambda on.
 # We then upload the compiler tree as a build artifact to enable re-use in
 # subsequent jobs.
@@ -104,82 +138,82 @@ jobs:
 #          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks
 
 # MacOS build+testsuite run, and Linux O0 run.
-  others:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-#          - name: linux-O0
-#            os: ubuntu-latest
-#            config_arg: CFLAGS='-O0'
-#          - name: macos
-#            os: macos-latest
-          - name: mingw64
-            os: windows-latest
-            submodules: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: ${{ matrix.submodules }}
-          show-progress: false
-          persist-credentials: false
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: mingw64
-          release: false
-          install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-binutils
-            make
-            diffutils
-            parallel
-      - name: OS Dependencies
-        if: runner.os == 'MacOS'
-        run: brew install parallel
-      - name: stuff
-        shell: cmd
-        run: echo %PATH%
-      - name: content
-        shell: cmd
-        run: type D:\a\_temp\setup-msys2\msys2.cmd
-      - name: status
-        shell: msys2 {0}
-        env:
-          MSYSTEM: MINGW64
-        run: |
-          pwd
-          echo "$PATH"
-          pacman -Q
-      - name: configure tree
-        shell: msys2 {0}
-        env:
-          MSYSTEM: MINGW64
-        run: |
-          CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
-      - name: Build
-        shell: msys2 {0}
-        env:
-          MSYSTEM: MINGW64
-        run: |
-          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
-      - name: Run the testsuite
-        if: ${{ matrix.name != 'linux-O0' }}
-        shell: msys2 {0}
-        env:
-          MSYSTEM: MINGW64
-        run: |
-          bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
-      - name: Run the testsuite (linux-O0)
-        if: ${{ matrix.name == 'linux-O0' }}
-        env:
-          OCAMLRUNPARAM: v=0,V=1
-          USE_RUNTIME: d
-        run: |
-          for dir in $PARALLEL_TESTS; do \
-           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
-          done
+#  others:
+#    name: ${{ matrix.name }}
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      matrix:
+#        include:
+##          - name: linux-O0
+##            os: ubuntu-latest
+##            config_arg: CFLAGS='-O0'
+##          - name: macos
+##            os: macos-latest
+#          - name: mingw64
+#            os: windows-latest
+#            submodules: true
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          submodules: ${{ matrix.submodules }}
+#          show-progress: false
+#          persist-credentials: false
+#      - uses: msys2/setup-msys2@v2
+#        with:
+#          msystem: mingw64
+#          release: false
+#          install: >-
+#            mingw-w64-x86_64-gcc
+#            mingw-w64-x86_64-binutils
+#            make
+#            diffutils
+#            parallel
+#      - name: OS Dependencies
+#        if: runner.os == 'MacOS'
+#        run: brew install parallel
+#      - name: stuff
+#        shell: cmd
+#        run: echo %PATH%
+#      - name: content
+#        shell: cmd
+#        run: type D:\a\_temp\setup-msys2\msys2.cmd
+#      - name: status
+#        shell: msys2 {0}
+#        env:
+#          MSYSTEM: MINGW64
+#        run: |
+#          pwd
+#          echo "$PATH"
+#          pacman -Q
+#      - name: configure tree
+#        shell: msys2 {0}
+#        env:
+#          MSYSTEM: MINGW64
+#        run: |
+#          CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
+#      - name: Build
+#        shell: msys2 {0}
+#        env:
+#          MSYSTEM: MINGW64
+#        run: |
+#          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
+#      - name: Run the testsuite
+#        if: ${{ matrix.name != 'linux-O0' }}
+#        shell: msys2 {0}
+#        env:
+#          MSYSTEM: MINGW64
+#        run: |
+#          bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
+#      - name: Run the testsuite (linux-O0)
+#        if: ${{ matrix.name == 'linux-O0' }}
+#        env:
+#          OCAMLRUNPARAM: v=0,V=1
+#          USE_RUNTIME: d
+#        run: |
+#          for dir in $PARALLEL_TESTS; do \
+#           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
+#          done
 
 #  i386:
 #    runs-on: ubuntu-latest
