@@ -9,6 +9,11 @@ OCaml 4.14 maintenance version
 
 ### Bug fixes:
 
+- #12726: fix segmentation fault under Windows when executing a bytecode file if
+  the runtime (`ocamlrun.exe`) cannot be found.
+  (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
+  David Allsopp)
+
 - #15019, #15030: `Marshal.from_{string,bytes}`: guard against overflow in
   the computation of the total data length.
   (Xavier Leroy, report by Akshay Singh, review by Nicolás Ojeda Bär
@@ -70,11 +75,6 @@ OCaml 4.14.3 (17 February 2026)
   functions instead of quadratic
   (Vincent Laviron, report by François Pottier, review by Nathanaëlle Courant
   and Gabriel Scherer)
-
-- #12726: fix segmentation fault under Windows when executing a bytecode file if
-  the runtime (`ocamlrun.exe`) cannot be found.
-  (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
-  David Allsopp)
 
 - #13430, #13434: protect memory-safety on Lazy.force races
   (Gabriel Scherer and Vincent Laviron, report by Edwin Török,
