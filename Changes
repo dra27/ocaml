@@ -81,6 +81,11 @@ OCaml 4.11 maintenance branch
   architectures
   (Florian Angeletti, review by David Allsopp)
 
+- #12726: fix segmentation fault under Windows when executing a bytecode file if
+  the runtime (`ocamlrun.exe`) cannot be found.
+  (Vadim Zborovskii, Nicolás Ojeda Bär, report by Vadim Zborovskii, review by
+  David Allsopp)
+
 OCaml 4.11.2 (24 February 2021)
 -------------------------------
 
