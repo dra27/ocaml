@@ -174,6 +174,10 @@ Working version
   (Olivier Nicole, Fabrice Buoro and Anmol Sahoo, review by Luc Maranget,
    Gabriel Scherer, Hernan Ponce de Leon and Xavier Leroy)
 
+- #12743: Use pthread_sigmask instead of sigprocmask
+  Updates usage of sigprocmask to pthread_sigmask in otherlibs/unix.
+  (Max Slater, review by Miod Vallat and Xavier Leroy)
+
 ### Code generation and optimizations:
 
 - #11239: on x86-64 and RISC-V, reduce alignment of OCaml stacks from 16 to 8.
@@ -276,15 +280,15 @@ Working version
   (Antonin Décimo, Damien Doligez, review by Sébastien Hinderer,
    Damien Doligez, Gabriel Scherer, and Xavier Leroy)
 
+* #12497, #12613: Make ocamlc/ocamlopt fail with an error when no
+  input files are specified to build an executable.
+  (Antonin Décimo, review by Sébastien Hinderer)
+
 - #12576: ocamldep: various refactors.
   (Antonin Décimo, review by Florian Angeletti, Gabriel Scherer, and Léo Andrès)
 
 - #12615: ocamldoc: get rid of the odoc_literate and odoc_todo generators.
   (Sébaistien Hinderer, review by Gabriel Scherer and Florian Angeletti)
-
-* #12497, #12613: Make ocamlc/ocamlopt fail with an error when no
-  input files are specified to build an executable.
-  (Antonin Décimo, review by Sébastien Hinderer)
 
 - #12688: Setting the env variable `NO_COLOR` with an empty value no longer
   has effects. Previously, setting `NO_COLOR` with any value, including
@@ -348,6 +352,11 @@ Working version
   greatly simplifies both the build system and testsuite machinery.
   (David Allsopp, review by Sébastien Hinderer)
 
+- #12297: Don't include bol (beginning-of-line) offsets for -dparsetree and
+  -dtypedtree and use line-relative locations in -dlambda (allows tests to
+  run with CRLF-formatted source files).
+  (David Allsopp, review by ???)
+
 - #12347: error messages: always report missing polyvariant tags
   (Florian Angeletti, report by Tianbo Hao, review by Gabriel Scherer)
 
@@ -369,6 +378,10 @@ Working version
 - #12679: Add more detail to the error message and manual in case of
   invalid module type substitutions.
   (Stefan Muenzel, review by Gabriel Scherer and Florian Angeletti)
+
+- #12750: Display the command executed to extract primitives in
+  `ocamlc -verbose`.
+  (David Allsopp, review by Nicolás Ojeda Bär)
 
 ### Internal/compiler-libs changes:
 
@@ -621,6 +634,14 @@ OCaml 5.1.1
 - #12645, fix error messages for cyclic type definitions in presence of
   the `-short-paths` flag.
   (Florian Angeletti, report by Vesa Karvonen, review by Gabriel Scherer)
+
+- #12581, #12609: Fix error on uses of packed modules outside their pack
+  to correctly handle nested packs
+  (Vincent Laviron, report by Javier Chávarri, review by Pierre Chambart)
+
+- #12757: Fix ocamlnat (native toplevel) by registering frametables correctly
+  (Stephen Dolan, Nick Barnes and Mark Shinwell,
+   review by Vincent Laviron and Sébastien Hinderer)
 
 OCaml 5.1.0 (14 September 2023)
 -------------------------------
@@ -893,6 +914,11 @@ Some of those changes will benefit all OCaml packages.
 - #12231: Support MinGW-w64 11.0 winpthreads library, where the macro
   to set up to get flexdll working changed
   (David Allsopp and Samuel Hym, light review by Xavier Leroy)
+
+- #12491, #12493, #12500, #12754: Do not change GC pace when creating
+  sub-arrays of bigarrays
+  (Xavier Leroy, report by Ido Yariv, analysis by Gabriel Scherer,
+   review by Gabriel Scherer and Fabrice Buoro)
 
 ### Language features:
 
