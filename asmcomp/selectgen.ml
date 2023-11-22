@@ -117,8 +117,8 @@ let size_expr (env:environment) exp =
           let regs = env_find id env in
           size_machtype (Array.map (fun r -> r.typ) regs)
         with Not_found ->
-          Misc.fatal_error("Selection.size_expr: unbound var " ^
-                           V.unique_name id)
+          Misc.fatal_errorf "Selection.size_expr: unbound var %s"
+                            (V.unique_name id)
         end
     | Ctuple el ->
         List.fold_right (fun e sz -> size localenv e + sz) el 0
@@ -606,7 +606,8 @@ method emit_expr (env:environment) exp =
       begin try
         Some(env_find v env)
       with Not_found ->
-        Misc.fatal_error("Selection.emit_expr: unbound var " ^ V.unique_name v)
+        Misc.fatal_errorf "Selection.emit_expr: unbound var %s"
+                          (V.unique_name v)
       end
   | Clet(v, e1, e2) ->
       begin match self#emit_expr env e1 with
@@ -625,7 +626,8 @@ method emit_expr (env:environment) exp =
         try
           env_find_mut v env
         with Not_found ->
-          Misc.fatal_error ("Selection.emit_expr: unbound var " ^ V.name v) in
+          Misc.fatal_errorf "Selection.emit_expr: unbound var %s"
+                            (V.name v) in
       begin match self#emit_expr env e1 with
         None -> None
       | Some r1 ->
@@ -784,8 +786,7 @@ method emit_expr (env:environment) exp =
           let dest_args =
             try env_find_static_exception nfail env
             with Not_found ->
-              Misc.fatal_error ("Selection.emit_expr: unbound label "^
-                                Stdlib.Int.to_string nfail)
+              Misc.fatal_errorf "Selection.emit_expr: unbound label %d" nfail
           in
           (* Intermediate registers to handle cases where some
              registers from src are present in dest *)

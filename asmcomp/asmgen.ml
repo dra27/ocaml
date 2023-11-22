@@ -107,8 +107,9 @@ let emit_fundecl fd =
 
 let rec regalloc ~ppf_dump round fd =
   if round > 50 then
-    fatal_error(fd.Mach.fun_name ^
-                ": function too complex, cannot complete register allocation");
+    Misc.fatal_errorf
+      "%s: function too complex, cannot complete register allocation"
+      fd.Mach.fun_name;
   dump_if ppf_dump dump_live "Liveness analysis" fd;
   let num_stack_slots =
     if !use_linscan then begin
