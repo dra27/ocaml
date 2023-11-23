@@ -16,9 +16,8 @@
 
 (* CSE for the AMD64 *)
 
-open Arch
 open Mach
-open CSEgen
+open CSEgen.Make(Arch)(Proc)
 
 class cse = object
 

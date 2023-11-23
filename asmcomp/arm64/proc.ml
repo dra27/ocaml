@@ -24,10 +24,6 @@ open Reg
 open Arch
 open Mach
 
-(* Instruction selection *)
-
-let word_addressed = false
-
 (* Registers available for register allocation *)
 
 (* Integer register map:
@@ -297,6 +293,5 @@ let assemble_file infile outfile =
   Ccomp.command (Config.asm ^ " " ^
                  (String.concat " " (Misc.debug_prefix_map_flags ())) ^
                  " -o " ^ Filename.quote outfile ^ " " ^ Filename.quote infile)
-
 
 let init () = ()

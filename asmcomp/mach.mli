@@ -36,7 +36,7 @@ type test =
   | Ioddtest
   | Ieventest
 
-type operation =
+type ('am, 'so) gen_operation =
     Imove
   | Ispill
   | Ireload
@@ -53,10 +53,10 @@ type operation =
                   stack_ofs : int; }
   | Istackoffset of int
   | Iload of { memory_chunk : Cmm.memory_chunk;
-               addressing_mode : Arch.addressing_mode;
+               addressing_mode : 'am;
                mutability : Asttypes.mutable_flag;
                is_atomic : bool }
-  | Istore of Cmm.memory_chunk * Arch.addressing_mode * bool
+  | Istore of Cmm.memory_chunk * 'am * bool
                                  (* false = initialization, true = assignment *)
   | Ialloc of { bytes : int; dbginfo : Debuginfo.alloc_dbginfo; }
   | Iintop of integer_operation
@@ -65,10 +65,17 @@ type operation =
   | Inegf | Iabsf | Iaddf | Isubf | Imulf | Idivf
   | Ifloatofint | Iintoffloat
   | Iopaque
-  | Ispecific of Arch.specific_operation
+  | Ispecific of 'so
   | Ipoll of { return_label: Cmm.label option }
   | Idls_get
   | Ireturn_addr (** Retrieve the return address from the stack frame *)
+
+type operation =
+  (Operations.addressing_modes, Operations.specific_operations) gen_operation
+
+val map_op :
+  ('a -> 'b) -> ('c -> 'd)
+    -> ('a, 'c) gen_operation -> ('b, 'd) gen_operation
 
 type instruction =
   { desc: instruction_desc;
@@ -100,7 +107,7 @@ type fundecl =
     fun_num_stack_slots: int array;
   }
 
-val dummy_instr: instruction
+val dummy_instr : unit -> instruction
 val end_instr: unit -> instruction
 val instr_cons:
       instruction_desc -> Reg.t array -> Reg.t array -> instruction ->

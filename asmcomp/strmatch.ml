@@ -46,9 +46,9 @@ module Make(I:I) = struct
         let d = Nativeint.to_int (Nativeint.logand mask p) in
         let d = Char.escaped (Char.chr d) in
         digits (d::k) (n-1) (Nativeint.shift_right_logical p  8) in
-    let ds = digits [] Arch.size_addr p in
+    let ds = digits [] Platform.info.size_addr p in
     let ds =
-      if Arch.big_endian then ds else List.rev ds in
+      if Platform.info.big_endian then ds else List.rev ds in
     String.concat "" ds
 
   let do_pp_cases chan cases =
@@ -79,7 +79,7 @@ module Make(I:I) = struct
       Cop(Cload {memory_chunk=Word_int;
                  mutability=Asttypes.Mutable;
                  is_atomic=false},
-        [Cop(Cadda,[str;Cconst_int(Arch.size_int*ind, dbg)], dbg)],
+        [Cop(Cadda,[str;Cconst_int(Platform.info.size_int*ind, dbg)], dbg)],
         dbg) in
     Clet(id, cell, body)
 
@@ -119,16 +119,16 @@ module Make(I:I) = struct
 
   let pat_of_string str =
     let len = String.length str in
-    let n = len / Arch.size_addr + 1 in
+    let n = len / Platform.info.size_addr + 1 in
     let get_byte i =
       if i < len then int_of_char str.[i]
-      else if i < n * Arch.size_addr - 1 then 0
-      else n * Arch.size_addr - 1 - len in
+      else if i < n * Platform.info.size_addr - 1 then 0
+      else n * Platform.info.size_addr - 1 - len in
     let mk_word ind =
       let w = ref 0n in
-      let imin = ind * Arch.size_addr
-      and imax = (ind + 1) * Arch.size_addr - 1 in
-      if Arch.big_endian then
+      let imin = ind * Platform.info.size_addr
+      and imax = (ind + 1) * Platform.info.size_addr - 1 in
+      if Platform.info.big_endian then
         for i = imin to imax do
           w := Nativeint.logor (Nativeint.shift_left !w 8)
               (Nativeint.of_int (get_byte i));

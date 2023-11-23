@@ -19,9 +19,11 @@
 open Arch
 open Mach
 
+module Schedgen = Schedgen.Make(Arch)(Proc)
+
 class scheduler = object
 
-inherit Schedgen.scheduler_generic
+inherit Schedgen.scheduler_generic Arch.identity_addressing
 
 (* Latencies (in cycles). Based roughly on the "common model". *)
 

@@ -44,12 +44,12 @@ let allocate_registers() =
   let unconstrained = ref [] in
 
   (* Reset the stack slot counts *)
-  let num_stack_slots = Array.make Proc.num_register_classes 0 in
+  let num_stack_slots = Array.make Platform.info.num_register_classes 0 in
 
   (* Preallocate the spilled registers in the stack.
      Split the remaining registers into constrained and unconstrained. *)
   let remove_reg reg =
-    let cl = Proc.register_class reg in
+    let cl = Platform.info.register_class reg in
     if reg.spill then begin
       (* Preallocate the registers in the stack *)
       let nslots = num_stack_slots.(cl) in
@@ -58,14 +58,14 @@ let allocate_registers() =
         (fun r ->
           match r.loc with
             Stack(Local n) ->
-              if Proc.register_class r = cl then conflict.(n) <- true
+              if Platform.info.register_class r = cl then conflict.(n) <- true
           | _ -> ())
         reg.interf;
       let slot = ref 0 in
       while !slot < nslots && conflict.(!slot) do incr slot done;
       reg.loc <- Stack(Local !slot);
       if !slot >= nslots then num_stack_slots.(cl) <- !slot + 1
-    end else if reg.degree < Proc.num_available_registers.(cl) then
+    end else if reg.degree < Platform.info.num_available_registers.(cl) then
       unconstrained := reg :: !unconstrained
     else begin
       constrained := OrderedRegSet.add reg !constrained
@@ -85,13 +85,13 @@ let allocate_registers() =
   (* Where to start the search for a suitable register.
      Used to introduce some "randomness" in the choice between registers
      with equal scores. This offers more opportunities for scheduling. *)
-  let start_register = Array.make Proc.num_register_classes 0 in
+  let start_register = Array.make Platform.info.num_register_classes 0 in
 
   (* Assign a location to a register, the best we can. *)
   let assign_location reg =
-    let cl = Proc.register_class reg in
-    let first_reg = Proc.first_available_register.(cl) in
-    let num_regs = Proc.num_available_registers.(cl) in
+    let cl = Platform.info.register_class reg in
+    let first_reg = Platform.info.first_available_register.(cl) in
+    let num_regs = Platform.info.num_available_registers.(cl) in
     let score = Array.make num_regs 0 in
     let best_score = ref (-1000000) and best_reg = ref (-1) in
     let start = start_register.(cl) in
@@ -156,7 +156,7 @@ let allocate_registers() =
     (* Found a register? *)
     if !best_reg >= 0 then begin
       reg.loc <- Reg(first_reg + !best_reg);
-      if Proc.rotate_registers then
+      if Platform.info.rotate_registers then
         start_register.(cl) <- (let start = start + 1 in
                                 if start >= num_regs then 0 else start)
     end else begin

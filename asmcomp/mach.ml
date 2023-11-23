@@ -36,7 +36,7 @@ type test =
   | Ioddtest
   | Ieventest
 
-type operation =
+type ('am, 'so) gen_operation =
     Imove
   | Ispill
   | Ireload
@@ -53,10 +53,10 @@ type operation =
                   stack_ofs : int; }
   | Istackoffset of int
   | Iload of { memory_chunk : Cmm.memory_chunk;
-               addressing_mode : Arch.addressing_mode;
+               addressing_mode : 'am;
                mutability : Asttypes.mutable_flag;
                is_atomic : bool }
-  | Istore of Cmm.memory_chunk * Arch.addressing_mode * bool
+  | Istore of Cmm.memory_chunk * 'am * bool
   | Ialloc of { bytes : int; dbginfo : Debuginfo.alloc_dbginfo; }
   | Iintop of integer_operation
   | Iintop_imm of integer_operation * int
@@ -64,10 +64,13 @@ type operation =
   | Inegf | Iabsf | Iaddf | Isubf | Imulf | Idivf
   | Ifloatofint | Iintoffloat
   | Iopaque
-  | Ispecific of Arch.specific_operation
+  | Ispecific of 'so
   | Ipoll of { return_label: Cmm.label option }
   | Idls_get
   | Ireturn_addr
+
+type operation =
+  (Operations.addressing_modes, Operations.specific_operations) gen_operation
 
 type instruction =
   { desc: instruction_desc;
@@ -99,18 +102,20 @@ type fundecl =
     fun_num_stack_slots: int array;
   }
 
-let rec dummy_instr =
-  { desc = Iend;
-    next = dummy_instr;
-    arg = [||];
-    res = [||];
-    dbg = Debuginfo.none;
-    live = Reg.Set.empty
-  }
+let dummy_instr () =
+  let rec dummy_instr =
+    { desc = Iend;
+      next = dummy_instr;
+      arg = [||];
+      res = [||];
+      dbg = Debuginfo.none;
+      live = Reg.Set.empty
+    }
+  in dummy_instr
 
 let end_instr () =
   { desc = Iend;
-    next = dummy_instr;
+    next = dummy_instr ();
     arg = [||];
     res = [||];
     dbg = Debuginfo.none;
@@ -151,12 +156,27 @@ let rec instr_iter f i =
       | _ ->
           instr_iter f i.next
 
+let map_op map_addressing_mode map_specific_operation = function
+| Iload { memory_chunk; addressing_mode; mutability; is_atomic } ->
+    let addressing_mode = map_addressing_mode addressing_mode in
+    Iload { memory_chunk; addressing_mode; mutability; is_atomic}
+| Istore (memory_chunk, addressing_mode, is_assignment) ->
+    let addressing_mode = map_addressing_mode addressing_mode in
+    Istore (memory_chunk, addressing_mode, is_assignment)
+| Ispecific sop ->
+    Ispecific (map_specific_operation sop)
+| (Imove | Ispill | Ireload | Iconst_int _ | Iconst_float _ | Iconst_symbol _
+   | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _ | Iextcall _
+   | Istackoffset _ | Ialloc _ | Iintop _ | Iintop_imm (_, _) | Icompf _ | Inegf
+   | Iabsf | Iaddf | Isubf | Imulf | Idivf | Ifloatofint | Iintoffloat | Iopaque
+   | Ipoll _ | Idls_get | Ireturn_addr) as desc -> desc
+
 let operation_is_pure = function
   | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _
   | Iextcall _ | Istackoffset _ | Istore _ | Ialloc _ | Ipoll _
   | Idls_get
   | Iintop(Icheckbound) | Iintop_imm(Icheckbound, _) | Iopaque -> false
-  | Ispecific sop -> Arch.operation_is_pure sop
+  | Ispecific sop -> Operations.operation_is_pure sop
   | _ -> true
 
 let operation_can_raise op =
@@ -164,5 +184,5 @@ let operation_can_raise op =
   | Icall_ind | Icall_imm _ | Iextcall _
   | Iintop (Icheckbound) | Iintop_imm (Icheckbound, _)
   | Ialloc _ | Ipoll _ -> true
-  | Ispecific sop -> Arch.operation_can_raise sop
+  | Ispecific sop -> Operations.operation_can_raise sop
   | _ -> false

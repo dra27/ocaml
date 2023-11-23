@@ -31,6 +31,12 @@ let insert_moves src dst next =
     else insert_move src.(i) dst.(i) (insmoves (i+1))
   in insmoves 0
 
+module Make (Arch : Operations.S) = struct
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
+  let unbox_op =
+    Mach.map_op Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
   class reload_generic = object (self)
 
   val mutable redo_regalloc = false
@@ -98,7 +104,8 @@ let insert_moves src dst next =
         insert_moves i.arg newarg
           {i with arg = newarg; next = self#reload i.next}
     | Iop op ->
-        let (newarg, newres) = self#reload_operation op i.arg i.res in
+        let (newarg, newres) =
+          self#reload_operation (unbox_op op) i.arg i.res in
         insert_moves i.arg newarg
           {i with arg = newarg; res = newres; next =
             (insert_moves newres i.res
@@ -123,7 +130,7 @@ let insert_moves src dst next =
           (Icatch(rec_flag, new_handlers, self#reload body)) [||] [||]
           (self#reload i.next)
     | Iexit i ->
-        instr_cons (Iexit i) [||] [||] dummy_instr
+        instr_cons (Iexit i) [||] [||] (dummy_instr ())
     | Itrywith(body, handler) ->
         instr_cons (Itrywith(self#reload body, self#reload handler)) [||] [||]
           (self#reload i.next)
@@ -135,3 +142,4 @@ let insert_moves src dst next =
              fun_num_stack_slots = Array.copy num_stack_slots},
      redo_regalloc)
   end
+end

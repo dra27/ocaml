@@ -23,7 +23,7 @@ SHELL=dash
 
 MAKE_WARN="$MAKE --warn-undefined-variables"
 
-export PATH=$PREFIX/bin:$PATH
+export PATH=$PREFIX/bin:/usr/local/opt/make/libexec/gnubin:$PATH
 
 Configure () {
   mkdir -p $PREFIX
@@ -53,7 +53,8 @@ Build () {
   fi
   failed=0
   if grep -Fq ' warning: undefined variable ' build.log; then
-    echo Undefined Makefile variables detected
+    echo Undefined Makefile variables detected:
+    grep -F ' warning: undefined variable ' build.log
     failed=1
   fi
   rm build.log
@@ -95,10 +96,6 @@ Checks () {
     echo Check the code examples in the manual
     $MAKE manual-pregen
   fi
-  # check_all_arches checks tries to compile all backends in place,
-  # we would need to redo (small parts of) world.opt afterwards to
-  # use the compiler again
-  $MAKE check_all_arches
   # Ensure that .gitignore is up-to-date - this will fail if any untreacked or
   # altered files exist.
   test -z "$(git status --porcelain)"

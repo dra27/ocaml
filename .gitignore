@@ -63,15 +63,20 @@ META
 
 # specific files and patterns in sub-directories
 
-/asmcomp/emit.ml
-/asmcomp/arch.mli
-/asmcomp/arch.ml
-/asmcomp/proc.ml
-/asmcomp/selection.ml
-/asmcomp/reload.ml
-/asmcomp/scheduling.ml
-/asmcomp/CSE.ml
-/asmcomp/stackframe.ml
+/asmcomp/default.ml
+/asmcomp/amd64.ml
+/asmcomp/arm64.ml
+/asmcomp/power.ml
+/asmcomp/riscv.ml
+/asmcomp/s390x.ml
+/asmcomp/**/CSE.mli
+/asmcomp/**/emit.ml
+/asmcomp/**/emit.mli
+/asmcomp/**/proc.mli
+/asmcomp/**/reload.mli
+/asmcomp/**/scheduling.mli
+/asmcomp/**/selection.mli
+/asmcomp/**/stackframe.mli
 
 /boot/ocamlrun
 /boot/camlheader

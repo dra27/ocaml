@@ -226,6 +226,7 @@ let make_globals_map units_list ~crc_interfaces =
     crc_interfaces defined
 
 let make_startup_file ~ppf_dump units_list ~crc_interfaces =
+  let open (val Platform.info.backend : Platform.Backend) in
   let compile_phrase p = Asmgen.compile_phrase ~ppf_dump p in
   Location.input_name := "caml_startup"; (* set name of "current" input *)
   Compilenv.reset "_startup";
@@ -268,6 +269,7 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Emit.end_assembly ()
 
 let make_shared_startup_file ~ppf_dump units =
+  let open (val Platform.info.backend : Platform.Backend) in
   let compile_phrase p = Asmgen.compile_phrase ~ppf_dump p in
   Location.input_name := "caml_startup";
   Compilenv.reset "_shared_startup";

@@ -18,13 +18,37 @@ open Mach
 open Linear
 
 module Make (T : Branch_relaxation_intf.S) = struct
+
+  let unbox_desc =
+    Linear.map_desc T.unbox_addressing_mode T.unbox_specific_operation
+  let box_desc =
+    Linear.map_desc T.box_addressing_mode T.box_specific_operation
+
+  let instr_size f op =
+    T.instr_size f (unbox_desc op)
+
+  let relax_allocation ~num_bytes ~dbginfo =
+    box_desc (T.relax_allocation ~num_bytes ~dbginfo)
+
+  let relax_poll ~return_label =
+    box_desc (T.relax_poll ~return_label)
+
+  let relax_intop_checkbound () =
+    box_desc (T.relax_intop_checkbound ())
+
+  let relax_intop_imm_checkbound ~bound =
+    box_desc (T.relax_intop_imm_checkbound ~bound)
+
+  let relax_specific_op sop =
+    box_desc (T.relax_specific_op (T.unbox_specific_operation sop))
+
   let label_map f =
     let map = Hashtbl.create 37 in
     let rec fill_map pc instr =
       match instr.desc with
       | Lend -> (pc, map)
       | Llabel lbl -> Hashtbl.add map lbl pc; fill_map pc instr.next
-      | op -> fill_map (pc + T.instr_size f op) instr.next
+      | op -> fill_map (pc + instr_size f op) instr.next
     in
     fill_map 0 f.fun_body
 
@@ -40,7 +64,7 @@ module Make (T : Branch_relaxation_intf.S) = struct
       branch_overflows map pc_branch lbl_dest max_branch_offset
 
   let instr_overflows ~code_size ~max_out_of_line_code_offset instr map pc =
-    match T.Cond_branch.classify_instr instr.desc with
+    match T.Cond_branch.classify_instr (unbox_desc instr.desc) with
     | None -> false
     | Some branch ->
       let max_branch_offset =
@@ -89,25 +113,25 @@ module Make (T : Branch_relaxation_intf.S) = struct
           instr_overflows ~code_size ~max_out_of_line_code_offset instr map pc
         in
         if not overflows then
-          fixup did_fix (pc + T.instr_size f instr.desc) instr.next
+          fixup did_fix (pc + instr_size f instr.desc) instr.next
         else
           match instr.desc with
           | Lop (Ipoll { return_label }) ->
-            instr.desc <- T.relax_poll ~return_label;
-            fixup true (pc + T.instr_size f instr.desc) instr.next
+            instr.desc <- relax_poll ~return_label;
+            fixup true (pc + instr_size f instr.desc) instr.next
           | Lop (Ialloc { bytes = num_bytes; dbginfo }) ->
-            instr.desc <- T.relax_allocation ~num_bytes ~dbginfo;
-            fixup true (pc + T.instr_size f instr.desc) instr.next
+            instr.desc <- relax_allocation ~num_bytes ~dbginfo;
+            fixup true (pc + instr_size f instr.desc) instr.next
           | Lop (Iintop (Icheckbound)) ->
-            instr.desc <- T.relax_intop_checkbound ();
-            fixup true (pc + T.instr_size f instr.desc) instr.next
+            instr.desc <- relax_intop_checkbound ();
+            fixup true (pc + instr_size f instr.desc) instr.next
           | Lop (Iintop_imm (Icheckbound, bound)) ->
             instr.desc
-              <- T.relax_intop_imm_checkbound ~bound;
-            fixup true (pc + T.instr_size f instr.desc) instr.next
+              <- relax_intop_imm_checkbound ~bound;
+            fixup true (pc + instr_size f instr.desc) instr.next
           | Lop (Ispecific specific) ->
-            instr.desc <- T.relax_specific_op specific;
-            fixup true (pc + T.instr_size f instr.desc) instr.next
+            instr.desc <- relax_specific_op specific;
+            fixup true (pc + instr_size f instr.desc) instr.next
           | Lcondbranch (test, lbl) ->
             let lbl2 = Cmm.new_label() in
             let cont =
@@ -116,7 +140,7 @@ module Make (T : Branch_relaxation_intf.S) = struct
             in
             instr.desc <- Lcondbranch (invert_test test, lbl2);
             instr.next <- cont;
-            fixup true (pc + T.instr_size f instr.desc) instr.next
+            fixup true (pc + instr_size f instr.desc) instr.next
           | Lcondbranch3 (lbl0, lbl1, lbl2) ->
             let cont =
               expand_optbranch lbl0 0 instr.arg

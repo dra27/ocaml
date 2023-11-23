@@ -65,6 +65,7 @@ let transfer i ~next ~exn =
       Reg.add_set_array exn i.arg
 
 let exnhandler before_handler =
+  let open (val Platform.info.backend : Platform.Backend) in
   Reg.Set.remove Proc.loc_exn_bucket before_handler
 
 let fundecl f =

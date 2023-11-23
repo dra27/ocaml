@@ -25,6 +25,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 let frame_size env =
   let size =
     env.stack_offset +      (* Trap frame, outgoing parameters *)
@@ -295,7 +297,7 @@ let name_for_specific = function
 
 let emit_instr env i =
     emit_debug_info i.dbg;
-    match i.desc with
+    match map_desc i.desc with
       Lend -> ()
     | Lprologue ->
       let n = frame_size env in

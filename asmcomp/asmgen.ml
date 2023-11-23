@@ -93,19 +93,28 @@ let write_linear prefix =
 let should_emit () =
   not (should_stop_after Compiler_pass.Scheduling)
 
-let if_emit_do f x = if should_emit () then f x else ()
-let emit_begin_assembly = if_emit_do Emit.begin_assembly
-let emit_end_assembly = if_emit_do Emit.end_assembly
-let emit_data = if_emit_do Emit.data
+let emit_begin_assembly () =
+  if should_emit () then
+    let open (val Platform.info.backend : Platform.Backend) in
+    Emit.begin_assembly ()
+let emit_end_assembly () =
+  if should_emit () then
+    let open (val Platform.info.backend : Platform.Backend) in
+    Emit.end_assembly ()
+let emit_data data_items =
+  if should_emit () then
+    let open (val Platform.info.backend : Platform.Backend) in
+    Emit.data data_items
 let emit_fundecl fd =
-  if should_emit() then begin
+  if should_emit () then
+    let open (val Platform.info.backend : Platform.Backend) in
     try
       Profile.record ~accumulate:true "emit" Emit.fundecl fd
     with Emitaux.Error e ->
       raise (Error (Asm_generation(fd.Linear.fun_name, e)))
-  end
 
 let rec regalloc ~ppf_dump round fd =
+  let open (val Platform.info.backend : Platform.Backend) in
   if round > 50 then
     Misc.fatal_errorf
       "%s: function too complex, cannot complete register allocation"
@@ -135,6 +144,7 @@ let rec regalloc ~ppf_dump round fd =
 let (++) x f = f x
 
 let compile_fundecl ~ppf_dump ~funcnames fd_cmm =
+  let open (val Platform.info.backend : Platform.Backend) in
   Proc.init ();
   Reg.reset();
   fd_cmm
@@ -209,6 +219,7 @@ let compile_genfuns ~ppf_dump f =
     (Cmm_helpers.generic_functions true [Compilenv.current_unit_infos ()])
 
 let compile_unit ~output_prefix ~asm_filename ~keep_asm ~obj_filename gen =
+  let open (val Platform.info.backend : Platform.Backend) in
   reset ();
   let create_asm = should_emit () &&
                    (keep_asm || not !Emitaux.binary_backend_available) in
@@ -335,3 +346,6 @@ let () =
       | Error err -> Some (Location.error_of_printer_file report_error err)
       | _ -> None
     )
+
+let () =
+  Platform.load_backend (module Default.Backend : Platform.Backend)

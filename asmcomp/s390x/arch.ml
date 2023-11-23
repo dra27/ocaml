@@ -16,9 +16,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Specific operations for the Z processor *)
+include Operations.S390x
 
-open Format
+(* Specific operations for the Z processor *)
 
 (* Machine-specific command-line options *)
 
@@ -29,18 +29,6 @@ let command_line_options =
       " Generate position-independent machine code (default)";
     "-fno-PIC", Arg.Clear pic_code,
       " Generate position-dependent machine code" ]
-
-(* Specific operations *)
-
-type specific_operation =
-    Imultaddf                           (* multiply and add *)
-  | Imultsubf                           (* multiply and subtract *)
-
-(* Addressing modes *)
-
-type addressing_mode =
-  | Iindexed of int                     (* reg + displ *)
-  | Iindexed2 of int                    (* reg + reg + displ *)
 
 (* Sizes, endianness *)
 
@@ -69,30 +57,20 @@ let num_args_addressing = function
   | Iindexed _ -> 1
   | Iindexed2 _ -> 2
 
-(* Printing operations and addressing modes *)
+(* Working around the lack of more exotic typing *)
 
-let print_addressing printreg addr ppf arg =
+let box_addressing_mode addressing_mode =
+  (S390x addressing_mode : Operations.addressing_modes)
+
+let unbox_addressing_mode (addr : Operations.addressing_modes) =
   match addr with
-  | Iindexed n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a%s" printreg arg.(0) idx
-  | Iindexed2 n ->
-      let idx = if n <> 0 then Printf.sprintf " + %i" n else "" in
-      fprintf ppf "%a + %a%s" printreg arg.(0) printreg arg.(1) idx
+  | S390x addressing_mode -> addressing_mode
+  | _ -> assert false
 
-let print_specific_operation printreg op ppf arg =
-  match op with
-  | Imultaddf ->
-      fprintf ppf "%a *f %a +f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Imultsubf ->
-      fprintf ppf "%a *f %a -f %a"
-        printreg arg.(0) printreg arg.(1) printreg arg.(2)
+let box_specific_operation sop =
+  (S390x sop : Operations.specific_operations)
 
-(* Specific operations that are pure *)
-
-let operation_is_pure _ = true
-
-(* Specific operations that can raise *)
-
-let operation_can_raise _ = false
+let unbox_specific_operation (sop : Operations.specific_operations) =
+  match sop with
+  | S390x specific_operation -> specific_operation
+  | _ -> assert false

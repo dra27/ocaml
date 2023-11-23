@@ -23,16 +23,21 @@ type op_class =
   | Op_store of bool  (* memory store, false = init, true = assign *)
   | Op_other   (* anything else that does not allocate nor store in memory *)
 
+module Make (Arch : Operations.S) (_: module type of Processor) : sig
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
+
   class cse_generic : object
     (* The following methods can be overridden to handle processor-specific
        operations. *)
 
-    method class_of_operation: Mach.operation -> op_class
+    method class_of_operation: operation -> op_class
 
-    method is_cheap_operation: Mach.operation -> bool
+    method is_cheap_operation: operation -> bool
       (* Operations that are so cheap that it isn't worth factoring them. *)
 
     (* The following method is the entry point and should not be overridden *)
     method fundecl: Mach.fundecl -> Mach.fundecl
 
   end
+end

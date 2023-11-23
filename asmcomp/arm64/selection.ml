@@ -61,6 +61,8 @@ let is_stack_slot rv =
 
 (* Instruction selection *)
 
+module Selectgen = Selectgen.Make(Arch)(Proc)
+
 class selector = object(self)
 
 inherit Selectgen.selector_generic as super
@@ -214,7 +216,7 @@ method! select_operation op args dbg =
 
 method! insert_move_extcall_arg env ty_arg src dst =
   if macosx && ty_arg = XInt32 && is_stack_slot dst
-  then self#insert env (Iop (Ispecific Imove32)) src dst
+  then ignore (self#insert_op env (Ispecific Imove32) src dst)
   else self#insert_moves env src dst
 end
 

@@ -19,6 +19,12 @@ open Reg
 open Mach
 open Linear
 
+module Make (Arch : Operations.S) (Proc : module type of Processor) = struct
+  type operation =
+    (Arch.addressing_mode, Arch.specific_operation) Mach.gen_operation
+  let unbox_op =
+    Mach.map_op Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
   (* Representation of the code DAG. *)
 
   type code_dag_node = {
@@ -31,10 +37,6 @@ open Linear
       mutable ancestors: int;             (* Number of ancestors *)
       mutable emitted_ancestors: int      (* Number of emitted ancestors *)
     }
-
-  let dummy_node =
-    { instr = end_instr; delay = 0; sons = []; date = 0;
-      length = -1; ancestors = 0; emitted_ancestors = 0 }
 
   (* The code dag itself is represented by two tables from registers to nodes:
      - "results" maps registers to the instructions that produced them;
@@ -138,18 +140,20 @@ open Linear
     | instr :: rem ->
         if instr == node then rem else instr :: remove_instr node rem
 
-  (* We treat Lreloadretaddr as a word-sized load *)
-
-  let some_load =
-    Iload {
-      memory_chunk = Cmm.Word_int;
-      addressing_mode = Arch.identity_addressing;
-      mutability = Mutable;
-      is_atomic = false }
-
   (* The generic scheduler *)
 
-  class virtual scheduler_generic = object (self)
+  class virtual scheduler_generic = fun identity_addressing ->
+    (* We treat Lreloadretaddr as a word-sized load *)
+
+    let some_load =
+      Iload {
+        memory_chunk = Cmm.Word_int;
+        addressing_mode = identity_addressing;
+        mutability = Mutable;
+        is_atomic = false }
+    in
+
+    object (self)
 
   (* Determine whether an operation ends a basic block or not.
      Can be overridden for some processors to signal specific instructions
@@ -175,6 +179,7 @@ open Linear
   method private instr_in_basic_block instr try_nesting =
     match instr.desc with
       Lop op ->
+        let op = unbox_op op in
         self#oper_in_basic_block op &&
         not (try_nesting > 0 && self#is_checkbound op)
     | Lreloadretaddr -> true
@@ -204,22 +209,22 @@ open Linear
 
   method private instr_is_store instr =
     match instr.desc with
-      Lop op -> self#is_store op
+      Lop op -> self#is_store (unbox_op op)
     | _ -> false
 
   method private instr_is_load instr =
     match instr.desc with
-      Lop op -> self#is_load op
+      Lop op -> self#is_load (unbox_op op)
     | _ -> false
 
   method private instr_is_checkbound instr =
     match instr.desc with
-      Lop op -> self#is_checkbound op
+      Lop op -> self#is_checkbound (unbox_op op)
     | _ -> false
 
   (* Estimate the latency of an operation. *)
 
-  method virtual oper_latency : Mach.operation -> int
+  method virtual oper_latency : operation -> int
 
   (* Estimate the latency of a Lreloadretaddr operation. *)
 
@@ -229,13 +234,13 @@ open Linear
 
   method private instr_latency instr =
     match instr.desc with
-      Lop op -> self#oper_latency op
+      Lop op -> self#oper_latency (unbox_op op)
     | Lreloadretaddr -> self#reload_retaddr_latency
     | _ -> assert false
 
   (* Estimate the number of cycles consumed by emitting an operation. *)
 
-  method virtual oper_issue_cycles : Mach.operation -> int
+  method virtual oper_issue_cycles : operation -> int
 
   (* Estimate the number of cycles consumed by emitting a Lreloadretaddr. *)
 
@@ -245,7 +250,7 @@ open Linear
 
   method private instr_issue_cycles instr =
     match instr.desc with
-      Lop op -> self#oper_issue_cycles op
+      Lop op -> self#oper_issue_cycles (unbox_op op)
     | Lreloadretaddr -> self#reload_retaddr_issue_cycles
     | _ -> assert false
 
@@ -328,6 +333,9 @@ open Linear
      This does not take multiple issues into account, though. *)
 
   method private ready_instruction date queue =
+    let dummy_node =
+      { instr = end_instr (); delay = 0; sons = []; date = 0;
+        length = -1; ancestors = 0; emitted_ancestors = 0 } in
     let rec extract best = function
       [] ->
         if best == dummy_node then None else Some best
@@ -405,3 +413,4 @@ open Linear
       f
 
   end
+end

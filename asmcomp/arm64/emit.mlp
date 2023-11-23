@@ -27,6 +27,8 @@ open Linear
 open Emitaux
 open Emitenv
 
+let map_desc = Linear.map_desc Arch.unbox_addressing_mode Arch.unbox_specific_operation
+
 (* Names for special regs *)
 
 let reg_domain_state_ptr = phys_reg 25 (* x28 *)
@@ -356,7 +358,7 @@ let emit_load_symbol_addr dst s =
 
 let num_call_gc_and_check_bound_points env =
   let rec loop instr ((call_gc, check_bound) as totals) =
-    match instr.desc with
+    match map_desc instr.desc with
     | Lend -> totals
     | Lop (Ialloc _) when env.f.fun_fast ->
       loop instr.next (call_gc + 1, check_bound)
@@ -405,6 +407,8 @@ module BR = Branch_relaxation.Make (struct
      occur for branches between functions; in this case, the linker should be
      able to insert veneers anyway.  (See section 4.6.7 of the document
      "ELF for the ARM 64-bit architecture (AArch64)".) *)
+
+  include Arch
 
   type distance = int
 
@@ -678,7 +682,7 @@ let name_for_float_comparison = function
 
 let emit_instr env i =
     emit_debug_info i.dbg;
-    match i.desc with
+    match map_desc i.desc with
     | Lend -> ()
     | Lprologue ->
       let n = frame_size env in
