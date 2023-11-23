@@ -59,9 +59,21 @@ jobs:
           show-progress: false
           persist-credentials: false
       - name: MSYS2 Installation ID
-        shell: C:\msys64\usr\bin\bash.exe -lc '{0}'
-        run: $GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh
-          
+        id: msys2
+        run: |
+          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/tools/ci/actions/msys2.sh"
+      - name: MSYS2 Installation Cache
+        uses: actions/cache@v3
+        with:
+          path: msys2
+          key: msys2-${{ steps.msys2.outputs.msys2-release }}-${{ steps.msys2.outputs.msys2-cache }}
+          restore-keys: |
+            msys2-${{ steps.msys2.outputs.msys2-release }}-
+            msys2-
+      - name: MSYS2 Installation
+        run: |
+          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/tools/ci/actions/msys2_unpack.sh"
+
 # This job will do the initial build of the compiler (on linux), with flambda on.
 # We then upload the compiler tree as a build artifact to enable re-use in
 # subsequent jobs.

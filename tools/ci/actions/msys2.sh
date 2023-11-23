@@ -56,4 +56,5 @@ key="$(echo "${KEY[@]}" | sort | md5sum | cut -f1 -d' ')"
 
 echo "Yielding $key"
 
-echo "msys2=$key" >> "$GITHUB_ENV"
+echo "msys2-cache=$key" >> "$GITHUB_ENV"
+echo "msys2-release=$current" >> "$GITHUB_ENV"
