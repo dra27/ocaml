@@ -61,6 +61,13 @@ jobs:
       - name: MSYS2 Installation ID
         id: msys2
         run: |
+          C:\msys64\usr\bin\bash -lc "ls -l"
+          C:\msys64\usr\bin\bash -lc "pwd"
+          C:\msys64\usr\bin\bash -lc "ls -l /d"
+          C:\msys64\usr\bin\bash -lc "ls -l /d/a"
+          C:\msys64\usr\bin\bash -lc "ls -l /d/a/ocaml"
+          C:\msys64\usr\bin\bash -lc "ls -l /d/a/ocaml/ocaml"
+          C:\msys64\usr\bin\bash -lc "ls -l `$(cygpath `$GITHUB_WORKSPACE/tools/ci/actions/msys2.sh)"
           C:\msys64\usr\bin\bash -lc "bash `$(cygpath `$GITHUB_WORKSPACE/tools/ci/actions/msys2.sh)"
       - name: MSYS2 Installation Cache
         uses: actions/cache@v3
