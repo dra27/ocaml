@@ -155,13 +155,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        shell:
-          - bash
         include:
           - name: linux-O0
             os: ubuntu-latest
+            shell: bash
             config_arg: CFLAGS='-O0'
           - name: macos
+            shell: bash
             os: macos-latest
           - name: mingw64
             os: windows-latest

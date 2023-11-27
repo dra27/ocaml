@@ -92,7 +92,7 @@ if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   call :Info New version: %LATEST_INSTALLER_VERSION%
   for %%f in (current msys2.tar) do if exist %GITHUB_WORKSPACE%\msys2\%%f del %GITHUB_WORKSPACE%\msys2\%%f
   rem TODO Ensure error here does propagate!
-  curl --location --no-progress-meter --remote-name --output %GITHUB_WORKSPACE%\msys2\%INSTALLER% %INSTALLER_URL%
+  curl --location --no-progress-meter --output %GITHUB_WORKSPACE%\msys2\%INSTALLER% %INSTALLER_URL%
   if errorlevel 1 (
     call :Error Failed to download %INSTALLER_URL%
     exit /b 1
