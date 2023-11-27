@@ -97,7 +97,7 @@ if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
     call :Error Failed to download %INSTALLER_URL%
     exit /b 1
   )
-  call :Info Extracting MSYS2...
+  echo ::group::Extracting MSYS2
   %GITHUB_WORKSPACE%\msys2\%INSTALLER% -y -oD:\
   if errorlevel 1 (
     del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
@@ -106,13 +106,14 @@ if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   )
   del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
   echo Done
-  call :Info Running MSYS2 for the first time
+  echo ::endgroup::
+  echo ::group::Running MSYS2 for the first time
   D:\msys64\usr\bin\bash.exe -le uname -a
   if errorlevel 1 (
     call :Error First-time operation failed - unable to proceed
-    exit /b 1
   )
-  echo Done
+  D:\msys64\usr\bin\bash.exe -lec uname -a
+  echo ::endgroup::
   echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
 )
 
