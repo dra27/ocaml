@@ -28,51 +28,51 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  windows:
-    runs-on: 'windows-latest'
-    outputs:
-      year: ${{ steps.date.outputs.year }}
-      week: ${{ steps.date.outputs.week }}
-    steps:
-      - name: Wakey wakey
-        id: date
-        run: |
-          Add-Content -Path $env:GITHUB_OUTPUT -Value "year=$(Get-Date -UFormat '%Y')"
-          Add-Content -Path $env:GITHUB_OUTPUT -Value "week=$(Get-Date -UFormat '%W')"
-      - name: Status
-        run: |
-          echo "Year is ${{ steps.date.outputs.year }}"
-          echo "Week is ${{ steps.date.outputs.week }}"
-      - name: MSYS2 Installer Cache
-        uses: actions/cache@v3
-        with:
-          path: msys2-installer
-          key: msys2-installer-${{ steps.date.outputs.year }}-${{ steps.date.outputs.week }}
-          restore-keys: |
-            msys2-installer-${{ steps.date.outputs.year }}
-            msys2-installer-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: ocaml
-          submodules: ${{ matrix.submodules }}
-          show-progress: false
-          persist-credentials: false
-      - name: MSYS2 Installation ID
-        id: msys2
-        run: |
-          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
-      - name: MSYS2 Installation Cache
-        uses: actions/cache@v3
-        with:
-          path: msys2
-          key: msys2-${{ steps.msys2.outputs.msys2-release }}-${{ steps.msys2.outputs.msys2-cache }}
-          restore-keys: |
-            msys2-${{ steps.msys2.outputs.msys2-release }}-
-            msys2-
-      - name: MSYS2 Installation
-        run: |
-          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/tools/ci/actions/msys2_unpack.sh"
+#  windows:
+#    runs-on: 'windows-latest'
+##    outputs:
+##      year: ${{ steps.date.outputs.year }}
+##      week: ${{ steps.date.outputs.week }}
+#    steps:
+##      - name: Wakey wakey
+##        id: date
+##        run: |
+##          Add-Content -Path $env:GITHUB_OUTPUT -Value "year=$(Get-Date -UFormat '%Y')"
+##          Add-Content -Path $env:GITHUB_OUTPUT -Value "week=$(Get-Date -UFormat '%W')"
+##      - name: Status
+##        run: |
+##          echo "Year is ${{ steps.date.outputs.year }}"
+##          echo "Week is ${{ steps.date.outputs.week }}"
+##      - name: MSYS2 Installer Cache
+##        uses: actions/cache@v3
+##        with:
+##          path: msys2-installer
+##          key: msys2-installer-${{ steps.date.outputs.year }}-${{ steps.date.outputs.week }}
+##          restore-keys: |
+##            msys2-installer-${{ steps.date.outputs.year }}
+##            msys2-installer-
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          path: ocaml
+#          submodules: ${{ matrix.submodules }}
+#          show-progress: false
+#          persist-credentials: false
+#      - name: MSYS2 Installation
+#        id: msys2
+#        run: |
+#          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
+#      - name: MSYS2 Installation Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: msys2
+#          key: msys2-${{ steps.msys2.outputs.msys2-release }}-${{ steps.msys2.outputs.msys2-cache }}
+#          restore-keys: |
+#            msys2-1-${{ steps.msys2.outputs.msys2-release }}-
+#            msys2-1-
+#      - name: MSYS2 Installation
+#        run: |
+#          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/tools/ci/actions/msys2_unpack.sh"
 
 # This job will do the initial build of the compiler (on linux), with flambda on.
 # We then upload the compiler tree as a build artifact to enable re-use in
@@ -150,27 +150,47 @@ jobs:
 #          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks
 
 # MacOS build+testsuite run, and Linux O0 run.
-#  others:
-#    name: ${{ matrix.name }}
-#    runs-on: ${{ matrix.os }}
-#    strategy:
-#      matrix:
-#        include:
-##          - name: linux-O0
-##            os: ubuntu-latest
-##            config_arg: CFLAGS='-O0'
-##          - name: macos
-##            os: macos-latest
-#          - name: mingw64
-#            os: windows-latest
-#            submodules: true
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        with:
-#          submodules: ${{ matrix.submodules }}
-#          show-progress: false
-#          persist-credentials: false
+  others:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        shell:
+          - bash
+        include:
+          - name: linux-O0
+            os: ubuntu-latest
+            config_arg: CFLAGS='-O0'
+          - name: macos
+            os: macos-latest
+          - name: mingw64
+            os: windows-latest
+            submodules: true
+            shell: ${{ github.workspace }}\bin\msys2.cmd {0}
+            MSYSTEM: MINGW64
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    env:
+      MSYSTEM: ${{ matrix.MSYSTEM }}
+    steps:
+      - name: Restore MSYS2 Installation Cache
+        if: runner.os == 'Windows'
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            msys2-installer
+            msys2
+          # XXX Use a global epoch number instead of the -1
+          key: msys2-1-latest
+          restore-keys: msys2-1-
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ocaml
+          submodules: ${{ matrix.submodules }}
+          show-progress: false
+          persist-credentials: false
 #      - uses: msys2/setup-msys2@v2
 #        with:
 #          msystem: mingw64
@@ -181,9 +201,15 @@ jobs:
 #            make
 #            diffutils
 #            parallel
-#      - name: OS Dependencies
-#        if: runner.os == 'MacOS'
-#        run: brew install parallel
+      - name: macOS Dependencies
+        if: runner.os == 'macOS'
+        run: brew install parallel
+      - name: Windows Dependencies
+        if: runner.os == 'Windows'
+        id: msys2
+        shell: cmd
+        run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
+#          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
 #      - name: stuff
 #        shell: cmd
 #        run: echo %PATH%
@@ -198,34 +224,33 @@ jobs:
 #          pwd
 #          echo "$PATH"
 #          pacman -Q
-#      - name: configure tree
-#        shell: msys2 {0}
-#        env:
-#          MSYSTEM: MINGW64
-#        run: |
-#          CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
-#      - name: Build
-#        shell: msys2 {0}
-#        env:
-#          MSYSTEM: MINGW64
-#        run: |
-#          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
-#      - name: Run the testsuite
-#        if: ${{ matrix.name != 'linux-O0' }}
-#        shell: msys2 {0}
-#        env:
-#          MSYSTEM: MINGW64
-#        run: |
-#          bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
-#      - name: Run the testsuite (linux-O0)
-#        if: ${{ matrix.name == 'linux-O0' }}
-#        env:
-#          OCAMLRUNPARAM: v=0,V=1
-#          USE_RUNTIME: d
-#        run: |
-#          for dir in $PARALLEL_TESTS; do \
-#           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
-#          done
+      - name: configure tree
+        run: |
+          CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
+      - name: Build
+        run: |
+          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
+      - name: Run the testsuite
+        if: ${{ matrix.name != 'linux-O0' }}
+        run: |
+         bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
+      - name: Run the testsuite (linux-O0)
+        if: ${{ matrix.name == 'linux-O0' }}
+        env:
+          OCAMLRUNPARAM: v=0,V=1
+          USE_RUNTIME: d
+        run: |
+          for dir in $PARALLEL_TESTS; do \
+           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
+         done
+      - name: Save MSYS2 Installation Cache
+        if: runner.os == 'Windows'
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            msys2-installer
+            msys2
+          key: msys2-1-${{ steps.msys2.outputs.msys2-release }}-${{ steps.msys2.outputs.msys2-cache }}
 
 #  i386:
 #    runs-on: ubuntu-latest

@@ -13,48 +13,43 @@
 #*                                                                        *
 #**************************************************************************
 
+set -e
+
+function compute_package_key
+{
+  # Build a package database
+  declare -gA PKGS
+  while read -r pkg ver ; do
+    PKGS[$pkg]="$pkg=$ver"
+  done < <(pacman -Sl | cut -f2,3 -d ' ')
+
+  # Build a cache key of versions
+  declare -gA KEY
+  for pkg in $({ pactree -lu base; echo mingw-w64-x86_64-gcc; } | sort); do
+    # Remove any pins
+    pkg="${pkg%=*}"
+    KEY[$pkg]="${PKGS[$pkg]}"
+  done
+
+  echo Expected packages
+  for entry in $(echo "${KEY[@]}" | sort); do
+    echo $entry
+  done
+
+  key="$(echo "${KEY[@]}" | sort | md5sum | cut -f1 -d' ')"
+}
+
+compute_package_key
+original_key="$key"
+
 # Synchronise the databases
 
-#pacman -Sy
+pacman -Sy
+compute_package_key
+new_key="$key"
 
-# Build a package database
-declare -A PKGS
-while read -r pkg ver ; do
-  PKGS[$pkg]="$pkg=$ver"
-done < <(pacman -Sl | cut -f2,3 -d ' ')
+pacman -Syu mingw-w64-x86_64-gcc
 
-# Build a cache key of versions
-declare -A KEY
-for pkg in $({ pactree -lu base; echo mingw-w64-x86_64-gcc; } | sort); do
-  # Remove any pins
-  pkg="${pkg%=*}"
-  KEY[$pkg]="${PKGS[$pkg]}"
-done
+# TODO Using the cache key to delete the tarball
 
-cd "$GITHUB_WORKSPACE"
-
-pwd
-
-GIT='/c/Program Files/Git/cmd/git.exe'
-
-if [[ -d msys2-installer ]]; then
-  "$GIT" -C msys2-installer fetch upstream --tags
-else
-  "$GIT" clone -o upstream https://github.com/msys2/msys2-installer.git
-fi
-
-cd msys2-installer
-current="$("$GIT" tag | grep -Ex '[0-9]{4}(-[0-9]{2}){2}' | sort -r | head -n 1)"
-echo "Current version is $current"
-
-echo Expected packages
-for entry in $(echo "${KEY[@]}" | sort); do
-  echo $entry
-done
-
-key="$(echo "${KEY[@]}" | sort | md5sum | cut -f1 -d' ')"
-
-echo "Yielding $key"
-
-echo "msys2-cache=$key" >> "$GITHUB_ENV"
-echo "msys2-release=$current" >> "$GITHUB_ENV"
+echo "msys2-cache=$new_key" >> "$GITHUB_ENV"
