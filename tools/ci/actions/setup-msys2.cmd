@@ -109,12 +109,13 @@ if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   echo ::endgroup::
   rem TODO Do this properly!
   C:\msys64\usr\bin\bash.exe -lec "sed -i -e s/refresh-keys/version/ /d/msys64/etc/post-install/07-pacman-key.post"
+  C:\msys64\usr\bin\bash.exe -lec "sed -i -e s/CheckSpace/#&/ /d/msys64/etc/pacman.conf"
   echo ::group::Running MSYS2 for the first time
   D:\msys64\usr\bin\bash.exe -lec uname -a
   if errorlevel 1 (
     call :Error First-time operation failed - unable to proceed
+    exit /b 1
   )
-  D:\msys64\usr\bin\bash.exe -lec uname -a
   echo ::endgroup::
   echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
 )

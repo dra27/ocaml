@@ -48,7 +48,7 @@ pacman -Sy
 compute_package_key
 new_key="$key"
 
-pacman -Syu mingw-w64-x86_64-gcc
+pacman -Syuu mingw-w64-x86_64-gcc
 
 # TODO Using the cache key to delete the tarball
 
