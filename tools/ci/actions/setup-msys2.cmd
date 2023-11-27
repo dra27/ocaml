@@ -83,12 +83,12 @@ if "%CURRENT_INSTALLER_VERSION%" equ "unknown" (
     set CURRENT_INSTALLER_VERSION=unknown
   )
 )
+set INSTALLER=msys2-base-x86_64-%LATEST_INSTALLER_VERSION:-=%.sfx.exe
+set INSTALLER_URL=https://github.com/msys2/msys2-installer/releases/download/%LATEST_INSTALLER_VERSION%/%INSTALLER%
 if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   call :Info Current base is up-to-date
   C:\msys64\usr\bin\tar.exe -C /d -pxf %GITHUB_WORKSPACE%\msys2\msys2.tar
 ) else (
-  set INSTALLER=msys2-base-x86_64-%LATEST_INSTALLER_VERSION:-=%.sfx.exe
-  set INSTALLER_URL=https://github.com/msys2/msys2-installer/releases/download/%LATEST_INSTALLER_VERSION%/%INSTALLER%
   call :Info New version: %LATEST_INSTALLER_VERSION%
   for %%f in (current msys2.tar) do if exist %GITHUB_WORKSPACE%\msys2\%%f del %GITHUB_WORKSPACE%\msys2\%%f
   rem TODO Ensure error here does propagate!
