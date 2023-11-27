@@ -239,9 +239,9 @@ jobs:
         env:
           OCAMLRUNPARAM: v=0,V=1
           USE_RUNTIME: d
-        run: |
-          for dir in $PARALLEL_TESTS; do \
-           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
+        run: >
+          for dir in $PARALLEL_TESTS; do
+           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir";
          done
       - name: Save MSYS2 Installation Cache
         if: runner.os == 'Windows'
