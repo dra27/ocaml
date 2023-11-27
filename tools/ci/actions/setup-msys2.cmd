@@ -107,8 +107,10 @@ if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
   echo Done
   echo ::endgroup::
+  rem TODO Do this properly!
+  C:\msys64\usr\bin\bash.exe -lec "sed -i -e s/refresh-keys/version/ /d/msys64/etc/post-install/07-pacman-key.post"
   echo ::group::Running MSYS2 for the first time
-  D:\msys64\usr\bin\bash.exe -le uname -a
+  D:\msys64\usr\bin\bash.exe -lec uname -a
   if errorlevel 1 (
     call :Error First-time operation failed - unable to proceed
   )
@@ -121,7 +123,7 @@ echo msys2-release=%LATEST_INSTALLER_VERSION%>> %GITHUB_ENV%
 
 rem TODO When testing this, the msys2 cache should be written _even_ if the build itself fails (unlike actions/cache)
 
-D:\msys64\usr\bin\bash.exe -le GITHUB_WORKSPACE\ocaml\tools\ci\actions\msys2.sh
+D:\msys64\usr\bin\bash.exe -le %GITHUB_WORKSPACE%\ocaml\tools\ci\actions\msys2.sh
 if errorlevel 1 (
   call :Error Checking MSYS2 failed - unable to proceed
   exit /b 1
