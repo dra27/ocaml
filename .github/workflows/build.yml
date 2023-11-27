@@ -234,6 +234,16 @@ jobs:
         if: ${{ matrix.name != 'linux-O0' }}
         run: |
          bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
+# FIXME This is causing a YAML error...
+#      - name: Run the testsuite (linux-O0)
+#        if: ${{ matrix.name == 'linux-O0' }}
+#        env:
+#          OCAMLRUNPARAM: v=0,V=1
+#          USE_RUNTIME: d
+#        run: >
+#          for dir in $PARALLEL_TESTS; do
+#           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir";
+#         done
       - name: Save MSYS2 Installation Cache
         if: runner.os == 'Windows'
         uses: actions/cache/save@v3
