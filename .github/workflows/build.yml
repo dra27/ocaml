@@ -176,6 +176,7 @@ jobs:
     defaults:
       run:
         shell: ${{ matrix.shell }}
+        working-directory: ./ocaml
     env:
       MSYSTEM: ${{ matrix.MSYSTEM }}
     steps:
@@ -213,7 +214,7 @@ jobs:
         run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies != ''
-        run: ${{ github.workspace }}/ocaml/tools/ci/actions/setup-dependencies.sh ${{ runner.os }} ${{ matrix.dependencies }}
+        run: ${{ github.workspace }}/ocaml/tools/ci/actions/setup-dependencies.sh ${{ runner.os }} "${{ matrix.dependencies }}"
 #          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
 #      - name: stuff
 #        shell: cmd

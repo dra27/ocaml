@@ -44,11 +44,11 @@ original_key="$key"
 
 # Synchronise the databases
 
-pacman -Sy
+#pacman -Sy
 compute_package_key
 new_key="$key"
 
-pacman --noconfirm -Syu mingw-w64-x86_64-gcc
+#pacman --noconfirm -Syu mingw-w64-x86_64-gcc
 
 # TODO Using the cache key to delete the tarball
 
