@@ -169,7 +169,7 @@ jobs:
             os: windows-latest
             shell: D:\a\ocaml\ocaml\bin\msys2.cmd {0}
             MSYSTEM: MINGW64
-            dependencies: mingw-w64-x86_64-gcc
+            dependencies: bash
             submodules: true
 # XXX Temporary...
       fail-fast: false
