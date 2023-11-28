@@ -175,16 +175,11 @@ goto :EOF
 
 :UpdateStage
 :: Determine if there are updates to install
-if exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
-  D:\msys64\usr\bin\bash.exe -lec %GITHUB_WORKSPACE%\ocaml\tools\ci\actions\update-msys2.sh
-  if errorlevel 1 (
-    del %GITHUB_WORKSPACE%\msys2\msys2.tar
-    call :Update
-  )
+D:\msys64\usr\bin\bash.exe -lec %GITHUB_WORKSPACE%\ocaml\tools\ci\actions\update-msys2.sh
+if errorlevel 1 (
+  del %GITHUB_WORKSPACE%\msys2\msys2.tar
+  call :Update
 )
-dir %GITHUB_WORKSPACE%
-dir %GITHUB_WORKSPACE%\msys2
-dir %GITHUB_WORKSPACE%\msys2-installer
 
 if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
   call :Info Updating cache
@@ -193,6 +188,10 @@ if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
   popd > nul
   echo Done
 )
+
+dir %GITHUB_WORKSPACE%
+dir %GITHUB_WORKSPACE%\msys2
+dir %GITHUB_WORKSPACE%\msys2-installer
 
 goto :EOF
 

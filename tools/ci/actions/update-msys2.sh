@@ -42,10 +42,13 @@ function compute_package_key
 compute_package_key
 original_key="$key"
 
-# Synchronise the databases
-
-pacman -Sy
-compute_package_key
+# If the tarball doesn't exist, this is a fresh installation and has already
+# been updated
+if [[ -e "$GITHUB_WORKSPACE/msys2/msys2.tar" ]]; then
+  # Synchronise the databases
+  pacman -Sy
+  compute_package_key
+fi
 new_key="$key"
 
 echo "msys2-cache=$new_key" >> "$GITHUB_OUTPUT"
