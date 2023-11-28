@@ -88,42 +88,70 @@ set INSTALLER_URL=https://github.com/msys2/msys2-installer/releases/download/%LA
 if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   call :Info Current base is up-to-date
   C:\msys64\usr\bin\tar.exe -C /d -pxf %GITHUB_WORKSPACE%\msys2\msys2.tar
-) else (
-  call :Info New version: %LATEST_INSTALLER_VERSION%
-  for %%f in (current msys2.tar) do if exist %GITHUB_WORKSPACE%\msys2\%%f del %GITHUB_WORKSPACE%\msys2\%%f
-  if not exist %GITHUB_WORKSPACE%\msys2 md %GITHUB_WORKSPACE%\msys2
-  curl --location --no-progress-meter --output %GITHUB_WORKSPACE%\msys2\%INSTALLER% %INSTALLER_URL%
-  if errorlevel 1 (
-    call :Error Failed to download %INSTALLER_URL%
-    exit /b 1
-  )
-  echo ::group::Extracting MSYS2
-  %GITHUB_WORKSPACE%\msys2\%INSTALLER% -y -oD:\
-  if errorlevel 1 (
-    del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
-    call :Error Base installation failed to extract
-    exit /b 1
-  )
-  del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
-  echo Done
-  echo ::endgroup::
-  rem TODO Do this properly!
-  C:\msys64\usr\bin\bash.exe -lec "sed -i -e s/refresh-keys/version/ /d/msys64/etc/post-install/07-pacman-key.post"
-  C:\msys64\usr\bin\bash.exe -lec "sed -i -e s/CheckSpace/#&/ /d/msys64/etc/pacman.conf"
-  echo ::group::Running MSYS2 for the first time
-  D:\msys64\usr\bin\bash.exe -lec uname -a
-  if errorlevel 1 (
-    call :Error First-time operation failed - unable to proceed
-    exit /b 1
-  )
-  echo ::endgroup::
-  echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
+  goto Finish
 )
+
+:: Fresh installation of MSYS2
+
+:: Download and extract the base installation
+call :Info New version: %LATEST_INSTALLER_VERSION%
+for %%f in (current msys2.tar) do if exist %GITHUB_WORKSPACE%\msys2\%%f del %GITHUB_WORKSPACE%\msys2\%%f
+if not exist %GITHUB_WORKSPACE%\msys2 md %GITHUB_WORKSPACE%\msys2
+curl --location --no-progress-meter --output %GITHUB_WORKSPACE%\msys2\%INSTALLER% %INSTALLER_URL%
+if errorlevel 1 (
+  call :Error Failed to download %INSTALLER_URL%
+  exit /b 1
+)
+echo ::group::Extracting MSYS2
+%GITHUB_WORKSPACE%\msys2\%INSTALLER% -y -oD:\
+if errorlevel 1 (
+  del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
+  call :Error Base installation failed to extract
+  exit /b 1
+)
+del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
+echo Done
+echo ::endgroup::
+
+:: Set-up procedure adapted from msys2/setup-msys2
+:: Disable Key Refresh
+:: Windows equivalent of sed -i.orig -e '/--populate/d' /etc/post-install/07-pacman-key.post
+ren D:\msys64\etc\post-install\07-pacman-key.post 07-pacman-key.post.orig
+findstr /V /C:--populate D:\msys64\etc\post-install\07-pacman-key.post.orig > D:\msys64\etc\post-install\07-pacman-key.post
+
+echo ::group::Running MSYS2 for the first time
+D:\msys64\usr\bin\bash.exe -lec uname -a
+if errorlevel 1 (
+  call :Error First-time operation failed - unable to proceed
+  exit /b 1
+)
+echo ::endgroup::
+
+:: Disable disk space checking in Pacman
+ren D:\msys64\etc\pacman.conf D:\msys64\etc\pacman.conf.orig
+findstr /V /C:CheckSpace D:\msys64\etc\pacman.conf.orig > D:\msys64\etc\pacman.conf
+
+echo ::group::Updating the base installation
+D:\msys64\usr\bin\bash.exe -lec "pacman --noconfirm -Syuu --overwrite *"
+taskkill /F /FI "MODULES eq msys-2.0.dll"
+D:\msys64\usr\bin\bash.exe -lec "pacman --noconfirm -Syuu --overwrite *"
+if errorlevel 1 (
+  call :Error Updating MSYS2 has failed - unable to proceed
+  exit /b 1
+)
+dir D:\msys64\etc\pacman.conf*
+dir D:\msys64\etc\post-install\07*
+exit /b 1
+echo ::endgroup::
+
+echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
+
+:Finish
 
 echo msys2-release=%LATEST_INSTALLER_VERSION%>> %GITHUB_ENV%
 
 rem TODO When testing this, the msys2 cache should be written _even_ if the build itself fails (unlike actions/cache)
-
+rem TODO Is this part of the later stage?
 D:\msys64\usr\bin\bash.exe -le %GITHUB_WORKSPACE%\ocaml\tools\ci\actions\msys2.sh
 if errorlevel 1 (
   call :Error Checking MSYS2 failed - unable to proceed
