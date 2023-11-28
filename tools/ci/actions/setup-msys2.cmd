@@ -115,9 +115,9 @@ echo ::endgroup::
 
 :: Set-up procedure adapted from msys2/setup-msys2
 :: Disable Key Refresh
-:: Windows equivalent of sed -i.orig -e '/--populate/d' /etc/post-install/07-pacman-key.post
+:: Windows equivalent of sed -i.orig -e '/--refresh-keys/d' /etc/post-install/07-pacman-key.post
 ren D:\msys64\etc\post-install\07-pacman-key.post 07-pacman-key.post.orig
-findstr /V /C:--populate D:\msys64\etc\post-install\07-pacman-key.post.orig > D:\msys64\etc\post-install\07-pacman-key.post
+findstr /V /C:--refresh-keys D:\msys64\etc\post-install\07-pacman-key.post.orig > D:\msys64\etc\post-install\07-pacman-key.post
 
 echo ::group::Running MSYS2 for the first time
 D:\msys64\usr\bin\bash.exe -lec uname -a
