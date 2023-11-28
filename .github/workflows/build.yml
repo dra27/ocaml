@@ -253,17 +253,17 @@ jobs:
 #           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir";
 #         done
       - name: Update MSYS2 (Windows only)
-        if: ${{ steps.install-msys2.outcome == 'success' }}
+        if: ${{ steps.install-msys2.outcome == 'success' && always() }}
         id: update-msys2
         shell: cmd
         run: tools/ci/actions/setup-msys2.cmd update
       - name: Save MSYS2 Installation Cache
-        if: ${{ steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' }}
+        if: ${{ steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' && always() }}
         uses: actions/cache/save@v3
         with:
           path: |
-            msys2-installer
-            msys2
+            D:\a\ocaml\ocaml\msys2-installer
+            D:\a\ocaml\ocaml\msys2
           key: msys2-1-${{ steps.install-msys2.outputs.msys2-release }}-${{ steps.update-msys2.outputs.msys2-cache }}
 
 #  i386:

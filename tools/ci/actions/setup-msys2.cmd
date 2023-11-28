@@ -21,8 +21,10 @@
 :: amount of installation work for every CI run. We avoid this by instead
 :: maintaining our own complete installation, which is fully cached.
 
+:: Put the ASCII Escape Code into %ESC%
+for /f "delims=#" %%e in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set ESC=%%e
+
 if not defined GITHUB_WORKSPACE goto Environment
-if not defined DEPENDENCIES goto Environment
 :: TODO And the rest...
 :: Assumptions:
 ::  - Git checkout located at %GITHUB_WORKSPACE%
@@ -30,10 +32,9 @@ if not defined DEPENDENCIES goto Environment
 ::  - MSYS2 installation maintained in D:\
 ::  - TODO XXX ...
 
-:: Put the ASCII Escape Code into %ESC%
-for /f "delims=#" %%e in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set ESC=%%e
-
 if "%1" equ "update" goto :UpdateStage
+
+if not defined DEPENDENCIES goto Environment
 
 :: Stage 1: Set-up the PATH, etc. for the msys2 shell
 if not exist %GITHUB_WORKSPACE%\bin\nul md %GITHUB_WORKSPACE%\bin
