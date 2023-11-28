@@ -184,9 +184,10 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/cache/restore@v3
         with:
+          # XXX Relative paths should work, or is the workdir getting in the way??
           path: |
-            msys2-installer
-            msys2
+            D:\a\ocaml\ocaml\msys2-installer
+            D:\a\ocaml\ocaml\msys2
           # XXX Use a global epoch number instead of the -1
           key: msys2-1-latest
           restore-keys: msys2-1-
