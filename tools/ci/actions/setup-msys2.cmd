@@ -99,7 +99,9 @@ set INSTALLER=msys2-base-x86_64-%LATEST_INSTALLER_VERSION:-=%.sfx.exe
 set INSTALLER_URL=https://github.com/msys2/msys2-installer/releases/download/%LATEST_INSTALLER_VERSION%/%INSTALLER%
 if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   call :Info Current base is up-to-date
-  C:\msys64\usr\bin\tar.exe -C /d -pxf %GITHUB_WORKSPACE%\msys2\msys2.tar
+  pushd %GITHUB_WORKSPACE%\msys2 > nul
+  C:\msys64\usr\bin\tar.exe -C /d -pxf msys2.tar
+  popd > nul
   if "%DEPENDENCIES%" neq "%CURRENT_DEPENDENCIES%" (
     call :Info Dependencies have changed - updating installation
     del %GITHUB_WORKSPACE%\msys2\msys2.tar
