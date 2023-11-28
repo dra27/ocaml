@@ -217,6 +217,7 @@ jobs:
         run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies != ''
+        id: dependencies
         run: tools/ci/actions/setup-dependencies.sh ${{ runner.os }} "${{ matrix.dependencies }}"
 #          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
 #      - name: stuff
@@ -254,9 +255,11 @@ jobs:
 #           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir";
 #         done
       - name: Update MSYS2 (Windows only)
-        if: ${{ steps.install-msys2.outcome == 'success' && always() }}
+        if: ${{ steps.install-msys2.outcome == 'success' && steps.dependencies.outcome != 'failure' && always() }}
         id: update-msys2
         shell: cmd
+        env:
+          DEPENDENCIES: ${{ matrix.dependencies }}
         run: tools/ci/actions/setup-msys2.cmd update
       - name: Save MSYS2 Installation Cache
         if: ${{ steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' && always() }}

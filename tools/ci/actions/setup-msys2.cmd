@@ -25,6 +25,7 @@
 for /f "delims=#" %%e in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set ESC=%%e
 
 if not defined GITHUB_WORKSPACE goto Environment
+if not defined DEPENDENCIES goto Environment
 :: TODO And the rest...
 :: Assumptions:
 ::  - Git checkout located at %GITHUB_WORKSPACE%
@@ -33,8 +34,6 @@ if not defined GITHUB_WORKSPACE goto Environment
 ::  - TODO XXX ...
 
 if "%1" equ "update" goto :UpdateStage
-
-if not defined DEPENDENCIES goto Environment
 
 :: Stage 1: Set-up the PATH, etc. for the msys2 shell
 if not exist %GITHUB_WORKSPACE%\bin\nul md %GITHUB_WORKSPACE%\bin
@@ -101,6 +100,10 @@ if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   call :Info Current base is up-to-date
   pushd %GITHUB_WORKSPACE%\msys2 > nul
   C:\msys64\usr\bin\tar.exe -C /d -pxf msys2.tar
+  if errorlevel 1 (
+    call :Error Extraction failed - cannot proceed
+    exit /b 1
+  )
   popd > nul
   if "%DEPENDENCIES%" neq "%CURRENT_DEPENDENCIES%" (
     call :Info Dependencies have changed - updating installation
@@ -176,6 +179,7 @@ echo [%ESC%[1;33mWARNING%ESC%[0m] %*
 goto :EOF
 
 :UpdateStage
+echo %DEPENDENCIES%> %GITHUB_WORKSPACE%\msys2\dependencies
 :: Determine if there are updates to install
 D:\msys64\usr\bin\bash.exe -lec '%GITHUB_WORKSPACE%\ocaml\tools\ci\actions\update-msys2.sh'
 if errorlevel 1 (
