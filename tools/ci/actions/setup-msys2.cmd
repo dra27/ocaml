@@ -132,7 +132,9 @@ if errorlevel 1 (
 
 if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
   call :Info Updating cache
-  C:\msys64\usr\bin\tar.exe -C /d -pcf %GITHUB_WORKSPACE%\msys2\msys2.tar msys64
+  pushd %GITHUB_WORKSPACE%\msys2 > nul
+  C:\msys64\usr\bin\tar.exe -C /d -pcf msys2.tar msys64
+  popd > nul
   echo Done
 )
 
