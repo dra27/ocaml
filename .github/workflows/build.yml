@@ -180,6 +180,13 @@ jobs:
     env:
       MSYSTEM: ${{ matrix.MSYSTEM }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ocaml
+          submodules: ${{ matrix.submodules }}
+          show-progress: false
+          persist-credentials: false
       - name: Restore MSYS2 Installation Cache
         if: runner.os == 'Windows'
         uses: actions/cache/restore@v3
@@ -190,15 +197,11 @@ jobs:
             D:\a\ocaml\ocaml\msys2
           # XXX Use a global epoch number instead of the -1
           # XXX The cache key should the hash of the required dependencies - perhaps by hashing the workflow YAML?
-          key: msys2-1-latest
-          restore-keys: msys2-1-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: ocaml
-          submodules: ${{ matrix.submodules }}
-          show-progress: false
-          persist-credentials: false
+          #     It should still restore the most recent cache (for the msys2-installer directory, etc.)
+          key: msys2-1-${{ hashFiles('ocaml/.github/workflows/build.yml') }}-latest
+          restore-keys: |
+            msys2-1-${{ hashFiles('ocaml/.github/workflows/build.yml') }}-
+            msys2-1-
 #      - uses: msys2/setup-msys2@v2
 #        with:
 #          msystem: mingw64
@@ -269,7 +272,7 @@ jobs:
           path: |
             D:\a\ocaml\ocaml\msys2-installer
             D:\a\ocaml\ocaml\msys2
-          key: msys2-1-${{ steps.install-msys2.outputs.msys2-release }}-${{ steps.update-msys2.outputs.msys2-cache }}
+          key: msys2-1-${{ hashFiles('ocaml/.github/workflows/build.yml') }}-${{ steps.install-msys2.outputs.msys2-release }}-${{ steps.update-msys2.outputs.msys2-cache }}
 
 #  i386:
 #    runs-on: ubuntu-latest

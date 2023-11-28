@@ -192,10 +192,6 @@ if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
   echo Done
 )
 
-dir %GITHUB_WORKSPACE%
-dir %GITHUB_WORKSPACE%\msys2
-dir %GITHUB_WORKSPACE%\msys2-installer
-
 goto :EOF
 
 :Update
