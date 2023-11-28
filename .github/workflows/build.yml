@@ -209,8 +209,10 @@ jobs:
 #            parallel
       - name: MSYS2 (Windows only)
         if: runner.os == 'Windows'
-        id: msys2
+        id: install-msys2
         shell: cmd
+        env:
+          DEPENDENCIES: ${{ matrix.dependencies }}
         run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies != ''
@@ -239,7 +241,7 @@ jobs:
       - name: Run the testsuite
         if: ${{ matrix.name != 'linux-O0' }}
         run: |
-         bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
+          bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
 # FIXME This is causing a YAML error...
 #      - name: Run the testsuite (linux-O0)
 #        if: ${{ matrix.name == 'linux-O0' }}
@@ -250,14 +252,19 @@ jobs:
 #          for dir in $PARALLEL_TESTS; do
 #           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir";
 #         done
+      - name: Update MSYS2 (Windows only)
+        if: ${{ steps.install-msys2.outcome == 'success' }}
+        id: update-msys2
+        shell: cmd
+        run: tools/ci/actions/setup-msys2.cmd update
       - name: Save MSYS2 Installation Cache
-        if: runner.os == 'Windows'
+        if: ${{ steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' }}
         uses: actions/cache/save@v3
         with:
           path: |
             msys2-installer
             msys2
-          key: msys2-1-${{ steps.msys2.outputs.msys2-release }}-${{ steps.msys2.outputs.msys2-cache }}
+          key: msys2-1-${{ steps.install-msys2.outputs.msys2-release }}-${{ steps.update-msys2.outputs.msys2-cache }}
 
 #  i386:
 #    runs-on: ubuntu-latest

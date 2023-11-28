@@ -44,12 +44,15 @@ original_key="$key"
 
 # Synchronise the databases
 
-#pacman -Sy
+pacman -Sy
 compute_package_key
 new_key="$key"
 
-#pacman --noconfirm -Syu mingw-w64-x86_64-gcc
+echo "msys2-cache=$new_key" >> "$GITHUB_OUTPUT"
 
-# TODO Using the cache key to delete the tarball
-
-echo "msys2-cache=$new_key" >> "$GITHUB_ENV"
+if [[ $new_key != $original_key ]]; then
+  echo -e '[\e[1;34mINFO\e[0m] Package updates required'
+  exit 1
+else
+  echo -e '[\e[1;34mINFO\e[0m] No package updates'
+fi

@@ -21,6 +21,9 @@
 :: amount of installation work for every CI run. We avoid this by instead
 :: maintaining our own complete installation, which is fully cached.
 
+if not defined GITHUB_WORKSPACE goto Environment
+if not defined DEPENDENCIES goto Environment
+:: TODO And the rest...
 :: Assumptions:
 ::  - Git checkout located at %GITHUB_WORKSPACE%
 ::  - Runner's installation of MSYS2 is at C:\msys64 (cf. https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md#msys2)
@@ -29,6 +32,8 @@
 
 :: Put the ASCII Escape Code into %ESC%
 for /f "delims=#" %%e in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set ESC=%%e
+
+if "%1" equ "update" goto :UpdateStage
 
 :: Stage 1: Set-up the PATH, etc. for the msys2 shell
 if not exist %GITHUB_WORKSPACE%\bin\nul md %GITHUB_WORKSPACE%\bin
@@ -73,6 +78,12 @@ if not exist %GITHUB_WORKSPACE%\msys2\current (
   for /f "delims=" %%v in ('type %GITHUB_WORKSPACE%\msys2\current') do set CURRENT_INSTALLER_VERSION=%%v
 )
 
+if not exist %GITHUB_WORKSPACE%\msys2\dependencies (
+  set CURRENT_DEPENDENCIES=unknown
+) else (
+  for /f "delims=" %%v in ('type %GITHUB_WORKSPACE%\msys2\dependencies') do set CURRENT_DEPENDENCIES=%%v
+)
+
 if "%CURRENT_INSTALLER_VERSION%" equ "unknown" (
   call :Info No previous version found: first time set-up assumed
 ) else (
@@ -88,6 +99,11 @@ set INSTALLER_URL=https://github.com/msys2/msys2-installer/releases/download/%LA
 if "%LATEST_INSTALLER_VERSION%" equ "%CURRENT_INSTALLER_VERSION%" (
   call :Info Current base is up-to-date
   C:\msys64\usr\bin\tar.exe -C /d -pxf %GITHUB_WORKSPACE%\msys2\msys2.tar
+  if "%DEPENDENCIES%" neq "%CURRENT_DEPENDENCIES%" (
+    call :Info Dependencies have changed - updating installation
+    del %GITHUB_WORKSPACE%\msys2\msys2.tar
+    call :Update
+  )
   goto Finish
 )
 
@@ -113,11 +129,9 @@ del %GITHUB_WORKSPACE%\msys2\%INSTALLER%
 echo Done
 echo ::endgroup::
 
-:: Set-up procedure adapted from msys2/setup-msys2
-:: Disable Key Refresh
-:: Windows equivalent of sed -i.orig -e '/--refresh-keys/d' /etc/post-install/07-pacman-key.post
 ren D:\msys64\etc\post-install\07-pacman-key.post 07-pacman-key.post.orig
-findstr /V /C:--refresh-keys D:\msys64\etc\post-install\07-pacman-key.post.orig > D:\msys64\etc\post-install\07-pacman-key.post
+ren D:\msys64\etc\pacman.conf pacman.conf.orig
+call :PatchMSYS2Config
 
 echo ::group::Running MSYS2 for the first time
 D:\msys64\usr\bin\bash.exe -lec uname -a
@@ -125,46 +139,24 @@ if errorlevel 1 (
   call :Error First-time operation failed - unable to proceed
   exit /b 1
 )
-echo ::endgroup::
-
-:: Disable disk space checking in Pacman
-ren D:\msys64\etc\pacman.conf pacman.conf.orig
-findstr /V /C:CheckSpace D:\msys64\etc\pacman.conf.orig > D:\msys64\etc\pacman.conf
-
-echo ::group::Updating the base installation
-D:\msys64\usr\bin\bash.exe -lec "pacman --noconfirm -Syuu --overwrite *"
-taskkill /F /FI "MODULES eq msys-2.0.dll"
-D:\msys64\usr\bin\bash.exe -lec "pacman --noconfirm -Syuu --overwrite *"
-if errorlevel 1 (
-  call :Error Updating MSYS2 has failed - unable to proceed
-  exit /b 1
-)
-dir D:\msys64\etc\pacman.conf*
-dir D:\msys64\etc\post-install\07*
-exit /b 1
-echo ::endgroup::
-
 echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
+echo ::endgroup::
+
+call :Update
 
 :Finish
 
-echo msys2-release=%LATEST_INSTALLER_VERSION%>> %GITHUB_ENV%
+echo msys2-release=%LATEST_INSTALLER_VERSION%>> %GITHUB_OUTPUT%
 
-rem TODO When testing this, the msys2 cache should be written _even_ if the build itself fails (unlike actions/cache)
-rem TODO Is this part of the later stage?
-D:\msys64\usr\bin\bash.exe -le %GITHUB_WORKSPACE%\ocaml\tools\ci\actions\msys2.sh
-if errorlevel 1 (
-  call :Error Checking MSYS2 failed - unable to proceed
-  exit /b 1
-)
+goto :EOF
 
-if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
-  call :Info Updating cache
-  pushd %GITHUB_WORKSPACE%\msys2 > nul
-  C:\msys64\usr\bin\tar.exe -C /d -pcf msys2.tar msys64
-  popd > nul
-  echo Done
-)
+:PatchMSYS2Config
+:: Disable Key Refresh
+:: Windows equivalent of sed -i.orig -e '/--refresh-keys/d' /etc/post-install/07-pacman-key.post
+findstr /V /C:--refresh-keys D:\msys64\etc\post-install\07-pacman-key.post.orig > D:\msys64\etc\post-install\07-pacman-key.post
+
+:: Disable disk space checking in Pacman
+findstr /V /C:CheckSpace D:\msys64\etc\pacman.conf.orig > D:\msys64\etc\pacman.conf
 
 goto :EOF
 
@@ -179,3 +171,50 @@ goto :EOF
 :Warning
 echo [%ESC%[1;33mWARNING%ESC%[0m] %*
 goto :EOF
+
+:UpdateStage
+:: Determine if there are updates to install
+if exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
+  D:\msys64\usr\bin\bash.exe -lec %GITHUB_WORKSPACE%\ocaml\tools\ci\actions\update-msys2.sh
+  if errorlevel 1 (
+    del %GITHUB_WORKSPACE%\msys2\msys2.tar
+    call :Update
+  )
+)
+
+if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
+  call :Info Updating cache
+  pushd %GITHUB_WORKSPACE%\msys2 > nul
+  C:\msys64\usr\bin\tar.exe -C /d -pcf msys2.tar msys64
+  popd > nul
+  echo Done
+)
+
+goto :EOF
+
+:Update
+
+echo ::group::Updating the base installation
+D:\msys64\usr\bin\bash.exe -lec "pacman --noconfirm -Syuu --overwrite *"
+taskkill /F /FI "MODULES eq msys-2.0.dll"
+D:\msys64\usr\bin\bash.exe -lec "pacman --noconfirm -Syuu --overwrite *"
+if errorlevel 1 (
+  call :Error Updating MSYS2 has failed - unable to proceed
+  exit /b 1
+)
+if exist D:\msys64\etc\pacman.conf.pacnew (
+  del D:\msys64\etc\pacman.conf.orig
+  ren D:\msys64\etc\pacman.conf.pacnew pacman.conf.orig
+)
+if exist D:\msys64\etc\post-install\07-pacman-key.post.pacnew (
+  del D:\msys64\etc\post-install\07-pacman-key.post.orig
+  ren D:\msys64\etc\post-install\07-pacman-key.post.pacnew 07-pacman-key.post.orig
+)
+call :PatchMSYS2Config
+echo ::endgroup::
+
+goto :EOF
+
+:Environment
+:: TODO Finish this...
+echo Stuff
