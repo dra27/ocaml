@@ -160,15 +160,15 @@ case "$1" in
     fi
     # The testsuite is too slow to run on AppVeyor in full. Run the dynlink
     # tests now (to include natdynlink)
-    run "test dynlink $PORT" \
-        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
+#    run "test dynlink $PORT" \
+#        $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
     # Now reconfigure ocamltest to run in bytecode-only mode
-    sed -i '/native_/s/true/false/' \
-           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+#    sed -i '/native_/s/true/false/' \
+#           "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+#    $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
     # And run the entire testsuite, skipping all the native-code tests
     run "test $PORT" \
-        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
+        make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 parallel
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
