@@ -182,6 +182,9 @@ if exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
     call :Update
   )
 )
+dir %GITHUB_WORKSPACE%
+dir %GITHUB_WORKSPACE%\msys2
+dir %GITHUB_WORKSPACE%\msys2-installer
 
 if not exist %GITHUB_WORKSPACE%\msys2\msys2.tar (
   call :Info Updating cache
