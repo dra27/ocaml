@@ -145,8 +145,7 @@ if errorlevel 1 (
 echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
 echo ::endgroup::
 
-rem TODO Restore this line!
-rem call :Update
+call :Update
 
 :Finish
 

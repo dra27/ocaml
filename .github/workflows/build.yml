@@ -169,7 +169,7 @@ jobs:
             os: windows-latest
             shell: D:\a\ocaml\ocaml\bin\msys2.cmd {0}
             MSYSTEM: MINGW64
-            dependencies: bash
+            dependencies: mingw-w64-x86_64-gcc make diffutils parallel
             submodules: true
 # XXX Temporary...
       fail-fast: false
@@ -189,6 +189,7 @@ jobs:
             D:\a\ocaml\ocaml\msys2-installer
             D:\a\ocaml\ocaml\msys2
           # XXX Use a global epoch number instead of the -1
+          # XXX The cache key should the hash of the required dependencies - perhaps by hashing the workflow YAML?
           key: msys2-1-latest
           restore-keys: msys2-1-
       - name: Checkout
