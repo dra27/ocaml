@@ -167,7 +167,7 @@ jobs:
 #            dependencies: parallel
           - name: mingw64
             os: windows-latest
-            shell: ${{ github.workspace }}\bin\msys2.cmd {0}
+            shell: D:\a\ocaml\ocaml\bin\msys2.cmd {0}
             MSYSTEM: MINGW64
             dependencies: mingw-w64-x86_64-gcc
             submodules: true
