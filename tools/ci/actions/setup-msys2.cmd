@@ -69,9 +69,6 @@ if "%LATEST_INSTALLER_VERSION%" equ "unknown" (
   exit /b 1
 )
 
-:: TODO Remove this!
-set LATEST_INSTALLER_VERSION=2023-01-27
-
 if not exist %GITHUB_WORKSPACE%\msys2\current (
   set CURRENT_INSTALLER_VERSION=unknown
 ) else (
@@ -148,7 +145,8 @@ if errorlevel 1 (
 echo %LATEST_INSTALLER_VERSION%> %GITHUB_WORKSPACE%\msys2\current
 echo ::endgroup::
 
-call :Update
+rem TODO Restore this line!
+rem call :Update
 
 :Finish
 
