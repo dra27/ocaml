@@ -128,7 +128,7 @@ if errorlevel 1 (
 echo ::endgroup::
 
 :: Disable disk space checking in Pacman
-ren D:\msys64\etc\pacman.conf D:\msys64\etc\pacman.conf.orig
+ren D:\msys64\etc\pacman.conf pacman.conf.orig
 findstr /V /C:CheckSpace D:\msys64\etc\pacman.conf.orig > D:\msys64\etc\pacman.conf
 
 echo ::group::Updating the base installation
