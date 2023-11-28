@@ -181,7 +181,7 @@ goto :EOF
 :UpdateStage
 echo %DEPENDENCIES%> %GITHUB_WORKSPACE%\msys2\dependencies
 :: Determine if there are updates to install
-D:\msys64\usr\bin\bash.exe -lec '%GITHUB_WORKSPACE%\ocaml\tools\ci\actions\update-msys2.sh'
+call msys2.cmd ocaml/tools/ci/actions/update-msys2.sh
 if errorlevel 1 (
   del %GITHUB_WORKSPACE%\msys2\msys2.tar
   call :Update
