@@ -156,18 +156,23 @@ jobs:
     strategy:
       matrix:
         include:
-#          - name: linux-O0
-#            os: ubuntu-latest
-#            shell: bash
-#            config_arg: CFLAGS='-O0'
-#          - name: macos
-#            shell: bash
-#            os: macos-latest
+          - name: linux-O0
+            os: ubuntu-latest
+            shell: bash
+            dependencies: gcc make libzstd-dev parallel
+            config_arg: CFLAGS='-O0'
+          - name: macos
+            os: macos-latest
+            shell: bash
+            dependencies: parallel
           - name: mingw64
             os: windows-latest
-            submodules: true
             shell: ${{ github.workspace }}\bin\msys2.cmd {0}
             MSYSTEM: MINGW64
+            dependencies: mingw-w64-x86_64-gcc
+            submodules: true
+# XXX Temporary...
+      fail-fast: false
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -201,14 +206,14 @@ jobs:
 #            make
 #            diffutils
 #            parallel
-      - name: macOS Dependencies
-        if: runner.os == 'macOS'
-        run: brew install parallel
-      - name: Windows Dependencies
+      - name: MSYS2 (Windows only)
         if: runner.os == 'Windows'
         id: msys2
         shell: cmd
         run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
+      - name: ${{ runner.os }} Dependencies
+        if: matrix.dependencies != ''
+        run: ${{ github.workspace }}/ocaml/tools/ci/actions/setup-dependencies.sh ${{ runner.os }} ${{ matrix.dependencies }}
 #          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
 #      - name: stuff
 #        shell: cmd
