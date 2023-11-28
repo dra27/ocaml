@@ -189,6 +189,7 @@ jobs:
           persist-credentials: false
       - name: Restore MSYS2 Installation Cache
         if: runner.os == 'Windows'
+        id: msys2-cache
         uses: actions/cache/restore@v3
         with:
           # XXX Relative paths should work, or is the workdir getting in the way??
@@ -266,13 +267,13 @@ jobs:
           DEPENDENCIES: ${{ matrix.dependencies }}
         run: tools/ci/actions/setup-msys2.cmd update
       - name: Save MSYS2 Installation Cache
-        if: ${{ steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' && always() }}
+        if: ${{ steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' && steps.msys2-cache.outputs.cache-matched-key != format('msys2-1-{0}-{1}-{2}', hashFiles('ocaml/.github/workflows/build.yml'), steps.install-msys2.outputs.msys2-release, steps.update-msys2.outputs.msys2-cache) && always() }}
         uses: actions/cache/save@v3
         with:
           path: |
             D:\a\ocaml\ocaml\msys2-installer
             D:\a\ocaml\ocaml\msys2
-          key: msys2-1-${{ hashFiles('ocaml/.github/workflows/build.yml') }}-${{ steps.install-msys2.outputs.msys2-release }}-${{ steps.update-msys2.outputs.msys2-cache }}
+          key: ${{ format('msys2-1-{0}-{1}-{2}', hashFiles('ocaml/.github/workflows/build.yml'), steps.install-msys2.outputs.msys2-release, steps.update-msys2.outputs.msys2-cache) }}
 
 #  i386:
 #    runs-on: ubuntu-latest
