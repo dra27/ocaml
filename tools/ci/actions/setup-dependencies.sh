@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
   Linux)
-    installed_packages_command="dpkg-query -W -f '\${Package}\\t\${Version}\\n'"
+    installed_packages_command="dpkg-query -W -f '\${Package} \${Version}\\n'"
     sudo='sudo'
     sync_command='apt-get update'
     install_packages_command='sudo apt-get install -y';;
@@ -35,38 +35,39 @@ case "$1" in
     sync_command='pacman --noconfirm -Syu'
     check_pacman $packages;;
   *)
-    echo -e "[\e[1;31mERROR\e[0m] Runner \"$1\" not recognised!" >&2
+    echo $'[\e[1;31mERROR\e[0m] Runner "'"$1\" not recognised!" >&2
     exit 1;;
 esac
 
-declare -A INSTALLED
-while read -r pkg ver; do
-  INSTALLED[$pkg]="$ver"
-done < <($installed_packages_command)
-
 NEEDED=($(echo $2 | tr ' ' '\n' | sort))
 MISSING=()
-for pkg in "${NEEDED[@]}"; do
-  if [[ ! -v "INSTALLED[$pkg]" ]]; then
-    MISSING+="$pkg"
+INSTALLED=($($installed_packages_command | cut -f1 -d ' '))
+
+for dep in "${NEEDED[@]}"; do
+  for pkg in "${INSTALLED[@]}"; do
+    if [[ $dep = $pkg ]]; then
+      break;
+    fi
+  done
+  if [[ $pkg != $dep ]]; then
+    MISSING+=("$dep")
   fi
 done
 
 if [[ ${#MISSING[@]} -gt 0 ]]; then
-  echo -e "[\e[1;34mINFO\e[0m] Will install: ${MISSING[@]}"
+  echo $'[\e[1;34mINFO\e[0m] Will install: '"${MISSING[@]}"
   echo "::group::Installing missing dependencies using ${install_packages_command%% *}"
   if [[ -n $sync_command ]]; then
     $sudo $sync_command
   fi
   $sudo $install_packages_command "${MISSING[@]}"
   echo '::endgroup::'
-  # Update the installed versions
-  while read -r pkg ver; do
-    INSTALLED[$pkg]="$ver"
-  done < <($installed_packages_command)
 fi
 
-echo -e "[\e[1;34mINFO\e[0m] Package versions"
-for pkg in "${NEEDED[@]}"; do
-  echo "$pkg: ${INSTALLED[$pkg]}"
-done
+echo $'[\e[1;34mINFO\e[0m] Package versions'
+while read -r pkg ver; do
+  if [[ $pkg = ${NEEDED[0]} ]]; then
+    echo "$pkg: $ver"
+    NEEDED=("${NEEDED[@]:1}")
+  fi
+done < <($installed_packages_command)
