@@ -18,22 +18,31 @@ set -e
 # $1 = Linux, macOS or Windows (runner.os)
 # $2 = space-separated list of required packages
 
+function installed_packages
+{
+  case "$1" in
+    Linux) dpkg-query -W -f '${Package} ${Version}\n';;
+    macOS) brew list --versions;;
+    Windows) pacman -Sl | cut -f2,3 -d ' ';;
+  esac
+}
+
 case "$1" in
   Linux)
-    installed_packages_command="dpkg-query -W -f '\${Package} \${Version}\\n'"
     sudo='sudo'
-    sync_command='apt-get update'
-    install_packages_command='sudo apt-get install -y';;
+    package_manager='apt-get'
+    sync_command='update'
+    install_command='install -y';;
   macOS)
-    installed_packages_command='brew list --versions'
     sudo=''
+    package_manager='brew'
     sync_command=''
-    install_packages_command='brew install';;
+    install_command='install';;
   Windows)
-    installed_packages_command="pacman -Sl | cut -f2,3 -d ' '"
     sudo=''
-    sync_command='pacman --noconfirm -Syu'
-    check_pacman $packages;;
+    package_manager='pacman'
+    sync_command='--noconfirm -Syu'
+    install_command='--noconfirm -S';;
   *)
     echo $'[\e[1;31mERROR\e[0m] Runner "'"$1\" not recognised!" >&2
     exit 1;;
@@ -41,7 +50,7 @@ esac
 
 NEEDED=($(echo $2 | tr ' ' '\n' | sort))
 MISSING=()
-INSTALLED=($($installed_packages_command | cut -f1 -d ' '))
+INSTALLED=($(installed_packages "$1" | cut -f1 -d ' '))
 
 for dep in "${NEEDED[@]}"; do
   for pkg in "${INSTALLED[@]}"; do
@@ -56,11 +65,11 @@ done
 
 if [[ ${#MISSING[@]} -gt 0 ]]; then
   echo $'[\e[1;34mINFO\e[0m] Will install: '"${MISSING[@]}"
-  echo "::group::Installing missing dependencies using ${install_packages_command%% *}"
+  echo "::group::Installing missing dependencies using $package_manager"
   if [[ -n $sync_command ]]; then
-    $sudo $sync_command
+    $sudo $package_manager $sync_command
   fi
-  $sudo $install_packages_command "${MISSING[@]}"
+  $sudo $package_manager $install_command "${MISSING[@]}"
   echo '::endgroup::'
 fi
 
@@ -70,4 +79,4 @@ while read -r pkg ver; do
     echo "$pkg: $ver"
     NEEDED=("${NEEDED[@]:1}")
   fi
-done < <($installed_packages_command)
+done < <(installed_packages "$1")
