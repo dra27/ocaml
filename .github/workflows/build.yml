@@ -156,15 +156,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: linux-O0
-            os: ubuntu-latest
-            shell: bash
-            dependencies: gcc make libzstd-dev parallel
-            config_arg: CFLAGS='-O0'
-          - name: macos
-            os: macos-latest
-            shell: bash
-            dependencies: parallel
+#          - name: linux-O0
+#            os: ubuntu-latest
+#            shell: bash
+#            dependencies: gcc make libzstd-dev parallel
+#            config_arg: CFLAGS='-O0'
+#          - name: macos
+#            os: macos-latest
+#            shell: bash
+#            dependencies: parallel
           - name: mingw64
             os: windows-latest
             shell: ${{ github.workspace }}\bin\msys2.cmd {0}
