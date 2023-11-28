@@ -214,7 +214,7 @@ jobs:
         run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies != ''
-        run: ${{ github.workspace }}/ocaml/tools/ci/actions/setup-dependencies.sh ${{ runner.os }} "${{ matrix.dependencies }}"
+        run: tools/ci/actions/setup-dependencies.sh ${{ runner.os }} "${{ matrix.dependencies }}"
 #          C:\msys64\usr\bin\bash -lc "`$GITHUB_WORKSPACE/ocaml/tools/ci/actions/msys2.sh"
 #      - name: stuff
 #        shell: cmd
@@ -232,14 +232,14 @@ jobs:
 #          pacman -Q
       - name: configure tree
         run: |
-          CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j bash -xe ocaml/tools/ci/actions/runner.sh configure
+          CONFIG_ARG=${{ matrix.config_arg }} MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
-          MAKE_ARG=-j bash -xe ocaml/tools/ci/actions/runner.sh build
+          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
         if: ${{ matrix.name != 'linux-O0' }}
         run: |
-         bash -c 'SHOW_TIMINGS=1 ocaml/tools/ci/actions/runner.sh test'
+         bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
 # FIXME This is causing a YAML error...
 #      - name: Run the testsuite (linux-O0)
 #        if: ${{ matrix.name == 'linux-O0' }}
@@ -248,7 +248,7 @@ jobs:
 #          USE_RUNTIME: d
 #        run: >
 #          for dir in $PARALLEL_TESTS; do
-#           bash -cxe "SHOW_TIMINGS=1 ocaml/tools/ci/actions/runner.sh test_prefix $dir";
+#           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir";
 #         done
       - name: Save MSYS2 Installation Cache
         if: runner.os == 'Windows'
