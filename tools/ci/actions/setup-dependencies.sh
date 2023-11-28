@@ -23,7 +23,7 @@ function installed_packages
   case "$1" in
     Linux) dpkg-query -W -f '${Package} ${Version}\n';;
     macOS) brew list --versions;;
-    Windows) pacman -Sl | cut -f2,3 -d ' ';;
+    Windows) pacman -Q;;
   esac
 }
 
