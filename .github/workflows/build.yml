@@ -70,28 +70,39 @@ jobs:
           path: /tmp/sources.tar.zstd
           retention-days: 1
 
-# Full testsuite run, and other sanity checks
-# "extra" testsuite runs, reusing the previously built compiler tree.
-# debug: running the full testsuite with the
-#        debug runtime and minor heap verification.
-# debug-s4096: select testsuite run with the debug runtime and a small
-#              minor heap.
-  normal:
-    name: ${{ matrix.name }}
+# Testsuite runs, and other sanity checks, reusing the previously built compiler tree.
+# - Full testsuite run, and other sanity checks
+# - Full testsuite run, with the debug runtime and minor heap verification
+# - Partial testsuite run with the debug runtime and a small minor heap
+  linux-tests:
     needs: build
     runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
     strategy:
       matrix:
         include:
-          - id: normal
-            name: normal
+          - name: Full tests
+            id: normal
             dependencies: texlive-latex-extra texlive-fonts-recommended hevea sass
-          - id: debug
-            name: extra (debug)
-          - id: debug-s4096
-            name: extra (debug-s4096)
+            OCAMLRUNPARAM: b=0,v=0
+            make-arg: -j
+          - name: Debug runtime
+            id: debug
+            OCAMLRUNPARAM: v=0,V=1
+            use-runtime: d
+            show-timings: 1
+          - name: Debug runtime (s=4096)
+            id: debug-s4096
+            OCAMLRUNPARAM: s=4096,v=0
+            use-runtime: d
+            show-timings: 1
+    env:
+      OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
+      MAKE_ARG: ${{ matrix.make-arg }}
+      USE_RUNTIME: ${{ matrix.use-runtime }}
+      SHOW_TIMINGS: ${{ matrix.show-timings }}
     steps:
-      - name: Download Artifact
+      - name: Download artifact
         uses: actions/download-artifact@v3
         with:
           name: compiler
@@ -102,43 +113,28 @@ jobs:
       - name: Packages
         if: matrix.dependencies != ''
         run: |
-          sudo apt-get update -y && sudo apt-get install -y ${{ matrix.dependencies }}
+          sudo apt-get update -y
+          sudo apt-get install -y ${{ matrix.dependencies }}
       - name: Run the testsuite
-        if: matrix.id == 'normal'
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
-      - name: Run the testsuite (debug runtime)
-        if: matrix.id == 'debug'
-        env:
-          OCAMLRUNPARAM: v=0,V=1
-          USE_RUNTIME: d
-        run: |
-          bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test"
+        if: matrix.id != 'debug-s4096'
+        run: bash -xe tools/ci/actions/runner.sh test
       - name: Run the testsuite (s=4096, debug runtime)
         if: matrix.id == 'debug-s4096'
-        env:
-          OCAMLRUNPARAM: s=4096,v=0
-          USE_RUNTIME: d
         run: |
-          for dir in $PARALLEL_TESTS; do \
-            bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
           done
       - name: Build API Documentation
         if: matrix.id == 'normal'
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh api-docs
+        run: bash -xe tools/ci/actions/runner.sh api-docs
       - name: Install
         if: matrix.id == 'normal'
-        run: |
-         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+        run: bash -xe tools/ci/actions/runner.sh install
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh manual
+        run: bash -xe tools/ci/actions/runner.sh manual
       - name: Other checks
         if: matrix.id == 'normal'
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh other-checks
+        run: bash -xe tools/ci/actions/runner.sh other-checks
 
 # MacOS build+testsuite run, and Linux O0 run.
   others:
