@@ -54,13 +54,13 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: >-
-          bash -xe tools/ci/actions/runner.sh configure
+          tools/ci/actions/runner.sh configure
           --enable-flambda
           --enable-cmm-invariants
           --enable-dependency-generation
           --enable-native-toplevel
       - name: Build
-        run: bash -xe tools/ci/actions/runner.sh build
+        run: tools/ci/actions/runner.sh build
       - name: Prepare Artifact
         run: tar --zstd -cf /tmp/sources.tar.zstd .
       - name: Upload Artifact
@@ -119,19 +119,19 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y ${{ matrix.dependencies }}
       - name: Run the testsuite
-        run: bash -xe tools/ci/actions/runner.sh test ${{ matrix.tests }}
+        run: tools/ci/actions/runner.sh test ${{ matrix.tests }}
       - name: Build API Documentation
         if: matrix.id == 'normal'
-        run: bash -xe tools/ci/actions/runner.sh api-docs
+        run: tools/ci/actions/runner.sh api-docs
       - name: Install
         if: matrix.id == 'normal'
-        run: bash -xe tools/ci/actions/runner.sh install
+        run: tools/ci/actions/runner.sh install
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
-        run: bash -xe tools/ci/actions/runner.sh manual
+        run: tools/ci/actions/runner.sh manual
       - name: Other checks
         if: matrix.id == 'normal'
-        run: bash -xe tools/ci/actions/runner.sh other-checks
+        run: tools/ci/actions/runner.sh other-checks
 
 # MacOS build+testsuite run, and Linux O0 run.
   others:
@@ -165,11 +165,11 @@ jobs:
         if: runner.os == 'MacOS'
         run: brew install parallel
       - name: configure tree
-        run: bash -xe tools/ci/actions/runner.sh configure ${{ env.config-arg }}
+        run: tools/ci/actions/runner.sh configure ${{ env.config-arg }}
       - name: Build
-        run: bash -xe tools/ci/actions/runner.sh build
+        run: tools/ci/actions/runner.sh build
       - name: Run the testsuite
-        run: bash -xe tools/ci/actions/runner.sh test ${{ matrix.tests }}
+        run: tools/ci/actions/runner.sh test ${{ matrix.tests }}
 
   i386:
     runs-on: ubuntu-latest
@@ -185,9 +185,8 @@ jobs:
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
       - name: configure tree
-        run: bash -xe tools/ci/actions/runner.sh configure
+        run: tools/ci/actions/runner.sh configure
       - name: Build
-        run: bash -xe tools/ci/actions/runner.sh build
+        run: tools/ci/actions/runner.sh build
       - name: Run the testsuite
-        run: |
-          bash -xe tools/ci/actions/runner.sh test
+        run: tools/ci/actions/runner.sh test
