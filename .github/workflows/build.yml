@@ -16,6 +16,7 @@ permissions: {}
 # cases in the runtime system.
 env:
   PARALLEL_TESTS: parallel callback gc-roots weak-ephe-final
+  MAKE_ARG: -j
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
 # Concurrent workflows are grouped by the PR or branch that triggered them
@@ -57,10 +58,9 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
-        run: |
-          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
+        run: bash -xe tools/ci/actions/runner.sh build
       - name: Prepare Artifact
         run: tar --zstd -cf /tmp/sources.tar.zstd .
       - name: Upload Artifact
@@ -85,7 +85,6 @@ jobs:
             id: normal
             dependencies: texlive-latex-extra texlive-fonts-recommended hevea sass
             OCAMLRUNPARAM: b=0,v=0
-            make-arg: -j
           - name: Debug runtime
             id: debug
             OCAMLRUNPARAM: v=0,V=1
@@ -98,7 +97,6 @@ jobs:
             show-timings: 1
     env:
       OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
-      MAKE_ARG: ${{ matrix.make-arg }}
       USE_RUNTIME: ${{ matrix.use-runtime }}
       SHOW_TIMINGS: ${{ matrix.show-timings }}
     steps:
@@ -158,10 +156,9 @@ jobs:
         run: brew install parallel
       - name: configure tree
         run: |
-          CONFIG_ARG='${{ matrix.config_arg }}' MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
+          CONFIG_ARG='${{ matrix.config_arg }}' bash -xe tools/ci/actions/runner.sh configure
       - name: Build
-        run: |
-          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
+        run: bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
         if: ${{ matrix.name != 'linux-O0' }}
         run: |
@@ -190,11 +187,9 @@ jobs:
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
       - name: configure tree
-        run: |
-          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh configure
+        run: bash -xe tools/ci/actions/runner.sh configure
       - name: Build
-        run: |
-          MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
+        run: bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
         run: |
           bash -xe tools/ci/actions/runner.sh test
