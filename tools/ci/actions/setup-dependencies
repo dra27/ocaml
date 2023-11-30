@@ -23,6 +23,7 @@ function installed_packages
   case "$1" in
     Linux) dpkg-query -W -f '${Package} ${Version}\n';;
     macOS) brew list --versions;;
+    Windows) pacman -Q;;
   esac
 }
 
@@ -38,8 +39,10 @@ case "$1" in
     sync_command=''
     install_command='install';;
   Windows)
-    echo $'[\e[1;31mERROR\e[0m] Windows is not yet supported!' >&2
-    exit 1;;
+    sudo=''
+    package_manager='pacman'
+    sync_command='--noconfirm -Syu'
+    install_command='--noconfirm -S';;
   *)
     echo $'[\e[1;31mERROR\e[0m] Runner "'"$1\" not recognised!" >&2
     exit 1;;

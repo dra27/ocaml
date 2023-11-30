@@ -13,6 +13,7 @@ permissions: {}
 
 env:
   MAKE_ARG: -j
+  MSYS2_CACHE_EPOCH: 1
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
 # Concurrent workflows are grouped by the PR or branch that triggered them
@@ -33,10 +34,14 @@ jobs:
     runs-on: 'ubuntu-latest'
     outputs:
       manual_changed: ${{ steps.manual.outputs.manual_changed }}
+    defaults:
+      run:
+        working-directory: ./ocaml
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          path: ocaml
           show-progress: false
           persist-credentials: false
       - name: Check for manual changes
@@ -58,8 +63,8 @@ jobs:
         id: config-cache
         uses: actions/cache/restore@v3
         with:
-          path: config.cache
-          key: config.cache-linux-${{ hashFiles('configure') }}
+          path: ocaml/config.cache
+          key: config.cache-linux-${{ hashFiles('ocaml/configure') }}
       - name: Configure tree
         run: >-
           tools/ci/actions/runner.sh configure
@@ -71,8 +76,8 @@ jobs:
         if: steps.config-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: config.cache
-          key: config.cache-linux-${{ hashFiles('configure') }}
+          path: ocaml/config.cache
+          key: config.cache-linux-${{ hashFiles('ocaml/configure') }}
       - name: Build
         run: tools/ci/actions/runner.sh build
       - name: Prepare Artifact
@@ -92,6 +97,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     name: 'Test: Linux ${{ matrix.name }}'
+    defaults:
+      run:
+        working-directory: ./ocaml
     strategy:
       matrix:
         include:
@@ -157,6 +165,7 @@ jobs:
           - name: Linux -O0
             id: linux-O0
             os: ubuntu-latest
+            shell: bash
             config-arg: CFLAGS='-O0'
             OCAMLRUNPARAM: v=0,V=1
             use-runtime: d
@@ -168,19 +177,56 @@ jobs:
           - name: macOS
             id: macos
             os: macos-latest
+            shell: bash
             dependencies: parallel
+          - name: Windows (mingw-w64; amd64)
+            id: mingw64
+            os: windows-latest
+            # XXX Let's use D:\msys64\bin ??
+            shell: D:\a\ocaml\ocaml\bin\msys2.cmd {0}
+            MSYSTEM: MINGW64
+            dependencies: mingw-w64-x86_64-gcc make diffutils parallel
+            submodules: true
       # Allow all platforms to be tested, even if one fails
       fail-fast: false
     env:
       OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
       USE_RUNTIME: ${{ matrix.use-runtime }}
       SHOW_TIMINGS: 1
+      MSYSTEM: ${{ matrix.MSYSTEM }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+        working-directory: ./ocaml
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          path: ocaml
+          submodules: ${{ matrix.submodules }}
           show-progress: false
           persist-credentials: false
+      - name: Restore MSYS2 Installation Cache
+        if: runner.os == 'Windows'
+        id: msys2-cache
+        uses: actions/cache/restore@v3
+        with:
+          # XXX Relative paths should work, or is the workdir getting in the way??
+          path: |
+            D:\a\ocaml\ocaml\msys2-installer
+            D:\a\ocaml\ocaml\msys2
+          key: msys2-${{ env.MSYS2_CACHE_EPOCH }}-${{ hashFiles('ocaml/.github/workflows/build.yml') }}-latest
+          restore-keys: |
+            msys2-${{ env.MSYS2_CACHE_EPOCH }}-${{ hashFiles('ocaml/.github/workflows/build.yml') }}-
+            msys2-${{ env.MSYS2_CACHE_EPOCH }}-
+      - name: MSYS2 (Windows only)
+        if: matrix.MSYSTEM != ''
+        id: install-msys2
+        shell: cmd
+        env:
+          # XXX Can this be passed as a parameter to setup-msys2.cmd ??
+          DEPENDENCIES: ${{ matrix.dependencies }}
+        run: ${{ github.workspace }}\ocaml\tools\ci\actions\setup-msys2.cmd
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies  != ''
         run: tools/ci/actions/setup-dependencies ${{ runner.os }} "${{ matrix.dependencies }}"
@@ -188,20 +234,36 @@ jobs:
         id: config-cache
         uses: actions/cache/restore@v3
         with:
-          path: config.cache
-          key: config.cache-${{ matrix.id }}-${{ hashFiles('configure') }}
+          path: ocaml/config.cache
+          key: config.cache-${{ matrix.id }}-${{ hashFiles('ocaml/configure') }}
       - name: configure tree
         run: tools/ci/actions/runner.sh configure ${{ env.config-arg }}
       - name: Save config.cache
         if: steps.config-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: config.cache
-          key: config.cache-${{ matrix.id }}-${{ hashFiles('configure') }}
+          path: ocaml/config.cache
+          key: config.cache-${{ matrix.id }}-${{ hashFiles('ocaml/configure') }}
       - name: Build
         run: tools/ci/actions/runner.sh build
       - name: Run the testsuite
         run: tools/ci/actions/runner.sh test ${{ matrix.tests }}
+      - name: Update MSYS2 (Windows only)
+        if: steps.install-msys2.outcome == 'success' && steps.dependencies.outcome != 'failure' && always()
+        id: update-msys2
+        shell: cmd
+        env:
+          # XXX Can this be passed as a parameter to setup-msys2.cmd ??
+          DEPENDENCIES: ${{ matrix.dependencies }}
+        run: tools/ci/actions/setup-msys2.cmd update
+      - name: Save MSYS2 Installation Cache
+        if: steps.install-msys2.outcome == 'success' && steps.update-msys2.outcome == 'success' && steps.msys2-cache.outputs.cache-matched-key != format('msys2-{0}-{1}-{2}-{3}', env.MSYS2_CACHE_EPOCH, hashFiles('ocaml/.github/workflows/build.yml'), steps.install-msys2.outputs.msys2-release, steps.update-msys2.outputs.msys2-cache) && always()
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            D:\a\ocaml\ocaml\msys2-installer
+            D:\a\ocaml\ocaml\msys2
+          key: ${{ format('msys2-{0}-{1}-{2}-{3}', env.MSYS2_CACHE_EPOCH, hashFiles('ocaml/.github/workflows/build.yml'), steps.install-msys2.outputs.msys2-release, steps.update-msys2.outputs.msys2-cache) }}
 
 # Linux i386 has to be in a separate job as it needs a Docker container and
 # GitHub actions doesn't allow mixing container/VM in a single matrix.

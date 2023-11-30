@@ -67,6 +67,8 @@ META.in                  typo.missing-header
 /LICENSE                 typo.very-long-line typo.missing-header
 # tools/ci/appveyor/appveyor_build.cmd only has missing-header because
 # dra27 too lazy to update check-typo to interpret Cmd-style comments!
+/tools/ci/actions/msys2.cmd       typo.missing-header
+/tools/ci/actions/setup-msys2.cmd       typo.very-long-line typo.missing-header
 /tools/ci/appveyor/appveyor_build.cmd       typo.very-long-line typo.missing-header typo.non-ascii
 /tools/ci/inria/bootstrap/remove-sinh-primitive.patch typo.prune
 /release-info/howto.md                    typo.missing-header typo.long-line
