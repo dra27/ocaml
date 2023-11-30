@@ -35,8 +35,9 @@ jobs:
       manual_changed: ${{ steps.manual.outputs.manual_changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
+          show-progress: false
           persist-credentials: false
       - name: Check for manual changes
         id: manual
@@ -176,8 +177,9 @@ jobs:
       SHOW_TIMINGS: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
+          show-progress: false
           persist-credentials: false
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies  != ''
