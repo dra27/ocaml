@@ -107,6 +107,15 @@ jobs:
         run: tools/ci/actions/check-labelled-interfaces.sh
         if: always()
 
+      - name: config.cache
+        # This cache is shared with the build job in the main workflow, so it's
+        # only restored, not saved.
+        uses: actions/cache/restore@v3
+        with:
+          path: config.cache
+          key: config.cache-linux-${{ hashFiles('configure') }}
+        if: always()
+
         # This step records the build success in the variable build-status,
         # allowing the last two steps to skip, rather than go beserk with a
         # faulty compiler.

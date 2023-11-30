@@ -37,7 +37,7 @@ request can be merged.
 ------------------------------------------------------------------------
 EOF
 
-  ./configure --prefix="$PREFIX" \
+  ./configure -C --prefix="$PREFIX" \
               --enable-flambda-invariants \
               --enable-ocamltest \
               --disable-dependency-generation "$@"
@@ -103,6 +103,8 @@ Checks () {
   $MAKE -C manual distclean
   # check that the `distclean` target definitely cleans the tree
   $MAKE distclean
+  # config.cache should never be removed the build system
+  rm -f config.cache
   # Check the working tree is clean
   test -z "$(git status --porcelain)"
   # Check that there are no ignored files
@@ -132,9 +134,9 @@ ReportBuildStatus () {
 BasicCompiler () {
   trap ReportBuildStatus ERR
 
-  ./configure --disable-dependency-generation \
-              --disable-debug-runtime \
-              --disable-instrumented-runtime
+  ./configure -C --disable-dependency-generation \
+                 --disable-debug-runtime \
+                 --disable-instrumented-runtime
 
   # Need a runtime
   make -j coldstart

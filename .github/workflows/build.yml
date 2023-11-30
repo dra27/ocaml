@@ -53,6 +53,12 @@ jobs:
           '${{ github.event.ref }}'
           '${{ github.event.after }}'
           '${{ github.event.repository.full_name }}'
+      - name: Restore config.cache
+        id: config-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: config.cache
+          key: config.cache-linux-${{ hashFiles('configure') }}
       - name: Configure tree
         run: >-
           tools/ci/actions/runner.sh configure
@@ -60,6 +66,12 @@ jobs:
           --enable-cmm-invariants
           --enable-dependency-generation
           --enable-native-toplevel
+      - name: Save config.cache
+        if: steps.config-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: config.cache
+          key: config.cache-linux-${{ hashFiles('configure') }}
       - name: Build
         run: tools/ci/actions/runner.sh build
       - name: Prepare Artifact
@@ -144,6 +156,7 @@ jobs:
       matrix:
         include:
           - name: Linux -O0
+            id: linux-O0
             os: ubuntu-latest
             config-arg: CFLAGS='-O0'
             OCAMLRUNPARAM: v=0,V=1
@@ -154,6 +167,7 @@ jobs:
             # so this list must be manually kept in sync with the s=4096 test
             tests: parallel callback gc-roots weak-ephe-final
           - name: macOS
+            id: macos
             os: macos-latest
     env:
       OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
@@ -167,8 +181,20 @@ jobs:
       - name: OS Dependencies
         if: runner.os == 'macOS'
         run: brew install parallel
+      - name: Restore config.cache
+        id: config-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: config.cache
+          key: config.cache-${{ matrix.id }}-${{ hashFiles('configure') }}
       - name: configure tree
         run: tools/ci/actions/runner.sh configure ${{ env.config-arg }}
+      - name: Save config.cache
+        if: steps.config-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: config.cache
+          key: config.cache-${{ matrix.id }}-${{ hashFiles('configure') }}
       - name: Build
         run: tools/ci/actions/runner.sh build
       - name: Run the testsuite
@@ -190,6 +216,8 @@ jobs:
       - name: Checkout
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
+        # actions/cache requires node16 from the actions/runner, which is not
+        # available for a 32-bit build.
       - name: configure tree
         run: tools/ci/actions/runner.sh configure
       - name: Build
