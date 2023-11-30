@@ -19,7 +19,7 @@ set -xe
 PREFIX=~/local
 
 MAKE="make $MAKE_ARG"
-SHELL=dash
+#SHELL=dash
 
 MAKE_WARN="$MAKE --warn-undefined-variables"
 
