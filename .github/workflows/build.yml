@@ -132,8 +132,10 @@ jobs:
         with:
           name: compiler
       - name: Unpack Artifact
+        working-directory: .
         run: |
-          tar --zstd -xf sources.tar.zstd
+          mkdir -p ocaml
+          tar -C ocaml --zstd -xf sources.tar.zstd
           rm -f sources.tar.zstd
       - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies != ''
