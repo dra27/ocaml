@@ -109,19 +109,6 @@ Checks () {
   test -z "$(git ls-files --others -i --exclude-standard)"
 }
 
-CheckManual () {
-      cat<<EOF
---------------------------------------------------------------------------
-This test checks the global structure of the reference manual
-(e.g. missing chapters).
---------------------------------------------------------------------------
-EOF
-  # we need some of the configuration data provided by configure
-  ./configure
-  $MAKE check-stdlib check-case-collision -C manual/tests
-
-}
-
 BuildManual () {
   $MAKE -C manual/src/html_processing duniverse
   $MAKE -C manual manual
