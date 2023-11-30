@@ -66,16 +66,13 @@ Build () {
 
 Test () {
   echo Running the testsuite
-  $MAKE -C testsuite parallel
-  cd ..
-}
-
-# By default, TestPrefix will attempt to run the tests
-# in the given directory in parallel.
-TestPrefix () {
-  TO_RUN=parallel-"$1"
-  echo Running single testsuite directory with $TO_RUN
-  $MAKE -C testsuite $TO_RUN
+  if [ $# -gt 0 ]; then
+    list="$(mktemp)"
+    echo "$*" | tr ' ' '\n' | sed -e 's|^|tests/|' > $list
+    $MAKE -C testsuite one LIST="$list"
+  else
+    $MAKE -C testsuite parallel
+  fi
   cd ..
 }
 
@@ -163,8 +160,7 @@ BasicCompiler () {
 case $1 in
 configure) Configure "${@:2}";;
 build) Build;;
-test) Test;;
-test_prefix) TestPrefix $2;;
+test) Test "${@:2}";;
 api-docs) API_Docs;;
 install) Install;;
 manual) BuildManual;;

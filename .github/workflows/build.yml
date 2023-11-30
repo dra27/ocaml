@@ -11,11 +11,7 @@ on:
 # Restrict the GITHUB_TOKEN
 permissions: {}
 
-# List of test directories for the debug-s4096 and linux-O0 jobs.
-# These directories are selected because of their tendencies to reach corner
-# cases in the runtime system.
 env:
-  PARALLEL_TESTS: parallel callback gc-roots weak-ephe-final
   MAKE_ARG: -j
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
@@ -99,6 +95,11 @@ jobs:
             OCAMLRUNPARAM: s=4096,v=0
             use-runtime: d
             show-timings: 1
+            # These directories are selected because of their tendencies to
+            # reach corner cases in the runtime system.
+            # GitHub Actions doesn't allow this to be specified using a variable
+            # so this list must be manually kept in sync with the -O0 build
+            tests: parallel callback gc-roots weak-ephe-final
     env:
       OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
       USE_RUNTIME: ${{ matrix.use-runtime }}
@@ -118,13 +119,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y ${{ matrix.dependencies }}
       - name: Run the testsuite
-        if: matrix.id != 'debug-s4096'
-        run: bash -xe tools/ci/actions/runner.sh test
-      - name: Run the testsuite (s=4096, debug runtime)
-        if: matrix.id == 'debug-s4096'
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
-          done
+        run: bash -xe tools/ci/actions/runner.sh test ${{ matrix.tests }}
       - name: Build API Documentation
         if: matrix.id == 'normal'
         run: bash -xe tools/ci/actions/runner.sh api-docs
@@ -148,9 +143,18 @@ jobs:
           - name: linux-O0
             os: ubuntu-latest
             config-arg: CFLAGS='-O0'
+            OCAMLRUNPARAM: v=0,V=1
+            use-runtime: d
+            # These directories are selected because of their tendencies to
+            # reach corner cases in the runtime system.
+            # GitHub Actions doesn't allow this to be specified using a variable
+            # so this list must be manually kept in sync with the s=4096 test
+            tests: parallel callback gc-roots weak-ephe-final
           - name: macos
             os: macos-latest
     env:
+      OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
+      USE_RUNTIME: ${{ matrix.use-runtime }}
       SHOW_TIMINGS: 1
     steps:
       - name: Checkout
@@ -165,17 +169,7 @@ jobs:
       - name: Build
         run: bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
-        if: ${{ matrix.name != 'linux-O0' }}
-        run: bash -xe tools/ci/actions/runner.sh test
-      - name: Run the testsuite (linux-O0)
-        if: ${{ matrix.name == 'linux-O0' }}
-        env:
-          OCAMLRUNPARAM: v=0,V=1
-          USE_RUNTIME: d
-        run: |
-          for dir in $PARALLEL_TESTS; do \
-           bash -cxe "tools/ci/actions/runner.sh test_prefix $dir"; \
-          done
+        run: bash -xe tools/ci/actions/runner.sh test ${{ matrix.tests }}
 
   i386:
     runs-on: ubuntu-latest
