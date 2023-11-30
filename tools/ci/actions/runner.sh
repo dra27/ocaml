@@ -37,14 +37,10 @@ request can be merged.
 ------------------------------------------------------------------------
 EOF
 
-  configure_flags="\
-    --prefix=$PREFIX \
-    --enable-flambda-invariants \
-    --enable-ocamltest \
-    --disable-dependency-generation \
-    $CONFIG_ARG"
-
-  ./configure $configure_flags
+  ./configure --prefix="$PREFIX" \
+              --enable-flambda-invariants \
+              --enable-ocamltest \
+              --disable-dependency-generation "$@"
 }
 
 Build () {
@@ -165,7 +161,7 @@ BasicCompiler () {
 }
 
 case $1 in
-configure) Configure;;
+configure) Configure "${@:2}";;
 build) Build;;
 test) Test;;
 test_prefix) TestPrefix $2;;

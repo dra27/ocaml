@@ -57,8 +57,12 @@ jobs:
          '${{ github.event.after }}'
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
-        run: |
-          CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+        run: >-
+          bash -xe tools/ci/actions/runner.sh configure
+          --enable-flambda
+          --enable-cmm-invariants
+          --enable-dependency-generation
+          --enable-native-toplevel
       - name: Build
         run: bash -xe tools/ci/actions/runner.sh build
       - name: Prepare Artifact
@@ -143,7 +147,7 @@ jobs:
         include:
           - name: linux-O0
             os: ubuntu-latest
-            config_arg: CFLAGS='-O0'
+            config-arg: CFLAGS='-O0'
           - name: macos
             os: macos-latest
     steps:
@@ -155,8 +159,7 @@ jobs:
         if: runner.os == 'MacOS'
         run: brew install parallel
       - name: configure tree
-        run: |
-          CONFIG_ARG='${{ matrix.config_arg }}' bash -xe tools/ci/actions/runner.sh configure
+        run: bash -xe tools/ci/actions/runner.sh configure ${{ env.config-arg }}
       - name: Build
         run: bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
