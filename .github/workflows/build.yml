@@ -168,6 +168,8 @@ jobs:
             id: macos
             os: macos-latest
             dependencies: parallel
+      # Allow all platforms to be tested, even if one fails
+      fail-fast: false
     env:
       OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
       USE_RUNTIME: ${{ matrix.use-runtime }}
