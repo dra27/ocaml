@@ -150,6 +150,8 @@ jobs:
             config-arg: CFLAGS='-O0'
           - name: macos
             os: macos-latest
+    env:
+      SHOW_TIMINGS: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -164,8 +166,7 @@ jobs:
         run: bash -xe tools/ci/actions/runner.sh build
       - name: Run the testsuite
         if: ${{ matrix.name != 'linux-O0' }}
-        run: |
-          bash -c 'SHOW_TIMINGS=1 tools/ci/actions/runner.sh test'
+        run: bash -xe tools/ci/actions/runner.sh test
       - name: Run the testsuite (linux-O0)
         if: ${{ matrix.name == 'linux-O0' }}
         env:
@@ -173,7 +174,7 @@ jobs:
           USE_RUNTIME: d
         run: |
           for dir in $PARALLEL_TESTS; do \
-           bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
+           bash -cxe "tools/ci/actions/runner.sh test_prefix $dir"; \
           done
 
   i386:
