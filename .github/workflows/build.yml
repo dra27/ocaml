@@ -126,11 +126,9 @@ jobs:
         run: |
           tar --zstd -xf sources.tar.zstd
           rm -f sources.tar.zstd
-      - name: Packages
+      - name: ${{ runner.os }} Dependencies
         if: matrix.dependencies != ''
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ${{ matrix.dependencies }}
+        run: tools/ci/actions/setup-dependencies ${{ runner.os }} "${{ matrix.dependencies }}"
       - name: Run the testsuite
         run: tools/ci/actions/runner.sh test ${{ matrix.tests }}
       - name: Build API Documentation
@@ -169,6 +167,7 @@ jobs:
           - name: macOS
             id: macos
             os: macos-latest
+            dependencies: parallel
     env:
       OCAMLRUNPARAM: ${{ matrix.OCAMLRUNPARAM }}
       USE_RUNTIME: ${{ matrix.use-runtime }}
@@ -178,9 +177,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
-      - name: OS Dependencies
-        if: runner.os == 'macOS'
-        run: brew install parallel
+      - name: ${{ runner.os }} Dependencies
+        if: matrix.dependencies  != ''
+        run: tools/ci/actions/setup-dependencies ${{ runner.os }} "${{ matrix.dependencies }}"
       - name: Restore config.cache
         id: config-cache
         uses: actions/cache/restore@v3
@@ -209,7 +208,7 @@ jobs:
       image: debian:12
       options: --platform linux/i386 --user root
     steps:
-      - name: OS Dependencies
+      - name: ${{ runner.os }} Dependencies
         run: |
           apt-get update
           apt-get install -y git gcc make parallel

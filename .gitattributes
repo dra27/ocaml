@@ -184,6 +184,7 @@ stdlib/Compflags text eol=lf
 stdlib/hashbang -text
 tools/autogen text eol=lf
 tools/bump-magic-numbers eol=lf typo.long-line
+tools/ci/actions/setup-dependencies eol=lf
 tools/ci/inria/bootstrap/remove-sinh-primitive.patch -text
 tools/check-typo text eol=lf
 tools/check-symbol-names text eol=lf
