@@ -619,20 +619,6 @@ let emit_global_constant outchan (name, value) =
 
 (* Output a bytecode executable as a C file *)
 
-(* Primitives declared in the included headers but re-declared in the
-   primitives table need to be guarded and not declared twice. *)
-let guarded_primitives = [
-    "caml_get_public_method", "caml__get_public_method";
-    "caml_set_oo_id", "caml__set_oo_id";
-  ]
-
-let output_without_guarded_primitives outchan s =
-  List.iter (fun (f, f') -> Printf.fprintf outchan "#define %s %s\n" f f')
-    guarded_primitives;
-  output_string outchan s;
-  List.iter (fun (f, _) -> Printf.fprintf outchan "#undef %s\n" f)
-    guarded_primitives
-
 let link_bytecode_as_c tolink outfile with_main =
   let outchan = open_out outfile in
   Misc.try_finally
@@ -642,19 +628,17 @@ let link_bytecode_as_c tolink outfile with_main =
        (* The bytecode *)
        output_string outchan "\
 #define CAML_INTERNALS\n\
-#define CAMLDLLIMPORT\
+#define CAMLDLLIMPORT\n\
+#define CAML_INTERNALS_NO_PRIM_DECLARATIONS\
 \n\
 \n#ifdef __cplusplus\
 \nextern \"C\" {\
-\n#endif\n";
-       output_without_guarded_primitives outchan "\
+\n#endif\
 \n#include <caml/mlvalues.h>\
 \n#include <caml/startup.h>\
 \n#include <caml/sys.h>\
-\n#include <caml/misc.h>\n";
-       List.iter (fun (f, _) -> Printf.fprintf outchan "\n#undef %s" f)
-         guarded_primitives;
-       output_string outchan "\nstatic int caml_code[] = {\n";
+\n#include <caml/misc.h>\n\
+\nstatic int caml_code[] = {\n";
        Symtable.init();
        clear_crc_interfaces ();
        let currpos = ref 0 in
@@ -836,10 +820,9 @@ let link objfiles output_name =
          output_string poc "\
          #ifdef __cplusplus\n\
          extern \"C\" {\n\
-         #endif\n";
-         output_without_guarded_primitives poc
-           "#include <caml/mlvalues.h>\n";
-         output_char poc '\n';
+         #endif\n\
+         #define CAML_INTERNALS_NO_PRIM_DECLARATIONS\n\
+         #include <caml/mlvalues.h>\n";
          Symtable.output_primitive_table poc;
          List.iter (emit_global_constant poc) !Clflags.global_string_constants;
          output_string poc "\n\
