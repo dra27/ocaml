@@ -143,9 +143,9 @@ is as follows:
   provided callback functions are called.
 \end{enumerate}
 
-\section{s-runtime-tracing-usage}{Usage}
+\section{s:runtime-tracing-usage}{Usage}
 
-\subsection{s-runtime-tracing-ocaml-apis}{With OCaml APIs}
+\subsection{s:runtime-tracing-ocaml-apis}{With OCaml APIs}
 
 We start with a simple example that prints the name, begin and end times
 of events emitted by the runtime event tracing system:
@@ -338,7 +338,7 @@ event tracing system. The following environment variables are available:
 The size of the runtime events ring buffers can be configured via OCAMLRUNPARAM,
 see section \ref{s:ocamlrun-options} for more information.
 
-\subsubsection{s-runtime-tracing-instrumented-runtime}{Building with the instrumented runtime}
+\subsubsection{s:runtime-tracing-instrumented-runtime}{Building with the instrumented runtime}
 
 To receive events that are only available in the instrumented runtime, the
 OCaml program needs to be compiled and linked against the instrumented runtime.
@@ -358,7 +358,7 @@ And for dune:
  (libraries unix runtime_events))
 \end{verbatim}
 
-\subsection{s-runtime-tracing-tooling}{With tooling}
+\subsection{s:runtime-tracing-tooling}{With tooling}
 
 Programmatic access to events is intended primarily for writers of observability
 libraries and tooling that end-users use. The flexible API enables use of
@@ -390,7 +390,7 @@ Perfetto
 \fi
 to visualize the collected trace.
 
-\subsubsection{s-runtime-tracing-latency}{Measuring GC latency}
+\subsubsection{s:runtime-tracing-latency}{Measuring GC latency}
 
 The olly utility also includes a latency subcommand which consumes runtime
 events data and on program completion emits a parseable histogram summary of
