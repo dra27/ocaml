@@ -40,7 +40,6 @@ EOF
   configure_flags="\
     --prefix=$PREFIX \
     --enable-flambda-invariants \
-    --enable-ocamltest \
     $CONFIG_ARG"
 
   ./configure $configure_flags
