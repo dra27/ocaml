@@ -20,8 +20,24 @@ ROOTDIR = ..
 
 TARGET_BINDIR ?= $(BINDIR)
 
-COMPILER=$(ROOTDIR)/ocamlc
-CAMLC=$(CAMLRUN) $(COMPILER)
+# There are three ways the Standard Library is compiled in bytecode:
+# 1. During coldstart
+#      - using ../boot/ocamlc which runs on ../boot/ocamlrun
+# 2. During coreall (via library),
+#      - using ../ocamlc which runs on ../boot/ocamlrun
+# 3. During coreboot (via library-cross),
+#      - using ../ocamlc which at that point runs on ../runtime/ocamlrun
+# If $(USE_BOOT_OCAMLC) is non-empty, we select case 1 and use $(BOOT_OCAMLC).
+# Otherwise, we use $(CAMLRUN) ../ocamlc, with $(CAMLRUN) being
+# ../boot/ocamlrun by default, but able to overridden by library-cross to
+# ../runtime/ocamlrun.
+USE_BOOT_OCAMLC ?=
+
+ifeq "$(USE_BOOT_OCAMLC)" ""
+CAMLC = $(CAMLRUN) $(ROOTDIR)/ocamlc
+else
+CAMLC = $(BOOT_OCAMLC)
+endif
 COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
           -g -warn-error A -bin-annot -nostdlib \
           -safe-string -strict-formats
@@ -228,7 +244,7 @@ stdlib__%.cmx: %.ml
 	           -o $@ -c $<
 
 # Dependencies on the compiler
-COMPILER_DEPS=$(filter-out -use-prims $(CAMLRUN), $(CAMLC))
+COMPILER_DEPS=$(filter-out $(CAMLRUN), $(CAMLC))
 $(OBJS) std_exit.cmo: $(COMPILER_DEPS)
 $(OBJS:.cmo=.cmi) std_exit.cmi: $(COMPILER_DEPS)
 $(OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
