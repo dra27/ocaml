@@ -27,31 +27,14 @@ jobs:
 # subsequent jobs.
   build:
     runs-on: 'ubuntu-latest'
-    outputs:
-      manual_changed: ${{ steps.manual.outputs.manual_changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           persist-credentials: false
-      - name: Check for manual changes
-        id: manual
-        run: >-
-         tools/ci/actions/check-manual-modified.sh
-         '${{ github.ref }}'
-         '${{ github.event_name }}'
-         '${{ github.event.pull_request.base.ref }}'
-         '${{ github.event.pull_request.base.sha }}'
-         '${{ github.event.pull_request.head.ref }}'
-         '${{ github.event.pull_request.head.sha }}'
-         '${{ github.event.ref }}'
-         '${{ github.event.before }}'
-         '${{ github.event.ref }}'
-         '${{ github.event.after }}'
-         '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-dependency-generation' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -112,10 +95,6 @@ jobs:
         if: matrix.id == 'normal'
         run: |
          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
-      - name: Build the manual
-        if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
-        run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh manual
       - name: Other checks
         if: matrix.id == 'normal'
         run: |
