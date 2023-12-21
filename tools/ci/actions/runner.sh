@@ -23,9 +23,11 @@ SHELL=dash
 
 MAKE_WARN="$MAKE --warn-undefined-variables"
 
-if grep '^NATIVE_COMPILER=false' Makefile.config &> /dev/null; then
+if grep '^ARCH=none' Makefile.config &> /dev/null; then
   build_ocamlnat=0
+  make_target=world
 else
+  make_target=world.opt
   if grep '^SUPPORTS_SHARED_LIBRARIES=false' Makefile.config \
        &> /dev/null; then
     build_ocamlnat=0
@@ -58,12 +60,12 @@ EOF
 
 Build () {
   if [ "$(uname)" = 'Darwin' ]; then
-    script -q build.log $MAKE_WARN
+    script -q build.log $MAKE_WARN $make_target
     if ((build_ocamlnat)); then
       script -qa build.log $MAKE_WARN ocamlnat
     fi
   else
-    script --return --command "$MAKE_WARN" build.log
+    script --return --command "$MAKE_WARN $make_target" build.log
     if ((build_ocamlnat)); then
       script --return --append --command "$MAKE_WARN ocamlnat" build.log
     fi

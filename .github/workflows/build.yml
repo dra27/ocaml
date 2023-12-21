@@ -111,7 +111,6 @@ jobs:
             os: ubuntu-latest
             config_arg: >-
               --disable-naked-pointers
-              --disable-stdlib-manpages
           - name: macos
             os: macos-13
     steps:
