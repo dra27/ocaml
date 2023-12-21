@@ -134,6 +134,7 @@ USE_STDLIB = -nostdlib -I ../stdlib
 FLEXDLL_OBJECTS = \
   flexdll_$(FLEXDLL_CHAIN).$(O) flexdll_initer_$(FLEXDLL_CHAIN).$(O)
 FLEXLINK_BUILD_ENV = \
+  MSVCC_ROOT= \
   MSVC_DETECT=0 OCAML_CONFIG_FILE=../Makefile.config \
   CHAINS=$(FLEXDLL_CHAIN) ROOTDIR=..
 FLEXDLL_SOURCE_FILES = \
@@ -168,11 +169,10 @@ coldstart: $(COLDSTART_DEPS)
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
 	$(MAKE) runtime-all
 	$(MAKE) -C stdlib \
-	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
-	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' USE_BOOT_OCAMLC=true all
 else
-	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' \
-    CAMLC='$$(BOOT_OCAMLC)' all
+	$(MAKE) -C stdlib \
+	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' USE_BOOT_OCAMLC=true all
 	$(MAKE) boot/flexlink.byte$(EXE)
 	$(MAKE) runtime-all
 endif # ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
