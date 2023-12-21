@@ -1,14 +1,17 @@
 (* TEST
 flags = "-no-alias-deps"
 compile_only = "true"
-files = "b.cmi c.mli d.mli"
+files = "b.cmi.in c.mli d.mli"
 * setup-ocamlc.byte-build-env
-** ocamlc.byte
+** script
+script =
+  "cp ${test_source_directory}/b.cmi.in ${test_build_directory}/b.cmi"
+*** ocamlc.byte
 all_modules = "c.mli d.mli aliases.ml"
-*** check-ocamlc.byte-output
-**** ocamlobjinfo
+**** check-ocamlc.byte-output
+***** ocamlobjinfo
 program = "aliases.cmo"
-***** check-program-output
+****** check-program-output
 *)
 
 module A' = A (* missing a.cmi *)
