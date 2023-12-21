@@ -41,7 +41,6 @@ EOF
     --prefix=$PREFIX \
     --enable-flambda-invariants \
     --enable-ocamltest \
-    --disable-dependency-generation \
     $CONFIG_ARG"
 
   ./configure $configure_flags
@@ -156,8 +155,7 @@ ReportBuildStatus () {
 BasicCompiler () {
   trap ReportBuildStatus ERR
 
-  ./configure --disable-dependency-generation \
-              --disable-debug-runtime \
+  ./configure --disable-debug-runtime \
               --disable-instrumented-runtime
 
   # Need a runtime
