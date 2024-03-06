@@ -67,14 +67,6 @@ echo "OCAML_JOBS=$OCAML_JOBS"
 echo "OCAML_4_ONLY=$OCAML_4_ONLY"
 
 #########################################################################
-# Stop now if the platform doesn't support OCaml 5
-case "$OCAML_4_ONLY" in
-  true) echo "This machine/OS does not support OCaml 5. Stopping now."
-        exit 0
-        ;;
-esac
-
-#########################################################################
 # Display environment information
 uname -a
 for i in issue redhat-release ; do
