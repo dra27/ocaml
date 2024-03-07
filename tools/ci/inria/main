@@ -201,12 +201,6 @@ case "${OCAML_ARCH}" in
 esac
 
 
-echo ==========
-git config --list --show-origin
-ls -la /cygdrive/c/Users/ci
-find /cygdrive/c -name .gitconfig
-echo ==========
-
 # Make sure two builds won't use the same install directory
 instdir="$instdir-$$"
 
@@ -227,6 +221,10 @@ fi
 
 pwd
 cd "$jenkinsdir"
+
+echo ==========
+git config --list --show-origin
+echo ==========
 
 if $init_submodule; then
   git submodule update --init flexdll
