@@ -222,10 +222,12 @@ fi
 pwd
 cd "$jenkinsdir"
 
+if [ "${OCAML_ARCH}" = msvc64 ] ; then
 echo ==========
-git config --unset core.autocrlf
+git config --global --unset core.autocrlf
 git config --list --show-origin
 echo ==========
+fi
 
 file Makefile
 file configure
