@@ -226,6 +226,9 @@ echo ==========
 git config --list --show-origin
 echo ==========
 
+file Makefile
+file configure
+
 if $init_submodule; then
   git submodule update --init flexdll
 elif [ -f flexdll/Makefile ]; then
