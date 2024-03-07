@@ -223,6 +223,7 @@ pwd
 cd "$jenkinsdir"
 
 echo ==========
+git config --unset core.autocrlf
 git config --list --show-origin
 echo ==========
 
