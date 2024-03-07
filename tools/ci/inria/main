@@ -228,6 +228,11 @@ echo ==========
 
 file Makefile
 file configure
+unix2dos configure
+file configure
+rm Makefile
+git checkout -- Makefile
+file Makefile
 
 if $init_submodule; then
   git submodule update --init flexdll
