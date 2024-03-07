@@ -233,6 +233,12 @@ file configure
 rm Makefile
 git checkout -- Makefile
 file Makefile
+git config core.autocrlf
+git config core.autocrlf false
+which git
+rm Makefile
+git checkout -- Makefile
+file Makefile
 
 if $init_submodule; then
   git submodule update --init flexdll
