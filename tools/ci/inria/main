@@ -203,6 +203,8 @@ esac
 
 echo ==========
 git config --list --show-origin
+ls -la /cygdrive/c/Users/ci
+find /cygdrive/c -name .gitconfig
 echo ==========
 
 # Make sure two builds won't use the same install directory
