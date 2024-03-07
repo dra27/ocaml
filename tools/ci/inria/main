@@ -234,7 +234,7 @@ rm Makefile
 git checkout -- Makefile
 file Makefile
 git config core.autocrlf
-git config core.autocrlf false
+git config core.autocrlf input
 which git
 rm Makefile
 git checkout -- Makefile
