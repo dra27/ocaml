@@ -92,6 +92,10 @@ OCaml 4.09 maintenance branch
   architectures
   (Florian Angeletti, review by David Allsopp)
 
+- #13018, #14661: Don't pass duplicate libraries to the linker when compiling
+  ocamlc.opt and when using systhreads (new versions of lld emit a warning).
+  (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
+
 OCaml 4.09.1 (16 Mars 2020):
 ----------------------------
 
