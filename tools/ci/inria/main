@@ -223,7 +223,7 @@ pwd
 cd "$jenkinsdir"
 
 if [ "${OCAML_ARCH}" = msvc64 ] ; then
-git ls-files -z | xargs -0 rm -f
+git ls-files -z | fgrep -v winpthreads | fgrep -v flexdll | xargs -0 rm -f
 git checkout .
 fi
 
