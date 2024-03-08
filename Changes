@@ -52,6 +52,10 @@ OCaml 4.08 maintenance branch:
   code or an OCaml thread stops.
   (Xavier Leroy, review by David Allsopp, Florian Angeletti and Damien Doligez)
 
+- #12116, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
+
 OCaml 4.08.1 (5 August 2019)
 ----------------------------
 
