@@ -38,6 +38,10 @@ OCaml 4.11 maintenance branch
   This avoids a "dangling pointer" warning of GCC 12.1.
   (Xavier Leroy, report by Armaël Guéneau, review by Gabriel Scherer)
 
+- #12116, #12993: explicitly build non PIE executables on x86 32bits
+  architectures
+  (Florian Angeletti, review by David Allsopp)
+
 OCaml 4.11.2 (24 February 2021)
 -------------------------------
 
