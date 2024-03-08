@@ -227,6 +227,11 @@ git ls-files -z | fgrep -zv winpthreads | fgrep -vz flexdll | xargs -0 rm -f
 git checkout .
 fi
 
+
+echo ======================
+git ls-files --eol | fgrep crlf
+echo ======================
+
 file Makefile.build_config.in
 file Makefile
 file configure
