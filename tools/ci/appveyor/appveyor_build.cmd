@@ -140,6 +140,8 @@ set CYGWIN_INSTALL_PACKAGES=
 set CYGWIN_UPGRADE_REQUIRED=%FORCE_CYGWIN_UPGRADE%
 
 for %%P in (%CYGWIN_PACKAGES%) do call :CheckPackage %%P
+set CYGWIN_UPGRADE_REQUIRED=1
+set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.6.0-0.115.g579064bf4d40
 call :UpgradeCygwin
 
 "%CYG_ROOT%\bin\bash.exe" -lc "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/appveyor_build.sh install" || exit /b 1
