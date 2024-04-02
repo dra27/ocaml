@@ -24,6 +24,9 @@ chcp 65001 > nul
 set BUILD_PREFIX=🐫реализация
 set OCAMLROOT=%PROGRAMFILES%\Бактріан🐫
 
+set BUILD_PREFIX=OCaml
+set OCAMLROOT=%PROGRAMFILES%\OCaml
+
 if "%1" neq "install" goto %1
 setlocal enabledelayedexpansion
 echo AppVeyor Environment
@@ -140,10 +143,10 @@ set CYGWIN_INSTALL_PACKAGES=
 set CYGWIN_UPGRADE_REQUIRED=%FORCE_CYGWIN_UPGRADE%
 
 for %%P in (%CYGWIN_PACKAGES%) do call :CheckPackage %%P
-set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.4.10-1,tar=1.35-1,dash=0.5.12-2
+rem set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.4.10-1,tar=1.35-1,dash=0.5.12-2
 rem set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.6.0-0.108.gb7f5a33200a9
-rem set CYGWIN_UPGRADE_REQUIRED=1
-rem set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.6.0-0.109.ga0a25849f9dd
+set CYGWIN_UPGRADE_REQUIRED=1
+set CYGWIN_INSTALL_PACKAGES=%CYGWIN_INSTALL_PACKAGES%,cygwin=3.6.0-0.109.ga0a25849f9dd
 call :UpgradeCygwin
 
 "%CYG_ROOT%\bin\bash.exe" -lc "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/appveyor_build.sh install" || exit /b 1
