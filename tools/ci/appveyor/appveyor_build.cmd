@@ -24,9 +24,6 @@ chcp 65001 > nul
 set BUILD_PREFIX=🐫реализация
 set OCAMLROOT=%PROGRAMFILES%\Бактріан🐫
 
-set BUILD_PREFIX=OCaml
-set OCAMLROOT=%PROGRAMFILES%\OCaml
-
 if "%1" neq "install" goto %1
 setlocal enabledelayedexpansion
 echo AppVeyor Environment
