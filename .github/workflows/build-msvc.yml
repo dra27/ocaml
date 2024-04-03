@@ -15,6 +15,7 @@ on:
 env:
   BOOTSTRAP_FLEXDLL: true
   CYG_ROOT: 'D:\cygwin'
+  BUILD_MODE: world.opt
 
 jobs:
   build:
