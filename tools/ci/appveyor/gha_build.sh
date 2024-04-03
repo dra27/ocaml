@@ -15,6 +15,8 @@
 
 set -e
 
+echo "Here we are with $BUILD_PREFIX"
+
 BUILD_PID=0
 
 # This must correspond with the entry in appveyor.yml
