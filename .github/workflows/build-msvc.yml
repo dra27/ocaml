@@ -12,6 +12,9 @@ on:
       - 'trunk'
   pull_request:
 
+env:
+  BOOTSTRAP_FLEXDLL: true
+
 jobs:
   build:
     permissions: {}
@@ -23,6 +26,7 @@ jobs:
     name: ${{ matrix.x86_64 && 'MSVC 64 bits' || 'MSVC 32 bits' }}
 
     strategy:
+      fail-fast: false
       matrix:
         x86_64: [true, false]
 
@@ -55,7 +59,7 @@ jobs:
       - name: Install Cygwin
         uses: cygwin/cygwin-install-action@v3
         with:
-          packages: make,bash,mingw64-x86_64-gcc-core
+          packages: make,bash,mingw64-x86_64-gcc-core,mingw64-i686-gcc-core
           install-dir: 'D:\cygwin'
 
 #      - name: Save Cygwin cache
@@ -68,14 +72,17 @@ jobs:
 #          key: cygwin-packages
 
       - name: Build OCaml
-        shell: bash -e {0}
+#        shell: bash -e {0}
+        shell: cmd
         env:
           HOST: ${{ matrix.x86_64 && 'x86_64-w64-mingw32' || 'i686-w64-mingw32' }}
         run: >-
-          eval $(tools/msvs-promote-path) ;
-          ./configure --host=$HOST --enable-imprecise-c99-float-ops ;
-          make ;
-          runtime/ocamlrun ocamlc -config ;
+#          eval $(tools/msvs-promote-path) ;
+#          ./configure --host=$HOST --enable-imprecise-c99-float-ops ;
+#          make ;
+#          runtime/ocamlrun ocamlc -config ;
+           tools\ci\appveyor\gha_build.cmd install
+           tools\ci\appveyor\gha_build.cmd build
 
 #      - name: Assemble backend with MinGW GASM and compare
 #        shell: bash -e {0}

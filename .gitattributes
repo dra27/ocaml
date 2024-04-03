@@ -154,7 +154,7 @@ tools/magic                       typo.missing-header
 *.check-program-output text eol=lf
 *.run text eol=lf
 
-/tools/ci/appveyor/appveyor_build.cmd text eol=crlf
+/tools/ci/appveyor/*_build.cmd text eol=crlf
 
 Makefile* linguist-language=Makefile
 *.c linguist-language=C
