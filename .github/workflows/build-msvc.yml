@@ -47,6 +47,6 @@ jobs:
         shell: cmd
         env:
           HOST: ${{ matrix.x86_64 && 'x86_64-w64-mingw32' || 'i686-w64-mingw32' }}
-        run: >-
+        run: |
            tools\ci\appveyor\gha_build.cmd install
            tools\ci\appveyor\gha_build.cmd build
