@@ -14,6 +14,7 @@ on:
 
 env:
   BOOTSTRAP_FLEXDLL: true
+  CYG_ROOT: 'D:\cygwin'
 
 jobs:
   build:
@@ -47,6 +48,7 @@ jobs:
         shell: cmd
         env:
           HOST: ${{ matrix.x86_64 && 'x86_64-w64-mingw32' || 'i686-w64-mingw32' }}
+          PORT: ${{ matrix.x86_64 && 'mingw64' || 'mingw32' }}
         run: |
            call tools\ci\appveyor\gha_build.cmd install
            call tools\ci\appveyor\gha_build.cmd build
