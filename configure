@@ -827,6 +827,7 @@ outputexe
 unixlib
 unix_or_win32
 systhread_support
+ocamltest_system
 system
 model
 arch64
@@ -2851,6 +2852,7 @@ VERSION=4.10.3+dev0-2020-12-08
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -13654,6 +13656,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 arch=none
 model=default
 system=unknown
+ocamltest_system=unknown
 
 case $host in #(
   i[3456]86-*-linux*) :
@@ -13744,6 +13747,10 @@ fi; system=elf ;; #(
   *) :
      ;;
 esac
+
+if test x"$ocamltest_system" = 'xunknown'; then :
+  ocamltest_system="$system"
+fi
 
 if test x"$enable_native_compiler" = "xno"; then :
   arch=none; model=default; system=unknown; native_compiler=false
