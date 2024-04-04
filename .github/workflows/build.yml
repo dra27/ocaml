@@ -29,7 +29,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: Configure tree
@@ -111,11 +111,11 @@ jobs:
             os: ubuntu-latest
             config_arg: >-
               --disable-naked-pointers
-          - name: macos
+          - name: macos-x86_64
             os: macos-13
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: OS Dependencies
