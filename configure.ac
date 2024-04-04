@@ -88,6 +88,7 @@ AC_SUBST([arch])
 AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
+AC_SUBST([ocamltest_system])
 AC_SUBST([systhread_support])
 AC_SUBST([unix_or_win32])
 AC_SUBST([unixlib])
@@ -878,6 +879,7 @@ OCAML_CC_SUPPORTS_ALIGNED
 arch=none
 model=default
 system=unknown
+ocamltest_system=unknown
 
 AS_CASE([$host],
   [[i[3456]86-*-linux*]],
@@ -961,6 +963,8 @@ AS_CASE([$host],
   [x86_64-*-cygwin*],
     [arch=amd64; system=cygwin]
 )
+
+AS_IF([test x"$ocamltest_system" = 'xunknown'],[ocamltest_system="$system"])
 
 AS_IF([test x"$enable_native_compiler" = "xno"],
   [arch=none; model=default; system=unknown; native_compiler=false
