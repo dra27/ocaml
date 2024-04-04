@@ -26,7 +26,10 @@ let init_path ?(dir="") () =
       !Clflags.include_dirs
   in
   let dirs =
-    !Compenv.last_include_dirs @ dirs @ Config.flexdll_dirs @
+    !Compenv.last_include_dirs @ dirs @
+    (* Config.flexdll_dirs is either [] or ["+flexdll"]: don't include a
+       reference to the Standard Library when -nostdlib was specified. *)
+    (if !Clflags.no_std_include then [] else Config.flexdll_dirs) @
     !Compenv.first_include_dirs
   in
   let exp_dirs =

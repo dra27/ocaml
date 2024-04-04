@@ -34,6 +34,11 @@ OCaml 4.14 maintenance version
   extends this to the bytecode executables emitted by that compiler.
   (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
+* #13070: On Windows, when configured with bootstrapped flexdll, don't add
+  +flexdll to the search path when -nostdlib is specified (which then means
+  -L <path-to-flexdll> no longer gets passed to the system linker).
+  (David Allsopp, review by Florian Angeletti)
+
 - #15019, #15030: `Marshal.from_{string,bytes}`: guard against overflow in
   the computation of the total data length.
   (Xavier Leroy, report by Akshay Singh, review by Nicolás Ojeda Bär
