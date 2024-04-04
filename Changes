@@ -53,6 +53,11 @@ OCaml 4.14 maintenance version
   extends this to the bytecode executables emitted by that compiler.
   (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
+* #13070: On Windows, when configured with bootstrapped flexdll, don't add
+  +flexdll to the search path when -nostdlib is specified (which then means
+  -L <path-to-flexdll> no longer gets passed to the system linker).
+  (David Allsopp, review by Florian Angeletti)
+
 - #13430, #13434: protect memory-safety on Lazy.force races
   (Gabriel Scherer and Vincent Laviron, report by Edwin Török,
    review by Vincent Laviron)
