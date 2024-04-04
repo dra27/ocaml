@@ -226,7 +226,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 	    $(call SUBST,unix) \
 	    $(call SUBST,systhreads) \
 	    $(call SUBST,str) \
-	    $(call SUBST,SYSTEM) \
+	    $(call SUBST,OCAMLTEST_SYSTEM) \
 	    $(call SUBST_STRING,CPP) \
 	    $(call SUBST_STRING,ocamlcdefaultflags) \
 	    $(call SUBST_STRING,ocamloptdefaultflags) \
