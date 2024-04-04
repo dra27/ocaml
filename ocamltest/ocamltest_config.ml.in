@@ -39,7 +39,7 @@ let objext = "%%O%%"
 
 let libext = "%%A%%"
 
-let system = "%%SYSTEM%%"
+let system = "%%OCAMLTEST_SYSTEM%%"
 
 let c_preprocessor = "%%CPP%%"
 
