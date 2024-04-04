@@ -96,6 +96,11 @@ OCaml 4.10 maintenance branch
   extends this to the bytecode executables emitted by that compiler.
   (David Allsopp, review by Damien Doligez, Xavier Leroy and Olivier Nicole)
 
+* #13070: On Windows, when configured with bootstrapped flexdll, don't add
+  +flexdll to the search path when -nostdlib is specified (which then means
+  -L <path-to-flexdll> no longer gets passed to the system linker).
+  (David Allsopp, review by Florian Angeletti)
+
 OCaml 4.10.2 (8 December 2020)
 ------------------------------
 
