@@ -87,8 +87,11 @@ function set_configuration {
     if ! ./configure --cache-file="$CACHE_FILE" $host \
                      --prefix="$2" ; then
         rm -f -- "$CACHE_FILE"
+        local failed
         ./configure --cache-file="$CACHE_FILE" $host \
-                    --prefix="$2"
+                    --prefix="$2" \
+            || failed=$?
+        if ((failed)) ; then cat config.log ; exit $failed ; fi
     fi
 
     FILE=$(pwd | cygpath -f - -m)/Makefile.config
