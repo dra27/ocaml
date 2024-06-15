@@ -148,7 +148,7 @@ CAMLnoreturn_end;
    If overflow is reported, this is the exact result modulo 2 to the word size.
 */
 
-static inline int caml_uadd_overflow(uintnat a, uintnat b, uintnat * res)
+Caml_inline int caml_uadd_overflow(uintnat a, uintnat b, uintnat * res)
 {
 #if __GNUC__ >= 5 || Caml_has_builtin(__builtin_add_overflow)
   return __builtin_add_overflow(a, b, res);
@@ -159,7 +159,7 @@ static inline int caml_uadd_overflow(uintnat a, uintnat b, uintnat * res)
 #endif
 }
 
-static inline int caml_usub_overflow(uintnat a, uintnat b, uintnat * res)
+Caml_inline int caml_usub_overflow(uintnat a, uintnat b, uintnat * res)
 {
 #if __GNUC__ >= 5 || Caml_has_builtin(__builtin_sub_overflow)
   return __builtin_sub_overflow(a, b, res);
@@ -171,7 +171,7 @@ static inline int caml_usub_overflow(uintnat a, uintnat b, uintnat * res)
 }
 
 #if __GNUC__ >= 5 || Caml_has_builtin(__builtin_mul_overflow)
-static inline int caml_umul_overflow(uintnat a, uintnat b, uintnat * res)
+Caml_inline int caml_umul_overflow(uintnat a, uintnat b, uintnat * res)
 {
   return __builtin_mul_overflow(a, b, res);
 }
@@ -211,6 +211,8 @@ extern int caml_umul_overflow(uintnat a, uintnat b, uintnat * res);
 
 #define caml_stat_strdup_to_os caml_stat_strdup_to_utf16
 #define caml_stat_strdup_of_os caml_stat_strdup_of_utf16
+#define caml_stat_strndup_to_os caml_stat_strndup_to_utf16
+#define caml_stat_strndup_of_os caml_stat_strndup_of_utf16
 #define caml_copy_string_of_os caml_copy_string_of_utf16
 
 #else /* _WIN32 */
@@ -243,6 +245,8 @@ extern int caml_umul_overflow(uintnat a, uintnat b, uintnat * res);
 
 #define caml_stat_strdup_to_os caml_stat_strdup
 #define caml_stat_strdup_of_os caml_stat_strdup
+#define caml_stat_strndup_to_os caml_stat_strndup
+#define caml_stat_strndup_of_os caml_stat_strndup
 #define caml_copy_string_of_os caml_copy_string
 
 #endif /* _WIN32 */

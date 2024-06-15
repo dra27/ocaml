@@ -34,14 +34,12 @@
 #endif
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
-#define inline __inline
+#define Caml_inline static __inline
+#else
+#define Caml_inline static inline
 #endif
 
 #include "s.h"
-
-#ifdef BOOTSTRAPPING_FLEXLINK
-#undef SUPPORT_DYNAMIC_LINKING
-#endif
 
 #ifndef CAML_NAME_SPACE
 #include "compatibility.h"
@@ -55,6 +53,19 @@
 
 #ifdef HAS_STDINT_H
 #include <stdint.h>
+#endif
+
+/* Disable the mingw-w64 *printf shims */
+#if defined(CAML_INTERNALS) && defined(__MINGW32__)
+  /* Headers may have already included <_mingw.h>, so #undef if necessary. */
+  #ifdef __USE_MINGW_ANSI_STDIO
+    #undef __USE_MINGW_ANSI_STDIO
+  #endif
+  /* <stdio.h> must either be #include'd before this header or
+     __USE_MINGW_ANSI_STDIO needs to be 0 when <stdio.h> is processed. The final
+     effect will be the same - stdio.h will define snprintf and misc.h will make
+     snprintf a macro (referring to caml_snprintf). */
+  #define __USE_MINGW_ANSI_STDIO 0
 #endif
 
 #if defined(__MINGW32__) || (defined(_MSC_VER) && _MSC_VER < 1800)
@@ -84,7 +95,7 @@
 #endif
 #endif
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !__USE_MINGW_ANSI_STDIO
   #define ARCH_INT64_TYPE long long
   #define ARCH_UINT64_TYPE unsigned long long
   #define ARCH_INT64_PRINTF_FORMAT "I64"

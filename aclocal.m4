@@ -104,6 +104,7 @@ AC_DEFUN([OCAML_CC_SAVE_VARIABLES], [
   saved_CC="$CC"
   saved_CFLAGS="$CFLAGS"
   saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
   saved_ac_ext="$ac_ext"
   saved_ac_compile="$ac_compile"
   # Move the content of confdefs.h to another file so it does not
@@ -121,6 +122,7 @@ AC_DEFUN([OCAML_CC_RESTORE_VARIABLES], [
   CPPFLAGS="$saved_CPPFLAGS"
   CFLAGS="$saved_CFLAGS"
   CC="$saved_CC"
+  LIBS="$saved_LIBS"
 ])
 
 AC_DEFUN([OCAML_AS_HAS_DEBUG_PREFIX_MAP], [
@@ -263,4 +265,195 @@ AC_DEFUN([OCAML_CHECK_LIBUNWIND], [
     [libunwind_available=false])
   LDFLAGS="$SAVED_LDFLAGS"
   CFLAGS="$SAVED_CFLAGS"
+])
+
+AC_DEFUN([OCAML_TEST_FLEXLINK], [
+  OCAML_CC_SAVE_VARIABLES
+
+  AC_MSG_CHECKING([whether $1 works])
+
+  AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([int answer = 42;])],
+    [# Create conftest1.$ac_objext as a symlink on Cygwin to ensure that native
+    # flexlink can cope. The reverse test is unnecessary (a Cygwin-compiled
+    # flexlink can read anything).
+    mv conftest.$ac_objext conftest1.$ac_objext
+    AS_CASE([$4],[*-pc-cygwin],
+      [ln -s conftest1.$ac_objext conftest2.$ac_objext],
+      [cp conftest1.$ac_objext conftest2.$ac_objext])
+
+    CC="$1 -chain $2 -exe"
+    LIBS="conftest2.$ac_objext"
+    CPPFLAGS="$3 $CPPFLAGS"
+    AC_LINK_IFELSE(
+      [AC_LANG_SOURCE([int main() { return 0; }])],
+      [AC_MSG_RESULT([yes])],
+      [AC_MSG_RESULT([no])
+      AC_MSG_ERROR([$1 does not work])])],
+    [AC_MSG_RESULT([unexpected compile error])
+    AC_MSG_ERROR([error calling the C compiler])])
+
+  OCAML_CC_RESTORE_VARIABLES
+])
+
+AC_DEFUN([OCAML_TEST_FLEXDLL_H], [
+  OCAML_CC_SAVE_VARIABLES
+
+  AS_IF([test -n "$1"],[CPPFLAGS="-I $1 $CPPFLAGS"])
+  have_flexdll_h=no
+  AC_CHECK_HEADER([flexdll.h],[have_flexdll_h=yes],[have_flexdll_h=no])
+  AS_IF([test x"$have_flexdll_h" = 'xno'],
+    [AS_IF([test -n "$1"],
+      [AC_MSG_ERROR([$1/flexdll.h appears unusable])])])
+
+  OCAML_CC_RESTORE_VARIABLES
+])
+
+AC_DEFUN([OCAML_TEST_FLEXLINK_WHERE], [
+  OCAML_CC_SAVE_VARIABLES
+
+  AC_MSG_CHECKING([if "$1 -where" includes flexdll.h])
+  flexlink_where="$($1 -where | tr -d '\r')"
+  CPPFLAGS="$CPPFLAGS -I \"$flexlink_where\""
+  cat > conftest.c <<"EOF"
+#include <flexdll.h>
+int main (void) {return 0;}
+EOF
+  cat > conftest.Makefile <<EOF
+all:
+	$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.c $LIBS
+EOF
+  AS_IF([make -f conftest.Makefile >/dev/null 2>/dev/null],
+    [have_flexdll_h=yes
+    AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])])
+
+  OCAML_CC_RESTORE_VARIABLES
+])
+
+AC_DEFUN([OCAML_CHECK_LN_ON_WINDOWS], [
+  AC_MSG_CHECKING([for a workable solution for ln -sf])
+  ln -sf configure conftestLink
+  AS_IF([test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"],
+    [rm -f conftestLink
+    CYGWIN=winsymlinks:native ln -sf configure conftestLink
+    AS_IF([test -z "$(cmd /c dir conftestLink 2>/dev/null | grep -F SYMLINK)"],
+      [ln='cp -pf'],
+      [ln='CYGWIN=winsymlinks:native ln -sf']
+    )],
+    [ln='ln -sf']
+  )
+  AC_MSG_RESULT([$ln])
+])
+
+dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR(from, to, result[, test]) computes the
+dnl relative path between the contents of $from and $to and puts the result in
+dnl $result (i.e. from, to and result are the _names_ of variables). The fourth
+dnl parameter is used for testing and if non-empty causes result to be set to ''
+dnl instead of calling AC_MSG_ERROR.
+AC_DEFUN([OCAML_COMPUTE_BINDIR_TO_LIBDIR], [
+  eval "from=\"\$$1\""
+  eval "to=\"\$$2\""
+
+  AS_IF([test -z "$4"],[
+    dnl In live mode, display the names of the variables
+    AC_MSG_CHECKING([relative path between \$$1 and \$$2])
+  ],[
+    dnl In testing mode, display the actual values
+    AC_MSG_CHECKING([relative path between $from and $to])
+  ])
+
+  dnl Compute the relative path from $from to $to. There are five cases
+  dnl to consider:
+  dnl
+  dnl | $from  | $to     | result
+  dnl +----------+-------------+--------
+  dnl | /ocaml   | /ocaml      | .
+  dnl | /bin     | /binn       | ../binn
+  dnl | /ocaml   | /ocaml/lib  | ./lib
+  dnl | /a/b/c   | /a          | ../..
+  dnl | C:\ocaml | D:\ocamllib | Error
+  dnl
+  dnl This code goes to considerable trouble only to use POSIX options!
+  dnl $result is guaranteed to begin either ./ or ../
+
+  AS_IF([test "x$from" = "x$to"],[
+    result='.'
+  ],[
+    dnl Get the offset of the first byte which differs between the two
+    echo "$from" > conftest.from
+    echo "$to" > conftest.to
+    common_prefix_len="$(cmp -l conftest.from conftest.to 2>/dev/null \
+                           | head -n 1 \
+                           | sed -e 's/^ *//' \
+                           | cut -d ' ' -f 1)"
+    common_prefix="$(expr $common_prefix_len - 1)"
+    AS_IF([test $common_prefix -eq 0],[
+      result=''
+      AS_IF([test -z "$4"],[AC_MSG_ERROR([no common prefix])])
+    ],[
+      common_prefix="$(echo "$from" | cut -c -$common_prefix)"
+
+      dnl to might be a subdirectory of from. ${result##/*} erases a string
+      dnl which begins with / and tests that $to is of the form "$from/dir"
+      dnl (cf. $from=/ocaml and $to=/ocamllib)
+      from_chopped="$(echo "$from" | cut -c $common_prefix_len-)"
+      to_chopped="$(echo "$to" | cut -c $common_prefix_len-)"
+      AS_IF([test "x${common_prefix}" = "x${from}" && \
+             test -z "${to_chopped##/*}" ],[
+        result=".$to_chopped"
+      ],
+      [test "y${common_prefix}" = "x${to}" && \
+       test -z "${from_chopped##/*}"],[
+        echo "Here with $from_chopped and $to_chopped but confused"
+        exit 1
+      ],[
+        dnl $to is not rooted inside $from, so work out the number of ../
+        dnl components needed to get from $from to $common_prefix. Ensure it's a
+        dnl directory component only (/foo/bar and /foo/baz have /foo/ba in
+        dnl common)
+        AS_IF([test "x${common_prefix}" = "x${to}" && \
+               test -z "${from_chopped##/*}"],[
+          common_prefix=$(echo "$common_prefix/" | wc -c)
+        ],[
+          common_prefix=$(echo "${common_prefix%/*}/" | wc -c)
+        ])
+        dnl Remove the prefix from each directory
+        get_from="$(echo "$from" | cut -c $common_prefix-)"
+        get_to="$(echo "$to" | cut -c $common_prefix-)"
+        dnl get_from is a relative path, so recursively calling dirname will
+        dnl eventually get us back to ".". Each call to dirname adds ../ to the
+        dnl result
+        result=''
+        while test "$get_from" != '.' ; do
+          result="../$result"
+          get_from="$(dirname "$get_from")"
+        done
+        AS_IF([test -z "$get_to"],[
+          result="${result%/}"
+        ],[
+          result="$result$get_to"
+        ])
+      ])
+    ])
+  ])
+  eval "$3='$result'"
+  AC_MSG_RESULT([$result])
+])
+
+AC_DEFUN([OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST],[
+  a="$1"
+  b="$2"
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([a],[b],[r],[1])
+  AS_IF([test "x$r" != "x$3"],[
+    AC_MSG_ERROR([Expected "$3"])
+  ])
+])
+
+AC_DEFUN([OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS],[
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/ocaml],[/ocaml],[.])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/bin],[/binn],[../binn])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/ocaml],[/ocaml/lib],[./lib])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([/a/b/c],[/a],[../..])
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR_TEST([C:\ocaml],[D:\ocamllib],[])
 ])

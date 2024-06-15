@@ -17,8 +17,8 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 ifeq "$(filter str,$(OTHERLIBRARIES))" ""
   str := false
@@ -43,8 +43,7 @@ else
 endif
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
-  ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)"|cygpath -w -f - \
-    | sed 's/\\/\\\\\\\\/g')
+  ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)" | cygpath -w -f -)
   mkexe := $(MKEXE_ANSI) -link $(OC_LDFLAGS)
 else
   ocamlsrcdir := $(abspath $(shell pwd)/..)
@@ -167,7 +166,7 @@ bytecode_modules := $(o_files) $(cmo_files)
 
 native_modules := $(o_files) $(cmx_files)
 
-directories := $(addprefix $(ROOTDIR)/,utils bytecomp parsing stdlib \
+directories := $(addprefix $(ROOTDIR)/,runtime utils bytecomp parsing stdlib \
                                        compilerlibs file_formats)
 
 include_directories := $(addprefix -I , $(directories))
@@ -184,7 +183,7 @@ ocamldep := $(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/boot/ocamlc -depend
 depflags := -slash
 depincludes :=
 
-ocamllex := $(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/lex/ocamllex
+ocamllex := $(ROOTDIR)/boot/ocamlrun $(ROOTDIR)/boot/ocamllex
 
 ocamlyacc := $(ROOTDIR)/yacc/ocamlyacc
 
@@ -206,7 +205,8 @@ ocamltest$(EXE): $(bytecode_modules)
 	$(ocamlc) -c $<
 
 ocamltest.opt$(EXE): $(native_modules)
-	$(ocamlopt_cmd) ocamlcommon.cmxa ocamlbytecomp.cmxa -o $@ $^
+	$(ocamlopt_cmd) $(DOTOPT_LINKFLAGS) \
+	                ocamlcommon.cmxa ocamlbytecomp.cmxa -o $@ $^
 
 %.cmx: %.ml
 	$(ocamlopt) -c $<
@@ -224,45 +224,46 @@ ocamltest.opt$(EXE): $(native_modules)
 	$(CC) $(OC_CFLAGS) $(OC_CPPFLAGS) -c $<
 
 ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
-	sed \
-	  -e 's|@@AFL_INSTRUMENT@@|$(AFL_INSTRUMENT)|' \
-	  -e 's|@@ARCH@@|$(ARCH)|' \
-	  -e 's|@@SHARED_LIBRARIES@@|$(SUPPORTS_SHARED_LIBRARIES)|' \
-	  -e 's|@@UNIX@@|$(unix)|' \
-	  -e 's|@@SYSTHREADS@@|$(systhreads)|' \
-	  -e 's|@@STR@@|$(str)|' \
-	  -e 's|@@SYSTEM@@|$(SYSTEM)|' \
-	  -e 's|@@CPP@@|$(CPP)|' \
-	  -e 's|@@OCAMLCDEFAULTFLAGS@@|$(ocamlcdefaultflags)|' \
-	  -e 's|@@OCAMLOPTDEFAULTFLAGS@@|$(ocamloptdefaultflags)|' \
-	  -e 's|@@OCAMLSRCDIR@@|$(ocamlsrcdir)|' \
-	  -e 's|@@FLAMBDA@@|$(FLAMBDA)|' \
-	  -e 's|@@SPACETIME@@|$(WITH_SPACETIME)|' \
-	  -e 's|@@FORCE_SAFE_STRING@@|$(FORCE_SAFE_STRING)|' \
-	  -e 's|@@FLAT_FLOAT_ARRAY@@|$(FLAT_FLOAT_ARRAY)|' \
-	  -e 's|@@OCAMLDOC@@|$(WITH_OCAMLDOC)|' \
-	  -e 's|@@OCAMLDEBUG@@|$(WITH_OCAMLDEBUG)|' \
-	  -e 's|@@OBJEXT@@|$(O)|' \
-	  -e 's|@@NATIVE_DYNLINK@@|$(NATDYNLINK)|' \
-	  -e 's|@@SHARED_LIBRARY_CFLAGS@@|$(SHAREDLIB_CFLAGS)|' \
-	  -e 's|@@SHAREDOBJEXT@@|$(SO)|' \
-	  -e 's|@@CSC@@|$(CSC)|' \
-	  -e 's|@@CSCFLAGS@@|$(CSCFLAGS)|' \
-	  -e 's|@@MKDLL@@|$(MKDLL)|' \
-	  -e 's|@@MKEXE@@|$(mkexe)|' \
-	  -e 's|@@BYTECCLIBS@@|$(BYTECCLIBS)|' \
-	  -e 's|@@NATIVECCLIBS@@|$(NATIVECCLIBS)|' \
-	  -e 's|@@ASM@@|$(ASM)|' \
-	  -e 's|@@CC@@|$(CC)|' \
-	  -e 's|@@CFLAGS@@|$(OC_CFLAGS)|' \
-	  -e 's|@@CCOMPTYPE@@|$(CCOMPTYPE)|' \
-	  -e 's|@@WINDOWS_UNICODE@@|$(WINDOWS_UNICODE)|' \
-	  $< > $@
+	sed $(call SUBST,AFL_INSTRUMENT) \
+	    $(call SUBST,ARCH) \
+	    $(call SUBST,SUPPORTS_SHARED_LIBRARIES) \
+	    $(call SUBST,unix) \
+	    $(call SUBST,systhreads) \
+	    $(call SUBST,str) \
+	    $(call SUBST,SYSTEM) \
+	    $(call SUBST_STRING,CPP) \
+	    $(call SUBST_STRING,ocamlcdefaultflags) \
+	    $(call SUBST_STRING,ocamloptdefaultflags) \
+	    $(call SUBST_STRING,ocamlsrcdir) \
+	    $(call SUBST,FLAMBDA) \
+	    $(call SUBST,WITH_SPACETIME) \
+	    $(call SUBST,FORCE_SAFE_STRING) \
+	    $(call SUBST,FLAT_FLOAT_ARRAY) \
+	    $(call SUBST,WITH_OCAMLDOC) \
+	    $(call SUBST,WITH_OCAMLDEBUG) \
+	    $(call SUBST,O) \
+	    $(call SUBST,NATDYNLINK) \
+	    $(call SUBST_STRING,SHAREDLIB_CFLAGS) \
+	    $(call SUBST,SO) \
+	    $(call SUBST_STRING,CSC) \
+	    $(call SUBST_STRING,CSCFLAGS) \
+	    $(call SUBST_STRING,MKDLL) \
+	    $(call SUBST_STRING,mkexe) \
+	    $(call SUBST_STRING,BYTECCLIBS) \
+	    $(call SUBST_STRING,NATIVECCLIBS) \
+	    $(call SUBST_STRING,ASM) \
+	    $(call SUBST_STRING,CC) \
+	    $(call SUBST_STRING,OC_CFLAGS) \
+	    $(call SUBST,CCOMPTYPE) \
+	    $(call SUBST,WINDOWS_UNICODE) \
+	    $< > $@
 
 .PHONY: clean
 clean:
-	rm -rf ocamltest$(EXE) ocamltest.opt$(EXE)
-	rm -rf $(o_files) $(ocaml_objects)
+	rm -rf ocamltest ocamltest.exe ocamltest.opt ocamltest.opt.exe
+	rm -rf $(c_files:.c=.o) $(c_files:.c=.obj)
+	rm -rf run_unix.o run_win32.o run_win32.obj
+	rm -rf $(ml_files:.ml=.o) $(ml_files:.ml=.obj)
 	rm -rf $(cmi_files)
 	rm -rf $(cmo_files)
 	rm -rf $(cmx_files)
