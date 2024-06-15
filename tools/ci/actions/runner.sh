@@ -48,8 +48,10 @@ EOF
     ./configure $configure_flags
     ;;
   i386)
-    ./configure --build=x86_64-pc-linux-gnu --host=i386-linux \
-      CC='gcc -m32' AS='as --32' ASPP='gcc -m32 -c' \
+    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
+      CC='gcc -m32 -march=x86-64' \
+      AS='as --32' \
+      ASPP='gcc -m32 -march=x86-64 -c' \
       PARTIALLD='ld -r -melf_i386' \
       $configure_flags
     ;;
@@ -70,9 +72,10 @@ Build () {
 Test () {
   cd testsuite
   echo Running the testsuite with the normal runtime
-  $MAKE all
+  $MAKE parallel
   echo Running the testsuite with the debug runtime
-  $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd all
+  $MAKE USE_RUNTIME='d' OCAMLTESTDIR='$(BASEDIR_HOST)/$(DIR)/_ocamltestd' \
+        TESTLOG=_logd parallel
   cd ..
 }
 
@@ -121,6 +124,21 @@ EOF
 
 }
 
+BasicCompiler () {
+  # The presence of this file can be detected by later steps which
+  # can choose to skip, rather than run (and presumably error).
+  touch compiler-failed-to-build
+  ./configure --disable-dependency-generation \
+              --disable-debug-runtime \
+              --disable-instrumented-runtime
+
+  # Need a runtime
+  make -j coldstart
+  # And generated files (ocamllex compiles ocamlyacc)
+  make -j ocamllex
+  rm -f compiler-failed-to-build
+}
+
 case $1 in
 configure) Configure;;
 build) Build;;
@@ -128,6 +146,7 @@ test) Test;;
 api-docs) API_Docs;;
 install) Install;;
 other-checks) Checks;;
+basic-compiler) BasicCompiler;;
 *) echo "Unknown CI instruction: $1"
    exit 1;;
 esac
