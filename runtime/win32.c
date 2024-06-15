@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <wchar.h>
 #include "caml/alloc.h"
 #include "caml/codefrag.h"
 #include "caml/fail.h"
@@ -128,23 +129,25 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
   return retcode;
 }
 
-wchar_t * caml_decompose_path(struct ext_table * tbl, wchar_t * path)
+void caml_decompose_path(struct ext_table * tbl, wchar_t * path)
 {
   wchar_t * p, * q;
+  wchar_t c;
   int n;
 
-  if (path == NULL) return NULL;
+  if (path == NULL) return;
   p = caml_stat_wcsdup(path);
   q = p;
   while (1) {
     for (n = 0; q[n] != 0 && q[n] != L';'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
-    q = q + n;
-    if (*q == 0) break;
-    *q = 0;
-    q += 1;
+    c = q[n];
+    q[n] = 0;
+    caml_ext_table_add(tbl, caml_stat_wcsdup(q));
+    if (c == 0) break;
+    q = q + n + 1;
   }
-  return p;
+  caml_stat_free(p);
+  return;
 }
 
 wchar_t * caml_search_in_path(struct ext_table * path, const wchar_t * name)
@@ -885,28 +888,57 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
   return v;
 }
 
-CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+Caml_inline wchar_t *strndup_to_utf16(const char *s,
+                                      size_t len, size_t *out_len)
 {
   wchar_t * ws;
   int retcode;
 
-  retcode = win_multi_byte_to_wide_char(s, -1, NULL, 0);
-  ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
-  win_multi_byte_to_wide_char(s, -1, ws, retcode);
+  retcode = win_multi_byte_to_wide_char(s, len, NULL, 0);
+  ws = caml_stat_alloc_noexc(retcode * sizeof(wchar_t));
+  win_multi_byte_to_wide_char(s, len, ws, retcode);
+  if (out_len != NULL)
+    *out_len = retcode;
 
   return ws;
 }
 
-CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+Caml_inline caml_stat_string strndup_of_utf16(const wchar_t *s,
+                                              size_t len, size_t *out_len)
 {
   caml_stat_string out;
   int retcode;
 
-  retcode = win_wide_char_to_multi_byte(s, -1, NULL, 0);
+  retcode = win_wide_char_to_multi_byte(s, len, NULL, 0);
   out = caml_stat_alloc(retcode);
-  win_wide_char_to_multi_byte(s, -1, out, retcode);
+  win_wide_char_to_multi_byte(s, len, out, retcode);
+  if (out_len != NULL)
+    *out_len = retcode;
 
   return out;
+}
+
+CAMLexport wchar_t *caml_stat_strndup_to_utf16(const char *s,
+                                               size_t len, size_t *out_len)
+{
+  return strndup_to_utf16(s, len, out_len);
+}
+
+CAMLexport caml_stat_string caml_stat_strndup_of_utf16(const wchar_t *s,
+                                                       size_t len,
+                                                       size_t *out_len)
+{
+  return strndup_of_utf16(s, len, out_len);
+}
+
+CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
+{
+  return strndup_to_utf16(s, -1, NULL);
+}
+
+CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
+{
+  return strndup_of_utf16(s, -1, NULL);
 }
 
 void caml_probe_win32_version(void)
@@ -1041,4 +1073,74 @@ CAMLexport clock_t caml_win32_clock(void)
   /* total in 100-nanosecond intervals (1e7 / CLOCKS_PER_SEC) */
   clocks_per_sec = INT64_LITERAL(10000000U) / (ULONGLONG)CLOCKS_PER_SEC;
   return (clock_t)(total / clocks_per_sec);
+}
+
+CAMLextern void caml_locate_standard_library (const wchar_t *exe_name)
+{
+  if (Is_relative_dir(caml_standard_library_default)) {
+    LPWSTR root, basename, candidate, resolved_candidate;
+    DWORD buf_len, l;
+    HANDLE h;
+    l = GetFullPathName(exe_name, 0, NULL, NULL);
+    if (l == 0) {
+      /* Impossible thing: the path returned by GetModuleFileName can't be
+         parsed by GetFullPathName */
+      caml_standard_library = caml_standard_library_default;
+      return;
+    }
+again1:
+    CAMLassert(l != 0);
+    buf_len = l;
+    root = caml_stat_alloc(buf_len * sizeof(wchar_t));
+    l = GetFullPathName(exe_name, buf_len, root, &basename);
+    if (l > buf_len) {
+      caml_stat_free(root);
+      goto again1;
+    }
+    CAMLassert(basename != root && *(basename - 1) == '/');
+    /* Make root the dirname */
+    *(basename - 1) = 0;
+    caml_relative_root_dir = root;
+    candidate = caml_stat_strconcat_os(3, caml_relative_root_dir,
+                                          CAML_DIR_SEP,
+                                          caml_standard_library_default);
+    h = CreateFile(candidate, 0,
+                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                   NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    if (h != INVALID_HANDLE_VALUE) {
+      l = GetFinalPathNameByHandle(h, NULL, 0,
+                                   FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+again2:
+      buf_len = l;
+      resolved_candidate = caml_stat_alloc(buf_len * sizeof(wchar_t));
+      l = GetFinalPathNameByHandle(h, resolved_candidate, buf_len,
+                                   FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+      if (l > buf_len) {
+        caml_stat_free(resolved_candidate);
+        goto again2;
+      }
+      /* GetFinalPathNameByHandle always returns \\?\ which needs stripping.
+         UNC paths are returned as \\?\UNC\ - in this case, reuse the \\ from
+         \\?\. */
+      CAMLassert(l > 4 && resolved_candidate[0] == '\\'
+                       && resolved_candidate[1] == '\\'
+                       && resolved_candidate[2] == '?'
+                       && resolved_candidate[3] == '\\');
+      if (l >= 8 && resolved_candidate[4] == 'U'
+                 && resolved_candidate[5] == 'N'
+                 && resolved_candidate[6] == 'C'
+                 && resolved_candidate[7] == '\\')
+        wmemmove_s(resolved_candidate + 2, l - 1,
+                   resolved_candidate + 8, l - 7);
+      else
+        wmemmove_s(resolved_candidate, l + 1,
+                   resolved_candidate + 4, l - 3);
+      caml_stat_free(candidate);
+      caml_standard_library = resolved_candidate;
+    } else {
+      caml_standard_library = candidate;
+    }
+  } else {
+    caml_standard_library = caml_standard_library_default;
+  }
 }

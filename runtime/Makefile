@@ -50,20 +50,20 @@ endif
 
 # Targets to build and install
 
-PROGRAMS := ocamlrun$(EXE)
+PROGRAMS := ocamlrun
 BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
 BYTECODE_SHARED_LIBRARIES :=
 NATIVE_STATIC_LIBRARIES := libasmrun.$(A)
 NATIVE_SHARED_LIBRARIES :=
 
 ifeq "$(RUNTIMED)" "true"
-PROGRAMS += ocamlrund$(EXE)
+PROGRAMS += ocamlrund
 BYTECODE_STATIC_LIBRARIES += libcamlrund.$(A)
 NATIVE_STATIC_LIBRARIES += libasmrund.$(A)
 endif
 
 ifeq "$(INSTRUMENTED_RUNTIME)" "true"
-PROGRAMS += ocamlruni$(EXE)
+PROGRAMS += ocamlruni
 BYTECODE_STATIC_LIBRARIES += libcamlruni.$(A)
 NATIVE_STATIC_LIBRARIES += libasmruni.$(A)
 endif
@@ -71,9 +71,9 @@ endif
 ifeq "$(UNIX_OR_WIN32)" "unix"
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 BYTECODE_STATIC_LIBRARIES += libcamlrun_pic.$(A)
-BYTECODE_SHARED_LIBRARIES += libcamlrun_shared.$(SO)
+BYTECODE_SHARED_LIBRARIES += camlrun
 NATIVE_STATIC_LIBRARIES += libasmrun_pic.$(A)
-NATIVE_SHARED_LIBRARIES += libasmrun_shared.$(SO)
+NATIVE_SHARED_LIBRARIES += asmrun
 endif
 endif
 
@@ -142,34 +142,65 @@ endif
 # Build, install and clean targets
 
 .PHONY: all
-all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) $(PROGRAMS) \
-     sak$(EXE)
+all: $(BYTECODE_STATIC_LIBRARIES) \
+     $(BYTECODE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL)) \
+     $(PROGRAMS:%=%$(EXE)) sak$(EXE)
 
 .PHONY: allopt
 ifneq "$(NATIVE_COMPILER)" "false"
-allopt: $(NATIVE_STATIC_LIBRARIES) $(NATIVE_SHARED_LIBRARIES)
+allopt: $(NATIVE_STATIC_LIBRARIES) \
+        $(NATIVE_SHARED_LIBRARIES:%=lib%_shared$(EXT_DLL))
 else
 allopt:
 	$(error The build has been configured with --disable-native-compiler)
 endif
 
 INSTALL_INCDIR=$(INSTALL_LIBDIR)/caml
-.PHONY: install
-install:
-	$(INSTALL_PROG) $(PROGRAMS) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(BYTECODE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(BYTECODE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
+
+define INSTALL_RUNTIME
+install::
+	$(INSTALL_PROG) \
+    $(1)$(EXE) "$(INSTALL_BINDIR)/$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" "$(1)$(EXE)"
+	cd "$(INSTALL_BINDIR)" && \
+    $(LN) "$(TARGET)-$(1)-$(BYTECODE_RUNTIME_ID)$(EXE)" \
+           "$(1)-$(ZINC_RUNTIME_ID)$(EXE)"
+endef
+define INSTALL_RUNTIME_LIB
+ifeq "$(2)" "BYTECODE"
+install::
+else
+installopt::
 endif
+	$(INSTALL_PROG) \
+    lib$(1)_shared$(EXT_DLL) \
+      "$(INSTALL_LIBDIR)/lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)"
+	cd "$(INSTALL_LIBDIR)" && \
+    $(LN) "lib$(1)-$(TARGET)-$($(2)_RUNTIME_ID)$(EXT_DLL)" \
+    "lib$(1)_shared$(EXT_DLL)"
+endef
+
+.PHONY: install
+$(foreach runtime, $(PROGRAMS), \
+  $(eval $(call INSTALL_RUNTIME,$(runtime))))
+
+install::
+	$(INSTALL_DATA) $(BYTECODE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
+
+$(foreach shared_runtime, $(BYTECODE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),BYTECODE)))
+
+install::
 	mkdir -p "$(INSTALL_INCDIR)"
 	$(INSTALL_DATA) caml/domain_state.tbl caml/*.h "$(INSTALL_INCDIR)"
 
 .PHONY: installopt
-installopt:
+installopt::
 	$(INSTALL_DATA) $(NATIVE_STATIC_LIBRARIES) "$(INSTALL_LIBDIR)"
-ifneq "$(NATIVE_SHARED_LIBRARIES)" ""
-	$(INSTALL_PROG) $(NATIVE_SHARED_LIBRARIES) "$(INSTALL_LIBDIR)"
-endif
+
+$(foreach shared_runtime, $(NATIVE_SHARED_LIBRARIES), \
+  $(eval $(call INSTALL_RUNTIME_LIB,$(shared_runtime),NATIVE)))
 
 .PHONY: clean
 clean:
@@ -186,8 +217,16 @@ distclean: clean
 # Generated non-object files
 
 ld.conf: $(ROOTDIR)/Makefile.config
+ifneq "$(STUBLIBDIR)" "$(LIBDIR)/stublibs"
 	echo "$(STUBLIBDIR)" > $@
-	echo "$(LIBDIR)" >> $@
+else
+ifeq "$(UNIX_OR_WIN32)" "unix"
+	echo './stublibs' > $@
+else
+	echo '.\stublibs' > $@
+endif
+endif
+	echo "." >> $@
 
 # If primitives contain duplicated lines (e.g. because the code is defined
 # like
@@ -241,7 +280,7 @@ caml/jumptbl.h : caml/instruct.h
 	       -e '/^}/q' > $@
 
 caml/version.h : $(ROOTDIR)/tools/make-version-header.sh $(ROOTDIR)/VERSION
-	$^ > $@
+	$^ $(OCAML_RELEASE_NUMBER) > $@
 
 # These are provided as a temporary shim to allow cross-compilation systems
 # to supply a host C compiler and different flags and a linking macro.
@@ -260,14 +299,19 @@ C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
 build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+ifneq "$(LIBDIR_REL)" ""
+	echo '#define OCAML_STDLIB_DIR_REL $(call C_LITERAL,$(LIBDIR_REL))' \
+	       >> $@
+endif
 	echo '#define HOST "$(HOST)"' >> $@
+	echo '#define BYTECODE_RUNTIME_ID "$(BYTECODE_RUNTIME_ID)"' >> $@
 
 # Libraries and programs
 
-ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
+ocamlrun$(EXE): prims.$(O) stdlib.$(O) libcamlrun.$(A)
 	$(MKEXE) -o $@ $^ $(LIBS)
 
-ocamlruns$(EXE): prims.$(O) libcamlrun_non_shared.$(A)
+ocamlruns$(EXE): prims.$(O) stdlib.$(O) libcamlrun_non_shared.$(A)
 	$(call MKEXE_USING_COMPILER,$@,$^ $(LIBS))
 
 libcamlrun.$(A): $(libcamlrun_OBJECTS)
@@ -276,13 +320,13 @@ libcamlrun.$(A): $(libcamlrun_OBJECTS)
 libcamlrun_non_shared.$(A): $(libcamlrun_non_shared_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlrund$(EXE): prims.$(O) libcamlrund.$(A)
+ocamlrund$(EXE): prims.$(O) stdlib.$(O) libcamlrund.$(A)
 	$(MKEXE) $(MKEXEDEBUGFLAG) -o $@ $^ $(LIBS)
 
 libcamlrund.$(A): $(libcamlrund_OBJECTS)
 	$(call MKLIB,$@, $^)
 
-ocamlruni$(EXE): prims.$(O) libcamlruni.$(A)
+ocamlruni$(EXE): prims.$(O) stdlib.$(O) libcamlruni.$(A)
 	$(MKEXE) -o $@ $^ $(INSTRUMENTED_RUNTIME_LIBS) $(LIBS)
 
 libcamlruni.$(A): $(libcamlruni_OBJECTS)
@@ -362,6 +406,9 @@ object_types := % %.b %.bd %.bi %.bpic
 ifneq "$(NATIVE_COMPILER)" "false"
 object_types += %.n %.nd %.ni %.np %.npic
 endif
+
+# Disable the default rule from Makefile.common
+%.$(O): %.c $(REQUIRED_HEADERS)
 
 $(foreach object_type, $(object_types), \
   $(eval $(call COMPILE_C_FILE,$(object_type),%)))

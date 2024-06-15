@@ -25,6 +25,9 @@ AC_INIT([OCaml],
 
 AC_MSG_NOTICE([Configuring OCaml version AC_PACKAGE_VERSION])
 
+# OCAML__RELEASE_NUMBER must be incremented with each minor release.
+m4_define([OCAML__RELEASE_NUMBER], [14])
+
 # Configuration variables
 
 ## Command-line arguments passed to configure
@@ -65,6 +68,8 @@ extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+bindir_to_libdir=''
+runtime_search=no
 
 # Information about the package
 
@@ -76,9 +81,22 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 ## Output variables
 
+m4_cond(m4_bregexp(AC_PACKAGE_VERSION, [.*\(+dev\).*], [\1]), [+dev],
+  [m4_define([OCAML__DEVELOPMENT_VERSION], [true])],
+  [m4_define([OCAML__DEVELOPMENT_VERSION], [false])])
+
+m4_define([OCAML__VERSION_MAJOR],
+          m4_bregexp(AC_PACKAGE_VERSION, [^\([^.]*\).*], [\1]))
+m4_define([OCAML__VERSION_MINOR],
+          m4_bregexp(AC_PACKAGE_VERSION, [^[^.]*\.\([^.]*\).*], [\1]))
+
 AC_SUBST([CONFIGURE_ARGS])
 AC_SUBST([native_compiler])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
+AC_SUBST([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
+AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
+AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
+AC_SUBST([OCAML_DEVELOPMENT_VERSION], [OCAML__DEVELOPMENT_VERSION])
 AC_SUBST([CC])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
@@ -120,6 +138,7 @@ AC_SUBST([flexdir])
 AC_SUBST([bootstrapping_flexdll])
 AC_SUBST([long_shebang])
 AC_SUBST([shebangscripts])
+AC_SUBST([bin_sh])
 AC_SUBST([AR])
 AC_SUBST([RANLIB])
 AC_SUBST([RANLIBCMD])
@@ -162,6 +181,7 @@ AC_SUBST([windows_unicode])
 AC_SUBST([flat_float_array])
 AC_SUBST([function_sections])
 AC_SUBST([afl])
+AC_SUBST([ln])
 AC_SUBST([force_safe_string])
 AC_SUBST([default_safe_string])
 AC_SUBST([flexdll_chain])
@@ -171,14 +191,35 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([naked_pointers])
 AC_SUBST([naked_pointers_checker])
+AC_SUBST([bindir_exp])
+AC_SUBST([bindir_exp_sh])
+AC_SUBST([target_bindir])
+AC_SUBST([target_bindir_exp])
+AC_SUBST([target_bindir_exp_sh])
+AC_SUBST([bindir_to_libdir])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
+AC_SUBST([zinc_runtime_id])
+AC_SUBST([runtime_search])
 
 ## Generated files
 
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
+AC_CONFIG_FILES([stdlib/camlheader.shebang])
+AC_CONFIG_FILES([stdlib/camlheader.sh])
+AC_CONFIG_FILES([stdlib/target_camlheader.shebang])
+AC_CONFIG_FILES([stdlib/target_camlheader.sh])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
+AC_CONFIG_FILES([utils/config.mlp])
+
+AC_CONFIG_COMMANDS([shebang],[],[
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.shebang.in \
+    > stdlib/target_camlheader.shebang.in
+  sed -e 's/bindir_exp/target_&/' stdlib/camlheader.sh.in \
+    > stdlib/target_camlheader.sh.in])
 
 # Checks for system types
 
@@ -329,7 +370,9 @@ AC_ARG_ENABLE([cmm-invariants],
 
 AC_ARG_WITH([target-bindir],
   [AS_HELP_STRING([--with-target-bindir],
-    [location of binary programs on target system])])
+    [location of the runtime binaries on target system])],
+  [target_bindir=$withval],
+  [target_bindir=''])
 
 AC_ARG_ENABLE([reserved-header-bits],
   [AS_HELP_STRING([--enable-reserved-header-bits=BITS],
@@ -395,6 +438,17 @@ AC_ARG_ENABLE([function-sections],
     [do not emit each function in a separate section])],
   [],
   [enable_function_sections=auto])
+
+AC_ARG_ENABLE([relative],
+  [AS_HELP_STRING([--enable-relative],
+    [try to locate the standard library using relative paths])])
+
+AC_ARG_ENABLE([runtime-search],
+  [AS_HELP_STRING([--enable-runtime-search],
+    [allow bytecode executables to search for ocamlrun])],
+  [AS_CASE([$enableval],[yes|no|always],[],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search]))])])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
@@ -516,9 +570,13 @@ AS_CASE([$ocaml_cv_cc_vendor],
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
+    dir_sep="\\"
+    OCAML_CHECK_LN_ON_WINDOWS
     unixlib="win32unix"
     ],
   [unix_or_win32="unix"
+  dir_sep='/'
+  ln='ln -sf'
   unixlib="unix"])
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
@@ -539,6 +597,7 @@ AS_IF([test x"$enable_str_lib" != "xno"],
 ## TODO: have two values, one for host and one for target
 AC_SYS_INTERPRETER
 
+bin_sh=''
 long_shebang=false
 AS_IF(
   [test "x$interpval" = "xyes"],
@@ -546,14 +605,13 @@ AS_IF(
       [*-cygwin|*-*-mingw32|*-pc-windows],
         [shebangscripts=false],
       [shebangscripts=true
-       prev_exec_prefix="$exec_prefix"
-       AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
-       eval "expanded_bindir=\"$bindir\""
-       exec_prefix="$prev_exec_prefix"
-       # Assume maximum shebang is 128 chars; less #!, /ocamlrun, an optional
-       # 1 char suffix and the \0 leaving 115 characters
-       AS_IF([test "${#expanded_bindir}" -gt 115],[long_shebang=true])
-      ]
+      bin_sh="$(command -v sh 2>/dev/null)"
+      AS_IF([test x"$bin_sh" = 'x' || test x"${bin_sh#* }" != x"$bin_sh" \
+             || test "${#bin_sha}" -gt 125],
+        [AC_MSG_WARN([m4_normalize([could not determine a shebang-compatible
+                                   location of sh - #! scripts disabled])])
+        shebangscripts=false
+        bin_sh=''])]
     )],
   [shebangscripts=false]
 )
@@ -588,7 +646,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
     cc_warnings=''],
   [outputobj='-o $(EMPTY)'
   warn_error_flag='-Werror'
-  cc_warnings='-Wall -Wdeclaration-after-statement'])
+  cc_warnings='-Wall'])
 
 AS_CASE([$enable_warn_error,AC_PACKAGE_VERSION],
   [yes,*|,*+dev*],
@@ -855,6 +913,7 @@ AS_IF([test "x$ac_cv_lib_m_cos" = xyes ], [mathlib="-lm"], [mathlib=""])
 
 AC_CHECK_HEADER([math.h])
 AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
+AC_CHECK_HEADER([libgen.h],[AC_DEFINE([HAS_LIBGEN_H])])
 AC_CHECK_HEADER([stdint.h],[AC_DEFINE([HAS_STDINT_H])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT])], [],
   [#include <sys/types.h>])
@@ -1959,6 +2018,15 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
 
+AS_IF([test x"$enable_relative" = "xyes"],[
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
+  dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
+  dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
+])
+
+AS_IF([test x"$enable_runtime_search" != 'x'],
+  [runtime_search="$enable_runtime_search"])
+
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [AS_CASE([$WINDOWS_UNICODE_MODE],
@@ -2001,6 +2069,64 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_stdlib_manpages" != "xno"],
   [stdlib_manpages=true],[stdlib_manpages=false])
+
+AS_IF([test x"$bindir" = 'x${exec_prefix}/bin'],
+  [AS_IF([test x"$exec_prefix" = 'xNONE'],
+    [AS_IF([test x"$prefix" = 'xNONE'],
+      [bindir_exp="${ac_default_prefix}/bin"],
+      [bindir_exp="${prefix}/bin"])],
+    [bindir_exp="${exec_prefix}/bin"])])
+AS_IF([test x"${target_bindir}" = 'x'],
+  [target_bindir_exp="$bindir_exp"],
+  [target_bindir_exp="${target_bindir}"])
+
+bindir_exp="${bindir_exp%$dir_sep}$dir_sep"
+bindir_exp_sh="'$(echo "${bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+target_bindir_exp="${target_bindir_exp%$dir_sep}$dir_sep"
+target_bindir_exp_sh="'$(echo "${target_bindir_exp}" | sed -e "s/'/'\\\\''/g")'"
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+m4_define([ALPHABET],
+          [0123456789abcdefghijklmnopqrstuv])
+alphabet='ALPHABET'
+
+m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
+  [m4_define([ID_VERSION], m4_eval(OCAML__RELEASE_NUMBER << 1))],
+  [m4_define([ID_VERSION], m4_eval(1 + (OCAML__RELEASE_NUMBER << 1)))])
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=m4_eval(ID_VERSION >> 5)
+# Bit 7 (int31)
+AS_IF([! $arch64], [quintet1="4 + ${quintet1}"])
+# Bit 8 (no shared libraries)
+AS_IF([! $supports_shared_libraries], [quintet1="8 + ${quintet1}"])
+# Bit 9 (--enable-naked-pointers) cannot be set since OCaml 5.0
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${profinfo_width} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+AS_IF([$frame_pointers], [quintet3_native='1'], [quintet3_native='0'])
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+AS_IF([! $flat_float_array], [quintet3_byte="8 + ${quintet3_byte}"])
+# Bit 19 (WINDOWS_UNICODE=ansi)
+AS_CASE([$host,$windows_unicode],
+  [*-*-mingw32,0|*-pc-windows,0], [quintet3_byte="16 + ${quintet3_byte}"])
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}QUINTET0"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}QUINTET0"
+zinc_runtime_id="00${quintet1}QUINTET0"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h

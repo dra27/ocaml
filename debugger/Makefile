@@ -18,6 +18,7 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
+RUNTIMEDIR=$(ROOTDIR)/runtime
 DYNLINKDIR=$(ROOTDIR)/otherlibs/dynlink
 UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
 
@@ -25,6 +26,11 @@ CAMLC=$(BEST_OCAMLC) -g -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48-70 -warn-error +A \
           -safe-string -strict-sequence -strict-formats
 LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  LINKFLAGS += -use-prims $(ROOTDIR)/runtime/primitives
+else
+  LINKFLAGS += -custom -I $(RUNTIMEDIR) $(SET_RELATIVE_STDLIB)
+endif
 CAMLDEP=$(BEST_OCAMLDEP)
 DEPFLAGS=-slash
 DEPINCLUDES=$(INCLUDES)
