@@ -107,9 +107,14 @@ let add_ccobjs origin l =
 
 let runtime_lib () =
   let libname =
-    if !Clflags.gprofile
-    then "libasmrunp" ^ ext_lib
-    else "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
+    if !Clflags.runtime_variant = "_shared" then
+      Printf.sprintf "-lasmrun-%s-%s"
+        Config.target
+        Config.native_runtime_id
+    else if !Clflags.gprofile then
+      "libasmrunp" ^ ext_lib
+    else
+      "libasmrun" ^ !Clflags.runtime_variant ^ ext_lib in
   try
     if !Clflags.nopervasives then []
     else [ Load_path.find libname ]
@@ -236,6 +241,10 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Array.iteri
     (fun i name -> compile_phrase (Cmmgen.predef_exception i name))
     Runtimedef.builtin_exceptions;
+  List.iter
+    (fun (name, value) ->
+      compile_phrase (Cmmgen.emit_global_string_constant name value))
+    !Clflags.global_string_constants;
   compile_phrase (Cmmgen.global_table name_list);
   let globals_map = make_globals_map units_list ~crc_interfaces in
   compile_phrase (Cmmgen.globals_map globals_map);
@@ -337,6 +346,7 @@ let link ~ppf_dump objfiles output_name =
       else if !Clflags.output_c_object then stdlib :: objfiles
       else stdlib :: (objfiles @ [stdexit]) in
     let units_tolink = List.fold_right scan_file objfiles [] in
+    Compenv.set_caml_standard_library_default ();
     Array.iter remove_required Runtimedef.builtin_exceptions;
     begin match extract_missing_globals() with
       [] -> ()

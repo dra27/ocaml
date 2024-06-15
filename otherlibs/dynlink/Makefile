@@ -19,8 +19,8 @@
 
 ROOTDIR = ../..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 
@@ -36,6 +36,7 @@ OPTCOMPFLAGS=-O3
 else
 OPTCOMPFLAGS=
 endif
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 
 OBJS=dynlink_compilerlibs.cmo dynlink_types.cmo \
   dynlink_platform_intf.cmo dynlink_common.cmo dynlink.cmo
@@ -141,7 +142,7 @@ extract_crc.cmo: extract_crc.ml dynlink.cmi
 	$(OCAMLC) -c $(COMPFLAGS) extract_crc.ml
 
 extract_crc: $(COMPILEROBJS) dynlink.cma extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) $(BYTELINK_FLAGS) -o $@ $^
 
 install:
 	$(INSTALL_DATA) \
@@ -167,7 +168,7 @@ partialclean:
 	rm -f extract_crc *.cm[ioaxt] *.cmti *.cmxa
 
 clean: partialclean
-	rm -f *.$(A) *.$(O) *.so *.dll dynlink.mlopt \
+	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink.mlopt \
 	      dynlink_platform_intf.mli
 
 depend:

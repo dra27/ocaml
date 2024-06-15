@@ -15,13 +15,20 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
 
 STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
+else
+  BYTELINK_FLAGS = -custom -I $(ROOTDIR)/runtime $(SET_RELATIVE_STDLIB)
+endif
+
 OCAMLC    = $(OCAMLRUN) $(ROOTDIR)/ocamlc $(STDLIBFLAGS)
 OCAMLOPT  = $(OCAMLRUN) $(ROOTDIR)/ocamlopt $(STDLIBFLAGS)
 OCAMLDEP  = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc -depend
@@ -168,9 +175,8 @@ LIBCMOFILES = $(CMOFILES)
 LIBCMXFILES = $(LIBCMOFILES:.cmo=.cmx)
 LIBCMIFILES = $(LIBCMOFILES:.cmo=.cmi)
 
-
 .PHONY: all
-all: lib exe generators manpages
+all: lib exe generators
 
 manpages: generators
 
@@ -207,10 +213,12 @@ OCAMLDOC_BCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cma)
 OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(OCAMLDOC): $(EXECMOFILES)
-	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
+	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(BYTELINK_FLAGS) \
+	  $(OCAMLDOC_BCLIBRARIES) $^
 
 $(OCAMLDOC_OPT): $(EXECMXFILES)
-	$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_NCLIBRARIES) $^
+	$(OCAMLOPT_CMD) -o $@ -linkall $(LINKFLAGS) $(DOTOPT_LINKFLAGS) \
+    $(OCAMLDOC_NCLIBRARIES) $^
 
 $(OCAMLDOC_LIBCMA): $(LIBCMOFILES)
 	$(OCAMLC) -a -o $@ $(LINKFLAGS) $^
@@ -496,12 +504,13 @@ odoc:
 .PHONY: clean
 clean:
 	rm -f *~ \#*\#
-	rm -f $(OCAMLDOC) $(OCAMLDOC_OPT) *.cma *.cmxa *.cmo *.cmi *.cmx *.cmt *.cmti *.$(A) *.$(O)
+	rm -f $(OCAMLDOC) $(OCAMLDOC_OPT) *.cma *.cmxa *.cmo *.cmi *.cmx *.cmt *.cmti *.a *.lib *.o *.obj
 	rm -f odoc_parser.output odoc_text_parser.output
 	rm -f odoc_lexer.ml odoc_text_lexer.ml odoc_see_lexer.ml odoc_ocamlhtml.ml
 	rm -f odoc_parser.ml odoc_parser.mli odoc_text_parser.ml odoc_text_parser.mli
 	rm -rf stdlib_man stdlib_html stdlib_texi stdlib_latex
-	rm -f generators/*.cm[taiox] generators/*.$(A) generators/*.$(O) generators/*.cmx[as]
+	rm -f generators/*.cm[taiox] generators/*.a generators/*.lib generators/*.o generators/*.obj \
+        generators/*.cmx[as]
 
 .PHONY: depend
 depend:

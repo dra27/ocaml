@@ -31,9 +31,13 @@
  || defined(SYS_solaris) || defined(SYS_beos) || defined(SYS_gnu)
 #define G(x) x
 #define LBL(x) CONCAT(.L,x)
+#define ENDOBJECT(name) \
+        .type name,@object; \
+        .size name, . - name
 #else
 #define G(x) CONCAT(_,x)
 #define LBL(x) CONCAT(L,x)
+#define ENDOBJECT(name)
 #endif
 
 #if defined(SYS_linux_elf) || defined(SYS_bsd_elf) \
@@ -465,6 +469,7 @@ G(caml_system__frametable):
         .value  -1              /* negative frame size => use callback link */
         .value  0               /* no roots here */
 #endif
+        ENDOBJECT(caml_system__frametable)
 
         .globl  G(caml_extra_params)
 G(caml_extra_params):

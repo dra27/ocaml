@@ -47,8 +47,8 @@ extern int caml_read_fd(int fd, int flags, void * buf, int n);
 extern int caml_write_fd(int fd, int flags, void * buf, int n);
 
 /* Decompose the given path into a list of directories, and add them
-   to the given table. */
-extern char_os * caml_decompose_path(struct ext_table * tbl, char_os * path);
+   to the given table. entries added to tbl are strdup'd. */
+extern void caml_decompose_path(struct ext_table * tbl, char_os * path);
 
 /* Search the given file in the given list of directories.
    If not found, return a copy of [name]. */
@@ -145,6 +145,27 @@ extern wchar_t* caml_stat_strdup_to_utf16(const char *s);
 */
 extern char* caml_stat_strdup_of_utf16(const wchar_t *s);
 
+/* [caml_stat_strndup_to_utf16(s, n, &out_n)] returns a copy of the first n
+   bytes of s re-encoded in UTF-16. If out_n is not NULL, then the size of the
+   result is recorded in *out_n.
+
+   The returned string is allocated with [caml_stat_alloc], so it should be free
+   using [caml_stat_free].
+*/
+CAMLextern wchar_t *caml_stat_strndup_to_utf16(const char *s,
+                                               size_t len, size_t *out_len);
+
+/* [caml_stat_strndup_to_utf16(s, n, &out_n)] returns a copy of the first n
+   bytes of s re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is
+   non-zero or the current Windows code page otherwise . If out_n is not NULL,
+   then the size of the result is recorded in *out_n.
+
+   The returned string is allocated with [caml_stat_alloc], so it should be free
+   using [caml_stat_free].
+*/
+CAMLextern char *caml_stat_strndup_of_utf16(const wchar_t *s,
+                                            size_t len, size_t *out_len);
+
 /* [caml_copy_string_of_utf16(s)] returns an OCaml string containing a copy of
    [s] re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero
    or in the current code page otherwise.
@@ -153,8 +174,27 @@ extern value caml_copy_string_of_utf16(const wchar_t *s);
 
 extern int caml_win32_isatty(int fd);
 
+#define CAML_DIR_SEP T("\\")
+#define Is_dir_separator(c) (c == '\\' || c == '/')
+
+#else
+
+#define CAML_DIR_SEP "/"
+#define Is_dir_separator(c) (c == '/')
+
 #endif /* _WIN32 */
 
+/* True if:
+   - dir equals "."
+   - dir equals ".."
+   - dir begins "./"
+   - dir begins "../"
+   The tests for null avoid the need to call strlen_os. */
+#define Is_relative_dir(dir) \
+  (dir[0] == '.' \
+   && (dir[1] == 0 \
+       || Is_dir_separator(dir[1]) \
+       || (dir[1] == '.' && (dir[2] == 0 || Is_dir_separator(dir[2])))))
 #endif /* CAML_INTERNALS */
 
 #endif /* CAML_OSDEPS_H */

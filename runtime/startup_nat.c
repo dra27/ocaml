@@ -44,7 +44,6 @@
 #endif
 
 extern int caml_parser_trace;
-CAMLexport header_t caml_atom_table[256];
 char * caml_code_area_start, * caml_code_area_end;
 struct ext_table caml_code_fragments_table;
 
@@ -93,6 +92,7 @@ void (*caml_termination_hook)(void *) = NULL;
 extern value caml_start_program (void);
 extern void caml_init_ieee_floats (void);
 extern void caml_init_signals (void);
+extern void caml_terminate_signals(void);
 #ifdef _WIN32
 extern void caml_win32_overflow_detection (void);
 #endif
@@ -107,6 +107,7 @@ extern void caml_install_invalid_parameter_handler();
 value caml_startup_common(char_os **argv, int pooling)
 {
   char_os * exe_name, * proc_self_exe;
+  value res;
   char tos;
 
   /* Determine options */
@@ -146,18 +147,21 @@ value caml_startup_common(char_os **argv, int pooling)
   caml_init_backtrace();
   caml_debugger_init (); /* force debugger.o stub to be linked */
   exe_name = argv[0];
-  if (exe_name == NULL) exe_name = _T("");
+  if (exe_name == NULL) exe_name = T("");
   proc_self_exe = caml_executable_name();
   if (proc_self_exe != NULL)
     exe_name = proc_self_exe;
   else
     exe_name = caml_search_exe_in_path(exe_name);
-  caml_sys_init(exe_name, argv);
+  caml_sys_init(proc_self_exe, exe_name, argv);
   if (sigsetjmp(caml_termination_jmpbuf.buf, 0)) {
+    caml_terminate_signals();
     if (caml_termination_hook != NULL) caml_termination_hook(NULL);
     return Val_unit;
   }
-  return caml_start_program();
+  res = caml_start_program();
+  caml_terminate_signals();
+  return res;
 }
 
 value caml_startup_exn(char_os **argv)

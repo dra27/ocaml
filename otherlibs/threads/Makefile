@@ -68,16 +68,16 @@ all: libvmthreads.a threads.cma stdlib.cma unix.cma
 allopt:
 
 libvmthreads.a: $(C_OBJS)
-	$(MKLIB) -o threads -oc vmthreads $(C_OBJS)
+	$(MKLIB_CMD) -o threads -oc vmthreads $(C_OBJS)
 
 threads.cma: $(CAML_OBJS)
-	$(MKLIB) -ocamlc '$(CAMLC)' -o threads -oc vmthreads $^
+	$(MKLIB_CMD) -ocamlc '$(CAMLC)' -o threads -oc vmthreads $^
 
 stdlib.cma: $(LIB_OBJS)
 	$(CAMLC) -a -o $@ $^
 
 unix.cma: $(UNIXLIB_OBJS)
-	$(MKLIB) -ocamlc '$(CAMLC)' -o unix -linkall $^
+	$(MKLIB_CMD) -ocamlc '$(CAMLC)' -o unix -linkall $^
 
 stdlib.cmo: stdlib.mli stdlib.cmi stdlib.ml
 	$(CAMLC) ${COMPFLAGS} -nopervasives \
@@ -147,8 +147,11 @@ installopt:
 %.$(O): %.c
 	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
+.PHONY: beforedepend
+beforedepend: stdlib.mli unix.mli
+
 .PHONY: depend
-depend:
+depend: beforedepend
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(error Dependencies cannot be regenerated using the MSVC ports)
 else

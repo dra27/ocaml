@@ -32,6 +32,7 @@ type error =
   | File_exists of string
   | Cannot_open_dll of string
   | Required_module_unavailable of string
+  | Needs_custom_runtime of string
 
 exception Error of error
 

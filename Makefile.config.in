@@ -37,10 +37,15 @@ exec_prefix=@exec_prefix@
 ### Where to install the binaries
 BINDIR=@bindir@
 
+### Location of ocamlrun on the target system (path embedded in bytecode
+# executables)
+TARGET_BINDIR=@target_bindir@
+
 datarootdir=@datarootdir@
 
 ### Where to install the standard library
 LIBDIR=@libdir@
+LIBDIR_REL=@bindir_to_libdir@
 
 ### Where to install the stub code for the standard library
 STUBLIBDIR=@libdir@/stublibs
@@ -56,7 +61,9 @@ LIBRARIES_MAN_SECTION=@libraries_man_section@
 ### Beware: on some systems (e.g. SunOS 4), this will work only if
 ### the string "#!$(BINDIR)/ocamlrun" is less than 32 characters long.
 ### In doubt, set HASHBANGSCRIPTS to false.
-HASHBANGSCRIPTS=@hashbangscripts@
+SHEBANGSCRIPTS=@shebangscripts@
+# For compatibility
+HASHBANGSCRIPTS:=$(SHEBANGSCRIPTS)
 
 ### Path to the libtool script
 LIBTOOL = $(TOP_BUILDDIR)/libtool
@@ -209,7 +216,7 @@ OCAMLOPT_CPPFLAGS=@ocamlopt_cppflags@
 NATIVECCLIBS=@nativecclibs@
 SYSTHREAD_SUPPORT=@systhread_support@
 PACKLD=@PACKLD@
-IFLEXDIR=@iflexdir@
+FLEXDLL_CHAIN=@flexdll_chain@
 EXTRALIBS=@extralibs@
 CCOMPTYPE=@ccomptype@
 TOOLCHAIN=@toolchain@
@@ -229,6 +236,7 @@ RUNTIMEI=@instrumented_runtime@
 WITH_DEBUGGER=@with_debugger@
 WITH_CAMLTEX=@with_camltex@
 WITH_OCAMLDOC=@ocamldoc@
+WITH_OCAMLTEST=@ocamltest@
 ASM_CFI_SUPPORTED=@asm_cfi_supported@
 WITH_FRAME_POINTERS=@frame_pointers@
 WITH_SPACETIME=@spacetime@
@@ -250,6 +258,20 @@ AFL_INSTRUMENT=@afl@
 MAX_TESTSUITE_DIR_RETRIES=@max_testsuite_dir_retries@
 FLAT_FLOAT_ARRAY=@flat_float_array@
 AWK=@AWK@
+STDLIB_MANPAGES=@stdlib_manpages@
+
+
+### Native command to build ocamlrun.exe
+
+ifeq "$(TOOLCHAIN)" "msvc"
+  MERGEMANIFESTEXE=test ! -f $(1).manifest \
+          || mt -nologo -outputresource:$(1) -manifest $(1).manifest \
+          && rm -f $(1).manifest
+  MKEXE_BOOT=$(CC) $(OC_CFLAGS) $(OUTPUTEXE)$(1) $(2) \
+    /link /subsystem:console $(OC_LDFLAGS) && ($(MERGEMANIFESTEXE))
+else
+  MKEXE_BOOT=$(CC) $(OC_CFLAGS) $(OC_LDFLAGS) $(OUTPUTEXE)$(1) $(2)
+endif # ifeq "$(TOOLCHAIN)" "msvc"
 
 # The following variables were defined only in the config/Makefile.* files.
 # They were not defined by the configure script used on Unix systems,
@@ -266,25 +288,15 @@ ifeq "$(UNIX_OR_WIN32)" "win32"
   FIND=/usr/bin/find
   SORT=/usr/bin/sort
   SET_LD_PATH=PATH="$(PATH):$(LD_PATH)"
-  FLEXLINK_CMD=flexlink
   MKEXE_ANSI=$(FLEXLINK) -exe
-  FLEXDLL_CHAIN=@flexdll_chain@
-  # FLEXLINK_FLAGS must be safe to insert in an OCaml string
-  #   (see ocamlmklibconfig.ml in tools/Makefile)
-  FLEXLINK_FLAGS=@flexlink_flags@
-  FLEXLINK=$(FLEXLINK_CMD) $(FLEXLINK_FLAGS)
-
-  ### Native command to build ocamlrun.exe
-
-  ifeq "$(TOOLCHAIN)" "mingw"
-    MKEXE_BOOT=$(CC) $(OC_CFLAGS) $(OC_LDFLAGS) $(OUTPUTEXE)$(1) $(2)
-  endif # ifeq "$(TOOLCHAIN)" "mingw"
-
-  ifeq "$(TOOLCHAIN)" "msvc"
-    MERGEMANIFESTEXE=test ! -f $(1).manifest \
-	           || mt -nologo -outputresource:$(1) -manifest $(1).manifest \
-	           && rm -f $(1).manifest
-    MKEXE_BOOT=$(CC) $(OC_CFLAGS) $(OUTPUTEXE)$(1) $(2) \
-      /link /subsystem:console $(OC_LDFLAGS) && ($(MERGEMANIFESTEXE))
-  endif # ifeq "$(TOOLCHAIN)" "msvc"
 endif # ifeq "$(UNIX_OR_WIN32)" "win32"
+
+FLEXLINK_FLAGS=@flexlink_flags@
+FLEXLINK_CMD=flexlink
+FLEXLINK=$(FLEXLINK_CMD) $(FLEXLINK_FLAGS)
+
+BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
+
+# RuntimeID values
+BYTECODE_RUNTIME_ID=@bytecode_runtime_id@
+NATIVE_RUNTIME_ID=@native_runtime_id@

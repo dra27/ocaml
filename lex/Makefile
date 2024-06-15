@@ -17,18 +17,19 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 CAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc
 
 CAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc -strict-sequence -nostdlib \
-        -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
+        -I $(ROOTDIR)/boot
 CAMLOPT = $(CAMLRUN) $(ROOTDIR)/ocamlopt -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS = $(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
             -safe-string -strict-sequence -strict-formats -bin-annot
 LINKFLAGS =
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 YACCFLAGS = -v
 CAMLLEX = $(CAMLRUN) $(ROOTDIR)/boot/ocamllex
 CAMLDEP = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc -depend
@@ -44,14 +45,14 @@ allopt: ocamllex.opt
 opt.opt: allopt
 
 ocamllex: $(OBJS)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o ocamllex $(OBJS)
+	$(CAMLC) $(LINKFLAGS) $(BYTELINK_FLAGS) -compat-32 -o ocamllex $(OBJS)
 
 ocamllex.opt: $(OBJS:.cmo=.cmx)
-	$(CAMLOPT_CMD) -o ocamllex.opt $(OBJS:.cmo=.cmx)
+	$(CAMLOPT_CMD) $(DOTOPT_LINKFLAGS) -o ocamllex.opt $(OBJS:.cmo=.cmx)
 
 clean::
 	rm -f ocamllex ocamllex.opt
-	rm -f *.cmo *.cmi *.cmx *.cmt *.cmti *.$(O) *~
+	rm -f *.cmo *.cmi *.cmx *.cmt *.cmti *.o *.obj *~
 
 parser.ml parser.mli: parser.mly
 	$(CAMLYACC) $(YACCFLAGS) parser.mly
