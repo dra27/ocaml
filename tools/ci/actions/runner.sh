@@ -50,7 +50,7 @@ EOF
     ./configure $configure_flags
     ;;
   i386)
-    ./configure --build=x86_64-pc-linux-gnu --host=i386-linux \
+    ./configure --build=x86_64-pc-linux-gnu --host=i386-pc-linux-gnu \
       CC='gcc -m32 -march=x86-64' \
       AS='as --32' \
       ASPP='gcc -m32 -march=x86-64 -c' \
@@ -65,7 +65,11 @@ EOF
 }
 
 Build () {
-  script --return --command "$MAKE_WARN world.opt" build.log
+  if [ "$(uname)" = 'Darwin' ]; then
+    script -q build.log $MAKE_WARN world.opt
+  else
+    script --return --command "$MAKE_WARN world.opt" build.log
+  fi
   echo Ensuring that all names are prefixed in the runtime
   ./tools/check-symbol-names runtime/*.a
 }
@@ -73,9 +77,10 @@ Build () {
 Test () {
   cd testsuite
   echo Running the testsuite with the normal runtime
-  $MAKE all
+  $MAKE parallel
   echo Running the testsuite with the debug runtime
-  $MAKE USE_RUNTIME='d' OCAMLTESTDIR="$(pwd)/_ocamltestd" TESTLOG=_logd all
+  $MAKE USE_RUNTIME='d' OCAMLTESTDIR='$(BASEDIR_HOST)/$(DIR)/_ocamltestd' \
+        TESTLOG=_logd parallel
   cd ..
 }
 

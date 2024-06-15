@@ -105,7 +105,7 @@ otherlibs/win32unix/symlink.c     typo.long-line
 runtime/sak.c            typo.non-ascii
 runtime/caml/compatibility.h    typo.very-long-line
 
-stdlib/hashbang     typo.white-at-eol typo.missing-lf
+stdlib/camlheader.sh.in  typo.long-line
 
 testsuite/tests/**                                      typo.missing-header typo.long-line=may
 testsuite/tests/lib-bigarray-2/bigarrf.f                typo.tab

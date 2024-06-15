@@ -37,6 +37,12 @@ SUBST_QUOTE=$(call SUBST_QUOTE2,$1,$($1))
 FLEXLINK_LDFLAGS=$(if $(OC_LDFLAGS), -link "$(OC_LDFLAGS)")
 FLEXLINK_DLL_LDFLAGS=$(if $(OC_DLL_LDFLAGS), -link "$(OC_DLL_LDFLAGS)")
 
+ifeq "$(LIBDIR_REL)" ""
+  BINDIR_REL = $(BINDIR)
+else
+  BINDIR_REL =
+endif
+
 config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	sed $(call SUBST,AFL_INSTRUMENT) \
 	    $(call SUBST,ARCH) \
@@ -58,7 +64,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST_STRING,FLEXLINK_FLAGS) \
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST,HOST) \
-	    $(call SUBST_STRING,BINDIR) \
+	    $(call SUBST_STRING,BINDIR_REL) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL) \
 	    $(call SUBST_STRING,MKEXE) \
@@ -89,6 +95,9 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,FUNCTION_SECTIONS) \
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
+	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
+	    $(call SUBST_STRING,ZINC_RUNTIME_ID) \
+	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \
 	    $< > $@
 
 # Test for the substitution functions above

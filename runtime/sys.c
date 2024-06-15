@@ -61,6 +61,10 @@
 #include "caml/callback.h"
 #include "caml/startup_aux.h"
 
+
+char_os * caml_standard_library = NULL;
+char_os * caml_relative_root_dir = NULL;
+
 static char * error_message(void)
 {
   return strerror(errno);
@@ -417,6 +421,7 @@ CAMLprim value caml_sys_getenv(value var)
 }
 
 char_os * caml_exe_name;
+char_os * caml_proc_exe_name;
 static value main_argv;
 
 CAMLprim value caml_sys_get_argv(value unit)
@@ -446,7 +451,12 @@ CAMLprim value caml_sys_executable_name(value unit)
   return caml_copy_string_of_os(caml_exe_name);
 }
 
-void caml_sys_init(char_os * exe_name, char_os **argv)
+CAMLprim value caml_sys_interpreter_name(value unit)
+{
+  return caml_copy_string_of_os(caml_proc_exe_name);
+}
+
+void caml_sys_init(char_os * proc_exe_name, char_os * exe_name, char_os **argv)
 {
 #ifdef _WIN32
   /* Initialises the caml_win32_* globals on Windows with the version of
@@ -457,6 +467,7 @@ void caml_sys_init(char_os * exe_name, char_os **argv)
 #endif
 #endif
   caml_exe_name = exe_name;
+  caml_proc_exe_name = (proc_exe_name ? proc_exe_name : exe_name);
   main_argv = caml_alloc_array((void *)caml_copy_string_of_os,
                                (char const **) argv);
   caml_register_generational_global_root(&main_argv);
@@ -661,6 +672,30 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 {
   return Val_int(1); /* Bytecode backed */
 }
+
+CAMLprim value caml_sys_get_stdlib_dirs(value unit)
+{
+  CAMLparam0();
+  CAMLlocal4(result, def, eff, root_dir);
+#ifdef NATIVE_CODE
+  if (caml_standard_library == NULL)
+    caml_locate_standard_library(caml_exe_name);
+#endif
+  def = caml_copy_string_of_os(caml_standard_library_default);
+  if (caml_relative_root_dir != NULL) {
+    root_dir = caml_copy_string_of_os(caml_relative_root_dir);
+    root_dir = caml_alloc_some(root_dir);
+  } else {
+    root_dir = Val_none;
+  }
+  eff = caml_copy_string_of_os(caml_standard_library);
+  result = caml_alloc_small(3, 0);
+  Field(result, 0) = def;
+  Field(result, 1) = eff;
+  Field(result, 2) = root_dir;
+  CAMLreturn(result);
+}
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */

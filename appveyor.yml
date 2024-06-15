@@ -21,6 +21,9 @@ image: Visual Studio 2015
 # Do a shallow clone of the repo to speed up the build
 clone_depth: 1
 
+# Do not build feature branch with open Pull Requests
+skip_branch_with_pr: true
+
 environment:
   global:
     CYG_ROOT: C:/cygwin64
@@ -41,9 +44,6 @@ environment:
       BUILD_MODE: C
       SDK: |-
         "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
-
-matrix:
-  fast_finish: true
 
 cache:
   - C:\cygwin64\var\cache\setup

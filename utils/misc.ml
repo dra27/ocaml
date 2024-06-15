@@ -225,8 +225,23 @@ module Stdlib = struct
       in
       loop 0
 
+    let rtrim_cr s =
+      if s = "" then s
+      else
+        let len = String.length s in
+        let i = ref len in
+        while !i > 0 && s.[!i - 1] = '\r' do
+          decr i
+        done;
+        if !i <> len then
+          String.sub s 0 !i
+        else
+          s
+
     let print ppf t =
       Format.pp_print_string ppf t
+
+    external escaped_c : string -> string = "caml_format_c_string_literal"
   end
 
   external compare : 'a -> 'a -> int = "%compare"
@@ -1123,4 +1138,19 @@ module Magic_number = struct
          match check_current kind info with
            | Error err -> Error (Unexpected_error err)
            | Ok () -> Ok info
+end
+
+module RuntimeID = struct
+  let make_zinc ~static ~int31 release_number ~is_release =
+    if release_number > 63 then
+      invalid_arg "Invalid release_number";
+    let alphabet = "0123456789abcdefghijklmnopqrstuv" in
+    let zinc_id =
+      (if static then 0x100 else 0) lor
+      (if int31 then 0x80 else 0) lor
+      (release_number lsl 1) lor
+      (if is_release then 1 else 0)
+    in
+    Printf.sprintf
+      "00%c%c" alphabet.[zinc_id lsr 5] alphabet.[zinc_id land 0x1f]
 end
