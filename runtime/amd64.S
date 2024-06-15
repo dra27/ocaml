@@ -77,8 +77,12 @@
 #if defined(SYS_linux) || defined(SYS_gnu)
 #define ENDFUNCTION(name) \
         .size name, . - name
+#define ENDOBJECT(name) \
+        .type name, @object; \
+        .size name, . - name;
 #else
 #define ENDFUNCTION(name)
+#define ENDOBJECT(name)
 #endif
 
 #ifdef ASM_CFI_SUPPORTED
@@ -703,6 +707,7 @@ G(caml_system__frametable):
         .quad   LBL(107)    /* return address into callback */
         .value  -1          /* negative frame size => use callback link */
         .value  0           /* no roots here */
+        ENDOBJECT(G(caml_system__frametable))
         .align  EIGHT_ALIGN
         .quad   16
         .quad   0

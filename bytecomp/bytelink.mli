@@ -35,6 +35,7 @@ type error =
   | Cannot_open_dll of filepath
   | Required_module_unavailable of modname
   | Camlheader of string * filepath
+  | Needs_custom_runtime of filepath
 
 exception Error of error
 

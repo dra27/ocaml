@@ -81,6 +81,12 @@ let print_cmo_infos cu =
 let print_spaced_string s =
   printf " %s" s
 
+let dllib (suffixed, name) =
+  if suffixed then
+    Printf.sprintf "%s-<target>-<bytecode-runtime-id>" name
+  else
+    name
+
 let print_cma_infos (lib : Cmo_format.library) =
   printf "Force custom: %s\n" (if lib.lib_custom then "YES" else "no");
   printf "Extra C object files:";
@@ -90,7 +96,7 @@ let print_cma_infos (lib : Cmo_format.library) =
   List.iter print_spaced_string (List.rev lib.lib_ccopts);
   printf "\n";
   print_string "Extra dynamically-loaded libraries:";
-  List.iter print_spaced_string (List.rev lib.lib_dllibs);
+  List.iter print_spaced_string (List.rev_map dllib lib.lib_dllibs);
   printf "\n";
   List.iter print_cmo_infos lib.lib_units
 

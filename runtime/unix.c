@@ -30,7 +30,8 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include "caml/config.h"
-#ifdef SUPPORT_DYNAMIC_LINKING
+#if defined(SUPPORT_DYNAMIC_LINKING) && !defined(BUILDING_LIBCAMLRUNS)
+#define WITH_DYNAMIC_LINKING
 #ifdef __CYGWIN__
 #include "flexdll.h"
 #else
@@ -44,6 +45,9 @@
 #include <dirent.h>
 #else
 #include <sys/dir.h>
+#endif
+#ifdef HAS_LIBGEN_H
+#include <libgen.h>
 #endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
@@ -114,9 +118,12 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
   return retcode;
 }
 
-caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
+static caml_stat_string decompose_path(struct ext_table * tbl,
+                                       char * path,
+                                       int dup)
 {
   char * p, * q;
+  char c;
   size_t n;
 
   if (path == NULL) return NULL;
@@ -124,13 +131,26 @@ caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
   q = p;
   while (1) {
     for (n = 0; q[n] != 0 && q[n] != ':'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
-    q = q + n;
-    if (*q == 0) break;
-    *q = 0;
-    q += 1;
+    c = q[n];
+    q[n] = 0;
+    if (dup)
+      caml_ext_table_add(tbl, caml_stat_strdup(q));
+    else
+      caml_ext_table_add(tbl, q);
+    if (c == 0) break;
+    q = q + n + 1;
+  }
+  if (dup) {
+    free(p);
+    p = NULL;
   }
   return p;
+}
+
+void caml_decompose_path(struct ext_table * tbl, char * path)
+{
+  decompose_path(tbl, path, 1);
+  return;
 }
 
 caml_stat_string caml_search_in_path(struct ext_table * path, const char * name)
@@ -209,7 +229,7 @@ caml_stat_string caml_search_exe_in_path(const char * name)
   caml_stat_string res;
 
   caml_ext_table_init(&path, 8);
-  tofree = caml_decompose_path(&path, getenv("PATH"));
+  tofree = decompose_path(&path, getenv("PATH"), 0);
 #ifndef __CYGWIN__
   res = caml_search_in_path(&path, name);
 #else
@@ -232,7 +252,7 @@ caml_stat_string caml_search_dll_in_path(struct ext_table * path,
   return res;
 }
 
-#ifdef SUPPORT_DYNAMIC_LINKING
+#ifdef WITH_DYNAMIC_LINKING
 #ifdef __CYGWIN__
 /* Use flexdll */
 
@@ -263,7 +283,7 @@ char * caml_dlerror(void)
   return flexdll_dlerror();
 }
 
-#else
+#else /* ! __CYGWIN__ */
 /* Use normal dlopen */
 
 #ifndef RTLD_GLOBAL
@@ -303,7 +323,7 @@ char * caml_dlerror(void)
   return (char*) dlerror();
 }
 
-#endif
+#endif /* __CYGWIN__ */
 #else
 
 void * caml_dlopen(char * libname, int for_execution, int global)
@@ -330,7 +350,7 @@ char * caml_dlerror(void)
   return "dynamic loading not supported on this platform";
 }
 
-#endif
+#endif /* WITH_DYNAMIC_LINKING */
 
 /* Add to [contents] the (short) names of the files contained in
    the directory named [dirname].  No entries are added for [.] and [..].
@@ -439,4 +459,67 @@ int caml_num_rows_fd(int fd)
 #else
   return -1;
 #endif
+}
+
+static char * caml_dirname (const char * path)
+{
+#ifdef HAS_LIBGEN_H
+  char *dir, *res;
+  dir = caml_stat_strdup(path);
+  res = caml_stat_strdup(dirname(dir));
+  caml_stat_free(dir);
+  return res;
+#else
+  /* See Filename.generic_dirname */
+  size_t n = strlen(path) - 1;
+  char *res;
+  if (n < 0) /* path is "" */
+    return caml_stat_strdup(".");
+  while (n >= 0 && path[n] == '/')
+    n--;
+  if (n < 0) /* path is entirely slashes */
+    return caml_stat_strdup("/");
+  while (n >= 0 && path[n] != '/')
+    n--;
+  if (n < 0) /* path is relative */
+    return caml_stat_strdup(".");
+  while (n >= 0 && path[n] == '/')
+    n--;
+  if (n < 0) /* path is a file at root */
+    return caml_stat_strdup("/");
+  /* n is the _index_ of the last character of the dirname */
+  res = caml_stat_alloc(n + 2);
+  memcpy(res, path, n + 1);
+  res[n + 1] = 0;
+  return res;
+#endif
+}
+
+CAMLextern void caml_locate_standard_library (const char *exe_name)
+{
+  if (Is_relative_dir(caml_standard_library_default)) {
+    char * candidate;
+    char * root = caml_dirname(exe_name);
+    /* Determine the standard library default relative to exe_name */
+    caml_relative_root_dir = root;
+    candidate = caml_stat_strconcat_os(3, caml_relative_root_dir,
+                                          CAML_DIR_SEP,
+                                          caml_standard_library_default);
+#ifndef HAS_REALPATH
+    caml_standard_library = candidate;
+#else
+    char * resolved_candidate = realpath(candidate, NULL);
+    /* If realpath fails, use the non-normalised path for error messages. */
+    if (resolved_candidate == NULL) {
+      caml_standard_library = candidate;
+    } else {
+      caml_stat_free(candidate);
+      /* caml_realpath uses malloc */
+      caml_standard_library = caml_stat_strdup_os(resolved_candidate);
+      free(resolved_candidate);
+    }
+#endif
+  } else {
+    caml_standard_library = caml_standard_library_default;
+  }
 }
