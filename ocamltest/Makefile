@@ -179,7 +179,7 @@ bytecode_modules := $(o_files) $(cmo_files)
 
 native_modules := $(o_files) $(cmx_files)
 
-directories := $(addprefix $(ROOTDIR)/,utils bytecomp parsing \
+directories := $(addprefix $(ROOTDIR)/,runtime utils bytecomp parsing \
                                        compilerlibs file_formats)
 
 include_directories := $(addprefix -I , $(directories))
@@ -218,7 +218,7 @@ ocamltest$(EXE): $(deps_byte) $(bytecode_modules)
 $(eval $(call PROGRAM_SYNONYM,ocamltest.opt))
 
 ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
-	$(ocamlopt_cmd) $(unix_include)-o $@ $^
+	$(ocamlopt_cmd) $(DOTOPT_LINKFLAGS) $(unix_include)-o $@ $^
 
 %.cmx: %.ml $(deps_opt)
 	$(ocamlopt) -c $<

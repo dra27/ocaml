@@ -44,10 +44,15 @@ exec_prefix=@exec_prefix@
 ### Where to install the binaries
 BINDIR=@bindir@
 
+### Location of ocamlrun on the target system (path embedded in bytecode
+# executables)
+TARGET_BINDIR=@target_bindir@
+
 datarootdir=@datarootdir@
 
 ### Where to install the standard library
 LIBDIR=@libdir@
+LIBDIR_REL=@bindir_to_libdir@
 
 ### Where to install the stub code for the standard library
 STUBLIBDIR=@libdir@/stublibs
@@ -64,7 +69,6 @@ LIBRARIES_MAN_DIR=$(MANDIR)/man3
 ### the string "#!$(BINDIR)/ocamlrun" is less than 32 characters long.
 ### In doubt, set HASHBANGSCRIPTS to false.
 SHEBANGSCRIPTS=@shebangscripts@
-LONG_SHEBANG=@long_shebang@
 # For compatibility
 HASHBANGSCRIPTS:=$(SHEBANGSCRIPTS)
 
@@ -246,6 +250,10 @@ FUNCTION_SECTIONS=@function_sections@
 AWK=@AWK@
 STDLIB_MANPAGES=@stdlib_manpages@
 NAKED_POINTERS=false
+
+# RuntimeID values
+BYTECODE_RUNTIME_ID=@bytecode_runtime_id@
+NATIVE_RUNTIME_ID=@native_runtime_id@
 
 # Deprecated variables
 

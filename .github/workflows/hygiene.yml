@@ -1,6 +1,5 @@
 name: Hygiene
 on:
-  push:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
