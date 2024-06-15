@@ -21,8 +21,8 @@
 
 ROOTDIR = ../..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
@@ -37,6 +37,7 @@ COMPFLAGS=-strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66 \
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
 endif
+BYTELINK_FLAGS = -use-prims $(ROOTDIR)/runtime/primitives
 
 COMPFLAGS += -I byte
 OPTCOMPFLAGS += -I native
@@ -227,7 +228,7 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 	cp $< $@
 
 extract_crc: dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $^
+	$(OCAMLC) $(BYTELINK_FLAGS) -o $@ $^
 
 install:
 	$(INSTALL_DATA) \
@@ -252,11 +253,12 @@ installopt:
 partialclean:
 	rm -f extract_crc *.cm[ioaxt] *.cmti *.cmxa \
 	      byte/*.cm[iot] byte/*.cmti \
-	      native/*.cm[ixt] native/*.cmti native/*.$(O) \
-	      $(LOCAL_SRC)/*.cm[ioaxt] $(LOCAL_SRC)/*.cmti $(LOCAL_SRC)/*.$(O)
+	      native/*.cm[ixt] native/*.cmti native/*.o native/*.obj \
+	      $(LOCAL_SRC)/*.cm[ioaxt] $(LOCAL_SRC)/*.cmti \
+        $(LOCAL_SRC)/*.o $(LOCAL_SRC)/*.obj
 
 clean: partialclean
-	rm -f *.$(A) *.$(O) *.so *.dll dynlink_platform_intf.mli \
+	rm -f *.a *.lib *.o *.obj *.so *.dll dynlink_platform_intf.mli \
 	      $(LOCAL_SRC)/*.ml $(LOCAL_SRC)/*.mli $(LOCAL_SRC)/Makefile \
 	      $(LOCAL_SRC)/.depend byte/dynlink.mli native/dynlink.mli
 

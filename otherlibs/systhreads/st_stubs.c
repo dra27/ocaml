@@ -140,6 +140,7 @@ static st_retcode caml_threadstatus_wait (value);
 #ifdef NATIVE_CODE
 extern struct longjmp_buffer caml_termination_jmpbuf;
 extern void (*caml_termination_hook)(void);
+extern int caml_stop_stack_overflow_detection(void);
 #endif
 
 /* Hook for scanning the stacks of the other threads */
@@ -172,7 +173,7 @@ static void caml_thread_scan_roots(scanning_action action)
 
 /* Saving and restoring runtime state in curr_thread */
 
-static inline void caml_thread_save_runtime_state(void)
+Caml_inline void caml_thread_save_runtime_state(void)
 {
 #ifdef NATIVE_CODE
   curr_thread->top_of_stack = Caml_state->top_of_stack;
@@ -201,7 +202,7 @@ static inline void caml_thread_save_runtime_state(void)
   curr_thread->memprof_suspended = caml_memprof_suspended;
 }
 
-static inline void caml_thread_restore_runtime_state(void)
+Caml_inline void caml_thread_restore_runtime_state(void)
 {
 #ifdef NATIVE_CODE
   Caml_state->top_of_stack = curr_thread->top_of_stack;
@@ -576,6 +577,7 @@ static ST_THREAD_FUNCTION caml_thread_start(void * arg)
     caml_thread_stop();
 #ifdef NATIVE_CODE
   }
+  caml_stop_stack_overflow_detection();
 #endif
   /* The thread now stops running */
   return 0;

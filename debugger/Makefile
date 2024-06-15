@@ -15,10 +15,11 @@
 
 ROOTDIR = ..
 
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+-include $(ROOTDIR)/Makefile.config
+-include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
 
+RUNTIMEDIR=$(ROOTDIR)/runtime
 DYNLINKDIR=$(ROOTDIR)/otherlibs/dynlink
 UNIXDIR=$(ROOTDIR)/otherlibs/$(UNIXLIB)
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
@@ -28,6 +29,11 @@ CAMLC=$(BEST_OCAMLC) -g -nostdlib -I $(ROOTDIR)/stdlib
 COMPFLAGS=$(INCLUDES) -absname -w +a-4-9-41-42-44-45-48 -warn-error A \
           -safe-string -strict-sequence -strict-formats
 LINKFLAGS=-linkall -I $(UNIXDIR) -I $(DYNLINKDIR)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+  LINKFLAGS += -use-prims $(ROOTDIR)/runtime/primitives
+else
+  LINKFLAGS += -custom -I $(RUNTIMEDIR) $(SET_RELATIVE_STDLIB)
+endif
 YACCFLAGS=
 CAMLLEX=$(BEST_OCAMLLEX)
 CAMLDEP=$(BEST_OCAMLDEP)
@@ -87,7 +93,7 @@ install:
 	$(INSTALL_PROG) ocamldebug$(EXE) "$(INSTALL_BINDIR)/ocamldebug$(EXE)"
 
 clean::
-	rm -f ocamldebug$(EXE)
+	rm -f ocamldebug ocamldebug.exe
 	rm -f *.cmo *.cmi
 
 .SUFFIXES:

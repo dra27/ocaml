@@ -48,6 +48,7 @@ _build
 /ocaml-*.cache
 /config.log
 /config.status
+/flexlink.opt
 /libtool
 /ocamlc.opt
 /expunge
@@ -67,8 +68,10 @@ _build
 /asmcomp/CSE.ml
 
 /boot/ocamlrun
+/boot/ocamlruns
 /boot/camlheader
 /boot/ocamlc.opt
+/boot/flexlink.byte
 
 /bytecomp/opcodes.ml
 /bytecomp/opcodes.mli
@@ -80,6 +83,8 @@ _build
 
 /emacs/ocamltags
 /emacs/*.elc
+
+/flexdll-sources
 
 /lambda/runtimedef.ml
 
@@ -190,14 +195,18 @@ _build
 /runtime/.gdb_history
 /runtime/*.d.c
 /runtime/*.pic.c
+/runtime/build_config.h
+/runtime/sak
 /runtime/domain_state32.inc
 /runtime/domain_state64.inc
 
 /stdlib/camlheader
+/stdlib/camlheader.sh
 /stdlib/target_camlheader
-/stdlib/camlheader[di]
-/stdlib/target_camlheader[di]
-/stdlib/camlheader_ur
+/stdlib/target_camlheader.shebang.in
+/stdlib/target_camlheader.sh
+/stdlib/target_camlheader.sh.in
+/stdlib/*.shebang
 /stdlib/labelled-*
 /stdlib/caml
 /stdlib/sys.ml
@@ -247,7 +256,6 @@ _build
 /tools/keywords
 /tools/ocamlmklib
 /tools/ocamlmklib.opt
-/tools/ocamlmklibconfig.ml
 /tools/objinfo_helper
 /tools/read_cmt
 /tools/read_cmt.opt
@@ -260,6 +268,7 @@ _build
 /tools/caml-tex
 
 /utils/config.ml
+/utils/config.mlp
 /utils/domainstate.ml
 /utils/domainstate.mli
 

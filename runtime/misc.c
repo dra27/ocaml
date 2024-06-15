@@ -90,6 +90,9 @@ CAMLexport void caml_fatal_error (char *msg, ...)
     fprintf (stderr, "\n");
   }
   va_end(ap);
+#if defined(_CALL_REPORTFAULT) && !defined(__MINGW32__)
+  _set_abort_behavior(0, _CALL_REPORTFAULT);
+#endif
   abort();
 }
 

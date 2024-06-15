@@ -467,8 +467,8 @@ color_t caml_allocation_color (void *hp)
   }
 }
 
-static inline value caml_alloc_shr_aux (mlsize_t wosize, tag_t tag, int track,
-                                        int raise_oom, uintnat profinfo)
+Caml_inline value caml_alloc_shr_aux (mlsize_t wosize, tag_t tag, int track,
+                                      int raise_oom, uintnat profinfo)
 {
   header_t *hp;
   value *new_block;
@@ -937,6 +937,18 @@ CAMLexport caml_stat_string caml_stat_strdup(const char *s)
   caml_stat_string result = caml_stat_strdup_noexc(s);
   if (result == NULL)
     caml_raise_out_of_memory();
+  return result;
+}
+
+CAMLexport caml_stat_string caml_stat_strndup(const char *s,
+                                              asize_t len, asize_t *out_len)
+{
+  caml_stat_block result = caml_stat_alloc_noexc(len);
+  if (result == NULL)
+    caml_raise_out_of_memory();
+  memcpy(result, s, len);
+  if (out_len != NULL)
+    *out_len = len;
   return result;
 }
 

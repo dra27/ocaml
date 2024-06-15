@@ -13,6 +13,8 @@
 #*                                                                        *
 #**************************************************************************
 
+.NOTPARALLEL:
+
 TOPDIR = ../..
 COMPFLAGS ?=
 RUNTIME_VARIANT ?=
@@ -47,4 +49,4 @@ testing.cmo : testing.cmi
 
 .PHONY: clean
 clean:
-	rm -f *.cm* *.$(O) *.$(A)
+	rm -f *.cm* *.o *.obj *.a *.lib
