@@ -157,6 +157,12 @@ let get_test_source_directory test_dirname =
     Sys.with_chdir test_dirname Sys.getcwd
   else test_dirname
 
+let canonicalise_slashes =
+  if Sys.win32 then
+    String.map (function '/' -> '\\' | c -> c)
+  else
+    Fun.id
+
 let get_test_build_directory_prefix test_dirname =
   let ocamltestdir_variable = "OCAMLTESTDIR" in
   let root =
@@ -164,7 +170,40 @@ let get_test_build_directory_prefix test_dirname =
       (Filename.concat (Sys.getcwd ()) "_ocamltest")
   in
   if test_dirname = "." then root
-  else Filename.concat root test_dirname
+  else
+    (* When building with make parallel or make one, the infrastructure sets
+       OCAMLTESTDIR to tests/path-to-test/_ocamltest. The original logic here
+       would then put the output of tests/path-to-test/test.ml in
+       tests/path-to-test/_ocamltest/tests/path-to-test/test. The additional
+       tests/path-to-test is not necessary for disambiguating, so this little
+       process here attempts to shorten it. *)
+    let root_dir =
+      if Filename.basename root = "_ocamltest" then
+        Filename.dirname root
+      else
+        root
+    in
+    (* Cygwin's sh won't execute a program where the path only contains
+       backslashes. This search therefore goes through a slightly silly dance
+       where any slashes are normalised to backslashes for the string
+       comparisons, but the results still use the original path so that any
+       normal slashes are preserved. *)
+    let root_dir = canonicalise_slashes root_dir in
+    (* Eliminate any prefixing directories of test_dirname which are suffixing
+       directories of root_dir. *)
+    let test_dirname =
+      let rec aux dir =
+        if dir = Filename.current_dir_name then
+          test_dirname
+        else
+          if String.ends_with ~suffix:(Filename.dir_sep ^ dir) root_dir then
+            let l = String.length dir in
+            String.sub test_dirname l (String.length test_dirname - l)
+          else
+            aux (Filename.dirname dir) in
+      aux (canonicalise_slashes test_dirname)
+    in
+    Filename.concat root test_dirname
 
 let tests_to_skip = ref []
 
