@@ -5694,6 +5694,226 @@ asmcomp/debug/reg_with_debug_info.cmx : \
 asmcomp/debug/reg_with_debug_info.cmi : \
     asmcomp/reg.cmi \
     middle_end/backend_var.cmi
+testsuite/tools/cmdline.cmo : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/cmdline.cmi
+testsuite/tools/cmdline.cmx : \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/cmdline.cmi
+testsuite/tools/cmdline.cmi : \
+    testsuite/tools/harness.cmi
+testsuite/tools/codegen_main.cmo : \
+    utils/profile.cmi \
+    testsuite/tools/parsecmmaux.cmi \
+    testsuite/tools/lexcmm.cmi \
+    asmcomp/emitaux.cmi \
+    asmcomp/emit.cmi \
+    middle_end/compilenv.cmi \
+    utils/clflags.cmi \
+    asmcomp/asmgen.cmi
+testsuite/tools/codegen_main.cmx : \
+    utils/profile.cmx \
+    testsuite/tools/parsecmmaux.cmx \
+    testsuite/tools/lexcmm.cmi \
+    asmcomp/emitaux.cmx \
+    asmcomp/emit.cmx \
+    middle_end/compilenv.cmx \
+    utils/clflags.cmx \
+    asmcomp/asmgen.cmx
+testsuite/tools/environment.cmo : \
+    testsuite/tools/harness.cmi \
+    utils/config.cmi \
+    bytecomp/bytesections.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/environment.cmx : \
+    testsuite/tools/harness.cmx \
+    utils/config.cmx \
+    bytecomp/bytesections.cmx \
+    testsuite/tools/environment.cmi
+testsuite/tools/environment.cmi : \
+    testsuite/tools/harness.cmi
+testsuite/tools/expect_test.cmo : \
+    utils/warnings.cmi \
+    toplevel/toploop.cmi \
+    parsing/printast.cmi \
+    parsing/pprintast.cmi \
+    parsing/parsetree.cmi \
+    parsing/parse.cmi \
+    utils/misc.cmi \
+    driver/main_args.cmi \
+    parsing/location.cmi \
+    driver/compmisc.cmi \
+    driver/compenv.cmi \
+    utils/clflags.cmi \
+    typing/btype.cmi \
+    parsing/asttypes.cmi \
+    parsing/ast_mapper.cmi
+testsuite/tools/expect_test.cmx : \
+    utils/warnings.cmx \
+    toplevel/toploop.cmx \
+    parsing/printast.cmx \
+    parsing/pprintast.cmx \
+    parsing/parsetree.cmi \
+    parsing/parse.cmx \
+    utils/misc.cmx \
+    driver/main_args.cmx \
+    parsing/location.cmx \
+    driver/compmisc.cmx \
+    driver/compenv.cmx \
+    utils/clflags.cmx \
+    typing/btype.cmx \
+    parsing/asttypes.cmi \
+    parsing/ast_mapper.cmx
+testsuite/tools/harness.cmo : \
+    utils/config.cmi \
+    testsuite/tools/harness.cmi
+testsuite/tools/harness.cmx : \
+    utils/config.cmx \
+    testsuite/tools/harness.cmi
+testsuite/tools/harness.cmi :
+testsuite/tools/lexcmm.cmi :
+testsuite/tools/parsecmmaux.cmo : \
+    parsing/location.cmi \
+    lambda/lambda.cmi \
+    lambda/debuginfo.cmi \
+    middle_end/backend_var.cmi \
+    testsuite/tools/parsecmmaux.cmi
+testsuite/tools/parsecmmaux.cmx : \
+    parsing/location.cmx \
+    lambda/lambda.cmx \
+    lambda/debuginfo.cmx \
+    middle_end/backend_var.cmx \
+    testsuite/tools/parsecmmaux.cmi
+testsuite/tools/parsecmmaux.cmi : \
+    parsing/location.cmi \
+    lambda/debuginfo.cmi \
+    middle_end/backend_var.cmi
+testsuite/tools/testBytecodeBinaries.cmo : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    testsuite/tools/testBytecodeBinaries.cmi
+testsuite/tools/testBytecodeBinaries.cmx : \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    testsuite/tools/testBytecodeBinaries.cmi
+testsuite/tools/testBytecodeBinaries.cmi : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/testDynlink.cmo : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    testsuite/tools/testDynlink.cmi
+testsuite/tools/testDynlink.cmx : \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    testsuite/tools/testDynlink.cmi
+testsuite/tools/testDynlink.cmi : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/testLinkModes.cmo : \
+    testsuite/tools/toolchain.cmi \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    utils/ccomp.cmi \
+    testsuite/tools/testLinkModes.cmi
+testsuite/tools/testLinkModes.cmx : \
+    testsuite/tools/toolchain.cmx \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    utils/ccomp.cmx \
+    testsuite/tools/testLinkModes.cmi
+testsuite/tools/testLinkModes.cmi : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/testRelocation.cmo : \
+    testsuite/tools/toolchain.cmi \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    testsuite/tools/testRelocation.cmi
+testsuite/tools/testRelocation.cmx : \
+    testsuite/tools/toolchain.cmx \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    testsuite/tools/testRelocation.cmi
+testsuite/tools/testRelocation.cmi : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/testToplevel.cmo : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    testsuite/tools/testToplevel.cmi
+testsuite/tools/testToplevel.cmx : \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    testsuite/tools/testToplevel.cmi
+testsuite/tools/testToplevel.cmi : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/test_in_prefix.cmo : \
+    testsuite/tools/toolchain.cmi \
+    testsuite/tools/test_ld_conf.cmi \
+    testsuite/tools/testToplevel.cmi \
+    testsuite/tools/testRelocation.cmi \
+    testsuite/tools/testLinkModes.cmi \
+    testsuite/tools/testDynlink.cmi \
+    testsuite/tools/testBytecodeBinaries.cmi \
+    utils/misc.cmi \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    driver/compmisc.cmi \
+    testsuite/tools/cmdline.cmi \
+    utils/clflags.cmi \
+    testsuite/tools/test_in_prefix.cmi
+testsuite/tools/test_in_prefix.cmx : \
+    testsuite/tools/toolchain.cmx \
+    testsuite/tools/test_ld_conf.cmx \
+    testsuite/tools/testToplevel.cmx \
+    testsuite/tools/testRelocation.cmx \
+    testsuite/tools/testLinkModes.cmx \
+    testsuite/tools/testDynlink.cmx \
+    testsuite/tools/testBytecodeBinaries.cmx \
+    utils/misc.cmx \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    driver/compmisc.cmx \
+    testsuite/tools/cmdline.cmx \
+    utils/clflags.cmx \
+    testsuite/tools/test_in_prefix.cmi
+testsuite/tools/test_in_prefix.cmi :
+testsuite/tools/test_ld_conf.cmo : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi \
+    utils/config.cmi \
+    testsuite/tools/test_ld_conf.cmi
+testsuite/tools/test_ld_conf.cmx : \
+    testsuite/tools/harness.cmx \
+    testsuite/tools/environment.cmx \
+    utils/config.cmx \
+    testsuite/tools/test_ld_conf.cmi
+testsuite/tools/test_ld_conf.cmi : \
+    testsuite/tools/harness.cmi \
+    testsuite/tools/environment.cmi
+testsuite/tools/toolchain.cmo : \
+    testsuite/tools/harness.cmi \
+    utils/config.cmi \
+    testsuite/tools/toolchain.cmi
+testsuite/tools/toolchain.cmx : \
+    testsuite/tools/harness.cmx \
+    utils/config.cmx \
+    testsuite/tools/toolchain.cmi
+testsuite/tools/toolchain.cmi :
 driver/compenv.cmo : \
     utils/warnings.cmi \
     utils/profile.cmi \
