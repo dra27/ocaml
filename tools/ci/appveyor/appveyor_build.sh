@@ -95,11 +95,13 @@ function set_configuration {
 
     # Remove configure cache if the script has failed
     if ! ./configure --cache-file="$CACHE_FILE" $dep $build $man $host \
-                     --prefix="$2" --enable-ocamltest ; then
+                     --prefix="$2" --enable-ocamltest \
+                     --enable-native-toplevel ; then
         rm -f -- "$CACHE_FILE"
         local failed
         ./configure --cache-file="$CACHE_FILE" $dep $build $man $host \
                     --prefix="$2" --enable-ocamltest \
+                    --enable-native-toplevel \
             || failed=$?
         if ((failed)) ; then cat config.log ; exit $failed ; fi
     fi
@@ -173,6 +175,9 @@ case "$1" in
     run "test $PORT" \
         make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    run "test installation of $PORT" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
