@@ -58,6 +58,7 @@ EOF
   call-configure --prefix="$PREFIX" \
                  --enable-flambda-invariants \
                  --enable-ocamltest \
+                 --enable-native-toplevel \
                  --disable-dependency-generation \
                  $CONFIG_ARG
 }
@@ -116,6 +117,10 @@ API_Docs () {
 
 Install () {
   $MAKE install
+}
+
+Test-In-Prefix () {
+  $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
 }
 
 Checks () {
@@ -207,6 +212,7 @@ test) Test parallel;;
 test_sequential) Test sequential;;
 api-docs) API_Docs;;
 install) Install;;
+test-in-prefix) Test-In-Prefix;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
