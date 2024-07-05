@@ -264,6 +264,8 @@ main_build() {
   eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
   grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
+  make_ocamlnat=$make_native
+  grep -q '^NATDYNLINK=false' Makefile.config && make_ocamlnat=false
 
   if $init_submodule; then
     $make $jobs --warn-undefined-variables flexdll
@@ -274,6 +276,9 @@ main_build() {
     $make $jobs --warn-undefined-variables coreboot
     if $make_native; then
       $make $jobs --warn-undefined-variables opt.opt
+      if $make_ocamlnat; then
+        $make $jobs --warn-undefined-variables ocamlnat
+      fi
       if $init_submodule; then
         $make $jobs --warn-undefined-variables flexlink.opt
       fi
@@ -282,6 +287,9 @@ main_build() {
     fi
   else
     $make $jobs --warn-undefined-variables
+    if $make_ocamlnat; then
+      $make $jobs --warn-undefined-variables ocamlnat
+    fi
     if $make_native && $init_submodule; then
       $make $jobs --warn-undefined-variables flexlink.opt
     fi
@@ -292,6 +300,12 @@ main_build() {
   fi
 
   $make --warn-undefined-variables install
+  case $confoptions in
+    *--disable-unix-lib*) ;;         # test-in-prefix needs Unix lib
+    *)
+      $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+      ;;
+  esac
   rm -rf "$instdir"
 }
 
