@@ -8173,6 +8173,15 @@ tools/sync_dynlink.cmo : \
 tools/sync_dynlink.cmx : \
     tools/sync_dynlink.cmi
 tools/sync_dynlink.cmi :
+tools/test_install.cmo : \
+    otherlibs/unix/unix.cmi \
+    utils/config.cmi \
+    tools/test_install.cmi
+tools/test_install.cmx : \
+    otherlibs/unix/unix.cmx \
+    utils/config.cmx \
+    tools/test_install.cmi
+tools/test_install.cmi :
 debugger/breakpoints.cmo : \
     debugger/symbols.cmi \
     debugger/pos.cmi \
