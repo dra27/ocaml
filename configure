@@ -870,6 +870,7 @@ exeext
 ac_tool_prefix
 DIFF_FLAGS
 CC
+ocaml_cv_cc_vendor
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
 OCAML_VERSION_PATCHLEVEL
@@ -3245,6 +3246,7 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
@@ -3341,6 +3343,8 @@ OCAML_VERSION_SHORT=5.0
 
 
 ## Generated files
+
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
@@ -20659,6 +20663,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;
