@@ -21,6 +21,14 @@
 
 INSTALL ?= @INSTALL@
 
+SRCDIR_ABS = @ocamlsrcdir@
+
+### Whether the native compiler has been enabled or not
+NATIVE_COMPILER=@native_compiler@
+
+# The C compiler vendor
+OCAML_CC_VENDOR = @ocaml_cc_vendor@
+
 # This is munged into utils/config.ml, not overridable by other parts of
 # the build system.
 OC_DLL_LDFLAGS=@oc_dll_ldflags@
