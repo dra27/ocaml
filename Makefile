@@ -1989,6 +1989,37 @@ $(asmgen_OBJECT): $(asmgen_SOURCE)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 endif
 
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  stubs.c \
+  harness.mli harness.ml \
+  toolchain.mli toolchain.ml \
+  environment.mli environment.ml \
+  cmdline.mli cmdline.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = \
+  otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
+
+# Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
+$(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
+
+# test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
+testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+
+test_in_prefix_BYTECODE_LINKFLAGS += -custom
+
+testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
+
+testsuite/tools/dump_load_path$(EXE): \
+  testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
+	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+
 ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -custom -g
 
 ocamltest/ocamltest$(EXE): ocamlc ocamlyacc ocamllex
@@ -2035,7 +2066,11 @@ partialclean::
 	rm -f $(addprefix testsuite/lib/*.,cm* o obj a lib)
 	rm -f $(addprefix testsuite/tools/*.,cm* o obj a lib)
 	rm -f testsuite/tools/codegen testsuite/tools/codegen.exe
+	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
 	rm -f testsuite/tools/expect testsuite/tools/expect.exe
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
 	rm -f testsuite/tools/lexcmm.ml
 	rm -f $(addprefix testsuite/tools/parsecmm., ml mli output)
 
@@ -2632,6 +2667,7 @@ endif
 	$(MAKE) -C manual distclean
 	rm -f ocamldoc/META
 	rm -f $(addprefix ocamltest/,ocamltest_config.ml ocamltest_unix.ml)
+	rm -f testsuite/tools/toolchain.ml
 	rm -f otherlibs/dynlink/META otherlibs/dynlink/dynlink_config.ml \
 	  otherlibs/dynlink/dynlink_cmo_format.mli \
 	  otherlibs/dynlink/dynlink_cmxs_format.mli \
