@@ -143,6 +143,10 @@ Install () {
   $MAKE install
 }
 
+Test-In-Prefix () {
+  $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
+}
+
 Checks () {
   if fgrep 'SUPPORTS_SHARED_LIBRARIES=true' Makefile.config &>/dev/null ; then
     echo Check the code examples in the manual
@@ -232,6 +236,7 @@ test_sequential) Test sequential;;
 test_prefix) TestPrefix $2;;
 api-docs) API_Docs;;
 install) Install;;
+test-in-prefix) Test-In-Prefix;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
