@@ -244,6 +244,7 @@ eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
 if $make_native; then
   $make $jobs world.opt
+  $make $jobs ocamlnat
   if $check_make_alldepend; then $make alldepend; fi
 else
   $make $jobs world
@@ -255,6 +256,7 @@ if $dorebase; then
     rebase -b 0x7cdc0000 otherlibs/systhreads/dllthreads.so
 fi
 $make install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
 
 rm -rf "$instdir"
 cd testsuite
