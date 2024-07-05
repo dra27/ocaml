@@ -134,6 +134,10 @@ jobs:
         if: matrix.id == 'normal'
         run: |
          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      - name: Test in prefix
+        if: matrix.id == 'normal'
+        run: |
+         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
         run: |
@@ -158,14 +162,17 @@ jobs:
           - name: macos-x86_64
             os: macos-13
             config_arg: --with-target-sh=exe
+            test-in-prefix: true
           - name: macos-arm64
             os: macos-14
+            test-in-prefix: true
           - name: static
             os: ubuntu-latest
-            config_arg: --disable-shared
+            config_arg: --disable-native-toplevel --disable-shared
+            test-in-prefix: true
           - name: minimal
             os: ubuntu-latest
-            config_arg: --disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc
+            config_arg: --disable-native-toplevel --disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc
       fail-fast: false
     steps:
       - name: Checkout
@@ -216,6 +223,14 @@ jobs:
           for dir in $PARALLEL_TESTS; do \
            bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test_prefix $dir"; \
           done
+      - name: Install
+        if: ${{ matrix.test-in-prefix }}
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh install
+      - name: Test in prefix
+        if: ${{ matrix.test-in-prefix }}
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
 
   i386:
     runs-on: ubuntu-latest
@@ -234,7 +249,7 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j CONFIG_ARG='--with-target-sh=exe' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel --with-target-sh=exe' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
@@ -242,3 +257,9 @@ jobs:
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-testsuite') }}
         run: |
           su ocaml -c "bash -xe tools/ci/actions/runner.sh test"
+      - name: Install
+        run: |
+          su ocaml -c "bash -xe tools/ci/actions/runner.sh install"
+      - name: Test in prefix
+        run: |
+          su ocaml -c "bash -xe tools/ci/actions/runner.sh test-in-prefix"
