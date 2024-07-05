@@ -27,7 +27,9 @@ let auto_include find_in_dir fn =
    then the standard library directory (unless the -nostdlib option is given).
  *)
 
-let init_path ?(auto_include=auto_include) ?(dir="") () =
+let reinit_path ?(auto_include=auto_include)
+                ?(standard_library=Config.standard_library)
+                ?(dir="") () =
   let dirs =
     if !Clflags.use_threads then "+threads" :: !Clflags.include_dirs
     else
@@ -41,14 +43,19 @@ let init_path ?(auto_include=auto_include) ?(dir="") () =
     !Compenv.first_include_dirs
   in
   let exp_dirs =
-    List.map (Misc.expand_directory Config.standard_library) dirs
+    List.map (Misc.expand_directory standard_library) dirs
   in
   let dirs =
+    let std_include =
+      if !Clflags.no_std_include then [] else [standard_library]
+    in
     (if !Clflags.no_cwd then [] else [dir])
-    @ List.rev_append exp_dirs (Clflags.std_include_dir ())
+    @ List.rev_append exp_dirs std_include
   in
   Load_path.init ~auto_include dirs;
   Env.reset_cache ()
+
+let init_path = reinit_path ?standard_library:None
 
 (* Return the initial environment in which compilation proceeds. *)
 
