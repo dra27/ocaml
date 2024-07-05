@@ -914,6 +914,7 @@ ac_tool_prefix
 CSCFLAGS
 CSC
 DIFF_FLAGS
+ocaml_cc_vendor
 CC
 LINEAR_MAGIC_NUMBER
 CMT_MAGIC_NUMBER
@@ -3388,6 +3389,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
 
+
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
@@ -3555,6 +3557,8 @@ ac_config_files="$ac_config_files otherlibs/dynlink/META"
 ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
+
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
 
 
 # Definitions related to the version of OCaml
@@ -20665,6 +20669,14 @@ case $enable_ocamltest,true in #(
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt
     ocamltest='ocamltest'
+    if $native_compiler
+then :
+  optional_native_tools="$optional_native_tools \
+testsuite/tools/test_in_prefix.opt"
+else $as_nop
+  optional_bytecode_tools="$optional_bytecode_tools \
+testsuite/tools/test_in_prefix"
+fi
     testsuite_tools='testsuite/tools/codegen testsuite/tools/expect'
     optional_bytecode_tools="$optional_bytecode_tools $testsuite_tools" ;; #(
   *) :
@@ -22187,6 +22199,7 @@ do
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "native-symlinks") CONFIG_COMMANDS="$CONFIG_COMMANDS native-symlinks" ;;
     "ocamldoc/META") CONFIG_FILES="$CONFIG_FILES ocamldoc/META" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
