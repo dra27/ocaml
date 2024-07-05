@@ -70,8 +70,7 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" \
-        '--enable-native-toplevel' '--enable-ocamltest')
+  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" '--enable-ocamltest')
 
   case "$1" in
     cygwin*)
@@ -224,7 +223,8 @@ case "$1" in
         # https://github.com/appveyor/ci/issues/1824
         build="-C ../$BUILD_PREFIX-$PORT"
         script --quiet --return --command \
-          "if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
+          "if ! $MAKE -j $build; then $MAKE $build; exit 1; fi && \
+$MAKE -C ../$BUILD_PREFIX-$PORT ocamlnat" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed --unbuffered \
                 -e 's/\d027\[K//g' \
@@ -237,7 +237,8 @@ case "$1" in
       run "$MAKE world" $MAKE world
       run "$MAKE bootstrap" $MAKE bootstrap
       run "$MAKE opt" $MAKE opt
-      run "$MAKE opt.opt" $MAKE opt.opt;;
+      run "$MAKE opt.opt" $MAKE opt.opt
+      run "$MAKE ocamlnat" $MAKE ocamlnat;;
     C)
       run "$MAKE world" $MAKE world
       run "$MAKE runtimeopt" $MAKE runtimeopt
