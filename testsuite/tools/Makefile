@@ -64,7 +64,7 @@ include $(BASEDIR)/makefiles/Makefile.common
 .PHONY: clean
 clean: defaultclean
 	rm -f $(expect_PROG)
-	rm -f codegen parsecmm.ml parsecmm.mli lexcmm.ml
+	rm -f codegen parsecmm.ml parsecmm.mli lexcmm.ml *.cmt *.cmti
 
 expect_test.cmo: COMPFLAGS=$(expect_COMPFLAGS)
 
