@@ -167,10 +167,10 @@ jobs:
                 // # Add "static" and "minimal" jobs
                 jobs = jobs.concat([
                   {name: 'static', os: 'ubuntu-latest',
-                   config_arg: '--disable-native-toplevel --disable-shared',
+                   config_arg: '--disable-shared',
                    'test-in-prefix': true},
                   {name: 'minimal', os: 'ubuntu-latest',
-                   config_arg: '--disable-native-toplevel --disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc'}]);
+                   config_arg: '--disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc'}]);
               }
             }
             return jobs;
@@ -241,7 +241,7 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
