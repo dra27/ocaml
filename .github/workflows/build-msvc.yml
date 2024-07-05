@@ -94,14 +94,18 @@ jobs:
         env:
           HOST: ${{ matrix.x86_64 && 'x86_64-pc-windows' || 'i686-pc-windows' }}
           CC: ${{ matrix.cc }}
+          CONFIGURE_FLAGS: >-
+            --cache-file=config.cache
+            --prefix "$PROGRAMFILES/Бактріан🐫"
+            --host=$HOST
+            CC=$CC
+            --enable-ocamltest
         run: >-
           eval $(tools/msvs-promote-path) ;
-          if ! ./configure --cache-file=config.cache --host=$HOST CC=$CC
-          --prefix "$PROGRAMFILES/Бактріан🐫"; then
+          if ! ./configure ${{ env.CONFIGURE_FLAGS }} ; then
           rm -rf config.cache ;
           failed=0 ;
-          ./configure --cache-file=config.cache --host=$HOST CC=$CC
-          --prefix "$PROGRAMFILES/Бактріан🐫"
+          ./configure ${{ env.CONFIGURE_FLAGS }} \
           || failed=$?;
           if ((failed)) ; then cat config.log ; exit $failed ; fi ;
           fi ;
