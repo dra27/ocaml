@@ -225,6 +225,6 @@ let () =
   List.iter
     (function `Some f -> assert (f env = `None) | `None -> ()) programs;
   (* 4. Finally re-run the main test battery in the new prefix *)
-  Compmisc.reinit_path ~standard_library:libdir ();
+  Compmisc.init_path ~standard_library:libdir ();
   let programs = run_tests env in
   assert (List.for_all (function `None -> true | _ -> false) programs)
