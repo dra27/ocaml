@@ -15,6 +15,7 @@
 open Harness.Import
 
 let c_compiler_vendor = {@QS@|@ocaml_cc_vendor@|@QS@}
+let compression_c_libraries = {@QS@|@zstd_libs@|@QS@}
 
 (* cf. OCAML_CC_VENDOR in aclocal.m4 and utils.config.mli *)
 let is_clang =

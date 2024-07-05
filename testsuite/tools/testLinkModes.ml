@@ -492,7 +492,8 @@ let compile_test usr_bin_sh config env test test_program description =
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Static) ->
           f ~mode:Native
-            ~clibs:["-lcomprmarsh"; "-lunixnat"; Config.compression_c_libraries]
+            ~clibs:["-lcomprmarsh"; "-lunixnat";
+                    Toolchain.compression_c_libraries]
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Shared) ->
           (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
@@ -502,7 +503,8 @@ let compile_test usr_bin_sh config env test test_program description =
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
           f ~mode:Native ~use_shared_runtime:true ~may_segfault
-            ~clibs:["-lcomprmarsh"; "-lunixnat"; Config.compression_c_libraries]
+            ~clibs:["-lcomprmarsh"; "-lunixnat";
+                    Toolchain.compression_c_libraries]
             ~linker_exit_code ["-output-obj"]
       | Output_complete_obj(C_ocamlc, Static) ->
           (* At the moment, the partial linker will pass -lws2_32 and -ladvapi32
@@ -532,7 +534,7 @@ let compile_test usr_bin_sh config env test test_program description =
           (* At the moment, the partial linker will pass -lzstd to ld -r which
              will (normally) fail). Until this is done, pass the libraries
              manually, using -noautolink. *)
-          f ~mode:Native ~clibs:[Config.compression_c_libraries]
+          f ~mode:Native ~clibs:[Toolchain.compression_c_libraries]
             ~linker_exit_code
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
@@ -540,7 +542,7 @@ let compile_test usr_bin_sh config env test test_program description =
           (* ocamlopt doesn't correctly implement -runtime-variant _shared *)
           let compilation_exit_code = fails_if true in
           f ~mode:Native ~use_shared_runtime:true
-            ~compilation_exit_code ~clibs:[Config.compression_c_libraries]
+            ~compilation_exit_code ~clibs:[Toolchain.compression_c_libraries]
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
       | Output_complete_exe Static ->

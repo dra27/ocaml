@@ -39,7 +39,7 @@ else
 VERBOSE_FLAG =
 endif
 
-test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
+test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O) ../tools/dump_load_path$(EXE)
 	@$< $(DRIVER_ARGS)
 
 SCRUB_ENV = \
@@ -50,6 +50,7 @@ bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
 
 ../tools/test_in_prefix$(EXE) \
 ../tools/test_in_prefix.opt$(EXE): $(wildcard ../tools/*.ml*)
+../tools/dump_load_path$(EXE): ../tools/dump_load_path.c
 
 ../tools/%:
 	$(MAKE) -C $(ROOTDIR) testsuite/tools/$*
