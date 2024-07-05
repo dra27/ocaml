@@ -52,6 +52,7 @@ function run {
 function set_configuration {
   args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
         '--prefix' "$2" \
+        '--enable-native-toplevel' \
         '--enable-ocamltest')
 
   case "$1" in
@@ -124,6 +125,9 @@ case "$1" in
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
