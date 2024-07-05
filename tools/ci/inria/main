@@ -275,7 +275,7 @@ if test "$flambda" = "true"; then
 fi
 
 case $NODE_NAME in
-  *-32|ocaml-ppc-64-*)
+  *-32|ocaml-ppc-64-*|ocaml-zsystems|ocaml-riscv|ocaml-cygwin-64)
     # Native compilation not supported
     ;;
   *)
