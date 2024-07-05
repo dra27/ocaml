@@ -1863,6 +1863,19 @@ $(asmgen_OBJECT): $(asmgen_SOURCE)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 endif
 
+test_in_prefix_SOURCES = \
+  $(addprefix testsuite/tools/,test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_LIBRARIES = otherlibs/unix/unix compilerlibs/ocamlcommon
+
+testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
+
+testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix.%: \
+  OC_COMMON_COMPFLAGS += -rectypes
+
 ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 
 ocamltest/ocamltest$(EXE): ocamlc ocamlyacc ocamllex
@@ -1910,6 +1923,9 @@ partialclean::
 	rm -f $(addprefix testsuite/tools/*.,cm* o obj a lib)
 	rm -f testsuite/tools/codegen testsuite/tools/codegen.exe
 	rm -f testsuite/tools/expect testsuite/tools/expect.exe
+	rm -f testsuite/tools/test_in_prefix testsuite/tools/test_in_prefix.exe
+	rm -f testsuite/tools/test_in_prefix.opt \
+        testsuite/tools/test_in_prefix.opt.exe
 	rm -f testsuite/tools/lexcmm.ml
 	rm -f $(addprefix testsuite/tools/parsecmm., ml mli output)
 
