@@ -311,6 +311,8 @@ META
 /tools/eventlog_metadata
 /tools/lintapidiff.opt
 /tools/sync_dynlink.opt
+/tools/test_install.opt
+/tools/test_install.opt.exe
 
 /toplevel/byte/topeval.mli
 /toplevel/byte/trace.mli
