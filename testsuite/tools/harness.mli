@@ -73,6 +73,29 @@ module Import : sig
       (** Sorted list of basenames of libraries to test.
           Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
   }
+
+  module Char : sig
+    include module type of (struct include Char end)
+
+    module Ascii : sig
+      val is_letter : char -> bool
+    end
+  end
+
+  module Result : sig
+    include module type of (struct include Result end)
+
+    module Syntax : sig
+      val ( let+ ) : ('a, 'e) result -> ('a -> 'b) -> ('b, 'e) result
+      val ( and+ ) : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
+    end
+  end
+
+  module Sys : sig
+    include module type of (struct include Sys end)
+
+    val signal_to_string : int -> string
+  end
 end
 
 open Import

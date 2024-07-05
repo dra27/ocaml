@@ -105,8 +105,8 @@ let read_runtime_launch_info file =
     Harness.fail_because "%s: corrupt header" file
 
 let () =
-  let ~config, ~pwd, ~prefix, ~bindir:_, ~bindir_suffix, ~libdir,
-      ~libdir_suffix, ~summarise_only, ~verbose =
+  let config, pwd, prefix, _, bindir_suffix, libdir, libdir_suffix,
+      summarise_only, verbose =
     match Cmdline.parse Sys.argv with
     | Result.Error (code, msg) ->
         prerr_string msg;

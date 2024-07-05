@@ -12,6 +12,64 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Char = struct
+  include Char
+
+  module Ascii = struct
+    let is_letter = function 'A' .. 'Z' | 'a' .. 'z' -> true | _ -> false
+  end
+end
+
+module Result = struct
+  include Result
+
+  let product r0 r1 = match r0, r1 with
+  | (Error _ as r), _
+  | _, (Error _ as r) -> r
+  | Ok v0, Ok v1 -> Ok (v0, v1)
+
+  module Syntax = struct
+    let ( let+ ) r f = map f r
+    let ( and+ ) = product
+  end
+end
+
+module Sys = struct
+  include Sys
+
+  let signal_to_string s =
+    if s = sigabrt then "SIGABRT"
+    else if s = sigalrm then "SIGALRM"
+    else if s = sigfpe then "SIGFPE"
+    else if s = sighup then "SIGHUP"
+    else if s = sigill then "SIGILL"
+    else if s = sigint then "SIGINT"
+    else if s = sigkill then "SIGKILL"
+    else if s = sigpipe then "SIGPIPE"
+    else if s = sigquit then "SIGQUIT"
+    else if s = sigsegv then "SIGSEGV"
+    else if s = sigterm then "SIGTERM"
+    else if s = sigusr1 then "SIGUSR1"
+    else if s = sigusr2 then "SIGUSR2"
+    else if s = sigchld then "SIGCHLD"
+    else if s = sigcont then "SIGCONT"
+    else if s = sigstop then "SIGSTOP"
+    else if s = sigtstp then "SIGTSTP"
+    else if s = sigttin then "SIGTTIN"
+    else if s = sigttou then "SIGTTOU"
+    else if s = sigvtalrm then "SIGVTALRM"
+    else if s = sigprof then "SIGPROF"
+    else if s = sigbus then "SIGBUS"
+    else if s = sigpoll then "SIGPOLL"
+    else if s = sigsys then "SIGSYS"
+    else if s = sigtrap then "SIGTRAP"
+    else if s = sigurg then "SIGURG"
+    else if s = sigxcpu then "SIGXCPU"
+    else if s = sigxfsz then "SIGXFSZ"
+    else if s < sigxfsz then invalid_arg "Sys.signal_to_string"
+    else "SIG(" ^ string_of_int s ^ ")"
+end
+
 module Import = struct
   type launch_mode = Header_exe | Header_shebang
 
@@ -35,6 +93,10 @@ module Import = struct
     shebangscripts: bool;
     libraries: string list list
   }
+
+  module Char = Char
+  module Result = Result
+  module Sys = Sys
 end
 
 open Import
