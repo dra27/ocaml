@@ -56,18 +56,16 @@ function set_configuration {
 
   case "$1" in
     cygwin*)
-      args+=('--disable-dependency-generation' '--enable-native-toplevel');;
+      args+=('--disable-dependency-generation');;
     mingw32)
       args+=('--host=i686-w64-mingw32' '--disable-dependency-generation');;
     mingw64)
-      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation' \
-             '--enable-native-toplevel');;
+      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation');;
     msvc32)
       args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
     msvc64)
       # Explicitly test dependency generation on msvc64
-      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
-             '--enable-native-toplevel');;
+      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation');;
   esac
 
   mkdir -p "$CACHE_DIRECTORY"
@@ -176,7 +174,8 @@ case "$1" in
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
         script --quiet --return --command \
-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt && \
+$MAKE -C ../$BUILD_PREFIX-$PORT ocamlnat" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
@@ -188,7 +187,8 @@ case "$1" in
       run "$MAKE world" $MAKE world
       run "$MAKE bootstrap" $MAKE bootstrap
       run "$MAKE opt" $MAKE opt
-      run "$MAKE opt.opt" $MAKE opt.opt;;
+      run "$MAKE opt.opt" $MAKE opt.opt
+      run "$MAKE ocamlnat" $MAKE ocamlnat;;
     C)
       run "$MAKE world" $MAKE world
       run "$MAKE runtimeopt" $MAKE runtimeopt
