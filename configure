@@ -840,6 +840,7 @@ exeext
 ac_tool_prefix
 DIRECT_CPP
 CC
+ocaml_cv_cc_vendor
 VERSION
 native_compiler
 CONFIGURE_ARGS
@@ -2849,6 +2850,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 VERSION=4.12.2+relocatable
 
 
+
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
@@ -2945,6 +2947,8 @@ VERSION=4.12.2+relocatable
 
 
 ## Generated files
+
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
@@ -18549,6 +18553,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
