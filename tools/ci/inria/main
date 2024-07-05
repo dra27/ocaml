@@ -311,6 +311,7 @@ if $make_native && $check_make_alldepend; then
 fi
 
 $make --warn-undefined-variables install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
 rm -rf "$instdir"
 
 cd testsuite
