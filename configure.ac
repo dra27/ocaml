@@ -71,7 +71,9 @@ AC_CONFIG_AUX_DIR([build-aux])
 ## Output variables
 
 AC_SUBST([CONFIGURE_ARGS])
+AC_SUBST([native_compiler])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
+AC_SUBST([ocaml_cv_cc_vendor])
 AC_SUBST([CC])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
@@ -175,6 +177,7 @@ AC_SUBST([target_bindir])
 
 ## Generated files
 
+AC_CONFIG_FILES([testsuite/tools/toolchain.ml])
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
