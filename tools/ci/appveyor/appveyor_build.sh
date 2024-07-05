@@ -52,7 +52,6 @@ function run {
 function set_configuration {
   args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
         '--prefix' "$2" \
-        '--enable-native-toplevel' \
         '--enable-ocamltest')
 
   case "$1" in
@@ -182,7 +181,8 @@ case "$1" in
         # For an explanation of the sed command, see
         # https://github.com/appveyor/ci/issues/1824
         script --quiet --return --command \
-          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt" \
+          "$MAKE -C ../$BUILD_PREFIX-$PORT world.opt && \
+$MAKE -C ../$BUILD_PREFIX-$PORT ocamlnat" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed -e 's/\d027\[K//g' \
                 -e 's/\d027\[m/\d027[0m/g' \
@@ -194,7 +194,8 @@ case "$1" in
       run "$MAKE world" $MAKE world
       run "$MAKE bootstrap" $MAKE bootstrap
       run "$MAKE opt" $MAKE opt
-      run "$MAKE opt.opt" $MAKE opt.opt;;
+      run "$MAKE opt.opt" $MAKE opt.opt
+      run "$MAKE ocamlnat" $MAKE ocamlnat;;
     C)
       run "$MAKE world" $MAKE world
       run "$MAKE runtimeopt" $MAKE runtimeopt
