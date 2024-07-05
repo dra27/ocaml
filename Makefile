@@ -932,6 +932,36 @@ tests:
 clean::
 	$(MAKE) -C testsuite clean
 
+# Test an installation (hic sunt dracones)
+
+# The tests for an installation may operate outside the build tree and are
+# consequently only runnable explicitly by adding I_KNOW_THE_RISK=yes to the
+# command line.
+I_KNOW_THE_RISK ?=
+ifeq "$(origin I_KNOW_THE_RISK)$(I_KNOW_THE_RISK)" "command lineyes"
+
+SCRUB_ENV = \
+  CAML_LD_LIBRARY_PATH OCAMLLIB CAMLLIB OCAMLPARAM OCAMLRUNPARAM CAMLRUNPARAM
+
+# The program must always be compiled
+.PHONY: tools/test_install.opt$(EXE)
+tools/test_install.opt$(EXE):
+	cd tools ; env $(addprefix -u , $(SCRUB_ENV)) PATH="$(BINDIR):$$PATH" \
+    "$(BINDIR)/ocamlopt$(EXE)" \
+      -I +compiler-libs -I +unix ocamlcommon.cmxa unix.cmxa \
+      -o test_install.opt$(EXE) test_install.mli test_install.ml
+
+test-installation: tools/test_install.opt$(EXE)
+	@$^ "$(BINDIR)" "$(LIBDIR)" $(ALL_OTHERLIBS)
+else
+test-installation:
+	$(error The test-installation target must be invoked as \
+          `make I_KNOW_THE_RISK=yes test-installation`)
+endif
+
+clean::
+	rm -f tools/test_install.opt tools/test_install.opt.exe
+
 # Build the manual latex files from the etex source files
 # (see manual/README.md)
 .PHONY: manual-pregen
@@ -2233,6 +2263,11 @@ lintapidiff: tools/lintapidiff.opt$(EXE)
 	git ls-files -- 'otherlibs/*/*.mli' 'stdlib/*.mli' |\
 	    grep -Ev internal\|obj\|stdLabels\|moreLabels |\
 	    tools/lintapidiff.opt $(VERSIONS)
+
+# Test an installation of OCaml
+
+test_install_SOURCES = tools/test_install.mli tools/test_install.ml
+test_install_LIBRARIES = otherlibs/unix/unix
 
 # Regenerate otherlibs/dynlink/byte/dynlink_symtable from its bytecomp sources
 
