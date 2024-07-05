@@ -414,6 +414,10 @@ and runtime_mode = Shared | Static
    [test_program] to execute [test] in [env]. The compiler is invoked explicitly
    (PATH-resolution is not used). *)
 let compile_test usr_bin_sh config env test test_program description =
+  let module Config = struct
+    include Config
+    let compression_c_libraries = Toolchain.compression_c_libraries
+  end in
     (* Convert a test to the required properties needed to build and run it:
        - use_shared_runtime is true if -runtime-variant _shared is needed, etc.
        - options is a list of flags to be passed to the compiler

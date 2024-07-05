@@ -355,7 +355,7 @@ let () =
       && not config.target_launcher_searches_for_ocamlrun in
     let run run_process test =
       let code, lines =
-        run_process ~runtime test_program []
+        run_process ?argv0:None ~runtime test_program []
       in
       if code = 0 then
         let lines =
@@ -476,8 +476,16 @@ let remove_if_exists file =
    output is returned in the same format. *)
 let ocamlrun_config env run_process _test =
   let ocamlrun = Environment.ocamlrun env in
+  (* Prior to #13492 (OCaml 5.4.0), ocamlrun -config doesn't include directories
+     specified in CAML_LD_LIBRARY_PATH. The test is concerned with the behaviour
+     of the functions, rather than ocamlrun -config, so instead call a small C
+     auxiliary which back-ports the required behaviour from 5.4.0 *)
+  let shim =
+    Harness.exe (Environment.in_test_root env "../tools/dump_load_path")
+  in
   let code, lines =
-    run_process ~runtime:false ocamlrun ["-config"] in
+    run_process ?argv0:(Some ocamlrun) ~runtime:false shim ["-config"]
+  in
   if code = 0 then
     let strip s =
       let len = String.length s in
@@ -580,9 +588,9 @@ let run_test ~ocamllib_dir ~camllib_dir env programs test =
   in
   let ocamllib = process_env ocamllib_dir test.ocamllib in
   let camllib = process_env camllib_dir test.camllib in
-  let run_process ~runtime program args =
+  let run_process ?argv0 ~runtime program args =
     Environment.run_process_with_test_env
-      ~runtime ~caml_ld_library_path ~ocamllib ~camllib env program args
+      ?argv0 ~runtime ~caml_ld_library_path ~ocamllib ~camllib env program args
   in
   (* Now run the test for all the supplied programs *)
   match List.map (fun f -> f run_process test) programs with
