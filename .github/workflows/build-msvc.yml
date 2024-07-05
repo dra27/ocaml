@@ -100,6 +100,7 @@ jobs:
             --host=$HOST
             CC=$CC
             --enable-ocamltest
+            ${{ matrix.x86_64 && '--enable-native-toplevel' || '--disable-native-toplevel' }}
         run: >-
           eval $(tools/msvs-promote-path) ;
           if ! ./configure ${{ env.CONFIGURE_FLAGS }} ; then
@@ -147,3 +148,9 @@ jobs:
       - name: Install the compiler
         shell: bash
         run: make install
+
+      - name: Test in prefix
+        shell: bash
+        run: >-
+          eval $(tools/msvs-promote-path) ;
+          make -f Makefile.test -C testsuite/in_prefix test-in-prefix
