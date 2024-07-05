@@ -274,6 +274,7 @@ main_build() {
     $make $jobs --warn-undefined-variables coreboot
     if $make_native; then
       $make $jobs --warn-undefined-variables opt.opt
+      $make $jobs --warn-undefined-variables ocamlnat
       if $init_submodule; then
         $make $jobs --warn-undefined-variables flexlink.opt
       fi
@@ -282,8 +283,11 @@ main_build() {
     fi
   else
     $make $jobs --warn-undefined-variables
-    if $make_native && $init_submodule; then
-      $make $jobs --warn-undefined-variables flexlink.opt
+    if $make_native; then
+      $make $jobs --warn-undefined-variables ocamlnat
+      if $init_submodule; then
+        $make $jobs --warn-undefined-variables flexlink.opt
+      fi
     fi
   fi
 
@@ -292,6 +296,7 @@ main_build() {
   fi
 
   $make --warn-undefined-variables install
+  $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
   rm -rf "$instdir"
 }
 
