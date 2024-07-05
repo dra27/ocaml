@@ -58,7 +58,7 @@ jobs:
               if (labels.some(label => label.name === 'CI: Full matrix')) {
                 console.log('Full matrix requested');
                 // # Test bytecode-only Cygwin
-                include.push({cc: 'gcc', arch: 'x86_64', config_arg: '--disable-native-toplevel --disable-native-compiler'});
+                include.push({cc: 'gcc', arch: 'x86_64', config_arg: '--disable-native-compiler'});
               }
             }
             return {config_arg: [''], arch: ['x86_64'], cc: compilers, include: include};
@@ -157,7 +157,6 @@ jobs:
             ${{ matrix.cc != 'gcc' && format('--host={0}-pc-windows', matrix.arch) || '' }}
             ${{ matrix.cc != 'gcc' && format('CC={0}', matrix.cc) || '' }}
             --enable-ocamltest
-            ${{ endsWith(matrix.arch, '64') && '--enable-native-toplevel' || '--disable-native-toplevel' }}
             ${{ matrix.config_arg }}
         run: |
           eval $(tools/msvs-promote-path)

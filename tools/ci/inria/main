@@ -260,28 +260,29 @@ if $flambda; then
 --disable-naked-pointers"
 fi
 
-case $NODE_NAME in
-  *)
-    # Include ocamlnat (for the in-prefix tests) unless explicitly disabled:
-    # a later --disable-native-toplevel will take precedence if present.
-    confoptions="--enable-native-toplevel $confoptions";;
-esac
-
 main_build() {
   eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
   grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
+  make_ocamlnat=$make_native
+  grep -q '^NATDYNLINK=false' Makefile.config && make_ocamlnat=false
 
   if $bootstrap; then
     $make $jobs --warn-undefined-variables core
     $make $jobs --warn-undefined-variables coreboot
     if $make_native; then
       $make $jobs --warn-undefined-variables opt.opt
+      if $make_ocamlnat; then
+        $make $jobs --warn-undefined-variables ocamlnat
+      fi
     else
       $make $jobs --warn-undefined-variables all
     fi
   else
     $make $jobs --warn-undefined-variables
+    if $make_ocamlnat; then
+      $make $jobs --warn-undefined-variables ocamlnat
+    fi
   fi
 
   if $make_native && $check_make_alldepend; then

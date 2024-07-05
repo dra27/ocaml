@@ -41,7 +41,6 @@ build() {
 #  - Ensure the testsuite runs correctly with everything switched off
 build "minimal build" \
         -conf --disable-native-compiler \
-        -conf --disable-native-toplevel \
         -conf --disable-shared \
         -conf --disable-debug-runtime \
         -conf --disable-instrumented-runtime \
