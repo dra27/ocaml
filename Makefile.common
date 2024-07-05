@@ -42,6 +42,9 @@ INSTALL_MANDIR = $(DESTDIR)$(MANDIR)
 
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
+# Standard library flags
+STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
+
 BOOT_OCAMLC = $(CAMLRUN) $(ROOTDIR)/boot/ocamlc
 
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "false"
