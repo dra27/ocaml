@@ -24,9 +24,14 @@ INSTALL ?= @INSTALL@
 INSTALL_DATA ?= @INSTALL_DATA@
 INSTALL_PROG ?= @INSTALL_PROGRAM@
 
+SRCDIR_ABS = @ocamlsrcdir@
+
 # The command to generate C dependency information
 DEP_CC=@DEP_CC@ -MM
 COMPUTE_DEPS=@compute_deps@
+
+# The C compiler vendor
+OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
 # This is munged into utils/config.ml, not overridable by other parts of
 # the build system.
