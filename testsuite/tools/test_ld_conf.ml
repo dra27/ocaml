@@ -475,7 +475,13 @@ let remove_if_exists file =
    [compile_ld_conf_test_programs] but calling [ocamlrun -config] instead. The
    output is returned in the same format. *)
 let ocamlrun_config env run_process _test =
-  let ocamlrun = Environment.ocamlrun env in
+  (* Prior to #13492 (OCaml 5.4.0), ocamlrun -config doesn't include directories
+     specified in CAML_LD_LIBRARY_PATH. The test is concerned with the behaviour
+     of the functions, rather than ocamlrun -config, so instead call a small C
+     auxiliary which back-ports the required behaviour from 5.4.0 *)
+  let ocamlrun = (* Environment.ocamlrun env in *)
+    Harness.exe (Environment.in_test_root env "../tools/dump_load_path")
+  in
   let code, lines =
     run_process ~runtime:false ocamlrun ["-config"] in
   if code = 0 then

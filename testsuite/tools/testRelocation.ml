@@ -16,10 +16,13 @@ open Harness.Import
 
 type location = Build | Prefix | Relative
 
-module LocationSet = Set.Make(struct
+module Location = struct
   type t = location
   let compare = Stdlib.compare
-end)
+end
+
+module LocationSet = Set.Make(Location)
+module LocationMap = Map.Make(Location)
 
 (* Augment toolchain properties with information from the configuration (this
    essentially goes from "is foo capable of doing bar" to "foo does bar in this
@@ -31,7 +34,7 @@ let effective_toolchain _config =
   let assembler_embeds_build_path =
     Toolchain.assembler_embeds_build_path
   in
-  ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path
+  c_compiler_debug_paths_are_absolute, assembler_embeds_build_path
 
 (* The reproducible ruleset is the simplest: nothing is allowed to contain the
    build path and only Makefile.config may contain the installation prefix or
@@ -44,12 +47,12 @@ let reproducible_rules file =
 
 (* The ruleset for files in bindir *)
 let bindir_rules config file =
-  let ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path =
+  let c_compiler_debug_paths_are_absolute, assembler_embeds_build_path =
     effective_toolchain config in
   let basename = Filename.basename file in
   if Filename.extension basename = ".manifest" then
     (* Executable manifests installed as part of flexlink for the MSVC port *)
-    LocationSet.empty
+    LocationMap.empty
   else
     (* Analysis on filenames doesn't need to care about .exe *)
     let basename =
@@ -74,9 +77,9 @@ let bindir_rules config file =
         | _ -> false
       in
       if code_embeds_stdlib_location || linker_embeds_stdlib_location then
-        LocationSet.singleton Prefix
+        LocationMap.singleton Prefix false
       else
-        LocationSet.empty
+        LocationMap.empty
     in
     (* Determining if the build path will be found consists of two strictly
        separated portions: the properties we expect from the file itself and
@@ -138,12 +141,12 @@ let bindir_rules config file =
                   || linked_with_debug))
     in
     if contains_build_path then
-      LocationSet.add Build prefix
+      LocationMap.add Build false prefix
     else
       prefix
 
 let libdir_rules config file =
-  let ~c_compiler_debug_paths_are_absolute, ~assembler_embeds_build_path =
+  let c_compiler_debug_paths_are_absolute, assembler_embeds_build_path =
     effective_toolchain config in
   let basename = Filename.basename file in
   (* expunge is an executable installed to libdir *)
@@ -156,27 +159,25 @@ let libdir_rules config file =
        - contains OCaml debug information
        - contains C debug information
        - contains objects which have been created by the assembler *)
-    let (~stdlib:embeds_stdlib_location,
-         ~ocaml_debug:has_ocaml_debug_info,
-         ~c_debug:has_c_debug_info,
-         ~s:contains_assembled_objects) =
+    let (embeds_stdlib_location, has_ocaml_debug_info, has_c_debug_info,
+         contains_assembled_objects) =
       if List.mem basename ["Makefile.config";
                             "ld.conf";
                             "runtime-launch-info"] then
         (* These files all embed the Standard Library location *)
-        (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        (true, false, false, false)
       else if basename = "config.cmx" then
         (* config.cmx contains Config.standard_library for inlining *)
-        (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        (true, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
         let stdlib = (* via Config.standard_library *)
           List.mem basename ["config.cmt"; "config_main.cmt";
                              "ocamlcommon.cma"] in
-        (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
+        (stdlib, true, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
-        (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
+        (false, false, true, true)
       else if ext = Config.ext_obj then
         (* Any object produced by ocamlopt will have a .cmx file with it *)
         let is_ocaml =
@@ -185,7 +186,7 @@ let libdir_rules config file =
            but the FlexDLL support objects are not. *)
         let c_debug =
           not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
-        (~stdlib:false, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
+        (false, false, c_debug, is_ocaml)
       else if ext = Config.ext_lib || ext = Config.ext_dll then
         (* Based on the filename, is this one of the bytecode runtime libraries
            (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
@@ -207,13 +208,13 @@ let libdir_rules config file =
             is_camlrun
             || Filename.remove_extension basename = "ocamlcommon"
           in
-          (~stdlib, ~ocaml_debug:false, ~c_debug:(not is_ocaml), ~s:is_ocaml)
+          (stdlib, false, (not is_ocaml), is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
-          (~stdlib:is_camlrun, ~ocaml_debug:false, ~c_debug:true, ~s:false)
+          (is_camlrun, false, true, false)
       else
-        (~stdlib:false, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        (false, false, false, false)
     in
     let contains_build_path =
       (* libasmrun* is a special case as it contains the only assembled object
@@ -237,12 +238,12 @@ let libdir_rules config file =
     in
     let prefix =
       if embeds_stdlib_location then
-        LocationSet.singleton Prefix
+        LocationMap.singleton Prefix false
       else
-        LocationSet.empty
+        LocationMap.empty
     in
     if contains_build_path then
-      LocationSet.add Build prefix
+      LocationMap.add Build false prefix
     else
       prefix
 
@@ -426,11 +427,20 @@ let run ~reproducible config env =
     in
     let seen, hits = List.fold_left_map gather LocationSet.empty seen in
     let expected = rules file in
+    let expected =
+      let f location optional acc =
+        if LocationSet.mem location seen || not optional then
+          LocationSet.add location acc
+        else
+          acc
+      in
+      LocationMap.fold f expected LocationSet.empty
+    in
     let reproducible = reproducible_rules file in
     let consistent = LocationSet.equal expected reproducible in
     let reproducible = LocationSet.equal seen reproducible in
     if LocationSet.equal seen expected then
-      ~incorrect:false, ~seen, ~reproducible, ~consistent
+      false, seen, reproducible, consistent
     else
       let string_of_location = function
       | Build -> "Build directory"
@@ -451,12 +461,12 @@ let run ~reproducible config env =
               "contain the " ^ String.concat " & " expected in
           Printf.eprintf "%s: expected to %s, but it %s\n"
                          file_rel expected msg;
-          ~incorrect:true, ~seen, ~reproducible, ~consistent
+          true, seen, reproducible, consistent
   in
   (* Analyse the files in a given directory using a ruleset *)
   let rec scan_aux dir rel h rules
-               ((~failed, ~results, ~reproducible:reproducible_so_far,
-                 ~consistent:consistent_so_far) as acc) =
+               ((failed, results, reproducible_so_far,
+                 consistent_so_far) as acc) =
     match Unix.readdir h with
     | entry ->
         let acc =
@@ -468,12 +478,12 @@ let run ~reproducible config env =
             | {Unix.st_kind = S_DIR; _} ->
                 scan_aux entry entry_rel (Unix.opendir entry) rules acc
             | {Unix.st_kind = S_REG; _} ->
-                let ~incorrect, ~seen, ~reproducible, ~consistent =
+                let incorrect, seen, reproducible, consistent =
                   in_unexpected_state entry entry_rel rules in
-                  ~failed:(failed || incorrect),
-                  ~results:((entry_rel, seen)::results),
-                  ~reproducible:(reproducible_so_far && reproducible),
-                  ~consistent:(consistent_so_far && consistent)
+                  (failed || incorrect),
+                  ((entry_rel, seen)::results),
+                  (reproducible_so_far && reproducible),
+                  (consistent_so_far && consistent)
             | _ ->
                 acc
           else
@@ -487,8 +497,8 @@ let run ~reproducible config env =
     scan_aux dir rel_root (Unix.opendir dir) (rules config)
   in
   (* Analyse files in bindir and libdir and collect all the results *)
-  let ~failed, ~results, ~reproducible:results_are_reproducible, ~consistent =
-    ~failed:false, ~results:[], ~reproducible:true, ~consistent:true
+  let failed, results, results_are_reproducible, consistent =
+    (false, [], true, true)
     |> scan Environment.bindir "$bindir" bindir_rules
     |> scan Environment.libdir "$libdir" libdir_rules
   in

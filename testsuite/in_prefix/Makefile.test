@@ -39,7 +39,7 @@ else
 VERBOSE_FLAG =
 endif
 
-test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
+test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O) ../tools/dump_load_path$(EXE)
 	@$< $(DRIVER_ARGS)
 
 SCRUB_ENV = \

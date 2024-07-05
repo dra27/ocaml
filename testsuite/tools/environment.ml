@@ -324,8 +324,8 @@ let display_execution level status pid ~runtime program argv0 args
   end
 
 (* Executes a single command, returning the exit code and lines of output *)
-let run_one (~runtime, ~quiet, ~fails, ~program, ~argv0, ~args,
-             ~env:({environment; verbose; _} as env)) =
+let run_one (runtime, quiet, fails, program, argv0, args,
+             ({environment; verbose; _} as env)) =
   flush stderr;
   flush stdout;
   let quiet = quiet && not verbose in
@@ -485,7 +485,7 @@ let run_process ?(runtime = false) ?(stubs = false) ?(stdlib = false)
         else
           program, argv0, args
       in
-      ~runtime, ~quiet, ~fails, ~program, ~argv0, ~args, ~env
+      runtime, quiet, fails, program, argv0, args, env
     in
     (* In order to ensure that bugs are not silently fixed (or, more to the
        point, that a shim isn't left enabled and so masks something different),

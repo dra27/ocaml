@@ -271,6 +271,7 @@ META
 /testsuite/_retries
 
 /testsuite/tools/codegen
+/testsuite/tools/dump_load_path
 /testsuite/tools/expect
 /testsuite/tools/lexcmm.ml
 /testsuite/tools/parsecmm.ml
