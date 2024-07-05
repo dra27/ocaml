@@ -173,6 +173,9 @@ case "$1" in
       run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
     fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
+    run "test $PORT in prefix" \
+      $MAKE -f Makefile.test -C "$FULL_BUILD_PREFIX-$PORT/testsuite/in_prefix" \
+            test-in-prefix
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
            $MAKE -C "$FULL_BUILD_PREFIX-$PORT" check_all_arches
@@ -225,7 +228,8 @@ case "$1" in
         # https://github.com/appveyor/ci/issues/1824
         build="-C ../$BUILD_PREFIX-$PORT world.opt"
         script --quiet --return --command \
-          "if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
+          "if ! $MAKE -j $build; then $MAKE $build; exit 1; else \
+$MAKE $build ocamlnat; fi" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed --unbuffered \
                 -e 's/\d027\[K//g' \
@@ -238,7 +242,8 @@ case "$1" in
       run "$MAKE world" $MAKE world
       run "$MAKE bootstrap" $MAKE bootstrap
       run "$MAKE opt" $MAKE opt
-      run "$MAKE opt.opt" $MAKE opt.opt;;
+      run "$MAKE opt.opt" $MAKE opt.opt
+      run "$MAKE ocamlnat" $MAKE ocamlnat;;
     C)
       run "$MAKE world" $MAKE world
       run "$MAKE runtimeopt" $MAKE runtimeopt
