@@ -100,6 +100,7 @@ jobs:
             --host=$HOST
             CC=$CC
             --enable-ocamltest
+            --enable-native-toplevel
         run: >-
           eval $(tools/msvs-promote-path) ;
           if ! ./configure ${{ env.CONFIGURE_FLAGS }} ; then
@@ -147,3 +148,10 @@ jobs:
       - name: Install the compiler
         shell: bash
         run: make install
+
+      - name: Test the installation
+        shell: bash
+        run: >-
+          eval $(tools/msvs-promote-path) ;
+          make I_KNOW_THE_RISK=yes test-installation
+        if: matrix.x86_64
