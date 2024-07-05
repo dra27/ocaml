@@ -52,22 +52,21 @@ function run {
 function set_configuration {
   args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
         '--prefix' "$2" \
+        '--enable-native-toplevel' \
         '--enable-ocamltest')
 
   case "$1" in
     cygwin*)
-      args+=('--disable-dependency-generation' '--enable-native-toplevel');;
+      args+=('--disable-dependency-generation');;
     mingw32)
       args+=('--host=i686-w64-mingw32' '--disable-dependency-generation');;
     mingw64)
-      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation' \
-             '--enable-native-toplevel');;
+      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation');;
     msvc32)
       args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
     msvc64)
       # Explicitly test dependency generation on msvc64
-      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
-             '--enable-native-toplevel');;
+      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation');;
   esac
 
   mkdir -p "$CACHE_DIRECTORY"
