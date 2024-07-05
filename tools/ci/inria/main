@@ -261,9 +261,6 @@ if $flambda; then
 fi
 
 case $NODE_NAME in
-  *-32|ocaml-ppc-64-*|ocaml-zsystems|ocaml-riscv|ocaml-cygwin-64)
-    # Native compilation not supported
-    ;;
   *)
     # Include ocamlnat (for the in-prefix tests) unless explicitly disabled:
     # a later --disable-native-toplevel will take precedence if present.
