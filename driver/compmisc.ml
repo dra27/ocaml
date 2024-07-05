@@ -21,7 +21,7 @@ open Compenv
    then the standard library directory (unless the -nostdlib option is given).
  *)
 
-let init_path ?(dir="") () =
+let reinit_path ?(standard_library=Config.standard_library) ?(dir="") () =
   let dirs =
     if !Clflags.use_threads then "+threads" :: !Clflags.include_dirs
     else
@@ -35,9 +35,13 @@ let init_path ?(dir="") () =
     !first_include_dirs
   in
   let exp_dirs =
-    List.map (Misc.expand_directory Config.standard_library) dirs in
-  Load_path.init (dir :: List.rev_append exp_dirs (Clflags.std_include_dir ()));
+    List.map (Misc.expand_directory standard_library) dirs in
+  let std_include =
+    if !Clflags.no_std_include then [] else [standard_library] in
+  Load_path.init (dir :: List.rev_append exp_dirs std_include);
   Env.reset_cache ()
+
+let init_path = reinit_path ?standard_library:None
 
 (* Return the initial environment in which compilation proceeds. *)
 
