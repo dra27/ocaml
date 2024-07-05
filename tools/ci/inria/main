@@ -260,15 +260,6 @@ if $flambda; then
 --disable-naked-pointers"
 fi
 
-case $NODE_NAME in
-  *-32|ocaml-ppc-64-be)
-    # Native compilation not supported
-    ;;
-  *)
-    # Include ocamlnat in the in-prefix tests
-    confoptions="$confoptions --enable-native-toplevel";;
-esac
-
 main_build() {
   eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
@@ -279,11 +270,15 @@ main_build() {
     $make $jobs --warn-undefined-variables coreboot
     if $make_native; then
       $make $jobs --warn-undefined-variables opt.opt
+      $make $jobs --warn-undefined-variables ocamlnat
     else
       $make $jobs --warn-undefined-variables all
     fi
   else
     $make $jobs --warn-undefined-variables
+    if $make_native; then
+      $make $jobs --warn-undefined-variables ocamlnat
+    fi
   fi
 
   if $make_native && $check_make_alldepend; then

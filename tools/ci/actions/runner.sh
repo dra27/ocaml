@@ -58,7 +58,6 @@ EOF
   call-configure --prefix="$PREFIX" \
                  --enable-flambda-invariants \
                  --enable-ocamltest \
-                 --enable-native-toplevel \
                  --disable-dependency-generation \
                  $CONFIG_ARG
 }
