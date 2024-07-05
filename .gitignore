@@ -280,6 +280,8 @@ META
 /tools/ocamlprof
 /tools/ocamlprof.opt
 /tools/opnames.ml
+/tools/test_install.opt
+/tools/test_install.opt.exe
 /tools/dumpobj
 /tools/dumpobj.opt
 /tools/ocamlobjinfo

@@ -7390,6 +7390,19 @@ tools/stripdebug.cmx : \
     bytecomp/bytesections.cmx \
     tools/stripdebug.cmi
 tools/stripdebug.cmi :
+tools/test_install.cmo : \
+    otherlibs/unix/unix.cmi \
+    utils/config.cmi \
+    driver/compmisc.cmi \
+    utils/ccomp.cmi \
+    tools/test_install.cmi
+tools/test_install.cmx : \
+    otherlibs/unix/unix.cmx \
+    utils/config.cmx \
+    driver/compmisc.cmx \
+    utils/ccomp.cmx \
+    tools/test_install.cmi
+tools/test_install.cmi :
 debugger/breakpoints.cmo : \
     debugger/symbols.cmi \
     debugger/pos.cmi \
