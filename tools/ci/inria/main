@@ -270,11 +270,15 @@ main_build() {
     $make $jobs --warn-undefined-variables coreboot
     if $make_native; then
       $make $jobs --warn-undefined-variables opt.opt
+      $make $jobs --warn-undefined-variables ocamlnat
     else
       $make $jobs --warn-undefined-variables all
     fi
   else
     $make $jobs --warn-undefined-variables
+    if $make_native; then
+      $make $jobs --warn-undefined-variables ocamlnat
+    fi
   fi
 
   if $make_native && $check_make_alldepend; then
@@ -282,6 +286,7 @@ main_build() {
   fi
 
   $make --warn-undefined-variables install
+  $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
   rm -rf "$instdir"
 }
 
