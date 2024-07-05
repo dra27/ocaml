@@ -69,8 +69,8 @@ let run_tests ~sh config env =
   TestLinkModes.run ~sh config env
 
 let () =
-  let ~config, ~pwd, ~prefix, ~bindir:_, ~bindir_suffix, ~libdir,
-      ~libdir_suffix, ~summarise_only, ~verbose =
+  let config, pwd, prefix, _, bindir_suffix, libdir, libdir_suffix,
+      summarise_only, verbose =
     match Cmdline.parse Sys.argv with
     | Result.Error (code, msg) ->
         prerr_string msg;

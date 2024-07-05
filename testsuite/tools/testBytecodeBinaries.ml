@@ -68,15 +68,19 @@ let run config env =
                  distribution's tools when called with -M. *)
               let without_exe = Filename.remove_extension binary in
               let (this_exit_code, _) as this =
-                let fails = not (String.contains without_exe '.') in
+                let fails =
+                  without_exe <> "ocamlmklib"
+                  && not (String.contains without_exe '.')
+                in
                 Environment.run_process
                   ~fails env program ~argv0:without_exe ["-M"]
               in
               if this_exit_code = 0 then
                 if this = exec_magic then
                   let (that_exit_code, _) as that =
+                    let fails = without_exe <> "ocamlmklib" in
                     Environment.run_process
-                      ~fails:true env program ~argv0:binary ["-M"]
+                      ~fails env program ~argv0:binary ["-M"]
                   in
                   if this = that then
                     Harness.fail_because
@@ -91,7 +95,15 @@ let run config env =
                       "%s is not expected to return the exec magic number!"
                       without_exe
                   else () (* Expected outcome was the exec magic number *)
+                else if without_exe <> "ocamlmklib" then
+                  Harness.fail_because
+                    "%s is expected to return with a non-zero exit code"
+                    without_exe
                 else () (* Expected outcome is a zero exit code *)
+              else if without_exe = "ocamlmklib" then
+                Harness.fail_because
+                  "%s is expected to return with exit code 0"
+                  without_exe
               else () (* Expected outcome is a non-zero exit code *)
         | _ ->
             if not fails then
