@@ -64,7 +64,7 @@ let split_to_prefix first second =
             let prefix = List.fold_left Filename.concat dir dirs in
             let first_suffix = List.fold_left Filename.concat dir1 dirs1 in
             let second_suffix = List.fold_left Filename.concat dir2 dirs2 in
-            Result.ok (~prefix, ~first, ~first_suffix, ~second, ~second_suffix)
+            Result.ok (prefix, first, first_suffix, second, second_suffix)
       else
         loop (dir1::prefix) (dirs1, dirs2)
   | [], _ ->
@@ -78,6 +78,20 @@ let concat_all empty = function
 | hd::tl -> Result.ok (List.fold_left Filename.concat hd tl)
 | [] -> Result.error empty
 
+module Result = struct
+  include Result
+
+  let product r0 r1 = match r0, r1 with
+  | (Error _ as r), _
+  | _, (Error _ as r) -> r
+  | Ok v0, Ok v1 -> Ok (v0, v1)
+
+  module Syntax = struct
+    let ( let+ ) r f = map f r
+    let ( and+ ) = product
+  end
+end
+
 let walk_to_prefix first second =
   let rec loop suffix1 = function
   | rev_first_hd::rev_first_tl, second_hd::second_tl
@@ -89,7 +103,7 @@ let walk_to_prefix first second =
       and+ first_suffix = concat_all `Second_in_first suffix1
       and+ second_suffix = concat_all `First_in_second suffix2 in
       let second = Filename.concat prefix second_suffix in
-      (~prefix, ~first, ~first_suffix, ~second, ~second_suffix)
+      (prefix, first, first_suffix, second, second_suffix)
   in
   loop [] (List.rev (split_dir [] first), split_dir [] second)
 
@@ -100,7 +114,7 @@ let parse argv =
   let bindir = ref "" in
   let libdir = ref "" in
   let tree =
-    ref (~prefix:"", ~first:"", ~first_suffix:"", ~second:"", ~second_suffix:"")
+    ref ("", "", "", "", "")
   in
   let config =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
@@ -128,8 +142,7 @@ let parse argv =
           error "directory given for --bindir inside that given for --libdir"
       | Result.Error `Second_in_first ->
           error "directory given for --libdir inside that given for --bindir"
-      | Result.Ok ((~prefix, ~first:_, ~first_suffix:_,
-                    ~second:libdir, ~second_suffix:_) as result) ->
+      | Result.Ok ((prefix, _, _, libdir, _) as result) ->
           if Sys.file_exists (prefix ^ ".new") then
             error "can't rename %s to %s.new as the latter already exists!"
                   prefix prefix
@@ -206,8 +219,6 @@ options are:" in
   | () ->
       let config, pwd, summarise_only, verbose =
         !config, !pwd, !summary, !verbose in
-      let ~prefix,
-          ~first:bindir, ~first_suffix:bindir_suffix,
-          ~second:libdir, ~second_suffix:libdir_suffix = !tree in
-      Result.ok (~config, ~pwd, ~prefix, ~bindir, ~bindir_suffix, ~libdir,
-                 ~libdir_suffix, ~summarise_only, ~verbose)
+      let prefix, bindir, bindir_suffix, libdir, libdir_suffix = !tree in
+      Result.ok (config, pwd, prefix, bindir, bindir_suffix, libdir,
+                 libdir_suffix, summarise_only, verbose)
