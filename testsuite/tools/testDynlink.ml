@@ -97,18 +97,6 @@ let () =
       Environment.fail_because "%s is expected to return with exit code %d"
                                test_program expected_exit_code;
   in
-  let test_libraries_in_prog ?expected_exit_code env libraries =
-    if mode = Native && List.mem "threads" libraries then
-      let threads_plugin =
-        Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
-      in
-      if Sys.file_exists threads_plugin then
-        Environment.fail_because "threads.cmxs is not expected to exist"
-      else
-        ()
-    else
-      test_libraries_in_prog ?expected_exit_code env libraries
-  in
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
   let expected_exit_code =
