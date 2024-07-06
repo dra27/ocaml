@@ -1185,27 +1185,6 @@ let run (config : Installation.t) env mode =
                     (* dynlink.cmxs does not exist, for obvious reasons, but we
                        can check loading the library in ocamlnat "works". *)
                     "cmxa"
-                  else if library = "threads" then
-                    let threads_plugin =
-                      let plugin = Filename.concat "threads" "threads.cmxs" in
-                      Environment.in_libdir env plugin
-                    in
-                    if Sys.file_exists threads_plugin then
-                      Environment.fail_because
-                        "threads.cmxs is not expected to exist"
-                    else if Sys.win32 then
-                      (* cf. note in ocaml/ocaml#13520 - threads.cmxa is
-                         correctly compiled assuming winpthreads is statically
-                         in the same image (so without defining
-                         WINPTHREADS_USE_DLLIMPORT), but this is incorrect for
-                         threads.cmxs, as threads.cmxs may load more than 2GiB
-                         away from the main executable. For native Windows, it's
-                         not possible to rely on ocamlnat's automatic
-                         cmxa -> cmxs recompilation. *)
-                      "cmxs"
-                    else
-                      (* cf. ocaml/ocaml#12250 - no threads.cmxs *)
-                      "cmxa"
                   else
                     "cmxs"
               | Bytecode ->
@@ -1227,11 +1206,8 @@ let run (config : Installation.t) env mode =
     in
     let expected_exit_code =
       if Sys.cygwin && mode = Native && List.mem "unix" libraries
-      || Sys.win32 && mode = Native && List.mem "threads" libraries
       || has_c_stubs && not Config.supports_shared_libraries then
-        (* cf. ocaml/flexdll#146 - Cygwin's ocamlnat can't load unix.cmxs and
-           the lines above will have triggered native Windows being unable to
-           load threads.cmxs *)
+        (* cf. ocaml/flexdll#146 - Cygwin's ocamlnat can't load unix.cmxs *)
         125
       else
         0
@@ -1343,18 +1319,6 @@ let () =
     if exit_code <> expected_exit_code then
       Environment.fail_because "%s is expected to return with exit code %d"
                                test_program expected_exit_code;
-  in
-  let test_libraries_in_prog ?expected_exit_code env libraries =
-    if mode = Native && List.mem "threads" libraries then
-      let threads_plugin =
-        Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
-      in
-      if Sys.file_exists threads_plugin then
-        Environment.fail_because "threads.cmxs is not expected to exist"
-      else
-        ()
-    else
-      test_libraries_in_prog ?expected_exit_code env libraries
   in
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
