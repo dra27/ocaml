@@ -7,6 +7,7 @@ on:
       - '5.**'
       - 'trunk'
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 # Restrict the GITHUB_TOKEN
 permissions: {}
@@ -37,11 +38,27 @@ jobs:
     runs-on: 'ubuntu-latest'
     outputs:
       manual_changed: ${{ steps.manual.outputs.manual_changed }}
+    strategy:
+      matrix:
+        id: [ normal, tsan ]
+        exclude:
+          - id: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'run-thread-sanitizer') && 'tsan' }}
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Install libunwind
+        run: sudo apt install -y libunwind-dev
+        if: matrix.id == 'tsan'
+      # This temporary workaround reduces the number of random bits for the base
+      # address of vma regions for mmap allocation, to avoid the
+      # "FATAL: ThreadSanitizer: unexpected memory mapping" TSan error.
+      # See:  https://github.com/google/sanitizers/issues/1716
+      - name: Tune vm.mmap_rnd_bits value for TSan
+        run: sudo sysctl vm.mmap_rnd_bits=28
+        if: matrix.id == 'tsan'
       - name: Check for manual changes
         id: manual
         run: >-
@@ -58,8 +75,9 @@ jobs:
          '${{ github.event.after }}'
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
+# XXX COMBAK Should be possible to move the CONFIG_ARG to the matrix and still exclude by name
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='${{ matrix.id == 'tsan' && '--enable-tsan CPPFLAGS=-DTSAN_INSTRUMENT_ALL' || '--enable-flambda' }} --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -68,7 +86,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: compiler
+          name: compiler-${{ matrix.id }}
           path: /tmp/sources.tar.zstd
           retention-days: 1
 
@@ -86,17 +104,30 @@ jobs:
       matrix:
         include:
           - id: normal
+            compiler: normal
             name: normal
             dependencies: texlive-latex-extra texlive-fonts-recommended hevea sass
           - id: debug
+            compiler: normal
             name: extra (debug)
           - id: debug-s4096
+            compiler: normal
             name: extra (debug-s4096)
+          - id: tsan-normal
+            compiler: tsan
+            name: extra (tsan-normal)
+            dependencies: libunwind-dev
+          - id: tsan-debug
+            compiler: tsan
+            name: extra (tsan-debug)
+            dependencies: libunwind-dev
+        exclude:
+          - compiler: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'run-thread-sanitizer') && 'tsan' }}
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: compiler
+          name: compiler-${{ matrix.compiler == 'tsan' && 'tsan' || 'normal' }}
       - name: Unpack Artifact
         run: |
           tar --zstd -xf sources.tar.zstd
@@ -108,14 +139,14 @@ jobs:
       - name: Run the testsuite
         if: matrix.id == 'normal'
         run: |
-          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test
+          bash -cxe "${{ matrix.compiler == 'tsan' && 'TSAN_OPTIONS=history_size=6 ' }}MAKE_ARG=-j OCAMLRUNPARAM=b=v=0 tools/ci/actions/runner.sh ${{ matrix.compiler == 'tsan' && 'test_sequential' || 'test' }}"
       - name: Run the testsuite (debug runtime)
         if: matrix.id == 'debug'
         env:
           OCAMLRUNPARAM: v=0,V=1
           USE_RUNTIME: d
         run: |
-          bash -cxe "SHOW_TIMINGS=1 tools/ci/actions/runner.sh test"
+          bash -cxe "${{ matrix.compiler == 'tsan' && 'TIMEOUT=1800 TSAN_OPTIONS=history_size=6 ' }}SHOW_TIMINGS=1 tools/ci/actions/runner.sh ${{ matrix.compiler == 'tsan' && 'test_sequential' || 'test' }}"
       - name: Run the testsuite (s=4096, debug runtime)
         if: matrix.id == 'debug-s4096'
         env:
