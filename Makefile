@@ -952,7 +952,7 @@ tools/test_install.opt$(EXE):
       -o test_install.opt$(EXE) test_install.mli test_install.ml
 
 test-installation: tools/test_install.opt$(EXE)
-	@$^ "$(BINDIR)" "$(LIBDIR)" $(ALL_OTHERLIBS)
+	@$^ "$(BINDIR)" "$(LIBDIR)" "$(RELOCATABLE)" $(ALL_OTHERLIBS)
 else
 test-installation:
 	$(error The test-installation target must be invoked as \

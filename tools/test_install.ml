@@ -242,7 +242,8 @@ let compile_with_options env compiler ~native options
   List.iter Sys.remove files;
   Some (f test_program)
 
-let compile_obj env compiler ~native runtime test_program description f =
+let compile_obj env standard_library compiler ~native
+                runtime test_program description f =
   Printf.printf "  Compiling %s\n%!" description;
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     Printf.fprintf oc
@@ -277,7 +278,7 @@ let compile_obj env compiler ~native runtime test_program description f =
       \  caml_startup(argv);\n\
       \  caml_shutdown();\n\
        }\n");
-  if Ccomp.compile_file "test_install_main.c" <> 0 then begin
+  if Ccomp.compile_file ~standard_library "test_install_main.c" <> 0 then begin
     print_endline "Unexpected C compiler error";
     exit 1
   end;
@@ -342,95 +343,155 @@ let run_program env test_program =
     exit 1
   end
 
-let compile_with_options ?(unix_only=false) env
+let compile_with_options ?(unix_only=false) ?(full_only=false) ~full env
                          compiler ~native options test_program description =
-  if unix_only && Sys.win32 then
+  if unix_only && Sys.win32 || full_only && not full then
     None
   else
-    let cont test_program () =
-      run_program env test_program;
-      Some test_program
+    let cont test_program =
+      if full_only then
+        fun () ->
+          run_program env test_program;
+          Sys.remove test_program;
+          None
+      else
+        fun () ->
+          run_program env test_program;
+          Some test_program
     in
     compile_with_options
       env compiler ~native options test_program description cont
 
-let compile_obj ?(unix_only=false) env
+let compile_obj ?(unix_only=false) ?(full_only=false) ~full env standard_library
                 compiler ~native runtime test_program description =
-  if unix_only && Sys.win32 then
+  if unix_only && Sys.win32 || full_only && not full then
     None
   else
-    let cont test_program () =
-      run_program env test_program;
-      Some test_program
+    let cont test_program =
+      if full_only then
+        fun () ->
+          run_program env test_program;
+          Sys.remove test_program;
+          None
+      else
+        fun () ->
+          run_program env test_program;
+          Some test_program
     in
-    compile_obj env compiler ~native runtime test_program description cont
+    compile_obj env standard_library compiler ~native
+                runtime test_program description cont
 
-let test_standard_library_location env bindir libdir ocamlc ocamlopt =
+let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
   let ocamlc_where = compiler_where env ocamlc in
   let ocamlopt_where = compiler_where env ocamlopt in
   Printf.printf "  ocamlc -where: %s\n  ocamlopt -where: %s\n%!"
                 ocamlc_where ocamlopt_where;
   let unix_only = true in
+  let full_only = true in
   let programs = List.filter_map Fun.id [
-    compile_with_options env ocamlc ~native:false
+    compile_with_options ~full_only ~full env ocamlc ~native:false
       [] "test_bytecode"
       "Bytecode (with tender)";
-    compile_with_options env ocamlc ~native:false
+    compile_with_options ~full env ocamlc ~native:false
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
-    compile_with_options ~unix_only env ocamlc ~native:false
+    compile_with_options ~unix_only ~full env ocamlc ~native:false
       ["-custom"; "-runtime-variant"; "_shared"] "test_custom_shared"
       "Bytecode (-custom shared runtime)";
-    compile_obj env ocamlc ~native:false
+    compile_obj ~full env libdir ocamlc ~native:false
       "-lcamlrun" "test_output_obj_static"
       "Bytecode (-output-obj static runtime)";
-    compile_obj ~unix_only env ocamlc ~native:false
+    compile_obj ~unix_only ~full env libdir ocamlc ~native:false
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
-    compile_with_options env ocamlc ~native:false
+    compile_with_options ~full env ocamlc ~native:false
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
-    compile_with_options ~unix_only env ocamlc ~native:false
+    compile_with_options ~unix_only ~full env ocamlc ~native:false
       ["-output-complete-exe"; "-runtime-variant"; "_shared"]
       "test_output_complete_exe_shared"
       "Bytecode (-output-complete-exe shared runtime)";
-    compile_with_options env ocamlopt ~native:true
+    compile_with_options ~full env ocamlopt ~native:true
       [] "test_native_static"
       "Native (static runtime)";
-    compile_obj env ocamlopt ~native:true
+    compile_obj ~full env libdir ocamlopt ~native:true
       "-lasmrun" "test_native_output_obj_static"
       "Native (-output-obj static runtime)";
-    compile_obj ~unix_only env ocamlopt ~native:true
+    compile_obj ~unix_only ~full env libdir ocamlopt ~native:true
       "-lasmrun_shared" "test_native_output_obj_shared"
       "Native (-output-obj shared runtime)";
   ] in
   Printf.printf "Running programs\n%!";
   List.filter_map (fun f -> f ()) programs
 
-let run_tests env bindir libdir libraries =
+let run_tests ~full env bindir libdir libraries =
   let libraries = sort_libraries libraries in
   let ocaml = exe (Filename.concat bindir "ocaml") in
   let ocamlnat = exe (Filename.concat bindir "ocamlnat") in
   let ocamlc = exe (Filename.concat bindir "ocamlc") in
   let ocamlopt = exe (Filename.concat bindir "ocamlopt") in
-  load_libraries_in_toplevel env ocaml "cma" libraries;
+  if full then
+    load_libraries_in_toplevel env ocaml "cma" libraries;
   load_libraries_in_toplevel env ocamlnat "cmxa" libraries;
-  load_libraries_in_prog env libdir ocamlc ~native:false libraries;
+  if full then
+    load_libraries_in_prog env libdir ocamlc ~native:false libraries;
   load_libraries_in_prog env libdir ocamlopt ~native:true libraries;
-  test_bytecode_binaries env bindir;
-  test_standard_library_location env bindir libdir ocamlc ocamlopt
+  if full then
+    test_bytecode_binaries env bindir;
+  test_standard_library_location ~full env bindir libdir ocamlc ocamlopt
+
+let rec split_dir acc dir =
+  let dirname = Filename.dirname dir in
+  if dirname = dir then
+    dir::acc
+  else
+    split_dir (Filename.basename dir :: acc) dirname
+
+let join_dir = function
+| dir::dirs -> List.fold_left Filename.concat dir dirs
+| [] -> assert false
+
+let rec split_to_prefix prefix bindir libdir =
+  match bindir, libdir with
+  | (dir1::bindir'), (dir2::libdir') ->
+      if dir1 = dir2 then
+        split_to_prefix (dir1::prefix) bindir' libdir'
+      else
+        join_dir (List.rev prefix), join_dir bindir, join_dir libdir
+  | [], _
+  | _, [] ->
+      assert false
 
 let () =
   Compmisc.init_path ();
-  if Array.length Sys.argv < 3 then begin
-    Printf.eprintf "Usage: test_install <bindir> <libdir> [<library1> ...]\n";
+  if Array.length Sys.argv < 4 then begin
+    Printf.eprintf
+      "Usage: test_install <bindir> <libdir> <yes|no> [<library1> ...]\n";
     exit 2
   end else
     let libraries =
-      Array.to_list (Array.sub Sys.argv 3 (Array.length Sys.argv - 3)) in
+      Array.to_list (Array.sub Sys.argv 4 (Array.length Sys.argv - 4)) in
     let bindir = Sys.argv.(1) in
     let libdir = Sys.argv.(2) in
     let env = make_env bindir libdir in
-    let programs = run_tests env bindir libdir libraries in
-    List.iter Sys.remove programs
+    let programs = run_tests ~full:true env bindir libdir libraries in
+    if Sys.argv.(3) = "yes" then
+      let prefix, bindir_suffix, libdir_suffix =
+        split_to_prefix [] (split_dir [] bindir) (split_dir [] libdir) in
+      let new_prefix = prefix ^ ".new" in
+      let bindir = Filename.concat new_prefix bindir_suffix in
+      let libdir = Filename.concat new_prefix libdir_suffix in
+      Printf.printf "\nRenaming %s to %s\n\n%!" prefix new_prefix;
+      Sys.rename prefix new_prefix;
+      at_exit (fun () ->
+        flush stderr;
+        flush stdout;
+        Printf.printf "\nRestoring %s to %s\n" new_prefix prefix;
+        Sys.rename new_prefix prefix);
+      Printf.printf "Re-running test programs\n%!";
+      let env = make_env bindir libdir in
+      List.iter (run_program env) programs;
+      List.iter Sys.remove programs;
+      Compmisc.init_path ~standard_library:libdir ();
+      List.iter Sys.remove (run_tests ~full:false env bindir libdir libraries)

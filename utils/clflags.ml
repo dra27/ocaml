@@ -156,12 +156,12 @@ let dont_write_files = ref false        (* set to true under ocamldoc *)
 let insn_sched_default = true
 let insn_sched = ref insn_sched_default (* -[no-]insn-sched *)
 
-let std_include_flag prefix =
+let std_include_flag ?(standard_library=Config.standard_library) prefix =
   if !no_std_include then ""
-  else (prefix ^ (Filename.quote Config.standard_library))
+  else (prefix ^ (Filename.quote standard_library))
 
-let std_include_dir () =
-  if !no_std_include then [] else [Config.standard_library]
+let std_include_dir ?(standard_library=Config.standard_library) () =
+  if !no_std_include then [] else [standard_library]
 
 let shared = ref false (* -shared *)
 let dlcode = ref true (* not -nodynlink *)
