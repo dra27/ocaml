@@ -104,7 +104,7 @@ let parse argv =
   in
   let config =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
-         has_runtime_search = None; launcher_searches_for_ocamlrun = false;
+         has_runtime_search = Absolute; launcher_searches_for_ocamlrun = false;
          target_launcher_searches_for_ocamlrun = false;
          bytecode_shebangs_by_default = false; shebangscripts = false;
          libraries = []}
@@ -163,16 +163,15 @@ let parse argv =
     config := {!config with shebangscripts}
   in
   let parse_search = function
-  | "enable" -> true
-  | "always" -> false
+  | Some "enable" -> Config.Absolute_then_search
+  | Some "always" -> Config.Search
+  | None -> Config.Absolute
   | _ ->
       raise (Arg.Bad
         "--with-runtime-search: argument should be either enable or always")
   in
   let has_runtime_search arg =
-    let has_runtime_search = Option.map parse_search arg in
-    if has_runtime_search <> None then
-      error "--with-runtime-search is not implemented!";
+    let has_runtime_search = parse_search arg in
     config := {!config with has_runtime_search}
   in
   let args = Arg.align [
