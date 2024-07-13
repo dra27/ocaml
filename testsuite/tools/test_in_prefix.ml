@@ -216,7 +216,8 @@ options are:" in
   in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
-  let relocatable = false in
+  let relocatable =
+    config.has_relative_libdir <> None && config.has_runtime_search <> None in
   let reproducible = false in
   let target_relocatable = config.has_runtime_search_target <> None in
   if bindir = "" || libdir = "" then
