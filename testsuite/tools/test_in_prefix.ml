@@ -119,8 +119,10 @@ let () =
     (Unix.stat (Filename.concat libdir "camlheader")).Unix.st_size in
   let bytecode_shebangs_by_default =
     Config.launch_method <> Config.Executable in
-  let launcher_searches_for_ocamlrun = false in
-  let target_launcher_searches_for_ocamlrun = false in
+  let launcher_searches_for_ocamlrun =
+    (config.has_runtime_search <> Config.Absolute) in
+  let target_launcher_searches_for_ocamlrun =
+    (Config.search_method <> Config.Absolute) in
   let config =
     {config with libraries;
                  launcher_searches_for_ocamlrun;
@@ -154,8 +156,19 @@ let () =
     && not Toolchain.linker_embeds_build_path
     && (not Toolchain.c_compiler_always_embeds_build_path
         || not Toolchain.c_compiler_debug_paths_can_be_absolute)
+    (* Prior to #13828 (OCaml 5.4.0), .cmt and .cmti embed the absolute location
+       of the compiler without using BUILD_PATH_PREFIX_MAP. However, this
+       embedding is not entirely predictable, because it only happens when
+       ocamlc.opt or ocamlopt.opt is used for compilation, rather than when the
+       bytecode version of the tool is passed is explicitly to ocamlrun (in this
+       case, Sys.argv.(0) always retains the relative path used in the build
+       system). For this reason, when configured relatively, on Windows, with
+       native compilation available, accept that the Build directory may appear
+       in .cmt/.cmti files, and therefore that the output may not be
+       reproducible. *)
+    && (not Sys.win32 || not config.has_ocamlopt)
   in
-  let target_relocatable = false in
+  let target_relocatable = (Config.search_method <> Config.Absolute) in
   (* Use Harness.pp_path unless --verbose was specified *)
   let pp_path =
     if verbose then
