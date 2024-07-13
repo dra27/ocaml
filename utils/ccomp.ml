@@ -77,7 +77,7 @@ let display_msvc_output file name =
     close_in c;
     Sys.remove file
 
-let compile_file ?output ?(opt="") ?stable_name name =
+let compile_file ?standard_library ?output ?(opt="") ?stable_name name =
   let (pipe, file) =
     if Config.ccomp_type = "msvc" && not !Clflags.verbose then
       try
@@ -116,7 +116,7 @@ let compile_file ?output ?(opt="") ?stable_name name =
             (List.map (Misc.expand_directory Config.standard_library)
                (List.rev (  !Clflags.hidden_include_dirs
                           @ !Clflags.include_dirs))))
-         (Clflags.std_include_flag "-I")
+         (Clflags.std_include_flag ?standard_library "-I")
          (Filename.quote name)
          (* cl tediously includes the name of the C file as the first thing it
             outputs (in fairness, the tedious thing is that there's no switch to
