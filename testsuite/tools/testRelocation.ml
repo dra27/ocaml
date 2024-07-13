@@ -62,12 +62,14 @@ let bindir_rules config file =
     (* Determine if the installation prefix should be found in this file *)
     let prefix =
       let code_embeds_stdlib_location =
-        (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
-           except flexlink and ocamllex link with the Config module, either
-           directly or via ocamlcommon *)
-        not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
-                                "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
-                                "ocamlyacc"])
+        (* If the compiler is configured with an absolute libdir, the runtime
+           binaries all contain OCAML_STDLIB_DIR and everything except flexlink
+           and ocamllex link with the Config module, either directly or via
+           ocamlcommon *)
+        config.has_relative_libdir = None
+        && not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
+                                   "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
+                                   "ocamlyacc"])
       in
       let linker_embeds_stdlib_location =
         (* If the launcher doesn't search for ocamlrun, then either the #! stub
@@ -183,7 +185,9 @@ let libdir_rules config file =
               && (basename = "config.cmx"
                   || basename = "dynlink_compilerlibs.cmx") then
         (* config.cmx contains Config.standard_library for inlining *)
-        (true, false, false, false)
+        let stdlib =
+          config.has_relative_libdir = None && not Config.flambda in
+        (stdlib, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
         let stdlib_from_flexdll = (* via FlexDLL bootstrap *)
           (* Prior to #13070 in 5.3.0, the compiler still added +flexdll to the
@@ -219,14 +223,25 @@ let libdir_rules config file =
           else
             false in
         let stdlib_from_config = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "dynlink.cma"; "ocamlcommon.cma"] in
+          config.has_relative_libdir = None
+          && List.mem basename ["config.cmt"; "dynlink.cma"; "ocamlcommon.cma"]
+        in
         let stdlib = stdlib_from_flexdll || stdlib_from_config in
         (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
         let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
         (stdlib, has_ocaml_debug_info, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
-        let stdlib = config.shebangscripts && basename <> "camlheader_ur" in
-        (stdlib, false, false, false)
+        (* When the compiler is configured with a relative libdir,
+           runtime-launch-info just contains ".", rather than the prefix *)
+        let stdlib =
+          config.has_relative_libdir = None
+          && config.shebangscripts
+          && basename <> "camlheader_ur"
+        in
+        let has_c_debug_info =
+          (* The mingw-w64 port doesn't strip stdlib/header.o *)
+          String.starts_with ~prefix:"mingw" Config.system in
+        (stdlib, false, has_c_debug_info, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. With flambda
@@ -262,8 +277,9 @@ let libdir_rules config file =
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            Filename.remove_extension basename = "dynlink"
-            || Filename.remove_extension basename = "ocamlcommon"
+            config.has_relative_libdir = None
+            && (Filename.remove_extension basename = "dynlink"
+                || Filename.remove_extension basename = "ocamlcommon")
           in
           let c_debug = compiled_with_debug && not is_ocaml in
           (stdlib, false, c_debug, compiled_with_debug && is_ocaml)
@@ -306,6 +322,13 @@ let libdir_rules config file =
         LocationMap.singleton Prefix false
       else
         LocationMap.empty
+    in
+    let prefix =
+      if config.has_relative_libdir <> None
+         && basename = "Makefile.config" then
+        LocationMap.add Relative false prefix
+      else
+        prefix
     in
     if contains_build_path then
       LocationMap.add Build false prefix
