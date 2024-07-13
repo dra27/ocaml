@@ -62,13 +62,15 @@ let bindir_rules config file =
     (* Determine if the installation prefix should be found in this file *)
     let prefix =
       let code_embeds_stdlib_location =
-        (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
-           except flexlink and ocamllex link with the Config module, either
-           directly or via ocamlcommon *)
-        not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
-                                "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
-                                "ocamlyacc";
-                                "ocaml-instr-graph"; "ocaml-instr-report"])
+        (* If the compiler is configured with an absolute libdir, the runtime
+           binaries all contain OCAML_STDLIB_DIR and everything except flexlink
+           and ocamllex link with the Config module, either directly or via
+           ocamlcommon *)
+        config.has_relative_libdir = None
+        && not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
+                                   "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
+                                   "ocamlyacc";
+                                   "ocaml-instr-graph"; "ocaml-instr-report"])
       in
       let linker_embeds_stdlib_location =
         (* If the launcher doesn't search for ocamlrun, then either the #! stub
@@ -227,7 +229,11 @@ let libdir_rules config file =
            the wrong name *)
       else if String.starts_with ~prefix:"target_camlheader" basename
               || basename = "camlheader" then
-        let stdlib = config.shebangscripts && basename <> "camlheader_ur" in
+        let stdlib =
+          config.has_relative_libdir = None
+          && config.shebangscripts
+          && basename <> "camlheader_ur"
+        in
         (not_optionally stdlib, false, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
@@ -302,6 +308,7 @@ let libdir_rules config file =
         (* The .cmxs files are all built without -g prior to #9804 in
            OCaml 4.12.0 *)
         contains_assembled_objects
+        && config.has_relative_libdir = None
         && not Harness.is_macos && Config.ccomp_type <> "msvc"
         && Toolchain.assembler_embeds_build_path
       else if ext = Config.ext_dll
@@ -321,6 +328,13 @@ let libdir_rules config file =
           LocationMap.singleton Prefix optionally
       | None ->
           LocationMap.empty
+    in
+    let prefix =
+      if config.has_relative_libdir <> None
+         && basename = "Makefile.config" then
+        LocationMap.add Relative false prefix
+      else
+        prefix
     in
     if contains_build_path then
       LocationMap.add Build false prefix
