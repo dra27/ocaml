@@ -1303,6 +1303,12 @@ let test_ld_conf ~original env bindir libdir =
   let tests =
     let main, main_outcome, main_outcome_cr =
       let (/) = Filename.concat in
+      let libdir =
+        if config.has_relative_libdir = None then
+          Config.standard_library
+        else
+          libdir
+      in
       let data = [
         (* Root directory (both forms) preserved *)
         "/", "/", None;
