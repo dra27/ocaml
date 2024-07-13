@@ -87,7 +87,7 @@ val classify_executable : string -> Harness.Import.executable
 (** [classify_executable file] analyses [file] and returns an {!executable}
     classification for it. *)
 
-val[@ocaml.warning "-32"] launched_via_stub : string -> bool
+val launched_via_stub : string -> bool
 (** [launched_via_stub file] is [true] only for bytecode executables which use
     the executable launcher. *)
 
