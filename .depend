@@ -5907,9 +5907,11 @@ middle_end/flambda/base_types/var_within_closure.cmi : \
     middle_end/flambda/base_types/closure_element.cmi
 testsuite/tools/cmdline.cmo : \
     testsuite/tools/harness.cmi \
+    utils/config.cmi \
     testsuite/tools/cmdline.cmi
 testsuite/tools/cmdline.cmx : \
     testsuite/tools/harness.cmx \
+    utils/config.cmx \
     testsuite/tools/cmdline.cmi
 testsuite/tools/cmdline.cmi : \
     testsuite/tools/harness.cmi
@@ -5991,6 +5993,7 @@ testsuite/tools/harness.cmx : \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmi : \
     utils/misc.cmi \
+    utils/config.cmi \
     bytecomp/byterntm.cmi
 testsuite/tools/lexcmm.cmi :
 testsuite/tools/parsecmmaux.cmo : \
