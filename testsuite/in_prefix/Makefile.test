@@ -26,6 +26,7 @@ endif
       $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
+      $(call bool_to_with, relative-libdir, $(RELATIVE_LIBDIR)) \
       $(ALL_OTHERLIBS)
 
 SCRUB_ENV = \
