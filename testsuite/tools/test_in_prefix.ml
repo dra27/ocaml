@@ -152,7 +152,7 @@ let () =
      relocatable and also required support from the assembler and C compiler. *)
   let relocatable =
     config.has_relative_libdir <> None
-    && config.launcher_searches_for_ocamlrun
+    && config.has_runtime_search <> Config.Disable
   in
   let reproducible =
     relocatable
