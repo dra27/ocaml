@@ -20,6 +20,8 @@ type config = {
     (* $(INSTALL_OCAMLNAT) - Makefile.build_config *)
   has_ocamlopt: bool;
     (* $(NATIVE_COMPILER) - Makefile.config *)
+  has_relative_libdir: bool;
+    (* $(RELATIVE_LIBDIR) - Makefile.build_config *)
   libraries: string list list
     (* Sorted list of basenames of libraries to test.
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -42,8 +44,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let bindir = ref "" in
   let libdir = ref "" in
   let config =
-    ref {supports_shared_libraries = false;
-         has_ocamlnat = false; has_ocamlopt = false; libraries = []}
+    ref {supports_shared_libraries = false; has_ocamlnat = false;
+         has_ocamlopt = false; has_relative_libdir = false; libraries = []}
   in
   let check_exists r dir =
     if Sys.file_exists dir then
@@ -62,6 +64,9 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
+  let has_relative_libdir has_relative_libdir () =
+    config := {!config with has_relative_libdir}
+  in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -78,6 +83,9 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
 \tNative compiler (ocamlopt) is installed in the directory given in --bindir";
     "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+    "--with-relative-libdir", Arg.Unit (has_relative_libdir true), "\
+\tCompiler was configured with --enable-relative";
+    "--without-relative-libdir", Arg.Unit (has_relative_libdir false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -1330,7 +1338,7 @@ let test_ld_conf ~original env bindir libdir =
       (* Various test lines above all fed via ld.conf in the Standard Library.
          ocamlrun can't find ld.conf after the prefix has been renamed *)
       let outcome =
-        if original then
+        if original || config.has_relative_libdir then
           (* Known issue: Windows strips out the blank entries in the search
              path (somewhat counterintuitively!) *)
           if Sys.win32 then
@@ -1355,7 +1363,7 @@ let test_ld_conf ~original env bindir libdir =
       (* Part of the outcome from ld.conf. ocamlrun can't find ld.conf after the
          prefix has been renamed *)
       let outcome_ld_conf =
-        if original then
+        if original || config.has_relative_libdir then
           if Sys.win32 then
             main_outcome
           else
@@ -1409,7 +1417,7 @@ let test_ld_conf ~original env bindir libdir =
       in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir then
           outcome_caml_ld_library_path @ main_outcome
         else
           outcome_caml_ld_library_path
@@ -1421,7 +1429,7 @@ let test_ld_conf ~original env bindir libdir =
       (* As first, but with a CR at the end of each line *)
       let stdlib = List.map (Fun.flip (^) "\r") ("" :: main) in
       let outcome =
-        if original then
+        if original || config.has_relative_libdir then
           (* Known issue: Windows strips out the blank entries in the search
              path (somewhat counterintuitively!) *)
           if Sys.win32 then
@@ -1443,7 +1451,7 @@ let test_ld_conf ~original env bindir libdir =
          path *)
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir then
           ["ld.conf"]
         else
           []
@@ -1459,7 +1467,7 @@ let test_ld_conf ~original env bindir libdir =
        stdlib = ["ld.conf"]; outcome} :: tests in
     let outcome =
       (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-      if original then
+      if original || config.has_relative_libdir then
         ["masked-stdlib"]
       else
         []
@@ -1470,7 +1478,7 @@ let test_ld_conf ~original env bindir libdir =
          "." entries to the search path *)
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir then
           ["ld.conf"]
         else
           []
@@ -1503,7 +1511,7 @@ let test_ld_conf ~original env bindir libdir =
   let tests =
     let outcome =
       (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-      if original then
+      if original || config.has_relative_libdir then
         ["libdir"]
       else
         []
@@ -1532,7 +1540,7 @@ let test_ld_conf ~original env bindir libdir =
       in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir then
           ["libdir"]
         else
           []
@@ -1726,10 +1734,12 @@ let compile_test ~original env bindir =
        - clibs prepends any additional C libraries which must be passed when
          linking (implies main_in_c is true) *)
     let use_shared_runtime, needs_ocamlopt, options, main_in_c,
-        compilation_exit_code, linker_exit_code, may_segfault, clibs =
+        compilation_exit_code, linker_exit_code, may_segfault,
+        compiled_with_relative, clibs =
       let f ?(use_shared_runtime = false) ?(needs_ocamlopt = false)
             ?(calls_linker = needs_ocamlopt) ?(compilation_exit_code = 0)
-            ?(linker_exit_code = 0) ?(may_segfault = false) ?clibs options =
+            ?(linker_exit_code = 0) ?(may_segfault = false)
+            ?(compiled_with_relative = false) ?clibs options =
         let main_in_c = clibs <> None in
         let clibs = Option.value ~default:[] clibs in
         let compilation_exit_code, linker_exit_code =
@@ -1750,7 +1760,8 @@ let compile_test ~original env bindir =
             compilation_exit_code, linker_exit_code
         in
         use_shared_runtime, needs_ocamlopt, options, main_in_c,
-        compilation_exit_code, linker_exit_code, may_segfault, clibs
+        compilation_exit_code, linker_exit_code, may_segfault,
+        compiled_with_relative, clibs
       in
       let fails_if ?(compilation_exit_code = 2) cond =
         if cond then
@@ -1760,7 +1771,7 @@ let compile_test ~original env bindir =
       in
       match test with
       | Default C_ocamlc ->
-          f []
+          f ~compiled_with_relative:config.has_relative_libdir []
       | Default C_ocamlopt ->
           f ~needs_ocamlopt:true []
       | Custom Static ->
@@ -2076,6 +2087,7 @@ let compile_test ~original env bindir =
               in
               List.map test_with_outcome tests
             in
+            let arg = compiled_with_relative || arg in
             let execute ({argv0; prefix_path_with_cwd}, outcome) =
               let expected_executable_name, expected_exit_code, expected_argv0 =
                 match outcome with
@@ -2205,10 +2217,11 @@ let () =
   (* Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
   (* Finally re-run all of the tests with the new prefix *)
-  let caml_ld_library_path, ocamllib =
+  let caml_ld_library_path =
     assert (not relocatable);
-    Some [Filename.concat libdir "stublibs"], Some libdir
+    Some [Filename.concat libdir "stublibs"]
   in
+  let ocamllib = if config.has_relative_libdir then None else Some libdir in
   let env = Environment.make ?caml_ld_library_path bindir libdir in
   let runtime =
     if target_launcher_searches_for_ocamlrun then
