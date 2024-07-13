@@ -32,12 +32,18 @@ else
 VERBOSE_FLAG =
 endif
 
+ifeq "$(LIBDIR_REL)" ""
+LIBDIR_REL_FLAG = --without-relative-libdir
+else
+LIBDIR_REL_FLAG = --with-relative-libdir '$(LIBDIR_REL)'
+endif
+
 test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
 	@$< $(VERBOSE_FLAG) --bindir "$(BINDIR)" --libdir "$(LIBDIR)" \
       $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
-      $(OTHERLIBRARIES)
+      $(LIBDIR_REL_FLAG) $(OTHERLIBRARIES)
 
 SCRUB_ENV = \
   CAML_LD_LIBRARY_PATH OCAMLLIB CAMLLIB OCAMLPARAM OCAMLRUNPARAM CAMLRUNPARAM
