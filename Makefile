@@ -960,7 +960,7 @@ else
 endif
 
 test-installation: tools/test_install$(EXE)
-	@$^ "$(BINDIR)" "$(LIBDIR)" "$(SUPPORTS_SHARED_LIBRARIES)" "$(INSTALL_OCAMLNAT)" "$(NATIVE_COMPILER)" $(ALL_OTHERLIBS)
+	@$^ "$(BINDIR)" "$(LIBDIR)" "$(SUPPORTS_SHARED_LIBRARIES)" "$(INSTALL_OCAMLNAT)" "$(NATIVE_COMPILER)" $(RELATIVE_LIBDIR) $(ALL_OTHERLIBS)
 else
 test-installation:
 	$(error The test-installation target must be invoked as \

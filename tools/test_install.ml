@@ -489,7 +489,8 @@ let run_program env ?runtime test_program ~arg =
 
 (* XXX Code dup between these two paths *)
 let compile_with_options ?(unix_only=false)
-                         ?(supports_shared=true) ?(tendered=false) ~full env
+                         ?(supports_shared=true) ?(tendered=false)
+                         ?(relative_libdir=false) ~full env
                          compiler ?(native_compiler=true) ~native ?runtime
                          options test_program description =
   if unix_only && Sys.win32 || not supports_shared
@@ -498,9 +499,11 @@ let compile_with_options ?(unix_only=false)
   else
     let cont test_program ?runtime env ~arg =
       let runtime = if tendered then runtime else None in
+      let arg = (relative_libdir && tendered) || arg in
       run_program env ?runtime test_program ~arg;
       if full then
         Some (fun ?runtime env ~arg ->
+          let arg = (relative_libdir && tendered) || arg in
           let runtime = if tendered then runtime else None in
           run_program env ?runtime test_program ~arg;
           Sys.remove test_program;
@@ -535,7 +538,8 @@ let compile_obj ?(unix_only=false)
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
 let test_standard_library_location ~full env bindir libdir supports_shared
-                                   native_compiler ocamlc ocamlopt =
+                                   native_compiler relative_libdir ocamlc
+                                   ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
   let runtime =
     if native_compiler || Sys.win32 then
@@ -556,7 +560,8 @@ let test_standard_library_location ~full env bindir libdir supports_shared
   let tendered = true in
   let programs = List.filter_map Fun.id [
     (* XXX Shouldn't this more be that the test is expected to fail?? *)
-    compile_with_options ~tendered ~full env ocamlc ?runtime ~native:false
+    compile_with_options ~tendered ~relative_libdir ~full env ocamlc ?runtime
+                         ~native:false
       [] "test_bytecode"
       "Bytecode (with tender)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
@@ -604,7 +609,7 @@ let test_standard_library_location ~full env bindir libdir supports_shared
 
 (* XXX ~full is more the phase - have we renamed the root, etc. *)
 let run_tests ~full env bindir libdir supports_shared test_ocamlnat
-              native_compiler libraries =
+              native_compiler relative_libdir libraries =
   let libraries = sort_libraries libraries in
   let ocaml = exe (Filename.concat bindir "ocaml") in
   let ocamlnat = exe (Filename.concat bindir "ocamlnat") in
@@ -625,7 +630,8 @@ let run_tests ~full env bindir libdir supports_shared test_ocamlnat
   (*if full then*)
     test_bytecode_binaries ~full env bindir;
   test_standard_library_location
-    ~full env bindir libdir supports_shared native_compiler ocamlc ocamlopt
+    ~full env bindir libdir supports_shared native_compiler relative_libdir
+       ocamlc ocamlopt
 
 let rec split_dir acc dir =
   let dirname = Filename.dirname dir in
@@ -657,17 +663,18 @@ let () =
     exit 2
   end else
     let libraries =
-      Array.to_list (Array.sub Sys.argv 6 (Array.length Sys.argv - 6)) in
+      Array.to_list (Array.sub Sys.argv 7 (Array.length Sys.argv - 7)) in
     let bindir = Sys.argv.(1) in
     let libdir = Sys.argv.(2) in
     let supports_shared = bool_of_string Sys.argv.(3) in
     let test_ocamlnat = bool_of_string Sys.argv.(4) in
     let native_compiler = bool_of_string Sys.argv.(5) in
+    let relative_libdir = bool_of_string Sys.argv.(6) in
     let env = make_env bindir libdir in
     let programs =
       run_tests
         ~full:true env bindir libdir supports_shared test_ocamlnat
-          native_compiler libraries in
+          native_compiler relative_libdir libraries in
     let prefix, bindir_suffix, libdir_suffix =
       split_to_prefix [] (split_dir [] bindir) (split_dir [] libdir) in
     let new_prefix = prefix ^ ".new" in
@@ -687,12 +694,11 @@ let () =
     let runtime = Some (exe (Filename.concat bindir "ocamlrun")) in
     List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
     (*List.iter Sys.remove programs;*)
-    let env =
-      make_env ~ocamllib:true bindir libdir in
+    let env = make_env ~ocamllib:(not relative_libdir) bindir libdir in
     Compmisc.init_path ~standard_library:libdir ();
     let programs =
       run_tests
         ~full:false env bindir libdir supports_shared test_ocamlnat
-          native_compiler libraries
+          native_compiler relative_libdir libraries
     in
     assert (programs = [])
