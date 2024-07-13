@@ -84,7 +84,7 @@ let run config env =
                     else
                       failed, "compiled with -custom"
                 | Tendered {runtime; id; header; search; _} ->
-                    let reported_runtime =
+                    let reported_runtime, search =
                       let id =
                         Option.map
                           (fun t -> "-" ^ Misc.RuntimeID.to_string t) id
@@ -92,24 +92,22 @@ let run config env =
                       in
                       match search with
                       | Disable dir ->
-                          dir ^ runtime ^ id
+                          dir ^ runtime ^ id, Config.Disable
                       | Enable dir ->
-                          Printf.sprintf "[%s]%s%s" dir runtime id
+                          Printf.sprintf "[%s]%s%s" dir runtime id,
+                          Config.Enable
                       | Always ->
-                          runtime ^ id
+                          runtime ^ id, Config.Always
                     in
                     let expected_id =
                       if config.filename_mangling then
-                        Some (Misc.RuntimeID.make_zinc ())
+                        match config.has_runtime_search with
+                        | Config.Disable | Config.Enable ->
+                            Some (Misc.RuntimeID.make_zinc ())
+                        | Config.Always ->
+                            Some (Misc.RuntimeID.make_zinc ())
                       else
                         None
-                    in
-                    let expected_search =
-                      if Sys.win32 then
-                        Byterntm.Always
-                      else
-                        Byterntm.Disable
-                          (Filename.concat (Environment.bindir env) "")
                     in
                     let expected_launch_mode =
                       if Config.shebangscripts then
@@ -124,11 +122,11 @@ let run config env =
                         Format.pp_print_string f (Misc.RuntimeID.to_string id)
                     in
                     let pp_search f = function
-                    | Byterntm.Disable _ ->
+                    | Config.Disable ->
                         Format.pp_print_string f "disable"
-                    | Byterntm.Enable _ ->
+                    | Config.Enable ->
                         Format.pp_print_string f "enable"
-                    | Byterntm.Always ->
+                    | Config.Always ->
                         Format.pp_print_string f "always"
                     in
                     let pp_launch f = function
@@ -145,7 +143,7 @@ let run config env =
                     in
                     let failed =
                       failed
-                      |> check expected_search search
+                      |> check config.has_runtime_search search
                                "search mechanism" pp_search
                       |> check expected_id id
                                "runtime ID" pp_runtime_id
