@@ -77,7 +77,7 @@ let bindir_rules config file =
         (* If the launcher doesn't search for ocamlrun, then either the #! stub
            will include the absolute path or the RNTM section will *)
         match classification with
-        | Tendered _ when not config.launcher_searches_for_ocamlrun -> true
+        | Tendered _ when config.has_runtime_search <> Config.Search -> true
         | _ -> false
       in
       if code_embeds_stdlib_location || linker_embeds_stdlib_location then
