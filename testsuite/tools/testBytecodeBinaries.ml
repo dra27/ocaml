@@ -86,23 +86,30 @@ let run config env =
               | Tendered {runtime; id; header; search} ->
                   let expected_id =
                     if Config.suffixing then
-                      Some (Misc.RuntimeID.make_zinc ())
+                      match config.has_runtime_search with
+                      | Config.Absolute | Config.Absolute_then_search ->
+                          Some (Misc.RuntimeID.make_zinc ())
+                      | Config.Search ->
+                          Some (Misc.RuntimeID.make_zinc
+                                  ~int31:false
+                                  ~static:false
+                                  ~no_compression:false ())
                     else
                       None
                   in
-                  let expected = (runtime = "ocamlrun" && id = expected_id) in
-                  let runtime, is_expected_runtime =
+                  let runtime, expected_search =
                     let id =
                       Option.map (fun t -> "-" ^ Misc.RuntimeID.to_string t) id
                       |> Option.value ~default:""
                     in
                     match search with
                     | Absolute dir ->
-                        dir ^ runtime ^ id, expected
+                        dir ^ runtime ^ id, Config.Absolute
                     | Absolute_then_search dir ->
-                        Printf.sprintf "[%s]%s%s" dir runtime id, false
+                        Printf.sprintf "[%s]%s%s" dir runtime id,
+                        Config.Absolute_then_search
                     | Search ->
-                        runtime ^ id, false
+                        runtime ^ id, Config.Search
                   in
                   let expected_launch_mode =
                     if config.shebangscripts then
@@ -110,14 +117,19 @@ let run config env =
                     else
                       Header_exe
                   in
-                  if is_expected_runtime then
-                    if header = expected_launch_mode then
-                      runtime
+                  if config.has_runtime_search = expected_search then
+                    if expected_id = id then
+                      if header = expected_launch_mode then
+                        runtime
+                      else
+                        Harness.fail_because "%s: unexpected launch mode"
+                                             program
                     else
-                      Harness.fail_because "%s: unexpected launch mode" program
+                      Harness.fail_because "%s: unexpected runtime %S"
+                                           program runtime
                   else
-                    Harness.fail_because "%s: unexpected runtime %S"
-                                         program runtime
+                    Harness.fail_because "%s: unexpected search mechanism"
+                                         program
             in
             Printf.printf "  Runtime: %s\n  Output: %s\n" runtime output;
             if Sys.win32 && Filename.extension binary = ".exe" then
