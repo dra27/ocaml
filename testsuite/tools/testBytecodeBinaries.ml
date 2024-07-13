@@ -99,8 +99,7 @@ let run config env =
                       | Config.Search ->
                           Some (Misc.RuntimeID.make_zinc
                                   ~int31:false
-                                  ~static:false
-                                  ~no_compression:false ())
+                                  ~static:false ())
                     else
                       None
                   in

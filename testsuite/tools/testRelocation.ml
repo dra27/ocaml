@@ -41,13 +41,12 @@ let effective_toolchain config =
   in
   c_compiler_debug_paths_are_absolute, assembler_embeds_build_path
 
-(* The reproducible ruleset is the simplest: only Makefile.config may contain
-   the installation prefix or use the relative prefix. Since OC_FLAGS wasn't
-   moved to Makefile.build_config.in until #12108 in OCaml 5.1.0,
-   Makefile.config also ends up containing the build path. *)
+(* The reproducible ruleset is the simplest: nothing is allowed to contain the
+   build path and only Makefile.config may contain the installation prefix or
+   use the relative prefix. *)
 let reproducible_rules file =
   if Filename.basename file = "Makefile.config" then
-    LocationSet.of_list [Build; Relative; Prefix]
+    LocationSet.of_list [Relative; Prefix]
   else
     LocationSet.empty
 
