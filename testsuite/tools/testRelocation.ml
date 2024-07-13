@@ -303,6 +303,7 @@ let libdir_rules config file =
         (* The .cmxs files are all built without -g prior to #9804 in
            OCaml 4.12.0 *)
         contains_assembled_objects
+        && config.has_relative_libdir = None
         && not Harness.is_macos && Config.ccomp_type <> "msvc"
         && Toolchain.assembler_embeds_build_path
       else if ext = Config.ext_dll
