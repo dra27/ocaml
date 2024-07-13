@@ -87,6 +87,7 @@ let () =
       has_c_stubs
       && expected_exit_code = None
       && Config.supports_shared_libraries
+      && config.has_relative_libdir = None
     in
     let expected_exit_code =
       match expected_exit_code with
