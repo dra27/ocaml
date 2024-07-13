@@ -88,7 +88,7 @@ let run (config : Installation.t) env mode =
         ~fails:(expected_exit_code <> 0)
         ~runtime:(mode = Bytecode && not config.launcher_searches_for_ocamlrun)
         ~stubs:(mode = Bytecode && has_c_stubs)
-        ~stdlib:true env toplevel args
+        ~stdlib:(config.has_relative_libdir = None) env toplevel args
     in
     Environment.display_output output;
     if exit_code <> expected_exit_code then

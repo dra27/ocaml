@@ -126,7 +126,7 @@ val fail_because : ('a, unit, string, 'b) format4 -> 'a
 
 val classify_executable : string -> executable
 
-val[@ocaml.warning "-32"] launched_via_stub : string -> bool
+val launched_via_stub : string -> bool
 
 val erase_file : string -> unit
 

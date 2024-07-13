@@ -74,7 +74,7 @@ let () =
     ] in
     let runtime =
       mode = Bytecode && Installation.ocamlc_fails_after_rename config in
-    let stdlib = true in
+    let stdlib = config.has_relative_libdir = None in
     Environment.run_process Execute ~runtime ~stdlib env compiler args;
     let files = test_program :: files in
     let files =
@@ -87,7 +87,8 @@ let () =
     in
     let runtime =
       mode = Bytecode
-      && not config.target_launcher_searches_for_ocamlrun in
+      && not config.target_launcher_searches_for_ocamlrun
+      && config.has_relative_libdir = None in
     let run run_process test =
       let code, lines =
         run_process ~runtime test_program []
@@ -99,7 +100,8 @@ let () =
              ld.conf files *)
           if Sys.win32 then
             if ((test.camllib = Empty
-                   && not (Environment.is_renamed env))
+                   && (not (Environment.is_renamed env)
+                       || config.has_relative_libdir <> None))
                 || test.ocamllib = Empty) then
               let unmask s = not (String.starts_with ~prefix:"masked-" s) in
               let lines' = List.filter unmask lines in
@@ -349,8 +351,9 @@ let run (config : Installation.t) env =
      stdlib = []; outcome = []}
   in
   let if_ld_conf_found outcome =
-    (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-    if Environment.is_renamed env then
+    (* ocamlrun can only find ld.conf after the prefix has been renamed if it's
+       configured with --with-relative-libdir *)
+    if Environment.is_renamed env && config.has_relative_libdir = None then
       []
     else
       outcome
@@ -364,6 +367,12 @@ let run (config : Installation.t) env =
           Environment.libdir env
         else
           Config.standard_library in
+      let libdir =
+        if config.has_relative_libdir = None then
+          libdir
+        else
+          try Unix.realpath libdir
+          with Invalid_argument _ -> libdir in
       let (/) = Filename.concat in
       let data = [
         (* Root directory (both forms) preserved *)
