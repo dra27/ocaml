@@ -30,6 +30,10 @@ type config = {
     (* $(NATIVE_COMPILER) - Makefile.config *)
   has_relative_libdir: string option;
     (* $(LIBDIR_REL) - Makefile.build_config *)
+  has_runtime_search: bool option;
+    (* $(RUNTIME_SEARCH) - Makefile.build_config *)
+  has_runtime_search_target: bool option;
+    (* $(RUNTIME_SEARCH_TARGET) - Makefile.build_config *)
   libraries: string list list
     (* Sorted list of basenames of libraries to test.
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -83,7 +87,9 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let libdir = ref "" in
   let config =
     ref {supports_shared_libraries = false; has_ocamlnat = false;
-         has_ocamlopt = false; has_relative_libdir = None; libraries = []}
+         has_ocamlopt = false; has_relative_libdir = None;
+         has_runtime_search = None; has_runtime_search_target = None;
+         libraries = []}
   in
   let check_exists r dir =
     if Sys.file_exists dir then
@@ -106,6 +112,21 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     config := {!config with has_relative_libdir = Some relative_libdir} in
   let absolute_libdir () =
     config := {!config with has_relative_libdir = None} in
+  let parse_search suffix = function
+  | "fallback" -> false
+  | "always" -> true
+  | _ ->
+      raise (Arg.Bad (Printf.sprintf "--with-runtime-search%s: argument should \
+                                      be either fallback or always" suffix))
+  in
+  let has_runtime_search arg =
+    let has_runtime_search = Option.map (parse_search "") arg in
+    config := {!config with has_runtime_search}
+  in
+  let has_runtime_search_target arg =
+    let has_runtime_search_target = Option.map (parse_search "-target") arg in
+    config := {!config with has_runtime_search_target}
+  in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -125,6 +146,16 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     "--with-relative-libdir", Arg.String relative_libdir, "\
 \tCompiler was configured with --with-relative-libdir";
     "--without-relative-libdir", Arg.Unit absolute_libdir, "";
+    "--with-runtime-search",
+      Arg.String (fun s -> has_runtime_search (Some s)), "\
+\tCompiler bytecode binaries can search for their runtimes";
+    "--without-runtime-search",
+      Arg.Unit (fun () -> has_runtime_search None), "";
+    "--with-runtime-search-target",
+      Arg.String (fun s -> has_runtime_search_target (Some s)), "\
+\tBytecode binaries produced by the compiler can search for their runtimes";
+    "--without-runtime-search-target",
+      Arg.Unit (fun () -> has_runtime_search_target None), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -156,7 +187,7 @@ options are:" in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
   let relocatable = false in
-  let target_relocatable = false in
+  let target_relocatable = config.has_runtime_search_target <> None in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
     exit 2
@@ -774,10 +805,12 @@ let exe =
     Fun.id
 
 (* launcher_searches_for_ocamlrun describes whether ocamlc emits an RNTM with
-   the name of the runtime only, expecting the launcher in stdlib/header*.c to
-   search PATH for it. This used to be the behaviour for native Windows. *)
-let launcher_searches_for_ocamlrun = false
-let target_launcher_searches_for_ocamlrun = false
+   the name of the runtime only, expecting the bytecode launcher to search PATH
+   for it. *)
+let launcher_searches_for_ocamlrun =
+  config.has_runtime_search <> None
+let target_launcher_searches_for_ocamlrun =
+  config.has_runtime_search_target <> None
 
 (* linker_is_flexlink is true for Cygwin when shared library support is enabled
    and always true for native Windows. *)
@@ -2393,7 +2426,7 @@ let test_relocation prefix bindir libdir =
       |> Option.value ~default:basename_without_type in
     let classification = classify_executable file in
     if classification = Tendered && basename <> "ocaml" then
-      if not launcher_searches_for_ocamlrun
+      if config.has_runtime_search <> Some true
          || (config.has_relative_libdir = None
              && basename_without_type <> "flexlink"
              && basename_without_type <> "ocamllex") then
@@ -2401,7 +2434,11 @@ let test_relocation prefix bindir libdir =
       else
         LocationSet.empty
     else if classification = Shebang && basename <> "ocaml" then
-      LocationSet.singleton Prefix
+      if config.has_runtime_search <> Some true
+         || basename_without_type <> "ocamllex" then
+        LocationSet.singleton Prefix
+      else
+        LocationSet.empty
     else if basename = "default.manifest"
             || basename = "default_amd64.manifest" then
       LocationSet.empty
