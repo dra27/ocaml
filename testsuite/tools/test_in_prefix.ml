@@ -25,7 +25,7 @@ type config = {
   has_ocamlopt: bool;
     (* $(NATIVE_COMPILER) - Makefile.config *)
   has_relative_libdir: string option;
-    (* Not yet implemented; always None. *)
+    (* $(LIBDIR_REL) - Makefile.build_config *)
   has_runtime_search: bool option;
     (* Not yet implemented; always None. *)
   libraries: string list list
@@ -198,7 +198,7 @@ let orig_bindir, orig_libdir, prefix, bindir_suffix, libdir_suffix, config,
 <pwd>\tCurrent working directory to use";
     "--bindir", Arg.String (check_exists ~absolute:true bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
-    "--libdir", Arg.String (check_exists ~absolute:true libdir), "\
+    "--libdir", Arg.String (check_exists ~absolute:false libdir), "\
 <libdir>\tDirectory containing stdlib.cma (must share a prefix with --bindir)";
     "--summary", Arg.Set show_summary, "";
     "--verbose", Arg.Set verbose, "";
@@ -1209,7 +1209,8 @@ let load_libraries_in_toplevel env mode libraries =
       Environment.run_process Return
         ~runtime:(mode = Bytecode && not launcher_searches_for_ocamlrun)
         ~stubs:(mode = Bytecode && has_c_stubs)
-        ~stdlib:true ~fails:(expected_exit_code <> 0) env toplevel args
+        ~stdlib:(config.has_relative_libdir = None)
+        ~fails:(expected_exit_code <> 0) env toplevel args
     in
     Environment.display_output output;
     if exit_code <> expected_exit_code then
@@ -1262,7 +1263,7 @@ let () =
       let args = if custom then "-custom" :: args else args in
       Environment.run_process Execute
         ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
-        ~stdlib:true env compiler args in
+        ~stdlib:(config.has_relative_libdir = None) env compiler args in
     compile ();
     files, compile
   in
@@ -1282,10 +1283,12 @@ let () =
         mode = Bytecode
         && expected_exit_code = None
         && not target_launcher_searches_for_ocamlrun
+        && config.has_relative_libdir = None
       in
       let stubs =
         has_c_stubs
         && expected_exit_code = None
+        && config.supports_shared_libraries
       in
       let expected_exit_code =
         match expected_exit_code with
@@ -1314,9 +1317,16 @@ let () =
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
   let expected_exit_code =
-    (* Bytecode executables launched using the executable header require
-       caml_executable_name to know where the runtime is. *)
-    None in
+    (* Relocatable OCaml bytecode executables launched using the executable
+       header require caml_executable_name, or they end up being accidentally
+       relative, since the exec call leaves argv[0] as being the bytecode image
+       itself. *)
+    if mode = Bytecode && config.has_relative_libdir <> None
+       && no_caml_executable_name
+       && launched_via_stub test_program then
+      Some 2
+    else
+      None in
   let libraries = List.filter not_dynlink libraries in
   let () =
     List.iter (test_libraries_in_prog ?expected_exit_code env) libraries;
@@ -1479,7 +1489,7 @@ let () =
     ] in
     Environment.run_process Execute
       ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
-      ~stdlib:true env compiler args;
+      ~stdlib:(config.has_relative_libdir = None) env compiler args;
     let files = test_program :: files in
     let files =
       if mode = Native then
@@ -1490,7 +1500,10 @@ let () =
         "test_install_script.cmo" :: files
     in
     let runtime =
-      mode = Bytecode && not target_launcher_searches_for_ocamlrun in
+      mode = Bytecode
+      && not target_launcher_searches_for_ocamlrun
+      && config.has_relative_libdir = None
+    in
     let run run_process test =
       let code, lines =
         run_process ~runtime test_program []
@@ -1501,7 +1514,9 @@ let () =
              differently from _wgetenv which in the tests will cause it load
              ld.conf files *)
           if Sys.win32 then
-            if (test.camllib = Empty && not (Environment.is_renamed env)
+            if (test.camllib = Empty
+                  && (not (Environment.is_renamed env)
+                      || config.has_relative_libdir <> None)
                 || test.ocamllib = Empty) then
               let unmask s = not (String.starts_with ~prefix:"masked-" s) in
               let lines' = List.filter unmask lines in
@@ -1746,8 +1761,9 @@ let test_ld_conf env =
      stdlib = []; outcome = []}
   in
   let if_ld_conf_found outcome =
-    (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-    if Environment.is_renamed env then
+    (* ocamlrun can only find ld.conf after the prefix has been renamed if it's
+       configured with --with-relative-libdir *)
+    if Environment.is_renamed env && config.has_relative_libdir = None then
       []
     else
       outcome
@@ -1757,6 +1773,13 @@ let test_ld_conf env =
   let tests =
     let main, main_outcome, main_outcome_cr =
       let libdir = Environment.libdir env in
+      let libdir =
+        if config.has_relative_libdir = None then
+          libdir
+        else
+          try Unix.realpath libdir
+          with Invalid_argument _ -> libdir
+      in
       let (/) = Filename.concat in
       let data = [
         (* Root directory (both forms) preserved *)
@@ -2083,7 +2106,7 @@ let run_program =
       if Environment.is_renamed env then
         stdlib_exists_when_renamed
       else
-        false in
+        config.has_relative_libdir <> None in
     let args = [string_of_bool stdlib_exists; prefix; libdir_suffix] in
     let argv0 =
       if argv0 = test_program then
@@ -2343,7 +2366,7 @@ let compile_test env =
           options
       in
       let options =
-        if Environment.is_renamed env then
+        if Environment.is_renamed env || config.has_relative_libdir <> None then
           options
         else
           let new_libdir = Filename.concat (prefix ^ ".new") libdir_suffix in
@@ -2379,7 +2402,7 @@ let compile_test env =
           Environment.run_process Return
             ~fails:(compilation_exit_code <> 0)
             ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
-            ~stdlib:true
+            ~stdlib:(config.has_relative_libdir = None)
             ~stubs:(with_unix && tendered) env compiler args
         in
         Environment.display_output output;
@@ -2408,7 +2431,12 @@ let compile_test env =
           (* Nothing to run because linking the test is known to fail *)
           `None
         else
-          let stdlib_exists_when_renamed = not (Environment.is_renamed env) in
+          let compiled_location = Environment.is_renamed env in
+          let stdlib_exists_when_renamed =
+            if config.has_relative_libdir = None then
+              not (Environment.is_renamed env)
+            else
+              Environment.is_renamed env in
           (* Each test is compiled twice - in the original prefix
              (~original:true) and in the renamed prefix (~original:false).
              Additionally, the tests compiled in the original prefix are
@@ -2416,9 +2444,13 @@ let compile_test env =
              is what this slightly convoluted run function sets up *)
           let rec run env =
             (* Bytecode executables with absolute headers will need to be
-               invoked via ocamlrun after the prefix has been renamed. *)
+               invoked via ocamlrun after the prefix has been renamed.
+               XXX Expand: when relative, runtime-launch-info contains a .
+                   and so the header is _correctly_ computed even after
+                   renaming. *)
             let via_ocamlrun =
               Environment.is_renamed env
+                <> (compiled_location && config.has_relative_libdir <> None)
               && tendered && not target_launcher_searches_for_ocamlrun
             in
             (* Each executable is invoked with six different values of
@@ -2503,6 +2535,16 @@ let compile_test env =
                         else if Sys.win32 then
                           (* stdlib/headernt.c correctly preserves argv[0] *)
                           Success {executable_name = test_program_path; argv0}
+                        else if no_caml_executable_name
+                                && not (Environment.is_renamed env)
+                                && config.has_relative_libdir <> None then
+                          (* Without caml_executable_name, ocamlrun will be
+                             forced to interpret the relative standard library
+                             relative to argv[0], which will fail. As with the
+                             Dynlink testing, after the prefix has been renamed,
+                             CAML_LD_LIBRARY_PATH has to be set, so this will
+                             succeed. *)
+                          Fail 134
                         else
                           (* stdlib/header.c does not preserve argv[0] *)
                           Success {executable_name = argv0_resolved;
@@ -2936,9 +2978,10 @@ let test_relocation env prefix =
           (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
              except flexlink and ocamllex link with the Config module, either
              directly or via ocamlcommon *)
-          not (List.mem basename ["flexlink.byte"; "flexlink.opt";
-                                  "ocamllex.byte"; "ocamllex.opt";
-                                  "ocamlyacc"])
+          config.has_relative_libdir = None
+          && not (List.mem basename ["flexlink.byte"; "flexlink.opt";
+                                     "ocamllex.byte"; "ocamllex.opt";
+                                     "ocamlyacc"])
         in
         let linker_embeds_stdlib_location =
           (* If the launcher doesn't search for ocamlrun, then either the #!
@@ -3027,17 +3070,21 @@ let test_relocation env prefix =
            ~ocaml_debug:has_ocaml_debug_info,
            ~c_debug:contains_c_debug_info,
            ~s:contains_assembled_objects) =
-        if List.mem basename ["Makefile.config";
-                              "ld.conf";
-                              "runtime-launch-info"] then
+        if basename = "Makefile.config" || basename = "ld.conf" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if basename = "config.cmx" then
-          (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+          let stdlib =
+            config.has_relative_libdir = None && not Config.flambda in
+          (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
           let stdlib =
-            List.mem basename ["config.cmt"; "config_main.cmt";
-                               "ocamlcommon.cma"] in
+            config.has_relative_libdir = None
+            && List.mem basename ["config.cmt"; "config_main.cmt";
+                                  "ocamlcommon.cma"] in
           (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
+        else if basename = "runtime-launch-info" then
+          let stdlib = config.has_relative_libdir = None in
+          (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if ext = ".cmxs" then
           (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
         else if ext = Config.ext_obj then
@@ -3051,7 +3098,8 @@ let test_relocation env prefix =
             let is_ocaml =
               Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
             let stdlib =
-              Filename.remove_extension basename = "ocamlcommon" in
+              config.has_relative_libdir = None
+              && Filename.remove_extension basename = "ocamlcommon" in
             let c_debug = not is_ocaml in
             (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
           else
@@ -3082,6 +3130,13 @@ let test_relocation env prefix =
           LocationSet.singleton Prefix
         else
           LocationSet.empty
+      in
+      let prefix =
+        if config.has_relative_libdir <> None
+           && (basename = "Makefile.config" || basename = "ld.conf") then
+          LocationSet.add Relative prefix
+        else
+          prefix
       in
       if contains_build_path then
         LocationSet.add Build prefix
