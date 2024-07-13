@@ -247,7 +247,7 @@ let libdir_rules config file =
     let prefix =
       if config.has_relative_libdir <> None
          && basename = "Makefile.config" then
-        LocationSet.add Relative prefix
+        LocationMap.add Relative false prefix
       else
         prefix
     in
