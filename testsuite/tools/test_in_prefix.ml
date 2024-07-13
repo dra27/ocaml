@@ -168,7 +168,7 @@ directories given for --bindir and --libdir do not have a common prefix";
   in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
-  let relocatable = false in
+  let relocatable = config.has_relative_libdir && config.has_runtime_search in
   let target_relocatable = config.has_runtime_search_target in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
@@ -2238,11 +2238,12 @@ let () =
   (* Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
   (* Finally re-run all of the tests with the new prefix *)
-  let caml_ld_library_path =
-    assert (not relocatable);
-    Some [Filename.concat libdir "stublibs"]
+  let caml_ld_library_path, ocamllib =
+    if config.has_relative_libdir then
+      None, None
+    else
+      Some [Filename.concat libdir "stublibs"], Some libdir
   in
-  let ocamllib = if config.has_relative_libdir then None else Some libdir in
   let env = Environment.make ?caml_ld_library_path bindir libdir in
   let runtime =
     if target_launcher_searches_for_ocamlrun then
