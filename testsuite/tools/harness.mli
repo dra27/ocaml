@@ -61,8 +61,8 @@ module Import : sig
       (** {v [$(NATIVE_COMPILER)] v} - {v Makefile.config v} *)
     has_relative_libdir: string option;
       (** Not implemented; always None. *)
-    has_runtime_search: bool option;
-      (** Not implemented; always None. *)
+    has_runtime_search: Config.search_method;
+      (** {v $(RUNTIME_SEARCH) v} - {v Makefile.build_config v} *)
     launcher_searches_for_ocamlrun: bool;
       (** Indicates whether bytecode executables in the compiler distribution
           use a launcher that is capable of searching PATH to find ocamlrun. At
