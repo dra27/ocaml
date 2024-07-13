@@ -158,17 +158,6 @@ let () =
     && not Toolchain.linker_embeds_build_path
     && (not Toolchain.c_compiler_always_embeds_build_path
         || not Toolchain.c_compiler_debug_paths_can_be_absolute)
-    (* Prior to #13828 (OCaml 5.4.0), .cmt and .cmti embed the absolute location
-       of the compiler without using BUILD_PATH_PREFIX_MAP. However, this
-       embedding is not entirely predictable, because it only happens when
-       ocamlc.opt or ocamlopt.opt is used for compilation, rather than when the
-       bytecode version of the tool is passed is explicitly to ocamlrun (in this
-       case, Sys.argv.(0) always retains the relative path used in the build
-       system). For this reason, when configured relatively, on Windows, with
-       native compilation available, accept that the Build directory may appear
-       in .cmt/.cmti files, and therefore that the output may not be
-       reproducible. *)
-    && (not Sys.win32 || not config.has_ocamlopt)
   in
   let target_relocatable = (Config.search_method <> Config.Absolute) in
   (* Use Harness.pp_path unless --verbose was specified *)
