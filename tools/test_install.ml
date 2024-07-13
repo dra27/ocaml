@@ -21,6 +21,8 @@ type config = {
     (* $(INSTALL_OCAMLNAT) - Makefile.build_config *)
   has_ocamlopt: bool;
     (* $(NATIVE_COMPILER) - Makefile.config *)
+  has_relative_libdir: bool;
+    (* $(RELATIVE_LIBDIR) - Makefile.build_config *)
   libraries: string list
     (* Sorted basenames of libraries to test.
         Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -49,8 +51,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
   let bindir = ref "" in
   let libdir = ref "" in
   let config =
-    ref {supports_shared_libraries = false;
-         has_ocamlnat = false; has_ocamlopt = false; libraries = []} in
+    ref {supports_shared_libraries = false; has_ocamlnat = false;
+         has_ocamlopt = false; has_relative_libdir = false; libraries = []} in
   let check_exists r dir =
     if Sys.file_exists dir then
       if Sys.is_directory dir then
@@ -68,6 +70,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
     config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () =
     config := {!config with has_ocamlopt} in
+  let has_relative_libdir has_relative_libdir () =
+    config := {!config with has_relative_libdir} in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -82,6 +86,9 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
     "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
 \tNative compiler (ocamlopt) is installed in the directory given in --bindir";
     "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+    "--with-relative-libdir", Arg.Unit (has_relative_libdir true), "\
+\tCompiler was configured with --enable-relative";
+    "--without-relative-libdir", Arg.Unit (has_relative_libdir false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = lib::config.contents.libraries} in
@@ -785,9 +792,11 @@ let compile_with_options ?(unix_only=false)
   else
     let cont test_program ?runtime env ~arg =
       let runtime = if tendered && not Sys.win32 then runtime else None in
+      let arg = (config.has_relative_libdir && tendered) || arg in
       run_program env ?runtime test_program ~arg;
       if full then
         Some (fun ?runtime env ~arg ->
+          let arg = (config.has_relative_libdir && tendered) || arg in
           let runtime = if tendered && not Sys.win32 then runtime else None in
           run_program env ?runtime test_program ~arg;
           Sys.remove test_program;
@@ -934,7 +943,8 @@ let () =
   let runtime = Some (exe (Filename.concat bindir "ocamlrun")) in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
   let env =
-    Environment.make ~caml_ld_library_path:true ~ocamllib:true bindir libdir in
+    Environment.make ~caml_ld_library_path:true
+                     ~ocamllib:(not config.has_relative_libdir) bindir libdir in
   Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests ~full:false env bindir libdir config.libraries in
   assert (programs = [])
