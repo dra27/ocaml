@@ -163,7 +163,7 @@ let libdir_rules config file =
          ~c_debug:has_c_debug_info,
          ~s:contains_assembled_objects) =
       if basename = "Makefile.config" then
-        (* These files all embed the Standard Library location *)
+        (* Embeds the Standard Library location *)
         (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       else if basename = "config.cmx" then
         (* config.cmx contains Config.standard_library for inlining *)
@@ -253,7 +253,7 @@ let libdir_rules config file =
     in
     let prefix =
       if config.has_relative_libdir <> None
-         && (basename = "Makefile.config" || basename = "ld.conf") then
+         && basename = "Makefile.config" then
         LocationSet.add Relative prefix
       else
         prefix
