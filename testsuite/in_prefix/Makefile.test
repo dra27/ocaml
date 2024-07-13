@@ -32,6 +32,8 @@ test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
       $(call bool_to_with, relative-libdir, $(RELATIVE_LIBDIR)) \
+      $(call bool_to_with, runtime-search, $(RUNTIME_SEARCH)) \
+      $(call bool_to_with, runtime-search-target, $(RUNTIME_SEARCH_TARGET)) \
       $(OTHERLIBRARIES)
 
 SCRUB_ENV = \

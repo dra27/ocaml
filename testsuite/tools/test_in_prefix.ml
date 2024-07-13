@@ -23,6 +23,10 @@ type config = {
     (* $(NATIVE_COMPILER) - Makefile.config *)
   has_relative_libdir: bool;
     (* $(RELATIVE_LIBDIR) - Makefile.build_config *)
+  has_runtime_search: bool;
+    (* $(RUNTIME_SEARCH) - Makefile.build_config *)
+  has_runtime_search_target: bool;
+    (* $(RUNTIME_SEARCH_TARGET) - Makefile.build_config *)
   libraries: string list
     (* Sorted basenames of libraries to test.
         Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -55,7 +59,9 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let libdir = ref "" in
   let config =
     ref {supports_shared_libraries = false; has_ocamlnat = false;
-         has_ocamlopt = false; has_relative_libdir = false; libraries = []}
+         has_ocamlopt = false; has_relative_libdir = false;
+         has_runtime_search = false; has_runtime_search_target = false;
+         libraries = []}
   in
   let check_exists r dir =
     if Sys.file_exists dir then
@@ -77,6 +83,12 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let has_relative_libdir has_relative_libdir () =
     config := {!config with has_relative_libdir}
   in
+  let has_runtime_search has_runtime_search () =
+    config := {!config with has_runtime_search}
+  in
+  let has_runtime_search_target has_runtime_search_target () =
+    config := {!config with has_runtime_search_target}
+  in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -95,6 +107,14 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     "--with-relative-libdir", Arg.Unit (has_relative_libdir true), "\
 \tCompiler was configured with --enable-relative";
     "--without-relative-libdir", Arg.Unit (has_relative_libdir false), "";
+    "--with-runtime-search", Arg.Unit (has_runtime_search true), "\
+\tCompiler bytecode binaries can search for their runtimes";
+    "--without-runtime-search", Arg.Unit (has_runtime_search false), "";
+    "--with-runtime-search-target",
+      Arg.Unit (has_runtime_search_target true), "\
+\tBytecode binaries produced by the compiler can search for their runtimes";
+    "--without-runtime-search-target",
+      Arg.Unit (has_runtime_search_target false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = lib::config.contents.libraries}
@@ -149,8 +169,8 @@ directories given for --bindir and --libdir do not have a common prefix";
   in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
-  let relocatable = false in
-  let target_relocatable = false in
+  let relocatable = config.has_relative_libdir && config.has_runtime_search in
+  let target_relocatable = config.has_runtime_search_target in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
     exit 2
@@ -666,7 +686,7 @@ let load_libraries_in_toplevel ~original env bindir mode libraries =
     ["-noinit"; "-no-version"; "-noprompt"; "test_install_script.ml"]
   in
   let runtime =
-    if original || mode = Native then
+    if original || config.has_runtime_search || mode = Native then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
@@ -707,7 +727,8 @@ let load_libraries_in_prog ~original env bindir libdir mode libraries =
     in
     let compiler = Filename.concat bindir (exe compiler) in
     let runtime =
-      if original || config.has_ocamlopt || mode = Native then
+      if original || config.has_ocamlopt || mode = Native
+      || config.has_runtime_search then
         None
       else
         ocamlrun
@@ -719,7 +740,7 @@ let load_libraries_in_prog ~original env bindir libdir mode libraries =
     Environment.run_process Stdout ?runtime compiler args env
   in
   let runtime =
-    if original || mode = Native then
+    if original || mode = Native || config.has_runtime_search_target then
       None
     else
       ocamlrun
@@ -762,7 +783,7 @@ let test_bytecode_binaries ~original env bindir =
           | (0, output) ->
               let format_line = Format.printf "@{<inline_code>>@} %s\n%!" in
               List.iter format_line output
-          | (2, _) when not original ->
+          | (2, _) when not original && not config.has_runtime_search ->
               ()
           | _ ->
               fail_because "it was broken"
@@ -821,7 +842,7 @@ type linkage =
 
 let compile_test ~original env bindir =
   let runtime =
-    if original || config.has_ocamlopt then
+    if original || config.has_ocamlopt || config.has_runtime_search then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
@@ -976,7 +997,7 @@ let test_standard_library_location ~original env bindir =
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 display_path bindir;
   let runtime =
-    if original || config.has_ocamlopt then
+    if original || config.has_runtime_search || config.has_ocamlopt then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
@@ -1024,7 +1045,7 @@ let test_standard_library_location ~original env bindir =
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
   let runtime =
-    if original then
+    if original || config.has_runtime_search_target then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
@@ -1066,7 +1087,12 @@ let () =
   Printf.printf "Re-running test programs\n%!";
   (* Finally re-run all of the tests with the new prefix *)
   let env = Environment.make bindir libdir in
-  let runtime = Some (Filename.concat bindir (exe "ocamlrun")) in
+  let runtime =
+    if config.has_runtime_search_target then
+      None
+    else
+      Some (Filename.concat bindir (exe "ocamlrun"))
+  in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
   let env =
     Environment.make ~ocamllib:(not config.has_relative_libdir) bindir libdir
