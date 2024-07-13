@@ -27,7 +27,9 @@ type config = {
   has_relative_libdir: string option;
     (* Not yet implemented; always None. *)
   has_runtime_search: bool option;
-    (* Not yet implemented; always None. *)
+    (* $(RUNTIME_SEARCH) - Makefile.build_config *)
+  has_runtime_search_target: bool option;
+    (* $(RUNTIME_SEARCH_TARGET) - Makefile.build_config *)
   libraries: string list list
     (* Sorted list of basenames of libraries to test.
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -158,7 +160,8 @@ let orig_bindir, orig_libdir, prefix, bindir_suffix, libdir_suffix, config,
   let config =
     ref {supports_shared_libraries = false; has_ocamlnat = false;
          has_ocamlopt = false; has_relative_libdir = None;
-         has_runtime_search = None; libraries = []}
+         has_runtime_search = None; has_runtime_search_target = None;
+         libraries = []}
   in
   let process_pwd dir =
     (* The build directory may contain symlinks, and if this is so then the
@@ -202,16 +205,20 @@ let orig_bindir, orig_libdir, prefix, bindir_suffix, libdir_suffix, config,
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
-  let parse_search = function
-  | "enable" -> true
-  | "always" -> false
+  let parse_search suffix = function
+  | "fallback" -> false
+  | "always" -> true
   | _ ->
-      raise (Arg.Bad
-        "--with-runtime-search: argument should be either enable or always")
+      raise (Arg.Bad (Printf.sprintf "--with-runtime-search%s: argument should \
+                                      be either fallback or always" suffix))
   in
   let has_runtime_search arg =
-    let has_runtime_search = Option.map parse_search arg in
+    let has_runtime_search = Option.map (parse_search "") arg in
     config := {!config with has_runtime_search}
+  in
+  let has_runtime_search_target arg =
+    let has_runtime_search_target = Option.map (parse_search "-target") arg in
+    config := {!config with has_runtime_search_target}
   in
   let args = Arg.align [
     "--pwd", Arg.String process_pwd, "\
@@ -236,6 +243,11 @@ let orig_bindir, orig_libdir, prefix, bindir_suffix, libdir_suffix, config,
 \tCompiler bytecode binaries can search for their runtimes";
     "--without-runtime-search",
       Arg.Unit (fun () -> has_runtime_search None), "";
+    "--with-runtime-search-target",
+      Arg.String (fun s -> has_runtime_search_target (Some s)), "\
+\tBytecode binaries produced by the compiler can search for their runtimes";
+    "--without-runtime-search-target",
+      Arg.Unit (fun () -> has_runtime_search_target None), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -321,8 +333,6 @@ directories given for --bindir and --libdir do not have a common prefix"
       prefix prefix;
     if Sys.file_exists (Filename.concat libdir "ld.conf.bak") then
       error "can't backup ld.conf to ld.conf.bak as the latter already exists!";
-    if config.has_runtime_search <> None then
-      error "--with-runtime-search is not implemented!";
     let no_markup ansi = { Misc.Style.ansi; text_close = ""; text_open = "" } in
     let runtime_launch_info =
       let file = Filename.concat libdir "runtime-launch-info" in
@@ -341,7 +351,7 @@ directories given for --bindir and --libdir do not have a common prefix"
       && (not Toolchain.c_compiler_always_embeds_build_path
           || not Toolchain.c_compiler_debug_paths_can_be_absolute)
     in
-    let target_relocatable = false in
+    let target_relocatable = config.has_runtime_search_target <> None in
     Misc.Style.(set_styles {
       warning = no_markup [Bold; FG Yellow];
       error = no_markup [Bold; FG Red];
@@ -1142,12 +1152,12 @@ let library mode name =
     name ^ ".cma"
 
 (* launcher_searches_for_ocamlrun describes whether ocamlc emits an RNTM with
-   the name of the runtime only, expecting the launcher in stdlib/header*.c to
-   search PATH for it. This used to be the behaviour for native Windows. *)
+   the name of the runtime only, expecting the bytecode launcher to search PATH
+   for it. *)
 let launcher_searches_for_ocamlrun =
-  false
+  config.has_runtime_search <> None
 let target_launcher_searches_for_ocamlrun =
-  false
+  config.has_runtime_search_target <> None
 
 (* linker_is_flexlink is true for Cygwin when shared library support is enabled
    and always true for native Windows. *)
@@ -2979,7 +2989,7 @@ let test_relocation env prefix =
           (* If the launcher doesn't search for ocamlrun, then either the #!
              stub will include the absolute path or the RNTM section will *)
           match classification with
-          | Tendered _ when not launcher_searches_for_ocamlrun -> true
+          | Tendered _ when config.has_runtime_search <> Some true -> true
           | _ -> false
         in
         if code_embeds_stdlib_location || linker_embeds_stdlib_location then
