@@ -37,6 +37,8 @@ test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
       $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
+      $(call search_to_with, runtime-search, $(RUNTIME_SEARCH)) \
+      $(call search_to_with, runtime-search-target, $(RUNTIME_SEARCH_TARGET)) \
       $(OTHERLIBRARIES)
 
 SCRUB_ENV = \
@@ -44,6 +46,10 @@ SCRUB_ENV = \
 
 # Generates --without-$(1) if $(2) = false or --with-$(1) otherwise
 bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
+
+# Generates --without-$(1) if $(2) = false or --with-$(1)=$(2) otherwise
+search_to_with = \
+  $(call bool_to_with,$(1),$(2))$(if $(filter-out false,$(2)),=$(strip $(2)))
 
 ../tools/test_in_prefix$(EXE) \
 ../tools/test_in_prefix.opt$(EXE): ../tools/test_in_prefix.ml
