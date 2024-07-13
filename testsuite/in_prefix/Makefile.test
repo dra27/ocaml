@@ -22,8 +22,10 @@ else
 DRIVER = ../tools/test_in_prefix$(EXE)
 endif
 
+LIBDIR_ARG = $(if $(LIBDIR_REL),$(LIBDIR_REL),$(LIBDIR))
+
 default: $(DRIVER)
-	@$< --bindir "$(BINDIR)" --libdir "$(LIBDIR)" --summary
+	@$< --bindir "$(BINDIR)" --libdir "$(LIBDIR_ARG)" --summary
 	@$(error In order to execute the test, run $(MAKE) test-in-prefix)
 
 ifeq "$(origin VERBOSE)" "command line"
@@ -33,7 +35,7 @@ VERBOSE_FLAG =
 endif
 
 test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
-	@$< $(VERBOSE_FLAG) --bindir "$(BINDIR)" --libdir "$(LIBDIR)" \
+	@$< $(VERBOSE_FLAG) --bindir "$(BINDIR)" --libdir "$(LIBDIR_ARG)" \
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
       $(OTHERLIBRARIES) --pwd "$(SRCDIR_ABS)/testsuite/in_prefix"

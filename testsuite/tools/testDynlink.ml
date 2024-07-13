@@ -58,7 +58,7 @@ let () =
       let args = if custom then "-custom" :: args else args in
       let runtime =
         mode = Bytecode && Installation.ocamlc_fails_after_rename config in
-      let stdlib = true in
+      let stdlib = config.has_relative_libdir = None in
       Environment.run_process Execute ~runtime ~stdlib env compiler args in
     compile ();
     files, compile
@@ -70,10 +70,13 @@ let () =
       mode = Bytecode
       && expected_exit_code = None
       && not config.target_launcher_searches_for_ocamlrun
+      && config.has_relative_libdir = None
     in
     let stubs =
       has_c_stubs
       && expected_exit_code = None
+      && Config.supports_shared_libraries
+      && config.has_relative_libdir = None
     in
     let expected_exit_code =
       match expected_exit_code with
@@ -112,9 +115,16 @@ let () =
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
   let expected_exit_code =
-    (* Bytecode executables launched using the executable header require
-       caml_executable_name to know where the runtime is. *)
-    None in
+    (* Relocatable OCaml bytecode executables launched using the executable
+       header require caml_executable_name, or they end up being accidentally
+       relative, since the exec call leaves argv[0] as being the bytecode image
+       itself. *)
+    if mode = Bytecode && config.has_relative_libdir <> None
+       && Toolchain.no_caml_executable_name
+       && Environment.launched_via_stub test_program then
+      Some 2
+    else
+      None in
   let libraries = List.filter not_dynlink config.libraries in
   let () =
     List.iter (test_libraries_in_prog ?expected_exit_code env) libraries;

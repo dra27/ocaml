@@ -335,9 +335,10 @@ let run ~reproducible (config : Installation.t) env =
           (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
              except flexlink and ocamllex link with the Config module, either
              directly or via ocamlcommon *)
-          not (List.mem basename ["flexlink.byte"; "flexlink.opt";
-                                  "ocamllex.byte"; "ocamllex.opt";
-                                  "ocamlyacc"])
+          config.has_relative_libdir = None
+          && not (List.mem basename ["flexlink.byte"; "flexlink.opt";
+                                     "ocamllex.byte"; "ocamllex.opt";
+                                     "ocamlyacc"])
         in
         let linker_embeds_stdlib_location =
           (* If the launcher doesn't search for ocamlrun, then either the #!
@@ -426,17 +427,23 @@ let run ~reproducible (config : Installation.t) env =
            ~ocaml_debug:has_ocaml_debug_info,
            ~c_debug:contains_c_debug_info,
            ~s:contains_assembled_objects) =
-        if basename = "Makefile.config" || basename = "runtime-launch-info" then
+        if basename = "Makefile.config" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if basename = "config.cmx" then
-          (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+          let stdlib =
+            config.has_relative_libdir = None && not Config.flambda in
+          (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
           let stdlib =
-            List.mem basename ["config.cmt"; "config_main.cmt";
-                               "ocamlcommon.cma"] in
+            config.has_relative_libdir = None
+            && List.mem basename ["config.cmt"; "config_main.cmt";
+                                  "ocamlcommon.cma"] in
           let ocaml_debug =
             true in
           (~stdlib, ~ocaml_debug, ~c_debug:false, ~s:false)
+        else if basename = "runtime-launch-info" then
+          let stdlib = config.has_relative_libdir = None in
+          (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if ext = ".cmxs" then
           (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
         else if ext = Config.ext_obj then
@@ -450,7 +457,8 @@ let run ~reproducible (config : Installation.t) env =
             let is_ocaml =
               Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
             let stdlib =
-              Filename.remove_extension basename = "ocamlcommon" in
+              config.has_relative_libdir = None
+              && Filename.remove_extension basename = "ocamlcommon" in
             let c_debug = not is_ocaml in
             (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
           else
@@ -481,6 +489,13 @@ let run ~reproducible (config : Installation.t) env =
           LocationSet.singleton Prefix
         else
           LocationSet.empty
+      in
+      let prefix =
+        if config.has_relative_libdir <> None
+           && basename = "Makefile.config" then
+          LocationSet.add Relative prefix
+        else
+          prefix
       in
       if contains_build_path then
         LocationSet.add Build prefix
