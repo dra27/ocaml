@@ -71,7 +71,8 @@ Exercises:
 
 Shims:
 - On Unix, the bytecode toplevel contains the absolute location of `ocamlrun`,
-  so must be explicitly invoked via `ocamlrun`
+  so must be explicitly invoked via `ocamlrun`, unless the compiler is
+  configured with `--enable-runtime-search`
 - Both toplevels contain the absolute location of the Standard Library,
   requiring `OCAMLLIB` to be set, unless the compiler was configured with
   `--enable-relative`
@@ -84,14 +85,13 @@ Shims:
 - For a bytecode-only build, `ocamlc` contains the absolute location of
   `ocamlrun`, so must be explicitly invoked via `ocamlrun` (if the native
   compiler is available, then both `ocamlc` and `ocamlopt` will be native
-  executables)
+  executables), unless the compiler is configured with `--enable-runtime-search`
 - Both compilers contain the absolute location of the Standard Library,
   requiring `OCAMLLIB` to be set, unless the comnpiler was configured with
   `--enable-relative`
 - The executable created by `ocamlc` contains the absolute location of
-  `ocamlrun`, so must be explicitly invoked via `ocamlrun` and also have
-  `OCAMLLIB` adjusted, as that `ocamlrun` contains an absolute path to the
-  Standard Library
+  `ocamlrun`, so must be explicitly invoked via `ocamlrun`, unless the
+  compiler is configured with `--enable-runtime-search-target`
 
 ### Executing installed bytecode binaries with `-vnum`
 
@@ -105,7 +105,8 @@ Exercises:
 
 Shims:
 - On builds with shared library support, all the executables will contain the
-  absolute location of `ocamlrun` and will fail to execute
+  absolute location of `ocamlrun` and will fail to execute, unless the compiler
+  was configured with `--enable-runtime-search`
 - On builds without shared library support, executables using libraries with
   C stubs (in particular, `ocamldebug` and `ocamldoc`) are compiled with
   `-custom` and do succeed
@@ -132,6 +133,8 @@ Exercises:
 
 Shims:
 - As with the `Dynlink` test, on bytecode-only builds the compiler must be
-  explicitly invoked via `ocamlrun`
+  explicitly invoked via `ocamlrun`, unless the compiler was configured with
+  `--enable-runtime-search`
 - The executable produced by `ocamlc` by default contains the absolute location
-  of `ocamlrun` and so has to be run explicitly via `ocamlrun`
+  of `ocamlrun` and so has to be run explicitly via `ocamlrun`, unless the
+  compiler was configured with `--enable-runtime-search-target`
