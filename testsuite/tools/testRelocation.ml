@@ -41,13 +41,12 @@ let effective_toolchain config =
   in
   c_compiler_debug_paths_are_absolute, assembler_embeds_build_path
 
-(* The reproducible ruleset is the simplest: only Makefile.config may contain
-   the installation prefix or use the relative prefix. Since OC_FLAGS wasn't
-   moved to Makefile.build_config.in until #12108 in OCaml 5.1.0,
-   Makefile.config also ends up containing the build path. *)
+(* The reproducible ruleset is the simplest: nothing is allowed to contain the
+   build path and only Makefile.config may contain the installation prefix or
+   use the relative prefix. *)
 let reproducible_rules file =
   if Filename.basename file = "Makefile.config" then
-    LocationSet.of_list [Build; Relative; Prefix]
+    LocationSet.of_list [Relative; Prefix]
   else
     LocationSet.empty
 
@@ -81,7 +80,7 @@ let bindir_rules config file =
         (* If the launcher doesn't search for ocamlrun, then either the #! stub
            will include the absolute path or the RNTM section will *)
         match classification with
-        | Tendered _ when not config.launcher_searches_for_ocamlrun -> true
+        | Tendered _ when config.has_runtime_search <> Config.Search -> true
         | _ -> false
       in
       if code_embeds_stdlib_location || linker_embeds_stdlib_location then
@@ -568,17 +567,6 @@ let run ~reproducible config env =
     |> scan Environment.libdir "$libdir" libdir_rules
   in
   flush stderr;
-  (* Abort the harness if there are files which didn't match a ruleset *)
-  let () =
-    if results_are_reproducible && not consistent then
-      Harness.fail_because
-        "Internal error: bindir_rules and libdir_rules disagree with \
-         reproducible_rules"
-    else if results_are_reproducible <> reproducible then
-      Harness.fail_because
-        "The build is %sexpected to be reproducible"
-        (if not reproducible then "not " else "")
-  in
   (* Summarise the results, using wildcards to bring them to a readable
      length *)
   let sections =
@@ -697,7 +685,15 @@ let run ~reproducible config env =
     let pp_results = Format.(pp_print_list ~pp_sep pp_print_string) in
     Format.printf "@[<hov 4>  %a@]@." pp_results results
   in
+  (* Abort the harness if there are files which didn't match a ruleset *)
   if failed then
-    Harness.fail_because "Installed files don't match expectation"
-  else
-  List.iter display sections
+    Harness.fail_because "Installed files don't match expectation";
+  List.iter display sections;
+  if results_are_reproducible && not consistent then
+    Harness.fail_because
+      "Internal error: bindir_rules and libdir_rules disagree with \
+       reproducible_rules"
+  else if results_are_reproducible <> reproducible then
+    Harness.fail_because
+      "The build is %sexpected to be reproducible"
+      (if not reproducible then "not " else "")
