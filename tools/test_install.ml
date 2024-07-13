@@ -45,7 +45,7 @@ let scrub =
    with effectively PATH=$bindir:$PATH and
    LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH on Unix or
    PATH=$bindir;$libdir;$PATH on Windows. *)
-let make_env bindir libdir =
+let make_env ?(ocamllib=true) bindir libdir =
   let keep binding =
     let equals = String.index binding '=' in
     let name = String.sub binding 0 equals in
@@ -74,6 +74,13 @@ let make_env bindir libdir =
       bindings
     else
       ("LD_LIBRARY_PATH=" ^ libdir)::bindings in
+  let bindings =
+    if ocamllib then
+      ("CAML_LD_LIBRARY_PATH=" ^ Filename.concat libdir "stublibs") ::
+      ("OCAMLLIB=" ^ libdir) :: bindings
+    else
+      bindings
+  in
   Array.of_list bindings
 
 (* Return the list of otherlibs in a dependency-compatible order *)
@@ -242,7 +249,8 @@ let compile_with_options env compiler ~native options
   List.iter Sys.remove files;
   Some (f test_program)
 
-let compile_obj env compiler ~native runtime test_program description f =
+let compile_obj env standard_library compiler ~native
+                runtime test_program description f =
   Printf.printf "  Compiling %s\n%!" description;
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     Printf.fprintf oc
@@ -277,7 +285,7 @@ let compile_obj env compiler ~native runtime test_program description f =
       \  caml_startup(argv);\n\
       \  caml_shutdown();\n\
        }\n");
-  if Ccomp.compile_file "test_install_main.c" <> 0 then begin
+  if Ccomp.compile_file ~standard_library "test_install_main.c" <> 0 then begin
     print_endline "Unexpected C compiler error";
     exit 1
   end;
@@ -354,7 +362,7 @@ let compile_with_options ?(unix_only=false) env
     compile_with_options
       env compiler ~native options test_program description cont
 
-let compile_obj ?(unix_only=false) env
+let compile_obj ?(unix_only=false) env standard_library
                 compiler ~native runtime test_program description =
   if unix_only && Sys.win32 then
     None
@@ -363,7 +371,8 @@ let compile_obj ?(unix_only=false) env
       run_program env test_program;
       Some test_program
     in
-    compile_obj env compiler ~native runtime test_program description cont
+    compile_obj env standard_library compiler ~native
+                runtime test_program description cont
 
 let test_standard_library_location env bindir libdir ocamlc ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
@@ -382,10 +391,10 @@ let test_standard_library_location env bindir libdir ocamlc ocamlopt =
     compile_with_options ~unix_only env ocamlc ~native:false
       ["-custom"; "-runtime-variant"; "_shared"] "test_custom_shared"
       "Bytecode (-custom shared runtime)";
-    compile_obj env ocamlc ~native:false
+    compile_obj env libdir ocamlc ~native:false
       "-lcamlrun" "test_output_obj_static"
       "Bytecode (-output-obj static runtime)";
-    compile_obj ~unix_only env ocamlc ~native:false
+    compile_obj ~unix_only env libdir ocamlc ~native:false
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
     compile_with_options env ocamlc ~native:false
@@ -398,10 +407,10 @@ let test_standard_library_location env bindir libdir ocamlc ocamlopt =
     compile_with_options env ocamlopt ~native:true
       [] "test_native_static"
       "Native (static runtime)";
-    compile_obj env ocamlopt ~native:true
+    compile_obj env libdir ocamlopt ~native:true
       "-lasmrun" "test_native_output_obj_static"
       "Native (-output-obj static runtime)";
-    compile_obj ~unix_only env ocamlopt ~native:true
+    compile_obj ~unix_only env libdir ocamlopt ~native:true
       "-lasmrun_shared" "test_native_output_obj_shared"
       "Native (-output-obj shared runtime)";
   ] in
@@ -421,16 +430,57 @@ let run_tests env bindir libdir libraries =
   test_bytecode_binaries env bindir;
   test_standard_library_location env bindir libdir ocamlc ocamlopt
 
+let rec split_dir acc dir =
+  let dirname = Filename.dirname dir in
+  if dirname = dir then
+    dir::acc
+  else
+    split_dir (Filename.basename dir :: acc) dirname
+
+let join_dir = function
+| dir::dirs -> List.fold_left Filename.concat dir dirs
+| [] -> assert false
+
+let rec split_to_prefix prefix bindir libdir =
+  match bindir, libdir with
+  | (dir1::bindir'), (dir2::libdir') ->
+      if dir1 = dir2 then
+        split_to_prefix (dir1::prefix) bindir' libdir'
+      else
+        join_dir (List.rev prefix), join_dir bindir, join_dir libdir
+  | [], _
+  | _, [] ->
+      assert false
+
 let () =
   Compmisc.init_path ();
-  if Array.length Sys.argv < 3 then begin
-    Printf.eprintf "Usage: test_install <bindir> <libdir> [<library1> ...]\n";
+  if Array.length Sys.argv < 4 then begin
+    Printf.eprintf
+      "Usage: test_install <bindir> <libdir> <yes|no> [<library1> ...]\n";
     exit 2
   end else
     let libraries =
-      Array.to_list (Array.sub Sys.argv 3 (Array.length Sys.argv - 3)) in
+      Array.to_list (Array.sub Sys.argv 4 (Array.length Sys.argv - 4)) in
     let bindir = Sys.argv.(1) in
     let libdir = Sys.argv.(2) in
     let env = make_env bindir libdir in
     let programs = run_tests env bindir libdir libraries in
-    List.iter Sys.remove programs
+    if Sys.argv.(3) = "yes" then
+      let prefix, bindir_suffix, libdir_suffix =
+        split_to_prefix [] (split_dir [] bindir) (split_dir [] libdir) in
+      let new_prefix = prefix ^ ".new" in
+      let bindir = Filename.concat new_prefix bindir_suffix in
+      let libdir = Filename.concat new_prefix libdir_suffix in
+      Printf.printf "\nRenaming %s to %s\n\n%!" prefix new_prefix;
+      Sys.rename prefix new_prefix;
+      at_exit (fun () ->
+        flush stderr;
+        flush stdout;
+        Printf.printf "\nRestoring %s to %s\n" new_prefix prefix;
+        Sys.rename new_prefix prefix);
+      Printf.printf "Re-running test programs\n%!";
+      let env = make_env ~ocamllib:true bindir libdir in
+      List.iter (run_program env) programs;
+      List.iter Sys.remove programs;
+      Compmisc.init_path ~standard_library:libdir ();
+      List.iter Sys.remove (run_tests env bindir libdir libraries)
