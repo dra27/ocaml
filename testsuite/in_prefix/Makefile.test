@@ -29,7 +29,7 @@ endif
 INSTALL_OCAMLNAT = $(if $(wildcard $(ROOTDIR)/ocamlnat$(EXE)),true,false)
 
 DRIVER_ARGS = \
-  $(VERBOSE_FLAG) --bindir "$(BINDIR)" --libdir "$(LIBDIR)" \
+  $(VERBOSE_FLAG) --bindir "$(BINDIR)" --libdir '$(TARGET_LIBDIR)' \
   $(call bool_to_with, shebangscripts, $(HASHBANGSCRIPTS)) \
   $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
   $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
