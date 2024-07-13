@@ -24,7 +24,9 @@ type t = {
   has_relative_libdir: string option;
     (** {v $(LIBDIR_REL) v} - {v Makefile.build_config v} *)
   has_runtime_search: bool option;
-    (** Not implemented; always None. *)
+    (** {v $(RUNTIME_SEARCH) v} - {v Makefile.build_config v} *)
+  has_runtime_search_target: bool option;
+    (** {v $(RUNTIME_SEARCH_TARGET) v} - {v Makefile.build_config v} *)
   launcher_searches_for_ocamlrun: bool;
     (** Indicates whether bytecode executables in the compiler distribution use
         a launcher that is capable of searching PATH to find ocamlrun. This used
