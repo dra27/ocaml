@@ -1289,6 +1289,7 @@ let () =
       has_c_stubs
       && expected_exit_code = None
       && config.supports_shared_libraries
+      && config.has_relative_libdir = None
     in
     let expected_exit_code =
       match expected_exit_code with
@@ -1359,13 +1360,16 @@ let test_bytecode_binaries env =
       if classification <> Vanilla then
         let fails =
           (* After the prefix has been renamed, bytecode executables compiled
-             with -custom will still work. Otherwise, only executables where the
-             header can search for ocamlrun and which do not require any C stubs
-             to be loaded will still work. *)
+             with -custom will still work. Otherwise, the header needs to be
+             able to search for ocamlrun and, if applicable, ocamlrun needs to
+             be able to load C stubs (which will only happen if the runtime
+             locates the Standard Library using a relative directory, so that it
+             can find ld.conf) *)
           Environment.is_renamed env
           && match classification with
              | Tendered(~header:_, ~dlls) ->
-                 not launcher_searches_for_ocamlrun || dlls
+                 not launcher_searches_for_ocamlrun
+                 || dlls && config.has_relative_libdir = None
              | _ ->
                  false
         in
@@ -2467,14 +2471,10 @@ let compile_test env =
                           (* stdlib/headernt.c correctly preserves argv[0] *)
                           Success {executable_name = test_program_path; argv0}
                         else if no_caml_executable_name
-                                && not (Environment.is_renamed env)
                                 && config.has_relative_libdir <> None then
                           (* Without caml_executable_name, ocamlrun will be
                              forced to interpret the relative standard library
-                             relative to argv[0], which will fail. As with the
-                             Dynlink testing, after the prefix has been renamed,
-                             CAML_LD_LIBRARY_PATH has to be set, so this will
-                             succeed. *)
+                             relative to argv[0], which will fail. *)
                           Fail 134
                         else
                           (* stdlib/header.c does not preserve argv[0] *)
@@ -2509,8 +2509,11 @@ let compile_test env =
                 | Fail code -> "", code, ""
                 | Success {executable_name; argv0} -> executable_name, 0, argv0
               in
+              let stubs =
+                tendered && with_unix && config.has_relative_libdir = None
+              in
               run_program
-                env ~runtime:via_ocamlrun ~stubs:(tendered && with_unix)
+                env ~runtime:via_ocamlrun ~stubs
                 test_program_path ~prefix_path_with_cwd expected_executable_name
                 expected_exit_code argv0 expected_argv0 ~may_segfault
                 ~stdlib_exists_when_renamed
@@ -3066,7 +3069,7 @@ let test_relocation env prefix =
       in
       let prefix =
         if config.has_relative_libdir <> None
-           && (basename = "Makefile.config" || basename = "ld.conf") then
+           && basename = "Makefile.config" then
           LocationSet.add Relative prefix
         else
           prefix
