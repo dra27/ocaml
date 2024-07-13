@@ -28,6 +28,8 @@ type config = {
     (* $(INSTALL_OCAMLNAT) - Makefile.build_config *)
   has_ocamlopt: bool;
     (* $(NATIVE_COMPILER) - Makefile.config *)
+  has_relative_libdir: string option;
+    (* $(LIBDIR_REL) - Makefile.build_config *)
   libraries: string list list
     (* Sorted list of basenames of libraries to test.
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -80,8 +82,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let bindir = ref "" in
   let libdir = ref "" in
   let config =
-    ref {supports_shared_libraries = false;
-         has_ocamlnat = false; has_ocamlopt = false; libraries = []}
+    ref {supports_shared_libraries = false; has_ocamlnat = false;
+         has_ocamlopt = false; has_relative_libdir = None; libraries = []}
   in
   let check_exists r dir =
     if Sys.file_exists dir then
@@ -89,7 +91,7 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
         if Filename.is_relative dir then
           raise (Arg.Bad (dir ^ ": is not an absolute path"))
         else
-          r := dir
+          r := Unix.realpath dir
       else
         raise (Arg.Bad (dir ^ ": not a directory"))
     else
@@ -100,6 +102,10 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
+  let relative_libdir relative_libdir =
+    config := {!config with has_relative_libdir = Some relative_libdir} in
+  let absolute_libdir () =
+    config := {!config with has_relative_libdir = None} in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -116,6 +122,9 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
 \tNative compiler (ocamlopt) is installed in the directory given in --bindir";
     "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+    "--with-relative-libdir", Arg.String relative_libdir, "\
+\tCompiler was configured with --with-relative-libdir";
+    "--without-relative-libdir", Arg.Unit absolute_libdir, "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -923,7 +932,8 @@ let () =
      files
   in
   let runtime =
-    if mode = Native || original || target_launcher_searches_for_ocamlrun then
+    if mode = Native || original || target_launcher_searches_for_ocamlrun
+       || config.has_relative_libdir <> None then
       None
     else
       ocamlrun
@@ -1124,7 +1134,8 @@ let () =
         "test_install_script.cmo" :: files
     in
     let runtime =
-      if mode = Native || original || target_launcher_searches_for_ocamlrun then
+      if mode = Native || original || target_launcher_searches_for_ocamlrun
+         || config.has_relative_libdir <> None then
         None
       else
         Some ocamlrun
@@ -1329,6 +1340,12 @@ let test_ld_conf ~original env bindir libdir =
   let tests =
     let main, main_outcome, main_outcome_cr =
       let (/) = Filename.concat in
+      let libdir =
+        if config.has_relative_libdir = None then
+          Config.standard_library
+        else
+          libdir
+      in
       let data = [
         (* Root directory (both forms) preserved *)
         "/", "/", None;
@@ -1362,7 +1379,7 @@ let test_ld_conf ~original env bindir libdir =
       (* Various test lines above all fed via ld.conf in the Standard Library.
          ocamlrun can't find ld.conf after the prefix has been renamed *)
       let outcome =
-        if original then
+        if original || config.has_relative_libdir <> None then
           (* Known issue: Windows strips out the blank entries in the search
              path (somewhat counterintuitively!) *)
           if Sys.win32 then
@@ -1387,7 +1404,7 @@ let test_ld_conf ~original env bindir libdir =
       (* Part of the outcome from ld.conf. ocamlrun can't find ld.conf after the
          prefix has been renamed *)
       let outcome_ld_conf =
-        if original then
+        if original || config.has_relative_libdir <> None then
           if Sys.win32 then
             main_outcome
           else
@@ -1441,7 +1458,7 @@ let test_ld_conf ~original env bindir libdir =
       in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir <> None then
           outcome_caml_ld_library_path @ main_outcome
         else
           outcome_caml_ld_library_path
@@ -1453,7 +1470,7 @@ let test_ld_conf ~original env bindir libdir =
       (* As first, but with a CR at the end of each line *)
       let stdlib = List.map (Fun.flip (^) "\r") ("" :: main) in
       let outcome =
-        if original then
+        if original || config.has_relative_libdir <> None then
           (* Known issue: Windows strips out the blank entries in the search
              path (somewhat counterintuitively!) *)
           if Sys.win32 then
@@ -1475,7 +1492,7 @@ let test_ld_conf ~original env bindir libdir =
          path *)
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir <> None then
           ["ld.conf"]
         else
           []
@@ -1502,7 +1519,7 @@ let test_ld_conf ~original env bindir libdir =
          "." entries to the search path *)
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir <> None then
           ["ld.conf"]
         else
           []
@@ -1564,7 +1581,7 @@ let test_ld_conf ~original env bindir libdir =
       in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if original || config.has_relative_libdir <> None then
           ["libdir"]
         else
           []
@@ -1937,7 +1954,7 @@ let compile_test ~original env bindir libdir =
           options
       in
       let options =
-        if original then
+        if original && config.has_relative_libdir = None then
           let new_libdir = Filename.concat (prefix ^ ".new") libdir_suffix in
           let stdlib_default = "standard_library_default=" ^ new_libdir in
           let options = "-set-runtime-default" :: stdlib_default :: options in
@@ -2000,7 +2017,7 @@ let compile_test ~original env bindir libdir =
             (* Bytecode executables with absolute headers will need to be
                invoked via ocamlrun after the prefix has been renamed. *)
             let runtime =
-              if (not original || not arg)
+              if (not original && config.has_relative_libdir = None || not arg)
               && (executable = Shebang || executable = Tendered)
               && not target_launcher_searches_for_ocamlrun then
                 runtime
@@ -2211,7 +2228,8 @@ let test_standard_library_location ~original env bindir libdir =
       Some (Filename.concat bindir (exe "ocamlrun"))
   in
   Printf.printf "Running programs\n%!";
-  List.filter_map (fun f -> f ?runtime env ~arg:(not original)) programs
+  let arg = config.has_relative_libdir <> None || not original in
+  List.filter_map (fun f -> f ?runtime env ~arg) programs
 
 let utf_16le_of_utf_8 s =
   let s = Misc.Stdlib.String.to_utf_8_seq s in
@@ -2234,7 +2252,7 @@ let matches_at file file_len i s =
   else
     matches_at file s (i + s_len - 1) (s_len - 1)
 
-type location = Build | Prefix
+type location = Build | Prefix | Relative
 and encoding = UTF_8 | UTF_16
 
 module LocationSet = Set.Make(struct
@@ -2274,7 +2292,8 @@ let test_relocation prefix bindir libdir =
   Printf.printf "\nChecking installed files for\n\
                   \  Installation Prefix: %s\n\
                   \  Build Root: %s\n%!" prefix build_root;
-  let build_root, prefix =
+  let relative_libdir, build_root, prefix =
+    let relative = Option.map ((^) "/") config.has_relative_libdir in
     if Sys.win32 then
       let normalise s =
         let s =
@@ -2284,9 +2303,9 @@ let test_relocation prefix bindir libdir =
           else
             s in
         String.map (function '\\' -> '/' | c -> c) s in
-      normalise build_root, normalise prefix
+      Option.map normalise relative, normalise build_root, normalise prefix
     else
-      build_root, prefix in
+      relative, build_root, prefix in
   let prefix_in_build =
     split_to_common_prefix prefix build_root = Result.Error `First_in_second in
   let tests = [
@@ -2295,6 +2314,13 @@ let test_relocation prefix bindir libdir =
     (Build, UTF_8), build_root, not prefix_in_build;
     (Build, UTF_16), utf_16le_of_utf_8 build_root, not prefix_in_build;
   ] in
+  let tests =
+    match relative_libdir with
+    | Some relative_libdir ->
+        ((Relative, UTF_8), relative_libdir, true) ::
+        ((Relative, UTF_16), utf_16le_of_utf_8 relative_libdir, true) :: tests
+    | None ->
+        tests in
   let in_unexpected_state file file_rel rules =
     let content, content_len = read_file file in
     let seen = contains content content_len tests 0 [] in
@@ -2309,6 +2335,10 @@ let test_relocation prefix bindir libdir =
             LocationSet.add Prefix acc, Some "Installation prefix (in UTF-8)"
         | Prefix, UTF_16 ->
             LocationSet.add Prefix acc, Some "Installation prefix (in UTF-16)"
+        | Relative, UTF_8 ->
+            LocationSet.add Relative acc, Some "Relative prefix (in UTF-8)"
+        | Relative, UTF_16 ->
+            LocationSet.add Relative acc, Some "Relative prefix (in UTF-16)"
       else
         acc, None in
     let seen, hits = List.fold_left_map gather LocationSet.empty tests in
@@ -2318,7 +2348,8 @@ let test_relocation prefix bindir libdir =
     else
       let string_of_location = function
       | Build -> "Build directory"
-      | Prefix -> "Installation prefix" in
+      | Prefix -> "Installation prefix"
+      | Relative -> "Relative prefix" in
       let hits =
         let hits = List.filter_map Fun.id hits in
         if hits = [] then
@@ -2370,7 +2401,8 @@ let test_relocation prefix bindir libdir =
     let classification = classify_executable file in
     if classification = Tendered && basename <> "ocaml" then
       if not launcher_searches_for_ocamlrun
-         || (basename_without_type <> "flexlink"
+         || (config.has_relative_libdir = None
+             && basename_without_type <> "flexlink"
              && basename_without_type <> "ocamllex") then
         LocationSet.singleton Prefix
       else
@@ -2382,9 +2414,11 @@ let test_relocation prefix bindir libdir =
       LocationSet.empty
     else
       let prefix =
-        if basename_without_type <> "ocamllex"
-           && basename_without_type <> "flexlink"
-           && basename <> "ocamlyacc" then
+        if config.has_relative_libdir = None
+             && basename <> "ocamlyacc"
+             && basename_without_type <> "ocamllex"
+             && basename_without_type <> "flexlink"
+           || basename = "ocaml" && not launcher_searches_for_ocamlrun then
           LocationSet.singleton Prefix
         else
           LocationSet.empty in
@@ -2398,21 +2432,36 @@ let test_relocation prefix bindir libdir =
   let libdir_files_with_prefix =
     let (/) = Filename.concat in
     let files = [
-      "runtime-launch-info";
-      "compiler-libs" / "ocamlcommon.cma";
-      "compiler-libs" / "ocamlcommon" ^ Config.ext_lib;
-      "compiler-libs" / "config.cmx";
-      "expunge";
       "Makefile.config";
     ] in
     let files =
-      if Config.compression_c_libraries = "" then
+      if config.has_relative_libdir <> None then
+        if launcher_searches_for_ocamlrun then
+          files
+        else
+          "expunge" :: files
+      else
+        "expunge" ::
+        "runtime-launch-info" ::
+        ("compiler-libs" / "ocamlcommon.cma") ::
+        ("compiler-libs" / "ocamlcommon" ^ Config.ext_lib) ::
+        ("compiler-libs" / "config.cmx") ::
+        files in
+    let files =
+      if config.has_relative_libdir = None &&
+           Config.compression_c_libraries = "" then
         "compiler-libs" / "config.cmt" ::
         "compiler-libs" / "config_main.cmt" ::
         files
       else
         files in
     StringSet.of_list (List.map (Filename.concat libdir) files) in
+  let libdir_files_with_relative_prefix =
+    if config.has_relative_libdir = None then
+      StringSet.empty
+    else
+      let files = ["Makefile.config"] in
+      StringSet.of_list (List.map (Filename.concat libdir) files) in
   let libdir_exts_with_build =
     let exts = [".cmo"; ".cma"] in
     let exts =
@@ -2460,10 +2509,15 @@ let test_relocation prefix bindir libdir =
             LocationSet.empty
         else
           LocationSet.empty in
-      if StringSet.mem file libdir_files_with_prefix then
-        LocationSet.add Prefix build
+      let build_and_prefix =
+        if StringSet.mem file libdir_files_with_prefix then
+          LocationSet.add Prefix build
+        else
+          build in
+      if StringSet.mem file libdir_files_with_relative_prefix then
+        LocationSet.add Relative build_and_prefix
       else
-        build
+        build_and_prefix
   in
   let failed =
     scan false bindir "$bindir" (Unix.opendir bindir) bindir_rules in
@@ -2509,10 +2563,12 @@ let () =
   (* Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
   (* Finally re-run all of the tests with the new prefix *)
-  let caml_ld_library_path, ocamllib =
+  let caml_ld_library_path =
     assert (not relocatable);
-    Some [Filename.concat libdir "stublibs"], Some libdir
+    Some [Filename.concat libdir "stublibs"]
   in
+  let ocamllib =
+    if config.has_relative_libdir = None then Some libdir else None in
   let env = Environment.make ?caml_ld_library_path bindir libdir in
   let runtime =
     if target_launcher_searches_for_ocamlrun then
@@ -2520,7 +2576,9 @@ let () =
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
   in
-  List.iter (fun f -> assert (f ?runtime env ~arg:true = None)) programs;
+  let re_run f =
+    assert (f ?runtime env ~arg:(config.has_relative_libdir = None) = None) in
+  List.iter re_run programs;
   let env =
     Environment.make ?ocamllib bindir libdir
   in
