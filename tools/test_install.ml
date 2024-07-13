@@ -343,103 +343,85 @@ let run_program env test_program =
     exit 1
   end
 
-let compile_with_options ?(unix_only=false) ?(full_only=false) ~full env
+let compile_with_options ?(unix_only=false) env
                          compiler ~native options test_program description =
-  if unix_only && Sys.win32 || full_only && not full then
+  if unix_only && Sys.win32 then
     None
   else
-    let cont test_program =
-      if full_only then
-        fun () ->
-          run_program env test_program;
-          Sys.remove test_program;
-          None
-      else
-        fun () ->
-          run_program env test_program;
-          Some test_program
+    let cont test_program () =
+      run_program env test_program;
+      Some test_program
     in
     compile_with_options
       env compiler ~native options test_program description cont
 
-let compile_obj ?(unix_only=false) ?(full_only=false) ~full env standard_library
+let compile_obj ?(unix_only=false) env standard_library
                 compiler ~native runtime test_program description =
-  if unix_only && Sys.win32 || full_only && not full then
+  if unix_only && Sys.win32 then
     None
   else
-    let cont test_program =
-      if full_only then
-        fun () ->
-          run_program env test_program;
-          Sys.remove test_program;
-          None
-      else
-        fun () ->
-          run_program env test_program;
-          Some test_program
+    let cont test_program () =
+      run_program env test_program;
+      Some test_program
     in
     compile_obj env standard_library compiler ~native
                 runtime test_program description cont
 
-let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
+let test_standard_library_location env bindir libdir ocamlc ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
   let ocamlc_where = compiler_where env ocamlc in
   let ocamlopt_where = compiler_where env ocamlopt in
   Printf.printf "  ocamlc -where: %s\n  ocamlopt -where: %s\n%!"
                 ocamlc_where ocamlopt_where;
   let unix_only = true in
-  let full_only = true in
   let programs = List.filter_map Fun.id [
-    compile_with_options ~full_only ~full env ocamlc ~native:false
+    compile_with_options env ocamlc ~native:false
       [] "test_bytecode"
       "Bytecode (with tender)";
-    compile_with_options ~full env ocamlc ~native:false
+    compile_with_options env ocamlc ~native:false
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
-    compile_with_options ~unix_only ~full env ocamlc ~native:false
+    compile_with_options ~unix_only env ocamlc ~native:false
       ["-custom"; "-runtime-variant"; "_shared"] "test_custom_shared"
       "Bytecode (-custom shared runtime)";
-    compile_obj ~full env libdir ocamlc ~native:false
+    compile_obj env libdir ocamlc ~native:false
       "-lcamlrun" "test_output_obj_static"
       "Bytecode (-output-obj static runtime)";
-    compile_obj ~unix_only ~full env libdir ocamlc ~native:false
+    compile_obj ~unix_only env libdir ocamlc ~native:false
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
-    compile_with_options ~full env ocamlc ~native:false
+    compile_with_options env ocamlc ~native:false
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
-    compile_with_options ~unix_only ~full env ocamlc ~native:false
+    compile_with_options ~unix_only env ocamlc ~native:false
       ["-output-complete-exe"; "-runtime-variant"; "_shared"]
       "test_output_complete_exe_shared"
       "Bytecode (-output-complete-exe shared runtime)";
-    compile_with_options ~full env ocamlopt ~native:true
+    compile_with_options env ocamlopt ~native:true
       [] "test_native_static"
       "Native (static runtime)";
-    compile_obj ~full env libdir ocamlopt ~native:true
+    compile_obj env libdir ocamlopt ~native:true
       "-lasmrun" "test_native_output_obj_static"
       "Native (-output-obj static runtime)";
-    compile_obj ~unix_only ~full env libdir ocamlopt ~native:true
+    compile_obj ~unix_only env libdir ocamlopt ~native:true
       "-lasmrun_shared" "test_native_output_obj_shared"
       "Native (-output-obj shared runtime)";
   ] in
   Printf.printf "Running programs\n%!";
   List.filter_map (fun f -> f ()) programs
 
-let run_tests ~full env bindir libdir libraries =
+let run_tests env bindir libdir libraries =
   let libraries = sort_libraries libraries in
   let ocaml = exe (Filename.concat bindir "ocaml") in
   let ocamlnat = exe (Filename.concat bindir "ocamlnat") in
   let ocamlc = exe (Filename.concat bindir "ocamlc") in
   let ocamlopt = exe (Filename.concat bindir "ocamlopt") in
-  if full then
-    load_libraries_in_toplevel env ocaml "cma" libraries;
+  load_libraries_in_toplevel env ocaml "cma" libraries;
   load_libraries_in_toplevel env ocamlnat "cmxa" libraries;
-  if full then
-    load_libraries_in_prog env libdir ocamlc ~native:false libraries;
+  load_libraries_in_prog env libdir ocamlc ~native:false libraries;
   load_libraries_in_prog env libdir ocamlopt ~native:true libraries;
-  if full then
-    test_bytecode_binaries env bindir;
-  test_standard_library_location ~full env bindir libdir ocamlc ocamlopt
+  test_bytecode_binaries env bindir;
+  test_standard_library_location env bindir libdir ocamlc ocamlopt
 
 let rec split_dir acc dir =
   let dirname = Filename.dirname dir in
@@ -475,7 +457,7 @@ let () =
     let bindir = Sys.argv.(1) in
     let libdir = Sys.argv.(2) in
     let env = make_env bindir libdir in
-    let programs = run_tests ~full:true env bindir libdir libraries in
+    let programs = run_tests env bindir libdir libraries in
     if Sys.argv.(3) = "yes" then
       let prefix, bindir_suffix, libdir_suffix =
         split_to_prefix [] (split_dir [] bindir) (split_dir [] libdir) in
@@ -494,4 +476,4 @@ let () =
       List.iter (run_program env) programs;
       List.iter Sys.remove programs;
       Compmisc.init_path ~standard_library:libdir ();
-      List.iter Sys.remove (run_tests ~full:false env bindir libdir libraries)
+      List.iter Sys.remove (run_tests env bindir libdir libraries)
