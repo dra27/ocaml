@@ -166,7 +166,7 @@ directories given for --bindir and --libdir do not have a common prefix";
   in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
-  let relocatable = false in
+  let relocatable = config.has_relative_libdir && config.has_runtime_search in
   let target_relocatable = config.has_runtime_search_target in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
