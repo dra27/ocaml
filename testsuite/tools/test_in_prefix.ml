@@ -3457,7 +3457,8 @@ let () =
     {config with Installation.libraries; launcher_searches_for_ocamlrun;
                  target_launcher_searches_for_ocamlrun}
   in
-  let relocatable = false in
+  let relocatable =
+    config.has_relative_libdir <> None && config.has_runtime_search <> None in
   let reproducible =
     relocatable
     && (not config.has_ocamlopt
