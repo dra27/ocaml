@@ -968,6 +968,8 @@ test-installation: tools/test_install$(EXE) tools/test_install_main.$(O)
       $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
+      $(call bool_to_with, runtime-search, $(RUNTIME_SEARCH)) \
+      $(call bool_to_with, runtime-search-target, $(RUNTIME_SEARCH_TARGET)) \
       $(ALL_OTHERLIBS)
 else
 test-installation:
