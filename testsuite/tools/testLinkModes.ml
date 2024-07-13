@@ -96,7 +96,7 @@ let () =
    [expected_exit_code]. [~may_segfault] is an escape hatch used for s390x tests
    which fail on RHEL/Fedora at the moment.
 *)
-let run_program env (_config : Installation.t) =
+let run_program env (config : Installation.t) =
   let prefix = Environment.prefix env in
   let libdir_suffix = Environment.libdir_suffix env in
   let prefix, libdir_suffix =
@@ -113,7 +113,7 @@ let run_program env (_config : Installation.t) =
       if Environment.is_renamed env then
         stdlib_exists_when_renamed
       else
-        false in
+        config.has_relative_libdir <> None in
     let args = [string_of_bool stdlib_exists; prefix; libdir_suffix] in
     let argv0 =
       if argv0 = test_program then
@@ -378,7 +378,7 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           options
       in
       let options =
-        if Environment.is_renamed env then
+        if Environment.is_renamed env || config.has_relative_libdir <> None then
           options
         else
           let new_libdir =
@@ -417,7 +417,7 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           let runtime =
             mode = Bytecode && Installation.ocamlc_fails_after_rename config in
           let stubs = with_unix && tendered in
-          let stdlib = true in
+          let stdlib = config.has_relative_libdir = None in
           Environment.run_process Return
             ~fails ~runtime ~stubs ~stdlib env compiler args
         in
@@ -448,7 +448,11 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           `None
         else
           let stdlib_exists_when_renamed =
-            not (Environment.is_renamed env) in
+            if config.has_relative_libdir = None then
+              not (Environment.is_renamed env)
+            else
+              Environment.is_renamed env in
+          let compiled_location = Environment.is_renamed env in
           (* Each test is compiled twice - in the original prefix
              (~original:true) and in the renamed prefix (~original:false).
              Additionally, the tests compiled in the original prefix are
@@ -456,9 +460,13 @@ let compile_test usr_bin_sh (config : Installation.t) env =
              is what this slightly convoluted run function sets up *)
           let rec run env =
             (* Bytecode executables with absolute headers will need to be
-               invoked via ocamlrun after the prefix has been renamed. *)
+               invoked via ocamlrun after the prefix has been renamed.
+               XXX Expand: when relative, runtime-launch-info contains a .
+                   and so the header is _correctly_ computed even after
+                   renaming. *)
             let via_ocamlrun =
               Environment.is_renamed env
+                <> (compiled_location && config.has_relative_libdir <> None)
               && tendered && not target_launcher_searches_for_ocamlrun
             in
             (* Each executable is invoked with six different values of
@@ -543,6 +551,16 @@ let compile_test usr_bin_sh (config : Installation.t) env =
                         else if Sys.win32 then
                           (* stdlib/headernt.c correctly preserves argv[0] *)
                           Success {executable_name = test_program_path; argv0}
+                        else if Toolchain.no_caml_executable_name
+                                && not (Environment.is_renamed env)
+                                && config.has_relative_libdir <> None then
+                          (* Without caml_executable_name, ocamlrun will be
+                             forced to interpret the relative standard library
+                             relative to argv[0], which will fail. As with the
+                             Dynlink testing, after the prefix has been renamed,
+                             CAML_LD_LIBRARY_PATH has to be set, so this will
+                             succeed. *)
+                          Fail 134
                         else
                           (* stdlib/header.c does not preserve argv[0] *)
                           Success {executable_name = argv0_resolved;
