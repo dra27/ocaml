@@ -20,6 +20,10 @@ type config = {
     (* $(INSTALL_OCAMLNAT) - Makefile.build_config *)
   has_ocamlopt: bool;
     (* $(NATIVE_COMPILER) - Makefile.config *)
+  has_runtime_search: bool;
+    (* $(RUNTIME_SEARCH) - Makefile.build_config *)
+  has_runtime_search_target: bool;
+    (* $(RUNTIME_SEARCH_TARGET) - Makefile.build_config *)
   libraries: string list list
     (* Sorted list of basenames of libraries to test.
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -43,7 +47,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let libdir = ref "" in
   let config =
     ref {supports_shared_libraries = false;
-         has_ocamlnat = false; has_ocamlopt = false; libraries = []}
+         has_ocamlnat = false; has_ocamlopt = false; has_runtime_search = false;
+         has_runtime_search_target = false; libraries = []}
   in
   let check_exists r dir =
     if Sys.file_exists dir then
@@ -62,6 +67,12 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
+  let has_runtime_search has_runtime_search () =
+    config := {!config with has_runtime_search}
+  in
+  let has_runtime_search_target has_runtime_search_target () =
+    config := {!config with has_runtime_search_target}
+  in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -78,6 +89,14 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
 \tNative compiler (ocamlopt) is installed in the directory given in --bindir";
     "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+    "--with-runtime-search", Arg.Unit (has_runtime_search true), "\
+\tCompiler bytecode binaries can search for their runtimes";
+    "--without-runtime-search", Arg.Unit (has_runtime_search false), "";
+    "--with-runtime-search-target",
+      Arg.Unit (has_runtime_search_target true), "\
+\tBytecode binaries produced by the compiler can search for their runtimes";
+    "--without-runtime-search-target",
+      Arg.Unit (has_runtime_search_target false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -141,7 +160,7 @@ directories given for --bindir and --libdir do not have a common prefix";
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
   let relocatable = false in
-  let target_relocatable = false in
+  let target_relocatable = config.has_runtime_search_target in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
     exit 2
@@ -725,10 +744,10 @@ let exe =
     Fun.id
 
 (* launcher_searches_for_ocamlrun describes whether ocamlc emits an RNTM with
-   the name of the runtime only, expecting the launcher in stdlib/header*.c to
-   search PATH for it. This used to be the behaviour for native Windows. *)
-let launcher_searches_for_ocamlrun = false
-let target_launcher_searches_for_ocamlrun = false
+   the name of the runtime only, expecting the bytecode launcher to search PATH
+   for it. *)
+let launcher_searches_for_ocamlrun = config.has_runtime_search
+let target_launcher_searches_for_ocamlrun = config.has_runtime_search_target
 
 (* linker_is_flexlink is true for Cygwin when shared library support is enabled
    and always true for native Windows. *)
