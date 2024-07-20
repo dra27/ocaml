@@ -2964,6 +2964,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 
+.PHONY: .depend
 include .depend
 
 Makefile.config Makefile.build_config: config.status
