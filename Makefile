@@ -3111,6 +3111,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 
+.PHONY: .depend
 include .depend
 
 # Include the cross-compiler recipes only when relevant
