@@ -54,28 +54,22 @@ function run {
 function set_configuration {
     case "$1" in
         cygwin*)
-            dep='--disable-dependency-generation'
             man=''
         ;;
         mingw32)
             host='--host=i686-w64-mingw32'
-            dep='--disable-dependency-generation'
             man=''
         ;;
         mingw64)
             host='--host=x86_64-w64-mingw32'
-            dep='--disable-dependency-generation'
             man='--disable-stdlib-manpages'
         ;;
         msvc32)
             host='--host=i686-pc-windows'
-            dep='--disable-dependency-generation'
             man=''
         ;;
         msvc64)
             host='--host=x86_64-pc-windows'
-            # Explicitly test dependency generation on msvc64
-            dep='--enable-dependency-generation'
             man=''
         ;;
     esac
@@ -94,11 +88,11 @@ function set_configuration {
     fi
 
     # Remove configure cache if the script has failed
-    if ! ./configure --cache-file="$CACHE_FILE" $dep $build $man $host \
+    if ! ./configure --cache-file="$CACHE_FILE" $build $man $host \
                      --prefix="$2" --enable-ocamltest ; then
         rm -f -- "$CACHE_FILE"
         local failed
-        ./configure --cache-file="$CACHE_FILE" $dep $build $man $host \
+        ./configure --cache-file="$CACHE_FILE" $build $man $host \
                     --prefix="$2" --enable-ocamltest \
             || failed=$?
         if ((failed)) ; then cat config.log ; exit $failed ; fi
