@@ -59,7 +59,6 @@ EOF
                  --enable-flambda-invariants \
                  --enable-ocamltest \
                  --enable-native-toplevel \
-                 --disable-dependency-generation \
                  $CONFIG_ARG
 }
 
@@ -277,8 +276,7 @@ BasicCompiler () {
   local failed
   trap ReportBuildStatus ERR
 
-  call-configure --disable-dependency-generation \
-                 --disable-debug-runtime \
+  call-configure --disable-debug-runtime \
                  --disable-instrumented-runtime \
                  --enable-ocamltest \
 
