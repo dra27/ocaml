@@ -19,6 +19,11 @@ OCaml 4.09 maintenance branch
   revise generation of config/util.ml to better quote special characters
   (Xavier Leroy, review by David Allsopp)
 
+- #8837: build manpages using ocamldoc.opt when available
+  cuts the manpages build time from 14s to 4s
+  (Gabriel Scherer, review by David Allsopp and Sébastien Hinderer,
+   report by David Allsopp)
+
 - #9250: Add --disable-ocamltest to configure and disable building for
   non-development builds.
   (David Allsopp, review by Sébastien Hinderer)
