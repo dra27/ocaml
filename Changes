@@ -47,6 +47,9 @@ OCaml 4.08 maintenance branch:
   prevent their C99-compliant snprintf conflicting with ours.
   (David Allsopp, report by Michael Soegtrop, review by Xavier Leroy)
 
+- #10062: set ARCH_INT64_PRINTF_FORMAT correctly for both modes of mingw-w64
+  (David Allsopp, review by Xavier Leroy)
+
 - #10250, #10266: Dynamically allocate alternate signal stacks to
   accommodate changes in Glibc 2.34.
   (Xavier Leroy, reports by Tomasz Kłoczko and R.W.M. Jones, review by Anil
