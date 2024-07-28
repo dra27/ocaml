@@ -40,6 +40,10 @@ OCaml 4.10 maintenance branch
   (report by Emilio Jesús Gallego Arias, analysis and fix by Stephen Dolan,
    code by Xavier Leroy, review by Hugo Heuzard and Gabriel Scherer)
 
+- #9335: actually have --disable-stdlib-manpages not build the manpages
+  (implementation conflicted with #8837 which wasn't picked up in review)
+  (David Allsopp, review by Florian Angeletti and Sébastien Hinderer)
+
 - #9925: Correct passing -fdebug-prefix-map to flexlink on Cygwin by prefixing
   it with -link.
   (David Allsopp, review by Xavier Leroy)
