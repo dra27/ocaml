@@ -26,6 +26,9 @@ OCaml 4.11 maintenance branch
   it with -link.
   (David Allsopp, review by Xavier Leroy)
 
+- #10062: set ARCH_INT64_PRINTF_FORMAT correctly for both modes of mingw-w64
+  (David Allsopp, review by Xavier Leroy)
+
 - #10147, #10148: Fix building runtime with GCC on macOS.
   (David Allsopp, report by John Skaller)
 
