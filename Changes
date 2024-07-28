@@ -22,6 +22,10 @@ OCaml 4.11 maintenance branch
 
 ### Bug fixes:
 
+- #9925: Correct passing -fdebug-prefix-map to flexlink on Cygwin by prefixing
+  it with -link.
+  (David Allsopp, review by Xavier Leroy)
+
 - #10147, #10148: Fix building runtime with GCC on macOS.
   (David Allsopp, report by John Skaller)
 
