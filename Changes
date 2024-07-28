@@ -15,8 +15,8 @@ OCaml 4.08 maintenance branch:
 
 ### Build system:
 
-- #8835: new configure option --disable-stdlib-manpages to disable building
-  and installation of the library manpages.
+- #8835, #9335: new configure option --disable-stdlib-manpages to disable
+  building and installation of the library manpages.
   (David Allsopp, review by Florian Angeletti and Gabriel Scherer)
 
 - #8837: build manpages using ocamldoc.opt when available
