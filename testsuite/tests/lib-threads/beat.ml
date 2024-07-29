@@ -1,15 +1,10 @@
 (* TEST
+ include systhreads;
+ hassysthreads;
  {
-   include systhreads;
-   hassysthreads;
+   bytecode;
  }{
-   reason = "off-by-one error on MacOS+Clang (https://github.com/ocaml-multicore/ocaml-multicore/issues/408)";
-   skip;
-   {
-     bytecode;
-   }{
-     native;
-   }
+   native;
  }
 *)
 
@@ -19,16 +14,25 @@ open Printf
 
 let tick (delay, count) =
   while true do
+    let start = Unix.gettimeofday () in
     Thread.delay delay;
-    incr count
+    count := !count +. (Unix.gettimeofday () -. start)
   done
 
+let within reading expected tick tolerance =
+  let delta = tick *. (1.0 +. tolerance) in
+  reading >= expected -. delta && reading <= expected +. delta
+
 let _ =
-  let c1 = ref 0 and c2 = ref 0 in
-  ignore (Thread.create tick (0.333333333, c1));
-  ignore (Thread.create tick (0.5, c2));
+  let c1 = ref 0.0 and c2 = ref 0.0 in
+  let tick1 = 0.333333333 and tick2 = 0.5 in
+  let start = Unix.gettimeofday () in
+  ignore (Thread.create tick (tick1, c1));
+  ignore (Thread.create tick (tick2, c2));
   Thread.delay 3.0;
-  let n1 = !c1 and n2 = !c2 in
-  if n1 >= 8 && n1 <= 10 && n2 >= 5 && n2 <= 7
+  let d = Unix.gettimeofday () -. start
+  and d1 = !c1 and d2 = !c2 in
+  let tolerance = 0.5 in
+  if within d1 d tick1 tolerance && within d2 d tick2 tolerance
   then printf "passed\n"
-  else printf "FAILED (n1 = %d, n2 = %d)\n" n1 n2
+  else printf "FAILED (d = %f, d1 = %f, d2 = %f)\n" d d1 d2
