@@ -48,6 +48,9 @@ stdlib/*.mld             typo.missing-header
 
 *.adoc                   typo.long-line=may
 
+# Github templates and scripts lack headers, have long lines
+/.github/**              typo.missing-header typo.long-line=may typo.very-long-line=may
+
 /.mailmap                typo.long-line typo.missing-header typo.non-ascii
 /.merlin                 typo.missing-header
 /Changes                 typo.utf8 typo.missing-header
@@ -145,9 +148,9 @@ menhir-bench.bash typo.missing-header typo.utf8
 
 configure.ac text eol=lf
 build-aux/compile text eol=lf
-build-aux/config.guess text eol=lf
-build-aux/config.sub text eol=lf
-build-aux/install text eol=lf
+build-aux/config.guess linguist-generated text eol=lf
+build-aux/config.sub linguist-generated text eol=lf
+build-aux/install-sh text eol=lf
 build-aux/missing text eol=lf
 config/auto-aux/hasgot text eol=lf
 config/auto-aux/hasgot2 text eol=lf
