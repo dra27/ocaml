@@ -343,8 +343,10 @@ utils/config.ml: utils/config.mlp Makefile.config utils/Makefile Makefile
 reconfigure:
 	./configure $(CONFIGURE_ARGS)
 
+AUTOCONF_TOOL_NAME ?=
+
 configure: configure.ac aclocal.m4 VERSION tools/autogen
-	tools/autogen
+	tools/autogen $(AUTOCONF_TOOL_NAME)
 
 .PHONY: partialclean
 partialclean::
