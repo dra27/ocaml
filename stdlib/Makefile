@@ -269,7 +269,7 @@ stdlib__%.p.cmx: %.ml
 	           -p -c -o $@ $<
 
 # Dependencies on the compiler
-COMPILER_DEPS=$(filter-out -use-prims, $(COMPILER))
+COMPILER_DEPS=$(filter-out -use-prims $(CAMLRUN), $(CAMLC))
 $(OBJS) std_exit.cmo: $(COMPILER_DEPS)
 $(OBJS:.cmo=.cmi) std_exit.cmi: $(COMPILER_DEPS)
 $(OBJS:.cmo=.cmx) std_exit.cmx: $(OPTCOMPILER)
@@ -288,6 +288,7 @@ clean::
 	rm -f *.cm* *.o *.obj *.a *.lib *.odoc
 	rm -f *~
 	rm -f camlheader*
+	rm -rf flexdll
 
 include .depend
 
