@@ -33,6 +33,7 @@ jobs:
         exclude:
           - cc: clang-cl
             x86_64: false
+      fail-fast: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - name: Save pristine PATH
