@@ -73,6 +73,7 @@ jobs:
           - id: debug
             name: debug runtime
             dependencies: libunwind-dev
+      fail-fast: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
