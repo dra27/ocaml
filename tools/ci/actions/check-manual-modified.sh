@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*            Gabriel Scherer, projet Parsifal, INRIA Saclay              *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
 #*                                                                        *
-#*   Copyright 2020 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2021 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,16 +13,23 @@
 #*                                                                        *
 #**************************************************************************
 
-MAKECMDGOALS ?= defaultentry
+set -e
 
-CLEAN_TARGET_NAMES=clean partialclean distclean
+# Test whether the manual/ has been touched by this PR.
 
-# Some special targets ('*clean' and 'configure') do not require configuration.
-# REQUIRES_CONFIGURATION is empty if only those targets are requested,
-# and non-empty if configuration is required.
-REQUIRES_CONFIGURATION := $(strip \
-  $(filter-out $(CLEAN_TARGET_NAMES) configure, $(MAKECMDGOALS)))
+if [[ $2 = 'push' && ${11} = 'ocaml/ocaml' ]]; then
+  # Always build the manual for pushes to ocaml/ocaml
+  result=true
+else
+  # We need all the commits in the PR to be available
+  . tools/ci/actions/deepen-fetch.sh
+  if git diff "$MERGE_BASE..$PR_HEAD" --name-only --exit-code \
+       -- manual/* > /dev/null; then
+    result=false
+  else
+    result=true
+  fi
+fi
 
-ifneq "$(REQUIRES_CONFIGURATION)" ""
-include $(ROOTDIR)/Makefile.build_config
-endif
+echo "Manual altered: $result"
+echo "manual_changed=$result" >>"$GITHUB_OUTPUT"
