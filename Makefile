@@ -21,9 +21,9 @@ ROOTDIR = .
 # first.
 # If no goals were specified (i.e. `make`), add defaultentry (since it requires
 # ./configure to be run)
+MAKECMDGOALS ?= defaultentry
 CAN_BE_UNCONFIGURED := $(strip \
-  $(filter-out partialclean clean distclean configure, \
-	$(if $(MAKECMDGOALS),$(MAKECMDGOALS),defaultentry)))
+  $(filter-out partialclean clean distclean configure, $(MAKECMDGOALS)))
 
 ifeq "$(CAN_BE_UNCONFIGURED)" ""
 -include Makefile.config
@@ -135,8 +135,10 @@ utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
 utils/domainstate.mli: utils/domainstate.mli.c runtime/caml/domain_state.tbl
 	$(CPP) -I runtime/caml $< > $@
 
+AUTOCONF_TOOL_NAME ?=
+
 configure: configure.ac aclocal.m4 VERSION tools/autogen
-	tools/autogen
+	tools/autogen $(AUTOCONF_TOOL_NAME)
 
 .PHONY: partialclean
 partialclean::
@@ -664,7 +666,7 @@ beforedepend:: parsing/lexer.ml
 
 ocamlc.opt: compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlbytecomp.cmxa \
             $(BYTESTART:.cmo=.cmx)
-	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ -cclib "$(BYTECCLIBS)"
+	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ $(PTHREAD_CAML_LINK)
 
 partialclean::
 	rm -f ocamlc.opt
