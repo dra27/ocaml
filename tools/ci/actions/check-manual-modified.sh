@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*                 Xavier Clerc, SED, INRIA Rocquencourt                  *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
 #*                                                                        *
-#*   Copyright 2010 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2021 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,40 +13,23 @@
 #*                                                                        *
 #**************************************************************************
 
-.NOTPARALLEL:
+set -e
 
-TOPDIR = ../..
-COMPFLAGS ?=
-RUNTIME_VARIANT ?=
+# Test whether the manual/ has been touched by this PR.
 
-include $(TOPDIR)/Makefile.tools
+if [[ $2 = 'push' && ${11} = 'ocaml/ocaml' ]]; then
+  # Always build the manual for pushes to ocaml/ocaml
+  result=true
+else
+  # We need all the commits in the PR to be available
+  . tools/ci/actions/deepen-fetch.sh
+  if git diff "$MERGE_BASE..$PR_HEAD" --name-only --exit-code \
+       -- manual/* > /dev/null; then
+    result=false
+  else
+    result=true
+  fi
+fi
 
-libraries := testing.cmi testing.cma lib.cmo
-
-# If the native compiler is enabled, then also compile testing.cmxa
-ifeq "$(NATIVE_COMPILER)" "true"
-libraries += testing.cmxa
-endif
-
-all: $(libraries)
-
-testing.cma: testing.cmo
-	$(OCAMLC) -a -linkall -o $@ $<
-
-testing.cmxa: testing.cmx
-	$(OCAMLOPT) -a -linkall -o $@ $<
-
-testing.cmo : testing.cmi
-
-%.cmi: %.mli
-	$(OCAMLC) -c $<
-
-%.cmo: %.ml
-	$(OCAMLC) -c $<
-
-%.cmx: %.ml
-	$(OCAMLOPT) -c $<
-
-.PHONY: clean
-clean:
-	rm -f *.cm* *.o *.obj *.a *.lib
+echo "Manual altered: $result"
+echo "manual_changed=$result" >>"$GITHUB_OUTPUT"

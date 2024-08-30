@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*                 Xavier Clerc, SED, INRIA Rocquencourt                  *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
 #*                                                                        *
-#*   Copyright 2010 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2021 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,40 +13,26 @@
 #*                                                                        *
 #**************************************************************************
 
-.NOTPARALLEL:
+set -e
 
-TOPDIR = ../..
-COMPFLAGS ?=
-RUNTIME_VARIANT ?=
+# Hygiene Checks: Ensure that *Labels module docs are in sync with the
+# unlabelled version.
 
-include $(TOPDIR)/Makefile.tools
+MSG='CheckSyncStdlibDocs is a no-op'
 
-libraries := testing.cmi testing.cma lib.cmo
-
-# If the native compiler is enabled, then also compile testing.cmxa
-ifeq "$(NATIVE_COMPILER)" "true"
-libraries += testing.cmxa
-endif
-
-all: $(libraries)
-
-testing.cma: testing.cmo
-	$(OCAMLC) -a -linkall -o $@ $<
-
-testing.cmxa: testing.cmx
-	$(OCAMLOPT) -a -linkall -o $@ $<
-
-testing.cmo : testing.cmi
-
-%.cmi: %.mli
-	$(OCAMLC) -c $<
-
-%.cmo: %.ml
-	$(OCAMLC) -c $<
-
-%.cmx: %.ml
-	$(OCAMLOPT) -c $<
-
-.PHONY: clean
-clean:
-	rm -f *.cm* *.o *.obj *.a *.lib
+tools/sync_stdlib_docs
+if git diff --quiet --exit-code; then
+  echo -e "$MSG: \e[32mYES\e[0m"
+else
+  echo -e "$MSG: \e[31mNO\e[0m"
+  echo "CheckSyncStdlibDocs: failure with the following differences:"
+  git --no-pager diff
+  cat<<EOF
+------------------------------------------------------------------------
+This should be fixable by just running tools/sync_stdlib_docs and
+eviewing the changes it makes.
+------------------------------------------------------------------------
+EOF
+  git checkout .
+  exit 1
+fi
