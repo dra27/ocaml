@@ -1,11 +1,11 @@
+#!/usr/bin/env bash
 #**************************************************************************
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*            Gabriel Scherer, projet Parsifal, INRIA Saclay              *
+#*                 David Allsopp, OCaml Labs, Cambridge.                  *
 #*                                                                        *
-#*   Copyright 2018 Institut National de Recherche en Informatique et     *
-#*     en Automatique.                                                    *
+#*   Copyright 2021 David Allsopp Ltd.                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *
 #*   the GNU Lesser General Public License version 2.1, with the          *
@@ -13,26 +13,23 @@
 #*                                                                        *
 #**************************************************************************
 
-ROOTDIR=..
--include $(ROOTDIR)/Makefile.config
--include $(ROOTDIR)/Makefile.common
+set -e
 
-OTHERLIBRARIES ?= bigarray dynlink raw_spacetime_lib str systhreads \
-                  unix win32unix
+# Test whether the manual/ has been touched by this PR.
 
-# $1: target name to dispatch to all otherlibs/*/Makefile
-define dispatch_
-$1:
-	@for lib in $$(OTHERLIBRARIES); do \
-	  ($$(MAKE) -C $$$$lib $1) || exit $$$$?; \
-	done
-endef
-define dispatch
-$(eval $(call dispatch_,$1))
-endef
+if [[ $2 = 'push' && ${11} = 'ocaml/ocaml' ]]; then
+  # Always build the manual for pushes to ocaml/ocaml
+  result=true
+else
+  # We need all the commits in the PR to be available
+  . tools/ci/actions/deepen-fetch.sh
+  if git diff "$MERGE_BASE..$PR_HEAD" --name-only --exit-code \
+       -- manual/* > /dev/null; then
+    result=false
+  else
+    result=true
+  fi
+fi
 
-.PHONY: all allopt clean partialclean
-$(call dispatch,all)
-$(call dispatch,allopt)
-$(call dispatch,clean)
-$(call dispatch,partialclean)
+echo "Manual altered: $result"
+echo "manual_changed=$result" >>"$GITHUB_OUTPUT"

@@ -2696,7 +2696,7 @@ extralibs=
 ## Source directory
 
 
-## Directory containing auxiliary scripts used dugring build
+## Directory containing auxiliary scripts used during build
 ac_aux_dir=
 for ac_dir in build-aux "$srcdir"/build-aux; do
   if test -f "$ac_dir/install-sh"; then
@@ -12555,6 +12555,9 @@ fi ;; #(
   *,x86_64-*-linux*) :
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
  ;; #(
+  *,i[3456]86-*) :
+    # Explicitly disable PIE executables on Linux and *BSD x86_32
+    mkexe="$mkexe -no-pie " ;; #(
   xlc*,powerpc-ibm-aix*) :
     mkexe="$mkexe "
      oc_ldflags="-brtl -bexpfull"
@@ -13311,7 +13314,7 @@ natdynlinkopts=""
 if test x"$enable_shared" != "xno"; then :
   case $host in #(
   *-apple-darwin*) :
-    mksharedlib="$CC -shared -flat_namespace -undefined suppress \
+    mksharedlib="$CC -shared -undefined dynamic_lookup \
                    -Wl,-no_compact_unwind"
       shared_libraries_supported=true ;; #(
   *-*-mingw32) :
@@ -13337,7 +13340,14 @@ esac ;; #(
   *-*-linux*|*-*-freebsd[3-9]*|*-*-freebsd[1-9][0-9]*\
     |*-*-openbsd*|*-*-netbsd*|*-*-dragonfly*|*-*-gnu*|*-*-haiku*) :
     sharedlib_cflags="-fPIC"
-      mksharedlib="$CC -shared"
+       case $CC,$host in #(
+  *,i[3456]86-*) :
+    # Disable DT_TEXTREL warnings on Linux and BSD i386
+           # See https://github.com/ocaml/ocaml/issues/9800
+           mksharedlib="$CC -shared -Wl,-z,notext" ;; #(
+  *) :
+    mksharedlib="$CC -shared" ;;
+esac
       oc_ldflags="$oc_ldflags -Wl,-E"
       rpath="-Wl,-rpath,"
       mksharedlibrpath="-Wl,-rpath,"
