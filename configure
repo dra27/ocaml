@@ -732,7 +732,6 @@ INSTALL_PROGRAM
 flexlink
 CPP
 ac_ct_DEP_CC
-DEP_CC
 LT_SYS_LIBRARY_PATH
 OTOOL64
 OTOOL
@@ -913,6 +912,8 @@ ac_tool_prefix
 CSCFLAGS
 CSC
 DIFF_FLAGS
+DEP_CC_PREFIX
+DEP_CC
 CC
 LINEAR_MAGIC_NUMBER
 CMT_MAGIC_NUMBER
@@ -3382,6 +3383,8 @@ CMXS_MAGIC_NUMBER=Caml1999D035
 CMT_MAGIC_NUMBER=Caml1999T035
 
 LINEAR_MAGIC_NUMBER=Caml1999L035
+
+
 
 
 
@@ -13369,11 +13372,17 @@ CC=$lt_save_CC
 CFLAGS="$saved_CFLAGS"
 host_os=$old_host_os
 
+DEP_CC_PREFIX=''
 case $host in #(
   sparc-sun-solaris*) :
     DEP_CC="false" ;; #(
   *-pc-windows) :
-    if test -n "$ac_tool_prefix"; then
+    if test x"$CC" = "xclang-cl"
+then :
+  DEP_CC="$CC"
+      DEP_CC_PREFIX='/clang:'
+else $as_nop
+  if test -n "$ac_tool_prefix"; then
   for ac_prog in $DEP_CC gcc cc x86_64-w64-mingw32-gcc i686-w64-mingw32-gcc
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -13482,7 +13491,8 @@ esac
     DEP_CC=$ac_ct_DEP_CC
   fi
 fi
- ;; #(
+
+fi ;; #(
   *) :
     DEP_CC="$CC" ;;
 esac

@@ -1492,34 +1492,61 @@ runtime/%.npic.$(O): OC_CFLAGS = $(OC_NATIVE_CFLAGS) $(SHAREDLIB_CFLAGS)
 runtime/%.npic.$(O): OC_CPPFLAGS = $(OC_NATIVE_CPPFLAGS)
 $(DEPDIR)/runtime/%.npic.$(D): OC_CPPFLAGS = $(OC_NATIVE_CPPFLAGS)
 
-## Compilation of runtime C files
+## Compilation of C files
 
-# The COMPILE_C_FILE macro below receives as argument the pattern
-# that corresponds to the name of the generated object file
-# (without the extension, which is added by the macro)
-define COMPILE_C_FILE
+# There are two scenarios in which a C object may need to be rebuilt:
+# 1. The C source file is newer than the object
+# 2. A file #include'd by the C source file is newer than the object
+#
+# When the C source file is newer than the object, we do not have to care about
+# which included files are newer, we just have to be sure that all the files
+# which may be #include'd definitely exist.
+#
+# GCC and clang can both generate the precise dependency information
+# needed for (2) as part of compiling the C file. We therefore use C dependency
+# information lazily.
+
+# All C files must depend on the _presence_ of the $(runtime_BUILT_HEADERS). If
+# a C file actually uses one of these headers, then the dependency will be
+# recorded in the .d file (and becomes a real dependency, not an order-only
+# dependency).
+runtime_MISSING_BUILT_HEADERS = \
+  $(filter-out $(wildcard $(runtime_BUILT_HEADERS)), $(runtime_BUILT_HEADERS))
+
+# COMPILE_C_FILE generates the compilation rules for C objects
+#   $1 = target pattern for the generated object file (without the .$(O))
+#   $2 = source pattern for the C source file (without the .c)
+#   $3 = optional; if non-empty suppresses the generation of dependency rules
+define DO_COMPILE_C_FILE
 ifeq "$(COMPUTE_DEPS)" "true"
-ifneq "$(1)" "%"
-# -MG would ensure that the dependencies are generated even if the files listed
-# in $$(runtime_BUILT_HEADERS) haven't been assembled yet. However,
-# this goes subtly wrong if the user has the headers installed,
-# as gcc will pick up a dependency on those instead and the local
-# ones will not be generated. For this reason, we don't use -MG and
-# instead include $(runtime_BUILT_HEADERS) in the order only dependencies
-# to ensure that they exist before dependencies are computed.
-$(DEPDIR)/$(1).$(D): runtime/%.c | $(DEPDIR)/runtime $(runtime_BUILT_HEADERS)
-	$$(V_CCDEPS)$$(DEP_CC) $$(OC_CPPFLAGS) $$(CPPFLAGS) $$< -MT \
-	  'runtime/$$*$(subst runtime/%,,$(1)).$(O)' -MF $$@
-endif # ifneq "$(1)" "%"
-$(1).$(O): $(2).c
+# Secondary expansion means we can use @D to depend on the directory being
+# created.
+$(1).$(O): $(2).c \
+  $(if $(3),,| $(DEPDIR)/$$$$(@D) $(runtime_MISSING_BUILT_HEADERS))
 else
 $(1).$(O): $(2).c \
   $(runtime_CONFIGURED_HEADERS) $(runtime_BUILT_HEADERS) \
   $(RUNTIME_HEADERS)
 endif # ifeq "$(COMPUTE_DEPS)" "true"
 	$$(V_CC)$$(CC) $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
-	  $$(OUTPUTOBJ)$$@ -c $$<
+	  $$(OUTPUTOBJ)$$@ \
+	  $(if $(3),,$(call DEP_FLAGS,$$@,$(DEPDIR)/$$(@:.$(O)=.$(D)))) \
+	  -c $$<
+# This is skipped if either $(COMPUTE_DEPS) is false or $(3) is non-empty
+ifeq "$(COMPUTE_DEPS)$(3)" "true"
+# MSVC doesn't emit usable dependency information, but if GCC is available
+# then it can instead be called in order to generate the .d file.
+ifneq "$(CC)$(3)" "$(DEP_CC)"
+	$$(V_CCDEPS)$$(DEP_CC) $$(OC_CPPFLAGS) $$(CPPFLAGS) $$< -MM -MT $$@ \
+   -MF $(DEPDIR)/$$(@:.$(O)=.$(D))
+endif # ifneq "$(CC)" "$(DEP_CC)"
+endif # ifeq "$(COMPUTE_DEPS)$(3)" "true"
 endef
+
+# The additional call expands the optional $(3) to an empty string
+COMPILE_C_FILE = \
+  $(call DO_COMPILE_C_FILE,$(1),$(2),$\
+                           $(if $(filter-out undefined,$(origin 3)),$(3)))
 
 runtime/winpthreads/%.$(O): $(WINPTHREADS_SOURCE_DIR)/src/%.c \
                             $(wildcard $(WINPTHREADS_SOURCE_DIR)/include/*.h) \
@@ -1530,7 +1557,8 @@ runtime/winpthreads/%.$(O): $(WINPTHREADS_SOURCE_DIR)/src/%.c \
 runtime/winpthreads:
 	$(MKDIR) $@
 
-$(DEPDIR)/runtime:
+.PRECIOUS: $(DEPDIR)/%
+$(DEPDIR)/%:
 	$(MKDIR) $@
 
 runtime_OBJECT_TYPES = % %.b %.bd %.bi %.bpic
@@ -1550,6 +1578,8 @@ $(eval $(call COMPILE_C_FILE,runtime/$(UNIX_OR_WIN32)_non_shared.%, \
 $(foreach runtime_OBJECT_TYPE,$(subst %,,$(runtime_OBJECT_TYPES)), \
   $(eval \
     runtime/dynlink$(runtime_OBJECT_TYPE).$(O): $(ROOTDIR)/Makefile.config))
+
+$(eval $(call COMPILE_C_FILE,yacc/%,yacc/%,no-deps))
 
 ## Compilation of runtime assembly files
 
@@ -1587,19 +1617,9 @@ runtime/%_libasmrunpic.obj: runtime/%.asm
 
 ## Runtime dependencies
 
-runtime_DEP_FILES := $(addsuffix .b, \
-  $(basename $(runtime_BYTECODE_C_SOURCES) runtime/instrtrace))
-ifeq "$(NATIVE_COMPILER)" "true"
-runtime_DEP_FILES += $(addsuffix .n, $(basename $(runtime_NATIVE_C_SOURCES)))
-endif
-runtime_DEP_FILES += $(addsuffix d, $(runtime_DEP_FILES)) \
-             $(addsuffix i, $(runtime_DEP_FILES)) \
-             $(addsuffix pic, $(runtime_DEP_FILES))
-runtime_DEP_FILES := $(addsuffix .$(D), $(runtime_DEP_FILES))
-
-ifeq "$(COMPUTE_DEPS)" "true"
-include $(addprefix $(DEPDIR)/, $(runtime_DEP_FILES))
-endif
+RUNTIME_DEP_FILES := $(wildcard $(DEPDIR)/runtime/*.$(D))
+.PHONY: $(RUNTIME_DEP_FILES)
+include $(RUNTIME_DEP_FILES)
 
 .PHONY: runtime
 runtime: stdlib/libcamlrun.$(A)
@@ -1930,19 +1950,9 @@ ocamltest_SOURCES = $(addprefix ocamltest/, \
 $(eval $(call COMPILE_C_FILE,ocamltest/%.b,ocamltest/%))
 $(eval $(call COMPILE_C_FILE,ocamltest/%.n,ocamltest/%))
 
-ifeq "$(COMPUTE_DEPS)" "true"
-include $(addprefix $(DEPDIR)/, $(ocamltest_C_FILES:.c=.$(D)))
-endif
-
-ocamltest_DEP_FILES = $(addprefix $(DEPDIR)/, $(ocamltest_C_FILES:.c=.$(D)))
-
-$(ocamltest_DEP_FILES): | $(DEPDIR)/ocamltest
-
-$(DEPDIR)/ocamltest:
-	$(MKDIR) $@
-
-$(ocamltest_DEP_FILES): $(DEPDIR)/ocamltest/%.$(D): ocamltest/%.c
-	$(V_CCDEPS)$(DEP_CC) $(OC_CPPFLAGS) $(CPPFLAGS) $< -MT '$*.$(O)' -MF $@
+ocamltest_DEPEND_FILES := $(wildcard $(DEPDIR)/ocamltest/*.$(D))
+.PHONY: $(ocamltest_DEPEND_FILES)
+include $(ocamltest_DEPEND_FILES)
 
 ocamltest/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
@@ -2205,6 +2215,7 @@ endif
 endif
 
 # Check that the stack limit is reasonable (Unix-only)
+$(eval $(call COMPILE_C_FILE,tools/checkstack,tools/checkstack,no-deps))
 .PHONY: checkstack
 ifeq "$(UNIX_OR_WIN32)" "unix"
 checkstack: tools/checkstack$(EXE)
@@ -2964,6 +2975,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 
+.PHONY: .depend
 include .depend
 
 Makefile.config Makefile.build_config: config.status

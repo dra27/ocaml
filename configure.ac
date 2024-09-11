@@ -122,6 +122,8 @@ AC_SUBST([CMXS_MAGIC_NUMBER], [CMXS__MAGIC_NUMBER])
 AC_SUBST([CMT_MAGIC_NUMBER], [CMT__MAGIC_NUMBER])
 AC_SUBST([LINEAR_MAGIC_NUMBER], [LINEAR__MAGIC_NUMBER])
 AC_SUBST([CC])
+AC_SUBST([DEP_CC])
+AC_SUBST([DEP_CC_PREFIX])
 AC_SUBST([DIFF_FLAGS])
 AC_SUBST([CSC])
 AC_SUBST([CSCFLAGS])
@@ -623,14 +625,18 @@ LT_INIT
 CFLAGS="$saved_CFLAGS"
 host_os=$old_host_os
 
+DEP_CC_PREFIX=''
 AS_CASE([$host],
   [sparc-sun-solaris*],
     [DEP_CC="false"],
   [*-pc-windows],
-    [AC_CHECK_TOOLS(
-      [DEP_CC],
-      [$DEP_CC gcc cc x86_64-w64-mingw32-gcc i686-w64-mingw32-gcc],
-      [false])],
+    [AS_IF([test x"$CC" = "xclang-cl"],
+      [DEP_CC="$CC"
+      DEP_CC_PREFIX='/clang:'],
+      [AC_CHECK_TOOLS(
+        [DEP_CC],
+        [$DEP_CC gcc cc x86_64-w64-mingw32-gcc i686-w64-mingw32-gcc],
+        [false])])],
   [DEP_CC="$CC"])
 
 AS_CASE([$enable_dependency_generation],
