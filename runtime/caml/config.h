@@ -97,10 +97,6 @@
   #define ARCH_INT64_TYPE long long
   #define ARCH_UINT64_TYPE unsigned long long
   #define ARCH_INT64_PRINTF_FORMAT "I64"
-#elif defined(_MSC_VER)
-  #define ARCH_INT64_TYPE __int64
-  #define ARCH_UINT64_TYPE unsigned __int64
-  #define ARCH_INT64_PRINTF_FORMAT "I64"
 #else
   #if SIZEOF_LONG == 8
     #define ARCH_INT64_TYPE long

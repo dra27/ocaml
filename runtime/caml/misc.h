@@ -58,7 +58,7 @@
 
 #if defined(__GNUC__)                                           \
     && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L \
-    || defined(_MSC_VER) && _MSC_VER >= 1925
+    || defined(_MSC_VER)
 
 #define CAML_STRINGIFY(x) #x
 #ifdef _MSC_VER
