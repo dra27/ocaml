@@ -481,6 +481,9 @@ void caml_signal_thread(void * lpParam)
 
 #if defined(NATIVE_CODE)
 
+/* XXX Is this a legacy which should be removed? Do we still need to raise
+       caml_stack_overflow at this point? */
+
 /* Handling of system stack overflow.
  * Based on code provided by Olivier Andrieu.
 
@@ -640,6 +643,8 @@ int caml_win32_random_seed (intnat data[16])
 }
 
 
+/* Is this - and related code in startup_byt.c and startup_nat.c also needed
+   for UCRT-based mingw-w64 builds? Check PR#4887 for repro. */
 #ifdef _MSC_VER
 
 static void invalid_parameter_handler(const wchar_t* expression,
