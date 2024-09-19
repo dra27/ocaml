@@ -74,3 +74,4 @@ depopts: [
   "ocaml-option-static"
   "ocaml-option-tsan"
 ]
+extra-files: ["ocaml-variants.install" "sha256=7af3dc34e6f9f3be2ffd8d32cd64fa650d6a036c86c4821a7033d24a90fba11c"]
