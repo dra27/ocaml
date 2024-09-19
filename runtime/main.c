@@ -38,3 +38,25 @@ int main_os(int argc, char_os **argv)
   caml_do_exit(0);
   return 0; /* not reached */
 }
+
+#ifndef NATIVE_CODE
+void caml_startup(char_os ** argv)
+{
+  return;
+}
+
+value caml_startup_exn(char_os ** argv)
+{
+  return Val_unit;
+}
+
+void caml_startup_pooled(char_os ** argv)
+{
+  return;
+}
+
+value caml_startup_pooled_exn(char_os ** argv)
+{
+  return Val_unit;
+}
+#endif

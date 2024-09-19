@@ -524,7 +524,31 @@ let link_bytecode_as_c tolink outfile with_main =
        Symtable.output_primitive_table outchan;
        (* The entry point *)
        if with_main then begin
+         (* The stubs for caml_startup are included for link-compatibility with
+            native code, and mean that interop libraries which are designed both
+            with a foreign runtime or with the OCaml runtime involved can still
+            be linked. *)
          output_string outchan "\
+\nvoid caml_startup(char_os ** argv)\
+\n{\
+\n  return;\
+\n}\
+\n\
+\nvalue caml_startup_exn(char_os ** argv)\
+\n{\
+\n  return Val_unit;\
+\n}\
+\n\
+\nvoid caml_startup_pooled(char_os ** argv)\
+\n{\
+\n  return;\
+\n}\
+\n\
+\nvalue caml_startup_pooled_exn(char_os ** argv)\
+\n{\
+\n  return Val_unit;\
+\n}\
+\n\
 \nint main_os(int argc, char_os **argv)\
 \n{\
 \n  caml_byte_program_mode = COMPLETE_EXE;\
