@@ -109,6 +109,10 @@ value caml_startup_common(char_os **argv, int pooling)
   value res;
   char tos;
 
+  /* All function calls prior to caml_startup_aux must be idempotent, as it's
+     possible caml_startup_common may be called after the runtime has been
+     initialised. */
+
   /* Initialize the domain */
   caml_init_domain();
   /* Determine options */
@@ -116,7 +120,6 @@ value caml_startup_common(char_os **argv, int pooling)
   caml_verb_gc = 0x3F;
 #endif
   caml_parse_ocamlrunparam();
-  CAML_EVENTLOG_INIT();
 #ifdef DEBUG
   caml_gc_message (-1, "### OCaml runtime: debug mode ###\n");
 #endif
@@ -124,6 +127,7 @@ value caml_startup_common(char_os **argv, int pooling)
     pooling = 1;
   if (!caml_startup_aux(pooling))
     return Val_unit;
+  CAML_EVENTLOG_INIT();
 
   caml_init_frame_descriptors();
   caml_init_locale();

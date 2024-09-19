@@ -472,12 +472,12 @@ CAMLexport void caml_main(char_os **argv)
   caml_verb_gc = 0x3F;
 #endif
   caml_parse_ocamlrunparam();
-  CAML_EVENTLOG_INIT();
 #ifdef DEBUG
   caml_gc_message (-1, "### OCaml runtime: debug mode ###\n");
 #endif
   if (!caml_startup_aux(/* pooling */ caml_cleanup_on_exit))
     return;
+  CAML_EVENTLOG_INIT();
 
   caml_init_locale();
 #if defined(_MSC_VER) && __STDC_SECURE_LIB__ >= 200411L
@@ -609,6 +609,10 @@ CAMLexport value caml_startup_code_exn(
   char_os * cds_file;
   char_os * exe_name;
 
+  /* All function calls prior to caml_startup_aux must be idempotent, as it's
+     possible caml_startup_common may be called after the runtime has been
+     initialised. */
+
   /* Initialize the domain */
   caml_init_domain();
   /* Determine options */
@@ -616,7 +620,6 @@ CAMLexport value caml_startup_code_exn(
   caml_verb_gc = 0x3F;
 #endif
   caml_parse_ocamlrunparam();
-  CAML_EVENTLOG_INIT();
 #ifdef DEBUG
   caml_gc_message (-1, "### OCaml runtime: debug mode ###\n");
 #endif
@@ -624,6 +627,7 @@ CAMLexport value caml_startup_code_exn(
     pooling = 1;
   if (!caml_startup_aux(pooling))
     return Val_unit;
+  CAML_EVENTLOG_INIT();
 
   caml_init_locale();
 #if defined(_MSC_VER) && __STDC_SECURE_LIB__ >= 200411L
