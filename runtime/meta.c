@@ -43,9 +43,6 @@ CAMLprim value caml_get_global_data(value unit)
   return caml_global_data;
 }
 
-char * caml_section_table = NULL;
-asize_t caml_section_table_size;
-
 CAMLprim value caml_get_section_table(value unit)
 {
   if (caml_section_table == NULL) caml_raise_not_found();
