@@ -652,7 +652,31 @@ static char caml_sections[] = {
        Symtable.output_primitive_table outchan;
        (* The entry point *)
        if with_main then begin
+         (* The stubs for caml_startup are included for link-compatibility with
+            native code, and mean that interop libraries which are designed both
+            with a foreign runtime or with the OCaml runtime involved can still
+            be linked. *)
          output_string outchan {|
+void caml_startup(char_os ** argv)
+{
+  return;
+}
+
+value caml_startup_exn(char_os ** argv)
+{
+  return Val_unit;
+}
+
+void caml_startup_pooled(char_os ** argv)
+{
+  return;
+}
+
+value caml_startup_pooled_exn(char_os ** argv)
+{
+  return Val_unit;
+}
+
 int main_os(int argc, char_os **argv)
 {
   caml_byte_program_mode = COMPLETE_EXE;
