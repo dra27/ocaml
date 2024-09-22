@@ -232,7 +232,18 @@ prims.c : primitives
 	 echo; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' $<; \
-	 echo '  0 };') > $@
+	 echo '  0 };'; \
+	 echo '#define CAML_INTERNALS'; \
+	 echo '#include "caml/instruct.h"'; \
+	 echo 'enum caml_byte_program_mode { APPENDED, EMBEDDED };'; \
+	 echo 'typedef int32_t opcode_t;'; \
+	 echo 'opcode_t caml_start_code[] = {STOP};'; \
+	 echo 'size_t caml_code_size = sizeof(caml_start_code);'; \
+	 echo 'char * caml_marshalled_global_data = NULL;'; \
+	 echo 'size_t caml_marshalled_global_data_size = 0;'; \
+	 echo 'char * caml_section_table = NULL;'; \
+	 echo 'size_t caml_section_table_size = 0;'; \
+	 echo 'enum caml_byte_program_mode caml_byte_program_mode = APPENDED;') > $@
 
 caml/opnames.h : caml/instruct.h
 	tr -d '\r' < $< | \
