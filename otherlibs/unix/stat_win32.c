@@ -15,14 +15,7 @@
 #define CAML_INTERNALS
 
 #include <errno.h>
-#ifdef _MSC_VER
-#include <float.h>
-#ifndef nextafter
-#define nextafter _nextafter
-#endif
-#else
 #include <math.h>
-#endif
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>

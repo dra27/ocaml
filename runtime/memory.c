@@ -490,6 +490,8 @@ CAMLexport value caml_alloc_shr_noexc(mlsize_t wosize, tag_t tag) {
    the implementation from the user.
 */
 
+/* XXX Why is this guarded _MSC_VER - shouldn't it least be a #if within with
+       an error if we get !defined(HAVE_MAX_ALIGN_T) && !defined(_MSC_VER)? */
 #if !defined(HAVE_MAX_ALIGN_T) && defined(_MSC_VER)
 typedef double max_align_t;
 #endif

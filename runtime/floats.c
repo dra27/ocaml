@@ -49,6 +49,8 @@
 #include <xlocale.h>
 #endif
 
+/* XXX Check needed here, but also w.r.t. #10258 and #12519 */
+
 #if defined(_MSC_VER)
 #ifndef locale_t
 #define locale_t _locale_t

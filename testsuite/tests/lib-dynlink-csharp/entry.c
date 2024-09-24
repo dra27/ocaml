@@ -21,7 +21,7 @@
 #include <caml/fail.h>
 
 #if !defined(OPENSTEP) && (defined(_WIN32) && !defined(__CYGWIN__))
-#  if defined(_MSC_VER) || defined(__MINGW32__)
+#  if defined(_WIN32)
 #    define _DLLAPI __declspec(dllexport)
 #  else
 #    define _DLLAPI extern
