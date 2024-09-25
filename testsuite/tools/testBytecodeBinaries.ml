@@ -31,8 +31,8 @@ let run config env =
   let bindir = Environment.bindir env in
   Format.printf "\nTesting bytecode binaries in %a\n"
                 (Environment.pp_path env) bindir;
-  let ocamlrun = Environment.ocamlrun env in
   let exec_magic =
+    let ocamlrun = Environment.ocamlrun env in
     Environment.run_process env ocamlrun ["-M"]
   in
   let test_binary binary =
@@ -55,54 +55,8 @@ let run config env =
                  false
         in
         match Environment.run_process ~fails env program ["-vnum"] with
-        | (0, ((output::rest) as all_output)) when not fails ->
-            if rest <> [] then begin
-              Environment.display_output all_output;
-              Harness.fail_because "%s: expected only one line of output"
-                                   program
-            end;
-            let runtime =
-              let compiled_by_boot_ocamlc =
-                let name =
-                  if Filename.extension binary = ".exe" then
-                    Filename.remove_extension binary
-                  else
-                    binary
-                in
-                name <> "ocamldoc" && name <> "ocamldebug"
-              in
-              match classification with
-              | Vanilla -> assert false
-              | Custom ->
-                  if Config.supports_shared_libraries
-                     || compiled_by_boot_ocamlc then
-                    Harness.fail_because "%s: unexpected -custom runtime"
-                                         program
-                  else
-                    "compiled with -custom"
-              | Tendered {runtime; header; _} ->
-                  let is_expected_runtime =
-                    if Sys.win32 then
-                      runtime = "ocamlrun"
-                    else
-                      runtime = ocamlrun
-                  in
-                  let expected_launch_mode =
-                    if Config.shebangscripts then
-                      Header_shebang
-                    else
-                      Header_exe
-                  in
-                  if is_expected_runtime then
-                    if header = expected_launch_mode then
-                      runtime
-                    else
-                      Harness.fail_because "%s: unexpected launch mode" program
-                  else
-                    Harness.fail_because "%s: unexpected runtime %S"
-                                         program runtime
-            in
-            Printf.printf "  Runtime: %s\n  Output: %s\n" runtime output;
+        | (0, output) when not fails ->
+            Environment.display_output output;
             if Sys.win32 && Filename.extension binary = ".exe" then
               (* This additional part of the test ensures that the executable
                  launcher on Windows can correctly hand-over to ocamlrun on
@@ -114,15 +68,19 @@ let run config env =
                  distribution's tools when called with -M. *)
               let without_exe = Filename.remove_extension binary in
               let (this_exit_code, _) as this =
-                let fails = not (String.contains without_exe '.') in
+                let fails =
+                  without_exe <> "ocamlmklib"
+                  && not (String.contains without_exe '.')
+                in
                 Environment.run_process
                   ~fails env program ~argv0:without_exe ["-M"]
               in
               if this_exit_code = 0 then
                 if this = exec_magic then
                   let (that_exit_code, _) as that =
+                    let fails = without_exe <> "ocamlmklib" in
                     Environment.run_process
-                      ~fails:true env program ~argv0:binary ["-M"]
+                      ~fails env program ~argv0:binary ["-M"]
                   in
                   if this = that then
                     Harness.fail_because
@@ -137,7 +95,15 @@ let run config env =
                       "%s is not expected to return the exec magic number!"
                       without_exe
                   else () (* Expected outcome was the exec magic number *)
+                else if without_exe <> "ocamlmklib" then
+                  Harness.fail_because
+                    "%s is expected to return with a non-zero exit code"
+                    without_exe
                 else () (* Expected outcome is a zero exit code *)
+              else if without_exe = "ocamlmklib" then
+                Harness.fail_because
+                  "%s is expected to return with exit code 0"
+                  without_exe
               else () (* Expected outcome is a non-zero exit code *)
         | _ ->
             if not fails then
