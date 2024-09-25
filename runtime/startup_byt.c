@@ -376,6 +376,15 @@ static int parse_command_line(char_os **argv)
   return i;
 }
 
+static const char_os * get_stdlib_location(void)
+{
+  const char_os * stdlib;
+  stdlib = caml_secure_getenv(T("OCAMLLIB"));
+  if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
+  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
+  return stdlib;
+}
+
 /* Print the configuration of the runtime to stdout; memory allocated is not
    freed, since the runtime will terminate after calling this. */
 static void do_print_config(void)
@@ -385,9 +394,9 @@ static void do_print_config(void)
   /* Print the runtime configuration */
   printf("version: %s\n", OCAML_VERSION_STRING);
   printf("standard_library_default: %s\n",
-         caml_stat_strdup_of_os(OCAML_STDLIB_DIR));
+         caml_stat_strdup_of_os(caml_standard_library_default));
   printf("standard_library: %s\n",
-         caml_stat_strdup_of_os(caml_get_stdlib_location()));
+         caml_stat_strdup_of_os(get_stdlib_location()));
   printf("int_size: %d\n", 8 * (int)sizeof(value));
   printf("word_size: %d\n", 8 * (int)sizeof(value) - 1);
   printf("os_type: %s\n", OCAML_OS_TYPE);
@@ -424,7 +433,7 @@ static void do_print_config(void)
   puts("shared_libs_path:");
   caml_decompose_path(&caml_shared_libs_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
-  caml_parse_ld_conf();
+  caml_parse_ld_conf(OCAML_STDLIB_DIR, &caml_shared_libs_path);
   for (int i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
     if (dir[0] == 0)
@@ -484,16 +493,20 @@ CAMLexport void caml_main(char_os **argv)
   exe_name = argv[0];
   fd = caml_attempt_open(&exe_name, &trail, 0);
 
+  proc_self_exe = caml_executable_name();
+
   /* Little grasshopper wonders why we do that at all, since
      "The current executable is ocamlrun itself, it's never a bytecode
      program".  Little grasshopper "ocamlc -custom" in mind should keep.
      With -custom, we have an executable that is ocamlrun itself
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
-  if (fd < 0 && (proc_self_exe = caml_executable_name()) != NULL) {
+  if (fd < 0 && proc_self_exe != NULL) {
     exe_name = proc_self_exe;
     fd = caml_attempt_open(&exe_name, &trail, 0);
   }
+
+  caml_locate_standard_library(proc_self_exe ? proc_self_exe : exe_name);
 
   if (fd < 0) {
     pos = parse_command_line(argv);
@@ -562,7 +575,7 @@ CAMLexport void caml_main(char_os **argv)
   caml_close_channel(chan); /* this also closes fd */
   caml_stat_free(trail.section);
   /* Initialize system libraries */
-  caml_sys_init(exe_name, argv + pos);
+  caml_sys_init(proc_self_exe, exe_name, argv + pos);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
@@ -596,7 +609,7 @@ CAMLexport value caml_startup_code_exn(
            int pooling,
            char_os **argv)
 {
-  char_os * exe_name;
+  char_os * exe_name, * proc_self_exe;
   value res;
 
   /* Determine options */
@@ -623,8 +636,13 @@ CAMLexport value caml_startup_code_exn(
   /* runtime_events has to be brought up after the gc */
   CAML_RUNTIME_EVENTS_INIT();
 
-  exe_name = caml_executable_name();
-  if (exe_name == NULL) exe_name = caml_search_exe_in_path(argv[0]);
+  proc_self_exe = caml_executable_name();
+  if (proc_self_exe == NULL)
+    exe_name = caml_search_exe_in_path(argv[0]);
+  else
+    exe_name = proc_self_exe;
+
+  caml_locate_standard_library(exe_name);
 
   Caml_state->external_raise = NULL;
   /* Setup signal handling */
@@ -647,7 +665,7 @@ CAMLexport value caml_startup_code_exn(
   caml_modify_generational_global_root
     (&caml_global_data, caml_input_value_from_block(data, data_size));
   /* Initialize system libraries */
-  caml_sys_init(exe_name, argv);
+  caml_sys_init(proc_self_exe, exe_name, argv);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
