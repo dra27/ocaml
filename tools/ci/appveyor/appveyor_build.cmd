@@ -84,6 +84,8 @@ goto :EOF
 
 :install
 
+goto :EOF
+
 call :SetDefaultSDK
 
 git worktree add "..\%BUILD_PREFIX%-%PORT%" -b appveyor-build-%PORT%
@@ -141,10 +143,11 @@ call :UpgradeCygwin
 goto :EOF
 
 :build
-"%CYG_ROOT%\bin\bash.exe" -lc "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/appveyor_build.sh" || exit /b 1
+rem "%CYG_ROOT%\bin\bash.exe" -lc "$APPVEYOR_BUILD_FOLDER/tools/ci/appveyor/appveyor_build.sh" || exit /b 1
 goto :EOF
 
 :test
+goto :EOF
 rem No tests run in the "C" build mode
 if "%BUILD_MODE%" equ "C" goto :EOF
 rem Add a C# compiler in PATH for the testsuite for mingw

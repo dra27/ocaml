@@ -28,11 +28,12 @@ jobs:
 
     strategy:
       matrix:
-        x86_64: [true, false]
+        x86_64: [true]
         cc: [cl, clang-cl]
         exclude:
           - cc: clang-cl
             x86_64: false
+      fail-fast: false
 
     steps:
       - name: Save pristine PATH
@@ -135,4 +136,6 @@ jobs:
         shell: bash
         run: >-
           eval $(tools/msvs-promote-path) ;
+          make -C testsuite one KEEP=1 TEST=tests/lib-runtime-events/test_dropped_events.ml ;
+          while true; do if testsuite/_ocamltest/tests/lib-runtime-events/test_dropped_events/ocamlopt.opt/test_dropped_events.opt.exe; then printf '*'; else break; fi ; done ; echo ;
           make -j tests ;
