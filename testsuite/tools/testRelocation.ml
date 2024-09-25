@@ -59,12 +59,14 @@ let bindir_rules config file =
     (* Determine if the installation prefix should be found in this file *)
     let prefix =
       let code_embeds_stdlib_location =
-        (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
-           except flexlink and ocamllex link with the Config module, either
-           directly or via ocamlcommon *)
-        not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
-                                "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
-                                "ocamlyacc"])
+        (* If the compiler is configured with an absolute libdir, the runtime
+           binaries all contain OCAML_STDLIB_DIR and everything except flexlink
+           and ocamllex link with the Config module, either directly or via
+           ocamlcommon *)
+        config.has_relative_libdir = None
+        && not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
+                                   "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
+                                   "ocamlyacc"])
       in
       let linker_embeds_stdlib_location =
         (* If the launcher doesn't search for ocamlrun, then either the #! stub
@@ -160,20 +162,30 @@ let libdir_rules config file =
          ~ocaml_debug:has_ocaml_debug_info,
          ~c_debug:has_c_debug_info,
          ~s:contains_assembled_objects) =
-      if List.mem basename ["Makefile.config";
-                            "ld.conf";
-                            "runtime-launch-info"] then
+      if basename = "Makefile.config" then
         (* These files all embed the Standard Library location *)
         (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       else if basename = "config.cmx" then
         (* config.cmx contains Config.standard_library for inlining *)
-        (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        let stdlib =
+          config.has_relative_libdir = None && not Config.flambda in
+        (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
         let stdlib = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "config_main.cmt";
-                             "ocamlcommon.cma"] in
-        (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
+          config.has_relative_libdir = None
+          && List.mem basename ["config.cmt"; "config_main.cmt";
+                                "ocamlcommon.cma"] in
+        (* The compiler's artefacts are all compiled with -g *)
+        let ocaml_debug = true in
+        (~stdlib, ~ocaml_debug, ~c_debug:false, ~s:false)
+      else if basename = "runtime-launch-info" then
+        (* When the compiler is configured with a relative libdir,
+           runtime-launch-info just contains ".", rather than the prefix *)
+        let stdlib = (config.has_relative_libdir = None) in
+        (~stdlib, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       else if ext = ".cmxs" then
+        (* TODO Check in backport-trunk: does c_debug _need_ to be set? *)
+        (* TODO Check in backport-trunk: don't they contains ocaml_debug too? *)
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
         (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
@@ -181,6 +193,8 @@ let libdir_rules config file =
         (* Any object produced by ocamlopt will have a .cmx file with it *)
         let is_ocaml =
           Sys.file_exists (Filename.remove_extension file ^ ".cmx") in
+        (* TODO Check in backport-trunk: don't is_ocaml objects have
+                ocaml_debug:true? *)
         (* All C objects compiled by OCaml's build system are compiled with -g,
            but the FlexDLL support objects are not. *)
         let c_debug =
@@ -191,12 +205,6 @@ let libdir_rules config file =
            (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
            Note that these properties are _not_ used for libasmrun* (see
            below) *)
-        let is_camlrun =
-          let dir = Filename.basename (Filename.dirname file) in
-          dir <> "stublibs"
-            && String.starts_with ~prefix:"libcamlrun" basename
-            && not (String.starts_with ~prefix:"libcamlruntime" basename)
-        in
         if ext = Config.ext_lib then
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
@@ -204,14 +212,16 @@ let libdir_rules config file =
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            is_camlrun
-            || Filename.remove_extension basename = "ocamlcommon"
-          in
-          (~stdlib, ~ocaml_debug:false, ~c_debug:(not is_ocaml), ~s:is_ocaml)
+            config.has_relative_libdir = None
+            && Filename.remove_extension basename = "ocamlcommon" in
+          (* TODO Check in backport-trunk: don't is_ocaml objects have
+                  ocaml_debug:true and therefore the archives too? *)
+          let c_debug = not is_ocaml in
+          (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
-          (~stdlib:is_camlrun, ~ocaml_debug:false, ~c_debug:true, ~s:false)
+          (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:false)
       else
         (~stdlib:false, ~ocaml_debug:false, ~c_debug:false, ~s:false)
     in
@@ -240,6 +250,13 @@ let libdir_rules config file =
         LocationSet.singleton Prefix
       else
         LocationSet.empty
+    in
+    let prefix =
+      if config.has_relative_libdir <> None
+         && (basename = "Makefile.config" || basename = "ld.conf") then
+        LocationSet.add Relative prefix
+      else
+        prefix
     in
     if contains_build_path then
       LocationSet.add Build prefix
