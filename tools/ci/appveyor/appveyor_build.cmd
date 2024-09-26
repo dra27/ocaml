@@ -61,6 +61,12 @@ if %ERRORLEVEL% equ 1 (
 goto :EOF
 
 :UpgradeCygwin
+if %CYGWIN_UPGRADE_REQUIRED% equ 1 (
+  set CYGWIN_FLAGS=--upgrade-also
+  set CYGWIN_UPGRADE_REQUIRED=0
+) else (
+  set CYGWIN_FLAGS=
+)
 set CURRENT_SETUP_VERSION=2.934
 if "%CYGWIN_INSTALL_PACKAGES%" neq "" (
   if not exist C:\projects\cache md C:\projects\cache
@@ -68,7 +74,7 @@ if "%CYGWIN_INSTALL_PACKAGES%" neq "" (
     appveyor DownloadFile "https://cygwin.com/setup/setup-%CURRENT_SETUP_VERSION%.x86_64.exe" -FileName "setup-%CURRENT_SETUP_VERSION%-x86_64.exe" || exit /b 1
     move setup-%CURRENT_SETUP_VERSION%-x86_64.exe C:\projects\cache\
   )
-  "C:\projects\cache\setup-%CURRENT_SETUP_VERSION%-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages %CYGWIN_INSTALL_PACKAGES:~1%
+  "C:\projects\cache\setup-%CURRENT_SETUP_VERSION%-x86_64.exe" --quiet-mode --no-shortcuts --no-startmenu --no-desktop --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" %CYGWIN_FLAGS%--packages %CYGWIN_INSTALL_PACKAGES:~1%
 )
 for %%P in (%CYGWIN_COMMANDS%) do "%CYG_ROOT%\bin\%%P.exe" --version 2> nul > nul || set CYGWIN_UPGRADE_REQUIRED=1
 "%CYG_ROOT%\bin\bash.exe" -lc "cygcheck -dc %CYGWIN_PACKAGES%"
