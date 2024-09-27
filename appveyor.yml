@@ -12,6 +12,10 @@
 #*                                                                        *
 #**************************************************************************
 
+branches:
+  only:
+    - relocatable-base-5.1
+
 # Compile the 64 bits version
 platform:
   - x64
