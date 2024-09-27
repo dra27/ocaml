@@ -1,6 +1,6 @@
 opam-version: "2.0"
-version: "4.11.3+trunk"
-synopsis: "OCaml release 4.11, maintenance version"
+version: "4.11.3+relocatable"
+synopsis: "Relocatable OCaml 4.11 branch"
 depends: [
   "ocaml" {= "4.11.3" & post}
   "base-unix" {post}
