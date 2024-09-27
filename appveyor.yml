@@ -14,9 +14,7 @@
 
 branches:
   only:
-    - /4\.*/
-    - /5\.*/
-    - trunk
+    - relocatable-base-5.2
 
 # Compile the 64 bits version
 platform:
