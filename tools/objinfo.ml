@@ -71,6 +71,12 @@ let print_cmo_infos cu =
 let print_spaced_string s =
   printf " %s" s
 
+let dllib (suffixed, name) =
+  if suffixed then
+    Printf.sprintf "%s-<target>-<bytecode-runtime-id>" name
+  else
+    name
+
 let print_cma_infos (lib : Cmo_format.library) =
   printf "Force custom: %s\n" (if lib.lib_custom then "YES" else "no");
   printf "Extra C object files:";
@@ -80,7 +86,7 @@ let print_cma_infos (lib : Cmo_format.library) =
   List.iter print_spaced_string (List.rev lib.lib_ccopts);
   printf "\n";
   print_string "Extra dynamically-loaded libraries:";
-  List.iter print_spaced_string (List.rev lib.lib_dllibs);
+  List.iter print_spaced_string (List.rev_map dllib lib.lib_dllibs);
   printf "\n";
   List.iter print_cmo_infos lib.lib_units
 
@@ -433,6 +439,14 @@ let dump_obj filename =
   then dump_cmxs ic
   else exit_magic_error ~expected_kind:None (Parse_error head_error)
 
+let print_version () =
+  Format.printf "ocamlobjinfo, version %s@." Sys.ocaml_version;
+  exit 0
+
+let print_version_num () =
+  Format.printf "%s@." Sys.ocaml_version;
+  exit 0
+
 let arg_list = [
   "-quiet", Arg.Set quiet,
     " Only print explicitely required information";
@@ -447,6 +461,8 @@ let arg_list = [
   "-decls", Arg.Set decls,
     " Print a list of all declarations in the module";
   "-null-crc", Arg.Set no_crc, " Print a null CRC for imported interfaces";
+  "-version", Arg.Unit print_version, " Print version and exit";
+  "-vnum", Arg.Unit print_version_num, " Print version number and exit";
   "-args", Arg.Expand Arg.read_arg,
      "<file> Read additional newline separated command line arguments \n\
      \      from <file>";

@@ -41,6 +41,7 @@ EOF
     --prefix=$PREFIX \
     --enable-flambda-invariants \
     --enable-ocamltest \
+    --enable-native-toplevel \
     --disable-dependency-generation \
     $CONFIG_ARG"
 
@@ -112,6 +113,7 @@ API_Docs () {
 
 Install () {
   $MAKE install
+  $MAKE I_KNOW_THE_RISK=yes test-installation
 }
 
 Checks () {

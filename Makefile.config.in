@@ -48,6 +48,7 @@ datarootdir=@datarootdir@
 
 ### Where to install the standard library
 LIBDIR=@libdir@
+LIBDIR_REL=@bindir_to_libdir@
 
 ### Where to install the stub code for the standard library
 STUBLIBDIR=@libdir@/stublibs
@@ -214,6 +215,10 @@ FLAT_FLOAT_ARRAY=@flat_float_array@
 FUNCTION_SECTIONS=@function_sections@
 AWK=@AWK@
 NAKED_POINTERS=false
+
+# RuntimeID values
+BYTECODE_RUNTIME_ID=@bytecode_runtime_id@
+NATIVE_RUNTIME_ID=@native_runtime_id@
 
 # Deprecated variables
 
