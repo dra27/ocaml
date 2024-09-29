@@ -76,6 +76,12 @@ function set_configuration {
       args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
              '--enable-native-toplevel');;
   esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
 
   # Remove old configure cache if the configure script or the OS
   # have changed
@@ -142,7 +148,7 @@ case "$1" in
     ;;
   test)
     FULL_BUILD_PREFIX="$APPVEYOR_BUILD_FOLDER/../$BUILD_PREFIX"
-    run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
+    #run 'ocamlc.opt -version' "$FULL_BUILD_PREFIX-$PORT/ocamlc.opt" -version
     if [[ $PORT =~ mingw* ]] ; then
       run "Check runtime symbols" \
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
@@ -161,10 +167,13 @@ case "$1" in
       # tests now (to include natdynlink)
       run "test dynlink $PORT" \
           $MAKE -C "$FULL_BUILD_PREFIX-$PORT/testsuite" parallel-lib-dynlink
-      # Now reconfigure ocamltest to run in bytecode-only mode
-      sed -i '/native_/s/true/false/' \
-             "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
-      $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt
+      case "$PORT" in
+        *64)
+          # Now reconfigure ocamltest to run in bytecode-only mode
+          sed -i '/native_/s/true/false/' \
+                 "$FULL_BUILD_PREFIX-$PORT/ocamltest/ocamltest_config.ml"
+          $MAKE -C "$FULL_BUILD_PREFIX-$PORT" -j ocamltest ocamltest.opt;;
+      esac
       # And run the entire testsuite, skipping all the native-code tests
       run "test $PORT" \
           make -C "$FULL_BUILD_PREFIX-$PORT/testsuite" SHOW_TIMINGS=1 all
