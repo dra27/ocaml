@@ -73,6 +73,7 @@ function set_configuration {
 
   args=('--cache-file' "$CACHE_FILE" \
         '--prefix' "$2" \
+        '--disable-dependency-generation' \
         '--enable-ocamltest')
 
   case "$1" in
@@ -83,7 +84,6 @@ function set_configuration {
     msvc32)
       args+=('--host=i686-pc-windows');;
     msvc64)
-      # Explicitly test dependency generation on msvc64
       args+=('--host=x86_64-pc-windows');;
   esac
   if [[ $RELOCATABLE = 'true' ]]; then
@@ -166,7 +166,7 @@ case "$1" in
       exit 1
     fi
     rm -f results
-    run_testsuite=true
+    run_testsuite=$TESTSUITE
     if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
       API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
       if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
