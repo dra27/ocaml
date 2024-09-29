@@ -20,11 +20,7 @@ BUILD_PID=0
 # This must correspond with the entry in appveyor.yml
 CACHE_DIRECTORY=/cygdrive/c/projects/cache
 
-if [[ -z $APPVEYOR_PULL_REQUEST_HEAD_COMMIT ]] ; then
-  MAKE="make -j$NUMBER_OF_PROCESSORS"
-else
-  MAKE=make
-fi
+MAKE="make -j$NUMBER_OF_PROCESSORS"
 
 function run {
   if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
@@ -52,21 +48,19 @@ function run {
 function set_configuration {
   args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
         '--prefix' "$2" \
+        '--disable-dependency-generation' \
         '--enable-native-toplevel' \
         '--enable-ocamltest')
 
   case "$1" in
-    cygwin*)
-      args+=('--disable-dependency-generation');;
     mingw32)
-      args+=('--host=i686-w64-mingw32' '--disable-dependency-generation');;
+      args+=('--host=i686-w64-mingw32');;
     mingw64)
-      args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation');;
+      args+=('--host=x86_64-w64-mingw32');;
     msvc32)
-      args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
+      args+=('--host=i686-pc-windows');;
     msvc64)
-      # Explicitly test dependency generation on msvc64
-      args+=('--host=x86_64-pc-windows' '--enable-dependency-generation');;
+      args+=('--host=x86_64-pc-windows');;
   esac
   case "$RELOCATABLE,$1" in
     true,cygwin*)
@@ -126,7 +120,7 @@ case "$1" in
     elif [[ $PORT = 'mingw32' ]] ; then
       export PATH="$PATH:/usr/i686-w64-mingw32/sys-root/mingw/bin"
     fi
-    run_testsuite=true
+    run_testsuite=$TESTSUITE
     if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
       API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
       if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
