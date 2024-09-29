@@ -129,7 +129,56 @@ Install () {
 }
 
 Test-In-Prefix () {
+  echo 'Checking that relocatable compilers invoked with alternate runtimes'
+  echo "use their configured location, not the alternate runtime's"
+  cp -a "$PREFIX" "$PREFIX.new"
+  expected1="$(realpath "$PREFIX/lib/ocaml")"
+  if grep -Fxq 'LIBDIR_REL=' Makefile.build_config; then
+    # Compiler configured absolutely - both should return the same answer
+    expected2="$expected1"
+  else
+    # Compiler configured relatively - each should return its own location
+    expected2="$(realpath "$PREFIX.new/lib/ocaml")"
+  fi
+  lib1="$($PREFIX.new/bin/ocamlrun $PREFIX/bin/ocamlc.byte -where)"
+  lib2="$($PREFIX/bin/ocamlrun $PREFIX.new/bin/ocamlc.byte -where)"
+  if [[ $lib1 = $expected1 && $lib2 = $expected2 ]]; then
+    echo "$PREFIX.new/bin/ocamlrun $PREFIX/bin/ocamlc.byte -where: $lib1"
+    echo "$PREFIX/bin/ocamlrun $PREFIX.new/bin/ocamlc.byte -where: $lib2"
+    echo 'Correct.'
+  else
+    echo "$PREFIX.new/bin/ocamlrun $PREFIX/bin/ocamlc.byte -where: $lib1"
+    echo "EXPECTED: $expected1"
+    echo "$PREFIX/bin/ocamlrun $PREFIX.new/bin/ocamlc.byte -where: $lib2"
+    echo "EXPECTED: $expected2"
+    exit 1
+  fi
+  rm -rf "$PREFIX.new"
   $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
+}
+
+Re-Test-In-Prefix () {
+  mkdir -p bak
+  mv Makefile.config Makefile.build_config config.status bak
+  git clean -dfX &>/dev/null
+  rm -rf "$PREFIX"
+  mv bak/Makefile.config bak/Makefile.build_config bak/config.status .
+  rmdir bak
+  if grep -Fxq 'LIBDIR_REL=' Makefile.build_config; then
+    # Compiler configured absolutely - reconfigure relatively
+    echo '::group::Re-building the compiler with a relative libdir'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          ADDITIONAL_CONFIGURE_ARGS=--with-relative-libdir=../lib/ocaml
+  else
+    # Compiler configured relatively - reconfigure absolutely
+    echo '::group::Re-building the compiler with an absolute libdir'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          ADDITIONAL_CONFIGURE_ARGS=--without-relative-libdir
+  fi
+  $MAKE
+  $MAKE install
+  echo '::endgroup::'
+  Test-In-Prefix
 }
 
 Checks () {
@@ -223,6 +272,7 @@ test_prefix) TestPrefix $2;;
 api-docs) API_Docs;;
 install) Install;;
 test-in-prefix) Test-In-Prefix;;
+re-test-in-prefix) Re-Test-In-Prefix;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
