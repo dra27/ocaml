@@ -48,6 +48,7 @@ environment:
   matrix:
     - PORT: mingw64
       BOOTSTRAP_FLEXDLL: true
+      RUNTIME_SEARCH: true
 # OCaml 5.0 does not yet support MSVC
 #    - PORT: msvc64
 #      BOOTSTRAP_FLEXDLL: false
