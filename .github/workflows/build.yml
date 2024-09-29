@@ -59,7 +59,7 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --enable-native-toplevel --enable-runtime-search --enable-runtime-search-target' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -162,8 +162,13 @@ jobs:
             in-prefix-test: true
           - name: macos-arm64
             os: macos-14
+            config_arg: --enable-runtime-search
             in-prefix-test: true
-          - name: static
+          - name: static - host-search
+            os: ubuntu-latest
+            config_arg: --disable-shared --disable-native-toplevel --enable-runtime-search
+            in-prefix-test: true
+          - name: static - host-absolute
             os: ubuntu-latest
             config_arg: --disable-shared --disable-native-toplevel
             in-prefix-test: true
