@@ -158,6 +158,12 @@ jobs:
             os: macos-13
           - name: macos-arm64
             os: macos-14
+          - name: static
+            os: ubuntu-latest
+            config_arg: --disable-shared
+          - name: minimal
+            os: ubuntu-latest
+            config_arg: --disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc
     steps:
       - name: Checkout
         uses: actions/checkout@v4
