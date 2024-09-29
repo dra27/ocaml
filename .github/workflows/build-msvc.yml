@@ -102,6 +102,8 @@ jobs:
             --enable-ocamltest
             ${{ matrix.x86_64 && '--enable-native-toplevel' || '--disable-native-toplevel' }}
             --${{ matrix.cc == 'cl' && 'enable' || 'disable' }}-relative
+            --${{ matrix.cc == 'cl' && 'enable' || 'disable' }}-runtime-search
+            --${{ matrix.cc == 'cl' && matrix.x86_64 && 'enable' || 'disable' }}-runtime-search-target
         run: >-
           eval $(tools/msvs-promote-path) ;
           if ! ./configure ${{ env.CONFIGURE_FLAGS }} ; then
