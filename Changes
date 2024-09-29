@@ -8,6 +8,11 @@ OCaml 5.1.2
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
 
+* #13497: Correct implementation of caml_stat_strdup_to_utf16 to raise
+  Out_of_memory instead of returning of NULL (the behaviour of
+  caml_stat_strdup_to_os was inconsistent between Unix/Windows).
+  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
+
 ### Manual and documentation:
 
 - #12840: manual: update runtime tracing chapter for custom events (ex #12335)
