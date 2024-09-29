@@ -69,6 +69,9 @@ function set_configuration {
       args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
              '--enable-native-toplevel');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--with-relative-libdir')
+  fi
 
   mkdir -p "$CACHE_DIRECTORY"
   echo './configure' "${args[@]@Q}"
