@@ -27,13 +27,6 @@ OCaml 4.11 maintenance branch
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
 
-### Code generation and optimizations:
-
-- #9752: Revised handling of calling conventions for external C functions.
-   Provide a more precise description of the types of unboxed arguments,
-   so that the ARM64 iOS/macOS calling conventions can be honored.
-   (Xavier Leroy, review by Mark Shinwell and Eduardo Rafael)
-
 ### Compiler user-interface and warnings:
 
 - #10046: Link all DLLs with -static-libgcc on mingw32 to prevent dependency
