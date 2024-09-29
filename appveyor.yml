@@ -37,15 +37,33 @@ environment:
     OCAMLRUNPARAM: v=0,b
     FORCE_CYGWIN_UPGRADE: 0
     BUILD_MODE: world.opt
+    TESTSUITE: true
     # Fully print commands executed by Make
     # MAKEFLAGS: V=1
   matrix:
     - PORT: mingw32
       BOOTSTRAP_FLEXDLL: true
+      TESTSUITE: false
+    - PORT: mingw32
+      BOOTSTRAP_FLEXDLL: false
       RELOCATABLE: true
+    - PORT: mingw64
+      BOOTSTRAP_FLEXDLL: true
+      TESTSUITE: false
+    - PORT: mingw64
+      BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
+      TESTSUITE: false
     - PORT: msvc64
       BOOTSTRAP_FLEXDLL: false
-      BUILD_MODE: steps
+    - PORT: msvc64
+      BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
+      TESTSUITE: false
+    - PORT: msvc32
+      BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
+      TESTSUITE: false
     - PORT: msvc32
       BOOTSTRAP_FLEXDLL: false
       BUILD_MODE: C
