@@ -77,7 +77,8 @@ function set_configuration {
              '--enable-native-toplevel');;
   esac
   if [[ $RELOCATABLE = 'true' ]]; then
-    args+=('--with-relative-libdir')
+    args+=('--with-relative-libdir' \
+           '--enable-runtime-search=always' '--enable-runtime-search-target')
   fi
 
   # Remove old configure cache if the configure script or the OS
