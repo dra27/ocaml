@@ -82,6 +82,9 @@ function set_configuration {
     true,*)
       args+=('--with-relative-libdir=..\lib\ocaml');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--enable-runtime-search=always' '--enable-runtime-search-target')
+  fi
 
   # Remove old configure cache if the configure script or the OS
   # have changed
