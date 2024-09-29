@@ -20,11 +20,7 @@ BUILD_PID=0
 # This must correspond with the entry in appveyor.yml
 CACHE_DIRECTORY=/cygdrive/c/projects/cache
 
-if [[ -z $APPVEYOR_PULL_REQUEST_HEAD_COMMIT ]] ; then
-  MAKE="make -j$NUMBER_OF_PROCESSORS"
-else
-  MAKE=make
-fi
+MAKE="make -j$NUMBER_OF_PROCESSORS"
 
 function run {
   NAME=$1
@@ -125,7 +121,7 @@ case "$1" in
     elif [[ $PORT = 'mingw32' ]] ; then
       export PATH="$PATH:/usr/i686-w64-mingw32/sys-root/mingw/bin"
     fi
-    run_testsuite=true
+    run_testsuite=$TESTSUITE
     if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
       API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
       if curl --silent "$API_URL/labels" | grep -q 'CI: Skip testsuite'; then
