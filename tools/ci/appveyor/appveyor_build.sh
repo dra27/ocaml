@@ -69,7 +69,8 @@ function set_configuration {
     mingw64)
       args+=('--host=x86_64-w64-mingw32' '--disable-dependency-generation' \
              '--disable-stdlib-manpages' '--enable-native-toplevel' \
-             '--with-relative-libdir=..\lib\ocaml');;
+             '--with-relative-libdir=..\lib\ocaml' \
+             '--enable-runtime-search' '--enable-runtime-search-target');;
     msvc32)
       args+=('--host=i686-pc-windows' '--disable-dependency-generation');;
     msvc64)
