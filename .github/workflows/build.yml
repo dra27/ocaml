@@ -55,7 +55,7 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-dependency-generation --with-relative-libdir=../lib/ocaml' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -122,6 +122,10 @@ jobs:
         if: matrix.id == 'normal'
         run: |
          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
+      - name: Test in prefix (alternate configuration)
+        if: matrix.id == 'normal' && needs.config.outputs.full-matrix == 'true'
+        run: |
+         MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh re-test-in-prefix
       - name: Build the manual
         if: matrix.id == 'normal' && needs.build.outputs.manual_changed == 'true'
         run: |
@@ -135,9 +139,23 @@ jobs:
   config:
     runs-on: ubuntu-latest
     outputs:
+      full-matrix: ${{ steps.full.outputs.result }}
       jobs: ${{ steps.jobs.outputs.result }}
       skip-testsuite: ${{ steps.skip.outputs.result }}
     steps:
+      - name: Record if the build matrix is expanded
+        id: full
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let full_matrix = false;
+            if (context.payload.pull_request) {
+              const { data: labels } =
+                await github.rest.issues.listLabelsOnIssue({...context.repo, issue_number: context.payload.pull_request.number});
+              full_matrix = labels.some(label => label.name === 'CI: Full matrix');
+            }
+            console.log('Full matrix: ' + full_matrix);
+            return full_matrix;
       - name: Compute matrix for the "others" job
         id: jobs
         uses: actions/github-script@v7
@@ -154,6 +172,7 @@ jobs:
                config_arg: '--with-target-sh=exe',
                'test-in-prefix': true},
               {name: 'macos-arm64', os: 'macos-15',
+               config_arg: '--with-relative-libdir=../lib/ocaml',
                'test-in-prefix': true}];
             // # If this is a pull request, see if the PR has the
             // # 'CI: Full matrix' label. This is done using an API request,
@@ -226,6 +245,10 @@ jobs:
         if: ${{ matrix.test-in-prefix }}
         run: |
           MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
+      - name: Test in prefix (alternate configuration)
+        if: ${{ matrix.test-in-prefix && needs.config.outputs.full-matrix == 'true' }}
+        run: |
+          MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh re-test-in-prefix
 
   i386:
     runs-on: ubuntu-latest
@@ -258,4 +281,8 @@ jobs:
           su ocaml -c "bash -xe tools/ci/actions/runner.sh install"
       - name: Test in prefix
         run: |
-          su ocaml -c "bash -xe tools/ci/actions/runner.sh test-in-prefix"
+          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh test-in-prefix"
+      - name: Test in prefix (alternate configuration)
+        if: ${{ needs.config.outputs.full-matrix == 'true' }}
+        run: |
+          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh re-test-in-prefix"
