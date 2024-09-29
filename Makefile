@@ -332,9 +332,10 @@ endif
 utils/config.ml: utils/config.mlp Makefile.config utils/Makefile Makefile
 	$(MAKE) -C utils config.ml
 
+ADDITIONAL_CONFIGURE_ARGS ?=
 .PHONY: reconfigure
 reconfigure:
-	./configure $(CONFIGURE_ARGS)
+	./configure $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 
 AUTOCONF_TOOL_NAME ?=
 
