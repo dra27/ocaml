@@ -10,6 +10,11 @@ OCaml 5.3 maintenance version
   disk usage considerably.
   (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
 
+* #13497: Correct implementation of caml_stat_strdup_to_utf16 to raise
+  Out_of_memory instead of returning of NULL (the behaviour of
+  caml_stat_strdup_to_os was inconsistent between Unix/Windows).
+  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
+
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
 
