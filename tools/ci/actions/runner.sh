@@ -130,6 +130,27 @@ Install () {
 
 Test-In-Prefix () {
   $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
+  mkdir -p bak
+  mv Makefile.config Makefile.build_config config.status bak
+  git clean -dfX &>/dev/null
+  rm -rf "$PREFIX"
+  mv bak/Makefile.config bak/Makefile.build_config bak/config.status .
+  rmdir bak
+  if grep -Fxq 'LIBDIR_REL=' Makefile.build_config; then
+    # Compiler configured absolutely - reconfigure relatively
+    echo '::group::Re-building the compiler with a relative libdir'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          ADDITIONAL_CONFIGURE_ARGS=--with-relative-libdir=../lib/ocaml
+  else
+    # Compiler configured relatively - reconfigure absolutely
+    echo '::group::Re-building the compiler with an absolute libdir'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          ADDITIONAL_CONFIGURE_ARGS=--without-relative-libdir
+  fi
+  $MAKE
+  $MAKE install
+  echo '::endgroup::'
+  $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
 }
 
 Checks () {
