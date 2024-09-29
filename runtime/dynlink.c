@@ -144,7 +144,7 @@ static void parse_ld_conf(const char_os *location)
       ("error while reading loader config file %s",
        caml_stat_strdup_of_os(ldconfname));
   config[nread] = 0;
-  wconfig = caml_stat_strdup_to_os(config);
+  wconfig = caml_stat_strdup_noexc_to_os(config);
   caml_stat_free(config);
   q = wconfig;
   for (p = wconfig; *p != 0; p++) {
