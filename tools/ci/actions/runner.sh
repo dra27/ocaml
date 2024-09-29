@@ -132,6 +132,30 @@ Test-In-Prefix () {
   $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
 }
 
+Re-Test-In-Prefix () {
+  mkdir -p bak
+  mv Makefile.config Makefile.build_config config.status bak
+  git clean -dfX &>/dev/null
+  rm -rf "$PREFIX"
+  mv bak/Makefile.config bak/Makefile.build_config bak/config.status .
+  rmdir bak
+  if grep -Fxq 'LIBDIR_REL=' Makefile.build_config; then
+    # Compiler configured absolutely - reconfigure relatively
+    echo '::group::Re-building the compiler with a relative libdir'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          ADDITIONAL_CONFIGURE_ARGS=--with-relative-libdir=../lib/ocaml
+  else
+    # Compiler configured relatively - reconfigure absolutely
+    echo '::group::Re-building the compiler with an absolute libdir'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          ADDITIONAL_CONFIGURE_ARGS=--without-relative-libdir
+  fi
+  $MAKE
+  $MAKE install
+  echo '::endgroup::'
+  $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
+}
+
 Checks () {
   if fgrep 'SUPPORTS_SHARED_LIBRARIES=true' Makefile.config &>/dev/null ; then
     echo Check the code examples in the manual
@@ -223,6 +247,7 @@ test_prefix) TestPrefix $2;;
 api-docs) API_Docs;;
 install) Install;;
 test-in-prefix) Test-In-Prefix;;
+re-test-in-prefix) Re-Test-In-Prefix;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
