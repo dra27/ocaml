@@ -84,6 +84,9 @@ function set_configuration {
       # Explicitly test dependency generation on msvc64
       args+=('--host=x86_64-pc-windows');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--with-relative-libdir')
+  fi
 
   # Remove old configure cache if the configure script or the OS
   # have changed
