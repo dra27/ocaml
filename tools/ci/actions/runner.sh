@@ -132,6 +132,32 @@ Test-In-Prefix () {
   $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
 }
 
+Re-Test-In-Prefix () {
+  mkdir -p bak
+  mv Makefile.config Makefile.build_config config.status bak
+  git clean -dfX &>/dev/null
+  rm -rf "$PREFIX"
+  mv bak/Makefile.config bak/Makefile.build_config bak/config.status .
+  rmdir bak
+  if grep -Fxq 'RUNTIME_SEARCH = ' Makefile.build_config; then
+    # Compiler configured absolutely - reconfigure to search
+    echo '::group::Re-building the compiler with runtime searching'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          'ADDITIONAL_CONFIGURE_ARGS=--enable-runtime-search=always \
+--enable-runtime-search-target'
+  else
+    # Compiler configured to search - reconfigure absolutely
+    echo '::group::Re-building the compiler with absolute runtime only'
+    $MAKE COMPUTE_DEPS=false reconfigure \
+          'ADDITIONAL_CONFIGURE_ARGS=--disable-runtime-search \
+--disable-runtime-search-target'
+  fi
+  $MAKE
+  $MAKE install
+  echo '::endgroup::'
+  $MAKE -C testsuite/in_prefix -f Makefile.test test-in-prefix
+}
+
 Checks () {
   if fgrep 'SUPPORTS_SHARED_LIBRARIES=true' Makefile.config &>/dev/null ; then
     echo Check the code examples in the manual
@@ -223,6 +249,7 @@ test_prefix) TestPrefix $2;;
 api-docs) API_Docs;;
 install) Install;;
 test-in-prefix) Test-In-Prefix;;
+re-test-in-prefix) Re-Test-In-Prefix;;
 manual) BuildManual;;
 other-checks) Checks;;
 basic-compiler) BasicCompiler;;
