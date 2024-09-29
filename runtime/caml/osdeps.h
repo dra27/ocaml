@@ -131,8 +131,10 @@ extern int win_wide_char_to_multi_byte(const wchar_t* s,
    [caml_windows_unicode_runtime_enabled] is non-zero **and** [s] is valid
    UTF-8, or the current Windows code page otherwise.
 
-   The returned string is allocated with [caml_stat_alloc], so it should be free
-   using [caml_stat_free].
+   The returned string is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+
+   If allocation fails, this raises Out_of_memory.
 */
 extern wchar_t* caml_stat_strdup_to_utf16(const char *s);
 
@@ -140,8 +142,10 @@ extern wchar_t* caml_stat_strdup_to_utf16(const char *s);
    re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero or
    the current Windows code page otherwise.
 
-   The returned string is allocated with [caml_stat_alloc], so it should be free
-   using [caml_stat_free].
+   The returned string is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+
+   If allocation fails, this raises Out_of_memory.
 */
 extern char* caml_stat_strdup_of_utf16(const wchar_t *s);
 
