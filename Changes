@@ -36,6 +36,11 @@ OCaml 4.11 maintenance branch
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
 
+* #13497: Correct implementation of caml_stat_strdup_to_utf16 to raise
+  Out_of_memory instead of returning of NULL (the behaviour of
+  caml_stat_strdup_to_os was inconsistent between Unix/Windows).
+  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
+
 ### Code generation and optimizations:
 
 - #9752: Revised handling of calling conventions for external C functions.
