@@ -67,6 +67,12 @@ function set_configuration {
     msvc64)
       args+=('--host=x86_64-pc-windows');;
   esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
 
   mkdir -p "$CACHE_DIRECTORY"
   echo './configure' "${args[@]@Q}"
