@@ -216,6 +216,9 @@ Re-Test-In-Prefix () {
 --prefix='"$PREFIX"'.new --libdir='"$PREFIX"'.new/lib/ocaml-lib'
   fi
   $MAKE
+  if ((build_ocamlnat)); then
+    $MAKE ocamlnat
+  fi
   $MAKE install
   echo '::endgroup::'
   Test-In-Prefix
