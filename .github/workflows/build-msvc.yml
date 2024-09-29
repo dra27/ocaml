@@ -55,7 +55,7 @@ jobs:
                 include.push({cc: 'gcc', x86_64: true, config_arg: '--disable-native-toplevel --disable-native-compiler --with-target-sh=sh'});
               }
             }
-            return {config_arg: [''], x86_64: [true], cc: compilers, include: include};
+            return {config_arg: [''], x86_64: [true], cc: compilers, runtime_search: ['search', 'absolute'], include: include};
       - name: Determine if the testsuite should be skipped
         id: skip
         uses: actions/github-script@v7
@@ -79,7 +79,7 @@ jobs:
 
     timeout-minutes: ${{ matrix.cc == 'gcc' && 90 || 60 }}
 
-    name: ${{ matrix.cc == 'cl' && 'MSVC' || matrix.cc == 'gcc' && 'Cygwin' || 'clang-cl' }} ${{ matrix.x86_64 && '64 bits' || '32 bits' }} ${{ matrix.config_arg != '' && format('({0})', matrix.config_arg) || '' }}
+    name: ${{ matrix.cc == 'cl' && 'MSVC' || matrix.cc == 'gcc' && 'Cygwin' || 'clang-cl' }} ${{ matrix.x86_64 && '64 bits' || '32 bits' }} ${{ matrix.runtime_search }} ${{ matrix.config_arg != '' && format('({0})', matrix.config_arg) || '' }}
 
     strategy:
       matrix: ${{ fromJSON(needs.config.outputs.matrix) }}
@@ -141,6 +141,7 @@ jobs:
             ${{ matrix.cc != 'gcc' && format('CC={0}', matrix.cc) || '' }}
             --enable-ocamltest
             ${{ matrix.x86_64 && '--enable-native-toplevel' || '--disable-native-toplevel' }}
+            ${{ matrix.runtime_search == 'search' && '--enable-runtime-search=always --enable-runtime-search-target' || '--disable-runtime-search --disable-runtime-search-target' }}
             ${{ matrix.config_arg }}
         run: |
           eval $(tools/msvs-promote-path)
