@@ -37,6 +37,9 @@ jobs:
           - cc: gcc
             x86_64: true
             config_arg: --disable-native-toplevel --disable-native-compiler --with-target-sh=sh
+          - cc: gcc
+            x86_64: true
+            config_arg: --with-relative-libdir=../lib/ocaml --with-target-sh=sh
       fail-fast: false
 
     steps:
@@ -104,6 +107,7 @@ jobs:
             ${{ matrix.cc != 'gcc' && format('CC={0}', matrix.cc) || '' }}
             --enable-ocamltest
             ${{ matrix.x86_64 && '--enable-native-toplevel' || '--disable-native-toplevel' }}
+            ${{ matrix.cc == 'cl' && '--with-relative-libdir=..\\lib\\ocaml' || '--without-relative-libdir' }}
             ${{ matrix.config_arg }}
         run: >-
           eval $(tools/msvs-promote-path) ;
