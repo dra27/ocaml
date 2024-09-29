@@ -68,6 +68,9 @@ function set_configuration {
       # Explicitly test dependency generation on msvc64
       args+=('--host=x86_64-pc-windows' '--enable-dependency-generation');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--with-relative-libdir')
+  fi
 
   mkdir -p "$CACHE_DIRECTORY"
   echo './configure' "${args[@]@Q}"
