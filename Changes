@@ -18,6 +18,11 @@ OCaml 4.13 maintenance branch
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
 
+* #13497: Correct implementation of caml_stat_strdup_to_utf16 to raise
+  Out_of_memory instead of returning of NULL (the behaviour of
+  caml_stat_strdup_to_os was inconsistent between Unix/Windows).
+  (David Allsopp, review by Nick Barnes, Antonin Décimo and Miod Vallat)
+
 ### Compiler user-interface and warnings:
 
 - #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
