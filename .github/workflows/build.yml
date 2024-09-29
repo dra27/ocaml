@@ -77,7 +77,7 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-codegen-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-codegen-invariants --enable-dependency-generation --enable-native-toplevel --with-relative-libdir=../lib/ocaml' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -189,6 +189,7 @@ jobs:
             test-in-prefix: true
           - name: macos-arm64
             os: macos-14
+            config_arg: --with-relative-libdir=../lib/ocaml
             test-in-prefix: true
           - name: static
             os: ubuntu-latest
@@ -266,10 +267,19 @@ jobs:
           MAKE_ARG=-j OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh test-in-prefix
 
   i386:
+    name: i386 - ${{ matrix.name }}
     runs-on: ubuntu-latest
     container:
       image: debian:12
       options: --platform linux/i386 --user root
+    strategy:
+      matrix:
+        include:
+          - name: absolute
+            config_arg: --without-relative-libdir
+          - name: relative
+            config_arg: --with-relative-libdir=../lib/ocaml
+      fail-fast: false
     steps:
       - name: OS Dependencies
         working-directory: .
@@ -289,7 +299,7 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel --with-target-sh=exe' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel --with-target-sh=exe ${{ matrix.config_arg }}' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
