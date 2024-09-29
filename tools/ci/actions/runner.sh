@@ -215,7 +215,7 @@ Re-Test-In-Prefix () {
           'ADDITIONAL_CONFIGURE_ARGS=--without-relative-libdir \
 --prefix='"$PREFIX"'.new --libdir='"$PREFIX"'.new/lib/ocaml-lib'
   fi
-  $MAKE
+  $MAKE $make_target
   if ((build_ocamlnat)); then
     $MAKE ocamlnat
   fi
