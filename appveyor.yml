@@ -60,7 +60,7 @@ environment:
 #        "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
 
 matrix:
-  fast_finish: true
+  fast_finish: false
 
 cache:
   - C:\cygwin64\var\cache\setup
