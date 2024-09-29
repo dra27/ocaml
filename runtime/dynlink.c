@@ -83,20 +83,10 @@ static c_primitive lookup_primitive(const char * name)
 
 #define LD_CONF_NAME T("ld.conf")
 
-CAMLexport const char_os * caml_get_stdlib_location(void)
+static void parse_ld_conf(const char_os *location)
 {
-  const char_os * stdlib;
-  stdlib = caml_secure_getenv(T("OCAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
-  return stdlib;
-}
-
-CAMLexport char_os * caml_parse_ld_conf(void)
-{
-  const char_os * stdlib;
-  char_os * ldconfname, * wconfig, * p, * q;
-  char * config;
+  char_os * ldconfname;
+  char * config, * p, * q;
 #ifdef _WIN32
   struct _stati64 st;
 #else
@@ -104,11 +94,10 @@ CAMLexport char_os * caml_parse_ld_conf(void)
 #endif
   int ldconf, nread;
 
-  stdlib = caml_get_stdlib_location();
-  ldconfname = caml_stat_strconcat_os(3, stdlib, T("/"), LD_CONF_NAME);
+  ldconfname = caml_stat_strconcat_os(3, location, CAML_DIR_SEP, LD_CONF_NAME);
   if (stat_os(ldconfname, &st) == -1) {
     caml_stat_free(ldconfname);
-    return NULL;
+    return;
   }
   ldconf = open_os(ldconfname, O_RDONLY, 0);
   if (ldconf == -1)
@@ -121,20 +110,49 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       ("error while reading loader config file %s",
        caml_stat_strdup_of_os(ldconfname));
   config[nread] = 0;
-  wconfig = caml_stat_strdup_to_os(config);
-  caml_stat_free(config);
-  q = wconfig;
-  for (p = wconfig; *p != 0; p++) {
+  q = config;
+  for (p = config; *p != 0; p++) {
     if (*p == '\n') {
       *p = 0;
-      caml_ext_table_add(&caml_shared_libs_path, q);
+      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
       q = p + 1;
     }
   }
-  if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
+  if (q < p)
+    caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_to_os(q));
   close(ldconf);
+  caml_stat_free(config);
   caml_stat_free(ldconfname);
-  return wconfig;
+  return;
+}
+
+CAMLexport void caml_parse_ld_conf(void)
+{
+  char_os * env_value;
+  char_os * locations[3] = {T(""), T(""), NULL};
+  int i, file_count = 0;
+
+  /* Read $OCAMLLIB */
+  env_value = caml_secure_getenv(T("OCAMLLIB"));
+  if (env_value != NULL && strlen_os(env_value) > 0)
+    locations[file_count++] = caml_stat_strdup_os(env_value);
+  /* Add $CAMLLIB if set and not equal to $OCAMLLIB */
+  env_value = caml_secure_getenv(T("CAMLLIB"));
+  if (env_value != NULL && strlen_os(env_value) > 0
+      && strcmp_os(env_value, locations[0]))
+    locations[file_count++] = caml_stat_strdup_os(env_value);
+  /* Add OCAML_STDLIB_DIR if not equal to either */
+  if (strcmp_os(OCAML_STDLIB_DIR, locations[0])
+      || strcmp_os(OCAML_STDLIB_DIR, locations[1]))
+    locations[file_count++] = caml_stat_strdup_os(OCAML_STDLIB_DIR);
+
+  /* Load and parse all the ld.conf files */
+  for (i = 0; i < file_count; i++) {
+    parse_ld_conf(locations[i]);
+    caml_stat_free(locations[i]);
+  }
+
+  return;
 }
 
 /* Open the given shared library and add it to shared_libs.
@@ -175,6 +193,8 @@ void caml_build_primitive_table(char_os * lib_path,
      - directories specified on the command line with the -I option
      - directories specified in the CAML_LD_LIBRARY_PATH
      - directories specified in the executable
+     - directories specified in OCAMLLIB/ld.conf
+     - directories specified in CAMLLIB/ld.conf
      - directories specified in the file <stdlib>/ld.conf
 
      caml_shared_libs_path and caml_prim_name_table are not freed afterwards:
@@ -183,7 +203,7 @@ void caml_build_primitive_table(char_os * lib_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
   if (lib_path != NULL)
     for (char_os *p = lib_path; *p != 0; p += strlen_os(p) + 1)
-      caml_ext_table_add(&caml_shared_libs_path, p);
+      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_os(p));
   caml_parse_ld_conf();
   /* Open the shared libraries */
   caml_ext_table_init(&shared_libs, 8);
