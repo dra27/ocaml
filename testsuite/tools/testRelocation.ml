@@ -245,7 +245,7 @@ let libdir_rules config file =
     in
     let prefix =
       if config.has_relative_libdir <> None
-         && (basename = "Makefile.config" || basename = "ld.conf") then
+         && basename = "Makefile.config" then
         LocationSet.add Relative prefix
       else
         prefix

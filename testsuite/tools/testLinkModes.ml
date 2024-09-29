@@ -316,13 +316,10 @@ let test_runs usr_bin_sh test_program_path test_program
               (* stdlib/headernt.c correctly preserves argv[0] *)
               Success {executable_name = test_program_path; argv0}
             else if Harness.no_caml_executable_name
-                    && not (Environment.is_renamed env)
                     && config.has_relative_libdir <> None then
               (* Without caml_executable_name, ocamlrun will be forced to
                  interpret the relative standard library relative to argv[0],
-                 which will fail. As with the Dynlink testing, after the prefix
-                 has been renamed, CAML_LD_LIBRARY_PATH has to be set, so this
-                 will succeed. *)
+                 which will fail. *)
               Fail 134
             else
               (* stdlib/header.c does not preserve argv[0] *)
@@ -377,7 +374,7 @@ let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
         | Fail code -> "", code, ""
         | Success {executable_name; argv0} -> executable_name, 0, argv0
       in
-      let stubs = tendered && with_unix in
+      let stubs = tendered && with_unix && config.has_relative_libdir = None in
       run_program
         env config ~runtime:via_ocamlrun ~stubs
         test_program_path ~prefix_path_with_cwd expected_executable_name
