@@ -178,7 +178,8 @@ options are:" in
   in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
-  let relocatable = false in
+  let relocatable =
+    config.has_relative_libdir <> None && config.has_runtime_search <> None in
   let target_relocatable = config.has_runtime_search_target <> None in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
@@ -2559,6 +2560,40 @@ let test_relocation prefix bindir libdir =
       else
         build_and_prefix
   in
+  let bindir_rules, libdir_rules =
+    if config.has_relative_libdir <> None
+       && config.has_runtime_search = Some true then
+      let bindir_rules file =
+        let basename = Filename.basename file in
+        if Config.ccomp_type = "msvc" && not clang_cl
+           && List.mem "ocamlrund" (String.split_on_char '-' basename) then
+          LocationSet.singleton Build
+        else if Config.system = "macosx" then
+          let classification = classify_executable file in
+          if classification = Shebang then
+            LocationSet.empty
+          else
+            LocationSet.singleton Build
+        else
+          LocationSet.empty in
+      let libdir_rules file =
+        let basename = Filename.basename file in
+        let ext = Filename.extension basename in
+        if Filename.basename file = "Makefile.config" then
+          LocationSet.of_list [Relative; Prefix]
+        else if Config.ccomp_type = "msvc" then
+          if ext = Config.ext_lib || ext = Config.ext_obj then
+            LocationSet.singleton Build
+          else
+            LocationSet.empty
+        else if Config.system = "macosx"
+                && (ext = Config.ext_dll || ext = ".cmxs") then
+          LocationSet.singleton Build
+        else
+          LocationSet.empty in
+      bindir_rules, libdir_rules
+    else
+      bindir_rules, libdir_rules in
   let failed =
     scan false bindir "$bindir" (Unix.opendir bindir) bindir_rules in
   let failed =
@@ -2603,12 +2638,12 @@ let () =
   (* Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
   (* Finally re-run all of the tests with the new prefix *)
-  let caml_ld_library_path =
-    assert (not relocatable);
-    Some [Filename.concat libdir "stublibs"]
+  let caml_ld_library_path, ocamllib =
+    if config.has_relative_libdir <> None then
+      None, None
+    else
+      Some [Filename.concat libdir "stublibs"], Some libdir
   in
-  let ocamllib =
-    if config.has_relative_libdir = None then Some libdir else None in
   let env = Environment.make ?caml_ld_library_path bindir libdir in
   let runtime =
     if target_launcher_searches_for_ocamlrun then
