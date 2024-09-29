@@ -46,6 +46,13 @@ environment:
     # Fully print commands executed by Make
     # MAKEFLAGS: V=1
   matrix:
+    - PORT: mingw32
+      BOOTSTRAP_FLEXDLL: true
+    - PORT: mingw32
+      BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
+    - PORT: mingw64
+      BOOTSTRAP_FLEXDLL: true
     - PORT: mingw64
       BOOTSTRAP_FLEXDLL: true
       RELOCATABLE: true
