@@ -40,6 +40,7 @@ environment:
   matrix:
     - PORT: mingw32
       BOOTSTRAP_FLEXDLL: true
+      RELOCATABLE: true
     - PORT: msvc64
       BOOTSTRAP_FLEXDLL: false
       BUILD_MODE: steps
