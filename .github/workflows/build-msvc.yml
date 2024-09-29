@@ -161,6 +161,7 @@ jobs:
             ${{ matrix.cc != 'gcc' && format('CC={0}', matrix.cc) || '' }}
             --enable-ocamltest
             ${{ matrix.libdir == 'relative' && '--with-relative-libdir' || '--without-relative-libdir' }}
+            ${{ matrix.libdir == 'relative' && '--enable-runtime-search --enable-runtime-search-target=fallback' || '--disable-runtime-search --disable-runtime-search-target' }}
             ${{ matrix.config_arg }}
         run: |
           eval $(tools/msvs-promote-path)
