@@ -76,6 +76,12 @@ function set_configuration {
       args+=('--host=x86_64-pc-windows' '--enable-dependency-generation' \
              '--enable-native-toplevel');;
   esac
+  case "$RELOCATABLE,$1" in
+    true,cygwin*)
+      args+=('--with-relative-libdir=../lib/ocaml');;
+    true,*)
+      args+=('--with-relative-libdir=..\lib\ocaml');;
+  esac
 
   # Remove old configure cache if the configure script or the OS
   # have changed
