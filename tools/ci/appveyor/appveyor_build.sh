@@ -62,7 +62,8 @@ function set_configuration {
       args+=('--host=x86_64-pc-windows');;
   esac
   if [[ $RELOCATABLE = 'true' ]]; then
-    args+=('--with-relative-libdir')
+    args+=('--with-relative-libdir' \
+           '--enable-runtime-search' '--enable-runtime-search-target=fallback')
   fi
 
   mkdir -p "$CACHE_DIRECTORY"
