@@ -963,7 +963,7 @@ CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
   int retcode;
 
   retcode = caml_win32_multi_byte_to_wide_char(s, -1, NULL, 0);
-  ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
+  ws = caml_stat_alloc(retcode * sizeof(*ws));
   caml_win32_multi_byte_to_wide_char(s, -1, ws, retcode);
 
   return ws;
