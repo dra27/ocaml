@@ -71,6 +71,7 @@ jobs:
             dependencies: texlive-latex-extra texlive-fonts-recommended hevea sass
           - id: debug
             name: extra (debug)
+      fail-fast: false
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -178,6 +179,7 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJSON(needs.config.outputs.jobs) }}
+      fail-fast: false
     steps:
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu-')
