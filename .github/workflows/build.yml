@@ -59,7 +59,7 @@ jobs:
          '${{ github.event.repository.full_name }}'
       - name: Configure tree
         run: |
-          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-codegen-invariants --enable-dependency-generation --enable-native-toplevel' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
+          MAKE_ARG=-j CONFIG_ARG='--enable-flambda --enable-cmm-invariants --enable-codegen-invariants --enable-dependency-generation --enable-native-toplevel --with-relative-libdir=../lib/ocaml' OCAMLRUNPARAM=b,v=0 bash -xe tools/ci/actions/runner.sh configure
       - name: Build
         run: |
           MAKE_ARG=-j bash -xe tools/ci/actions/runner.sh build
@@ -168,6 +168,7 @@ jobs:
             test-in-prefix: true
           - name: macos-arm64
             os: macos-14
+            config_arg: --with-relative-libdir=../lib/ocaml
             test-in-prefix: true
           - name: static
             os: ubuntu-latest
@@ -265,4 +266,4 @@ jobs:
           su ocaml -c "bash -xe tools/ci/actions/runner.sh install"
       - name: Test in prefix
         run: |
-          su ocaml -c "bash -xe tools/ci/actions/runner.sh test-in-prefix"
+          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh test-in-prefix"
