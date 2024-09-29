@@ -70,6 +70,9 @@ function set_configuration {
     true,*)
       args+=('--with-relative-libdir=..\lib\ocaml');;
   esac
+  if [[ $RELOCATABLE = 'true' ]]; then
+    args+=('--enable-runtime-search=always' '--enable-runtime-search-target')
+  fi
 
   mkdir -p "$CACHE_DIRECTORY"
   echo './configure' "${args[@]@Q}"
