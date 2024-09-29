@@ -92,6 +92,7 @@ jobs:
             name: extra (debug)
           - id: debug-s4096
             name: extra (debug-s4096)
+      fail-fast: false
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -164,6 +165,7 @@ jobs:
           - name: minimal
             os: ubuntu-latest
             config_arg: --disable-native-compiler --disable-shared --disable-debug-runtime --disable-instrumented-runtime --disable-systhreads --disable-str-lib --disable-unix-lib --disable-ocamldoc
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
