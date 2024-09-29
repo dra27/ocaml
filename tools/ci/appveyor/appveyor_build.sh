@@ -70,7 +70,8 @@ function set_configuration {
              '--enable-native-toplevel');;
   esac
   if [[ $RELOCATABLE = 'true' ]]; then
-    args+=('--with-relative-libdir')
+    args+=('--with-relative-libdir' \
+           '--enable-runtime-search' '--enable-runtime-search-target=fallback')
   fi
 
   mkdir -p "$CACHE_DIRECTORY"
