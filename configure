@@ -779,6 +779,7 @@ build_cpu
 build
 target_bindir
 QS
+TARGET_LIBDIR
 compute_deps
 stdlib_manpages
 PACKLD
@@ -3302,6 +3303,7 @@ OCAML_VERSION_SHORT=5.0
 
 
  # TODO: rename this variable
+
 
 
 
@@ -19684,6 +19686,7 @@ fi
 then :
   TARGET_BINDIR="$ocaml_bindir"
 fi
+  TARGET_LIBDIR="$libdir"
   if test x"$target_launch_method" = 'x'
 then :
   target_launch_method="$launch_method"
