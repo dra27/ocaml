@@ -176,6 +176,7 @@ AC_SUBST([stdlib_manpages])
 AC_SUBST([QS])
 AC_SUBST([naked_pointers])
 AC_SUBST([target_bindir])
+AC_SUBST([TARGET_LIBDIR])
 
 ## Generated files
 
@@ -2009,6 +2010,7 @@ AC_CONFIG_COMMANDS_PRE([
   eval "ocaml_bindir=\"$bindir\""
   eval "ocaml_libdir=\"$libdir\""
   AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
+  TARGET_LIBDIR="$libdir"
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"
