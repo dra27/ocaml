@@ -748,6 +748,7 @@ build_os
 build_vendor
 build_cpu
 build
+TARGET_LIBDIR
 target_bindir
 naked_pointers
 QS
@@ -2921,6 +2922,7 @@ VERSION=4.10.3+dev0-2020-12-08
 
 
  # TODO: rename this variable
+
 
 
 
@@ -17548,6 +17550,7 @@ fi
   if test x"$TARGET_BINDIR" = 'x'; then :
   TARGET_BINDIR="$ocaml_bindir"
 fi
+  TARGET_LIBDIR="$libdir"
   if test x"$target_launch_method" = 'x'; then :
   target_launch_method="$launch_method"
 fi
