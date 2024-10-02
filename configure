@@ -784,6 +784,7 @@ build
 target_bindir
 ar_supports_response_files
 QS
+TARGET_LIBDIR
 ocaml_libdir
 ocaml_bindir
 compute_deps
@@ -3439,6 +3440,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L034
 
 
  # TODO: rename this variable
+
 
 
 
@@ -20384,6 +20386,11 @@ fi
 if test x"$libdir" = x'${exec_prefix}/lib'
 then :
   libdir="$libdir"/ocaml
+fi
+
+if test x"$TARGET_LIBDIR" = x
+then :
+  TARGET_LIBDIR="$libdir"
 fi
 
 if test x"$mandir" = x'${datarootdir}/man'
