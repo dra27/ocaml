@@ -168,6 +168,7 @@ AC_SUBST([flexdll_chain])
 AC_SUBST([flexlink_flags])
 AC_SUBST([PACKLD])
 AC_SUBST([stdlib_manpages])
+AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
 
@@ -1921,6 +1922,7 @@ AC_CONFIG_COMMANDS_PRE([
   eval "ocaml_bindir=\"$bindir\""
   eval "ocaml_libdir=\"$libdir\""
   AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
+  TARGET_LIBDIR="$libdir"
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"
