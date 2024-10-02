@@ -750,6 +750,7 @@ build_cpu
 build
 target_bindir
 QS
+TARGET_LIBDIR
 naked_pointers
 stdlib_manpages
 PACKLD
@@ -2916,6 +2917,7 @@ VERSION=4.10.3+relocatable
 
 
  # TODO: rename this variable
+
 
 
 
@@ -17502,6 +17504,7 @@ fi
   if test x"$TARGET_BINDIR" = 'x'; then :
   TARGET_BINDIR="$ocaml_bindir"
 fi
+  TARGET_LIBDIR="$libdir"
   if test x"$target_launch_method" = 'x'; then :
   target_launch_method="$launch_method"
 fi
