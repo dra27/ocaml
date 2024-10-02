@@ -253,6 +253,7 @@ AC_SUBST([build_libraries_manpages])
 AC_SUBST([compute_deps])
 AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
+AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
 
@@ -2687,6 +2688,7 @@ AC_CONFIG_COMMANDS_PRE([
   eval "ocaml_bindir=\"$bindir\""
   eval "ocaml_libdir=\"$libdir\""
   AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
+  TARGET_LIBDIR="$libdir"
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"

@@ -787,6 +787,7 @@ build_cpu
 build
 ar_supports_response_files
 QS
+TARGET_LIBDIR
 ocaml_libdir
 ocaml_bindir
 compute_deps
@@ -3472,6 +3473,7 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
 
 
 
@@ -21196,6 +21198,7 @@ fi
 then :
   TARGET_BINDIR="$ocaml_bindir"
 fi
+  TARGET_LIBDIR="$libdir"
   if test x"$target_launch_method" = 'x'
 then :
   target_launch_method="$launch_method"
