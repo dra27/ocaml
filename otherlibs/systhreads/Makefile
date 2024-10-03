@@ -53,35 +53,48 @@ CMIFILES=$(MLIFILES:.mli=.cmi)
 
 all: lib$(LIBNAME).$(A) $(LIBNAME).cma $(CMIFILES)
 
-allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa $(CMIFILES)
+allopt: lib$(LIBNAME)nat_static.$(A) $(LIBNAME).cmxa $(CMIFILES)
+
+ifeq "$(NATDYNLINK)" "true"
+allopt: $(LIBNAME).cmxs lib$(LIBNAME)nat_shared.$(A)
+endif
 
 lib$(LIBNAME).$(A): OC_CFLAGS = $(OC_BYTECODE_CFLAGS)
 
-lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) $(BYTECODE_C_OBJS)
+lib$(LIBNAME).$(A): st_stubs_static.b.$(O) dll$(LIBNAME)$(EXT_DLL)
+	$(V_OCAMLMKLIB)$(MKLIB) -verbose -custom -o $(LIBNAME) $<
 
-lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
+dll$(LIBNAME)$(EXT_DLL): st_stubs_shared.b.$(O)
+	$(V_MKDLL)$(MKDLL) -o $@ $^
 
-lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME)nat $^
+lib$(LIBNAME)nat_%.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
+
+lib$(LIBNAME)nat_static.$(A): st_stubs_static.n.$(O)
+	$(V_OCAMLMKLIB)$(MKLIB) -verbose -custom -o $(LIBNAME)nat_static $^
+
+lib$(LIBNAME)nat_shared.$(A): st_stubs_shared.n.$(O)
+	$(V_OCAMLMKLIB)$(MKLIB) -verbose -custom -o $(LIBNAME)nat_shared $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
+	$(V_OCAMLMKLIB)$(MKLIB) -verbose -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
 
-# See remark above: force static linking of libthreadsnat.a
 $(LIBNAME).cmxa: $(THREADS_NCOBJS)
-	$(V_LINKOPT)$(CAMLOPT) -linkall -a -cclib -lthreadsnat -o $@ $^
+	$(V_LINKOPT)$(CAMLOPT) -linkall -a -cclib -lthreadsnat_static -o $@ $^
+
+$(LIBNAME).cmxs: $(THREADS_NCOBJS) lib$(LIBNAME)nat_shared.$(A)
+	$(V_LINKOPT)$(CAMLOPT) -linkall -shared -cclib -lthreadsnat_shared -o $@ $<
 
 # The following lines produce two object files st_stubs.b.$(O) and
 # st_stubs.n.$(O) from the same source file st_stubs.c (it is compiled
 # twice, each time with different options).
 
-st_stubs.n.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
+st_stubs%.n.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS)
+st_stubs_shared.%.$(O): OC_CPPFLAGS += -DSYSTHREADS_SHARED
 
 ifeq "$(COMPUTE_DEPS)" "true"
-st_stubs.%.$(O): st_stubs.c
+st_stubs%.$(O): st_stubs.c
 else
-st_stubs.%.$(O): st_stubs.c $(RUNTIME_HEADERS) $(wildcard *.h)
+st_stubs%.$(O): st_stubs.c $(RUNTIME_HEADERS) $(wildcard *.h)
 endif
 	$(V_CC)$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ -c $<
@@ -119,10 +132,13 @@ endif
 	$(INSTALL_DATA) caml/threads.h "$(INSTALL_INCDIR)"
 
 installopt:
-	$(INSTALL_DATA) libthreadsnat.$(A) "$(INSTALL_LIBDIR)"
+	$(INSTALL_DATA) libthreadsnat_static.$(A) "$(INSTALL_LIBDIR)"
 	$(INSTALL_DATA) \
 	  $(THREADS_NCOBJS) threads.cmxa threads.$(A) \
 	  "$(INSTALL_THREADSLIBDIR)"
+ifeq "$(NATDYNLINK)" "true"
+	$(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_THREADSLIBDIR)"
+endif
 
 %.cmi: %.mli
 	$(V_OCAMLC)$(CAMLC) -c $(COMPFLAGS) $<
