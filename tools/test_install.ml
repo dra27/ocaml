@@ -45,7 +45,7 @@ let scrub =
    with effectively PATH=$bindir:$PATH and
    LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH on Unix or
    PATH=$bindir;$libdir;$PATH on Windows. *)
-let make_env ?(caml_ld_library_path=false) ?(ocamllib=false) bindir libdir =
+let make_env ?(ocamllib=false) bindir libdir =
   let keep binding =
     let equals = String.index binding '=' in
     let name = String.sub binding 0 equals in
@@ -77,12 +77,6 @@ let make_env ?(caml_ld_library_path=false) ?(ocamllib=false) bindir libdir =
   let bindings =
     if ocamllib then
       ("OCAMLLIB=" ^ libdir) :: bindings
-    else
-      bindings
-  in
-  let bindings =
-    if caml_ld_library_path then
-      ("CAML_LD_LIBRARY_PATH=" ^ Filename.concat libdir "stublibs") :: bindings
     else
       bindings
   in
@@ -694,7 +688,7 @@ let () =
     List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
     (*List.iter Sys.remove programs;*)
     let env =
-      make_env ~caml_ld_library_path:true ~ocamllib:true bindir libdir in
+      make_env ~ocamllib:true bindir libdir in
     Compmisc.init_path ~standard_library:libdir ();
     let programs =
       run_tests
