@@ -46,8 +46,7 @@ sixth test are re-run and then the entire battery is executed a second time.
 
 During this second execution, the test harness does whatever is physically
 possible to allow these tests to proceed:
-- Environment variables `CAML_LD_LIBRARY_PATH` and `OCAMLLIB` are manipulated to
-  allow the compiler to operate
+- The `OCAMLLIB` environment variable is used to allow the compiler to operate
 - Bytecode executables which will no longer be able to find `ocamlrun` are
   explictly passed to `ocamlrun`. The harness always verifies that this step is
   required by first executing the binary and ensuring that it fails and then
@@ -74,8 +73,6 @@ Shims:
   so must be explicitly invoked via `ocamlrun`
 - Both toplevels contain the absolute location of the Standard Library,
   requiring `OCAMLLIB` to be set
-- `ld.conf` contains the absolute location of the `stublibs` directory,
-  requiring `CAML_LD_LIBRARY_PATH` to be adjusted
 
 ### Loading archives/plugins (.cma / .cmxs) with `Dynlink`
 
@@ -89,10 +86,9 @@ Shims:
 - Both compilers contain the absolute location of the Standard Library,
   requiring `OCAMLLIB` to be set
 - The executable created by `ocamlc` contains the absolute location of
-  `ocamlrun`, so must be both explicitly invoked via `ocamlrun` and also have
-  `CAML_LD_LIBRARY_PATH` adjusted, as that `ocamlrun` will either not load
-  `ld.conf` or (with `OCAMLLIB` set) will be pointed to an `ld.conf` containing
-  the absolute location of the `stublibs` directory
+  `ocamlrun`, so must be explicitly invoked via `ocamlrun` and also have
+  `OCAMLLIB` adjusted, as that `ocamlrun` contains an absolute path to the
+  Standard Library
 
 ### Executing installed bytecode binaries with `-vnum`
 
