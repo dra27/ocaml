@@ -233,10 +233,13 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG=--disable-native-toplevel su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
       - name: Run the testsuite
         run: |
           su ocaml -c "bash -xe tools/ci/actions/runner.sh test"
+      - name: Install
+        run: |
+          su ocaml -c "bash -xe tools/ci/actions/runner.sh install"

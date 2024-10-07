@@ -8223,12 +8223,14 @@ tools/test_install.cmo : \
     utils/config.cmi \
     driver/compmisc.cmi \
     utils/ccomp.cmi \
+    bytecomp/bytesections.cmi \
     tools/test_install.cmi
 tools/test_install.cmx : \
     otherlibs/unix/unix.cmx \
     utils/config.cmx \
     driver/compmisc.cmx \
     utils/ccomp.cmx \
+    bytecomp/bytesections.cmx \
     tools/test_install.cmi
 tools/test_install.cmi :
 debugger/breakpoints.cmo : \

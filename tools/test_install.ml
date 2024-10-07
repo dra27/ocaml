@@ -45,7 +45,7 @@ let scrub =
    with effectively PATH=$bindir:$PATH and
    LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH on Unix or
    PATH=$bindir;$libdir;$PATH on Windows. *)
-let make_env bindir libdir =
+let make_env ?(caml_ld_library_path=false) ?(ocamllib=false) bindir libdir =
   let keep binding =
     let equals = String.index binding '=' in
     let name = String.sub binding 0 equals in
@@ -74,6 +74,18 @@ let make_env bindir libdir =
       bindings
     else
       ("LD_LIBRARY_PATH=" ^ libdir)::bindings in
+  let bindings =
+    if ocamllib then
+      ("OCAMLLIB=" ^ libdir) :: bindings
+    else
+      bindings
+  in
+  let bindings =
+    if caml_ld_library_path then
+      ("CAML_LD_LIBRARY_PATH=" ^ Filename.concat libdir "stublibs") :: bindings
+    else
+      bindings
+  in
   Array.of_list bindings
 
 (* Return the list of otherlibs in a dependency-compatible order *)
@@ -91,7 +103,7 @@ let sort_libraries libraries =
 
 (* This test verifies that a series of libraries can be loaded in a toplevel.
    Any failures cause the script to be aborted. *)
-let load_libraries_in_toplevel env toplevel ext libraries =
+let load_libraries_in_toplevel env ?runtime toplevel ext libraries =
   Printf.printf "\nTesting loading of libraries in %s\n%!" toplevel;
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     List.iter (fun library ->
@@ -109,9 +121,16 @@ let load_libraries_in_toplevel env toplevel ext libraries =
       library library ext library ext) libraries;
     Printf.fprintf oc "#quit;;\n");
   let pid =
-    Unix.create_process_env
-      toplevel [| toplevel; "-noinit"; "-no-version"; "-noprompt";
+    let executable, args =
+      match runtime with
+      | Some runtime when not Sys.win32 ->
+          runtime, [| runtime; toplevel; "-noinit"; "-no-version"; "-noprompt";
                   "test_install_script.ml" |]
+      | _ -> toplevel, [| toplevel; "-noinit"; "-no-version"; "-noprompt";
+                  "test_install_script.ml" |]
+    in
+    Unix.create_process_env
+      executable args
       env Unix.stdin Unix.stdout Unix.stderr
   in
   let result = Unix.waitpid [] pid in
@@ -122,10 +141,11 @@ let load_libraries_in_toplevel env toplevel ext libraries =
 
 (* This test verifies that a series of libraries can be loaded via Dynlink.
    Any failures will cause either an exception or a compilation error. *)
-let load_libraries_in_prog env libdir compiler ~native libraries =
+let load_libraries_in_prog env ?runtime libdir compiler native_compiler ~native
+                           libraries =
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     let emit_library library =
-      if library <> "dynlink" && (not native || library <> "threads") then
+      if library <> "dynlink" (*&& (not native || library <> "threads")*) then
         let libdir = Filename.concat libdir library in
         let library = library ^ ".cma" in
         let lib = Filename.concat libdir library in
@@ -147,10 +167,18 @@ let load_libraries_in_prog env libdir compiler ~native libraries =
     Filename.concat (Unix.getcwd ()) (exe "test_install_script") in
   let pid =
     let dynlink = if native then "dynlink.cmxa" else "dynlink.cma" in
-    Unix.create_process_env
-      compiler [| compiler; "-I"; "+dynlink"; dynlink; "-linkall";
+    let executable, args =
+      match runtime with
+      | Some runtime when not Sys.win32 && not native_compiler ->
+          (* XXX All the dupl, etc. *)
+          runtime, [| runtime; compiler; "-I"; "+dynlink"; dynlink; "-linkall";
                             "-o"; test_program; "test_install_script.ml" |]
-      env Unix.stdin Unix.stdout Unix.stderr
+      | _ ->
+          compiler, [| compiler; "-I"; "+dynlink"; dynlink; "-linkall";
+                            "-o"; test_program; "test_install_script.ml" |]
+    in
+    Unix.create_process_env
+      executable args env Unix.stdin Unix.stdout Unix.stderr
   in
   let () =
     match Unix.waitpid [] pid with
@@ -160,8 +188,14 @@ let load_libraries_in_prog env libdir compiler ~native libraries =
         exit 1
   in
   let pid =
+    (* XXX Code dup with toplevels etc. *)
+    let executable, args =
+      match runtime with
+      | None -> test_program, [| test_program |]
+      | Some runtime -> runtime, [| runtime; test_program |]
+    in
     Unix.create_process_env
-      test_program [| test_program |] env Unix.stdin Unix.stdout Unix.stderr
+      executable args env Unix.stdin Unix.stdout Unix.stderr
   in
   let (_, result) = Unix.waitpid [] pid in
   let files = [
@@ -187,30 +221,74 @@ let is_executable =
       try Unix.access binary [Unix.X_OK]; true
       with Unix.Unix_error _ -> false
 
-let is_bytecode file =
-  In_channel.with_open_bin file (fun ic ->
-    let len = in_channel_length ic in
-    if len >= String.length Config.exec_magic_number then begin
-      seek_in ic (len - String.length Config.exec_magic_number);
-      input_line ic = Config.exec_magic_number
-    end else
-      false)
+let classify_bytecode_image file =
+  try
+    In_channel.with_open_bin file (fun ic ->
+      let start = really_input_string ic 2 in
+      let is_RNTM = function
+      | Bytesections.{name = Name.RNTM; _} -> true
+      | _ -> false in
+      let sections = Bytesections.(all (read_toc ic)) in
+      if start = "#!" then
+        `Shebang
+      else if List.exists is_RNTM sections then
+        `Launcher
+      else
+        `Custom)
+  with End_of_file | Bytesections.Bad_magic_number ->
+    `Bytecode_not_found
+
+let print_process_status oc = function
+| Unix.WEXITED n -> Printf.fprintf oc "exited with %d" n
+| Unix.WSIGNALED _ -> output_string oc "signalled"
+| Unix.WSTOPPED _ -> output_string oc "stopped"
 
 (* This test verifies that a series of libraries can be loaded via Dynlink.
    Any failures will cause either an exception or a compilation error. *)
-let test_bytecode_binaries env bindir =
+let test_bytecode_binaries ~full env bindir =
   let test_binary binary =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
     let binary = Filename.concat bindir binary in
-    if is_executable binary && is_bytecode binary then begin
-      Printf.printf "  Testing %s -vnum: %!" binary;
-      let pid =
-        Unix.create_process_env binary [| binary; "-vnum" |]
-        env Unix.stdin Unix.stdout Unix.stderr in
-      if not (snd (Unix.waitpid [] pid) = Unix.WEXITED 0) then
-        exit 1
-    end
+    if is_executable binary then
+      match classify_bytecode_image binary with
+      | `Bytecode_not_found -> ()
+      | (`Shebang | `Launcher | `Custom) as kind ->
+          Printf.printf "  Testing %s -vnum: %!" binary;
+          try
+            let pid =
+              Unix.create_process_env binary [| binary; "-vnum" |]
+              env Unix.stdin Unix.stdout Unix.stderr in
+            let (_, result) = Unix.waitpid [] pid in
+            let incorrect_status =
+              if full then
+                (* First time around, everything is supposed to work! *)
+                result <> Unix.WEXITED 0
+              else
+                match kind with
+                | `Custom ->
+                    (* Executables compiled with -custom should work
+                       regardless *)
+                    result <> Unix.WEXITED 0
+                | `Launcher ->
+                    (* Second time around, the executable launchers should fail,
+                       except on Windows (since PATH is adjusted) *)
+                    not Sys.win32 && result <> Unix.WEXITED 2
+                | `Shebang ->
+                    (* Second time around, the shebangs should all be broken so
+                       Unix_error should already have been raised! *)
+                    true
+            in
+            if incorrect_status then begin
+              Printf.eprintf "%s did not terminate as expected (%a)\n"
+                             binary print_process_status result;
+              exit 1
+            end
+          with Unix.Unix_error(_, "create_process", _) as e ->
+            if full || Sys.win32 then
+              raise e
+            else
+              Printf.printf "unable to run\n%!"
   in
   let binaries = Sys.readdir bindir in
   Printf.printf "\nTesting bytecode binaries in %s\n" bindir;
@@ -220,31 +298,43 @@ let test_bytecode_binaries env bindir =
 let write_test_program description =
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     Printf.fprintf oc {|
+let state = bool_of_string Sys.argv.(1)
+
 let is_directory dir =
   try Sys.is_directory dir
   with Sys_error _ -> false
 
 let () =
   Printf.printf "  %s: %%s\n%%!" Config.standard_library;
-  if not (is_directory Config.standard_library) then
-    let () = prerr_endline "  *** Directory not found!" in
+  if is_directory Config.standard_library <> state then
+    let () =
+      Printf.eprintf "  *** Directory %%sfound!\n"
+                     (if state then "not " else "")
+    in
     exit 1
 |} description)
 
-let compile_with_options env compiler ~native options
+let compile_with_options env compiler ~native ?runtime options
                          test_program description f =
   Printf.printf "  Compiling %s\n%!" description;
   write_test_program description;
   let test_program =
     Filename.concat (Unix.getcwd ()) (exe test_program) in
   let pid =
-    let args = Array.of_list
+    let args =
       (compiler :: "-o" :: test_program :: "-I" :: "+compiler-libs" ::
        (if native then "ocamlcommon.cmxa" else "ocamlcommon.cma") ::
          "test_install_script.ml" :: options)
     in
+    let executable, args =
+      match runtime with
+      | Some runtime ->
+          runtime, runtime :: args
+      | None ->
+          compiler, args
+    in
     Unix.create_process_env
-      compiler args env Unix.stdin Unix.stdout Unix.stderr
+      executable (Array.of_list args) env Unix.stdin Unix.stdout Unix.stderr
   in
   let () =
     match Unix.waitpid [] pid with
@@ -266,20 +356,28 @@ let compile_with_options env compiler ~native options
   List.iter Sys.remove files;
   Some (f test_program)
 
-let compile_obj env compiler ~native runtime test_program description f =
+let compile_obj env standard_library compiler ~native ?runtime
+                runtime_lib test_program description f =
   Printf.printf "  Compiling %s\n%!" description;
   write_test_program description;
   let test_program =
     Filename.concat (Unix.getcwd ()) (exe test_program) in
   let pid =
-    let args = [|
+    let args = [
       compiler; "-o"; "test_install_ocaml" ^ Config.ext_obj;
       "-I"; "+compiler-libs"; "-output-obj";
       (if native then "ocamlcommon.cmxa" else "ocamlcommon.cma");
       "test_install_script.ml"
-    |] in
+    ] in
+    let executable, args =
+      match runtime with
+      | Some runtime ->
+          runtime, runtime :: args
+      | None ->
+          compiler, args
+    in
     Unix.create_process_env
-      compiler args env Unix.stdin Unix.stdout Unix.stderr
+      executable (Array.of_list args) env Unix.stdin Unix.stdout Unix.stderr
   in
   let () =
     match Unix.waitpid [] pid with
@@ -299,7 +397,7 @@ let compile_obj env compiler ~native runtime test_program description f =
       \  caml_shutdown();\n\
       \  return 0;\n\
        }\n");
-  if Ccomp.compile_file "test_install_main.c" <> 0 then begin
+  if Ccomp.compile_file ~standard_library "test_install_main.c" <> 0 then begin
     print_endline "Unexpected C compiler error";
     exit 1
   end;
@@ -323,10 +421,11 @@ let compile_obj env compiler ~native runtime test_program description f =
   let flags =
     let libraries =
       if native then
-        Config.native_c_libraries ^ " " ^ Config.comprmarsh_c_libraries
+        Config.native_c_libraries ^ " -lcomprmarsh "
+          ^ Config.comprmarsh_c_libraries
       else
         Config.bytecomp_c_libraries in
-    runtime ^ " -lcomprmarsh " ^ libraries
+    runtime_lib ^ " " ^ libraries
   in
   if Ccomp.call_linker Ccomp.Exe test_program objects flags <> 0 then begin
     print_endline "Unexpected linker error";
@@ -335,11 +434,18 @@ let compile_obj env compiler ~native runtime test_program description f =
   List.iter Sys.remove files;
   Some (f test_program)
 
-let compiler_where env compiler =
+let compiler_where env ?runtime compiler =
   let from_compiler, stdout = Unix.pipe ~cloexec:true () in
+  let executable, args =
+    match runtime with
+    | Some runtime ->
+        runtime, [| runtime; compiler; "-where" |]
+    | None ->
+        compiler, [| compiler; "-where" |]
+  in
   let pid =
     Unix.create_process_env
-      compiler [| compiler; "-where" |]
+      executable args
       env Unix.stdin stdout Unix.stderr
   in
   let ic = Unix.in_channel_of_descr from_compiler in
@@ -353,118 +459,246 @@ let compiler_where env compiler =
     exit 1
   end
 
-let run_program env test_program =
+let run_program env ?runtime test_program ~arg =
   let pid =
-    Unix.create_process_env
-      test_program [| test_program |] env Unix.stdin Unix.stdout Unix.stderr
+    try
+      let pid =
+        Unix.create_process_env
+           test_program [| test_program; string_of_bool arg |]
+                       env Unix.stdin Unix.stdout Unix.stderr
+      in
+      match runtime with
+      | None -> pid
+      | Some runtime ->
+          (* We should get here if the program used the executable launcher, not
+             a shebang *)
+          let (_, result) = Unix.waitpid [] pid in
+          if not Sys.win32 && result <> Unix.WEXITED 2 then begin
+            Printf.eprintf "%s did not terminate as expected (launcher %a)\n"
+                           test_program print_process_status result;
+            exit 1
+          end;
+          raise (Unix.Unix_error(Unix.ENOENT, "create_process", ""))
+    with Unix.Unix_error(Unix.ENOENT, "create_process", _)
+         when runtime <> None ->
+      let runtime = Option.get runtime in
+      Unix.create_process_env
+         runtime [| runtime; test_program; string_of_bool arg |]
+                     env Unix.stdin Unix.stdout Unix.stderr
   in
   let (_, result) = Unix.waitpid [] pid in
   if result <> Unix.WEXITED 0 then begin
-    Printf.eprintf "%s did not terminate as expected\n" test_program;
+    Printf.eprintf "%s did not terminate as expected (%a)\n"
+                   test_program print_process_status result;
     exit 1
   end
 
-let compile_with_options ?(unix_only=false) ?(supports_shared=true) env
-                         compiler ~native options test_program description =
-  if unix_only && Sys.win32 || not supports_shared then
+(* XXX Code dup between these two paths *)
+let compile_with_options ?(unix_only=false)
+                         ?(supports_shared=true) ?(tendered=false) ~full env
+                         compiler ?(native_compiler=true) ~native ?runtime
+                         options test_program description =
+  if unix_only && Sys.win32 || not supports_shared
+  || native && not native_compiler then
     None
   else
-    let cont test_program () =
-      run_program env test_program;
-      Some test_program
+    let cont test_program ?runtime env ~arg =
+      let runtime = if tendered then runtime else None in
+      run_program env ?runtime test_program ~arg;
+      if full then
+        Some (fun ?runtime env ~arg ->
+          let runtime = if tendered then runtime else None in
+          run_program env ?runtime test_program ~arg;
+          Sys.remove test_program;
+          None)
+      else
+        (Sys.remove test_program; None)
     in
     compile_with_options
-      env compiler ~native options test_program description cont
+      env compiler ~native ?runtime options test_program description cont
 
-let compile_obj ?(unix_only=false) ?(supports_shared=true) env
-                compiler ~native runtime test_program description =
-  if unix_only && Sys.win32 || not supports_shared then
+let compile_obj ?(unix_only=false)
+                ?(supports_shared=true) ~full env standard_library
+                compiler ?(native_compiler=true) ~native ?runtime runtime_lib
+                test_program description =
+  if unix_only && Sys.win32 || not supports_shared
+  || native && not native_compiler then
     None
   else
-    let cont test_program () =
-      run_program env test_program;
-      Some test_program
+    let cont test_program ?runtime env ~arg =
+      run_program env test_program ~arg;
+      if full then
+        Some (fun ?runtime env ~arg -> run_program env test_program ~arg;
+        Sys.remove test_program;
+        None)
+      else
+        (Sys.remove test_program; None)
     in
-    compile_obj env compiler ~native runtime test_program description cont
+    compile_obj env standard_library compiler ~native ?runtime
+                runtime_lib test_program description cont
 
 (* This test verifies both that all compilation mechanisms are working and that
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
-let test_standard_library_location env bindir libdir supports_shared
-                                   ocamlc ocamlopt =
+let test_standard_library_location ~full env bindir libdir supports_shared
+                                   native_compiler ocamlc ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
-  let ocamlc_where = compiler_where env ocamlc in
-  let ocamlopt_where = compiler_where env ocamlopt in
+  let runtime =
+    if native_compiler || Sys.win32 then
+      None
+    else
+      Some (exe (Filename.concat bindir "ocamlrun"))
+  in
+  let ocamlc_where = compiler_where env ?runtime ocamlc in
+  let ocamlopt_where =
+    if native_compiler then
+      compiler_where env ocamlopt
+    else
+      "n/a"
+  in
   Printf.printf "  ocamlc -where: %s\n  ocamlopt -where: %s\n%!"
                 ocamlc_where ocamlopt_where;
   let unix_only = true in
+  let tendered = true in
   let programs = List.filter_map Fun.id [
-    compile_with_options env ocamlc ~native:false
+    (* XXX Shouldn't this more be that the test is expected to fail?? *)
+    compile_with_options ~tendered ~full env ocamlc ?runtime ~native:false
       [] "test_bytecode"
       "Bytecode (with tender)";
-    compile_with_options env ocamlc ~native:false
+    compile_with_options ~full env ocamlc ?runtime ~native:false
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
-    compile_with_options ~unix_only ~supports_shared env ocamlc ~native:false
+    compile_with_options
+      ~unix_only ~supports_shared ~full env ocamlc ?runtime ~native:false
       ["-custom"; "-runtime-variant"; "_shared"] "test_custom_shared"
       "Bytecode (-custom shared runtime)";
-    compile_obj env ocamlc ~native:false
+    compile_obj ~full env libdir ocamlc ?runtime ~native:false
       "-lcamlrun" "test_output_obj_static"
       "Bytecode (-output-obj static runtime)";
-    compile_obj ~unix_only ~supports_shared env ocamlc ~native:false
+    compile_obj
+      ~unix_only ~supports_shared ~full env libdir ocamlc ?runtime ~native:false
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
-    compile_with_options env ocamlc ~native:false
+    compile_with_options ~full env ocamlc ?runtime ~native:false
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
-    compile_with_options ~unix_only ~supports_shared env ocamlc ~native:false
+    compile_with_options
+      ~unix_only ~supports_shared ~full env ocamlc ?runtime ~native:false
       ["-output-complete-exe"; "-runtime-variant"; "_shared"]
       "test_output_complete_exe_shared"
       "Bytecode (-output-complete-exe shared runtime)";
-    compile_with_options env ocamlopt ~native:true
+    compile_with_options ~full env ocamlopt ~native_compiler ~native:true
       [] "test_native_static"
       "Native (static runtime)";
-    compile_obj env ocamlopt ~native:true
+    compile_obj ~full env libdir ocamlopt ~native_compiler ~native:true
       "-lasmrun" "test_native_output_obj_static"
       "Native (-output-obj static runtime)";
-    compile_obj ~unix_only ~supports_shared env ocamlopt ~native:true
+    compile_obj
+      ~unix_only ~supports_shared ~full env libdir ocamlopt ~native_compiler
+      ~native:true
       "-lasmrun_shared" "test_native_output_obj_shared"
       "Native (-output-obj shared runtime)";
   ] in
+  let runtime =
+    if full then
+      None
+    else
+      Some (exe (Filename.concat bindir "ocamlrun"))
+  in
   Printf.printf "Running programs\n%!";
-  List.filter_map (fun f -> f ()) programs
+  List.filter_map (fun f -> f ?runtime env ~arg:true) programs
 
-let run_tests env bindir libdir supports_shared test_ocamlnat libraries =
+(* XXX ~full is more the phase - have we renamed the root, etc. *)
+let run_tests ~full env bindir libdir supports_shared test_ocamlnat
+              native_compiler libraries =
   let libraries = sort_libraries libraries in
   let ocaml = exe (Filename.concat bindir "ocaml") in
   let ocamlnat = exe (Filename.concat bindir "ocamlnat") in
   let ocamlc = exe (Filename.concat bindir "ocamlc") in
   let ocamlopt = exe (Filename.concat bindir "ocamlopt") in
-  if supports_shared then
-    load_libraries_in_toplevel env ocaml "cma" libraries;
+  let runtime =
+    if full then None else Some (exe (Filename.concat bindir "ocamlrun")) in
+  if supports_shared then begin
+    load_libraries_in_toplevel env ?runtime ocaml "cma" libraries end;
   if test_ocamlnat then
     load_libraries_in_toplevel env ocamlnat "cmxs" libraries;
   if supports_shared then
-    load_libraries_in_prog env libdir ocamlc ~native:false libraries;
-  if supports_shared then
-    load_libraries_in_prog env libdir ocamlopt ~native:true libraries;
-  test_bytecode_binaries env bindir;
-  test_standard_library_location env bindir libdir supports_shared
-                                 ocamlc ocamlopt
+    load_libraries_in_prog env ?runtime libdir ocamlc native_compiler
+       ~native:false libraries;
+  if native_compiler && supports_shared then
+    load_libraries_in_prog env libdir ocamlopt native_compiler ~native:true
+      libraries;
+  (*if full then*)
+    test_bytecode_binaries ~full env bindir;
+  test_standard_library_location
+    ~full env bindir libdir supports_shared native_compiler ocamlc ocamlopt
+
+let rec split_dir acc dir =
+  let dirname = Filename.dirname dir in
+  if dirname = dir then
+    dir::acc
+  else
+    split_dir (Filename.basename dir :: acc) dirname
+
+let join_dir = function
+| dir::dirs -> List.fold_left Filename.concat dir dirs
+| [] -> assert false
+
+let rec split_to_prefix prefix bindir libdir =
+  match bindir, libdir with
+  | (dir1::bindir'), (dir2::libdir') ->
+      if dir1 = dir2 then
+        split_to_prefix (dir1::prefix) bindir' libdir'
+      else
+        join_dir (List.rev prefix), join_dir bindir, join_dir libdir
+  | [], _
+  | _, [] ->
+      assert false
 
 let () =
   Compmisc.init_path ();
-  if Array.length Sys.argv < 3 then begin
-    Printf.eprintf "Usage: test_install <bindir> <libdir> [<library1> ...]\n";
+  if Array.length Sys.argv < 4 then begin
+    Printf.eprintf
+      "Usage: test_install <bindir> <libdir> <yes|no> [<library1> ...]\n";
     exit 2
   end else
     let libraries =
-      Array.to_list (Array.sub Sys.argv 5 (Array.length Sys.argv - 5)) in
+      Array.to_list (Array.sub Sys.argv 6 (Array.length Sys.argv - 6)) in
     let bindir = Sys.argv.(1) in
     let libdir = Sys.argv.(2) in
     let supports_shared = bool_of_string Sys.argv.(3) in
     let test_ocamlnat = bool_of_string Sys.argv.(4) in
+    let native_compiler = bool_of_string Sys.argv.(5) in
     let env = make_env bindir libdir in
     let programs =
-      run_tests env bindir libdir supports_shared test_ocamlnat libraries in
-    List.iter Sys.remove programs
+      run_tests
+        ~full:true env bindir libdir supports_shared test_ocamlnat
+          native_compiler libraries in
+    let prefix, bindir_suffix, libdir_suffix =
+      split_to_prefix [] (split_dir [] bindir) (split_dir [] libdir) in
+    let new_prefix = prefix ^ ".new" in
+    let bindir = Filename.concat new_prefix bindir_suffix in
+    let libdir = Filename.concat new_prefix libdir_suffix in
+    Printf.printf "\nRenaming %s to %s\n\n%!" prefix new_prefix;
+    Sys.rename prefix new_prefix;
+    at_exit (fun () ->
+      flush stderr;
+      flush stdout;
+      Printf.printf "\nRestoring %s to %s\n" new_prefix prefix;
+      Sys.rename new_prefix prefix);
+    Printf.printf "Re-running test programs\n%!";
+    (* On re-running the test programs, the Standard Library should _not_
+       exist (because the programs were not compiled relocatably) *)
+    let env = make_env bindir libdir in
+    let runtime = Some (exe (Filename.concat bindir "ocamlrun")) in
+    List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
+    (*List.iter Sys.remove programs;*)
+    let env =
+      make_env ~caml_ld_library_path:true ~ocamllib:true bindir libdir in
+    Compmisc.init_path ~standard_library:libdir ();
+    let programs =
+      run_tests
+        ~full:false env bindir libdir supports_shared test_ocamlnat
+          native_compiler libraries
+    in
+    assert (programs = [])

@@ -945,15 +945,22 @@ SCRUB_ENV = \
   CAML_LD_LIBRARY_PATH OCAMLLIB CAMLLIB OCAMLPARAM OCAMLRUNPARAM CAMLRUNPARAM
 
 # The program must always be compiled
-.PHONY: tools/test_install.opt$(EXE)
-tools/test_install.opt$(EXE):
+.PHONY: tools/test_install$(EXE)
+tools/test_install$(EXE):
+ifeq "$(NATIVE_COMPILER)" "true"
 	cd tools ; env $(addprefix -u , $(SCRUB_ENV)) PATH="$(BINDIR):$$PATH" \
     "$(BINDIR)/ocamlopt$(EXE)" \
       -I +compiler-libs -I +unix ocamlcommon.cmxa unix.cmxa \
-      -o test_install.opt$(EXE) test_install.mli test_install.ml
+      -o test_install$(EXE) test_install.mli test_install.ml
+else
+	cd tools ; env $(addprefix -u , $(SCRUB_ENV)) PATH="$(BINDIR):$$PATH" \
+    "$(BINDIR)/ocamlc$(EXE)" \
+      -I +compiler-libs -I +unix ocamlcommon.cma unix.cma \
+      -custom -o test_install$(EXE) test_install.mli test_install.ml
+endif
 
-test-installation: tools/test_install.opt$(EXE)
-	@$^ "$(BINDIR)" "$(LIBDIR)" "$(SUPPORTS_SHARED_LIBRARIES)" "$(INSTALL_OCAMLNAT)" $(ALL_OTHERLIBS)
+test-installation: tools/test_install$(EXE)
+	@$^ "$(BINDIR)" "$(LIBDIR)" "$(SUPPORTS_SHARED_LIBRARIES)" "$(INSTALL_OCAMLNAT)" "$(NATIVE_COMPILER)" $(ALL_OTHERLIBS)
 else
 test-installation:
 	$(error The test-installation target must be invoked as \
@@ -961,7 +968,7 @@ test-installation:
 endif
 
 clean::
-	rm -f tools/test_install.opt tools/test_install.opt.exe
+	rm -f tools/test_install tools/test_install.exe
 
 # Build the manual latex files from the etex source files
 # (see manual/README.md)
