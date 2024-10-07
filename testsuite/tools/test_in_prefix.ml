@@ -1662,7 +1662,7 @@ let () =
   in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
   let env =
-    Environment.make ~caml_ld_library_path:true ~ocamllib:true bindir libdir
+    Environment.make ~ocamllib:true bindir libdir
   in
   Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests ~original:false env bindir libdir config.libraries in
