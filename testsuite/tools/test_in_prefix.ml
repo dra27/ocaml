@@ -341,8 +341,7 @@ let print_process_status () = function
 module Environment : sig
   type t
 
-  val make :
-    ?caml_ld_library_path:bool -> ?ocamllib:bool -> string -> string -> t
+  val make : ?ocamllib:bool -> string -> string -> t
 
   val run_process :
     'a output
@@ -357,7 +356,6 @@ end = struct
     serial: int;
     bindir: string;
     libdir: string;
-    set_CAML_LD_LIBRARY_PATH: bool;
     set_OCAMLLIB: bool;
   }
 
@@ -401,7 +399,7 @@ end = struct
      LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH on Unix or
      DYLD_LIBRARY_PATH=$libdir$:DYLD_LIBRARY_PATH on macOS or
      PATH=$bindir;$libdir;$PATH on Windows. *)
-  let make ?(caml_ld_library_path=false) ?(ocamllib=false) bindir libdir =
+  let make ?(ocamllib=false) bindir libdir =
     let keep binding =
       let equals = String.index binding '=' in
       let name = String.sub binding 0 equals in
@@ -439,22 +437,14 @@ end = struct
       end else
         bindings
     in
-    let bindings =
-      if caml_ld_library_path then begin
-        assert (not relocatable);
-        ("CAML_LD_LIBRARY_PATH=" ^ Filename.concat libdir "stublibs")::bindings
-      end else
-        bindings
-    in
     let env = Array.of_list bindings in
     try {env; serial = Hashtbl.find environments env; bindir; libdir;
-         set_CAML_LD_LIBRARY_PATH = caml_ld_library_path;
          set_OCAMLLIB = ocamllib}
     with Not_found ->
       let serial = Hashtbl.length environments + 1 in
       Hashtbl.add environments env serial;
       {env; serial; bindir; libdir;
-       set_CAML_LD_LIBRARY_PATH = caml_ld_library_path; set_OCAMLLIB = ocamllib}
+       set_OCAMLLIB = ocamllib}
 
   let null = Unix.openfile Filename.null [Unix.O_WRONLY] 0o200
 
@@ -520,11 +510,6 @@ end = struct
 @{<inline_code>> @}  @{<hint>LD_LIBRARY_PATH@}=%a:$LD_LIBRARY_PATH\n"
                       display_path environment.bindir
                       display_path environment.libdir;
-        if environment.set_CAML_LD_LIBRARY_PATH then
-          Format.printf "\
-@{<inline_code>> @}  @{<warning>CAML_LD_LIBRARY_PATH@}=\
-  %a/stublibs:$CAML_LD_LIBRARY_PATH\n"
-            display_path libdir;
         if environment.set_OCAMLLIB then
           Format.printf "\
 @{<inline_code>> @}  @{<warning>OCAMLLIB@}=%a:$OCAMLLIB\n" display_path libdir
@@ -1068,9 +1053,7 @@ let () =
   let env = Environment.make bindir libdir in
   let runtime = Some (Filename.concat bindir (exe "ocamlrun")) in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
-  let env =
-    Environment.make ~caml_ld_library_path:true ~ocamllib:true bindir libdir
-  in
+  let env = Environment.make ~ocamllib:true bindir libdir in
   Compmisc.reinit_path ~standard_library:libdir ();
   let programs = run_tests ~original:false env bindir libdir config.libraries in
   assert (programs = [])
