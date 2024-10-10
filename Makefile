@@ -959,8 +959,16 @@ else
       -custom -o test_install$(EXE) test_install.mli test_install.ml
 endif
 
+# Generates --without-$(1) if $(2) = false or --with-$(1) otherwise
+bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
+
 test-installation: tools/test_install$(EXE) tools/test_install_main.$(O)
-	@$< "$(BINDIR)" "$(LIBDIR)" "$(SUPPORTS_SHARED_LIBRARIES)" "$(INSTALL_OCAMLNAT)" "$(NATIVE_COMPILER)" $(ALL_OTHERLIBS)
+	@$< --bindir "$(BINDIR)" \
+      --libdir "$(LIBDIR)" \
+      $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
+      $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
+      $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
+      $(ALL_OTHERLIBS)
 else
 test-installation:
 	$(error The test-installation target must be invoked as \

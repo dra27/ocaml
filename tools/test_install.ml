@@ -12,6 +12,77 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type config = {
+  supports_shared_libraries: bool;
+  has_ocamlnat: bool;
+  has_ocamlopt: bool;
+  libraries: string list
+}
+
+let initial_bindir, initial_libdir, config =
+  (* Return the list of otherlibs in a dependency-compatible order *)
+  let sort_libraries libraries =
+    let compare l r =
+      if l = "unix" && r = "threads" then
+        -1
+      else if l = "threads" && r = "unix" then
+        1
+      else
+        String.compare l r
+    in
+    List.map (function "systhreads" -> "threads" | lib -> lib) libraries
+    |> List.sort compare in
+  let bindir = ref "" in
+  let libdir = ref "" in
+  let config =
+    ref {supports_shared_libraries = false;
+         has_ocamlnat = false; has_ocamlopt = false; libraries = []} in
+  let check_exists r dir =
+    if Sys.file_exists dir then
+      if Sys.is_directory dir then
+        r := dir
+      else
+        raise (Arg.Bad (dir ^ ": not a directory"))
+    else
+      raise (Arg.Bad (dir ^ ": directory not found")) in
+  let supports_shared_libraries supports_shared_libraries () =
+    config := {!config with supports_shared_libraries} in
+  let has_ocamlnat has_ocamlnat () =
+    config := {!config with has_ocamlnat} in
+  let has_ocamlopt has_ocamlopt () =
+    config := {!config with has_ocamlopt} in
+  let args = Arg.align [
+    "--bindir", Arg.String (check_exists bindir), "\
+<bindir>\tDirectory containing programs (must share a prefix with --libdir)";
+    "--libdir", Arg.String (check_exists libdir), "\
+<libdir>\tDirectory containing stdlib.cma (must share a prefix with --bindir)";
+    "--with-shared", Arg.Unit (supports_shared_libraries true), "\
+\tInstallation supports shared libraries (*.dll/*.so can be used from OCaml)";
+    "--without-shared", Arg.Unit (supports_shared_libraries false), "";
+    "--with-ocamlnat", Arg.Unit (has_ocamlnat true), "\
+\tNative toplevel (ocamlnat) is installed in the directory given in --bindir";
+    "--without-ocamlnat", Arg.Unit (has_ocamlnat false), "";
+    "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
+\tNative compiler (ocamlopt) is installed in the directory given in --bindir";
+    "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+  ] in
+  let libraries lib =
+    config := {!config with libraries = lib::config.contents.libraries} in
+  let usage = "\n\
+Usage: test_install --bindir <bindir> --libdir <libdir> <options> [libraries]\n\
+options are:" in
+  Arg.parse args libraries usage;
+  let config =
+    {!config with libraries = sort_libraries config.contents.libraries} in
+  let {contents = bindir} = bindir in
+  let {contents = libdir} = libdir in
+  if bindir = "" || libdir = "" then
+    let () = Arg.usage args usage in
+    exit 2
+  else
+    bindir, libdir, config
+
+
 module StringSet = Set.Make(String)
 
 let exe =
@@ -88,19 +159,6 @@ let make_env ?(caml_ld_library_path=false) ?(ocamllib=false) bindir libdir =
   in
   Array.of_list bindings
 
-(* Return the list of otherlibs in a dependency-compatible order *)
-let sort_libraries libraries =
-  let compare l r =
-    if l = "unix" && r = "threads" then
-      -1
-    else if l = "threads" && r = "unix" then
-      1
-    else
-      String.compare l r
-  in
-  List.map (function "systhreads" -> "threads" | lib -> lib) libraries
-  |> List.sort compare
-
 (* This test verifies that a series of libraries can be loaded in a toplevel.
    Any failures cause the script to be aborted. *)
 let load_libraries_in_toplevel env ?runtime toplevel ext libraries =
@@ -141,8 +199,7 @@ let load_libraries_in_toplevel env ?runtime toplevel ext libraries =
 
 (* This test verifies that a series of libraries can be loaded via Dynlink.
    Any failures will cause either an exception or a compilation error. *)
-let load_libraries_in_prog env ?runtime libdir compiler native_compiler ~native
-                           libraries =
+let load_libraries_in_prog env ?runtime libdir compiler ~native libraries =
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     let emit_library library =
       if library <> "dynlink" (*&& (not native || library <> "threads")*) then
@@ -169,7 +226,7 @@ let load_libraries_in_prog env ?runtime libdir compiler native_compiler ~native
     let dynlink = if native then "dynlink.cmxa" else "dynlink.cma" in
     let executable, args =
       match runtime with
-      | Some runtime when not Sys.win32 && not native_compiler ->
+      | Some runtime when not Sys.win32 && not config.has_ocamlopt ->
           (* XXX All the dupl, etc. *)
           runtime, [| runtime; compiler; "-I"; "+dynlink"; dynlink; "-linkall";
                             "-o"; test_program; "test_install_script.ml" |]
@@ -499,11 +556,12 @@ let run_program env ?runtime test_program ~arg =
 
 (* XXX Code dup between these two paths *)
 let compile_with_options ?(unix_only=false)
-                         ?(supports_shared=true) ?(tendered=false) ~full env
-                         compiler ?(native_compiler=true) ~native ?runtime
+                         ?(needs_shared=false) ?(tendered=false) ~full env
+                         compiler ~native ?runtime
                          options test_program description =
-  if unix_only && Sys.win32 || not supports_shared
-  || native && not native_compiler then
+  if unix_only && Sys.win32
+  || needs_shared && not config.supports_shared_libraries
+  || native && not config.has_ocamlopt then
     None
   else
     let cont test_program ?runtime env ~arg =
@@ -522,11 +580,12 @@ let compile_with_options ?(unix_only=false)
       env compiler ~native ?runtime options test_program description cont
 
 let compile_obj ?(unix_only=false)
-                ?(supports_shared=true) ~full env standard_library
-                compiler ?(native_compiler=true) ~native ?runtime runtime_lib
+                ?(needs_shared=false) ~full env standard_library
+                compiler ~native ?runtime runtime_lib
                 test_program description =
-  if unix_only && Sys.win32 || not supports_shared
-  || native && not native_compiler then
+  if unix_only && Sys.win32
+  || needs_shared && not config.supports_shared_libraries
+  || native && not config.has_ocamlopt then
     None
   else
     let cont test_program ?runtime env ~arg =
@@ -544,18 +603,17 @@ let compile_obj ?(unix_only=false)
 (* This test verifies both that all compilation mechanisms are working and that
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
-let test_standard_library_location ~full env bindir libdir supports_shared
-                                   native_compiler ocamlc ocamlopt =
+let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
   Printf.printf "\nTesting compilation mechanisms for %s\n%!" bindir;
   let runtime =
-    if native_compiler || Sys.win32 then
+    if config.has_ocamlopt || Sys.win32 then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun"))
   in
   let ocamlc_where = compiler_where env ?runtime ocamlc in
   let ocamlopt_where =
-    if native_compiler then
+    if config.has_ocamlopt then
       compiler_where env ocamlopt
     else
       "n/a"
@@ -564,6 +622,7 @@ let test_standard_library_location ~full env bindir libdir supports_shared
                 ocamlc_where ocamlopt_where;
   let unix_only = true in
   let tendered = true in
+  let needs_shared = true in
   let programs = List.filter_map Fun.id [
     (* XXX Shouldn't this more be that the test is expected to fail?? *)
     compile_with_options ~tendered ~full env ocamlc ?runtime ~native:false
@@ -573,33 +632,32 @@ let test_standard_library_location ~full env bindir libdir supports_shared
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
     compile_with_options
-      ~unix_only ~supports_shared ~full env ocamlc ?runtime ~native:false
+      ~unix_only ~needs_shared ~full env ocamlc ?runtime ~native:false
       ["-custom"; "-runtime-variant"; "_shared"] "test_custom_shared"
       "Bytecode (-custom shared runtime)";
     compile_obj ~full env libdir ocamlc ?runtime ~native:false
       "-lcamlrun" "test_output_obj_static"
       "Bytecode (-output-obj static runtime)";
     compile_obj
-      ~unix_only ~supports_shared ~full env libdir ocamlc ?runtime ~native:false
+      ~unix_only ~needs_shared ~full env libdir ocamlc ?runtime ~native:false
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
     compile_with_options
-      ~unix_only ~supports_shared ~full env ocamlc ?runtime ~native:false
+      ~unix_only ~needs_shared ~full env ocamlc ?runtime ~native:false
       ["-output-complete-exe"; "-runtime-variant"; "_shared"]
       "test_output_complete_exe_shared"
       "Bytecode (-output-complete-exe shared runtime)";
-    compile_with_options ~full env ocamlopt ~native_compiler ~native:true
+    compile_with_options ~full env ocamlopt ~native:true
       [] "test_native_static"
       "Native (static runtime)";
-    compile_obj ~full env libdir ocamlopt ~native_compiler ~native:true
+    compile_obj ~full env libdir ocamlopt ~native:true
       "-lasmrun" "test_native_output_obj_static"
       "Native (-output-obj static runtime)";
     compile_obj
-      ~unix_only ~supports_shared ~full env libdir ocamlopt ~native_compiler
-      ~native:true
+      ~unix_only ~needs_shared ~full env libdir ocamlopt ~native:true
       "-lasmrun_shared" "test_native_output_obj_shared"
       "Native (-output-obj shared runtime)";
   ] in
@@ -613,29 +671,23 @@ let test_standard_library_location ~full env bindir libdir supports_shared
   List.filter_map (fun f -> f ?runtime env ~arg:true) programs
 
 (* XXX ~full is more the phase - have we renamed the root, etc. *)
-let run_tests ~full env bindir libdir supports_shared test_ocamlnat
-              native_compiler libraries =
-  let libraries = sort_libraries libraries in
+let run_tests ~full env bindir libdir libraries =
   let ocaml = exe (Filename.concat bindir "ocaml") in
   let ocamlnat = exe (Filename.concat bindir "ocamlnat") in
   let ocamlc = exe (Filename.concat bindir "ocamlc") in
   let ocamlopt = exe (Filename.concat bindir "ocamlopt") in
   let runtime =
     if full then None else Some (exe (Filename.concat bindir "ocamlrun")) in
-  if supports_shared then begin
-    load_libraries_in_toplevel env ?runtime ocaml "cma" libraries end;
-  if test_ocamlnat then
-    load_libraries_in_toplevel env ocamlnat "cmxs" libraries;
-  if supports_shared then
-    load_libraries_in_prog env ?runtime libdir ocamlc native_compiler
-       ~native:false libraries;
-  if native_compiler && supports_shared then
-    load_libraries_in_prog env libdir ocamlopt native_compiler ~native:true
-      libraries;
-  (*if full then*)
-    test_bytecode_binaries ~full env bindir;
-  test_standard_library_location
-    ~full env bindir libdir supports_shared native_compiler ocamlc ocamlopt
+  if config.supports_shared_libraries then begin
+    load_libraries_in_toplevel env ?runtime ocaml "cma" config.libraries end;
+  if config.has_ocamlnat then
+    load_libraries_in_toplevel env ocamlnat "cmxs" config.libraries;
+  if config.supports_shared_libraries then
+    load_libraries_in_prog env ?runtime libdir ocamlc ~native:false libraries;
+  if config.has_ocamlopt && config.supports_shared_libraries then
+    load_libraries_in_prog env libdir ocamlopt ~native:true libraries;
+  test_bytecode_binaries ~full env bindir;
+  test_standard_library_location ~full env bindir libdir ocamlc ocamlopt
 
 let rec split_dir acc dir =
   let dirname = Filename.dirname dir in
@@ -661,49 +713,29 @@ let rec split_to_prefix prefix bindir libdir =
 
 let () =
   Compmisc.init_path ();
-  if Array.length Sys.argv < 4 then begin
-    Printf.eprintf
-      "Usage: test_install <bindir> <libdir> <yes|no> [<library1> ...]\n";
-    exit 2
-  end else
-    let libraries =
-      Array.to_list (Array.sub Sys.argv 6 (Array.length Sys.argv - 6)) in
-    let bindir = Sys.argv.(1) in
-    let libdir = Sys.argv.(2) in
-    let supports_shared = bool_of_string Sys.argv.(3) in
-    let test_ocamlnat = bool_of_string Sys.argv.(4) in
-    let native_compiler = bool_of_string Sys.argv.(5) in
-    let env = make_env bindir libdir in
-    let programs =
-      run_tests
-        ~full:true env bindir libdir supports_shared test_ocamlnat
-          native_compiler libraries in
-    let prefix, bindir_suffix, libdir_suffix =
-      split_to_prefix [] (split_dir [] bindir) (split_dir [] libdir) in
-    let new_prefix = prefix ^ ".new" in
-    let bindir = Filename.concat new_prefix bindir_suffix in
-    let libdir = Filename.concat new_prefix libdir_suffix in
-    Printf.printf "\nRenaming %s to %s\n\n%!" prefix new_prefix;
-    Sys.rename prefix new_prefix;
-    at_exit (fun () ->
-      flush stderr;
-      flush stdout;
-      Printf.printf "\nRestoring %s to %s\n" new_prefix prefix;
-      Sys.rename new_prefix prefix);
-    Printf.printf "Re-running test programs\n%!";
-    (* On re-running the test programs, the Standard Library should _not_
-       exist (because the programs were not compiled relocatably) *)
-    let env = make_env bindir libdir in
-    let runtime = Some (exe (Filename.concat bindir "ocamlrun")) in
-    List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
-    (*List.iter Sys.remove programs;*)
-    let env =
-      make_env ~caml_ld_library_path:true ~ocamllib:true bindir libdir in
-    Compmisc.reinit_path ~standard_library:libdir ();
-    (*Load_path.add_dir ~hidden:false libdir;*)
-    let programs =
-      run_tests
-        ~full:false env bindir libdir supports_shared test_ocamlnat
-          native_compiler libraries
-    in
-    assert (programs = [])
+  let env = make_env initial_bindir initial_libdir in
+  let programs =
+    run_tests ~full:true env initial_bindir initial_libdir config.libraries in
+  let prefix, bindir_suffix, libdir_suffix =
+    let bindir = split_dir [] initial_bindir in
+    let libdir = split_dir [] initial_libdir in
+    split_to_prefix [] bindir libdir in
+  let new_prefix = prefix ^ ".new" in
+  let bindir = Filename.concat new_prefix bindir_suffix in
+  let libdir = Filename.concat new_prefix libdir_suffix in
+  Printf.printf "\nRenaming %s to %s\n\n%!" prefix new_prefix;
+  Sys.rename prefix new_prefix;
+  at_exit (fun () ->
+    flush stderr;
+    flush stdout;
+    Printf.printf "\nRestoring %s to %s\n" new_prefix prefix;
+    Sys.rename new_prefix prefix);
+  Printf.printf "Re-running test programs\n%!";
+  let env = make_env bindir libdir in
+  let runtime = Some (exe (Filename.concat bindir "ocamlrun")) in
+  List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
+  let env =
+    make_env ~caml_ld_library_path:true ~ocamllib:true bindir libdir in
+  Compmisc.reinit_path ~standard_library:libdir ();
+  let programs = run_tests ~full:false env bindir libdir config.libraries in
+  assert (programs = [])
