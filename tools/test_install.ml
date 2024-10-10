@@ -12,6 +12,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Parse command line. Result is the globally-immutable configuration and the
+   directories to use for bindir and libdir in both phases of the test. *)
 type config = {
   supports_shared_libraries: bool;
   has_ocamlnat: bool;
@@ -19,8 +21,9 @@ type config = {
   libraries: string list
 }
 
-let initial_bindir, initial_libdir, config =
-  (* Return the list of otherlibs in a dependency-compatible order *)
+let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
+  (* Map directory names for otherlibs to library names and sort them in a
+     dependency-compatible order. *)
   let sort_libraries libraries =
     let compare l r =
       if l = "unix" && r = "threads" then
@@ -40,7 +43,10 @@ let initial_bindir, initial_libdir, config =
   let check_exists r dir =
     if Sys.file_exists dir then
       if Sys.is_directory dir then
-        r := dir
+        if Filename.is_relative dir then
+          raise (Arg.Bad (dir ^ ": is not an absolute path"))
+        else
+          r := dir
       else
         raise (Arg.Bad (dir ^ ": not a directory"))
     else
@@ -71,6 +77,40 @@ let initial_bindir, initial_libdir, config =
   let usage = "\n\
 Usage: test_install --bindir <bindir> --libdir <libdir> <options> [libraries]\n\
 options are:" in
+  let error msg =
+    Printf.eprintf "%s: %s\n" Sys.executable_name msg;
+    Arg.usage args usage;
+    exit 2 in
+  let split_to_prefix bindir libdir =
+    let rec split_dir acc dir =
+      let dirname = Filename.dirname dir in
+      if dirname = dir then
+        dir::acc
+      else
+        split_dir (Filename.basename dir :: acc) dirname in
+    let rec loop prefix bindir libdir =
+      match bindir, libdir with
+      | (dir1::bindir), (dir2::libdir) ->
+          if dir1 = dir2 then
+            loop (dir1::prefix) bindir libdir
+          else begin
+            match List.rev prefix with
+            | [] | [_] ->
+              (* The prefix is either the root directory (/, C:\, etc.) or, on
+                 Windows, the two directories are actually on different drives
+               *)
+              error "\
+directories given for --bindir and --libdir do not have a common prefix";
+            | dir::dirs ->
+                List.fold_left Filename.concat dir dirs,
+                List.fold_left Filename.concat dir1 bindir,
+                List.fold_left Filename.concat dir2 libdir
+          end
+      | [], _ ->
+          error "directory given for --libdir inside that given for --bindir"
+      | _, [] ->
+          error "directory given for --bindir inside that given for --libdir" in
+    loop [] (split_dir [] bindir) (split_dir [] libdir) in
   Arg.parse args libraries usage;
   let config =
     {!config with libraries = sort_libraries config.contents.libraries} in
@@ -80,8 +120,8 @@ options are:" in
     let () = Arg.usage args usage in
     exit 2
   else
-    bindir, libdir, config
-
+    let prefix, bindir_suffix, libdir_suffix = split_to_prefix bindir libdir in
+    bindir, libdir, prefix, bindir_suffix, libdir_suffix, config
 
 module StringSet = Set.Make(String)
 
@@ -689,37 +729,11 @@ let run_tests ~full env bindir libdir libraries =
   test_bytecode_binaries ~full env bindir;
   test_standard_library_location ~full env bindir libdir ocamlc ocamlopt
 
-let rec split_dir acc dir =
-  let dirname = Filename.dirname dir in
-  if dirname = dir then
-    dir::acc
-  else
-    split_dir (Filename.basename dir :: acc) dirname
-
-let join_dir = function
-| dir::dirs -> List.fold_left Filename.concat dir dirs
-| [] -> assert false
-
-let rec split_to_prefix prefix bindir libdir =
-  match bindir, libdir with
-  | (dir1::bindir'), (dir2::libdir') ->
-      if dir1 = dir2 then
-        split_to_prefix (dir1::prefix) bindir' libdir'
-      else
-        join_dir (List.rev prefix), join_dir bindir, join_dir libdir
-  | [], _
-  | _, [] ->
-      assert false
-
 let () =
   Compmisc.init_path ();
-  let env = make_env initial_bindir initial_libdir in
+  let env = make_env bindir libdir in
   let programs =
-    run_tests ~full:true env initial_bindir initial_libdir config.libraries in
-  let prefix, bindir_suffix, libdir_suffix =
-    let bindir = split_dir [] initial_bindir in
-    let libdir = split_dir [] initial_libdir in
-    split_to_prefix [] bindir libdir in
+    run_tests ~full:true env bindir libdir config.libraries in
   let new_prefix = prefix ^ ".new" in
   let bindir = Filename.concat new_prefix bindir_suffix in
   let libdir = Filename.concat new_prefix libdir_suffix in
