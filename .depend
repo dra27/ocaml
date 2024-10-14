@@ -8220,6 +8220,7 @@ tools/sync_dynlink.cmx : \
 tools/sync_dynlink.cmi :
 tools/test_install.cmo : \
     otherlibs/unix/unix.cmi \
+    utils/misc.cmi \
     utils/config.cmi \
     driver/compmisc.cmi \
     utils/ccomp.cmi \
@@ -8227,6 +8228,7 @@ tools/test_install.cmo : \
     tools/test_install.cmi
 tools/test_install.cmx : \
     otherlibs/unix/unix.cmx \
+    utils/misc.cmx \
     utils/config.cmx \
     driver/compmisc.cmx \
     utils/ccomp.cmx \
