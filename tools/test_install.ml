@@ -137,7 +137,7 @@ directories given for --bindir and --libdir do not have a common prefix";
     if Sys.file_exists (prefix ^ ".new") then
       error "can't rename %s to %s.new as the latter already exists!"
       prefix prefix;
-    Misc.Style.setup None;
+    Misc.Style.setup (Some Always);
     let no_markup ansi = { Misc.Style.ansi; text_close = ""; text_open = "" } in
     Misc.Style.(set_styles {
       warning = no_markup [Bold; FG Yellow];
