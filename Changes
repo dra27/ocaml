@@ -14,6 +14,13 @@ Working version
 
 ### Runtime system:
 
+* #11449, #13497: Add caml_stat_strndup_{to,of}_os functions allowing conversion
+  of string data which may contain NUL characters. Correct implementation of
+  caml_stat_strdup_to_utf16 to raise Out_of_memory instead of returning of NULL
+  (the behaviour of caml_stat_strdup_to_os was inconsistent between
+  Unix/Windows).
+  (David Allsopp, review by Antonin Décimo)
+
 - #13352: Concurrency refactors and cleanups.
   (Antonin Décimo, review by Gabriel Scherer, David Allsopp, and Miod Vallat)
 
@@ -28,6 +35,10 @@ Working version
 ### Code generation and optimizations:
 
 ### Standard library:
+
+- #13???: Add Sys.interpreter containing the full path (if available) to the
+  currently executing runtime.
+  (David Allsopp, review by ???)
 
 ### Other libraries:
 
@@ -218,6 +229,12 @@ ___________
   runtime assertions.
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and David Allsopp)
 
+- #13???: Added --enable-relative which allows the runtime and the compilers to
+  locate the Standard Library relative to where the binaries themselves,
+  removing the absolute path previously embedded in
+  caml_standard_library_default.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 - #13014: Enable compile-time option -function-sections on all previously
@@ -240,6 +257,10 @@ ___________
   local opens
   (Vincent Laviron, review by Hugo Heuzard, Nathanaëlle Courant
    and Gabriel Scherer)
+
+- #13???: Add -set-global-string option to both compilers, allowing a C symbol
+  to be added to the binary with the given name and value.
+  (David Allsopp, review by ???)
 
 ### Standard library:
 
