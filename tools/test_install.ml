@@ -21,6 +21,10 @@ type config = {
     (* $(INSTALL_OCAMLNAT) - Makefile.build_config *)
   has_ocamlopt: bool;
     (* $(NATIVE_COMPILER) - Makefile.config *)
+  has_runtime_search: bool;
+    (* $(RUNTIME_SEARCH) - Makefile.build_config *)
+  has_runtime_search_target: bool;
+    (* $(RUNTIME_SEARCH_TARGET) - Makefile.build_config *)
   libraries: string list
     (* Sorted basenames of libraries to test.
         Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -50,7 +54,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
   let libdir = ref "" in
   let config =
     ref {supports_shared_libraries = false;
-         has_ocamlnat = false; has_ocamlopt = false; libraries = []} in
+         has_ocamlnat = false; has_ocamlopt = false; has_runtime_search = true;
+         has_runtime_search_target = true; libraries = []} in
   let check_exists r dir =
     if Sys.file_exists dir then
       if Sys.is_directory dir then
@@ -68,6 +73,10 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
     config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () =
     config := {!config with has_ocamlopt} in
+  let has_runtime_search has_runtime_search () =
+    config := {!config with has_runtime_search} in
+  let has_runtime_search_target has_runtime_search_target () =
+    config := {!config with has_runtime_search_target} in
   let args = Arg.align [
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
@@ -82,6 +91,14 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config =
     "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
 \tNative compiler (ocamlopt) is installed in the directory given in --bindir";
     "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+    "--with-runtime-search", Arg.Unit (has_runtime_search true), "\
+\tCompiler bytecode binaries can search for their runtimes";
+    "--without-runtime-search", Arg.Unit (has_runtime_search false), "";
+    "--with-runtime-search-target",
+      Arg.Unit (has_runtime_search_target true), "\
+\tBytecode binaries produced by the compiler can search for their runtimes";
+    "--without-runtime-search-target",
+      Arg.Unit (has_runtime_search_target false), "";
   ] in
   let libraries lib =
     config := {!config with libraries = lib::config.contents.libraries} in
@@ -552,7 +569,8 @@ let load_libraries_in_toplevel env ?runtime toplevel ext libraries =
 
 (* This test verifies that a series of libraries can be loaded via Dynlink.
    Any failures will cause either an exception or a compilation error. *)
-let load_libraries_in_prog env ?runtime libdir compiler ~native libraries =
+let load_libraries_in_prog env ?runtime ?target_runtime libdir compiler ~native
+                           libraries =
   Out_channel.with_open_text "test_install_script.ml" (fun oc ->
     let emit_library library =
       if library <> "dynlink" (*&& (not native || library <> "threads")*) then
@@ -582,12 +600,14 @@ let load_libraries_in_prog env ?runtime libdir compiler ~native libraries =
       "-o"; test_program; "test_install_script.ml"
     ] in
     let runtime =
-      if Sys.win32 || config.has_ocamlopt then
+      if config.has_ocamlopt then
         None
       else
         runtime in
     Environment.run_process Stdout ?runtime compiler args env in
-  let () = Environment.run_process Stdout ?runtime test_program [] env in
+  let () =
+    Environment.run_process Stdout
+                            ?runtime:target_runtime test_program [] env in
   let files = [
     test_program;
     "test_install_script.ml";
@@ -638,13 +658,13 @@ let test_bytecode_binaries ~full env bindir =
                        regardless *)
                     result <> 0
                 | `Launcher ->
-                    (* Second time around, the executable launchers should fail,
-                       except on Windows (since PATH is adjusted) *)
-                    not Sys.win32 && result <> 2
+                    (* Second time around, the executable launchers should
+                       fail *)
+                    not config.has_runtime_search && result <> 2
                 | `Shebang ->
                     (* Second time around, the shebangs should all be broken so
                        Unix_error should already have been raised! *)
-                    true
+                    not config.has_runtime_search
             in
             if incorrect_status then
               fail_because "%s did not terminate as expected (%a)"
@@ -652,7 +672,7 @@ let test_bytecode_binaries ~full env bindir =
             if result = 2 then
               print_endline "unable to run"
           with Unix.Unix_error(_, "create_process", _) as e ->
-            if full || Sys.win32 then
+            if full then
               raise e
             else
               print_endline "  Result: unable to run"
@@ -784,11 +804,11 @@ let compile_with_options ?(unix_only=false)
     None
   else
     let cont test_program ?runtime env ~arg =
-      let runtime = if tendered && not Sys.win32 then runtime else None in
+      let runtime = if tendered then runtime else None in
       run_program env ?runtime test_program ~arg;
       if full then
         Some (fun ?runtime env ~arg ->
-          let runtime = if tendered && not Sys.win32 then runtime else None in
+          let runtime = if tendered then runtime else None in
           run_program env ?runtime test_program ~arg;
           Sys.remove test_program;
           None)
@@ -826,7 +846,7 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 display_path bindir;
   let runtime =
-    if full || config.has_ocamlopt || Sys.win32 then
+    if full || config.has_runtime_search || config.has_ocamlopt then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun"))
@@ -843,12 +863,18 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
   let unix_only = true in
   let tendered = true in
   let needs_shared = true in
+  (* With an absolute header, in bytecode-only mode, flexlink is a bytecode
+     executable and cannot run in the second phase. *)
+  let disabled_for_bytecode_only_windows =
+    not full && Sys.win32
+    && not config.has_runtime_search && not config.has_ocamlopt in
   let programs = List.filter_map Fun.id [
     (* XXX Shouldn't this more be that the test is expected to fail?? *)
     compile_with_options ~tendered ~full env ocamlc ?runtime ~native:false
       [] "test_bytecode"
       "Bytecode (with tender)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
+      ~unix_only:disabled_for_bytecode_only_windows
       ["-custom"] "test_custom_static"
       "Bytecode (-custom static runtime)";
     compile_with_options
@@ -863,6 +889,7 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
       "-lcamlrun_shared" "test_output_obj_shared"
       "Bytecode (-output-obj shared runtime)";
     compile_with_options ~full env ocamlc ?runtime ~native:false
+      ~unix_only:disabled_for_bytecode_only_windows
       ["-output-complete-exe"] "test_output_complete_exe_static"
       "Bytecode (-output-complete-exe static runtime)";
     compile_with_options
@@ -882,7 +909,7 @@ let test_standard_library_location ~full env bindir libdir ocamlc ocamlopt =
       "Native (-output-obj shared runtime)";
   ] in
   let runtime =
-    if full then
+    if config.has_runtime_search_target || full then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun"))
@@ -897,7 +924,12 @@ let run_tests ~full env bindir libdir libraries =
   let ocamlc = exe (Filename.concat bindir "ocamlc") in
   let ocamlopt = exe (Filename.concat bindir "ocamlopt") in
   let runtime =
-    if full || Sys.win32 then
+    if full || config.has_runtime_search then
+      None
+    else
+      Some (exe (Filename.concat bindir "ocamlrun")) in
+  let target_runtime =
+    if full || config.has_runtime_search_target then
       None
     else
       Some (exe (Filename.concat bindir "ocamlrun")) in
@@ -906,7 +938,8 @@ let run_tests ~full env bindir libdir libraries =
   if config.has_ocamlnat then
     load_libraries_in_toplevel env ocamlnat "cmxs" config.libraries;
   if config.supports_shared_libraries then
-    load_libraries_in_prog env ?runtime libdir ocamlc ~native:false libraries;
+    load_libraries_in_prog env ?runtime ?target_runtime libdir ocamlc
+                           ~native:false libraries;
   if config.has_ocamlopt && config.supports_shared_libraries then
     load_libraries_in_prog env libdir ocamlopt ~native:true libraries;
   test_bytecode_binaries ~full env bindir;
@@ -931,7 +964,11 @@ let () =
     Sys.rename new_prefix prefix);
   Printf.printf "Re-running test programs\n%!";
   let env = Environment.make bindir libdir in
-  let runtime = Some (exe (Filename.concat bindir "ocamlrun")) in
+  let runtime =
+    if config.has_runtime_search_target then
+      None
+    else
+      Some (exe (Filename.concat bindir "ocamlrun")) in
   List.iter (fun f -> assert (f ?runtime env ~arg:false = None)) programs;
   let env =
     Environment.make ~caml_ld_library_path:true ~ocamllib:true bindir libdir in
