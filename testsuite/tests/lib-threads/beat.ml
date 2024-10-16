@@ -1,34 +1,51 @@
 (* TEST
+ include systhreads;
+ hassysthreads;
+ readonly_files = "timed_delay.c";
+ script = "sh ${test_source_directory}/has-nanosleep.sh";
+ script;
  {
-   include systhreads;
-   hassysthreads;
+   setup-ocamlc.byte-build-env;
+   all_modules = "timed_delay.c beat.ml";
+   ocamlc.byte;
+   output = "${test_build_directory}/program-output";
+   stdout = "${output}";
+   run;
+   check-program-output;
  }{
-   reason = "off-by-one error on MacOS+Clang (https://github.com/ocaml-multicore/ocaml-multicore/issues/408)";
-   skip;
-   {
-     bytecode;
-   }{
-     native;
-   }
+   setup-ocamlopt.byte-build-env;
+   all_modules = "timed_delay.c beat.ml";
+   ocamlopt.byte;
+   output = "${test_build_directory}/program-output";
+   stdout = "${output}";
+   run;
+   check-program-output;
  }
 *)
 
 (* Test Thread.delay and its scheduling *)
 
+external timed_delay : float -> float = "caml_thread_timed_delay"
+
 open Printf
 
 let tick (delay, count) =
   while true do
-    Thread.delay delay;
-    incr count
+    count := !count +. timed_delay delay;
   done
 
+let within reading expected tick tolerance =
+  let delta = tick *. (1.0 +. tolerance) in
+  reading >= expected -. delta && reading <= expected +. delta
+
 let _ =
-  let c1 = ref 0 and c2 = ref 0 in
-  ignore (Thread.create tick (0.333333333, c1));
-  ignore (Thread.create tick (0.5, c2));
-  Thread.delay 3.0;
-  let n1 = !c1 and n2 = !c2 in
-  if n1 >= 8 && n1 <= 10 && n2 >= 5 && n2 <= 7
+  let c1 = ref 0.0 and c2 = ref 0.0 in
+  let tick1 = 0.333333333 and tick2 = 0.5 in
+  ignore (Thread.create tick (tick1, c1));
+  ignore (Thread.create tick (tick2, c2));
+  let d = timed_delay 3.0 in
+  let d1 = !c1 and d2 = !c2 in
+  let tolerance = 0.5 in
+  if within d1 d tick1 tolerance && within d2 d tick2 tolerance
   then printf "passed\n"
-  else printf "FAILED (n1 = %d, n2 = %d)\n" n1 n2
+  else printf "FAILED (d = %f, d1 = %f, d2 = %f)\n" d d1 d2
