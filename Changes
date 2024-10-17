@@ -282,6 +282,12 @@ Working version
 - #14198 Constraints on module unpacking are not ghost
   (Thomas Refis, review by Nicolás Ojeda Bär)
 
+- #14???: `-l` libraries are no longer given to the partial linker (for
+  `-output-complete-obj`) if `ocamlc`/`ocamlopt` cannot resolve them in the
+  current search path. Allows system libraries (e.g. `-lzstd`) to be specified
+  in .cma or .cmxa files without breaking `-output-complete-obj`.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #13810: Support build of cross compilers to native freestanding targets
