@@ -10578,6 +10578,25 @@ testsuite/tools/parsecmmaux.cmi : \
     parsing/location.cmi \
     lambda/debuginfo.cmi \
     middle_end/backend_var.cmi
+testsuite/tools/test_in_prefix.cmo : \
+    otherlibs/unix/unix.cmi \
+    utils/misc.cmi \
+    utils/config.cmi \
+    driver/compmisc.cmi \
+    file_formats/cmx_format.cmi \
+    utils/ccomp.cmi \
+    bytecomp/bytesections.cmi \
+    testsuite/tools/test_in_prefix.cmi
+testsuite/tools/test_in_prefix.cmx : \
+    otherlibs/unix/unix.cmx \
+    utils/misc.cmx \
+    utils/config.cmx \
+    driver/compmisc.cmx \
+    file_formats/cmx_format.cmi \
+    utils/ccomp.cmx \
+    bytecomp/bytesections.cmx \
+    testsuite/tools/test_in_prefix.cmi
+testsuite/tools/test_in_prefix.cmi :
 otherlibs/dynlink/byte/dynlink.cmo : \
     otherlibs/dynlink/dynlink_types.cmi \
     otherlibs/dynlink/byte/dynlink_symtable.cmi \
