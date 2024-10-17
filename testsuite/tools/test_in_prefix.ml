@@ -865,14 +865,11 @@ let compile_test ~original env bindir =
       | Output_complete_obj(C_ocamlc, Shared) ->
           true, false, ["-output-complete-obj"], true, None
       | Output_complete_obj(C_ocamlopt, Static) ->
-          (* At the moment, the partial linker will pass -lzstd to ld -r which
-             will (normally) fail). Until this is done, pass the libraries
-             manually. *)
-          false, true, ["-output-complete-obj"; "-noautolink"], true,
-          Some ocamlcommon_native_c_libraries
+          false, true, ["-output-complete-obj"], true,
+          Some Config.comprmarsh_c_libraries
       | Output_complete_obj(C_ocamlopt, Shared) ->
-          true, true, ["-output-complete-obj"; "-noautolink"], true,
-          Some ocamlcommon_native_c_libraries
+          true, true, ["-output-complete-obj"], true,
+          Some Config.comprmarsh_c_libraries
       | Output_complete_exe Static ->
           false, false, ["-output-complete-exe"], false, None
       | Output_complete_exe Shared ->
