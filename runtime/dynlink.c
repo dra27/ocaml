@@ -40,6 +40,7 @@
 #include "caml/signals.h"
 #include "caml/intext.h"
 #include "caml/startup.h"
+#include "caml/sys.h"
 
 #include "build_config.h"
 
@@ -88,7 +89,7 @@ CAMLexport const char_os * caml_get_stdlib_location(void)
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
   if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
+  if (stdlib == NULL) stdlib = caml_standard_library;
   return stdlib;
 }
 
@@ -121,7 +122,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
       ("error while reading loader config file %s",
        caml_stat_strdup_of_os(ldconfname));
   config[nread] = 0;
-  wconfig = caml_stat_strdup_to_os(config);
+  wconfig = caml_stat_strdup_noexc_to_os(config);
   caml_stat_free(config);
   q = wconfig;
   for (p = wconfig; *p != 0; p++) {

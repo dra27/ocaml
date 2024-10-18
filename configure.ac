@@ -83,6 +83,8 @@ ocamltest_libunix=None
 ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
+bindir_to_libdir=''
+relative_libdir=false
 
 # Information about the package
 
@@ -257,6 +259,8 @@ AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
+AC_SUBST([bindir_to_libdir])
+AC_SUBST([relative_libdir])
 
 ## Generated files
 
@@ -564,6 +568,10 @@ AC_ARG_ENABLE([function-sections],
 AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
+
+AC_ARG_ENABLE([relative],
+  [AS_HELP_STRING([--enable-relative],
+    [try to locate the standard library using relative paths])])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
@@ -1165,6 +1173,7 @@ AS_CASE([$host],
   [AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD], [1])])])
 
 AC_CHECK_HEADER([math.h])
+AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
 AC_CHECK_HEADER([pthread_np.h],[AC_DEFINE([HAS_PTHREAD_NP_H], [1])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT], [1])], [],
   [#include <sys/types.h>])
@@ -2649,6 +2658,13 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
+
+AS_IF([test x"$enable_relative" = "xyes"],[
+  relative_libdir=true
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
+  dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
+  dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
+])
 
 # Define default prefix correctly for the different Windows ports
 AS_IF([test x"$prefix" = "xNONE"],
