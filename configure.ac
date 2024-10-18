@@ -1400,14 +1400,6 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
     [aarch64-*-netbsd*], [natdynlink=true],
     [riscv*-*-linux*], [natdynlink=true])])
 
-AS_CASE([$enable_native_toplevel,$natdynlink],
-  [yes,false],
-    [AC_MSG_ERROR(m4_normalize([
-      The native toplevel requires native dynlink support]))],
-  [yes,*],
-    [install_ocamlnat=true],
-  [install_ocamlnat=false])
-
 # Try to work around the Skylake/Kaby Lake processor bug.
 AS_CASE(["$ocaml_cc_vendor,$host"],
   [*gcc*,x86_64-*|*gcc*,i686-*],
@@ -1566,6 +1558,14 @@ AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
 AS_IF([$natdynlink],
   [natdynlink_archive="dynlink.cmxa"],
   [natdynlink_archive=""])
+
+AS_CASE([$enable_native_toplevel,$natdynlink],
+  [yes,false],
+    [AC_MSG_ERROR(m4_normalize([
+      The native toplevel requires native dynlink support]))],
+  [yes,*],
+    [install_ocamlnat=true],
+  [install_ocamlnat=false])
 
 AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
 
@@ -2500,6 +2500,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt
     ocamltest='ocamltest'
+    AS_IF([$native_compiler],
+      [optional_native_tools="$optional_native_tools \
+testsuite/tools/test_in_prefix.opt"],
+      [optional_bytecode_tools="$optional_bytecode_tools \
+testsuite/tools/test_in_prefix"])
     testsuite_tools='testsuite/tools/codegen testsuite/tools/expect'
     optional_bytecode_tools="$optional_bytecode_tools $testsuite_tools"],
   [build_ocamltest=false
