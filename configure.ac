@@ -260,6 +260,7 @@ AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
+AC_SUBST([zinc_runtime_id])
 
 ## Generated files
 
@@ -2723,6 +2724,7 @@ quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
 
 bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}QUINTET0"
 native_runtime_id="${quintet3_native}${quintet2}${quintet1}QUINTET0"
+zinc_runtime_id="00${quintet1}QUINTET0"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
