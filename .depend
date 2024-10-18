@@ -2379,6 +2379,7 @@ bytecomp/bytelink.cmo : \
     utils/consistbl.cmi \
     utils/config.cmi \
     utils/compression.cmi \
+    driver/compenv.cmi \
     file_formats/cmo_format.cmi \
     utils/clflags.cmi \
     utils/ccomp.cmi \
@@ -2398,6 +2399,7 @@ bytecomp/bytelink.cmx : \
     utils/consistbl.cmx \
     utils/config.cmx \
     utils/compression.cmx \
+    driver/compenv.cmx \
     file_formats/cmo_format.cmi \
     utils/clflags.cmx \
     utils/ccomp.cmx \
@@ -2793,6 +2795,7 @@ asmcomp/asmlink.cmo : \
     utils/consistbl.cmi \
     utils/config.cmi \
     middle_end/compilenv.cmi \
+    driver/compenv.cmi \
     file_formats/cmx_format.cmi \
     asmcomp/cmm_helpers.cmi \
     asmcomp/cmm.cmi \
@@ -2814,6 +2817,7 @@ asmcomp/asmlink.cmx : \
     utils/consistbl.cmx \
     utils/config.cmx \
     middle_end/compilenv.cmx \
+    driver/compenv.cmx \
     file_formats/cmx_format.cmi \
     asmcomp/cmm_helpers.cmx \
     asmcomp/cmm.cmx \
@@ -10578,6 +10582,25 @@ testsuite/tools/parsecmmaux.cmi : \
     parsing/location.cmi \
     lambda/debuginfo.cmi \
     middle_end/backend_var.cmi
+testsuite/tools/test_in_prefix.cmo : \
+    otherlibs/unix/unix.cmi \
+    utils/misc.cmi \
+    utils/config.cmi \
+    driver/compmisc.cmi \
+    file_formats/cmx_format.cmi \
+    utils/ccomp.cmi \
+    bytecomp/bytesections.cmi \
+    testsuite/tools/test_in_prefix.cmi
+testsuite/tools/test_in_prefix.cmx : \
+    otherlibs/unix/unix.cmx \
+    utils/misc.cmx \
+    utils/config.cmx \
+    driver/compmisc.cmx \
+    file_formats/cmx_format.cmi \
+    utils/ccomp.cmx \
+    bytecomp/bytesections.cmx \
+    testsuite/tools/test_in_prefix.cmi
+testsuite/tools/test_in_prefix.cmi :
 otherlibs/dynlink/byte/dynlink.cmo : \
     otherlibs/dynlink/dynlink_types.cmi \
     otherlibs/dynlink/byte/dynlink_symtable.cmi \
