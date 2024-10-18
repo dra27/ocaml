@@ -92,7 +92,39 @@ CAMLexport const char_os * caml_get_stdlib_location(void)
   return stdlib;
 }
 
-CAMLexport char_os * caml_parse_ld_conf(void)
+Caml_inline char_os * filename_concat(const char_os * path1,
+                                      const char_os * path2)
+{
+  if (Is_dir_separator(path1[strlen_os(path1) - 1]))
+    return caml_stat_strconcat_os(2, path1, path2);
+  else
+    return caml_stat_strconcat_os(3, path1, CAML_DIR_SEP, path2);
+}
+
+static void add_ld_conf_entry(const char_os * root, char_os * dir)
+{
+  char_os * entry;
+  size_t len = strlen_os(dir);
+  /* Implicit paths, "." and ".." are treated relative to ld.conf */
+  if ((len == 1 && dir[0] == '.')
+      || (len == 2 && dir[0] == '.' && Is_dir_separator(dir[1]))) {
+    /* "." or "./" - add the directory containing ld.conf */
+    entry = caml_stat_strdup_os(root);
+  } else if (len >= 2 && dir[0] == '.' && dir[1] == '.'
+             && (len == 2 || Is_dir_separator(dir[2]))) {
+    /* ".." or "../<path...>" */
+    entry = filename_concat(root, dir);
+  } else if (len >= 2 && dir[0] == '.' && Is_dir_separator(dir[1])) {
+    /* "./<path...>" */
+    entry = filename_concat(root, dir + 2);
+  } else {
+    /* Absolute or implicit path */
+    entry = caml_stat_strdup_os(dir);
+  }
+  caml_ext_table_add(&caml_shared_libs_path, entry);
+}
+
+CAMLexport void caml_parse_ld_conf(void)
 {
   const char_os * stdlib;
   char_os * ldconfname, * wconfig, * p, * q;
@@ -108,7 +140,7 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   ldconfname = caml_stat_strconcat_os(3, stdlib, T("/"), LD_CONF_NAME);
   if (stat_os(ldconfname, &st) == -1) {
     caml_stat_free(ldconfname);
-    return NULL;
+    return;
   }
   ldconf = open_os(ldconfname, O_RDONLY, 0);
   if (ldconf == -1)
@@ -127,14 +159,16 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   for (p = wconfig; *p != 0; p++) {
     if (*p == '\n') {
       *p = 0;
-      caml_ext_table_add(&caml_shared_libs_path, q);
+      add_ld_conf_entry(stdlib, q);
       q = p + 1;
     }
   }
-  if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
+  if (q < p)
+    add_ld_conf_entry(stdlib, q);
   close(ldconf);
+  caml_stat_free(wconfig);
   caml_stat_free(ldconfname);
-  return wconfig;
+  return;
 }
 
 /* Open the given shared library and add it to shared_libs.
@@ -183,7 +217,7 @@ void caml_build_primitive_table(char_os * lib_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
   if (lib_path != NULL)
     for (char_os *p = lib_path; *p != 0; p += strlen_os(p) + 1)
-      caml_ext_table_add(&caml_shared_libs_path, p);
+      caml_ext_table_add(&caml_shared_libs_path, caml_stat_strdup_os(p));
   caml_parse_ld_conf();
   /* Open the shared libraries */
   caml_ext_table_init(&shared_libs, 8);
