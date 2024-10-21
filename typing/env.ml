@@ -21,6 +21,7 @@ open Asttypes
 open Longident
 open Path
 open Types
+open Data_types
 
 open Local_store
 
@@ -1650,7 +1651,7 @@ let prefix_idents root prefixing_sub sg =
       let p = Pdot(root, Ident.name id) in
       prefix_idents root
         ((SigL_modtype(id, mtd, vis), p) :: items_and_paths)
-        (Subst.add_modtype id (Mty_ident p) prefixing_sub)
+        (Subst.add_modtype id p prefixing_sub)
         rem
     | SigL_class(id, cd, rs, vis) :: rem ->
       (* pretend this is a type, cf. PR#6650 *)
@@ -2621,7 +2622,7 @@ let mark_label_used usage ld =
   | exception Not_found -> ()
 
 let mark_constructor_description_used usage env cstr =
-  let ty_path = Btype.cstr_type_path cstr in
+  let ty_path = cstr_res_type_path cstr in
   mark_type_path_used env ty_path;
   match Types.Uid.Tbl.find !used_constructors cstr.cstr_uid with
   | mark -> mark usage

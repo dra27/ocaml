@@ -22,6 +22,7 @@ open Misc
 open Asttypes
 open Parsetree
 open Types
+open Data_types
 open Typedtree
 open Btype
 open Ctype
@@ -341,6 +342,11 @@ let extract_option_type env ty =
     Tconstr(path, [ty], _) when Path.same path Predef.path_option -> ty
   | _ -> assert false
 
+let is_floatarray_type env ty =
+  match get_desc (expand_head env ty) with
+    Tconstr(path, [], _) -> Path.same path Predef.path_floatarray
+  | _ -> false
+
 let protect_expansion env ty =
   if Env.has_local_constraints env then generic_instance ty else ty
 
@@ -380,6 +386,20 @@ let extract_label_names env ty =
 
 let is_principal ty =
   not !Clflags.principal || get_level ty = generic_level
+
+(* Returns [Some ty_elt] if the expected type can be used for type-directed
+   disambiguation of an array literal. *)
+let disambiguate_array_literal ~loc env expected_ty =
+  let return ty =
+    if not (is_principal expected_ty) then
+      Location.prerr_warning loc
+        (not_principal "this type-based array disambiguation");
+    Some ty
+  in
+  if is_floatarray_type env expected_ty then
+    return (instance Predef.type_float)
+  else
+    None
 
 (* Typing of patterns *)
 
@@ -447,7 +467,7 @@ let unify_pat ?sdesc_for_hint env pat expected_ty =
 
 (* unification of a type with a Tconstr with freshly created arguments *)
 let unify_head_only ~refine loc penv ty constr =
-  let path = cstr_type_path constr in
+  let path = cstr_res_type_path constr in
   let decl = Env.find_type path !!penv in
   let ty' = Ctype.newconstr path (Ctype.instance_list decl.type_params) in
   unify_pat_types_refine ~refine loc penv ty' ty
@@ -697,7 +717,7 @@ and build_as_type_extra env p = function
   | (Tpat_constraint {ctyp_type = ty; _}, _, _) :: rest ->
       (* If the type constraint is ground, then this is the best type
          we can return, so just return an instance (cf. #12313) *)
-      if free_variables ty = [] then instance ty else
+      if closed_type_expr ty then instance ty else
       (* Otherwise we combine the inferred type for the pattern with
          then non-ground constraint in a non-ambivalent way *)
       let as_ty = build_as_type_extra env p rest in
@@ -975,11 +995,14 @@ let solve_Ppat_record_field ~refine loc penv label label_lid record_ty =
   end
 
 let solve_Ppat_array ~refine loc env expected_ty =
-  let ty_elt = newgenvar() in
   let expected_ty = generic_instance expected_ty in
-  unify_pat_types_refine ~refine
-    loc env (Predef.type_array ty_elt) expected_ty;
-  ty_elt
+  match disambiguate_array_literal ~loc !!env expected_ty with
+  | Some ty_elt -> ty_elt
+  | None ->
+      let ty_elt = newgenvar() in
+      unify_pat_types_refine ~refine
+        loc env (Predef.type_array ty_elt) expected_ty;
+      ty_elt
 
 let solve_Ppat_lazy ~refine loc env expected_ty =
   let nv = newgenvar () in
@@ -3866,12 +3889,20 @@ and type_expect_
         exp_attributes = sexp.pexp_attributes;
         exp_env = env }
   | Pexp_array(sargl) ->
-      let ty = newgenvar() in
-      let to_unify = Predef.type_array ty in
-      with_explanation (fun () ->
-        unify_exp_types loc env to_unify (generic_instance ty_expected));
+      let ty_elt =
+        let ty_expected = generic_instance ty_expected in
+        match disambiguate_array_literal ~loc env ty_expected with
+        | Some ty_elt -> ty_elt
+        | None ->
+            let ty = newgenvar () in
+            let to_unify = Predef.type_array ty in
+            with_explanation (fun () ->
+                unify_exp_types loc env to_unify ty_expected);
+            ty
+      in
       let argl =
-        List.map (fun sarg -> type_expect env sarg (mk_expected ty)) sargl in
+        List.map (fun sarg -> type_expect env sarg (mk_expected ty_elt)) sargl
+      in
       re {
         exp_desc = Texp_array argl;
         exp_loc = loc; exp_extra = [];
@@ -4415,7 +4446,9 @@ and type_coerce
   match sty with
   | None ->
     let (cty', ty', force) =
-      Typetexp.transl_simple_type_delayed env sty'
+      with_local_level_generalize_structure begin fun () ->
+        Typetexp.transl_simple_type_delayed env sty'
+      end
     in
     let arg, arg_type, gen =
       let lv = get_current_level () in
@@ -4432,18 +4465,18 @@ and type_coerce
           (* prerr_endline "self coercion"; *)
           r := loc :: !r;
           force ()
-      | _ when free_variables ~env arg_type = []
-            && free_variables ~env ty' = [] ->
+      | _ when closed_type_expr ~env arg_type
+            && closed_type_expr ~env ty' ->
           if not gen && (* first try a single coercion *)
             let snap = snapshot () in
-            let ty, _b = enlarge_type env ty' in
+            let ty, _b = enlarge_type env (generic_instance ty') in
             try
               force (); Ctype.unify env arg_type ty; true
             with Unify _ ->
               backtrack snap; false
           then ()
           else begin try
-            let force' = subtype env arg_type ty' in
+            let force' = subtype env arg_type (generic_instance ty') in
             force (); force' ();
             if not gen && !Clflags.principal then
               Location.prerr_warning loc
@@ -4453,7 +4486,7 @@ and type_coerce
             raise (Error (loc, env, Not_subtype err))
           end;
       | _ ->
-          let ty, b = enlarge_type env ty' in
+          let ty, b = enlarge_type env (generic_instance ty') in
           force ();
           begin try Ctype.unify env arg_type ty with Unify err ->
             let expanded = full_expand ~may_forget_scope:true env ty' in
@@ -4474,7 +4507,9 @@ and type_coerce
         end
       in
       begin try
-        let force'' = subtype env (instance ty) (instance ty') in
+        let force'' =
+          subtype env (generic_instance ty) (generic_instance ty')
+        in
         force (); force' (); force'' ()
       with Subtype err ->
         raise (Error (loc, env, Not_subtype err))
@@ -5132,7 +5167,7 @@ and type_label_exp create env loc ty_expected
           (lid, label, sarg) =
   (* Here also ty_expected may be at generic_level *)
   let separate = !Clflags.principal || Env.has_local_constraints env in
-  let is_poly = label_is_poly label in
+  let is_poly = is_poly_Tpoly label.lbl_arg in
   let (vars, arg) =
     (* raise level to check univars *)
     with_local_level_generalize_if is_poly begin fun () ->

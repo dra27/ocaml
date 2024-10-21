@@ -5,6 +5,13 @@ Working version
 
 ### Language features:
 
+- #13340: Array literal syntax can now be used to denote values of type `'a
+  array` and `floatarray`, both in expressions and patterns. The compiler
+  disambiguates each case by using contextual type information (assuming `'a
+  array` by default).
+  (Nicolás Ojeda Bär, review by Richard Eisenberg, Jeremy Yallop, Jacques
+  Garrigue, and Gabriel Scherer)
+
 ### Runtime system:
 
 - #13352: Concurrency refactors and cleanups.
@@ -14,13 +21,50 @@ Working version
   available in older, now unsupported Windows versions.
   (Antonin Décimo, review by Nicolás Ojeda Bär and David Allsopp)
 
+- #13465: Unify the bytecode and native startup API by always providing the 4
+  caml_startup functions in libcamlrun (as is already the case in libasmrun) by
+  exposing data symbols instead of functions from objects compiled with
+  `-output-obj`, `-output-complete-obj` and `-output-complete-exe`. This has no
+  effect on the linking of OCaml code with a C (or other language) driving
+  program, but can simplify the writing of interop libraries to other languages
+  by ensuring the caml_startup symbol is always defined.
+  (David Allsopp, review by ???)
+
 - #13470: Constify some function parameters, flags tables, and some
   pointers in C code (take 3).
   (Antonin Décimo, review by Stephen Dolan and Miod Vallat)
 
+- #13492: Parse the CAML_LD_LIBRARY_PATH environment variable for the
+  shared_libs_path item in `ocamlrun -config` in addition to displaying the
+  entries found in ld.conf.
+  (David Allsopp, review by Stephen Dolan)
+
+- #13500: Add frame pointers support for ARM64 on Linux and macOS.
+  (Tim McGilchrist, review by KC Sivaramakrishnan, Fabrice Buoro
+   and Miod Vallat)
+
+- #13522: Confirm runtime events ring is still active after callback.
+  (KC Sivaramakrishnan, review by Sadiq Jaffer and Miod Vallat)
+
+- #13529: Do not write to event ring after going out of stw participant set.
+  (KC Sivaramakrishnan, review by Sadiq Jaffer)
+
+- #12964: Reintroduce "memory cleanup upon exit" mode. The cleanup will
+  however be incomplete if not all domains have been joined when the main
+  domain terminates.
+  (Miod Vallat, review by KC Sivaramakrishnan, feedback from Nick Barnes
+   and Gabriel Scherer)
+
+- #13354: Use C99 flexible array member syntax everywhere.
+  (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and Xavier Leroy)
+
 ### Code generation and optimizations:
 
 ### Standard library:
+
+- #13543: Remove some String-Bytes conversion from the stdlib to behave better
+  with js_of_ocaml
+  (Hugo Heuzard, review by Gabriel Scherer)
 
 ### Other libraries:
 
@@ -54,11 +98,22 @@ Working version
   in OCAMLRUNPARAM
   (Gabriel Scherer, review by Vincent Laviron)
 
+- #13493: Clearer error message in ocamlc for conflicting link options for
+  C stubs when shared libraries are not available.
+  (David Allsopp, review by Gabriel Scherer)
+
 ### Internal/compiler-libs changes:
 
 - #13425: undocumented -dmatchcomp flag for the debug
   output of the pattern-matching compiler
   (Gabriel Scherer, review by Vincent Laviron and Nicolás Ojeda Bär)
+
+- #13460: introduce a variant of all predefined types
+  (Gabriel Scherer, review by Ulysse Gérard and Florian Angeletti)
+
+- #13457, #13537: Annotate alloc/free open/close pairs of functions
+  with compiler attributes for static analysis.
+  (Antonin Décimo, review by Gabriel Scherer and Florian Angeletti)
 
 ### Build system:
 
@@ -70,6 +125,12 @@ Working version
 
 - #13454: Output a correct trace of the C_CALLN bytecode.
   (Miod Vallat, review by Antonin Décimo)
+
+- #13388, #13540: raises an error message (and not an internal compiler error)
+  when two local substitutions are incompatible (for instance `module type
+  S:=sig end type t:=(module S)`)
+  (Florian Angeletti, report by Nailen Matschke, review by Gabriel Scherer, and
+  Leo White)
 
 OCaml 5.3.0
 ___________
@@ -211,6 +272,9 @@ ___________
   runtime assertions.
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and David Allsopp)
 
+- #13407: Add Runtime_events.EV_EMPTY_MINOR
+  (Thomas Leonard)
+
 ### Code generation and optimizations:
 
 - #13014: Enable compile-time option -function-sections on all previously
@@ -332,7 +396,7 @@ ___________
   LLDB support for them.
   (Nick Barnes, review by Tim McGilchrist and Gabriel Scherer)
 
-- #13199: Support running native debuggers in ocamltest.
+- #13199, #13485: Support running native debuggers in ocamltest.
   (Tim McGilchrist and Sebastien Hinderer, review by Sebastien Hinderer,
    Gabriel Scherer and Antonin Décimo)
 
@@ -382,6 +446,9 @@ ___________
   page.
   (KC Sivaramakrishnan, review by Anil Madhavapeddy, Florian Angeletti and Miod
    Vallat)
+
+- #13314: Comment the code of Translclass
+  (Vincent Laviron and Nathanaëlle Courant, review by Olivier Nicole)
 
 - #13424: Fix `Gc.quick_stat` documentation to clarify that returned fields
   `live_words`, `live_blocks`, `free_words`, and `fragments` are not zero.
@@ -524,6 +591,14 @@ ___________
   in Float.Array.
   (Gabriel Scherer, review by Nicolás Ojeda Bär)
 
+- #13464: Use generic types in call to `subtype`. This improves
+  inference of type-directed disambiguation in principal mode.
+  (Richard Eisenberg, review by Jacques Garrigue)
+
+- #13507: A small refactoring to [free_vars] to make it a bit faster
+  by not allocating a list when the list is not necessary.
+  (Richard Eisenberg, review by Jacques Garrigue)
+
 ### Build system:
 
 - #12909: Reorganise how MKEXE_VIA_CC is built to make it correct for MSVC by
@@ -617,7 +692,7 @@ ___________
   incorrectly triggering Warning 53.
   (Nicolás Ojeda Bär, review by Chris Casinghino and Florian Angeletti)
 
-- #13203: Do not issue warning 53 is the compiler is stopping before attributes
+- #13203: Do not issue warning 53 if the compiler is stopping before attributes
   have been accurately marked.
   (Chris Casinghino, review by Florian Angeletti)
 
@@ -1373,6 +1448,10 @@ OCaml 5.2.0 (13 May 2024)
   (Antonin Décimo, review by Miod Vallat and Sébastien Hinderer)
 
 ### Bug fixes:
+
+- #13502: Fix misindexing related to `Gc.finalise_last` that could prevent
+  finalisers from being run.
+  (Nick Roberts, review by Mark Shinwell)
 
 - #10652, #12720: fix evaluation order in presence of optional arguments
   (Jacques Garrigue, report by Leo White, review by Vincent Laviron)

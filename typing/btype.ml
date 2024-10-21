@@ -171,7 +171,6 @@ let type_origin decl =
   match decl.type_kind with
   | Type_abstract origin -> origin
   | Type_variant _ | Type_record _ | Type_open -> Definition
-let label_is_poly lbl = is_poly_Tpoly lbl.lbl_arg
 
 let dummy_method = "*dummy method*"
 
@@ -557,9 +556,8 @@ end = struct
 
   let with_scope f =
     let scope = { saved_desc = [] } in
-    let res = f scope in
-    cleanup scope;
-    res
+    Fun.protect ~finally:(fun () -> cleanup scope) (fun () -> f scope)
+
 end
 
                   (*******************************************)
@@ -775,15 +773,3 @@ let instance_variable_type label sign =
   match Vars.find label sign.csig_vars with
   | (_, _, ty) -> ty
   | exception Not_found -> assert false
-
-
-                  (**********)
-                  (*  Misc  *)
-                  (**********)
-
-(**** Type information getter ****)
-
-let cstr_type_path cstr =
-  match get_desc cstr.cstr_res with
-  | Tconstr (p, _, _) -> p
-  | _ -> assert false

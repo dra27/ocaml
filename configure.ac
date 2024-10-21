@@ -1239,15 +1239,15 @@ AS_IF([! $arch64],
   [AS_CASE([$target_cpu],
     [i686], [],
     [AS_IF([test "$ac_cv_alignof_double" -gt 4],
-      [align_double=true,
+      [align_double=true
        AC_DEFINE([ARCH_ALIGN_DOUBLE], [1])])
      AS_IF([test "x$ac_cv_sizeof_long" = "x8" &&
             test "$ac_cv_alignof_long" -gt 4],
-      [align_int64=true,
+      [align_int64=true
        AC_DEFINE([ARCH_ALIGN_INT64], [1])],
       [AS_IF([test "x$ac_cv_sizeof_long_long" = "x8" &&
               test "$ac_cv_alignof_long_long" -gt 4],
-      [align_int64=true,
+      [align_int64=true
        AC_DEFINE([ARCH_ALIGN_INT64], [1])])])
     ])])
 
@@ -2448,7 +2448,7 @@ AS_IF([$native_compiler],
 
 AS_IF([test x"$enable_frame_pointers" = "xyes"],
   [AS_CASE([$host],
-    [x86_64-*-linux*|x86_64-*-darwin*],
+    [x86_64-*-linux*|x86_64-*-darwin*|aarch64-*-linux*|aarch64-*-darwin*],
      [AS_CASE([$ocaml_cc_vendor],
         [clang-*|gcc-*],
          [common_cflags="$common_cflags -g  -fno-omit-frame-pointer"

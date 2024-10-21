@@ -113,8 +113,6 @@ int caml_read_trailer(int fd, struct exec_trailer *trail)
       ? 0 : WRONG_MAGIC;
 }
 
-enum caml_byte_program_mode caml_byte_program_mode = STANDARD;
-
 int caml_attempt_open(char_os **name, struct exec_trailer *trail,
                       int do_open_script)
 {
@@ -125,12 +123,12 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
 
   truename = caml_search_exe_in_path(*name);
   u8 = caml_stat_strdup_of_os(truename);
-  caml_gc_message(0x100, "Opening bytecode executable %s\n", u8);
+  CAML_GC_MESSAGE(STARTUP, "Opening bytecode executable %s\n", u8);
   caml_stat_free(u8);
   fd = open_os(truename, O_RDONLY | O_BINARY);
   if (fd == -1) {
     caml_stat_free(truename);
-    caml_gc_message(0x100, "Cannot open file\n");
+    CAML_GC_MESSAGE(STARTUP, "Cannot open file\n");
     if (errno == EMFILE)
       return NO_FDS;
     else
@@ -141,7 +139,7 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
     if (err < 2 || (buf [0] == '#' && buf [1] == '!')) {
       close(fd);
       caml_stat_free(truename);
-      caml_gc_message(0x100, "Rejected #! script\n");
+      CAML_GC_MESSAGE(STARTUP, "Rejected #! script\n");
       return BAD_BYTECODE;
     }
   }
@@ -149,7 +147,7 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
   if (err != 0) {
     close(fd);
     caml_stat_free(truename);
-    caml_gc_message(0x100, "Not a bytecode executable\n");
+    CAML_GC_MESSAGE(STARTUP, "Not a bytecode executable\n");
     return err;
   }
   *name = truename;
@@ -320,7 +318,7 @@ static int parse_command_line(char_os **argv)
         params->trace_level += 1; /* ignored unless DEBUG mode */
         break;
       case 'v':
-        atomic_store_relaxed(&caml_verb_gc, 0x001+0x004+0x008+0x010+0x020);
+        atomic_store_relaxed(&caml_verb_gc, CAML_GC_MSG_VERBOSE);
         break;
       case 'p':
         for (int j = 0; caml_names_of_builtin_cprim[j] != NULL; j++)
@@ -422,6 +420,8 @@ static void do_print_config(void)
 
   /* Parse ld.conf and print the effective search path */
   puts("shared_libs_path:");
+  caml_decompose_path(&caml_shared_libs_path,
+                      caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
   caml_parse_ld_conf();
   for (int i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
@@ -447,6 +447,8 @@ extern void caml_install_invalid_parameter_handler(void);
 
 #endif
 
+void caml_startup_code_aux(int, char_os **);;;;
+
 /* Main entry point when loading code from a file */
 
 CAMLexport void caml_main(char_os **argv)
@@ -458,6 +460,14 @@ CAMLexport void caml_main(char_os **argv)
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
   char_os * exe_name, * proc_self_exe;
+
+  /* Programs compiled with -output-obj/-output-complete-exe (can) come through
+     main_os but have linked data which is signalled by caml_byte_program_mode
+   */
+  if (caml_byte_program_mode == EMBEDDED) {
+    caml_startup_code_aux(/* pooling */ 0, argv);
+    return;
+  }
 
   /* Determine options */
   caml_parse_ocamlrunparam();
@@ -587,12 +597,7 @@ CAMLexport void caml_main(char_os **argv)
 
 /* Main entry point when code is linked in as initialized data */
 
-CAMLexport value caml_startup_code_exn(
-           code_t code, asize_t code_size,
-           char *data, asize_t data_size,
-           char *section_table, asize_t section_table_size,
-           int pooling,
-           char_os **argv)
+CAMLexport value caml_startup_code_exn_aux(int pooling, char_os **argv)
 {
   char_os * exe_name;
   value res;
@@ -632,26 +637,25 @@ CAMLexport value caml_startup_code_exn(
   /* Initialize the debugger, if needed */
   caml_debugger_init();
   /* Load the code */
-  caml_start_code = code;
-  caml_code_size = code_size;
   caml_init_code_fragments();
   caml_init_debug_info();
 #ifdef THREADED_CODE
-  caml_thread_code(caml_start_code, code_size);
+  caml_thread_code(caml_start_code, caml_code_size);
 #endif
   /* Use the builtin table of primitives */
   caml_build_primitive_table_builtin();
   /* Load the globals */
-  caml_modify_generational_global_root
-    (&caml_global_data, caml_input_value_from_block(data, data_size));
+  if (caml_marshalled_global_data_size > 0)
+    caml_modify_generational_global_root
+      (&caml_global_data,
+       caml_input_value_from_block(caml_marshalled_global_data,
+                                   caml_marshalled_global_data_size));
   /* Initialize system libraries */
   caml_sys_init(exe_name, argv);
   /* Load debugging info, if b>=2 */
   caml_load_main_debug_info();
   /* ensure all globals are in major heap */
   caml_minor_collection();
-  /* Record the sections (for caml_dynlink_get_bytecode_sections) */
-  caml_init_section_table(section_table, section_table_size);
   /* Execute the program */
   caml_debugger(PROGRAM_START, Val_unit);
   res = caml_interprete(caml_start_code, caml_code_size);
@@ -659,18 +663,11 @@ CAMLexport value caml_startup_code_exn(
   return res;
 }
 
-CAMLexport void caml_startup_code(
-           code_t code, asize_t code_size,
-           char *data, asize_t data_size,
-           char *section_table, asize_t section_table_size,
-           int pooling,
-           char_os **argv)
+CAMLexport void caml_startup_code_aux(int pooling, char_os **argv)
 {
   value res;
 
-  res = caml_startup_code_exn(code, code_size, data, data_size,
-                              section_table, section_table_size,
-                              pooling, argv);
+  res = caml_startup_code_exn_aux(pooling, argv);
   if (Is_exception_result(res)) {
     value exn = Extract_exception(res);
     if (caml_debugger_in_use) {
@@ -680,4 +677,59 @@ CAMLexport void caml_startup_code(
     }
     caml_fatal_uncaught_exception(exn);
   }
+}
+
+void caml_startup(char_os ** argv)
+{
+  caml_startup_code_aux(/* pooling */ 0, argv);
+}
+
+value caml_startup_exn(char_os ** argv)
+{
+  return caml_startup_code_exn_aux(/* pooling */ 0, argv);
+}
+
+void caml_startup_pooled(char_os ** argv)
+{
+  caml_startup_code_aux(/* pooling */ 1, argv);
+}
+
+value caml_startup_pooled_exn(char_os ** argv)
+{
+  return caml_startup_code_exn_aux(/* pooling */ 1, argv);
+}
+
+/* Legacy linking functions, used in bytecomp/bytelink.ml. Kept only because
+   they're global and may have been used with other interop mechanisms. */
+CAMLexport value caml_startup_code_exn(
+           code_t code, asize_t code_size,
+           char *data, asize_t data_size,
+           char *section_table, asize_t section_table_size,
+           int pooling,
+           char_os **argv)
+{
+  caml_start_code = code;
+  caml_code_size = code_size;
+  caml_marshalled_global_data = data;
+  caml_marshalled_global_data_size = data_size;
+  caml_section_table = section_table;
+  caml_section_table_size = section_table_size;
+  return caml_startup_code_exn_aux(pooling, argv);
+}
+
+CAMLexport void caml_startup_code(
+           code_t code, asize_t code_size,
+           char *data, asize_t data_size,
+           char *section_table, asize_t section_table_size,
+           int pooling,
+           char_os **argv)
+{
+  caml_start_code = code;
+  caml_code_size = code_size;
+  caml_marshalled_global_data = data;
+  caml_marshalled_global_data_size = data_size;
+  caml_section_table = section_table;
+  caml_section_table_size = section_table_size;
+
+  caml_startup_code_aux(pooling, argv);
 }
