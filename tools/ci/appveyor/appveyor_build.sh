@@ -96,12 +96,16 @@ function set_configuration {
     # Remove configure cache if the script has failed
     if ! ./configure --cache-file="$CACHE_FILE" $dep $build $man $host \
                      --prefix="$2" --enable-ocamltest \
-                     --enable-native-toplevel ; then
+                     --enable-native-toplevel \
+                     --enable-runtime-search \
+                     --enable-runtime-search-target ; then
         rm -f -- "$CACHE_FILE"
         local failed
         ./configure --cache-file="$CACHE_FILE" $dep $build $man $host \
                     --prefix="$2" --enable-ocamltest \
                     --enable-native-toplevel \
+                    --enable-runtime-search \
+                    --enable-runtime-search-target \
             || failed=$?
         if ((failed)) ; then cat config.log ; exit $failed ; fi
     fi
