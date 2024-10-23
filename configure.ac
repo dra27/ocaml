@@ -83,6 +83,10 @@ ocamltest_libunix=None
 ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
+bindir_to_libdir=''
+relative_libdir=false
+runtime_search=false
+runtime_search_target=false
 
 # Information about the package
 
@@ -105,6 +109,7 @@ AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+AC_SUBST([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 AC_DEFINE([MAGIC_NUMBER_PREFIX], ["][MAGIC_NUMBER__PREFIX]["])
 AC_DEFINE([MAGIC_NUMBER_VERSION], ["][MAGIC_NUMBER__VERSION]["])
 AC_DEFINE([EXEC_MAGIC_LENGTH], [MAGIC_NUMBER__LENGTH])
@@ -255,6 +260,14 @@ AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([QS])
 AC_SUBST([ar_supports_response_files])
+AC_SUBST([bindir_to_libdir])
+AC_SUBST([relative_libdir])
+AC_SUBST([bytecode_runtime_id])
+AC_SUBST([native_runtime_id])
+AC_SUBST([zinc_runtime_id])
+AC_SUBST([zinc_runtime_additional])
+AC_SUBST([runtime_search])
+AC_SUBST([runtime_search_target])
 
 ## Generated files
 
@@ -285,6 +298,7 @@ m4_if([OCAML__VERSION_EXTRA],[], [],
   AC_DEFINE([OCAML_VERSION_EXTRA], ["][OCAML__VERSION_EXTRA]["])])
 AC_DEFINE([OCAML_VERSION], [OCAML__VERSION_NUMBER])
 AC_DEFINE([OCAML_VERSION_STRING], ["][OCAML__VERSION]["])
+AC_DEFINE([OCAML_RELEASE_NUMBER], [OCAML__RELEASE_NUMBER])
 
 # Works out how many "o"s are needed in quoted strings
 AC_CONFIG_COMMANDS_PRE(OCAML_QUOTED_STRING_ID)
@@ -563,6 +577,32 @@ AC_ARG_ENABLE([mmap-map-stack],
   [AS_HELP_STRING([--enable-mmap-map-stack],
     [use mmap to allocate stacks instead of malloc])])
 
+AC_ARG_ENABLE([relative],
+  [AS_HELP_STRING([--enable-relative],
+    [try to locate the standard library using relative paths])])
+
+AC_ARG_ENABLE([runtime-search],
+  [AS_HELP_STRING([--enable-runtime-search],
+    [allow the distribution's bytecode executables to search for ocamlrun])],
+  [AS_CASE([$enableval],
+    [no],[search_method='1'],
+    [yes],[search_method='2';runtime_search=true],
+    [always],[search_method='3';runtime_search=true],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search]))])],
+  [search_method='1'])
+
+AC_ARG_ENABLE([runtime-search-target],
+  [AS_HELP_STRING([--enable-runtime-search-target],
+    [allow bytecode executables produced by ocamlc to search for ocamlrun])],
+  [AS_CASE([$enableval],
+    [no],[target_search_method='1'],
+    [yes],[target_search_method='2';runtime_search_target=true],
+    [always],[target_search_method='3';runtime_search_target=true],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search-target]))])],
+  [target_search_method='1'])
+
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
     [use the AFL fuzzer])])
@@ -724,7 +764,7 @@ AS_CASE([$lt_cv_ar_at_file],
 AS_CASE([$host],
   [*-*-mingw32*|*-pc-windows],
     [unix_or_win32="win32"
-    ln='cp -pf'
+    OCAML_CHECK_LN_ON_WINDOWS
     ocamltest_libunix="Some false"
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr"],
@@ -798,17 +838,21 @@ AS_IF([test "x$interpval" = "xyes"],
 # in config.status, rather than by the .in mechanism, since the latter cannot
 # reliably process binary files.
 AC_CONFIG_COMMANDS([shebang],
-  [printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+  [printf '%s%s\n%s\000\n' "$search_method" "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$target_bindir" \
-    > stdlib/target_runtime.info],
+  printf '%s%s\n%s\000\n' "$target_search_method" "$target_launch_method" \
+    "$target_bindir" > stdlib/target_runtime.info],
 dnl These declarations are put in a here-document in configure, so the command
 dnl in '$(...)' _is_ evaluated as the content is written to config.status (by
 dnl standard interpretation of a here-document). The sed commands quote any
 dnl nefarious single quotes which may appear in any of the strings.
+dnl Since $search_method/$target_search_method are only ever 1, 2 or 3, no
+dnl escaping is done.
   [launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  search_method='$search_method'
+  target_search_method='$target_search_method'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   target_bindir='$(echo "$target_bindir" | sed -e "s/'/'\"'\"'/g")'])
 
@@ -1163,6 +1207,7 @@ AS_CASE([$host],
   [AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD], [1])])])
 
 AC_CHECK_HEADER([math.h])
+AC_CHECK_HEADERS([unistd.h],[AC_DEFINE([HAS_UNISTD])])
 AC_CHECK_HEADER([pthread_np.h],[AC_DEFINE([HAS_PTHREAD_NP_H], [1])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT], [1])], [],
   [#include <sys/types.h>])
@@ -1392,14 +1437,6 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
     [aarch64-*-netbsd*], [natdynlink=true],
     [riscv*-*-linux*], [natdynlink=true])])
 
-AS_CASE([$enable_native_toplevel,$natdynlink],
-  [yes,false],
-    [AC_MSG_ERROR(m4_normalize([
-      The native toplevel requires native dynlink support]))],
-  [yes,*],
-    [install_ocamlnat=true],
-  [install_ocamlnat=false])
-
 # Try to work around the Skylake/Kaby Lake processor bug.
 AS_CASE(["$ocaml_cc_vendor,$host"],
   [*gcc*,x86_64-*|*gcc*,i686-*],
@@ -1558,6 +1595,14 @@ AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
 AS_IF([$natdynlink],
   [natdynlink_archive="dynlink.cmxa"],
   [natdynlink_archive=""])
+
+AS_CASE([$enable_native_toplevel,$natdynlink],
+  [yes,false],
+    [AC_MSG_ERROR(m4_normalize([
+      The native toplevel requires native dynlink support]))],
+  [yes,*],
+    [install_ocamlnat=true],
+  [install_ocamlnat=false])
 
 AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
 
@@ -2493,6 +2538,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt
     ocamltest='ocamltest'
+    AS_IF([$native_compiler],
+      [optional_native_tools="$optional_native_tools \
+testsuite/tools/test_in_prefix.opt"],
+      [optional_bytecode_tools="$optional_bytecode_tools \
+testsuite/tools/test_in_prefix"])
     testsuite_tools='testsuite/tools/codegen testsuite/tools/expect'
     optional_bytecode_tools="$optional_bytecode_tools $testsuite_tools"],
   [build_ocamltest=false
@@ -2638,6 +2688,13 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
 
+AS_IF([test x"$enable_relative" = "xyes"],[
+  relative_libdir=true
+  OCAML_COMPUTE_BINDIR_TO_LIBDIR([bindir],[libdir],[bindir_to_libdir])
+  dnl Tests for the OCAML_COMPUTE_BINDIR_TO_LIBDIR macro
+  dnl OCAML_COMPUTE_BINDIR_TO_LIBDIR_TESTS
+])
+
 # Define default prefix correctly for the different Windows ports
 AS_IF([test x"$prefix" = "xNONE"],
   [AS_CASE([$host],
@@ -2666,6 +2723,72 @@ AS_CASE([$host],
     # This is required as otherwise floats are printed
     # as "Infinity" and "Inf" instead of the expected "inf"
     [AC_DEFINE([HAS_BROKEN_PRINTF], [1])])
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+m4_define([ALPHABET],
+          [0123456789abcdefghijklmnopqrstuv])
+alphabet='ALPHABET'
+
+m4_cond(OCAML__DEVELOPMENT_VERSION, [true],
+         [m4_define([ID_VERSION], m4_eval(OCAML__RELEASE_NUMBER << 1))],
+         [m4_define([ID_VERSION], m4_eval(1 + (OCAML__RELEASE_NUMBER << 1)))])
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+m4_define([QUINTET0], [m4_substr(ALPHABET, m4_eval(ID_VERSION & 31), [1])])
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=m4_eval(ID_VERSION >> 5)
+quintet1a=''
+quintet1b=''
+quintet1c=''
+# Bits 7 & 8 (int31 + no shared libraries)
+AS_CASE([$arch64,$supports_shared_libraries],
+  [false,false],
+    dnl no int63 support; no support for shared libraries
+    [quintet1="8 + 4 + ${quintet1}"],
+  [false,true],
+    dnl no int63 support;
+    [quintet1a="8 + 4 + ${quintet1}"
+    quintet1="4 + ${quintet1}"],
+  [true,false],
+    dnl no shared library support
+    [quintet1a="8 + 4 + ${quintet1}"
+    quintet1="8 + ${quintet1}"],
+  [true,true],
+    [quintet1a="4 + ${quintet1}"
+    quintet1b="8 + ${quintet1}"
+    quintet1c="8 + 4 + ${quintet1}"])
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+AS_IF([test -n "${quintet1a}"],
+  [zinc_runtime_additional="00$(echo "${alphabet}" | \
+     cut -c $(expr ${quintet1a} + 1))QUINTET0"])
+AS_IF([test -n "${quintet1b}"],
+  [zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1b} + 1))QUINTET0"])
+AS_IF([test -n "${quintet1c}"],
+  [zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1c} + 1))QUINTET0"])
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${reserved_header_bits} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+AS_IF([$frame_pointers], [quintet3_native='1'], [quintet3_native='0'])
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+AS_IF([! $flat_float_array], [quintet3_byte="8 + ${quintet3_byte}"])
+# Bit 19 (WINDOWS_UNICODE=ansi)
+AS_CASE([$host,$windows_unicode],
+  [*-*-mingw32,0|*-pc-windows,0], [quintet3_byte="16 + ${quintet3_byte}"])
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}QUINTET0"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}QUINTET0"
+zinc_runtime_id="00${quintet1}QUINTET0"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
