@@ -224,6 +224,10 @@ let make_startup_file ~ppf_dump units_list ~crc_interfaces =
   Array.iteri
     (fun i name -> compile_phrase (Cmm_helpers.predef_exception i name))
     Runtimedef.builtin_exceptions;
+  List.iter
+    (fun (name, value) ->
+      compile_phrase (Cmm_helpers.emit_global_string_constant name value))
+    !Clflags.global_string_constants;
   compile_phrase (Cmm_helpers.global_table name_list);
   let globals_map = make_globals_map units_list ~crc_interfaces in
   compile_phrase (Cmm_helpers.globals_map globals_map);
@@ -331,6 +335,7 @@ let link ~ppf_dump objfiles output_name =
     let obj_infos = List.map read_file objfiles in
     let ldeps = Linkdeps.create ~complete:true in
     let units_tolink = List.fold_right (scan_file ldeps) obj_infos [] in
+    Compenv.set_caml_standard_library_default ();
     (match Linkdeps.check ldeps with
      | None -> ()
      | Some e -> raise (Error (Link_error e)));

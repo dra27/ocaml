@@ -590,6 +590,10 @@ let output_cds_file outfile =
        Bytesections.write_toc_and_trailer toc_writer;
     )
 
+let emit_global_constant outchan (name, value) =
+  let value = Misc.Stdlib.String.escaped_c value in
+  Printf.fprintf outchan "char_os * %s = %s;\n" name value
+
 (* Output a bytecode executable as a C file *)
 
 let link_bytecode_as_c tolink outfile with_main =
@@ -653,6 +657,8 @@ static char caml_sections[] = {
        (* The table of primitives *)
        Symtable.output_primitive_table outchan;
        (* The entry point *)
+       List.iter (emit_global_constant outchan)
+                 !Clflags.global_string_constants;
        if with_main then begin
          output_string outchan {|
 int main_os(int argc, char_os **argv)
@@ -776,9 +782,12 @@ let link objfiles output_name =
   Clflags.all_ccopts := !lib_ccopts @ !Clflags.all_ccopts;
                                                    (* put user's opts first *)
   Clflags.dllibs := !lib_dllibs @ !Clflags.dllibs; (* put user's DLLs first *)
-  if not !Clflags.custom_runtime then
+  if !Clflags.custom_runtime then
+    Compenv.set_caml_standard_library_default ();
+  if not !Clflags.custom_runtime then begin
+    assert (!Clflags.global_string_constants = []);
     link_bytecode tolink output_name true
-  else if not !Clflags.output_c_object then begin
+  end else if not !Clflags.output_c_object then begin
     let bytecode_name = Filename.temp_file "camlcode" "" in
     let prim_name =
       if !Clflags.keep_camlprimc_file then
@@ -804,6 +813,7 @@ extern "C" {
 
 |};
          Symtable.output_primitive_table poc;
+         List.iter (emit_global_constant poc) !Clflags.global_string_constants;
          output_string poc {|
 #ifdef __cplusplus
 }

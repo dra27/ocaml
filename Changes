@@ -49,6 +49,12 @@ Working version
 - #13354: Use C99 flexible array member syntax everywhere.
   (Antonin Décimo, review by Miod Vallat, Gabriel Scherer, and Xavier Leroy)
 
+- #13???: Added --enable-relative which allows the runtime and the compilers to
+  locate the Standard Library relative to where the binaries themselves,
+  removing the absolute path previously embedded in
+  caml_standard_library_default.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
@@ -56,6 +62,10 @@ Working version
 - #13543: Remove some String-Bytes conversion from the stdlib to behave better
   with js_of_ocaml
   (Hugo Heuzard, review by Gabriel Scherer)
+
+- #13???: Add Sys.interpreter containing the full path (if available) to the
+  currently executing runtime.
+  (David Allsopp, review by ???)
 
 ### Other libraries:
 
@@ -307,6 +317,10 @@ ___________
   local opens
   (Vincent Laviron, review by Hugo Heuzard, Nathanaëlle Courant
    and Gabriel Scherer)
+
+- #13???: Add -set-global-string option to both compilers, allowing a C symbol
+  to be added to the binary with the given name and value.
+  (David Allsopp, review by ???)
 
 ### Standard library:
 
