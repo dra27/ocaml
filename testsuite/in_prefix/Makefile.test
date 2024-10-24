@@ -1,0 +1,46 @@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*                        David Allsopp, Tarides                          *
+#*                                                                        *
+#*   Copyright 2024 David Allsopp Ltd.                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+ROOTDIR = ../..
+
+include $(ROOTDIR)/Makefile.common
+
+ifeq "$(NATIVE_COMPILER)" "true"
+DRIVER = ../tools/test_in_prefix.opt$(EXE)
+else
+DRIVER = ../tools/test_in_prefix$(EXE)
+endif
+
+default: $(DRIVER)
+	@$< --bindir "$(BINDIR)" --libdir "$(LIBDIR)" --summary
+	@$(error In order to execute the test, run $(MAKE) test-in-prefix)
+
+test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
+	@$< --bindir "$(BINDIR)" --libdir "$(LIBDIR)" \
+      $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
+      $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
+      $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
+      $(OTHERLIBRARIES)
+
+SCRUB_ENV = \
+  CAML_LD_LIBRARY_PATH OCAMLLIB CAMLLIB OCAMLPARAM OCAMLRUNPARAM CAMLRUNPARAM
+
+# Generates --without-$(1) if $(2) = false or --with-$(1) otherwise
+bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
+
+../tools/test_in_prefix$(EXE) \
+../tools/test_in_prefix.opt$(EXE): ../tools/test_in_prefix.ml
+
+../tools/%:
+	$(MAKE) -C $(ROOTDIR) testsuite/tools/$*
