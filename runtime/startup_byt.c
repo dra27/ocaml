@@ -332,7 +332,8 @@ static int parse_command_line(char_os **argv)
         break;
       case 'I':
         if (argv[i + 1] != NULL) {
-          caml_ext_table_add(&caml_shared_libs_path, argv[i + 1]);
+          caml_ext_table_add(&caml_shared_libs_path,
+                             caml_stat_strdup_os(argv[i + 1]));
           i++;
         } else {
           error("option '-I' needs an argument.");
@@ -386,8 +387,6 @@ static void do_print_config(void)
   printf("version: %s\n", OCAML_VERSION_STRING);
   printf("standard_library_default: %s\n",
          caml_stat_strdup_of_os(OCAML_STDLIB_DIR));
-  printf("standard_library: %s\n",
-         caml_stat_strdup_of_os(caml_get_stdlib_location()));
   printf("int_size: %d\n", 8 * (int)sizeof(value));
   printf("word_size: %d\n", 8 * (int)sizeof(value) - 1);
   printf("os_type: %s\n", OCAML_OS_TYPE);
