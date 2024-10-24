@@ -49,8 +49,8 @@ extern int caml_read_fd(int fd, int flags, void * buf, int n);
 extern int caml_write_fd(int fd, int flags, void * buf, int n);
 
 /* Decompose the given path into a list of directories, and add them
-   to the given table. */
-extern char_os * caml_decompose_path(struct ext_table * tbl, char_os * path);
+   to the given table. entries added to tbl are strdup'd. */
+extern void caml_decompose_path(struct ext_table * tbl, char_os * path);
 
 /* Search the given file in the given list of directories.
    If not found, return a copy of [name]. */
@@ -145,6 +145,14 @@ CAMLextern value caml_win32_xdg_defaults(void);
 
 CAMLextern value caml_win32_get_temp_path(void);
 
+#define CAML_DIR_SEP T("\\")
+#define Is_dir_separator(c) (c == '\\' || c == '/')
+
+#else
+
+#define CAML_DIR_SEP "/"
+#define Is_dir_separator(c) (c == '/')
+
 #endif /* _WIN32 */
 
 /* Returns the current value of a counter that increments once per nanosecond.
@@ -158,17 +166,43 @@ extern uint64_t caml_time_counter(void);
 
 extern void caml_init_os_params(void);
 
+/* True if:
+   - dir equals "."
+   - dir equals ".."
+   - dir begins "./"
+   - dir begins "../"
+   The tests for null avoid the need to call strlen_os. */
+#define Is_relative_dir(dir) \
+  (dir[0] == '.' \
+   && (dir[1] == 0 \
+       || Is_dir_separator(dir[1]) \
+       || (dir[1] == '.' && (dir[2] == 0 || Is_dir_separator(dir[2])))))
+
 #endif /* CAML_INTERNALS */
 
 #ifdef _WIN32
+
+/* [caml_stat_strdup_noexc_to_utf16(s)] returns a null-terminated copy of [s],
+   re-encoded in UTF-16.  The encoding of [s] is assumed to be UTF-8 if
+   [caml_windows_unicode_runtime_enabled] is non-zero **and** [s] is valid
+   UTF-8, or the current Windows code page otherwise.
+
+   The returned string is allocated with [caml_stat_alloc_noexc], so it should
+   be freed using [caml_stat_free].
+
+   If allocation fails, this returns NULL.
+*/
+CAMLextern wchar_t* caml_stat_strdup_noexc_to_utf16(const char *s);
 
 /* [caml_stat_strdup_to_utf16(s)] returns a null-terminated copy of [s],
    re-encoded in UTF-16.  The encoding of [s] is assumed to be UTF-8 if
    [caml_windows_unicode_runtime_enabled] is non-zero **and** [s] is valid
    UTF-8, or the current Windows code page otherwise.
 
-   The returned string is allocated with [caml_stat_alloc], so it should be free
-   using [caml_stat_free].
+   The returned string is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+
+   If allocation fails, this raises Out_of_memory.
 */
 CAMLextern wchar_t* caml_stat_strdup_to_utf16(const char *s);
 
@@ -176,8 +210,8 @@ CAMLextern wchar_t* caml_stat_strdup_to_utf16(const char *s);
    re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero or
    the current Windows code page otherwise.
 
-   The returned string is allocated with [caml_stat_alloc_noexc], so
-   it should be freed using [caml_stat_free].
+   The returned string is allocated with [caml_stat_alloc_noexc], so it should
+   be freed using [caml_stat_free].
 
    If allocation fails, this returns NULL.
 */
@@ -187,12 +221,37 @@ CAMLextern char* caml_stat_strdup_noexc_of_utf16(const wchar_t *s);
    re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero or
    the current Windows code page otherwise.
 
-   The returned string is allocated with [caml_stat_alloc_noexc], so
-   it should be freed using [caml_stat_free].
+   The returned string is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
 
    If allocation fails, this raises Out_of_memory.
 */
 CAMLextern char* caml_stat_strdup_of_utf16(const wchar_t *s);
+
+/* [caml_stat_char_array_to_utf16(s, size, &out_size)] returns a copy of the
+   first [size] bytes of [s] re-encoded in UTF-16. The encoding of [s] is
+   assumed to be UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero
+   **and** [s] is valid UTF-8, or the current Windows code page otherwise. If
+   [out_size] is not [NULL], then the number of UTF-16 code units in the result
+   is recorded in [*out_size].
+
+   The returned buffer is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+*/
+CAMLextern wchar_t *caml_stat_char_array_to_utf16(const char *s, size_t size,
+                                                  size_t *out_size);
+
+/* [caml_stat_char_array_of_utf16(s, size, &out_size)] returns a copy of the
+   first [size] UTF-16 code units of [s] re-encoded in UTF-8 if
+   [caml_windows_unicode_runtime_enabled] is non-zero or the current Windows
+   code page otherwise. If [out_size] is not [NULL], then the size of the result
+   in bytes recorded in [*out_size].
+
+   The returned buffer is allocated with [caml_stat_alloc], so it should be
+   freed using [caml_stat_free].
+*/
+CAMLextern char *caml_stat_char_array_of_utf16(const wchar_t *s, size_t size,
+                                               size_t *out_size);
 
 /* [caml_copy_string_of_utf16(s)] returns an OCaml string containing a copy of
    [s] re-encoded in UTF-8 if [caml_windows_unicode_runtime_enabled] is non-zero
