@@ -74,11 +74,20 @@
 
 #endif
 
+#define OBJECT(name) \
+        .globl name; \
+        .align EIGHT_ALIGN; \
+        name:
+
 #if defined(SYS_linux) || defined(SYS_gnu)
 #define ENDFUNCTION(name) \
         .size name, . - name
+#define ENDOBJECT(name) \
+        .type name, @object; \
+        .size name, . - name;
 #else
 #define ENDFUNCTION(name)
+#define ENDOBJECT(name)
 #endif
 
 #ifdef ASM_CFI_SUPPORTED
@@ -1358,9 +1367,7 @@ ENDFUNCTION(G(caml_assert_stack_invariants))
 G(caml_system__code_end):
 
         .data
-        .globl  G(caml_system.frametable)
-        .align  EIGHT_ALIGN
-G(caml_system.frametable):
+OBJECT(G(caml_system.frametable))
         .quad   2           /* two descriptors */
         .quad   LBL(108)    /* return address into callback */
         .value  -1          /* negative frame size => use callback link */
@@ -1369,6 +1376,7 @@ G(caml_system.frametable):
         .quad   LBL(frame_runstack) /* return address into fiber_val_handler */
         .value  -1          /* negative frame size => use callback link */
         .value  0           /* no roots here */
+ENDOBJECT(G(caml_system.frametable))
 
 #if defined(SYS_macosx)
         .literal16

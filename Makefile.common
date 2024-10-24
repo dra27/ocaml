@@ -27,7 +27,8 @@ MKDIR=mkdir -p
 EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
-# $( ) suppresses warning from the alignments in the V_ macros below
+# $( ) suppresses warning from the alignments in the V_ macros below and also
+# allows $\ at the end a line
 $(SPACE) :=
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
@@ -155,6 +156,15 @@ OPTCOMPFLAGS=
 ifeq "$(FUNCTION_SECTIONS)" "true"
 OPTCOMPFLAGS += -function-sections
 endif
+
+ifeq "$(LIBDIR_REL)" ""
+  SET_RELATIVE_STDLIB =
+else
+  SET_RELATIVE_STDLIB = \
+-set-global-string 'caml_standard_library_default=$(LIBDIR_REL)'
+endif
+
+DOTOPT_LINKFLAGS = $(SET_RELATIVE_STDLIB)
 
 # The rule to compile C files
 
@@ -297,6 +307,8 @@ endef # _OCAML_COMMON_BASE
 
 define _OCAML_PROGRAM_BASE
 $(eval $(call _OCAML_COMMON_BASE,$(1)))
+# To be overridden by the programs needing special link flags
+$(basename $(notdir $(1)))_COMMON_LINKFLAGS =
 endef # _OCAML_PROGRAM_BASE
 
 LINK_BYTECODE_PROGRAM =\
@@ -319,8 +331,17 @@ $(basename $(notdir $(1)))_BCOBJS = \
   $$($(basename $(notdir $(1)))_CMA_FILES) \
   $$($(basename $(notdir $(1)))_BO_FILES) \
   $$($(basename $(notdir $(1)))_CMO_FILES)
+# To be overridden by the programs needing special bytecode link flags
+$(basename $(notdir $(1)))_BYTECODE_LINKFLAGS =
+
+$(basename $(notdir $(1)))_BYTECODE_LINKCMD = \
+$(strip \
+  $$(CAMLC) $$(OC_COMMON_LINKFLAGS) $$(OC_BYTECODE_LINKFLAGS) \
+  $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
+  $$($(basename $(notdir $(1)))_BYTECODE_LINKFLAGS))
+
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_BCOBJS)
-	$$(V_LINKC)$$(LINK_BYTECODE_PROGRAM) -o $$@ \
+	$$(V_LINKC)$$($(basename $(notdir $(1)))_BYTECODE_LINKCMD) -o $$@ \
 	  $$($(basename $(notdir $(1)))_BCOBJS)
 endef # _OCAML_BYTECODE_PROGRAM
 
@@ -328,9 +349,6 @@ define OCAML_BYTECODE_PROGRAM
 $(eval $(call _OCAML_PROGRAM_BASE,$(1)))
 $(eval $(call _OCAML_BYTECODE_PROGRAM,$(1)))
 endef # OCAML_BYTECODE_PROGRAM
-
-LINK_NATIVE_PROGRAM =\
-  $(CAMLOPT) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
 
 define _OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
@@ -345,8 +363,18 @@ $(basename $(notdir $(1)))_NCOBJS = \
   $$($(basename $(notdir $(1)))_CMXA_FILES) \
   $$($(basename $(notdir $(1)))_NO_FILES) \
   $$($(basename $(notdir $(1)))_CMX_FILES)
+
+# To be overridden by the programs needing special native link flags
+$(basename $(notdir $(1)))_NATIVE_LINKFLAGS = $(DOTOPT_LINKFLAGS)
+
+$(basename $(notdir $(1)))_NATIVE_LINKCMD = \
+$(strip \
+  $$(CAMLOPT) $$(OC_COMMON_LINKFLAGS) $$(OC_NATIVE_LINKFLAGS) \
+  $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
+  $$($(basename $(notdir $(1)))_NATIVE_LINKFLAGS))
+
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_NCOBJS)
-	$$(V_LINKOPT)$$(LINK_NATIVE_PROGRAM) -o $$@ \
+	$$(V_LINKOPT)$$($(basename $(notdir $(1)))_NATIVE_LINKCMD) -o $$@ \
 	  $$($(basename $(notdir $(1)))_NCOBJS)
 endef # _OCAML_NATIVE_PROGRAM
 
@@ -449,3 +477,12 @@ endef # INSTALL_STRIPPED_BYTE_PROG
 # boot/ as part of coldstart. See read_runtime_launch_info in
 # bytecomp/bytelink.ml for further details.
 HEADER_NAME = runtime-launch-info
+
+ifeq "$(UNIX_OR_WIN32)" "win32"
+# Ensure that no command can create Cygwin symbolic links by ensuring that
+# symlink(2) will fail if native NTFS symlinks aren't available.
+export CYGWIN := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(CYGWIN)) winsymlinks:nativestrict)
+export MSYS := $(strip \
+  $(filter-out winsymlinks winsymlinks:%, $(MSYS)) winsymlinks:nativestrict)
+endif

@@ -46,6 +46,14 @@
 
 #define ENDFUNCTION(name)
 
+#define OBJECT(name) \
+        .align 8; \
+        .globl name; \
+        .type name, @object; \
+        name:
+
+#define ENDOBJECT(name)
+
 #ifdef ASM_CFI_SUPPORTED
 #define CFI_STARTPROC .cfi_startproc
 #define CFI_ENDPROC .cfi_endproc
@@ -1232,10 +1240,7 @@ caml_system__code_end:
 /* Frame table */
 
         .section ".data"
-        .align 8
-        .globl  caml_system.frametable
-        .type   caml_system.frametable, @object
-caml_system.frametable:
+OBJECT(caml_system.frametable)
         .quad   2               /* two descriptors */
         .quad   LBL(caml_retaddr)  /* return address into callback */
         .short  -1              /* negative size count => use callback link */
@@ -1245,6 +1250,7 @@ caml_system.frametable:
         .short  -1              /* negative size count => use callback link */
         .short  0               /* no roots here */
         .align  8
+ENDOBJECT(caml_system.frametable)
 
 /* Mark stack as non-executable */
         .section .note.GNU-stack,"",%progbits

@@ -781,6 +781,14 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search_target
+runtime_search
+zinc_runtime_additional
+zinc_runtime_id
+native_runtime_id
+bytecode_runtime_id
+relative_libdir
+bindir_to_libdir
 target_bindir
 ar_supports_response_files
 QS
@@ -918,6 +926,7 @@ CMO_MAGIC_NUMBER
 CMI_MAGIC_NUMBER
 EXEC_MAGIC_NUMBER
 MAGIC_NUMBER_LENGTH
+OCAML_RELEASE_NUMBER
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
 OCAML_VERSION_PATCHLEVEL
@@ -1008,6 +1017,9 @@ enable_force_safe_string
 enable_flat_float_array
 enable_function_sections
 enable_mmap_map_stack
+enable_relative
+enable_runtime_search
+enable_runtime_search_target
 with_afl
 with_flexdll
 with_zstd
@@ -1704,6 +1716,13 @@ Optional Features:
   --disable-function-sections
                           do not emit each function in a separate section
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
+  --enable-relative       try to locate the standard library using relative
+                          paths
+  --enable-runtime-search allow the distribution's bytecode executables to
+                          search for ocamlrun
+  --enable-runtime-search-target
+                          allow bytecode executables produced by ocamlc to
+                          search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3298,6 +3317,10 @@ ocamltest_libunix=None
 ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
+bindir_to_libdir=''
+relative_libdir=false
+runtime_search=false
+runtime_search_target=false
 
 # Information about the package
 
@@ -3327,6 +3350,8 @@ OCAML_VERSION_PATCHLEVEL=1
 OCAML_VERSION_EXTRA=relocatable
 
 OCAML_VERSION_SHORT=5.2
+
+OCAML_RELEASE_NUMBER=18
 
 printf "%s\n" "#define MAGIC_NUMBER_PREFIX \"Caml1999\"" >>confdefs.h
 
@@ -3487,6 +3512,14 @@ LINEAR_MAGIC_NUMBER=Caml1999L034
 
 
 
+
+
+
+
+
+
+
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3536,6 +3569,8 @@ printf "%s\n" "#define OCAML_VERSION_ADDITIONAL \"relocatable\"" >>confdefs.h
 printf "%s\n" "#define OCAML_VERSION 50201" >>confdefs.h
 
 printf "%s\n" "#define OCAML_VERSION_STRING \"5.2.1+relocatable\"" >>confdefs.h
+
+printf "%s\n" "#define OCAML_RELEASE_NUMBER 18" >>confdefs.h
 
 
 # Works out how many "o"s are needed in quoted strings
@@ -4096,6 +4131,49 @@ fi
 if test ${enable_mmap_map_stack+y}
 then :
   enableval=$enable_mmap_map_stack;
+fi
+
+
+# Check whether --enable-relative was given.
+if test ${enable_relative+y}
+then :
+  enableval=$enable_relative;
+fi
+
+
+# Check whether --enable-runtime-search was given.
+if test ${enable_runtime_search+y}
+then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  no) :
+    search_method='1' ;; #(
+  yes) :
+    search_method='2';runtime_search=true ;; #(
+  always) :
+    search_method='3';runtime_search=true ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
+else $as_nop
+  search_method='1'
+fi
+
+
+# Check whether --enable-runtime-search-target was given.
+if test ${enable_runtime_search_target+y}
+then :
+  enableval=$enable_runtime_search_target; case $enableval in #(
+  no) :
+    target_search_method='1' ;; #(
+  yes) :
+    target_search_method='2';runtime_search_target=true ;; #(
+  always) :
+    target_search_method='3';runtime_search_target=true ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
+esac
+else $as_nop
+  target_search_method='1'
 fi
 
 
@@ -13764,7 +13842,19 @@ esac
 case $host in #(
   *-*-mingw32*|*-pc-windows) :
     unix_or_win32="win32"
-    ln='cp -pf'
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
+printf %s "checking for a workable solution for ln -sf... " >&6; }
+  if MSYS=winsymlinks:nativestrict CYGWIN=winsymlinks:nativestrict ln -sf configure conftestLink 2>/dev/null
+then :
+  ln='ln -sf'
+else $as_nop
+  ln='cp -pf'
+
+fi
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
+printf "%s\n" "$ln" >&6; }
+
     ocamltest_libunix="Some false"
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr" ;; #(
@@ -15550,15 +15640,6 @@ then :
 esac
 fi
 
-case $enable_native_toplevel,$natdynlink in #(
-  yes,false) :
-    as_fn_error $? "The native toplevel requires native dynlink support" "$LINENO" 5 ;; #(
-  yes,*) :
-    install_ocamlnat=true ;; #(
-  *) :
-    install_ocamlnat=false ;;
-esac
-
 # Try to work around the Skylake/Kaby Lake processor bug.
 case "$ocaml_cc_vendor,$host" in #(
   *gcc*,x86_64-*|*gcc*,i686-*) :
@@ -15810,6 +15891,15 @@ then :
 else $as_nop
   natdynlink_archive=""
 fi
+
+case $enable_native_toplevel,$natdynlink in #(
+  yes,false) :
+    as_fn_error $? "The native toplevel requires native dynlink support" "$LINENO" 5 ;; #(
+  yes,*) :
+    install_ocamlnat=true ;; #(
+  *) :
+    install_ocamlnat=false ;;
+esac
 
 printf "%s\n" "#define OCAML_OS_TYPE \"$ostype\"" >>confdefs.h
 
@@ -20079,6 +20169,14 @@ case $enable_ocamltest,false in #(
     ocamltest_target=ocamltest
     ocamltest_opt_target=ocamltest.opt
     ocamltest='ocamltest'
+    if $native_compiler
+then :
+  optional_native_tools="$optional_native_tools \
+testsuite/tools/test_in_prefix.opt"
+else $as_nop
+  optional_bytecode_tools="$optional_bytecode_tools \
+testsuite/tools/test_in_prefix"
+fi
     testsuite_tools='testsuite/tools/codegen testsuite/tools/expect'
     optional_bytecode_tools="$optional_bytecode_tools $testsuite_tools" ;; #(
   *) :
@@ -20379,6 +20477,113 @@ then :
   mandir='${prefix}/man'
 fi
 
+if test x"$enable_relative" = "xyes"
+then :
+
+  relative_libdir=true
+
+  eval "from=\"\$bindir\""
+  eval "to=\"\$libdir\""
+
+  if test -z ""
+then :
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking relative path between \$bindir and \$libdir" >&5
+printf %s "checking relative path between \$bindir and \$libdir... " >&6; }
+
+else $as_nop
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking relative path between $from and $to" >&5
+printf %s "checking relative path between $from and $to... " >&6; }
+
+fi
+
+
+  if test "x$from" = "x$to"
+then :
+
+    result='.'
+
+else $as_nop
+
+        echo "$from" > conftest.from
+    echo "$to" > conftest.to
+    common_prefix_len="$(cmp -l conftest.from conftest.to 2>/dev/null \
+                           | head -n 1 \
+                           | sed -e 's/^ *//' \
+                           | cut -d ' ' -f 1)"
+    common_prefix="$(expr $common_prefix_len - 1)"
+    if test $common_prefix -eq 0
+then :
+
+      result=''
+      if test -z ""
+then :
+  as_fn_error $? "no common prefix" "$LINENO" 5
+fi
+
+else $as_nop
+
+      common_prefix="$(echo "$from" | cut -c -$common_prefix)"
+
+                        from_chopped="$(echo "$from" | cut -c $common_prefix_len-)"
+      to_chopped="$(echo "$to" | cut -c $common_prefix_len-)"
+      if test "x${common_prefix}" = "x${from}" && \
+             test -z "${to_chopped##/*}"
+then :
+
+        result=".$to_chopped"
+
+elif test "y${common_prefix}" = "x${to}" && \
+       test -z "${from_chopped##/*}"
+then :
+
+        echo "Here with $from_chopped and $to_chopped but confused"
+        exit 1
+
+else $as_nop
+
+                                        if test "x${common_prefix}" = "x${to}" && \
+               test -z "${from_chopped##/*}"
+then :
+
+          common_prefix=$(echo "$common_prefix/" | wc -c)
+
+else $as_nop
+
+          common_prefix=$(echo "${common_prefix%/*}/" | wc -c)
+
+fi
+                get_from="$(echo "$from" | cut -c $common_prefix-)"
+        get_to="$(echo "$to" | cut -c $common_prefix-)"
+                                result=''
+        while test "$get_from" != '.' ; do
+          result="../$result"
+          get_from="$(dirname "$get_from")"
+        done
+        if test -z "$get_to"
+then :
+
+          result="${result%/}"
+
+else $as_nop
+
+          result="$result$get_to"
+
+fi
+
+fi
+
+fi
+
+fi
+  eval "bindir_to_libdir='$result'"
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $result" >&5
+printf "%s\n" "$result" >&6; }
+
+
+fi
+
 case $host in #(
   *-*-mingw32*|*-pc-windows) :
     case $WINDOWS_UNICODE_MODE in #(
@@ -20451,6 +20656,87 @@ case $host in #(
   *) :
      ;;
 esac
+
+# Determine the RuntimeID (see runtime/Mangling.md)
+
+alphabet='0123456789abcdefghijklmnopqrstuv'
+
+
+
+# Bits 0-4 (release bit + low 4 bits of release number)
+
+
+# Bits 5-6 (high 2 bits of release number)
+quintet1=1
+quintet1a=''
+quintet1b=''
+quintet1c=''
+# Bits 7 & 8 (int31 + no shared libraries)
+case $arch64,$supports_shared_libraries in #(
+  false,false) :
+        quintet1="8 + 4 + ${quintet1}" ;; #(
+  false,true) :
+        quintet1a="8 + 4 + ${quintet1}"
+    quintet1="4 + ${quintet1}" ;; #(
+  true,false) :
+        quintet1a="8 + 4 + ${quintet1}"
+    quintet1="8 + ${quintet1}" ;; #(
+  true,true) :
+    quintet1a="4 + ${quintet1}"
+    quintet1b="8 + ${quintet1}"
+    quintet1c="8 + 4 + ${quintet1}" ;; #(
+  *) :
+     ;;
+esac
+quintet1="$(echo "${alphabet}" | cut -c $(expr ${quintet1} + 1))"
+if test -n "${quintet1a}"
+then :
+  zinc_runtime_additional="00$(echo "${alphabet}" | \
+     cut -c $(expr ${quintet1a} + 1))5"
+fi
+if test -n "${quintet1b}"
+then :
+  zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1b} + 1))5"
+fi
+if test -n "${quintet1c}"
+then :
+  zinc_runtime_additional="${zinc_runtime_additional} \
+00$(echo "${alphabet}" | cut -c $(expr ${quintet1c} + 1))5"
+fi
+
+# Bits 10-14 (number of reserved header bits)
+quintet2="$(echo "${alphabet}" | cut -c $(expr ${reserved_header_bits} + 1))"
+
+quintet3_byte='0'
+# Bit 15 (--enable-frame-pointers)
+if $frame_pointers
+then :
+  quintet3_native='1'
+else $as_nop
+  quintet3_native='0'
+fi
+# Bit 16 (--enable-spacetime) cannot be set since OCaml 4.12+
+# Bit 17 (--disable-force-safe-string) cannot be set since OCaml 5.0
+# Bit 18 (--disable-flat-float-array)
+if ! $flat_float_array
+then :
+  quintet3_byte="8 + ${quintet3_byte}"
+fi
+# Bit 19 (WINDOWS_UNICODE=ansi)
+case $host,$windows_unicode in #(
+  *-*-mingw32,0|*-pc-windows,0) :
+    quintet3_byte="16 + ${quintet3_byte}" ;; #(
+  *) :
+     ;;
+esac
+quintet3_native="${quintet3_byte} + ${quintet3_native}"
+quintet3_byte="$(echo "${alphabet}" | cut -c $(expr ${quintet3_byte} + 1))"
+quintet3_native="$(echo "${alphabet}" | cut -c $(expr ${quintet3_native} + 1))"
+
+bytecode_runtime_id="${quintet3_byte}${quintet2}${quintet1}5"
+native_runtime_id="${quintet3_native}${quintet2}${quintet1}5"
+zinc_runtime_id="00${quintet1}5"
 
 # Do not permanently cache the result of flexdll.h
 unset ac_cv_header_flexdll_h
@@ -21594,6 +21880,8 @@ fi
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  search_method='$search_method'
+  target_search_method='$target_search_method'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   target_bindir='$(echo "$target_bindir" | sed -e "s/'/'\"'\"'/g")'
 
@@ -22760,10 +23048,10 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
-    "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
+    "shebang":C) printf '%s%s\n%s\000\n' "$search_method" "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$target_bindir" \
-    > stdlib/target_runtime.info ;;
+  printf '%s%s\n%s\000\n' "$target_search_method" "$target_launch_method" \
+    "$target_bindir" > stdlib/target_runtime.info ;;
 
   esac
 done # for ac_tag
