@@ -59,16 +59,16 @@ endif
 lib$(LIBNAME).$(A): OC_CFLAGS = $(OC_BYTECODE_CFLAGS)
 
 lib$(LIBNAME).$(A): st_stubs.b.$(O) st_stubs_shared.b.$(O)
-	@$(MKLIB) -o $(LIBNAME) st_stubs_shared.b.$(O)
-	$(V_OCAMLMKLIB)$(MKLIB) -custom -o $(LIBNAME) $<
+	@$(MKLIB) -suffixed -o $(LIBNAME) st_stubs_shared.b.$(O)
+	$(V_OCAMLMKLIB)$(MKLIB) -custom -suffixed -o $(LIBNAME) $<
 
 lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
 
 lib$(LIBNAME)nat.$(A): st_stubs.n.$(O)
-	$(V_OCAMLMKLIB)$(MKLIB) -custom -o $(LIBNAME)nat $^
+	$(V_OCAMLMKLIB)$(MKLIB) -custom -suffixed -o $(LIBNAME)nat $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
+	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^ -suffixed
 
 # See remark above: force static linking of libthreadsnat.a
 $(LIBNAME).cmxa: $(THREADS_NCOBJS)
@@ -107,9 +107,11 @@ distclean: clean
 
 INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
 
+DLLTHREADS = dllthreads-$(TARGET)-$(BYTECODE_RUNTIME_ID)$(EXT_DLL)
+
 install:
-	if test -f dllthreads$(EXT_DLL); then \
-	  $(INSTALL_PROG) dllthreads$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
+	if test -f $(DLLTHREADS); then \
+	  $(INSTALL_PROG) $(DLLTHREADS) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
 	$(MKDIR) "$(INSTALL_THREADSLIBDIR)"

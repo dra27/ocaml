@@ -673,7 +673,7 @@ let load_libraries_in_toplevel ~original env bindir mode libraries =
     ["-noinit"; "-no-version"; "-noprompt"; "test_install_script.ml"]
   in
   let runtime =
-    if original || Sys.win32 || mode = Native then
+    if original || mode = Native then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
@@ -714,7 +714,7 @@ let load_libraries_in_prog ~original env bindir libdir mode libraries =
     in
     let compiler = Filename.concat bindir (exe compiler) in
     let runtime =
-      if original || Sys.win32 || config.has_ocamlopt || mode = Native then
+      if original || config.has_ocamlopt || mode = Native then
         None
       else
         ocamlrun
@@ -726,7 +726,7 @@ let load_libraries_in_prog ~original env bindir libdir mode libraries =
     Environment.run_process Stdout ?runtime compiler args env
   in
   let runtime =
-    if original || Sys.win32 || mode = Native then
+    if original || mode = Native then
       None
     else
       ocamlrun
@@ -769,7 +769,7 @@ let test_bytecode_binaries ~original env bindir =
           | (0, output) ->
               let format_line = Format.printf "@{<inline_code>>@} %s\n%!" in
               List.iter format_line output
-          | (2, _) when not original && not Sys.win32 ->
+          | (2, _) when not original ->
               ()
           | _ ->
               fail_because "it was broken"
@@ -828,7 +828,7 @@ type linkage =
 
 let compile_test ~original env bindir =
   let runtime =
-    if original || config.has_ocamlopt || Sys.win32 then
+    if original || config.has_ocamlopt then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))
@@ -875,10 +875,14 @@ let compile_test ~original env bindir =
       | Output_complete_exe Shared ->
           true, false, ["-output-complete-exe"], false, None
     in
-    (* At present, shared runtime support is not available on Windows *)
+    (* At present, shared runtime support is not available on Windows.
+       With an absolute header, in bytecode-only mode, flexlink is a bytecode
+       executable and cannot run in the second phase.*)
     if use_shared_runtime
        && (Sys.win32 || not config.supports_shared_libraries)
-    || needs_ocamlopt && not config.has_ocamlopt then
+    || needs_ocamlopt && not config.has_ocamlopt
+    || not config.has_ocamlopt && not main_in_c && test <> Default C_ocamlc
+       && (Sys.win32 || Sys.cygwin && config.supports_shared_libraries) then
       None
     else
       let test_program = Filename.concat test_root (exe test_program) in
@@ -950,7 +954,7 @@ let compile_test ~original env bindir =
       in
       let rec run ~original ?runtime env ~arg =
         let runtime =
-          if test = Default C_ocamlc && not Sys.win32 then
+          if test = Default C_ocamlc then
             runtime
           else
             None
@@ -976,7 +980,7 @@ let test_standard_library_location ~original env bindir =
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 display_path bindir;
   let runtime =
-    if original || config.has_ocamlopt || Sys.win32 then
+    if original || config.has_ocamlopt then
       None
     else
       Some (Filename.concat bindir (exe "ocamlrun"))

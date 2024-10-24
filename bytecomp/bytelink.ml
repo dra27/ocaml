@@ -385,12 +385,6 @@ let find_bin_sh () =
    called) *)
 
 let write_header outchan =
-  let use_runtime, runtime =
-    if String.length !Clflags.use_runtime > 0 then
-      (true, make_absolute !Clflags.use_runtime)
-    else
-      (false, "ocamlrun" ^ !Clflags.runtime_variant)
-  in
   (* Write the header *)
   let runtime_info =
     let header = "runtime-launch-info" in
@@ -398,11 +392,13 @@ let write_header outchan =
     with Not_found -> raise (Error (File_not_found header))
   in
   let runtime =
-    (* Historically, the native Windows ports are assumed to be finding
-       ocamlrun using a PATH search. *)
-    if use_runtime || Sys.win32 then
-      runtime
+    if String.length !Clflags.use_runtime > 0 then
+      make_absolute !Clflags.use_runtime
     else
+      let runtime =
+        Printf.sprintf "ocamlrun%s-%s"
+                       !Clflags.runtime_variant Config.zinc_runtime_id
+      in
       Filename.concat runtime_info.bindir runtime
   in
   (* Determine which method will be used for launching the executable:
@@ -484,13 +480,28 @@ let link_bytecode ?final_name tolink exec_name standalone =
        let start_code = pos_out outchan in
        Symtable.init();
        clear_crc_interfaces ();
-       let sharedobjs = List.map Dll.extract_dll_name !Clflags.dllibs in
+       let (tocheck, sharedobjs) =
+         let process_dllib ((suffixed, name) as dllib) (tocheck, sharedobjs) =
+           let resolved_name = Dll.extract_dll_name dllib in
+           let partial_name =
+             if suffixed then
+               if String.starts_with ~prefix:"-l" name then
+                 (suffixed, "dll" ^ String.sub name 2 (String.length name - 2))
+               else
+                 dllib
+             else
+               (false, resolved_name)
+           in
+           (resolved_name::tocheck, partial_name::sharedobjs)
+         in
+         List.fold_right process_dllib !Clflags.dllibs ([], [])
+       in
        let check_dlls = standalone && Config.target = Config.host in
        if check_dlls then begin
          (* Initialize the DLL machinery *)
          Dll.init_compile !Clflags.no_std_include;
          Dll.add_path (Load_path.get_path_list ());
-         try Dll.open_dlls Dll.For_checking sharedobjs
+         try Dll.open_dlls Dll.For_checking tocheck
          with Failure reason -> raise(Error(Cannot_open_dll reason))
        end;
        let output_fun buf =
@@ -505,11 +516,20 @@ let link_bytecode ?final_name tolink exec_name standalone =
        (* DLL stuff *)
        if standalone then begin
          (* The extra search path for DLLs *)
-         output_string outchan (concat_null_terminated !Clflags.dllpaths);
-         Bytesections.record toc_writer DLPT;
+         if !Clflags.dllpaths <> [] then begin
+           output_string outchan (concat_null_terminated !Clflags.dllpaths);
+           Bytesections.record toc_writer DLPT
+         end;
          (* The names of the DLLs *)
-         output_string outchan (concat_null_terminated sharedobjs);
-         Bytesections.record toc_writer DLLS
+         if sharedobjs <> [] then begin
+           let output_sharedobj (suffixed, name) =
+             output_char outchan (if suffixed then '-' else ':');
+             output_string outchan name;
+             output_byte outchan 0
+           in
+           List.iter output_sharedobj sharedobjs;
+           Bytesections.record toc_writer DLLS
+         end
        end;
        (* The names of all primitives *)
        Symtable.output_primitive_names outchan;
@@ -715,13 +735,22 @@ value caml_startup_pooled_exn(char_os ** argv)
   if not with_main && !Clflags.debug then
     output_cds_file ((Filename.chop_extension outfile) ^ ".cds")
 
+let runtime_library_name runtime_variant =
+  if runtime_variant = "_shared" then
+    Printf.sprintf "-lcamlrun-%s-%s"
+      Config.target
+      Config.bytecode_runtime_id
+  else
+    "-lcamlrun" ^ runtime_variant
+
 (* Build a custom runtime *)
 
 let build_custom_runtime prim_name exec_name =
   let runtime_lib =
     if not !Clflags.with_runtime
     then ""
-    else "-lcamlrun" ^ !Clflags.runtime_variant in
+    else runtime_library_name !Clflags.runtime_variant
+  in
   let stable_name =
     if not !Clflags.keep_camlprimc_file then
       Some "camlprim.c"
@@ -858,7 +887,8 @@ extern "C" {
                  let runtime_lib =
                    if not !Clflags.with_runtime
                    then ""
-                   else "-lcamlrun" ^ !Clflags.runtime_variant in
+                   else runtime_library_name !Clflags.runtime_variant
+                 in
                  Ccomp.call_linker mode output_name
                    ([obj_file] @ List.rev !Clflags.ccobjs @ [runtime_lib])
                    c_libs = 0
