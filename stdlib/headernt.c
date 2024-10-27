@@ -13,7 +13,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* The launcher for bytecode executables */
+/* The launcher for bytecode executables (as #! is not available) */
 
 #define CAML_INTERNALS
 #include "caml/exec.h"
@@ -23,43 +23,35 @@
 
 #include <windows.h>
 
-Caml_inline unsigned long read_size(const char * const ptr)
-{
-  const unsigned char * const p = (const unsigned char * const) ptr;
-  return ((unsigned long) p[0] << 24) | ((unsigned long) p[1] << 16) |
-         ((unsigned long) p[2] << 8) | p[3];
-}
+/* C11's _Noreturn is deprecated in C23 in favour of attributes */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+  #define NORETURN [[noreturn]]
+#else
+  #define NORETURN _Noreturn
+#endif
 
-Caml_inline char * read_runtime_path(HANDLE h)
-{
-  char buffer[TRAILER_SIZE];
-  static char runtime_path[MAX_PATH];
-  DWORD nread;
-  int num_sections, path_size;
-  long ofs;
+#if WINDOWS_UNICODE
+#define CP CP_UTF8
+#else
+#define CP CP_ACP
+#endif
 
-  if (SetFilePointer(h, -TRAILER_SIZE, NULL, FILE_END) == -1) return NULL;
-  if (! ReadFile(h, buffer, TRAILER_SIZE, &nread, NULL)) return NULL;
-  if (nread != TRAILER_SIZE) return NULL;
-  num_sections = read_size(buffer);
-  ofs = TRAILER_SIZE + num_sections * 8;
-  if (SetFilePointer(h, - ofs, NULL, FILE_END) == -1) return NULL;
-  path_size = 0;
-  for (int i = 0; i < num_sections; i++) {
-    if (! ReadFile(h, buffer, 8, &nread, NULL) || nread != 8) return NULL;
-    if (buffer[0] == 'R' && buffer[1] == 'N' &&
-        buffer[2] == 'T' && buffer[3] == 'M') {
-      path_size = read_size(buffer + 4);
-      ofs += path_size;
-    } else if (path_size > 0)
-      ofs += read_size(buffer + 4);
-  }
-  if (path_size == 0) return NULL;
-  if (path_size >= MAX_PATH) return NULL;
-  if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return NULL;
-  if (! ReadFile(h, runtime_path, path_size, &nread, NULL)) return NULL;
-  if (nread != path_size) return NULL;
-  return runtime_path;
+/* mingw-w64 has a limits.h which defines PATH_MAX as an alias for MAX_PATH */
+#if !defined(PATH_MAX)
+#define PATH_MAX MAX_PATH
+#endif
+
+#define SEEK_END FILE_END
+
+#define lseek(h, offset, origin) SetFilePointer((h), (offset), NULL, (origin))
+
+typedef HANDLE file_descriptor;
+
+static int read(HANDLE h, LPVOID buffer, DWORD buffer_size)
+{
+  DWORD nread = 0;
+  ReadFile(h, buffer, buffer_size, &nread, NULL);
+  return nread;
 }
 
 static BOOL WINAPI ctrl_handler(DWORD event)
@@ -70,16 +62,10 @@ static BOOL WINAPI ctrl_handler(DWORD event)
     return FALSE;
 }
 
-#if WINDOWS_UNICODE
-#define CP CP_UTF8
-#else
-#define CP CP_ACP
-#endif
-
-static void write_console(HANDLE hOut, WCHAR *wstr)
+static void write_error(const wchar_t *wstr, HANDLE hOut)
 {
   DWORD consoleMode, numwritten, len;
-  static char str[MAX_PATH];
+  char str[MAX_PATH];
 
   if (GetConsoleMode(hOut, &consoleMode) != 0) {
     /* The output stream is a Console */
@@ -92,70 +78,100 @@ static void write_console(HANDLE hOut, WCHAR *wstr)
   }
 }
 
-CAMLnoret Caml_inline void run_runtime(wchar_t * runtime,
-         wchar_t * const cmdline)
+NORETURN static void exit_with_error(const wchar_t *wstr1,
+                                     const wchar_t *wstr2,
+                                     const wchar_t *wstr3)
 {
-  wchar_t path[MAX_PATH];
+  HANDLE hOut = GetStdHandle(STD_ERROR_HANDLE);
+  if (wstr1) write_error(wstr1, hOut);
+  if (wstr2) write_error(wstr2, hOut);
+  if (wstr3) write_error(wstr3, hOut);
+  write_error(L"\r\n", hOut);
+  ExitProcess(2);
+}
+
+static uint32_t read_size(const char *ptr)
+{
+  const unsigned char *p = (const unsigned char *)ptr;
+  return ((uint32_t) p[0] << 24) | ((uint32_t) p[1] << 16) |
+         ((uint32_t) p[2] << 8) | p[3];
+}
+
+static char * read_runtime_path(file_descriptor fd)
+{
+  char buffer[TRAILER_SIZE];
+  static char runtime_path[PATH_MAX];
+  int num_sections;
+  uint32_t path_size;
+  long ofs;
+
+  if (lseek(fd, -TRAILER_SIZE, SEEK_END) == -1) return NULL;
+  if (read(fd, buffer, TRAILER_SIZE) < TRAILER_SIZE) return NULL;
+  num_sections = read_size(buffer);
+  ofs = TRAILER_SIZE + num_sections * 8;
+  if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
+  path_size = 0;
+  for (int i = 0; i < num_sections; i++) {
+    if (read(fd, buffer, 8) < 8) return NULL;
+    if (buffer[0] == 'R' && buffer[1] == 'N' &&
+        buffer[2] == 'T' && buffer[3] == 'M') {
+      path_size = read_size(buffer + 4);
+      ofs += path_size;
+    } else if (path_size > 0)
+      ofs += read_size(buffer + 4);
+  }
+  if (path_size == 0) return NULL;
+  if (path_size >= PATH_MAX) return NULL;
+  if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
+  if (read(fd, runtime_path, path_size) != path_size) return NULL;
+
+  return runtime_path;
+}
+
+NORETURN void __cdecl wmainCRTStartup(void)
+{
+  wchar_t truename[MAX_PATH];
+  char *runtime_path;
+  wchar_t wruntime_path[MAX_PATH];
+  HANDLE h;
   STARTUPINFO stinfo;
   PROCESS_INFORMATION procinfo;
   DWORD retcode;
-  if (SearchPath(NULL, runtime, L".exe", sizeof(path)/sizeof(wchar_t),
-                 path, NULL) == 0) {
-    HANDLE errh;
-    errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, L"Cannot exec ");
-    write_console(errh, runtime);
-    write_console(errh, L"\r\n");
-    ExitProcess(2);
-  }
-  /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take
-     the underlying OCaml program with us! */
-  SetConsoleCtrlHandler(ctrl_handler, TRUE);
 
-  stinfo.cb = sizeof(stinfo);
-  stinfo.lpReserved = NULL;
-  stinfo.lpDesktop = NULL;
-  stinfo.lpTitle = NULL;
-  stinfo.dwFlags = 0;
-  stinfo.cbReserved2 = 0;
-  stinfo.lpReserved2 = NULL;
-  if (!CreateProcess(path, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
-                     &stinfo, &procinfo)) {
-    HANDLE errh;
-    errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, L"Cannot exec ");
-    write_console(errh, runtime);
-    write_console(errh, L"\r\n");
-    ExitProcess(2);
-  }
-  CloseHandle(procinfo.hThread);
-  WaitForSingleObject(procinfo.hProcess , INFINITE);
-  GetExitCodeProcess(procinfo.hProcess , &retcode);
-  CloseHandle(procinfo.hProcess);
-  ExitProcess(retcode);
-}
+  if (GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t)) == 0)
+    exit_with_error(L"Out of memory", NULL, NULL);
 
-_Noreturn void __cdecl wmainCRTStartup(void)
-{
-  wchar_t truename[MAX_PATH];
-  wchar_t * cmdline = GetCommandLine();
-  char * runtime_path;
-  wchar_t wruntime_path[MAX_PATH];
-  HANDLE h;
-
-  GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t));
   h = CreateFile(truename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                  NULL, OPEN_EXISTING, 0, NULL);
   if (h == INVALID_HANDLE_VALUE ||
-      (runtime_path = read_runtime_path(h)) == NULL) {
-    HANDLE errh;
-    errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, truename);
-    write_console(errh, L" not found or is not a bytecode executable file\r\n");
-    ExitProcess(2);
-  }
+      (runtime_path = read_runtime_path(h)) == NULL ||
+      !MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
+                           sizeof(wruntime_path)/sizeof(wchar_t)))
+    exit_with_error(NULL, truename,
+                    L" not found or is not a bytecode executable file");
   CloseHandle(h);
-  MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
-                      sizeof(wruntime_path)/sizeof(wchar_t));
-  run_runtime(wruntime_path , cmdline);
+  if (SearchPath(NULL, wruntime_path, L".exe", sizeof(truename)/sizeof(wchar_t),
+                 truename, NULL)) {
+    /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take
+       the underlying OCaml program with us! */
+    SetConsoleCtrlHandler(ctrl_handler, TRUE);
+
+    stinfo.cb = sizeof(stinfo);
+    stinfo.lpReserved = NULL;
+    stinfo.lpDesktop = NULL;
+    stinfo.lpTitle = NULL;
+    stinfo.dwFlags = 0;
+    stinfo.cbReserved2 = 0;
+    stinfo.lpReserved2 = NULL;
+    if (CreateProcess(truename, GetCommandLine(), NULL, NULL, TRUE, 0,
+                      NULL, NULL, &stinfo, &procinfo)) {
+      CloseHandle(procinfo.hThread);
+      WaitForSingleObject(procinfo.hProcess, INFINITE);
+      GetExitCodeProcess(procinfo.hProcess, &retcode);
+      CloseHandle(procinfo.hProcess);
+      ExitProcess(retcode);
+    }
+  }
+
+  exit_with_error(L"Cannot exec ", wruntime_path, NULL);
 }
