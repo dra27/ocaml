@@ -22,15 +22,6 @@
 #include "caml/mlvalues.h"
 #include "caml/exec.h"
 
-#ifndef __MINGW32__
-#pragma comment(linker , "/subsystem:console")
-#pragma comment(lib , "kernel32")
-#ifdef _UCRT
-#pragma comment(lib , "ucrt.lib")
-#pragma comment(lib , "vcruntime.lib")
-#endif
-#endif
-
 Caml_inline unsigned long read_size(const char * const ptr)
 {
   const unsigned char * const p = (const unsigned char * const) ptr;
@@ -143,7 +134,7 @@ CAMLnoret Caml_inline void run_runtime(wchar_t * runtime,
   ExitProcess(retcode);
 }
 
-int wmain(void)
+void __declspec(noreturn) __cdecl wmainCRTStartup(void)
 {
   wchar_t truename[MAX_PATH];
   wchar_t * cmdline = GetCommandLine();
