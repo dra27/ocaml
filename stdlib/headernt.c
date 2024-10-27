@@ -22,14 +22,11 @@
 #include "caml/mlvalues.h"
 #include "caml/exec.h"
 
+/* TODO Eliminate this nonsense - just build it with the flags! */
 #ifndef __MINGW32__
 #pragma comment(linker , "/entry:headerentry")
 #pragma comment(linker , "/subsystem:console")
 #pragma comment(lib , "kernel32")
-#ifdef _UCRT
-#pragma comment(lib , "ucrt.lib")
-#pragma comment(lib , "vcruntime.lib")
-#endif
 #endif
 
 char * default_runtime_name = RUNTIME_NAME;
@@ -94,17 +91,19 @@ static BOOL WINAPI ctrl_handler(DWORD event)
 #define CP CP_ACP
 #endif
 
-static void write_console(HANDLE hOut, WCHAR *wstr)
+#define msg_and_length(msg) msg , ((sizeof(msg) / sizeof(wchar_t)) - 1)
+
+static void write_console(HANDLE hOut, WCHAR *wstr, size_t wlen)
 {
   DWORD consoleMode, numwritten, len;
   static char str[MAX_PATH];
 
   if (GetConsoleMode(hOut, &consoleMode) != 0) {
     /* The output stream is a Console */
-    WriteConsole(hOut, wstr, wcslen(wstr), &numwritten, NULL);
+    WriteConsole(hOut, wstr, wlen, &numwritten, NULL);
   } else { /* The output stream is redirected */
     len =
-      WideCharToMultiByte(CP, 0, wstr, wcslen(wstr), str, sizeof(str),
+      WideCharToMultiByte(CP, 0, wstr, wlen, str, sizeof(str),
                           NULL, NULL);
     WriteFile(hOut, str, len, &numwritten, NULL);
   }
@@ -121,9 +120,9 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
                  path, &runtime) == 0) {
     HANDLE errh;
     errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, L"Cannot exec ");
-    write_console(errh, runtime);
-    write_console(errh, L"\r\n");
+    write_console(errh, msg_and_length(L"Cannot exec "));
+    write_console(errh, runtime, wcslen(runtime));
+    write_console(errh, L"\r\n", 2);
     ExitProcess(2);
 #if _MSC_VER >= 1200
     __assume(0); /* Not reached */
@@ -144,9 +143,9 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
                      &stinfo, &procinfo)) {
     HANDLE errh;
     errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, L"Cannot exec ");
-    write_console(errh, runtime);
-    write_console(errh, L"\r\n");
+    write_console(errh, msg_and_length(L"Cannot exec "));
+    write_console(errh, runtime, wcslen(runtime));
+    write_console(errh, L"\r\n", 2);
     ExitProcess(2);
 #if _MSC_VER >= 1200
     __assume(0); /* Not reached */
@@ -162,8 +161,9 @@ static __inline void __declspec(noreturn) run_runtime(wchar_t * runtime,
 #endif
 }
 
+/* XXX TODO Check whether headerentry(void) makes a difference! */
 #ifdef __MINGW32__
-int wmain(void)
+void headerentry()
 #else
 void __declspec(noreturn) __cdecl headerentry()
 #endif
@@ -181,8 +181,8 @@ void __declspec(noreturn) __cdecl headerentry()
       (runtime_path = read_runtime_path(h)) == NULL) {
     HANDLE errh;
     errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, truename);
-    write_console(errh, L" not found or is not a bytecode executable file\r\n");
+    write_console(errh, truename, wcslen(truename));
+    write_console(errh, msg_and_length(L" not found or is not a bytecode executable file\r\n"));
     ExitProcess(2);
 #if _MSC_VER >= 1200
     __assume(0); /* Not reached */
@@ -194,8 +194,5 @@ void __declspec(noreturn) __cdecl headerentry()
   run_runtime(wruntime_path , cmdline);
 #if _MSC_VER >= 1200
     __assume(0); /* Not reached */
-#endif
-#ifdef __MINGW32__
-    return 0;
 #endif
 }
