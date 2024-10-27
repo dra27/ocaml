@@ -93,6 +93,15 @@ endif
 %-launch-info: %.info tmpheader.exe
 	@cat $^ > $@
 
+ifeq "$(TOOLCHAIN)" "mingw"
+tmpheader.exe: OC_LDFLAGS += -nostartfiles -Wl,-e,wmainCRTStartup
+endif
+ifeq "$(TOOLCHAIN)" "msvc"
+tmpheader.exe: OC_LDFLAGS += \
+  /NOCOFFGRPINFO /subsystem:console kernel32.lib libucrt.lib
+headernt.obj: OC_CFLAGS := $(filter-out /MD -MD, $(OC_CFLAGS)) /Os /MT
+endif
+
 .INTERMEDIATE: tmpheader.exe
 tmpheader.exe: $(HEADERPROGRAM).$(O)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
