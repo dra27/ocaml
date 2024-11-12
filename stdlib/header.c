@@ -18,6 +18,7 @@
 #define CAML_INTERNALS
 #include "caml/exec.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,22 +132,21 @@ static uint32_t read_size(const char *ptr)
          ((uint32_t) p[2] << 8) | p[3];
 }
 
-static char * read_runtime_path(int fd)
+static bool read_runtime_path(int fd, char *result)
 {
   char buffer[TRAILER_SIZE];
-  static char runtime_path[PATH_MAX];
   int num_sections;
   uint32_t path_size;
   long ofs;
 
-  if (lseek(fd, -TRAILER_SIZE, SEEK_END) == -1) return NULL;
-  if (read(fd, buffer, TRAILER_SIZE) < TRAILER_SIZE) return NULL;
+  if (lseek(fd, -TRAILER_SIZE, SEEK_END) == -1) return false;
+  if (read(fd, buffer, TRAILER_SIZE) < TRAILER_SIZE) return false;
   num_sections = read_size(buffer);
   ofs = TRAILER_SIZE + num_sections * 8;
-  if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
+  if (lseek(fd, -ofs, SEEK_END) == -1) return false;
   path_size = 0;
   for (int i = 0; i < num_sections; i++) {
-    if (read(fd, buffer, 8) < 8) return NULL;
+    if (read(fd, buffer, 8) < 8) return false;
     if (buffer[0] == 'R' && buffer[1] == 'N' &&
         buffer[2] == 'T' && buffer[3] == 'M') {
       path_size = read_size(buffer + 4);
@@ -154,21 +154,23 @@ static char * read_runtime_path(int fd)
     } else if (path_size > 0)
       ofs += read_size(buffer + 4);
   }
-  if (path_size == 0) return NULL;
-  if (path_size >= PATH_MAX) return NULL;
-  if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
-  if (read(fd, runtime_path, path_size) != path_size) return NULL;
-  return runtime_path;
+  if (path_size == 0) return false;
+  if (path_size >= PATH_MAX) return false;
+  if (lseek(fd, -ofs, SEEK_END) == -1) return false;
+  if (read(fd, result, path_size) != path_size) return false;
+
+  return true;
 }
 
 int main(int argc, char ** argv)
 {
-  char * truename, * runtime_path;
+  char * truename;
+  char runtime_path[PATH_MAX];
   int fd;
 
   truename = searchpath(argv[0]);
   fd = open(truename, O_RDONLY | O_BINARY);
-  if (fd == -1 || (runtime_path = read_runtime_path(fd)) == NULL)
+  if (fd == -1 || !read_runtime_path(fd, runtime_path))
     exit_with_error(NULL, truename,
                     " not found or is not a bytecode executable file");
   close(fd);
