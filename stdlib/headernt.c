@@ -31,6 +31,16 @@
 #define CP CP_ACP
 #endif
 
+#define lseek(h, offset, origin) SetFilePointer((h), (offset), NULL, (origin))
+static int read(HANDLE h, LPVOID buffer, DWORD buffer_size)
+{
+  DWORD nread = 0;
+  ReadFile(h, buffer, buffer_size, &nread, NULL);
+  return nread;
+}
+
+#define SEEK_END FILE_END
+
 static BOOL WINAPI ctrl_handler(DWORD event)
 {
   if (event == CTRL_C_EVENT || event == CTRL_BREAK_EVENT)
@@ -74,22 +84,21 @@ static uint32_t read_size(const char * const ptr)
          ((uint32_t) p[2] << 8) | p[3];
 }
 
-static bool read_runtime_path(HANDLE h, char *result)
+static bool read_runtime_path(HANDLE fd, char *result)
 {
   char buffer[TRAILER_SIZE];
-  DWORD nread;
-  int num_sections, path_size;
+  int num_sections;
+  uint32_t path_size;
   long ofs;
 
-  if (SetFilePointer(h, -TRAILER_SIZE, NULL, FILE_END) == -1) return false;
-  if (! ReadFile(h, buffer, TRAILER_SIZE, &nread, NULL)) return false;
-  if (nread != TRAILER_SIZE) return false;
+  if (lseek(fd, -TRAILER_SIZE, SEEK_END) == -1) return false;
+  if (read(fd, buffer, TRAILER_SIZE) < TRAILER_SIZE) return false;
   num_sections = read_size(buffer);
   ofs = TRAILER_SIZE + num_sections * 8;
-  if (SetFilePointer(h, - ofs, NULL, FILE_END) == -1) return false;
+  if (lseek(fd, -ofs, SEEK_END) == -1) return false;
   path_size = 0;
   for (int i = 0; i < num_sections; i++) {
-    if (! ReadFile(h, buffer, 8, &nread, NULL) || nread != 8) return false;
+    if (read(fd, buffer, 8) < 8) return false;
     if (buffer[0] == 'R' && buffer[1] == 'N' &&
         buffer[2] == 'T' && buffer[3] == 'M') {
       path_size = read_size(buffer + 4);
@@ -99,9 +108,9 @@ static bool read_runtime_path(HANDLE h, char *result)
   }
   if (path_size == 0) return false;
   if (path_size >= MAX_PATH) return false;
-  if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return false;
-  if (! ReadFile(h, result, path_size, &nread, NULL)) return false;
-  if (nread != path_size) return false;
+  if (lseek(fd, -ofs, SEEK_END) == -1) return false;
+  if (read(fd, result, path_size) != path_size) return false;
+
   return true;
 }
 
