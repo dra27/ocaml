@@ -92,16 +92,32 @@ static char * read_runtime_path(HANDLE h)
   return runtime_path;
 }
 
-static void __declspec(noreturn) run_runtime(wchar_t * runtime,
-         wchar_t * const cmdline)
+void __declspec(noreturn) __cdecl wmainCRTStartup(void)
 {
-  wchar_t path[MAX_PATH];
+  wchar_t truename[MAX_PATH];
+  wchar_t * cmdline = GetCommandLine();
+  char * runtime_path;
+  wchar_t wruntime_path[MAX_PATH];
+  HANDLE h, errh;
   STARTUPINFO stinfo;
   PROCESS_INFORMATION procinfo;
   DWORD retcode;
-  HANDLE errh;
-  if (SearchPath(NULL, runtime, L".exe", sizeof(path)/sizeof(wchar_t),
-                 path, NULL)) {
+
+  GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t));
+  h = CreateFile(truename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                 NULL, OPEN_EXISTING, 0, NULL);
+  if (h == INVALID_HANDLE_VALUE ||
+      (runtime_path = read_runtime_path(h)) == NULL ||
+      !MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
+                           sizeof(wruntime_path)/sizeof(wchar_t))) {
+    errh = GetStdHandle(STD_ERROR_HANDLE);
+    write_console(errh, truename);
+    write_console(errh, L" not found or is not a bytecode executable file\r\n");
+    ExitProcess(2);
+  }
+  CloseHandle(h);
+  if (SearchPath(NULL, wruntime_path, L".exe", sizeof(truename)/sizeof(wchar_t),
+                 truename, NULL)) {
     /* Need to ignore ctrl-C and ctrl-break, otherwise we'll die and take
        the underlying OCaml program with us! */
     SetConsoleCtrlHandler(ctrl_handler, TRUE);
@@ -113,7 +129,7 @@ static void __declspec(noreturn) run_runtime(wchar_t * runtime,
     stinfo.dwFlags = 0;
     stinfo.cbReserved2 = 0;
     stinfo.lpReserved2 = NULL;
-    if (CreateProcess(path, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
+    if (CreateProcess(truename, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
                       &stinfo, &procinfo)) {
       CloseHandle(procinfo.hThread);
       WaitForSingleObject(procinfo.hProcess, INFINITE);
@@ -125,32 +141,7 @@ static void __declspec(noreturn) run_runtime(wchar_t * runtime,
 
   errh = GetStdHandle(STD_ERROR_HANDLE);
   write_console(errh, L"Cannot exec ");
-  write_console(errh, runtime);
+  write_console(errh, wruntime_path);
   write_console(errh, L"\r\n");
   ExitProcess(2);
-}
-
-void __declspec(noreturn) __cdecl wmainCRTStartup(void)
-{
-  wchar_t truename[MAX_PATH];
-  wchar_t * cmdline = GetCommandLine();
-  char * runtime_path;
-  wchar_t wruntime_path[MAX_PATH];
-  HANDLE h;
-
-  GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t));
-  h = CreateFile(truename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-                 NULL, OPEN_EXISTING, 0, NULL);
-  if (h == INVALID_HANDLE_VALUE ||
-      (runtime_path = read_runtime_path(h)) == NULL) {
-    HANDLE errh;
-    errh = GetStdHandle(STD_ERROR_HANDLE);
-    write_console(errh, truename);
-    write_console(errh, L" not found or is not a bytecode executable file\r\n");
-    ExitProcess(2);
-  }
-  CloseHandle(h);
-  MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
-                      sizeof(wruntime_path)/sizeof(wchar_t));
-  run_runtime(wruntime_path , cmdline);
 }
