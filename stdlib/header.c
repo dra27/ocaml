@@ -113,9 +113,14 @@ static char * searchpath(char * name)
 
 #endif
 
-static void errwrite(const char * msg)
+static void exit_with_error(const char * const str1, const char * const str2,
+                            const char * const str3)
 {
-  fputs(msg, stderr);
+  if (str1) fputs(str1, stderr);
+  if (str2) fputs(str2, stderr);
+  if (str3) fputs(str3, stderr);
+  fputs("\n", stderr);
+  exit(2);
 }
 
 static uint32_t read_size(const char * const ptr)
@@ -162,15 +167,11 @@ int main(int argc, char ** argv)
 
   truename = searchpath(argv[0]);
   fd = open(truename, O_RDONLY | O_BINARY);
-  if (fd == -1 || (runtime_path = read_runtime_path(fd)) == NULL) {
-    errwrite(truename);
-    errwrite(" not found or is not a bytecode executable file\n");
-    return 2;
-  }
+  if (fd == -1 || (runtime_path = read_runtime_path(fd)) == NULL)
+    exit_with_error(NULL, truename,
+                    " not found or is not a bytecode executable file");
   argv[0] = truename;
   execv(runtime_path, argv);
-  errwrite("Cannot exec ");
-  errwrite(runtime_path);
-  errwrite("\n");
-  return 2;
+
+  exit_with_error("Cannot exec ", runtime_path, NULL);
 }
