@@ -163,7 +163,7 @@ static bool read_runtime_path(int fd, char *result)
 
 int main(int argc, char ** argv)
 {
-  char * truename;
+  char * truename, * image;
   char runtime_path[PATH_MAX];
   int fd;
 
@@ -173,8 +173,10 @@ int main(int argc, char ** argv)
     exit_with_error(NULL, truename,
                     " not found or is not a bytecode executable file");
   close(fd);
-  argv[0] = truename;
-  execv(runtime_path, argv);
 
-  exit_with_error("Cannot exec ", runtime_path, NULL);
+  image = searchpath(runtime_path);
+  argv[0] = truename;
+  execv(image, argv);
+
+  exit_with_error("Cannot exec ", image, NULL);
 }
