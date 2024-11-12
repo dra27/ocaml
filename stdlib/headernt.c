@@ -18,6 +18,8 @@
 #define CAML_INTERNALS
 #include "caml/exec.h"
 
+#include <stdbool.h>
+
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 
@@ -72,23 +74,22 @@ static uint32_t read_size(const char * const ptr)
          ((uint32_t) p[2] << 8) | p[3];
 }
 
-static char * read_runtime_path(HANDLE h)
+static bool read_runtime_path(HANDLE h, char *result)
 {
   char buffer[TRAILER_SIZE];
-  static char runtime_path[MAX_PATH];
   DWORD nread;
   int num_sections, path_size;
   long ofs;
 
-  if (SetFilePointer(h, -TRAILER_SIZE, NULL, FILE_END) == -1) return NULL;
-  if (! ReadFile(h, buffer, TRAILER_SIZE, &nread, NULL)) return NULL;
-  if (nread != TRAILER_SIZE) return NULL;
+  if (SetFilePointer(h, -TRAILER_SIZE, NULL, FILE_END) == -1) return false;
+  if (! ReadFile(h, buffer, TRAILER_SIZE, &nread, NULL)) return false;
+  if (nread != TRAILER_SIZE) return false;
   num_sections = read_size(buffer);
   ofs = TRAILER_SIZE + num_sections * 8;
-  if (SetFilePointer(h, - ofs, NULL, FILE_END) == -1) return NULL;
+  if (SetFilePointer(h, - ofs, NULL, FILE_END) == -1) return false;
   path_size = 0;
   for (int i = 0; i < num_sections; i++) {
-    if (! ReadFile(h, buffer, 8, &nread, NULL) || nread != 8) return NULL;
+    if (! ReadFile(h, buffer, 8, &nread, NULL) || nread != 8) return false;
     if (buffer[0] == 'R' && buffer[1] == 'N' &&
         buffer[2] == 'T' && buffer[3] == 'M') {
       path_size = read_size(buffer + 4);
@@ -96,19 +97,19 @@ static char * read_runtime_path(HANDLE h)
     } else if (path_size > 0)
       ofs += read_size(buffer + 4);
   }
-  if (path_size == 0) return NULL;
-  if (path_size >= MAX_PATH) return NULL;
-  if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return NULL;
-  if (! ReadFile(h, runtime_path, path_size, &nread, NULL)) return NULL;
-  if (nread != path_size) return NULL;
-  return runtime_path;
+  if (path_size == 0) return false;
+  if (path_size >= MAX_PATH) return false;
+  if (SetFilePointer(h, -ofs, NULL, FILE_END) == -1) return false;
+  if (! ReadFile(h, result, path_size, &nread, NULL)) return false;
+  if (nread != path_size) return false;
+  return true;
 }
 
 void __declspec(noreturn) __cdecl wmainCRTStartup(void)
 {
   wchar_t truename[MAX_PATH];
   wchar_t * cmdline = GetCommandLine();
-  char * runtime_path;
+  char runtime_path[MAX_PATH];
   wchar_t wruntime_path[MAX_PATH];
   HANDLE h;
   STARTUPINFO stinfo;
@@ -118,8 +119,7 @@ void __declspec(noreturn) __cdecl wmainCRTStartup(void)
   GetModuleFileName(NULL, truename, sizeof(truename)/sizeof(wchar_t));
   h = CreateFile(truename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                  NULL, OPEN_EXISTING, 0, NULL);
-  if (h == INVALID_HANDLE_VALUE ||
-      (runtime_path = read_runtime_path(h)) == NULL ||
+  if (h == INVALID_HANDLE_VALUE || !read_runtime_path(h, runtime_path) ||
       !MultiByteToWideChar(CP, 0, runtime_path, -1, wruntime_path,
                            sizeof(wruntime_path)/sizeof(wchar_t)))
     exit_with_error(NULL, truename,
