@@ -13,14 +13,15 @@
 /*                                                                        */
 /**************************************************************************/
 
+/* The launcher for bytecode executables */
+
 #define CAML_INTERNALS
+#include "caml/exec.h"
 
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include "caml/mlvalues.h"
-#include "caml/exec.h"
 
 static unsigned long read_size(const char * const ptr)
 {
@@ -91,7 +92,7 @@ static void write_console(HANDLE hOut, WCHAR *wstr)
   }
 }
 
-CAMLnoret static void run_runtime(wchar_t * runtime,
+static void __declspec(noreturn) run_runtime(wchar_t * runtime,
          wchar_t * const cmdline)
 {
   wchar_t path[MAX_PATH];
