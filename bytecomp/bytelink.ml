@@ -403,9 +403,9 @@ let write_header outchan =
         runtime_info
   in
   let static = not Config.supports_shared_libraries in
-  let runtime =
+  let runtime, search =
     if String.length !Clflags.use_runtime > 0 then
-      make_absolute !Clflags.use_runtime
+      make_absolute !Clflags.use_runtime, Clflags.Absolute
     else
       let runtime_id =
         let open Config in
@@ -417,7 +417,10 @@ let write_header outchan =
       let runtime =
         Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id
       in
-      Filename.concat runtime_info.bindir runtime
+      if !Clflags.search_method <> Clflags.Absolute then
+        runtime, !Clflags.search_method
+      else
+        Filename.concat runtime_info.bindir runtime, Clflags.Absolute
   in
   (* Determine which method will be used for launching the executable:
      Executable: concatenate the bytecode image to the executable stub
@@ -427,7 +430,7 @@ let write_header outchan =
     if runtime_info.launcher = Executable then
       Executable
     else
-      if invalid_for_shebang_line runtime then
+      if search <> Clflags.Absolute || invalid_for_shebang_line runtime then
         match runtime_info.launcher with
         | Shebang_bin_sh sh ->
             let sh =
@@ -447,14 +450,42 @@ let write_header outchan =
   (* Write the header *)
   match launcher with
   | Shebang_runtime ->
+      assert (search = Clflags.Absolute);
       (* Use the runtime directly *)
       Printf.fprintf outchan "#!%s\n" runtime;
       Bytesections.init_record outchan
   | Shebang_bin_sh bin_sh ->
-      (* exec the runtime using sh *)
-      Printf.fprintf outchan "\
-        #!%s\n\
-        exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime);
+      let () =
+        if search = Clflags.Absolute then
+          (* exec the runtime using sh *)
+          Printf.fprintf outchan "\
+            #!%s\n\
+            exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
+        else
+          let absolute_then_search =
+            if search = Clflags.Absolute_then_search then
+              let runtime =
+                Filename.quote (Filename.concat runtime_info.bindir runtime) in
+              Printf.sprintf "\nc=%s\nif ! test -f \"$c\"; then" runtime
+            else "" in
+          let absolute_then_search_fi =
+            if search = Clflags.Absolute_then_search then "\nfi" else "" in
+          Printf.fprintf outchan {|#!%s
+r=%s%s
+d="$(dirname "$0" 2>/dev/null)"
+test -z "$d" || d="${d%%/}/"
+c="$(command -v "$d$r")"
+test -n "$c" || c="$(command -v "$r")"%s
+if test -z "$c"; then
+echo 'This program requires OCaml %d.%d'>&2
+echo "The interpreter ($r) was not found either with $0 or in \$PATH">&2
+else
+exec "$c" "$0" "$@"
+fi
+exit 126
+|} bin_sh runtime absolute_then_search absolute_then_search_fi
+   Sys.ocaml_release.major Sys.ocaml_release.minor
+      in
       Bytesections.init_record outchan
   | Executable ->
       (* Use the executable stub launcher *)
@@ -463,7 +494,17 @@ let write_header outchan =
       Out_channel.output_substring outchan runtime_info.buffer pos len;
       (* The runtime name needs recording in RNTM *)
       let toc_writer = Bytesections.init_record outchan in
-      Printf.fprintf outchan "%s\000" runtime;
+      let () =
+        match search with
+        | Absolute ->
+            output_string outchan runtime
+        | Absolute_then_search ->
+            Printf.fprintf outchan "%s\000%s"
+              (Filename.(dirname (concat runtime_info.bindir current_dir_name)))
+              runtime
+        | Search ->
+            Printf.fprintf outchan "\000%s" runtime
+      in
       Bytesections.record toc_writer RNTM;
       toc_writer
 
