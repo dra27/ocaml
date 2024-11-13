@@ -53,6 +53,7 @@ BUILD_MAP_CFLAGS = $(foreach flag, $(BUILD_MAP_FLAGS), \
 
 LAUNCH_METHOD = @launch_method@
 LAUNCH_METHOD_TARGET = @launch_method_target@
+RUNTIME_SEARCH_TARGET = @runtime_search_target@
 SUFFIXING = @suffixing@
 
 # Which tool to use to display differences between files
