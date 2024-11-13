@@ -618,15 +618,19 @@ let write_header outchan =
              (since [command -v] will have returned an empty string) and an
              error message can be displayed. Otherwise, exec the file which was
              found. *)
+          let version =
+            let v = Sys.ocaml_version in
+            String.sub v 0 (String.index_from v (String.index v '.' + 1) '.')
+          in
           output_script search {|
             if test -z "$c"; then
-              echo 'This program requires OCaml %d.%d'>&2
+              echo 'This program requires OCaml %s'>&2
               echo "Interpreter ($r) not found either with $0 or in \$PATH">&2
             else
               exec "$c" "$0" "$@"
             fi
             exit 126
-          |} Sys.ocaml_release.major Sys.ocaml_release.minor
+          |} version
         end
       in
       Bytesections.init_record outchan
