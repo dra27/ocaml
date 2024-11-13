@@ -179,12 +179,19 @@ let flexdll_dirs = [%%FLEXDLL_DIR%%];;
 
 let suffixing = %%SUFFIXING%%
 let launch_method = "%%TARGET_LAUNCH_METHOD%%"
+let search_method = "%%TARGET_SEARCH_METHOD%%"
 
 let launch_method =
   match launch_method with
   | "exe" -> Executable
   | "sh" -> Shebang None
   | _ -> Shebang (Some launch_method)
+
+let search_method =
+  match search_method with
+  | "always" -> Search
+  | "enable" -> Absolute_then_search
+  | _ -> Absolute
 
 type configuration_value =
   | String of string
