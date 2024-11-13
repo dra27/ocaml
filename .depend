@@ -2027,9 +2027,11 @@ bytecomp/bytepackager.cmi : \
     typing/ident.cmi \
     typing/env.cmi
 bytecomp/bytesections.cmo : \
+    utils/misc.cmi \
     utils/config.cmi \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmx : \
+    utils/misc.cmx \
     utils/config.cmx \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmi :
@@ -5957,11 +5959,14 @@ testsuite/tools/expect_test.cmx : \
     parsing/ast_mapper.cmx
 testsuite/tools/harness.cmo : \
     utils/config.cmi \
+    bytecomp/bytesections.cmi \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmx : \
     utils/config.cmx \
+    bytecomp/bytesections.cmx \
     testsuite/tools/harness.cmi
-testsuite/tools/harness.cmi :
+testsuite/tools/harness.cmi : \
+    bytecomp/bytesections.cmi
 testsuite/tools/lexcmm.cmi :
 testsuite/tools/parsecmmaux.cmo : \
     parsing/location.cmi \
