@@ -1280,6 +1280,7 @@ AC_SEARCH_LIBS([cos], [m],
 
 # Checks for header files
 
+AC_CHECK_HEADER([libgen.h],[AC_DEFINE([HAS_LIBGEN_H], [1])])
 AC_CHECK_HEADER([pthread_np.h],[AC_DEFINE([HAS_PTHREAD_NP_H], [1])])
 AC_CHECK_HEADER([dirent.h], [AC_DEFINE([HAS_DIRENT], [1])], [],
   [#include <sys/types.h>])
@@ -1832,6 +1833,9 @@ AC_CHECK_FUNC([getrusage], [AC_DEFINE([HAS_GETRUSAGE], [1])])
 
 ## times
 AC_CHECK_FUNC([times], [AC_DEFINE([HAS_TIMES], [1])])
+
+## strlcpy
+AC_CHECK_FUNC([strlcpy], [AC_DEFINE([HAS_STRLCPY], [1])])
 
 ## secure_getenv and __secure_getenv
 
