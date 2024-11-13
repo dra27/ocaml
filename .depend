@@ -2471,9 +2471,11 @@ bytecomp/bytepackager.cmi : \
     typing/env.cmi \
     file_formats/cmo_format.cmi
 bytecomp/bytesections.cmo : \
+    utils/misc.cmi \
     utils/config.cmi \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmx : \
+    utils/misc.cmx \
     utils/config.cmx \
     bytecomp/bytesections.cmi
 bytecomp/bytesections.cmi :
@@ -10594,12 +10596,15 @@ testsuite/tools/expect.cmi : \
 testsuite/tools/harness.cmo : \
     otherlibs/unix/unix.cmi \
     utils/config.cmi \
+    bytecomp/bytesections.cmi \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmx : \
     otherlibs/unix/unix.cmx \
     utils/config.cmx \
+    bytecomp/bytesections.cmx \
     testsuite/tools/harness.cmi
-testsuite/tools/harness.cmi :
+testsuite/tools/harness.cmi : \
+    bytecomp/bytesections.cmi
 testsuite/tools/lexcmm.cmo : \
     testsuite/tools/parsecmm.cmi \
     utils/misc.cmi \
