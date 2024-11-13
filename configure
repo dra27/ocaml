@@ -4427,7 +4427,7 @@ else $as_nop
   suffixing=true
 fi
 else $as_nop
-  suffixing=true
+  suffixing=auto
 fi
 
 
@@ -4466,6 +4466,10 @@ fi
 case $suffixing,$runtime_search,$runtime_search_target in #(
   true,*,*|false,,) :
      ;; #(
+  auto,,) :
+    suffixing=false ;; #(
+  auto,*,*) :
+    suffixing=true ;; #(
   false,*,*) :
     as_fn_error $? "--disable-suffixed cannot be used with --enable-runtime-search or --enable-runtime-search-target" "$LINENO" 5 ;; #(
   *) :
