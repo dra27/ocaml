@@ -2210,7 +2210,7 @@ let compile_test ~original env bindir =
                     | Tendered ->
                         if argv0_not_ocaml then
                           if Sys.win32 then
-                            (* stdlib/headernt.c will find ocamlrun (because it
+                            (* stdlib/header.c will find ocamlrun (because it
                                effectively uses caml_executable_name) but fails
                                to hand off the bytecode image, which causes
                                ocamlrun to exit with code 127 *)
@@ -2223,7 +2223,7 @@ let compile_test ~original env bindir =
                                Somewhat confusingly, it exits with code 2 *)
                             Fail 2
                         else if Sys.win32 then
-                          (* stdlib/headernt.c correctly preserves argv[0] *)
+                          (* stdlib/header.c correctly preserves argv[0] *)
                           Success {executable_name = test_program_path; argv0}
                         else
                           (* stdlib/header.c does not preserve argv[0] *)
