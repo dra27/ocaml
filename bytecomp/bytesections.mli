@@ -56,7 +56,16 @@ val pos_first_section: in_channel -> int
 
 val reset: unit -> unit
 
-val read_runtime : in_channel -> string
+(** Search methods used by a tendered bytecode image to find a runtime. *)
+type search_mode =
+| Absolute of string
+    (** Check fixed location only *)
+| Absolute_then_search of string
+    (** Check given location first then search for the interpreter *)
+| Search
+    (** Always search for the interpreter *)
+
+val read_runtime : in_channel -> string * search_mode
 (** Returns the runtime used by this tendered/standalone image
 
     @raise Not_found For an image linked using -without-runtime *)
