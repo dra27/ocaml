@@ -37,6 +37,7 @@ OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
 LAUNCH_METHOD = @launch_method@
 TARGET_LAUNCH_METHOD = @target_launch_method@
+TARGET_SEARCH_METHOD = @runtime_search_target@
 SUFFIXING = @suffixing@
 
 # This is munged into utils/config.ml, not overridable by other parts of
@@ -62,3 +63,5 @@ ZINC_RUNTIME_ID=@zinc_runtime_id@
 
 # Platform-dependent command to create symbolic links
 LN = @ln@
+
+RUNTIME_SEARCH = @runtime_search@
