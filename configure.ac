@@ -84,6 +84,8 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 target_libdir_is_relative=false
+runtime_search=''
+runtime_search_target=''
 
 # Information about the package
 
@@ -268,6 +270,8 @@ AC_SUBST([zinc_runtime_id])
 AC_SUBST([bytecode_runtime_id])
 AC_SUBST([native_runtime_id])
 AC_SUBST([suffixing])
+AC_SUBST([runtime_search])
+AC_SUBST([runtime_search_target])
 
 ## Generated files
 
@@ -634,7 +638,34 @@ AC_ARG_ENABLE([suffixing],
   [AS_HELP_STRING([--enable-suffixing],
     [enable suffixing of runtime executables and shared libraries])],
   [AS_IF([test "x$enableval" = 'xno'], [suffixing=false], [suffixing=true])],
-  [suffixing=false])
+  [suffixing=auto])
+
+AC_ARG_ENABLE([runtime-search],
+  [AS_HELP_STRING([--enable-runtime-search],
+    [allow the distribution's bytecode executables to search for ocamlrun])],
+  [AS_CASE([$enableval],
+    [no],[],
+    [yes],[runtime_search='enable'],
+    [always],[runtime_search='always'],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search]))])])
+
+AC_ARG_ENABLE([runtime-search-target],
+  [AS_HELP_STRING([--enable-runtime-search-target],
+    [allow bytecode executables produced by ocamlc to search for ocamlrun])],
+  [AS_CASE([$enableval],
+    [no],[],
+    [yes],[runtime_search_target='enable'],
+    [always],[runtime_search_target='always'],
+    [AC_MSG_ERROR(m4_normalize([valid values are yes, no or always for
+       --enable-runtime-search-target]))])])
+
+AS_CASE([$suffixing,$runtime_search,$runtime_search_target],
+  [true,*,*|false,,],[],
+  [auto,,],[suffixing=false],
+  [auto,*,*],[suffixing=true],
+  [false,*,*],[AC_MSG_ERROR(m4_normalize([--disable-suffixed cannot be used with
+       --enable-runtime-search or --enable-runtime-search-target]))])
 
 AC_ARG_WITH([afl],
   [AS_HELP_STRING([--with-afl],
