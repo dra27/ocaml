@@ -475,6 +475,12 @@ Working version
   rejected too.
   (David Allsopp, review by Antonin Décimo and Gabriel Scherer)
 
+- #13???: New --enable-runtime-search configure option controls the
+  -runtime-search option used to build the bytecode binaries in the compiler
+  distribution. --enable-runtime-search-target controls the default value of
+  -runtime-search used for bytecode executables produced by the compiler.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #13691 #13895: Make four globals underlying Gc.control atomic to avoid C data
