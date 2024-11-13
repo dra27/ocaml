@@ -17326,6 +17326,13 @@ fi
 
 # Checks for header files
 
+ac_fn_c_check_header_compile "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
+if test "x$ac_cv_header_libgen_h" = xyes
+then :
+  printf "%s\n" "#define HAS_LIBGEN_H 1" >>confdefs.h
+
+fi
+
 ac_fn_c_check_header_compile "$LINENO" "pthread_np.h" "ac_cv_header_pthread_np_h" "$ac_includes_default"
 if test "x$ac_cv_header_pthread_np_h" = xyes
 then :
@@ -19372,6 +19379,15 @@ ac_fn_c_check_func "$LINENO" "times" "ac_cv_func_times"
 if test "x$ac_cv_func_times" = xyes
 then :
   printf "%s\n" "#define HAS_TIMES 1" >>confdefs.h
+
+fi
+
+
+## strlcpy
+ac_fn_c_check_func "$LINENO" "strlcpy" "ac_cv_func_strlcpy"
+if test "x$ac_cv_func_strlcpy" = xyes
+then :
+  printf "%s\n" "#define HAS_STRLCPY 1" >>confdefs.h
 
 fi
 
