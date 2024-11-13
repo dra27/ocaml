@@ -144,7 +144,9 @@ let () =
 
      For the compiler's files to be reproducible, the compiler needs to be both
      relocatable and also required support from the assembler and C compiler. *)
-  let relocatable = false in
+  let relocatable =
+    config.has_relative_libdir <> None
+    && config.has_runtime_search <> Config.Absolute in
   let reproducible =
     relocatable
     (* At present, the compiler build doesn't actually take advantage of this
