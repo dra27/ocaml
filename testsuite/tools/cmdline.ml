@@ -164,11 +164,11 @@ let parse argv =
     config := {!config with shebangscripts}
   in
   let parse_search = function
-  | "enable" -> true
-  | "always" -> false
+  | "fallback" -> true
+  | "enable" -> false
   | _ ->
       raise (Arg.Bad
-        "--with-runtime-search: argument should be either enable or always")
+        "--with-runtime-search: argument should be either fallback or enable")
   in
   let has_runtime_search arg =
     let has_runtime_search = Option.map parse_search arg in
