@@ -296,7 +296,15 @@ let dump_byte ic =
   let toc = Bytesections.read_toc ic in
   let () =
     try
-      printf "Runtime:\n\t%s\n" (Bytesections.read_runtime toc ic)
+      let runtime, search = Bytesections.read_runtime toc ic in
+      let runtime =
+        match search with
+        | Bytesections.Search -> runtime
+        | Bytesections.Absolute_then_search dir ->
+            Printf.sprintf "[%s]%s" dir runtime
+        | Bytesections.Absolute dir -> dir ^ runtime
+      in
+      printf "Runtime:\n\t%s\n" runtime
     with Not_found -> ()
   in
   let all = Bytesections.all toc in
