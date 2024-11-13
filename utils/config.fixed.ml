@@ -85,3 +85,4 @@ let ar_supports_response_files = true
 let shebangscripts = false
 let suffixing = true
 let launch_method = "sh"
+let search_method = "always"
