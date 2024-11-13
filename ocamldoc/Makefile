@@ -166,7 +166,8 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 $(OCAMLDOC): LINKFLAGS += \
   -use-prims $(ROOTDIR)/runtime/primitives \
   -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
-  -launch-method $(LAUNCH_METHOD)
+  -launch-method $(LAUNCH_METHOD) \
+  -runtime-search $(if $(RUNTIME_SEARCH),$(RUNTIME_SEARCH),disable)
 endif
 
 $(OCAMLDOC): $(EXECMOFILES)
