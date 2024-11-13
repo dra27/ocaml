@@ -33,7 +33,8 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 LINKFLAGS += \
   -use-prims $(ROOTDIR)/runtime/primitives \
   -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
-  -launch-method $(LAUNCH_METHOD)
+  -launch-method $(LAUNCH_METHOD) \
+  -runtime-search $(if $(RUNTIME_SEARCH),$(RUNTIME_SEARCH),disable)
 else
 ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
   # ocamldebug is linked with -g which will result in a -custom executable when
