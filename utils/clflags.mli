@@ -109,6 +109,7 @@ val use_prims : string ref
 val use_runtime : string ref
 val target_bindir : string ref
 val launch_method : Config.launch_method ref
+val search_method : Config.search_method ref
 val plugin : bool ref
 val principal : bool ref
 val real_paths : bool ref
