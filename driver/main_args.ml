@@ -2014,11 +2014,11 @@ third-party libraries such as Lwt, but with a different API."
           "-launch-method: expect sh, exe or an absolute path for <method>"
     let _search_method = function
     | "disable" ->
-        search_method := None
+        search_method := Some None
     | "enable" ->
-        search_method := Some true
+        search_method := Some (Some true)
     | "always" ->
-        search_method := Some false
+        search_method := Some (Some false)
     | _ ->
         assert false
     let _v () = Compenv.print_version_and_library "compiler"
