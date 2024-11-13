@@ -15,6 +15,15 @@
 (** Parser for RNTM in bytecode executables. Parses both the RNTM section and
     the shebang launcher produced by {!Bytelink}. *)
 
+(** Search methods used by a tendered bytecode image to find a runtime. *)
+type search_method =
+| Disable of string
+    (** Check fixed location only *)
+| Enable of string
+    (** Check given location first then search for the interpreter *)
+| Always
+    (** Always search for the interpreter *)
+
 val read_runtime : in_channel -> string option
 (** Returns the runtime used by this tendered/standalone image. If the runtime
     used cannot be parsed, or the image was linked using -without-runtime, then
