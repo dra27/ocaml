@@ -499,7 +499,8 @@ let write_sh_launcher outchan bin_sh bindir search runtime =
       {|"$c"|}
   in
   let release =
-    Printf.sprintf "%d.%d" Sys.ocaml_release.major Sys.ocaml_release.minor
+    let v = Sys.ocaml_version in
+    String.sub v 0 (String.index_from v (String.index v '.' + 1) '.')
   in
   (* Each of the three search modes requires a slightly different shell script.
      However, these shell scripts do have one very useful property: the script
