@@ -349,6 +349,18 @@ val launch_method : launch_method
 
     @since 5.5 *)
 
+(** Mechanisms used by tendered bytecode executables to locate the interpreter
+
+    @since 5.5 *)
+type search_method =
+| Disable
+    (** Interpreter searching disabled - check fixed absolute location only *)
+| Enable
+    (** Check fixed absolute location first, but fallback to a search if that
+        fails *)
+| Always
+    (** Always search for the interpreter *)
+
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 
