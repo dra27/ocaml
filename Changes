@@ -39,7 +39,10 @@ OCaml 5.4 maintenance version
 - #14245: New option -launch-method for ocamlc allows the method used by a
   tendered bytecode executable to locate the interpreter to be given explicitly.
   In particular, it makes it easier to specify the use of the executable
-  launcher on Unix.
+  launcher on Unix. New option -runtime-search extends the bytecode executable
+  header to be able to search for the runtime interpreter in the directory
+  containing the executable and in PATH rather than relying on a single
+  hard-coded path.
   (David Allsopp, review by Samuel Hym and ???)
 
 ### Internal/compiler-libs changes:
