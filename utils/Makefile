@@ -97,6 +97,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,AR_SUPPORTS_RESPONSE_FILES) \
 	    $(call SUBST,SUFFIXING) \
 	    $(call SUBST_STRING,TARGET_LAUNCH_METHOD) \
+	    $(call SUBST_STRING,TARGET_SEARCH_METHOD) \
 	    $(call SUBST_STRING,BYTECODE_RUNTIME_ID) \
 	    $(call SUBST_STRING,NATIVE_RUNTIME_ID) \
 	    $< > $@
