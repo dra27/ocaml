@@ -160,6 +160,13 @@ end
 module String = struct
   include Misc.Stdlib.String
 
+  let fold_left f x a =
+    let r = ref x in
+    for i = 0 to length a - 1 do
+      r := f !r (unsafe_get a i)
+    done;
+    !r
+
   let exists p s =
     let n = length s in
     let rec loop i =
