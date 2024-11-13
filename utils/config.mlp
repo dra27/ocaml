@@ -122,6 +122,7 @@ and cmxs_magic_number = "Caml1999D028"
 and cmt_magic_number = "Caml1999T028"
 
 type launch_method = Executable | Shebang of string option
+type search_method = Absolute | Absolute_then_search | Search
 
 let interface_suffix = ref ".mli"
 
