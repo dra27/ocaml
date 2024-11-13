@@ -647,6 +647,25 @@ only recursive types where the recursion goes through an object type
 are supported. Note that once you have created an interface using this
 flag, you must use it again for all dependencies.
 .TP
+.BI \-runtime\-search " method"
+Controls whether the header used by normal bytecode executables is permitted to
+search for the interpreter, or requires it to be at a fixed location.
+The following methods are supported:
+
+.B disable
+A fixed absolute path to the interpreter is used, and the executable will not
+launch if the interpreter is not found at this location.
+
+.B fallback
+A fixed absolute path to the interpreter is used, but if the executable cannot
+find the interpreter at this location then it will search first in the directory
+containing the executable and then in PATH.
+
+.B enable
+The executable searches for the interpreter first in the directory containing
+the executable and then in PATH. No absolute path to the interpreter is
+recorded.
+.TP
 .BI \-runtime\-variant \ suffix
 Add
 .I suffix
