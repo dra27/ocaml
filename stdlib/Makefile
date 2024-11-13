@@ -119,6 +119,9 @@ else
 HEADERLIBS =
 endif
 
+header.$(O): OC_CPPFLAGS += \
+  -DOV_MAJOR=$(OCAML_VERSION_MAJOR) -DOV_MINOR=$(OCAML_VERSION_MINOR)
+
 .INTERMEDIATE: tmpheader.exe
 tmpheader.exe: header.$(O)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(HEADERLIBS))

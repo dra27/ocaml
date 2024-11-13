@@ -204,6 +204,21 @@ val target_os_type: string
 -  ["Win32"] (for MS-Windows, OCaml compiled with MSVC++ or MinGW-w64),
 -  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin). *)
 
+val target_unix: bool
+(** True if [target_os_type = "Unix"]
+
+    @since 5.5 *)
+
+val target_win32: bool
+(** True if [target_os_type = "Win32"]
+
+    @since 5.5 *)
+
+val target_cygwin: bool
+(** True if [target_os_type = "Cygwin"]
+
+    @since 5.5 *)
+
 val asm: string
 (** The assembler (and flags) to use for assembling
     ocamlopt-generated code. *)
@@ -323,6 +338,15 @@ val launch_method : launch_method
 (** Default launch mechanism for bytecode executables
 
     @since 5.5 *)
+
+(** Mechanisms used by tendered bytecode executables to locate the interpreter
+
+    @since 5.5 *)
+type search_method =
+| Absolute             (** Check fixed absolute location only *)
+| Absolute_then_search (** Check fixed absolute location, but perform a search
+                           if that fails *)
+| Search               (** Always search for the interpreter *)
 
 val shebangscripts : bool
 (** Whether the target supports shebang scripts

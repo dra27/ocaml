@@ -85,10 +85,10 @@ let classify_executable file =
       | _ -> false
       in
       match Bytesections.read_runtime toc ic with
-      | runtime ->
+      | runtime, search ->
           let header = if start = "#!" then Header_shebang else Header_exe in
           let dlls = List.exists is_DLLS sections in
-          Tendered {header; dlls; runtime}
+          Tendered {header; dlls; runtime; search}
       | exception Not_found ->
           Custom)
   with End_of_file | Bytesections.Bad_magic_number ->
