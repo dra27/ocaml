@@ -26,7 +26,6 @@
   #define NORETURN
 #endif
 
-#include <stdbool.h>
 #include <errno.h>
 
 #ifdef _WIN32
@@ -131,7 +130,7 @@ static int exec_file(wchar_t *file, wchar_t *cmdline)
   }
 }
 
-static bool file_exists(const wchar_t *file)
+static int file_exists(const wchar_t *file)
 {
   return (GetFileAttributes(file) != INVALID_FILE_ATTRIBUTES);
 }
@@ -300,7 +299,7 @@ static int exec_file(const char *file, char * const argv[])
   return (execvp(file, argv) == -1 ? errno : 0);
 }
 
-static bool file_exists(const char *file)
+static int file_exists(const char *file)
 {
   struct stat st;
   return (lstat(file, &st) == 0);
@@ -356,11 +355,14 @@ _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
 {
   const char_os *rntm_end = rntm + (rntm_bsz - 1);
   char_os *rntm_bindir_end = rntm;
+  char_os *root = NULL;
+  char_os *root_basename = NULL;
 
   while (*rntm_bindir_end != 0)
     rntm_bindir_end++;
 
   if (*rntm != 0) {
+    int status;
     /* Legacy RNTM: single string with an extra "\0" character. Interpret this
        as "Absolute". In particular, for Windows, where boot/ocamlc will be
        writing "ocamlrun\0" for RNTM, this actually maintains the required
@@ -370,13 +372,11 @@ _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
     /* Absolute / Absolute_then_search (see bytecomp/bytelink.ml) */
     if (rntm_bindir_end != rntm_end)
       *rntm_bindir_end = Directory_separator_character;
-    int status = exec_file(rntm, argv);
+    status = exec_file(rntm, argv);
     if (rntm_bindir_end == rntm_end || status != ENOENT)
       exit_with_error(T("Cannot exec "), rntm, NULL);
   }
 
-  char_os *root = NULL;
-  char_os *root_basename = NULL;
   if (argv0_dirname != NULL) {
     /* Similarly - this could be a static buffer */
     root = (char_os *)malloc((PATH_MAX + 1) * sizeof(char_os));
