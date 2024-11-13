@@ -68,6 +68,7 @@ let default_safe_string = true
 let naked_pointers = false
 
 type launch_method = Executable | Shebang of string option
+type search_method = Absolute | Absolute_then_search | Search
 
 let launch_method =
   match launch_method with
