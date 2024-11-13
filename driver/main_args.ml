@@ -543,6 +543,16 @@ let mk_launch_method f =
   \          /path/interpreter - use #!, or the given sh-compatible \
   \            interpreter if the interpreter path cannot be used"
 
+let mk_search_method f =
+  "-runtime-search", Arg.Symbol (["disable"; "enable"; "always"], f),
+  Printf.sprintf
+    "  Control the way the bytecode header searches for the interpreter\n\
+    \    The following settings are supported:\n\
+    \      disable  use a fixed absolute path to the runtime\n\
+    \      enable   search for runtime only if not found at the absolute path\n\
+    \      always   always search for the runtime\n\
+    \    The default setting is 'disable'."
+
 let mk_use_runtime f =
   "-use-runtime", Arg.String f,
   "<file>  Generate bytecode for the given runtime system"
@@ -980,6 +990,7 @@ module type Bytecomp_options = sig
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
   val _launch_method : string -> unit
+  val _search_method : string -> unit
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
@@ -1166,6 +1177,7 @@ struct
     mk_use_runtime F._use_runtime;
     mk_use_runtime_2 F._use_runtime;
     mk_launch_method F._launch_method;
+    mk_search_method F._search_method;
     mk_v F._v;
     mk_verbose F._verbose;
     mk_version F._version;
