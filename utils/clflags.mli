@@ -116,7 +116,7 @@ val noversion : bool ref
 val use_prims : string ref
 val use_runtime : string ref
 val launch_method : launch_method option ref
-val search_method : bool option ref
+val search_method : bool option option ref
 val plugin : bool ref
 val principal : bool ref
 val print_variance : bool ref
