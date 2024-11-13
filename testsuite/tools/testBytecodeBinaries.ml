@@ -90,12 +90,15 @@ let run config env =
                                          program
                   else
                     "compiled with -custom"
-              | Tendered {runtime; header; _} ->
-                  let is_expected_runtime =
-                    if Sys.win32 then
-                      runtime = "ocamlrun"
-                    else
-                      runtime = ocamlrun
+              | Tendered {runtime; header; search; _} ->
+                  let runtime, is_expected_runtime =
+                    match search with
+                    | Absolute dir ->
+                        dir ^ runtime, not Sys.win32 && runtime = "ocamlrun"
+                    | Absolute_then_search dir ->
+                        Printf.sprintf "[%s/]%s" dir runtime, false
+                    | Search ->
+                        runtime, Sys.win32 && runtime = "ocamlrun"
                   in
                   let expected_launch_mode =
                     if Config.shebangscripts then
