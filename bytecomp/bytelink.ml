@@ -307,6 +307,7 @@ type search_method =
 type runtime_launch_info = {
   buffer : string;
   bindir : string;
+  search : search_method;
   launcher : launch_method;
   executable_offset : int
 }
@@ -324,8 +325,15 @@ let invalid_for_shebang_line path =
   String.length path > 125 || String.exists invalid_char path
 
 (* The runtime-launch-info file consists of two "lines" followed by binary data.
-   The file is _always_ LF-formatted, even on Windows. The sequence of bytes up
-   to the first '\n' is interpreted:
+   The file is _always_ LF-formatted, even on Windows. The first character
+   indicates the search mode for the header and is either '1', '2', or '3' for:
+     - "1" - use an absolute path to the runtime only (--runtime-search=no)
+     - "2" - use an absolute path, but fallback to searching the directory
+             containing the image and then PATH if that runtime is not found
+             (--runtime-search=yes)
+     - "3" - always search the directory containing the image and then PATH for
+             the runtime (--runtime-search=always)
+   The remaining bytes up to the first '\n' are interpreted:
      - "sh" - use a shebang-style launcher. If sh is needed, determine its
               location from [command -p -v sh]
      - "exe" - use the executable launcher contained in this runtime-launch-info
@@ -351,8 +359,17 @@ let read_runtime_launch_info file =
     let bindir_end = String.index_from buffer bindir_start '\000' in
     let bindir = String.sub buffer bindir_start (bindir_end - bindir_start) in
     let executable_offset = bindir_end + 2 in
+    let search =
+      (* buffer <> "" since we have the index of the first \n *)
+      match buffer.[0] with
+      | '1' -> Absolute
+      | '2' -> Absolute_then_search
+      | '3' -> Search
+      | _ -> raise Not_found
+    in
     let launcher =
-      let kind = String.sub buffer 0 (bindir_start - 1) in
+      (* buffer has at least one character before the first \n *)
+      let kind = String.sub buffer 1 (bindir_start - 2) in
       if kind = "exe" then
         Executable
       else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
@@ -363,7 +380,7 @@ let read_runtime_launch_info file =
        || buffer.[executable_offset - 1] <> '\n' then
       raise Not_found
     else
-      {bindir; launcher; buffer; executable_offset}
+      {bindir; search; launcher; buffer; executable_offset}
   with Not_found ->
     raise (Error (Camlheader ("corrupt header", file)))
 
@@ -422,13 +439,21 @@ let write_header outchan =
       let runtime =
         Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id
       in
-      match !Clflags.search_method with
-      | None ->
-          Filename.concat runtime_info.bindir runtime, Absolute
-      | Some true ->
-          runtime, Absolute_then_search
-      | Some false ->
-          runtime, Search
+      let search =
+        match !Clflags.search_method with
+        | None ->
+            runtime_info.search
+        | Some None ->
+            Absolute
+        | Some (Some true) ->
+            Absolute_then_search
+        | Some (Some false) ->
+            Search
+      in
+      if search <> Absolute then
+        runtime, search
+      else
+        Filename.concat runtime_info.bindir runtime, Absolute
   in
   (* Determine which method will be used for launching the executable:
      Executable: concatenate the bytecode image to the executable stub
