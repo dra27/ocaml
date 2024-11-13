@@ -13,7 +13,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* The launcher for bytecode executables */
+/* The launcher for bytecode executables (as #! is not available) */
 
 #define CAML_INTERNALS
 #include "caml/exec.h"
@@ -29,6 +29,11 @@
 #define CP CP_UTF8
 #else
 #define CP CP_ACP
+#endif
+
+/* mingw-w64 has a limits.h which defines PATH_MAX as an alias for MAX_PATH */
+#if !defined(PATH_MAX)
+#define PATH_MAX MAX_PATH
 #endif
 
 #define SEEK_END FILE_END
@@ -108,7 +113,7 @@ static bool read_runtime_path(HANDLE fd, char *result)
       ofs += read_size(buffer + 4);
   }
   if (path_size == 0) return false;
-  if (path_size >= MAX_PATH) return false;
+  if (path_size >= PATH_MAX) return false;
   if (lseek(fd, -ofs, SEEK_END) == -1) return false;
   if (read(fd, result, path_size) != path_size) return false;
 
