@@ -84,12 +84,6 @@ installopt-default:
 	  stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx \
 	  "$(INSTALL_LIBDIR)"
 
-ifeq "$(UNIX_OR_WIN32)" "unix"
-HEADERPROGRAM = header
-else # Windows
-HEADERPROGRAM = headernt
-endif
-
 %-launch-info: %.info tmpheader.exe
 	@cat $^ > $@
 
@@ -99,11 +93,11 @@ endif
 ifeq "$(TOOLCHAIN)" "msvc"
 tmpheader.exe: OC_LDFLAGS += \
   /NOCOFFGRPINFO /subsystem:console kernel32.lib libucrt.lib
-headernt.obj: OC_CFLAGS := $(filter-out /MD -MD, $(OC_CFLAGS)) /Os /MT
+header.obj: OC_CFLAGS := $(filter-out /MD -MD, $(OC_CFLAGS)) /Os /MT
 endif
 
 .INTERMEDIATE: tmpheader.exe
-tmpheader.exe: $(HEADERPROGRAM).$(O)
+tmpheader.exe: header.$(O)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^)
 	$(STRIP) $@
 
