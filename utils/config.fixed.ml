@@ -74,3 +74,4 @@ let flexdll_dirs = []
 let ar_supports_response_files = true
 let suffixing = true
 let launch_method = "sh"
+let search_method = "always"
