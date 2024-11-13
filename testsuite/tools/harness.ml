@@ -74,7 +74,10 @@ module Import = struct
   type launch_mode = Header_exe | Header_shebang
 
   type executable =
-  | Tendered of {header: launch_mode; dlls: bool; runtime: string}
+  | Tendered of {header: launch_mode;
+                 dlls: bool;
+                 runtime: string;
+                 search: Bytesections.search_mode}
   | Custom
   | Vanilla
 
