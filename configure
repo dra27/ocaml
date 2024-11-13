@@ -785,6 +785,8 @@ build_os
 build_vendor
 build_cpu
 build
+runtime_search_target
+runtime_search
 suffixing
 native_runtime_id
 bytecode_runtime_id
@@ -1032,6 +1034,8 @@ enable_function_sections
 enable_mmap_map_stack
 with_relative_libdir
 enable_suffixing
+enable_runtime_search
+enable_runtime_search_target
 with_afl
 with_flexdll
 with_winpthreads_msvc
@@ -1736,6 +1740,11 @@ Optional Features:
   --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
   --enable-suffixing      enable suffixing of runtime executables and shared
                           libraries
+  --enable-runtime-search allow the distribution's bytecode executables to
+                          search for ocamlrun
+  --enable-runtime-search-target
+                          allow bytecode executables produced by ocamlc to
+                          search for ocamlrun
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3345,6 +3354,8 @@ ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
 target_libdir_is_relative=false
+runtime_search=''
+runtime_search_target=''
 
 # Information about the package
 
@@ -3500,6 +3511,8 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
  # TODO: rename this variable
+
+
 
 
 
@@ -4261,9 +4274,54 @@ else $as_nop
   suffixing=true
 fi
 else $as_nop
-  suffixing=false
+  suffixing=auto
 fi
 
+
+# Check whether --enable-runtime-search was given.
+if test ${enable_runtime_search+y}
+then :
+  enableval=$enable_runtime_search; case $enableval in #(
+  no) :
+     ;; #(
+  yes) :
+    runtime_search='enable' ;; #(
+  always) :
+    runtime_search='always' ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
+esac
+fi
+
+
+# Check whether --enable-runtime-search-target was given.
+if test ${enable_runtime_search_target+y}
+then :
+  enableval=$enable_runtime_search_target; case $enableval in #(
+  no) :
+     ;; #(
+  yes) :
+    runtime_search_target='enable' ;; #(
+  always) :
+    runtime_search_target='always' ;; #(
+  *) :
+    as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
+esac
+fi
+
+
+case $suffixing,$runtime_search,$runtime_search_target in #(
+  true,*,*|false,,) :
+     ;; #(
+  auto,,) :
+    suffixing=false ;; #(
+  auto,*,*) :
+    suffixing=true ;; #(
+  false,*,*) :
+    as_fn_error $? "--disable-suffixed cannot be used with --enable-runtime-search or --enable-runtime-search-target" "$LINENO" 5 ;; #(
+  *) :
+     ;;
+esac
 
 
 # Check whether --with-afl was given.
