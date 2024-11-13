@@ -82,7 +82,8 @@ and use_prims = ref ""                  (* -use-prims ... *)
 and use_runtime = ref ""                (* -use-runtime ... *)
 and launch_method =                     (* -launch-method ... *)
   ref Config.launch_method
-and search_method = ref Config.Absolute (* -search-method ... *)
+and search_method =                     (* -search-method ... *)
+  ref Config.search_method
 and plugin = ref false                  (* -plugin ... *)
 and principal = ref false               (* -principal *)
 and real_paths = ref true               (* -short-paths *)
