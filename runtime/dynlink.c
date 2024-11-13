@@ -137,6 +137,17 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   return wconfig;
 }
 
+char_os * caml_search_dll_in_path(struct ext_table * path, const char_os * name)
+{
+  char_os * dllname;
+  char_os * res;
+
+  dllname = caml_stat_strconcat_os(2, name, EXT_DLL);
+  res = caml_search_in_path(path, dllname);
+  caml_stat_free(dllname);
+  return res;
+}
+
 /* Open the given shared library and add it to shared_libs.
    Abort on error. */
 static void open_shared_lib(char_os * name)
