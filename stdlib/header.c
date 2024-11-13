@@ -354,6 +354,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
 
   /* The first character of rntm is NUL for Search mode */
   if (*rntm != 0) {
+    int status;
     /* boot/ocamlc writes a NUL-terminated string to RNTM. In this case,
        rntm_bindir_end points to that NUL (which will have been included in the
        length of RNTM recorded in the bytecode image) and immediately following
@@ -370,7 +371,7 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
        NUL-terminated full path we can attempt to exec. */
     if (rntm_bindir_end != rntm_end)
       *rntm_bindir_end = Directory_separator_character;
-    int status = exec_file(rntm, argv);
+    status = exec_file(rntm, argv);
     /* exec failed. For Absolute mode, there's nothing else to be tried. For
        Absolute_then_search, if the failure was for any other reason than ENOENT
        then there is also nothing else to be tried. */
@@ -385,11 +386,11 @@ NORETURN void search_and_exec_runtime(char_os *rntm, uint32_t rntm_bsz,
        if it's known. */
     if (argv0_dirname != NULL) {
       char_os root[PATH_MAX];
+      char_os *root_basename = root;
       unsafe_copy(root, argv0_dirname, PATH_MAX);
 
       /* Ensure root ends with a directory separator. root_basename points to
          the character at which to place <runtime-basename> */
-      char_os *root_basename = root;
       while (*root_basename != 0)
         root_basename++;
       if (root_basename > root && !Is_separator(*(root_basename - 1)))
