@@ -138,6 +138,12 @@ CAMLextern value caml_win32_xdg_defaults(void);
 
 CAMLextern value caml_win32_get_temp_path(void);
 
+#define EXT_DLL L".dll"
+
+#else
+
+#define EXT_DLL ".so"
+
 #endif /* _WIN32 */
 
 /* Returns the current value of a counter that increments once per nanosecond.
