@@ -193,6 +193,12 @@ let launch_method =
   | "sh" -> Shebang None
   | _ -> Shebang (Some launch_method)
 
+let search_method =
+  match search_method with
+  | "always" -> Search
+  | "enable" -> Absolute_then_search
+  | _ -> Absolute
+
 let ar_supports_response_files = %%AR_SUPPORTS_RESPONSE_FILES%%;;
 
 type configuration_value =
