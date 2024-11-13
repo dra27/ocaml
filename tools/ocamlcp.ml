@@ -105,6 +105,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _use_prims = ignore
   let _use_runtime = ignore
   let _launch_method = ignore
+  let _search_method = ignore
   let _v = ignore
   let _version = ignore
   let _vnum = ignore
