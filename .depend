@@ -5806,11 +5806,14 @@ testsuite/tools/expect_test.cmx : \
     parsing/ast_mapper.cmx
 testsuite/tools/harness.cmo : \
     utils/config.cmi \
+    bytecomp/byterntm.cmi \
     testsuite/tools/harness.cmi
 testsuite/tools/harness.cmx : \
     utils/config.cmx \
+    bytecomp/byterntm.cmx \
     testsuite/tools/harness.cmi
-testsuite/tools/harness.cmi :
+testsuite/tools/harness.cmi : \
+    bytecomp/byterntm.cmi
 testsuite/tools/lexcmm.cmi :
 testsuite/tools/parsecmmaux.cmo : \
     parsing/location.cmi \
