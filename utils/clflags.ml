@@ -82,6 +82,13 @@ and use_prims = ref ""                  (* -use-prims ... *)
 and use_runtime = ref ""                (* -use-runtime ... *)
 and launch_method =                     (* -launch-method ... *)
   ref Config.launch_method
+and search_method =                     (* -search-method ... *)
+  if Config.target_win32 then
+    (* Historically, the native Windows ports are assumed to be finding ocamlrun
+       using a PATH search. *)
+    ref Config.Search
+  else
+    ref Config.Absolute
 and principal = ref false               (* -principal *)
 and real_paths = ref true               (* -short-paths *)
 and recursive_types = ref false         (* -rectypes *)
