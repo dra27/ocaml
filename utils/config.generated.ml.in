@@ -103,3 +103,5 @@ let shebangscripts = @shebangscripts@
 let suffixing = @suffixing@
 
 let launch_method = {@QS@|@target_launch_method@|@QS@}
+
+let search_method = {@QS@|@runtime_search_target@|@QS@}
