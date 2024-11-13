@@ -116,6 +116,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _use_prims s = option_with_arg "-use-prims" s
   let _use_runtime s = option_with_arg "-use-runtime" s
   let _launch_method s = option_with_arg "-launch-method" s
+  let _search_method s = option_with_arg "-runtime-search" s
   let _v = option "-v"
   let _version = option "-version"
   let _vnum = option "-vnum"
