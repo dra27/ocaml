@@ -39,6 +39,7 @@ module Float_arg_helper = Arg_helper.Make (struct
 end)
 
 type launch_method = Executable | Shebang of string option
+type search_method = Absolute | Absolute_then_search | Search
 
 let objfiles = ref ([] : string list)         (* .cmo and .cma files *)
 and ccobjs = ref ([] : string list)           (* .o, .a, .so and -cclib -lxxx *)
@@ -90,6 +91,7 @@ and open_modules = ref []               (* -open *)
 and use_prims = ref ""                  (* -use-prims ... *)
 and use_runtime = ref ""                (* -use-runtime ... *)
 and launch_method = ref None            (* -launch-method ... *)
+and search_method = ref Absolute        (* -search-method ... *)
 and plugin = ref false                  (* -plugin ... *)
 and principal = ref false               (* -principal *)
 and real_paths = ref true               (* -short-paths *)

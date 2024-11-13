@@ -379,7 +379,10 @@ Working version
 
 - #13???: New option -launch-method for ocamlc allows the method specified in
   runtime-launch-method to be overridden. In particular, it makes it easier to
-  specify the use of the executable launcher on Unix.
+  specify the use of the executable launcher on Unix. New option -runtime-search
+  extends the bytecode executable header to be able to search for the runtime
+  interpreter in the directory containing the executable and in PATH rather than
+  relying on a single hard-coded path.
   (David Allsopp, review by ???)
 
 ### Internal/compiler-libs changes:
