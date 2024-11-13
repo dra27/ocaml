@@ -137,6 +137,15 @@ module Options = Main_args.Make_bytecomp_options (struct
     | _ ->
         Compenv.fatal
           "-launch-method: expect sh, exe or an absolute path for <method>"
+  let _search_method = function
+  | "disable" ->
+      search_method := Config.Disable
+  | "fallback" ->
+      search_method := Config.Fallback
+  | "enable" ->
+      search_method := Config.Enable
+  | _ ->
+      assert false
   let _v () = print_version_and_library "compiler"
   let _version = print_version_string
   let _vnum = print_version_string
