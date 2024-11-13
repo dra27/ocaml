@@ -47,6 +47,7 @@ let default_safe_string = true
 let naked_pointers = false
 
 type launch_method = Executable | Shebang of string option
+type search_method = Absolute | Absolute_then_search | Search
 
 let launch_method =
   match launch_method with
@@ -65,6 +66,9 @@ let lazy_tag = 246
 let max_young_wosize = 256
 let stack_threshold = 32 (* see runtime/caml/config.h *)
 let stack_safety_margin = 6
+let target_unix = (target_os_type = "Unix")
+let target_win32 = (target_os_type = "Win32")
+let target_cygwin = (target_os_type = "Cygwin")
 let default_executable_name =
   match target_os_type with
     "Unix" -> "a.out"
