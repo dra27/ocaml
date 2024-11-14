@@ -236,6 +236,9 @@ int main(int argc, char *argv[])
   char runtime_path[PATH_MAX];
   int fd;
 
+  if (argc < 1)
+    exit_with_error("Unable to load bytecode image", NULL, NULL);
+
   truename = searchpath(argv[0]);
   fd = open(truename, O_RDONLY | O_BINARY);
   if (fd == -1 || !read_runtime_path(fd, runtime_path))
