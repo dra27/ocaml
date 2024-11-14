@@ -187,6 +187,17 @@ static char * searchpath(char * name)
 
 #endif
 
+/* caml_executable_name uses caml_stat_alloc and caml_stat_free */
+void *caml_stat_alloc(size_t size)
+{
+  return malloc(size);
+}
+
+void caml_stat_free(void *ptr)
+{
+  free(ptr);
+}
+
 NORETURN static void exit_with_error(const char *str1,
                                      const char *str2,
                                      const char *str3)
@@ -292,12 +303,17 @@ NORETURN void __cdecl wmainCRTStartup(void)
 
 #else
 
+/* Borrowed from libcamlrun */
+char * caml_executable_name(void);
+
 int main(int argc, char *argv[])
 {
   char *truename, *runtime_path;
   int fd;
 
-  truename = searchpath(argv[0]);
+  truename = caml_executable_name();
+  if (truename == NULL) truename = searchpath(argv[0]);
+  if (truename == NULL) truename = argv[0];
   fd = open(truename, O_RDONLY | O_BINARY);
   if (fd == -1 || (runtime_path = read_runtime_path(fd)) == NULL)
     exit_with_error(NULL, truename,
