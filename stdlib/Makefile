@@ -110,12 +110,13 @@ HEADERLIBS = kernel32.lib
 else
 HEADERLIBS =
 endif
+header.$(O): OC_CPPFLAGS += -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
 
 header.$(O): OC_CPPFLAGS += \
   -DOVMAJOR=$(OCAML_VERSION_MAJOR) -DOV_MINOR=$(OCAML_VERSION_MINOR)
 
 .INTERMEDIATE: tmpheader.exe
-tmpheader.exe: header.$(O)
+tmpheader.exe: header.$(O) libcamlrun.$(A)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(HEADERLIBS))
 # Do not strip the header produced by cl
 ifneq "$(TOOLCHAIN)" "msvc"
