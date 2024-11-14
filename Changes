@@ -110,6 +110,13 @@ Working version
   (Stephen Dolan, review by Nick Barnes and Josh Berdine, benchmarking by
    Nicolás Ojeda Bär)
 
+- #13???: Change semantics of the internal caml_attempt_open bytecode runtime
+  function to require the caller to perform PATH-resolution prior to calling the
+  function. Addresses a small memory leak in the bytecode runtime, but also
+  affects the resolution of CAML_DEBUG_FILE, which is still searched in PATH,
+  but at program startup instead of when the debug information is first loaded.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
