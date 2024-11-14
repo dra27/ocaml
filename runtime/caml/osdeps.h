@@ -138,6 +138,12 @@ CAMLextern value caml_win32_xdg_defaults(void);
 
 CAMLextern value caml_win32_get_temp_path(void);
 
+#else
+
+/* As caml_search_exe_in_path, but returns NULL if the file cannot be found in
+   any of the directories specified in PATH. Used by stdlib/header.c */
+caml_stat_string caml_search_in_system_path(const char *);
+
 #endif /* _WIN32 */
 
 /* Returns the current value of a counter that increments once per nanosecond.
