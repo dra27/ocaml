@@ -113,21 +113,18 @@ int caml_read_trailer(int fd, struct exec_trailer *trail)
       ? 0 : WRONG_MAGIC;
 }
 
-int caml_attempt_open(char_os **name, struct exec_trailer *trail,
+int caml_attempt_open(const char_os *name, struct exec_trailer *trail,
                       int do_open_script)
 {
-  char_os * truename;
   int fd;
   int err;
   char *u8;
 
-  truename = caml_search_exe_in_path(*name);
-  u8 = caml_stat_strdup_of_os(truename);
+  u8 = caml_stat_strdup_of_os(name);
   CAML_GC_MESSAGE(STARTUP, "Opening bytecode executable %s\n", u8);
   caml_stat_free(u8);
-  fd = open_os(truename, O_RDONLY | O_BINARY);
+  fd = open_os(name, O_RDONLY | O_BINARY);
   if (fd == -1) {
-    caml_stat_free(truename);
     CAML_GC_MESSAGE(STARTUP, "Cannot open file\n");
     if (errno == EMFILE)
       return NO_FDS;
@@ -140,7 +137,6 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
     err = read (fd, buf, 2);
     if (err < 2 || (buf[0] == '#' && buf[1] == '!')) {
       close(fd);
-      caml_stat_free(truename);
       CAML_GC_MESSAGE(STARTUP, "Rejected #! script\n");
       return BAD_BYTECODE;
     }
@@ -149,11 +145,9 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
   err = caml_read_trailer(fd, trail);
   if (err != 0) {
     close(fd);
-    caml_stat_free(truename);
     CAML_GC_MESSAGE(STARTUP, "Not a bytecode executable\n");
     return err;
   }
-  *name = truename;
   return fd;
 }
 
@@ -460,7 +454,7 @@ CAMLexport void caml_main(char_os **argv)
   value res;
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
-  char_os * exe_name, * proc_self_exe;
+  char_os * exe_name = NULL, * proc_self_exe;
 
   /* Determine options */
   caml_parse_ocamlrunparam();
@@ -485,8 +479,8 @@ CAMLexport void caml_main(char_os **argv)
 
   if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
     /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
-    exe_name = argv[0];
-    fd = caml_attempt_open(&exe_name, &trail, 0);
+    exe_name = caml_search_exe_in_path(argv[0]);
+    fd = caml_attempt_open(exe_name, &trail, 0);
   }
 
   /* Little grasshopper wonders why we do that at all, since
@@ -496,9 +490,12 @@ CAMLexport void caml_main(char_os **argv)
      concatenated with the bytecode.  So, if the attempt with argv[0]
      failed, it is worth trying again with executable_name. */
   if (caml_byte_program_mode == APPENDED || fd < 0) {
+    caml_stat_free(exe_name);
     if (proc_self_exe != NULL) {
       exe_name = proc_self_exe;
-      fd = caml_attempt_open(&exe_name, &trail, 0);
+      fd = caml_attempt_open(proc_self_exe, &trail, 0);
+      if (fd >= 0)
+        exe_name = proc_self_exe;
     }
     if (fd < 0 && caml_byte_program_mode == APPENDED)
       error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
@@ -513,8 +510,8 @@ CAMLexport void caml_main(char_os **argv)
     if (argv[pos] == 0) {
       error("no bytecode file specified");
     }
-    exe_name = argv[pos];
-    fd = caml_attempt_open(&exe_name, &trail, 1);
+    exe_name = caml_search_exe_in_path(argv[pos]);
+    fd = caml_attempt_open(exe_name, &trail, 1);
     switch(fd) {
     case FILE_NOT_FOUND:
       error("cannot find file '%s'",
