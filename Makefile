@@ -692,7 +692,7 @@ boot/ocamlrun$(EXE):
 
 # Start up the system from the distribution compiler
 .PHONY: coldstart
-coldstart: boot/ocamlrun$(EXE) runtime/libcamlrun.$(A)
+coldstart: boot/ocamlrun$(EXE) stdlib/libcamlrun.$(A)
 	$(MAKE) -C stdlib OCAMLRUN='$$(ROOTDIR)/$<' USE_BOOT_OCAMLC=true all
 	rm -f $(addprefix boot/, libcamlrun.$(A) $(LIBFILES))
 	cp $(addprefix stdlib/, $(LIBFILES)) boot
@@ -1236,6 +1236,10 @@ runtime_COMMON_C_SOURCES = \
   $(UNIX_OR_WIN32) \
   weak
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+runtime_COMMON_C_SOURCES += unix_executable
+endif
+
 runtime_BYTECODE_ONLY_C_SOURCES = \
   backtrace_byt \
   fail_byt \
@@ -1602,11 +1606,11 @@ include $(addprefix $(DEPDIR)/, $(runtime_DEP_FILES))
 endif
 
 .PHONY: runtime
-runtime: stdlib/libcamlrun.$(A)
+runtime: stdlib/libcamlrun.$(A) runtime-all
 
 .PHONY: makeruntime
 makeruntime: runtime-all
-stdlib/libcamlrun.$(A): runtime-all
+stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
 	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
 	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
@@ -1656,7 +1660,7 @@ library: ocamlc
 	$(MAKE) -C stdlib all
 
 .PHONY: library-cross
-library-cross:
+library-cross: stdlib/libcamlrun.$(A)
 	$(MAKE) -C stdlib OCAMLRUN=../runtime/ocamlrun$(EXE) all
 
 .PHONY: libraryopt
