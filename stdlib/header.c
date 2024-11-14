@@ -106,28 +106,31 @@ NORETURN static void exit_with_error(const wchar_t *wstr1,
 
 typedef int file_descriptor;
 
-static char * searchpath(char * name)
+static char * searchpath(char *name)
 {
-  static char fullname[PATH_MAX + 1];
-  char * path;
+  char *fullname;
+  char *path;
   struct stat st;
+  size_t len = 0;
 
-  for (char *p = name; *p != 0; p++) {
-    if (*p == '/') return name;
+  for (char *p = name, len = 0; *p != 0; p++, len++) {
+    if (*p == '/') return NULL;
   }
-  path = getenv("PATH");
-  if (path == NULL) return name;
+  if ((path = getenv("PATH")) == NULL) return NULL;
+  /* len is now strlen(name) + strlen(path) + separator + terminator */
+  len += strlen(path) + 2;
+  if ((fullname = (char *)malloc(len)) == NULL) return NULL;
   while(1) {
-    char * p;
+    char *p;
     for (p = fullname; *path != 0 && *path != ':'; p++, path++)
-      if (p < fullname + PATH_MAX) *p = *path;
-    if (p != fullname && p < fullname + PATH_MAX)
+      if (p < fullname + len) *p = *path;
+    if (p != fullname && p < fullname + len)
       *p++ = '/';
     for (char *q = name; *q != 0; p++, q++)
-      if (p < fullname + PATH_MAX) *p = *q;
+      if (p < fullname + len) *p = *q;
     *p = 0;
     if (stat(fullname, &st) == 0 && S_ISREG(st.st_mode)) break;
-    if (*path == 0) return name;
+    if (*path == 0) return NULL;
     path++;
   }
   return fullname;
@@ -247,6 +250,7 @@ int main(int argc, char *argv[])
     exit_with_error("Unable to load bytecode image", NULL, NULL);
 
   truename = searchpath(argv[0]);
+  if (truename == NULL) truename = argv[0];
   fd = open(truename, O_RDONLY | O_BINARY);
   if (fd == -1 || (runtime_path = read_runtime_path(fd)) == NULL)
     exit_with_error(NULL, truename,
