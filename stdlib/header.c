@@ -203,6 +203,11 @@ void *caml_stat_alloc(size_t size)
   return malloc(size);
 }
 
+void caml_stat_free(void *ptr)
+{
+  free(ptr);
+}
+
 NORETURN static void exit_with_error(const char *str1,
                                      const char *str2,
                                      const char *str3)
@@ -394,6 +399,7 @@ NORETURN void __cdecl wmainCRTStartup(void)
 
 /* Borrowed from libcamlrun */
 char * caml_search_in_system_path(const char *);
+char * caml_executable_name(void);
 
 int main(int argc, char *argv[])
 {
@@ -404,7 +410,8 @@ int main(int argc, char *argv[])
   if (argc < 1)
     exit_with_error("Unable to load bytecode image", NULL, NULL);
 
-  truename = caml_search_in_system_path(argv[0]);
+  truename = caml_executable_name();
+  if (truename == NULL) truename = caml_search_in_system_path(argv[0]);
   if (truename == NULL) truename = argv[0];
   fd = open(truename, O_RDONLY | O_BINARY);
   if (fd == -1 || (runtime_path = read_runtime_path(fd, &rntm_strlen)) == NULL)

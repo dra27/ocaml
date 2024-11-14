@@ -1245,7 +1245,7 @@ runtime_COMMON_C_SOURCES = \
   weak
 
 ifeq "$(UNIX_OR_WIN32)" "unix"
-runtime_COMMON_C_SOURCES += unix_searchpath
+runtime_COMMON_C_SOURCES += unix_executable
 endif
 
 runtime_BYTECODE_ONLY_C_SOURCES = \
