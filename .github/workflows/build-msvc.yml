@@ -34,8 +34,11 @@ jobs:
           - cc: clang-cl
             x86_64: false
 
-    steps:
+    env:
+      HOST: ${{ matrix.x86_64 && 'x86_64-pc-windows' || 'i686-pc-windows' }}
+      CC: ${{ matrix.cc }}
 
+    steps:
       - name: Fetch OCaml
         uses: actions/checkout@v4
         with:
@@ -68,9 +71,6 @@ jobs:
 
       - name: Compute a key to cache configure results
         shell: bash
-        env:
-          HOST: ${{ matrix.x86_64 && 'x86_64-pc-windows' || 'i686-pc-windows' }}
-          CC: ${{ matrix.cc }}
         run: >-
           echo "AUTOCONF_CACHE_KEY=$HOST-$CC-$({ cat configure; uname; } | sha1sum | cut -c 1-7)" >> $GITHUB_ENV
 
@@ -83,9 +83,6 @@ jobs:
 
       - name: Build OCaml
         shell: bash
-        env:
-          HOST: ${{ matrix.x86_64 && 'x86_64-pc-windows' || 'i686-pc-windows' }}
-          CC: ${{ matrix.cc }}
         run: >-
           eval $(tools/msvs-promote-path) ;
           if ! ./configure --cache-file=config.cache --host=$HOST CC=$CC ; then
