@@ -81,7 +81,7 @@ jobs:
             config.cache
           key: ${{ steps.keys.outputs.AUTOCONF_CACHE_KEY }}
 
-      - name: Build OCaml
+      - name: Configure tree
         shell: bash
         run: >-
           eval $(tools/msvs-promote-path) ;
@@ -92,9 +92,6 @@ jobs:
           || failed=$?;
           if ((failed)) ; then cat config.log ; exit $failed ; fi ;
           fi ;
-          make -j || failed=$? ;
-          if ((failed)) ; then make -j1 V=1 ; exit $failed ; fi ;
-          runtime/ocamlrun ocamlc -config ;
         # Don't add indentation or comments, it breaks Bash on
         # Windows when the yaml text block scalar is processed as a
         # single line.
@@ -105,6 +102,17 @@ jobs:
           path: |
             config.cache
           key: ${{ steps.keys.outputs.AUTOCONF_CACHE_KEY }}
+
+      - name: Build OCaml
+        shell: bash
+        run: >-
+          eval $(tools/msvs-promote-path) ;
+          make -j || failed=$? ;
+          if ((failed)) ; then make -j1 V=1 ; exit $failed ; fi ;
+          runtime/ocamlrun ocamlc -config ;
+        # Don't add indentation or comments, it breaks Bash on
+        # Windows when the yaml text block scalar is processed as a
+        # single line.
 
       - name: Assemble backend with MinGW GASM and compare
         shell: bash
