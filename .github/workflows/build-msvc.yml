@@ -90,7 +90,7 @@ jobs:
           failed=0 ;
           ./configure --cache-file=config.cache --host=$HOST CC=$CC \
           || failed=$?;
-          if ((failed)) ; then cat config.log ; exit $failed ; fi ;
+          if ((failed)) ; then echo ; echo "::group::config.log content ($(wc -l config.log) lines)"; cat config.log; echo '::endgroup::'; exit $failed ; fi ;
           fi ;
         # Don't add indentation or comments, it breaks Bash on
         # Windows when the yaml text block scalar is processed as a
