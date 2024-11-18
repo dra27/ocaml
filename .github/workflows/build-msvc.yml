@@ -53,7 +53,7 @@ jobs:
                 // # Test Cygwin as well
                 compilers.push('gcc');
                 // # Test bytecode-only Cygwin
-                include.push({cc: 'gcc', arch: 'x86_64', libdir: 'absolute', config_arg: '--disable-native-toplevel --disable-native-compiler'});
+                include.push({cc: 'gcc', arch: 'x86_64', libdir: 'absolute', config_arg: '--disable-native-toplevel --disable-native-compiler --with-target-sh=sh'});
                 // # Test i686 MSVC absolute
                 include.push({cc: 'cl', arch: 'i686', libdir: 'absolute'});
                 // # Expand the main matrix to include relative testing
