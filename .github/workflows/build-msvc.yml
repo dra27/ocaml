@@ -63,7 +63,7 @@ jobs:
               if (labels.some(label => label.name === 'CI: Full matrix')) {
                 console.log('Full matrix requested');
                 // # Test bytecode-only Cygwin
-                include.push({cc: 'gcc', arch: 'x86_64', config_arg: '--disable-native-toplevel --disable-native-compiler'});
+                include.push({cc: 'gcc', arch: 'x86_64', config_arg: '--disable-native-toplevel --disable-native-compiler --with-target-sh=sh'});
               }
             }
             return {config_arg: [''], arch: ['x86_64'], cc: compilers, include: include};
