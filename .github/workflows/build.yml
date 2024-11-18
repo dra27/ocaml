@@ -165,8 +165,10 @@ jobs:
               {name: 'linux-O0', os: 'ubuntu-latest',
                config_arg: "CFLAGS='-O0'"},
               {name: 'linux-arm64', os: 'ubuntu-24.04-arm',
+               config_arg: '--with-target-sh=exe',
                'test-in-prefix': true},
               {name: 'macos-x86_64', os: 'macos-15-intel',
+               config_arg: '--with-target-sh=exe',
                'test-in-prefix': true},
               {name: 'macos-arm64', os: 'macos-latest',
                'test-in-prefix': true}];
@@ -277,7 +279,7 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG='--disable-native-toplevel --with-target-sh=exe' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
