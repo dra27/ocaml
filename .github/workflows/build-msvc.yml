@@ -52,7 +52,7 @@ jobs:
                 // # Test Cygwin as well
                 compilers.push('gcc');
                 // # Test bytecode-only Cygwin
-                include.push({cc: 'gcc', x86_64: true, config_arg: '--disable-native-compiler'});
+                include.push({cc: 'gcc', x86_64: true, config_arg: '--disable-native-compiler --with-target-sh=sh'});
               }
             }
             return {config_arg: [''], x86_64: [true], cc: compilers, include: include};
