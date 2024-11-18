@@ -148,8 +148,10 @@ jobs:
               {name: 'no-naked-pointers', os: 'ubuntu-latest',
                config_arg: '--disable-naked-pointers --disable-stdlib-manpages'},
               {name: 'linux-arm64', os: 'ubuntu-24.04-arm',
+               config_arg: '--with-target-sh=exe',
                'test-in-prefix': true},
               {name: 'macos-x86_64', os: 'macos-13',
+               config_arg: '--with-target-sh=exe',
                'test-in-prefix': true},
               {name: 'macos-arm64', os: 'macos-15',
                'test-in-prefix': true}];
@@ -243,7 +245,7 @@ jobs:
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
-          MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
+          MAKE_ARG=-j CONFIG_ARG='--with-target-sh=exe' su ocaml -c "bash -xe tools/ci/actions/runner.sh configure"
       - name: Build
         run: |
           MAKE_ARG=-j su ocaml -c "bash -xe tools/ci/actions/runner.sh build"
