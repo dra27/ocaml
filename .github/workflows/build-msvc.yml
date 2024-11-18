@@ -36,7 +36,7 @@ jobs:
             x86_64: false
           - cc: gcc
             x86_64: true
-            config_arg: --disable-native-compiler
+            config_arg: --disable-native-compiler --with-target-sh=sh
       fail-fast: false
 
     steps:
