@@ -77,11 +77,9 @@ let run config env mode =
     let expected_exit_code =
       (* Systems configured with --disable-shared can't load bytecode libraries
          which need C stubs *)
-      if Sys.cygwin && mode = Native && List.mem "unix" libraries
-      || Sys.win32 && mode = Native && List.mem "threads" libraries
+      if Sys.win32 && mode = Native && List.mem "threads" libraries
       || has_c_stubs && not Config.supports_shared_libraries then
-        (* cf. ocaml/flexdll#146 - Cygwin's ocamlnat can't load unix.cmxs and
-           the lines above will have triggered native Windows being unable to
+        (* The lines above will have triggered native Windows being unable to
            load threads.cmxs *)
         125
       else
