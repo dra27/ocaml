@@ -1197,9 +1197,7 @@ let load_libraries_in_toplevel env mode libraries =
       ["-noinit"; "-no-version"; "-noprompt"; "test_install_script.ml"]
     in
     let expected_exit_code =
-      if Sys.cygwin && mode = Native && List.mem "unix" libraries
-      || has_c_stubs && not config.supports_shared_libraries then
-        (* cf. ocaml/flexdll#146 - Cygwin's ocamlnat can't load unix.cmxs *)
+      if has_c_stubs && not config.supports_shared_libraries then
         125
       else
         0
@@ -1282,10 +1280,7 @@ let () =
       match expected_exit_code with
       | Some code -> code
       | None ->
-          if (Sys.cygwin && mode = Native && List.mem "unix" libraries)
-             || (not config.supports_shared_libraries && has_c_stubs) then
-            (* cf. ocaml/flexdll#146 - Cygwin's natdynlink can't load
-                   unix.cmxs *)
+          if not config.supports_shared_libraries && has_c_stubs then
             2
           else
             0
