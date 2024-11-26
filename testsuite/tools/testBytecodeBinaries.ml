@@ -66,10 +66,9 @@ let run config env =
                  be likely distinct from the behaviour of any of the
                  distribution's tools when called with -M. *)
               let without_exe = Filename.remove_extension binary in
-              let fails = (without_exe <> "ocamlmklib") in
               let (_exit_code, _output) =
                 Environment.run_process
-                  ~fails env program ~argv0:without_exe ["-M"] in ()
+                  ~fails:true env program ~argv0:without_exe ["-M"] in ()
         | _ ->
             if not fails then
               Harness.fail_because "%s: not expected to have failed" program
