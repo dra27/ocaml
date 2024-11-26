@@ -1345,8 +1345,7 @@ let test_bytecode_binaries env =
                  be likely distinct from the behaviour of any of the
                  distribution's tools when called with -M. *)
               let without_exe = Filename.remove_extension binary in
-              let fails = (without_exe <> "ocamlmklib") in
-              Environment.run_process Execute ~fails env
+              Environment.run_process Execute ~fails:true env
                                       program ~argv0:without_exe ["-M"]
         | _ ->
             if not fails then
