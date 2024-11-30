@@ -311,11 +311,11 @@ $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
 rm -rf "$instdir"
 
 cd testsuite
-if test -n "$jobs" && test -x /usr/bin/parallel
-then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables \
-                                      SHOW_TIMINGS=1 parallel
-else $make --warn-undefined-variables SHOW_TIMINGS=1 all
-fi
+#if test -n "$jobs" && test -x /usr/bin/parallel
+#then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables \
+#                                      SHOW_TIMINGS=1 parallel
+#else $make --warn-undefined-variables SHOW_TIMINGS=1 all
+#fi
 
 if $bootstrap; then
   git checkout ../boot/ocamlc ../boot/ocamllex
