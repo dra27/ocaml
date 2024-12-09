@@ -3207,9 +3207,9 @@ fi
 
 # Check whether --with-target-bindir was given.
 if test "${with_target_bindir+set}" = set; then :
-  withval=$with_target_bindir; target_bindir=$withval
+  withval=$with_target_bindir; TARGET_BINDIR=$withval
 else
-  target_bindir=''
+  TARGET_BINDIR=''
 fi
 
 
@@ -17328,8 +17328,8 @@ fi
   eval "exec_prefix=\"$exec_prefix\""
   eval "ocaml_bindir=\"$bindir\""
   eval "ocaml_libdir=\"$libdir\""
-  if test x"$target_bindir" = 'x'; then :
-  target_bindir="$ocaml_bindir"
+  if test x"$TARGET_BINDIR" = 'x'; then :
+  TARGET_BINDIR="$ocaml_bindir"
 fi
   if test x"$target_launch_method" = 'x'; then :
   target_launch_method="$launch_method"
@@ -18205,7 +18205,7 @@ fi
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
-  target_bindir='$(echo "$target_bindir" | sed -e "s/'/'\"'\"'/g")'
+  TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
 
 _ACEOF
 
@@ -19321,7 +19321,7 @@ ltmain=$ac_aux_dir/ltmain.sh
  ;;
     "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$target_bindir" \
+  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info ;;
 
   esac
