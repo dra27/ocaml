@@ -97,6 +97,12 @@ val bytecomp_c_libraries: string
 val native_c_libraries: string
 (** The C libraries to link with native-code programs *)
 
+val compression_c_libraries: string
+(** The C libraries needed with -lcomprmarsh (should appear before
+    {!native_c_libraries} in a call to the C compiler)
+
+    @since 5.4 *)
+
 val native_pack_linker: string
 (** The linker to use for packaging (ocamlopt -pack) and for partial
     links (ocamlopt -output-obj). *)
