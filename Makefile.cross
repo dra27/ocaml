@@ -27,7 +27,16 @@ HOST_ZSTD_LIBS=ZSTD_LIBS=$(shell ocamlopt -config-var compression_c_libraries)
 
 CROSS_OVERRIDES=OCAMLRUN=ocamlrun NEW_OCAMLRUN=ocamlrun \
   BOOT_OCAMLLEX=ocamllex OCAMLYACC=ocamlyacc
-CROSS_COMPILER_OVERRIDES=$(CROSS_OVERRIDES) CAMLC=ocamlc CAMLOPT=ocamlopt \
+# The build system adds various include directories which pertain to the current
+# tree, including -I runtime, which is necessary for -custom executables
+# (ocamltest, and other executables in static builds). It is fiddly to change
+# this, so we perform a slightly different trick `ocamlopt -I +` will put the
+# host compiler's standard library (and consequently its runtime objects) well
+# above the .a files found with -I runtime. For now, this seems the least evil
+# way of ensuring that the bytecode compiler has the C headers in runtime/caml
+# available without breaking builds with an external ocamlopt.
+CROSS_COMPILER_OVERRIDES=$(CROSS_OVERRIDES) \
+  CAMLC=ocamlc CAMLOPT='ocamlopt -I +' \
   BEST_OCAMLC=ocamlc BEST_OCAMLOPT=ocamlopt BEST_OCAMLLEX=ocamllex
 CROSS_COMPILERLIBS_OVERRIDES=$(CROSS_OVERRIDES) CAMLC=ocamlc \
   CAMLOPT="$(ROOTDIR)/ocamlopt.opt$(EXE) $(STDLIBFLAGS)"
