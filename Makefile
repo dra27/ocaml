@@ -1389,12 +1389,10 @@ $(SAK): runtime/sak.$(O)
 runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
 	$(V_CC)$(SAK_CC) $(SAK_CFLAGS) $(OUTPUTOBJ)$@ -c $<
 
-C_LITERAL = $(shell $(SAK) $(ENCODE_C_LITERAL) '$(1)')
-
-runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
-	$(V_GEN)echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@ && \
-	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(TARGET_LIBDIR))' >> $@ && \
-	echo '#define HOST "$(HOST)"' >> $@
+# --no-print-directory inhibits the Entering/Leaving notices while -q suppresses
+# the "Nothing to be done" messages.
+runtime/build_config.h: runtime/Makefile.build_config Makefile.config $(SAK)
+	$(V_GEN)$(MAKE) -C $(<D) -f $(<F) --no-print-directory -q > $@
 
 ## Runtime libraries and programs
 

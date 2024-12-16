@@ -1,0 +1,30 @@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*                        David Allsopp, Tarides                          *
+#*                                                                        *
+#*   Copyright 2024 David Allsopp Ltd.                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+ROOTDIR = ..
+
+include $(ROOTDIR)/Makefile.build_config
+
+C_LITERAL = $(shell ./sak$(EXE) $(ENCODE_C_LITERAL) '$(subst ','"'"',$(1))')
+
+# It is remarkably hairy to unify the rules of GNU make escaping with the wild
+# west of rules relating to how the echo built-in interprets backslashes (Posix
+# is extremely liberal). The trick here is to have a phony make target whose
+# job is simply to use $(info ) to display the lines instead. Thus, we use GNU
+# make essentially as a shell script!
+.PHONY: print
+print:
+	$(info /* This file is generated from $(ROOTDIR)/Makefile.config */)
+	$(info #define OCAML_STDLIB_DIR $(call C_LITERAL,$(TARGET_LIBDIR)))
+	$(info #define HOST "$(HOST)")
