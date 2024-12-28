@@ -33,7 +33,23 @@ let pass_or_skip test pass_reason skip_reason _log env =
   (result, env)
 
 let mkreason what commandline exitcode =
-  Printf.sprintf "%s: command\n%s\nfailed with exit code %d"
+  let exitcode =
+    (* On Windows, "negative" exit codes are probably NTSTATUS values. For
+       example, if a program accesses an invalid memory location, Unix sends a
+       SIGSEGV signal which, if unhandled, will terminate the process (setting
+       some kind of non-zero exit code - for example, Linux sets the exit code
+       to 128 + signal number to give a fairly memorable 139). In the equivalent
+       scenario, Windows throws an EXCEPTION_ACCESS_VIOLATION which, if handled
+       by the default exception handler, will terminate the process with exit
+       code STATUS_ACCESS_VIOLATION. These codes are large negative numbers,
+       which are not terribly memorable in decimal, so for negative exit codes
+       we instead display them in hexadecimal as 0xc0000005 is slightly more
+       memorable than -1073741819. *)
+    if Sys.win32 && exitcode < 0 then
+      Printf.sprintf "0x%08lx" (Int32.of_int exitcode)
+    else
+      string_of_int exitcode in
+  Printf.sprintf "%s: command\n%s\nfailed with exit code %s"
     what commandline exitcode
 
 let testfile env =
