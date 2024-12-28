@@ -137,7 +137,6 @@ AC_SUBST([exeext])
 AC_SUBST([OBJEXT])
 AC_SUBST([libext])
 AC_SUBST([S])
-AC_SUBST([runtime_asm_objects])
 AC_SUBST([SO])
 AC_SUBST([arch])
 AC_SUBST([arch_specific_SOURCES])
@@ -1604,10 +1603,6 @@ native_cflags=''
 oc_native_cflags=''
 oc_native_cppflags="-DNATIVE_CODE\
  -DTARGET_${arch} -DMODEL_${model} -DSYS_${system}"
-AS_CASE([$ccomptype],
-  [msvc],
-    [runtime_asm_objects=${arch}nt.${OBJEXT}],
-  [runtime_asm_objects=${arch}.${OBJEXT}])
 
 AS_CASE([$enable_native_compiler,$has_native_backend],
   [no,*],

@@ -918,7 +918,6 @@ arch64
 arch_specific_SOURCES
 arch
 SO
-runtime_asm_objects
 S
 libext
 OBJEXT
@@ -3418,7 +3417,6 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
-
 
 
 
@@ -18359,12 +18357,6 @@ native_cflags=''
 oc_native_cflags=''
 oc_native_cppflags="-DNATIVE_CODE\
  -DTARGET_${arch} -DMODEL_${model} -DSYS_${system}"
-case $ccomptype in #(
-  msvc) :
-    runtime_asm_objects=${arch}nt.${OBJEXT} ;; #(
-  *) :
-    runtime_asm_objects=${arch}.${OBJEXT} ;;
-esac
 
 case $enable_native_compiler,$has_native_backend in #(
   no,*) :

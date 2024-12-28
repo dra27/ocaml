@@ -1318,19 +1318,20 @@ libcamlrunpic_OBJECTS = \
   $(runtime_BYTECODE_C_SOURCES:.c=.bpic.$(O)) $(winpthreads_OBJECTS)
 
 libasmrun_OBJECTS = \
-  $(runtime_NATIVE_C_SOURCES:.c=.n.$(O)) $(runtime_ASM_OBJECTS) \
+  $(runtime_NATIVE_C_SOURCES:.c=.n.$(O)) runtime/$(ARCH).$(O) \
   $(winpthreads_OBJECTS)
 
 libasmrund_OBJECTS = \
-  $(runtime_NATIVE_C_SOURCES:.c=.nd.$(O)) $(runtime_ASM_OBJECTS:.$(O)=.d.$(O)) \
+  $(runtime_NATIVE_C_SOURCES:.c=.nd.$(O)) runtime/$(ARCH).d.$(O) \
   $(winpthreads_OBJECTS)
 
 libasmruni_OBJECTS = \
-  $(runtime_NATIVE_C_SOURCES:.c=.ni.$(O)) $(runtime_ASM_OBJECTS:.$(O)=.i.$(O)) \
+  $(runtime_NATIVE_C_SOURCES:.c=.ni.$(O)) runtime/$(ARCH).i.$(O) \
   $(winpthreads_OBJECTS)
 
-libasmrunpic_OBJECTS = $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) \
-  $(runtime_ASM_OBJECTS:.$(O)=_libasmrunpic.$(O)) $(winpthreads_OBJECTS)
+libasmrunpic_OBJECTS = \
+  $(runtime_NATIVE_C_SOURCES:.c=.npic.$(O)) runtime/$(ARCH)_libasmrunpic.$(O) \
+  $(winpthreads_OBJECTS)
 
 libcomprmarsh_OBJECTS = runtime/zstd.npic.$(O)
 
@@ -1572,13 +1573,13 @@ runtime/%_libasmrunpic.o: runtime/%.S
 runtime/domain_state.inc: runtime/caml/domain_state.tbl
 	$(V_GEN)$(CPP) $< > $@
 
-runtime/amd64nt.obj: runtime/amd64nt.asm runtime/domain_state.inc
+runtime/amd64.obj: runtime/amd64.asm runtime/domain_state.inc
 	$(V_ASM)$(ASM)$@ $<
 
-runtime/amd64nt.d.obj: runtime/amd64nt.asm runtime/domain_state.inc
+runtime/amd64.d.obj: runtime/amd64.asm runtime/domain_state.inc
 	$(V_ASM)$(ASM)$@ $(ocamlrund_CPPFLAGS) $<
 
-runtime/amd64nt.i.obj: runtime/amd64nt.asm runtime/domain_state.inc
+runtime/amd64.i.obj: runtime/amd64.asm runtime/domain_state.inc
 	$(V_ASM)$(ASM)$@ $(ocamlruni_CPPFLAGS) $<
 
 runtime/%_libasmrunpic.obj: runtime/%.asm
