@@ -216,6 +216,14 @@ let arch_arm64 = make
      "Target is i386 architecture"
      "Target is not i386 architecture")
 
+let arch_intel = make
+  ~name:"arch_intel"
+  ~description:"Pass if target is an Intel architecture"
+  (Actions_helpers.pass_or_skip
+     (match Ocamltest_config.arch with "amd64" | "i386" -> true | _ -> false)
+     "Target is an Intel architecture"
+     "Target is not an Intel architecture")
+
 let arch_power = make
   ~name:"arch_power"
   ~description:"Pass if target is a POWER architecture"
@@ -398,6 +406,7 @@ let _ =
     arch_arm64;
     arch_amd64;
     arch_i386;
+    arch_intel;
     arch_power;
     arch_riscv;
     arch_s390x;
