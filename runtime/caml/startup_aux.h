@@ -54,7 +54,7 @@ struct caml_params {
   uintnat max_domains;
 };
 
-extern const struct caml_params* const caml_params;
+CAMLextern const struct caml_params* const caml_params;
 
 extern void caml_parse_ocamlrunparam (void);
 
