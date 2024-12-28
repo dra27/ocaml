@@ -1,5 +1,6 @@
 (* TEST
  modules = "fakeclock.c";
+ arch_intel;
  include unix;
  libwin32unix;
  {
