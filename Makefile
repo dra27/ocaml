@@ -913,7 +913,9 @@ partialclean::
 
 INSTALL_COMPLIBDIR = $(DESTDIR)$(COMPLIBDIR)
 INSTALL_FLEXDLLDIR = $(INSTALL_LIBDIR)/flexdll
-FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
+# TODO arm64 version? (if corrected, fix install target too)
+FLEXDLL_MANIFEST = \
+  $(if $(filter-out arm64, $(ARCH)),default$(filter-out _i386,_$(ARCH)).manifest)
 
 DOC_FILES=\
   Changes \
@@ -2793,7 +2795,8 @@ endif
 	  $(INSTALL_PROG) debugger/ocamldebug$(EXE) "$(INSTALL_BINDIR)"; \
 	fi
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
-ifeq "$(TOOLCHAIN)" "msvc"
+# TODO Remove the $(filter ..) if there's an arm64 version as well
+ifeq "$(TOOLCHAIN)$(filter arm64,$(ARCH))" "msvc"
 	$(INSTALL_DATA) $(FLEXDLL_SOURCE_DIR)/$(FLEXDLL_MANIFEST) \
     "$(INSTALL_BINDIR)/"
 endif

@@ -354,7 +354,9 @@ AS_IF([test -n "$csc"],
     [*-*-mingw32*|*-pc-windows],
       [CSC=csc
       CSCFLAGS="/nologo /nowarn:1668"
-      AS_CASE([$host_cpu], [i*86], [CSCFLAGS="$CSCFLAGS /platform:x86"])],
+      AS_CASE([$host_cpu],
+        [i*86], [CSCFLAGS="$CSCFLAGS /platform:x86"],
+        [aarch64], [CSCFLAGS="$CSCFLAGS /platform:arm64"])],
     [AC_MSG_WARN([Mono is not yet supported - C sharp tests disabled])])])
 
 # Environment variables that are taken into account
@@ -711,8 +713,9 @@ AS_CASE([$target],
       mkexe_via_cc_extra_cmd=' && $(call MERGEMANIFESTEXE,$(1))'
       libext=lib
       AR=""
-      AS_IF([test "$target_cpu" = "x86_64" ],
-        [machine="-machine:AMD64 "],
+      AS_CASE([$target_cpu],
+        [x86_64], [machine="-machine:AMD64 "],
+        [aarch64], [machine="-machine:ARM64 "],
         [machine=""])
       mklib="link -lib -nologo $machine /out:\$(1) \$(2)"
     ],
@@ -1044,6 +1047,9 @@ AS_CASE([$target],
     flexlink_flags='-merge-manifest -stack 16777216'],
   [x86_64-pc-windows],
     [flexdll_chain='msvc64'
+    flexlink_flags='-merge-manifest -stack 33554432'],
+  [aarch64-pc-windows],
+    [flexdll_chain='msvcarm64'
     flexlink_flags='-merge-manifest -stack 33554432'],
   [flexdll_chain=''])
 
@@ -1508,6 +1514,8 @@ AS_CASE([$target],
     [arch=i386; system=win32],
   [x86_64-pc-windows],
     [has_native_backend=yes; arch=amd64; system=win64],
+  [aarch64-pc-windows],
+    [has_native_backend=yes; arch=arm64; system=win64],
   [[powerpc64le*-*-linux*]],
     [has_native_backend=yes; arch=power; model=ppc64le; system=linux],
   [[powerpc64*-*-linux-musl*]],
@@ -1716,6 +1724,9 @@ AS_CASE([$as_target,$ocaml_cc_vendor],
     default_aspp="$default_as"],
   [x86_64-pc-windows,*],
     [default_as="ml64 -nologo -Cp -c -Fo"
+    default_aspp="$default_as"],
+  [aarch64-pc-windows,*],
+    [default_as="armasm64"
     default_aspp="$default_as"],
   [*-*-darwin*,clang-*],
     [default_as="$default_as -Wno-trigraphs"
@@ -2750,7 +2761,8 @@ AS_IF([test x"$prefix" = "xNONE"],
     [i686-w64-mingw32*], [prefix='C:/ocamlmgw'],
     [x86_64-w64-mingw32*], [prefix='C:/ocamlmgw64'],
     [i686-pc-windows], [prefix='C:/ocamlms'],
-    [x86_64-pc-windows], [prefix='C:/ocamlms64'])],
+    [x86_64-pc-windows], [prefix='C:/ocamlms64'],
+    [aarch64-pc-windows], [prefix='C:/ocamlmsarm64'])],
   [AS_CASE([$build,$host],
     [*-pc-cygwin,*-*-mingw32*|*-pc-cygwin,*-pc-windows],
       [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"])])

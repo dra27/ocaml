@@ -41,7 +41,7 @@ SetThreadDescription(HANDLE hThread, PCWSTR lpThreadDescription);
 
 #include "caml/misc.h"
 
-#if defined(_WIN32) && !defined(NATIVE_CODE) && !defined(_MSC_VER)
+#if defined(_WIN32) && !defined(NATIVE_CODE) && (!defined(_MSC_VER) || defined(_M_ARM64))
 /* Ensure that pthread.h marks symbols __declspec(dllimport) so that they can be
    picked up from the runtime (which will have linked winpthreads statically).
    mingw-w64 11.0.0 introduced WINPTHREADS_USE_DLLIMPORT to do this explicitly;

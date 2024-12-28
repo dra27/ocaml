@@ -107,12 +107,16 @@ void ReplaceFunction(char* fn, char* module, void* pNew)
   HMODULE hModule = LoadLibrary(module);
   void* pCode;
   DWORD dwOldProtect = 0;
-#ifdef _M_X64
+#if defined(_M_X64)
   SIZE_T jmpSize = 13;
   BYTE jump[13];
-#else
+#elif defined(_M_IX86)
   SIZE_T jmpSize = 5;
   BYTE jump[5];
+#elif defined(_M_ARM64)
+#error "ARM64 version not yet implemented"
+#else
+#error "Unsupported architecture"
 #endif
   SIZE_T bytesWritten;
 
@@ -123,18 +127,22 @@ void ReplaceFunction(char* fn, char* module, void* pNew)
 
   /* Overwrite the code with a jump to our function */
   if (VirtualProtect(pCode, jmpSize, PAGE_EXECUTE_READWRITE, &dwOldProtect)) {
-#ifdef _M_X64
+#if defined(_M_X64)
     jump[0] = 0x49;             /* REX.WB prefix */
     jump[1] = 0xBB;             /* MOV r11, ... */
     memcpy(jump + 2, &pNew, 8); /* imm64 */
     jump[10] = 0x41;            /* REX.B prefix */
     jump[11] = 0xFF;            /* JMP */
     jump[12] = 0xE3;            /* r11 */
-#else
+#elif defined(_M_IX86)
     /* JMP rel32 to FakeClock */
     DWORD dwRelativeAddr = (DWORD)pNew - ((DWORD)pCode + 5);
     jump[0] = 0xE9;
     memcpy(jump + 1, &dwRelativeAddr, 4);
+#elif defined(_M_ARM64)
+#error "ARM64 version not yet implemented"
+#else
+#error "Unsupported architecture"
 #endif
 
     if (WriteProcessMemory(GetCurrentProcess(), pCode, jump, jmpSize, NULL)) {
