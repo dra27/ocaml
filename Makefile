@@ -1007,7 +1007,7 @@ partialclean::
 TOPFLAGS ?=
 OC_TOPFLAGS = $(STDLIBFLAGS) -I toplevel -noinit $(TOPINCLUDES) $(TOPFLAGS)
 
-RUN_OCAML = $(RLWRAP) $(OCAMLRUN) ./ocaml$(EXE) $(OC_TOPFLAGS)
+RUN_OCAML = $(RLWRAP) runtime/ocamlrun$(EXE) ./ocaml$(EXE) $(OC_TOPFLAGS)
 RUN_OCAMLNAT = $(RLWRAP) ./ocamlnat$(EXE) $(OC_TOPFLAGS)
 
 # Note: Beware that, since these rules begin with a coldstart, both
@@ -1017,7 +1017,7 @@ RUN_OCAMLNAT = $(RLWRAP) ./ocamlnat$(EXE) $(OC_TOPFLAGS)
 runtop: coldstart
 	$(MAKE) ocamlc
 	$(MAKE) ocaml
-	@$(RUN_OCAML)
+	$(RUN_OCAML)
 
 .PHONY: runtop-with-otherlibs
 runtop-with-otherlibs: coldstart
