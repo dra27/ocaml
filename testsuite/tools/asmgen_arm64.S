@@ -60,7 +60,7 @@ G(call_gen_code):
 G(caml_c_call):
         br      x15
 
-#if !defined(SYS_macosx)
+#if !defined(SYS_macosx) && !defined(SYS_win64)
 /* Mark stack as non-executable */
         .section .note.GNU-stack,"",%progbits
 #endif

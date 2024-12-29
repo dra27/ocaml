@@ -21,6 +21,7 @@
 open Format
 
 let macosx = (Config.system = "macosx")
+let win64 = (Config.system = "win64")
 
 (* Machine-specific command-line options *)
 

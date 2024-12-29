@@ -512,6 +512,8 @@ void caml_signal_thread(void * lpParam)
  * quickly.
  */
 
+/* TODO ARM64 - remove when implemented */
+#ifndef _M_ARM64
 static uintnat win32_alt_stack[0x100];
 
 static void caml_reset_stack (void *faulting_address)
@@ -535,9 +537,10 @@ static void caml_reset_stack (void *faulting_address)
  failed:
   caml_raise_stack_overflow();
 }
+#endif
 
 
-#ifndef _WIN64
+#if defined(_M_IX86)
 static LONG CALLBACK
     caml_stack_overflow_VEH (EXCEPTION_POINTERS* exn_info)
 {
@@ -567,7 +570,7 @@ static LONG CALLBACK
   return EXCEPTION_CONTINUE_SEARCH;
 }
 
-#else
+#elif defined(_M_X64)
 
 static LONG CALLBACK
     caml_stack_overflow_VEH (EXCEPTION_POINTERS* exn_info)
@@ -598,22 +601,36 @@ static LONG CALLBACK
 
   return EXCEPTION_CONTINUE_SEARCH;
 }
+
+#elif defined(_M_ARM64)
+
+/* TODO */
+
 #endif /* _WIN64 */
 
+/* TODO ARM64 - remove when implemented */
+#ifndef _M_ARM64
 static PVOID caml_stack_overflow_handle;
+#endif
 
 void caml_win32_overflow_detection(void)
 {
+/* TODO ARM64 */
+#ifndef _M_ARM64
   caml_stack_overflow_handle =
     AddVectoredExceptionHandler(1, caml_stack_overflow_VEH);
   if (caml_stack_overflow_handle == NULL) {
     caml_fatal_error("cannot install stack overflow detection");
   }
+#endif
 }
 
 void caml_win32_unregister_overflow_detection(void)
 {
+/* TODO ARM64 - remove when implemented */
+#ifndef _M_ARM64
   RemoveVectoredExceptionHandler(caml_stack_overflow_handle);
+#endif
 }
 
 #endif /* NATIVE_CODE */

@@ -707,7 +707,7 @@ let run_codegen log env =
     if exit_status=0
     then begin
       let finalise =
-        if Ocamltest_config.ccomptype="msvc"
+        if Ocamltest_config.ccomptype="msvc" && Ocamltest_config.arch<>"arm64"
         then finalise_codegen_msvc
         else finalise_codegen_cc
       in

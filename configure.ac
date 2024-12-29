@@ -1439,6 +1439,8 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
   [AS_CASE(["$target"],
     [*-*-cygwin*], [natdynlink=true],
     [*-*-mingw32*], [natdynlink=true],
+    dnl XXX natdynlink isn't yet working
+    [aarch64-pc-windows], [natdynlink=false],
     [*-pc-windows], [natdynlink=true],
     [[i[3456]86-*-linux*]], [natdynlink=true],
     [[x86_64-*-linux*]], [natdynlink=true],
@@ -1721,7 +1723,7 @@ AS_CASE([$as_target,$ocaml_cc_vendor],
     [default_as="ml64 -nologo -Cp -c -Fo"
     default_aspp="$default_as"],
   [aarch64-pc-windows,*],
-    [default_as="armasm64"
+    [default_as="clang -c"
     default_aspp="$default_as"],
   [*-*-darwin*,clang-*],
     [default_as="$default_as -Wno-trigraphs"

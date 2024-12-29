@@ -153,7 +153,8 @@ let asmgen_skip_on_bytecode_only =
   Actions_helpers.skip_with_reason "native compiler disabled"
 
 let msvc64 =
-  Ocamltest_config.ccomptype = "msvc" && Ocamltest_config.arch="amd64"
+  Ocamltest_config.ccomptype = "msvc"
+  && (Ocamltest_config.arch="amd64" || Ocamltest_config.arch="arm64")
 
 let asmgen_skip_on_msvc64 =
   Actions_helpers.skip_with_reason "not ported to MSVC64 yet"

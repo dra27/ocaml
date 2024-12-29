@@ -18044,6 +18044,8 @@ then :
     natdynlink=true ;; #(
   *-*-mingw32*) :
     natdynlink=true ;; #(
+      aarch64-pc-windows) :
+    natdynlink=false ;; #(
   *-pc-windows) :
     natdynlink=true ;; #(
   i[3456]86-*-linux*) :
@@ -18719,7 +18721,7 @@ esac ;; #(
     default_as="ml64 -nologo -Cp -c -Fo"
     default_aspp="$default_as" ;; #(
   aarch64-pc-windows,*) :
-    default_as="armasm64"
+    default_as="clang -c"
     default_aspp="$default_as" ;; #(
   *-*-darwin*,clang-*) :
     default_as="$default_as -Wno-trigraphs"

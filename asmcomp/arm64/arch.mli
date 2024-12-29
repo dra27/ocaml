@@ -19,6 +19,7 @@
 (* Specific operations for the ARM processor, 64-bit mode *)
 
 val macosx : bool
+val win64 : bool
 
 (* Machine-specific command-line options *)
 
