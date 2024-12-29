@@ -109,7 +109,7 @@ let nattoplevel = {
      output";
   test_actions =
   [
-    shared_libraries;
+    native_dynlink; (* NB: native_dynlink iff shared_libraries *)
     setup_ocamlnat_build_env;
     ocamlnat;
     check_ocamlnat_output;

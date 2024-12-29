@@ -50,6 +50,7 @@ val shared_libraries : Actions.t
 val no_shared_libraries : Actions.t
 
 val native_compiler : Actions.t
+val native_dynlink : Actions.t
 
 val afl_instrument : Actions.t
 val no_afl_instrument : Actions.t

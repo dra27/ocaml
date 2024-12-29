@@ -1,5 +1,5 @@
 (* TEST
- shared-libraries;
+ native-dynlink;
  setup-ocamlopt.byte-build-env;
  flags = "-shared";
  all_modules = "question.ml";
