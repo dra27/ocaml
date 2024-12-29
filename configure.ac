@@ -336,7 +336,8 @@ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
 AS_CASE([$target],
   [*-pc-windows],
     [AS_IF([test -z "$CC"],
-      AS_IF([test x"$target_cpu" = 'xaarch64'],[CC=clang-cl],[CC=cl]))
+      AS_IF([test x"$target_cpu" = 'xaarch64'],[CC=clang-cl
+            STRIP=llvm-strip],[CC=cl]))
     ccomptype=msvc
     S=asm
     SO=dll

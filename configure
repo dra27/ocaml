@@ -3775,6 +3775,7 @@ then :
   if test x"$target_cpu" = 'xaarch64'
 then :
   CC=clang-cl
+            STRIP=llvm-strip
 else $as_nop
   CC=cl
 fi
