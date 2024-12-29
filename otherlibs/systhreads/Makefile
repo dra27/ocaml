@@ -62,8 +62,10 @@ lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
 
 lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
 
+# Passing -custom to ocamlmklib inhibits the creation of a DLL. Since only C
+# objects are passed, this has no further effect.
 lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME)nat $^
+	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME)nat -custom $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
 	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
@@ -90,7 +92,7 @@ partialclean:
 
 .PHONY: clean
 clean: partialclean
-	rm -f dllthreads*.so dllthreads*.dll *.a *.lib *.o *.obj
+	rm -f dllthreads.so dllthreads.dll *.a *.lib *.o *.obj
 	rm -rf $(DEPDIR)
 
 .PHONY: distclean
