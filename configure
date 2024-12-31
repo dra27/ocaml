@@ -18050,8 +18050,6 @@ then :
     natdynlink=true ;; #(
   *-*-mingw32*) :
     natdynlink=true ;; #(
-      aarch64-pc-windows) :
-    natdynlink=false ;; #(
   *-pc-windows) :
     natdynlink=true ;; #(
   i[3456]86-*-linux*) :

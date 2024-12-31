@@ -1441,8 +1441,6 @@ AS_IF([test x"$supports_shared_libraries" = 'xtrue'],
   [AS_CASE(["$target"],
     [*-*-cygwin*], [natdynlink=true],
     [*-*-mingw32*], [natdynlink=true],
-    dnl XXX natdynlink isn't yet working
-    [aarch64-pc-windows], [natdynlink=false],
     [*-pc-windows], [natdynlink=true],
     [[i[3456]86-*-linux*]], [natdynlink=true],
     [[x86_64-*-linux*]], [natdynlink=true],
