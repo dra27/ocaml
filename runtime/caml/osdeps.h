@@ -159,10 +159,10 @@ extern void caml_init_os_params(void);
 extern "C" {
 #endif
 
-extern unsigned short caml_win32_major;
-extern unsigned short caml_win32_minor;
-extern unsigned short caml_win32_build;
-extern unsigned short caml_win32_revision;
+CAMLextern unsigned short caml_win32_major;
+CAMLextern unsigned short caml_win32_minor;
+CAMLextern unsigned short caml_win32_build;
+CAMLextern unsigned short caml_win32_revision;
 
 /* [caml_stat_strdup_to_utf16(s)] returns a null-terminated copy of [s],
    re-encoded in UTF-16.  The encoding of [s] is assumed to be UTF-8 if
