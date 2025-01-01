@@ -122,3 +122,11 @@ depopts: [
   "ocaml-option-static"
   "ocaml-option-tsan"
 ]
+pin-depends: [
+  ["conf-msvcarm64.dev" "git+https://github.com/dra27/msvs-tools.git#windows-on-arm64"]
+  ["msvs-detect.0.8.0~dev" "git+https://github.com/dra27/msvs-tools.git#windows-on-arm64"]
+  ["arch-arm64.1" "git+https://github.com/dra27/msvs-tools.git#windows-on-arm64"]
+  ["ocaml-env-msvcarm64.1" "git+https://github.com/dra27/msvs-tools.git#windows-on-arm64"]
+  ["system-msvc.1" "git+https://github.com/dra27/msvs-tools.git#windows-on-arm64"]
+  ["flexdll.0.44" "git+https://github.com/dra27/flexdll.git#msvcarm64"]
+]
