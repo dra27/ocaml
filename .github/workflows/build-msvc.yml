@@ -134,7 +134,6 @@ jobs:
 
       - name: Configure tree
         env:
-<<<<<<< HEAD
           CONFIG_ARGS: >-
             --cache-file=config.cache
             --prefix "${{ matrix.cc != 'gcc' && '$PROGRAMFILES/Бактріан🐫' || '$(cygpath "$PROGRAMFILES/Бактріан🐫")'}}"
@@ -157,27 +156,6 @@ jobs:
               exit $failed
             fi
           fi
-=======
-          HOST: ${{ matrix.x86_64 && 'x86_64-pc-windows' || 'i686-pc-windows' }}
-          CC: ${{ matrix.cc }}
-        run: >-
-          eval $(tools/msvs-promote-path) ;
-          if ! ./configure --cache-file=config.cache --host=$HOST CC=$CC
-          --prefix "$PROGRAMFILES/Бактріан🐫"; then
-          rm -rf config.cache ;
-          failed=0 ;
-          ./configure --cache-file=config.cache --host=$HOST CC=$CC
-          --prefix "$PROGRAMFILES/Бактріан🐫"
-          || failed=$?;
-          if ((failed)) ; then cat config.log ; exit $failed ; fi ;
-          fi ;
-          make -j || failed=$? ;
-          if ((failed)) ; then make -j1 V=1 ; exit $failed ; fi ;
-          runtime/ocamlrun ocamlc -config ;
-        # Don't add indentation or comments, it breaks Bash on
-        # Windows when the yaml text block scalar is processed as a
-        # single line.
->>>>>>> b204bc49ea5
 
       - name: Save Autoconf cache
         uses: actions/cache/save@v4
@@ -209,22 +187,12 @@ jobs:
         if: endsWith(matrix.arch, '64') && matrix.cc != 'gcc'
 
       - name: Run the test suite
-<<<<<<< HEAD
         if: ${{ needs.config.outputs.skip-testsuite != 'true' }}
         run: |
           eval $(tools/msvs-promote-path)
           make tests
 
       - name: Install the compiler
-=======
-        shell: bash
-        run: >-
-          eval $(tools/msvs-promote-path) ;
-          make -j tests ;
-
-      - name: Install the compiler
-        shell: bash
->>>>>>> b204bc49ea5
         run: make install
 
       - name: Test in prefix

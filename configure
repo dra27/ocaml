@@ -13819,29 +13819,6 @@ esac
 ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
 ocamlsrcdir=${ocamlsrcdir%X}
 
-<<<<<<< HEAD
-=======
-case $host in #(
-  *-*-mingw32*|*-pc-windows) :
-
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
-printf %s "checking for a workable solution for ln -sf... " >&6; }
-  if MSYS=winsymlinks:nativestrict CYGWIN=winsymlinks:nativestrict ln -sf configure conftestLink 2>/dev/null
-then :
-  ln='ln -sf'
-else $as_nop
-  ln='cp -pf'
-
-fi
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
-printf "%s\n" "$ln" >&6; }
-
-    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")" ;; #(
-  *) :
-    ln='ln -sf' ;;
-esac
-
->>>>>>> b204bc49ea5
 # Whether ar supports @FILE arguments
 
 case $lt_cv_ar_at_file in #(
@@ -13856,7 +13833,19 @@ esac
 case $host in #(
   *-*-mingw32*|*-pc-windows) :
     unix_or_win32="win32"
-    ln='cp -pf'
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for a workable solution for ln -sf" >&5
+printf %s "checking for a workable solution for ln -sf... " >&6; }
+  if MSYS=winsymlinks:nativestrict CYGWIN=winsymlinks:nativestrict ln -sf configure conftestLink 2>/dev/null
+then :
+  ln='ln -sf'
+else $as_nop
+  ln='cp -pf'
+
+fi
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ln" >&5
+printf "%s\n" "$ln" >&6; }
+
     ocamltest_libunix="Some false"
     ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
     ocamlyacc_wstr_module="yacc/wstr" ;; #(
