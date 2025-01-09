@@ -716,6 +716,15 @@ AS_CASE([$ocaml_cc_vendor],
 ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
 ocamlsrcdir=${ocamlsrcdir%X}
 
+<<<<<<< HEAD
+=======
+AS_CASE([$host],
+  [*-*-mingw32*|*-pc-windows],
+    [OCAML_CHECK_LN_ON_WINDOWS
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"],
+  [ln='ln -sf'])
+
+>>>>>>> b204bc49ea5
 # Whether ar supports @FILE arguments
 
 AS_CASE([$lt_cv_ar_at_file],
