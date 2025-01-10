@@ -328,18 +328,13 @@ CAMLprim value caml_raw_backtrace_slot(value bt, value index)
 
 CAMLprim value caml_raw_backtrace_next_slot(value slot)
 {
-  debuginfo dbg;
-
   CAMLparam1(slot);
-  CAMLlocal1(v);
+  value v;
 
-  dbg = Debuginfo_val(slot);
+  debuginfo dbg = Debuginfo_val(slot);
   dbg = caml_debuginfo_next(dbg);
 
-  if (dbg == NULL)
-    v = Val_none;
-  else
-    v = caml_alloc_some(Val_debuginfo(dbg));
+  Caml_copy_nullable(v, Val_debuginfo, dbg);
 
   CAMLreturn(v);
 }

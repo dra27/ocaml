@@ -13,6 +13,9 @@
 /*                                                                        */
 /**************************************************************************/
 
+/* For Caml_copy_nullable */
+#define CAML_INTERNALS
+
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>
@@ -176,12 +179,9 @@ CAMLexport value caml_unix_getsockopt_aux(const char * name,
                                      enum option_type ty, int level, int option,
                                      value socket)
 {
-  CAMLparam0();
-  CAMLlocal1(err);
   value res;
   union option_value optval;
   socklen_param_type optsize;
-
 
   switch (ty) {
   case TYPE_BOOL:
@@ -206,28 +206,19 @@ CAMLexport value caml_unix_getsockopt_aux(const char * name,
   case TYPE_INT:
     res = Val_int(optval.i); break;
   case TYPE_LINGER:
-    if (optval.lg.l_onoff == 0) {
-      res = Val_none;
-    } else {
-      res = caml_alloc_some(Val_int(optval.lg.l_linger));
-    }
+    Caml_copy_nullable(res, Val_int, optval.lg.l_linger);
     break;
   case TYPE_TIMEVAL:
     res = caml_copy_double((double) optval.tv.tv_sec
                            + (double) optval.tv.tv_usec / 1e6);
     break;
   case TYPE_UNIX_ERROR:
-    if (optval.i == 0) {
-      res = Val_none;
-    } else {
-      err = caml_unix_error_of_code(optval.i);
-      res = caml_alloc_some(err);
-    }
+    Caml_copy_nullable(res, caml_unix_error_of_code, optval.i);
     break;
   default:
     caml_unix_error(EINVAL, name, Nothing);
   }
-  CAMLreturn(res);
+  return res;
 }
 
 CAMLexport value caml_unix_setsockopt_aux(const char * name,

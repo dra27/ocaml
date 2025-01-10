@@ -62,6 +62,23 @@ CAMLextern value caml_alloc_sprintf(const char * format, ...)
 ;
 CAMLextern value caml_alloc_some(value);
 
+#ifdef CAML_INTERNALS
+/* If [x == 0], convenience macro [Caml_copy_nullable(v, F, x)] makes
+   [v = None], otherwise it makes [v = Some (F(x))].
+   For example, [Caml_copy_nullable(v, caml_copy_string_of_os, path)] converts
+   [char_os *path] to a [string option] value stored in [v] and
+   [Caml_copy_nullable(v, Val_int, x)] converts [int x] to an [int option]
+   value stored in [v] (where [v = None] if [x == 0]). */
+#define Caml_copy_nullable(v, F, x) do { \
+  if (x == 0) {                       \
+    (v) = Val_none;                      \
+  } else {                               \
+    (v) = F(x);                        \
+    (v) = caml_alloc_some((v));          \
+  }                                      \
+}while(0)
+#endif /* CAML_INTERNALS */
+
 typedef void (*final_fun)(value);
 CAMLextern value caml_alloc_final (mlsize_t, /*size in words*/
                                    final_fun, /*finalization function*/

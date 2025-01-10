@@ -486,10 +486,9 @@ CAMLprim value caml_sys_executable_name(value unit)
 
 CAMLprim value caml_sys_proc_self_exe(value unit)
 {
-  if (caml_params->proc_self_exe == NULL)
-    return Val_none;
-  else
-    return caml_alloc_some(caml_copy_string_of_os(caml_params->proc_self_exe));
+  value res =
+    Caml_copy_nullable(res, caml_copy_string_of_os, caml_params->proc_self_exe);
+  return res;
 }
 
 void caml_sys_init(const char_os * proc_self_exe,
