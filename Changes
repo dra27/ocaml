@@ -206,6 +206,10 @@ Working version
   that the current backtrace is preserved when Sys.getenv_opt returns None.
   (David Allsopp, review by Nicolás Ojeda Bär, Josh Berdine and Gabriel Scherer)
 
+- #13728: Add Sys.runtime_executable containing the full path (if available) to
+  the currently executing runtime.
+  (David Allsopp, review by Nicolás Ojeda Bär and Daniel Bünzli)
+
 - #13737: Avoid closure allocations in Weak.Make.add when resizing the
   table
   (Vincent Laviron, review by Gabriel Scherer and Daniel Bünzli)
