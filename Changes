@@ -1,3 +1,12 @@
+OCaml 5.4 maintenance version
+-----------------------------
+
+### Build system:
+
+- #14243: New configure option --with-additional-stublibsdir allows an
+  additional directory to be added to the start of ld.conf.
+  (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
+
 ### Bug fixes:
 
 - #14574, #14577, #14589: Fix wrong assembly code generated for ARM64
@@ -6,10 +15,6 @@
 
 OCaml 5.4.1 (17 February 2026)
 ------------------------------
-
-- #14243: New configure option --with-additional-stublibsdir allows an
-  additional directory to be added to the start of ld.conf.
-  (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
 
 ### Bug fixes:
 
