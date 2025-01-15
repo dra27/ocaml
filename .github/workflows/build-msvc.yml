@@ -67,7 +67,7 @@ jobs:
       - name: Install Cygwin
         uses: cygwin/cygwin-install-action@v5
         with:
-          packages: make,bash,${{ matrix.cc != 'gcc' && 'mingw64-x86_64-' || 'gcc-fortran,' }}gcc-core,cygwin=3.5.4-1,cygwin-devel=3.5.4-1
+          packages: make,bash,${{ matrix.cc != 'gcc' && 'mingw64-x86_64-' || 'gcc-fortran,' }}gcc-core,cygwin=3.6.0-0.320.g1e6a3b39f1c6,cygwin-devel=3.6.0-0.320.g1e6a3b39f1c6
           install-dir: 'D:\cygwin'
 
       - name: Save Cygwin cache
