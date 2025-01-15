@@ -1029,6 +1029,7 @@ enable_flambda
 enable_flambda_invariants
 enable_cmm_invariants
 with_target_sh
+with_stublibs
 enable_reserved_header_bits
 enable_stdlib_manpages
 enable_warn_error
@@ -1760,6 +1761,8 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-odoc             build documentation with odoc
   --with-target-sh        location of Posix sh on the target system
+  --with-stublibs         additional directory for searching for bytecode stub
+                          libraries
   --with-afl              use the AFL fuzzer
   --with-flexdll          bootstrap FlexDLL from the given sources
   --with-winpthreads-msvc build winpthreads (only for the MSVC port) from the
@@ -4180,6 +4183,25 @@ else $as_nop
 fi
 else $as_nop
   target_launch_method=''
+fi
+
+
+
+# Check whether --with-stublibs was given.
+if test ${with_stublibs+y}
+then :
+  withval=$with_stublibs; if test x"$withval" = 'xno'
+then :
+  ocaml_additional_stublibs_dir=''
+else $as_nop
+           if test x"$withval" = 'xyes'
+then :
+  as_fn_error $? "--with-stublibs needs an argument" "$LINENO" 5
+fi
+    ocaml_additional_stublibs_dir="$withval"
+fi
+else $as_nop
+  ocaml_additional_stublibs_dir=''
 fi
 
 
@@ -23574,6 +23596,10 @@ unset ac_cv_header_flexdll_h
 # (this is needed for the OCaml configuration module)
 
 
+# Create ld.conf
+ac_config_commands="$ac_config_commands runtime/ld.conf"
+
+
 # Just before config.status is generated, determine the final values for MKEXE,
 # MKDLL, MKMAINDLL and MKEXE_VIA_CC. The final variables controlling these are:
 # $mkexe - the linking command and munged CFLAGS + any extra flexlink flags
@@ -24697,6 +24723,9 @@ fi
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
+ocaml_additional_stublibs_dir=\
+'$(echo "$ocaml_additional_stublibs_dir" | sed -e "s/'/'\"'\"'/g")'
+  ocaml_libdir='$(echo "$ocaml_libdir" | sed -e "s/'/'\"'\"'/g")'
 
 _ACEOF
 
@@ -24735,6 +24764,7 @@ do
     "shebang") CONFIG_COMMANDS="$CONFIG_COMMANDS shebang" ;;
     "otherlibs/systhreads/META") CONFIG_FILES="$CONFIG_FILES otherlibs/systhreads/META" ;;
     "ocamltest/ocamltest_unix.ml") CONFIG_LINKS="$CONFIG_LINKS ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}" ;;
+    "runtime/ld.conf") CONFIG_COMMANDS="$CONFIG_COMMANDS runtime/ld.conf" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -25875,6 +25905,11 @@ ltmain=$ac_aux_dir/ltmain.sh
     > stdlib/runtime.info
   printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info ;;
+    "runtime/ld.conf":C) rm -f runtime/ld.conf
+  test x"$ocaml_additional_stublibs_dir" = 'x' || \
+    echo "$ocaml_additional_stublibs_dir" > runtime/ld.conf
+  echo "$ocaml_libdir/stublibs" >> runtime/ld.conf
+  echo "$ocaml_libdir" >> runtime/ld.conf ;;
 
   esac
 done # for ac_tag
