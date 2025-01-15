@@ -412,6 +412,10 @@ Working version
   rejected too.
   (David Allsopp, review by Antonin Décimo and Gabriel Scherer)
 
+- #13???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #13691: Make four globals underlying Gc.control atomic to avoid C data
