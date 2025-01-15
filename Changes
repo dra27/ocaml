@@ -1,3 +1,12 @@
+OCaml 5.4 maintenance version
+-----------------------------
+
+### Build system:
+
+- #14243: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf.
+  (David Allsopp, review by Jonah Beckford, Hugo Heuzard and ???)
+
 OCaml 5.4.0 (9 October 2025)
 ----------------------------
 
