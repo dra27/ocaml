@@ -46,6 +46,10 @@ Working version
 
 ### Build system:
 
+- #13???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 
