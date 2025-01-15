@@ -60,6 +60,10 @@ OCaml 4.13 maintenance branch
   is dash, rather than bash, this now works correctly).
   (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
 
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
