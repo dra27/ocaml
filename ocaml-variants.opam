@@ -64,6 +64,7 @@ build: [
     "--host=i686-pc-windows"    {system-msvc:installed & arch-x86_32:installed}
     "--host=i686-w64-mingw32"   {os-distribution = "cygwin" & system-mingw:installed & arch-x86_32:installed}
     "--prefix=%{prefix}%"
+    "--with-stublibs=%{stublibs}%"
     "--with-flexdll=%{flexdll:share}%" {os = "win32" & flexdll:installed}
     "-C"
     "--with-afl" {ocaml-option-afl:installed}
