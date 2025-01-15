@@ -116,6 +116,10 @@ OCaml 4.08 maintenance branch:
   is dash, rather than bash, this now works correctly).
   (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
 
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #2267: merge generation of header programs, also fixing parallel build on
