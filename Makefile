@@ -1446,6 +1446,7 @@ depend: beforedepend
 distclean: clean
 	$(MAKE) -C ocamltest distclean
 	rm -f testsuite/tools/toolchain.ml
+	$(MAKE) -C runtime distclean
 	rm -f boot/ocamlrun boot/ocamlrun boot/ocamlrun.exe boot/$(HEADER_NAME) \
 	boot/ocamlruns boot/ocamlruns.exe \
 	boot/flexlink.byte boot/flexlink.byte.exe \
