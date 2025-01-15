@@ -1178,8 +1178,7 @@ runtime_BUILT_HEADERS = $(addprefix runtime/, \
 ## Targets to build and install
 
 runtime_PROGRAMS = runtime/ocamlrun$(EXE)
-runtime_BYTECODE_STATIC_LIBRARIES = $(addprefix runtime/, \
-  ld.conf libcamlrun.$(A))
+runtime_BYTECODE_STATIC_LIBRARIES = runtime/libcamlrun.$(A)
 runtime_BYTECODE_SHARED_LIBRARIES =
 runtime_NATIVE_STATIC_LIBRARIES = \
   runtime/libasmrun.$(A) runtime/libcomprmarsh.$(A)
@@ -1258,10 +1257,6 @@ runtime-allopt:
 endif
 
 ## Generated non-object files
-
-runtime/ld.conf: $(ROOTDIR)/Makefile.config
-	$(V_GEN)echo "$(STUBLIBDIR)" > $@ && \
-	echo "$(LIBDIR)" >> $@
 
 runtime/primitives: runtime/gen_primitives.sh $(runtime_BYTECODE_C_SOURCES)
 	$(V_GEN)runtime/gen_primitives.sh $@ $(runtime_BYTECODE_C_SOURCES)
@@ -1496,7 +1491,7 @@ makeruntime: runtime-all
 stdlib/libcamlrun.$(A): runtime-all
 	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
-	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
+	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll)
 	rm -f $(addprefix runtime/, ocamlrun ocamlrund ocamlruni ocamlruns sak)
 	rm -f $(addprefix runtime/, \
 	  ocamlrun.exe ocamlrund.exe ocamlruni.exe ocamlruns.exe sak.exe)
@@ -2459,7 +2454,7 @@ distclean: clean
 	rm -f $(addprefix ocamltest/,ocamltest_config.ml ocamltest_unix.ml)
 	rm -f testsuite/tools/toolchain.ml
 	$(MAKE) -C otherlibs distclean
-	rm -f $(runtime_CONFIGURED_HEADERS)
+	rm -f $(runtime_CONFIGURED_HEADERS) runtime/ld.conf
 	$(MAKE) -C stdlib distclean
 	$(MAKE) -C testsuite distclean
 	rm -f tools/eventlog_metadata tools/*.bak
@@ -2483,7 +2478,7 @@ install:
 	$(MKDIR) "$(INSTALL_INCDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR_PROFILING)"
 	$(INSTALL_PROG) $(runtime_PROGRAMS) "$(INSTALL_BINDIR)"
-	$(INSTALL_DATA) $(runtime_BYTECODE_STATIC_LIBRARIES) \
+	$(INSTALL_DATA) runtime/ld.conf $(runtime_BYTECODE_STATIC_LIBRARIES) \
 	  "$(INSTALL_LIBDIR)"
 ifneq "$(runtime_BYTECODE_SHARED_LIBRARIES)" ""
 	$(INSTALL_PROG) $(runtime_BYTECODE_SHARED_LIBRARIES) \
