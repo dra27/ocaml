@@ -55,6 +55,10 @@ OCaml 5.0 maintenance version
   is dash, rather than bash, this now works correctly).
   (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
 
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #12726: fix segmentation fault under Windows when executing a bytecode file if
