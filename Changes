@@ -14,6 +14,12 @@ OCaml 5.4 maintenance version
   normalised on both Windows and Unix.
   (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
 
+### Internal/compiler-libs changes:
+
+- #14243: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
+
 ### Build system:
 
 - #14243: New configure option --with-additional-stublibsdir allows an
