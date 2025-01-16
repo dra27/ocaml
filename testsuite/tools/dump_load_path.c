@@ -23,6 +23,8 @@
 #include <caml/misc.h>
 #include <caml/osdeps.h>
 
+#include "../../runtime/build_config.h"
+
 int main_os(int argc, char_os **argv)
 {
   const char_os *dir;
@@ -30,7 +32,7 @@ int main_os(int argc, char_os **argv)
   caml_ext_table_init(&caml_shared_libs_path, 8);
   caml_decompose_path(&caml_shared_libs_path,
                       caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
-  caml_parse_ld_conf();
+  caml_parse_ld_conf(OCAML_STDLIB_DIR, &caml_shared_libs_path);
   for (int i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
     if (dir[0] == 0)
