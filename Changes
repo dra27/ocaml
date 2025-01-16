@@ -400,6 +400,10 @@ Working version
   (Ulysse Gérard and Jules Aguillon, review by Jules Aguillon
    and Florian Angeletti)
 
+- #13???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #13431: Simplify github action responsible for flagging PRs with
