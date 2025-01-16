@@ -55,6 +55,10 @@ Working version
   (Nicolás Ojeda Bär, review by Gabriel Scherer, Samuel Vivien, Ulysse Gérard
   and Vincent Laviron)
 
+- #13???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #13???: New configure option --with-stublibs allows an additional directory
