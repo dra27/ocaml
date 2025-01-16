@@ -76,6 +76,8 @@ static c_primitive lookup_primitive(char * name)
   return NULL;
 }
 
+#endif /* NATIVE_CODE */
+
 /* Parse the ld.conf file and add the directories
    listed there to the search path */
 
@@ -110,7 +112,7 @@ static char_os *expand_entry(char_os *libroot, char_os *dir)
   }
 }
 
-CAMLexport char_os * caml_parse_ld_conf(void)
+CAMLexport char_os * caml_parse_ld_conf(struct ext_table *table)
 {
   const char_os * const locations[3] = {
     caml_secure_getenv(T("OCAMLLIB")),
@@ -184,13 +186,38 @@ CAMLexport char_os * caml_parse_ld_conf(void)
     char_os *entry = entries.contents[i];
     length = strlen_os(entry) + 1;
     memcpy(p, entry, length * sizeof(char_os));
-    caml_ext_table_add(&caml_shared_libs_path, p);
+    caml_ext_table_add(table, p);
     p += length;
   }
   caml_ext_table_free(&entries, 1);
 
   return result;
 }
+
+/* Exposes caml_parse_ld_conf as a primitive for the bytecode compiler, saving
+   the duplication of the logic with the bytecode compiler. */
+CAMLprim value caml_dynlink_parse_ld_conf(value unit)
+{
+  CAMLparam0();
+  CAMLlocal2(list, str);
+
+  struct ext_table table;
+  caml_ext_table_init(&table, 8);
+  char_os *tofree = caml_parse_ld_conf(&table);
+
+  list = Val_emptylist;
+  for (int i = table.size - 1; i >= 0; i--) {
+    str = caml_copy_string_of_os(table.contents[i]);
+    list = caml_alloc_2(Tag_cons, str, list);
+  }
+
+  caml_ext_table_free(&table, 0);
+  caml_stat_free(tofree);
+
+  CAMLreturn(list);
+}
+
+#ifndef NATIVE_CODE
 
 /* Open the given shared library and add it to shared_libs.
    Abort on error. */
@@ -244,7 +271,7 @@ void caml_build_primitive_table(char_os * lib_path,
   if (lib_path != NULL)
     for (p = lib_path; *p != 0; p += strlen_os(p) + 1)
       caml_ext_table_add(&caml_shared_libs_path, p);
-  caml_parse_ld_conf();
+  caml_parse_ld_conf(&caml_shared_libs_path);
   /* Open the shared libraries */
   caml_ext_table_init(&shared_libs, 8);
   if (libs != NULL)
