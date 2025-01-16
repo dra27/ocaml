@@ -71,6 +71,10 @@ OCaml 4.11 maintenance branch
   compiling the primitives file before calling the linker.
   (David Allsopp, review by Vincent Laviron)
 
+- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #10135: Overhaul the FlexDLL bootstrap process. It's now fully integrated
