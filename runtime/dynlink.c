@@ -205,18 +205,23 @@ CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
 CAMLprim value caml_dynlink_parse_ld_conf(value vstdlib)
 {
   CAMLparam1(vstdlib);
-  CAMLlocal2(list, str);
+  CAMLlocal3(list, str, cell);
 
   char_os *stdlib = caml_stat_strdup_to_os(String_val(vstdlib));
   struct ext_table table;
+  char_os *tofree;
+  int i;
   caml_ext_table_init(&table, 8);
-  char_os *tofree = caml_parse_ld_conf(stdlib, &table);
+  tofree = caml_parse_ld_conf(stdlib, &table);
   caml_stat_free(stdlib);
 
   list = Val_emptylist;
-  for (int i = table.size - 1; i >= 0; i--) {
+  for (i = table.size - 1; i >= 0; i--) {
     str = caml_copy_string_of_os(table.contents[i]);
-    list = caml_alloc_2(Tag_cons, str, list);
+    cell = caml_alloc_small(2, Tag_cons);
+    Field(cell, 0) = str;
+    Field(cell, 1) = list;
+    list = cell;
   }
 
   caml_ext_table_free(&table, 0);
