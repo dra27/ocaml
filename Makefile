@@ -1149,7 +1149,7 @@ testsuite/tools/%.$(O): OC_CPPFLAGS += -I runtime -I otherlibs/$(UNIXLIB)
 testsuite/tools/%.cmi: COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
 testsuite/tools/%.cmo: COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
 testsuite/tools/%.cmx: \
-  OPTCOMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
+  COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
 
 ifneq "$(FLEXDLL_SUBMODULE_PRESENT)" ""
 testsuite/tools/dump_load_path$(EXE): \
@@ -1160,7 +1160,7 @@ testsuite/tools/dump_load_path$(EXE): \
 	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
 testsuite/tools/test_in_prefix$(EXE): \
-  CAMLC = $(CAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+  CAMLC = $(CAMLRUN) $(ROOTDIR)/ocamlc $(STDLIBFLAGS)
 
 testsuite/tools/test_in_prefix$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
