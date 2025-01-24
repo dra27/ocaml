@@ -39,6 +39,16 @@ module In_channel = struct
     if ofs < 0 || len < 0 || ofs > Bigarray.Array1.dim buf - len
     then invalid_arg "really_input_bigarray"
     else unsafe_really_input_bigarray ic buf ofs len
+
+  let [@tail_mod_cons] rec input_lines ic =
+    match Stdlib.input_line ic with
+    | line -> line :: input_lines ic
+    | exception End_of_file -> []
+
+  let rec fold_lines f accu ic =
+    match Stdlib.input_line ic with
+    | line -> fold_lines f (f accu line) ic
+    | exception End_of_file -> accu
 end
 
 module List = struct

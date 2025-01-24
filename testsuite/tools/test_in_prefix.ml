@@ -35,18 +35,18 @@ let print_summary config header_size ~prefix ~bindir_suffix ~libdir_suffix
   in
   let pp_relocatable f b =
     Format.fprintf f "@{<%s>%srelocatable@}"
-      (if b then "hint" else "warning")
+      (if b then "loc" else "warning")
       (if b then "" else "not ")
   in
   let pp_reproducible f b =
     if b then
-      Format.fprintf f " and @{<hint>reproducible@}"
+      Format.fprintf f " and @{<loc>reproducible@}"
   in
   Format.printf
     "@{<loc>Test Environment@}\n\
-    \    @{<hint>prefix@} = %s\n\
-    \    @{<hint>bindir@} = [$prefix/]%s\n\
-    \    @{<hint>libdir@} = [$prefix/]%s\n\
+    \    @{<loc>prefix@} = %s\n\
+    \    @{<loc>bindir@} = [$prefix/]%s\n\
+    \    @{<loc>libdir@} = [$prefix/]%s\n\
     \  - C compiler is %s [%s] for %s\n\
     \  - OCaml is %a%a; target binaries by default are %a\n\
     \  - Executable header size is %.2fKiB (%d bytes)\n\
@@ -213,8 +213,7 @@ let () =
   Misc.Color.(set_styles {
     warning = [Bold; FG Yellow];
     error = [Bold; FG Red];
-    loc = [FG Blue];
-    hint = [Bold; FG Green]});
+    loc = [FG Blue]});
   print_summary config header_size
                 ~prefix ~bindir_suffix ~libdir_suffix
                 ~relocatable ~target_relocatable ~reproducible;

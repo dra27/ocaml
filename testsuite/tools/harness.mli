@@ -88,6 +88,8 @@ module Import : sig
     val really_input_bigarray : t ->
       (_, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t ->
       int -> int -> unit option
+    val input_lines : t -> string list
+    val fold_lines : ('acc -> string -> 'acc) -> 'acc -> t -> 'acc
   end
 
   module List : sig
