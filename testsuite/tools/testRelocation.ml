@@ -97,9 +97,7 @@ let bindir_rules config file =
         (* All native executable are linked with -g apart from flexlink.opt *)
         `Native_ocaml, (basename <> "flexlink.opt")
       else if classification <> Vanilla then
-        (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but the
-           debugging information in ocamlc.byte and ocamlopt.byte is
-           stripped. *)
+        (* All bytecode executables are linked with -g *)
         let launched_via_mingw_stub =
           match classification with
           | Tendered {header = Header_exe; _} ->
@@ -107,7 +105,7 @@ let bindir_rules config file =
               String.starts_with ~prefix:"mingw" Config.system
           | _ -> false
         in
-        `Bytecode_ocaml, (basename = "ocaml" || launched_via_mingw_stub)
+        `Bytecode_ocaml, (true || launched_via_mingw_stub)
       else
         (* Bytecode runtimes and ocamlyacc of which only ocamlrund is linked
            with -g *)
@@ -211,15 +209,14 @@ let libdir_rules config file =
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
             Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
-          let library = Filename.remove_extension basename in
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            is_camlrun || library = "dynlink" || library = "ocamlcommon"
+            is_camlrun
+            || Filename.remove_extension basename = "dynlink"
+            || Filename.remove_extension basename = "ocamlcommon"
           in
-          (* ocamlcommon.a contains a copy of zstd.n.o - i.e. it contains a
-             manually added object built using the C compiler *)
-          (stdlib, false, (not is_ocaml || library = "ocamlcommon"), is_ocaml)
+          (stdlib, false, (not is_ocaml), is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)

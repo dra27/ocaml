@@ -92,15 +92,15 @@ let classify_executable file =
     In_channel.with_open_bin file (fun ic ->
       let start = really_input_string ic 2 in
       let is_RNTM = function
-      | Bytesections.{name = Name.RNTM; _} -> true
+      | "RNTM", _ -> true
       | _ -> false
       in
       let is_DLLS = function
-      | Bytesections.{name = Name.DLLS; len} when len > 0 -> true
+      | "DLLS", len when len > 0 -> true
       | _ -> false
       in
-      let toc = Bytesections.read_toc ic in
-      let sections = Bytesections.all toc in
+      let () = Bytesections.read_toc ic in
+      let sections = Bytesections.toc () in
       if start = "#!" then
         let runtime =
           seek_in ic 2;
@@ -124,7 +124,7 @@ let classify_executable file =
                   runtime}
       else if List.exists is_RNTM sections then
         let rntm =
-          Bytesections.read_section_string toc ic Bytesections.Name.RNTM in
+          Bytesections.read_section_string ic "RNTM" in
         let len = String.length rntm in
         if len = 0 || rntm.[len - 1] <> '\000' then
           Harness.fail_because "%s contains corrupt RNTM: %S" file rntm;
@@ -547,44 +547,9 @@ let read_content file ic =
     Harness.fail_because "Error reading %s" file;
   content, len
 
-let output_compunit ic oc (compunit : Cmo_format.compilation_unit) =
-  seek_in ic compunit.cu_pos;
-  Misc.copy_file_chunk ic oc compunit.cu_codesize;
-  if compunit.cu_debug > 0 then begin
-    seek_in ic compunit.cu_debug;
-    output_value oc (Compression.input_value ic);
-    output_value oc (Compression.input_value ic);
-  end;
-  output_value oc compunit
-
-let with_decompressed_ocaml_artefact ic file f =
-  let magic = Cmt_format.read_magic_number ic in
-  let temp_file, oc =
-    Filename.open_temp_file ~mode:[Open_binary] "ocaml-artefact-" ".tmp" in
-  let () =
-    if magic = Config.cmi_magic_number || magic = Config.cmt_magic_number then
-      output_value oc (Cmt_format.read file)
-    else if magic = Config.cmo_magic_number then begin
-      seek_in ic (input_binary_int ic);
-      let compunit = (input_value ic : Cmo_format.compilation_unit) in
-      output_compunit ic oc compunit
-    end else if magic = Config.cma_magic_number then begin
-      seek_in ic (input_binary_int ic);
-      let toc = (input_value ic : Cmo_format.library) in
-      List.iter (output_compunit ic oc) toc.lib_units;
-      output_value oc toc
-    end else
-      Harness.fail_because "Unexpected magic number %S in %s" magic file in
-  close_out oc;
-  let result = In_channel.with_open_bin temp_file (f temp_file) in
-  Sys.remove temp_file;
-  result
-
 let input_artefact_from_file env file =
   In_channel.with_open_bin file @@ fun ic ->
     match Filename.extension file with
-    | ".cma" | ".cmi" | ".cmo" | ".cmti" | ".cmt" ->
-        with_decompressed_ocaml_artefact ic file read_content
     | ext when (ext = Config.ext_lib || ext = Config.ext_obj)
                && Sys.os_type = "Unix" && Config.system <> "macosx" ->
         let exit, lines =
