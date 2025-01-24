@@ -170,6 +170,7 @@ let base_bindings =
       "CAMLLIB";
       "CAMLRUNPARAM";
       "CAML_LD_LIBRARY_PATH";
+      "OCAML_FLEXLINK";
       "OCAMLLIB";
       "OCAMLPARAM";
       "OCAMLRUNPARAM";
@@ -254,7 +255,7 @@ let make pp_path ~verbose ~test_root ~test_root_logical
 let last_environment = ref (-1)
 
 (* Display a line of output from a process on the console *)
-let format_line () = Format.printf "@{<inline_code>>@} %s\n%!"
+let format_line () = Format.printf "@{<loc>>@} %s\n%!"
 
 let string_of_process_status = function
 | Unix.WEXITED n -> "exit " ^ string_of_int n
@@ -294,7 +295,7 @@ let display_execution level status pid ~runtime program argv0 args
   | _ -> ()
   in
   let style_of_level = function
-  | `Normal -> "inline_code"
+  | `Normal -> "loc"
   | `Warning -> "warning"
   | `Error -> "error"
   in
@@ -313,12 +314,12 @@ let display_execution level status pid ~runtime program argv0 args
   if serial <> !last_environment then begin
     last_environment := serial;
     Format.printf "\
-      @{<inline_code>> @}@{<loc>Environment@}\n\
-      @{<inline_code>> @}  @{<loc>PATH=%a:$PATH@}\n"
+      @{<loc>> @}@{<loc>Environment@}\n\
+      @{<loc>> @}  @{<loc>PATH=%a:$PATH@}\n"
       pp_path (bindir env);
     if not Sys.win32 then
       Format.printf "\
-        @{<inline_code>> @}  @{<loc>%s=%a:$%s@}\n"
+        @{<loc>> @}  @{<loc>%s=%a:$%s@}\n"
       ld_library_path_name pp_path (libdir env)
       ld_library_path_name
   end

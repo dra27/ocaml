@@ -177,11 +177,12 @@ let libdir_rules config file =
           List.mem basename ["config.cmt"; "config_main.cmt"; "dynlink.cma";
                              "ocamlcommon.cma"] in
         (stdlib, true, false, false)
-      else if basename = "runtime-launch-info" then
+      else if String.starts_with ~prefix:"camlheader" basename then
+        let stdlib = (basename = "camlheader") in
         let has_c_debug_info =
           (* The mingw-w64 port doesn't strip stdlib/header.o *)
           String.starts_with ~prefix:"mingw" Config.system in
-        (true, false, has_c_debug_info, false)
+        (stdlib, false, has_c_debug_info, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
@@ -210,14 +211,15 @@ let libdir_rules config file =
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
             Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
+          let library = Filename.remove_extension basename in
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            is_camlrun
-            || Filename.remove_extension basename = "dynlink"
-            || Filename.remove_extension basename = "ocamlcommon"
+            is_camlrun || library = "dynlink" || library = "ocamlcommon"
           in
-          (stdlib, false, (not is_ocaml), is_ocaml)
+          (* ocamlcommon.a contains a copy of zstd.n.o - i.e. it contains a
+             manually added object built using the C compiler *)
+          (stdlib, false, (not is_ocaml || library = "ocamlcommon"), is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
