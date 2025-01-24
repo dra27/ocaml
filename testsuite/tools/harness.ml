@@ -360,6 +360,9 @@ end
 module Sys = struct
   include Sys
 
+  let mkdir = Unix.mkdir
+  let rmdir = Unix.rmdir
+
   let signal_to_string s =
     if s = sigabrt then "SIGABRT"
     else if s = sigalrm then "SIGALRM"
@@ -568,3 +571,8 @@ let pp_path ~prefix ~bindir_suffix ~libdir_suffix ~test_root f path =
             Format.pp_print_string f "$bindir"
           else
             Format.pp_print_string f path
+
+let is_macos =
+  let os = List.hd (List.rev (String.split_on_char '-' Config.host)) in
+  Config.system = "macosx"
+  || Config.system = "unknown" && String.starts_with ~prefix:"darwin" os

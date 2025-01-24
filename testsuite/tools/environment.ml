@@ -152,7 +152,7 @@ let launched_via_stub program =
 module StringSet = Set.Make(String)
 
 let ld_library_path_name =
-  if Config.system = "macosx" then
+  if Harness.is_macos then
     "DYLD_LIBRARY_PATH"
   else
     "LD_LIBRARY_PATH"
@@ -550,7 +550,7 @@ let input_artefact_from_file env file =
   In_channel.with_open_bin file @@ fun ic ->
     match Filename.extension file with
     | ext when (ext = Config.ext_lib || ext = Config.ext_obj)
-               && Sys.os_type = "Unix" && Config.system <> "macosx" ->
+               && Sys.os_type = "Unix" && not Harness.is_macos ->
         let exit, lines =
           run_process ~quiet:true env "readelf" ["-tS"; file]
         in

@@ -141,6 +141,8 @@ module Import : sig
   module Sys : sig
     include module type of (struct include Sys end)
 
+    val mkdir : string -> int -> unit
+    val rmdir : string -> unit
     val signal_to_string : int -> string
   end
 
@@ -164,6 +166,9 @@ val no_caml_executable_name : bool
 (** [true] if the [caml_executable_name] runtime function is not implemented on
     this platform, which means that it is not guaranteed to be possible to work
     out the absolute path of the currently-running executable. *)
+
+val is_macos : bool
+(** [true] for macOS systems. *)
 
 val erase_file : string -> unit
 (** [erase_file file] calls [Sys.remove file], wrapped with the usual dances

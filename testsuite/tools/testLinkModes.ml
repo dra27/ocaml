@@ -553,7 +553,7 @@ let compile_test usr_bin_sh config env test test_program description =
              error. Prior to #10376 in 4.13.0, the options are incorrectly
              passed as /l options, which are ignored by the linker. *)
           let compilation_exit_code =
-            fails_if (Config.system <> "macosx" && Config.ccomp_type <> "msvc")
+            fails_if (not Harness.is_macos && Config.ccomp_type <> "msvc")
           in
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)

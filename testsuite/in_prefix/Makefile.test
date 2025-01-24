@@ -17,6 +17,7 @@ ROOTDIR = ../..
 ../tools/%:
 	$(MAKE) -C $(ROOTDIR) testsuite/tools/$*
 
+include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
 ifeq "$(NATIVE_COMPILER)" "true"
