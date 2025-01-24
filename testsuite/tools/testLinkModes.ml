@@ -537,8 +537,11 @@ let compile_test usr_bin_sh config env test test_program description =
           f ~mode:Native ~clibs:[unixlib] ["-output-obj"]
       | Output_obj(C_ocamlopt, Shared) ->
           (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
-             segfaults *)
-          let may_segfault = List.mem Config.architecture ["s390x"; "riscv"] in
+             segfaults. Prior to #8708 in 4.09.0, the i386 version also
+             segfaults. *)
+          let may_segfault =
+            List.mem Config.architecture ["i386"; "s390x"; "riscv"]
+          in
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in

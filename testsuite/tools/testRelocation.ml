@@ -192,11 +192,9 @@ let libdir_rules config file =
         let stdlib = (* via Config.standard_library *)
           List.mem basename ["config.cmt"; "config_main.cmt"; "dynlink.cma";
                              "ocamlcommon.cma"] in
-        (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0.
-           Dynlink's artefacts are not compiled with -g until #9183
-           in 4.11.0. *)
+        (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0. *)
         let has_ocaml_debug_info =
-          basename <> "odoc_info.cma" && basename <> "dynlink.cma"
+          basename <> "odoc_info.cma"
         in
         (not_optionally stdlib, has_ocaml_debug_info, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
@@ -234,14 +232,12 @@ let libdir_rules config file =
         if ext = Config.ext_lib then
           let name = Filename.remove_extension basename in
           (* ocamldoc's artefacts are not compiled with -g until #11147
-             in 5.0. Dynlink's artefacts are not compiled with -g until #9183 in
-             4.11.0. With flambda enabled, the bigarray code is trivial enough
+             in 5.0. With flambda enabled, the bigarray code is trivial enough
              that it doesn't end up with any paths. *)
           let compiled_with_debug =
             Toolchain.c_compiler_always_embeds_build_path
             || ((name <> "bigarray" || not Config.flambda)
-                && name <> "odoc_info"
-                && name <> "dynlink")
+                && name <> "odoc_info")
           in
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
@@ -250,7 +246,6 @@ let libdir_rules config file =
              embeds the Standard Library location *)
           let stdlib =
             is_camlrun
-            || Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
           (* Prior to #9804 (OCaml 4.12.0), only the runtime objects were
@@ -306,6 +301,10 @@ let libdir_rules config file =
     in
     if contains_build_path then
       LocationMap.add Build false prefix
+    else if ext = ".cmx" && Config.flambda then
+      (* Prior to #8507 in OCaml 4.09.0, flamba used entire filenames for
+         generating some internal symbols. *)
+      LocationMap.add Build true prefix
     else
       prefix
 

@@ -147,7 +147,9 @@ let () =
   let libraries =
     (* Map build directories in otherlibs to installed libraries *)
     let add_dependencies = function
+    | ["graph"] | ["win32graph"] -> ["graphics"]
     | ["systhreads"] -> ["unix"; "threads"]
+    | ["threads"] -> ["unix"; "vmthreads"]
     | ["win32unix"] -> ["unix"]
     | x -> x
     in
@@ -237,7 +239,7 @@ let () =
   let run_tests = run_tests ~sh config in
   (* 1. Run the main test battery in the Original phase. The result is a list
         of programs which can be run after the prefix has been renamed *)
-  Compmisc.init_path ();
+  Compmisc.init_path (Sys.(backend_type = Native));
   let programs = run_tests env in
   (* 2. Relocation test *)
   TestRelocation.run ~reproducible config env;
@@ -260,6 +262,6 @@ let () =
   List.iter
     (function `Some f -> assert (f env = `None) | `None -> ()) programs;
   (* 4. Finally re-run the main test battery in the new prefix *)
-  Compmisc.reinit_path ~standard_library:libdir ();
+  Compmisc.reinit_path ~standard_library:libdir (Sys.(backend_type = Native));
   let programs = run_tests env in
   assert (List.for_all (function `None -> true | _ -> false) programs)
