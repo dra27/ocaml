@@ -100,7 +100,14 @@ let bindir_rules config file =
         (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but the
            debugging information in ocamlc.byte and ocamlopt.byte is
            stripped. *)
-        `Bytecode_ocaml, (basename = "ocaml")
+        let launched_via_mingw_stub =
+          match classification with
+          | Tendered {header = Header_exe; _} ->
+              (* The mingw-w64 port doesn't strip stdlib/header.o *)
+              String.starts_with ~prefix:"mingw" Config.system
+          | _ -> false
+        in
+        `Bytecode_ocaml, (basename = "ocaml" || launched_via_mingw_stub)
       else
         (* Bytecode runtimes and ocamlyacc of which only ocamlrund is linked
            with -g *)
@@ -158,19 +165,23 @@ let libdir_rules config file =
        - contains objects which have been created by the assembler *)
     let (embeds_stdlib_location, has_ocaml_debug_info, has_c_debug_info,
          contains_assembled_objects) =
-      if List.mem basename ["Makefile.config";
-                            "ld.conf";
-                            "runtime-launch-info"] then
+      if basename = "Makefile.config" || basename = "ld.conf" then
         (* These files all embed the Standard Library location *)
         (true, false, false, false)
-      else if basename = "config.cmx" then
+      else if basename = "config.cmx"
+              || basename = "dynlink_compilerlibs.cmx" then
         (* config.cmx contains Config.standard_library for inlining *)
         (true, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
         let stdlib = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "config_main.cmt";
+          List.mem basename ["config.cmt"; "config_main.cmt"; "dynlink.cma";
                              "ocamlcommon.cma"] in
         (stdlib, true, false, false)
+      else if basename = "runtime-launch-info" then
+        let has_c_debug_info =
+          (* The mingw-w64 port doesn't strip stdlib/header.o *)
+          String.starts_with ~prefix:"mingw" Config.system in
+        (true, false, has_c_debug_info, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
@@ -203,6 +214,7 @@ let libdir_rules config file =
              embeds the Standard Library location *)
           let stdlib =
             is_camlrun
+            || Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
           (stdlib, false, (not is_ocaml), is_ocaml)

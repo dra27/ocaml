@@ -82,6 +82,13 @@ module Import : sig
     end
   end
 
+  module List : sig
+    include module type of (struct include List end)
+
+    val take_while : ('a -> bool) -> 'a list -> 'a list
+    val drop_while : ('a -> bool) -> 'a list -> 'a list
+  end
+
   module Result : sig
     include module type of (struct include Result end)
 
