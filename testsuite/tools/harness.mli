@@ -102,6 +102,12 @@ module Import : sig
     val set_binary_mode : t -> bool -> unit
   end
 
+  module Int : sig
+    include module type of (struct include Int end)
+
+    val max : int -> int -> int
+  end
+
   module List : sig
     include module type of (struct include List end)
 
@@ -125,6 +131,13 @@ module Import : sig
     end
   end
 
+  module String : sig
+    include module type of (struct include String end)
+
+    val starts_with : prefix:string -> string -> bool
+    val ends_with : suffix:string -> string -> bool
+  end
+
   module Sys : sig
     include module type of (struct include Sys end)
 
@@ -139,6 +152,12 @@ module Import : sig
     val utf_decode_uchar : utf_decode -> t
     val utf_decode_length : utf_decode -> int
     val utf_16_byte_length : t -> int
+  end
+
+  module Unix : sig
+    include module type of (struct include Unix end)
+
+    val realpath : string -> string
   end
 end
 

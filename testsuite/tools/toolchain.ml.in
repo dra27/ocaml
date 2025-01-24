@@ -12,6 +12,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Harness.Import
+
 let c_compiler_vendor = {@QS@|@ocaml_cv_cc_vendor@|@QS@}
 
 (* cf. OCAML_CC_VENDOR in aclocal.m4 and utils.config.mli *)

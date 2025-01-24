@@ -160,6 +160,7 @@ let libdir_rules config file =
     bindir_rules config file
   else
     let ext = Filename.extension basename in
+    let not_optionally b = if b then Some false else None in
     (* Determine if the file:
        - embeds the Standard Library location
        - contains OCaml debug information
@@ -169,23 +170,26 @@ let libdir_rules config file =
          contains_assembled_objects) =
       if basename = "Makefile.config" || basename = "ld.conf" then
         (* These files all embed the Standard Library location *)
-        (true, false, false, false)
-      (* Unknown bug in 4.x flambda - the inlining information for MSVC and
-         mingw-w64 appears to be corrupt. *)
-      else if (not Config.flambda || not Sys.win32)
-              && (basename = "config.cmx"
-                  || basename = "dynlink_compilerlibs.cmx") then
-        (* config.cmx contains Config.standard_library for inlining *)
-        (true, false, false, false)
+        (Some false, false, false, false)
+      else if basename = "config.cmx"
+              || basename = "dynlink_compilerlibs.cmx" then
+        (* Unknown bug in 4.x flambda - the inlining information for MSVC and
+           mingw-w64 appears to be corrupt. Prior to the addition of
+           Config.bindir in #10204 in 4.13, flambda didn't embed the prefix. The
+           conditions under which flambda does include any of these constants in
+           the .cmx file are also heavily dependent on the code itself. For this
+           reason, in flambda mode, we make the appearance of the prefix in
+           these two files an optional expectation in flambda mode. *)
+        (Some Config.flambda, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
         let stdlib = (* via Config.standard_library *)
           List.mem basename ["config.cmt"; "dynlink.cma"; "ocamlcommon.cma"] in
         (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
         let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
-        (stdlib, has_ocaml_debug_info, false, false)
+        (not_optionally stdlib, has_ocaml_debug_info, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
         let stdlib = (basename = "camlheader") in
-        (stdlib, false, false, false)
+        (not_optionally stdlib, false, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. With flambda
@@ -194,7 +198,7 @@ let libdir_rules config file =
         let superficial =
           basename = "bigarray.cmxs"
           && (Config.flambda || not Toolchain.assembler_embeds_build_path) in
-        (false, false, not superficial, not superficial)
+        (None, false, not superficial, not superficial)
       else if ext = Config.ext_obj then
         (* Any object produced by ocamlopt will have a .cmx file with it *)
         let is_ocaml =
@@ -203,7 +207,7 @@ let libdir_rules config file =
            but the FlexDLL support objects are not. *)
         let c_debug =
           not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
-        (false, false, c_debug, is_ocaml)
+        (None, false, c_debug, is_ocaml)
       else if ext = Config.ext_lib || ext = Config.ext_dll then
         (* Based on the filename, is this one of the bytecode runtime libraries
            (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
@@ -235,14 +239,19 @@ let libdir_rules config file =
             || Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
-          let c_debug = compiled_with_debug && not is_ocaml in
-          (stdlib, false, c_debug, compiled_with_debug && is_ocaml)
+          let c_debug =
+            compiled_with_debug && not is_ocaml
+          in
+          let is_ocaml =
+            compiled_with_debug && is_ocaml
+          in
+          (not_optionally stdlib, false, c_debug, is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
-          (is_camlrun, false, true, false)
+          (not_optionally is_camlrun, false, true, false)
       else
-        (false, false, false, false)
+        (None, false, false, false)
     in
     let contains_build_path =
       (* libasmrun* is a special case as it contains the only assembled object
@@ -272,10 +281,11 @@ let libdir_rules config file =
            && Toolchain.c_compiler_always_embeds_build_path
     in
     let prefix =
-      if embeds_stdlib_location then
-        LocationMap.singleton Prefix false
-      else
-        LocationMap.empty
+      match embeds_stdlib_location with
+      | Some optionally ->
+          LocationMap.singleton Prefix optionally
+      | None ->
+          LocationMap.empty
     in
     if contains_build_path then
       LocationMap.add Build false prefix
