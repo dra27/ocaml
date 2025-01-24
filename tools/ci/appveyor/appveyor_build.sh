@@ -227,7 +227,8 @@ case "$1" in
         script --quiet --return --command \
           "( test "$BOOTSTRAP_FLEXDLL" = 'false' || "\
 "$MAKE -C ../$BUILD_PREFIX-$PORT flexdll ) && "\
-"if ! $MAKE -j $build; then $MAKE $build; exit 1; fi" \
+"if ! $MAKE -j $build; then $MAKE $build; exit 1; fi && "\
+"$MAKE -C ../$BUILD_PREFIX-$PORT flexlink.opt" \
           "../$BUILD_PREFIX-$PORT/build.log" |
             sed --unbuffered \
                 -e 's/\d027\[K//g' \
