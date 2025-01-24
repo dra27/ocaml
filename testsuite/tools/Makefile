@@ -95,6 +95,6 @@ asmgen_i386.obj: asmgen_i386nt.asm
 
 .PHONY: clean
 clean:
-	rm -f *.cm* *.o *.obj
+	rm -f *.cm* *.o *.obj *.cmt *.cmti
 	rm -f expect_test expect_test.exe codegen codegen.exe
 	rm -f parsecmm.ml parsecmm.mli lexcmm.ml
