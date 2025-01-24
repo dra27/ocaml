@@ -931,7 +931,14 @@ let test_bytecode_binaries ~original env bindir =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
     let program = Filename.concat bindir binary in
-    if is_executable program then
+    let accepts_vnum basename =
+      let basename =
+        match String.index basename '.' with
+        | i -> String.sub basename 0 i
+        | exception Not_found -> basename in
+      basename <> "ocamlcmt" && basename <> "ocamlobjinfo"
+    in
+    if accepts_vnum binary && is_executable program then
       let classification = classify_executable program in
       match classification with
       | Native -> ()
