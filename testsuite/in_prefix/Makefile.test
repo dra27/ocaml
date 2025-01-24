@@ -14,6 +14,9 @@
 
 ROOTDIR = ../..
 
+../tools/%:
+	$(MAKE) -C $(ROOTDIR) testsuite/tools/$*
+
 include $(ROOTDIR)/Makefile.common
 
 ifeq "$(NATIVE_COMPILER)" "true"
@@ -50,6 +53,3 @@ bool_to_with = --with$(if $(filter false,$(2)),out)-$(strip $(1))
 
 ../tools/test_in_prefix$(EXE) \
 ../tools/test_in_prefix.opt$(EXE): $(wildcard ../tools/*.ml*)
-
-../tools/%:
-	$(MAKE) -C $(ROOTDIR) testsuite/tools/$*

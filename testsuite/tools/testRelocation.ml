@@ -100,15 +100,20 @@ let bindir_rules config file =
         (* All native executable are linked with -g apart from flexlink.opt *)
         `Native_ocaml, (basename <> "flexlink.opt")
       else if classification <> Vanilla then
-        (* All bytecode executables are linked with -g *)
-        let launched_via_mingw_stub =
-          match classification with
-          | Tendered {header = Header_exe; _} ->
-              (* The mingw-w64 port doesn't strip stdlib/header.o *)
-              String.starts_with ~prefix:"mingw" Config.system
-          | _ -> false
+        let linked_with_debug =
+          (* All bytecode executables are linked with -g, except flexlink.byte,
+             ocamllex.byte and ocamldoc (until #11147 in 5.0). *)
+          let bytecode_executables =
+            ["flexlink.byte"; "ocamllex.byte"; "ocamldoc"] in
+          let bytecode_executables =
+            if config.has_ocamlopt then
+              bytecode_executables
+            else
+              "flexlink" :: "ocamllex" :: bytecode_executables
+          in
+          not (List.mem basename bytecode_executables)
         in
-        `Bytecode_ocaml, (true || launched_via_mingw_stub)
+        `Bytecode_ocaml, linked_with_debug
       else
         (* Bytecode runtimes and ocamlyacc of which only ocamlrund is linked
            with -g *)
@@ -138,12 +143,15 @@ let bindir_rules config file =
               && c_compiler_debug_paths_are_absolute)
       | `Other ->
           (* Only ocamlrund is linked with -g. However, since the C objects
-             which make up the executables are all compiled with -g, this will
-             still result in debug information in all non-OCaml executables. *)
-          Toolchain.linker_embeds_build_path
-          || (c_compiler_debug_paths_are_absolute
-              && (Toolchain.linker_propagates_debug_information
-                  || linked_with_debug))
+             which make up the runtimes are all compiled with -g, this will
+             still result in debug information in all non-OCaml executables.
+             ocamlyacc's objects, however, are not compiled with -g (until
+             #11240 in 5.0). *)
+          basename <> "ocamlyacc"
+          && (Toolchain.linker_embeds_build_path
+              || (c_compiler_debug_paths_are_absolute
+                  && (Toolchain.linker_propagates_debug_information
+                      || linked_with_debug)))
     in
     if contains_build_path then
       LocationMap.add Build false prefix
@@ -169,8 +177,11 @@ let libdir_rules config file =
       if basename = "Makefile.config" || basename = "ld.conf" then
         (* These files all embed the Standard Library location *)
         (true, false, false, false)
-      else if basename = "config.cmx"
-              || basename = "dynlink_compilerlibs.cmx" then
+      (* Unknown bug in 4.x flambda - the inlining information for MSVC and
+         mingw-w64 appears to be corrupt. *)
+      else if (not Config.flambda || not Sys.win32)
+              && (basename = "config.cmx"
+                  || basename = "dynlink_compilerlibs.cmx") then
         (* config.cmx contains Config.standard_library for inlining *)
         (true, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
@@ -188,8 +199,8 @@ let libdir_rules config file =
              the backend-specific toplevel modules use the .cmt from the
              bytecode version. *)
           if Config.flexdll_dirs <> [] then
-            let subdir = Filename.basename (Filename.dirname file) in
-            if List.mem subdir ["profiling"; "compiler-libs"] then
+            if Filename.basename (Filename.dirname file) = "compiler-libs"
+               || Filename.chop_extension basename = "profiling" then
               let ocamlc_only =
                 ["config_boot.cmt";
                  "config_main.cmt";
@@ -202,23 +213,29 @@ let libdir_rules config file =
               && config.has_ocamlopt
               && not (List.mem basename ocamlc_only)
             else
-              ext = ".cmt" || ext = ".cmti"
+              (config.has_ocamlopt || basename <> "topdirs.cmt")
+              && basename <> "topdirs.cmti"
+              && (ext = ".cmt" || ext = ".cmti")
           else
             false in
         let stdlib_from_config = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "config_main.cmt"; "dynlink.cma";
-                             "ocamlcommon.cma"] in
-        ((stdlib_from_flexdll || stdlib_from_config), true, false, false)
+          List.mem basename ["config.cmt"; "dynlink.cma"; "ocamlcommon.cma"] in
+        let stdlib = stdlib_from_flexdll || stdlib_from_config in
+        (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
+        let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
+        (stdlib, has_ocaml_debug_info, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
         let stdlib = config.shebangscripts && basename <> "camlheader_ur" in
-        let has_c_debug_info =
-          (* The mingw-w64 port doesn't strip stdlib/header.o *)
-          String.starts_with ~prefix:"mingw" Config.system in
-        (stdlib, false, has_c_debug_info, false)
+        (stdlib, false, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
-           objects and obviously contain assembled objects. *)
-        (false, false, true, true)
+           objects and obviously contain assembled objects. With flambda
+           enabled, the bigarray code is trivial enough that it doesn't end up
+           with any paths. *)
+        let superficial =
+          basename = "bigarray.cmxs"
+          && (Config.flambda || not Toolchain.assembler_embeds_build_path) in
+        (false, false, not superficial, not superficial)
       else if ext = Config.ext_obj then
         (* Any object produced by ocamlopt will have a .cmx file with it *)
         let is_ocaml =
@@ -240,6 +257,15 @@ let libdir_rules config file =
             && not (String.starts_with ~prefix:"libcamlruntime" basename)
         in
         if ext = Config.ext_lib then
+          let name = Filename.remove_extension basename in
+          (* ocamldoc's artefacts are not compiled with -g until #11147
+             in 5.0. With flambda enabled, the bigarray code is trivial enough
+             that it doesn't end up with any paths. *)
+          let compiled_with_debug =
+            Toolchain.c_compiler_always_embeds_build_path
+            || ((name <> "bigarray" || not Config.flambda)
+                && name <> "odoc_info")
+          in
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
             Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
@@ -250,7 +276,8 @@ let libdir_rules config file =
             || Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
-          (stdlib, false, (not is_ocaml), is_ocaml)
+          let c_debug = compiled_with_debug && not is_ocaml in
+          (stdlib, false, c_debug, compiled_with_debug && is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
@@ -267,6 +294,13 @@ let libdir_rules config file =
          || (assembler_embeds_build_path
                && not Toolchain.asmrun_assembled_with_cc)
          || ext = Config.ext_dll && Toolchain.linker_embeds_build_path)
+      else if basename = "bigarray.cmxs" && Config.system = "macosx" then
+        (* It's still not entirely clear under what circumstances the macOS
+           linker ends up putting the build path in - in this case, the library
+           is clearly trivial, so perhaps it's that it contains no source
+           locations. While it affects only a legacy library on a single
+           platform, it can sit as a somewhat warty special case... *)
+        false
       else if (ext = Config.ext_dll || ext = ".cmxs")
          && (not Toolchain.linker_propagates_debug_information
              || Toolchain.linker_embeds_build_path) then

@@ -27,9 +27,16 @@ let run config env mode =
   let compile_test_program () =
     Out_channel.with_open_text "test_install_script.ml" (fun oc ->
       Printf.fprintf oc {|
-let load_library basename =
+let load_library library =
+  let stdlib = %S in
+  let basename, dir =
+    let dir = Filename.dirname library in
+    if dir = Filename.current_dir_name then
+      library, stdlib
+    else
+      Filename.basename library, Filename.concat stdlib dir
+  in
   let lib = Dynlink.adapt_filename (basename ^ ".cma") in
-  let dir = Filename.concat %S basename in
   Dynlink.loadfile (Filename.concat dir lib);
   Printf.printf "Loaded %%s\n" lib
 
@@ -69,7 +76,11 @@ let () =
   let test_libraries_in_prog ?expected_exit_code env libraries =
     (* For simplicity, the test for whether libraries have C stubs is based on
        the names, rather than inspecting the library metadata *)
-    let has_c_stubs library = (mode = Bytecode && library <> "dynlink") in
+    let has_c_stubs library =
+      mode = Bytecode
+      && library <> "dynlink"
+      && library <> "bigarray"
+    in
     let has_c_stubs = List.exists has_c_stubs libraries in
     (* In the Renamed phase, the test driver will need to be launched with
        ocamlrun, unless executables produced by the compiler are capable of
@@ -110,8 +121,9 @@ let () =
       Harness.fail_because "%s is expected to return with exit code %d"
                            test_program expected_exit_code;
   in
+  let is_systhreads_library library = Filename.dirname library = "threads" in
   let test_libraries_in_prog ?expected_exit_code env libraries =
-    if mode = Native && List.mem "threads" libraries then
+    if mode = Native && List.exists is_systhreads_library libraries then
       (* cf. ocaml/ocaml#12250 - no threads.cmxs *)
       let threads_plugin =
         Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
@@ -123,7 +135,16 @@ let () =
     else
       test_libraries_in_prog ?expected_exit_code env libraries
   in
-  let not_dynlink l = not (List.mem "dynlink" l) in
+  let not_dynlink l =
+    if List.mem "dynlink" l then
+      None
+    else
+      let archive = function
+      | "threads" -> Filename.concat "threads" "threads"
+      | name -> name
+      in
+      Some (List.map archive l)
+  in
   let files, re_compile = compile_test_program () in
   let expected_exit_code =
     (* Bytecode executables launched using the executable header require
@@ -131,7 +152,7 @@ let () =
        Library is only stored as an absolute path, this doesn't affect the
        execution of the test driver (yet). *)
     None in
-  let libraries = List.filter not_dynlink config.libraries in
+  let libraries = List.filter_map not_dynlink config.libraries in
   let () =
     List.iter (test_libraries_in_prog ?expected_exit_code env) libraries;
     if expected_exit_code <> None then
