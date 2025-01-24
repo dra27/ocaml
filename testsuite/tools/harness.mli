@@ -111,6 +111,7 @@ module Import : sig
   module List : sig
     include module type of (struct include List end)
 
+    val find_map : ('a -> 'b option) -> 'a list -> 'b option
     val take_while : ('a -> bool) -> 'a list -> 'a list
     val drop_while : ('a -> bool) -> 'a list -> 'a list
     val fold_left_map :
