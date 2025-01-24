@@ -346,8 +346,10 @@ let test_runs usr_bin_sh test_program_path test_program
               if Sys.win32 then
                 (* stdlib/header.c will find ocamlrun (because it effectively
                    uses caml_executable_name) but fails to hand off the bytecode
-                   image, which causes ocamlrun to exit with code 127 *)
-                Fail 127
+                   image, which causes ocamlrun to exit with code 2 (as prior
+                   to #8630 in 4.10.0, the runtime used caml_fatal_error for
+                   this reporting) *)
+                Fail 2
               else
                 (* stdlib/header.c will fail to find ocamlrun, because it never
                    uses caml_executable_name and so will either fail to find the
@@ -366,8 +368,10 @@ let test_runs usr_bin_sh test_program_path test_program
               if argv0_not_ocaml then
                 (* -custom executables are ocamlrun, but will be unable to
                    launch the bytecode image without caml_executable_name.
-                   ocamlrun exits with code 127 in this situation *)
-                Fail 127
+                   ocamlrun exits with code 2 in this situation (as prior to
+                   #8630 in 4.10.0, the runtime used caml_fatal_error for this
+                   reporting) *)
+                Fail 2
               else
                 Success {executable_name = argv0_resolved; argv0}
             else
@@ -431,7 +435,7 @@ let make_test_runner ~stdlib_exists_when_renamed ~may_segfault ~with_unix
 
 (* Describe the various ways in which executables can be produced by our two
    compilers... *)
-type linkage =
+type[@ocaml.warning "-37"] linkage =
 | Default_ocamlc of launch_mode
 | Default_ocamlopt
 | Custom_runtime of runtime_mode
@@ -728,10 +732,6 @@ let run ~sh config env =
       "byt_complete_obj_static" "-output-complete-obj static runtime";
     compile_test (Output_complete_obj(C_ocamlc, Shared))
       "byt_complete_obj_shared" "-output-complete-obj shared runtime";
-    compile_test (Output_complete_exe Static)
-      "byt_complete_exe_static" "-output-complete-exe static runtime";
-    compile_test (Output_complete_exe Shared)
-      "byt_complete_exe_shared" "-output-complete-exe shared runtime";
     compile_test Default_ocamlopt
       "nat_default" "static runtime";
     compile_test (Output_obj(C_ocamlopt, Static))
