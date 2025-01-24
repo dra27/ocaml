@@ -1205,8 +1205,8 @@ test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
 test_in_prefix_LIBRARIES = \
   otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
 
-testsuite/tools/%.cmo: VPATH += otherlibs/unix
-testsuite/tools/%.cmx: VPATH += otherlibs/unix
+testsuite/tools/%.cmo: DIRS += otherlibs/unix testsuite/tools
+testsuite/tools/%.cmx: DIRS += otherlibs/unix testsuite/tools
 
 # Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
@@ -1214,7 +1214,7 @@ $(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
 
 testsuite/tools/dump_load_path$(EXE): \
   testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
-	$(V_MKEXE)$(MKEXE) -o $@ $^ $(BYTECCLIBS)
+	$(MKEXE) -o $@ $^ $(BYTECCLIBS)
 
 testsuite/tools/test_in_prefix$(EXE): \
   CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
@@ -1222,14 +1222,14 @@ testsuite/tools/test_in_prefix$(EXE): \
 testsuite/tools/test_in_prefix$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
     $(test_in_prefix_SOURCES))))
-	$(V_OCAMLC)$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
+	$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
     -I otherlibs/unix -I compilerlibs \
     $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
 
 testsuite/tools/test_in_prefix.opt$(EXE): \
   $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
     $(test_in_prefix_SOURCES))))
-	$(V_OCAMLOPT)$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
+	$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
     -I otherlibs/unix -I compilerlibs \
     $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
 
