@@ -21,7 +21,11 @@
 #include <caml/misc.h>
 #include <caml/osdeps.h>
 
-int main_os(int argc, char_os **argv)
+#ifdef _WIN32
+int wmain(int argc, wchar_t **argv)
+#else
+int main(int argc, char **argv)
+#endif
 {
   const char_os *dir;
   puts("shared_libs_path:");

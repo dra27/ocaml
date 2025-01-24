@@ -18,7 +18,11 @@
 #define CAML_INTERNALS
 #include <caml/callback.h>
 
-int main_os(int argc, char_os **argv)
+#ifdef _WIN32
+int wmain(int argc, wchar_t **argv)
+#else
+int main(int argc, char **argv)
+#endif
 {
   caml_startup(argv);
   caml_shutdown();

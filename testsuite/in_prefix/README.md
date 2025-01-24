@@ -21,8 +21,8 @@ compiler as command line parameters, rather than probing it (for example
 The test battery consists of five individual tests:
 
 1. Loading libraries with `Dynlink` (skipped for `--disable-native-compiler`)
-2. Loading libraries in the two toplevels (native code skipped for
-   `--disable-native-toplevel`)
+2. Loading libraries in the two toplevels (native code skipped if ocamlnat has
+   not been compiled in the build tree)
 3. Processing of `CAML_LD_LIBRARY_PATH` and `ld.conf` by `ocamlrun` and `ocamlc`
 4. Executing any bytecode binaries found in bindir with `-vnum`
 5. Compilation and execution of a `print_endline Config.standard_library`

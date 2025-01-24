@@ -27,18 +27,22 @@ let run config env mode =
       Out_channel.with_open_text "test_install_script.ml" (fun oc ->
         let has_c_stubs =
           List.fold_left (fun c_bindings library ->
-            let directory =
+            (* Prior to #10476 (4.14.0) errors coming from directives didn't
+               cause a non-zero exit code for a script (hence a failing #load
+               isn't sufficient) - the script therefore attempts to "ignore" a
+               known value in the library, which triggers an actual error. *)
+            let symbol, directory =
               match library with
               | "bigarray" ->
-                  None
+                  "Bigarray.kind_size_in_bytes", None
               | "dynlink" ->
-                  None
+                  "Dynlink.loadfile", None
               | "str" ->
-                  None
+                  "Str.quote", None
               | "threads" ->
-                  Some "threads"
+                  "Thread.self", Some "threads"
               | "unix" ->
-                  None
+                  "Unix.stat", None
               | _ ->
                   assert false
             in
@@ -81,8 +85,9 @@ let run config env mode =
             in
             Printf.fprintf oc
               "%s#load \"%s.%s\";;\n\
-               print_endline \"Loaded %s.%s\";;"
-              directory library ext library ext;
+               if Obj.is_block (Obj.repr %s) then\n\
+                 print_endline \"Loaded %s.%s\";;"
+              directory library ext symbol library ext;
             (c_bindings
              || (mode = Bytecode
                  && library <> "dynlink"
@@ -103,7 +108,7 @@ let run config env mode =
         (* cf. ocaml/flexdll#146 - Cygwin's ocamlnat can't load unix.cmxs and
            the lines above will have triggered native Windows being unable to
            load threads.cmxs *)
-        125
+        2
       else
         0
     in
