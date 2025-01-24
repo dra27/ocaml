@@ -130,7 +130,7 @@ let () =
     (* --pwd is ignored on Windows, since Sys.getcwd is automatically the
        logical CWD. *)
     if Sys.win32 then
-      cwd, Unix.realpath cwd
+      cwd, (*Unix.realpath*) cwd
     else
       pwd, cwd
   in

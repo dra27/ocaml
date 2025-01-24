@@ -284,6 +284,12 @@ module In_channel = struct
   let set_binary_mode = Stdlib.set_binary_mode_in
 end
 
+module Int = struct
+  include Int
+
+  let max x y : t = if x >= y then x else y
+end
+
 module List = struct
   include List
 
@@ -326,6 +332,29 @@ module Result = struct
     let ( let+ ) r f = map f r
     let ( and+ ) = product
   end
+end
+
+module String_backports = struct
+  include String
+
+  let starts_with ~prefix s =
+    let len_s = length s
+    and len_pre = length prefix in
+    let rec aux i =
+      if i = len_pre then true
+      else if unsafe_get s i <> unsafe_get prefix i then false
+      else aux (i + 1)
+    in len_s >= len_pre && aux 0
+
+  let ends_with ~suffix s =
+    let len_s = length s
+    and len_suf = length suffix in
+    let diff = len_s - len_suf in
+    let rec aux i =
+      if i = len_suf then true
+      else if unsafe_get s (diff + i) <> unsafe_get suffix i then false
+      else aux (i + 1)
+    in diff >= 0 && aux 0
 end
 
 module Sys = struct
@@ -391,9 +420,11 @@ module Import = struct
   module Bytes = Bytes
   module Char = Char
   module In_channel = In_channel
+  module Int = Int
   module List = List
   module Out_channel = Out_channel
   module Result = Result
+  module String = String_backports
   module Sys = Sys
   module Uchar = Uchar
 end

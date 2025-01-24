@@ -102,6 +102,12 @@ module Import : sig
     val set_binary_mode : t -> bool -> unit
   end
 
+  module Int : sig
+    include module type of (struct include Int end)
+
+    val max : int -> int -> int
+  end
+
   module List : sig
     include module type of (struct include List end)
 
@@ -123,6 +129,13 @@ module Import : sig
       val ( let+ ) : ('a, 'e) result -> ('a -> 'b) -> ('b, 'e) result
       val ( and+ ) : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
     end
+  end
+
+  module String : sig
+    include module type of (struct include String end)
+
+    val starts_with : prefix:string -> string -> bool
+    val ends_with : suffix:string -> string -> bool
   end
 
   module Sys : sig

@@ -60,6 +60,29 @@ let libdir_suffix = Sys.argv.(6)
 
 let is_directory dir =%s
 
+module String = struct
+  include String
+
+  let starts_with ~prefix s =
+    let len_s = length s
+    and len_pre = length prefix in
+    let rec aux i =
+      if i = len_pre then true
+      else if unsafe_get s i <> unsafe_get prefix i then false
+      else aux (i + 1)
+    in len_s >= len_pre && aux 0
+
+  let ends_with ~suffix s =
+    let len_s = length s
+    and len_suf = length suffix in
+    let diff = len_s - len_suf in
+    let rec aux i =
+      if i = len_suf then true
+      else if unsafe_get s (diff + i) <> unsafe_get suffix i then false
+      else aux (i + 1)
+    in diff >= 0 && aux 0
+end
+
 let display_lib =
   let dir = Config.standard_library in
   let f = function '\\' when Sys.win32 -> '/' | c -> c in
@@ -179,10 +202,18 @@ let link_with_main_in_c env ~use_shared_runtime ~linker_exit_code mode
                         clibs ocaml_object test_program_path =
   let runtime_lib =
     let suffix = if use_shared_runtime then "_shared" else "" in
-    if mode = Native then
-      "-lasmrun" ^ suffix
+    let name =
+      if mode = Native then
+        "asmrun" ^ suffix
+      else
+        "camlrun" ^ suffix
+    in
+    (* The MSVC ports don't automatically translate -lfoo to libfoo.lib until
+       #10376 in 4.13.0. *)
+    if Config.ccomp_type = "msvc" then
+      Printf.sprintf "lib%s.lib" name
     else
-      "-lcamlrun" ^ suffix
+      "-l" ^ name
   in
   let flags =
     let libraries =
@@ -458,6 +489,14 @@ let compile_test usr_bin_sh config env test test_program description =
         else
           0
       in
+      (* The MSVC ports don't automatically translate -lfoo to libfoo.lib until
+         #10376 in 4.13.0. *)
+      let unixlib =
+        if Config.ccomp_type = "msvc" then
+          "libunix.lib"
+        else
+          "-lunix"
+      in
       match test with
       | Default_ocamlc _launch_method ->
           f ~tendered:true []
@@ -472,15 +511,15 @@ let compile_test usr_bin_sh config env test test_program description =
           f ~calls_linker:true ~use_shared_runtime:true ~compilation_exit_code
             ["-custom"]
       | Output_obj(C_ocamlc, Static) ->
-          f ~clibs:["-lunix"] ["-output-obj"]
+          f ~clibs:[unixlib] ["-output-obj"]
       | Output_obj(C_ocamlc, Shared) ->
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
-          f ~use_shared_runtime:true ~clibs:["-lunix"] ~linker_exit_code
+          f ~use_shared_runtime:true ~clibs:[unixlib] ~linker_exit_code
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Static) ->
-          f ~mode:Native ~clibs:["-lunix"] ["-output-obj"]
+          f ~mode:Native ~clibs:[unixlib] ["-output-obj"]
       | Output_obj(C_ocamlopt, Shared) ->
           (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
              segfaults *)
@@ -489,19 +528,22 @@ let compile_test usr_bin_sh config env test test_program description =
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
           f ~mode:Native ~use_shared_runtime:true ~may_segfault
-            ~clibs:["-lunix"] ~linker_exit_code ["-output-obj"]
+            ~clibs:[unixlib] ~linker_exit_code ["-output-obj"]
       | Output_complete_obj(C_ocamlc, Static) ->
           (* At the moment, the partial linker will pass -lws2_32 and -ladvapi32
              on to the partial linker on mingw-w64 which causes a failure. Until
              this is fixed, pass the libraries manually, using -noautolink. *)
           f ~clibs:[]
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunix"]
+            ["-output-complete-obj"; "-noautolink"; "-cclib"; unixlib]
       | Output_complete_obj(C_ocamlc, Shared) ->
           (* The partial linker doesn't correctly process
              -runtime-variant _shared, as the .so gets passed to the partial
              linker. On macOS, this causes a warning; on other systems, it's an
-             error. *)
-          let compilation_exit_code = fails_if (Config.system <> "macosx") in
+             error. Prior to #10376 in 4.13.0, the options are incorrectly
+             passed as /l options, which are ignored by the linker. *)
+          let compilation_exit_code =
+            fails_if (Config.system <> "macosx" && Config.ccomp_type <> "msvc")
+          in
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
@@ -519,13 +561,13 @@ let compile_test usr_bin_sh config env test test_program description =
              will (normally) fail). Until this is done, pass the libraries
              manually, using -noautolink. *)
           f ~mode:Native ~clibs:[] ~linker_exit_code
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunix"]
+            ["-output-complete-obj"; "-noautolink"; "-cclib"; unixlib]
       | Output_complete_obj(C_ocamlopt, Shared) ->
           (* ocamlopt doesn't correctly implement -runtime-variant _shared *)
           let compilation_exit_code = fails_if true in
           f ~mode:Native ~use_shared_runtime:true
             ~compilation_exit_code ~clibs:[]
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunix"]
+            ["-output-complete-obj"; "-noautolink"; "-cclib"; unixlib]
       | Output_complete_exe Static ->
           f ~calls_linker:true ["-output-complete-exe"]
       | Output_complete_exe Shared ->
