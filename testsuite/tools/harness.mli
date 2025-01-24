@@ -74,6 +74,13 @@ module Import : sig
           Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
   }
 
+  module Bytes : sig
+    include module type of (struct include Bytes end)
+
+    val get_utf_8_uchar : t -> int -> int
+    val set_utf_16le_uchar : t -> int -> Uchar.t -> int
+  end
+
   module Char : sig
     include module type of (struct include Char end)
 
@@ -83,13 +90,16 @@ module Import : sig
   end
 
   module In_channel : sig
-    include module type of (struct include In_channel end)
+    type t = Stdlib.in_channel
 
+    val with_open_bin : string -> (t -> 'a) -> 'a
+    val input_all : t -> string
+    val input_lines : t -> string list
     val really_input_bigarray : t ->
       (_, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t ->
       int -> int -> unit option
-    val input_lines : t -> string list
     val fold_lines : ('acc -> string -> 'acc) -> 'acc -> t -> 'acc
+    val set_binary_mode : t -> bool -> unit
   end
 
   module List : sig
@@ -97,6 +107,13 @@ module Import : sig
 
     val take_while : ('a -> bool) -> 'a list -> 'a list
     val drop_while : ('a -> bool) -> 'a list -> 'a list
+  end
+
+  module Out_channel : sig
+    type t = Stdlib.out_channel
+
+    val with_open_bin : string -> (t -> 'a) -> 'a
+    val with_open_text : string -> (t -> 'a) -> 'a
   end
 
   module Result : sig
@@ -112,6 +129,16 @@ module Import : sig
     include module type of (struct include Sys end)
 
     val signal_to_string : int -> string
+  end
+
+  module Uchar : sig
+    include module type of (struct include Uchar end)
+
+    type utf_decode = int
+
+    val utf_decode_uchar : utf_decode -> t
+    val utf_decode_length : utf_decode -> int
+    val utf_16_byte_length : t -> int
   end
 end
 

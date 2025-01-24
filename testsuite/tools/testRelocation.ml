@@ -151,8 +151,9 @@ let libdir_rules config file =
   let c_compiler_debug_paths_are_absolute, assembler_embeds_build_path =
     effective_toolchain config in
   let basename = Filename.basename file in
-  (* expunge is an executable installed to libdir *)
-  if basename = "expunge" || basename = "expunge.exe" then
+  (* expunge and extract_crc are executables installed to libdir *)
+  if basename = "expunge" || basename = "expunge.exe"
+     || basename = "extract_crc" || basename = "extract_crc.exe" then
     bindir_rules config file
   else
     let ext = Filename.extension basename in
