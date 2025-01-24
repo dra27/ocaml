@@ -67,7 +67,8 @@ let bindir_rules config file =
            directly or via ocamlcommon *)
         not (List.mem basename ["flexlink.byte"; "flexlink.opt"; "flexlink";
                                 "ocamllex.byte"; "ocamllex.opt"; "ocamllex";
-                                "ocamlyacc"])
+                                "ocamlyacc";
+                                "ocaml-instr-graph"; "ocaml-instr-report"])
       in
       let linker_embeds_stdlib_location =
         (* If the launcher doesn't search for ocamlrun, then either the #! stub
@@ -101,10 +102,11 @@ let bindir_rules config file =
         `Native_ocaml, (basename <> "flexlink.opt")
       else if classification <> Vanilla then
         let linked_with_debug =
-          (* All bytecode executables are linked with -g, except flexlink.byte,
-             ocamllex.byte and ocamldoc (until #11147 in 5.0). *)
+          (* All bytecode executables are linked with -g, except extract_crc
+             (until #9183 in 4.11.0), flexlink.byte, ocamllex.byte and ocamldoc
+             (until #11147 in 5.0). *)
           let bytecode_executables =
-            ["flexlink.byte"; "ocamllex.byte"; "ocamldoc"] in
+            ["extract_crc"; "flexlink.byte"; "ocamllex.byte"; "ocamldoc"] in
           let bytecode_executables =
             if config.has_ocamlopt then
               bytecode_executables
@@ -147,7 +149,9 @@ let bindir_rules config file =
              still result in debug information in all non-OCaml executables.
              ocamlyacc's objects, however, are not compiled with -g (until
              #11240 in 5.0). *)
-          basename <> "ocamlyacc"
+          not (List.mem basename ["ocaml-instr-graph";
+                                  "ocaml-instr-report";
+                                  "ocamlyacc"])
           && (Toolchain.linker_embeds_build_path
               || (c_compiler_debug_paths_are_absolute
                   && (Toolchain.linker_propagates_debug_information
@@ -229,8 +233,12 @@ let libdir_rules config file =
         let stdlib_from_config = (* via Config.standard_library *)
           List.mem basename ["config.cmt"; "dynlink.cma"; "ocamlcommon.cma"] in
         let stdlib = stdlib_from_flexdll || stdlib_from_config in
-        (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
-        let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
+        (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0.
+           Dynlink's artefacts are not compiled with -g until #9183
+           in 4.11.0. *)
+        let has_ocaml_debug_info =
+          basename <> "odoc_info.cma" && basename <> "dynlink.cma"
+        in
         (not_optionally stdlib, has_ocaml_debug_info, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
         let stdlib = config.shebangscripts && basename <> "camlheader_ur" in
@@ -267,12 +275,14 @@ let libdir_rules config file =
         if ext = Config.ext_lib then
           let name = Filename.remove_extension basename in
           (* ocamldoc's artefacts are not compiled with -g until #11147
-             in 5.0. With flambda enabled, the bigarray code is trivial enough
+             in 5.0. Dynlink's artefacts are not compiled with -g until #9183 in
+             4.11.0. With flambda enabled, the bigarray code is trivial enough
              that it doesn't end up with any paths. *)
           let compiled_with_debug =
             Toolchain.c_compiler_always_embeds_build_path
             || ((name <> "bigarray" || not Config.flambda)
-                && name <> "odoc_info")
+                && name <> "odoc_info"
+                && name <> "dynlink")
           in
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
