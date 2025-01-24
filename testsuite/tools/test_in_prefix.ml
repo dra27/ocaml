@@ -12,6 +12,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module List = struct
+  include List
+
+let take_while p l =
+  let[@tail_mod_cons] rec aux = function
+    | x::l when p x -> x::aux l
+    | _rest -> []
+  in
+  aux l
+end
+
 (* Compiler configuration, determined from the command line *)
 type config = {
   supports_shared_libraries: bool;
@@ -953,7 +964,14 @@ let test_bytecode_binaries ~original env bindir =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
     let program = Filename.concat bindir binary in
-    if is_executable program then
+    let accepts_vnum basename =
+      let basename =
+        match String.index basename '.' with
+        | i -> String.sub basename 0 i
+        | exception Not_found -> basename in
+      basename <> "ocamlcmt" && basename <> "ocamlobjinfo"
+    in
+    if accepts_vnum binary && is_executable program then
       let classification = classify_executable program in
       match classification with
       | Native -> ()
