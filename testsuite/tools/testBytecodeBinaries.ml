@@ -39,7 +39,14 @@ let run config env =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
     let program = Filename.concat bindir binary in
-    if is_executable program then
+    let accepts_vnum basename =
+      let basename =
+        match String.index basename '.' with
+        | i -> String.sub basename 0 i
+        | exception Not_found -> basename in
+      basename <> "ocamlcmt" && basename <> "ocamlobjinfo"
+      in
+      if accepts_vnum binary && is_executable program then
       let classification = Environment.classify_executable program in
       if classification <> Vanilla then
         let fails =
