@@ -98,7 +98,7 @@ AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
 AC_SUBST([CC])
-AC_SUBST([ocaml_cc_vendor])
+AC_SUBST([ocaml_cv_cc_vendor])
 AC_SUBST([DIFF_FLAGS])
 AC_SUBST([CSC])
 AC_SUBST([CSCFLAGS])
@@ -1422,7 +1422,7 @@ AS_IF([test -z "$AS"], [AS="$default_as"])
 
 AS_IF([test -z "$ASPP"], [ASPP="$default_aspp"])
 
-AS_CASE([$ocaml_cc_vendor],
+AS_CASE([$ocaml_cv_cc_vendor],
   [clang-*],
     [AC_MSG_CHECKING([DWARF version of $AS])
     m4_normalize([asm_dwarf_version="$(\

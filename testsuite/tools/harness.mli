@@ -82,6 +82,14 @@ module Import : sig
     end
   end
 
+  module In_channel : sig
+    include module type of (struct include In_channel end)
+
+    val really_input_bigarray : t ->
+      (_, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t ->
+      int -> int -> unit option
+  end
+
   module List : sig
     include module type of (struct include List end)
 

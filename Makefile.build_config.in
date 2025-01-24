@@ -53,7 +53,7 @@ DEP_CC=@DEP_CC@ -MM
 COMPUTE_DEPS=@compute_deps@
 
 # The C compiler vendor
-OCAML_CC_VENDOR = @ocaml_cc_vendor@
+OCAML_CC_VENDOR = @ocaml_cv_cc_vendor@
 
 # Build-system flags to use to compile C files
 OC_CFLAGS=@oc_cflags@
