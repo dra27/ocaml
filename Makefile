@@ -1887,7 +1887,7 @@ $(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
 # test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
 testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
-test_in_prefix_BYTECODE_LINKFLAGS += -custom
+testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 
 testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 

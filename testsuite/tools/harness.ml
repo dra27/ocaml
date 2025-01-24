@@ -20,6 +20,21 @@ module Char = struct
   end
 end
 
+module List = struct
+  include List
+
+  let take_while p l =
+    let[@tail_mod_cons] rec aux = function
+      | x::l when p x -> x::aux l
+      | _rest -> []
+    in
+    aux l
+
+  let rec drop_while p = function
+    | x::l when p x -> drop_while p l
+    | rest -> rest
+end
+
 module Option = struct
   include Option
 
@@ -103,6 +118,7 @@ module Import = struct
   }
 
   module Char = Char
+  module List = List
   module Option = Option
   module Result = Result
   module Sys = Sys
