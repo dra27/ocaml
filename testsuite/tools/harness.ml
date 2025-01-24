@@ -303,6 +303,14 @@ module List = struct
   let rec drop_while p = function
     | x::l when p x -> drop_while p l
     | rest -> rest
+
+  let fold_left_map f accu l =
+    let rec aux accu l_accu = function
+      | [] -> accu, rev l_accu
+      | x :: l ->
+          let accu, x = f accu x in
+          aux accu (x :: l_accu) l in
+    aux accu [] l
 end
 
 module Out_channel = struct
