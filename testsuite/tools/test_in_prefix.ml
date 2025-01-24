@@ -12,6 +12,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Char = struct
+  include Char
+
+  module Ascii = struct
+    let is_letter = function 'A' .. 'Z' | 'a' .. 'z' -> true | _ -> false
+  end
+end
+
 (* Compiler configuration, determined from the command line *)
 type config = {
   supports_shared_libraries: bool;
