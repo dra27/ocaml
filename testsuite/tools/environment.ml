@@ -215,6 +215,42 @@ let last_environment = ref (-1)
 (* Display a line of output from a process on the console *)
 let format_line () = Format.printf "@{<inline_code>>@} %s\n%!"
 
+module Sys = struct
+  include Sys
+
+  let signal_to_string s =
+    if s = sigabrt then "SIGABRT"
+    else if s = sigalrm then "SIGALRM"
+    else if s = sigfpe then "SIGFPE"
+    else if s = sighup then "SIGHUP"
+    else if s = sigill then "SIGILL"
+    else if s = sigint then "SIGINT"
+    else if s = sigkill then "SIGKILL"
+    else if s = sigpipe then "SIGPIPE"
+    else if s = sigquit then "SIGQUIT"
+    else if s = sigsegv then "SIGSEGV"
+    else if s = sigterm then "SIGTERM"
+    else if s = sigusr1 then "SIGUSR1"
+    else if s = sigusr2 then "SIGUSR2"
+    else if s = sigchld then "SIGCHLD"
+    else if s = sigcont then "SIGCONT"
+    else if s = sigstop then "SIGSTOP"
+    else if s = sigtstp then "SIGTSTP"
+    else if s = sigttin then "SIGTTIN"
+    else if s = sigttou then "SIGTTOU"
+    else if s = sigvtalrm then "SIGVTALRM"
+    else if s = sigprof then "SIGPROF"
+    else if s = sigbus then "SIGBUS"
+    else if s = sigpoll then "SIGPOLL"
+    else if s = sigsys then "SIGSYS"
+    else if s = sigtrap then "SIGTRAP"
+    else if s = sigurg then "SIGURG"
+    else if s = sigxcpu then "SIGXCPU"
+    else if s = sigxfsz then "SIGXFSZ"
+    else if s < sigxfsz then invalid_arg "Sys.signal_to_string"
+    else "SIG(" ^ string_of_int s ^ ")"
+end
+
 let string_of_process_status = function
 | Unix.WEXITED n -> "exit " ^ string_of_int n
 | Unix.WSIGNALED n -> Sys.signal_to_string n
@@ -286,8 +322,8 @@ let display_execution level status pid ~runtime program argv0 args
 let fail_because fmt = Format.ksprintf (fun s -> prerr_endline s; exit 1) fmt
 
 (* Executes a single command, returning the exit code and lines of output *)
-let run_one (~runtime, ~quiet, ~fails, ~program, ~argv0, ~args,
-             ~env:({environment; verbose; _} as env)) =
+let run_one (runtime, quiet, fails, program, argv0, args,
+             ({environment; verbose; _} as env)) =
   flush stderr;
   flush stdout;
   let quiet = quiet && not verbose in
@@ -447,7 +483,7 @@ let run_process ?(runtime = false) ?(stubs = false) ?(stdlib = false)
         else
           program, argv0, args
       in
-      ~runtime, ~quiet, ~fails, ~program, ~argv0, ~args, ~env
+      runtime, quiet, fails, program, argv0, args, env
     in
     (* In order to ensure that bugs are not silently fixed (or, more to the
        point, that a shim isn't left enabled and so masks something different),
