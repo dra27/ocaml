@@ -360,6 +360,9 @@ end
 module Sys = struct
   include Sys
 
+  let mkdir = Unix.mkdir
+  let rmdir = Unix.rmdir
+
   let signal_to_string s =
     if s = sigabrt then "SIGABRT"
     else if s = sigalrm then "SIGALRM"

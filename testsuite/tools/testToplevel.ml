@@ -37,6 +37,8 @@ let run config env mode =
                   "Bigarray.kind_size_in_bytes", None
               | "dynlink" ->
                   "Dynlink.loadfile", None
+              | "raw_spacetime_lib" ->
+                  "Raw_spacetime_lib.Annotation.to_int", None
               | "str" ->
                   "Str.quote", None
               | "threads" ->

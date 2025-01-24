@@ -141,6 +141,8 @@ module Import : sig
   module Sys : sig
     include module type of (struct include Sys end)
 
+    val mkdir : string -> int -> unit
+    val rmdir : string -> unit
     val signal_to_string : int -> string
   end
 

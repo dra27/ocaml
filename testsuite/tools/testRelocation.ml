@@ -214,8 +214,8 @@ let libdir_rules config file =
            (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
            Note that these properties are _not_ used for libasmrun* (see
            below) *)
+        let dir = Filename.basename (Filename.dirname file) in
         let is_camlrun =
-          let dir = Filename.basename (Filename.dirname file) in
           dir <> "stublibs"
             && String.starts_with ~prefix:"libcamlrun" basename
             && not (String.starts_with ~prefix:"libcamlruntime" basename)
@@ -240,8 +240,11 @@ let libdir_rules config file =
             || Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
+          (* Prior to #9804 (OCaml 4.12.0), only the runtime objects were
+             compiled with debug information *)
           let c_debug =
-            compiled_with_debug && not is_ocaml
+            Toolchain.c_compiler_always_embeds_build_path
+            || is_camlrun && compiled_with_debug && not is_ocaml
           in
           let is_ocaml =
             compiled_with_debug && is_ocaml
@@ -249,8 +252,9 @@ let libdir_rules config file =
           (not_optionally stdlib, false, c_debug, is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
-             C stubs. All of these are compiled with -g *)
-          (not_optionally is_camlrun, false, true, false)
+             C stubs. The runtime libraries are compiled with -g, but prior to
+             #9804 (OCaml 4.12.0) the stub libraries were not *)
+          (not_optionally is_camlrun, false, (dir <> "stublibs"), false)
       else
         (None, false, false, false)
     in
@@ -263,17 +267,16 @@ let libdir_rules config file =
          || (assembler_embeds_build_path
                && not Toolchain.asmrun_assembled_with_cc)
          || ext = Config.ext_dll && Toolchain.linker_embeds_build_path)
-      else if basename = "bigarray.cmxs" && Config.system = "macosx" then
-        (* It's still not entirely clear under what circumstances the macOS
-           linker ends up putting the build path in - in this case, the library
-           is clearly trivial, so perhaps it's that it contains no source
-           locations. While it affects only a legacy library on a single
-           platform, it can sit as a somewhat warty special case... *)
-        false
-      else if (ext = Config.ext_dll || ext = ".cmxs")
+      else if ext = ".cmxs" then
+        (* The .cmxs files are all built without -g prior to #9804 in
+           OCaml 4.12.0 *)
+        contains_assembled_objects
+        && Config.system <> "macosx" && Config.ccomp_type <> "msvc"
+        && Toolchain.assembler_embeds_build_path
+      else if ext = Config.ext_dll
          && (not Toolchain.linker_propagates_debug_information
              || Toolchain.linker_embeds_build_path) then
-        Toolchain.linker_embeds_build_path
+        Toolchain.linker_embeds_build_path && has_c_debug_info
       else
         has_ocaml_debug_info
         || has_c_debug_info && c_compiler_debug_paths_are_absolute
