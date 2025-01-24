@@ -49,6 +49,3 @@ val linker_is_flexlink : bool
 val c_compiler_vendor : string
 (** The vendor and version of the C compiler, as determined by configure.ac
     (see Config.c_compiler_vendor in OCaml 5.5) *)
-
-val compression_c_libraries : string
-(** The C libraries needed with -lcomprmarsh *)
