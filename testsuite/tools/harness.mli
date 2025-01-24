@@ -54,7 +54,7 @@ module Import : sig
       (** {v [$(NATIVE_COMPILER)] v} - {v Makefile.config v} *)
     has_relative_libdir: string option;
       (** Not implemented; always None. *)
-    has_runtime_search: bool option;
+  has_runtime_search: bool option;
       (** Not implemented; always None. *)
     launcher_searches_for_ocamlrun: bool;
       (** Indicates whether bytecode executables in the compiler distribution
@@ -80,6 +80,14 @@ module Import : sig
     module Ascii : sig
       val is_letter : char -> bool
     end
+  end
+
+  module In_channel : sig
+    include module type of (struct include In_channel end)
+
+    val really_input_bigarray : t ->
+      (_, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t ->
+      int -> int -> unit option
   end
 
   module List : sig

@@ -152,7 +152,7 @@ let () =
     List.map add_dependencies libraries
   in
   let runtime_launch_info =
-    let file = Filename.concat libdir "runtime-launch-info" in
+    let file = Filename.concat libdir "camlheader" in
     read_runtime_launch_info file in
   let header_size =
     let {buffer; executable_offset; _} = runtime_launch_info in
@@ -208,15 +208,13 @@ let () =
     else
       None
   in
-  Misc.Style.setup style;
-  let no_markup ansi = { Misc.Style.ansi; text_close = ""; text_open = "" } in
-  (* (Ab)use the tags used in Misc.Style rather than making our own *)
-  Misc.Style.(set_styles {
-    warning = no_markup [Bold; FG Yellow];
-    error = no_markup [Bold; FG Red];
-    loc = no_markup [Bold; FG Blue];
-    hint = no_markup [Bold; FG Green];
-    inline_code = no_markup [FG Blue]});
+  Misc.Color.setup style;
+  (* (Ab)use the tags used in Misc.Color rather than making our own *)
+  Misc.Color.(set_styles {
+    warning = [Bold; FG Yellow];
+    error = [Bold; FG Red];
+    loc = [FG Blue];
+    hint = [Bold; FG Green]});
   print_summary config header_size
                 ~prefix ~bindir_suffix ~libdir_suffix
                 ~relocatable ~target_relocatable ~reproducible;

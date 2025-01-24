@@ -199,7 +199,7 @@ let link_with_main_in_c env ~use_shared_runtime ~linker_exit_code mode
         Format.pp_print_char f ' '; (Environment.pp_path env) f x in
       List.iter pp (test_program_path :: ocaml_object :: main_in_c :: flags)
     in
-    Format.printf "@{<inline_code>$CC -o%a@}\n%!" summarise ();
+    Format.printf "@{<loc>$CC -o%a@}\n%!" summarise ();
     Ccomp.call_linker Ccomp.Exe test_program_path [ocaml_object; main_in_c]
                       (String.concat " " flags)
   in
@@ -481,8 +481,7 @@ let compile_test usr_bin_sh config env test test_program description =
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Static) ->
           f ~mode:Native
-            ~clibs:["-lcomprmarsh"; "-lunixnat";
-                    Toolchain.compression_c_libraries]
+            ~clibs:["-lunixnat"; Toolchain.compression_c_libraries]
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Shared) ->
           (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
@@ -492,8 +491,7 @@ let compile_test usr_bin_sh config env test test_program description =
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
           f ~mode:Native ~use_shared_runtime:true ~may_segfault
-            ~clibs:["-lcomprmarsh"; "-lunixnat";
-                    Toolchain.compression_c_libraries]
+            ~clibs:["-lunixnat"; Toolchain.compression_c_libraries]
             ~linker_exit_code ["-output-obj"]
       | Output_complete_obj(C_ocamlc, Static) ->
           (* At the moment, the partial linker will pass -lws2_32 and -ladvapi32
@@ -525,15 +523,13 @@ let compile_test usr_bin_sh config env test test_program description =
              manually, using -noautolink. *)
           f ~mode:Native ~clibs:[Toolchain.compression_c_libraries]
             ~linker_exit_code
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
-                                                    "-cclib"; "-lcomprmarsh"]
+            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat"]
       | Output_complete_obj(C_ocamlopt, Shared) ->
           (* ocamlopt doesn't correctly implement -runtime-variant _shared *)
           let compilation_exit_code = fails_if true in
           f ~mode:Native ~use_shared_runtime:true
             ~compilation_exit_code ~clibs:[Toolchain.compression_c_libraries]
-            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
-                                                    "-cclib"; "-lcomprmarsh"]
+            ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat"]
       | Output_complete_exe Static ->
           f ~calls_linker:true ["-output-complete-exe"]
       | Output_complete_exe Shared ->
