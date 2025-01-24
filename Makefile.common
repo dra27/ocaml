@@ -34,6 +34,9 @@ else
 FLEXDLL_SUBMODULE_PRESENT =
 endif
 
+# Standard library flags
+STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/stdlib
+
 # Use boot/ocamlc.opt if available
 CAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
 ifeq (0,$(shell \
