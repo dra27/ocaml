@@ -91,10 +91,6 @@ let classify_executable file =
   try
     In_channel.with_open_bin file (fun ic ->
       let start = really_input_string ic 2 in
-      let is_RNTM = function
-      | Bytesections.{name = Name.RNTM; _} -> true
-      | _ -> false
-      in
       let is_DLLS = function
       | Bytesections.{name = Name.DLLS; len} when len > 0 -> true
       | _ -> false
@@ -122,15 +118,20 @@ let classify_executable file =
         Tendered {header = Header_shebang;
                   dlls = List.exists is_DLLS sections;
                   runtime}
-      else if List.exists is_RNTM sections then
+      else if List.exists is_DLLS sections then
         let rntm =
-          Bytesections.read_section_string toc ic Bytesections.Name.RNTM in
+          try Bytesections.read_section_string toc ic Bytesections.Name.RNTM
+          with Not_found -> "ocamlrun\000"
+        in
         let len = String.length rntm in
         if len = 0 || rntm.[len - 1] <> '\000' then
           Harness.fail_because "%s contains corrupt RNTM: %S" file rntm;
         let runtime = String.sub rntm 0 (len - 1) in
+        let dlls =
+          Bytesections.read_section_string toc ic Bytesections.Name.DLLS
+        in
         Tendered {header = Header_exe;
-                  dlls = List.exists is_DLLS sections;
+                  dlls = dlls <> "";
                   runtime}
       else
         Custom)
@@ -170,6 +171,7 @@ let base_bindings =
       "CAMLLIB";
       "CAMLRUNPARAM";
       "CAML_LD_LIBRARY_PATH";
+      "OCAML_FLEXLINK";
       "OCAMLLIB";
       "OCAMLPARAM";
       "OCAMLRUNPARAM";
@@ -254,7 +256,7 @@ let make pp_path ~verbose ~test_root ~test_root_logical
 let last_environment = ref (-1)
 
 (* Display a line of output from a process on the console *)
-let format_line () = Format.printf "@{<inline_code>>@} %s\n%!"
+let format_line () = Format.printf "@{<loc>>@} %s\n%!"
 
 let string_of_process_status = function
 | Unix.WEXITED n -> "exit " ^ string_of_int n
@@ -294,7 +296,7 @@ let display_execution level status pid ~runtime program argv0 args
   | _ -> ()
   in
   let style_of_level = function
-  | `Normal -> "inline_code"
+  | `Normal -> "loc"
   | `Warning -> "warning"
   | `Error -> "error"
   in
@@ -313,12 +315,12 @@ let display_execution level status pid ~runtime program argv0 args
   if serial <> !last_environment then begin
     last_environment := serial;
     Format.printf "\
-      @{<inline_code>> @}@{<loc>Environment@}\n\
-      @{<inline_code>> @}  @{<loc>PATH=%a:$PATH@}\n"
+      @{<loc>> @}@{<loc>Environment@}\n\
+      @{<loc>> @}  @{<loc>PATH=%a:$PATH@}\n"
       pp_path (bindir env);
     if not Sys.win32 then
       Format.printf "\
-        @{<inline_code>> @}  @{<loc>%s=%a:$%s@}\n"
+        @{<loc>> @}  @{<loc>%s=%a:$%s@}\n"
       ld_library_path_name pp_path (libdir env)
       ld_library_path_name
   end

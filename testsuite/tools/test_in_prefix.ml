@@ -84,24 +84,13 @@ let read_runtime_launch_info file =
       In_channel.with_open_bin file In_channel.input_all
     with Sys_error msg -> Harness.fail_because "%s: %s" file msg
   in
-  try
-    let bindir_start = String.index buffer '\n' + 1 in
-    let bindir_end = String.index_from buffer bindir_start '\000' in
-    let executable_offset = bindir_end + 2 in
-    let launcher =
-      let kind = String.sub buffer 0 (bindir_start - 1) in
-      if kind = "exe" then
-        Executable
-      else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
-        Shebang_bin_sh kind
-      else
-        raise Not_found in
-    if String.length buffer < executable_offset
-       || buffer.[executable_offset - 1] <> '\n' then
-      raise Not_found
+  let length = String.length buffer in
+  if length >= 2 then
+    if String.starts_with ~prefix:"#!" buffer then
+      {buffer; launcher = Shebang_bin_sh ""; executable_offset = length}
     else
-      {launcher; buffer; executable_offset}
-  with Not_found ->
+      {buffer; launcher = Executable; executable_offset = 0}
+  else
     Harness.fail_because "%s: corrupt header" file
 
 let () =
@@ -152,7 +141,7 @@ let () =
     List.map add_dependencies libraries
   in
   let runtime_launch_info =
-    let file = Filename.concat libdir "runtime-launch-info" in
+    let file = Filename.concat libdir "camlheader" in
     read_runtime_launch_info file in
   let header_size =
     let {buffer; executable_offset; _} = runtime_launch_info in
@@ -208,15 +197,13 @@ let () =
     else
       None
   in
-  Misc.Style.setup style;
-  let no_markup ansi = { Misc.Style.ansi; text_close = ""; text_open = "" } in
-  (* (Ab)use the tags used in Misc.Style rather than making our own *)
-  Misc.Style.(set_styles {
-    warning = no_markup [Bold; FG Yellow];
-    error = no_markup [Bold; FG Red];
-    loc = no_markup [Bold; FG Blue];
-    hint = no_markup [Bold; FG Green];
-    inline_code = no_markup [FG Blue]});
+  Misc.Color.setup style;
+  (* (Ab)use the tags used in Misc.Color rather than making our own *)
+  Misc.Color.(set_styles {
+    warning = [Bold; FG Yellow];
+    error = [Bold; FG Red];
+    loc = [FG Blue];
+    hint = [Bold; FG Green]});
   print_summary config header_size
                 ~prefix ~bindir_suffix ~libdir_suffix
                 ~relocatable ~target_relocatable ~reproducible;

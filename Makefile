@@ -1245,20 +1245,33 @@ test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
 test_in_prefix_LIBRARIES = \
   otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
 
+testsuite/tools/%.cmo: VPATH += otherlibs/unix
+testsuite/tools/%.cmx: VPATH += otherlibs/unix
+
 # Needed for the additional stubs.c (since caml_sys_proc_self_exe is 5.5+)
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.b,testsuite/tools/%))
 $(eval $(call COMPILE_C_FILE,testsuite/tools/%.n,testsuite/tools/%))
 
-# test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
-testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
-
-testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
-
-testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
-
 testsuite/tools/dump_load_path$(EXE): \
   testsuite/tools/dump_load_path.$(O) runtime/prims.$(O) runtime/libcamlrun.$(A)
 	$(V_MKEXE)$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
+
+testsuite/tools/test_in_prefix$(EXE): \
+  CAMLC = $(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) $(STDLIBFLAGS)
+
+testsuite/tools/test_in_prefix$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmo, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(V_OCAMLC)$(FLEXLINK_ENV) $(CAMLC) $(STDLIBFLAGS) -custom -o $@ -I runtime \
+    -I otherlibs/unix -I compilerlibs \
+    $(addsuffix .cma, $(test_in_prefix_LIBRARIES)) $^
+
+testsuite/tools/test_in_prefix.opt$(EXE): \
+  $(patsubst %.c, %.$(O), $(patsubst %.ml, %.cmx, $(filter-out %.mli, \
+    $(test_in_prefix_SOURCES))))
+	$(V_OCAMLOPT)$(FLEXLINK_ENV) $(CAMLOPT) $(STDLIBFLAGS) -o $@ \
+    -I otherlibs/unix -I compilerlibs \
+    $(addsuffix .cmxa, $(test_in_prefix_LIBRARIES)) $^
 
 partialclean::
 	rm -f testsuite/tools/dump_load_path testsuite/tools/dump_load_path.exe
@@ -1606,7 +1619,7 @@ partialclean::
 depend: beforedepend
 	$(V_GEN)(for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
-         middle_end/flambda/base_types \
+         middle_end/flambda/base_types testsuite/tools \
          driver toplevel toplevel/byte toplevel/native lex tools; \
 	 do \
 	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
