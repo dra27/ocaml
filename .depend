@@ -5495,6 +5495,7 @@ testsuite/tools/cmdline.cmi : \
     testsuite/tools/harness.cmi
 testsuite/tools/codegen_main.cmo : \
     utils/profile.cmi \
+    asmcomp/printmach.cmi \
     testsuite/tools/parsecmmaux.cmi \
     testsuite/tools/lexcmm.cmi \
     asmcomp/emitaux.cmi \
@@ -5504,6 +5505,7 @@ testsuite/tools/codegen_main.cmo : \
     asmcomp/asmgen.cmi
 testsuite/tools/codegen_main.cmx : \
     utils/profile.cmx \
+    asmcomp/printmach.cmx \
     testsuite/tools/parsecmmaux.cmx \
     testsuite/tools/lexcmm.cmi \
     asmcomp/emitaux.cmx \
@@ -5526,6 +5528,7 @@ testsuite/tools/environment.cmi : \
 testsuite/tools/expect_test.cmo : \
     utils/warnings.cmi \
     toplevel/toploop.cmi \
+    utils/profile.cmi \
     parsing/printast.cmi \
     parsing/pprintast.cmi \
     parsing/parsetree.cmi \
@@ -5542,6 +5545,7 @@ testsuite/tools/expect_test.cmo : \
 testsuite/tools/expect_test.cmx : \
     utils/warnings.cmx \
     toplevel/toploop.cmx \
+    utils/profile.cmx \
     parsing/printast.cmx \
     parsing/pprintast.cmx \
     parsing/parsetree.cmi \
