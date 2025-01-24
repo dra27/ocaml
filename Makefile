@@ -50,7 +50,7 @@ endif
 CAMLLEX=$(CAMLRUN) boot/ocamllex
 CAMLDEP=$(CAMLRUN) boot/ocamlc -depend
 DEPFLAGS=-slash
-DEPINCLUDES=$(INCLUDES)
+DEPINCLUDES=$(INCLUDES) -I testsuite/tools
 
 OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
 OCAMLTEST_OPT=$(WITH_OCAMLTEST:=.opt)
@@ -908,8 +908,8 @@ ocamltest: ocamlc ocamlyacc ocamllex otherlibraries
 
 test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
   stubs.c \
-  toolchain.mli toolchain.ml \
   harness.mli harness.ml \
+  toolchain.mli toolchain.ml \
   environment.mli environment.ml \
   cmdline.mli cmdline.ml \
   testBytecodeBinaries.mli testBytecodeBinaries.ml \
@@ -922,8 +922,8 @@ test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
 test_in_prefix_LIBRARIES = \
   otherlibs/$(UNIXLIB)/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
 
-testsuite/tools/%.$(O): OC_CPPFLAGS += -I runtime
-testsuite/tools/%.cmi: COMPFLAGS += -I testsuite/tools
+testsuite/tools/%.$(O): OC_CPPFLAGS += -I runtime -I otherlibs/$(UNIXLIB)
+testsuite/tools/%.cmi: COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
 testsuite/tools/%.cmo: COMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
 testsuite/tools/%.cmx: \
   OPTCOMPFLAGS += -I otherlibs/$(UNIXLIB) -I testsuite/tools
