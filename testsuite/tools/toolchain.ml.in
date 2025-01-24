@@ -48,6 +48,15 @@ let asmrun_assembled_with_cc =
      compiler in order to use the preprocessor. *)
   not is_msvc
 
+module Scanf = struct
+  include Scanf
+
+  let sscanf_opt s fmt af =
+    try
+      Some (sscanf s fmt af)
+    with Scan_failure _ | Failure _ | End_of_file -> None
+end
+
 let assembler_embeds_build_path =
   if is_clang_assembler && Config.system = "macosx" then
     (* Xcode 16 targetting macOS 15 or later uses DWARF v5 and embeds build

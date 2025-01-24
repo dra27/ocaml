@@ -27,6 +27,21 @@ let run config env mode =
       Out_channel.with_open_text "test_install_script.ml" (fun oc ->
         let has_c_stubs =
           List.fold_left (fun c_bindings library ->
+            let directory =
+              match library with
+              | "bigarray" ->
+                  None
+              | "dynlink" ->
+                  None
+              | "str" ->
+                  None
+              | "threads" ->
+                  Some "threads"
+              | "unix" ->
+                  None
+              | _ ->
+                  assert false
+            in
             let ext =
               match mode with
               | Native ->
@@ -60,13 +75,18 @@ let run config env mode =
               | Bytecode ->
                   "cma"
             in
+            let directory =
+              Option.map (Printf.sprintf "#directory \"+%s\";;\n") directory
+              |> Option.value ~default:""
+            in
             Printf.fprintf oc
-              "#directory \"+%s\";;\n\
-               #load \"%s.%s\";;\n\
+              "%s#load \"%s.%s\";;\n\
                print_endline \"Loaded %s.%s\";;"
-            library library ext library ext;
+              directory library ext library ext;
             (c_bindings
-             || (library <> "dynlink" && mode = Bytecode))) false libraries
+             || (mode = Bytecode
+                 && library <> "dynlink"
+                 && library <> "bigarray"))) false libraries
         in
         Printf.fprintf oc "#quit;;\n";
         has_c_stubs)

@@ -145,8 +145,10 @@ let () =
   (* Augment the list of libraries with their dependencies. This is done by hand
      given that there's only one to worry about... *)
   let libraries =
+    (* Map build directories in otherlibs to installed libraries *)
     let add_dependencies = function
     | ["systhreads"] -> ["unix"; "threads"]
+    | ["win32unix"] -> ["unix"]
     | x -> x
     in
     List.map add_dependencies libraries
