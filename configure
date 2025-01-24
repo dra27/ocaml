@@ -802,6 +802,7 @@ mkdll_exp
 mkdll
 rpath
 sharedlib_cflags
+asm_dwarf_version
 asm_cfi_supported
 AS
 endianness
@@ -867,6 +868,7 @@ OBJEXT
 exeext
 ac_tool_prefix
 DIFF_FLAGS
+ocaml_cv_cc_vendor
 CC
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
@@ -3240,6 +3242,7 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
@@ -3333,6 +3336,7 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
 ## Generated files
 
 ac_config_files="$ac_config_files Makefile.build_config"
@@ -3360,6 +3364,8 @@ ac_config_files="$ac_config_files otherlibs/dynlink/META"
 ac_config_files="$ac_config_files otherlibs/runtime_events/META"
 
 ac_config_files="$ac_config_files stdlib/META"
+
+ac_config_files="$ac_config_files testsuite/tools/toolchain.ml"
 
 
 # Definitions related to the version of OCaml
@@ -15662,6 +15668,18 @@ then :
   ASPP="$default_aspp"
 fi
 
+case $ocaml_cv_cc_vendor in #(
+  clang-*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking DWARF version of $AS" >&5
+printf %s "checking DWARF version of $AS... " >&6; }
+    asm_dwarf_version="$( $AS -### -g -c -x c /dev/null -o /dev/null 2>&1 | sed -ne "s/.*dwarf-version=\([0-9]*\).*/Some \1/p")"
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $asm_dwarf_version" >&5
+printf "%s\n" "$asm_dwarf_version" >&6; }
+    test -n "$asm_dwarf_version" || asm_dwarf_version='None' ;; #(
+  *) :
+    asm_dwarf_version='None' ;;
+esac
+
 # Utilities
 # Extract the first word of "rlwrap", so it can be a program name with args.
 set dummy rlwrap; ac_word=$2
@@ -20615,6 +20633,7 @@ do
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
+    "testsuite/tools/toolchain.ml") CONFIG_FILES="$CONFIG_FILES testsuite/tools/toolchain.ml" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "otherlibs/unix/META") CONFIG_FILES="$CONFIG_FILES otherlibs/unix/META" ;;
     "otherlibs/str/META") CONFIG_FILES="$CONFIG_FILES otherlibs/str/META" ;;
