@@ -105,9 +105,13 @@ let () =
           (* Systems configured with --disable-shared can't load bytecode
              libraries which need C stubs *)
           if (Sys.cygwin && mode = Native && List.mem "unix" libraries)
-             || (not Config.supports_shared_libraries && has_c_stubs) then
             (* cf. ocaml/flexdll#146 - Cygwin's natdynlink can't load
                    unix.cmxs *)
+             || (not Config.supports_shared_libraries && has_c_stubs)
+            (* The graphics library doesn't load on macOS arm64 *)
+             || Harness.is_macos
+                && Config.architecture = "none"
+                && List.mem "graphics" libraries then
             2
           else
             0
@@ -121,7 +125,9 @@ let () =
       Harness.fail_because "%s is expected to return with exit code %d"
                            test_program expected_exit_code;
   in
-  let is_systhreads_library library = Filename.dirname library = "threads" in
+  let is_systhreads_library library =
+    String.ends_with ~suffix:"threads" (Filename.dirname library)
+  in
   let test_libraries_in_prog ?expected_exit_code env libraries =
     if mode = Native && List.exists is_systhreads_library libraries then
       (* cf. ocaml/ocaml#12250 - no threads.cmxs *)
@@ -141,6 +147,7 @@ let () =
     else
       let archive = function
       | "threads" -> Filename.concat "threads" "threads"
+      | "vmthreads" -> Filename.concat "vmthreads" "threads"
       | name -> name
       in
       Some (List.map archive l)

@@ -1069,6 +1069,9 @@ ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
 partialclean::
 	$(MAKE) -C ocamltest clean
 
+%.$(O): %.c
+	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
+
 test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
   stubs.c \
   harness.mli harness.ml \

@@ -31,22 +31,31 @@ let run config env mode =
                cause a non-zero exit code for a script (hence a failing #load
                isn't sufficient) - the script therefore attempts to "ignore" a
                known value in the library, which triggers an actual error. *)
-            let symbol, directory =
+            let symbol, archive, directory =
               match library with
               | "bigarray" ->
-                  "Bigarray.kind_size_in_bytes", None
+                  "Bigarray.kind_size_in_bytes", library, None
               | "dynlink" ->
-                  "Dynlink.loadfile", None
+                  if mode = Bytecode then
+                    "Dynlink.loadfile", library, None
+                  else
+                    (* Prior to the removal of compiler plugins by #2276 in
+                       OCaml 4.09.0, using Dynlink in ocamlnat was somewhat
+                       ambiguous! *)
+                    "Compdynlink.loadfile", library, Some "compiler-libs"
+              | "graphics" ->
+                  "Graphics.open_graph", library, None
               | "raw_spacetime_lib" ->
-                  "Raw_spacetime_lib.Annotation.to_int", None
+                  "Raw_spacetime_lib.Annotation.to_int", library, None
               | "str" ->
-                  "Str.quote", None
+                  "Str.quote", library, None
               | "threads" ->
-                  "Thread.self", Some "threads"
+                  "Thread.self", library, Some "threads"
               | "unix" ->
-                  "Unix.stat", None
-              | _ ->
-                  assert false
+                  "Unix.stat", library, None
+              | "vmthreads" ->
+                  "Thread.self", "threads", Some "vmthreads"
+              | _ -> assert false
             in
             let ext =
               match mode with
@@ -89,7 +98,7 @@ let run config env mode =
               "%s#load \"%s.%s\";;\n\
                if Obj.is_block (Obj.repr %s) then\n\
                  print_endline \"Loaded %s.%s\";;"
-              directory library ext symbol library ext;
+              directory archive ext symbol library ext;
             (c_bindings
              || (mode = Bytecode
                  && library <> "dynlink"
@@ -106,6 +115,10 @@ let run config env mode =
          which need C stubs *)
       if Sys.cygwin && mode = Native && List.mem "unix" libraries
       || Sys.win32 && mode = Native && List.mem "threads" libraries
+        (* The graphics library doesn't load on macOS arm64 *)
+      || Harness.is_macos
+         && Config.architecture = "none"
+         && List.mem "graphics" libraries
       || has_c_stubs && not Config.supports_shared_libraries then
         (* cf. ocaml/flexdll#146 - Cygwin's ocamlnat can't load unix.cmxs and
            the lines above will have triggered native Windows being unable to
@@ -133,4 +146,11 @@ let run config env mode =
                            toplevel expected_exit_code;
     Sys.remove "test_install_script.ml"
   in
-  List.iter test_libraries_in_toplevel config.libraries
+  let libraries =
+    if mode = Bytecode then
+      config.libraries
+    else
+      (* The vmthreads library is a bytecode-only library *)
+      List.filter (fun l -> not (List.mem "vmthreads" l)) config.libraries
+  in
+  List.iter test_libraries_in_toplevel libraries

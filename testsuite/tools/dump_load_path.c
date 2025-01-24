@@ -33,7 +33,7 @@ int main(int argc, char **argv)
   puts("shared_libs_path:");
   caml_ext_table_init(&caml_shared_libs_path, 8);
   caml_decompose_path(&caml_shared_libs_path,
-                      caml_secure_getenv(T("CAML_LD_LIBRARY_PATH")));
+                      caml_secure_getenv(_T("CAML_LD_LIBRARY_PATH")));
   caml_parse_ld_conf();
   for (int i = 0; i < caml_shared_libs_path.size; i++) {
     dir = caml_shared_libs_path.contents[i];
