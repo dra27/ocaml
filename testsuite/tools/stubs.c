@@ -29,7 +29,7 @@ value caml_ml_input_bigarray(value vchannel, value vbuf,
   intnat n;
 
   Lock(channel);
-  n = caml_getblock(channel, Caml_ba_data_val(vbuf) + pos, len);
+  n = caml_getblock(channel, (char *)Caml_ba_data_val(vbuf) + pos, len);
   Unlock(channel);
 
   CAMLreturn (Val_long(n));
