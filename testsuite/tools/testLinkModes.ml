@@ -234,15 +234,26 @@ let link_with_main_in_c env ~use_shared_runtime ~linker_exit_code mode
     Ccomp.call_linker Ccomp.Exe test_program_path [ocaml_object; main_in_c]
                       (String.concat " " flags)
   in
+  let linker_exit_code = (linker_exit_code = 0) in
   if exit_code <> linker_exit_code then
+    let exit_code =
+      if exit_code then
+        "exit code 0"
+      else
+        "non-zero exit code"
+    in
+    let linker_exit_code =
+      if linker_exit_code then
+        "exit code 0"
+      else
+        "a non-zero exit code"
+    in
     Harness.fail_because
-      "Linker returned with exit code %d instead of %d"
-      exit_code linker_exit_code
-  else if exit_code <> 0 then
-    false
+      "Linker returned with %s instead of %s" exit_code linker_exit_code
   else begin
-    Harness.erase_file ocaml_object;
-    true
+    if exit_code then
+      Harness.erase_file ocaml_object;
+    exit_code
   end
 
 (* Each execution of a test program sets Sys.argv.(0) and may optionally require

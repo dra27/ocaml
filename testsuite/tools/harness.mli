@@ -113,6 +113,8 @@ module Import : sig
 
     val take_while : ('a -> bool) -> 'a list -> 'a list
     val drop_while : ('a -> bool) -> 'a list -> 'a list
+    val fold_left_map :
+      ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
   end
 
   module Out_channel : sig
