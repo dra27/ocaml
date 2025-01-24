@@ -17,10 +17,8 @@
 
 val parse:
   string array
-    -> (config:Harness.Import.config * pwd:string * prefix:string *
-        bindir:string * bindir_suffix:string *
-        libdir:string * libdir_suffix:string *
-        summarise_only:bool * verbose:bool, int * string) Result.t
+    -> (Harness.Import.config * string * string * string * string * string *
+        string * bool * bool, int * string) Result.t
 (** [parse_cmdline argv] parses [argv] and either returns a tuple of properties
     derived from it, or a message to be displayed with an exit code.
 
