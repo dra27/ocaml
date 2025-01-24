@@ -12,6 +12,137 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Uchar = struct
+  include Uchar
+
+  type utf_decode = int
+
+  let decode_bits = 24
+
+  let[@inline] utf_decode_length d = (d lsr decode_bits) land 0b111
+  let[@inline] utf_decode_uchar d = unsafe_of_int (d land 0xFFFFFF)
+  let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
+  let[@inline] utf_decode_invalid n = (n lsl decode_bits) lor (to_int rep)
+
+  let utf_16_byte_length u = match to_int u with
+  | u when u < 0 -> assert false
+  | u when u <= 0xFFFF -> 2
+  | u when u <= 0x10FFFF -> 4
+  | _ -> assert false
+end
+
+module Bytes = struct
+  include Bytes
+
+  external unsafe_get_uint8 : bytes -> int -> int = "%bytes_unsafe_get"
+
+  external unsafe_set_uint16_ne : bytes -> int -> int -> unit
+                                = "%caml_bytes_set16u"
+
+  external swap16 : int -> int = "%bswap16"
+
+  let unsafe_set_uint16_le b i x =
+    if Sys.big_endian
+    then unsafe_set_uint16_ne b i (swap16 x)
+    else unsafe_set_uint16_ne b i x
+
+  let dec_invalid = Uchar.utf_decode_invalid
+  let[@inline] dec_ret n u = Uchar.utf_decode n (Uchar.unsafe_of_int u)
+
+  let[@inline] not_in_x80_to_xBF b = b lsr 6 <> 0b10
+  let[@inline] not_in_xA0_to_xBF b = b lsr 5 <> 0b101
+  let[@inline] not_in_x80_to_x9F b = b lsr 5 <> 0b100
+  let[@inline] not_in_x90_to_xBF b = b < 0x90 || 0xBF < b
+  let[@inline] not_in_x80_to_x8F b = b lsr 4 <> 0x8
+
+  let[@inline] utf_8_uchar_2 b0 b1 =
+    ((b0 land 0x1F) lsl 6) lor
+    ((b1 land 0x3F))
+
+  let[@inline] utf_8_uchar_3 b0 b1 b2 =
+    ((b0 land 0x0F) lsl 12) lor
+    ((b1 land 0x3F) lsl 6) lor
+    ((b2 land 0x3F))
+
+  let[@inline] utf_8_uchar_4 b0 b1 b2 b3 =
+    ((b0 land 0x07) lsl 18) lor
+    ((b1 land 0x3F) lsl 12) lor
+    ((b2 land 0x3F) lsl 6) lor
+    ((b3 land 0x3F))
+
+  let get_utf_8_uchar b i =
+    let b0 = get_uint8 b i in (* raises if [i] is not a valid index. *)
+    let get = unsafe_get_uint8 in
+    let max = length b - 1 in
+    match Char.unsafe_chr b0 with (* See The Unicode Standard, Table 3.7 *)
+    | '\x00' .. '\x7F' -> dec_ret 1 b0
+    | '\xC2' .. '\xDF' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+        dec_ret 2 (utf_8_uchar_2 b0 b1)
+    | '\xE0' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_xA0_to_xBF b1 then dec_invalid 1 else
+        let i = i + 1 in if i > max then dec_invalid 2 else
+        let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+        dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+    | '\xE1' .. '\xEC' | '\xEE' .. '\xEF' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+        let i = i + 1 in if i > max then dec_invalid 2 else
+        let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+        dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+    | '\xED' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_x80_to_x9F b1 then dec_invalid 1 else
+        let i = i + 1 in if i > max then dec_invalid 2 else
+        let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+        dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+    | '\xF0' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_x90_to_xBF b1 then dec_invalid 1 else
+        let i = i + 1 in if i > max then dec_invalid 2 else
+        let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+        let i = i + 1 in if i > max then dec_invalid 3 else
+        let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+        dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+    | '\xF1' .. '\xF3' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+        let i = i + 1 in if i > max then dec_invalid 2 else
+        let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+        let i = i + 1 in if i > max then dec_invalid 3 else
+        let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+        dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+    | '\xF4' ->
+        let i = i + 1 in if i > max then dec_invalid 1 else
+        let b1 = get b i in if not_in_x80_to_x8F b1 then dec_invalid 1 else
+        let i = i + 1 in if i > max then dec_invalid 2 else
+        let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+        let i = i + 1 in if i > max then dec_invalid 3 else
+        let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+        dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+    | _ -> dec_invalid 1
+
+  let set_utf_16le_uchar b i u =
+    let set = unsafe_set_uint16_le in
+    let max = length b - 1 in
+    if i < 0 || i > max then invalid_arg "index out of bounds" else
+    match Uchar.to_int u with
+    | u when u < 0 -> assert false
+    | u when u <= 0xFFFF ->
+        let last = i + 1 in
+        if last > max then 0 else (set b i u; 2)
+    | u when u <= 0x10FFFF ->
+        let last = i + 3 in
+        if last > max then 0 else
+        let u' = u - 0x10000 in
+        let hi = (0xD800 lor (u' lsr 10)) in
+        let lo = (0xDC00 lor (u' land 0x3FF)) in
+        set b i hi; set b (i + 2) lo; 4
+    | _ -> assert false
+end
+
 module Char = struct
   include Char
 
@@ -21,11 +152,111 @@ module Char = struct
 end
 
 module In_channel = struct
-  include In_channel
+  type t = Stdlib.in_channel
 
   external unsafe_input_bigarray :
     t -> _ Bigarray.Array1.t -> int -> int -> int
     = "caml_ml_input_bigarray"
+
+  let with_open openfun s f =
+    let ic = openfun s in
+    Fun.protect ~finally:(fun () -> close_in_noerr ic)
+      (fun () -> f ic)
+
+  let with_open_bin s f =
+    with_open open_in_bin s f
+
+  (* Read up to [len] bytes into [buf], starting at [ofs]. Return total bytes
+     read. *)
+  let read_upto ic buf ofs len =
+    let rec loop ofs len =
+      if len = 0 then ofs
+      else begin
+        let r = input ic buf ofs len in
+        if r = 0 then
+          ofs
+        else
+          loop (ofs + r) (len - r)
+      end
+    in
+    loop ofs len - ofs
+
+  (* Best effort attempt to return a buffer with >= (ofs + n) bytes of storage,
+     and such that it coincides with [buf] at indices < [ofs].
+
+     The returned buffer is equal to [buf] itself if it already has sufficient
+     free space.
+
+     The returned buffer may have *fewer* than [ofs + n] bytes of storage if
+     this number is > [Sys.max_string_length]. However the returned buffer will
+     *always* have > [ofs] bytes of storage. In the limiting case when [ofs =
+     len = Sys.max_string_length] (so that it is not possible to resize the
+     buffer at all), an exception is raised. *)
+
+  let ensure buf ofs n =
+    let len = Bytes.length buf in
+    if len >= ofs + n then buf
+    else begin
+      let new_len = ref len in
+      while !new_len < ofs + n do
+        new_len := 2 * !new_len + 1
+      done;
+      let new_len = !new_len in
+      let new_len =
+        if new_len <= Sys.max_string_length then
+          new_len
+        else if ofs < Sys.max_string_length then
+          Sys.max_string_length
+        else
+          failwith "In_channel.input_all: channel content \
+                    is larger than maximum string length"
+      in
+      let new_buf = Bytes.create new_len in
+      Bytes.blit buf 0 new_buf 0 ofs;
+      buf
+    end
+
+  let input_all ic =
+    let chunk_size = 65536 in (* IO_BUFFER_SIZE *)
+    let initial_size =
+      try
+        in_channel_length ic - pos_in ic
+      with Sys_error _ ->
+        -1
+    in
+    let initial_size = if initial_size < 0 then chunk_size else initial_size in
+    let initial_size =
+      if initial_size <= Sys.max_string_length then
+        initial_size
+      else
+        Sys.max_string_length
+    in
+    let buf = Bytes.create initial_size in
+    let nread = read_upto ic buf 0 initial_size in
+    if nread < initial_size then (* EOF reached, buffer partially filled *)
+      Bytes.sub_string buf 0 nread
+    else begin (* nread = initial_size, maybe EOF reached *)
+      match input_char ic with
+      | exception End_of_file ->
+          (* EOF reached, buffer is completely filled *)
+          Bytes.unsafe_to_string buf
+      | c ->
+          (* EOF not reached *)
+          let rec loop buf ofs =
+            let buf = ensure buf ofs chunk_size in
+            let rem = Bytes.length buf - ofs in
+            (* [rem] can be < [chunk_size] if buffer size close to
+               [Sys.max_string_length] *)
+            let r = read_upto ic buf ofs rem in
+            if r < rem then (* EOF reached *)
+              Bytes.sub_string buf 0 (ofs + r)
+            else (* r = rem *)
+              loop buf (ofs + rem)
+          in
+          let buf = ensure buf nread (chunk_size + 1) in
+          Bytes.set buf nread c;
+          loop buf (nread + 1)
+    end
 
   let rec unsafe_really_input_bigarray ic buf ofs len =
     if len <= 0 then Some () else begin
@@ -49,6 +280,8 @@ module In_channel = struct
     match Stdlib.input_line ic with
     | line -> fold_lines f (f accu line) ic
     | exception End_of_file -> accu
+
+  let set_binary_mode = Stdlib.set_binary_mode_in
 end
 
 module List = struct
@@ -64,6 +297,21 @@ module List = struct
   let rec drop_while p = function
     | x::l when p x -> drop_while p l
     | rest -> rest
+end
+
+module Out_channel = struct
+  type t = Stdlib.out_channel
+
+  let with_open openfun s f =
+    let oc = openfun s in
+    Fun.protect ~finally:(fun () -> Stdlib.close_out_noerr oc)
+      (fun () -> f oc)
+
+  let with_open_bin s f =
+    with_open Stdlib.open_out_bin s f
+
+  let with_open_text s f =
+    with_open Stdlib.open_out s f
 end
 
 module Result = struct
@@ -140,11 +388,14 @@ module Import = struct
     libraries: string list list
   }
 
+  module Bytes = Bytes
   module Char = Char
   module In_channel = In_channel
   module List = List
+  module Out_channel = Out_channel
   module Result = Result
   module Sys = Sys
+  module Uchar = Uchar
 end
 
 open Import
