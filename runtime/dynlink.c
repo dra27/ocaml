@@ -96,9 +96,10 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   struct stat st;
 #endif
   int ldconf, nread;
+  size_t length;
 
   stdlib = caml_get_stdlib_location();
-  size_t length = strlen_os(stdlib);
+  length = strlen_os(stdlib);
   if (length == 0 || !Is_dir_separator(stdlib[length - 1]))
     ldconfname = caml_stat_strconcat_os(3, stdlib, CAML_DIR_SEP, LD_CONF_NAME);
   else
