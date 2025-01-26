@@ -25,6 +25,12 @@ OCaml 4.13 maintenance branch
   entries found in ld.conf.
   (David Allsopp, review by Stephen Dolan)
 
+* #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from. The brave may continue to put implicit paths in ld.conf. The
+  interpretation of CAML_LD_LIBRARY_PATH is unaltered.
+  (David Allsopp, review by ???)
+
 ### Compiler user-interface and warnings:
 
 - #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
