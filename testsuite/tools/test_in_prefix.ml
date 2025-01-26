@@ -1545,7 +1545,13 @@ let () =
              ocamlrun opens it in binary mode (the default) *)
           match test.stdlib with
           | "\r" :: _ when Sys.cygwin && lines <> [] ->
-              "\r" :: List.map (Fun.flip (^) "\r") (List.tl lines)
+              (* This all gets a bit silly until CRLF is consistently
+                 handled! *)
+              let lines =
+                "" :: List.take 2 (List.tl lines)
+                  @ ["."; ".."] @ List.drop 5 lines
+              in
+              List.map (Fun.flip (^) "\r") lines
           | _ ->
               lines
         in
@@ -1793,16 +1799,16 @@ let test_ld_conf env =
         "/", "/", None;
         "//", "//", None;
         (* Current and Parent directory names *)
-        ".", ".", None;
-        "..", "..", None;
+        ".", libdir / "", if_not_win32 ".\r";
+        "..", libdir / "..", if_not_win32 "..\r";
         (* Current and Parent directory names with OS-default trailing separator
            (i.e. ./ and ../ on Unix and .\ and ..\ on Windows) *)
-        "." / "", "." / "", None;
-        ".." / "", ".." / "", None;
+        "." / "", libdir / "", None;
+        ".." / "", libdir / ".." / "", None;
         (* "stublibs" relative to the Current and Parent directory (using OS-
            default separator) *)
-        "." / "stublibs", "." / "stublibs", None;
-        ".." / "stublibs", ".." / "stublibs", None;
+        "." / "stublibs", libdir / "stublibs", None;
+        ".." / "stublibs", libdir / ".." / "stublibs", None;
         (* Other cases - implicit and absolute entries, and entries beginning
            with the Current and Parent directory names *)
         "stublibs", "stublibs", None;
