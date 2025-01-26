@@ -77,6 +77,12 @@ Working version
   (Guillaume Munch-Maccagnoni, review by Gabriel Scherer, tests by
   Jan Midtgaard)
 
+* #13???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from. The brave may continue to put implicit paths in ld.conf. The
+  interpretation of CAML_LD_LIBRARY_PATH is unaltered.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
