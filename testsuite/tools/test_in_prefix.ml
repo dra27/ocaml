@@ -1369,22 +1369,23 @@ let test_ld_conf ~original env bindir libdir =
      CAML_LD_LIBRARY_PATH and ld.conf *)
   let tests =
     let main, main_outcome, main_outcome_cr =
+      let if_not_win32 s = if Sys.win32 then None else Some s in
       let (/) = Filename.concat in
       let data = [
         (* Root directory (both forms) preserved *)
         "/", "/", None;
         "//", "//", None;
         (* Current and Parent directory names *)
-        ".", ".", None;
-        "..", "..", None;
+        ".", libdir / "", if_not_win32 ".\r";
+        "..", libdir / "..", if_not_win32 "..\r";
         (* Current and Parent directory names with OS-default trailing separator
            (i.e. ./ and ../ on Unix and .\ and ..\ on Windows) *)
-        "." / "", "." / "", None;
-        ".." / "", ".." / "", None;
+        "." / "", libdir / "", None;
+        ".." / "", libdir / ".." / "", None;
         (* "stublibs" relative to the Current and Parent directory (using OS-
            default separator) *)
-        "." / "stublibs", "." / "stublibs", None;
-        ".." / "stublibs", ".." / "stublibs", None;
+        "." / "stublibs", libdir / "stublibs", None;
+        ".." / "stublibs", libdir / ".." / "stublibs", None;
         (* Other cases - implicit and absolute entries, and entries beginning
            with the Current and Parent directory names *)
         "stublibs", "stublibs", None;
