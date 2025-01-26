@@ -187,3 +187,5 @@ let reset () =
   search_path := [];
   opened_dlls :=[];
   linking_in_core := false
+
+let search_path () = !search_path
