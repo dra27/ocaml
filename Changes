@@ -1,6 +1,14 @@
 OCaml 5.4 maintenance version
 -----------------------------
 
+### Runtime system:
+
+* #14???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from. The brave may continue to put implicit paths in ld.conf. The
+  interpretation of CAML_LD_LIBRARY_PATH is unaltered.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #14???: New configure option --with-stublibs allows an additional directory
