@@ -122,14 +122,17 @@ static char_os *make_relative_path_absolute(char_os *path, char_os *root)
 CAMLexport char_os * caml_parse_ld_conf(void)
 {
   char_os * stdlib, * libroot, * ldconfname, * wconfig, * p, * q;
+  char_os last, * entry, * result;
   char * config;
 #ifdef _WIN32
   struct _stati64 st;
 #else
   struct stat st;
 #endif
-  int ldconf, nread;
+  int ldconf, nread, i;
   size_t length;
+  /* Use a temporary ext_table to hold the individually-allocated entries */
+  struct ext_table entries;
 
   stdlib = caml_get_stdlib_location();
   libroot = caml_stat_strconcat_os(2, stdlib, CAML_DIR_SEP);
@@ -156,16 +159,14 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   wconfig = caml_stat_strdup_to_os(config);
   caml_stat_free(config);
 
-  /* Use a temporary ext_table to hold the individually-allocated entries */
-  struct ext_table entries;
   caml_ext_table_init(&entries, 8);
   length = 0;
   p = wconfig;
   while (*p != '\0') {
     for (q = p; *q != '\0' && *q != '\n'; q++) /*nothing*/;
-    char_os last = *q;
+    last = *q;
     *q = '\0';
-    char_os *entry = make_relative_path_absolute(p, libroot);
+    entry = make_relative_path_absolute(p, libroot);
     length += strlen_os(entry) + 1;
     caml_ext_table_add(&entries, entry);
     p = q;
@@ -176,9 +177,9 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   close(ldconf);
 
   /* Now concatenate them all and load the search path */
-  char_os *result = caml_stat_alloc(length * sizeof(char_os));
+  result = caml_stat_alloc(length * sizeof(char_os));
   p = result;
-  for (int i = 0; i < entries.size; i++) {
+  for (i = 0; i < entries.size; i++) {
     char_os *entry = entries.contents[i];
     length = strlen_os(entry) + 1;
     memcpy(p, entry, length * sizeof(char_os));
