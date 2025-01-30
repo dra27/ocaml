@@ -505,11 +505,15 @@ let link_bytecode ?final_name tolink exec_name standalone =
        (* DLL stuff *)
        if standalone then begin
          (* The extra search path for DLLs *)
-         output_string outchan (concat_null_terminated !Clflags.dllpaths);
-         Bytesections.record toc_writer DLPT;
+         if !Clflags.dllpaths <> [] then begin
+           output_string outchan (concat_null_terminated !Clflags.dllpaths);
+           Bytesections.record toc_writer DLPT
+         end;
          (* The names of the DLLs *)
-         output_string outchan (concat_null_terminated sharedobjs);
-         Bytesections.record toc_writer DLLS
+         if sharedobjs <> [] then begin
+           output_string outchan (concat_null_terminated sharedobjs);
+           Bytesections.record toc_writer DLLS
+         end
        end;
        (* The names of all primitives *)
        Symtable.output_primitive_names outchan;
