@@ -1070,6 +1070,7 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
         | Ostype_cygwin -> make_const_bool (Config.target_os_type = "Cygwin")
         | Backend_type ->
             make_const_int 0 (* tag 0 is the same as Native here *)
+        | Shared_libraries -> make_const_bool Config.supports_shared_libraries
       in
       let arg, _approx = close env arg in
       let id = Ident.create_local "dummy" in

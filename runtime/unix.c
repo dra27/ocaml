@@ -228,7 +228,19 @@ caml_stat_string caml_search_dll_in_path(struct ext_table * path,
   return res;
 }
 
+/* Primitive is defined here rather than sys.c as otherwise sys.c would need
+   duplicating for libcamlrun_non_shared */
+CAMLprim value caml_sys_const_shared_libraries(value unit)
+{
 #ifdef WITH_DYNAMIC_LINKING
+  return Val_true;
+#else
+  return Val_false;
+#endif
+}
+
+#ifdef WITH_DYNAMIC_LINKING
+
 #ifdef __CYGWIN__
 /* Use flexdll */
 

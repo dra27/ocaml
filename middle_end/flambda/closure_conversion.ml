@@ -405,6 +405,8 @@ let rec close t env (lam : Lambda.lambda) : Flambda.t =
             lambda_const_bool (String.equal Config.target_os_type "Cygwin")
         | Backend_type ->
             Lambda.const_int 0 (* tag 0 is the same as Native *)
+        | Shared_libraries ->
+            lambda_const_bool Config.supports_shared_libraries
         end
       in
       close t env
