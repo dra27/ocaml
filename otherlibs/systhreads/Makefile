@@ -108,7 +108,7 @@ clean: partialclean
 INSTALL_THREADSLIBDIR=$(INSTALL_LIBDIR)/$(LIBNAME)
 
 install:
-	if test -f dllthreads$(EXT_DLL); then \
+	if $(SUPPORTS_SHARED_LIBRARIES) && test -f dllthreads$(EXT_DLL); then \
 	  $(INSTALL_PROG) dllthreads$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
 	fi
 	$(INSTALL_DATA) libthreads.$(A) "$(INSTALL_LIBDIR)"
