@@ -107,6 +107,12 @@ OCaml 4.08 maintenance branch:
   to be added to the start of ld.conf.
   (David Allsopp, review by ???)
 
+- #14???: New configure option --with-stublibs allows an additional directory
+  to be added to the start of ld.conf. Additionally, the stublibs subdirectory
+  is no longer created, nor added to ld.conf, when building OCaml with
+  --disable-shared.
+  (David Allsopp, review by ???)
+
 ### Bug fixes:
 
 - #2267: merge generation of header programs, also fixing parallel build on
