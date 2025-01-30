@@ -380,7 +380,9 @@ FLEXDLL_MANIFEST = default$(filter-out _i386,_$(ARCH)).manifest
 install:
 	$(MKDIR) "$(INSTALL_BINDIR)"
 	$(MKDIR) "$(INSTALL_LIBDIR)"
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(MKDIR) "$(INSTALL_STUBLIBDIR)"
+endif
 	$(MKDIR) "$(INSTALL_COMPLIBDIR)"
 	$(INSTALL_DATA) \
 	  VERSION \
