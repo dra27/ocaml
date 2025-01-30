@@ -270,7 +270,8 @@ let primitive ppf = function
        | Ostype_unix -> "ostype_unix"
        | Ostype_win32 -> "ostype_win32"
        | Ostype_cygwin -> "ostype_cygwin"
-       | Backend_type -> "backend_type" in
+       | Backend_type -> "backend_type"
+       | Shared_libraries -> "shared_libraries" in
      fprintf ppf "sys.constant_%s" const_name
   | Pisint -> fprintf ppf "isint"
   | Pisout -> fprintf ppf "isout"
