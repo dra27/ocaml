@@ -52,7 +52,8 @@ CAMLOBJS_NAT ?= $(CAMLOBJS:.cmo=.cmx)
 CLIBNAME ?= $(LIBNAME)
 
 ifeq "$(C_SOURCES)" ""
-STUBSLIB=
+STUBSLIB_BYTECODE=
+STUBSLIB_NATIVE=
 else
 COBJS_BYTECODE = $(C_SOURCES:.c=.b.$(O))
 COBJS_NATIVE = $(C_SOURCES:.c=.n.$(O))
@@ -98,10 +99,10 @@ lib$(CLIBNAME_NATIVE).$(A): $(COBJS)
 INSTALL_LIBDIR_LIBNAME = $(INSTALL_LIBDIR)/$(LIBNAME)
 
 install::
+ifneq "$(STUBSLIB_BYTECODE)" ""
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(INSTALL_PROG) dll$(CLIBNAME_BYTECODE)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"
 endif
-ifneq "$(STUBSLIB_BYTECODE)" ""
 	$(INSTALL_DATA) $(STUBSLIB_BYTECODE) "$(INSTALL_LIBDIR)/"
 endif
 # If installing over a previous OCaml version, ensure the library is removed
@@ -131,10 +132,10 @@ installopt:
 	if test -f $(LIBNAME).cmxs; then \
 	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR_LIBNAME)"; \
 	fi
+ifneq "$(STUBSLIB_NATIVE)" ""
 ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
 	$(INSTALL_PROG) dll$(CLIBNAME_NATIVE)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"
 endif
-ifneq "$(STUBSLIB_NATIVE)" ""
 	$(INSTALL_DATA) $(STUBSLIB_NATIVE) "$(INSTALL_LIBDIR)/"
 endif
 
