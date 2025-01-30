@@ -102,6 +102,11 @@ Working version
   lines in ld.conf are now likewise ignored.
   (David Allsopp, review by ???)
 
+* #14???: Windows and Unix. When configured with --disable-shared, the runtime
+  now rejects bytecode executables which require DLLs to be loaded earlier, and
+  with a less unclear error message.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
@@ -189,6 +194,14 @@ Working version
   calling `caml_sys_system_command` on Windows. Error with EINVAL
   instead of ENOENT if the command string is not a valid C string.
   (Antonin Décimo, review by Gabriel Scherer and Nicolás Ojeda Bär)
+
+- #14???: Improved the error message when bytecode Dynlink is asked to load an
+  archive which needs dynamic loading on a runtime which doesn't support it.
+  Previously, the full machinery to search for DLLs was invoked, and the error
+  confusingly included the name of a non-existent DLL. The entire process is now
+  skipped, with a general message that dynamic loading is needed and is
+  unavailable.
+  (David Allsopp, review by ???)
 
 ### Tools:
 
