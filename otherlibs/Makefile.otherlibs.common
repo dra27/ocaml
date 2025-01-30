@@ -98,7 +98,8 @@ lib$(CLIBNAME_NATIVE).$(A): $(COBJS)
 INSTALL_LIBDIR_LIBNAME = $(INSTALL_LIBDIR)/$(LIBNAME)
 
 install::
-	if test -f dll$(CLIBNAME_BYTECODE)$(EXT_DLL); then \
+	if $(SUPPORTS_SHARED_LIBRARIES) \
+	     && test -f dll$(CLIBNAME_BYTECODE)$(EXT_DLL); then \
 	  $(INSTALL_PROG) \
 	    dll$(CLIBNAME_BYTECODE)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
 	fi
@@ -132,7 +133,8 @@ installopt:
 	if test -f $(LIBNAME).cmxs; then \
 	  $(INSTALL_PROG) $(LIBNAME).cmxs "$(INSTALL_LIBDIR_LIBNAME)"; \
 	fi
-	if test -f dll$(CLIBNAME_NATIVE)$(EXT_DLL); then \
+	if $(SUPPORTS_SHARED_LIBRARIES) \
+	     && test -f dll$(CLIBNAME_NATIVE)$(EXT_DLL); then \
 	  $(INSTALL_PROG) \
 	    dll$(CLIBNAME_NATIVE)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
 	fi
