@@ -89,11 +89,10 @@ lib$(CLIBNAME).$(A): $(COBJS)
 	$(MKLIB_CMD) -oc $(CLIBNAME) $(COBJS) $(LDOPTS)
 
 install::
-	if test -f dll$(CLIBNAME)$(EXT_DLL); then \
-	  $(INSTALL_PROG) \
-	    dll$(CLIBNAME)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
-	fi
 ifneq "$(STUBSLIB)" ""
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+	$(INSTALL_PROG) dll$(CLIBNAME)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"
+endif
 	$(INSTALL_DATA) $(STUBSLIB) "$(INSTALL_LIBDIR)/"
 	cd "$(INSTALL_LIBDIR)"; $(RANLIB) lib$(CLIBNAME).$(A)
 endif
