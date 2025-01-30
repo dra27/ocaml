@@ -88,11 +88,10 @@ lib$(CLIBNAME).$(A): $(COBJS)
 INSTALL_LIBDIR_LIBNAME = $(INSTALL_LIBDIR)/$(LIBNAME)
 
 install::
-	if test -f dll$(CLIBNAME)$(EXT_DLL); then \
-	  $(INSTALL_PROG) \
-	    dll$(CLIBNAME)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"; \
-	fi
 ifneq "$(STUBSLIB)" ""
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+	$(INSTALL_PROG) dll$(CLIBNAME)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)"
+endif
 	$(INSTALL_DATA) $(STUBSLIB) "$(INSTALL_LIBDIR)/"
 endif
 # If installing over a previous OCaml version, ensure the library is removed
