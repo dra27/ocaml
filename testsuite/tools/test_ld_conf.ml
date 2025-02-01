@@ -124,7 +124,7 @@ let run (config : Installation.t) env =
      be used for $OCAMLLIB and $CAMLLIB to point to if needed which can then
      have temporary ld.conf files placed in them. The ld.conf in libdir is
      backed up and restored after the test. *)
-  let ocamlrun_config run_process _test =
+  let ocamlrun_config run_process test =
     let ocamlrun = Environment.ocamlrun env in
     let code, lines =
       run_process ~runtime:false ocamlrun ["-config"] in
@@ -326,14 +326,7 @@ let run (config : Installation.t) env =
       List.fold_left fold ([], [], []) (List.rev data)
     in
     let main_outcome = List.tl main_outcome in
-    let main_outcome_cr =
-      (* On Windows, a line consisting of just a CR will be interpreted as a
-         blank line, and consequently ignored. *)
-      if Sys.win32 then
-        List.tl main_outcome_cr
-      else
-        main_outcome_cr
-    in
+    let main_outcome_cr = List.tl main_outcome_cr in
     let tests =
       (* Various test lines above all fed via ld.conf in the Standard Library *)
       [{base with description = "Base ld.conf test";
@@ -344,7 +337,7 @@ let run (config : Installation.t) env =
       {base with description = "Base ld.conf + CAML_LD_LIBRARY_PATH";
                  caml_ld_library_path = Set main;
                  stdlib = main;
-                 outcome = main_outcome
+                 outcome = List.tl main
                              @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with entries in CAML_LD_LIBRARY_PATH including quotes and
@@ -384,17 +377,9 @@ let run (config : Installation.t) env =
                              @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with a CR at the end of each line *)
-      let outcome =
-        (* Known issue: Windows strips out the blank entries in the search
-           path (somewhat counterintuitively!) *)
-        if Sys.win32 then
-          main_outcome_cr
-        else
-          "." :: main_outcome_cr
-      in
       {base with description = "Base ld.conf with CRLF endings";
                  stdlib = List.map (Fun.flip (^) "\r") ("" :: main);
-                 outcome = if_ld_conf_found outcome} :: tests in
+                 outcome = if_ld_conf_found main_outcome_cr} :: tests in
     tests
   in
   (* Batch 2: effects of empty (vs unset) environment variables *)
