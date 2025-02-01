@@ -114,7 +114,9 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
   return retcode;
 }
 
-caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
+Caml_inline caml_stat_string decompose_path(struct ext_table * tbl,
+                                            char * path,
+                                            bool include_blanks)
 {
   char * p, * q;
   size_t n;
@@ -122,15 +124,27 @@ caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
   if (path == NULL) return NULL;
   p = caml_stat_strdup(path);
   q = p;
+
   while (1) {
+    /* If blank entries are not included, skip any prefixing colons */
+    if (!include_blanks)
+      while (*q == ':')
+        q++;
+    /* Find the end of this entry */
     for (n = 0; q[n] != 0 && q[n] != ':'; n++) /*nothing*/;
-    caml_ext_table_add(tbl, q);
+    if (include_blanks || n > 0)
+      caml_ext_table_add(tbl, q);
     q = q + n;
     if (*q == 0) break;
     *q = 0;
     q += 1;
   }
   return p;
+}
+
+caml_stat_string caml_decompose_path(struct ext_table * tbl, char * path)
+{
+  return decompose_path(tbl, path, false);
 }
 
 caml_stat_string caml_search_in_path(struct ext_table * path, const char * name)
@@ -205,7 +219,11 @@ caml_stat_string caml_search_exe_in_path(const char * name)
   caml_stat_string res;
 
   caml_ext_table_init(&path, 8);
-  tofree = caml_decompose_path(&path, getenv("PATH"));
+  /* This implementation treats PATH being "Set But Null" (i.e. equal to "") as
+     begin equivalent to being set to ".", since decompose_path adds an empty
+     string to the path which will then be interpreted as "." by
+     caml_search_exe_in_path. */
+  tofree = decompose_path(&path, getenv("PATH"), true);
 #ifndef __CYGWIN__
   res = caml_search_in_path(&path, name);
 #else
