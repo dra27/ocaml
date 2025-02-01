@@ -59,6 +59,10 @@ Working version
   (Tim McGilchrist, review by Nick Barnes, Sadiq Jaffer and
   Gabriel Scherer)
 
+- #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
+  the empty string.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
