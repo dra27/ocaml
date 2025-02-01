@@ -123,7 +123,10 @@ Working version
 * #14???: When set to the empty string, OCAMLRUNPARAM, OCAMLLIB and CAMLLIB are
   now ignored (i.e. treated as if they were unset). In particular, this means
   that a blank value for OCAMLLIB no longer prevents the compiler's default
-  Standard Library from being used.
+  Standard Library from being used. CAML_LD_LIBRARY_PATH now ignores empty
+  segments (instead of interpreting them as being ".") which also means that
+  CAML_LD_LIBRARY_PATH is ignored if it is just set to the empty string. Blank
+  lines in ld.conf are now likewise ignored.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
@@ -287,6 +290,13 @@ Working version
 - #14245: ocamlobjinfo now displays the runtime invoked by a bytecode
   executable (either from the RNTM section or by analysing the shebang lines)
   (David Allsopp, review by Damien Doligez and Samuel Hym)
+
+### Toplevel:
+
+- #14???: Empty segments in OCAMLTOP_INCLUDE_PATH are no longer interpreted as
+  adding the current working directory to the search path. The current working
+  directory can of course still be included in the search path by adding ".".
+  (David Allsopp, review by ???)
 
 ### Manual and documentation:
 
