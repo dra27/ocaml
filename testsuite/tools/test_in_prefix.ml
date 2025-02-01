@@ -1462,7 +1462,7 @@ let () =
       mode = Bytecode
       && not target_launcher_searches_for_ocamlrun
       && config.has_relative_libdir = None in
-    let run run_process test =
+    let run run_process _test =
       let code, lines =
         run_process ~runtime test_program []
       in
@@ -1701,14 +1701,7 @@ let test_ld_conf env =
       List.fold_left fold ([], [], []) (List.rev data)
     in
     let main_outcome = List.tl main_outcome in
-    let main_outcome_cr =
-      (* On Windows, a line consisting of just a CR will be interpreted as a
-         blank line, and consequently ignored. *)
-      if Sys.win32 then
-        List.tl main_outcome_cr
-      else
-        main_outcome_cr
-    in
+    let main_outcome_cr = List.tl main_outcome_cr in
     let tests =
       (* Various test lines above all fed via ld.conf in the Standard Library *)
       [{base with description = "Base ld.conf test";
@@ -1719,7 +1712,7 @@ let test_ld_conf env =
       {base with description = "Base ld.conf + CAML_LD_LIBRARY_PATH";
                  caml_ld_library_path = Set main;
                  stdlib = main;
-                 outcome = main_outcome
+                 outcome = List.tl main
                              @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with entries in CAML_LD_LIBRARY_PATH including quotes and
@@ -1759,17 +1752,9 @@ let test_ld_conf env =
                              @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with a CR at the end of each line *)
-      let outcome =
-        (* Known issue: Windows strips out the blank entries in the search
-           path (somewhat counterintuitively!) *)
-        if Sys.win32 then
-          main_outcome_cr
-        else
-          "." :: main_outcome_cr
-      in
       {base with description = "Base ld.conf with CRLF endings";
                  stdlib = List.map (Fun.flip (^) "\r") ("" :: main);
-                 outcome = if_ld_conf_found outcome} :: tests in
+                 outcome = if_ld_conf_found main_outcome_cr} :: tests in
     tests
   in
   (* Batch 2: effects of empty (vs unset) environment variables *)
