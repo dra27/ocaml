@@ -139,7 +139,7 @@ CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
   /* Use a temporary ext_table to hold the individually-allocated entries */
   caml_ext_table_init(&entries, 8);
   for (int i = 0; i < sizeof(locations) / sizeof(locations[0]); i++) {
-    if (locations[i] != NULL) {
+    if (locations[i] != NULL && *locations[i] != '\0') {
       libroot = caml_stat_strconcat_os(2, locations[i], CAML_DIR_SEP);
       size_t libroot_length = strlen_os(libroot);
       if (libroot_length > 1 && Is_separator(libroot[libroot_length - 2]))
