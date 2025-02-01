@@ -72,7 +72,10 @@ Working version
   (David Allsopp, review by ???)
 
 - #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
-  the empty string.
+  the empty string. CAML_LD_LIBRARY_PATH now ignores empty segments (instead of
+  interpreting them as being ".") which also means that CAML_LD_LIBRARY_PATH is
+  ignored if it is just set to the empty string. Blank lines in ld.conf are also
+  now ignored.
   (David Allsopp, review by ???)
 
 ### Code generation and optimizations:
@@ -179,6 +182,13 @@ Working version
 
 - #14???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
   TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
+  (David Allsopp, review by ???)
+
+### Toplevel:
+
+- #14???: Empty segments in OCAMLTOP_INCLUDE_PATH are no longer interpreted as
+  adding the current working directory to the search path. The current working
+  directory can of course still be included in the search path by adding ".".
   (David Allsopp, review by ???)
 
 ### Manual and documentation:
