@@ -307,6 +307,10 @@ Working version
   tests that fail on mono-core systems.
   (Stéphane Glondu, review by Nicolás Ojeda Bär)
 
+- #13???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
+  TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
+  (David Allsopp, review by ???)
+
 ### Manual and documentation:
 
 - #13694: Fix name for caml_hash_variant in the C interface.
