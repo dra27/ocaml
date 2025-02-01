@@ -36,13 +36,16 @@ let standard_library_effective, relative_root_dir =
   stdlib_dirs standard_library_default
 
 let standard_library =
-  try
-    Sys.getenv "OCAMLLIB"
-  with Not_found ->
-  try
-    Sys.getenv "CAMLLIB"
-  with Not_found ->
-    standard_library_effective
+  match Sys.getenv_opt "OCAMLLIB" with
+  | None | Some "" ->
+      begin match Sys.getenv_opt "CAMLLIB" with
+      | None | Some "" ->
+          standard_library_effective
+      | Some value ->
+          value
+      end
+  | Some value ->
+      value
 
 let standard_library_relative = relative_root_dir <> None
 
