@@ -179,6 +179,10 @@ Working version
   sources of installed packages.
   (Pierre Boutillier, review by Gabriel Scherer)
 
+- #14???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
+  TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
+  (David Allsopp, review by ???)
+
 ### Manual and documentation:
 
 * #13975: documented the `[@remove_aliases]` built-in attribute for signatures
