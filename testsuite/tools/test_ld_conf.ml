@@ -103,14 +103,7 @@ let tests config env =
       List.fold_left fold ([], [], []) (List.rev data)
     in
     let main_outcome = List.tl main_outcome in
-    let main_outcome_cr =
-      (* On Windows, a line consisting of just a CR will be interpreted as a
-         blank line, and consequently ignored. *)
-      if Sys.win32 then
-        List.tl main_outcome_cr
-      else
-        main_outcome_cr
-    in
+    let main_outcome_cr = List.tl main_outcome_cr in
     let tests =
       (* Various test lines above all fed via ld.conf in the Standard Library *)
       [{base with description = "Base ld.conf test";
@@ -121,7 +114,7 @@ let tests config env =
       {base with description = "Base ld.conf + CAML_LD_LIBRARY_PATH";
                  caml_ld_library_path = Set main;
                  stdlib = main;
-                 outcome = main_outcome
+                 outcome = List.tl main
                              @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with entries in CAML_LD_LIBRARY_PATH including quotes and
@@ -161,17 +154,9 @@ let tests config env =
                              @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with a CR at the end of each line *)
-      let outcome =
-        (* Known issue: Windows strips out the blank entries in the search
-           path (somewhat counterintuitively!) *)
-        if Sys.win32 then
-          main_outcome_cr
-        else
-          "." :: main_outcome_cr
-      in
       {base with description = "Base ld.conf with CRLF endings";
                  stdlib = List.map (Fun.flip (^) "\r") ("" :: main);
-                 outcome = if_ld_conf_found outcome} :: tests in
+                 outcome = if_ld_conf_found main_outcome_cr} :: tests in
     tests
   in
   (* Batch 2: effects of empty (vs unset) environment variables *)
@@ -310,25 +295,11 @@ let () =
       mode = Bytecode
       && not config.target_launcher_searches_for_ocamlrun
       && config.has_relative_libdir = None in
-    let run run_process test =
+    let run run_process _test =
       let code, lines =
         run_process ~runtime test_program []
       in
       if code = 0 then
-        let lines =
-          (* Known issues:
-             - Misc.split_path_contents ignores empty strings where
-               caml_decompose_path does not
-             - Sys.getenv can't return empty environment variables on Windows,
-               but _wgetenv can
-             - Windows strips out the blank entries in the search path
-               (somewhat counterintuitively!) *)
-          if not Sys.win32 && (test.caml_ld_library_path = Set []
-                               || test.caml_ld_library_path = Empty) then
-            "." :: lines
-          else
-            lines
-        in
         description :: lines
       else
         Harness.fail_because "%s is expected to exit with code 0"
