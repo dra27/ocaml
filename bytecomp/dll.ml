@@ -162,6 +162,7 @@ let ld_library_path_contents () =
   | exception Not_found ->
       []
   | s ->
+      (* NB: Misc.split_path_contents "" = [] *)
       Misc.split_path_contents s
 
 (* Initialization for separate compilation *)
