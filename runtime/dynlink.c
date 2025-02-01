@@ -87,8 +87,10 @@ CAMLexport const char_os * caml_get_stdlib_location(void)
 {
   const char_os * stdlib;
   stdlib = caml_secure_getenv(T("OCAMLLIB"));
-  if (stdlib == NULL) stdlib = caml_secure_getenv(T("CAMLLIB"));
-  if (stdlib == NULL) stdlib = OCAML_STDLIB_DIR;
+  if (stdlib == NULL || *stdlib == '\0')
+    stdlib = caml_secure_getenv(T("CAMLLIB"));
+  if (stdlib == NULL || *stdlib == '\0')
+    stdlib = OCAML_STDLIB_DIR;
   return stdlib;
 }
 
