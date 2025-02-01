@@ -89,6 +89,10 @@ Working version
   but at program startup instead of when the debug information is first loaded.
   (David Allsopp, review by ???)
 
+- #14???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
+  the empty string.
+  (David Allsopp, review by ???)
+
 ### Code generation and optimizations:
 
 ### Standard library:
