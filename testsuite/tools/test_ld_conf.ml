@@ -65,6 +65,8 @@ let tests _config env =
           Config.standard_library in
       let (/) = Filename.concat in
       let data = [
+        (* Blank line - should be ignored on all platforms *)
+        "", "", None;
         (* Root directory (both forms) preserved *)
         "/", "/", None;
         "//", "//", None;
@@ -101,51 +103,27 @@ let tests _config env =
       in
       List.fold_left fold ([], [], []) (List.rev data)
     in
+    let main_outcome = List.tl main_outcome in
+    let main_outcome_cr =
+      (* On Windows, a line consisting of just a CR will be interpreted as a
+         blank line, and consequently ignored. *)
+      if Sys.win32 then
+        List.tl main_outcome_cr
+      else
+        main_outcome_cr
+    in
     let tests =
       (* Various test lines above all fed via ld.conf in the Standard Library *)
-      let outcome =
-        (* Known issue: Windows strips out the blank entries in the search path
-           (somewhat counterintuitively!) *)
-        if Sys.win32 then
-          main_outcome
-        else
-          "." :: main_outcome
-      in
       [{base with description = "Base ld.conf test";
-                  stdlib = "" :: main;
-                  outcome = if_ld_conf_found outcome}] in
+                  stdlib = main;
+                  outcome = if_ld_conf_found main_outcome}] in
     let tests =
       (* As first, but with the same entries in CAML_LD_LIBRARY_PATH too *)
-      let stdlib =
-        if Sys.win32 then
-          (* Known issue: Windows ignores empty entries in the search path, and
-             it's slightly easier to test this only once in this test *)
-          main
-        else
-          "" :: main
-      in
-      (* Part of the outcome from ld.conf *)
-      let outcome_ld_conf =
-        if Sys.win32 then
-          main_outcome
-        else
-          "." :: main_outcome
-      in
-      (* Part of the outcome from CAML_LD_LIBRARY_PATH *)
-      let outcome_caml_ld_library_path =
-        if Sys.win32 then
-          (* No blank entry at the start: Windows returns the same entries *)
-          main
-        else
-          (* Unix displays "." for the blank, but otherwise returns the same
-             entries *)
-          "." :: main
-      in
       {base with description = "Base ld.conf + CAML_LD_LIBRARY_PATH";
-                 caml_ld_library_path = Set stdlib;
-                 stdlib;
-                 outcome = outcome_caml_ld_library_path
-                             @ if_ld_conf_found outcome_ld_conf} :: tests in
+                 caml_ld_library_path = Set main;
+                 stdlib = main;
+                 outcome = main_outcome
+                             @ if_ld_conf_found main_outcome} :: tests in
     let tests =
       (* As first, but with entries in CAML_LD_LIBRARY_PATH including quotes and
          separators. No effect on Unix, as the colon separator is always
@@ -200,33 +178,17 @@ let tests _config env =
   (* Batch 2: effects of empty (vs unset) environment variables *)
   let tests =
     let tests =
-      (* Empty CAML_LD_LIBRARY_PATH should add "." to the start of the search
-         path *)
-      let outcome_caml_ld_library_path =
-        if Sys.win32 then
-          []
-        else
-          ["."]
-      in
+      (* Empty CAML_LD_LIBRARY_PATH - should be ignored *)
       {base with description = "Empty CAML_LD_LIBRARY_PATH";
                  caml_ld_library_path = Empty;
                  stdlib = ["ld.conf"];
-                 outcome = outcome_caml_ld_library_path
-                             @ if_ld_conf_found ["ld.conf"]} :: tests in
+                 outcome = if_ld_conf_found ["ld.conf"]} :: tests in
     let tests =
-      (* Embedded empty entries in CAML_LD_LIBRARY_PATH should add equivalent
-         "." entries to the search path *)
-      let outcome_caml_ld_library_path =
-        if Sys.win32 then
-          []
-        else
-          ["."; "."]
-      in
+      (* Empty segments in CAML_LD_LIBRARY_PATH - should be ignored *)
       {base with description = "Embedded empty entry in CAML_LD_LIBRARY_PATH";
             caml_ld_library_path = Set [""; ""];
             stdlib = ["ld.conf"];
-            outcome = outcome_caml_ld_library_path
-                        @ if_ld_conf_found ["ld.conf"]} :: tests in
+            outcome = if_ld_conf_found ["ld.conf"]} :: tests in
     let tests =
       (* An empty CAMLLIB should not stop ld.conf in the Standard Library being
          processed *)
@@ -313,17 +275,8 @@ let () =
             && Sys.getenv_opt "OCAMLLIB" <> Some "")
 
 let () =
-  let print s =
-    (* Known issue: ocamlrun -config suppresses blank lines on Windows, but
-       displays them as "." on other platforms. Do a similar transformation
-       here, but suppress the lines entirely on Windows. *)
-    if s <> "" then
-      print_endline s
-    else if not Sys.win32 then
-      print_endline "."
-  in
   Dll.init_compile false;
-  List.iter print (Dll.search_path ())
+  List.iter print_endline (Dll.search_path ())
 |})
   in
   let compile_test_program mode files test_program description =
@@ -381,30 +334,12 @@ let () =
               (* This all gets a bit silly until CRLF is consistently
                  handled! *)
               let lines =
-                "" :: List.take 2 (List.tl lines)
-                  @ ["."; ".."] @ List.drop 5 lines
+                "" :: "" :: List.take 2 lines
+                  @ ["."; ".."] @ List.drop 4 lines
               in
               List.map (Fun.flip (^) "\r") lines
           | _ ->
               lines
-        in
-        let lines =
-          (* Known issue: Misc.split_path_contents ignores empty strings where
-             caml_decompose_path does not. Mitigate it by detecting the
-             environment setting and simulating the line. *)
-          if test.caml_ld_library_path = Set []
-             || test.caml_ld_library_path = Empty then
-            "." :: lines
-          else
-            lines
-        in
-        (* Known issue: Windows strips out the blank entries in the search path
-           (somewhat counterintuitively!) *)
-        let lines =
-          if not Sys.win32 then
-            lines
-          else
-            List.drop_while (String.equal ".") lines
         in
         let lines =
           (* Known issue: Dll.ld_conf_contents preserves NUL characters in lines
