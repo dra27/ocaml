@@ -111,8 +111,9 @@ let iter_on_declarations ~(f: Shape.Uid.t -> item_declaration -> unit) = {
 }
 
 let need_to_clear_env =
-  try ignore (Sys.getenv "OCAML_BINANNOT_WITHENV"); false
-  with Not_found -> true
+  match Sys.getenv_opt "OCAML_BINANNOT_WITHENV" with
+  | None | Some "" -> true
+  | Some _ -> false
 
 let keep_only_summary = Env.keep_only_summary
 
