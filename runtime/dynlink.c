@@ -129,11 +129,13 @@ CAMLexport char_os * caml_parse_ld_conf(void)
   for (p = wconfig; *p != 0; p++) {
     if (*p == '\n') {
       *p = 0;
-      caml_ext_table_add(&caml_shared_libs_path, q);
+      if (q < p)
+        caml_ext_table_add(&caml_shared_libs_path, q);
       q = p + 1;
     }
   }
-  if (q < p) caml_ext_table_add(&caml_shared_libs_path, q);
+  if (q < p)
+    caml_ext_table_add(&caml_shared_libs_path, q);
   close(ldconf);
   caml_stat_free(ldconfname);
   return wconfig;

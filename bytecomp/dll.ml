@@ -146,7 +146,9 @@ let ld_conf_contents () =
     let ic = open_in (Filename.concat Config.standard_library "ld.conf") in
     begin try
       while true do
-        path := input_line ic :: !path
+        let line = input_line ic in
+        if line <> "" then
+          path := line :: !path
       done
     with End_of_file -> ()
     end;
@@ -162,7 +164,6 @@ let ld_library_path_contents () =
   | exception Not_found ->
       []
   | s ->
-      (* NB: Misc.split_path_contents "" = [] *)
       Misc.split_path_contents s
 
 (* Initialization for separate compilation *)
