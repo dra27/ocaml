@@ -205,6 +205,10 @@ caml_stat_string caml_search_exe_in_path(const char * name)
   caml_stat_string res;
 
   caml_ext_table_init(&path, 8);
+  /* This implementation treats PATH being "Set But Null" (i.e. equal to "") as
+     begin equivalent to being set to ".", since caml_decompose_path adds an
+     empty string to the path which will then be interpreted as "." by
+     caml_search_exe_in_path. */
   tofree = caml_decompose_path(&path, getenv("PATH"));
 #ifndef __CYGWIN__
   res = caml_search_in_path(&path, name);
