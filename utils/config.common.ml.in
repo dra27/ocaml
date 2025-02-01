@@ -21,13 +21,16 @@
 let version = Sys.ocaml_version
 
 let standard_library =
-  try
-    Sys.getenv "OCAMLLIB"
-  with Not_found ->
-  try
-    Sys.getenv "CAMLLIB"
-  with Not_found ->
-    standard_library_default
+  match Sys.getenv_opt "OCAMLLIB" with
+  | None | Some "" ->
+      begin match Sys.getenv_opt "CAMLLIB" with
+      | None | Some "" ->
+          standard_library_default
+      | Some value ->
+          value
+      end
+  | Some value ->
+      value
 
 let exec_magic_number = {magic|@EXEC_MAGIC_NUMBER@|magic}
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
