@@ -25,12 +25,11 @@ let break _signum =
   then interrupted := true
   else raise Sys.Break
 
-let _ =
-  match Sys.os_type with
-    "Win32" -> ()
-  | _ ->
-      Sys.set_signal Sys.sigint (Sys.Signal_handle break);
-      Sys.set_signal Sys.sigpipe (Sys.Signal_handle(fun _ -> raise End_of_file))
+let () =
+  if not Sys.win32 then begin
+    Sys.set_signal Sys.sigint (Sys.Signal_handle break);
+    Sys.set_signal Sys.sigpipe (Sys.Signal_handle(fun _ -> raise End_of_file))
+  end
 
 let protect f =
   if !is_protected then

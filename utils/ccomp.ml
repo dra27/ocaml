@@ -51,7 +51,7 @@ let quote_files ~response_files lst =
   let s = String.concat " " quoted in
   if response_files &&
   (String.length s >= 65536
-  || (String.length s >= 4096 && Sys.os_type = "Win32"))
+  || (String.length s >= 4096 && Sys.win32))
   then build_response_file quoted
   else s
 
