@@ -2229,7 +2229,7 @@ let compile_test usr_bin_sh (config : Installation.t) env
           test_program_path
       in
       let with_unix = (Config.supports_shared_libraries || not tendered) in
-      let is_randomized = false in
+      let is_randomized = Environment.is_renamed env in
       let verbose = Environment.verbose env in
       write_test_program ~verbose ~is_randomized ~with_unix description;
       let options =
@@ -2265,6 +2265,12 @@ let compile_test usr_bin_sh (config : Installation.t) env
       in
       let args =
         "-I" :: "+compiler-libs" :: Environment.lib mode "ocamlcommon" :: args
+      in
+      let args =
+        if is_randomized then
+          "-set-runtime-default" :: "R" :: args
+        else
+          args
       in
       let args =
         if verbose then
