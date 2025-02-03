@@ -2172,7 +2172,7 @@ let compile_test env =
           test_program_path
       in
       let with_unix = (config.supports_shared_libraries || not tendered) in
-      let is_randomized = false in
+      let is_randomized = Environment.is_renamed env in
       write_test_program ~is_randomized ~with_unix description;
       let options =
         if use_shared_runtime then
@@ -2205,6 +2205,12 @@ let compile_test env =
       in
       let args =
         "-I" :: "+compiler-libs" :: library mode "ocamlcommon" :: args
+      in
+      let args =
+        if is_randomized then
+          "-set-runtime-default" :: "R" :: args
+        else
+          args
       in
       let args =
         if verbose then
