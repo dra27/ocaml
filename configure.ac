@@ -261,6 +261,7 @@ AC_SUBST([flexdll_chain])
 AC_SUBST([PACKLD])
 AC_SUBST([build_libraries_manpages])
 AC_SUBST([compute_deps])
+AC_SUBST([ocaml_prefix])
 AC_SUBST([ocaml_bindir])
 AC_SUBST([ocaml_libdir])
 AC_SUBST([TARGET_LIBDIR])
@@ -2803,9 +2804,6 @@ AC_CONFIG_COMMANDS_PRE([cclibs="$cclibs $mathlib $DLLIBS $PTHREAD_LIBS"])
 AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
   [libdir="$libdir"/ocaml])
 
-AS_IF([test x"$TARGET_LIBDIR" = x],
-  [TARGET_LIBDIR="$libdir"])
-
 AS_IF([test x"$mandir" = x'${datarootdir}/man'],
   [mandir='${prefix}/man'])
 
@@ -2815,10 +2813,29 @@ AS_IF([test x"$prefix" = "xNONE"],
     [i686-w64-mingw32*], [prefix='C:/ocamlmgw'],
     [x86_64-w64-mingw32*], [prefix='C:/ocamlmgw64'],
     [i686-pc-windows], [prefix='C:/ocamlms'],
-    [x86_64-pc-windows], [prefix='C:/ocamlms64'])],
-  [AS_CASE([$cygwin_build_env,$host],
-    [true,*-w64-mingw32*|true,*-pc-windows],
-      [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"])])
+    [x86_64-pc-windows], [prefix='C:/ocamlms64'])])
+
+# Normalise $prefix, if necessary, on Windows
+ocaml_bindir="$bindir"
+ocaml_libdir="$libdir"
+ocaml_prefix="$prefix"
+AS_CASE([$cygwin_build_env,$host],
+  [true,*-w64-mingw32*|true,*-pc-windows],
+    [prefix="$(LC_ALL=C.UTF-8 cygpath -m "$prefix")"
+    AS_IF([test "x${ocaml_prefix%%/*}" != "x$ocaml_prefix"],
+      # $prefix contained a slash - normalise it with cygpath. The rationale for
+      # this allows both `./configure --prefix $PWD/install` (which will be a
+      # Cygwin path) and also systems lazily using slashes instead of
+      # backslashes (i.e. C:/Backslashes/Scare/Us) to work.
+      [ocaml_prefix="$prefix"],
+      # $prefix was using backslashes - preserve these in the build, but
+      # continue to use slashes for the Makefile variables.
+      [AS_IF([test "x$bindir" = 'x${exec_prefix}/bin'],
+        [ocaml_bindir='${exec_prefix}\bin'],
+        [ocaml_bindir="$bindir"])
+      AS_IF([test "x$libdir" = 'x${exec_prefix}/lib/ocaml'],
+        [ocaml_libdir='${exec_prefix}\lib\ocaml'],
+        [ocaml_libdir="$libdir"])])])
 
 # Define a few macros that were defined in config/m-nt.h
 # but whose value is not guessed properly by configure
@@ -2845,12 +2862,15 @@ unset ac_cv_header_flexdll_h
 AC_CONFIG_COMMANDS_PRE([
   saved_exec_prefix="$exec_prefix"
   saved_prefix="$prefix"
-  AS_IF([test "x$prefix" = "xNONE"],[prefix="$ac_default_prefix"])
+  AS_IF([test "x$prefix" = "xNONE"],
+    [prefix="$ac_default_prefix"],
+    [prefix="$ocaml_prefix"])
   AS_IF([test "x$exec_prefix" = "xNONE"],[exec_prefix="$prefix"])
   eval "exec_prefix=\"$exec_prefix\""
-  eval "ocaml_bindir=\"$bindir\""
-  eval "ocaml_libdir=\"$libdir\""
+  eval "ocaml_bindir=\"$ocaml_bindir\""
+  eval "ocaml_libdir=\"$ocaml_libdir\""
   AS_IF([test x"$TARGET_BINDIR" = 'x'],[TARGET_BINDIR="$ocaml_bindir"])
+  AS_IF([test x"$TARGET_LIBDIR" = 'x'],[TARGET_LIBDIR="$ocaml_libdir"])
   AS_IF([test x"$target_launch_method" = 'x'],
     [target_launch_method="$launch_method"])
   prefix="$saved_prefix"
