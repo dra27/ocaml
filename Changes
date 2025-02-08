@@ -95,6 +95,11 @@ OCaml 4.09 maintenance branch
   disk usage considerably.
   (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
 
+- #13789: Harden the escaping of backslashes when generating
+  runtime/build_config.h (in particular, if the underlying implementation of sh
+  is dash, rather than bash, this now works correctly).
+  (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
+
 ### Bug fixes:
 
 - #9326, #10125: Gc.set incorrectly handles the three `custom_*` fields,
