@@ -61,6 +61,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 datarootdir = @datarootdir@
 DOCDIR=@docdir@
 
+### Where to look for the standard library on target
+TARGET_LIBDIR=@TARGET_LIBDIR@
+
 # Expanded form of MKEXE_EXP and MKDLL_EXP _with host flexlink command_
 MKEXE_EXP=@mkexe_exp@
 MKDLL_EXP=@mkdll_exp@
