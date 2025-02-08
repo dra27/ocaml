@@ -30,5 +30,8 @@ OC_DLL_LDFLAGS=@oc_dll_ldflags@
 FLEXDLL_SOURCES=@flexdir@
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 
+### Where to look for the standard library on target
+TARGET_LIBDIR=@TARGET_LIBDIR@
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
