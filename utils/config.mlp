@@ -14,7 +14,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let bindir = "%%BINDIR%%"
+let bindir = "%%OCAML_BINDIR%%"
 
 let standard_library_default = "%%LIBDIR%%"
 
