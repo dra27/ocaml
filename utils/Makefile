@@ -59,6 +59,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST_STRING,FLEXLINK_FLAGS) \
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST,HOST) \
+	    $(call SUBST_STRING,OCAML_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST,LIBUNWIND_AVAILABLE) \
 	    $(call SUBST,LIBUNWIND_LINK_FLAGS) \
