@@ -44,5 +44,8 @@ DOCUMENTATION_TOOL_CMD=@documentation_tool_cmd@
 FLEXDLL_SOURCES=@flexdir@
 BOOTSTRAPPING_FLEXDLL=@bootstrapping_flexdll@
 
+### Where to look for the standard library on target
+TARGET_LIBDIR=@TARGET_LIBDIR@
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
