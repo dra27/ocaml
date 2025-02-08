@@ -62,7 +62,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
 	    $(call SUBST_STRING,FLEXDLL_CHAIN) \
 	    $(call SUBST,HOST) \
-	    $(call SUBST_STRING,BINDIR) \
+	    $(call SUBST_STRING,OCAML_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL_EXP) \
 	    $(call SUBST_STRING,MKEXE_EXP) \
