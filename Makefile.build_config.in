@@ -52,5 +52,8 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 datarootdir = @datarootdir@
 DOCDIR=@docdir@
 
+### Where to look for the standard library on target
+TARGET_LIBDIR=@TARGET_LIBDIR@
+
 # Platform-dependent command to create symbolic links
 LN = @ln@
