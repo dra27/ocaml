@@ -17,6 +17,11 @@ OCaml 5.3 maintenance version
   disk usage considerably.
   (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
 
+- #13789: Harden the escaping of backslashes when generating
+  runtime/build_config.h (in particular, if the underlying implementation of sh
+  is dash, rather than bash, this now works correctly).
+  (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
+
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
 
