@@ -55,6 +55,11 @@ OCaml 4.13 maintenance branch
   disk usage considerably.
   (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
 
+- #13789: Harden the escaping of backslashes when generating
+  runtime/build_config.h (in particular, if the underlying implementation of sh
+  is dash, rather than bash, this now works correctly).
+  (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
+
 ### Bug fixes:
 
 - #10698, #10726, #10891: Free the alternate signal stack when the main OCaml
