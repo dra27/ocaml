@@ -78,6 +78,11 @@ OCaml 4.11 maintenance branch
   disk usage considerably.
   (David Allsopp, review by Nicolás Ojeda Bär and Gabriel Scherer)
 
+- #13789: Harden the escaping of backslashes when generating
+  runtime/build_config.h (in particular, if the underlying implementation of sh
+  is dash, rather than bash, this now works correctly).
+  (David Allsopp and Samuel Hym, review by Antonin Décimo and Gabriel Scherer)
+
 ### Bug fixes:
 
 - #10147, #10148: Fix building runtime with GCC on macOS.
