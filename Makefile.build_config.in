@@ -59,6 +59,7 @@ DOCDIR=@docdir@
 
 ### Where to look for the standard library on target
 TARGET_LIBDIR=@TARGET_LIBDIR@
+OCAML_BINDIR = @ocaml_bindir@
 
 # Platform-dependent command to create symbolic links
 LN = @ln@
