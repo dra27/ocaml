@@ -49,7 +49,7 @@ jobs:
           echo "$PREFIX/bin" >> "$GITHUB_PATH"
           set -x
           ./configure --disable-warn-error --disable-ocamldoc \
-              --disable-ocamltest --disable-stdlib-manpages \
+              --disable-ocamltest --disable-stdlib-manpages --with-relative-libdir=../lib/ocaml \
               --disable-dependency-generation --prefix="$PREFIX" || res=$?
           if ! [ "$res" = 0 ]; then cat config.log; exit "$res"; fi
           make -j
@@ -87,7 +87,7 @@ jobs:
         run: |
           set -x
           ./configure --prefix="$HOME/cross" --target=x86_64-w64-mingw32 \
-              TARGET_LIBDIR="$TESTDIR" || res=$?
+              --with-relative-libdir=../lib/ocaml TARGET_LIBDIR="$TESTDIR" || res=$?
           if ! [ "$res" = 0 ]; then cat config.log; exit "$res"; fi
           make crossopt -j$(nproc)
           make installcross
@@ -155,7 +155,7 @@ jobs:
         run: |
           set -x
           ./configure --prefix="$HOME/cross" --target=aarch64-linux-gnu \
-              || res=$?
+              --with-relative-libdir=../lib/ocaml || res=$?
           if ! [ "$res" = 0 ]; then cat config.log; exit "$res"; fi
           make crossopt -j
           make installcross
@@ -236,6 +236,7 @@ jobs:
           # So the result program should _not_ be run with cleanup on exit
           # (so no `c=1` in `OCAMLRUNPARAM`)
           ./configure --prefix="$HOME/cross" --target=$TARGET \
+              --with-relative-libdir=../lib/ocaml \
               TARGET_LIBDIR="/dummy/directory" \
               CC="$DIR/clang --target=$TARGET" \
               CPPFLAGS='-Dpthread_cancel=assert' \
