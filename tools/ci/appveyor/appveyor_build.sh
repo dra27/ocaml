@@ -60,7 +60,7 @@ function set_configuration {
   CACHE_FILE_PREFIX="$CACHE_DIRECTORY/config.cache-$1"
   CACHE_FILE="$CACHE_FILE_PREFIX-$CACHE_KEY"
 
-  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2" '--enable-ocamltest')
+  args=('--cache-file' "$CACHE_FILE" '--prefix' "$2")
 
   case "$1" in
     mingw32)
