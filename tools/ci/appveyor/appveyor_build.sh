@@ -27,22 +27,22 @@ else
 fi
 
 function run {
-    if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
-    NAME=$1
-    shift
-    echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
-    CODE=$?
-    if [[ $CODE -ne 0 ]] ; then
-        echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-        if [[ $BUILD_PID -ne 0 ]] ; then
-          kill -KILL $BUILD_PID 2>/dev/null
-          wait $BUILD_PID 2>/dev/null
-        fi
-        exit $CODE
-    else
-        echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ $1 = "--show" ]] ; then SHOW_CMD='true'; shift; else SHOW_CMD=''; fi
+  NAME=$1
+  shift
+  echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  if [[ -n $SHOW_CMD ]]; then (set -x; "$@"); else "$@"; fi
+  CODE=$?
+  if [[ $CODE -ne 0 ]] ; then
+    echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    if [[ $BUILD_PID -ne 0 ]] ; then
+      kill -KILL $BUILD_PID 2>/dev/null
+      wait $BUILD_PID 2>/dev/null
     fi
+    exit $CODE
+  else
+    echo "-=-=- End of $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  fi
 }
 
 # Function: set_configuration
@@ -51,32 +51,32 @@ function run {
 # $2: the prefix to use to install
 # $3: C compiler flags to use to turn warnings into errors
 function set_configuration {
-    case "$1" in
-        mingw)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-w64-mingw32'
-        ;;
-        msvc)
-            build='--build=i686-pc-cygwin'
-            host='--host=i686-pc-windows'
-        ;;
-        msvc64)
-            build='--build=x86_64-pc-cygwin'
-            host='--host=x86_64-pc-windows'
-        ;;
-    esac
+  case "$1" in
+    mingw)
+      build='--build=i686-pc-cygwin'
+      host='--host=i686-w64-mingw32'
+      ;;
+    msvc)
+      build='--build=i686-pc-cygwin'
+      host='--host=i686-pc-windows'
+      ;;
+    msvc64)
+      build='--build=x86_64-pc-cygwin'
+      host='--host=x86_64-pc-windows'
+      ;;
+  esac
 
-    mkdir -p "$CACHE_DIRECTORY"
+  mkdir -p "$CACHE_DIRECTORY"
+  ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
+              $build $host --prefix="$2" --enable-ocamltest || ( \
+    rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
     ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $build $host --prefix="$2" --enable-ocamltest || ( \
-      rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-      ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                  $build $host --prefix="$2" --enable-ocamltest )
+                $build $host --prefix="$2" --enable-ocamltest )
 
-    FILE=$(pwd | cygpath -f - -m)/Makefile.config
-    echo "Edit $FILE to turn C compiler warnings into errors"
-    sed -i -e '/^ *OC_CFLAGS *=/s/\r\?$/ '"$3"'\0/' "$FILE"
-#    run "Content of $FILE" cat Makefile.config
+  FILE=$(pwd | cygpath -f - -m)/Makefile.config
+  echo "Edit $FILE to turn C compiler warnings into errors"
+  sed -i -e '/^ *OC_CFLAGS *=/s/\r\?$/ '"$3"'\0/' "$FILE"
+#  run "Content of $FILE" cat Makefile.config
 }
 
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
