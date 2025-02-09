@@ -48,27 +48,24 @@ function run {
 # $2: the prefix to use to install
 # $3: C compiler flags to use to turn warnings into errors
 function set_configuration {
+  args=('--cache-file' "$CACHE_DIRECTORY/config.cache-$1" \
+        '--prefix' "$2")
+
   case "$1" in
     mingw)
-      build='--build=i686-pc-cygwin'
-      host='--host=i686-w64-mingw32'
-      ;;
+      args+=('--host=i686-w64-mingw32');;
     msvc)
-      build='--build=i686-pc-cygwin'
-      host='--host=i686-pc-windows'
-      ;;
+      args+=('--host=i686-pc-windows');;
     msvc64)
-      build='--build=x86_64-pc-cygwin'
-      host='--host=x86_64-pc-windows'
-      ;;
+      args+=('--host=x86_64-pc-windows');;
   esac
 
   mkdir -p "$CACHE_DIRECTORY"
-  ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-              $build $host --prefix="$2" || ( \
-    rm -f "$CACHE_DIRECTORY/config.cache-$1" ; \
-    ./configure --cache-file="$CACHE_DIRECTORY/config.cache-$1" \
-                $build $host --prefix="$2" )
+  echo './configure' "${args[@]@Q}"
+  if ! ./configure "${args[@]}"; then
+    rm -f "$CACHE_DIRECTORY/config.cache-$1"
+    ./configure "${args[@]}"
+  fi
 
   FILE=$(pwd | cygpath -f - -m)/Makefile.config
   echo "Edit $FILE to turn C compiler warnings into errors"
