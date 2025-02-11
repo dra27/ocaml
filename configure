@@ -23549,7 +23549,7 @@ else $as_nop
   ./*|.\\*) :
     libdir="$bindir${bindir_to_libdir#.}" ;; #(
   ../*|..\\*) :
-    libdir="$bindir$default_separator$bindir_to_libdir" ;; #(
+    libdir="$bindir/$bindir_to_libdir" ;; #(
   *) :
     as_fn_error $? "--with-relative-libdir requires a relative path" "$LINENO" 5 ;;
 esac
