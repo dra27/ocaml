@@ -2665,7 +2665,7 @@ AS_IF([test x"$libdir" = x'${exec_prefix}/lib'],
     [libdir="$libdir"/ocaml],
     [AS_CASE([$bindir_to_libdir],
       [./*|.\\*],[libdir="$bindir${bindir_to_libdir[#].}"],
-      [../*|..\\*],[libdir="$bindir$default_separator$bindir_to_libdir"],
+      [../*|..\\*],[libdir="$bindir/$bindir_to_libdir"],
       [AC_MSG_ERROR([--with-relative-libdir requires a relative path])])])],
   [AS_IF([test x"$bindir_to_libdir" != 'x'],
     [AC_MSG_ERROR(m4_normalize([--with-relative-libdir and --libdir cannot both
