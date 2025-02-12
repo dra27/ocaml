@@ -2418,8 +2418,12 @@ let test_relocation prefix bindir libdir =
            && basename <> "ocaml"
            && (basename <> "ocamlrund" || clang_cl) then
         prefix
-      else
+      else if config.has_relative_libdir = None
+              || (Config.system = "macosx" || not Config.c_has_debug_prefix_map)
+                   && basename <> "ocaml" then
         LocationSet.add Build prefix
+      else
+        prefix
   in
   let libdir_files_with_prefix =
     let (/) = Filename.concat in
@@ -2455,20 +2459,29 @@ let test_relocation prefix bindir libdir =
       let files = ["Makefile.config"] in
       StringSet.of_list (List.map (Filename.concat libdir) files) in
   let libdir_exts_with_build =
-    let exts = [".cmo"; ".cma"] in
     let exts =
-      if (not Sys.win32 && Config.system <> "macosx")
+      if config.has_relative_libdir <> None then
+        []
+      else
+        [".cmo"; ".cma"] in
+    let exts =
+      if (not Sys.win32 && Config.system <> "macosx"
+          && (not Config.c_has_debug_prefix_map
+              || config.has_relative_libdir = None))
          || Config.ccomp_type = "msvc" then
         Config.ext_obj :: exts
       else
         exts in
     let exts =
-      if Config.ccomp_type = "msvc" then
+      if Config.ccomp_type = "msvc"
+         || (config.has_relative_libdir <> None
+               && Config.system <> "macosx") then
         exts
       else
         Config.ext_dll :: ".cmxs" :: exts in
     let exts =
-      if Config.compression_c_libraries = "" then
+      if config.has_relative_libdir = None
+         && Config.compression_c_libraries = "" then
         ".cmti" :: ".cmt" :: exts
       else
         exts in
@@ -2484,6 +2497,9 @@ let test_relocation prefix bindir libdir =
       let build =
         if StringSet.mem ext libdir_exts_with_build then
           LocationSet.singleton Build
+        else if config.has_relative_libdir <> None
+                  && Config.c_has_debug_prefix_map then
+          LocationSet.empty
         else if ext = Config.ext_lib then
           if clang_cl then
             if String.starts_with ~prefix:"libasmrun" (Filename.basename file)
