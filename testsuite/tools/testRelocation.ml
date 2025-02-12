@@ -27,21 +27,27 @@ module LocationMap = Map.Make(Location)
 (* Augment toolchain properties with information from the configuration (this
    essentially goes from "is foo capable of doing bar" to "foo does bar in this
    context". *)
-let effective_toolchain _config =
+let effective_toolchain config =
   let c_compiler_debug_paths_are_absolute =
     Toolchain.c_compiler_debug_paths_can_be_absolute
+    && (not Config.c_has_debug_prefix_map || config.has_relative_libdir = None)
   in
   let assembler_embeds_build_path =
     Toolchain.assembler_embeds_build_path
+    && (not Config.as_has_debug_prefix_map
+        || Config.architecture = "riscv"
+        || Config.as_is_cc
+        || config.has_relative_libdir = None)
   in
   c_compiler_debug_paths_are_absolute, assembler_embeds_build_path
 
-(* The reproducible ruleset is the simplest: nothing is allowed to contain the
-   build path and only Makefile.config may contain the installation prefix or
-   use the relative prefix. *)
+(* The reproducible ruleset is the simplest: only Makefile.config may contain
+   the installation prefix or use the relative prefix. Since OC_FLAGS wasn't
+   moved to Makefile.build_config.in until #12108 in OCaml 5.1.0,
+   Makefile.config also ends up containing the build path. *)
 let reproducible_rules file =
   if Filename.basename file = "Makefile.config" then
-    LocationSet.of_list [Relative; Prefix]
+    LocationSet.of_list [Build; Relative; Prefix]
   else
     LocationSet.empty
 
@@ -129,12 +135,9 @@ let bindir_rules config file =
               && (c_compiler_debug_paths_are_absolute
                   || assembler_embeds_build_path))
       | `Bytecode_ocaml ->
-          (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
-             the debugging information in ocamlc.byte and ocamlopt.byte is
-             stripped. However, since the C objects in libcamlrun are compiled
-             with -g, this will still result in debug information for -custom
-             runtime executables. *)
-          linked_with_debug
+          (* All bytecode executables are compiled with -g which in particular
+             means that -custom executables will always embed the build path. *)
+          linked_with_debug && config.has_relative_libdir = None
           || (classification = Custom
               && Toolchain.linker_propagates_debug_information
               && c_compiler_debug_paths_are_absolute)
@@ -244,8 +247,13 @@ let libdir_rules config file =
          && (not Toolchain.linker_propagates_debug_information
              || Toolchain.linker_embeds_build_path) then
         Toolchain.linker_embeds_build_path
+      else if basename = "Makefile.config" then
+        (* When the compiler is configured with a relative libdir, the build
+           directory will also appear since OC_FLAGS wasn't moved to
+           Makefile.build_config.in until #12108 in OCaml 5.1.0 *)
+        config.has_relative_libdir <> None
       else
-        has_ocaml_debug_info
+        has_ocaml_debug_info && config.has_relative_libdir = None
         || has_c_debug_info && c_compiler_debug_paths_are_absolute
         || contains_assembled_objects && assembler_embeds_build_path
         || ext = Config.ext_obj
@@ -266,6 +274,20 @@ let libdir_rules config file =
     in
     if contains_build_path then
       LocationMap.add Build false prefix
+    (* Prior to #13828 (OCaml 5.4.0), .cmt and .cmti embed the absolute location
+       of the compiler without using BUILD_PATH_PREFIX_MAP. However, this
+       embedding is not entirely predictable, because it only happens when
+       ocamlc.opt or ocamlopt.opt is used for compilation, rather than when the
+       bytecode version of the tool is passed is explicitly to ocamlrun (in this
+       case, Sys.argv.(0) always retains the relative path used in the build
+       system). For this reason, when configured relatively, on Windows, with
+       native compilation available, accept that the Build directory may appear
+       in .cmt/.cmti files. *)
+    else if config.has_relative_libdir <> None
+            && Sys.win32
+            && config.has_ocamlopt
+            && (ext = ".cmt" || ext = ".cmti") then
+      LocationMap.add Build true prefix
     else
       prefix
 
