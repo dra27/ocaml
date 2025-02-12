@@ -60,6 +60,9 @@ profinfo_width=0
 extralibs=
 bootstrapping_flexdll=false
 target_libdir_is_relative=false
+srcdir_abs=''
+srcdir_abs_real=''
+build_map_flags=''
 
 # Information about the package
 
@@ -182,6 +185,9 @@ AC_SUBST([TARGET_LIBDIR])
 AC_SUBST([QS])
 AC_SUBST([target_bindir])
 AC_SUBST([target_libdir_is_relative])
+AC_SUBST([srcdir_abs])
+AC_SUBST([srcdir_abs_real])
+AC_SUBST([build_map_flags])
 
 ## Generated files
 
@@ -532,8 +538,8 @@ AS_CASE([$host],
 # See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
 # for the detailed explanation.
 
-ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-ocamlsrcdir=${ocamlsrcdir%X}
+srcdir_abs=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+srcdir_abs=${srcdir_abs%X}
 
 # Libraries to build depending on the host
 
@@ -542,12 +548,13 @@ AS_CASE([$cygwin_build_env,$host],
     [unix_or_win32="win32"
     OCAML_CHECK_LN_ON_WINDOWS
     default_separator='\'
-    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$srcdir_abs")"
     unixlib="win32unix"
     graphlib="win32graph"
     cc_profile=''],
   [unix_or_win32="unix"
   ln='ln -sf'
+  ocamlsrcdir="$srcdir_abs"
   default_separator='/'
   unixlib="unix"
   graphlib="graph"
@@ -1654,6 +1661,20 @@ AS_CASE([$CC,$host],
   [*,*-pc-windows], [cc_has_debug_prefix_map=false],
   [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
   [OCAML_CC_HAS_DEBUG_PREFIX_MAP])
+
+## -ffile-prefix-map support by the C compiler - used in the build, not by
+## the compiler
+AS_IF([test x"$bindir_to_libdir" != 'x'],
+  [srcdir_abs_real="$(realpath "$srcdir_abs" 2>/dev/null)"
+  AS_IF([test x"$srcdir_abs_real" = "x$srcdir_abs"],
+    [srcdir_abs_real=''])
+  AX_CHECK_COMPILE_FLAG([-Wa,--debug-prefix-map=old=new],
+    [build_map_flags='-Wa,--debug-prefix-map='], [], [$warn_error_flag])
+  AX_CHECK_COMPILE_FLAG([-ffile-prefix-map=old=new],
+    [build_map_flags="$build_map_flags -ffile-prefix-map="],
+    [AS_IF([$cc_has_debug_prefix_map],
+      [build_map_flags="$build_map_flags -fdebug-prefix-map="])],
+    [$warn_error_flag])])
 
 ## Does stat support nanosecond precision
 
