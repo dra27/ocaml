@@ -175,6 +175,15 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
+  # ocamldebug is linked with -g which will result in a -custom executable when
+  # shared libraries are not available. Ensure that the primitives object is
+  # compiled with the correct flags
+$(OCAMLDOC): LINKFLAGS += $(addprefix -ccopt$(SPACE), $(OC_MAP_CFLAGS))
+endif
+endif
+
 $(OCAMLDOC): $(EXECMOFILES)
 	$(OCAMLC) -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $^
 
