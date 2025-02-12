@@ -2589,7 +2589,8 @@ let test_relocation env prefix bindir libdir =
            || classification <> Vanilla
            || classification = Vanilla
               && String.ends_with ~suffix:"bsd" Config.system
-           || String.starts_with ~prefix:"ocamlrun" basename
+           || List.exists (String.starts_with ~prefix:"ocamlrun")
+                          (String.split_on_char '-' basename)
            || basename = "ocamlyacc" then
           prefix
         else
