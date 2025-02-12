@@ -12,6 +12,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Full path to testsuite/in_prefix in the build tree (i.e. where the harness is
+   executed from and where it places files.) *)
+let test_root = Sys.getcwd ()
+
 (* Compiler configuration, determined from the command line *)
 type config = {
   supports_shared_libraries: bool;
@@ -77,14 +81,40 @@ let split_to_common_prefix first second =
      and the binaries the compiler produces are relocatable. At present, no
      compiler is either relocatable or can produce relocatable binaries *)
 let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
-    config, relocatable, target_relocatable, verbose =
+    config, relocatable, target_relocatable, test_root, test_root_logical,
+    verbose =
   let show_summary = ref false in
   let verbose = ref false in
+  let test_root = ref test_root in
+  let test_root_logical = ref None in
   let bindir = ref "" in
   let libdir = ref "" in
   let config =
     ref {supports_shared_libraries = false;
          has_ocamlnat = false; has_ocamlopt = false; libraries = []}
+  in
+  let process_pwd dir =
+    (* The build directory may contain symlinks, and if this is so then the
+       reproducibility test must search for both the logical (symlinks not
+       resolved) and physical forms. This is particularly relevant on FreeBSD,
+       where /home is a symlink to /usr/home and matters because OCaml's
+       debugging information writes the physical directory where GCC/clang
+       writes the logical directory. The logical version of the current working
+       directory would normally just be [Sys.getenv "PWD"] but that can't be
+       relied on coming from GNU make, because the invocation of the harness is
+       passed through [sh -c] which correctly resets PWD to getcwd() (which is
+       the physical version). The logical cwd is therefore passed using the
+       --pwd argument from the Makefile. *)
+    if Sys.win32 then
+      (* --pwd is ignored on Windows, since Sys.getcwd is automatically the
+         logical CWD. *)
+      let test_root_physical = Unix.realpath !test_root in
+      if test_root_physical <> !test_root then begin
+        test_root_logical := Some !test_root;
+        test_root := test_root_physical
+      end else ()
+    else if dir <> !test_root then
+      test_root_logical := Some dir
   in
   let check_exists r dir =
     if Sys.file_exists dir then
@@ -104,6 +134,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
   let args = Arg.align [
+    "--pwd", Arg.String process_pwd, "\
+<pwd>\tCurrent working directory to use";
     "--bindir", Arg.String (check_exists bindir), "\
 <bindir>\tDirectory containing programs (must share a prefix with --libdir)";
     "--libdir", Arg.String (check_exists libdir), "\
@@ -215,10 +247,13 @@ directories given for --bindir and --libdir do not have a common prefix"
       exit 0;
     Format.printf
       "@{<loc>Test Environment@}\n\
+      \  @{<hint>target@} = %s\n\
+      \  @{<hint>cc@}     = %s\n\
       \  @{<hint>prefix@} = %s\n\
       \  @{<hint>bindir@} = [$prefix/]%s\n\
       \  @{<hint>libdir@} = [$prefix/]%s\n\
-       Compiler is " prefix bindir_suffix libdir_suffix;
+       Compiler is "
+         Config.target Config.c_compiler prefix bindir_suffix libdir_suffix;
     if relocatable then
       Format.printf "@{<hint>relocatable@}; binaries produced are "
     else
@@ -231,7 +266,8 @@ directories given for --bindir and --libdir do not have a common prefix"
                   (float_of_int header_size /. 1024.0) header_size;
     Format.printf "Testing %s\n%!" summary;
     bindir, libdir, prefix, bindir_suffix, libdir_suffix,
-    config, relocatable, target_relocatable, !verbose
+    config, relocatable, target_relocatable, !test_root, !test_root_logical,
+    !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
@@ -301,10 +337,6 @@ module String = struct
       loop 0
 end
 
-(* Full path to testsuite/in_prefix in the build tree (i.e. where the harness is
-   executed from and where it places files.) *)
-let test_root = Sys.getcwd ()
-
 let display_path f path =
   match String.remove_prefix ~prefix path with
   | Some remainder ->
@@ -370,7 +402,7 @@ type executable =
 | Custom
 | Vanilla
 
-let classify_executable file : executable =
+let classify_executable file =
   try
     In_channel.with_open_bin file (fun ic ->
       let start = really_input_string ic 2 in
@@ -435,6 +467,8 @@ type env_augmentation =
            ocamllib: string option;
            camllib: string option}
 
+module StringSet = Set.Make(String)
+
 (* All process invocation is done via [Environment.run_process] and
    [Environment.run_process_target] which in particular abstracts and manages
    the environment ultimately passed to [Unix.create_process_env]. *)
@@ -496,8 +530,6 @@ end = struct
     augmentations: (string * string) list;
     testing: bool;
   }
-
-  module StringSet = Set.Make(String)
 
   (* List of environment variables to remove from the calling environment *)
   let scrub =
@@ -1818,7 +1850,7 @@ type runtime_mode = Shared | Static
 type linkage =
 | Default_ocamlc
 | Default_ocamlopt
-| Custom of runtime_mode
+| Custom_runtime of runtime_mode
 | Output_obj of compiler * runtime_mode
 | Output_complete_obj of compiler * runtime_mode
 | Output_complete_exe of runtime_mode
@@ -1917,9 +1949,9 @@ let compile_test ~original env bindir =
           f []
       | Default_ocamlopt ->
           f ~needs_ocamlopt:true []
-      | Custom Static ->
+      | Custom_runtime Static ->
           f ~calls_linker:true ["-custom"]
-      | Custom Shared ->
+      | Custom_runtime Shared ->
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let compilation_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
@@ -2283,9 +2315,9 @@ let test_standard_library_location ~original env bindir =
   let tests = [
     compile_test Default_ocamlc
       "byt_default" "with tender";
-    compile_test (Custom Static)
+    compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
-    compile_test (Custom Shared)
+    compile_test (Custom_runtime Shared)
       "custom_shared" "-custom shared runtime";
     compile_test (Output_obj(C_ocamlc, Static))
       "byt_obj_static" "-output-obj static runtime";
@@ -2324,6 +2356,593 @@ let test_standard_library_location ~original env bindir =
   Printf.printf "Running programs\n%!";
   List.filter_map (fun f -> f ?runtime env ~arg:true) programs
 
+let utf_16le_of_utf_8 s =
+  let s = Misc.Stdlib.String.to_utf_8_seq s in
+  let utf_16le_length =
+    Seq.fold_left (fun acc u -> acc + Uchar.utf_16_byte_length u) 0 s in
+  let b = Bytes.create utf_16le_length in
+  ignore (Seq.fold_left (fun i u -> i + Bytes.set_utf_16le_uchar b i u) 0 s);
+  Bytes.unsafe_to_string b
+
+let rec matches_at file search i j =
+  let c1 = Bigarray.Array1.unsafe_get file i in
+  let c2 = String.unsafe_get search j in
+  (c1 = c2 || Sys.win32 && c1 = '\\' && c2 = '/')
+    && (j = 0 || matches_at file search (i - 1) (j - 1))
+
+let matches_at file file_len i s =
+  let s_len = String.length s in
+  if i + s_len > file_len then
+    false
+  else
+    matches_at file s (i + s_len - 1) (s_len - 1)
+
+type location = Build | Prefix
+type finding =
+| Build_dir of cwd * encoding
+| Prefix_dir of encoding
+and encoding = UTF_8 | UTF_16
+and cwd = Physical | Logical
+
+module LocationSet = Set.Make(struct
+  type t = location
+  let compare = Stdlib.compare
+end)
+
+let rec contains file file_len tests i seen =
+  if i = file_len then
+    seen
+  else
+    let c = Bigarray.Array1.unsafe_get file i in
+    let seen, i =
+      if c = '/' || Sys.win32 && c = '\\' then
+        let check_for acc (t, s) =
+          if matches_at file file_len i s then
+            (t, s)::acc
+          else
+            acc in
+        let seen_here = List.fold_left check_for [] tests in
+        let seen_here =
+          let compare (_, l) (_, r) =
+            -Int.compare (String.length l) (String.length r) in
+          List.sort compare seen_here in
+        match seen_here with
+        | (t, s)::_ ->
+            t :: seen, i + String.length s
+        | [] ->
+            seen, i
+      else
+        seen, i in
+    contains file file_len tests (i + 1) seen
+
+let read_content file ic =
+  let len = in_channel_length ic in
+  let content = Bigarray.Array1.create Bigarray.Char Bigarray.c_layout len in
+  if In_channel.really_input_bigarray ic content 0 len = None then
+    fail_because "Error reading %s" file;
+  content, len
+
+let output_compunit ic oc (compunit : Cmo_format.compilation_unit) =
+  seek_in ic compunit.cu_pos;
+  Misc.copy_file_chunk ic oc compunit.cu_codesize;
+  if compunit.cu_debug > 0 then begin
+    seek_in ic compunit.cu_debug;
+    output_value oc (Compression.input_value ic);
+    output_value oc (Compression.input_value ic);
+  end;
+  output_value oc compunit
+
+let with_decompressed_ocaml_artefact ic file f =
+  let magic = Cmt_format.read_magic_number ic in
+  let temp_file, oc =
+    Filename.open_temp_file ~mode:[Open_binary] "ocaml-artefact-" ".tmp" in
+  let () =
+    if magic = Config.cmi_magic_number || magic = Config.cmt_magic_number then
+      output_value oc (Cmt_format.read file)
+    else if magic = Config.cmo_magic_number then begin
+      seek_in ic (input_binary_int ic);
+      let compunit = (input_value ic : Cmo_format.compilation_unit) in
+      output_compunit ic oc compunit
+    end else if magic = Config.cma_magic_number then begin
+      seek_in ic (input_binary_int ic);
+      let toc = (input_value ic : Cmo_format.library) in
+      List.iter (output_compunit ic oc) toc.lib_units;
+      output_value oc toc
+    end else
+      fail_because "Unexpected magic number %S in %s" magic file in
+  close_out oc;
+  let result = In_channel.with_open_bin temp_file (f temp_file) in
+  Sys.remove temp_file;
+  result
+
+let read_file env file =
+  In_channel.with_open_bin file @@ fun ic ->
+    match Filename.extension file with
+    | ".cma" | ".cmi" | ".cmo" | ".cmti" | ".cmt" ->
+        with_decompressed_ocaml_artefact ic file read_content
+    | ext when (ext = Config.ext_lib || ext = Config.ext_obj)
+               && Sys.os_type = "Unix" && Config.system <> "macosx" ->
+        let exit, lines =
+          Environment.run_process Return "readelf" ["-tS"; file] env in
+        let contains_compressed l =
+          if l = "" || l.[0] <> ' ' then
+            false
+          else
+            let test = String.starts_with ~prefix:"COMPRESSED" in
+            let l = String.split_on_char ' ' l in
+            List.exists test l in
+        if exit <> 0 then
+          fail_because "readelf failed"
+        else if List.exists contains_compressed lines then
+          let temp_file = Filename.temp_file "ocaml-artefact-" ".tmp" in
+          let exit, _ =
+            let args = ["--decompress-debug-sections"; file; temp_file] in
+            Environment.run_process Return "objcopy" args env
+          in
+          if exit = 0 then
+            let result =
+              In_channel.with_open_bin temp_file (read_content temp_file) in
+            Sys.remove temp_file;
+            result
+          else begin
+            Sys.remove temp_file;
+            fail_because "objcopy failed"
+          end
+        else
+          read_content file ic
+    | _ ->
+        read_content file ic
+
+module StringMap = Map.Make(String)
+
+let test_relocation env prefix bindir libdir =
+  let grandparent dir = Filename.dirname (Filename.dirname dir) in
+  let build_root = grandparent test_root in
+  let build_root_logical = Option.map grandparent test_root_logical in
+  let build_root, build_root_logical, prefix =
+    if Sys.win32 then
+      let normalise s =
+        let s =
+          if String.length s > 2
+             && Char.Ascii.is_letter s.[0] && s.[1] = ':' then
+            String.sub s 2 (String.length s - 2)
+          else
+            s in
+        String.map (function '\\' -> '/' | c -> c) s in
+      let build_root_logical =
+        let f dir = normalise (Filename.dirname (Filename.dirname dir)) in
+        Option.map f test_root_logical
+      in
+      normalise build_root, Option.map normalise build_root_logical,
+      normalise prefix
+    else
+      build_root, build_root_logical, prefix in
+  Printf.printf "\nChecking installed files for\n\
+                  \  Installation Prefix: %s\n" prefix;
+  begin match build_root_logical with
+  | Some build_root_logical ->
+      Printf.printf "  Build Root (physical): %s\n\
+                    \  Build Root (logical): %s\n%!"
+                    build_root build_root_logical
+  | None ->
+      Printf.printf "  Build Root: %s\n%!" build_root
+  end;
+  let tests =
+    Option.value ~default:[]
+      (Option.map (fun build_root_logical ->
+        [Build_dir(Logical, UTF_8), build_root_logical;
+         Build_dir(Logical, UTF_16), utf_16le_of_utf_8 build_root_logical])
+        build_root_logical)
+  in
+  let tests =
+    (Prefix_dir UTF_8, prefix) ::
+    (Prefix_dir UTF_16, utf_16le_of_utf_8 prefix) ::
+    (Build_dir(Physical, UTF_8), build_root) ::
+    (Build_dir(Physical, UTF_16), utf_16le_of_utf_8 build_root) :: tests
+  in
+  let in_unexpected_state file file_rel rules =
+    let content, content_len = read_file env file in
+    let seen = contains content content_len tests 0 [] in
+    let string_of_encoding () =
+      function UTF_8 -> "UTF-8" | UTF_16 -> "UTF-16" in
+    let string_of_cwd () =
+      function Physical -> "Physical" | Logical -> "Logical" in
+    let string_of_build_dir =
+      if test_root_logical = None then
+        fun () (_, encoding) ->
+          Printf.sprintf "in %a" string_of_encoding encoding
+      else
+        fun () (cwd, encoding) ->
+          Printf.sprintf
+            "%a; in %a" string_of_cwd cwd string_of_encoding encoding
+    in
+    let some_string fmt = Printf.ksprintf Option.some fmt in
+    let gather seen = function
+    | Build_dir(kind, enc) ->
+        if LocationSet.mem Build seen then
+          seen, None
+        else
+          LocationSet.add Build seen,
+          some_string "Build directory (%a)" string_of_build_dir (kind, enc)
+    | Prefix_dir enc ->
+        if LocationSet.mem Prefix seen then
+          seen, None
+        else
+          LocationSet.add Prefix seen,
+          some_string "Installation prefix (%a)" string_of_encoding enc
+    in
+    let seen, hits = List.fold_left_map gather LocationSet.empty seen in
+    let expected = rules file in
+    if LocationSet.equal seen expected then
+      false, seen
+    else
+      let string_of_location = function
+      | Build -> "Build directory"
+      | Prefix -> "Installation prefix" in
+          let hits = List.filter_map Fun.id hits in
+          let msg =
+            if hits = [] then
+              "is relocatable"
+            else
+              "contains the " ^ String.concat " & " hits in
+          let expected =
+            let expected = LocationSet.elements expected in
+            if expected = [] then
+              "be relocatable"
+            else
+              let expected = List.map string_of_location expected in
+              "contain the " ^ String.concat " & " expected in
+          Printf.eprintf "%s: expected to %s, but it %s\n"
+                         file_rel expected msg;
+          true, seen
+  in
+  let rec scan dir rel h rules ((~failed, ~results) as acc) =
+    match Unix.readdir h with
+    | entry ->
+        let acc =
+          if entry <> Filename.current_dir_name
+             && entry <> Filename.parent_dir_name then
+            let entry_rel = Filename.concat rel entry in
+            let entry = Filename.concat dir entry in
+            match Unix.lstat entry with
+            | {Unix.st_kind = S_DIR; _} ->
+                scan entry entry_rel (Unix.opendir entry) rules acc
+            | {Unix.st_kind = S_REG; _} ->
+                let incorrect, state =
+                  in_unexpected_state entry entry_rel rules in
+                  ~failed:(failed || incorrect),
+                  ~results:((entry_rel, state)::results)
+            | _ ->
+                acc
+          else
+            acc in
+        scan dir rel h rules acc
+    | exception End_of_file ->
+        Unix.closedir h;
+        acc in
+  let is_clang =
+    List.mem "clang" (String.split_on_char '-' Config.c_compiler_vendor) in
+  let is_clang_assembler =
+    (* The clang-cl build of the MSVC port still has to MASM at present *)
+    is_clang && Config.ccomp_type <> "msvc" in
+  (* Determine two properties of the way programs are linked w.r.t. debug
+     information: does debug information use absolute paths, and is (some) debug
+     information in .o files always transferred to the resulting executable,
+     even if it is not linked with -g. These are properties of the platform, so
+     there should be no file-specific references in these definitions. *)
+  let (~absolute_paths:c_compiler_debug_paths_are_absolute,
+       ~implicit_debug_info:linker_propagates_debug_information,
+       ~embeds:c_compiler_always_embeds_build_path) =
+    if Config.ccomp_type = "msvc" then
+      (* The MSVC port calls the linker directly, and debugging information is
+         not propagated. At present, building with clang-cl also uses the
+         Microsoft Linker. clang-cl, however, embeds relative paths in objects
+         (for reasons which are not entirely clear) *)
+      (~absolute_paths:(not is_clang),
+       ~implicit_debug_info:false,
+       ~embeds:true)
+    else
+      (~absolute_paths:true,
+       ~implicit_debug_info:true,
+       ~embeds:false)
+  in
+  let assembler_embeds_build_path =
+    not (String.starts_with ~prefix:"mingw" Config.system)
+    && not is_clang_assembler
+  in
+  let linker_embeds_build_path =
+    Config.system = "macosx"
+  in
+  let bindir_rules file =
+    let basename = Filename.basename file in
+    if Filename.extension basename = ".manifest" then
+      (* Executable manifests installed as part of flexlink for the MSVC port *)
+      LocationSet.empty
+    else
+      (* Analysis on filenames doesn't need to care about .exe *)
+      let basename =
+        Filename.chop_suffix_opt ~suffix:".exe" basename
+        |> Option.value ~default:basename in
+      let classification = classify_executable file in
+      (* Determine if the installation prefix should be found in this file *)
+      let prefix =
+        let embeds_stdlib_location =
+          (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
+             except flexlink and ocamllex link with the Config module, either
+             directly or via ocamlcommon *)
+          not (List.mem basename ["flexlink.byte"; "flexlink.opt";
+                                  "ocamllex.byte"; "ocamllex.opt";
+                                  "ocamlyacc"])
+        in
+        if embeds_stdlib_location (* OCaml code contains stdlib location *)
+           || classification = Shebang (* #! line begins with prefix *)
+           || classification = Custom (* libcamlrun* contain stdlib location *)
+           || (classification = Tendered (* RNTM section contains the prefix *)
+               && not launcher_searches_for_ocamlrun) then
+          LocationSet.singleton Prefix
+        else
+          LocationSet.empty
+      in
+      (* Determining if the build path will be found consists of two strictly
+         separated portions: the properties we expect from the file itself and
+         then how they are applied by the platform itself.
+         First, determine if the program was compiled by ocamlopt, ocamlc or is
+         a pure C program and, additionally, whether it was linked with -g.
+         These are properties of the programs themselves, so there should be no
+         platform-specific references in these definitions. *)
+      let program_kind, linked_with_debug =
+        (* As it happens, all ocamlopt-produced executables end with .opt or are
+           ocamlnat. Other mechanisms (in particular looking for the
+           caml_start_program symbol) are available, but are a bit more complex
+           to make portable, and we don't need them at the moment, since
+           -output-obj, -output-complete-obj or -output-complete-exe are not
+           used by the compiler distribution. *)
+        if String.ends_with ~suffix:".opt" basename
+           || basename = "ocamlnat" then
+          (* All native executable are linked with -g apart from flexlink.opt *)
+          `Native_ocaml, (basename <> "flexlink.opt")
+        else if classification <> Vanilla then
+          (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
+             the debugging information in ocamlc.byte and ocamlopt.byte is
+             stripped. *)
+          `Bytecode_ocaml, (basename = "ocaml")
+        else
+          (* Bytecode runtimes and ocamlyacc of which only ocamlrund is linked
+             with -g *)
+          `Other, (basename = "ocamlrund")
+      in
+      (* Combine this with the properties of the platform to determine whether
+         the executable will contain the build path. *)
+      let contains_build_path =
+        match program_kind with
+        | `Native_ocaml ->
+            (* If the linker propagates debugging information, it doesn't matter
+               whether -g was passed to ocamlopt, because the build path will be
+               embedded via libasmrun *)
+            linker_embeds_build_path
+            || (c_compiler_debug_paths_are_absolute
+                && linker_propagates_debug_information)
+        | `Bytecode_ocaml ->
+            (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
+               the debugging information in ocamlc.byte and ocamlopt.byte is
+               stripped. However, since the C objects in libcamlrun are compiled
+               with -g, this will still result in debug information for -custom
+               runtime executables. *)
+            linked_with_debug
+            || (classification = Custom
+                && linker_propagates_debug_information
+                && c_compiler_debug_paths_are_absolute)
+        | `Other ->
+            (* Only ocamlrund is linked with -g. However, since the C objects
+               which make up the executables are all compiled with -g, this
+               will still result in debug information in all non-OCaml
+               executables. *)
+            linker_embeds_build_path
+            || (c_compiler_debug_paths_are_absolute
+                && (linker_propagates_debug_information || linked_with_debug))
+      in
+      if contains_build_path then
+        LocationSet.add Build prefix
+      else
+        prefix
+  in
+  let libdir_rules file =
+    let basename = Filename.basename file in
+    let ext = Filename.extension basename in
+    if basename = "expunge" || basename = "expunge.exe" then
+      bindir_rules file
+    else
+      let (~stdlib:embeds_stdlib_location,
+           ~ocaml_debug:has_ocaml_debug_info,
+           ~c_debug:contains_c_debug_info,
+           ~s:contains_assembled_objects) =
+        if List.mem basename ["Makefile.config";
+                              "ld.conf";
+                              "runtime-launch-info"] then
+          (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        else if basename = "config.cmx" then
+          (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+        else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
+          let stdlib =
+            List.mem basename ["config.cmt"; "config_main.cmt";
+                               "ocamlcommon.cma"] in
+          (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
+        else if ext = ".cmxs" then
+          (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
+        else if ext = Config.ext_obj then
+          let is_ocaml =
+            Sys.file_exists (Filename.chop_extension file ^ ".cmx") in
+          let c_debug =
+            not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
+          (~stdlib:false, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
+        else if ext = Config.ext_lib || ext = Config.ext_dll then
+          let is_asmrun = String.starts_with ~prefix:"libasmrun" basename in
+          let is_camlrun =
+            let dir = Filename.basename (Filename.dirname file) in
+            dir <> "stublibs"
+              && String.starts_with ~prefix:"libcamlrun" basename
+              && not (String.starts_with ~prefix:"libcamlruntime" basename)
+          in
+          if ext = Config.ext_lib then
+            let is_ocaml =
+              Sys.file_exists (Filename.chop_extension file ^ ".cmxa") in
+            let stdlib =
+              is_camlrun || Filename.chop_extension basename = "ocamlcommon" in
+            let c_debug = not is_ocaml in
+            (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:(is_ocaml || is_asmrun))
+          else
+            (~stdlib:is_camlrun, ~ocaml_debug:false, ~c_debug:true, ~s:false)
+        else
+          (~stdlib:false, ~ocaml_debug:false, ~c_debug:false, ~s:false)
+      in
+      let contains_build_path =
+        if (ext = Config.ext_dll || ext = ".cmxs")
+           && (not linker_propagates_debug_information
+               || linker_embeds_build_path) then
+          linker_embeds_build_path
+        else
+          has_ocaml_debug_info
+          || contains_c_debug_info && c_compiler_debug_paths_are_absolute
+          || contains_assembled_objects && assembler_embeds_build_path
+          || ext = Config.ext_obj && c_compiler_always_embeds_build_path
+      in
+      let prefix =
+        if embeds_stdlib_location then
+          LocationSet.singleton Prefix
+        else
+          LocationSet.empty
+      in
+      if contains_build_path then
+        LocationSet.add Build prefix
+      else
+        prefix
+  in
+  let ~failed, ~results =
+    ~failed:false, ~results:[]
+    |> scan bindir "$bindir" (Unix.opendir bindir) bindir_rules
+    |> scan libdir "$libdir" (Unix.opendir libdir) libdir_rules
+  in
+  flush stderr;
+  let sections =
+    let f acc (_, seen) = LocationSet.union acc seen in
+    List.fold_left f LocationSet.empty results
+    |> LocationSet.elements
+    |> List.sort Stdlib.compare
+    |> List.map Option.some
+    |> List.cons None in
+  let results =
+    let aggregate acc ((file, seen) as item) =
+      let extension =
+        if String.starts_with ~prefix:"$bindir" file then
+          "$bindir/"
+        else if Filename.basename file = "META" then
+          "/META"
+        else
+          let extension = Filename.extension file in
+          if extension = ".conf" || extension = ".config" then
+            ""
+          else if extension = ".in" then
+            Filename.extension (Filename.chop_extension file) ^ extension
+          else
+            extension
+      in
+      let (files, all_seen) =
+        try StringMap.find extension acc
+        with Not_found -> [], LocationSet.empty
+      in
+      StringMap.add extension (item::files, LocationSet.union seen all_seen) acc
+    in
+    let aggregated = List.fold_left aggregate StringMap.empty results in
+    let collapse extension (files, all_seen) acc =
+      if extension = "" then
+        List.rev_append files acc
+      else
+        let test section =
+          let test =
+            Option.fold ~none:LocationSet.is_empty ~some:LocationSet.mem section
+          in
+          let section =
+            Option.fold ~none:LocationSet.empty
+                        ~some:LocationSet.singleton section
+          in
+          match List.partition (fun (_, s) -> test s) files with
+          | _::_, (([] | [_] | [_; _]) as exceptions) ->
+              let extension, exceptions =
+                if extension.[0] = '.' then
+                  "*" ^ extension, List.map fst exceptions
+                else if extension.[0] = '/' then
+                  "**" ^ extension, List.map fst exceptions
+                else
+                  let l = String.length extension in
+                  let chop (f, _) = String.sub f l (String.length f - l) in
+                  extension ^ "*", List.map chop exceptions
+              in
+              let suffix =
+                if exceptions = [] then
+                  ""
+                else
+                  " (except " ^ String.concat " and " exceptions ^ ")"
+              in
+              let files =
+                let keep (file, seen) =
+                  let seen = LocationSet.diff seen section in
+                  if LocationSet.is_empty seen then
+                    None
+                  else
+                    Some (file, seen)
+                in
+                List.filter_map keep files
+              in
+              let item = (extension ^ suffix, section) in
+              Some (item :: List.rev_append files acc)
+          | _, _ ->
+              None
+        in
+        let result =
+          LocationSet.elements all_seen
+          |> List.sort Stdlib.compare
+          |> List.map Option.some
+          |> List.cons None
+          |> List.find_map test
+        in
+        match result with
+        | Some acc ->
+            acc
+        | None ->
+            List.rev_append files acc
+    in
+    StringMap.fold collapse aggregated []
+  in
+  let display section =
+    let test =
+      match section with
+      | None ->
+          Printf.printf "\nRelocatable files:\n";
+          LocationSet.is_empty
+      | Some path ->
+          let name =
+            match path with
+            | Build -> "build path"
+            | Prefix -> "installation prefix"
+          in
+          Printf.printf "\nFiles containing the %s:\n" name;
+          LocationSet.mem path
+    in
+    (* Put wildcard patterns first *)
+    let compare l r = Stdlib.compare (l.[0] <> '*', l) (r.[0] <> '*', r) in
+    let results =
+      List.filter_map (fun (f, s) -> if test s then Some f else None) results
+      |> List.sort compare
+    in
+    let pp_sep f () = Format.pp_print_char f ','; Format.pp_print_space f () in
+    let pp_results = Format.(pp_print_list ~pp_sep pp_print_string) in
+    Format.printf "@[<hov 4>  %a@]@." pp_results results
+  in
+  if failed then
+    fail_because "Installed files don't match expectation"
+  else
+  List.iter display sections
+
 let run_tests ~original env bindir libdir libraries =
   if config.supports_shared_libraries then
     load_libraries_in_toplevel ~original env bindir libdir Bytecode libraries;
@@ -2343,6 +2962,7 @@ let () =
   if verbose then
     Clflags.verbose := true;
   let env = Environment.make bindir libdir in
+  let () = test_relocation env prefix bindir libdir in
   let programs = run_tests ~original:true env bindir libdir config.libraries in
   (* Now rename the prefix, appending .new to the directory name *)
   let new_prefix = prefix ^ ".new" in
