@@ -10618,7 +10618,10 @@ testsuite/tools/test_in_prefix.cmo : \
     otherlibs/unix/unix.cmi \
     utils/misc.cmi \
     utils/config.cmi \
+    utils/compression.cmi \
     driver/compmisc.cmi \
+    file_formats/cmt_format.cmi \
+    file_formats/cmo_format.cmi \
     utils/clflags.cmi \
     utils/ccomp.cmi \
     bytecomp/bytesections.cmi \
@@ -10628,7 +10631,10 @@ testsuite/tools/test_in_prefix.cmx : \
     otherlibs/unix/unix.cmx \
     utils/misc.cmx \
     utils/config.cmx \
+    utils/compression.cmx \
     driver/compmisc.cmx \
+    file_formats/cmt_format.cmx \
+    file_formats/cmo_format.cmi \
     utils/clflags.cmx \
     utils/ccomp.cmx \
     bytecomp/bytesections.cmx \
