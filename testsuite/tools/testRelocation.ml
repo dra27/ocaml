@@ -134,11 +134,8 @@ let bindir_rules config file =
               && (c_compiler_debug_paths_are_absolute
                   || assembler_embeds_build_path))
       | `Bytecode_ocaml ->
-          (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
-             the debugging information in ocamlc.byte and ocamlopt.byte is
-             stripped. However, since the C objects in libcamlrun are compiled
-             with -g, this will still result in debug information for -custom
-             runtime executables. *)
+          (* All bytecode executables are compiled with -g which in particular
+             means that -custom executables will always embed the build path. *)
           linked_with_debug && config.has_relative_libdir = None
           || (classification = Custom
               && Toolchain.linker_propagates_debug_information
