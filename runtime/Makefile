@@ -372,8 +372,8 @@ $(1).$(O): $(2).c
 else
 $(1).$(O): $(2).c $(CONFIG_HEADERS) $(GENERATED_HEADERS) $(RUNTIME_HEADERS)
 endif # ifneq "$(COMPUTE_DEPS)" "false"
-	$$(CC) -c $$(OC_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) $$(CPPFLAGS) \
-	  $$(OUTPUTOBJ)$$@ $$<
+	$$(CC) -c $$(OC_CFLAGS) $$(PRIVATE_CFLAGS) $$(CFLAGS) $$(OC_CPPFLAGS) \
+	  $$(CPPFLAGS) $$(OUTPUTOBJ)$$@ $$<
 endef
 
 object_types := % %.b %.bd %.bi %.bpic
