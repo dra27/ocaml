@@ -84,11 +84,11 @@ $(LIBNAME).cmxa: $(THREADS_NCOBJS)
 # twice, each time with different options).
 
 st_stubs_b.$(O): st_stubs.c $(HEADER)
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) -I$(ROOTDIR)/runtime  \
-	  $(SHAREDLIB_CFLAGS) $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) \
+	  -I$(ROOTDIR)/runtime $(SHAREDLIB_CFLAGS) $(OUTPUTOBJ)$@ $<
 
 st_stubs_n.$(O): st_stubs.c $(HEADER)
-	$(CC) $(OC_CFLAGS) $(OC_CPPFLAGS) \
+	$(CC) $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) \
 	  -I$(ROOTDIR)/runtime $(SHAREDLIB_CFLAGS) -DNATIVE_CODE \
 	  -DTARGET_$(ARCH) -DMODEL_$(MODEL) -DSYS_$(SYSTEM) \
 	  $(OUTPUTOBJ)$@ -c $<
