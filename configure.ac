@@ -1835,9 +1835,7 @@ AS_IF([test x"$bindir_to_libdir" != 'x'],
       [map_cflags="-fdebug-prefix-map=$srcdir_abs=+build"
       AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
         [map_cflags="$map_cflags \
--fdebug-prefix-map=$srcdir_abs_real=+build"])])], [$warn_error_flag])
-  AS_IF([test x"$map_cflags" != 'x'],
-    [internal_cflags="$internal_cflags $map_cflags"])])
+-fdebug-prefix-map=$srcdir_abs_real=+build"])])], [$warn_error_flag])])
 
 ## Does stat support nanosecond precision
 

@@ -135,6 +135,9 @@ ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
     $(BUILD_PATH_PREFIX_MAP)$\
       :.=$(SRCDIR_ENCODED)$\
       $(if $(SRCDIR_REAL_ENCODED),:.=$(SRCDIR_REAL_ENCODED))
+  PRIVATE_CFLAGS = $(OC_MAP_CFLAGS)
+else
+  PRIVATE_CFLAGS =
 endif # ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
 
 # Allow Makefile.cross to override the Standard Library default for the compiler
@@ -161,8 +164,8 @@ REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
 endif
 
 %.$(O): %.c $(REQUIRED_HEADERS)
-	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
-	  $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(PRIVATE_CFLAGS) \
+	  $(OC_CPPFLAGS) $(CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 $(DEPDIR):
 	$(MKDIR) $@
