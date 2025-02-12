@@ -63,6 +63,7 @@ DOCDIR=@docdir@
 TARGET_LIBDIR=@TARGET_LIBDIR@
 TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
+OC_MAP_CFLAGS = @map_cflags@
 
 # Platform-dependent command to create symbolic links
 LN = @ln@
