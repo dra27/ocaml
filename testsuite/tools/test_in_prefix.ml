@@ -183,13 +183,14 @@ let () =
      For the compiler's files to be reproducible, the compiler needs to be both
      relocatable and also required support from the assembler and C compiler. *)
   let relocatable =
+    (* A Windows build with a relative libdir and no native compiler (to avoid
+       the cmt/cmti absolute path embedding) ends up being reproducible because
+       the executable header doesn't include the prefix! *)
     config.has_relative_libdir <> None
-    && config.launcher_searches_for_ocamlrun
-  in
+    && not config.has_ocamlopt
+    && launcher_searches_for_ocamlrun in
   let reproducible =
-    relocatable && false
-    (* At present, the compiler build doesn't actually take advantage of this
-       configuration *)
+    relocatable
     && (not config.has_ocamlopt
         || not Toolchain.assembler_embeds_build_path
         || Config.as_has_debug_prefix_map && Config.architecture <> "riscv")
