@@ -25,6 +25,36 @@ type config = {
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
 }
 
+(* XXX Misc.Stdlib.List.find_and_chop_longest_common_prefix ? *)
+let split_to_common_prefix first second =
+  let rec split_dir acc dir =
+    let dirname = Filename.dirname dir in
+    if dirname = dir then
+      dir::acc
+    else
+      split_dir (Filename.basename dir :: acc) dirname
+  in
+  let rec loop prefix first second =
+    match first, second with
+    | (dir1::first), (dir2::second) ->
+        if dir1 = dir2 then
+          loop (dir1::prefix) first second
+        else begin
+          match List.rev prefix with
+          | [] | [_] ->
+              Result.error `Nothing_in_common
+          | dir::dirs ->
+              Result.ok (List.fold_left Filename.concat dir dirs,
+                         List.fold_left Filename.concat dir1 first,
+                         List.fold_left Filename.concat dir2 second)
+        end
+    | [], _ ->
+        Result.error `Second_in_first
+    | _, [] ->
+        Result.error `First_in_second
+  in
+  loop [] (split_dir [] first) (split_dir [] second)
+
 (* Parse the command line, with the following results:
    - bindir, config, libdir and verbose come directly from the command line
    - prefix, bindir_suffix and libdir_suffix are derived from bindir and libdir.
@@ -94,38 +124,6 @@ options are:" in
     in
     Printf.ksprintf f fmt
   in
-  let split_to_prefix bindir libdir =
-    let rec split_dir acc dir =
-      let dirname = Filename.dirname dir in
-      if dirname = dir then
-        dir::acc
-      else
-        split_dir (Filename.basename dir :: acc) dirname
-    in
-    let rec loop prefix bindir libdir =
-      match bindir, libdir with
-      | (dir1::bindir), (dir2::libdir) ->
-          if dir1 = dir2 then
-            loop (dir1::prefix) bindir libdir
-          else begin
-            match List.rev prefix with
-            | [] | [_] ->
-              (* The prefix is either the root directory (/, C:\, etc.) or, on
-                 Windows, the two directories are actually on different drives
-               *)
-              error "\
-directories given for --bindir and --libdir do not have a common prefix";
-            | dir::dirs ->
-                List.fold_left Filename.concat dir dirs,
-                List.fold_left Filename.concat dir1 bindir,
-                List.fold_left Filename.concat dir2 libdir
-          end
-      | [], _ ->
-          error "directory given for --libdir inside that given for --bindir"
-      | _, [] ->
-          error "directory given for --bindir inside that given for --libdir"
-    in
-    loop [] (split_dir [] bindir) (split_dir [] libdir) in
   Arg.parse args libraries usage;
   let config =
     let libraries = List.sort Stdlib.compare config.contents.libraries in
@@ -146,7 +144,19 @@ directories given for --bindir and --libdir do not have a common prefix";
     let () = Arg.usage args usage in
     exit 2
   else
-    let prefix, bindir_suffix, libdir_suffix = split_to_prefix bindir libdir in
+    let prefix, bindir_suffix, libdir_suffix =
+      match split_to_common_prefix bindir libdir with
+      | Result.Ok r -> r
+      | Result.Error `Nothing_in_common ->
+          (* The prefix is either the root directory (/, C:\, etc.) or, on
+             Windows, the two directories are actually on different drives *)
+          error "\
+directories given for --bindir and --libdir do not have a common prefix"
+      | Result.Error `First_in_second ->
+          error "directory given for --bindir inside that given for --libdir"
+      | Result.Error `Second_in_first ->
+          error "directory given for --libdir inside that given for --bindir"
+    in
     let style =
       if Sys.getenv_opt "GITHUB_ACTIONS" <> None
       || Sys.getenv_opt "APPVEYOR_BUILD_ID" <> None then
@@ -349,7 +359,7 @@ type executable =
 | Custom
 | Native
 
-let classify_executable file : executable =
+let classify_executable file =
   try
     In_channel.with_open_bin file (fun ic ->
       let start = really_input_string ic 2 in
@@ -390,6 +400,8 @@ let string_of_process_status = function
 type _ output =
 | Stdout : unit output
 | Return : (int * string list) output
+
+module StringSet = Set.Make(String)
 
 (* All process invocation is done via [Environment.run_process] and
    [Environment.run_process_target] which in particular abstracts and manages
@@ -454,8 +466,6 @@ end = struct
     libdir: string;
     augmentations: (string * string) list;
   }
-
-  module StringSet = Set.Make(String)
 
   (* List of environment variables to remove from the calling environment *)
   let scrub =
@@ -2227,6 +2237,272 @@ let test_standard_library_location ~original env bindir =
   Printf.printf "Running programs\n%!";
   List.filter_map (fun f -> f ?runtime env ~arg:true) programs
 
+let utf_16le_of_utf_8 s =
+  let s = Misc.Stdlib.String.to_utf_8_seq s in
+  let utf_16le_length =
+    Seq.fold_left (fun acc u -> acc + Uchar.utf_16_byte_length u) 0 s in
+  let b = Bytes.create utf_16le_length in
+  ignore (Seq.fold_left (fun i u -> i + Bytes.set_utf_16le_uchar b i u) 0 s);
+  Bytes.unsafe_to_string b
+
+let rec matches_at file search i j =
+  let c1 = Bigarray.Array1.unsafe_get file i in
+  let c2 = String.unsafe_get search j in
+  (c1 = c2 || Sys.win32 && c1 = '\\' && c2 = '/')
+    && (j = 0 || matches_at file search (i - 1) (j - 1))
+
+let matches_at file file_len i s =
+  let s_len = String.length s in
+  if i + s_len > file_len then
+    false
+  else
+    matches_at file s (i + s_len - 1) (s_len - 1)
+
+type location = Build | Prefix
+and encoding = UTF_8 | UTF_16
+
+module LocationSet = Set.Make(struct
+  type t = location
+  let compare = Stdlib.compare
+end)
+
+let rec contains file file_len tests i seen =
+  if i = file_len then
+    seen
+  else
+    let c = Bigarray.Array1.unsafe_get file i in
+    let seen =
+      if c = '/' || Sys.win32 && c = '\\' then
+        let check_for ((seen, unmatched) as acc) (t, s, always_test) =
+          if (unmatched || always_test) && matches_at file file_len i s then
+            t::seen, false
+          else
+            acc in
+        fst (List.fold_left check_for (seen, true) tests)
+      else
+        seen in
+    contains file file_len tests (i + 1) seen
+
+let read_file file =
+  In_channel.with_open_bin file @@ fun ic ->
+    let len = in_channel_length ic in
+    let content = Bigarray.Array1.create Bigarray.Char Bigarray.c_layout len in
+    if In_channel.really_input_bigarray ic content 0 len = None then
+      fail_because "Error reading %s" file;
+    content, len
+
+let clang_cl = String.starts_with ~prefix:"clang-cl" Config.c_compiler
+
+let test_relocation prefix bindir libdir =
+  let build_root = Filename.dirname (Filename.dirname test_root) in
+  Printf.printf "\nChecking installed files for\n\
+                  \  Installation Prefix: %s\n\
+                  \  Build Root: %s\n%!" prefix build_root;
+  let build_root, prefix =
+    if Sys.win32 then
+      let normalise s =
+        let s =
+          if String.length s > 2
+             && Char.Ascii.is_letter s.[0] && s.[1] = ':' then
+            String.sub s 2 (String.length s - 2)
+          else
+            s in
+        String.map (function '\\' -> '/' | c -> c) s in
+      normalise build_root, normalise prefix
+    else
+      build_root, prefix in
+  let prefix_in_build =
+    split_to_common_prefix prefix build_root = Result.Error `First_in_second in
+  let tests = [
+    (Prefix, UTF_8), prefix, true;
+    (Prefix, UTF_16), utf_16le_of_utf_8 prefix, true;
+    (Build, UTF_8), build_root, not prefix_in_build;
+    (Build, UTF_16), utf_16le_of_utf_8 build_root, not prefix_in_build;
+  ] in
+  let in_unexpected_state file file_rel rules =
+    let content, content_len = read_file file in
+    let seen = contains content content_len tests 0 [] in
+    let gather acc (d, _, _) =
+      if List.mem d seen then
+        match d with
+        | Build, UTF_8 ->
+            LocationSet.add Build acc, Some "Build directory (in UTF-8)"
+        | Build, UTF_16 ->
+            LocationSet.add Build acc, Some "Build directory (in UTF-16)"
+        | Prefix, UTF_8 ->
+            LocationSet.add Prefix acc, Some "Installation prefix (in UTF-8)"
+        | Prefix, UTF_16 ->
+            LocationSet.add Prefix acc, Some "Installation prefix (in UTF-16)"
+      else
+        acc, None in
+    let seen, hits = List.fold_left_map gather LocationSet.empty tests in
+    let expected = rules file in
+    if LocationSet.equal seen expected then
+      false
+    else
+      let string_of_location = function
+      | Build -> "Build directory"
+      | Prefix -> "Installation prefix" in
+      let hits =
+        let hits = List.filter_map Fun.id hits in
+        if hits = [] then
+          "is relocatable"
+        else
+          "contains the " ^ String.concat " & " hits in
+      let expected =
+        let expected = LocationSet.elements expected in
+        if expected = [] then
+          "be relocatable"
+        else
+          let expected = List.map string_of_location expected in
+          "contain the " ^ String.concat " & " expected in
+      Printf.eprintf "%s: expected to %s, but it %s\n" file_rel expected hits;
+      true
+  in
+  let rec scan failed dir rel h rules =
+    match Unix.readdir h with
+    | entry ->
+        let failed =
+          if entry <> Filename.current_dir_name
+             && entry <> Filename.parent_dir_name then
+            let entry_rel = Filename.concat rel entry in
+            let entry = Filename.concat dir entry in
+            match Unix.lstat entry with
+            | {Unix.st_kind = S_DIR; _} ->
+                scan failed entry entry_rel (Unix.opendir entry) rules
+            | {Unix.st_kind = S_REG; _} ->
+                in_unexpected_state entry entry_rel rules || failed
+            | _ ->
+                failed
+          else
+            failed in
+        scan failed dir rel h rules
+    | exception End_of_file ->
+        Unix.closedir h;
+        failed in
+  let bindir_rules file =
+    let basename = Filename.basename file in
+    let basename =
+      Filename.chop_suffix_opt ~suffix:".exe" basename
+      |> Option.value ~default:basename in
+    let basename_without_type =
+      Filename.chop_suffix_opt ~suffix:".opt" basename
+      |> Option.value ~default:basename in
+    let basename_without_type =
+      Filename.chop_suffix_opt ~suffix:".byte" basename
+      |> Option.value ~default:basename_without_type in
+    let classification = classify_executable file in
+    if classification = Tendered && basename <> "ocaml" then
+      if not launcher_searches_for_ocamlrun
+         || (basename_without_type <> "flexlink"
+             && basename_without_type <> "ocamllex") then
+        LocationSet.singleton Prefix
+      else
+        LocationSet.empty
+    else if classification = Shebang && basename <> "ocaml" then
+      LocationSet.singleton Prefix
+    else if basename = "default.manifest"
+            || basename = "default_amd64.manifest" then
+      LocationSet.empty
+    else
+      let prefix =
+        if basename_without_type <> "ocamllex"
+           && basename_without_type <> "flexlink"
+           && basename <> "ocamlyacc" then
+          LocationSet.singleton Prefix
+        else
+          LocationSet.empty in
+      if Config.ccomp_type = "msvc"
+           && basename <> "ocaml"
+           && (basename <> "ocamlrund" || clang_cl) then
+        prefix
+      else
+        LocationSet.add Build prefix
+  in
+  let libdir_files_with_prefix =
+    let (/) = Filename.concat in
+    let files = [
+      "runtime-launch-info";
+      "compiler-libs" / "ocamlcommon.cma";
+      "compiler-libs" / "ocamlcommon" ^ Config.ext_lib;
+      "compiler-libs" / "config.cmx";
+      "expunge";
+      "ld.conf";
+      "libcamlrun_shared" ^ Config.ext_dll;
+      "Makefile.config";
+    ] in
+    let files =
+      if Config.compression_c_libraries = "" then
+        "compiler-libs" / "config.cmt" ::
+        "compiler-libs" / "config_main.cmt" ::
+        files
+      else
+        files in
+    StringSet.of_list (List.map (Filename.concat libdir) files) in
+  let libdir_exts_with_build =
+    let exts = [".cmo"; ".cma"] in
+    let exts =
+      if (not Sys.win32 && Config.system <> "macosx")
+         || Config.ccomp_type = "msvc" then
+        Config.ext_obj :: exts
+      else
+        exts in
+    let exts =
+      if Config.ccomp_type = "msvc" then
+        exts
+      else
+        Config.ext_dll :: ".cmxs" :: exts in
+    let exts =
+      if Config.compression_c_libraries = "" then
+        ".cmti" :: ".cmt" :: exts
+      else
+        exts in
+    StringSet.of_list exts in
+  let libcamlrun_prefix = Filename.concat libdir "libcamlrun" in
+  let libdir_rules file =
+    if Sys.cygwin && Filename.basename (Filename.dirname file) = "flexdll" then
+      LocationSet.empty
+    else
+      let file =
+        Filename.chop_suffix_opt ~suffix:".exe" file
+        |> Option.value ~default:file in
+      let ext = Filename.extension file in
+      let build =
+        if StringSet.mem ext libdir_exts_with_build then
+          LocationSet.singleton Build
+        else if ext = Config.ext_lib then
+          if clang_cl then
+            if String.starts_with ~prefix:"libasmrun" (Filename.basename file)
+               || (Sys.file_exists
+                     (Filename.remove_extension file ^ ".cmxa")) then
+              LocationSet.singleton Build
+            else
+              LocationSet.empty
+          else if (not Sys.win32 && Config.system <> "macosx")
+                  || Config.ccomp_type = "msvc"
+                  || not (Sys.file_exists
+                            (Filename.remove_extension file ^ ".cmxa")) then
+            LocationSet.singleton Build
+          else
+            LocationSet.empty
+        else
+          LocationSet.empty in
+      if ext = Config.ext_lib
+           && String.starts_with ~prefix:libcamlrun_prefix file
+           && not (String.starts_with ~prefix:"libcamlruntime_events"
+                    (Filename.remove_extension (Filename.basename file)))
+         || StringSet.mem file libdir_files_with_prefix then
+        LocationSet.add Prefix build
+      else
+        build
+  in
+  let failed =
+    scan false bindir "$bindir" (Unix.opendir bindir) bindir_rules in
+  let failed =
+    scan failed libdir "$libdir" (Unix.opendir libdir) libdir_rules in
+  if failed then
+    fail_because "Installed files don't match expectation"
+
 let run_tests ~original env bindir libdir libraries =
   if config.supports_shared_libraries then
     load_libraries_in_toplevel ~original env bindir libdir Bytecode libraries;
@@ -2247,6 +2523,7 @@ let () =
     Clflags.verbose := true;
   let env = Environment.make bindir libdir in
   let programs = run_tests ~original:true env bindir libdir config.libraries in
+  let () = test_relocation prefix bindir libdir in
   (* Now rename the prefix, appending .new to the directory name *)
   let new_prefix = prefix ^ ".new" in
   let bindir = Filename.concat new_prefix bindir_suffix in
