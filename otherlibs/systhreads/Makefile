@@ -93,10 +93,10 @@ $(LIBNAME).cmxa: $(THREADS_NCOBJS)
 st_stubs_n.$(O): OC_CPPFLAGS += $(NATIVE_CPPFLAGS)
 
 st_stubs_b.$(O): st_stubs.c $(HEADER)
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 st_stubs_n.$(O): st_stubs.c $(HEADER)
-	$(CC) -c $(OC_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
+	$(CC) -c $(OC_CFLAGS) $(PRIVATE_CFLAGS) $(OC_CPPFLAGS) $(OUTPUTOBJ)$@ $<
 
 partialclean:
 	rm -f *.cm*
