@@ -2918,9 +2918,14 @@ let test_relocation env prefix =
         acc in
   let c_compiler_debug_paths_are_absolute =
     Toolchain.c_compiler_debug_paths_can_be_absolute
+    && (not Config.c_has_debug_prefix_map || config.has_relative_libdir = None)
   in
   let assembler_embeds_build_path =
     Toolchain.assembler_embeds_build_path
+    && (not Config.as_has_debug_prefix_map
+        || Config.architecture = "riscv"
+        || Config.as_is_cc
+        || config.has_relative_libdir = None)
   in
   let bindir_rules file =
     let basename = Filename.basename file in
@@ -3002,7 +3007,7 @@ let test_relocation env prefix =
                stripped. However, since the C objects in libcamlrun are compiled
                with -g, this will still result in debug information for -custom
                runtime executables. *)
-            linked_with_debug
+            linked_with_debug && config.has_relative_libdir = None
             || (classification = Custom
                 && Toolchain.linker_propagates_debug_information
                 && c_compiler_debug_paths_are_absolute)
@@ -3043,7 +3048,7 @@ let test_relocation env prefix =
             && List.mem basename ["config.cmt"; "config_main.cmt";
                                   "ocamlcommon.cma"] in
           let ocaml_debug =
-            true in
+            config.has_relative_libdir = None in
           (~stdlib, ~ocaml_debug, ~c_debug:false, ~s:false)
         else if basename = "runtime-launch-info" then
           let stdlib = config.has_relative_libdir = None in
