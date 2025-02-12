@@ -2670,8 +2670,25 @@ let test_relocation env prefix bindir libdir =
            && basename <> "ocaml"
            && (basename <> "ocamlrund" || clang_cl) then
         prefix
-      else
+      else if config.has_relative_libdir = None
+              || (Config.system = "macosx" || not Config.c_has_debug_prefix_map)
+                   && basename <> "ocaml" then
         LocationSet.add Build prefix
+      else
+        if (Config.as_has_debug_prefix_map || Sys.win32) (* XXX The Sys.win32
+                                                                here is mingw -
+                                                                the point of PE
+                                                                doesn't do this
+                                                                *)
+           || classification <> Vanilla
+           || classification = Vanilla
+              && String.ends_with ~suffix:"bsd" Config.system
+           || List.exists (String.starts_with ~prefix:"ocamlrun")
+                          (String.split_on_char '-' basename)
+           || basename = "ocamlyacc" then
+          prefix
+        else
+          LocationSet.add Build prefix
   in
   let libdir_files_with_prefix =
     let (/) = Filename.concat in
@@ -2707,16 +2724,36 @@ let test_relocation env prefix bindir libdir =
       let files = ["Makefile.config"] in
       StringSet.of_list (List.map (Filename.concat libdir) files) in
   let libdir_exts_with_build =
-    let exts = [".cmo"; ".cma"; ".cmti"; ".cmt"] in
+    let exts =
+      if config.has_relative_libdir <> None then
+        []
+      else
+        [".cmo"; ".cma"; ".cmti"; ".cmt"] in
     let exts =
       if (not Sys.win32 && Config.system <> "macosx"
-          && not (String.ends_with ~suffix:"bsd" Config.system))
+          && not (String.ends_with ~suffix:"bsd" Config.system)
+          && (not Config.as_has_debug_prefix_map (* XXX This relies on the fact
+                                                        that we only install .o
+                                                        files produced by
+                                                        ocamlopt *)
+              || config.has_relative_libdir = None))
          || Config.ccomp_type = "msvc" then
         Config.ext_obj :: exts
       else
         exts in
     let exts =
       if Config.ccomp_type = "msvc" then
+        exts
+      else if config.has_relative_libdir <> None
+              && Config.system <> "macosx"
+              && not (String.ends_with ~suffix:"bsd" Config.system) then
+        if Config.as_has_debug_prefix_map || Sys.win32 then (* XXX Sys.win32 =>
+                                                                   mingw-w64 *)
+          exts
+        else
+          ".cmxs" :: exts
+      else if String.ends_with ~suffix:"bsd" Config.system
+              && config.has_relative_libdir <> None then
         exts
       else
         Config.ext_dll :: ".cmxs" :: exts in
@@ -2732,6 +2769,17 @@ let test_relocation env prefix bindir libdir =
       let build =
         if StringSet.mem ext libdir_exts_with_build then
           LocationSet.singleton Build
+        else if config.has_relative_libdir <> None
+                  && Config.c_has_debug_prefix_map then
+          if ext = Config.ext_lib && not Config.as_has_debug_prefix_map
+             && Config.system <> "macosx"
+             && not (String.ends_with ~suffix:"bsd" Config.system)
+             && not Sys.win32
+             && (Sys.file_exists
+                   (Filename.remove_extension file ^ ".cmxa")) then
+            LocationSet.singleton Build
+          else
+            LocationSet.empty
         else if ext = Config.ext_lib then
           if clang_cl then
             if String.starts_with ~prefix:"libasmrun" (Filename.basename file)
