@@ -841,14 +841,15 @@ AS_CASE([$ocaml_cc_vendor],
 # See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
 # for the detailed explanation.
 
-ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-ocamlsrcdir=${ocamlsrcdir%X}
+srcdir_abs=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+srcdir_abs=${srcdir_abs%X}
 
 AS_CASE([$cygwin_build_env,$host],
   [true,*-w64-mingw32*|true,*-pc-windows],
     [OCAML_CHECK_LN_ON_WINDOWS
-    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"],
-  [ln='ln -sf'])
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$srcdir_abs")"],
+  [ln='ln -sf'
+  ocamlsrcdir="$srcdir_abs"])
 
 # Whether ar supports @FILE arguments
 
@@ -2348,6 +2349,13 @@ AS_CASE([$ocaml_cc_vendor,$target],
   [AX_CHECK_COMPILE_FLAG([-fdebug-prefix-map=old=new],
     [cc_has_debug_prefix_map=true], [cc_has_debug_prefix_map=false],
     [$warn_error_flag])])
+
+## -ffile-prefix-map support by the C compiler - used in the build, not by
+## the compiler
+AS_IF([test x"$bindir_to_libdir" != 'x'],
+  [AX_CHECK_COMPILE_FLAG([-ffile-prefix-map=old=new],
+    [internal_cflags="$internal_cflags -ffile-prefix-map=$srcdir_abs=+build"],
+    [], [$warn_error_flag])])
 
 ## Does stat support nanosecond precision
 

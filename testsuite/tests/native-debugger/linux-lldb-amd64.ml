@@ -1,4 +1,5 @@
 (* TEST
+   unset BUILD_PATH_PREFIX_MAP;
    native-compiler;
    linux;
    arch_amd64;

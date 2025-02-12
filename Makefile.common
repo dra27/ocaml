@@ -29,6 +29,7 @@ EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
 # $( ) suppresses warning from the alignments in the V_ macros below
 $(SPACE) :=
+HASH := \#
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
 DIR_SEP := \$ # There must a space following the $
@@ -179,6 +180,10 @@ endif
 ifeq "$(LIBDIR_REL)" ""
   SET_RELATIVE_STDLIB =
 else
+  SRCDIR_ENCODED = $(subst =,%+,$(subst :,%.,$(subst %,%$(HASH),$(SRCDIR_ABS))))
+  BUILD_PATH_PREFIX_MAP ?=
+  export BUILD_PATH_PREFIX_MAP := \
+    $(BUILD_PATH_PREFIX_MAP):.=$(SRCDIR_ENCODED)
   SET_RELATIVE_STDLIB = \
 -set-runtime-default 'standard_library_default=$(LIBDIR_REL)'
 endif # ifeq "$(LIBDIR_REL)" ""
