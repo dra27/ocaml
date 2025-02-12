@@ -166,7 +166,8 @@ OTHERLIBRARIES=@otherlibraries@
 UNIX_OR_WIN32=@unix_or_win32@
 INSTALL_SOURCE_ARTIFACTS=@install_source_artifacts@
 
-OC_CFLAGS=@oc_cflags@
+BUILD_MAP_CFLAGS ?=
+OC_CFLAGS=@oc_cflags@ $(BUILD_MAP_CFLAGS)
 CFLAGS?=@CFLAGS@
 OC_CPPFLAGS=-I$(ROOTDIR)/runtime @oc_cppflags@
 CPPFLAGS?=@CPPFLAGS@
