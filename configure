@@ -816,6 +816,7 @@ oc_dll_ldflags
 oc_ldflags
 oc_cppflags
 oc_cflags
+map_cflags
 toolchain
 ccomptype
 mkexedebugflag
@@ -2877,6 +2878,7 @@ VERSION=4.13.2+relocatable
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -12734,8 +12736,8 @@ esac
 # See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
 # for the detailed explanation.
 
-ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-ocamlsrcdir=${ocamlsrcdir%X}
+srcdir_abs=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+srcdir_abs=${srcdir_abs%X}
 
 # Libraries to build depending on the host
 
@@ -12755,12 +12757,13 @@ fi
 $as_echo "$ln" >&6; }
 
     default_separator='\'
-    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$srcdir_abs")"
     unixlib="win32unix"
      ;; #(
   *) :
     unix_or_win32="unix"
   ln='ln -sf'
+  ocamlsrcdir="$srcdir_abs"
   default_separator='/'
   unixlib="unix" ;;
 esac
@@ -16131,6 +16134,62 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CFLAGS="$saved_CFLAGS"
  ;;
 esac
+
+## -ffile-prefix-map support by the C compiler - used in the build, not by
+## the compiler
+map_cflags=''
+if test x"$bindir_to_libdir" != 'x'; then :
+  srcdir_abs_real="$(realpath "$srcdir_abs" 2>/dev/null)"
+  if test x"$srcdir_abs_real" = 'x'; then :
+  srcdir_abs_real="$srcdir_abs"
+fi
+  as_CACHEVAR=`$as_echo "ax_cv_check_cflags_$warn_error_flag_-ffile-prefix-map=old=new" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the C compiler accepts -ffile-prefix-map=old=new" >&5
+$as_echo_n "checking whether the C compiler accepts -ffile-prefix-map=old=new... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS $warn_error_flag -ffile-prefix-map=old=new"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+  map_cflags="-ffile-prefix-map=$srcdir_abs=+build"
+    if test x"$srcdir_abs_real" != x"$srcdir_abs"; then :
+  map_cflags="$map_cflags -ffile-prefix-map=$srcdir_abs_real=+build"
+fi
+else
+  if $cc_has_debug_prefix_map; then :
+  map_cflags="-fdebug-prefix-map=$srcdir_abs=+build"
+      if test x"$srcdir_abs_real" != x"$srcdir_abs"; then :
+  map_cflags="$map_cflags \
+-fdebug-prefix-map=$srcdir_abs_real=+build"
+fi
+fi
+fi
+
+fi
 
 ## Does stat support nanosecond precision
 
