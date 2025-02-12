@@ -41,12 +41,13 @@ let effective_toolchain config =
   in
   c_compiler_debug_paths_are_absolute, assembler_embeds_build_path
 
-(* The reproducible ruleset is the simplest: nothing is allowed to contain the
-   build path and only Makefile.config may contain the installation prefix or
-   use the relative prefix. *)
+(* The reproducible ruleset is the simplest: only Makefile.config may contain
+   the installation prefix or use the relative prefix. Since OC_FLAGS wasn't
+   moved to Makefile.build_config.in until #12108 in OCaml 5.1.0,
+   Makefile.config also ends up containing the build path. *)
 let reproducible_rules file =
   if Filename.basename file = "Makefile.config" then
-    LocationSet.of_list [Relative; Prefix]
+    LocationSet.of_list [Build; Relative; Prefix]
   else
     LocationSet.empty
 
@@ -134,11 +135,8 @@ let bindir_rules config file =
               && (c_compiler_debug_paths_are_absolute
                   || assembler_embeds_build_path))
       | `Bytecode_ocaml ->
-          (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
-             the debugging information in ocamlc.byte and ocamlopt.byte is
-             stripped. However, since the C objects in libcamlrun are compiled
-             with -g, this will still result in debug information for -custom
-             runtime executables. *)
+          (* All bytecode executables are compiled with -g which in particular
+             means that -custom executables will always embed the build path. *)
           linked_with_debug && config.has_relative_libdir = None
           || (classification = Custom
               && Toolchain.linker_propagates_debug_information
@@ -249,6 +247,11 @@ let libdir_rules config file =
          && (not Toolchain.linker_propagates_debug_information
              || Toolchain.linker_embeds_build_path) then
         Toolchain.linker_embeds_build_path
+      else if basename = "Makefile.config" then
+        (* When the compiler is configured with a relative libdir, the build
+           directory will also appear since OC_FLAGS wasn't moved to
+           Makefile.build_config.in until #12108 in OCaml 5.1.0 *)
+        config.has_relative_libdir <> None
       else
         has_ocaml_debug_info && config.has_relative_libdir = None
         || has_c_debug_info && c_compiler_debug_paths_are_absolute
