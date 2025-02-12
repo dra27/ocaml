@@ -72,6 +72,7 @@ DOCDIR=@docdir@
 TARGET_LIBDIR=@TARGET_LIBDIR@
 TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
+OC_MAP_CFLAGS = @map_cflags@
 
 # Expanded form of MKEXE_EXP and MKDLL_EXP _with host flexlink command_
 MKEXE_EXP=@mkexe_exp@
