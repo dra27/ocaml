@@ -37,7 +37,7 @@ test-in-prefix: $(DRIVER) ../tools/main_in_c.$(O)
       $(call bool_to_with, shared, $(SUPPORTS_SHARED_LIBRARIES)) \
       $(call bool_to_with, ocamlnat, $(INSTALL_OCAMLNAT)) \
       $(call bool_to_with, ocamlopt, $(NATIVE_COMPILER)) \
-      $(OTHERLIBRARIES)
+      $(OTHERLIBRARIES) --pwd "$(SRCDIR_ABS)/testsuite/in_prefix"
 
 SCRUB_ENV = \
   CAML_LD_LIBRARY_PATH OCAMLLIB CAMLLIB OCAMLPARAM OCAMLRUNPARAM CAMLRUNPARAM
