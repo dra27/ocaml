@@ -146,6 +146,8 @@ module Stdlib : sig
     module Tbl : Hashtbl.S with type key = string
 
     val for_all : (char -> bool) -> t -> bool
+
+    val to_utf_8_seq : t -> Uchar.t Seq.t
   end
 
   external compare : 'a -> 'a -> int = "%compare"
