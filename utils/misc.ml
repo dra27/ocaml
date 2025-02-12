@@ -219,6 +219,104 @@ module Stdlib = struct
       | Exit -> None
   end
 
+  (* Not to be exposed *)
+  module Uchar = struct
+    include Uchar
+
+    let decode_bits = 24
+
+    let[@inline] utf_decode_length d = (d lsr decode_bits) land 0b111
+    let[@inline] utf_decode_uchar d = unsafe_of_int (d land 0xFFFFFF)
+    let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
+    let[@inline] utf_decode_invalid n = (n lsl decode_bits) lor (to_int rep)
+
+  end
+
+  (* Not to be exposed *)
+  module Bytes = struct
+    include Bytes
+
+    external unsafe_get_uint8 : bytes -> int -> int = "%bytes_unsafe_get"
+
+    let dec_invalid = Uchar.utf_decode_invalid
+    let[@inline] dec_ret n u = Uchar.utf_decode n (Uchar.unsafe_of_int u)
+
+    let[@inline] not_in_x80_to_xBF b = b lsr 6 <> 0b10
+    let[@inline] not_in_xA0_to_xBF b = b lsr 5 <> 0b101
+    let[@inline] not_in_x80_to_x9F b = b lsr 5 <> 0b100
+    let[@inline] not_in_x90_to_xBF b = b < 0x90 || 0xBF < b
+    let[@inline] not_in_x80_to_x8F b = b lsr 4 <> 0x8
+
+    let[@inline] utf_8_uchar_2 b0 b1 =
+      ((b0 land 0x1F) lsl 6) lor
+      ((b1 land 0x3F))
+
+    let[@inline] utf_8_uchar_3 b0 b1 b2 =
+      ((b0 land 0x0F) lsl 12) lor
+      ((b1 land 0x3F) lsl 6) lor
+      ((b2 land 0x3F))
+
+    let[@inline] utf_8_uchar_4 b0 b1 b2 b3 =
+      ((b0 land 0x07) lsl 18) lor
+      ((b1 land 0x3F) lsl 12) lor
+      ((b2 land 0x3F) lsl 6) lor
+      ((b3 land 0x3F))
+
+    let get_utf_8_uchar b i =
+      let b0 = get_uint8 b i in (* raises if [i] is not a valid index. *)
+      let get = unsafe_get_uint8 in
+      let max = length b - 1 in
+      match Char.unsafe_chr b0 with (* See The Unicode Standard, Table 3.7 *)
+      | '\x00' .. '\x7F' -> dec_ret 1 b0
+      | '\xC2' .. '\xDF' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+          dec_ret 2 (utf_8_uchar_2 b0 b1)
+      | '\xE0' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_xA0_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+      | '\xE1' .. '\xEC' | '\xEE' .. '\xEF' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+      | '\xED' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_x9F b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          dec_ret 3 (utf_8_uchar_3 b0 b1 b2)
+      | '\xF0' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x90_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          let i = i + 1 in if i > max then dec_invalid 3 else
+          let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+          dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+      | '\xF1' .. '\xF3' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_xBF b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          let i = i + 1 in if i > max then dec_invalid 3 else
+          let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+          dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+      | '\xF4' ->
+          let i = i + 1 in if i > max then dec_invalid 1 else
+          let b1 = get b i in if not_in_x80_to_x8F b1 then dec_invalid 1 else
+          let i = i + 1 in if i > max then dec_invalid 2 else
+          let b2 = get b i in if not_in_x80_to_xBF b2 then dec_invalid 2 else
+          let i = i + 1 in if i > max then dec_invalid 3 else
+          let b3 = get b i in if not_in_x80_to_xBF b3 then dec_invalid 3 else
+          dec_ret 4 (utf_8_uchar_4 b0 b1 b2 b3)
+      | _ -> dec_invalid 1
+  end
+
   module String = struct
     include String
     module Set = Set.Make(String)
@@ -234,6 +332,16 @@ module Stdlib = struct
         i = len || (f t.[i] && loop (i + 1))
       in
       loop 0
+
+    let rec to_utf_8_seq b i () =
+      if i >= Bytes.length b then
+        Seq.Nil
+      else
+        let next = Bytes.get_utf_8_uchar b i in
+        let u = Uchar.utf_decode_uchar next in
+        Seq.Cons(u, to_utf_8_seq b (i + Uchar.utf_decode_length next))
+
+    let to_utf_8_seq s = to_utf_8_seq (Bytes.unsafe_of_string s) 0
 
     let print ppf t =
       Format.pp_print_string ppf t
