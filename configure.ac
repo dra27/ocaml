@@ -116,6 +116,7 @@ AC_SUBST([mkexe_extra_flags])
 AC_SUBST([mkexe_via_cc_ldflags])
 AC_SUBST([ccomptype])
 AC_SUBST([toolchain])
+AC_SUBST([map_cflags])
 AC_SUBST([oc_cflags])
 AC_SUBST([oc_cppflags])
 AC_SUBST([oc_ldflags])
@@ -1872,19 +1873,21 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
 
 ## -ffile-prefix-map support by the C compiler - used in the build, not by
 ## the compiler
+map_cflags=''
 AS_IF([test x"$bindir_to_libdir" != 'x'],
   [srcdir_abs_real="$(realpath "$srcdir_abs" 2>/dev/null)"
   AS_IF([test x"$srcdir_abs_real" = 'x'],[srcdir_abs_real="$srcdir_abs"])
   AX_CHECK_COMPILE_FLAG([-ffile-prefix-map=old=new],
-    [internal_cflags="$internal_cflags -ffile-prefix-map=$srcdir_abs=+build"
+    [map_cflags="-ffile-prefix-map=$srcdir_abs=+build"
     AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
-      [internal_cflags="$internal_cflags \
--ffile-prefix-map=$srcdir_abs_real=+build"])],
+      [map_cflags="$map_cflags -ffile-prefix-map=$srcdir_abs_real=+build"])],
     [AS_IF([$cc_has_debug_prefix_map],
-      [internal_cflags="$internal_cflags -fdebug-prefix-map=$srcdir_abs=+build"
+      [map_cflags="-fdebug-prefix-map=$srcdir_abs=+build"
       AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
-        [internal_cflags="$internal_cflags \
--fdebug-prefix-map=$srcdir_abs_real=+build"])])], [$warn_error_flag])])
+        [map_cflags="$map_cflags \
+-fdebug-prefix-map=$srcdir_abs_real=+build"])])], [$warn_error_flag])
+  AS_IF([test x"$map_cflags" != 'x'],
+    [internal_cflags="$internal_cflags $map_cflags"])])
 
 ## Does stat support nanosecond precision
 
