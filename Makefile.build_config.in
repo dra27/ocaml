@@ -31,6 +31,14 @@ AS_IS_CC = @as_is_cc@
 # The C compiler vendor
 OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
+BUILD_PATH_LOGICAL = @srcdir_abs@
+BUILD_PATH_PHYSICAL = @srcdir_abs_real@
+BUILD_MAP_FLAGS = @build_map_flags@
+BUILD_MAP_CFLAGS = $(foreach flag, $(BUILD_MAP_FLAGS), \
+  $(call QUOTE_SINGLE,$(flag)$(BUILD_PATH_LOGICAL)=+build) \
+  $(if $(BUILD_PATH_PHYSICAL), \
+    $(call $(QUOTE_SINGLE),$(flag)$(BUILD_PATH_PHYSICAL)=+build)))
+
 # This is munged into utils/config.ml, not overridable by other parts of
 # the build system.
 OC_DLL_LDFLAGS=@oc_dll_ldflags@
