@@ -110,6 +110,7 @@ AC_SUBST([mkexe])
 AC_SUBST([mkexedebugflag])
 AC_SUBST([ccomptype])
 AC_SUBST([toolchain])
+AC_SUBST([map_cflags])
 AC_SUBST([oc_cflags])
 AC_SUBST([oc_cppflags])
 AC_SUBST([oc_ldflags])
@@ -580,8 +581,8 @@ AS_CASE([$ocaml_cv_cc_vendor],
 # See https://lists.gnu.org/archive/html/autoconf/2019-07/msg00002.html
 # for the detailed explanation.
 
-ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
-ocamlsrcdir=${ocamlsrcdir%X}
+srcdir_abs=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+srcdir_abs=${srcdir_abs%X}
 
 # Libraries to build depending on the host
 
@@ -590,11 +591,12 @@ AS_CASE([$cygwin_build_env,$host],
     [unix_or_win32="win32"
     OCAML_CHECK_LN_ON_WINDOWS
     default_separator='\'
-    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$ocamlsrcdir")"
+    ocamlsrcdir="$(LC_ALL=C.UTF-8 cygpath -w -- "$srcdir_abs")"
     unixlib="win32unix"
     ],
   [unix_or_win32="unix"
   ln='ln -sf'
+  ocamlsrcdir="$srcdir_abs"
   default_separator='/'
   unixlib="unix"])
 
@@ -1759,6 +1761,25 @@ AS_CASE([$ocaml_cv_cc_vendor,$host],
   [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
   [sunc*,sparc-sun-*], [cc_has_debug_prefix_map=false],
   [OCAML_CC_HAS_DEBUG_PREFIX_MAP])
+
+## -ffile-prefix-map support by the C compiler - used in the build, not by
+## the compiler
+map_cflags=''
+AS_IF([test x"$bindir_to_libdir" != 'x'],
+  [srcdir_abs_real="$(realpath "$srcdir_abs" 2>/dev/null)"
+  AS_IF([test x"$srcdir_abs_real" = 'x'],[srcdir_abs_real="$srcdir_abs"])
+  AX_CHECK_COMPILE_FLAG([-Wa,--debug-prefix-map=old=new],
+    [internal_cflags="$internal_cflags \
+-Wa,--debug-prefix-map=$srcdir_abs=+build"], [], [$warn_error_flag])
+  AX_CHECK_COMPILE_FLAG([-ffile-prefix-map=old=new],
+    [map_cflags="-ffile-prefix-map=$srcdir_abs=+build"
+    AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
+      [map_cflags="$map_cflags -ffile-prefix-map=$srcdir_abs_real=+build"])],
+    [AS_IF([$cc_has_debug_prefix_map],
+      [map_cflags="-fdebug-prefix-map=$srcdir_abs=+build"
+      AS_IF([test x"$srcdir_abs_real" != x"$srcdir_abs"],
+        [map_cflags="$map_cflags \
+-fdebug-prefix-map=$srcdir_abs_real=+build"])])], [$warn_error_flag])])
 
 ## Does stat support nanosecond precision
 
