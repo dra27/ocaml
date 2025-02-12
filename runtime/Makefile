@@ -343,7 +343,8 @@ libasmrun_shared.$(SO): $(libasmrunpic_OBJECTS)
 # (without the extension, which is added by the macro)
 define COMPILE_C_FILE
 $(1).$(O): $(2).c
-	$$(CC) -c $$(OC_CFLAGS) $$(OC_CPPFLAGS) $$(OUTPUTOBJ)$$@ $$<
+	$$(CC) -c $$(OC_CFLAGS) $$(PRIVATE_CFLAGS) $$(OC_CPPFLAGS) \
+	  $$(OUTPUTOBJ)$$@ $$<
 endef
 
 object_types := % %_b %_bd %_bi %_bpic %_n %_nd %_ni %_np %_npic
