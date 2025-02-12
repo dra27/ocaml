@@ -132,10 +132,16 @@ let bindir_rules config file =
               && (c_compiler_debug_paths_are_absolute
                   || assembler_embeds_build_path))
       | `Bytecode_ocaml ->
-          (* All bytecode executables are compiled with -g which in particular
-             means that -custom executables will always embed the build path. *)
+          (* All bytecode executables are compiled with -g except for ocamldoc
+             (until #11147 in 5.0). Bytecode executables containing objects
+             compiled with -g will contain the build path when the compiler is
+             not configured with a relative libdir. ocamldoc will contain the
+             build path only if libcamlrun includes it. *)
           linked_with_debug && config.has_relative_libdir = None
           || (classification = Custom
+              && (basename <> "ocamldoc"
+                  || config.has_relative_libdir = None
+                  || c_compiler_debug_paths_are_absolute)
               && Toolchain.linker_propagates_debug_information
               && c_compiler_debug_paths_are_absolute)
       | `Other ->
@@ -270,11 +276,6 @@ let libdir_rules config file =
          && (not Toolchain.linker_propagates_debug_information
              || Toolchain.linker_embeds_build_path) then
         Toolchain.linker_embeds_build_path
-      else if basename = "Makefile.config" then
-        (* When the compiler is configured with a relative libdir, the build
-           directory will also appear since OC_FLAGS wasn't moved to
-           Makefile.build_config.in until #12108 in OCaml 5.1.0 *)
-        config.has_relative_libdir <> None
       else
         has_ocaml_debug_info && config.has_relative_libdir = None
         || has_c_debug_info && c_compiler_debug_paths_are_absolute
