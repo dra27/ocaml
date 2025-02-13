@@ -11,6 +11,16 @@ on:
 # Restrict the GITHUB_TOKEN
 permissions: {}
 
+# GitHub Actions will use /home/runner/work/ocaml/ocaml on Unix (on macOS,
+# /Users/runner/work/ocaml/ocaml). We make a slight adjustment so that the build
+# is done in /home/runner/work/ocaml/build as this creates a build prefix which
+# doesn't contain any common substrings. The effect is that even if zstd
+# compresses this path, the complete build prefix still appears somewhere in the
+# file, if only in a dictionary.
+defaults:
+  run:
+    working-directory: ../build
+
 env:
   # List of test directories for the debug-s4096 and linux-O0 jobs. These
   # directories are selected because of their tendencies to reach corner cases
@@ -42,6 +52,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Move the checkout
+        working-directory: .
+        run: |
+          cd ..
+          mv ocaml build
+          # The directory must exist, or /home/runner/work/ocaml/ocaml/../build
+          # can't be used as a CWD!
+          mkdir ocaml
       - name: Check for manual changes
         id: manual
         run: >-
@@ -99,9 +117,12 @@ jobs:
         with:
           name: compiler
       - name: Unpack Artifact
+        working-directory: .
         run: |
-          tar --zstd -xf sources.tar.zstd
-          rm -f sources.tar.zstd
+          mkdir ../build
+          cd ../build
+          tar --zstd -xf ../ocaml/sources.tar.zstd
+          rm -f ../ocaml/sources.tar.zstd
       - name: Packages
         if: matrix.dependencies != ''
         run: |
@@ -183,6 +204,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Move the checkout
+        working-directory: .
+        run: |
+          cd ..
+          mv ocaml build
+          # The directory must exist, or /home/runner/work/ocaml/ocaml/../build
+          # can't be used as a CWD!
+          mkdir ocaml
+
       - name: MacOS 13 Dependencies
         if: matrix.os == 'macos-13'
         run: |
@@ -242,6 +272,7 @@ jobs:
       options: --platform linux/i386 --user root
     steps:
       - name: OS Dependencies
+        working-directory: .
         run: |
           apt-get update -y
           apt-get install -y git gcc make parallel
@@ -249,6 +280,12 @@ jobs:
       - name: Checkout
         # See https://github.com/actions/checkout/issues/334
         uses: actions/checkout@v1
+      - name: Move the checkout
+        working-directory: .
+        run: |
+          cd ..
+          mv ocaml build
+          mkdir ocaml
       - name: configure tree
         run: |
           chown -R ocaml:ocaml .
