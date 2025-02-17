@@ -3334,6 +3334,7 @@ tsan_ldflags="-fsanitize=thread"
 CSC=""
 CSCFLAGS=""
 
+# ostype *must* be of "Unix", "Win32", or "Cygwin"
 ostype="Unix"
 SO="so"
 toolchain="cc"

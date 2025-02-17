@@ -55,11 +55,12 @@ end
 let prepend_to_list l e = l := e :: !l
 
 (* Fix path to use '/' as directory separator instead of '\'.
-   Only under Windows. *)
-let fix_slash s =
-  if Sys.os_type = "Unix" then s else begin
-    String.map (function '\\' -> '/' | c -> c) s
-  end
+   Only under Windows/Cygwin. *)
+let fix_slash =
+  if Sys.unix then
+    Fun.id
+  else
+    String.map (function '\\' -> '/' | c -> c)
 
 (* Since we reinitialize load_path after reading OCAMLCOMP,
   we must use a cache instead of calling Sys.readdir too often. *)

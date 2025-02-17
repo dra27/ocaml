@@ -149,7 +149,13 @@ val os_type : string
 (** Operating system currently executing the OCaml program. One of
 -  ["Unix"] (for all Unix versions, including Linux and Mac OS X),
 -  ["Win32"] (for MS-Windows, OCaml compiled with MSVC++ or MinGW-w64),
--  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin). *)
+-  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin).
+
+   There have been other possible values for this string in OCaml's history, but
+   these three possible values are now permanently fixed. It is recommended that
+   {!unix}, {!win32}, or {!cygwin} be used instead, to avoid the need for
+   string comparison.
+*)
 
 type backend_type =
   | Native

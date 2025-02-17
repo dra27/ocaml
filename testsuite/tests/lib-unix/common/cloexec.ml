@@ -53,14 +53,15 @@
    Windows will not allocate to the OCaml runtime of fdstatus.exe *)
 
 let string_of_fd (fd: Unix.file_descr) : string =
-  match Sys.os_type with
-  | "Unix" | "Cygwin" ->  Int.to_string (Obj.magic fd : int)
-  | "Win32" ->
-      if Sys.word_size = 32 then
-        Int32.to_string (Obj.magic fd : int32)
-      else
-        Int64.to_string (Obj.magic fd : int64)
-  | _ -> assert false
+  if Sys.unix || Sys.cygwin then
+    Int.to_string (Obj.magic fd : int)
+  else if Sys.win32 then
+    if Sys.word_size = 32 then
+      Int32.to_string (Obj.magic fd : int32)
+    else
+      Int64.to_string (Obj.magic fd : int64)
+  else
+    assert false
 
 let status_checker = "fdstatus.exe"
 

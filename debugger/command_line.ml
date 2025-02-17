@@ -79,11 +79,8 @@ let error text =
   raise Toplevel
 
 let check_not_windows feature =
-  match Sys.os_type with
-  | "Win32" ->
-      error ("\'"^feature^"\' feature not supported on Windows")
-  | _ ->
-      ()
+  if Sys.win32 then
+    error ("\'"^feature^"\' feature not supported on Windows")
 
 let eol =
   end_of_line Lexer.lexeme
