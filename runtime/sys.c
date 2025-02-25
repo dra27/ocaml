@@ -721,6 +721,14 @@ CAMLprim value caml_sys_const_backend_type(value unit)
 {
   return Val_int(1); /* Bytecode backed */
 }
+
+#ifndef NATIVE_CODE
+CAMLprim value caml_sys_const_standard_library_default(value unit)
+{
+  return caml_copy_string_of_os(caml_standard_library_default);
+}
+#endif
+
 CAMLprim value caml_sys_get_config(value unit)
 {
   CAMLparam0 ();   /* unit is unused */
