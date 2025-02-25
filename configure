@@ -20760,8 +20760,6 @@ fi
 
 ## -fdebug-prefix-map support by the C compiler
 case $ocaml_cc_vendor,$target in #(
-  *,*-w64-mingw32*) :
-    cc_has_debug_prefix_map=false ;; #(
   *,*-pc-windows) :
     cc_has_debug_prefix_map=false ;; #(
   xlc*,powerpc-ibm-aix*) :
@@ -22862,7 +22860,7 @@ asm_cfi_supported=false
 if $native_compiler
 then :
   case $target in #(
-  *-w64-mingw32*|*-pc-windows) :
+  *-pc-windows) :
      ;; #(
   *) :
 

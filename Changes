@@ -279,6 +279,9 @@ Working version
 - #13764, #13779: add missing "-keywords" flag to ocamldep and ocamlprof
   (Florian Angeletti, report by Prashanth Mundkur, review by Gabriel Scherer)
 
+- #13830: Detect and use -fdebug-prefix-map on mingw-w64
+  (David Allsopp, review by ???)
+
 ### Manual and documentation:
 
 - #13694: Fix name for caml_hash_variant in the C interface.
