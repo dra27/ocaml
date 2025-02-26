@@ -434,6 +434,7 @@ CAMLexport void caml_main(char_os **argv)
   char * req_prims;
   char_os * shared_lib_path, * shared_libs;
   char_os * exe_name, * proc_self_exe;
+  char_os * image_standard_library_default;
 
   caml_ensure_spacetime_dot_o_is_included++;
 
@@ -548,6 +549,15 @@ CAMLexport void caml_main(char_os **argv)
   req_prims = read_section(fd, &trail, "PRIM");
   if (req_prims == NULL) caml_fatal_error("no PRIM section");
   caml_build_primitive_table(shared_lib_path, shared_libs, req_prims);
+  /* Load the embedded overridden caml_standard_library_default value, if one is
+     available. Note that although -custom executables come through this
+     mechanism, they don't define OSLD sections because
+     caml_runtime_standard_library_default and caml_standard_library_default are
+     fundamentally equal and caml_runtime_standard_library_default is set when
+     the -custom executable is linked. */
+  image_standard_library_default = read_section_to_os(fd, &trail, "OSLD");
+  if (image_standard_library_default != NULL)
+    caml_standard_library_default = image_standard_library_default;
   caml_stat_free(shared_lib_path);
   caml_stat_free(shared_libs);
   caml_stat_free(req_prims);
