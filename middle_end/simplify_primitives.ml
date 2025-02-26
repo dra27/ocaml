@@ -232,6 +232,9 @@ let primitive (p : Lambda.primitive) (args, approxs) expr dbg ~size_int
           S.const_bool_expr expr (String.equal Sys.os_type "Cygwin")
         | Backend_type ->
           S.const_ptr_expr expr 0 (* tag 0 is the same as Native *)
+        | Standard_library_default ->
+            (* XXX TODO ... *)
+            assert false
         end
       | _ -> expr, A.value_unknown Other, C.Benefit.zero
       end
