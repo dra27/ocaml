@@ -16,8 +16,6 @@
 
 let bindir = "%%OCAML_BINDIR%%"
 
-let standard_library_default = "%%LIBDIR%%"
-
 let ccomp_type = "%%CCOMPTYPE%%"
 let c_compiler = "%%CC%%"
 let c_output_obj = "%%OUTPUTOBJ%%"
