@@ -760,9 +760,16 @@ runtime/primitives: \
                     echo runtime/primitives.new)
 	cp $^ $@
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+  CHAR_OS = char
+else
+  CHAR_OS = wchar_t
+endif
+
 runtime/prims.c : runtime/primitives
 	export LC_ALL=C; \
 	(echo '#include "caml/config.h"'; \
+	 echo '#include "build_config.h"'; \
 	 echo 'typedef intnat value;'; \
 	 echo 'typedef value (*c_primitive)(void);'; \
 	 echo; \
@@ -777,7 +784,9 @@ runtime/prims.c : runtime/primitives
 	 echo '  0 };'; \
 	 echo; \
 	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
-	 echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;') > $@
+	 echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;'; \
+	 echo "const $(CHAR_OS) *caml_runtime_standard_library_default = \
+OCAML_STDLIB_DIR;") > $@
 
 runtime/caml/opnames.h : runtime/caml/instruct.h
 	tr -d '\r' < $< | \
@@ -814,6 +823,8 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
+
+runtime/prims.$(O): runtime/build_config.h
 
 ## Runtime libraries and programs
 
