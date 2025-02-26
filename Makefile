@@ -1392,6 +1392,8 @@ runtime/build_config.h: $(ROOTDIR)/Makefile.config $(SAK)
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
 
+runtime/prims.$(O): runtime/build_config.h
+
 ## Runtime libraries and programs
 
 runtime/ocamlrun$(EXE): runtime/prims.$(O) runtime/libcamlrun.$(A)
