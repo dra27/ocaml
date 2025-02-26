@@ -100,6 +100,10 @@ SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
 # in config.mlp.  Thus, backslashes and double quotes must be escaped.
 SUBST_STRING=-e 's!%%$1%%!$(call SED_ESCAPE,$(call OCAML_ESCAPE,$($1)))!'
 
+# Allow Makefile.cross to add flags to OC_COMMON_LINKFLAGS
+OC_CROSS_LINKFLAGS ?=
+OC_COMMON_LINKFLAGS += $(OC_CROSS_LINKFLAGS)
+
 # The rule to compile C files
 
 # This rule is similar to GNU make's implicit rule, except that it is more
