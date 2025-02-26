@@ -211,9 +211,16 @@ primitives: $(shell ./gen_primitives.sh > primitives.new; \
                     cmp -s primitives primitives.new || echo primitives.new)
 	cp $^ $@
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+  CHAR_OS = char
+else
+  CHAR_OS = wchar_t
+endif
+
 prims.c : primitives
 	export LC_ALL=C; \
 	(echo '#include "caml/config.h"'; \
+	 echo '#include "build_config.h"'; \
 	 echo 'typedef intnat value;'; \
 	 echo 'typedef value (*c_primitive)(void);'; \
 	 echo; \
@@ -228,7 +235,9 @@ prims.c : primitives
 	 echo '  0 };'; \
 	 echo; \
 	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
-   echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;') > $@
+   echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;'; \
+	 echo "const $(CHAR_OS) *caml_runtime_standard_library_default = \
+OCAML_STDLIB_DIR;") > $@
 
 caml/opnames.h : caml/instruct.h
 	cat $^ | tr -d '\r' | \
@@ -259,6 +268,8 @@ build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
 	         '$(call C_LITERAL,$(TARGET_LIBDIR))'; \
 	  echo '#define HOST "$(HOST)"'; \
 	} > $@
+
+prims.$(O): build_config.h
 
 # Libraries and programs
 
