@@ -43,6 +43,10 @@ CAMLnoreturn_end;
 
 extern char_os * caml_exe_name;
 
+/* The default location of the Standard Library as used by the
+   %standard_library_default to find */
+extern char_os *caml_standard_library_default;
+
 #ifdef __cplusplus
 }
 #endif
