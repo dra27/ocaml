@@ -209,16 +209,6 @@ let libdir_rules config file =
           not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
         (None, false, c_debug, is_ocaml)
       else if ext = Config.ext_lib || ext = Config.ext_dll then
-        (* Based on the filename, is this one of the bytecode runtime libraries
-           (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
-           Note that these properties are _not_ used for libasmrun* (see
-           below) *)
-        let is_camlrun =
-          let dir = Filename.basename (Filename.dirname file) in
-          dir <> "stublibs"
-            && String.starts_with ~prefix:"libcamlrun" basename
-            && not (String.starts_with ~prefix:"libcamlruntime" basename)
-        in
         if ext = Config.ext_lib then
           let name = Filename.remove_extension basename in
           (* ocamldoc's artefacts are not compiled with -g until #11147
@@ -235,8 +225,7 @@ let libdir_rules config file =
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            is_camlrun
-            || Filename.remove_extension basename = "dynlink"
+            Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
           let c_debug =
@@ -249,7 +238,7 @@ let libdir_rules config file =
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
-          (not_optionally is_camlrun, false, true, false)
+          (None, false, true, false)
       else
         (None, false, false, false)
     in
