@@ -2742,6 +2742,7 @@ asmcomp/cmmgen.cmo : \
     utils/numbers.cmi \
     utils/misc.cmi \
     bytecomp/lambda.cmi \
+    typing/ident.cmi \
     middle_end/debuginfo.cmi \
     utils/config.cmi \
     asmcomp/compilenv.cmi \
@@ -2766,6 +2767,7 @@ asmcomp/cmmgen.cmx : \
     utils/numbers.cmx \
     utils/misc.cmx \
     bytecomp/lambda.cmx \
+    typing/ident.cmx \
     middle_end/debuginfo.cmx \
     utils/config.cmx \
     asmcomp/compilenv.cmx \

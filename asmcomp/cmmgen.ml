@@ -2130,6 +2130,9 @@ and transl_prim_1 env p arg dbg =
         | Ostype_win32 -> const_of_bool (Sys.os_type = "Win32")
         | Ostype_cygwin -> const_of_bool (Sys.os_type = "Cygwin")
         | Backend_type -> int_const 0 (* tag 0 is the same as Native here *)
+        | Standard_library_default ->
+            Compilenv.need_stdlib_location ();
+            Cconst_symbol (Ident.name (Compilenv.stdlib_symbol_name))
       end
   | Poffsetint n ->
       if no_overflow_lsl n 1 then
@@ -2951,13 +2954,13 @@ let cdefine_symbol (symb, global) =
 
 (* Emit structured constants *)
 
+let emit_block white_header symb cont =
+  (* Headers for structured constants must be marked black in case we
+     are in no-naked-pointers mode.  See [caml_darken]. *)
+  let black_header = Nativeint.logor white_header caml_black in
+  Cint black_header :: cdefine_symbol symb @ cont
+
 let rec emit_structured_constant symb cst cont =
-  let emit_block white_header symb cont =
-    (* Headers for structured constants must be marked black in case we
-       are in no-naked-pointers mode.  See [caml_darken]. *)
-    let black_header = Nativeint.logor white_header caml_black in
-    Cint black_header :: cdefine_symbol symb @ cont
-  in
   match cst with
   | Uconst_float s->
       emit_block float_header symb (Cdouble s :: cont)
@@ -3629,6 +3632,13 @@ let predef_exception i name =
                          Uconst_ref(label, Some cst);
                          Uconst_int (-i-1);
                        ])) cont)
+
+let emit_global_string_constant name value =
+  let data_items =
+    emit_block (string_header (String.length value)) (name, Global)
+      (emit_string_constant value [])
+  in
+  Cdata data_items
 
 (* Header for a plugin *)
 
