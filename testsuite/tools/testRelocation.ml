@@ -202,12 +202,6 @@ let libdir_rules config file =
            (libcamlrun.a, libcamlrund.a, libcamlrun_shared.so, etc.
            Note that these properties are _not_ used for libasmrun* (see
            below) *)
-        let is_camlrun =
-          let dir = Filename.basename (Filename.dirname file) in
-          dir <> "stublibs"
-            && String.starts_with ~prefix:"libcamlrun" basename
-            && not (String.starts_with ~prefix:"libcamlruntime" basename)
-        in
         if ext = Config.ext_lib then
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
@@ -215,15 +209,14 @@ let libdir_rules config file =
           (* Config.standard_library is in ocamlcommon and the bytecode runtime
              embeds the Standard Library location *)
           let stdlib =
-            is_camlrun
-            || Filename.remove_extension basename = "dynlink"
+            Filename.remove_extension basename = "dynlink"
             || Filename.remove_extension basename = "ocamlcommon"
           in
           (stdlib, false, (not is_ocaml), is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
-          (is_camlrun, false, true, false)
+          (false, false, true, false)
       else
         (false, false, false, false)
     in
