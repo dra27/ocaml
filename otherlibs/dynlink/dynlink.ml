@@ -23,6 +23,9 @@ open! Dynlink_compilerlibs  (* REMOVE_ME for ../../debugger/dynlink.ml *)
 module DC = Dynlink_common
 module DT = Dynlink_types
 
+external caml_dynlink_parse_runtime_ld_conf : unit -> unit
+  = "caml_dynlink_parse_runtime_ld_conf"
+
 module Bytecode = struct
   type filename = string
 
@@ -66,6 +69,14 @@ module Bytecode = struct
       invalid_arg "The dynlink.cma library cannot be used \
         inside the OCaml toplevel"
     end;
+    (* The pack for Dynlink_compilerlibs simply re-packs the existing modules
+       until #1063 in 4.09.0, which prevents patching bytecomp/dll.ml to call
+       caml_dynlink_parse_runtime_ld_conf instead of caml_dynlink_parse_ld_conf.
+       Instead, the primitive is called _before_ Symtable.init_toplevel (which
+       will call caml_dynlink_parse_ld_conf) in order to signal the runtime to
+       use caml_runtime_standard_library_default instead of
+       Config.standard_library_default. *)
+    caml_dynlink_parse_runtime_ld_conf ();
     default_crcs := Symtable.init_toplevel ();
     default_global_map := Symtable.current_state ()
 
