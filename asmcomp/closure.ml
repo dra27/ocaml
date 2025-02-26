@@ -496,15 +496,20 @@ let simplif_prim_pure fpc p (args, approxs) dbg =
   (* Compile-time constants *)
   | Pctconst c, _, _ ->
       begin match c with
-        | Big_endian -> make_const_bool Arch.big_endian
-        | Word_size -> make_const_int (8*Arch.size_int)
-        | Int_size -> make_const_int (8*Arch.size_int - 1)
-        | Max_wosize -> make_const_int ((1 lsl ((8*Arch.size_int) - 10)) - 1 )
-        | Ostype_unix -> make_const_bool (Sys.os_type = "Unix")
-        | Ostype_win32 -> make_const_bool (Sys.os_type = "Win32")
-        | Ostype_cygwin -> make_const_bool (Sys.os_type = "Cygwin")
-        | Backend_type ->
-            make_const_ptr 0 (* tag 0 is the same as Native here *)
+      | Big_endian -> make_const_bool Arch.big_endian
+      | Word_size -> make_const_int (8*Arch.size_int)
+      | Int_size -> make_const_int (8*Arch.size_int - 1)
+      | Max_wosize -> make_const_int ((1 lsl ((8*Arch.size_int) - 10)) - 1)
+      | Ostype_unix -> make_const_bool (Sys.os_type = "Unix")
+      | Ostype_win32 -> make_const_bool (Sys.os_type = "Win32")
+      | Ostype_cygwin -> make_const_bool (Sys.os_type = "Cygwin")
+      | Backend_type ->
+          make_const_ptr 0 (* tag 0 is the same as Native here *)
+      | Standard_library_default ->
+          Compilenv.need_stdlib_location ();
+          let id = Compilenv.stdlib_symbol_name in
+          Uprim(Pgetglobal id, [], Debuginfo.none),
+          Value_const (Uconst_ref (Ident.name id, None))
       end
   (* Catch-all *)
   | _ ->
@@ -1382,7 +1387,9 @@ let collect_exported_structured_constants a =
     | Uconst_ref (s, (Some c)) ->
         Compilenv.add_exported_constant s;
         structured_constant c
-    | Uconst_ref (_s, None) -> assert false (* Cannot be generated *)
+    | Uconst_ref (s, None) ->
+        (* Only generated in one context *)
+        assert (s = Ident.name Compilenv.stdlib_symbol_name)
     | Uconst_int _ | Uconst_ptr _ -> ()
   and structured_constant = function
     | Uconst_block (_, ul) -> List.iter const ul
