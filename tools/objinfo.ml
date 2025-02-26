@@ -32,6 +32,8 @@ let shape = ref false
 
 module Magic_number = Misc.Magic_number
 
+let yesno_of_bool oc b = output_string oc (if b then "YES" else "no")
+
 let input_stringlist ic len =
   let get_string_list sect len =
     let rec fold s e acc =
@@ -77,13 +79,13 @@ let print_cmo_infos cu =
         printf "YES\n";
         printf "Primitives declared in this module:\n";
         List.iter print_line l);
-  printf "Force link: %s\n" (if cu.cu_force_link then "YES" else "no")
+  printf "Force link: %a\n" yesno_of_bool cu.cu_force_link
 
 let print_spaced_string s =
   printf " %s" s
 
 let print_cma_infos (lib : Cmo_format.library) =
-  printf "Force custom: %s\n" (if lib.lib_custom then "YES" else "no");
+  printf "Force custom: %a\n" yesno_of_bool lib.lib_custom;
   printf "Extra C object files:";
   (* PR#4949: print in linking order *)
   List.iter print_spaced_string (List.rev lib.lib_ccobjs);
@@ -180,7 +182,9 @@ let print_cmx_infos (ui, crc) =
   printf "Currying functions:%a\n" pr_funs ui.ui_curry_fun;
   printf "Apply functions:%a\n" pr_funs ui.ui_apply_fun;
   printf "Send functions:%a\n" pr_funs ui.ui_send_fun;
-  printf "Force link: %s\n" (if ui.ui_force_link then "YES" else "no")
+  printf "Force link: %a\n" yesno_of_bool ui.ui_force_link;
+  printf
+    "Requires caml_standard_library_nat: %a\n" yesno_of_bool ui.ui_need_stdlib
 
 let print_cmxa_infos (lib : Cmx_format.library_infos) =
   printf "Extra C object files:";
@@ -245,6 +249,11 @@ let dump_byte ic =
                  (input_stringlist ic len)
            | "SYMB" ->
                print_global_table (input_value ic)
+           | "OSLD" ->
+               let caml_standard_library_default =
+                 Bytesections.read_section_string ic section in
+               printf "caml_standard_library_default: %s\n"
+                      caml_standard_library_default
            | _ -> ()
        with _ -> ()
     )
