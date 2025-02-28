@@ -34,6 +34,10 @@ jobs:
     outputs:
       manual_changed: ${{ steps.manual.outputs.manual_changed }}
     steps:
+      - name: OS Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libx11-dev
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -96,7 +100,8 @@ jobs:
       - name: Packages
         if: matrix.dependencies != ''
         run: |
-          sudo apt-get update -y && sudo apt-get install -y ${{ matrix.dependencies }}
+          sudo apt-get update -y
+          sudo apt-get install -y libx11-dev ${{ matrix.dependencies }}
       - name: Run the testsuite
         if: matrix.id == 'normal'
         run: |
@@ -143,6 +148,11 @@ jobs:
           - name: macos-arm64
             os: macos-14
     steps:
+      - name: Linux Dependencies
+        if: startsWith(matrix.os, 'ubuntu-')
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libx11-dev
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -169,7 +179,7 @@ jobs:
     steps:
       - name: OS Dependencies
         run: |
-          apt-get update
+          apt-get update -y
           apt-get install -y git gcc make parallel libx11-dev
           adduser --disabled-password --gecos '' ocaml
       - name: Checkout
