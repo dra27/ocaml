@@ -1971,7 +1971,8 @@ third-party libraries such as Lwt, but with a different API."
     include Core
     include Compiler
     let _compat_32 = set bytecode_compatible_32
-    let _custom = set custom_runtime
+    let _custom () =
+      custom_runtime := true; use_runtime := ""; use_prims := ""
     let _dcamlprimc = set keep_camlprimc_file
     let _dinstr = set dump_instr
     let _dllib s = Compenv.defer (ProcessDLLs (Misc.rev_split_words s))
@@ -1986,8 +1987,8 @@ third-party libraries such as Lwt, but with a different API."
     let _output_complete_exe () =
       _output_complete_obj (); output_complete_executable := true
     let _output_obj () = output_c_object := true; custom_runtime := true
-    let _use_prims s = use_prims := s
-    let _use_runtime s = use_runtime := s
+    let _use_prims s = use_prims := s; custom_runtime := false
+    let _use_runtime s = use_runtime := s; custom_runtime := false
     let _launch_method = function
     | "exe" ->
         launch_method := Some Executable
