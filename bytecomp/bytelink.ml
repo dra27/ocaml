@@ -299,12 +299,11 @@ type launch_method =
 | Shebang_runtime
 | Executable
 
-type[@ocaml.warning "-69"] runtime_launch_info = {
+type runtime_launch_info = {
   buffer : string;
   bindir : string;
   launcher : launch_method;
-  executable_offset : int;
-  runtime_id : string
+  executable_offset : int
 }
 
 (* See https://www.in-ulm.de/~mascheck/various/shebang/#origin for a deep
@@ -320,9 +319,8 @@ let invalid_for_shebang_line path =
   String.length path > 125 || String.exists invalid_char path
 
 (* The runtime-launch-info file consists of two "lines" followed by binary data.
-   The file is _always_ LF-formatted, even on Windows. The first four bytes are
-   the bytecode runtime ID. The sequence of bytes following that up to the first
-   '\n' is interpreted:
+   The file is _always_ LF-formatted, even on Windows. The sequence of bytes up
+   to the first '\n' is interpreted:
      - "sh" - use a shebang-style launcher. If sh is needed, determine its
               location from [command -p -v sh]
      - "exe" - use the executable launcher contained in this runtime-launch-info
@@ -349,11 +347,7 @@ let read_runtime_launch_info file =
     let bindir = String.sub buffer bindir_start (bindir_end - bindir_start) in
     let executable_offset = bindir_end + 2 in
     let launcher =
-      let kind =
-        if buffer.[0] = '0' then
-          String.sub buffer 4 (bindir_start - 5)
-        else
-          String.sub buffer 0 (bindir_start - 1) in
+      let kind = String.sub buffer 0 (bindir_start - 1) in
       if kind = "exe" then
         Executable
       else if kind <> "" && (kind.[0] = '/' || kind = "sh") then
@@ -364,7 +358,7 @@ let read_runtime_launch_info file =
        || buffer.[executable_offset - 1] <> '\n' then
       raise Not_found
     else
-      {bindir; launcher; buffer; executable_offset; runtime_id = ""}
+      {bindir; launcher; buffer; executable_offset}
   with Not_found ->
     raise (Error (Camlheader ("corrupt header", file)))
 
