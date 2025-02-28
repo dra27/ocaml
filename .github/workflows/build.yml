@@ -83,7 +83,8 @@ jobs:
       - name: Packages
         if: matrix.dependencies != ''
         run: |
-          sudo apt-get update -y && sudo apt-get install -y libx11-dev ${{ matrix.dependencies }}
+          sudo apt-get update -y
+          sudo apt-get install -y libx11-dev ${{ matrix.dependencies }}
       - name: Run the testsuite
         if: matrix.id == 'normal'
         run: |
@@ -156,7 +157,7 @@ jobs:
     steps:
       - name: OS Dependencies
         run: |
-          apt-get update
+          apt-get update -y
           apt-get install -y git gcc make parallel libx11-dev
           adduser --disabled-password --gecos '' ocaml
       - name: Checkout
