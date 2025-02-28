@@ -40,8 +40,9 @@ type runtime_launch_info = {
   bindir : string;          (** Directory containing runtime executables *)
   launcher : launch_method; (** Default launch method (this is never
                                 {!Shebang_runtime}) *)
-  executable_offset : int   (** Offset in the buffer field at which the
+  executable_offset : int;  (** Offset in the buffer field at which the
                                 executable stub data begins *)
+  runtime_id : string       (** Bytecode Runtime ID *)
 }
 
 val read_runtime_launch_info : string -> runtime_launch_info
