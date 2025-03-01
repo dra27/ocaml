@@ -90,7 +90,9 @@ let compile_file ?output ?(opt="") ?stable_name name =
       ("", "") in
   let debug_prefix_map =
     match stable_name with
-    | Some stable when Config.c_has_debug_prefix_map ->
+    | Some stable
+      when Config.c_has_debug_prefix_map
+           && not (String.starts_with ~prefix:"mingw" Config.system) ->
       Printf.sprintf " -fdebug-prefix-map=%s=%s" name stable
     | Some _ | None -> "" in
   let exit =
