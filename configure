@@ -15287,8 +15287,6 @@ fi
 
 ## -fdebug-prefix-map support by the C compiler
 case $CC,$host in #(
-  *,*-*-mingw32) :
-    cc_has_debug_prefix_map=false ;; #(
   *,*-pc-windows) :
     cc_has_debug_prefix_map=false ;; #(
   xlc*,powerpc-ibm-aix*) :
