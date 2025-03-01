@@ -1491,6 +1491,8 @@ AS_CASE([$as_target,$ocaml_cv_cc_vendor],
     [AS_CASE([$as_cpu],
       [x86_64|arm*|aarch64*|i[[3-6]]86|riscv*],
         [default_as="${toolpref}as"])],
+  [*-*-cygwin,gcc-*],
+    [default_as="${toolpref}as"],
   [i686-pc-windows,*],
     [default_as="ml -nologo -coff -Cp -c -Fo"
     default_aspp="$default_as"],
