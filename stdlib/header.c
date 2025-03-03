@@ -387,7 +387,6 @@ int main(int argc, char *argv[])
 #endif
     argv0_dirname = NULL;
 
-  argv[0] = truename;
   search_and_exec_runtime(runtime_path, rntm_size + 1, argv, argv0_dirname);
 }
 
