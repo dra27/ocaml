@@ -316,9 +316,8 @@ let test_runs usr_bin_sh test_program_path test_program
               (* stdlib/header.c correctly preserves argv[0] for Windows *)
               Success {executable_name = test_program_path; argv0}
             else
-              (* stdlib/header.c does not preserve argv[0] for Unix *)
-              Success {executable_name = argv0_resolved;
-                       argv0 = argv0_resolved}
+              (* stdlib/header.c correctly preserves argv[0] *)
+              Success {executable_name = argv0_resolved; argv0}
         | Custom ->
             if Harness.no_caml_executable_name then
               if argv0_not_ocaml then
