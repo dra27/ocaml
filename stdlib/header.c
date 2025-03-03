@@ -241,7 +241,6 @@ int main(int argc, char *argv[])
                     " not found or is not a bytecode executable file");
   close(fd);
 
-  argv[0] = truename;
   execvp(runtime_path, argv);
 
   exit_with_error("Cannot exec ", runtime_path, NULL);
