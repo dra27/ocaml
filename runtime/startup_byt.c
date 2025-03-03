@@ -121,7 +121,7 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
   char_os * truename;
   int fd;
   int err;
-  char buf [2], * u8;
+  char *u8;
 
   truename = caml_search_exe_in_path(*name);
   u8 = caml_stat_strdup_of_os(truename);
@@ -136,15 +136,18 @@ int caml_attempt_open(char_os **name, struct exec_trailer *trail,
     else
       return FILE_NOT_FOUND;
   }
+#ifndef _WIN32
+  char buf[2];
   if (!do_open_script) {
     err = read (fd, buf, 2);
-    if (err < 2 || (buf [0] == '#' && buf [1] == '!')) {
+    if (err < 2 || (buf[0] == '#' && buf[1] == '!')) {
       close(fd);
       caml_stat_free(truename);
       CAML_GC_MESSAGE(STARTUP, "Rejected #! script\n");
       return BAD_BYTECODE;
     }
   }
+#endif
   err = caml_read_trailer(fd, trail);
   if (err != 0) {
     close(fd);
