@@ -2460,7 +2460,8 @@ let compile_test env =
               {argv0_not_ocaml = false; argv0_resolved = test_program_relative}
             ] in
             let runs =
-              let test_with_outcome (({argv0; _} as test), properties) =
+              let test_with_outcome
+                    (({argv0; prefix_path_with_cwd; _} as test), properties) =
                 let {argv0_not_ocaml; argv0_resolved} = properties in
                 let outcome =
                   (* If strategy has been specified, this program is going to be
@@ -2477,13 +2478,7 @@ let compile_test env =
                                  argv0 = test_program_path}
                     | Tendered(~header:Header_exe, ~dlls:_) ->
                         if argv0_not_ocaml then
-                          if Sys.win32 then
-                            (* stdlib/header.c will find ocamlrun (because it
-                               effectively uses caml_executable_name) but fails
-                               to hand off the bytecode image, which causes
-                               ocamlrun to exit with code 127 *)
-                            Fail 127
-                          else if no_caml_executable_name then
+                          if no_caml_executable_name then
                             (* stdlib/header.c will fail to find ocamlrun
                                because caml_executable_name isn't implemented so
                                will either fail to find the executable or will
@@ -2491,8 +2486,11 @@ let compile_test env =
                                Somewhat confusingly, it exits with code 2 *)
                             Fail 2
                           else
-                            Success {executable_name = test_program_path;
-                                     argv0 = test_program_path}
+                            (* stdlib/header.c will find ocamlrun (because it
+                               effectively uses caml_executable_name) but fails
+                               to hand off the bytecode image, which causes
+                               ocamlrun to exit with code 127 *)
+                            Fail 127
                         else if Sys.win32 then
                           (* stdlib/header.c correctly preserves argv[0] *)
                           Success {executable_name = test_program_path; argv0}
@@ -2503,14 +2501,18 @@ let compile_test env =
                              relative to argv[0], which will fail. *)
                           Fail 134
                         else
-                          (* stdlib/header.c does not preserve argv[0] *)
+                          (* stdlib/header.c correctly preserves argv[0] *)
                           let executable_name =
-                            if no_caml_executable_name then
+                            (* XXX The Windows implementation uses SearchPath
+                                   which results explicit files in the cwd, but
+                                   that doesn't happen elsewhere *)
+                            if no_caml_executable_name
+                               || prefix_path_with_cwd then
                               argv0_resolved
                             else
-                              test_program_path
+                              argv0
                           in
-                          Success {executable_name; argv0 = executable_name}
+                          Success {executable_name; argv0}
                     | Custom ->
                         if no_caml_executable_name then
                           if argv0_not_ocaml then
