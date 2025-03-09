@@ -233,8 +233,8 @@ type signal = int
   This is either a platform independent negative number for those signals
   that OCaml recognizes or a positive number for a platform dependent
   signal number. The function {!signal_of_int} converts known platform dependent
-  numbers to independent ones, and {!signal_to_int} does the reverse converting
-  known platform independent numbers to dependent ones. *)
+  numbers to independent ones, and {!signal_to_int} does the reverse.
+  @since 5.4 *)
 
 type signal_behavior =
     Signal_default
@@ -257,7 +257,6 @@ external signal :
 
 val set_signal : signal -> signal_behavior -> unit
 (** Same as {!Sys.signal} but return value is ignored. *)
-
 
 (** {2 Signal numbers for the standard POSIX signals.} *)
 
