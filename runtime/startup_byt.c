@@ -27,6 +27,7 @@
 #include <unistd.h>
 #endif
 #ifdef _WIN32
+#include <windows.h>
 #include <io.h>
 #include <process.h>
 #endif
@@ -77,7 +78,7 @@ const char_os * caml_runtime_standard_library_effective = NULL;
 static char magicstr[EXEC_MAGIC_LENGTH+1];
 
 /* Print the specified error message followed by an end-of-line and exit */
-static void error(const char *msg, ...)
+CAMLnoret static void error(const char *msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
@@ -490,71 +491,137 @@ CAMLexport void caml_main(char_os **argv)
 
   argv0 = proc_self_exe = caml_executable_name();
 
-  if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
-    /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
-    exe_name = caml_search_exe_in_path(argv[0]);
-    fd = caml_attempt_open(exe_name, &trail, 0);
-    if (proc_self_exe == NULL) {
-      tofree = argv0 = exe_name;
-    } else if (fd < 0) {
-      caml_stat_free(exe_name);
+  /* XXX Security implications. The ordering is all wrong atm as well.
+         Querying proc_self_exe / argv[0] should be controlled by a prims.c flag
+         (so that -custom runtimes _always_ expect to do that and bomb
+         otherwise); Such executables would therefore not do this trick _at all_
+         */
+  /* XXX Given that we're using sscanf, and Windows doesn't need to pass a
+         filename, could possibly do a different encoding for __OCAML_EXEC_FD
+         to be <unsigned-decimal><filename> and have the executable header
+         ensure that the filename always begins with ./ or / ?? */
+  char_os *str_fd = caml_secure_getenv(T("__OCAML_EXEC_FD"));
+  if (str_fd != NULL) {
+#ifdef _WIN32
+    if (wcslen(str_fd) != 1)
+      error("descriptor passed via environment is invalid");
+    else
+      fd = (int)str_fd[0];
+    DWORD len =
+      GetFinalPathNameByHandle((HANDLE)_get_osfhandle(fd),
+                               NULL, 0, VOLUME_NAME_DOS);
+    if (len > 0) {
+      exe_name = caml_stat_alloc((len + 1) * sizeof(wchar_t));
+      if (GetFinalPathNameByHandle((HANDLE)_get_osfhandle(fd),
+                                   exe_name, len, VOLUME_NAME_DOS) != 0) {
+        /* XXX UNC paths, etc. */
+        if (len > 4 && exe_name[0] == L'\\' && exe_name[1] == L'\\'
+                    && exe_name[2] == L'?' && exe_name[3] == L'\\') {
+          wchar_t *p = exe_name + 4;
+          wchar_t *w = exe_name;
+          while ((*w++ = *p++));
+        }
+      } else {
+        /* XXX Definite error here - exe_name needs restoring to something else
+         */
+        error("figure out the error");
+      }
+    } else {
+      /* XXX Fallback to searching argv[0] as the best bet??? */
+      error("figure out the error");
     }
-  }
+#else
+    int offset;
+    if (sscanf_os(str_fd, T("%u,%n"), &fd, &offset) <= 0)
+      error("descriptor passed via environment is invalid");
+    exe_name = caml_stat_strdup(str_fd + offset);
+#endif
+    int err = caml_read_trailer(fd, &trail);
+    if (err != 0) {
+      close(fd);
+      CAML_GC_MESSAGE(STARTUP, "Descriptor is not a bytecode image\n");
+      /* Termination code shared with normal startup route */
+      fd = err;
+    } else {
+#if defined(_WIN32)
+  _wputenv(L"__OCAML_EXEC_FD=");
+#elif defined(HAS_SETENV_UNSETENV)
+  unsetenv("__OCAML_EXEC_FD");
+#endif
+    }
+    if (proc_self_exe == NULL)
+      argv0 = exe_name;
+  } else {
+    /* If __OCAML_EXEC_FN is in the environment, but __OCAML_EXEC_FD is not,
+       then __OCAML_EXEC_FN is simply ignored. */
 
-  /* Little grasshopper wonders why we do that at all, since
-     "The current executable is ocamlrun itself, it's never a bytecode
-     program".  Little grasshopper "ocamlc -custom" in mind should keep.
-     With -custom, we have an executable that is ocamlrun itself
-     concatenated with the bytecode.  So, if the attempt with argv[0]
-     failed, it is worth trying again with executable_name. */
-  if (caml_byte_program_mode == APPENDED || fd < 0) {
-    if (proc_self_exe != NULL) {
-      exe_name = proc_self_exe;
+    if (caml_byte_program_mode != APPENDED || proc_self_exe == NULL) {
+      /* First, try argv[0] (when ocamlrun is called by a bytecode program) */
+      exe_name = caml_search_exe_in_path(argv[0]);
       fd = caml_attempt_open(exe_name, &trail, 0);
+      if (proc_self_exe == NULL) {
+        argv0 = exe_name;
+        if (fd < 0)
+          tofree = exe_name;
+      } else if (fd < 0) {
+        caml_stat_free(exe_name);
+      }
     }
-    if (fd < 0 && caml_byte_program_mode == APPENDED)
-      error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
+
+    /* Little grasshopper wonders why we do that at all, since
+       "The current executable is ocamlrun itself, it's never a bytecode
+       program".  Little grasshopper "ocamlc -custom" in mind should keep.
+       With -custom, we have an executable that is ocamlrun itself
+       concatenated with the bytecode.  So, if the attempt with argv[0]
+       failed, it is worth trying again with executable_name. */
+    if (caml_byte_program_mode == APPENDED || fd < 0) {
+      if (proc_self_exe != NULL) {
+        exe_name = proc_self_exe;
+        fd = caml_attempt_open(exe_name, &trail, 0);
+      }
+      if (fd < 0 && caml_byte_program_mode == APPENDED)
+        error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
+    }
+
+    if (fd < 0) {
+      pos = parse_command_line(argv);
+      if (caml_params->print_config) {
+        caml_runtime_standard_library_effective =
+          caml_locate_standard_library(argv0,
+                                       caml_runtime_standard_library_default,
+                                       NULL);
+
+        do_print_config();
+        exit(0);
+      }
+      if (argv[pos] == 0) {
+        error("no bytecode file specified");
+      }
+      exe_name = caml_search_exe_in_path(argv[pos]);
+      fd = caml_attempt_open(exe_name, &trail, 1);
+    }
   }
 
-  if (argv0 == NULL)
-    argv0 = caml_search_exe_in_path(exe_name);
-
-  if (fd < 0) {
-    pos = parse_command_line(argv);
-    if (caml_params->print_config) {
-      caml_runtime_standard_library_effective =
-        caml_locate_standard_library(argv0,
-                                     caml_runtime_standard_library_default,
-                                     NULL);
-
-      do_print_config();
-      exit(0);
-    }
-    if (argv[pos] == 0) {
-      error("no bytecode file specified");
-    }
-    exe_name = caml_search_exe_in_path(argv[pos]);
-    fd = caml_attempt_open(exe_name, &trail, 1);
-    switch(fd) {
-    case FILE_NOT_FOUND:
-      error("cannot find file '%s'",
-                       caml_stat_strdup_of_os(argv[pos]));
-      break;
-    case BAD_BYTECODE:
-      error(
-        "the file '%s' is not a bytecode executable file",
-        caml_stat_strdup_of_os(exe_name));
-      break;
-    case WRONG_MAGIC:
-      error(
-        "the file '%s' has not the right magic number: "\
-        "expected %s, got %s",
-        caml_stat_strdup_of_os(exe_name),
-        EXEC_MAGIC,
-        magicstr);
-      break;
-    }
+  switch(fd) {
+  case FILE_NOT_FOUND:
+    error("cannot find file '%s'",
+                     caml_stat_strdup_of_os(exe_name));
+    break;
+  case BAD_BYTECODE:
+    error(
+      "the file '%s' is not a bytecode executable file",
+      caml_stat_strdup_of_os(exe_name));
+    break;
+  case WRONG_MAGIC:
+    error(
+      "the file '%s' has not the right magic number: "\
+      "expected %s, got %s",
+      caml_stat_strdup_of_os(exe_name),
+      EXEC_MAGIC,
+      magicstr);
+    break;
   }
+
   /* Read the table of contents (section descriptors) */
   caml_read_section_descriptors(fd, &trail);
 
