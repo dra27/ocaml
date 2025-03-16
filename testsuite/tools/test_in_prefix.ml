@@ -1349,10 +1349,6 @@ let is_executable =
 let test_bytecode_binaries env =
   let bindir = Environment.bindir env in
   Format.printf "\nTesting bytecode binaries in %a\n" display_path bindir;
-  let exec_magic =
-    let ocamlrun = Environment.ocamlrun env in
-    Environment.run_process Return env ocamlrun ["-M"]
-  in
   let test_binary binary =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
@@ -1388,44 +1384,9 @@ let test_bytecode_binaries env =
                  be likely distinct from the behaviour of any of the
                  distribution's tools when called with -M. *)
               let without_exe = Filename.remove_extension binary in
-              let (this_exit_code, _) as this =
-                let fails =
-                  without_exe <> "ocamlmklib"
-                  && not (String.contains without_exe '.')
-                in
-                Environment.run_process Return ~fails env
-                                        program ~argv0:without_exe ["-M"]
-              in
-              if this_exit_code = 0 then
-                if this = exec_magic then
-                  let (that_exit_code, _) as that =
-                    let fails = without_exe <> "ocamlmklib" in
-                    Environment.run_process Return ~fails env
-                                            program ~argv0:binary ["-M"]
-                  in
-                  if this = that then
-                    fail_because
-                      "Neither %s nor %s seem to load the bytecode image"
-                      without_exe binary
-                  else if that_exit_code = 0 then
-                    fail_because
-                      "%s is not expected to return with exit code 0"
-                      binary
-                  else if not (String.contains without_exe '.') then
-                    fail_because
-                      "%s is not expected to return the exec magic number!"
-                      without_exe
-                  else () (* Expected outcome was the exec magic number *)
-                else if without_exe <> "ocamlmklib" then
-                  fail_because
-                    "%s is expected to return with a non-zero exit code"
-                    without_exe
-                else () (* Expected outcome is a zero exit code *)
-              else if without_exe = "ocamlmklib" then
-                fail_because
-                  "%s is expected to return with exit code 0"
-                  without_exe
-              else () (* Expected outcome is a non-zero exit code *)
+              let fails = (without_exe <> "ocamlmklib") in
+              Environment.run_process Execute ~fails env
+                                      program ~argv0:without_exe ["-M"]
         | _ ->
             if not fails then
               fail_because "it was broken"
@@ -2460,8 +2421,7 @@ let compile_test env =
               {argv0_not_ocaml = false; argv0_resolved = test_program_relative}
             ] in
             let runs =
-              let test_with_outcome
-                    (({argv0; prefix_path_with_cwd; _} as test), properties) =
+              let test_with_outcome (({argv0; _} as test), properties) =
                 let {argv0_not_ocaml; argv0_resolved} = properties in
                 let outcome =
                   (* If strategy has been specified, this program is going to be
@@ -2477,23 +2437,13 @@ let compile_test env =
                         Success {executable_name = test_program_path;
                                  argv0 = test_program_path}
                     | Tendered(~header:Header_exe, ~dlls:_) ->
-                        if argv0_not_ocaml then
-                          if no_caml_executable_name then
-                            (* stdlib/header.c will fail to find ocamlrun
-                               because caml_executable_name isn't implemented so
-                               will either fail to find the executable or will
-                               identify that it is not a bytecode executable.
-                               Somewhat confusingly, it exits with code 2 *)
-                            Fail 2
-                          else
-                            (* stdlib/header.c will find ocamlrun (because it
-                               effectively uses caml_executable_name) but fails
-                               to hand off the bytecode image, which causes
-                               ocamlrun to exit with code 127 *)
-                            Fail 127
-                        else if Sys.win32 then
-                          (* stdlib/header.c correctly preserves argv[0] *)
-                          Success {executable_name = test_program_path; argv0}
+                        if argv0_not_ocaml && no_caml_executable_name then
+                          (* stdlib/header.c will fail to find ocamlrun because
+                             caml_executable_name isn't implemented so will
+                             either fail to find the executable or will identify
+                             that it is not a bytecode executable.
+                             Somewhat confusingly, it exits with code 2 *)
+                          Fail 2
                         else if no_caml_executable_name
                                 && config.has_relative_libdir <> None then
                           (* Without caml_executable_name, ocamlrun will be
@@ -2501,16 +2451,11 @@ let compile_test env =
                              relative to argv[0], which will fail. *)
                           Fail 134
                         else
-                          (* stdlib/header.c correctly preserves argv[0] *)
                           let executable_name =
-                            (* XXX The Windows implementation uses SearchPath
-                                   which results explicit files in the cwd, but
-                                   that doesn't happen elsewhere *)
-                            if no_caml_executable_name
-                               || prefix_path_with_cwd then
+                            if no_caml_executable_name then
                               argv0_resolved
                             else
-                              argv0
+                              test_program_path
                           in
                           Success {executable_name; argv0}
                     | Custom ->
