@@ -554,6 +554,11 @@ Working version
 - #14370: Fix headers for C++ inclusion.
   (Antonin Décimo, review by Gabriel Scherer)
 
+- #14???: Fix the hand-off of the bytecode image to the runtime from the
+  executable header. In particular, running `ocamlc.byte` rather than
+  `ocamlc.byte.exe` now invokes the compiler instead of ocamlrun itself!
+  (David Allsopp, review by ???)
+
 OCaml 5.4.0 (9 October 2025)
 ----------------------------
 
