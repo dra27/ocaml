@@ -300,24 +300,25 @@ let test_runs usr_bin_sh test_program_path test_program
             Success {executable_name = test_program_path;
                      argv0 = test_program_path}
         | Tendered {header = Header_exe; _} ->
-            if argv0_not_ocaml then
-              if Sys.win32 then
-                (* stdlib/header.c will find ocamlrun (because it effectively
-                   uses caml_executable_name) but fails to hand off the bytecode
-                   image, which causes ocamlrun to exit with code 127 *)
-                Fail 127
-              else
-                (* stdlib/header.c will fail to find ocamlrun, because it never
-                   uses caml_executable_name and so will either fail to find the
-                   executable or will identify that it is not a bytecode
-                   executable. Somewhat confusingly, it exits with code 2 *)
-                Fail 2
-            else if Sys.win32 then
-              (* stdlib/header.c correctly preserves argv[0] for Windows *)
-              Success {executable_name = test_program_path; argv0}
+            if argv0_not_ocaml && not Sys.win32 then
+              (* stdlib/header.c will fail to find ocamlrun, because it never
+                 uses caml_executable_name and so will either fail to find the
+                 executable or will identify that it is not a bytecode
+                 executable. Somewhat confusingly, it exits with code 2 *)
+              Fail 2
             else
+              let executable_name =
+                if not Sys.win32 then
+                  (* The location of the bytecode executable is only resolved
+                     using a PATH-search *)
+                  argv0_resolved
+                else
+                  (* On Windows, caml_executable_name is effectively used when
+                     handing off the image *)
+                  test_program_path
+              in
               (* stdlib/header.c correctly preserves argv[0] *)
-              Success {executable_name = argv0_resolved; argv0}
+              Success {executable_name; argv0}
         | Custom ->
             if Harness.no_caml_executable_name then
               if argv0_not_ocaml then
