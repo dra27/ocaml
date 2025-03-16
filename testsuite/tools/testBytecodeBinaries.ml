@@ -27,10 +27,6 @@ let run (config : Installation.t) env =
   let bindir = Environment.bindir env in
   Format.printf "\nTesting bytecode binaries in %a\n"
                 (Environment.pp_path env) bindir;
-  let exec_magic =
-    let ocamlrun = Environment.ocamlrun env in
-    Environment.run_process Return env ocamlrun ["-M"]
-  in
   let test_binary binary =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
@@ -71,31 +67,9 @@ let run (config : Installation.t) env =
                 Environment.run_process Return ~fails env
                                         program ~argv0:without_exe ["-M"]
               in
-              if this_exit_code = 0 then
-                if this = exec_magic then
-                  let (that_exit_code, _) as that =
-                    let fails = without_exe <> "ocamlmklib" in
-                    Environment.run_process Return ~fails env
-                                            program ~argv0:binary ["-M"]
-                  in
-                  if this = that then
-                    Environment.fail_because
-                      "Neither %s nor %s seem to load the bytecode image"
-                      without_exe binary
-                  else if that_exit_code = 0 then
-                    Environment.fail_because
-                      "%s is not expected to return with exit code 0"
-                      binary
-                  else if not (String.contains without_exe '.') then
-                    Environment.fail_because
-                      "%s is not expected to return the exec magic number!"
-                      without_exe
-                  else () (* Expected outcome was the exec magic number *)
-                else if without_exe <> "ocamlmklib" then
-                  Environment.fail_because
-                    "%s is expected to return with a non-zero exit code"
-                    without_exe
-                else () (* Expected outcome is a zero exit code *)
+              let fails = (without_exe <> "ocamlmklib") in
+              Environment.run_process Execute ~fails env
+                                      program ~argv0:without_exe ["-M"]
               else if without_exe = "ocamlmklib" then
                 Environment.fail_because
                   "%s is expected to return with exit code 0"
