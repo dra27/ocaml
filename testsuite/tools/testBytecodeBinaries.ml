@@ -31,7 +31,6 @@ let run config env =
   let bindir = Environment.bindir env in
   Format.printf "\nTesting bytecode binaries in %a\n"
                 (Environment.pp_path env) bindir;
-  let ocamlrun = Environment.ocamlrun env in
   let test_binary binary =
     if String.starts_with ~prefix:"ocaml" binary
     || String.starts_with ~prefix:"flexlink" binary then
