@@ -94,13 +94,7 @@ static int exec_file(wchar_t *file, wchar_t *cmdline)
        underlying OCaml program with us! */
     SetConsoleCtrlHandler(ctrl_handler, TRUE);
 
-    stinfo.cb = sizeof(stinfo);
-    stinfo.lpReserved = NULL;
-    stinfo.lpDesktop = NULL;
-    stinfo.lpTitle = NULL;
-    stinfo.dwFlags = 0;
-    stinfo.cbReserved2 = 0;
-    stinfo.lpReserved2 = NULL;
+    GetStartupInfo(&stinfo);
     if (CreateProcess(truename, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
                       &stinfo, &procinfo)) {
       free(truename);
