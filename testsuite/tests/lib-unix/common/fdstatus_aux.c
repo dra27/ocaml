@@ -1,5 +1,12 @@
 /* Check if file descriptors are open or not */
 
+#ifdef _WIN32
+#define _CRT_NONSTDC_NO_WARNINGS
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -7,12 +14,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef _WIN32
-#include <io.h>
-#define close _close
-#else
-#include <unistd.h>
-#endif
 
 void process_fd(const char * s)
 {
