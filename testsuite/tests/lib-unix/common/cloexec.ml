@@ -1,6 +1,6 @@
 (* TEST
  include unix;
- readonly_files = "fdstatus_aux.c fdstatus_main.ml";
+ readonly_files = "fdstatus_aux.c fdstatus_main.ml cloexec_leap.ml";
  (*
    This test is temporarily disabled on the MinGW and MSVC ports,
    because since fdstatus has been wrapped in an OCaml program,
@@ -22,6 +22,9 @@
    program = "${test_build_directory}/fdstatus.exe";
    all_modules = "fdstatus_aux.c fdstatus_main.ml";
    ocamlc.byte;
+   program = "${test_build_directory}/cloexec_leap.exe";
+   all_modules = "cloexec_leap.ml";
+   ocamlc.byte;
    program = "${test_build_directory}/cloexec.byte";
    all_modules = "fdstatus_aux.c cloexec.ml";
    ocamlc.byte;
@@ -41,6 +44,9 @@
    setup-ocamlopt.byte-build-env;
    program = "${test_build_directory}/fdstatus.exe";
    all_modules = "fdstatus_aux.c fdstatus_main.ml";
+   ocamlopt.byte;
+   program = "${test_build_directory}/cloexec_leap.exe";
+   all_modules = "cloexec_leap.ml";
    ocamlopt.byte;
    program = "${test_build_directory}/cloexec.opt";
    all_modules = "fdstatus_aux.c cloexec.ml";
@@ -62,7 +68,7 @@
 external fd_of_file_descr : Unix.file_descr -> int = "caml_fd_of_filedescr"
 let string_of_fd fd = Int.to_string (fd_of_file_descr fd)
 
-let status_checker = "fdstatus.exe"
+let status_checker = "cloexec_leap.exe"
 
 let _ =
   let f0 = Unix.(openfile "tmp.txt" [O_WRONLY; O_CREAT; O_TRUNC] 0o600) in
