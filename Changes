@@ -26,6 +26,10 @@ OCaml 5.3 maintenance version
   both Windows and Unix.
   (David Allsopp, review by ???)
 
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
