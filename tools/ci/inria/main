@@ -242,6 +242,9 @@ fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+
 if $make_native; then
   $make $jobs world.opt
   $make $jobs ocamlnat
@@ -264,3 +267,14 @@ if test -n "$jobs" && test -x /usr/bin/parallel
 then PARALLEL="$jobs $PARALLEL" $make parallel
 else $make all
 fi
+cd ..
+
+git clean -q -f -d -x
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
+                 --with-relative-libdir $confoptions
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+$make $jobs
+$make install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+rm -rf "$instdir"
