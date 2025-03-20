@@ -45,6 +45,10 @@ OCaml 4.12, maintenance version
   both Windows and Unix.
   (David Allsopp, review by ???)
 
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by ???)
+
 ### Compiler user-interface and warnings:
 
 - #10531: add naked_pointers to ocamlc -config exporting NAKED_POINTERS from
