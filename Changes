@@ -14,6 +14,10 @@ OCaml 5.4 maintenance version
   both Windows and Unix.
   (David Allsopp, review by Jonah Beckford, Hugo Heuzard and ???)
 
+- #14244: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by Jonah Beckford, Antonin Décimo, Samuel Hym and ???)
+
 ### Internal/compiler-libs changes:
 
 - #14243: ocamlc now uses the same code as the runtime to parse ld.conf (via a
