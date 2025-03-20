@@ -734,7 +734,9 @@ let link_bytecode_as_c tolink outfile with_main =
        output_without_guarded_primitives outchan "\
 \n#include <caml/mlvalues.h>\
 \n#include <caml/startup.h>\
-\n#include <caml/sys.h>\n";
+\n#include <caml/sys.h>\
+\n\
+\nenum caml_byte_program_mode caml_byte_program_mode = EMBEDDED;\n";
        output_string outchan "\nstatic int caml_code[] = {\n";
        Symtable.init();
        clear_crc_interfaces ();
@@ -771,7 +773,6 @@ let link_bytecode_as_c tolink outfile with_main =
 \nint main(int argc, char **argv)\
 \n#endif\
 \n{\
-\n  caml_byte_program_mode = COMPLETE_EXE;\
 \n  caml_startup_code(caml_code, sizeof(caml_code),\
 \n                    caml_data, sizeof(caml_data),\
 \n                    caml_sections, sizeof(caml_sections),\
@@ -917,10 +918,13 @@ let link objfiles output_name =
          output_string poc "\
          #ifdef __cplusplus\n\
          extern \"C\" {\n\
-         #endif";
+         #endif\n\
+         #define CAML_INTERNALS";
          output_without_guarded_primitives poc
            "\n#include <caml/mlvalues.h>";
-         output_char poc '\n';
+         output_string poc "\n#include <caml/startup.h>\n\
+         \n\
+         enum caml_byte_program_mode caml_byte_program_mode = APPENDED;\n";
          Symtable.output_primitive_table poc;
          output_string poc "\
          #ifdef __cplusplus\n\
