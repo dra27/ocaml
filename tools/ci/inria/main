@@ -139,10 +139,10 @@ CCOMP=
 case $NODE_NAME in
   ocaml-ppc-32)
     CCOMP="CC='gcc -m32'"
-    OCAML_CONFIGURE_OPTIONS=;;
+    OCAML_CONFIGURE_OPTIONS='';;
   ocaml-ppc-64)
     CCOMP="CC='gcc -m64'"
-    OCAML_CONFIGURE_OPTIONS=;;
+    OCAML_CONFIGURE_OPTIONS='';;
 esac
 
 #########################################################################
@@ -163,6 +163,12 @@ jobs=''
 bootstrap=false
 init_submodule_flexdll=false
 init_submodule_winpthreads=false
+
+case $NODE_NAME in
+  ocaml-alpine)
+    confoptions="$confoptions CFLAGS=-gz=none \
+AS='as --nocompress-debug-sections'";;
+esac
 
 memory_model_tests="tests/memory-model/forbidden.ml \
 tests/memory-model/publish.ml"
@@ -294,6 +300,8 @@ case $NODE_NAME in
     # Include ocamlnat in the in-prefix tests
     confoptions="$confoptions --enable-native-toplevel";;
 esac
+
+confoptions="$confoptions --without-zstd"
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
