@@ -55,6 +55,11 @@ OCaml 4.09 maintenance branch
   normalised on both Windows and Unix.
   (David Allsopp, review by Jonah Beckford, Damien Doligez and Hugo Heuzard)
 
+- #14244: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by Jonah Beckford, Antonin Décimo, Damien Doligez and
+   Samuel Hym)
+
 ### Code generation and optimization
 
 - #9752, #10026: Revised handling of calling conventions for external
