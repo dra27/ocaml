@@ -473,8 +473,11 @@ CAMLexport void caml_main(char_os **argv)
     } else {
       caml_stat_free(proc_self_exe);
     }
-    if (fd < 0 && caml_byte_program_mode == APPENDED)
-      error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
+    if (fd < 0 && caml_byte_program_mode == APPENDED) {
+      fprintf(stderr, "unable to open file '%s'",
+                       caml_stat_strdup_of_os(exe_name));
+      exit(127);
+    }
   } else {
     caml_stat_free(proc_self_exe);
   }
