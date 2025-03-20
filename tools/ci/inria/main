@@ -329,7 +329,17 @@ then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables \
                                       SHOW_TIMINGS=1 parallel
 else $make --warn-undefined-variables SHOW_TIMINGS=1 all
 fi
+cd ..
+
+git clean -q -f -d -x
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
+                 --enable-runtime-search=always --enable-runtime-search-target \
+                 $confoptions
+$make $jobs
+$make install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+rm -rf "$instdir"
 
 if $bootstrap; then
-  git checkout ../boot/ocamlc ../boot/ocamllex
+  git checkout boot/ocamlc boot/ocamllex
 fi
