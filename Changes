@@ -42,6 +42,10 @@ OCaml 5.1.2
   C primitive), eliminating some highly obscure corner cases.
   (David Allsopp, review by ???)
 
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 * #12751: --with-target-bindir configure option implemented. This option
