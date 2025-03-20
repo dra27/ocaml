@@ -288,6 +288,9 @@ fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+
 grep -q '^NATIVE_COMPILER=false' Makefile.config && make_native=false
 
 if test "$flambda" = "true" && test "$make_native" = "false"; then
@@ -319,7 +322,18 @@ then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables \
                                       SHOW_TIMINGS=1 parallel
 else $make --warn-undefined-variables SHOW_TIMINGS=1 all
 fi
+cd ..
+
+git clean -q -f -d -x
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
+                 --with-relative-libdir $confoptions
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+$make $jobs
+$make install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+rm -rf "$instdir"
 
 if $bootstrap; then
-  git checkout ../boot/ocamlc ../boot/ocamllex
+  git checkout boot/ocamlc boot/ocamllex
 fi
