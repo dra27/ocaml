@@ -243,6 +243,9 @@ fi
 
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' $confoptions
 
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+
 if $bootstrap; then
   $make $jobs --warn-undefined-variables core
   $make $jobs --warn-undefined-variables coreboot
@@ -273,7 +276,18 @@ if test -n "$jobs" && test -x /usr/bin/parallel
 then PARALLEL="$jobs $PARALLEL" $make --warn-undefined-variables parallel
 else $make --warn-undefined-variables all
 fi
+cd ..
+
+git clean -q -f -d -x
+eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
+                 --with-relative-libdir $confoptions
+grep -F -e prefix -e DIR= Makefile.config
+grep -F 'LIBDIR' Makefile.build_config
+$make $jobs
+$make install
+$make -f Makefile.test -C testsuite/in_prefix test-in-prefix
+rm -rf "$instdir"
 
 if $bootstrap; then
-  git checkout ../boot/ocamlc ../boot/ocamllex
+  git checkout boot/ocamlc boot/ocamllex
 fi
