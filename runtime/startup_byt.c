@@ -505,9 +505,13 @@ CAMLexport void caml_main(char_os **argv)
     if (proc_self_exe != NULL) {
       exe_name = proc_self_exe;
       fd = caml_attempt_open(&exe_name, &trail, 0);
+    } else {
+      caml_stat_free(proc_self_exe);
     }
     if (fd < 0 && caml_byte_program_mode == APPENDED)
       error("unable to open file '%s'", caml_stat_strdup_of_os(exe_name));
+  } else {
+    caml_stat_free(proc_self_exe);
   }
 
   if (fd < 0) {
