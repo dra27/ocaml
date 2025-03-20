@@ -225,7 +225,10 @@ prims.c : primitives
 	 echo; \
 	 echo 'char * caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' $<; \
-	 echo '  0 };') > $@
+	 echo '  0 };'; \
+	 echo; \
+	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
+   echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;') > $@
 
 caml/opnames.h : caml/instruct.h
 	tr -d '\r' < $< | \
