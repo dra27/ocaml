@@ -2531,12 +2531,8 @@ let compile_test usr_bin_sh (config : Installation.t) env =
                           else
                             Success {executable_name = argv0_resolved; argv0}
                         else
-                          if Sys.win32 || argv0_not_ocaml then
-                            (* SearchPath will resolve the relative/implicit
-                               arguments to absolute paths *)
-                            Success {executable_name = test_program_path; argv0}
-                          else
-                            Success {executable_name = argv0_resolved; argv0}
+                          (* -custom executables use caml_executable_name *)
+                          Success {executable_name = test_program_path; argv0}
                     | Vanilla ->
                         if Toolchain.no_caml_executable_name then
                           Success {executable_name = argv0_resolved; argv0}
