@@ -18,6 +18,10 @@ OCaml 5.4 maintenance version
   C primitive), eliminating some highly obscure corner cases.
   (David Allsopp, review by ???)
 
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #14???: New configure option --with-stublibs allows an additional directory
