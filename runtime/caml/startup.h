@@ -47,6 +47,14 @@ extern int32_t caml_seek_optional_section(int fd, struct exec_trailer *trail,
 extern int32_t caml_seek_section(int fd, struct exec_trailer *trail,
                                  char *name);
 
+enum caml_byte_program_mode {
+  STANDARD, /* Default mode for ocamlrun */
+  APPENDED, /* bytecode must be appended (i.e. -custom) */
+  EMBEDDED  /* bytecode embedded in C (e.g. -output-obj) */
+};
+
+extern enum caml_byte_program_mode caml_byte_program_mode;
+
 #endif /* CAML_INTERNALS */
 
 #endif /* CAML_STARTUP_H */
