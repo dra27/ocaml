@@ -290,7 +290,8 @@ cd ..
 
 git clean -q -f -d -x
 eval ./configure "$CCOMP" $build $host --prefix='$instdir' \
-                 --with-relative-libdir $confoptions
+                 --with-relative-libdir --enable-runtime-search \
+                 --enable-runtime-search-target=fallback $confoptions
 grep -F -e prefix -e DIR= Makefile.config
 grep -F 'LIBDIR' Makefile.build_config
 $make $jobs
