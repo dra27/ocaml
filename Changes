@@ -26,6 +26,10 @@ OCaml 5.1.2
   both Windows and Unix.
   (David Allsopp, review by ???)
 
+- #14???: Executables linked with `ocamlc -custom` now always attempt to load
+  bytecode from the executable itself, rather than first trying `argv[0]`.
+  (David Allsopp, review by ???)
+
 ### Manual and documentation:
 
 - #12840: manual: update runtime tracing chapter for custom events (ex #12335)
