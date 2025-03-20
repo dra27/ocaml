@@ -774,7 +774,10 @@ runtime/prims.c : runtime/primitives
 	 echo; \
 	 echo 'const char * const caml_names_of_builtin_cprim[] = {'; \
 	 sed -e 's/.*/  "&",/' $<; \
-	 echo '  0 };') > $@
+	 echo '  0 };'; \
+	 echo; \
+	 echo 'enum caml_byte_program_mode {STANDARD, APPENDED, EMBEDDED};'; \
+	 echo 'enum caml_byte_program_mode caml_byte_program_mode = STANDARD;') > $@
 
 runtime/caml/opnames.h : runtime/caml/instruct.h
 	tr -d '\r' < $< | \
