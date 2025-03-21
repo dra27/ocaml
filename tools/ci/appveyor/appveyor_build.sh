@@ -96,7 +96,8 @@ function set_configuration {
 #  run "Content of $FILE" cat Makefile.config
 }
 
-PARALLEL_URL='https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel'
+PARALLEL_URL=\
+'https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel?h=20241222'
 APPVEYOR_BUILD_FOLDER=$(echo "$APPVEYOR_BUILD_FOLDER" | cygpath -f -)
 FLEXDLLROOT="$PROGRAMFILES/flexdll"
 OCAMLROOT=$(echo "$OCAMLROOT" | cygpath -f - -m)
