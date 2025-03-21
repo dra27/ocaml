@@ -14,6 +14,21 @@
 
 open Harness.Import
 
+module List = struct
+  include List
+
+  let take_while p l =
+    let[@tail_mod_cons] rec aux = function
+      | x::l when p x -> x::aux l
+      | _rest -> []
+    in
+    aux l
+
+  let[@ocaml.warning "-32"] rec drop_while p = function
+    | x::l when p x -> drop_while p l
+    | rest -> rest
+end
+
 (* Tests for the handling of the DLL search path. *)
 type ld_conf_test = {
   description: string;
