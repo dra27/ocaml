@@ -2390,15 +2390,15 @@ let rec contains file file_len tests i seen =
     let c = Bigarray.Array1.unsafe_get file i in
     let seen, i =
       if c = '/' || Sys.win32 && c = '\\' then
-        let check_for ((seen, unmatched) as acc) (t, s, always_test) =
-          if (unmatched || always_test) && matches_at file file_len i s then
-            (t, s)::seen, false
+        let check_for acc (t, s) =
+          if matches_at file file_len i s then
+            (t, s)::acc
           else
             acc in
-        let (seen_here, _) = List.fold_left check_for ([], true) tests in
+        let seen_here = List.fold_left check_for [] tests in
         let seen_here =
           let compare (_, l) (_, r) =
-            Int.compare (String.length l) (String.length r) in
+            -Int.compare (String.length l) (String.length r) in
           List.sort compare seen_here in
         match seen_here with
         | (t, s)::_ ->
@@ -2409,17 +2409,87 @@ let rec contains file file_len tests i seen =
         seen, i in
     contains file file_len tests (i + 1) seen
 
-let read_file file =
+let read_content file ic =
+  let len = in_channel_length ic in
+  let content = Bigarray.Array1.create Bigarray.Char Bigarray.c_layout len in
+  if In_channel.really_input_bigarray ic content 0 len = None then
+    fail_because "Error reading %s" file;
+  content, len
+
+let output_compunit ic oc (compunit : Cmo_format.compilation_unit) =
+  seek_in ic compunit.cu_pos;
+  Misc.copy_file_chunk ic oc compunit.cu_codesize;
+  if compunit.cu_debug > 0 then begin
+    seek_in ic compunit.cu_debug;
+    output_value oc (Compression.input_value ic);
+    output_value oc (Compression.input_value ic);
+  end;
+  output_value oc compunit
+
+let with_decompressed_ocaml_artefact ic file f =
+  let magic = Cmt_format.read_magic_number ic in
+  let temp_file, oc =
+    Filename.open_temp_file ~mode:[Open_binary] "ocaml-artefact-" ".tmp" in
+  let () =
+    if magic = Config.cmi_magic_number || magic = Config.cmt_magic_number then
+      output_value oc (Cmt_format.read file)
+    else if magic = Config.cmo_magic_number then begin
+      seek_in ic (input_binary_int ic);
+      let compunit = (input_value ic : Cmo_format.compilation_unit) in
+      output_compunit ic oc compunit
+    end else if magic = Config.cma_magic_number then begin
+      seek_in ic (input_binary_int ic);
+      let toc = (input_value ic : Cmo_format.library) in
+      List.iter (output_compunit ic oc) toc.lib_units;
+      output_value oc toc
+    end else
+      fail_because "Unexpected magic number %S in %s" magic file in
+  close_out oc;
+  let result = In_channel.with_open_bin temp_file (f temp_file) in
+  Sys.remove temp_file;
+  result
+
+let read_file env file =
   In_channel.with_open_bin file @@ fun ic ->
-    let len = in_channel_length ic in
-    let content = Bigarray.Array1.create Bigarray.Char Bigarray.c_layout len in
-    if In_channel.really_input_bigarray ic content 0 len = None then
-      fail_because "Error reading %s" file;
-    content, len
+    match Filename.extension file with
+    | ".cma" | ".cmi" | ".cmo" | ".cmti" | ".cmt" ->
+        with_decompressed_ocaml_artefact ic file read_content
+    | ext when (ext = Config.ext_lib || ext = Config.ext_obj)
+               && Sys.os_type = "Unix" && Config.system <> "macosx" ->
+        let exit, lines =
+          Environment.run_process Return "readelf" ["-tS"; file] env in
+        let contains_compressed l =
+          if l = "" || l.[0] <> ' ' then
+            false
+          else
+            let test = String.starts_with ~prefix:"COMPRESSED" in
+            let l = String.split_on_char ' ' l in
+            List.exists test l in
+        if exit <> 0 then
+          fail_because "readelf failed"
+        else if List.exists contains_compressed lines then
+          let temp_file = Filename.temp_file "ocaml-artefact-" ".tmp" in
+          let exit, _ =
+            let args = ["--decompress-debug-sections"; file; temp_file] in
+            Environment.run_process Return "objcopy" args env
+          in
+          if exit = 0 then
+            let result =
+              In_channel.with_open_bin temp_file (read_content temp_file) in
+            Sys.remove temp_file;
+            result
+          else begin
+            Sys.remove temp_file;
+            fail_because "objcopy failed"
+          end
+        else
+          read_content file ic
+    | _ ->
+        read_content file ic
 
 let clang_cl = String.starts_with ~prefix:"clang-cl" Config.c_compiler
 
-let test_relocation prefix bindir libdir =
+let test_relocation env prefix bindir libdir =
   let grandparent dir = Filename.dirname (Filename.dirname dir) in
   let build_root = grandparent test_root in
   let build_root_logical = Option.map grandparent test_root_logical in
@@ -2454,25 +2524,18 @@ let test_relocation prefix bindir libdir =
   let tests =
     Option.value ~default:[]
       (Option.map (fun build_root_logical ->
-        let prefix_in_build =
-          split_to_common_prefix prefix build_root_logical
-            = Result.Error `First_in_second in
-        [Build_dir(Logical, UTF_8), build_root_logical, not prefix_in_build;
-         Build_dir(Logical, UTF_16), utf_16le_of_utf_8 build_root_logical,
-                                     not prefix_in_build]) build_root_logical)
+        [Build_dir(Logical, UTF_8), build_root_logical;
+         Build_dir(Logical, UTF_16), utf_16le_of_utf_8 build_root_logical])
+        build_root_logical)
   in
   let tests =
-    let prefix_in_build =
-      split_to_common_prefix prefix build_root
-        = Result.Error `First_in_second in
-    (Prefix_dir UTF_8, prefix, true) ::
-    (Prefix_dir UTF_16, utf_16le_of_utf_8 prefix, true) ::
-    (Build_dir(Physical, UTF_8), build_root, not prefix_in_build) ::
-    (Build_dir(Physical, UTF_16), utf_16le_of_utf_8 build_root,
-                                  not prefix_in_build) :: tests
+    (Prefix_dir UTF_8, prefix) ::
+    (Prefix_dir UTF_16, utf_16le_of_utf_8 prefix) ::
+    (Build_dir(Physical, UTF_8), build_root) ::
+    (Build_dir(Physical, UTF_16), utf_16le_of_utf_8 build_root) :: tests
   in
   let in_unexpected_state file file_rel rules =
-    let content, content_len = read_file file in
+    let content, content_len = read_file env file in
     let seen = contains content content_len tests 0 [] in
     let string_of_encoding () =
       function UTF_8 -> "UTF-8" | UTF_16 -> "UTF-16" in
@@ -2488,7 +2551,7 @@ let test_relocation prefix bindir libdir =
             "%a; in %a" string_of_cwd cwd string_of_encoding encoding
     in
     let some_string fmt = Printf.ksprintf Option.some fmt in
-    let gather acc (d, _, _) =
+    let gather acc (d, _) =
       if List.mem d seen then
         match d with
         | Build_dir(kind, enc) ->
@@ -2590,23 +2653,19 @@ let test_relocation prefix bindir libdir =
       "compiler-libs" / "ocamlcommon.cma";
       "compiler-libs" / "ocamlcommon" ^ Config.ext_lib;
       "compiler-libs" / "config.cmx";
+      "compiler-libs" / "config.cmt";
+      "compiler-libs" / "config_main.cmt";
       "expunge";
       "ld.conf";
       "libcamlrun_shared" ^ Config.ext_dll;
       "Makefile.config";
     ] in
-    let files =
-      if Config.compression_c_libraries = "" then
-        "compiler-libs" / "config.cmt" ::
-        "compiler-libs" / "config_main.cmt" ::
-        files
-      else
-        files in
     StringSet.of_list (List.map (Filename.concat libdir) files) in
   let libdir_exts_with_build =
-    let exts = [".cmo"; ".cma"] in
+    let exts = [".cmo"; ".cma"; ".cmti"; ".cmt"] in
     let exts =
-      if (not Sys.win32 && Config.system <> "macosx")
+      if (not Sys.win32 && Config.system <> "macosx"
+          && not (String.ends_with ~suffix:"bsd" Config.system))
          || Config.ccomp_type = "msvc" then
         Config.ext_obj :: exts
       else
@@ -2616,11 +2675,6 @@ let test_relocation prefix bindir libdir =
         exts
       else
         Config.ext_dll :: ".cmxs" :: exts in
-    let exts =
-      if Config.compression_c_libraries = "" then
-        ".cmti" :: ".cmt" :: exts
-      else
-        exts in
     StringSet.of_list exts in
   let libcamlrun_prefix = Filename.concat libdir "libcamlrun" in
   let libdir_rules file =
@@ -2646,7 +2700,12 @@ let test_relocation prefix bindir libdir =
                   || Config.ccomp_type = "msvc"
                   || not (Sys.file_exists
                             (Filename.remove_extension file ^ ".cmxa")) then
-            LocationSet.singleton Build
+            if String.ends_with ~suffix:"bsd" Config.system
+               && (Sys.file_exists
+                     (Filename.remove_extension file ^ ".cmxa")) then
+              LocationSet.empty
+            else
+              LocationSet.singleton Build
           else
             LocationSet.empty
         else
@@ -2686,8 +2745,8 @@ let () =
   if verbose then
     Clflags.verbose := true;
   let env = Environment.make bindir libdir in
+  let () = test_relocation env prefix bindir libdir in
   let programs = run_tests ~original:true env bindir libdir config.libraries in
-  let () = test_relocation prefix bindir libdir in
   (* Now rename the prefix, appending .new to the directory name *)
   let new_prefix = prefix ^ ".new" in
   let bindir = Filename.concat new_prefix bindir_suffix in
