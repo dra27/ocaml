@@ -180,6 +180,12 @@ Working version
   variables.
   (Florian Angeletti, review by Gabriel Scherer)
 
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #13839, #14008: Reimplement `let open`, `let module` and `let exception` in
