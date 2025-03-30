@@ -127,7 +127,7 @@ COMP=\
 
 COMMON=$(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
-BYTECOMP=bytecomp/instruct.cmo bytecomp/bytegen.cmo \
+BYTECOMP=bytecomp/byterntm.cmo bytecomp/instruct.cmo bytecomp/bytegen.cmo \
   bytecomp/printinstr.cmo bytecomp/emitcode.cmo \
   bytecomp/bytelink.cmo bytecomp/bytelibrarian.cmo bytecomp/bytepackager.cmo \
   driver/errors.cmo driver/compile.cmo
