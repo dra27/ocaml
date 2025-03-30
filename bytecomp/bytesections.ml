@@ -15,6 +15,29 @@
 
 (* Handling of sections in bytecode executable files *)
 
+module String = struct
+  include String
+
+  let starts_with ~prefix s =
+    let len_s = length s
+    and len_pre = length prefix in
+    let rec aux i =
+      if i = len_pre then true
+      else if unsafe_get s i <> unsafe_get prefix i then false
+      else aux (i + 1)
+    in len_s >= len_pre && aux 0
+
+  let ends_with ~suffix s =
+    let len_s = length s
+    and len_suf = length suffix in
+    let diff = len_s - len_suf in
+    let rec aux i =
+      if i = len_suf then true
+      else if unsafe_get s (diff + i) <> unsafe_get suffix i then false
+      else aux (i + 1)
+    in diff >= 0 && aux 0
+end
+
 (* List of all sections, in reverse order *)
 
 let section_table = ref ([] : (string * int) list)
