@@ -1731,6 +1731,13 @@ bytecomp/bytepackager.cmx : \
 bytecomp/bytepackager.cmi : \
     typing/ident.cmi \
     typing/env.cmi
+bytecomp/byterntm.cmo : \
+    bytecomp/bytesections.cmi \
+    bytecomp/byterntm.cmi
+bytecomp/byterntm.cmx : \
+    bytecomp/bytesections.cmx \
+    bytecomp/byterntm.cmi
+bytecomp/byterntm.cmi :
 bytecomp/bytesections.cmo : \
     utils/config.cmi \
     bytecomp/bytesections.cmi
@@ -5519,11 +5526,13 @@ testsuite/tools/environment.cmo : \
     testsuite/tools/harness.cmi \
     utils/config.cmi \
     bytecomp/bytesections.cmi \
+    bytecomp/byterntm.cmi \
     testsuite/tools/environment.cmi
 testsuite/tools/environment.cmx : \
     testsuite/tools/harness.cmx \
     utils/config.cmx \
     bytecomp/bytesections.cmx \
+    bytecomp/byterntm.cmx \
     testsuite/tools/environment.cmi
 testsuite/tools/environment.cmi : \
     testsuite/tools/harness.cmi
