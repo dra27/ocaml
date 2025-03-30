@@ -368,6 +368,11 @@ Working version
 - #13818: better delimited hints in error message
   (Florian Angeletti, review by Gabriel Scherer)
 
+- #13???: New option -launch-method for ocamlc allows the method specified in
+  runtime-launch-method to be overridden. In particular, it makes it easier to
+  specify the use of the executable launcher on Unix.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #13314: Comment the code of Translclass
