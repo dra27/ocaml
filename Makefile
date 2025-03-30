@@ -678,7 +678,10 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# The lexer
+# The lexers
+
+bytecomp/byterntm.ml: bytecomp/byterntm.mll
+	$(CAMLLEX) $(OCAMLLEX_FLAGS) $<
 
 parsing/lexer.ml: parsing/lexer.mll
 	$(CAMLLEX) $(OCAMLLEX_FLAGS) $<
