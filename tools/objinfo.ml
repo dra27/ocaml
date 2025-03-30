@@ -211,6 +211,11 @@ let p_list title print = function
 
 let dump_byte ic =
   let toc = Bytesections.read_toc ic in
+  let () =
+    try
+      printf "Runtime:\n\t%s\n" (Bytesections.read_runtime toc ic)
+    with Not_found -> ()
+  in
   let all = Bytesections.all toc in
   List.iter
     (fun {Bytesections.name = section; len; _} ->
