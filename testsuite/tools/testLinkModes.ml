@@ -176,7 +176,8 @@ type outcome =
    executed in [env]. The compiler is invoked explicitly (PATH-resolution is not
    used). [~original] indicates whether the compiler is still in its original
    prefix (i.e. the prefix has not yet been renamed). *)
-let compile_test usr_bin_sh (config : Installation.t) env =
+let compile_test usr_bin_sh (config : Installation.t) env
+                 ~bytecode_shebangs_by_default =
   let main_object =
     Filename.concat (Filename.dirname Sys.executable_name)
                     ("main_in_c" ^ Config.ext_obj)
@@ -232,8 +233,20 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           0
       in
       match test with
-      | Default_ocamlc _launch_method ->
-          f ~tendered:true []
+      | Default_ocamlc Header_exe ->
+          let args =
+            if bytecode_shebangs_by_default then
+              ["-launch-method"; "exe"]
+            else
+              [] in
+          f ~tendered:true args
+      | Default_ocamlc Header_shebang ->
+          let args =
+            if bytecode_shebangs_by_default then
+              []
+            else
+              ["-launch-method"; "sh"] in
+          f ~tendered:true args
       | Default_ocamlopt ->
           f ~mode:Native []
       | Custom_runtime Static ->
@@ -632,16 +645,10 @@ let run ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
   in
   Format.printf "ocamlc -where: %a\nocamlopt -where: %a\n%!"
                 pp_path ocamlc_where pp_path ocamlopt_where;
-  let compile_test = compile_test sh config env in
-  let launch_method =
-    if bytecode_shebangs_by_default then
-      Header_shebang
-    else
-      Header_exe
-  in
+  let compile_test = compile_test sh config env ~bytecode_shebangs_by_default in
   let tests = [
-    compile_test (Default_ocamlc launch_method)
-      "byt_default" "with tender";
+    compile_test (Default_ocamlc Header_exe)
+      "byt_default_exe" "with tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom_runtime Shared)
@@ -669,6 +676,12 @@ let run ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
     compile_test (Output_complete_obj(C_ocamlopt, Shared))
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
+  let tests =
+    if Config.shebangscripts then
+      (compile_test (Default_ocamlc Header_shebang) "byt_default_sh" "with #!")
+        :: tests
+    else
+      tests in
   (* The test programs compiled before the prefix renamed and re-executed after
      it is renamed which means that the runtime location is passed to each test.
      Each test individually determines if the runtime is actually passed to the
