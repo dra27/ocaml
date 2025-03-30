@@ -22,6 +22,12 @@ OCaml 5.4 maintenance version
   trying `argv[0]`.
   (David Allsopp, review by ???)
 
+### Tools:
+
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
 ### Compiler user-interface and warnings:
 
 - #14???: Add -set-runtime-default option to the compiler, allowing the default
