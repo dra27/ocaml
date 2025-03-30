@@ -87,3 +87,8 @@ val all : section_table -> section_entry list
 
 val pos_first_section : section_table -> int
 (** Return the position of the beginning of the first section *)
+
+val read_runtime : section_table -> in_channel -> string
+(** Returns the runtime used by this tendered/standalone image
+
+    @raise Not_found For an image linked using -without-runtime *)
