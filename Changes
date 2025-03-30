@@ -19,6 +19,11 @@ Working version
 
 ### Compiler user-interface and warnings:
 
+- #13???: New option -launch-method for ocamlc allows the method specified in
+  runtime-launch-method to be overridden. In particular, it makes it easier to
+  specify the use of the executable launcher on Unix.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 ### Build system:
