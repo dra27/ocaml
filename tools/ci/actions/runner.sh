@@ -25,6 +25,20 @@ MAKE_WARN="$MAKE --warn-undefined-variables"
 
 export PATH=$PREFIX/bin:$PATH
 
+call-configure () {
+  local failed
+  ./configure "$@" || failed=$?
+  if ((failed)); then
+    # Output seems to be a little unpredictable in GitHub Actions: ensure that
+    # the fold is definitely on a new line
+    echo
+    echo "::group::config.log content ($(wc -l config.log) lines)"
+    cat config.log
+    echo '::endgroup::'
+    exit $failed
+  fi
+}
+
 Configure () {
   mkdir -p $PREFIX
   cat<<EOF
@@ -37,14 +51,13 @@ request can be merged.
 ------------------------------------------------------------------------
 EOF
 
-  configure_flags="\
-    --prefix=$PREFIX \
-    --enable-flambda-invariants \
-    $CONFIG_ARG"
-
-  local failed
-  ./configure $configure_flags || failed=$?
-  if ((failed)) ; then cat config.log ; exit $failed ; fi
+  # $CONFIG_ARG will be intentionally word-split - there is no way to pass
+  # arguments requiring spaces from the workflows.
+  # $CONFIG_ARG also appears last to allow settings specified here to be
+  # overridden by the workflows.
+  call-configure --prefix="$PREFIX" \
+                 --enable-flambda-invariants \
+                 $CONFIG_ARG
 }
 
 Build () {
@@ -153,9 +166,7 @@ This test checks the global structure of the reference manual
 --------------------------------------------------------------------------
 EOF
   # we need some of the configuration data provided by configure
-  local failed
-  ./configure || failed=$?
-  if ((failed)) ; then cat config.log ; exit $failed ; fi
+  call-configure
   $MAKE check-stdlib check-case-collision -C manual/tests
 
 }
@@ -184,11 +195,8 @@ BasicCompiler () {
   local failed
   trap ReportBuildStatus ERR
 
-  local failed
-  ./configure --disable-debug-runtime \
-              --disable-instrumented-runtime \
-      || failed=$?
-  if ((failed)) ; then cat config.log ; exit $failed ; fi
+  call-configure --disable-debug-runtime \
+                 --disable-instrumented-runtime
 
   # Need a runtime
   make -j coldstart || failed=$?
