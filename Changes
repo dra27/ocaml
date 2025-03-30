@@ -51,6 +51,10 @@ Working version
   in the debugger
   (Pierre Boutillier and Gabriel Scherer, review by Florian Angeletti)
 
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
 ### Manual and documentation:
 
 * #13975: documented the `[@remove_aliases]` built-in attribute for signatures
