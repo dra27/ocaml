@@ -233,7 +233,11 @@ Working version
   e.g. `< foo : int; .. as $0>` when $0 is introduced by a GADT constructor
   (Stefan Muenzel, review by Jacques Garrigue and Florian Angeletti)
 
-
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix.
+  (David Allsopp, review by ???)
 
 ### Internal/compiler-libs changes:
 
