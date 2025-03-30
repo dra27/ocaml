@@ -55,3 +55,8 @@ val pos_first_section: in_channel -> int
    (* Return the position of the beginning of the first section *)
 
 val reset: unit -> unit
+
+val read_runtime : in_channel -> string
+(** Returns the runtime used by this tendered/standalone image
+
+    @raise Not_found For an image linked using -without-runtime *)
