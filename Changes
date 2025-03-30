@@ -77,6 +77,11 @@ Working version
   recursive modules.
   (Shivam Acharya, review by Gabriel Scherer and Florian Angeletti)
 
+- #14???: New option -launch-method for ocamlc allows the method specified in
+  runtime-launch-method to be overridden. In particular, it makes it easier to
+  specify the use of the executable launcher on Unix.
+  (David Allsopp, review by ???)
+
 ### Internal/compiler-libs changes:
 
 - #13839, #14008: Reimplement `let open`, `let module` and `let exception` in
