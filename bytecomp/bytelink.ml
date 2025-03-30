@@ -422,6 +422,17 @@ let write_header outchan =
     try read_runtime_launch_info (Load_path.find header)
     with Not_found -> raise (Error (File_not_found header))
   in
+  let runtime_info =
+    match !Clflags.launch_method with
+    | Some Executable ->
+        {runtime_info with launcher = Executable}
+    | Some (Shebang None) ->
+        {runtime_info with launcher = Shebang_bin_sh "sh"}
+    | Some (Shebang (Some path)) ->
+        {runtime_info with launcher = Shebang_bin_sh path}
+    | None ->
+        runtime_info
+  in
   let runtime =
     (* Historically, the native Windows ports are assumed to be finding
        ocamlrun using a PATH search. *)
