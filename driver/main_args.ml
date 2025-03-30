@@ -535,6 +535,14 @@ let mk_unsafe_string f =
     "-unsafe-string", Arg.Unit f, " Make strings mutable (default)"
 ;;
 
+let mk_launch_method f =
+  "-launch-method", Arg.String f,
+  "<method>  Specify the mechanism for the bytecode launcher:\n\
+  \          exe - use the executable launcher in runtime-launch-info\n\
+  \          sh - use a #!, using sh if the interpreter path cannot be used\n\
+  \          /path/interpreter - use #!, or the given sh-compatible \
+  \            interpreter if the interpreter path cannot be used"
+
 let mk_use_runtime f =
   "-use-runtime", Arg.String f,
   "<file>  Generate bytecode for the given runtime system"
@@ -971,6 +979,7 @@ module type Bytecomp_options = sig
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _launch_method : string -> unit
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
@@ -1156,6 +1165,7 @@ struct
     mk_unsafe_string F._unsafe_string;
     mk_use_runtime F._use_runtime;
     mk_use_runtime_2 F._use_runtime;
+    mk_launch_method F._launch_method;
     mk_v F._v;
     mk_verbose F._verbose;
     mk_version F._version;
