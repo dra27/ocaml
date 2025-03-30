@@ -216,6 +216,11 @@ let dump_byte ic =
   Bytesections.read_toc ic;
   let toc = Bytesections.toc () in
   let toc = List.sort Stdlib.compare toc in
+  let () =
+    try
+      printf "Runtime:\n\t%s\n" (Bytesections.read_runtime ic)
+    with Not_found -> ()
+  in
   List.iter
     (fun (section, _) ->
        try
