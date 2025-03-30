@@ -107,3 +107,5 @@ let flexdll_dirs = [@flexdll_dir@]
 let ar_supports_response_files = @ar_supports_response_files@
 
 let tsan = @tsan@
+
+let shebangscripts = @shebangscripts@
