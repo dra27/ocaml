@@ -54,6 +54,20 @@ OCaml 5.2 maintenance version
   executable (either from the RNTM section or by analysing the shebang lines)
   (David Allsopp, review by ???)
 
+### Compiler user-interface and warnings:
+
+- #14???: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix.
+  (David Allsopp, review by ???)
+
+### Internal/compiler-libs changes:
+
+- #14???: ocamlc now uses the same code as the runtime to parse ld.conf (via a
+  C primitive), eliminating some highly obscure corner cases.
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 - #13494: Use native symlinks on Windows for the OCaml installation, reducing
