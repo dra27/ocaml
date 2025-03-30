@@ -133,7 +133,8 @@ objinfo.cmo : \
     ../file_formats/cmt_format.cmi \
     ../file_formats/cmo_format.cmi \
     ../file_formats/cmi_format.cmi \
-    ../bytecomp/bytesections.cmi
+    ../bytecomp/bytesections.cmi \
+    ../bytecomp/byterntm.cmi
 objinfo.cmx : \
     ../bytecomp/symtable.cmx \
     ../middle_end/symbol.cmx \
@@ -149,7 +150,8 @@ objinfo.cmx : \
     ../file_formats/cmt_format.cmx \
     ../file_formats/cmo_format.cmi \
     ../file_formats/cmi_format.cmx \
-    ../bytecomp/bytesections.cmx
+    ../bytecomp/bytesections.cmx \
+    ../bytecomp/byterntm.cmx
 ocamlcp.cmo : \
     ../driver/main_args.cmi
 ocamlcp.cmx : \
