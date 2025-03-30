@@ -114,6 +114,8 @@ and ast_intf_magic_number = "Caml1999N026"
 and cmxs_magic_number = "Caml1999D026"
 and cmt_magic_number = "Caml1999T026"
 
+type launch_method = Executable | Shebang of string option
+
 let interface_suffix = ref ".mli"
 
 let max_tag = 245
