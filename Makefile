@@ -692,12 +692,12 @@ natruntop:
 otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 	$(MAKE) -C otherlibs/dynlink allopt
 
-# Cleanup the lexer
+# Cleanup the lexers
 
 partialclean::
-	rm -f parsing/lexer.ml
+	rm -f bytecomp/byterntm.ml parsing/lexer.ml
 
-beforedepend:: parsing/lexer.ml
+beforedepend:: bytecomp/byterntm.ml parsing/lexer.ml
 
 # The bytecode compiler compiled with the native-code compiler
 
