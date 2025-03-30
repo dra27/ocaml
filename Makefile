@@ -927,7 +927,7 @@ otherlibs/dynlink/dynlink.cmxa: otherlibs/dynlink/native/dynlink.ml
 # The lexers
 
 bytecomp/byterntm.ml: bytecomp/byterntm.mll
-	$(CAMLLEX) $(OCAMLLEX_FLAGS) $<
+	$(CAMLLEX) $<
 
 parsing/lexer.ml: parsing/lexer.mll
 	$(CAMLLEX) $<
