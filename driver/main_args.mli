@@ -146,6 +146,7 @@ module type Bytecomp_options = sig
   val _make_runtime : unit -> unit
   val _vmthread : unit -> unit
   val _use_runtime : string -> unit
+  val _launch_method : string -> unit
 
   val _dinstr : unit -> unit
   val _dcamlprimc : unit -> unit
