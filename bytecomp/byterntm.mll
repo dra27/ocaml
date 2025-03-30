@@ -42,7 +42,7 @@ and analyze_sh_launcher b = parse
       { None }
 
 {
-let read_runtime t ic =
+let read_runtime ic =
   seek_in ic 0;
   let lexbuf =
     try
@@ -50,7 +50,7 @@ let read_runtime t ic =
         let () = seek_in ic 0 in
         Some (Lexing.from_channel ic)
       else
-        let rntm = Bytesections.(read_section_string t ic Name.RNTM) in
+        let rntm = Bytesections.(read_section_string ic "RNTM") in
         Some (Lexing.from_string rntm)
     with End_of_file | Not_found -> None
   in
