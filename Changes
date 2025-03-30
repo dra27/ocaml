@@ -62,6 +62,10 @@ OCaml 4.14 maintenance version
   value of the Standard Library location used by the runtime to be overridden.
   (Antonin Décimo, review by David Allsopp)
 
+- #14???: ocamlobjinfo now displays the runtime invoked by a bytecode
+  executable (either from the RNTM section or by analysing the shebang lines)
+  (David Allsopp, review by ???)
+
 ### Build system:
 
 * #12751: --with-target-bindir configure option implemented. This option
