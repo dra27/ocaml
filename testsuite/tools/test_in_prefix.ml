@@ -90,7 +90,7 @@ let split_to_common_prefix first second =
      compiler is either relocatable or can produce relocatable binaries *)
 let bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     config, relocatable, target_relocatable, test_root, test_root_logical,
-    verbose =
+    bytecode_shebangs_by_default, verbose =
   let show_summary = ref false in
   let verbose = ref false in
   let test_root = ref test_root in
@@ -272,7 +272,7 @@ directories given for --bindir and --libdir do not have a common prefix"
     Format.printf "Testing %s\n%!" summary;
     bindir, libdir, prefix, bindir_suffix, libdir_suffix,
     config, relocatable, target_relocatable, !test_root, !test_root_logical,
-    !verbose
+    (runtime_launch_info.launcher <> Bytelink.Executable), !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
@@ -1841,8 +1841,9 @@ let run_program =
    compilers... *)
 type compiler = C_ocamlc | C_ocamlopt
 type runtime_mode = Shared | Static
+type launch_mode = Header_exe | Header_shebang
 type linkage =
-| Default_ocamlc
+| Default_ocamlc of launch_mode
 | Default_ocamlopt
 | Custom of runtime_mode
 | Output_obj of compiler * runtime_mode
@@ -1939,8 +1940,20 @@ let compile_test ~original env bindir =
           0
       in
       match test with
-      | Default_ocamlc ->
-          f []
+      | Default_ocamlc Header_exe ->
+          let args =
+            if bytecode_shebangs_by_default then
+              ["-launch-method"; "exe"]
+            else
+              [] in
+          f args
+      | Default_ocamlc Header_shebang ->
+          let args =
+            if bytecode_shebangs_by_default then
+              []
+            else
+              ["-launch-method"; "sh"] in
+          f args
       | Default_ocamlopt ->
           f ~needs_ocamlopt:true []
       | Custom Static ->
@@ -2307,8 +2320,8 @@ let test_standard_library_location ~original env bindir =
                 display_path ocamlc_where display_path ocamlopt_where;
   let compile_test = compile_test ~original env bindir in
   let tests = [
-    compile_test Default_ocamlc
-      "byt_default" "with tender";
+    compile_test (Default_ocamlc Header_exe)
+      "byt_default_exe" "with tender";
     compile_test (Custom Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom Shared)
@@ -2325,7 +2338,7 @@ let test_standard_library_location ~original env bindir =
       "byt_complete_exe_static" "-output-complete-exe static runtime";
     compile_test (Output_complete_exe Shared)
       "byt_complete_exe_shared" "-output-complete-exe shared runtime";
-    compile_test Default_ocamlopt
+    compile_test (Default_ocamlopt)
       "nat_default" "static runtime";
     compile_test (Output_obj(C_ocamlopt, Static))
       "nat_obj_static" "-output-obj static runtime";
@@ -2336,6 +2349,12 @@ let test_standard_library_location ~original env bindir =
     compile_test (Output_complete_obj(C_ocamlopt, Shared))
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
+  let tests =
+    if Config.shebangscripts then
+      (compile_test (Default_ocamlc Header_shebang) "byt_default_sh" "with #!")
+        :: tests
+    else
+      tests in
   let programs = List.filter_map Fun.id tests in
   (* The test programs compiled before the prefix renamed and re-executed after
      it is renamed which means that the runtime location is passed to each test.
