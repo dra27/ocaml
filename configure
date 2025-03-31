@@ -3367,8 +3367,8 @@ ocamltest_libunix=None
 ocamltest_unix_impl="dummy"
 unix_library=""
 unix_directory=""
-runtime_search=false
-runtime_search_target=false
+runtime_search=''
+runtime_search_target='None'
 
 # Information about the package
 
@@ -4287,16 +4287,14 @@ if test ${enable_runtime_search+y}
 then :
   enableval=$enable_runtime_search; case $enableval in #(
   no) :
-    search_method='1' ;; #(
+     ;; #(
   yes) :
-    search_method='2';runtime_search=fallback ;; #(
+    runtime_search='-runtime-search enable' ;; #(
   always) :
-    search_method='3';runtime_search=always ;; #(
+    runtime_search='-runtime-search always' ;; #(
   *) :
     as_fn_error $? "valid values are yes, no or always for --enable-runtime-search" "$LINENO" 5 ;;
 esac
-else $as_nop
-  search_method='1'
 fi
 
 
@@ -4305,16 +4303,14 @@ if test ${enable_runtime_search_target+y}
 then :
   enableval=$enable_runtime_search_target; case $enableval in #(
   no) :
-    target_search_method='1' ;; #(
+     ;; #(
   yes) :
-    target_search_method='2';runtime_search_target=fallback ;; #(
+    runtime_search_target='Some true' ;; #(
   always) :
-    target_search_method='3';runtime_search_target=always ;; #(
+    runtime_search_target='Some false' ;; #(
   *) :
     as_fn_error $? "valid values are yes, no or always for --enable-runtime-search-target" "$LINENO" 5 ;;
 esac
-else $as_nop
-  target_search_method='1'
 fi
 
 
@@ -24870,8 +24866,6 @@ fi
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
   target_launch_method=\
 '$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
-  search_method='$search_method'
-  target_search_method='$target_search_method'
   ocaml_bindir='$(echo "$ocaml_bindir" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
 
@@ -26048,10 +26042,10 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
-    "shebang":C) printf '%s%s\n%s\000\n' "$search_method" "$launch_method" "$ocaml_bindir" \
+    "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$ocaml_bindir" \
     > stdlib/runtime.info
-  printf '%s%s\n%s\000\n' "$target_search_method" "$target_launch_method" \
-    "$TARGET_BINDIR" > stdlib/target_runtime.info ;;
+  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
+    > stdlib/target_runtime.info ;;
 
   esac
 done # for ac_tag
