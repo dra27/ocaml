@@ -69,7 +69,6 @@ val o3_arguments : inlining_arguments
 val use_inlining_arguments_set : ?round:int -> inlining_arguments -> unit
 
 type launch_method = Executable | Shebang of string option
-type search_method = Absolute | Absolute_then_search | Search
 
 val objfiles : string list ref
 val ccobjs : string list ref
@@ -117,7 +116,7 @@ val noversion : bool ref
 val use_prims : string ref
 val use_runtime : string ref
 val launch_method : launch_method option ref
-val search_method : search_method ref
+val search_method : bool option ref
 val plugin : bool ref
 val principal : bool ref
 val print_variance : bool ref
