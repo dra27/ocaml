@@ -338,6 +338,11 @@ val native_runtime_id : string
 
     @since 5.5 *)
 
+val search_method : bool option
+(** Default setting for -search-method
+
+    @since 5.5 *)
+
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 

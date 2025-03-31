@@ -203,4 +203,3 @@ ZINC_RUNTIME_ID = @zinc_runtime_id@
 ADDITIONAL_ZINC_RUNTIME_IDs = @zinc_runtime_additional@
 
 RUNTIME_SEARCH = @runtime_search@
-RUNTIME_SEARCH_TARGET = @runtime_search_target@
