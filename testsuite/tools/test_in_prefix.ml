@@ -29,8 +29,6 @@ type t = {
     (** Not implemented; always None. *)
   has_runtime_search: bool option;
     (* {v $(RUNTIME_SEARCH) v} - {v Makefile.build_config v} *)
-  has_runtime_search_target: bool option;
-    (* {v $(RUNTIME_SEARCH_TARGET) v} - {v Makefile.build_config v} *)
   launcher_searches_for_ocamlrun: bool;
     (** Indicates whether bytecode executables in the compiler distribution use
         a launcher that is capable of searching PATH to find ocamlrun. This used
@@ -61,7 +59,6 @@ type t = {
   has_ocamlopt: bool;
   has_relative_libdir: string option;
   has_runtime_search: bool option;
-  has_runtime_search_target: bool option;
   launcher_searches_for_ocamlrun: bool;
   target_launcher_searches_for_ocamlrun: bool;
   libraries: string list list
@@ -244,8 +241,7 @@ let parse_cmdline argv =
   in
   let config =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
-         has_runtime_search = None; has_runtime_search_target = None;
-         launcher_searches_for_ocamlrun = false;
+         has_runtime_search = None; launcher_searches_for_ocamlrun = false;
          target_launcher_searches_for_ocamlrun = false; libraries = []}
   in
   let error fmt = Printf.ksprintf (fun s -> raise (Arg.Bad s)) fmt in
@@ -299,20 +295,16 @@ let parse_cmdline argv =
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
-  let parse_search suffix = function
-  | "fallback" -> false
-  | "always" -> true
+  let parse_search = function
+  | "enable" -> true
+  | "always" -> false
   | _ ->
-      raise (Arg.Bad (Printf.sprintf "--with-runtime-search%s: argument should \
-                                      be either fallback or always" suffix))
+      raise (Arg.Bad
+        "--with-runtime-search: argument should be either enable or always")
   in
   let has_runtime_search arg =
-    let has_runtime_search = Option.map (parse_search "") arg in
+    let has_runtime_search = Option.map parse_search arg in
     config := {!config with has_runtime_search}
-  in
-  let has_runtime_search_target arg =
-    let has_runtime_search_target = Option.map (parse_search "-target") arg in
-    config := {!config with has_runtime_search_target}
   in
   let args = Arg.align [
     "--pwd", Arg.Set_string pwd, "<pwd>\tCurrent working directory to use";
@@ -333,11 +325,6 @@ let parse_cmdline argv =
 \tCompiler bytecode binaries can search for their runtimes";
     "--without-runtime-search",
       Arg.Unit (fun () -> has_runtime_search None), "";
-    "--with-runtime-search-target",
-      Arg.String (fun s -> has_runtime_search_target (Some s)), "\
-\tBytecode binaries produced by the compiler can search for their runtimes";
-    "--without-runtime-search-target",
-      Arg.Unit (fun () -> has_runtime_search_target None), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -2205,7 +2192,7 @@ let run_program env (_config : Installation.t) =
 type compiler = C_ocamlc | C_ocamlopt
 type runtime_mode = Shared | Static
 type linkage =
-| Default_ocamlc of launch_mode
+| Default_ocamlc of launch_mode * bool option
 | Default_ocamlopt
 | Custom_runtime of runtime_mode
 | Output_obj of compiler * runtime_mode
@@ -2298,20 +2285,27 @@ let compile_test usr_bin_sh (config : Installation.t) env
           0
       in
       match test with
-      | Default_ocamlc Header_exe ->
+      | Default_ocamlc(launch_method, search_method) ->
           let args =
-            if bytecode_shebangs_by_default then
-              ["-launch-method"; "exe"]
-            else
-              [] in
-          f ~tendered:true args
-      | Default_ocamlc Header_shebang ->
-          let args =
-            if bytecode_shebangs_by_default then
-              []
-            else
-              ["-launch-method"; "sh"] in
-          f ~tendered:true args
+            match launch_method with
+            | Header_exe when bytecode_shebangs_by_default ->
+                ["-launch-method"; "exe"]
+            | Header_shebang when not bytecode_shebangs_by_default ->
+                ["-launch-method"; "sh"]
+            | _ ->
+                [] in
+          let args, target_launcher_searches_for_ocamlrun =
+            match search_method with
+            | search_method when search_method = Config.search_method ->
+                args, None
+            | None ->
+                "-runtime-search" :: "disable" :: args, Some false
+            | Some true ->
+                "-runtime-search" :: "enable" :: args, Some true
+            | Some false ->
+                "-runtime-search" :: "always" :: args, Some true
+          in
+          f ?target_launcher_searches_for_ocamlrun ~tendered:true args
       | Default_ocamlopt ->
           f ~mode:Native []
       | Custom_runtime Static ->
@@ -2686,8 +2680,12 @@ let run ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
                 pp_path ocamlc_where pp_path ocamlopt_where;
   let compile_test = compile_test sh config env ~bytecode_shebangs_by_default in
   let tests = [
-    compile_test (Default_ocamlc Header_exe)
-      "byt_default_exe" "with tender";
+    compile_test (Default_ocamlc(Header_exe, None))
+      "byt_default_exe_disable" "with absolute tender";
+    compile_test (Default_ocamlc(Header_exe, Some true))
+      "byt_default_exe_enable" "with fallback tender";
+    compile_test (Default_ocamlc(Header_exe, Some false))
+      "byt_default_exe_always" "with relocatable tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom_runtime Shared)
@@ -2717,8 +2715,13 @@ let run ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
   ] in
   let tests =
     if Config.shebangscripts then
-      (compile_test (Default_ocamlc Header_shebang) "byt_default_sh" "with #!")
-        :: tests
+      (compile_test (Default_ocamlc(Header_shebang, None))
+        "byt_default_sh_disable" "with absolute #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Some true))
+        "byt_default_sh_enable" "with fallback #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Some false))
+        "byt_default_sh_always" "with relocatable #!") ::
+      tests
     else
       tests in
   (* The test programs compiled before the prefix renamed and re-executed after
@@ -3067,7 +3070,7 @@ let run ~reproducible (config : Installation.t) env =
           (* If the launcher doesn't search for ocamlrun, then either the #!
              stub will include the absolute path or the RNTM section will *)
           match classification with
-          | Tendered _ when config.has_runtime_search <> Some true -> true
+          | Tendered _ when config.has_runtime_search <> Some false -> true
           | _ -> false
         in
         if code_embeds_stdlib_location || linker_embeds_stdlib_location then
@@ -3457,9 +3460,7 @@ let () =
     let {Bytelink.buffer; executable_offset; _} = runtime_launch_info in
     String.length buffer - executable_offset in
   let launcher_searches_for_ocamlrun = config.has_runtime_search <> None in
-  let target_launcher_searches_for_ocamlrun =
-    config.has_runtime_search_target <> None
-  in
+  let target_launcher_searches_for_ocamlrun = Config.search_method <> None in
   let config =
     {config with Installation.libraries; launcher_searches_for_ocamlrun;
                  target_launcher_searches_for_ocamlrun}
@@ -3474,7 +3475,7 @@ let () =
     && (not Toolchain.c_compiler_always_embeds_build_path
         || not Toolchain.c_compiler_debug_paths_can_be_absolute)
   in
-  let target_relocatable = config.has_runtime_search_target <> None in
+  let target_relocatable = Config.search_method <> None in
   let summary =
     let choose b t f = (if b then t else f), true in
     let puzzle = [
