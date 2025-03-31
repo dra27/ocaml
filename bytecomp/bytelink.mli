@@ -36,17 +36,10 @@ type launch_method =
 | Shebang_runtime          (** Invoke the runtime directly *)
 | Executable               (** Use the executable stub *)
 
-(** Permitted methods for searching for the runtime executable *)
-type search_method =
-| Absolute             (** Absolute path only *)
-| Absolute_then_search (** Absolute path with fallback to searching *)
-| Search               (** Search only; no absolute path stored *)
-
 (** runtime-launch-info files *)
 type runtime_launch_info = {
   buffer : string;          (** Content of the file *)
   bindir : string;          (** Directory containing runtime executables *)
-  search : search_method;   (** Default search method *)
   launcher : launch_method; (** Default launch method (this is never
                                 {!Shebang_runtime}) *)
   executable_offset : int;  (** Offset in the buffer field at which the

@@ -74,6 +74,8 @@ let afl_instrument = @afl@
 let bytecode_runtime_id = {@QS@|@bytecode_runtime_id@|@QS@}
 let native_runtime_id = {@QS@|@native_runtime_id@|@QS@}
 
+let search_method = @runtime_search_target@
+
 let native_compiler = @native_compiler@
 
 let architecture = {@QS@|@arch@|@QS@}
