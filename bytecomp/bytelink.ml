@@ -294,6 +294,11 @@ type launch_method =
 | Shebang_runtime
 | Executable
 
+type search_method =
+| Absolute
+| Absolute_then_search
+| Search
+
 type runtime_launch_info = {
   buffer : string;
   bindir : string;
@@ -404,7 +409,7 @@ let write_header outchan =
       let make_absolute file =
         if Filename.is_relative file then Filename.concat (Sys.getcwd()) file
         else file in
-      make_absolute !Clflags.use_runtime, Clflags.Absolute
+      make_absolute !Clflags.use_runtime, Absolute
     else
       let runtime_id =
         let open Config in
@@ -416,10 +421,13 @@ let write_header outchan =
       let runtime =
         Printf.sprintf "ocamlrun%s-%s" !Clflags.runtime_variant runtime_id
       in
-      if !Clflags.search_method <> Clflags.Absolute then
-        runtime, !Clflags.search_method
-      else
-        Filename.concat runtime_info.bindir runtime, Clflags.Absolute
+      match !Clflags.search_method with
+      | None ->
+          Filename.concat runtime_info.bindir runtime, Absolute
+      | Some true ->
+          runtime, Absolute_then_search
+      | Some false ->
+          runtime, Search
   in
   (* Determine which method will be used for launching the executable:
      Executable: concatenate the bytecode image to the executable stub
@@ -429,7 +437,7 @@ let write_header outchan =
     if runtime_info.launcher = Executable then
       Executable
     else
-      if search <> Clflags.Absolute || invalid_for_shebang_line runtime then
+      if search <> Absolute || invalid_for_shebang_line runtime then
         match runtime_info.launcher with
         | Shebang_bin_sh sh ->
             let sh =
@@ -449,26 +457,26 @@ let write_header outchan =
   (* Write the header *)
   match launcher with
   | Shebang_runtime ->
-      assert (search = Clflags.Absolute);
+      assert (search = Absolute);
       (* Use the runtime directly *)
       Printf.fprintf outchan "#!%s\n" runtime;
       Bytesections.init_record outchan
   | Shebang_bin_sh bin_sh ->
       let () =
-        if search = Clflags.Absolute then
+        if search = Absolute then
           (* exec the runtime using sh *)
           Printf.fprintf outchan "\
             #!%s\n\
             exec %s \"$0\" \"$@\"\n" bin_sh (Filename.quote runtime)
         else
           let absolute_then_search =
-            if search = Clflags.Absolute_then_search then
+            if search = Absolute_then_search then
               let runtime =
                 Filename.quote (Filename.concat runtime_info.bindir runtime) in
               Printf.sprintf "\nc=%s\nif ! test -f \"$c\"; then" runtime
             else "" in
           let absolute_then_search_fi =
-            if search = Clflags.Absolute_then_search then "\nfi" else "" in
+            if search = Absolute_then_search then "\nfi" else "" in
           Printf.fprintf outchan {|#!%s
 r=%s%s
 d="$(dirname "$0" 2>/dev/null)"
