@@ -337,7 +337,7 @@ $(basename $(notdir $(1)))_COMMON_LINKFLAGS =
 endef # _OCAML_PROGRAM_BASE
 
 LINK_BYTECODE_PROGRAM =\
-  $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
+  $(CAMLC) $(RUNTIME_SEARCH) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
 
 # The _OCAML_BYTECODE_PROGRAM macro defines a bytecode program but assuming
 # that _OCAML_PROGRAM_BASE has already been called. Its public counterpart
@@ -361,7 +361,7 @@ $(basename $(notdir $(1)))_BYTECODE_LINKFLAGS =
 
 $(basename $(notdir $(1)))_BYTECODE_LINKCMD = \
 $(strip \
-  $$(CAMLC) $$(SET_RELATIVE_STDLIB) \
+  $$(CAMLC) $$(SET_RELATIVE_STDLIB) $$(RUNTIME_SEARCH) \
   $$(OC_COMMON_LINKFLAGS) $$(OC_BYTECODE_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_COMMON_LINKFLAGS) \
   $$($(basename $(notdir $(1)))_BYTECODE_LINKFLAGS))
