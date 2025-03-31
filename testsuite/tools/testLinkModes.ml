@@ -140,7 +140,7 @@ let run_program env (_config : Installation.t) =
 type compiler = C_ocamlc | C_ocamlopt
 type runtime_mode = Shared | Static
 type linkage =
-| Default_ocamlc of launch_mode
+| Default_ocamlc of launch_mode * bool option
 | Default_ocamlopt
 | Custom_runtime of runtime_mode
 | Output_obj of compiler * runtime_mode
@@ -232,20 +232,27 @@ let compile_test usr_bin_sh (config : Installation.t) env =
           0
       in
       match test with
-      | Default_ocamlc Header_exe ->
+      | Default_ocamlc(launch_method, search_method) ->
           let args =
-            if config.bytecode_shebangs_by_default then
-              ["-launch-method"; "exe"]
-            else
-              [] in
-          f ~tendered:true args
-      | Default_ocamlc Header_shebang ->
-          let args =
-            if config.bytecode_shebangs_by_default then
-              []
-            else
-              ["-launch-method"; "sh"] in
-          f ~tendered:true args
+            match launch_method with
+            | Header_exe when config.bytecode_shebangs_by_default ->
+                ["-launch-method"; "exe"]
+            | Header_shebang when not config.bytecode_shebangs_by_default ->
+                ["-launch-method"; "sh"]
+            | _ ->
+                [] in
+          let args, target_launcher_searches_for_ocamlrun =
+            match search_method with
+            | search_method when search_method = Config.search_method ->
+                args, None
+            | None ->
+                "-runtime-search" :: "disable" :: args, Some false
+            | Some true ->
+                "-runtime-search" :: "enable" :: args, Some true
+            | Some false ->
+                "-runtime-search" :: "always" :: args, Some true
+          in
+          f ?target_launcher_searches_for_ocamlrun ~tendered:true args
       | Default_ocamlopt ->
           f ~mode:Native []
       | Custom_runtime Static ->
@@ -620,8 +627,12 @@ let run ~sh (config : Installation.t) env =
                 pp_path ocamlc_where pp_path ocamlopt_where;
   let compile_test = compile_test sh config env in
   let tests = [
-    compile_test (Default_ocamlc Header_exe)
-      "byt_default_exe" "with tender";
+    compile_test (Default_ocamlc(Header_exe, None))
+      "byt_default_exe_disable" "with absolute tender";
+    compile_test (Default_ocamlc(Header_exe, Some true))
+      "byt_default_exe_enable" "with fallback tender";
+    compile_test (Default_ocamlc(Header_exe, Some false))
+      "byt_default_exe_always" "with relocatable tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
     compile_test (Custom_runtime Shared)
@@ -651,8 +662,13 @@ let run ~sh (config : Installation.t) env =
   ] in
   let tests =
     if Config.shebangscripts then
-      (compile_test (Default_ocamlc Header_shebang) "byt_default_sh" "with #!")
-        :: tests
+      (compile_test (Default_ocamlc(Header_shebang, None))
+        "byt_default_sh_disable" "with absolute #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Some true))
+        "byt_default_sh_enable" "with fallback #!") ::
+      (compile_test (Default_ocamlc(Header_shebang, Some false))
+        "byt_default_sh_always" "with relocatable #!") ::
+      tests
     else
       tests in
   (* The test programs compiled before the prefix renamed and re-executed after

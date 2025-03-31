@@ -108,9 +108,7 @@ let () =
   let bytecode_shebangs_by_default =
     runtime_launch_info.launcher <> Bytelink.Executable in
   let launcher_searches_for_ocamlrun = config.has_runtime_search <> None in
-  let target_launcher_searches_for_ocamlrun =
-    config.has_runtime_search_target <> None
-  in
+  let target_launcher_searches_for_ocamlrun = Config.search_method <> None in
   let config =
     {config with Installation.libraries;
                  launcher_searches_for_ocamlrun;
@@ -127,7 +125,7 @@ let () =
     && (not Toolchain.c_compiler_always_embeds_build_path
         || not Toolchain.c_compiler_debug_paths_can_be_absolute)
   in
-  let target_relocatable = config.has_runtime_search_target <> None in
+  let target_relocatable = Config.search_method <> None in
   let summary =
     let choose b t f = (if b then t else f), true in
     let puzzle = [
