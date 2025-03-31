@@ -55,8 +55,6 @@ module Import : sig
       (** Not implemented; always None. *)
     has_runtime_search: bool option;
       (** {v $(RUNTIME_SEARCH) v} - {v Makefile.build_config v} *)
-    has_runtime_search_target: bool option;
-      (** {v $(RUNTIME_SEARCH_TARGET) v} - {v Makefile.build_config v} *)
     launcher_searches_for_ocamlrun: bool;
       (** Indicates whether bytecode executables in the compiler distribution
           a launcher that is capable of searching PATH to find ocamlrun. This
