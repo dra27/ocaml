@@ -624,6 +624,7 @@ $(foreach LIBRARY, $(OCAML_NATIVE_LIBRARIES),\
 
 USE_RUNTIME_PRIMS = -use-prims ../runtime/primitives
 USE_STDLIB = -nostdlib -I ../stdlib
+FLEXLINK_LINK_FLAGS = $(USE_RUNTIME_PRIMS) $(USE_STDLIB) $(RUNTIME_SEARCH)
 
 FLEXDLL_OBJECTS = \
   flexdll_$(FLEXDLL_CHAIN).$(O) flexdll_initer_$(FLEXDLL_CHAIN).$(O)
@@ -642,7 +643,7 @@ flexlink.byte$(EXE): $(FLEXDLL_SOURCES)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlrun$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT='$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) $(USE_STDLIB)' \
+	  OCAMLOPT='$(value BOOT_OCAMLC) $(FLEXLINK_LINK_FLAGS)' \
 	  flexlink.exe support
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe $@
 	cp $(addprefix $(FLEXDLL_SOURCE_DIR)/, $(FLEXDLL_OBJECTS)) $(ROOTDIR)
