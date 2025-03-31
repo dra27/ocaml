@@ -531,6 +531,11 @@ let mk_launch_method f =
    in runtime-launch-info"
 
 let mk_search_method f =
+  let default =
+    match Config.search_method with
+    | None -> "disable"
+    | Some true -> "enable"
+    | Some false -> "always" in
   "-runtime-search", Arg.Symbol (["disable"; "enable"; "always"], f),
   Printf.sprintf
     "  Control the way the bytecode header searches for the interpreter\n\
@@ -538,7 +543,7 @@ let mk_search_method f =
     \      disable  use a fixed absolute path to the runtime\n\
     \      enable   search for runtime only if not found at the absolute path\n\
     \      always   always search for the runtime\n\
-    \    The default setting is 'disable'."
+    \    The default setting is '%s'." default
 
 let mk_use_runtime f =
   "-use-runtime", Arg.String f,
@@ -2023,11 +2028,11 @@ third-party libraries such as Lwt, but with a different API."
           "-launch-method: expect sh, exe or an absolute path for <method>"
     let _search_method = function
     | "disable" ->
-        search_method := Some None
+        search_method := None
     | "enable" ->
-        search_method := Some (Some true)
+        search_method := Some true
     | "always" ->
-        search_method := Some (Some false)
+        search_method := Some false
     | _ ->
         assert false
     let _v () = Compenv.print_version_and_library "compiler"
