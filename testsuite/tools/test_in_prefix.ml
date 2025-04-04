@@ -2978,8 +2978,7 @@ let run ~reproducible (config : Installation.t) env =
         else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
           let stdlib =
             config.has_relative_libdir = None
-            && List.mem basename ["config.cmt"; "config_main.cmt";
-                                  "ocamlcommon.cma"] in
+            && List.mem basename ["config.cmt"; "ocamlcommon.cma"] in
           let ocaml_debug =
             config.has_relative_libdir = None in
           (~stdlib, ~ocaml_debug, ~c_debug:false, ~s:false)
