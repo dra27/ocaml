@@ -99,7 +99,7 @@ module Toolchain = struct
          (for reasons which are not entirely clear) *)
       (~absolute_paths:(not is_clang),
        ~implicit_debug_info:false,
-       ~embeds:true,
+       ~embeds:(not is_clang),
        ~asmrun_assembled_with_cc:false)
     else
       (~absolute_paths:true,
