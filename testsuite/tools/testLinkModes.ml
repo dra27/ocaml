@@ -566,11 +566,14 @@ let compile_test usr_bin_sh config env test test_program description =
           f ~mode:Native ~clibs:[Config.compression_c_libraries]
             ~linker_exit_code ["-output-complete-obj"]
       | Output_complete_obj(C_ocamlopt, Shared) ->
-          (* ocamlopt allows the .so to be passed to the partial linker which
-             fails with GNU ld, but not with the macOS linker *)
-          let compilation_exit_code = fails_if (Config.system <> "macosx") in
-          f ~mode:Native ~use_shared_runtime:true
-            ~compilation_exit_code ~clibs:[Config.compression_c_libraries]
+          (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
+             segfaults *)
+          let may_segfault = List.mem Config.architecture ["s390x"; "riscv"] in
+          (* Shared compilation isn't available on native Windows and fails on
+             Cygwin *)
+          let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
+          f ~mode:Native ~use_shared_runtime:true ~may_segfault
+            ~linker_exit_code ~clibs:[Config.compression_c_libraries]
             ["-output-complete-obj"]
       | Output_complete_exe Static ->
           f ~calls_linker:true ["-output-complete-exe"]
