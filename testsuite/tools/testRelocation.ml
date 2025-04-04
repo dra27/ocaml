@@ -169,9 +169,8 @@ let libdir_rules config file =
         (* config.cmx contains Config.standard_library for inlining *)
         (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
-        let stdlib = (* via Config.standard_library *)
-          List.mem basename ["config.cmt"; "config_main.cmt";
-                             "ocamlcommon.cma"] in
+        (* via Config.standard_library *)
+        let stdlib = basename = "config.cmt" || basename = "ocamlcommon.cma" in
         (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
