@@ -433,9 +433,7 @@ let run ~reproducible (config : Installation.t) env =
         else if basename = "config.cmx" then
           (~stdlib:true, ~ocaml_debug:false, ~c_debug:false, ~s:false)
         else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
-          let stdlib =
-            List.mem basename ["config.cmt"; "config_main.cmt";
-                               "ocamlcommon.cma"] in
+          let stdlib = List.mem basename ["config.cmt"; "ocamlcommon.cma"] in
           let ocaml_debug =
             true in
           (~stdlib, ~ocaml_debug, ~c_debug:false, ~s:false)
