@@ -24,6 +24,7 @@ let bindir = "/tmp"
 let standard_library_default = "/tmp"
 let ccomp_type = "n/a"
 let c_compiler = boot_cannot_call "the C compiler"
+let c_compiler_vendor = ""
 let c_output_obj = ""
 let c_has_debug_prefix_map = false
 let as_has_debug_prefix_map = false
