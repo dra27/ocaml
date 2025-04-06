@@ -23,6 +23,8 @@ INSTALL ?= @INSTALL@
 
 SRCDIR_ABS = @ocamlsrcdir@
 
+AS_IS_CC = @as_is_cc@
+
 # The C compiler vendor
 OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
