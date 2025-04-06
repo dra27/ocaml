@@ -71,6 +71,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_STRING,MKMAINDLL) \
 	    $(call SUBST,MODEL) \
 	    $(call SUBST_STRING,NATIVECCLIBS) \
+	    $(call SUBST,AS_IS_CC) \
 	    $(call SUBST_STRING,OCAMLC_CFLAGS) \
 	    $(call SUBST_STRING,OCAMLC_CPPFLAGS) \
 	    $(call SUBST_STRING,OCAMLOPT_CFLAGS) \
