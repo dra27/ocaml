@@ -27,6 +27,7 @@ let c_compiler_vendor = ""
 let c_output_obj = ""
 let c_has_debug_prefix_map = false
 let as_has_debug_prefix_map = false
+let as_is_cc = false
 let ocamlc_cflags = ""
 let ocamlc_cppflags = ""
 let ocamlopt_cflags = ""
