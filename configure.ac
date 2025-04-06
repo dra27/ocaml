@@ -132,6 +132,7 @@ AC_SUBST([instrumented_runtime])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
+AC_SUBST([as_is_cc])
 AC_SUBST([with_debugger]) # TODO: rename this variable
 AC_SUBST([with_camltex])
 AC_SUBST([ocamldoc])
@@ -1207,6 +1208,9 @@ AS_IF([test -n "$host_alias"], [toolpref="${host_alias}-"], [toolpref=""])
 # One may want to check whether the user provided values first
 # and only compute values if none has been provided
 
+as_is_cc=false
+default_as=''
+
 AS_CASE(["$arch,$system"],
   [i386,win32],
     [default_as="ml -nologo -coff -Cp -c -Fo"],
@@ -1216,7 +1220,8 @@ AS_CASE(["$arch,$system"],
     [AS_CASE([$ocaml_cv_cc_vendor],
       [clang-*],
         [default_as='clang -arch x86_64 -Wno-trigraphs -c'
-        default_aspp='clang -arch x86_64 -Wno-trigraphs -c'],
+        default_aspp='clang -arch x86_64 -Wno-trigraphs -c'
+        as_is_cc=true],
       [default_as="${toolpref}as -arch x86_64"
       default_aspp="${toolpref}gcc -arch x86_64 -c"])],
   [amd64,solaris],
@@ -1241,16 +1246,21 @@ AS_CASE(["$arch,$system"],
     default_aspp="${toolpref}gcc -c -Wa,-march=$model"],
   [*,freebsd],
     [default_as="${toolpref}cc -c -Wno-trigraphs"
-    default_aspp="${toolpref}cc -c -Wno-trigraphs"],
+    default_aspp="${toolpref}cc -c -Wno-trigraphs"
+    as_is_cc=true],
   [*,dragonfly],
     [default_as="${toolpref}as"
     default_aspp="${toolpref}cc -c"],
   [amd64,*|arm,*|arm64,*|i386,*],
     [AS_CASE([$ocaml_cv_cc_vendor],
       [clang-*], [default_as="${toolpref}clang -c -Wno-trigraphs"
-                  default_aspp="${toolpref}clang -c -Wno-trigraphs"],
+                  default_aspp="${toolpref}clang -c -Wno-trigraphs"
+                  as_is_cc=true],
       [default_as="${toolpref}as"
       default_aspp="${toolpref}gcc -c"])])
+
+AS_IF([test -z "$default_as"],[default_as="$CC -c"; as_is_cc=true])
+AS_IF([test -z "$default_aspp"],[default_aspp="$CC -c"])
 
 AS_IF([test "$with_pic"],
   [fpic=true
@@ -1567,6 +1577,7 @@ AC_CHECK_FUNC([pwrite], [AC_DEFINE([HAS_PWRITE])])
 
 ## -fdebug-prefix-map support by the C compiler
 AS_CASE([$CC,$host],
+  [*,*-*-mingw32], [cc_has_debug_prefix_map=false],
   [*,*-pc-windows], [cc_has_debug_prefix_map=false],
   [xlc*,powerpc-ibm-aix*], [cc_has_debug_prefix_map=false],
   [OCAML_CC_HAS_DEBUG_PREFIX_MAP])
