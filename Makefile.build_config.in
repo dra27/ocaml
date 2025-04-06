@@ -26,6 +26,8 @@ INSTALL_PROG ?= @INSTALL_PROGRAM@
 
 SRCDIR_ABS = @ocamlsrcdir@
 
+AS_IS_CC = @as_is_cc@
+
 # The command to generate C dependency information
 DEP_CC=@DEP_CC@ -MM
 COMPUTE_DEPS=@compute_deps@
