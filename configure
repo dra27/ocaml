@@ -790,6 +790,7 @@ ocamltest
 ocamldoc
 with_camltex
 with_debugger
+as_is_cc
 as_has_debug_prefix_map
 cc_has_debug_prefix_map
 otherlibraries
@@ -2866,6 +2867,7 @@ VERSION=4.12.2+dev0-2021-09-23
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
 
 
 
@@ -14720,6 +14722,9 @@ else
 fi
 
 
+as_is_cc=false
+default_as=''
+
 case "$arch,$system" in #(
   i386,win32) :
     default_as="ml -nologo -coff -Cp -c -Fo" ;; #(
@@ -14729,7 +14734,8 @@ case "$arch,$system" in #(
     case $ocaml_cv_cc_vendor in #(
   clang-*) :
     default_as='clang -arch x86_64 -Wno-trigraphs -c'
-        default_aspp='clang -arch x86_64 -Wno-trigraphs -c' ;; #(
+        default_aspp='clang -arch x86_64 -Wno-trigraphs -c'
+        as_is_cc=true ;; #(
   *) :
     default_as="${toolpref}as -arch x86_64"
       default_aspp="${toolpref}gcc -arch x86_64 -c" ;;
@@ -14747,6 +14753,7 @@ fi ;; #(
     if test x"$SYSTEM_AS" = "x"; then :
   default_as="${toolpref}gcc -m64 -c"
           default_aspp="${toolpref}gcc -m64 -c"
+          as_is_cc=true
 else
   default_as="${toolpref}as --64"
           default_aspp="${toolpref}gcc -m64 -c"
@@ -14773,7 +14780,8 @@ esac ;; #(
     default_aspp="${toolpref}gcc -c -Wa,-march=$model" ;; #(
   *,freebsd) :
     default_as="${toolpref}cc -c -Wno-trigraphs"
-    default_aspp="${toolpref}cc -c -Wno-trigraphs" ;; #(
+    default_aspp="${toolpref}cc -c -Wno-trigraphs"
+    as_is_cc=true ;; #(
   *,dragonfly) :
     default_as="${toolpref}as"
     default_aspp="${toolpref}cc -c" ;; #(
@@ -14781,7 +14789,8 @@ esac ;; #(
     case $ocaml_cv_cc_vendor in #(
   clang-*) :
     default_as="${toolpref}clang -c -Wno-trigraphs"
-                  default_aspp="${toolpref}clang -c -Wno-trigraphs" ;; #(
+                  default_aspp="${toolpref}clang -c -Wno-trigraphs"
+                  as_is_cc=true ;; #(
   *) :
     default_as="${toolpref}as"
       default_aspp="${toolpref}gcc -c" ;;
@@ -14789,6 +14798,13 @@ esac ;; #(
   *) :
      ;;
 esac
+
+if test -z "$default_as"; then :
+  default_as="$CC -c"; as_is_cc=true
+fi
+if test -z "$default_aspp"; then :
+  default_aspp="$CC -c"
+fi
 
 if test "$with_pic"; then :
   fpic=true
