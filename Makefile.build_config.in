@@ -26,6 +26,8 @@ SRCDIR_ABS = @ocamlsrcdir@
 ### Whether the native compiler has been enabled or not
 NATIVE_COMPILER=@native_compiler@
 
+AS_IS_CC = @as_is_cc@
+
 # The C compiler vendor
 OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
