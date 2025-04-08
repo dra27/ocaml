@@ -96,10 +96,16 @@ fi
 
 case "$1" in
   install)
+    mkdir -p "$CACHE_DIRECTORY"
+    if [ -e "$CACHE_DIRECTORY/parallel" ]; then
+      $CACHE_DIRECTORY/parallel --version || \
+        rm -f "$CACHE_DIRECTORY/parallel-source"
+    fi
     if [ ! -e "$CACHE_DIRECTORY/parallel-source" ] || \
        [ "$PARALLEL_URL" != "$(cat "$CACHE_DIRECTORY/parallel-source")" ] ; then
       # Download latest version directly from the repo
-      curl -Ls $PARALLEL_URL -o "$CACHE_DIRECTORY/parallel"
+      curl -L "$PARALLEL_URL" -o "$CACHE_DIRECTORY/parallel"
+      head -4 "$CACHE_DIRECTORY/parallel"
       echo "$PARALLEL_URL" > "$CACHE_DIRECTORY/parallel-source"
     fi
     cp "$CACHE_DIRECTORY/parallel" /usr/bin
