@@ -1997,9 +1997,6 @@ testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 
 testsuite/tools/test_in_prefi%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
-testsuite/tools/test_in_prefix.%: \
-  OC_COMMON_COMPFLAGS += -rectypes
-
 ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -custom -g
 
 ocamltest/ocamltest$(EXE): ocamlc ocamlyacc ocamllex
