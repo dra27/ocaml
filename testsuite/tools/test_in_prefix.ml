@@ -487,6 +487,17 @@ type _ output =
 | Execute : unit output
 | Return : (int * string list) output
 
+type phase = Original | Renamed
+
+type mode = Bytecode | Native
+
+(* exe ["foo" = "foo.exe"] on Windows or ["foo"] otherwise. *)
+let exe =
+  if Sys.win32 then
+    Fun.flip (^) ".exe"
+  else
+    Fun.id
+
 module StringSet = Set.Make(String)
 
 (* All process invocation is done via [Environment.run_process] and
@@ -500,7 +511,19 @@ module Environment : sig
      with [LD_LIBRARY_PATH] / [DYLD_LIBRARY_PATH] set or updated).
      [?env] allows [CAML_LD_LIBRARY_PATH], [OCAMLLIB] and [CAMLLIB] to be set
      (they will be unset otherwise). *)
-  val make : string -> string -> t
+  val make : ?phase:phase -> string -> string -> t
+
+  val is_renamed : t -> bool
+
+  val bindir : t -> string
+
+  val libdir : t -> string
+
+  val tool_path : t -> mode -> string -> string -> string
+
+  val ocamlrun : t -> string
+
+  val in_libdir : t -> string -> string
 
   (* [run_process mode ?strategy ?fails program ?argv0 args environment]
      executes [program] with [args] in [environment]. Set [~fails:true] for
@@ -556,6 +579,7 @@ end = struct
     serial: int;
     bindir: string;
     libdir: string;
+    phase: phase;
     caml_ld_library_path: shim;
     ocamllib: shim;
     camllib: shim;
@@ -652,12 +676,26 @@ end = struct
     in
     {env with env = Array.of_list bindings}
 
+  let is_renamed {phase; _} = (phase = Renamed)
+
+  let bindir {bindir; _} = bindir
+  let libdir {libdir; _} = libdir
+
+  let tool_path {bindir; _} mode bytecode native =
+    Filename.concat bindir (exe (if mode = Bytecode then bytecode else native))
+
+  let ocamlrun {bindir; _} =
+    Filename.concat bindir (exe "ocamlrun")
+
+  let in_libdir {libdir; _} path =
+    Filename.concat libdir path
+
   (* Returns an environment where any variables in scrub have been removed and
      with effectively PATH=$bindir:$PATH and
      LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH on Unix or
      DYLD_LIBRARY_PATH=$libdir$:DYLD_LIBRARY_PATH on macOS or
      PATH=$bindir;$libdir;$PATH on Windows. *)
-  let make bindir libdir =
+  let make ?(phase = Original) bindir libdir =
     let update binding =
       let equals = String.index binding '=' in
       let name = String.sub binding 0 equals in
@@ -685,8 +723,8 @@ end = struct
         Hashtbl.add environments bindings serial;
         serial
     in
-    {env = Array.of_list bindings; serial; bindir; libdir; ocamllib = Unshimmed;
-     camllib = Unshimmed; caml_ld_library_path = Unshimmed;
+    {phase; env = Array.of_list bindings; serial; bindir; libdir;
+    ocamllib = Unshimmed; camllib = Unshimmed; caml_ld_library_path = Unshimmed;
      prefix_path_with_cwd = false}
 
   let last_environment = ref (-1)
@@ -793,10 +831,13 @@ end = struct
           (* cf. ocaml/ocaml#13693 - s390x executables might segfault, so this
              gets converted to Docker's exit code so it can be skipped *)
           Unix.WEXITED 139
+(* XXX This doesn't work - for example, the problem is we can't differentiate
+       exit 2 from the ocamlc.byte and exit 2 from header.c
       | Unix.WEXITED 2 when classification = Tendered ->
           (* Normalise the exit(2) from header.c to code 127 (as a #!-style
              header would do *)
           Unix.WEXITED 127
+*)
       | status ->
           status
     in
@@ -893,6 +934,7 @@ end = struct
           env
       in
       let shim ~stubs ~stdlib env =
+        (* XXX NB This is protected at at type level now - this code can go *)
         match env.ocamllib, env.camllib, env.caml_ld_library_path with
         | Test _, _, _
         | _, Test _, _
@@ -946,7 +988,9 @@ end = struct
           strategy
       in
       let strategy =
-        if strategy = [] then
+        (* XXX This can be simplified - the point is that the flags are only
+               used for a second phase environment *)
+        if env.phase = Original || strategy = [] then
           [None, None]
         else
           strategy
@@ -979,12 +1023,11 @@ end = struct
 
 end
 
-(* exe ["foo" = "foo.exe"] on Windows or ["foo"] otherwise. *)
-let exe =
-  if Sys.win32 then
-    Fun.flip (^) ".exe"
+let library mode name =
+  if mode = Native then
+    name ^ ".cmxa"
   else
-    Fun.id
+    name ^ ".cma"
 
 (* launcher_searches_for_ocamlrun describes whether ocamlc emits an RNTM with
    the name of the runtime only, expecting the launcher in stdlib/header*.c to
@@ -1003,19 +1046,11 @@ let linker_is_flexlink =
 let ocamlc_executable_after_rename =
   config.has_ocamlopt || launcher_searches_for_ocamlrun
 
-type mode = Bytecode | Native
-
 (* This test verifies that a series of libraries can be loaded in a toplevel.
    Any failures cause the script to be aborted. *)
-let load_libraries_in_toplevel ~original env bindir libdir mode libraries =
-  let toplevel =
-    match mode with
-    | Bytecode -> "ocaml"
-    | Native -> "ocamlnat"
-  in
-  let toplevel = Filename.concat bindir (exe toplevel) in
-  Format.printf "%sTesting loading of libraries in %a\n%!"
-                (if original then "\n" else "") display_path toplevel;
+let load_libraries_in_toplevel env mode libraries =
+  let toplevel = Environment.tool_path env mode "ocaml" "ocamlnat" in
+  Format.printf "Testing loading of libraries in %a\n%!" display_path toplevel;
   let test_libraries_in_toplevel libraries =
     let has_c_stubs =
       Out_channel.with_open_text "test_install_script.ml" (fun oc ->
@@ -1030,7 +1065,8 @@ let load_libraries_in_toplevel ~original env bindir libdir mode libraries =
                     "cmxa"
                   else if library = "threads" then
                     let threads_plugin =
-                      Filename.(concat (concat libdir "threads") "threads.cmxs")
+                      let plugin = Filename.concat "threads" "threads.cmxs" in
+                      Environment.in_libdir env plugin
                     in
                     if Sys.file_exists threads_plugin then
                       fail_because "threads.cmxs is not expected to exist"
@@ -1079,10 +1115,9 @@ let load_libraries_in_toplevel ~original env bindir libdir mode libraries =
     in
     let exit_code, output =
       Environment.run_process Return
-        ~runtime:(not original && mode = Bytecode
-                  && not launcher_searches_for_ocamlrun)
-        ~stubs:(not original && mode = Bytecode && has_c_stubs)
-        ~stdlib:(not original) env toplevel args
+        ~runtime:(mode = Bytecode && not launcher_searches_for_ocamlrun)
+        ~stubs:(mode = Bytecode && has_c_stubs)
+        ~stdlib:true env toplevel args
     in
     Environment.display_output output;
     if exit_code <> expected_exit_code then
@@ -1094,7 +1129,7 @@ let load_libraries_in_toplevel ~original env bindir libdir mode libraries =
 
 (* This test verifies that a series of libraries can be loaded via Dynlink.
    Any failures will cause either an exception or a compilation error. *)
-let load_libraries_in_prog ~original env bindir libdir mode libraries =
+let load_libraries_in_prog env mode libraries =
   Format.printf "\nTesting loading of libraries with %s dynlink\n"
                 (if mode = Native then "native" else "bytecode");
   let test_program = Filename.concat test_root (exe "test_script") in
@@ -1110,17 +1145,12 @@ let load_library basename =
 let () =
   let () = Dynlink.allow_unsafe_modules true in
   List.iter load_library (List.tl (Array.to_list Sys.argv))
-|} libdir
+|} (Environment.libdir env)
     );
     flush stdout;
-    let compiler, dynlink =
-      match mode with
-      | Bytecode -> "ocamlc", "dynlink.cma"
-      | Native -> "ocamlopt", "dynlink.cmxa"
-    in
-    let compiler = Filename.concat bindir (exe compiler) in
+    let compiler = Environment.tool_path env mode "ocamlc" "ocamlopt" in
     let args = [
-      "-I"; "+dynlink"; dynlink; "-linkall";
+      "-I"; "+dynlink"; library mode "dynlink"; "-linkall";
       "-o"; test_program; "test_install_script.ml"
     ] in
     let files = [
@@ -1139,9 +1169,8 @@ let () =
         erase_file test_program;
       let args = if custom then "-custom" :: args else args in
       Environment.run_process Execute
-        ~runtime:(not original && mode = Bytecode
-                  && not ocamlc_executable_after_rename)
-        ~stdlib:(not original) env compiler args in
+        ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
+        ~stdlib:true env compiler args in
     compile ();
     files, compile
   in
@@ -1150,7 +1179,7 @@ let () =
     let has_c_stubs = List.exists has_c_stubs libraries in
     if mode = Native && List.mem "threads" libraries then
       let threads_plugin =
-        Filename.(concat (concat libdir "threads") "threads.cmxs")
+        Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
       in
       if Sys.file_exists threads_plugin then
         fail_because "threads.cmxs is not expected to exist"
@@ -1170,13 +1199,11 @@ let () =
               0
       in
       let exit_code, output =
-        let stubs =
-          not original && has_c_stubs && config.supports_shared_libraries
-        in
         Environment.run_process Return
-          ~runtime:(not original && mode = Bytecode
+          ~runtime:(mode = Bytecode
                     && not target_launcher_searches_for_ocamlrun)
-          ~stubs env test_program libraries
+          ~stubs:(has_c_stubs && config.supports_shared_libraries) env
+          test_program libraries
       in
       Environment.display_output output;
       if exit_code <> expected_exit_code then
@@ -1186,13 +1213,15 @@ let () =
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
   let expected_exit_code =
+    (* XXX COMBAK on this - the comment is wrong, but it won't be clear until
+           the rebase *)
     (* Tendered OCaml bytecode executables have an increased reliance on
        caml_executable_name, and may need to be compiled with -custom under
        certain configurations because they won't be able to find ld.conf (or
        they can, but ld.conf will be incorrect). This never applies when the
        prefix has been renamed, since CAML_LD_LIBRARY_PATH has to be set for
        other reasons, and the problem is masked. *)
-    if mode = Bytecode && no_caml_executable_name && original
+    if mode = Bytecode && no_caml_executable_name
        && classify_executable test_program = Tendered then
       None
     else
@@ -1215,10 +1244,11 @@ let is_executable =
       with Unix.Unix_error _ -> false
 
 (* XXX The comment here needs writing! *)
-let test_bytecode_binaries ~original env bindir =
+let test_bytecode_binaries env =
+  let bindir = Environment.bindir env in
   Format.printf "\nTesting bytecode binaries in %a\n" display_path bindir;
   let exec_magic =
-    let ocamlrun = Filename.concat bindir (exe "ocamlrun") in
+    let ocamlrun = Environment.ocamlrun env in
     Environment.run_process Return env ocamlrun ["-M"]
   in
   let test_binary binary =
@@ -1231,7 +1261,7 @@ let test_bytecode_binaries ~original env bindir =
       | Vanilla -> ()
       | Shebang | Tendered | Custom ->
           let fails =
-            not original
+            Environment.is_renamed env
             && (classification = Tendered && not launcher_searches_for_ocamlrun
                 || classification = Shebang
                 || launcher_searches_for_ocamlrun
@@ -1317,7 +1347,7 @@ type ld_conf_test = {
 }
 and var_setting = Unset | Empty | Set of string list
 
-let compile_ld_conf_test_programs ~original env bindir =
+let compile_ld_conf_test_programs env =
   let write_ld_conf_test_driver () =
     Out_channel.with_open_text "test_install_script.ml" (fun oc ->
       output_string oc {|
@@ -1344,21 +1374,15 @@ let () =
     (* The test driver simply calls Dll.init_compile to trigger the processing
        and then prints the resulting search path to standard output. *)
     let test_program = Filename.concat test_root (exe test_program) in
-    let compiler, cma_ext =
-      if mode = Native then
-        "ocamlopt", Fun.flip (^) ".cmxa"
-      else
-        "ocamlc", Fun.flip (^) ".cma"
-    in
-    let compiler = Filename.concat bindir (exe compiler) in
+    let compiler = Environment.tool_path env mode "ocamlc" "ocamlopt" in
     let args = [
-      "-I"; "+compiler-libs"; cma_ext "ocamlcommon"; cma_ext "ocamlbytecomp";
+      "-I"; "+compiler-libs";
+      library mode "ocamlcommon"; library mode "ocamlbytecomp";
       "-o"; test_program; "test_install_script.ml"
     ] in
     Environment.run_process Execute
-      ~runtime:(not original && mode = Bytecode
-                && not ocamlc_executable_after_rename)
-      ~stdlib:(not original) env compiler args;
+      ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
+      ~stdlib:true env compiler args;
     let files = test_program :: files in
     let files =
       if mode = Native then
@@ -1369,9 +1393,7 @@ let () =
         "test_install_script.cmo" :: files
     in
     let runtime =
-      not original && mode = Bytecode
-      && not target_launcher_searches_for_ocamlrun
-    in
+      mode = Bytecode && not target_launcher_searches_for_ocamlrun in
     let run run_process test =
       let code, lines =
         run_process ~target:true ~runtime test_program []
@@ -1382,7 +1404,8 @@ let () =
              differently from _wgetenv which in the tests will cause it load
              ld.conf files *)
           if Sys.win32 then
-            if (test.camllib = Empty && original || test.ocamllib = Empty) then
+            if (test.camllib = Empty && not (Environment.is_renamed env)
+                || test.ocamllib = Empty) then
               let unmask s = not (String.starts_with ~prefix:"masked-" s) in
               let lines' = List.filter unmask lines in
               if lines = lines' then
@@ -1470,7 +1493,7 @@ let () =
    and ocamlc (which processes it in order to determine the primitives made
    available by stub libraries referenced by .cma files). The test ensures that
    both implementations are producing the same results. *)
-let test_ld_conf ~original env bindir libdir =
+let test_ld_conf env =
   print_endline "\nTesting processing of ld.conf";
   let remove_if_exists file =
     if Sys.file_exists file then
@@ -1483,7 +1506,7 @@ let test_ld_conf ~original env bindir libdir =
      have temporary ld.conf files placed in them. The ld.conf in libdir is
      backed up and restored after the test. *)
   let ocamlrun_config run_process _test =
-    let ocamlrun = Filename.concat bindir (exe "ocamlrun") in
+    let ocamlrun = Environment.ocamlrun env in
     let code, lines =
       run_process ~target:false ~runtime:false ocamlrun ["-config"] in
     if code = 0 then
@@ -1503,10 +1526,10 @@ let test_ld_conf ~original env bindir libdir =
     else
       fail_because "Unexpected exit code %d from ocamlrun -config" code
   in
-  let programs, files = compile_ld_conf_test_programs ~original env bindir in
+  let programs, files = compile_ld_conf_test_programs env in
   let programs = ocamlrun_config :: programs in
-  let backed_up_ld_conf = Filename.concat libdir "ld.conf.bak" in
-  let libdir_ld_conf = Filename.concat libdir "ld.conf" in
+  let backed_up_ld_conf = Environment.in_libdir env "ld.conf.bak" in
+  let libdir_ld_conf = Environment.in_libdir env "ld.conf" in
   let ocamllib_dir = Filename.concat test_root "ocamllib" in
   let camllib_dir = Filename.concat test_root "camllib" in
   let ocamllib_ld_conf = Filename.concat ocamllib_dir "ld.conf" in
@@ -1671,15 +1694,15 @@ let test_ld_conf ~original env bindir libdir =
       (* Various test lines above all fed via ld.conf in the Standard Library.
          ocamlrun can't find ld.conf after the prefix has been renamed *)
       let outcome =
-        if original then
+        if Environment.is_renamed env then
+          []
+        else
           (* Known issue: Windows strips out the blank entries in the search
              path (somewhat counterintuitively!) *)
           if Sys.win32 then
             main_outcome
           else
             "." :: main_outcome
-        else
-          []
       in
       [{base with description; stdlib = "" :: main; outcome}] in
     let tests =
@@ -1696,13 +1719,13 @@ let test_ld_conf ~original env bindir libdir =
       (* Part of the outcome from ld.conf. ocamlrun can't find ld.conf after the
          prefix has been renamed *)
       let outcome_ld_conf =
-        if original then
+        if Environment.is_renamed env then
+          []
+        else
           if Sys.win32 then
             main_outcome
           else
             "." :: main_outcome
-        else
-          []
       in
       (* Part of the outcome from CAML_LD_LIBRARY_PATH *)
       let outcome_caml_ld_library_path =
@@ -1750,10 +1773,10 @@ let test_ld_conf ~original env bindir libdir =
       in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
-          outcome_caml_ld_library_path @ main_outcome
-        else
+        if Environment.is_renamed env then
           outcome_caml_ld_library_path
+        else
+          outcome_caml_ld_library_path @ main_outcome
       in
       {base with description; caml_ld_library_path = Set caml_ld_library_path;
        stdlib = main; outcome} :: tests in
@@ -1763,15 +1786,15 @@ let test_ld_conf ~original env bindir libdir =
       let stdlib = List.map (Fun.flip (^) "\r") ("" :: main) in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
+        if Environment.is_renamed env then
+          []
+        else
           if Sys.win32 then
             (* Windows opens ld.conf in text mode, so the line with just \r is
                read as an empty string and consequently stripped *)
             main_outcome_cr
           else
             "\r" :: main_outcome_cr
-        else
-          []
       in
       {base with description; stdlib; outcome} :: tests in
     tests
@@ -1784,10 +1807,10 @@ let test_ld_conf ~original env bindir libdir =
          path *)
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
-          ["ld.conf"]
-        else
+        if Environment.is_renamed env then
           []
+        else
+          ["ld.conf"]
       in
       (* Effect of CAML_LD_LIBRARY_PATH *)
       let outcome =
@@ -1804,10 +1827,10 @@ let test_ld_conf ~original env bindir libdir =
          "." entries to the search path *)
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
-          ["ld.conf"]
-        else
+        if Environment.is_renamed env then
           []
+        else
+          ["ld.conf"]
       in
       (* Effect of CAML_LD_LIBRARY_PATH *)
       let outcome =
@@ -1860,10 +1883,10 @@ let test_ld_conf ~original env bindir libdir =
       in
       let outcome =
         (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if original then
-          ["libdir"]
-        else
+        if Environment.is_renamed env then
           []
+        else
+          ["libdir"]
       in
       {base with description; stdlib; outcome} :: tests in
     tests
@@ -1882,7 +1905,7 @@ let test_ld_conf ~original env bindir libdir =
   restore ();
   List.iter erase_file files
 
-let write_test_program ~original:_ ~with_unix description =
+let write_test_program ~is_randomized ~with_unix description =
   let is_directory =
     if with_unix then
 {|
@@ -1952,7 +1975,8 @@ let () =
                    expected_argv0 Sys.argv.(0);
     exit 1
   end
-|} is_directory (if verbose then "" else "i") description ""
+|} is_directory (if verbose then "" else "i") description
+   (if is_randomized then "not " else "")
 
 let usr_bin_sh =
   let env = Environment.make bindir libdir in
@@ -1981,8 +2005,13 @@ let run_program =
   in
   fun env ~runtime ~stubs test_program expected_executable_name
       ~prefix_path_with_cwd expected_exit_code argv0 expected_argv0
-      ~may_segfault ~arg ->
-    let args = [string_of_bool arg; prefix; libdir_suffix] in
+      ~may_segfault ~stdlib_exists_when_renamed ->
+    let stdlib_exists =
+      if Environment.is_renamed env then
+        stdlib_exists_when_renamed
+      else
+        true in
+    let args = [string_of_bool stdlib_exists; prefix; libdir_suffix] in
     let argv0 =
       if argv0 = test_program then
         None
@@ -2044,9 +2073,7 @@ type outcome =
    executed in [env]. The compiler is invoked explicitly (PATH-resolution is not
    used). [~original] indicates whether the compiler is still in its original
    prefix (i.e. the prefix has not yet been renamed). *)
-let compile_test ~original env bindir _libdir =
-  let ocamlc = Filename.concat bindir (exe "ocamlc") in
-  let ocamlopt = Filename.concat bindir (exe "ocamlopt") in
+let compile_test env =
   let main_object =
     Filename.concat (Filename.dirname Sys.executable_name)
                     ("main_in_c" ^ Config.ext_obj)
@@ -2064,10 +2091,10 @@ let compile_test ~original env bindir _libdir =
          at either compilation, linking or execution time.
        - clibs prepends any additional C libraries which must be passed when
          linking (implies main_in_c is true) *)
-    let use_shared_runtime, needs_ocamlopt, options, main_in_c,
+    let use_shared_runtime, mode, options, main_in_c,
         compilation_exit_code, linker_exit_code, may_segfault, tendered, clibs =
-      let f ?(use_shared_runtime = false) ?(needs_ocamlopt = false)
-            ?(calls_linker = needs_ocamlopt) ?(compilation_exit_code = 0)
+      let f ?(use_shared_runtime = false) ?(mode = Bytecode)
+            ?(calls_linker = (mode = Native)) ?(compilation_exit_code = 0)
             ?(linker_exit_code = 0) ?(may_segfault = false) ?(tendered = false)
             ?clibs options =
         let main_in_c = clibs <> None in
@@ -2079,7 +2106,7 @@ let compile_test ~original env bindir _libdir =
              If the system does support native compilation,
              If the launcher does not search for ocamlrun,
              Yours is... an error, my son! *)
-          if not original && calls_linker && linker_is_flexlink &&
+          if Environment.is_renamed env && calls_linker && linker_is_flexlink &&
              not config.has_ocamlopt && not launcher_searches_for_ocamlrun then
             if main_in_c then
               compilation_exit_code, 2
@@ -2088,7 +2115,7 @@ let compile_test ~original env bindir _libdir =
           else
             compilation_exit_code, linker_exit_code
         in
-        use_shared_runtime, needs_ocamlopt, options, main_in_c,
+        use_shared_runtime, mode, options, main_in_c,
         compilation_exit_code, linker_exit_code, may_segfault, tendered, clibs
       in
       let fails_if ?(compilation_exit_code = 2) cond =
@@ -2101,7 +2128,7 @@ let compile_test ~original env bindir _libdir =
       | Default_ocamlc ->
           f ~tendered:true []
       | Default_ocamlopt ->
-          f ~needs_ocamlopt:true []
+          f ~mode:Native []
       | Custom_runtime Static ->
           f ~calls_linker:true ["-custom"]
       | Custom_runtime Shared ->
@@ -2119,7 +2146,7 @@ let compile_test ~original env bindir _libdir =
           f ~use_shared_runtime:true ~clibs:["-lunixbyt"] ~linker_exit_code
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Static) ->
-          f ~needs_ocamlopt:true
+          f ~mode:Native
             ~clibs:["-lcomprmarsh"; "-lunixnat"; Config.compression_c_libraries]
             ["-output-obj"]
       | Output_obj(C_ocamlopt, Shared) ->
@@ -2129,7 +2156,7 @@ let compile_test ~original env bindir _libdir =
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
-          f ~needs_ocamlopt:true ~use_shared_runtime:true ~may_segfault
+          f ~mode:Native ~use_shared_runtime:true ~may_segfault
             ~clibs:["-lcomprmarsh"; "-lunixnat"; Config.compression_c_libraries]
             ~linker_exit_code ["-output-obj"]
       | Output_complete_obj(C_ocamlc, Static) ->
@@ -2160,14 +2187,14 @@ let compile_test ~original env bindir _libdir =
           (* At the moment, the partial linker will pass -lzstd to ld -r which
              will (normally) fail). Until this is done, pass the libraries
              manually, using -noautolink. *)
-          f ~needs_ocamlopt:true ~clibs:[Config.compression_c_libraries]
+          f ~mode:Native ~clibs:[Config.compression_c_libraries]
             ~linker_exit_code
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
       | Output_complete_obj(C_ocamlopt, Shared) ->
           (* ocamlopt doesn't correctly implement -runtime-variant _shared *)
           let compilation_exit_code = fails_if true in
-          f ~needs_ocamlopt:true ~use_shared_runtime:true
+          f ~mode:Native ~use_shared_runtime:true
             ~compilation_exit_code ~clibs:[Config.compression_c_libraries]
             ["-output-complete-obj"; "-noautolink"; "-cclib"; "-lunixnat";
                                                     "-cclib"; "-lcomprmarsh"]
@@ -2181,24 +2208,24 @@ let compile_test ~original env bindir _libdir =
             ["-output-complete-exe"]
     in
     if use_shared_runtime && not config.supports_shared_libraries
-    || needs_ocamlopt && not config.has_ocamlopt then
+    || mode = Native && not config.has_ocamlopt then
       (* This test cannot be compiled because OCaml has been configured without
          required support *)
-      None
+      `None
     else
       let test_program_path = Filename.concat test_root (exe test_program) in
-      let compiler = if needs_ocamlopt then ocamlopt else ocamlc in
+      let compiler = Environment.tool_path env mode "ocamlc" "ocamlopt" in
       let compile_with_main_in_c output =
         let runtime_lib =
           let suffix = if use_shared_runtime then "_shared" else "" in
-          if needs_ocamlopt then
+          if mode = Native then
             "-lasmrun" ^ suffix
           else
             "-lcamlrun" ^ suffix
         in
         let flags =
           let libraries =
-            if needs_ocamlopt then
+            if mode = Native then
               [runtime_lib; Config.native_c_libraries]
             else
               [runtime_lib; Config.bytecomp_c_libraries]
@@ -2231,13 +2258,8 @@ let compile_test ~original env bindir _libdir =
           test_program_path
       in
       let with_unix = (config.supports_shared_libraries || not tendered) in
-      write_test_program ~original ~with_unix description;
-      let ocamlcommon, unix =
-        if needs_ocamlopt then
-          "ocamlcommon.cmxa", "unix.cmxa"
-        else
-          "ocamlcommon.cma", "unix.cma"
-      in
+      let is_randomized = false in
+      write_test_program ~is_randomized ~with_unix description;
       let options =
         if use_shared_runtime then
           "-runtime-variant" :: "_shared" :: options
@@ -2250,11 +2272,13 @@ let compile_test ~original env bindir _libdir =
       in
       let args =
         if with_unix then
-          "-I" :: "+unix" :: unix :: args
+          "-I" :: "+unix" :: library mode "unix" :: args
         else
           args
       in
-      let args = "-I" :: "+compiler-libs" :: ocamlcommon :: args in
+      let args =
+        "-I" :: "+compiler-libs" :: library mode "ocamlcommon" :: args
+      in
       let args =
         if verbose then
           "-verbose" :: args
@@ -2265,10 +2289,9 @@ let compile_test ~original env bindir _libdir =
         let exit_code, output =
           Environment.run_process Return
             ~fails:(compilation_exit_code <> 0)
-            ~runtime:(not original && not needs_ocamlopt
-                      && not ocamlc_executable_after_rename)
-            ~stdlib:(not original)
-            ~stubs:(not original && with_unix && tendered) env compiler args
+            ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
+            ~stdlib:true
+            ~stubs:(with_unix && tendered) env compiler args
         in
         Environment.display_output output;
         exit_code
@@ -2278,15 +2301,15 @@ let compile_test ~original env bindir _libdir =
                      compiler compilation_exit_code
       else if exit_code <> 0 then
         (* Nothing to run because compilation of the test is known to fail *)
-        None
+        `None
       else
         let files = [
           "test_install_script.ml";
           "test_install_script.cmi";
-          "test_install_script.cm" ^ (if needs_ocamlopt then "x" else "o")
+          "test_install_script.cm" ^ (if mode = Native then "x" else "o")
         ] in
         let files =
-          if needs_ocamlopt then
+          if mode = Native then
             ("test_install_script" ^ Config.ext_obj)::files
           else
            files
@@ -2294,19 +2317,20 @@ let compile_test ~original env bindir _libdir =
         List.iter erase_file files;
         if main_in_c && not (compile_with_main_in_c output) then
           (* Nothing to run because linking the test is known to fail *)
-          None
+          `None
         else
           let executable = classify_executable test_program_path in
+          let stdlib_exists_when_renamed = false in
           (* Each test is compiled twice - in the original prefix
              (~original:true) and in the renamed prefix (~original:false).
              Additionally, the tests compiled in the original prefix are
              _executed_ a second time after the prefix has been renamed, which
              is what this slightly convoluted run function sets up *)
-          let rec run ~original ~runtime ~stubs env ~arg =
+          let rec run env =
             (* Bytecode executables with absolute headers will need to be
                invoked via ocamlrun after the prefix has been renamed. *)
             let via_ocamlrun =
-              (not original || not arg)
+              Environment.is_renamed env
               && tendered && not target_launcher_searches_for_ocamlrun
             in
             (* Each executable is invoked with six different values of
@@ -2354,7 +2378,7 @@ let compile_test ~original env bindir _libdir =
               {argv0 = test_program; prefix_path_with_cwd = false},
               {argv0_not_ocaml = false; argv0_resolved = test_program};
               (* Run 5 - Sys.argv.(0) is test_program (implicit, with PATH) *)
-              {argv0 = test_program; prefix_path_with_cwd = true},
+              {argv0 = test_program; prefix_path_with_cwd = not Sys.win32},
               {argv0_not_ocaml = false; argv0_resolved = test_program_relative}
             ] in
             let runs =
@@ -2428,24 +2452,23 @@ let compile_test ~original env bindir _libdir =
                 | Fail code -> "", code, ""
                 | Success {executable_name; argv0} -> executable_name, 0, argv0
               in
-              let runtime = via_ocamlrun && runtime in
-              let stubs =
-                stubs && (not original || not arg) && tendered && with_unix in
-              run_program env ~runtime ~stubs test_program_path
-                          ~prefix_path_with_cwd expected_executable_name
-                          expected_exit_code
-                          argv0 expected_argv0 ~may_segfault ~arg
+              run_program
+                env ~runtime:via_ocamlrun ~stubs:(tendered && with_unix)
+                test_program_path ~prefix_path_with_cwd expected_executable_name
+                expected_exit_code argv0 expected_argv0 ~may_segfault
+                ~stdlib_exists_when_renamed
             in
             List.iter execute runs;
             print_newline ();
-            if original then
-              Some (run ~original:false)
+            if Environment.is_renamed env then
+              (erase_file test_program_path; `None)
             else
-              (erase_file test_program_path; None)
+              `Some run
           in
-          Some (run ~original)
+          `Some run
 
-let compiler_where env ?runtime compiler =
+let compiler_where env ?runtime mode =
+  let compiler = Environment.tool_path env mode "ocamlc" "ocamlopt" in
   match Environment.run_process Return ?runtime env compiler ["-where"] with
   | (0, [where]) -> where
   | _ ->
@@ -2454,23 +2477,20 @@ let compiler_where env ?runtime compiler =
 (* This test verifies both that all compilation mechanisms are working and that
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
-let test_standard_library_location ~original env bindir libdir =
+let test_standard_library_location env =
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
-                display_path bindir;
-  let ocamlc = Filename.concat bindir (exe "ocamlc") in
-  let ocamlopt = Filename.concat bindir (exe "ocamlopt") in
+                display_path (Environment.bindir env);
   let ocamlc_where =
-    let runtime = not original && not ocamlc_executable_after_rename in
-    compiler_where env ~runtime ocamlc in
+    compiler_where env ~runtime:(not ocamlc_executable_after_rename) Bytecode in
   let ocamlopt_where =
     if config.has_ocamlopt then
-      compiler_where env ocamlopt
+      compiler_where env Native
     else
       "n/a"
   in
   Format.printf "ocamlc -where: %a\nocamlopt -where: %a\n%!"
                 display_path ocamlc_where display_path ocamlopt_where;
-  let compile_test = compile_test ~original env bindir libdir in
+  let compile_test = compile_test env in
   let tests = [
     compile_test Default_ocamlc
       "byt_default" "with tender";
@@ -2501,15 +2521,12 @@ let test_standard_library_location ~original env bindir libdir =
     compile_test (Output_complete_obj(C_ocamlopt, Shared))
       "nat_complete_obj_shared" "-output-complete-obj shared runtime";
   ] in
-  let programs = List.filter_map Fun.id tests in
   (* The test programs compiled before the prefix renamed and re-executed after
      it is renamed which means that the runtime location is passed to each test.
      Each test individually determines if the runtime is actually passed to the
      invocation of the executable. *)
-  let runtime = not original && not target_launcher_searches_for_ocamlrun in
-  let stubs = not original && config.supports_shared_libraries in
   Printf.printf "Running programs\n%!";
-  List.filter_map (fun f -> f ~runtime ~stubs env ~arg:original) programs
+  List.map (function `Some f -> f env | `None -> `None) tests
 
 let utf_16le_of_utf_8 s =
   let s = Misc.Stdlib.String.to_utf_8_seq s in
@@ -2652,7 +2669,7 @@ let read_file env file =
 
 module StringMap = Map.Make(String)
 
-let test_relocation env prefix bindir libdir =
+let test_relocation env prefix =
   let grandparent dir = Filename.dirname (Filename.dirname dir) in
   let build_root = grandparent test_root in
   let build_root_logical = Option.map grandparent test_root_logical in
@@ -2990,10 +3007,11 @@ let test_relocation env prefix bindir libdir =
       else
         prefix
   in
+  let opendir f = Unix.opendir (f env) in
   let ~failed, ~results =
     ~failed:false, ~results:[]
-    |> scan bindir "$bindir" (Unix.opendir bindir) bindir_rules
-    |> scan libdir "$libdir" (Unix.opendir libdir) libdir_rules
+    |> scan bindir "$bindir" (opendir Environment.bindir) bindir_rules
+    |> scan libdir "$libdir" (opendir Environment.libdir) libdir_rules
   in
   flush stderr;
   let sections =
@@ -3117,25 +3135,25 @@ let test_relocation env prefix bindir libdir =
   else
   List.iter display sections
 
-let run_tests ~original env bindir libdir libraries =
-  load_libraries_in_prog ~original env bindir libdir Bytecode libraries;
+let run_tests env libraries =
+  load_libraries_in_prog env Bytecode libraries;
   if config.has_ocamlopt && config.supports_shared_libraries then
-    load_libraries_in_prog ~original env bindir libdir Native libraries;
-  load_libraries_in_toplevel ~original env bindir libdir Bytecode libraries;
+    load_libraries_in_prog env Native libraries;
+  load_libraries_in_toplevel env Bytecode libraries;
   if config.has_ocamlnat then
-    load_libraries_in_toplevel ~original env bindir libdir Native libraries;
-  test_ld_conf ~original env bindir libdir;
-  test_bytecode_binaries ~original env bindir;
-  test_standard_library_location ~original env bindir libdir
+    load_libraries_in_toplevel env Native libraries;
+  test_ld_conf env;
+  test_bytecode_binaries env;
+  test_standard_library_location env
 
 let () =
   (* Run all tests in the supplied prefix *)
   Compmisc.init_path ();
   if verbose then
     Clflags.verbose := true;
-  let env = Environment.make bindir libdir in
-  let () = test_relocation env prefix bindir libdir in
-  let programs = run_tests ~original:true env bindir libdir config.libraries in
+  let env = Environment.make ~phase:Original bindir libdir in
+  let () = test_relocation env prefix in
+  let programs = run_tests env config.libraries in
   (* Now rename the prefix, appending .new to the directory name *)
   let new_prefix = prefix ^ ".new" in
   let bindir = Filename.concat new_prefix bindir_suffix in
@@ -3149,14 +3167,12 @@ let () =
     Format.printf "Restoring %a to %a\n" display_path new_prefix
                                          display_path prefix;
     Sys.rename new_prefix prefix);
-  let env = Environment.make bindir libdir in
+  let env = Environment.make ~phase:Renamed bindir libdir in
   (* Re-run the test programs compiled with the normal prefix *)
   Printf.printf "Re-running test programs\n%!";
   (* Finally re-run all of the tests with the new prefix *)
-  let runtime = not target_launcher_searches_for_ocamlrun in
-  let stubs = config.supports_shared_libraries in
   List.iter
-    (fun f -> assert (f ~runtime ~stubs env ~arg:false = None)) programs;
+    (function `Some f -> assert (f env = `None) | `None -> ()) programs;
   Compmisc.reinit_path ~standard_library:libdir ();
-  let programs = run_tests ~original:false env bindir libdir config.libraries in
-  assert (programs = [])
+  let programs = run_tests env config.libraries in
+  assert (List.for_all (function `None -> true | _ -> false) programs)
