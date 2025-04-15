@@ -781,17 +781,22 @@ end = struct
   | Some pid when verbose -> Format.fprintf f " [@{<loc>%d@}]" pid
   | _ -> ()
 
-  let display_execution level status pid program argv0 args environment =
-    let style =
-      match level with
-      | `Normal -> "inline_code"
-      | `Warning -> "warning"
-      | `Error -> "error"
+  let display_execution level status pid ~runtime
+                        program argv0 args environment =
+    let style_of_level = function
+    | `Normal -> "inline_code"
+    | `Warning -> "warning"
+    | `Error -> "error"
     in
+    let program_style =
+      let level = if runtime then `Warning else level in
+      style_of_level level
+    in
+    let style = style_of_level level in
     let exited_normally = (level = `Normal && status = Unix.WEXITED 0) in
     Format.printf "@{<%s>%a@}%a@{<%s>%a@}%a%a\n@?"
                   style pp_environment environment
-                  (pp_program style program) argv0
+                  (pp_program program_style program) argv0
                   style pp_args args
                   pp_pid pid
                   (pp_status ~exited_normally style) status;
@@ -809,7 +814,8 @@ end = struct
         ld_library_path_name
     end
 
-  let run_one ~just_execute ~fails ~quiet program ?argv0 args environment =
+  let run_one ~just_execute ~fails ~quiet ~runtime
+              program ?argv0 args environment =
     flush stderr;
     flush stdout;
     let quiet = quiet && not verbose in
@@ -879,12 +885,14 @@ end = struct
             | Some argv0 -> Printf.sprintf "%s (from %s)" argv0 program
             | None -> program
           in
-          display_execution `Error status pid program argv0 args environment;
+          display_execution
+            `Error status pid ~runtime program argv0 args environment;
           fail_because "%s did not terminate as expected (got %s)"
                        display_argv0 (string_of_process_status status)
     in
     if not quiet then
-      display_execution level status pid program argv0 args environment;
+      display_execution
+        level status pid ~runtime program argv0 args environment;
     let _ = Unix.lseek stdout 0 Unix.SEEK_SET in
     let lines =
       let ic = Unix.in_channel_of_descr stdout in
@@ -914,12 +922,12 @@ end = struct
         acc
     | (runtime, strategy_env)::strategy ->
         let acc =
-          let program, argv0, args =
+          let runtime, program, argv0, args =
             match runtime with
             | Some runtime ->
-                runtime, None, program::args
+                true, runtime, None, program::args
             | None ->
-                program, argv0, args
+                false, program, argv0, args
           in
           let env = Option.value ~default:env strategy_env in
           let (~just_execute, ~fails, ~quiet) =
@@ -928,7 +936,7 @@ end = struct
             else
               (~just_execute:true, ~fails:true, ~quiet:true)
           in
-          run_one ~just_execute ~fails ~quiet program ?argv0 args env
+          run_one ~just_execute ~fails ~quiet ~runtime program ?argv0 args env
         in
         run ~quiet ~fails env program ?argv0 args acc strategy ~just_execute
 
