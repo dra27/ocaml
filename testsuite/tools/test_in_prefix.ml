@@ -1283,8 +1283,9 @@ let test_bytecode_binaries env =
                    distribution's tools when called with -M. *)
                 let without_exe = Filename.chop_extension binary in
                 let (this_exit_code, _) as this =
+                  let fails = not (String.contains without_exe '.') in
                   Environment.run_process Return env program ~argv0:without_exe
-                                                 ["-M"] ~fails:true
+                                                 ["-M"] ~fails
                 in
                 if this_exit_code = 0 then
                   if this = exec_magic then
