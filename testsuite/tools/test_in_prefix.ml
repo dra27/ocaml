@@ -84,7 +84,8 @@ let split_to_common_prefix first second =
    - relocatable and target_relocatable are respectively true if the compiler
      and the binaries the compiler produces are relocatable. At present, no
      compiler is either relocatable or can produce relocatable binaries *)
-let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config,
+(* XXX Get these variables elsewhere, given the leaking of libdir in ld.conf *)
+let orig_bindir, orig_libdir, prefix, bindir_suffix, libdir_suffix, config,
     test_root, test_root_logical, bytecode_shebangs_by_default, verbose =
   let show_summary = ref false in
   let verbose = ref false in
@@ -2006,7 +2007,7 @@ let () =
    (if is_randomized then "not " else "")
 
 let usr_bin_sh =
-  let env = Environment.make bindir libdir in
+  let env = Environment.make orig_bindir orig_libdir in
   match Environment.run_process Return ~quiet:true env
                                 "sh" ["-c"; "command -v sh"] with
   | (0, [where]) -> where
@@ -3045,11 +3046,14 @@ let test_relocation env prefix =
       else
         prefix
   in
-  let opendir f = Unix.opendir (f env) in
+  let scan f rel_root =
+    let dir = f env in
+    scan dir rel_root (Unix.opendir dir)
+  in
   let ~failed, ~results =
     ~failed:false, ~results:[]
-    |> scan bindir "$bindir" (opendir Environment.bindir) bindir_rules
-    |> scan libdir "$libdir" (opendir Environment.libdir) libdir_rules
+    |> scan Environment.bindir "$bindir" bindir_rules
+    |> scan Environment.libdir "$libdir" libdir_rules
   in
   flush stderr;
   let sections =
@@ -3189,7 +3193,7 @@ let () =
   Compmisc.init_path ();
   if verbose then
     Clflags.verbose := true;
-  let env = Environment.make ~phase:Original bindir libdir in
+  let env = Environment.make ~phase:Original orig_bindir orig_libdir in
   let () = test_relocation env prefix in
   let programs = run_tests env config.libraries in
   (* Now rename the prefix, appending .new to the directory name *)
