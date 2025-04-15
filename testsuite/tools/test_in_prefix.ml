@@ -26,6 +26,8 @@ type config = {
     (* $(NATIVE_COMPILER) - Makefile.config *)
   has_relative_libdir: string option;
     (* Not yet implemented; always None. *)
+  has_runtime_search: bool option;
+    (* Not yet implemented; always None. *)
   libraries: string list list
     (* Sorted list of basenames of libraries to test.
        Derived from $(OTHERLIBRARIES) - Makefile.config *)
@@ -83,7 +85,7 @@ let split_to_common_prefix first second =
      and the binaries the compiler produces are relocatable. At present, no
      compiler is either relocatable or can produce relocatable binaries *)
 let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config,
-    test_root, test_root_logical, verbose =
+    test_root, test_root_logical, bytecode_shebangs_by_default, verbose =
   let show_summary = ref false in
   let verbose = ref false in
   let test_root = ref test_root in
@@ -92,7 +94,8 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config,
   let libdir = ref "" in
   let config =
     ref {supports_shared_libraries = false; has_ocamlnat = false;
-         has_ocamlopt = false; has_relative_libdir = None; libraries = []}
+         has_ocamlopt = false; has_relative_libdir = None;
+         has_runtime_search = None; libraries = []}
   in
   let process_pwd dir =
     (* The build directory may contain symlinks, and if this is so then the
@@ -136,6 +139,17 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config,
   in
   let has_ocamlnat has_ocamlnat () = config := {!config with has_ocamlnat} in
   let has_ocamlopt has_ocamlopt () = config := {!config with has_ocamlopt} in
+  let parse_search = function
+  | "enable" -> true
+  | "always" -> false
+  | _ ->
+      raise (Arg.Bad
+        "--with-runtime-search: argument should be either enable or always")
+  in
+  let has_runtime_search arg =
+    let has_runtime_search = Option.map parse_search arg in
+    config := {!config with has_runtime_search}
+  in
   let args = Arg.align [
     "--pwd", Arg.String process_pwd, "\
 <pwd>\tCurrent working directory to use";
@@ -154,6 +168,11 @@ let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config,
     "--with-ocamlopt", Arg.Unit (has_ocamlopt true), "\
 \tNative compiler (ocamlopt) is installed in the directory given in --bindir";
     "--without-ocamlopt", Arg.Unit (has_ocamlopt false), "";
+    "--with-runtime-search",
+      Arg.String (fun s -> has_runtime_search (Some s)), "\
+\tCompiler bytecode binaries can search for their runtimes";
+    "--without-runtime-search",
+      Arg.Unit (fun () -> has_runtime_search None), "";
   ] in
   let libraries lib =
     config := {!config with libraries = [lib]::config.contents.libraries}
@@ -241,6 +260,8 @@ directories given for --bindir and --libdir do not have a common prefix"
       prefix prefix;
     if Sys.file_exists (Filename.concat libdir "ld.conf.bak") then
       error "can't backup ld.conf to ld.conf.bak as the latter already exists!";
+    if config.has_runtime_search <> None then
+      error "--with-runtime-search is not implemented!";
     let no_markup ansi = { Misc.Style.ansi; text_close = ""; text_open = "" } in
     let runtime_launch_info =
       let file = Filename.concat libdir "runtime-launch-info" in
@@ -292,7 +313,8 @@ directories given for --bindir and --libdir do not have a common prefix"
     if !show_summary then
       exit 0;
     bindir, libdir, prefix, bindir_suffix, libdir_suffix,
-    {config with has_relative_libdir}, !test_root, !test_root_logical, !verbose
+    {config with has_relative_libdir}, !test_root, !test_root_logical,
+    (runtime_launch_info.launcher <> Bytelink.Executable), !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
@@ -2033,8 +2055,9 @@ let run_program =
    compilers... *)
 type compiler = C_ocamlc | C_ocamlopt
 type runtime_mode = Shared | Static
+type launch_mode = Header_exe | Header_shebang
 type linkage =
-| Default_ocamlc
+| Default_ocamlc of launch_mode
 | Default_ocamlopt
 | Custom_runtime of runtime_mode
 | Output_obj of compiler * runtime_mode
@@ -2089,11 +2112,13 @@ let compile_test env =
        - clibs prepends any additional C libraries which must be passed when
          linking (implies main_in_c is true) *)
     let use_shared_runtime, mode, options, main_in_c,
-        compilation_exit_code, linker_exit_code, may_segfault, tendered, clibs =
+        compilation_exit_code, linker_exit_code, may_segfault, tendered,
+        target_launcher_searches_for_ocamlrun, clibs =
       let f ?(use_shared_runtime = false) ?(mode = Bytecode)
             ?(calls_linker = (mode = Native)) ?(compilation_exit_code = 0)
             ?(linker_exit_code = 0) ?(may_segfault = false) ?(tendered = false)
-            ?clibs options =
+            ?(target_launcher_searches_for_ocamlrun =
+                target_launcher_searches_for_ocamlrun) ?clibs options =
         let main_in_c = clibs <> None in
         let clibs = Option.value ~default:[] clibs in
         let compilation_exit_code, linker_exit_code =
@@ -2113,7 +2138,8 @@ let compile_test env =
             compilation_exit_code, linker_exit_code
         in
         use_shared_runtime, mode, options, main_in_c,
-        compilation_exit_code, linker_exit_code, may_segfault, tendered, clibs
+        compilation_exit_code, linker_exit_code, may_segfault, tendered,
+        target_launcher_searches_for_ocamlrun, clibs
       in
       let fails_if ?(compilation_exit_code = 2) cond =
         if cond then
@@ -2122,7 +2148,7 @@ let compile_test env =
           0
       in
       match test with
-      | Default_ocamlc ->
+      | Default_ocamlc _launch_method ->
           f ~tendered:true []
       | Default_ocamlopt ->
           f ~mode:Native []
@@ -2488,8 +2514,14 @@ let test_standard_library_location env =
   Format.printf "ocamlc -where: %a\nocamlopt -where: %a\n%!"
                 display_path ocamlc_where display_path ocamlopt_where;
   let compile_test = compile_test env in
+  let launch_method =
+    if bytecode_shebangs_by_default then
+      Header_shebang
+    else
+      Header_exe
+  in
   let tests = [
-    compile_test Default_ocamlc
+    compile_test (Default_ocamlc launch_method)
       "byt_default" "with tender";
     compile_test (Custom_runtime Static)
       "custom_static" "-custom static runtime";
