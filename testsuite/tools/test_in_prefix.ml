@@ -82,8 +82,8 @@ let split_to_common_prefix first second =
    - relocatable and target_relocatable are respectively true if the compiler
      and the binaries the compiler produces are relocatable. At present, no
      compiler is either relocatable or can produce relocatable binaries *)
-let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config, relocatable,
-    target_relocatable, test_root, test_root_logical, verbose =
+let bindir, libdir, prefix, bindir_suffix, libdir_suffix, config,
+    test_root, test_root_logical, verbose =
   let show_summary = ref false in
   let verbose = ref false in
   let test_root = ref test_root in
@@ -292,8 +292,7 @@ directories given for --bindir and --libdir do not have a common prefix"
     if !show_summary then
       exit 0;
     bindir, libdir, prefix, bindir_suffix, libdir_suffix,
-    {config with has_relative_libdir}, relocatable, target_relocatable,
-    !test_root, !test_root_logical, !verbose
+    {config with has_relative_libdir}, !test_root, !test_root_logical, !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
@@ -556,12 +555,12 @@ module Environment : sig
      [--verbose] was specified or if the outcome of the command doesn't match
      [~fails]. *)
   val run_process :
-    'a output -> ?target:bool -> ?runtime:bool -> ?stubs:bool -> ?stdlib:bool
+    'a output -> ?runtime:bool -> ?stubs:bool -> ?stdlib:bool
     -> ?prefix_path_with_cwd:bool -> ?quiet:bool -> ?fails:bool -> t
     -> string -> ?argv0:string -> string list -> 'a
 
   val run_process_with_test_env :
-    'a output -> ?target:bool -> ?runtime:bool
+    'a output -> ?runtime:bool
     -> caml_ld_library_path:string list option -> ocamllib:string option
     -> camllib:string option -> t -> ?quiet:bool -> ?fails:bool
     -> string -> ?argv0:string -> string list -> 'a
@@ -912,13 +911,12 @@ end = struct
         run ~quiet ~fails env program ?argv0 args acc strategy ~just_execute
 
   let run_process : type s . s output
-                      -> ?target:bool -> ?runtime:bool -> ?stubs:bool
-                      -> ?stdlib:bool -> ?prefix_path_with_cwd:bool
+                      -> ?runtime:bool -> ?stubs:bool -> ?stdlib:bool
+                      -> ?prefix_path_with_cwd:bool
                       -> ?quiet:bool -> ?fails:bool
                       -> t -> string -> ?argv0:string -> string list -> s =
-    fun output ?(target = false) ?(runtime = false) ?(stubs = false)
-               ?(stdlib = false) ?(prefix_path_with_cwd = false)
-               ?(quiet = false) ?(fails = false)
+    fun output ?(runtime = false) ?(stubs = false) ?(stdlib = false)
+               ?(prefix_path_with_cwd = false) ?(quiet = false) ?(fails = false)
                env program ?argv0 args ->
       let env =
         if prefix_path_with_cwd then
@@ -976,10 +974,7 @@ end = struct
           else
             strategy in
         if runtime <> None || stubs || stdlib then
-          if target && target_relocatable || not target && relocatable then
-            invalid_arg "Execution strategy requested for a relocatable outcome"
-          else
-            (None, shim ~stubs:false ~stdlib:false env) :: strategy
+          (None, shim ~stubs:false ~stdlib:false env) :: strategy
         else
           strategy
       in
@@ -1000,7 +995,7 @@ end = struct
 
   let display_output output = List.iter (format_line ()) output
 
-  let run_process_with_test_env mode ?target ?runtime ~caml_ld_library_path
+  let run_process_with_test_env mode ?runtime ~caml_ld_library_path
                                 ~ocamllib ~camllib env ?quiet ?fails program =
     let env =
       let caml_ld_library_path =
@@ -1015,7 +1010,7 @@ end = struct
       let camllib = f camllib in
       augment {env with caml_ld_library_path; ocamllib; camllib}
     in
-    run_process mode ?target ?runtime ?quiet ?fails env program
+    run_process mode ?runtime ?quiet ?fails env program
 
 end
 
@@ -1263,7 +1258,7 @@ let test_bytecode_binaries env =
                 || classification = Shebang
                 || launcher_searches_for_ocamlrun
                    && config.supports_shared_libraries
-                   && List.mem (Filename.chop_extension binary)
+                   && List.mem (Filename.remove_extension binary)
                                ["ocamldebug"; "ocamldoc"])
           in
           match Environment.run_process Return ~fails env program ["-vnum"] with
@@ -1278,7 +1273,7 @@ let test_bytecode_binaries env =
                    that ocamlrun -M returning the runtime's magic number would
                    be likely distinct from the behaviour of any of the
                    distribution's tools when called with -M. *)
-                let without_exe = Filename.chop_extension binary in
+                let without_exe = Filename.remove_extension binary in
                 let (this_exit_code, _) as this =
                   let fails =
                     without_exe <> "ocamlmklib"
@@ -1398,7 +1393,7 @@ let () =
       mode = Bytecode && not target_launcher_searches_for_ocamlrun in
     let run run_process test =
       let code, lines =
-        run_process ~target:true ~runtime test_program []
+        run_process ~runtime test_program []
       in
       if code = 0 then
         let lines =
@@ -1510,7 +1505,7 @@ let test_ld_conf env =
   let ocamlrun_config run_process _test =
     let ocamlrun = Environment.ocamlrun env in
     let code, lines =
-      run_process ~target:false ~runtime:false ocamlrun ["-config"] in
+      run_process ~runtime:false ocamlrun ["-config"] in
     if code = 0 then
       let strip s =
         let len = String.length s in
@@ -1566,9 +1561,9 @@ let test_ld_conf env =
     in
     let ocamllib = process_env ocamllib_dir ocamllib_ld_conf test.ocamllib in
     let camllib = process_env camllib_dir camllib_ld_conf test.camllib in
-    let run_process ~target ~runtime program args =
+    let run_process ~runtime program args =
       Environment.run_process_with_test_env
-        Return ~target ~runtime ~caml_ld_library_path ~ocamllib ~camllib env
+        Return ~runtime ~caml_ld_library_path ~ocamllib ~camllib env
           program args
     in
     match List.map (fun f -> f run_process test) programs with
@@ -2024,7 +2019,7 @@ let run_program =
     let fails = (expected_exit_code <> 0) in
     let (exit_code, output) =
       Environment.run_process
-        Return ~fails ~target:true ~runtime ~stubs ~prefix_path_with_cwd env
+        Return ~fails ~runtime ~stubs ~prefix_path_with_cwd env
         test_program ?argv0 args
     in
     Environment.display_output output;
@@ -2963,7 +2958,7 @@ let test_relocation env prefix =
           (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
         else if ext = Config.ext_obj then
           let is_ocaml =
-            Sys.file_exists (Filename.chop_extension file ^ ".cmx") in
+            Sys.file_exists (Filename.remove_extension file ^ ".cmx") in
           let c_debug =
             not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
           (~stdlib:false, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
@@ -2977,9 +2972,10 @@ let test_relocation env prefix =
           in
           if ext = Config.ext_lib then
             let is_ocaml =
-              Sys.file_exists (Filename.chop_extension file ^ ".cmxa") in
+              Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
             let stdlib =
-              is_camlrun || Filename.chop_extension basename = "ocamlcommon" in
+              is_camlrun || Filename.remove_extension basename = "ocamlcommon"
+            in
             let c_debug = not is_ocaml in
             (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:(is_ocaml || is_asmrun))
           else
@@ -3035,7 +3031,7 @@ let test_relocation env prefix =
           if extension = ".conf" || extension = ".config" then
             ""
           else if extension = ".in" then
-            Filename.extension (Filename.chop_extension file) ^ extension
+            Filename.extension (Filename.remove_extension file) ^ extension
           else
             extension
       in
