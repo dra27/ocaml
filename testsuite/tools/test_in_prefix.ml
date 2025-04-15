@@ -982,7 +982,7 @@ end = struct
         in
         let runtime =
           if runtime then
-            Some (Filename.concat env.bindir "ocamlrun")
+            Some (Filename.concat env.bindir (exe "ocamlrun"))
           else
             None
         in
