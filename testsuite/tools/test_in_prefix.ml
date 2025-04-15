@@ -841,21 +841,17 @@ end = struct
       | status ->
           status
     in
-    let quiet, level, exit_code =
+    let level, exit_code =
       match status with
       | Unix.WEXITED n
-        when not just_execute || (fails = (n <> 0)) ->
-          let expected_outcome = (fails = (n <> 0)) in
+        when fails = (n <> 0) ->
           let level =
-            if expected_outcome then
-              if n = 0 then
-                `Normal
-              else
-                `Warning
+            if n = 0 then
+              `Normal
             else
-              `Error
+              `Warning
           in
-          (quiet && expected_outcome), level, n
+          level, n
       | _ ->
           let display_argv0 =
             match argv0 with
@@ -1117,7 +1113,7 @@ let load_libraries_in_toplevel env mode libraries =
       Environment.run_process Return
         ~runtime:(mode = Bytecode && not launcher_searches_for_ocamlrun)
         ~stubs:(mode = Bytecode && has_c_stubs)
-        ~stdlib:true env toplevel args
+        ~stdlib:true ~fails:(expected_exit_code <> 0) env toplevel args
     in
     Environment.display_output output;
     if exit_code <> expected_exit_code then
@@ -1202,7 +1198,8 @@ let () =
         Environment.run_process Return
           ~runtime:(mode = Bytecode
                     && not target_launcher_searches_for_ocamlrun)
-          ~stubs:(has_c_stubs && config.supports_shared_libraries) env
+          ~stubs:(has_c_stubs && config.supports_shared_libraries)
+          ~fails:(expected_exit_code <> 0) env
           test_program libraries
       in
       Environment.display_output output;
@@ -1283,15 +1280,19 @@ let test_bytecode_binaries env =
                    distribution's tools when called with -M. *)
                 let without_exe = Filename.chop_extension binary in
                 let (this_exit_code, _) as this =
-                  let fails = not (String.contains without_exe '.') in
-                  Environment.run_process Return env program ~argv0:without_exe
-                                                 ["-M"] ~fails
+                  let fails =
+                    without_exe <> "ocamlmklib"
+                    && not (String.contains without_exe '.')
+                  in
+                  Environment.run_process Return ~fails env
+                                          program ~argv0:without_exe ["-M"]
                 in
                 if this_exit_code = 0 then
                   if this = exec_magic then
                     let (that_exit_code, _) as that =
-                      Environment.run_process Return env program ~argv0:binary
-                                                     ["-M"] ~fails:true
+                      let fails = without_exe <> "ocamlmklib" in
+                      Environment.run_process Return ~fails env
+                                              program ~argv0:binary ["-M"]
                     in
                     if this = that then
                       fail_because
