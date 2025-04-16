@@ -205,6 +205,7 @@ options are:" in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
   let relocatable = false in
+  let reproducible = false in
   let target_relocatable = false in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
@@ -298,18 +299,23 @@ directories given for --bindir and --libdir do not have a common prefix"
         (if b then "hint" else "warning")
         (if b then "" else "not ")
     in
+    let pp_reproducible f b =
+      if b then
+        Format.fprintf f " and @{<hint>reproducible@}"
+    in
     Format.printf
       "@{<loc>Test Environment@}\n\
       \    @{<hint>prefix@} = %s\n\
       \    @{<hint>bindir@} = [$prefix/]%s\n\
       \    @{<hint>libdir@} = [$prefix/]%s\n\
       \  - C compiler is %s [%s] for %s\n\
-      \  - OCaml is %a; target binaries by default are %a\n\
+      \  - OCaml is %a%a; target binaries by default are %a\n\
       \  - Executable header size is %.2fKiB (%d bytes)\n\
       \  - Testing %s\n@?"
          prefix bindir_suffix libdir_suffix
          Config.c_compiler Config.c_compiler_vendor Config.target
-         pp_relocatable relocatable pp_relocatable target_relocatable
+         pp_relocatable relocatable pp_reproducible reproducible
+         pp_relocatable target_relocatable
          (float_of_int header_size /. 1024.0) header_size summary;
     if !show_summary then
       exit 0;
@@ -444,9 +450,9 @@ let no_caml_executable_name = (proc_self_exe () = None)
    - Vanilla executables (vanilla ocamlopt or any of the caml_startup mechanisms
      via -output-obj, -output-complete-exe, etc.). The actual OCaml program may
      be bytecode (but it will have been embedded in a C object). *)
+type launch_mode = Header_exe | Header_shebang
 type executable =
-| Tendered
-| Shebang
+| Tendered of (header:launch_mode * dlls:bool)
 | Custom
 | Vanilla
 
@@ -458,15 +464,32 @@ let classify_executable file =
       | Bytesections.{name = Name.RNTM; _} -> true
       | _ -> false
       in
+      let is_DLLS = function
+      | Bytesections.{name = Name.DLLS; len} when len > 0 -> true
+      | _ -> false
+      in
       let sections = Bytesections.(all (read_toc ic)) in
       if start = "#!" then
-        Shebang
+        Tendered(~header:Header_shebang, ~dlls:(List.exists is_DLLS sections))
       else if List.exists is_RNTM sections then
-        Tendered
+        Tendered(~header:Header_exe, ~dlls:(List.exists is_DLLS sections))
       else
         Custom)
   with End_of_file | Bytesections.Bad_magic_number ->
     Vanilla
+
+let is_shebang program =
+  if Filename.is_relative program then
+    false
+  else
+    match classify_executable program with
+    | Tendered(~header:Header_shebang, ~dlls:_) -> true
+    | _ -> false
+
+let launched_via_stub program =
+  match classify_executable program with
+  | Tendered(~header:Header_exe, ~dlls:_) -> true
+  | _ -> false
 
 (* Belt-and-braces file removal function - allow up to 30 seconds for
    Windows Defender and other nonsense *)
@@ -826,12 +849,6 @@ end = struct
       let fd = Unix.openfile captured_output flags 0o600 in
       fd, fd
     in
-    let classification =
-      if Filename.is_relative program then
-        Vanilla
-      else
-        classify_executable program
-    in
     let pid =
       let argv0 = Option.value ~default:program argv0 in
       try
@@ -842,7 +859,7 @@ end = struct
         Some pid
       with
       | Unix.(Unix_error(ENOENT, "create_process", _))
-        when classification = Shebang -> None
+        when is_shebang program -> None
     in
     let _, status =
       Option.map (Unix.waitpid []) pid
@@ -1245,7 +1262,7 @@ let () =
        prefix has been renamed, since CAML_LD_LIBRARY_PATH has to be set for
        other reasons, and the problem is masked. *)
     if mode = Bytecode && no_caml_executable_name
-       && classify_executable test_program = Tendered then
+       && launched_via_stub test_program then
       None
     else
       None in
@@ -1280,72 +1297,73 @@ let test_bytecode_binaries env =
     let program = Filename.concat bindir binary in
     if is_executable program then
       let classification = classify_executable program in
-      match classification with
-      | Vanilla -> ()
-      | Shebang | Tendered | Custom ->
-          let fails =
-            Environment.is_renamed env
-            && (classification = Tendered && not launcher_searches_for_ocamlrun
-                || classification = Shebang
-                || launcher_searches_for_ocamlrun
-                   && config.supports_shared_libraries
-                   && List.mem (Filename.remove_extension binary)
-                               ["ocamldebug"; "ocamldoc"])
-          in
-          match Environment.run_process Return ~fails env program ["-vnum"] with
-          | (0, output) when not fails ->
-              Environment.display_output output;
-              if Sys.win32 && Filename.extension binary = ".exe" then
-                (* This additional part of the test ensures that the executable
-                   launcher on Windows can correctly hand-over to ocamlrun on
-                   Windows. The check is that a binary named ocamlc.byte.exe
-                   can be invoked as ocamlc.byte. -M is used as a previous bug
-                   caused ocamlc.byte to act solely as ocamlrun, the test being
-                   that ocamlrun -M returning the runtime's magic number would
-                   be likely distinct from the behaviour of any of the
-                   distribution's tools when called with -M. *)
-                let without_exe = Filename.remove_extension binary in
-                let (this_exit_code, _) as this =
-                  let fails =
-                    without_exe <> "ocamlmklib"
-                    && not (String.contains without_exe '.')
-                  in
-                  Environment.run_process Return ~fails env
-                                          program ~argv0:without_exe ["-M"]
+      if classification <> Vanilla then
+        let fails =
+          (* After the prefix has been renamed, bytecode executables compiled
+             with -custom will still work. Otherwise, only executables where the
+             header can search for ocamlrun and which do not require any C stubs
+             to be loaded will still work. *)
+          Environment.is_renamed env
+          && match classification with
+             | Tendered(~header:_, ~dlls) ->
+                 not launcher_searches_for_ocamlrun || dlls
+             | _ ->
+                 false
+        in
+        match Environment.run_process Return ~fails env program ["-vnum"] with
+        | (0, output) when not fails ->
+            Environment.display_output output;
+            if Sys.win32 && Filename.extension binary = ".exe" then
+              (* This additional part of the test ensures that the executable
+                 launcher on Windows can correctly hand-over to ocamlrun on
+                 Windows. The check is that a binary named ocamlc.byte.exe
+                 can be invoked as ocamlc.byte. -M is used as a previous bug
+                 caused ocamlc.byte to act solely as ocamlrun, the test being
+                 that ocamlrun -M returning the runtime's magic number would
+                 be likely distinct from the behaviour of any of the
+                 distribution's tools when called with -M. *)
+              let without_exe = Filename.remove_extension binary in
+              let (this_exit_code, _) as this =
+                let fails =
+                  without_exe <> "ocamlmklib"
+                  && not (String.contains without_exe '.')
                 in
-                if this_exit_code = 0 then
-                  if this = exec_magic then
-                    let (that_exit_code, _) as that =
-                      let fails = without_exe <> "ocamlmklib" in
-                      Environment.run_process Return ~fails env
-                                              program ~argv0:binary ["-M"]
-                    in
-                    if this = that then
-                      fail_because
-                        "Neither %s nor %s seem to load the bytecode image"
-                        without_exe binary
-                    else if that_exit_code = 0 then
-                      fail_because
-                        "%s is not expected to return with exit code 0"
-                        binary
-                    else if not (String.contains without_exe '.') then
-                      fail_because
-                        "%s is not expected to return the exec magic number!"
-                        without_exe
-                    else () (* Expected outcome was the exec magic number *)
-                  else if without_exe <> "ocamlmklib" then
+                Environment.run_process Return ~fails env
+                                        program ~argv0:without_exe ["-M"]
+              in
+              if this_exit_code = 0 then
+                if this = exec_magic then
+                  let (that_exit_code, _) as that =
+                    let fails = without_exe <> "ocamlmklib" in
+                    Environment.run_process Return ~fails env
+                                            program ~argv0:binary ["-M"]
+                  in
+                  if this = that then
                     fail_because
-                      "%s is expected to return with a non-zero exit code"
+                      "Neither %s nor %s seem to load the bytecode image"
+                      without_exe binary
+                  else if that_exit_code = 0 then
+                    fail_because
+                      "%s is not expected to return with exit code 0"
+                      binary
+                  else if not (String.contains without_exe '.') then
+                    fail_because
+                      "%s is not expected to return the exec magic number!"
                       without_exe
-                  else () (* Expected outcome is a zero exit code *)
-                else if without_exe = "ocamlmklib" then
+                  else () (* Expected outcome was the exec magic number *)
+                else if without_exe <> "ocamlmklib" then
                   fail_because
-                    "%s is expected to return with exit code 0"
+                    "%s is expected to return with a non-zero exit code"
                     without_exe
-                else () (* Expected outcome is a non-zero exit code *)
-          | _ ->
-              if not fails then
-                fail_because "it was broken"
+                else () (* Expected outcome is a zero exit code *)
+              else if without_exe = "ocamlmklib" then
+                fail_because
+                  "%s is expected to return with exit code 0"
+                  without_exe
+              else () (* Expected outcome is a non-zero exit code *)
+        | _ ->
+            if not fails then
+              fail_because "it was broken"
   in
   let binaries = Sys.readdir bindir in
   Array.sort String.compare binaries;
@@ -2064,7 +2082,6 @@ let run_program =
    compilers... *)
 type compiler = C_ocamlc | C_ocamlopt
 type runtime_mode = Shared | Static
-type launch_mode = Header_exe | Header_shebang
 type linkage =
 | Default_ocamlc of launch_mode
 | Default_ocamlopt
@@ -2351,7 +2368,6 @@ let compile_test env =
           (* Nothing to run because linking the test is known to fail *)
           `None
         else
-          let executable = classify_executable test_program_path in
           let stdlib_exists_when_renamed = false in
           (* Each test is compiled twice - in the original prefix
              (~original:true) and in the renamed prefix (~original:false).
@@ -2423,13 +2439,13 @@ let compile_test env =
                     Success {executable_name = test_program_path;
                              argv0 = test_program_path}
                   else
-                    match executable with
-                    | Shebang ->
+                    match classify_executable test_program_path with
+                    | Tendered(~header:Header_shebang, ~dlls:_) ->
                         (* Likewise, shebang executables, regardless of the
                            input argv[0], will just see test_program_path *)
                         Success {executable_name = test_program_path;
                                  argv0 = test_program_path}
-                    | Tendered ->
+                    | Tendered(~header:Header_exe, ~dlls:_) ->
                         if argv0_not_ocaml then
                           if Sys.win32 then
                             (* stdlib/headernt.c will find ocamlrun (because it
@@ -2894,7 +2910,7 @@ let test_relocation env prefix =
       let classification = classify_executable file in
       (* Determine if the installation prefix should be found in this file *)
       let prefix =
-        let embeds_stdlib_location =
+        let code_embeds_stdlib_location =
           (* The runtime binaries all contain OCAML_STDLIB_DIR and everything
              except flexlink and ocamllex link with the Config module, either
              directly or via ocamlcommon *)
@@ -2902,11 +2918,14 @@ let test_relocation env prefix =
                                   "ocamllex.byte"; "ocamllex.opt";
                                   "ocamlyacc"])
         in
-        if embeds_stdlib_location (* OCaml code contains stdlib location *)
-           || classification = Shebang (* #! line begins with prefix *)
-           || classification = Custom (* libcamlrun* contain stdlib location *)
-           || (classification = Tendered (* RNTM section contains the prefix *)
-               && not launcher_searches_for_ocamlrun) then
+        let linker_embeds_stdlib_location =
+          (* If the launcher doesn't search for ocamlrun, then either the #!
+             stub will include the absolute path or the RNTM section will *)
+          match classification with
+          | Tendered _ when not launcher_searches_for_ocamlrun -> true
+          | _ -> false
+        in
+        if code_embeds_stdlib_location || linker_embeds_stdlib_location then
           LocationSet.singleton Prefix
         else
           LocationSet.empty
