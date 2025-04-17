@@ -1694,6 +1694,13 @@ let test_ld_conf env =
      caml_ld_library_path = Unset; ocamllib = Unset; camllib = Unset;
      stdlib = []; outcome = []}
   in
+  let if_ld_conf_found outcome =
+    (* ocamlrun can't find ld.conf after the prefix has been renamed *)
+    if Environment.is_renamed env then
+      []
+    else
+      outcome
+  in
   (* Batch 1: various interesting kinds of line, tested when read through
      CAML_LD_LIBRARY_PATH and ld.conf *)
   let tests =
@@ -1738,23 +1745,19 @@ let test_ld_conf env =
       List.fold_left fold ([], [], []) (List.rev data)
     in
     let tests =
-      let description = "Base ld.conf test" in
-      (* Various test lines above all fed via ld.conf in the Standard Library.
-         ocamlrun can't find ld.conf after the prefix has been renamed *)
+      (* Various test lines above all fed via ld.conf in the Standard Library *)
       let outcome =
-        if Environment.is_renamed env then
-          []
+        (* Known issue: Windows strips out the blank entries in the search path
+           (somewhat counterintuitively!) *)
+        if Sys.win32 then
+          main_outcome
         else
-          (* Known issue: Windows strips out the blank entries in the search
-             path (somewhat counterintuitively!) *)
-          if Sys.win32 then
-            main_outcome
-          else
-            "." :: main_outcome
+          "." :: main_outcome
       in
-      [{base with description; stdlib = "" :: main; outcome}] in
+      [{base with description = "Base ld.conf test";
+                  stdlib = "" :: main;
+                  outcome = if_ld_conf_found outcome}] in
     let tests =
-      let description = "Base ld.conf + CAML_LD_LIBRARY_PATH" in
       (* As first, but with the same entries in CAML_LD_LIBRARY_PATH too *)
       let stdlib =
         if Sys.win32 then
@@ -1764,16 +1767,12 @@ let test_ld_conf env =
         else
           "" :: main
       in
-      (* Part of the outcome from ld.conf. ocamlrun can't find ld.conf after the
-         prefix has been renamed *)
+      (* Part of the outcome from ld.conf *)
       let outcome_ld_conf =
-        if Environment.is_renamed env then
-          []
+        if Sys.win32 then
+          main_outcome
         else
-          if Sys.win32 then
-            main_outcome
-          else
-            "." :: main_outcome
+          "." :: main_outcome
       in
       (* Part of the outcome from CAML_LD_LIBRARY_PATH *)
       let outcome_caml_ld_library_path =
@@ -1785,10 +1784,12 @@ let test_ld_conf env =
              entries *)
           "." :: main
       in
-      {base with description; caml_ld_library_path = Set stdlib; stdlib;
-       outcome = outcome_caml_ld_library_path @ outcome_ld_conf} :: tests in
+      {base with description = "Base ld.conf + CAML_LD_LIBRARY_PATH";
+                 caml_ld_library_path = Set stdlib;
+                 stdlib;
+                 outcome = outcome_caml_ld_library_path
+                             @ if_ld_conf_found outcome_ld_conf} :: tests in
     let tests =
-      let description = "Base ld.conf + CAML_LD_LIBRARY_PATH with quoting" in
       (* As first, but with entries in CAML_LD_LIBRARY_PATH including quotes and
          separators. No effect on Unix, as the colon separator is always
          expressly prohibited in PATH-like environment variables, but the semi-
@@ -1819,124 +1820,97 @@ let test_ld_conf env =
         else
           test, test
       in
-      let outcome =
-        (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if Environment.is_renamed env then
-          outcome_caml_ld_library_path
-        else
-          outcome_caml_ld_library_path @ main_outcome
-      in
-      {base with description; caml_ld_library_path = Set caml_ld_library_path;
-       stdlib = main; outcome} :: tests in
+      {base with description = "Base ld.conf + quoted CAML_LD_LIBRARY_PATH";
+                 caml_ld_library_path = Set caml_ld_library_path;
+                 stdlib = main;
+                 outcome = outcome_caml_ld_library_path
+                             @ if_ld_conf_found main_outcome} :: tests in
     let tests =
-      let description = "Base ld.conf with CRLF endings" in
       (* As first, but with a CR at the end of each line *)
-      let stdlib = List.map (Fun.flip (^) "\r") ("" :: main) in
       let outcome =
-        (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if Environment.is_renamed env then
-          []
+        if Sys.win32 then
+          (* Windows opens ld.conf in text mode, so the line with just \r is
+             read as an empty string and consequently stripped *)
+          main_outcome_cr
         else
-          if Sys.win32 then
-            (* Windows opens ld.conf in text mode, so the line with just \r is
-               read as an empty string and consequently stripped *)
-            main_outcome_cr
-          else
-            "\r" :: main_outcome_cr
+          "\r" :: main_outcome_cr
       in
-      {base with description; stdlib; outcome} :: tests in
+      {base with description = "Base ld.conf with CRLF endings";
+                 stdlib = List.map (Fun.flip (^) "\r") ("" :: main);
+                 outcome = if_ld_conf_found outcome} :: tests in
     tests
   in
   (* Batch 2: effects of empty (vs unset) environment variables *)
   let tests =
     let tests =
-      let description = "Empty CAML_LD_LIBRARY_PATH" in
       (* Empty CAML_LD_LIBRARY_PATH should add "." to the start of the search
          path *)
-      let outcome =
-        (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if Environment.is_renamed env then
+      let outcome_caml_ld_library_path =
+        if Sys.win32 then
           []
         else
-          ["ld.conf"]
+          ["."]
       in
-      (* Effect of CAML_LD_LIBRARY_PATH *)
-      let outcome =
-        if Sys.win32 then
-          outcome
-        else
-          "." :: outcome
-      in
-      {base with description; caml_ld_library_path = Empty;
-       stdlib = ["ld.conf"]; outcome} :: tests in
+      {base with description = "Empty CAML_LD_LIBRARY_PATH";
+                 caml_ld_library_path = Empty;
+                 stdlib = ["ld.conf"];
+                 outcome = outcome_caml_ld_library_path
+                             @ if_ld_conf_found ["ld.conf"]} :: tests in
     let tests =
-      let description = "Embedded empty entry in CAML_LD_LIBRARY_PATH" in
       (* Embedded empty entries in CAML_LD_LIBRARY_PATH should add equivalent
          "." entries to the search path *)
-      let outcome =
-        (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if Environment.is_renamed env then
+      let outcome_caml_ld_library_path =
+        if Sys.win32 then
           []
         else
-          ["ld.conf"]
+          ["."; "."]
       in
-      (* Effect of CAML_LD_LIBRARY_PATH *)
-      let outcome =
-        if Sys.win32 then
-          outcome
-        else
-          "." :: "." :: outcome
-      in
-      {base with description; caml_ld_library_path = Set [""; ""];
-       stdlib = ["ld.conf"]; outcome} :: tests in
+      {base with description = "Embedded empty entry in CAML_LD_LIBRARY_PATH";
+            caml_ld_library_path = Set [""; ""];
+            stdlib = ["ld.conf"];
+            outcome = outcome_caml_ld_library_path
+                        @ if_ld_conf_found ["ld.conf"]} :: tests in
     let tests =
-      let description = "Empty CAMLLIB" in
       (* An empty CAMLLIB should cause ld.conf in the Standard Library to be
          ignored, but not CAML_LD_LIBRARY PATH *)
-      {base with description;
-       caml_ld_library_path = Set ["env"]; camllib = Empty;
-       stdlib = ["masked-stdlib"]; outcome = ["env"]} :: tests in
+      {base with description = "Empty CAMLLIB";
+                 caml_ld_library_path = Set ["env"];
+                 camllib = Empty;
+                 stdlib = ["masked-stdlib"];
+                 outcome = ["env"]} :: tests in
     let tests =
-      let description = "Empty OCAMLLIB" in
       (* An empty OCAMLLIB should cause ld.conf in both the Standard Library and
          CAMLLIB to be ignored, but not CAML_LD_LIBRARY_PATH *)
-      {description; caml_ld_library_path = Set ["env"]; ocamllib = Empty;
-       camllib = Set ["masked-camllib"]; stdlib = ["masked-stdlib"];
+      {description = "Empty OCAMLLIB";
+       caml_ld_library_path = Set ["env"];
+       ocamllib = Empty;
+       camllib = Set ["masked-camllib"];
+       stdlib = ["masked-stdlib"];
        outcome = ["env"]} :: tests in
     tests
   in
   (* Batch 3: load priority, embedded NUL characters, EOL-at-EOF, etc. *)
   let tests =
     let tests =
-      let description = "$OCAMLLIB/ld.conf" in
       (* OCAMLLIB should have priority over CAMLLIB and the Standard Library *)
-      {description; caml_ld_library_path = Set ["env"];
+      {description = "$OCAMLLIB/ld.conf";
+       caml_ld_library_path = Set ["env"];
        ocamllib = Set ["ocamllib\000"; "hidden"];
-       camllib = Set ["camllib\000"; "hidden"]; stdlib = ["libdir"];
+       camllib = Set ["camllib\000"; "hidden"];
+       stdlib = ["libdir"];
        outcome = ["env"; "ocamllib"]} :: tests in
     let tests =
       (* CAMLLIB should have priority over the Standard Library *)
-      let description = "$CAMLLIB/ld.conf" in
-      {base with description; caml_ld_library_path = Set ["env"];
-       camllib = Set ["camllib\000"; "hidden"]; stdlib = ["libdir"];
-       outcome = ["env"; "camllib"]} :: tests in
+      {base with description = "$CAMLLIB/ld.conf";
+                 caml_ld_library_path = Set ["env"];
+                 camllib = Set ["camllib\000"; "hidden"];
+                 stdlib = ["libdir"];
+                 outcome = ["env"; "camllib"]} :: tests in
     let tests =
       (* EOL-at-EOF should not add a blank entry to the search path *)
-      let description = "EOL-at-EOF" in
-      let stdlib =
-        if Sys.win32 then
-          ["libdir\r\n"]
-        else
-          ["libdir\n"]
-      in
-      let outcome =
-        (* ocamlrun can't find ld.conf after the prefix has been renamed *)
-        if Environment.is_renamed env then
-          []
-        else
-          ["libdir"]
-      in
-      {base with description; stdlib; outcome} :: tests in
+      {base with description = "EOF-at-EOF";
+            stdlib = (if Sys.win32 then ["libdir\r\n"] else ["libdir\n"]);
+            outcome = if_ld_conf_found ["libdir"]} :: tests in
     tests
   in
   ensure_dir ocamllib_dir;
