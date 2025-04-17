@@ -1698,6 +1698,7 @@ let test_ld_conf env =
      CAML_LD_LIBRARY_PATH and ld.conf *)
   let tests =
     let main, main_outcome, main_outcome_cr =
+      let libdir = Environment.libdir env in
       let (/) = Filename.concat in
       let data = [
         (* Root directory (both forms) preserved *)
@@ -1719,6 +1720,7 @@ let test_ld_conf env =
         "stublibs", "stublibs", None;
         ".stublibs", ".stublibs", None;
         "..stublibs", "..stublibs", None;
+        libdir, libdir, None;
         "/lib/ocaml", "/lib/ocaml", Some "/lib/ocaml\r";
       ] in
       let fold (main, main_outcome, main_outcome_cr) (line, outcome, cr) =
