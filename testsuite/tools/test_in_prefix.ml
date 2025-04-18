@@ -1225,6 +1225,15 @@ let () =
       else
         ()
     else
+      let runtime =
+        mode = Bytecode
+        && expected_exit_code = None
+        && not target_launcher_searches_for_ocamlrun
+      in
+      let stubs =
+        has_c_stubs
+        && expected_exit_code = None
+      in
       let expected_exit_code =
         match expected_exit_code with
         | Some code -> code
@@ -1239,9 +1248,8 @@ let () =
       in
       let exit_code, output =
         Environment.run_process Return
-          ~runtime:(mode = Bytecode
-                    && not target_launcher_searches_for_ocamlrun)
-          ~stubs:(has_c_stubs && config.supports_shared_libraries)
+          ~runtime
+          ~stubs
           ~fails:(expected_exit_code <> 0) env
           test_program libraries
       in
@@ -1253,19 +1261,9 @@ let () =
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
   let expected_exit_code =
-    (* XXX COMBAK on this - the comment is wrong, but it won't be clear until
-           the rebase *)
-    (* Tendered OCaml bytecode executables have an increased reliance on
-       caml_executable_name, and may need to be compiled with -custom under
-       certain configurations because they won't be able to find ld.conf (or
-       they can, but ld.conf will be incorrect). This never applies when the
-       prefix has been renamed, since CAML_LD_LIBRARY_PATH has to be set for
-       other reasons, and the problem is masked. *)
-    if mode = Bytecode && no_caml_executable_name
-       && launched_via_stub test_program then
-      None
-    else
-      None in
+    (* Bytecode executables launched using the executable header require
+       caml_executable_name to know where the runtime is. *)
+    None in
   let libraries = List.filter not_dynlink libraries in
   let () =
     List.iter (test_libraries_in_prog ?expected_exit_code env) libraries;
