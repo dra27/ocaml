@@ -204,9 +204,6 @@ options are:" in
   in
   let {contents = bindir} = bindir in
   let {contents = libdir} = libdir in
-  let relocatable = false in
-  let reproducible = false in
-  let target_relocatable = false in
   if bindir = "" || libdir = "" then
     let () = Arg.usage args usage in
     exit 2
@@ -271,6 +268,10 @@ directories given for --bindir and --libdir do not have a common prefix"
     let header_size =
       let {Bytelink.buffer; executable_offset; _} = runtime_launch_info in
       String.length buffer - executable_offset in
+    let config = {config with has_relative_libdir} in
+    let relocatable = false in
+    let reproducible = false in
+    let target_relocatable = false in
     Misc.Style.(set_styles {
       warning = no_markup [Bold; FG Yellow];
       error = no_markup [Bold; FG Red];
@@ -319,9 +320,9 @@ directories given for --bindir and --libdir do not have a common prefix"
          (float_of_int header_size /. 1024.0) header_size summary;
     if !show_summary then
       exit 0;
-    bindir, libdir, prefix, bindir_suffix, libdir_suffix,
-    {config with has_relative_libdir}, !test_root, !test_root_logical,
-    (runtime_launch_info.launcher <> Bytelink.Executable), !verbose
+    bindir, libdir, prefix, bindir_suffix, libdir_suffix, config, !test_root,
+    !test_root_logical, (runtime_launch_info.launcher <> Bytelink.Executable),
+    !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
@@ -486,7 +487,7 @@ let is_shebang program =
     | Tendered(~header:Header_shebang, ~dlls:_) -> true
     | _ -> false
 
-let launched_via_stub program =
+let[@ocaml.warning "-32"] launched_via_stub program =
   match classify_executable program with
   | Tendered(~header:Header_exe, ~dlls:_) -> true
   | _ -> false
