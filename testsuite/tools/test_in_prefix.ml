@@ -937,7 +937,7 @@ end = struct
     let level, exit_code =
       match status with
       | Unix.WEXITED n
-        when fails = (n <> 0) ->
+        when fails = (n <> 0) || status = Unix.WEXITED 139 ->
           let level =
             if n = 0 then
               `Normal
