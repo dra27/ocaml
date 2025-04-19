@@ -311,7 +311,8 @@ directories given for --bindir and --libdir do not have a common prefix"
     let relocatable = false in
     let reproducible =
       relocatable
-      && (not Toolchain.assembler_embeds_build_path
+      && (not config.has_ocamlopt
+          || not Toolchain.assembler_embeds_build_path
           || Config.as_has_debug_prefix_map)
       && not Toolchain.linker_embeds_build_path
       && (not Toolchain.c_compiler_always_embeds_build_path
