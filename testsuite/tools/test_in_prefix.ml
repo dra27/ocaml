@@ -74,6 +74,44 @@ let split_to_common_prefix first second =
   in
   loop [] (split_dir [] first) (split_dir [] second)
 
+(* XXX Other things will go in here from below, too) *)
+module Toolchain = struct
+  let is_clang =
+    List.mem "clang" (String.split_on_char '-' Config.c_compiler_vendor)
+
+  let is_clang_assembler =
+    (* The clang-cl build of the MSVC port still has to MASM at present *)
+    is_clang && Config.ccomp_type <> "msvc"
+
+  (* Determine two properties of the way programs are linked w.r.t. debug
+     information: does debug information use absolute paths, and is (some) debug
+     information in .o files always transferred to the resulting executable,
+     even if it is not linked with -g. These are properties of the platform, so
+     there should be no file-specific references in these definitions. *)
+  let (~absolute_paths:c_compiler_debug_paths_can_be_absolute,
+       ~implicit_debug_info:linker_propagates_debug_information,
+       ~embeds:c_compiler_always_embeds_build_path) =
+    if Config.ccomp_type = "msvc" then
+      (* The MSVC port calls the linker directly, and debugging information is
+         not propagated. At present, building with clang-cl also uses the
+         Microsoft Linker. clang-cl, however, embeds relative paths in objects
+         (for reasons which are not entirely clear) *)
+      (~absolute_paths:(not is_clang),
+       ~implicit_debug_info:false,
+       ~embeds:true)
+    else
+      (~absolute_paths:true,
+       ~implicit_debug_info:true,
+       ~embeds:false)
+
+  let assembler_embeds_build_path =
+    not (String.starts_with ~prefix:"mingw" Config.system)
+    && not is_clang_assembler
+
+  let linker_embeds_build_path =
+    Config.system = "macosx"
+end
+
 (* Parse the command line, with the following results:
    - bindir, config, libdir and verbose come directly from the command line
    - prefix, bindir_suffix and libdir_suffix are derived from bindir and libdir.
@@ -86,7 +124,8 @@ let split_to_common_prefix first second =
      compiler is either relocatable or can produce relocatable binaries *)
 (* XXX Get these variables elsewhere, given the leaking of libdir in ld.conf *)
 let orig_bindir, orig_libdir, prefix, bindir_suffix, libdir_suffix, config,
-    test_root, test_root_logical, bytecode_shebangs_by_default, verbose =
+    test_root, test_root_logical, bytecode_shebangs_by_default, reproducible,
+    verbose =
   let show_summary = ref false in
   let verbose = ref false in
   let test_root = ref test_root in
@@ -270,7 +309,14 @@ directories given for --bindir and --libdir do not have a common prefix"
       String.length buffer - executable_offset in
     let config = {config with has_relative_libdir} in
     let relocatable = false in
-    let reproducible = false in
+    let reproducible =
+      relocatable
+      && (not Toolchain.assembler_embeds_build_path
+          || Config.as_has_debug_prefix_map)
+      && not Toolchain.linker_embeds_build_path
+      && (not Toolchain.c_compiler_always_embeds_build_path
+          || not Toolchain.c_compiler_debug_paths_can_be_absolute)
+    in
     let target_relocatable = false in
     Misc.Style.(set_styles {
       warning = no_markup [Bold; FG Yellow];
@@ -322,7 +368,7 @@ directories given for --bindir and --libdir do not have a common prefix"
       exit 0;
     bindir, libdir, prefix, bindir_suffix, libdir_suffix, config, !test_root,
     !test_root_logical, (runtime_launch_info.launcher <> Bytelink.Executable),
-    !verbose
+    reproducible, !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
@@ -2752,6 +2798,12 @@ let test_relocation env prefix =
     (Build_dir(Physical, UTF_8), build_root) ::
     (Build_dir(Physical, UTF_16), utf_16le_of_utf_8 build_root) :: tests
   in
+  let reproducible_rules file =
+    if Filename.basename file = "Makefile.config" then
+      LocationSet.of_list [Relative; Prefix]
+    else
+      LocationSet.empty
+  in
   let in_unexpected_state file file_rel rules =
     let content, content_len = read_file env file in
     let seen = contains content content_len tests 0 [] in
@@ -2791,8 +2843,11 @@ let test_relocation env prefix =
     in
     let seen, hits = List.fold_left_map gather LocationSet.empty seen in
     let expected = rules file in
+    let reproducible = reproducible_rules file in
+    let consistent = LocationSet.equal expected reproducible in
+    let reproducible = LocationSet.equal seen reproducible in
     if LocationSet.equal seen expected then
-      false, seen
+      ~incorrect:false, ~seen, ~reproducible, ~consistent
     else
       let string_of_location = function
       | Build -> "Build directory"
@@ -2813,9 +2868,11 @@ let test_relocation env prefix =
               "contain the " ^ String.concat " & " expected in
           Printf.eprintf "%s: expected to %s, but it %s\n"
                          file_rel expected msg;
-          true, seen
+          ~incorrect:true, ~seen, ~reproducible, ~consistent
   in
-  let rec scan dir rel h rules ((~failed, ~results) as acc) =
+  let rec scan dir rel h rules
+               ((~failed, ~results, ~reproducible:reproducible_so_far,
+                 ~consistent:consistent_so_far) as acc) =
     match Unix.readdir h with
     | entry ->
         let acc =
@@ -2827,10 +2884,12 @@ let test_relocation env prefix =
             | {Unix.st_kind = S_DIR; _} ->
                 scan entry entry_rel (Unix.opendir entry) rules acc
             | {Unix.st_kind = S_REG; _} ->
-                let incorrect, state =
+                let ~incorrect, ~seen, ~reproducible, ~consistent =
                   in_unexpected_state entry entry_rel rules in
                   ~failed:(failed || incorrect),
-                  ~results:((entry_rel, state)::results)
+                  ~results:((entry_rel, seen)::results),
+                  ~reproducible:(reproducible_so_far && reproducible),
+                  ~consistent:(consistent_so_far && consistent)
             | _ ->
                 acc
           else
@@ -2839,38 +2898,11 @@ let test_relocation env prefix =
     | exception End_of_file ->
         Unix.closedir h;
         acc in
-  let is_clang =
-    List.mem "clang" (String.split_on_char '-' Config.c_compiler_vendor) in
-  let is_clang_assembler =
-    (* The clang-cl build of the MSVC port still has to MASM at present *)
-    is_clang && Config.ccomp_type <> "msvc" in
-  (* Determine two properties of the way programs are linked w.r.t. debug
-     information: does debug information use absolute paths, and is (some) debug
-     information in .o files always transferred to the resulting executable,
-     even if it is not linked with -g. These are properties of the platform, so
-     there should be no file-specific references in these definitions. *)
-  let (~absolute_paths:c_compiler_debug_paths_are_absolute,
-       ~implicit_debug_info:linker_propagates_debug_information,
-       ~embeds:c_compiler_always_embeds_build_path) =
-    if Config.ccomp_type = "msvc" then
-      (* The MSVC port calls the linker directly, and debugging information is
-         not propagated. At present, building with clang-cl also uses the
-         Microsoft Linker. clang-cl, however, embeds relative paths in objects
-         (for reasons which are not entirely clear) *)
-      (~absolute_paths:(not is_clang),
-       ~implicit_debug_info:false,
-       ~embeds:true)
-    else
-      (~absolute_paths:true,
-       ~implicit_debug_info:true,
-       ~embeds:false)
+  let c_compiler_debug_paths_are_absolute =
+    Toolchain.c_compiler_debug_paths_can_be_absolute
   in
   let assembler_embeds_build_path =
-    not (String.starts_with ~prefix:"mingw" Config.system)
-    && not is_clang_assembler
-  in
-  let linker_embeds_build_path =
-    Config.system = "macosx"
+    Toolchain.assembler_embeds_build_path
   in
   let bindir_rules file =
     let basename = Filename.basename file in
@@ -2941,9 +2973,9 @@ let test_relocation env prefix =
             (* If the linker propagates debugging information, it doesn't matter
                whether -g was passed to ocamlopt, because the build path will be
                embedded via libasmrun *)
-            linker_embeds_build_path
+            Toolchain.linker_embeds_build_path
             || (c_compiler_debug_paths_are_absolute
-                && linker_propagates_debug_information)
+                && Toolchain.linker_propagates_debug_information)
         | `Bytecode_ocaml ->
             (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
                the debugging information in ocamlc.byte and ocamlopt.byte is
@@ -2952,16 +2984,17 @@ let test_relocation env prefix =
                runtime executables. *)
             linked_with_debug
             || (classification = Custom
-                && linker_propagates_debug_information
+                && Toolchain.linker_propagates_debug_information
                 && c_compiler_debug_paths_are_absolute)
         | `Other ->
             (* Only ocamlrund is linked with -g. However, since the C objects
                which make up the executables are all compiled with -g, this
                will still result in debug information in all non-OCaml
                executables. *)
-            linker_embeds_build_path
+            Toolchain.linker_embeds_build_path
             || (c_compiler_debug_paths_are_absolute
-                && (linker_propagates_debug_information || linked_with_debug))
+                && (Toolchain.linker_propagates_debug_information
+                    || linked_with_debug))
       in
       if contains_build_path then
         LocationSet.add Build prefix
@@ -3020,14 +3053,15 @@ let test_relocation env prefix =
       in
       let contains_build_path =
         if (ext = Config.ext_dll || ext = ".cmxs")
-           && (not linker_propagates_debug_information
-               || linker_embeds_build_path) then
-          linker_embeds_build_path
+           && (not Toolchain.linker_propagates_debug_information
+               || Toolchain.linker_embeds_build_path) then
+          Toolchain.linker_embeds_build_path
         else
           has_ocaml_debug_info
           || contains_c_debug_info && c_compiler_debug_paths_are_absolute
           || contains_assembled_objects && assembler_embeds_build_path
-          || ext = Config.ext_obj && c_compiler_always_embeds_build_path
+          || ext = Config.ext_obj
+             && Toolchain.c_compiler_always_embeds_build_path
       in
       let prefix =
         if embeds_stdlib_location then
@@ -3044,12 +3078,20 @@ let test_relocation env prefix =
     let dir = f env in
     scan dir rel_root (Unix.opendir dir)
   in
-  let ~failed, ~results =
-    ~failed:false, ~results:[]
+  let ~failed, ~results, ~reproducible:results_are_reproducible, ~consistent =
+    ~failed:false, ~results:[], ~reproducible:true, ~consistent:true
     |> scan Environment.bindir "$bindir" bindir_rules
     |> scan Environment.libdir "$libdir" libdir_rules
   in
   flush stderr;
+  let () =
+    if results_are_reproducible && not consistent then
+      fail_because "Internal error: bindir_rules and libdir_rules disagree \
+                    with reproducible_rules"
+    else if results_are_reproducible <> reproducible then
+      fail_because "The build is %sexpected to be reproducible"
+        (if not reproducible then "not " else "")
+  in
   let sections =
     let f acc (_, seen) = LocationSet.union acc seen in
     List.fold_left f LocationSet.empty results
