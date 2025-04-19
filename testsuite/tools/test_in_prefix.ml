@@ -919,7 +919,8 @@ end = struct
           (* Convert SIGABRT to exit code 134 *)
           Unix.WEXITED 134
       | Unix.WSIGNALED n
-        when n = Sys.sigsegv && Config.architecture = "s390x" ->
+        when n = Sys.sigsegv
+             && List.mem Config.architecture ["s390x"; "riscv"] ->
           (* cf. ocaml/ocaml#13693 - s390x executables might segfault, so this
              gets converted to Docker's exit code so it can be skipped *)
           Unix.WEXITED 139
@@ -2222,7 +2223,7 @@ let compile_test env =
       | Output_obj(C_ocamlopt, Shared) ->
           (* cf. ocaml/ocaml#13693 - on Fedora/RHEL, this executable
              segfaults *)
-          let may_segfault = (Config.architecture = "s390x") in
+          let may_segfault = List.mem Config.architecture ["s390x"; "riscv"] in
           (* Shared compilation isn't available on native Windows and fails on
              Cygwin *)
           let linker_exit_code = fails_if (Sys.win32 || Sys.cygwin) in
