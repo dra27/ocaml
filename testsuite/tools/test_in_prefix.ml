@@ -370,9 +370,10 @@ directories given for --bindir and --libdir do not have a common prefix"
          (float_of_int header_size /. 1024.0) header_size summary;
     if !show_summary then
       exit 0;
-    bindir, libdir, prefix, bindir_suffix, libdir_suffix, config, !test_root,
-    !test_root_logical, (runtime_launch_info.launcher <> Bytelink.Executable),
-    reproducible, !verbose
+    bindir, Filename.concat prefix libdir_suffix, prefix, bindir_suffix,
+    libdir_suffix, config, !test_root, !test_root_logical,
+    (runtime_launch_info.launcher <> Bytelink.Executable), reproducible,
+    !verbose
 
 (* display_path jumps through some mildly convoluted hoops to create something
    approaching diff'able output.
