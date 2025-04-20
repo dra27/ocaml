@@ -90,7 +90,8 @@ module Toolchain = struct
      there should be no file-specific references in these definitions. *)
   let (~absolute_paths:c_compiler_debug_paths_can_be_absolute,
        ~implicit_debug_info:linker_propagates_debug_information,
-       ~embeds:c_compiler_always_embeds_build_path) =
+       ~embeds:c_compiler_always_embeds_build_path,
+       ~asmrun_assembled_with_cc) =
     if Config.ccomp_type = "msvc" then
       (* The MSVC port calls the linker directly, and debugging information is
          not propagated. At present, building with clang-cl also uses the
@@ -98,11 +99,13 @@ module Toolchain = struct
          (for reasons which are not entirely clear) *)
       (~absolute_paths:(not is_clang),
        ~implicit_debug_info:false,
-       ~embeds:true)
+       ~embeds:true,
+       ~asmrun_assembled_with_cc:false)
     else
       (~absolute_paths:true,
        ~implicit_debug_info:true,
-       ~embeds:false)
+       ~embeds:false,
+       ~asmrun_assembled_with_cc:true)
 
   let assembler_embeds_build_path =
     not (String.starts_with ~prefix:"mingw" Config.system)
@@ -2976,8 +2979,9 @@ let test_relocation env prefix =
                whether -g was passed to ocamlopt, because the build path will be
                embedded via libasmrun *)
             Toolchain.linker_embeds_build_path
-            || (c_compiler_debug_paths_are_absolute
-                && Toolchain.linker_propagates_debug_information)
+            || (Toolchain.linker_propagates_debug_information
+                && (c_compiler_debug_paths_are_absolute
+                    || assembler_embeds_build_path))
         | `Bytecode_ocaml ->
             (* Only ocamlc.byte, ocamlopt.byte and ocaml are linked with -g, but
                the debugging information in ocamlc.byte and ocamlopt.byte is
@@ -3033,7 +3037,6 @@ let test_relocation env prefix =
             not (is_ocaml || String.starts_with ~prefix:"flexdll_" basename) in
           (~stdlib:false, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
         else if ext = Config.ext_lib || ext = Config.ext_dll then
-          let is_asmrun = String.starts_with ~prefix:"libasmrun" basename in
           let is_camlrun =
             let dir = Filename.basename (Filename.dirname file) in
             dir <> "stublibs"
@@ -3047,14 +3050,20 @@ let test_relocation env prefix =
               is_camlrun || Filename.remove_extension basename = "ocamlcommon"
             in
             let c_debug = not is_ocaml in
-            (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:(is_ocaml || is_asmrun))
+            (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
           else
             (~stdlib:is_camlrun, ~ocaml_debug:false, ~c_debug:true, ~s:false)
         else
           (~stdlib:false, ~ocaml_debug:false, ~c_debug:false, ~s:false)
       in
       let contains_build_path =
-        if (ext = Config.ext_dll || ext = ".cmxs")
+        if String.starts_with ~prefix:"libasmrun" basename then
+          ((c_compiler_debug_paths_are_absolute
+              && Toolchain.asmrun_assembled_with_cc)
+           || (assembler_embeds_build_path
+                 && not Toolchain.asmrun_assembled_with_cc)
+           || ext = Config.ext_dll && Toolchain.linker_embeds_build_path)
+        else if (ext = Config.ext_dll || ext = ".cmxs")
            && (not Toolchain.linker_propagates_debug_information
                || Toolchain.linker_embeds_build_path) then
           Toolchain.linker_embeds_build_path
