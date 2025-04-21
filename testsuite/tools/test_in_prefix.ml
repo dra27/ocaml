@@ -1207,9 +1207,10 @@ let load_libraries_in_toplevel env mode libraries =
     in
     let exit_code, output =
       Environment.run_process Return
+        ~fails:(expected_exit_code <> 0)
         ~runtime:(mode = Bytecode && not launcher_searches_for_ocamlrun)
         ~stubs:(mode = Bytecode && has_c_stubs)
-        ~stdlib:true ~fails:(expected_exit_code <> 0) env toplevel args
+        ~stdlib:true env toplevel args
     in
     Environment.display_output output;
     if exit_code <> expected_exit_code then
@@ -1301,9 +1302,7 @@ let () =
       in
       let exit_code, output =
         Environment.run_process Return
-          ~runtime
-          ~stubs
-          ~fails:(expected_exit_code <> 0) env
+          ~fails:(expected_exit_code <> 0) ~runtime ~stubs env
           test_program libraries
       in
       Environment.display_output output;
@@ -2366,8 +2365,8 @@ let compile_test env =
           Environment.run_process Return
             ~fails:(compilation_exit_code <> 0)
             ~runtime:(mode = Bytecode && not ocamlc_executable_after_rename)
-            ~stdlib:true
-            ~stubs:(with_unix && tendered) env compiler args
+            ~stubs:(with_unix && tendered)
+            ~stdlib:true env compiler args
         in
         Environment.display_output output;
         exit_code
