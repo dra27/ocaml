@@ -1489,7 +1489,8 @@ let () =
         "test_install_script.cmo" :: files
     in
     let runtime =
-      mode = Bytecode && not target_launcher_searches_for_ocamlrun in
+      mode = Bytecode
+      && not target_launcher_searches_for_ocamlrun in
     let run run_process test =
       let code, lines =
         run_process ~runtime test_program []
@@ -1500,7 +1501,8 @@ let () =
              differently from _wgetenv which in the tests will cause it load
              ld.conf files *)
           if Sys.win32 then
-            if (test.camllib = Empty && not (Environment.is_renamed env)
+            if ((test.camllib = Empty
+                   && not (Environment.is_renamed env))
                 || test.ocamllib = Empty) then
               let unmask s = not (String.starts_with ~prefix:"masked-" s) in
               let lines' = List.filter unmask lines in
@@ -1878,9 +1880,9 @@ let test_ld_conf env =
     let tests =
       (* As first, but with a CR at the end of each line *)
       let outcome =
+        (* Windows opens ld.conf in text mode, so the line with just \r is
+           read as an empty string and consequently stripped *)
         if Sys.win32 then
-          (* Windows opens ld.conf in text mode, so the line with just \r is
-             read as an empty string and consequently stripped *)
           main_outcome_cr
         else
           "\r" :: main_outcome_cr
@@ -2394,7 +2396,8 @@ let compile_test env =
           (* Nothing to run because linking the test is known to fail *)
           `None
         else
-          let stdlib_exists_when_renamed = false in
+          let stdlib_exists_when_renamed =
+            false in
           (* Each test is compiled twice - in the original prefix
              (~original:true) and in the renamed prefix (~original:false).
              Additionally, the tests compiled in the original prefix are
@@ -3027,7 +3030,9 @@ let test_relocation env prefix =
           let stdlib =
             List.mem basename ["config.cmt"; "config_main.cmt";
                                "ocamlcommon.cma"] in
-          (~stdlib, ~ocaml_debug:true, ~c_debug:false, ~s:false)
+          let ocaml_debug =
+            true in
+          (~stdlib, ~ocaml_debug, ~c_debug:false, ~s:false)
         else if ext = ".cmxs" then
           (~stdlib:false, ~ocaml_debug:false, ~c_debug:true, ~s:true)
         else if ext = Config.ext_obj then
@@ -3047,7 +3052,8 @@ let test_relocation env prefix =
             let is_ocaml =
               Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
             let stdlib =
-              is_camlrun || Filename.remove_extension basename = "ocamlcommon"
+              is_camlrun
+              || Filename.remove_extension basename = "ocamlcommon"
             in
             let c_debug = not is_ocaml in
             (~stdlib, ~ocaml_debug:false, ~c_debug, ~s:is_ocaml)
