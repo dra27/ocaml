@@ -1272,45 +1272,44 @@ let () =
   let test_libraries_in_prog ?expected_exit_code env libraries =
     let has_c_stubs library = (mode = Bytecode && library <> "dynlink") in
     let has_c_stubs = List.exists has_c_stubs libraries in
-    if mode = Native && List.mem "threads" libraries then
-      let threads_plugin =
-        Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
-      in
-      if Sys.file_exists threads_plugin then
-        fail_because "threads.cmxs is not expected to exist"
-      else
-        ()
-    else
-      let runtime =
-        mode = Bytecode
-        && expected_exit_code = None
-        && not target_launcher_searches_for_ocamlrun
-      in
-      let stubs =
-        has_c_stubs
-        && expected_exit_code = None
-      in
-      let expected_exit_code =
-        match expected_exit_code with
-        | Some code -> code
-        | None ->
-            if (Sys.cygwin && mode = Native && List.mem "unix" libraries)
-               || (not config.supports_shared_libraries && has_c_stubs) then
-              (* cf. ocaml/flexdll#146 - Cygwin's natdynlink can't load
-                     unix.cmxs *)
-              2
-            else
-              0
-      in
-      let exit_code, output =
-        Environment.run_process Return
-          ~fails:(expected_exit_code <> 0) ~runtime ~stubs env
-          test_program libraries
-      in
-      Environment.display_output output;
-      if exit_code <> expected_exit_code then
-        fail_because "%s is expected to return with exit code %d"
-                     test_program expected_exit_code;
+    let () =
+      if mode = Native && List.mem "threads" libraries then
+        let threads_plugin =
+          Environment.in_libdir env (Filename.concat "threads" "threads.cmxs")
+        in
+        if Sys.file_exists threads_plugin then
+          fail_because "threads.cmxs is not expected to exist"
+    in
+    let runtime =
+      mode = Bytecode
+      && expected_exit_code = None
+      && not target_launcher_searches_for_ocamlrun
+    in
+    let stubs =
+      has_c_stubs
+      && expected_exit_code = None
+    in
+    let expected_exit_code =
+      match expected_exit_code with
+      | Some code -> code
+      | None ->
+          if (Sys.cygwin && mode = Native && List.mem "unix" libraries)
+             || (not config.supports_shared_libraries && has_c_stubs) then
+            (* cf. ocaml/flexdll#146 - Cygwin's natdynlink can't load
+                   unix.cmxs *)
+            2
+          else
+            0
+    in
+    let exit_code, output =
+      Environment.run_process Return
+        ~fails:(expected_exit_code <> 0) ~runtime ~stubs env
+        test_program libraries
+    in
+    Environment.display_output output;
+    if exit_code <> expected_exit_code then
+      fail_because "%s is expected to return with exit code %d"
+                   test_program expected_exit_code;
   in
   let not_dynlink l = not (List.mem "dynlink" l) in
   let files, re_compile = compile_test_program () in
