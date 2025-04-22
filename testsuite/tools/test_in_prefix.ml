@@ -1762,7 +1762,11 @@ let test_ld_conf env =
      CAML_LD_LIBRARY_PATH and ld.conf *)
   let tests =
     let main, main_outcome, main_outcome_cr =
-      let libdir = Environment.libdir env in
+      let libdir =
+        if Environment.is_renamed env then
+          Environment.libdir env
+        else
+          Config.standard_library in
       let (/) = Filename.concat in
       let data = [
         (* Root directory (both forms) preserved *)
