@@ -330,6 +330,14 @@ if $make_native && $check_make_alldepend; then
 fi
 
 $make --warn-undefined-variables install
+dwarfdump -a stdlib/std_exit.o
+hexdump -C stdlib/std_exit.o
+rm stdlib/std_exit.cmx
+cd stdlib
+../boot/ocamlrun ../ocamlopt -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal    -c std_exit.ml -S
+hexdump -C std_exit.o
+cat std_exit.s
+cd ..
 $make -f Makefile.test -C testsuite/in_prefix test-in-prefix
 rm -rf "$instdir"
 
