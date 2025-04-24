@@ -108,8 +108,28 @@ module Toolchain = struct
        ~asmrun_assembled_with_cc:true)
 
   let assembler_embeds_build_path =
-    not (String.starts_with ~prefix:"mingw" Config.system)
-    && not is_clang_assembler
+    if is_clang_assembler && Config.system = "macos" then
+      (* Xcode 16 targetting macOS 15 or later uses DWARF v5 and embeds build
+         paths by default, cf. https://developer.apple.com/documentation/xcode-release-notes/xcode-16-release-notes *)
+      match String.split_on_char '-' Config.c_compiler_vendor,
+            String.split_on_char '-' Config.target with
+      | ["clang"; major; _], [_; "apple"; darwin]
+        when String.starts_with ~prefix:"darwin" darwin ->
+          (* Xcode 16.0 shipped with clang-16.00.0.26.3
+             macOS 15 uses Darwin 24.x *)
+          let clang_major =
+            Scanf.sscanf_opt major "%u%!" (fun x -> x >= 16)
+            |> Option.value ~default:true (* Assume up-to-date *)
+          and darwin_major =
+            Scanf.sscanf_opt darwin "darwin%u." (fun x -> x >= 24)
+            |> Option.value ~default:true (* Assume up-to-date *)
+          in
+          clang_major && darwin_major
+      | _ ->
+          false
+    else
+      not (String.starts_with ~prefix:"mingw" Config.system)
+      && not is_clang_assembler
 
   let linker_embeds_build_path =
     Config.system = "macosx"
