@@ -1,4 +1,45 @@
 Working version
+----------------
+
+(Changes that can break existing programs are marked with a "*")
+
+### Language features:
+
+### Runtime system:
+
+<<<<<<<
+=======
+* #13???: Explicit relative paths in ld.conf (".", "..", "./<path...>",
+  "../<path...>") are interpreted as being relative to the directory ld.conf
+  was loaded from, and the default ld.conf now uses relative paths, rather than
+  embedding the absolute path to the Standard Library. The brave may continue to
+  put implicit paths in ld.conf. The interpretation of CAML_LD_LIBRARY_PATH is
+  unaltered. Additionally, ld.conf is loaded from all of $OCAMLLIB/ld.conf,
+  $CAMLLIB/ld.conf and standard_library_default/ld.conf rather than just the
+  first one found.
+  (David Allsopp, review by ???)
+
+>>>>>>>
+### Code generation and optimizations:
+
+### Standard library:
+
+### Other libraries:
+
+### Tools:
+
+### Manual and documentation:
+
+### Compiler user-interface and warnings:
+
+### Internal/compiler-libs changes:
+
+### Build system:
+
+### Bug fixes:
+
+
+OCaml 5.4.0
 ---------------
 
 (Changes that can break existing programs are marked with a "*")
@@ -88,6 +129,9 @@ Working version
   (Stephen Dolan and David Allsopp, report by Thomas Leonard, review by Tim
    McGilchrist and Fabrice Buoro)
 
+- #13643: Allow values reachable from ephemeron keys to be collected by minor GC
+  (Stephen Dolan, review by François Bobot)
+
 - #13701: optimize `caml_continuation_use` based on #12735
   (Hugo Heuzard, review by KC Sivaramakrishnan)
 
@@ -110,16 +154,14 @@ Working version
   (Stephen Dolan, review by Nick Barnes and Josh Berdine, benchmarking by
    Nicolás Ojeda Bär)
 
-<<<<<<<
-=======
-- #13???: The CAML_DEBUG_FILE environment variable is now ignored if it set to
-  the empty string. CAML_LD_LIBRARY_PATH now ignores empty segments (instead of
-  interpreting them as being ".") which also means that CAML_LD_LIBRARY_PATH is
-  ignored if it is just set to the empty string. Blank lines in ld.conf are also
-  now ignored.
-  (David Allsopp, review by ???)
+- #13300, #13861: introduce `Gc.ramp_up` to explicitly mark ramp-up
+  phases of memory consumption and avoid GC overwork. Ramp-up behaviors
+  are worse with OCaml 5 than with OCaml 4 due to higher sensitivity
+  to excessive pacing computations. Indicating ramp-up explicitly eliminates
+  the main known slowdown of OCaml 5 (relative to OCaml 4) for Coq/Rocq.
+  (Gabriel Scherer, review by Damien Doligez and Guillaume Munch-Maccagnoni,
+   report by Emilio Jesús Gallego Arias and Olivier Nicole)
 
->>>>>>>
 ### Code generation and optimizations:
 
 * #13050: Use '$' instead of '.' to separate module names in symbol names.
@@ -159,6 +201,16 @@ Working version
   Xavier Leroy)
 
 ### Standard library:
+
+* #13862: Make List.sort_uniq keep the first occurrences of duplicates.
+  (Benoît Jubin, review by Nicolás Ojeda Bär, Gabriel Scherer)
+
+- #13720: Add Result.{get_ok',error_to_failure}
+ (Daniel Bünzli, review by wikku, Gabriel Scherer, Nicolás Ojeda Bär,
+  Vincent Laviron and hirrolot)
+
+- #13696: Add Result.product and Result.Syntax.
+  (Daniel Bünzli, review by Gabriel Scherer, Nicolás Ojeda Bär)
 
 - #13885: Add Dynarray.{exists2, for_all2}.
   (T. Kinsart, review by Daniel Bünzli, Gabriel Scherer, and Nicolás Ojeda Bär)
@@ -249,6 +301,16 @@ Working version
 - #13859: Fix Weak.get_copy not darkening custom blocks
   (Josh Berdine, review by Stephen Dolan)
 
+- #13932: Add List.singleton and Seq.singleton
+  (David Allsopp, tariffs applied by Nicolás Ojeda Bär and Gabriel Scherer)
+
+* #13843: Add signal definitions for SIGIO and SIGWINCH. Introduces a
+  type alias for signal int, signal_to_string to convert OCaml signal numbers
+  to their POSIX equivalent names, and signal_of_int/signal_to_int for
+  converting between OCaml and platform signal numbers. (Reported in #13825)
+  (Tim McGilchrist, review by David Allsopp, Nicolás Ojeda Bär, Daniel Bünzli
+   Jan Midtgaard and Miod Vallat)
+
 ### Other libraries:
 
 * #13376: Allow Dynlink.loadfile_private to load bytecode libraries with
@@ -282,6 +344,13 @@ Working version
   is used. Cap the timeout to $2^{32}$ milliseconds.
   (Antonin Décimo, review by Gabriel Scherer and Miod Vallat)
 
+- #13921: Set cloexec correctly on CRT file descriptors created by the Unix
+  library on Windows. The inheritance on the underlying Win32 handles was
+  correctly set, but the book-keeping for the CRT was leaking the value of
+  non-inherited handles which combined with re-use of HANDLE values within
+  processes could appear to make a CRT file descriptor "re-open".
+  (David Allsopp, review by Nicolás Ojeda Bär)
+
 ### Tools:
 
 - #12019: ocamlc: add `align_double` and `align_int64` to `ocamlc -config`
@@ -296,9 +365,10 @@ Working version
   functionality broken by #13272.
   (Nick Barnes, review by Tim McGilchrist Gabriel Scherer)
 
-- #13199, #13485: Support running native debuggers in ocamltest.
-  (Tim McGilchrist and Sebastien Hinderer, review by Sebastien Hinderer,
-   Gabriel Scherer and Antonin Décimo)
+- #13199, #13485, #13665, #13762, #13965: Support running native debuggers in
+  ocamltest.
+  (Tim McGilchrist, Sebastien Hinderer, David Allsopp, Antonin Décimo, review by
+  Sebastien Hinderer, Gabriel Scherer, Antonin Décimo, and Tim McGilchrist)
 
 - #13764, #13779: add missing "-keywords" flag to ocamldep and ocamlprof
   (Florian Angeletti, report by Prashanth Mundkur, review by Gabriel Scherer)
@@ -312,20 +382,6 @@ Working version
   tests that fail on mono-core systems.
   (Stéphane Glondu, review by Nicolás Ojeda Bär)
 
-<<<<<<<
-=======
-- #13???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
-  TMPDIR=/tmp (as it already does if TMPDIR is not set at all).
-  (David Allsopp, review by ???)
-
-### Toplevel:
-
-- #13???: Empty segments in OCAMLTOP_INCLUDE_PATH are no longer interpreted as
-  adding the current working directory to the search path. The current working
-  directory can of course still be included in the search path by adding ".".
-  (David Allsopp, review by ???)
-
->>>>>>>
 ### Manual and documentation:
 
 - #13694: Fix name for caml_hash_variant in the C interface.
@@ -333,6 +389,16 @@ Working version
 
 - #13732: Document that custom finalizers must not access the OCaml heap, etc.
   (Josh Berdine, review by Stephen Dolan and Guillaume Munch-Maccagnoni)
+
+- #12452: Add examples to Stdlib.Fun documentation.
+  (Hazem ElMasry, review by Florian Angeletti and Gabriel Scherer)
+
+- #13924: Document how to put [@deprecated] on let bindings, constructors, etc
+  in the manual
+  (Valentin Gatien-Baron, review by Florian Angeletti)
+
+- #13751: Document support for profiling with Linux perf and frame pointers.
+  (Tim McGilchrist, review by Gabriel Scherer and Miod Vallat)
 
 ### Compiler user-interface and warnings:
 
@@ -397,6 +463,10 @@ Working version
 - #13314: Comment the code of Translclass
   (Vincent Laviron and Nathanaëlle Courant, review by Olivier Nicole)
 
+- #13362: reimplement Floatarray.concat in C (`caml_floatarray_concat`),
+  matching the implementation of Array.concat.
+  (Gabriel Scherer, review by Nicolás Ojeda Bär)
+
 - #13624: Added location to exception definitions and type extensions
   (Samuel Vivien, review by Gabriel Scherer)
 
@@ -452,12 +522,27 @@ Working version
 - #13848: Add all paths components to the cmt files indexes
   (Ulysse Gérard, review by Florian Angeletti)
 
+- #13854: Make the parser set loc_ghost more correctly, for `keyword%extension`
+  syntax
+  (Valentin Gatien-Baron, review by Florian Angeletti)
+
 - #13856: Add a new indirection in types AST called `package` that stores the
   content of a `Tpackage` node
   (Samuel Vivien, review by Florian Angeletti)
 
+- #13866: Modified occurence check that prevents recursive types for it to see
+  the checked type as a graph rather than a tree
+  (Samuel Vivien, report by Didier Remy, review by Florian Angeletti
+   and Jacques Garrigue)
+
 - #13884 Correctly index modules in constructors and labels paths
   (Ulysse Gérard, review by Florian Angeletti)
+
+- #13952: check and document the correctness of `caml_domain_alone ()`.
+  (Gabriel Scherer, review by KC Sivaramakrishnan, report by Olivier Nicole)
+
+- #13971 Keep generalized structure from patterns when typing `let`
+  (Leo White, review by Samuel Vivien and Florian Angeletti)
 
 ### Build system:
 
@@ -483,6 +568,13 @@ Working version
   (David Allsopp, review by Antonin Décimo and Gabriel Scherer)
 
 ### Bug fixes:
+
+- #13977: Pass `-fPIC` when compiling C files using `ocamlopt`. This was a
+  regression in OCaml 5.3.
+  (Nicolás Ojeda Bär, review by Daniel Bünzli and Gabriel Scherer)
+
+- #13957: Allow 'effect' as attribute id.
+  (Pieter Goetschalckx, review by Nicolás Ojeda Bär and Florian Angeletti)
 
 - #13691 #13895: Make four globals underlying Gc.control atomic to avoid C data
   races against them.
@@ -531,9 +623,17 @@ Working version
   type annotations.
   (Chris Casinghino, review by Florian Angeletti and Gabriel Scherer)
 
+- #13930, #13933: Fix bugs in recursive values definitions involving
+  lazy values that have already been evaluated.
+  (Gabriel Scherer, review by Vincent Laviron, report by Vincent Laviron)
+
 - #13867: Fix bug with some recursive bindings of lazy values.
   (Guillaume Bury and Vincent Laviron, review by Stefan Muenzel
    and Gabriel Scherer)
+
+- #13931: fix bugs in nested recursive value definitions.
+  (Gabriel Scherer, review by Vincent Laviron,
+   report by Vincent Laviron)
 
 - #13875, #13878: Add dedicated constructor for mutable variable access in
   Cmm to prevent bugs linked to incorrect handling of coeffects.
@@ -549,6 +649,16 @@ Working version
 * #13874, #13882: Make evaluation order consistent for applications when using
   the non-flambda native compiler
   (Vincent Laviron, report by Jean-Marie Madiot, review by Gabriel Scherer)
+
+- #13942: Fix assertion on empty array case
+  (Olivier Nicole, review by Gabriel Scherer)
+
+- #13950: Avoid tearing in `Array.sub`
+  (Gabriel Scherer and Olivier Nicole, report by Jan Midtgaard, review by
+   Gabriel Scherer)
+
+- #13928, #13944: Fix handling of excessively nested unboxed types
+  (Vincent Laviron, review by Gabriel Scherer)
 
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
@@ -1045,6 +1155,10 @@ OCaml 5.3.0 (8 January 2025)
   by not allocating a list when the list is not necessary.
   (Richard Eisenberg, review by Jacques Garrigue)
 
+* #13972: Renamed the `-no-alias-deps` flag internal representation to
+  `no_alias_deps` instead of `transparent_modules`.
+  (Clement Blaudeau, review by Gabriel Scherer)
+
 ### Build system:
 
 - #12909: Reorganise how MKEXE_VIA_CC is built to make it correct for MSVC by
@@ -1247,6 +1361,18 @@ OCaml 5.3.0 (8 January 2025)
 - #13603, #13604: fix source printing in the presence of the escaped raw
   identifier `\#mod`.
   (Florian Angeletti, report by Chris Casinghino, review by Gabriel Scherer)
+
+* #13830: fail rather than silently create abstract module types when avoiding
+  (i.e. hiding) signature items, as in:
+  ```ocaml
+    module N = struct
+      open (struct type t = A | B end)
+      module type T = sig type u = t * int end
+    end
+  ```
+  Before, it was succeeding with `module N : sig module type T end`, now it
+  fails. Similarly for anonymous functor calls (of the form `F(struct ... end))
+  (Clement Blaudeau, review by Gabriel Scherer)
 
 OCaml 5.2.0 (13 May 2024)
 -------------------------

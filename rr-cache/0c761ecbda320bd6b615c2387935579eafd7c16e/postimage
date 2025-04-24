@@ -55,7 +55,7 @@ val standard_library_effective: string
 val standard_library_relative: bool
 (** Whether {!standard_library_effective} is computed relative to the runtime
 
-    @since 5.4 *)
+    @since 5.5 *)
 
 val standard_library: string
 (** The effective directory containing the standard libraries *)
@@ -89,7 +89,7 @@ val c_compiler_vendor: string
     - {v sunc v} - Oracle Solaris Studio.
     - {v unknown v} - unknown compiler vendor. No additional version info.
 
-    @since 5.4 *)
+    @since 5.5 *)
 
 val c_output_obj: string
 (** Name of the option of the C compiler for specifying the output
@@ -103,7 +103,9 @@ val as_has_debug_prefix_map : bool
 
 val as_is_cc : bool
 (** Whether the assembler is actually an assembler, or whether we are really
-    assembling files via the C compiler *)
+    assembling files via the C compiler
+
+    @since 5.5 *)
 
 val bytecode_cflags : string
 (** The flags ocamlc should pass to the C compiler *)
@@ -239,31 +241,19 @@ val target_os_type: string
 -  ["Win32"] (for MS-Windows, OCaml compiled with MSVC++ or MinGW-w64),
 -  ["Cygwin"] (for MS-Windows, OCaml compiled with Cygwin).
 
-    @since 5.4 *)
+    @since 5.5 *)
 
 val target_unix: bool
-<<<<<<<
 (** True if [target_os_type = "Unix"]
-    @since 5.4 *)
+    @since 5.5 *)
 
 val target_win32: bool
 (** True if [target_os_type = "Win32"]
-    @since 5.4 *)
+    @since 5.5 *)
 
 val target_cygwin: bool
 (** True if [target_os_type = "Cygwin"]
-=======
-(** True if [target_os_type = "Unix"].
-    @since 5.4 *)
-
-val target_win32: bool
-(** True if [target_os_type = "Win32"].
-    @since 5.4 *)
-
-val target_cygwin: bool
-(** True if [target_os_type = "Cygwin"].
->>>>>>>
-    @since 5.4 *)
+    @since 5.5 *)
 
 val asm: string
 (** The assembler (and flags) to use for assembling
@@ -376,17 +366,17 @@ val shebangscripts : bool
 val bytecode_runtime_id : string
 (** The RuntimeID for ocamlrun and libcamlrun_shared
 
-    @since 5.4 *)
+    @since 5.5 *)
 
 val native_runtime_id : string
 (** The RuntimeID for libasmrun_shared
 
-    @since 5.4 *)
+    @since 5.5 *)
 
 val search_method : bool option
 (** Default setting for -search-method
 
-    @since 5.4 *)
+    @since 5.5 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
