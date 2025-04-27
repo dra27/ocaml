@@ -109,7 +109,7 @@ static int exec_file(wchar_t *file, wchar_t *cmdline, STARTUPINFO *stinfo)
     SetConsoleCtrlHandler(ctrl_handler, TRUE);
 
     if (CreateProcess(truename, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
-                      stinfo, &procinfo)) {
+                      &stinfo, &procinfo)) {
       free(truename);
       CloseHandle(procinfo.hThread);
       WaitForSingleObject(procinfo.hProcess, INFINITE);
@@ -245,7 +245,7 @@ static uint32_t read_size(const char *ptr)
 static char * read_runtime_path(HANDLE fd, uint32_t *path_size)
 {
   char buffer[TRAILER_SIZE];
-  char *result;
+  char *runtime_path;
   int num_sections;
   long ofs;
 
@@ -265,11 +265,11 @@ static char * read_runtime_path(HANDLE fd, uint32_t *path_size)
   }
   if (*path_size == 0) return NULL;
   if (lseek(fd, -ofs, SEEK_END) == -1) return NULL;
-  if ((result = (char *)malloc(*path_size + 1)) == NULL) return NULL;
-  if (read(fd, result, *path_size) != *path_size) return NULL;
-  result[*path_size] = 0;
+  if ((runtime_path = (char *)malloc(*path_size + 1)) == NULL) return NULL;
+  if (read(fd, runtime_path, *path_size) != *path_size) return NULL;
+  runtime_path[*path_size] = 0;
 
-  return result;
+  return runtime_path;
 }
 
 _Noreturn void search_and_exec_runtime(char_os *rntm, uint32_t rntm_size,
