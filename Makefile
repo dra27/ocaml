@@ -1986,8 +1986,17 @@ $(asmgen_OBJECT): $(asmgen_SOURCE)
 	$(V_ASM)$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
 endif
 
-test_in_prefix_SOURCES = \
-  $(addprefix testsuite/tools/,test_in_prefix.mli test_in_prefix.ml)
+test_in_prefix_SOURCES = $(addprefix testsuite/tools/,\
+  installation.mli installation.ml \
+  toolchain.mli toolchain.ml \
+  environment.mli environment.ml \
+  testBytecodeBinaries.mli testBytecodeBinaries.ml \
+  testDynlink.mli testDynlink.ml \
+  testLinkModes.mli testLinkModes.ml \
+  testRelocation.mli testRelocation.ml \
+  testToplevel.mli testToplevel.ml \
+  test_ld_conf.mli test_ld_conf.ml \
+  test_in_prefix.mli test_in_prefix.ml)
 test_in_prefix_LIBRARIES = \
   otherlibs/unix/unix compilerlibs/ocamlcommon compilerlibs/ocamlbytecomp
 
