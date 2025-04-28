@@ -109,7 +109,7 @@ static int exec_file(wchar_t *file, wchar_t *cmdline, STARTUPINFO *stinfo)
     SetConsoleCtrlHandler(ctrl_handler, TRUE);
 
     if (CreateProcess(truename, cmdline, NULL, NULL, TRUE, 0, NULL, NULL,
-                      &stinfo, &procinfo)) {
+                      stinfo, &procinfo)) {
       free(truename);
       CloseHandle(procinfo.hThread);
       WaitForSingleObject(procinfo.hProcess, INFINITE);
