@@ -19,6 +19,7 @@ type t = {
   has_runtime_search: bool option;
   launcher_searches_for_ocamlrun: bool;
   target_launcher_searches_for_ocamlrun: bool;
+  bytecode_shebangs_by_default: bool;
   libraries: string list list
 }
 
@@ -200,7 +201,8 @@ let parse_cmdline argv =
   let config =
     ref {has_ocamlnat = false; has_ocamlopt = false; has_relative_libdir = None;
          has_runtime_search = None; launcher_searches_for_ocamlrun = false;
-         target_launcher_searches_for_ocamlrun = false; libraries = []}
+         target_launcher_searches_for_ocamlrun = false;
+         bytecode_shebangs_by_default = false; libraries = []}
   in
   let error fmt = Printf.ksprintf (fun s -> raise (Arg.Bad s)) fmt in
   let check_tree () =

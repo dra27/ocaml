@@ -590,7 +590,7 @@ let compiler_where env ?runtime mode =
 (* This test verifies both that all compilation mechanisms are working and that
    each of these programs can correctly identify the Standard Library location.
    Any failures will cause either an exception or a compilation error. *)
-let run ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
+let run ~sh (config : Installation.t) env =
   let pp_path = Environment.pp_path env in
   Format.printf "\nTesting compilation mechanisms for %a\n%!"
                 pp_path (Environment.bindir env);
@@ -607,7 +607,7 @@ let run ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
                 pp_path ocamlc_where pp_path ocamlopt_where;
   let compile_test = compile_test sh config env in
   let launch_method =
-    if bytecode_shebangs_by_default then
+    if config.bytecode_shebangs_by_default then
       Header_shebang
     else
       Header_exe

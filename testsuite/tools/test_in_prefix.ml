@@ -12,7 +12,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let run_tests ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
+let run_tests ~sh (config : Installation.t) env =
   TestDynlink.run config env Bytecode;
   if config.has_ocamlopt && Config.supports_shared_libraries then
     TestDynlink.run config env Native;
@@ -21,7 +21,7 @@ let run_tests ~sh ~bytecode_shebangs_by_default (config : Installation.t) env =
     TestToplevel.run config env Native;
   Test_ld_conf.run config env;
   TestBytecodeBinaries.run config env;
-  TestLinkModes.run ~sh ~bytecode_shebangs_by_default config env
+  TestLinkModes.run ~sh config env
 
 (*
 (* Parse the command line, with the following results:
@@ -105,11 +105,15 @@ let () =
   let header_size =
     let {Bytelink.buffer; executable_offset; _} = runtime_launch_info in
     String.length buffer - executable_offset in
+  let bytecode_shebangs_by_default =
+    runtime_launch_info.launcher <> Bytelink.Executable in
   let launcher_searches_for_ocamlrun = Sys.win32 in
   let target_launcher_searches_for_ocamlrun = Sys.win32 in
   let config =
-    {config with Installation.libraries; launcher_searches_for_ocamlrun;
-                 target_launcher_searches_for_ocamlrun}
+    {config with Installation.libraries;
+                 launcher_searches_for_ocamlrun;
+                 target_launcher_searches_for_ocamlrun;
+                 bytecode_shebangs_by_default}
   in
   let relocatable = false in
   let reproducible =
@@ -180,9 +184,7 @@ let () =
   in
   let () = TestRelocation.run ~reproducible config env in
   let run_tests =
-    let bytecode_shebangs_by_default =
-      runtime_launch_info.launcher <> Bytelink.Executable in
-    run_tests ~sh ~bytecode_shebangs_by_default config in
+    run_tests ~sh config in
   let programs = run_tests env in
   (* Now rename the prefix, appending .new to the directory name *)
   let new_prefix = prefix ^ ".new" in
