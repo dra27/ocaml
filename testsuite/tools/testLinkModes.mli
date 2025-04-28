@@ -12,5 +12,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val run : sh:string -> bytecode_shebangs_by_default:bool -> Installation.t
+val run : sh:string -> Installation.t
   -> Environment.t -> ([ `None | `Some of Environment.t -> 'a ] as 'a) list

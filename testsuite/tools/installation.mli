@@ -15,9 +15,7 @@
 (** Installation configuration. Includes functions for parsing the harness's
     command line. *)
 
-(** Compiler installation's configuration. The properties included here are
-    passed on the command line, as they indicate what the build system was
-    instructed to do. *)
+(** Compiler installation's configuration *)
 type t = {
   has_ocamlnat: bool;
     (** {v [$(INSTALL_OCAMLNAT)] v} - {v Makefile.build_config v} *)
@@ -35,6 +33,9 @@ type t = {
     (** Indicates whether the executable launcher used by ocamlc is capable of
         searching PATH to find ocamlrun. At present, only native Windows has
         this behaviour. *)
+  bytecode_shebangs_by_default: bool;
+    (** True if ocamlc uses a shebang-style header rather than an executable
+        header for tendered bytecode executables. *)
   libraries: string list list
     (** Sorted list of basenames of libraries to test.
         Derived from {v [$(OTHERLIBRARIES)] v} - {v Makefile.config v} *)
