@@ -120,7 +120,16 @@ case "$1" in
           "$FULL_BUILD_PREFIX-$PORT/tools/check-symbol-names" \
           $FULL_BUILD_PREFIX-$PORT/runtime/*.a
     fi
-    run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
+    run_testsuite=true
+    if [[ -n $APPVEYOR_PULL_REQUEST_NUMBER ]]; then
+      API_URL="https://api.github.com/repos/$APPVEYOR_REPO_NAME/issues/$APPVEYOR_PULL_REQUEST_NUMBER"
+      if curl --silent "$API_URL/labels" | grep -q "CI: Skip testsuite"; then
+        run_testsuite=false
+      fi
+    fi
+    if $run_testsuite; then
+      run "test $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" tests
+    fi
     run "install $PORT" $MAKE -C "$FULL_BUILD_PREFIX-$PORT" install
     if [[ $PORT = 'msvc64' ]] ; then
       run "$MAKE check_all_arches" \
