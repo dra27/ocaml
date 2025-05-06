@@ -25,6 +25,14 @@ Working version
 
 ### Tools:
 
+* #13638: ocamlmklib exits with code 4 if passed an unrecognised option, as it
+  does with an unrecognised file.
+  (David Allsopp, review by Antonin Décimo and Sébastien Hinderer)
+
+- #13966: Enable "generalized polymorphic #install_printer"
+  in the debugger
+  (Pierre Boutillier and Gabriel Scherer, review by Florian Angeletti)
+
 <<<<<<<
 =======
 - #13???: ocamlyacc treats TMPDIR='' (i.e. set, but to the empty string) as
@@ -41,9 +49,24 @@ Working version
 >>>>>>>
 ### Manual and documentation:
 
+* #13975: documented the `[@remove_aliases]` built-in attribute for signatures
+  (introduced by #1652 in 2018). Small refactor of the code that fetches the
+  attribute.
+  (Clement Blaudeau, review by Gabriel Scherer)
+
+- #14002: Add anchors to items and headings of the web version of the API
+  documentation for easier linking.
+  (Nicolás Ojeda Bär, report by Louis Roché, review by Gabriel Scherer and
+  Florian Angeletti)
+
 ### Compiler user-interface and warnings:
 
 ### Internal/compiler-libs changes:
+
+- #13839, #14008: Reimplement `let open`, `let module` and `let exception` in
+  terms of a single construct.
+  (Nicolás Ojeda Bär, review by Gabriel Scherer, Samuel Vivien, Ulysse Gérard
+  and Vincent Laviron)
 
 ### Build system:
 
@@ -549,11 +572,17 @@ OCaml 5.4.0
 - #13884 Correctly index modules in constructors and labels paths
   (Ulysse Gérard, review by Florian Angeletti)
 
+- #13946: refactor the #install_printer code in the debugger and toplevel
+  (Pierre Boutillier, review by Gabriel Scherer and Florian Angeletti)
+
 - #13952: check and document the correctness of `caml_domain_alone ()`.
   (Gabriel Scherer, review by KC Sivaramakrishnan, report by Olivier Nicole)
 
 - #13971 Keep generalized structure from patterns when typing `let`
   (Leo White, review by Samuel Vivien and Florian Angeletti)
+
+- #13980 Refactor `type-approx` and improve some errors' locations.
+  (Leo White, Ulysse Gérard, review by Samuel Vivien and Florian Angeletti)
 
 ### Build system:
 

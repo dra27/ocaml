@@ -85,33 +85,47 @@ static c_primitive lookup_primitive(const char * name)
 
 #define LD_CONF_NAME T("ld.conf")
 
-static char_os *expand_entry(char_os *libroot, char_os *dir)
+/* Return a copy of [path], interpreting explicit-relative paths relative to
+   [root]. [root] must end with a directory separator. The result of this
+   function can never be ".", ".." or a path beginning "./" or "../". Note that
+   the function does not necessary canonicalise the path. */
+static char_os *make_relative_path_absolute(char_os *path, char_os *root)
 {
-  if (dir[0] == '.') {
-    if (dir[1] == '\0') {
-      /* dir is exactly "." => return libroot */
-      return caml_stat_strdup_os(libroot);
-    } else if (Is_separator(dir[1])) {
-      if (dir[2] == '\0') {
-        /* dir is exactly "./" => return libroot */
-        return caml_stat_strdup_os(libroot);
+<<<<<<<
+  const char_os * stdlib;
+  stdlib = caml_secure_getenv(T("OCAMLLIB"));
+  if (stdlib == NULL || *stdlib == '\0')
+    stdlib = caml_secure_getenv(T("CAMLLIB"));
+  if (stdlib == NULL || *stdlib == '\0')
+    stdlib = OCAML_STDLIB_DIR;
+  return stdlib;
+=======
+  if (path[0] == '.') {
+    if (path[1] == '\0') {
+      /* path is exactly "." => return root */
+      return caml_stat_strdup_os(root);
+    } else if (Is_separator(path[1])) {
+      if (path[2] == '\0') {
+        /* path is exactly "./" => return root */
+        return caml_stat_strdup_os(root);
       } else {
-        /* dir begins "./" => replace the ./ with libroot (which has a trailing
-           slash) */
-        return caml_stat_strconcat_os(2, libroot, (dir + 2));
+        /* path begins "./" => replace the ./ with root (which has a trailing
+           separator) */
+        return caml_stat_strconcat_os(2, root, (path + 2));
       }
-    } else if (dir[1] == '.' && (dir[2] == '\0' || Is_separator(dir[2]))) {
-      /* dir is either exactly ".." or begins "../" => prefix it with libroot
+    } else if (path[1] == '.' && (path[2] == '\0' || Is_separator(path[2]))) {
+      /* path is either exactly ".." or begins "../" => prefix it with root
          (which has a trailing slash) */
-      return caml_stat_strconcat_os(2, libroot, dir);
+      return caml_stat_strconcat_os(2, root, path);
     } else {
-      /* dir is not relative, but simply begins with a dot => return a copy */
-      return caml_stat_strdup_os(dir);
+      /* path is not relative, but simply begins with a dot => return a copy */
+      return caml_stat_strdup_os(path);
     }
   } else {
-    /* dir is not relative => return a copy */
-    return caml_stat_strdup_os(dir);
+    /* path is not relative => return a copy */
+    return caml_stat_strdup_os(path);
   }
+>>>>>>>
 }
 
 CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
@@ -132,9 +146,10 @@ CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
   size_t length = 0;
   struct ext_table entries;
 
+  /* Use a temporary ext_table to hold the individually-allocated entries */
   caml_ext_table_init(&entries, 8);
   for (int i = 0; i < sizeof(locations) / sizeof(locations[0]); i++) {
-    if (locations[i] != NULL && *locations[i] != '\0') {
+    if (locations[i] != NULL) {
       libroot = caml_stat_strconcat_os(2, locations[i], CAML_DIR_SEP);
       size_t libroot_length = strlen_os(libroot);
       if (libroot_length > 1 && Is_separator(libroot[libroot_length - 2]))
@@ -167,11 +182,13 @@ CAMLexport char_os * caml_parse_ld_conf(const char_os * stdlib,
         char_os *r = q;
         if (*q == '\n') {
           r++;
+          /* Ignore any trailing CR characters, so that CR*LF is uniformly
+             treated as a single LF. */
           while (q > p && *(q - 1) == '\r')
             q--;
         }
         *q = '\0';
-        char_os *entry = expand_entry(libroot, p);
+        char_os *entry = make_relative_path_absolute(p, libroot);
         length += strlen_os(entry) + 1;
         caml_ext_table_add(&entries, entry);
         p = r;
