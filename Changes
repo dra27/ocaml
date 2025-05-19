@@ -1,6 +1,8 @@
 OCaml 5.0 maintenance version
 -----------------------------
 
+Testing CI workflow
+
 ### Runtime system:
 
 - #12231: Support MinGW-w64 11.0 winpthreads library, where the macro
