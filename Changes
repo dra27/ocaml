@@ -1,6 +1,8 @@
 OCaml 5.2 maintenance version
 -----------------------------
 
+Testing CI workflow
+
 - #13790: Fix bytecode-only build of Cygwin when flexlink is being bootstrapped
   with the compiler.
   (David Allsopp, review by Antonin Décimo and Miod Vallat)
