@@ -1,6 +1,8 @@
 OCaml 4.14 maintenance version
 ------------------------------
 
+Testing CI workflow
+
 ### Runtime system:
 
 ### Code generation and optimizations:
