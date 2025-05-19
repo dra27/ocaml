@@ -1,6 +1,8 @@
 OCaml 5.1.2
 -----------
 
+Testing CI workflow
+
 ### Manual and documentation:
 
 - #12840: manual: update runtime tracing chapter for custom events (ex #12335)
