@@ -198,9 +198,11 @@ let sanitize_event ev =
     (* Leave these as it. *)
     ev
   | _ ->
-  let unmapped_abspath =
+  let unmapped_abspath = path
+(* XXX Temporarily disabled
     if (Filename.is_relative path) then (Filename.concat (Sys.getcwd ()) path)
     else path
+*)
   in
   let mapped_abspath = Location.rewrite_absolute_path unmapped_abspath in
   (* If mapping did nothing, just keep the event as is. *)
