@@ -75,6 +75,12 @@ OCaml 4.12, maintenance version
   (Antonin Décimo, review by David Allsopp, Jonah Beckford, Damien Doligez and
    Samuel Hym)
 
+- #14245: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix.
+  (David Allsopp, review by Damien Doligez and Samuel Hym)
+
 ### Internal/compiler-libs changes:
 
 - #10045: Add libext variable to ocamltest and enable C# tests on on mingw
