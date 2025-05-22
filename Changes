@@ -36,6 +36,12 @@ OCaml 5.4 maintenance version
   (Antonin Décimo, review by David Allsopp, Jonah Beckford, Antonin Décimo,
   Samuel Hym and ???)
 
+- #14245: New option -launch-method for ocamlc allows the method used by a
+  tendered bytecode executable to locate the interpreter to be given explicitly.
+  In particular, it makes it easier to specify the use of the executable
+  launcher on Unix.
+  (David Allsopp, review by Samuel Hym and ???)
+
 ### Internal/compiler-libs changes:
 
 - #14243: ocamlc now uses the same code as the runtime to parse ld.conf (via a
