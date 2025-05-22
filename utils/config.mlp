@@ -117,6 +117,8 @@ and cmxs_magic_number = "Caml1999D025"
     (* cmxs_magic_number is duplicated in otherlibs/dynlink/natdynlink.ml *)
 and cmt_magic_number = "Caml1999T025"
 
+type launch_method = Executable | Shebang of string option
+
 let interface_suffix = ref ".mli"
 
 let max_tag = 245
