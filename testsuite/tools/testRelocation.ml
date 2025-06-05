@@ -191,8 +191,7 @@ let libdir_rules config file =
       (* Unknown bug in 4.x flambda - the inlining information for MSVC and
          mingw-w64 appears to be corrupt. *)
       else if (not Config.flambda || not Sys.win32)
-              && (basename = "config.cmx"
-                  || basename = "dynlink_compilerlibs.cmx") then
+              && basename = "config.cmx" then
         (* config.cmx contains Config.standard_library for inlining *)
         let stdlib =
           config.has_relative_libdir = None && not Config.flambda in
@@ -255,8 +254,7 @@ let libdir_rules config file =
              embeds the Standard Library location *)
           let stdlib =
             config.has_relative_libdir = None
-            && (Filename.remove_extension basename = "dynlink"
-                || Filename.remove_extension basename = "ocamlcommon")
+            && Filename.remove_extension basename = "ocamlcommon"
           in
           (* Prior to #9804 (OCaml 4.12.0), only the runtime objects were
              compiled with debug information *)
