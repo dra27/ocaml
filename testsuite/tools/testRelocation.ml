@@ -197,13 +197,6 @@ let libdir_rules config file =
         (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
         let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
         (stdlib, has_ocaml_debug_info, false, false)
-      else if String.starts_with ~prefix:"camlheader" basename then
-        (* When the compiler is configured with a relative libdir,
-           runtime-launch-info just contains ".", rather than the prefix *)
-        let stdlib =
-          (basename = "camlheader") && (config.has_relative_libdir = None)
-        in
-        (stdlib, false, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. With flambda
