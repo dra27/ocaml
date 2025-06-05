@@ -754,6 +754,7 @@ target_libdir_is_relative
 target_bindir
 QS
 TARGET_LIBDIR
+TARGET_BINDIR
 naked_pointers_checker
 naked_pointers
 ocaml_bindir
@@ -808,6 +809,8 @@ mklib
 RANLIBCMD
 RANLIB
 AR
+launch_method_target
+launch_method
 shebangscripts
 bootstrapping_flexdll
 flexdir
@@ -2939,7 +2942,10 @@ VERSION=4.13.2+relocatable
 
 
 
+
+
  # TODO: rename this variable
+
 
 
 
@@ -3367,12 +3373,12 @@ fi
 # Check whether --with-target-sh was given.
 if test "${with_target_sh+set}" = set; then :
   withval=$with_target_sh; if test x"$withval" = 'xno'; then :
-  target_launch_method='exe'
+  launch_method_target='exe'
 else
-  target_launch_method="$withval"
+  launch_method_target="$withval"
 fi
 else
-  target_launch_method=''
+  launch_method_target=''
 fi
 
 
@@ -12844,8 +12850,8 @@ if test "x$interpval" = "xyes"; then :
       # not use shebang scripts
       shebangscripts=true
       launch_method='sh'
-      if test x"$target_launch_method" = 'x'; then :
-  target_launch_method='exe'
+      if test x"$launch_method_target" = 'x'; then :
+  launch_method_target='exe'
 fi ;; #(
   *-*-mingw32*|*-pc-windows) :
      ;; #(
@@ -18346,8 +18352,8 @@ fi
 else
   TARGET_LIBDIR="$bindir_to_libdir"
 fi
-  if test x"$target_launch_method" = 'x'; then :
-  target_launch_method="$launch_method"
+  if test x"$launch_method_target" = 'x'; then :
+  launch_method_target="$launch_method"
 fi
   prefix="$saved_prefix"
   exec_prefix="$saved_exec_prefix"
@@ -19217,8 +19223,8 @@ fi
 
 
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
-  target_launch_method=\
-'$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  launch_method_target=\
+'$(echo "$launch_method_target" | sed -e "s/'/'\"'\"'/g")'
   HOST_BINDIR='$(echo "$HOST_BINDIR" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
 ocaml_additional_stublibs_dir=\
@@ -20344,7 +20350,7 @@ ltmain=$ac_aux_dir/ltmain.sh
  ;;
     "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$HOST_BINDIR" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
+  printf '%s\n%s\000\n' "$launch_method_target" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info ;;
     "runtime/ld.conf":C) rm -f runtime/ld.conf
   test x"$ocaml_additional_stublibs_dir" = 'x' || \
