@@ -781,6 +781,7 @@ target_libdir_is_relative
 target_bindir
 QS
 TARGET_LIBDIR
+TARGET_BINDIR
 ocaml_bindir
 ocaml_prefix
 compute_deps
@@ -832,6 +833,8 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+target_launch_method
+launch_method
 shebangscripts
 flexlink_flags
 bootstrapping_flexdll
@@ -3318,7 +3321,10 @@ OCAML_VERSION_SHORT=5.0
 
 
 
+
+
  # TODO: rename this variable
+
 
 
 
