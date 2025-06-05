@@ -26,6 +26,11 @@ val version: string
 val bindir: string
 (** The directory containing the binary programs *)
 
+val target_bindir: string
+(** The directory containing the runtime binaries on the target system
+
+    @since 5.5 *)
+
 val standard_library: string
 (** The directory containing the standard libraries *)
 
@@ -318,6 +323,11 @@ type launch_method =
                                the runtime, or via sh. The parameter if
                                specified is the full path to sh, otherwise the
                                linker searches for it. *)
+
+val launch_method : launch_method
+(** Default launch mechanism for bytecode executables
+
+    @since 5.5 *)
 
 val shebangscripts : bool
 (** Whether the target supports shebang scripts
