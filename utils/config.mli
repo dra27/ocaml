@@ -37,6 +37,11 @@ val standard_library_default: string
 
     @since 5.5 *)
 
+val target_bindir: string
+(** The directory containing the runtime binaries on the target system
+
+    @since 5.5 *)
+
 val standard_library: string
 (** The effective directory containing the standard libraries, taking CAMLLIB
     and OCAMLLIB into account. *)
@@ -278,6 +283,11 @@ type launch_method =
         shebang line, then a shell script is generated. When this is necessary,
         the parameter in [Shebang (Some sh)] is the full path to [sh]; if the
         parameter is [None], then the linker searches PATH for [sh]. *)
+
+val launch_method : launch_method
+(** Default launch mechanism for bytecode executables
+
+    @since 5.5 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
