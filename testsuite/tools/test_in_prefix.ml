@@ -116,7 +116,7 @@ let () =
     List.map add_dependencies libraries
   in
   let header_size =
-    (Unix.stat (Filename.concat libdir "runtime-launch-info")).Unix.st_size in
+    (Unix.stat (Filename.concat libdir "camlheader")).Unix.st_size in
   let bytecode_shebangs_by_default =
     Config.launch_method <> Config.Executable in
   let launcher_searches_for_ocamlrun = Sys.win32 in
