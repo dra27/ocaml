@@ -751,6 +751,7 @@ target_libdir_is_relative
 target_bindir
 QS
 TARGET_LIBDIR
+TARGET_BINDIR
 naked_pointers_checker
 naked_pointers
 ocaml_bindir
@@ -805,6 +806,8 @@ mklib
 RANLIBCMD
 RANLIB
 AR
+target_launch_method
+launch_method
 shebangscripts
 bootstrapping_flexdll
 flexdir
@@ -2933,7 +2936,10 @@ VERSION=4.13.2+relocatable
 
 
 
+
+
  # TODO: rename this variable
+
 
 
 
