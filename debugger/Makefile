@@ -34,6 +34,8 @@ ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
   # compiled with the correct flags
   LINKFLAGS += $(addprefix -ccopt$(SPACE), $(OC_MAP_CFLAGS))
 endif
+else
+LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 YACCFLAGS=
 CAMLLEX=$(CAMLRUN) $(ROOTDIR)/boot/ocamllex
