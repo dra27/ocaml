@@ -153,7 +153,7 @@ target_camlheader%: tmpheader.exe
 
 endif
 
-target_$(HEADER_NAME): target_runtime.info tmpheader.exe
+target_$(HEADER_NAME): tmpheader.exe
 	@cat $^ > $@
 
 $(HEADER_NAME): runtime.info tmpheader.exe
