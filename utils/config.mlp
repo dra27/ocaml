@@ -170,6 +170,14 @@ let systhread_supported = %%SYSTHREAD_SUPPORT%%;;
 
 let flexdll_dirs = [%%FLEXDLL_DIR%%];;
 
+let launch_method = "%%TARGET_LAUNCH_METHOD%%"
+
+let launch_method =
+  match launch_method with
+  | "exe" -> Executable
+  | "sh" -> Shebang None
+  | _ -> Shebang (Some launch_method)
+
 type configuration_value =
   | String of string
   | Int of int
