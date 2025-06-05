@@ -793,6 +793,7 @@ ar_supports_response_files
 QS
 TARGET_LIBDIR
 ocaml_libdir
+TARGET_BINDIR
 ocaml_bindir
 ocaml_prefix
 compute_deps
@@ -864,6 +865,8 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+target_launch_method
+launch_method
 shebangscripts
 winpthreads_source_include_dir
 winpthreads_source_dir
@@ -3491,7 +3494,10 @@ LINEAR_MAGIC_NUMBER=Caml1999L035
 
 
 
+
+
  # TODO: rename this variable
+
 
 
 
