@@ -752,6 +752,7 @@ target_libdir_is_relative
 target_bindir
 QS
 TARGET_LIBDIR
+TARGET_BINDIR
 ar_supports_response_files
 naked_pointers_checker
 naked_pointers
@@ -806,6 +807,8 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+target_launch_method
+launch_method
 shebangscripts
 bootstrapping_flexdll
 flexdir
@@ -2945,7 +2948,10 @@ OCAML_VERSION_SHORT=4.14
 
 
 
+
+
  # TODO: rename this variable
+
 
 
 
