@@ -23,6 +23,9 @@
 val version: string
 (** The current version number of the system *)
 
+val bindir: string
+(** The directory containing the binary programs *)
+
 val standard_library_default: string
 (** The configured value for the directory containing the standard libraries.
     May be a relative path if the compiler was configured with

@@ -42,7 +42,8 @@ $(and $(filter-out 1,$(words $1)),$(error \
 $(call PROGRAM_SYNONYM, $1)
 
 $1$(EXE): $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(call ADD_BYTECODE_RUNTIME, $$(LINKFLAGS)) $$(LINKFLAGS) \
+	          -I $$(ROOTDIR) -o $$@ $2
 
 $(call PROGRAM_SYNONYM, $1.opt)
 
