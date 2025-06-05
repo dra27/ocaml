@@ -68,31 +68,6 @@ let run_tests ~sh config env =
   TestBytecodeBinaries.run config env;
   TestLinkModes.run ~sh config env
 
-type launch_method =
-| Shebang_bin_sh of string
-| Executable
-
-type runtime_launch_info = {
-  buffer : string;
-  launcher : launch_method;
-  executable_offset : int
-}
-
-let read_runtime_launch_info file =
-  let buffer =
-    try
-      In_channel.with_open_bin file In_channel.input_all
-    with Sys_error msg -> Harness.fail_because "%s: %s" file msg
-  in
-  let length = String.length buffer in
-  if length >= 2 then
-    if String.starts_with ~prefix:"#!" buffer then
-      {buffer; launcher = Shebang_bin_sh ""; executable_offset = length}
-    else
-      {buffer; launcher = Executable; executable_offset = 0}
-  else
-    Harness.fail_because "%s: corrupt header" file
-
 let () =
   let config, pwd, prefix, _, bindir_suffix, libdir, libdir_suffix,
       summarise_only, verbose =
@@ -142,14 +117,10 @@ let () =
     in
     List.map add_dependencies libraries
   in
-  let runtime_launch_info =
-    let file = Filename.concat libdir "camlheader" in
-    read_runtime_launch_info file in
   let header_size =
-    let {buffer; executable_offset; _} = runtime_launch_info in
-    String.length buffer - executable_offset in
+    (Unix.stat (Filename.concat libdir "camlheader")).Unix.st_size in
   let bytecode_shebangs_by_default =
-    runtime_launch_info.launcher <> Executable in
+    Config.launch_method <> Config.Executable in
   let launcher_searches_for_ocamlrun = Sys.win32 in
   let target_launcher_searches_for_ocamlrun = Sys.win32 in
   let config =
