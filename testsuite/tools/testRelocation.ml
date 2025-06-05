@@ -216,18 +216,6 @@ let libdir_rules config file =
           && List.mem basename ["config.cmt"; "config_main.cmt"; "dynlink.cma";
                                 "ocamlcommon.cma"] in
         ((stdlib_from_flexdll || stdlib_from_config), true, false, false)
-      else if String.starts_with ~prefix:"camlheader" basename then
-        (* When the compiler is configured with a relative libdir,
-           runtime-launch-info just contains ".", rather than the prefix *)
-        let stdlib =
-          config.has_relative_libdir = None
-          && config.shebangscripts
-          && basename <> "camlheader_ur"
-        in
-        let has_c_debug_info =
-          (* The mingw-w64 port doesn't strip stdlib/header.o *)
-          String.starts_with ~prefix:"mingw" Config.system in
-        (stdlib, false, has_c_debug_info, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
