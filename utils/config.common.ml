@@ -41,6 +41,11 @@ let standard_library =
 let standard_library_relative = relative_root_dir <> None
 
 let bindir = Option.value ~default:bindir relative_root_dir
+let target_bindir =
+  if target_bindir = Filename.current_dir_name then
+    Filename.dirname Sys.executable_name
+  else
+    target_bindir
 
 let exec_magic_number = "Caml1999X032"
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
@@ -68,6 +73,12 @@ let default_safe_string = true
 let naked_pointers = false
 
 type launch_method = Executable | Shebang of string option
+
+let launch_method =
+  match launch_method with
+  | "exe" -> Executable
+  | "sh" -> Shebang None
+  | _ -> Shebang (Some launch_method)
 
 let interface_suffix = ref ".mli"
 
