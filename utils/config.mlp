@@ -17,6 +17,8 @@
 (* The main OCaml version string has moved to ../VERSION *)
 let version = Sys.ocaml_version
 
+let bindir = "%%OCAML_BINDIR%%"
+
 external standard_library_default : unit -> string = "%standard_library_default"
 
 let standard_library_default = standard_library_default ()
@@ -37,6 +39,8 @@ let standard_library =
     standard_library_effective
 
 let standard_library_relative = relative_root_dir <> None
+
+let bindir = Option.value ~default:bindir relative_root_dir
 
 let ccomp_type = "%%CCOMPTYPE%%"
 let c_compiler = "%%CC%%"
@@ -165,6 +169,14 @@ let default_executable_name =
 let systhread_supported = %%SYSTHREAD_SUPPORT%%;;
 
 let flexdll_dirs = [%%FLEXDLL_DIR%%];;
+
+let launch_method = "%%TARGET_LAUNCH_METHOD%%"
+
+let launch_method =
+  match launch_method with
+  | "exe" -> Executable
+  | "sh" -> Shebang None
+  | _ -> Shebang (Some launch_method)
 
 type configuration_value =
   | String of string
