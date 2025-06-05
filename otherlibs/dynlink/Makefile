@@ -233,7 +233,8 @@ dynlink_platform_intf.mli: dynlink_platform_intf.ml
 	cp $< $@
 
 extract_crc: dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
-	$(OCAMLC) -o $@ $(OC_COMMON_LINKFLAGS) $^
+	$(OCAMLC) -o $@ $(call ADD_BYTECODE_RUNTIME, $(OC_COMMON_LINKFLAGS)) \
+	                $(OC_COMMON_LINKFLAGS) $^
 
 install:
 	$(INSTALL_DATA) \
