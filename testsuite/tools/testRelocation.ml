@@ -192,15 +192,10 @@ let libdir_rules config file =
         (* The compiler's artefacts are all compiled with -g *)
         (stdlib, true, false, false)
       else if String.starts_with ~prefix:"camlheader" basename then
-        (* When the compiler is configured with a relative libdir,
-           runtime-launch-info just contains ".", rather than the prefix *)
-        let stdlib =
-          (basename = "camlheader") && (config.has_relative_libdir = None)
-        in
         let has_c_debug_info =
           (* The mingw-w64 port doesn't strip stdlib/header.o *)
           String.starts_with ~prefix:"mingw" Config.system in
-        (stdlib, false, has_c_debug_info, false)
+        (false, false, has_c_debug_info, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. *)
