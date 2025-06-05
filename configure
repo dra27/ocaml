@@ -753,6 +753,8 @@ mklib
 RANLIBCMD
 RANLIB
 AR
+target_launch_method
+launch_method
 hashbangscripts
 bootstrapping_flexdll
 flexdir
@@ -2818,6 +2820,8 @@ VERSION=4.08.2+relocatable
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
 
 
 
