@@ -879,6 +879,8 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+launch_method_target
+launch_method
 shebangscripts
 winpthreads_source_include_dir
 winpthreads_source_dir
@@ -3526,6 +3528,8 @@ LINEAR_MAGIC_NUMBER=Caml1999L036
 
 
 
+
+
  # TODO: rename this variable
 
 
@@ -4248,12 +4252,12 @@ if test ${with_target_sh+y}
 then :
   withval=$with_target_sh; if test x"$withval" = 'xno'
 then :
-  target_launch_method='exe'
+  launch_method_target='exe'
 else $as_nop
-  target_launch_method="$withval"
+  launch_method_target="$withval"
 fi
 else $as_nop
-  target_launch_method=''
+  launch_method_target=''
 fi
 
 
@@ -15162,9 +15166,9 @@ then :
       # not use shebang scripts
       shebangscripts=true
       launch_method='sh'
-      if test x"$target_launch_method" = 'x'
+      if test x"$launch_method_target" = 'x'
 then :
-  target_launch_method='exe'
+  launch_method_target='exe'
 fi ;; #(
   *-w64-mingw32*|*-pc-windows) :
      ;; #(
@@ -24126,9 +24130,9 @@ else $as_nop
   TARGET_LIBDIR="$bindir_to_libdir"
 fi
 fi
-  if test x"$target_launch_method" = 'x'
+  if test x"$launch_method_target" = 'x'
 then :
-  target_launch_method="$launch_method"
+  launch_method_target="$launch_method"
 fi
   prefix="$saved_prefix"
   exec_prefix="$saved_exec_prefix"
@@ -25086,8 +25090,8 @@ fi
 
 
   launch_method='$(echo "$launch_method" | sed -e "s/'/'\"'\"'/g")'
-  target_launch_method=\
-'$(echo "$target_launch_method" | sed -e "s/'/'\"'\"'/g")'
+  launch_method_target=\
+'$(echo "$launch_method_target" | sed -e "s/'/'\"'\"'/g")'
   HOST_BINDIR='$(echo "$HOST_BINDIR" | sed -e "s/'/'\"'\"'/g")'
   TARGET_BINDIR='$(echo "$TARGET_BINDIR" | sed -e "s/'/'\"'\"'/g")'
 ocaml_additional_stublibs_dir=\
@@ -26273,7 +26277,7 @@ ltmain=$ac_aux_dir/ltmain.sh
  ;;
     "shebang":C) printf '%s\n%s\000\n' "$launch_method" "$HOST_BINDIR" \
     > stdlib/runtime.info
-  printf '%s\n%s\000\n' "$target_launch_method" "$TARGET_BINDIR" \
+  printf '%s\n%s\000\n' "$launch_method_target" "$TARGET_BINDIR" \
     > stdlib/target_runtime.info ;;
     "runtime/ld.conf":C) rm -f runtime/ld.conf
   test x"$ocaml_additional_stublibs_dir" = 'x' || \
