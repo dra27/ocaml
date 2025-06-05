@@ -182,17 +182,23 @@ let libdir_rules config file =
       if basename = "Makefile.config" then
         (* Embeds the Standard Library location *)
         (Some false, false, false, false)
+      (* Unknown bug in 4.x flambda - the inlining information for MSVC and
+         mingw-w64 appears to be corrupt. *)
+      else if (not Config.flambda || not Sys.win32)
+              && (basename = "config.cmx"
+                  || basename = "dynlink_compilerlibs.cmx") then
+        (* config.cmx contains Config.standard_library for inlining *)
+        let stdlib =
+          config.has_relative_libdir = None && not Config.flambda in
+        (not_optionally stdlib, false, false, false)
       else if List.mem ext [".cma"; ".cmo"; ".cmt"; ".cmti"] then
+        let stdlib = (* via Config.standard_library *)
+          config.has_relative_libdir = None
+          && List.mem basename ["config.cmt"; "dynlink.cma";
+                                "ocamlcommon.cma"] in
         (* ocamldoc's artefacts are not compiled with -g until #11147 in 5.0 *)
         let has_ocaml_debug_info = (basename <> "odoc_info.cma") in
-        (None, has_ocaml_debug_info, false, false)
-      else if String.starts_with ~prefix:"camlheader" basename then
-        (* When the compiler is configured with a relative libdir,
-           runtime-launch-info just contains ".", rather than the prefix *)
-        let stdlib =
-          (basename = "camlheader") && (config.has_relative_libdir = None)
-        in
-        (not_optionally stdlib, false, false, false)
+        (not_optionally stdlib, has_ocaml_debug_info, false, false)
       else if ext = ".cmxs" then
         (* All the .cmxs files built by the distribution at present include C
            objects and obviously contain assembled objects. With flambda
@@ -229,13 +235,16 @@ let libdir_rules config file =
           (* Any archive produced by ocamlopt will have a .cmxa file with it *)
           let is_ocaml =
             Sys.file_exists (Filename.remove_extension file ^ ".cmxa") in
-          let c_debug =
-            compiled_with_debug && not is_ocaml
+          (* Config.standard_library is in ocamlcommon and the bytecode runtime
+             embeds the Standard Library location *)
+          let stdlib =
+            config.has_relative_libdir = None
+            && (Filename.remove_extension basename = "dynlink"
+                || Filename.remove_extension basename = "ocamlcommon")
           in
-          let is_ocaml =
-            compiled_with_debug && is_ocaml
-          in
-          (None, false, c_debug, is_ocaml)
+          let c_debug = compiled_with_debug && not is_ocaml in
+          (not_optionally stdlib, false, c_debug,
+           compiled_with_debug && is_ocaml)
         else
           (* DLLs are either the shared versions of the runtime libraries or
              C stubs. All of these are compiled with -g *)
