@@ -832,6 +832,8 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+target_launch_method
+launch_method
 shebangscripts
 flexlink_flags
 bootstrapping_flexdll
@@ -3262,6 +3264,8 @@ OCAML_VERSION_SHORT=5.0
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
 
 
 

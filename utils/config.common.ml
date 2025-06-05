@@ -69,6 +69,12 @@ let naked_pointers = false
 
 type launch_method = Executable | Shebang of string option
 
+let launch_method =
+  match launch_method with
+  | "exe" -> Executable
+  | "sh" -> Shebang None
+  | _ -> Shebang (Some launch_method)
+
 let interface_suffix = ref ".mli"
 
 let max_tag = 243

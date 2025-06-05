@@ -163,7 +163,12 @@ OCAMLDOC_NCLIBRARIES = $(OCAMLDOC_LIBRARIES:%=%.cmxa)
 
 $(eval $(call PROGRAM_SYNONYM,ocamldoc))
 
-ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(OCAMLDOC): LINKFLAGS += \
+  -use-prims $(ROOTDIR)/runtime/primitives \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
+  -launch-method $(LAUNCH_METHOD)
+else
 ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
   # ocamldebug is linked with -g which will result in a -custom executable when
   # shared libraries are not available. Ensure that the primitives object is

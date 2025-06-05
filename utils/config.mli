@@ -286,6 +286,11 @@ type launch_method =
                                specified is the full path to sh, otherwise the
                                linker searches for it. *)
 
+val launch_method : launch_method
+(** Default launch mechanism for bytecode executables
+
+    @since 5.5 *)
+
 (** Access to configuration values *)
 val print_config : out_channel -> unit
 

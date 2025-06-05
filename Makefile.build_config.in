@@ -43,6 +43,9 @@ COMPUTE_DEPS=@compute_deps@
 # The C compiler vendor
 OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
+LAUNCH_METHOD = @launch_method@
+TARGET_LAUNCH_METHOD = @target_launch_method@
+
 # Which tool to use to display differences between files
 DIFF=@DIFF@
 # Which flags to pass to the diff tool
