@@ -42,7 +42,8 @@ $(and $(filter-out 1,$(words $1)),$(error \
 $(call PROGRAM_SYNONYM, $1)
 
 $1$(EXE): $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $$(LINKFLAGS)) \
+	          $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
 
 $(call PROGRAM_SYNONYM, $1.opt)
 
@@ -328,6 +329,14 @@ checkstack$(EXE): checkstack.$(O)
 
 caml_tex := caml-tex$(EXE)
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(caml_tex): LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+
+# caml-tex uses str.cma and unix.cma and so must be compiled with
+# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
+# compiler does not necessarily have the correct shared library
+# configuration.
 $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
                          -I $(ROOTDIR)/runtime
 $(caml_tex): $(caml_tex_files)
