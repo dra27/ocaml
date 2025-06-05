@@ -141,7 +141,8 @@ extract_crc.cmo: extract_crc.ml dynlink.cmi
 	$(OCAMLC) -c $(COMPFLAGS) extract_crc.ml
 
 extract_crc: $(COMPILEROBJS) dynlink.cma extract_crc.cmo
-	$(OCAMLC) -o $@ $(OC_COMMON_LINKFLAGS) $^
+	$(OCAMLC) -o $@ $(call ADD_BYTECODE_RUNTIME, $(OC_COMMON_LINKFLAGS)) \
+	                $(OC_COMMON_LINKFLAGS) $^
 
 install:
 	$(INSTALL_DATA) \
