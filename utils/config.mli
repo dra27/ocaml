@@ -23,6 +23,9 @@
 val version: string
 (** The current version number of the system *)
 
+val bindir: string
+(** The directory containing the binary programs *)
+
 val standard_library_default: string
 (** The configured value for the directory containing the standard libraries.
     May be a relative path if the compiler was configured with
@@ -280,6 +283,11 @@ type launch_method =
                                the runtime, or via sh. The parameter if
                                specified is the full path to sh, otherwise the
                                linker searches for it. *)
+
+val launch_method : launch_method
+(** Default launch mechanism for bytecode executables
+
+    @since 5.5 *)
 
 (** Access to configuration values *)
 val print_config : out_channel -> unit
