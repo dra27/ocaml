@@ -48,7 +48,8 @@ define byte_and_opt_
 $(and $(filter-out 1,$(words $1)),$(error \
    cannot build file with whitespace in name))
 $1: $3 $2
-	$$(CAMLC) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
+	$$(CAMLC) $$(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $$(LINKFLAGS)) \
+	          $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ $2
 
 $1.opt: $3 $$(call byte2native,$2)
 	$$(CAMLOPT_CMD) $$(LINKFLAGS) -I $$(ROOTDIR) -o $$@ \
@@ -351,6 +352,9 @@ checkstack$(EXE): checkstack.$(O)
 
 caml-tex: INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB)) \
                       -I $(ROOTDIR)/runtime
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+caml-tex: LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
 caml-tex: $(CAMLTEX)
 	$(ROOTDIR)/runtime/ocamlrun $(ROOTDIR)/ocamlc -nostdlib \
 	                            -I $(ROOTDIR)/stdlib $(LINKFLAGS) -linkall \
