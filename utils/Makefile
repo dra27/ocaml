@@ -91,6 +91,7 @@ config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AR_SUPPORTS_RESPONSE_FILES) \
+	    $(call SUBST_STRING,TARGET_LAUNCH_METHOD) \
 	    $< > $@
 
 # Test for the substitution functions above
