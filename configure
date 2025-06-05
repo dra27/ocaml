@@ -876,6 +876,8 @@ natdynlink
 supports_shared_libraries
 mklib
 AR
+target_launch_method
+launch_method
 shebangscripts
 winpthreads_source_include_dir
 winpthreads_source_dir
@@ -3436,6 +3438,8 @@ LINEAR_MAGIC_NUMBER=Caml1999L037
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
 
 
 
