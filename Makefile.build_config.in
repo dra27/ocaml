@@ -52,6 +52,7 @@ BUILD_MAP_CFLAGS = $(foreach flag, $(BUILD_MAP_FLAGS), \
     $(call $(QUOTE_SINGLE),$(flag)$(BUILD_PATH_PHYSICAL)=+build)))
 
 LAUNCH_METHOD = @launch_method@
+TARGET_LAUNCH_METHOD = @target_launch_method@
 
 # Which tool to use to display differences between files
 DIFF=@DIFF@
@@ -82,6 +83,7 @@ DOCDIR=@docdir@
 TARGET_LIBDIR=@TARGET_LIBDIR@
 TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
+TARGET_BINDIR = @TARGET_BINDIR@
 
 # Expanded form of MKEXE_EXP and MKDLL_EXP _with host flexlink command_
 MKEXE_EXP=@mkexe_exp@
