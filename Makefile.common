@@ -167,6 +167,33 @@ $(1): $(1)$(EXE)
 endif
 endef # PROGRAM_SYNONYM
 
+# $(ROOTDIR)/ocamlc needs -launch-method to be given explicitly as its default
+# values are those for the target (cf. --with-target-sh and TARGET_BINDIR).
+BYTECODE_LAUNCHER_FLAGS = \
+  -launch-method $(call QUOTE_SINGLE,$(LAUNCH_METHOD) $(BINDIR))
+
+# $(BOOTSTRAPPED) will be non-empty after the compiler has been bootstrapped, as
+# the -launch-method string will appear in it.
+BOOTSTRAPPED := \
+  $(shell grep -Fq 'launch-method' $(ROOTDIR)/boot/ocamlc && echo Bootstrapped)
+
+# Prior to bootstrapping, boot/ocamlc gets the correct host values from
+# boot/runtime-launch-info and doesn't yet recognise -launch-method. After
+# bootstrapping, both compilers must be passed -launch-method.
+ifeq "$(BOOTSTRAPPED)" ""
+ROOT_LINK_FLAGS := $(BYTECODE_LAUNCHER_FLAGS)
+BYTECODE_LAUNCHER_FLAGS :=
+endif
+
+MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS = \
+  $(if $(filter -custom, $(1)),,\
+    -use-prims $(ROOTDIR)/runtime/primitives $(BYTECODE_LAUNCHER_FLAGS))
+
+LINK_BYTECODE_PROGRAM =\
+  $(CAMLC) $(OC_COMMON_LINKFLAGS) \
+    $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, \
+      $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)) $(OC_BYTECODE_LINKFLAGS)
+
 # ocamlc has several mechanisms for linking a bytecode image to the runtime
 # which executes it. The exact mechanism depends on the platform and the precise
 # location of the runtime. The boot compiler (boot/ocamlc) therefore needs this
