@@ -645,8 +645,10 @@ flexlink.byte$(EXE): $(FLEXDLL_SOURCES)
 	rm -f $(FLEXDLL_SOURCE_DIR)/flexlink.exe
 	$(MAKE) -C $(FLEXDLL_SOURCE_DIR) $(FLEXLINK_BUILD_ENV) \
 	  OCAMLRUN='$$(ROOTDIR)/boot/ocamlrun$(EXE)' NATDYNLINK=false \
-	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) $(USE_RUNTIME_PRIMS) \
-	                                                    $(USE_STDLIB)) \
+	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  flexlink.exe support
 	cp $(FLEXDLL_SOURCE_DIR)/flexlink.exe $@
 	cp $(addprefix $(FLEXDLL_SOURCE_DIR)/, $(FLEXDLL_OBJECTS)) $(ROOTDIR)
@@ -1865,6 +1867,15 @@ OCAMLDOC_LIBCMTS=$(OCAMLDOC_LIBMLIS:.mli=.cmt) $(OCAMLDOC_LIBMLIS:.mli=.cmti)
 ocamldoc/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 ocamldoc/%: CAMLOPT = $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamldoc needs a custom runtime when building statically owing to the C stubs
+# in unix.cma and str.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
+else
+ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+
 .PHONY: ocamldoc
 ocamldoc: ocamldoc/ocamldoc$(EXE) ocamldoc/odoc_test.cmo
 
@@ -2233,6 +2244,15 @@ debugger/ocamldebug.cmo: $(ocamldebug_DEBUGGER_OBJECTS)
 
 debugger/ocamldebug_entry.cmo: debugger/ocamldebug.cmo
 
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamldebug needs a custom runtime when building statically owing to the
+# C stubs in unix.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
+else
+debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
+
 clean::
 	rm -f debugger/ocamldebug debugger/ocamldebug.exe
 	rm -f debugger/debugger_lexer.ml
@@ -2500,6 +2520,15 @@ $(ocamltex): OC_COMMON_LINKFLAGS += -linkall
 $(ocamltex): VPATH += $(addprefix otherlibs/,str unix)
 
 tools/ocamltex.cmo: OC_COMMON_COMPFLAGS += -no-alias-deps
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
+# ocamltex needs a custom runtime when building statically owing to the C stubs
+# in unix.cma and str.cma. This is specified explicitly to suppress the default
+# linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
+tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
+else
+tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
 
 # we need str and unix which depend on the bytecode version of other tools
 # thus we use the othertools target
