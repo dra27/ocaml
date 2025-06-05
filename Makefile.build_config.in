@@ -43,6 +43,9 @@ COMPUTE_DEPS=@compute_deps@
 # The C compiler vendor
 OCAML_CC_VENDOR = @ocaml_cc_vendor@
 
+LAUNCH_METHOD = @launch_method@
+TARGET_LAUNCH_METHOD = @target_launch_method@
+
 # Which tool to use to display differences between files
 DIFF=@DIFF@
 # Which flags to pass to the diff tool
@@ -72,6 +75,7 @@ DOCDIR=@docdir@
 TARGET_LIBDIR=@TARGET_LIBDIR@
 TARGET_LIBDIR_IS_RELATIVE=@target_libdir_is_relative@
 OCAML_BINDIR = @ocaml_bindir@
+TARGET_BINDIR = @TARGET_BINDIR@
 OC_MAP_CFLAGS = @map_cflags@
 
 # Expanded form of MKEXE_EXP and MKDLL_EXP _with host flexlink command_
