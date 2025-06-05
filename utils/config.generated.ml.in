@@ -19,6 +19,7 @@
    than compiled on its own *)
 
 let bindir = {@QS@|@ocaml_bindir@|@QS@}
+let target_bindir = {@QS@|@TARGET_BINDIR@|@QS@}
 
 let standard_library_default = {@QS@|@ocaml_libdir@|@QS@}
 
@@ -102,3 +103,5 @@ let ar_supports_response_files = @ar_supports_response_files@
 let tsan = @tsan@
 
 let shebangscripts = @shebangscripts@
+
+let launch_method = {@QS@|@target_launch_method@|@QS@}
