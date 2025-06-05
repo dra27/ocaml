@@ -63,6 +63,8 @@ COMPFLAGS=-strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66 \
 	  -warn-error A \
           -bin-annot -safe-string -strict-formats $(INCLUDES)
 LINKFLAGS=$(OC_COMMON_LINKFLAGS)
+BYTECODE_LINKFLAGS = \
+  $(call MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS, $(LINKFLAGS)) $(LINKFLAGS)
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
 OCAML_NATDYNLINKOPTS=
@@ -365,7 +367,9 @@ else
 	$(MAKE) -C $(FLEXDLL_SOURCES) $(FLEXLINK_BUILD_ENV) \
 	  CAMLRUN='$$(ROOTDIR)/boot/ocamlruns$(EXE)' NATDYNLINK=false \
 	  OCAMLOPT=$(call QUOTE_SINGLE,$(value BOOT_OCAMLC) \
-	                               $(USE_RUNTIME_PRIMS) $(USE_STDLIB)) \
+	                                 $(USE_RUNTIME_PRIMS) \
+	                                 $(BYTECODE_LAUNCHER_FLAGS) \
+	                                 $(USE_STDLIB)) \
 	  flexlink.exe support
 	mv $(FLEXDLL_SOURCES)/flexlink.exe boot/flexlink.byte$(EXE)
 	cp $(addprefix $(FLEXDLL_SOURCES)/, $(FLEXDLL_OBJECTS)) boot/
@@ -802,7 +806,7 @@ partialclean::
 	rm -f compilerlibs/ocamlbytecomp.cma
 
 ocamlc: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma $(BYTESTART)
-	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+	$(CAMLC) $(BYTECODE_LINKFLAGS) -compat-32 -o $@ $^
 
 partialclean::
 	rm -rf ocamlc
@@ -817,7 +821,7 @@ partialclean::
 
 ocamlopt: compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
           $(OPTSTART)
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(BYTECODE_LINKFLAGS) -o $@ $^
 
 partialclean::
 	rm -f ocamlopt
@@ -836,7 +840,7 @@ ocaml_dependencies := \
 
 .INTERMEDIATE: ocaml.tmp
 ocaml.tmp: $(ocaml_dependencies)
-	$(CAMLC) $(LINKFLAGS) -linkall -o $@ $^
+	$(CAMLC) $(BYTECODE_LINKFLAGS) -linkall -o $@ $^
 
 ocaml: expunge ocaml.tmp
 	- $(CAMLRUN) $^ $@ $(PERVASIVES)
@@ -972,7 +976,7 @@ tools/cvt_emit: tools/cvt_emit.mll
 
 expunge: compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
          toplevel/expunge.cmo
-	$(CAMLC) $(LINKFLAGS) -o $@ $^
+	$(CAMLC) $(BYTECODE_LINKFLAGS) -o $@ $^
 
 partialclean::
 	rm -f expunge
