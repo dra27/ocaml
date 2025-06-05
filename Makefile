@@ -1755,9 +1755,9 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # ocamldoc needs a custom runtime when building statically owing to the C stubs
 # in unix.cma and str.cma. This is specified explicitly to suppress the default
 # linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
-ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += -custom
+ocamldoc/ocamldoc$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 else
-ocamldoc/ocamldoc$(EXE): ocamldoc_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+ocamldoc/ocamldoc$(EXE): OC_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 
 .PHONY: ocamldoc
@@ -1911,7 +1911,7 @@ test_in_prefix_LIBRARIES = \
 # test_in_prefix% would only match test_in_prefix.opt, hence the missing 'x'!
 testsuite/tools/test_in_prefi%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
 
-test_in_prefix_BYTECODE_LINKFLAGS = -custom
+testsuite/tools/test_in_prefix$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 
 ifeq "$(TARGET_LIBDIR_IS_RELATIVE)" "true"
 # testsuite/tools/test_in_prefix cannot use a relative stdlib because it is run
@@ -2119,9 +2119,9 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # ocamldebug needs a custom runtime when building statically owing to the
 # C stubs in unix.cma. This is specified explicitly to suppress the default
 # linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
-debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += -custom
+debugger/ocamldebug$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 else
-debugger/ocamldebug$(EXE): ocamldebug_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+debugger/ocamldebug$(EXE): OC_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 
 clean::
@@ -2380,9 +2380,9 @@ ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "false"
 # ocamltex needs a custom runtime when building statically owing to the C stubs
 # in unix.cma and str.cma. This is specified explicitly to suppress the default
 # linking flags (see $(MAYBE_ADD_BYTECODE_LAUNCHER_FLAGS) in Makefile.common)
-tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += -custom
+tools/ocamltex$(EXE): OC_BYTECODE_LINKFLAGS += -custom
 else
-tools/ocamltex$(EXE): ocamltex_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
+tools/ocamltex$(EXE): OC_BYTECODE_LINKFLAGS += $(ROOT_LINK_FLAGS)
 endif
 
 # we need str and unix which depend on the bytecode version of other tools
