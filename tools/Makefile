@@ -61,7 +61,8 @@ $(foreach program, $(programs_byte) $(programs_opt),\
   $(eval $(call PROGRAM_SYNONYM,$(program))))
 
 $(programs_byte:%=%$(EXE)):
-	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+	$(CAMLC) $(call ADD_BYTECODE_RUNTIME, $(LINKFLAGS)) $(LINKFLAGS) \
+	         -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
 
 $(programs_opt:%=%$(EXE)):
 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
@@ -311,6 +312,10 @@ checkstack$(EXE): checkstack.$(O)
 #Scan latex files, and run ocaml code examples
 
 caml_tex := caml-tex$(EXE)
+
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+$(caml_tex): LINKFLAGS += $(ROOT_LINK_FLAGS)
+endif
 
 # caml-tex uses str.cma and unix.cma and so must be compiled with
 # $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot

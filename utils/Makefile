@@ -63,6 +63,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST_STRING,FLEXDLL_CHAIN) \
 	    $(call SUBST,HOST) \
 	    $(call SUBST_STRING,OCAML_BINDIR) \
+	    $(call SUBST_STRING,TARGET_BINDIR) \
 	    $(call SUBST_STRING,LIBDIR) \
 	    $(call SUBST_STRING,MKDLL_EXP) \
 	    $(call SUBST_STRING,MKEXE_EXP) \
@@ -91,6 +92,7 @@ config_main.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile config.common.ml
 	    $(call SUBST,FUNCTION_SECTIONS) \
 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
+	    $(call SUBST_STRING,TARGET_LAUNCH_METHOD) \
 	    $< > $@
 	cat config.common.ml >> $@
 
