@@ -171,6 +171,12 @@ let flexdll_dirs = [%%FLEXDLL_DIR%%];;
 
 let launch_method = "%%TARGET_LAUNCH_METHOD%%"
 
+let launch_method =
+  match launch_method with
+  | "exe" -> Executable
+  | "sh" -> Shebang None
+  | _ -> Shebang (Some launch_method)
+
 let ar_supports_response_files = %%AR_SUPPORTS_RESPONSE_FILES%%;;
 
 type configuration_value =
