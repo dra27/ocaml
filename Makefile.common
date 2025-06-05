@@ -259,8 +259,43 @@ MERGEMANIFESTEXE = $(call if_file_exists, $(1).manifest, \
 
 .SECONDEXPANSION:
 
+# The correct runtime for bytecode executables is 'ocamlrun' on Windows and
+# '$(BINDIR)/ocamlrun' on Unix.
+# Pre-bootstrap, boot/ocamlc still reads boot/runtime-launch-info and so works.
+# However, $(ROOTDIR)/ocamlc expects -use-runtime '$(BINDIR)/', which
+# boot/ocamlc doesn't yet understand.
+# The workaround, for Unix, is to add -use-runtime '$(BINDIR)/ocamlrun' which
+# both compilers correctly understand.
+# $(BOOTSTRAPPED) will be non-empty after the compiler has been bootstrapped,
+# and is used to ensure that after bootstrapping the compiler is actually being
+# invoked as we want it to be (i.e. all the workarounds automatically become
+# dead code following the bootstrap).
+BOOTSTRAPPED := \
+  $(shell grep -Fq 'launch-method' $(ROOTDIR)/boot/ocamlc && echo Bootstrapped)
+
+ifeq "$(UNIX_OR_WIN32)$(BOOTSTRAPPED)" "win32"
+
+# Historically, the native Windows ports are assumed to be finding ocamlrun
+# using a PATH search.
+BYTECODE_RUNTIME_FLAGS =
+
+else
+
+RUNTIME_NAME = $(if $(BOOTSTRAPPED),,ocamlrun)
+BYTECODE_RUNTIME_FLAGS = \
+  -use-runtime $(call QUOTE_SINGLE,$(BINDIR)$(DIR_SEP)$(RUNTIME_NAME)) \
+  $(if $(BOOTSTRAPPED),-launch-method $(LAUNCH_METHOD))
+
+endif
+
+ADD_BYTECODE_RUNTIME = \
+  $(if $(filter -custom, $(1)),,\
+    -use-prims $(ROOTDIR)/runtime/primitives $(BYTECODE_RUNTIME_FLAGS))
+
 LINK_BYTECODE_PROGRAM =\
-  $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
+  $(CAMLC) $(OC_COMMON_LINKFLAGS) \
+    $(call ADD_BYTECODE_RUNTIME, \
+      $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)) $(OC_BYTECODE_LINKFLAGS)
 
 define OCAML_BYTECODE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))

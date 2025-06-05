@@ -1905,11 +1905,11 @@ third-party libraries such as Lwt, but with a different API."
     let _use_runtime s = use_runtime := s
     let _launch_method = function
     | "exe" ->
-        launch_method := Some Config.Executable
+        launch_method := Config.Executable
     | "sh" ->
-        launch_method := Some (Config.Shebang None)
+        launch_method := Config.Shebang None
     | s when s <> "" && s.[0] = '/' ->
-        launch_method := Some (Config.Shebang (Some s))
+        launch_method := Config.Shebang (Some s)
     | _ ->
         Compenv.fatal
           "-launch-method: expect sh, exe or an absolute path for <method>"
